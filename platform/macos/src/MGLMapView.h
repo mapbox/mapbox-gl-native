@@ -23,10 +23,13 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
     
     /** Each drawing operation is replaced by a translucent fill. Overlapping
         drawing operations appear more prominent to help diagnose overdrawing.
+        @note This option does nothing in Release builds of the SDK.
      */
     MGLMapDebugOverdrawVisualizationMask = 1 << 5,
     
-    /** The stencil buffer is shown instead of the color buffer. */
+    /** The stencil buffer is shown instead of the color buffer.
+        @note This option does nothing in Release builds of the SDK.
+     */
     MGLMapDebugStencilBufferMask = 1 << 6,
 };
 
