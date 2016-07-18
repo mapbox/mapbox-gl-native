@@ -121,30 +121,31 @@ matrix:
       script:
         - make tidy
 
-    # # Qt 4 - Release
-    # - os: linux
-    #   sudo: required
-    #   dist: trusty
-    #   language: cpp
-    #   compiler: "qt4-gcc5-release"
-    #   env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
-    #   addons: *qt4
-    #   script:
-    #     - make qt-app
-    #     - LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so make test-qt-Memory.*:*.Load
+    # Qt 4 - Release
+    - os: linux
+      sudo: required
+      dist: trusty
+      language: cpp
+      compiler: "qt4-gcc5-release"
+      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5 WITH_QT_4=1
+      addons: *qt4
+      script:
+        - make qt-app
+        - LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so make run-qt-test-Memory.*:*.Load
 
-    # # Qt 5 - Release
-    # - os: linux
-    #   sudo: required
-    #   dist: trusty
-    #   language: cpp
-    #   compiler: "qt5-gcc5-release"
-    #   env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
-    #   addons: *qt5
-    #   script:
-    #     - make qt-app
-    #     - make qt-qml-app
-    #     - make test-valgrind-qt--*.Load
+    # Qt 5 - Release
+    - os: linux
+      sudo: required
+      dist: trusty
+      language: cpp
+      compiler: "qt5-gcc5-release"
+      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
+      addons: *qt5
+      script:
+        - make qt-app
+        - make qt-qml-app
+        - make qt-test
+        - scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load
 
 cache:
   directories:
