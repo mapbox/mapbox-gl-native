@@ -1,16 +1,13 @@
 #pragma once
 
 #include <mbgl/style/source.hpp>
+#include <mapbox/geojson.hpp>
 
 namespace mapbox {
 
 namespace geojsonvt {
 class GeoJSONVT;
 } // namespace geojsonvt
-
-namespace geojson {
-class geojson;
-} // namespace geojson
 
 } // namespace mapbox
 

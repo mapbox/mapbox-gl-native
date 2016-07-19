@@ -315,12 +315,14 @@
         'cflags_cc': [
           '<@(variant_cflags)',
           '<@(geometry_cflags)',
+          '<@(geojson_cflags)',
           '<@(unique_resource_cflags)',
         ],
         'xcode_settings': {
           'OTHER_CPLUSPLUSFLAGS': [
             '<@(variant_cflags)',
             '<@(geometry_cflags)',
+            '<@(geojson_cflags)',
             '<@(unique_resource_cflags)',
           ],
         },
