@@ -363,6 +363,16 @@ check-linux: clang-tools-linux
 check-macos: clang-tools-macos
 	scripts/clang-tools.sh $(MACOS_OUTPUT_PATH)/$(BUILDTYPE) --diff
 
+fuzz-%: platform/macos/platform.gyp $(MACOS_OUTPUT_PATH)/config.gypi
+	.mason/mason install afl 2.19b
+	.mason/mason install clang 3.8.0
+	CXX=afl-clang-fast++ CC=afl-clang-fast $(GYP) -f ninja -I $(MACOS_OUTPUT_PATH)/config.gypi \
+	  --generator-output=$(MACOS_OUTPUT_PATH)/fuzz $<
+	PATH="`.mason/mason prefix afl 2.19b`/bin:`.mason/mason prefix clang 3.8.0`/bin:${PATH}" \
+		AFL_PATH=`.mason/mason prefix afl 2.19b`/lib/afl deps/ninja/ninja-macos -C $(MACOS_OUTPUT_PATH)/fuzz/$(BUILDTYPE) fuzz
+	scripts/fuzz.sh $(MACOS_OUTPUT_PATH)/fuzz/$(BUILDTYPE) $*
+
+
 #### Miscellaneous targets #####################################################
 
 style-code:

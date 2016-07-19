@@ -20,6 +20,7 @@ xcuserdata
 /test/fixtures/**/actual.png
 /test/fixtures/**/diff.png
 /test/output
+/test/fuzz-result
 /node_modules
 /platform/ios/benchmark/assets/glyphs/DIN*
 /platform/ios/benchmark/assets/tiles/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6

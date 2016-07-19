@@ -27,6 +27,42 @@
         '../../test/src/main.cpp',
       ],
     },
+      {
+      'target_name': 'fuzz',
+      'type': 'executable',
+
+      'dependencies': [
+        'platform-lib',
+      ],
+
+      'include_dirs': [
+        '../../include',
+        '../../src',
+      ],
+
+      'sources': [
+        '../../test/src/fuzz.cpp',
+      ],
+
+      'variables': {
+        'cflags_cc': [
+          '<@(rapidjson_cflags)',
+          '<@(variant_cflags)',
+          '<@(geometry_cflags)',
+          '<@(protozero_cflags)',
+        ],
+      },
+
+      'conditions': [
+        ['OS == "mac"', {
+          'xcode_settings': {
+            'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
+          },
+        }, {
+         'cflags_cc': [ '<@(cflags_cc)' ],
+        }],
+      ],
+    },
     {
       'target_name': 'benchmark',
       'type': 'executable',

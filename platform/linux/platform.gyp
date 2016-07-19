@@ -35,6 +35,25 @@
       ],
     },
     {
+      'target_name': 'fuzz',
+      'type': 'executable',
+
+      'dependencies': [
+        'test-lib',
+        'platform-lib',
+        'copy_certificate_bundle',
+      ],
+
+      'include_dirs': [
+        '../../include',
+        '../../src',
+      ],
+
+      'sources': [
+        '../../test/src/fuzz.cpp',
+      ],
+    },
+    {
       'target_name': 'benchmark',
       'type': 'executable',
 

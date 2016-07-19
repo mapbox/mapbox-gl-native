@@ -1,0 +1,1 @@
+http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf?access_token=key

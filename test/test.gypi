@@ -60,6 +60,7 @@
         'text/quads.cpp',
 
         'tile/geometry_tile_data.cpp',
+        'tile/vector_tile_data.cpp',
         'tile/tile_id.cpp',
 
         'storage/offline.cpp',
