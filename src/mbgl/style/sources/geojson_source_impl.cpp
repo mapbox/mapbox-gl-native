@@ -118,7 +118,7 @@ void GeoJSONSource::Impl::load(FileSource& fileSource) {
 
 Range<uint8_t> GeoJSONSource::Impl::getZoomRange() {
     assert(loaded);
-    return { 0, urlOrGeoJSON.get<GeoJSONVTPointer>()->options.maxZoom };
+    return { 0, options.maxzoom };
 }
 
 std::unique_ptr<Tile> GeoJSONSource::Impl::createTile(const OverscaledTileID& tileID,
@@ -126,9 +126,11 @@ std::unique_ptr<Tile> GeoJSONSource::Impl::createTile(const OverscaledTileID& ti
     assert(loaded);
     if (urlOrGeoJSON.is<GeoJSONVTPointer>()) {
         return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters, *urlOrGeoJSON.get<GeoJSONVTPointer>());
-    } else {
+    }
+    if (urlOrGeoJSON.is<SuperclusterPointer>()) {
         return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters, *urlOrGeoJSON.get<SuperclusterPointer>());
     }
+    assert(false);
 }
 
 } // namespace style
