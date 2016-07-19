@@ -16,7 +16,7 @@ public:
     ~Impl() final;
 
     void setURL(std::string);
-    void setGeoJSON(GeoJSON&&);
+    void setGeoJSON(mapbox::geojson::geojson&&);
 
     void load(FileSource&) final;
 
@@ -24,15 +24,11 @@ public:
         return util::tileSize;
     }
 
-    const variant<std::string, GeoJSON>& getURLOrGeoJSON() const {
-        return urlOrGeoJSON;
-    }
-
 private:
     Range<uint8_t> getZoomRange() final;
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
 
-    variant<std::string, GeoJSON> urlOrGeoJSON;
+    variant<std::string, GeoJSONVTPointer> urlOrGeoJSON;
     std::unique_ptr<AsyncRequest> req;
 
     GeoJSONOptions options;

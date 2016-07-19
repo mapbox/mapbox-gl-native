@@ -127,9 +127,8 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
 
         case SourceType::GeoJSON: {
             style::GeoJSONSource::Impl* geojsonSource = static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
-            const variant<std::string, GeoJSON>& urlOrGeoJSON = geojsonSource->getURLOrGeoJSON();
 
-            if (urlOrGeoJSON.is<std::string>()) {
+            if (!geojsonSource->loaded) {
                 result.requiredResourceCount += 1;
             }
             break;
@@ -203,7 +202,7 @@ void OfflineDownload::activateDownload() {
                 break;
             }
         }
-        
+
         for (const auto& resource : spriteResources(parser)) {
             ensureResource(resource);
         }
@@ -243,16 +242,16 @@ void OfflineDownload::ensureResource(const Resource& resource, std::function<voi
                 status.completedTileCount += 1;
                 status.completedTileSize += offlineResponse->second;
             }
-            
+
             observer->statusChanged(status);
-            
+
             if (status.complete()) {
                 setState(OfflineRegionDownloadState::Inactive);
             }
 
             return;
         }
-        
+
         if (checkTileCountLimit(resource)) {
             return;
         }
@@ -279,11 +278,11 @@ void OfflineDownload::ensureResource(const Resource& resource, std::function<voi
             }
 
             observer->statusChanged(status);
-            
+
             if (checkTileCountLimit(resource)) {
                 return;
             }
-            
+
             if (status.complete()) {
                 setState(OfflineRegionDownloadState::Inactive);
             }
@@ -299,7 +298,7 @@ bool OfflineDownload::checkTileCountLimit(const Resource& resource) {
         setState(OfflineRegionDownloadState::Inactive);
         return true;
     }
-    
+
     return false;
 }
 

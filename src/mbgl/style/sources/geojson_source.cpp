@@ -13,7 +13,7 @@ void GeoJSONSource::setURL(const std::string& url) {
     impl->setURL(url);
 }
 
-void GeoJSONSource::setGeoJSON(GeoJSON&& geoJSON) {
+void GeoJSONSource::setGeoJSON(mapbox::geojson::geojson&& geoJSON) {
     impl->setGeoJSON(std::move(geoJSON));
 }
 

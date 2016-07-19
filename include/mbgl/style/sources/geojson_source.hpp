@@ -1,10 +1,23 @@
 #pragma once
 
 #include <mbgl/style/source.hpp>
-#include <mbgl/util/geojson.hpp>
+
+namespace mapbox {
+
+namespace geojsonvt {
+class GeoJSONVT;
+} // namespace geojsonvt
+
+namespace geojson {
+class geojson;
+} // namespace geojson
+
+} // namespace mapbox
 
 namespace mbgl {
 namespace style {
+
+using GeoJSONVTPointer = std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>;
 
 struct GeoJSONOptions {
     // GeoJSON-VT options
@@ -23,7 +36,7 @@ public:
     GeoJSONSource(const std::string& id, const GeoJSONOptions& options_ = GeoJSONOptions());
 
     void setURL(const std::string& url);
-    void setGeoJSON(GeoJSON&&);
+    void setGeoJSON(mapbox::geojson::geojson&&);
 
     // Private implementation
 

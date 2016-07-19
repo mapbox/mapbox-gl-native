@@ -20,18 +20,9 @@ namespace style {
 namespace conversion {
 
 template <>
-Result<GeoJSON> convertGeoJSON(const JSValue& value, const GeoJSONOptions& options) {
-    double scale = util::EXTENT / util::tileSize;
-
-    mapbox::geojsonvt::Options vtOptions;
-    vtOptions.maxZoom = options.maxzoom;
-    vtOptions.extent = util::EXTENT;
-    vtOptions.buffer = std::round(scale * options.buffer);
-    vtOptions.tolerance = scale * options.tolerance;
-
+Result<mapbox::geojson::geojson> convertGeoJSON(const JSValue& value) {
     try {
-        const auto geojson = mapbox::geojson::convert(value);
-        return GeoJSON { std::make_unique<mapbox::geojsonvt::GeoJSONVT>(geojson, vtOptions) };
+        return mapbox::geojson::convert(value);
     } catch (const std::exception& ex) {
         return Error { ex.what() };
     }
@@ -48,12 +39,20 @@ void GeoJSONSource::Impl::setURL(std::string url) {
     urlOrGeoJSON = std::move(url);
 }
 
-void GeoJSONSource::Impl::setGeoJSON(GeoJSON&& geoJSON) {
-    urlOrGeoJSON = std::move(geoJSON);
+void GeoJSONSource::Impl::setGeoJSON(mapbox::geojson::geojson&& geoJSON) {
+    double scale = util::EXTENT / util::tileSize;
+
+    mapbox::geojsonvt::Options vtOptions;
+    vtOptions.maxZoom = options.maxzoom;
+    vtOptions.extent = util::EXTENT;
+    vtOptions.buffer = std::round(scale * options.buffer);
+    vtOptions.tolerance = scale * options.tolerance;
+
+    urlOrGeoJSON = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(geoJSON, vtOptions);
 }
 
 void GeoJSONSource::Impl::load(FileSource& fileSource) {
-    if (urlOrGeoJSON.is<GeoJSON>()) {
+    if (!urlOrGeoJSON.is<std::string>()) {
         loaded = true;
         return;
     }
@@ -83,15 +82,16 @@ void GeoJSONSource::Impl::load(FileSource& fileSource) {
 
             invalidateTiles();
 
-            conversion::Result<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d, this->options);
+            conversion::Result<mapbox::geojson::geojson> geoJSON = conversion::convertGeoJSON<JSValue>(d);
             if (!geoJSON) {
                 Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", geoJSON.error().message.c_str());
                 // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
                 // tiles to load.
                 mapbox::geojson::feature_collection features;
-                urlOrGeoJSON = GeoJSON { std::make_unique<mapbox::geojsonvt::GeoJSONVT>(features) };
+                mapbox::geojson::geojson empty_geojson{ features };
+                setGeoJSON(empty_geojson);
             } else {
-                urlOrGeoJSON = std::move(*geoJSON);
+                setGeoJSON(*geoJSON);
             }
 
             loaded = true;
@@ -102,13 +102,13 @@ void GeoJSONSource::Impl::load(FileSource& fileSource) {
 
 Range<uint8_t> GeoJSONSource::Impl::getZoomRange() {
     assert(loaded);
-    return { 0, urlOrGeoJSON.get<GeoJSON>().impl->options.maxZoom };
+    return { 0, urlOrGeoJSON.get<GeoJSONVTPointer>()->options.maxZoom };
 }
 
 std::unique_ptr<Tile> GeoJSONSource::Impl::createTile(const OverscaledTileID& tileID,
                                                       const UpdateParameters& parameters) {
     assert(loaded);
-    return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters, *urlOrGeoJSON.get<GeoJSON>().impl);
+    return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters, *urlOrGeoJSON.get<GeoJSONVTPointer>());
 }
 
 } // namespace style
