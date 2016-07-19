@@ -82,10 +82,18 @@ std::string normalizeSpriteURL(const std::string& url, const std::string& access
     std::string id, extension;
     if (isDraft) {
         size_t index = pathname[3].find_first_of("@.");
+        if (index == std::string::npos) {
+            Log::Error(Event::ParseStyle, "Invalid sprite URL");
+            return url;
+        }
         id = pathname[2];
         extension = pathname[3].substr(index);
     } else {
         size_t index = pathname[2].find_first_of("@.");
+        if (index == std::string::npos) {
+            Log::Error(Event::ParseStyle, "Invalid sprite URL");
+            return url;
+        }
         id = pathname[2].substr(0, index);
         extension = pathname[2].substr(index);
     }
