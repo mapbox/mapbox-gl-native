@@ -17,6 +17,7 @@ mason_use(protozero 1.3.0)
 mason_use(pixelmatch 0.9.0)
 
 option(WITH_CXX11ABI "Use cxx11abi mason packages" OFF)
+option(WITH_COVERAGE "Enable coverage reports" OFF)
 
 if(WITH_CXX11ABI)
     mason_use(geojson 0.1.4-cxx11abi)
@@ -25,6 +26,11 @@ else()
     mason_use(geojson 0.1.4)
     mason_use(gtest 1.7.0)
 endif()
+
+if(WITH_COVERAGE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+endif(WITH_COVERAGE)
 
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Wshadow -Wno-variadic-macros -Wno-unknown-pragmas")

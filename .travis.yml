@@ -78,7 +78,7 @@ matrix:
       sudo: false
       language: cpp
       compiler: "glfw-gcc5-debug"
-      env: BUILDTYPE=Debug _CXX=g++-5 _CC=gcc-5 ENABLE_COVERAGE=1
+      env: BUILDTYPE=Debug _CXX=g++-5 _CC=gcc-5 WITH_COVERAGE=1
       addons: *gcc5
       after_script:
         - ccache --show-stats

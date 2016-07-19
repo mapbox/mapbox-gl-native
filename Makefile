@@ -258,7 +258,8 @@ $(LINUX_BUILD): $(BUILD_DEPS)
 	(cd $(LINUX_OUTPUT_PATH) && cmake -G Ninja ../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh))
+		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
+		-DWITH_COVERAGE=${WITH_COVERAGE})
 
 .PHONY: linux
 linux: glfw-app render offline
@@ -296,10 +297,6 @@ endif
 run-test-%: test
 	$(GDB) $(LINUX_OUTPUT_PATH)/mbgl-test --gtest_catch_exceptions=0 --gtest_filter=$*
 
-.PHONY: coverage
-coverage: test
-	scripts/collect-coverage.sh $(LINUX_OUTPUT_PATH)
-
 .PHONY: compdb
 compdb: $(LINUX_BUILD)
 	# Ninja generator already outputs the file at the right location
@@ -334,7 +331,8 @@ $(QT_BUILD): $(BUILD_DEPS)
 		-DMBGL_PLATFORM=qt \
 		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
 		-DWITH_QT_4=${WITH_QT_4} \
-		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh))
+		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
+		-DWITH_COVERAGE=${WITH_COVERAGE})
 
 .PHONY: qt-app
 qt-app: $(QT_BUILD)
