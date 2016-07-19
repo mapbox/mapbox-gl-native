@@ -39,7 +39,7 @@ void GeoJSONSource::Impl::setURL(std::string url) {
     urlOrGeoJSON = std::move(url);
 }
 
-void GeoJSONSource::Impl::setGeoJSON(mapbox::geojson::geojson&& geoJSON) {
+void GeoJSONSource::Impl::setGeoJSON(const mapbox::geojson::geojson& geoJSON) {
     double scale = util::EXTENT / util::tileSize;
 
     mapbox::geojsonvt::Options vtOptions;

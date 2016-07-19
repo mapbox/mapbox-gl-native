@@ -36,7 +36,7 @@ public:
     GeoJSONSource(const std::string& id, const GeoJSONOptions& options_ = GeoJSONOptions());
 
     void setURL(const std::string& url);
-    void setGeoJSON(mapbox::geojson::geojson&&);
+    void setGeoJSON(const mapbox::geojson::geojson&);
 
     // Private implementation
 
