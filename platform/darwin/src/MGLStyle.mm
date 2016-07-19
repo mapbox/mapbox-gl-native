@@ -1,6 +1,17 @@
 #import "MGLStyle.h"
 
+#import "MGLStyleLayer.h"
+#import "MGLFillStyleLayer.h"
+#import "MGLStyle_Private.hpp"
+#import "MGLStyleLayer_Private.hpp"
 #import <mbgl/util/default_styles.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/mbgl.hpp>
+
+@interface MGLStyle()
+@property (nonatomic, weak) MGLMapView *mapView;
+@property (nonatomic) mbgl::Map *mbglMap;
+@end
 
 @implementation MGLStyle
 
@@ -52,6 +63,17 @@ static NSURL *MGLStyleURL_emerald;
         MGLStyleURL_emerald = [NSURL URLWithString:@"mapbox://styles/mapbox/emerald-v8"];
     });
     return MGLStyleURL_emerald;
+}
+
+- (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier
+{
+    mbgl::style::Layer *layer = self.mbglMap->getLayer(identifier.UTF8String);
+    mbgl::style::FillLayer *fillLayer = reinterpret_cast<mbgl::style::FillLayer *>(layer);
+    MGLFillStyleLayer *fillStyleLayer = [[MGLFillStyleLayer alloc] init];
+    fillStyleLayer.layer = fillLayer;
+    fillStyleLayer.mapView = self.mapView;
+    fillStyleLayer.mbglMap = self.mbglMap;
+    return fillStyleLayer;
 }
 
 @end

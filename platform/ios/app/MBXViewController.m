@@ -4,6 +4,7 @@
 #import "MBXCustomCalloutView.h"
 #import "MBXOfflinePacksTableViewController.h"
 #import "MBXAnnotationView.h"
+#import "MGLFillStyleLayer.h"
 
 #import <Mapbox/Mapbox.h>
 
@@ -200,6 +201,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         @"Start World Tour",
         @"Add Custom Callout Point",
         @"Remove Annotations",
+        @"Runtime styling",
         nil];
 
     if (self.debugLoggingEnabled)
@@ -276,6 +278,10 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 15)
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 13)
+    {
+        [self testRuntimeStyling];
     }
     else if (buttonIndex == actionSheet.numberOfButtons - 2 && self.debugLoggingEnabled)
     {
@@ -434,6 +440,12 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     
     [self.mapView addAnnotation:annotation];
     [self.mapView showAnnotations:@[annotation] animated:YES];
+}
+
+- (void)testRuntimeStyling
+{
+    MGLFillStyleLayer *waterLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
+    waterLayer.fillColor = [UIColor redColor];
 }
 
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer *)longPress

@@ -2,6 +2,9 @@
 
 #import "MGLTypes.h"
 
+@class MGLFillStyleLayer;
+@class MGLStyleLayer;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -158,7 +161,9 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
-- (instancetype)init NS_UNAVAILABLE;
+//- (instancetype)init NS_UNAVAILABLE;
+
+- (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier;
 
 @end
 
