@@ -19,14 +19,15 @@ bool isMapboxURL(const std::string& url) {
 
 std::vector<std::string> getMapboxURLPathname(const std::string& url) {
     std::vector<std::string> pathname;
-    std::size_t startIndex = protocol.length();
-    while (startIndex < url.length()) {
-        std::size_t endIndex = url.find("/", startIndex);
+    auto startIndex = protocol.length();
+    auto end = url.find_first_of("?#");
+    if (end == std::string::npos) {
+        end = url.length();
+    }
+    while (startIndex < end) {
+        auto endIndex = url.find("/", startIndex);
         if (endIndex == std::string::npos) {
-            endIndex = url.find_first_of("?#");
-        }
-        if (endIndex == std::string::npos) {
-            endIndex = url.length();
+            endIndex = end;
         }
         pathname.push_back(url.substr(startIndex, endIndex - startIndex));
         startIndex = endIndex + 1;
@@ -51,16 +52,15 @@ std::string normalizeStyleURL(const std::string& url, const std::string& accessT
         return url;
     }
 
-    std::vector<std::string> pathname = getMapboxURLPathname(url);
-
+    const auto pathname = getMapboxURLPathname(url);
     if (pathname.size() < 3) {
         Log::Error(Event::ParseStyle, "Invalid style URL");
         return url;
     }
 
-    std::string user = pathname[1];
-    std::string id = pathname[2];
-    bool isDraft = pathname.size() > 3;
+    const auto& user = pathname[1];
+    const auto& id = pathname[2];
+    const bool isDraft = pathname.size() > 3;
     return baseURL + "styles/v1/" + user + "/" + id + (isDraft ? "/draft" : "") + "?access_token=" + accessToken;
 }
 
@@ -69,36 +69,33 @@ std::string normalizeSpriteURL(const std::string& url, const std::string& access
         return url;
     }
 
-    std::vector<std::string> pathname = getMapboxURLPathname(url);
-
+    const auto pathname = getMapboxURLPathname(url);
     if (pathname.size() < 3) {
         Log::Error(Event::ParseStyle, "Invalid sprite URL");
         return url;
     }
 
-    std::string user = pathname[1];
-    bool isDraft = pathname.size() > 3;
+    const auto& user = pathname[1];
+    const bool isDraft = pathname.size() > 3;
 
-    std::string id, extension;
-    if (isDraft) {
-        size_t index = pathname[3].find_first_of("@.");
-        if (index == std::string::npos) {
-            Log::Error(Event::ParseStyle, "Invalid sprite URL");
-            return url;
-        }
-        id = pathname[2];
-        extension = pathname[3].substr(index);
-    } else {
-        size_t index = pathname[2].find_first_of("@.");
-        if (index == std::string::npos) {
-            Log::Error(Event::ParseStyle, "Invalid sprite URL");
-            return url;
-        }
-        id = pathname[2].substr(0, index);
-        extension = pathname[2].substr(index);
+    const auto& name = isDraft ? pathname[3] : pathname[2];
+    const size_t index = name.find_first_of("@.");
+    if (index == std::string::npos) {
+        Log::Error(Event::ParseStyle, "Invalid sprite URL");
+        return url;
     }
+    const auto& extension = name.substr(index);
 
-    return baseURL + "styles/v1/" + user + "/" + id + "/" + (isDraft ? "draft/" : "") + "sprite" + extension + "?access_token=" + accessToken;
+    if (isDraft) {
+        const auto& id = pathname[2];
+        return baseURL + "styles/v1/" + user + "/" + id + "/draft/sprite" + extension +
+               "?access_token=" + accessToken;
+
+    } else {
+        const auto& id = pathname[2].substr(0, index);
+        return baseURL + "styles/v1/" + user + "/" + id + "/sprite" + extension + "?access_token=" +
+               accessToken;
+    }
 }
 
 std::string normalizeGlyphsURL(const std::string& url, const std::string& accessToken) {
@@ -106,16 +103,15 @@ std::string normalizeGlyphsURL(const std::string& url, const std::string& access
         return url;
     }
 
-    std::vector<std::string> pathname = getMapboxURLPathname(url);
-
+    const auto pathname = getMapboxURLPathname(url);
     if (pathname.size() < 4) {
       Log::Error(Event::ParseStyle, "Invalid glyph URL");
       return url;
     }
 
-    std::string user = pathname[1];
-    std::string fontstack = pathname[2];
-    std::string range = pathname[3];
+    const auto& user = pathname[1];
+    const auto& fontstack = pathname[2];
+    const auto& range = pathname[3];
 
     return baseURL + "fonts/v1/" + user + "/" + fontstack + "/" + range + "?access_token=" + accessToken;
 }
@@ -136,7 +132,7 @@ std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_
 
     tilesetStartIdx += sizeof("/v4/") - 1;
 
-    auto tilesetEndIdx = url.find("/", tilesetStartIdx);
+    const auto tilesetEndIdx = url.find("/", tilesetStartIdx);
     if (tilesetEndIdx == std::string::npos) {
         return url;
     }
@@ -153,12 +149,12 @@ std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_
         basenameIdx += 1;
     }
 
-    auto extensionIdx = url.find(".", basenameIdx);
+    const auto extensionIdx = url.find(".", basenameIdx);
     if (extensionIdx == std::string::npos || extensionIdx == queryIdx - 1) {
         return url;
     }
 
-    auto tileset = url.substr(tilesetStartIdx, tilesetEndIdx - tilesetStartIdx);
+    const auto tileset = url.substr(tilesetStartIdx, tilesetEndIdx - tilesetStartIdx);
     auto extension = url.substr(extensionIdx + 1, queryIdx - extensionIdx - 1);
 
 #if !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
