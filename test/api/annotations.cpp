@@ -53,8 +53,8 @@ TEST(Annotations, LineAnnotation) {
 
     LineString<double> line = {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }};
     LineAnnotation annotation { line };
-    annotation.color = { 255, 0, 0, 1 };
-    annotation.width = 5;
+    annotation.color = { { 255, 0, 0, 1 } };
+    annotation.width = { 5 };
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotation(annotation);
@@ -69,7 +69,7 @@ TEST(Annotations, FillAnnotation) {
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
     FillAnnotation annotation { polygon };
-    annotation.color = { 255, 0, 0, 1 };
+    annotation.color = { { 255, 0, 0, 1 } };
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotation(annotation);
@@ -77,6 +77,21 @@ TEST(Annotations, FillAnnotation) {
 
     test.map.setZoom(test.map.getMaxZoom());
     test.checkRendering("fill_annotation_max_zoom");
+}
+
+TEST(Annotations, OverlappingFillAnnotation) {
+    AnnotationTest test;
+
+    Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
+    FillAnnotation underlaidAnnotation { polygon };
+    underlaidAnnotation.color = { { 0, 255, 0, 1 } };
+    FillAnnotation overlaidAnnotation { polygon };
+    overlaidAnnotation.color = { { 255, 0, 0, 1 } };
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotation(underlaidAnnotation);
+    test.map.addAnnotation(overlaidAnnotation);
+    test.checkRendering("overlapping_fill_annotation");
 }
 
 TEST(Annotations, StyleSourcedShapeAnnotation) {
@@ -110,7 +125,7 @@ TEST(Annotations, NonImmediateAdd) {
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
     FillAnnotation annotation { polygon };
-    annotation.color = { 255, 0, 0, 1 };
+    annotation.color = { { 255, 0, 0, 1 } };
 
     test.map.addAnnotation(annotation);
     test.checkRendering("non_immediate_add");
@@ -162,8 +177,8 @@ TEST(Annotations, RemoveShape) {
 
     LineString<double> line = {{ { 0, 0 }, { 45, 45 } }};
     LineAnnotation annotation { line };
-    annotation.color = { 255, 0, 0, 1 };
-    annotation.width = 5;
+    annotation.color = { { 255, 0, 0, 1 } };
+    annotation.width = { 5 };
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     AnnotationID shape = test.map.addAnnotation(annotation);

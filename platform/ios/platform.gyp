@@ -129,6 +129,14 @@
         'CLANG_ENABLE_OBJC_ARC': 'YES',
         'CLANG_ENABLE_MODULES': 'YES',
       },
+      
+      'conditions': [
+        ['OS == "mac"', {
+          'xcode_settings': {
+            'BITCODE_GENERATION_MODE': 'bitcode',
+          },
+        },],
+      ],
 
       'link_settings': {
         'libraries': [ '<@(libraries)' ],

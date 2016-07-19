@@ -40,10 +40,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Tells the delegate that the viewpoint depicted by the map view is changing.
  
- This method is called as the currently displayed map camera changes due to
- animation. During movement, this method may be called many times to report
- updates to the viewpoint. Therefore, your implementation of this method should
- be as lightweight as possible to avoid affecting performance.
+ This method is called as the currently displayed map camera changes as part of
+ an animation, whether due to a user gesture or due to a call to a method such
+ as `-[MGLMapView setCamera:animated:]`. During the animation, this method may
+ be called many times to report updates to the viewpoint. Therefore, your
+ implementation of this method should be as lightweight as possible to avoid
+ affecting performance.
  
  @param mapView The map view whose viewpoint is changing.
  */
@@ -54,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
  changing.
  
  This method is called whenever the currently displayed map camera has finished
- changing.
+ changing, after any calls to `-mapViewRegionIsChanging:` due to animation.
  
  @param mapView The map view whose viewpoint has changed.
  @param animated Whether the change caused an animated effect on the map.
@@ -85,10 +87,34 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)mapViewWillStartRenderingMap:(MGLMapView *)mapView;
 - (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
+
+/**
+ Tells the delegate that the map view is about to redraw.
+ 
+ This method is called any time the map view needs to redraw due to a change in
+ the viewpoint or style property transition. This method may be called very
+ frequently, even moreso than `-mapViewRegionIsChanging:`. Therefore, your
+ implementation of this method should be as lightweight as possible to avoid
+ affecting performance.
+ 
+ @param mapView The map view that is about to redraw.
+ */
 - (void)mapViewWillStartRenderingFrame:(MGLMapView *)mapView;
+
+/**
+ Tells the delegate that the map view has just redrawn.
+ 
+ This method is called any time the map view needs to redraw due to a change in
+ the viewpoint or style property transition. This method may be called very
+ frequently, even moreso than `-mapViewRegionIsChanging:`. Therefore, your
+ implementation of this method should be as lightweight as possible to avoid
+ affecting performance.
+ 
+ @param mapView The map view that has just redrawn.
+ */
 - (void)mapViewDidFinishRenderingFrame:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
 
-#pragma mark Managing the Display of Annotations
+#pragma mark Managing the Appearance of Annotations
 
 /**
  Returns an annotation image object to mark the given point annotation object on
@@ -129,7 +155,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns the color to use when rendering the fill of a polygon annotation.
  
- The default fill color is selected menu item color. If a pattern color is
+ The default fill color is the selected menu item color. If a pattern color is
  specified, the result is undefined.
  
  @param mapView The map view rendering the polygon annotation.
@@ -172,7 +198,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapView:(MGLMapView *)mapView didDeselectAnnotation:(id <MGLAnnotation>)annotation;
 
-#pragma mark Displaying Information About Annotations
+#pragma mark Managing Callout Popovers
 
 /**
  Returns a Boolean value indicating whether the annotation is able to display
@@ -182,13 +208,13 @@ NS_ASSUME_NONNULL_BEGIN
  displayed for the annotation.
  
  If the return value is `YES`, a callout popover is shown when the user clicks
- on a selected annotation. The default callout displays the annotation’s title
- and subtitle. You can customize the popover’s contents by implementing the
- `-mapView:calloutViewControllerForAnnotation:` method.
+ on an annotation, selecting it. The default callout displays the annotation’s
+ title and subtitle. You can customize the popover’s contents by implementing
+ the `-mapView:calloutViewControllerForAnnotation:` method.
  
- If the return value is `NO`, or if this method is unimplemented, or if the
- annotation lacks a title, the annotation will not show a callout even when
- selected.
+ If the return value is `NO`, or if this method is absent from the delegate, or
+ if the annotation lacks a title, the annotation will not show a callout even
+ when selected.
  
  @param mapView The map view that has selected the annotation.
  @param annotation The object representing the annotation.

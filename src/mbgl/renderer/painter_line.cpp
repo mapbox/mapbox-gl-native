@@ -1,10 +1,10 @@
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
+#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
-#include <mbgl/shader/line_shader.hpp>
-#include <mbgl/shader/linesdf_shader.hpp>
-#include <mbgl/shader/linepattern_shader.hpp>
+#include <mbgl/shader/shaders.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/util/mat2.hpp>
@@ -13,10 +13,10 @@ namespace mbgl {
 
 using namespace style;
 
-void Painter::renderLine(LineBucket& bucket,
+void Painter::renderLine(PaintParameters& parameters,
+                         LineBucket& bucket,
                          const LineLayer& layer,
-                         const UnwrappedTileID& tileID,
-                         const mat4& matrix) {
+                         const RenderTile& tile) {
     // Abort early.
     if (pass == RenderPass::Opaque) return;
 
@@ -37,7 +37,7 @@ void Painter::renderLine(LineBucket& bucket,
 
     const Color color = properties.lineColor;
     const float opacity = properties.lineOpacity;
-    const float ratio = 1.0 / tileID.pixelsToTileUnits(1.0, state.getZoom());
+    const float ratio = 1.0 / tile.id.pixelsToTileUnits(1.0, state.getZoom());
 
     mat2 antialiasingMatrix;
     matrix::identity(antialiasingMatrix);
@@ -50,54 +50,53 @@ void Painter::renderLine(LineBucket& bucket,
     float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
     float extra = (topedgelength + x) / topedgelength - 1.0f;
 
-    mat4 vtxMatrix =
-        translatedMatrix(matrix, properties.lineTranslate, tileID, properties.lineTranslateAnchor);
+    mat4 vtxMatrix = tile.translatedMatrix(properties.lineTranslate,
+                                           properties.lineTranslateAnchor,
+                                           state);
 
     setDepthSublayer(0);
 
-    const bool overdraw = isOverdraw();
-    const auto& shaderLineSDF = overdraw ? linesdfOverdrawShader : linesdfShader;
-    const auto& shaderLinePattern = overdraw ? linepatternOverdrawShader : linepatternShader;
-    const auto& shaderLine = overdraw ? lineOverdrawShader : lineShader;
+    auto& linesdfShader = parameters.shaders.linesdf;
+    auto& linepatternShader = parameters.shaders.linepattern;
+    auto& lineShader = parameters.shaders.line;
 
     if (!properties.lineDasharray.value.from.empty()) {
-        config.program = shaderLineSDF->getID();
+        config.program = linesdfShader.getID();
 
-        shaderLineSDF->u_matrix = vtxMatrix;
-        shaderLineSDF->u_linewidth = properties.lineWidth / 2;
-        shaderLineSDF->u_gapwidth = properties.lineGapWidth / 2;
-        shaderLineSDF->u_antialiasing = antialiasing / 2;
-        shaderLineSDF->u_ratio = ratio;
-        shaderLineSDF->u_blur = blur;
-        shaderLineSDF->u_color = color;
-        shaderLineSDF->u_opacity = opacity;
+        linesdfShader.u_matrix = vtxMatrix;
+        linesdfShader.u_linewidth = properties.lineWidth / 2;
+        linesdfShader.u_gapwidth = properties.lineGapWidth / 2;
+        linesdfShader.u_antialiasing = antialiasing / 2;
+        linesdfShader.u_ratio = ratio;
+        linesdfShader.u_blur = blur;
+        linesdfShader.u_color = color;
+        linesdfShader.u_opacity = opacity;
 
-        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round, store);
-        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round, store);
+        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round);
+        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round);
 
         const float widthA = posA.width * properties.lineDasharray.value.fromScale * layer.impl->dashLineWidth;
         const float widthB = posB.width * properties.lineDasharray.value.toScale * layer.impl->dashLineWidth;
 
-        float scaleXA = 1.0 / tileID.pixelsToTileUnits(widthA, state.getIntegerZoom());
+        float scaleXA = 1.0 / tile.id.pixelsToTileUnits(widthA, state.getIntegerZoom());
         float scaleYA = -posA.height / 2.0;
-        float scaleXB = 1.0 / tileID.pixelsToTileUnits(widthB, state.getIntegerZoom());
+        float scaleXB = 1.0 / tile.id.pixelsToTileUnits(widthB, state.getIntegerZoom());
         float scaleYB = -posB.height / 2.0;
 
-        shaderLineSDF->u_patternscale_a = {{ scaleXA, scaleYA }};
-        shaderLineSDF->u_tex_y_a = posA.y;
-        shaderLineSDF->u_patternscale_b = {{ scaleXB, scaleYB }};
-        shaderLineSDF->u_tex_y_b = posB.y;
-        shaderLineSDF->u_sdfgamma = lineAtlas->width / (std::min(widthA, widthB) * 256.0 * frame.pixelRatio) / 2;
-        shaderLineSDF->u_mix = properties.lineDasharray.value.t;
-        shaderLineSDF->u_extra = extra;
-        shaderLineSDF->u_offset = -properties.lineOffset;
-        shaderLineSDF->u_antialiasingmatrix = antialiasingMatrix;
+        linesdfShader.u_patternscale_a = {{ scaleXA, scaleYA }};
+        linesdfShader.u_tex_y_a = posA.y;
+        linesdfShader.u_patternscale_b = {{ scaleXB, scaleYB }};
+        linesdfShader.u_tex_y_b = posB.y;
+        linesdfShader.u_sdfgamma = lineAtlas->width / (std::min(widthA, widthB) * 256.0 * frame.pixelRatio) / 2;
+        linesdfShader.u_mix = properties.lineDasharray.value.t;
+        linesdfShader.u_extra = extra;
+        linesdfShader.u_offset = -properties.lineOffset;
+        linesdfShader.u_antialiasingmatrix = antialiasingMatrix;
 
-        shaderLineSDF->u_image = 0;
-        config.activeTexture = GL_TEXTURE0;
-        lineAtlas->bind(store);
+        linesdfShader.u_image = 0;
+        lineAtlas->bind(store, config, 0);
 
-        bucket.drawLineSDF(*shaderLineSDF, store, overdraw);
+        bucket.drawLineSDF(linesdfShader, store, isOverdraw());
 
     } else if (!properties.linePattern.value.from.empty()) {
         optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.linePattern.value.from, true);
@@ -106,58 +105,57 @@ void Painter::renderLine(LineBucket& bucket,
         if (!imagePosA || !imagePosB)
             return;
 
-        config.program = shaderLinePattern->getID();
+        config.program = linepatternShader.getID();
 
-        shaderLinePattern->u_matrix = vtxMatrix;
-        shaderLinePattern->u_linewidth = properties.lineWidth / 2;
-        shaderLinePattern->u_gapwidth = properties.lineGapWidth / 2;
-        shaderLinePattern->u_antialiasing = antialiasing / 2;
-        shaderLinePattern->u_ratio = ratio;
-        shaderLinePattern->u_blur = blur;
+        linepatternShader.u_matrix = vtxMatrix;
+        linepatternShader.u_linewidth = properties.lineWidth / 2;
+        linepatternShader.u_gapwidth = properties.lineGapWidth / 2;
+        linepatternShader.u_antialiasing = antialiasing / 2;
+        linepatternShader.u_ratio = ratio;
+        linepatternShader.u_blur = blur;
 
-        shaderLinePattern->u_pattern_size_a = {{
-            tileID.pixelsToTileUnits((*imagePosA).size[0] * properties.linePattern.value.fromScale, state.getIntegerZoom()),
+        linepatternShader.u_pattern_size_a = {{
+            tile.id.pixelsToTileUnits((*imagePosA).size[0] * properties.linePattern.value.fromScale, state.getIntegerZoom()),
             (*imagePosA).size[1]
         }};
-        shaderLinePattern->u_pattern_tl_a = (*imagePosA).tl;
-        shaderLinePattern->u_pattern_br_a = (*imagePosA).br;
+        linepatternShader.u_pattern_tl_a = (*imagePosA).tl;
+        linepatternShader.u_pattern_br_a = (*imagePosA).br;
 
-        shaderLinePattern->u_pattern_size_b = {{
-            tileID.pixelsToTileUnits((*imagePosB).size[0] * properties.linePattern.value.toScale, state.getIntegerZoom()),
+        linepatternShader.u_pattern_size_b = {{
+            tile.id.pixelsToTileUnits((*imagePosB).size[0] * properties.linePattern.value.toScale, state.getIntegerZoom()),
             (*imagePosB).size[1]
         }};
-        shaderLinePattern->u_pattern_tl_b = (*imagePosB).tl;
-        shaderLinePattern->u_pattern_br_b = (*imagePosB).br;
+        linepatternShader.u_pattern_tl_b = (*imagePosB).tl;
+        linepatternShader.u_pattern_br_b = (*imagePosB).br;
 
-        shaderLinePattern->u_fade = properties.linePattern.value.t;
-        shaderLinePattern->u_opacity = properties.lineOpacity;
-        shaderLinePattern->u_extra = extra;
-        shaderLinePattern->u_offset = -properties.lineOffset;
-        shaderLinePattern->u_antialiasingmatrix = antialiasingMatrix;
+        linepatternShader.u_fade = properties.linePattern.value.t;
+        linepatternShader.u_opacity = properties.lineOpacity;
+        linepatternShader.u_extra = extra;
+        linepatternShader.u_offset = -properties.lineOffset;
+        linepatternShader.u_antialiasingmatrix = antialiasingMatrix;
 
-        shaderLinePattern->u_image = 0;
-        config.activeTexture = GL_TEXTURE0;
-        spriteAtlas->bind(true, store);
+        linepatternShader.u_image = 0;
+        spriteAtlas->bind(true, store, config, 0);
 
-        bucket.drawLinePatterns(*shaderLinePattern, store, overdraw);
+        bucket.drawLinePatterns(linepatternShader, store, isOverdraw());
 
     } else {
-        config.program = shaderLine->getID();
+        config.program = lineShader.getID();
 
-        shaderLine->u_matrix = vtxMatrix;
-        shaderLine->u_linewidth = properties.lineWidth / 2;
-        shaderLine->u_gapwidth = properties.lineGapWidth / 2;
-        shaderLine->u_antialiasing = antialiasing / 2;
-        shaderLine->u_ratio = ratio;
-        shaderLine->u_blur = blur;
-        shaderLine->u_extra = extra;
-        shaderLine->u_offset = -properties.lineOffset;
-        shaderLine->u_antialiasingmatrix = antialiasingMatrix;
+        lineShader.u_matrix = vtxMatrix;
+        lineShader.u_linewidth = properties.lineWidth / 2;
+        lineShader.u_gapwidth = properties.lineGapWidth / 2;
+        lineShader.u_antialiasing = antialiasing / 2;
+        lineShader.u_ratio = ratio;
+        lineShader.u_blur = blur;
+        lineShader.u_extra = extra;
+        lineShader.u_offset = -properties.lineOffset;
+        lineShader.u_antialiasingmatrix = antialiasingMatrix;
 
-        shaderLine->u_color = color;
-        shaderLine->u_opacity = opacity;
+        lineShader.u_color = color;
+        lineShader.u_opacity = opacity;
 
-        bucket.drawLines(*shaderLine, store, overdraw);
+        bucket.drawLines(lineShader, store, isOverdraw());
     }
 }
 

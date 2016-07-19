@@ -13,6 +13,6 @@ namespace node_mbgl {
 v8::Local<v8::Value> toJS(const mbgl::Value&);
 v8::Local<v8::Object> toJS(const mbgl::Feature&);
 v8::Local<v8::Object> toJS(const mbgl::Feature::geometry_type&);
-v8::Local<v8::Object> toJS(const mbgl::Feature::property_map&);
+v8::Local<v8::Object> toJS(const mbgl::PropertyMap&);
 
 }

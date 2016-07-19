@@ -7,18 +7,18 @@ namespace mbgl {
 
 using namespace style;
 
-void RasterBucket::upload(gl::ObjectStore& store) {
+void RasterBucket::upload(gl::ObjectStore& store, gl::Config& config) {
     if (hasData()) {
-        raster.upload(store);
+        raster.upload(store, config, 0);
         uploaded = true;
     }
 }
 
 void RasterBucket::render(Painter& painter,
+                          PaintParameters& parameters,
                           const Layer& layer,
-                          const UnwrappedTileID& tileID,
-                          const mat4& matrix) {
-    painter.renderRaster(*this, *layer.as<RasterLayer>(), tileID, matrix);
+                          const RenderTile& tile) {
+    painter.renderRaster(parameters, *this, *layer.as<RasterLayer>(), tile);
 }
 
 void RasterBucket::setImage(PremultipliedImage image) {
@@ -30,10 +30,8 @@ void RasterBucket::drawRaster(RasterShader& shader,
                               VertexArrayObject& array,
                               gl::Config& config,
                               gl::ObjectStore& store) {
-    config.activeTexture = GL_TEXTURE0;
-    raster.bind(store, Raster::Scaling::Linear);
-    config.activeTexture = GL_TEXTURE1;
-    raster.bind(store, Raster::Scaling::Linear);
+    raster.bind(store, config, 0, Raster::Scaling::Linear);
+    raster.bind(store, config, 1, Raster::Scaling::Linear);
     array.bind(shader, vertices, BUFFER_OFFSET_0, store);
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)vertices.index()));
 }

@@ -109,5 +109,13 @@ void CircleLayer::setCircleTranslateAnchor(PropertyValue<TranslateAnchorType> va
     impl->paint.circleTranslateAnchor.set(value, klass);
 }
 
+PropertyValue<CirclePitchScaleType> CircleLayer::getCirclePitchScale() const {
+    return impl->paint.circlePitchScale.get();
+}
+
+void CircleLayer::setCirclePitchScale(PropertyValue<CirclePitchScaleType> value, const optional<std::string>& klass) {
+    impl->paint.circlePitchScale.set(value, klass);
+}
+
 } // namespace style
 } // namespace mbgl

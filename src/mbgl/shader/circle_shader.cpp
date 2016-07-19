@@ -5,11 +5,11 @@
 
 namespace mbgl {
 
-CircleShader::CircleShader(gl::ObjectStore& store, bool overdraw)
+CircleShader::CircleShader(gl::ObjectStore& store, Defines defines)
     : Shader(shaders::circle::name,
              shaders::circle::vertex,
              shaders::circle::fragment,
-             store, overdraw) {
+             store, defines) {
 }
 
 void CircleShader::bind(GLbyte* offset) {

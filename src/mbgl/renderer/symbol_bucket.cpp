@@ -73,7 +73,7 @@ SymbolBucket::~SymbolBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-void SymbolBucket::upload(gl::ObjectStore& store) {
+void SymbolBucket::upload(gl::ObjectStore& store, gl::Config&) {
     if (hasTextData()) {
         renderData->text.vertices.upload(store);
         renderData->text.triangles.upload(store);
@@ -87,10 +87,10 @@ void SymbolBucket::upload(gl::ObjectStore& store) {
 }
 
 void SymbolBucket::render(Painter& painter,
+                          PaintParameters& parameters,
                           const Layer& layer,
-                          const UnwrappedTileID& tileID,
-                          const mat4& matrix) {
-    painter.renderSymbol(*this, *layer.as<SymbolLayer>(), tileID, matrix);
+                          const RenderTile& tile) {
+    painter.renderSymbol(parameters, *this, *layer.as<SymbolLayer>(), tile);
 }
 
 bool SymbolBucket::hasData() const { return hasTextData() || hasIconData() || !symbolInstances.empty(); }
@@ -119,7 +119,7 @@ void SymbolBucket::parseFeatures(const GeometryTileLayer& layer, const Filter& f
     const GLsizei featureCount = static_cast<GLsizei>(layer.featureCount());
     for (GLsizei i = 0; i < featureCount; i++) {
         auto feature = layer.getFeature(i);
-        if (!filter(feature->getType(), [&] (const auto& key) { return feature->getValue(key); }))
+        if (!filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
             continue;
 
         SymbolFeature ft;

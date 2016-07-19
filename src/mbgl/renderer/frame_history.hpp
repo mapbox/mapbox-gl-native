@@ -9,14 +9,18 @@
 
 namespace mbgl {
 
+namespace gl {
+class Config;
+} // namespace gl
+
 class FrameHistory {
 public:
     FrameHistory();
     void record(const TimePoint&, float zoom, const Duration&);
 
     bool needsAnimation(const Duration&) const;
-    void bind(gl::ObjectStore&);
-    void upload(gl::ObjectStore&);
+    void bind(gl::ObjectStore&, gl::Config&, uint32_t);
+    void upload(gl::ObjectStore&, gl::Config&, uint32_t);
 
 private:
     const int width = 256;

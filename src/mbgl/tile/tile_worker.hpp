@@ -2,13 +2,13 @@
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/tile/tile_id.hpp>
-#include <mbgl/util/atomic.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 
+#include <atomic>
 #include <string>
 #include <memory>
 #include <mutex>
@@ -49,7 +49,7 @@ public:
                SpriteStore&,
                GlyphAtlas&,
                GlyphStore&,
-               const util::Atomic<bool>&,
+               const std::atomic<bool>&,
                const MapMode);
     ~TileWorker();
 
@@ -73,7 +73,7 @@ private:
     SpriteStore& spriteStore;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
-    const util::Atomic<bool>& obsolete;
+    const std::atomic<bool>& obsolete;
     const MapMode mode;
 
     bool partialParse = false;

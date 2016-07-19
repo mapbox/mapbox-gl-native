@@ -3,11 +3,35 @@
 
 static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReuseIdentifer";
 
+@interface MGLAnnotationView (Test)
+@property (nonatomic) MGLMapView *mapView;
+@property (nonatomic, readwrite) MGLAnnotationViewDragState dragState;
+
+- (void)setDragState:(MGLAnnotationViewDragState)dragState;
+@end
+
+@interface MGLMapView (Test)
+@property (nonatomic) UIView<MGLCalloutView> *calloutViewForSelectedAnnotation;
+@end
+
 @interface MGLTestAnnotation : NSObject <MGLAnnotation>
 @property (nonatomic, assign) CLLocationCoordinate2D coordinate;
 @end
 
 @implementation MGLTestAnnotation
+@end
+
+@interface MGLTestCalloutView: UIView<MGLCalloutView>
+@property (nonatomic) BOOL didCallDismissCalloutAnimated;
+@end
+
+@implementation MGLTestCalloutView
+
+- (void)dismissCalloutAnimated:(BOOL)animated
+{
+    _didCallDismissCalloutAnimated = YES;
+}
+
 @end
 
 @interface MGLAnnotationViewTests : XCTestCase <MGLMapViewDelegate>
@@ -28,15 +52,21 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
 - (void)testAnnotationView
 {
     _expectation = [self expectationWithDescription:@"annotation property"];
-    
+
     MGLTestAnnotation *annotation = [[MGLTestAnnotation alloc] init];
     [_mapView addAnnotation:annotation];
-    
+
     [self waitForExpectationsWithTimeout:1 handler:nil];
-    
+
     XCTAssert(_mapView.annotations.count == 1, @"number of annotations should be 1");
     XCTAssertNotNil(_annotationView.annotation, @"annotation property should not be nil");
-    
+    XCTAssertNotNil(_annotationView.mapView, @"mapView property should not be nil");
+
+    MGLTestCalloutView *testCalloutView = [[MGLTestCalloutView  alloc] init];
+    _mapView.calloutViewForSelectedAnnotation = testCalloutView;
+    _annotationView.dragState = MGLAnnotationViewDragStateStarting;
+    XCTAssertTrue(testCalloutView.didCallDismissCalloutAnimated, @"callout view was not dismissed");
+
     [_mapView removeAnnotation:_annotationView.annotation];
     
     XCTAssert(_mapView.annotations.count == 0, @"number of annotations should be 0");
@@ -54,9 +84,12 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     
     _annotationView = annotationView;
     
-    [_expectation fulfill];
-    
     return annotationView;
+}
+
+- (void)mapView:(MGLMapView *)mapView didAddAnnotationViews:(NSArray<MGLAnnotationView *> *)annotationViews
+{
+    [_expectation fulfill];
 }
 
 @end

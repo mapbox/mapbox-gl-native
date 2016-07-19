@@ -7,7 +7,7 @@ namespace mbgl {
 
 class LinepatternShader : public Shader {
 public:
-    LinepatternShader(gl::ObjectStore&, bool overdraw = false);
+    LinepatternShader(gl::ObjectStore&, Defines defines = None);
 
     void bind(GLbyte *offset) final;
 

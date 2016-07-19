@@ -18,8 +18,17 @@ public:
 
     virtual void bind(GLbyte *offset) = 0;
 
+    enum Defines : bool {
+        None = false,
+        Overdraw = true,
+    };
+
 protected:
-    Shader(const char* name_, const char* vertex, const char* fragment, gl::ObjectStore&, bool overdraw = false);
+    Shader(const char* name_,
+           const char* vertex,
+           const char* fragment,
+           gl::ObjectStore&,
+           Defines defines = Defines::None);
 
     static constexpr GLint         a_pos = 0;
     static constexpr GLint     a_extrude = 1;

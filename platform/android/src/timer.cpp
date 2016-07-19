@@ -29,14 +29,13 @@ public:
     }
 
     void stop() {
-        task = nullptr;
         loop->removeRunnable(this);
     }
 
     void reschedule() {
         if (repeat != Duration::zero()) {
             due = Clock::now() + repeat;
-            loop->addRunnable(this);
+            loop->wake();
         } else {
             stop();
         }
@@ -47,8 +46,8 @@ public:
     }
 
     void runTask() override {
-        task();
         reschedule();
+        task();
     }
 
 private:

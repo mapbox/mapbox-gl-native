@@ -13,28 +13,30 @@ template <typename T>
 class Value {
 public:
     void operator=(const typename T::Type& value) {
-        if (dirty || current != value) {
+        if (*this != value) {
             dirty = false;
             current = value;
             T::Set(current);
         }
     }
 
+    bool operator!=(const typename T::Type& value) const {
+        return dirty || current != value;
+    }
+
     void reset() {
-        dirty = true;
-        current = T::Default;
-        T::Set(current);
+        *this = T::Default;
     }
 
     void setDirty() {
         dirty = true;
     }
 
-    typename T::Type getCurrent() {
+    typename T::Type getCurrent() const {
         return current;
     }
 
-    bool getDirty() {
+    bool getDirty() const {
         return dirty;
     }
 
@@ -117,6 +119,7 @@ public:
     Value<PixelZoom> pixelZoom;
     Value<RasterPos> rasterPos;
 #endif // GL_ES_VERSION_2_0
+    std::array<Value<BindTexture>, 2> texture;
 };
 
 } // namespace gl

@@ -26,6 +26,7 @@ template <class PropertyAccessor>
 class FilterEvaluator {
 public:
     const FeatureType featureType;
+    const optional<FeatureIdentifier> featureIdentifier;
     const PropertyAccessor propertyAccessor;
 
     bool operator()(const NullFilter&) const {
@@ -123,9 +124,19 @@ public:
 
 private:
     optional<Value> getValue(const std::string& key_) const {
-        return key_ == "$type"
-            ? optional<Value>(uint64_t(featureType))
-            : propertyAccessor(key_);
+        if (key_ == "$type") {
+            return optional<Value>(uint64_t(featureType));
+        } else if (key_ == "$id") {
+            if (featureIdentifier) {
+                return FeatureIdentifier::visit(*featureIdentifier, [] (auto id) {
+                    return Value(std::move(id));
+                });
+            } else {
+                return optional<Value>();
+            }
+        } else {
+            return propertyAccessor(key_);
+        }
     }
 
     template <class Op>
@@ -151,13 +162,24 @@ private:
             return false;
         }
 
+        bool operator()(const NullValue&,
+                        const NullValue&) const {
+            // Should be unreachable; null is not currently allowed by the style specification.
+            assert(false);
+            return false;
+        }
+
         bool operator()(const std::vector<Value>&,
                         const std::vector<Value>&) const {
+            // Should be unreachable; nested values are not currently allowed by the style specification.
+            assert(false);
             return false;
         }
 
         bool operator()(const std::unordered_map<std::string, Value>&,
                         const std::unordered_map<std::string, Value>&) const {
+            // Should be unreachable; nested values are not currently allowed by the style specification.
+            assert(false);
             return false;
         }
     };
@@ -172,9 +194,18 @@ private:
     }
 };
 
+inline bool Filter::operator()(const Feature& feature) const {
+    return operator()(apply_visitor(ToFeatureType(), feature.geometry), feature.id, [&] (const std::string& key) -> optional<Value> {
+        auto it = feature.properties.find(key);
+        if (it == feature.properties.end())
+            return {};
+        return it->second;
+    });
+}
+
 template <class PropertyAccessor>
-bool Filter::operator()(FeatureType type, PropertyAccessor accessor) const {
-    return FilterBase::visit(*this, FilterEvaluator<PropertyAccessor> { type, accessor });
+bool Filter::operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor) const {
+    return FilterBase::visit(*this, FilterEvaluator<PropertyAccessor> { type, id, accessor });
 }
 
 } // namespace style

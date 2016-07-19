@@ -300,6 +300,14 @@ public class MarkerView extends Marker {
         super.setIcon(transparentIcon);
     }
 
+    @Override
+    public void setPosition(LatLng position) {
+        super.setPosition(position);
+        if (markerViewManager != null) {
+            markerViewManager.update();
+        }
+    }
+
     public boolean isSelected() {
         return selected;
     }

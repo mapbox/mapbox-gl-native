@@ -28,6 +28,11 @@ MBGL_DEFINE_ENUM(RotateAnchorType, {
     { RotateAnchorType::Viewport, "viewport" },
 });
 
+MBGL_DEFINE_ENUM(CirclePitchScaleType, {
+    { CirclePitchScaleType::Map, "map" },
+    { CirclePitchScaleType::Viewport, "viewport" },
+});
+
 MBGL_DEFINE_ENUM(LineCapType, {
     { LineCapType::Round, "round" },
     { LineCapType::Butt, "butt" },

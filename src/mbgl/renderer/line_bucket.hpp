@@ -24,8 +24,8 @@ public:
     LineBucket(uint32_t overscaling);
     ~LineBucket() override;
 
-    void upload(gl::ObjectStore&) override;
-    void render(Painter&, const style::Layer&, const UnwrappedTileID&, const mat4&) override;
+    void upload(gl::ObjectStore&, gl::Config&) override;
+    void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
     bool hasData() const override;
     bool needsClipping() const override;
 

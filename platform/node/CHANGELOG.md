@@ -1,3 +1,9 @@
+# 3.3.0
+
+- Adds runtime styling API ([#5318](https://github.com/mapbox/mapbox-gl-native/pull/5318), [#5380](https://github.com/mapbox/mapbox-gl-native/pull/5380), [#5428](https://github.com/mapbox/mapbox-gl-native/pull/5428), [#5429](https://github.com/mapbox/mapbox-gl-native/pull/5429), [#5462](https://github.com/mapbox/mapbox-gl-native/pull/5462), [#5614](https://github.com/mapbox/mapbox-gl-native/pull/5614), [#5670](https://github.com/mapbox/mapbox-gl-native/pull/5670))
+- Adds `BUILDTYPE=Debug` support to `make node` ([#5474](https://github.com/mapbox/mapbox-gl-native/pull/5474))
+- Fixes a memory leak in `NodeRequest` ([#5529](https://github.com/mapbox/mapbox-gl-native/pull/5529))
+
 # 3.2.1
 
 - Fixes a memory leak in raster image data ([#5269](https://github.com/mapbox/mapbox-gl-native/pull/5269))

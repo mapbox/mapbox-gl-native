@@ -108,6 +108,8 @@
               'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
               'DEAD_CODE_STRIPPING': 'NO',
             },
+          }, 'OS=="android"', {
+            'cflags_cc': [ '-g', '-Os', '-fvisibility=hidden' ],
           }, {
             'cflags_cc': [ '-g', '-O3' ],
           }],
@@ -192,6 +194,7 @@
           '<@(protozero_cflags)',
           '<@(boost_cflags)',
           '<@(geometry_cflags)',
+          '<@(geojson_cflags)',
           '<@(geojsonvt_cflags)',
           '<@(rapidjson_cflags)',
           '<@(variant_cflags)',
@@ -207,7 +210,7 @@
           '<@(opengl_ldflags)',
         ],
         'libraries': [
-          '<@(geojsonvt_static_libs)',
+          '<@(geojson_static_libs)',
         ],
       },
 
@@ -216,6 +219,7 @@
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
             'OTHER_CFLAGS': [ '<@(cflags)' ],
+            'BITCODE_GENERATION_MODE': 'bitcode',
           },
         }, {
           'cflags_cc': [ '<@(cflags_cc)' ],

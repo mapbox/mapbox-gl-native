@@ -1,13 +1,16 @@
 #include "run_loop_impl.hpp"
 
+#include <mbgl/platform/platform.hpp>
 #include <mbgl/util/thread_context.hpp>
 #include <mbgl/util/thread_local.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <android/looper.h>
 
 #include <algorithm>
 #include <cassert>
 #include <functional>
+#include <memory>
 #include <stdexcept>
 #include <vector>
 
@@ -36,8 +39,14 @@ int looperCallbackDefault(int fd, int, void* data) {
     int buffer[1];
     while (read(fd, buffer, sizeof(buffer)) > 0) {}
 
-    auto runLoop = reinterpret_cast<RunLoop*>(data);
+    auto runLoopImpl = reinterpret_cast<RunLoop::Impl*>(data);
+    auto runLoop = runLoopImpl->runLoop;
+
     runLoop->runOnce();
+
+    if (!runLoopImpl->running) {
+        ALooper_wake(runLoopImpl->loop);
+    }
 
     return 1;
 }
@@ -47,9 +56,27 @@ int looperCallbackDefault(int fd, int, void* data) {
 namespace mbgl {
 namespace util {
 
-RunLoop::Impl::Impl(RunLoop* runLoop, RunLoop::Type type) {
+// This is needed only for the RunLoop living on the main thread because of
+// how we implement timers. We sleep on `ALooper_pollAll` until the next
+// timeout, but on the main thread `ALooper_pollAll` is called by the activity
+// automatically, thus we cannot set the timeout. Instead we wake the loop
+// with an external file descriptor event coming from this thread.
+class Alarm {
+public:
+    Alarm(RunLoop::Impl* loop_) : loop(loop_) {}
+
+    void set(const Milliseconds& timeout) {
+        alarm.start(timeout, mbgl::Duration::zero(), [this]() { loop->wake(); });
+    }
+
+private:
+    Timer alarm;
+    RunLoop::Impl* loop;
+};
+
+RunLoop::Impl::Impl(RunLoop* runLoop_, RunLoop::Type type) : runLoop(runLoop_) {
     using namespace mbgl::android;
-    detach = attach_jni_thread(theJVM, &env, "");
+    detach = attach_jni_thread(theJVM, &env, platform::getCurrentThreadName());
 
     loop = ALooper_prepare(0);
     assert(loop);
@@ -73,7 +100,9 @@ RunLoop::Impl::Impl(RunLoop* runLoop, RunLoop::Type type) {
         break;
     case Type::Default:
         ret = ALooper_addFd(loop, fds[PIPE_OUT], ALOOPER_POLL_CALLBACK,
-            ALOOPER_EVENT_INPUT, looperCallbackDefault, runLoop);
+            ALOOPER_EVENT_INPUT, looperCallbackDefault, this);
+        alarm = std::make_unique<Thread<Alarm>>(ThreadContext{"Alarm"}, this);
+        running = true;
         break;
     }
 
@@ -83,6 +112,8 @@ RunLoop::Impl::Impl(RunLoop* runLoop, RunLoop::Type type) {
 }
 
 RunLoop::Impl::~Impl() {
+    alarm.reset();
+
     if (ALooper_removeFd(loop, fds[PIPE_OUT]) != 1) {
         throw std::runtime_error("Failed to remove file descriptor from Looper.");
     }
@@ -117,10 +148,16 @@ void RunLoop::Impl::addRunnable(Runnable* runnable) {
 void RunLoop::Impl::removeRunnable(Runnable* runnable) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    if (runnable->iter != runnables.end()) {
-        runnables.erase(runnable->iter);
-        runnable->iter = runnables.end();
+    if (runnable->iter == runnables.end()) {
+        return;
     }
+
+    if (nextRunnable == runnable->iter) {
+        ++nextRunnable;
+    }
+
+    runnables.erase(runnable->iter);
+    runnable->iter = runnables.end();
 }
 
 void RunLoop::Impl::initRunnable(Runnable* runnable) {
@@ -135,8 +172,8 @@ Milliseconds RunLoop::Impl::processRunnables() {
 
     // O(N) but in the render thread where we get tons
     // of messages, the size of the list is usually 1~2.
-    for (auto iter = runnables.begin(); iter != runnables.end();) {
-        Runnable* runnable = *(iter++);
+    for (nextRunnable = runnables.begin(); nextRunnable != runnables.end();) {
+        Runnable* runnable = *(nextRunnable++);
 
         auto const dueTime = runnable->dueTime();
         if (dueTime <= now) {
@@ -148,9 +185,14 @@ Milliseconds RunLoop::Impl::processRunnables() {
 
     if (runnables.empty() || nextDue == TimePoint::max()) {
         return Milliseconds(-1);
-    } else {
-        return std::chrono::duration_cast<Milliseconds>(nextDue - now);
     }
+
+    auto timeout = std::chrono::duration_cast<Milliseconds>(nextDue - now);
+    if (alarm) {
+        alarm->invoke(&Alarm::set, timeout);
+    }
+
+    return timeout;
 }
 
 RunLoop* RunLoop::Get() {
@@ -197,8 +239,10 @@ void RunLoop::runOnce() {
 }
 
 void RunLoop::stop() {
-    impl->running = false;
-    impl->wake();
+    invoke([&] {
+        impl->running = false;
+        impl->wake();
+    });
 }
 
 void RunLoop::addWatch(int, Event, std::function<void(int, Event)>&&) {

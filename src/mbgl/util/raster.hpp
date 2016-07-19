@@ -3,9 +3,14 @@
 #include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/atomic.hpp>
+
+#include <atomic>
 
 namespace mbgl {
+
+namespace gl {
+class Config;
+} // namespace gl
 
 class Raster {
 public:
@@ -16,17 +21,21 @@ public:
     void load(PremultipliedImage, uint32_t mipmapLevel = 0);
 
     // bind current texture
-    void bind(gl::ObjectStore&, Scaling = Scaling::Nearest, MipMap = MipMap::No);
+    void bind(gl::ObjectStore&,
+              gl::Config&,
+              uint32_t unit,
+              Scaling = Scaling::Nearest,
+              MipMap = MipMap::No);
 
     // uploads the texture if it hasn't been uploaded yet.
-    void upload(gl::ObjectStore&);
+    void upload(gl::ObjectStore&, gl::Config&, uint32_t unit);
 
     // loaded status
     bool isLoaded() const;
 
 private:
     // raw pixels have been loaded
-    util::Atomic<bool> loaded { false };
+    std::atomic<bool> loaded { false };
 
     // filters
     Scaling filter = Scaling::Nearest;

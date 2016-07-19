@@ -95,7 +95,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
     }
 }
 
-void FillBucket::upload(gl::ObjectStore& store) {
+void FillBucket::upload(gl::ObjectStore& store, gl::Config&) {
     vertexBuffer.upload(store);
     triangleElementsBuffer.upload(store);
     lineElementsBuffer.upload(store);
@@ -105,10 +105,10 @@ void FillBucket::upload(gl::ObjectStore& store) {
 }
 
 void FillBucket::render(Painter& painter,
+                        PaintParameters& parameters,
                         const Layer& layer,
-                        const UnwrappedTileID& tileID,
-                        const mat4& matrix) {
-    painter.renderFill(*this, *layer.as<FillLayer>(), tileID, matrix);
+                        const RenderTile& tile) {
+    painter.renderFill(parameters, *this, *layer.as<FillLayer>(), tile);
 }
 
 bool FillBucket::hasData() const {

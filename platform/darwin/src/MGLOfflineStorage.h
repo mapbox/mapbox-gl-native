@@ -217,6 +217,14 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
  */
 - (void)setMaximumAllowedMapboxTiles:(uint64_t)maximumCount;
 
+/**
+ The cumulative size, measured in bytes, of all downloaded resources on disk.
+ 
+ The returned value includes all resources, including tiles, whether downloaded
+ as part of an offline pack or due to caching during normal use of `MGLMapView`.
+ */
+@property (nonatomic, readonly) unsigned long long countOfBytesCompleted;
+
 @end
 
 NS_ASSUME_NONNULL_END

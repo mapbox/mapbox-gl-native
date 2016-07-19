@@ -18,11 +18,9 @@ custom_categories:
     children:
       - MGLAccountManager
       - MGLMapCamera
-      - MGLMapDebugMaskOptions
       - MGLMapView
       - MGLMapViewDelegate
       - MGLStyle
-      - MGLStyleDefaultVersion
       - MGLUserTrackingMode
   - name: Annotations
     children:
@@ -52,17 +50,8 @@ custom_categories:
       - MGLOfflineRegion
       - MGLOfflineStorage
       - MGLOfflinePack
-      - MGLOfflinePackAdditionCompletionHandler
-      - MGLOfflinePackErrorNotification
-      - MGLOfflinePackErrorUserInfoKey
-      - MGLOfflinePackMaximumCountUserInfoKey
-      - MGLOfflinePackMaximumMapboxTilesReachedNotification
       - MGLOfflinePackProgress
-      - MGLOfflinePackProgressChangedNotification
-      - MGLOfflinePackProgressUserInfoKey
-      - MGLOfflinePackRemovalCompletionHandler
       - MGLOfflinePackState
-      - MGLOfflinePackStateUserInfoKey
       - MGLTilePyramidOfflineRegion
   - name: Geometry
     children:
@@ -75,6 +64,7 @@ custom_categories:
       - MGLCoordinateBoundsMake
       - MGLCoordinateBoundsOffset
       - MGLCoordinateFormatter
+      - MGLCoordinateInCoordinateBounds
       - MGLCoordinateSpan
       - MGLCoordinateSpanEqualToCoordinateSpan
       - MGLCoordinateSpanMake

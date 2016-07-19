@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11129.15" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11163.2" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11129.15"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11163.2"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -129,7 +129,6 @@
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="aJh-i4-bef"/>
                             <menuItem title="Page Setup…" keyEquivalent="P" id="qIS-W8-SiK">
-                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                 <connections>
                                     <action selector="runPageLayout:" target="-1" id="Din-rz-gC5"/>
                                 </connections>
@@ -437,45 +436,40 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Debug" id="McE-ka-r79">
                         <items>
-                            <menuItem title="Show Tile Boundaries" id="rDE-dG-rTR">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Show Tile Boundaries" keyEquivalent="b" id="rDE-dG-rTR">
                                 <connections>
                                     <action selector="toggleTileBoundaries:" target="-1" id="LAO-88-F7h"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Tile Info" id="LoH-qD-kb0">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Show Tile Info" keyEquivalent="i" id="LoH-qD-kb0">
                                 <connections>
                                     <action selector="toggleTileInfo:" target="-1" id="KCn-0G-V87"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Tile Timestamps" id="bY0-2E-LZ7">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Show Tile Timestamps" keyEquivalent="t" id="bY0-2E-LZ7">
                                 <connections>
                                     <action selector="toggleTileTimestamps:" target="-1" id="tBs-2N-KEG"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Collision Boxes" id="Y0b-3K-mJE">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Show Collision Boxes" keyEquivalent="C" id="Y0b-3K-mJE">
                                 <connections>
                                     <action selector="toggleCollisionBoxes:" target="-1" id="EYa-7n-iWZ"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Overdraw Visualization" id="hSX-Be-8xC">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Show Overdraw Visualization" keyEquivalent="O" id="hSX-Be-8xC">
                                 <connections>
                                     <action selector="toggleOverdrawVisualization:" target="-1" id="usj-ug-upt"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="2EG-Hp-4FA"/>
-                            <menuItem title="Show Color Buffer" id="Eao-WE-BWz">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Color Buffer" keyEquivalent="c" id="Eao-WE-BWz">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="showColorBuffer:" target="-1" id="Nuq-Qs-98g"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Stencil Buffer" id="LlS-Yh-RkN">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Stencil Buffer" keyEquivalent="s" id="LlS-Yh-RkN">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="showStencilBuffer:" target="-1" id="WkN-t9-Mpv"/>
                                 </connections>
@@ -494,14 +488,13 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="Sl5-nE-kHd"/>
-                            <menuItem title="Blanket Map With Pins" id="LMZ-oe-Ngh">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Blanket Map With Pins" keyEquivalent="." id="LMZ-oe-Ngh">
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                 <connections>
                                     <action selector="dropManyPins:" target="-1" id="Rtv-8N-3Z8"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Add Polygon and Polyline" id="DVr-vT-lpe">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Add Polygon and Polyline" keyEquivalent="l" id="DVr-vT-lpe">
                                 <connections>
                                     <action selector="drawPolygonAndPolyLineAnnotations:" target="-1" id="EhT-CB-gee"/>
                                 </connections>
@@ -513,14 +506,16 @@
                                 </connections>
                             </menuItem>
                             <menuItem title="Remove All Annotations" id="6rC-68-vk0">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
                                 <connections>
                                     <action selector="removeAllAnnotations:" target="-1" id="6v3-0E-LsR"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="wQq-Mx-QY0"/>
                             <menuItem title="Start World Tour" id="VFo-Jh-2sw">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <modifierMask key="keyEquivalentModifierMask" option="YES"/>
                                 <connections>
                                     <action selector="startWorldTour:" target="-1" id="66Y-Gm-Yn1"/>
                                 </connections>
@@ -815,7 +810,6 @@
                                     </connections>
                                 </tableView>
                             </subviews>
-                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
                         <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="QLr-6P-Ogs">
                             <rect key="frame" x="1" y="264" width="400" height="16"/>

@@ -395,6 +395,10 @@ public:
     clickGestureRecognizer.delaysPrimaryMouseButtonEvents = NO;
     [self addGestureRecognizer:clickGestureRecognizer];
     
+    NSClickGestureRecognizer *rightClickGestureRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleRightClickGesture:)];
+    rightClickGestureRecognizer.buttonMask = 0x2;
+    [self addGestureRecognizer:rightClickGestureRecognizer];
+    
     NSClickGestureRecognizer *doubleClickGestureRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleClickGesture:)];
     doubleClickGestureRecognizer.numberOfClicksRequired = 2;
     doubleClickGestureRecognizer.delaysPrimaryMouseButtonEvents = NO;
@@ -1356,6 +1360,14 @@ public:
         }
     } else {
         [self deselectAnnotation:self.selectedAnnotation];
+    }
+}
+
+/// Right-click to show the context menu.
+- (void)handleRightClickGesture:(NSClickGestureRecognizer *)gestureRecognizer {
+    NSMenu *menu = [self menuForEvent:[NSApp currentEvent]];
+    if (menu) {
+        [NSMenu popUpContextMenu:menu withEvent:[NSApp currentEvent] forView:self];
     }
 }
 

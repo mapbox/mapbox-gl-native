@@ -22,7 +22,7 @@ TileWorker::TileWorker(OverscaledTileID id_,
                        SpriteStore& spriteStore_,
                        GlyphAtlas& glyphAtlas_,
                        GlyphStore& glyphStore_,
-                       const util::Atomic<bool>& obsolete_,
+                       const std::atomic<bool>& obsolete_,
                        const MapMode mode_)
     : id(std::move(id_)),
       spriteStore(spriteStore_),

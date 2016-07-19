@@ -1,6 +1,7 @@
 {
   'variables': {
     'loop_lib': 'android',
+    'OS': 'android',
     'headless_lib': 'none',
     'coverage': 0,
   },
@@ -30,7 +31,7 @@
         'src/log_android.cpp',
         'src/http_file_source.cpp',
         'src/asset_file_source.cpp',
-        '../default/thread.cpp',
+        'src/thread.cpp',
         '../default/string_stdlib.cpp',
         '../default/image.cpp',
         '../default/png_reader.cpp',

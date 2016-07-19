@@ -14,10 +14,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.graphics.SurfaceTexture;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -45,7 +43,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.Surface;
-import android.view.TextureView;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
@@ -196,8 +195,7 @@ public class MapView extends FrameLayout {
         }
 
         // Reference the TextureView
-        TextureView textureView = (TextureView) view.findViewById(R.id.textureView);
-        textureView.setSurfaceTextureListener(new SurfaceTextureListener());
+        SurfaceView surfaceView = (SurfaceView) view.findViewById(R.id.surfaceView);
 
         // Check if we are in Android Studio UI editor to avoid error in layout preview
         if (isInEditMode()) {
@@ -212,6 +210,8 @@ public class MapView extends FrameLayout {
         setFocusable(true);
         setFocusableInTouchMode(true);
         requestFocus();
+
+        surfaceView.getHolder().addCallback(new SurfaceCallback());
 
         // Touch gesture detectors
         mGestureDetector = new GestureDetectorCompat(context, new GestureListener());
@@ -262,13 +262,7 @@ public class MapView extends FrameLayout {
         }
 
         // access token
-        String accessToken;
-        if (MapboxAccountManager.getInstance() != null) {
-            accessToken = MapboxAccountManager.getInstance().getAccessToken();
-        } else {
-            accessToken = options.getAccessToken();
-        }
-
+        String accessToken = options.getAccessToken();
         if (!TextUtils.isEmpty(accessToken)) {
             mMapboxMap.setAccessToken(accessToken);
         }
@@ -364,8 +358,17 @@ public class MapView extends FrameLayout {
      */
     @UiThread
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        String accessToken = mMapboxMap.getAccessToken();
+        if (TextUtils.isEmpty(accessToken)) {
+            accessToken = MapboxAccountManager.getInstance().getAccessToken();
+            mMapboxMap.setAccessToken(accessToken);
+        } else {
+            // user provided access token through xml attributes, need to start MapboxAccountManager
+            MapboxAccountManager.start(getContext(), accessToken);
+        }
+
         // Force a check for an access token
-        MapboxAccountManager.validateAccessToken(getAccessToken());
+        MapboxAccountManager.validateAccessToken(accessToken);
 
         if (savedInstanceState != null && savedInstanceState.getBoolean(MapboxConstants.STATE_HAS_SAVED_STATE)) {
 
@@ -456,7 +459,16 @@ public class MapView extends FrameLayout {
                     }
                 } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {
                     mMapboxMap.getMarkerViewManager().scheduleViewMarkerInvalidation();
+
+                    mCompassView.update(getBearing());
+                    mMyLocationView.update();
+                    mMapboxMap.getMarkerViewManager().update();
+
+                    for (InfoWindow infoWindow : mMapboxMap.getInfoWindows()) {
+                        infoWindow.update();
+                    }
                 }
+
             }
         });
 
@@ -625,49 +637,11 @@ public class MapView extends FrameLayout {
         mNativeMapView.setPitch(pitch, 0);
     }
 
-
-    //
-    // Direction
-    //
-
-    double getDirection() {
-        if (mDestroyed) {
-            return 0;
-        }
-
-        double direction = -mNativeMapView.getBearing();
-
-        while (direction > 360) {
-            direction -= 360;
-        }
-        while (direction < 0) {
-            direction += 360;
-        }
-
-        return direction;
-    }
-
-    void setDirection(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION) double direction) {
-        if (mDestroyed) {
-            return;
-        }
-        setDirection(direction, false);
-    }
-
-    void setDirection(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION) double direction, boolean animated) {
-        if (mDestroyed) {
-            return;
-        }
-        long duration = animated ? MapboxConstants.ANIMATION_DURATION : 0;
-        mNativeMapView.cancelTransitions();
-        // Out of range directions are normalised in setBearing
-        mNativeMapView.setBearing(-direction, duration);
-    }
-
     void resetNorth() {
         if (mDestroyed) {
             return;
         }
+        mMyLocationView.setBearing(0);
         mNativeMapView.cancelTransitions();
         mNativeMapView.resetNorth();
     }
@@ -1347,92 +1321,66 @@ public class MapView extends FrameLayout {
         return mNativeMapView.getScale();
     }
 
-    // This class handles TextureView callbacks
-    private class SurfaceTextureListener implements TextureView.SurfaceTextureListener {
+    private class SurfaceCallback implements SurfaceHolder.Callback {
 
         private Surface mSurface;
-        private View mViewHolder;
 
-        private static final int VIEW_MARKERS_POOL_SIZE = 20;
-
-
-        // Called when the native surface texture has been created
-        // Must do all EGL/GL ES initialization here
         @Override
-        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-            mNativeMapView.createSurface(mSurface = new Surface(surface));
-            mNativeMapView.resizeFramebuffer(width, height);
+        public void surfaceCreated(SurfaceHolder holder) {
+            mNativeMapView.createSurface(mSurface = holder.getSurface());
             mHasSurface = true;
         }
 
-        // Called when the native surface texture has been destroyed
-        // Must do all EGL/GL ES destruction here
         @Override
-        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            if (mDestroyed) {
+                return;
+            }
+            mNativeMapView.resizeFramebuffer(width, height);
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder) {
             mHasSurface = false;
 
             if (mNativeMapView != null) {
                 mNativeMapView.destroySurface();
             }
             mSurface.release();
-            return true;
         }
-
-        // Called when the format or size of the native surface texture has been changed
-        // Must handle window resizing here.
-        @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-            if (mDestroyed) {
-                return;
-            }
-
-            mNativeMapView.resizeFramebuffer(width, height);
-        }
-
-        // Called when the SurfaceTexure frame is drawn to screen
-        // Must sync with UI here
-        @Override
-        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-            if (mDestroyed) {
-                return;
-            }
-            mCompassView.update(getDirection());
-            mMyLocationView.update();
-            mMapboxMap.getMarkerViewManager().update();
-
-            for (InfoWindow infoWindow : mMapboxMap.getInfoWindows()) {
-                infoWindow.update();
-            }
-        }
-    }
-
-    // Used by UserLocationView
-    void update() {
-        if (mDestroyed) {
-            return;
-        }
-
-        mNativeMapView.update();
     }
 
     CameraPosition invalidateCameraPosition() {
         if (mDestroyed) {
             return new CameraPosition.Builder().build();
         }
-        return new CameraPosition.Builder(mNativeMapView.getCameraValues()).build();
+        CameraPosition position = new CameraPosition.Builder(mNativeMapView.getCameraValues()).build();
+        mMyLocationView.setCameraPosition(position);
+        return position;
     }
 
     double getBearing() {
         if (mDestroyed) {
             return 0;
         }
-        return mNativeMapView.getBearing();
+
+        double direction = -mNativeMapView.getBearing();
+
+        while (direction > 360) {
+            direction -= 360;
+        }
+        while (direction < 0) {
+            direction += 360;
+        }
+
+        return direction;
     }
 
     void setBearing(float bearing) {
         if (mDestroyed) {
             return;
         }
+        mMyLocationView.setBearing(bearing);
         mNativeMapView.setBearing(bearing);
     }
 
@@ -1440,7 +1388,16 @@ public class MapView extends FrameLayout {
         if (mDestroyed) {
             return;
         }
+        mMyLocationView.setBearing(bearing);
         mNativeMapView.setBearing(bearing, duration);
+    }
+
+    void setBearing(double bearing, float focalX, float focalY) {
+        if (mDestroyed) {
+            return;
+        }
+        mMyLocationView.setBearing(bearing);
+        mNativeMapView.setBearing(bearing, focalX, focalY);
     }
 
     //
@@ -1484,6 +1441,17 @@ public class MapView extends FrameLayout {
     private void trackGestureEvent(@NonNull String gestureId, @NonNull float xCoordinate, @NonNull float yCoordinate) {
         LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
+        // NaN and Infinite checks to prevent JSON errors at send to server time
+        if (Double.isNaN(tapLatLng.getLatitude()) ||  Double.isNaN(tapLatLng.getLongitude())) {
+            Log.d(MapView.class.getSimpleName(), "trackGestureEvent() has a NaN lat or lon.  Returning.");
+            return;
+        }
+
+        if (Double.isInfinite(tapLatLng.getLatitude()) ||  Double.isInfinite(tapLatLng.getLongitude())) {
+            Log.d(MapView.class.getSimpleName(), "trackGestureEvent() has an Infinite lat or lon.  Returning.");
+            return;
+        }
+
         Hashtable<String, Object> evt = new Hashtable<>();
         evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_CLICK);
         evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
@@ -1504,6 +1472,17 @@ public class MapView extends FrameLayout {
      */
     private void trackGestureDragEndEvent(@NonNull float xCoordinate, @NonNull float yCoordinate) {
         LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
+
+        // NaN and Infinite checks to prevent JSON errors at send to server time
+        if (Double.isNaN(tapLatLng.getLatitude()) ||  Double.isNaN(tapLatLng.getLongitude())) {
+            Log.d(MapView.class.getSimpleName(), "trackGestureDragEndEvent() has a NaN lat or lon.  Returning.");
+            return;
+        }
+
+        if (Double.isInfinite(tapLatLng.getLatitude()) ||  Double.isInfinite(tapLatLng.getLongitude())) {
+            Log.d(MapView.class.getSimpleName(), "trackGestureDragEndEvent() has an Infinite lat or lon.  Returning.");
+            return;
+        }
 
         Hashtable<String, Object> evt = new Hashtable<>();
         evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_DRAGEND);
@@ -1781,9 +1760,10 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
+            requestDisallowInterceptTouchEvent(true);
+
             // reset tracking modes if gesture occurs
             resetTrackingModesIfRequired();
-
 
             // Cancel any animation
             mNativeMapView.cancelTransitions();
@@ -1952,12 +1932,10 @@ public class MapView extends FrameLayout {
             // Rotate the map
             if (mFocalPoint != null) {
                 // User provided focal point
-                mNativeMapView.setBearing(bearing, mFocalPoint.x / mScreenDensity, mFocalPoint.y / mScreenDensity);
+                setBearing(bearing, mFocalPoint.x / mScreenDensity, mFocalPoint.y / mScreenDensity);
             } else {
                 // around gesture
-                mNativeMapView.setBearing(bearing,
-                        detector.getFocusX() / mScreenDensity,
-                        detector.getFocusY() / mScreenDensity);
+                setBearing(bearing, detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
             }
             return true;
         }
@@ -2602,7 +2580,9 @@ public class MapView extends FrameLayout {
         if (!mInitialLoad) {
             callback.onMapReady(mMapboxMap);
         } else {
-            mOnMapReadyCallbackList.add(callback);
+            if(callback!=null) {
+                mOnMapReadyCallbackList.add(callback);
+            }
         }
     }
 
@@ -2620,18 +2600,19 @@ public class MapView extends FrameLayout {
 
     @UiThread
     void snapshot(@NonNull final MapboxMap.SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
-        TextureView textureView = (TextureView) findViewById(R.id.textureView);
-        final boolean canUseBitmap = bitmap != null && textureView.getWidth() == bitmap.getWidth() && textureView.getHeight() == bitmap.getHeight();
-
-        setDrawingCacheEnabled(true);
-        Bitmap content = Bitmap.createBitmap(getDrawingCache());
-        setDrawingCacheEnabled(false);
-
-        Bitmap output = Bitmap.createBitmap(content.getWidth(), content.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-        canvas.drawBitmap(canUseBitmap ? textureView.getBitmap(bitmap) : textureView.getBitmap(), 0, 0, null);
-        canvas.drawBitmap(content, new Matrix(), null);
-        callback.onSnapshotReady(output);
+//        TextureView textureView = (TextureView) findViewById(R.id.textureView);
+//        final boolean canUseBitmap = bitmap != null && textureView.getWidth() == bitmap.getWidth() && textureView.getHeight() == bitmap.getHeight();
+//
+//        setDrawingCacheEnabled(true);
+//        Bitmap content = Bitmap.createBitmap(getDrawingCache());
+//        setDrawingCacheEnabled(false);
+//
+//        Bitmap output = Bitmap.createBitmap(content.getWidth(), content.getHeight(), Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas(output);
+//        canvas.drawBitmap(canUseBitmap ? textureView.getBitmap(bitmap) : textureView.getBitmap(), 0, 0, null);
+//        canvas.drawBitmap(content, new Matrix(), null);
+//        callback.onSnapshotReady(output);
+        throw new RuntimeException("TextureView code needs to be migrated to SurfaceView");
     }
 
     //

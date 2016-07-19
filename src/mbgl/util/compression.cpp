@@ -1,4 +1,4 @@
-#include "compression.hpp"
+#include <mbgl/util/compression.hpp>
 
 #include <zlib.h>
 

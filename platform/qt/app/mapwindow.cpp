@@ -1,7 +1,9 @@
 #include "mapwindow.hpp"
 
 #include <QApplication>
+#include <QColor>
 #include <QDebug>
+#include <QFile>
 #include <QIcon>
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -72,6 +74,33 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
     switch (ev->key()) {
     case Qt::Key_S:
         changeStyle();
+        break;
+    case Qt::Key_L: {
+            m_map.setPaintProperty("water", "fill-color", QColor(255, 0, 0));
+            m_map.setPaintProperty("building", "fill-color", "red");
+            m_map.setPaintProperty("road-secondary-tertiary", "line-color", "red");
+
+            m_map.setLayoutProperty("road-label-small", "symbol-placement", "point");
+            m_map.setLayoutProperty("road-label-medium", "symbol-placement", "point");
+            m_map.setLayoutProperty("road-label-large", "symbol-placement", "point");
+
+            QFile geojson(":source.geojson");
+            geojson.open(QIODevice::ReadOnly);
+
+            QVariantMap testSource;
+            testSource["type"] = "geojson";
+            testSource["data"] = geojson.readAll();
+
+            m_map.addSource("testSource", testSource);
+
+            QVariantMap testLayer;
+            testLayer["id"] = "testLayer";
+            testLayer["type"] = "fill";
+            testLayer["source"] = "testSource";
+
+            m_map.addLayer(testLayer);
+            m_map.setPaintProperty("testLayer", "fill-color", QColor("blue"));
+        }
         break;
     case Qt::Key_Tab:
         m_map.cycleDebugOptions();

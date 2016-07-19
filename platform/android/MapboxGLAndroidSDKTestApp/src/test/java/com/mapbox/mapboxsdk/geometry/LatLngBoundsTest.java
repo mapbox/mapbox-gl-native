@@ -8,6 +8,9 @@ import com.mapbox.mapboxsdk.utils.MockParcel;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -103,6 +106,24 @@ public class LatLngBoundsTest {
     @Test
     public void testIncluding() {
         assertTrue("LatLng should be included", mLatLngBounds.contains(new LatLng(1, 1)));
+    }
+
+    @Test
+    public void testIncludes() {
+        List<LatLng> points = new ArrayList<>();
+        points.add(LAT_LNG_NULL_ISLAND);
+        points.add(LAT_LNG_NOT_NULL_ISLAND);
+
+        LatLngBounds latLngBounds1 = new LatLngBounds.Builder()
+                .includes(points)
+                .build();
+
+        LatLngBounds latLngBounds2 = new LatLngBounds.Builder()
+                .include(LAT_LNG_NULL_ISLAND)
+                .include(LAT_LNG_NOT_NULL_ISLAND)
+                .build();
+
+        assertEquals("LatLngBounds should match", latLngBounds1, latLngBounds2);
     }
 
     @Test

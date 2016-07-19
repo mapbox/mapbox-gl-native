@@ -18,10 +18,12 @@ static bool setFlag = false;
 
 struct MockGLObject {
     using Type = bool;
-    static const Type Default = false;
+    static const Type Default;
     static Type Get() { getFlag = true; return true; }
     static void Set(const Type&) { setFlag = true; }
 };
+
+const bool MockGLObject::Default = false;
 
 TEST(GLObject, Preserve) {
     getFlag = false;
@@ -61,7 +63,7 @@ TEST(GLObject, Value) {
 
     object->reset();
     EXPECT_EQ(object->getCurrent(), false);
-    EXPECT_TRUE(object->getDirty());
+    EXPECT_FALSE(object->getDirty());
     EXPECT_TRUE(setFlag);
 }
 

@@ -45,6 +45,11 @@ enum class RotateAnchorType : bool {
     Viewport,
 };
 
+enum class CirclePitchScaleType : bool {
+    Map,
+    Viewport,
+};
+
 enum class SymbolPlacementType : bool {
     Point,
     Line,

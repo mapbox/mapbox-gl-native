@@ -3,7 +3,14 @@
 const fs = require('fs');
 const ejs = require('ejs');
 const spec = require('mapbox-gl-style-spec').latest;
-var parseCSSColor = require('csscolorparser').parseCSSColor;
+var colorParser = require('csscolorparser');
+
+function parseCSSColor(str) {
+  var color = colorParser.parseCSSColor(str);
+  return [
+      color[0] / 255 * color[3], color[1] / 255 * color[3], color[2] / 255 * color[3], color[3]
+  ];
+}
 
 global.camelize = function (str) {
   return str.replace(/(?:^|-)(.)/g, function (_, x) {

@@ -40,58 +40,92 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
     return sharedOfflineStorage;
 }
 
-- (instancetype)init {
-    if (self = [super init]) {
-        // Place the cache in a location specific to the application, so that
-        // packs downloaded by other applications don’t count toward this
-        // application’s limits.
-        // ~/Library/Application Support/tld.app.bundle.id/cache.db
-        NSURL *cacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
-                                                                          inDomain:NSUserDomainMask
-                                                                 appropriateForURL:nil
-                                                                            create:YES
-                                                                             error:nil];
-        NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
-        if (!bundleIdentifier) {
-            // There’s no main bundle identifier when running in a unit test bundle.
-            bundleIdentifier = [NSBundle bundleForClass:[self class]].bundleIdentifier;
-        }
-        cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
-        [[NSFileManager defaultManager] createDirectoryAtURL:cacheDirectoryURL
-                                 withIntermediateDirectories:YES
-                                                  attributes:nil
-                                                       error:nil];
-        NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:MGLOfflineStorageFileName];
-        NSString *cachePath = cacheURL ? cacheURL.path : @"";
-        
-        // Move the offline cache from v3.2.0-beta.1 to a location that can also
-        // be used for ambient caching.
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-        // ~/Documents/offline.db
-        NSArray *legacyPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *legacyCachePath = [legacyPaths.firstObject stringByAppendingPathComponent:MGLOfflineStorageFileName3_2_0_beta_1];
-#elif TARGET_OS_MAC
-        // ~/Library/Caches/tld.app.bundle.id/offline.db
-        NSURL *legacyCacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory
-                                                                                inDomain:NSUserDomainMask
-                                                                       appropriateForURL:nil
-                                                                                  create:NO
-                                                                                   error:nil];
-        legacyCacheDirectoryURL = [legacyCacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
-        NSURL *legacyCacheURL = [legacyCacheDirectoryURL URLByAppendingPathComponent:MGLOfflineStorageFileName3_2_0_beta_1];
-        NSString *legacyCachePath = legacyCacheURL ? legacyCacheURL.path : @"";
-#endif
-        if (![[NSFileManager defaultManager] fileExistsAtPath:cachePath]) {
-            [[NSFileManager defaultManager] moveItemAtPath:legacyCachePath toPath:cachePath error:NULL];
-        }
-        
-        _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [NSBundle mainBundle].resourceURL.path.UTF8String);
+/**
+ Returns the file URL to the offline cache, with the option to omit the private
+ subdirectory for legacy (v3.2.0 - v3.2.3) migration purposes.
 
+ The cache is located in a directory specific to the application, so that packs
+ downloaded by other applications don’t count toward this application’s limits.
+
+ The cache is located at:
+ ~/Library/Application Support/tld.app.bundle.id/.mapbox/cache.db
+
+ The subdirectory-less cache was located at:
+ ~/Library/Application Support/tld.app.bundle.id/cache.db
+ */
++ (NSURL *)cacheURLIncludingSubdirectory:(BOOL)useSubdirectory {
+    NSURL *cacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
+                                                                      inDomain:NSUserDomainMask
+                                                             appropriateForURL:nil
+                                                                        create:YES
+                                                                         error:nil];
+    NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
+    if (!bundleIdentifier) {
+        // There’s no main bundle identifier when running in a unit test bundle.
+        bundleIdentifier = [NSBundle bundleForClass:self].bundleIdentifier;
+    }
+    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
+    if (useSubdirectory) {
+        cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@".mapbox"];
+    }
+    [[NSFileManager defaultManager] createDirectoryAtURL:cacheDirectoryURL
+                             withIntermediateDirectories:YES
+                                              attributes:nil
+                                                   error:nil];
+    if (useSubdirectory) {
         // Avoid backing up the offline cache onto iCloud, because it can be
         // redownloaded. Ideally, we’d even put the ambient cache in Caches, so
         // it can be reclaimed by the system when disk space runs low. But
         // unfortunately it has to live in the same file as offline resources.
-        [cacheURL setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:NULL];
+        [cacheDirectoryURL setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    }
+    return [cacheDirectoryURL URLByAppendingPathComponent:MGLOfflineStorageFileName];
+}
+
+/**
+ Returns the absolute path to the location where v3.2.0-beta.1 placed the
+ offline cache.
+ */
++ (NSString *)legacyCachePath {
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+    // ~/Documents/offline.db
+    NSArray *legacyPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *legacyCachePath = [legacyPaths.firstObject stringByAppendingPathComponent:MGLOfflineStorageFileName3_2_0_beta_1];
+#elif TARGET_OS_MAC
+    // ~/Library/Caches/tld.app.bundle.id/offline.db
+    NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
+    NSURL *legacyCacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory
+                                                                            inDomain:NSUserDomainMask
+                                                                   appropriateForURL:nil
+                                                                              create:NO
+                                                                               error:nil];
+    legacyCacheDirectoryURL = [legacyCacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
+    NSURL *legacyCacheURL = [legacyCacheDirectoryURL URLByAppendingPathComponent:MGLOfflineStorageFileName3_2_0_beta_1];
+    NSString *legacyCachePath = legacyCacheURL ? legacyCacheURL.path : @"";
+#endif
+    return legacyCachePath;
+}
+
+- (instancetype)init {
+    if (self = [super init]) {
+        NSURL *cacheURL = [[self class] cacheURLIncludingSubdirectory:YES];
+        NSString *cachePath = cacheURL.path ?: @"";
+
+        // Move the offline cache from v3.2.0-beta.1 to a location that can also
+        // be used for ambient caching.
+        if (![[NSFileManager defaultManager] fileExistsAtPath:cachePath]) {
+            NSString *legacyCachePath = [[self class] legacyCachePath];
+            [[NSFileManager defaultManager] moveItemAtPath:legacyCachePath toPath:cachePath error:NULL];
+        }
+
+        // Move the offline file cache from v3.2.x path to a subdirectory that
+        // can be reliably excluded from backups.
+        if (![[NSFileManager defaultManager] fileExistsAtPath:cachePath]) {
+            NSURL *subdirectorylessCacheURL = [[self class] cacheURLIncludingSubdirectory:NO];
+            [[NSFileManager defaultManager] moveItemAtPath:subdirectorylessCacheURL.path toPath:cachePath error:NULL];
+        }
+
+        _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [NSBundle mainBundle].resourceURL.path.UTF8String);
 
         // Observe for changes to the global access token (and find out the current one).
         [[MGLAccountManager sharedManager] addObserver:self
@@ -239,6 +273,19 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
 
 - (void)setMaximumAllowedMapboxTiles:(uint64_t)maximumCount {
     _mbglFileSource->setOfflineMapboxTileCountLimit(maximumCount);
+}
+
+#pragma mark -
+
+- (unsigned long long)countOfBytesCompleted {
+    NSURL *cacheURL = [[self class] cacheURLIncludingSubdirectory:YES];
+    NSString *cachePath = cacheURL.path;
+    if (!cachePath) {
+        return 0;
+    }
+    
+    NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:cachePath error:NULL];
+    return attributes.fileSize;
 }
 
 #pragma mark MGLOfflinePackDelegate methods

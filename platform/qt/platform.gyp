@@ -47,7 +47,6 @@
         '../default/online_file_source.cpp',
         '../default/sqlite3.cpp',
         '../default/string_stdlib.cpp',
-        '../default/thread.cpp',
         'include/qmapbox.hpp',
         'include/qmapboxgl.hpp',
         'include/qquickmapboxgl.hpp',
@@ -74,6 +73,8 @@
       'variables': {
         'cflags': [
           '<@(boost_cflags)',
+          '<@(geojson_cflags)',
+          '<@(libjpeg-turbo_cflags)',
           '<@(nunicode_cflags)',
           '<@(opengl_cflags)',
           '<@(qt_core_cflags)',
@@ -93,6 +94,8 @@
           '<@(zlib_ldflags)',
         ],
         'libraries': [
+          '<@(geojson_static_libs)',
+          '<@(libjpeg-turbo_static_libs)',
           '<@(nunicode_static_libs)',
           '<@(sqlite_static_libs)',
           '<@(zlib_static_libs)',
@@ -164,16 +167,25 @@
         ['OS == "mac"', {
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags)' ],
-          }
+          },
+          'sources': [
+            '../darwin/src/nsthread.mm',
+          ],
         }, {
           'cflags_cc': [ '<@(cflags)' ],
+          'sources': [
+            '../default/thread.cpp',
+          ],
         }]
       ],
 
       'link_settings': {
         'conditions': [
           ['OS == "mac"', {
-            'libraries': [ '<@(libraries)' ],
+            'libraries': [
+              '<@(libraries)',
+              '$(SDKROOT)/System/Library/Frameworks/Cocoa.framework',
+            ],
             'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
           }, {
             'libraries': [ '<@(libraries)', '<@(ldflags)' ],

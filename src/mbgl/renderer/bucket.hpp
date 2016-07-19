@@ -2,9 +2,9 @@
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/renderer/render_pass.hpp>
-#include <mbgl/util/atomic.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/mat4.hpp>
+
+#include <atomic>
 
 #define BUFFER_OFFSET_0  ((GLbyte*)nullptr)
 #define BUFFER_OFFSET(i) ((BUFFER_OFFSET_0) + (i))
@@ -12,11 +12,13 @@
 namespace mbgl {
 
 class Painter;
-class UnwrappedTileID;
+class PaintParameters;
 class CollisionTile;
+class RenderTile;
 
 namespace gl {
 class ObjectStore;
+class Config;
 } // namespace gl
 
 namespace style {
@@ -29,11 +31,11 @@ public:
 
     // As long as this bucket has a Prepare render pass, this function is getting called. Typically,
     // this only happens once when the bucket is being rendered for the first time.
-    virtual void upload(gl::ObjectStore&) = 0;
+    virtual void upload(gl::ObjectStore&, gl::Config&) = 0;
 
     // Every time this bucket is getting rendered, this function is called. This happens either
     // once or twice (for Opaque and Transparent render passes).
-    virtual void render(Painter&, const style::Layer&, const UnwrappedTileID&, const mat4&) = 0;
+    virtual void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) = 0;
 
     virtual ~Bucket() = default;
 
@@ -49,7 +51,7 @@ public:
     virtual void swapRenderData() {}
 
 protected:
-    util::Atomic<bool> uploaded { false };
+    std::atomic<bool> uploaded { false };
 };
 
 } // namespace mbgl

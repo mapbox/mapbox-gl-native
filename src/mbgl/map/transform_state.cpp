@@ -16,7 +16,7 @@ TransformState::TransformState(ConstrainMode constrainMode_, ViewportMode viewpo
 #pragma mark - Matrix
 
 void TransformState::matrixFor(mat4& matrix, const UnwrappedTileID& tileID) const {
-    const uint32_t tileScale = 1u << tileID.canonical.z;
+    const uint64_t tileScale = 1ull << tileID.canonical.z;
     const double s = worldSize() / tileScale;
 
     matrix::identity(matrix);

@@ -5,8 +5,9 @@ CXX11ABI=${CXX11ABI:-$(scripts/check-cxx11abi.sh)}
 UNIQUE_RESOURCE_VERSION=dev
 PROTOZERO_VERSION=1.3.0
 BOOST_VERSION=1.60.0
-GEOMETRY_VERSION=0.5.0
-GEOJSONVT_VERSION=4.1.2${CXX11ABI:-}
+GEOMETRY_VERSION=0.8.0
+GEOJSON_VERSION=0.1.4${CXX11ABI:-}
+GEOJSONVT_VERSION=6.1.0
 GTEST_VERSION=1.7.0${CXX11ABI:-}
 LIBJPEG_TURBO_VERSION=1.4.2
 NUNICODE_VERSION=1.6
@@ -37,7 +38,12 @@ fi
 function print_qt_flags {
     mason install Qt system
 
-    QT_VERSION_MAJOR=$(qmake -query QT_VERSION | cut -d. -f1)
+    QMAKE="qmake"
+    if [ ! $(which ${QMAKE} 2>/dev/null) ]; then
+        QMAKE="qmake-qt5"
+    fi
+
+    QT_VERSION_MAJOR=$(${QMAKE} -query QT_VERSION | cut -d. -f1)
     CONFIG+="    'qt_version_major%': ['${QT_VERSION_MAJOR}'],"$LN
     CONFIG+="    'qt_image_decoders%': [0],"$LN
 

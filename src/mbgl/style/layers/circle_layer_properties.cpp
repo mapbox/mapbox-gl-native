@@ -12,6 +12,7 @@ void CirclePaintProperties::cascade(const CascadeParameters& parameters) {
     circleOpacity.cascade(parameters);
     circleTranslate.cascade(parameters);
     circleTranslateAnchor.cascade(parameters);
+    circlePitchScale.cascade(parameters);
 }
 
 bool CirclePaintProperties::recalculate(const CalculationParameters& parameters) {
@@ -23,6 +24,7 @@ bool CirclePaintProperties::recalculate(const CalculationParameters& parameters)
     hasTransitions |= circleOpacity.calculate(parameters);
     hasTransitions |= circleTranslate.calculate(parameters);
     hasTransitions |= circleTranslateAnchor.calculate(parameters);
+    hasTransitions |= circlePitchScale.calculate(parameters);
 
     return hasTransitions;
 }

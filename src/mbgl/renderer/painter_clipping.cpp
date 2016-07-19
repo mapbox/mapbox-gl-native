@@ -1,6 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/style/source.hpp>
-#include <mbgl/shader/plain_shader.hpp>
+#include <mbgl/shader/shaders.hpp>
 #include <mbgl/util/clip_id.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/gl/debugging.hpp>
@@ -8,17 +9,16 @@
 namespace mbgl {
 
 
-void Painter::drawClippingMasks(const std::map<UnwrappedTileID, ClipID>& stencils) {
+void Painter::drawClippingMasks(PaintParameters& parameters, const std::map<UnwrappedTileID, ClipID>& stencils) {
     MBGL_DEBUG_GROUP("clipping masks");
 
-    const bool overdraw = isOverdraw();
-    const auto& shaderPlain = overdraw ? plainOverdrawShader : plainShader;
-    auto& arrayCoveringPlain = overdraw ? coveringPlainOverdrawArray : coveringPlainArray;
+    auto& plainShader = parameters.shaders.plain;
+    auto& arrayCoveringPlain = parameters.shaders.coveringPlainArray;
 
     mat4 matrix;
     const GLuint mask = 0b11111111;
 
-    config.program = shaderPlain->getID();
+    config.program = plainShader.getID();
     config.stencilOp.reset();
     config.stencilTest = GL_TRUE;
     config.depthTest = GL_FALSE;
@@ -26,7 +26,7 @@ void Painter::drawClippingMasks(const std::map<UnwrappedTileID, ClipID>& stencil
     config.colorMask = { GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE };
     config.stencilMask = mask;
 
-    arrayCoveringPlain.bind(*shaderPlain, tileStencilBuffer, BUFFER_OFFSET_0, store);
+    arrayCoveringPlain.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET_0, store);
 
     for (const auto& stencil : stencils) {
         const auto& id = stencil.first;
@@ -35,7 +35,7 @@ void Painter::drawClippingMasks(const std::map<UnwrappedTileID, ClipID>& stencil
         MBGL_DEBUG_GROUP(std::string{ "mask: " } + util::toString(id));
         state.matrixFor(matrix, id);
         matrix::multiply(matrix, projMatrix, matrix);
-        shaderPlain->u_matrix = matrix;
+        plainShader.u_matrix = matrix;
 
         const GLint ref = (GLint)(clip.reference.to_ulong());
         config.stencilFunc = { GL_ALWAYS, ref, mask };

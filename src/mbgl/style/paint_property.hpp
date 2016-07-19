@@ -39,8 +39,14 @@ public:
         return *this;
     }
 
+    bool isUndefined() const {
+        return values.find(ClassID::Default) == values.end();
+    }
+
     const PropertyValue<T>& get() const {
-        return values.at(ClassID::Default);
+        static const PropertyValue<T> staticValue;
+        const auto it = values.find(ClassID::Default);
+        return it == values.end() ? staticValue : it->second;
     }
 
     void set(const PropertyValue<T>& value_, const optional<std::string>& klass) {

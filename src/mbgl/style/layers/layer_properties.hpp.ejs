@@ -37,7 +37,13 @@ public:
 <% if (/-pattern$/.test(property.name) || property.name === 'line-dasharray') { -%>
     PaintProperty<<%- propertyType(property) %>, CrossFadedPropertyEvaluator> <%- camelizeWithLeadingLowercase(property.name) %> { <%- defaultValue(property) %> };
 <% } else if (property.name === 'fill-outline-color') { -%>
-    PaintProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { { 0, 0, 0, -1 } };
+    PaintProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { {} };
+<% } else if (property.name.endsWith('color') && defaultValue(property) === '{ 0, 0, 0, 0 }') { -%>
+    PaintProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { {} };
+<% } else if (property.name.endsWith('color') && defaultValue(property) === '{ 0, 0, 0, 1 }') { -%>
+    PaintProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { Color::black() };
+<% } else if (property.name.endsWith('color') && defaultValue(property) === '{ 1, 1, 1, 1 }') { -%>
+    PaintProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { Color::white() };
 <% } else { -%>
     PaintProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { <%- defaultValue(property) %> };
 <% } -%>
