@@ -13,7 +13,6 @@ set(MBGL_TEST_FILES
     test/api/custom_layer.cpp
     test/api/render_missing.cpp
     test/api/repeated_render.cpp
-    test/api/set_style.cpp
 
     # geometry
     test/geometry/binpack.cpp

@@ -1,5 +1,6 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
@@ -51,6 +52,24 @@ TEST(Map, Offline) {
                      0.1);
 
     NetworkStatus::Set(NetworkStatus::Status::Online);
+}
+
+TEST(Map, SetStyleInvalidJSON) {
+    MapTest test;
+
+    Log::setObserver(std::make_unique<FixtureLogObserver>());
+
+    {
+        Map map(test.view, test.fileSource, MapMode::Still);
+        map.setStyleJSON("invalid");
+    }
+
+    auto observer = Log::removeObserver();
+    auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
+    EXPECT_EQ(1u, flo->count({ EventSeverity::Error, Event::ParseStyle, -1,
+        "Error parsing style JSON at 0: Invalid value." }));
+    auto unchecked = flo->unchecked();
+    EXPECT_TRUE(unchecked.empty()) << unchecked;
 }
 
 TEST(Map, DoubleStyleLoad) {
