@@ -10,6 +10,7 @@
 #include <mapbox/geojson/rapidjson.hpp>
 #include <mapbox/geojsonvt.hpp>
 #include <mapbox/geojsonvt/convert.hpp>
+#include <supercluster.hpp>
 
 #include <rapidjson/error/en.h>
 
@@ -47,13 +48,23 @@ std::string GeoJSONSource::Impl::getURL() {
 void GeoJSONSource::Impl::setGeoJSON(const mapbox::geojson::geojson& geoJSON) {
     double scale = util::EXTENT / util::tileSize;
 
-    mapbox::geojsonvt::Options vtOptions;
-    vtOptions.maxZoom = options.maxzoom;
-    vtOptions.extent = util::EXTENT;
-    vtOptions.buffer = std::round(scale * options.buffer);
-    vtOptions.tolerance = scale * options.tolerance;
+    if (!options.cluster) {
+        mapbox::geojsonvt::Options vtOptions;
+        vtOptions.maxZoom = options.maxzoom;
+        vtOptions.extent = util::EXTENT;
+        vtOptions.buffer = std::round(scale * options.buffer);
+        vtOptions.tolerance = scale * options.tolerance;
+        urlOrGeoJSON = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(geoJSON, vtOptions);
 
-    urlOrGeoJSON = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(geoJSON, vtOptions);
+    } else {
+        mapbox::supercluster::Options clusterOptions;
+        clusterOptions.maxZoom = options.clusterMaxZoom;
+        clusterOptions.extent = util::EXTENT;
+        clusterOptions.radius = std::round(scale * options.clusterRadius);
+
+        const auto& features = geoJSON.get<mapbox::geometry::feature_collection<double>>();
+        urlOrGeoJSON = std::make_unique<mapbox::supercluster::Supercluster>(features, clusterOptions);
+    }
 }
 
 void GeoJSONSource::Impl::load(FileSource& fileSource) {
@@ -113,7 +124,11 @@ Range<uint8_t> GeoJSONSource::Impl::getZoomRange() {
 std::unique_ptr<Tile> GeoJSONSource::Impl::createTile(const OverscaledTileID& tileID,
                                                       const UpdateParameters& parameters) {
     assert(loaded);
-    return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters, *urlOrGeoJSON.get<GeoJSONVTPointer>());
+    if (urlOrGeoJSON.is<GeoJSONVTPointer>()) {
+        return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters, *urlOrGeoJSON.get<GeoJSONVTPointer>());
+    } else {
+        return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters, *urlOrGeoJSON.get<SuperclusterPointer>());
+    }
 }
 
 } // namespace style

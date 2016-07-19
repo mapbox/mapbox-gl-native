@@ -30,7 +30,7 @@ private:
     Range<uint8_t> getZoomRange() final;
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
 
-    variant<std::string, GeoJSONVTPointer> urlOrGeoJSON;
+    variant<std::string, GeoJSONVTPointer, SuperclusterPointer> urlOrGeoJSON;
     std::unique_ptr<AsyncRequest> req;
 
     GeoJSONOptions options;

@@ -9,12 +9,17 @@ namespace geojsonvt {
 class GeoJSONVT;
 } // namespace geojsonvt
 
+namespace supercluster {
+class Supercluster;
+} // namespace supercluster
+
 } // namespace mapbox
 
 namespace mbgl {
 namespace style {
 
 using GeoJSONVTPointer = std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>;
+using SuperclusterPointer = std::unique_ptr<mapbox::supercluster::Supercluster>;
 
 struct GeoJSONOptions {
     // GeoJSON-VT options
