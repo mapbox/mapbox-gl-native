@@ -189,10 +189,9 @@ void OfflineDownload::activateDownload() {
 
             case SourceType::GeoJSON: {
                 style::GeoJSONSource::Impl* geojsonSource = static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
-                const variant<std::string, GeoJSON>& urlOrGeoJSON = geojsonSource->getURLOrGeoJSON();
 
-                if (urlOrGeoJSON.is<std::string>()) {
-                    ensureResource(Resource::source(urlOrGeoJSON.get<std::string>()));
+                if (!geojsonSource->loaded) {
+                    ensureResource(Resource::source(geojsonSource->getURL()));
                 }
                 break;
             }

@@ -38,6 +38,8 @@ public:
     void setURL(const std::string& url);
     void setGeoJSON(const mapbox::geojson::geojson&);
 
+    std::string getURL();
+
     // Private implementation
 
     class Impl;

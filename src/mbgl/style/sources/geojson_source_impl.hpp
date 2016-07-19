@@ -18,6 +18,8 @@ public:
     void setURL(std::string);
     void setGeoJSON(const mapbox::geojson::geojson&);
 
+    std::string getURL();
+
     void load(FileSource&) final;
 
     uint16_t getTileSize() const final {

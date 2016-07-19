@@ -52,7 +52,6 @@ std::unique_ptr<GeoJSONTileData> convertTile(const mapbox::geometry::feature_col
 
     if (!features.empty()) {
         std::vector<std::shared_ptr<const GeoJSONTileFeature>> convertedFeatures;
-        GeometryCoordinates line;
 
         ToFeatureType toFeatureType;
         ToGeometryCollection toGeometryCollection;
