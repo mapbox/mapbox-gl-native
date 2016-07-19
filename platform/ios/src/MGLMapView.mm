@@ -220,6 +220,7 @@ public:
 @property (nonatomic) GLKView *glView;
 @property (nonatomic) UIImageView *glSnapshotView;
 @property (nonatomic, readwrite) UIImageView *compassView;
+@property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *compassViewConstraints;
 @property (nonatomic, readwrite) UIImageView *logoView;
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *logoViewConstraints;
 @property (nonatomic, readwrite) UIButton *attributionButton;
@@ -451,7 +452,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     // setup compass
     //
     _compassView = [[UIImageView alloc] initWithImage:self.compassImage];
-    _compassView.frame = { CGPointZero, _compassView.image.size };
     _compassView.alpha = 0;
     _compassView.userInteractionEnabled = YES;
     [_compassView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
@@ -462,6 +462,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     [container addSubview:_compassView];
     container.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:container];
+    _compassViewConstraints = [NSMutableArray array];
 
     // setup interaction
     //
@@ -737,40 +738,29 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     // compass
     //
     UIView *compassContainer = self.compassView.superview;
-    [compassContainer removeConstraints:compassContainer.constraints];
+    [constraintParentView removeConstraints:self.compassViewConstraints];
+    [self.compassViewConstraints removeAllObjects];
 
-    NSMutableArray *compassContainerConstraints = [NSMutableArray array];
-    if (viewController)
-    {
-        [compassContainerConstraints addObject:
-         [NSLayoutConstraint constraintWithItem:compassContainer
-                                      attribute:NSLayoutAttributeTop
-                                      relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                         toItem:viewController.topLayoutGuide
-                                      attribute:NSLayoutAttributeBottom
-                                     multiplier:1
-                                       constant:5]];
-    }
-    [compassContainerConstraints addObject:
+    [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeTop
                                   relatedBy:NSLayoutRelationGreaterThanOrEqual
                                      toItem:self
                                   attribute:NSLayoutAttributeTop
                                  multiplier:1
-                                   constant:5]];
+                                   constant:5 + self.contentInset.top]];
 
-    [compassContainerConstraints addObject:
+    [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeTrailing
                                   relatedBy:NSLayoutRelationEqual
                                      toItem:compassContainer
                                   attribute:NSLayoutAttributeTrailing
                                  multiplier:1
-                                   constant:5]];
+                                   constant:5 + self.contentInset.right]];
 
     UIImage *compassImage = self.compassView.image;
-    [compassContainerConstraints addObject:
+    [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeWidth
                                   relatedBy:NSLayoutRelationEqual
@@ -779,7 +769,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                  multiplier:1
                                    constant:compassImage.size.width]];
 
-    [compassContainerConstraints addObject:
+    [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeHeight
                                   relatedBy:NSLayoutRelationEqual
@@ -787,23 +777,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                   attribute:NSLayoutAttributeNotAnAttribute
                                  multiplier:1
                                    constant:compassImage.size.height]];
-    [constraintParentView addConstraints:compassContainerConstraints];
+    [constraintParentView addConstraints:self.compassViewConstraints];
 
     // logo bug
     //
-    [self.logoView removeConstraints:self.logoViewConstraints];
+    [constraintParentView removeConstraints:self.logoViewConstraints];
     [self.logoViewConstraints removeAllObjects];
-    if (viewController)
-    {
-        [self.logoViewConstraints addObject:
-         [NSLayoutConstraint constraintWithItem:viewController.bottomLayoutGuide
-                                      attribute:NSLayoutAttributeTop
-                                      relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                         toItem:self.logoView
-                                      attribute:NSLayoutAttributeBaseline
-                                     multiplier:1
-                                       constant:8]];
-    }
+    
     [self.logoViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeBottom
@@ -811,7 +791,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                      toItem:self.logoView
                                   attribute:NSLayoutAttributeBaseline
                                  multiplier:1
-                                   constant:8]];
+                                   constant:8 + self.contentInset.bottom]];
 
     [self.logoViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self.logoView
@@ -820,24 +800,14 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                      toItem:self
                                   attribute:NSLayoutAttributeLeading
                                  multiplier:1
-                                   constant:8]];
+                                   constant:8 + self.contentInset.left]];
     [constraintParentView addConstraints:self.logoViewConstraints];
 
     // attribution button
     //
-    [self.attributionButton removeConstraints:self.attributionButtonConstraints];
+    [constraintParentView removeConstraints:self.attributionButtonConstraints];
     [self.attributionButtonConstraints removeAllObjects];
-    if (viewController)
-    {
-        [self.attributionButtonConstraints addObject:
-         [NSLayoutConstraint constraintWithItem:viewController.bottomLayoutGuide
-                                      attribute:NSLayoutAttributeTop
-                                      relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                         toItem:self.attributionButton
-                                      attribute:NSLayoutAttributeBaseline
-                                     multiplier:1
-                                       constant:8]];
-    }
+    
     [self.attributionButtonConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeBottom
@@ -845,7 +815,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                      toItem:self.attributionButton
                                   attribute:NSLayoutAttributeBaseline
                                  multiplier:1
-                                   constant:8]];
+                                   constant:8 + self.contentInset.bottom]];
 
     [self.attributionButtonConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
@@ -854,7 +824,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                      toItem:self.attributionButton
                                   attribute:NSLayoutAttributeTrailing
                                  multiplier:1
-                                   constant:8]];
+                                   constant:8 + self.contentInset.right]];
     [constraintParentView addConstraints:self.attributionButtonConstraints];
 
     [super updateConstraints];
@@ -974,6 +944,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         [self didUpdateLocationWithUserTrackingAnimated:animated];
     }
+    
+    // Compass, logo and attribution button constraints needs to be updated.
+    [self setNeedsUpdateConstraints];
 }
 
 /// Returns the frame of inset content within the map view.
@@ -3632,7 +3605,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         {
             MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
             annotationView = annotationContext.annotationView;
-            annotationView.selected = NO;
+            [annotationView setSelected:NO animated:animated];
         }
 
         // clean up

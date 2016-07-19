@@ -411,7 +411,6 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 {
     if (longPress.state == UIGestureRecognizerStateBegan)
     {
-        /*
         CGPoint point = [longPress locationInView:longPress.view];
         NSArray *features = [self.mapView visibleFeaturesAtPoint:point];
         NSString *title;
@@ -428,7 +427,6 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         pin.subtitle = [[[MGLCoordinateFormatter alloc] init] stringFromCoordinate:pin.coordinate];
         // Calling `addAnnotation:` on mapView is not required since `selectAnnotation:animated` has the side effect of adding the annotation if required
         [self.mapView selectAnnotation:pin animated:YES];
-        */
     }
 }
 
