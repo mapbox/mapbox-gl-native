@@ -30,7 +30,7 @@ Result<GeoJSON> convertGeoJSON(const JSValue& value) {
 }
 } // namespace conversion
 
-GeoJSONSource::Impl::Impl(std::string id_, Source& base_, const GeoJSONOptions& options_)
+GeoJSONSource::Impl::Impl(std::string id_, Source& base_, const GeoJSONOptions options_)
     : Source::Impl(SourceType::GeoJSON, std::move(id_), base_), options(options_) {
 }
 
@@ -124,11 +124,10 @@ std::unique_ptr<Tile> GeoJSONSource::Impl::createTile(const OverscaledTileID& ti
     assert(loaded);
     if (urlOrGeoJSON.is<GeoJSONVTPointer>()) {
         return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters, *urlOrGeoJSON.get<GeoJSONVTPointer>());
-    }
-    if (urlOrGeoJSON.is<SuperclusterPointer>()) {
+    } else {
+        assert(urlOrGeoJSON.is<SuperclusterPointer>());
         return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters, *urlOrGeoJSON.get<SuperclusterPointer>());
     }
-    assert(false);
 }
 
 } // namespace style
