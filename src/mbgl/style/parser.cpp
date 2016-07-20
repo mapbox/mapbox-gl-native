@@ -29,6 +29,11 @@ void Parser::parse(const std::string& json) {
         return;
     }
 
+    if (!document.IsObject()) {
+        Log::Error(Event::ParseStyle, "Style JSON must be an object");
+        return;
+    }
+
     if (document.HasMember("version")) {
         int version = document["version"].GetInt();
         if (version != 8) {
