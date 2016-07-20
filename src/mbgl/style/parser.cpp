@@ -35,7 +35,8 @@ void Parser::parse(const std::string& json) {
     }
 
     if (document.HasMember("version")) {
-        int version = document["version"].GetInt();
+        const JSValue& versionValue = document["version"];
+        const int version = versionValue.IsNumber() ? versionValue.GetInt() : 0;
         if (version != 8) {
             Log::Warning(Event::ParseStyle, "current renderer implementation only supports style spec version 8; using an outdated style will cause rendering errors");
         }
