@@ -32,22 +32,22 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
 
     private static final String TAG = "LocationServices";
 
-    private static LocationServices instance;
+    protected static LocationServices instance;
 
-    private Context context;
+    protected Context context;
     private LostApiClient locationClient;
     private Location lastLocation;
 
     private CopyOnWriteArrayList<LocationListener> locationListeners;
 
-    private boolean isGPSEnabled;
+    protected boolean isGPSEnabled;
 
     /**
      * Private constructor for singleton LocationServices
      */
-    private LocationServices(Context context) {
+    protected LocationServices(Context context) {
         super();
-        this.context = context;
+        this.context = context.getApplicationContext();
         // Setup location services
         locationClient = new LostApiClient.Builder(context).build();
         locationListeners = new CopyOnWriteArrayList<>();
@@ -61,7 +61,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
      */
     public static LocationServices getLocationServices(@NonNull final Context context) {
         if (instance == null) {
-            instance = new LocationServices(context.getApplicationContext());
+            instance = new LocationServices(context);
         }
         return instance;
     }
@@ -112,6 +112,11 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
         }
 
         isGPSEnabled = enableGPS;
+    }
+
+
+    public void release() {
+        context = null;
     }
 
     /**
