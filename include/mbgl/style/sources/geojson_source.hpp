@@ -1,6 +1,8 @@
 #pragma once
 
 #include <mbgl/style/source.hpp>
+#include <mbgl/util/geojson.hpp>
+
 #include <mapbox/geojson.hpp>
 
 namespace mapbox {
@@ -38,7 +40,7 @@ public:
     GeoJSONSource(const std::string& id, const GeoJSONOptions& options_ = GeoJSONOptions());
 
     void setURL(const std::string& url);
-    void setGeoJSON(const mapbox::geojson::geojson&);
+    void setGeoJSON(const GeoJSON&);
 
     std::string getURL();
 

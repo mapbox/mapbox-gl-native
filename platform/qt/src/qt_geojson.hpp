@@ -15,7 +15,7 @@ namespace style {
 namespace conversion {
 
 template <>
-Result<mapbox::geojson::geojson> convertGeoJSON(const QVariant& value) {
+Result<GeoJSON> convertGeoJSON(const QVariant& value) {
     if (value.type() != QVariant::ByteArray) {
         return Error { "JSON data must be in QByteArray" };
     }
@@ -36,7 +36,7 @@ Result<mapbox::geojson::geojson> convertGeoJSON(const QVariant& value) {
         return Error { message.str() };
     }
 
-    conversion::Result<mapbox::geojson::geojson> geoJSON = conversion::convertGeoJSON<JSValue>(d);
+    conversion::Result<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d);
     if (!geoJSON) {
         return Error { geoJSON.error().message };
     }

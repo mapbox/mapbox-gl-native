@@ -21,7 +21,7 @@ namespace style {
 namespace conversion {
 
 template <>
-Result<mapbox::geojson::geojson> convertGeoJSON(const JSValue& value) {
+Result<GeoJSON> convertGeoJSON(const JSValue& value) {
     try {
         return mapbox::geojson::convert(value);
     } catch (const std::exception& ex) {
@@ -45,7 +45,7 @@ std::string GeoJSONSource::Impl::getURL() {
     return urlOrGeoJSON.get<std::string>();
 }
 
-void GeoJSONSource::Impl::setGeoJSON(const mapbox::geojson::geojson& geoJSON) {
+void GeoJSONSource::Impl::setGeoJSON(const GeoJSON& geoJSON) {
     double scale = util::EXTENT / util::tileSize;
 
     if (!options.cluster) {
@@ -98,14 +98,12 @@ void GeoJSONSource::Impl::load(FileSource& fileSource) {
 
             invalidateTiles();
 
-            conversion::Result<mapbox::geojson::geojson> geoJSON = conversion::convertGeoJSON<JSValue>(d);
+            conversion::Result<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d);
             if (!geoJSON) {
                 Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", geoJSON.error().message.c_str());
                 // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
                 // tiles to load.
-                mapbox::geojson::feature_collection features;
-                mapbox::geojson::geojson empty_geojson{ features };
-                setGeoJSON(empty_geojson);
+                setGeoJSON(GeoJSON { FeatureCollection{} });
             } else {
                 setGeoJSON(*geoJSON);
             }

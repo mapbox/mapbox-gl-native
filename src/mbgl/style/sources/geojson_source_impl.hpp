@@ -16,7 +16,7 @@ public:
     ~Impl() final;
 
     void setURL(std::string);
-    void setGeoJSON(const mapbox::geojson::geojson&);
+    void setGeoJSON(const GeoJSON&);
 
     std::string getURL();
 

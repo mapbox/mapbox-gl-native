@@ -8,7 +8,7 @@ namespace style {
 namespace conversion {
 
 template <class V>
-Result<mapbox::geojson::geojson> convertGeoJSON(const V& value);
+Result<GeoJSON> convertGeoJSON(const V& value);
 
 } // namespace conversion
 } // namespace style

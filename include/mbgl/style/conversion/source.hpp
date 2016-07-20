@@ -159,7 +159,7 @@ private:
         auto result = std::make_unique<GeoJSONSource>(id, options);
 
         if (isObject(*dataValue)) {
-            Result<mapbox::geojson::geojson> geoJSON = convertGeoJSON(*dataValue);
+            Result<GeoJSON> geoJSON = convertGeoJSON(*dataValue);
             if (!geoJSON) {
                 return geoJSON.error();
             }
