@@ -27,6 +27,7 @@
     annotation.opacity = { static_cast<float>([delegate alphaForShapeAnnotation:self]) };
     annotation.color = { [delegate strokeColorForShapeAnnotation:self] };
     annotation.width = { static_cast<float>([delegate lineWidthForPolylineAnnotation:self]) };
+	annotation.isMappyPath = { static_cast<bool>([delegate witheStrokeForPolylineAnnotation:self]) };
 
     return annotation;
 }

@@ -15,6 +15,7 @@ void LineLayoutProperties::recalculate(const CalculationParameters& parameters) 
 void LinePaintProperties::cascade(const CascadeParameters& parameters) {
     lineOpacity.cascade(parameters);
     lineColor.cascade(parameters);
+	lineIsMappyPath.cascade(parameters);
     lineTranslate.cascade(parameters);
     lineTranslateAnchor.cascade(parameters);
     lineWidth.cascade(parameters);
@@ -31,6 +32,7 @@ bool LinePaintProperties::recalculate(const CalculationParameters& parameters) {
     hasTransitions |= lineOpacity.calculate(parameters);
     hasTransitions |= lineColor.calculate(parameters);
     hasTransitions |= lineTranslate.calculate(parameters);
+	hasTransitions |= lineIsMappyPath.calculate(parameters);
     hasTransitions |= lineTranslateAnchor.calculate(parameters);
     hasTransitions |= lineWidth.calculate(parameters);
     hasTransitions |= lineGapWidth.calculate(parameters);

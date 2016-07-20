@@ -249,6 +249,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (CGFloat)mapView:(MGLMapView *)mapView lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
 
+/**
+ Returns YES if a polyline annotation must have a white stroke.
+ 
+ By default, the polyline doesn't have a white stroke.
+ 
+ @param mapView The map view rendering the polyline annotation.
+ @param annotation The annotation being rendered.
+ @return YES or NO
+ */
+- (BOOL)mapView:(MGLMapView *)mapView whiteStrokeForPolylineAnnotation:(MGLPolyline *)annotation;
+
 #pragma mark Managing Annotation Views
 
 /**

@@ -47,6 +47,9 @@ public:
 
     PropertyValue<Color> getLineColor() const;
     void setLineColor(PropertyValue<Color>, const optional<std::string>& klass = {});
+	
+	PropertyValue<bool> getLineIsMappyPath () const;
+	void setLineIsMappyPath(PropertyValue<bool>, const optional<std::string>& klass = {});
 
     PropertyValue<std::array<float, 2>> getLineTranslate() const;
     void setLineTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});

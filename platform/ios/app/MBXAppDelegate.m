@@ -20,7 +20,7 @@ NSString * const MBXMapboxAccessTokenDefaultsKey = @"MBXMapboxAccessToken";
             // the token.
             accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:MBXMapboxAccessTokenDefaultsKey];
         }
-        [MGLAccountManager setAccessToken:accessToken];
+        [MGLAccountManager setAccessToken:@"sk.eyJ1IjoieGF2aWVyY291dGluIiwiYSI6IldfdlRPVlkifQ.Kdk-xoV7zPNAcD_FJtA-UQ"];
     }
 
     return YES;
