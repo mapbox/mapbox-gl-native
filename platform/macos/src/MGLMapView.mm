@@ -9,6 +9,7 @@
 #import "MGLGeometry_Private.h"
 #import "MGLMultiPoint_Private.h"
 #import "MGLOfflineStorage_Private.h"
+#import "MGLStyle_Private.hpp"
 
 #import "MGLAccountManager.h"
 #import "MGLMapCamera.h"
@@ -2125,6 +2126,16 @@ public:
     if (callout) {
         callout.positioningRect = [self positioningRectForCalloutForAnnotationWithTag:_selectedAnnotationTag];
     }
+}
+
+#pragma mark - Runtime styling
+
+- (MGLStyle *)style
+{
+    MGLStyle *style = [[MGLStyle alloc] init];
+    style.mapView = self;
+    style.mbglMap = _mbglMap;
+    return style;
 }
 
 #pragma mark MGLMultiPointDelegate methods

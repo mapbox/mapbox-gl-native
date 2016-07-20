@@ -484,6 +484,11 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
 }
 
+- (IBAction)runtimeStyling:(id)sender {
+    MGLFillStyleLayer *fillStyleLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
+    fillStyleLayer.fillColor = [NSColor redColor];
+}
+
 - (IBAction)dropPin:(NSMenuItem *)sender {
     [self dropPinAtPoint:_mouseLocationForMapViewContextMenu];
 }
@@ -577,6 +582,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return self.mapView.direction != 0;
     }
     if (menuItem.action == @selector(reload:)) {
+        return YES;
+    }
+    if (menuItem.action == @selector(runtimeStyling:)) {
         return YES;
     }
     if (menuItem.action == @selector(dropPin:)) {

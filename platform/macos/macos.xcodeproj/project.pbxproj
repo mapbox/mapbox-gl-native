@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3537CA741D3F93A600380318 /* MGLStyle_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3537CA731D3F93A600380318 /* MGLStyle_Private.hpp */; };
 		35602BFA1D3EA99F0050646F /* MGLFillStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 35602BF81D3EA99F0050646F /* MGLFillStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		35602BFB1D3EA99F0050646F /* MGLFillStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35602BF91D3EA99F0050646F /* MGLFillStyleLayer.mm */; };
 		35602BFF1D3EA9B40050646F /* MGLStyleLayer_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 35602BFC1D3EA9B40050646F /* MGLStyleLayer_Private.hpp */; };
@@ -153,6 +154,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3537CA731D3F93A600380318 /* MGLStyle_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MGLStyle_Private.hpp; sourceTree = "<group>"; };
 		35602BF81D3EA99F0050646F /* MGLFillStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFillStyleLayer.h; sourceTree = "<group>"; };
 		35602BF91D3EA99F0050646F /* MGLFillStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFillStyleLayer.mm; sourceTree = "<group>"; };
 		35602BFC1D3EA9B40050646F /* MGLStyleLayer_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MGLStyleLayer_Private.hpp; sourceTree = "<group>"; };
@@ -523,6 +525,7 @@
 				DAE6C36B1CC31E2A00DB3429 /* MGLAccountManager.m */,
 				DAE6C34D1CC31E0400DB3429 /* MGLMapCamera.h */,
 				DAE6C36E1CC31E2A00DB3429 /* MGLMapCamera.mm */,
+				3537CA731D3F93A600380318 /* MGLStyle_Private.hpp */,
 				DAE6C3571CC31E0400DB3429 /* MGLStyle.h */,
 				DAE6C37A1CC31E2A00DB3429 /* MGLStyle.mm */,
 				35602BFC1D3EA9B40050646F /* MGLStyleLayer_Private.hpp */,
@@ -615,6 +618,7 @@
 				35602C001D3EA9B40050646F /* MGLStyleLayer.h in Headers */,
 				DAE6C35D1CC31E0400DB3429 /* MGLMapCamera.h in Headers */,
 				DAE6C3B41CC31EF300DB3429 /* MGLCompassCell.h in Headers */,
+				3537CA741D3F93A600380318 /* MGLStyle_Private.hpp in Headers */,
 				DAE6C3B91CC31EF300DB3429 /* MGLOpenGLLayer.h in Headers */,
 				DAE6C3891CC31E2A00DB3429 /* MGLMultiPoint_Private.h in Headers */,
 				DAE6C3A51CC31E9400DB3429 /* MGLMapView+IBAdditions.h in Headers */,

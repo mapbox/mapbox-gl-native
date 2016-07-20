@@ -1,0 +1,29 @@
+<%
+  const type = locals.type;
+  const layoutProperties = locals.layoutProperties;
+  const paintProperties = locals.paintProperties;
+-%>
+// This file is generated. Do not edit.
+
+#import <Mapbox/Mapbox.h>
+
+#import "MGLTypes.h"
+
+@interface MGL<%- camelize(type) %>StyleLayer : MGLStyleLayer
+
+<% if (layoutProperties.length) { -%>
+// Layout properties
+
+<% for (const property of layoutProperties) { -%>
+@property (nonatomic) <%- propertyType(property) %> <% if (isObject(property)) { -%>*<% } -%><%- camelizeWithLeadingLowercase(property.name) %>;
+
+<% } -%>
+<% } -%>
+// Paint properties
+
+<% for (const property of paintProperties) { -%>
+@property (nonatomic) <%- propertyType(property) %> <% if (isObject(property)) { -%>*<% } -%><%- camelizeWithLeadingLowercase(property.name) %>;
+
+<% } -%>
+@end
+
