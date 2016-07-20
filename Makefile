@@ -476,3 +476,22 @@ clean:
 distclean: clean
 	-rm -rf ./mason_packages
 	-rm -rf ./node_modules
+
+#### Unity targets #####################################################
+
+export UNITY_OUTPUT_PATH = build/unity-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)/$(BUILDTYPE)
+UNITY_BUILD = $(UNITY_OUTPUT_PATH)/build.ninja
+
+$(UNITY_BUILD): $(BUILD_DEPS)
+	mkdir -p $(UNITY_OUTPUT_PATH)
+	(cd $(UNITY_OUTPUT_PATH) && cmake -G Ninja ../../.. \
+		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		-DMBGL_PLATFORM=unity \
+		-DMASON_PLATFORM=$(BUILD_PLATFORM) \
+		-DMASON_PLATFORM_VERSION=$(BUILD_PLATFORM_VERSION) \
+		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh))
+
+.PHONY: unity
+unity: $(UNITY_BUILD)
+	$(NINJA) -j$(JOBS) -C $(UNITY_OUTPUT_PATH) unity
