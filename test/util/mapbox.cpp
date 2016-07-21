@@ -7,7 +7,6 @@
 
 using namespace mbgl;
 
-
 TEST(Mapbox, SourceURL) {
     EXPECT_EQ(
         "https://api.mapbox.com/v4/user.map.json?access_token=key&secure",
@@ -66,6 +65,12 @@ TEST(Mapbox, SpriteURL) {
     EXPECT_EQ(
         "https://api.mapbox.com/styles/v1/mapbox/streets-v8/draft/sprite@2x.png?access_token=key",
         mbgl::util::mapbox::normalizeSpriteURL("mapbox://sprites/mapbox/streets-v8/draft@2x.png", "key"));
+    EXPECT_EQ(
+        "mapbox://sprites/mapbox/streets-v9?fresh=true.png",
+        mbgl::util::mapbox::normalizeSpriteURL(
+            "mapbox://sprites/mapbox/streets-v9?fresh=true.png",
+            "key"));
+    EXPECT_EQ("mapbox://////", mbgl::util::mapbox::normalizeSpriteURL("mapbox://////", "key"));
 }
 
 TEST(Mapbox, TileURL) {

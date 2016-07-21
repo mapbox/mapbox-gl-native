@@ -57,6 +57,7 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
     MGLMapDebugCollisionBoxesMask = 1 << 4,
     /** Each drawing operation is replaced by a translucent fill. Overlapping
         drawing operations appear more prominent to help diagnose overdrawing.
+        @note This option does nothing in Release builds of the SDK.
      */
     MGLMapDebugOverdrawVisualizationMask = 1 << 5,
 };
