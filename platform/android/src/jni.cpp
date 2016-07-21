@@ -1142,11 +1142,14 @@ void listOfflineRegions(JNIEnv *env, jni::jobject* obj, jlong defaultFileSourceP
             std::size_t index = 0;
             jni::jarray<jni::jobject>* jregions = &jni::NewObjectArray(*env2, regions->size(), *offlineRegionClass, NULL);
             for (auto& region : *regions) {
+                // Create a new local reference frame (capacity 2 for the NewObject allocations below)
+                // to avoid a local reference table overflow (#5629)
+                jni::UniqueLocalFrame frame = jni::PushLocalFrame(*env2, 2);
+
                 // Build the Region object
                 jni::jobject* jregion = &jni::NewObject(*env2, *offlineRegionClass, *offlineRegionConstructorId);
                 jni::SetField<jni::jobject*>(*env2, jregion, *offlineRegionOfflineManagerId, obj);
                 jni::SetField<jlong>(*env2, jregion, *offlineRegionIdId, region.getID());
-
 
                 // Definition object
                 mbgl::OfflineTilePyramidRegionDefinition definition = region.getDefinition();
