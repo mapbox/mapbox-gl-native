@@ -4,37 +4,52 @@
 
 #import "MGLTypes.h"
 
+typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineCap) {
+    MGLLineStyleLayerLineCapButt,
+    MGLLineStyleLayerLineCapRound,
+    MGLLineStyleLayerLineCapSquare,
+};
+typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineJoin) {
+    MGLLineStyleLayerLineJoinBevel,
+    MGLLineStyleLayerLineJoinRound,
+    MGLLineStyleLayerLineJoinMiter,
+};
+typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
+    MGLLineStyleLayerLineTranslateAnchorMap,
+    MGLLineStyleLayerLineTranslateAnchorViewport,
+};
+
 @interface MGLLineStyleLayer : MGLStyleLayer
 
 // Layout properties
 
-@property (nonatomic) NSString *lineCap;
+@property (nonatomic) MGLLineStyleLayerLineCap lineCap;
 
-@property (nonatomic) NSString *lineJoin;
+@property (nonatomic) MGLLineStyleLayerLineJoin lineJoin;
 
-@property (nonatomic) float lineMiterLimit;
+@property (nonatomic) CGFloat lineMiterLimit;
 
-@property (nonatomic) float lineRoundLimit;
+@property (nonatomic) CGFloat lineRoundLimit;
 
 // Paint properties
 
-@property (nonatomic) float lineOpacity;
+@property (nonatomic) CGFloat lineOpacity;
 
 @property (nonatomic) MGLColor *lineColor;
 
-@property (nonatomic) NSMutableArray *lineTranslate;
+@property (nonatomic) NSArray *lineTranslate;
 
-@property (nonatomic) NSString *lineTranslateAnchor;
+@property (nonatomic) MGLLineStyleLayerLineTranslateAnchor lineTranslateAnchor;
 
-@property (nonatomic) float lineWidth;
+@property (nonatomic) CGFloat lineWidth;
 
-@property (nonatomic) float lineGapWidth;
+@property (nonatomic) CGFloat lineGapWidth;
 
-@property (nonatomic) float lineOffset;
+@property (nonatomic) CGFloat lineOffset;
 
-@property (nonatomic) float lineBlur;
+@property (nonatomic) CGFloat lineBlur;
 
-@property (nonatomic) CGVector *lineDasharray;
+@property (nonatomic) NSArray *lineDasharray;
 
 @property (nonatomic) NSString *linePattern;
 

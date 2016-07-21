@@ -4,23 +4,32 @@
 
 #import "MGLTypes.h"
 
+typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCircleTranslateAnchor) {
+    MGLCircleStyleLayerCircleTranslateAnchorMap,
+    MGLCircleStyleLayerCircleTranslateAnchorViewport,
+};
+typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
+    MGLCircleStyleLayerCirclePitchScaleMap,
+    MGLCircleStyleLayerCirclePitchScaleViewport,
+};
+
 @interface MGLCircleStyleLayer : MGLStyleLayer
 
 // Paint properties
 
-@property (nonatomic) float circleRadius;
+@property (nonatomic) CGFloat circleRadius;
 
 @property (nonatomic) MGLColor *circleColor;
 
-@property (nonatomic) float circleBlur;
+@property (nonatomic) CGFloat circleBlur;
 
-@property (nonatomic) float circleOpacity;
+@property (nonatomic) CGFloat circleOpacity;
 
-@property (nonatomic) NSMutableArray *circleTranslate;
+@property (nonatomic) NSArray *circleTranslate;
 
-@property (nonatomic) NSString *circleTranslateAnchor;
+@property (nonatomic) MGLCircleStyleLayerCircleTranslateAnchor circleTranslateAnchor;
 
-@property (nonatomic) NSString *circlePitchScale;
+@property (nonatomic) MGLCircleStyleLayerCirclePitchScale circlePitchScale;
 
 @end
 

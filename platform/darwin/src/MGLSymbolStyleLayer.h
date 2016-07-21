@@ -4,13 +4,65 @@
 
 #import "MGLTypes.h"
 
+typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerSymbolPlacement) {
+    MGLSymbolStyleLayerSymbolPlacementPoint,
+    MGLSymbolStyleLayerSymbolPlacementLine,
+};
+typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconRotationAlignment) {
+    MGLSymbolStyleLayerIconRotationAlignmentMap,
+    MGLSymbolStyleLayerIconRotationAlignmentViewport,
+};
+typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconTextFit) {
+    MGLSymbolStyleLayerIconTextFitNone,
+    MGLSymbolStyleLayerIconTextFitBoth,
+    MGLSymbolStyleLayerIconTextFitWidth,
+    MGLSymbolStyleLayerIconTextFitHeight,
+};
+typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextPitchAlignment) {
+    MGLSymbolStyleLayerTextPitchAlignmentMap,
+    MGLSymbolStyleLayerTextPitchAlignmentViewport,
+};
+typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextRotationAlignment) {
+    MGLSymbolStyleLayerTextRotationAlignmentMap,
+    MGLSymbolStyleLayerTextRotationAlignmentViewport,
+};
+typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextJustify) {
+    MGLSymbolStyleLayerTextJustifyLeft,
+    MGLSymbolStyleLayerTextJustifyCenter,
+    MGLSymbolStyleLayerTextJustifyRight,
+};
+typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextAnchor) {
+    MGLSymbolStyleLayerTextAnchorCenter,
+    MGLSymbolStyleLayerTextAnchorLeft,
+    MGLSymbolStyleLayerTextAnchorRight,
+    MGLSymbolStyleLayerTextAnchorTop,
+    MGLSymbolStyleLayerTextAnchorBottom,
+    MGLSymbolStyleLayerTextAnchorTopLeft,
+    MGLSymbolStyleLayerTextAnchorTopRight,
+    MGLSymbolStyleLayerTextAnchorBottomLeft,
+    MGLSymbolStyleLayerTextAnchorBottomRight,
+};
+typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTransform) {
+    MGLSymbolStyleLayerTextTransformNone,
+    MGLSymbolStyleLayerTextTransformUppercase,
+    MGLSymbolStyleLayerTextTransformLowercase,
+};
+typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconTranslateAnchor) {
+    MGLSymbolStyleLayerIconTranslateAnchorMap,
+    MGLSymbolStyleLayerIconTranslateAnchorViewport,
+};
+typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
+    MGLSymbolStyleLayerTextTranslateAnchorMap,
+    MGLSymbolStyleLayerTextTranslateAnchorViewport,
+};
+
 @interface MGLSymbolStyleLayer : MGLStyleLayer
 
 // Layout properties
 
-@property (nonatomic) NSString *symbolPlacement;
+@property (nonatomic) MGLSymbolStyleLayerSymbolPlacement symbolPlacement;
 
-@property (nonatomic) float symbolSpacing;
+@property (nonatomic) CGFloat symbolSpacing;
 
 @property (nonatomic) BOOL symbolAvoidEdges;
 
@@ -20,55 +72,55 @@
 
 @property (nonatomic) BOOL iconOptional;
 
-@property (nonatomic) NSString *iconRotationAlignment;
+@property (nonatomic) MGLSymbolStyleLayerIconRotationAlignment iconRotationAlignment;
 
-@property (nonatomic) float iconSize;
+@property (nonatomic) CGFloat iconSize;
 
-@property (nonatomic) NSString *iconTextFit;
+@property (nonatomic) MGLSymbolStyleLayerIconTextFit iconTextFit;
 
-@property (nonatomic) NSMutableArray *iconTextFitPadding;
+@property (nonatomic) NSArray *iconTextFitPadding;
 
 @property (nonatomic) NSString *iconImage;
 
-@property (nonatomic) float iconRotate;
+@property (nonatomic) CGFloat iconRotate;
 
-@property (nonatomic) float iconPadding;
+@property (nonatomic) CGFloat iconPadding;
 
 @property (nonatomic) BOOL iconKeepUpright;
 
-@property (nonatomic) NSMutableArray *iconOffset;
+@property (nonatomic) NSArray *iconOffset;
 
-@property (nonatomic) NSString *textPitchAlignment;
+@property (nonatomic) MGLSymbolStyleLayerTextPitchAlignment textPitchAlignment;
 
-@property (nonatomic) NSString *textRotationAlignment;
+@property (nonatomic) MGLSymbolStyleLayerTextRotationAlignment textRotationAlignment;
 
 @property (nonatomic) NSString *textField;
 
-@property (nonatomic) CGVector *textFont;
+@property (nonatomic) NSArray *textFont;
 
-@property (nonatomic) float textSize;
+@property (nonatomic) CGFloat textSize;
 
-@property (nonatomic) float textMaxWidth;
+@property (nonatomic) CGFloat textMaxWidth;
 
-@property (nonatomic) float textLineHeight;
+@property (nonatomic) CGFloat textLineHeight;
 
-@property (nonatomic) float textLetterSpacing;
+@property (nonatomic) CGFloat textLetterSpacing;
 
-@property (nonatomic) NSString *textJustify;
+@property (nonatomic) MGLSymbolStyleLayerTextJustify textJustify;
 
-@property (nonatomic) NSString *textAnchor;
+@property (nonatomic) MGLSymbolStyleLayerTextAnchor textAnchor;
 
-@property (nonatomic) float textMaxAngle;
+@property (nonatomic) CGFloat textMaxAngle;
 
-@property (nonatomic) float textRotate;
+@property (nonatomic) CGFloat textRotate;
 
-@property (nonatomic) float textPadding;
+@property (nonatomic) CGFloat textPadding;
 
 @property (nonatomic) BOOL textKeepUpright;
 
-@property (nonatomic) NSString *textTransform;
+@property (nonatomic) MGLSymbolStyleLayerTextTransform textTransform;
 
-@property (nonatomic) NSMutableArray *textOffset;
+@property (nonatomic) NSArray *textOffset;
 
 @property (nonatomic) BOOL textAllowOverlap;
 
@@ -78,33 +130,33 @@
 
 // Paint properties
 
-@property (nonatomic) float iconOpacity;
+@property (nonatomic) CGFloat iconOpacity;
 
 @property (nonatomic) MGLColor *iconColor;
 
 @property (nonatomic) MGLColor *iconHaloColor;
 
-@property (nonatomic) float iconHaloWidth;
+@property (nonatomic) CGFloat iconHaloWidth;
 
-@property (nonatomic) float iconHaloBlur;
+@property (nonatomic) CGFloat iconHaloBlur;
 
-@property (nonatomic) NSMutableArray *iconTranslate;
+@property (nonatomic) NSArray *iconTranslate;
 
-@property (nonatomic) NSString *iconTranslateAnchor;
+@property (nonatomic) MGLSymbolStyleLayerIconTranslateAnchor iconTranslateAnchor;
 
-@property (nonatomic) float textOpacity;
+@property (nonatomic) CGFloat textOpacity;
 
 @property (nonatomic) MGLColor *textColor;
 
 @property (nonatomic) MGLColor *textHaloColor;
 
-@property (nonatomic) float textHaloWidth;
+@property (nonatomic) CGFloat textHaloWidth;
 
-@property (nonatomic) float textHaloBlur;
+@property (nonatomic) CGFloat textHaloBlur;
 
-@property (nonatomic) NSMutableArray *textTranslate;
+@property (nonatomic) NSArray *textTranslate;
 
-@property (nonatomic) NSString *textTranslateAnchor;
+@property (nonatomic) MGLSymbolStyleLayerTextTranslateAnchor textTranslateAnchor;
 
 @end
 

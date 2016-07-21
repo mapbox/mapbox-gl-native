@@ -4,21 +4,26 @@
 
 #import "MGLTypes.h"
 
+typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
+    MGLFillStyleLayerFillTranslateAnchorMap,
+    MGLFillStyleLayerFillTranslateAnchorViewport,
+};
+
 @interface MGLFillStyleLayer : MGLStyleLayer
 
 // Paint properties
 
 @property (nonatomic) BOOL fillAntialias;
 
-@property (nonatomic) float fillOpacity;
+@property (nonatomic) CGFloat fillOpacity;
 
 @property (nonatomic) MGLColor *fillColor;
 
 @property (nonatomic) MGLColor *fillOutlineColor;
 
-@property (nonatomic) NSMutableArray *fillTranslate;
+@property (nonatomic) NSArray *fillTranslate;
 
-@property (nonatomic) NSString *fillTranslateAnchor;
+@property (nonatomic) MGLFillStyleLayerFillTranslateAnchor fillTranslateAnchor;
 
 @property (nonatomic) NSString *fillPattern;
 

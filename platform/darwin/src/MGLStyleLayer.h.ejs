@@ -9,20 +9,39 @@
 
 #import "MGLTypes.h"
 
+<% for (const property of layoutProperties) { -%>
+<% if (property.type == "enum") { -%>
+typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %>) {
+<% for (const value of property.values) { -%>
+    MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
+<% } -%>
+};
+<% } -%>
+<% } -%>
+<% for (const property of paintProperties) { -%>
+<% if (property.type == "enum") { -%>
+typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %>) {
+<% for (const value of property.values) { -%>
+    MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
+<% } -%>
+};
+<% } -%>
+<% } -%>
+
 @interface MGL<%- camelize(type) %>StyleLayer : MGLStyleLayer
 
 <% if (layoutProperties.length) { -%>
 // Layout properties
 
 <% for (const property of layoutProperties) { -%>
-@property (nonatomic) <%- propertyType(property) %> <% if (isObject(property)) { -%>*<% } -%><%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic) <%- propertyType(property, type) %> <% if (isObject(property)) { -%>*<% } -%><%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 <% } -%>
 // Paint properties
 
 <% for (const property of paintProperties) { -%>
-@property (nonatomic) <%- propertyType(property) %> <% if (isObject(property)) { -%>*<% } -%><%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic) <%- propertyType(property, type) %> <% if (isObject(property)) { -%>*<% } -%><%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 @end

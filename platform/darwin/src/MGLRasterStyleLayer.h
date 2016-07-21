@@ -4,23 +4,24 @@
 
 #import "MGLTypes.h"
 
+
 @interface MGLRasterStyleLayer : MGLStyleLayer
 
 // Paint properties
 
-@property (nonatomic) float rasterOpacity;
+@property (nonatomic) CGFloat rasterOpacity;
 
-@property (nonatomic) float rasterHueRotate;
+@property (nonatomic) CGFloat rasterHueRotate;
 
-@property (nonatomic) float rasterBrightnessMin;
+@property (nonatomic) CGFloat rasterBrightnessMin;
 
-@property (nonatomic) float rasterBrightnessMax;
+@property (nonatomic) CGFloat rasterBrightnessMax;
 
-@property (nonatomic) float rasterSaturation;
+@property (nonatomic) CGFloat rasterSaturation;
 
-@property (nonatomic) float rasterContrast;
+@property (nonatomic) CGFloat rasterContrast;
 
-@property (nonatomic) float rasterFadeDuration;
+@property (nonatomic) CGFloat rasterFadeDuration;
 
 @end
 

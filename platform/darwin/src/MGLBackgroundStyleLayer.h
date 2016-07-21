@@ -4,6 +4,7 @@
 
 #import "MGLTypes.h"
 
+
 @interface MGLBackgroundStyleLayer : MGLStyleLayer
 
 // Paint properties
@@ -12,7 +13,7 @@
 
 @property (nonatomic) NSString *backgroundPattern;
 
-@property (nonatomic) float backgroundOpacity;
+@property (nonatomic) CGFloat backgroundOpacity;
 
 @end
 

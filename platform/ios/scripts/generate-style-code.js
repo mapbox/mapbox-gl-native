@@ -4,6 +4,9 @@ const fs = require('fs');
 const ejs = require('ejs');
 const spec = require('mapbox-gl-style-spec').latest;
 
+var prefix = 'MGL';
+var suffix = 'StyleLayer';
+
 global.camelize = function (str) {
     return str.replace(/(?:^|-)(.)/g, function (_, x) {
         return x.toUpperCase();
@@ -24,31 +27,25 @@ global.isObject = function (property) {
             return true;
         case 'array':
             return true;
-        case 'enum': // (enum will be converted to NSString hence isObject(enum) == true)
-            return true;
         default:
             return false;
     }
 }
 
-global.propertyType = function (property) {
+global.propertyType = function (property, layerType = null) {
     switch (property.type) {
         case 'boolean':
             return 'BOOL';
         case 'number':
-            return 'float';
+            return 'CGFloat';
         case 'string':
             return 'NSString';
         case 'enum':
-            return 'NSString';
+            return `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`
         case 'color':
             return `MGLColor`;
         case 'array':
-            if (property.length) {
-                return `NSMutableArray`;
-            } else {
-                return `CGVector`;
-            }
+            return 'NSArray';
         default: throw new Error(`unknown type for ${property.name}`)
     }
 }
@@ -78,5 +75,5 @@ const layers = spec.layer.type.values.map((type) => {
 });
 
 for (const layer of layers) {
-    fs.writeFileSync(`platform/darwin/src/MGL${camelize(layer.type)}StyleLayer.h`, layerH(layer));
+    fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, layerH(layer));
 }
