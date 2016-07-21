@@ -15,7 +15,7 @@ struct NodeLogObserver::LogMessage {
         : severity(severity_),
         event(event_),
         code(code_),
-        text(text_) {}
+        text(std::move(text_)) {}
 };
 
 NodeLogObserver::NodeLogObserver(v8::Local<v8::Object> target)
@@ -61,4 +61,4 @@ bool NodeLogObserver::onRecord(mbgl::EventSeverity severity, mbgl::Event event, 
     return true;
 }
 
-}
+} // namespace node_mbgl

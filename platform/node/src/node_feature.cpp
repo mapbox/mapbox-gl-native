@@ -166,4 +166,4 @@ v8::Local<v8::Object> toJS(const Feature& feature) {
     return scope.Escape(result);
 }
 
-}
+} // namespace node_mbgl
