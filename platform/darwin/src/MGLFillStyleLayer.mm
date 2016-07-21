@@ -1,7 +1,6 @@
 #import "MGLFillStyleLayer.h"
 
 #include "MGLStyleLayer_Private.hpp"
-
 #include <mbgl/style/layers/fill_layer.hpp>
 
 @interface MGLFillStyleLayer() {
@@ -19,7 +18,7 @@
 - (void)setFillColor:(MGLColor *)fillColor
 {
     _fillColor = fillColor;
-    fillLayer->setFillColor(MGLColorFromColor(fillColor));
+    fillLayer->setFillColor(fillColor.mbgl_color);
     [self updateStyleAndClasses];
 }
 

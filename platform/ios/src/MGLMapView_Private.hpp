@@ -1,5 +1,7 @@
 #import <Mapbox/Mapbox.h>
 
+#include <mbgl/mbgl.hpp>
+
 /// Minimum size of an annotation’s accessibility element.
 extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;
 
@@ -10,6 +12,9 @@ extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;
 
 /** Triggers another render pass even when it is not necessary. */
 - (void)setNeedsGLDisplay;
+
+// TODO: TBD Temporary way of accessing mbglMap while runtime styling is being developed.
+- (mbgl::Map *)mbglMap;
 
 /** Returns whether the map view is currently loading or processing any assets required to render the map */
 - (BOOL)isFullyLoaded;

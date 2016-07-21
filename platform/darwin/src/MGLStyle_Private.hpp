@@ -7,5 +7,4 @@
 
 @interface MGLStyle (Private)
 @property (nonatomic, weak) MGLMapView *mapView;
-@property (nonatomic) mbgl::Map *mbglMap;
 @end

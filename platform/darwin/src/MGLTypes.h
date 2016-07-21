@@ -13,11 +13,11 @@
 #endif
 
 #if TARGET_OS_IPHONE
-#define MGLColor UIColor
 @class UIColor;
+#define MGLColor UIColor
 #else
-#define MGLColor NSColor
 @class NSColor;
+#define MGLColor NSColor
 #endif
 
 NS_ASSUME_NONNULL_BEGIN

@@ -1,4 +1,4 @@
-#import "MGLMapView_Private.h"
+#import "MGLMapView_Private.hpp"
 #import "MGLAnnotationImage_Private.h"
 #import "MGLAttributionButton.h"
 #import "MGLCompassCell.h"
@@ -2134,8 +2134,12 @@ public:
 {
     MGLStyle *style = [[MGLStyle alloc] init];
     style.mapView = self;
-    style.mbglMap = _mbglMap;
     return style;
+}
+
+- (mbgl::Map *)mbglMap
+{
+    return _mbglMap;
 }
 
 #pragma mark MGLMultiPointDelegate methods
