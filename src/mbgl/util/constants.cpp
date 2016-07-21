@@ -6,7 +6,7 @@ namespace mbgl {
 
 namespace debug {
 
-#if defined(DEBUG)
+#ifndef NDEBUG
 const bool tileParseWarnings = false;
 const bool styleParseWarnings = false;
 const bool spriteWarnings = false;

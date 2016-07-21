@@ -2,7 +2,7 @@
 
 #include <string>
 
-#if defined(DEBUG)
+#ifndef NDEBUG
 #define __MBGL_DEBUG_GROUP_NAME2(counter) __MBGL_DEBUG_GROUP_##counter
 #define __MBGL_DEBUG_GROUP_NAME(counter) __MBGL_DEBUG_GROUP_NAME2(counter)
 #define MBGL_DEBUG_GROUP(string) ::mbgl::gl::debugging::group __MBGL_DEBUG_GROUP_NAME(__LINE__)(string);
