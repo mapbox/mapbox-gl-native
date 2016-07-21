@@ -3,7 +3,8 @@
   const layoutProperties = locals.layoutProperties;
   const paintProperties = locals.paintProperties;
 -%>
-// This file is generated. Do not edit.
+// This file is generated. 
+// Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-ios`.
 
 #import <Mapbox/Mapbox.h>
 
@@ -31,16 +32,22 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 @interface MGL<%- camelize(type) %>StyleLayer : MGLStyleLayer
 
 <% if (layoutProperties.length) { -%>
-// Layout properties
+#pragma mark - Accessing the Layout Attributes
 
 <% for (const property of layoutProperties) { -%>
+/**
+  <%- property.doc %>
+*/
 @property (nonatomic) <%- propertyType(property, type) %> <% if (isObject(property)) { -%>*<% } -%><%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 <% } -%>
-// Paint properties
+#pragma mark - Accessing the Paint Attributes
 
 <% for (const property of paintProperties) { -%>
+/**
+  <%- property.doc %>
+*/
 @property (nonatomic) <%- propertyType(property, type) %> <% if (isObject(property)) { -%>*<% } -%><%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
