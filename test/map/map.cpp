@@ -1,5 +1,6 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/test/fake_file_source.hpp>
 #include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/map/map.hpp>
@@ -78,6 +79,69 @@ TEST(Map, DoubleStyleLoad) {
     Map map(test.view, test.fileSource, MapMode::Still);
     map.setStyleJSON("");
     map.setStyleJSON("");
+}
+
+TEST(Map, StyleFresh) {
+    // The map should not revalidate fresh styles.
+
+    MapTest test;
+    FakeFileSource fileSource;
+
+    Map map(test.view, fileSource, MapMode::Still);
+    map.setStyleURL("mapbox://styles/test");
+    EXPECT_EQ(1u, fileSource.requests.size());
+
+    Response response;
+    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
+    response.expires = Timestamp::max();
+
+    fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(0u, fileSource.requests.size());
+}
+
+TEST(Map, StyleExpired) {
+    // The map should allow expired styles to be revalidated, so long as no mutations are made.
+
+    using namespace std::chrono_literals;
+
+    MapTest test;
+    FakeFileSource fileSource;
+
+    Map map(test.view, fileSource, MapMode::Still);
+    map.setStyleURL("mapbox://styles/test");
+    EXPECT_EQ(1u, fileSource.requests.size());
+
+    Response response;
+    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
+    response.expires = util::now() - 1h;
+
+    fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(1u, fileSource.requests.size());
+
+    map.addLayer(std::make_unique<style::BackgroundLayer>("bg"));
+    EXPECT_EQ(1u, fileSource.requests.size());
+
+    fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(0u, fileSource.requests.size());
+    EXPECT_NE(nullptr, map.getLayer("bg"));
+}
+
+TEST(Map, StyleEarlyMutation) {
+    // An early mutation should not prevent the initial style load.
+
+    MapTest test;
+    FakeFileSource fileSource;
+
+    Map map(test.view, fileSource, MapMode::Still);
+    map.setStyleURL("mapbox://styles/test");
+    map.addLayer(std::make_unique<style::BackgroundLayer>("bg"));
+
+    Response response;
+    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/water.json"));
+    fileSource.respond(Resource::Style, response);
+
+    EXPECT_EQ(0u, fileSource.requests.size());
+    EXPECT_NE(nullptr, map.getLayer("water"));
 }
 
 TEST(Map, AddLayer) {

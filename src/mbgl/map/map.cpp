@@ -67,6 +67,7 @@ public:
 
     std::string styleURL;
     std::string styleJSON;
+    bool styleMutated = false;
 
     std::unique_ptr<AsyncRequest> styleRequest;
 
@@ -293,10 +294,21 @@ void Map::setStyleURL(const std::string& url) {
     impl->styleRequest = nullptr;
     impl->styleURL = url;
     impl->styleJSON.clear();
+    impl->styleMutated = false;
 
     impl->style = std::make_unique<Style>(impl->fileSource, impl->pixelRatio);
 
     impl->styleRequest = impl->fileSource.request(Resource::style(impl->styleURL), [this](Response res) {
+        // Once we get a fresh style, or the style is mutated, stop revalidating.
+        if (res.isFresh() || impl->styleMutated) {
+            impl->styleRequest.reset();
+        }
+
+        // Don't allow a loaded, mutated style to be overwritten with a new version.
+        if (impl->styleMutated && impl->style->loaded) {
+            return;
+        }
+
         if (res.error) {
             if (res.error->reason == Response::Error::Reason::NotFound &&
                 util::mapbox::isMapboxURL(impl->styleURL)) {
@@ -323,6 +335,8 @@ void Map::setStyleJSON(const std::string& json) {
 
     impl->styleURL.clear();
     impl->styleJSON.clear();
+    impl->styleMutated = false;
+
     impl->style = std::make_unique<Style>(impl->fileSource, impl->pixelRatio);
 
     impl->loadStyleJSON(json);
@@ -746,22 +760,27 @@ AnnotationIDs Map::queryPointAnnotations(const ScreenBox& box) {
 #pragma mark - Style API
 
 style::Source* Map::getSource(const std::string& sourceID) {
+    impl->styleMutated = true;
     return impl->style ? impl->style->getSource(sourceID) : nullptr;
 }
 
 void Map::addSource(std::unique_ptr<style::Source> source) {
+    impl->styleMutated = true;
     impl->style->addSource(std::move(source));
 }
 
 void Map::removeSource(const std::string& sourceID) {
+    impl->styleMutated = true;
     impl->style->removeSource(sourceID);
 }
 
 style::Layer* Map::getLayer(const std::string& layerID) {
+    impl->styleMutated = true;
     return impl->style ? impl->style->getLayer(layerID) : nullptr;
 }
 
 void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& before) {
+    impl->styleMutated = true;
     impl->view.activate();
 
     impl->style->addLayer(std::move(layer), before);
@@ -772,6 +791,7 @@ void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& be
 }
 
 void Map::removeLayer(const std::string& id) {
+    impl->styleMutated = true;
     impl->view.activate();
 
     impl->style->removeLayer(id);
