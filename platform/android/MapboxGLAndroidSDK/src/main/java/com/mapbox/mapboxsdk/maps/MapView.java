@@ -1504,12 +1504,12 @@ public class MapView extends FrameLayout {
         LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
         // NaN and Infinite checks to prevent JSON errors at send to server time
-        if (Double.isNaN(tapLatLng.getLatitude()) ||  Double.isNaN(tapLatLng.getLongitude())) {
+        if (Double.isNaN(tapLatLng.getLatitude()) || Double.isNaN(tapLatLng.getLongitude())) {
             Log.d(MapView.class.getSimpleName(), "trackGestureEvent() has a NaN lat or lon.  Returning.");
             return;
         }
 
-        if (Double.isInfinite(tapLatLng.getLatitude()) ||  Double.isInfinite(tapLatLng.getLongitude())) {
+        if (Double.isInfinite(tapLatLng.getLatitude()) || Double.isInfinite(tapLatLng.getLongitude())) {
             Log.d(MapView.class.getSimpleName(), "trackGestureEvent() has an Infinite lat or lon.  Returning.");
             return;
         }
@@ -1536,12 +1536,12 @@ public class MapView extends FrameLayout {
         LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
         // NaN and Infinite checks to prevent JSON errors at send to server time
-        if (Double.isNaN(tapLatLng.getLatitude()) ||  Double.isNaN(tapLatLng.getLongitude())) {
+        if (Double.isNaN(tapLatLng.getLatitude()) || Double.isNaN(tapLatLng.getLongitude())) {
             Log.d(MapView.class.getSimpleName(), "trackGestureDragEndEvent() has a NaN lat or lon.  Returning.");
             return;
         }
 
-        if (Double.isInfinite(tapLatLng.getLatitude()) ||  Double.isInfinite(tapLatLng.getLongitude())) {
+        if (Double.isInfinite(tapLatLng.getLatitude()) || Double.isInfinite(tapLatLng.getLongitude())) {
             Log.d(MapView.class.getSimpleName(), "trackGestureDragEndEvent() has an Infinite lat or lon.  Returning.");
             return;
         }
@@ -1822,7 +1822,7 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
-            requestDisallowInterceptTouchEvent(true);
+         //   requestDisallowInterceptTouchEvent(true);
 
             // reset tracking modes if gesture occurs
             resetTrackingModesIfRequired();
@@ -2638,11 +2638,11 @@ public class MapView extends FrameLayout {
      * @param callback The callback object that will be triggered when the map is ready to be used.
      */
     @UiThread
-    public void getMapAsync(@NonNull final OnMapReadyCallback callback) {
-        if (!mInitialLoad) {
+    public void getMapAsync(final OnMapReadyCallback callback) {
+        if (!mInitialLoad && callback != null) {
             callback.onMapReady(mMapboxMap);
         } else {
-            if(callback!=null) {
+            if (callback != null) {
                 mOnMapReadyCallbackList.add(callback);
             }
         }

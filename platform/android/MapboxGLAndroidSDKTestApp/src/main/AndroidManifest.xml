@@ -24,7 +24,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.infowindow.InfoWindowActivity"
             android:description="@string/description_info_window"
@@ -187,7 +186,6 @@
                 android:name="@string/category"
                 android:value="@string/category_annotation" />
         </activity>
-
         <activity
             android:name=".activity.annotation.PolylineActivity"
             android:description="@string/description_polyline"
@@ -261,7 +259,6 @@
                 android:name="@string/category"
                 android:value="@string/category_maplayout" />
         </activity>
-
         <activity
             android:name=".activity.annotation.MarkerViewActivity"
             android:description="@string/description_view_marker"
@@ -278,7 +275,6 @@
                 android:name="@string/category"
                 android:value="@string/category_annotation" />
         </activity>
-
         <activity
             android:name=".activity.navigation.LocationPickerActivity"
             android:description="@string/description_location_picker"
@@ -287,11 +283,19 @@
                 android:name="@string/category"
                 android:value="@string/category_navigation" />
         </activity>
-
         <activity
             android:name=".activity.fragment.ViewPagerActivity"
             android:description="@string/description_viewpager"
             android:label="@string/activity_viewpager">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_fragment" />
+        </activity>
+        <activity
+            android:name=".activity.maplayout.NavigationDrawerActivity"
+            android:description="@string/description_navigation_drawer"
+            android:label="@string/title_activity_navigation_drawer"
+            android:theme="@style/AppTheme.ActionBar.Transparent">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_fragment" />
@@ -306,9 +310,9 @@
             android:value="sk.eyJ1IjoiYmxlZWdlIiwiYSI6InNpcml1c2x5In0.KyT-boMyC_xZYTYojTc8zg" />
 
         <!-- Comment out this setting to switch to external storage (and disable internal) in your app -->
-        <!--<meta-data-->
-            <!--android:name="com.mapbox.SetStorageExternal"-->
-            <!--android:value="true" />-->
+        <!-- <meta-data -->
+        <!-- android:name="com.mapbox.SetStorageExternal" -->
+        <!-- android:value="true" /> -->
 
         <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
 

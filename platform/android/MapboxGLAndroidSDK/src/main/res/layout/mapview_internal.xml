@@ -9,7 +9,7 @@
     <FrameLayout
         android:id="@+id/markerViewContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <com.mapbox.mapboxsdk.maps.widgets.CompassView
         android:id="@+id/compassView"
@@ -28,11 +28,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
+        android:background="@drawable/bg_default_selector"
         android:clickable="true"
         android:contentDescription="@string/attributionsIconContentDescription"
         android:padding="7dp"
-        android:src="@drawable/ic_info_outline_24dp_selector"
-        android:background="@drawable/bg_default_selector"/>
+        android:src="@drawable/ic_info_outline_24dp_selector" />
 
     <com.mapbox.mapboxsdk.maps.widgets.MyLocationView
         android:id="@+id/userLocationView"
