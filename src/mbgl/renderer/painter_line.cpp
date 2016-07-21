@@ -148,7 +148,7 @@ void Painter::renderLine(PaintParameters& parameters,
 			config.program = lineShader.getID();
 			
 			lineShader.u_matrix = vtxMatrix;
-			lineShader.u_linewidth = properties.lineWidth;
+			lineShader.u_linewidth = (properties.lineWidth * 3.0f) / 4.0f;
 			lineShader.u_gapwidth = properties.lineGapWidth / 2;
 			lineShader.u_antialiasing = antialiasing / 2;
 			lineShader.u_ratio = ratio;
