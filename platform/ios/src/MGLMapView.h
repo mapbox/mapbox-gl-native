@@ -43,7 +43,7 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
     MGLAnnotationVerticalAlignmentBottom,
 };
 
-/** Options for enabling debugging features in an MGLMapView instance. */
+/** Options for enabling debugging features in an `MGLMapView` instance. */
 typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
     /** Edges of tile boundaries are shown as thick, red lines to help diagnose
         tile clipping issues. */
@@ -64,7 +64,7 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
 
 /**
  An interactive, customizable map view with an interface similar to the one
- provided by Apple's MapKit.
+ provided by Apple’s MapKit.
  
  Using `MGLMapView`, you can embed the map inside a view, allow users to
  manipulate it with standard gestures, animate the map between different
@@ -87,7 +87,7 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
  Mapbox-hosted vector tiles and styles require an API access token, which you
  can obtain from the
  <a href="https://www.mapbox.com/studio/account/tokens/">Mapbox account page</a>.
- Access tokens associate requests to Mapbox's vector tile and style APIs with
+ Access tokens associate requests to Mapbox’s vector tile and style APIs with
  your Mapbox account. They also deter other developers from using your styles
  without your permission.
  
@@ -114,9 +114,9 @@ IB_DESIGNABLE
  
  @param frame The frame for the view, measured in points.
  @param styleURL URL of the map style to display. The URL may be a full HTTP
-    or HTTPS URL, a Mapbox URL indicating the style's map ID
+    or HTTPS URL, a Mapbox URL indicating the style’s map ID
     (`mapbox://styles/{user}/{style}`), or a path to a local file relative
-    to the application's resource path. Specify `nil` for the default style.
+    to the application’s resource path. Specify `nil` for the default style.
  @return An initialized map view.
  */
 - (instancetype)initWithFrame:(CGRect)frame styleURL:(nullable NSURL *)styleURL;
@@ -124,7 +124,7 @@ IB_DESIGNABLE
 #pragma mark Accessing the Delegate
 
 /**
- The receiver's delegate.
+ The receiver’s delegate.
  
  A map view sends messages to its delegate to notify it of changes to its
  contents or the viewpoint. The delegate also provides information about
@@ -133,7 +133,7 @@ IB_DESIGNABLE
  */
 @property(nonatomic, weak, nullable) IBOutlet id<MGLMapViewDelegate> delegate;
 
-#pragma mark Configuring the Map's Appearance
+#pragma mark Configuring the Map’s Appearance
 
 /**
  URLs of the styles bundled with the library.
@@ -146,12 +146,12 @@ IB_DESIGNABLE
 /**
  URL of the style currently displayed in the receiver.
  
- The URL may be a full HTTP or HTTPS URL, a Mapbox URL indicating the style's
+ The URL may be a full HTTP or HTTPS URL, a Mapbox URL indicating the style’s
  map ID (`mapbox://styles/{user}/{style}`), or a path to a local file
- relative to the application's resource path.
+ relative to the application’s resource path.
  
  If you set this property to `nil`, the receiver will use the default style
- and this property will automatically be set to that style's URL.
+ and this property will automatically be set to that style’s URL.
  */
 @property (nonatomic, null_resettable) NSURL *styleURL;
 
@@ -170,7 +170,7 @@ IB_DESIGNABLE
 - (IBAction)reloadStyle:(id)sender;
 
 /**
- A control indicating the map's direction and allowing the user to manipulate
+ A control indicating the map’s direction and allowing the user to manipulate
  the direction, positioned in the upper-right corner.
  */
 @property (nonatomic, readonly) UIImageView *compassView;
@@ -236,18 +236,18 @@ IB_DESIGNABLE
  */
 - (void)removeStyleClass:(NSString *)styleClass;
 
-#pragma mark Displaying the User's Location
+#pragma mark Displaying the User’s Location
 
 /**
  A Boolean value indicating whether the map may display the user location.
  
  Setting this property to `YES` causes the map view to use the Core Location
  framework to find the current location. As long as this property is `YES`, the
- map view continues to track the user's location and update it periodically.
+ map view continues to track the user’s location and update it periodically.
  
- This property does not indicate whether the user's position is actually visible
+ This property does not indicate whether the user’s position is actually visible
  on the map, only whether the map view is allowed to display it. To determine
- whether the user's position is visible, use the `userLocationVisible` property.
+ whether the user’s position is visible, use the `userLocationVisible` property.
  The default value of this property is `NO`.
  
  On iOS 8 and above, your app must specify a value for
@@ -258,7 +258,7 @@ IB_DESIGNABLE
 @property (nonatomic, assign) BOOL showsUserLocation;
 
 /** 
- A Boolean value indicating whether the device's current location is visible in
+ A Boolean value indicating whether the device’s current location is visible in
  the map view.
  
  Use `showsUserLocation` to control the visibility of the on-screen user
@@ -267,7 +267,7 @@ IB_DESIGNABLE
 @property (nonatomic, assign, readonly, getter=isUserLocationVisible) BOOL userLocationVisible;
 
 /**
- Returns the annotation object indicating the user's current location.
+ Returns the annotation object indicating the user’s current location.
  */
 @property (nonatomic, readonly, nullable) MGLUserLocation *userLocation;
 
@@ -578,7 +578,7 @@ IB_DESIGNABLE
 - (IBAction)resetNorth;
 
 /**
- The coordinate bounds visible in the receiver's viewport.
+ The coordinate bounds visible in the receiver’s viewport.
  
  Changing the value of this property updates the receiver immediately. If you
  want to animate the change, call `-setVisibleCoordinateBounds:animated:`
@@ -597,7 +597,7 @@ IB_DESIGNABLE
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated;
 
 /**
- Changes the receiver's viewport to fit the given coordinate bounds and
+ Changes the receiver’s viewport to fit the given coordinate bounds and
  optionally some additional padding on each side.
  
  @param bounds The bounds that the viewport will show in its entirety.
@@ -609,7 +609,7 @@ IB_DESIGNABLE
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
 
 /**
- Changes the receiver's viewport to fit all of the given coordinates and
+ Changes the receiver’s viewport to fit all of the given coordinates and
  optionally some additional padding on each side.
  
  @param coordinates The coordinates that the viewport will show.
@@ -623,7 +623,7 @@ IB_DESIGNABLE
 - (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
 
 /**
- Changes the receiver's viewport to fit all of the given coordinates and
+ Changes the receiver’s viewport to fit all of the given coordinates and
  optionally some additional padding on each side.
  
  @param coordinates The coordinates that the viewport will show.
@@ -657,7 +657,7 @@ IB_DESIGNABLE
  Sets the visible region so that the map displays the specified annotations with
  the specified amount of padding on each side.
 
- Calling this method updates the value in the visibleCoordinateBounds property
+ Calling this method updates the value in the `visibleCoordinateBounds` property
  and potentially other properties to reflect the new map region.
 
  @param annotations The annotations that you want to be visible in the map.
@@ -788,7 +788,7 @@ IB_DESIGNABLE
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets;
 
 /**
- Returns the point in this view's coordinate system on which to "anchor" in
+ Returns the point in this view’s coordinate system on which to "anchor" in
  response to a user-initiated gesture.
  
  For example, a pinch-to-zoom gesture would anchor the map at the midpoint of
@@ -798,7 +798,7 @@ IB_DESIGNABLE
  user annotation is used as the anchor point.
  
  Subclasses may override this method to provide specialized behavior - for
- example, anchoring on the map's center point to provide a "locked" zooming
+ example, anchoring on the map’s center point to provide a "locked" zooming
  mode.
  
  @param gesture An anchorable user gesture.
@@ -850,7 +850,7 @@ IB_DESIGNABLE
 #pragma mark Converting Geographic Coordinates
 
 /**
- Converts a point in the given view's coordinate system to a geographic
+ Converts a point in the given view’s coordinate system to a geographic
  coordinate.
  
  @param point The point to convert.
@@ -860,13 +860,13 @@ IB_DESIGNABLE
 - (CLLocationCoordinate2D)convertPoint:(CGPoint)point toCoordinateFromView:(nullable UIView *)view;
 
 /**
- Converts a geographic coordinate to a point in the given view's coordinate
+ Converts a geographic coordinate to a point in the given view’s coordinate
  system.
  
  @param coordinate The geographic coordinate to convert.
  @param view The view in whose coordinate system the returned point should be
     expressed. If this parameter is `nil`, the returned point is expressed
-    in the window's coordinate system. If `view` is not `nil`, it must
+    in the window’s coordinate system. If `view` is not `nil`, it must
     belong to the same window as the map view.
  @return The point (in the appropriate view or window coordinate system)
     corresponding to the given geographic coordinate.
@@ -896,7 +896,7 @@ IB_DESIGNABLE
 - (CGRect)convertCoordinateBounds:(MGLCoordinateBounds)bounds toRectToView:(nullable UIView *)view;
 
 /**
- Returns the distance spanned by one point in the map view's coordinate system
+ Returns the distance spanned by one point in the map view’s coordinate system
  at the given latitude and current zoom level.
  
  The distance between points decreases as the latitude approaches the poles.
