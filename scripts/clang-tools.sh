@@ -42,15 +42,14 @@ function check_format() {
 export CLANG_TIDY CLANG_FORMAT
 export -f check_tidy check_format
 
-git diff-index --quiet HEAD || {
-    echo "Your repository contains unstaged and/or uncommitted changes."
-    echo "Please commit all changes before proceeding."
-    exit 1
-}
-
 echo "Running clang checks... (this might take a while)"
 
-if [ -n $2 ] && [ $2 == "--diff" ]; then
+if [[ -n $2 ]] && [[ $2 == "--diff" ]]; then
+    git diff-index --quiet HEAD || {
+        echo "Your repository contains unstaged and/or uncommitted changes."
+        echo "Please commit all changes before proceeding."
+        exit 1
+    }
     DIFF_FILES=$(for file in `git diff origin/master..HEAD --name-only | grep "pp$"`; do echo $file; done)
     if [[ -n $DIFF_FILES ]]; then
         echo "${DIFF_FILES}" | xargs -I{} -P ${JOBS} bash -c 'check_tidy --fix' {}
@@ -63,6 +62,6 @@ if [ -n $2 ] && [ $2 == "--diff" ]; then
     fi
     echo "All looks good!"
 else
-    git ls-files '${CDUP}/src/mbgl/*.cpp' '${CDUP}/platform/*.cpp' '${CDUP}/test/*.cpp' | \
+    git ls-files "${CDUP}/src/mbgl/*.cpp" "${CDUP}/platform/*.cpp" "${CDUP}/test/*.cpp" | \
         xargs -I{} -P ${JOBS} bash -c 'check_tidy' {}
 fi

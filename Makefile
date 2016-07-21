@@ -168,11 +168,11 @@ clang-tools: compdb
 
 .PHONY: tidy
 tidy: clang-tools
-	scripts/clang-tools.sh $(MACOS_OUTPUT_PATH)/$(BUILDTYPE)
+	scripts/clang-tools.sh $(MACOS_COMPDB_PATH)
 
 .PHONY: check
 check: clang-tools
-	scripts/clang-tools.sh $(MACOS_OUTPUT_PATH)/$(BUILDTYPE) --diff
+	scripts/clang-tools.sh $(MACOS_COMPDB_PATH) --diff
 
 endif
 
@@ -304,23 +304,18 @@ coverage: test
 compdb: $(LINUX_BUILD)
 	# Ninja generator already outputs the file at the right location
 
-.PHONY: tidy
-tidy: compdb
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-headers
-	scripts/clang-tidy.sh $(LINUX_OUTPUT_PATH)
-
 .PHONY: clang-tools
-clang-tools:
+clang-tools: compdb
 	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
 	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
-	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH) headers
+	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-headers
 
 .PHONY: tidy
 tidy: clang-tools
 	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH)
 
 .PHONY: check
-check: compdb clang-tools
+check: clang-tools
 	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH) --diff
 
 endif
