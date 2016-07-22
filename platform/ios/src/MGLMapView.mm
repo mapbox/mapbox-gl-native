@@ -3042,7 +3042,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     return 3.0;
 }
 
-- (BOOL)witheStrokeForPolylineAnnotation:(MGLPolyline *)annotation
+- (BOOL)whiteStrokeForPolylineAnnotation:(MGLPolyline *)annotation
 {
 	if (_delegateHasWhiteStrokeForShapeAnnotations)
 	{
