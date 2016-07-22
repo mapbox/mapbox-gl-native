@@ -24,11 +24,19 @@ StubFileSource::StubFileSource() {
         for (auto& pair : pending_) {
             optional<Response> res = std::get<1>(pair.second)(std::get<0>(pair.second));
             if (res) {
-                std::get<2>(pair.second)(*res);
-
+                // This must be before calling the callback, because it's possible that the callback
+                // could:
+                //
+                //   1. Deallocate the AsyncRequest itself, thus removing it from pending
+                //   2. Allocate a new AsyncRequest at the same memory location
+                //
+                // If remove(pair.first) was called after both those things happened, it would
+                // remove the newly allocated request rather than the intended request.
                 if (!res->error) {
                     remove(pair.first);
                 }
+
+                std::get<2>(pair.second)(*res);
             }
         }
     });
