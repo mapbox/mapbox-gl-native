@@ -7,7 +7,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** The MGLUserLocation class defines a specific type of annotation that identifies the user’s current location. You do not create instances of this class directly. Instead, you retrieve an existing MGLUserLocation object from the userLocation property of the map view displayed in your application. */
+/**
+ The MGLUserLocation class defines a specific type of annotation that identifies
+ the user’s current location. You do not create instances of this class
+ directly. Instead, you retrieve an existing MGLUserLocation object from the
+ `userLocation` property of the map view displayed in your application.
+ */
 @interface MGLUserLocation : NSObject <MGLAnnotation>
 
 #pragma mark Determining the User’s Position
@@ -15,17 +20,22 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The current location of the device. (read-only)
 
- This property contains `nil` if the map view is not currently showing the user location or if the user’s location has not yet been determined.
+ This property contains `nil` if the map view is not currently showing the user
+ location or if the user’s location has not yet been determined.
  */
 @property (nonatomic, readonly, nullable) CLLocation *location;
 
-/** A Boolean value indicating whether the user’s location is currently being updated. (read-only) */
+/** 
+ A Boolean value indicating whether the user’s location is currently being
+ updated. (read-only)
+ */
 @property (nonatomic, readonly, getter=isUpdating) BOOL updating;
 
 /**
  The heading of the user location. (read-only)
  
- This property is `nil` if the user location tracking mode is not `MGLUserTrackingModeFollowWithHeading`.
+ This property is `nil` if the user location tracking mode is not 
+ `MGLUserTrackingModeFollowWithHeading`.
  */
 @property (nonatomic, readonly, nullable) CLHeading *heading;
 
