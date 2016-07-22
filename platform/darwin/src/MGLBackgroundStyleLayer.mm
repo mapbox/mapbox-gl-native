@@ -29,11 +29,11 @@
 }
 - (void)setBackgroundPattern:(NSString*)backgroundPattern
 {
+    // TODO: setterString
 }
 - (NSString *)backgroundPattern
 {
-    // TODO:
-    return @"string";
+    return @""; // TODO: getterString
 }
 - (void)setBackgroundOpacity:(CGFloat)backgroundOpacity
 {
@@ -41,8 +41,7 @@
 }
 - (CGFloat)backgroundOpacity
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 @end

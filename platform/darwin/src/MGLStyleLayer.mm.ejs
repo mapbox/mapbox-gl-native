@@ -29,46 +29,12 @@
 
 - (void)set<%- camelize(property.name) %>:(<%- propertyType(property, type) %><% if (isObject(property)) { -%>*<% } -%>)<%- camelizeWithLeadingLowercase(property.name) %>
 {
-<% if (property.type == "boolean") { -%>
- // TODO: Boolean
-<% } -%>
-<% if (property.type == "number") { -%>
-    <%- camelizeWithLeadingLowercase(type) %>Layer->set<%- camelize(property.name) %>(<%- camelizeWithLeadingLowercase(property.name) %>);
-<% } -%>
-<% if (property.type == "string") { -%>
-    // TODO:
-    return @"string";
-<% } -%>
-<% if (property.type == "color") { -%>
-    <%- camelizeWithLeadingLowercase(type) %>Layer->set<%- camelize(property.name) %>(<%- camelizeWithLeadingLowercase(property.name) %>.mbgl_color);
-<% } -%>
+    <%- setterImplementation(property, type) %>
 }
 
 - (<%- propertyType(property, type) %><% if (isObject(property)) { -%> *<% } -%>)<%- camelizeWithLeadingLowercase(property.name) %>
 {
-<% if (property.type == "color") { -%>
-    return [MGLColor mbgl_color:<%- camelizeWithLeadingLowercase(type) %>Layer->get<%- camelize(property.name) %>().asConstant()];
-<% } -%>
-<% if (property.type == "boolean") { -%>
-    // TODO:
-    return YES;
-<% } -%>
-<% if (property.type == "number") { -%>
-    // TODO:
-    return 0;
-<% } -%>
-<% if (property.type == "array") { -%>
-    // TODO:
-    return @[];
-<% } -%>
-<% if (property.type == "string") { -%>
-    // TODO:
-    return @"string";
-<% } -%>
-<% if (property.type == "enum") { -%>
-    // TODO:
-    return MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(property.values[0]) %>;
-<% } -%>
+    <%- getterImplementation(property, type) %>
 }
 <% } -%>
 <% } -%>
@@ -78,38 +44,11 @@
 <% for (const property of paintProperties) { -%>
 - (void)set<%- camelize(property.name) %>:(<%- propertyType(property, type) %><% if (isObject(property)) { -%>*<% } -%>)<%- camelizeWithLeadingLowercase(property.name) %>
 {
-<% if (property.type == "color") { -%>
-    <%- camelizeWithLeadingLowercase(type) %>Layer->set<%- camelize(property.name) %>(<%- camelizeWithLeadingLowercase(property.name) %>.mbgl_color);
-<% } -%>
-<% if (property.type == "number") { -%>
-    <%- camelizeWithLeadingLowercase(type) %>Layer->set<%- camelize(property.name) %>(<%- camelizeWithLeadingLowercase(property.name) %>);
-<% } -%>
+    <%- setterImplementation(property, type) %>
 }
 - (<%- propertyType(property, type) %><% if (isObject(property)) { -%> *<% } -%>)<%- camelizeWithLeadingLowercase(property.name) %>
 {
-<% if (property.type == "color") { -%>
-    return [MGLColor mbgl_color:<%- camelizeWithLeadingLowercase(type) %>Layer->get<%- camelize(property.name) %>().asConstant()];
-<% } -%>
-<% if (property.type == "boolean") { -%>
-    // TODO:
-    return YES;
-<% } -%>
-<% if (property.type == "number") { -%>
-    // TODO:
-    return 0;
-<% } -%>
-<% if (property.type == "array") { -%>
-    // TODO:
-    return @[];
-<% } -%>
-<% if (property.type == "string") { -%>
-    // TODO:
-    return @"string";
-<% } -%>
-<% if (property.type == "enum") { -%>
-    // TODO:
-    return MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(property.values[0]) %>;
-<% } -%>
+    <%- getterImplementation(property, type) %>
 }
 <% } -%>
 <% } -%>

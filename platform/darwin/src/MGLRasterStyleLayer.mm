@@ -25,8 +25,7 @@
 }
 - (CGFloat)rasterOpacity
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setRasterHueRotate:(CGFloat)rasterHueRotate
 {
@@ -34,8 +33,7 @@
 }
 - (CGFloat)rasterHueRotate
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setRasterBrightnessMin:(CGFloat)rasterBrightnessMin
 {
@@ -43,8 +41,7 @@
 }
 - (CGFloat)rasterBrightnessMin
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setRasterBrightnessMax:(CGFloat)rasterBrightnessMax
 {
@@ -52,8 +49,7 @@
 }
 - (CGFloat)rasterBrightnessMax
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setRasterSaturation:(CGFloat)rasterSaturation
 {
@@ -61,8 +57,7 @@
 }
 - (CGFloat)rasterSaturation
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setRasterContrast:(CGFloat)rasterContrast
 {
@@ -70,8 +65,7 @@
 }
 - (CGFloat)rasterContrast
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setRasterFadeDuration:(CGFloat)rasterFadeDuration
 {
@@ -79,8 +73,7 @@
 }
 - (CGFloat)rasterFadeDuration
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 @end

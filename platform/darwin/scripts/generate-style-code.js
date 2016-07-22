@@ -50,6 +50,43 @@ global.propertyType = function (property, layerType = null) {
     }
 }
 
+global.setterImplementation = function(property, layerType = null) {
+    switch (property.type) {
+        case 'boolean':
+            return '// TODO: setterBool';
+        case 'number':
+            return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)});`;
+        case 'string':
+            return '// TODO: setterString';
+        case 'enum':
+            return `// TODO: setterEnum`; 
+        case 'color':
+            return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_color);`;
+        case 'array':
+            return '// TODO: setterArray';
+        default: throw new Error(`unknown type for ${property.name}`)
+    }
+}
+
+global.getterImplementation = function(property, layerType = null) {
+    switch (property.type) {
+        case 'boolean':
+            return 'return YES; // TODO: getterBool';
+        case 'number':
+            return 'return 0; // TODO: getterNumber';
+        case 'string':
+            return 'return @""; // TODO: getterString';
+        case 'enum':
+            return `return ${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}${camelize(property.values[0])};`
+        case 'color':
+            return `return [MGLColor mbgl_color:${camelizeWithLeadingLowercase(layerType)}Layer->get${camelize(property.name)}().asConstant()];`;
+        case 'array':
+            return 'return @[]; // TODO: getterArray';
+        default:
+         throw new Error(`unknown type for ${property.name}`)
+    }
+}
+
 const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.ejs', 'utf8'), { strict: true });
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
 

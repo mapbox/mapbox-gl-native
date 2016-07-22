@@ -21,11 +21,11 @@
 
 - (void)setFillAntialias:(BOOL)fillAntialias
 {
+    // TODO: setterBool
 }
 - (BOOL)fillAntialias
 {
-    // TODO:
-    return YES;
+    return YES; // TODO: getterBool
 }
 - (void)setFillOpacity:(CGFloat)fillOpacity
 {
@@ -33,8 +33,7 @@
 }
 - (CGFloat)fillOpacity
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setFillColor:(MGLColor*)fillColor
 {
@@ -54,27 +53,27 @@
 }
 - (void)setFillTranslate:(NSArray*)fillTranslate
 {
+    // TODO: setterArray
 }
 - (NSArray *)fillTranslate
 {
-    // TODO:
-    return @[];
+    return @[]; // TODO: getterArray
 }
 - (void)setFillTranslateAnchor:(MGLFillStyleLayerFillTranslateAnchor)fillTranslateAnchor
 {
+    // TODO: setterEnum
 }
 - (MGLFillStyleLayerFillTranslateAnchor)fillTranslateAnchor
 {
-    // TODO:
     return MGLFillStyleLayerFillTranslateAnchorMap;
 }
 - (void)setFillPattern:(NSString*)fillPattern
 {
+    // TODO: setterString
 }
 - (NSString *)fillPattern
 {
-    // TODO:
-    return @"string";
+    return @""; // TODO: getterString
 }
 
 @end

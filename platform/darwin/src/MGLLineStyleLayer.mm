@@ -22,21 +22,21 @@
 
 - (void)setLineCap:(MGLLineStyleLayerLineCap)lineCap
 {
+    // TODO: setterEnum
 }
 
 - (MGLLineStyleLayerLineCap)lineCap
 {
-    // TODO:
     return MGLLineStyleLayerLineCapButt;
 }
 
 - (void)setLineJoin:(MGLLineStyleLayerLineJoin)lineJoin
 {
+    // TODO: setterEnum
 }
 
 - (MGLLineStyleLayerLineJoin)lineJoin
 {
-    // TODO:
     return MGLLineStyleLayerLineJoinBevel;
 }
 
@@ -47,8 +47,7 @@
 
 - (CGFloat)lineMiterLimit
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 - (void)setLineRoundLimit:(CGFloat)lineRoundLimit
@@ -58,8 +57,7 @@
 
 - (CGFloat)lineRoundLimit
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 #pragma mark - Accessing the Paint Attributes
 
@@ -69,8 +67,7 @@
 }
 - (CGFloat)lineOpacity
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setLineColor:(MGLColor*)lineColor
 {
@@ -82,18 +79,18 @@
 }
 - (void)setLineTranslate:(NSArray*)lineTranslate
 {
+    // TODO: setterArray
 }
 - (NSArray *)lineTranslate
 {
-    // TODO:
-    return @[];
+    return @[]; // TODO: getterArray
 }
 - (void)setLineTranslateAnchor:(MGLLineStyleLayerLineTranslateAnchor)lineTranslateAnchor
 {
+    // TODO: setterEnum
 }
 - (MGLLineStyleLayerLineTranslateAnchor)lineTranslateAnchor
 {
-    // TODO:
     return MGLLineStyleLayerLineTranslateAnchorMap;
 }
 - (void)setLineWidth:(CGFloat)lineWidth
@@ -102,8 +99,7 @@
 }
 - (CGFloat)lineWidth
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setLineGapWidth:(CGFloat)lineGapWidth
 {
@@ -111,8 +107,7 @@
 }
 - (CGFloat)lineGapWidth
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setLineOffset:(CGFloat)lineOffset
 {
@@ -120,8 +115,7 @@
 }
 - (CGFloat)lineOffset
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setLineBlur:(CGFloat)lineBlur
 {
@@ -129,24 +123,23 @@
 }
 - (CGFloat)lineBlur
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setLineDasharray:(NSArray*)lineDasharray
 {
+    // TODO: setterArray
 }
 - (NSArray *)lineDasharray
 {
-    // TODO:
-    return @[];
+    return @[]; // TODO: getterArray
 }
 - (void)setLinePattern:(NSString*)linePattern
 {
+    // TODO: setterString
 }
 - (NSString *)linePattern
 {
-    // TODO:
-    return @"string";
+    return @""; // TODO: getterString
 }
 
 @end

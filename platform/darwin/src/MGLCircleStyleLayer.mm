@@ -25,8 +25,7 @@
 }
 - (CGFloat)circleRadius
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setCircleColor:(MGLColor*)circleColor
 {
@@ -42,8 +41,7 @@
 }
 - (CGFloat)circleBlur
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setCircleOpacity:(CGFloat)circleOpacity
 {
@@ -51,31 +49,30 @@
 }
 - (CGFloat)circleOpacity
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setCircleTranslate:(NSArray*)circleTranslate
 {
+    // TODO: setterArray
 }
 - (NSArray *)circleTranslate
 {
-    // TODO:
-    return @[];
+    return @[]; // TODO: getterArray
 }
 - (void)setCircleTranslateAnchor:(MGLCircleStyleLayerCircleTranslateAnchor)circleTranslateAnchor
 {
+    // TODO: setterEnum
 }
 - (MGLCircleStyleLayerCircleTranslateAnchor)circleTranslateAnchor
 {
-    // TODO:
     return MGLCircleStyleLayerCircleTranslateAnchorMap;
 }
 - (void)setCirclePitchScale:(MGLCircleStyleLayerCirclePitchScale)circlePitchScale
 {
+    // TODO: setterEnum
 }
 - (MGLCircleStyleLayerCirclePitchScale)circlePitchScale
 {
-    // TODO:
     return MGLCircleStyleLayerCirclePitchScaleMap;
 }
 

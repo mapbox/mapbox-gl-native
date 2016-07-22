@@ -22,11 +22,11 @@
 
 - (void)setSymbolPlacement:(MGLSymbolStyleLayerSymbolPlacement)symbolPlacement
 {
+    // TODO: setterEnum
 }
 
 - (MGLSymbolStyleLayerSymbolPlacement)symbolPlacement
 {
-    // TODO:
     return MGLSymbolStyleLayerSymbolPlacementPoint;
 }
 
@@ -37,61 +37,56 @@
 
 - (CGFloat)symbolSpacing
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 - (void)setSymbolAvoidEdges:(BOOL)symbolAvoidEdges
 {
- // TODO: Boolean
+    // TODO: setterBool
 }
 
 - (BOOL)symbolAvoidEdges
 {
-    // TODO:
-    return YES;
+    return YES; // TODO: getterBool
 }
 
 - (void)setIconAllowOverlap:(BOOL)iconAllowOverlap
 {
- // TODO: Boolean
+    // TODO: setterBool
 }
 
 - (BOOL)iconAllowOverlap
 {
-    // TODO:
-    return YES;
+    return YES; // TODO: getterBool
 }
 
 - (void)setIconIgnorePlacement:(BOOL)iconIgnorePlacement
 {
- // TODO: Boolean
+    // TODO: setterBool
 }
 
 - (BOOL)iconIgnorePlacement
 {
-    // TODO:
-    return YES;
+    return YES; // TODO: getterBool
 }
 
 - (void)setIconOptional:(BOOL)iconOptional
 {
- // TODO: Boolean
+    // TODO: setterBool
 }
 
 - (BOOL)iconOptional
 {
-    // TODO:
-    return YES;
+    return YES; // TODO: getterBool
 }
 
 - (void)setIconRotationAlignment:(MGLSymbolStyleLayerIconRotationAlignment)iconRotationAlignment
 {
+    // TODO: setterEnum
 }
 
 - (MGLSymbolStyleLayerIconRotationAlignment)iconRotationAlignment
 {
-    // TODO:
     return MGLSymbolStyleLayerIconRotationAlignmentMap;
 }
 
@@ -102,40 +97,37 @@
 
 - (CGFloat)iconSize
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 - (void)setIconTextFit:(MGLSymbolStyleLayerIconTextFit)iconTextFit
 {
+    // TODO: setterEnum
 }
 
 - (MGLSymbolStyleLayerIconTextFit)iconTextFit
 {
-    // TODO:
     return MGLSymbolStyleLayerIconTextFitNone;
 }
 
 - (void)setIconTextFitPadding:(NSArray*)iconTextFitPadding
 {
+    // TODO: setterArray
 }
 
 - (NSArray *)iconTextFitPadding
 {
-    // TODO:
-    return @[];
+    return @[]; // TODO: getterArray
 }
 
 - (void)setIconImage:(NSString*)iconImage
 {
-    // TODO:
-    return @"string";
+    // TODO: setterString
 }
 
 - (NSString *)iconImage
 {
-    // TODO:
-    return @"string";
+    return @""; // TODO: getterString
 }
 
 - (void)setIconRotate:(CGFloat)iconRotate
@@ -145,8 +137,7 @@
 
 - (CGFloat)iconRotate
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 - (void)setIconPadding:(CGFloat)iconPadding
@@ -156,71 +147,67 @@
 
 - (CGFloat)iconPadding
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 - (void)setIconKeepUpright:(BOOL)iconKeepUpright
 {
- // TODO: Boolean
+    // TODO: setterBool
 }
 
 - (BOOL)iconKeepUpright
 {
-    // TODO:
-    return YES;
+    return YES; // TODO: getterBool
 }
 
 - (void)setIconOffset:(NSArray*)iconOffset
 {
+    // TODO: setterArray
 }
 
 - (NSArray *)iconOffset
 {
-    // TODO:
-    return @[];
+    return @[]; // TODO: getterArray
 }
 
 - (void)setTextPitchAlignment:(MGLSymbolStyleLayerTextPitchAlignment)textPitchAlignment
 {
+    // TODO: setterEnum
 }
 
 - (MGLSymbolStyleLayerTextPitchAlignment)textPitchAlignment
 {
-    // TODO:
     return MGLSymbolStyleLayerTextPitchAlignmentMap;
 }
 
 - (void)setTextRotationAlignment:(MGLSymbolStyleLayerTextRotationAlignment)textRotationAlignment
 {
+    // TODO: setterEnum
 }
 
 - (MGLSymbolStyleLayerTextRotationAlignment)textRotationAlignment
 {
-    // TODO:
     return MGLSymbolStyleLayerTextRotationAlignmentMap;
 }
 
 - (void)setTextField:(NSString*)textField
 {
-    // TODO:
-    return @"string";
+    // TODO: setterString
 }
 
 - (NSString *)textField
 {
-    // TODO:
-    return @"string";
+    return @""; // TODO: getterString
 }
 
 - (void)setTextFont:(NSArray*)textFont
 {
+    // TODO: setterArray
 }
 
 - (NSArray *)textFont
 {
-    // TODO:
-    return @[];
+    return @[]; // TODO: getterArray
 }
 
 - (void)setTextSize:(CGFloat)textSize
@@ -230,8 +217,7 @@
 
 - (CGFloat)textSize
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 - (void)setTextMaxWidth:(CGFloat)textMaxWidth
@@ -241,8 +227,7 @@
 
 - (CGFloat)textMaxWidth
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 - (void)setTextLineHeight:(CGFloat)textLineHeight
@@ -252,8 +237,7 @@
 
 - (CGFloat)textLineHeight
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 - (void)setTextLetterSpacing:(CGFloat)textLetterSpacing
@@ -263,27 +247,26 @@
 
 - (CGFloat)textLetterSpacing
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 - (void)setTextJustify:(MGLSymbolStyleLayerTextJustify)textJustify
 {
+    // TODO: setterEnum
 }
 
 - (MGLSymbolStyleLayerTextJustify)textJustify
 {
-    // TODO:
     return MGLSymbolStyleLayerTextJustifyLeft;
 }
 
 - (void)setTextAnchor:(MGLSymbolStyleLayerTextAnchor)textAnchor
 {
+    // TODO: setterEnum
 }
 
 - (MGLSymbolStyleLayerTextAnchor)textAnchor
 {
-    // TODO:
     return MGLSymbolStyleLayerTextAnchorCenter;
 }
 
@@ -294,8 +277,7 @@
 
 - (CGFloat)textMaxAngle
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 - (void)setTextRotate:(CGFloat)textRotate
@@ -305,8 +287,7 @@
 
 - (CGFloat)textRotate
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 - (void)setTextPadding:(CGFloat)textPadding
@@ -316,72 +297,67 @@
 
 - (CGFloat)textPadding
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 
 - (void)setTextKeepUpright:(BOOL)textKeepUpright
 {
- // TODO: Boolean
+    // TODO: setterBool
 }
 
 - (BOOL)textKeepUpright
 {
-    // TODO:
-    return YES;
+    return YES; // TODO: getterBool
 }
 
 - (void)setTextTransform:(MGLSymbolStyleLayerTextTransform)textTransform
 {
+    // TODO: setterEnum
 }
 
 - (MGLSymbolStyleLayerTextTransform)textTransform
 {
-    // TODO:
     return MGLSymbolStyleLayerTextTransformNone;
 }
 
 - (void)setTextOffset:(NSArray*)textOffset
 {
+    // TODO: setterArray
 }
 
 - (NSArray *)textOffset
 {
-    // TODO:
-    return @[];
+    return @[]; // TODO: getterArray
 }
 
 - (void)setTextAllowOverlap:(BOOL)textAllowOverlap
 {
- // TODO: Boolean
+    // TODO: setterBool
 }
 
 - (BOOL)textAllowOverlap
 {
-    // TODO:
-    return YES;
+    return YES; // TODO: getterBool
 }
 
 - (void)setTextIgnorePlacement:(BOOL)textIgnorePlacement
 {
- // TODO: Boolean
+    // TODO: setterBool
 }
 
 - (BOOL)textIgnorePlacement
 {
-    // TODO:
-    return YES;
+    return YES; // TODO: getterBool
 }
 
 - (void)setTextOptional:(BOOL)textOptional
 {
- // TODO: Boolean
+    // TODO: setterBool
 }
 
 - (BOOL)textOptional
 {
-    // TODO:
-    return YES;
+    return YES; // TODO: getterBool
 }
 #pragma mark - Accessing the Paint Attributes
 
@@ -391,8 +367,7 @@
 }
 - (CGFloat)iconOpacity
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setIconColor:(MGLColor*)iconColor
 {
@@ -416,8 +391,7 @@
 }
 - (CGFloat)iconHaloWidth
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setIconHaloBlur:(CGFloat)iconHaloBlur
 {
@@ -425,23 +399,22 @@
 }
 - (CGFloat)iconHaloBlur
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setIconTranslate:(NSArray*)iconTranslate
 {
+    // TODO: setterArray
 }
 - (NSArray *)iconTranslate
 {
-    // TODO:
-    return @[];
+    return @[]; // TODO: getterArray
 }
 - (void)setIconTranslateAnchor:(MGLSymbolStyleLayerIconTranslateAnchor)iconTranslateAnchor
 {
+    // TODO: setterEnum
 }
 - (MGLSymbolStyleLayerIconTranslateAnchor)iconTranslateAnchor
 {
-    // TODO:
     return MGLSymbolStyleLayerIconTranslateAnchorMap;
 }
 - (void)setTextOpacity:(CGFloat)textOpacity
@@ -450,8 +423,7 @@
 }
 - (CGFloat)textOpacity
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setTextColor:(MGLColor*)textColor
 {
@@ -475,8 +447,7 @@
 }
 - (CGFloat)textHaloWidth
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setTextHaloBlur:(CGFloat)textHaloBlur
 {
@@ -484,23 +455,22 @@
 }
 - (CGFloat)textHaloBlur
 {
-    // TODO:
-    return 0;
+    return 0; // TODO: getterNumber
 }
 - (void)setTextTranslate:(NSArray*)textTranslate
 {
+    // TODO: setterArray
 }
 - (NSArray *)textTranslate
 {
-    // TODO:
-    return @[];
+    return @[]; // TODO: getterArray
 }
 - (void)setTextTranslateAnchor:(MGLSymbolStyleLayerTextTranslateAnchor)textTranslateAnchor
 {
+    // TODO: setterEnum
 }
 - (MGLSymbolStyleLayerTextTranslateAnchor)textTranslateAnchor
 {
-    // TODO:
     return MGLSymbolStyleLayerTextTranslateAnchorMap;
 }
 
