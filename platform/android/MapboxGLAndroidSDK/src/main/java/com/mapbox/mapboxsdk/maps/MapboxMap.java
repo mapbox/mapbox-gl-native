@@ -1142,8 +1142,8 @@ public class MapboxMap {
         }
 
         if (!handledDefaultClick) {
-
             if (marker instanceof MarkerView) {
+                mMarkerViewManager.select((MarkerView) marker, false);
                 mMarkerViewManager.ensureInfoWindowOffset((MarkerView) marker);
             }
 
