@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
-
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -41,6 +41,7 @@ public class SnapshotActivity extends AppCompatActivity {
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+                mapboxMap.setStyleUrl(Style.OUTDOORS);
                 FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
                 fab.setColorFilter(ContextCompat.getColor(SnapshotActivity.this, R.color.primary));
                 fab.setOnClickListener(new View.OnClickListener() {
