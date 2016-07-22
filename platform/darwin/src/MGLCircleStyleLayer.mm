@@ -25,7 +25,7 @@
 }
 - (CGFloat)circleRadius
 {
-    return 0; // TODO: getterNumber
+    return circleLayer->getCircleRadius().asConstant();
 }
 - (void)setCircleColor:(MGLColor*)circleColor
 {
@@ -41,7 +41,7 @@
 }
 - (CGFloat)circleBlur
 {
-    return 0; // TODO: getterNumber
+    return circleLayer->getCircleBlur().asConstant();
 }
 - (void)setCircleOpacity:(CGFloat)circleOpacity
 {
@@ -49,7 +49,7 @@
 }
 - (CGFloat)circleOpacity
 {
-    return 0; // TODO: getterNumber
+    return circleLayer->getCircleOpacity().asConstant();
 }
 - (void)setCircleTranslate:(NSArray*)circleTranslate
 {

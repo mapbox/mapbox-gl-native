@@ -53,11 +53,11 @@ global.propertyType = function (property, layerType = null) {
 global.setterImplementation = function(property, layerType = null) {
     switch (property.type) {
         case 'boolean':
-            return '// TODO: setterBool';
+            return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)});`;
         case 'number':
             return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)});`;
         case 'string':
-            return '// TODO: setterString';
+            return `${layerType}Layer->set${camelize(property.name)}(std::string(${camelizeWithLeadingLowercase(property.name)}.UTF8String));`;
         case 'enum':
             return `// TODO: setterEnum`; 
         case 'color':
@@ -71,11 +71,11 @@ global.setterImplementation = function(property, layerType = null) {
 global.getterImplementation = function(property, layerType = null) {
     switch (property.type) {
         case 'boolean':
-            return 'return YES; // TODO: getterBool';
+            return `return ${layerType}Layer->get${camelize(property.name)}().asConstant();`;
         case 'number':
-            return 'return 0; // TODO: getterNumber';
+            return `return ${layerType}Layer->get${camelize(property.name)}().asConstant();`;
         case 'string':
-            return 'return @""; // TODO: getterString';
+            return `return @(std::string(${layerType}Layer->get${camelize(property.name)}().asConstant()).c_str());`
         case 'enum':
             return `return ${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}${camelize(property.values[0])};`
         case 'color':

@@ -47,7 +47,7 @@
 
 - (CGFloat)lineMiterLimit
 {
-    return 0; // TODO: getterNumber
+    return lineLayer->getLineMiterLimit().asConstant();
 }
 
 - (void)setLineRoundLimit:(CGFloat)lineRoundLimit
@@ -57,7 +57,7 @@
 
 - (CGFloat)lineRoundLimit
 {
-    return 0; // TODO: getterNumber
+    return lineLayer->getLineRoundLimit().asConstant();
 }
 #pragma mark - Accessing the Paint Attributes
 
@@ -67,7 +67,7 @@
 }
 - (CGFloat)lineOpacity
 {
-    return 0; // TODO: getterNumber
+    return lineLayer->getLineOpacity().asConstant();
 }
 - (void)setLineColor:(MGLColor*)lineColor
 {
@@ -99,7 +99,7 @@
 }
 - (CGFloat)lineWidth
 {
-    return 0; // TODO: getterNumber
+    return lineLayer->getLineWidth().asConstant();
 }
 - (void)setLineGapWidth:(CGFloat)lineGapWidth
 {
@@ -107,7 +107,7 @@
 }
 - (CGFloat)lineGapWidth
 {
-    return 0; // TODO: getterNumber
+    return lineLayer->getLineGapWidth().asConstant();
 }
 - (void)setLineOffset:(CGFloat)lineOffset
 {
@@ -115,7 +115,7 @@
 }
 - (CGFloat)lineOffset
 {
-    return 0; // TODO: getterNumber
+    return lineLayer->getLineOffset().asConstant();
 }
 - (void)setLineBlur:(CGFloat)lineBlur
 {
@@ -123,7 +123,7 @@
 }
 - (CGFloat)lineBlur
 {
-    return 0; // TODO: getterNumber
+    return lineLayer->getLineBlur().asConstant();
 }
 - (void)setLineDasharray:(NSArray*)lineDasharray
 {
@@ -135,11 +135,11 @@
 }
 - (void)setLinePattern:(NSString*)linePattern
 {
-    // TODO: setterString
+    lineLayer->setLinePattern(std::string(linePattern.UTF8String));
 }
 - (NSString *)linePattern
 {
-    return @""; // TODO: getterString
+    return @(std::string(lineLayer->getLinePattern().asConstant()).c_str());
 }
 
 @end

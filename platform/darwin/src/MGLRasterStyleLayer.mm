@@ -25,7 +25,7 @@
 }
 - (CGFloat)rasterOpacity
 {
-    return 0; // TODO: getterNumber
+    return rasterLayer->getRasterOpacity().asConstant();
 }
 - (void)setRasterHueRotate:(CGFloat)rasterHueRotate
 {
@@ -33,7 +33,7 @@
 }
 - (CGFloat)rasterHueRotate
 {
-    return 0; // TODO: getterNumber
+    return rasterLayer->getRasterHueRotate().asConstant();
 }
 - (void)setRasterBrightnessMin:(CGFloat)rasterBrightnessMin
 {
@@ -41,7 +41,7 @@
 }
 - (CGFloat)rasterBrightnessMin
 {
-    return 0; // TODO: getterNumber
+    return rasterLayer->getRasterBrightnessMin().asConstant();
 }
 - (void)setRasterBrightnessMax:(CGFloat)rasterBrightnessMax
 {
@@ -49,7 +49,7 @@
 }
 - (CGFloat)rasterBrightnessMax
 {
-    return 0; // TODO: getterNumber
+    return rasterLayer->getRasterBrightnessMax().asConstant();
 }
 - (void)setRasterSaturation:(CGFloat)rasterSaturation
 {
@@ -57,7 +57,7 @@
 }
 - (CGFloat)rasterSaturation
 {
-    return 0; // TODO: getterNumber
+    return rasterLayer->getRasterSaturation().asConstant();
 }
 - (void)setRasterContrast:(CGFloat)rasterContrast
 {
@@ -65,7 +65,7 @@
 }
 - (CGFloat)rasterContrast
 {
-    return 0; // TODO: getterNumber
+    return rasterLayer->getRasterContrast().asConstant();
 }
 - (void)setRasterFadeDuration:(CGFloat)rasterFadeDuration
 {
@@ -73,7 +73,7 @@
 }
 - (CGFloat)rasterFadeDuration
 {
-    return 0; // TODO: getterNumber
+    return rasterLayer->getRasterFadeDuration().asConstant();
 }
 
 @end

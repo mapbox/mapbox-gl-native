@@ -37,47 +37,47 @@
 
 - (CGFloat)symbolSpacing
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getSymbolSpacing().asConstant();
 }
 
 - (void)setSymbolAvoidEdges:(BOOL)symbolAvoidEdges
 {
-    // TODO: setterBool
+    symbolLayer->setSymbolAvoidEdges(symbolAvoidEdges);
 }
 
 - (BOOL)symbolAvoidEdges
 {
-    return YES; // TODO: getterBool
+    return symbolLayer->getSymbolAvoidEdges().asConstant();
 }
 
 - (void)setIconAllowOverlap:(BOOL)iconAllowOverlap
 {
-    // TODO: setterBool
+    symbolLayer->setIconAllowOverlap(iconAllowOverlap);
 }
 
 - (BOOL)iconAllowOverlap
 {
-    return YES; // TODO: getterBool
+    return symbolLayer->getIconAllowOverlap().asConstant();
 }
 
 - (void)setIconIgnorePlacement:(BOOL)iconIgnorePlacement
 {
-    // TODO: setterBool
+    symbolLayer->setIconIgnorePlacement(iconIgnorePlacement);
 }
 
 - (BOOL)iconIgnorePlacement
 {
-    return YES; // TODO: getterBool
+    return symbolLayer->getIconIgnorePlacement().asConstant();
 }
 
 - (void)setIconOptional:(BOOL)iconOptional
 {
-    // TODO: setterBool
+    symbolLayer->setIconOptional(iconOptional);
 }
 
 - (BOOL)iconOptional
 {
-    return YES; // TODO: getterBool
+    return symbolLayer->getIconOptional().asConstant();
 }
 
 - (void)setIconRotationAlignment:(MGLSymbolStyleLayerIconRotationAlignment)iconRotationAlignment
@@ -97,7 +97,7 @@
 
 - (CGFloat)iconSize
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getIconSize().asConstant();
 }
 
 - (void)setIconTextFit:(MGLSymbolStyleLayerIconTextFit)iconTextFit
@@ -122,12 +122,12 @@
 
 - (void)setIconImage:(NSString*)iconImage
 {
-    // TODO: setterString
+    symbolLayer->setIconImage(std::string(iconImage.UTF8String));
 }
 
 - (NSString *)iconImage
 {
-    return @""; // TODO: getterString
+    return @(std::string(symbolLayer->getIconImage().asConstant()).c_str());
 }
 
 - (void)setIconRotate:(CGFloat)iconRotate
@@ -137,7 +137,7 @@
 
 - (CGFloat)iconRotate
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getIconRotate().asConstant();
 }
 
 - (void)setIconPadding:(CGFloat)iconPadding
@@ -147,17 +147,17 @@
 
 - (CGFloat)iconPadding
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getIconPadding().asConstant();
 }
 
 - (void)setIconKeepUpright:(BOOL)iconKeepUpright
 {
-    // TODO: setterBool
+    symbolLayer->setIconKeepUpright(iconKeepUpright);
 }
 
 - (BOOL)iconKeepUpright
 {
-    return YES; // TODO: getterBool
+    return symbolLayer->getIconKeepUpright().asConstant();
 }
 
 - (void)setIconOffset:(NSArray*)iconOffset
@@ -192,12 +192,12 @@
 
 - (void)setTextField:(NSString*)textField
 {
-    // TODO: setterString
+    symbolLayer->setTextField(std::string(textField.UTF8String));
 }
 
 - (NSString *)textField
 {
-    return @""; // TODO: getterString
+    return @(std::string(symbolLayer->getTextField().asConstant()).c_str());
 }
 
 - (void)setTextFont:(NSArray*)textFont
@@ -217,7 +217,7 @@
 
 - (CGFloat)textSize
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getTextSize().asConstant();
 }
 
 - (void)setTextMaxWidth:(CGFloat)textMaxWidth
@@ -227,7 +227,7 @@
 
 - (CGFloat)textMaxWidth
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getTextMaxWidth().asConstant();
 }
 
 - (void)setTextLineHeight:(CGFloat)textLineHeight
@@ -237,7 +237,7 @@
 
 - (CGFloat)textLineHeight
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getTextLineHeight().asConstant();
 }
 
 - (void)setTextLetterSpacing:(CGFloat)textLetterSpacing
@@ -247,7 +247,7 @@
 
 - (CGFloat)textLetterSpacing
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getTextLetterSpacing().asConstant();
 }
 
 - (void)setTextJustify:(MGLSymbolStyleLayerTextJustify)textJustify
@@ -277,7 +277,7 @@
 
 - (CGFloat)textMaxAngle
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getTextMaxAngle().asConstant();
 }
 
 - (void)setTextRotate:(CGFloat)textRotate
@@ -287,7 +287,7 @@
 
 - (CGFloat)textRotate
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getTextRotate().asConstant();
 }
 
 - (void)setTextPadding:(CGFloat)textPadding
@@ -297,17 +297,17 @@
 
 - (CGFloat)textPadding
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getTextPadding().asConstant();
 }
 
 - (void)setTextKeepUpright:(BOOL)textKeepUpright
 {
-    // TODO: setterBool
+    symbolLayer->setTextKeepUpright(textKeepUpright);
 }
 
 - (BOOL)textKeepUpright
 {
-    return YES; // TODO: getterBool
+    return symbolLayer->getTextKeepUpright().asConstant();
 }
 
 - (void)setTextTransform:(MGLSymbolStyleLayerTextTransform)textTransform
@@ -332,32 +332,32 @@
 
 - (void)setTextAllowOverlap:(BOOL)textAllowOverlap
 {
-    // TODO: setterBool
+    symbolLayer->setTextAllowOverlap(textAllowOverlap);
 }
 
 - (BOOL)textAllowOverlap
 {
-    return YES; // TODO: getterBool
+    return symbolLayer->getTextAllowOverlap().asConstant();
 }
 
 - (void)setTextIgnorePlacement:(BOOL)textIgnorePlacement
 {
-    // TODO: setterBool
+    symbolLayer->setTextIgnorePlacement(textIgnorePlacement);
 }
 
 - (BOOL)textIgnorePlacement
 {
-    return YES; // TODO: getterBool
+    return symbolLayer->getTextIgnorePlacement().asConstant();
 }
 
 - (void)setTextOptional:(BOOL)textOptional
 {
-    // TODO: setterBool
+    symbolLayer->setTextOptional(textOptional);
 }
 
 - (BOOL)textOptional
 {
-    return YES; // TODO: getterBool
+    return symbolLayer->getTextOptional().asConstant();
 }
 #pragma mark - Accessing the Paint Attributes
 
@@ -367,7 +367,7 @@
 }
 - (CGFloat)iconOpacity
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getIconOpacity().asConstant();
 }
 - (void)setIconColor:(MGLColor*)iconColor
 {
@@ -391,7 +391,7 @@
 }
 - (CGFloat)iconHaloWidth
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getIconHaloWidth().asConstant();
 }
 - (void)setIconHaloBlur:(CGFloat)iconHaloBlur
 {
@@ -399,7 +399,7 @@
 }
 - (CGFloat)iconHaloBlur
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getIconHaloBlur().asConstant();
 }
 - (void)setIconTranslate:(NSArray*)iconTranslate
 {
@@ -423,7 +423,7 @@
 }
 - (CGFloat)textOpacity
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getTextOpacity().asConstant();
 }
 - (void)setTextColor:(MGLColor*)textColor
 {
@@ -447,7 +447,7 @@
 }
 - (CGFloat)textHaloWidth
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getTextHaloWidth().asConstant();
 }
 - (void)setTextHaloBlur:(CGFloat)textHaloBlur
 {
@@ -455,7 +455,7 @@
 }
 - (CGFloat)textHaloBlur
 {
-    return 0; // TODO: getterNumber
+    return symbolLayer->getTextHaloBlur().asConstant();
 }
 - (void)setTextTranslate:(NSArray*)textTranslate
 {

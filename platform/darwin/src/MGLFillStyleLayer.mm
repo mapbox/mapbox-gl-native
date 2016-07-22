@@ -21,11 +21,11 @@
 
 - (void)setFillAntialias:(BOOL)fillAntialias
 {
-    // TODO: setterBool
+    fillLayer->setFillAntialias(fillAntialias);
 }
 - (BOOL)fillAntialias
 {
-    return YES; // TODO: getterBool
+    return fillLayer->getFillAntialias().asConstant();
 }
 - (void)setFillOpacity:(CGFloat)fillOpacity
 {
@@ -33,7 +33,7 @@
 }
 - (CGFloat)fillOpacity
 {
-    return 0; // TODO: getterNumber
+    return fillLayer->getFillOpacity().asConstant();
 }
 - (void)setFillColor:(MGLColor*)fillColor
 {
@@ -69,11 +69,11 @@
 }
 - (void)setFillPattern:(NSString*)fillPattern
 {
-    // TODO: setterString
+    fillLayer->setFillPattern(std::string(fillPattern.UTF8String));
 }
 - (NSString *)fillPattern
 {
-    return @""; // TODO: getterString
+    return @(std::string(fillLayer->getFillPattern().asConstant()).c_str());
 }
 
 @end

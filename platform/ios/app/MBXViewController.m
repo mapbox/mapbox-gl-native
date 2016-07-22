@@ -446,7 +446,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 {
     MGLFillStyleLayer *waterLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
     waterLayer.fillColor = [UIColor redColor];
-    waterLayer.fillOpacity = 0.4;
+    
     [waterLayer updateStyleAndClasses];
 }
 

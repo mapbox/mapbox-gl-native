@@ -29,11 +29,11 @@
 }
 - (void)setBackgroundPattern:(NSString*)backgroundPattern
 {
-    // TODO: setterString
+    backgroundLayer->setBackgroundPattern(std::string(backgroundPattern.UTF8String));
 }
 - (NSString *)backgroundPattern
 {
-    return @""; // TODO: getterString
+    return @(std::string(backgroundLayer->getBackgroundPattern().asConstant()).c_str());
 }
 - (void)setBackgroundOpacity:(CGFloat)backgroundOpacity
 {
@@ -41,7 +41,7 @@
 }
 - (CGFloat)backgroundOpacity
 {
-    return 0; // TODO: getterNumber
+    return backgroundLayer->getBackgroundOpacity().asConstant();
 }
 
 @end

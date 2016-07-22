@@ -37,6 +37,7 @@
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
+#import "NSColor+MGLAdditions.hpp"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -122,16 +123,6 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
     [function getControlPointAtIndex:0 values:p1];
     [function getControlPointAtIndex:1 values:p2];
     return { p1[0], p1[1], p2[0], p2[1] };
-}
-
-/// Converts the given color into an mbgl::Color in calibrated RGB space.
-mbgl::Color MGLColorObjectFromNSColor(NSColor *color) {
-    if (!color) {
-        return { 0, 0, 0, 0 };
-    }
-    CGFloat r, g, b, a;
-    [[color colorUsingColorSpaceName:NSCalibratedRGBColorSpace] getRed:&r green:&g blue:&b alpha:&a];
-    return { (float)r, (float)g, (float)b, (float)a };
 }
 
 /// Lightweight container for metadata about an annotation, including the annotation itself.
@@ -2155,14 +2146,14 @@ public:
     NSColor *color = (_delegateHasStrokeColorsForShapeAnnotations
                       ? [self.delegate mapView:self strokeColorForShapeAnnotation:annotation]
                       : [NSColor selectedMenuItemColor]);
-    return MGLColorObjectFromNSColor(color);
+    return color.mbgl_color;
 }
 
 - (mbgl::Color)fillColorForPolygonAnnotation:(MGLPolygon *)annotation {
     NSColor *color = (_delegateHasFillColorsForShapeAnnotations
                       ? [self.delegate mapView:self fillColorForPolygonAnnotation:annotation]
                       : [NSColor selectedMenuItemColor]);
-    return MGLColorObjectFromNSColor(color);
+    return color.mbgl_color;
 }
 
 - (CGFloat)lineWidthForPolylineAnnotation:(MGLPolyline *)annotation {
