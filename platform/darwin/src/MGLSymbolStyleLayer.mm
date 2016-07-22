@@ -1,5 +1,5 @@
 // This file is generated. 
-// Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-ios`.
+// Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLSymbolStyleLayer.h"
