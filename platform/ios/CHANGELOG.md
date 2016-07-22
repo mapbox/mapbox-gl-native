@@ -11,6 +11,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 * Improved the performance of relocating a non-view-backed point annotation by changing its `coordinate` property. ([#5385](https://github.com/mapbox/mapbox-gl-native/pull/5385))
 * MGLMapDebugOverdrawVisualizationMask does nothing in Release builds of the SDK. This is disabled for performance reasons. ([#5555](https://github.com/mapbox/mapbox-gl-native/pull/5555))
 * Include simulator architecture slices in the dSYM file that is generated for release builds. ([#5740](https://github.com/mapbox/mapbox-gl-native/pull/5740))
+* Fixed an issue where annotation views could be assigned to multipoint annotations. ([#5770](https://github.com/mapbox/mapbox-gl-native/pull/5770))
 
 ## 3.3.1
 
