@@ -442,6 +442,9 @@ public class MarkerViewManager {
                 }
             }
         }
+        // trigger update to make newly added ViewMarker visible,
+        // these would only be updated when the map is moved.
+        update();
     }
 
     //TODO: This whole method is a stopgap for: https://github.com/mapbox/mapbox-gl-native/issues/5384
