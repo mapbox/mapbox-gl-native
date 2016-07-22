@@ -156,6 +156,7 @@ public class MapView extends FrameLayout {
     private PointF mFocalPoint;
 
     private String mStyleUrl;
+    private String mInitalStyle;
 
     private List<OnMapReadyCallback> mOnMapReadyCallbackList;
 
@@ -270,7 +271,7 @@ public class MapView extends FrameLayout {
         // style url
         String style = options.getStyle();
         if (!TextUtils.isEmpty(style)) {
-            mMapboxMap.setStyleUrl(style);
+            mInitalStyle = style;
         }
 
         // MyLocationView
@@ -567,8 +568,9 @@ public class MapView extends FrameLayout {
         mMyLocationView.onResume();
 
         if (mStyleUrl == null) {
+            // user supplied style through xml
             // user has failed to supply a style url
-            setStyleUrl(Style.MAPBOX_STREETS);
+            setStyleUrl(mInitalStyle == null ? Style.MAPBOX_STREETS : mInitalStyle);
         }
     }
 
