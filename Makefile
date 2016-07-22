@@ -367,6 +367,45 @@ test-node: node
 	npm test
 	npm run test-suite
 
+#### Android targets ###########################################################
+
+ANDROID_ENV = platform/android/scripts/toolchain.sh
+ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
+
+define ANDROID_RULES
+
+build/android-$1/$(BUILDTYPE): $(BUILD_DEPS)
+	mkdir -p build/android-$1/$(BUILDTYPE)
+
+build/android-$1/$(BUILDTYPE)/toolchain.cmake: platform/android/scripts/toolchain.sh build/android-$1/$(BUILDTYPE)
+	$(ANDROID_ENV) $1 > build/android-$1/$(BUILDTYPE)/toolchain.cmake
+
+build/android-$1/$(BUILDTYPE)/Makefile: build/android-$1/$(BUILDTYPE)/toolchain.cmake platform/android/config.cmake
+	cd build/android-$1/$(BUILDTYPE) && cmake ../../.. \
+		-DCMAKE_TOOLCHAIN_FILE=build/android-$1/$(BUILDTYPE)/toolchain.cmake \
+		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		-DMBGL_PLATFORM=android
+
+android-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile
+	$(MAKE) -j$(JOBS) -C build/android-$1/$(BUILDTYPE) all
+
+android-$1: android-lib-$1
+	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
+
+apackage: android-lib-$1
+endef
+
+$(foreach abi,$(ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
+
+android: android-arm-v7
+
+test-android:
+	cd platform/android && ./gradlew testReleaseUnitTest --continue
+
+apackage:
+	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
+
 #### Miscellaneous targets #####################################################
 
 style-code:
