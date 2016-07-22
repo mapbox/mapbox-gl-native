@@ -9,8 +9,8 @@ endif()
 option(WITH_QT_DECODERS "Use builtin Qt image decoders" OFF)
 option(WITH_QT_4        "Use Qt4 instead of Qt5"        OFF)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -fvisibility=hidden")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -D__QT__")
+set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -fvisibility=hidden -D__QT__")
 
 project(Qt4And5)
 
@@ -35,7 +35,6 @@ set(MBGL_QT_FILES
 
     # Misc
     PRIVATE platform/default/log_stderr.cpp
-    PRIVATE platform/default/string_stdlib.cpp
 
     # Platform integration
     PRIVATE platform/qt/src/async_task.cpp
@@ -50,6 +49,7 @@ set(MBGL_QT_FILES
     PRIVATE platform/qt/src/qmapboxgl_p.hpp
     PRIVATE platform/qt/src/run_loop.cpp
     PRIVATE platform/qt/src/run_loop_impl.hpp
+    PRIVATE platform/qt/src/string_stdlib.cpp
     PRIVATE platform/qt/src/timer.cpp
     PRIVATE platform/qt/src/timer_impl.hpp
 
