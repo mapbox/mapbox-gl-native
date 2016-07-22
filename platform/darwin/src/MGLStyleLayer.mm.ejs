@@ -1,0 +1,117 @@
+<%
+  const type = locals.type;
+  const layoutProperties = locals.layoutProperties;
+  const paintProperties = locals.paintProperties;
+-%>
+// This file is generated. 
+// Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-ios`.
+
+#import "MGLStyleLayer_Private.hpp"
+#import "MGL<%- camelize(type) %>StyleLayer.h"
+#import <mbgl/style/layers/<%- type %>_layer.hpp>
+
+@interface MGL<%- camelize(type) %>StyleLayer() {
+    mbgl::style::<%- camelize(type) %>Layer *<%- type %>Layer;
+}
+@end
+
+@implementation MGL<%- camelize(type) %>StyleLayer
+
+- (void)setLayer:(mbgl::style::Layer *)layer
+{
+    <%- camelizeWithLeadingLowercase(type) %>Layer = reinterpret_cast<mbgl::style::<%- camelize(type) %>Layer *>(layer);
+}
+
+<% if (layoutProperties.length) { -%>
+#pragma mark - Accessing the Layout Attributes
+
+<% for (const property of layoutProperties) { -%>
+
+- (void)set<%- camelize(property.name) %>:(<%- propertyType(property, type) %><% if (isObject(property)) { -%>*<% } -%>)<%- camelizeWithLeadingLowercase(property.name) %>
+{
+<% if (property.type == "boolean") { -%>
+ // TODO: Boolean
+<% } -%>
+<% if (property.type == "number") { -%>
+    <%- camelizeWithLeadingLowercase(type) %>Layer->set<%- camelize(property.name) %>(<%- camelizeWithLeadingLowercase(property.name) %>);
+<% } -%>
+<% if (property.type == "string") { -%>
+    // TODO:
+    return @"string";
+<% } -%>
+<% if (property.type == "color") { -%>
+    <%- camelizeWithLeadingLowercase(type) %>Layer->set<%- camelize(property.name) %>(<%- camelizeWithLeadingLowercase(property.name) %>.mbgl_color);
+<% } -%>
+}
+
+- (<%- propertyType(property, type) %><% if (isObject(property)) { -%> *<% } -%>)<%- camelizeWithLeadingLowercase(property.name) %>
+{
+<% if (property.type == "color") { -%>
+    return [MGLColor mbgl_color:<%- camelizeWithLeadingLowercase(type) %>Layer->get<%- camelize(property.name) %>().asConstant()];
+<% } -%>
+<% if (property.type == "boolean") { -%>
+    // TODO:
+    return YES;
+<% } -%>
+<% if (property.type == "number") { -%>
+    // TODO:
+    return 0;
+<% } -%>
+<% if (property.type == "array") { -%>
+    // TODO:
+    return @[];
+<% } -%>
+<% if (property.type == "string") { -%>
+    // TODO:
+    return @"string";
+<% } -%>
+<% if (property.type == "enum") { -%>
+    // TODO:
+    return MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(property.values[0]) %>;
+<% } -%>
+}
+<% } -%>
+<% } -%>
+<% if (paintProperties.length) { -%>
+#pragma mark - Accessing the Paint Attributes
+
+<% for (const property of paintProperties) { -%>
+- (void)set<%- camelize(property.name) %>:(<%- propertyType(property, type) %><% if (isObject(property)) { -%>*<% } -%>)<%- camelizeWithLeadingLowercase(property.name) %>
+{
+<% if (property.type == "color") { -%>
+    <%- camelizeWithLeadingLowercase(type) %>Layer->set<%- camelize(property.name) %>(<%- camelizeWithLeadingLowercase(property.name) %>.mbgl_color);
+<% } -%>
+<% if (property.type == "number") { -%>
+    <%- camelizeWithLeadingLowercase(type) %>Layer->set<%- camelize(property.name) %>(<%- camelizeWithLeadingLowercase(property.name) %>);
+<% } -%>
+}
+- (<%- propertyType(property, type) %><% if (isObject(property)) { -%> *<% } -%>)<%- camelizeWithLeadingLowercase(property.name) %>
+{
+<% if (property.type == "color") { -%>
+    return [MGLColor mbgl_color:<%- camelizeWithLeadingLowercase(type) %>Layer->get<%- camelize(property.name) %>().asConstant()];
+<% } -%>
+<% if (property.type == "boolean") { -%>
+    // TODO:
+    return YES;
+<% } -%>
+<% if (property.type == "number") { -%>
+    // TODO:
+    return 0;
+<% } -%>
+<% if (property.type == "array") { -%>
+    // TODO:
+    return @[];
+<% } -%>
+<% if (property.type == "string") { -%>
+    // TODO:
+    return @"string";
+<% } -%>
+<% if (property.type == "enum") { -%>
+    // TODO:
+    return MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(property.values[0]) %>;
+<% } -%>
+}
+<% } -%>
+<% } -%>
+
+@end

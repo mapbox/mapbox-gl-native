@@ -2,4 +2,6 @@
 
 @interface MGLStyleLayer : NSObject
 
+- (void)updateStyleAndClasses;
+
 @end

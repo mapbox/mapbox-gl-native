@@ -6,4 +6,6 @@
 
 - (mbgl::Color)mbgl_color;
 
++ (NSColor *)mbgl_color:(mbgl::Color)color;
+
 @end

@@ -318,6 +318,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		35136D471D42295400C20EFD /* Layers */ = {
+			isa = PBXGroup;
+			children = (
+				35602BFC1D3EA9B40050646F /* MGLStyleLayer_Private.hpp */,
+				35602BFD1D3EA9B40050646F /* MGLStyleLayer.h */,
+				35602BFE1D3EA9B40050646F /* MGLStyleLayer.mm */,
+				35602BF81D3EA99F0050646F /* MGLFillStyleLayer.h */,
+				35602BF91D3EA99F0050646F /* MGLFillStyleLayer.mm */,
+			);
+			name = Layers;
+			sourceTree = "<group>";
+		};
 		DA839E891CC2E3400062CAFB = {
 			isa = PBXGroup;
 			children = (
@@ -520,6 +532,7 @@
 		DAE6C3491CC31DF500DB3429 /* Foundation */ = {
 			isa = PBXGroup;
 			children = (
+				35136D471D42295400C20EFD /* Layers */,
 				DAD1657F1CF4CF50001FF4B9 /* Categories */,
 				DAD1657C1CF4CE6B001FF4B9 /* Formatters */,
 				DAD1657D1CF4CECB001FF4B9 /* Geometry */,
@@ -532,11 +545,6 @@
 				3537CA731D3F93A600380318 /* MGLStyle_Private.hpp */,
 				DAE6C3571CC31E0400DB3429 /* MGLStyle.h */,
 				DAE6C37A1CC31E2A00DB3429 /* MGLStyle.mm */,
-				35602BFC1D3EA9B40050646F /* MGLStyleLayer_Private.hpp */,
-				35602BFD1D3EA9B40050646F /* MGLStyleLayer.h */,
-				35602BFE1D3EA9B40050646F /* MGLStyleLayer.mm */,
-				35602BF81D3EA99F0050646F /* MGLFillStyleLayer.h */,
-				35602BF91D3EA99F0050646F /* MGLFillStyleLayer.mm */,
 				DAE6C3591CC31E0400DB3429 /* MGLTypes.h */,
 				DAE6C37C1CC31E2A00DB3429 /* MGLTypes.m */,
 			);

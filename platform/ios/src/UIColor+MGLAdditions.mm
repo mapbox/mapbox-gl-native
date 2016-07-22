@@ -14,4 +14,9 @@
     return { (float)r, (float)g, (float)b, (float)a };
 }
 
++ (UIColor *)mbgl_color:(mbgl::Color)color
+{
+    return [UIColor colorWithRed:color.r green:color.g blue:color.b alpha:color.a];
+}
+
 @end

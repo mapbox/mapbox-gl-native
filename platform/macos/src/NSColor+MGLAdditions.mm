@@ -15,5 +15,9 @@
     return { (float)r, (float)g, (float)b, (float)a };
 }
 
++ (NSColor *)mbgl_color:(mbgl::Color)color
+{
+    return [NSColor colorWithRed:color.r green:color.g blue:color.b alpha:color.a];
+}
 
 @end

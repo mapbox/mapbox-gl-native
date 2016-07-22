@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		35136D391D42271A00C20EFD /* MGLBackgroundStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35136D381D42271A00C20EFD /* MGLBackgroundStyleLayer.mm */; };
+		35136D3A1D42271A00C20EFD /* MGLBackgroundStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35136D381D42271A00C20EFD /* MGLBackgroundStyleLayer.mm */; };
+		35136D3C1D42272500C20EFD /* MGLCircleStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35136D3B1D42272500C20EFD /* MGLCircleStyleLayer.mm */; };
+		35136D3D1D42272500C20EFD /* MGLCircleStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35136D3B1D42272500C20EFD /* MGLCircleStyleLayer.mm */; };
+		35136D3F1D42273000C20EFD /* MGLLineStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35136D3E1D42273000C20EFD /* MGLLineStyleLayer.mm */; };
+		35136D401D42273000C20EFD /* MGLLineStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35136D3E1D42273000C20EFD /* MGLLineStyleLayer.mm */; };
+		35136D421D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35136D411D42274500C20EFD /* MGLRasterStyleLayer.mm */; };
+		35136D431D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35136D411D42274500C20EFD /* MGLRasterStyleLayer.mm */; };
+		35136D451D42275100C20EFD /* MGLSymbolStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35136D441D42275100C20EFD /* MGLSymbolStyleLayer.mm */; };
+		35136D461D42275100C20EFD /* MGLSymbolStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35136D441D42275100C20EFD /* MGLSymbolStyleLayer.mm */; };
 		35305D481D22AA680007D005 /* NSData+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35305D471D22AA450007D005 /* NSData+MGLAdditions.mm */; };
 		35305D491D22AA680007D005 /* NSData+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35305D471D22AA450007D005 /* NSData+MGLAdditions.mm */; };
 		35305D4A1D22AA6A0007D005 /* NSData+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 35305D461D22AA450007D005 /* NSData+MGLAdditions.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -360,6 +370,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		35136D381D42271A00C20EFD /* MGLBackgroundStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLBackgroundStyleLayer.mm; sourceTree = "<group>"; };
+		35136D3B1D42272500C20EFD /* MGLCircleStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLCircleStyleLayer.mm; sourceTree = "<group>"; };
+		35136D3E1D42273000C20EFD /* MGLLineStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLineStyleLayer.mm; sourceTree = "<group>"; };
+		35136D411D42274500C20EFD /* MGLRasterStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLRasterStyleLayer.mm; sourceTree = "<group>"; };
+		35136D441D42275100C20EFD /* MGLSymbolStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLSymbolStyleLayer.mm; sourceTree = "<group>"; };
 		35305D461D22AA450007D005 /* NSData+MGLAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSData+MGLAdditions.h"; sourceTree = "<group>"; };
 		35305D471D22AA450007D005 /* NSData+MGLAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSData+MGLAdditions.mm"; sourceTree = "<group>"; };
 		353933F11D3FB753003F57D7 /* MGLCircleStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCircleStyleLayer.h; sourceTree = "<group>"; };
@@ -609,15 +624,20 @@
 			isa = PBXGroup;
 			children = (
 				353933F41D3FB785003F57D7 /* MGLBackgroundStyleLayer.h */,
+				35136D381D42271A00C20EFD /* MGLBackgroundStyleLayer.mm */,
 				353933F11D3FB753003F57D7 /* MGLCircleStyleLayer.h */,
+				35136D3B1D42272500C20EFD /* MGLCircleStyleLayer.mm */,
 				35D13AC11D3D19DD00AFB4E0 /* MGLFillStyleLayer.h */,
 				35D13AC21D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm */,
 				353933F71D3FB79F003F57D7 /* MGLLineStyleLayer.h */,
+				35136D3E1D42273000C20EFD /* MGLLineStyleLayer.mm */,
 				353933FA1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h */,
+				35136D411D42274500C20EFD /* MGLRasterStyleLayer.mm */,
+				35E79F1F1D41266300957B9E /* MGLStyleLayer_Private.hpp */,
 				35D13AB51D3D15E300AFB4E0 /* MGLStyleLayer.h */,
 				35D13AB61D3D15E300AFB4E0 /* MGLStyleLayer.mm */,
 				353933FD1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h */,
-				35E79F1F1D41266300957B9E /* MGLStyleLayer_Private.hpp */,
+				35136D441D42275100C20EFD /* MGLSymbolStyleLayer.mm */,
 			);
 			name = Layers;
 			sourceTree = "<group>";
@@ -1480,16 +1500,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35136D391D42271A00C20EFD /* MGLBackgroundStyleLayer.mm in Sources */,
 				DA88485D1CBAFB9800AB86E3 /* MGLUserLocationAnnotationView.m in Sources */,
 				DAD165701CF41981001FF4B9 /* MGLFeature.mm in Sources */,
 				40EDA1C11CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */,
 				DA8848541CBAFB9800AB86E3 /* MGLCompactCalloutView.m in Sources */,
 				DA8848251CBAFA6200AB86E3 /* MGLPointAnnotation.m in Sources */,
+				35136D3C1D42272500C20EFD /* MGLCircleStyleLayer.mm in Sources */,
+				35136D421D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */,
 				DA88482D1CBAFA6200AB86E3 /* NSBundle+MGLAdditions.m in Sources */,
 				DA88485B1CBAFB9800AB86E3 /* MGLUserLocation.m in Sources */,
 				DA88488C1CBB037E00AB86E3 /* SMCalloutView.m in Sources */,
 				DA35A2B81CCA9A5D00E826B2 /* MGLClockDirectionFormatter.m in Sources */,
 				DAD1657A1CF4CDFF001FF4B9 /* MGLShapeCollection.m in Sources */,
+				DA8848901CBB048E00AB86E3 /* reachability.m in Sources */,
+				35136D451D42275100C20EFD /* MGLSymbolStyleLayer.mm in Sources */,
 				DA8848211CBAFA6200AB86E3 /* MGLOfflinePack.mm in Sources */,
 				DA8848591CBAFB9800AB86E3 /* MGLMapView.mm in Sources */,
 				DA8848501CBAFB9800AB86E3 /* MGLAnnotationImage.m in Sources */,
@@ -1512,6 +1537,7 @@
 				35D13AC51D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */,
 				DA8848241CBAFA6200AB86E3 /* MGLOfflineStorage.mm in Sources */,
 				DA88482A1CBAFA6200AB86E3 /* MGLTilePyramidOfflineRegion.mm in Sources */,
+				35136D3F1D42273000C20EFD /* MGLLineStyleLayer.mm in Sources */,
 				DA88481A1CBAFA6200AB86E3 /* MGLAccountManager.m in Sources */,
 				DA8848271CBAFA6200AB86E3 /* MGLPolyline.mm in Sources */,
 				DA8848581CBAFB9800AB86E3 /* MGLMapboxEvents.m in Sources */,
@@ -1524,17 +1550,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35136D3A1D42271A00C20EFD /* MGLBackgroundStyleLayer.mm in Sources */,
 				DAA4E4221CBB730400178DFB /* MGLPointAnnotation.m in Sources */,
 				DAD165711CF41981001FF4B9 /* MGLFeature.mm in Sources */,
 				40EDA1C21CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */,
 				DAA4E4291CBB730400178DFB /* NSBundle+MGLAdditions.m in Sources */,
 				DAA4E42E1CBB730400178DFB /* MGLAPIClient.m in Sources */,
+				35136D3D1D42272500C20EFD /* MGLCircleStyleLayer.mm in Sources */,
+				35136D431D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */,
 				DAA4E4201CBB730400178DFB /* MGLOfflinePack.mm in Sources */,
 				DAA4E4331CBB730400178DFB /* MGLUserLocation.m in Sources */,
 				DAA4E4351CBB730400178DFB /* SMCalloutView.m in Sources */,
 				DA35A2B91CCA9A5D00E826B2 /* MGLClockDirectionFormatter.m in Sources */,
 				DAD1657B1CF4CDFF001FF4B9 /* MGLShapeCollection.m in Sources */,
 				DAA4E4251CBB730400178DFB /* MGLShape.m in Sources */,
+				35136D461D42275100C20EFD /* MGLSymbolStyleLayer.mm in Sources */,
 				DAA4E42B1CBB730400178DFB /* NSString+MGLAdditions.m in Sources */,
 				DAA4E4261CBB730400178DFB /* MGLStyle.mm in Sources */,
 				DAA4E41D1CBB730400178DFB /* MGLGeometry.mm in Sources */,
@@ -1556,6 +1586,7 @@
 				35D13AC61D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */,
 				DAA4E42A1CBB730400178DFB /* NSProcessInfo+MGLAdditions.m in Sources */,
 				DAA4E4211CBB730400178DFB /* MGLOfflineStorage.mm in Sources */,
+				35136D401D42273000C20EFD /* MGLLineStyleLayer.mm in Sources */,
 				DAA4E42F1CBB730400178DFB /* MGLCompactCalloutView.m in Sources */,
 				DAA4E4271CBB730400178DFB /* MGLTilePyramidOfflineRegion.mm in Sources */,
 				DAA4E41C1CBB730400178DFB /* MGLAccountManager.m in Sources */,
