@@ -14,6 +14,7 @@ TEST(TextConversions, to_upper) {
     EXPECT_EQ(std::string("MASSE"), platform::uppercase("maße"));     // DE
     EXPECT_EQ(std::string("WEISSKOPFSEEADLER"), platform::uppercase("weißkopfseeadler")); // DE
 
+    EXPECT_EQ(std::string("BÊNÇÃO"), platform::uppercase("bênção")); // PT
     EXPECT_EQ(std::string("AZƏRBAYCAN"), platform::uppercase("Azərbaycan")); // AZ
 
     EXPECT_EQ(std::string("ὈΔΥΣΣΕΎΣ"), platform::uppercase("Ὀδυσσεύς")); // GR
@@ -29,6 +30,7 @@ TEST(TextConversions, to_lower) {
     EXPECT_EQ(std::string("masse"), platform::lowercase("MASSE"));     // DE
     EXPECT_EQ(std::string("weisskopfseeadler"), platform::lowercase("weiSSkopfseeadler")); // DE
 
+    EXPECT_EQ(std::string("bênção"), platform::lowercase("BÊNÇÃO")); // PT
     EXPECT_EQ(std::string("azərbaycan"), platform::lowercase("AZƏRBAYCAN")); // AZ
     EXPECT_EQ(std::string("ὀδυσσεύς"), platform::lowercase("ὈΔΥΣΣΕΎΣ")); // GR
 
