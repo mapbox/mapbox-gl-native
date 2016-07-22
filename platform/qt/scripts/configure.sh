@@ -10,7 +10,6 @@ GEOJSON_VERSION=0.1.4${CXX11ABI:-}
 GEOJSONVT_VERSION=6.1.0
 GTEST_VERSION=1.7.0${CXX11ABI:-}
 LIBJPEG_TURBO_VERSION=1.4.2
-NUNICODE_VERSION=1.6
 PIXELMATCH_VERSION=0.9.0
 RAPIDJSON_VERSION=1.0.2
 SQLITE_VERSION=3.9.1
@@ -20,12 +19,15 @@ WEBP_VERSION=0.5.0
 EARCUT_VERSION=0.11
 
 function print_default_flags {
-    CONFIG+="    'cflags': $(quote_flags -fvisibility=hidden),"$LN
+    CONFIG+="    'cflags': $(quote_flags -fvisibility=hidden -D__QT__),"$LN
 }
 
 if [ "$MASON_PLATFORM" == "osx" ]; then
+    # XXX: Argh, adding the __QT__ flag here because GYP for OSX does
+    # not respect the `cflags` variable above and we need it to reach
+    # the utests somehow. Gonna be fixed properly when we move to CMake.
     function print_opengl_flags {
-        CONFIG+="    'opengl_cflags%': [],"$LN
+        CONFIG+="    'opengl_cflags%': ['-D__QT__'],"$LN
         CONFIG+="    'opengl_ldflags%': ['-framework OpenGL', '-framework CoreFoundation'],"$LN
     }
 else
