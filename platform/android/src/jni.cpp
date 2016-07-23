@@ -1689,7 +1689,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeProjectedMetersForLatLng, "(JDD)Lcom/mapbox/mapboxsdk/geometry/ProjectedMeters;"),
         MAKE_NATIVE_METHOD(nativeLatLngForProjectedMeters, "(JDD)Lcom/mapbox/mapboxsdk/geometry/LatLng;"),
         MAKE_NATIVE_METHOD(nativePixelForLatLng, "(JDD)Landroid/graphics/PointF;"),
-        MAKE_NATIVE_METHOD(nativeLatLngForPixel, "(JLandroid/graphics/PointF;)Lcom/mapbox/mapboxsdk/geometry/LatLng;"),
+        MAKE_NATIVE_METHOD(nativeLatLngForPixel, "(JFF)Lcom/mapbox/mapboxsdk/geometry/LatLng;"),
         MAKE_NATIVE_METHOD(nativeGetTopOffsetPixelsForAnnotationSymbol, "(JLjava/lang/String;)D"),
         MAKE_NATIVE_METHOD(nativeJumpTo, "(JDDDDD)V"),
         MAKE_NATIVE_METHOD(nativeEaseTo, "(JDDDJDDZ)V"),
