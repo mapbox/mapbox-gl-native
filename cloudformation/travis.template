@@ -179,6 +179,22 @@
                                 }
                             ]
                         }
+                    },
+                    {
+                        "PolicyName": "get-ci—access-token",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "s3:GetObject"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": [
+                                        "arn:aws:s3:::mapbox/android/ci-access-token/developer-config.xml"
+                                    ]
+                                }
+                            ]
+                        }
                     }
                 ]
             }

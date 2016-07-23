@@ -23,6 +23,10 @@ workflows:
             else
                 envman add --key SKIPCI --value false
             fi
+    - create-android-emulator@0.9.1:
+        inputs:
+        - name: test
+        - platform: android-23
     - script:
         title: Build
         run_if: '{{enveq "SKIPCI" "false"}}'
@@ -31,10 +35,32 @@ workflows:
             #!/bin/bash
             set -eu -o pipefail
             curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-            sudo apt-get install -y pkg-config nodejs
+            apt-get install -y pkg-config python-pip python-dev build-essential nodejs
+            pip install awscli
+
+            aws s3 cp s3://mapbox/android/ci-access-token/developer-config.xml platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
+
             export BUILDTYPE=Release
             make android
             make test-android
+    - script:
+        title: Setting env for gpu emulator
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -ex
+            envman add --key LD_LIBRARY_PATH --value "$ANDROID_HOME/tools/lib64:$LD_LIBRARY_PATH"
+    - start-android-emulator@1.0.2:
+        inputs:
+        - other_options: "-gpu on"
+    - script:
+        title: Run integragion tests
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - content: |-
+            #!/bin/bash
+            cd platform/android/
+            ./gradlew -Pandroid.testInstrumentationRunnerArguments.class=com.mapbox.mapboxsdk.testapp.espresso.LatLngBoundsActivityTest connectedAndroidTest
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
