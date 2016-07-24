@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
@@ -175,6 +174,19 @@ public class MarkerViewManager {
      * @param marker the MarkerView to deselect
      */
     public void deselect(@NonNull MarkerView marker) {
+        deselect(marker, true);
+    }
+
+    /**
+     * Animate a MarkerView to a deselected state.
+     * <p>
+     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onDeselect(MarkerView, View)} will be called to execute an animation.
+     * </p>
+     *
+     * @param marker        the MarkerView to deselect
+     * @param callbackToMap indicates if deselect marker must be called on MapboxMap
+     */
+    public void deselect(@NonNull MarkerView marker, boolean callbackToMap) {
         final View convertView = markerViewMap.get(marker);
         if (convertView != null) {
             for (MapboxMap.MarkerViewAdapter adapter : markerViewAdapters) {
@@ -182,6 +194,10 @@ public class MarkerViewManager {
                     adapter.onDeselect(marker, convertView);
                 }
             }
+            if (callbackToMap) {
+                mapboxMap.deselectMarker(marker);
+            }
+            marker.setSelected(false);
         }
     }
 
@@ -197,7 +213,7 @@ public class MarkerViewManager {
     /**
      * Animate a MarkerView to a selected state.
      *
-     * @param marker the MarkerView object to select
+     * @param marker        the MarkerView object to select
      * @param callbackToMap indicates if select marker must be called on MapboxMap
      */
     public void select(@NonNull MarkerView marker, boolean callbackToMap) {

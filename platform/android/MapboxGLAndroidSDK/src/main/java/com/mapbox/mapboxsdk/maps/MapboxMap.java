@@ -1170,7 +1170,7 @@ public class MapboxMap {
             }
 
             if (marker instanceof MarkerView) {
-                mMarkerViewManager.deselect((MarkerView) marker);
+                mMarkerViewManager.deselect((MarkerView) marker, false);
             }
         }
 
@@ -1189,6 +1189,10 @@ public class MapboxMap {
 
         if (marker.isInfoWindowShown()) {
             marker.hideInfoWindow();
+        }
+
+        if (marker instanceof MarkerView) {
+            mMarkerViewManager.deselect((MarkerView) marker, false);
         }
 
         mSelectedMarkers.remove(marker);
