@@ -184,9 +184,12 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         ((debugMask & MGLMapDebugOverdrawVisualizationMask)
          ? @"Hide Overdraw Visualization"
          : @"Show Overdraw Visualization"),
-        @"Add 100 Points",
-        @"Add 1,000 Points",
-        @"Add 10,000 Points",
+        @"Add 100 Views",
+        @"Add 1,000 Views",
+        @"Add 10,000 Views",
+        @"Add 100 Sprites",
+        @"Add 1,000 Sprites",
+        @"Add 10,000 Sprites",
         @"Add Test Shapes",
         @"Start World Tour",
         @"Add Custom Callout Point",
@@ -230,29 +233,41 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 6)
     {
-        [self parseFeaturesAddingCount:100];
+        [self parseFeaturesAddingCount:100 usingViews:YES];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 7)
     {
-        [self parseFeaturesAddingCount:1000];
+        [self parseFeaturesAddingCount:1000 usingViews:YES];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
     {
-        [self parseFeaturesAddingCount:10000];
+        [self parseFeaturesAddingCount:10000 usingViews:YES];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 9)
     {
-        [self addTestShapes];
+        [self parseFeaturesAddingCount:100 usingViews:NO];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 10)
     {
-        [self startWorldTour:actionSheet];
+        [self parseFeaturesAddingCount:1000 usingViews:NO];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 11)
     {
-        [self presentAnnotationWithCustomCallout];
+        [self parseFeaturesAddingCount:10000 usingViews:NO];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 12)
+    {
+        [self addTestShapes];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 13)
+    {
+        [self startWorldTour:actionSheet];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 14)
+    {
+        [self presentAnnotationWithCustomCallout];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 15)
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }
@@ -276,7 +291,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     }
 }
 
-- (void)parseFeaturesAddingCount:(NSUInteger)featuresCount
+- (void)parseFeaturesAddingCount:(NSUInteger)featuresCount usingViews:(BOOL)useViews
 {
     [self.mapView removeAnnotations:self.mapView.annotations];
 
@@ -301,6 +316,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
                 MGLPointAnnotation *annotation = [MGLPointAnnotation new];
                 annotation.coordinate = coordinate;
                 annotation.title = title;
+                annotation.subtitle = [NSString stringWithFormat:@"View: %i", useViews];
 
                 [annotations addObject:annotation];
 
@@ -582,7 +598,8 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
 {
     // Use GL backed pins for dropped pin annotations
-    if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]])
+    if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]] ||
+        ([annotation isKindOfClass:[MGLPointAnnotation class]] && [[(MGLPointAnnotation *)annotation subtitle] isEqualToString:@"View: 0"]))
     {
         return nil;
     }
@@ -608,6 +625,73 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         annotationView.backgroundColor = [UIColor orangeColor];
     }
     return annotationView;
+}
+
+- (MGLAnnotationImage *)mapView:(MGLMapView * __nonnull)mapView imageForAnnotation:(id <MGLAnnotation> __nonnull)annotation
+{
+    if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]]    ||
+        [annotation isKindOfClass:[MBXCustomCalloutAnnotation class]] ||
+        ([annotation isKindOfClass:[MGLPointAnnotation class]] && [[(MGLPointAnnotation *)annotation subtitle] isEqualToString:@"View: 1"]))
+    {
+        return nil; // use default marker
+    }
+
+    NSString *title = [(MGLPointAnnotation *)annotation title];
+    if (!title.length) return nil;
+    NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
+
+    MGLAnnotationImage *annotationImage = [mapView dequeueReusableAnnotationImageWithIdentifier:lastTwoCharacters];
+
+    if ( ! annotationImage)
+    {
+        UIColor *color;
+
+        // make every tenth annotation blue
+        if ([lastTwoCharacters hasSuffix:@"0"]) {
+            color = [UIColor blueColor];
+        } else {
+            color = [UIColor redColor];
+        }
+
+        UIImage *image = [self imageWithText:lastTwoCharacters backgroundColor:color];
+        annotationImage = [MGLAnnotationImage annotationImageWithImage:image reuseIdentifier:lastTwoCharacters];
+
+        // don't allow touches on blue annotations
+        if ([color isEqual:[UIColor blueColor]]) annotationImage.enabled = NO;
+    }
+
+    return annotationImage;
+}
+
+
+- (UIImage *)imageWithText:(NSString *)text backgroundColor:(UIColor *)color
+{
+    CGRect rect = CGRectMake(0, 0, 20, 15);
+
+    UIGraphicsBeginImageContextWithOptions(rect.size, NO, [[UIScreen mainScreen] scale]);
+
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+
+    CGContextSetFillColorWithColor(ctx, [[color colorWithAlphaComponent:0.75] CGColor]);
+    CGContextFillRect(ctx, rect);
+
+    CGContextSetStrokeColorWithColor(ctx, [[UIColor blackColor] CGColor]);
+    CGContextStrokeRectWithWidth(ctx, rect, 2);
+
+    NSAttributedString *drawString = [[NSAttributedString alloc] initWithString:text attributes:@{
+        NSFontAttributeName: [UIFont fontWithName:@"Arial-BoldMT" size:12],
+        NSForegroundColorAttributeName: [UIColor whiteColor],
+    }];
+    CGSize stringSize = drawString.size;
+    CGRect stringRect = CGRectMake((rect.size.width - stringSize.width) / 2,
+                                   (rect.size.height - stringSize.height) / 2,
+                                   stringSize.width,
+                                   stringSize.height);
+    [drawString drawInRect:stringRect];
+
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
 }
 
 - (BOOL)mapView:(__unused MGLMapView *)mapView annotationCanShowCallout:(__unused id <MGLAnnotation>)annotation
