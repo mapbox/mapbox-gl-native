@@ -639,6 +639,8 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         return nil; // use default marker
     }
 
+    NSAssert([annotation isKindOfClass:[MBXSpriteBackedAnnotation class]], @"Annotations should be sprite-backed.");
+
     NSString *title = [(MGLPointAnnotation *)annotation title];
     if (!title.length) return nil;
     NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
