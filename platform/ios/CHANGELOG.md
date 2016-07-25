@@ -12,6 +12,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 * MGLMapDebugOverdrawVisualizationMask does nothing in Release builds of the SDK. This is disabled for performance reasons. ([#5555](https://github.com/mapbox/mapbox-gl-native/pull/5555))
 * Include simulator architecture slices in the dSYM file that is generated for release builds. ([#5740](https://github.com/mapbox/mapbox-gl-native/pull/5740))
 * Fixed an issue where annotation views could be assigned to multipoint annotations. ([#5770](https://github.com/mapbox/mapbox-gl-native/pull/5770))
+* Fixed the static only framework build. ([#5782](https://github.com/mapbox/mapbox-gl-native/issues/5782))
 
 ## 3.3.1
 
