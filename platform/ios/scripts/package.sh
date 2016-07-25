@@ -108,7 +108,7 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
         -jobs ${JOBS} | xcpretty
 fi
 
-LIBS=(Mapbox.a mbgl-core.a mbgl-platform-ios.a)
+LIBS=(Mapbox.a)
 
 # https://medium.com/@syshen/create-an-ios-universal-framework-148eb130a46c
 if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
