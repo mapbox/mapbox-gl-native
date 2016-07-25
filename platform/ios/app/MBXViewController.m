@@ -30,6 +30,12 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 @implementation MBXCustomCalloutAnnotation
 @end
 
+@interface MBXSpriteBackedAnnotation : MGLPointAnnotation
+@end
+
+@implementation MBXSpriteBackedAnnotation
+@end
+
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
 
 @property (nonatomic) IBOutlet MGLMapView *mapView;
@@ -313,10 +319,10 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
                                                                                [feature[@"geometry"][@"coordinates"][0] doubleValue]);
                 NSString *title = feature[@"properties"][@"NAME"];
 
-                MGLPointAnnotation *annotation = [MGLPointAnnotation new];
+                MGLPointAnnotation *annotation = (useViews ? [MGLPointAnnotation new] : [MBXSpriteBackedAnnotation new]);
+
                 annotation.coordinate = coordinate;
                 annotation.title = title;
-                annotation.subtitle = [NSString stringWithFormat:@"View: %i", useViews];
 
                 [annotations addObject:annotation];
 
@@ -598,8 +604,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
 {
     // Use GL backed pins for dropped pin annotations
-    if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]] ||
-        ([annotation isKindOfClass:[MGLPointAnnotation class]] && [[(MGLPointAnnotation *)annotation subtitle] isEqualToString:@"View: 0"]))
+    if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]] || [annotation isKindOfClass:[MBXSpriteBackedAnnotation class]])
     {
         return nil;
     }
@@ -629,9 +634,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 - (MGLAnnotationImage *)mapView:(MGLMapView * __nonnull)mapView imageForAnnotation:(id <MGLAnnotation> __nonnull)annotation
 {
-    if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]]    ||
-        [annotation isKindOfClass:[MBXCustomCalloutAnnotation class]] ||
-        ([annotation isKindOfClass:[MGLPointAnnotation class]] && [[(MGLPointAnnotation *)annotation subtitle] isEqualToString:@"View: 1"]))
+    if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]] || [annotation isKindOfClass:[MBXCustomCalloutAnnotation class]])
     {
         return nil; // use default marker
     }
