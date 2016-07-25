@@ -204,12 +204,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns the alpha value to use when rendering a shape annotation.
  
- A value of 0.0 results in a completely transparent shape. A value of 1.0, the
- default, results in a completely opaque shape.
+ A value of `0.0` results in a completely transparent shape. A value of `1.0`,
+ the default, results in a completely opaque shape.
  
  @param mapView The map view rendering the shape annotation.
  @param annotation The annotation being rendered.
- @return An alpha value between 0 and 1.0.
+ @return An alpha value between `0` and `1.0`.
  */
 - (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation;
 
@@ -241,7 +241,7 @@ NS_ASSUME_NONNULL_BEGIN
  Returns the line width in points to use when rendering the outline of a
  polyline annotation.
  
- By default, the polyline is outlined with a line 3.0 points wide.
+ By default, the polyline is outlined with a line `3.0` points wide.
  
  @param mapView The map view rendering the polygon annotation.
  @param annotation The annotation being rendered.

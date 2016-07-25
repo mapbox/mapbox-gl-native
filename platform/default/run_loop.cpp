@@ -158,7 +158,7 @@ void RunLoop::run() {
 void RunLoop::runOnce() {
     MBGL_VERIFY_THREAD(tid);
 
-    uv_run(impl->loop, UV_RUN_ONCE);
+    uv_run(impl->loop, UV_RUN_NOWAIT);
 }
 
 void RunLoop::stop() {

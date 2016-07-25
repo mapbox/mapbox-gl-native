@@ -439,7 +439,7 @@ final class NativeMapView {
     }
 
     public LatLng latLngForPixel(PointF pixel) {
-        return nativeLatLngForPixel(mNativeMapViewPtr, pixel);
+        return nativeLatLngForPixel(mNativeMapViewPtr, pixel.x, pixel.y);
     }
 
     public double getTopOffsetPixelsForAnnotationSymbol(String symbolName) {
@@ -630,7 +630,7 @@ final class NativeMapView {
 
     private native PointF nativePixelForLatLng(long nativeMapViewPtr, double lat, double lon);
 
-    private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, PointF pixel);
+    private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, float x, float y);
 
     private native double nativeGetTopOffsetPixelsForAnnotationSymbol(long nativeMapViewPtr, String symbolName);
     

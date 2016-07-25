@@ -387,6 +387,35 @@ IB_DESIGNABLE
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated;
 
 /**
+ Sets the visible region so that the map displays the specified annotations.
+
+ Calling this method updates the value in the `visibleCoordinateBounds` property
+ and potentially other properties to reflect the new map region. A small amount
+ of padding is reserved around the edges of the map view. To specify a different
+ amount of padding, use the `-showAnnotations:edgePadding:animated:` method.
+
+ @param annotations The annotations that you want to be visible in the map.
+ @param animated `YES` if you want the map region change to be animated, or `NO`
+ if you want the map to display the new region immediately without animations.
+ */
+- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations animated:(BOOL)animated;
+
+/**
+ Sets the visible region so that the map displays the specified annotations with
+ the specified amount of padding on each side.
+
+ Calling this method updates the value in the `visibleCoordinateBounds` property
+ and potentially other properties to reflect the new map region.
+
+ @param annotations The annotations that you want to be visible in the map.
+ @param insets The minimum padding (in screen points) around the edges of the
+ map view to keep clear of annotations.
+ @param animated `YES` if you want the map region change to be animated, or `NO`
+ if you want the map to display the new region immediately without animations.
+ */
+- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated;
+
+/**
  Returns the camera that best fits the given coordinate bounds.
  
  @param bounds The coordinate bounds to fit to the receiver’s viewport.

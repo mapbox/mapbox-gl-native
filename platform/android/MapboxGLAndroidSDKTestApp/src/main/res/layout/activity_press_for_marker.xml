@@ -20,6 +20,9 @@
         app:center_longitude="5.7215506"
         app:zoom="11"
         app:style_url="@string/style_mapbox_streets"
+        app:logo_gravity="top|end"
+        app:attribution_gravity="top|end"
+        app:logo_margin_right="10dp"
         android:layout_below="@id/toolbar"/>
 
 </RelativeLayout>

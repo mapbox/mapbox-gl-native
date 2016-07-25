@@ -98,9 +98,9 @@ inline optional<Value> toValue(v8::Local<v8::Value> value) {
     } else if (value->IsString()) {
         return { std::string(*Nan::Utf8String(value)) };
     } else if (value->IsUint32()) {
-        return { value->Uint32Value() };
+        return { std::uint64_t(value->Uint32Value()) };
     } else if (value->IsInt32()) {
-        return { value->Int32Value() };
+        return { std::int64_t(value->Int32Value()) };
     } else if (value->IsNumber()) {
         return { value->NumberValue() };
     } else {

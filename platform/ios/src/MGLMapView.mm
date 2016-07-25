@@ -4558,7 +4558,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         
         MGLAnnotationContext &annotationContext = pair.second;
         MGLAnnotationView *annotationView = annotationContext.annotationView;
-       
+
+        // Defer to the shape/polygon styling delegate methods
+        if ([annotationContext.annotation isKindOfClass:[MGLMultiPoint class]])
+        {
+            continue;
+        }
+
         if (!annotationView)
         {
             MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotationContext.annotation];

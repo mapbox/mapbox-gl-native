@@ -11,4 +11,9 @@
     <dimen name="toolbar_shadow">4dp</dimen>
     <dimen name="locationview_background_drawable_padding">2dp</dimen>
     <dimen name="locationview_padding_top">350dp</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="navigation_drawer_width">240dp</dimen>
+    <dimen name="toolbar_padding_top">0dp</dimen>
 </resources>
