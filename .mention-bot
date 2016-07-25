@@ -1,0 +1,5 @@
+{
+  "requiredOrgs": ["mapbox"], // mention-bot will only mention user who are members of one of these organizations.
+  "message": "@pullRequester, thanks for your PR! By analyzing this pull request, we identified @reviewers to be potential reviewers.",
+  "numFilesToCheck": 10, // Number of files to check against, default is 5.
+}
