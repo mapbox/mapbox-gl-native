@@ -120,8 +120,8 @@ public class FeatureOverviewActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startFeature(features.get(requestCode));
-        }else{
-            Snackbar.make(findViewById(android.R.id.content),"Can't open without the location permission.",Snackbar.LENGTH_SHORT).show();
+        } else {
+            Snackbar.make(findViewById(android.R.id.content), "Can't open without the location permission.", Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -147,7 +147,7 @@ public class FeatureOverviewActivity extends AppCompatActivity {
             String packageName = getApplicationContext().getPackageName();
             String metaDataKey = getString(R.string.category);
             for (ActivityInfo info : app.activities) {
-                if (info.name.startsWith(packageName) && !info.name.equals(FeatureOverviewActivity.class.getName())) {
+                if (info.labelRes != 0 && info.name.startsWith(packageName) && !info.name.equals(FeatureOverviewActivity.class.getName())) {
                     String label = getString(info.labelRes);
                     String description = resolveString(info.descriptionRes);
                     String category = resolveMetaData(info.metaData, metaDataKey);
@@ -176,10 +176,10 @@ public class FeatureOverviewActivity extends AppCompatActivity {
             return category;
         }
 
-        private String resolveString(@StringRes int stringRes){
-            try{
+        private String resolveString(@StringRes int stringRes) {
+            try {
                 return getString(stringRes);
-            }catch (Resources.NotFoundException e){
+            } catch (Resources.NotFoundException e) {
                 return "-";
             }
         }

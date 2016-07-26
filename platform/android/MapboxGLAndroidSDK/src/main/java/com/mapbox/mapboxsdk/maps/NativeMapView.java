@@ -16,7 +16,6 @@ import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
-import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
@@ -463,14 +462,6 @@ final class NativeMapView {
         nativeFlyTo(mNativeMapViewPtr, angle, center.getLatitude(), center.getLongitude(), duration, pitch, zoom);
     }
 
-    public void addCustomLayer(CustomLayer customLayer, String before) {
-        nativeAddCustomLayer(mNativeMapViewPtr, customLayer, before);
-    }
-
-    public void removeCustomLayer(String id) {
-        nativeRemoveCustomLayer(mNativeMapViewPtr, id);
-    }
-
     public double[] getCameraValues() {
         return nativeGetCameraValues(mNativeMapViewPtr);
     }
@@ -483,6 +474,7 @@ final class NativeMapView {
 
     public void addLayer(@NonNull Layer layer, @Nullable String before) {
         nativeAddLayer(mNativeMapViewPtr, layer.getNativePtr(), before);
+        layer.invalidate();
     }
 
     public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
@@ -666,10 +658,6 @@ final class NativeMapView {
     private native void nativeEaseTo(long nativeMapViewPtr, double angle, double latitude, double longitude, long duration, double pitch, double zoom, boolean easingInterpolator);
 
     private native void nativeFlyTo(long nativeMapViewPtr, double angle, double latitude, double longitude, long duration, double pitch, double zoom);
-
-    private native void nativeAddCustomLayer(long nativeMapViewPtr, CustomLayer customLayer, String before);
-
-    private native void nativeRemoveCustomLayer(long nativeMapViewPtr, String id);
 
     private native double[] nativeGetCameraValues(long mNativeMapViewPtr);
 

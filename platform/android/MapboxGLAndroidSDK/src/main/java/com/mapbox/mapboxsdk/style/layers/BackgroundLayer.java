@@ -16,4 +16,31 @@ public class BackgroundLayer extends Layer {
 
     protected native void initialize(String layerId);
 
+
+    // Property getters
+
+    @SuppressWarnings("unchecked")
+    public PropertyValue<String> getBackgroundColor() {
+        checkValidity();
+        return (PropertyValue<String>) new PropertyValue(nativeGetBackgroundColor());
+    }
+
+    @SuppressWarnings("unchecked")
+    public PropertyValue<String> getBackgroundPattern() {
+        checkValidity();
+        return (PropertyValue<String>) new PropertyValue(nativeGetBackgroundPattern());
+    }
+
+    @SuppressWarnings("unchecked")
+    public PropertyValue<Float> getBackgroundOpacity() {
+        checkValidity();
+        return (PropertyValue<Float>) new PropertyValue(nativeGetBackgroundOpacity());
+    }
+
+    private native Object nativeGetBackgroundColor();
+
+    private native Object nativeGetBackgroundPattern();
+
+    private native Object nativeGetBackgroundOpacity();
+
 }

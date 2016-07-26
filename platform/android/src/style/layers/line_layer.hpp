@@ -24,8 +24,38 @@ public:
 
     ~LineLayer();
 
+    // Property getters
+    jni::Object<jni::ObjectTag> getLineCap(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLineJoin(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLineMiterLimit(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLineRoundLimit(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLineOpacity(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLineColor(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLineTranslate(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLineTranslateAnchor(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLineWidth(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLineGapWidth(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLineOffset(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLineBlur(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLineDasharray(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLinePattern(jni::JNIEnv&);
+
     jni::jobject* createJavaPeer(jni::JNIEnv&);
-};
+
+}; // class LineLayer
 
 } // namespace android
 } // namespace mbgl

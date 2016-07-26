@@ -1,5 +1,6 @@
 <%
   const type = locals.type;
+  const properties = locals.properties;
 -%>
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
 
@@ -31,8 +32,14 @@ public:
 
     ~<%- camelize(type) %>Layer();
 
+    // Property getters
+<% for (const property of properties) { -%>
+    jni::Object<jni::ObjectTag> get<%- camelize(property.name) %>(jni::JNIEnv&);
+
+<% } -%>
     jni::jobject* createJavaPeer(jni::JNIEnv&);
-};
+
+}; // class <%- camelize(type) %>Layer
 
 } // namespace android
 } // namespace mbgl

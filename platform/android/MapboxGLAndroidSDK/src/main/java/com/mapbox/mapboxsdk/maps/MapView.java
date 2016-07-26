@@ -78,7 +78,6 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
@@ -2602,34 +2601,6 @@ public class MapView extends FrameLayout {
 
     int getAttributionTintColor() {
         return mMapboxMap.getUiSettings().getAttributionTintColor();
-    }
-
-    //
-    // Custom layer
-    //
-
-    @UiThread
-    void addCustomLayer(CustomLayer customLayer, String before) {
-        if (mDestroyed) {
-            return;
-        }
-        mNativeMapView.addCustomLayer(customLayer, before);
-    }
-
-    @UiThread
-    void removeCustomLayer(String id) {
-        if (mDestroyed) {
-            return;
-        }
-        mNativeMapView.removeCustomLayer(id);
-    }
-
-    @UiThread
-    void invalidateCustomLayers() {
-        if (mDestroyed) {
-            return;
-        }
-        mNativeMapView.update();
     }
 
     /**

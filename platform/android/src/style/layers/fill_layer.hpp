@@ -24,8 +24,24 @@ public:
 
     ~FillLayer();
 
+    // Property getters
+    jni::Object<jni::ObjectTag> getFillAntialias(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getFillOpacity(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getFillColor(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getFillOutlineColor(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getFillTranslate(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getFillTranslateAnchor(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getFillPattern(jni::JNIEnv&);
+
     jni::jobject* createJavaPeer(jni::JNIEnv&);
-};
+
+}; // class FillLayer
 
 } // namespace android
 } // namespace mbgl

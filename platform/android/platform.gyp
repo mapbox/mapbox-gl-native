@@ -43,6 +43,7 @@
         'src/style/layers/line_layer.cpp',
         'src/style/layers/raster_layer.cpp',
         'src/style/layers/symbol_layer.cpp',
+        'src/style/layers/custom_layer.cpp',
         '../default/string_stdlib.cpp',
         '../default/image.cpp',
         '../default/png_reader.cpp',

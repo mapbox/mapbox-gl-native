@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 /**
  * Base class for the different Layer types
@@ -9,17 +8,18 @@ import android.util.Log;
 public abstract class Layer {
 
     private long nativePtr;
+    private boolean invalidated;
 
     public Layer(long nativePtr) {
-        Log.i(Layer.class.getSimpleName(), "Native pointer constructor: " + nativePtr);
         this.nativePtr = nativePtr;
     }
 
     public Layer() {
-        Log.i(Layer.class.getSimpleName(), "Default constructor");
     }
 
-    public void set(@NonNull Property<?>... properties) {
+    public void setProperties(@NonNull Property<?>... properties) {
+        checkValidity();
+
         if (properties.length == 0) {
             return;
         }
@@ -28,9 +28,9 @@ public abstract class Layer {
         for (Property<?> property : properties) {
             if (property instanceof PaintProperty) {
                 updateClasses = true;
-                nativeSetPaintProperty(property.name, property.value);
+                nativeSetPaintProperty(property.name, convertValue(property.value));
             } else {
-                nativeSetLayoutProperty(property.name, property.value);
+                nativeSetLayoutProperty(property.name, convertValue(property.value));
             }
         }
 
@@ -38,13 +38,41 @@ public abstract class Layer {
     }
 
     public String getId() {
+        checkValidity();
         return nativeGetId();
+    }
+
+    public PropertyValue<String> getVisibility() {
+        checkValidity();
+        return new PropertyValue<>(nativeGetVisibility());
+    }
+
+    public float getMinZoom() {
+        checkValidity();
+        return nativeGetMinZoom();
+    }
+
+    public float getMaxZoom() {
+        checkValidity();
+        return nativeGetMaxZoom();
+    }
+
+    public void setMinZoom(float zoom) {
+        checkValidity();
+        nativeSetMinZoom(zoom);
+    }
+
+    public void setMaxZoom(float zoom) {
+        checkValidity();
+        nativeSetMaxZoom(zoom);
     }
 
     @Override
     protected native void finalize() throws Throwable;
 
     protected native String nativeGetId();
+
+    protected native Object nativeGetVisibility();
 
     protected native void nativeSetLayoutProperty(String name, Object value);
 
@@ -56,13 +84,29 @@ public abstract class Layer {
 
     protected native void nativeUpdateStyle(boolean updateClasses);
 
-    @Override
-    public String toString() {
-        return "Layer: " + getId();
-    }
+    protected native float nativeGetMinZoom();
+
+    protected native float nativeGetMaxZoom();
+
+    protected native void nativeSetMinZoom(float zoom);
+
+    protected native void nativeSetMaxZoom(float zoom);
 
     public long getNativePtr() {
         return nativePtr;
     }
 
+    private Object convertValue(Object value) {
+        return value != null && value instanceof Function ? ((Function) value).toValueObject() : value;
+    }
+
+    protected void checkValidity() {
+        if (invalidated) {
+            throw new RuntimeException("Layer has been invalidated. Request a new reference after adding");
+        }
+    }
+
+    public void invalidate() {
+        this.invalidated = true;
+    }
 }

@@ -4,24 +4,64 @@
 
 #include <string>
 
-//XXX
-#include <mbgl/platform/log.hpp>
+#include "../conversion/property_value.hpp"
 
 namespace mbgl {
 namespace android {
 
     RasterLayer::RasterLayer(jni::JNIEnv& env, jni::String layerId, jni::String sourceId)
         : Layer(env, std::make_unique<mbgl::style::RasterLayer>(jni::Make<std::string>(env, layerId), jni::Make<std::string>(env, sourceId))) {
-        mbgl::Log::Debug(mbgl::Event::JNI, "RasterLayer constructed, owning reference");
     }
 
     RasterLayer::RasterLayer(mbgl::Map& map, mbgl::style::RasterLayer& coreLayer)
         : Layer(map, coreLayer) {
-
-        mbgl::Log::Debug(mbgl::Event::JNI, "RasterLayer Non-owning reference constructor");
     }
 
     RasterLayer::~RasterLayer() = default;
+
+    // Property getters
+
+    jni::Object<jni::ObjectTag> RasterLayer::getRasterOpacity(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::RasterLayer>()->RasterLayer::getRasterOpacity());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<jni::ObjectTag> RasterLayer::getRasterHueRotate(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::RasterLayer>()->RasterLayer::getRasterHueRotate());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<jni::ObjectTag> RasterLayer::getRasterBrightnessMin(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::RasterLayer>()->RasterLayer::getRasterBrightnessMin());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<jni::ObjectTag> RasterLayer::getRasterBrightnessMax(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::RasterLayer>()->RasterLayer::getRasterBrightnessMax());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<jni::ObjectTag> RasterLayer::getRasterSaturation(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::RasterLayer>()->RasterLayer::getRasterSaturation());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<jni::ObjectTag> RasterLayer::getRasterContrast(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::RasterLayer>()->RasterLayer::getRasterContrast());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<jni::ObjectTag> RasterLayer::getRasterFadeDuration(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::RasterLayer>()->RasterLayer::getRasterFadeDuration());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
 
     jni::Class<RasterLayer> RasterLayer::javaClass;
 
@@ -31,8 +71,6 @@ namespace android {
     }
 
     void RasterLayer::registerNative(jni::JNIEnv& env) {
-        mbgl::Log::Debug(mbgl::Event::JNI, "Registering native background layer");
-
         //Lookup the class
         RasterLayer::javaClass = *jni::Class<RasterLayer>::Find(env).NewGlobalRef(env).release();
 
@@ -43,9 +81,14 @@ namespace android {
             env, RasterLayer::javaClass, "nativePtr",
             std::make_unique<RasterLayer, JNIEnv&, jni::String, jni::String>,
             "initialize",
-            "finalize"
-        );
-
+            "finalize",
+            METHOD(&RasterLayer::getRasterOpacity, "nativeGetRasterOpacity"),
+            METHOD(&RasterLayer::getRasterHueRotate, "nativeGetRasterHueRotate"),
+            METHOD(&RasterLayer::getRasterBrightnessMin, "nativeGetRasterBrightnessMin"),
+            METHOD(&RasterLayer::getRasterBrightnessMax, "nativeGetRasterBrightnessMax"),
+            METHOD(&RasterLayer::getRasterSaturation, "nativeGetRasterSaturation"),
+            METHOD(&RasterLayer::getRasterContrast, "nativeGetRasterContrast"),
+            METHOD(&RasterLayer::getRasterFadeDuration, "nativeGetRasterFadeDuration"));
     }
 
 } // namespace android

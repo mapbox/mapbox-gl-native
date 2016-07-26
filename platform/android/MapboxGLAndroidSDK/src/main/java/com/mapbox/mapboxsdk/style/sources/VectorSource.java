@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.style.sources;
 
 import java.net.URL;
-import java.util.HashMap;
 
 public class VectorSource extends Source {
     public static final String TYPE = "vector";
@@ -14,5 +13,10 @@ public class VectorSource extends Source {
     public VectorSource(String id, String url) {
         super(id, TYPE);
         this.put(URL_KEY, url);
+    }
+
+    public VectorSource(String id, TileSet tileSet) {
+        super(id, TYPE);
+        this.putAll(tileSet.toValueObject());
     }
 }

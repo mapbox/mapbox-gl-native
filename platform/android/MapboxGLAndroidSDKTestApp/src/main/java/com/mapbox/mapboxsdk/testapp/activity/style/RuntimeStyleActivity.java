@@ -6,6 +6,7 @@ import android.support.annotation.RawRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -16,14 +17,17 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
+import com.mapbox.mapboxsdk.style.layers.Function;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.layers.Property;
+import com.mapbox.mapboxsdk.style.layers.PropertyValue;
 import com.mapbox.mapboxsdk.style.layers.RasterLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.RasterSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
+import com.mapbox.mapboxsdk.style.sources.TileSet;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.mapboxsdk.testapp.R;
 
@@ -36,6 +40,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import static com.mapbox.mapboxsdk.style.layers.Filter.*;
+import static com.mapbox.mapboxsdk.style.layers.Function.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
@@ -138,6 +143,12 @@ public class RuntimeStyleActivity extends AppCompatActivity {
             case R.id.action_add_satellite_layer:
                 addSatelliteLayer();
                 return true;
+            case R.id.action_update_water_color_on_zoom:
+                updateWaterColorOnZoom();
+                return true;
+            case R.id.action_add_custom_tiles:
+                addCustomTileSource();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -148,7 +159,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
         for (String roadLayer : roadLayers) {
             Layer layer = mapboxMap.getLayer(roadLayer);
             if (layer != null) {
-                layer.set(visibility(false));
+                layer.setProperties(visibility(VISIBLE));
             }
         }
     }
@@ -162,7 +173,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
                 for (String roadLayer : roadLayers) {
                     Layer layer = mapboxMap.getLayer(roadLayer);
                     if (layer != null) {
-                        layer.set(symbolPlacement(SYMBOL_PLACEMENT_POINT));
+                        layer.setProperties(symbolPlacement(SYMBOL_PLACEMENT_POINT));
                     }
                 }
             }
@@ -172,16 +183,16 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     private void setBackgroundOpacity() {
         Layer background = mapboxMap.getLayer("background");
         if (background != null) {
-            background.set(backgroundOpacity(0.2f));
+            background.setProperties(backgroundOpacity(0.2f));
         }
     }
 
     private void setWaterColor() {
         Layer water = mapboxMap.getLayer("water");
         if (water != null) {
-            water.set(
-                visibility(true),
-                fillColor(Color.RED)
+            water.setProperties(
+                    visibility(VISIBLE),
+                    fillColor(Color.RED)
             );
         } else {
             Toast.makeText(RuntimeStyleActivity.this, "No water layer in this style", Toast.LENGTH_SHORT).show();
@@ -210,7 +221,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
         mapboxMap.addSource(source);
 
         FillLayer layer = new FillLayer("parksLayer", "amsterdam-spots");
-        layer.set(
+        layer.setProperties(
                 fillColor(Color.RED),
                 fillOutlineColor(Color.BLUE),
                 fillOpacity(0.3f),
@@ -224,7 +235,18 @@ public class RuntimeStyleActivity extends AppCompatActivity {
         //layer.setPaintProperty(fillColor(Color.RED)); //XXX But not after the object is attached
 
         //Or get the object later and set it. It's all good.
-        mapboxMap.getLayer("parksLayer").set(fillColor(Color.RED));
+        mapboxMap.getLayer("parksLayer").setProperties(fillColor(Color.RED));
+
+        //You can get a typed layer, if you're sure it's of that type. Use with care
+        layer = mapboxMap.getLayerAs("parksLayer");
+        //And get some properties
+        PropertyValue<Boolean> fillAntialias = layer.getFillAntialias();
+        Log.d(TAG, "Fill anti alias: " + fillAntialias.getValue());
+        layer.setProperties(fillTranslateAnchor(FILL_TRANSLATE_ANCHOR_MAP));
+        PropertyValue<String> fillTranslateAnchor = layer.getFillTranslateAnchor();
+        Log.d(TAG, "Fill translate anchor: " + fillTranslateAnchor.getValue());
+        PropertyValue<String> visibility = layer.getVisibility();
+        Log.d(TAG, "Visibility: " + visibility.getValue());
 
         //Get a good look at it all
         mapboxMap.animateCamera(CameraUpdateFactory.zoomTo(12));
@@ -237,7 +259,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
         LineLayer layer = new LineLayer("terrainLayer", "my-terrain-source");
         layer.setSourceLayer("contour");
-        layer.set(
+        layer.setProperties(
                 lineJoin(Property.LINE_JOIN_ROUND),
                 lineCap(Property.LINE_CAP_ROUND),
                 lineColor(Color.RED),
@@ -245,15 +267,48 @@ public class RuntimeStyleActivity extends AppCompatActivity {
         );
 
         mapboxMap.addLayer(layer);
+
+        //Need to get a fresh handle
+        layer = mapboxMap.getLayerAs("terrainLayer");
+
+        //Make sure it's also applied after the fact
+        layer.setMinZoom(10);
+        layer.setMaxZoom(15);
+
+        layer = (LineLayer) mapboxMap.getLayer("terrainLayer");
+        Toast.makeText(this, String.format("Set min/max zoom to %s - %s", layer.getMinZoom(), layer.getMaxZoom()), Toast.LENGTH_SHORT).show();
     }
 
     private void addSatelliteLayer() {
         //Add a source
-        Source source = new RasterSource("my-raster-source", "mapbox://mapbox.satellite");
+        Source source = new RasterSource("my-raster-source", "mapbox://mapbox.satellite").withTileSize(512);
         mapboxMap.addSource(source);
 
         //Add a layer
         mapboxMap.addLayer(new RasterLayer("satellite-layer", "my-raster-source"));
+    }
+
+    private void updateWaterColorOnZoom() {
+        FillLayer layer = mapboxMap.getLayerAs("water");
+        if (layer == null) {
+            return;
+        }
+
+        //Set a zoom function to update the color of the water
+        layer.setProperties(fillColor(zoom(0.8f,
+                stop(1, fillColor(Color.GREEN)),
+                stop(4, fillColor(Color.BLUE)),
+                stop(12, fillColor(Color.RED)),
+                stop(20, fillColor(Color.BLACK))
+        )));
+
+        //do some animations to show it off properly
+        mapboxMap.animateCamera(CameraUpdateFactory.zoomTo(1), 1500);
+
+        PropertyValue<String> fillColor = layer.getFillColor();
+        Function<String> function = fillColor.getFunction();
+        Log.d(TAG, "Fill color base: " + function.getBase());
+        Log.d(TAG, "Fill color #stops: " + function.getStops().length);
     }
 
     private String readRawResource(@RawRes int rawResource) throws IOException {
@@ -282,6 +337,17 @@ public class RuntimeStyleActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
+    }
+
+    private void addCustomTileSource() {
+        //Add a source
+        Source source = new VectorSource("custom-tile-source", new TileSet("2.1.0", "https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"));
+        mapboxMap.addSource(source);
+
+        //Add a layer
+        FillLayer layer = new FillLayer("custom-tile-layers", "custom-tile-source");
+        layer.setSourceLayer("water");
+        mapboxMap.addLayer(layer);
     }
 
     private static class DefaultCallback implements MapboxMap.CancelableCallback {

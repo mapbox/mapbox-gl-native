@@ -45,11 +45,25 @@ public:
 
     void updateStyle(jni::JNIEnv&, jni::jboolean updateClasses);
 
+    //Zoom
+
+    jni::jfloat getMinZoom(jni::JNIEnv&);
+
+    jni::jfloat getMaxZoom(jni::JNIEnv&);
+
+    void setMinZoom(jni::JNIEnv&, jni::jfloat zoom);
+
+    void setMaxZoom(jni::JNIEnv&, jni::jfloat zoom);
+
     /* common properties, but not shared by all */
 
     void setFilter(jni::JNIEnv& env, jni::Array<jni::Object<>> jfilter);
 
     void setSourceLayer(jni::JNIEnv& env, jni::String sourceLayer);
+
+    //Property getters
+
+    jni::Object<jni::ObjectTag> getVisibility(jni::JNIEnv&);
 
 protected:
     std::unique_ptr<mbgl::style::Layer> ownedLayer;

@@ -317,6 +317,11 @@
                 android:value="@string/category_imagegenerator" />
         </activity>
 
+
+        <!-- For Unit tests -->
+        <activity android:name=".activity.style.RuntimeStyleTestActivity"/>
+        <activity android:name=".activity.style.RuntimeStyleTimingTestActivity"/>
+
         <!-- Configuration Settings -->
         <meta-data
             android:name="com.mapbox.TestEventsServer"

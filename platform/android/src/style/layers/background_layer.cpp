@@ -4,24 +4,40 @@
 
 #include <string>
 
-//XXX
-#include <mbgl/platform/log.hpp>
+#include "../conversion/property_value.hpp"
 
 namespace mbgl {
 namespace android {
 
     BackgroundLayer::BackgroundLayer(jni::JNIEnv& env, jni::String layerId)
         : Layer(env, std::make_unique<mbgl::style::BackgroundLayer>(jni::Make<std::string>(env, layerId))) {
-        mbgl::Log::Debug(mbgl::Event::JNI, "BackgroundLayer constructed, owning reference");
     }
 
     BackgroundLayer::BackgroundLayer(mbgl::Map& map, mbgl::style::BackgroundLayer& coreLayer)
         : Layer(map, coreLayer) {
-
-        mbgl::Log::Debug(mbgl::Event::JNI, "BackgroundLayer Non-owning reference constructor");
     }
 
     BackgroundLayer::~BackgroundLayer() = default;
+
+    // Property getters
+
+    jni::Object<jni::ObjectTag> BackgroundLayer::getBackgroundColor(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::BackgroundLayer>()->BackgroundLayer::getBackgroundColor());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<jni::ObjectTag> BackgroundLayer::getBackgroundPattern(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::BackgroundLayer>()->BackgroundLayer::getBackgroundPattern());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<jni::ObjectTag> BackgroundLayer::getBackgroundOpacity(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::BackgroundLayer>()->BackgroundLayer::getBackgroundOpacity());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
 
     jni::Class<BackgroundLayer> BackgroundLayer::javaClass;
 
@@ -31,8 +47,6 @@ namespace android {
     }
 
     void BackgroundLayer::registerNative(jni::JNIEnv& env) {
-        mbgl::Log::Debug(mbgl::Event::JNI, "Registering native background layer");
-
         //Lookup the class
         BackgroundLayer::javaClass = *jni::Class<BackgroundLayer>::Find(env).NewGlobalRef(env).release();
 
@@ -43,9 +57,10 @@ namespace android {
             env, BackgroundLayer::javaClass, "nativePtr",
             std::make_unique<BackgroundLayer, JNIEnv&, jni::String>,
             "initialize",
-            "finalize"
-        );
-
+            "finalize",
+            METHOD(&BackgroundLayer::getBackgroundColor, "nativeGetBackgroundColor"),
+            METHOD(&BackgroundLayer::getBackgroundPattern, "nativeGetBackgroundPattern"),
+            METHOD(&BackgroundLayer::getBackgroundOpacity, "nativeGetBackgroundOpacity"));
     }
 
 } // namespace android
