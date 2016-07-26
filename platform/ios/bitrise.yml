@@ -36,7 +36,7 @@ workflows:
             gem install jazzy --no-rdoc --no-ri
             export BUILDTYPE=Debug
             make ios
-            make test-ios
+            make ios-test
         - is_debug: 'yes'
     - slack:
         title: Post to Slack

@@ -40,6 +40,7 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
     std::string message;
 
     // This host does not respond (== connection error).
+    // Are you seeing this test fail? Make sure you don't have a server running on port 3001!
     map.setStyleJSON(style);
     map.renderStill([&](std::exception_ptr err, PremultipliedImage&&) {
         ASSERT_TRUE(err.operator bool());

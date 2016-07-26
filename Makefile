@@ -39,7 +39,7 @@ else
 endif
 
 .PHONY: default
-default: test-$(BUILD_PLATFORM)
+default: test
 
 ifneq (,$(wildcard .git/.))
 .mason/mason:
@@ -109,16 +109,24 @@ macos: $(MACOS_PROJ_PATH)
 xproj: $(MACOS_PROJ_PATH)
 	open $(MACOS_WORK_PATH)
 
-.PHONY: test-macos
-test-macos: $(MACOS_PROJ_PATH)
+.PHONY: test
+test: $(MACOS_PROJ_PATH)
 	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-test' build $(XCPRETTY)
-	ulimit -c unlimited && ($(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-test & pid=$$! && wait $$pid \
+
+.PHONY: run-test
+run-test: run-test-*
+
+run-test-%: test
+	ulimit -c unlimited && ($(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-test --gtest_catch_exceptions=0 --gtest_filter=$* & pid=$$! && wait $$pid \
 	  || (lldb -c /cores/core.$$pid --batch --one-line 'thread backtrace all' --one-line 'quit' && exit 1))
 	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'CI' test $(XCPRETTY)
 
 .PHONY: glfw-app
 glfw-app: $(MACOS_PROJ_PATH)
 	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-glfw' build $(XCPRETTY)
+
+.PHONY: run-glfw-app
+run-glfw-app: glfw-app
 	"$(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-glfw"
 
 .PHONY: render
@@ -210,8 +218,8 @@ ios: $(IOS_PROJ_PATH)
 iproj: $(IOS_PROJ_PATH)
 	open $(IOS_WORK_PATH)
 
-.PHONY: test-ios
-test-ios: $(IOS_PROJ_PATH)
+.PHONY: ios-test
+ios-test: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' test $(XCPRETTY)
 
 .PHONY: ipackage
@@ -264,23 +272,31 @@ $(LINUX_BUILD): $(BUILD_DEPS)
 .PHONY: linux
 linux: glfw-app render offline
 
-test-linux: run-test-*
+.PHONY: test
+test: $(LINUX_BUILD)
+	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-test
 
-.PHONY: linux-render
+ifneq (,$(shell which gdb))
+  GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
+endif
+
+.PHONY: run-test
+run-test: run-test-*
+
+run-test-%: test
+	$(GDB) $(LINUX_OUTPUT_PATH)/mbgl-test --gtest_catch_exceptions=0 --gtest_filter=$*
+
+.PHONY: render
 render: $(LINUX_BUILD)
 	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-render
 
-.PHONY: linux-offline
+.PHONY: offline
 offline: $(LINUX_BUILD)
 	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-offline
 
 .PHONY: glfw-app
 glfw-app: $(LINUX_BUILD)
 	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-glfw
-
-.PHONY: test
-test: $(LINUX_BUILD)
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-test
 
 .PHONY: run-glfw-app
 run-glfw-app: glfw-app
@@ -289,13 +305,6 @@ run-glfw-app: glfw-app
 .PHONY: node
 node: $(LINUX_BUILD)
 	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node
-
-ifneq (,$(shell which gdb))
-  GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
-endif
-
-run-test-%: test
-	$(GDB) $(LINUX_OUTPUT_PATH)/mbgl-test --gtest_catch_exceptions=0 --gtest_filter=$*
 
 .PHONY: compdb
 compdb: $(LINUX_BUILD)
