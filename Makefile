@@ -424,9 +424,11 @@ build/android-$1/$(BUILDTYPE)/Makefile: build/android-$1/$(BUILDTYPE)/toolchain.
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DMBGL_PLATFORM=android
 
+.PHONY: android-lib-$1
 android-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile
 	$(MAKE) -j$(JOBS) -C build/android-$1/$(BUILDTYPE) all
 
+.PHONY: android-$1
 android-$1: android-lib-$1
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
@@ -435,16 +437,20 @@ endef
 
 $(foreach abi,$(ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
 
+.PHONY: android
 android: android-arm-v7
 
-test-android:
+.PHONY: android-test
+android-test:
 	cd platform/android && ./gradlew testReleaseUnitTest --continue
 
+.PHONY: apackage
 apackage:
 	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
 
 #### Miscellaneous targets #####################################################
 
+.PHONY: style-code
 style-code:
 	node scripts/generate-style-code.js
 
