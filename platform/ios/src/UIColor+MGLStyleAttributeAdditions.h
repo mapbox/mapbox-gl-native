@@ -4,8 +4,4 @@
 
 @interface UIColor (MGLStyleAttributeAdditions) <MGLStyleAttributeValue>
 
-- (id<MGLStyleAttributeValue>)mgl_colorAttributeValue;
-
-- (MGLAttributeColor)attributeColor;
-
 @end

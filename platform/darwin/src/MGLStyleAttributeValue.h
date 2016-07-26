@@ -2,18 +2,13 @@
 
 #import "MGLTypes.h"
 
-typedef struct {
-    float red;
-    float green;
-    float blue;
-    float alpha;
-} MGLAttributeColor;
-
 @protocol MGLStyleAttributeValue <NSObject>
 @optional
 - (NSString *)stringValue;
 - (MGLColor *)colorValue;
-- (MGLAttributeColor)attributeColor;
+- (NSNumber *)numberValue;
+- (NSValue *)valueValue;
+- (BOOL)isFunction;
 @end
 
 /*

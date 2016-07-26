@@ -39,19 +39,19 @@
 }
 - (void)setFillColor:(id <MGLStyleAttributeValue>)fillColor
 {
-    fillLayer->setFillColor([MGLStyleAttribute colorPropertyValueWith:fillColor]);
+    fillLayer->setFillColor(fillColor.colorValue.mbgl_propertyValue);
 }
 - (id <MGLStyleAttributeValue>)fillColor
 {
-    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:fillLayer->getFillColor().asConstant()];
+    return [MGLColor mbgl_propertyValue:fillLayer->getFillColor()];
 }
 - (void)setFillOutlineColor:(id <MGLStyleAttributeValue>)fillOutlineColor
 {
-    fillLayer->setFillOutlineColor([MGLStyleAttribute colorPropertyValueWith:fillOutlineColor]);
+    fillLayer->setFillOutlineColor(fillOutlineColor.colorValue.mbgl_propertyValue);
 }
 - (id <MGLStyleAttributeValue>)fillOutlineColor
 {
-    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:fillLayer->getFillOutlineColor().asConstant()];
+    return [MGLColor mbgl_propertyValue:fillLayer->getFillOutlineColor()];
 }
 - (void)setFillTranslate:(id <MGLStyleAttributeValue>)fillTranslate
 {

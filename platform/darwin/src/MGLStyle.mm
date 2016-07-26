@@ -5,6 +5,7 @@
 #import "MGLFillStyleLayer.h"
 #import "MGLStyle_Private.hpp"
 #import "MGLStyleLayer_Private.hpp"
+#import "MGLSource.h"
 
 #import <mbgl/util/default_styles.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
@@ -66,6 +67,16 @@ static NSURL *MGLStyleURL_emerald;
     return MGLStyleURL_emerald;
 }
 
+- (mbgl::style::Layer *)mbglLayerWithIdentifier:(NSString *)identifier
+{
+    return self.mapView.mbglMap->getLayer(identifier.UTF8String);
+}
+
+- (mbgl::style::Source *)mbglSourceWithIdentifier:(NSString *)identifier
+{
+    return self.mapView.mbglMap->getSource(identifier.UTF8String);
+}
+
 - (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier
 {
     mbgl::style::Layer *layer = self.mapView.mbglMap->getLayer(identifier.UTF8String);
@@ -81,5 +92,11 @@ static NSURL *MGLStyleURL_emerald;
     //mbgl::style::Source *source = self.mapView.mbglMap->getSource("composite"); //com.mapbox.annotations
     //mbgl::style::Source<mbgl::style::VectorSource> *vectorSource = reinterpret_cast<mbgl::style::Source<VectorSource>>(source);
 }
+
+/*
+- (MGLSource *)sourceWithIdentifier:(NSString *)identifier
+{
+    
+}*/
 
 @end

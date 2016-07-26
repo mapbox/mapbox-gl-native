@@ -73,8 +73,8 @@ global.setterImplementation = function(property, layerType = null) {
         case 'enum':
             return `// TODO: setterEnum`; 
         case 'color':
-            //fillLayer->setFillColor([MGLStyleAttribute colorPropertyValueWith:fillColor]);
-            return `${layerType}Layer->set${camelize(property.name)}([MGLStyleAttribute colorPropertyValueWith:${camelizeWithLeadingLowercase(property.name)}]);`;
+            //fillLayer->setFillColor([MGLStyleAttribute colorPropertyValueWith:fillColor]);//fillLayer->setFillColor(fillColor.colorValue.mbgl_color);
+            return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.colorValue.mbgl_propertyValue);`;
         case 'array':
             return '// TODO: setterArray';
         default: throw new Error(`unknown type for ${property.name}`)
@@ -92,7 +92,7 @@ global.getterImplementation = function(property, layerType = null) {
         case 'enum':
             return `return [[MGLStyleAttribute alloc] init]; //return ${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}${camelize(property.values[0])};`
         case 'color':
-            return  `return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:${camelizeWithLeadingLowercase(layerType)}Layer->get${camelize(property.name)}().asConstant()];`;
+            return `return [MGLColor mbgl_propertyValue:${camelizeWithLeadingLowercase(layerType)}Layer->get${camelize(property.name)}()];`
         case 'array':
             return 'return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray';
         default:

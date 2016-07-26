@@ -373,19 +373,19 @@
 }
 - (void)setIconColor:(id <MGLStyleAttributeValue>)iconColor
 {
-    symbolLayer->setIconColor([MGLStyleAttribute colorPropertyValueWith:iconColor]);
+    symbolLayer->setIconColor(iconColor.colorValue.mbgl_propertyValue);
 }
 - (id <MGLStyleAttributeValue>)iconColor
 {
-    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:symbolLayer->getIconColor().asConstant()];
+    return [MGLColor mbgl_propertyValue:symbolLayer->getIconColor()];
 }
 - (void)setIconHaloColor:(id <MGLStyleAttributeValue>)iconHaloColor
 {
-    symbolLayer->setIconHaloColor([MGLStyleAttribute colorPropertyValueWith:iconHaloColor]);
+    symbolLayer->setIconHaloColor(iconHaloColor.colorValue.mbgl_propertyValue);
 }
 - (id <MGLStyleAttributeValue>)iconHaloColor
 {
-    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:symbolLayer->getIconHaloColor().asConstant()];
+    return [MGLColor mbgl_propertyValue:symbolLayer->getIconHaloColor()];
 }
 - (void)setIconHaloWidth:(id <MGLStyleAttributeValue>)iconHaloWidth
 {
@@ -429,19 +429,19 @@
 }
 - (void)setTextColor:(id <MGLStyleAttributeValue>)textColor
 {
-    symbolLayer->setTextColor([MGLStyleAttribute colorPropertyValueWith:textColor]);
+    symbolLayer->setTextColor(textColor.colorValue.mbgl_propertyValue);
 }
 - (id <MGLStyleAttributeValue>)textColor
 {
-    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:symbolLayer->getTextColor().asConstant()];
+    return [MGLColor mbgl_propertyValue:symbolLayer->getTextColor()];
 }
 - (void)setTextHaloColor:(id <MGLStyleAttributeValue>)textHaloColor
 {
-    symbolLayer->setTextHaloColor([MGLStyleAttribute colorPropertyValueWith:textHaloColor]);
+    symbolLayer->setTextHaloColor(textHaloColor.colorValue.mbgl_propertyValue);
 }
 - (id <MGLStyleAttributeValue>)textHaloColor
 {
-    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:symbolLayer->getTextHaloColor().asConstant()];
+    return [MGLColor mbgl_propertyValue:symbolLayer->getTextHaloColor()];
 }
 - (void)setTextHaloWidth:(id <MGLStyleAttributeValue>)textHaloWidth
 {

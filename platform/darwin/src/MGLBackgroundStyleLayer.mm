@@ -23,11 +23,11 @@
 
 - (void)setBackgroundColor:(id <MGLStyleAttributeValue>)backgroundColor
 {
-    backgroundLayer->setBackgroundColor([MGLStyleAttribute colorPropertyValueWith:backgroundColor]);
+    backgroundLayer->setBackgroundColor(backgroundColor.colorValue.mbgl_propertyValue);
 }
 - (id <MGLStyleAttributeValue>)backgroundColor
 {
-    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:backgroundLayer->getBackgroundColor().asConstant()];
+    return [MGLColor mbgl_propertyValue:backgroundLayer->getBackgroundColor()];
 }
 - (void)setBackgroundPattern:(id <MGLStyleAttributeValue>)backgroundPattern
 {

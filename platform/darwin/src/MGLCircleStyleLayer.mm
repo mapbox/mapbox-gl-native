@@ -31,11 +31,11 @@
 }
 - (void)setCircleColor:(id <MGLStyleAttributeValue>)circleColor
 {
-    circleLayer->setCircleColor([MGLStyleAttribute colorPropertyValueWith:circleColor]);
+    circleLayer->setCircleColor(circleColor.colorValue.mbgl_propertyValue);
 }
 - (id <MGLStyleAttributeValue>)circleColor
 {
-    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:circleLayer->getCircleColor().asConstant()];
+    return [MGLColor mbgl_propertyValue:circleLayer->getCircleColor()];
 }
 - (void)setCircleBlur:(id <MGLStyleAttributeValue>)circleBlur
 {

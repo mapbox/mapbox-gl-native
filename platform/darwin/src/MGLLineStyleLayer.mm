@@ -73,11 +73,11 @@
 }
 - (void)setLineColor:(id <MGLStyleAttributeValue>)lineColor
 {
-    lineLayer->setLineColor([MGLStyleAttribute colorPropertyValueWith:lineColor]);
+    lineLayer->setLineColor(lineColor.colorValue.mbgl_propertyValue);
 }
 - (id <MGLStyleAttributeValue>)lineColor
 {
-    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:lineLayer->getLineColor().asConstant()];
+    return [MGLColor mbgl_propertyValue:lineLayer->getLineColor()];
 }
 - (void)setLineTranslate:(id <MGLStyleAttributeValue>)lineTranslate
 {
