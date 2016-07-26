@@ -15,8 +15,7 @@ AnnotationSource::Impl::Impl(Source& base_)
 }
 
 Range<uint8_t> AnnotationSource::Impl::getZoomRange() {
-    // Same as default geojson-vt-cpp.
-    return { 0, 18 };
+    return { 0, 22 };
 }
 
 void AnnotationSource::Impl::load(FileSource&) {
