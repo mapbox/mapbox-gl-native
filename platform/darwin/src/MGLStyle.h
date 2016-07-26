@@ -163,7 +163,11 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 //- (instancetype)init NS_UNAVAILABLE;
 
+#pragma mark - Runtime style API
+
 - (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier;
+
+- (void)sourceTest;
 
 @end
 

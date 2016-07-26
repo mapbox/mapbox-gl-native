@@ -4,6 +4,7 @@
 #import <Mapbox/Mapbox.h>
 
 #import "MGLTypes.h"
+#import "MGLStyleAttributeValue.h"
 
 
 @interface MGLBackgroundStyleLayer : MGLStyleLayer
@@ -13,17 +14,17 @@
 /**
   The color with which the background will be drawn.
 */
-@property (nonatomic) MGLColor *backgroundColor;
+@property (nonatomic) id <MGLStyleAttributeValue> backgroundColor;
 
 /**
   Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
 */
-@property (nonatomic) NSString *backgroundPattern;
+@property (nonatomic) id <MGLStyleAttributeValue> backgroundPattern;
 
 /**
   The opacity at which the background will be drawn.
 */
-@property (nonatomic) CGFloat backgroundOpacity;
+@property (nonatomic) id <MGLStyleAttributeValue> backgroundOpacity;
 
 @end
 

@@ -2,6 +2,8 @@
 // Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleLayer_Private.hpp"
+#import "MGLStyleAttributeValue.h"
+#import "MGLStyleAttribute.hpp"
 #import "MGLLineStyleLayer.h"
 #import <mbgl/style/layers/line_layer.hpp>
 
@@ -20,126 +22,126 @@
 #pragma mark - Accessing the Layout Attributes
 
 
-- (void)setLineCap:(MGLLineStyleLayerLineCap)lineCap
+- (void)setLineCap:(id <MGLStyleAttributeValue>)lineCap
 {
     // TODO: setterEnum
 }
 
-- (MGLLineStyleLayerLineCap)lineCap
+- (id <MGLStyleAttributeValue>)lineCap
 {
-    return MGLLineStyleLayerLineCapButt;
+    return [[MGLStyleAttribute alloc] init]; //return MGLLineStyleLayerLineCapButt;
 }
 
-- (void)setLineJoin:(MGLLineStyleLayerLineJoin)lineJoin
+- (void)setLineJoin:(id <MGLStyleAttributeValue>)lineJoin
 {
     // TODO: setterEnum
 }
 
-- (MGLLineStyleLayerLineJoin)lineJoin
+- (id <MGLStyleAttributeValue>)lineJoin
 {
-    return MGLLineStyleLayerLineJoinBevel;
+    return [[MGLStyleAttribute alloc] init]; //return MGLLineStyleLayerLineJoinBevel;
 }
 
-- (void)setLineMiterLimit:(CGFloat)lineMiterLimit
+- (void)setLineMiterLimit:(id <MGLStyleAttributeValue>)lineMiterLimit
 {
-    lineLayer->setLineMiterLimit(lineMiterLimit);
+    // lineLayer->setLineMiterLimit(lineMiterLimit.number.floatValue);
 }
 
-- (CGFloat)lineMiterLimit
+- (id <MGLStyleAttributeValue>)lineMiterLimit
 {
-    return lineLayer->getLineMiterLimit().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineMiterLimit().asConstant();
 }
 
-- (void)setLineRoundLimit:(CGFloat)lineRoundLimit
+- (void)setLineRoundLimit:(id <MGLStyleAttributeValue>)lineRoundLimit
 {
-    lineLayer->setLineRoundLimit(lineRoundLimit);
+    // lineLayer->setLineRoundLimit(lineRoundLimit.number.floatValue);
 }
 
-- (CGFloat)lineRoundLimit
+- (id <MGLStyleAttributeValue>)lineRoundLimit
 {
-    return lineLayer->getLineRoundLimit().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineRoundLimit().asConstant();
 }
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setLineOpacity:(CGFloat)lineOpacity
+- (void)setLineOpacity:(id <MGLStyleAttributeValue>)lineOpacity
 {
-    lineLayer->setLineOpacity(lineOpacity);
+    // lineLayer->setLineOpacity(lineOpacity.number.floatValue);
 }
-- (CGFloat)lineOpacity
+- (id <MGLStyleAttributeValue>)lineOpacity
 {
-    return lineLayer->getLineOpacity().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineOpacity().asConstant();
 }
-- (void)setLineColor:(MGLColor*)lineColor
+- (void)setLineColor:(id <MGLStyleAttributeValue>)lineColor
 {
-    lineLayer->setLineColor(lineColor.mbgl_color);
+    lineLayer->setLineColor([MGLStyleAttribute colorPropertyValueWith:lineColor]);
 }
-- (MGLColor *)lineColor
+- (id <MGLStyleAttributeValue>)lineColor
 {
-    return [MGLColor mbgl_color:lineLayer->getLineColor().asConstant()];
+    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:lineLayer->getLineColor().asConstant()];
 }
-- (void)setLineTranslate:(NSArray*)lineTranslate
+- (void)setLineTranslate:(id <MGLStyleAttributeValue>)lineTranslate
 {
     // TODO: setterArray
 }
-- (NSArray *)lineTranslate
+- (id <MGLStyleAttributeValue>)lineTranslate
 {
-    return @[]; // TODO: getterArray
+    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
 }
-- (void)setLineTranslateAnchor:(MGLLineStyleLayerLineTranslateAnchor)lineTranslateAnchor
+- (void)setLineTranslateAnchor:(id <MGLStyleAttributeValue>)lineTranslateAnchor
 {
     // TODO: setterEnum
 }
-- (MGLLineStyleLayerLineTranslateAnchor)lineTranslateAnchor
+- (id <MGLStyleAttributeValue>)lineTranslateAnchor
 {
-    return MGLLineStyleLayerLineTranslateAnchorMap;
+    return [[MGLStyleAttribute alloc] init]; //return MGLLineStyleLayerLineTranslateAnchorMap;
 }
-- (void)setLineWidth:(CGFloat)lineWidth
+- (void)setLineWidth:(id <MGLStyleAttributeValue>)lineWidth
 {
-    lineLayer->setLineWidth(lineWidth);
+    // lineLayer->setLineWidth(lineWidth.number.floatValue);
 }
-- (CGFloat)lineWidth
+- (id <MGLStyleAttributeValue>)lineWidth
 {
-    return lineLayer->getLineWidth().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineWidth().asConstant();
 }
-- (void)setLineGapWidth:(CGFloat)lineGapWidth
+- (void)setLineGapWidth:(id <MGLStyleAttributeValue>)lineGapWidth
 {
-    lineLayer->setLineGapWidth(lineGapWidth);
+    // lineLayer->setLineGapWidth(lineGapWidth.number.floatValue);
 }
-- (CGFloat)lineGapWidth
+- (id <MGLStyleAttributeValue>)lineGapWidth
 {
-    return lineLayer->getLineGapWidth().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineGapWidth().asConstant();
 }
-- (void)setLineOffset:(CGFloat)lineOffset
+- (void)setLineOffset:(id <MGLStyleAttributeValue>)lineOffset
 {
-    lineLayer->setLineOffset(lineOffset);
+    // lineLayer->setLineOffset(lineOffset.number.floatValue);
 }
-- (CGFloat)lineOffset
+- (id <MGLStyleAttributeValue>)lineOffset
 {
-    return lineLayer->getLineOffset().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineOffset().asConstant();
 }
-- (void)setLineBlur:(CGFloat)lineBlur
+- (void)setLineBlur:(id <MGLStyleAttributeValue>)lineBlur
 {
-    lineLayer->setLineBlur(lineBlur);
+    // lineLayer->setLineBlur(lineBlur.number.floatValue);
 }
-- (CGFloat)lineBlur
+- (id <MGLStyleAttributeValue>)lineBlur
 {
-    return lineLayer->getLineBlur().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineBlur().asConstant();
 }
-- (void)setLineDasharray:(NSArray*)lineDasharray
+- (void)setLineDasharray:(id <MGLStyleAttributeValue>)lineDasharray
 {
     // TODO: setterArray
 }
-- (NSArray *)lineDasharray
+- (id <MGLStyleAttributeValue>)lineDasharray
 {
-    return @[]; // TODO: getterArray
+    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
 }
-- (void)setLinePattern:(NSString*)linePattern
+- (void)setLinePattern:(id <MGLStyleAttributeValue>)linePattern
 {
-    lineLayer->setLinePattern(std::string(linePattern.UTF8String));
+    // lineLayer->setLinePattern(std::string(linePattern.string.UTF8String));
 }
-- (NSString *)linePattern
+- (id <MGLStyleAttributeValue>)linePattern
 {
-    return @(std::string(lineLayer->getLinePattern().asConstant()).c_str());
+    return [[MGLStyleAttribute alloc] init]; //return @(std::string(lineLayer->getLinePattern().asConstant()).c_str());
 }
 
 @end

@@ -76,4 +76,10 @@ static NSURL *MGLStyleURL_emerald;
     return fillStyleLayer;
 }
 
+- (void)sourceTest
+{
+    //mbgl::style::Source *source = self.mapView.mbglMap->getSource("composite"); //com.mapbox.annotations
+    //mbgl::style::Source<mbgl::style::VectorSource> *vectorSource = reinterpret_cast<mbgl::style::Source<VectorSource>>(source);
+}
+
 @end

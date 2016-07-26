@@ -2,6 +2,8 @@
 // Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleLayer_Private.hpp"
+#import "MGLStyleAttributeValue.h"
+#import "MGLStyleAttribute.hpp"
 #import "MGLSymbolStyleLayer.h"
 #import <mbgl/style/layers/symbol_layer.hpp>
 
@@ -20,458 +22,458 @@
 #pragma mark - Accessing the Layout Attributes
 
 
-- (void)setSymbolPlacement:(MGLSymbolStyleLayerSymbolPlacement)symbolPlacement
+- (void)setSymbolPlacement:(id <MGLStyleAttributeValue>)symbolPlacement
 {
     // TODO: setterEnum
 }
 
-- (MGLSymbolStyleLayerSymbolPlacement)symbolPlacement
+- (id <MGLStyleAttributeValue>)symbolPlacement
 {
-    return MGLSymbolStyleLayerSymbolPlacementPoint;
+    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerSymbolPlacementPoint;
 }
 
-- (void)setSymbolSpacing:(CGFloat)symbolSpacing
+- (void)setSymbolSpacing:(id <MGLStyleAttributeValue>)symbolSpacing
 {
-    symbolLayer->setSymbolSpacing(symbolSpacing);
+    // symbolLayer->setSymbolSpacing(symbolSpacing.number.floatValue);
 }
 
-- (CGFloat)symbolSpacing
+- (id <MGLStyleAttributeValue>)symbolSpacing
 {
-    return symbolLayer->getSymbolSpacing().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getSymbolSpacing().asConstant();
 }
 
-- (void)setSymbolAvoidEdges:(BOOL)symbolAvoidEdges
+- (void)setSymbolAvoidEdges:(id <MGLStyleAttributeValue>)symbolAvoidEdges
 {
-    symbolLayer->setSymbolAvoidEdges(symbolAvoidEdges);
+    // symbolLayer->setSymbolAvoidEdges(symbolAvoidEdges);
 }
 
-- (BOOL)symbolAvoidEdges
+- (id <MGLStyleAttributeValue>)symbolAvoidEdges
 {
-    return symbolLayer->getSymbolAvoidEdges().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getSymbolAvoidEdges().asConstant();
 }
 
-- (void)setIconAllowOverlap:(BOOL)iconAllowOverlap
+- (void)setIconAllowOverlap:(id <MGLStyleAttributeValue>)iconAllowOverlap
 {
-    symbolLayer->setIconAllowOverlap(iconAllowOverlap);
+    // symbolLayer->setIconAllowOverlap(iconAllowOverlap);
 }
 
-- (BOOL)iconAllowOverlap
+- (id <MGLStyleAttributeValue>)iconAllowOverlap
 {
-    return symbolLayer->getIconAllowOverlap().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconAllowOverlap().asConstant();
 }
 
-- (void)setIconIgnorePlacement:(BOOL)iconIgnorePlacement
+- (void)setIconIgnorePlacement:(id <MGLStyleAttributeValue>)iconIgnorePlacement
 {
-    symbolLayer->setIconIgnorePlacement(iconIgnorePlacement);
+    // symbolLayer->setIconIgnorePlacement(iconIgnorePlacement);
 }
 
-- (BOOL)iconIgnorePlacement
+- (id <MGLStyleAttributeValue>)iconIgnorePlacement
 {
-    return symbolLayer->getIconIgnorePlacement().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconIgnorePlacement().asConstant();
 }
 
-- (void)setIconOptional:(BOOL)iconOptional
+- (void)setIconOptional:(id <MGLStyleAttributeValue>)iconOptional
 {
-    symbolLayer->setIconOptional(iconOptional);
+    // symbolLayer->setIconOptional(iconOptional);
 }
 
-- (BOOL)iconOptional
+- (id <MGLStyleAttributeValue>)iconOptional
 {
-    return symbolLayer->getIconOptional().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconOptional().asConstant();
 }
 
-- (void)setIconRotationAlignment:(MGLSymbolStyleLayerIconRotationAlignment)iconRotationAlignment
-{
-    // TODO: setterEnum
-}
-
-- (MGLSymbolStyleLayerIconRotationAlignment)iconRotationAlignment
-{
-    return MGLSymbolStyleLayerIconRotationAlignmentMap;
-}
-
-- (void)setIconSize:(CGFloat)iconSize
-{
-    symbolLayer->setIconSize(iconSize);
-}
-
-- (CGFloat)iconSize
-{
-    return symbolLayer->getIconSize().asConstant();
-}
-
-- (void)setIconTextFit:(MGLSymbolStyleLayerIconTextFit)iconTextFit
+- (void)setIconRotationAlignment:(id <MGLStyleAttributeValue>)iconRotationAlignment
 {
     // TODO: setterEnum
 }
 
-- (MGLSymbolStyleLayerIconTextFit)iconTextFit
+- (id <MGLStyleAttributeValue>)iconRotationAlignment
 {
-    return MGLSymbolStyleLayerIconTextFitNone;
+    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerIconRotationAlignmentMap;
 }
 
-- (void)setIconTextFitPadding:(NSArray*)iconTextFitPadding
+- (void)setIconSize:(id <MGLStyleAttributeValue>)iconSize
+{
+    // symbolLayer->setIconSize(iconSize.number.floatValue);
+}
+
+- (id <MGLStyleAttributeValue>)iconSize
+{
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconSize().asConstant();
+}
+
+- (void)setIconTextFit:(id <MGLStyleAttributeValue>)iconTextFit
+{
+    // TODO: setterEnum
+}
+
+- (id <MGLStyleAttributeValue>)iconTextFit
+{
+    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerIconTextFitNone;
+}
+
+- (void)setIconTextFitPadding:(id <MGLStyleAttributeValue>)iconTextFitPadding
 {
     // TODO: setterArray
 }
 
-- (NSArray *)iconTextFitPadding
+- (id <MGLStyleAttributeValue>)iconTextFitPadding
 {
-    return @[]; // TODO: getterArray
+    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
 }
 
-- (void)setIconImage:(NSString*)iconImage
+- (void)setIconImage:(id <MGLStyleAttributeValue>)iconImage
 {
-    symbolLayer->setIconImage(std::string(iconImage.UTF8String));
+    // symbolLayer->setIconImage(std::string(iconImage.string.UTF8String));
 }
 
-- (NSString *)iconImage
+- (id <MGLStyleAttributeValue>)iconImage
 {
-    return @(std::string(symbolLayer->getIconImage().asConstant()).c_str());
+    return [[MGLStyleAttribute alloc] init]; //return @(std::string(symbolLayer->getIconImage().asConstant()).c_str());
 }
 
-- (void)setIconRotate:(CGFloat)iconRotate
+- (void)setIconRotate:(id <MGLStyleAttributeValue>)iconRotate
 {
-    symbolLayer->setIconRotate(iconRotate);
+    // symbolLayer->setIconRotate(iconRotate.number.floatValue);
 }
 
-- (CGFloat)iconRotate
+- (id <MGLStyleAttributeValue>)iconRotate
 {
-    return symbolLayer->getIconRotate().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconRotate().asConstant();
 }
 
-- (void)setIconPadding:(CGFloat)iconPadding
+- (void)setIconPadding:(id <MGLStyleAttributeValue>)iconPadding
 {
-    symbolLayer->setIconPadding(iconPadding);
+    // symbolLayer->setIconPadding(iconPadding.number.floatValue);
 }
 
-- (CGFloat)iconPadding
+- (id <MGLStyleAttributeValue>)iconPadding
 {
-    return symbolLayer->getIconPadding().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconPadding().asConstant();
 }
 
-- (void)setIconKeepUpright:(BOOL)iconKeepUpright
+- (void)setIconKeepUpright:(id <MGLStyleAttributeValue>)iconKeepUpright
 {
-    symbolLayer->setIconKeepUpright(iconKeepUpright);
+    // symbolLayer->setIconKeepUpright(iconKeepUpright);
 }
 
-- (BOOL)iconKeepUpright
+- (id <MGLStyleAttributeValue>)iconKeepUpright
 {
-    return symbolLayer->getIconKeepUpright().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconKeepUpright().asConstant();
 }
 
-- (void)setIconOffset:(NSArray*)iconOffset
+- (void)setIconOffset:(id <MGLStyleAttributeValue>)iconOffset
 {
     // TODO: setterArray
 }
 
-- (NSArray *)iconOffset
+- (id <MGLStyleAttributeValue>)iconOffset
 {
-    return @[]; // TODO: getterArray
+    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
 }
 
-- (void)setTextPitchAlignment:(MGLSymbolStyleLayerTextPitchAlignment)textPitchAlignment
-{
-    // TODO: setterEnum
-}
-
-- (MGLSymbolStyleLayerTextPitchAlignment)textPitchAlignment
-{
-    return MGLSymbolStyleLayerTextPitchAlignmentMap;
-}
-
-- (void)setTextRotationAlignment:(MGLSymbolStyleLayerTextRotationAlignment)textRotationAlignment
+- (void)setTextPitchAlignment:(id <MGLStyleAttributeValue>)textPitchAlignment
 {
     // TODO: setterEnum
 }
 
-- (MGLSymbolStyleLayerTextRotationAlignment)textRotationAlignment
+- (id <MGLStyleAttributeValue>)textPitchAlignment
 {
-    return MGLSymbolStyleLayerTextRotationAlignmentMap;
+    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerTextPitchAlignmentMap;
 }
 
-- (void)setTextField:(NSString*)textField
+- (void)setTextRotationAlignment:(id <MGLStyleAttributeValue>)textRotationAlignment
 {
-    symbolLayer->setTextField(std::string(textField.UTF8String));
+    // TODO: setterEnum
 }
 
-- (NSString *)textField
+- (id <MGLStyleAttributeValue>)textRotationAlignment
 {
-    return @(std::string(symbolLayer->getTextField().asConstant()).c_str());
+    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerTextRotationAlignmentMap;
 }
 
-- (void)setTextFont:(NSArray*)textFont
+- (void)setTextField:(id <MGLStyleAttributeValue>)textField
+{
+    // symbolLayer->setTextField(std::string(textField.string.UTF8String));
+}
+
+- (id <MGLStyleAttributeValue>)textField
+{
+    return [[MGLStyleAttribute alloc] init]; //return @(std::string(symbolLayer->getTextField().asConstant()).c_str());
+}
+
+- (void)setTextFont:(id <MGLStyleAttributeValue>)textFont
 {
     // TODO: setterArray
 }
 
-- (NSArray *)textFont
+- (id <MGLStyleAttributeValue>)textFont
 {
-    return @[]; // TODO: getterArray
+    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
 }
 
-- (void)setTextSize:(CGFloat)textSize
+- (void)setTextSize:(id <MGLStyleAttributeValue>)textSize
 {
-    symbolLayer->setTextSize(textSize);
+    // symbolLayer->setTextSize(textSize.number.floatValue);
 }
 
-- (CGFloat)textSize
+- (id <MGLStyleAttributeValue>)textSize
 {
-    return symbolLayer->getTextSize().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextSize().asConstant();
 }
 
-- (void)setTextMaxWidth:(CGFloat)textMaxWidth
+- (void)setTextMaxWidth:(id <MGLStyleAttributeValue>)textMaxWidth
 {
-    symbolLayer->setTextMaxWidth(textMaxWidth);
+    // symbolLayer->setTextMaxWidth(textMaxWidth.number.floatValue);
 }
 
-- (CGFloat)textMaxWidth
+- (id <MGLStyleAttributeValue>)textMaxWidth
 {
-    return symbolLayer->getTextMaxWidth().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextMaxWidth().asConstant();
 }
 
-- (void)setTextLineHeight:(CGFloat)textLineHeight
+- (void)setTextLineHeight:(id <MGLStyleAttributeValue>)textLineHeight
 {
-    symbolLayer->setTextLineHeight(textLineHeight);
+    // symbolLayer->setTextLineHeight(textLineHeight.number.floatValue);
 }
 
-- (CGFloat)textLineHeight
+- (id <MGLStyleAttributeValue>)textLineHeight
 {
-    return symbolLayer->getTextLineHeight().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextLineHeight().asConstant();
 }
 
-- (void)setTextLetterSpacing:(CGFloat)textLetterSpacing
+- (void)setTextLetterSpacing:(id <MGLStyleAttributeValue>)textLetterSpacing
 {
-    symbolLayer->setTextLetterSpacing(textLetterSpacing);
+    // symbolLayer->setTextLetterSpacing(textLetterSpacing.number.floatValue);
 }
 
-- (CGFloat)textLetterSpacing
+- (id <MGLStyleAttributeValue>)textLetterSpacing
 {
-    return symbolLayer->getTextLetterSpacing().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextLetterSpacing().asConstant();
 }
 
-- (void)setTextJustify:(MGLSymbolStyleLayerTextJustify)textJustify
-{
-    // TODO: setterEnum
-}
-
-- (MGLSymbolStyleLayerTextJustify)textJustify
-{
-    return MGLSymbolStyleLayerTextJustifyLeft;
-}
-
-- (void)setTextAnchor:(MGLSymbolStyleLayerTextAnchor)textAnchor
+- (void)setTextJustify:(id <MGLStyleAttributeValue>)textJustify
 {
     // TODO: setterEnum
 }
 
-- (MGLSymbolStyleLayerTextAnchor)textAnchor
+- (id <MGLStyleAttributeValue>)textJustify
 {
-    return MGLSymbolStyleLayerTextAnchorCenter;
+    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerTextJustifyLeft;
 }
 
-- (void)setTextMaxAngle:(CGFloat)textMaxAngle
-{
-    symbolLayer->setTextMaxAngle(textMaxAngle);
-}
-
-- (CGFloat)textMaxAngle
-{
-    return symbolLayer->getTextMaxAngle().asConstant();
-}
-
-- (void)setTextRotate:(CGFloat)textRotate
-{
-    symbolLayer->setTextRotate(textRotate);
-}
-
-- (CGFloat)textRotate
-{
-    return symbolLayer->getTextRotate().asConstant();
-}
-
-- (void)setTextPadding:(CGFloat)textPadding
-{
-    symbolLayer->setTextPadding(textPadding);
-}
-
-- (CGFloat)textPadding
-{
-    return symbolLayer->getTextPadding().asConstant();
-}
-
-- (void)setTextKeepUpright:(BOOL)textKeepUpright
-{
-    symbolLayer->setTextKeepUpright(textKeepUpright);
-}
-
-- (BOOL)textKeepUpright
-{
-    return symbolLayer->getTextKeepUpright().asConstant();
-}
-
-- (void)setTextTransform:(MGLSymbolStyleLayerTextTransform)textTransform
+- (void)setTextAnchor:(id <MGLStyleAttributeValue>)textAnchor
 {
     // TODO: setterEnum
 }
 
-- (MGLSymbolStyleLayerTextTransform)textTransform
+- (id <MGLStyleAttributeValue>)textAnchor
 {
-    return MGLSymbolStyleLayerTextTransformNone;
+    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerTextAnchorCenter;
 }
 
-- (void)setTextOffset:(NSArray*)textOffset
+- (void)setTextMaxAngle:(id <MGLStyleAttributeValue>)textMaxAngle
+{
+    // symbolLayer->setTextMaxAngle(textMaxAngle.number.floatValue);
+}
+
+- (id <MGLStyleAttributeValue>)textMaxAngle
+{
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextMaxAngle().asConstant();
+}
+
+- (void)setTextRotate:(id <MGLStyleAttributeValue>)textRotate
+{
+    // symbolLayer->setTextRotate(textRotate.number.floatValue);
+}
+
+- (id <MGLStyleAttributeValue>)textRotate
+{
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextRotate().asConstant();
+}
+
+- (void)setTextPadding:(id <MGLStyleAttributeValue>)textPadding
+{
+    // symbolLayer->setTextPadding(textPadding.number.floatValue);
+}
+
+- (id <MGLStyleAttributeValue>)textPadding
+{
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextPadding().asConstant();
+}
+
+- (void)setTextKeepUpright:(id <MGLStyleAttributeValue>)textKeepUpright
+{
+    // symbolLayer->setTextKeepUpright(textKeepUpright);
+}
+
+- (id <MGLStyleAttributeValue>)textKeepUpright
+{
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextKeepUpright().asConstant();
+}
+
+- (void)setTextTransform:(id <MGLStyleAttributeValue>)textTransform
+{
+    // TODO: setterEnum
+}
+
+- (id <MGLStyleAttributeValue>)textTransform
+{
+    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerTextTransformNone;
+}
+
+- (void)setTextOffset:(id <MGLStyleAttributeValue>)textOffset
 {
     // TODO: setterArray
 }
 
-- (NSArray *)textOffset
+- (id <MGLStyleAttributeValue>)textOffset
 {
-    return @[]; // TODO: getterArray
+    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
 }
 
-- (void)setTextAllowOverlap:(BOOL)textAllowOverlap
+- (void)setTextAllowOverlap:(id <MGLStyleAttributeValue>)textAllowOverlap
 {
-    symbolLayer->setTextAllowOverlap(textAllowOverlap);
+    // symbolLayer->setTextAllowOverlap(textAllowOverlap);
 }
 
-- (BOOL)textAllowOverlap
+- (id <MGLStyleAttributeValue>)textAllowOverlap
 {
-    return symbolLayer->getTextAllowOverlap().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextAllowOverlap().asConstant();
 }
 
-- (void)setTextIgnorePlacement:(BOOL)textIgnorePlacement
+- (void)setTextIgnorePlacement:(id <MGLStyleAttributeValue>)textIgnorePlacement
 {
-    symbolLayer->setTextIgnorePlacement(textIgnorePlacement);
+    // symbolLayer->setTextIgnorePlacement(textIgnorePlacement);
 }
 
-- (BOOL)textIgnorePlacement
+- (id <MGLStyleAttributeValue>)textIgnorePlacement
 {
-    return symbolLayer->getTextIgnorePlacement().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextIgnorePlacement().asConstant();
 }
 
-- (void)setTextOptional:(BOOL)textOptional
+- (void)setTextOptional:(id <MGLStyleAttributeValue>)textOptional
 {
-    symbolLayer->setTextOptional(textOptional);
+    // symbolLayer->setTextOptional(textOptional);
 }
 
-- (BOOL)textOptional
+- (id <MGLStyleAttributeValue>)textOptional
 {
-    return symbolLayer->getTextOptional().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextOptional().asConstant();
 }
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setIconOpacity:(CGFloat)iconOpacity
+- (void)setIconOpacity:(id <MGLStyleAttributeValue>)iconOpacity
 {
-    symbolLayer->setIconOpacity(iconOpacity);
+    // symbolLayer->setIconOpacity(iconOpacity.number.floatValue);
 }
-- (CGFloat)iconOpacity
+- (id <MGLStyleAttributeValue>)iconOpacity
 {
-    return symbolLayer->getIconOpacity().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconOpacity().asConstant();
 }
-- (void)setIconColor:(MGLColor*)iconColor
+- (void)setIconColor:(id <MGLStyleAttributeValue>)iconColor
 {
-    symbolLayer->setIconColor(iconColor.mbgl_color);
+    symbolLayer->setIconColor([MGLStyleAttribute colorPropertyValueWith:iconColor]);
 }
-- (MGLColor *)iconColor
+- (id <MGLStyleAttributeValue>)iconColor
 {
-    return [MGLColor mbgl_color:symbolLayer->getIconColor().asConstant()];
+    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:symbolLayer->getIconColor().asConstant()];
 }
-- (void)setIconHaloColor:(MGLColor*)iconHaloColor
+- (void)setIconHaloColor:(id <MGLStyleAttributeValue>)iconHaloColor
 {
-    symbolLayer->setIconHaloColor(iconHaloColor.mbgl_color);
+    symbolLayer->setIconHaloColor([MGLStyleAttribute colorPropertyValueWith:iconHaloColor]);
 }
-- (MGLColor *)iconHaloColor
+- (id <MGLStyleAttributeValue>)iconHaloColor
 {
-    return [MGLColor mbgl_color:symbolLayer->getIconHaloColor().asConstant()];
+    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:symbolLayer->getIconHaloColor().asConstant()];
 }
-- (void)setIconHaloWidth:(CGFloat)iconHaloWidth
+- (void)setIconHaloWidth:(id <MGLStyleAttributeValue>)iconHaloWidth
 {
-    symbolLayer->setIconHaloWidth(iconHaloWidth);
+    // symbolLayer->setIconHaloWidth(iconHaloWidth.number.floatValue);
 }
-- (CGFloat)iconHaloWidth
+- (id <MGLStyleAttributeValue>)iconHaloWidth
 {
-    return symbolLayer->getIconHaloWidth().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconHaloWidth().asConstant();
 }
-- (void)setIconHaloBlur:(CGFloat)iconHaloBlur
+- (void)setIconHaloBlur:(id <MGLStyleAttributeValue>)iconHaloBlur
 {
-    symbolLayer->setIconHaloBlur(iconHaloBlur);
+    // symbolLayer->setIconHaloBlur(iconHaloBlur.number.floatValue);
 }
-- (CGFloat)iconHaloBlur
+- (id <MGLStyleAttributeValue>)iconHaloBlur
 {
-    return symbolLayer->getIconHaloBlur().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconHaloBlur().asConstant();
 }
-- (void)setIconTranslate:(NSArray*)iconTranslate
+- (void)setIconTranslate:(id <MGLStyleAttributeValue>)iconTranslate
 {
     // TODO: setterArray
 }
-- (NSArray *)iconTranslate
+- (id <MGLStyleAttributeValue>)iconTranslate
 {
-    return @[]; // TODO: getterArray
+    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
 }
-- (void)setIconTranslateAnchor:(MGLSymbolStyleLayerIconTranslateAnchor)iconTranslateAnchor
+- (void)setIconTranslateAnchor:(id <MGLStyleAttributeValue>)iconTranslateAnchor
 {
     // TODO: setterEnum
 }
-- (MGLSymbolStyleLayerIconTranslateAnchor)iconTranslateAnchor
+- (id <MGLStyleAttributeValue>)iconTranslateAnchor
 {
-    return MGLSymbolStyleLayerIconTranslateAnchorMap;
+    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerIconTranslateAnchorMap;
 }
-- (void)setTextOpacity:(CGFloat)textOpacity
+- (void)setTextOpacity:(id <MGLStyleAttributeValue>)textOpacity
 {
-    symbolLayer->setTextOpacity(textOpacity);
+    // symbolLayer->setTextOpacity(textOpacity.number.floatValue);
 }
-- (CGFloat)textOpacity
+- (id <MGLStyleAttributeValue>)textOpacity
 {
-    return symbolLayer->getTextOpacity().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextOpacity().asConstant();
 }
-- (void)setTextColor:(MGLColor*)textColor
+- (void)setTextColor:(id <MGLStyleAttributeValue>)textColor
 {
-    symbolLayer->setTextColor(textColor.mbgl_color);
+    symbolLayer->setTextColor([MGLStyleAttribute colorPropertyValueWith:textColor]);
 }
-- (MGLColor *)textColor
+- (id <MGLStyleAttributeValue>)textColor
 {
-    return [MGLColor mbgl_color:symbolLayer->getTextColor().asConstant()];
+    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:symbolLayer->getTextColor().asConstant()];
 }
-- (void)setTextHaloColor:(MGLColor*)textHaloColor
+- (void)setTextHaloColor:(id <MGLStyleAttributeValue>)textHaloColor
 {
-    symbolLayer->setTextHaloColor(textHaloColor.mbgl_color);
+    symbolLayer->setTextHaloColor([MGLStyleAttribute colorPropertyValueWith:textHaloColor]);
 }
-- (MGLColor *)textHaloColor
+- (id <MGLStyleAttributeValue>)textHaloColor
 {
-    return [MGLColor mbgl_color:symbolLayer->getTextHaloColor().asConstant()];
+    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:symbolLayer->getTextHaloColor().asConstant()];
 }
-- (void)setTextHaloWidth:(CGFloat)textHaloWidth
+- (void)setTextHaloWidth:(id <MGLStyleAttributeValue>)textHaloWidth
 {
-    symbolLayer->setTextHaloWidth(textHaloWidth);
+    // symbolLayer->setTextHaloWidth(textHaloWidth.number.floatValue);
 }
-- (CGFloat)textHaloWidth
+- (id <MGLStyleAttributeValue>)textHaloWidth
 {
-    return symbolLayer->getTextHaloWidth().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextHaloWidth().asConstant();
 }
-- (void)setTextHaloBlur:(CGFloat)textHaloBlur
+- (void)setTextHaloBlur:(id <MGLStyleAttributeValue>)textHaloBlur
 {
-    symbolLayer->setTextHaloBlur(textHaloBlur);
+    // symbolLayer->setTextHaloBlur(textHaloBlur.number.floatValue);
 }
-- (CGFloat)textHaloBlur
+- (id <MGLStyleAttributeValue>)textHaloBlur
 {
-    return symbolLayer->getTextHaloBlur().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextHaloBlur().asConstant();
 }
-- (void)setTextTranslate:(NSArray*)textTranslate
+- (void)setTextTranslate:(id <MGLStyleAttributeValue>)textTranslate
 {
     // TODO: setterArray
 }
-- (NSArray *)textTranslate
+- (id <MGLStyleAttributeValue>)textTranslate
 {
-    return @[]; // TODO: getterArray
+    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
 }
-- (void)setTextTranslateAnchor:(MGLSymbolStyleLayerTextTranslateAnchor)textTranslateAnchor
+- (void)setTextTranslateAnchor:(id <MGLStyleAttributeValue>)textTranslateAnchor
 {
     // TODO: setterEnum
 }
-- (MGLSymbolStyleLayerTextTranslateAnchor)textTranslateAnchor
+- (id <MGLStyleAttributeValue>)textTranslateAnchor
 {
-    return MGLSymbolStyleLayerTextTranslateAnchorMap;
+    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerTextTranslateAnchorMap;
 }
 
 @end

@@ -2,6 +2,8 @@
 // Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleLayer_Private.hpp"
+#import "MGLStyleAttributeValue.h"
+#import "MGLStyleAttribute.hpp"
 #import "MGLFillStyleLayer.h"
 #import <mbgl/style/layers/fill_layer.hpp>
 
@@ -19,61 +21,61 @@
 
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setFillAntialias:(BOOL)fillAntialias
+- (void)setFillAntialias:(id <MGLStyleAttributeValue>)fillAntialias
 {
-    fillLayer->setFillAntialias(fillAntialias);
+    // fillLayer->setFillAntialias(fillAntialias);
 }
-- (BOOL)fillAntialias
+- (id <MGLStyleAttributeValue>)fillAntialias
 {
-    return fillLayer->getFillAntialias().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return fillLayer->getFillAntialias().asConstant();
 }
-- (void)setFillOpacity:(CGFloat)fillOpacity
+- (void)setFillOpacity:(id <MGLStyleAttributeValue>)fillOpacity
 {
-    fillLayer->setFillOpacity(fillOpacity);
+    // fillLayer->setFillOpacity(fillOpacity.number.floatValue);
 }
-- (CGFloat)fillOpacity
+- (id <MGLStyleAttributeValue>)fillOpacity
 {
-    return fillLayer->getFillOpacity().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return fillLayer->getFillOpacity().asConstant();
 }
-- (void)setFillColor:(MGLColor*)fillColor
+- (void)setFillColor:(id <MGLStyleAttributeValue>)fillColor
 {
-    fillLayer->setFillColor(fillColor.mbgl_color);
+    fillLayer->setFillColor([MGLStyleAttribute colorPropertyValueWith:fillColor]);
 }
-- (MGLColor *)fillColor
+- (id <MGLStyleAttributeValue>)fillColor
 {
-    return [MGLColor mbgl_color:fillLayer->getFillColor().asConstant()];
+    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:fillLayer->getFillColor().asConstant()];
 }
-- (void)setFillOutlineColor:(MGLColor*)fillOutlineColor
+- (void)setFillOutlineColor:(id <MGLStyleAttributeValue>)fillOutlineColor
 {
-    fillLayer->setFillOutlineColor(fillOutlineColor.mbgl_color);
+    fillLayer->setFillOutlineColor([MGLStyleAttribute colorPropertyValueWith:fillOutlineColor]);
 }
-- (MGLColor *)fillOutlineColor
+- (id <MGLStyleAttributeValue>)fillOutlineColor
 {
-    return [MGLColor mbgl_color:fillLayer->getFillOutlineColor().asConstant()];
+    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:fillLayer->getFillOutlineColor().asConstant()];
 }
-- (void)setFillTranslate:(NSArray*)fillTranslate
+- (void)setFillTranslate:(id <MGLStyleAttributeValue>)fillTranslate
 {
     // TODO: setterArray
 }
-- (NSArray *)fillTranslate
+- (id <MGLStyleAttributeValue>)fillTranslate
 {
-    return @[]; // TODO: getterArray
+    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
 }
-- (void)setFillTranslateAnchor:(MGLFillStyleLayerFillTranslateAnchor)fillTranslateAnchor
+- (void)setFillTranslateAnchor:(id <MGLStyleAttributeValue>)fillTranslateAnchor
 {
     // TODO: setterEnum
 }
-- (MGLFillStyleLayerFillTranslateAnchor)fillTranslateAnchor
+- (id <MGLStyleAttributeValue>)fillTranslateAnchor
 {
-    return MGLFillStyleLayerFillTranslateAnchorMap;
+    return [[MGLStyleAttribute alloc] init]; //return MGLFillStyleLayerFillTranslateAnchorMap;
 }
-- (void)setFillPattern:(NSString*)fillPattern
+- (void)setFillPattern:(id <MGLStyleAttributeValue>)fillPattern
 {
-    fillLayer->setFillPattern(std::string(fillPattern.UTF8String));
+    // fillLayer->setFillPattern(std::string(fillPattern.string.UTF8String));
 }
-- (NSString *)fillPattern
+- (id <MGLStyleAttributeValue>)fillPattern
 {
-    return @(std::string(fillLayer->getFillPattern().asConstant()).c_str());
+    return [[MGLStyleAttribute alloc] init]; //return @(std::string(fillLayer->getFillPattern().asConstant()).c_str());
 }
 
 @end

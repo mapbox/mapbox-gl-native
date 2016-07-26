@@ -2,6 +2,8 @@
 // Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleLayer_Private.hpp"
+#import "MGLStyleAttributeValue.h"
+#import "MGLStyleAttribute.hpp"
 #import "MGLRasterStyleLayer.h"
 #import <mbgl/style/layers/raster_layer.hpp>
 
@@ -19,61 +21,61 @@
 
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setRasterOpacity:(CGFloat)rasterOpacity
+- (void)setRasterOpacity:(id <MGLStyleAttributeValue>)rasterOpacity
 {
-    rasterLayer->setRasterOpacity(rasterOpacity);
+    // rasterLayer->setRasterOpacity(rasterOpacity.number.floatValue);
 }
-- (CGFloat)rasterOpacity
+- (id <MGLStyleAttributeValue>)rasterOpacity
 {
-    return rasterLayer->getRasterOpacity().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return rasterLayer->getRasterOpacity().asConstant();
 }
-- (void)setRasterHueRotate:(CGFloat)rasterHueRotate
+- (void)setRasterHueRotate:(id <MGLStyleAttributeValue>)rasterHueRotate
 {
-    rasterLayer->setRasterHueRotate(rasterHueRotate);
+    // rasterLayer->setRasterHueRotate(rasterHueRotate.number.floatValue);
 }
-- (CGFloat)rasterHueRotate
+- (id <MGLStyleAttributeValue>)rasterHueRotate
 {
-    return rasterLayer->getRasterHueRotate().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return rasterLayer->getRasterHueRotate().asConstant();
 }
-- (void)setRasterBrightnessMin:(CGFloat)rasterBrightnessMin
+- (void)setRasterBrightnessMin:(id <MGLStyleAttributeValue>)rasterBrightnessMin
 {
-    rasterLayer->setRasterBrightnessMin(rasterBrightnessMin);
+    // rasterLayer->setRasterBrightnessMin(rasterBrightnessMin.number.floatValue);
 }
-- (CGFloat)rasterBrightnessMin
+- (id <MGLStyleAttributeValue>)rasterBrightnessMin
 {
-    return rasterLayer->getRasterBrightnessMin().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return rasterLayer->getRasterBrightnessMin().asConstant();
 }
-- (void)setRasterBrightnessMax:(CGFloat)rasterBrightnessMax
+- (void)setRasterBrightnessMax:(id <MGLStyleAttributeValue>)rasterBrightnessMax
 {
-    rasterLayer->setRasterBrightnessMax(rasterBrightnessMax);
+    // rasterLayer->setRasterBrightnessMax(rasterBrightnessMax.number.floatValue);
 }
-- (CGFloat)rasterBrightnessMax
+- (id <MGLStyleAttributeValue>)rasterBrightnessMax
 {
-    return rasterLayer->getRasterBrightnessMax().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return rasterLayer->getRasterBrightnessMax().asConstant();
 }
-- (void)setRasterSaturation:(CGFloat)rasterSaturation
+- (void)setRasterSaturation:(id <MGLStyleAttributeValue>)rasterSaturation
 {
-    rasterLayer->setRasterSaturation(rasterSaturation);
+    // rasterLayer->setRasterSaturation(rasterSaturation.number.floatValue);
 }
-- (CGFloat)rasterSaturation
+- (id <MGLStyleAttributeValue>)rasterSaturation
 {
-    return rasterLayer->getRasterSaturation().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return rasterLayer->getRasterSaturation().asConstant();
 }
-- (void)setRasterContrast:(CGFloat)rasterContrast
+- (void)setRasterContrast:(id <MGLStyleAttributeValue>)rasterContrast
 {
-    rasterLayer->setRasterContrast(rasterContrast);
+    // rasterLayer->setRasterContrast(rasterContrast.number.floatValue);
 }
-- (CGFloat)rasterContrast
+- (id <MGLStyleAttributeValue>)rasterContrast
 {
-    return rasterLayer->getRasterContrast().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return rasterLayer->getRasterContrast().asConstant();
 }
-- (void)setRasterFadeDuration:(CGFloat)rasterFadeDuration
+- (void)setRasterFadeDuration:(id <MGLStyleAttributeValue>)rasterFadeDuration
 {
-    rasterLayer->setRasterFadeDuration(rasterFadeDuration);
+    // rasterLayer->setRasterFadeDuration(rasterFadeDuration.number.floatValue);
 }
-- (CGFloat)rasterFadeDuration
+- (id <MGLStyleAttributeValue>)rasterFadeDuration
 {
-    return rasterLayer->getRasterFadeDuration().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return rasterLayer->getRasterFadeDuration().asConstant();
 }
 
 @end

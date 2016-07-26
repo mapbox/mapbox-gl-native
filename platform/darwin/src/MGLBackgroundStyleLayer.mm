@@ -2,6 +2,8 @@
 // Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleLayer_Private.hpp"
+#import "MGLStyleAttributeValue.h"
+#import "MGLStyleAttribute.hpp"
 #import "MGLBackgroundStyleLayer.h"
 #import <mbgl/style/layers/background_layer.hpp>
 
@@ -19,29 +21,29 @@
 
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setBackgroundColor:(MGLColor*)backgroundColor
+- (void)setBackgroundColor:(id <MGLStyleAttributeValue>)backgroundColor
 {
-    backgroundLayer->setBackgroundColor(backgroundColor.mbgl_color);
+    backgroundLayer->setBackgroundColor([MGLStyleAttribute colorPropertyValueWith:backgroundColor]);
 }
-- (MGLColor *)backgroundColor
+- (id <MGLStyleAttributeValue>)backgroundColor
 {
-    return [MGLColor mbgl_color:backgroundLayer->getBackgroundColor().asConstant()];
+    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:backgroundLayer->getBackgroundColor().asConstant()];
 }
-- (void)setBackgroundPattern:(NSString*)backgroundPattern
+- (void)setBackgroundPattern:(id <MGLStyleAttributeValue>)backgroundPattern
 {
-    backgroundLayer->setBackgroundPattern(std::string(backgroundPattern.UTF8String));
+    // backgroundLayer->setBackgroundPattern(std::string(backgroundPattern.string.UTF8String));
 }
-- (NSString *)backgroundPattern
+- (id <MGLStyleAttributeValue>)backgroundPattern
 {
-    return @(std::string(backgroundLayer->getBackgroundPattern().asConstant()).c_str());
+    return [[MGLStyleAttribute alloc] init]; //return @(std::string(backgroundLayer->getBackgroundPattern().asConstant()).c_str());
 }
-- (void)setBackgroundOpacity:(CGFloat)backgroundOpacity
+- (void)setBackgroundOpacity:(id <MGLStyleAttributeValue>)backgroundOpacity
 {
-    backgroundLayer->setBackgroundOpacity(backgroundOpacity);
+    // backgroundLayer->setBackgroundOpacity(backgroundOpacity.number.floatValue);
 }
-- (CGFloat)backgroundOpacity
+- (id <MGLStyleAttributeValue>)backgroundOpacity
 {
-    return backgroundLayer->getBackgroundOpacity().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return backgroundLayer->getBackgroundOpacity().asConstant();
 }
 
 @end

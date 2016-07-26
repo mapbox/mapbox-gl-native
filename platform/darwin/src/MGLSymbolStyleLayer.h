@@ -4,6 +4,7 @@
 #import <Mapbox/Mapbox.h>
 
 #import "MGLTypes.h"
+#import "MGLStyleAttributeValue.h"
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerSymbolPlacement) {
     MGLSymbolStyleLayerSymbolPlacementPoint,
@@ -64,244 +65,244 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
   Label placement relative to its geometry. `line` can only be used on LineStrings and Polygons.
 */
-@property (nonatomic) MGLSymbolStyleLayerSymbolPlacement symbolPlacement;
+@property (nonatomic) id <MGLStyleAttributeValue> symbolPlacement;
 
 /**
   Distance between two symbol anchors.
 */
-@property (nonatomic) CGFloat symbolSpacing;
+@property (nonatomic) id <MGLStyleAttributeValue> symbolSpacing;
 
 /**
   If true, the symbols will not cross tile edges to avoid mutual collisions. Recommended in layers that don't have enough padding in the vector tile to prevent collisions, or if it is a point symbol layer placed after a line symbol layer.
 */
-@property (nonatomic) BOOL symbolAvoidEdges;
+@property (nonatomic) id <MGLStyleAttributeValue> symbolAvoidEdges;
 
 /**
   If true, the icon will be visible even if it collides with other previously drawn symbols.
 */
-@property (nonatomic) BOOL iconAllowOverlap;
+@property (nonatomic) id <MGLStyleAttributeValue> iconAllowOverlap;
 
 /**
   If true, other symbols can be visible even if they collide with the icon.
 */
-@property (nonatomic) BOOL iconIgnorePlacement;
+@property (nonatomic) id <MGLStyleAttributeValue> iconIgnorePlacement;
 
 /**
   If true, text will display without their corresponding icons when the icon collides with other symbols and the text does not.
 */
-@property (nonatomic) BOOL iconOptional;
+@property (nonatomic) id <MGLStyleAttributeValue> iconOptional;
 
 /**
   Orientation of icon when map is rotated.
 */
-@property (nonatomic) MGLSymbolStyleLayerIconRotationAlignment iconRotationAlignment;
+@property (nonatomic) id <MGLStyleAttributeValue> iconRotationAlignment;
 
 /**
   Scale factor for icon. 1 is original size, 3 triples the size.
 */
-@property (nonatomic) CGFloat iconSize;
+@property (nonatomic) id <MGLStyleAttributeValue> iconSize;
 
 /**
   Position and scale an icon by the its corresponding text.
 */
-@property (nonatomic) MGLSymbolStyleLayerIconTextFit iconTextFit;
+@property (nonatomic) id <MGLStyleAttributeValue> iconTextFit;
 
 /**
   Size of padding area around the text-fit size in clockwise order: top, right, bottom, left.
 */
-@property (nonatomic) NSArray *iconTextFitPadding;
+@property (nonatomic) id <MGLStyleAttributeValue> iconTextFitPadding;
 
 /**
   A string with {tokens} replaced, referencing the data property to pull from.
 */
-@property (nonatomic) NSString *iconImage;
+@property (nonatomic) id <MGLStyleAttributeValue> iconImage;
 
 /**
   Rotates the icon clockwise.
 */
-@property (nonatomic) CGFloat iconRotate;
+@property (nonatomic) id <MGLStyleAttributeValue> iconRotate;
 
 /**
   Size of the additional area around the icon bounding box used for detecting symbol collisions.
 */
-@property (nonatomic) CGFloat iconPadding;
+@property (nonatomic) id <MGLStyleAttributeValue> iconPadding;
 
 /**
   If true, the icon may be flipped to prevent it from being rendered upside-down.
 */
-@property (nonatomic) BOOL iconKeepUpright;
+@property (nonatomic) id <MGLStyleAttributeValue> iconKeepUpright;
 
 /**
   Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate left and up.
 */
-@property (nonatomic) NSArray *iconOffset;
+@property (nonatomic) id <MGLStyleAttributeValue> iconOffset;
 
 /**
   Aligns text to the plane of the `viewport` or the `map` when the map is pitched. Matches `text-rotation-alignment` if unspecified.
 */
-@property (nonatomic) MGLSymbolStyleLayerTextPitchAlignment textPitchAlignment;
+@property (nonatomic) id <MGLStyleAttributeValue> textPitchAlignment;
 
 /**
   Orientation of text when map is rotated.
 */
-@property (nonatomic) MGLSymbolStyleLayerTextRotationAlignment textRotationAlignment;
+@property (nonatomic) id <MGLStyleAttributeValue> textRotationAlignment;
 
 /**
   Value to use for a text label. Feature properties are specified using tokens like {field_name}.
 */
-@property (nonatomic) NSString *textField;
+@property (nonatomic) id <MGLStyleAttributeValue> textField;
 
 /**
   Font stack to use for displaying text.
 */
-@property (nonatomic) NSArray *textFont;
+@property (nonatomic) id <MGLStyleAttributeValue> textFont;
 
 /**
   Font size.
 */
-@property (nonatomic) CGFloat textSize;
+@property (nonatomic) id <MGLStyleAttributeValue> textSize;
 
 /**
   The maximum line width for text wrapping.
 */
-@property (nonatomic) CGFloat textMaxWidth;
+@property (nonatomic) id <MGLStyleAttributeValue> textMaxWidth;
 
 /**
   Text leading value for multi-line text.
 */
-@property (nonatomic) CGFloat textLineHeight;
+@property (nonatomic) id <MGLStyleAttributeValue> textLineHeight;
 
 /**
   Text tracking amount.
 */
-@property (nonatomic) CGFloat textLetterSpacing;
+@property (nonatomic) id <MGLStyleAttributeValue> textLetterSpacing;
 
 /**
   Text justification options.
 */
-@property (nonatomic) MGLSymbolStyleLayerTextJustify textJustify;
+@property (nonatomic) id <MGLStyleAttributeValue> textJustify;
 
 /**
   Part of the text placed closest to the anchor.
 */
-@property (nonatomic) MGLSymbolStyleLayerTextAnchor textAnchor;
+@property (nonatomic) id <MGLStyleAttributeValue> textAnchor;
 
 /**
   Maximum angle change between adjacent characters.
 */
-@property (nonatomic) CGFloat textMaxAngle;
+@property (nonatomic) id <MGLStyleAttributeValue> textMaxAngle;
 
 /**
   Rotates the text clockwise.
 */
-@property (nonatomic) CGFloat textRotate;
+@property (nonatomic) id <MGLStyleAttributeValue> textRotate;
 
 /**
   Size of the additional area around the text bounding box used for detecting symbol collisions.
 */
-@property (nonatomic) CGFloat textPadding;
+@property (nonatomic) id <MGLStyleAttributeValue> textPadding;
 
 /**
   If true, the text may be flipped vertically to prevent it from being rendered upside-down.
 */
-@property (nonatomic) BOOL textKeepUpright;
+@property (nonatomic) id <MGLStyleAttributeValue> textKeepUpright;
 
 /**
   Specifies how to capitalize text, similar to the CSS `text-transform` property.
 */
-@property (nonatomic) MGLSymbolStyleLayerTextTransform textTransform;
+@property (nonatomic) id <MGLStyleAttributeValue> textTransform;
 
 /**
   Offset distance of text from its anchor. Positive values indicate right and down, while negative values indicate left and up.
 */
-@property (nonatomic) NSArray *textOffset;
+@property (nonatomic) id <MGLStyleAttributeValue> textOffset;
 
 /**
   If true, the text will be visible even if it collides with other previously drawn symbols.
 */
-@property (nonatomic) BOOL textAllowOverlap;
+@property (nonatomic) id <MGLStyleAttributeValue> textAllowOverlap;
 
 /**
   If true, other symbols can be visible even if they collide with the text.
 */
-@property (nonatomic) BOOL textIgnorePlacement;
+@property (nonatomic) id <MGLStyleAttributeValue> textIgnorePlacement;
 
 /**
   If true, icons will display without their corresponding text when the text collides with other symbols and the icon does not.
 */
-@property (nonatomic) BOOL textOptional;
+@property (nonatomic) id <MGLStyleAttributeValue> textOptional;
 
 #pragma mark - Accessing the Paint Attributes
 
 /**
   The opacity at which the icon will be drawn.
 */
-@property (nonatomic) CGFloat iconOpacity;
+@property (nonatomic) id <MGLStyleAttributeValue> iconOpacity;
 
 /**
   The color of the icon. This can only be used with sdf icons.
 */
-@property (nonatomic) MGLColor *iconColor;
+@property (nonatomic) id <MGLStyleAttributeValue> iconColor;
 
 /**
   The color of the icon's halo. Icon halos can only be used with sdf icons.
 */
-@property (nonatomic) MGLColor *iconHaloColor;
+@property (nonatomic) id <MGLStyleAttributeValue> iconHaloColor;
 
 /**
   Distance of halo to the icon outline.
 */
-@property (nonatomic) CGFloat iconHaloWidth;
+@property (nonatomic) id <MGLStyleAttributeValue> iconHaloWidth;
 
 /**
   Fade out the halo towards the outside.
 */
-@property (nonatomic) CGFloat iconHaloBlur;
+@property (nonatomic) id <MGLStyleAttributeValue> iconHaloBlur;
 
 /**
   Distance that the icon's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
 */
-@property (nonatomic) NSArray *iconTranslate;
+@property (nonatomic) id <MGLStyleAttributeValue> iconTranslate;
 
 /**
   Control whether the translation is relative to the map (north) or viewport (screen).
 */
-@property (nonatomic) MGLSymbolStyleLayerIconTranslateAnchor iconTranslateAnchor;
+@property (nonatomic) id <MGLStyleAttributeValue> iconTranslateAnchor;
 
 /**
   The opacity at which the text will be drawn.
 */
-@property (nonatomic) CGFloat textOpacity;
+@property (nonatomic) id <MGLStyleAttributeValue> textOpacity;
 
 /**
   The color with which the text will be drawn.
 */
-@property (nonatomic) MGLColor *textColor;
+@property (nonatomic) id <MGLStyleAttributeValue> textColor;
 
 /**
   The color of the text's halo, which helps it stand out from backgrounds.
 */
-@property (nonatomic) MGLColor *textHaloColor;
+@property (nonatomic) id <MGLStyleAttributeValue> textHaloColor;
 
 /**
   Distance of halo to the font outline. Max text halo width is 1/4 of the font-size.
 */
-@property (nonatomic) CGFloat textHaloWidth;
+@property (nonatomic) id <MGLStyleAttributeValue> textHaloWidth;
 
 /**
   The halo's fadeout distance towards the outside.
 */
-@property (nonatomic) CGFloat textHaloBlur;
+@property (nonatomic) id <MGLStyleAttributeValue> textHaloBlur;
 
 /**
   Distance that the text's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
 */
-@property (nonatomic) NSArray *textTranslate;
+@property (nonatomic) id <MGLStyleAttributeValue> textTranslate;
 
 /**
   Control whether the translation is relative to the map (north) or viewport (screen).
 */
-@property (nonatomic) MGLSymbolStyleLayerTextTranslateAnchor textTranslateAnchor;
+@property (nonatomic) id <MGLStyleAttributeValue> textTranslateAnchor;
 
 @end
 

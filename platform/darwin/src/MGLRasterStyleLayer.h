@@ -4,6 +4,7 @@
 #import <Mapbox/Mapbox.h>
 
 #import "MGLTypes.h"
+#import "MGLStyleAttributeValue.h"
 
 
 @interface MGLRasterStyleLayer : MGLStyleLayer
@@ -13,37 +14,37 @@
 /**
   The opacity at which the image will be drawn.
 */
-@property (nonatomic) CGFloat rasterOpacity;
+@property (nonatomic) id <MGLStyleAttributeValue> rasterOpacity;
 
 /**
   Rotates hues around the color wheel.
 */
-@property (nonatomic) CGFloat rasterHueRotate;
+@property (nonatomic) id <MGLStyleAttributeValue> rasterHueRotate;
 
 /**
   Increase or reduce the brightness of the image. The value is the minimum brightness.
 */
-@property (nonatomic) CGFloat rasterBrightnessMin;
+@property (nonatomic) id <MGLStyleAttributeValue> rasterBrightnessMin;
 
 /**
   Increase or reduce the brightness of the image. The value is the maximum brightness.
 */
-@property (nonatomic) CGFloat rasterBrightnessMax;
+@property (nonatomic) id <MGLStyleAttributeValue> rasterBrightnessMax;
 
 /**
   Increase or reduce the saturation of the image.
 */
-@property (nonatomic) CGFloat rasterSaturation;
+@property (nonatomic) id <MGLStyleAttributeValue> rasterSaturation;
 
 /**
   Increase or reduce the contrast of the image.
 */
-@property (nonatomic) CGFloat rasterContrast;
+@property (nonatomic) id <MGLStyleAttributeValue> rasterContrast;
 
 /**
   Fade duration when a new tile is added.
 */
-@property (nonatomic) CGFloat rasterFadeDuration;
+@property (nonatomic) id <MGLStyleAttributeValue> rasterFadeDuration;
 
 @end
 

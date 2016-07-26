@@ -5,6 +5,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/mbgl.hpp>
 #include <mbgl/util/chrono.hpp>
+#import "MGLStyleAttributeValue.h"
 
 #if TARGET_OS_IPHONE
 #import "UIColor+MGLAdditions.hpp"

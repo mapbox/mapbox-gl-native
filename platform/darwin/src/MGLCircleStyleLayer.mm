@@ -2,6 +2,8 @@
 // Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleLayer_Private.hpp"
+#import "MGLStyleAttributeValue.h"
+#import "MGLStyleAttribute.hpp"
 #import "MGLCircleStyleLayer.h"
 #import <mbgl/style/layers/circle_layer.hpp>
 
@@ -19,61 +21,61 @@
 
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setCircleRadius:(CGFloat)circleRadius
+- (void)setCircleRadius:(id <MGLStyleAttributeValue>)circleRadius
 {
-    circleLayer->setCircleRadius(circleRadius);
+    // circleLayer->setCircleRadius(circleRadius.number.floatValue);
 }
-- (CGFloat)circleRadius
+- (id <MGLStyleAttributeValue>)circleRadius
 {
-    return circleLayer->getCircleRadius().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return circleLayer->getCircleRadius().asConstant();
 }
-- (void)setCircleColor:(MGLColor*)circleColor
+- (void)setCircleColor:(id <MGLStyleAttributeValue>)circleColor
 {
-    circleLayer->setCircleColor(circleColor.mbgl_color);
+    circleLayer->setCircleColor([MGLStyleAttribute colorPropertyValueWith:circleColor]);
 }
-- (MGLColor *)circleColor
+- (id <MGLStyleAttributeValue>)circleColor
 {
-    return [MGLColor mbgl_color:circleLayer->getCircleColor().asConstant()];
+    return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:circleLayer->getCircleColor().asConstant()];
 }
-- (void)setCircleBlur:(CGFloat)circleBlur
+- (void)setCircleBlur:(id <MGLStyleAttributeValue>)circleBlur
 {
-    circleLayer->setCircleBlur(circleBlur);
+    // circleLayer->setCircleBlur(circleBlur.number.floatValue);
 }
-- (CGFloat)circleBlur
+- (id <MGLStyleAttributeValue>)circleBlur
 {
-    return circleLayer->getCircleBlur().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return circleLayer->getCircleBlur().asConstant();
 }
-- (void)setCircleOpacity:(CGFloat)circleOpacity
+- (void)setCircleOpacity:(id <MGLStyleAttributeValue>)circleOpacity
 {
-    circleLayer->setCircleOpacity(circleOpacity);
+    // circleLayer->setCircleOpacity(circleOpacity.number.floatValue);
 }
-- (CGFloat)circleOpacity
+- (id <MGLStyleAttributeValue>)circleOpacity
 {
-    return circleLayer->getCircleOpacity().asConstant();
+    return [[MGLStyleAttribute alloc] init]; //return circleLayer->getCircleOpacity().asConstant();
 }
-- (void)setCircleTranslate:(NSArray*)circleTranslate
+- (void)setCircleTranslate:(id <MGLStyleAttributeValue>)circleTranslate
 {
     // TODO: setterArray
 }
-- (NSArray *)circleTranslate
+- (id <MGLStyleAttributeValue>)circleTranslate
 {
-    return @[]; // TODO: getterArray
+    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
 }
-- (void)setCircleTranslateAnchor:(MGLCircleStyleLayerCircleTranslateAnchor)circleTranslateAnchor
+- (void)setCircleTranslateAnchor:(id <MGLStyleAttributeValue>)circleTranslateAnchor
 {
     // TODO: setterEnum
 }
-- (MGLCircleStyleLayerCircleTranslateAnchor)circleTranslateAnchor
+- (id <MGLStyleAttributeValue>)circleTranslateAnchor
 {
-    return MGLCircleStyleLayerCircleTranslateAnchorMap;
+    return [[MGLStyleAttribute alloc] init]; //return MGLCircleStyleLayerCircleTranslateAnchorMap;
 }
-- (void)setCirclePitchScale:(MGLCircleStyleLayerCirclePitchScale)circlePitchScale
+- (void)setCirclePitchScale:(id <MGLStyleAttributeValue>)circlePitchScale
 {
     // TODO: setterEnum
 }
-- (MGLCircleStyleLayerCirclePitchScale)circlePitchScale
+- (id <MGLStyleAttributeValue>)circlePitchScale
 {
-    return MGLCircleStyleLayerCirclePitchScaleMap;
+    return [[MGLStyleAttribute alloc] init]; //return MGLCircleStyleLayerCirclePitchScaleMap;
 }
 
 @end

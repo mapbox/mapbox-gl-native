@@ -445,8 +445,15 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 - (void)testRuntimeStyling
 {
     MGLFillStyleLayer *waterLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
-    waterLayer.fillColor = [UIColor redColor];
+    waterLayer.fillColor = [UIColor redColor].mgl_colorAttributeValue;
     
+    MGLFillStyleLayer *parkLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"park"];
+    parkLayer.fillColor = [UIColor greenColor].mgl_colorAttributeValue;
+    
+    MGLFillStyleLayer *buildingLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"building"];
+    buildingLayer.fillColor = [UIColor blackColor].mgl_colorAttributeValue;
+    
+    //[self.mapView.style sourceTest];
     [waterLayer updateStyleAndClasses];
 }
 

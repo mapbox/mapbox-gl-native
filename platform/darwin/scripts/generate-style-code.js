@@ -7,6 +7,8 @@ const spec = require('mapbox-gl-style-spec').latest;
 var prefix = 'MGL';
 var suffix = 'StyleLayer';
 
+var colorType = 'MGLStyleAttributeColor';
+
 global.camelize = function (str) {
     return str.replace(/(?:^|-)(.)/g, function (_, x) {
         return x.toUpperCase();
@@ -20,12 +22,19 @@ global.camelizeWithLeadingLowercase = function (str) {
 }
 
 global.isObject = function (property) {
+    return false;
     switch (property.type) {
         case 'string':
             return true;
         case 'color':
             return true;
         case 'array':
+            return true;
+        case 'number':
+            return true;
+        case 'boolean':
+            return true;
+        case 'enum':
             return true;
         default:
             return false;
@@ -33,19 +42,22 @@ global.isObject = function (property) {
 }
 
 global.propertyType = function (property, layerType = null) {
+    return `id <MGLStyleAttributeValue>`;
     switch (property.type) {
         case 'boolean':
-            return 'BOOL';
+            //return `id <MGLStyleAttributeValue>`;
+            return 'MGLNumberStyleAttributeValue';
         case 'number':
-            return 'CGFloat';
+            return 'MGLNumberStyleAttributeValue';
         case 'string':
-            return 'NSString';
+            return 'MGLStringStyleAttributeValue';
         case 'enum':
-            return `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`
+            //return `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`
+            return 'MGLNumberStyleAttributeValue';
         case 'color':
-            return `MGLColor`;
+            return `${colorType}`;
         case 'array':
-            return 'NSArray';
+            return `MGLNumberStyleAttributeValue`;
         default: throw new Error(`unknown type for ${property.name}`)
     }
 }
@@ -53,15 +65,16 @@ global.propertyType = function (property, layerType = null) {
 global.setterImplementation = function(property, layerType = null) {
     switch (property.type) {
         case 'boolean':
-            return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)});`;
+            return `// ${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)});`;
         case 'number':
-            return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)});`;
+            return `// ${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.number.floatValue);`;
         case 'string':
-            return `${layerType}Layer->set${camelize(property.name)}(std::string(${camelizeWithLeadingLowercase(property.name)}.UTF8String));`;
+            return `// ${layerType}Layer->set${camelize(property.name)}(std::string(${camelizeWithLeadingLowercase(property.name)}.string.UTF8String));`;
         case 'enum':
             return `// TODO: setterEnum`; 
         case 'color':
-            return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_color);`;
+            //fillLayer->setFillColor([MGLStyleAttribute colorPropertyValueWith:fillColor]);
+            return `${layerType}Layer->set${camelize(property.name)}([MGLStyleAttribute colorPropertyValueWith:${camelizeWithLeadingLowercase(property.name)}]);`;
         case 'array':
             return '// TODO: setterArray';
         default: throw new Error(`unknown type for ${property.name}`)
@@ -71,17 +84,17 @@ global.setterImplementation = function(property, layerType = null) {
 global.getterImplementation = function(property, layerType = null) {
     switch (property.type) {
         case 'boolean':
-            return `return ${layerType}Layer->get${camelize(property.name)}().asConstant();`;
+            return `return [[MGLStyleAttribute alloc] init]; //return ${layerType}Layer->get${camelize(property.name)}().asConstant();`;
         case 'number':
-            return `return ${layerType}Layer->get${camelize(property.name)}().asConstant();`;
+            return `return [[MGLStyleAttribute alloc] init]; //return ${layerType}Layer->get${camelize(property.name)}().asConstant();`;
         case 'string':
-            return `return @(std::string(${layerType}Layer->get${camelize(property.name)}().asConstant()).c_str());`
+            return `return [[MGLStyleAttribute alloc] init]; //return @(std::string(${layerType}Layer->get${camelize(property.name)}().asConstant()).c_str());`
         case 'enum':
-            return `return ${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}${camelize(property.values[0])};`
+            return `return [[MGLStyleAttribute alloc] init]; //return ${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}${camelize(property.values[0])};`
         case 'color':
-            return `return [MGLColor mbgl_color:${camelizeWithLeadingLowercase(layerType)}Layer->get${camelize(property.name)}().asConstant()];`;
+            return  `return [[MGLStyleAttribute alloc] init]; //return [MGLColor mbgl_color:${camelizeWithLeadingLowercase(layerType)}Layer->get${camelize(property.name)}().asConstant()];`;
         case 'array':
-            return 'return @[]; // TODO: getterArray';
+            return 'return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray';
         default:
          throw new Error(`unknown type for ${property.name}`)
     }
