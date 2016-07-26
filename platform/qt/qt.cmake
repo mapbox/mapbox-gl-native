@@ -12,8 +12,6 @@ option(WITH_QT_4        "Use Qt4 instead of Qt5"        OFF)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -D__QT__")
 set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -fvisibility=hidden -D__QT__")
 
-project(Qt4And5)
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -35,6 +33,10 @@ set(MBGL_QT_FILES
 
     # Misc
     PRIVATE platform/default/log_stderr.cpp
+
+    # Headless headless_view_cgl
+    PRIVATE platform/default/headless_display.cpp
+    PRIVATE platform/default/headless_view.cpp
 
     # Platform integration
     PRIVATE platform/qt/src/async_task.cpp
@@ -83,6 +85,7 @@ endif()
 if (BUILD_PLATFORM STREQUAL "macos")
     list(APPEND MBGL_QT_FILES
         PRIVATE platform/darwin/src/nsthread.mm
+        PRIVATE platform/darwin/src/headless_view_cgl.cpp
     )
     list(APPEND MBGL_QT_LIBRARIES
         PRIVATE "-framework Foundation"
@@ -91,8 +94,10 @@ if (BUILD_PLATFORM STREQUAL "macos")
 else()
     list(APPEND MBGL_QT_FILES
         PRIVATE platform/default/thread.cpp
+        PRIVATE platform/default/headless_view_glx.cpp
     )
     list(APPEND MBGL_QT_LIBRARIES
         PRIVATE -lGL
+        PRIVATE -lX11
     )
 endif()

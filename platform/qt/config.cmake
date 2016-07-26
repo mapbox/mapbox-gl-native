@@ -40,21 +40,14 @@ macro(mbgl_platform_core)
 endmacro()
 
 # TODO: Implement a Qt headless view, using offscreen
-# graphics system. Right now tests are Linux only.
+# graphics system.
 macro(mbgl_platform_test)
     target_sources(mbgl-test
-        PRIVATE platform/default/headless_display.cpp
-        PRIVATE platform/default/headless_view.cpp
-        PRIVATE platform/default/headless_view_glx.cpp
         PRIVATE test/src/main.cpp
     )
 
     set_source_files_properties(
         test/src/main.cpp
         PROPERTIES COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
-    )
-
-    target_link_libraries(mbgl-test
-        PRIVATE -lX11
     )
 endmacro()
