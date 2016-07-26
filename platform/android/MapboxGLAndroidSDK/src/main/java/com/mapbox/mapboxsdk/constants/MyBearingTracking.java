@@ -20,7 +20,7 @@ public class MyBearingTracking {
      * Indicates the parameter accepts one of the values from {@link MyBearingTracking}.
      */
     @IntDef({NONE, COMPASS, GPS, /**COMBINED**/})
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface Mode {
     }
 

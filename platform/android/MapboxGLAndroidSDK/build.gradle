@@ -18,7 +18,7 @@ repositories {
 }
 
 ext {
-    supportLibVersion = '23.4.0'
+    supportLibVersion = '23.+'
 }
 
 dependencies {
@@ -63,7 +63,9 @@ android {
         }
 
         release {
+            shrinkResources false
             jniDebuggable false
+            minifyEnabled false
             buildConfigField "String", "MAPBOX_EVENTS_USER_AGENT_BASE", new StringBuilder().append("\"").append("MapboxEventsAndroid/").append(project.VERSION_NAME).append("\"").toString()
             consumerProguardFiles 'proguard-rules.pro'
         }

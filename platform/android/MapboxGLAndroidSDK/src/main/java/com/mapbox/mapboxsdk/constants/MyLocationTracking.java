@@ -20,7 +20,7 @@ public class MyLocationTracking {
      * Indicates the parameter accepts one of the values from {@link MyLocationTracking}.
      */
     @IntDef({TRACKING_NONE, TRACKING_FOLLOW})
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface Mode {
     }
 

@@ -277,7 +277,7 @@ public class MapView extends FrameLayout {
         MyLocationViewSettings myLocationViewSettings = mMapboxMap.getMyLocationViewSettings();
         myLocationViewSettings.setForegroundDrawable(options.getMyLocationForegroundDrawable(), options.getMyLocationForegroundBearingDrawable());
         myLocationViewSettings.setForegroundTintColor(options.getMyLocationForegroundTintColor());
-        myLocationViewSettings.setBackgroundDrawable(options.getMyLocationBackgroundDrawable(), options.getMyLocationBackgroundPadding());
+        myLocationViewSettings.setBackgroundDrawable(options.getMyLocationBackgroundDrawable(), options.getMyLocationBackgroundBearingDrawable(), options.getMyLocationBackgroundPadding());
         myLocationViewSettings.setBackgroundTintColor(options.getMyLocationBackgroundTintColor());
         myLocationViewSettings.setAccuracyAlpha(options.getMyLocationAccuracyAlpha());
         myLocationViewSettings.setAccuracyTintColor(options.getMyLocationAccuracyTintColor());

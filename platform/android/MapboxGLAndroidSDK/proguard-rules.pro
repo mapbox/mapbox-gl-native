@@ -32,3 +32,19 @@
 
 # Gesture package
 -keep class almeros.android.multitouch.gesturedetectors.** { *; }
+-dontshrink
+
+# Keep - Library. Keep all public and protected classes, fields, and methods.
+-keep public class * {
+    public protected <fields>;
+    public protected <methods>;
+}
+-keep public interface * {
+    public protected <methods>;
+}
+
+-keepattributes *Annotation*
+-keepattributes InnerClasses
+
+-keep class com.mapzen.** { *; }
+-keep class com.squareup.** { *; }

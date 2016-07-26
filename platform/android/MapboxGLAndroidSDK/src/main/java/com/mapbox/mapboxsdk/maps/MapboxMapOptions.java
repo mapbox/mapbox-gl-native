@@ -67,6 +67,7 @@ public class MapboxMapOptions implements Parcelable {
     private Drawable myLocationForegroundDrawable;
     private Drawable myLocationForegroundBearingDrawable;
     private Drawable myLocationBackgroundDrawable;
+    private Drawable myLocationBackgroundBearingDrawable;
     private int myLocationForegroundTintColor;
     private int myLocationBackgroundTintColor;
     private int[] myLocationBackgroundPadding;
@@ -489,6 +490,21 @@ public class MapboxMapOptions implements Parcelable {
      * @param myLocationBackgroundDrawable the drawable to show as background
      * @return This
      */
+    public MapboxMapOptions myLocationBackgroundDrawable(Drawable myLocationBackgroundDrawable, Drawable myLocationBackgroundBearingDrawable) {
+        this.myLocationBackgroundDrawable = myLocationBackgroundDrawable;
+        this.myLocationBackgroundBearingDrawable = myLocationBackgroundBearingDrawable;
+        return this;
+    }
+
+    /**
+     * Set the background drawable of MyLocationView.
+     * <p>
+     * Padding can be added to provide an offset to the background.
+     * </p>
+     *
+     * @param myLocationBackgroundDrawable the drawable to show as background
+     * @return This
+     */
     public MapboxMapOptions myLocationBackgroundDrawable(Drawable myLocationBackgroundDrawable) {
         this.myLocationBackgroundDrawable = myLocationBackgroundDrawable;
         return this;
@@ -774,6 +790,15 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
+     * Get the current configured MyLocationView background bearing drawable.
+     *
+     * @return the drawable used as background when bearing is enabled
+     */
+    public Drawable getMyLocationBackgroundBearingDrawable() {
+        return myLocationBackgroundBearingDrawable;
+    }
+
+    /**
      * Get the current configured MyLocationView foreground tint color.
      *
      * @return the tint color
@@ -921,6 +946,8 @@ public class MapboxMapOptions implements Parcelable {
             return false;
         if (myLocationBackgroundDrawable != null ? !myLocationBackgroundDrawable.equals(options.myLocationBackgroundDrawable) : options.myLocationBackgroundDrawable != null)
             return false;
+        if (myLocationBackgroundBearingDrawable != null ? !myLocationBackgroundBearingDrawable.equals(options.myLocationBackgroundBearingDrawable) : options.myLocationBackgroundBearingDrawable != null)
+            return false;
         if (!Arrays.equals(myLocationBackgroundPadding, options.myLocationBackgroundPadding))
             return false;
         if (style != null ? !style.equals(options.style) : options.style != null) return false;
@@ -951,6 +978,7 @@ public class MapboxMapOptions implements Parcelable {
         result = 31 * result + (myLocationForegroundDrawable != null ? myLocationForegroundDrawable.hashCode() : 0);
         result = 31 * result + (myLocationForegroundBearingDrawable != null ? myLocationForegroundBearingDrawable.hashCode() : 0);
         result = 31 * result + (myLocationBackgroundDrawable != null ? myLocationBackgroundDrawable.hashCode() : 0);
+        result = 31 * result + (myLocationBackgroundBearingDrawable != null ? myLocationBackgroundBearingDrawable.hashCode() : 0);
         result = 31 * result + myLocationForegroundTintColor;
         result = 31 * result + myLocationBackgroundTintColor;
         result = 31 * result + Arrays.hashCode(myLocationBackgroundPadding);

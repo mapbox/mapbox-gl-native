@@ -76,12 +76,15 @@ public class MyLocationView extends View {
     private Drawable foregroundDrawable;
     private Drawable foregroundBearingDrawable;
     private Drawable backgroundDrawable;
+    private Drawable backgroundBearingDrawable;
 
     private int foregroundTintColor;
     private int backgroundTintColor;
 
-    private Rect foregroundBounds;
-    private Rect backgroundBounds;
+    private final Rect foregroundBounds = new Rect();
+    private final Rect foregroundBearingBounds = new Rect();
+    private final Rect backgroundBounds = new Rect();
+    private final Rect backgroundBearingBounds = new Rect();
 
     private int backgroundOffsetLeft;
     private int backgroundOffsetTop;
@@ -155,6 +158,12 @@ public class MyLocationView extends View {
             backgroundDrawable = defaultDrawable.getConstantState().newDrawable();
         }
 
+        if (backgroundBearingDrawable == null) {
+            // if the user didn't provide a background resource for bearing drawable we will use the bearingDrawable resource instead,
+            // we need to create a new drawable to handle tinting correctly
+            backgroundBearingDrawable = backgroundDrawable.getConstantState().newDrawable();
+        }
+
         if (defaultDrawable.getIntrinsicWidth() != bearingDrawable.getIntrinsicWidth() || defaultDrawable.getIntrinsicHeight() != bearingDrawable.getIntrinsicHeight()) {
             throw new RuntimeException("The dimensions from location and bearing drawables should be match");
         }
@@ -179,13 +188,16 @@ public class MyLocationView extends View {
         invalidate();
     }
 
-    public final void setShadowDrawable(Drawable drawable) {
-        setShadowDrawable(drawable, 0, 0, 0, 0);
+    public final void setShadowDrawable(Drawable defaultDrawable, Drawable bearingDrawable) {
+        setShadowDrawable(defaultDrawable, bearingDrawable, 0, 0, 0, 0);
     }
 
-    public final void setShadowDrawable(Drawable drawable, int left, int top, int right, int bottom) {
-        if (drawable != null) {
-            backgroundDrawable = drawable;
+    public final void setShadowDrawable(Drawable defaultDrawable, Drawable bearingDrawable, int left, int top, int right, int bottom) {
+        if (defaultDrawable != null) {
+            backgroundDrawable = defaultDrawable;
+        }
+        if (bearingDrawable != null) {
+            backgroundBearingDrawable = bearingDrawable;
         }
 
         backgroundOffsetLeft = left;
@@ -200,10 +212,12 @@ public class MyLocationView extends View {
     public final void setShadowDrawableTint(@ColorInt int color) {
         if (color != Color.TRANSPARENT) {
             backgroundTintColor = color;
-            if (backgroundDrawable == null) {
-                return;
+            if (backgroundDrawable != null) {
+                backgroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
             }
-            backgroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            if (backgroundBearingDrawable != null) {
+                backgroundBearingDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            }
         }
         invalidate();
     }
@@ -221,32 +235,37 @@ public class MyLocationView extends View {
     }
 
     private void invalidateBounds() {
-        if (backgroundDrawable == null || foregroundDrawable == null || foregroundBearingDrawable == null) {
+        if (backgroundDrawable == null || foregroundDrawable == null || foregroundBearingDrawable == null || backgroundBearingDrawable == null) {
             return;
         }
 
-        int backgroundWidth = backgroundDrawable.getIntrinsicWidth();
-        int backgroundHeight = backgroundDrawable.getIntrinsicHeight();
         int horizontalOffset = backgroundOffsetLeft - backgroundOffsetRight;
         int verticalOffset = backgroundOffsetTop - backgroundOffsetBottom;
-        backgroundBounds = new Rect(-backgroundWidth / 2 + horizontalOffset, -backgroundHeight / 2 + verticalOffset, backgroundWidth / 2 + horizontalOffset, backgroundHeight / 2 + verticalOffset);
-        backgroundDrawable.setBounds(backgroundBounds);
-
-        int foregroundWidth = foregroundDrawable.getIntrinsicWidth();
-        int foregroundHeight = foregroundDrawable.getIntrinsicHeight();
-        foregroundBounds = new Rect(-foregroundWidth / 2, -foregroundHeight / 2, foregroundWidth / 2, foregroundHeight / 2);
-        foregroundDrawable.setBounds(foregroundBounds);
-        foregroundBearingDrawable.setBounds(foregroundBounds);
+        computeBounds(backgroundDrawable, backgroundBounds, horizontalOffset, verticalOffset);
+        computeBounds(backgroundBearingDrawable, backgroundBearingBounds, horizontalOffset, verticalOffset);
+        computeBounds(foregroundDrawable, foregroundBounds);
+        computeBounds(foregroundBearingDrawable, foregroundBearingBounds);
 
         // invoke a new draw
         invalidate();
+    }
+
+    private void computeBounds(Drawable drawable, Rect bounds) {
+        computeBounds(drawable, bounds, 0, 0);
+    }
+
+    private void computeBounds(Drawable drawable, Rect bounds, int horizontalOffset, int verticalOffset) {
+        int halfWidth = drawable.getIntrinsicWidth() / 2;
+        int halfHeight = drawable.getIntrinsicHeight() / 2;
+        bounds.set(-halfWidth + horizontalOffset, -halfHeight + verticalOffset, halfWidth + horizontalOffset, halfHeight + verticalOffset);
+        drawable.setBounds(bounds);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (location == null || foregroundBounds == null || backgroundBounds == null || accuracyAnimator == null || screenLocation == null) {
+        if (location == null || foregroundBounds == null || foregroundBearingBounds == null || accuracyAnimator == null || screenLocation == null) {
             // Not ready yet
             return;
         }
@@ -285,18 +304,19 @@ public class MyLocationView extends View {
         // draw circle
         canvas.drawCircle(0, 0, accuracyPixels, accuracyPaint);
 
-        // draw shadow
-        if (backgroundDrawable != null) {
-            backgroundDrawable.draw(canvas);
-        }
-
-        // draw foreground
         if (myBearingTrackingMode == MyBearingTracking.NONE) {
-            if (foregroundDrawable != null) {
-                foregroundDrawable.draw(canvas);
-            }
-        } else if (foregroundBearingDrawable != null && foregroundBounds != null) {
-            foregroundBearingDrawable.draw(canvas);
+            draw(canvas, foregroundDrawable, backgroundDrawable);
+        } else {
+            draw(canvas, foregroundBearingDrawable, backgroundBearingDrawable);
+        }
+    }
+
+    private void draw(Canvas canvas, Drawable foreground, Drawable background) {
+        if (background != null) {
+            background.draw(canvas);
+        }
+        if (foreground != null) {
+            foreground.draw(canvas);
         }
     }
 
@@ -356,8 +376,8 @@ public class MyLocationView extends View {
     }
 
     @Override
-    public void onRestoreInstanceState(Parcelable state){
-        if (state instanceof Bundle){
+    public void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
             tilt = bundle.getFloat("tilt");
             state = bundle.getParcelable("superState");

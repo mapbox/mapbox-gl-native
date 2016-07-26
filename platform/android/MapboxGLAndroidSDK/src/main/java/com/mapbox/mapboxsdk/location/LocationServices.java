@@ -116,7 +116,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
 
 
     public void release() {
-        context = null;
+        com.mapzen.android.lost.api.LocationServices.FusedLocationApi.removeLocationUpdates(this);
     }
 
     /**

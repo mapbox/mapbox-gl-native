@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.maps.widgets;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
+import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 
@@ -35,6 +36,7 @@ public class MyLocationViewSettings {
     //
 
     private Drawable backgroundDrawable;
+    private Drawable backgroundBearingDrawable;
     private int[] backgroundOffset = new int[4];
 
     @ColorInt
@@ -147,16 +149,21 @@ public class MyLocationViewSettings {
      * Padding can be added to provide an offset to the background
      * </p>
      *
-     * @param backgroundDrawable the drawable to show as background
+     * @param backgroundDrawable the drawable to show as default background
      * @param padding            the padding added to the background
      */
-    public void setBackgroundDrawable(Drawable backgroundDrawable, int[] padding) {
-        this.backgroundDrawable = backgroundDrawable;
+    public void setBackgroundDrawable(@Nullable Drawable backgroundDrawable, @Nullable Drawable backgroundBearingDrawable, @Nullable int[] padding) {
+        if (backgroundDrawable != null) {
+            this.backgroundDrawable = backgroundDrawable;
+        }
+        if (backgroundBearingDrawable != null) {
+            this.backgroundBearingDrawable = backgroundBearingDrawable;
+        }
         this.backgroundOffset = padding;
         if (padding != null && padding.length == 4) {
-            myLocationView.setShadowDrawable(backgroundDrawable, padding[0], padding[1], padding[2], padding[3]);
+            myLocationView.setShadowDrawable(backgroundDrawable, backgroundBearingDrawable, padding[0], padding[1], padding[2], padding[3]);
         } else {
-            myLocationView.setShadowDrawable(backgroundDrawable);
+            myLocationView.setShadowDrawable(backgroundDrawable, backgroundBearingDrawable);
         }
     }
 
@@ -167,6 +174,15 @@ public class MyLocationViewSettings {
      */
     public Drawable getBackgroundDrawable() {
         return backgroundDrawable;
+    }
+
+    /**
+     * Get the bearing background drawable of MyLocationView.
+     *
+     * @return the drawable used as background when bearing mode enabled
+     */
+    public Drawable getBackgroundBearingDrawable() {
+        return backgroundBearingDrawable;
     }
 
     /**
