@@ -3,8 +3,15 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/range.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/variant.hpp>
+#include <mbgl/util/geometry.hpp>
+#include <mbgl/util/tile_cover.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/storage/response.hpp>
+
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 
 #include <string>
 #include <vector>
@@ -15,7 +22,7 @@ namespace mbgl {
 class TileID;
 
 /*
- * An offline region defined by a style URL, geographic bounding box, zoom range, and
+ * An offline region defined by a style URL, geometry, zoom range, and
  * device pixel ratio.
  *
  * Both minZoom and maxZoom must be ≥ 0, and maxZoom must be ≥ minZoom.
@@ -25,29 +32,118 @@ class TileID;
  *
  * pixelRatio must be ≥ 0 and should typically be 1.0 or 2.0.
  */
-class OfflineTilePyramidRegionDefinition {
+    
+template <typename TGeometry>
+struct OfflineFixedGeometryTraits { };
+    
+template <>
+struct OfflineFixedGeometryTraits<LatLngBounds> {
+    static const char typeName[];
+    constexpr static const size_t typeNameLength = sizeof("PYRAMID") - 1;
+    
+    void encode(rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator>& doc, LatLngBounds bounds);
+    LatLngBounds decode(const rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator>& doc);
+};
+    
+template <>
+struct OfflineFixedGeometryTraits<Polygon<double>> {
+    static const char typeName[];
+    constexpr static const size_t typeNameLength = sizeof("POLYGON") - 1;
+    
+    void encode(rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator>&, const Polygon<double>&);
+    Polygon<double> decode(const rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator>&);
+};
+    
+template <typename TGeometry>
+class OfflineFixedGeometryRegionDefinition {
 public:
-    OfflineTilePyramidRegionDefinition(std::string, LatLngBounds, double, double, float);
-
+    OfflineFixedGeometryRegionDefinition(std::string styleURL_, TGeometry geometry_, Range<double> zoomRange_, float pixelRatio_)
+    : styleURL(std::move(styleURL_)),
+    geometry(std::move(geometry_)),
+    minZoom(zoomRange_.min),
+    maxZoom(zoomRange_.max),
+    pixelRatio(pixelRatio_) { }
+    
     /* Private */
-    std::vector<CanonicalTileID> tileCover(SourceType, uint16_t tileSize, const Range<uint8_t>& zoomRange) const;
-
+    std::vector<CanonicalTileID> tileCover(SourceType type, uint16_t tileSize, Range<uint8_t> sourceZoomRange) const {
+        double minZ = std::max<double>(util::coveringZoomLevel(minZoom, type, tileSize), sourceZoomRange.min);
+        double maxZ = std::min<double>(util::coveringZoomLevel(maxZoom, type, tileSize), sourceZoomRange.max);
+        
+        assert(minZ >= 0);
+        assert(maxZ >= 0);
+        assert(minZ < std::numeric_limits<uint8_t>::max());
+        assert(maxZ < std::numeric_limits<uint8_t>::max());
+        
+        std::vector<CanonicalTileID> result;
+        for (uint8_t z = minZ; z <= maxZ; ++z) {
+            for (const auto& tile : util::tileCover(geometry, z)) {
+                result.emplace_back(tile.canonical);
+            }
+        }
+        
+        return result;
+    }
+    
+    std::string encode() const {
+        OfflineFixedGeometryTraits<TGeometry> geometryTraits;
+        
+        rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> doc;
+        doc.SetObject();
+        
+        doc.AddMember("type", rapidjson::StringRef(geometryTraits.typeName, geometryTraits.typeNameLength), doc.GetAllocator());
+        doc.AddMember("style_url", rapidjson::StringRef(styleURL.data(), styleURL.length()), doc.GetAllocator());
+        
+        geometryTraits.encode(doc, geometry);
+        
+        doc.AddMember("min_zoom", minZoom, doc.GetAllocator());
+        if (std::isfinite(maxZoom)) {
+            doc.AddMember("max_zoom", maxZoom, doc.GetAllocator());
+        }
+        
+        doc.AddMember("pixel_ratio", pixelRatio, doc.GetAllocator());
+        
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+        doc.Accept(writer);
+        
+        return buffer.GetString();
+    }
+    
+    static OfflineFixedGeometryRegionDefinition<TGeometry> decode(const rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator>& doc) {
+        OfflineFixedGeometryTraits<TGeometry> geometryTraits;
+        
+        if (doc.HasParseError() ||
+            !doc.HasMember("style_url") || !doc["style_url"].IsString() ||
+            !doc.HasMember("min_zoom") || !doc["min_zoom"].IsDouble() ||
+            (doc.HasMember("max_zoom") && !doc["max_zoom"].IsDouble()) ||
+            !doc.HasMember("pixel_ratio") || !doc["pixel_ratio"].IsDouble()) {
+            throw std::runtime_error("Malformed offline fixed geometry region definition");
+        }
+        
+        std::string styleURL { doc["style_url"].GetString(), doc["style_url"].GetStringLength() };
+        double minZoom = doc["min_zoom"].GetDouble();
+        double maxZoom = doc.HasMember("max_zoom") ? doc["max_zoom"].GetDouble() : INFINITY;
+        Range<double> zoomRange{ minZoom, maxZoom };
+        float pixelRatio = doc["pixel_ratio"].GetDouble();
+        
+        auto geometry = geometryTraits.decode(doc);
+        
+        return { styleURL, geometry, zoomRange, pixelRatio };
+    }
+    
     const std::string styleURL;
-    const LatLngBounds bounds;
+    const TGeometry geometry;
     const double minZoom;
     const double maxZoom;
     const float pixelRatio;
 };
-
-/*
- * For the present, a tile pyramid is the only type of offline region. In the future,
- * other definition types will be available and this will be a variant type.
- */
-using OfflineRegionDefinition = OfflineTilePyramidRegionDefinition;
-
-/*
- * The encoded format is private.
- */
+    
+using OfflineRegionDefinition = variant<OfflineFixedGeometryRegionDefinition<LatLngBounds>, OfflineFixedGeometryRegionDefinition<Polygon<double>>>;
+    
+float pixelRatio(const OfflineRegionDefinition&);
+const std::string& styleURL(const OfflineRegionDefinition&);
+std::vector<CanonicalTileID> tileCover(const OfflineRegionDefinition&, SourceType, uint16_t, Range<uint8_t>);
+    
 std::string encodeOfflineRegionDefinition(const OfflineRegionDefinition&);
 OfflineRegionDefinition decodeOfflineRegionDefinition(const std::string&);
 

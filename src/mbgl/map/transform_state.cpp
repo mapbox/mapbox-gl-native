@@ -207,6 +207,10 @@ Point<double> TransformState::project(const LatLng& ll) const {
         (util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + ll.latitude * M_PI / util::DEGREES_MAX)))
     ) * worldSize() / util::DEGREES_MAX;
 }
+    
+LatLng TransformState::unproject(const Point<double>& p, LatLng::WrapMode wrapMode) const {
+    return unproject(p, worldSize(), wrapMode);
+}
 
 LatLng TransformState::unproject(const Point<double>& p, double worldSize, LatLng::WrapMode wrapMode) const {
     Point<double> p2 = p * util::DEGREES_MAX / worldSize;
