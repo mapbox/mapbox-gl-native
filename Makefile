@@ -319,7 +319,8 @@ endif
 
 #### Qt targets #####################################################
 
-export QT_OUTPUT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)/$(BUILDTYPE)
+QT_ROOT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
+export QT_OUTPUT_PATH = $(QT_ROOT_PATH)/$(BUILDTYPE)
 QT_BUILD = $(QT_OUTPUT_PATH)/build.ninja
 
 $(QT_BUILD): $(BUILD_DEPS)
@@ -333,6 +334,33 @@ $(QT_BUILD): $(BUILD_DEPS)
 		-DWITH_QT_4=${WITH_QT_4} \
 		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
 		-DWITH_COVERAGE=${WITH_COVERAGE})
+
+ifeq ($(HOST_PLATFORM), macos)
+
+MACOS_QT_PROJ_PATH = $(QT_ROOT_PATH)/xcode/mbgl.xcodeproj
+$(MACOS_QT_PROJ_PATH): $(BUILD_DEPS)
+	mkdir -p $(QT_ROOT_PATH)/xcode
+	(cd $(QT_ROOT_PATH)/xcode && cmake -G Xcode ../../.. \
+		-DBUILD_PLATFORM=$(BUILD_PLATFORM) \
+		-DMBGL_PLATFORM=qt \
+		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
+		-DWITH_QT_4=${WITH_QT_4} \
+		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
+		-DWITH_COVERAGE=${WITH_COVERAGE})
+
+	@# Create Xcode schemes so that we can use xcodebuild from the command line. CMake doesn't
+	@# create these automatically.
+	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-qt SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-qt-qml SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-test SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-core SCHEME_TYPE=library BUILDABLE_NAME=libmbgl-core.a BLUEPRINT_NAME=mbgl-core platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=qmapboxgl SCHEME_TYPE=library BUILDABLE_NAME=libqmapboxgl.dylib BLUEPRINT_NAME=qmapboxgl platform/macos/scripts/create_scheme.sh
+
+.PHONY: qtproj
+qtproj: $(MACOS_QT_PROJ_PATH)
+	open $(MACOS_QT_PROJ_PATH)
+
+endif
 
 .PHONY: qt-app
 qt-app: $(QT_BUILD)
