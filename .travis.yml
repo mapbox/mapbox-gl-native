@@ -45,7 +45,7 @@ before_script:
   - cmake --version
 script:
   - make linux
-  - make test-linux
+  - make test
 after_script:
   - ccache --show-stats
   - ./platform/linux/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
@@ -151,7 +151,6 @@ cache:
   directories:
     - $HOME/.ccache
     - $HOME/.cache/pip
-    - .mason
     - node_modules
     - mason_packages/.binaries
 
