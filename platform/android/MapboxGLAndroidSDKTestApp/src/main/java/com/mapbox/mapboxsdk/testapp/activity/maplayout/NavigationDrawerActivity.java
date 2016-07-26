@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -29,6 +30,8 @@ import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.testapp.R;
 
 public class NavigationDrawerActivity extends AppCompatActivity {
+
+    private boolean firstStyle = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,35 +56,29 @@ public class NavigationDrawerActivity extends AppCompatActivity {
 
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
-        MapboxMapOptions options = new MapboxMapOptions();
         switch (position) {
             case 0:
-                options.styleUrl(Style.DARK);
+                MapboxMapOptions options = new MapboxMapOptions();
+                options.styleUrl(firstStyle ? Style.LIGHT : Style.SATELLITE);
                 options.camera(new CameraPosition.Builder()
                         .target(new LatLng(39.913271, 116.413891))
                         .zoom(12)
                         .build());
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, MapFragment.newInstance(options))
+                        .commit();
+
+                firstStyle = !firstStyle;
                 break;
             case 1:
-                options.styleUrl(Style.LIGHT);
-                options.camera(new CameraPosition.Builder()
-                        .target(new LatLng(31.227831, 121.449076))
-                        .zoom(6)
-                        .build());
-                break;
-            case 2:
-                options.styleUrl(Style.SATELLITE);
-                options.camera(new CameraPosition.Builder()
-                        .target(new LatLng(22.294297, 114.177891))
-                        .zoom(8)
-                        .build());
+                Snackbar.make(
+                        findViewById(android.R.id.content),
+                        "Hello from snackbar",
+                        Snackbar.LENGTH_LONG)
+                        .show();
                 break;
         }
-
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, MapFragment.newInstance(options))
-                .commit();
     }
 
     public static class NavigationDrawerFragment extends Fragment {
@@ -112,30 +109,6 @@ public class NavigationDrawerActivity extends AppCompatActivity {
                 mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
                 mFromSavedInstanceState = true;
             }
-
-            mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
-                @Override
-                public void onDrawerSlide(View drawerView, float slideOffset) {
-                    mDrawerLayout.bringChildToFront(drawerView);
-                    mDrawerLayout.requestLayout();
-                }
-
-                @Override
-                public void onDrawerOpened(View drawerView) {
-
-                }
-
-                @Override
-                public void onDrawerClosed(View drawerView) {
-
-                }
-
-                @Override
-                public void onDrawerStateChanged(int newState) {
-
-                }
-            });
-
             selectItem(mCurrentSelectedPosition);
         }
 
@@ -162,8 +135,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
                     android.R.id.text1,
                     new String[]{
                             getString(R.string.title_section1),
-                            getString(R.string.title_section2),
-                            getString(R.string.title_section3),
+                            getString(R.string.title_section2)
                     }));
             mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
             return mDrawerListView;
@@ -178,7 +150,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         public void setUp(Activity activity, int fragmentId, DrawerLayout drawerLayout, ActionBar actionBar) {
             mFragmentContainerView = activity.findViewById(fragmentId);
             mDrawerLayout = drawerLayout;
-            mDrawerLayout.setScrimColor(Color.TRANSPARENT);
+//            mDrawerLayout.setScrimColor(Color.TRANSPARENT);
 
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);

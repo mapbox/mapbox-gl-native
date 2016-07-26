@@ -53,9 +53,9 @@
     <string name="activity_offline">Offline Map</string>
     <string name="activity_minmax_zoom">Min/Max Zoom</string>
     <string name="activity_viewpager">ViewPager</string>
-    <string name="title_activity_navigation_drawer">Navigation Drawer</string>
     <string name="activity_runtime_style">Runtime Style</string>
     <string name="activity_print">Print a map</string>
+    <string name="title_activity_navigation_drawer">Android SDK View integration</string>
 
     <!-- Description -->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
@@ -93,9 +93,9 @@
     <string name="description_dynamic_info_window_adapter">Learn how to create a dynamic custom InfoWindow</string>
     <string name="description_location_picker">Use a fixed Marker to select your location</string>
     <string name="description_viewpager">Use SupportMapFragments in a ViewPager</string>
-    <string name="description_navigation_drawer">Test for Navigation Drawer support</string>
     <string name="description_runtime_style">Adopt the map style on the fly</string>
     <string name="description_print">Shows how to print a map</string>
+    <string name="description_navigation_drawer">Test animation of Android SDK View components</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
     <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>
@@ -186,9 +186,8 @@
 
     <string name="navigation_select_location_button_text">Select Location!</string>
 
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="title_section1">Different style</string>
+    <string name="title_section2">Show Snackbar</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
