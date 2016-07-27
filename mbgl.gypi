@@ -196,6 +196,8 @@
           '<@(geometry_cflags)',
           '<@(geojson_cflags)',
           '<@(geojsonvt_cflags)',
+          '<@(supercluster_cflags)',
+          '<@(kdbush_cflags)',
           '<@(rapidjson_cflags)',
           '<@(variant_cflags)',
           '<@(earcut_cflags)',
@@ -313,12 +315,14 @@
         'cflags_cc': [
           '<@(variant_cflags)',
           '<@(geometry_cflags)',
+          '<@(geojson_cflags)',
           '<@(unique_resource_cflags)',
         ],
         'xcode_settings': {
           'OTHER_CPLUSPLUSFLAGS': [
             '<@(variant_cflags)',
             '<@(geometry_cflags)',
+            '<@(geojson_cflags)',
             '<@(unique_resource_cflags)',
           ],
         },

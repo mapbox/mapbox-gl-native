@@ -3,6 +3,7 @@
 #include <mbgl/style/update_parameters.hpp>
 
 #include <mapbox/geojsonvt.hpp>
+#include <supercluster.hpp>
 
 namespace mbgl {
 
@@ -46,17 +47,16 @@ private:
 };
 
 // Converts the geojsonvt::Tile to a a GeoJSONTile. They have a differing internal structure.
-std::unique_ptr<GeoJSONTileData> convertTile(const mapbox::geojsonvt::Tile& tile) {
+std::unique_ptr<GeoJSONTileData> convertTile(const mapbox::geometry::feature_collection<int16_t>& features) {
     std::shared_ptr<GeoJSONTileLayer> layer;
 
-    if (!tile.features.empty()) {
-        std::vector<std::shared_ptr<const GeoJSONTileFeature>> features;
-        GeometryCoordinates line;
+    if (!features.empty()) {
+        std::vector<std::shared_ptr<const GeoJSONTileFeature>> convertedFeatures;
 
         ToFeatureType toFeatureType;
         ToGeometryCollection toGeometryCollection;
 
-        for (auto& feature : tile.features) {
+        for (auto& feature : features) {
             const FeatureType featureType = apply_visitor(toFeatureType, feature.geometry);
 
             if (featureType == FeatureType::Unknown) {
@@ -72,11 +72,11 @@ std::unique_ptr<GeoJSONTileData> convertTile(const mapbox::geojsonvt::Tile& tile
 
             PropertyMap properties = feature.properties;
 
-            features.emplace_back(std::make_shared<GeoJSONTileFeature>(
+            convertedFeatures.emplace_back(std::make_shared<GeoJSONTileFeature>(
                 featureType, std::move(geometry), std::move(properties)));
         }
 
-        layer = std::make_unique<GeoJSONTileLayer>(std::move(features));
+        layer = std::make_unique<GeoJSONTileLayer>(std::move(convertedFeatures));
     }
 
     return std::make_unique<GeoJSONTileData>(layer);
@@ -87,7 +87,15 @@ GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
                          const style::UpdateParameters& parameters,
                          mapbox::geojsonvt::GeoJSONVT& geojsonvt)
     : GeometryTile(overscaledTileID, sourceID_, parameters.style, parameters.mode) {
-    setData(convertTile(geojsonvt.getTile(id.canonical.z, id.canonical.x, id.canonical.y)));
+    setData(convertTile(geojsonvt.getTile(id.canonical.z, id.canonical.x, id.canonical.y).features));
+}
+
+GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
+                         std::string sourceID_,
+                         const style::UpdateParameters& parameters,
+                         mapbox::supercluster::Supercluster& supercluster)
+    : GeometryTile(overscaledTileID, sourceID_, parameters.style, parameters.mode) {
+    setData(convertTile(supercluster.getTile(id.canonical.z, id.canonical.x, id.canonical.y)));
 }
 
 void GeoJSONTile::setNecessity(Necessity) {}

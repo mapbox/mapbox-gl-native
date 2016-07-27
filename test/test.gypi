@@ -103,6 +103,8 @@
           '<@(boost_cflags)',
           '<@(sqlite_cflags)',
           '<@(geojsonvt_cflags)',
+          '<@(supercluster_cflags)',
+          '<@(kdbush_cflags)',
           '<@(rapidjson_cflags)',
           '<@(pixelmatch_cflags)',
           '<@(earcut_cflags)',
@@ -113,8 +115,7 @@
         ],
         'libraries': [
           '<@(gtest_static_libs)',
-          '<@(sqlite_static_libs)',
-          '<@(geojsonvt_static_libs)',
+          '<@(sqlite_static_libs)'
         ],
       },
 
