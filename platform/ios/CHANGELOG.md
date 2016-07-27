@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone.  Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## 3.3.2
+
+* Fixed a crash that occurred when initializing an MGLMapView on iOS 8.1 or below. ([#5791](https://github.com/mapbox/mapbox-gl-native/pull/5791))
+
 ## 3.3.1
 
 * Fixed a crash that occurred when a sprite URL lacks a file extension. See [this comment](https://github.com/mapbox/mapbox-gl-native/issues/5722#issuecomment-233701251) to determine who may be affected by this bug. ([#5723](https://github.com/mapbox/mapbox-gl-native/pull/5723))
