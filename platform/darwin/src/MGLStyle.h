@@ -167,6 +167,8 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 - (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier;
 
+- (void)removeLayer:(MGLStyleLayer *)styleLayer;
+
 - (void)sourceTest;
 
 @end

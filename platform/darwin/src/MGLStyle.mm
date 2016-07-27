@@ -80,7 +80,8 @@ static NSURL *MGLStyleURL_emerald;
 - (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier
 {
     auto *layer = self.mapView.mbglMap->getLayer(identifier.UTF8String);
-    auto *fillLayer = reinterpret_cast<mbgl::style::FillLayer *>(layer);
+    const std::string layerID = layer->getID();
+    auto fillLayer = reinterpret_cast<mbgl::style::FillLayer *>(layer);
     
     MGLFillStyleLayer *fillStyleLayer = [[MGLFillStyleLayer alloc] init];
     fillStyleLayer.layer = fillLayer;
@@ -89,16 +90,9 @@ static NSURL *MGLStyleURL_emerald;
     return fillStyleLayer;
 }
 
-- (void)sourceTest
+- (void)removeLayer:(MGLStyleLayer *)styleLayer
 {
-    //mbgl::style::Source *source = self.mapView.mbglMap->getSource("composite"); //com.mapbox.annotations
-    //mbgl::style::Source<mbgl::style::VectorSource> *vectorSource = reinterpret_cast<mbgl::style::Source<VectorSource>>(source);
+    self.mapView.mbglMap->removeLayer(styleLayer.layer->getID());
 }
-
-/*
-- (MGLSource *)sourceWithIdentifier:(NSString *)identifier
-{
-    
-}*/
 
 @end

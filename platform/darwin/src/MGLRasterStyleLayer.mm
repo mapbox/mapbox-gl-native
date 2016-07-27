@@ -6,75 +6,69 @@
 #import "MGLRasterStyleLayer.h"
 #import <mbgl/style/layers/raster_layer.hpp>
 
-@interface MGLRasterStyleLayer() {
-    mbgl::style::RasterLayer *rasterLayer;
-}
+@interface MGLRasterStyleLayer()
+@property (nonatomic) mbgl::style::RasterLayer *layer;
 @end
 
 @implementation MGLRasterStyleLayer
-
-- (void)setLayer:(mbgl::style::Layer *)layer
-{
-    rasterLayer = reinterpret_cast<mbgl::style::RasterLayer *>(layer);
-}
 
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setRasterOpacity:(id <MGLStyleAttributeValue>)rasterOpacity
 {
-    rasterLayer->setRasterOpacity(rasterOpacity.numberValue.mbgl_numberPropertyValue);
+    self.layer->setRasterOpacity(rasterOpacity.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterOpacity
 {
-    return [NSNumber mbgl_numberWithPropertyValue:rasterLayer->getRasterOpacity()];
+    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterOpacity()];
 }
 - (void)setRasterHueRotate:(id <MGLStyleAttributeValue>)rasterHueRotate
 {
-    rasterLayer->setRasterHueRotate(rasterHueRotate.numberValue.mbgl_numberPropertyValue);
+    self.layer->setRasterHueRotate(rasterHueRotate.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterHueRotate
 {
-    return [NSNumber mbgl_numberWithPropertyValue:rasterLayer->getRasterHueRotate()];
+    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterHueRotate()];
 }
 - (void)setRasterBrightnessMin:(id <MGLStyleAttributeValue>)rasterBrightnessMin
 {
-    rasterLayer->setRasterBrightnessMin(rasterBrightnessMin.numberValue.mbgl_numberPropertyValue);
+    self.layer->setRasterBrightnessMin(rasterBrightnessMin.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterBrightnessMin
 {
-    return [NSNumber mbgl_numberWithPropertyValue:rasterLayer->getRasterBrightnessMin()];
+    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterBrightnessMin()];
 }
 - (void)setRasterBrightnessMax:(id <MGLStyleAttributeValue>)rasterBrightnessMax
 {
-    rasterLayer->setRasterBrightnessMax(rasterBrightnessMax.numberValue.mbgl_numberPropertyValue);
+    self.layer->setRasterBrightnessMax(rasterBrightnessMax.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterBrightnessMax
 {
-    return [NSNumber mbgl_numberWithPropertyValue:rasterLayer->getRasterBrightnessMax()];
+    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterBrightnessMax()];
 }
 - (void)setRasterSaturation:(id <MGLStyleAttributeValue>)rasterSaturation
 {
-    rasterLayer->setRasterSaturation(rasterSaturation.numberValue.mbgl_numberPropertyValue);
+    self.layer->setRasterSaturation(rasterSaturation.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterSaturation
 {
-    return [NSNumber mbgl_numberWithPropertyValue:rasterLayer->getRasterSaturation()];
+    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterSaturation()];
 }
 - (void)setRasterContrast:(id <MGLStyleAttributeValue>)rasterContrast
 {
-    rasterLayer->setRasterContrast(rasterContrast.numberValue.mbgl_numberPropertyValue);
+    self.layer->setRasterContrast(rasterContrast.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterContrast
 {
-    return [NSNumber mbgl_numberWithPropertyValue:rasterLayer->getRasterContrast()];
+    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterContrast()];
 }
 - (void)setRasterFadeDuration:(id <MGLStyleAttributeValue>)rasterFadeDuration
 {
-    rasterLayer->setRasterFadeDuration(rasterFadeDuration.numberValue.mbgl_numberPropertyValue);
+    self.layer->setRasterFadeDuration(rasterFadeDuration.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterFadeDuration
 {
-    return [NSNumber mbgl_numberWithPropertyValue:rasterLayer->getRasterFadeDuration()];
+    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterFadeDuration()];
 }
 
 @end

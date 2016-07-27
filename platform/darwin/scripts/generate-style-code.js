@@ -65,15 +65,15 @@ global.propertyType = function (property, layerType = null) {
 global.setterImplementation = function(property, layerType = null) {
     switch (property.type) {
         case 'boolean':
-            return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.numberValue.mbgl_booleanPropertyValue);`;
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.numberValue.mbgl_booleanPropertyValue);`;
         case 'number':
-            return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.numberValue.mbgl_numberPropertyValue);`;
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.numberValue.mbgl_numberPropertyValue);`;
         case 'string':
-            return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.stringValue.mbgl_stringPropertyValue);`;
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.stringValue.mbgl_stringPropertyValue);`;
         case 'enum':
             return `// TODO: setterEnum`; 
         case 'color':
-            return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.colorValue.mbgl_propertyValue);`;
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.colorValue.mbgl_propertyValue);`;
         case 'array':
             return '// TODO: setterArray';
         default: throw new Error(`unknown type for ${property.name}`)
@@ -83,17 +83,17 @@ global.setterImplementation = function(property, layerType = null) {
 global.getterImplementation = function(property, layerType = null) {
     switch (property.type) {
         case 'boolean':
-            return `return [NSNumber mbgl_booleanWithPropertyValue:${layerType}Layer->get${camelize(property.name)}()];`;
+            return `return [NSNumber mbgl_booleanWithPropertyValue:self.layer->get${camelize(property.name)}()];`;
         case 'number':
-            return `return [NSNumber mbgl_numberWithPropertyValue:${layerType}Layer->get${camelize(property.name)}()];`;
+            return `return [NSNumber mbgl_numberWithPropertyValue:self.layer->get${camelize(property.name)}()];`;
         case 'string':
-            return `return [NSString mbgl_stringWithPropertyValue:${layerType}Layer->get${camelize(property.name)}()];`;
+            return `return [NSString mbgl_stringWithPropertyValue:self.layer->get${camelize(property.name)}()];`;
         case 'enum':
-            return `auto rawValue = ${layerType}Layer->get${camelize(property.name)}();
+            return `auto rawValue = self.layer->get${camelize(property.name)}();
     const char *type = @encode(${prefix}${camelize(layerType)}${suffix}${camelize(property.name)});
     return [NSValue value:&rawValue withObjCType:type];`
         case 'color':
-            return `return [MGLColor mbgl_propertyValue:${camelizeWithLeadingLowercase(layerType)}Layer->get${camelize(property.name)}()];`
+            return `return [MGLColor mbgl_propertyValue:self.layer->get${camelize(property.name)}()];`
         case 'array':
             //return `return [NSArray mbgl_arrayWithPropertyValue:${layerType}Layer->get${camelize(property.name)}()];`;
             return `return @[];`;

@@ -6,51 +6,45 @@
 #import "MGLCircleStyleLayer.h"
 #import <mbgl/style/layers/circle_layer.hpp>
 
-@interface MGLCircleStyleLayer() {
-    mbgl::style::CircleLayer *circleLayer;
-}
+@interface MGLCircleStyleLayer()
+@property (nonatomic) mbgl::style::CircleLayer *layer;
 @end
 
 @implementation MGLCircleStyleLayer
-
-- (void)setLayer:(mbgl::style::Layer *)layer
-{
-    circleLayer = reinterpret_cast<mbgl::style::CircleLayer *>(layer);
-}
 
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setCircleRadius:(id <MGLStyleAttributeValue>)circleRadius
 {
-    circleLayer->setCircleRadius(circleRadius.numberValue.mbgl_numberPropertyValue);
+    self.layer->setCircleRadius(circleRadius.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)circleRadius
 {
-    return [NSNumber mbgl_numberWithPropertyValue:circleLayer->getCircleRadius()];
+    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getCircleRadius()];
 }
 - (void)setCircleColor:(id <MGLStyleAttributeValue>)circleColor
 {
-    circleLayer->setCircleColor(circleColor.colorValue.mbgl_propertyValue);
+    self.layer->setCircleColor(circleColor.colorValue.mbgl_propertyValue);
 }
 - (id <MGLStyleAttributeValue>)circleColor
 {
-    return [MGLColor mbgl_propertyValue:circleLayer->getCircleColor()];
+    return [MGLColor mbgl_propertyValue:self.layer->getCircleColor()];
 }
 - (void)setCircleBlur:(id <MGLStyleAttributeValue>)circleBlur
 {
-    circleLayer->setCircleBlur(circleBlur.numberValue.mbgl_numberPropertyValue);
+    self.layer->setCircleBlur(circleBlur.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)circleBlur
 {
-    return [NSNumber mbgl_numberWithPropertyValue:circleLayer->getCircleBlur()];
+    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getCircleBlur()];
 }
 - (void)setCircleOpacity:(id <MGLStyleAttributeValue>)circleOpacity
 {
-    circleLayer->setCircleOpacity(circleOpacity.numberValue.mbgl_numberPropertyValue);
+    self.layer->setCircleOpacity(circleOpacity.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)circleOpacity
 {
-    return [NSNumber mbgl_numberWithPropertyValue:circleLayer->getCircleOpacity()];
+    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getCircleOpacity()];
 }
 - (void)setCircleTranslate:(id <MGLStyleAttributeValue>)circleTranslate
 {
@@ -66,7 +60,7 @@
 }
 - (id <MGLStyleAttributeValue>)circleTranslateAnchor
 {
-    auto rawValue = circleLayer->getCircleTranslateAnchor();
+    auto rawValue = self.layer->getCircleTranslateAnchor();
     const char *type = @encode(MGLCircleStyleLayerCircleTranslateAnchor);
     return [NSValue value:&rawValue withObjCType:type];
 }
@@ -76,7 +70,7 @@
 }
 - (id <MGLStyleAttributeValue>)circlePitchScale
 {
-    auto rawValue = circleLayer->getCirclePitchScale();
+    auto rawValue = self.layer->getCirclePitchScale();
     const char *type = @encode(MGLCircleStyleLayerCirclePitchScale);
     return [NSValue value:&rawValue withObjCType:type];
 }

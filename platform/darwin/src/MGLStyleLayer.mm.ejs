@@ -11,17 +11,11 @@
 #import "MGL<%- camelize(type) %>StyleLayer.h"
 #import <mbgl/style/layers/<%- type %>_layer.hpp>
 
-@interface MGL<%- camelize(type) %>StyleLayer() {
-    mbgl::style::<%- camelize(type) %>Layer *<%- type %>Layer;
-}
+@interface MGL<%- camelize(type) %>StyleLayer()
+@property (nonatomic) mbgl::style::<%- camelize(type) %>Layer *layer;
 @end
 
 @implementation MGL<%- camelize(type) %>StyleLayer
-
-- (void)setLayer:(mbgl::style::Layer *)layer
-{
-    <%- camelizeWithLeadingLowercase(type) %>Layer = reinterpret_cast<mbgl::style::<%- camelize(type) %>Layer *>(layer);
-}
 
 <% if (layoutProperties.length) { -%>
 #pragma mark - Accessing the Layout Attributes

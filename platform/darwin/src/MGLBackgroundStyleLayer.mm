@@ -6,43 +6,37 @@
 #import "MGLBackgroundStyleLayer.h"
 #import <mbgl/style/layers/background_layer.hpp>
 
-@interface MGLBackgroundStyleLayer() {
-    mbgl::style::BackgroundLayer *backgroundLayer;
-}
+@interface MGLBackgroundStyleLayer()
+@property (nonatomic) mbgl::style::BackgroundLayer *layer;
 @end
 
 @implementation MGLBackgroundStyleLayer
-
-- (void)setLayer:(mbgl::style::Layer *)layer
-{
-    backgroundLayer = reinterpret_cast<mbgl::style::BackgroundLayer *>(layer);
-}
 
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setBackgroundColor:(id <MGLStyleAttributeValue>)backgroundColor
 {
-    backgroundLayer->setBackgroundColor(backgroundColor.colorValue.mbgl_propertyValue);
+    self.layer->setBackgroundColor(backgroundColor.colorValue.mbgl_propertyValue);
 }
 - (id <MGLStyleAttributeValue>)backgroundColor
 {
-    return [MGLColor mbgl_propertyValue:backgroundLayer->getBackgroundColor()];
+    return [MGLColor mbgl_propertyValue:self.layer->getBackgroundColor()];
 }
 - (void)setBackgroundPattern:(id <MGLStyleAttributeValue>)backgroundPattern
 {
-    backgroundLayer->setBackgroundPattern(backgroundPattern.stringValue.mbgl_stringPropertyValue);
+    self.layer->setBackgroundPattern(backgroundPattern.stringValue.mbgl_stringPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)backgroundPattern
 {
-    return [NSString mbgl_stringWithPropertyValue:backgroundLayer->getBackgroundPattern()];
+    return [NSString mbgl_stringWithPropertyValue:self.layer->getBackgroundPattern()];
 }
 - (void)setBackgroundOpacity:(id <MGLStyleAttributeValue>)backgroundOpacity
 {
-    backgroundLayer->setBackgroundOpacity(backgroundOpacity.numberValue.mbgl_numberPropertyValue);
+    self.layer->setBackgroundOpacity(backgroundOpacity.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)backgroundOpacity
 {
-    return [NSNumber mbgl_numberWithPropertyValue:backgroundLayer->getBackgroundOpacity()];
+    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getBackgroundOpacity()];
 }
 
 @end
