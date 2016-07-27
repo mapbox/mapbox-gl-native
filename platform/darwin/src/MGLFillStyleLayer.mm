@@ -3,7 +3,9 @@
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
-#import "MGLStyleAttribute.hpp"
+#import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSString+MGLStyleAttributeAdditions_Private.hpp"
 #import "MGLFillStyleLayer.h"
 #import <mbgl/style/layers/fill_layer.hpp>
 
@@ -23,11 +25,11 @@
 
 - (void)setFillAntialias:(id <MGLStyleAttributeValue>)fillAntialias
 {
-    // fillLayer->setFillAntialias(fillAntialias);
+    fillLayer->setFillAntialias(fillAntialias.numberValue.mbgl_booleanPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)fillAntialias
 {
-    return [[MGLStyleAttribute alloc] init]; //return fillLayer->getFillAntialias().asConstant();
+    return [NSNumber mbgl_booleanWithPropertyValue:fillLayer->getFillAntialias()];
 }
 - (void)setFillOpacity:(id <MGLStyleAttributeValue>)fillOpacity
 {
@@ -35,7 +37,7 @@
 }
 - (id <MGLStyleAttributeValue>)fillOpacity
 {
-    return [[MGLStyleAttribute alloc] init]; //return fillLayer->getFillOpacity().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:fillLayer->getFillOpacity()];
 }
 - (void)setFillColor:(id <MGLStyleAttributeValue>)fillColor
 {
@@ -59,7 +61,7 @@
 }
 - (id <MGLStyleAttributeValue>)fillTranslate
 {
-    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
+    return @[];
 }
 - (void)setFillTranslateAnchor:(id <MGLStyleAttributeValue>)fillTranslateAnchor
 {
@@ -67,7 +69,7 @@
 }
 - (id <MGLStyleAttributeValue>)fillTranslateAnchor
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLFillStyleLayerFillTranslateAnchorMap;
+    return @0;
 }
 - (void)setFillPattern:(id <MGLStyleAttributeValue>)fillPattern
 {
@@ -75,7 +77,7 @@
 }
 - (id <MGLStyleAttributeValue>)fillPattern
 {
-    return [[MGLStyleAttribute alloc] init]; //return @(std::string(fillLayer->getFillPattern().asConstant()).c_str());
+    return @"";
 }
 
 @end

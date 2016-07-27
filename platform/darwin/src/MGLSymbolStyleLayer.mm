@@ -3,7 +3,9 @@
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
-#import "MGLStyleAttribute.hpp"
+#import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSString+MGLStyleAttributeAdditions_Private.hpp"
 #import "MGLSymbolStyleLayer.h"
 #import <mbgl/style/layers/symbol_layer.hpp>
 
@@ -29,7 +31,7 @@
 
 - (id <MGLStyleAttributeValue>)symbolPlacement
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerSymbolPlacementPoint;
+    return @0;
 }
 
 - (void)setSymbolSpacing:(id <MGLStyleAttributeValue>)symbolSpacing
@@ -39,47 +41,47 @@
 
 - (id <MGLStyleAttributeValue>)symbolSpacing
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getSymbolSpacing().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getSymbolSpacing()];
 }
 
 - (void)setSymbolAvoidEdges:(id <MGLStyleAttributeValue>)symbolAvoidEdges
 {
-    // symbolLayer->setSymbolAvoidEdges(symbolAvoidEdges);
+    symbolLayer->setSymbolAvoidEdges(symbolAvoidEdges.numberValue.mbgl_booleanPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)symbolAvoidEdges
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getSymbolAvoidEdges().asConstant();
+    return [NSNumber mbgl_booleanWithPropertyValue:symbolLayer->getSymbolAvoidEdges()];
 }
 
 - (void)setIconAllowOverlap:(id <MGLStyleAttributeValue>)iconAllowOverlap
 {
-    // symbolLayer->setIconAllowOverlap(iconAllowOverlap);
+    symbolLayer->setIconAllowOverlap(iconAllowOverlap.numberValue.mbgl_booleanPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)iconAllowOverlap
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconAllowOverlap().asConstant();
+    return [NSNumber mbgl_booleanWithPropertyValue:symbolLayer->getIconAllowOverlap()];
 }
 
 - (void)setIconIgnorePlacement:(id <MGLStyleAttributeValue>)iconIgnorePlacement
 {
-    // symbolLayer->setIconIgnorePlacement(iconIgnorePlacement);
+    symbolLayer->setIconIgnorePlacement(iconIgnorePlacement.numberValue.mbgl_booleanPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)iconIgnorePlacement
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconIgnorePlacement().asConstant();
+    return [NSNumber mbgl_booleanWithPropertyValue:symbolLayer->getIconIgnorePlacement()];
 }
 
 - (void)setIconOptional:(id <MGLStyleAttributeValue>)iconOptional
 {
-    // symbolLayer->setIconOptional(iconOptional);
+    symbolLayer->setIconOptional(iconOptional.numberValue.mbgl_booleanPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)iconOptional
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconOptional().asConstant();
+    return [NSNumber mbgl_booleanWithPropertyValue:symbolLayer->getIconOptional()];
 }
 
 - (void)setIconRotationAlignment:(id <MGLStyleAttributeValue>)iconRotationAlignment
@@ -89,7 +91,7 @@
 
 - (id <MGLStyleAttributeValue>)iconRotationAlignment
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerIconRotationAlignmentMap;
+    return @0;
 }
 
 - (void)setIconSize:(id <MGLStyleAttributeValue>)iconSize
@@ -99,7 +101,7 @@
 
 - (id <MGLStyleAttributeValue>)iconSize
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconSize().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getIconSize()];
 }
 
 - (void)setIconTextFit:(id <MGLStyleAttributeValue>)iconTextFit
@@ -109,7 +111,7 @@
 
 - (id <MGLStyleAttributeValue>)iconTextFit
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerIconTextFitNone;
+    return @0;
 }
 
 - (void)setIconTextFitPadding:(id <MGLStyleAttributeValue>)iconTextFitPadding
@@ -119,7 +121,7 @@
 
 - (id <MGLStyleAttributeValue>)iconTextFitPadding
 {
-    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
+    return @[];
 }
 
 - (void)setIconImage:(id <MGLStyleAttributeValue>)iconImage
@@ -129,7 +131,7 @@
 
 - (id <MGLStyleAttributeValue>)iconImage
 {
-    return [[MGLStyleAttribute alloc] init]; //return @(std::string(symbolLayer->getIconImage().asConstant()).c_str());
+    return @"";
 }
 
 - (void)setIconRotate:(id <MGLStyleAttributeValue>)iconRotate
@@ -139,7 +141,7 @@
 
 - (id <MGLStyleAttributeValue>)iconRotate
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconRotate().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getIconRotate()];
 }
 
 - (void)setIconPadding:(id <MGLStyleAttributeValue>)iconPadding
@@ -149,17 +151,17 @@
 
 - (id <MGLStyleAttributeValue>)iconPadding
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconPadding().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getIconPadding()];
 }
 
 - (void)setIconKeepUpright:(id <MGLStyleAttributeValue>)iconKeepUpright
 {
-    // symbolLayer->setIconKeepUpright(iconKeepUpright);
+    symbolLayer->setIconKeepUpright(iconKeepUpright.numberValue.mbgl_booleanPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)iconKeepUpright
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconKeepUpright().asConstant();
+    return [NSNumber mbgl_booleanWithPropertyValue:symbolLayer->getIconKeepUpright()];
 }
 
 - (void)setIconOffset:(id <MGLStyleAttributeValue>)iconOffset
@@ -169,7 +171,7 @@
 
 - (id <MGLStyleAttributeValue>)iconOffset
 {
-    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
+    return @[];
 }
 
 - (void)setTextPitchAlignment:(id <MGLStyleAttributeValue>)textPitchAlignment
@@ -179,7 +181,7 @@
 
 - (id <MGLStyleAttributeValue>)textPitchAlignment
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerTextPitchAlignmentMap;
+    return @0;
 }
 
 - (void)setTextRotationAlignment:(id <MGLStyleAttributeValue>)textRotationAlignment
@@ -189,7 +191,7 @@
 
 - (id <MGLStyleAttributeValue>)textRotationAlignment
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerTextRotationAlignmentMap;
+    return @0;
 }
 
 - (void)setTextField:(id <MGLStyleAttributeValue>)textField
@@ -199,7 +201,7 @@
 
 - (id <MGLStyleAttributeValue>)textField
 {
-    return [[MGLStyleAttribute alloc] init]; //return @(std::string(symbolLayer->getTextField().asConstant()).c_str());
+    return @"";
 }
 
 - (void)setTextFont:(id <MGLStyleAttributeValue>)textFont
@@ -209,7 +211,7 @@
 
 - (id <MGLStyleAttributeValue>)textFont
 {
-    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
+    return @[];
 }
 
 - (void)setTextSize:(id <MGLStyleAttributeValue>)textSize
@@ -219,7 +221,7 @@
 
 - (id <MGLStyleAttributeValue>)textSize
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextSize().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getTextSize()];
 }
 
 - (void)setTextMaxWidth:(id <MGLStyleAttributeValue>)textMaxWidth
@@ -229,7 +231,7 @@
 
 - (id <MGLStyleAttributeValue>)textMaxWidth
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextMaxWidth().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getTextMaxWidth()];
 }
 
 - (void)setTextLineHeight:(id <MGLStyleAttributeValue>)textLineHeight
@@ -239,7 +241,7 @@
 
 - (id <MGLStyleAttributeValue>)textLineHeight
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextLineHeight().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getTextLineHeight()];
 }
 
 - (void)setTextLetterSpacing:(id <MGLStyleAttributeValue>)textLetterSpacing
@@ -249,7 +251,7 @@
 
 - (id <MGLStyleAttributeValue>)textLetterSpacing
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextLetterSpacing().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getTextLetterSpacing()];
 }
 
 - (void)setTextJustify:(id <MGLStyleAttributeValue>)textJustify
@@ -259,7 +261,7 @@
 
 - (id <MGLStyleAttributeValue>)textJustify
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerTextJustifyLeft;
+    return @0;
 }
 
 - (void)setTextAnchor:(id <MGLStyleAttributeValue>)textAnchor
@@ -269,7 +271,7 @@
 
 - (id <MGLStyleAttributeValue>)textAnchor
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerTextAnchorCenter;
+    return @0;
 }
 
 - (void)setTextMaxAngle:(id <MGLStyleAttributeValue>)textMaxAngle
@@ -279,7 +281,7 @@
 
 - (id <MGLStyleAttributeValue>)textMaxAngle
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextMaxAngle().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getTextMaxAngle()];
 }
 
 - (void)setTextRotate:(id <MGLStyleAttributeValue>)textRotate
@@ -289,7 +291,7 @@
 
 - (id <MGLStyleAttributeValue>)textRotate
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextRotate().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getTextRotate()];
 }
 
 - (void)setTextPadding:(id <MGLStyleAttributeValue>)textPadding
@@ -299,17 +301,17 @@
 
 - (id <MGLStyleAttributeValue>)textPadding
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextPadding().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getTextPadding()];
 }
 
 - (void)setTextKeepUpright:(id <MGLStyleAttributeValue>)textKeepUpright
 {
-    // symbolLayer->setTextKeepUpright(textKeepUpright);
+    symbolLayer->setTextKeepUpright(textKeepUpright.numberValue.mbgl_booleanPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textKeepUpright
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextKeepUpright().asConstant();
+    return [NSNumber mbgl_booleanWithPropertyValue:symbolLayer->getTextKeepUpright()];
 }
 
 - (void)setTextTransform:(id <MGLStyleAttributeValue>)textTransform
@@ -319,7 +321,7 @@
 
 - (id <MGLStyleAttributeValue>)textTransform
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerTextTransformNone;
+    return @0;
 }
 
 - (void)setTextOffset:(id <MGLStyleAttributeValue>)textOffset
@@ -329,37 +331,37 @@
 
 - (id <MGLStyleAttributeValue>)textOffset
 {
-    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
+    return @[];
 }
 
 - (void)setTextAllowOverlap:(id <MGLStyleAttributeValue>)textAllowOverlap
 {
-    // symbolLayer->setTextAllowOverlap(textAllowOverlap);
+    symbolLayer->setTextAllowOverlap(textAllowOverlap.numberValue.mbgl_booleanPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textAllowOverlap
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextAllowOverlap().asConstant();
+    return [NSNumber mbgl_booleanWithPropertyValue:symbolLayer->getTextAllowOverlap()];
 }
 
 - (void)setTextIgnorePlacement:(id <MGLStyleAttributeValue>)textIgnorePlacement
 {
-    // symbolLayer->setTextIgnorePlacement(textIgnorePlacement);
+    symbolLayer->setTextIgnorePlacement(textIgnorePlacement.numberValue.mbgl_booleanPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textIgnorePlacement
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextIgnorePlacement().asConstant();
+    return [NSNumber mbgl_booleanWithPropertyValue:symbolLayer->getTextIgnorePlacement()];
 }
 
 - (void)setTextOptional:(id <MGLStyleAttributeValue>)textOptional
 {
-    // symbolLayer->setTextOptional(textOptional);
+    symbolLayer->setTextOptional(textOptional.numberValue.mbgl_booleanPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textOptional
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextOptional().asConstant();
+    return [NSNumber mbgl_booleanWithPropertyValue:symbolLayer->getTextOptional()];
 }
 #pragma mark - Accessing the Paint Attributes
 
@@ -369,7 +371,7 @@
 }
 - (id <MGLStyleAttributeValue>)iconOpacity
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconOpacity().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getIconOpacity()];
 }
 - (void)setIconColor:(id <MGLStyleAttributeValue>)iconColor
 {
@@ -393,7 +395,7 @@
 }
 - (id <MGLStyleAttributeValue>)iconHaloWidth
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconHaloWidth().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getIconHaloWidth()];
 }
 - (void)setIconHaloBlur:(id <MGLStyleAttributeValue>)iconHaloBlur
 {
@@ -401,7 +403,7 @@
 }
 - (id <MGLStyleAttributeValue>)iconHaloBlur
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getIconHaloBlur().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getIconHaloBlur()];
 }
 - (void)setIconTranslate:(id <MGLStyleAttributeValue>)iconTranslate
 {
@@ -409,7 +411,7 @@
 }
 - (id <MGLStyleAttributeValue>)iconTranslate
 {
-    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
+    return @[];
 }
 - (void)setIconTranslateAnchor:(id <MGLStyleAttributeValue>)iconTranslateAnchor
 {
@@ -417,7 +419,7 @@
 }
 - (id <MGLStyleAttributeValue>)iconTranslateAnchor
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerIconTranslateAnchorMap;
+    return @0;
 }
 - (void)setTextOpacity:(id <MGLStyleAttributeValue>)textOpacity
 {
@@ -425,7 +427,7 @@
 }
 - (id <MGLStyleAttributeValue>)textOpacity
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextOpacity().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getTextOpacity()];
 }
 - (void)setTextColor:(id <MGLStyleAttributeValue>)textColor
 {
@@ -449,7 +451,7 @@
 }
 - (id <MGLStyleAttributeValue>)textHaloWidth
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextHaloWidth().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getTextHaloWidth()];
 }
 - (void)setTextHaloBlur:(id <MGLStyleAttributeValue>)textHaloBlur
 {
@@ -457,7 +459,7 @@
 }
 - (id <MGLStyleAttributeValue>)textHaloBlur
 {
-    return [[MGLStyleAttribute alloc] init]; //return symbolLayer->getTextHaloBlur().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:symbolLayer->getTextHaloBlur()];
 }
 - (void)setTextTranslate:(id <MGLStyleAttributeValue>)textTranslate
 {
@@ -465,7 +467,7 @@
 }
 - (id <MGLStyleAttributeValue>)textTranslate
 {
-    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
+    return @[];
 }
 - (void)setTextTranslateAnchor:(id <MGLStyleAttributeValue>)textTranslateAnchor
 {
@@ -473,7 +475,7 @@
 }
 - (id <MGLStyleAttributeValue>)textTranslateAnchor
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLSymbolStyleLayerTextTranslateAnchorMap;
+    return @0;
 }
 
 @end

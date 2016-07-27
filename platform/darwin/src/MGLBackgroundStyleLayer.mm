@@ -3,7 +3,9 @@
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
-#import "MGLStyleAttribute.hpp"
+#import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSString+MGLStyleAttributeAdditions_Private.hpp"
 #import "MGLBackgroundStyleLayer.h"
 #import <mbgl/style/layers/background_layer.hpp>
 
@@ -35,7 +37,7 @@
 }
 - (id <MGLStyleAttributeValue>)backgroundPattern
 {
-    return [[MGLStyleAttribute alloc] init]; //return @(std::string(backgroundLayer->getBackgroundPattern().asConstant()).c_str());
+    return @"";
 }
 - (void)setBackgroundOpacity:(id <MGLStyleAttributeValue>)backgroundOpacity
 {
@@ -43,7 +45,7 @@
 }
 - (id <MGLStyleAttributeValue>)backgroundOpacity
 {
-    return [[MGLStyleAttribute alloc] init]; //return backgroundLayer->getBackgroundOpacity().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:backgroundLayer->getBackgroundOpacity()];
 }
 
 @end

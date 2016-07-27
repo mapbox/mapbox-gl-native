@@ -3,7 +3,9 @@
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
-#import "MGLStyleAttribute.hpp"
+#import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSString+MGLStyleAttributeAdditions_Private.hpp"
 #import "MGLLineStyleLayer.h"
 #import <mbgl/style/layers/line_layer.hpp>
 
@@ -29,7 +31,7 @@
 
 - (id <MGLStyleAttributeValue>)lineCap
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLLineStyleLayerLineCapButt;
+    return @0;
 }
 
 - (void)setLineJoin:(id <MGLStyleAttributeValue>)lineJoin
@@ -39,7 +41,7 @@
 
 - (id <MGLStyleAttributeValue>)lineJoin
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLLineStyleLayerLineJoinBevel;
+    return @0;
 }
 
 - (void)setLineMiterLimit:(id <MGLStyleAttributeValue>)lineMiterLimit
@@ -49,7 +51,7 @@
 
 - (id <MGLStyleAttributeValue>)lineMiterLimit
 {
-    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineMiterLimit().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:lineLayer->getLineMiterLimit()];
 }
 
 - (void)setLineRoundLimit:(id <MGLStyleAttributeValue>)lineRoundLimit
@@ -59,7 +61,7 @@
 
 - (id <MGLStyleAttributeValue>)lineRoundLimit
 {
-    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineRoundLimit().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:lineLayer->getLineRoundLimit()];
 }
 #pragma mark - Accessing the Paint Attributes
 
@@ -69,7 +71,7 @@
 }
 - (id <MGLStyleAttributeValue>)lineOpacity
 {
-    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineOpacity().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:lineLayer->getLineOpacity()];
 }
 - (void)setLineColor:(id <MGLStyleAttributeValue>)lineColor
 {
@@ -85,7 +87,7 @@
 }
 - (id <MGLStyleAttributeValue>)lineTranslate
 {
-    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
+    return @[];
 }
 - (void)setLineTranslateAnchor:(id <MGLStyleAttributeValue>)lineTranslateAnchor
 {
@@ -93,7 +95,7 @@
 }
 - (id <MGLStyleAttributeValue>)lineTranslateAnchor
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLLineStyleLayerLineTranslateAnchorMap;
+    return @0;
 }
 - (void)setLineWidth:(id <MGLStyleAttributeValue>)lineWidth
 {
@@ -101,7 +103,7 @@
 }
 - (id <MGLStyleAttributeValue>)lineWidth
 {
-    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineWidth().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:lineLayer->getLineWidth()];
 }
 - (void)setLineGapWidth:(id <MGLStyleAttributeValue>)lineGapWidth
 {
@@ -109,7 +111,7 @@
 }
 - (id <MGLStyleAttributeValue>)lineGapWidth
 {
-    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineGapWidth().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:lineLayer->getLineGapWidth()];
 }
 - (void)setLineOffset:(id <MGLStyleAttributeValue>)lineOffset
 {
@@ -117,7 +119,7 @@
 }
 - (id <MGLStyleAttributeValue>)lineOffset
 {
-    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineOffset().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:lineLayer->getLineOffset()];
 }
 - (void)setLineBlur:(id <MGLStyleAttributeValue>)lineBlur
 {
@@ -125,7 +127,7 @@
 }
 - (id <MGLStyleAttributeValue>)lineBlur
 {
-    return [[MGLStyleAttribute alloc] init]; //return lineLayer->getLineBlur().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:lineLayer->getLineBlur()];
 }
 - (void)setLineDasharray:(id <MGLStyleAttributeValue>)lineDasharray
 {
@@ -133,7 +135,7 @@
 }
 - (id <MGLStyleAttributeValue>)lineDasharray
 {
-    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
+    return @[];
 }
 - (void)setLinePattern:(id <MGLStyleAttributeValue>)linePattern
 {
@@ -141,7 +143,7 @@
 }
 - (id <MGLStyleAttributeValue>)linePattern
 {
-    return [[MGLStyleAttribute alloc] init]; //return @(std::string(lineLayer->getLinePattern().asConstant()).c_str());
+    return @"";
 }
 
 @end

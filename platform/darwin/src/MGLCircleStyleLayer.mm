@@ -3,7 +3,9 @@
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
-#import "MGLStyleAttribute.hpp"
+#import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSString+MGLStyleAttributeAdditions_Private.hpp"
 #import "MGLCircleStyleLayer.h"
 #import <mbgl/style/layers/circle_layer.hpp>
 
@@ -27,7 +29,7 @@
 }
 - (id <MGLStyleAttributeValue>)circleRadius
 {
-    return [[MGLStyleAttribute alloc] init]; //return circleLayer->getCircleRadius().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:circleLayer->getCircleRadius()];
 }
 - (void)setCircleColor:(id <MGLStyleAttributeValue>)circleColor
 {
@@ -43,7 +45,7 @@
 }
 - (id <MGLStyleAttributeValue>)circleBlur
 {
-    return [[MGLStyleAttribute alloc] init]; //return circleLayer->getCircleBlur().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:circleLayer->getCircleBlur()];
 }
 - (void)setCircleOpacity:(id <MGLStyleAttributeValue>)circleOpacity
 {
@@ -51,7 +53,7 @@
 }
 - (id <MGLStyleAttributeValue>)circleOpacity
 {
-    return [[MGLStyleAttribute alloc] init]; //return circleLayer->getCircleOpacity().asConstant();
+    return [NSNumber mbgl_numberWithPropertyValue:circleLayer->getCircleOpacity()];
 }
 - (void)setCircleTranslate:(id <MGLStyleAttributeValue>)circleTranslate
 {
@@ -59,7 +61,7 @@
 }
 - (id <MGLStyleAttributeValue>)circleTranslate
 {
-    return [[MGLStyleAttribute alloc] init]; //return @[]; // TODO: getterArray
+    return @[];
 }
 - (void)setCircleTranslateAnchor:(id <MGLStyleAttributeValue>)circleTranslateAnchor
 {
@@ -67,7 +69,7 @@
 }
 - (id <MGLStyleAttributeValue>)circleTranslateAnchor
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLCircleStyleLayerCircleTranslateAnchorMap;
+    return @0;
 }
 - (void)setCirclePitchScale:(id <MGLStyleAttributeValue>)circlePitchScale
 {
@@ -75,7 +77,7 @@
 }
 - (id <MGLStyleAttributeValue>)circlePitchScale
 {
-    return [[MGLStyleAttribute alloc] init]; //return MGLCircleStyleLayerCirclePitchScaleMap;
+    return @0;
 }
 
 @end
