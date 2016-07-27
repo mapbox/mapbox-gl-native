@@ -5,8 +5,9 @@ namespace mbgl {
 namespace style {
 
 GeoJSONSource::GeoJSONSource(const std::string& id, const GeoJSONOptions options)
-    : Source(SourceType::GeoJSON, std::make_unique<GeoJSONSource::Impl>(std::move(id), *this, options))
-    , impl(static_cast<Impl*>(baseImpl.get())) {
+    : Source(SourceType::GeoJSON,
+             std::make_unique<GeoJSONSource::Impl>(std::move(id), *this, options)),
+      impl(static_cast<Impl*>(baseImpl.get())) {
 }
 
 void GeoJSONSource::setURL(const std::string& url) {

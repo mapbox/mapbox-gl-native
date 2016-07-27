@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/source_impl.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/util/variant.hpp>
 
 namespace mbgl {
