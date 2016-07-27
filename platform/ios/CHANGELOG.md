@@ -14,7 +14,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 * Fixed an issue where annotation views could be assigned to multipoint annotations. ([#5770](https://github.com/mapbox/mapbox-gl-native/pull/5770))
 * Fixed the static only framework build. ([#5782](https://github.com/mapbox/mapbox-gl-native/issues/5782))
 
-## 3.3.1
+## 3.3.1 - July 19, 2016
 
 * Fixed a crash that occurred when a sprite URL lacks a file extension. See [this comment](https://github.com/mapbox/mapbox-gl-native/issues/5722#issuecomment-233701251) to determine who may be affected by this bug. ([#5723](https://github.com/mapbox/mapbox-gl-native/pull/5723))
 * Fixed an issue causing overlapping polylines and polygons to be drawn in undefined z-order. Shapes are always drawn in the order they are added to the map, from the oldest on the bottom to the newest on the top. ([#5710](https://github.com/mapbox/mapbox-gl-native/pull/5710))
@@ -25,7 +25,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 * The compass, Mapbox logo, and attribution button now accommodate the containing map view’s content insets. If your interface elements partially overlap the map view but do not affect the top and bottom layout guides, set the `automaticallyAdjustsScrollViewInsets` property to `NO` and set the `contentInset` property to a suitable value. ([#5671](https://github.com/mapbox/mapbox-gl-native/pull/5671))
 * Added a property to MGLOfflineStorage, `countOfBytesCompleted`, that indicates the disk space occupied by all cached and offline resources. ([#5585](https://github.com/mapbox/mapbox-gl-native/pull/5585))
 
-## 3.3.0
+## 3.3.0 - July 14, 2016
 
 ### Styles and data
 
@@ -80,25 +80,25 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 - Added NSFormatter subclasses for converting geographic coordinates and directions into display strings. ([#4802](https://github.com/mapbox/mapbox-gl-native/pull/4802))
 - Added `MGLCoordinateInCoordinateBounds()`, a function that tests whether or not a coordinate is in a given bounds. ([#5053](https://github.com/mapbox/mapbox-gl-native/pull/5053))
 
-## 3.2.3
+## 3.2.3 - June 7, 2016
 
 - Fixed an issue preventing `-[MGLMapViewDelegate mapViewDidFinishLoadingMap:]` from being called when returning to the view controller containing the map view from another view controller. ([#5164](https://github.com/mapbox/mapbox-gl-native/pull/5164))
 - Declarations in the API documentation are shown in both Objective-C and Swift. ([realm/jazzy#530](https://github.com/realm/jazzy/pull/530))
 
-## 3.2.2
+## 3.2.2 - May 10, 2016
 
 - Existing MGLStyle class methods that return default style URLs have been deprecated in favor of new methods that require an explicit style version parameter. The deprecated, unversioned methods continue to return version 8 of the respective styles and will not be updated as new versions of the styles are released. ([#4759](https://github.com/mapbox/mapbox-gl-native/pull/4759))
 - Deprecated `+[MGLStyle emeraldStyleURL]` with no replacement method. To use the Emerald style going forward, we recommend that you use the underlying URL. ([#4759](https://github.com/mapbox/mapbox-gl-native/pull/4759))
 - Added `+[MGLStyle outdoorsStyleURLWithVersion:]` for the new Outdoors style. ([#4759](https://github.com/mapbox/mapbox-gl-native/pull/4759))
 - The Hybrid style is now called Satellite Streets. ([#4759](https://github.com/mapbox/mapbox-gl-native/pull/4759))
 
-## 3.2.1
+## 3.2.1 - April 20, 2016
 
 - Fixed a hang that could occur if the host application attempts to set user defaults on a background queue. ([#4745](https://github.com/mapbox/mapbox-gl-native/pull/4745))
 - User location heading updates now resume properly when an app becomes active again. ([#4674](https://github.com/mapbox/mapbox-gl-native/pull/4674))
 - Fixed an issue causing hyperlinks in the documentation to be displayed as raw Markdown syntax when viewed in Xcode’s Quick Help popover or sidebar. ([#4760](https://github.com/mapbox/mapbox-gl-native/pull/4760))
 
-## 3.2.0
+## 3.2.0 - April 5, 2016
 
 - If you’ve previously installed the SDK as a static framework, the installation workflow has changed to address issues when submitting your application to the App Store or installing it on a device. Upon upgrading to this version of the SDK, you’ll need to add Mapbox.bundle to the Copy Bundle Resources build phase and remove Mapbox.framework from the Embed Frameworks build phase. ([#4455](https://github.com/mapbox/mapbox-gl-native/pull/4455))
 - Offline packs can now be downloaded to allow users to view specific regions of the map offline. A new MGLOfflineStorage class provides APIs for managing MGLOfflinePacks. ([#4221](https://github.com/mapbox/mapbox-gl-native/pull/4221))
@@ -119,12 +119,12 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 - The Improve This Map tool now uses the same zoom level that is currently being shown in the map view. ([#4068](https://github.com/mapbox/mapbox-gl-native/pull/4068))
 - Fixed a formatting issue in the documentation for `MGLCoordinateBoundsIsEmpty()`. ([#3958](https://github.com/mapbox/mapbox-gl-native/pull/3958))
 
-## 3.1.2
+## 3.1.2 - February 22, 2016
 
 - You can once again install the static framework without manually linking several framework and library dependencies. ([#4029](https://github.com/mapbox/mapbox-gl-native/pull/4029))
 - The location manager used by MGLMapView to show the user’s location is now paused when the application is sent to the background. ([#4034](https://github.com/mapbox/mapbox-gl-native/pull/4034))
 
-## 3.1.1
+## 3.1.1 - February 15, 2016
 
 - Corrected the dynamic framework’s minimum deployment target to iOS 8.0. ([#3872](https://github.com/mapbox/mapbox-gl-native/pull/3872))
 - Fixed Fabric compatibility. ([#3847](https://github.com/mapbox/mapbox-gl-native/pull/3847))
@@ -133,7 +133,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 - Fixed an issue that incorrectly expanded the tappable area of an annotation and prevented the annotation’s alignment rect insets from having any effect on the tappable area. ([#3898](https://github.com/mapbox/mapbox-gl-native/pull/3898))
 - Fixed an issue preventing `-[MGLMapViewDelegate mapView:tapOnCalloutForAnnotation:]` from being called when a non-custom callout view is tapped. ([#3875](https://github.com/mapbox/mapbox-gl-native/pull/3875))
 
-## 3.1.0
+## 3.1.0 - February 5, 2016
 
 - The SDK is now distributed as a dynamic framework instead of a static library, resulting in a simpler installation workflow and significantly reduced download size. The framework contains both simulator and device content. If you install the dynamic framework manually, you’ll need to strip out the simulator content before submitting your application to the App Store due to [an Xcode bug](http://www.openradar.me/radar?id=6409498411401216); see the installation instructions included with the framework for details. ([#3183](https://github.com/mapbox/mapbox-gl-native/pull/3183))
 - Fixed an issue causing the entire MGLMapView to leak. ([#3448](https://github.com/mapbox/mapbox-gl-native/pull/3448))
@@ -162,13 +162,13 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 - Avoids triggering the blue background location status bar when user has granted "when in use" permission. ([#3671](https://github.com/mapbox/mapbox-gl-native/issues/3671))
 - Deprecated the `debugActive` property and `-toggleDebug` method on MGLMapView in favor of a new `debugMask` property that exposes individual style debugging options. ([#3742](https://github.com/mapbox/mapbox-gl-native/pull/3742))
 
-## 3.0.1
+## 3.0.1 - December 7, 2015
 
 - Fixed CoreTelephony.framework crash. ([#3170](https://github.com/mapbox/mapbox-gl-native/pull/3170))
 - Fixed an issue preventing the compass from responding to taps after the compass is moved programmatically. ([#3117](https://github.com/mapbox/mapbox-gl-native/pull/3117))
 - CocoaPods is now distributed via a (static) framework. ([#3181](https://github.com/mapbox/mapbox-gl-native/issues/3181))
 
-## 3.0.0
+## 3.0.0 - November 23, 2015
 
 - If you install this SDK via CocoaPods, CocoaPods version 0.38.0 or above is required. ([#2132](https://github.com/mapbox/mapbox-gl-native/pull/2132))
 - The `styleID` property has been removed from MGLMapView. Instead, set the `styleURL` property to an NSURL in the form `mapbox://styles/STYLE_ID`. If you previously set the style ID in Interface Builder’s Attributes inspector, delete the `styleID` entry from the User Defined Runtime Attributes section of the Identity inspector, then set the new “Style URL” inspectable to a value in the form `mapbox://styles/STYLE_ID`. ([#2632](https://github.com/mapbox/mapbox-gl-native/pull/2632))
@@ -193,15 +193,15 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 - Removed CoreTelephony.framework dependency. ([#2581](https://github.com/mapbox/mapbox-gl-native/pull/2581))
 - Improved user location annotation responsiveness. ([#2643](https://github.com/mapbox/mapbox-gl-native/pull/2643))
 
-## 2.1.2
+## 2.1.2 - September 15, 2015
 
 - Built with Xcode 6.4 to not yet trigger Bitcode compatibility until Xcode 7 stabilizes. ([#2332](https://github.com/mapbox/mapbox-gl-native/issues/2332))
 
-## 2.1.1
+## 2.1.1 - September 15, 2015
 
 - Fixes for Xcode 7 and Bitcode. ([#2238](https://github.com/mapbox/mapbox-gl-native/pull/2238))
 
-## 2.1.0
+## 2.1.0 - September 14, 2015
 
 - A two-finger vertical swipe now tilts the map into perspective mode. ([#2116](https://github.com/mapbox/mapbox-gl-native/pull/2116))
 - A new `MGLMapCamera` API allows you to transition multiple viewpoint properties, including rotation and pitch, simultaneously with an optional custom duration and timing function. ([#2193](https://github.com/mapbox/mapbox-gl-native/pull/2193))
@@ -220,21 +220,21 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 - Minor style updates. ([#1910](https://github.com/mapbox/mapbox-gl-native/pull/1910))
 - The CocoaPods pod now contains a `README.md` file. ([#1886](https://github.com/mapbox/mapbox-gl-native/pull/1886))
 
-## 2.0.0
+## 2.0.0 - August 21, 2015
 
 Repackaging 2.0.0-pre.1 as it contained no issues.
 
-## 2.0.0-pre.1
+## 2.0.0-pre.1 - August 21, 2015
 
 Repackaging 0.5.1 as the Mapbox iOS SDK 2.0.0 series.
 
-## 0.5.1
+## 0.5.1 - July 13, 2015
 
 ### iOS
 
 - Added support for CocoaPods 0.38.0. ([#1876](https://github.com/mapbox/mapbox-gl-native/pull/1876))
 
-## 0.5.0
+## 0.5.0 - July 9, 2015
 
 ### Core
 
@@ -263,7 +263,7 @@ Repackaging 0.5.1 as the Mapbox iOS SDK 2.0.0 series.
 - Fixed an issue in which `-[MGLMapView direction]` would sometimes return 360 instead of 0. ([#1829](https://github.com/mapbox/mapbox-gl-native/pull/1829))
 - Build against iOS 8.4. ([#1868](https://github.com/mapbox/mapbox-gl-native/pull/1868))
 
-## 0.4.0
+## 0.4.0 - June 19, 2015
 
 ### Core
 
@@ -287,11 +287,11 @@ Repackaging 0.5.1 as the Mapbox iOS SDK 2.0.0 series.
 - Internal use of the Reachability library has been cleaned up so that your app can include its own copy of Reachability. ([#1718](https://github.com/mapbox/mapbox-gl-native/issues/1718))
 - Now distribute a binary stripped of debugging symbols by default with an optional, secondary symbols build. ([#1650](https://github.com/mapbox/mapbox-gl-native/issues/1650))
 
-## 0.3.1
+## 0.3.1 - May 15, 2015
 
 - Temporarily removed `IBDesignable` support on iOS.
 
-## 0.3.0
+## 0.3.0 - May 14, 2015
 
 - Initial iOS beta release.
 
