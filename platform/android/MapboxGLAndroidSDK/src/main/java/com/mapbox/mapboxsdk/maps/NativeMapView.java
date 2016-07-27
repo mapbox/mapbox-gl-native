@@ -501,6 +501,10 @@ final class NativeMapView {
         nativeRemoveSource(mNativeMapViewPtr, sourceId);
     }
 
+    public void scheduleTakeSnapshot() {
+        nativeScheduleTakeSnapshot(mNativeMapViewPtr);
+    }
+
     //
     // Callbacks
     //
@@ -515,6 +519,10 @@ final class NativeMapView {
 
     protected void onFpsChanged(double fps) {
         mMapView.onFpsChanged(fps);
+    }
+
+    protected void onSnapshotReady(byte[] bytes) {
+        mMapView.onSnapshotReady(bytes);
     }
 
     //
@@ -686,4 +694,6 @@ final class NativeMapView {
     private native long nativeUpdatePolygon(long nativeMapViewPtr, long polygonId, Polygon polygon);
 
     private native long nativeUpdatePolyline(long nativeMapviewPtr, long polylineId, Polyline polyline);
+
+    private native void nativeScheduleTakeSnapshot(long nativeMapViewPtr);
 }

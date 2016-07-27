@@ -13,6 +13,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -157,6 +158,7 @@ public class MapView extends FrameLayout {
     private String mInitalStyle;
 
     private List<OnMapReadyCallback> mOnMapReadyCallbackList;
+    private SnapshotRequest mSnapshotRequest;
 
     @UiThread
     public MapView(@NonNull Context context) {
@@ -196,7 +198,7 @@ public class MapView extends FrameLayout {
 
         // Reference the TextureView
         SurfaceView surfaceView = (SurfaceView) view.findViewById(R.id.surfaceView);
-        
+
         // Check if we are in Android Studio UI editor to avoid error in layout preview
         if (isInEditMode()) {
             return;
@@ -1838,7 +1840,7 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
-         //   requestDisallowInterceptTouchEvent(true);
+            requestDisallowInterceptTouchEvent(true);
 
             // reset tracking modes if gesture occurs
             resetTrackingModesIfRequired();
@@ -2652,21 +2654,51 @@ public class MapView extends FrameLayout {
         return mNativeMapView;
     }
 
+    //
+    // Snapshot API
+    //
+
     @UiThread
     void snapshot(@NonNull final MapboxMap.SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
-//        TextureView textureView = (TextureView) findViewById(R.id.textureView);
-//        final boolean canUseBitmap = bitmap != null && textureView.getWidth() == bitmap.getWidth() && textureView.getHeight() == bitmap.getHeight();
-//
-//        setDrawingCacheEnabled(true);
-//        Bitmap content = Bitmap.createBitmap(getDrawingCache());
-//        setDrawingCacheEnabled(false);
-//
-//        Bitmap output = Bitmap.createBitmap(content.getWidth(), content.getHeight(), Bitmap.Config.ARGB_8888);
-//        Canvas canvas = new Canvas(output);
-//        canvas.drawBitmap(canUseBitmap ? textureView.getBitmap(bitmap) : textureView.getBitmap(), 0, 0, null);
-//        canvas.drawBitmap(content, new Matrix(), null);
-//        callback.onSnapshotReady(output);
-        throw new RuntimeException("TextureView code needs to be migrated to SurfaceView");
+        mSnapshotRequest = new SnapshotRequest(bitmap, callback);
+        mNativeMapView.scheduleTakeSnapshot();
+        mNativeMapView.render();
+    }
+
+    // Called when the snapshot method was executed
+    // Called via JNI from NativeMapView
+    // Forward to any listeners
+    protected void onSnapshotReady(byte[] bytes) {
+        if (mSnapshotRequest != null && bytes != null) {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inBitmap = mSnapshotRequest.getBitmap();  // the old Bitmap to be reused
+            options.inMutable = true;
+            options.inSampleSize = 1;
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+
+            MapboxMap.SnapshotReadyCallback callback = mSnapshotRequest.getCallback();
+            if (callback != null) {
+                callback.onSnapshotReady(bitmap);
+            }
+        }
+    }
+
+    private class SnapshotRequest {
+        private Bitmap bitmap;
+        private MapboxMap.SnapshotReadyCallback callback;
+
+        public SnapshotRequest(Bitmap bitmap, MapboxMap.SnapshotReadyCallback callback) {
+            this.bitmap = bitmap;
+            this.callback = callback;
+        }
+
+        public Bitmap getBitmap() {
+            return bitmap;
+        }
+
+        public MapboxMap.SnapshotReadyCallback getCallback() {
+            return callback;
+        }
     }
 
     //
