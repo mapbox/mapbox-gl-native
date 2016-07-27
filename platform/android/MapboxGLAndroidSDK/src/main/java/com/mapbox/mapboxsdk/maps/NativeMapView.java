@@ -470,6 +470,10 @@ final class NativeMapView {
         return nativeGetCameraValues(mNativeMapViewPtr);
     }
 
+    public void scheduleTakeSnapshot() {
+        nativeScheduleTakeSnapshot(mNativeMapViewPtr);
+    }
+
     //
     // Callbacks
     //
@@ -484,6 +488,10 @@ final class NativeMapView {
 
     protected void onFpsChanged(double fps) {
         mMapView.onFpsChanged(fps);
+    }
+
+    protected void onSnapshotReady(byte[] bytes){
+        mMapView.onSnapshotReady(bytes);
     }
 
     //
@@ -633,7 +641,7 @@ final class NativeMapView {
     private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, float x, float y);
 
     private native double nativeGetTopOffsetPixelsForAnnotationSymbol(long nativeMapViewPtr, String symbolName);
-    
+
     private native void nativeJumpTo(long nativeMapViewPtr, double angle, double latitude, double longitude, double pitch, double zoom);
 
     private native void nativeEaseTo(long nativeMapViewPtr, double angle, double latitude, double longitude, long duration, double pitch, double zoom, boolean easingInterpolator);
@@ -645,4 +653,6 @@ final class NativeMapView {
     private native void nativeRemoveCustomLayer(long nativeMapViewPtr, String id);
 
     private native double[] nativeGetCameraValues(long mNativeMapViewPtr);
+
+    private native void nativeScheduleTakeSnapshot(long nativeMapViewPtr);
 }
