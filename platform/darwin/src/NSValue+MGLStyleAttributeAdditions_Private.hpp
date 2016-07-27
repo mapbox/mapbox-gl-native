@@ -4,8 +4,6 @@
 
 #include <mbgl/style/property_value.hpp>
 
-@interface NSArray (MGLStyleAttributeAdditions_Private) <MGLStyleAttributeValue>
-
-// TODO:
+@interface NSValue (MGLStyleAttributeAdditions_Private) <MGLStyleAttributeValue>
 
 @end

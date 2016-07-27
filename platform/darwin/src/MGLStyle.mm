@@ -79,11 +79,13 @@ static NSURL *MGLStyleURL_emerald;
 
 - (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier
 {
-    mbgl::style::Layer *layer = self.mapView.mbglMap->getLayer(identifier.UTF8String);
-    mbgl::style::FillLayer *fillLayer = reinterpret_cast<mbgl::style::FillLayer *>(layer);
+    auto *layer = self.mapView.mbglMap->getLayer(identifier.UTF8String);
+    auto *fillLayer = reinterpret_cast<mbgl::style::FillLayer *>(layer);
+    
     MGLFillStyleLayer *fillStyleLayer = [[MGLFillStyleLayer alloc] init];
     fillStyleLayer.layer = fillLayer;
     fillStyleLayer.mapView = self.mapView;
+    
     return fillStyleLayer;
 }
 

@@ -446,17 +446,15 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 {
     MGLFillStyleLayer *waterLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
     waterLayer.fillColor = [UIColor redColor];
-    //waterLayer.fillColor = [UIColor redColor].mgl_colorAttributeValue;
+    waterLayer.fillTranslateAnchor = MGLFillStyleLayerFillTranslateAnchorMap;
     
     MGLFillStyleLayer *parkLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"park"];
     //parkLayer.fillColor = [UIColor greenColor].mgl_colorAttributeValue;
     parkLayer.fillColor = [UIColor greenColor];
     
     MGLFillStyleLayer *buildingLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"building"];
-    //buildingLayer.fillColor = [UIColor blackColor].
     buildingLayer.fillColor = [UIColor blackColor];
     
-    //[self.mapView.style sourceTest];
     [waterLayer updateStyleAndClasses];
 }
 

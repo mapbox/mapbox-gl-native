@@ -6,6 +6,7 @@
 #import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
 #import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
 #import "NSString+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSValue+MGLStyleAttributeAdditions_Private.hpp"
 
 #include <mbgl/style/layer.hpp>
 #include <mbgl/mbgl.hpp>

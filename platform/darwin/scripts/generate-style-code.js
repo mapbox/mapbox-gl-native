@@ -89,8 +89,9 @@ global.getterImplementation = function(property, layerType = null) {
         case 'string':
             return `return [NSString mbgl_stringWithPropertyValue:${layerType}Layer->get${camelize(property.name)}()];`;
         case 'enum':
-            //return `return [[MGLStyleAttribute alloc] init]; //return ${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}${camelize(property.values[0])};`
-            return `return @0;`;
+            return `auto rawValue = ${layerType}Layer->get${camelize(property.name)}();
+    const char *type = @encode(${prefix}${camelize(layerType)}${suffix}${camelize(property.name)});
+    return [NSValue value:&rawValue withObjCType:type];`
         case 'color':
             return `return [MGLColor mbgl_propertyValue:${camelizeWithLeadingLowercase(layerType)}Layer->get${camelize(property.name)}()];`
         case 'array':

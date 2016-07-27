@@ -28,7 +28,9 @@
 
 - (id <MGLStyleAttributeValue>)lineCap
 {
-    return @0;
+    auto rawValue = lineLayer->getLineCap();
+    const char *type = @encode(MGLLineStyleLayerLineCap);
+    return [NSValue value:&rawValue withObjCType:type];
 }
 
 - (void)setLineJoin:(id <MGLStyleAttributeValue>)lineJoin
@@ -38,7 +40,9 @@
 
 - (id <MGLStyleAttributeValue>)lineJoin
 {
-    return @0;
+    auto rawValue = lineLayer->getLineJoin();
+    const char *type = @encode(MGLLineStyleLayerLineJoin);
+    return [NSValue value:&rawValue withObjCType:type];
 }
 
 - (void)setLineMiterLimit:(id <MGLStyleAttributeValue>)lineMiterLimit
@@ -92,7 +96,9 @@
 }
 - (id <MGLStyleAttributeValue>)lineTranslateAnchor
 {
-    return @0;
+    auto rawValue = lineLayer->getLineTranslateAnchor();
+    const char *type = @encode(MGLLineStyleLayerLineTranslateAnchor);
+    return [NSValue value:&rawValue withObjCType:type];
 }
 - (void)setLineWidth:(id <MGLStyleAttributeValue>)lineWidth
 {

@@ -66,7 +66,9 @@
 }
 - (id <MGLStyleAttributeValue>)circleTranslateAnchor
 {
-    return @0;
+    auto rawValue = circleLayer->getCircleTranslateAnchor();
+    const char *type = @encode(MGLCircleStyleLayerCircleTranslateAnchor);
+    return [NSValue value:&rawValue withObjCType:type];
 }
 - (void)setCirclePitchScale:(id <MGLStyleAttributeValue>)circlePitchScale
 {
@@ -74,7 +76,9 @@
 }
 - (id <MGLStyleAttributeValue>)circlePitchScale
 {
-    return @0;
+    auto rawValue = circleLayer->getCirclePitchScale();
+    const char *type = @encode(MGLCircleStyleLayerCirclePitchScale);
+    return [NSValue value:&rawValue withObjCType:type];
 }
 
 @end
