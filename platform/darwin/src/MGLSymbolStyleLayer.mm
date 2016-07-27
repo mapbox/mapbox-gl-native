@@ -3,9 +3,6 @@
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
-#import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
-#import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
-#import "NSString+MGLStyleAttributeAdditions_Private.hpp"
 #import "MGLSymbolStyleLayer.h"
 #import <mbgl/style/layers/symbol_layer.hpp>
 
@@ -36,7 +33,7 @@
 
 - (void)setSymbolSpacing:(id <MGLStyleAttributeValue>)symbolSpacing
 {
-    // symbolLayer->setSymbolSpacing(symbolSpacing.number.floatValue);
+    symbolLayer->setSymbolSpacing(symbolSpacing.numberValue.mbgl_numberPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)symbolSpacing
@@ -96,7 +93,7 @@
 
 - (void)setIconSize:(id <MGLStyleAttributeValue>)iconSize
 {
-    // symbolLayer->setIconSize(iconSize.number.floatValue);
+    symbolLayer->setIconSize(iconSize.numberValue.mbgl_numberPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)iconSize
@@ -126,17 +123,17 @@
 
 - (void)setIconImage:(id <MGLStyleAttributeValue>)iconImage
 {
-    // symbolLayer->setIconImage(std::string(iconImage.string.UTF8String));
+    symbolLayer->setIconImage(iconImage.stringValue.mbgl_stringPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)iconImage
 {
-    return @"";
+    return [NSString mbgl_stringWithPropertyValue:symbolLayer->getIconImage()];
 }
 
 - (void)setIconRotate:(id <MGLStyleAttributeValue>)iconRotate
 {
-    // symbolLayer->setIconRotate(iconRotate.number.floatValue);
+    symbolLayer->setIconRotate(iconRotate.numberValue.mbgl_numberPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)iconRotate
@@ -146,7 +143,7 @@
 
 - (void)setIconPadding:(id <MGLStyleAttributeValue>)iconPadding
 {
-    // symbolLayer->setIconPadding(iconPadding.number.floatValue);
+    symbolLayer->setIconPadding(iconPadding.numberValue.mbgl_numberPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)iconPadding
@@ -196,12 +193,12 @@
 
 - (void)setTextField:(id <MGLStyleAttributeValue>)textField
 {
-    // symbolLayer->setTextField(std::string(textField.string.UTF8String));
+    symbolLayer->setTextField(textField.stringValue.mbgl_stringPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textField
 {
-    return @"";
+    return [NSString mbgl_stringWithPropertyValue:symbolLayer->getTextField()];
 }
 
 - (void)setTextFont:(id <MGLStyleAttributeValue>)textFont
@@ -216,7 +213,7 @@
 
 - (void)setTextSize:(id <MGLStyleAttributeValue>)textSize
 {
-    // symbolLayer->setTextSize(textSize.number.floatValue);
+    symbolLayer->setTextSize(textSize.numberValue.mbgl_numberPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textSize
@@ -226,7 +223,7 @@
 
 - (void)setTextMaxWidth:(id <MGLStyleAttributeValue>)textMaxWidth
 {
-    // symbolLayer->setTextMaxWidth(textMaxWidth.number.floatValue);
+    symbolLayer->setTextMaxWidth(textMaxWidth.numberValue.mbgl_numberPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textMaxWidth
@@ -236,7 +233,7 @@
 
 - (void)setTextLineHeight:(id <MGLStyleAttributeValue>)textLineHeight
 {
-    // symbolLayer->setTextLineHeight(textLineHeight.number.floatValue);
+    symbolLayer->setTextLineHeight(textLineHeight.numberValue.mbgl_numberPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textLineHeight
@@ -246,7 +243,7 @@
 
 - (void)setTextLetterSpacing:(id <MGLStyleAttributeValue>)textLetterSpacing
 {
-    // symbolLayer->setTextLetterSpacing(textLetterSpacing.number.floatValue);
+    symbolLayer->setTextLetterSpacing(textLetterSpacing.numberValue.mbgl_numberPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textLetterSpacing
@@ -276,7 +273,7 @@
 
 - (void)setTextMaxAngle:(id <MGLStyleAttributeValue>)textMaxAngle
 {
-    // symbolLayer->setTextMaxAngle(textMaxAngle.number.floatValue);
+    symbolLayer->setTextMaxAngle(textMaxAngle.numberValue.mbgl_numberPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textMaxAngle
@@ -286,7 +283,7 @@
 
 - (void)setTextRotate:(id <MGLStyleAttributeValue>)textRotate
 {
-    // symbolLayer->setTextRotate(textRotate.number.floatValue);
+    symbolLayer->setTextRotate(textRotate.numberValue.mbgl_numberPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textRotate
@@ -296,7 +293,7 @@
 
 - (void)setTextPadding:(id <MGLStyleAttributeValue>)textPadding
 {
-    // symbolLayer->setTextPadding(textPadding.number.floatValue);
+    symbolLayer->setTextPadding(textPadding.numberValue.mbgl_numberPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textPadding
@@ -367,7 +364,7 @@
 
 - (void)setIconOpacity:(id <MGLStyleAttributeValue>)iconOpacity
 {
-    // symbolLayer->setIconOpacity(iconOpacity.number.floatValue);
+    symbolLayer->setIconOpacity(iconOpacity.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)iconOpacity
 {
@@ -391,7 +388,7 @@
 }
 - (void)setIconHaloWidth:(id <MGLStyleAttributeValue>)iconHaloWidth
 {
-    // symbolLayer->setIconHaloWidth(iconHaloWidth.number.floatValue);
+    symbolLayer->setIconHaloWidth(iconHaloWidth.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)iconHaloWidth
 {
@@ -399,7 +396,7 @@
 }
 - (void)setIconHaloBlur:(id <MGLStyleAttributeValue>)iconHaloBlur
 {
-    // symbolLayer->setIconHaloBlur(iconHaloBlur.number.floatValue);
+    symbolLayer->setIconHaloBlur(iconHaloBlur.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)iconHaloBlur
 {
@@ -423,7 +420,7 @@
 }
 - (void)setTextOpacity:(id <MGLStyleAttributeValue>)textOpacity
 {
-    // symbolLayer->setTextOpacity(textOpacity.number.floatValue);
+    symbolLayer->setTextOpacity(textOpacity.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)textOpacity
 {
@@ -447,7 +444,7 @@
 }
 - (void)setTextHaloWidth:(id <MGLStyleAttributeValue>)textHaloWidth
 {
-    // symbolLayer->setTextHaloWidth(textHaloWidth.number.floatValue);
+    symbolLayer->setTextHaloWidth(textHaloWidth.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)textHaloWidth
 {
@@ -455,7 +452,7 @@
 }
 - (void)setTextHaloBlur:(id <MGLStyleAttributeValue>)textHaloBlur
 {
-    // symbolLayer->setTextHaloBlur(textHaloBlur.number.floatValue);
+    symbolLayer->setTextHaloBlur(textHaloBlur.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)textHaloBlur
 {

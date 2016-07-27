@@ -3,9 +3,6 @@
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
-#import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
-#import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
-#import "NSString+MGLStyleAttributeAdditions_Private.hpp"
 #import "MGLBackgroundStyleLayer.h"
 #import <mbgl/style/layers/background_layer.hpp>
 
@@ -33,15 +30,15 @@
 }
 - (void)setBackgroundPattern:(id <MGLStyleAttributeValue>)backgroundPattern
 {
-    // backgroundLayer->setBackgroundPattern(std::string(backgroundPattern.string.UTF8String));
+    backgroundLayer->setBackgroundPattern(backgroundPattern.stringValue.mbgl_stringPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)backgroundPattern
 {
-    return @"";
+    return [NSString mbgl_stringWithPropertyValue:backgroundLayer->getBackgroundPattern()];
 }
 - (void)setBackgroundOpacity:(id <MGLStyleAttributeValue>)backgroundOpacity
 {
-    // backgroundLayer->setBackgroundOpacity(backgroundOpacity.number.floatValue);
+    backgroundLayer->setBackgroundOpacity(backgroundOpacity.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)backgroundOpacity
 {

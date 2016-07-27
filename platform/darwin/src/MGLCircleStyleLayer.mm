@@ -3,9 +3,6 @@
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
-#import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
-#import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
-#import "NSString+MGLStyleAttributeAdditions_Private.hpp"
 #import "MGLCircleStyleLayer.h"
 #import <mbgl/style/layers/circle_layer.hpp>
 
@@ -25,7 +22,7 @@
 
 - (void)setCircleRadius:(id <MGLStyleAttributeValue>)circleRadius
 {
-    // circleLayer->setCircleRadius(circleRadius.number.floatValue);
+    circleLayer->setCircleRadius(circleRadius.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)circleRadius
 {
@@ -41,7 +38,7 @@
 }
 - (void)setCircleBlur:(id <MGLStyleAttributeValue>)circleBlur
 {
-    // circleLayer->setCircleBlur(circleBlur.number.floatValue);
+    circleLayer->setCircleBlur(circleBlur.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)circleBlur
 {
@@ -49,7 +46,7 @@
 }
 - (void)setCircleOpacity:(id <MGLStyleAttributeValue>)circleOpacity
 {
-    // circleLayer->setCircleOpacity(circleOpacity.number.floatValue);
+    circleLayer->setCircleOpacity(circleOpacity.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)circleOpacity
 {

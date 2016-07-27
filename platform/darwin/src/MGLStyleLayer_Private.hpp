@@ -1,11 +1,15 @@
 #import "MGLStyleLayer.h"
 
 #import "MGLTypes.h"
+#import "MGLStyleAttributeValue.h"
+
+#import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSString+MGLStyleAttributeAdditions_Private.hpp"
 
 #include <mbgl/style/layer.hpp>
 #include <mbgl/mbgl.hpp>
 #include <mbgl/util/chrono.hpp>
-#import "MGLStyleAttributeValue.h"
 
 #if TARGET_OS_IPHONE
 #import "UIColor+MGLAdditions.hpp"

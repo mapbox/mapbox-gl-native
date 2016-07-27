@@ -67,9 +67,9 @@ global.setterImplementation = function(property, layerType = null) {
         case 'boolean':
             return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.numberValue.mbgl_booleanPropertyValue);`;
         case 'number':
-            return `// ${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.number.floatValue);`;
+            return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.numberValue.mbgl_numberPropertyValue);`;
         case 'string':
-            return `// ${layerType}Layer->set${camelize(property.name)}(std::string(${camelizeWithLeadingLowercase(property.name)}.string.UTF8String));`;
+            return `${layerType}Layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.stringValue.mbgl_stringPropertyValue);`;
         case 'enum':
             return `// TODO: setterEnum`; 
         case 'color':
@@ -87,8 +87,7 @@ global.getterImplementation = function(property, layerType = null) {
         case 'number':
             return `return [NSNumber mbgl_numberWithPropertyValue:${layerType}Layer->get${camelize(property.name)}()];`;
         case 'string':
-            //return `return [NSNumber mbgl_numberWithPropertyValue:${layerType}Layer->get${camelize(property.name)}()];`;
-            return `return @"";`;
+            return `return [NSString mbgl_stringWithPropertyValue:${layerType}Layer->get${camelize(property.name)}()];`;
         case 'enum':
             //return `return [[MGLStyleAttribute alloc] init]; //return ${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}${camelize(property.values[0])};`
             return `return @0;`;

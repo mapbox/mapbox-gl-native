@@ -8,6 +8,8 @@
 
 - (mbgl::style::PropertyValue<bool>)mbgl_booleanPropertyValue;
 
+- (mbgl::style::PropertyValue<float>)mbgl_numberPropertyValue;
+
 + (NSNumber *)mbgl_booleanWithPropertyValue:(mbgl::style::PropertyValue<bool>)propertyValue;
 
 + (NSNumber *)mbgl_numberWithPropertyValue:(mbgl::style::PropertyValue<float>)propertyValue;

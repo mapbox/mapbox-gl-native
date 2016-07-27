@@ -3,9 +3,6 @@
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
-#import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
-#import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
-#import "NSString+MGLStyleAttributeAdditions_Private.hpp"
 #import "MGLRasterStyleLayer.h"
 #import <mbgl/style/layers/raster_layer.hpp>
 
@@ -25,7 +22,7 @@
 
 - (void)setRasterOpacity:(id <MGLStyleAttributeValue>)rasterOpacity
 {
-    // rasterLayer->setRasterOpacity(rasterOpacity.number.floatValue);
+    rasterLayer->setRasterOpacity(rasterOpacity.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterOpacity
 {
@@ -33,7 +30,7 @@
 }
 - (void)setRasterHueRotate:(id <MGLStyleAttributeValue>)rasterHueRotate
 {
-    // rasterLayer->setRasterHueRotate(rasterHueRotate.number.floatValue);
+    rasterLayer->setRasterHueRotate(rasterHueRotate.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterHueRotate
 {
@@ -41,7 +38,7 @@
 }
 - (void)setRasterBrightnessMin:(id <MGLStyleAttributeValue>)rasterBrightnessMin
 {
-    // rasterLayer->setRasterBrightnessMin(rasterBrightnessMin.number.floatValue);
+    rasterLayer->setRasterBrightnessMin(rasterBrightnessMin.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterBrightnessMin
 {
@@ -49,7 +46,7 @@
 }
 - (void)setRasterBrightnessMax:(id <MGLStyleAttributeValue>)rasterBrightnessMax
 {
-    // rasterLayer->setRasterBrightnessMax(rasterBrightnessMax.number.floatValue);
+    rasterLayer->setRasterBrightnessMax(rasterBrightnessMax.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterBrightnessMax
 {
@@ -57,7 +54,7 @@
 }
 - (void)setRasterSaturation:(id <MGLStyleAttributeValue>)rasterSaturation
 {
-    // rasterLayer->setRasterSaturation(rasterSaturation.number.floatValue);
+    rasterLayer->setRasterSaturation(rasterSaturation.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterSaturation
 {
@@ -65,7 +62,7 @@
 }
 - (void)setRasterContrast:(id <MGLStyleAttributeValue>)rasterContrast
 {
-    // rasterLayer->setRasterContrast(rasterContrast.number.floatValue);
+    rasterLayer->setRasterContrast(rasterContrast.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterContrast
 {
@@ -73,7 +70,7 @@
 }
 - (void)setRasterFadeDuration:(id <MGLStyleAttributeValue>)rasterFadeDuration
 {
-    // rasterLayer->setRasterFadeDuration(rasterFadeDuration.number.floatValue);
+    rasterLayer->setRasterFadeDuration(rasterFadeDuration.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)rasterFadeDuration
 {

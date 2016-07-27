@@ -3,9 +3,6 @@
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
-#import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
-#import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
-#import "NSString+MGLStyleAttributeAdditions_Private.hpp"
 #import "MGLFillStyleLayer.h"
 #import <mbgl/style/layers/fill_layer.hpp>
 
@@ -33,7 +30,7 @@
 }
 - (void)setFillOpacity:(id <MGLStyleAttributeValue>)fillOpacity
 {
-    // fillLayer->setFillOpacity(fillOpacity.number.floatValue);
+    fillLayer->setFillOpacity(fillOpacity.numberValue.mbgl_numberPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)fillOpacity
 {
@@ -73,11 +70,11 @@
 }
 - (void)setFillPattern:(id <MGLStyleAttributeValue>)fillPattern
 {
-    // fillLayer->setFillPattern(std::string(fillPattern.string.UTF8String));
+    fillLayer->setFillPattern(fillPattern.stringValue.mbgl_stringPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)fillPattern
 {
-    return @"";
+    return [NSString mbgl_stringWithPropertyValue:fillLayer->getFillPattern()];
 }
 
 @end
