@@ -13,11 +13,24 @@
 
 @interface MGL<%- camelize(type) %>StyleLayer()
 @property (nonatomic) mbgl::style::<%- camelize(type) %>Layer *layer;
+@property (nonatomic, readwrite) NSString *layerID;
+@property (nonatomic, readwrite) NSString *sourceID;
 @end
 
 @implementation MGL<%- camelize(type) %>StyleLayer
 
 @synthesize mapView;
+
+- (instancetype)initWithLayerID:(NSString *)layerID sourceID:(NSString *)sourceID
+{
+    self = [super init];
+    if (self == nil) return nil;
+    _layerID = layerID;
+    _sourceID = sourceID;
+    <%- initLayer(type) %>
+    return self;
+}
+
 <% if (layoutProperties.length) { -%>
 #pragma mark - Accessing the Layout Attributes
 

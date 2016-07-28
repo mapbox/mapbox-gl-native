@@ -124,6 +124,11 @@ static NSURL *MGLStyleURL_emerald;
     self.mapView.mbglMap->removeLayer(styleLayer.layer->getID());
 }
 
+- (void)addLayer:(id <MGLStyleLayer, MGLStyleLayer_Private>)styleLayer
+{
+    self.mapView.mbglMap->addLayer(std::unique_ptr<mbgl::style::Layer>(styleLayer.layer));
+}
+
 - (void)tempUpdateStyleAndClasses
 {
     self.mapView.mbglMap->update(mbgl::Update::RecalculateStyle | mbgl::Update::Classes);

@@ -451,15 +451,20 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     MGLFillStyleLayer *buildingLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"building"];
     buildingLayer.fillColor = [UIColor blackColor];
     
-    MGLLineStyleLayer *ferryLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"road-motorway"];
-    ferryLayer.lineColor = [UIColor blackColor];
-    ferryLayer.lineWidth = @50.0f;
+    MGLLineStyleLayer *roadLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"road-primary"];
+    roadLayer.lineColor = [UIColor blackColor];
+    
+    MGLLineStyleLayer *ferryLineLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"ferry"];
+    ferryLineLayer.lineColor = [UIColor redColor];
     
     MGLSymbolStyleLayer *stateLayer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:@"state-label-lg"];
     stateLayer.textColor = [UIColor redColor];
     
     MGLFillStyleLayer *parkLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"park"];
     [self.mapView.style removeLayer:parkLayer];
+    
+    MGLFillStyleLayer *newLayer = [[MGLFillStyleLayer alloc] initWithLayerID:@"123" sourceID:@"tba"];
+    [self.mapView.style addLayer:newLayer];
     
     [self.mapView.style tempUpdateStyleAndClasses];
 }

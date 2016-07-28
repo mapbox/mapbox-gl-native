@@ -8,11 +8,24 @@
 
 @interface MGLLineStyleLayer()
 @property (nonatomic) mbgl::style::LineLayer *layer;
+@property (nonatomic, readwrite) NSString *layerID;
+@property (nonatomic, readwrite) NSString *sourceID;
 @end
 
 @implementation MGLLineStyleLayer
 
 @synthesize mapView;
+
+- (instancetype)initWithLayerID:(NSString *)layerID sourceID:(NSString *)sourceID
+{
+    self = [super init];
+    if (self == nil) return nil;
+    _layerID = layerID;
+    _sourceID = sourceID;
+    _layer = new mbgl::style::LineLayer(layerID.UTF8String, sourceID.UTF8String);
+    return self;
+}
+
 #pragma mark - Accessing the Layout Attributes
 
 

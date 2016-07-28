@@ -8,11 +8,24 @@
 
 @interface MGLBackgroundStyleLayer()
 @property (nonatomic) mbgl::style::BackgroundLayer *layer;
+@property (nonatomic, readwrite) NSString *layerID;
+@property (nonatomic, readwrite) NSString *sourceID;
 @end
 
 @implementation MGLBackgroundStyleLayer
 
 @synthesize mapView;
+
+- (instancetype)initWithLayerID:(NSString *)layerID sourceID:(NSString *)sourceID
+{
+    self = [super init];
+    if (self == nil) return nil;
+    _layerID = layerID;
+    _sourceID = sourceID;
+    _layer = new mbgl::style::BackgroundLayer(layerID.UTF8String);
+    return self;
+}
+
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setBackgroundColor:(id <MGLStyleAttributeValue>)backgroundColor

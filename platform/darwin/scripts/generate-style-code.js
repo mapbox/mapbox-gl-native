@@ -62,6 +62,14 @@ global.propertyType = function (property, layerType = null) {
     }
 }
 
+global.initLayer = function (layerType) {
+    if (layerType == "background") {
+        return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerID.UTF8String);`
+    } else {
+        return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerID.UTF8String, sourceID.UTF8String);`
+    }
+}
+
 global.setterImplementation = function(property, layerType = null) {
     switch (property.type) {
         case 'boolean':

@@ -8,11 +8,24 @@
 
 @interface MGLFillStyleLayer()
 @property (nonatomic) mbgl::style::FillLayer *layer;
+@property (nonatomic, readwrite) NSString *layerID;
+@property (nonatomic, readwrite) NSString *sourceID;
 @end
 
 @implementation MGLFillStyleLayer
 
 @synthesize mapView;
+
+- (instancetype)initWithLayerID:(NSString *)layerID sourceID:(NSString *)sourceID
+{
+    self = [super init];
+    if (self == nil) return nil;
+    _layerID = layerID;
+    _sourceID = sourceID;
+    _layer = new mbgl::style::FillLayer(layerID.UTF8String, sourceID.UTF8String);
+    return self;
+}
+
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setFillAntialias:(id <MGLStyleAttributeValue>)fillAntialias

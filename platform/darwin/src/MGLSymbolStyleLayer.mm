@@ -8,11 +8,24 @@
 
 @interface MGLSymbolStyleLayer()
 @property (nonatomic) mbgl::style::SymbolLayer *layer;
+@property (nonatomic, readwrite) NSString *layerID;
+@property (nonatomic, readwrite) NSString *sourceID;
 @end
 
 @implementation MGLSymbolStyleLayer
 
 @synthesize mapView;
+
+- (instancetype)initWithLayerID:(NSString *)layerID sourceID:(NSString *)sourceID
+{
+    self = [super init];
+    if (self == nil) return nil;
+    _layerID = layerID;
+    _sourceID = sourceID;
+    _layer = new mbgl::style::SymbolLayer(layerID.UTF8String, sourceID.UTF8String);
+    return self;
+}
+
 #pragma mark - Accessing the Layout Attributes
 
 
