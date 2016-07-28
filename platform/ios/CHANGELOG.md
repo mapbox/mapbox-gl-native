@@ -4,8 +4,8 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 
 ## 3.3.2
 
-* Fixed a crash that occurred when initializing an MGLMapView on iOS 8.1 or below. ([#5791](https://github.com/mapbox/mapbox-gl-native/pull/5791))
-* Fixed an issue where pan gestures that originated on view annotations would not pan the underlying map. ([#5813](https://github.com/mapbox/mapbox-gl-native/pull/5813))
+* Speculatively fixed a crash that occurred when initializing an MGLMapView on iOS 7.x. ([#5791](https://github.com/mapbox/mapbox-gl-native/pull/5791))
+* View-backed annotations no longer prevent the user from starting to pan the map. ([#5813](https://github.com/mapbox/mapbox-gl-native/pull/5813))
 * Fixed an issue that caused the user dot to be selected when tapping an annotation that lies within the user dot’s accuracy circle. ([#5816](https://github.com/mapbox/mapbox-gl-native/pull/5816))
 
 ## 3.3.1
