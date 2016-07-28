@@ -19,10 +19,19 @@ QQuickMapboxGLRenderer::QQuickMapboxGLRenderer()
     settings.setViewportMode(QMapboxGLSettings::FlippedYViewport);
 
     m_map.reset(new QMapboxGL(nullptr, settings));
+    connect(m_map.data(), SIGNAL(mapChanged(QMapboxGL::MapChange)), this, SLOT(onMapChanged(QMapboxGL::MapChange)));
 }
 
 QQuickMapboxGLRenderer::~QQuickMapboxGLRenderer()
 {
+}
+
+void QQuickMapboxGLRenderer::onMapChanged(QMapboxGL::MapChange change)
+{
+    if (change == QMapboxGL::MapChangeDidFinishLoadingMap) {
+        m_styleLoaded = true;
+        update();
+    }
 }
 
 QOpenGLFramebufferObject* QQuickMapboxGLRenderer::createFramebufferObject(const QSize &size)
@@ -61,6 +70,7 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
 
     if (syncStatus & QQuickMapboxGL::StyleNeedsSync) {
         m_map->setStyleURL(quickMap->style());
+        m_styleLoaded = false;
     }
 
     if (syncStatus & QQuickMapboxGL::PanNeedsSync) {
@@ -76,7 +86,19 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
         m_map->setPitch(quickMap->pitch());
     }
 
-    if (syncStatus & QQuickMapboxGL::ColorNeedsSync && m_map->isFullyLoaded()) {
-        m_map->setPaintProperty("background", "background-color", quickMap->color());
+    if (m_styleLoaded) {
+        if (!quickMap->layoutPropertyChanges().empty()) {
+            for (const auto& change: quickMap->layoutPropertyChanges()) {
+                m_map->setLayoutProperty(change.layer, change.property, change.value);
+            }
+            quickMap->layoutPropertyChanges().clear();
+        }
+
+        if (!quickMap->paintPropertyChanges().empty()) {
+            for (const auto& change: quickMap->paintPropertyChanges()) {
+                m_map->setPaintProperty(change.layer, change.property, change.value, change.klass);
+            }
+            quickMap->paintPropertyChanges().clear();
+        }
     }
 }

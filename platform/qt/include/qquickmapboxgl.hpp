@@ -34,6 +34,19 @@ class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
     Q_PROPERTY(qreal pitch READ pitch WRITE setPitch NOTIFY pitchChanged)
 
 public:
+    struct LayoutPropertyChange {
+        QString layer;
+        QString property;
+        QVariant value;
+    };
+
+    struct PaintPropertyChange {
+        QString layer;
+        QString property;
+        QVariant value;
+        QString klass;
+    };
+
     QQuickMapboxGL(QQuickItem *parent = 0);
     virtual ~QQuickMapboxGL();
 
@@ -69,6 +82,9 @@ public:
 
     Q_INVOKABLE void pan(int dx, int dy);
 
+    QList<LayoutPropertyChange>& layoutPropertyChanges() { return m_layoutChanges; }
+    QList<PaintPropertyChange>& paintPropertyChanges() { return m_paintChanges; }
+
     // MapboxGL QML Type interface.
     void setStyle(const QString &style);
     QString style() const;
@@ -81,6 +97,9 @@ public:
 
     QPointF swapPan();
 
+    void setLayoutProperty(const QString &layer, const QString &property, const QVariant &value);
+    void setPaintProperty(const QString &layer, const QString &property, const QVariant &value, const QString &klass = QString());
+
     enum SyncState {
         NothingNeedsSync = 0,
         ZoomNeedsSync    = 1 << 0,
@@ -89,7 +108,6 @@ public:
         PanNeedsSync     = 1 << 3,
         BearingNeedsSync = 1 << 4,
         PitchNeedsSync   = 1 << 5,
-        ColorNeedsSync   = 1 << 6,
     };
 
     int swapSyncState();
@@ -123,7 +141,9 @@ private:
 
     QGeoCoordinate m_center;
     QGeoShape m_visibleRegion;
-    QColor m_color = Qt::black;
+    QColor m_color;
+    QList<LayoutPropertyChange> m_layoutChanges;
+    QList<PaintPropertyChange> m_paintChanges;
 
     QString m_style;
     qreal m_bearing = 0;

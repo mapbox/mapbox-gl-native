@@ -4,8 +4,9 @@
 #include <QQuickFramebufferObject>
 #include <QScopedPointer>
 
+#include <QMapboxGL>
+
 class QGeoCoordinate;
-class QMapboxGL;
 class QOpenGLFramebufferObject;
 class QSize;
 
@@ -25,8 +26,12 @@ public:
 signals:
     void centerChanged(const QGeoCoordinate &);
 
+public slots:
+    void onMapChanged(QMapboxGL::MapChange);
+
 private:
     bool m_initialized = false;
+    bool m_styleLoaded = false;
 
     QScopedPointer<QMapboxGL> m_map;
 };
