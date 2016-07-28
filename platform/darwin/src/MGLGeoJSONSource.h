@@ -2,8 +2,8 @@
 
 @interface MGLGeoJSONSource : MGLSource
 
-- (instancetype)initWithSourceID:(NSString *)sourceID url:(NSURL *)url NS_DESIGNATED_INITIALIZER;
+@property (nonatomic, readonly, copy) NSString *data;
 
-- (NSString *)urlString;
+- (instancetype)initWithSourceID:(NSString *)sourceID url:(NSURL *)url NS_DESIGNATED_INITIALIZER;
 
 @end

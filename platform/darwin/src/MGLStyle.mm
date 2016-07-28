@@ -10,6 +10,7 @@
 
 #import "MGLStyle_Private.hpp"
 #import "MGLStyleLayer_Private.hpp"
+#import "MGLSource_Private.hpp"
 #import "MGLSource.h"
 
 #import <mbgl/util/default_styles.hpp>
@@ -114,10 +115,9 @@ static NSURL *MGLStyleURL_emerald;
         return MGLRasterStyleLayer.class;
     } else if (dynamic_cast<mbgl::style::CircleLayer *>(layer)) {
         return MGLCircleStyleLayer.class;
-    } else {
-        [NSException raise:@"Layer type not handled" format:@""];
     }
-    return @"";
+    [NSException raise:@"Layer type not handled" format:@""];
+    return nil;
 }
 
 - (void)removeLayer:(id <MGLStyleLayer_Private>)styleLayer
@@ -132,9 +132,12 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)addSource:(MGLGeoJSONSource *)source
 {
-    auto mbgl_source = std::make_unique<mbgl::style::GeoJSONSource>(source.sourceID.UTF8String);
-    mbgl_source->setURL(source.urlString.UTF8String);
-    self.mapView.mbglMap->addSource(std::move(mbgl_source));
+    self.mapView.mbglMap->addSource(std::move([source mbgl_source]));
+}
+
+- (void)removeSource:(MGLSource *)source
+{
+    self.mapView.mbglMap->removeSource(source.sourceID.UTF8String);
 }
 
 - (void)tempUpdateStyleAndClasses

@@ -174,6 +174,8 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 - (void)addSource:(MGLSource *)source;
 
+- (void)removeSource:(MGLSource *)source;
+
 - (void)tempUpdateStyleAndClasses;
 
 @end
