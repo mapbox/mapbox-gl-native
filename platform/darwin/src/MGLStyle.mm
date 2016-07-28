@@ -3,12 +3,21 @@
 #import "MGLMapView_Private.hpp"
 #import "MGLStyleLayer.h"
 #import "MGLFillStyleLayer.h"
+#import "MGLLineStyleLayer.h"
+#import "MGLCircleStyleLayer.h"
+#import "MGLSymbolStyleLayer.h"
+#import "MGLRasterStyleLayer.h"
+
 #import "MGLStyle_Private.hpp"
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLSource.h"
 
 #import <mbgl/util/default_styles.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/mbgl.hpp>
 
 @interface MGLStyle()
@@ -77,22 +86,47 @@ static NSURL *MGLStyleURL_emerald;
     return self.mapView.mbglMap->getSource(identifier.UTF8String);
 }
 
-- (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier
+- (id <MGLStyleLayer>)layerWithIdentifier:(NSString *)identifier
 {
-    auto *layer = self.mapView.mbglMap->getLayer(identifier.UTF8String);
-    const std::string layerID = layer->getID();
-    auto fillLayer = reinterpret_cast<mbgl::style::FillLayer *>(layer);
+    auto layer = self.mapView.mbglMap->getLayer(identifier.UTF8String);
     
-    MGLFillStyleLayer *fillStyleLayer = [[MGLFillStyleLayer alloc] init];
-    fillStyleLayer.layer = fillLayer;
-    fillStyleLayer.mapView = self.mapView;
+    const std::string class_name = typeid(*layer).name();
+    Class clazz = [self classFromLayer:layer];
     
-    return fillStyleLayer;
+    id <MGLStyleLayer, MGLStyleLayer_Private> styleLayer = [[clazz alloc] init];
+    styleLayer.layer = layer;
+    styleLayer.mapView = self.mapView;
+    
+    return styleLayer;
 }
 
-- (void)removeLayer:(MGLStyleLayer *)styleLayer
+- (Class)classFromLayer:(mbgl::style::Layer *)layer
+{
+    // TODO: Improve this
+    if (dynamic_cast<mbgl::style::FillLayer *>(layer)) {
+        return MGLFillStyleLayer.class;
+    } else if (dynamic_cast<mbgl::style::LineLayer *>(layer)) {
+        return MGLLineStyleLayer.class;
+    } else if (dynamic_cast<mbgl::style::SymbolLayer *>(layer)) {
+        return MGLSymbolStyleLayer.class;
+    } else if (dynamic_cast<mbgl::style::RasterLayer *>(layer)) {
+        return MGLRasterStyleLayer.class;
+    } else if (dynamic_cast<mbgl::style::CircleLayer *>(layer)) {
+        return MGLCircleStyleLayer.class;
+    } else {
+        [NSException raise:@"Layer type not handled" format:@""];
+    }
+    return @"";
+}
+
+- (void)removeLayer:(id <MGLStyleLayer_Private>)styleLayer
 {
     self.mapView.mbglMap->removeLayer(styleLayer.layer->getID());
+}
+
+- (void)tempUpdateStyleAndClasses
+{
+    self.mapView.mbglMap->update(mbgl::Update::RecalculateStyle | mbgl::Update::Classes);
 }
 
 @end

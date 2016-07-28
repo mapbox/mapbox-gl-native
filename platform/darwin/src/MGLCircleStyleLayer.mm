@@ -12,6 +12,7 @@
 
 @implementation MGLCircleStyleLayer
 
+@synthesize mapView;
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setCircleRadius:(id <MGLStyleAttributeValue>)circleRadius

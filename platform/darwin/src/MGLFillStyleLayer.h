@@ -11,7 +11,7 @@ typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
     MGLFillStyleLayerFillTranslateAnchorViewport,
 };
 
-@interface MGLFillStyleLayer : MGLStyleLayer
+@interface MGLFillStyleLayer : NSObject <MGLStyleLayer>
 
 #pragma mark - Accessing the Paint Attributes
 

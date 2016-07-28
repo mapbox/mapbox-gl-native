@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 
-@interface MGLStyleLayer : NSObject
+@class MGLMapView;
 
-- (void)updateStyleAndClasses;
-
+@protocol MGLStyleLayer <NSObject>
+@property (nonatomic, weak) MGLMapView *mapView;
 @end

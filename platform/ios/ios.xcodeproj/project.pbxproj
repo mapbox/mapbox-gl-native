@@ -59,12 +59,12 @@
 		353933F31D3FB753003F57D7 /* MGLCircleStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933F11D3FB753003F57D7 /* MGLCircleStyleLayer.h */; };
 		353933F51D3FB785003F57D7 /* MGLBackgroundStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933F41D3FB785003F57D7 /* MGLBackgroundStyleLayer.h */; };
 		353933F61D3FB785003F57D7 /* MGLBackgroundStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933F41D3FB785003F57D7 /* MGLBackgroundStyleLayer.h */; };
-		353933F81D3FB79F003F57D7 /* MGLLineStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933F71D3FB79F003F57D7 /* MGLLineStyleLayer.h */; };
-		353933F91D3FB79F003F57D7 /* MGLLineStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933F71D3FB79F003F57D7 /* MGLLineStyleLayer.h */; };
+		353933F81D3FB79F003F57D7 /* MGLLineStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933F71D3FB79F003F57D7 /* MGLLineStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		353933F91D3FB79F003F57D7 /* MGLLineStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933F71D3FB79F003F57D7 /* MGLLineStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		353933FB1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933FA1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h */; };
 		353933FC1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933FA1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h */; };
-		353933FE1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933FD1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h */; };
-		353933FF1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933FD1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h */; };
+		353933FE1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933FD1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		353933FF1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933FD1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		353D23961D0B0DFE002BE09D /* MGLAnnotationViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */; };
 		354D42DC1D4919F900F400A1 /* NSValue+MGLStyleAttributeAdditions_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 354D42DB1D4919F900F400A1 /* NSValue+MGLStyleAttributeAdditions_Private.hpp */; };
 		354D42DD1D4919F900F400A1 /* NSValue+MGLStyleAttributeAdditions_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 354D42DB1D4919F900F400A1 /* NSValue+MGLStyleAttributeAdditions_Private.hpp */; };

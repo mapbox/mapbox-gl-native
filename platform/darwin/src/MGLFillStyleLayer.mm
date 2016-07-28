@@ -12,6 +12,7 @@
 
 @implementation MGLFillStyleLayer
 
+@synthesize mapView;
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setFillAntialias:(id <MGLStyleAttributeValue>)fillAntialias

@@ -58,7 +58,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
     MGLSymbolStyleLayerTextTranslateAnchorViewport,
 };
 
-@interface MGLSymbolStyleLayer : MGLStyleLayer
+@interface MGLSymbolStyleLayer : NSObject <MGLStyleLayer>
 
 #pragma mark - Accessing the Layout Attributes
 

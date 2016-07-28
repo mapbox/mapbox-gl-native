@@ -12,6 +12,7 @@
 
 @implementation MGLBackgroundStyleLayer
 
+@synthesize mapView;
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setBackgroundColor:(id <MGLStyleAttributeValue>)backgroundColor

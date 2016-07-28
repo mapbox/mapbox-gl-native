@@ -12,6 +12,7 @@
 
 @implementation MGLLineStyleLayer
 
+@synthesize mapView;
 #pragma mark - Accessing the Layout Attributes
 
 

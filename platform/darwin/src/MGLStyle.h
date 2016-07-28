@@ -2,8 +2,10 @@
 
 #import "MGLTypes.h"
 
-@class MGLFillStyleLayer;
-@class MGLStyleLayer;
+#import "MGLStyleLayer.h"
+
+//@class MGLFillStyleLayer;
+//@class MGLStyleLayer;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -165,11 +167,11 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 #pragma mark - Runtime style API
 
-- (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier;
+- (id <MGLStyleLayer>)layerWithIdentifier:(NSString *)identifier;
 
-- (void)removeLayer:(MGLStyleLayer *)styleLayer;
+- (void)removeLayer:(id <MGLStyleLayer>)styleLayer;
 
-- (void)sourceTest;
+- (void)tempUpdateStyleAndClasses;
 
 @end
 

@@ -451,10 +451,17 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     MGLFillStyleLayer *buildingLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"building"];
     buildingLayer.fillColor = [UIColor blackColor];
     
+    MGLLineStyleLayer *ferryLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"road-motorway"];
+    ferryLayer.lineColor = [UIColor blackColor];
+    ferryLayer.lineWidth = @50.0f;
+    
+    MGLSymbolStyleLayer *stateLayer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:@"state-label-lg"];
+    stateLayer.textColor = [UIColor redColor];
+    
     MGLFillStyleLayer *parkLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"park"];
     [self.mapView.style removeLayer:parkLayer];
     
-    [waterLayer updateStyleAndClasses];
+    [self.mapView.style tempUpdateStyleAndClasses];
 }
 
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer *)longPress

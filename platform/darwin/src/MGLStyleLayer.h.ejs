@@ -30,7 +30,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 <% } -%>
 <% } -%>
 
-@interface MGL<%- camelize(type) %>StyleLayer : MGLStyleLayer
+@interface MGL<%- camelize(type) %>StyleLayer : NSObject <MGLStyleLayer>
 
 <% if (layoutProperties.length) { -%>
 #pragma mark - Accessing the Layout Attributes

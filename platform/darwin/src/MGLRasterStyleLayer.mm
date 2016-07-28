@@ -12,6 +12,7 @@
 
 @implementation MGLRasterStyleLayer
 
+@synthesize mapView;
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setRasterOpacity:(id <MGLStyleAttributeValue>)rasterOpacity

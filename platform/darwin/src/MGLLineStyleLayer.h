@@ -21,7 +21,7 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
     MGLLineStyleLayerLineTranslateAnchorViewport,
 };
 
-@interface MGLLineStyleLayer : MGLStyleLayer
+@interface MGLLineStyleLayer : NSObject <MGLStyleLayer>
 
 #pragma mark - Accessing the Layout Attributes
 

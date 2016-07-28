@@ -12,6 +12,7 @@
 
 @implementation MGLSymbolStyleLayer
 
+@synthesize mapView;
 #pragma mark - Accessing the Layout Attributes
 
 

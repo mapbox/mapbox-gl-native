@@ -15,7 +15,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
     MGLCircleStyleLayerCirclePitchScaleViewport,
 };
 
-@interface MGLCircleStyleLayer : MGLStyleLayer
+@interface MGLCircleStyleLayer : NSObject <MGLStyleLayer>
 
 #pragma mark - Accessing the Paint Attributes
 
