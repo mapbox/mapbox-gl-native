@@ -1,5 +1,6 @@
-mason_use(glfw 3.1.2)
-mason_use(boost_libprogram_options 1.60.0)
+mason_use(glfw VERSION 3.1.2)
+mason_use(boost_libprogram_options VERSION 1.60.0)
+mason_use(gtest VERSION 1.7.0${MASON_CXXABI_SUFFIX})
 
 include(cmake/loop-darwin.cmake)
 

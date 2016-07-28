@@ -1,14 +1,12 @@
 #Include to use build specific variables
 include(${CMAKE_CURRENT_BINARY_DIR}/toolchain.cmake)
 
-mason_use(geojson 0.1.4)
-mason_use(jni.hpp 2.0.0)
-mason_use(libjpeg-turbo 1.4.2)
-mason_use(libpng 1.6.20)
-mason_use(libzip 0.11.2)
-mason_use(nunicode 1.6)
-mason_use(sqlite 3.9.1)
-mason_use(zlib system)
+mason_use(jni.hpp VERSION 2.0.0 HEADER_ONLY)
+mason_use(libjpeg-turbo VERSION 1.4.2)
+mason_use(libpng VERSION 1.6.20)
+mason_use(libzip VERSION 0.11.2)
+mason_use(nunicode VERSION 1.6)
+mason_use(sqlite VERSION 3.9.1)
 
 macro(mbgl_platform_core)
 
@@ -57,7 +55,6 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC nunicode)
     target_add_mason_package(mbgl-core PUBLIC libpng)
     target_add_mason_package(mbgl-core PUBLIC libjpeg-turbo)
-    target_add_mason_package(mbgl-core PUBLIC zlib)
     target_add_mason_package(mbgl-core PUBLIC libzip)
     target_add_mason_package(mbgl-core PUBLIC geojson)
     target_add_mason_package(mbgl-core PUBLIC jni.hpp)
@@ -69,6 +66,7 @@ macro(mbgl_platform_core)
         PUBLIC -lGLESv2
         PUBLIC -lstdc++
         PUBLIC -latomic
+        PUBLIC -lz
     )
 endmacro()
 

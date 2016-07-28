@@ -82,7 +82,7 @@ else()
 endif()
 
 # OS specific configurations
-if (BUILD_PLATFORM STREQUAL "macos")
+if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     list(APPEND MBGL_QT_FILES
         PRIVATE platform/darwin/src/nsthread.mm
         PRIVATE platform/darwin/src/headless_view_cgl.cpp

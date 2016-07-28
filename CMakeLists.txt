@@ -1,31 +1,37 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.1)
 project(mbgl LANGUAGES CXX C)
-include(cmake/npm.cmake)
-include(cmake/mason.cmake)
+
 include(cmake/mbgl.cmake)
 
-mason_use(geometry 0.8.0)
-mason_use(variant 1.1.0)
-mason_use(unique_resource dev)
-mason_use(rapidjson 1.0.2)
-mason_use(boost 1.60.0)
-mason_use(geojsonvt 6.1.2)
-mason_use(supercluster 0.2.0)
-mason_use(kdbush 0.1.1)
-mason_use(earcut 0.11)
-mason_use(protozero 1.3.0)
-mason_use(pixelmatch 0.9.0)
+if(NOT EXISTS ".mason/mason.cmake")
+   execute_process(
+        COMMAND git submodule update --init .mason
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+endif()
+
+include(.mason/mason.cmake)
+
+include(cmake/npm.cmake)
 
 option(WITH_CXX11ABI "Use cxx11abi mason packages" OFF)
 option(WITH_COVERAGE "Enable coverage reports" OFF)
 
 if(WITH_CXX11ABI)
-    mason_use(geojson 0.1.4-cxx11abi)
-    mason_use(gtest 1.7.0-cxx11abi)
-else()
-    mason_use(geojson 0.1.4)
-    mason_use(gtest 1.7.0)
+    set(MASON_CXXABI_SUFFIX -cxx11abi)
 endif()
+
+mason_use(geometry VERSION 0.8.0 HEADER_ONLY)
+mason_use(variant VERSION 1.1.0 HEADER_ONLY)
+mason_use(unique_resource VERSION dev HEADER_ONLY)
+mason_use(rapidjson VERSION 1.0.2 HEADER_ONLY)
+mason_use(boost VERSION 1.60.0 HEADER_ONLY)
+mason_use(geojsonvt VERSION 6.1.2 HEADER_ONLY)
+mason_use(supercluster VERSION 0.2.0 HEADER_ONLY)
+mason_use(kdbush VERSION 0.1.1 HEADER_ONLY)
+mason_use(earcut VERSION 0.11 HEADER_ONLY)
+mason_use(protozero VERSION 1.3.0 HEADER_ONLY)
+mason_use(pixelmatch VERSION 0.9.0 HEADER_ONLY)
+mason_use(geojson VERSION 0.1.4${MASON_CXXABI_SUFFIX})
 
 if(WITH_COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")

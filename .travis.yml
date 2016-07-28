@@ -46,6 +46,7 @@ before_script:
 script:
   - make linux
   - make test
+  - make run-test
 after_script:
   - ccache --show-stats
   - ./platform/linux/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
