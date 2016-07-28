@@ -4,6 +4,8 @@
 
 #import "MGLStyleLayer.h"
 
+@class MGLSource;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -166,9 +168,11 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 - (id <MGLStyleLayer>)layerWithIdentifier:(NSString *)identifier;
 
+- (void)addLayer:(id <MGLStyleLayer>)styleLayer;
+
 - (void)removeLayer:(id <MGLStyleLayer>)styleLayer;
 
-- (void)addLayer:(id <MGLStyleLayer>)styleLayer;
+- (void)addSource:(MGLSource *)source;
 
 - (void)tempUpdateStyleAndClasses;
 

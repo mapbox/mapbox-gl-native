@@ -36,6 +36,8 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLFillStyleLayer.h"
 #import "MGLLineStyleLayer.h"
 #import "MGLSymbolStyleLayer.h"
+#import "MGLSource.h"
+#import "MGLGeoJSONSource.h"
 #import "MGLTilePyramidOfflineRegion.h"
 #import "MGLTypes.h"
 #import "MGLUserLocation.h"

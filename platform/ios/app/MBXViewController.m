@@ -463,7 +463,13 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     MGLFillStyleLayer *parkLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"park"];
     [self.mapView.style removeLayer:parkLayer];
     
-    MGLFillStyleLayer *newLayer = [[MGLFillStyleLayer alloc] initWithLayerID:@"123" sourceID:@"tba"];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"ams"
+                                                                      url:[NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"]];
+    [self.mapView.style addSource:source];
+    
+    MGLFillStyleLayer *newLayer = [[MGLFillStyleLayer alloc] initWithLayerID:@"test" sourceID:@"ams"];
+    newLayer.fillColor = [UIColor purpleColor];
+    
     [self.mapView.style addLayer:newLayer];
     
     [self.mapView.style tempUpdateStyleAndClasses];

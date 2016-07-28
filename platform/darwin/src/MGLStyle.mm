@@ -18,6 +18,7 @@
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/mbgl.hpp>
 
 @interface MGLStyle()
@@ -127,6 +128,13 @@ static NSURL *MGLStyleURL_emerald;
 - (void)addLayer:(id <MGLStyleLayer, MGLStyleLayer_Private>)styleLayer
 {
     self.mapView.mbglMap->addLayer(std::unique_ptr<mbgl::style::Layer>(styleLayer.layer));
+}
+
+- (void)addSource:(MGLGeoJSONSource *)source
+{
+    auto mbgl_source = std::make_unique<mbgl::style::GeoJSONSource>(source.sourceID.UTF8String);
+    mbgl_source->setURL(source.urlString.UTF8String);
+    self.mapView.mbglMap->addSource(std::move(mbgl_source));
 }
 
 - (void)tempUpdateStyleAndClasses
