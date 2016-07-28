@@ -192,6 +192,8 @@ $(foreach abi,$(ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
 android: android-arm-v7
 
 test-android:
+	$(RUN) PLATFORM=android SUBPLATFORM=x86 Makefile/test-jni-lib
+	javac test/src/Main.java
 	cd platform/android && ./gradlew testReleaseUnitTest --continue
 
 apackage:

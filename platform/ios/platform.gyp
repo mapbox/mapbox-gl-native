@@ -38,7 +38,6 @@
 
       'sources': [
         '../../test/src/main.mm',
-#        '../../src/mbgl/util/premultiply.cpp',
       ],
 
       'xcode_settings': {
