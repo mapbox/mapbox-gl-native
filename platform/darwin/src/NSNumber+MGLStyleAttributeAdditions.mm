@@ -6,7 +6,7 @@
 
 - (NSNumber *)numberValue
 {
-    return @(0);
+    return self;
 }
 
 - (mbgl::style::PropertyValue<bool>)mbgl_booleanPropertyValue

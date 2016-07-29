@@ -1,6 +1,8 @@
 #import <Foundation/Foundation.h>
 
 #import "MGLTypes.h"
+#import "MGLStyleAttributePair.h"
+#import "MGLStyleAttributeValue.h"
 
 typedef NS_ENUM(NSUInteger, MGLStyleAttributeFunctionType) {
     MGLStyleAttributeFunctionTypeExponential,
@@ -10,9 +12,9 @@ typedef NS_ENUM(NSUInteger, MGLStyleAttributeFunctionType) {
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MGLStyleAttributeFunction : NSObject
+@interface MGLStyleAttributeFunction : NSObject <MGLStyleAttributeValue>
 
-@property (nonatomic, copy) NSArray *stops;
+@property (nonatomic, copy) NSArray<MGLStyleAttributePair *> *stops;
 
 @property (nonatomic, copy, nullable) NSString *property;
 

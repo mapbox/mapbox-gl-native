@@ -472,7 +472,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     [self.mapView.style addSource:rasterSource];
     
     MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerID:@"my-raster-layer" sourceID:@"my-raster-source"];
-    //rasterLayer.rasterOpacity = @(0.5f);
+    rasterLayer.rasterOpacity = @(0.2f);
     [self.mapView.style addLayer:rasterLayer];
     
     MGLFillStyleLayer *newLayer = [[MGLFillStyleLayer alloc] initWithLayerID:@"test" sourceID:@"ams"];
