@@ -55,6 +55,7 @@
     <string name="activity_viewpager">ViewPager</string>
     <string name="title_activity_navigation_drawer">Navigation Drawer</string>
     <string name="activity_runtime_style">Runtime Style</string>
+    <string name="activity_print">Print a map</string>
 
     <!-- Description -->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
@@ -94,6 +95,7 @@
     <string name="description_viewpager">Use SupportMapFragments in a ViewPager</string>
     <string name="description_navigation_drawer">Test for Navigation Drawer support</string>
     <string name="description_runtime_style">Adopt the map style on the fly</string>
+    <string name="description_print">Shows how to print a map</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
     <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>

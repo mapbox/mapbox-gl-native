@@ -300,13 +300,21 @@
                 android:name="@string/category"
                 android:value="@string/category_fragment" />
         </activity>
-
-        <activity android:name=".activity.style.RuntimeStyleActivity"
-                  android:description="@string/description_runtime_style"
-                  android:label="@string/activity_runtime_style">
+        <activity
+            android:name=".activity.style.RuntimeStyleActivity"
+            android:description="@string/description_runtime_style"
+            android:label="@string/activity_runtime_style">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_style" />
+        </activity>
+        <activity
+            android:name=".activity.imagegenerator.PrintActivity"
+            android:description="@string/description_print"
+            android:label="@string/activity_print">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_imagegenerator" />
         </activity>
 
         <!-- Configuration Settings -->
