@@ -2660,6 +2660,10 @@ public class MapView extends FrameLayout {
         return mMyLocationView;
     }
 
+    NativeMapView getNativeMapView() {
+        return mNativeMapView;
+    }
+
     @UiThread
     void snapshot(@NonNull final MapboxMap.SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
         TextureView textureView = (TextureView) findViewById(R.id.textureView);

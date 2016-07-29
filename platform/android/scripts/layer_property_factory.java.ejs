@@ -1,0 +1,45 @@
+<%
+  const paintProperties = locals.paintProperties;
+  const layoutProperties = locals.layoutProperties;
+-%>
+// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
+package com.mapbox.mapboxsdk.style.layers;
+
+import android.annotation.SuppressLint;
+import android.support.annotation.ColorInt;
+
+/**
+ * Constructs paint/layout properties for Layers
+ * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layers>Layer style documentation</a>
+ *
+ */
+public class PropertyFactory {
+
+    public static Property<String> visibility(Boolean visible) {
+        return new LayoutProperty<>("visibility", visible? "visible": "none");
+    }
+
+<% for (const property of paintProperties) { -%>
+<% if (property.type == 'color') { -%>
+    public static Property<String> <%- camelizeWithLeadingLowercase(property.name) %>(@ColorInt int value) {
+        return new PaintProperty<>("<%-  property.name %>", colorToRgbaString(value));
+    }
+
+<% } -%>
+    public static Property<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %>(<%- propertyTypeAnnotation(property) %><%- iff(() => propertyTypeAnnotation(property), " ") %><%- propertyType(property) %> value) {
+        return new PaintProperty<>("<%-  property.name %>", value);
+    }
+
+<% } -%>
+<% for (const property of layoutProperties) { -%>
+    public static Property<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %>(<%- propertyTypeAnnotation(property) %><%- iff(() => propertyTypeAnnotation(property), " ") %><%- propertyType(property) %> value) {
+        return new LayoutProperty<>("<%-  property.name %>", value);
+    }
+
+<% } -%>
+    @SuppressLint("DefaultLocale")
+    static String colorToRgbaString(@ColorInt int value) {
+        return String.format("rgba(%d, %d, %d, %d)", (value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF, (value >> 24) & 0xFF);
+    }
+
+}

@@ -121,6 +121,10 @@ public class MyLocationView extends View {
     }
 
     private void init(Context context) {
+        if(isInEditMode()){
+            return;
+        }
+
         setEnabled(false);
 
         // setup LayoutParams

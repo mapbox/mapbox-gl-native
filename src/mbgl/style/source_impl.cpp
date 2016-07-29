@@ -207,6 +207,11 @@ static Point<int16_t> coordinateToTilePoint(const UnwrappedTileID& tileID, const
 }
 
 std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRenderedFeatures(const QueryParameters& parameters) const {
+    std::unordered_map<std::string, std::vector<Feature>> result;
+    if (renderTiles.empty()) {
+        return result;
+    }
+
     LineString<double> queryGeometry;
 
     for (const auto& p : parameters.geometry) {
@@ -214,9 +219,11 @@ std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRendere
             parameters.transformState, 0, { p.x, parameters.transformState.getHeight() - p.y }).p);
     }
 
-    mapbox::geometry::box<double> box = mapbox::geometry::envelope(queryGeometry);
+    if (queryGeometry.empty()) {
+        return result;
+    }
 
-    std::unordered_map<std::string, std::vector<Feature>> result;
+    mapbox::geometry::box<double> box = mapbox::geometry::envelope(queryGeometry);
 
     for (const auto& tilePtr : renderTiles) {
         const RenderTile& tile = tilePtr.second;

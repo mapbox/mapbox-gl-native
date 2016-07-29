@@ -54,6 +54,7 @@
     <string name="activity_minmax_zoom">Min/Max Zoom</string>
     <string name="activity_viewpager">ViewPager</string>
     <string name="title_activity_navigation_drawer">Navigation Drawer</string>
+    <string name="activity_runtime_style">Runtime Style</string>
 
     <!-- Description -->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
@@ -92,6 +93,7 @@
     <string name="description_location_picker">Use a fixed Marker to select your location</string>
     <string name="description_viewpager">Use SupportMapFragments in a ViewPager</string>
     <string name="description_navigation_drawer">Test for Navigation Drawer support</string>
+    <string name="description_runtime_style">Adopt the map style on the fly</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
     <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>
@@ -112,6 +114,7 @@
     <string name="category_offline">Offline</string>
     <string name="category_userlocation">User Location</string>
     <string name="category_navigation">Navigation</string>
+    <string name="category_style">Styling</string>
 
     <string name="action_visible_bounds_explanation">Center map around 2 markers</string>
     <string name="action_remove_polylines">Remove polylines</string>

@@ -40,6 +40,9 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
+import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
+import com.mapbox.mapboxsdk.style.sources.Source;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -101,6 +104,39 @@ public class MapboxMap {
         mSelectedMarkers = new ArrayList<>();
         mInfoWindows = new ArrayList<>();
         mMarkerViewManager = new MarkerViewManager(this, mapView);
+    }
+
+    // Style
+
+    @Nullable
+    @UiThread
+    public Layer getLayer(@NonNull String layerId) {
+        return getMapView().getNativeMapView().getLayer(layerId);
+    }
+
+    @UiThread
+    public void addLayer(@NonNull Layer layer) {
+        addLayer(layer, null);
+    }
+
+    @UiThread
+    public void addLayer(@NonNull Layer layer, String before) {
+        getMapView().getNativeMapView().addLayer(layer, before);
+    }
+
+    @UiThread
+    public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
+        getMapView().getNativeMapView().removeLayer(layerId);
+    }
+
+    @UiThread
+    public void addSource(@NonNull Source source) {
+        getMapView().getNativeMapView().addSource(source);
+    }
+
+    @UiThread
+    public void removeSource(@NonNull String sourceId) {
+        getMapView().getNativeMapView().removeSource(sourceId);
     }
 
     //

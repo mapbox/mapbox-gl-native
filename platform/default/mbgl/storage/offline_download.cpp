@@ -1,15 +1,15 @@
-#include <mbgl/storage/offline_download.hpp>
-#include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/offline_database.hpp>
+#include <mbgl/storage/offline_download.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/style/parser.hpp>
-#include <mbgl/style/tile_source_impl.hpp>
 #include <mbgl/style/sources/geojson_source_impl.hpp>
+#include <mbgl/style/tile_source_impl.hpp>
 #include <mbgl/text/glyph.hpp>
-#include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/tileset.hpp>
 
 #include <set>
@@ -66,7 +66,8 @@ std::vector<Resource> OfflineDownload::glyphResources(const style::Parser& parse
     if (!parser.glyphURL.empty()) {
         for (const auto& fontStack : parser.fontStacks()) {
             for (uint32_t i = 0; i < 256; i++) {
-                result.push_back(Resource::glyphs(parser.glyphURL, fontStack, getGlyphRange(i * 256)));
+                result.push_back(
+                    Resource::glyphs(parser.glyphURL, fontStack, getGlyphRange(i * 256)));
             }
         }
     }
@@ -74,11 +75,13 @@ std::vector<Resource> OfflineDownload::glyphResources(const style::Parser& parse
     return result;
 }
 
-std::vector<Resource> OfflineDownload::tileResources(SourceType type, uint16_t tileSize, const Tileset& tileset) const {
+std::vector<Resource>
+OfflineDownload::tileResources(SourceType type, uint16_t tileSize, const Tileset& tileset) const {
     std::vector<Resource> result;
 
     for (const auto& tile : definition.tileCover(type, tileSize, tileset.zoomRange)) {
-        result.push_back(Resource::tile(tileset.tiles[0], definition.pixelRatio, tile.x, tile.y, tile.z));
+        result.push_back(
+            Resource::tile(tileset.tiles[0], definition.pixelRatio, tile.x, tile.y, tile.z));
     }
 
     return result;
@@ -106,18 +109,26 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         switch (source->baseImpl->type) {
         case SourceType::Vector:
         case SourceType::Raster: {
-            style::TileSourceImpl* tileSource = static_cast<style::TileSourceImpl*>(source->baseImpl.get());
+            style::TileSourceImpl* tileSource =
+                static_cast<style::TileSourceImpl*>(source->baseImpl.get());
             const variant<std::string, Tileset>& urlOrTileset = tileSource->getURLOrTileset();
 
             if (urlOrTileset.is<Tileset>()) {
-                result.requiredResourceCount += tileResources(source->baseImpl->type, tileSource->getTileSize(), urlOrTileset.get<Tileset>()).size();
+                result.requiredResourceCount +=
+                    tileResources(source->baseImpl->type, tileSource->getTileSize(),
+                                  urlOrTileset.get<Tileset>())
+                        .size();
             } else {
                 result.requiredResourceCount += 1;
                 const std::string& url = urlOrTileset.get<std::string>();
                 optional<Response> sourceResponse = offlineDatabase.get(Resource::source(url));
                 if (sourceResponse) {
-                    result.requiredResourceCount += tileResources(source->baseImpl->type, tileSource->getTileSize(),
-                        style::TileSourceImpl::parseTileJSON(*sourceResponse->data, url, source->baseImpl->type, tileSource->getTileSize())).size();
+                    result.requiredResourceCount +=
+                        tileResources(source->baseImpl->type, tileSource->getTileSize(),
+                                      style::TileSourceImpl::parseTileJSON(
+                                          *sourceResponse->data, url, source->baseImpl->type,
+                                          tileSource->getTileSize()))
+                            .size();
                 } else {
                     result.requiredResourceCountIsPrecise = false;
                 }
@@ -126,10 +137,10 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         }
 
         case SourceType::GeoJSON: {
-            style::GeoJSONSource::Impl* geojsonSource = static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
-            const variant<std::string, GeoJSON>& urlOrGeoJSON = geojsonSource->getURLOrGeoJSON();
+            style::GeoJSONSource::Impl* geojsonSource =
+                static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
 
-            if (urlOrGeoJSON.is<std::string>()) {
+            if (!geojsonSource->loaded) {
                 result.requiredResourceCount += 1;
             }
             break;
@@ -153,7 +164,7 @@ void OfflineDownload::activateDownload() {
 
     requiredSourceURLs.clear();
 
-    ensureResource(Resource::style(definition.styleURL), [&] (Response styleResponse) {
+    ensureResource(Resource::style(definition.styleURL), [&](Response styleResponse) {
         status.requiredResourceCountIsPrecise = true;
 
         style::Parser parser;
@@ -165,7 +176,8 @@ void OfflineDownload::activateDownload() {
             switch (type) {
             case SourceType::Vector:
             case SourceType::Raster: {
-                const style::TileSourceImpl* tileSource = static_cast<style::TileSourceImpl*>(source->baseImpl.get());
+                const style::TileSourceImpl* tileSource =
+                    static_cast<style::TileSourceImpl*>(source->baseImpl.get());
                 const variant<std::string, Tileset>& urlOrTileset = tileSource->getURLOrTileset();
                 const uint16_t tileSize = tileSource->getTileSize();
 
@@ -176,8 +188,9 @@ void OfflineDownload::activateDownload() {
                     status.requiredResourceCountIsPrecise = false;
                     requiredSourceURLs.insert(url);
 
-                    ensureResource(Resource::source(url), [=] (Response sourceResponse) {
-                        ensureTiles(type, tileSize, style::TileSourceImpl::parseTileJSON(*sourceResponse.data, url, type, tileSize));
+                    ensureResource(Resource::source(url), [=](Response sourceResponse) {
+                        ensureTiles(type, tileSize, style::TileSourceImpl::parseTileJSON(
+                                                        *sourceResponse.data, url, type, tileSize));
 
                         requiredSourceURLs.erase(url);
                         if (requiredSourceURLs.empty()) {
@@ -189,11 +202,11 @@ void OfflineDownload::activateDownload() {
             }
 
             case SourceType::GeoJSON: {
-                style::GeoJSONSource::Impl* geojsonSource = static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
-                const variant<std::string, GeoJSON>& urlOrGeoJSON = geojsonSource->getURLOrGeoJSON();
+                style::GeoJSONSource::Impl* geojsonSource =
+                    static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
 
-                if (urlOrGeoJSON.is<std::string>()) {
-                    ensureResource(Resource::source(urlOrGeoJSON.get<std::string>()));
+                if (!geojsonSource->loaded) {
+                    ensureResource(Resource::source(geojsonSource->getURL()));
                 }
                 break;
             }
@@ -203,7 +216,7 @@ void OfflineDownload::activateDownload() {
                 break;
             }
         }
-        
+
         for (const auto& resource : spriteResources(parser)) {
             ensureResource(resource);
         }
@@ -224,14 +237,16 @@ void OfflineDownload::ensureTiles(SourceType type, uint16_t tileSize, const Tile
     }
 }
 
-void OfflineDownload::ensureResource(const Resource& resource, std::function<void (Response)> callback) {
+void OfflineDownload::ensureResource(const Resource& resource,
+                                     std::function<void(Response)> callback) {
     status.requiredResourceCount++;
 
     auto workRequestsIt = requests.insert(requests.begin(), nullptr);
-    *workRequestsIt = util::RunLoop::Get()->invokeCancellable([=] () {
+    *workRequestsIt = util::RunLoop::Get()->invokeCancellable([=]() {
         requests.erase(workRequestsIt);
 
-        optional<std::pair<Response, uint64_t>> offlineResponse = offlineDatabase.getRegionResource(id, resource);
+        optional<std::pair<Response, uint64_t>> offlineResponse =
+            offlineDatabase.getRegionResource(id, resource);
         if (offlineResponse) {
             if (callback) {
                 callback(offlineResponse->first);
@@ -243,22 +258,22 @@ void OfflineDownload::ensureResource(const Resource& resource, std::function<voi
                 status.completedTileCount += 1;
                 status.completedTileSize += offlineResponse->second;
             }
-            
+
             observer->statusChanged(status);
-            
+
             if (status.complete()) {
                 setState(OfflineRegionDownloadState::Inactive);
             }
 
             return;
         }
-        
+
         if (checkTileCountLimit(resource)) {
             return;
         }
 
         auto fileRequestsIt = requests.insert(requests.begin(), nullptr);
-        *fileRequestsIt = onlineFileSource.request(resource, [=] (Response onlineResponse) {
+        *fileRequestsIt = onlineFileSource.request(resource, [=](Response onlineResponse) {
             if (onlineResponse.error) {
                 observer->responseError(*onlineResponse.error);
                 return;
@@ -279,11 +294,11 @@ void OfflineDownload::ensureResource(const Resource& resource, std::function<voi
             }
 
             observer->statusChanged(status);
-            
+
             if (checkTileCountLimit(resource)) {
                 return;
             }
-            
+
             if (status.complete()) {
                 setState(OfflineRegionDownloadState::Inactive);
             }
@@ -292,14 +307,13 @@ void OfflineDownload::ensureResource(const Resource& resource, std::function<voi
 }
 
 bool OfflineDownload::checkTileCountLimit(const Resource& resource) {
-    if (resource.kind == Resource::Kind::Tile
-        && util::mapbox::isMapboxURL(resource.url)
-        && offlineDatabase.offlineMapboxTileCountLimitExceeded()) {
+    if (resource.kind == Resource::Kind::Tile && util::mapbox::isMapboxURL(resource.url) &&
+        offlineDatabase.offlineMapboxTileCountLimitExceeded()) {
         observer->mapboxTileCountLimitExceeded(offlineDatabase.getOfflineMapboxTileCountLimit());
         setState(OfflineRegionDownloadState::Inactive);
         return true;
     }
-    
+
     return false;
 }
 

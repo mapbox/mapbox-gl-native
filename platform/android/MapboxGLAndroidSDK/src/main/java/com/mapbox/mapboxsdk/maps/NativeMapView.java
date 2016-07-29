@@ -5,6 +5,8 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.Surface;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -16,6 +18,9 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
+import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
+import com.mapbox.mapboxsdk.style.sources.Source;
 
 import java.util.List;
 
@@ -470,6 +475,28 @@ final class NativeMapView {
         return nativeGetCameraValues(mNativeMapViewPtr);
     }
 
+    // Runtime style Api
+
+    public Layer getLayer(String layerId) {
+        return nativeGetLayer(mNativeMapViewPtr, layerId);
+    }
+
+    public void addLayer(@NonNull Layer layer, @Nullable String before) {
+        nativeAddLayer(mNativeMapViewPtr, layer.getNativePtr(), before);
+    }
+
+    public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
+        nativeRemoveLayer(mNativeMapViewPtr, layerId);
+    }
+
+    public void addSource(@NonNull Source source) {
+        nativeAddSource(mNativeMapViewPtr, source.getId(), source);
+    }
+
+    public void removeSource(@NonNull String sourceId) {
+        nativeRemoveSource(mNativeMapViewPtr, sourceId);
+    }
+
     //
     // Callbacks
     //
@@ -633,7 +660,7 @@ final class NativeMapView {
     private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, float x, float y);
 
     private native double nativeGetTopOffsetPixelsForAnnotationSymbol(long nativeMapViewPtr, String symbolName);
-    
+
     private native void nativeJumpTo(long nativeMapViewPtr, double angle, double latitude, double longitude, double pitch, double zoom);
 
     private native void nativeEaseTo(long nativeMapViewPtr, double angle, double latitude, double longitude, long duration, double pitch, double zoom, boolean easingInterpolator);
@@ -645,4 +672,14 @@ final class NativeMapView {
     private native void nativeRemoveCustomLayer(long nativeMapViewPtr, String id);
 
     private native double[] nativeGetCameraValues(long mNativeMapViewPtr);
+
+    private native Layer nativeGetLayer(long nativeMapViewPtr, String layerId);
+
+    private native void nativeAddLayer(long nativeMapViewPtr, long layerPtr, String before);
+
+    private native void nativeRemoveLayer(long nativeMapViewPtr, String layerId) throws NoSuchLayerException;
+
+    private native void nativeAddSource(long mNativeMapViewPtr, String id, Source source);
+
+    private native void nativeRemoveSource(long mNativeMapViewPtr, String sourceId);
 }
