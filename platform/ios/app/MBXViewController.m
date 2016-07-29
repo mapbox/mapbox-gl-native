@@ -444,21 +444,11 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 - (void)testRuntimeStyling
 {
-    MGLFillStyleLayer *waterLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
-    MGLStyleAttributeFunction *colorFunction = [[MGLStyleAttributeFunction alloc] init];
-    colorFunction.stops = @[[MGLStyleAttributePair pairWith:@(10.0f) and:[UIColor redColor]],
-                            [MGLStyleAttributePair pairWith:@(13.0f) and:[UIColor greenColor]],
-                            [MGLStyleAttributePair pairWith:@(16.0f) and:[UIColor blueColor]]];
-    waterLayer.fillColor = colorFunction;
-    
-    waterLayer.fillOpacity = @(0.5);
-    waterLayer.fillTranslateAnchor = MGLFillStyleLayerFillTranslateAnchorMap;
+    [self styleWaterLayer];
+    [self styleRoadLayer];
     
     MGLFillStyleLayer *buildingLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"building"];
     buildingLayer.fillColor = [UIColor blackColor];
-    
-    MGLLineStyleLayer *roadLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"road-primary"];
-    roadLayer.lineColor = [UIColor blackColor];
     
     MGLLineStyleLayer *ferryLineLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"ferry"];
     ferryLineLayer.lineColor = [UIColor redColor];
@@ -488,6 +478,44 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     [self.mapView.style addLayer:newLayer];
     
     [self.mapView.style tempUpdateStyleAndClasses];
+}
+
+- (void)styleWaterLayer
+{
+    MGLFillStyleLayer *waterLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
+    MGLStyleAttributeFunction *waterColorFunction = [[MGLStyleAttributeFunction alloc] init];
+    waterColorFunction.stops = @[[MGLStyleAttributePair pairWith:@(10.0f) and:[UIColor redColor]],
+                                 [MGLStyleAttributePair pairWith:@(13.0f) and:[UIColor greenColor]],
+                                 [MGLStyleAttributePair pairWith:@(16.0f) and:[UIColor blueColor]]];
+    
+    MGLStyleAttributeFunction *waterAntialiasFunction = [[MGLStyleAttributeFunction alloc] init];
+    waterAntialiasFunction.stops = @[[MGLStyleAttributePair pairWith:@(10.0f) and:@NO],
+                                     [MGLStyleAttributePair pairWith:@(11.0f) and:@YES],
+                                     [MGLStyleAttributePair pairWith:@(12.0f) and:@NO],
+                                     [MGLStyleAttributePair pairWith:@(13.0f) and:@YES],
+                                     [MGLStyleAttributePair pairWith:@(14.0f) and:@NO]];
+    waterLayer.fillAntialias = waterAntialiasFunction;
+    waterLayer.fillColor = waterColorFunction;
+    waterLayer.fillOpacity = @(0.5);
+    waterLayer.fillTranslateAnchor = MGLFillStyleLayerFillTranslateAnchorMap;
+}
+
+- (void)styleRoadLayer
+{
+    MGLLineStyleLayer *roadLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"road-primary"];
+    roadLayer.lineColor = [UIColor blackColor];
+    MGLStyleAttributeFunction *lineWidthFunction = [[MGLStyleAttributeFunction alloc] init];
+    lineWidthFunction.stops = @[[MGLStyleAttributePair pairWith:@(10.0f) and:@(2.0f)],
+                                [MGLStyleAttributePair pairWith:@(13.0f) and:@(8.0f)],
+                                [MGLStyleAttributePair pairWith:@(16.0f) and:@(2.0f)]];
+    
+    MGLStyleAttributeFunction *roadLineColor = [[MGLStyleAttributeFunction alloc] init];
+    roadLineColor.stops = @[[MGLStyleAttributePair pairWith:@(10.0f) and:[UIColor purpleColor]],
+                            [MGLStyleAttributePair pairWith:@(13.0f) and:[UIColor yellowColor]],
+                            [MGLStyleAttributePair pairWith:@(16.0f) and:[UIColor cyanColor]]];
+    roadLayer.lineColor = roadLineColor;
+    roadLayer.lineWidth = lineWidthFunction;
+    roadLayer.lineGapWidth = lineWidthFunction;
 }
 
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer *)longPress

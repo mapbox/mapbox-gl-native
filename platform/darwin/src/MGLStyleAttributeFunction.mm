@@ -19,14 +19,38 @@
     std::vector<std::pair<float, mbgl::Color>> stops;
     
     for (MGLStyleAttributePair *stop in self.stops) {
-        if ([stop.t2 isKindOfClass:UIColor.class]) {
-            NSNumber *t1 = stop.t1;
-            UIColor *t2 = stop.t2; // TODO: t2 could be bool, float or color.
-            stops.emplace_back(std::make_pair(t1.floatValue, t2.mbgl_color));
-        }
+        NSNumber *t1 = stop.t1;
+        UIColor *t2 = stop.t2;
+        stops.emplace_back(std::make_pair(t1.floatValue, t2.mbgl_color));
     }
     
     return mbgl::style::Function<mbgl::Color>({{stops}}, _base.floatValue);
+}
+
+- (mbgl::style::PropertyValue<float>)mbgl_floatPropertyValue
+{
+    std::vector<std::pair<float, float>> stops;
+    
+    for (MGLStyleAttributePair *stop in self.stops) {
+        NSNumber *t1 = stop.t1;
+        NSNumber *t2 = stop.t2;
+        stops.emplace_back(std::make_pair(t1.floatValue, t2.floatValue));
+    }
+    
+    return mbgl::style::Function<float>({{stops}}, _base.floatValue);
+}
+
+- (mbgl::style::PropertyValue<bool>)mbgl_boolPropertyValue
+{
+    std::vector<std::pair<float, bool>> stops;
+    
+    for (MGLStyleAttributePair *stop in self.stops) {
+        NSNumber *t1 = stop.t1;
+        NSNumber *t2 = stop.t2;
+        stops.emplace_back(std::make_pair(t1.floatValue, t2.boolValue));
+    }
+    
+    return mbgl::style::Function<bool>({{stops}}, _base.floatValue);
 }
 
 @end

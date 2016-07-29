@@ -11,4 +11,9 @@
     return pair;
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<t1:%@ t2:%@>", _t1, _t2];
+}
+
 @end
