@@ -445,7 +445,13 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 - (void)testRuntimeStyling
 {
     MGLFillStyleLayer *waterLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
-    waterLayer.fillColor = [UIColor blueColor];
+    MGLStyleAttributeFunction *colorFunction = [[MGLStyleAttributeFunction alloc] init];
+    colorFunction.stops = @[[MGLStyleAttributePair pairWith:@(10.0f) and:[UIColor redColor]],
+                            [MGLStyleAttributePair pairWith:@(13.0f) and:[UIColor greenColor]],
+                            [MGLStyleAttributePair pairWith:@(16.0f) and:[UIColor blueColor]]];
+    waterLayer.fillColor = colorFunction;
+    
+    waterLayer.fillOpacity = @(0.5);
     waterLayer.fillTranslateAnchor = MGLFillStyleLayerFillTranslateAnchorMap;
     
     MGLFillStyleLayer *buildingLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"building"];
@@ -467,13 +473,14 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"ams" url:geoJSONURL];
     [self.mapView.style addSource:source];
     
+    /*
     NSURL *rasterURL = [NSURL URLWithString:@"mapbox://mapbox.satellite"];
     MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithSourceID:@"my-raster-source" url:rasterURL tileSize:512];
-    [self.mapView.style addSource:rasterSource];
+    [self.mapView.style addSource:rasterSource];*/
     
-    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerID:@"my-raster-layer" sourceID:@"my-raster-source"];
-    rasterLayer.rasterOpacity = @(0.2f);
-    [self.mapView.style addLayer:rasterLayer];
+    //MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerID:@"my-raster-layer" sourceID:@"my-raster-source"];
+    //rasterLayer.rasterOpacity = @(0.2f);
+    //[self.mapView.style addLayer:rasterLayer];
     
     MGLFillStyleLayer *newLayer = [[MGLFillStyleLayer alloc] initWithLayerID:@"test" sourceID:@"ams"];
     newLayer.fillColor = [UIColor purpleColor];

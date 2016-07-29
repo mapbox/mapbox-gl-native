@@ -28,39 +28,39 @@
 
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setCircleRadius:(id <MGLStyleAttributeValue>)circleRadius
+- (void)setCircleRadius:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleRadius
 {
-    self.layer->setCircleRadius(circleRadius.numberValue.mbgl_numberPropertyValue);
+    self.layer->setCircleRadius(circleRadius.mbgl_floatPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)circleRadius
 {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getCircleRadius()];
 }
-- (void)setCircleColor:(id <MGLStyleAttributeValue>)circleColor
+- (void)setCircleColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleColor
 {
-    self.layer->setCircleColor(circleColor.colorValue.mbgl_propertyValue);
+    self.layer->setCircleColor(circleColor.mbgl_colorPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)circleColor
 {
     return [MGLColor mbgl_propertyValue:self.layer->getCircleColor()];
 }
-- (void)setCircleBlur:(id <MGLStyleAttributeValue>)circleBlur
+- (void)setCircleBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleBlur
 {
-    self.layer->setCircleBlur(circleBlur.numberValue.mbgl_numberPropertyValue);
+    self.layer->setCircleBlur(circleBlur.mbgl_floatPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)circleBlur
 {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getCircleBlur()];
 }
-- (void)setCircleOpacity:(id <MGLStyleAttributeValue>)circleOpacity
+- (void)setCircleOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleOpacity
 {
-    self.layer->setCircleOpacity(circleOpacity.numberValue.mbgl_numberPropertyValue);
+    self.layer->setCircleOpacity(circleOpacity.mbgl_floatPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)circleOpacity
 {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getCircleOpacity()];
 }
-- (void)setCircleTranslate:(id <MGLStyleAttributeValue>)circleTranslate
+- (void)setCircleTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleTranslate
 {
     // TODO: setterArray
 }
@@ -68,7 +68,7 @@
 {
     return @[];
 }
-- (void)setCircleTranslateAnchor:(id <MGLStyleAttributeValue>)circleTranslateAnchor
+- (void)setCircleTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleTranslateAnchor
 {
     // TODO: setterEnum
 }
@@ -78,7 +78,7 @@
     const char *type = @encode(MGLCircleStyleLayerCircleTranslateAnchor);
     return [NSValue value:&rawValue withObjCType:type];
 }
-- (void)setCirclePitchScale:(id <MGLStyleAttributeValue>)circlePitchScale
+- (void)setCirclePitchScale:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circlePitchScale
 {
     // TODO: setterEnum
 }

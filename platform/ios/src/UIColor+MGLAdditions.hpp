@@ -7,7 +7,7 @@
 
 - (mbgl::Color)mbgl_color;
 
-- (mbgl::style::PropertyValue<mbgl::Color>)mbgl_propertyValue;
+- (mbgl::style::PropertyValue<mbgl::Color>)mbgl_colorPropertyValue;
 
 + (UIColor *)mbgl_color:(mbgl::Color)color;
 

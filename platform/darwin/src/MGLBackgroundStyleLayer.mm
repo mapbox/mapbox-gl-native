@@ -28,15 +28,15 @@
 
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setBackgroundColor:(id <MGLStyleAttributeValue>)backgroundColor
+- (void)setBackgroundColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundColor
 {
-    self.layer->setBackgroundColor(backgroundColor.colorValue.mbgl_propertyValue);
+    self.layer->setBackgroundColor(backgroundColor.mbgl_colorPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)backgroundColor
 {
     return [MGLColor mbgl_propertyValue:self.layer->getBackgroundColor()];
 }
-- (void)setBackgroundPattern:(id <MGLStyleAttributeValue>)backgroundPattern
+- (void)setBackgroundPattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundPattern
 {
     self.layer->setBackgroundPattern(backgroundPattern.stringValue.mbgl_stringPropertyValue);
 }
@@ -44,9 +44,9 @@
 {
     return [NSString mbgl_stringWithPropertyValue:self.layer->getBackgroundPattern()];
 }
-- (void)setBackgroundOpacity:(id <MGLStyleAttributeValue>)backgroundOpacity
+- (void)setBackgroundOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundOpacity
 {
-    self.layer->setBackgroundOpacity(backgroundOpacity.numberValue.mbgl_numberPropertyValue);
+    self.layer->setBackgroundOpacity(backgroundOpacity.mbgl_floatPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)backgroundOpacity
 {

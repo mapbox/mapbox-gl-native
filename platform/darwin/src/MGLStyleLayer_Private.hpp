@@ -5,6 +5,8 @@
 #import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
 #import "NSString+MGLStyleAttributeAdditions_Private.hpp"
 #import "NSValue+MGLStyleAttributeAdditions_Private.hpp"
+#import "MGLStyleAttributeFunction_Private.hpp"
+#import "MGLStyleAttributeValue_Private.hpp"
 
 #if TARGET_OS_IPHONE
 #import "UIColor+MGLAdditions.hpp"

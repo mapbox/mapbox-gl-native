@@ -28,39 +28,39 @@
 
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setFillAntialias:(id <MGLStyleAttributeValue>)fillAntialias
+- (void)setFillAntialias:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillAntialias
 {
-    self.layer->setFillAntialias(fillAntialias.numberValue.mbgl_booleanPropertyValue);
+    self.layer->setFillAntialias(fillAntialias.mbgl_boolPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)fillAntialias
 {
     return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getFillAntialias()];
 }
-- (void)setFillOpacity:(id <MGLStyleAttributeValue>)fillOpacity
+- (void)setFillOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillOpacity
 {
-    self.layer->setFillOpacity(fillOpacity.numberValue.mbgl_numberPropertyValue);
+    self.layer->setFillOpacity(fillOpacity.mbgl_floatPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)fillOpacity
 {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getFillOpacity()];
 }
-- (void)setFillColor:(id <MGLStyleAttributeValue>)fillColor
+- (void)setFillColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillColor
 {
-    self.layer->setFillColor(fillColor.colorValue.mbgl_propertyValue);
+    self.layer->setFillColor(fillColor.mbgl_colorPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)fillColor
 {
     return [MGLColor mbgl_propertyValue:self.layer->getFillColor()];
 }
-- (void)setFillOutlineColor:(id <MGLStyleAttributeValue>)fillOutlineColor
+- (void)setFillOutlineColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillOutlineColor
 {
-    self.layer->setFillOutlineColor(fillOutlineColor.colorValue.mbgl_propertyValue);
+    self.layer->setFillOutlineColor(fillOutlineColor.mbgl_colorPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)fillOutlineColor
 {
     return [MGLColor mbgl_propertyValue:self.layer->getFillOutlineColor()];
 }
-- (void)setFillTranslate:(id <MGLStyleAttributeValue>)fillTranslate
+- (void)setFillTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslate
 {
     // TODO: setterArray
 }
@@ -68,7 +68,7 @@
 {
     return @[];
 }
-- (void)setFillTranslateAnchor:(id <MGLStyleAttributeValue>)fillTranslateAnchor
+- (void)setFillTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslateAnchor
 {
     // TODO: setterEnum
 }
@@ -78,7 +78,7 @@
     const char *type = @encode(MGLFillStyleLayerFillTranslateAnchor);
     return [NSValue value:&rawValue withObjCType:type];
 }
-- (void)setFillPattern:(id <MGLStyleAttributeValue>)fillPattern
+- (void)setFillPattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillPattern
 {
     self.layer->setFillPattern(fillPattern.stringValue.mbgl_stringPropertyValue);
 }

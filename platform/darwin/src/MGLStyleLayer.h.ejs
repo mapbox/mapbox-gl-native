@@ -39,7 +39,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 /**
   <%- property.doc %>
 */
-@property (nonatomic) <%- propertyType(property, type) %> <% if (isObject(property)) { -%>*<% } -%><%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic) <%- propertyType(property, false, type) %> <% if (isObject(property)) { -%>*<% } -%><%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 <% } -%>
@@ -49,7 +49,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 /**
   <%- property.doc %>
 */
-@property (nonatomic) <%- propertyType(property, type) %> <% if (isObject(property)) { -%>*<% } -%><%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic) <%- propertyType(property, false, type) %> <% if (isObject(property)) { -%>*<% } -%><%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 @end

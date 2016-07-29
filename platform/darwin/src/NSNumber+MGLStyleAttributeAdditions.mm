@@ -9,15 +9,13 @@
     return self;
 }
 
-- (mbgl::style::PropertyValue<bool>)mbgl_booleanPropertyValue
+- (mbgl::style::PropertyValue<bool>)mbgl_boolPropertyValue
 {
-    // TODO: Figure out if value is constant, undefined or a function
     return mbgl::style::PropertyValue<bool> { self.boolValue };
 }
 
-- (mbgl::style::PropertyValue<float>)mbgl_numberPropertyValue
+- (mbgl::style::PropertyValue<float>)mbgl_floatPropertyValue
 {
-    // TODO: Figure out if value is constant, undefined or a function
     return mbgl::style::PropertyValue<float> { self.floatValue };
 }
 

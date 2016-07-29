@@ -41,25 +41,8 @@ global.isObject = function (property) {
     }
 }
 
-global.propertyType = function (property, layerType = null) {
-    return `id <MGLStyleAttributeValue>`;
-    switch (property.type) {
-        case 'boolean':
-            //return `id <MGLStyleAttributeValue>`;
-            return 'MGLNumberStyleAttributeValue';
-        case 'number':
-            return 'MGLNumberStyleAttributeValue';
-        case 'string':
-            return 'MGLStringStyleAttributeValue';
-        case 'enum':
-            //return `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`
-            return 'MGLNumberStyleAttributeValue';
-        case 'color':
-            return `${colorType}`;
-        case 'array':
-            return `MGLNumberStyleAttributeValue`;
-        default: throw new Error(`unknown type for ${property.name}`)
-    }
+global.propertyType = function (property, _private=false) {
+    return (_private) ? `id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>` : `id <MGLStyleAttributeValue>`;
 }
 
 global.initLayer = function (layerType) {
@@ -73,15 +56,15 @@ global.initLayer = function (layerType) {
 global.setterImplementation = function(property, layerType = null) {
     switch (property.type) {
         case 'boolean':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.numberValue.mbgl_booleanPropertyValue);`;
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_boolPropertyValue);`;
         case 'number':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.numberValue.mbgl_numberPropertyValue);`;
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_floatPropertyValue);`;
         case 'string':
             return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.stringValue.mbgl_stringPropertyValue);`;
         case 'enum':
             return `// TODO: setterEnum`; 
         case 'color':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.colorValue.mbgl_propertyValue);`;
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_colorPropertyValue);`;
         case 'array':
             return '// TODO: setterArray';
         default: throw new Error(`unknown type for ${property.name}`)

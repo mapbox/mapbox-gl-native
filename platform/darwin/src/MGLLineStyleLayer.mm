@@ -29,7 +29,7 @@
 #pragma mark - Accessing the Layout Attributes
 
 
-- (void)setLineCap:(id <MGLStyleAttributeValue>)lineCap
+- (void)setLineCap:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineCap
 {
     // TODO: setterEnum
 }
@@ -41,7 +41,7 @@
     return [NSValue value:&rawValue withObjCType:type];
 }
 
-- (void)setLineJoin:(id <MGLStyleAttributeValue>)lineJoin
+- (void)setLineJoin:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineJoin
 {
     // TODO: setterEnum
 }
@@ -53,9 +53,9 @@
     return [NSValue value:&rawValue withObjCType:type];
 }
 
-- (void)setLineMiterLimit:(id <MGLStyleAttributeValue>)lineMiterLimit
+- (void)setLineMiterLimit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineMiterLimit
 {
-    self.layer->setLineMiterLimit(lineMiterLimit.numberValue.mbgl_numberPropertyValue);
+    self.layer->setLineMiterLimit(lineMiterLimit.mbgl_floatPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)lineMiterLimit
@@ -63,9 +63,9 @@
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getLineMiterLimit()];
 }
 
-- (void)setLineRoundLimit:(id <MGLStyleAttributeValue>)lineRoundLimit
+- (void)setLineRoundLimit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineRoundLimit
 {
-    self.layer->setLineRoundLimit(lineRoundLimit.numberValue.mbgl_numberPropertyValue);
+    self.layer->setLineRoundLimit(lineRoundLimit.mbgl_floatPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)lineRoundLimit
@@ -74,23 +74,23 @@
 }
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setLineOpacity:(id <MGLStyleAttributeValue>)lineOpacity
+- (void)setLineOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineOpacity
 {
-    self.layer->setLineOpacity(lineOpacity.numberValue.mbgl_numberPropertyValue);
+    self.layer->setLineOpacity(lineOpacity.mbgl_floatPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)lineOpacity
 {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getLineOpacity()];
 }
-- (void)setLineColor:(id <MGLStyleAttributeValue>)lineColor
+- (void)setLineColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineColor
 {
-    self.layer->setLineColor(lineColor.colorValue.mbgl_propertyValue);
+    self.layer->setLineColor(lineColor.mbgl_colorPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)lineColor
 {
     return [MGLColor mbgl_propertyValue:self.layer->getLineColor()];
 }
-- (void)setLineTranslate:(id <MGLStyleAttributeValue>)lineTranslate
+- (void)setLineTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineTranslate
 {
     // TODO: setterArray
 }
@@ -98,7 +98,7 @@
 {
     return @[];
 }
-- (void)setLineTranslateAnchor:(id <MGLStyleAttributeValue>)lineTranslateAnchor
+- (void)setLineTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineTranslateAnchor
 {
     // TODO: setterEnum
 }
@@ -108,39 +108,39 @@
     const char *type = @encode(MGLLineStyleLayerLineTranslateAnchor);
     return [NSValue value:&rawValue withObjCType:type];
 }
-- (void)setLineWidth:(id <MGLStyleAttributeValue>)lineWidth
+- (void)setLineWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineWidth
 {
-    self.layer->setLineWidth(lineWidth.numberValue.mbgl_numberPropertyValue);
+    self.layer->setLineWidth(lineWidth.mbgl_floatPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)lineWidth
 {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getLineWidth()];
 }
-- (void)setLineGapWidth:(id <MGLStyleAttributeValue>)lineGapWidth
+- (void)setLineGapWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineGapWidth
 {
-    self.layer->setLineGapWidth(lineGapWidth.numberValue.mbgl_numberPropertyValue);
+    self.layer->setLineGapWidth(lineGapWidth.mbgl_floatPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)lineGapWidth
 {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getLineGapWidth()];
 }
-- (void)setLineOffset:(id <MGLStyleAttributeValue>)lineOffset
+- (void)setLineOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineOffset
 {
-    self.layer->setLineOffset(lineOffset.numberValue.mbgl_numberPropertyValue);
+    self.layer->setLineOffset(lineOffset.mbgl_floatPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)lineOffset
 {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getLineOffset()];
 }
-- (void)setLineBlur:(id <MGLStyleAttributeValue>)lineBlur
+- (void)setLineBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineBlur
 {
-    self.layer->setLineBlur(lineBlur.numberValue.mbgl_numberPropertyValue);
+    self.layer->setLineBlur(lineBlur.mbgl_floatPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)lineBlur
 {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getLineBlur()];
 }
-- (void)setLineDasharray:(id <MGLStyleAttributeValue>)lineDasharray
+- (void)setLineDasharray:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineDasharray
 {
     // TODO: setterArray
 }
@@ -148,7 +148,7 @@
 {
     return @[];
 }
-- (void)setLinePattern:(id <MGLStyleAttributeValue>)linePattern
+- (void)setLinePattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)linePattern
 {
     self.layer->setLinePattern(linePattern.stringValue.mbgl_stringPropertyValue);
 }
