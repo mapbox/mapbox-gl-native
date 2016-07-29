@@ -1,6 +1,8 @@
-# master
+# 3.3.1 - July 29, 2016
 
-* Map debug options 'overdraw' and 'stencil clip' are now disabled (no-ops) in release mode. ([#5555](https://github.com/mapbox/mapbox-gl-native/pull/5555))
+- Fixes `minzoom` and `maxzoom` properties ([#5828](https://github.com/mapbox/mapbox-gl-native/pull/5828))
+- Fixes `RunLoop::runOnce()` to use `UV_RUN_NOWAIT` instead of `UV_RUN_ONCE` (which can block the libuv threadpool) ([#5758](https://github.com/mapbox/mapbox-gl-native/pull/5758))
+- Map debug options 'overdraw' and 'stencil clip' are now disabled (no-ops) in release mode ([#5555](https://github.com/mapbox/mapbox-gl-native/pull/5555))
 
 # 3.3.0 - July 14, 2016
 
