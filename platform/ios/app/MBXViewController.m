@@ -446,6 +446,8 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 {
     [self styleWaterLayer];
     [self styleRoadLayer];
+    [self styleRasterLayer];
+    [self styleGeoJSONSource];
     
     MGLFillStyleLayer *buildingLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"building"];
     buildingLayer.fillColor = [UIColor blackColor];
@@ -459,34 +461,43 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     MGLFillStyleLayer *parkLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"park"];
     [self.mapView.style removeLayer:parkLayer];
     
+    [self.mapView.style tempUpdateStyleAndClasses];
+}
+
+- (void)styleGeoJSONSource
+{
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"ams" url:geoJSONURL];
     [self.mapView.style addSource:source];
     
-    /*
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerID:@"test" sourceID:@"ams"];
+    fillLayer.fillColor = [UIColor purpleColor];
+    [self.mapView.style addLayer:fillLayer];
+}
+
+- (void)styleRasterLayer
+{
     NSURL *rasterURL = [NSURL URLWithString:@"mapbox://mapbox.satellite"];
     MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithSourceID:@"my-raster-source" url:rasterURL tileSize:512];
-    [self.mapView.style addSource:rasterSource];*/
+    [self.mapView.style addSource:rasterSource];
     
-    //MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerID:@"my-raster-layer" sourceID:@"my-raster-source"];
-    //rasterLayer.rasterOpacity = @(0.2f);
-    //[self.mapView.style addLayer:rasterLayer];
-    
-    MGLFillStyleLayer *newLayer = [[MGLFillStyleLayer alloc] initWithLayerID:@"test" sourceID:@"ams"];
-    newLayer.fillColor = [UIColor purpleColor];
-    
-    [self.mapView.style addLayer:newLayer];
-    
-    [self.mapView.style tempUpdateStyleAndClasses];
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerID:@"my-raster-layer" sourceID:@"my-raster-source"];
+    MGLStyleAttributeFunction *opacityFunction = [[MGLStyleAttributeFunction alloc] init];
+    opacityFunction.stops = @[[MGLStyleAttributePair pairWith:@(6.0f) and:@(0.2f)],
+                              [MGLStyleAttributePair pairWith:@(20.0f) and:@(1.0f)]];
+    rasterLayer.rasterOpacity = opacityFunction;
+    [self.mapView.style addLayer:rasterLayer];
 }
 
 - (void)styleWaterLayer
 {
     MGLFillStyleLayer *waterLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
     MGLStyleAttributeFunction *waterColorFunction = [[MGLStyleAttributeFunction alloc] init];
-    waterColorFunction.stops = @[[MGLStyleAttributePair pairWith:@(10.0f) and:[UIColor redColor]],
-                                 [MGLStyleAttributePair pairWith:@(13.0f) and:[UIColor greenColor]],
-                                 [MGLStyleAttributePair pairWith:@(16.0f) and:[UIColor blueColor]]];
+    waterColorFunction.stops = @[[MGLStyleAttributePair pairWith:@(6.0f) and:[UIColor yellowColor]],
+                                 [MGLStyleAttributePair pairWith:@(8.0f) and:[UIColor blueColor]],
+                                 [MGLStyleAttributePair pairWith:@(10.0f) and:[UIColor redColor]],
+                                 [MGLStyleAttributePair pairWith:@(12.0f) and:[UIColor greenColor]],
+                                 [MGLStyleAttributePair pairWith:@(14.0f) and:[UIColor blueColor]]];
     
     MGLStyleAttributeFunction *waterAntialiasFunction = [[MGLStyleAttributeFunction alloc] init];
     waterAntialiasFunction.stops = @[[MGLStyleAttributePair pairWith:@(10.0f) and:@NO],
