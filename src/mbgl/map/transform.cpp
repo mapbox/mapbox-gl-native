@@ -559,7 +559,9 @@ void Transform::startTransition(const CameraOptions& camera,
                                 std::function<Update(double)> frame,
                                 const Duration& duration) {
     if (transitionFinishFn) {
-        transitionFinishFn();
+        std::function<void()> tmpFunction = transitionFinishFn;
+        transitionFinishFn = nullptr;
+        tmpFunction();
     }
 
     bool isAnimated = duration != Duration::zero();
@@ -599,8 +601,9 @@ void Transform::startTransition(const CameraOptions& camera,
                 callback(MapChangeRegionIsChanging);
             }
         } else {
-            transitionFinishFn();
+            std::function<void()> tmpFunction = transitionFinishFn;
             transitionFinishFn = nullptr;
+            tmpFunction();
 
             // This callback gets destroyed here,
             // we can only return after this point.
@@ -636,11 +639,12 @@ Update Transform::updateTransitions(const TimePoint& now) {
 
 void Transform::cancelTransitions() {
     if (transitionFinishFn) {
-        transitionFinishFn();
+        std::function<void()> tmpFunction = transitionFinishFn;
+        transitionFinishFn = nullptr;
+        tmpFunction();
     }
 
     transitionFrameFn = nullptr;
-    transitionFinishFn = nullptr;
 }
 
 void Transform::setGestureInProgress(bool inProgress) {
