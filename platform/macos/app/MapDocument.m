@@ -486,8 +486,14 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 - (IBAction)runtimeStyling:(id)sender {
     MGLFillStyleLayer *fillStyleLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
-    fillStyleLayer.fillColor = [NSColor redColor];
-    [fillStyleLayer updateStyleAndClasses];
+    
+    MGLStyleAttributeFunction *colorFunction = [[MGLStyleAttributeFunction alloc] init];
+    colorFunction.stops = @[[MGLStyleAttributePair pairWith:@(0.0) and:[NSColor redColor]],
+                            [MGLStyleAttributePair pairWith:@(10.0) and:[NSColor yellowColor]],
+                            [MGLStyleAttributePair pairWith:@(20.0) and:[NSColor blackColor]]];
+    fillStyleLayer.fillColor = colorFunction;
+    
+    [self.mapView.style tempUpdateStyleAndClasses];
 }
 
 - (IBAction)dropPin:(NSMenuItem *)sender {

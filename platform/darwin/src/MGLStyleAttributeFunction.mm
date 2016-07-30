@@ -20,7 +20,7 @@
     
     for (MGLStyleAttributePair *stop in self.stops) {
         NSNumber *t1 = stop.t1;
-        UIColor *t2 = stop.t2;
+        MGLColor *t2 = stop.t2;
         stops.emplace_back(std::make_pair(t1.floatValue, t2.mbgl_color));
     }
     

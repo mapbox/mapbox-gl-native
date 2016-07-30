@@ -1,6 +1,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include <mbgl/util/color.hpp>
+#include <mbgl/style/property_value.hpp>
 
 @interface NSColor (MGLAdditions)
 
@@ -13,5 +14,7 @@
  Instantiates `NSColor` from an `mbgl::Color`
  */
 + (NSColor *)mbgl_color:(mbgl::Color)color;
+
++ (NSColor *)mbgl_propertyValue:(mbgl::style::PropertyValue<mbgl::Color>)color;
 
 @end
