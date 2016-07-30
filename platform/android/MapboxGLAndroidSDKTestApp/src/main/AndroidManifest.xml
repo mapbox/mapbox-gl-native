@@ -90,6 +90,14 @@
                 android:value="@string/category_camera" />
         </activity>
         <activity
+            android:name=".activity.camera.CameraAnimationChainingActivity"
+            android:description="@string/description_camera_animation_chaining"
+            android:label="@string/activity_camera_animation_chaining">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_camera" />
+        </activity>
+        <activity
             android:name=".activity.camera.CameraPositionActivity"
             android:description="@string/description_cameraposition"
             android:label="@string/activity_camera_position">

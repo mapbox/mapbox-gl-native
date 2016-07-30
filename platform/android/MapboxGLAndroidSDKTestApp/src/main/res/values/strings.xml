@@ -27,6 +27,7 @@
 
     <!-- Camera -->
     <string name="activity_camera_animation_types">Animation Types</string>
+    <string name="activity_camera_animation_chaining">Chained Animations</string>
     <string name="activity_camera_zoom">Zoom Methods</string>
     <string name="activity_visible_coordinate_bounds">LatLngBounds Method</string>
     <string name="activity_camera_position">CameraPosition Method</string>
@@ -58,7 +59,8 @@
 
     <!-- Description -->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
-    <string name="description_user_location_customization">Customize the location of the user</string>
+    <string name="description_user_location_customization">Customize the location of the user
+    </string>
     <string name="description_user_location_dot_color">Customize the user location color</string>
     <string name="description_user_location_toggle">Toggle location of the user on and off</string>
     <string name="description_custom_layer">Overlay a custom native layer on the map</string>
@@ -72,7 +74,9 @@
     <string name="description_info_window">Learn how to handle the InfoWindow</string>
     <string name="description_info_window_concurrent">InfoWindow example with multiple open</string>
     <string name="description_add_bulk_markers">Add Markers In Bulk to a Map</string>
-    <string name="description_camera_animation_types">Showcase the different animation types</string>
+    <string name="description_camera_animation_types">Showcase the different animation types
+    </string>
+    <string name="description_camera_animation_chaining">Showcase chaining animations</string>
     <string name="description_visible_bounds">Center the camera around a bounds</string>
     <string name="description_dynamic_marker">Update position and icon</string>
     <string name="description_map_padding">Map Padding example</string>
@@ -86,10 +90,14 @@
     <string name="description_scroll_by">Scroll with pixels in x,y direction</string>
     <string name="description_snapshot">Example to make a snapshot of the map</string>
     <string name="description_doublemap">2 maps in a view hierarchy</string>
-    <string name="description_back_to_map">Restart map view after temporarily leaving to another activity</string>
+    <string name="description_back_to_map">Restart map view after temporarily leaving to another
+        activity
+    </string>
     <string name="description_view_marker">Use an Android SDK View as marker</string>
     <string name="description_view_marker_scale">Scale a View Marker</string>
-    <string name="description_dynamic_info_window_adapter">Learn how to create a dynamic custom InfoWindow</string>
+    <string name="description_dynamic_info_window_adapter">Learn how to create a dynamic custom
+        InfoWindow
+    </string>
     <string name="description_location_picker">Use a fixed Marker to select your location</string>
     <string name="description_viewpager">Use SupportMapFragments in a ViewPager</string>
     <string name="description_navigation_drawer">Test for Navigation Drawer support</string>
@@ -97,8 +105,12 @@
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
     <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>
-    <string name="menuitem_title_tracking_mode_dismiss_on_gesture">Dismiss location tracking on gesture</string>
-    <string name="menuitem_title_bearing_mode_dismiss_on_gesture">Dismiss bearing tracking on gesture</string>
+    <string name="menuitem_title_tracking_mode_dismiss_on_gesture">Dismiss location tracking on
+        gesture
+    </string>
+    <string name="menuitem_title_bearing_mode_dismiss_on_gesture">Dismiss bearing tracking on
+        gesture
+    </string>
     <string name="menuitem_title_reset">Reset</string>
 
     <string name="category">category</string>
@@ -169,7 +181,9 @@
 
     <string name="dialog_camera_position">Animate to new position</string>
 
-    <string name="geocoder_instructions">Tap Map To Geocode Where Black Marker Is Currently Located</string>
+    <string name="geocoder_instructions">Tap Map To Geocode Where Black Marker Is Currently
+        Located
+    </string>
 
     <string name="dynamic_marker_chelsea_title">Chelsea</string>
     <string name="dynamic_marker_chelsea_snippet">Stamford Bridge</string>
