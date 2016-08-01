@@ -1,11 +1,6 @@
 # This file is to be reused by target platforms that don't
 # support `mason` (i.e. Yocto). Do not add any `mason` macro.
 
-if (CMAKE_VERSION VERSION_EQUAL "3.6.0")
-    # CMake 3.6.0 is buggy: https://gitlab.kitware.com/cmake/cmake/issues/16209
-    message(FATAL_ERROR "CMake 3.6.0 is not supported due to a bug in automoc name generation. Please upgrade or downgrade.")
-endif()
-
 option(WITH_QT_DECODERS "Use builtin Qt image decoders" OFF)
 option(WITH_QT_4        "Use Qt4 instead of Qt5"        OFF)
 
@@ -54,9 +49,6 @@ set(MBGL_QT_FILES
     PRIVATE platform/qt/src/string_stdlib.cpp
     PRIVATE platform/qt/src/timer.cpp
     PRIVATE platform/qt/src/timer_impl.hpp
-
-    # Qt resources
-    PRIVATE platform/qt/qmapbox.qrc
 
     # Public headers
     PRIVATE platform/qt/include/qmapbox.hpp

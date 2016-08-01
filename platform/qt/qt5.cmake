@@ -6,6 +6,8 @@ find_package(Qt5OpenGL   REQUIRED)
 find_package(Qt5Quick    REQUIRED)
 find_package(Qt5Widgets  REQUIRED)
 
+QT5_ADD_RESOURCES(MBGL_QT_FILES platform/qt/qmapbox.qrc)
+
 set(MBGL_QT_LIBRARIES
     PRIVATE Qt5::Core
     PRIVATE Qt5::Gui
