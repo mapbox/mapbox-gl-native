@@ -264,6 +264,18 @@
           },
         }],
 
+        ['headless_lib == "egl"', {
+          'sources': [
+            'platform/default/headless_display.cpp',
+            'platform/default/headless_view.cpp',
+            'platform/default/headless_view_egl.cpp',
+          ],
+
+          'link_settings': {
+            'libraries': [ '-lGL -lEGL -lgbm -ldrm' ],
+          },
+        }],
+
         ['loop_lib == "darwin"', {
           'sources': [
             'platform/darwin/src/async_task.cpp',
