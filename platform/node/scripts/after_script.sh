@@ -3,11 +3,6 @@
 set -e
 set -o pipefail
 
-if [[ "$BUILDTYPE" == "Debug" ]]; then
-    echo "Please run this script in release mode (BUILDTYPE=Release)."
-    exit 1
-fi
-
 JOB=$1
 TAG=$2
 
@@ -19,9 +14,11 @@ if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
     echo http://mapbox.s3.amazonaws.com/mapbox-gl-native/render-tests/$JOB/index.html
 fi
 
-PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
-
 if [[ $TAG == node-v${PACKAGE_JSON_VERSION} ]]; then
-    ./node_modules/.bin/node-pre-gyp package
-    ./node_modules/.bin/node-pre-gyp publish info
+    if [[ "$BUILDTYPE" == "Debug" ]]; then
+        echo "Please run this script in release mode (BUILDTYPE=Release)."
+        exit 1
+    else
+        ./node_modules/.bin/node-pre-gyp package publish info
+    fi
 fi
