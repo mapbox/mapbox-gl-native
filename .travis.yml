@@ -56,13 +56,17 @@ matrix:
       dist: trusty
       language: node
       compiler: "node4-clang35-debug"
-      env: BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5
+      env: _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
+      before_script:
+        - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
+        - export PUBLISH=$([[ ${TAG} == "node-v${PACKAGE_JSON_VERSION}" ]] && echo 1 || echo 0)
+        - export BUILDTYPE=$([[ ${PUBLISH} ]] && echo "Release" || echo "Debug")
       script:
         - nvm install 4
         - nvm use 4
         - make node
-        - make test-node
+        - if [[ ! ${PUBLISH} ]]; then make test-node; fi
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
