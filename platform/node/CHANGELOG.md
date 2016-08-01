@@ -1,3 +1,7 @@
+# 3.3.2 - August 1, 2016
+
+- Fixes Node.js binary publishing to build with `BUILDTYPE=Release`
+
 # 3.3.1 - July 29, 2016
 
 - Fixes `minzoom` and `maxzoom` properties ([#5828](https://github.com/mapbox/mapbox-gl-native/pull/5828))
