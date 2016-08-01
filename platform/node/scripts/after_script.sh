@@ -14,7 +14,7 @@ if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
     echo http://mapbox.s3.amazonaws.com/mapbox-gl-native/render-tests/$JOB/index.html
 fi
 
-if [[ $TAG == node-v${PACKAGE_JSON_VERSION} ]]; then
+if [[ ${PUBLISH} ]]; then
     if [[ "$BUILDTYPE" == "Debug" ]]; then
         echo "Please run this script in release mode (BUILDTYPE=Release)."
         exit 1
