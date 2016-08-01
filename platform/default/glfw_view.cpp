@@ -172,6 +172,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
                 }
             }
             break;
+#if not MBGL_USE_GLES2
         case GLFW_KEY_B: {
             auto debug = view->map->getDebug();
             if (debug & mbgl::MapDebugOptions::StencilClip) {
@@ -184,6 +185,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             }
             view->map->setDebug(debug);
         } break;
+#endif // MBGL_USE_GLES2
         case GLFW_KEY_N:
             if (!mods)
                 view->map->resetNorth();

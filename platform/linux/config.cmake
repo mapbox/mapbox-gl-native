@@ -1,5 +1,5 @@
 mason_use(glfw VERSION 3.2.1)
-if (WITH_OSMESA OR IS_CI_BUILD)
+if(IS_CI_BUILD)
     mason_use(mesa VERSION 13.0.0${MASON_MESA_SUFFIX}${MASON_CXXABI_SUFFIX})
 endif()
 mason_use(boost_libprogram_options VERSION 1.60.0)
@@ -15,12 +15,24 @@ mason_use(benchmark VERSION 1.0.0)
 include(cmake/loop-uv.cmake)
 
 macro(mbgl_platform_core)
-    if (WITH_OSMESA)
+    if(WITH_OSMESA)
         target_sources(mbgl-core
             PRIVATE platform/default/headless_backend_osmesa.cpp
             PRIVATE platform/default/headless_display.cpp
         )
         target_add_mason_package(mbgl-core PUBLIC mesa)
+    elseif(WITH_EGL)
+        target_sources(mbgl-core
+            PRIVATE platform/linux/src/headless_backend_egl.cpp
+            PRIVATE platform/linux/src/headless_display_egl.cpp
+        )
+        # TODO: Provide surface-less EGL mesa for CI builds.
+        # https://github.com/mapbox/mapbox-gl-native/issues/7020
+        target_link_libraries(mbgl-core
+            PUBLIC -lGLESv2
+            PUBLIC -lEGL
+            PUBLIC -lgbm
+        )
     else()
         target_sources(mbgl-core
             PRIVATE platform/linux/src/headless_backend_glx.cpp

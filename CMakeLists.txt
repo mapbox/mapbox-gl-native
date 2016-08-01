@@ -15,15 +15,23 @@ include(.mason/mason.cmake)
 option(WITH_CXX11ABI "Use cxx11abi mason packages" OFF)
 option(WITH_COVERAGE "Enable coverage reports" OFF)
 option(WITH_OSMESA   "Use OSMesa headless backend" OFF)
+option(WITH_EGL      "Use EGL backend" OFF)
 option(IS_CI_BUILD   "Continuous integration build" OFF)
 
 if(WITH_CXX11ABI)
     set(MASON_CXXABI_SUFFIX -cxx11abi)
 endif()
 
+if(WITH_OSMESA AND WITH_EGL)
+    message(FATAL_ERROR "WITH_OSMESA and WITH_EGL are mutually exclusive.")
+endif()
+
 if(WITH_OSMESA)
     # Default mesa mason binary is OSMesa.
     set(MASON_MESA_SUFFIX "")
+elseif(WITH_EGL)
+    add_definitions(-DMBGL_USE_GLES2=1)
+    set(MASON_MESA_SUFFIX "-egl")
 else()
     set(MASON_MESA_SUFFIX "-glx")
 endif()
