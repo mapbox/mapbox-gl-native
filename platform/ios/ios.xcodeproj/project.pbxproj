@@ -27,8 +27,8 @@
 		350098CD1D482D9C004B2AF0 /* NSArray+MGLStyleAttributeAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 350098C91D482D9C004B2AF0 /* NSArray+MGLStyleAttributeAdditions.mm */; };
 		350098CF1D482E10004B2AF0 /* NSArray+MGLStyleAttributeAdditions_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 350098CE1D482E10004B2AF0 /* NSArray+MGLStyleAttributeAdditions_Private.hpp */; };
 		350098D01D482E10004B2AF0 /* NSArray+MGLStyleAttributeAdditions_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 350098CE1D482E10004B2AF0 /* NSArray+MGLStyleAttributeAdditions_Private.hpp */; };
-		350098D31D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098D11D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.h */; };
-		350098D41D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098D11D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.h */; };
+		350098D31D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098D11D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		350098D41D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098D11D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		350098D51D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 350098D21D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.mm */; };
 		350098D61D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 350098D21D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.mm */; };
 		350098D81D4830D5004B2AF0 /* NSString+MGLStyleAttributeAdditions_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 350098D71D4830D5004B2AF0 /* NSString+MGLStyleAttributeAdditions_Private.hpp */; };

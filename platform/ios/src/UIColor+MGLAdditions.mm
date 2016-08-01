@@ -15,7 +15,7 @@
     return {{ color.r, color.g, color.b, color.a }};
 }
 
-+ (UIColor *)mbgl_color:(mbgl::Color)color
++ (UIColor *)mbgl_colorWithColor:(mbgl::Color)color
 {
     return [UIColor colorWithRed:color.r green:color.g blue:color.b alpha:color.a];
 }

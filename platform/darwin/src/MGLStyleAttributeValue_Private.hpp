@@ -9,4 +9,5 @@
 - (mbgl::style::PropertyValue<mbgl::Color>)mbgl_colorPropertyValue;
 - (mbgl::style::PropertyValue<float>)mbgl_floatPropertyValue;
 - (mbgl::style::PropertyValue<bool>)mbgl_boolPropertyValue;
+- (mbgl::style::PropertyValue<std::string>)mbgl_stringPropertyValue;
 @end

@@ -60,7 +60,7 @@ global.setterImplementation = function(property, layerType = null) {
         case 'number':
             return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_floatPropertyValue);`;
         case 'string':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.stringValue.mbgl_stringPropertyValue);`;
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_stringPropertyValue);`;
         case 'enum':
             return `// TODO: setterEnum`; 
         case 'color':

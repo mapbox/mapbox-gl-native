@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 
-@interface NSString (MGLStyleAttributeAdditions)
+#import "MGLStyleAttributeValue.h"
 
-
+@interface NSString (MGLStyleAttributeAdditions) <MGLStyleAttributeValue>
 
 @end

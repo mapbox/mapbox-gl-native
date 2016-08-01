@@ -150,7 +150,7 @@
 }
 - (void)setLinePattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)linePattern
 {
-    self.layer->setLinePattern(linePattern.stringValue.mbgl_stringPropertyValue);
+    self.layer->setLinePattern(linePattern.mbgl_stringPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)linePattern
 {

@@ -137,7 +137,7 @@
 
 - (void)setIconImage:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconImage
 {
-    self.layer->setIconImage(iconImage.stringValue.mbgl_stringPropertyValue);
+    self.layer->setIconImage(iconImage.mbgl_stringPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)iconImage
@@ -211,7 +211,7 @@
 
 - (void)setTextField:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textField
 {
-    self.layer->setTextField(textField.stringValue.mbgl_stringPropertyValue);
+    self.layer->setTextField(textField.mbgl_stringPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textField

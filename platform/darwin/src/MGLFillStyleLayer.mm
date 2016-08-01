@@ -80,7 +80,7 @@
 }
 - (void)setFillPattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillPattern
 {
-    self.layer->setFillPattern(fillPattern.stringValue.mbgl_stringPropertyValue);
+    self.layer->setFillPattern(fillPattern.mbgl_stringPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)fillPattern
 {

@@ -38,7 +38,7 @@
 }
 - (void)setBackgroundPattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundPattern
 {
-    self.layer->setBackgroundPattern(backgroundPattern.stringValue.mbgl_stringPropertyValue);
+    self.layer->setBackgroundPattern(backgroundPattern.mbgl_stringPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)backgroundPattern
 {

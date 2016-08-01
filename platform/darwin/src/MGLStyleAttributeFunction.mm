@@ -53,4 +53,17 @@
     return mbgl::style::Function<bool>({{stops}}, _base.floatValue);
 }
 
+- (mbgl::style::PropertyValue<std::string>)mbgl_stringPropertyValue
+{
+    std::vector<std::pair<float, std::string>> stops;
+    
+    for (MGLStyleAttributePair *stop in self.stops) {
+        NSNumber *t1 = stop.t1;
+        NSString *t2 = stop.t2;
+        stops.emplace_back(std::make_pair(t1.floatValue, t2.UTF8String));
+    }
+    
+    return mbgl::style::Function<std::string>({{stops}}, _base.floatValue);
+}
+
 @end
