@@ -53,7 +53,20 @@ global.initLayer = function (layerType) {
     }
 }
 
-global.setterImplementation = function(property, layerType = null) {
+global.arraySetterImplementation = function(property) {
+    switch (property.name) {
+        case 'icon-text-fit-padding':
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_paddingPropertyValue);`;
+        case 'line-dasharray':
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_dashArrayPropertyValue);`;
+        case 'text-font':
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_fontPropertyValue);`;
+        default:
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_offsetPropertyValue);`;
+    }
+}
+
+global.setterImplementation = function(property) {
     switch (property.type) {
         case 'boolean':
             return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_boolPropertyValue);`;
@@ -66,7 +79,7 @@ global.setterImplementation = function(property, layerType = null) {
         case 'color':
             return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_colorPropertyValue);`;
         case 'array':
-            return '// TODO: setterArray';
+            return arraySetterImplementation(property);
         default: throw new Error(`unknown type for ${property.name}`)
     }
 }

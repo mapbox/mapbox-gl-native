@@ -62,7 +62,7 @@
 }
 - (void)setCircleTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleTranslate
 {
-    // TODO: setterArray
+    self.layer->setCircleTranslate(circleTranslate.mbgl_offsetPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)circleTranslate
 {

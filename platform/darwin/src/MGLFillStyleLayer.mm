@@ -62,7 +62,7 @@
 }
 - (void)setFillTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslate
 {
-    // TODO: setterArray
+    self.layer->setFillTranslate(fillTranslate.mbgl_offsetPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)fillTranslate
 {

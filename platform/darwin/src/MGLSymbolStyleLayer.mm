@@ -127,7 +127,7 @@
 
 - (void)setIconTextFitPadding:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTextFitPadding
 {
-    // TODO: setterArray
+    self.layer->setIconTextFitPadding(iconTextFitPadding.mbgl_paddingPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)iconTextFitPadding
@@ -177,7 +177,7 @@
 
 - (void)setIconOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconOffset
 {
-    // TODO: setterArray
+    self.layer->setIconOffset(iconOffset.mbgl_offsetPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)iconOffset
@@ -221,7 +221,7 @@
 
 - (void)setTextFont:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textFont
 {
-    // TODO: setterArray
+    self.layer->setTextFont(textFont.mbgl_fontPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textFont
@@ -347,7 +347,7 @@
 
 - (void)setTextOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textOffset
 {
-    // TODO: setterArray
+    self.layer->setTextOffset(textOffset.mbgl_offsetPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)textOffset
@@ -428,7 +428,7 @@
 }
 - (void)setIconTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTranslate
 {
-    // TODO: setterArray
+    self.layer->setIconTranslate(iconTranslate.mbgl_offsetPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)iconTranslate
 {
@@ -486,7 +486,7 @@
 }
 - (void)setTextTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTranslate
 {
-    // TODO: setterArray
+    self.layer->setTextTranslate(textTranslate.mbgl_offsetPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)textTranslate
 {

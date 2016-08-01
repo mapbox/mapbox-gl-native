@@ -505,16 +505,20 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
                                      [MGLStyleAttributePair pairWith:@(12.0f) and:@NO],
                                      [MGLStyleAttributePair pairWith:@(13.0f) and:@YES],
                                      [MGLStyleAttributePair pairWith:@(14.0f) and:@NO]];
+    
     waterLayer.fillAntialias = waterAntialiasFunction;
     waterLayer.fillColor = waterColorFunction;
     waterLayer.fillOpacity = @(0.5);
     waterLayer.fillTranslateAnchor = MGLFillStyleLayerFillTranslateAnchorMap;
     
     MGLStyleAttributeFunction *waterFillPattern = [[MGLStyleAttributeFunction alloc] init];
-    waterFillPattern.stops = @[[MGLStyleAttributePair pairWith:@6.0f and:@"airfield-15"],
-                               [MGLStyleAttributePair pairWith:@8.0f and:@"cafe-15"],
+    waterFillPattern.stops = @[[MGLStyleAttributePair pairWith:@8.0f and:@"airfield-15"],
+                               [MGLStyleAttributePair pairWith:@6.0f and:@"cafe-15"],
                                [MGLStyleAttributePair pairWith:@10.0f and:@"boston-t"]];
     waterLayer.fillPattern = waterFillPattern;
+    waterLayer.fillTranslate = @[];
+    
+    waterLayer.fillTranslateAnchor = MGLFillStyleLayerFillTranslateAnchorMap;
 }
 
 - (void)styleRoadLayer

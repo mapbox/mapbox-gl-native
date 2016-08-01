@@ -92,7 +92,7 @@
 }
 - (void)setLineTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineTranslate
 {
-    // TODO: setterArray
+    self.layer->setLineTranslate(lineTranslate.mbgl_offsetPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)lineTranslate
 {
@@ -142,7 +142,7 @@
 }
 - (void)setLineDasharray:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineDasharray
 {
-    // TODO: setterArray
+    self.layer->setLineDasharray(lineDasharray.mbgl_dashArrayPropertyValue);
 }
 - (id <MGLStyleAttributeValue>)lineDasharray
 {
