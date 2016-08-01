@@ -60,7 +60,7 @@ matrix:
       addons: *clang35
       before_script:
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
-        - export PUBLISH=$([[ ${TAG} == "node-v${PACKAGE_JSON_VERSION}" ]] && echo 1 || echo 0))
+        - export PUBLISH=$([[ ${TAG} == "node-v${PACKAGE_JSON_VERSION}" ]] && echo 1 || echo 0)
         - export BUILDTYPE=$([[ ${PUBLISH} ]] && echo "Release" || echo "Debug")
       script:
         - nvm install 4
