@@ -3,6 +3,11 @@
 set -e
 set -o pipefail
 
+if [[ "$BUILDTYPE" == "Debug" ]]; then
+    echo "Please run this script in release mode (BUILDTYPE=Release)."
+    exit 1
+fi
+
 JOB=$1
 TAG=$2
 

@@ -65,7 +65,9 @@ matrix:
         - make test-node
       after_script:
         - ccache --show-stats
-        - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
+        - if [[ $TAG == node-v${PACKAGE_JSON_VERSION} ]]; then
+        -   ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
+        - fi
 
     # GCC 5 - Debug - Coverage
     - os: linux
