@@ -10,10 +10,6 @@
 #include <unistd.h>
 #endif
 
-#if MBGL_USE_GLX
-#include <GL/glx.h>
-#endif
-
 namespace mbgl {
 
 HeadlessDisplay::HeadlessDisplay() {
@@ -73,58 +69,16 @@ HeadlessDisplay::HeadlessDisplay() {
         throw std::runtime_error("Failed to choose argb config.");
     }
 #endif
-
-#if MBGL_USE_GLX
-    if (!XInitThreads()) {
-        throw std::runtime_error("Failed to XInitThreads.");
-    }
-
-    xDisplay = XOpenDisplay(nullptr);
-    if (xDisplay == nullptr) {
-        throw std::runtime_error("Failed to open X display.");
-    }
-
-    const char *extensions = reinterpret_cast<const char *>(glXQueryServerString(xDisplay, DefaultScreen(xDisplay), GLX_EXTENSIONS));
-    if (!extensions) {
-        throw std::runtime_error("Cannot read GLX extensions.");
-    }
-    if (!strstr(extensions,"GLX_SGIX_fbconfig")) {
-        throw std::runtime_error("Extension GLX_SGIX_fbconfig was not found.");
-    }
-    if (!strstr(extensions, "GLX_SGIX_pbuffer")) {
-        throw std::runtime_error("Cannot find glXCreateContextAttribsARB.");
-    }
-
-    // We're creating a dummy pbuffer anyway that we're not using.
-    static int pixelFormat[] = {
-        GLX_DRAWABLE_TYPE, GLX_PBUFFER_BIT,
-        None
-    };
-
-    int configs = 0;
-    fbConfigs = glXChooseFBConfig(xDisplay, DefaultScreen(xDisplay), pixelFormat, &configs);
-    if (fbConfigs == nullptr) {
-        throw std::runtime_error("Failed to glXChooseFBConfig.");
-    }
-    if (configs <= 0) {
-        throw std::runtime_error("No Framebuffer configurations.");
-    }
-#endif
 }
 
 HeadlessDisplay::~HeadlessDisplay() {
 #if MBGL_USE_CGL
     CGLDestroyPixelFormat(pixelFormat);
 #endif
-
 #if MBGL_USE_EGL
     eglTerminate(dpy);
     gbm_device_destroy(gbm);
     close(fd);
-#endif
-#if MBGL_USE_GLX
-    XFree(fbConfigs);
-    XCloseDisplay(xDisplay);
 #endif
 }
 

@@ -5,7 +5,7 @@
       ['OS == "mac"', {
         'headless_lib': 'cgl',
       }, {
-        'headless_lib': 'glx',
+        'headless_lib': 'egl',
       }]
     ],
     'qtlibversion': '1.0.0',
