@@ -223,7 +223,7 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
         hasPendingTransitions |= layer->baseImpl->recalculate(parameters);
 
         Source* source = getSource(layer->baseImpl->source);
-        if (source && layer->baseImpl->needsRendering()) {
+        if (source && layer->baseImpl->needsRendering(z)) {
             source->baseImpl->enabled = true;
             if (!source->baseImpl->loaded) {
                 source->baseImpl->load(fileSource);

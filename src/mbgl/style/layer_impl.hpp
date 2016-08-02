@@ -64,7 +64,7 @@ public:
     bool hasRenderPass(RenderPass) const;
 
     // Checks whether this layer can be rendered.
-    bool needsRendering() const;
+    bool needsRendering(float zoom) const;
 
     virtual float getQueryRadius() const { return 0; }
     virtual bool queryIntersectsGeometry(

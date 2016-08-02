@@ -14,10 +14,36 @@ ApplicationWindow {
     visible: true
 
     ColorDialog {
-        id: colorDialog
-        title: "Background color"
-        visible: false
-        color: "black"
+        id: landColorDialog
+        title: "Land color"
+        onCurrentColorChanged: { mapStreets.color = currentColor }
+    }
+
+    ColorDialog {
+        id: waterColorDialog
+        title: "Water color"
+        onCurrentColorChanged: { waterColor.value = currentColor }
+    }
+
+    MapboxLayoutStyleProperty {
+        parent: mapStreets
+        layer: "road-label-large"
+        property: "visibility"
+        value: roadLabel.checked ? "visible" : "none"
+    }
+
+    MapboxLayoutStyleProperty {
+        parent: mapStreets
+        layer: "road-label-medium"
+        property: "visibility"
+        value: roadLabel.checked ? "visible" : "none"
+    }
+
+    MapboxLayoutStyleProperty {
+        parent: mapStreets
+        layer: "road-label-small"
+        property: "visibility"
+        value: roadLabel.checked ? "visible" : "none"
     }
 
     RowLayout {
@@ -43,7 +69,7 @@ ApplicationWindow {
             front: Rectangle {
                 anchors.fill: parent
 
-                QQuickMapboxGL {
+                MapboxMap {
                     id: mapStreets
 
                     anchors.fill: parent
@@ -59,8 +85,14 @@ ApplicationWindow {
                     bearing: bearingSlider.value
                     pitch: pitchSlider.value
 
-                    color: colorDialog.currentColor
+                    color: landColorDialog.color
                     copyrightsVisible: true
+
+                    MapboxPaintStyleProperty {
+                        id: waterColor
+                        layer: "water"
+                        property: "fill-color"
+                    }
 
                     Image {
                         id: logo
@@ -121,7 +153,7 @@ ApplicationWindow {
             back: Rectangle {
                 anchors.fill: parent
 
-                QQuickMapboxGL {
+                MapboxMap {
                     id: mapSatellite
 
                     anchors.fill: parent
@@ -232,9 +264,25 @@ ApplicationWindow {
             }
 
             Button {
-                id: colorChangeButton
-                text: "Change background color"
-                onClicked: colorDialog.open()
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: "Select land color"
+                onClicked: landColorDialog.open()
+            }
+
+            Button {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: "Select water color"
+                onClicked: waterColorDialog.open()
+            }
+
+            CheckBox {
+                id: roadLabel
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: "Toggle road label"
+                checked: true
             }
         }
     }

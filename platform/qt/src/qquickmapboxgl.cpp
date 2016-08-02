@@ -150,14 +150,13 @@ bool QQuickMapboxGL::copyrightsVisible() const
 
 void QQuickMapboxGL::setColor(const QColor &color)
 {
-    if (color == m_color) {
+    if (m_color == color) {
         return;
     }
 
     m_color = color;
 
-    m_syncState |= ColorNeedsSync;
-    update();
+    setPaintProperty("background", "background-color", color);
 
     emit colorChanged(m_color);
 }
@@ -172,6 +171,18 @@ void QQuickMapboxGL::pan(int dx, int dy)
     m_pan += QPointF(dx, -dy);
 
     m_syncState |= PanNeedsSync;
+    update();
+}
+
+void QQuickMapboxGL::setLayoutProperty(const QString &layer, const QString &property, const QVariant &value)
+{
+    m_layoutChanges.append(LayoutPropertyChange { layer, property, value });
+    update();
+}
+
+void QQuickMapboxGL::setPaintProperty(const QString &layer, const QString &property, const QVariant &value, const QString &klass)
+{
+    m_paintChanges.append(PaintPropertyChange { layer, property, value, klass });
     update();
 }
 
