@@ -21,6 +21,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     protected String snippet;
     protected String title;
     protected Icon icon;
+    protected MarkerView aboveMarkerView;
     protected boolean flat;
     protected float anchorU = 0.5f;
     protected float anchorV = 1f;
@@ -78,6 +79,17 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
      */
     public T icon(Icon icon) {
         this.icon = icon;
+        return getThis();
+    }
+
+    /**
+     * Set the MarkerView above which this MarkerView is shown.
+     *
+     * @param aboveMarkerView the MarkerView above which to show
+     * @return the object for which the method was called
+      */
+    public T aboveMarkerView(MarkerView aboveMarkerView) {
+        this.aboveMarkerView = aboveMarkerView;
         return getThis();
     }
 

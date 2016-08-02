@@ -46,6 +46,8 @@ public class MarkerView extends Marker {
 
     private Icon markerViewIcon;
 
+    private MarkerView aboveMarkerView;
+
     private boolean selected;
 
     /**
@@ -71,6 +73,7 @@ public class MarkerView extends Marker {
         this.anchorU = baseMarkerViewOptions.anchorU;
         this.anchorV = baseMarkerViewOptions.anchorV;
         this.selected = baseMarkerViewOptions.selected;
+        this.aboveMarkerView = baseMarkerViewOptions.aboveMarkerView;
     }
 
     /**
@@ -328,6 +331,8 @@ public class MarkerView extends Marker {
     public Icon getIcon() {
         return markerViewIcon;
     }
+
+    public MarkerView getAboveMarkerView() { return aboveMarkerView; }
 
     /**
      * Set the MapboxMap associated tot the MapView containing the MarkerView.
