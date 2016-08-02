@@ -316,11 +316,18 @@
                 android:name="@string/category"
                 android:value="@string/category_imagegenerator" />
         </activity>
-
+        <activity
+            android:name=".activity.maplayout.SurfaceViewMediaControlActivity"
+            android:description="@string/description_surfaceview_mediacontrols"
+            android:label="@string/activity_surfaceview_overlay">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_maplayout" />
+        </activity>
 
         <!-- For Unit tests -->
-        <activity android:name=".activity.style.RuntimeStyleTestActivity"/>
-        <activity android:name=".activity.style.RuntimeStyleTimingTestActivity"/>
+        <activity android:name=".activity.style.RuntimeStyleTestActivity" />
+        <activity android:name=".activity.style.RuntimeStyleTimingTestActivity" />
 
         <!-- Configuration Settings -->
         <meta-data
