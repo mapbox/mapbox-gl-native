@@ -1,3 +1,7 @@
+# 3.3.3 - August 2, 2016
+
+- Switches `mbgl::HeadlessView` from GLX to EGL ([#5843](https://github.com/mapbox/mapbox-gl-native/pull/5843))
+
 # 3.3.2 - August 1, 2016
 
 - Fixes Node.js binary publishing to build with `BUILDTYPE=Release` ([#5838](https://github.com/mapbox/mapbox-gl-native/pull/5838))
