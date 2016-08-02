@@ -32,7 +32,7 @@
   },
   "scripts": {
     "preinstall": "npm install node-pre-gyp",
-    "install": "node-pre-gyp install --fallback-to-build=false || BUILDTYPE=Release make node",
+    "install": "node-pre-gyp install --fallback-to-build=false || make node",
     "test": "tape platform/node/test/js/**/*.test.js",
     "test-memory": "node --expose-gc platform/node/test/memory.test.js",
     "test-suite": "node platform/node/test/render.test.js && node platform/node/test/query.test.js"
