@@ -23,31 +23,21 @@
     _mapView.delegate = self;
 }
 
-- (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-    [super tearDown];
-}
-
-- (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView
-{
-    [_expectation fulfill];
-}
-
-- (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered
-{
-    [_expectation fulfill];
-}
-
 - (void)testBackgroundLayer
 {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"sourceID" url:geoJSONURL];    
     MGLBackgroundStyleLayer *layer = [[MGLBackgroundStyleLayer alloc] initWithLayerID:@"layerID" sourceID:@"sourceID"];
-    // Layout properties
-    // Paint properties
-    layer.backgroundColor = MGLRuntimeStylingHelper.testColor;XCTAssert([layer.backgroundColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
-    layer.backgroundPattern = MGLRuntimeStylingHelper.testString;XCTAssert([layer.backgroundPattern isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");
-    layer.backgroundOpacity = MGLRuntimeStylingHelper.testNumber;XCTAssert([layer.backgroundOpacity isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    [_mapView.style addLayer:layer];
+
+    layer.backgroundColor = MGLRuntimeStylingHelper.testColor;
+    layer.backgroundPattern = MGLRuntimeStylingHelper.testString;
+    layer.backgroundOpacity = MGLRuntimeStylingHelper.testNumber;
+
+    MGLBackgroundStyleLayer *gLayer = [_mapView.style layerWithIdentifier:@"layerID"];
+    XCTAssert([gLayer.backgroundColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
+    XCTAssert([gLayer.backgroundPattern isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");
+    XCTAssert([gLayer.backgroundOpacity isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
 }
 
 @end

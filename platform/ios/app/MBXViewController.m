@@ -483,8 +483,8 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     
     MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerID:@"my-raster-layer" sourceID:@"my-raster-source"];
     MGLStyleAttributeFunction *opacityFunction = [[MGLStyleAttributeFunction alloc] init];
-    opacityFunction.stops = @[[MGLStyleAttributePair pairWith:@(6.0f) and:@(0.2f)],
-                              [MGLStyleAttributePair pairWith:@(20.0f) and:@(1.0f)]];
+    opacityFunction.stops = @{@20.0f: @1.0f,
+                              @5.0f: @0.0f};
     rasterLayer.rasterOpacity = opacityFunction;
     [self.mapView.style addLayer:rasterLayer];
 }
@@ -493,32 +493,21 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 {
     MGLFillStyleLayer *waterLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
     MGLStyleAttributeFunction *waterColorFunction = [[MGLStyleAttributeFunction alloc] init];
-    waterColorFunction.stops = @[[MGLStyleAttributePair pairWith:@(6.0f) and:[UIColor yellowColor]],
-                                 [MGLStyleAttributePair pairWith:@(8.0f) and:[UIColor blueColor]],
-                                 [MGLStyleAttributePair pairWith:@(10.0f) and:[UIColor redColor]],
-                                 [MGLStyleAttributePair pairWith:@(12.0f) and:[UIColor greenColor]],
-                                 [MGLStyleAttributePair pairWith:@(14.0f) and:[UIColor blueColor]]];
-    
-    MGLStyleAttributeFunction *waterAntialiasFunction = [[MGLStyleAttributeFunction alloc] init];
-    waterAntialiasFunction.stops = @[[MGLStyleAttributePair pairWith:@(10.0f) and:@NO],
-                                     [MGLStyleAttributePair pairWith:@(11.0f) and:@YES],
-                                     [MGLStyleAttributePair pairWith:@(12.0f) and:@NO],
-                                     [MGLStyleAttributePair pairWith:@(13.0f) and:@YES],
-                                     [MGLStyleAttributePair pairWith:@(14.0f) and:@NO]];
-    
-    waterLayer.fillAntialias = waterAntialiasFunction;
+    waterColorFunction.stops = @{@6.0f: [UIColor yellowColor],
+                                 @8.0f: [UIColor blueColor],
+                                 @10.0f: [UIColor redColor],
+                                 @12.0f: [UIColor greenColor],
+                                 @14.0f: [UIColor blueColor]};
     waterLayer.fillColor = waterColorFunction;
-    waterLayer.fillOpacity = @(0.5);
-    waterLayer.fillTranslateAnchor = MGLFillStyleLayerFillTranslateAnchorMap;
     
-    MGLStyleAttributeFunction *waterFillPattern = [[MGLStyleAttributeFunction alloc] init];
-    waterFillPattern.stops = @[[MGLStyleAttributePair pairWith:@8.0f and:@"airfield-15"],
-                               [MGLStyleAttributePair pairWith:@6.0f and:@"cafe-15"],
-                               [MGLStyleAttributePair pairWith:@10.0f and:@"boston-t"]];
-    waterLayer.fillPattern = waterFillPattern;
-    waterLayer.fillTranslate = @[];
+    MGLStyleAttributeFunction *fillAntialias = [[MGLStyleAttributeFunction alloc] init];
+    fillAntialias.stops = @{@11: @YES,
+                            @12: @NO,
+                            @13: @YES,
+                            @14: @NO,
+                            @15: @YES};
+    waterLayer.fillAntialias = fillAntialias;
     
-    waterLayer.fillTranslateAnchor = MGLFillStyleLayerFillTranslateAnchorMap;
 }
 
 - (void)styleRoadLayer
@@ -526,14 +515,11 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     MGLLineStyleLayer *roadLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"road-primary"];
     roadLayer.lineColor = [UIColor blackColor];
     MGLStyleAttributeFunction *lineWidthFunction = [[MGLStyleAttributeFunction alloc] init];
-    lineWidthFunction.stops = @[[MGLStyleAttributePair pairWith:@(10.0f) and:@(2.0f)],
-                                [MGLStyleAttributePair pairWith:@(13.0f) and:@(8.0f)],
-                                [MGLStyleAttributePair pairWith:@(16.0f) and:@(2.0f)]];
     
     MGLStyleAttributeFunction *roadLineColor = [[MGLStyleAttributeFunction alloc] init];
-    roadLineColor.stops = @[[MGLStyleAttributePair pairWith:@(10.0f) and:[UIColor purpleColor]],
-                            [MGLStyleAttributePair pairWith:@(13.0f) and:[UIColor yellowColor]],
-                            [MGLStyleAttributePair pairWith:@(16.0f) and:[UIColor cyanColor]]];
+    roadLineColor.stops = @{@10: [UIColor purpleColor],
+                            @13: [UIColor yellowColor],
+                            @16: [UIColor cyanColor]};
     roadLayer.lineColor = roadLineColor;
     roadLayer.lineWidth = lineWidthFunction;
     roadLayer.lineGapWidth = lineWidthFunction;

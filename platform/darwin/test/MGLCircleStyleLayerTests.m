@@ -23,33 +23,27 @@
     _mapView.delegate = self;
 }
 
-- (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-    [super tearDown];
-}
-
-- (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView
-{
-    [_expectation fulfill];
-}
-
-- (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered
-{
-    [_expectation fulfill];
-}
-
 - (void)testCircleLayer
 {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"sourceID" url:geoJSONURL];    
     MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithLayerID:@"layerID" sourceID:@"sourceID"];
-    // Layout properties
-    // Paint properties
-    layer.circleRadius = MGLRuntimeStylingHelper.testNumber;XCTAssert([layer.circleRadius isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    layer.circleColor = MGLRuntimeStylingHelper.testColor;XCTAssert([layer.circleColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
-    layer.circleBlur = MGLRuntimeStylingHelper.testNumber;XCTAssert([layer.circleBlur isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    layer.circleOpacity = MGLRuntimeStylingHelper.testNumber;XCTAssert([layer.circleOpacity isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    [_mapView.style addLayer:layer];
+
+    layer.circleRadius = MGLRuntimeStylingHelper.testNumber;
+    layer.circleColor = MGLRuntimeStylingHelper.testColor;
+    layer.circleBlur = MGLRuntimeStylingHelper.testNumber;
+    layer.circleOpacity = MGLRuntimeStylingHelper.testNumber;
     layer.circleTranslate = MGLRuntimeStylingHelper.testOffset;
+    // TODO: setterEnum
+    // TODO: setterEnum
+
+    MGLCircleStyleLayer *gLayer = [_mapView.style layerWithIdentifier:@"layerID"];
+    XCTAssert([gLayer.circleRadius isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    XCTAssert([gLayer.circleColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
+    XCTAssert([gLayer.circleBlur isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    XCTAssert([gLayer.circleOpacity isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    XCTAssert([gLayer.circleTranslate isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");
     // TODO: setterEnum
     // TODO: setterEnum
 }

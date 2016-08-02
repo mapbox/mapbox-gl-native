@@ -15,5 +15,6 @@
 - (mbgl::style::PropertyValue<std::array<float, 4>>)mbgl_paddingPropertyValue;
 - (mbgl::style::PropertyValue<std::vector<std::string> >)mbgl_fontPropertyValue;
 - (mbgl::style::PropertyValue<std::vector<float> >)mbgl_dashArrayPropertyValue;
+- (mbgl::style::PropertyValue<uint8_t>)mbgl_enumPropertyValue;
 
 @end

@@ -14,14 +14,15 @@
     return self;
 }
 
+
 - (mbgl::style::PropertyValue<mbgl::Color>)mbgl_colorPropertyValue
 {
     std::vector<std::pair<float, mbgl::Color>> stops;
     
-    for (MGLStyleAttributePair *stop in self.stops) {
-        NSNumber *t1 = stop.t1;
-        MGLColor *t2 = stop.t2;
-        stops.emplace_back(std::make_pair(t1.floatValue, t2.mbgl_color));
+    NSArray *zoomKeys = self.stops.allKeys;
+    for (NSNumber *zoomKey in zoomKeys) {
+        UIColor *color = self.stops[zoomKey];
+        stops.emplace_back(std::make_pair(zoomKey.floatValue, color.mbgl_color));
     }
     
     return mbgl::style::Function<mbgl::Color>({{stops}}, _base.floatValue);
@@ -31,10 +32,10 @@
 {
     std::vector<std::pair<float, float>> stops;
     
-    for (MGLStyleAttributePair *stop in self.stops) {
-        NSNumber *t1 = stop.t1;
-        NSNumber *t2 = stop.t2;
-        stops.emplace_back(std::make_pair(t1.floatValue, t2.floatValue));
+    NSArray *zoomKeys = self.stops.allKeys;
+    for (NSNumber *zoomKey in zoomKeys) {
+        NSNumber *number = self.stops[zoomKey];
+        stops.emplace_back(std::make_pair(zoomKey.floatValue, number.floatValue));
     }
     
     return mbgl::style::Function<float>({{stops}}, _base.floatValue);
@@ -44,10 +45,10 @@
 {
     std::vector<std::pair<float, bool>> stops;
     
-    for (MGLStyleAttributePair *stop in self.stops) {
-        NSNumber *t1 = stop.t1;
-        NSNumber *t2 = stop.t2;
-        stops.emplace_back(std::make_pair(t1.floatValue, t2.boolValue));
+    NSArray *zoomKeys = self.stops.allKeys;
+    for (NSNumber *zoomKey in zoomKeys) {
+        NSNumber *number = self.stops[zoomKey];
+        stops.emplace_back(std::make_pair(zoomKey.floatValue, number.boolValue));
     }
     
     return mbgl::style::Function<bool>({{stops}}, _base.floatValue);
@@ -57,10 +58,10 @@
 {
     std::vector<std::pair<float, std::string>> stops;
     
-    for (MGLStyleAttributePair *stop in self.stops) {
-        NSNumber *t1 = stop.t1;
-        NSString *t2 = stop.t2;
-        stops.emplace_back(std::make_pair(t1.floatValue, t2.UTF8String));
+    NSArray *zoomKeys = self.stops.allKeys;
+    for (NSNumber *zoomKey in zoomKeys) {
+        NSString *string = self.stops[zoomKey];
+        stops.emplace_back(std::make_pair(zoomKey.floatValue, string.UTF8String));
     }
     
     return mbgl::style::Function<std::string>({{stops}}, _base.floatValue);

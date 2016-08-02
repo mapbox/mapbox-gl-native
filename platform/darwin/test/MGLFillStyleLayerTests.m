@@ -23,35 +23,29 @@
     _mapView.delegate = self;
 }
 
-- (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-    [super tearDown];
-}
-
-- (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView
-{
-    [_expectation fulfill];
-}
-
-- (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered
-{
-    [_expectation fulfill];
-}
-
 - (void)testFillLayer
 {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"sourceID" url:geoJSONURL];    
     MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithLayerID:@"layerID" sourceID:@"sourceID"];
-    // Layout properties
-    // Paint properties
-    layer.fillAntialias = MGLRuntimeStylingHelper.testBool;XCTAssert([layer.fillAntialias isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
-    layer.fillOpacity = MGLRuntimeStylingHelper.testNumber;XCTAssert([layer.fillOpacity isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    layer.fillColor = MGLRuntimeStylingHelper.testColor;XCTAssert([layer.fillColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
-    layer.fillOutlineColor = MGLRuntimeStylingHelper.testColor;XCTAssert([layer.fillOutlineColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
+    [_mapView.style addLayer:layer];
+
+    layer.fillAntialias = MGLRuntimeStylingHelper.testBool;
+    layer.fillOpacity = MGLRuntimeStylingHelper.testNumber;
+    layer.fillColor = MGLRuntimeStylingHelper.testColor;
+    layer.fillOutlineColor = MGLRuntimeStylingHelper.testColor;
     layer.fillTranslate = MGLRuntimeStylingHelper.testOffset;
     // TODO: setterEnum
-    layer.fillPattern = MGLRuntimeStylingHelper.testString;XCTAssert([layer.fillPattern isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");
+    layer.fillPattern = MGLRuntimeStylingHelper.testString;
+
+    MGLFillStyleLayer *gLayer = [_mapView.style layerWithIdentifier:@"layerID"];
+    XCTAssert([gLayer.fillAntialias isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
+    XCTAssert([gLayer.fillOpacity isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    XCTAssert([gLayer.fillColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
+    XCTAssert([gLayer.fillOutlineColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
+    XCTAssert([gLayer.fillTranslate isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");
+    // TODO: setterEnum
+    XCTAssert([gLayer.fillPattern isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");
 }
 
 @end

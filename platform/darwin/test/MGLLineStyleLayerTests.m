@@ -23,42 +23,43 @@
     _mapView.delegate = self;
 }
 
-- (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-    [super tearDown];
-}
-
-- (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView
-{
-    [_expectation fulfill];
-}
-
-- (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered
-{
-    [_expectation fulfill];
-}
-
 - (void)testLineLayer
 {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"sourceID" url:geoJSONURL];    
     MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithLayerID:@"layerID" sourceID:@"sourceID"];
-    // Layout properties
+    [_mapView.style addLayer:layer];
+
     // TODO: setterEnum
     // TODO: setterEnum
-    layer.lineMiterLimit = MGLRuntimeStylingHelper.testNumber;XCTAssert([layer.lineMiterLimit isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    layer.lineRoundLimit = MGLRuntimeStylingHelper.testNumber;XCTAssert([layer.lineRoundLimit isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    // Paint properties
-    layer.lineOpacity = MGLRuntimeStylingHelper.testNumber;XCTAssert([layer.lineOpacity isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    layer.lineColor = MGLRuntimeStylingHelper.testColor;XCTAssert([layer.lineColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
+    layer.lineMiterLimit = MGLRuntimeStylingHelper.testNumber;
+    layer.lineRoundLimit = MGLRuntimeStylingHelper.testNumber;
+    layer.lineOpacity = MGLRuntimeStylingHelper.testNumber;
+    layer.lineColor = MGLRuntimeStylingHelper.testColor;
     layer.lineTranslate = MGLRuntimeStylingHelper.testOffset;
     // TODO: setterEnum
-    layer.lineWidth = MGLRuntimeStylingHelper.testNumber;XCTAssert([layer.lineWidth isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    layer.lineGapWidth = MGLRuntimeStylingHelper.testNumber;XCTAssert([layer.lineGapWidth isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    layer.lineOffset = MGLRuntimeStylingHelper.testNumber;XCTAssert([layer.lineOffset isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    layer.lineBlur = MGLRuntimeStylingHelper.testNumber;XCTAssert([layer.lineBlur isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    layer.lineWidth = MGLRuntimeStylingHelper.testNumber;
+    layer.lineGapWidth = MGLRuntimeStylingHelper.testNumber;
+    layer.lineOffset = MGLRuntimeStylingHelper.testNumber;
+    layer.lineBlur = MGLRuntimeStylingHelper.testNumber;
     layer.lineDasharray = MGLRuntimeStylingHelper.testDashArray;
-    layer.linePattern = MGLRuntimeStylingHelper.testString;XCTAssert([layer.linePattern isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");
+    layer.linePattern = MGLRuntimeStylingHelper.testString;
+
+    MGLLineStyleLayer *gLayer = [_mapView.style layerWithIdentifier:@"layerID"];
+    // TODO: setterEnum
+    // TODO: setterEnum
+    XCTAssert([gLayer.lineMiterLimit isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    XCTAssert([gLayer.lineRoundLimit isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    XCTAssert([gLayer.lineOpacity isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    XCTAssert([gLayer.lineColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
+    XCTAssert([gLayer.lineTranslate isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");
+    // TODO: setterEnum
+    XCTAssert([gLayer.lineWidth isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    XCTAssert([gLayer.lineGapWidth isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    XCTAssert([gLayer.lineOffset isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    XCTAssert([gLayer.lineBlur isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    XCTAssert([gLayer.lineDasharray isEqual:MGLRuntimeStylingHelper.testDashArray], @"Should be equal");
+    XCTAssert([gLayer.linePattern isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");
 }
 
 @end

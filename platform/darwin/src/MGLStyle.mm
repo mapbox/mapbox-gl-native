@@ -96,6 +96,7 @@ static NSURL *MGLStyleURL_emerald;
     Class clazz = [self classFromLayer:layer];
     
     id <MGLStyleLayer, MGLStyleLayer_Private> styleLayer = [[clazz alloc] init];
+    styleLayer.layerID = identifier;
     styleLayer.layer = layer;
     styleLayer.mapView = self.mapView;
     

@@ -28,33 +28,26 @@
     _mapView.delegate = self;
 }
 
-- (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-    [super tearDown];
-}
-
-- (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView
-{
-    [_expectation fulfill];
-}
-
-- (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered
-{
-    [_expectation fulfill];
-}
-
 - (void)test<%- camelize(type) %>Layer
 {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"sourceID" url:geoJSONURL];    
     MGL<%- camelize(type) %>StyleLayer *layer = [[MGL<%- camelize(type) %>StyleLayer alloc] initWithLayerID:@"layerID" sourceID:@"sourceID"];
-    // Layout properties
+    [_mapView.style addLayer:layer];
+
 <% for (const property of layoutProperties) { -%>
     <%- testImplementation(property) %>
 <% } -%>
-    // Paint properties
 <% for (const property of paintProperties) { -%>
     <%- testImplementation(property) %>
+<% } -%>
+
+    MGL<%- camelize(type) %>StyleLayer *gLayer = [_mapView.style layerWithIdentifier:@"layerID"];
+<% for (const property of layoutProperties) { -%>
+    <%- testGetterImplementation(property) %>
+<% } -%>
+<% for (const property of paintProperties) { -%>
+    <%- testGetterImplementation(property) %>
 <% } -%>
 }
 

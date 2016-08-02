@@ -24,22 +24,49 @@ global.camelizeWithLeadingLowercase = function (str) {
 global.testImplementation = function (property) {
     switch (property.type) {
         case 'boolean':
-            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testBool;` +
-            `XCTAssert([layer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");`;
+            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testBool;`;
         case 'number':
-            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testNumber;` +
-            `XCTAssert([layer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");`;
+            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testNumber;`;
         case 'string':
-            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testString;` +
-            `XCTAssert([layer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");`;
+            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testString;`;
         case 'enum':
             return `// TODO: setterEnum`; 
         case 'color':
-            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testColor;` +
-            `XCTAssert([layer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");`;
+            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testColor;`;
         case 'array':
             return testArrayImplementation(property);
         default: throw new Error(`unknown type for ${property.name}`)
+    }
+}
+
+global.testGetterImplementation = function (property) {
+    switch (property.type) {
+        case 'boolean':
+            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");`;
+        case 'number':
+            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");`;
+        case 'string':
+            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");`;
+        case 'enum':
+            return `// TODO: getterEnum`; 
+        case 'color':
+            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");`;
+        case 'array':
+            return testGetterArrayImplementation(property);
+        default: throw new Error(`unknown type for ${property.name}`)
+    }
+}
+
+global.testGetterArrayImplementation = function (property) {
+    switch (property.name) {
+        case 'icon-text-fit-padding':
+            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testPadding], @"Should be equal");`;
+        case 'line-dasharray':
+            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testDashArray], @"Should be equal");`;
+        case 'text-font':
+            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testFont], @"Should be equal");`;
+        default:
+            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");`; // Default offset (dx, dy)
     }
 }
 
