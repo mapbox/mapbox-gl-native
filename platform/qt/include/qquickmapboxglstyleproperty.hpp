@@ -35,9 +35,7 @@ protected:
     QQuickMapboxGLStyleProperty(QQuickItem *parent);
     virtual void updateParent() = 0;
 
-    QVariant m_layer;
-    QVariant m_property;
-    QVariant m_value;
+    QVariantMap m_map;
 };
 
 class Q_DECL_EXPORT QQuickMapboxGLLayoutStyleProperty : public QQuickMapboxGLStyleProperty
@@ -67,9 +65,6 @@ signals:
 
 protected:
     virtual void updateParent();
-
-private:
-    QVariant m_class;
 };
 
 #endif // QQUICKMAPBOXGLSTYLEPROPERTY_H

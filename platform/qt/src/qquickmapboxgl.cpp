@@ -156,7 +156,12 @@ void QQuickMapboxGL::setColor(const QColor &color)
 
     m_color = color;
 
-    setPaintProperty("background", "background-color", color);
+    QVariantMap paintProperty;
+    paintProperty["type"] = QQuickMapboxGLLayoutStyleProperty::PaintType;
+    paintProperty["layer"] = "background";
+    paintProperty["property"] = "background-color";
+    paintProperty["value"] = color;
+    onStylePropertyUpdated(paintProperty);
 
     emit colorChanged(m_color);
 }
@@ -171,18 +176,6 @@ void QQuickMapboxGL::pan(int dx, int dy)
     m_pan += QPointF(dx, -dy);
 
     m_syncState |= PanNeedsSync;
-    update();
-}
-
-void QQuickMapboxGL::setLayoutProperty(const QString &layer, const QString &property, const QVariant &value)
-{
-    m_layoutChanges.append(LayoutPropertyChange { layer, property, value });
-    update();
-}
-
-void QQuickMapboxGL::setPaintProperty(const QString &layer, const QString &property, const QVariant &value, const QString &klass)
-{
-    m_paintChanges.append(PaintPropertyChange { layer, property, value, klass });
     update();
 }
 
