@@ -1016,6 +1016,7 @@ public class MapView extends FrameLayout {
 
         if (updatedMarker.getId() == -1) {
             Log.w(MapboxConstants.TAG, "marker has an id of -1, possibly was not added yet, doing nothing");
+            return;
         }
 
         if (!(updatedMarker instanceof MarkerView)) {
@@ -1023,6 +1024,43 @@ public class MapView extends FrameLayout {
         }
 
         mNativeMapView.updateMarker(updatedMarker);
+    }
+
+
+    void updatePolygon(Polygon polygon) {
+        if (mDestroyed) {
+            return;
+        }
+
+        if (polygon == null) {
+            Log.w(MapboxConstants.TAG, "polygon was null, doing nothing");
+            return;
+        }
+
+        if (polygon.getId() == -1) {
+            Log.w(MapboxConstants.TAG, "polygon has an id of -1, indicating the polygon was not added to the map yet.");
+            return;
+        }
+
+        mNativeMapView.updatePolygon(polygon);
+    }
+
+    void updatePolyline(Polyline polyline) {
+        if (mDestroyed) {
+            return;
+        }
+
+        if (polyline == null) {
+            Log.w(MapboxConstants.TAG, "polygon was null, doing nothing");
+            return;
+        }
+
+        if (polyline.getId() == -1) {
+            Log.w(MapboxConstants.TAG, "polygon has an id of -1, indicating the polygon was not added to the map yet.");
+            return;
+        }
+
+        mNativeMapView.updatePolyline(polyline);
     }
 
     private void ensureIconLoaded(Marker marker) {

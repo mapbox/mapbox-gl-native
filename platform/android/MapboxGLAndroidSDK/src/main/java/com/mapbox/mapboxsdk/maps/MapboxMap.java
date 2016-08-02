@@ -827,6 +827,36 @@ public class MapboxMap {
     }
 
     /**
+     * Update a polygon on this map.
+     *
+     * @param polygon An updated polygon object.
+     */
+    @UiThread
+    public void updatePolygon(Polygon polygon) {
+        mMapView.updatePolygon(polygon);
+
+        int index = mAnnotations.indexOfKey(polygon.getId());
+        if (index > -1) {
+            mAnnotations.setValueAt(index, polygon);
+        }
+    }
+
+    /**
+     * Update a polyline on this map.
+     *
+     * @param polyline An updated polyline object.
+     */
+    @UiThread
+    public void updatePolyline(Polyline polyline) {
+        mMapView.updatePolyline(polyline);
+
+        int index = mAnnotations.indexOfKey(polyline.getId());
+        if (index > -1) {
+            mAnnotations.setValueAt(index, polyline);
+        }
+    }
+
+    /**
      * Adds a polyline to this map.
      *
      * @param polylineOptions A polyline options object that defines how to render the polyline.

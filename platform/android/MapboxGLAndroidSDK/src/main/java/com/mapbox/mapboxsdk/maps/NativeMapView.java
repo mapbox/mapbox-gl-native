@@ -381,6 +381,18 @@ final class NativeMapView {
         nativeUpdateMarker(mNativeMapViewPtr, marker.getId(), position.getLatitude(), position.getLongitude(), icon.getId());
     }
 
+    public void updatePolygon(Polygon polygon) {
+        //TODO remove new id assignment, https://github.com/mapbox/mapbox-gl-native/issues/5844
+        long newId = nativeUpdatePolygon(mNativeMapViewPtr, polygon.getId(), polygon);
+        polygon.setId(newId);
+    }
+
+    public void updatePolyline(Polyline polyline) {
+        //TODO remove new id assignment, https://github.com/mapbox/mapbox-gl-native/issues/5844
+        long newId = nativeUpdatePolyline(mNativeMapViewPtr, polyline.getId(), polyline);
+        polyline.setId(newId);
+    }
+
     public void removeAnnotation(long id) {
         long[] ids = {id};
         removeAnnotations(ids);
@@ -670,4 +682,8 @@ final class NativeMapView {
     private native void nativeAddSource(long mNativeMapViewPtr, String id, Source source);
 
     private native void nativeRemoveSource(long mNativeMapViewPtr, String sourceId);
+
+    private native long nativeUpdatePolygon(long nativeMapViewPtr, long polygonId, Polygon polygon);
+
+    private native long nativeUpdatePolyline(long nativeMapviewPtr, long polylineId, Polyline polyline);
 }
