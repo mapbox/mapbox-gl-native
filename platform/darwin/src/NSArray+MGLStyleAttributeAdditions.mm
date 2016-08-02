@@ -12,7 +12,7 @@
 
 - (mbgl::style::PropertyValue<std::array<float, 2>>)mbgl_offsetPropertyValue
 {
-    NSAssert(self.count == 4, @"Offset must contain 2 values (dx, dy)");
+    NSAssert(self.count == 2, @"Offset must contain 2 values (dx, dy)");
     NSNumber *dx = self[0];
     NSNumber *dy = self[1];
     return {{dx.floatValue, dy.floatValue}};

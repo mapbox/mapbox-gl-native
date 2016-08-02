@@ -21,23 +21,38 @@ global.camelizeWithLeadingLowercase = function (str) {
     });
 }
 
-global.isObject = function (property) {
-    return false;
+global.testImplementation = function (property) {
     switch (property.type) {
-        case 'string':
-            return true;
-        case 'color':
-            return true;
-        case 'array':
-            return true;
-        case 'number':
-            return true;
         case 'boolean':
-            return true;
+            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testBool;` +
+            `XCTAssert([layer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");`;
+        case 'number':
+            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testNumber;` +
+            `XCTAssert([layer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");`;
+        case 'string':
+            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testString;` +
+            `XCTAssert([layer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");`;
         case 'enum':
-            return true;
+            return `// TODO: setterEnum`; 
+        case 'color':
+            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testColor;` +
+            `XCTAssert([layer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");`;
+        case 'array':
+            return testArrayImplementation(property);
+        default: throw new Error(`unknown type for ${property.name}`)
+    }
+}
+
+global.testArrayImplementation = function (property) {
+    switch (property.name) {
+        case 'icon-text-fit-padding':
+            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testPadding;`;
+        case 'line-dasharray':
+            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testDashArray;`;
+        case 'text-font':
+            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testFont;`;
         default:
-            return false;
+            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testOffset;`; // Default offset (dx, dy)
     }
 }
 
@@ -108,6 +123,7 @@ global.getterImplementation = function(property, layerType = null) {
 
 const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.ejs', 'utf8'), { strict: true });
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
+const testLayers = ejs.compile(fs.readFileSync('platform/darwin/src/MGLRuntimeStylingTests.m.ejs', 'utf8'), { strict: true});
 
 const layers = spec.layer.type.values.map((type) => {
     const layoutProperties = Object.keys(spec[`layout_${type}`]).reduce((memo, name) => {
@@ -134,4 +150,5 @@ const layers = spec.layer.type.values.map((type) => {
 for (const layer of layers) {
     fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, layerH(layer));
     fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
+    fs.writeFileSync(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.m`, testLayers(layer));
 }
