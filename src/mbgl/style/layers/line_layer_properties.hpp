@@ -29,6 +29,7 @@ public:
 
     PaintProperty<float> lineOpacity { 1 };
     PaintProperty<Color> lineColor { Color::black() };
+	PaintProperty<bool> lineIsMappyPath { false };
     PaintProperty<std::array<float, 2>> lineTranslate { {{ 0, 0 }} };
     PaintProperty<TranslateAnchorType> lineTranslateAnchor { TranslateAnchorType::Map };
     PaintProperty<float> lineWidth { 1 };

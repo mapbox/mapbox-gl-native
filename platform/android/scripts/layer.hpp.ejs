@@ -1,0 +1,38 @@
+<%
+  const type = locals.type;
+-%>
+// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
+
+#pragma once
+
+#include "layer.hpp"
+#include <mbgl/style/layers/<%- type %>_layer.hpp>
+#include <jni/jni.hpp>
+
+namespace mbgl {
+namespace android {
+
+class <%- camelize(type) %>Layer : public Layer {
+public:
+
+    static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/<%- camelize(type) %>Layer"; };
+
+    static jni::Class<<%- camelize(type) %>Layer> javaClass;
+
+    static void registerNative(jni::JNIEnv&);
+
+<% if (type === 'background') { -%>
+    <%- camelize(type) %>Layer(jni::JNIEnv&, jni::String);
+<% } else { -%>
+    <%- camelize(type) %>Layer(jni::JNIEnv&, jni::String, jni::String);
+<% } -%>
+
+    <%- camelize(type) %>Layer(mbgl::Map&, mbgl::style::<%- camelize(type) %>Layer&);
+
+    ~<%- camelize(type) %>Layer();
+
+    jni::jobject* createJavaPeer(jni::JNIEnv&);
+};
+
+} // namespace android
+} // namespace mbgl

@@ -75,4 +75,8 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
     if (syncStatus & QQuickMapboxGL::PitchNeedsSync) {
         m_map->setPitch(quickMap->pitch());
     }
+
+    if (syncStatus & QQuickMapboxGL::ColorNeedsSync && m_map->isFullyLoaded()) {
+        m_map->setPaintProperty("background", "background-color", quickMap->color());
+    }
 }

@@ -50,13 +50,13 @@ after_script:
 
 matrix:
   include:
-    # Clang 3.5 - Release - Node
+    # Clang 3.5 - Debug - Node
     - os: linux
       sudo: required
       dist: trusty
       language: node
-      compiler: "node4-clang35-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
+      compiler: "node4-clang35-debug"
+      env: BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
       script:
         - nvm install 4

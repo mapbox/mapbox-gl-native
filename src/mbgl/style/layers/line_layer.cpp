@@ -105,6 +105,14 @@ void LineLayer::setLineColor(PropertyValue<Color> value, const optional<std::str
     impl->paint.lineColor.set(value, klass);
 }
 
+PropertyValue<bool> LineLayer::getLineIsMappyPath() const {
+	return impl->paint.lineIsMappyPath.get();
+}
+	
+void LineLayer::setLineIsMappyPath(PropertyValue<bool> value, const optional<std::string>& klass) {
+	impl->paint.lineIsMappyPath.set(value, klass);
+}
+
 PropertyValue<std::array<float, 2>> LineLayer::getLineTranslate() const {
     return impl->paint.lineTranslate.get();
 }

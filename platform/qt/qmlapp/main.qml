@@ -3,6 +3,7 @@ import QtPositioning 5.0
 import QtQuick 2.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.0
+import QtQuick.Dialogs 1.0
 
 import QQuickMapboxGL 1.0
 
@@ -11,6 +12,13 @@ ApplicationWindow {
     width: 1024
     height: 768
     visible: true
+
+    ColorDialog {
+        id: colorDialog
+        title: "Background color"
+        visible: false
+        color: "black"
+    }
 
     RowLayout {
         anchors.fill: parent
@@ -51,7 +59,7 @@ ApplicationWindow {
                     bearing: bearingSlider.value
                     pitch: pitchSlider.value
 
-                    color: "red"
+                    color: colorDialog.currentColor
                     copyrightsVisible: true
 
                     Image {
@@ -184,37 +192,50 @@ ApplicationWindow {
             }
         }
 
-        Slider {
-            id: bearingSlider
+        ColumnLayout {
+            RowLayout {
+                anchors.margins: 50
+                spacing: anchors.margins
 
-            Layout.fillHeight: true
-            orientation: Qt.Vertical
+                Slider {
+                    id: bearingSlider
 
-            value: 0
-            minimumValue: 0
-            maximumValue: 180
-        }
+                    Layout.fillHeight: true
+                    orientation: Qt.Vertical
 
-        Slider {
-            id: pitchSlider
+                    value: 0
+                    minimumValue: 0
+                    maximumValue: 180
+                }
 
-            Layout.fillHeight: true
-            orientation: Qt.Vertical
+                Slider {
+                    id: pitchSlider
 
-            value: 0
-            minimumValue: 0
-            maximumValue: 60
-        }
+                    Layout.fillHeight: true
+                    orientation: Qt.Vertical
 
-        Slider {
-            id: flipSlider
+                    value: 0
+                    minimumValue: 0
+                    maximumValue: 60
+                }
 
-            Layout.fillHeight: true
-            orientation: Qt.Vertical
+                Slider {
+                    id: flipSlider
 
-            value: 0
-            minimumValue: 0
-            maximumValue: 180
+                    Layout.fillHeight: true
+                    orientation: Qt.Vertical
+
+                    value: 0
+                    minimumValue: 0
+                    maximumValue: 180
+                }
+            }
+
+            Button {
+                id: colorChangeButton
+                text: "Change background color"
+                onClicked: colorDialog.open()
+            }
         }
     }
 }

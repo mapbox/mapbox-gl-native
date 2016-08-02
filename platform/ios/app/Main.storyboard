@@ -79,7 +79,7 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AAd-8J-9UU" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="lfd-mn-7en">
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="1" id="lfd-mn-7en">
                     <connections>
                         <action selector="handleLongPress:" destination="WaX-pd-UZQ" id="dkk-bc-rvl"/>
                     </connections>

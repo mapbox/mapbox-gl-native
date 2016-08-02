@@ -1039,6 +1039,7 @@
 					"$(rapidjson_cflags)",
 					"$(variant_cflags)",
 					"$(geometry_cflags)",
+					"$(geojson_cflags)",
 				);
 				OTHER_LDFLAGS = (
 					"$(zlib_ldflags)",
@@ -1078,6 +1079,7 @@
 					"$(rapidjson_cflags)",
 					"$(variant_cflags)",
 					"$(geometry_cflags)",
+					"$(geojson_cflags)",
 				);
 				OTHER_LDFLAGS = (
 					"$(zlib_ldflags)",
@@ -1104,6 +1106,7 @@
 					"$(OTHER_CFLAGS)",
 					"$(variant_cflags)",
 					"$(geometry_cflags)",
+					"$(geojson_cflags)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1122,6 +1125,7 @@
 					"$(OTHER_CFLAGS)",
 					"$(variant_cflags)",
 					"$(geometry_cflags)",
+					"$(geojson_cflags)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";

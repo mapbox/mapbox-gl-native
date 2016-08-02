@@ -27,7 +27,7 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
             return Feature { std::move(geom) };
         }));
         mapbox::geojsonvt::Options options;
-        options.maxZoom = util::clamp<uint8_t>(maxZoom, 0, 18);
+        options.maxZoom = maxZoom;
         options.buffer = 255u;
         options.extent = util::EXTENT;
         options.tolerance = baseTolerance;

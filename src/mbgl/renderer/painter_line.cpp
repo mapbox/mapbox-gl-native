@@ -140,7 +140,31 @@ void Painter::renderLine(PaintParameters& parameters,
         bucket.drawLinePatterns(linepatternShader, store, isOverdraw());
 
     } else {
-        config.program = lineShader.getID();
+		// Mappy specific drawing on paths
+		if (properties.lineIsMappyPath == true)
+		{
+			Color stroke_color = {1.0, 1.0, 1.0, opacity};
+			
+			config.program = lineShader.getID();
+			
+			lineShader.u_matrix = vtxMatrix;
+			lineShader.u_linewidth = (properties.lineWidth * 3.0f) / 4.0f;
+			lineShader.u_gapwidth = properties.lineGapWidth / 2;
+			lineShader.u_antialiasing = antialiasing / 2;
+			lineShader.u_ratio = ratio;
+			lineShader.u_blur = blur;
+			lineShader.u_extra = extra;
+			lineShader.u_offset = -properties.lineOffset;
+			lineShader.u_antialiasingmatrix = antialiasingMatrix;
+			
+			lineShader.u_color = stroke_color;
+			lineShader.u_opacity = opacity;
+			
+			setDepthSublayer(0);
+			bucket.drawLines(lineShader, store, isOverdraw());
+		}
+
+		config.program = lineShader.getID();
 
         lineShader.u_matrix = vtxMatrix;
         lineShader.u_linewidth = properties.lineWidth / 2;

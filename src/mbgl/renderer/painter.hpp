@@ -86,7 +86,10 @@ public:
     // Renders the red debug frame around a tile, visualizing its perimeter.
     void renderDebugFrame(const mat4 &matrix);
 
+#if defined(DEBUG)
+    // Renders tile clip boundaries, using stencil buffer to calculate fill color.
     void renderClipMasks();
+#endif
 
     void renderDebugText(Tile&, const mat4&);
     void renderFill(PaintParameters&, FillBucket&, const style::FillLayer&, const RenderTile&);
@@ -139,7 +142,11 @@ private:
 
     void setDepthSublayer(int n);
 
+#if defined(DEBUG)
     bool isOverdraw() const { return frame.debugOptions & MapDebugOptions::Overdraw; }
+#else
+    bool isOverdraw() const { return false; }
+#endif
 
     mat4 projMatrix;
 
@@ -174,7 +181,9 @@ private:
     FrameHistory frameHistory;
 
     std::unique_ptr<Shaders> shaders;
+#if defined(DEBUG)
     std::unique_ptr<Shaders> overdrawShaders;
+#endif
 
     // Set up the stencil quad we're using to generate the stencil mask.
     StaticVertexBuffer tileStencilBuffer {

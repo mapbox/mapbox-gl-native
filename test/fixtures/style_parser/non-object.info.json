@@ -1,0 +1,7 @@
+{
+    "default": {
+        "log": [
+            [1, "ERROR", "ParseStyle", "Style JSON must be an object"]
+        ]
+    }
+}

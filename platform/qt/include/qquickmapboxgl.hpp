@@ -89,6 +89,7 @@ public:
         PanNeedsSync     = 1 << 3,
         BearingNeedsSync = 1 << 4,
         PitchNeedsSync   = 1 << 5,
+        ColorNeedsSync   = 1 << 6,
     };
 
     int swapSyncState();
@@ -122,6 +123,7 @@ private:
 
     QGeoCoordinate m_center;
     QGeoShape m_visibleRegion;
+    QColor m_color = Qt::black;
 
     QString m_style;
     qreal m_bearing = 0;

@@ -41,6 +41,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Returns the stroke width object for the given annotation. */
 - (CGFloat)lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
 
+/** Returns YES if the polyline must have a white stroke. */
+- (BOOL)whiteStrokeForPolylineAnnotation:(MGLPolyline *)annotation;
+
 @end
 
 NS_ASSUME_NONNULL_END

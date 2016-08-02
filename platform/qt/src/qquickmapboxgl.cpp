@@ -148,16 +148,23 @@ bool QQuickMapboxGL::copyrightsVisible() const
     return false;
 }
 
-void QQuickMapboxGL::setColor(const QColor &)
+void QQuickMapboxGL::setColor(const QColor &color)
 {
-    // TODO: can be made functional after landing #837
-    qWarning() << __PRETTY_FUNCTION__
-        << "Use Mapbox Studio to change the map background color.";
+    if (color == m_color) {
+        return;
+    }
+
+    m_color = color;
+
+    m_syncState |= ColorNeedsSync;
+    update();
+
+    emit colorChanged(m_color);
 }
 
 QColor QQuickMapboxGL::color() const
 {
-    return QColor();
+    return m_color;
 }
 
 void QQuickMapboxGL::pan(int dx, int dy)

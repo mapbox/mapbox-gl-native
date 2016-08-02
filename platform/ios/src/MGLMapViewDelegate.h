@@ -204,12 +204,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns the alpha value to use when rendering a shape annotation.
  
- A value of 0.0 results in a completely transparent shape. A value of 1.0, the
- default, results in a completely opaque shape.
+ A value of `0.0` results in a completely transparent shape. A value of `1.0`,
+ the default, results in a completely opaque shape.
  
  @param mapView The map view rendering the shape annotation.
  @param annotation The annotation being rendered.
- @return An alpha value between 0 and 1.0.
+ @return An alpha value between `0` and `1.0`.
  */
 - (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation;
 
@@ -241,13 +241,24 @@ NS_ASSUME_NONNULL_BEGIN
  Returns the line width in points to use when rendering the outline of a
  polyline annotation.
  
- By default, the polyline is outlined with a line 3.0 points wide.
+ By default, the polyline is outlined with a line `3.0` points wide.
  
  @param mapView The map view rendering the polygon annotation.
  @param annotation The annotation being rendered.
  @return A line width for the polyline, measured in points.
  */
 - (CGFloat)mapView:(MGLMapView *)mapView lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
+
+/**
+Returns YES if a polyline annotation must have a white stroke.
+
+By default, the polyline doesn't have a white stroke.
+
+@param mapView The map view rendering the polyline annotation.
+@param annotation The annotation being rendered.
+@return YES or NO
+*/
+- (BOOL)mapView:(MGLMapView *)mapView whiteStrokeForPolylineAnnotation:(MGLPolyline *)annotation;
 
 #pragma mark Managing Annotation Views
 
@@ -442,6 +453,34 @@ NS_ASSUME_NONNULL_BEGIN
  @return The accessory view to display.
  */
 - (nullable UIView *)mapView:(MGLMapView *)mapView rightCalloutAccessoryViewForAnnotation:(id <MGLAnnotation>)annotation;
+
+#pragma mark Managing Callout Views
+
+/**
+ Returns a Boolean value indicating whether the annotation is able to display
+ extra information in a callout bubble.
+ 
+ This method is called after an annotation is selected, before any callout is
+ displayed for the annotation.
+ 
+ If the return value is `YES`, a callout view is shown when the user taps on an
+ annotation, selecting it. The default callout displays the annotation’s title
+ and subtitle. You can add accessory views to either end of the callout by
+ implementing the `-mapView:leftCalloutAccessoryViewForAnnotation:` and
+ `-mapView:rightCalloutAccessoryViewForAnnotation:` methods. You can further
+ customize the callout’s contents by implementing the
+ `-mapView:calloutViewForAnnotation:` method.
+ 
+ If the return value is `NO`, or if this method is absent from the delegate, or
+ if the annotation lacks a title, the annotation will not show a callout even
+ when selected.
+ 
+ @param mapView The map view that has selected the annotation.
+ @param annotation The object representing the annotation.
+ @return A Boolean value indicating whether the annotation should show a
+    callout.
+ */
+- (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation;
 
 /**
  Tells the delegate that the user tapped one of the accessory controls in the

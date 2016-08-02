@@ -65,6 +65,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     BOOL _randomizesCursorsOnDroppedPins;
     BOOL _isTouringWorld;
     BOOL _isShowingPolygonAndPolylineAnnotations;
+    BOOL _isShowingAnimatedAnnotation;
 }
 
 #pragma mark Lifecycle
@@ -329,9 +330,14 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
 }
 
+- (IBAction)showAllAnnotations:(id)sender {
+    [self.mapView showAnnotations:self.mapView.annotations animated:YES];
+}
+
 - (IBAction)removeAllAnnotations:(id)sender {
     [self.mapView removeAnnotations:self.mapView.annotations];
     _isShowingPolygonAndPolylineAnnotations = NO;
+    _isShowingAnimatedAnnotation = NO;
 }
 
 - (IBAction)startWorldTour:(id)sender {
@@ -408,6 +414,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 - (IBAction)drawAnimatedAnnotation:(id)sender {
     DroppedPinAnnotation *annotation = [[DroppedPinAnnotation alloc] init];
     [self.mapView addAnnotation:annotation];
+
+    _isShowingAnimatedAnnotation = YES;
 
     [NSTimer scheduledTimerWithTimeInterval:1.0/60.0
                                      target:self
@@ -632,10 +640,13 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     if (menuItem.action == @selector(dropManyPins:)) {
         return YES;
     }
-    if (menuItem.action == @selector(drawAnimatedAnnotation:)) {
-        return YES;
+    if (menuItem.action == @selector(drawPolygonAndPolyLineAnnotations:)) {
+        return !_isShowingPolygonAndPolylineAnnotations;
     }
-    if (menuItem.action == @selector(removeAllAnnotations:)) {
+    if (menuItem.action == @selector(drawAnimatedAnnotation:)) {
+        return !_isShowingAnimatedAnnotation;
+    }
+    if (menuItem.action == @selector(showAllAnnotations:) || menuItem.action == @selector(removeAllAnnotations:)) {
         return self.mapView.annotations.count > 0;
     }
     if (menuItem.action == @selector(startWorldTour:)) {
@@ -643,9 +654,6 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     if (menuItem.action == @selector(stopWorldTour:)) {
         return _isTouringWorld;
-    }
-    if (menuItem.action == @selector(drawPolygonAndPolyLineAnnotations:)) {
-        return !_isShowingPolygonAndPolylineAnnotations;
     }
     if (menuItem.action == @selector(addOfflinePack:)) {
         NSURL *styleURL = self.mapView.styleURL;
