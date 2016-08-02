@@ -679,6 +679,9 @@ jni::jarray<jlong>* nativeAddMarkers(JNIEnv *env, jni::jobject* obj, jlong nativ
     NullCheck(*env, jarray);
     std::size_t len = jni::GetArrayLength(*env, *jarray);
 
+    // Only allow relative placement for single markers.
+    assert(len == 1 || aboveMarker == nullptr);
+
     std::vector<mbgl::AnnotationID> ids;
     ids.reserve(len);
 

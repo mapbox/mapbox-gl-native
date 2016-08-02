@@ -359,11 +359,7 @@ final class NativeMapView {
     }
 
     public long[] addMarkers(List<Marker> markers) {
-        return addMarkers(markers, null);
-    }
-
-    public long[] addMarkers(List<Marker> markers, Marker aboveMarker) {
-        return nativeAddMarkers(mNativeMapViewPtr, markers.toArray(new Marker[markers.size()]), aboveMarker);
+        return nativeAddMarkers(mNativeMapViewPtr, markers.toArray(new Marker[markers.size()]), null);
     }
 
     public long addPolyline(Polyline polyline) {
