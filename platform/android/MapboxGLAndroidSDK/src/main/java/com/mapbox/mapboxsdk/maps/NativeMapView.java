@@ -621,7 +621,7 @@ final class NativeMapView {
 
     private native void nativeUpdateMarker(long nativeMapViewPtr, long markerId, double lat, double lon, String iconId);
 
-    private native long[] nativeAddMarkers(long mNativeMapViewPtr, Marker[] markers);
+    private native long[] nativeAddMarkers(long nativeMapViewPtr, Marker[] markers);
 
     private native long[] nativeAddPolylines(long mNativeMapViewPtr, Polyline[] polylines);
 
