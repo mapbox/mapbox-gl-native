@@ -350,12 +350,20 @@ final class NativeMapView {
     }
 
     public long addMarker(Marker marker) {
+        return addMarker(marker, null);
+    }
+
+    public long addMarker(Marker marker, Marker aboveMarker) {
         Marker[] markers = {marker};
-        return nativeAddMarkers(mNativeMapViewPtr, markers)[0];
+        return nativeAddMarkers(mNativeMapViewPtr, markers, aboveMarker)[0];
     }
 
     public long[] addMarkers(List<Marker> markers) {
-        return nativeAddMarkers(mNativeMapViewPtr, markers.toArray(new Marker[markers.size()]));
+        return addMarkers(markers, null);
+    }
+
+    public long[] addMarkers(List<Marker> markers, Marker aboveMarker) {
+        return nativeAddMarkers(mNativeMapViewPtr, markers.toArray(new Marker[markers.size()]), aboveMarker);
     }
 
     public long addPolyline(Polyline polyline) {
@@ -621,7 +629,7 @@ final class NativeMapView {
 
     private native void nativeUpdateMarker(long nativeMapViewPtr, long markerId, double lat, double lon, String iconId);
 
-    private native long[] nativeAddMarkers(long nativeMapViewPtr, Marker[] markers);
+    private native long[] nativeAddMarkers(long mNativeMapViewPtr, Marker[] markers, Marker aboveMarker);
 
     private native long[] nativeAddPolylines(long mNativeMapViewPtr, Polyline[] polylines);
 

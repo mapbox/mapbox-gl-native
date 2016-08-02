@@ -1050,10 +1050,14 @@ public class MapView extends FrameLayout {
     }
 
     long addMarker(@NonNull Marker marker) {
+        return addMarker(marker, null);
+    }
+
+    long addMarker(@NonNull Marker marker, MarkerView aboveMarker) {
         if (mDestroyed) {
             return 0l;
         }
-        return mNativeMapView.addMarker(marker);
+        return mNativeMapView.addMarker(marker, aboveMarker);
     }
 
     long[] addMarkers(@NonNull List<Marker> markerList) {

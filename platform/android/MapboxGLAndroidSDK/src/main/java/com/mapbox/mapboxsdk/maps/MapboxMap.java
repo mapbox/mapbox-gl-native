@@ -736,9 +736,26 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions) {
+        return addMarker(markerOptions, null);
+    }
+
+    /**
+     * <p>
+     * Adds a marker to this map above an existing marker.
+     * </p>
+     * The marker's icon is rendered on the map at the location {@code Marker.position}.
+     * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
+     *
+     * @param markerOptions A marker options object that defines how to render the marker.
+     * @param aboveMarker An existing map marker on top of which to add the new marker.
+     * @return The {@code Marker} that was added to the map.
+     */
+    @UiThread
+    @NonNull
+    public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions, MarkerView aboveMarker) {
         MarkerView marker = prepareViewMarker(markerOptions);
         marker.setMapboxMap(this);
-        long id = mMapView.addMarker(marker);
+        long id = mMapView.addMarker(marker, aboveMarker);
         marker.setId(id);
         mAnnotations.put(id, marker);
         mMarkerViewManager.invalidateViewMarkersInBounds();
