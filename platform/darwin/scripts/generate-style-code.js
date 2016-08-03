@@ -89,9 +89,9 @@ global.propertyType = function (property, _private) {
 
 global.initLayer = function (layerType) {
     if (layerType == "background") {
-        return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerID.UTF8String);`
+        return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String);`
     } else {
-        return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerID.UTF8String, sourceID.UTF8String);`
+        return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String, sourceIdentifier.UTF8String);`
     }
 }
 

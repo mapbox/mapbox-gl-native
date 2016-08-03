@@ -27,8 +27,8 @@
 
 - (void)testSymbolLayer {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"sourceID" url:geoJSONURL];    
-    MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithLayerID:@"layerID" sourceID:@"sourceID"];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:geoJSONURL];
+    MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithLayerIdentifier:@"layerID" sourceIdentifier:@"sourceID"];
     [_mapView.style addLayer:layer];
 
     // TODO: setterEnum

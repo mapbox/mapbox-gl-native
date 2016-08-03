@@ -96,7 +96,7 @@ static NSURL *MGLStyleURL_emerald;
     Class clazz = [self classFromLayer:layer];
     
     id <MGLStyleLayer, MGLStyleLayer_Private> styleLayer = [[clazz alloc] init];
-    styleLayer.layerID = identifier;
+    styleLayer.layerIdentifier = identifier;
     styleLayer.layer = layer;
     styleLayer.mapView = self.mapView;
     
@@ -138,7 +138,7 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)removeSource:(MGLSource *)source
 {
-    self.mapView.mbglMap->removeSource(source.sourceID.UTF8String);
+    self.mapView.mbglMap->removeSource(source.sourceIdentifier.UTF8String);
 }
 
 - (void)tempUpdateStyleAndClasses

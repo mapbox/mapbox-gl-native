@@ -5,13 +5,13 @@
 @protocol MGLStyleLayer <NSObject>
 
 @property (nonatomic, weak) MGLMapView *mapView;
-@property (nonatomic, readonly) NSString *layerID;
+@property (nonatomic, readonly) NSString *layerIdentifier;
 
 @optional
 
-@property (nonatomic, readonly) NSString *sourceID;
+@property (nonatomic, readonly) NSString *sourceIdentifier;
 
-- (instancetype)initWithLayerID:(NSString *)layerID;
-- (instancetype)initWithLayerID:(NSString *)layerID sourceID:(NSString *)sourceID;
+- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier;
+- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier sourceIdentifier:(NSString *)sourceIdentifier;
 
 @end

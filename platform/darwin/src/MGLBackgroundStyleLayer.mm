@@ -10,8 +10,8 @@
 @interface MGLBackgroundStyleLayer ()
 
 @property (nonatomic) mbgl::style::BackgroundLayer *layer;
-@property (nonatomic, readwrite) NSString *layerID;
-@property (nonatomic, readwrite) NSString *sourceID;
+@property (nonatomic, readwrite) NSString *layerIdentifier;
+@property (nonatomic, readwrite) NSString *sourceIdentifier;
 
 @end
 
@@ -19,12 +19,12 @@
 
 @synthesize mapView;
 
-- (instancetype)initWithLayerID:(NSString *)layerID sourceID:(NSString *)sourceID {
-    self = [super init];
-    if (self == nil) return nil;
-    _layerID = layerID;
-    _sourceID = sourceID;
-    _layer = new mbgl::style::BackgroundLayer(layerID.UTF8String);
+- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier sourceIdentifier:(NSString *)sourceIdentifier {
+    if (self = [super init]) {
+        _layerIdentifier = layerIdentifier;
+        _sourceIdentifier = sourceIdentifier;
+        _layer = new mbgl::style::BackgroundLayer(layerIdentifier.UTF8String);
+    }
     return self;
 }
 

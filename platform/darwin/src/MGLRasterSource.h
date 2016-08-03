@@ -2,9 +2,9 @@
 
 @interface MGLRasterSource : MGLSource
 
-@property (nonatomic, readonly, copy) NSURL *url;
+@property (nonatomic, readonly, copy) NSURL *URL;
 @property (nonatomic, readonly, assign) CGFloat tileSize;
 
-- (instancetype)initWithSourceID:(NSString *)sourceID url:(NSURL *)url tileSize:(CGFloat)tileSize;
+- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url tileSize:(CGFloat)tileSize;
 
 @end

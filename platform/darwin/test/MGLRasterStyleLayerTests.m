@@ -27,8 +27,8 @@
 
 - (void)testRasterLayer {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"sourceID" url:geoJSONURL];    
-    MGLRasterStyleLayer *layer = [[MGLRasterStyleLayer alloc] initWithLayerID:@"layerID" sourceID:@"sourceID"];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:geoJSONURL];
+    MGLRasterStyleLayer *layer = [[MGLRasterStyleLayer alloc] initWithLayerIdentifier:@"layerID" sourceIdentifier:@"sourceID"];
     [_mapView.style addLayer:layer];
 
     layer.rasterOpacity = MGLRuntimeStylingHelper.testNumber;

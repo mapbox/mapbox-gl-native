@@ -4,6 +4,6 @@
 
 @property (nonatomic, readonly, copy) NSString *data;
 
-- (instancetype)initWithSourceID:(NSString *)sourceID url:(NSURL *)url NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url NS_DESIGNATED_INITIALIZER;
 
 @end

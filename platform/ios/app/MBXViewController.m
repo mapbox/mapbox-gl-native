@@ -467,10 +467,10 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 - (void)styleGeoJSONSource
 {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"ams" url:geoJSONURL];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
     [self.mapView.style addSource:source];
     
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerID:@"test" sourceID:@"ams"];
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" sourceIdentifier:@"ams"];
     fillLayer.fillColor = [UIColor purpleColor];
     [self.mapView.style addLayer:fillLayer];
 }
@@ -478,10 +478,10 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 - (void)styleRasterLayer
 {
     NSURL *rasterURL = [NSURL URLWithString:@"mapbox://mapbox.satellite"];
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithSourceID:@"my-raster-source" url:rasterURL tileSize:512];
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithSourceIdentifier:@"my-raster-source" URL:rasterURL tileSize:512];
     [self.mapView.style addSource:rasterSource];
     
-    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerID:@"my-raster-layer" sourceID:@"my-raster-source"];
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerIdentifier:@"my-raster-layer" sourceIdentifier:@"my-raster-source"];
     MGLStyleAttributeFunction *opacityFunction = [[MGLStyleAttributeFunction alloc] init];
     opacityFunction.stops = @{@20.0f: @1.0f,
                               @5.0f: @0.0f};

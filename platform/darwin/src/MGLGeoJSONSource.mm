@@ -4,8 +4,10 @@
 
 #include <mbgl/style/sources/geojson_source.hpp>
 
-@interface MGLGeoJSONSource()
-@property (nonatomic, copy) NSURL *url;
+@interface MGLGeoJSONSource ()
+
+@property (nonatomic, copy) NSURL *URL;
+
 @end
 
 @implementation MGLGeoJSONSource
@@ -13,18 +15,18 @@
 static NSString *MGLGeoJSONSourceType   = @"geojson";
 static NSString *MGLGeoJSONDataKey      = @"data";
 
-- (instancetype)initWithSourceID:(NSString *)sourceID url:(NSURL *)url
+- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url
 {
-    self = [super initWithSourceID:sourceID sourceType:MGLGeoJSONSourceType];
-    if (self == nil) return nil;
-    _data = url.absoluteString;
+    if (self = [super initWithSourceIdentifier:sourceIdentifier sourceType:MGLGeoJSONSourceType]) {
+        _data = url.absoluteString;
+    }
     return self;
 }
 
 
 - (std::unique_ptr<mbgl::style::Source>)mbgl_source
 {
-    auto source = std::make_unique<mbgl::style::GeoJSONSource>(self.sourceID.UTF8String);
+    auto source = std::make_unique<mbgl::style::GeoJSONSource>(self.sourceIdentifier.UTF8String);
     source->setURL(self.data.UTF8String);
     return std::move(source);
 }

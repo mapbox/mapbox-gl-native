@@ -8,9 +8,9 @@
 
 - (instancetype)init
 {
-    self = [super init];
-    if (self == nil) return nil;
-    _base = @1;
+    if (self = [super init]) {
+        _base = @1;
+    }
     return self;
 }
 
