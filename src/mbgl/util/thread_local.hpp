@@ -2,9 +2,7 @@
 
 #include <mbgl/util/noncopyable.hpp>
 
-#include <stdexcept>
-
-#include <pthread.h>
+#include <memory>
 
 namespace mbgl {
 namespace util {
@@ -17,39 +15,15 @@ public:
         set(val);
     }
 
-    ThreadLocal() {
-        int ret = pthread_key_create(&key, [](void *ptr) {
-            delete reinterpret_cast<T *>(ptr);
-        });
+    ThreadLocal();
+    ~ThreadLocal();
 
-        if (ret) {
-            throw std::runtime_error("Failed to init local storage key.");
-        }
-    }
-
-    ~ThreadLocal() {
-        if (pthread_key_delete(key)) {
-            throw std::runtime_error("Failed to delete local storage key.");
-        }
-    }
-
-    T* get() {
-        T* ret = reinterpret_cast<T*>(pthread_getspecific(key));
-        if (!ret) {
-            return nullptr;
-        }
-
-        return ret;
-    }
-
-    void set(T* ptr) {
-        if (pthread_setspecific(key, ptr)) {
-            throw std::runtime_error("Failed to set local storage.");
-        }
-    }
+    T* get();
+    void set(T* ptr);
 
 private:
-    pthread_key_t key;
+    class Impl;
+    std::unique_ptr<Impl> impl;
 };
 
 } // namespace util
