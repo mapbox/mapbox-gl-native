@@ -1,11 +1,11 @@
-package com.mapbox.mapboxsdk.testapp.espresso;
+package com.mapbox.mapboxsdk.activity;
 
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.mapbox.mapboxsdk.testapp.activity.annotation.PolylineActivity;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.activity.fragment.MapFragmentActivity;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -13,17 +13,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests on PolyLineActivity
+ * Tests on MapFragmentActivity
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class PolylineActivityTest extends BaseTest {
+public class MapFragmentActivityTest extends BaseTest {
 
     @Rule
-    public ActivityTestRule<PolylineActivity> mActivityRule = new ActivityTestRule<>(
-            PolylineActivity.class);
+    public ActivityTestRule<MapFragmentActivity> mActivityRule = new ActivityTestRule<>(
+            MapFragmentActivity.class);
 
-    private PolylineActivity mActivity = null;
+    private MapFragmentActivity mActivity = null;
 
     @Before
     public void setActivity() {
@@ -32,6 +32,8 @@ public class PolylineActivityTest extends BaseTest {
 
     @Test
     public void testSanity() {
-        checkViewIsDisplayed(R.id.mapView);
+        checkViewIsDisplayed(R.id.fragment_container);
     }
+
+    // FIXME need a way to check if fragment was correctly added to Activity
 }

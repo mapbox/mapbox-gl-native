@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.testapp.espresso.utils;
+package com.mapbox.mapboxsdk.activity.utils;
 
 import android.support.annotation.IdRes;
 

@@ -1,11 +1,12 @@
-package com.mapbox.mapboxsdk.testapp.espresso;
+package com.mapbox.mapboxsdk.activity;
 
+import android.app.Activity;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.mapbox.mapboxsdk.testapp.activity.annotation.BulkMarkerActivity;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.activity.maplayout.MapPaddingActivity;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -13,17 +14,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests on BulkMarkerActivity
+ * Tests on MapPaddingActivity
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class BulkMarkerActivityTest extends BaseTest {
+public class MapPaddingActivityTest extends BaseTest {
 
     @Rule
-    public ActivityTestRule<BulkMarkerActivity> mActivityRule = new ActivityTestRule<>(
-            BulkMarkerActivity.class);
+    public ActivityTestRule<MapPaddingActivity> mActivityRule = new ActivityTestRule<>(MapPaddingActivity.class);
 
-    private BulkMarkerActivity mActivity = null;
+    private Activity mActivity = null;
 
     @Before
     public void setActivity() {

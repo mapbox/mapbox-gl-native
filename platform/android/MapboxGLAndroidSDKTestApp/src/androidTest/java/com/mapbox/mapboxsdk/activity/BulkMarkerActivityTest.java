@@ -1,12 +1,11 @@
-package com.mapbox.mapboxsdk.testapp.espresso;
+package com.mapbox.mapboxsdk.activity;
 
-import android.app.Activity;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.activity.fragment.SupportMapFragmentActivity;
+import com.mapbox.mapboxsdk.testapp.activity.annotation.BulkMarkerActivity;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -14,16 +13,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests on SupportMapFragmentActivity
+ * Tests on BulkMarkerActivity
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class SupportMapFragmentActivityTest extends BaseTest {
+public class BulkMarkerActivityTest extends BaseTest {
 
     @Rule
-    public ActivityTestRule<SupportMapFragmentActivity> mActivityRule = new ActivityTestRule<>(SupportMapFragmentActivity.class);
+    public ActivityTestRule<BulkMarkerActivity> mActivityRule = new ActivityTestRule<>(
+            BulkMarkerActivity.class);
 
-    private Activity mActivity = null;
+    private BulkMarkerActivity mActivity = null;
 
     @Before
     public void setActivity() {
@@ -32,7 +32,6 @@ public class SupportMapFragmentActivityTest extends BaseTest {
 
     @Test
     public void testSanity() {
-        checkViewIsDisplayed(R.id.fragment_container);
+        checkViewIsDisplayed(R.id.mapView);
     }
 }
-

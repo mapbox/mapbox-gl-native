@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.testapp.espresso;
+package com.mapbox.mapboxsdk.activity;
 
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;

@@ -6,12 +6,12 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
+import com.mapbox.mapboxsdk.activity.BaseTest;
+import com.mapbox.mapboxsdk.activity.utils.OnMapReadyIdlingResource;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
-import com.mapbox.mapboxsdk.testapp.espresso.BaseTest;
-import com.mapbox.mapboxsdk.testapp.espresso.utils.OnMapReadyIdlingResource;
 
 import org.junit.After;
 import org.junit.Before;
@@ -19,9 +19,19 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.*;
-import static com.mapbox.mapboxsdk.style.layers.Property.*;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
+import static com.mapbox.mapboxsdk.style.layers.Property.FILL_TRANSLATE_ANCHOR_MAP;
+import static com.mapbox.mapboxsdk.style.layers.Property.NONE;
+import static com.mapbox.mapboxsdk.style.layers.Property.VISIBLE;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillAntialias;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOutlineColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillPattern;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillTranslate;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillTranslateAnchor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Basic smoke tests for FillLayer
@@ -176,8 +186,8 @@ public class FillLayerTest extends BaseTest {
         assertNotNull(layer);
 
         //Set and Get
-        layer.setProperties(fillTranslate(new Float[]{0f,0f}));
-        assertEquals((Float[]) layer.getFillTranslate().getValue(), (Float[]) new Float[]{0f,0f});
+        layer.setProperties(fillTranslate(new Float[]{0f, 0f}));
+        assertEquals((Float[]) layer.getFillTranslate().getValue(), (Float[]) new Float[]{0f, 0f});
     }
 
     @Test
@@ -225,8 +235,8 @@ public class FillLayerTest extends BaseTest {
     }
 
 
-   @After
-   public void unregisterIntentServiceIdlingResource() {
-       Espresso.unregisterIdlingResources(idlingResource);
-   }
+    @After
+    public void unregisterIntentServiceIdlingResource() {
+        Espresso.unregisterIdlingResources(idlingResource);
+    }
 }

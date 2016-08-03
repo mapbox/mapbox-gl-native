@@ -1,12 +1,12 @@
-package com.mapbox.mapboxsdk.testapp.espresso;
+package com.mapbox.mapboxsdk.activity;
 
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.mapbox.mapboxsdk.testapp.activity.annotation.DynamicMarkerChangeActivity;
+import com.mapbox.mapboxsdk.activity.utils.ViewUtils;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.espresso.utils.ViewUtils;
+import com.mapbox.mapboxsdk.testapp.activity.annotation.DynamicMarkerChangeActivity;
 
 import org.junit.Rule;
 import org.junit.Test;

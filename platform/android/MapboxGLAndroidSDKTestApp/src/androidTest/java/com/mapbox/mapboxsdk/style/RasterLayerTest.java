@@ -6,12 +6,12 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
+import com.mapbox.mapboxsdk.activity.BaseTest;
+import com.mapbox.mapboxsdk.activity.utils.OnMapReadyIdlingResource;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.RasterLayer;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
-import com.mapbox.mapboxsdk.testapp.espresso.BaseTest;
-import com.mapbox.mapboxsdk.testapp.espresso.utils.OnMapReadyIdlingResource;
 
 import org.junit.After;
 import org.junit.Before;
@@ -19,9 +19,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.*;
-import static com.mapbox.mapboxsdk.style.layers.Property.*;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
+import static com.mapbox.mapboxsdk.style.layers.Property.NONE;
+import static com.mapbox.mapboxsdk.style.layers.Property.VISIBLE;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.rasterBrightnessMax;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.rasterBrightnessMin;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.rasterContrast;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.rasterFadeDuration;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.rasterHueRotate;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.rasterOpacity;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.rasterSaturation;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Basic smoke tests for RasterLayer
@@ -225,8 +234,8 @@ public class RasterLayerTest extends BaseTest {
     }
 
 
-   @After
-   public void unregisterIntentServiceIdlingResource() {
-       Espresso.unregisterIdlingResources(idlingResource);
-   }
+    @After
+    public void unregisterIntentServiceIdlingResource() {
+        Espresso.unregisterIdlingResources(idlingResource);
+    }
 }

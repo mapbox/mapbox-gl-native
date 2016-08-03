@@ -1,12 +1,12 @@
-package com.mapbox.mapboxsdk.testapp.espresso;
+package com.mapbox.mapboxsdk.activity;
 
 import android.app.Activity;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.mapbox.mapboxsdk.testapp.activity.directions.DirectionsActivity;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.activity.directions.DirectionsActivity;
 
 import org.junit.Before;
 import org.junit.Rule;

@@ -1,8 +1,8 @@
-package com.mapbox.mapboxsdk.testapp.espresso;
+package com.mapbox.mapboxsdk.activity;
 
 import android.app.Activity;
 
-import com.mapbox.mapboxsdk.testapp.espresso.utils.ScreenshotUtil;
+import com.mapbox.mapboxsdk.activity.utils.ScreenshotUtil;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;

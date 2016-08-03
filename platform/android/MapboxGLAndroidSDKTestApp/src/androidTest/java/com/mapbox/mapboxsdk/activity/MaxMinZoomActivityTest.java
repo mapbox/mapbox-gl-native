@@ -1,12 +1,12 @@
-package com.mapbox.mapboxsdk.testapp.espresso;
+package com.mapbox.mapboxsdk.activity;
 
 import android.app.Activity;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.mapbox.mapboxsdk.testapp.activity.maplayout.MapPaddingActivity;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.activity.camera.MaxMinZoomActivity;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -14,14 +14,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests on MapPaddingActivity
+ * Tests on MaxMinZoomActivity
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class MapPaddingActivityTest extends BaseTest {
+public class MaxMinZoomActivityTest extends BaseTest {
 
     @Rule
-    public ActivityTestRule<MapPaddingActivity> mActivityRule = new ActivityTestRule<>(MapPaddingActivity.class);
+    public ActivityTestRule<MaxMinZoomActivity> mActivityRule = new ActivityTestRule<>(MaxMinZoomActivity.class);
 
     private Activity mActivity = null;
 
