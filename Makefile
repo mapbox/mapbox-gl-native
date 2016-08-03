@@ -425,7 +425,7 @@ build/android-$1/$(BUILDTYPE)/toolchain.cmake: platform/android/scripts/toolchai
 	$(ANDROID_ENV) $1 > build/android-$1/$(BUILDTYPE)/toolchain.cmake
 
 build/android-$1/$(BUILDTYPE)/Makefile: build/android-$1/$(BUILDTYPE)/toolchain.cmake platform/android/config.cmake
-	cd build/android-$1/$(BUILDTYPE) && cmake ../../.. \
+	cd build/android-$1/$(BUILDTYPE) && cmake ../../.. -G Ninja \
 		-DCMAKE_TOOLCHAIN_FILE=build/android-$1/$(BUILDTYPE)/toolchain.cmake \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
@@ -433,7 +433,7 @@ build/android-$1/$(BUILDTYPE)/Makefile: build/android-$1/$(BUILDTYPE)/toolchain.
 
 .PHONY: android-lib-$1
 android-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile
-	$(MAKE) -j$(JOBS) -C build/android-$1/$(BUILDTYPE) all
+	$(NINJA) -j$(JOBS) -C build/android-$1/$(BUILDTYPE) all
 
 .PHONY: android-$1
 android-$1: android-lib-$1
