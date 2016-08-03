@@ -45,7 +45,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)symbolSpacing {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getSymbolSpacing()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getSymbolSpacing()];
 }
 
 - (void)setSymbolAvoidEdges:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)symbolAvoidEdges {
@@ -53,7 +53,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)symbolAvoidEdges {
-    return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getSymbolAvoidEdges()];
+    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getSymbolAvoidEdges()];
 }
 
 - (void)setIconAllowOverlap:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconAllowOverlap {
@@ -61,7 +61,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconAllowOverlap {
-    return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getIconAllowOverlap()];
+    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getIconAllowOverlap()];
 }
 
 - (void)setIconIgnorePlacement:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconIgnorePlacement {
@@ -69,7 +69,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconIgnorePlacement {
-    return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getIconIgnorePlacement()];
+    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getIconIgnorePlacement()];
 }
 
 - (void)setIconOptional:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconOptional {
@@ -77,7 +77,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconOptional {
-    return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getIconOptional()];
+    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getIconOptional()];
 }
 
 - (void)setIconRotationAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconRotationAlignment {
@@ -95,7 +95,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconSize {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getIconSize()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getIconSize()];
 }
 
 - (void)setIconTextFit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTextFit {
@@ -129,7 +129,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconRotate {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getIconRotate()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getIconRotate()];
 }
 
 - (void)setIconPadding:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconPadding {
@@ -137,7 +137,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconPadding {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getIconPadding()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getIconPadding()];
 }
 
 - (void)setIconKeepUpright:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconKeepUpright {
@@ -145,7 +145,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconKeepUpright {
-    return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getIconKeepUpright()];
+    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getIconKeepUpright()];
 }
 
 - (void)setIconOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconOffset {
@@ -197,7 +197,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textSize {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextSize()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextSize()];
 }
 
 - (void)setTextMaxWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textMaxWidth {
@@ -205,7 +205,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textMaxWidth {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextMaxWidth()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextMaxWidth()];
 }
 
 - (void)setTextLineHeight:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textLineHeight {
@@ -213,7 +213,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textLineHeight {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextLineHeight()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextLineHeight()];
 }
 
 - (void)setTextLetterSpacing:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textLetterSpacing {
@@ -221,7 +221,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textLetterSpacing {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextLetterSpacing()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextLetterSpacing()];
 }
 
 - (void)setTextJustify:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textJustify {
@@ -249,7 +249,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textMaxAngle {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextMaxAngle()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextMaxAngle()];
 }
 
 - (void)setTextRotate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textRotate {
@@ -257,7 +257,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textRotate {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextRotate()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextRotate()];
 }
 
 - (void)setTextPadding:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textPadding {
@@ -265,7 +265,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textPadding {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextPadding()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextPadding()];
 }
 
 - (void)setTextKeepUpright:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textKeepUpright {
@@ -273,7 +273,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textKeepUpright {
-    return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getTextKeepUpright()];
+    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getTextKeepUpright()];
 }
 
 - (void)setTextTransform:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTransform {
@@ -299,7 +299,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textAllowOverlap {
-    return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getTextAllowOverlap()];
+    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getTextAllowOverlap()];
 }
 
 - (void)setTextIgnorePlacement:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textIgnorePlacement {
@@ -307,7 +307,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textIgnorePlacement {
-    return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getTextIgnorePlacement()];
+    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getTextIgnorePlacement()];
 }
 
 - (void)setTextOptional:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textOptional {
@@ -315,7 +315,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textOptional {
-    return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getTextOptional()];
+    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getTextOptional()];
 }
 
 #pragma mark - Accessing the Paint Attributes
@@ -325,7 +325,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconOpacity {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getIconOpacity()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getIconOpacity()];
 }
 
 - (void)setIconColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconColor {
@@ -349,7 +349,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconHaloWidth {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getIconHaloWidth()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getIconHaloWidth()];
 }
 
 - (void)setIconHaloBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconHaloBlur {
@@ -357,7 +357,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconHaloBlur {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getIconHaloBlur()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getIconHaloBlur()];
 }
 
 - (void)setIconTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTranslate {
@@ -383,7 +383,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textOpacity {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextOpacity()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextOpacity()];
 }
 
 - (void)setTextColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textColor {
@@ -407,7 +407,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textHaloWidth {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextHaloWidth()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextHaloWidth()];
 }
 
 - (void)setTextHaloBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textHaloBlur {
@@ -415,7 +415,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textHaloBlur {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextHaloBlur()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextHaloBlur()];
 }
 
 - (void)setTextTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTranslate {

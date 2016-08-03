@@ -55,7 +55,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)lineMiterLimit {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getLineMiterLimit()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getLineMiterLimit()];
 }
 
 - (void)setLineRoundLimit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineRoundLimit {
@@ -63,7 +63,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)lineRoundLimit {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getLineRoundLimit()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getLineRoundLimit()];
 }
 
 #pragma mark - Accessing the Paint Attributes
@@ -73,7 +73,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)lineOpacity {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getLineOpacity()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getLineOpacity()];
 }
 
 - (void)setLineColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineColor {
@@ -107,7 +107,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)lineWidth {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getLineWidth()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getLineWidth()];
 }
 
 - (void)setLineGapWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineGapWidth {
@@ -115,7 +115,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)lineGapWidth {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getLineGapWidth()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getLineGapWidth()];
 }
 
 - (void)setLineOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineOffset {
@@ -123,7 +123,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)lineOffset {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getLineOffset()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getLineOffset()];
 }
 
 - (void)setLineBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineBlur {
@@ -131,7 +131,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)lineBlur {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getLineBlur()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getLineBlur()];
 }
 
 - (void)setLineDasharray:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineDasharray {

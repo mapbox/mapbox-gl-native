@@ -6,6 +6,10 @@
 
 @interface MGLStyleAttribute : NSObject <MGLStyleAttributeValue>
 
-+ (id <MGLStyleAttributeValue>)mbgl_colorPropertyValueWith:(mbgl::style::PropertyValue<mbgl::Color>)color;
++ (id <MGLStyleAttributeValue>)mbgl_colorPropertyValueWith:(mbgl::style::PropertyValue<mbgl::Color>)property;
+
++ (id <MGLStyleAttributeValue>)mbgl_numberPropertyValueWith:(mbgl::style::PropertyValue<float>)property;
+
++ (id <MGLStyleAttributeValue>)mbgl_boolPropertyValueWith:(mbgl::style::PropertyValue<bool>)property;
 
 @end

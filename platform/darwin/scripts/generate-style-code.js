@@ -137,9 +137,9 @@ global.arraySetterImplementation = function(property) {
 global.getterImplementation = function(property, layerType) {
     switch (property.type) {
         case 'boolean':
-            return `return [NSNumber mbgl_booleanWithPropertyValue:self.layer->get${camelize(property.name)}()];`;
+            return `return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->get${camelize(property.name)}()];`
         case 'number':
-            return `return [NSNumber mbgl_numberWithPropertyValue:self.layer->get${camelize(property.name)}()];`;
+            return `return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->get${camelize(property.name)}()];`
         case 'string':
             return `return [NSString mbgl_stringWithPropertyValue:self.layer->get${camelize(property.name)}()];`;
         case 'enum':

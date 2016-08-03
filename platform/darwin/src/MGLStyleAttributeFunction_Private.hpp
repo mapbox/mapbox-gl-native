@@ -29,8 +29,10 @@
 
 @interface MGLStyleAttributeFunction(Private)
 
-- (mbgl::style::Function<mbgl::Color>)colorFunction;
++ (instancetype)functionWithColorPropertyValue:(mbgl::style::Function<mbgl::Color>)property;
 
-+ (instancetype)functionWithColorPropertyValue:(mbgl::style::Function<mbgl::Color>)propertyValue;
++ (instancetype)functionWithNumberPropertyValue:(mbgl::style::Function<float>)property;
+
++ (instancetype)functionWithBoolPropertyValue:(mbgl::style::Function<bool>)property;
 
 @end;

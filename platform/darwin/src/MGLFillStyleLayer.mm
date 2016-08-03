@@ -35,7 +35,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)fillAntialias {
-    return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getFillAntialias()];
+    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getFillAntialias()];
 }
 
 - (void)setFillOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillOpacity {
@@ -43,7 +43,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)fillOpacity {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getFillOpacity()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getFillOpacity()];
 }
 
 - (void)setFillColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillColor {

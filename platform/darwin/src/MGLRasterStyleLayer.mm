@@ -35,7 +35,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)rasterOpacity {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterOpacity()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getRasterOpacity()];
 }
 
 - (void)setRasterHueRotate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)rasterHueRotate {
@@ -43,7 +43,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)rasterHueRotate {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterHueRotate()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getRasterHueRotate()];
 }
 
 - (void)setRasterBrightnessMin:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)rasterBrightnessMin {
@@ -51,7 +51,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)rasterBrightnessMin {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterBrightnessMin()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getRasterBrightnessMin()];
 }
 
 - (void)setRasterBrightnessMax:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)rasterBrightnessMax {
@@ -59,7 +59,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)rasterBrightnessMax {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterBrightnessMax()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getRasterBrightnessMax()];
 }
 
 - (void)setRasterSaturation:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)rasterSaturation {
@@ -67,7 +67,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)rasterSaturation {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterSaturation()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getRasterSaturation()];
 }
 
 - (void)setRasterContrast:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)rasterContrast {
@@ -75,7 +75,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)rasterContrast {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterContrast()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getRasterContrast()];
 }
 
 - (void)setRasterFadeDuration:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)rasterFadeDuration {
@@ -83,7 +83,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)rasterFadeDuration {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getRasterFadeDuration()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getRasterFadeDuration()];
 }
 
 @end

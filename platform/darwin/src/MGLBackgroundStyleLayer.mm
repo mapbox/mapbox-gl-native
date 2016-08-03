@@ -51,7 +51,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)backgroundOpacity {
-    return [NSNumber mbgl_numberWithPropertyValue:self.layer->getBackgroundOpacity()];
+    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getBackgroundOpacity()];
 }
 
 @end
