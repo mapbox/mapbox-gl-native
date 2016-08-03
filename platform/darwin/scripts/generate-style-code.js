@@ -108,7 +108,7 @@ global.arraySetterImplementation = function(property) {
     }
 }
 
-global.setterImplementation = function(property) {
+global.setterImplementation = function(property, layerType) {
     switch (property.type) {
         case 'boolean':
             return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_boolPropertyValue);`;
@@ -117,14 +117,15 @@ global.setterImplementation = function(property) {
         case 'string':
             return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_stringPropertyValue);`;
         case 'enum':
-            var enumType = camelize(property.name) + 'Type';
+            var mbglType = camelize(property.name) + 'Type';
             if (/-translate-anchor$/.test(property.name)) {
-                enumType = 'TranslateAnchorType';
+                mbglType = 'TranslateAnchorType';
             }
             if (/-(rotation|pitch)-alignment$/.test(property.name)) {
-                enumType = 'AlignmentType';
+                mbglType = 'AlignmentType';
             }
-            return `MGLSetEnumProperty(${camelizeWithLeadingLowercase(property.name)}, ${camelize(property.name)}, ${enumType});`; 
+            var objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+            return `MGLSetEnumProperty(${camelizeWithLeadingLowercase(property.name)}, ${camelize(property.name)}, ${mbglType}, ${objCType});`; 
         case 'color':
             return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_colorPropertyValue);`;
         case 'array':

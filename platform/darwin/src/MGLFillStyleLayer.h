@@ -1,5 +1,5 @@
 // This file is generated. 
-// Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import <Mapbox/Mapbox.h>
 

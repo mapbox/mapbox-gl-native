@@ -11,7 +11,7 @@
 
 - (mbgl::style::PropertyValue<bool>)mbgl_boolPropertyValue
 {
-    return mbgl::style::PropertyValue<bool> { self.boolValue };
+    return mbgl::style::PropertyValue<bool> { !!self.boolValue };
 }
 
 - (mbgl::style::PropertyValue<float>)mbgl_floatPropertyValue

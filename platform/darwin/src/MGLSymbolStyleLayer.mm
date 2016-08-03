@@ -1,5 +1,5 @@
 // This file is generated. 
-// Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
@@ -31,7 +31,7 @@
 
 - (void)setSymbolPlacement:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)symbolPlacement
 {
-    MGLSetEnumProperty(symbolPlacement, SymbolPlacement, SymbolPlacementType);
+    MGLSetEnumProperty(symbolPlacement, SymbolPlacement, SymbolPlacementType, MGLSymbolStyleLayerSymbolPlacement);
 }
 
 - (id <MGLStyleAttributeValue>)symbolPlacement
@@ -93,7 +93,7 @@
 
 - (void)setIconRotationAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconRotationAlignment
 {
-    MGLSetEnumProperty(iconRotationAlignment, IconRotationAlignment, AlignmentType);
+    MGLSetEnumProperty(iconRotationAlignment, IconRotationAlignment, AlignmentType, MGLSymbolStyleLayerIconRotationAlignment);
 }
 
 - (id <MGLStyleAttributeValue>)iconRotationAlignment
@@ -115,7 +115,7 @@
 
 - (void)setIconTextFit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTextFit
 {
-    MGLSetEnumProperty(iconTextFit, IconTextFit, IconTextFitType);
+    MGLSetEnumProperty(iconTextFit, IconTextFit, IconTextFitType, MGLSymbolStyleLayerIconTextFit);
 }
 
 - (id <MGLStyleAttributeValue>)iconTextFit
@@ -187,7 +187,7 @@
 
 - (void)setTextPitchAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textPitchAlignment
 {
-    MGLSetEnumProperty(textPitchAlignment, TextPitchAlignment, AlignmentType);
+    MGLSetEnumProperty(textPitchAlignment, TextPitchAlignment, AlignmentType, MGLSymbolStyleLayerTextPitchAlignment);
 }
 
 - (id <MGLStyleAttributeValue>)textPitchAlignment
@@ -199,7 +199,7 @@
 
 - (void)setTextRotationAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textRotationAlignment
 {
-    MGLSetEnumProperty(textRotationAlignment, TextRotationAlignment, AlignmentType);
+    MGLSetEnumProperty(textRotationAlignment, TextRotationAlignment, AlignmentType, MGLSymbolStyleLayerTextRotationAlignment);
 }
 
 - (id <MGLStyleAttributeValue>)textRotationAlignment
@@ -271,7 +271,7 @@
 
 - (void)setTextJustify:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textJustify
 {
-    MGLSetEnumProperty(textJustify, TextJustify, TextJustifyType);
+    MGLSetEnumProperty(textJustify, TextJustify, TextJustifyType, MGLSymbolStyleLayerTextJustify);
 }
 
 - (id <MGLStyleAttributeValue>)textJustify
@@ -283,7 +283,7 @@
 
 - (void)setTextAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textAnchor
 {
-    MGLSetEnumProperty(textAnchor, TextAnchor, TextAnchorType);
+    MGLSetEnumProperty(textAnchor, TextAnchor, TextAnchorType, MGLSymbolStyleLayerTextAnchor);
 }
 
 - (id <MGLStyleAttributeValue>)textAnchor
@@ -335,7 +335,7 @@
 
 - (void)setTextTransform:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTransform
 {
-    MGLSetEnumProperty(textTransform, TextTransform, TextTransformType);
+    MGLSetEnumProperty(textTransform, TextTransform, TextTransformType, MGLSymbolStyleLayerTextTransform);
 }
 
 - (id <MGLStyleAttributeValue>)textTransform
@@ -436,7 +436,7 @@
 }
 - (void)setIconTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTranslateAnchor
 {
-    MGLSetEnumProperty(iconTranslateAnchor, IconTranslateAnchor, TranslateAnchorType);
+    MGLSetEnumProperty(iconTranslateAnchor, IconTranslateAnchor, TranslateAnchorType, MGLSymbolStyleLayerIconTranslateAnchor);
 }
 - (id <MGLStyleAttributeValue>)iconTranslateAnchor
 {
@@ -494,7 +494,7 @@
 }
 - (void)setTextTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTranslateAnchor
 {
-    MGLSetEnumProperty(textTranslateAnchor, TextTranslateAnchor, TranslateAnchorType);
+    MGLSetEnumProperty(textTranslateAnchor, TextTranslateAnchor, TranslateAnchorType, MGLSymbolStyleLayerTextTranslateAnchor);
 }
 - (id <MGLStyleAttributeValue>)textTranslateAnchor
 {

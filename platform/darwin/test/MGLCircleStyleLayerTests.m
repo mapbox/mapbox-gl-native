@@ -1,5 +1,5 @@
 // This file is generated. 
-// Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import <Mapbox/Mapbox.h>
 #import "MGLRuntimeStylingHelper.h"
@@ -44,8 +44,8 @@
     XCTAssert([gLayer.circleBlur isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.circleOpacity isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.circleTranslate isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");
-    // TODO: setterEnum
-    // TODO: setterEnum
+    // TODO: getterEnum
+    // TODO: getterEnum
 }
 
 @end

@@ -1,5 +1,5 @@
 // This file is generated. 
-// Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
@@ -70,7 +70,7 @@
 }
 - (void)setFillTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslateAnchor
 {
-    MGLSetEnumProperty(fillTranslateAnchor, FillTranslateAnchor, TranslateAnchorType);
+    MGLSetEnumProperty(fillTranslateAnchor, FillTranslateAnchor, TranslateAnchorType, MGLFillStyleLayerFillTranslateAnchor);
 }
 - (id <MGLStyleAttributeValue>)fillTranslateAnchor
 {

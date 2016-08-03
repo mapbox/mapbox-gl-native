@@ -1,5 +1,5 @@
 // This file is generated. 
-// Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
@@ -70,7 +70,7 @@
 }
 - (void)setCircleTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleTranslateAnchor
 {
-    MGLSetEnumProperty(circleTranslateAnchor, CircleTranslateAnchor, TranslateAnchorType);
+    MGLSetEnumProperty(circleTranslateAnchor, CircleTranslateAnchor, TranslateAnchorType, MGLCircleStyleLayerCircleTranslateAnchor);
 }
 - (id <MGLStyleAttributeValue>)circleTranslateAnchor
 {
@@ -80,7 +80,7 @@
 }
 - (void)setCirclePitchScale:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circlePitchScale
 {
-    MGLSetEnumProperty(circlePitchScale, CirclePitchScale, CirclePitchScaleType);
+    MGLSetEnumProperty(circlePitchScale, CirclePitchScale, CirclePitchScaleType, MGLCircleStyleLayerCirclePitchScale);
 }
 - (id <MGLStyleAttributeValue>)circlePitchScale
 {

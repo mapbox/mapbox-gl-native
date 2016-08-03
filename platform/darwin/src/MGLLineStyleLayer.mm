@@ -1,5 +1,5 @@
 // This file is generated. 
-// Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
@@ -31,7 +31,7 @@
 
 - (void)setLineCap:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineCap
 {
-    MGLSetEnumProperty(lineCap, LineCap, LineCapType);
+    MGLSetEnumProperty(lineCap, LineCap, LineCapType, MGLLineStyleLayerLineCap);
 }
 
 - (id <MGLStyleAttributeValue>)lineCap
@@ -43,7 +43,7 @@
 
 - (void)setLineJoin:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineJoin
 {
-    MGLSetEnumProperty(lineJoin, LineJoin, LineJoinType);
+    MGLSetEnumProperty(lineJoin, LineJoin, LineJoinType, MGLLineStyleLayerLineJoin);
 }
 
 - (id <MGLStyleAttributeValue>)lineJoin
@@ -100,7 +100,7 @@
 }
 - (void)setLineTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineTranslateAnchor
 {
-    MGLSetEnumProperty(lineTranslateAnchor, LineTranslateAnchor, TranslateAnchorType);
+    MGLSetEnumProperty(lineTranslateAnchor, LineTranslateAnchor, TranslateAnchorType, MGLLineStyleLayerLineTranslateAnchor);
 }
 - (id <MGLStyleAttributeValue>)lineTranslateAnchor
 {

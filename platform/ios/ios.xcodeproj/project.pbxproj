@@ -11,8 +11,8 @@
 		350098B01D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098AD1D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		350098B11D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 350098AE1D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.mm */; };
 		350098B21D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 350098AE1D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.mm */; };
-		350098BB1D480108004B2AF0 /* MGLVectorSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098B91D480108004B2AF0 /* MGLVectorSource.h */; };
-		350098BC1D480108004B2AF0 /* MGLVectorSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098B91D480108004B2AF0 /* MGLVectorSource.h */; };
+		350098BB1D480108004B2AF0 /* MGLVectorSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098B91D480108004B2AF0 /* MGLVectorSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		350098BC1D480108004B2AF0 /* MGLVectorSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098B91D480108004B2AF0 /* MGLVectorSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		350098BD1D480108004B2AF0 /* MGLVectorSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 350098BA1D480108004B2AF0 /* MGLVectorSource.m */; };
 		350098BE1D480108004B2AF0 /* MGLVectorSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 350098BA1D480108004B2AF0 /* MGLVectorSource.m */; };
 		350098C11D48149E004B2AF0 /* NSNumber+MGLStyleAttributeAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098BF1D48149E004B2AF0 /* NSNumber+MGLStyleAttributeAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -478,8 +478,8 @@
 		357579861D502AFE000B822E /* MGLLineStyleLayerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLLineStyleLayerTests.m; path = ../../darwin/test/MGLLineStyleLayerTests.m; sourceTree = "<group>"; };
 		357579881D502B06000B822E /* MGLCircleStyleLayerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLCircleStyleLayerTests.m; path = ../../darwin/test/MGLCircleStyleLayerTests.m; sourceTree = "<group>"; };
 		3575798A1D502B0C000B822E /* MGLBackgroundStyleLayerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLBackgroundStyleLayerTests.m; path = ../../darwin/test/MGLBackgroundStyleLayerTests.m; sourceTree = "<group>"; };
-		3575798C1D502EC7000B822E /* MGLRuntimeStylingHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLRuntimeStylingHelper.h; sourceTree = "<group>"; };
-		3575798D1D502EC7000B822E /* MGLRuntimeStylingHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLRuntimeStylingHelper.m; sourceTree = "<group>"; };
+		3575798C1D502EC7000B822E /* MGLRuntimeStylingHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLRuntimeStylingHelper.h; path = ../../darwin/test/MGLRuntimeStylingHelper.h; sourceTree = "<group>"; };
+		3575798D1D502EC7000B822E /* MGLRuntimeStylingHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLRuntimeStylingHelper.m; path = ../../darwin/test/MGLRuntimeStylingHelper.m; sourceTree = "<group>"; };
 		35CE61801D4165D9004F2359 /* UIColor+MGLAdditions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = "UIColor+MGLAdditions.hpp"; sourceTree = "<group>"; };
 		35CE61811D4165D9004F2359 /* UIColor+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIColor+MGLAdditions.mm"; sourceTree = "<group>"; };
 		35D13AB51D3D15E300AFB4E0 /* MGLStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLStyleLayer.h; sourceTree = "<group>"; };
@@ -721,8 +721,8 @@
 			isa = PBXGroup;
 			children = (
 				35136D4A1D4277FC00C20EFD /* MGLSource.h */,
-				35136D4B1D4277FC00C20EFD /* MGLSource.mm */,
 				3566C7701D4A9198008152BC /* MGLSource_Private.hpp */,
+				35136D4B1D4277FC00C20EFD /* MGLSource.mm */,
 				350098B91D480108004B2AF0 /* MGLVectorSource.h */,
 				350098BA1D480108004B2AF0 /* MGLVectorSource.m */,
 				3566C7641D4A77BA008152BC /* MGLGeoJSONSource.h */,
@@ -746,8 +746,8 @@
 				35136D3E1D42273000C20EFD /* MGLLineStyleLayer.mm */,
 				353933FA1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h */,
 				35136D411D42274500C20EFD /* MGLRasterStyleLayer.mm */,
-				35E79F1F1D41266300957B9E /* MGLStyleLayer_Private.hpp */,
 				35D13AB51D3D15E300AFB4E0 /* MGLStyleLayer.h */,
+				35E79F1F1D41266300957B9E /* MGLStyleLayer_Private.hpp */,
 				35D13AB61D3D15E300AFB4E0 /* MGLStyleLayer.mm */,
 				353933FD1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h */,
 				35136D441D42275100C20EFD /* MGLSymbolStyleLayer.mm */,
@@ -776,27 +776,27 @@
 				350098AD1D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.h */,
 				350098AE1D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.mm */,
 				350098BF1D48149E004B2AF0 /* NSNumber+MGLStyleAttributeAdditions.h */,
-				350098C01D48149E004B2AF0 /* NSNumber+MGLStyleAttributeAdditions.mm */,
 				350098C51D48288B004B2AF0 /* NSNumber+MGLStyleAttributeAdditions_Private.hpp */,
+				350098C01D48149E004B2AF0 /* NSNumber+MGLStyleAttributeAdditions.mm */,
 				350098C81D482D9C004B2AF0 /* NSArray+MGLStyleAttributeAdditions.h */,
-				350098C91D482D9C004B2AF0 /* NSArray+MGLStyleAttributeAdditions.mm */,
 				350098CE1D482E10004B2AF0 /* NSArray+MGLStyleAttributeAdditions_Private.hpp */,
+				350098C91D482D9C004B2AF0 /* NSArray+MGLStyleAttributeAdditions.mm */,
 				350098D11D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.h */,
-				350098D21D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.mm */,
 				350098D71D4830D5004B2AF0 /* NSString+MGLStyleAttributeAdditions_Private.hpp */,
+				350098D21D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.mm */,
 				350098DA1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h */,
-				350098DB1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.mm */,
 				354D42DB1D4919F900F400A1 /* NSValue+MGLStyleAttributeAdditions_Private.hpp */,
+				350098DB1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.mm */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
 		};
-		357579811D502AD4000B822E /* Style */ = {
+		357579811D502AD4000B822E /* Styling */ = {
 			isa = PBXGroup;
 			children = (
 				3575798F1D513EF1000B822E /* Layers */,
 			);
-			name = Style;
+			name = Styling;
 			sourceTree = "<group>";
 		};
 		3575798F1D513EF1000B822E /* Layers */ = {
@@ -924,8 +924,7 @@
 		DA2E88521CC036F400F24E7B /* SDK Tests */ = {
 			isa = PBXGroup;
 			children = (
-				357579811D502AD4000B822E /* Style */,
-				DA2E88551CC036F400F24E7B /* Info.plist */,
+				357579811D502AD4000B822E /* Styling */,
 				353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */,
 				DA35A2C31CCA9F8300E826B2 /* MGLClockDirectionFormatterTests.m */,
 				DA35A2C41CCA9F8300E826B2 /* MGLCompassDirectionFormatterTests.m */,
@@ -937,6 +936,7 @@
 				DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */,
 				DA2E885F1CC0382C00F24E7B /* MGLOfflineStorageTests.m */,
 				DA2E88601CC0382C00F24E7B /* MGLStyleTests.mm */,
+				DA2E88551CC036F400F24E7B /* Info.plist */,
 			);
 			name = "SDK Tests";
 			path = test;

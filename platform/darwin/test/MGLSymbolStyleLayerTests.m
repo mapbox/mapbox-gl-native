@@ -1,5 +1,5 @@
 // This file is generated. 
-// Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import <Mapbox/Mapbox.h>
 #import "MGLRuntimeStylingHelper.h"
@@ -80,36 +80,36 @@
     // TODO: setterEnum
 
     MGLSymbolStyleLayer *gLayer = [_mapView.style layerWithIdentifier:@"layerID"];
-    // TODO: setterEnum
+    // TODO: getterEnum
     XCTAssert([gLayer.symbolSpacing isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.symbolAvoidEdges isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
     XCTAssert([gLayer.iconAllowOverlap isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
     XCTAssert([gLayer.iconIgnorePlacement isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
     XCTAssert([gLayer.iconOptional isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
-    // TODO: setterEnum
+    // TODO: getterEnum
     XCTAssert([gLayer.iconSize isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    // TODO: setterEnum
+    // TODO: getterEnum
     XCTAssert([gLayer.iconTextFitPadding isEqual:MGLRuntimeStylingHelper.testPadding], @"Should be equal");
     XCTAssert([gLayer.iconImage isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");
     XCTAssert([gLayer.iconRotate isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.iconPadding isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.iconKeepUpright isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
     XCTAssert([gLayer.iconOffset isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");
-    // TODO: setterEnum
-    // TODO: setterEnum
+    // TODO: getterEnum
+    // TODO: getterEnum
     XCTAssert([gLayer.textField isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");
     XCTAssert([gLayer.textFont isEqual:MGLRuntimeStylingHelper.testFont], @"Should be equal");
     XCTAssert([gLayer.textSize isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.textMaxWidth isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.textLineHeight isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.textLetterSpacing isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    // TODO: setterEnum
-    // TODO: setterEnum
+    // TODO: getterEnum
+    // TODO: getterEnum
     XCTAssert([gLayer.textMaxAngle isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.textRotate isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.textPadding isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.textKeepUpright isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
-    // TODO: setterEnum
+    // TODO: getterEnum
     XCTAssert([gLayer.textOffset isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");
     XCTAssert([gLayer.textAllowOverlap isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
     XCTAssert([gLayer.textIgnorePlacement isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
@@ -120,14 +120,14 @@
     XCTAssert([gLayer.iconHaloWidth isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.iconHaloBlur isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.iconTranslate isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");
-    // TODO: setterEnum
+    // TODO: getterEnum
     XCTAssert([gLayer.textOpacity isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.textColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
     XCTAssert([gLayer.textHaloColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
     XCTAssert([gLayer.textHaloWidth isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.textHaloBlur isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.textTranslate isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");
-    // TODO: setterEnum
+    // TODO: getterEnum
 }
 
 @end

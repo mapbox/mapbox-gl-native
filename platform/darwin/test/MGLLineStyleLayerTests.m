@@ -1,5 +1,5 @@
 // This file is generated. 
-// Edit platform/ios/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import <Mapbox/Mapbox.h>
 #import "MGLRuntimeStylingHelper.h"
@@ -46,14 +46,14 @@
     layer.linePattern = MGLRuntimeStylingHelper.testString;
 
     MGLLineStyleLayer *gLayer = [_mapView.style layerWithIdentifier:@"layerID"];
-    // TODO: setterEnum
-    // TODO: setterEnum
+    // TODO: getterEnum
+    // TODO: getterEnum
     XCTAssert([gLayer.lineMiterLimit isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.lineRoundLimit isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.lineOpacity isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.lineColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
     XCTAssert([gLayer.lineTranslate isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");
-    // TODO: setterEnum
+    // TODO: getterEnum
     XCTAssert([gLayer.lineWidth isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.lineGapWidth isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
     XCTAssert([gLayer.lineOffset isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
