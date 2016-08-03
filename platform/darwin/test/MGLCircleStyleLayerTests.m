@@ -19,8 +19,8 @@
     layer.circleBlur = MGLRuntimeStylingHelper.testNumber;
     layer.circleOpacity = MGLRuntimeStylingHelper.testNumber;
     layer.circleTranslate = MGLRuntimeStylingHelper.testOffset;
-    // TODO: setterEnum
-    // TODO: setterEnum
+    #warning Missing setter for circleTranslateAnchor enum
+    #warning Missing setter for circlePitchScale enum
 
     MGLCircleStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
     XCTAssertEqualObjects(gLayer.circleRadius, MGLRuntimeStylingHelper.testNumber);
@@ -28,8 +28,8 @@
     XCTAssertEqualObjects(gLayer.circleBlur, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.circleOpacity, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.circleTranslate, MGLRuntimeStylingHelper.testOffset);
-    // TODO: getterEnum
-    // TODO: getterEnum
+    #warning Missing getter for circleTranslateAnchor enum
+    #warning Missing getter for circlePitchScale enum
 }
 
 @end

@@ -105,7 +105,7 @@ static NSURL *MGLStyleURL_emerald;
 
 - (Class)classFromLayer:(mbgl::style::Layer *)layer
 {
-    // TODO: Improve this
+#warning Improve this
     if (layer->is<mbgl::style::FillLayer>()) {
         return MGLFillStyleLayer.class;
     } else if (layer->is<mbgl::style::LineLayer>()) {

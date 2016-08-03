@@ -6,6 +6,6 @@
 
 @interface NSArray (MGLStyleAttributeAdditions_Private) <MGLStyleAttributeValue>
 
-// TODO:
+#warning
 
 @end

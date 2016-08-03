@@ -22,7 +22,7 @@
 
 + (UIColor *)mbgl_propertyValue:(mbgl::style::PropertyValue<mbgl::Color>)color
 {
-    // TODO: Figure out if property value is constant, undefined or a function.
+#warning Figure out if property value is constant, undefined or a function.
     return [UIColor colorWithRed:color.asConstant().r
                            green:color.asConstant().g
                             blue:color.asConstant().b

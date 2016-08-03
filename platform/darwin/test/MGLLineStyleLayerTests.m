@@ -14,14 +14,14 @@
     MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithLayerIdentifier:@"layerID" sourceIdentifier:@"sourceID"];
     [self.mapView.style addLayer:layer];
 
-    // TODO: setterEnum
-    // TODO: setterEnum
+    #warning Missing setter for lineCap enum
+    #warning Missing setter for lineJoin enum
     layer.lineMiterLimit = MGLRuntimeStylingHelper.testNumber;
     layer.lineRoundLimit = MGLRuntimeStylingHelper.testNumber;
     layer.lineOpacity = MGLRuntimeStylingHelper.testNumber;
     layer.lineColor = MGLRuntimeStylingHelper.testColor;
     layer.lineTranslate = MGLRuntimeStylingHelper.testOffset;
-    // TODO: setterEnum
+    #warning Missing setter for lineTranslateAnchor enum
     layer.lineWidth = MGLRuntimeStylingHelper.testNumber;
     layer.lineGapWidth = MGLRuntimeStylingHelper.testNumber;
     layer.lineOffset = MGLRuntimeStylingHelper.testNumber;
@@ -30,14 +30,14 @@
     layer.linePattern = MGLRuntimeStylingHelper.testString;
 
     MGLLineStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
-    // TODO: getterEnum
-    // TODO: getterEnum
+    #warning Missing getter for lineCap enum
+    #warning Missing getter for lineJoin enum
     XCTAssertEqualObjects(gLayer.lineMiterLimit, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineRoundLimit, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineOpacity, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineColor, MGLRuntimeStylingHelper.testColor);
     XCTAssertEqualObjects(gLayer.lineTranslate, MGLRuntimeStylingHelper.testOffset);
-    // TODO: getterEnum
+    #warning Missing getter for lineTranslateAnchor enum
     XCTAssertEqualObjects(gLayer.lineWidth, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineGapWidth, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineOffset, MGLRuntimeStylingHelper.testNumber);

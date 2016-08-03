@@ -5142,7 +5142,7 @@ void MGLFinishCustomStyleLayer(void *context)
     _mbglMap->update(mbgl::Update::Repaint);
 }
 
-// TODO: TBD Temporary way of accessing mbglMap while runtime styling is being developed.
+#warning TBD Temporary way of accessing mbglMap while runtime styling is being developed.
 - (mbgl::Map *)mbglMap {
     return _mbglMap;
 }

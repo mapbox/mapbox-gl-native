@@ -19,7 +19,7 @@
     layer.fillColor = MGLRuntimeStylingHelper.testColor;
     layer.fillOutlineColor = MGLRuntimeStylingHelper.testColor;
     layer.fillTranslate = MGLRuntimeStylingHelper.testOffset;
-    // TODO: setterEnum
+    #warning Missing setter for fillTranslateAnchor enum
     layer.fillPattern = MGLRuntimeStylingHelper.testString;
 
     MGLFillStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
@@ -28,7 +28,7 @@
     XCTAssertEqualObjects(gLayer.fillColor, MGLRuntimeStylingHelper.testColor);
     XCTAssertEqualObjects(gLayer.fillOutlineColor, MGLRuntimeStylingHelper.testColor);
     XCTAssertEqualObjects(gLayer.fillTranslate, MGLRuntimeStylingHelper.testOffset);
-    // TODO: getterEnum
+    #warning Missing getter for fillTranslateAnchor enum
     XCTAssertEqualObjects(gLayer.fillPattern, MGLRuntimeStylingHelper.testString);
 }
 

@@ -30,7 +30,7 @@ global.testImplementation = function (property) {
         case 'string':
             return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testString;`;
         case 'enum':
-            return `// TODO: setterEnum`; 
+            return `#warning Missing setter for ${camelizeWithLeadingLowercase(property.name)} enum`;
         case 'color':
             return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testColor;`;
         case 'array':
@@ -48,7 +48,7 @@ global.testGetterImplementation = function (property) {
         case 'string':
             return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testString);`;
         case 'enum':
-            return `// TODO: getterEnum`; 
+            return `#warning Missing getter for ${camelizeWithLeadingLowercase(property.name)} enum`;
         case 'color':
             return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testColor);`;
         case 'array':
