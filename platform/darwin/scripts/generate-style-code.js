@@ -42,15 +42,15 @@ global.testImplementation = function (property) {
 global.testGetterImplementation = function (property) {
     switch (property.type) {
         case 'boolean':
-            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");`;
+            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testBool);`;
         case 'number':
-            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");`;
+            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testNumber);`;
         case 'string':
-            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");`;
+            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testString);`;
         case 'enum':
             return `// TODO: getterEnum`; 
         case 'color':
-            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");`;
+            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testColor);`;
         case 'array':
             return testGetterArrayImplementation(property);
         default: throw new Error(`unknown type for ${property.name}`)
@@ -60,13 +60,13 @@ global.testGetterImplementation = function (property) {
 global.testGetterArrayImplementation = function (property) {
     switch (property.name) {
         case 'icon-text-fit-padding':
-            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testPadding], @"Should be equal");`;
+            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testPadding);`;
         case 'line-dasharray':
-            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testDashArray], @"Should be equal");`;
+            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testDashArray);`;
         case 'text-font':
-            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testFont], @"Should be equal");`;
+            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testFont);`;
         default:
-            return `XCTAssert([gLayer.${camelizeWithLeadingLowercase(property.name)} isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");`; // Default offset (dx, dy)
+            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testOffset);`; // Default offset (dx, dy)
     }
 }
 

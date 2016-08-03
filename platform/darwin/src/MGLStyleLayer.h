@@ -5,7 +5,7 @@
 @protocol MGLStyleLayer <NSObject>
 
 @property (nonatomic, weak) MGLMapView *mapView;
-@property (nonatomic, readonly) NSString *layerIdentifier;
+@property (nonatomic, copy, readonly) NSString *layerIdentifier;
 
 @optional
 

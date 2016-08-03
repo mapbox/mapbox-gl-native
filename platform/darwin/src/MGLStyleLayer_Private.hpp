@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import "MGLStyleLayer.h"
 #include <mbgl/style/layer.hpp>
 
 #import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
@@ -16,10 +17,10 @@
 
 @class MGLMapView;
 
-@protocol MGLStyleLayer_Private <NSObject>
+@protocol MGLStyleLayer_Private <MGLStyleLayer>
 
 @property (nonatomic, weak) MGLMapView *mapView;
-@property (nonatomic, copy) NSString *layerIdentifier;
+@property (nonatomic, readwrite, copy) NSString *layerIdentifier;
 @property (nonatomic) mbgl::style::Layer *layer;
 
 @end

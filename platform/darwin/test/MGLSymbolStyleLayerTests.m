@@ -1,35 +1,18 @@
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
-#import <Mapbox/Mapbox.h>
-#import "MGLRuntimeStylingHelper.h"
-#import <XCTest/XCTest.h>
+#import "MGLStyleLayerTests.h"
 
-@interface MGLSymbolLayerTests : XCTestCase <MGLMapViewDelegate>
-
-@property (nonatomic) MGLMapView *mapView;
-@property (nonatomic) XCTestExpectation *expectation;
-
+@interface MGLSymbolLayerTests : MGLStyleLayerTests
 @end
 
 @implementation MGLSymbolLayerTests
-
-- (void)setUp {
-    [super setUp];
-    UIApplication *app = [[UIApplication sharedApplication] delegate];
-    UIViewController *vc = [[UIViewController alloc] init];
-    app.keyWindow.rootViewController = vc;
-    [vc view]; // Force load xib
-    _mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 256, 256)];
-    [vc.view addSubview:_mapView];
-    _mapView.delegate = self;
-}
 
 - (void)testSymbolLayer {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:geoJSONURL];
     MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithLayerIdentifier:@"layerID" sourceIdentifier:@"sourceID"];
-    [_mapView.style addLayer:layer];
+    [self.mapView.style addLayer:layer];
 
     // TODO: setterEnum
     layer.symbolSpacing = MGLRuntimeStylingHelper.testNumber;
@@ -80,54 +63,54 @@
     layer.textTranslate = MGLRuntimeStylingHelper.testOffset;
     // TODO: setterEnum
 
-    MGLSymbolStyleLayer *gLayer = [_mapView.style layerWithIdentifier:@"layerID"];
+    MGLSymbolStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
     // TODO: getterEnum
-    XCTAssert([gLayer.symbolSpacing isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.symbolAvoidEdges isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
-    XCTAssert([gLayer.iconAllowOverlap isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
-    XCTAssert([gLayer.iconIgnorePlacement isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
-    XCTAssert([gLayer.iconOptional isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
+    XCTAssertEqualObjects(gLayer.symbolSpacing, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.symbolAvoidEdges, MGLRuntimeStylingHelper.testBool);
+    XCTAssertEqualObjects(gLayer.iconAllowOverlap, MGLRuntimeStylingHelper.testBool);
+    XCTAssertEqualObjects(gLayer.iconIgnorePlacement, MGLRuntimeStylingHelper.testBool);
+    XCTAssertEqualObjects(gLayer.iconOptional, MGLRuntimeStylingHelper.testBool);
     // TODO: getterEnum
-    XCTAssert([gLayer.iconSize isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    XCTAssertEqualObjects(gLayer.iconSize, MGLRuntimeStylingHelper.testNumber);
     // TODO: getterEnum
-    XCTAssert([gLayer.iconTextFitPadding isEqual:MGLRuntimeStylingHelper.testPadding], @"Should be equal");
-    XCTAssert([gLayer.iconImage isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");
-    XCTAssert([gLayer.iconRotate isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.iconPadding isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.iconKeepUpright isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
-    XCTAssert([gLayer.iconOffset isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");
-    // TODO: getterEnum
-    // TODO: getterEnum
-    XCTAssert([gLayer.textField isEqual:MGLRuntimeStylingHelper.testString], @"Should be equal");
-    XCTAssert([gLayer.textFont isEqual:MGLRuntimeStylingHelper.testFont], @"Should be equal");
-    XCTAssert([gLayer.textSize isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.textMaxWidth isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.textLineHeight isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.textLetterSpacing isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
+    XCTAssertEqualObjects(gLayer.iconTextFitPadding, MGLRuntimeStylingHelper.testPadding);
+    XCTAssertEqualObjects(gLayer.iconImage, MGLRuntimeStylingHelper.testString);
+    XCTAssertEqualObjects(gLayer.iconRotate, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.iconPadding, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.iconKeepUpright, MGLRuntimeStylingHelper.testBool);
+    XCTAssertEqualObjects(gLayer.iconOffset, MGLRuntimeStylingHelper.testOffset);
     // TODO: getterEnum
     // TODO: getterEnum
-    XCTAssert([gLayer.textMaxAngle isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.textRotate isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.textPadding isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.textKeepUpright isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
+    XCTAssertEqualObjects(gLayer.textField, MGLRuntimeStylingHelper.testString);
+    XCTAssertEqualObjects(gLayer.textFont, MGLRuntimeStylingHelper.testFont);
+    XCTAssertEqualObjects(gLayer.textSize, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.textMaxWidth, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.textLineHeight, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.textLetterSpacing, MGLRuntimeStylingHelper.testNumber);
     // TODO: getterEnum
-    XCTAssert([gLayer.textOffset isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");
-    XCTAssert([gLayer.textAllowOverlap isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
-    XCTAssert([gLayer.textIgnorePlacement isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
-    XCTAssert([gLayer.textOptional isEqual:MGLRuntimeStylingHelper.testBool], @"Should be equal");
-    XCTAssert([gLayer.iconOpacity isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.iconColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
-    XCTAssert([gLayer.iconHaloColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
-    XCTAssert([gLayer.iconHaloWidth isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.iconHaloBlur isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.iconTranslate isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");
     // TODO: getterEnum
-    XCTAssert([gLayer.textOpacity isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.textColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
-    XCTAssert([gLayer.textHaloColor isEqual:MGLRuntimeStylingHelper.testColor], @"Should be equal");
-    XCTAssert([gLayer.textHaloWidth isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.textHaloBlur isEqual:MGLRuntimeStylingHelper.testNumber], @"Should be equal");
-    XCTAssert([gLayer.textTranslate isEqual:MGLRuntimeStylingHelper.testOffset], @"Should be equal");
+    XCTAssertEqualObjects(gLayer.textMaxAngle, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.textRotate, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.textPadding, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.textKeepUpright, MGLRuntimeStylingHelper.testBool);
+    // TODO: getterEnum
+    XCTAssertEqualObjects(gLayer.textOffset, MGLRuntimeStylingHelper.testOffset);
+    XCTAssertEqualObjects(gLayer.textAllowOverlap, MGLRuntimeStylingHelper.testBool);
+    XCTAssertEqualObjects(gLayer.textIgnorePlacement, MGLRuntimeStylingHelper.testBool);
+    XCTAssertEqualObjects(gLayer.textOptional, MGLRuntimeStylingHelper.testBool);
+    XCTAssertEqualObjects(gLayer.iconOpacity, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.iconColor, MGLRuntimeStylingHelper.testColor);
+    XCTAssertEqualObjects(gLayer.iconHaloColor, MGLRuntimeStylingHelper.testColor);
+    XCTAssertEqualObjects(gLayer.iconHaloWidth, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.iconHaloBlur, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.iconTranslate, MGLRuntimeStylingHelper.testOffset);
+    // TODO: getterEnum
+    XCTAssertEqualObjects(gLayer.textOpacity, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.textColor, MGLRuntimeStylingHelper.testColor);
+    XCTAssertEqualObjects(gLayer.textHaloColor, MGLRuntimeStylingHelper.testColor);
+    XCTAssertEqualObjects(gLayer.textHaloWidth, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.textHaloBlur, MGLRuntimeStylingHelper.testNumber);
+    XCTAssertEqualObjects(gLayer.textTranslate, MGLRuntimeStylingHelper.testOffset);
     // TODO: getterEnum
 }
 
