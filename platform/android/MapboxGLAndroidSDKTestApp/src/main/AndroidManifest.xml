@@ -309,6 +309,15 @@
                 android:value="@string/category_style" />
         </activity>
         <activity
+            android:name=".activity.style.GeoJsonClusteringActivity"
+            android:description="@string/description_geojson_clustering"
+            android:label="@string/activity_geojson_clustering">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style" />
+        </activity>
+
+        <activity
             android:name=".activity.imagegenerator.PrintActivity"
             android:description="@string/description_print"
             android:label="@string/activity_print">

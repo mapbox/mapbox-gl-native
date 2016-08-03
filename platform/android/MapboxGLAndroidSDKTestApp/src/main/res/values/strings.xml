@@ -54,6 +54,7 @@
     <string name="activity_minmax_zoom">Min/Max Zoom</string>
     <string name="activity_viewpager">ViewPager</string>
     <string name="activity_runtime_style">Runtime Style</string>
+    <string name="activity_geojson_clustering">GeoJson Clustering</string>
     <string name="activity_print">Print a map</string>
     <string name="activity_surfaceview_overlay">SurfaceView MediaOverlay</string>
     <string name="title_activity_navigation_drawer">Android SDK View integration</string>
@@ -95,6 +96,7 @@
     <string name="description_location_picker">Use a fixed Marker to select your location</string>
     <string name="description_viewpager">Use SupportMapFragments in a ViewPager</string>
     <string name="description_runtime_style">Adopt the map style on the fly</string>
+    <string name="description_geojson_clustering">Use GeoJson sources and dynamic layers to cluster information</string>
     <string name="description_print">Shows how to print a map</string>
     <string name="description_navigation_drawer">Test animation of Android SDK View components</string>
     <string name="description_surfaceview_mediacontrols">Test overlaying SurfaceView</string>

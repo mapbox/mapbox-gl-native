@@ -41,4 +41,19 @@ public class GeoJsonSource extends Source {
         super(id, TYPE);
         this.put(DATA_KEY, url.toExternalForm());
     }
+
+    public GeoJsonSource withCluster(boolean cluster) {
+        this.put("cluster", cluster);
+        return this;
+    }
+
+    public GeoJsonSource withClusterMaxZoom(float zoom) {
+        this.put("clusterMaxZoom", zoom);
+        return this;
+    }
+
+    public GeoJsonSource withClusterRadius(float radius) {
+        this.put("clusterRadius", radius);
+        return this;
+    }
 }
