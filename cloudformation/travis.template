@@ -179,6 +179,22 @@
                                 }
                             ]
                         }
+                    },
+                    {
+                        "PolicyName": “put-android-test-api",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "s3:PutObject""
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": [
+                                        "arn:aws:s3:::mapbox-android-sdk/*”
+                                    ]
+                                }
+                            ]
+                        }
                     }
                 ]
             }
