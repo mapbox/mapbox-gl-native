@@ -34,8 +34,10 @@ endif
 
 ifeq ($(V), 1)
   export XCPRETTY
+  NINJA_ARGS ?= -v
 else
   export XCPRETTY ?= | xcpretty
+  NINJA_ARGS ?=
 endif
 
 .PHONY: default
@@ -274,7 +276,7 @@ linux: glfw-app render offline
 
 .PHONY: test
 test: $(LINUX_BUILD)
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-test
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-test
 
 ifneq (,$(shell which gdb))
   GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
@@ -288,15 +290,15 @@ run-test-%: test
 
 .PHONY: render
 render: $(LINUX_BUILD)
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-render
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-render
 
 .PHONY: offline
 offline: $(LINUX_BUILD)
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-offline
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-offline
 
 .PHONY: glfw-app
 glfw-app: $(LINUX_BUILD)
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-glfw
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-glfw
 
 .PHONY: run-glfw-app
 run-glfw-app: glfw-app
@@ -304,7 +306,7 @@ run-glfw-app: glfw-app
 
 .PHONY: node
 node: $(LINUX_BUILD)
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node
 
 .PHONY: compdb
 compdb: $(LINUX_BUILD)
@@ -314,7 +316,7 @@ compdb: $(LINUX_BUILD)
 clang-tools: compdb
 	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
 	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-headers
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-headers
 
 .PHONY: tidy
 tidy: clang-tools
@@ -380,7 +382,7 @@ endif
 
 .PHONY: qt-app
 qt-app: $(QT_BUILD)
-	$(NINJA) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-qt
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-qt
 
 .PHONY: run-qt-app
 run-qt-app: qt-app
@@ -388,7 +390,7 @@ run-qt-app: qt-app
 
 .PHONY: qt-qml-app
 qt-qml-app: $(QT_BUILD)
-	$(NINJA) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-qt-qml
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-qt-qml
 
 .PHONY: run-qt-qml-app
 run-qt-qml-app: qt-qml-app
@@ -396,7 +398,7 @@ run-qt-qml-app: qt-qml-app
 
 .PHONY: qt-test
 qt-test: $(QT_BUILD)
-	$(NINJA) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-test
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-test
 
 run-qt-test-%: qt-test
 	$(QT_OUTPUT_PATH)/mbgl-test --gtest_catch_exceptions=0 --gtest_filter=$*
@@ -433,7 +435,7 @@ build/android-$1/$(BUILDTYPE)/Makefile: build/android-$1/$(BUILDTYPE)/toolchain.
 
 .PHONY: android-lib-$1
 android-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile
-	$(NINJA) -j$(JOBS) -C build/android-$1/$(BUILDTYPE) all
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C build/android-$1/$(BUILDTYPE) all
 
 .PHONY: android-$1
 android-$1: android-lib-$1
