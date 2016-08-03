@@ -289,6 +289,9 @@
 		DA8F25A61D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+MGLStyleAttributeAdditions.h"; sourceTree = "<group>"; };
 		DA8F25A71D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSValue+MGLStyleAttributeAdditions.mm"; sourceTree = "<group>"; };
 		DA8F25A81D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = "NSValue+MGLStyleAttributeAdditions_Private.hpp"; sourceTree = "<group>"; };
+		DA8F25B51D51D2240010E6B5 /* MGLRuntimeStylingTests.m.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = MGLRuntimeStylingTests.m.ejs; sourceTree = "<group>"; };
+		DA8F25B61D51D2240010E6B5 /* MGLStyleLayer.h.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = MGLStyleLayer.h.ejs; sourceTree = "<group>"; };
+		DA8F25B71D51D2240010E6B5 /* MGLStyleLayer.mm.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = MGLStyleLayer.mm.ejs; sourceTree = "<group>"; };
 		DAC2ABC41CC6D343006D18C4 /* MGLAnnotationImage_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationImage_Private.h; sourceTree = "<group>"; };
 		DACC22121CF3D3E200D220D9 /* MGLFeature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFeature.h; sourceTree = "<group>"; };
 		DACC22131CF3D3E200D220D9 /* MGLFeature.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFeature.mm; sourceTree = "<group>"; };
@@ -586,6 +589,17 @@
 			path = ../../ios/test;
 			sourceTree = "<group>";
 		};
+		DA8F25B81D51D2280010E6B5 /* Foundation Templates */ = {
+			isa = PBXGroup;
+			children = (
+				DA8F25B51D51D2240010E6B5 /* MGLRuntimeStylingTests.m.ejs */,
+				DA8F25B61D51D2240010E6B5 /* MGLStyleLayer.h.ejs */,
+				DA8F25B71D51D2240010E6B5 /* MGLStyleLayer.mm.ejs */,
+			);
+			name = "Foundation Templates";
+			path = ../../darwin/src;
+			sourceTree = "<group>";
+		};
 		DAD1657C1CF4CE6B001FF4B9 /* Formatters */ = {
 			isa = PBXGroup;
 			children = (
@@ -680,6 +694,7 @@
 			children = (
 				DAE6C3C11CC31F4500DB3429 /* Mapbox.h */,
 				DAE6C3491CC31DF500DB3429 /* Foundation */,
+				DA8F25B81D51D2280010E6B5 /* Foundation Templates */,
 				DA8933B21CCD2C0700E68420 /* Foundation Resources */,
 				DAE6C39E1CC31E7C00DB3429 /* Kit */,
 				DA8933A81CCD28D100E68420 /* Kit Resources */,

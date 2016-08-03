@@ -644,6 +644,9 @@
 		DA8963341CC549A100684375 /* sprites */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sprites; sourceTree = "<group>"; };
 		DA8963351CC549A100684375 /* styles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = styles; sourceTree = "<group>"; };
 		DA8963361CC549A100684375 /* tiles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tiles; sourceTree = "<group>"; };
+		DA8F25B91D51D2570010E6B5 /* MGLRuntimeStylingTests.m.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = MGLRuntimeStylingTests.m.ejs; sourceTree = "<group>"; };
+		DA8F25BA1D51D2570010E6B5 /* MGLStyleLayer.h.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = MGLStyleLayer.h.ejs; sourceTree = "<group>"; };
+		DA8F25BB1D51D2570010E6B5 /* MGLStyleLayer.mm.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = MGLStyleLayer.mm.ejs; sourceTree = "<group>"; };
 		DAA4E4021CBB5C2F00178DFB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		DAA4E4041CBB5C9E00178DFB /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		DAA4E4061CBB5CBF00178DFB /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
@@ -947,6 +950,7 @@
 			children = (
 				DA88485E1CBAFC2E00AB86E3 /* Mapbox.h */,
 				DA8847DE1CBAFA3E00AB86E3 /* Foundation */,
+				DA8F25BC1D51D2570010E6B5 /* Foundation Templates */,
 				DA8933B91CCD2C6700E68420 /* Foundation Resources */,
 				DA8848331CBAFB2A00AB86E3 /* Kit */,
 				DA8848621CBAFCC100AB86E3 /* Kit Resources */,
@@ -1077,6 +1081,17 @@
 			);
 			name = Fixtures;
 			path = assets;
+			sourceTree = "<group>";
+		};
+		DA8F25BC1D51D2570010E6B5 /* Foundation Templates */ = {
+			isa = PBXGroup;
+			children = (
+				DA8F25B91D51D2570010E6B5 /* MGLRuntimeStylingTests.m.ejs */,
+				DA8F25BA1D51D2570010E6B5 /* MGLStyleLayer.h.ejs */,
+				DA8F25BB1D51D2570010E6B5 /* MGLStyleLayer.mm.ejs */,
+			);
+			name = "Foundation Templates";
+			path = ../../darwin/src;
 			sourceTree = "<group>";
 		};
 		DABCABA91CB80692000A7C39 /* Benchmarking App */ = {
