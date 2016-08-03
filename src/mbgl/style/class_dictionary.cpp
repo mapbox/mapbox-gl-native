@@ -1,6 +1,6 @@
 #include <mbgl/style/class_dictionary.hpp>
 
-#include <pthread.h>
+#include <mbgl/util/thread_local.hpp>
 
 namespace mbgl {
 namespace style {
@@ -8,20 +8,12 @@ namespace style {
 ClassDictionary::ClassDictionary() {}
 
 ClassDictionary &ClassDictionary::Get() {
-    static pthread_once_t store_once = PTHREAD_ONCE_INIT;
-    static pthread_key_t store_key;
+    static util::ThreadLocal<ClassDictionary> dictionary;
 
-    // Create the key.
-    pthread_once(&store_once, []() {
-        pthread_key_create(&store_key, [](void *ptr) {
-            delete reinterpret_cast<ClassDictionary *>(ptr);
-        });
-    });
-
-    ClassDictionary *ptr = reinterpret_cast<ClassDictionary *>(pthread_getspecific(store_key));
+    ClassDictionary *ptr = dictionary.get();
     if (ptr == nullptr) {
         ptr = new ClassDictionary();
-        pthread_setspecific(store_key, ptr);
+        dictionary.set(ptr);
     }
 
     return *ptr;
