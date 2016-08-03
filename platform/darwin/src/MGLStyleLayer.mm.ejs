@@ -9,20 +9,22 @@
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
 #import "MGL<%- camelize(type) %>StyleLayer.h"
-#import <mbgl/style/layers/<%- type %>_layer.hpp>
 
-@interface MGL<%- camelize(type) %>StyleLayer()
+#include <mbgl/style/layers/<%- type %>_layer.hpp>
+
+@interface MGL<%- camelize(type) %>StyleLayer ()
+
 @property (nonatomic) mbgl::style::<%- camelize(type) %>Layer *layer;
 @property (nonatomic, readwrite) NSString *layerID;
 @property (nonatomic, readwrite) NSString *sourceID;
+
 @end
 
 @implementation MGL<%- camelize(type) %>StyleLayer
 
 @synthesize mapView;
 
-- (instancetype)initWithLayerID:(NSString *)layerID sourceID:(NSString *)sourceID
-{
+- (instancetype)initWithLayerID:(NSString *)layerID sourceID:(NSString *)sourceID {
     self = [super init];
     if (self == nil) return nil;
     _layerID = layerID;
@@ -35,31 +37,28 @@
 #pragma mark - Accessing the Layout Attributes
 
 <% for (const property of layoutProperties) { -%>
-
-- (void)set<%- camelize(property.name) %>:(<%- propertyType(property, true, type) %>)<%- camelizeWithLeadingLowercase(property.name) %>
-{
+- (void)set<%- camelize(property.name) %>:(<%- propertyType(property, true, type) %>)<%- camelizeWithLeadingLowercase(property.name) %> {
     <%- setterImplementation(property, type) %>
 }
 
-- (<%- propertyType(property, false, type) %>)<%- camelizeWithLeadingLowercase(property.name) %>
-{
+- (<%- propertyType(property, false, type) %>)<%- camelizeWithLeadingLowercase(property.name) %> {
     <%- getterImplementation(property, type) %>
 }
+
 <% } -%>
 <% } -%>
 <% if (paintProperties.length) { -%>
 #pragma mark - Accessing the Paint Attributes
 
 <% for (const property of paintProperties) { -%>
-- (void)set<%- camelize(property.name) %>:(<%- propertyType(property, true, type) %>)<%- camelizeWithLeadingLowercase(property.name) %>
-{
+- (void)set<%- camelize(property.name) %>:(<%- propertyType(property, true, type) %>)<%- camelizeWithLeadingLowercase(property.name) %> {
     <%- setterImplementation(property, type) %>
 }
-- (<%- propertyType(property, false, type) %>)<%- camelizeWithLeadingLowercase(property.name) %>
-{
+
+- (<%- propertyType(property, false, type) %>)<%- camelizeWithLeadingLowercase(property.name) %> {
     <%- getterImplementation(property, type) %>
 }
-<% } -%>
-<% } -%>
 
+<% } -%>
+<% } -%>
 @end

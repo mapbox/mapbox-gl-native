@@ -4,20 +4,22 @@
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
 #import "MGLSymbolStyleLayer.h"
-#import <mbgl/style/layers/symbol_layer.hpp>
 
-@interface MGLSymbolStyleLayer()
+#include <mbgl/style/layers/symbol_layer.hpp>
+
+@interface MGLSymbolStyleLayer ()
+
 @property (nonatomic) mbgl::style::SymbolLayer *layer;
 @property (nonatomic, readwrite) NSString *layerID;
 @property (nonatomic, readwrite) NSString *sourceID;
+
 @end
 
 @implementation MGLSymbolStyleLayer
 
 @synthesize mapView;
 
-- (instancetype)initWithLayerID:(NSString *)layerID sourceID:(NSString *)sourceID
-{
+- (instancetype)initWithLayerID:(NSString *)layerID sourceID:(NSString *)sourceID {
     self = [super init];
     if (self == nil) return nil;
     _layerID = layerID;
@@ -28,476 +30,407 @@
 
 #pragma mark - Accessing the Layout Attributes
 
-
-- (void)setSymbolPlacement:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)symbolPlacement
-{
+- (void)setSymbolPlacement:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)symbolPlacement {
     MGLSetEnumProperty(symbolPlacement, SymbolPlacement, SymbolPlacementType, MGLSymbolStyleLayerSymbolPlacement);
 }
 
-- (id <MGLStyleAttributeValue>)symbolPlacement
-{
+- (id <MGLStyleAttributeValue>)symbolPlacement {
     auto rawValue = self.layer->getSymbolPlacement();
     const char *type = @encode(MGLSymbolStyleLayerSymbolPlacement);
     return [NSValue value:&rawValue withObjCType:type];
 }
 
-- (void)setSymbolSpacing:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)symbolSpacing
-{
+- (void)setSymbolSpacing:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)symbolSpacing {
     self.layer->setSymbolSpacing(symbolSpacing.mbgl_floatPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)symbolSpacing
-{
+- (id <MGLStyleAttributeValue>)symbolSpacing {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getSymbolSpacing()];
 }
 
-- (void)setSymbolAvoidEdges:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)symbolAvoidEdges
-{
+- (void)setSymbolAvoidEdges:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)symbolAvoidEdges {
     self.layer->setSymbolAvoidEdges(symbolAvoidEdges.mbgl_boolPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)symbolAvoidEdges
-{
+- (id <MGLStyleAttributeValue>)symbolAvoidEdges {
     return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getSymbolAvoidEdges()];
 }
 
-- (void)setIconAllowOverlap:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconAllowOverlap
-{
+- (void)setIconAllowOverlap:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconAllowOverlap {
     self.layer->setIconAllowOverlap(iconAllowOverlap.mbgl_boolPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)iconAllowOverlap
-{
+- (id <MGLStyleAttributeValue>)iconAllowOverlap {
     return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getIconAllowOverlap()];
 }
 
-- (void)setIconIgnorePlacement:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconIgnorePlacement
-{
+- (void)setIconIgnorePlacement:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconIgnorePlacement {
     self.layer->setIconIgnorePlacement(iconIgnorePlacement.mbgl_boolPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)iconIgnorePlacement
-{
+- (id <MGLStyleAttributeValue>)iconIgnorePlacement {
     return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getIconIgnorePlacement()];
 }
 
-- (void)setIconOptional:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconOptional
-{
+- (void)setIconOptional:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconOptional {
     self.layer->setIconOptional(iconOptional.mbgl_boolPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)iconOptional
-{
+- (id <MGLStyleAttributeValue>)iconOptional {
     return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getIconOptional()];
 }
 
-- (void)setIconRotationAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconRotationAlignment
-{
+- (void)setIconRotationAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconRotationAlignment {
     MGLSetEnumProperty(iconRotationAlignment, IconRotationAlignment, AlignmentType, MGLSymbolStyleLayerIconRotationAlignment);
 }
 
-- (id <MGLStyleAttributeValue>)iconRotationAlignment
-{
+- (id <MGLStyleAttributeValue>)iconRotationAlignment {
     auto rawValue = self.layer->getIconRotationAlignment();
     const char *type = @encode(MGLSymbolStyleLayerIconRotationAlignment);
     return [NSValue value:&rawValue withObjCType:type];
 }
 
-- (void)setIconSize:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconSize
-{
+- (void)setIconSize:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconSize {
     self.layer->setIconSize(iconSize.mbgl_floatPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)iconSize
-{
+- (id <MGLStyleAttributeValue>)iconSize {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getIconSize()];
 }
 
-- (void)setIconTextFit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTextFit
-{
+- (void)setIconTextFit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTextFit {
     MGLSetEnumProperty(iconTextFit, IconTextFit, IconTextFitType, MGLSymbolStyleLayerIconTextFit);
 }
 
-- (id <MGLStyleAttributeValue>)iconTextFit
-{
+- (id <MGLStyleAttributeValue>)iconTextFit {
     auto rawValue = self.layer->getIconTextFit();
     const char *type = @encode(MGLSymbolStyleLayerIconTextFit);
     return [NSValue value:&rawValue withObjCType:type];
 }
 
-- (void)setIconTextFitPadding:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTextFitPadding
-{
+- (void)setIconTextFitPadding:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTextFitPadding {
     self.layer->setIconTextFitPadding(iconTextFitPadding.mbgl_paddingPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)iconTextFitPadding
-{
+- (id <MGLStyleAttributeValue>)iconTextFitPadding {
     return @[];
 }
 
-- (void)setIconImage:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconImage
-{
+- (void)setIconImage:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconImage {
     self.layer->setIconImage(iconImage.mbgl_stringPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)iconImage
-{
+- (id <MGLStyleAttributeValue>)iconImage {
     return [NSString mbgl_stringWithPropertyValue:self.layer->getIconImage()];
 }
 
-- (void)setIconRotate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconRotate
-{
+- (void)setIconRotate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconRotate {
     self.layer->setIconRotate(iconRotate.mbgl_floatPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)iconRotate
-{
+- (id <MGLStyleAttributeValue>)iconRotate {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getIconRotate()];
 }
 
-- (void)setIconPadding:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconPadding
-{
+- (void)setIconPadding:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconPadding {
     self.layer->setIconPadding(iconPadding.mbgl_floatPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)iconPadding
-{
+- (id <MGLStyleAttributeValue>)iconPadding {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getIconPadding()];
 }
 
-- (void)setIconKeepUpright:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconKeepUpright
-{
+- (void)setIconKeepUpright:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconKeepUpright {
     self.layer->setIconKeepUpright(iconKeepUpright.mbgl_boolPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)iconKeepUpright
-{
+- (id <MGLStyleAttributeValue>)iconKeepUpright {
     return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getIconKeepUpright()];
 }
 
-- (void)setIconOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconOffset
-{
+- (void)setIconOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconOffset {
     self.layer->setIconOffset(iconOffset.mbgl_offsetPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)iconOffset
-{
+- (id <MGLStyleAttributeValue>)iconOffset {
     return @[];
 }
 
-- (void)setTextPitchAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textPitchAlignment
-{
+- (void)setTextPitchAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textPitchAlignment {
     MGLSetEnumProperty(textPitchAlignment, TextPitchAlignment, AlignmentType, MGLSymbolStyleLayerTextPitchAlignment);
 }
 
-- (id <MGLStyleAttributeValue>)textPitchAlignment
-{
+- (id <MGLStyleAttributeValue>)textPitchAlignment {
     auto rawValue = self.layer->getTextPitchAlignment();
     const char *type = @encode(MGLSymbolStyleLayerTextPitchAlignment);
     return [NSValue value:&rawValue withObjCType:type];
 }
 
-- (void)setTextRotationAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textRotationAlignment
-{
+- (void)setTextRotationAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textRotationAlignment {
     MGLSetEnumProperty(textRotationAlignment, TextRotationAlignment, AlignmentType, MGLSymbolStyleLayerTextRotationAlignment);
 }
 
-- (id <MGLStyleAttributeValue>)textRotationAlignment
-{
+- (id <MGLStyleAttributeValue>)textRotationAlignment {
     auto rawValue = self.layer->getTextRotationAlignment();
     const char *type = @encode(MGLSymbolStyleLayerTextRotationAlignment);
     return [NSValue value:&rawValue withObjCType:type];
 }
 
-- (void)setTextField:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textField
-{
+- (void)setTextField:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textField {
     self.layer->setTextField(textField.mbgl_stringPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textField
-{
+- (id <MGLStyleAttributeValue>)textField {
     return [NSString mbgl_stringWithPropertyValue:self.layer->getTextField()];
 }
 
-- (void)setTextFont:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textFont
-{
+- (void)setTextFont:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textFont {
     self.layer->setTextFont(textFont.mbgl_fontPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textFont
-{
+- (id <MGLStyleAttributeValue>)textFont {
     return @[];
 }
 
-- (void)setTextSize:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textSize
-{
+- (void)setTextSize:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textSize {
     self.layer->setTextSize(textSize.mbgl_floatPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textSize
-{
+- (id <MGLStyleAttributeValue>)textSize {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextSize()];
 }
 
-- (void)setTextMaxWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textMaxWidth
-{
+- (void)setTextMaxWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textMaxWidth {
     self.layer->setTextMaxWidth(textMaxWidth.mbgl_floatPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textMaxWidth
-{
+- (id <MGLStyleAttributeValue>)textMaxWidth {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextMaxWidth()];
 }
 
-- (void)setTextLineHeight:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textLineHeight
-{
+- (void)setTextLineHeight:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textLineHeight {
     self.layer->setTextLineHeight(textLineHeight.mbgl_floatPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textLineHeight
-{
+- (id <MGLStyleAttributeValue>)textLineHeight {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextLineHeight()];
 }
 
-- (void)setTextLetterSpacing:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textLetterSpacing
-{
+- (void)setTextLetterSpacing:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textLetterSpacing {
     self.layer->setTextLetterSpacing(textLetterSpacing.mbgl_floatPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textLetterSpacing
-{
+- (id <MGLStyleAttributeValue>)textLetterSpacing {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextLetterSpacing()];
 }
 
-- (void)setTextJustify:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textJustify
-{
+- (void)setTextJustify:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textJustify {
     MGLSetEnumProperty(textJustify, TextJustify, TextJustifyType, MGLSymbolStyleLayerTextJustify);
 }
 
-- (id <MGLStyleAttributeValue>)textJustify
-{
+- (id <MGLStyleAttributeValue>)textJustify {
     auto rawValue = self.layer->getTextJustify();
     const char *type = @encode(MGLSymbolStyleLayerTextJustify);
     return [NSValue value:&rawValue withObjCType:type];
 }
 
-- (void)setTextAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textAnchor
-{
+- (void)setTextAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textAnchor {
     MGLSetEnumProperty(textAnchor, TextAnchor, TextAnchorType, MGLSymbolStyleLayerTextAnchor);
 }
 
-- (id <MGLStyleAttributeValue>)textAnchor
-{
+- (id <MGLStyleAttributeValue>)textAnchor {
     auto rawValue = self.layer->getTextAnchor();
     const char *type = @encode(MGLSymbolStyleLayerTextAnchor);
     return [NSValue value:&rawValue withObjCType:type];
 }
 
-- (void)setTextMaxAngle:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textMaxAngle
-{
+- (void)setTextMaxAngle:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textMaxAngle {
     self.layer->setTextMaxAngle(textMaxAngle.mbgl_floatPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textMaxAngle
-{
+- (id <MGLStyleAttributeValue>)textMaxAngle {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextMaxAngle()];
 }
 
-- (void)setTextRotate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textRotate
-{
+- (void)setTextRotate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textRotate {
     self.layer->setTextRotate(textRotate.mbgl_floatPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textRotate
-{
+- (id <MGLStyleAttributeValue>)textRotate {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextRotate()];
 }
 
-- (void)setTextPadding:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textPadding
-{
+- (void)setTextPadding:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textPadding {
     self.layer->setTextPadding(textPadding.mbgl_floatPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textPadding
-{
+- (id <MGLStyleAttributeValue>)textPadding {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextPadding()];
 }
 
-- (void)setTextKeepUpright:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textKeepUpright
-{
+- (void)setTextKeepUpright:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textKeepUpright {
     self.layer->setTextKeepUpright(textKeepUpright.mbgl_boolPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textKeepUpright
-{
+- (id <MGLStyleAttributeValue>)textKeepUpright {
     return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getTextKeepUpright()];
 }
 
-- (void)setTextTransform:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTransform
-{
+- (void)setTextTransform:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTransform {
     MGLSetEnumProperty(textTransform, TextTransform, TextTransformType, MGLSymbolStyleLayerTextTransform);
 }
 
-- (id <MGLStyleAttributeValue>)textTransform
-{
+- (id <MGLStyleAttributeValue>)textTransform {
     auto rawValue = self.layer->getTextTransform();
     const char *type = @encode(MGLSymbolStyleLayerTextTransform);
     return [NSValue value:&rawValue withObjCType:type];
 }
 
-- (void)setTextOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textOffset
-{
+- (void)setTextOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textOffset {
     self.layer->setTextOffset(textOffset.mbgl_offsetPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textOffset
-{
+- (id <MGLStyleAttributeValue>)textOffset {
     return @[];
 }
 
-- (void)setTextAllowOverlap:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textAllowOverlap
-{
+- (void)setTextAllowOverlap:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textAllowOverlap {
     self.layer->setTextAllowOverlap(textAllowOverlap.mbgl_boolPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textAllowOverlap
-{
+- (id <MGLStyleAttributeValue>)textAllowOverlap {
     return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getTextAllowOverlap()];
 }
 
-- (void)setTextIgnorePlacement:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textIgnorePlacement
-{
+- (void)setTextIgnorePlacement:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textIgnorePlacement {
     self.layer->setTextIgnorePlacement(textIgnorePlacement.mbgl_boolPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textIgnorePlacement
-{
+- (id <MGLStyleAttributeValue>)textIgnorePlacement {
     return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getTextIgnorePlacement()];
 }
 
-- (void)setTextOptional:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textOptional
-{
+- (void)setTextOptional:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textOptional {
     self.layer->setTextOptional(textOptional.mbgl_boolPropertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)textOptional
-{
+- (id <MGLStyleAttributeValue>)textOptional {
     return [NSNumber mbgl_booleanWithPropertyValue:self.layer->getTextOptional()];
 }
+
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setIconOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconOpacity
-{
+- (void)setIconOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconOpacity {
     self.layer->setIconOpacity(iconOpacity.mbgl_floatPropertyValue);
 }
-- (id <MGLStyleAttributeValue>)iconOpacity
-{
+
+- (id <MGLStyleAttributeValue>)iconOpacity {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getIconOpacity()];
 }
-- (void)setIconColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconColor
-{
+
+- (void)setIconColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconColor {
     self.layer->setIconColor(iconColor.mbgl_colorPropertyValue);
 }
-- (id <MGLStyleAttributeValue>)iconColor
-{
+
+- (id <MGLStyleAttributeValue>)iconColor {
     return [MGLColor mbgl_propertyValue:self.layer->getIconColor()];
 }
-- (void)setIconHaloColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconHaloColor
-{
+
+- (void)setIconHaloColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconHaloColor {
     self.layer->setIconHaloColor(iconHaloColor.mbgl_colorPropertyValue);
 }
-- (id <MGLStyleAttributeValue>)iconHaloColor
-{
+
+- (id <MGLStyleAttributeValue>)iconHaloColor {
     return [MGLColor mbgl_propertyValue:self.layer->getIconHaloColor()];
 }
-- (void)setIconHaloWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconHaloWidth
-{
+
+- (void)setIconHaloWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconHaloWidth {
     self.layer->setIconHaloWidth(iconHaloWidth.mbgl_floatPropertyValue);
 }
-- (id <MGLStyleAttributeValue>)iconHaloWidth
-{
+
+- (id <MGLStyleAttributeValue>)iconHaloWidth {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getIconHaloWidth()];
 }
-- (void)setIconHaloBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconHaloBlur
-{
+
+- (void)setIconHaloBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconHaloBlur {
     self.layer->setIconHaloBlur(iconHaloBlur.mbgl_floatPropertyValue);
 }
-- (id <MGLStyleAttributeValue>)iconHaloBlur
-{
+
+- (id <MGLStyleAttributeValue>)iconHaloBlur {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getIconHaloBlur()];
 }
-- (void)setIconTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTranslate
-{
+
+- (void)setIconTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTranslate {
     self.layer->setIconTranslate(iconTranslate.mbgl_offsetPropertyValue);
 }
-- (id <MGLStyleAttributeValue>)iconTranslate
-{
+
+- (id <MGLStyleAttributeValue>)iconTranslate {
     return @[];
 }
-- (void)setIconTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTranslateAnchor
-{
+
+- (void)setIconTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTranslateAnchor {
     MGLSetEnumProperty(iconTranslateAnchor, IconTranslateAnchor, TranslateAnchorType, MGLSymbolStyleLayerIconTranslateAnchor);
 }
-- (id <MGLStyleAttributeValue>)iconTranslateAnchor
-{
+
+- (id <MGLStyleAttributeValue>)iconTranslateAnchor {
     auto rawValue = self.layer->getIconTranslateAnchor();
     const char *type = @encode(MGLSymbolStyleLayerIconTranslateAnchor);
     return [NSValue value:&rawValue withObjCType:type];
 }
-- (void)setTextOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textOpacity
-{
+
+- (void)setTextOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textOpacity {
     self.layer->setTextOpacity(textOpacity.mbgl_floatPropertyValue);
 }
-- (id <MGLStyleAttributeValue>)textOpacity
-{
+
+- (id <MGLStyleAttributeValue>)textOpacity {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextOpacity()];
 }
-- (void)setTextColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textColor
-{
+
+- (void)setTextColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textColor {
     self.layer->setTextColor(textColor.mbgl_colorPropertyValue);
 }
-- (id <MGLStyleAttributeValue>)textColor
-{
+
+- (id <MGLStyleAttributeValue>)textColor {
     return [MGLColor mbgl_propertyValue:self.layer->getTextColor()];
 }
-- (void)setTextHaloColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textHaloColor
-{
+
+- (void)setTextHaloColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textHaloColor {
     self.layer->setTextHaloColor(textHaloColor.mbgl_colorPropertyValue);
 }
-- (id <MGLStyleAttributeValue>)textHaloColor
-{
+
+- (id <MGLStyleAttributeValue>)textHaloColor {
     return [MGLColor mbgl_propertyValue:self.layer->getTextHaloColor()];
 }
-- (void)setTextHaloWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textHaloWidth
-{
+
+- (void)setTextHaloWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textHaloWidth {
     self.layer->setTextHaloWidth(textHaloWidth.mbgl_floatPropertyValue);
 }
-- (id <MGLStyleAttributeValue>)textHaloWidth
-{
+
+- (id <MGLStyleAttributeValue>)textHaloWidth {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextHaloWidth()];
 }
-- (void)setTextHaloBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textHaloBlur
-{
+
+- (void)setTextHaloBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textHaloBlur {
     self.layer->setTextHaloBlur(textHaloBlur.mbgl_floatPropertyValue);
 }
-- (id <MGLStyleAttributeValue>)textHaloBlur
-{
+
+- (id <MGLStyleAttributeValue>)textHaloBlur {
     return [NSNumber mbgl_numberWithPropertyValue:self.layer->getTextHaloBlur()];
 }
-- (void)setTextTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTranslate
-{
+
+- (void)setTextTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTranslate {
     self.layer->setTextTranslate(textTranslate.mbgl_offsetPropertyValue);
 }
-- (id <MGLStyleAttributeValue>)textTranslate
-{
+
+- (id <MGLStyleAttributeValue>)textTranslate {
     return @[];
 }
-- (void)setTextTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTranslateAnchor
-{
+
+- (void)setTextTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTranslateAnchor {
     MGLSetEnumProperty(textTranslateAnchor, TextTranslateAnchor, TranslateAnchorType, MGLSymbolStyleLayerTextTranslateAnchor);
 }
-- (id <MGLStyleAttributeValue>)textTranslateAnchor
-{
+
+- (id <MGLStyleAttributeValue>)textTranslateAnchor {
     auto rawValue = self.layer->getTextTranslateAnchor();
     const char *type = @encode(MGLSymbolStyleLayerTextTranslateAnchor);
     return [NSValue value:&rawValue withObjCType:type];

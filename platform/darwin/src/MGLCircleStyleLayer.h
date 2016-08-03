@@ -10,6 +10,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCircleTranslateAnchor) {
     MGLCircleStyleLayerCircleTranslateAnchorMap,
     MGLCircleStyleLayerCircleTranslateAnchorViewport,
 };
+
 typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
     MGLCircleStyleLayerCirclePitchScaleMap,
     MGLCircleStyleLayerCirclePitchScaleViewport,
@@ -20,39 +21,38 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
 #pragma mark - Accessing the Paint Attributes
 
 /**
-  Circle radius.
-*/
+ Circle radius.
+ */
 @property (nonatomic) id <MGLStyleAttributeValue> circleRadius;
 
 /**
-  The color of the circle.
-*/
+ The color of the circle.
+ */
 @property (nonatomic) id <MGLStyleAttributeValue> circleColor;
 
 /**
-  Amount to blur the circle. 1 blurs the circle such that only the centerpoint is full opacity.
-*/
+ Amount to blur the circle. 1 blurs the circle such that only the centerpoint is full opacity.
+ */
 @property (nonatomic) id <MGLStyleAttributeValue> circleBlur;
 
 /**
-  The opacity at which the circle will be drawn.
-*/
+ The opacity at which the circle will be drawn.
+ */
 @property (nonatomic) id <MGLStyleAttributeValue> circleOpacity;
 
 /**
-  The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
-*/
+ The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
+ */
 @property (nonatomic) id <MGLStyleAttributeValue> circleTranslate;
 
 /**
-  Control whether the translation is relative to the map (north) or viewport (screen)
-*/
+ Control whether the translation is relative to the map (north) or viewport (screen)
+ */
 @property (nonatomic) id <MGLStyleAttributeValue> circleTranslateAnchor;
 
 /**
-  Controls the scaling behavior of the circle when the map is pitched. The value `map` scales circles according to their apparent distance to the camera. The value `viewport` results in no pitch-related scaling.
-*/
+ Controls the scaling behavior of the circle when the map is pitched. The value `map` scales circles according to their apparent distance to the camera. The value `viewport` results in no pitch-related scaling.
+ */
 @property (nonatomic) id <MGLStyleAttributeValue> circlePitchScale;
 
 @end
-

@@ -6,8 +6,10 @@
 #import <XCTest/XCTest.h>
 
 @interface MGLBackgroundLayerTests : XCTestCase <MGLMapViewDelegate>
+
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) XCTestExpectation *expectation;
+
 @end
 
 @implementation MGLBackgroundLayerTests
@@ -23,8 +25,7 @@
     _mapView.delegate = self;
 }
 
-- (void)testBackgroundLayer
-{
+- (void)testBackgroundLayer {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"sourceID" url:geoJSONURL];    
     MGLBackgroundStyleLayer *layer = [[MGLBackgroundStyleLayer alloc] initWithLayerID:@"layerID" sourceID:@"sourceID"];

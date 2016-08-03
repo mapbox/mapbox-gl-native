@@ -18,6 +18,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
     MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
 <% } -%>
 };
+
 <% } -%>
 <% } -%>
 <% for (const property of paintProperties) { -%>
@@ -27,9 +28,9 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
     MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
 <% } -%>
 };
-<% } -%>
-<% } -%>
 
+<% } -%>
+<% } -%>
 @interface MGL<%- camelize(type) %>StyleLayer : NSObject <MGLStyleLayer>
 
 <% if (layoutProperties.length) { -%>
@@ -37,8 +38,8 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 
 <% for (const property of layoutProperties) { -%>
 /**
-  <%- property.doc %>
-*/
+ <%- property.doc %>
+ */
 @property (nonatomic) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
@@ -47,10 +48,9 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 
 <% for (const property of paintProperties) { -%>
 /**
-  <%- property.doc %>
-*/
+ <%- property.doc %>
+ */
 @property (nonatomic) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 @end
-

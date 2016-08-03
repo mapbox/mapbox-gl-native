@@ -6,8 +6,10 @@
 #import <XCTest/XCTest.h>
 
 @interface MGLFillLayerTests : XCTestCase <MGLMapViewDelegate>
+
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) XCTestExpectation *expectation;
+
 @end
 
 @implementation MGLFillLayerTests
@@ -23,8 +25,7 @@
     _mapView.delegate = self;
 }
 
-- (void)testFillLayer
-{
+- (void)testFillLayer {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"sourceID" url:geoJSONURL];    
     MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithLayerID:@"layerID" sourceID:@"sourceID"];

@@ -6,8 +6,10 @@
 #import <XCTest/XCTest.h>
 
 @interface MGLRasterLayerTests : XCTestCase <MGLMapViewDelegate>
+
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) XCTestExpectation *expectation;
+
 @end
 
 @implementation MGLRasterLayerTests
@@ -23,8 +25,7 @@
     _mapView.delegate = self;
 }
 
-- (void)testRasterLayer
-{
+- (void)testRasterLayer {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"sourceID" url:geoJSONURL];    
     MGLRasterStyleLayer *layer = [[MGLRasterStyleLayer alloc] initWithLayerID:@"layerID" sourceID:@"sourceID"];

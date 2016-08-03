@@ -14,11 +14,12 @@
 #import "NSColor+MGLAdditions.hpp"
 #endif
 
-
 @class MGLMapView;
 
 @protocol MGLStyleLayer_Private <NSObject>
+
 @property (nonatomic, weak) MGLMapView *mapView;
 @property (nonatomic, copy) NSString *layerID;
 @property (nonatomic) mbgl::style::Layer *layer;
+
 @end

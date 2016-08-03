@@ -6,8 +6,10 @@
 #import <XCTest/XCTest.h>
 
 @interface MGLSymbolLayerTests : XCTestCase <MGLMapViewDelegate>
+
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) XCTestExpectation *expectation;
+
 @end
 
 @implementation MGLSymbolLayerTests
@@ -23,8 +25,7 @@
     _mapView.delegate = self;
 }
 
-- (void)testSymbolLayer
-{
+- (void)testSymbolLayer {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"sourceID" url:geoJSONURL];    
     MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithLayerID:@"layerID" sourceID:@"sourceID"];

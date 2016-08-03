@@ -6,8 +6,10 @@
 #import <XCTest/XCTest.h>
 
 @interface MGLCircleLayerTests : XCTestCase <MGLMapViewDelegate>
+
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) XCTestExpectation *expectation;
+
 @end
 
 @implementation MGLCircleLayerTests
@@ -23,8 +25,7 @@
     _mapView.delegate = self;
 }
 
-- (void)testCircleLayer
-{
+- (void)testCircleLayer {
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceID:@"sourceID" url:geoJSONURL];    
     MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithLayerID:@"layerID" sourceID:@"sourceID"];
