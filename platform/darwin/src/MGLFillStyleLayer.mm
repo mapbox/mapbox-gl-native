@@ -51,7 +51,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)fillColor {
-    return [MGLColor mbgl_propertyValue:self.layer->getFillColor()];
+    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getFillColor()];
 }
 
 - (void)setFillOutlineColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillOutlineColor {
@@ -59,7 +59,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)fillOutlineColor {
-    return [MGLColor mbgl_propertyValue:self.layer->getFillOutlineColor()];
+    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getFillOutlineColor()];
 }
 
 - (void)setFillTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslate {

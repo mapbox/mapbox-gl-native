@@ -13,7 +13,7 @@
 /**
  Instantiates `NSColor` from an `mbgl::Color`
  */
-+ (NSColor *)mbgl_color:(mbgl::Color)color;
++ (NSColor *)mbgl_colorWithColor:(mbgl::Color)color;
 
 + (NSColor *)mbgl_propertyValue:(mbgl::style::PropertyValue<mbgl::Color>)color;
 

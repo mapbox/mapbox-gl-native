@@ -35,7 +35,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)backgroundColor {
-    return [MGLColor mbgl_propertyValue:self.layer->getBackgroundColor()];
+    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getBackgroundColor()];
 }
 
 - (void)setBackgroundPattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundPattern {

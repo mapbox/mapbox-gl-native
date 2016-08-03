@@ -54,4 +54,17 @@
     return mbgl::style::Function<std::string>({{stops}}, _base.floatValue);
 }
 
++ (instancetype)functionWithColorPropertyValue:(mbgl::style::Function<mbgl::Color>)propertyValue
+{
+    auto stops = propertyValue.getStops();
+    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
+    NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
+    for (auto stop : stops) {
+        convertedStops[@(stop.first)] = [MGLColor mbgl_colorWithColor:stop.second];
+    }
+    function.base = @(propertyValue.getBase());
+    function.stops = convertedStops;
+    return function;
+}
+
 @end

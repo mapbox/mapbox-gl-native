@@ -1,6 +1,8 @@
 #import <Foundation/Foundation.h>
-#import "MGLStyleLayer.h"
 #include <mbgl/style/layer.hpp>
+
+#import "MGLStyleLayer.h"
+#import "MGLStyleAttribute.hpp"
 
 #import "NSNumber+MGLStyleAttributeAdditions_Private.hpp"
 #import "NSArray+MGLStyleAttributeAdditions_Private.hpp"
@@ -11,8 +13,10 @@
 
 #if TARGET_OS_IPHONE
 #import "UIColor+MGLAdditions.hpp"
+#import "UIColor+MGLStyleAttributeAdditions_Private.hpp"
 #else
 #import "NSColor+MGLAdditions.hpp"
+#import "NSColor+MGLStyleAttributeAdditions_Private.hpp"
 #endif
 
 @class MGLMapView;

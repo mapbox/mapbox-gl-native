@@ -147,7 +147,7 @@ global.getterImplementation = function(property, layerType) {
     const char *type = @encode(${prefix}${camelize(layerType)}${suffix}${camelize(property.name)});
     return [NSValue value:&rawValue withObjCType:type];`
         case 'color':
-            return `return [MGLColor mbgl_propertyValue:self.layer->get${camelize(property.name)}()];`
+            return `return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->get${camelize(property.name)}()];`
         case 'array':
             return arrayGetterImplementation(property);
         default:

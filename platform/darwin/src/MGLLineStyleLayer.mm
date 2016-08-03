@@ -81,7 +81,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)lineColor {
-    return [MGLColor mbgl_propertyValue:self.layer->getLineColor()];
+    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getLineColor()];
 }
 
 - (void)setLineTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineTranslate {

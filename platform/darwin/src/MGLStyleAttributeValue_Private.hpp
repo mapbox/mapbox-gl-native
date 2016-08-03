@@ -7,6 +7,8 @@
 @protocol MGLStyleAttributeValue_Private <NSObject>
 - (BOOL)isFunction;
 @optional
+
+// Convert darwin types to mbgl types
 - (mbgl::style::PropertyValue<mbgl::Color>)mbgl_colorPropertyValue;
 - (mbgl::style::PropertyValue<float>)mbgl_floatPropertyValue;
 - (mbgl::style::PropertyValue<bool>)mbgl_boolPropertyValue;
@@ -16,5 +18,8 @@
 - (mbgl::style::PropertyValue<std::vector<std::string> >)mbgl_stringArrayPropertyValue;
 - (mbgl::style::PropertyValue<std::vector<float> >)mbgl_numberArrayPropertyValue;
 - (mbgl::style::PropertyValue<uint8_t>)mbgl_enumPropertyValue;
+
+// Convert mbgl types to darwin types
+- (id <MGLStyleAttributeValue>)mbgl_colorPropertyValueWith:(mbgl::style::PropertyValue<mbgl::Color>)color;
 
 @end

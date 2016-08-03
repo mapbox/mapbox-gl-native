@@ -12,6 +12,7 @@
     NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:geoJSONURL];
     MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithLayerIdentifier:@"layerID" sourceIdentifier:@"sourceID"];
+    [self.mapView.style addSource:source];
     [self.mapView.style addLayer:layer];
 
     layer.circleRadius = MGLRuntimeStylingHelper.testNumber;

@@ -28,5 +28,9 @@
     }
 
 @interface MGLStyleAttributeFunction(Private)
+
 - (mbgl::style::Function<mbgl::Color>)colorFunction;
+
++ (instancetype)functionWithColorPropertyValue:(mbgl::style::Function<mbgl::Color>)propertyValue;
+
 @end;

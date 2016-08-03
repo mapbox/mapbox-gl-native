@@ -279,7 +279,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 13)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 16)
     {
         [self testRuntimeStyling];
     }

@@ -43,7 +43,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)circleColor {
-    return [MGLColor mbgl_propertyValue:self.layer->getCircleColor()];
+    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getCircleColor()];
 }
 
 - (void)setCircleBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleBlur {

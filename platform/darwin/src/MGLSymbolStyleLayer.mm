@@ -333,7 +333,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconColor {
-    return [MGLColor mbgl_propertyValue:self.layer->getIconColor()];
+    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getIconColor()];
 }
 
 - (void)setIconHaloColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconHaloColor {
@@ -341,7 +341,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconHaloColor {
-    return [MGLColor mbgl_propertyValue:self.layer->getIconHaloColor()];
+    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getIconHaloColor()];
 }
 
 - (void)setIconHaloWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconHaloWidth {
@@ -391,7 +391,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textColor {
-    return [MGLColor mbgl_propertyValue:self.layer->getTextColor()];
+    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getTextColor()];
 }
 
 - (void)setTextHaloColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textHaloColor {
@@ -399,7 +399,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textHaloColor {
-    return [MGLColor mbgl_propertyValue:self.layer->getTextHaloColor()];
+    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getTextHaloColor()];
 }
 
 - (void)setTextHaloWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textHaloWidth {
