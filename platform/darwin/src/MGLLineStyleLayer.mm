@@ -89,7 +89,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)lineTranslate {
-    return @[];
+    return [NSArray mbgl_offsetPropertyValue:self.layer->getLineTranslate()];
 }
 
 - (void)setLineTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineTranslateAnchor {
@@ -135,11 +135,11 @@
 }
 
 - (void)setLineDasharray:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineDasharray {
-    self.layer->setLineDasharray(lineDasharray.mbgl_dashArrayPropertyValue);
+    self.layer->setLineDasharray(lineDasharray.mbgl_numberArrayPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)lineDasharray {
-    return @[];
+    return [NSArray mbgl_numberArrayPropertyValue:self.layer->getLineDasharray()];
 }
 
 - (void)setLinePattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)linePattern {

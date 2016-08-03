@@ -95,19 +95,6 @@ global.initLayer = function (layerType) {
     }
 }
 
-global.arraySetterImplementation = function(property) {
-    switch (property.name) {
-        case 'icon-text-fit-padding':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_paddingPropertyValue);`;
-        case 'line-dasharray':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_dashArrayPropertyValue);`;
-        case 'text-font':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_fontPropertyValue);`;
-        default:
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_offsetPropertyValue);`;
-    }
-}
-
 global.setterImplementation = function(property, layerType) {
     switch (property.type) {
         case 'boolean':
@@ -134,6 +121,19 @@ global.setterImplementation = function(property, layerType) {
     }
 }
 
+global.arraySetterImplementation = function(property) {
+    switch (property.name) {
+        case 'icon-text-fit-padding':
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_paddingPropertyValue);`;
+        case 'line-dasharray':
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_numberArrayPropertyValue);`;
+        case 'text-font':
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_stringArrayPropertyValue);`;
+        default:
+            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_offsetPropertyValue);`;
+    }
+}
+
 global.getterImplementation = function(property, layerType) {
     switch (property.type) {
         case 'boolean':
@@ -149,10 +149,22 @@ global.getterImplementation = function(property, layerType) {
         case 'color':
             return `return [MGLColor mbgl_propertyValue:self.layer->get${camelize(property.name)}()];`
         case 'array':
-            //return `return [NSArray mbgl_arrayWithPropertyValue:${layerType}Layer->get${camelize(property.name)}()];`;
-            return `return @[];`;
+            return arrayGetterImplementation(property);
         default:
          throw new Error(`unknown type for ${property.name}`)
+    }
+}
+
+global.arrayGetterImplementation = function(property) {
+    switch (property.name) {
+        case 'icon-text-fit-padding':
+            return `return [NSArray mbgl_paddingPropertyValue:self.layer->get${camelize(property.name)}()];`;
+        case 'line-dasharray':
+            return `return [NSArray mbgl_numberArrayPropertyValue:self.layer->get${camelize(property.name)}()];`;
+        case 'text-font':
+            return `return [NSArray mbgl_stringArrayPropertyValue:self.layer->get${camelize(property.name)}()];`;
+        default:
+            return `return [NSArray mbgl_offsetPropertyValue:self.layer->get${camelize(property.name)}()];`;
     }
 }
 

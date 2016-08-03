@@ -67,7 +67,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)circleTranslate {
-    return @[];
+    return [NSArray mbgl_offsetPropertyValue:self.layer->getCircleTranslate()];
 }
 
 - (void)setCircleTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleTranslateAnchor {

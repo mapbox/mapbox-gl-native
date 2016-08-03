@@ -25,7 +25,7 @@
 
 + (NSArray *)testDashArray
 {
-    return @[@"", @""];
+    return @[@1, @2];
 }
 
 + (NSNumber *)testNumber
