@@ -328,7 +328,12 @@ endif
 
 #### Qt targets #####################################################
 
+ifeq ($(WITH_QT_4), 1)
+QT_ROOT_PATH = build/qt4-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
+else
 QT_ROOT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
+endif
+
 export QT_OUTPUT_PATH = $(QT_ROOT_PATH)/$(BUILDTYPE)
 QT_BUILD = $(QT_OUTPUT_PATH)/build.ninja
 
