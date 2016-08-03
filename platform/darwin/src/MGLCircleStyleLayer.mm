@@ -70,7 +70,7 @@
 }
 - (void)setCircleTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleTranslateAnchor
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(circleTranslateAnchor, CircleTranslateAnchor, TranslateAnchorType);
 }
 - (id <MGLStyleAttributeValue>)circleTranslateAnchor
 {
@@ -80,7 +80,7 @@
 }
 - (void)setCirclePitchScale:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circlePitchScale
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(circlePitchScale, CirclePitchScale, CirclePitchScaleType);
 }
 - (id <MGLStyleAttributeValue>)circlePitchScale
 {

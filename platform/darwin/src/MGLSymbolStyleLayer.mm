@@ -31,7 +31,7 @@
 
 - (void)setSymbolPlacement:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)symbolPlacement
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(symbolPlacement, SymbolPlacement, SymbolPlacementType);
 }
 
 - (id <MGLStyleAttributeValue>)symbolPlacement
@@ -93,7 +93,7 @@
 
 - (void)setIconRotationAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconRotationAlignment
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(iconRotationAlignment, IconRotationAlignment, AlignmentType);
 }
 
 - (id <MGLStyleAttributeValue>)iconRotationAlignment
@@ -115,7 +115,7 @@
 
 - (void)setIconTextFit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTextFit
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(iconTextFit, IconTextFit, IconTextFitType);
 }
 
 - (id <MGLStyleAttributeValue>)iconTextFit
@@ -187,7 +187,7 @@
 
 - (void)setTextPitchAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textPitchAlignment
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(textPitchAlignment, TextPitchAlignment, AlignmentType);
 }
 
 - (id <MGLStyleAttributeValue>)textPitchAlignment
@@ -199,7 +199,7 @@
 
 - (void)setTextRotationAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textRotationAlignment
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(textRotationAlignment, TextRotationAlignment, AlignmentType);
 }
 
 - (id <MGLStyleAttributeValue>)textRotationAlignment
@@ -271,7 +271,7 @@
 
 - (void)setTextJustify:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textJustify
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(textJustify, TextJustify, TextJustifyType);
 }
 
 - (id <MGLStyleAttributeValue>)textJustify
@@ -283,7 +283,7 @@
 
 - (void)setTextAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textAnchor
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(textAnchor, TextAnchor, TextAnchorType);
 }
 
 - (id <MGLStyleAttributeValue>)textAnchor
@@ -335,7 +335,7 @@
 
 - (void)setTextTransform:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTransform
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(textTransform, TextTransform, TextTransformType);
 }
 
 - (id <MGLStyleAttributeValue>)textTransform
@@ -436,7 +436,7 @@
 }
 - (void)setIconTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTranslateAnchor
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(iconTranslateAnchor, IconTranslateAnchor, TranslateAnchorType);
 }
 - (id <MGLStyleAttributeValue>)iconTranslateAnchor
 {
@@ -494,7 +494,7 @@
 }
 - (void)setTextTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTranslateAnchor
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(textTranslateAnchor, TextTranslateAnchor, TranslateAnchorType);
 }
 - (id <MGLStyleAttributeValue>)textTranslateAnchor
 {

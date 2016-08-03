@@ -31,7 +31,7 @@
 
 - (void)setLineCap:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineCap
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(lineCap, LineCap, LineCapType);
 }
 
 - (id <MGLStyleAttributeValue>)lineCap
@@ -43,7 +43,7 @@
 
 - (void)setLineJoin:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineJoin
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(lineJoin, LineJoin, LineJoinType);
 }
 
 - (id <MGLStyleAttributeValue>)lineJoin
@@ -100,7 +100,7 @@
 }
 - (void)setLineTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineTranslateAnchor
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(lineTranslateAnchor, LineTranslateAnchor, TranslateAnchorType);
 }
 - (id <MGLStyleAttributeValue>)lineTranslateAnchor
 {

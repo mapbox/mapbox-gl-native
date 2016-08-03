@@ -117,7 +117,14 @@ global.setterImplementation = function(property) {
         case 'string':
             return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_stringPropertyValue);`;
         case 'enum':
-            return `// TODO: setterEnum`; 
+            var enumType = camelize(property.name) + 'Type';
+            if (/-translate-anchor$/.test(property.name)) {
+                enumType = 'TranslateAnchorType';
+            }
+            if (/-(rotation|pitch)-alignment$/.test(property.name)) {
+                enumType = 'AlignmentType';
+            }
+            return `MGLSetEnumProperty(${camelizeWithLeadingLowercase(property.name)}, ${camelize(property.name)}, ${enumType});`; 
         case 'color':
             return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_colorPropertyValue);`;
         case 'array':

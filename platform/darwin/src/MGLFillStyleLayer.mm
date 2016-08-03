@@ -70,7 +70,7 @@
 }
 - (void)setFillTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslateAnchor
 {
-    // TODO: setterEnum
+    MGLSetEnumProperty(fillTranslateAnchor, FillTranslateAnchor, TranslateAnchorType);
 }
 - (id <MGLStyleAttributeValue>)fillTranslateAnchor
 {
