@@ -14,7 +14,6 @@
 		353D23961D0B0DFE002BE09D /* MGLAnnotationViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */; };
 		35E208A71D24210F00EC9A46 /* MGLNSDataAdditionsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 35E208A61D24210F00EC9A46 /* MGLNSDataAdditionsTests.m */; };
 		36F1153D1D46080700878E1A /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F1153B1D46080700878E1A /* libmbgl-core.a */; };
-		36F1153E1D46080700878E1A /* libmbgl-platform-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F1153C1D46080700878E1A /* libmbgl-platform-ios.a */; };
 		4018B1C71CDC287F00F666AF /* MGLAnnotationView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4018B1C41CDC277F00F666AF /* MGLAnnotationView.mm */; };
 		4018B1C81CDC287F00F666AF /* MGLAnnotationView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4018B1C41CDC277F00F666AF /* MGLAnnotationView.mm */; };
 		4018B1C91CDC288A00F666AF /* MGLAnnotationView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 4018B1C31CDC277F00F666AF /* MGLAnnotationView_Private.h */; };
@@ -549,7 +548,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				36F1153D1D46080700878E1A /* libmbgl-core.a in Frameworks */,
-				36F1153E1D46080700878E1A /* libmbgl-platform-ios.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -5,7 +5,7 @@ set -o pipefail
 set -u
 
 NAME=Mapbox
-OUTPUT=platform/ios/pkg
+OUTPUT=build/ios/pkg
 DERIVED_DATA=build/ios
 PRODUCTS=${DERIVED_DATA}
 
