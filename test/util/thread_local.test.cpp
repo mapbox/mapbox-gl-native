@@ -71,38 +71,30 @@ TEST(ThreadLocalStorage, NotSetReturnsNull) {
 
 namespace {
 
-struct DtorCounter {
-    ~DtorCounter() { ++(*value); }
-    unsigned *value;
-};
-
 class TestThreadReclaim {
 public:
-    TestThreadReclaim(mbgl::ActorRef<TestThreadReclaim>, DtorCounter* counter_) {
-        counter.set(counter_);
+    TestThreadReclaim(mbgl::ActorRef<TestThreadReclaim>, int* data_) {
+        data.set(data_);
     }
 
 private:
-    static ThreadLocal<DtorCounter> counter;
+    ThreadLocal<int> data;
 };
-
-ThreadLocal<DtorCounter> TestThreadReclaim::counter;
 
 } // namespace
 
 TEST(ThreadLocalStorage, AutoReclaim) {
     RunLoop loop;
 
-    unsigned counter = 0;
+    auto data1 = new int;
+    auto data2 = new int;
 
-    auto dtorCounter1 = new DtorCounter{ &counter };
-    auto dtorCounter2 = new DtorCounter{ &counter };
-
-    auto thread1 = std::make_unique<Thread<TestThreadReclaim>>("Test", dtorCounter1);
-    auto thread2 = std::make_unique<Thread<TestThreadReclaim>>("Test", dtorCounter2);
+    auto thread1 = std::make_unique<Thread<TestThreadReclaim>>("Test", data1);
+    auto thread2 = std::make_unique<Thread<TestThreadReclaim>>("Test", data2);
 
     thread1.reset();
     thread2.reset();
 
-    EXPECT_EQ(counter, 2u);
+    // Should not leak, valgrind will
+    // let us know.
 }
