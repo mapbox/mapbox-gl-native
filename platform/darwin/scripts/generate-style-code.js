@@ -83,8 +83,8 @@ global.testArrayImplementation = function (property) {
     }
 }
 
-global.propertyType = function (property, _private=false) {
-    return (_private) ? `id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>` : `id <MGLStyleAttributeValue>`;
+global.propertyType = function (property, _private) {
+    return _private ? `id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>` : `id <MGLStyleAttributeValue>`;
 }
 
 global.initLayer = function (layerType) {
@@ -126,7 +126,7 @@ global.setterImplementation = function(property) {
     }
 }
 
-global.getterImplementation = function(property, layerType = null) {
+global.getterImplementation = function(property, layerType) {
     switch (property.type) {
         case 'boolean':
             return `return [NSNumber mbgl_booleanWithPropertyValue:self.layer->get${camelize(property.name)}()];`;
