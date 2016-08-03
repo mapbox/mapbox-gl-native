@@ -34,7 +34,7 @@ set(MBGL_QT_FILES
     # Thread
     PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
     PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
-    PRIVATE platform/default/thread_local.cpp
+    PRIVATE platform/qt/src/thread_local.cpp
 
     # Platform integration
     PRIVATE platform/qt/src/async_task.cpp
