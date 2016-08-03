@@ -1,6 +1,7 @@
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
 package com.mapbox.mapboxsdk.style;
 
+import android.graphics.Color;
 import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -147,6 +148,28 @@ public class FillLayerTest extends BaseTest {
     }
 
     @Test
+    public void testFillColorAsInt() {
+        checkViewIsDisplayed(R.id.mapView);
+
+        mapboxMap = rule.getActivity().getMapboxMap();
+
+        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+            Log.i(TAG, "Adding layer");
+            layer = new FillLayer("my-layer", "composite");
+            layer.setSourceLayer("composite");
+            mapboxMap.addLayer(layer);
+            //Layer reference is now stale, get new reference
+            layer = mapboxMap.getLayerAs("my-layer");
+        }
+        Log.i(TAG, "fill-color");
+        assertNotNull(layer);
+
+        //Set and Get
+        layer.setProperties(fillColor(Color.RED));
+        assertEquals(layer.getFillColorAsInt(), Color.RED);
+    }
+
+    @Test
     public void testFillOutlineColor() {
         checkViewIsDisplayed(R.id.mapView);
 
@@ -166,6 +189,28 @@ public class FillLayerTest extends BaseTest {
         //Set and Get
         layer.setProperties(fillOutlineColor("rgba(0, 0, 0, 1)"));
         assertEquals((String) layer.getFillOutlineColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    }
+
+    @Test
+    public void testFillOutlineColorAsInt() {
+        checkViewIsDisplayed(R.id.mapView);
+
+        mapboxMap = rule.getActivity().getMapboxMap();
+
+        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+            Log.i(TAG, "Adding layer");
+            layer = new FillLayer("my-layer", "composite");
+            layer.setSourceLayer("composite");
+            mapboxMap.addLayer(layer);
+            //Layer reference is now stale, get new reference
+            layer = mapboxMap.getLayerAs("my-layer");
+        }
+        Log.i(TAG, "fill-outline-color");
+        assertNotNull(layer);
+
+        //Set and Get
+        layer.setProperties(fillOutlineColor(Color.RED));
+        assertEquals(layer.getFillOutlineColorAsInt(), Color.RED);
     }
 
     @Test

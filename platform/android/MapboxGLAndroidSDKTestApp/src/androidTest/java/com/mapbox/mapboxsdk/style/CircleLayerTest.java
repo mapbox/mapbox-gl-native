@@ -1,6 +1,7 @@
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
 package com.mapbox.mapboxsdk.style;
 
+import android.graphics.Color;
 import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -112,6 +113,28 @@ public class CircleLayerTest extends BaseTest {
         //Set and Get
         layer.setProperties(circleColor("rgba(0, 0, 0, 1)"));
         assertEquals((String) layer.getCircleColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    }
+
+    @Test
+    public void testCircleColorAsInt() {
+        checkViewIsDisplayed(R.id.mapView);
+
+        mapboxMap = rule.getActivity().getMapboxMap();
+
+        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+            Log.i(TAG, "Adding layer");
+            layer = new CircleLayer("my-layer", "composite");
+            layer.setSourceLayer("composite");
+            mapboxMap.addLayer(layer);
+            //Layer reference is now stale, get new reference
+            layer = mapboxMap.getLayerAs("my-layer");
+        }
+        Log.i(TAG, "circle-color");
+        assertNotNull(layer);
+
+        //Set and Get
+        layer.setProperties(circleColor(Color.RED));
+        assertEquals(layer.getCircleColorAsInt(), Color.RED);
     }
 
     @Test

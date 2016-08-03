@@ -1,6 +1,7 @@
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
 package com.mapbox.mapboxsdk.style;
 
+import android.graphics.Color;
 import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -923,6 +924,28 @@ public class SymbolLayerTest extends BaseTest {
     }
 
     @Test
+    public void testIconColorAsInt() {
+        checkViewIsDisplayed(R.id.mapView);
+
+        mapboxMap = rule.getActivity().getMapboxMap();
+
+        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+            Log.i(TAG, "Adding layer");
+            layer = new SymbolLayer("my-layer", "composite");
+            layer.setSourceLayer("composite");
+            mapboxMap.addLayer(layer);
+            //Layer reference is now stale, get new reference
+            layer = mapboxMap.getLayerAs("my-layer");
+        }
+        Log.i(TAG, "icon-color");
+        assertNotNull(layer);
+
+        //Set and Get
+        layer.setProperties(iconColor(Color.RED));
+        assertEquals(layer.getIconColorAsInt(), Color.RED);
+    }
+
+    @Test
     public void testIconHaloColor() {
         checkViewIsDisplayed(R.id.mapView);
 
@@ -942,6 +965,28 @@ public class SymbolLayerTest extends BaseTest {
         //Set and Get
         layer.setProperties(iconHaloColor("rgba(0, 0, 0, 1)"));
         assertEquals((String) layer.getIconHaloColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    }
+
+    @Test
+    public void testIconHaloColorAsInt() {
+        checkViewIsDisplayed(R.id.mapView);
+
+        mapboxMap = rule.getActivity().getMapboxMap();
+
+        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+            Log.i(TAG, "Adding layer");
+            layer = new SymbolLayer("my-layer", "composite");
+            layer.setSourceLayer("composite");
+            mapboxMap.addLayer(layer);
+            //Layer reference is now stale, get new reference
+            layer = mapboxMap.getLayerAs("my-layer");
+        }
+        Log.i(TAG, "icon-halo-color");
+        assertNotNull(layer);
+
+        //Set and Get
+        layer.setProperties(iconHaloColor(Color.RED));
+        assertEquals(layer.getIconHaloColorAsInt(), Color.RED);
     }
 
     @Test
@@ -1077,6 +1122,28 @@ public class SymbolLayerTest extends BaseTest {
     }
 
     @Test
+    public void testTextColorAsInt() {
+        checkViewIsDisplayed(R.id.mapView);
+
+        mapboxMap = rule.getActivity().getMapboxMap();
+
+        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+            Log.i(TAG, "Adding layer");
+            layer = new SymbolLayer("my-layer", "composite");
+            layer.setSourceLayer("composite");
+            mapboxMap.addLayer(layer);
+            //Layer reference is now stale, get new reference
+            layer = mapboxMap.getLayerAs("my-layer");
+        }
+        Log.i(TAG, "text-color");
+        assertNotNull(layer);
+
+        //Set and Get
+        layer.setProperties(textColor(Color.RED));
+        assertEquals(layer.getTextColorAsInt(), Color.RED);
+    }
+
+    @Test
     public void testTextHaloColor() {
         checkViewIsDisplayed(R.id.mapView);
 
@@ -1096,6 +1163,28 @@ public class SymbolLayerTest extends BaseTest {
         //Set and Get
         layer.setProperties(textHaloColor("rgba(0, 0, 0, 1)"));
         assertEquals((String) layer.getTextHaloColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    }
+
+    @Test
+    public void testTextHaloColorAsInt() {
+        checkViewIsDisplayed(R.id.mapView);
+
+        mapboxMap = rule.getActivity().getMapboxMap();
+
+        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+            Log.i(TAG, "Adding layer");
+            layer = new SymbolLayer("my-layer", "composite");
+            layer.setSourceLayer("composite");
+            mapboxMap.addLayer(layer);
+            //Layer reference is now stale, get new reference
+            layer = mapboxMap.getLayerAs("my-layer");
+        }
+        Log.i(TAG, "text-halo-color");
+        assertNotNull(layer);
+
+        //Set and Get
+        layer.setProperties(textHaloColor(Color.RED));
+        assertEquals(layer.getTextHaloColorAsInt(), Color.RED);
     }
 
     @Test

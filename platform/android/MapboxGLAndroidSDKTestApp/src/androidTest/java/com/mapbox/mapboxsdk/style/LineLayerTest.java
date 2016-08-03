@@ -1,6 +1,7 @@
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
 package com.mapbox.mapboxsdk.style;
 
+import android.graphics.Color;
 import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -219,6 +220,28 @@ public class LineLayerTest extends BaseTest {
         //Set and Get
         layer.setProperties(lineColor("rgba(0, 0, 0, 1)"));
         assertEquals((String) layer.getLineColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    }
+
+    @Test
+    public void testLineColorAsInt() {
+        checkViewIsDisplayed(R.id.mapView);
+
+        mapboxMap = rule.getActivity().getMapboxMap();
+
+        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+            Log.i(TAG, "Adding layer");
+            layer = new LineLayer("my-layer", "composite");
+            layer.setSourceLayer("composite");
+            mapboxMap.addLayer(layer);
+            //Layer reference is now stale, get new reference
+            layer = mapboxMap.getLayerAs("my-layer");
+        }
+        Log.i(TAG, "line-color");
+        assertNotNull(layer);
+
+        //Set and Get
+        layer.setProperties(lineColor(Color.RED));
+        assertEquals(layer.getLineColorAsInt(), Color.RED);
     }
 
     @Test

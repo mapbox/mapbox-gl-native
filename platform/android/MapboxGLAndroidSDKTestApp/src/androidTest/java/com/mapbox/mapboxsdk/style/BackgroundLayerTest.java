@@ -1,6 +1,7 @@
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
 package com.mapbox.mapboxsdk.style;
 
+import android.graphics.Color;
 import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -83,6 +84,22 @@ public class BackgroundLayerTest extends BaseTest {
         //Set and Get
         layer.setProperties(backgroundColor("rgba(0, 0, 0, 1)"));
         assertEquals((String) layer.getBackgroundColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    }
+
+    @Test
+    public void testBackgroundColorAsInt() {
+        checkViewIsDisplayed(R.id.mapView);
+
+        mapboxMap = rule.getActivity().getMapboxMap();
+
+        Log.i(TAG, "Retrieving layer");
+        layer = mapboxMap.getLayerAs("background");
+        Log.i(TAG, "background-color");
+        assertNotNull(layer);
+
+        //Set and Get
+        layer.setProperties(backgroundColor(Color.RED));
+        assertEquals(layer.getBackgroundColorAsInt(), Color.RED);
     }
 
     @Test

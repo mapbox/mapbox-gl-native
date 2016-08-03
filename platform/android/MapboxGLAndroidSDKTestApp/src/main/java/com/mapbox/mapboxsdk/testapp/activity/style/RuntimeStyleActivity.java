@@ -345,9 +345,10 @@ public class RuntimeStyleActivity extends AppCompatActivity {
         mapboxMap.addSource(source);
 
         //Add a layer
-        FillLayer layer = new FillLayer("custom-tile-layers", "custom-tile-source");
-        layer.setSourceLayer("water");
-        mapboxMap.addLayer(layer);
+        mapboxMap.addLayer(
+                new FillLayer("custom-tile-layers", "custom-tile-source")
+                        .withSourceLayer("water")
+        );
     }
 
     private static class DefaultCallback implements MapboxMap.CancelableCallback {

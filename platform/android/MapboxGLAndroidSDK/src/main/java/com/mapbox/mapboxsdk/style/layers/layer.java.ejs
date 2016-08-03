@@ -5,6 +5,13 @@
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
 package com.mapbox.mapboxsdk.style.layers;
 
+import com.mapbox.mapboxsdk.exceptions.ConversionException;
+
+import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
+
+import static com.mapbox.mapboxsdk.utils.ColorUtils.*;
+
 /**
  * <%- camelize(type) %> Layer
  */
@@ -31,6 +38,11 @@ public class <%- camelize(type) %>Layer extends Layer {
         checkValidity();
         nativeSetSourceLayer(sourceLayer);
     }
+
+    public <%- camelize(type) %>Layer withSourceLayer(String sourceLayer) {
+        setSourceLayer(sourceLayer);
+        return this;
+    }
 <% } -%>
 
 <% if (type !== 'background' && type !== 'raster') { -%>
@@ -44,7 +56,22 @@ public class <%- camelize(type) %>Layer extends Layer {
         nativeSetFilter(filter);
     }
 
+    public <%- camelize(type) %>Layer withFilter(Object[] filter) {
+        setFilter(filter);
+        return this;
+    }
+
+    public <%- camelize(type) %>Layer withFilter(Filter.Statement filter) {
+        setFilter(filter);
+        return this;
+    }
+
 <% } -%>
+
+    public <%- camelize(type) %>Layer withProperties(@NonNull Property<?>... properties) {
+        setProperties(properties);
+        return this;
+    }
 
     // Property getters
 
@@ -54,6 +81,23 @@ public class <%- camelize(type) %>Layer extends Layer {
         checkValidity();
         return (PropertyValue<<%- propertyType(property) %>>) new PropertyValue(nativeGet<%- camelize(property.name) %>());
     }
+ <% if (property.type == 'color') { -%>
+     /**
+      * <%- property.doc %>
+      * @throws RuntimeException
+      */
+    @ColorInt
+    public int get<%- camelize(property.name) %>AsInt() {
+        checkValidity();
+        PropertyValue<<%- propertyType(property) %>> value = get<%- camelize(property.name) %>();
+        if (value.isValue()) {
+            return rgbaToColor(value.getValue());
+        } else {
+            throw new RuntimeException("<%- property.name %> was set as a Function");
+        }
+    }
+
+ <% } -%>
 
 <% } -%>
 <% for (const property of properties) { -%>

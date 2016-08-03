@@ -1,6 +1,13 @@
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
 package com.mapbox.mapboxsdk.style.layers;
 
+import com.mapbox.mapboxsdk.exceptions.ConversionException;
+
+import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
+
+import static com.mapbox.mapboxsdk.utils.ColorUtils.*;
+
 /**
  * Circle Layer
  */
@@ -21,6 +28,11 @@ public class CircleLayer extends Layer {
         nativeSetSourceLayer(sourceLayer);
     }
 
+    public CircleLayer withSourceLayer(String sourceLayer) {
+        setSourceLayer(sourceLayer);
+        return this;
+    }
+
     public void setFilter(Filter.Statement filter) {
         checkValidity();
         this.setFilter(filter.toArray());
@@ -31,6 +43,21 @@ public class CircleLayer extends Layer {
         nativeSetFilter(filter);
     }
 
+    public CircleLayer withFilter(Object[] filter) {
+        setFilter(filter);
+        return this;
+    }
+
+    public CircleLayer withFilter(Filter.Statement filter) {
+        setFilter(filter);
+        return this;
+    }
+
+
+    public CircleLayer withProperties(@NonNull Property<?>... properties) {
+        setProperties(properties);
+        return this;
+    }
 
     // Property getters
 
@@ -39,43 +66,58 @@ public class CircleLayer extends Layer {
         checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetCircleRadius());
     }
-
+ 
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getCircleColor() {
         checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetCircleColor());
     }
+      /**
+      * The color of the circle.
+      * @throws RuntimeException
+      */
+    @ColorInt
+    public int getCircleColorAsInt() {
+        checkValidity();
+        PropertyValue<String> value = getCircleColor();
+        if (value.isValue()) {
+            return rgbaToColor(value.getValue());
+        } else {
+            throw new RuntimeException("circle-color was set as a Function");
+        }
+    }
 
+ 
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getCircleBlur() {
         checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetCircleBlur());
     }
-
+ 
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getCircleOpacity() {
         checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetCircleOpacity());
     }
-
+ 
     @SuppressWarnings("unchecked")
     public PropertyValue<Float[]> getCircleTranslate() {
         checkValidity();
         return (PropertyValue<Float[]>) new PropertyValue(nativeGetCircleTranslate());
     }
-
+ 
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getCircleTranslateAnchor() {
         checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetCircleTranslateAnchor());
     }
-
+ 
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getCirclePitchScale() {
         checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetCirclePitchScale());
     }
-
+ 
     private native Object nativeGetCircleRadius();
 
     private native Object nativeGetCircleColor();
