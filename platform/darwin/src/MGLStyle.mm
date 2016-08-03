@@ -19,6 +19,7 @@
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/mbgl.hpp>
 
@@ -92,7 +93,6 @@ static NSURL *MGLStyleURL_emerald;
 {
     auto layer = self.mapView.mbglMap->getLayer(identifier.UTF8String);
     
-    const std::string class_name = typeid(*layer).name();
     Class clazz = [self classFromLayer:layer];
     
     id <MGLStyleLayer, MGLStyleLayer_Private> styleLayer = [[clazz alloc] init];
@@ -106,19 +106,21 @@ static NSURL *MGLStyleURL_emerald;
 - (Class)classFromLayer:(mbgl::style::Layer *)layer
 {
     // TODO: Improve this
-    if (dynamic_cast<mbgl::style::FillLayer *>(layer)) {
+    if (layer->is<mbgl::style::FillLayer>()) {
         return MGLFillStyleLayer.class;
-    } else if (dynamic_cast<mbgl::style::LineLayer *>(layer)) {
+    } else if (layer->is<mbgl::style::LineLayer>()) {
         return MGLLineStyleLayer.class;
-    } else if (dynamic_cast<mbgl::style::SymbolLayer *>(layer)) {
+    } else if (layer->is<mbgl::style::SymbolLayer>()) {
         return MGLSymbolStyleLayer.class;
-    } else if (dynamic_cast<mbgl::style::RasterLayer *>(layer)) {
+    } else if (layer->is<mbgl::style::RasterLayer>()) {
         return MGLRasterStyleLayer.class;
-    } else if (dynamic_cast<mbgl::style::CircleLayer *>(layer)) {
+    } else if (layer->is<mbgl::style::CircleLayer>()) {
         return MGLCircleStyleLayer.class;
+    } else if (layer->is<mbgl::style::BackgroundLayer>()) {
+        return MGLBackgroundStyleLayer.class;
     }
     [NSException raise:@"Layer type not handled" format:@""];
-    return nil;
+    return Nil;
 }
 
 - (void)removeLayer:(id <MGLStyleLayer_Private>)styleLayer
