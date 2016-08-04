@@ -1,44 +1,62 @@
 package com.mapbox.mapboxsdk.activity;
 
 import android.app.Activity;
+import android.support.test.espresso.Espresso;
+import android.support.test.rule.ActivityTestRule;
+import android.util.Log;
 
-import com.mapbox.mapboxsdk.activity.utils.ScreenshotUtil;
+import com.mapbox.mapboxsdk.utils.OnMapReadyIdlingResource;
+import com.mapbox.mapboxsdk.utils.ScreenshotUtil;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.testapp.R;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
-/**
- * Base Espresso class for all tests, helps working with ActivityInstrumentationTestCase2
- */
-public class BaseTest {
+public abstract class BaseTest {
 
-    protected final static String HOME_BUTTON_STRING = "Navigate up";
+    @Rule
+    public ActivityTestRule<Activity> rule = new ActivityTestRule<>(getActivityClass());
+    protected MapboxMap mapboxMap;
+    protected OnMapReadyIdlingResource idlingResource;
 
-    /*
-     * Shortcuts for common UI tests
-     */
+    @Before
+    public void beforeTest() {
+        Log.e(MapboxConstants.TAG, "@Before test: register idle resource");
+        idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
+        Espresso.registerIdlingResources(idlingResource);
+        checkViewIsDisplayed(R.id.mapView);
+        mapboxMap = idlingResource.getMapboxMap();
+    }
+
+    protected abstract Class getActivityClass();
 
     protected void checkViewIsDisplayed(int id) {
         onView(withId(id))
                 .check(matches(isDisplayed()));
     }
 
-    /*
-     * Screenshots logic
-     */
-
-    protected void takeNamedScreenshot(final Activity activity, final String name) {
-
-        // Screenshots need to be taken on the UI thread
+    protected void takeScreenshot(final String name) {
+        final Activity activity = rule.getActivity();
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 ScreenshotUtil.take(activity, name);
             }
         });
-
     }
 
+    @After
+    public void afterTest() {
+        Log.e(MapboxConstants.TAG, "@After test: unregister idle resource");
+        Espresso.unregisterIdlingResources(idlingResource);
+    }
 }
+

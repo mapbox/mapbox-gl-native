@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
@@ -10,19 +10,19 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/pressForMarkerMapView"
+        android:id="@id/mapView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        app:attribution_gravity="top|end"
         app:center_latitude="45.1855569"
         app:center_longitude="5.7215506"
-        app:zoom="11"
-        app:style_url="@string/style_mapbox_streets"
         app:logo_gravity="top|end"
-        app:attribution_gravity="top|end"
         app:logo_margin_right="10dp"
-        android:layout_below="@id/toolbar"/>
+        app:style_url="@string/style_mapbox_streets"
+        app:zoom="11" />
 
 </RelativeLayout>

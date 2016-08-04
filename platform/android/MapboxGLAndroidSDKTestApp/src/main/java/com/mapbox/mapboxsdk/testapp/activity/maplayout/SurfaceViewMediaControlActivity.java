@@ -12,14 +12,17 @@ import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
 import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class SurfaceViewMediaControlActivity extends AppCompatActivity {
+public class SurfaceViewMediaControlActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private MapView mMapView;
+    private MapboxMap mapboxMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +40,18 @@ public class SurfaceViewMediaControlActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
+        mMapView.getMapAsync(this);
 
         // add another SurfaceView to the Layout
         FrameLayout container = (FrameLayout) findViewById(R.id.container);
         GLSurfaceView mediaControlSurfaceView = new ClearGLSurfaceView(this);
         mediaControlSurfaceView.setZOrderMediaOverlay(true);
         container.addView(mediaControlSurfaceView);
+    }
+
+    @Override
+    public void onMapReady(MapboxMap mapboxMap) {
+        this.mapboxMap = mapboxMap;
     }
 
     @Override

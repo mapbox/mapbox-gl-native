@@ -1,29 +1,23 @@
 package com.mapbox.mapboxsdk.camera;
 
-import android.app.Activity;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
-import android.support.test.rule.ActivityTestRule;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.activity.BaseMapboxMapTest;
+import com.mapbox.mapboxsdk.activity.BaseTest;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMapUtils;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.annotation.DynamicMarkerChangeActivity;
 
 import org.hamcrest.Matcher;
-import org.junit.Rule;
 import org.junit.Test;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
-public class TiltTest extends BaseMapboxMapTest {
-
-    @Rule
-    public final ActivityTestRule<DynamicMarkerChangeActivity> rule = new ActivityTestRule<>(DynamicMarkerChangeActivity.class);
+public class TiltTest extends BaseTest {
 
     @Test
     public void testTilt() {
@@ -31,8 +25,8 @@ public class TiltTest extends BaseMapboxMapTest {
     }
 
     @Override
-    public Activity getActivity() {
-        return rule.getActivity();
+    public Class getActivityClass() {
+        return DynamicMarkerChangeActivity.class;
     }
 
     private class TiltAction implements ViewAction {

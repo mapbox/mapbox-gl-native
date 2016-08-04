@@ -5,7 +5,6 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
@@ -26,12 +25,15 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapFragment;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 public class NavigationDrawerActivity extends AppCompatActivity {
 
     private boolean firstStyle = true;
+    private MapboxMap mapboxMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +60,28 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         // update the main content by replacing fragments
         switch (position) {
             case 0:
+                // options
                 MapboxMapOptions options = new MapboxMapOptions();
                 options.styleUrl(firstStyle ? Style.LIGHT : Style.SATELLITE);
                 options.camera(new CameraPosition.Builder()
                         .target(new LatLng(39.913271, 116.413891))
                         .zoom(12)
                         .build());
+
+                // fragment
+                MapFragment mapFragment = MapFragment.newInstance(options);
                 FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, MapFragment.newInstance(options))
+                        .replace(R.id.container, mapFragment)
                         .commit();
+
+                // get callback when map is ready
+                mapFragment.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(MapboxMap map) {
+                        mapboxMap = map;
+                    }
+                });
 
                 firstStyle = !firstStyle;
                 break;

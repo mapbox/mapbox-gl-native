@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
     <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/mapView"
+        android:id="@id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <FrameLayout
         android:id="@+id/map_card"
@@ -20,7 +19,6 @@
         <com.mapbox.mapboxsdk.maps.MapView
             android:id="@+id/mini_map"
             android:layout_width="100dp"
-            android:layout_height="100dp"
-            />
+            android:layout_height="100dp" />
     </FrameLayout>
 </RelativeLayout>

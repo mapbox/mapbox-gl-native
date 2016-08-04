@@ -1,29 +1,23 @@
 package com.mapbox.mapboxsdk.camera;
 
-import android.app.Activity;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
-import android.support.test.rule.ActivityTestRule;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.activity.BaseMapboxMapTest;
+import com.mapbox.mapboxsdk.activity.BaseTest;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMapUtils;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.infowindow.InfoWindowActivity;
 
 import org.hamcrest.Matcher;
-import org.junit.Rule;
 import org.junit.Test;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
-public class RotateTest extends BaseMapboxMapTest {
-
-    @Rule
-    public final ActivityTestRule<InfoWindowActivity> rule = new ActivityTestRule<>(InfoWindowActivity.class);
+public class RotateTest extends BaseTest {
 
     @Test
     public void testRotate() {
@@ -31,8 +25,8 @@ public class RotateTest extends BaseMapboxMapTest {
     }
 
     @Override
-    public Activity getActivity() {
-        return rule.getActivity();
+    public Class getActivityClass() {
+        return InfoWindowActivity.class;
     }
 
     private class RotateAction implements ViewAction {

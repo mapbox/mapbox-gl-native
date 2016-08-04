@@ -30,7 +30,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 public class MyLocationTintActivity extends AppCompatActivity implements LocationListener {
 
     private MapView mapView;
-    private MapboxMap map;
+    private MapboxMap mapboxMap;
     private boolean firstRun;
 
     private static final int PERMISSIONS_LOCATION = 0;
@@ -53,8 +53,8 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMapReady(MapboxMap mapboxMap) {
-                map = mapboxMap;
+            public void onMapReady(MapboxMap map) {
+                mapboxMap = map;
                 toggleGps(!mapboxMap.isMyLocationEnabled());
 
                 final MyLocationViewSettings myLocationViewSettings = mapboxMap.getMyLocationViewSettings();
@@ -92,8 +92,8 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
 
     @Override
     public void onLocationChanged(Location location) {
-        if (map != null && firstRun) {
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 15));
+        if (mapboxMap != null && firstRun) {
+            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 15));
             firstRun = false;
         }
     }
@@ -167,12 +167,14 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
 
     private void enableLocation(boolean enabled) {
         if (enabled) {
-            map.setMyLocationEnabled(true);
-            if (map.getMyLocation() != null) {
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(map.getMyLocation().getLatitude(), map.getMyLocation().getLongitude()), 15));
+            mapboxMap.setMyLocationEnabled(true);
+            if (mapboxMap.getMyLocation() != null) {
+                mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(mapboxMap.getMyLocation().getLatitude(),
+                                mapboxMap.getMyLocation().getLongitude()), 15));
             }
         } else {
-            map.setMyLocationEnabled(false);
+            mapboxMap.setMyLocationEnabled(false);
         }
     }
 

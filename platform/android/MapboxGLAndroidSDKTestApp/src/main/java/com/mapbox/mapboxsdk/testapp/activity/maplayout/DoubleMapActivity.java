@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,6 +30,9 @@ public class DoubleMapActivity extends AppCompatActivity {
 
     private static final String TAG_FRAGMENT = "map";
 
+    // used for ui tests
+    private MapboxMap mapboxMap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,10 +57,33 @@ public class DoubleMapActivity extends AppCompatActivity {
         }
     }
 
+    public void setMapboxMap(MapboxMap map) {
+        // we need to set mapboxmap on the parent activity,
+        // for auto-generated ui tests
+
+        mapboxMap = map;
+        mapboxMap.setStyleUrl(Style.DARK);
+        mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(18));
+        try {
+            TrackingSettings settings = mapboxMap.getTrackingSettings();
+            settings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
+        } catch (SecurityException e) {
+            // permission is handled in MainActivity
+            finish();
+        }
+    }
+
     public static class DoubleMapFragment extends Fragment {
 
+        private DoubleMapActivity activity;
         private MapView mMapView;
         private MapView mMapViewMini;
+
+        @Override
+        public void onAttach(Context context) {
+            super.onAttach(context);
+            activity = (DoubleMapActivity) context;
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,15 +100,8 @@ public class DoubleMapActivity extends AppCompatActivity {
             mMapView.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                    mapboxMap.setStyleUrl(Style.DARK);
-
-                    mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(18));
-                    try {
-                        TrackingSettings settings = mapboxMap.getTrackingSettings();
-                        settings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
-                    } catch (SecurityException e) {
-                        // permission is handled in MainActivity
-                        getActivity().finish();
+                    if (activity != null) {
+                        activity.setMapboxMap(mapboxMap);
                     }
                 }
             });
