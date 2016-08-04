@@ -3,6 +3,7 @@
 #include <mbgl/util/constants.hpp>
 
 #include <QQuickMapboxGL>
+#include <QQuickMapboxGLStyleProperty>
 
 #include <QDebug>
 #include <QQuickItem>
@@ -256,4 +257,37 @@ int QQuickMapboxGL::swapSyncState()
     m_syncState = NothingNeedsSync;
 
     return oldState;
+}
+
+void QQuickMapboxGL::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
+{
+    QQuickFramebufferObject::itemChange(change, value);
+
+    switch (change) {
+    case QQuickItem::ItemChildAddedChange:
+        if (QQuickMapboxGLStyleProperty *property = qobject_cast<QQuickMapboxGLStyleProperty *>(value.item)) {
+            connect(property, SIGNAL(updated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
+        }
+        break;
+    case QQuickItem::ItemChildRemovedChange:
+        if (QQuickMapboxGLStyleProperty *property = qobject_cast<QQuickMapboxGLStyleProperty *>(value.item)) {
+            disconnect(property, SIGNAL(updated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
+        }
+    default:
+        break;
+    }
+}
+
+void QQuickMapboxGL::onStylePropertyUpdated(const QVariantMap &params)
+{
+    switch (params.value("type").toInt()) {
+    case QQuickMapboxGLStyleProperty::LayoutType:
+        m_layoutChanges << params;
+        break;
+    case QQuickMapboxGLStyleProperty::PaintType:
+        m_paintChanges << params;
+        break;
+    }
+
+    update();
 }

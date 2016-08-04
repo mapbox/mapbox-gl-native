@@ -12,10 +12,12 @@ class Q_DECL_EXPORT QQuickMapboxGLStyleProperty : public QQuickItem
     Q_PROPERTY(QVariant value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    virtual ~QQuickMapboxGLStyleProperty() {}
+    enum Type {
+        LayoutType = 0,
+        PaintType,
+    };
 
-    // QQuickItem implementation
-    virtual void itemChange(QQuickItem::ItemChange, const QQuickItem::ItemChangeData &);
+    virtual ~QQuickMapboxGLStyleProperty() {}
 
     void setLayer(const QString &);
     QString layer() const;
@@ -30,10 +32,11 @@ signals:
     void layerChanged(const QString &);
     void propertyChanged(const QString &);
     void valueChanged(const QVariant &);
+    void updated(const QVariantMap& params);
 
 protected:
-    QQuickMapboxGLStyleProperty(QQuickItem *parent);
-    virtual void updateParent() = 0;
+    QQuickMapboxGLStyleProperty(QQuickItem *parent, Type);
+    void checkUpdated();
 
     QVariantMap m_map;
 };
@@ -43,9 +46,6 @@ class Q_DECL_EXPORT QQuickMapboxGLLayoutStyleProperty : public QQuickMapboxGLSty
 public:
     QQuickMapboxGLLayoutStyleProperty(QQuickItem *parent = 0);
     virtual ~QQuickMapboxGLLayoutStyleProperty() {}
-
-protected:
-    virtual void updateParent();
 };
 
 class Q_DECL_EXPORT QQuickMapboxGLPaintStyleProperty : public QQuickMapboxGLStyleProperty
@@ -62,9 +62,6 @@ public:
 
 signals:
     void classChanged(const QString &);
-
-protected:
-    virtual void updateParent();
 };
 
 #endif // QQUICKMAPBOXGLSTYLEPROPERTY_H

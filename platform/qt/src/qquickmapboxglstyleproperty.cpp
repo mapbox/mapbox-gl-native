@@ -1,55 +1,20 @@
 #include <QQuickMapboxGLStyleProperty>
-#include <QQuickMapboxGL>
 
-QQuickMapboxGLStyleProperty::QQuickMapboxGLStyleProperty(QQuickItem *parent_)
+// QQuickMapboxGLStyleProperty
+
+QQuickMapboxGLStyleProperty::QQuickMapboxGLStyleProperty(QQuickItem *parent_, Type type)
     : QQuickItem(parent_)
 {
+    m_map["type"] = type;
 }
 
-QQuickMapboxGLLayoutStyleProperty::QQuickMapboxGLLayoutStyleProperty(QQuickItem *parent_)
-    : QQuickMapboxGLStyleProperty(parent_)
+void QQuickMapboxGLStyleProperty::checkUpdated()
 {
-}
-
-QQuickMapboxGLPaintStyleProperty::QQuickMapboxGLPaintStyleProperty(QQuickItem *parent_)
-    : QQuickMapboxGLStyleProperty(parent_)
-{
-}
-
-void QQuickMapboxGLLayoutStyleProperty::updateParent()
-{
-    if (m_map.value("layer").isNull() || m_map.value("property").isNull() || m_map.value("value").isNull()) {
-        return;
-    }
-
-    QQuickMapboxGL *map = qobject_cast<QQuickMapboxGL *>(parentItem());
-    if (map) {
-        map->setLayoutProperty(layer(), property(), value());
-    } else {
-        qWarning() << "Style property requires QQuickMapboxGL as parent item.";
-    }
-}
-
-void QQuickMapboxGLPaintStyleProperty::updateParent()
-{
-    if (m_map.value("layer").isNull() || m_map.value("property").isNull() || m_map.value("value").isNull()) {
-        return;
-    }
-
-    QQuickMapboxGL *map = qobject_cast<QQuickMapboxGL *>(parentItem());
-    if (map) {
-        map->setPaintProperty(layer(), property(), value(), styleClass());
-    } else {
-        qWarning() << "Style property requires QQuickMapboxGL as parent item.";
-    }
-}
-
-void QQuickMapboxGLStyleProperty::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &data)
-{
-    QQuickItem::itemChange(change, data);
-
-    if (change == QQuickItem::ItemParentHasChanged) {
-        updateParent();
+    if (m_map.value("type").isValid()
+            && m_map.value("layer").isValid()
+            && m_map.value("property").isValid()
+            && m_map.value("value").isValid()) {
+        emit updated(m_map);
     }
 }
 
@@ -61,7 +26,7 @@ void QQuickMapboxGLStyleProperty::setLayer(const QString &layer)
 
     m_map["layer"] = layer;
     emit layerChanged(layer);
-    updateParent();
+    checkUpdated();
 }
 
 QString QQuickMapboxGLStyleProperty::layer() const
@@ -77,7 +42,7 @@ void QQuickMapboxGLStyleProperty::setProperty(const QString &property)
 
     m_map["property"] = property;
     emit propertyChanged(property);
-    updateParent();
+    checkUpdated();
 }
 
 QString QQuickMapboxGLStyleProperty::property() const
@@ -93,7 +58,7 @@ void QQuickMapboxGLStyleProperty::setValue(const QVariant &value)
 
     m_map["value"] = value;
     emit valueChanged(value);
-    updateParent();
+    checkUpdated();
 }
 
 QVariant QQuickMapboxGLStyleProperty::value() const
@@ -109,10 +74,24 @@ void QQuickMapboxGLPaintStyleProperty::setStyleClass(const QString &styleClass)
 
     m_map["class"] = styleClass;
     emit classChanged(styleClass);
-    updateParent();
+    checkUpdated();
 }
 
 QString QQuickMapboxGLPaintStyleProperty::styleClass() const
 {
     return m_map.value("class").toString();
+}
+
+// QQuickMapboxGLLayoutStyleProperty
+
+QQuickMapboxGLLayoutStyleProperty::QQuickMapboxGLLayoutStyleProperty(QQuickItem *parent_)
+    : QQuickMapboxGLStyleProperty(parent_, LayoutType)
+{
+}
+
+// QQuickMapboxGLPaintStyleProperty
+
+QQuickMapboxGLPaintStyleProperty::QQuickMapboxGLPaintStyleProperty(QQuickItem *parent_)
+    : QQuickMapboxGLStyleProperty(parent_, PaintType)
+{
 }

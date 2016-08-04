@@ -96,6 +96,10 @@ public:
 
     int swapSyncState();
 
+protected:
+    // QQuickItem implementation.
+    virtual void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value);
+
 signals:
     void minimumZoomLevelChanged();
     void maximumZoomLevelChanged();
@@ -115,6 +119,9 @@ signals:
 
 public slots:
     void setCenter(const QGeoCoordinate &center);
+
+private slots:
+    void onStylePropertyUpdated(const QVariantMap &params);
 
 private:
     qreal m_minimumZoomLevel = 0;
