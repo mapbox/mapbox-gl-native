@@ -448,6 +448,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     [self styleRoadLayer];
     [self styleRasterLayer];
     [self styleGeoJSONSource];
+    [self styleSymbolLayer];
     
     MGLFillStyleLayer *buildingLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"building"];
     buildingLayer.fillColor = [UIColor blackColor];
@@ -455,13 +456,16 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     MGLLineStyleLayer *ferryLineLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"ferry"];
     ferryLineLayer.lineColor = [UIColor redColor];
     
-    MGLSymbolStyleLayer *stateLayer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:@"state-label-lg"];
-    stateLayer.textColor = [UIColor redColor];
-    
     MGLFillStyleLayer *parkLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"park"];
     [self.mapView.style removeLayer:parkLayer];
     
     [self.mapView.style tempUpdateStyleAndClasses];
+}
+
+- (void)styleSymbolLayer
+{
+    MGLSymbolStyleLayer *stateLayer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:@"state-label-lg"];
+    stateLayer.textColor = [UIColor redColor];
 }
 
 - (void)styleGeoJSONSource
@@ -507,7 +511,6 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
                             @14: @NO,
                             @15: @YES};
     waterLayer.fillAntialias = fillAntialias;
-    
 }
 
 - (void)styleRoadLayer

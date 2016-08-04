@@ -4,6 +4,9 @@
 #import "MGLStyleAttributeValue_Private.hpp"
 #import "MGLStyleAttributeFunction_Private.hpp"
 
+@interface MGLStyleAttributeFunction() <MGLStyleAttributeValue_Private>
+@end
+
 @implementation MGLStyleAttributeFunction
 
 - (instancetype)init
@@ -12,6 +15,11 @@
         _base = @1;
     }
     return self;
+}
+
+- (BOOL)isFunction
+{
+    return YES;
 }
 
 - (mbgl::style::PropertyValue<mbgl::Color>)mbgl_colorPropertyValue
@@ -52,6 +60,62 @@
         stops.emplace_back(zoomKey.floatValue, string.UTF8String);
     }];
     return mbgl::style::Function<std::string>({{stops}}, _base.floatValue);
+}
+
+- (mbgl::style::PropertyValue<std::vector<std::string> >)mbgl_stringArrayPropertyValue
+{
+    __block std::vector<std::pair<float, std::vector<std::string>>> stops;
+    [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSArray *  _Nonnull strings, BOOL * _Nonnull stop) {
+        NSAssert([strings isKindOfClass:[NSArray class]], @"Stops should be NSArray");
+        std::vector<std::string>convertedStrings;
+        for (NSString *string in strings) {
+            convertedStrings.emplace_back(string.UTF8String);
+        }
+        stops.emplace_back(zoomKey.floatValue, convertedStrings);
+    }];
+    return mbgl::style::Function<std::vector<std::string>>({{stops}}, _base.floatValue);
+}
+
+- (mbgl::style::PropertyValue<std::vector<float> >)mbgl_numberArrayPropertyValue
+{
+    __block std::vector<std::pair<float, std::vector<float>>> stops;
+    [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSArray *  _Nonnull numbers, BOOL * _Nonnull stop) {
+        NSAssert([numbers isKindOfClass:[NSArray class]], @"Stops should be NSArray");
+        std::vector<float>convertedNumbers;
+        for (NSNumber *number in numbers) {
+            convertedNumbers.emplace_back(number.floatValue);
+        }
+        stops.emplace_back(zoomKey.floatValue, convertedNumbers);
+    }];
+    return mbgl::style::Function<std::vector<float>>({{stops}}, _base.floatValue);
+}
+
+- (mbgl::style::PropertyValue<std::array<float, 4> >)mbgl_paddingPropertyValue
+{
+    __block std::vector<std::pair<float, std::array<float, 4>>> stops;
+    [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSArray *  _Nonnull padding, BOOL * _Nonnull stop) {
+        NSAssert([padding isKindOfClass:[NSArray class]], @"Stops should be NSArray");
+        NSNumber *top = padding[0];
+        NSNumber *left = padding[1];
+        NSNumber *bottom = padding[2];
+        NSNumber *right = padding[2];
+        auto pad = std::array<float, 4>({{top.floatValue, left.floatValue, bottom.floatValue, right.floatValue}});
+        stops.emplace_back(zoomKey.floatValue, pad);
+    }];
+    return mbgl::style::Function<std::array<float, 4>>({{stops}}, _base.floatValue);
+}
+
+- (mbgl::style::PropertyValue<std::array<float, 2> >)mbgl_offsetPropertyValue
+{
+    __block std::vector<std::pair<float, std::array<float, 2>>> stops;
+    [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSArray *  _Nonnull offset, BOOL * _Nonnull stop) {
+        NSAssert([offset isKindOfClass:[NSArray class]], @"Stops should be NSArray");
+        NSNumber *dx = offset[0];
+        NSNumber *dy = offset[1];
+        auto off = std::array<float, 2>({{dx.floatValue, dy.floatValue}});
+        stops.emplace_back(zoomKey.floatValue, off);
+    }];
+    return mbgl::style::Function<std::array<float, 2>>({{stops}}, _base.floatValue);
 }
 
 + (instancetype)functionWithColorPropertyValue:(mbgl::style::Function<mbgl::Color>)property
@@ -166,6 +230,14 @@
     function.base = @(property.getBase());
     function.stops = convertedStops;
     return function;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p, base = %@; stops = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.base,
+            self.stops];
 }
 
 @end
