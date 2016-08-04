@@ -124,7 +124,7 @@ public class MyLocationView extends View {
     }
 
     private void init(Context context) {
-        if(isInEditMode()){
+        if (isInEditMode()) {
             return;
         }
 
@@ -156,22 +156,6 @@ public class MyLocationView extends View {
             bearingDrawable = defaultDrawable.getConstantState().newDrawable();
         }
 
-        if (backgroundDrawable == null) {
-            // if the user didn't provide a background resource we will use the foreground resource instead,
-            // we need to create a new drawable to handle tinting correctly
-            backgroundDrawable = defaultDrawable.getConstantState().newDrawable();
-        }
-
-        if (backgroundBearingDrawable == null) {
-            // if the user didn't provide a background resource for bearing drawable we will use the bearingDrawable resource instead,
-            // we need to create a new drawable to handle tinting correctly
-            backgroundBearingDrawable = backgroundDrawable.getConstantState().newDrawable();
-        }
-
-        if (defaultDrawable.getIntrinsicWidth() != bearingDrawable.getIntrinsicWidth() || defaultDrawable.getIntrinsicHeight() != bearingDrawable.getIntrinsicHeight()) {
-            throw new RuntimeException("The dimensions from location and bearing drawables should be match");
-        }
-
         foregroundDrawable = defaultDrawable;
         foregroundBearingDrawable = bearingDrawable;
         setForegroundDrawableTint(foregroundTintColor);
@@ -197,12 +181,8 @@ public class MyLocationView extends View {
     }
 
     public final void setShadowDrawable(Drawable defaultDrawable, Drawable bearingDrawable, int left, int top, int right, int bottom) {
-        if (defaultDrawable != null) {
-            backgroundDrawable = defaultDrawable;
-        }
-        if (bearingDrawable != null) {
-            backgroundBearingDrawable = bearingDrawable;
-        }
+        backgroundDrawable = defaultDrawable;
+        backgroundBearingDrawable = bearingDrawable;
 
         backgroundOffsetLeft = left;
         backgroundOffsetTop = top;
@@ -239,10 +219,6 @@ public class MyLocationView extends View {
     }
 
     private void invalidateBounds() {
-        if (backgroundDrawable == null || foregroundDrawable == null || foregroundBearingDrawable == null || backgroundBearingDrawable == null) {
-            return;
-        }
-
         int horizontalOffset = backgroundOffsetLeft - backgroundOffsetRight;
         int verticalOffset = backgroundOffsetTop - backgroundOffsetBottom;
         computeBounds(backgroundDrawable, backgroundBounds, horizontalOffset, verticalOffset);
@@ -259,10 +235,12 @@ public class MyLocationView extends View {
     }
 
     private void computeBounds(Drawable drawable, Rect bounds, int horizontalOffset, int verticalOffset) {
-        int halfWidth = drawable.getIntrinsicWidth() / 2;
-        int halfHeight = drawable.getIntrinsicHeight() / 2;
-        bounds.set(-halfWidth + horizontalOffset, -halfHeight + verticalOffset, halfWidth + horizontalOffset, halfHeight + verticalOffset);
-        drawable.setBounds(bounds);
+        if (drawable != null) {
+            int halfWidth = drawable.getIntrinsicWidth() / 2;
+            int halfHeight = drawable.getIntrinsicHeight() / 2;
+            bounds.set(-halfWidth + horizontalOffset, -halfHeight + verticalOffset, halfWidth + horizontalOffset, halfHeight + verticalOffset);
+            drawable.setBounds(bounds);
+        }
     }
 
     @Override

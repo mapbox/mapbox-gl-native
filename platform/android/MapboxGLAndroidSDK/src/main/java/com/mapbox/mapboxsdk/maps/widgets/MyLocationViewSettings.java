@@ -153,12 +153,8 @@ public class MyLocationViewSettings {
      * @param padding            the padding added to the background
      */
     public void setBackgroundDrawable(@Nullable Drawable backgroundDrawable, @Nullable Drawable backgroundBearingDrawable, @Nullable int[] padding) {
-        if (backgroundDrawable != null) {
-            this.backgroundDrawable = backgroundDrawable;
-        }
-        if (backgroundBearingDrawable != null) {
-            this.backgroundBearingDrawable = backgroundBearingDrawable;
-        }
+        this.backgroundDrawable = backgroundDrawable;
+        this.backgroundBearingDrawable = backgroundBearingDrawable;
         this.backgroundOffset = padding;
         if (padding != null && padding.length == 4) {
             myLocationView.setShadowDrawable(backgroundDrawable, backgroundBearingDrawable, padding[0], padding[1], padding[2], padding[3]);
