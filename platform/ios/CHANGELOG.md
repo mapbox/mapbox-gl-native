@@ -14,6 +14,16 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 * Fixed an issue where annotation views could be assigned to multipoint annotations. ([#5770](https://github.com/mapbox/mapbox-gl-native/pull/5770))
 * Fixed the static only framework build. ([#5782](https://github.com/mapbox/mapbox-gl-native/issues/5782))
 
+## 3.3.3 - July 29, 2016
+
+* Fixes an issue where the style zoom levels were not respected when deciding when to render a layer. ([#5811](https://github.com/mapbox/mapbox-gl-native/issues/5811))
+
+## 3.3.2 - July 28, 2016
+
+* Speculatively fixed a crash that occurred when initializing an MGLMapView on iOS 7.x. ([#5791](https://github.com/mapbox/mapbox-gl-native/pull/5791))
+* View-backed annotations no longer prevent the user from starting to pan the map. ([#5813](https://github.com/mapbox/mapbox-gl-native/pull/5813))
+* Fixed an issue that caused the user dot to be selected when tapping an annotation that lies within the user dot’s accuracy circle. ([#5816](https://github.com/mapbox/mapbox-gl-native/pull/5816))
+
 ## 3.3.1 - July 19, 2016
 
 * Fixed a crash that occurred when a sprite URL lacks a file extension. See [this comment](https://github.com/mapbox/mapbox-gl-native/issues/5722#issuecomment-233701251) to determine who may be affected by this bug. ([#5723](https://github.com/mapbox/mapbox-gl-native/pull/5723))

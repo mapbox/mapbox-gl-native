@@ -586,9 +586,18 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     UIGraphicsBeginImageContextWithOptions(scaleImage.size, NO, [UIScreen mainScreen].scale);
     [scaleImage drawInRect:{ CGPointZero, scaleImage.size }];
     
-    CGFloat weight = &UIFontWeightUltraLight ? UIFontWeightUltraLight : -0.8;
+    CGFloat northSize = 9;
+    UIFont *northFont;
+    if ([UIFont respondsToSelector:@selector(systemFontOfSize:weight:)])
+    {
+        northFont = [UIFont systemFontOfSize:northSize weight:UIFontWeightUltraLight];
+    }
+    else
+    {
+        northFont = [UIFont systemFontOfSize:northSize];
+    }
     NSAttributedString *north = [[NSAttributedString alloc] initWithString:NSLocalizedStringWithDefaultValue(@"COMPASS_NORTH", nil, nil, @"N", @"Compass abbreviation for north") attributes:@{
-        NSFontAttributeName: [UIFont systemFontOfSize:9 weight:weight],
+        NSFontAttributeName: northFont,
         NSForegroundColorAttributeName: [UIColor whiteColor],
     }];
     CGRect stringRect = CGRectMake((scaleImage.size.width - north.size.width) / 2,
@@ -1385,8 +1394,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     CGPoint tapPoint = [singleTap locationInView:self];
 
-    if (self.userLocationVisible
-        && [self.userLocationAnnotationView.layer.presentationLayer hitTest:tapPoint])
+    CALayer *hitLayer = self.userLocationVisible ? [self.userLocationAnnotationView.layer.presentationLayer hitTest:tapPoint] : nil;
+    if (hitLayer && hitLayer != self.userLocationAnnotationView.haloLayer.presentationLayer)
     {
         if ( ! _userLocationAnnotationIsSelected)
         {

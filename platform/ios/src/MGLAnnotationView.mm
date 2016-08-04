@@ -235,7 +235,7 @@
 {
     BOOL isDragging = self.dragState == MGLAnnotationViewDragStateDragging;
     
-    if ([gestureRecognizer isKindOfClass:UIPanGestureRecognizer.class] && !(isDragging))
+    if (gestureRecognizer == _panGestureRecognizer && !(isDragging))
     {
         return NO;
     }
