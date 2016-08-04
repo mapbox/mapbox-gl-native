@@ -12,10 +12,11 @@ public:
 #if MBGL_USE_CGL
     CGLPixelFormatObj pixelFormat = nullptr;
 #endif
-
-#if MBGL_USE_GLX
-    Display *xDisplay = nullptr;
-    GLXFBConfig *fbConfigs = nullptr;
+#if MBGL_USE_EGL
+    int fd;
+    struct gbm_device *gbm = nullptr;
+    EGLDisplay dpy = 0;
+    EGLConfig config = 0;
 #endif
 };
 

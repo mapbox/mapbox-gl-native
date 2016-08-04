@@ -8,13 +8,13 @@
 #define MBGL_USE_CGL 1
 #endif
 #else
-#define GL_GLEXT_PROTOTYPES
-#define MBGL_USE_GLX 1
-typedef struct _XDisplay Display;
-typedef struct __GLXcontextRec* GLXContext;
-typedef struct __GLXFBConfigRec* GLXFBConfig;
-typedef long unsigned int XID;
-typedef XID GLXPbuffer;
+#define MBGL_USE_EGL 1
+struct gbm_surface {};
+struct gbm_device {};
+typedef void* EGLContext;
+typedef void* EGLDisplay;
+typedef void* EGLConfig;
+typedef void* EGLSurface;
 #endif
 
 #include <mbgl/mbgl.hpp>
@@ -71,11 +71,12 @@ private:
     void *glContext = nullptr;
 #endif
 
-#if MBGL_USE_GLX
-    Display *xDisplay = nullptr;
-    GLXFBConfig *fbConfigs = nullptr;
-    GLXContext glContext = nullptr;
-    GLXPbuffer glxPbuffer = 0;
+#if MBGL_USE_EGL
+    EGLDisplay dpy;
+    EGLContext glContext = nullptr;
+    EGLConfig config;
+    EGLSurface surface;
+    struct gbm_surface *gs = nullptr;
 #endif
 
     GLuint fbo = 0;

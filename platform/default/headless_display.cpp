@@ -3,8 +3,11 @@
 #include <cstring>
 #include <stdexcept>
 
-#if MBGL_USE_GLX
-#include <GL/glx.h>
+#if MBGL_USE_EGL
+#include <EGL/egl.h>
+#include <fcntl.h>
+#include <gbm.h>
+#include <unistd.h>
 #endif
 
 namespace mbgl {
@@ -29,40 +32,41 @@ HeadlessDisplay::HeadlessDisplay() {
     }
 #endif
 
-#if MBGL_USE_GLX
-    if (!XInitThreads()) {
-        throw std::runtime_error("Failed to XInitThreads.");
+#if MBGL_USE_EGL
+    // TODO(vignatti): it should search for a valid render* handle instead.
+    const char device_name[] = "/dev/dri/renderD128";
+    fd = open(device_name, O_RDWR);
+    if (fd < 0) {
+        throw std::runtime_error("Couldn't open drm device.");
     }
 
-    xDisplay = XOpenDisplay(nullptr);
-    if (xDisplay == nullptr) {
-        throw std::runtime_error("Failed to open X display.");
+    gbm = gbm_create_device(fd);
+    if (gbm == NULL) {
+        throw std::runtime_error("Couldn't create gbm device.");
     }
 
-    const char *extensions = reinterpret_cast<const char *>(glXQueryServerString(xDisplay, DefaultScreen(xDisplay), GLX_EXTENSIONS));
-    if (!extensions) {
-        throw std::runtime_error("Cannot read GLX extensions.");
-    }
-    if (!strstr(extensions,"GLX_SGIX_fbconfig")) {
-        throw std::runtime_error("Extension GLX_SGIX_fbconfig was not found.");
-    }
-    if (!strstr(extensions, "GLX_SGIX_pbuffer")) {
-        throw std::runtime_error("Cannot find glXCreateContextAttribsARB.");
+    dpy = eglGetDisplay(reinterpret_cast<EGLNativeDisplayType>(gbm));
+    if (dpy == EGL_NO_DISPLAY) {
+        throw std::runtime_error("eglGetDisplay() failed.");
     }
 
-    // We're creating a dummy pbuffer anyway that we're not using.
-    static int pixelFormat[] = {
-        GLX_DRAWABLE_TYPE, GLX_PBUFFER_BIT,
-        None
+    EGLint major, minor, n;
+    if (!eglInitialize(dpy, &major, &minor)) {
+        throw std::runtime_error("eglInitialize() failed.");
+    }
+
+    const EGLint attribs[] = {
+        EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+        EGL_RED_SIZE, 1,
+        EGL_GREEN_SIZE, 1,
+        EGL_BLUE_SIZE, 1,
+        EGL_ALPHA_SIZE, 0,
+        EGL_DEPTH_SIZE, 1,
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
+        EGL_NONE
     };
-
-    int configs = 0;
-    fbConfigs = glXChooseFBConfig(xDisplay, DefaultScreen(xDisplay), pixelFormat, &configs);
-    if (fbConfigs == nullptr) {
-        throw std::runtime_error("Failed to glXChooseFBConfig.");
-    }
-    if (configs <= 0) {
-        throw std::runtime_error("No Framebuffer configurations.");
+    if (!eglChooseConfig(dpy, attribs, &config, 1, &n) || n != 1) {
+        throw std::runtime_error("Failed to choose argb config.");
     }
 #endif
 }
@@ -71,10 +75,10 @@ HeadlessDisplay::~HeadlessDisplay() {
 #if MBGL_USE_CGL
     CGLDestroyPixelFormat(pixelFormat);
 #endif
-
-#if MBGL_USE_GLX
-    XFree(fbConfigs);
-    XCloseDisplay(xDisplay);
+#if MBGL_USE_EGL
+    eglTerminate(dpy);
+    gbm_device_destroy(gbm);
+    close(fd);
 #endif
 }
 

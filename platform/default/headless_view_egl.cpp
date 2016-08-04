@@ -4,51 +4,62 @@
 
 #include <cassert>
 
-#include <GL/glx.h>
+#include <GL/gl.h>
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+#include <gbm.h>
 
 namespace mbgl {
 
 gl::glProc HeadlessView::initializeExtension(const char* name) {
-    return glXGetProcAddress(reinterpret_cast<const GLubyte*>(name));
+    return eglGetProcAddress(name);
 }
 
 void HeadlessView::createContext() {
-    xDisplay = display->xDisplay;
-    fbConfigs = display->fbConfigs;
+    dpy = display->dpy;
+    config = display->config;
 
-    if (!glContext) {
-        // Try to create a legacy context
-        glContext = glXCreateNewContext(xDisplay, fbConfigs[0], GLX_RGBA_TYPE, None, True);
-        if (glContext) {
-            if (!glXIsDirect(xDisplay, glContext)) {
-                Log::Error(Event::OpenGL, "failed to create direct OpenGL Legacy context");
-                glXDestroyContext(xDisplay, glContext);
-                glContext = nullptr;
-            }
-        }
+    assert(dpy != EGL_NO_DISPLAY);
+    assert(glContext == EGL_NO_CONTEXT);
+    assert(config != nullptr);
+
+    eglBindAPI(EGL_OPENGL_API);
+
+    glContext = eglCreateContext(dpy, config, EGL_NO_CONTEXT, NULL);
+    if (glContext == EGL_NO_CONTEXT) {
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateContext() returned error 0x%04x",
+                         eglGetError());
+        throw std::runtime_error("Error creating GL context object");
     }
 
-    if (glContext == nullptr) {
-        throw std::runtime_error("Error creating GL context object.");
+    // TODO(vignatti): think about an optimal size here.
+    gs = gbm_surface_create(display->gbm, 8, 8,
+                            GBM_BO_FORMAT_XRGB8888,
+                            GBM_BO_USE_RENDERING);
+    if (gs == NULL) {
+        throw std::runtime_error("Unable to create gbm surface.");
     }
 
-    // Create a dummy pbuffer. We will render to framebuffers anyway, but we need a pbuffer to
-    // activate the context.
-    int pbufferAttributes[] = {
-        GLX_PBUFFER_WIDTH, 8,
-        GLX_PBUFFER_HEIGHT, 8,
-        None
-    };
-    glxPbuffer = glXCreatePbuffer(xDisplay, fbConfigs[0], pbufferAttributes);
+    surface = eglCreateWindowSurface(dpy, config, reinterpret_cast<EGLNativeWindowType>(gs), NULL);
+    if (surface == EGL_NO_SURFACE) {
+        throw std::runtime_error("Failed to create surface.");
+    }
 }
 
 void HeadlessView::destroyContext() {
-    if (glxPbuffer) {
-        glXDestroyPbuffer(xDisplay, glxPbuffer);
-        glxPbuffer = 0;
+    if (glContext) {
+        if (!eglDestroyContext(dpy, glContext)) {
+            throw std::runtime_error("Failed to destroy context.");
+        }
+
+        glContext = nullptr;
     }
 
-    glXDestroyContext(xDisplay, glContext);
+    gbm_surface_destroy(gs);
+    if (surface) {
+        eglDestroySurface(dpy, surface);
+        surface = 0;
+    }
 }
 
 void HeadlessView::resizeFramebuffer() {
@@ -114,13 +125,13 @@ void HeadlessView::clearBuffers() {
 }
 
 void HeadlessView::activateContext() {
-    if (!glXMakeContextCurrent(xDisplay, glxPbuffer, glxPbuffer, glContext)) {
+    if (!eglMakeCurrent(dpy, surface, surface, glContext)) {
         throw std::runtime_error("Switching OpenGL context failed.\n");
     }
 }
 
 void HeadlessView::deactivateContext() {
-    if (!glXMakeContextCurrent(xDisplay, 0, 0, nullptr)) {
+    if (!eglMakeCurrent(dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
         throw std::runtime_error("Removing OpenGL context failed.\n");
     }
 }

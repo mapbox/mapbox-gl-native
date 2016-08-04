@@ -1,7 +1,7 @@
 {
   'variables': {
     'loop_lib': 'uv',
-    'headless_lib': 'glx',
+    'headless_lib': 'egl',
     'coverage': '<!(echo $ENABLE_COVERAGE)>',
   },
   'conditions': [

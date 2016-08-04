@@ -250,17 +250,15 @@
           ],
         }],
 
-        ['headless_lib == "glx"', {
+        ['headless_lib == "egl"', {
           'sources': [
             'platform/default/headless_display.cpp',
             'platform/default/headless_view.cpp',
-            'platform/default/headless_view_glx.cpp',
+            'platform/default/headless_view_egl.cpp',
           ],
 
-          'cflags_cc': [ '<@(opengl_cflags)' ],
-
           'link_settings': {
-            'libraries': [ '<@(opengl_ldflags)' ],
+            'libraries': [ '-lGL -lEGL -lgbm -ldrm' ],
           },
         }],
 
