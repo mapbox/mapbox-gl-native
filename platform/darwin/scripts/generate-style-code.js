@@ -7,32 +7,32 @@ const spec = require('mapbox-gl-style-spec').latest;
 var prefix = 'MGL';
 var suffix = 'StyleLayer';
 
-var colorType = 'MGLStyleAttributeColor';
-
 global.camelize = function (str) {
     return str.replace(/(?:^|-)(.)/g, function (_, x) {
         return x.toUpperCase();
     });
-}
+};
 
 global.camelizeWithLeadingLowercase = function (str) {
     return str.replace(/-(.)/g, function (_, x) {
         return x.toUpperCase();
     });
-}
+};
+
+global.objCName = function (property) { return camelizeWithLeadingLowercase(property.name); }
 
 global.testImplementation = function (property) {
     switch (property.type) {
         case 'boolean':
-            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testBool;`;
+            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testBool;`;
         case 'number':
-            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testNumber;`;
+            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testNumber;`;
         case 'string':
-            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testString;`;
+            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testString;`;
         case 'enum':
-            return `#warning Missing setter for ${camelizeWithLeadingLowercase(property.name)} enum`;
+            return `#warning Missing setter for ${objCName(property)} enum`;
         case 'color':
-            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testColor;`;
+            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testColor;`;
         case 'array':
             return testArrayImplementation(property);
         default: throw new Error(`unknown type for ${property.name}`)
@@ -42,15 +42,15 @@ global.testImplementation = function (property) {
 global.testGetterImplementation = function (property) {
     switch (property.type) {
         case 'boolean':
-            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testBool);`;
+            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testBool);`;
         case 'number':
-            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testNumber);`;
+            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testNumber);`;
         case 'string':
-            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testString);`;
+            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testString);`;
         case 'enum':
-            return `#warning Missing getter for ${camelizeWithLeadingLowercase(property.name)} enum`;
+            return `#warning Missing getter for ${objCName(property)} enum`;
         case 'color':
-            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testColor);`;
+            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testColor);`;
         case 'array':
             return testGetterArrayImplementation(property);
         default: throw new Error(`unknown type for ${property.name}`)
@@ -60,32 +60,32 @@ global.testGetterImplementation = function (property) {
 global.testGetterArrayImplementation = function (property) {
     switch (property.name) {
         case 'icon-text-fit-padding':
-            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testPadding);`;
+            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testPadding);`;
         case 'line-dasharray':
-            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testDashArray);`;
+            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testDashArray);`;
         case 'text-font':
-            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testFont);`;
+            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testFont);`;
         default:
-            return `XCTAssertEqualObjects(gLayer.${camelizeWithLeadingLowercase(property.name)}, MGLRuntimeStylingHelper.testOffset);`; // Default offset (dx, dy)
+            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testOffset);`; // Default offset (dx, dy)
     }
-}
+};
 
 global.testArrayImplementation = function (property) {
     switch (property.name) {
         case 'icon-text-fit-padding':
-            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testPadding;`;
+            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testPadding;`;
         case 'line-dasharray':
-            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testDashArray;`;
+            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testDashArray;`;
         case 'text-font':
-            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testFont;`;
+            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testFont;`;
         default:
-            return `layer.${camelizeWithLeadingLowercase(property.name)} = MGLRuntimeStylingHelper.testOffset;`; // Default offset (dx, dy)
+            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testOffset;`; // Default offset (dx, dy)
     }
-}
+};
 
 global.propertyType = function (property, _private) {
     return _private ? `id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>` : `id <MGLStyleAttributeValue>`;
-}
+};
 
 global.initLayer = function (layerType) {
     if (layerType == "background") {
@@ -98,11 +98,11 @@ global.initLayer = function (layerType) {
 global.setterImplementation = function(property, layerType) {
     switch (property.type) {
         case 'boolean':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_boolPropertyValue);`;
+            return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_boolPropertyValue);`;
         case 'number':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_floatPropertyValue);`;
+            return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_floatPropertyValue);`;
         case 'string':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_stringPropertyValue);`;
+            return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_stringPropertyValue);`;
         case 'enum':
             var mbglType = camelize(property.name) + 'Type';
             if (/-translate-anchor$/.test(property.name)) {
@@ -112,9 +112,9 @@ global.setterImplementation = function(property, layerType) {
                 mbglType = 'AlignmentType';
             }
             var objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            return `MGLSetEnumProperty(${camelizeWithLeadingLowercase(property.name)}, ${camelize(property.name)}, ${mbglType}, ${objCType});`; 
+            return `MGLSetEnumProperty(${objCName(property)}, ${camelize(property.name)}, ${mbglType}, ${objCType});`; 
         case 'color':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_colorPropertyValue);`;
+            return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_colorPropertyValue);`;
         case 'array':
             return arraySetterImplementation(property);
         default: throw new Error(`unknown type for ${property.name}`)
@@ -122,16 +122,7 @@ global.setterImplementation = function(property, layerType) {
 }
 
 global.arraySetterImplementation = function(property) {
-    switch (property.name) {
-        case 'icon-text-fit-padding':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_paddingPropertyValue);`;
-        case 'line-dasharray':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_numberArrayPropertyValue);`;
-        case 'text-font':
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_stringArrayPropertyValue);`;
-        default:
-            return `self.layer->set${camelize(property.name)}(${camelizeWithLeadingLowercase(property.name)}.mbgl_offsetPropertyValue);`;
-    }
+    return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_${convertedType(property)}PropertyValue);`;
 }
 
 global.getterImplementation = function(property, layerType) {
@@ -156,15 +147,27 @@ global.getterImplementation = function(property, layerType) {
 }
 
 global.arrayGetterImplementation = function(property) {
+    return `return [MGLStyleAttribute mbgl_${convertedType(property)}PropertyValueWith:self.layer->get${camelize(property.name)}()];`
+}
+
+global.convertedType = function(property) {
     switch (property.name) {
+        case 'boolean':
+            return 'bool';
+        case 'number':
+            return 'number';
+        case 'color':
+            return 'color';
+        case 'string':
+            return 'string';
         case 'icon-text-fit-padding':
-            return `return [MGLStyleAttribute mbgl_paddingPropertyValueWith:self.layer->get${camelize(property.name)}()];`
+            return "padding";
         case 'line-dasharray':
-            return `return [MGLStyleAttribute mbgl_numberArrayPropertyValueWith:self.layer->get${camelize(property.name)}()];`;
+            return "numberArray";
         case 'text-font':
-            return `return [MGLStyleAttribute mbgl_stringArrayPropertyValueWith:self.layer->get${camelize(property.name)}()];`
+            return "stringArray";
         default:
-            return `return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->get${camelize(property.name)}()];`
+            return "offset";
     }
 }
 

@@ -37,11 +37,11 @@
 #pragma mark - Accessing the Layout Attributes
 
 <% for (const property of layoutProperties) { -%>
-- (void)set<%- camelize(property.name) %>:(<%- propertyType(property, true, type) %>)<%- camelizeWithLeadingLowercase(property.name) %> {
+- (void)set<%- camelize(property.name) %>:(<%- propertyType(property, true, type) %>)<%- objCName(property) %> {
     <%- setterImplementation(property, type) %>
 }
 
-- (<%- propertyType(property, false, type) %>)<%- camelizeWithLeadingLowercase(property.name) %> {
+- (<%- propertyType(property, false, type) %>)<%- objCName(property) %> {
     <%- getterImplementation(property, type) %>
 }
 
@@ -51,11 +51,11 @@
 #pragma mark - Accessing the Paint Attributes
 
 <% for (const property of paintProperties) { -%>
-- (void)set<%- camelize(property.name) %>:(<%- propertyType(property, true, type) %>)<%- camelizeWithLeadingLowercase(property.name) %> {
+- (void)set<%- camelize(property.name) %>:(<%- propertyType(property, true, type) %>)<%- objCName(property) %> {
     <%- setterImplementation(property, type) %>
 }
 
-- (<%- propertyType(property, false, type) %>)<%- camelizeWithLeadingLowercase(property.name) %> {
+- (<%- propertyType(property, false, type) %>)<%- objCName(property) %> {
     <%- getterImplementation(property, type) %>
 }
 
