@@ -20,13 +20,10 @@
     return [NSColor colorWithRed:color.r green:color.g blue:color.b alpha:color.a];
 }
 
-+ (NSColor *)mbgl_propertyValue:(mbgl::style::PropertyValue<mbgl::Color>)color
+- (mbgl::style::PropertyValue<mbgl::Color>)mbgl_colorPropertyValue
 {
-    // TODO: Figure out if property value is constant, undefined or a function.
-    return [NSColor colorWithRed:color.asConstant().r
-                           green:color.asConstant().g
-                            blue:color.asConstant().b
-                           alpha:color.asConstant().a];
+    mbgl::Color color = self.mbgl_color;
+    return {{ color.r, color.g, color.b, color.a }};
 }
 
 @end

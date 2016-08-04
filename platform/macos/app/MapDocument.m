@@ -495,6 +495,14 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     };
     fillStyleLayer.fillColor = colorFunction;
     
+    NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
+    [self.mapView.style addSource:source];
+    
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" sourceIdentifier:@"ams"];
+    fillLayer.fillColor = [NSColor purpleColor];
+    [self.mapView.style addLayer:fillLayer];
+    
     [self.mapView.style tempUpdateStyleAndClasses];
 }
 

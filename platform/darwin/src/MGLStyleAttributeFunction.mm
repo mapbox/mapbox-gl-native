@@ -56,8 +56,8 @@
 
 + (instancetype)functionWithColorPropertyValue:(mbgl::style::Function<mbgl::Color>)property
 {
-    auto stops = property.getStops();
     MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
+    auto stops = property.getStops();
     NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
     for (auto stop : stops) {
         convertedStops[@(stop.first)] = [MGLColor mbgl_colorWithColor:stop.second];
@@ -69,8 +69,8 @@
 
 + (instancetype)functionWithNumberPropertyValue:(mbgl::style::Function<float>)property
 {
-    auto stops = property.getStops();
     MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
+    auto stops = property.getStops();
     NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
     for (auto stop : stops) {
         convertedStops[@(stop.first)] = @(stop.second);
@@ -82,8 +82,8 @@
 
 + (instancetype)functionWithBoolPropertyValue:(mbgl::style::Function<bool>)property
 {
-    auto stops = property.getStops();
     MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
+    auto stops = property.getStops();
     NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
     for (auto stop : stops) {
         convertedStops[@(stop.first)] = @(stop.second);
@@ -95,8 +95,8 @@
 
 + (instancetype)functionWithStringPropertyValue:(mbgl::style::Function<std::string>)property
 {
-    auto stops = property.getStops();
     MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
+    auto stops = property.getStops();
     NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
     for (auto stop : stops) {
         convertedStops[@(stop.first)] = @(stop.second.c_str());
@@ -108,8 +108,8 @@
 
 + (instancetype)functionWithOffsetPropertyValue:(mbgl::style::Function<std::array<float, 2> >)property
 {
-    auto stops = property.getStops();
     MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
+    auto stops = property.getStops();
     NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
     for (auto stop : stops) {
         convertedStops[@(stop.first)] = @[@(stop.second[0]), @(stop.second[1])];
@@ -121,8 +121,8 @@
 
 + (instancetype)functionWithPaddingPropertyValue:(mbgl::style::Function<std::array<float, 4> >)property
 {
-    auto stops = property.getStops();
     MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
+    auto stops = property.getStops();
     NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
     for (auto stop : stops) {
         convertedStops[@(stop.first)] = @[@(stop.second[0]), @(stop.second[1]), @(stop.second[2]), @(stop.second[3])];
@@ -134,16 +134,34 @@
 
 + (instancetype)functionWithStringArrayPropertyValue:(mbgl::style::Function<std::vector<std::string> >)property
 {
-    auto stops = property.getStops();
     MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
+    auto stops = property.getStops();
     NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
     for (auto stop : stops) {
         auto strings = stop.second;
-        NSMutableArray *convertedStrings = [[NSMutableArray alloc] initWithCapacity:strings.size()];
-        for (auto const& string: stop.second) {
+        NSMutableArray *convertedStrings = [NSMutableArray arrayWithCapacity:strings.size()];
+        for (auto const& string: strings) {
             [convertedStrings addObject:@(string.c_str())];
         }
         convertedStops[@(stop.first)] = convertedStrings;
+    }
+    function.base = @(property.getBase());
+    function.stops = convertedStops;
+    return function;
+}
+
++ (instancetype)functionWithNumberArrayPropertyValue:(mbgl::style::Function<std::vector<float> >)property
+{
+    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
+    auto stops = property.getStops();
+    NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
+    for (auto stop : stops) {
+        auto numbers = stop.second;
+        NSMutableArray *convertedNumbers = [NSMutableArray arrayWithCapacity:numbers.size()];
+        for (auto const& number: numbers) {
+            [convertedNumbers addObject:@(number)];
+        }
+        convertedStops[@(stop.first)] = convertedNumbers;
     }
     function.base = @(property.getBase());
     function.stops = convertedStops;

@@ -160,7 +160,7 @@ global.arrayGetterImplementation = function(property) {
         case 'icon-text-fit-padding':
             return `return [MGLStyleAttribute mbgl_paddingPropertyValueWith:self.layer->get${camelize(property.name)}()];`
         case 'line-dasharray':
-            return `return [NSArray mbgl_numberArrayPropertyValue:self.layer->get${camelize(property.name)}()];`;
+            return `return [MGLStyleAttribute mbgl_numberArrayPropertyValueWith:self.layer->get${camelize(property.name)}()];`;
         case 'text-font':
             return `return [MGLStyleAttribute mbgl_stringArrayPropertyValueWith:self.layer->get${camelize(property.name)}()];`
         default:

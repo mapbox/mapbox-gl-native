@@ -20,4 +20,6 @@
 
 + (id <MGLStyleAttributeValue>)mbgl_stringArrayPropertyValueWith:(mbgl::style::PropertyValue<std::vector<std::string>>)property;
 
++ (id <MGLStyleAttributeValue>)mbgl_numberArrayPropertyValueWith:(mbgl::style::PropertyValue<std::vector<float>>)property;
+
 @end

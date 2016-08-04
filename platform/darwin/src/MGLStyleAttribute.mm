@@ -80,13 +80,29 @@
 {
     if (property.isConstant()) {
         auto strings = property.asConstant();
-        NSMutableArray *numbers = [[NSMutableArray alloc] initWithCapacity:strings.size()];
+        NSMutableArray *convertedStrings = [[NSMutableArray alloc] initWithCapacity:strings.size()];
         for (auto string : strings) {
-            [numbers addObject:@(string.c_str())];
+            [convertedStrings addObject:@(string.c_str())];
         }
-        return numbers;
+        return convertedStrings;
     } else if (property.isFunction()) {
         return [MGLStyleAttributeFunction functionWithStringArrayPropertyValue:property.asFunction()];
+    } else {
+        return nil;
+    }
+}
+
++ (id<MGLStyleAttributeValue>)mbgl_numberArrayPropertyValueWith:(mbgl::style::PropertyValue<std::vector<float> >)property
+{
+    if (property.isConstant()) {
+        auto numbers = property.asConstant();
+        NSMutableArray *convertedNumbers = [NSMutableArray arrayWithCapacity:numbers.size()];
+        for (auto number : numbers) {
+            [convertedNumbers addObject:@(number)];
+        }
+        return convertedNumbers;
+    } else if (property.isFunction()) {
+        return [MGLStyleAttributeFunction functionWithNumberArrayPropertyValue:property.asFunction()];
     } else {
         return nil;
     }

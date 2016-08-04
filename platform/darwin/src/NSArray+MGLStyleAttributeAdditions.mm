@@ -50,15 +50,5 @@
     return {{values}};
 }
 
-+ (NSArray *)mbgl_numberArrayPropertyValue:(mbgl::style::PropertyValue<std::vector<float> >)propertyValue
-{
-#warning Figure out if property value is undefined, constant or a function.
-    std::vector<float> values = propertyValue.asConstant();
-    NSMutableArray *array = [[NSMutableArray alloc] initWithCapacity:values.size()];
-    for (auto value : values) {
-        [array addObject:@(value)];
-    }
-    return array;
-}
 
 @end

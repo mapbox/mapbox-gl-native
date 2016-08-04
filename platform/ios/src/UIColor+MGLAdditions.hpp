@@ -11,6 +11,4 @@
 
 + (UIColor *)mbgl_colorWithColor:(mbgl::Color)color;
 
-+ (UIColor *)mbgl_propertyValue:(mbgl::style::PropertyValue<mbgl::Color>)color;
-
 @end

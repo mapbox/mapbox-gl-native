@@ -139,7 +139,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)lineDasharray {
-    return [NSArray mbgl_numberArrayPropertyValue:self.layer->getLineDasharray()];
+    return [MGLStyleAttribute mbgl_numberArrayPropertyValueWith:self.layer->getLineDasharray()];
 }
 
 - (void)setLinePattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)linePattern {
