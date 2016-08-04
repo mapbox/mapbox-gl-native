@@ -89,7 +89,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)lineTranslate {
-    return [NSArray mbgl_offsetPropertyValue:self.layer->getLineTranslate()];
+    return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->getLineTranslate()];
 }
 
 - (void)setLineTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineTranslateAnchor {
@@ -147,7 +147,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)linePattern {
-    return [NSString mbgl_stringWithPropertyValue:self.layer->getLinePattern()];
+    return [MGLStyleAttribute mbgl_stringPropertyValueWith:self.layer->getLinePattern()];
 }
 
 @end

@@ -43,7 +43,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)backgroundPattern {
-    return [NSString mbgl_stringWithPropertyValue:self.layer->getBackgroundPattern()];
+    return [MGLStyleAttribute mbgl_stringPropertyValueWith:self.layer->getBackgroundPattern()];
 }
 
 - (void)setBackgroundOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundOpacity {

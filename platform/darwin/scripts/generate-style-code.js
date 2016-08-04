@@ -141,7 +141,7 @@ global.getterImplementation = function(property, layerType) {
         case 'number':
             return `return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->get${camelize(property.name)}()];`
         case 'string':
-            return `return [NSString mbgl_stringWithPropertyValue:self.layer->get${camelize(property.name)}()];`;
+            return `return [MGLStyleAttribute mbgl_stringPropertyValueWith:self.layer->get${camelize(property.name)}()];`
         case 'enum':
             return `auto rawValue = self.layer->get${camelize(property.name)}();
     const char *type = @encode(${prefix}${camelize(layerType)}${suffix}${camelize(property.name)});
@@ -158,13 +158,13 @@ global.getterImplementation = function(property, layerType) {
 global.arrayGetterImplementation = function(property) {
     switch (property.name) {
         case 'icon-text-fit-padding':
-            return `return [NSArray mbgl_paddingPropertyValue:self.layer->get${camelize(property.name)}()];`;
+            return `return [MGLStyleAttribute mbgl_paddingPropertyValueWith:self.layer->get${camelize(property.name)}()];`
         case 'line-dasharray':
             return `return [NSArray mbgl_numberArrayPropertyValue:self.layer->get${camelize(property.name)}()];`;
         case 'text-font':
-            return `return [NSArray mbgl_stringArrayPropertyValue:self.layer->get${camelize(property.name)}()];`;
+            return `return [MGLStyleAttribute mbgl_stringArrayPropertyValueWith:self.layer->get${camelize(property.name)}()];`
         default:
-            return `return [NSArray mbgl_offsetPropertyValue:self.layer->get${camelize(property.name)}()];`;
+            return `return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->get${camelize(property.name)}()];`
     }
 }
 

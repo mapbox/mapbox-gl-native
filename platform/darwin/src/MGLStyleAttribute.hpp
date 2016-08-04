@@ -12,4 +12,12 @@
 
 + (id <MGLStyleAttributeValue>)mbgl_boolPropertyValueWith:(mbgl::style::PropertyValue<bool>)property;
 
++ (id <MGLStyleAttributeValue>)mbgl_stringPropertyValueWith:(mbgl::style::PropertyValue<std::string>)property;
+
++ (id <MGLStyleAttributeValue>)mbgl_offsetPropertyValueWith:(mbgl::style::PropertyValue<std::array<float, 2>>)property;
+
++ (id <MGLStyleAttributeValue>)mbgl_paddingPropertyValueWith:(mbgl::style::PropertyValue<std::array<float, 4>>)property;
+
++ (id <MGLStyleAttributeValue>)mbgl_stringArrayPropertyValueWith:(mbgl::style::PropertyValue<std::vector<std::string>>)property;
+
 @end

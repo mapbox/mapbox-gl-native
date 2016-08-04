@@ -93,4 +93,61 @@
     return function;
 }
 
++ (instancetype)functionWithStringPropertyValue:(mbgl::style::Function<std::string>)property
+{
+    auto stops = property.getStops();
+    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
+    NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
+    for (auto stop : stops) {
+        convertedStops[@(stop.first)] = @(stop.second.c_str());
+    }
+    function.base = @(property.getBase());
+    function.stops = convertedStops;
+    return function;
+}
+
++ (instancetype)functionWithOffsetPropertyValue:(mbgl::style::Function<std::array<float, 2> >)property
+{
+    auto stops = property.getStops();
+    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
+    NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
+    for (auto stop : stops) {
+        convertedStops[@(stop.first)] = @[@(stop.second[0]), @(stop.second[1])];
+    }
+    function.base = @(property.getBase());
+    function.stops = convertedStops;
+    return function;
+}
+
++ (instancetype)functionWithPaddingPropertyValue:(mbgl::style::Function<std::array<float, 4> >)property
+{
+    auto stops = property.getStops();
+    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
+    NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
+    for (auto stop : stops) {
+        convertedStops[@(stop.first)] = @[@(stop.second[0]), @(stop.second[1]), @(stop.second[2]), @(stop.second[3])];
+    }
+    function.base = @(property.getBase());
+    function.stops = convertedStops;
+    return function;
+}
+
++ (instancetype)functionWithStringArrayPropertyValue:(mbgl::style::Function<std::vector<std::string> >)property
+{
+    auto stops = property.getStops();
+    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
+    NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
+    for (auto stop : stops) {
+        auto strings = stop.second;
+        NSMutableArray *convertedStrings = [[NSMutableArray alloc] initWithCapacity:strings.size()];
+        for (auto const& string: stop.second) {
+            [convertedStrings addObject:@(string.c_str())];
+        }
+        convertedStops[@(stop.first)] = convertedStrings;
+    }
+    function.base = @(property.getBase());
+    function.stops = convertedStops;
+    return function;
+}
+
 @end

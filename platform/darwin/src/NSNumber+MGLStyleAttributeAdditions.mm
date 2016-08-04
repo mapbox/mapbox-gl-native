@@ -19,16 +19,4 @@
     return mbgl::style::PropertyValue<float> { self.floatValue };
 }
 
-+ (NSNumber *)mbgl_booleanWithPropertyValue:(mbgl::style::PropertyValue<bool>)propertyValue
-{
-#warning Figure out if value is constant, undefined or a function
-    return @(propertyValue.asConstant());
-}
-
-+ (NSNumber *)mbgl_numberWithPropertyValue:(mbgl::style::PropertyValue<float>)propertyValue
-{
-#warning Figure out if value is constant, undefined or a function
-    return @(propertyValue.asConstant());
-}
-
 @end

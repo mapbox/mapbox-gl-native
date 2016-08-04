@@ -35,4 +35,12 @@
 
 + (instancetype)functionWithBoolPropertyValue:(mbgl::style::Function<bool>)property;
 
++ (instancetype)functionWithStringPropertyValue:(mbgl::style::Function<std::string>)property;
+
++ (instancetype)functionWithOffsetPropertyValue:(mbgl::style::Function<std::array<float, 2>>)property;
+
++ (instancetype)functionWithPaddingPropertyValue:(mbgl::style::Function<std::array<float, 4>>)property;
+
++ (instancetype)functionWithStringArrayPropertyValue:(mbgl::style::Function<std::vector<std::string>>)property;
+
 @end;

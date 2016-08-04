@@ -67,7 +67,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)fillTranslate {
-    return [NSArray mbgl_offsetPropertyValue:self.layer->getFillTranslate()];
+    return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->getFillTranslate()];
 }
 
 - (void)setFillTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslateAnchor {
@@ -85,7 +85,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)fillPattern {
-    return [NSString mbgl_stringWithPropertyValue:self.layer->getFillPattern()];
+    return [MGLStyleAttribute mbgl_stringPropertyValueWith:self.layer->getFillPattern()];
 }
 
 @end

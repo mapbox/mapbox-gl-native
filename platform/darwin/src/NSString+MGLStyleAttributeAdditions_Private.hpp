@@ -8,6 +8,4 @@
 
 - (mbgl::style::PropertyValue<std::string>)mbgl_stringPropertyValue;
 
-+ (NSString *)mbgl_stringWithPropertyValue:(mbgl::style::PropertyValue<std::string>)propertyValue;
-
 @end

@@ -9,10 +9,4 @@
     return mbgl::style::PropertyValue<std::string> {{ self.UTF8String }};
 }
 
-+ (NSString *)mbgl_stringWithPropertyValue:(mbgl::style::PropertyValue<std::string>)propertyValue
-{
-#warning Figure out if property is a constant, undefined or a function.
-    return @(propertyValue.asConstant().c_str());
-}
-
 @end

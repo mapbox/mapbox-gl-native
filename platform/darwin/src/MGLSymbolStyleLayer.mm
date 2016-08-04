@@ -113,7 +113,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconTextFitPadding {
-    return [NSArray mbgl_paddingPropertyValue:self.layer->getIconTextFitPadding()];
+    return [MGLStyleAttribute mbgl_paddingPropertyValueWith:self.layer->getIconTextFitPadding()];
 }
 
 - (void)setIconImage:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconImage {
@@ -121,7 +121,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconImage {
-    return [NSString mbgl_stringWithPropertyValue:self.layer->getIconImage()];
+    return [MGLStyleAttribute mbgl_stringPropertyValueWith:self.layer->getIconImage()];
 }
 
 - (void)setIconRotate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconRotate {
@@ -153,7 +153,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconOffset {
-    return [NSArray mbgl_offsetPropertyValue:self.layer->getIconOffset()];
+    return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->getIconOffset()];
 }
 
 - (void)setTextPitchAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textPitchAlignment {
@@ -181,7 +181,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textField {
-    return [NSString mbgl_stringWithPropertyValue:self.layer->getTextField()];
+    return [MGLStyleAttribute mbgl_stringPropertyValueWith:self.layer->getTextField()];
 }
 
 - (void)setTextFont:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textFont {
@@ -189,7 +189,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textFont {
-    return [NSArray mbgl_stringArrayPropertyValue:self.layer->getTextFont()];
+    return [MGLStyleAttribute mbgl_stringArrayPropertyValueWith:self.layer->getTextFont()];
 }
 
 - (void)setTextSize:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textSize {
@@ -291,7 +291,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textOffset {
-    return [NSArray mbgl_offsetPropertyValue:self.layer->getTextOffset()];
+    return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->getTextOffset()];
 }
 
 - (void)setTextAllowOverlap:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textAllowOverlap {
@@ -365,7 +365,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconTranslate {
-    return [NSArray mbgl_offsetPropertyValue:self.layer->getIconTranslate()];
+    return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->getIconTranslate()];
 }
 
 - (void)setIconTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTranslateAnchor {
@@ -423,7 +423,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textTranslate {
-    return [NSArray mbgl_offsetPropertyValue:self.layer->getTextTranslate()];
+    return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->getTextTranslate()];
 }
 
 - (void)setTextTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTranslateAnchor {

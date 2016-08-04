@@ -41,4 +41,55 @@
     }
 }
 
++ (id<MGLStyleAttributeValue>)mbgl_stringPropertyValueWith:(mbgl::style::PropertyValue<std::string>)property
+{
+    if (property.isConstant()) {
+        return @(property.asConstant().c_str());
+    } else if (property.isFunction()) {
+        return [MGLStyleAttributeFunction functionWithStringPropertyValue:property.asFunction()];
+    } else {
+        return nil;
+    }
+}
+
++ (id<MGLStyleAttributeValue>)mbgl_offsetPropertyValueWith:(mbgl::style::PropertyValue<std::array<float, 2> >)property
+{
+    if (property.isConstant()) {
+        auto offset = property.asConstant();
+        return @[@(offset[0]), @(offset[1])];
+    } else if (property.isFunction()) {
+        return [MGLStyleAttributeFunction functionWithOffsetPropertyValue:property.asFunction()];
+    } else {
+        return nil;
+    }
+}
+
++ (id<MGLStyleAttributeValue>)mbgl_paddingPropertyValueWith:(mbgl::style::PropertyValue<std::array<float, 4> >)property
+{
+    if (property.isConstant()) {
+        auto padding = property.asConstant();
+        return @[@(padding[0]), @(padding[1]), @(padding[2]), @(padding[3])];
+    } else if (property.isFunction()) {
+        return [MGLStyleAttributeFunction functionWithPaddingPropertyValue:property.asFunction()];
+    } else {
+        return nil;
+    }
+}
+
++ (id<MGLStyleAttributeValue>)mbgl_stringArrayPropertyValueWith:(mbgl::style::PropertyValue<std::vector<std::string> >)property
+{
+    if (property.isConstant()) {
+        auto strings = property.asConstant();
+        NSMutableArray *numbers = [[NSMutableArray alloc] initWithCapacity:strings.size()];
+        for (auto string : strings) {
+            [numbers addObject:@(string.c_str())];
+        }
+        return numbers;
+    } else if (property.isFunction()) {
+        return [MGLStyleAttributeFunction functionWithStringArrayPropertyValue:property.asFunction()];
+    } else {
+        return nil;
+    }
+}
+
 @end
