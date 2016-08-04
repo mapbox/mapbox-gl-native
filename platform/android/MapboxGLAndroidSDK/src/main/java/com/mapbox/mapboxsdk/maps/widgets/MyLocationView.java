@@ -96,6 +96,9 @@ public class MyLocationView extends View {
     private float bearing;
     private float tilt;
 
+    // Controls the compass update rate in milliseconds
+    private static final int COMPASS_UPDATE_RATE_MS = 500;
+
     @MyLocationTracking.Mode
     private int myLocationTrackingMode;
 
@@ -461,7 +464,7 @@ public class MyLocationView extends View {
         previousDirection = newDir;
 
         directionAnimator = ValueAnimator.ofFloat(oldDir, newDir);
-        directionAnimator.setDuration(375);
+        directionAnimator.setDuration(COMPASS_UPDATE_RATE_MS);
         directionAnimator.addUpdateListener(invalidateSelfOnUpdateListener);
         directionAnimator.start();
     }
@@ -502,81 +505,68 @@ public class MyLocationView extends View {
 
     private class CompassListener implements SensorEventListener {
 
-        private SensorManager mSensorManager;
-        private Sensor mAccelerometer;
-        private Sensor mMagnetometer;
-        private boolean paused;
+        private final SensorManager sensorManager;
 
-        private float mCurrentDegree = 0f;
+        private Sensor rotationVectorSensor;
+        float[] matrix = new float[9];
+        float[] orientation = new float[3];
 
-        private float[] mOrientation = new float[3];
-        private float[] mGData = new float[3];
-        private float[] mMData = new float[3];
-        private float[] mR = new float[16];
-        private float[] mI = new float[16];
-
-        // Controls the sensor updateLatLng rate in milliseconds
-        private static final int UPDATE_RATE_MS = 500;
+        private int currentDegree = 0;
 
         // Compass data
-        private long mCompassUpdateNextTimestamp = 0;
+        private long compassUpdateNextTimestamp = 0;
 
         public CompassListener(Context context) {
-            mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-            mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+            sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+            rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
         }
 
         public void onResume() {
-            paused = false;
-            mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-            mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_GAME);
+            sensorManager.registerListener(this, rotationVectorSensor, SensorManager.SENSOR_DELAY_GAME);
         }
 
         public void onPause() {
-            paused = true;
-            mSensorManager.unregisterListener(this, mAccelerometer);
-            mSensorManager.unregisterListener(this, mMagnetometer);
+            sensorManager.unregisterListener(this, rotationVectorSensor);
         }
 
         @Override
         public void onSensorChanged(SensorEvent event) {
-            if (paused) {
-                return;
-            }
 
-            int type = event.sensor.getType();
-            if (type == Sensor.TYPE_ACCELEROMETER) {
-                System.arraycopy(event.values, 0, mGData, 0, 3);
-            } else if (type == Sensor.TYPE_MAGNETIC_FIELD) {
-                System.arraycopy(event.values, 0, mMData, 0, 3);
-            } else {
-                // we should not be here.
-                return;
-            }
-
+            // check when the last time the compass was updated, return if too soon.
             long currentTime = SystemClock.elapsedRealtime();
-            if (currentTime < mCompassUpdateNextTimestamp) {
+            if (currentTime < compassUpdateNextTimestamp) {
                 return;
             }
 
-            SensorManager.getRotationMatrix(mR, mI, mGData, mMData);
-            SensorManager.getOrientation(mR, mOrientation);
-            setCompass(mCurrentDegree = (int) (mOrientation[0] * 180.0f / Math.PI));
-            mCompassUpdateNextTimestamp = currentTime + UPDATE_RATE_MS;
+            if( event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR ){
+
+                // calculate the rotation matrix
+                SensorManager.getRotationMatrixFromVector(matrix, event.values );
+                SensorManager.getOrientation(matrix, orientation );
+
+                float magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation )[0]);
+                currentDegree = (int) (magneticHeading);
+
+                // Change the user location view orientation to reflect the device orientation
+                setCompass(currentDegree);
+
+                if(myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW){
+                    rotateCamera();
+                }
+
+                compassUpdateNextTimestamp = currentTime + COMPASS_UPDATE_RATE_MS;
+            }
         }
 
-        public float getCurrentDegree() {
-            return mCurrentDegree;
-        }
-
-        public boolean isPaused() {
-            return paused;
+        private void rotateCamera(){
+            CameraPosition.Builder builder = new CameraPosition.Builder();
+            builder.bearing(currentDegree);
+            mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), COMPASS_UPDATE_RATE_MS, false /*linear interpolator*/);
         }
 
         @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        }
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
     }
 
     private class MarkerCoordinateAnimatorListener implements ValueAnimator.AnimatorUpdateListener {
@@ -680,11 +670,6 @@ public class MyLocationView extends View {
                 }
                 gpsDirection = location.getBearing();
                 setCompass(gpsDirection);
-            } else if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
-                if (!compassListener.isPaused()) {
-                    builder.bearing(compassListener.getCurrentDegree());
-                    setCompass(0);
-                }
             }
 
             // accuracy
