@@ -38,7 +38,6 @@
 		558F18221D0B13B100123F46 /* libmbgl-loop.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 558F18211D0B13B000123F46 /* libmbgl-loop.a */; };
 		55D9B4B11D005D3900C1CCE2 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D9B4B01D005D3900C1CCE2 /* libz.tbd */; };
 		DA0CD58E1CF56F5800A5F5A5 /* MGLFeatureTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */; };
-		DA2DBBC91D51E26600D38FF9 /* MGLStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2DBBC81D51E26600D38FF9 /* MGLStyleLayerTests.m */; };
 		DA2DBBCB1D51E30A00D38FF9 /* MGLStyleLayerTests.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA2DBBCA1D51E30A00D38FF9 /* MGLStyleLayerTests.xib */; };
 		DA35A2A41CC9EB1A00E826B2 /* MGLCoordinateFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA35A2A61CC9EB2700E826B2 /* MGLCoordinateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */; };
@@ -62,13 +61,6 @@
 		DA8933AE1CCD290700E68420 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA8933AB1CCD290700E68420 /* Localizable.strings */; };
 		DA8933B51CCD2C2500E68420 /* Foundation.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA8933B31CCD2C2500E68420 /* Foundation.strings */; };
 		DA8933B81CCD2C2D00E68420 /* Foundation.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DA8933B61CCD2C2D00E68420 /* Foundation.stringsdict */; };
-		DA8F257E1D51C5F40010E6B5 /* MGLFillStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8F25741D51C5F40010E6B5 /* MGLFillStyleLayerTests.m */; };
-		DA8F257F1D51C5F40010E6B5 /* MGLRasterStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8F25751D51C5F40010E6B5 /* MGLRasterStyleLayerTests.m */; };
-		DA8F25801D51C5F40010E6B5 /* MGLSymbolStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8F25761D51C5F40010E6B5 /* MGLSymbolStyleLayerTests.m */; };
-		DA8F25811D51C5F40010E6B5 /* MGLLineStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8F25771D51C5F40010E6B5 /* MGLLineStyleLayerTests.m */; };
-		DA8F25821D51C5F40010E6B5 /* MGLCircleStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8F25781D51C5F40010E6B5 /* MGLCircleStyleLayerTests.m */; };
-		DA8F25831D51C5F40010E6B5 /* MGLBackgroundStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8F25791D51C5F40010E6B5 /* MGLBackgroundStyleLayerTests.m */; };
-		DA8F25841D51C5F40010E6B5 /* MGLRuntimeStylingHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8F257B1D51C5F40010E6B5 /* MGLRuntimeStylingHelper.m */; };
 		DA8F25871D51C9E10010E6B5 /* MGLBackgroundStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8F25851D51C9E10010E6B5 /* MGLBackgroundStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA8F25881D51C9E10010E6B5 /* MGLBackgroundStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA8F25861D51C9E10010E6B5 /* MGLBackgroundStyleLayer.mm */; };
 		DA8F258B1D51CA540010E6B5 /* MGLLineStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8F25891D51CA540010E6B5 /* MGLLineStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1108,22 +1100,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DA8F25801D51C5F40010E6B5 /* MGLSymbolStyleLayerTests.m in Sources */,
 				DA35A2C21CCA9F4A00E826B2 /* MGLClockDirectionFormatterTests.m in Sources */,
-				DA8F25841D51C5F40010E6B5 /* MGLRuntimeStylingHelper.m in Sources */,
-				DA8F25811D51C5F40010E6B5 /* MGLLineStyleLayerTests.m in Sources */,
-				DA8F257E1D51C5F40010E6B5 /* MGLFillStyleLayerTests.m in Sources */,
 				DAE6C3D41CC34C9900DB3429 /* MGLOfflineRegionTests.m in Sources */,
-				DA8F257F1D51C5F40010E6B5 /* MGLRasterStyleLayerTests.m in Sources */,
 				DAE6C3D61CC34C9900DB3429 /* MGLStyleTests.mm in Sources */,
 				DA35A2B61CCA14D700E826B2 /* MGLCompassDirectionFormatterTests.m in Sources */,
-				DA8F25831D51C5F40010E6B5 /* MGLBackgroundStyleLayerTests.m in Sources */,
-				DA8F25821D51C5F40010E6B5 /* MGLCircleStyleLayerTests.m in Sources */,
 				DAE6C3D21CC34C9900DB3429 /* MGLGeometryTests.mm in Sources */,
 				DAE6C3D51CC34C9900DB3429 /* MGLOfflineStorageTests.m in Sources */,
 				DAE6C3D31CC34C9900DB3429 /* MGLOfflinePackTests.m in Sources */,
 				DA35A2A81CC9F41600E826B2 /* MGLCoordinateFormatterTests.m in Sources */,
-				DA2DBBC91D51E26600D38FF9 /* MGLStyleLayerTests.m in Sources */,
 				DA0CD58E1CF56F5800A5F5A5 /* MGLFeatureTests.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
