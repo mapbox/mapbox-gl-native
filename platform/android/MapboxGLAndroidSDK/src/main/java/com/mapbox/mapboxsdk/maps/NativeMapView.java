@@ -20,7 +20,10 @@ import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.sources.Source;
+import com.mapbox.services.commons.geojson.Feature;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 // Class that wraps the native methods for convenience
@@ -41,6 +44,8 @@ final class NativeMapView {
 
     // Used for callbacks
     private MapView mMapView;
+
+    private final float pixelRatio;
 
     //
     // Static methods
@@ -63,7 +68,7 @@ final class NativeMapView {
         // the system
         String cachePath = dataPath;
 
-        float pixelRatio = context.getResources().getDisplayMetrics().density;
+        pixelRatio = context.getResources().getDisplayMetrics().density;
         String apkPath = context.getPackageCodePath();
         int availableProcessors = Runtime.getRuntime().availableProcessors();
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
@@ -501,6 +506,26 @@ final class NativeMapView {
         nativeRemoveSource(mNativeMapViewPtr, sourceId);
     }
 
+    // Feature querying
+
+    @NonNull
+    public List<Feature> queryRenderedFeatures(PointF coordinates, String... layerIds) {
+        Feature[] features = nativeQueryRenderedFeaturesForPoint(mNativeMapViewPtr, coordinates.x / pixelRatio, coordinates.y / pixelRatio, layerIds);
+        return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
+    }
+
+    @NonNull
+    public List<Feature> queryRenderedFeatures(RectF coordinates, String... layerIds) {
+        Feature[] features = nativeQueryRenderedFeaturesForBox(
+                mNativeMapViewPtr,
+                coordinates.left / pixelRatio,
+                coordinates.top / pixelRatio,
+                coordinates.right / pixelRatio,
+                coordinates.bottom / pixelRatio,
+                layerIds);
+        return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
+    }
+
     public void scheduleTakeSnapshot() {
         nativeScheduleTakeSnapshot(mNativeMapViewPtr);
     }
@@ -696,4 +721,8 @@ final class NativeMapView {
     private native long nativeUpdatePolyline(long nativeMapviewPtr, long polylineId, Polyline polyline);
 
     private native void nativeScheduleTakeSnapshot(long nativeMapViewPtr);
+
+    private native Feature[] nativeQueryRenderedFeaturesForPoint(long nativeMapViewPtr, float x, float y, String[] layerIds);
+
+    private native Feature[] nativeQueryRenderedFeaturesForBox(long mNativeMapViewPtr, float left, float top, float right, float bottom, String[] layerIds);
 }

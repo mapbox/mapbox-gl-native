@@ -14,6 +14,10 @@
 #include "style/layers/layers.hpp"
 #include "style/sources/sources.hpp"
 
+#include "conversion/conversion.hpp"
+#include "conversion/collection.hpp"
+#include "geometry/conversion/feature.hpp"
+
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/annotation/annotation.hpp>
@@ -23,8 +27,11 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/run_loop.hpp>
+
+#include <mapbox/geometry.hpp>
 
 #include <jni/jni.hpp>
 
@@ -929,6 +936,40 @@ void nativeSetVisibleCoordinateBounds(JNIEnv *env, jni::jobject* obj, jlong nati
     nativeMapView->getMap().easeTo(cameraOptions, animationOptions);
 }
 
+jni::jarray<jni::jobject>* nativeQueryRenderedFeaturesForPoint(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jfloat x, jni::jfloat y, jni::jarray<jni::jobject>*  layerIds) {
+    using namespace mbgl::android::conversion;
+    using namespace mapbox::geometry;
+
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeQueryRenderedFeatures for Point");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    mbgl::optional<std::vector<std::string>> layers;
+    if (layerIds != nullptr && jni::GetArrayLength(*env, *layerIds) > 0) {
+        layers = toVector(*env, *layerIds);
+    }
+    point<double> point = {x, y};
+
+    return *convert<jni::jarray<jni::jobject>*, std::vector<mbgl::Feature>>(*env, nativeMapView->getMap().queryRenderedFeatures(point, layers));
+}
+
+jni::jarray<jni::jobject>* nativeQueryRenderedFeaturesForBox(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jfloat left, jni::jfloat top, jni::jfloat right, jni::jfloat bottom, jni::jarray<jni::jobject>*  layerIds) {
+    using namespace mbgl::android::conversion;
+    using namespace mapbox::geometry;
+
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeQueryRenderedFeatures for Box %.2f %.2f %.2f %.2f", left, top, right, bottom);
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    mbgl::optional<std::vector<std::string>> layers;
+    if (layerIds != nullptr && jni::GetArrayLength(*env, *layerIds) > 0) {
+        layers = toVector(*env, *layerIds);
+    }
+    box<double> box = { point<double>{ left, top}, point<double>{ right, bottom } };
+
+    return *convert<jni::jarray<jni::jobject>*, std::vector<mbgl::Feature>>(*env, nativeMapView->getMap().queryRenderedFeatures(box, layers));
+}
+
 void nativeOnLowMemory(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeOnLowMemory");
     assert(nativeMapViewPtr != 0);
@@ -1800,7 +1841,9 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeAddSource, "(JLjava/lang/String;Lcom/mapbox/mapboxsdk/style/sources/Source;)V"),
         MAKE_NATIVE_METHOD(nativeRemoveSource, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeSetContentPadding, "(JDDDD)V"),
-        MAKE_NATIVE_METHOD(nativeScheduleTakeSnapshot, "(J)V")
+        MAKE_NATIVE_METHOD(nativeScheduleTakeSnapshot, "(J)V"),
+        MAKE_NATIVE_METHOD(nativeQueryRenderedFeaturesForPoint, "(JFF[Ljava/lang/String;)[Lcom/mapbox/services/commons/geojson/Feature;"),
+        MAKE_NATIVE_METHOD(nativeQueryRenderedFeaturesForBox, "(JFFFF[Ljava/lang/String;)[Lcom/mapbox/services/commons/geojson/Feature;")
     );
 
     // Offline begin

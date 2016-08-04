@@ -2,6 +2,8 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
+import android.graphics.RectF;
 import android.location.Location;
 import android.os.SystemClock;
 import android.support.annotation.FloatRange;
@@ -42,6 +44,7 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.sources.Source;
+import com.mapbox.services.commons.geojson.Feature;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -1721,6 +1724,33 @@ public class MapboxMap {
     public void snapshot(@NonNull SnapshotReadyCallback callback) {
         mMapView.snapshot(callback, null);
     }
+
+    /**
+     * Queries the map for rendered features
+     *
+     * @param coordinates the point to query
+     * @param layerIds    optionally - only query these layers
+     * @return the list of feature
+     */
+    @UiThread
+    @NonNull
+    public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates, @Nullable String... layerIds) {
+        return mMapView.getNativeMapView().queryRenderedFeatures(coordinates, layerIds);
+    }
+
+    /**
+     * Queries the map for rendered features
+     *
+     * @param coordinates the box to query
+     * @param layerIds    optionally - only query these layers
+     * @return the list of feature
+     */
+    @UiThread
+    @NonNull
+    public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates, @Nullable String... layerIds) {
+        return mMapView.getNativeMapView().queryRenderedFeatures(coordinates, layerIds);
+    }
+
 
     //
     // Interfaces

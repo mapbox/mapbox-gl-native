@@ -27,6 +27,11 @@ dependencies {
     compile "com.android.support:design:${supportLibVersion}"
     compile 'com.squareup.okhttp3:okhttp:3.3.0'
     compile 'com.mapzen.android:lost:1.1.0'
+
+    // Mapbox Android Services
+    compile('com.mapbox.mapboxsdk:mapbox-android-services:2.0.0-SNAPSHOT@aar') {
+        transitive = true
+    }
 }
 
 android {
