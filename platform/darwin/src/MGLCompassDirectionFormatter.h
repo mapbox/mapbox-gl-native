@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  Use this class to create localized heading strings when displaying directions
  irrespective of the user’s current location. To format a direction relative to
- the user’s current location, use `MGLCompassDirectionFormatter` instead.
+ the user’s current location, use `MGLClockDirectionFormatter` instead.
  */
 @interface MGLCompassDirectionFormatter : NSFormatter
 
