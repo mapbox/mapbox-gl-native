@@ -505,4 +505,8 @@ public class SymbolLayer extends Layer {
 
     private native Object nativeGetTextTranslateAnchor();
 
+
+    @Override
+    protected native void finalize() throws Throwable;
+
 }

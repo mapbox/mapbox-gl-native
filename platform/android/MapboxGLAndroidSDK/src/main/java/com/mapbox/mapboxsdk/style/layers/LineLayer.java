@@ -188,4 +188,8 @@ public class LineLayer extends Layer {
 
     private native Object nativeGetLinePattern();
 
+
+    @Override
+    protected native void finalize() throws Throwable;
+
 }

@@ -70,4 +70,8 @@ public class BackgroundLayer extends Layer {
 
     private native Object nativeGetBackgroundOpacity();
 
+
+    @Override
+    protected native void finalize() throws Throwable;
+
 }

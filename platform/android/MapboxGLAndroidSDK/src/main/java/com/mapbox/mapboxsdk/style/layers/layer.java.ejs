@@ -104,4 +104,8 @@ public class <%- camelize(type) %>Layer extends Layer {
     private native Object nativeGet<%- camelize(property.name) %>();
 
 <% } -%>
+
+    @Override
+    protected native void finalize() throws Throwable;
+
 }

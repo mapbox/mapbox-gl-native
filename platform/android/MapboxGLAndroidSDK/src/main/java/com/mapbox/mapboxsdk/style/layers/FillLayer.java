@@ -147,4 +147,8 @@ public class FillLayer extends Layer {
 
     private native Object nativeGetFillPattern();
 
+
+    @Override
+    protected native void finalize() throws Throwable;
+
 }

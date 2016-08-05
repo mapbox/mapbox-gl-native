@@ -27,4 +27,7 @@ public class CustomLayer extends Layer {
 
     protected native void nativeUpdate();
 
+    @Override
+    protected native void finalize() throws Throwable;
+
 }
