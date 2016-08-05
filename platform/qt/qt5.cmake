@@ -16,12 +16,12 @@ set(MBGL_QT_LIBRARIES
 )
 
 target_sources(qmapboxgl
-    PRIVATE platform/qt/include/qquickmapboxgl.hpp
-    PRIVATE platform/qt/include/qquickmapboxglmapparameter.hpp
-    PRIVATE platform/qt/src/qquickmapboxgl.cpp
-    PRIVATE platform/qt/src/qquickmapboxglmapparameter.cpp
-    PRIVATE platform/qt/src/qquickmapboxglrenderer.cpp
-    PRIVATE platform/qt/src/qquickmapboxglrenderer.hpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/include/qquickmapboxgl.hpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/include/qquickmapboxglmapparameter.hpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/qquickmapboxgl.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/qquickmapboxglmapparameter.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/qquickmapboxglrenderer.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/qquickmapboxglrenderer.hpp
 )
 
 target_link_libraries(qmapboxgl
@@ -42,9 +42,9 @@ target_link_libraries(mbgl-qt
 
 # QtQuick app
 add_executable(mbgl-qt-qml
-    platform/qt/qmlapp/main.cpp
-    platform/qt/qmlapp/qml.qrc
-    platform/qt/resources/common.qrc
+    ${CMAKE_SOURCE_DIR}/platform/qt/qmlapp/main.cpp
+    ${CMAKE_SOURCE_DIR}/platform/qt/qmlapp/qml.qrc
+    ${CMAKE_SOURCE_DIR}/platform/qt/resources/common.qrc
 )
 
 target_link_libraries(mbgl-qt-qml
