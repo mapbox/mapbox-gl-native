@@ -99,6 +99,7 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     )
     list(APPEND MBGL_QT_LIBRARIES
         PRIVATE -lGL
+        PRIVATE -pthread
     )
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     list(APPEND MBGL_QT_FILES
