@@ -11,8 +11,8 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
-import com.mapbox.mapboxsdk.testapp.BaseTest;
-import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
+import com.mapbox.mapboxsdk.activity.BaseTest;
+import com.mapbox.mapboxsdk.activity.utils.OnMapReadyIdlingResource;
 
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +25,7 @@ import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
 /**
- * Basic smoke tests for FillLayer
+ * Basic smoke tests for FillLayera
  */
 @RunWith(AndroidJUnit4.class)
 public class FillLayerTest extends BaseTest {
