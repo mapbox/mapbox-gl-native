@@ -97,6 +97,8 @@ private:
     std::unique_ptr<mbgl::DefaultFileSource> fileSource;
     std::unique_ptr<mbgl::Map> map;
     mbgl::EdgeInsets insets;
+
+    unsigned active = 0;
 };
 }
 }

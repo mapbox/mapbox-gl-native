@@ -125,6 +125,10 @@ std::array<uint16_t, 2> NativeMapView::getFramebufferSize() const {
 }
 
 void NativeMapView::activate() {
+    if (active++) {
+        return;
+    }
+
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::activate");
 
     oldDisplay = eglGetCurrentDisplay();
@@ -151,6 +155,10 @@ void NativeMapView::activate() {
 }
 
 void NativeMapView::deactivate() {
+    if (--active) {
+        return;
+    }
+
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::deactivate");
 
     assert(vm != nullptr);
