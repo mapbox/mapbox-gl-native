@@ -182,13 +182,21 @@ void QQuickMapboxGL::pan(int dx, int dy)
     update();
 }
 
-void QQuickMapboxGL::setStyle(const QString &styleUrl)
+void QQuickMapboxGL::setStyle(QQuickMapboxGLStyle *style)
 {
-    if (m_style == styleUrl) {
+    if (style == m_style) {
         return;
     }
 
-    m_style = styleUrl;
+    disconnect(style, SIGNAL(urlChanged(QString)), this, SLOT(onStyleChanged()));
+    disconnect(style, SIGNAL(propertyUpdated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
+    delete m_style;
+    m_style = style;
+    if (style) {
+        style->setParentItem(this);
+        connect(style, SIGNAL(urlChanged(QString)), this, SLOT(onStyleChanged()));
+        connect(style, SIGNAL(propertyUpdated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
+    }
 
     m_syncState |= StyleNeedsSync;
     update();
@@ -196,7 +204,7 @@ void QQuickMapboxGL::setStyle(const QString &styleUrl)
     emit styleChanged();
 }
 
-QString QQuickMapboxGL::style() const
+QQuickMapboxGLStyle *QQuickMapboxGL::style() const
 {
     return m_style;
 }
@@ -294,4 +302,12 @@ void QQuickMapboxGL::onStylePropertyUpdated(const QVariantMap &params)
     }
 
     update();
+}
+
+void QQuickMapboxGL::onStyleChanged()
+{
+    m_syncState |= StyleNeedsSync;
+    update();
+
+    emit styleChanged();
 }

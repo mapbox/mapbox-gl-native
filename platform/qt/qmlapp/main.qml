@@ -16,7 +16,7 @@ ApplicationWindow {
     ColorDialog {
         id: landColorDialog
         title: "Land color"
-        onCurrentColorChanged: { mapStreets.color = currentColor }
+        onCurrentColorChanged: { mapFront.color = currentColor }
     }
 
     ColorDialog {
@@ -26,21 +26,21 @@ ApplicationWindow {
     }
 
     MapboxLayoutStyleProperty {
-        parent: mapStreets
+        parent: styleStreets
         layer: "road-label-large"
         property: "visibility"
         value: roadLabel.checked ? "visible" : "none"
     }
 
     MapboxLayoutStyleProperty {
-        parent: mapStreets
+        parent: styleStreets
         layer: "road-label-medium"
         property: "visibility"
         value: roadLabel.checked ? "visible" : "none"
     }
 
     MapboxLayoutStyleProperty {
-        parent: mapStreets
+        parent: styleStreets
         layer: "road-label-small"
         property: "visibility"
         value: roadLabel.checked ? "visible" : "none"
@@ -70,12 +70,15 @@ ApplicationWindow {
                 anchors.fill: parent
 
                 MapboxMap {
-                    id: mapStreets
+                    id: mapFront
 
                     anchors.fill: parent
                     visible: false
 
-                    style: "mapbox://styles/mapbox/streets-v9"
+                    style: MapboxStyle {
+                        id: styleStreets
+                        url: "mapbox://styles/mapbox/streets-v9"
+                    }
 
                     center: QtPositioning.coordinate(60.170448, 24.942046) // Helsinki
                     zoomLevel: 14
@@ -124,7 +127,7 @@ ApplicationWindow {
                 OpacityMask {
                     anchors.fill: maskStreets
 
-                    source: mapStreets
+                    source: mapFront
                     maskSource: maskStreets
                 }
 
@@ -134,7 +137,7 @@ ApplicationWindow {
                     property var lastX: 0
                     property var lastY: 0
 
-                    onWheel: mapStreets.zoomLevel += 0.2 * wheel.angleDelta.y / 120
+                    onWheel: mapFront.zoomLevel += 0.2 * wheel.angleDelta.y / 120
 
                     onPressed: {
                         lastX = mouse.x
@@ -142,7 +145,7 @@ ApplicationWindow {
                     }
 
                     onPositionChanged: {
-                        mapStreets.pan(mouse.x - lastX, mouse.y - lastY)
+                        mapFront.pan(mouse.x - lastX, mouse.y - lastY)
 
                         lastX = mouse.x
                         lastY = mouse.y
@@ -154,20 +157,23 @@ ApplicationWindow {
                 anchors.fill: parent
 
                 MapboxMap {
-                    id: mapSatellite
+                    id: mapBack
 
                     anchors.fill: parent
                     visible: false
 
-                    style: "mapbox://styles/mapbox/satellite-streets-v9"
+                    style: MapboxStyle {
+                        id: styleSatellite
+                        url: "mapbox://styles/mapbox/satellite-streets-v9"
+                    }
 
-                    center: mapStreets.center
-                    zoomLevel: mapStreets.zoomLevel
-                    minimumZoomLevel: mapStreets.minimumZoomLevel
-                    maximumZoomLevel: mapStreets.maximumZoomLevel
+                    center: mapFront.center
+                    zoomLevel: mapFront.zoomLevel
+                    minimumZoomLevel: mapFront.minimumZoomLevel
+                    maximumZoomLevel: mapFront.maximumZoomLevel
 
-                    bearing: mapStreets.bearing
-                    pitch: mapStreets.pitch
+                    bearing: mapFront.bearing
+                    pitch: mapFront.pitch
 
                     Image {
                         anchors.right: parent.right
@@ -197,7 +203,7 @@ ApplicationWindow {
                 OpacityMask {
                     anchors.fill: maskSatellite
 
-                    source: mapSatellite
+                    source: mapBack
                     maskSource: maskSatellite
                 }
 
@@ -207,7 +213,7 @@ ApplicationWindow {
                     property var lastX: 0
                     property var lastY: 0
 
-                    onWheel: mapStreets.zoomLevel += 0.2 * wheel.angleDelta.y / 120
+                    onWheel: mapFront.zoomLevel += 0.2 * wheel.angleDelta.y / 120
 
                     onPressed: {
                         lastX = mouse.x
@@ -215,7 +221,7 @@ ApplicationWindow {
                     }
 
                     onPositionChanged: {
-                        mapStreets.pan(mouse.x - lastX, mouse.y - lastY)
+                        mapFront.pan(mouse.x - lastX, mouse.y - lastY)
 
                         lastX = mouse.x
                         lastY = mouse.y
@@ -281,14 +287,14 @@ ApplicationWindow {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: "Light style"
-                onClicked: { mapStreets.style = "mapbox://styles/mapbox/light-v9" }
+                onClicked: { styleStreets.url = "mapbox://styles/mapbox/light-v9" }
             }
 
             Button {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: "Dark style"
-                onClicked: { mapStreets.style = "mapbox://styles/mapbox/dark-v9" }
+                onClicked: { styleStreets.url = "mapbox://styles/mapbox/dark-v9" }
             }
 
             CheckBox {

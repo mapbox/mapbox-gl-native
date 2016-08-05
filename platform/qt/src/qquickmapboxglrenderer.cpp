@@ -2,6 +2,7 @@
 
 #include <QMapboxGL>
 #include <QQuickMapboxGL>
+#include <QQuickMapboxGLStyle>
 
 #include <QSize>
 #include <QOpenGLFramebufferObject>
@@ -83,8 +84,8 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
         m_map->setCoordinateZoom({ center.latitude(), center.longitude() }, quickMap->zoomLevel());
     }
 
-    if (syncStatus & QQuickMapboxGL::StyleNeedsSync) {
-        m_map->setStyleURL(quickMap->style());
+    if (syncStatus & QQuickMapboxGL::StyleNeedsSync && quickMap->style()) {
+        m_map->setStyleURL(quickMap->style()->url());
         m_styleLoaded = false;
     }
 
