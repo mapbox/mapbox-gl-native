@@ -20,11 +20,22 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, weak, nullable) MGLMapView *mapView;
  
 /**
- Returns the annotation object indicating the user's current location.
+ Returns the annotation object indicating the user’s current location.
  
- The value of this property is nil during initialization and while user tracking is inactive.
+ The value of this property is nil during initialization and while user tracking
+ is inactive.
  */
 @property (nonatomic, readonly, weak, nullable) MGLUserLocation *userLocation;
+
+/**
+ Returns the layer that should be used for annotation selection hit testing.
+ 
+ The default value of this property is the presentation layer of the view’s Core
+ Animation layer. When subclassing, you may override this property to specify a
+ different layer to be used for hit testing. This can be useful when you wish to
+ limit the interactive area of the annotation to a specific sublayer.
+ */
+@property (nonatomic, readonly, weak) CALayer *hitTestLayer;
 
 @end
 

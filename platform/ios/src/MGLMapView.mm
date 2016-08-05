@@ -1397,15 +1397,22 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     CGPoint tapPoint = [singleTap locationInView:self];
 
-    CALayer *hitLayer = self.userLocationVisible ? [self.userLocationAnnotationView.layer.presentationLayer hitTest:tapPoint] : nil;
-    if (hitLayer && hitLayer != self.userLocationAnnotationView.haloLayer.presentationLayer)
+    if (self.userLocationVisible)
     {
-        if ( ! _userLocationAnnotationIsSelected)
+
+        CGPoint tapPointForUserLocation = self.userLocationAnnotationView.hitTestLayer.superlayer ? [singleTap locationInView:self.userLocationAnnotationView] : tapPoint;
+
+        CALayer *hitLayer = self.userLocationVisible ? [self.userLocationAnnotationView.hitTestLayer hitTest:tapPointForUserLocation] : nil;
+        if (hitLayer)
         {
-            [self selectAnnotation:self.userLocation animated:YES];
+            if ( ! _userLocationAnnotationIsSelected)
+            {
+                [self selectAnnotation:self.userLocation animated:YES];
+            }
+            return;
         }
-        return;
     }
+
     
     MGLAnnotationTag hitAnnotationTag = [self annotationTagAtPoint:tapPoint persistingResults:YES];
     if (hitAnnotationTag != MGLAnnotationTagNotFound)

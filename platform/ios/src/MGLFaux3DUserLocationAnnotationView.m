@@ -40,6 +40,12 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     [self setupLayers];
 }
 
+- (CALayer *)hitTestLayer
+{
+    // only the main dot should be interactive (i.e., exclude the halo)
+    return _dotBorderLayer ?: _puckDot;
+}
+
 - (void)setTintColor:(UIColor *)tintColor
 {
     if (_puckModeActivated)
