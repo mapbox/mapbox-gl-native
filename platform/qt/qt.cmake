@@ -96,12 +96,16 @@ if (MASON_PLATFORM STREQUAL "osx" OR MASON_PLATFORM STREQUAL "ios")
         PRIVATE "-framework Foundation"
         PRIVATE "-framework OpenGL"
     )
-else()
+elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     list(APPEND MBGL_QT_FILES
         PRIVATE platform/default/thread.cpp
     )
     list(APPEND MBGL_QT_LIBRARIES
         PRIVATE -lGL
+    )
+elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+    list(APPEND MBGL_QT_FILES
+        PRIVATE platform/qt/src/thread.cpp
     )
 endif()
 
