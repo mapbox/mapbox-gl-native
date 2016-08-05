@@ -859,10 +859,14 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     : QObject(q)
     , size(size_)
     , q_ptr(q)
+#ifdef QT_OFFLINE
     , fileSourceObj(std::make_unique<mbgl::DefaultFileSource>(
         settings.cacheDatabasePath().toStdString(),
         settings.assetPath().toStdString(),
         settings.cacheDatabaseMaximumSize()))
+#else
+    , fileSourceObj(std::make_unique<mbgl::OnlineFileSource>())
+#endif
     , threadPool(4)
     , mapObj(std::make_unique<mbgl::Map>(
         *this, mbgl::Size{ static_cast<uint32_t>(size.width()), static_cast<uint32_t>(size.height()) },

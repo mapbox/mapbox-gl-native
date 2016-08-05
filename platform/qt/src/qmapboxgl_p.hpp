@@ -7,6 +7,7 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/util/geo.hpp>
 
 #include <QObject>
@@ -37,7 +38,12 @@ public:
 
     QMapboxGL *q_ptr { nullptr };
 
+#ifdef QT_OFFLINE
     std::unique_ptr<mbgl::DefaultFileSource> fileSourceObj;
+#else
+    std::unique_ptr<mbgl::OnlineFileSource> fileSourceObj;
+#endif
+
     mbgl::ThreadPool threadPool;
     std::unique_ptr<mbgl::Map> mapObj;
 

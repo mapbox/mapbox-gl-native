@@ -1,6 +1,5 @@
 include(platform/qt/qt.cmake)
 
-mason_use(sqlite VERSION 3.14.2)
 mason_use(gtest VERSION 1.7.0${MASON_CXXABI_SUFFIX})
 
 if(NOT WITH_QT_DECODERS)
@@ -13,6 +12,10 @@ if(NOT WITH_QT_I18N)
     mason_use(icu VERSION 58.1)
 endif()
 
+if(WITH_QT_OFFLINE)
+    mason_use(sqlite VERSION 3.14.2)
+endif()
+
 macro(mbgl_platform_core)
     target_sources(mbgl-core
         ${MBGL_QT_FILES}
@@ -23,13 +26,13 @@ macro(mbgl_platform_core)
         PRIVATE platform/qt/include
     )
 
-    target_add_mason_package(mbgl-core PRIVATE sqlite)
-
     target_link_libraries(mbgl-core
         ${MBGL_QT_LIBRARIES}
     )
 
-    if(NOT WITH_QT_DECODERS)
+    if(WITH_QT_DECODERS)
+        add_definitions(-DQT_IMAGE_DECODERS)
+    else()
         target_sources(mbgl-core
             PRIVATE platform/default/jpeg_reader.cpp
             PRIVATE platform/default/png_reader.cpp
@@ -39,8 +42,11 @@ macro(mbgl_platform_core)
         target_add_mason_package(mbgl-core PRIVATE libjpeg-turbo)
         target_add_mason_package(mbgl-core PRIVATE libpng)
         target_add_mason_package(mbgl-core PRIVATE webp)
-    else()
-        add_definitions(-DQT_IMAGE_DECODERS)
+    endif()
+
+    if(WITH_QT_OFFLINE)
+        target_add_mason_package(mbgl-core PRIVATE sqlite)
+        add_definitions(-DQT_OFFLINE)
     endif()
 
     if(NOT WITH_QT_I18N)
