@@ -526,6 +526,10 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     roadLayer.lineColor = roadLineColor;
     roadLayer.lineWidth = lineWidthFunction;
     roadLayer.lineGapWidth = lineWidthFunction;
+    
+    roadLayer.visible = NO;
+    roadLayer.maxZoom = 15;
+    roadLayer.minZoom = 13;
 }
 
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer *)longPress

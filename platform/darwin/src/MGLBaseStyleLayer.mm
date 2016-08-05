@@ -11,33 +11,33 @@
 - (void)setVisible:(BOOL)visible
 {
     mbgl::style::VisibilityType v = visible ? mbgl::style::VisibilityType::Visible : mbgl::style::VisibilityType::None;
-    _layer->setVisibility(v);
+    self.layer->setVisibility(v);
 }
 
 - (BOOL)isVisible
 {
-    mbgl::style::VisibilityType v = _layer->getVisibility();
+    mbgl::style::VisibilityType v = self.layer->getVisibility();
     return (v == mbgl::style::VisibilityType::Visible);
 }
 
 - (void)setMaxZoom:(float)maxZoom
 {
-    _layer->setMaxZoom(maxZoom);
+    self.layer->setMaxZoom(maxZoom);
 }
 
 - (float)maxZoom
 {
-    return _layer->getMaxZoom();
+    return self.layer->getMaxZoom();
 }
 
 - (void)setMinZoom:(float)minZoom
 {
-    _layer->setMinZoom(minZoom);
+    self.layer->setMinZoom(minZoom);
 }
 
 - (float)minZoom
 {
-    return _layer->getMinZoom();
+    return self.layer->getMinZoom();
 }
 
 @end
