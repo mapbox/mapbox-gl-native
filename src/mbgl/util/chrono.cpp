@@ -3,6 +3,13 @@
 #include <parsedate/parsedate.h>
 
 #include <cstdio>
+#include <ctime>
+
+#if defined(_WIN64)
+#define _gmtime(t, i) gmtime_s(i, t)
+#else
+#define _gmtime(t, i) gmtime_r(t, i)
+#endif
 
 namespace mbgl {
 namespace util {
@@ -14,7 +21,7 @@ static const char *months[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 std::string rfc1123(Timestamp timestamp) {
     std::time_t time = std::chrono::system_clock::to_time_t(timestamp);
     std::tm info;
-    gmtime_r(&time, &info);
+    _gmtime(&time, &info);
     char buffer[30];
     snprintf(buffer, 30, "%s, %02d %s %4d %02d:%02d:%02d GMT", week[info.tm_wday], info.tm_mday,
              months[info.tm_mon], 1900 + info.tm_year, info.tm_hour, info.tm_min, info.tm_sec);
@@ -24,7 +31,7 @@ std::string rfc1123(Timestamp timestamp) {
 std::string iso8601(Timestamp timestamp) {
     std::time_t time = std::chrono::system_clock::to_time_t(timestamp);
     std::tm info;
-    gmtime_r(&time, &info);
+    _gmtime(&time, &info);
     char buffer[30];
     std::strftime(buffer, sizeof(buffer), "%F %T", &info);
     return buffer;
