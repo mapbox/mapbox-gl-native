@@ -14,7 +14,7 @@ for FILE in $(git ls-files "include/*.hpp" "include/*.h" "src/*.hpp" "src/*.cpp"
         echo "    # ${CURRENT_PREFIX}" >> cmake/core-files.cmake
         PREFIX="${CURRENT_PREFIX}"
     fi
-    echo "    ${FILE#*#}" >> cmake/core-files.cmake
+    echo "    \${CMAKE_SOURCE_DIR}/${FILE#*#}" >> cmake/core-files.cmake
 done
 echo ")" >> cmake/core-files.cmake
 git diff cmake/core-files.cmake

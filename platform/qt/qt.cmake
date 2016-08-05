@@ -15,43 +15,43 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(MBGL_QT_FILES
     # File source
-    PRIVATE platform/default/asset_file_source.cpp
-    PRIVATE platform/default/local_file_source.cpp
-    PRIVATE platform/default/online_file_source.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/asset_file_source.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/local_file_source.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/online_file_source.cpp
 
     # Misc
-    PRIVATE platform/default/logging_stderr.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/logging_stderr.cpp
 
     # Thread
-    PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
-    PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
-    PRIVATE platform/qt/src/thread_local.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/mbgl/util/default_thread_pool.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/mbgl/util/default_thread_pool.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/thread_local.cpp
 
     # Platform integration
-    PRIVATE platform/qt/src/async_task.cpp
-    PRIVATE platform/qt/src/async_task_impl.hpp
-    PRIVATE platform/qt/src/http_file_source.cpp
-    PRIVATE platform/qt/src/http_file_source.hpp
-    PRIVATE platform/qt/src/http_request.cpp
-    PRIVATE platform/qt/src/http_request.hpp
-    PRIVATE platform/qt/src/image.cpp
-    PRIVATE platform/qt/src/run_loop.cpp
-    PRIVATE platform/qt/src/run_loop_impl.hpp
-    PRIVATE platform/qt/src/string_stdlib.cpp
-    PRIVATE platform/qt/src/timer.cpp
-    PRIVATE platform/qt/src/timer_impl.hpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/async_task.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/async_task_impl.hpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/http_file_source.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/http_file_source.hpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/http_request.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/http_request.hpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/image.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/run_loop.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/run_loop_impl.hpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/string_stdlib.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/timer.cpp
+    PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/timer_impl.hpp
 )
 
 if(WITH_QT_OFFLINE)
     list(APPEND MBGL_QT_FILES
-        PRIVATE platform/default/default_file_source.cpp
-        PRIVATE platform/default/mbgl/storage/offline.cpp
-        PRIVATE platform/default/mbgl/storage/offline_database.cpp
-        PRIVATE platform/default/mbgl/storage/offline_database.hpp
-        PRIVATE platform/default/mbgl/storage/offline_download.cpp
-        PRIVATE platform/default/mbgl/storage/offline_download.hpp
-        PRIVATE platform/default/sqlite3.cpp
-        PRIVATE platform/default/sqlite3.hpp
+        PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/default_file_source.cpp
+        PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/mbgl/storage/offline.cpp
+        PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/mbgl/storage/offline_database.cpp
+        PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/mbgl/storage/offline_database.hpp
+        PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/mbgl/storage/offline_download.cpp
+        PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/mbgl/storage/offline_download.hpp
+        PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/sqlite3.cpp
+        PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/sqlite3.hpp
     )
 endif()
 
@@ -61,33 +61,33 @@ include_directories(
 
 # Shared library
 add_library(qmapboxgl SHARED
-    platform/qt/include/qmapbox.hpp
-    platform/qt/include/qmapboxgl.hpp
-    platform/qt/src/qmapbox.cpp
-    platform/qt/src/qmapboxgl.cpp
-    platform/qt/src/qmapboxgl_p.hpp
-    platform/default/mbgl/util/default_styles.hpp
-    platform/default/mbgl/util/default_styles.cpp
+    ${CMAKE_SOURCE_DIR}/platform/qt/include/qmapbox.hpp
+    ${CMAKE_SOURCE_DIR}/platform/qt/include/qmapboxgl.hpp
+    ${CMAKE_SOURCE_DIR}/platform/qt/src/qmapbox.cpp
+    ${CMAKE_SOURCE_DIR}/platform/qt/src/qmapboxgl.cpp
+    ${CMAKE_SOURCE_DIR}/platform/qt/src/qmapboxgl_p.hpp
+    ${CMAKE_SOURCE_DIR}/platform/default/mbgl/util/default_styles.hpp
+    ${CMAKE_SOURCE_DIR}/platform/default/mbgl/util/default_styles.cpp
 )
 
 # C++ app
 add_executable(mbgl-qt
-    platform/qt/app/main.cpp
-    platform/qt/app/mapwindow.cpp
-    platform/qt/app/mapwindow.hpp
-    platform/qt/resources/common.qrc
+    ${CMAKE_SOURCE_DIR}/platform/qt/app/main.cpp
+    ${CMAKE_SOURCE_DIR}/platform/qt/app/mapwindow.cpp
+    ${CMAKE_SOURCE_DIR}/platform/qt/app/mapwindow.hpp
+    ${CMAKE_SOURCE_DIR}/platform/qt/resources/common.qrc
 )
 
 if(WITH_QT_4)
-    include(platform/qt/qt4.cmake)
+    include(${CMAKE_SOURCE_DIR}/platform/qt/qt4.cmake)
 else()
-    include(platform/qt/qt5.cmake)
+    include(${CMAKE_SOURCE_DIR}/platform/qt/qt5.cmake)
 endif()
 
 # OS specific configurations
 if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     list(APPEND MBGL_QT_FILES
-        PRIVATE platform/darwin/src/nsthread.mm
+        PRIVATE ${CMAKE_SOURCE_DIR}/platform/darwin/src/nsthread.mm
     )
     list(APPEND MBGL_QT_LIBRARIES
         PRIVATE "-framework Foundation"
@@ -95,14 +95,14 @@ if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     )
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     list(APPEND MBGL_QT_FILES
-        PRIVATE platform/default/thread.cpp
+        PRIVATE ${CMAKE_SOURCE_DIR}/platform/default/thread.cpp
     )
     list(APPEND MBGL_QT_LIBRARIES
         PRIVATE -lGL
     )
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     list(APPEND MBGL_QT_FILES
-        PRIVATE platform/qt/src/thread.cpp
+        PRIVATE ${CMAKE_SOURCE_DIR}/platform/qt/src/thread.cpp
     )
 endif()
 
