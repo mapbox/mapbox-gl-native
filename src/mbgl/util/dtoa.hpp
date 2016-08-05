@@ -5,7 +5,6 @@
 namespace mbgl {
 namespace util {
 
-char* dtoa(double value, char* buffer);
 std::string dtoa(double value);
 
 } // end namespace util
