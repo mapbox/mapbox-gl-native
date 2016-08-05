@@ -1,9 +1,14 @@
 #include "dtoa.hpp"
 
+// Clang on Windows 64-bits can't parse rapidjson's dtoa
+#if !defined(_WIN64)
 #include <rapidjson/internal/dtoa.h>
+#endif
 
 namespace mbgl {
 namespace util {
+
+#if !defined(_WIN64)
 
 namespace {
 
@@ -100,6 +105,14 @@ std::string dtoa(double value) {
     data.resize(end - data.data());
     return data;
 }
+
+#else
+
+std::string dtoa(double value) {
+    return std::to_string(value);
+}
+
+#endif
 
 } // namespace util
 } // namespace mbgl
