@@ -132,4 +132,8 @@ public class CircleLayer extends Layer {
 
     private native Object nativeGetCirclePitchScale();
 
+
+    @Override
+    protected native void finalize() throws Throwable;
+
 }

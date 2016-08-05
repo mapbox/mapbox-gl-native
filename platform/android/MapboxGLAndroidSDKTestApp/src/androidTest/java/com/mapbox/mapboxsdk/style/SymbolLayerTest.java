@@ -7,12 +7,12 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
-import com.mapbox.mapboxsdk.activity.BaseTest;
-import com.mapbox.mapboxsdk.activity.utils.OnMapReadyIdlingResource;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
+import com.mapbox.mapboxsdk.testapp.BaseTest;
+import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
 
 import org.junit.After;
 import org.junit.Before;
@@ -20,69 +20,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_MAP;
-import static com.mapbox.mapboxsdk.style.layers.Property.ICON_TEXT_FIT_NONE;
-import static com.mapbox.mapboxsdk.style.layers.Property.ICON_TRANSLATE_ANCHOR_MAP;
-import static com.mapbox.mapboxsdk.style.layers.Property.NONE;
-import static com.mapbox.mapboxsdk.style.layers.Property.SYMBOL_PLACEMENT_POINT;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_ANCHOR_CENTER;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_JUSTIFY_LEFT;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_PITCH_ALIGNMENT_MAP;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_ROTATION_ALIGNMENT_MAP;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_TRANSFORM_NONE;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_TRANSLATE_ANCHOR_MAP;
-import static com.mapbox.mapboxsdk.style.layers.Property.VISIBLE;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconHaloBlur;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconHaloColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconHaloWidth;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconKeepUpright;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOpacity;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOptional;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconPadding;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconRotate;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconRotationAlignment;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconTextFit;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconTextFitPadding;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconTranslate;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconTranslateAnchor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.symbolAvoidEdges;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.symbolPlacement;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.symbolSpacing;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAnchor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textFont;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textHaloBlur;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textHaloColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textHaloWidth;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textJustify;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textKeepUpright;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textLetterSpacing;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textLineHeight;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textMaxAngle;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textMaxWidth;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textOffset;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textOpacity;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textOptional;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textPadding;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textPitchAlignment;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textRotate;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textRotationAlignment;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textTransform;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textTranslate;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textTranslateAnchor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
+import static com.mapbox.mapboxsdk.style.layers.Property.*;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
 /**
  * Basic smoke tests for SymbolLayer
@@ -347,8 +287,8 @@ public class SymbolLayerTest extends BaseTest {
         assertNotNull(layer);
 
         //Set and Get
-        layer.setProperties(iconTextFitPadding(new Float[]{0f, 0f, 0f, 0f}));
-        assertEquals((Float[]) layer.getIconTextFitPadding().getValue(), (Float[]) new Float[]{0f, 0f, 0f, 0f});
+        layer.setProperties(iconTextFitPadding(new Float[]{0f,0f,0f,0f}));
+        assertEquals((Float[]) layer.getIconTextFitPadding().getValue(), (Float[]) new Float[]{0f,0f,0f,0f});
     }
 
     @Test
@@ -457,8 +397,8 @@ public class SymbolLayerTest extends BaseTest {
         assertNotNull(layer);
 
         //Set and Get
-        layer.setProperties(iconOffset(new Float[]{0f, 0f}));
-        assertEquals((Float[]) layer.getIconOffset().getValue(), (Float[]) new Float[]{0f, 0f});
+        layer.setProperties(iconOffset(new Float[]{0f,0f}));
+        assertEquals((Float[]) layer.getIconOffset().getValue(), (Float[]) new Float[]{0f,0f});
     }
 
     @Test
@@ -809,8 +749,8 @@ public class SymbolLayerTest extends BaseTest {
         assertNotNull(layer);
 
         //Set and Get
-        layer.setProperties(textOffset(new Float[]{0f, 0f}));
-        assertEquals((Float[]) layer.getTextOffset().getValue(), (Float[]) new Float[]{0f, 0f});
+        layer.setProperties(textOffset(new Float[]{0f,0f}));
+        assertEquals((Float[]) layer.getTextOffset().getValue(), (Float[]) new Float[]{0f,0f});
     }
 
     @Test
@@ -1051,8 +991,8 @@ public class SymbolLayerTest extends BaseTest {
         assertNotNull(layer);
 
         //Set and Get
-        layer.setProperties(iconTranslate(new Float[]{0f, 0f}));
-        assertEquals((Float[]) layer.getIconTranslate().getValue(), (Float[]) new Float[]{0f, 0f});
+        layer.setProperties(iconTranslate(new Float[]{0f,0f}));
+        assertEquals((Float[]) layer.getIconTranslate().getValue(), (Float[]) new Float[]{0f,0f});
     }
 
     @Test
@@ -1249,8 +1189,8 @@ public class SymbolLayerTest extends BaseTest {
         assertNotNull(layer);
 
         //Set and Get
-        layer.setProperties(textTranslate(new Float[]{0f, 0f}));
-        assertEquals((Float[]) layer.getTextTranslate().getValue(), (Float[]) new Float[]{0f, 0f});
+        layer.setProperties(textTranslate(new Float[]{0f,0f}));
+        assertEquals((Float[]) layer.getTextTranslate().getValue(), (Float[]) new Float[]{0f,0f});
     }
 
     @Test
@@ -1276,8 +1216,8 @@ public class SymbolLayerTest extends BaseTest {
     }
 
 
-    @After
-    public void unregisterIntentServiceIdlingResource() {
-        Espresso.unregisterIdlingResources(idlingResource);
-    }
+   @After
+   public void unregisterIntentServiceIdlingResource() {
+       Espresso.unregisterIdlingResources(idlingResource);
+   }
 }

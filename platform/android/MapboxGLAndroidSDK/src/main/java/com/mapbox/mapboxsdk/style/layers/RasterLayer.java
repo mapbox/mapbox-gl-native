@@ -97,4 +97,8 @@ public class RasterLayer extends Layer {
 
     private native Object nativeGetRasterFadeDuration();
 
+
+    @Override
+    protected native void finalize() throws Throwable;
+
 }
