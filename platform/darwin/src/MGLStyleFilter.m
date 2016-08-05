@@ -2,6 +2,4 @@
 
 @implementation MGLStyleFilter
 
-#warning not yet implemented
-
 @end

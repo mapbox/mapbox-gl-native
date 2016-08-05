@@ -105,7 +105,6 @@ static NSURL *MGLStyleURL_emerald;
 
 - (Class)classFromLayer:(mbgl::style::Layer *)layer
 {
-#warning Improve this
     if (layer->is<mbgl::style::FillLayer>()) {
         return MGLFillStyleLayer.class;
     } else if (layer->is<mbgl::style::LineLayer>()) {
@@ -141,11 +140,6 @@ static NSURL *MGLStyleURL_emerald;
 - (void)removeSource:(MGLSource *)source
 {
     self.mapView.mbglMap->removeSource(source.sourceIdentifier.UTF8String);
-}
-
-- (void)tempUpdateStyleAndClasses
-{
-    self.mapView.mbglMap->update(mbgl::Update::RecalculateStyle | mbgl::Update::Classes);
 }
 
 @end

@@ -502,8 +502,6 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" sourceIdentifier:@"ams"];
     fillLayer.fillColor = [NSColor purpleColor];
     [self.mapView.style addLayer:fillLayer];
-    
-    [self.mapView.style tempUpdateStyleAndClasses];
 }
 
 - (IBAction)dropPin:(NSMenuItem *)sender {

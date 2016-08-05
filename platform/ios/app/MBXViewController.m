@@ -458,8 +458,6 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     
     MGLFillStyleLayer *parkLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"park"];
     [self.mapView.style removeLayer:parkLayer];
-    
-    [self.mapView.style tempUpdateStyleAndClasses];
 }
 
 - (void)styleSymbolLayer

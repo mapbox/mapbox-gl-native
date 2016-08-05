@@ -162,9 +162,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
-//- (instancetype)init NS_UNAVAILABLE;
-
-#pragma mark - Runtime style API
+#pragma mark - Runtime styling API
 
 - (id <MGLStyleLayer>)layerWithIdentifier:(NSString *)identifier;
 
@@ -175,8 +173,6 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 - (void)addSource:(MGLSource *)source;
 
 - (void)removeSource:(MGLSource *)source;
-
-- (void)tempUpdateStyleAndClasses;
 
 @end
 
