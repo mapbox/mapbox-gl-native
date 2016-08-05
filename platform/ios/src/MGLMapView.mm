@@ -1392,10 +1392,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         return;
     }
 
+    CGPoint tapPoint = [singleTap locationInView:self];
+
     if (self.userLocationVisible)
     {
         CGPoint tapPointForUserLocation = [singleTap locationInView:self.userLocationAnnotationView];
         CALayer *hitLayer = [self.userLocationAnnotationView.hitTestLayer hitTest:tapPointForUserLocation];
+
         if (hitLayer)
         {
             if ( ! _userLocationAnnotationIsSelected)
@@ -1406,8 +1409,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         }
     }
 
-    CGPoint tapPoint = [singleTap locationInView:self];
-   
     // Handle the case of an offset annotation view by converting the tap point to be the geo location
     // of the annotation itself that the view represents
     for (MGLAnnotationView *view in self.annotationContainerView.annotationViews)

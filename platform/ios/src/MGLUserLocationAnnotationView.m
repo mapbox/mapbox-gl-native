@@ -11,6 +11,7 @@
 @interface MGLUserLocationAnnotationView()
 @property (nonatomic, weak, nullable) MGLMapView *mapView;
 @property (nonatomic, weak, nullable) MGLUserLocation *userLocation;
+@property (nonatomic, weak) CALayer *hitTestLayer;
 @end
 
 @implementation MGLUserLocationAnnotationView {
@@ -33,6 +34,11 @@
 - (void)didUpdateUserLocation:(MGLUserLocation *)userLocation
 {
     // Left blank intentionally. Subclasses may override this in order to customize UI based on course, speed etc.
+}
+
+- (CALayer *)hitTestLayer
+{
+    return self.layer.presentationLayer;
 }
 
 - (BOOL)isAccessibilityElement
