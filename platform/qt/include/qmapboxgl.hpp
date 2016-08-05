@@ -199,8 +199,8 @@ public:
     void setMargins(const QMargins &margins);
     QMargins margins() const;
 
-    void addSource(const QString& sourceID, const QVariant& value);
-    void removeSource(const QString& sourceID);
+    void addSource(const QString &sourceID, const QVariantMap& params);
+    void removeSource(const QString &sourceID);
 
     void addCustomLayer(const QString &id,
         QMapbox::CustomLayerInitializeFunction,
@@ -208,7 +208,7 @@ public:
         QMapbox::CustomLayerDeinitializeFunction,
         void* context,
         char* before = NULL);
-    void addLayer(const QVariant &value);
+    void addLayer(const QVariantMap &params);
     void removeLayer(const QString &id);
 
     void setFilter(const QString &layer, const QVariant &filter);
