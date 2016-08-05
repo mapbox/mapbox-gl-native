@@ -5,6 +5,7 @@
 
 #import "MGLTypes.h"
 #import "MGLStyleAttributeValue.h"
+#import "MGLBaseStyleLayer.h"
 
 typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineCap) {
     MGLLineStyleLayerLineCapButt,
@@ -23,7 +24,7 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
     MGLLineStyleLayerLineTranslateAnchorViewport,
 };
 
-@interface MGLLineStyleLayer : NSObject <MGLStyleLayer>
+@interface MGLLineStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
 
 #pragma mark - Accessing the Layout Attributes
 

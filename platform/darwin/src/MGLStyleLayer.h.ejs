@@ -10,6 +10,7 @@
 
 #import "MGLTypes.h"
 #import "MGLStyleAttributeValue.h"
+#import "MGLBaseStyleLayer.h"
 
 <% for (const property of layoutProperties) { -%>
 <% if (property.type == "enum") { -%>
@@ -31,7 +32,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 
 <% } -%>
 <% } -%>
-@interface MGL<%- camelize(type) %>StyleLayer : NSObject <MGLStyleLayer>
+@interface MGL<%- camelize(type) %>StyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
 
 <% if (layoutProperties.length) { -%>
 #pragma mark - Accessing the Layout Attributes

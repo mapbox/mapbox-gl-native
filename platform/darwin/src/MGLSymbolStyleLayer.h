@@ -5,6 +5,7 @@
 
 #import "MGLTypes.h"
 #import "MGLStyleAttributeValue.h"
+#import "MGLBaseStyleLayer.h"
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerSymbolPlacement) {
     MGLSymbolStyleLayerSymbolPlacementPoint,
@@ -67,7 +68,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
     MGLSymbolStyleLayerTextTranslateAnchorViewport,
 };
 
-@interface MGLSymbolStyleLayer : NSObject <MGLStyleLayer>
+@interface MGLSymbolStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
 
 #pragma mark - Accessing the Layout Attributes
 

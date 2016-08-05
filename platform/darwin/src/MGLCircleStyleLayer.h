@@ -5,6 +5,7 @@
 
 #import "MGLTypes.h"
 #import "MGLStyleAttributeValue.h"
+#import "MGLBaseStyleLayer.h"
 
 typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCircleTranslateAnchor) {
     MGLCircleStyleLayerCircleTranslateAnchorMap,
@@ -16,7 +17,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
     MGLCircleStyleLayerCirclePitchScaleViewport,
 };
 
-@interface MGLCircleStyleLayer : NSObject <MGLStyleLayer>
+@interface MGLCircleStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
 
 #pragma mark - Accessing the Paint Attributes
 

@@ -5,8 +5,9 @@
 
 #import "MGLTypes.h"
 #import "MGLStyleAttributeValue.h"
+#import "MGLBaseStyleLayer.h"
 
-@interface MGLBackgroundStyleLayer : NSObject <MGLStyleLayer>
+@interface MGLBackgroundStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
 
 #pragma mark - Accessing the Paint Attributes
 

@@ -5,13 +5,14 @@
 
 #import "MGLTypes.h"
 #import "MGLStyleAttributeValue.h"
+#import "MGLBaseStyleLayer.h"
 
 typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
     MGLFillStyleLayerFillTranslateAnchorMap,
     MGLFillStyleLayerFillTranslateAnchorViewport,
 };
 
-@interface MGLFillStyleLayer : NSObject <MGLStyleLayer>
+@interface MGLFillStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
 
 #pragma mark - Accessing the Paint Attributes
 
