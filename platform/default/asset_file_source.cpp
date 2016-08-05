@@ -8,7 +8,6 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 namespace mbgl {
 
@@ -34,7 +33,7 @@ public:
         struct stat buf;
         int result = stat(path.c_str(), &buf);
 
-        if (result == 0 && S_ISDIR(buf.st_mode)) {
+        if (result == 0 && (S_IFDIR & buf.st_mode)) {
             response.error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound);
         } else if (result == -1 && errno == ENOENT) {
             response.error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound);
