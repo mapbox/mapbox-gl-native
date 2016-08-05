@@ -28,9 +28,24 @@ QQuickMapboxGLRenderer::~QQuickMapboxGLRenderer()
 
 void QQuickMapboxGLRenderer::onMapChanged(QMapboxGL::MapChange change)
 {
-    if (change == QMapboxGL::MapChangeDidFinishLoadingMap) {
+    auto onMapChangeWillStartLoadingMap = [&]() {
+        m_styleLoaded = false;
+    };
+
+    auto onMapChangeDidFinishLoadingMap = [&]() {
         m_styleLoaded = true;
-        update();
+        emit styleChanged();
+    };
+
+    switch (change) {
+    case QMapboxGL::MapChangeWillStartLoadingMap:
+        onMapChangeWillStartLoadingMap();
+        break;
+    case QMapboxGL::MapChangeDidFinishLoadingMap:
+        onMapChangeDidFinishLoadingMap();
+        break;
+    default:
+        break;
     }
 }
 

@@ -23,7 +23,9 @@ QQuickMapboxGL::~QQuickMapboxGL()
 
 QQuickFramebufferObject::Renderer *QQuickMapboxGL::createRenderer() const
 {
-    return new QQuickMapboxGLRenderer();
+    QQuickMapboxGLRenderer *renderer = new QQuickMapboxGLRenderer();
+    connect(renderer, SIGNAL(styleChanged()), this, SIGNAL(styleChanged()));
+    return renderer;
 }
 
 void QQuickMapboxGL::setPlugin(QDeclarativeGeoServiceProvider *)
@@ -267,11 +269,13 @@ void QQuickMapboxGL::itemChange(QQuickItem::ItemChange change, const QQuickItem:
     case QQuickItem::ItemChildAddedChange:
         if (QQuickMapboxGLStyleProperty *property = qobject_cast<QQuickMapboxGLStyleProperty *>(value.item)) {
             connect(property, SIGNAL(updated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
+            connect(this, SIGNAL(styleChanged()), property, SLOT(checkUpdated()));
         }
         break;
     case QQuickItem::ItemChildRemovedChange:
         if (QQuickMapboxGLStyleProperty *property = qobject_cast<QQuickMapboxGLStyleProperty *>(value.item)) {
             disconnect(property, SIGNAL(updated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
+            disconnect(this, SIGNAL(styleChanged()), property, SLOT(checkUpdated()));
         }
     default:
         break;

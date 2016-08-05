@@ -28,6 +28,9 @@ public:
     void setValue(const QVariant &);
     QVariant value() const;
 
+public slots:
+    void checkUpdated();
+
 signals:
     void layerChanged(const QString &);
     void propertyChanged(const QString &);
@@ -36,7 +39,6 @@ signals:
 
 protected:
     QQuickMapboxGLStyleProperty(QQuickItem *parent, Type);
-    void checkUpdated();
 
     QVariantMap m_map;
 };

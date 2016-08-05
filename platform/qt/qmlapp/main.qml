@@ -277,6 +277,20 @@ ApplicationWindow {
                 onClicked: waterColorDialog.open()
             }
 
+            Button {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: "Light style"
+                onClicked: { mapStreets.style = "mapbox://styles/mapbox/light-v9" }
+            }
+
+            Button {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: "Dark style"
+                onClicked: { mapStreets.style = "mapbox://styles/mapbox/dark-v9" }
+            }
+
             CheckBox {
                 id: roadLabel
                 anchors.left: parent.left

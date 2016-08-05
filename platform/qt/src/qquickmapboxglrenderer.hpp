@@ -25,6 +25,7 @@ public:
 
 signals:
     void centerChanged(const QGeoCoordinate &);
+    void styleChanged();
 
 public slots:
     void onMapChanged(QMapboxGL::MapChange);
