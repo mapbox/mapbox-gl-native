@@ -2,8 +2,9 @@ package com.mapbox.mapboxsdk.style.layers;
 
 /**
  * Custom layer.
- * <p/>
+ * <p>
  * Experimental feature. Do not use.
+ * </p>
  */
 public class CustomLayer extends Layer {
 
