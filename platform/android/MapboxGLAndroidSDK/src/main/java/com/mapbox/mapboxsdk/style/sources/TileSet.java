@@ -157,8 +157,9 @@ public class TileSet {
      * If the array doesn't contain any entries, interactivity is not supported
      * for this tileset.     See https:github.com/mapbox/utfgrid-spec/tree/master/1.2
      * for the interactivity specification.
-     * <p/>
+     * <p>
      * Example: "http:localhost:8888/admin/1.0.0/broadband/{z}/{x}/{y}.grid.json"
+     * </p>
      */
     public void setGrids(String... grids) {
         this.grids = grids;
@@ -176,8 +177,9 @@ public class TileSet {
      * All endpoints MUST return the same content for the same URL.
      * If the array doesn't contain any entries, then no data is present in
      * the map.
-     * <p/>
+     * <p>
      * "http:localhost:8888/admin/data.geojson"
+     * </p>
      */
     public void setData(String... data) {
         this.data = data;
@@ -188,7 +190,7 @@ public class TileSet {
     }
 
     /**
-     * 0. >= 0, <= 22. An integer specifying the minimum zoom level.
+     * 0. &gt;= 0, &lt; 22. An integer specifying the minimum zoom level.
      */
     public void setMinZoom(float minZoom) {
         this.minZoom = minZoom;
@@ -199,7 +201,7 @@ public class TileSet {
     }
 
     /**
-     * 0. >= 0, <= 22. An integer specifying the maximum zoom level.
+     * 0. &gt;= 0, &lt;= 22. An integer specifying the maximum zoom level.
      */
     public void setMaxZoom(float maxZoom) {
         this.maxZoom = maxZoom;

@@ -76,6 +76,7 @@ public class OfflineManager {
     public interface CreateOfflineRegionCallback {
         /**
          * Receives the newly created offline region
+         *
          * @param offlineRegion
          */
         void onCreate(OfflineRegion offlineRegion);
@@ -95,7 +96,7 @@ public class OfflineManager {
     private OfflineManager(Context context) {
         // Get a pointer to the DefaultFileSource instance
         String assetRoot = getDatabasePath(context);
-        String cachePath = assetRoot  + File.separator + DATABASE_NAME;
+        String cachePath = assetRoot + File.separator + DATABASE_NAME;
         mDefaultFileSourcePtr = createDefaultFileSource(cachePath, assetRoot, DEFAULT_MAX_CACHE_SIZE);
 
         if (MapboxAccountManager.getInstance() != null) {
@@ -142,11 +143,12 @@ public class OfflineManager {
     }
 
     /**
-     *  Checks if external storage is available to at least read. In order for this to work, make
-     *  sure you include <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-     *  (or WRITE_EXTERNAL_STORAGE) for API level < 18 in your app Manifest.
-     *
-     *  Code from https://developer.android.com/guide/topics/data/data-storage.html#filesExternal
+     * Checks if external storage is available to at least read. In order for this to work, make
+     * sure you include &lt;uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /&gt;
+     * (or WRITE_EXTERNAL_STORAGE) for API level &lt; 18 in your app Manifest.
+     * <p>
+     * Code from https://developer.android.com/guide/topics/data/data-storage.html#filesExternal
+     * </p>
      */
     public static boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
@@ -190,8 +192,8 @@ public class OfflineManager {
 
     /**
      * Access token getter/setter
-     * @param accessToken
      *
+     * @param accessToken
      * @deprecated As of release 4.1.0, replaced by {@link MapboxAccountManager#start(Context, String)} ()}
      */
     @Deprecated
@@ -201,8 +203,8 @@ public class OfflineManager {
 
     /**
      * Get Access Token
-     * @return Access Token
      *
+     * @return Access Token
      * @deprecated As of release 4.1.0, replaced by {@link MapboxAccountManager#getAccessToken()}
      */
     @Deprecated
@@ -220,9 +222,10 @@ public class OfflineManager {
 
     /**
      * Retrieve all regions in the offline database.
-     *
+     * <p>
      * The query will be executed asynchronously and the results passed to the given
      * callback on the main thread.
+     * </p>
      */
     public void listOfflineRegions(@NonNull final ListOfflineRegionsCallback callback) {
         listOfflineRegions(mDefaultFileSourcePtr, new ListOfflineRegionsCallback() {
@@ -250,13 +253,15 @@ public class OfflineManager {
 
     /**
      * Create an offline region in the database.
-     *
+     * <p>
      * When the initial database queries have completed, the provided callback will be
      * executed on the main thread.
-     *
+     * </p>
+     * <p>
      * Note that the resulting region will be in an inactive download state; to begin
      * downloading resources, call `OfflineRegion.setDownloadState(DownloadState.STATE_ACTIVE)`,
      * optionally registering an `OfflineRegionObserver` beforehand.
+     * </p>
      */
     public void createOfflineRegion(
             @NonNull OfflineRegionDefinition definition,
@@ -303,6 +308,7 @@ public class OfflineManager {
             String cachePath, String assetRoot, long maximumCacheSize);
 
     private native void setAccessToken(long defaultFileSourcePtr, String accessToken);
+
     private native String getAccessToken(long defaultFileSourcePtr);
 
     private native void listOfflineRegions(
