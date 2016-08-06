@@ -30,7 +30,7 @@
 #include <cmath>
 #include <algorithm>
 
-using namespace CSSColorParser;
+namespace CSSColorParser {
 
 // http://www.w3.org/TR/css3-color/
 struct NamedColor { const char *const name; const Color color; };
@@ -180,7 +180,7 @@ std::vector<std::string> split(const std::string& s, char delim) {
     return elems;
 }
 
-Color CSSColorParser::parse(const std::string& css_str) {
+Color parse(const std::string& css_str) {
     std::string str = css_str;
 
     // Remove all whitespace, not compliant, but should just be more accepting.
@@ -288,3 +288,5 @@ Color CSSColorParser::parse(const std::string& css_str) {
 
     return {};
 }
+
+} // namespace CSSColorParser

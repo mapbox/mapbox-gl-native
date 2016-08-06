@@ -2,6 +2,8 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Color;
 
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+
 /**
  * Polyline is a geometry feature with an unclosed list of coordinates drawn as a line
  */
@@ -14,10 +16,20 @@ public final class Polyline extends MultiPoint {
         super();
     }
 
+    /**
+     * Returns the Polyline tint color.
+     *
+     * @return the tint color
+     */
     public int getColor() {
         return color;
     }
 
+    /**
+     * Returns the Polyline width.
+     *
+     * @return the width
+     */
     public float getWidth() {
         return width;
     }
@@ -27,8 +39,9 @@ public final class Polyline extends MultiPoint {
      *
      * @param color - the color in ARGB format
      */
-    void setColor(int color) {
+    public void setColor(int color) {
         this.color = color;
+        update();
     }
 
     /**
@@ -36,7 +49,16 @@ public final class Polyline extends MultiPoint {
      *
      * @param width in pixels
      */
-    void setWidth(float width) {
+    public void setWidth(float width) {
         this.width = width;
+        update();
+    }
+
+    @Override
+    void update() {
+        MapboxMap mapboxMap = getMapboxMap();
+        if (mapboxMap != null) {
+            mapboxMap.updatePolyline(this);
+        }
     }
 }

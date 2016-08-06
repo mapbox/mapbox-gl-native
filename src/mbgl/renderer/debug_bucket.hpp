@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/tile/tile_data.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/geometry/debug_font_buffer.hpp>
 #include <mbgl/geometry/vao.hpp>
@@ -8,11 +7,12 @@
 
 namespace mbgl {
 
+class OverscaledTileID;
 class PlainShader;
 
 namespace gl {
 class ObjectStore;
-}
+} // namespace gl
 
 class DebugBucket : private util::noncopyable {
 public:

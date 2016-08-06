@@ -1,2 +1,0 @@
-deb http://llvm.org/apt/precise/ llvm-toolchain-precise main
-deb-src http://llvm.org/apt/precise/ llvm-toolchain-precise main

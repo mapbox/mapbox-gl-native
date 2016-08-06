@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef DEBUG
+#ifndef NDEBUG
 
 #include <thread>
 #define MBGL_STORE_THREAD(tid) const std::thread::id tid = std::this_thread::get_id();

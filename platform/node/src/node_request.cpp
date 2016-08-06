@@ -1,14 +1,28 @@
 #include "node_request.hpp"
+#include "node_map.hpp"
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/chrono.hpp>
 
 #include <cmath>
-#include <iostream>
 
 namespace node_mbgl {
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-// Static Node Methods
+NodeRequest::NodeRequest(
+    NodeMap* target_,
+    mbgl::FileSource::Callback callback_)
+    : AsyncWorker(nullptr),
+    target(target_),
+    callback(std::move(callback_)) {
+}
+
+NodeRequest::~NodeRequest() {
+    // When this object gets garbage collected, make sure that the
+    // AsyncRequest can no longer attempt to remove the callback function
+    // this object was holding (it can't be fired anymore).
+    if (asyncRequest) {
+        asyncRequest->request = nullptr;
+    }
+}
 
 Nan::Persistent<v8::Function> NodeRequest::constructor;
 
@@ -19,73 +33,50 @@ NAN_MODULE_INIT(NodeRequest::Init) {
     tpl->SetClassName(Nan::New("Request").ToLocalChecked());
 
     constructor.Reset(tpl->GetFunction());
+
+    // TODO: Remove this from the public JavaScript API
     Nan::Set(target, Nan::New("Request").ToLocalChecked(), tpl->GetFunction());
 }
 
-NAN_METHOD(NodeRequest::New) {
-    auto req = new NodeRequest(*reinterpret_cast<mbgl::FileSource::Callback*>(info[0].As<v8::External>()->Value()));
-    req->Wrap(info.This());
+void NodeRequest::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    auto target = reinterpret_cast<NodeMap*>(info[0].As<v8::External>()->Value());
+    auto callback = reinterpret_cast<mbgl::FileSource::Callback*>(info[1].As<v8::External>()->Value());
+
+    auto request = new NodeRequest(target, *callback);
+
+    request->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
 }
 
-v8::Handle<v8::Object> NodeRequest::Create(const mbgl::Resource& resource, mbgl::FileSource::Callback callback) {
-    Nan::EscapableHandleScope scope;
-
-    v8::Local<v8::Value> argv[] = {
-        Nan::New<v8::External>(const_cast<mbgl::FileSource::Callback*>(&callback))
-    };
-    auto instance = Nan::New(constructor)->NewInstance(1, argv);
-
-    Nan::Set(instance, Nan::New("url").ToLocalChecked(), Nan::New(resource.url).ToLocalChecked());
-    Nan::Set(instance, Nan::New("kind").ToLocalChecked(), Nan::New<v8::Integer>(int(resource.kind)));
-
-    return scope.Escape(instance);
-}
-
-NAN_METHOD(NodeRequest::Respond) {
-    using Error = mbgl::Response::Error;
-
+void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     // Move out of the object so callback() can only be fired once.
     auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(info.Data().As<v8::Object>());
     auto callback = std::move(request->callback);
     if (!callback) {
-        info.GetReturnValue().SetUndefined();
-        return;
+        return info.GetReturnValue().SetUndefined();
     }
 
     mbgl::Response response;
 
     if (info.Length() < 1) {
         response.noContent = true;
+    } else if (info[0]->IsObject()) {
+        auto err = Nan::To<v8::Object>(info[0]).ToLocalChecked();
+        auto msg = Nan::New("message").ToLocalChecked();
 
-    } else if (info[0]->BooleanValue()) {
-        std::unique_ptr<Nan::Utf8String> message;
-
-        // Store the error string.
-        if (info[0]->IsObject()) {
-            auto err = info[0]->ToObject();
-            if (Nan::Has(err, Nan::New("message").ToLocalChecked()).FromJust()) {
-                message = std::make_unique<Nan::Utf8String>(
-                    Nan::Get(err, Nan::New("message").ToLocalChecked())
-                        .ToLocalChecked()
-                        ->ToString());
-            }
+        if (Nan::Has(err, msg).FromJust()) {
+            request->SetErrorMessage(*Nan::Utf8String(
+                Nan::Get(err, msg).ToLocalChecked()));
         }
-
-        if (!message) {
-            message = std::make_unique<Nan::Utf8String>(info[0]->ToString());
-        }
-        response.error = std::make_unique<Error>(
-            Error::Reason::Other, std::string{ **message, size_t(message->length()) });
-
+    } else if (info[0]->IsString()) {
+        request->SetErrorMessage(*Nan::Utf8String(info[0]));
     } else if (info.Length() < 2 || !info[1]->IsObject()) {
         return Nan::ThrowTypeError("Second argument must be a response object");
-
     } else {
-        auto res = info[1]->ToObject();
+        auto res = Nan::To<v8::Object>(info[1]).ToLocalChecked();
 
         if (Nan::Has(res, Nan::New("modified").ToLocalChecked()).FromJust()) {
-            const double modified = Nan::Get(res, Nan::New("modified").ToLocalChecked()).ToLocalChecked()->ToNumber()->Value();
+            const double modified = Nan::To<double>(Nan::Get(res, Nan::New("modified").ToLocalChecked()).ToLocalChecked()).FromJust();
             if (!std::isnan(modified)) {
                 response.modified = mbgl::Timestamp{ mbgl::Seconds(
                     static_cast<mbgl::Seconds::rep>(modified / 1000)) };
@@ -93,7 +84,7 @@ NAN_METHOD(NodeRequest::Respond) {
         }
 
         if (Nan::Has(res, Nan::New("expires").ToLocalChecked()).FromJust()) {
-            const double expires = Nan::Get(res, Nan::New("expires").ToLocalChecked()).ToLocalChecked()->ToNumber()->Value();
+            const double expires = Nan::To<double>(Nan::Get(res, Nan::New("expires").ToLocalChecked()).ToLocalChecked()).FromJust();
             if (!std::isnan(expires)) {
                 response.expires = mbgl::Timestamp{ mbgl::Seconds(
                     static_cast<mbgl::Seconds::rep>(expires / 1000)) };
@@ -101,19 +92,16 @@ NAN_METHOD(NodeRequest::Respond) {
         }
 
         if (Nan::Has(res, Nan::New("etag").ToLocalChecked()).FromJust()) {
-            auto etagHandle = Nan::Get(res, Nan::New("etag").ToLocalChecked()).ToLocalChecked();
-            if (etagHandle->BooleanValue()) {
-                const Nan::Utf8String etag { etagHandle->ToString() };
-                response.etag = std::string { *etag, size_t(etag.length()) };
-            }
+            const Nan::Utf8String etag(Nan::Get(res, Nan::New("etag").ToLocalChecked()).ToLocalChecked());
+            response.etag = std::string { *etag, size_t(etag.length()) };
         }
 
         if (Nan::Has(res, Nan::New("data").ToLocalChecked()).FromJust()) {
-            auto dataHandle = Nan::Get(res, Nan::New("data").ToLocalChecked()).ToLocalChecked();
-            if (node::Buffer::HasInstance(dataHandle)) {
+            auto data = Nan::Get(res, Nan::New("data").ToLocalChecked()).ToLocalChecked();
+            if (node::Buffer::HasInstance(data)) {
                 response.data = std::make_shared<std::string>(
-                    node::Buffer::Data(dataHandle),
-                    node::Buffer::Length(dataHandle)
+                    node::Buffer::Data(data),
+                    node::Buffer::Length(data)
                 );
             } else {
                 return Nan::ThrowTypeError("Response data must be a Buffer");
@@ -121,39 +109,43 @@ NAN_METHOD(NodeRequest::Respond) {
         }
     }
 
+    if (request->ErrorMessage()) {
+        response.error = std::make_unique<mbgl::Response::Error>(
+            mbgl::Response::Error::Reason::Other,
+            request->ErrorMessage()
+        );
+    }
+
     // Send the response object to the NodeFileSource object
     callback(response);
     info.GetReturnValue().SetUndefined();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-// Instance
+void NodeRequest::Execute() {
+    // Enter a new v8::Context to avoid leaking v8::FunctionTemplate
+    // from Nan::New<v8::Function>
+    v8::Local<v8::Context> context = v8::Context::New(v8::Isolate::GetCurrent());
+    v8::Context::Scope scope(context);
+
+    v8::Local<v8::Value> argv[] = { handle(), Nan::New<v8::Function>(NodeRequest::HandleCallback, handle()) };
+
+    Nan::MakeCallback(Nan::To<v8::Object>(target->handle()->GetInternalField(1)).ToLocalChecked(), "request", 2, argv);
+}
 
 NodeRequest::NodeAsyncRequest::NodeAsyncRequest(NodeRequest* request_) : request(request_) {
     assert(request);
-    // Make sure the JS object has a pointer to this so that it can remove its pointer in the
-    // destructor
+
+    // Make sure the JS object has a pointer to this so that it can remove
+    // its pointer in the destructor
     request->asyncRequest = this;
 }
 
 NodeRequest::NodeAsyncRequest::~NodeAsyncRequest() {
     if (request) {
-        // Remove the callback function because the AsyncRequest was canceled and we are no longer
-        // interested in the result.
+        // Remove the callback function because the AsyncRequest was
+        // canceled and we are no longer interested in the result.
         request->callback = {};
         request->asyncRequest = nullptr;
-    }
-}
-
-NodeRequest::NodeRequest(mbgl::FileSource::Callback callback_)
-    : callback(callback_) {
-}
-
-NodeRequest::~NodeRequest() {
-    // When this object gets garbage collected, make sure that the AsyncRequest can no longer
-    // attempt to remove the callback function this object was holding (it can't be fired anymore).
-    if (asyncRequest) {
-        asyncRequest->request = nullptr;
     }
 }
 

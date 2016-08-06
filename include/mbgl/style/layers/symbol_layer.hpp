@@ -15,14 +15,13 @@ namespace style {
 
 class SymbolLayer : public Layer {
 public:
-    SymbolLayer(const std::string& layerID);
+    SymbolLayer(const std::string& layerID, const std::string& sourceID);
     ~SymbolLayer() final;
 
     // Source
-
-    void setSource(const std::string& sourceID, const std::string& sourceLayer);
     const std::string& getSourceID() const;
     const std::string& getSourceLayer() const;
+    void setSourceLayer(const std::string& sourceLayer);
 
     void setFilter(const Filter&);
     const Filter& getFilter() const;
@@ -47,11 +46,17 @@ public:
     PropertyValue<bool> getIconOptional() const;
     void setIconOptional(PropertyValue<bool>);
 
-    PropertyValue<RotationAlignmentType> getIconRotationAlignment() const;
-    void setIconRotationAlignment(PropertyValue<RotationAlignmentType>);
+    PropertyValue<AlignmentType> getIconRotationAlignment() const;
+    void setIconRotationAlignment(PropertyValue<AlignmentType>);
 
     PropertyValue<float> getIconSize() const;
     void setIconSize(PropertyValue<float>);
+
+    PropertyValue<IconTextFitType> getIconTextFit() const;
+    void setIconTextFit(PropertyValue<IconTextFitType>);
+
+    PropertyValue<std::array<float, 4>> getIconTextFitPadding() const;
+    void setIconTextFitPadding(PropertyValue<std::array<float, 4>>);
 
     PropertyValue<std::string> getIconImage() const;
     void setIconImage(PropertyValue<std::string>);
@@ -68,8 +73,11 @@ public:
     PropertyValue<std::array<float, 2>> getIconOffset() const;
     void setIconOffset(PropertyValue<std::array<float, 2>>);
 
-    PropertyValue<RotationAlignmentType> getTextRotationAlignment() const;
-    void setTextRotationAlignment(PropertyValue<RotationAlignmentType>);
+    PropertyValue<AlignmentType> getTextPitchAlignment() const;
+    void setTextPitchAlignment(PropertyValue<AlignmentType>);
+
+    PropertyValue<AlignmentType> getTextRotationAlignment() const;
+    void setTextRotationAlignment(PropertyValue<AlignmentType>);
 
     PropertyValue<std::string> getTextField() const;
     void setTextField(PropertyValue<std::string>);
@@ -125,46 +133,46 @@ public:
     // Paint properties
 
     PropertyValue<float> getIconOpacity() const;
-    void setIconOpacity(PropertyValue<float>);
+    void setIconOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
 
     PropertyValue<Color> getIconColor() const;
-    void setIconColor(PropertyValue<Color>);
+    void setIconColor(PropertyValue<Color>, const optional<std::string>& klass = {});
 
     PropertyValue<Color> getIconHaloColor() const;
-    void setIconHaloColor(PropertyValue<Color>);
+    void setIconHaloColor(PropertyValue<Color>, const optional<std::string>& klass = {});
 
     PropertyValue<float> getIconHaloWidth() const;
-    void setIconHaloWidth(PropertyValue<float>);
+    void setIconHaloWidth(PropertyValue<float>, const optional<std::string>& klass = {});
 
     PropertyValue<float> getIconHaloBlur() const;
-    void setIconHaloBlur(PropertyValue<float>);
+    void setIconHaloBlur(PropertyValue<float>, const optional<std::string>& klass = {});
 
     PropertyValue<std::array<float, 2>> getIconTranslate() const;
-    void setIconTranslate(PropertyValue<std::array<float, 2>>);
+    void setIconTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
 
     PropertyValue<TranslateAnchorType> getIconTranslateAnchor() const;
-    void setIconTranslateAnchor(PropertyValue<TranslateAnchorType>);
+    void setIconTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
 
     PropertyValue<float> getTextOpacity() const;
-    void setTextOpacity(PropertyValue<float>);
+    void setTextOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
 
     PropertyValue<Color> getTextColor() const;
-    void setTextColor(PropertyValue<Color>);
+    void setTextColor(PropertyValue<Color>, const optional<std::string>& klass = {});
 
     PropertyValue<Color> getTextHaloColor() const;
-    void setTextHaloColor(PropertyValue<Color>);
+    void setTextHaloColor(PropertyValue<Color>, const optional<std::string>& klass = {});
 
     PropertyValue<float> getTextHaloWidth() const;
-    void setTextHaloWidth(PropertyValue<float>);
+    void setTextHaloWidth(PropertyValue<float>, const optional<std::string>& klass = {});
 
     PropertyValue<float> getTextHaloBlur() const;
-    void setTextHaloBlur(PropertyValue<float>);
+    void setTextHaloBlur(PropertyValue<float>, const optional<std::string>& klass = {});
 
     PropertyValue<std::array<float, 2>> getTextTranslate() const;
-    void setTextTranslate(PropertyValue<std::array<float, 2>>);
+    void setTextTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
 
     PropertyValue<TranslateAnchorType> getTextTranslateAnchor() const;
-    void setTextTranslateAnchor(PropertyValue<TranslateAnchorType>);
+    void setTextTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
 
     // Private implementation
 

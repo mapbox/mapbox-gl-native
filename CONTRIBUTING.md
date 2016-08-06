@@ -16,6 +16,8 @@ If you want to contribute code:
 
 1. Prefix your commit messages with the platform(s) your changes affect: `[core]`, `[android]`, `[ios]`, `[macos]`, `[node]`, or `[qt]`.
 
+Please note the special instructions for contributing new source code files, asset files, or user-facing strings to the [iOS SDK](platform/ios/DEVELOPING.md#contributing) or [macOS SDK](platform/macos/DEVELOPING.md#contributing).
+
 # Code of conduct
 Everyone is invited to participate in Mapbox’s open source projects and public discussions: we want to create a welcoming and friendly environment. Harassment of participants or other unethical and unprofessional behavior will not be tolerated in our spaces. The [Contributor Covenant](http://contributor-covenant.org) applies to all projects under the Mapbox organization and we ask that you please read [the full text](http://contributor-covenant.org/version/1/2/0/).
 

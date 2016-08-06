@@ -15,14 +15,14 @@
 namespace mapbox {
 namespace util {
 template <> struct nth<0, mbgl::GeometryCoordinate> {
-    inline static int64_t get(const mbgl::GeometryCoordinate& t) { return t.x; };
+    static int64_t get(const mbgl::GeometryCoordinate& t) { return t.x; };
 };
 
 template <> struct nth<1, mbgl::GeometryCoordinate> {
-    inline static int64_t get(const mbgl::GeometryCoordinate& t) { return t.y; };
+    static int64_t get(const mbgl::GeometryCoordinate& t) { return t.y; };
 };
-}
-}
+} // namespace util
+} // namespace mapbox
 
 namespace mbgl {
 
@@ -33,8 +33,7 @@ struct GeometryTooLongException : std::exception {};
 FillBucket::FillBucket() {
 }
 
-FillBucket::~FillBucket() {
-}
+FillBucket::~FillBucket() = default;
 
 void FillBucket::addGeometry(const GeometryCollection& geometry) {
     for (auto& polygon : classifyRings(geometry)) {
@@ -96,7 +95,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
     }
 }
 
-void FillBucket::upload(gl::ObjectStore& store) {
+void FillBucket::upload(gl::ObjectStore& store, gl::Config&) {
     vertexBuffer.upload(store);
     triangleElementsBuffer.upload(store);
     lineElementsBuffer.upload(store);
@@ -106,10 +105,10 @@ void FillBucket::upload(gl::ObjectStore& store) {
 }
 
 void FillBucket::render(Painter& painter,
+                        PaintParameters& parameters,
                         const Layer& layer,
-                        const UnwrappedTileID& tileID,
-                        const mat4& matrix) {
-    painter.renderFill(*this, *layer.as<FillLayer>(), tileID, matrix);
+                        const RenderTile& tile) {
+    painter.renderFill(parameters, *this, *layer.as<FillLayer>(), tile);
 }
 
 bool FillBucket::hasData() const {
@@ -120,52 +119,52 @@ bool FillBucket::needsClipping() const {
     return true;
 }
 
-void FillBucket::drawElements(PlainShader& shader, gl::ObjectStore& store) {
+void FillBucket::drawElements(PlainShader& shader, gl::ObjectStore& store, bool overdraw) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
-        group->array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index, store);
+        group->array[overdraw ? 1 : 0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
-void FillBucket::drawElements(PatternShader& shader, gl::ObjectStore& store) {
+void FillBucket::drawElements(PatternShader& shader, gl::ObjectStore& store, bool overdraw) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
-        group->array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index, store);
+        group->array[overdraw ? 3 : 2].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
-void FillBucket::drawVertices(OutlineShader& shader, gl::ObjectStore& store) {
+void FillBucket::drawVertices(OutlineShader& shader, gl::ObjectStore& store, bool overdraw) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : lineGroups) {
         assert(group);
-        group->array[0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index, store);
+        group->array[overdraw ? 1 : 0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * lineElementsBuffer.itemSize;
     }
 }
 
-void FillBucket::drawVertices(OutlinePatternShader& shader, gl::ObjectStore& store) {
+void FillBucket::drawVertices(OutlinePatternShader& shader, gl::ObjectStore& store, bool overdraw) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : lineGroups) {
         assert(group);
-        group->array[1].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index, store);
+        group->array[overdraw? 3 : 2].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * lineElementsBuffer.itemSize;
     }
 }
 
-}
+} // namespace mbgl

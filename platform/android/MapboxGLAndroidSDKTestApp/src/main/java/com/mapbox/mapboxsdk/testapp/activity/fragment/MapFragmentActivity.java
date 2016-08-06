@@ -17,7 +17,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
 public class MapFragmentActivity extends AppCompatActivity {
 
@@ -40,7 +39,7 @@ public class MapFragmentActivity extends AppCompatActivity {
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
             MapboxMapOptions options = new MapboxMapOptions();
-            options.styleUrl(Style.getOutdoorsStyleUrl(AppConstant.STYLE_VERSION));
+            options.styleUrl(Style.OUTDOORS);
 
             options.scrollGesturesEnabled(false);
             options.zoomGesturesEnabled(false);

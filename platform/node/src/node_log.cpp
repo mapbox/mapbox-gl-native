@@ -1,6 +1,8 @@
 #include "node_log.hpp"
 #include "util/async_queue.hpp"
 
+#include <mbgl/util/enum.hpp>
+
 namespace node_mbgl {
 
 struct NodeLogObserver::LogMessage {
@@ -13,7 +15,7 @@ struct NodeLogObserver::LogMessage {
         : severity(severity_),
         event(event_),
         code(code_),
-        text(text_) {}
+        text(std::move(text_)) {}
 };
 
 NodeLogObserver::NodeLogObserver(v8::Local<v8::Object> target)
@@ -23,10 +25,10 @@ NodeLogObserver::NodeLogObserver(v8::Local<v8::Object> target)
           auto msg = Nan::New<v8::Object>();
 
           Nan::Set(msg, Nan::New("class").ToLocalChecked(),
-              Nan::New(mbgl::EventClass(message.event).c_str()).ToLocalChecked());
+              Nan::New(mbgl::Enum<mbgl::Event>::toString(message.event)).ToLocalChecked());
 
           Nan::Set(msg, Nan::New("severity").ToLocalChecked(),
-              Nan::New(mbgl::EventSeverityClass(message.severity).c_str()).ToLocalChecked());
+              Nan::New(mbgl::Enum<mbgl::EventSeverity>::toString(message.severity)).ToLocalChecked());
 
           if (message.code != -1) {
               Nan::Set(msg, Nan::New("code").ToLocalChecked(),
@@ -40,7 +42,7 @@ NodeLogObserver::NodeLogObserver(v8::Local<v8::Object> target)
 
           v8::Local<v8::Value> argv[] = { Nan::New("message").ToLocalChecked(), msg };
           auto handle = Nan::New<v8::Object>(module);
-          auto emit = Nan::Get(handle, Nan::New("emit").ToLocalChecked()).ToLocalChecked()->ToObject();
+          auto emit = Nan::To<v8::Object>(Nan::Get(handle, Nan::New("emit").ToLocalChecked()).ToLocalChecked()).ToLocalChecked();
           Nan::CallAsFunction(emit, handle, 2, argv);
       })) {
     Nan::HandleScope scope;
@@ -59,4 +61,4 @@ bool NodeLogObserver::onRecord(mbgl::EventSeverity severity, mbgl::Event event, 
     return true;
 }
 
-}
+} // namespace node_mbgl

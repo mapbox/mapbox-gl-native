@@ -9,7 +9,7 @@ namespace mbgl {
 
 auto infinity = std::numeric_limits<float>::infinity();
 
-CollisionTile::CollisionTile(PlacementConfig config_) : config(config_),
+CollisionTile::CollisionTile(PlacementConfig config_) : config(std::move(config_)),
     edges({{
         // left
         CollisionBox(Point<float>(0, 0), 0, -infinity, 0, infinity, infinity),

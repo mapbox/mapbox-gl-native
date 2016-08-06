@@ -35,5 +35,5 @@ public slots:
     void onWriteEvent(int fd);
 };
 
-}
-}
+} // namespace util
+} // namespace mbgl

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <mbgl/util/enum.hpp>
-
 #include <cstdint>
 
 namespace mbgl {
@@ -12,14 +10,6 @@ enum class EventSeverity : uint8_t {
     Warning,
     Error,
 };
-
-MBGL_DEFINE_ENUM_CLASS(EventSeverityClass, EventSeverity, {
-    { EventSeverity::Debug, "DEBUG" },
-    { EventSeverity::Info, "INFO" },
-    { EventSeverity::Warning, "WARNING" },
-    { EventSeverity::Error, "ERROR" },
-    { EventSeverity(-1), "UNKNOWN" },
-});
 
 enum class Event : uint8_t {
     General,
@@ -40,27 +30,6 @@ enum class Event : uint8_t {
     Glyph,
 };
 
-MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
-    { Event::General, "General" },
-    { Event::Setup, "Setup" },
-    { Event::Shader, "Shader" },
-    { Event::ParseStyle, "ParseStyle" },
-    { Event::ParseTile, "ParseTile" },
-    { Event::Render, "Render" },
-    { Event::Style, "Style" },
-    { Event::Database, "Database" },
-    { Event::HttpRequest, "HttpRequest" },
-    { Event::Sprite, "Sprite" },
-    { Event::Image, "Image" },
-    { Event::OpenGL, "OpenGL" },
-    { Event::JNI, "JNI" },
-    { Event::Android, "Android" },
-    { Event::Crash, "Crash" },
-    { Event::Glyph, "Glyph" },
-    { Event(-1), "Unknown" },
-});
-
-
 struct EventPermutation {
     const EventSeverity severity;
     const Event event;
@@ -71,7 +40,7 @@ struct EventPermutation {
 };
 
 constexpr EventSeverity disabledEventSeverities[] = {
-#if DEBUG
+#ifdef NDEBUG
     EventSeverity(-1) // Avoid zero size array
 #else
     EventSeverity::Debug

@@ -1,13 +1,14 @@
 #include <mbgl/test/fixture_log_observer.hpp>
 #include <mbgl/test/util.hpp>
+#include <mbgl/util/enum.hpp>
 
 namespace mbgl {
 
 FixtureLog::Message::Message(EventSeverity severity_,
                              Event event_,
                              int64_t code_,
-                             const std::string& msg_)
-    : severity(severity_), event(event_), code(code_), msg(msg_) {
+                             std::string msg_)
+    : severity(severity_), event(event_), code(code_), msg(std::move(msg_)) {
 }
 
 bool FixtureLog::Message::operator==(const Message& rhs) const {
@@ -96,7 +97,8 @@ std::vector<FixtureLog::Message> FixtureLogObserver::unchecked() const {
 }
 
 ::std::ostream& operator<<(::std::ostream& os, const FixtureLog::Message& message) {
-    os << "[\"" << message.severity << "\", \"" << message.event << "\"";
+    os << "[\"" << Enum<EventSeverity>::toString(message.severity) << "\", \"";
+    os << Enum<Event>::toString(message.event) << "\"";
     os << ", " << message.code;
     os << ", \"" << message.msg << "\"";
     return os << "]" << std::endl;

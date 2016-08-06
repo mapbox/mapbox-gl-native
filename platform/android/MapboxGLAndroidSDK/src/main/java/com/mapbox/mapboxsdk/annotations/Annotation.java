@@ -23,6 +23,7 @@ public abstract class Annotation implements Comparable<Annotation> {
      */
     private long id = -1; // -1 unless added to a MapView
     protected MapboxMap mapboxMap;
+    protected MapView mapView;
 
     protected Annotation() {
     }
@@ -66,6 +67,22 @@ public abstract class Annotation implements Comparable<Annotation> {
      */
     protected MapboxMap getMapboxMap() {
         return mapboxMap;
+    }
+
+    /**
+     * Don not use this method.  Used internally by the SDK.
+     */
+    public void setMapView(MapView mapView) {
+        this.mapView = mapView;
+    }
+
+    /**
+     * Gets the associated MapView
+     *
+     * @return The MapView
+     */
+    protected MapView getMapView() {
+        return mapView;
     }
 
     @Override

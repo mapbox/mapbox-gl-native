@@ -80,8 +80,8 @@ TEST(ThreadLocalStorage, AutoReclaim) {
 
     unsigned counter = 0;
 
-    DtorCounter* dtorCounter1 = new DtorCounter{ &counter };
-    DtorCounter* dtorCounter2 = new DtorCounter{ &counter };
+    auto dtorCounter1 = new DtorCounter{ &counter };
+    auto dtorCounter2 = new DtorCounter{ &counter };
 
     ThreadContext context = {"Test"};
 
@@ -91,5 +91,5 @@ TEST(ThreadLocalStorage, AutoReclaim) {
     thread1.reset();
     thread2.reset();
 
-    EXPECT_EQ(counter, 2);
+    EXPECT_EQ(counter, 2u);
 }

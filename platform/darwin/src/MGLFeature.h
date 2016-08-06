@@ -29,13 +29,23 @@ NS_ASSUME_NONNULL_BEGIN
  An object that uniquely identifies the feature in its containing
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  
- The value of this property is currently always an `NSNumber` object but may in
- the future be an instance of another class, such as `NSString`.
- 
  The identifier corresponds to the
  <a href="https://github.com/mapbox/vector-tile-spec/tree/master/2.1#42-features">feature identifier</a>
  (`id`) in the tile source. If the source does not specify the feature’s
- identifier, the value of this property is `nil`.
+ identifier, the value of this property is `nil`. If specified, the identifier
+ may be an integer, floating-point number, or string. These data types are
+ mapped to instances of the following Foundation classes:
+ 
+ <table>
+ <thead>
+ <tr><th>In the tile source</th><th>This property</th></tr>
+ </thead>
+ <tbody>
+ <tr><td>Integer</td>               <td><code>NSNumber</code> (use the <code>unsignedLongLongValue</code> or <code>longLongValue</code> property)</td></tr>
+ <tr><td>Floating-point number</td> <td><code>NSNumber</code> (use the <code>doubleValue</code> property)</td></tr>
+ <tr><td>String</td>                <td><code>NSString</code></td></tr>
+ </tbody>
+ </table>
  
  For details about the identifiers used in most Mapbox-provided styles, consult
  the

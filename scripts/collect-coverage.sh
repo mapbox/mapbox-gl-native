@@ -3,8 +3,8 @@
 set -e
 set -o pipefail
 
-if [ -z ${ENABLE_COVERAGE} ] ; then
-    echo "ENABLE_COVERAGE environment variable is not set, aborting."
+if [ -z ${WITH_COVERAGE} ] ; then
+    echo "WITH_COVERAGE environment variable is not set, aborting."
     exit 1
 fi
 
@@ -32,7 +32,7 @@ lcov \
     >/dev/null 2>&1
 
 # Run all unit tests
-make test-*
+make
 
 # Collect coverage data and save it into coverage.info
 echo "Collecting coverage data..."

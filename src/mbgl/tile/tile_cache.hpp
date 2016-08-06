@@ -8,7 +8,7 @@
 
 namespace mbgl {
 
-class TileData;
+class Tile;
 
 class TileCache {
 public:
@@ -16,13 +16,13 @@ public:
 
     void setSize(size_t);
     size_t getSize() const { return size; };
-    void add(const OverscaledTileID& key, std::unique_ptr<TileData> data);
-    std::unique_ptr<TileData> get(const OverscaledTileID& key);
+    void add(const OverscaledTileID& key, std::unique_ptr<Tile> data);
+    std::unique_ptr<Tile> get(const OverscaledTileID& key);
     bool has(const OverscaledTileID& key);
     void clear();
 
 private:
-    std::map<OverscaledTileID, std::unique_ptr<TileData>> tiles;
+    std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
     std::list<OverscaledTileID> orderedKeys;
 
     size_t size;

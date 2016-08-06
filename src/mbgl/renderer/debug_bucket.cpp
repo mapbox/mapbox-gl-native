@@ -8,7 +8,7 @@
 #include <cassert>
 #include <string>
 
-using namespace mbgl;
+namespace mbgl {
 
 DebugBucket::DebugBucket(const OverscaledTileID& id,
                          const bool renderable_,
@@ -51,3 +51,5 @@ void DebugBucket::drawPoints(PlainShader& shader, gl::ObjectStore& store) {
         MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, (GLsizei)(fontBuffer.index())));
     }
 }
+
+} // namespace mbgl

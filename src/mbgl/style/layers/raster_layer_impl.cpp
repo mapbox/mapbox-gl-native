@@ -4,10 +4,6 @@
 namespace mbgl {
 namespace style {
 
-void RasterLayer::Impl::parsePaints(const JSValue& layer) {
-    paint.parse(layer);
-}
-
 void RasterLayer::Impl::cascade(const CascadeParameters& parameters) {
     paint.cascade(parameters);
 }

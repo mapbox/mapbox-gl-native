@@ -3,11 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>BuildLocationStyle</key>
-	<string>UseAppPreferences</string>
+	<string>CustomLocation</string>
+	<key>CustomBuildIntermediatesPath</key>
+	<string>../../build/ios</string>
 	<key>CustomBuildLocationType</key>
-	<string>RelativeToDerivedData</string>
+	<string>RelativeToWorkspace</string>
+	<key>CustomBuildProductsPath</key>
+	<string>../../build/ios</string>
 	<key>DerivedDataCustomLocation</key>
-	<string>../../build</string>
+	<string>../../build/ios</string>
 	<key>DerivedDataLocationStyle</key>
 	<string>WorkspaceRelativePath</string>
 	<key>IssueFilterStyle</key>

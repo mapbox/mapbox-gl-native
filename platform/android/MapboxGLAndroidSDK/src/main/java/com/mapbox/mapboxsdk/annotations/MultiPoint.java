@@ -34,19 +34,24 @@ public abstract class MultiPoint extends Annotation {
      *
      * @param points the points of the polyline
      */
-    void setPoints(List<LatLng> points) {
+    public void setPoints(List<LatLng> points) {
         this.points = new ArrayList<>(points);
+        update();
     }
 
-    void addPoint(LatLng point) {
+    public void addPoint(LatLng point) {
         points.add(point);
+        update();
     }
 
     public float getAlpha() {
         return alpha;
     }
 
-    void setAlpha(float alpha) {
+    public void setAlpha(float alpha) {
         this.alpha = alpha;
+        update();
     }
+
+    abstract void update();
 }

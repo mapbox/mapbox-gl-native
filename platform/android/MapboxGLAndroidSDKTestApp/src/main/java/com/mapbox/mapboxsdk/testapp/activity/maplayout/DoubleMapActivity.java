@@ -23,7 +23,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
 public class DoubleMapActivity extends AppCompatActivity {
 
@@ -73,7 +72,7 @@ public class DoubleMapActivity extends AppCompatActivity {
             mMapView.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                    mapboxMap.setStyleUrl(Style.getDarkStyleUrl(AppConstant.STYLE_VERSION));
+                    mapboxMap.setStyleUrl(Style.DARK);
 
                     mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(18));
                     try {
@@ -92,7 +91,7 @@ public class DoubleMapActivity extends AppCompatActivity {
             mMapViewMini.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                    mapboxMap.setStyleUrl(Style.getLightStyleUrl(AppConstant.STYLE_VERSION));
+                    mapboxMap.setStyleUrl(Style.LIGHT);
                     mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(4));
 
                     UiSettings uiSettings = mapboxMap.getUiSettings();

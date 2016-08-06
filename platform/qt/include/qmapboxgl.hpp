@@ -159,9 +159,12 @@ public:
     void setGestureInProgress(bool inProgress);
 
     void addClass(const QString &);
+    void addClass(const QString &, const QMapbox::TransitionOptions &);
     void removeClass(const QString &);
+    void removeClass(const QString &, const QMapbox::TransitionOptions &);
     bool hasClass(const QString &) const;
     void setClasses(const QStringList &);
+    void setClasses(const QStringList &, const QMapbox::TransitionOptions &);
     QStringList getClasses() const;
 
     QMapbox::AnnotationID addPointAnnotation(const QMapbox::PointAnnotation &);
@@ -170,6 +173,9 @@ public:
     void updatePointAnnotation(QMapbox::AnnotationID, const QMapbox::PointAnnotation &);
 
     void removeAnnotation(QMapbox::AnnotationID);
+
+    void setLayoutProperty(const QString &layer, const QString &property, const QVariant &value);
+    void setPaintProperty(const QString &layer, const QString &property, const QVariant &value, const QString &klass = QString());
 
     bool isRotating() const;
     bool isScaling() const;
@@ -193,13 +199,19 @@ public:
     void setMargins(const QMargins &margins);
     QMargins margins() const;
 
+    void addSource(const QString& sourceID, const QVariant& value);
+    void removeSource(const QString& sourceID);
+
     void addCustomLayer(const QString &id,
         QMapbox::CustomLayerInitializeFunction,
         QMapbox::CustomLayerRenderFunction,
         QMapbox::CustomLayerDeinitializeFunction,
         void* context,
         char* before = NULL);
-    void removeCustomLayer(const QString& id);
+    void addLayer(const QVariant &value);
+    void removeLayer(const QString &id);
+
+    void setFilter(const QString &layer, const QVariant &filter);
 
 public slots:
     void render();

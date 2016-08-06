@@ -126,11 +126,11 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 /// Converts the given color into an mbgl::Color in calibrated RGB space.
 mbgl::Color MGLColorObjectFromNSColor(NSColor *color) {
     if (!color) {
-        return {{ 0, 0, 0, 0 }};
+        return { 0, 0, 0, 0 };
     }
     CGFloat r, g, b, a;
     [[color colorUsingColorSpaceName:NSCalibratedRGBColorSpace] getRed:&r green:&g blue:&b alpha:&a];
-    return {{ (float)r, (float)g, (float)b, (float)a }};
+    return { (float)r, (float)g, (float)b, (float)a };
 }
 
 /// Lightweight container for metadata about an annotation, including the annotation itself.
@@ -394,6 +394,10 @@ public:
     NSClickGestureRecognizer *clickGestureRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleClickGesture:)];
     clickGestureRecognizer.delaysPrimaryMouseButtonEvents = NO;
     [self addGestureRecognizer:clickGestureRecognizer];
+    
+    NSClickGestureRecognizer *rightClickGestureRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleRightClickGesture:)];
+    rightClickGestureRecognizer.buttonMask = 0x2;
+    [self addGestureRecognizer:rightClickGestureRecognizer];
     
     NSClickGestureRecognizer *doubleClickGestureRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleClickGesture:)];
     doubleClickGestureRecognizer.numberOfClicksRequired = 2;
@@ -1037,8 +1041,8 @@ public:
     mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera];
     mbgl::AnimationOptions animationOptions;
     if (duration > 0) {
-        animationOptions.duration = MGLDurationInSeconds(duration);
-        animationOptions.easing = MGLUnitBezierForMediaTimingFunction(function);
+        animationOptions.duration.emplace(MGLDurationInSeconds(duration));
+        animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
     if (completion) {
         animationOptions.transitionFinishFn = [completion]() {
@@ -1356,6 +1360,14 @@ public:
         }
     } else {
         [self deselectAnnotation:self.selectedAnnotation];
+    }
+}
+
+/// Right-click to show the context menu.
+- (void)handleRightClickGesture:(NSClickGestureRecognizer *)gestureRecognizer {
+    NSMenu *menu = [self menuForEvent:[NSApp currentEvent]];
+    if (menu) {
+        [NSMenu popUpContextMenu:menu withEvent:[NSApp currentEvent] forView:self];
     }
 }
 
@@ -1986,6 +1998,38 @@ public:
     }
 }
 
+- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations animated:(BOOL)animated {
+    CGFloat maximumPadding = 100;
+    CGFloat yPadding = (NSHeight(self.bounds) / 5 <= maximumPadding) ? (NSHeight(self.bounds) / 5) : maximumPadding;
+    CGFloat xPadding = (NSWidth(self.bounds) / 5 <= maximumPadding) ? (NSWidth(self.bounds) / 5) : maximumPadding;
+
+    NSEdgeInsets edgeInsets = NSEdgeInsetsMake(yPadding, xPadding, yPadding, xPadding);
+
+    [self showAnnotations:annotations edgePadding:edgeInsets animated:animated];
+}
+
+- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated {
+    if ( ! annotations || ! annotations.count) return;
+
+    mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
+
+    for (id <MGLAnnotation> annotation in annotations)
+    {
+        if ([annotation conformsToProtocol:@protocol(MGLOverlay)])
+        {
+            bounds.extend(MGLLatLngBoundsFromCoordinateBounds(((id <MGLOverlay>)annotation).overlayBounds));
+        }
+        else
+        {
+            bounds.extend(MGLLatLngFromLocationCoordinate2D(annotation.coordinate));
+        }
+    }
+
+    [self setVisibleCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(bounds)
+                         edgePadding:insets
+                            animated:animated];
+}
+
 /// Returns a popover detailing the annotation.
 - (NSPopover *)calloutForAnnotation:(id <MGLAnnotation>)annotation {
     NSPopover *callout = [[NSPopover alloc] init];
@@ -2398,7 +2442,7 @@ public:
     if (options & mbgl::MapDebugOptions::Collision) {
         mask |= MGLMapDebugCollisionBoxesMask;
     }
-    if (options & mbgl::MapDebugOptions::Wireframe) {
+    if (options & mbgl::MapDebugOptions::Overdraw) {
         mask |= MGLMapDebugOverdrawVisualizationMask;
     }
     if (options & mbgl::MapDebugOptions::StencilClip) {
@@ -2422,7 +2466,7 @@ public:
         options |= mbgl::MapDebugOptions::Collision;
     }
     if (debugMask & MGLMapDebugOverdrawVisualizationMask) {
-        options |= mbgl::MapDebugOptions::Wireframe;
+        options |= mbgl::MapDebugOptions::Overdraw;
     }
     if (debugMask & MGLMapDebugStencilBufferMask) {
         options |= mbgl::MapDebugOptions::StencilClip;

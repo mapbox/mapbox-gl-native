@@ -4,6 +4,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/image.hpp>
 
+#include <array>
 #include <functional>
 #include <memory>
 

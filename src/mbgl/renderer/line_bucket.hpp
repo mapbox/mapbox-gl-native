@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/renderer/bucket.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
@@ -18,23 +18,23 @@ class LineSDFShader;
 class LinepatternShader;
 
 class LineBucket : public Bucket {
-    using TriangleGroup = ElementGroup<3>;
+    using TriangleGroup = ElementGroup<6>;
 
 public:
     LineBucket(uint32_t overscaling);
     ~LineBucket() override;
 
-    void upload(gl::ObjectStore&) override;
-    void render(Painter&, const style::Layer&, const UnwrappedTileID&, const mat4&) override;
+    void upload(gl::ObjectStore&, gl::Config&) override;
+    void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
     bool hasData() const override;
     bool needsClipping() const override;
 
     void addGeometry(const GeometryCollection&);
     void addGeometry(const GeometryCoordinates& line);
 
-    void drawLines(LineShader&, gl::ObjectStore&);
-    void drawLineSDF(LineSDFShader&, gl::ObjectStore&);
-    void drawLinePatterns(LinepatternShader&, gl::ObjectStore&);
+    void drawLines(LineShader&, gl::ObjectStore&, bool overdraw);
+    void drawLineSDF(LineSDFShader&, gl::ObjectStore&, bool overdraw);
+    void drawLinePatterns(LinepatternShader&, gl::ObjectStore&, bool overdraw);
 
 private:
     struct TriangleElement {

@@ -1,7 +1,7 @@
 {
     "default": {
         "log": [
-            [1, "WARNING", "ParseStyle", "function argument must be a numeric value"]
+            [1, "WARNING", "ParseStyle", "function stop must be an array"]
         ]
     }
 }

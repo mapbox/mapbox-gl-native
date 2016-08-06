@@ -59,7 +59,7 @@ namespace test {
 
 class Server {
 public:
-    Server(const char* executable);
+    Server(const char* script);
     ~Server();
 
 private:
@@ -73,5 +73,5 @@ void checkImage(const std::string& base,
                 double imageThreshold = 0,
                 double pixelThreshold = 0);
 
-}
-}
+} // namespace test
+} // namespace mbgl

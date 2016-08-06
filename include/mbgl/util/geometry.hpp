@@ -5,6 +5,13 @@
 
 namespace mbgl {
 
+enum class FeatureType : uint8_t {
+    Unknown = 0,
+    Point = 1,
+    LineString = 2,
+    Polygon = 3
+};
+
 template <class T>
 using Point = mapbox::geometry::point<T>;
 
@@ -33,5 +40,22 @@ template <class S, class T>
 Point<S> convertPoint(const Point<T>& p) {
     return Point<S>(p.x, p.y);
 }
+
+struct ToFeatureType {
+    template <class T>
+    FeatureType operator()(const Point<T> &) const { return FeatureType::Point; }
+    template <class T>
+    FeatureType operator()(const MultiPoint<T> &) const { return FeatureType::Point; }
+    template <class T>
+    FeatureType operator()(const LineString<T> &) const { return FeatureType::LineString; }
+    template <class T>
+    FeatureType operator()(const MultiLineString<T> &) const { return FeatureType::LineString; }
+    template <class T>
+    FeatureType operator()(const Polygon<T> &) const { return FeatureType::Polygon; }
+    template <class T>
+    FeatureType operator()(const MultiPolygon<T> &) const { return FeatureType::Polygon; }
+    template <class T>
+    FeatureType operator()(const mapbox::geometry::geometry_collection<T> &) const { return FeatureType::Unknown; }
+};
 
 } // namespace mbgl

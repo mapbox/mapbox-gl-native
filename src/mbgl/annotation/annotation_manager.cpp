@@ -1,10 +1,10 @@
 #include <mbgl/annotation/annotation_manager.hpp>
+#include <mbgl/annotation/annotation_source.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/annotation/line_annotation_impl.hpp>
 #include <mbgl/annotation/fill_annotation_impl.hpp>
 #include <mbgl/annotation/style_sourced_annotation_impl.hpp>
-#include <mbgl/style/source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
@@ -31,10 +31,9 @@ AnnotationID AnnotationManager::addAnnotation(const Annotation& annotation, cons
     return id;
 }
 
-void AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotation& annotation, const uint8_t maxZoom) {
-    removeAnnotation(id);
-    Annotation::visit(annotation, [&] (const auto& annotation_) {
-        this->add(id, annotation_, maxZoom);
+Update AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotation& annotation, const uint8_t maxZoom) {
+    return Annotation::visit(annotation, [&] (const auto& annotation_) {
+        return this->update(id, annotation_, maxZoom);
     });
 }
 
@@ -69,6 +68,53 @@ void AnnotationManager::add(const AnnotationID& id, const StyleSourcedAnnotation
         std::make_unique<StyleSourcedAnnotationImpl>(id, annotation, maxZoom));
 }
 
+Update AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t maxZoom) {
+    auto it = symbolAnnotations.find(id);
+    if (it == symbolAnnotations.end()) {
+        removeAndAdd(id, annotation, maxZoom);
+        return Update::AnnotationData | Update::AnnotationStyle;
+    }
+
+    Update result = Update::Nothing;
+    const SymbolAnnotation& existing = it->second->annotation;
+
+    if (existing.geometry != annotation.geometry) {
+        result |= Update::AnnotationData;
+    }
+
+    if (existing.icon != annotation.icon) {
+        result |= Update::AnnotationData | Update::AnnotationStyle;
+    }
+
+    if (result != Update::Nothing) {
+        removeAndAdd(id, annotation, maxZoom);
+    }
+
+    return result;
+}
+
+Update AnnotationManager::update(const AnnotationID& id, const LineAnnotation& annotation, const uint8_t maxZoom) {
+    removeAndAdd(id, annotation, maxZoom);
+    return Update::AnnotationData | Update::AnnotationStyle;
+}
+
+Update AnnotationManager::update(const AnnotationID& id, const FillAnnotation& annotation, const uint8_t maxZoom) {
+    removeAndAdd(id, annotation, maxZoom);
+    return Update::AnnotationData | Update::AnnotationStyle;
+}
+
+Update AnnotationManager::update(const AnnotationID& id, const StyleSourcedAnnotation& annotation, const uint8_t maxZoom) {
+    removeAndAdd(id, annotation, maxZoom);
+    return Update::AnnotationData | Update::AnnotationStyle;
+}
+
+void AnnotationManager::removeAndAdd(const AnnotationID& id, const Annotation& annotation, const uint8_t maxZoom) {
+    removeAnnotation(id);
+    Annotation::visit(annotation, [&] (const auto& annotation_) {
+        this->add(id, annotation_, maxZoom);
+    });
+}
+
 AnnotationIDs AnnotationManager::getPointAnnotationsInBounds(const LatLngBounds& bounds) const {
     AnnotationIDs result;
 
@@ -80,13 +126,13 @@ AnnotationIDs AnnotationManager::getPointAnnotationsInBounds(const LatLngBounds&
     return result;
 }
 
-std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const CanonicalTileID& tileID) {
+std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const CanonicalTileID& tileID) {
     if (symbolAnnotations.empty() && shapeAnnotations.empty())
         return nullptr;
 
-    auto tile = std::make_unique<AnnotationTile>();
+    auto tileData = std::make_unique<AnnotationTileData>();
 
-    AnnotationTileLayer& pointLayer = *tile->layers.emplace(
+    AnnotationTileLayer& pointLayer = *tileData->layers.emplace(
         PointLayerID,
         std::make_unique<AnnotationTileLayer>(PointLayerID)).first->second;
 
@@ -98,24 +144,22 @@ std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const CanonicalTileID
         }));
 
     for (const auto& shape : shapeAnnotations) {
-        shape.second->updateTile(tileID, *tile);
+        shape.second->updateTileData(tileID, *tileData);
     }
 
-    return tile;
+    return tileData;
 }
 
 void AnnotationManager::updateStyle(Style& style) {
     // Create annotation source, point layer, and point bucket
     if (!style.getSource(SourceID)) {
-        auto tileset = std::make_unique<Tileset>();
-        tileset->maxZoom = 18;
-        std::unique_ptr<Source> source = std::make_unique<Source>(SourceType::Annotations, SourceID, "", util::tileSize, std::move(tileset), nullptr);
-        source->enabled = true;
+        std::unique_ptr<Source> source = std::make_unique<AnnotationSource>();
+        source->baseImpl->enabled = true;
         style.addSource(std::move(source));
 
-        std::unique_ptr<SymbolLayer> layer = std::make_unique<SymbolLayer>(PointLayerID);
+        std::unique_ptr<SymbolLayer> layer = std::make_unique<SymbolLayer>(PointLayerID, SourceID);
 
-        layer->setSource(SourceID, PointLayerID);
+        layer->setSourceLayer(PointLayerID);
         layer->setIconImage({"{sprite}"});
         layer->setIconAllowOverlap(true);
 
@@ -135,26 +179,28 @@ void AnnotationManager::updateStyle(Style& style) {
     }
 
     obsoleteShapeAnnotationLayers.clear();
+}
 
-    for (auto& monitor : monitors) {
-        monitor->update(getTile(monitor->tileID.canonical));
+void AnnotationManager::updateData() {
+    for (auto& tile : tiles) {
+        tile->setData(getTileData(tile->id.canonical));
     }
 }
 
-void AnnotationManager::addTileMonitor(AnnotationTileMonitor& monitor) {
-    monitors.insert(&monitor);
-    monitor.update(getTile(monitor.tileID.canonical));
+void AnnotationManager::addTile(AnnotationTile& tile) {
+    tiles.insert(&tile);
+    tile.setData(getTileData(tile.id.canonical));
 }
 
-void AnnotationManager::removeTileMonitor(AnnotationTileMonitor& monitor) {
-    monitors.erase(&monitor);
+void AnnotationManager::removeTile(AnnotationTile& tile) {
+    tiles.erase(&tile);
 }
 
 void AnnotationManager::addIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
     spriteStore.setSprite(name, sprite);
     spriteAtlas.updateDirty();
 }
-    
+
 void AnnotationManager::removeIcon(const std::string& name) {
     spriteStore.removeSprite(name);
     spriteAtlas.updateDirty();

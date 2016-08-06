@@ -118,7 +118,7 @@
  */
 class PropertyValueEvaluator {
 public:
-    id operator()(const std::nullptr_t &) const {
+    id operator()(const mbgl::NullValue &) const {
         return [NSNull null];
     }
     
@@ -260,7 +260,7 @@ NS_ARRAY_OF(MGLShape <MGLFeature> *) *MGLFeaturesFromMBGLFeatures(const std::vec
         GeometryEvaluator<double> evaluator;
         MGLShape <MGLFeaturePrivate> *shape = mapbox::geometry::geometry<double>::visit(feature.geometry, evaluator);
         if (feature.id) {
-            shape.identifier = @(*feature.id);
+            shape.identifier = mbgl::FeatureIdentifier::visit(*feature.id, PropertyValueEvaluator());
         }
         shape.attributes = attributes;
         [shapes addObject:shape];

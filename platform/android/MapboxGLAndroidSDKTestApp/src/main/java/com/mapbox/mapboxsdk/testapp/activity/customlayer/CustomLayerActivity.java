@@ -6,18 +6,21 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.layers.CustomLayer;
+import com.mapbox.mapboxsdk.style.layers.CustomLayer;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.customlayer.ExampleCustomLayer;
 
 public class CustomLayerActivity extends AppCompatActivity {
+    private static final String TAG = CustomLayerActivity.class.getSimpleName();
 
     private MapboxMap mapboxMap;
     private MapView mapView;
@@ -66,10 +69,14 @@ public class CustomLayerActivity extends AppCompatActivity {
     private void swapCustomLayer() {
 
         if (isShowingCustomLayer) {
-            mapboxMap.removeCustomLayer("custom");
+            try {
+                mapboxMap.removeLayer("custom");
+            } catch (NoSuchLayerException e) {
+                Log.e(TAG, "No custom layer to remove");
+            }
             fab.setImageResource(R.drawable.ic_layers_24dp);
         } else {
-            mapboxMap.addCustomLayer(new CustomLayer("custom",
+            mapboxMap.addLayer(new CustomLayer("custom",
                     ExampleCustomLayer.createContext(),
                     ExampleCustomLayer.InitializeFunction,
                     ExampleCustomLayer.RenderFunction,

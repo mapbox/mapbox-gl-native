@@ -1,0 +1,20 @@
+#pragma once
+
+#include <mbgl/util/range.hpp>
+
+#include <vector>
+#include <string>
+#include <cstdint>
+
+namespace mbgl {
+
+class Tileset {
+public:
+    std::vector<std::string> tiles;
+    Range<uint8_t> zoomRange { 0, 22 };
+    std::string attribution;
+
+    // TileJSON also includes center, zoom, and bounds, but they are not used by mbgl.
+};
+
+} // namespace mbgl

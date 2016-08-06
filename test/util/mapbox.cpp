@@ -7,7 +7,6 @@
 
 using namespace mbgl;
 
-
 TEST(Mapbox, SourceURL) {
     EXPECT_EQ(
         "https://api.mapbox.com/v4/user.map.json?access_token=key&secure",

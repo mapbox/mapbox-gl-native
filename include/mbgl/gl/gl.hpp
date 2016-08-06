@@ -45,9 +45,9 @@ namespace gl {
                                 GLsizei length,
                                 const GLchar *message,
                                 const void *userParam);
-    
+
     template <class... Args> void mbx_trapExtension(const char *name, Args... args);
-    
+
     void mbx_trapExtension(const char *);
     void mbx_trapExtension(const char *, GLint, const char *);
     void mbx_trapExtension(const char *, GLsizei, GLuint *);
@@ -58,16 +58,16 @@ namespace gl {
     void mbx_trapExtension(const char *, GLuint, GLuint, GLuint, GLuint, GLint, const char *, const void*);
     void mbx_trapExtension(const char *name, GLuint array);
 #endif
-    
+
 struct Error : ::std::runtime_error {
-    inline Error(GLenum err, const std::string &msg) : ::std::runtime_error(msg), code(err) {};
+    Error(GLenum err, const std::string &msg) : ::std::runtime_error(msg), code(err) {};
     const GLenum code;
 };
 
 void checkError(const char *cmd, const char *file, int line);
 
-#if defined(DEBUG)
-#define MBGL_CHECK_ERROR(cmd) ([&]() { struct __MBGL_C_E { inline ~__MBGL_C_E() { ::mbgl::gl::checkError(#cmd, __FILE__, __LINE__); } } __MBGL_C_E; return cmd; }())
+#ifndef NDEBUG
+#define MBGL_CHECK_ERROR(cmd) ([&]() { struct __MBGL_C_E { ~__MBGL_C_E() { ::mbgl::gl::checkError(#cmd, __FILE__, __LINE__); } } __MBGL_C_E; return cmd; }())
 #else
 #define MBGL_CHECK_ERROR(cmd) (cmd)
 #endif

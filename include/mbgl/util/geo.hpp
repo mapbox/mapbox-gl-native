@@ -57,18 +57,18 @@ public:
     LatLng(const UnwrappedTileID& id);
 };
 
-inline bool operator==(const LatLng& a, const LatLng& b) {
+constexpr bool operator==(const LatLng& a, const LatLng& b) {
     return a.latitude == b.latitude && a.longitude == b.longitude;
 }
 
-inline bool operator!=(const LatLng& a, const LatLng& b) {
+constexpr bool operator!=(const LatLng& a, const LatLng& b) {
     return !(a == b);
 }
 
 class ProjectedMeters {
 public:
-    double northing = 0;
-    double easting = 0;
+    double northing;
+    double easting;
 
     ProjectedMeters(double n = 0, double e = 0)
         : northing(n), easting(e) {}
@@ -77,6 +77,10 @@ public:
         return !(std::isnan(northing) || std::isnan(easting));
     }
 };
+
+constexpr bool operator==(const ProjectedMeters& a, const ProjectedMeters& b) {
+    return a.northing == b.northing && a.easting == b.easting;
+}
 
 class LatLngBounds {
 public:
@@ -157,18 +161,18 @@ private:
     LatLng sw;
     LatLng ne;
 
-    LatLngBounds(const LatLng& sw_, const LatLng& ne_)
-        : sw(sw_), ne(ne_) {}
+    LatLngBounds(LatLng sw_, LatLng ne_)
+        : sw(std::move(sw_)), ne(std::move(ne_)) {}
 
-    friend bool operator==(const LatLngBounds&, const LatLngBounds&);
-    friend bool operator!=(const LatLngBounds&, const LatLngBounds&);
+    friend constexpr bool operator==(const LatLngBounds&, const LatLngBounds&);
+    friend constexpr bool operator!=(const LatLngBounds&, const LatLngBounds&);
 };
 
-inline bool operator==(const LatLngBounds& a, const LatLngBounds& b) {
+constexpr bool operator==(const LatLngBounds& a, const LatLngBounds& b) {
     return a.sw == b.sw && a.ne == b.ne;
 }
 
-inline bool operator!=(const LatLngBounds& a, const LatLngBounds& b) {
+constexpr bool operator!=(const LatLngBounds& a, const LatLngBounds& b) {
     return !(a == b);
 }
 
@@ -187,12 +191,12 @@ public:
     double left = 0;    ///< Number of pixels inset from the left edge.
     double bottom = 0;  ///< Number of pixels inset from the bottom edge.
     double right = 0;   ///< Number of pixels inset from the right edge.
-    
+
     EdgeInsets() {}
-    
+
     EdgeInsets(const double t, const double l, const double b, const double r)
         : top(t), left(l), bottom(b), right(r) {}
-    
+
     explicit operator bool() const {
         return !(std::isnan(top) || std::isnan(left) || std::isnan(bottom) || std::isnan(right))
             && (top || left || bottom || right);
@@ -210,7 +214,7 @@ public:
             top + o.top, left + o.left, bottom + o.bottom, right + o.right,
         };
     }
-    
+
     ScreenCoordinate getCenter(uint16_t width, uint16_t height) const;
 };
 

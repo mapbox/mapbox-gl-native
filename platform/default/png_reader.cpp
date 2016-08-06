@@ -1,16 +1,10 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/premultiply.hpp>
+#include <mbgl/util/char_array_buffer.hpp>
 #include <mbgl/platform/log.hpp>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunknown-pragmas"
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic ignored "-Wshadow"
-#include <boost/iostreams/stream.hpp>
-#pragma GCC diagnostic pop
-
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/device/array.hpp>
+#include <istream>
+#include <sstream>
 
 extern "C"
 {
@@ -18,9 +12,6 @@ extern "C"
 }
 
 namespace mbgl {
-
-using source_type = boost::iostreams::array_source;
-using input_stream = boost::iostreams::stream<source_type>;
 
 static void user_error_fn(png_structp, png_const_charp error_msg) {
     throw std::runtime_error(std::string("failed to read invalid png: '") + error_msg + "'");
@@ -31,7 +22,7 @@ static void user_warning_fn(png_structp, png_const_charp warning_msg) {
 }
 
 static void png_read_data(png_structp png_ptr, png_bytep data, png_size_t length) {
-    input_stream * fin = reinterpret_cast<input_stream*>(png_get_io_ptr(png_ptr));
+    std::istream* fin = reinterpret_cast<std::istream*>(png_get_io_ptr(png_ptr));
     fin->read(reinterpret_cast<char*>(data), length);
     std::streamsize read_count = fin->gcount();
     if (read_count < 0 || static_cast<png_size_t>(read_count) != length)
@@ -46,7 +37,7 @@ struct png_struct_guard {
           i_(info_ptr_ptr) {}
 
     ~png_struct_guard() {
-        png_destroy_read_struct(p_,i_,0);
+        png_destroy_read_struct(p_,i_,nullptr);
     }
 
     png_structpp p_;
@@ -54,8 +45,8 @@ struct png_struct_guard {
 };
 
 PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
-    source_type source(reinterpret_cast<const char*>(data), size);
-    input_stream stream(source);
+    util::CharArrayBuffer dataBuffer { reinterpret_cast<const char*>(data), size };
+    std::istream stream(&dataBuffer);
 
     png_byte header[8] = { 0 };
     stream.read(reinterpret_cast<char*>(header), 8);
@@ -66,7 +57,7 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
     if (!is_png)
         throw std::runtime_error("File or stream is not a png");
 
-    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
     if (!png_ptr)
         throw std::runtime_error("failed to allocate png_ptr");
 
@@ -87,7 +78,7 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
     png_uint_32 height = 0;
     int bit_depth = 0;
     int color_type = 0;
-    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, 0, 0, 0);
+    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, nullptr, nullptr, nullptr);
 
     UnassociatedImage image { width, height };
 
@@ -125,9 +116,9 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
         rows[row] = image.data.get() + row * width * 4;
     png_read_image(png_ptr, rows.get());
 
-    png_read_end(png_ptr, 0);
+    png_read_end(png_ptr, nullptr);
 
     return util::premultiply(std::move(image));
 }
 
-}
+} // namespace mbgl

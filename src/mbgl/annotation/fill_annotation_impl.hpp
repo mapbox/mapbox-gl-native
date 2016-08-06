@@ -7,7 +7,7 @@ namespace mbgl {
 
 class FillAnnotationImpl : public ShapeAnnotationImpl {
 public:
-    FillAnnotationImpl(const AnnotationID, const FillAnnotation&, const uint8_t maxZoom);
+    FillAnnotationImpl(AnnotationID, FillAnnotation, uint8_t maxZoom);
 
     void updateStyle(style::Style&) const final;
     const ShapeAnnotationGeometry& geometry() const final;

@@ -15,8 +15,8 @@ namespace mapbox {
 namespace sqlite {
 class Database;
 class Statement;
-}
-}
+} // namespace sqlite
+} // namespace mapbox
 
 namespace mbgl {
 
@@ -27,8 +27,7 @@ class OfflineDatabase : private util::noncopyable {
 public:
     // Limits affect ambient caching (put) only; resources required by offline
     // regions are exempt.
-    OfflineDatabase(const std::string& path,
-                    uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
+    OfflineDatabase(std::string path, uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
     ~OfflineDatabase();
 
     optional<Response> get(const Resource&);

@@ -1,6 +1,6 @@
 # [Mapbox macOS SDK](https://github.com/mapbox/mapbox-gl-native/tree/master/platform/macos/)
 
-The Mapbox macOS SDK is an open-source framework for embedding interactive map views with scalable, customizable vector maps into Cocoa applications on macOS 10.10.0 and above using Objective-C, Swift, or Interface Builder. It takes stylesheets that conform to the [Mapbox GL Style Specification](https://www.mapbox.com/mapbox-gl-style-spec/), applies them to vector tiles that conform to the [Mapbox Vector Tile Specification](https://www.mapbox.com/developers/vector-tiles/), and renders them using OpenGL.
+The Mapbox macOS SDK is an open-source framework for embedding interactive map views with scalable, customizable vector maps into Cocoa applications on macOS 10.10.0 and above using Objective-C, Swift, or Interface Builder. It takes stylesheets that conform to the [Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-style-spec/), applies them to vector tiles that conform to the [Mapbox Vector Tile Specification](https://www.mapbox.com/developers/vector-tiles/), and renders them using OpenGL.
 
 <img alt="" src="https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/macos/screenshot.png" width="645">
 

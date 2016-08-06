@@ -26,8 +26,8 @@ class OnlineFileRequest : public AsyncRequest {
 public:
     using Callback = std::function<void (Response)>;
 
-    OnlineFileRequest(const Resource&, Callback, OnlineFileSource::Impl&);
-    ~OnlineFileRequest();
+    OnlineFileRequest(Resource, Callback, OnlineFileSource::Impl&);
+    ~OnlineFileRequest() override;
 
     void networkIsReachableAgain();
     void schedule(optional<Timestamp> expires);
@@ -182,9 +182,9 @@ std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource
     return std::make_unique<OnlineFileRequest>(res, callback, *impl);
 }
 
-OnlineFileRequest::OnlineFileRequest(const Resource& resource_, Callback callback_, OnlineFileSource::Impl& impl_)
+OnlineFileRequest::OnlineFileRequest(Resource resource_, Callback callback_, OnlineFileSource::Impl& impl_)
     : impl(impl_),
-      resource(resource_),
+      resource(std::move(resource_)),
       callback(std::move(callback_)) {
     impl.add(this);
 

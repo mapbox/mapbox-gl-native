@@ -21,7 +21,7 @@ std::string getFileSourceRoot() {
 
 using namespace mbgl;
 
-TEST(AssetFileSource, Stress) {
+TEST(AssetFileSource, Load) {
     util::RunLoop loop;
 
     AssetFileSource fs(getFileSourceRoot());

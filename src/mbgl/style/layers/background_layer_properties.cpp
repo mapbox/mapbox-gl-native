@@ -5,12 +5,6 @@
 namespace mbgl {
 namespace style {
 
-void BackgroundPaintProperties::parse(const JSValue& value) {
-    backgroundColor.parse("background-color", value);
-    backgroundPattern.parse("background-pattern", value);
-    backgroundOpacity.parse("background-opacity", value);
-}
-
 void BackgroundPaintProperties::cascade(const CascadeParameters& parameters) {
     backgroundColor.cascade(parameters);
     backgroundPattern.cascade(parameters);

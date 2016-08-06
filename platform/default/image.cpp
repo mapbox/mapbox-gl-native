@@ -5,7 +5,7 @@
 #include <png.h>
 
 template<size_t max, typename... Args>
-inline static std::string sprintf(const char *msg, Args... args) {
+static std::string sprintf(const char *msg, Args... args) {
     char res[max];
     int len = snprintf(res, sizeof(res), msg, args...);
     return std::string(res, len);
@@ -30,15 +30,15 @@ std::string encodePNG(const PremultipliedImage& pre) {
 
     UnassociatedImage src = util::unpremultiply(std::move(copy));
 
-    png_voidp error_ptr = 0;
-    png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, error_ptr, NULL, NULL);
+    png_voidp error_ptr = nullptr;
+    png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, error_ptr, nullptr, nullptr);
     if (!png_ptr) {
         throw std::runtime_error("couldn't create png_ptr");
     }
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!png_ptr) {
-        png_destroy_write_struct(&png_ptr, (png_infopp)0);
+        png_destroy_write_struct(&png_ptr, (png_infopp)nullptr);
         throw std::runtime_error("couldn't create info_ptr");
     }
 
@@ -55,7 +55,7 @@ std::string encodePNG(const PremultipliedImage& pre) {
     png_set_write_fn(png_ptr, &result, [](png_structp png_ptr_, png_bytep data, png_size_t length) {
         std::string *out = static_cast<std::string *>(png_get_io_ptr(png_ptr_));
         out->append(reinterpret_cast<char *>(data), length);
-    }, NULL);
+    }, nullptr);
 
     struct ptrs {
         ptrs(size_t count) : rows(new png_bytep[count]) {}
@@ -68,7 +68,7 @@ std::string encodePNG(const PremultipliedImage& pre) {
     }
 
     png_set_rows(png_ptr, info_ptr, pointers.rows);
-    png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+    png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, nullptr);
     png_destroy_write_struct(&png_ptr, &info_ptr);
 
     return result;
@@ -112,4 +112,4 @@ PremultipliedImage decodeImage(const std::string& string) {
     throw std::runtime_error("unsupported image type");
 }
 
-}
+} // namespace mbgl

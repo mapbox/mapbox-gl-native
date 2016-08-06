@@ -12,7 +12,7 @@ enum class ThreadPriority : bool {
 
 struct ThreadContext {
 public:
-    ThreadContext(const std::string& name, ThreadPriority priority = ThreadPriority::Regular);
+    ThreadContext(std::string name, ThreadPriority priority = ThreadPriority::Regular);
 
     std::string name;
     ThreadPriority priority;

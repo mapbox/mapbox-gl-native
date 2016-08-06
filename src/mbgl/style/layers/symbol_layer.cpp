@@ -6,10 +6,11 @@
 namespace mbgl {
 namespace style {
 
-SymbolLayer::SymbolLayer(const std::string& layerID)
+SymbolLayer::SymbolLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(Type::Symbol, std::make_unique<Impl>())
     , impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
+    impl->source = sourceID;
 }
 
 SymbolLayer::SymbolLayer(const Impl& other)
@@ -23,15 +24,22 @@ std::unique_ptr<Layer> SymbolLayer::Impl::clone() const {
     return std::make_unique<SymbolLayer>(*this);
 }
 
-// Source
-
-void SymbolLayer::setSource(const std::string& sourceID, const std::string& sourceLayer) {
-    impl->source = sourceID;
-    impl->sourceLayer = sourceLayer;
+std::unique_ptr<Layer> SymbolLayer::Impl::cloneRef(const std::string& id_) const {
+    auto result = std::make_unique<SymbolLayer>(*this);
+    result->impl->id = id_;
+    result->impl->ref = this->id;
+    result->impl->paint = SymbolPaintProperties();
+    return std::move(result);
 }
+
+// Source
 
 const std::string& SymbolLayer::getSourceID() const {
     return impl->source;
+}
+
+void SymbolLayer::setSourceLayer(const std::string& sourceLayer) {
+    impl->sourceLayer = sourceLayer;
 }
 
 const std::string& SymbolLayer::getSourceLayer() const {
@@ -92,11 +100,11 @@ PropertyValue<bool> SymbolLayer::getIconOptional() const {
 void SymbolLayer::setIconOptional(PropertyValue<bool> value) {
     impl->layout.iconOptional.set(value);
 }
-PropertyValue<RotationAlignmentType> SymbolLayer::getIconRotationAlignment() const {
+PropertyValue<AlignmentType> SymbolLayer::getIconRotationAlignment() const {
     return impl->layout.iconRotationAlignment.get();
 }
 
-void SymbolLayer::setIconRotationAlignment(PropertyValue<RotationAlignmentType> value) {
+void SymbolLayer::setIconRotationAlignment(PropertyValue<AlignmentType> value) {
     impl->layout.iconRotationAlignment.set(value);
 }
 PropertyValue<float> SymbolLayer::getIconSize() const {
@@ -105,6 +113,20 @@ PropertyValue<float> SymbolLayer::getIconSize() const {
 
 void SymbolLayer::setIconSize(PropertyValue<float> value) {
     impl->layout.iconSize.set(value);
+}
+PropertyValue<IconTextFitType> SymbolLayer::getIconTextFit() const {
+    return impl->layout.iconTextFit.get();
+}
+
+void SymbolLayer::setIconTextFit(PropertyValue<IconTextFitType> value) {
+    impl->layout.iconTextFit.set(value);
+}
+PropertyValue<std::array<float, 4>> SymbolLayer::getIconTextFitPadding() const {
+    return impl->layout.iconTextFitPadding.get();
+}
+
+void SymbolLayer::setIconTextFitPadding(PropertyValue<std::array<float, 4>> value) {
+    impl->layout.iconTextFitPadding.set(value);
 }
 PropertyValue<std::string> SymbolLayer::getIconImage() const {
     return impl->layout.iconImage.get();
@@ -141,11 +163,18 @@ PropertyValue<std::array<float, 2>> SymbolLayer::getIconOffset() const {
 void SymbolLayer::setIconOffset(PropertyValue<std::array<float, 2>> value) {
     impl->layout.iconOffset.set(value);
 }
-PropertyValue<RotationAlignmentType> SymbolLayer::getTextRotationAlignment() const {
+PropertyValue<AlignmentType> SymbolLayer::getTextPitchAlignment() const {
+    return impl->layout.textPitchAlignment.get();
+}
+
+void SymbolLayer::setTextPitchAlignment(PropertyValue<AlignmentType> value) {
+    impl->layout.textPitchAlignment.set(value);
+}
+PropertyValue<AlignmentType> SymbolLayer::getTextRotationAlignment() const {
     return impl->layout.textRotationAlignment.get();
 }
 
-void SymbolLayer::setTextRotationAlignment(PropertyValue<RotationAlignmentType> value) {
+void SymbolLayer::setTextRotationAlignment(PropertyValue<AlignmentType> value) {
     impl->layout.textRotationAlignment.set(value);
 }
 PropertyValue<std::string> SymbolLayer::getTextField() const {
@@ -274,112 +303,112 @@ PropertyValue<float> SymbolLayer::getIconOpacity() const {
     return impl->paint.iconOpacity.get();
 }
 
-void SymbolLayer::setIconOpacity(PropertyValue<float> value) {
-    impl->paint.iconOpacity.set(value);
+void SymbolLayer::setIconOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
+    impl->paint.iconOpacity.set(value, klass);
 }
 
 PropertyValue<Color> SymbolLayer::getIconColor() const {
     return impl->paint.iconColor.get();
 }
 
-void SymbolLayer::setIconColor(PropertyValue<Color> value) {
-    impl->paint.iconColor.set(value);
+void SymbolLayer::setIconColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+    impl->paint.iconColor.set(value, klass);
 }
 
 PropertyValue<Color> SymbolLayer::getIconHaloColor() const {
     return impl->paint.iconHaloColor.get();
 }
 
-void SymbolLayer::setIconHaloColor(PropertyValue<Color> value) {
-    impl->paint.iconHaloColor.set(value);
+void SymbolLayer::setIconHaloColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+    impl->paint.iconHaloColor.set(value, klass);
 }
 
 PropertyValue<float> SymbolLayer::getIconHaloWidth() const {
     return impl->paint.iconHaloWidth.get();
 }
 
-void SymbolLayer::setIconHaloWidth(PropertyValue<float> value) {
-    impl->paint.iconHaloWidth.set(value);
+void SymbolLayer::setIconHaloWidth(PropertyValue<float> value, const optional<std::string>& klass) {
+    impl->paint.iconHaloWidth.set(value, klass);
 }
 
 PropertyValue<float> SymbolLayer::getIconHaloBlur() const {
     return impl->paint.iconHaloBlur.get();
 }
 
-void SymbolLayer::setIconHaloBlur(PropertyValue<float> value) {
-    impl->paint.iconHaloBlur.set(value);
+void SymbolLayer::setIconHaloBlur(PropertyValue<float> value, const optional<std::string>& klass) {
+    impl->paint.iconHaloBlur.set(value, klass);
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getIconTranslate() const {
     return impl->paint.iconTranslate.get();
 }
 
-void SymbolLayer::setIconTranslate(PropertyValue<std::array<float, 2>> value) {
-    impl->paint.iconTranslate.set(value);
+void SymbolLayer::setIconTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
+    impl->paint.iconTranslate.set(value, klass);
 }
 
 PropertyValue<TranslateAnchorType> SymbolLayer::getIconTranslateAnchor() const {
     return impl->paint.iconTranslateAnchor.get();
 }
 
-void SymbolLayer::setIconTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
-    impl->paint.iconTranslateAnchor.set(value);
+void SymbolLayer::setIconTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
+    impl->paint.iconTranslateAnchor.set(value, klass);
 }
 
 PropertyValue<float> SymbolLayer::getTextOpacity() const {
     return impl->paint.textOpacity.get();
 }
 
-void SymbolLayer::setTextOpacity(PropertyValue<float> value) {
-    impl->paint.textOpacity.set(value);
+void SymbolLayer::setTextOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
+    impl->paint.textOpacity.set(value, klass);
 }
 
 PropertyValue<Color> SymbolLayer::getTextColor() const {
     return impl->paint.textColor.get();
 }
 
-void SymbolLayer::setTextColor(PropertyValue<Color> value) {
-    impl->paint.textColor.set(value);
+void SymbolLayer::setTextColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+    impl->paint.textColor.set(value, klass);
 }
 
 PropertyValue<Color> SymbolLayer::getTextHaloColor() const {
     return impl->paint.textHaloColor.get();
 }
 
-void SymbolLayer::setTextHaloColor(PropertyValue<Color> value) {
-    impl->paint.textHaloColor.set(value);
+void SymbolLayer::setTextHaloColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+    impl->paint.textHaloColor.set(value, klass);
 }
 
 PropertyValue<float> SymbolLayer::getTextHaloWidth() const {
     return impl->paint.textHaloWidth.get();
 }
 
-void SymbolLayer::setTextHaloWidth(PropertyValue<float> value) {
-    impl->paint.textHaloWidth.set(value);
+void SymbolLayer::setTextHaloWidth(PropertyValue<float> value, const optional<std::string>& klass) {
+    impl->paint.textHaloWidth.set(value, klass);
 }
 
 PropertyValue<float> SymbolLayer::getTextHaloBlur() const {
     return impl->paint.textHaloBlur.get();
 }
 
-void SymbolLayer::setTextHaloBlur(PropertyValue<float> value) {
-    impl->paint.textHaloBlur.set(value);
+void SymbolLayer::setTextHaloBlur(PropertyValue<float> value, const optional<std::string>& klass) {
+    impl->paint.textHaloBlur.set(value, klass);
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getTextTranslate() const {
     return impl->paint.textTranslate.get();
 }
 
-void SymbolLayer::setTextTranslate(PropertyValue<std::array<float, 2>> value) {
-    impl->paint.textTranslate.set(value);
+void SymbolLayer::setTextTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
+    impl->paint.textTranslate.set(value, klass);
 }
 
 PropertyValue<TranslateAnchorType> SymbolLayer::getTextTranslateAnchor() const {
     return impl->paint.textTranslateAnchor.get();
 }
 
-void SymbolLayer::setTextTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
-    impl->paint.textTranslateAnchor.set(value);
+void SymbolLayer::setTextTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
+    impl->paint.textTranslateAnchor.set(value, klass);
 }
 
 } // namespace style

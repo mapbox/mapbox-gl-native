@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11129.15" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G26a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11129.15"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -129,7 +129,6 @@
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="aJh-i4-bef"/>
                             <menuItem title="Page Setup…" keyEquivalent="P" id="qIS-W8-SiK">
-                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                 <connections>
                                     <action selector="runPageLayout:" target="-1" id="Din-rz-gC5"/>
                                 </connections>
@@ -437,45 +436,40 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Debug" id="McE-ka-r79">
                         <items>
-                            <menuItem title="Show Tile Boundaries" id="rDE-dG-rTR">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Show Tile Boundaries" keyEquivalent="b" id="rDE-dG-rTR">
                                 <connections>
                                     <action selector="toggleTileBoundaries:" target="-1" id="LAO-88-F7h"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Tile Info" id="LoH-qD-kb0">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Show Tile Info" keyEquivalent="i" id="LoH-qD-kb0">
                                 <connections>
                                     <action selector="toggleTileInfo:" target="-1" id="KCn-0G-V87"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Tile Timestamps" id="bY0-2E-LZ7">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Show Tile Timestamps" keyEquivalent="t" id="bY0-2E-LZ7">
                                 <connections>
                                     <action selector="toggleTileTimestamps:" target="-1" id="tBs-2N-KEG"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Collision Boxes" id="Y0b-3K-mJE">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Show Collision Boxes" keyEquivalent="C" id="Y0b-3K-mJE">
                                 <connections>
                                     <action selector="toggleCollisionBoxes:" target="-1" id="EYa-7n-iWZ"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Overdraw Visualization" id="hSX-Be-8xC">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Show Overdraw Visualization" keyEquivalent="O" id="hSX-Be-8xC">
                                 <connections>
                                     <action selector="toggleOverdrawVisualization:" target="-1" id="usj-ug-upt"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="2EG-Hp-4FA"/>
-                            <menuItem title="Show Color Buffer" id="Eao-WE-BWz">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Color Buffer" keyEquivalent="c" id="Eao-WE-BWz">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="showColorBuffer:" target="-1" id="Nuq-Qs-98g"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Stencil Buffer" id="LlS-Yh-RkN">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Stencil Buffer" keyEquivalent="s" id="LlS-Yh-RkN">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="showStencilBuffer:" target="-1" id="WkN-t9-Mpv"/>
                                 </connections>
@@ -494,27 +488,40 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="Sl5-nE-kHd"/>
-                            <menuItem title="Blanket Map With Pins" id="LMZ-oe-Ngh">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Blanket Map With Pins" keyEquivalent="." id="LMZ-oe-Ngh">
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                 <connections>
                                     <action selector="dropManyPins:" target="-1" id="Rtv-8N-3Z8"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Add Polygon and Polyline" id="DVr-vT-lpe">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Add Polygon and Polyline" keyEquivalent="l" id="DVr-vT-lpe">
                                 <connections>
                                     <action selector="drawPolygonAndPolyLineAnnotations:" target="-1" id="EhT-CB-gee"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Remove All Annotations" id="6rC-68-vk0">
+                            <menuItem title="Add Animated Annotation" id="Etf-JN-Aoc">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="drawAnimatedAnnotation:" target="-1" id="CYM-WB-s97"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show All Annnotations" keyEquivalent="A" id="yMj-uM-8SN">
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                <connections>
+                                    <action selector="showAllAnnotations:" target="-1" id="ahr-OR-Em2"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Remove All Annotations" id="6rC-68-vk0">
+                                <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
                                 <connections>
                                     <action selector="removeAllAnnotations:" target="-1" id="6v3-0E-LsR"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="wQq-Mx-QY0"/>
                             <menuItem title="Start World Tour" id="VFo-Jh-2sw">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <modifierMask key="keyEquivalentModifierMask" option="YES"/>
                                 <connections>
                                     <action selector="startWorldTour:" target="-1" id="66Y-Gm-Yn1"/>
                                 </connections>
@@ -711,13 +718,13 @@
                                             </connections>
                                         </tableColumn>
                                         <tableColumn editable="NO" width="50" minWidth="40" maxWidth="1000" id="pkI-c7-xoD">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Downloaded">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Downloaded Resources">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
                                             <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="WfC-qb-HsW">
-                                                <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="sNm-Qn-ne6"/>
+                                                <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="sNm-Qn-ne6"/>
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -728,13 +735,13 @@
                                             </connections>
                                         </tableColumn>
                                         <tableColumn identifier="" editable="NO" width="50" minWidth="10" maxWidth="3.4028234663852886e+38" id="Rrd-A9-jqc">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Total">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Total Resources">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             </tableHeaderCell>
                                             <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="mHy-qJ-rOA">
-                                                <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="kyx-ZP-OBH"/>
+                                                <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="kyx-ZP-OBH"/>
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -744,14 +751,56 @@
                                                 <binding destination="dWe-R6-sRz" name="value" keyPath="arrangedObjects.countOfResourcesExpected" id="mh2-k0-vvB"/>
                                             </connections>
                                         </tableColumn>
+                                        <tableColumn editable="NO" width="50" minWidth="40" maxWidth="1000" id="kCO-Cd-bQt">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Downloaded Tiles">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="hUl-2C-sHr">
+                                                <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="KjY-J1-gSm"/>
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <connections>
+                                                <binding destination="dWe-R6-sRz" name="value" keyPath="arrangedObjects.countOfTilesCompleted" id="XHn-D7-zqf">
+                                                    <dictionary key="options">
+                                                        <bool key="NSConditionallySetsEditable" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </tableColumn>
+                                        <tableColumn editable="NO" width="60" minWidth="10" maxWidth="3.4028234663852886e+38" id="WO5-Ci-HgG">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Downloaded Tiles Size">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="cKy-kF-5Pv">
+                                                <byteCountFormatter key="formatter" allowsNonnumericFormatting="NO" includesActualByteCount="YES" id="bHS-Ch-aXU"/>
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <connections>
+                                                <binding destination="dWe-R6-sRz" name="value" keyPath="arrangedObjects.countOfTileBytesCompleted" id="Xpk-BZ-Xcr">
+                                                    <dictionary key="options">
+                                                        <bool key="NSConditionallySetsEditable" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </tableColumn>
                                         <tableColumn identifier="" editable="NO" width="60" minWidth="10" maxWidth="3.4028234663852886e+38" id="h7m-6l-KaS">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Size">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Downloaded Resources Size">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             </tableHeaderCell>
                                             <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="701-bg-k6L">
-                                                <byteCountFormatter key="formatter" allowsNonnumericFormatting="NO" id="IXV-J9-sP3"/>
+                                                <byteCountFormatter key="formatter" allowsNonnumericFormatting="NO" includesActualByteCount="YES" id="IXV-J9-sP3"/>
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -767,10 +816,9 @@
                                     </connections>
                                 </tableView>
                             </subviews>
-                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="QLr-6P-Ogs">
-                            <rect key="frame" x="1" y="7" width="0.0" height="16"/>
+                        <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="QLr-6P-Ogs">
+                            <rect key="frame" x="1" y="264" width="400" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="q0K-eE-mzL">
@@ -778,7 +826,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="MAZ-Iq-hBi">
-                            <rect key="frame" x="0.0" y="0.0" width="400" height="23"/>
+                            <rect key="frame" x="0.0" y="0.0" width="423" height="23"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
@@ -832,6 +880,8 @@ CA
                 <string>context</string>
                 <string>countOfResourcesCompleted</string>
                 <string>countOfResourcesExpected</string>
+                <string>countOfTilesCompleted</string>
+                <string>countOfTileBytesCompleted</string>
                 <string>countOfBytesCompleted</string>
                 <string>stateImage</string>
             </declaredKeys>

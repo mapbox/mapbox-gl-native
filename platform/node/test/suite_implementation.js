@@ -36,20 +36,44 @@ module.exports = function (style, options, callback) {
     options.pitch = style.pitch;
     options.debug = {
         tileBorders: options.debug,
-        collision: options.collisionDebug
+        collision: options.collisionDebug,
+        overdraw: options.showOverdrawInspector,
     };
 
     map.load(style);
 
-    map.render(options, function (err, pixels) {
-        var results = options.queryGeometry ?
-            map.queryRenderedFeatures(options.queryGeometry) :
-            [];
-        map.release();
-        if (timedOut) return;
-        clearTimeout(watchdog);
-        callback(err, pixels, results.map(prepareFeatures));
+    applyOperations(options.operations, function() {
+        map.render(options, function (err, pixels) {
+            var results = options.queryGeometry ?
+              map.queryRenderedFeatures(options.queryGeometry) :
+              [];
+            map.release();
+            if (timedOut) return;
+            clearTimeout(watchdog);
+            callback(err, pixels, results.map(prepareFeatures));
+        });
     });
+
+    function applyOperations(operations, callback) {
+        var operation = operations && operations[0];
+        if (!operations || operations.length === 0) {
+            callback();
+
+        } else if (operation[0] === 'wait') {
+            var wait = function() {
+                if (map.loaded()) {
+                    applyOperations(operations.slice(1), callback);
+                } else {
+                    map.render(options, wait);
+                }
+            };
+            wait();
+
+        } else {
+            map[operation[0]].apply(map, operation.slice(1));
+            applyOperations(operations.slice(1), callback);
+        }
+    }
 
     function prepareFeatures(r) {
         delete r.layer;

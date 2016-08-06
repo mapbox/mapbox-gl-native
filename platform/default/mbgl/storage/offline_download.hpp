@@ -17,7 +17,7 @@ class Tileset;
 
 namespace style {
 class Parser;
-}
+} // namespace style
 
 /**
  * Coordinates the request and storage of all resources for an offline region.

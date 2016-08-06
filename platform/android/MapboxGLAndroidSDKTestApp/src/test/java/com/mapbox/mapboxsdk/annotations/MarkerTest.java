@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.annotations;
 import android.graphics.Bitmap;
 import android.os.Parcelable;
 
+import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MockParcel;
 
@@ -23,8 +24,13 @@ public class MarkerTest {
 
     @Test
     public void testMarker() {
-        MarkerOptions markerOptions = new MarkerOptions();
+        MarkerOptions markerOptions = new MarkerOptions().position(new LatLng());
         assertNotNull("marker should not be null", markerOptions.getMarker());
+    }
+
+    @Test(expected = InvalidMarkerPositionException.class)
+    public void testInvalidMarker(){
+        new MarkerOptions().getMarker();
     }
 
     @Test
@@ -37,7 +43,7 @@ public class MarkerTest {
 
     @Test
     public void testTitle() {
-        MarkerOptions markerOptions = new MarkerOptions().title("Mapbox");
+        MarkerOptions markerOptions = new MarkerOptions().title("Mapbox").position(new LatLng());
         Marker marker = markerOptions.getMarker();
         assertEquals(marker.getTitle(), "Mapbox");
         assertEquals(markerOptions.getTitle(), "Mapbox");
@@ -45,7 +51,7 @@ public class MarkerTest {
 
     @Test
     public void testSnippet() {
-        MarkerOptions markerOptions = new MarkerOptions().snippet("Mapbox");
+        MarkerOptions markerOptions = new MarkerOptions().snippet("Mapbox").position(new LatLng());
         Marker marker = markerOptions.getMarker();
         assertEquals(marker.getSnippet(), "Mapbox");
     }
@@ -62,7 +68,7 @@ public class MarkerTest {
     public void testIcon() {
         Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_4444);
         Icon icon = IconFactory.recreate("test", bitmap);
-        MarkerOptions markerOptions = new MarkerOptions().icon(icon);
+        MarkerOptions markerOptions = new MarkerOptions().position(new LatLng()).icon(icon);
         Marker marker = markerOptions.getMarker();
         assertEquals("Icon should match", icon, marker.getIcon());
         assertEquals("Icon should match", icon, markerOptions.getIcon());
@@ -70,7 +76,7 @@ public class MarkerTest {
 
     @Test
     public void testHashCode() {
-        Marker marker = new MarkerOptions().getMarker();
+        Marker marker = new MarkerOptions().position(new LatLng()).getMarker();
         assertEquals("hash code should match", marker.hashCode(), 0);
     }
 

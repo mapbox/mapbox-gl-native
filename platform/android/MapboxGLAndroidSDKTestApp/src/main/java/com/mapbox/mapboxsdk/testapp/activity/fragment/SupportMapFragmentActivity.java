@@ -17,7 +17,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
 public class SupportMapFragmentActivity extends AppCompatActivity {
 
@@ -40,7 +39,7 @@ public class SupportMapFragmentActivity extends AppCompatActivity {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
             MapboxMapOptions options = new MapboxMapOptions();
-            options.styleUrl(Style.getSatelliteStreetsStyleUrl(AppConstant.STYLE_VERSION));
+            options.styleUrl(Style.SATELLITE_STREETS);
 
             options.scrollGesturesEnabled(false);
             options.zoomGesturesEnabled(false);

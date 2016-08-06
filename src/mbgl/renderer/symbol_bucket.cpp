@@ -1,7 +1,7 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
@@ -51,29 +51,29 @@ SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
 
     // Create the quad used for rendering the icon.
     iconQuads(addToBuffers && shapedIcon ?
-            getIconQuads(anchor, shapedIcon, line, layout, iconAlongLine) :
+            getIconQuads(anchor, shapedIcon, line, layout, iconAlongLine, shapedText) :
             SymbolQuads()),
 
     // Create the collision features that will be used to check whether this symbol instance can be placed
     textCollisionFeature(line, anchor, shapedText, textBoxScale, textPadding, textAlongLine, indexedFeature),
     iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconAlongLine, indexedFeature)
-    {};
+    {}
 
 
-SymbolBucket::SymbolBucket(uint32_t overscaling_, float zoom_, const MapMode mode_, const std::string& bucketName_, const std::string& sourceLayerName_)
+SymbolBucket::SymbolBucket(uint32_t overscaling_, float zoom_, const MapMode mode_, std::string bucketName_, std::string sourceLayerName_)
     : overscaling(overscaling_),
       zoom(zoom_),
       tileSize(util::tileSize * overscaling_),
       tilePixelRatio(float(util::EXTENT) / tileSize),
       mode(mode_),
-      bucketName(bucketName_),
-      sourceLayerName(sourceLayerName_) {}
+      bucketName(std::move(bucketName_)),
+      sourceLayerName(std::move(sourceLayerName_)) {}
 
 SymbolBucket::~SymbolBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-void SymbolBucket::upload(gl::ObjectStore& store) {
+void SymbolBucket::upload(gl::ObjectStore& store, gl::Config&) {
     if (hasTextData()) {
         renderData->text.vertices.upload(store);
         renderData->text.triangles.upload(store);
@@ -87,10 +87,10 @@ void SymbolBucket::upload(gl::ObjectStore& store) {
 }
 
 void SymbolBucket::render(Painter& painter,
+                          PaintParameters& parameters,
                           const Layer& layer,
-                          const UnwrappedTileID& tileID,
-                          const mat4& matrix) {
-    painter.renderSymbol(*this, *layer.as<SymbolLayer>(), tileID, matrix);
+                          const RenderTile& tile) {
+    painter.renderSymbol(parameters, *this, *layer.as<SymbolLayer>(), tile);
 }
 
 bool SymbolBucket::hasData() const { return hasTextData() || hasIconData() || !symbolInstances.empty(); }
@@ -119,9 +119,7 @@ void SymbolBucket::parseFeatures(const GeometryTileLayer& layer, const Filter& f
     const GLsizei featureCount = static_cast<GLsizei>(layer.featureCount());
     for (GLsizei i = 0; i < featureCount; i++) {
         auto feature = layer.getFeature(i);
-
-        FilterEvaluator evaluator(*feature);
-        if (!Filter::visit(filter, evaluator))
+        if (!filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
             continue;
 
         SymbolFeature ft;
@@ -284,6 +282,8 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
                 }
                 if ((*image).relativePixelRatio != 1.0f) {
                     iconsNeedLinear = true;
+                } else if (layout.iconRotate != 0) {
+                    iconsNeedLinear = true;
                 }
             }
         }
@@ -314,10 +314,10 @@ void SymbolBucket::addFeature(const GeometryCollection &lines,
     const float iconPadding = layout.iconPadding * tilePixelRatio;
     const float textMaxAngle = layout.textMaxAngle * util::DEG2RAD;
     const bool textAlongLine =
-        layout.textRotationAlignment == RotationAlignmentType::Map &&
+        layout.textRotationAlignment == AlignmentType::Map &&
         layout.symbolPlacement == SymbolPlacementType::Line;
     const bool iconAlongLine =
-        layout.iconRotationAlignment == RotationAlignmentType::Map &&
+        layout.iconRotationAlignment == AlignmentType::Map &&
         layout.symbolPlacement == SymbolPlacementType::Line;
     const bool mayOverlap = layout.textAllowOverlap || layout.iconAllowOverlap ||
         layout.textIgnorePlacement || layout.iconIgnorePlacement;
@@ -370,7 +370,7 @@ void SymbolBucket::addFeature(const GeometryCollection &lines,
         }
     }
 }
-    
+
 bool SymbolBucket::anchorIsTooClose(const std::u32string &text, const float repeatDistance, Anchor &anchor) {
     if (compareText.find(text) == compareText.end()) {
         compareText.emplace(text, Anchors());
@@ -394,10 +394,10 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
     // create the bufers used for rendering.
 
     const bool textAlongLine =
-        layout.textRotationAlignment == RotationAlignmentType::Map &&
+        layout.textRotationAlignment == AlignmentType::Map &&
         layout.symbolPlacement == SymbolPlacementType::Line;
     const bool iconAlongLine =
-        layout.iconRotationAlignment == RotationAlignmentType::Map &&
+        layout.iconRotationAlignment == AlignmentType::Map &&
         layout.symbolPlacement == SymbolPlacementType::Line;
 
     const bool mayOverlap = layout.textAllowOverlap || layout.iconAllowOverlap ||
@@ -495,7 +495,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         const auto &anchorPoint = symbol.anchorPoint;
 
         // drop upside down versions of glyphs
-        const float a = std::fmod(symbol.angle + placementAngle + M_PI, M_PI * 2);
+        const float a = std::fmod(symbol.anchorAngle + placementAngle + M_PI, M_PI * 2);
         if (keepUpright && alongLine && (a <= M_PI / 2 || a > M_PI * 3 / 2)) continue;
 
 
@@ -521,15 +521,18 @@ void SymbolBucket::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         auto &triangleGroup = *buffer.groups.back();
         GLsizei triangleIndex = triangleGroup.vertex_length;
 
+        // Encode angle of glyph
+        uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);
+
         // coordinates (2 triangles)
         buffer.vertices.add(anchorPoint.x, anchorPoint.y, tl.x, tl.y, tex.x, tex.y, minZoom,
-                            maxZoom, placementZoom);
+                            maxZoom, placementZoom, glyphAngle);
         buffer.vertices.add(anchorPoint.x, anchorPoint.y, tr.x, tr.y, tex.x + tex.w, tex.y,
-                            minZoom, maxZoom, placementZoom);
+                            minZoom, maxZoom, placementZoom, glyphAngle);
         buffer.vertices.add(anchorPoint.x, anchorPoint.y, bl.x, bl.y, tex.x, tex.y + tex.h,
-                            minZoom, maxZoom, placementZoom);
+                            minZoom, maxZoom, placementZoom, glyphAngle);
         buffer.vertices.add(anchorPoint.x, anchorPoint.y, br.x, br.y, tex.x + tex.w, tex.y + tex.h,
-                            minZoom, maxZoom, placementZoom);
+                            minZoom, maxZoom, placementZoom, glyphAngle);
 
         // add the two triangles, referencing the four coordinates we just inserted.
         buffer.triangles.add(triangleIndex + 0, triangleIndex + 1, triangleIndex + 2);
@@ -598,39 +601,39 @@ void SymbolBucket::swapRenderData() {
     }
 }
 
-void SymbolBucket::drawGlyphs(SDFShader& shader, gl::ObjectStore& store) {
+void SymbolBucket::drawGlyphs(SDFShader& shader, gl::ObjectStore& store, bool overdraw) {
     GLbyte *vertex_index = BUFFER_OFFSET_0;
     GLbyte *elements_index = BUFFER_OFFSET_0;
     auto& text = renderData->text;
     for (auto &group : text.groups) {
         assert(group);
-        group->array[0].bind(shader, text.vertices, text.triangles, vertex_index, store);
+        group->array[overdraw ? 1 : 0].bind(shader, text.vertices, text.triangles, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * text.vertices.itemSize;
         elements_index += group->elements_length * text.triangles.itemSize;
     }
 }
 
-void SymbolBucket::drawIcons(SDFShader& shader, gl::ObjectStore& store) {
+void SymbolBucket::drawIcons(SDFShader& shader, gl::ObjectStore& store, bool overdraw) {
     GLbyte *vertex_index = BUFFER_OFFSET_0;
     GLbyte *elements_index = BUFFER_OFFSET_0;
     auto& icon = renderData->icon;
     for (auto &group : icon.groups) {
         assert(group);
-        group->array[0].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
+        group->array[overdraw ? 1 : 0].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * icon.vertices.itemSize;
         elements_index += group->elements_length * icon.triangles.itemSize;
     }
 }
 
-void SymbolBucket::drawIcons(IconShader& shader, gl::ObjectStore& store) {
+void SymbolBucket::drawIcons(IconShader& shader, gl::ObjectStore& store, bool overdraw) {
     GLbyte *vertex_index = BUFFER_OFFSET_0;
     GLbyte *elements_index = BUFFER_OFFSET_0;
     auto& icon = renderData->icon;
     for (auto &group : icon.groups) {
         assert(group);
-        group->array[1].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
+        group->array[overdraw ? 3 : 2].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * icon.vertices.itemSize;
         elements_index += group->elements_length * icon.triangles.itemSize;

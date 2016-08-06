@@ -8,12 +8,14 @@
 #include <cstring>
 #include <cassert>
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <cstdio>
+#include <cassert>
 
 namespace mbgl {
 
-Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSource, gl::ObjectStore& store)
+Shader::Shader(const char* name_, const char* vertexSource, const char* fragmentSource, gl::ObjectStore& store, Defines defines)
     : name(name_)
     , program(store.createProgram())
     , vertexShader(store.createShader(GL_VERTEX_SHADER))
@@ -21,13 +23,19 @@ Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSo
 {
     util::stopwatch stopwatch("shader compilation", Event::Shader);
 
-    if (!compileShader(vertexShader, &vertSource)) {
-        Log::Error(Event::Shader, "Vertex shader %s failed to compile: %s", name, vertSource);
+    if (!compileShader(vertexShader, vertexSource)) {
+        Log::Error(Event::Shader, "Vertex shader %s failed to compile: %s", name, vertexSource);
         throw util::ShaderException(std::string { "Vertex shader " } + name + " failed to compile");
     }
 
-    if (!compileShader(fragmentShader, &fragSource)) {
-        Log::Error(Event::Shader, "Fragment shader %s failed to compile: %s", name, fragSource);
+    std::string fragment(fragmentSource);
+    if (defines & Defines::Overdraw) {
+        assert(fragment.find("#ifdef OVERDRAW_INSPECTOR") != std::string::npos);
+        fragment.replace(fragment.find_first_of('\n'), 1, "\n#define OVERDRAW_INSPECTOR\n");
+    }
+
+    if (!compileShader(fragmentShader, fragment.c_str())) {
+        Log::Error(Event::Shader, "Fragment shader %s failed to compile: %s", name, fragmentSource);
         throw util::ShaderException(std::string { "Fragment shader " } + name + " failed to compile");
     }
 
@@ -35,32 +43,37 @@ Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSo
     MBGL_CHECK_ERROR(glAttachShader(program.get(), vertexShader.get()));
     MBGL_CHECK_ERROR(glAttachShader(program.get(), fragmentShader.get()));
 
-    {
-        // Link program
-        GLint status;
-        MBGL_CHECK_ERROR(glLinkProgram(program.get()));
+    // Bind attribute variables
+    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_pos, "a_pos"));
+    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_extrude, "a_extrude"));
+    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_offset, "a_offset"));
+    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_data, "a_data"));
+    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_data1, "a_data1"));
+    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_data2, "a_data2"));
+    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_texture_pos, "a_texture_pos"));
 
-        MBGL_CHECK_ERROR(glGetProgramiv(program.get(), GL_LINK_STATUS, &status));
-        if (status == 0) {
-            GLint logLength;
-            MBGL_CHECK_ERROR(glGetProgramiv(program.get(), GL_INFO_LOG_LENGTH, &logLength));
-            const auto log = std::make_unique<GLchar[]>(logLength);
-            if (logLength > 0) {
-                MBGL_CHECK_ERROR(glGetProgramInfoLog(program.get(), logLength, &logLength, log.get()));
-                Log::Error(Event::Shader, "Program failed to link: %s", log.get());
-            }
-            throw util::ShaderException(std::string { "Program " } + name + " failed to link: " + log.get());
+    // Link program
+    GLint status;
+     MBGL_CHECK_ERROR(glLinkProgram(program.get()));
+
+    MBGL_CHECK_ERROR(glGetProgramiv(program.get(), GL_LINK_STATUS, &status));
+    if (status == 0) {
+        GLint logLength;
+        MBGL_CHECK_ERROR(glGetProgramiv(program.get(), GL_INFO_LOG_LENGTH, &logLength));
+        const auto log = std::make_unique<GLchar[]>(logLength);
+        if (logLength > 0) {
+            MBGL_CHECK_ERROR(glGetProgramInfoLog(program.get(), logLength, &logLength, log.get()));
+            Log::Error(Event::Shader, "Program failed to link: %s", log.get());
         }
+        throw util::ShaderException(std::string { "Program " } + name + " failed to link: " + log.get());
     }
-
-    a_pos = MBGL_CHECK_ERROR(glGetAttribLocation(program.get(), "a_pos"));
 }
 
-bool Shader::compileShader(gl::UniqueShader& shader, const GLchar *source[]) {
+bool Shader::compileShader(gl::UniqueShader& shader, const GLchar *source) {
     GLint status = 0;
 
-    const GLsizei lengths = static_cast<GLsizei>(std::strlen(*source));
-    MBGL_CHECK_ERROR(glShaderSource(shader.get(), 1, source, &lengths));
+    const GLsizei lengths = static_cast<GLsizei>(std::strlen(source));
+    MBGL_CHECK_ERROR(glShaderSource(shader.get(), 1, &source, &lengths));
 
     MBGL_CHECK_ERROR(glCompileShader(shader.get()));
 

@@ -9,17 +9,19 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LatLngBoundsActivity extends AppCompatActivity {
 
@@ -43,7 +45,7 @@ public class LatLngBoundsActivity extends AppCompatActivity {
         }
 
         mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setStyleUrl(Style.getDarkStyleUrl(AppConstant.STYLE_VERSION));
+        mMapView.setStyleUrl(Style.DARK);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -62,10 +64,13 @@ public class LatLngBoundsActivity extends AppCompatActivity {
                         .snippet("City Hall")
                         .position(NEW_YORK));
 
+                List<LatLng> points = new ArrayList<>();
+                points.add(NEW_YORK);
+                points.add(LOS_ANGELES);
+
                 // Create Bounds
                 final LatLngBounds bounds = new LatLngBounds.Builder()
-                        .include(NEW_YORK)
-                        .include(LOS_ANGELES)
+                        .includes(points)
                         .build();
 
                 // Add map padding

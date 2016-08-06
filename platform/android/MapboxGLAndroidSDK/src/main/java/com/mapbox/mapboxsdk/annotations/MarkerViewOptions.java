@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 /**
@@ -28,10 +29,9 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         flat(in.readByte() != 0);
         anchor(in.readFloat(), in.readFloat());
         infoWindowAnchor(in.readFloat(), in.readFloat());
-        selectAnimatorResource(in.readInt());
-        deselectAnimatorResource(in.readInt());
-        rotation(in.readInt());
+        rotation(in.readFloat());
         visible(in.readByte() != 0);
+        alpha(in.readFloat());
         if (in.readByte() != 0) {
             // this means we have an icon
             String iconId = in.readString();
@@ -61,10 +61,9 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         out.writeFloat(getAnchorV());
         out.writeFloat(getInfoWindowAnchorU());
         out.writeFloat(getInfoWindowAnchorV());
-        out.writeInt(getSelectAnimRes());
-        out.writeInt(getDeselectAnimRes());
-        out.writeInt(getRotation());
+        out.writeFloat(getRotation());
         out.writeByte((byte) (isVisible() ? 1 : 0));
+        out.writeFloat(alpha);
         Icon icon = getIcon();
         out.writeByte((byte) (icon != null ? 1 : 0));
         if (icon != null) {
@@ -75,6 +74,10 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
 
     @Override
     public MarkerView getMarker() {
+        if (position == null) {
+            throw new InvalidMarkerPositionException();
+        }
+        
         marker.setPosition(position);
         marker.setSnippet(snippet);
         marker.setTitle(title);
@@ -82,10 +85,9 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         marker.setFlat(flat);
         marker.setAnchor(anchorU, anchorV);
         marker.setInfoWindowAnchor(infoWindowAnchorU, infoWindowAnchorV);
-        marker.setSelectAnimRes(selectAnimRes);
-        marker.setDeselectAnimRes(deselectAnimRes);
         marker.setRotation(rotation);
         marker.setVisible(visible);
+        marker.setAlpha(alpha);
         return marker;
     }
 

@@ -7,7 +7,7 @@ set -u
 NAME=Mapbox
 OUTPUT=build/ios/pkg
 DERIVED_DATA=build/ios
-PRODUCTS=${DERIVED_DATA}/Build/Products
+PRODUCTS=${DERIVED_DATA}
 
 BUILDTYPE=${BUILDTYPE:-Debug}
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
@@ -108,7 +108,7 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
         -jobs ${JOBS} | xcpretty
 fi
 
-LIBS=(Mapbox.a mbgl-core.a mbgl-platform-ios.a)
+LIBS=(Mapbox.a)
 
 # https://medium.com/@syshen/create-an-ios-universal-framework-148eb130a46c
 if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
@@ -119,7 +119,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
             -o ${OUTPUT}/static/${NAME}.framework/${NAME} \
             ${LIBS[@]/#/${PRODUCTS}/${BUILDTYPE}-iphoneos/lib} \
             ${LIBS[@]/#/${PRODUCTS}/${BUILDTYPE}-iphonesimulator/lib} \
-            `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a`
+            `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojson.a`
         
         cp -rv ${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}.bundle ${STATIC_BUNDLE_DIR}
     fi
@@ -129,9 +129,19 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         cp -r \
             ${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}.framework \
             ${OUTPUT}/dynamic/
+
         if [[ -e ${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}.framework.dSYM ]]; then
+            step "Copying dSYM"
             cp -r ${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}.framework.dSYM \
-                ${OUTPUT}/dynamic/
+                  ${OUTPUT}/dynamic/
+            if [[ -e ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework.dSYM ]]; then
+                step "Merging device and simulator dSYMs…"
+                lipo \
+                    ${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME} \
+                    ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME} \
+                    -create -output ${OUTPUT}/dynamic/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}
+                lipo -info ${OUTPUT}/dynamic/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}
+            fi
         fi
 
         step "Merging simulator dynamic library into device dynamic library…"
@@ -140,7 +150,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
             ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework/${NAME} \
             -create -output ${OUTPUT}/dynamic/${NAME}.framework/${NAME} | echo
     fi
-    
+
     cp -rv ${PRODUCTS}/${BUILDTYPE}-iphoneos/Settings.bundle ${STATIC_SETTINGS_DIR}
 else
     if [[ ${BUILD_STATIC} == true ]]; then
@@ -149,7 +159,7 @@ else
         libtool -static -no_warning_for_no_symbols \
             -o ${OUTPUT}/static/${NAME}.framework/${NAME} \
             ${LIBS[@]/#/${PRODUCTS}/${BUILDTYPE}-iphonesimulator/lib} \
-            `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a`
+            `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojson.a`
         
         cp -rv ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.bundle ${STATIC_BUNDLE_DIR}
     fi
@@ -160,11 +170,12 @@ else
             ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework \
             ${OUTPUT}/dynamic/${NAME}.framework
         if [[ -e ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework.dSYM ]]; then
+            step "Copying dSYM"
             cp -r ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework.dSYM \
                 ${OUTPUT}/dynamic/
         fi
     fi
-    
+
     cp -rv ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/Settings.bundle ${STATIC_SETTINGS_DIR}
 fi
 

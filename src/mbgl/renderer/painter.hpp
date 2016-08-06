@@ -27,12 +27,12 @@
 
 namespace mbgl {
 
-class Tile;
+class RenderTile;
 class SpriteAtlas;
 class GlyphAtlas;
 class LineAtlas;
 struct FrameData;
-class TileData;
+class Tile;
 
 class DebugBucket;
 class FillBucket;
@@ -41,27 +41,15 @@ class CircleBucket;
 class SymbolBucket;
 class RasterBucket;
 
+class Shaders;
 class SDFShader;
-class PlainShader;
-class OutlineShader;
-class OutlinePatternShader;
-class LineShader;
-class LinejoinShader;
-class LineSDFShader;
-class LinepatternShader;
-class CircleShader;
-class PatternShader;
-class IconShader;
-class RasterShader;
-class SDFGlyphShader;
-class SDFIconShader;
-class CollisionBoxShader;
+class PaintParameters;
 
 struct ClipID;
 
 namespace util {
 class ObjectStore;
-}
+} // namespace util
 
 namespace style {
 class Style;
@@ -72,7 +60,7 @@ class CircleLayer;
 class SymbolLayer;
 class RasterLayer;
 class BackgroundLayer;
-}
+} // namespace style
 
 struct FrameData {
     std::array<uint16_t, 2> framebufferSize;
@@ -93,54 +81,53 @@ public:
                 SpriteAtlas& annotationSpriteAtlas);
 
     // Renders debug information for a tile.
-    void renderTileDebug(const Tile& tile);
+    void renderTileDebug(const RenderTile&);
 
     // Renders the red debug frame around a tile, visualizing its perimeter.
     void renderDebugFrame(const mat4 &matrix);
 
+#ifndef NDEBUG
+    // Renders tile clip boundaries, using stencil buffer to calculate fill color.
     void renderClipMasks();
+#endif
 
-    void renderDebugText(TileData&, const mat4&);
-    void renderFill(FillBucket&, const style::FillLayer&, const UnwrappedTileID&, const mat4&);
-    void renderLine(LineBucket&, const style::LineLayer&, const UnwrappedTileID&, const mat4&);
-    void renderCircle(CircleBucket&, const style::CircleLayer&, const UnwrappedTileID&, const mat4&);
-    void renderSymbol(SymbolBucket&, const style::SymbolLayer&, const UnwrappedTileID&, const mat4&);
-    void renderRaster(RasterBucket&, const style::RasterLayer&, const UnwrappedTileID&, const mat4&);
-    void renderBackground(const style::BackgroundLayer&);
+    void renderDebugText(Tile&, const mat4&);
+    void renderFill(PaintParameters&, FillBucket&, const style::FillLayer&, const RenderTile&);
+    void renderLine(PaintParameters&, LineBucket&, const style::LineLayer&, const RenderTile&);
+    void renderCircle(PaintParameters&, CircleBucket&, const style::CircleLayer&, const RenderTile&);
+    void renderSymbol(PaintParameters&, SymbolBucket&, const style::SymbolLayer&, const RenderTile&);
+    void renderRaster(PaintParameters&, RasterBucket&, const style::RasterLayer&, const RenderTile&);
+    void renderBackground(PaintParameters&, const style::BackgroundLayer&);
 
     float saturationFactor(float saturation);
     float contrastFactor(float contrast);
     std::array<float, 3> spinWeights(float spin_value);
 
-    void drawClippingMasks(const std::map<UnwrappedTileID, ClipID>&);
+    void drawClippingMasks(PaintParameters&, const std::map<UnwrappedTileID, ClipID>&);
 
     bool needsAnimation() const;
 
 private:
-    mat4 translatedMatrix(const mat4& matrix,
-                          const std::array<float, 2>& translation,
-                          const UnwrappedTileID& id,
-                          style::TranslateAnchorType anchor);
-
     std::vector<RenderItem> determineRenderOrder(const style::Style&);
 
     template <class Iterator>
-    void renderPass(RenderPass,
+    void renderPass(PaintParameters&,
+                    RenderPass,
                     Iterator it, Iterator end,
                     GLsizei i, int8_t increment);
 
     void setClipping(const ClipID&);
 
-    void renderSDF(SymbolBucket &bucket,
-                   const UnwrappedTileID &tileID,
-                   const mat4 &matrixSymbol,
+    void renderSDF(SymbolBucket&,
+                   const RenderTile&,
                    float scaleDivisor,
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&),
+                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, bool),
 
                    // Layout
-                   style::RotationAlignmentType rotationAlignment,
+                   style::AlignmentType rotationAlignment,
+                   style::AlignmentType pitchAlignment,
                    float layoutSize,
 
                    // Paint
@@ -155,18 +142,15 @@ private:
 
     void setDepthSublayer(int n);
 
+#ifndef NDEBUG
+    bool isOverdraw() const { return frame.debugOptions & MapDebugOptions::Overdraw; }
+#else
+    bool isOverdraw() const { return false; }
+#endif
+
     mat4 projMatrix;
-    mat4 nativeMatrix;
 
-    std::array<float, 2> extrudeScale;
-
-    // used to composite images and flips the geometry upside down
-    const mat4 flipMatrix = []{
-        mat4 flip;
-        matrix::ortho(flip, 0, util::EXTENT, -util::EXTENT, 0, 0, 1);
-        matrix::translate(flip, flip, 0, -util::EXTENT, 0);
-        return flip;
-    }();
+    std::array<float, 2> pixelsToGLUnits;
 
     const mat4 identityMatrix = []{
         mat4 identity;
@@ -196,45 +180,38 @@ private:
 
     FrameHistory frameHistory;
 
-    std::unique_ptr<PlainShader> plainShader;
-    std::unique_ptr<OutlineShader> outlineShader;
-    std::unique_ptr<OutlinePatternShader> outlinePatternShader;
-    std::unique_ptr<LineShader> lineShader;
-    std::unique_ptr<LineSDFShader> linesdfShader;
-    std::unique_ptr<LinepatternShader> linepatternShader;
-    std::unique_ptr<PatternShader> patternShader;
-    std::unique_ptr<IconShader> iconShader;
-    std::unique_ptr<RasterShader> rasterShader;
-    std::unique_ptr<SDFGlyphShader> sdfGlyphShader;
-    std::unique_ptr<SDFIconShader> sdfIconShader;
-    std::unique_ptr<CollisionBoxShader> collisionBoxShader;
-    std::unique_ptr<CircleShader> circleShader;
+    std::unique_ptr<Shaders> shaders;
+#ifndef NDEBUG
+    std::unique_ptr<Shaders> overdrawShaders;
+#endif
 
     // Set up the stencil quad we're using to generate the stencil mask.
-    StaticVertexBuffer tileStencilBuffer = {
+    StaticVertexBuffer tileStencilBuffer {
         // top left triangle
-        { 0, 0 },
-        { util::EXTENT, 0 },
-        { 0, util::EXTENT },
+        {{ 0, 0 }},
+        {{ util::EXTENT, 0 }},
+        {{ 0, util::EXTENT }},
 
         // bottom right triangle
-        { util::EXTENT, 0 },
-        { 0, util::EXTENT },
-        { util::EXTENT, util::EXTENT },
+        {{ util::EXTENT, 0 }},
+        {{ 0, util::EXTENT }},
+        {{ util::EXTENT, util::EXTENT }},
     };
 
-    VertexArrayObject coveringPlainArray;
-    VertexArrayObject coveringRasterArray;
-    VertexArrayObject backgroundPatternArray;
-    VertexArrayObject backgroundArray;
+    StaticRasterVertexBuffer rasterBoundsBuffer {
+        {{ 0, 0, 0, 0 }},
+        {{ util::EXTENT, 0, 32767, 0 }},
+        {{ 0, util::EXTENT, 0, 32767 }},
+        {{ util::EXTENT, util::EXTENT, 32767, 32767 }},
+    };
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
-    StaticVertexBuffer tileBorderBuffer = {
-        { 0, 0 },
-        { util::EXTENT, 0 },
-        { util::EXTENT, util::EXTENT },
-        { 0, util::EXTENT },
-        { 0, 0 },
+    StaticVertexBuffer tileBorderBuffer {
+        {{ 0, 0 }},
+        {{ util::EXTENT, 0 }},
+        {{ util::EXTENT, util::EXTENT }},
+        {{ 0, util::EXTENT }},
+        {{ 0, 0 }},
     };
 
     VertexArrayObject tileBorderArray;

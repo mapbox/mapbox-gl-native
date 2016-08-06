@@ -10,8 +10,6 @@
 
 namespace mbgl {
 
-class Shader;
-
 class VertexArrayObject : public util::noncopyable {
 public:
     static void Unbind();
@@ -19,8 +17,8 @@ public:
     VertexArrayObject();
     ~VertexArrayObject();
 
-    template <typename Shader, typename VertexBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, GLbyte *offset, gl::ObjectStore& store) {
+    template <typename VertexBuffer>
+    void bind(Shader& shader, VertexBuffer& vertexBuffer, GLbyte* offset, gl::ObjectStore& store) {
         bindVertexArrayObject(store);
         if (bound_shader == 0) {
             vertexBuffer.bind(store);
@@ -33,8 +31,8 @@ public:
         }
     }
 
-    template <typename Shader, typename VertexBuffer, typename ElementsBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, ElementsBuffer &elementsBuffer, GLbyte *offset, gl::ObjectStore& store) {
+    template <typename VertexBuffer, typename ElementsBuffer>
+    void bind(Shader& shader, VertexBuffer& vertexBuffer, ElementsBuffer& elementsBuffer, GLbyte* offset, gl::ObjectStore& store) {
         bindVertexArrayObject(store);
         if (bound_shader == 0) {
             vertexBuffer.bind(store);
@@ -62,10 +60,10 @@ private:
     // For debug reasons, we're storing the bind information so that we can
     // detect errors and report
     GLuint bound_shader = 0;
-    const char *bound_shader_name = "";
+    const char* bound_shader_name = "";
     GLuint bound_vertex_buffer = 0;
     GLuint bound_elements_buffer = 0;
-    GLbyte *bound_offset = 0;
+    GLbyte *bound_offset = nullptr;
 };
 
 } // namespace mbgl

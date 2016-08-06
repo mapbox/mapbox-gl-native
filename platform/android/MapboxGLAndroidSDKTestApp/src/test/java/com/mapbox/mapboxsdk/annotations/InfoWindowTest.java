@@ -32,7 +32,7 @@ public class InfoWindowTest {
     @Test
     public void testBoundMarker() {
         MarkerOptions markerOptions = new MarkerOptions();
-        Marker marker = markerOptions.getMarker();
+        Marker marker = markerOptions.position(new LatLng()).getMarker();
         InfoWindow infoWindow = new InfoWindow(mMapView, mMapboxMap).setBoundMarker(marker);
         assertEquals("marker should match", marker, infoWindow.getBoundMarker());
     }
@@ -53,7 +53,7 @@ public class InfoWindowTest {
         when(projection.toScreenLocation(latLng)).thenReturn(new PointF(0, 0));
 
         InfoWindow infoWindow = new InfoWindow(mMapView, mMapboxMap);
-        infoWindow.open(mMapView, new MarkerOptions().getMarker(), latLng, 0, 0);
+        infoWindow.open(mMapView, new MarkerOptions().position(new LatLng()).getMarker(), latLng, 0, 0);
         assertEquals("infowindow should not be visible", true, infoWindow.isVisible());
     }
 
@@ -65,7 +65,7 @@ public class InfoWindowTest {
         when(projection.toScreenLocation(latLng)).thenReturn(new PointF(0, 0));
 
         InfoWindow infoWindow = new InfoWindow(mMapView, mMapboxMap);
-        infoWindow.open(mMapView, new MarkerOptions().getMarker(), latLng, 0, 0);
+        infoWindow.open(mMapView, new MarkerOptions().position(new LatLng()).getMarker(), latLng, 0, 0);
         infoWindow.close();
         assertEquals("infowindow should not be visible", false, infoWindow.isVisible());
     }

@@ -6,9 +6,10 @@ using namespace mapbox::geometry;
 
 using Value = mbgl::Value;
 using Feature = mbgl::Feature;
+using FeatureIdentifier = mbgl::FeatureIdentifier;
 using Geometry = mbgl::Feature::geometry_type;
 using GeometryCollection = mapbox::geometry::geometry_collection<double>;
-using Properties = mbgl::Feature::property_map;
+using Properties = mbgl::PropertyMap;
 
 template <class T>
 struct ToType {
@@ -76,7 +77,7 @@ public:
 };
 
 struct ToValue {
-    v8::Local<v8::Value> operator()(std::nullptr_t) {
+    v8::Local<v8::Value> operator()(mbgl::NullValue) {
         Nan::EscapableHandleScope scope;
         return scope.Escape(Nan::Null());
     }
@@ -159,10 +160,10 @@ v8::Local<v8::Object> toJS(const Feature& feature) {
     Nan::Set(result, Nan::New("properties").ToLocalChecked(), toJS(feature.properties));
 
     if (feature.id) {
-        Nan::Set(result, Nan::New("id").ToLocalChecked(), Nan::New(double(*feature.id)));
+        Nan::Set(result, Nan::New("id").ToLocalChecked(), FeatureIdentifier::visit(*feature.id, ToValue()));
     }
 
     return scope.Escape(result);
 }
 
-}
+} // namespace node_mbgl

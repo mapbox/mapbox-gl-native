@@ -13,7 +13,7 @@
 using namespace mbgl;
 
 TEST(API, RenderWithoutCallback) {
-    FixtureLogObserver* log = new FixtureLogObserver();
+    auto log = new FixtureLogObserver();
     Log::setObserver(std::unique_ptr<Log::Observer>(log));
 
     util::RunLoop loop;

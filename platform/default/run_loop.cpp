@@ -14,9 +14,9 @@ using namespace mbgl::util;
 static ThreadLocal<RunLoop>& current = *new ThreadLocal<RunLoop>;
 
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void dummyCallback(uv_async_t*, int) {};
+void dummyCallback(uv_async_t*, int) {}
 #else
-void dummyCallback(uv_async_t*) {};
+void dummyCallback(uv_async_t*) {}
 #endif
 
 } // namespace
@@ -158,7 +158,7 @@ void RunLoop::run() {
 void RunLoop::runOnce() {
     MBGL_VERIFY_THREAD(tid);
 
-    uv_run(impl->loop, UV_RUN_ONCE);
+    uv_run(impl->loop, UV_RUN_NOWAIT);
 }
 
 void RunLoop::stop() {

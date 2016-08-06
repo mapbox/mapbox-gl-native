@@ -12,7 +12,7 @@
     "type": "circle",
     "source": "mapbox",
     "paint": {
-      "circle-opacity": null
+      "circle-opacity": "no"
     }
   }]
 }

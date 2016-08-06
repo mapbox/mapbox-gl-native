@@ -6,7 +6,6 @@
 #include <utility>
 #include <functional>
 
-#include <mbgl/util/atomic.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread_context.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -95,13 +94,7 @@ Thread<Object>::Thread(const ThreadContext& context, Args&&... args) {
     std::tuple<Args...> params = std::forward_as_tuple(::std::forward<Args>(args)...);
 
     thread = std::thread([&] {
-#if defined(__APPLE__)
-        pthread_setname_np(context.name.c_str());
-#elif defined(__GLIBC__) && defined(__GLIBC_PREREQ)
-#if __GLIBC_PREREQ(2, 12)
-        pthread_setname_np(pthread_self(), context.name.c_str());
-#endif
-#endif
+        platform::setCurrentThreadName(context.name);
 
         if (context.priority == ThreadPriority::Low) {
             platform::makeThreadLowPriority();

@@ -1,10 +1,17 @@
 #include "qmapboxgl_p.hpp"
 
+#include "qt_conversion.hpp"
+#include "qt_geojson.hpp"
+
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/layer.hpp>
+#include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/style/transition_options.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/constants.hpp>
@@ -19,6 +26,7 @@
 #include <QCoreApplication>
 #endif
 
+#include <QDebug>
 #include <QImage>
 #include <QMapboxGL>
 #include <QMargins>
@@ -72,6 +80,41 @@ static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingMapFul
 namespace {
 
 QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
+
+// Convertion helper functions.
+
+auto fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
+    const LineString &lineString = shapeAnnotation.first;
+    const QString &styleLayer = shapeAnnotation.second;
+
+    mbgl::LineString<double> mbglLineString;
+    mbglLineString.reserve(lineString.size());
+
+    for (const Coordinate &coordinate : lineString) {
+        mbglLineString.emplace_back(mbgl::Point<double> { coordinate.first, coordinate.second });
+    }
+
+    return mbgl::StyleSourcedAnnotation { std::move(mbglLineString), styleLayer.toStdString() };
+}
+
+auto fromQMapboxTransitionOptions(const QMapbox::TransitionOptions &options) {
+    auto convert = [](auto& value) -> mbgl::optional<mbgl::Duration> {
+        if (value.isValid()) {
+            return std::chrono::duration_cast<mbgl::Duration>(mbgl::Milliseconds(value.template value<qint64>()));
+        };
+        return {};
+    };
+    return mbgl::style::TransitionOptions { convert(options.duration), convert(options.delay) };
+}
+
+auto fromQStringList(const QStringList &list)
+{
+    std::vector<std::string> strings(list.size());
+    for (const QString &string : list) {
+        strings.emplace_back(string.toStdString());
+    }
+    return strings;
+}
 
 }
 
@@ -345,9 +388,19 @@ void QMapboxGL::addClass(const QString &className)
     d_ptr->mapObj->addClass(className.toStdString());
 }
 
+void QMapboxGL::addClass(const QString &className, const QMapbox::TransitionOptions &options)
+{
+    d_ptr->mapObj->addClass(className.toStdString(), fromQMapboxTransitionOptions(options));
+}
+
 void QMapboxGL::removeClass(const QString &className)
 {
     d_ptr->mapObj->removeClass(className.toStdString());
+}
+
+void QMapboxGL::removeClass(const QString &className, const QMapbox::TransitionOptions &options)
+{
+    d_ptr->mapObj->removeClass(className.toStdString(), fromQMapboxTransitionOptions(options));
 }
 
 bool QMapboxGL::hasClass(const QString &className) const
@@ -357,14 +410,12 @@ bool QMapboxGL::hasClass(const QString &className) const
 
 void QMapboxGL::setClasses(const QStringList &classNames)
 {
-    std::vector<std::string> mbglClassNames;
-    mbglClassNames.reserve(classNames.size());
+    d_ptr->mapObj->setClasses(fromQStringList(classNames));
+}
 
-    for (const QString &className : classNames) {
-        mbglClassNames.emplace_back(className.toStdString());
-    }
-
-    d_ptr->mapObj->setClasses(mbglClassNames);
+void QMapboxGL::setClasses(const QStringList &classNames, const QMapbox::TransitionOptions &options)
+{
+    d_ptr->mapObj->setClasses(fromQStringList(classNames), fromQMapboxTransitionOptions(options));
 }
 
 QStringList QMapboxGL::getClasses() const
@@ -392,27 +443,6 @@ void QMapboxGL::updatePointAnnotation(AnnotationID id, const PointAnnotation &po
     d_ptr->mapObj->updateAnnotation(id, fromPointAnnotation(pointAnnotation));
 }
 
-mbgl::Annotation fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
-    const CoordinateSegments &segments = shapeAnnotation.first;
-    const QString &styleLayer = shapeAnnotation.second;
-
-    mbgl::Polygon<double> polygon;
-    polygon.reserve(segments.size());
-
-    for (const Coordinates &coordinates : segments) {
-        mbgl::LinearRing<double> linearRing;
-        linearRing.reserve(coordinates.size());
-
-        for (const Coordinate &coordinate : coordinates) {
-            linearRing.emplace_back(mbgl::Point<double>(coordinate.first, coordinate.second));
-        }
-
-        polygon.emplace_back(linearRing);
-    }
-
-    return mbgl::StyleSourcedAnnotation { polygon, styleLayer.toStdString() };
-}
-
 AnnotationID QMapboxGL::addShapeAnnotation(const ShapeAnnotation &shapeAnnotation)
 {
     return d_ptr->mapObj->addAnnotation(fromQMapboxGLShapeAnnotation(shapeAnnotation));
@@ -421,6 +451,47 @@ AnnotationID QMapboxGL::addShapeAnnotation(const ShapeAnnotation &shapeAnnotatio
 void QMapboxGL::removeAnnotation(AnnotationID annotationID)
 {
     d_ptr->mapObj->removeAnnotation(annotationID);
+}
+
+void QMapboxGL::setLayoutProperty(const QString& layer_, const QString& property, const QVariant& value)
+{
+    using namespace mbgl::style;
+
+    Layer* layer = d_ptr->mapObj->getLayer(layer_.toStdString());
+    if (!layer) {
+        qWarning() << "Layer not found:" << layer_;
+        return;
+    }
+
+    if (conversion::setLayoutProperty(*layer, property.toStdString(), value)) {
+        qWarning() << "Error setting layout property:" << layer_ << "-" << property;
+        return;
+    }
+
+    d_ptr->mapObj->update(mbgl::Update::RecalculateStyle);
+}
+
+void QMapboxGL::setPaintProperty(const QString& layer_, const QString& property, const QVariant& value, const QString& klass_)
+{
+    using namespace mbgl::style;
+
+    Layer* layer = d_ptr->mapObj->getLayer(layer_.toStdString());
+    if (!layer) {
+        qWarning() << "Layer not found:" << layer_;
+        return;
+    }
+
+    mbgl::optional<std::string> klass;
+    if (!klass_.isEmpty()) {
+        klass = klass_.toStdString();
+    }
+
+    if (conversion::setPaintProperty(*layer, property.toStdString(), value, klass)) {
+        qWarning() << "Error setting paint property:" << layer_ << "-" << property;
+        return;
+    }
+
+    d_ptr->mapObj->update(mbgl::Update::RecalculateStyle | mbgl::Update::Classes);
 }
 
 bool QMapboxGL::isRotating() const
@@ -550,6 +621,25 @@ QMargins QMapboxGL::margins() const
     );
 }
 
+void QMapboxGL::addSource(const QString& sourceID, const QVariant& value)
+{
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    Result<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(value, sourceID.toStdString());
+    if (!source) {
+        qWarning() << "Unable to add source:" << source.error().message.c_str();
+        return;
+    }
+
+    d_ptr->mapObj->addSource(std::move(*source));
+}
+
+void QMapboxGL::removeSource(const QString& sourceID)
+{
+    d_ptr->mapObj->removeSource(sourceID.toStdString());
+}
+
 void QMapboxGL::addCustomLayer(const QString &id,
         QMapbox::CustomLayerInitializeFunction initFn,
         QMapbox::CustomLayerRenderFunction renderFn,
@@ -568,9 +658,63 @@ void QMapboxGL::addCustomLayer(const QString &id,
             before ? mbgl::optional<std::string>(before) : mbgl::optional<std::string>());
 }
 
-void QMapboxGL::removeCustomLayer(const QString& id)
+void QMapboxGL::addLayer(const QVariant& value)
+{
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    Result<std::unique_ptr<Layer>> layer = convert<std::unique_ptr<Layer>>(value);
+    if (!layer) {
+        qWarning() << "Unable to add layer:" << layer.error().message.c_str();
+        return;
+    }
+
+    d_ptr->mapObj->addLayer(std::move(*layer));
+}
+
+void QMapboxGL::removeLayer(const QString& id)
 {
     d_ptr->mapObj->removeLayer(id.toStdString());
+}
+
+void QMapboxGL::setFilter(const QString& layer_, const QVariant& filter_)
+{
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    Layer* layer = d_ptr->mapObj->getLayer(layer_.toStdString());
+    if (!layer) {
+        qWarning() << "Layer not found:" << layer_;
+        return;
+    }
+
+    Filter filter;
+
+    Result<Filter> converted = convert<Filter>(filter_);
+    if (!converted) {
+        qWarning() << "Error parsing filter:" << converted.error().message.c_str();
+        return;
+    }
+    filter = std::move(*converted);
+
+    if (layer->is<FillLayer>()) {
+        layer->as<FillLayer>()->setFilter(filter);
+        return;
+    }
+    if (layer->is<LineLayer>()) {
+        layer->as<LineLayer>()->setFilter(filter);
+        return;
+    }
+    if (layer->is<SymbolLayer>()) {
+        layer->as<SymbolLayer>()->setFilter(filter);
+        return;
+    }
+    if (layer->is<CircleLayer>()) {
+        layer->as<CircleLayer>()->setFilter(filter);
+        return;
+    }
+
+    qWarning() << "Layer doesn't support filters";
 }
 
 void QMapboxGL::render()
@@ -586,7 +730,6 @@ void QMapboxGL::connectionEstablished()
 
 QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings)
     : QObject(q)
-    , size(0, 0)
     , q_ptr(q)
     , fileSourceObj(std::make_unique<mbgl::DefaultFileSource>(
         settings.cacheDatabasePath().toStdString(),

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/renderer/bucket.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
@@ -61,16 +61,16 @@ class SymbolInstance {
 };
 
 class SymbolBucket : public Bucket {
-    typedef ElementGroup<1> TextElementGroup;
-    typedef ElementGroup<2> IconElementGroup;
+    typedef ElementGroup<2> TextElementGroup;
+    typedef ElementGroup<4> IconElementGroup;
     typedef ElementGroup<1> CollisionBoxElementGroup;
 
 public:
-    SymbolBucket(uint32_t overscaling, float zoom, const MapMode, const std::string& bucketName_, const std::string& sourceLayerName_);
+    SymbolBucket(uint32_t overscaling, float zoom, const MapMode, std::string bucketName_, std::string sourceLayerName_);
     ~SymbolBucket() override;
 
-    void upload(gl::ObjectStore&) override;
-    void render(Painter&, const style::Layer&, const UnwrappedTileID&, const mat4&) override;
+    void upload(gl::ObjectStore&, gl::Config&) override;
+    void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
     bool hasData() const override;
     bool hasTextData() const;
     bool hasIconData() const;
@@ -82,9 +82,9 @@ public:
                      GlyphAtlas&,
                      GlyphStore&);
 
-    void drawGlyphs(SDFShader&, gl::ObjectStore&);
-    void drawIcons(SDFShader&, gl::ObjectStore&);
-    void drawIcons(IconShader&, gl::ObjectStore&);
+    void drawGlyphs(SDFShader&, gl::ObjectStore&, bool overdraw);
+    void drawIcons(SDFShader&, gl::ObjectStore&, bool overdraw);
+    void drawIcons(IconShader&, gl::ObjectStore&, bool overdraw);
     void drawCollisionBoxes(CollisionBoxShader&, gl::ObjectStore&);
 
     void parseFeatures(const GeometryTileLayer&, const style::Filter&);
@@ -98,7 +98,7 @@ private:
             const size_t index);
     bool anchorIsTooClose(const std::u32string &text, const float repeatDistance, Anchor &anchor);
     std::map<std::u32string, std::vector<Anchor>> compareText;
-    
+
     void addToDebugBuffers(CollisionTile &collisionTile);
 
     void swapRenderData() override;

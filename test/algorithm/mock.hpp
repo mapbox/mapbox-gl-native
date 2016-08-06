@@ -7,16 +7,12 @@
 #include <map>
 
 #include <mbgl/tile/tile_id.hpp>
-
-struct MockSourceInfo {
-    uint8_t maxZoom = 16;
-    uint8_t minZoom = 0;
-};
+#include <mbgl/util/range.hpp>
 
 struct MockTileData;
 
 struct MockSource {
-    MockSourceInfo info;
+    mbgl::Range<uint8_t> zoomRange { 0, 16 };
     std::map<mbgl::OverscaledTileID, std::unique_ptr<MockTileData>> dataTiles;
     std::set<mbgl::UnwrappedTileID> idealTiles;
 
@@ -29,11 +25,17 @@ struct MockBucket {};
 
 struct MockTileData {
     MockTileData(const mbgl::OverscaledTileID& tileID_) : tileID(tileID_) {}
-    bool isRenderable() {
+
+    bool hasTriedOptional() const {
+        return triedOptional;
+    }
+
+    bool isRenderable() const {
         return renderable;
     }
 
     bool renderable = false;
+    bool triedOptional = false;
     const mbgl::OverscaledTileID tileID;
 };
 

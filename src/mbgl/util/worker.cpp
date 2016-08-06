@@ -3,7 +3,7 @@
 #include <mbgl/util/work_request.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/text/collision_tile.hpp>
 
@@ -31,11 +31,11 @@ public:
 
     void parseGeometryTile(TileWorker* worker,
                            std::vector<std::unique_ptr<style::Layer>> layers,
-                           std::unique_ptr<GeometryTile> tile,
+                           std::unique_ptr<GeometryTileData> tileData,
                            PlacementConfig config,
                            std::function<void(TileParseResult)> callback) {
         try {
-            callback(worker->parseAllLayers(std::move(layers), std::move(tile), config));
+            callback(worker->parseAllLayers(std::move(layers), std::move(tileData), config));
         } catch (...) {
             callback(std::current_exception());
         }
@@ -80,12 +80,12 @@ Worker::parseRasterTile(std::unique_ptr<RasterBucket> bucket,
 std::unique_ptr<AsyncRequest>
 Worker::parseGeometryTile(TileWorker& worker,
                           std::vector<std::unique_ptr<style::Layer>> layers,
-                          std::unique_ptr<GeometryTile> tile,
+                          std::unique_ptr<GeometryTileData> tileData,
                           PlacementConfig config,
                           std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::parseGeometryTile, callback, &worker,
-                                                std::move(layers), std::move(tile), config);
+                                                std::move(layers), std::move(tileData), config);
 }
 
 std::unique_ptr<AsyncRequest>

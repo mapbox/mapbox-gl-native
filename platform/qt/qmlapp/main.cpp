@@ -4,6 +4,7 @@
 #include <qqml.h>
 
 #include <QQuickMapboxGL>
+#include <QQuickMapboxGLStyleProperty>
 
 int main(int argc, char *argv[])
 {
@@ -13,7 +14,9 @@ int main(int argc, char *argv[])
     app.setWindowIcon(QIcon(":icon.png"));
 #endif
 
-    qmlRegisterType<QQuickMapboxGL>("QQuickMapboxGL", 1, 0, "QQuickMapboxGL");
+    qmlRegisterType<QQuickMapboxGL>("QQuickMapboxGL", 1, 0, "MapboxMap");
+    qmlRegisterType<QQuickMapboxGLLayoutStyleProperty>("QQuickMapboxGL", 1, 0, "MapboxLayoutStyleProperty");
+    qmlRegisterType<QQuickMapboxGLPaintStyleProperty>("QQuickMapboxGL", 1, 0, "MapboxPaintStyleProperty");
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));

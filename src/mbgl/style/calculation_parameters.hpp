@@ -12,13 +12,13 @@ public:
         : z(z_) {}
 
     CalculationParameters(float z_,
-                          const TimePoint& now_,
-                          const ZoomHistory& zoomHistory_,
-                          const Duration& defaultFadeDuration_)
+                          TimePoint now_,
+                          ZoomHistory zoomHistory_,
+                          Duration defaultFadeDuration_)
         : z(z_),
-          now(now_),
-          zoomHistory(zoomHistory_),
-          defaultFadeDuration(defaultFadeDuration_) {}
+          now(std::move(now_)),
+          zoomHistory(std::move(zoomHistory_)),
+          defaultFadeDuration(std::move(defaultFadeDuration_)) {}
 
     float z;
     TimePoint now;

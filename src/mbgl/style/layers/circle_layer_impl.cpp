@@ -8,10 +8,6 @@
 namespace mbgl {
 namespace style {
 
-void CircleLayer::Impl::parsePaints(const JSValue& layer) {
-    paint.parse(layer);
-}
-
 void CircleLayer::Impl::cascade(const CascadeParameters& parameters) {
     paint.cascade(parameters);
 }
@@ -19,7 +15,7 @@ void CircleLayer::Impl::cascade(const CascadeParameters& parameters) {
 bool CircleLayer::Impl::recalculate(const CalculationParameters& parameters) {
     bool hasTransitions = paint.recalculate(parameters);
 
-    passes = (paint.circleRadius > 0 && paint.circleColor.value[3] > 0 && paint.circleOpacity > 0)
+    passes = (paint.circleRadius > 0 && paint.circleColor.value.a > 0 && paint.circleOpacity > 0)
         ? RenderPass::Translucent : RenderPass::None;
 
     return hasTransitions;

@@ -13,14 +13,13 @@ namespace style {
 
 class CircleLayer : public Layer {
 public:
-    CircleLayer(const std::string& layerID);
+    CircleLayer(const std::string& layerID, const std::string& sourceID);
     ~CircleLayer() final;
 
     // Source
-
-    void setSource(const std::string& sourceID, const std::string& sourceLayer);
     const std::string& getSourceID() const;
     const std::string& getSourceLayer() const;
+    void setSourceLayer(const std::string& sourceLayer);
 
     void setFilter(const Filter&);
     const Filter& getFilter() const;
@@ -28,22 +27,25 @@ public:
     // Paint properties
 
     PropertyValue<float> getCircleRadius() const;
-    void setCircleRadius(PropertyValue<float>);
+    void setCircleRadius(PropertyValue<float>, const optional<std::string>& klass = {});
 
     PropertyValue<Color> getCircleColor() const;
-    void setCircleColor(PropertyValue<Color>);
+    void setCircleColor(PropertyValue<Color>, const optional<std::string>& klass = {});
 
     PropertyValue<float> getCircleBlur() const;
-    void setCircleBlur(PropertyValue<float>);
+    void setCircleBlur(PropertyValue<float>, const optional<std::string>& klass = {});
 
     PropertyValue<float> getCircleOpacity() const;
-    void setCircleOpacity(PropertyValue<float>);
+    void setCircleOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
 
     PropertyValue<std::array<float, 2>> getCircleTranslate() const;
-    void setCircleTranslate(PropertyValue<std::array<float, 2>>);
+    void setCircleTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
 
     PropertyValue<TranslateAnchorType> getCircleTranslateAnchor() const;
-    void setCircleTranslateAnchor(PropertyValue<TranslateAnchorType>);
+    void setCircleTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
+
+    PropertyValue<CirclePitchScaleType> getCirclePitchScale() const;
+    void setCirclePitchScale(PropertyValue<CirclePitchScaleType>, const optional<std::string>& klass = {});
 
     // Private implementation
 

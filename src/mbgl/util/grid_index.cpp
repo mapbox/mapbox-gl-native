@@ -1,5 +1,6 @@
 #include <mbgl/util/grid_index.hpp>
 #include <mbgl/geometry/feature_index.hpp>
+#include <mbgl/math/minmax.hpp>
 
 #include <unordered_set>
 
@@ -17,7 +18,7 @@ GridIndex<T>::GridIndex(int32_t extent_, int32_t n_, int32_t padding_) :
     max(extent + double(padding) / n * extent)
     {
         cells.resize(d * d);
-    };
+    }
 
 template <class T>
 void GridIndex<T>::insert(T&& t, const BBox& bbox) {
@@ -28,9 +29,10 @@ void GridIndex<T>::insert(T&& t, const BBox& bbox) {
     auto cx2 = convertToCellCoord(bbox.max.x);
     auto cy2 = convertToCellCoord(bbox.max.y);
 
-    for (int32_t x = cx1; x <= cx2; x++) {
-        for (int32_t y = cy1; y <= cy2; y++) {
-            auto cellIndex = d * y + x;
+    int32_t x, y, cellIndex;
+    for (x = cx1; x <= cx2; ++x) {
+        for (y = cy1; y <= cy2; ++y) {
+            cellIndex = d * y + x;
             cells[cellIndex].push_back(uid);
         }
     }
@@ -48,9 +50,10 @@ std::vector<T> GridIndex<T>::query(const BBox& queryBBox) const {
     auto cx2 = convertToCellCoord(queryBBox.max.x);
     auto cy2 = convertToCellCoord(queryBBox.max.y);
 
-    for (int32_t x = cx1; x <= cx2; x++) {
-        for (int32_t y = cy1; y <= cy2; y++) {
-            auto cellIndex = d * y + x;
+    int32_t x, y, cellIndex;
+    for (x = cx1; x <= cx2; ++x) {
+        for (y = cy1; y <= cy2; ++y) {
+            cellIndex = d * y + x;
             for (auto uid : cells[cellIndex]) {
                 if (seenUids.count(uid) == 0) {
                     seenUids.insert(uid);
@@ -75,8 +78,8 @@ std::vector<T> GridIndex<T>::query(const BBox& queryBBox) const {
 
 template <class T>
 int32_t GridIndex<T>::convertToCellCoord(int32_t x) const {
-    return std::max(0.0, std::min(d - 1.0, std::floor(x * scale) + padding));
+    return util::max(0.0, util::min(d - 1.0, std::floor(x * scale) + padding));
 }
 
 template class GridIndex<IndexedSubfeature>;
-}
+} // namespace mbgl

@@ -7,7 +7,7 @@ set -u
 NAME=Mapbox
 OUTPUT=build/macos/pkg
 DERIVED_DATA=build/macos
-PRODUCTS=${DERIVED_DATA}/Build/Products
+PRODUCTS=${DERIVED_DATA}
 
 BUILDTYPE=${BUILDTYPE:-Release}
 GCC_GENERATE_DEBUGGING_SYMBOLS=${SYMBOLS:-YES}
@@ -38,7 +38,7 @@ xcodebuild \
 
 step "Copying dynamic framework into place"
 mkdir -p "${OUTPUT}/${NAME}.framework"
-cp -r ${PRODUCTS}/${BUILDTYPE}/${NAME}.framework/* "${OUTPUT}/${NAME}.framework"
+ditto ${PRODUCTS}/${BUILDTYPE}/${NAME}.framework "${OUTPUT}/${NAME}.framework"
 if [[ -e ${PRODUCTS}/${BUILDTYPE}/${NAME}.framework.dSYM ]]; then
     cp -r ${PRODUCTS}/${BUILDTYPE}/${NAME}.framework.dSYM "${OUTPUT}"
 fi

@@ -11,20 +11,18 @@
 
 namespace mbgl {
 
-class Tile;
-
 struct ClipID {
-    inline ClipID() {}
-    inline ClipID(const std::string &mask_, const std::string &reference_) : mask(mask_), reference(reference_) {}
+    ClipID() {}
+    ClipID(const std::string &mask_, const std::string &reference_) : mask(mask_), reference(reference_) {}
 
     std::bitset<8> mask;
     std::bitset<8> reference;
 
-    inline bool operator==(const ClipID &other) const {
+    bool operator==(const ClipID &other) const {
         return mask == other.mask && reference == other.reference;
     }
 
-    inline ClipID& operator|=(const ClipID &other) {
+    ClipID& operator|=(const ClipID &other) {
         mask |= other.mask;
         reference |= other.reference;
         return *this;

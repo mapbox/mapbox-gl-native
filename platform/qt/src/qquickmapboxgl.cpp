@@ -148,16 +148,22 @@ bool QQuickMapboxGL::copyrightsVisible() const
     return false;
 }
 
-void QQuickMapboxGL::setColor(const QColor &)
+void QQuickMapboxGL::setColor(const QColor &color)
 {
-    // TODO: can be made functional after landing #837
-    qWarning() << __PRETTY_FUNCTION__
-        << "Use Mapbox Studio to change the map background color.";
+    if (m_color == color) {
+        return;
+    }
+
+    m_color = color;
+
+    setPaintProperty("background", "background-color", color);
+
+    emit colorChanged(m_color);
 }
 
 QColor QQuickMapboxGL::color() const
 {
-    return QColor();
+    return m_color;
 }
 
 void QQuickMapboxGL::pan(int dx, int dy)
@@ -165,6 +171,18 @@ void QQuickMapboxGL::pan(int dx, int dy)
     m_pan += QPointF(dx, -dy);
 
     m_syncState |= PanNeedsSync;
+    update();
+}
+
+void QQuickMapboxGL::setLayoutProperty(const QString &layer, const QString &property, const QVariant &value)
+{
+    m_layoutChanges.append(LayoutPropertyChange { layer, property, value });
+    update();
+}
+
+void QQuickMapboxGL::setPaintProperty(const QString &layer, const QString &property, const QVariant &value, const QString &klass)
+{
+    m_paintChanges.append(PaintPropertyChange { layer, property, value, klass });
     update();
 }
 

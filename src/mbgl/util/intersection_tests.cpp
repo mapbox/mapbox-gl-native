@@ -143,5 +143,5 @@ bool multiPolygonIntersectsMultiPolygon(const GeometryCollection& multiPolygonA,
     return false;
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl

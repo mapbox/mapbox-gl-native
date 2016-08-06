@@ -1,7 +1,9 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.graphics.PointF;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.view.Gravity;
 import android.view.View;
@@ -32,6 +34,10 @@ public class UiSettings {
     private boolean scrollGestureChangeAllowed = true;
 
     private boolean zoomControlsEnabled;
+
+    private boolean deselectMarkersOnTap = true;
+
+    private PointF focalPoint;
 
     UiSettings(@NonNull MapView mapView) {
         this.mapView = mapView;
@@ -484,6 +490,26 @@ public class UiSettings {
     }
 
     /**
+     * Gets whether the markers are automatically deselected (and therefore, their infowindows
+     * closed) when a map tap is detected.
+
+     * @return If true, markers are deselected on a map tap.
+     */
+    public boolean isDeselectMarkersOnTap() {
+        return deselectMarkersOnTap;
+    }
+
+    /**
+     * Sets whether the markers are automatically deselected (and therefore, their infowindows
+     * closed) when a map tap is detected.
+     *
+     * @param deselectMarkersOnTap
+     */
+    public void setDeselectMarkersOnTap(boolean deselectMarkersOnTap) {
+        this.deselectMarkersOnTap = deselectMarkersOnTap;
+    }
+
+    /**
      * <p>
      * Changes whether the user may scroll around the map.
      * </p>
@@ -539,6 +565,25 @@ public class UiSettings {
         setRotateGesturesEnabled(enabled);
         setTiltGesturesEnabled(enabled);
         setZoomGesturesEnabled(enabled);
+    }
+
+    /**
+     * Sets the focal point used as center for a gesture
+     *
+     * @param focalPoint the focal point to be used.
+     */
+    public void setFocalPoint(@Nullable PointF focalPoint) {
+        this.focalPoint = focalPoint;
+        mapView.setFocalPoint(focalPoint);
+    }
+
+    /**
+     * Returns the gesture focal point
+     *
+     * @return  The focal point
+     */
+    public PointF getFocalPoint() {
+        return focalPoint;
     }
 
     /**

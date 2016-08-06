@@ -21,14 +21,14 @@ Response& Response::operator=(const Response& res) {
     return *this;
 }
 
-Response::Error::Error(Reason reason_, const std::string& message_)
-    : reason(reason_), message(message_) {
+Response::Error::Error(Reason reason_, std::string message_)
+    : reason(reason_), message(std::move(message_)) {
 }
 
 std::ostream& operator<<(std::ostream& os, Response::Error::Reason r) {
     switch (r) {
     case Response::Error::Reason::Success:
-        return os << "Response::Error::Reason::NotFound";
+        return os << "Response::Error::Reason::Success";
     case Response::Error::Reason::NotFound:
         return os << "Response::Error::Reason::NotFound";
     case Response::Error::Reason::Server:

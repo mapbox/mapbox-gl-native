@@ -6,9 +6,9 @@ namespace gl {
 template <typename T>
 class Preserve {
 public:
-    inline Preserve() : data(T::Get()) {
+    Preserve() : data(T::Get()) {
     }
-    inline ~Preserve() {
+    ~Preserve() {
         T::Set(data);
     }
 

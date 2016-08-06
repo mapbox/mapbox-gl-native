@@ -1,6 +1,6 @@
 #include <mbgl/text/quads.hpp>
 #include <mbgl/text/shaping.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/geometry/anchor.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/util/math.hpp>
@@ -15,7 +15,7 @@ const float globalMinScale = 0.5f; // underscale by 1 zoom level
 
 SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
         const GeometryCoordinates& line, const SymbolLayoutProperties& layout,
-        const bool alongLine) {
+        const bool alongLine, const Shaping& shapedText) {
 
     auto image = *(shapedIcon.image);
 
@@ -24,11 +24,43 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
     auto right = left + image.pos.w / image.relativePixelRatio;
     auto top = shapedIcon.top - border;
     auto bottom = top + image.pos.h / image.relativePixelRatio;
-    Point<float> tl{left, top};
-    Point<float> tr{right, top};
-    Point<float> br{right, bottom};
-    Point<float> bl{left, bottom};
+    Point<float> tl;
+    Point<float> tr;
+    Point<float> br;
+    Point<float> bl;
 
+    if (layout.iconTextFit != IconTextFitType::None && shapedText) {
+        auto iconWidth = right - left;
+        auto iconHeight = bottom - top;
+        auto size = layout.textSize / 24.0f;
+        auto textLeft = shapedText.left * size;
+        auto textRight = shapedText.right * size;
+        auto textTop = shapedText.top * size;
+        auto textBottom = shapedText.bottom * size;
+        auto textWidth = textRight - textLeft;
+        auto textHeight = textBottom - textTop;;
+        auto padT = layout.iconTextFitPadding.value[0];
+        auto padR = layout.iconTextFitPadding.value[1];
+        auto padB = layout.iconTextFitPadding.value[2];
+        auto padL = layout.iconTextFitPadding.value[3];
+        auto offsetY = layout.iconTextFit == IconTextFitType::Width ? (textHeight - iconHeight) * 0.5 : 0;
+        auto offsetX = layout.iconTextFit == IconTextFitType::Height ? (textWidth - iconWidth) * 0.5 : 0;
+        auto width = layout.iconTextFit == IconTextFitType::Width || layout.iconTextFit == IconTextFitType::Both ? textWidth : iconWidth;
+        auto height = layout.iconTextFit == IconTextFitType::Height || layout.iconTextFit == IconTextFitType::Both ? textHeight : iconHeight;
+        left = textLeft + offsetX - padL;
+        top = textTop + offsetY - padT;
+        right = textLeft + offsetX + padR + width;
+        bottom = textTop + offsetY + padB + height;
+        tl = {left, top};
+        tr = {right, top};
+        br = {right, bottom};
+        bl = {left, bottom};
+    } else {
+        tl = {left, top};
+        tr = {right, top};
+        br = {right, bottom};
+        bl = {left, bottom};
+    }
 
     float angle = layout.iconRotate * util::DEG2RAD;
     if (alongLine) {
@@ -57,15 +89,15 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
     }
 
     SymbolQuads quads;
-    quads.emplace_back(tl, tr, bl, br, image.pos, 0, anchor.point, globalMinScale, std::numeric_limits<float>::infinity());
+    quads.emplace_back(tl, tr, bl, br, image.pos, 0, 0, anchor.point, globalMinScale, std::numeric_limits<float>::infinity());
     return quads;
 }
 
 struct GlyphInstance {
-    explicit GlyphInstance(const Point<float> &anchorPoint_) : anchorPoint(anchorPoint_) {}
-    explicit GlyphInstance(const Point<float> &anchorPoint_, float offset_, float minScale_, float maxScale_,
+    explicit GlyphInstance(Point<float> anchorPoint_) : anchorPoint(std::move(anchorPoint_)) {}
+    explicit GlyphInstance(Point<float> anchorPoint_, float offset_, float minScale_, float maxScale_,
             float angle_)
-        : anchorPoint(anchorPoint_), offset(offset_), minScale(minScale_), maxScale(maxScale_), angle(angle_) {}
+        : anchorPoint(std::move(anchorPoint_)), offset(offset_), minScale(minScale_), maxScale(maxScale_), angle(angle_) {}
 
     const Point<float> anchorPoint;
     const float offset = 0.0f;
@@ -101,8 +133,6 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
         const float scale = offset / dist;
         float angle = std::atan2(end.y - newAnchorPoint.y, end.x - newAnchorPoint.x);
         if (!forward)
-            angle += M_PI;
-        if (upsideDown)
             angle += M_PI;
 
         glyphs = GlyphInstance{
@@ -188,12 +218,11 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
             Point<float> tr = otr;
             Point<float> bl = obl;
             Point<float> br = obr;
-            const float angle = instance.angle + textRotate;
 
-            if (angle) {
+            if (textRotate) {
                 // Compute the transformation matrix.
-                float angle_sin = std::sin(angle);
-                float angle_cos = std::cos(angle);
+                float angle_sin = std::sin(textRotate);
+                float angle_cos = std::cos(textRotate);
                 std::array<float, 4> matrix = {{angle_cos, -angle_sin, angle_sin, angle_cos}};
 
                 tl = util::matrixMultiply(matrix, tl);
@@ -205,8 +234,9 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
             // Prevent label from extending past the end of the line
             const float glyphMinScale = std::max(instance.minScale, anchor.scale);
 
-            const float glyphAngle = std::fmod((anchor.angle + textRotate + instance.offset + 2 * M_PI), (2 * M_PI));
-            quads.emplace_back(tl, tr, bl, br, rect, glyphAngle, instance.anchorPoint, glyphMinScale, instance.maxScale);
+            const float anchorAngle = std::fmod((anchor.angle + instance.offset + 2 * M_PI), (2 * M_PI));
+            const float glyphAngle = std::fmod((instance.angle + instance.offset + 2 * M_PI), (2 * M_PI));
+            quads.emplace_back(tl, tr, bl, br, rect, anchorAngle, glyphAngle, instance.anchorPoint, glyphMinScale, instance.maxScale);
 
         }
 

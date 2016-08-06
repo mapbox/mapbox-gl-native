@@ -37,7 +37,7 @@ class Style : public GlyphStoreObserver,
               public util::noncopyable {
 public:
     Style(FileSource&, float pixelRatio);
-    ~Style();
+    ~Style() override;
 
     void setJSON(const std::string&);
 
@@ -60,8 +60,9 @@ public:
 
     Source* getSource(const std::string& id) const;
     void addSource(std::unique_ptr<Source>);
+    void removeSource(const std::string& sourceID);
 
-    std::vector<std::unique_ptr<Layer>> getLayers() const;
+    std::vector<const Layer*> getLayers() const;
     Layer* getLayer(const std::string& id) const;
     void addLayer(std::unique_ptr<Layer>,
                   optional<std::string> beforeLayerID = {});
@@ -73,7 +74,7 @@ public:
     void setClasses(const std::vector<std::string>&, const TransitionOptions& = {});
     std::vector<std::string> getClasses() const;
 
-    RenderData getRenderData() const;
+    RenderData getRenderData(MapDebugOptions) const;
 
     std::vector<Feature> queryRenderedFeatures(const QueryParameters&) const;
 
@@ -112,7 +113,7 @@ private:
     void onSourceError(Source&, std::exception_ptr) override;
     void onTileLoaded(Source&, const OverscaledTileID&, bool isNewTile) override;
     void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) override;
-    void onPlacementRedone() override;
+    void onNeedsRepaint() override;
 
     Observer nullObserver;
     Observer* observer = &nullObserver;

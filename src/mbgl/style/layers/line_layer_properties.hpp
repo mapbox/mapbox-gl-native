@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
-#include <mbgl/util/rapidjson.hpp>
 
 namespace mbgl {
 namespace style {
@@ -14,7 +14,6 @@ class CalculationParameters;
 
 class LineLayoutProperties {
 public:
-    void parse(const JSValue&);
     void recalculate(const CalculationParameters&);
 
     LayoutProperty<LineCapType> lineCap { LineCapType::Butt };
@@ -25,12 +24,11 @@ public:
 
 class LinePaintProperties {
 public:
-    void parse(const JSValue&);
     void cascade(const CascadeParameters&);
     bool recalculate(const CalculationParameters&);
 
     PaintProperty<float> lineOpacity { 1 };
-    PaintProperty<Color> lineColor { {{ 0, 0, 0, 1 }} };
+    PaintProperty<Color> lineColor { Color::black() };
     PaintProperty<std::array<float, 2>> lineTranslate { {{ 0, 0 }} };
     PaintProperty<TranslateAnchorType> lineTranslateAnchor { TranslateAnchorType::Map };
     PaintProperty<float> lineWidth { 1 };

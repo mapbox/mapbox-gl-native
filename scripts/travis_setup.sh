@@ -43,10 +43,14 @@ export DISPLAY=:99.0
 mapbox_time "checkout_mason" \
 git submodule update --init .mason
 
+# Touch package.json so that we are definitely going to run an npm update action
+mapbox_time "touch_package_json" \
+touch package.json
+
 # Install and set up to load a more recent version of mesa
 mapbox_time "install_mesa" \
-mason install mesa 10.4.3
-export LD_LIBRARY_PATH="`mason prefix mesa 10.4.3`/lib:${LD_LIBRARY_PATH:-}"
+mason install mesa 11.2.2
+export LD_LIBRARY_PATH="`mason prefix mesa 11.2.2`/lib:${LD_LIBRARY_PATH:-}"
 
 # Install and set up to load awscli
 pip install --user awscli

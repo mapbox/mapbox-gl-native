@@ -3,28 +3,28 @@ package com.mapbox.mapboxsdk.testapp.activity.annotation;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.ProgressDialog;
-import android.content.Context;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -86,36 +86,6 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         }
     }
 
-    public static class TextAdapter extends MapboxMap.MarkerViewAdapter<MarkerView> {
-
-        private LayoutInflater inflater;
-
-        public TextAdapter(@NonNull Context context) {
-            super(context);
-            this.inflater = LayoutInflater.from(context);
-        }
-
-        @Nullable
-        @Override
-        public View getView(@NonNull MarkerView marker, @Nullable View convertView, @NonNull ViewGroup parent) {
-            ViewHolder viewHolder;
-            if (convertView == null) {
-                viewHolder = new ViewHolder();
-                convertView = inflater.inflate(R.layout.view_text_marker, parent, false);
-                viewHolder.title = (TextView) convertView.findViewById(R.id.textView);
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
-            }
-            viewHolder.title.setText(marker.getTitle());
-            return convertView;
-        }
-
-        private static class ViewHolder {
-            TextView title;
-        }
-    }
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         int amount = Integer.valueOf(getResources().getStringArray(R.array.bulk_marker_list)[position]);
@@ -125,7 +95,6 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
             showMarkers(amount);
         }
     }
-
 
     private void onLatLngListLoaded(List<LatLng> latLngs, int amount) {
         mLocations = latLngs;
@@ -140,26 +109,32 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         }
 
         if (mCustomMarkerView) {
-            showNativeMarkers(amount);
+            showViewMarkers(amount);
         } else {
             showGlMarkers(amount);
         }
     }
 
-    private void showNativeMarkers(int amount) {
+    private void showViewMarkers(int amount) {
         DecimalFormat formatter = new DecimalFormat("#.#####");
         Random random = new Random();
         int randomIndex;
+
+        Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_droppin_24dp, getTheme());
+        int redColor = ResourcesCompat.getColor(getResources(), android.R.color.holo_red_dark, getTheme());
+        drawable.setColorFilter(redColor, PorterDuff.Mode.SRC_IN);
+        Icon icon = IconFactory.getInstance(this).fromDrawable(drawable);
 
         for (int i = 0; i < amount; i++) {
             randomIndex = random.nextInt(mLocations.size());
             LatLng latLng = mLocations.get(randomIndex);
             mMapboxMap.addMarker(new MarkerViewOptions()
                     .position(latLng)
+                    .icon(icon)
                     .title(String.valueOf(i))
                     .snippet(formatter.format(latLng.getLatitude()) + ", " + formatter.format(latLng.getLongitude())));
         }
-     }
+    }
 
     private void showGlMarkers(int amount) {
         List<MarkerOptions> markerOptionsList = new ArrayList<>();
@@ -246,9 +221,6 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                     int amount = Integer.valueOf(getResources().getStringArray(R.array.bulk_marker_list)[spinner.getSelectedItemPosition()]);
                     showMarkers(amount);
                 }
-
-                // add adapter
-                mMapboxMap.getMarkerViewManager().addMarkerViewAdapter(new TextAdapter(BulkMarkerActivity.this));
 
                 mMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
                     @Override

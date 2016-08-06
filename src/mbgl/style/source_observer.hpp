@@ -18,7 +18,7 @@ public:
     virtual void onSourceError(Source&, std::exception_ptr) {}
     virtual void onTileLoaded(Source&, const OverscaledTileID&, bool /* isNewTile */) {}
     virtual void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) {}
-    virtual void onPlacementRedone() {}
+    virtual void onNeedsRepaint() {}
 };
 
 } // namespace style
