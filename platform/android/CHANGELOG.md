@@ -2,6 +2,14 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 4.2.0-beta.1 - August 6, 2016
+
+Mabox Android 4.2.0 introduces the Runtime Style API and improves performance.
+
+* Runtime Style API ([#5610](https://github.com/mapbox/mapbox-gl-native/issues/5610))
+* Earcut ([#2444](https://github.com/mapbox/mapbox-gl-native/pull/2444))
+* SurfaceView ([#5000](https://github.com/mapbox/mapbox-gl-native/issues/5000))
+
 ## 4.1.1 - July 19, 2016
 
 Mapbox Android 4.1.1 is a patch release and is recommended to upgrade to it as soon as possible.
