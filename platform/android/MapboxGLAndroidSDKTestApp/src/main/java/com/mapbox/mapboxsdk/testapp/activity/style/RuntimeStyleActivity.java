@@ -159,7 +159,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
         for (String roadLayer : roadLayers) {
             Layer layer = mapboxMap.getLayer(roadLayer);
             if (layer != null) {
-                layer.setProperties(visibility(VISIBLE));
+                layer.setProperties(visibility(NONE));
             }
         }
     }

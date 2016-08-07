@@ -38,38 +38,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/android/src/log_android.cpp
         PRIVATE platform/default/string_stdlib.cpp
 
-        # Conversion
-        PRIVATE platform/android/src/conversion/constant.hpp
-        PRIVATE platform/android/src/conversion/conversion.hpp
-        PRIVATE platform/android/src/style/conversion/function.hpp
-        PRIVATE platform/android/src/style/conversion/property_value.hpp
-        PRIVATE platform/android/src/style/conversion/types.hpp
-        PRIVATE platform/android/src/style/conversion/types_string_values.hpp
-
-        # Style
-        PRIVATE platform/android/src/style/value.cpp
-        PRIVATE platform/android/src/style/value.hpp
-        PRIVATE platform/android/src/style/layers/background_layer.cpp
-        PRIVATE platform/android/src/style/layers/background_layer.hpp
-        PRIVATE platform/android/src/style/layers/circle_layer.cpp
-        PRIVATE platform/android/src/style/layers/circle_layer.hpp
-        PRIVATE platform/android/src/style/layers/custom_layer.cpp
-        PRIVATE platform/android/src/style/layers/custom_layer.hpp
-        PRIVATE platform/android/src/style/layers/fill_layer.cpp
-        PRIVATE platform/android/src/style/layers/fill_layer.hpp
-        PRIVATE platform/android/src/style/layers/layer.cpp
-        PRIVATE platform/android/src/style/layers/layer.hpp
-        PRIVATE platform/android/src/style/layers/layers.cpp
-        PRIVATE platform/android/src/style/layers/layers.hpp
-        PRIVATE platform/android/src/style/layers/line_layer.cpp
-        PRIVATE platform/android/src/style/layers/line_layer.hpp
-        PRIVATE platform/android/src/style/layers/raster_layer.cpp
-        PRIVATE platform/android/src/style/layers/raster_layer.hpp
-        PRIVATE platform/android/src/style/layers/symbol_layer.cpp
-        PRIVATE platform/android/src/style/layers/symbol_layer.hpp
-        PRIVATE platform/android/src/style/sources/sources.cpp
-        PRIVATE platform/android/src/style/sources/sources.hpp
-
         # Image handling
         PRIVATE platform/default/image.cpp
         PRIVATE platform/default/png_reader.cpp
@@ -91,6 +59,11 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC geojson)
     target_add_mason_package(mbgl-core PUBLIC jni.hpp)
 
+    target_compile_options(mbgl-core
+        PRIVATE -fvisibility=hidden
+        PRIVATE -Os
+    )
+
     target_link_libraries(mbgl-core
         PUBLIC -llog
         PUBLIC -landroid
@@ -103,8 +76,47 @@ macro(mbgl_platform_core)
 endmacro()
 
 add_library(mapbox-gl SHARED
+    # Conversion C++ -> Java
+    platform/android/src/conversion/constant.hpp
+    platform/android/src/conversion/conversion.hpp
+    platform/android/src/style/conversion/function.hpp
+    platform/android/src/style/conversion/property_value.hpp
+    platform/android/src/style/conversion/types.hpp
+    platform/android/src/style/conversion/types_string_values.hpp
+
+    # Style conversion Java -> C++
+    platform/android/src/style/android_conversion.hpp
+    platform/android/src/style/android_geojson.hpp
+    platform/android/src/style/value.cpp
+    platform/android/src/style/value.hpp
+
+    # Style
+    platform/android/src/style/layers/background_layer.cpp
+    platform/android/src/style/layers/background_layer.hpp
+    platform/android/src/style/layers/circle_layer.cpp
+    platform/android/src/style/layers/circle_layer.hpp
+    platform/android/src/style/layers/custom_layer.cpp
+    platform/android/src/style/layers/custom_layer.hpp
+    platform/android/src/style/layers/fill_layer.cpp
+    platform/android/src/style/layers/fill_layer.hpp
+    platform/android/src/style/layers/layer.cpp
+    platform/android/src/style/layers/layer.hpp
+    platform/android/src/style/layers/layers.cpp
+    platform/android/src/style/layers/layers.hpp
+    platform/android/src/style/layers/line_layer.cpp
+    platform/android/src/style/layers/line_layer.hpp
+    platform/android/src/style/layers/raster_layer.cpp
+    platform/android/src/style/layers/raster_layer.hpp
+    platform/android/src/style/layers/symbol_layer.cpp
+    platform/android/src/style/layers/symbol_layer.hpp
+    platform/android/src/style/sources/sources.cpp
+    platform/android/src/style/sources/sources.hpp
+
+    # Native map
     platform/android/src/native_map_view.cpp
     platform/android/src/native_map_view.hpp
+
+    # Main jni bindings
     platform/android/src/jni.cpp
     platform/android/src/jni.hpp
     platform/android/src/attach_env.cpp
@@ -113,12 +125,24 @@ add_library(mapbox-gl SHARED
     platform/android/src/java_types.hpp
 )
 
+target_add_mason_package(mapbox-gl PUBLIC rapidjson)
+
+target_compile_options(mapbox-gl
+    PRIVATE -fvisibility=hidden
+    PRIVATE -Os
+)
+
 target_link_libraries(mapbox-gl
     PUBLIC mbgl-core
 )
 
 add_library(example-custom-layer SHARED
     platform/android/src/example_custom_layer.cpp
+)
+
+target_compile_options(example-custom-layer
+    PRIVATE -fvisibility=hidden
+    PRIVATE -Os
 )
 
 target_link_libraries(example-custom-layer

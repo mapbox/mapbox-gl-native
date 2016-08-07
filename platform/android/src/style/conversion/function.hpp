@@ -23,7 +23,9 @@ inline jni::jobject* toFunctionStopJavaArray(jni::JNIEnv& env, std::vector<std::
     jni::jarray<jni::jobject>& jarray = jni::NewObjectArray(env, value.size(), *javaClass);
 
     for(size_t i = 0; i < value.size(); i = i + 1) {
-        jni::SetObjectArrayElement(env, jarray, i, &jni::NewObject(env, *javaClass, *constructor, value[i].first, *convert<jni::jobject*, T>(env, value[i].second)));
+        jni::jobject* in = *convert<jni::jobject*, float>(env, value[i].first);
+        jni::jobject* out = *convert<jni::jobject*, T>(env, value[i].second);
+        jni::SetObjectArrayElement(env, jarray, i, &jni::NewObject(env, *javaClass, *constructor, in, out));
     }
 
     return &jarray;
