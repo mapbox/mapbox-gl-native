@@ -42,7 +42,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 - (CALayer *)hitTestLayer
 {
-    // only the main dot should be interactive (i.e., exclude the halo)
+    // only the main dot should be interactive (i.e., exclude the accuracy ring and halo)
     return _dotBorderLayer ?: _puckDot;
 }
 
