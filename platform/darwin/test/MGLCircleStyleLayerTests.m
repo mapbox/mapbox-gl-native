@@ -20,8 +20,8 @@
     layer.circleBlur = MGLRuntimeStylingHelper.testNumber;
     layer.circleOpacity = MGLRuntimeStylingHelper.testNumber;
     layer.circleTranslate = MGLRuntimeStylingHelper.testOffset;
-    #warning Missing setter for circleTranslateAnchor enum
-    #warning Missing setter for circlePitchScale enum
+    layer.circleTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCircleTranslateAnchorViewport type:@encode(MGLCircleStyleLayerCircleTranslateAnchor)];
+    layer.circlePitchScale = [MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCirclePitchScaleViewport type:@encode(MGLCircleStyleLayerCirclePitchScale)];
 
     MGLCircleStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
     XCTAssertEqualObjects(gLayer.circleRadius, MGLRuntimeStylingHelper.testNumber);
@@ -29,8 +29,8 @@
     XCTAssertEqualObjects(gLayer.circleBlur, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.circleOpacity, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.circleTranslate, MGLRuntimeStylingHelper.testOffset);
-    #warning Missing getter for circleTranslateAnchor enum
-    #warning Missing getter for circlePitchScale enum
+    XCTAssertEqualObjects(gLayer.circleTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCircleTranslateAnchorViewport type:@encode(MGLCircleStyleLayerCircleTranslateAnchor)]);
+    XCTAssertEqualObjects(gLayer.circlePitchScale, [MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCirclePitchScaleViewport type:@encode(MGLCircleStyleLayerCirclePitchScale)]);
 }
 
 @end

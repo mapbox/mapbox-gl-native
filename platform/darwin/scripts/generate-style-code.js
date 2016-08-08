@@ -21,7 +21,7 @@ global.camelizeWithLeadingLowercase = function (str) {
 
 global.objCName = function (property) { return camelizeWithLeadingLowercase(property.name); }
 
-global.testImplementation = function (property) {
+global.testImplementation = function (property, layerType) {
     switch (property.type) {
         case 'boolean':
             return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testBool;`;
@@ -30,7 +30,9 @@ global.testImplementation = function (property) {
         case 'string':
             return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testString;`;
         case 'enum':
-            return `#warning Missing setter for ${objCName(property)} enum`;
+            var objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+            var objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
+            return `layer.${objCName(property)} = [MGLRuntimeStylingHelper testEnum:${objCEnum} type:@encode(${objCType})];`;    
         case 'color':
             return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testColor;`;
         case 'array':
@@ -39,7 +41,7 @@ global.testImplementation = function (property) {
     }
 }
 
-global.testGetterImplementation = function (property) {
+global.testGetterImplementation = function (property, layerType) {
     switch (property.type) {
         case 'boolean':
             return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testBool);`;
@@ -48,7 +50,9 @@ global.testGetterImplementation = function (property) {
         case 'string':
             return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testString);`;
         case 'enum':
-            return `#warning Missing getter for ${objCName(property)} enum`;
+            var objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+            var objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
+            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, [MGLRuntimeStylingHelper testEnum:${objCEnum} type:@encode(${objCType})]);`;
         case 'color':
             return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testColor);`;
         case 'array':
@@ -104,21 +108,25 @@ global.setterImplementation = function(property, layerType) {
         case 'string':
             return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_stringPropertyValue);`;
         case 'enum':
-            var mbglType = camelize(property.name) + 'Type';
-            if (/-translate-anchor$/.test(property.name)) {
-                mbglType = 'TranslateAnchorType';
-            }
-            if (/-(rotation|pitch)-alignment$/.test(property.name)) {
-                mbglType = 'AlignmentType';
-            }
             var objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            return `MGLSetEnumProperty(${objCName(property)}, ${camelize(property.name)}, ${mbglType}, ${objCType});`; 
+            return `MGLSetEnumProperty(${objCName(property)}, ${camelize(property.name)}, ${mbglType(property)}, ${objCType});`; 
         case 'color':
             return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_colorPropertyValue);`;
         case 'array':
             return arraySetterImplementation(property);
         default: throw new Error(`unknown type for ${property.name}`)
     }
+}
+
+global.mbglType = function(property) {
+    var mbglType = camelize(property.name) + 'Type';
+    if (/-translate-anchor$/.test(property.name)) {
+        mbglType = 'TranslateAnchorType';
+    }
+    if (/-(rotation|pitch)-alignment$/.test(property.name)) {
+        mbglType = 'AlignmentType';
+    }
+    return mbglType;
 }
 
 global.arraySetterImplementation = function(property) {
@@ -134,15 +142,14 @@ global.getterImplementation = function(property, layerType) {
         case 'string':
             return `return [MGLStyleAttribute mbgl_stringPropertyValueWith:self.layer->get${camelize(property.name)}()];`
         case 'enum':
-            return `auto rawValue = self.layer->get${camelize(property.name)}();
-    const char *type = @encode(${prefix}${camelize(layerType)}${suffix}${camelize(property.name)});
-    return [NSValue value:&rawValue withObjCType:type];`
+            var objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+            return `MGLGetEnumProperty(${camelize(property.name)}, ${mbglType(property)}, ${objCType});`;
         case 'color':
             return `return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->get${camelize(property.name)}()];`
         case 'array':
             return arrayGetterImplementation(property);
         default:
-         throw new Error(`unknown type for ${property.name}`)
+            throw new Error(`unknown type for ${property.name}`)
     }
 }
 

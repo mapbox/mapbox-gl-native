@@ -15,36 +15,36 @@
     [self.mapView.style addSource:source];
     [self.mapView.style addLayer:layer];
 
-    #warning Missing setter for symbolPlacement enum
+    layer.symbolPlacement = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerSymbolPlacementLine type:@encode(MGLSymbolStyleLayerSymbolPlacement)];
     layer.symbolSpacing = MGLRuntimeStylingHelper.testNumber;
     layer.symbolAvoidEdges = MGLRuntimeStylingHelper.testBool;
     layer.iconAllowOverlap = MGLRuntimeStylingHelper.testBool;
     layer.iconIgnorePlacement = MGLRuntimeStylingHelper.testBool;
     layer.iconOptional = MGLRuntimeStylingHelper.testBool;
-    #warning Missing setter for iconRotationAlignment enum
+    layer.iconRotationAlignment = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconRotationAlignmentViewport type:@encode(MGLSymbolStyleLayerIconRotationAlignment)];
     layer.iconSize = MGLRuntimeStylingHelper.testNumber;
-    #warning Missing setter for iconTextFit enum
+    layer.iconTextFit = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTextFitHeight type:@encode(MGLSymbolStyleLayerIconTextFit)];
     layer.iconTextFitPadding = MGLRuntimeStylingHelper.testPadding;
     layer.iconImage = MGLRuntimeStylingHelper.testString;
     layer.iconRotate = MGLRuntimeStylingHelper.testNumber;
     layer.iconPadding = MGLRuntimeStylingHelper.testNumber;
     layer.iconKeepUpright = MGLRuntimeStylingHelper.testBool;
     layer.iconOffset = MGLRuntimeStylingHelper.testOffset;
-    #warning Missing setter for textPitchAlignment enum
-    #warning Missing setter for textRotationAlignment enum
+    layer.textPitchAlignment = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextPitchAlignmentViewport type:@encode(MGLSymbolStyleLayerTextPitchAlignment)];
+    layer.textRotationAlignment = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextRotationAlignmentViewport type:@encode(MGLSymbolStyleLayerTextRotationAlignment)];
     layer.textField = MGLRuntimeStylingHelper.testString;
     layer.textFont = MGLRuntimeStylingHelper.testFont;
     layer.textSize = MGLRuntimeStylingHelper.testNumber;
     layer.textMaxWidth = MGLRuntimeStylingHelper.testNumber;
     layer.textLineHeight = MGLRuntimeStylingHelper.testNumber;
     layer.textLetterSpacing = MGLRuntimeStylingHelper.testNumber;
-    #warning Missing setter for textJustify enum
-    #warning Missing setter for textAnchor enum
+    layer.textJustify = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextJustifyRight type:@encode(MGLSymbolStyleLayerTextJustify)];
+    layer.textAnchor = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextAnchorBottomRight type:@encode(MGLSymbolStyleLayerTextAnchor)];
     layer.textMaxAngle = MGLRuntimeStylingHelper.testNumber;
     layer.textRotate = MGLRuntimeStylingHelper.testNumber;
     layer.textPadding = MGLRuntimeStylingHelper.testNumber;
     layer.textKeepUpright = MGLRuntimeStylingHelper.testBool;
-    #warning Missing setter for textTransform enum
+    layer.textTransform = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextTransformLowercase type:@encode(MGLSymbolStyleLayerTextTransform)];
     layer.textOffset = MGLRuntimeStylingHelper.testOffset;
     layer.textAllowOverlap = MGLRuntimeStylingHelper.testBool;
     layer.textIgnorePlacement = MGLRuntimeStylingHelper.testBool;
@@ -55,46 +55,46 @@
     layer.iconHaloWidth = MGLRuntimeStylingHelper.testNumber;
     layer.iconHaloBlur = MGLRuntimeStylingHelper.testNumber;
     layer.iconTranslate = MGLRuntimeStylingHelper.testOffset;
-    #warning Missing setter for iconTranslateAnchor enum
+    layer.iconTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTranslateAnchorViewport type:@encode(MGLSymbolStyleLayerIconTranslateAnchor)];
     layer.textOpacity = MGLRuntimeStylingHelper.testNumber;
     layer.textColor = MGLRuntimeStylingHelper.testColor;
     layer.textHaloColor = MGLRuntimeStylingHelper.testColor;
     layer.textHaloWidth = MGLRuntimeStylingHelper.testNumber;
     layer.textHaloBlur = MGLRuntimeStylingHelper.testNumber;
     layer.textTranslate = MGLRuntimeStylingHelper.testOffset;
-    #warning Missing setter for textTranslateAnchor enum
+    layer.textTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextTranslateAnchorViewport type:@encode(MGLSymbolStyleLayerTextTranslateAnchor)];
 
     MGLSymbolStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
-    #warning Missing getter for symbolPlacement enum
+    XCTAssertEqualObjects(gLayer.symbolPlacement, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerSymbolPlacementLine type:@encode(MGLSymbolStyleLayerSymbolPlacement)]);
     XCTAssertEqualObjects(gLayer.symbolSpacing, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.symbolAvoidEdges, MGLRuntimeStylingHelper.testBool);
     XCTAssertEqualObjects(gLayer.iconAllowOverlap, MGLRuntimeStylingHelper.testBool);
     XCTAssertEqualObjects(gLayer.iconIgnorePlacement, MGLRuntimeStylingHelper.testBool);
     XCTAssertEqualObjects(gLayer.iconOptional, MGLRuntimeStylingHelper.testBool);
-    #warning Missing getter for iconRotationAlignment enum
+    XCTAssertEqualObjects(gLayer.iconRotationAlignment, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconRotationAlignmentViewport type:@encode(MGLSymbolStyleLayerIconRotationAlignment)]);
     XCTAssertEqualObjects(gLayer.iconSize, MGLRuntimeStylingHelper.testNumber);
-    #warning Missing getter for iconTextFit enum
+    XCTAssertEqualObjects(gLayer.iconTextFit, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTextFitHeight type:@encode(MGLSymbolStyleLayerIconTextFit)]);
     XCTAssertEqualObjects(gLayer.iconTextFitPadding, MGLRuntimeStylingHelper.testPadding);
     XCTAssertEqualObjects(gLayer.iconImage, MGLRuntimeStylingHelper.testString);
     XCTAssertEqualObjects(gLayer.iconRotate, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.iconPadding, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.iconKeepUpright, MGLRuntimeStylingHelper.testBool);
     XCTAssertEqualObjects(gLayer.iconOffset, MGLRuntimeStylingHelper.testOffset);
-    #warning Missing getter for textPitchAlignment enum
-    #warning Missing getter for textRotationAlignment enum
+    XCTAssertEqualObjects(gLayer.textPitchAlignment, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextPitchAlignmentViewport type:@encode(MGLSymbolStyleLayerTextPitchAlignment)]);
+    XCTAssertEqualObjects(gLayer.textRotationAlignment, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextRotationAlignmentViewport type:@encode(MGLSymbolStyleLayerTextRotationAlignment)]);
     XCTAssertEqualObjects(gLayer.textField, MGLRuntimeStylingHelper.testString);
     XCTAssertEqualObjects(gLayer.textFont, MGLRuntimeStylingHelper.testFont);
     XCTAssertEqualObjects(gLayer.textSize, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.textMaxWidth, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.textLineHeight, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.textLetterSpacing, MGLRuntimeStylingHelper.testNumber);
-    #warning Missing getter for textJustify enum
-    #warning Missing getter for textAnchor enum
+    XCTAssertEqualObjects(gLayer.textJustify, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextJustifyRight type:@encode(MGLSymbolStyleLayerTextJustify)]);
+    XCTAssertEqualObjects(gLayer.textAnchor, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextAnchorBottomRight type:@encode(MGLSymbolStyleLayerTextAnchor)]);
     XCTAssertEqualObjects(gLayer.textMaxAngle, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.textRotate, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.textPadding, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.textKeepUpright, MGLRuntimeStylingHelper.testBool);
-    #warning Missing getter for textTransform enum
+    XCTAssertEqualObjects(gLayer.textTransform, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextTransformLowercase type:@encode(MGLSymbolStyleLayerTextTransform)]);
     XCTAssertEqualObjects(gLayer.textOffset, MGLRuntimeStylingHelper.testOffset);
     XCTAssertEqualObjects(gLayer.textAllowOverlap, MGLRuntimeStylingHelper.testBool);
     XCTAssertEqualObjects(gLayer.textIgnorePlacement, MGLRuntimeStylingHelper.testBool);
@@ -105,14 +105,14 @@
     XCTAssertEqualObjects(gLayer.iconHaloWidth, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.iconHaloBlur, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.iconTranslate, MGLRuntimeStylingHelper.testOffset);
-    #warning Missing getter for iconTranslateAnchor enum
+    XCTAssertEqualObjects(gLayer.iconTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTranslateAnchorViewport type:@encode(MGLSymbolStyleLayerIconTranslateAnchor)]);
     XCTAssertEqualObjects(gLayer.textOpacity, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.textColor, MGLRuntimeStylingHelper.testColor);
     XCTAssertEqualObjects(gLayer.textHaloColor, MGLRuntimeStylingHelper.testColor);
     XCTAssertEqualObjects(gLayer.textHaloWidth, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.textHaloBlur, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.textTranslate, MGLRuntimeStylingHelper.testOffset);
-    #warning Missing getter for textTranslateAnchor enum
+    XCTAssertEqualObjects(gLayer.textTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextTranslateAnchorViewport type:@encode(MGLSymbolStyleLayerTextTranslateAnchor)]);
 }
 
 @end

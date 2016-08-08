@@ -48,4 +48,9 @@
     return [MGLColor redColor];
 }
 
++ (NSValue *)testEnum:(NSUInteger)value type:(const char *)type
+{
+    return [NSValue value:&value withObjCType:type];
+}
+
 @end

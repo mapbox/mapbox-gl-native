@@ -21,18 +21,18 @@
     [self.mapView.style addLayer:layer];
 
 <% for (const property of layoutProperties) { -%>
-    <%- testImplementation(property) %>
+    <%- testImplementation(property, type) %>
 <% } -%>
 <% for (const property of paintProperties) { -%>
-    <%- testImplementation(property) %>
+    <%- testImplementation(property, type) %>
 <% } -%>
 
     MGL<%- camelize(type) %>StyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
 <% for (const property of layoutProperties) { -%>
-    <%- testGetterImplementation(property) %>
+    <%- testGetterImplementation(property, type) %>
 <% } -%>
 <% for (const property of paintProperties) { -%>
-    <%- testGetterImplementation(property) %>
+    <%- testGetterImplementation(property, type) %>
 <% } -%>
 }
 

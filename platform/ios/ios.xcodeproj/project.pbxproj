@@ -127,7 +127,6 @@
 		35E79F201D41266300957B9E /* MGLStyleLayer_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 35E79F1F1D41266300957B9E /* MGLStyleLayer_Private.hpp */; };
 		35E79F211D41266300957B9E /* MGLStyleLayer_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 35E79F1F1D41266300957B9E /* MGLStyleLayer_Private.hpp */; };
 		36F1153D1D46080700878E1A /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F1153B1D46080700878E1A /* libmbgl-core.a */; };
-		36F1153E1D46080700878E1A /* libmbgl-platform-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F1153C1D46080700878E1A /* libmbgl-platform-ios.a */; };
 		4018B1C71CDC287F00F666AF /* MGLAnnotationView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4018B1C41CDC277F00F666AF /* MGLAnnotationView.mm */; };
 		4018B1C81CDC287F00F666AF /* MGLAnnotationView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4018B1C41CDC277F00F666AF /* MGLAnnotationView.mm */; };
 		4018B1C91CDC288A00F666AF /* MGLAnnotationView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 4018B1C31CDC277F00F666AF /* MGLAnnotationView_Private.h */; };
@@ -1796,7 +1795,6 @@
 				DA35A2B81CCA9A5D00E826B2 /* MGLClockDirectionFormatter.m in Sources */,
 				DAD1657A1CF4CDFF001FF4B9 /* MGLShapeCollection.m in Sources */,
 				350098CC1D482D9C004B2AF0 /* NSArray+MGLStyleAttributeAdditions.mm in Sources */,
-				DA8848901CBB048E00AB86E3 /* reachability.m in Sources */,
 				35136D451D42275100C20EFD /* MGLSymbolStyleLayer.mm in Sources */,
 				35599DED1D46F14E0048254D /* MGLStyleAttributeFunction.mm in Sources */,
 				DA8848211CBAFA6200AB86E3 /* MGLOfflinePack.mm in Sources */,

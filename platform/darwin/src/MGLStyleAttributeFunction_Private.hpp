@@ -27,6 +27,17 @@
         self.layer->set##Name({ static_cast<mbgl::style::MBGLType>(value) }); \
     }
 
+#define MGLGetEnumProperty(Name, MBGLType, ObjCType) \
+    const char *type = @encode(ObjCType); \
+    mbgl::style::PropertyValue<mbgl::style::MBGLType> property = self.layer->get##Name(); \
+    if (property.isConstant()) { \
+        return [NSValue value:&property.asConstant() withObjCType:type]; \
+    } else if (property.isFunction()) { \
+        return nil; \
+    } else { \
+        return nil; \
+    }
+
 @interface MGLStyleAttributeFunction(Private)
 
 + (instancetype)functionWithColorPropertyValue:(mbgl::style::Function<mbgl::Color>)property;
@@ -44,5 +55,7 @@
 + (instancetype)functionWithStringArrayPropertyValue:(mbgl::style::Function<std::vector<std::string>>)property;
 
 + (instancetype)functionWithNumberArrayPropertyValue:(mbgl::style::Function<std::vector<float>>)property;
+
++ (instancetype)functionWithEnumProperyValue:(mbgl::style::Function<bool>)property type:(const char *)type;
 
 @end;

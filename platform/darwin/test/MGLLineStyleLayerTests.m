@@ -15,14 +15,14 @@
     [self.mapView.style addSource:source];
     [self.mapView.style addLayer:layer];
 
-    #warning Missing setter for lineCap enum
-    #warning Missing setter for lineJoin enum
+    layer.lineCap = [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineCapSquare type:@encode(MGLLineStyleLayerLineCap)];
+    layer.lineJoin = [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineJoinMiter type:@encode(MGLLineStyleLayerLineJoin)];
     layer.lineMiterLimit = MGLRuntimeStylingHelper.testNumber;
     layer.lineRoundLimit = MGLRuntimeStylingHelper.testNumber;
     layer.lineOpacity = MGLRuntimeStylingHelper.testNumber;
     layer.lineColor = MGLRuntimeStylingHelper.testColor;
     layer.lineTranslate = MGLRuntimeStylingHelper.testOffset;
-    #warning Missing setter for lineTranslateAnchor enum
+    layer.lineTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineTranslateAnchorViewport type:@encode(MGLLineStyleLayerLineTranslateAnchor)];
     layer.lineWidth = MGLRuntimeStylingHelper.testNumber;
     layer.lineGapWidth = MGLRuntimeStylingHelper.testNumber;
     layer.lineOffset = MGLRuntimeStylingHelper.testNumber;
@@ -31,14 +31,14 @@
     layer.linePattern = MGLRuntimeStylingHelper.testString;
 
     MGLLineStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
-    #warning Missing getter for lineCap enum
-    #warning Missing getter for lineJoin enum
+    XCTAssertEqualObjects(gLayer.lineCap, [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineCapSquare type:@encode(MGLLineStyleLayerLineCap)]);
+    XCTAssertEqualObjects(gLayer.lineJoin, [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineJoinMiter type:@encode(MGLLineStyleLayerLineJoin)]);
     XCTAssertEqualObjects(gLayer.lineMiterLimit, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineRoundLimit, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineOpacity, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineColor, MGLRuntimeStylingHelper.testColor);
     XCTAssertEqualObjects(gLayer.lineTranslate, MGLRuntimeStylingHelper.testOffset);
-    #warning Missing getter for lineTranslateAnchor enum
+    XCTAssertEqualObjects(gLayer.lineTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineTranslateAnchorViewport type:@encode(MGLLineStyleLayerLineTranslateAnchor)]);
     XCTAssertEqualObjects(gLayer.lineWidth, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineGapWidth, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineOffset, MGLRuntimeStylingHelper.testNumber);

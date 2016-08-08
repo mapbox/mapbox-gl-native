@@ -35,9 +35,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)symbolPlacement {
-    auto rawValue = self.layer->getSymbolPlacement();
-    const char *type = @encode(MGLSymbolStyleLayerSymbolPlacement);
-    return [NSValue value:&rawValue withObjCType:type];
+    MGLGetEnumProperty(SymbolPlacement, SymbolPlacementType, MGLSymbolStyleLayerSymbolPlacement);
 }
 
 - (void)setSymbolSpacing:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)symbolSpacing {
@@ -85,9 +83,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconRotationAlignment {
-    auto rawValue = self.layer->getIconRotationAlignment();
-    const char *type = @encode(MGLSymbolStyleLayerIconRotationAlignment);
-    return [NSValue value:&rawValue withObjCType:type];
+    MGLGetEnumProperty(IconRotationAlignment, AlignmentType, MGLSymbolStyleLayerIconRotationAlignment);
 }
 
 - (void)setIconSize:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconSize {
@@ -103,9 +99,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconTextFit {
-    auto rawValue = self.layer->getIconTextFit();
-    const char *type = @encode(MGLSymbolStyleLayerIconTextFit);
-    return [NSValue value:&rawValue withObjCType:type];
+    MGLGetEnumProperty(IconTextFit, IconTextFitType, MGLSymbolStyleLayerIconTextFit);
 }
 
 - (void)setIconTextFitPadding:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTextFitPadding {
@@ -161,9 +155,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textPitchAlignment {
-    auto rawValue = self.layer->getTextPitchAlignment();
-    const char *type = @encode(MGLSymbolStyleLayerTextPitchAlignment);
-    return [NSValue value:&rawValue withObjCType:type];
+    MGLGetEnumProperty(TextPitchAlignment, AlignmentType, MGLSymbolStyleLayerTextPitchAlignment);
 }
 
 - (void)setTextRotationAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textRotationAlignment {
@@ -171,9 +163,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textRotationAlignment {
-    auto rawValue = self.layer->getTextRotationAlignment();
-    const char *type = @encode(MGLSymbolStyleLayerTextRotationAlignment);
-    return [NSValue value:&rawValue withObjCType:type];
+    MGLGetEnumProperty(TextRotationAlignment, AlignmentType, MGLSymbolStyleLayerTextRotationAlignment);
 }
 
 - (void)setTextField:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textField {
@@ -229,9 +219,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textJustify {
-    auto rawValue = self.layer->getTextJustify();
-    const char *type = @encode(MGLSymbolStyleLayerTextJustify);
-    return [NSValue value:&rawValue withObjCType:type];
+    MGLGetEnumProperty(TextJustify, TextJustifyType, MGLSymbolStyleLayerTextJustify);
 }
 
 - (void)setTextAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textAnchor {
@@ -239,9 +227,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textAnchor {
-    auto rawValue = self.layer->getTextAnchor();
-    const char *type = @encode(MGLSymbolStyleLayerTextAnchor);
-    return [NSValue value:&rawValue withObjCType:type];
+    MGLGetEnumProperty(TextAnchor, TextAnchorType, MGLSymbolStyleLayerTextAnchor);
 }
 
 - (void)setTextMaxAngle:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textMaxAngle {
@@ -281,9 +267,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textTransform {
-    auto rawValue = self.layer->getTextTransform();
-    const char *type = @encode(MGLSymbolStyleLayerTextTransform);
-    return [NSValue value:&rawValue withObjCType:type];
+    MGLGetEnumProperty(TextTransform, TextTransformType, MGLSymbolStyleLayerTextTransform);
 }
 
 - (void)setTextOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textOffset {
@@ -373,9 +357,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconTranslateAnchor {
-    auto rawValue = self.layer->getIconTranslateAnchor();
-    const char *type = @encode(MGLSymbolStyleLayerIconTranslateAnchor);
-    return [NSValue value:&rawValue withObjCType:type];
+    MGLGetEnumProperty(IconTranslateAnchor, TranslateAnchorType, MGLSymbolStyleLayerIconTranslateAnchor);
 }
 
 - (void)setTextOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textOpacity {
@@ -431,9 +413,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textTranslateAnchor {
-    auto rawValue = self.layer->getTextTranslateAnchor();
-    const char *type = @encode(MGLSymbolStyleLayerTextTranslateAnchor);
-    return [NSValue value:&rawValue withObjCType:type];
+    MGLGetEnumProperty(TextTranslateAnchor, TranslateAnchorType, MGLSymbolStyleLayerTextTranslateAnchor);
 }
 
 @end

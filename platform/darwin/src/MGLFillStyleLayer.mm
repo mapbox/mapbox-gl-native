@@ -75,9 +75,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)fillTranslateAnchor {
-    auto rawValue = self.layer->getFillTranslateAnchor();
-    const char *type = @encode(MGLFillStyleLayerFillTranslateAnchor);
-    return [NSValue value:&rawValue withObjCType:type];
+    MGLGetEnumProperty(FillTranslateAnchor, TranslateAnchorType, MGLFillStyleLayerFillTranslateAnchor);
 }
 
 - (void)setFillPattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillPattern {

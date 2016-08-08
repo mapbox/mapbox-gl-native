@@ -20,4 +20,6 @@
 
 + (MGLColor *)testColor;
 
++ (NSValue *)testEnum:(NSUInteger)value type:(const char *)type;
+
 @end
