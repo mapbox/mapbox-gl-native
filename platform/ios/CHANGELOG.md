@@ -1,6 +1,6 @@
 # Changelog for Mapbox iOS SDK
 
-Mapbox welcomes participation and contributions from everyone.  Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ## master
 
@@ -13,6 +13,10 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 * Include simulator architecture slices in the dSYM file that is generated for release builds. ([#5740](https://github.com/mapbox/mapbox-gl-native/pull/5740))
 * Fixed an issue where annotation views could be assigned to multipoint annotations. ([#5770](https://github.com/mapbox/mapbox-gl-native/pull/5770))
 * Fixed the static only framework build. ([#5782](https://github.com/mapbox/mapbox-gl-native/issues/5782))
+
+## 3.3.4 - August 8, 2016
+
+* Fixed an issue that caused the user dot to be selected when tapping an annotation that lies within the user dot’s accuracy circle. First attempt was [#5816](https://github.com/mapbox/mapbox-gl-native/pull/5816) in v3.3.2, which excluded the pulsing halo but not the accuracy circle. ([#5894](https://github.com/mapbox/mapbox-gl-native/pull/5894))
 
 ## 3.3.3 - July 29, 2016
 

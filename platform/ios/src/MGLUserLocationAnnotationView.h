@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) MGLMapView *mapView;
 @property (nonatomic) MGLUserLocation *annotation;
 @property (nonatomic, readonly, nullable) CALayer *haloLayer;
+@property (nonatomic, readonly) CALayer *hitTestLayer;
 
 - (instancetype)initInMapView:(MGLMapView *)mapView NS_DESIGNATED_INITIALIZER;
 - (void)setupLayers;
