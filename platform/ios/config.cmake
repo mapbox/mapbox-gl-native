@@ -39,6 +39,8 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/headless_view.cpp
     )
 
+    target_add_mason_package(mbgl-core PUBLIC geojson)
+
     target_compile_options(mbgl-core
         PRIVATE -fobjc-arc
     )
