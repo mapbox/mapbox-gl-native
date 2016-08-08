@@ -457,6 +457,10 @@ android-test:
 apackage:
 	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
 
+.PHONY: style-code-android
+style-code-android:
+	node platform/android/scripts/generate-style-code.js
+
 #### Miscellaneous targets #####################################################
 
 .PHONY: style-code
