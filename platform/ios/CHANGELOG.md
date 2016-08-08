@@ -1,6 +1,10 @@
 # Changelog for Mapbox iOS SDK
 
-Mapbox welcomes participation and contributions from everyone.  Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+
+## 3.3.4
+
+* Fixed an issue that caused the user dot to be selected when tapping an annotation that lies within the user dot’s accuracy circle. First attempt was [#5816](https://github.com/mapbox/mapbox-gl-native/pull/5816) in v3.3.2, which excluded the pulsing halo but not the accuracy circle. ([#5894](https://github.com/mapbox/mapbox-gl-native/pull/5894))
 
 ## 3.3.3
 
