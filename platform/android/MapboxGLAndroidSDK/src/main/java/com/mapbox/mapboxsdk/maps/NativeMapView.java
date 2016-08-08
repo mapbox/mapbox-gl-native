@@ -358,13 +358,13 @@ final class NativeMapView {
         return nativeAddMarkers(mNativeMapViewPtr, markers.toArray(new Marker[markers.size()]));
     }
 
-    public long addPolyline(Polyline polyline) {
+    public long addPolyline(Polyline polyline, boolean withWhiteStroke) {
         Polyline[] polylines = {polyline};
-        return nativeAddPolylines(mNativeMapViewPtr, polylines)[0];
+        return nativeAddPolylines(mNativeMapViewPtr, polylines, withWhiteStroke)[0];
     }
 
-    public long[] addPolylines(List<Polyline> polylines) {
-        return nativeAddPolylines(mNativeMapViewPtr, polylines.toArray(new Polyline[polylines.size()]));
+    public long[] addPolylines(List<Polyline> polylines, boolean withWhiteStroke) {
+        return nativeAddPolylines(mNativeMapViewPtr, polylines.toArray(new Polyline[polylines.size()]), withWhiteStroke);
     }
 
     public long addPolygon(Polygon polygon) {
@@ -623,7 +623,7 @@ final class NativeMapView {
 
     private native long[] nativeAddMarkers(long nativeMapViewPtr, Marker[] markers);
 
-    private native long[] nativeAddPolylines(long mNativeMapViewPtr, Polyline[] polylines);
+    private native long[] nativeAddPolylines(long mNativeMapViewPtr, Polyline[] polylines, boolean withWhiteStroke);
 
     private native long[] nativeAddPolygons(long mNativeMapViewPtr, Polygon[] polygons);
 

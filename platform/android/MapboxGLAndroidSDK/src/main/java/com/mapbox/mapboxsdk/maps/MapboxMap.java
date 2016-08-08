@@ -821,9 +821,22 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public Polyline addPolyline(@NonNull PolylineOptions polylineOptions) {
+        return addPolyline(polylineOptions, false);
+    }
+
+    /**
+     * Adds a polyline to this map.
+     *
+     * @param polylineOptions A polyline options object that defines how to render the polyline.
+     * @param withWhiteStroke add the polyline with the white stroke or not
+     * @return The {@code Polyine} that was added to the map.
+     */
+    @UiThread
+    @NonNull
+    public Polyline addPolyline(@NonNull PolylineOptions polylineOptions, boolean withWhiteStroke) {
         Polyline polyline = polylineOptions.getPolyline();
         if (!polyline.getPoints().isEmpty()) {
-            long id = mMapView.addPolyline(polyline);
+            long id = mMapView.addPolyline(polyline, withWhiteStroke);
             polyline.setMapboxMap(this);
             polyline.setId(id);
             mAnnotations.put(id, polyline);
@@ -840,6 +853,19 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList) {
+        return addPolylines(polylineOptionsList, false);
+    }
+
+    /**
+     * Adds multiple polylines to this map.
+     *
+     * @param polylineOptionsList A list of polyline options objects that defines how to render the polylines.
+     * @param withWhiteStroke add the polylines with the white stroke or not
+     * @return A list of the {@code Polyline}s that were added to the map.
+     */
+    @UiThread
+    @NonNull
+    public List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList, boolean withWhiteStroke) {
         int count = polylineOptionsList.size();
         Polyline polyline;
         List<Polyline> polylines = new ArrayList<>(count);
@@ -852,7 +878,7 @@ public class MapboxMap {
                 }
             }
 
-            long[] ids = mMapView.addPolylines(polylines);
+            long[] ids = mMapView.addPolylines(polylines, withWhiteStroke);
 
             // if unit tests or polylines are correctly added to map
             if (ids == null || ids.length == polylines.size()) {

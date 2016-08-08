@@ -1063,18 +1063,18 @@ public class MapView extends FrameLayout {
         return mNativeMapView.addMarkers(markerList);
     }
 
-    long addPolyline(@NonNull Polyline polyline) {
+    long addPolyline(@NonNull Polyline polyline, boolean withWhiteStroke) {
         if (mDestroyed) {
             return 0l;
         }
-        return mNativeMapView.addPolyline(polyline);
+        return mNativeMapView.addPolyline(polyline, withWhiteStroke);
     }
 
-    long[] addPolylines(@NonNull List<Polyline> polylines) {
+    long[] addPolylines(@NonNull List<Polyline> polylines, boolean withWhiteStroke) {
         if (mDestroyed) {
             return new long[]{};
         }
-        return mNativeMapView.addPolylines(polylines);
+        return mNativeMapView.addPolylines(polylines, withWhiteStroke);
     }
 
     long addPolygon(@NonNull Polygon polygon) {
