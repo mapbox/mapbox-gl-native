@@ -39,6 +39,7 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
@@ -1590,6 +1591,24 @@ public class MapboxMap {
     }
 
     /**
+     * Sets a callback that's invoked when the the My Location view
+     * (which signifies the user's location) is clicked.
+     *
+     * @param listener The callback that's invoked when the user clicks on user location marker.
+     *                 To unset the callback, use null.
+     */
+    @UiThread
+    public void setOnMyLocationViewClickListener(@Nullable final MapboxMap.OnMyLocationViewClickListener listener) {
+        final MyLocationView userLocationView = mMapView.getUserLocationView();
+        userLocationView.setOnClickListener(listener != null ? new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onMyLocationViewClicked(getMyLocation());
+            }
+        } : null);
+    }
+
+    /**
      * Sets a callback that's invoked when the location tracking mode changes.
      *
      * @param listener The callback that's invoked when the location tracking mode changes.
@@ -2002,6 +2021,20 @@ public class MapboxMap {
          * @param location The current location of the My Location view The type of map change event.
          */
         void onMyLocationChange(@Nullable Location location);
+    }
+
+    /**
+     * Interface definition for a callback to be invoked when the the My Location view is clicked.
+     *
+     * @see MapboxMap#setOnMyLocationViewClickListener(OnMyLocationViewClickListener)
+     */
+    public interface OnMyLocationViewClickListener {
+        /**
+         * Called when the My Location view is clicked.
+         *
+         * @param location The current location of the My Location view.
+         */
+        boolean onMyLocationViewClicked(@Nullable Location location);
     }
 
     /**
