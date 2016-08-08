@@ -24,6 +24,7 @@ namespace android {
     CustomLayer::~CustomLayer() = default;
 
     void CustomLayer::update(jni::JNIEnv&) {
+        Log::Debug(mbgl::Event::JNI, "Updating map");
         if (map) {
             map->update(mbgl::Update::Repaint);
         } else {

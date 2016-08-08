@@ -20,7 +20,7 @@ public class CustomLayer extends Layer {
         super(nativePtr);
     }
 
-    public void invalidate() {
+    public void update() {
         nativeUpdate();
     }
 

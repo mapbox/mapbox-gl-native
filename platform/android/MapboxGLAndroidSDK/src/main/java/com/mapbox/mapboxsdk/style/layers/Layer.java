@@ -106,7 +106,7 @@ public abstract class Layer {
         }
     }
 
-    public void invalidate() {
+    public final void invalidate() {
         this.invalidated = true;
     }
 }
