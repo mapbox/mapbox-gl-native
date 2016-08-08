@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
@@ -8,7 +9,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,7 +30,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 
 public class PolylineActivity extends AppCompatActivity {
 
@@ -55,12 +57,6 @@ public class PolylineActivity extends AppCompatActivity {
     private boolean width = true;
     private boolean color = true;
     private String[] colors = {"red", "orange", "purple", "green", "brown", "blue"};
-//    options.add(generatePolyline(ANDORRA, LUXEMBOURG, "#F44336"));
-//    options.add(generatePolyline(ANDORRA, MONACO, "#FF5722"));
-//    options.add(generatePolyline(MONACO, VATICAN_CITY, "#673AB7"));
-//    options.add(generatePolyline(VATICAN_CITY, SAN_MARINO, "#009688"));
-//    options.add(generatePolyline(SAN_MARINO, LIECHTENSTEIN, "#795548"));
-//    options.add(generatePolyline(LIECHTENSTEIN, LUXEMBOURG, "#3F51B5"));
     private HashMap<Polyline, String> polylineColor = new HashMap<>();
 
     @Override
@@ -95,7 +91,8 @@ public class PolylineActivity extends AppCompatActivity {
                     Log.d(TAG, "polyline "+colors[i]+ " added");
 
                 }
-                configurePolylineClick(createPolylineClickListener());
+                int selectionThresholdInPx = (int) dipToPixels(PolylineActivity.this, (float) 15.0);
+                configurePolylineClick(createPolylineClickListener(), selectionThresholdInPx);
             }
         });
 
@@ -136,15 +133,15 @@ public class PolylineActivity extends AppCompatActivity {
         };
     }
 
-    private void configurePolylineClick(@NonNull OnPolylineClickListener onPolylineClickListener) {
-        mMapboxMap.setOnMapClickListener(createPolylineClickListener(mMapboxMap, onPolylineClickListener));
+    private void configurePolylineClick(@NonNull OnPolylineClickListener onPolylineClickListener, int selectionThresholdInPx) {
+        mMapboxMap.setOnMapClickListener(createPolylineClickListener(mMapboxMap, onPolylineClickListener, selectionThresholdInPx));
     }
 
-    private MapboxMap.OnMapClickListener createPolylineClickListener(final MapboxMap mMapboxMap, final OnPolylineClickListener onPolylineClickListener) {
+    private MapboxMap.OnMapClickListener createPolylineClickListener(final MapboxMap mMapboxMap, final OnPolylineClickListener onPolylineClickListener, final int selectionThresholdInPx) {
         return new MapboxMap.OnMapClickListener() {
             @Override
             public void onMapClick(@NonNull LatLng point) {
-                Polyline p = getProximityPolyline(point, mMapboxMap);
+                Polyline p = getProximityPolyline(point, mMapboxMap, selectionThresholdInPx);
                 if (p != null) {
                     onPolylineClickListener.onPolylineClick(p);
                 }
@@ -153,7 +150,7 @@ public class PolylineActivity extends AppCompatActivity {
     }
 
     @Nullable
-    private Polyline getProximityPolyline(@NonNull LatLng latlng, MapboxMap mMapboxMap) {
+    private Polyline getProximityPolyline(@NonNull LatLng latlng, MapboxMap mMapboxMap, int selectionThresholdInPx) {
         List<PolylineInPx> polylinesInPx = convertPolylinesInpx(mMapboxMap, mMapboxMap.getPolylines());
         PointF point = mMapboxMap.getProjection().toScreenLocation(latlng);
 
@@ -161,13 +158,20 @@ public class PolylineActivity extends AppCompatActivity {
         Polyline bestProximityPolyline = null;
         for (PolylineInPx polyline : polylinesInPx) {
             double proximity = bestProximityBeetweenPointAndPolyline(point, polyline);
-            Log.d(TAG, "proximity from "+polylineColor.get(polyline.getPolyline())+" = "+ proximity);
-            if (proximity < bestProximity) {
-                bestProximityPolyline =  polyline.getPolyline();
+            if( proximity < polyline.getPolyline().getWidth()/2 + selectionThresholdInPx) {
+                Log.d(TAG, "proximity from " + polylineColor.get(polyline.getPolyline()) + " = " + proximity);
+                if (proximity < bestProximity) {
+                    bestProximityPolyline = polyline.getPolyline();
+                }
+                bestProximity = Math.min(proximity, bestProximity);
             }
-            bestProximity = Math.min(proximity, bestProximity);
         }
         return bestProximityPolyline;
+    }
+
+    public static float dipToPixels(Context context, float dipValue) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
     }
 
     private List<PolylineInPx> convertPolylinesInpx(MapboxMap mMapboxMap, List<Polyline> polylines) {
