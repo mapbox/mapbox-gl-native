@@ -36,6 +36,8 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 @interface MGLStyle : NSObject
 
+#pragma mark Default Style URL's
+
 /**
  Returns the URL to version 8 of the
  <a href="https://www.mapbox.com/maps/streets/">Mapbox Streets</a> style.
@@ -162,16 +164,44 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
-#pragma mark - Runtime styling API
+#pragma mark Runtime Styling
 
-- (id <MGLStyleLayer>)layerWithIdentifier:(NSString *)identifier;
+/**
+ Returns a layer that conforms to MGLStyleLayer if any layer with the given identifier was found.
+ 
+ @return layer A layer of type `MGLBackgroundStyleLayer`, `MGLCircleStyleLayer`,
+ `MGLFillStyleLayer`, `MGLLineStyleLayer`, `MGLRasterStyleLayer` or `MGLSymbolStyleLayer`.
+ */
+- (nullable id <MGLStyleLayer>)layerWithIdentifier:(NSString *)identifier;
 
+/**
+ Adds a new layer to the map view.
+ 
+ @param styleLayer The layer object to add to the map view. This object
+ must conform to the `MGLStyleLayer` protocol.
+ */
 - (void)addLayer:(id <MGLStyleLayer>)styleLayer;
 
+/**
+ Removes a layer from the map view.
+ 
+ @param styleLayer The layer object to remove from the map view. This object
+ must conform to the `MGLStyleLayer` protocol.
+ */
 - (void)removeLayer:(id <MGLStyleLayer>)styleLayer;
 
+/**
+ Adds a new source to the map view.
+ 
+ @param source The source to add to the map view.
+ */
 - (void)addSource:(MGLSource *)source;
 
+/**
+ Removes a source from the map view.
+ 
+ @param source The source to remove
+ */
 - (void)removeSource:(MGLSource *)source;
 
 @end
