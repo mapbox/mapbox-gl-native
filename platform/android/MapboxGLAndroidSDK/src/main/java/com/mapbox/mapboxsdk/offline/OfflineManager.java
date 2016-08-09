@@ -55,16 +55,16 @@ public class OfflineManager {
      */
     public interface ListOfflineRegionsCallback {
         /**
-         * Receives the list of offline regions
+         * Receives the list of offline regions.
          *
-         * @param offlineRegions
+         * @param offlineRegions the offline region array
          */
         void onList(OfflineRegion[] offlineRegions);
 
         /**
-         * Receives the error message
+         * Receives the error message.
          *
-         * @param error
+         * @param error the error message
          */
         void onError(String error);
     }
@@ -75,16 +75,16 @@ public class OfflineManager {
      */
     public interface CreateOfflineRegionCallback {
         /**
-         * Receives the newly created offline region
+         * Receives the newly created offline region.
          *
-         * @param offlineRegion
+         * @param offlineRegion the offline region to create
          */
         void onCreate(OfflineRegion offlineRegion);
 
         /**
-         * Receives the error message
+         * Receives the error message.
          *
-         * @param error
+         * @param error the error message to be shown
          */
         void onError(String error);
     }
@@ -149,6 +149,8 @@ public class OfflineManager {
      * <p>
      * Code from https://developer.android.com/guide/topics/data/data-storage.html#filesExternal
      * </p>
+     *
+     * @return true if external storage is readable
      */
     public static boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
@@ -193,7 +195,7 @@ public class OfflineManager {
     /**
      * Access token getter/setter
      *
-     * @param accessToken
+     * @param accessToken the accessToken to be used by the offline manager.
      * @deprecated As of release 4.1.0, replaced by {@link MapboxAccountManager#start(Context, String)} ()}
      */
     @Deprecated
@@ -226,6 +228,8 @@ public class OfflineManager {
      * The query will be executed asynchronously and the results passed to the given
      * callback on the main thread.
      * </p>
+     *
+     * @param callback the callback to be invoked
      */
     public void listOfflineRegions(@NonNull final ListOfflineRegionsCallback callback) {
         listOfflineRegions(mDefaultFileSourcePtr, new ListOfflineRegionsCallback() {
@@ -262,6 +266,10 @@ public class OfflineManager {
      * downloading resources, call `OfflineRegion.setDownloadState(DownloadState.STATE_ACTIVE)`,
      * optionally registering an `OfflineRegionObserver` beforehand.
      * </p>
+     *
+     * @param definition the offline region definition
+     * @param metadata   the metadata in bytes
+     * @param callback   the callback to be invoked
      */
     public void createOfflineRegion(
             @NonNull OfflineRegionDefinition definition,

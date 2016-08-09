@@ -11,19 +11,25 @@ import android.support.annotation.ColorInt;
 /**
  * Constructs paint/layout properties for Layers
  *
- * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layers>Layer style documentation</a>
+ * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layers">Layer style documentation</a>
  */
 public class PropertyFactory {
 
     /**
-     * Set visibility
+     * Set the property visibility.
+     *
+     * @param value the visibility value
+     * @return property wrapper around visibility
      */
     public static Property<String> visibility(@Property.VISIBILITY String value) {
         return new LayoutProperty<>("visibility", value);
     }
 
     /**
-     * Set visibility
+     * Set the property visibility.
+     *
+     * @param function the visibility function
+     * @return property wrapper around a String function
      */
     public static Property<Function<String>> visibility(Function<String> function) {
         return new LayoutProperty<>("visibility", function);
@@ -33,6 +39,9 @@ public class PropertyFactory {
 <% if (property.type == 'color') { -%>
     /**
      * <%- property.doc %>
+     *
+     * @param value a int color value
+     * @return property wrapper around String color
      */
     public static Property<String> <%- camelizeWithLeadingLowercase(property.name) %>(@ColorInt int value) {
         return new PaintProperty<>("<%-  property.name %>", colorToRgbaString(value));
@@ -41,6 +50,9 @@ public class PropertyFactory {
 <% } -%>
     /**
      * <%- property.doc %>
+     *
+     * @param value a <%- propertyType(property) %> value
+     * @return property wrapper around <%- propertyType(property) %>
      */
     public static Property<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %>(<%- propertyTypeAnnotation(property) %><%- iff(() => propertyTypeAnnotation(property), " ") %><%- propertyType(property) %> value) {
         return new PaintProperty<>("<%-  property.name %>", value);
@@ -48,6 +60,9 @@ public class PropertyFactory {
 
     /**
      * <%- property.doc %>
+     *
+     * @param function a wrapper function for <%- propertyType(property) %>
+     * @return property wrapper around a <%- propertyType(property) %> function
      */
     public static Property<Function<<%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(Function<<%- propertyType(property) %>> function) {
         return new PaintProperty<>("<%-  property.name %>", function);
@@ -57,6 +72,9 @@ public class PropertyFactory {
 <% for (const property of layoutProperties) { -%>
     /**
      * <%- property.doc %>
+     *
+     * @param value a <%- propertyType(property) %> value
+     * @return property wrapper around <%- propertyType(property) %>
      */
     public static Property<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %>(<%- propertyTypeAnnotation(property) %><%- iff(() => propertyTypeAnnotation(property), " ") %><%- propertyType(property) %> value) {
         return new LayoutProperty<>("<%-  property.name %>", value);
@@ -64,6 +82,9 @@ public class PropertyFactory {
 
     /**
      * <%- property.doc %>
+     *
+     * @param function a wrapper function for <%- propertyType(property) %>
+     * @return property wrapper around a <%- propertyType(property) %> function
      */
     public static Property<Function<<%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(Function<<%- propertyType(property) %>> function) {
         return new LayoutProperty<>("<%-  property.name %>", function);

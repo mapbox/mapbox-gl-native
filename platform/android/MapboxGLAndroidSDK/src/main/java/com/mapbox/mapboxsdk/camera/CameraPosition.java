@@ -137,7 +137,7 @@ public final class CameraPosition implements Parcelable {
         /**
          * Creates a builder for building CameraPosition objects using radiants.
          *
-         * @param isRadiant
+         * @param isRadiant true if heading is in radiants
          */
         public Builder(boolean isRadiant) {
             this.isRadiant = isRadiant;

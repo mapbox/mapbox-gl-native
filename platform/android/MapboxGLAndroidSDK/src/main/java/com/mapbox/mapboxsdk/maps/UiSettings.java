@@ -8,8 +8,6 @@ import android.support.annotation.UiThread;
 import android.view.Gravity;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
-
 /**
  * Settings for the user interface of a MapboxMap. To obtain this interface, call getUiSettings().
  */
@@ -492,7 +490,7 @@ public class UiSettings {
     /**
      * Gets whether the markers are automatically deselected (and therefore, their infowindows
      * closed) when a map tap is detected.
-
+     *
      * @return If true, markers are deselected on a map tap.
      */
     public boolean isDeselectMarkersOnTap() {
@@ -503,7 +501,7 @@ public class UiSettings {
      * Sets whether the markers are automatically deselected (and therefore, their infowindows
      * closed) when a map tap is detected.
      *
-     * @param deselectMarkersOnTap
+     * @param deselectMarkersOnTap determines if markers should be deslected on tap
      */
     public void setDeselectMarkersOnTap(boolean deselectMarkersOnTap) {
         this.deselectMarkersOnTap = deselectMarkersOnTap;
@@ -580,7 +578,7 @@ public class UiSettings {
     /**
      * Returns the gesture focal point
      *
-     * @return  The focal point
+     * @return The focal point
      */
     public PointF getFocalPoint() {
         return focalPoint;

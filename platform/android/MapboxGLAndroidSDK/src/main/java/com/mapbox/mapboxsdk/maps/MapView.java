@@ -881,8 +881,8 @@ public class MapView extends FrameLayout {
      * DEPRECATED @see MapboxAccountManager#start(String)
      * </p>
      * <p>
-     * <p>
      * Sets the current Mapbox access token used to load map styles and tiles.
+     * </p>
      * <p>
      * You must set a valid access token before you call {@link MapView#onCreate(Bundle)}
      * or an exception will be thrown.

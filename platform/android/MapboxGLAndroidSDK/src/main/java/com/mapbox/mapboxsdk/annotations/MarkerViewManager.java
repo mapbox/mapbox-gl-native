@@ -156,7 +156,9 @@ public class MarkerViewManager {
     }
 
     /**
+     * Update and invalidate the MarkerView icon.
      *
+     * @param markerView the marker view to updates
      */
     public void updateIcon(@NonNull MarkerView markerView) {
         View convertView = markerViewMap.get(markerView);

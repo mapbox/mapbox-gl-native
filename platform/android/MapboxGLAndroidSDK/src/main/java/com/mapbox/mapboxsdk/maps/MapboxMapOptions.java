@@ -124,11 +124,11 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
-     * Creates a GoogleMapsOptions from the attribute set
+     * Creates a MapboxMapsOptions from the attribute set.s
      *
      * @param context Context related to a map view.
      * @param attrs   Attributeset containing configuration
-     * @return
+     * @return the MapboxMapOptions created from attributes
      */
     public static MapboxMapOptions createFromAttributes(@NonNull Context context, @Nullable AttributeSet attrs) {
         MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();

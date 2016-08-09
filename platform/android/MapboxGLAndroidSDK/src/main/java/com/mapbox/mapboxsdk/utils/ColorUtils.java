@@ -98,8 +98,10 @@ public class ColorUtils {
     }
 
     /**
-     * Convert an rgba string to a Color int
+     * Convert an rgba string to a Color int.
      *
+     * @param value the String representation of rgba
+     * @return the int representation of rgba
      * @throws ConversionException on illegal input
      */
     @ColorInt

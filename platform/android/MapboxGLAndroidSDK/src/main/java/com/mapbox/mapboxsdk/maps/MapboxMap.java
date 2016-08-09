@@ -1908,7 +1908,6 @@ public class MapboxMap {
         /**
          * Called when an MarkerView is removed from the MapView or the View object is going to be reused.
          * <p>
-         * <p>
          * This method should be used to reset an animated view back to it's original state for view reuse.
          * </p>
          * <p>
@@ -1990,8 +1989,9 @@ public class MapboxMap {
 
     /**
      * Interface definition for a callback to be invoked when the user clicks on a MarkerView.
-     *
-     * @see MarkerViewManager#setOnMarkerViewClickListener(OnMarkerViewClickListener)
+     * </p>
+     * {@link MarkerViewManager#setOnMarkerViewClickListener(OnMarkerViewClickListener)}
+     * </p>
      */
     public interface OnMarkerViewClickListener {
 
