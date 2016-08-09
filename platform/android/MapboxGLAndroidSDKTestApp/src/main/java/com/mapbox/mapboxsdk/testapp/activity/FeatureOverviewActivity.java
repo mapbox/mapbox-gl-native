@@ -68,8 +68,9 @@ public class FeatureOverviewActivity extends AppCompatActivity {
                     int itemPosition = sectionAdapter.getConvertedPosition(position);
                     Feature feature = features.get(itemPosition);
                     if (feature.isRequiresLocationPermission()) {
-                        requestLocationPermission(itemPosition);
-                        return;
+                        if (requestLocationPermission(itemPosition)) {
+                            return;
+                        }
                     }
                     startFeature(feature);
                 }
@@ -117,10 +118,13 @@ public class FeatureOverviewActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void requestLocationPermission(final int positionInList) {
+    private boolean requestLocationPermission(final int positionInList) {
         if ((ContextCompat.checkSelfPermission(FeatureOverviewActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
                 (ContextCompat.checkSelfPermission(FeatureOverviewActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
             ActivityCompat.requestPermissions(FeatureOverviewActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, positionInList);
+            return true;
+        } else {
+            return false;
         }
     }
 
