@@ -1,12 +1,23 @@
 #import "MGLBaseStyleLayer.h"
 
+#import "MGLStyleLayer_Private.hpp"
+#import "MGLMapView_Private.hpp"
+
 #include <mbgl/style/layer.hpp>
 
-@interface MGLBaseStyleLayer()
-@property (nonatomic) mbgl::style::Layer *layer;
+@interface MGLBaseStyleLayer() <MGLStyleLayer_Private>
 @end
 
 @implementation MGLBaseStyleLayer
+
+@synthesize layerIdentifier;
+@synthesize mapView;
+@synthesize layer;
+
+- (void)update
+{
+    self.mapView.mbglMap->update(mbgl::Update::RecalculateStyle | mbgl::Update::Classes);
+}
 
 - (void)setVisible:(BOOL)visible
 {

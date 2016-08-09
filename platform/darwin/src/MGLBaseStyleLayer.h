@@ -6,4 +6,6 @@
 @property (nonatomic, assign) float maxZoom;
 @property (nonatomic, assign) float minZoom;
 
+- (void)update;
+
 @end
