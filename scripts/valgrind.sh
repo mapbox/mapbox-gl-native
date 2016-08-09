@@ -3,6 +3,8 @@
 set -e
 set -o pipefail
 
+.mason/mason install valgrind latest
+
 PARAMS="\
     --leak-check=full \
     --show-leak-kinds=definite \

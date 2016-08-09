@@ -87,7 +87,7 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index()));
 }
 
-#if defined(DEBUG)
+#ifndef NDEBUG
 void Painter::renderClipMasks() {
     config.stencilTest = GL_FALSE;
     config.depthTest = GL_FALSE;
@@ -123,6 +123,6 @@ void Painter::renderClipMasks() {
     MBGL_CHECK_ERROR(glDrawPixels(fbSize[0], fbSize[1], GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels.get()));
 #endif // GL_ES_VERSION_2_0
 }
-#endif // defined(DEBUG)
+#endif // NDEBUG
 
 } // namespace mbgl

@@ -60,7 +60,7 @@ public class MapboxAccountManager {
     }
 
     /**
-     * Access Token for this application
+     * Access Token for this application.
      *
      * @return Mapbox Access Token
      */
@@ -69,10 +69,10 @@ public class MapboxAccountManager {
     }
 
     /**
-     * Runtime validation of Access Token
+     * Runtime validation of Access Token.
      *
      * @param accessToken Access Token to check
-     * @throws InvalidAccessTokenException
+     * @throws InvalidAccessTokenException the exception thrown
      */
     public static void validateAccessToken(String accessToken) throws InvalidAccessTokenException {
         if (TextUtils.isEmpty(accessToken) || (!accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("pk.") && !accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("sk."))) {

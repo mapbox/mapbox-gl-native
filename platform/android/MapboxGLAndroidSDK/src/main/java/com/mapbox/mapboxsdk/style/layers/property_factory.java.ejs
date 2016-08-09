@@ -1,0 +1,99 @@
+<%
+  const paintProperties = locals.paintProperties;
+  const layoutProperties = locals.layoutProperties;
+-%>
+// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
+package com.mapbox.mapboxsdk.style.layers;
+
+import android.annotation.SuppressLint;
+import android.support.annotation.ColorInt;
+
+/**
+ * Constructs paint/layout properties for Layers
+ *
+ * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layers">Layer style documentation</a>
+ */
+public class PropertyFactory {
+
+    /**
+     * Set the property visibility.
+     *
+     * @param value the visibility value
+     * @return property wrapper around visibility
+     */
+    public static Property<String> visibility(@Property.VISIBILITY String value) {
+        return new LayoutProperty<>("visibility", value);
+    }
+
+    /**
+     * Set the property visibility.
+     *
+     * @param function the visibility function
+     * @return property wrapper around a String function
+     */
+    public static Property<Function<String>> visibility(Function<String> function) {
+        return new LayoutProperty<>("visibility", function);
+    }
+
+<% for (const property of paintProperties) { -%>
+<% if (property.type == 'color') { -%>
+    /**
+     * <%- property.doc %>
+     *
+     * @param value a int color value
+     * @return property wrapper around String color
+     */
+    public static Property<String> <%- camelizeWithLeadingLowercase(property.name) %>(@ColorInt int value) {
+        return new PaintProperty<>("<%-  property.name %>", colorToRgbaString(value));
+    }
+
+<% } -%>
+    /**
+     * <%- property.doc %>
+     *
+     * @param value a <%- propertyType(property) %> value
+     * @return property wrapper around <%- propertyType(property) %>
+     */
+    public static Property<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %>(<%- propertyTypeAnnotation(property) %><%- iff(() => propertyTypeAnnotation(property), " ") %><%- propertyType(property) %> value) {
+        return new PaintProperty<>("<%-  property.name %>", value);
+    }
+
+    /**
+     * <%- property.doc %>
+     *
+     * @param function a wrapper function for <%- propertyType(property) %>
+     * @return property wrapper around a <%- propertyType(property) %> function
+     */
+    public static Property<Function<<%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(Function<<%- propertyType(property) %>> function) {
+        return new PaintProperty<>("<%-  property.name %>", function);
+    }
+
+<% } -%>
+<% for (const property of layoutProperties) { -%>
+    /**
+     * <%- property.doc %>
+     *
+     * @param value a <%- propertyType(property) %> value
+     * @return property wrapper around <%- propertyType(property) %>
+     */
+    public static Property<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %>(<%- propertyTypeAnnotation(property) %><%- iff(() => propertyTypeAnnotation(property), " ") %><%- propertyType(property) %> value) {
+        return new LayoutProperty<>("<%-  property.name %>", value);
+    }
+
+    /**
+     * <%- property.doc %>
+     *
+     * @param function a wrapper function for <%- propertyType(property) %>
+     * @return property wrapper around a <%- propertyType(property) %> function
+     */
+    public static Property<Function<<%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(Function<<%- propertyType(property) %>> function) {
+        return new LayoutProperty<>("<%-  property.name %>", function);
+    }
+
+<% } -%>
+    @SuppressLint("DefaultLocale")
+    static String colorToRgbaString(@ColorInt int value) {
+        return String.format("rgba(%d, %d, %d, %d)", (value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF, (value >> 24) & 0xFF);
+    }
+
+}

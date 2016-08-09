@@ -125,6 +125,10 @@ std::array<uint16_t, 2> NativeMapView::getFramebufferSize() const {
 }
 
 void NativeMapView::activate() {
+    if (active++) {
+        return;
+    }
+
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::activate");
 
     oldDisplay = eglGetCurrentDisplay();
@@ -151,6 +155,10 @@ void NativeMapView::activate() {
 }
 
 void NativeMapView::deactivate() {
+    if (--active) {
+        return;
+    }
+
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::deactivate");
 
     assert(vm != nullptr);
@@ -193,6 +201,35 @@ void NativeMapView::render() {
     }
 
     map->render();
+
+    if(snapshot){
+         snapshot = false;
+
+         // take snapshot
+         const unsigned int w = fbWidth;
+         const unsigned int h = fbHeight;
+         mbgl::PremultipliedImage image { w, h };
+         MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
+         const size_t stride = image.stride();
+         auto tmp = std::make_unique<uint8_t[]>(stride);
+         uint8_t *rgba = image.data.get();
+         for (int i = 0, j = h - 1; i < j; i++, j--) {
+            std::memcpy(tmp.get(), rgba + i * stride, stride);
+            std::memcpy(rgba + i * stride, rgba + j * stride, stride);
+            std::memcpy(rgba + j * stride, tmp.get(), stride);
+         }
+
+         // encode and convert to jbytes
+         std::string string = encodePNG(image);
+         jbyteArray arr = env->NewByteArray(string.length());
+         env->SetByteArrayRegion(arr,0,string.length(),(jbyte*)string.c_str());
+
+         // invoke Mapview#OnSnapshotReady
+         env->CallVoidMethod(obj, onSnapshotReadyId, arr);
+         if (env->ExceptionCheck()) {
+             env->ExceptionDescribe();
+         }
+    }
 
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)) {
         if (!eglSwapBuffers(display, surface)) {
@@ -434,6 +471,10 @@ void NativeMapView::destroySurface() {
         ANativeWindow_release(window);
         window = nullptr;
     }
+}
+
+void NativeMapView::scheduleTakeSnapshot() {
+    snapshot = true;
 }
 
 // Speed

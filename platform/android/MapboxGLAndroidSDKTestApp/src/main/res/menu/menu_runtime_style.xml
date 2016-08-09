@@ -34,4 +34,12 @@
         android:id="@+id/action_add_satellite_layer"
         android:title="Add a satellite layer"
         mapbox:showAsAction="never"/>
+    <item
+        android:id="@+id/action_update_water_color_on_zoom"
+        android:title="Change the water color on zoom"
+        mapbox:showAsAction="never"/>
+    <item
+        android:id="@+id/action_add_custom_tiles"
+        android:title="Custom tiles"
+        mapbox:showAsAction="never"/>
 </menu>

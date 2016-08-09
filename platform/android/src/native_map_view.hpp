@@ -49,6 +49,8 @@ public:
     mbgl::EdgeInsets getInsets() { return insets;}
     void setInsets(mbgl::EdgeInsets insets_);
 
+    void scheduleTakeSnapshot();
+
 private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
 
@@ -79,6 +81,7 @@ private:
     bool firstTime = false;
     bool fpsEnabled = false;
     bool sizeChanged = false;
+    bool snapshot = false;
     double fps = 0.0;
 
     int width = 0;
@@ -94,6 +97,8 @@ private:
     std::unique_ptr<mbgl::DefaultFileSource> fileSource;
     std::unique_ptr<mbgl::Map> map;
     mbgl::EdgeInsets insets;
+
+    unsigned active = 0;
 };
 }
 }

@@ -11,6 +11,17 @@ import java.lang.annotation.RetentionPolicy;
  */
 public abstract class Property<T> {
 
+    //visibility
+    public static final String VISIBLE = "visible";
+    public static final String NONE = "none";
+
+    @StringDef({
+            VISIBLE,
+            NONE
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface VISIBILITY {}
+
     //line-cap
     public static final String LINE_CAP_BUTT = "butt";
     public static final String LINE_CAP_ROUND = "round";

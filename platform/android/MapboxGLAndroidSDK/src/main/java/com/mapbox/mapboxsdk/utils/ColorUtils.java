@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.utils;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -11,6 +12,10 @@ import android.util.TypedValue;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.exceptions.ConversionException;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ColorUtils {
 
@@ -86,5 +91,29 @@ public class ColorUtils {
         Drawable originalDrawable = imageView.getDrawable();
         Drawable wrappedDrawable = DrawableCompat.wrap(originalDrawable);
         DrawableCompat.setTintList(wrappedDrawable, getSelector(tintColor));
+    }
+
+    static int normalizeColorComponent(String value) {
+        return (int) (Float.parseFloat(value) * 255);
+    }
+
+    /**
+     * Convert an rgba string to a Color int.
+     *
+     * @param value the String representation of rgba
+     * @return the int representation of rgba
+     * @throws ConversionException on illegal input
+     */
+    @ColorInt
+    public static int rgbaToColor(String value) {
+        Pattern c = Pattern.compile("rgba?\\s*\\(\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*,?\\s*(\\d+\\.?\\d*)?\\s*\\)");
+        Matcher m = c.matcher(value);
+        if (m.matches() && m.groupCount() == 3) {
+            return Color.rgb(normalizeColorComponent(m.group(1)), normalizeColorComponent(m.group(2)), normalizeColorComponent(m.group(3)));
+        } else if (m.matches() && m.groupCount() == 4) {
+            return Color.argb(normalizeColorComponent(m.group(4)), normalizeColorComponent(m.group(1)), normalizeColorComponent(m.group(2)), normalizeColorComponent(m.group(3)));
+        } else {
+            throw new ConversionException("Not a valid rgb/rgba value");
+        }
     }
 }

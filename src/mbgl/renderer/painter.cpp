@@ -28,10 +28,6 @@
 #include <mbgl/util/mat3.hpp>
 #include <mbgl/util/string.hpp>
 
-#if defined(DEBUG)
-#include <mbgl/util/stopwatch.hpp>
-#endif
-
 #include <cassert>
 #include <algorithm>
 #include <iostream>
@@ -46,7 +42,7 @@ Painter::Painter(const TransformState& state_,
     gl::debugging::enable();
 
     shaders = std::make_unique<Shaders>(store);
-#if defined(DEBUG)
+#ifndef NDEBUG
     overdrawShaders = std::make_unique<Shaders>(store, Shader::Overdraw);
 #endif
 
@@ -71,7 +67,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     frame = frame_;
 
     PaintParameters parameters {
-#if defined(DEBUG)
+#ifndef NDEBUG
         isOverdraw() ? *overdrawShaders : *shaders
 #else
         *shaders
@@ -159,7 +155,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         drawClippingMasks(parameters, generator.getStencils());
     }
 
-#if defined(DEBUG)
+#ifndef NDEBUG
     if (frame.debugOptions & MapDebugOptions::StencilClip) {
         renderClipMasks();
         return;

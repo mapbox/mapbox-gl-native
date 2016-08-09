@@ -29,10 +29,11 @@ workflows:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
+            brew install cmake
             gem install xcpretty --no-rdoc --no-ri
             export BUILDTYPE=Debug
             make macos
-            make test-macos
+            make test
         - is_debug: 'yes'
     - slack:
         title: Post to Slack

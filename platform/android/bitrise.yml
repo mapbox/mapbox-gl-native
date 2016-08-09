@@ -31,10 +31,10 @@ workflows:
             #!/bin/bash
             set -eu -o pipefail
             curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-            sudo apt-get install -y pkg-config nodejs
+            sudo apt-get install -y pkg-config nodejs cmake
             export BUILDTYPE=Release
             make android
-            make test-android
+            make android-test
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
@@ -63,7 +63,7 @@ workflows:
             set -eu -o pipefail
 
             curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-            apt-get install -y pkg-config python-pip python-dev build-essential nodejs
+            apt-get install -y pkg-config python-pip python-dev build-essential nodejs cmake
             pip install awscli
 
             aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg platform/android/MapboxGLAndroidSDK/secring.gpg

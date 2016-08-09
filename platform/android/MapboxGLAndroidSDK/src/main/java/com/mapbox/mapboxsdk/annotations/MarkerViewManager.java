@@ -156,7 +156,9 @@ public class MarkerViewManager {
     }
 
     /**
+     * Update and invalidate the MarkerView icon.
      *
+     * @param markerView the marker view to updates
      */
     public void updateIcon(@NonNull MarkerView markerView) {
         View convertView = markerViewMap.get(markerView);
@@ -442,6 +444,9 @@ public class MarkerViewManager {
                 }
             }
         }
+        // trigger update to make newly added ViewMarker visible,
+        // these would only be updated when the map is moved.
+        update();
     }
 
     //TODO: This whole method is a stopgap for: https://github.com/mapbox/mapbox-gl-native/issues/5384

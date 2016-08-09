@@ -55,8 +55,11 @@ public class OfflineRegion {
          * Implement this method to be notified of a change in the status of an
          * offline region. Status changes include any change in state of the members
          * of OfflineRegionStatus.
-         *
+         * <p>
          * This method will be executed on the main thread.
+         * </p>
+         *
+         * @param status the changed status
          */
         void onStatusChanged(OfflineRegionStatus status);
 
@@ -65,8 +68,11 @@ public class OfflineRegion {
          * regional resources. Such errors may be recoverable; for example the implementation
          * will attempt to re-request failed resources based on an exponential backoff
          * algorithm, or when it detects that network access has been restored.
-         *
+         * <p>
          * This method will be executed on the main thread.
+         * </p>
+         *
+         * @param error the offline region error message
          */
         void onError(OfflineRegionError error);
 
@@ -93,14 +99,14 @@ public class OfflineRegion {
         /**
          * Receives the status
          *
-         * @param status
+         * @param status the offline region status
          */
         void onStatus(OfflineRegionStatus status);
 
         /**
          * Receives the error message
          *
-         * @param error
+         * @param error the error message
          */
         void onError(String error);
     }
@@ -118,7 +124,7 @@ public class OfflineRegion {
         /**
          * Receives the error message
          *
-         * @param error
+         * @param error the error message
          */
         void onError(String error);
     }
@@ -127,15 +133,17 @@ public class OfflineRegion {
      * A region is either inactive (not downloading, but previously-downloaded
      * resources are available for use), or active (resources are being downloaded
      * or will be downloaded, if necessary, when network access is available).
-     *
+     * <p>
      * This state is independent of whether or not the complete set of resources
      * is currently available for offline use. To check if that is the case, use
      * `OfflineRegionStatus.isComplete()`.
+     * </p>
      */
 
     @IntDef({STATE_INACTIVE, STATE_ACTIVE})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface DownloadState {}
+    public @interface DownloadState {
+    }
 
     public static final int STATE_INACTIVE = 0;
     public static final int STATE_ACTIVE = 1;
@@ -148,6 +156,8 @@ public class OfflineRegion {
     /**
      * Gets whether or not the `OfflineRegionObserver` will continue to deliver messages even if
      * the region state has been set as STATE_INACTIVE.
+     *
+     * @return true if delivering inactive messages
      */
     public boolean isDeliveringInactiveMessages() {
         return deliverInactiveMessages;
@@ -157,6 +167,8 @@ public class OfflineRegion {
      * When set true, the `OfflineRegionObserver` will continue to deliver messages even if
      * the region state has been set as STATE_INACTIVE (operations happen asynchronously). If set
      * false, the client won't be notified of further messages.
+     *
+     * @param deliverInactiveMessages true if it should deliver inactive messages
      */
     public void setDeliverInactiveMessages(boolean deliverInactiveMessages) {
         this.deliverInactiveMessages = deliverInactiveMessages;
@@ -203,6 +215,8 @@ public class OfflineRegion {
 
     /**
      * Register an observer to be notified when the state of the region changes.
+     *
+     * @param observer the observer to be notified
      */
     public void setObserver(@NonNull final OfflineRegionObserver observer) {
         setOfflineRegionObserver(new OfflineRegionObserver() {
@@ -246,6 +260,8 @@ public class OfflineRegion {
 
     /**
      * Pause or resume downloading of regional resources.
+     *
+     * @param state the download state
      */
     public void setDownloadState(@DownloadState int state) {
         this.state = state;
@@ -256,6 +272,8 @@ public class OfflineRegion {
      * Retrieve the current status of the region. The query will be executed
      * asynchronously and the results passed to the given callback which will be
      * executed on the main thread.
+     *
+     * @param callback the callback to invoked.
      */
     public void getStatus(@NonNull final OfflineRegionStatusCallback callback) {
         getOfflineRegionStatus(new OfflineRegionStatusCallback() {
@@ -284,14 +302,19 @@ public class OfflineRegion {
     /**
      * Remove an offline region from the database and perform any resources evictions
      * necessary as a result.
-     *
+     * <p>
      * Eviction works by removing the least-recently requested resources not also required
      * by other regions, until the database shrinks below a certain size.
-     *
+     * </p>
+     * <p>
      * When the operation is complete or encounters an error, the given callback will be
      * executed on the main thread.
-     *
+     * </p>
+     * <p>
      * After you call this method, you may not call any additional methods on this object.
+     * </p>
+     *
+     * @param callback the callback to be invoked
      */
     public void delete(@NonNull final OfflineRegionDeleteCallback callback) {
         deleteOfflineRegion(new OfflineRegionDeleteCallback() {

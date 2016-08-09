@@ -3,10 +3,10 @@ package com.mapbox.mapboxsdk.camera;
 import android.content.res.TypedArray;
 import android.os.Parcelable;
 
+import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MathConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 import com.mapbox.mapboxsdk.utils.MockParcel;
 

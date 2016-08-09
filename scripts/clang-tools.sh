@@ -18,6 +18,8 @@ command -v ${CLANG_TIDY} >/dev/null 2>&1 || {
 
 cd $1
 
+CDUP=$(git rev-parse --show-cdup)
+
 function check_tidy() {
     echo "Running clang-tidy on $0..."
     if [[ -n $1 ]] && [[ $1 == "--fix" ]]; then
@@ -34,21 +36,20 @@ function check_tidy() {
 
 function check_format() {
     echo "Running clang-format on $0..."
-    ${CLANG_FORMAT} -i ../../../$0
+    ${CLANG_FORMAT} -i ${CDUP}/$0
 }
 
 export CLANG_TIDY CLANG_FORMAT
 export -f check_tidy check_format
 
-git diff-index --quiet HEAD || {
-    echo "Your repository contains unstaged and/or uncommitted changes."
-    echo "Please commit all changes before proceeding."
-    exit 1
-}
-
 echo "Running clang checks... (this might take a while)"
 
-if [ -n $2 ] && [ $2 == "--diff" ]; then
+if [[ -n $2 ]] && [[ $2 == "--diff" ]]; then
+    git diff-index --quiet HEAD || {
+        echo "Your repository contains unstaged and/or uncommitted changes."
+        echo "Please commit all changes before proceeding."
+        exit 1
+    }
     DIFF_FILES=$(for file in `git diff origin/master..HEAD --name-only | grep "pp$"`; do echo $file; done)
     if [[ -n $DIFF_FILES ]]; then
         echo "${DIFF_FILES}" | xargs -I{} -P ${JOBS} bash -c 'check_tidy --fix' {}
@@ -61,6 +62,6 @@ if [ -n $2 ] && [ $2 == "--diff" ]; then
     fi
     echo "All looks good!"
 else
-    git ls-files '../../../src/mbgl/*.cpp' '../../../platform/*.cpp' '../../../test/*.cpp' | \
+    git ls-files "${CDUP}/src/mbgl/*.cpp" "${CDUP}/platform/*.cpp" "${CDUP}/test/*.cpp" | \
         xargs -I{} -P ${JOBS} bash -c 'check_tidy' {}
 fi

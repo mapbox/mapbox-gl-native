@@ -6,6 +6,7 @@
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
 
 #include "background_layer.hpp"
 #include "circle_layer.hpp"
@@ -13,6 +14,7 @@
 #include "line_layer.hpp"
 #include "raster_layer.hpp"
 #include "symbol_layer.hpp"
+#include "custom_layer.hpp"
 
 namespace mbgl {
 namespace android {
@@ -31,6 +33,8 @@ Layer* initializeLayerPeer(mbgl::Map& map, mbgl::style::Layer& coreLayer) {
             layer = new RasterLayer(map, *coreLayer.as<mbgl::style::RasterLayer>());
     } else if (coreLayer.is<mbgl::style::SymbolLayer>()) {
         layer = new SymbolLayer(map, *coreLayer.as<mbgl::style::SymbolLayer>());
+    } else if (coreLayer.is<mbgl::style::CustomLayer>()) {
+        layer = new CustomLayer(map, *coreLayer.as<mbgl::style::CustomLayer>());
     } else {
         throw new std::runtime_error("Layer type not implemented");
     }
@@ -42,7 +46,6 @@ jni::jobject* createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style:
     std::unique_ptr<Layer> peerLayer = std::unique_ptr<Layer>(initializeLayerPeer(map, coreLayer));
     jni::jobject* result = peerLayer->createJavaPeer(env);
     peerLayer.release();
-
     return result;
 }
 
@@ -54,7 +57,8 @@ void registerNativeLayers(jni::JNIEnv& env) {
     LineLayer::registerNative(env);
     RasterLayer::registerNative(env);
     SymbolLayer::registerNative(env);
+    CustomLayer::registerNative(env);
 }
 
-}
-}
+} //android
+} //mbgl

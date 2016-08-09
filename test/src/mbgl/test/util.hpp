@@ -59,7 +59,7 @@ namespace test {
 
 class Server {
 public:
-    Server(const char* executable);
+    Server(const char* script);
     ~Server();
 
 private:

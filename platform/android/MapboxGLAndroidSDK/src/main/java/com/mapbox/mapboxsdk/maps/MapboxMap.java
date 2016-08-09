@@ -38,7 +38,6 @@ import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.style.layers.Layer;
@@ -60,6 +59,7 @@ import java.util.concurrent.TimeUnit;
  * </p>
  */
 public class MapboxMap {
+    private static final String TAG = MapboxMap.class.getSimpleName();
 
     private MapView mMapView;
     private UiSettings mUiSettings;
@@ -113,6 +113,21 @@ public class MapboxMap {
     @UiThread
     public Layer getLayer(@NonNull String layerId) {
         return getMapView().getNativeMapView().getLayer(layerId);
+    }
+
+    /**
+     * Tries to cast the Layer to T, returns null if it's another type
+     */
+    @Nullable
+    @UiThread
+    public <T extends Layer> T getLayerAs(@NonNull String layerId) {
+        try {
+            //noinspection unchecked
+            return (T) getMapView().getNativeMapView().getLayer(layerId);
+        } catch (ClassCastException e) {
+            Log.e(TAG, String.format("Layer: %s is a different type: %s", layerId, e.getMessage()));
+            return null;
+        }
     }
 
     @UiThread
@@ -809,6 +824,36 @@ public class MapboxMap {
         int index = mAnnotations.indexOfKey(updatedMarker.getId());
         if (index > -1) {
             mAnnotations.setValueAt(index, updatedMarker);
+        }
+    }
+
+    /**
+     * Update a polygon on this map.
+     *
+     * @param polygon An updated polygon object.
+     */
+    @UiThread
+    public void updatePolygon(Polygon polygon) {
+        mMapView.updatePolygon(polygon);
+
+        int index = mAnnotations.indexOfKey(polygon.getId());
+        if (index > -1) {
+            mAnnotations.setValueAt(index, polygon);
+        }
+    }
+
+    /**
+     * Update a polyline on this map.
+     *
+     * @param polyline An updated polyline object.
+     */
+    @UiThread
+    public void updatePolyline(Polyline polyline) {
+        mMapView.updatePolyline(polyline);
+
+        int index = mAnnotations.indexOfKey(polyline.getId());
+        if (index > -1) {
+            mAnnotations.setValueAt(index, polyline);
         }
     }
 
@@ -1666,34 +1711,6 @@ public class MapboxMap {
         return mOnMyBearingTrackingModeChangeListener;
     }
 
-    //
-    // Custom layer
-    //
-
-    /**
-     * Do not use this method, experimental feature.
-     */
-    @UiThread
-    public void addCustomLayer(CustomLayer customLayer, String before) {
-        mMapView.addCustomLayer(customLayer, before);
-    }
-
-    /**
-     * Do not use this method, experimental feature.
-     */
-    @UiThread
-    public void removeCustomLayer(String id) {
-        mMapView.removeCustomLayer(id);
-    }
-
-    /**
-     * Do not use this method, experimental feature.
-     */
-    @UiThread
-    public void invalidateCustomLayers() {
-        mMapView.invalidateCustomLayers();
-    }
-
     MapView getMapView() {
         return mMapView;
     }
@@ -1936,7 +1953,6 @@ public class MapboxMap {
         /**
          * Called when an MarkerView is removed from the MapView or the View object is going to be reused.
          * <p>
-         * <p>
          * This method should be used to reset an animated view back to it's original state for view reuse.
          * </p>
          * <p>
@@ -2018,8 +2034,9 @@ public class MapboxMap {
 
     /**
      * Interface definition for a callback to be invoked when the user clicks on a MarkerView.
-     *
-     * @see MarkerViewManager#setOnMarkerViewClickListener(OnMarkerViewClickListener)
+     * </p>
+     * {@link MarkerViewManager#setOnMarkerViewClickListener(OnMarkerViewClickListener)}
+     * </p>
      */
     public interface OnMarkerViewClickListener {
 

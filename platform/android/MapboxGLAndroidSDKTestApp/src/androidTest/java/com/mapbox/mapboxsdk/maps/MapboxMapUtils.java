@@ -5,24 +5,11 @@ package com.mapbox.mapboxsdk.maps;
  */
 public class MapboxMapUtils {
 
-    /**
-     * Get the MapboxMap instance linked to passed MapView
-     *
-     * @param mapView
-     * @return
-     */
-    public static MapboxMap getMapboxMap(MapView mapView) {
-        return mapView.getMapboxMap();
-    }
-
-    /**
-     * Set the direction of the user
-     *
-     * @param mapView
-     * @param direction
-     */
     public static void setDirection(MapView mapView, float direction) {
         mapView.setBearing(direction);
     }
 
+    public static void setTilt(MapView mapView, float tilt) {
+        mapView.setTilt((double) tilt);
+    }
 }

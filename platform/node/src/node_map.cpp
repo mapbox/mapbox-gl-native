@@ -772,4 +772,4 @@ std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resou
     return std::make_unique<NodeRequest::NodeAsyncRequest>(request);
 }
 
-}
+} // namespace node_mbgl

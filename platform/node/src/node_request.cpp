@@ -12,7 +12,7 @@ NodeRequest::NodeRequest(
     mbgl::FileSource::Callback callback_)
     : AsyncWorker(nullptr),
     target(target_),
-    callback(callback_) {
+    callback(std::move(callback_)) {
 }
 
 NodeRequest::~NodeRequest() {
@@ -149,4 +149,4 @@ NodeRequest::NodeAsyncRequest::~NodeAsyncRequest() {
     }
 }
 
-}
+} // namespace node_mbgl

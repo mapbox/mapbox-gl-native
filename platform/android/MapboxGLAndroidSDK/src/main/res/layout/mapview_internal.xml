@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextureView
-        android:id="@+id/textureView"
+    <SurfaceView
+        android:id="@+id/surfaceView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <FrameLayout
         android:id="@+id/markerViewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" />
+
+    <com.mapbox.mapboxsdk.maps.widgets.MyLocationView
+        android:id="@+id/userLocationView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -33,10 +39,5 @@
         android:contentDescription="@string/attributionsIconContentDescription"
         android:padding="7dp"
         android:src="@drawable/ic_info_outline_24dp_selector" />
-
-    <com.mapbox.mapboxsdk.maps.widgets.MyLocationView
-        android:id="@+id/userLocationView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
 </merge>

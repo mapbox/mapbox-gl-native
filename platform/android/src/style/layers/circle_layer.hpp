@@ -24,8 +24,24 @@ public:
 
     ~CircleLayer();
 
+    // Property getters
+    jni::Object<jni::ObjectTag> getCircleRadius(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getCircleColor(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getCircleBlur(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getCircleOpacity(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getCircleTranslate(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getCircleTranslateAnchor(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getCirclePitchScale(jni::JNIEnv&);
+
     jni::jobject* createJavaPeer(jni::JNIEnv&);
-};
+
+}; // class CircleLayer
 
 } // namespace android
 } // namespace mbgl

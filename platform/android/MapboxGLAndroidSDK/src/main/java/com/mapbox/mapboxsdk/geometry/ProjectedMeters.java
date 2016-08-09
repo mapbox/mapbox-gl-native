@@ -27,10 +27,10 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
     private double easting;
 
     /**
-     * Creates a ProjectedMeters based on projected meters in north and east direction
+     * Creates a ProjectedMeters based on projected meters in north and east direction.
      *
-     * @param northing
-     * @param easting
+     * @param northing the northing in meters
+     * @param easting  the easting in meters
      */
     public ProjectedMeters(double northing, double easting) {
         this.northing = northing;

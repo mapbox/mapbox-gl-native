@@ -3,18 +3,20 @@ package com.mapbox.mapboxsdk.testapp.model.activity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Feature implements Parcelable{
+public class Feature implements Parcelable {
 
     private String name;
     private String label;
     private String description;
     private String category;
+    private boolean requiresLocationPermission;
 
-    public Feature(String name, String label, String description, String category) {
+    public Feature(String name, String label, String description, String category, boolean requiresLocationPermission) {
         this.name = name;
         this.label = label;
         this.description = description;
         this.category = category;
+        this.requiresLocationPermission = requiresLocationPermission;
     }
 
     private Feature(Parcel in) {
@@ -22,6 +24,7 @@ public class Feature implements Parcelable{
         label = in.readString();
         description = in.readString();
         category = in.readString();
+        requiresLocationPermission = in.readByte() != 0;
     }
 
     public String getName() {
@@ -45,6 +48,10 @@ public class Feature implements Parcelable{
         return category;
     }
 
+    public boolean isRequiresLocationPermission() {
+        return requiresLocationPermission;
+    }
+
     public int describeContents() {
         return 0;
     }
@@ -54,6 +61,7 @@ public class Feature implements Parcelable{
         out.writeString(label);
         out.writeString(description);
         out.writeString(category);
+        out.writeByte((byte) (requiresLocationPermission ? 1 : 0));
     }
 
     public static final Parcelable.Creator<Feature> CREATOR

@@ -29,12 +29,13 @@ workflows:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
+            brew install cmake
             brew install qt
             brew link qt
             brew linkapps qt
             export BUILDTYPE=Debug
+            export WITH_QT_4=1
             make qt-app
-            make test-qt-*
         - is_debug: 'yes'
     - slack:
         title: Post to Slack

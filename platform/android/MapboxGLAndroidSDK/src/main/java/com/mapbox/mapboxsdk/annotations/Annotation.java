@@ -34,6 +34,8 @@ public abstract class Annotation implements Comparable<Annotation> {
      * </p>
      * This ID is unique for a MapView instance and is suitable for associating your own extra
      * data with.
+     *
+     * @return the assigned id
      */
     public long getId() {
         return id;
@@ -48,6 +50,8 @@ public abstract class Annotation implements Comparable<Annotation> {
 
     /**
      * Do not use this method. Used internally by the SDK.
+     *
+     * @param id the assigned id
      */
     public void setId(long id) {
         this.id = id;
@@ -55,15 +59,17 @@ public abstract class Annotation implements Comparable<Annotation> {
 
     /**
      * Do not use this method. Used internally by the SDK.
+     *
+     * @param mapboxMap the hosting mapbox map
      */
     public void setMapboxMap(MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
     }
 
     /**
-     * Gets the associated MapboxMap
+     * Gets the hosting mapbox map.
      *
-     * @return The MapboxMap
+     * @return the MapboxMap
      */
     protected MapboxMap getMapboxMap() {
         return mapboxMap;
@@ -71,13 +77,15 @@ public abstract class Annotation implements Comparable<Annotation> {
 
     /**
      * Don not use this method.  Used internally by the SDK.
+     *
+     * @param mapView the hosting map view
      */
     public void setMapView(MapView mapView) {
         this.mapView = mapView;
     }
 
     /**
-     * Gets the associated MapView
+     * Gets the hosting map view.
      *
      * @return The MapView
      */

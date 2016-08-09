@@ -29,6 +29,7 @@ workflows:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
+            brew install cmake
             brew unlink node
             brew install awscli homebrew/versions/node4-lts
             brew link homebrew/versions/node4-lts

@@ -177,10 +177,6 @@ void GlyphAtlas::upload(gl::ObjectStore& store, gl::Config& config, uint32_t uni
         }
 
         dirty = false;
-
-#if defined(DEBUG)
-        // platform::showDebugImage("Glyph Atlas", reinterpret_cast<char*>(data.get()), width, height);
-#endif
     }
 }
 

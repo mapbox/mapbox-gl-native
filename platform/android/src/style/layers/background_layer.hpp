@@ -24,8 +24,16 @@ public:
 
     ~BackgroundLayer();
 
+    // Property getters
+    jni::Object<jni::ObjectTag> getBackgroundColor(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getBackgroundPattern(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getBackgroundOpacity(jni::JNIEnv&);
+
     jni::jobject* createJavaPeer(jni::JNIEnv&);
-};
+
+}; // class BackgroundLayer
 
 } // namespace android
 } // namespace mbgl
