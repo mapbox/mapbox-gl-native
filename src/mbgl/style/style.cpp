@@ -35,7 +35,7 @@ static Observer nullObserver;
 Style::Style(FileSource& fileSource_, float pixelRatio)
     : fileSource(fileSource_),
       glyphStore(std::make_unique<GlyphStore>(fileSource)),
-      glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
+      glyphAtlas(std::make_unique<GlyphAtlas>(2048, 2048)),
       spriteStore(std::make_unique<SpriteStore>(pixelRatio)),
       spriteAtlas(std::make_unique<SpriteAtlas>(1024, 1024, pixelRatio, *spriteStore)),
       lineAtlas(std::make_unique<LineAtlas>(256, 512)),
