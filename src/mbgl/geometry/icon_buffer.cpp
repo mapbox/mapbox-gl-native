@@ -18,8 +18,8 @@ size_t IconVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, int16_t t
 
     uint16_t *ushorts = static_cast<uint16_t *>(data);
     // a_texture_pos
-    ubytes[4] /* tex */ = tx / 4;
-    ubytes[5] /* tex */ = ty / 4;
+    ushorts[4] /* tex */ = tx / 4;
+    ushorts[5] /* tex */ = ty / 4;
 
     uint8_t *ubytes = static_cast<uint8_t *>(data);
     // a_data1
