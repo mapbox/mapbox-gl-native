@@ -51,6 +51,8 @@ public:
 
     mbgl::HeadlessView view;
     std::unique_ptr<mbgl::Map> map;
+    std::vector<mbgl::AnnotationID> annotationIDs;
+    std::vector<std::string> annotationIconNames;
 
     std::exception_ptr error;
     mbgl::PremultipliedImage image;
