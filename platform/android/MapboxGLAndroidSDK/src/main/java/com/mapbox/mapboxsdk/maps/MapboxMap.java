@@ -94,6 +94,7 @@ public class MapboxMap {
 
     private double mMaxZoomLevel = -1;
     private double mMinZoomLevel = -1;
+    public OnMyLocationViewClickListener myLocationViewClickListener;
 
     MapboxMap(@NonNull MapView mapView) {
         mMapView = mapView;
@@ -1670,13 +1671,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setOnMyLocationViewClickListener(@Nullable final MapboxMap.OnMyLocationViewClickListener listener) {
-        final MyLocationView userLocationView = mMapView.getUserLocationView();
-        userLocationView.setOnClickListener(listener != null ? new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onMyLocationViewClicked(getMyLocation());
-            }
-        } : null);
+        myLocationViewClickListener = listener;
     }
 
     /**

@@ -1728,7 +1728,18 @@ public class MapView extends FrameLayout {
             builder.include(fromScreenLocation(new PointF(tapRect.right, tapRect.top)));
             builder.include(fromScreenLocation(new PointF(tapRect.right, tapRect.bottom)));
 
-            List<Marker> nearbyMarkers = getMarkersInBounds(builder.build());
+            final LatLngBounds latLngBounds = builder.build();
+
+            if (mMapboxMap.myLocationViewClickListener != null) {
+                final Location myLocation = getMyLocation();
+                if (latLngBounds.contains(new LatLng(myLocation))) {
+                    mMapboxMap.myLocationViewClickListener.onMyLocationViewClicked(myLocation);
+                    return true;
+                }
+            }
+
+
+            List<Marker> nearbyMarkers = getMarkersInBounds(latLngBounds);
             long newSelectedMarkerId = -1;
 
             if (nearbyMarkers != null && nearbyMarkers.size() > 0) {
