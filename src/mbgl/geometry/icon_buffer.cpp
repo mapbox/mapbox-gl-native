@@ -16,16 +16,19 @@ size_t IconVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, int16_t t
     shorts[2] /* offset */ = ::round(ox * 64); // use 1/64 pixels for placement
     shorts[3] /* offset */ = ::round(oy * 64);
 
+    uint16_t *ushorts = static_cast<uint16_t *>(data);
+    // a_texture_pos
+    ubytes[4] /* tex */ = tx / 4;
+    ubytes[5] /* tex */ = ty / 4;
+
     uint8_t *ubytes = static_cast<uint8_t *>(data);
     // a_data1
-    ubytes[8] /* tex */ = tx / 4;
-    ubytes[9] /* tex */ = ty / 4;
-    ubytes[10] /* labelminzoom */ = labelminzoom * 10;
-    ubytes[11] /* labelangle */ = labelangle;
+    ubytes[12] /* labelminzoom */ = labelminzoom * 10;
+    ubytes[13] /* labelangle */ = labelangle;
 
     // a_data2
-    ubytes[12] /* minzoom */ = minzoom * 10; // 1/10 zoom levels: z16 == 160.
-    ubytes[13] /* maxzoom */ = ::fmin(maxzoom, 25) * 10; // 1/10 zoom levels: z16 == 160.
+    ubytes[14] /* minzoom */ = minzoom * 10; // 1/10 zoom levels: z16 == 160.
+    ubytes[15] /* maxzoom */ = ::fmin(maxzoom, 25) * 10; // 1/10 zoom levels: z16 == 160.
 
     return idx;
 }

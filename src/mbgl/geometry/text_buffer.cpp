@@ -25,7 +25,7 @@ size_t TextVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, uint16_t 
     // a_data2
     ubytes[12] /* labelminzoom */ = labelminzoom * 10;
     ubytes[13] /* labelangle */ = labelangle;
-    
+
     ubytes[14] /* minzoom */ = minzoom * 10; // 1/10 zoom levels: z16 == 160.
     ubytes[15] /* maxzoom */ = ::fmin(maxzoom, 25) * 10; // 1/10 zoom levels: z16 == 160.
 
