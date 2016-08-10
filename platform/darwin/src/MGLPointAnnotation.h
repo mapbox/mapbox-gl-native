@@ -1,6 +1,11 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+#import "MGLCalloutView.h"
+#endif
+
 #import "MGLShape.h"
 
 #import "MGLTypes.h"
@@ -19,6 +24,14 @@ NS_ASSUME_NONNULL_BEGIN
  The coordinate point of the annotation, specified as a latitude and longitude.
  */
 @property (nonatomic, assign) CLLocationCoordinate2D coordinate;
+
+#if TARGET_OS_IPHONE
+
+@property (nonatomic) BOOL canShowCallout;
+
+@property (nonatomic, nullable) UIView <MGLCalloutView> *calloutView;
+
+#endif
 
 @end
 

@@ -47,6 +47,8 @@ NS_ASSUME_NONNULL_BEGIN
 /** The subtitle to display for the user location annotation. */
 @property (nonatomic, copy, nullable) NSString *subtitle;
 
+@property (nonatomic) BOOL canShowCallout;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -210,8 +210,6 @@ public:
                           GLKViewDelegate,
                           CLLocationManagerDelegate,
                           UIActionSheetDelegate,
-                          SMCalloutViewDelegate,
-                          MGLCalloutViewDelegate,
                           UIAlertViewDelegate,
                           MGLMultiPointDelegate,
                           MGLAnnotationImageDelegate>
@@ -1594,30 +1592,30 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
 }
 
-- (BOOL)calloutViewShouldHighlight:(__unused MGLCompactCalloutView *)calloutView
-{
-    return [self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)];
-}
-
-- (void)calloutViewClicked:(__unused SMCalloutView *)calloutView
-{
-    if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
-    {
-        id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
-        NSAssert(selectedAnnotation, @"Selected annotation should not be nil.");
-        [self.delegate mapView:self tapOnCalloutForAnnotation:selectedAnnotation];
-    }
-}
-
-- (void)calloutViewTapped:(__unused MGLCompactCalloutView *)calloutView
-{
-    if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
-    {
-        id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
-        NSAssert(selectedAnnotation, @"Selected annotation should not be nil.");
-        [self.delegate mapView:self tapOnCalloutForAnnotation:selectedAnnotation];
-    }
-}
+//- (BOOL)calloutViewShouldHighlight:(__unused MGLCompactCalloutView *)calloutView
+//{
+//    return [self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)];
+//}
+//
+//- (void)calloutViewClicked:(__unused UIView<MGLCalloutView> *)calloutView
+//{
+//    if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
+//    {
+//        id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
+//        NSAssert(selectedAnnotation, @"Selected annotation should not be nil.");
+//        [self.delegate mapView:self tapOnCalloutForAnnotation:selectedAnnotation];
+//    }
+//}
+//
+//- (void)calloutViewTapped:(__unused MGLCompactCalloutView *)calloutView
+//{
+//    if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
+//    {
+//        id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
+//        NSAssert(selectedAnnotation, @"Selected annotation should not be nil.");
+//        [self.delegate mapView:self tapOnCalloutForAnnotation:selectedAnnotation];
+//    }
+//}
 
 - (void)calloutViewDidAppear:(UIView<MGLCalloutView> *)calloutView
 {
@@ -3463,62 +3461,69 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     self.selectedAnnotation = annotation;
 
-    if ([annotation respondsToSelector:@selector(title)] &&
-        annotation.title &&
-        [self.delegate respondsToSelector:@selector(mapView:annotationCanShowCallout:)] &&
-        [self.delegate mapView:self annotationCanShowCallout:annotation])
+    if ([annotation respondsToSelector:@selector(canShowCallout)] && annotation.canShowCallout)
     {
-        // build the callout
-        UIView <MGLCalloutView> *calloutView;
-        if ([self.delegate respondsToSelector:@selector(mapView:calloutViewForAnnotation:)])
-        {
-            calloutView = [self.delegate mapView:self calloutViewForAnnotation:annotation];
-        }
-        if (!calloutView)
-        {
-            calloutView = [self calloutViewForAnnotation:annotation];
-        }
-        self.calloutViewForSelectedAnnotation = calloutView;
-
         if (_userLocationAnnotationIsSelected)
         {
             positioningRect = [self.userLocationAnnotationView.layer.presentationLayer frame];
-            
+
             CGRect implicitAnnotationFrame = [self.userLocationAnnotationView.layer.presentationLayer frame];
             CGRect explicitAnnotationFrame = self.userLocationAnnotationView.frame;
             _initialImplicitCalloutViewOffset = CGPointMake(CGRectGetMinX(explicitAnnotationFrame) - CGRectGetMinX(implicitAnnotationFrame),
                                                             CGRectGetMinY(explicitAnnotationFrame) - CGRectGetMinY(implicitAnnotationFrame));
         }
 
+        // build the callout
+        UIView <MGLCalloutView> *calloutView;
+        if ([annotation respondsToSelector:@selector(calloutView)] && annotation.calloutView)
+        {
+            calloutView = annotation.calloutView;
+        }
+        if (!calloutView)
+        {
+            calloutView = [MGLCompactCalloutView calloutView];
+        }
+
+        calloutView.tintColor = self.tintColor;
+
+        if ([calloutView respondsToSelector:@selector(title)])
+        {
+            calloutView.title = annotation.title;
+        }
+
+        if ([calloutView respondsToSelector:@selector(subtitle)])
+        {
+            calloutView.subtitle = annotation.subtitle;
+        }
+
+        self.calloutViewForSelectedAnnotation = calloutView;
+
         // consult delegate for left and/or right accessory views
-        if ([self.delegate respondsToSelector:@selector(mapView:leftCalloutAccessoryViewForAnnotation:)])
-        {
-            calloutView.leftAccessoryView = [self.delegate mapView:self leftCalloutAccessoryViewForAnnotation:annotation];
-
-            if ([calloutView.leftAccessoryView isKindOfClass:[UIControl class]])
-            {
-                UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                  action:@selector(handleCalloutAccessoryTapGesture:)];
-
-                [calloutView.leftAccessoryView addGestureRecognizer:calloutAccessoryTap];
-            }
-        }
-
-        if ([self.delegate respondsToSelector:@selector(mapView:rightCalloutAccessoryViewForAnnotation:)])
-        {
-            calloutView.rightAccessoryView = [self.delegate mapView:self rightCalloutAccessoryViewForAnnotation:annotation];
-
-            if ([calloutView.rightAccessoryView isKindOfClass:[UIControl class]])
-            {
-                UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                  action:@selector(handleCalloutAccessoryTapGesture:)];
-
-                [calloutView.rightAccessoryView addGestureRecognizer:calloutAccessoryTap];
-            }
-        }
-
-        // set annotation delegate to handle taps on the callout view
-        calloutView.delegate = self;
+//        if ([self.delegate respondsToSelector:@selector(mapView:leftCalloutAccessoryViewForAnnotation:)])
+//        {
+//            calloutView.leftAccessoryView = [self.delegate mapView:self leftCalloutAccessoryViewForAnnotation:annotation];
+//
+//            if ([calloutView.leftAccessoryView isKindOfClass:[UIControl class]])
+//            {
+//                UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
+//                                                                                                      action:@selector(handleCalloutAccessoryTapGesture:)];
+//
+//                [calloutView.leftAccessoryView addGestureRecognizer:calloutAccessoryTap];
+//            }
+//        }
+//
+//        if ([self.delegate respondsToSelector:@selector(mapView:rightCalloutAccessoryViewForAnnotation:)])
+//        {
+//            calloutView.rightAccessoryView = [self.delegate mapView:self rightCalloutAccessoryViewForAnnotation:annotation];
+//
+//            if ([calloutView.rightAccessoryView isKindOfClass:[UIControl class]])
+//            {
+//                UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
+//                                                                                                      action:@selector(handleCalloutAccessoryTapGesture:)];
+//
+//                [calloutView.rightAccessoryView addGestureRecognizer:calloutAccessoryTap];
+//            }
+//        }
 
         // present popup
         [calloutView presentCalloutFromRect:positioningRect
@@ -3537,15 +3542,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         [self.delegate mapView:self didSelectAnnotationView:annotationView];
     }
-}
-
-- (MGLCompactCalloutView *)calloutViewForAnnotation:(id <MGLAnnotation>)annotation
-{
-    MGLCompactCalloutView *calloutView = [MGLCompactCalloutView platformCalloutView];
-    calloutView.representedObject = annotation;
-    calloutView.tintColor = self.tintColor;
-
-    return calloutView;
 }
 
 /// Returns the rectangle that represents the annotation image of the annotation

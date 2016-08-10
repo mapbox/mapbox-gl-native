@@ -323,6 +323,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
                 annotation.coordinate = coordinate;
                 annotation.title = title;
+                annotation.canShowCallout = YES;
 
                 [annotations addObject:annotation];
 
@@ -429,9 +430,11 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     [self.mapView removeAnnotations:self.mapView.annotations];
     
     MBXCustomCalloutAnnotation *annotation = [[MBXCustomCalloutAnnotation alloc] init];
-    annotation.coordinate = CLLocationCoordinate2DMake(48.8533940, 2.3775439);
+    annotation.coordinate = CLLocationCoordinate2DMake(38.904722, -77.016389);//CLLocationCoordinate2DMake(48.8533940, 2.3775439);
     annotation.title = @"Custom Callout";
-    
+    annotation.canShowCallout = YES;
+    annotation.calloutView = [[MBXCustomCalloutView alloc] init];
+
     [self.mapView addAnnotation:annotation];
     [self.mapView showAnnotations:@[annotation] animated:YES];
 }
@@ -699,9 +702,15 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     return image;
 }
 
-- (BOOL)mapView:(__unused MGLMapView *)mapView annotationCanShowCallout:(__unused id <MGLAnnotation>)annotation
-{
-    return YES;
+- (void)mapView:(MGLMapView *)mapView didDeselectAnnotation:(id<MGLAnnotation>)annotation {
+    NSString *title = [(MGLPointAnnotation *)annotation title];
+    if ( ! title.length)
+    {
+        return;
+    }
+    NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
+    MGLAnnotationImage *annotationImage = [mapView dequeueReusableAnnotationImageWithIdentifier:lastTwoCharacters];
+    annotationImage.image = annotationImage.image ? nil : [self imageWithText:lastTwoCharacters backgroundColor:[UIColor grayColor]];
 }
 
 - (CGFloat)mapView:(__unused MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation
@@ -748,35 +757,35 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     }];
 }
 
-- (UIView<MGLCalloutView> *)mapView:(__unused MGLMapView *)mapView calloutViewForAnnotation:(id<MGLAnnotation>)annotation
-{
-    if ([annotation respondsToSelector:@selector(title)]
-        && [annotation isKindOfClass:[MBXCustomCalloutAnnotation class]])
-    {
-        MBXCustomCalloutView *calloutView = [[MBXCustomCalloutView alloc] init];
-        calloutView.representedObject = annotation;
-        return calloutView;
-    }
-    return nil;
-}
-
-- (UIView *)mapView:(__unused MGLMapView *)mapView leftCalloutAccessoryViewForAnnotation:(__unused id<MGLAnnotation>)annotation
-{
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
-    button.frame = CGRectZero;
-    [button setTitle:@"Left" forState:UIControlStateNormal];
-    [button sizeToFit];
-    return button;
-}
-
-- (UIView *)mapView:(__unused MGLMapView *)mapView rightCalloutAccessoryViewForAnnotation:(__unused id<MGLAnnotation>)annotation
-{
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
-    button.frame = CGRectZero;
-    [button setTitle:@"Right" forState:UIControlStateNormal];
-    [button sizeToFit];
-    return button;
-}
+//- (UIView<MGLCalloutView> *)mapView:(__unused MGLMapView *)mapView calloutViewForAnnotation:(id<MGLAnnotation>)annotation
+//{
+//    if ([annotation respondsToSelector:@selector(title)]
+//        && [annotation isKindOfClass:[MBXCustomCalloutAnnotation class]])
+//    {
+//        MBXCustomCalloutView *calloutView = [[MBXCustomCalloutView alloc] init];
+//        calloutView.representedObject = annotation;
+//        return calloutView;
+//    }
+//    return nil;
+//}
+//
+//- (UIView *)mapView:(__unused MGLMapView *)mapView leftCalloutAccessoryViewForAnnotation:(__unused id<MGLAnnotation>)annotation
+//{
+//    UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
+//    button.frame = CGRectZero;
+//    [button setTitle:@"Left" forState:UIControlStateNormal];
+//    [button sizeToFit];
+//    return button;
+//}
+//
+//- (UIView *)mapView:(__unused MGLMapView *)mapView rightCalloutAccessoryViewForAnnotation:(__unused id<MGLAnnotation>)annotation
+//{
+//    UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
+//    button.frame = CGRectZero;
+//    [button setTitle:@"Right" forState:UIControlStateNormal];
+//    [button sizeToFit];
+//    return button;
+//}
 
 - (void)mapView:(MGLMapView *)mapView tapOnCalloutForAnnotation:(id <MGLAnnotation>)annotation
 {

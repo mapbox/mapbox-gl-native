@@ -61,6 +61,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         
         _accessibilityCoordinateFormatter = [[MGLCoordinateFormatter alloc] init];
         _accessibilityCoordinateFormatter.unitStyle = NSFormattingUnitStyleLong;
+
+        self.annotation.canShowCallout = YES;
     }
     return self;
 }

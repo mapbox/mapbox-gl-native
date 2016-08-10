@@ -2,6 +2,11 @@
 #import <CoreLocation/CoreLocation.h>
 #import <TargetConditionals.h>
 
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+#import "MGLCalloutView.h"
+#endif
+
 #import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -48,6 +53,14 @@ NS_ASSUME_NONNULL_BEGIN
  This string is displayed in the callout for the associated annotation.
  */
 @property (nonatomic, readonly, copy, nullable) NSString *subtitle;
+
+#if TARGET_OS_IPHONE
+
+@property (nonatomic) BOOL canShowCallout;
+
+@property (nonatomic, nullable) UIView <MGLCalloutView> *calloutView;
+
+#endif
 
 #if !TARGET_OS_IPHONE
 
