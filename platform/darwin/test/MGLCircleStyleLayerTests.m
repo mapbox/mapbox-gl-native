@@ -9,8 +9,9 @@
 @implementation MGLCircleLayerTests
 
 - (void)testCircleLayer {
-    NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:geoJSONURL];
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
+    NSURL *url = [NSURL fileURLWithPath:filePath];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:url];
     MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithLayerIdentifier:@"layerID" sourceIdentifier:@"sourceID"];
     [self.mapView.style addSource:source];
     [self.mapView.style addLayer:layer];
@@ -29,8 +30,8 @@
     XCTAssertEqualObjects(gLayer.circleBlur, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.circleOpacity, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.circleTranslate, MGLRuntimeStylingHelper.testOffset);
-    XCTAssertEqualObjects(gLayer.circleTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCircleTranslateAnchorViewport type:@encode(MGLCircleStyleLayerCircleTranslateAnchor)]);
-    XCTAssertEqualObjects(gLayer.circlePitchScale, [MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCirclePitchScaleViewport type:@encode(MGLCircleStyleLayerCirclePitchScale)]);
+    XCTAssert([(NSValue *)gLayer.circleTranslateAnchor objCType] == [[MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCircleTranslateAnchorViewport type:@encode(MGLCircleStyleLayerCircleTranslateAnchor)] objCType]);
+    XCTAssert([(NSValue *)gLayer.circlePitchScale objCType] == [[MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCirclePitchScaleViewport type:@encode(MGLCircleStyleLayerCirclePitchScale)] objCType]);
 }
 
 @end

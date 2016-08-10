@@ -54,6 +54,7 @@
 		35305D481D22AA680007D005 /* NSData+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35305D471D22AA450007D005 /* NSData+MGLAdditions.mm */; };
 		35305D491D22AA680007D005 /* NSData+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35305D471D22AA450007D005 /* NSData+MGLAdditions.mm */; };
 		35305D4A1D22AA6A0007D005 /* NSData+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 35305D461D22AA450007D005 /* NSData+MGLAdditions.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		353349B31D5CC6F20094E9DE /* amsterdam.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 353349B21D5CC6F20094E9DE /* amsterdam.geojson */; };
 		3534C7921D4BC95400D874A4 /* MGLStyleAttributeFunction_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3534C7911D4BC95400D874A4 /* MGLStyleAttributeFunction_Private.hpp */; };
 		3534C7931D4BC95400D874A4 /* MGLStyleAttributeFunction_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3534C7911D4BC95400D874A4 /* MGLStyleAttributeFunction_Private.hpp */; };
 		3534C7951D4BD1D400D874A4 /* MGLStyleAttributeValue_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3534C7941D4BD1D400D874A4 /* MGLStyleAttributeValue_Private.hpp */; };
@@ -469,6 +470,7 @@
 		35136D4B1D4277FC00C20EFD /* MGLSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLSource.mm; sourceTree = "<group>"; };
 		35305D461D22AA450007D005 /* NSData+MGLAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSData+MGLAdditions.h"; sourceTree = "<group>"; };
 		35305D471D22AA450007D005 /* NSData+MGLAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSData+MGLAdditions.mm"; sourceTree = "<group>"; };
+		353349B21D5CC6F20094E9DE /* amsterdam.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = amsterdam.geojson; sourceTree = "<group>"; };
 		3534C7911D4BC95400D874A4 /* MGLStyleAttributeFunction_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MGLStyleAttributeFunction_Private.hpp; sourceTree = "<group>"; };
 		3534C7941D4BD1D400D874A4 /* MGLStyleAttributeValue_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MGLStyleAttributeValue_Private.hpp; sourceTree = "<group>"; };
 		3538AA151D541C43008EC33D /* MGLStyleFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLStyleFilter.h; sourceTree = "<group>"; };
@@ -827,6 +829,7 @@
 		357579811D502AD4000B822E /* Styling */ = {
 			isa = PBXGroup;
 			children = (
+				353349B21D5CC6F20094E9DE /* amsterdam.geojson */,
 				3575798F1D513EF1000B822E /* Layers */,
 			);
 			name = Styling;
@@ -1661,6 +1664,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				353349B31D5CC6F20094E9DE /* amsterdam.geojson in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

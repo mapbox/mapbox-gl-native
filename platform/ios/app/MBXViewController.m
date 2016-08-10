@@ -527,9 +527,9 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     roadLayer.lineWidth = lineWidthFunction;
     roadLayer.lineGapWidth = lineWidthFunction;
     
-    roadLayer.visible = NO;
-    roadLayer.maxZoom = 15;
-    roadLayer.minZoom = 13;
+    roadLayer.visible = YES;
+    roadLayer.maximumZoomLevel = 15;
+    roadLayer.minimumZoomLevel = 13;
 }
 
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer *)longPress

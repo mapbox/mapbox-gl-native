@@ -1,4 +1,4 @@
-#import <Mapbox/Mapbox.h>
+#import "MGLSource.h"
 
 @interface MGLRasterSource : MGLSource
 

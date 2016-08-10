@@ -9,8 +9,9 @@
 @implementation MGLFillLayerTests
 
 - (void)testFillLayer {
-    NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:geoJSONURL];
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
+    NSURL *url = [NSURL fileURLWithPath:filePath];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:url];
     MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"layerID" sourceIdentifier:@"sourceID"];
     [self.mapView.style addSource:source];
     [self.mapView.style addLayer:layer];
@@ -29,7 +30,7 @@
     XCTAssertEqualObjects(gLayer.fillColor, MGLRuntimeStylingHelper.testColor);
     XCTAssertEqualObjects(gLayer.fillOutlineColor, MGLRuntimeStylingHelper.testColor);
     XCTAssertEqualObjects(gLayer.fillTranslate, MGLRuntimeStylingHelper.testOffset);
-    XCTAssertEqualObjects(gLayer.fillTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLFillStyleLayerFillTranslateAnchorViewport type:@encode(MGLFillStyleLayerFillTranslateAnchor)]);
+    XCTAssert([(NSValue *)gLayer.fillTranslateAnchor objCType] == [[MGLRuntimeStylingHelper testEnum:MGLFillStyleLayerFillTranslateAnchorViewport type:@encode(MGLFillStyleLayerFillTranslateAnchor)] objCType]);
     XCTAssertEqualObjects(gLayer.fillPattern, MGLRuntimeStylingHelper.testString);
 }
 

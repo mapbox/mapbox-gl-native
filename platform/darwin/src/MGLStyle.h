@@ -36,7 +36,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 @interface MGLStyle : NSObject
 
-#pragma mark Default Style URL's
+#pragma mark Default Style URLs
 
 /**
  Returns the URL to version 8 of the
@@ -167,20 +167,29 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 #pragma mark Runtime Styling
 
 /**
- Returns a layer that conforms to MGLStyleLayer if any layer with the given identifier was found.
+ Returns a layer that conforms to `MGLStyleLayer` if any layer with the given
+ identifier was found.
  
- @return layer A layer of type `MGLBackgroundStyleLayer`, `MGLCircleStyleLayer`,
- `MGLFillStyleLayer`, `MGLLineStyleLayer`, `MGLRasterStyleLayer` or `MGLSymbolStyleLayer`.
+ @return layer A layer instance of the corresponding type.
  */
 - (nullable id <MGLStyleLayer>)layerWithIdentifier:(NSString *)identifier;
 
 /**
- Adds a new layer to the map view.
+ Adds a new layer at the top of the hierarchy.
  
  @param styleLayer The layer object to add to the map view. This object
  must conform to the `MGLStyleLayer` protocol.
  */
 - (void)addLayer:(id <MGLStyleLayer>)styleLayer;
+
+/**
+ Inserts a new layer below another layer.
+ 
+ @param styleLayer Layer to be inserted.
+ @param belowLayer A layer that's already on the map view.
+ */
+- (void)insertLayer:(id <MGLStyleLayer>)styleLayer
+         belowLayer:(id <MGLStyleLayer>)belowLayer;
 
 /**
  Removes a layer from the map view.
@@ -200,7 +209,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 /**
  Removes a source from the map view.
  
- @param source The source to remove
+ @param source The source to remove.
  */
 - (void)removeSource:(MGLSource *)source;
 

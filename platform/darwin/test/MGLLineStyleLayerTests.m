@@ -9,8 +9,9 @@
 @implementation MGLLineLayerTests
 
 - (void)testLineLayer {
-    NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:geoJSONURL];
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
+    NSURL *url = [NSURL fileURLWithPath:filePath];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:url];
     MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithLayerIdentifier:@"layerID" sourceIdentifier:@"sourceID"];
     [self.mapView.style addSource:source];
     [self.mapView.style addLayer:layer];
@@ -31,14 +32,14 @@
     layer.linePattern = MGLRuntimeStylingHelper.testString;
 
     MGLLineStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
-    XCTAssertEqualObjects(gLayer.lineCap, [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineCapSquare type:@encode(MGLLineStyleLayerLineCap)]);
-    XCTAssertEqualObjects(gLayer.lineJoin, [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineJoinMiter type:@encode(MGLLineStyleLayerLineJoin)]);
+    XCTAssert([(NSValue *)gLayer.lineCap objCType] == [[MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineCapSquare type:@encode(MGLLineStyleLayerLineCap)] objCType]);
+    XCTAssert([(NSValue *)gLayer.lineJoin objCType] == [[MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineJoinMiter type:@encode(MGLLineStyleLayerLineJoin)] objCType]);
     XCTAssertEqualObjects(gLayer.lineMiterLimit, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineRoundLimit, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineOpacity, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineColor, MGLRuntimeStylingHelper.testColor);
     XCTAssertEqualObjects(gLayer.lineTranslate, MGLRuntimeStylingHelper.testOffset);
-    XCTAssertEqualObjects(gLayer.lineTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineTranslateAnchorViewport type:@encode(MGLLineStyleLayerLineTranslateAnchor)]);
+    XCTAssert([(NSValue *)gLayer.lineTranslateAnchor objCType] == [[MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineTranslateAnchorViewport type:@encode(MGLLineStyleLayerLineTranslateAnchor)] objCType]);
     XCTAssertEqualObjects(gLayer.lineWidth, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineGapWidth, MGLRuntimeStylingHelper.testNumber);
     XCTAssertEqualObjects(gLayer.lineOffset, MGLRuntimeStylingHelper.testNumber);

@@ -52,7 +52,7 @@ global.testGetterImplementation = function (property, layerType) {
         case 'enum':
             var objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
             var objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, [MGLRuntimeStylingHelper testEnum:${objCEnum} type:@encode(${objCType})]);`;
+            return `XCTAssert([(NSValue *)gLayer.${objCName(property)} objCType] == [[MGLRuntimeStylingHelper testEnum:${objCEnum} type:@encode(${objCType})] objCType]);`;
         case 'color':
             return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testColor);`;
         case 'array':

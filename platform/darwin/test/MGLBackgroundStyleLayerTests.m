@@ -9,8 +9,9 @@
 @implementation MGLBackgroundLayerTests
 
 - (void)testBackgroundLayer {
-    NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:geoJSONURL];
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
+    NSURL *url = [NSURL fileURLWithPath:filePath];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:url];
     MGLBackgroundStyleLayer *layer = [[MGLBackgroundStyleLayer alloc] initWithLayerIdentifier:@"layerID" sourceIdentifier:@"sourceID"];
     [self.mapView.style addSource:source];
     [self.mapView.style addLayer:layer];

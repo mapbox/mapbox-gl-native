@@ -132,6 +132,13 @@ static NSURL *MGLStyleURL_emerald;
     self.mapView.mbglMap->addLayer(std::unique_ptr<mbgl::style::Layer>(styleLayer.layer));
 }
 
+- (void)insertLayer:(id <MGLStyleLayer, MGLStyleLayer_Private>)styleLayer
+         belowLayer:(id <MGLStyleLayer, MGLStyleLayer_Private>)belowLayer
+{
+    const mbgl::optional<std::string> belowLayerId{[belowLayer layerIdentifier].UTF8String};
+    self.mapView.mbglMap->addLayer(std::unique_ptr<mbgl::style::Layer>(styleLayer.layer), belowLayerId);
+}
+
 - (void)addSource:(MGLGeoJSONSource *)source
 {
     self.mapView.mbglMap->addSource(std::move([source mbgl_source]));

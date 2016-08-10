@@ -1,8 +1,6 @@
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
-#import <Mapbox/Mapbox.h>
-
 #import "MGLTypes.h"
 #import "MGLStyleAttributeValue.h"
 #import "MGLBaseStyleLayer.h"
