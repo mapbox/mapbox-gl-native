@@ -28,10 +28,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -48,7 +46,7 @@ import com.mapbox.services.commons.ServicesException;
 import com.mapbox.services.commons.models.Position;
 import com.mapbox.services.geocoding.v5.GeocodingCriteria;
 import com.mapbox.services.geocoding.v5.MapboxGeocoding;
-import com.mapbox.services.geocoding.v5.models.GeocodingFeature;
+import com.mapbox.services.geocoding.v5.models.CarmenFeature;
 import com.mapbox.services.geocoding.v5.models.GeocodingResponse;
 
 import java.util.List;
@@ -313,7 +311,7 @@ public class LocationPickerActivity extends AppCompatActivity {
             MapboxGeocoding client = new MapboxGeocoding.Builder()
                     .setAccessToken(getString(R.string.mapbox_access_token))
                     .setCoordinates(Position.fromCoordinates(point.getLongitude(), point.getLatitude()))
-                    .setType(GeocodingCriteria.TYPE_ADDRESS)
+                    .setGeocodingType(GeocodingCriteria.TYPE_ADDRESS)
                     .build();
 
             //Place the request
@@ -321,10 +319,10 @@ public class LocationPickerActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<GeocodingResponse> call, Response<GeocodingResponse> response) {
 
-                    List<GeocodingFeature> results = response.body().getFeatures();
+                    List<CarmenFeature> results = response.body().getFeatures();
                     String address = null;
                     if (results.size() > 0) {
-                        GeocodingFeature feature = results.get(0);
+                        CarmenFeature feature = results.get(0);
                         address = feature.getAddress() + " " + feature.getText();
                         Log.i(TAG, "address " + address);
                     } else {

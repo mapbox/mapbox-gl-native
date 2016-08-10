@@ -33,7 +33,6 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
 
     private MapView mMapView;
     private MapboxMap mMapboxMap;
-    private Random random = new Random();
 
     private LatLng dupontCircle = new LatLng(38.90962, -77.04341);
 
