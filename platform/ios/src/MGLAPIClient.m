@@ -63,7 +63,9 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
         dataTask = nil;
     }];
     [dataTask resume];
-    [self.dataTasks addObject:dataTask];
+    if (dataTask) {
+        [self.dataTasks addObject:dataTask];
+    }
 }
 
 - (void)postEvent:(nonnull MGLMapboxEventAttributes *)event completionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
