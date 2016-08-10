@@ -19,6 +19,7 @@
     <string name="activity_press_for_marker">Press Map For Marker</string>
     <string name="activity_view_marker">View Marker API</string>
     <string name="activity_view_marker_scale">Scaling in the View Marker API</string>
+    <string name="activity_view_marker_z_ordering">View Marker Z ordering</string>
 
     <!-- InfoWindow-->
     <string name="activity_info_window">Standard InfoWindow</string>
@@ -94,6 +95,7 @@
     <string name="description_viewpager">Use SupportMapFragments in a ViewPager</string>
     <string name="description_navigation_drawer">Test for Navigation Drawer support</string>
     <string name="description_runtime_style">Adopt the map style on the fly</string>
+    <string name="description_marker_view_z_ordering">Marker View Z ordering</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
     <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>
