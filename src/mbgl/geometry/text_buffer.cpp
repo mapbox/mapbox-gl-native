@@ -22,7 +22,7 @@ size_t TextVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, uint16_t 
     ushorts[5] /* tex */ = ty / 4;
 
     uint8_t *ubytes = static_cast<uint8_t *>(data);
-    // a_data2
+    // a_data
     ubytes[12] /* labelminzoom */ = labelminzoom * 10;
     ubytes[13] /* labelangle */ = labelangle;
 
