@@ -7,6 +7,7 @@
 #import "MGLCircleStyleLayer.h"
 #import "MGLSymbolStyleLayer.h"
 #import "MGLRasterStyleLayer.h"
+#import "MGLBackgroundStyleLayer.h"
 
 #import "MGLStyle_Private.hpp"
 #import "MGLStyleLayer_Private.hpp"
@@ -139,7 +140,7 @@ static NSURL *MGLStyleURL_emerald;
     self.mapView.mbglMap->addLayer(std::unique_ptr<mbgl::style::Layer>(styleLayer.layer), belowLayerId);
 }
 
-- (void)addSource:(MGLGeoJSONSource *)source
+- (void)addSource:(MGLSource *)source
 {
     self.mapView.mbglMap->addSource(std::move([source mbgl_source]));
 }
