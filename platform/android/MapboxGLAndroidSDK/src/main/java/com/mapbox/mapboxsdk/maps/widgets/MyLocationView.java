@@ -320,17 +320,43 @@ public class MyLocationView extends View {
         setBearing(position.bearing);
     }
 
-    public void onPause() {
-        compassListener.onPause();
-        toggleGps(false);
-    }
-
     public void onResume() {
         if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
             compassListener.onResume();
         }
         if (isEnabled()) {
             toggleGps(true);
+        }
+    }
+
+    public void onPause() {
+        compassListener.onPause();
+        toggleGps(false);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        // cleanup to prevent memory leaks
+        if (locationChangeAnimator != null) {
+            locationChangeAnimator.cancel();
+            locationChangeAnimator = null;
+        }
+
+        if (accuracyAnimator != null) {
+            accuracyAnimator.cancel();
+            accuracyAnimator = null;
+        }
+
+        if (directionAnimator != null) {
+            directionAnimator.cancel();
+            directionAnimator = null;
+        }
+
+        if (userLocationListener != null) {
+            LocationServices services = LocationServices.getLocationServices(getContext());
+            services.removeLocationListener(userLocationListener);
+            userLocationListener = null;
         }
     }
 

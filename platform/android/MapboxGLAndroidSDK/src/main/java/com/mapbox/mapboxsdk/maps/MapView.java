@@ -1493,6 +1493,14 @@ public class MapView extends FrameLayout {
         if (mMapboxMap.getUiSettings().isZoomControlsEnabled()) {
             mZoomButtonsController.setVisible(false);
         }
+
+        // make sure we don't leak location listener
+        if (mMyLocationListener != null) {
+            // cleanup to prevent memory leak
+            LocationServices services = LocationServices.getLocationServices(getContext());
+            services.removeLocationListener(mMyLocationListener);
+            mMyLocationListener = null;
+        }
     }
 
     // Called when view is hidden and shown
