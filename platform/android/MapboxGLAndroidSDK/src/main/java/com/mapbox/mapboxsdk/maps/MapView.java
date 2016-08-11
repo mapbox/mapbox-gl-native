@@ -2555,9 +2555,13 @@ public class MapView extends FrameLayout {
         if (trackingSettings.isDismissLocationTrackingOnGesture()) {
             resetLocationTrackingMode();
         }
+
+        //Mappy, the tracking mode isn't related to the bearing
+        /*
         if (trackingSettings.isDismissBearingTrackingOnGesture()) {
             resetBearingTrackingMode();
         }
+        */
     }
 
     private void resetLocationTrackingMode() {

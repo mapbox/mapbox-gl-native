@@ -24,6 +24,7 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -268,7 +269,6 @@ public class MyLocationView extends View {
         // apply tilt to camera
         camera.save();
         camera.rotate(tilt, 0, bearing);
-
         // map camera matrix on our matrix
         camera.getMatrix(matrix);
 
@@ -315,7 +315,8 @@ public class MyLocationView extends View {
 
     public void setCameraPosition(CameraPosition position) {
         setTilt(position.tilt);
-        setBearing(position.bearing);
+        //Mappy, the location marker is free from camara position bearing
+        // setBearing(position.bearing);
     }
 
     public void onPause() {
@@ -536,34 +537,40 @@ public class MyLocationView extends View {
                 return;
             }
 
-            if( event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR ){
+            if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
 
                 // calculate the rotation matrix
-                SensorManager.getRotationMatrixFromVector(matrix, event.values );
-                SensorManager.getOrientation(matrix, orientation );
+                SensorManager.getRotationMatrixFromVector(matrix, event.values);
+                SensorManager.getOrientation(matrix, orientation);
 
-                float magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation )[0]);
+                float magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation)[0]);
                 currentDegree = (int) (magneticHeading);
 
                 // Change the user location view orientation to reflect the device orientation
                 setCompass(currentDegree);
 
-                if(myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW){
+                /**
+                 * Mappy, the bearing of the sensor doesn't allow to rotate the map
+                if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
                     rotateCamera();
                 }
+                 */
+
+                bearing = currentDegree;
 
                 compassUpdateNextTimestamp = currentTime + COMPASS_UPDATE_RATE_MS;
             }
         }
 
-        private void rotateCamera(){
+        private void rotateCamera() {
             CameraPosition.Builder builder = new CameraPosition.Builder();
             builder.bearing(currentDegree);
             mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), COMPASS_UPDATE_RATE_MS, false /*linear interpolator*/);
         }
 
         @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
 
     }
 
