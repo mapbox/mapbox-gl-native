@@ -142,7 +142,7 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)addSource:(MGLSource *)source
 {
-    self.mapView.mbglMap->addSource(std::move([source mbgl_source]));
+    self.mapView.mbglMap->addSource([source mbgl_source]);
 }
 
 - (void)removeSource:(MGLSource *)source
