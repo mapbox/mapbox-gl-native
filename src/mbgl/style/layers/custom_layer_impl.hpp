@@ -21,7 +21,7 @@ public:
     ~Impl() final;
 
     void initialize();
-    void render(const TransformState&) const;
+    void render(const TransformState&, int framebuffer) const;
 
 private:
     std::unique_ptr<Layer> clone() const override;

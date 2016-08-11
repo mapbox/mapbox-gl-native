@@ -263,7 +263,7 @@ void Painter::renderPass(PaintParameters& parameters,
         } else if (layer.is<CustomLayer>()) {
             MBGL_DEBUG_GROUP(layer.baseImpl->id + " - custom");
             VertexArrayObject::Unbind();
-            layer.as<CustomLayer>()->impl->render(state);
+            layer.as<CustomLayer>()->impl->render(state, config.bindFramebuffer.getCurrent());
             config.setDirty();
             config.bindFramebuffer.reset();
             config.viewport.reset();

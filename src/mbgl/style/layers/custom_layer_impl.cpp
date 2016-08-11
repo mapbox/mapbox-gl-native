@@ -43,7 +43,7 @@ void CustomLayer::Impl::initialize() {
     initializeFn(context);
 }
 
-void CustomLayer::Impl::render(const TransformState& state) const {
+void CustomLayer::Impl::render(const TransformState& state, int framebuffer) const {
     assert(renderFn);
 
     CustomLayerRenderParameters parameters;
@@ -56,6 +56,7 @@ void CustomLayer::Impl::render(const TransformState& state) const {
     parameters.bearing = -state.getAngle() * util::RAD2DEG;
     parameters.pitch = state.getPitch();
     parameters.altitude = state.getAltitude();
+    parameters.framebuffer = framebuffer;
 
     renderFn(context, parameters);
 }
