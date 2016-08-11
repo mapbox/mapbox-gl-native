@@ -4,6 +4,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## master
 
+* Added runtime styling API for iOS ([#5727](https://github.com/mapbox/mapbox-gl-native/pull/5727))
 * As the user zooms in, tiles from lower zoom levels are scaled up until tiles for higher zoom levels are loaded. ([#5143](https://github.com/mapbox/mapbox-gl-native/pull/5143))
 * Added [quadkey](https://msdn.microsoft.com/en-us/library/bb259689.aspx) support and limited WMS support in raster tile URL templates. ([#5628](https://github.com/mapbox/mapbox-gl-native/pull/5628))
 * The `text-pitch-alignment` property is now supported in stylesheets for improved street label legibility on a tilted map. ([#5288](https://github.com/mapbox/mapbox-gl-native/pull/5288))
@@ -13,6 +14,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Include simulator architecture slices in the dSYM file that is generated for release builds. ([#5740](https://github.com/mapbox/mapbox-gl-native/pull/5740))
 * Fixed an issue where annotation views could be assigned to multipoint annotations. ([#5770](https://github.com/mapbox/mapbox-gl-native/pull/5770))
 * Fixed the static only framework build. ([#5782](https://github.com/mapbox/mapbox-gl-native/issues/5782))
+* Account for center offset when tapping annotation views. ([#5931](https://github.com/mapbox/mapbox-gl-native/pull/5931))
 
 ## 3.3.4 - August 8, 2016
 
