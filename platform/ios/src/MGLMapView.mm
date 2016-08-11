@@ -42,6 +42,7 @@
 #import "MGLMapboxEvents.h"
 #import "MGLCompactCalloutView.h"
 #import "MGLAnnotationContainerView.h"
+#import "MGLAnnotationContainerView_Private.h"
 
 #import <algorithm>
 #import <cstdlib>
@@ -1407,6 +1408,18 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
 
     CGPoint tapPoint = [singleTap locationInView:self];
+   
+    // Handle the case of an offset annotation view by converting the tap point to be the geo location
+    // of the annotation itself that the view represents
+    for (MGLAnnotationView *view in self.annotationContainerView.annotationViews)
+    {
+        if (view.centerOffset.dx != 0 || view.centerOffset.dy != 0) {
+            if (CGRectContainsPoint(view.frame, tapPoint)) {
+                CGPoint annotationPoint = [self convertCoordinate:view.annotation.coordinate toPointToView:self];
+                tapPoint = annotationPoint;
+            }
+        }
+    }
     
     MGLAnnotationTag hitAnnotationTag = [self annotationTagAtPoint:tapPoint persistingResults:YES];
     if (hitAnnotationTag != MGLAnnotationTagNotFound)
