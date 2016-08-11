@@ -1,5 +1,7 @@
 #import "MGLMapView.h"
 
+#import <mbgl/mbgl.hpp>
+
 @interface MGLMapView (Private)
 
 /// True if the view or application is in a state where it is not expected to be
@@ -19,5 +21,7 @@
 
 /// Synchronously render a frame of the map.
 - (void)renderSync;
+
+- (mbgl::Map *)mbglMap;
 
 @end

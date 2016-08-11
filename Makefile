@@ -253,6 +253,8 @@ ifabric: $(IOS_PROJ_PATH)
 idocument:
 	OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
 
+style-code-darwin:
+	node platform/darwin/scripts/generate-style-code.js
 endif
 
 #### Linux targets #####################################################

@@ -12,6 +12,14 @@
     #define _Nonnull
 #endif
 
+#if TARGET_OS_IPHONE
+@class UIColor;
+#define MGLColor UIColor
+#else
+@class NSColor;
+#define MGLColor NSColor
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
 /** Indicates an error occurred in the Mapbox SDK. */

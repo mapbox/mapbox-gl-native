@@ -484,6 +484,26 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
 }
 
+- (IBAction)runtimeStyling:(id)sender {
+    MGLFillStyleLayer *fillStyleLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
+    
+    MGLStyleAttributeFunction *colorFunction = [[MGLStyleAttributeFunction alloc] init];
+    colorFunction.stops = @{
+        @0.0: [NSColor redColor],
+        @10.0: [NSColor yellowColor],
+        @20.0: [NSColor blackColor],
+    };
+    fillStyleLayer.fillColor = colorFunction;
+    
+    NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
+    [self.mapView.style addSource:source];
+    
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" sourceIdentifier:@"ams"];
+    fillLayer.fillColor = [NSColor purpleColor];
+    [self.mapView.style addLayer:fillLayer];
+}
+
 - (IBAction)dropPin:(NSMenuItem *)sender {
     [self dropPinAtPoint:_mouseLocationForMapViewContextMenu];
 }
@@ -577,6 +597,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return self.mapView.direction != 0;
     }
     if (menuItem.action == @selector(reload:)) {
+        return YES;
+    }
+    if (menuItem.action == @selector(runtimeStyling:)) {
         return YES;
     }
     if (menuItem.action == @selector(dropPin:)) {

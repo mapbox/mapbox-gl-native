@@ -1,0 +1,55 @@
+<%
+  const type = locals.type;
+  const layoutProperties = locals.layoutProperties;
+  const paintProperties = locals.paintProperties;
+-%>
+// This file is generated. 
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
+
+#import "MGLTypes.h"
+#import "MGLStyleAttributeValue.h"
+#import "MGLBaseStyleLayer.h"
+
+<% for (const property of layoutProperties) { -%>
+<% if (property.type == "enum") { -%>
+typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %>) {
+<% for (const value of property.values) { -%>
+    MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
+<% } -%>
+};
+
+<% } -%>
+<% } -%>
+<% for (const property of paintProperties) { -%>
+<% if (property.type == "enum") { -%>
+typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %>) {
+<% for (const value of property.values) { -%>
+    MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
+<% } -%>
+};
+
+<% } -%>
+<% } -%>
+@interface MGL<%- camelize(type) %>StyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
+
+<% if (layoutProperties.length) { -%>
+#pragma mark - Accessing the Layout Attributes
+
+<% for (const property of layoutProperties) { -%>
+/**
+ <%- property.doc %>
+ */
+@property (nonatomic) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+
+<% } -%>
+<% } -%>
+#pragma mark - Accessing the Paint Attributes
+
+<% for (const property of paintProperties) { -%>
+/**
+ <%- property.doc %>
+ */
+@property (nonatomic) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+
+<% } -%>
+@end

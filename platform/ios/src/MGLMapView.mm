@@ -1,4 +1,4 @@
-#import "MGLMapView_Internal.h"
+#import "MGLMapView_Private.hpp"
 
 #import <mbgl/platform/log.hpp>
 #import <mbgl/gl/gl.hpp>
@@ -35,10 +35,13 @@
 #import "NSString+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
+#import "UIColor+MGLAdditions.hpp"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
 #import "MGLAnnotationImage_Private.h"
 #import "MGLAnnotationView_Private.h"
+#import "MGLStyle_Private.hpp"
+#import "MGLStyleLayer_Private.hpp"
 #import "MGLMapboxEvents.h"
 #import "MGLCompactCalloutView.h"
 #import "MGLAnnotationContainerView.h"
@@ -129,17 +132,6 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
     [function getControlPointAtIndex:0 values:p1];
     [function getControlPointAtIndex:1 values:p2];
     return { p1[0], p1[1], p2[0], p2[1] };
-}
-
-mbgl::Color MGLColorObjectFromUIColor(UIColor *color)
-{
-    if (!color)
-    {
-        return { 0, 0, 0, 0 };
-    }
-    CGFloat r, g, b, a;
-    [color getRed:&r green:&g blue:&b alpha:&a];
-    return { (float)r, (float)g, (float)b, (float)a };
 }
 
 @interface MGLAnnotationAccessibilityElement : UIAccessibilityElement
@@ -609,6 +601,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
+}
+
+- (MGLStyle *)style
+{
+    MGLStyle *style = [[MGLStyle alloc] init];
+    style.mapView = self;
+    return style;
 }
 
 - (void)reachabilityChanged:(NSNotification *)notification
@@ -3046,7 +3045,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     UIColor *color = (_delegateHasStrokeColorsForShapeAnnotations
                       ? [self.delegate mapView:self strokeColorForShapeAnnotation:annotation]
                       : self.tintColor);
-    return MGLColorObjectFromUIColor(color);
+    return color.mbgl_color;
 }
 
 - (mbgl::Color)fillColorForPolygonAnnotation:(MGLPolygon *)annotation
@@ -3054,7 +3053,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     UIColor *color = (_delegateHasFillColorsForShapeAnnotations
                       ? [self.delegate mapView:self fillColorForPolygonAnnotation:annotation]
                       : self.tintColor);
-    return MGLColorObjectFromUIColor(color);
+    return color.mbgl_color;
 }
 
 - (CGFloat)lineWidthForPolylineAnnotation:(MGLPolyline *)annotation
@@ -5158,6 +5157,10 @@ void MGLFinishCustomStyleLayer(void *context)
 - (void)setCustomStyleLayersNeedDisplay
 {
     _mbglMap->update(mbgl::Update::Repaint);
+}
+
+- (mbgl::Map *)mbglMap {
+    return _mbglMap;
 }
 
 @end

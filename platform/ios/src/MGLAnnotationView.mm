@@ -1,7 +1,7 @@
 #import "MGLAnnotationView.h"
 #import "MGLAnnotationView_Private.h"
+#import "MGLMapView_Private.hpp"
 #import "MGLAnnotation.h"
-#import "MGLMapView_Internal.h"
 
 #import "NSBundle+MGLAdditions.h"
 
