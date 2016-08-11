@@ -27,37 +27,37 @@ template <class Object>
 class Thread {
 public:
     template <class... Args>
-    Thread(const ThreadContext&, Args&&... args);
+    Thread(const ThreadContext&, Args... args);
     ~Thread();
 
     // Invoke object->fn(args...) in the runloop thread.
     template <typename Fn, class... Args>
-    void invoke(Fn fn, Args&&... args) {
-        loop->invoke(bind(fn), std::forward<Args>(args)...);
+    void invoke(Fn fn, Args... args) {
+        loop->invoke(bind<Fn, void>(fn), std::move(args)...);
     }
 
     // Invoke object->fn(args...) in the runloop thread, then invoke callback(result) in the current thread.
     template <typename Fn, class Cb, class... Args>
     std::unique_ptr<AsyncRequest>
-    invokeWithCallback(Fn fn, Cb&& callback, Args&&... args) {
-        return loop->invokeWithCallback(bind(fn), callback, std::forward<Args>(args)...);
+    invokeWithCallback(Fn fn, Cb callback, Args... args) {
+        return loop->invokeWithCallback(bind<Fn, void>(fn), std::move(callback), std::move(args)...);
     }
 
     // Invoke object->fn(args...) in the runloop thread, and wait for the result.
     template <class R, typename Fn, class... Args>
-    R invokeSync(Fn fn, Args&&... args) {
-        std::packaged_task<R ()> task(std::bind(fn, object, args...));
+    R invokeSync(Fn fn, Args... args) {
+        std::packaged_task<R (Args...)> task(bind<Fn, R>(fn));
         std::future<R> future = task.get_future();
-        loop->invoke(std::move(task));
+        loop->invoke(std::move(task), std::move(args)...);
         return future.get();
     }
 
     // Invoke object->fn(args...) in the runloop thread, and wait for it to complete.
     template <typename Fn, class... Args>
-    void invokeSync(Fn fn, Args&&... args) {
-        std::packaged_task<void ()> task(std::bind(fn, object, args...));
+    void invokeSync(Fn fn, Args... args) {
+        std::packaged_task<void (Args...)> task(bind<Fn, void>(fn));
         std::future<void> future = task.get_future();
-        loop->invoke(std::move(task));
+        loop->invoke(std::move(task), std::move(args)...);
         future.get();
     }
 
@@ -67,10 +67,10 @@ private:
     Thread& operator=(const Thread&) = delete;
     Thread& operator=(Thread&&) = delete;
 
-    template <typename Fn>
+    template <class Fn, class R>
     auto bind(Fn fn) {
-        return [fn, this] (auto &&... args) {
-            return (object->*fn)(std::forward<decltype(args)>(args)...);
+        return [fn, this] (auto... args) -> R {
+             return (object->*fn)(std::move(args)...);
         };
     }
 
@@ -78,8 +78,6 @@ private:
     void run(P&& params, std::index_sequence<I...>);
 
     std::promise<void> running;
-    std::promise<void> joinable;
-
     std::thread thread;
 
     Object* object = nullptr;
@@ -88,10 +86,10 @@ private:
 
 template <class Object>
 template <class... Args>
-Thread<Object>::Thread(const ThreadContext& context, Args&&... args) {
+Thread<Object>::Thread(const ThreadContext& context, Args... args) {
     // Note: We're using std::tuple<> to store the arguments because GCC 4.9 has a bug
     // when expanding parameters packs captured in lambdas.
-    std::tuple<Args...> params = std::forward_as_tuple(::std::forward<Args>(args)...);
+    std::tuple<Args...> params = std::forward_as_tuple(std::move(args)...);
 
     thread = std::thread([&] {
         platform::setCurrentThreadName(context.name);
@@ -112,22 +110,18 @@ void Thread<Object>::run(P&& params, std::index_sequence<I...>) {
     RunLoop loop_(RunLoop::Type::New);
     loop = &loop_;
 
+    running.set_value();
+
     Object object_(std::get<I>(std::forward<P>(params))...);
     object = &object_;
 
-    running.set_value();
     loop_.run();
 
-    loop = nullptr;
-    object = nullptr;
-
-    joinable.get_future().get();
 }
 
 template <class Object>
 Thread<Object>::~Thread() {
     loop->stop();
-    joinable.set_value();
     thread.join();
 }
 
