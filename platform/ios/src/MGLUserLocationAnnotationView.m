@@ -31,11 +31,6 @@
     return self;
 }
 
-- (void)didUpdateUserLocation:(MGLUserLocation *)userLocation
-{
-    // Left blank intentionally. Subclasses may override this in order to customize UI based on course, speed etc.
-}
-
 - (CALayer *)hitTestLayer
 {
     return self.layer.presentationLayer;

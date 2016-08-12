@@ -4062,8 +4062,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     [self didUpdateLocationWithUserTrackingAnimated:animated];
 
-    [self.userLocationAnnotationView didUpdateUserLocation:self.userLocation];
-
     NSTimeInterval duration = MGLAnimationDuration;
     if (oldLocation && ! CGPointEqualToPoint(self.userLocationAnnotationView.center, CGPointZero))
     {
@@ -4702,6 +4700,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         _userLocationAnimationCompletionDate = [NSDate dateWithTimeIntervalSinceNow:duration];
         
         annotationView.hidden = NO;
+        [annotationView update];
         
         if (_userLocationAnnotationIsSelected)
         {

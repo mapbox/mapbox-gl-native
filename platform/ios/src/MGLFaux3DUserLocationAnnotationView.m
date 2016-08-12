@@ -30,15 +30,27 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     double _oldPitch;
 }
 
-- (void)didUpdateUserLocation:(MGLUserLocation *)userLocation
-{
-    [self setupLayers];
-}
-
 - (CALayer *)hitTestLayer
 {
     // only the main dot should be interactive (i.e., exclude the accuracy ring and halo)
     return _dotBorderLayer ?: _puckDot;
+}
+
+- (void)update
+{
+    if (CGSizeEqualToSize(self.frame.size, CGSizeZero))
+    {
+        CGFloat frameSize = (self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? MGLUserLocationAnnotationPuckSize : MGLUserLocationAnnotationDotSize;
+        [self updateFrameWithSize:frameSize];
+    }
+
+    if (CLLocationCoordinate2DIsValid(self.userLocation.coordinate))
+    {
+        (self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? [self drawPuck] : [self drawDot];
+        [self updatePitch];
+    }
+
+    _haloLayer.hidden = ! CLLocationCoordinate2DIsValid(self.mapView.userLocation.coordinate) || self.mapView.userLocation.location.horizontalAccuracy > 10;
 }
 
 - (void)setTintColor:(UIColor *)tintColor
@@ -59,23 +71,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         _headingIndicatorLayer.contents = (__bridge id)[[self headingIndicatorTintedGradientImage] CGImage];
     }
-}
-
-- (void)setupLayers
-{
-    if (CGSizeEqualToSize(self.frame.size, CGSizeZero))
-    {
-        CGFloat frameSize = (self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? MGLUserLocationAnnotationPuckSize : MGLUserLocationAnnotationDotSize;
-        [self updateFrameWithSize:frameSize];
-    }
-
-    if (CLLocationCoordinate2DIsValid(self.userLocation.coordinate))
-    {
-        (self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? [self drawPuck] : [self drawDot];
-        [self updatePitch];
-    }
-    
-    _haloLayer.hidden = ! CLLocationCoordinate2DIsValid(self.mapView.userLocation.coordinate) || self.mapView.userLocation.location.horizontalAccuracy > 10;
 }
 
 - (void)updatePitch

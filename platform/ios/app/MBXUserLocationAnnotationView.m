@@ -13,7 +13,7 @@ const CGFloat MBXUserLocationDotSize = 10;
     return self;
 }
 
-- (void)didUpdateUserLocation:(MGLUserLocation *)userLocation
+- (void)update
 {
     [self updateFrameWithSize:self.intrinsicContentSize];
     [self setNeedsDisplay];

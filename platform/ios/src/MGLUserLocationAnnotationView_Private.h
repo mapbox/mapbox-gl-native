@@ -7,8 +7,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLUserLocationAnnotationView (Private)
 
-- (void)didUpdateUserLocation:(MGLUserLocation *)userLocation;
-
 @property (nonatomic, weak, nullable) MGLUserLocation *userLocation;
 @property (nonatomic, weak, nullable) MGLMapView *mapView;
 
