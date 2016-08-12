@@ -1,0 +1,20 @@
+{
+  "version":8,
+  "sources":{
+    "mapbox":{
+      "type":"raster",
+      "tiles": [
+        "http://a.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.mvt"
+      ],
+      "tileSize":256
+    }
+  },
+  "sprite":"./fixtures/sprites/1x",
+  "glyphs": "./fixtures/glyphs/{range}.pbf",
+  "layers":[
+    {
+      "type":"vector",
+      "source":"mapbox"
+    }
+  ]
+}

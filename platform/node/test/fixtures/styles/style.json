@@ -6,7 +6,7 @@
       "type": "vector",
       "maxzoom": 15,
       "tiles": [
-        "./fixtures/tiles/{z}-{x}-{y}.vector.pbf"
+        "./fixtures/tiles/{z}-{x}-{y}.mvt"
       ]
     }
   },
