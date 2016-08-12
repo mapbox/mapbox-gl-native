@@ -132,8 +132,6 @@ public class MyLocationView extends View {
             return;
         }
 
-        setEnabled(false);
-
         // setup LayoutParams
         ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -147,6 +145,7 @@ public class MyLocationView extends View {
 
         myLocationBehavior = new MyLocationBehaviorFactory().getBehavioralModel(MyLocationTracking.TRACKING_NONE);
         compassListener = new CompassListener(context);
+        setEnabled(false);
     }
 
     public final void setForegroundDrawables(Drawable defaultDrawable, Drawable bearingDrawable) {
@@ -325,10 +324,10 @@ public class MyLocationView extends View {
     }
 
     public void onResume() {
-        if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
-            compassListener.onResume();
-        }
         if (isEnabled()) {
+            if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+                compassListener.onResume();
+            }
             toggleGps(true);
         }
     }
@@ -350,6 +349,18 @@ public class MyLocationView extends View {
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
+
+        if (enabled) {
+            setVisibility(View.VISIBLE);
+            if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+                compassListener.onResume();
+            } else {
+                compassListener.onPause();
+            }
+        } else {
+            setVisibility(View.INVISIBLE);
+            compassListener.onPause();
+        }
         toggleGps(enabled);
     }
 
@@ -395,6 +406,7 @@ public class MyLocationView extends View {
             // Disable location and user dot
             location = null;
             locationServices.removeLocationListener(userLocationListener);
+            userLocationListener = null;
         }
 
         locationServices.toggleGPS(enableGps);
@@ -521,7 +533,7 @@ public class MyLocationView extends View {
         }
 
         public void onResume() {
-            sensorManager.registerListener(this, rotationVectorSensor, SensorManager.SENSOR_DELAY_GAME);
+            sensorManager.registerListener(this, rotationVectorSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
         public void onPause() {
@@ -543,7 +555,7 @@ public class MyLocationView extends View {
                 SensorManager.getRotationMatrixFromVector(matrix, event.values);
                 SensorManager.getOrientation(matrix, orientation);
 
-                float magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation)[0]);
+                float magneticHeading = (float) Math.toDegrees(orientation[0]);
                 currentDegree = (int) (magneticHeading);
 
                 // Change the user location view orientation to reflect the device orientation
