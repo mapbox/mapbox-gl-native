@@ -8,12 +8,6 @@ const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
 const CGFloat MGLUserLocationAnnotationPuckSize = 45.0;
 const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuckSize * 0.6;
 
-@interface MGLFaux3DUserLocationAnnotationView ()
-
-@property (nonatomic, readwrite) CALayer *haloLayer;
-
-@end
-
 #pragma mark -
 
 @implementation MGLFaux3DUserLocationAnnotationView
@@ -28,6 +22,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     CALayer *_accuracyRingLayer;
     CALayer *_dotBorderLayer;
     CALayer *_dotLayer;
+    CALayer *_haloLayer;
 
     double _oldHeadingAccuracy;
     CLLocationAccuracy _oldHorizontalAccuracy;
@@ -77,7 +72,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         [self updatePitch];
     }
     
-    self.haloLayer.hidden = ! CLLocationCoordinate2DIsValid(self.mapView.userLocation.coordinate) || self.mapView.userLocation.location.horizontalAccuracy > 10;
+    _haloLayer.hidden = ! CLLocationCoordinate2DIsValid(self.mapView.userLocation.coordinate) || self.mapView.userLocation.location.horizontalAccuracy > 10;
 }
 
 - (void)updatePitch
