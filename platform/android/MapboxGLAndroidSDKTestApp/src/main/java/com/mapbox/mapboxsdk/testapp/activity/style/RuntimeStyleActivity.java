@@ -307,8 +307,15 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
         PropertyValue<String> fillColor = layer.getFillColor();
         Function<String> function = fillColor.getFunction();
-        Log.d(TAG, "Fill color base: " + function.getBase());
-        Log.d(TAG, "Fill color #stops: " + function.getStops().length);
+        if (function != null) {
+            Log.d(TAG, "Fill color base: " + function.getBase());
+            Log.d(TAG, "Fill color #stops: " + function.getStops().length);
+            if (function.getStops() != null) {
+                for (Stop stop : function.getStops()) {
+                    Log.d(TAG, "Fill color #stops: " + stop);
+                }
+            }
+        }
     }
 
     private String readRawResource(@RawRes int rawResource) throws IOException {

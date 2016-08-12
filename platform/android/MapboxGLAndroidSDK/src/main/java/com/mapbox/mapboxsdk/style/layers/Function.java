@@ -27,6 +27,11 @@ public class Function<T> {
         Object[] toValueObject() {
             return new Object[]{in, out};
         }
+
+        @Override
+        public String toString() {
+            return String.format("[%s, %s]", in, out);
+        }
     }
 
     @SafeVarargs

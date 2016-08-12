@@ -26,11 +26,12 @@ public abstract class Layer {
 
         boolean updateClasses = false;
         for (Property<?> property : properties) {
+            Object converted = convertValue(property.value);
             if (property instanceof PaintProperty) {
                 updateClasses = true;
-                nativeSetPaintProperty(property.name, convertValue(property.value));
+                nativeSetPaintProperty(property.name, converted);
             } else {
-                nativeSetLayoutProperty(property.name, convertValue(property.value));
+                nativeSetLayoutProperty(property.name, converted);
             }
         }
 
