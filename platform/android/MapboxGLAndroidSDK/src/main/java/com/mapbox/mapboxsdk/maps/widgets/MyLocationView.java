@@ -25,8 +25,10 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -111,6 +113,7 @@ public class MyLocationView extends View {
 
     private GpsLocationListener userLocationListener;
     private CompassListener compassListener;
+    private WindowManager mWindowManager;
 
     public MyLocationView(Context context) {
         super(context);
@@ -146,6 +149,7 @@ public class MyLocationView extends View {
         myLocationBehavior = new MyLocationBehaviorFactory().getBehavioralModel(MyLocationTracking.TRACKING_NONE);
         compassListener = new CompassListener(context);
         setEnabled(false);
+        mWindowManager = (WindowManager) context.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
     }
 
     public final void setForegroundDrawables(Drawable defaultDrawable, Drawable bearingDrawable) {
@@ -268,6 +272,7 @@ public class MyLocationView extends View {
         // apply tilt to camera
         camera.save();
         camera.rotate(tilt, 0, bearing);
+        Log.d("ANMA-3976", "onDraw bearing=" + bearing);
         // map camera matrix on our matrix
         camera.getMatrix(matrix);
 
@@ -456,7 +461,7 @@ public class MyLocationView extends View {
         invalidate();
         update();
     }
-
+    
     private void setCompass(float bearing) {
         float oldDir = previousDirection;
         if (directionAnimator != null) {
@@ -560,18 +565,41 @@ public class MyLocationView extends View {
 
                 /**
                  * Mappy, the bearing of the sensor doesn't allow to rotate the map
-                // Change the user location view orientation to reflect the device orientation
-                setCompass(currentDegree);
+                 // Change the user location view orientation to reflect the device orientation
+                 setCompass(currentDegree);
 
-                if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-                    rotateCamera();
-                }
+                 if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
+                 rotateCamera();
+                 }
                  */
 
-                bearing = currentDegree;
+                setBearing(currentDegree);
 
                 compassUpdateNextTimestamp = currentTime + COMPASS_UPDATE_RATE_MS;
             }
+        }
+
+        private void setBearing(int newBearing) {
+            // take account of screen rotation away from its natural rotation
+            int rotation = mWindowManager.getDefaultDisplay().getRotation();
+            float screen_adjustment = 0;
+            switch (rotation) {
+                case Surface.ROTATION_0:
+                    screen_adjustment = 0;
+                    break;
+                case Surface.ROTATION_90:
+                    screen_adjustment = 90;
+                    break;
+                case Surface.ROTATION_180:
+                    screen_adjustment = 180;
+                    break;
+                case Surface.ROTATION_270:
+                    screen_adjustment = 270;
+                    break;
+            }
+            bearing = (newBearing - screen_adjustment) % 360;
+
+            Log.d("ANMA-3976", "setBearing newBearing=" + newBearing + " bearing=" + bearing + " screen_adjustment=" + screen_adjustment);
         }
 
         private void rotateCamera() {
