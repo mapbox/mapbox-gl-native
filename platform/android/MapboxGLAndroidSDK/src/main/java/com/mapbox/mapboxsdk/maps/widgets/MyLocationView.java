@@ -558,11 +558,11 @@ public class MyLocationView extends View {
                 float magneticHeading = (float) Math.toDegrees(orientation[0]);
                 currentDegree = (int) (magneticHeading);
 
+                /**
+                 * Mappy, the bearing of the sensor doesn't allow to rotate the map
                 // Change the user location view orientation to reflect the device orientation
                 setCompass(currentDegree);
 
-                /**
-                 * Mappy, the bearing of the sensor doesn't allow to rotate the map
                 if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
                     rotateCamera();
                 }
