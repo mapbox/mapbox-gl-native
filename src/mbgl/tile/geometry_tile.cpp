@@ -11,6 +11,7 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/platform/log.hpp>
 
 namespace mbgl {
 
@@ -62,6 +63,8 @@ std::vector<std::unique_ptr<Layer>> GeometryTile::cloneStyleLayers() const {
 
 void GeometryTile::setData(std::unique_ptr<GeometryTileData> data_) {
     if (!data_) {
+        Log::Info(Event::General, "[GeometryTile::setData] This is a 404 response. We're treating these as empty tiles.");
+
         // This is a 404 response. We're treating these as empty tiles.
         workRequest.reset();
         availableData = DataAvailability::All;
@@ -74,6 +77,7 @@ void GeometryTile::setData(std::unique_ptr<GeometryTileData> data_) {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
     // state despite pending parse operations.
     if (availableData == DataAvailability::All) {
+        Log::Info(Event::General, "[GeometryTile::setData] Mark the tile as pending again");
         availableData = DataAvailability::Some;
     }
 
@@ -88,6 +92,10 @@ void GeometryTile::setData(std::unique_ptr<GeometryTileData> data_) {
             auto& resultBuckets = result.get<TileParseResultData>();
             availableData = resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
 
+            if (availableData == DataAvailability::Some) {
+                Log::Info(Event::General, "[GeometryTile::setData] DataAvailability::Some");
+            }
+
             // Persist the configuration we just placed so that we can later check whether we need to
             // place again in case the configuration has changed.
             placedConfig = config;
@@ -97,6 +105,7 @@ void GeometryTile::setData(std::unique_ptr<GeometryTileData> data_) {
             buckets = std::move(resultBuckets.buckets);
 
             if (isComplete()) {
+                Log::Info(Event::General, "[GeometryTile::setData] isComplete() after moving over buckets from this parse request");
                 featureIndex = std::move(resultBuckets.featureIndex);
                 data = std::move(resultBuckets.tileData);
             }
@@ -104,6 +113,7 @@ void GeometryTile::setData(std::unique_ptr<GeometryTileData> data_) {
             redoPlacement();
             observer->onTileLoaded(*this, true);
         } else {
+            Log::Info(Event::General, "[GeometryTile::setData] DataAvailability::All");
             availableData = DataAvailability::All;
             observer->onTileError(*this, result.get<std::exception_ptr>());
         }
@@ -123,6 +133,10 @@ bool GeometryTile::parsePending() {
         if (result.is<TileParseResultData>()) {
             auto& resultBuckets = result.get<TileParseResultData>();
             availableData = resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
+
+            if (availableData == DataAvailability::Some) {
+                Log::Info(Event::General, "[GeometryTile::parsePending] DataAvailability::Some");
+            }
 
             // Move over all buckets we received in this parse request, potentially overwriting
             // existing buckets in case we got a refresh parse.
