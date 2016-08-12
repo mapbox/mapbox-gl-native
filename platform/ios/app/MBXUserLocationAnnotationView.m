@@ -3,11 +3,6 @@
 
 const CGFloat MBXUserLocationDotSize = 10;
 
-@interface MBXUserLocationAnnotationView()
-@property (nonatomic) CAShapeLayer *shapeLayer;
-@property (nonatomic) CALayer *dotLayer;
-@end
-
 @implementation MBXUserLocationAnnotationView
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -23,6 +18,7 @@ const CGFloat MBXUserLocationDotSize = 10;
     [self updateFrameWithSize:self.intrinsicContentSize];
     [self setNeedsDisplay];
 }
+
 
 - (CGSize)intrinsicContentSize
 {
@@ -171,7 +167,6 @@ const CGFloat MBXUserLocationDotSize = 10;
     [rectangle3Path closePath];
     [UIColor.whiteColor setFill];
     [rectangle3Path fill];
-
 }
 
 @end
