@@ -202,6 +202,7 @@ void Style::update(const UpdateParameters& parameters) {
 
     for (const auto& source : sources) {
         if (!source->baseImpl->update(parameters)) {
+            Log::Info(Event::General, "[Style::update] Tiles not complete");
             allTilesUpdated = false;
         }
     }
@@ -209,6 +210,7 @@ void Style::update(const UpdateParameters& parameters) {
     // We can only stop updating "partial" tiles when all of them
     // were notified of the arrival of the new resources.
     if (allTilesUpdated) {
+        Log::Info(Event::General, "[Style::update] All tiles updated");
         shouldReparsePartialTiles = false;
     }
 }
