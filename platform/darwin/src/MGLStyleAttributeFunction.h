@@ -3,11 +3,6 @@
 #import "MGLTypes.h"
 #import "MGLStyleAttributeValue.h"
 
-typedef NS_ENUM(NSUInteger, MGLStyleAttributeFunctionType) {
-    MGLStyleAttributeFunctionTypeExponential,
-    MGLStyleAttributeFunctionTypeInterval,
-    MGLStyleAttributeFunctionTypeCategorical
-};
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,8 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *property;
 
 @property (nonatomic, copy, nullable) NSNumber *base;
-
-@property (nonatomic, copy, nullable) NSNumber *functionType;
 
 @end
 
