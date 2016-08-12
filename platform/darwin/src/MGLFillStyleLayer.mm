@@ -37,7 +37,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)fillAntialias {
-    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getFillAntialias()];
+    return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->getFillAntialias()];
 }
 
 - (void)setFillOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillOpacity {
@@ -46,7 +46,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)fillOpacity {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getFillOpacity()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getFillOpacity()];
 }
 
 - (void)setFillColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillColor {
@@ -55,7 +55,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)fillColor {
-    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getFillColor()];
+    return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->getFillColor()];
 }
 
 - (void)setFillOutlineColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillOutlineColor {
@@ -64,7 +64,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)fillOutlineColor {
-    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getFillOutlineColor()];
+    return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->getFillOutlineColor()];
 }
 
 - (void)setFillTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslate {
@@ -73,7 +73,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)fillTranslate {
-    return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->getFillTranslate()];
+    return [MGLStyleAttribute mbgl_offsetWithPropertyValueOffset:self.layer->getFillTranslate()];
 }
 
 - (void)setFillTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslateAnchor {
@@ -91,7 +91,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)fillPattern {
-    return [MGLStyleAttribute mbgl_stringPropertyValueWith:self.layer->getFillPattern()];
+    return [MGLStyleAttribute mbgl_stringWithPropertyValueString:self.layer->getFillPattern()];
 }
 
 @end

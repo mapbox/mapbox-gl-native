@@ -145,16 +145,16 @@ global.arraySetterImplementation = function(property) {
 global.getterImplementation = function(property, layerType) {
     switch (property.type) {
         case 'boolean':
-            return `return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->get${camelize(property.name)}()];`
+            return `return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->get${camelize(property.name)}()];`
         case 'number':
-            return `return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->get${camelize(property.name)}()];`
+            return `return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->get${camelize(property.name)}()];`
         case 'string':
-            return `return [MGLStyleAttribute mbgl_stringPropertyValueWith:self.layer->get${camelize(property.name)}()];`
+            return `return [MGLStyleAttribute mbgl_stringWithPropertyValueString:self.layer->get${camelize(property.name)}()];`
         case 'enum':
             var objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
             return `MGLGetEnumProperty(${camelize(property.name)}, ${mbglType(property)}, ${objCType});`;
         case 'color':
-            return `return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->get${camelize(property.name)}()];`
+            return `return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->get${camelize(property.name)}()];`
         case 'array':
             return arrayGetterImplementation(property);
         default:
@@ -163,7 +163,7 @@ global.getterImplementation = function(property, layerType) {
 }
 
 global.arrayGetterImplementation = function(property) {
-    return `return [MGLStyleAttribute mbgl_${convertedType(property)}PropertyValueWith:self.layer->get${camelize(property.name)}()];`
+    return `return [MGLStyleAttribute mbgl_${convertedType(property)}WithPropertyValue${camelize(convertedType(property))}:self.layer->get${camelize(property.name)}()];`
 }
 
 global.convertedType = function(property) {

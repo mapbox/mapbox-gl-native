@@ -37,7 +37,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)backgroundColor {
-    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getBackgroundColor()];
+    return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->getBackgroundColor()];
 }
 
 - (void)setBackgroundPattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundPattern {
@@ -46,7 +46,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)backgroundPattern {
-    return [MGLStyleAttribute mbgl_stringPropertyValueWith:self.layer->getBackgroundPattern()];
+    return [MGLStyleAttribute mbgl_stringWithPropertyValueString:self.layer->getBackgroundPattern()];
 }
 
 - (void)setBackgroundOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundOpacity {
@@ -55,7 +55,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)backgroundOpacity {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getBackgroundOpacity()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getBackgroundOpacity()];
 }
 
 @end

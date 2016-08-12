@@ -37,7 +37,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)circleRadius {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getCircleRadius()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getCircleRadius()];
 }
 
 - (void)setCircleColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleColor {
@@ -46,7 +46,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)circleColor {
-    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getCircleColor()];
+    return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->getCircleColor()];
 }
 
 - (void)setCircleBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleBlur {
@@ -55,7 +55,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)circleBlur {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getCircleBlur()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getCircleBlur()];
 }
 
 - (void)setCircleOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleOpacity {
@@ -64,7 +64,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)circleOpacity {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getCircleOpacity()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getCircleOpacity()];
 }
 
 - (void)setCircleTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleTranslate {
@@ -73,7 +73,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)circleTranslate {
-    return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->getCircleTranslate()];
+    return [MGLStyleAttribute mbgl_offsetWithPropertyValueOffset:self.layer->getCircleTranslate()];
 }
 
 - (void)setCircleTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleTranslateAnchor {

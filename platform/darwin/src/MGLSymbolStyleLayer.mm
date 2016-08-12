@@ -46,7 +46,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)symbolSpacing {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getSymbolSpacing()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getSymbolSpacing()];
 }
 
 - (void)setSymbolAvoidEdges:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)symbolAvoidEdges {
@@ -55,7 +55,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)symbolAvoidEdges {
-    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getSymbolAvoidEdges()];
+    return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->getSymbolAvoidEdges()];
 }
 
 - (void)setIconAllowOverlap:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconAllowOverlap {
@@ -64,7 +64,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconAllowOverlap {
-    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getIconAllowOverlap()];
+    return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->getIconAllowOverlap()];
 }
 
 - (void)setIconIgnorePlacement:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconIgnorePlacement {
@@ -73,7 +73,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconIgnorePlacement {
-    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getIconIgnorePlacement()];
+    return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->getIconIgnorePlacement()];
 }
 
 - (void)setIconOptional:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconOptional {
@@ -82,7 +82,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconOptional {
-    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getIconOptional()];
+    return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->getIconOptional()];
 }
 
 - (void)setIconRotationAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconRotationAlignment {
@@ -100,7 +100,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconSize {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getIconSize()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getIconSize()];
 }
 
 - (void)setIconTextFit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTextFit {
@@ -118,7 +118,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconTextFitPadding {
-    return [MGLStyleAttribute mbgl_paddingPropertyValueWith:self.layer->getIconTextFitPadding()];
+    return [MGLStyleAttribute mbgl_paddingWithPropertyValuePadding:self.layer->getIconTextFitPadding()];
 }
 
 - (void)setIconImage:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconImage {
@@ -127,7 +127,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconImage {
-    return [MGLStyleAttribute mbgl_stringPropertyValueWith:self.layer->getIconImage()];
+    return [MGLStyleAttribute mbgl_stringWithPropertyValueString:self.layer->getIconImage()];
 }
 
 - (void)setIconRotate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconRotate {
@@ -136,7 +136,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconRotate {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getIconRotate()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getIconRotate()];
 }
 
 - (void)setIconPadding:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconPadding {
@@ -145,7 +145,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconPadding {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getIconPadding()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getIconPadding()];
 }
 
 - (void)setIconKeepUpright:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconKeepUpright {
@@ -154,7 +154,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconKeepUpright {
-    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getIconKeepUpright()];
+    return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->getIconKeepUpright()];
 }
 
 - (void)setIconOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconOffset {
@@ -163,7 +163,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconOffset {
-    return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->getIconOffset()];
+    return [MGLStyleAttribute mbgl_offsetWithPropertyValueOffset:self.layer->getIconOffset()];
 }
 
 - (void)setTextPitchAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textPitchAlignment {
@@ -190,7 +190,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textField {
-    return [MGLStyleAttribute mbgl_stringPropertyValueWith:self.layer->getTextField()];
+    return [MGLStyleAttribute mbgl_stringWithPropertyValueString:self.layer->getTextField()];
 }
 
 - (void)setTextFont:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textFont {
@@ -199,7 +199,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textFont {
-    return [MGLStyleAttribute mbgl_stringArrayPropertyValueWith:self.layer->getTextFont()];
+    return [MGLStyleAttribute mbgl_stringArrayWithPropertyValueStringArray:self.layer->getTextFont()];
 }
 
 - (void)setTextSize:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textSize {
@@ -208,7 +208,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textSize {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextSize()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getTextSize()];
 }
 
 - (void)setTextMaxWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textMaxWidth {
@@ -217,7 +217,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textMaxWidth {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextMaxWidth()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getTextMaxWidth()];
 }
 
 - (void)setTextLineHeight:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textLineHeight {
@@ -226,7 +226,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textLineHeight {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextLineHeight()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getTextLineHeight()];
 }
 
 - (void)setTextLetterSpacing:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textLetterSpacing {
@@ -235,7 +235,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textLetterSpacing {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextLetterSpacing()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getTextLetterSpacing()];
 }
 
 - (void)setTextJustify:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textJustify {
@@ -262,7 +262,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textMaxAngle {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextMaxAngle()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getTextMaxAngle()];
 }
 
 - (void)setTextRotate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textRotate {
@@ -271,7 +271,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textRotate {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextRotate()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getTextRotate()];
 }
 
 - (void)setTextPadding:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textPadding {
@@ -280,7 +280,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textPadding {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextPadding()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getTextPadding()];
 }
 
 - (void)setTextKeepUpright:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textKeepUpright {
@@ -289,7 +289,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textKeepUpright {
-    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getTextKeepUpright()];
+    return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->getTextKeepUpright()];
 }
 
 - (void)setTextTransform:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTransform {
@@ -307,7 +307,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textOffset {
-    return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->getTextOffset()];
+    return [MGLStyleAttribute mbgl_offsetWithPropertyValueOffset:self.layer->getTextOffset()];
 }
 
 - (void)setTextAllowOverlap:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textAllowOverlap {
@@ -316,7 +316,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textAllowOverlap {
-    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getTextAllowOverlap()];
+    return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->getTextAllowOverlap()];
 }
 
 - (void)setTextIgnorePlacement:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textIgnorePlacement {
@@ -325,7 +325,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textIgnorePlacement {
-    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getTextIgnorePlacement()];
+    return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->getTextIgnorePlacement()];
 }
 
 - (void)setTextOptional:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textOptional {
@@ -334,7 +334,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textOptional {
-    return [MGLStyleAttribute mbgl_boolPropertyValueWith:self.layer->getTextOptional()];
+    return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->getTextOptional()];
 }
 
 #pragma mark - Accessing the Paint Attributes
@@ -345,7 +345,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconOpacity {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getIconOpacity()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getIconOpacity()];
 }
 
 - (void)setIconColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconColor {
@@ -354,7 +354,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconColor {
-    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getIconColor()];
+    return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->getIconColor()];
 }
 
 - (void)setIconHaloColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconHaloColor {
@@ -363,7 +363,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconHaloColor {
-    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getIconHaloColor()];
+    return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->getIconHaloColor()];
 }
 
 - (void)setIconHaloWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconHaloWidth {
@@ -372,7 +372,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconHaloWidth {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getIconHaloWidth()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getIconHaloWidth()];
 }
 
 - (void)setIconHaloBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconHaloBlur {
@@ -381,7 +381,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconHaloBlur {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getIconHaloBlur()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getIconHaloBlur()];
 }
 
 - (void)setIconTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTranslate {
@@ -390,7 +390,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)iconTranslate {
-    return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->getIconTranslate()];
+    return [MGLStyleAttribute mbgl_offsetWithPropertyValueOffset:self.layer->getIconTranslate()];
 }
 
 - (void)setIconTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTranslateAnchor {
@@ -408,7 +408,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textOpacity {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextOpacity()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getTextOpacity()];
 }
 
 - (void)setTextColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textColor {
@@ -417,7 +417,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textColor {
-    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getTextColor()];
+    return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->getTextColor()];
 }
 
 - (void)setTextHaloColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textHaloColor {
@@ -426,7 +426,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textHaloColor {
-    return [MGLStyleAttribute mbgl_colorPropertyValueWith:self.layer->getTextHaloColor()];
+    return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->getTextHaloColor()];
 }
 
 - (void)setTextHaloWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textHaloWidth {
@@ -435,7 +435,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textHaloWidth {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextHaloWidth()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getTextHaloWidth()];
 }
 
 - (void)setTextHaloBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textHaloBlur {
@@ -444,7 +444,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textHaloBlur {
-    return [MGLStyleAttribute mbgl_numberPropertyValueWith:self.layer->getTextHaloBlur()];
+    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getTextHaloBlur()];
 }
 
 - (void)setTextTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTranslate {
@@ -453,7 +453,7 @@
 }
 
 - (id <MGLStyleAttributeValue>)textTranslate {
-    return [MGLStyleAttribute mbgl_offsetPropertyValueWith:self.layer->getTextTranslate()];
+    return [MGLStyleAttribute mbgl_offsetWithPropertyValueOffset:self.layer->getTextTranslate()];
 }
 
 - (void)setTextTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTranslateAnchor {
