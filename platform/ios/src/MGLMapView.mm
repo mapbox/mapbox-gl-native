@@ -1396,7 +1396,16 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     if (self.userLocationVisible)
     {
-        CGPoint tapPointForUserLocation = self.userLocationAnnotationView.hitTestLayer.superlayer ? [singleTap locationInView:self.userLocationAnnotationView] : tapPoint;
+        CGPoint tapPointForUserLocation;
+        if (self.userLocationAnnotationView.hitTestLayer == self.userLocationAnnotationView.layer.presentationLayer)
+        {
+            tapPointForUserLocation = tapPoint;
+        }
+        else
+        {
+            // Get the tap point within the custom hit test layer.
+            tapPointForUserLocation = [singleTap locationInView:self.userLocationAnnotationView];
+        }
 
         CALayer *hitLayer = [self.userLocationAnnotationView.hitTestLayer hitTest:tapPointForUserLocation];
 
