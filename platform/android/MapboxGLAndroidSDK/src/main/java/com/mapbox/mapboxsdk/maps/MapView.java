@@ -185,24 +185,22 @@ public class MapView extends FrameLayout {
     }
 
     private void initialize(@NonNull Context context, @NonNull MapboxMapOptions options) {
+        if (isInEditMode()) {
+            // if we are in an editor mode we show an image of a map
+            LayoutInflater.from(context).inflate(R.layout.mapview_preview, this);
+            return;
+        }
+
         mInitialLoad = true;
         mOnMapReadyCallbackList = new ArrayList<>();
         mOnMapChangedListener = new CopyOnWriteArrayList<>();
         mMapboxMap = new MapboxMap(this);
         mIcons = new ArrayList<>();
         View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
-
-        if (!isInEditMode()) {
-            setWillNotDraw(false);
-        }
+        setWillNotDraw(false);
 
         // Reference the TextureView
         SurfaceView surfaceView = (SurfaceView) view.findViewById(R.id.surfaceView);
-
-        // Check if we are in Android Studio UI editor to avoid error in layout preview
-        if (isInEditMode()) {
-            return;
-        }
 
         mNativeMapView = new NativeMapView(this);
 
@@ -1506,6 +1504,10 @@ public class MapView extends FrameLayout {
     // Called when view is hidden and shown
     @Override
     protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+        if (isInEditMode()) {
+            return;
+        }
+
         // Required by ZoomButtonController (from Android SDK documentation)
         if (mMapboxMap.getUiSettings().isZoomControlsEnabled() && (visibility != View.VISIBLE)) {
             mZoomButtonsController.setVisible(false);
