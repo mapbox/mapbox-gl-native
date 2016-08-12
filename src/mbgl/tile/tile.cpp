@@ -25,6 +25,7 @@ void Tile::dumpDebugLogs() const {
     Log::Info(Event::General, "Tile::id: %s", util::toString(id).c_str());
     Log::Info(Event::General, "Tile::renderable: %s", isRenderable() ? "yes" : "no");
     Log::Info(Event::General, "Tile::complete: %s", isComplete() ? "yes" : "no");
+    Log::Info(Event::General, "Tile::incomplete: %s", isIncomplete() ? "yes" : "no");
 }
 
 void Tile::queryRenderedFeatures(
