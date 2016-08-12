@@ -842,20 +842,24 @@ void nativeRemoveAnnotations(JNIEnv *env, jni::jobject* obj, jlong nativeMapView
     }
 }
 
-jni::jarray<jlong>* nativeGetAnnotationsInBounds(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jobject* latLngBounds_) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetAnnotationsInBounds");
+jni::jarray<jlong>* nativeQueryPointAnnotations(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jobject* rect) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeQueryPointAnnotations");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
     // Conversion
-    mbgl::LatLngBounds latLngBounds = latlngbounds_from_java(env, latLngBounds_);
-    if (latLngBounds.isEmpty()) {
-        return nullptr;
-    }
+    jfloat left = jni::GetField<jfloat>(*env, rect, *rectFLeftId);
+    jfloat right = jni::GetField<jfloat>(*env, rect, *rectFRightId);
+    jfloat top = jni::GetField<jfloat>(*env, rect, *rectFTopId);
+    jfloat bottom = jni::GetField<jfloat>(*env, rect, *rectFBottomId);
+    mbgl::ScreenBox box = {
+        { left, top },
+        { right, bottom },
+    };
 
     // Assume only points for now
-    std::vector<uint32_t> annotations = nativeMapView->getMap().getPointAnnotationsInBounds(
-        latLngBounds);
+    std::vector<uint32_t> annotations = nativeMapView->getMap().queryPointAnnotations(
+        box);
 
     return std_vector_uint_to_jobject(env, annotations);
 }
@@ -1772,7 +1776,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeUpdatePolygon, "(JJLcom/mapbox/mapboxsdk/annotations/Polygon;)J"),
         MAKE_NATIVE_METHOD(nativeUpdatePolyline, "(JJLcom/mapbox/mapboxsdk/annotations/Polyline;)J"),
         MAKE_NATIVE_METHOD(nativeRemoveAnnotations, "(J[J)V"),
-        MAKE_NATIVE_METHOD(nativeGetAnnotationsInBounds, "(JLcom/mapbox/mapboxsdk/geometry/LatLngBounds;)[J"),
+        MAKE_NATIVE_METHOD(nativeQueryPointAnnotations, "(JLandroid/graphics/RectF;)[J"),
         MAKE_NATIVE_METHOD(nativeAddAnnotationIcon, "(JLjava/lang/String;IIF[B)V"),
         MAKE_NATIVE_METHOD(nativeSetVisibleCoordinateBounds, "(J[Lcom/mapbox/mapboxsdk/geometry/LatLng;Landroid/graphics/RectF;DJ)V"),
         MAKE_NATIVE_METHOD(nativeOnLowMemory, "(J)V"),

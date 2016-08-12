@@ -217,9 +217,17 @@ TEST(Annotations, QueryRenderedFeatures) {
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
+    test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 50 }, "default_marker" });
 
     test::render(test.map);
 
     auto features = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 0, 0 }));
     EXPECT_EQ(features.size(), 1u);
+    EXPECT_TRUE(!!features[0].id);
+    EXPECT_EQ(*features[0].id, 0);
+
+    auto features2 = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 50, 0 }));
+    EXPECT_EQ(features2.size(), 1);
+    EXPECT_TRUE(!!features2[0].id);
+    EXPECT_EQ(*features2[0].id, 1);
 }

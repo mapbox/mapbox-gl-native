@@ -402,8 +402,8 @@ final class NativeMapView {
         nativeRemoveAnnotations(mNativeMapViewPtr, ids);
     }
 
-    public long[] getAnnotationsInBounds(LatLngBounds bbox) {
-        return nativeGetAnnotationsInBounds(mNativeMapViewPtr, bbox);
+    public long[] queryPointAnnotations(RectF rect) {
+        return nativeQueryPointAnnotations(mNativeMapViewPtr, rect);
     }
 
     public void addAnnotationIcon(String symbol, int width, int height, float scale, byte[] pixels) {
@@ -641,7 +641,7 @@ final class NativeMapView {
 
     private native void nativeRemoveAnnotations(long nativeMapViewPtr, long[] id);
 
-    private native long[] nativeGetAnnotationsInBounds(long mNativeMapViewPtr, LatLngBounds bbox);
+    private native long[] nativeQueryPointAnnotations(long mNativeMapViewPtr, RectF rect);
 
     private native void nativeAddAnnotationIcon(long nativeMapViewPtr, String symbol,
                                                 int width, int height, float scale, byte[] pixels);

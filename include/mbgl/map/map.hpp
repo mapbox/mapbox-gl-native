@@ -148,8 +148,6 @@ public:
     void updateAnnotation(AnnotationID, const Annotation&);
     void removeAnnotation(AnnotationID);
 
-    AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
-
     // Sources
     style::Source* getSource(const std::string& sourceID);
     void addSource(std::unique_ptr<style::Source>);
@@ -163,6 +161,7 @@ public:
     // Feature queries
     std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const optional<std::vector<std::string>>& layerIDs = {});
     std::vector<Feature> queryRenderedFeatures(const ScreenBox&,        const optional<std::vector<std::string>>& layerIDs = {});
+    AnnotationIDs queryPointAnnotations(const ScreenBox&);
 
     // Memory
     void setSourceTileCacheSize(size_t);

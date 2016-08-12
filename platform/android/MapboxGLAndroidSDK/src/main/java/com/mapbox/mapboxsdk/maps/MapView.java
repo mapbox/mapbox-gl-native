@@ -1153,13 +1153,13 @@ public class MapView extends FrameLayout {
         mNativeMapView.removeAnnotations(ids);
     }
 
-    List<Marker> getMarkersInBounds(@NonNull LatLngBounds bbox) {
-        if (mDestroyed || bbox == null) {
+    List<Marker> getMarkersInRect(@NonNull RectF rect) {
+        if (mDestroyed || rect == null) {
             return new ArrayList<>();
         }
 
-        // TODO: filter in JNI using C++ parameter to getAnnotationsInBounds
-        long[] ids = mNativeMapView.getAnnotationsInBounds(bbox);
+        // TODO: filter in JNI using C++ parameter to queryPointAnnotations
+        long[] ids = mNativeMapView.queryPointAnnotations(rect);
 
         List<Long> idsList = new ArrayList<>(ids.length);
         for (int i = 0; i < ids.length; i++) {
@@ -1179,13 +1179,13 @@ public class MapView extends FrameLayout {
         return new ArrayList<>(annotations);
     }
 
-    public List<MarkerView> getMarkerViewsInBounds(@NonNull LatLngBounds bbox) {
-        if (mDestroyed || bbox == null) {
+    public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rect) {
+        if (mDestroyed || rect == null) {
             return new ArrayList<>();
         }
 
-        // TODO: filter in JNI using C++ parameter to getAnnotationsInBounds
-        long[] ids = mNativeMapView.getAnnotationsInBounds(bbox);
+        // TODO: filter in JNI using C++ parameter to queryPointAnnotations
+        long[] ids = mNativeMapView.queryPointAnnotations(rect);
 
         List<Long> idsList = new ArrayList<>(ids.length);
         for (int i = 0; i < ids.length; i++) {
@@ -1730,13 +1730,7 @@ public class MapView extends FrameLayout {
                     tapPoint.x + mAverageIconWidth / 2 + toleranceSides,
                     tapPoint.y + mAverageIconHeight / 2 + toleranceTopBottom);
 
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            builder.include(fromScreenLocation(new PointF(tapRect.left, tapRect.bottom)));
-            builder.include(fromScreenLocation(new PointF(tapRect.left, tapRect.top)));
-            builder.include(fromScreenLocation(new PointF(tapRect.right, tapRect.top)));
-            builder.include(fromScreenLocation(new PointF(tapRect.right, tapRect.bottom)));
-
-            List<Marker> nearbyMarkers = getMarkersInBounds(builder.build());
+            List<Marker> nearbyMarkers = getMarkersInRect(tapRect);
             long newSelectedMarkerId = -1;
 
             if (nearbyMarkers != null && nearbyMarkers.size() > 0) {

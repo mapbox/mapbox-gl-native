@@ -765,7 +765,7 @@ public class MapboxMap {
         long id = mMapView.addMarker(marker);
         marker.setId(id);
         mAnnotations.put(id, marker);
-        mMarkerViewManager.invalidateViewMarkersInBounds();
+        mMarkerViewManager.invalidateViewMarkersInVisibleRegion();
         return marker;
     }
 

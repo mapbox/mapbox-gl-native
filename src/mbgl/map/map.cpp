@@ -703,10 +703,6 @@ void Map::removeAnnotation(AnnotationID annotation) {
     update(Update::AnnotationStyle | Update::AnnotationData);
 }
 
-AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
-    return impl->annotationManager->getPointAnnotationsInBounds(bounds);
-}
-
 #pragma mark - Feature query api
 
 std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const optional<std::vector<std::string>>& layerIDs) {
@@ -733,6 +729,18 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const opti
         impl->transform.getState(),
         layerIDs
     });
+}
+
+AnnotationIDs Map::queryPointAnnotations(const ScreenBox& box) {
+    auto features = queryRenderedFeatures(box, {{ AnnotationManager::PointLayerID }});
+    AnnotationIDs ids;
+    ids.reserve(features.size());
+    for (auto &feature : features) {
+        assert(feature.id);
+        assert(*feature.id <= std::numeric_limits<AnnotationID>::max());
+        ids.push_back(static_cast<AnnotationID>(feature.id->get<uint64_t>()));
+    }
+    return ids;
 }
 
 #pragma mark - Style API
