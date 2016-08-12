@@ -63,9 +63,12 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 - (void)setupLayers
 {
-    CGFloat frameSize = (self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? MGLUserLocationAnnotationPuckSize : MGLUserLocationAnnotationDotSize;
-    [self updateFrameWithSize:frameSize];
-    
+    if (CGSizeEqualToSize(self.frame.size, CGSizeZero))
+    {
+        CGFloat frameSize = (self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? MGLUserLocationAnnotationPuckSize : MGLUserLocationAnnotationDotSize;
+        [self updateFrameWithSize:frameSize];
+    }
+
     if (CLLocationCoordinate2DIsValid(self.userLocation.coordinate))
     {
         (self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? [self drawPuck] : [self drawDot];
