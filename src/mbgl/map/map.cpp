@@ -199,6 +199,8 @@ void Map::Impl::update() {
     }
 
     if (updateFlags == Update::Nothing || (mode == MapMode::Still && !callback)) {
+        if (updateFlags == Update::Nothing) Log::Info(Event::General, "[Map::Impl::update] Update::Nothing");
+        if (mode == MapMode::Still && !callback) Log::Info(Event::General, "[Map::Impl::update] Missing callback, return early");
         return;
     }
 
@@ -241,9 +243,19 @@ void Map::Impl::update() {
         view.invalidate();
     } else if (callback && style->isLoaded()) {
         util::stopwatch stopwatch2("render", Event::General);
+        Log::Info(Event::General, "[Map::Impl::update] Activating view and rendering");
         view.activate();
         render();
         view.deactivate();
+    } else {
+        // Is this redundant with the early return above?
+        if (!callback) {
+            Log::Info(Event::General, "[Map::Impl::update] Missing callback");
+        }
+
+        if (!style->isLoaded()) {
+            Log::Info(Event::General, "[Map::Impl::update] Style not finished loading");
+        }
     }
 
     updateFlags = Update::Nothing;
@@ -266,6 +278,7 @@ void Map::Impl::render() {
                     annotationManager->getSpriteAtlas());
 
     if (mode == MapMode::Still) {
+        Log::Info(Event::General, "[Map::Impl::render] Pass view.readStillImage() to callback");
         callback(nullptr, view.readStillImage());
         callback = nullptr;
     }
@@ -891,6 +904,8 @@ void Map::Impl::onNeedsRepaint() {
 }
 
 void Map::Impl::onResourceError(std::exception_ptr error) {
+    Log::Info(Event::General, "[Map::Impl::onResourceError]");
+
     if (mode == MapMode::Still && callback) {
         callback(error, {});
         callback = nullptr;
