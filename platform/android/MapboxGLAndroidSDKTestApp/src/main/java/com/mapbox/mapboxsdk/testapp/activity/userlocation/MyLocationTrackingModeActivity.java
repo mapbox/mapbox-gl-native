@@ -41,7 +41,7 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
     private static final int PERMISSIONS_LOCATION = 0;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_location_tracking);
 
@@ -103,7 +103,9 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
                     }
                 });
 
-                toggleGps(!mapboxMap.isMyLocationEnabled());
+                if (savedInstanceState == null) {
+                    toggleGps(true);
+                }
             }
         });
     }
