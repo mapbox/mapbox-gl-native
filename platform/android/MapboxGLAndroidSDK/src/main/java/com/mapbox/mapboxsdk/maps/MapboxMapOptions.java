@@ -2,14 +2,19 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -110,9 +115,11 @@ public class MapboxMapOptions implements Parcelable {
         zoomGesturesEnabled = in.readByte() != 0;
 
         myLocationEnabled = in.readByte() != 0;
-        //myLocationForegroundDrawable;
-        //myLocationForegroundBearingDrawable;
-        //myLocationBackgroundDrawable;
+
+        myLocationForegroundDrawable = new BitmapDrawable((Bitmap) in.readParcelable(getClass().getClassLoader()));
+        myLocationForegroundBearingDrawable = new BitmapDrawable((Bitmap) in.readParcelable(getClass().getClassLoader()));
+        myLocationBackgroundDrawable = new BitmapDrawable((Bitmap) in.readParcelable(getClass().getClassLoader()));
+
         myLocationForegroundTintColor = in.readInt();
         myLocationBackgroundTintColor = in.readInt();
         myLocationBackgroundPadding = in.createIntArray();
@@ -121,6 +128,20 @@ public class MapboxMapOptions implements Parcelable {
 
         style = in.readString();
         accessToken = in.readString();
+    }
+
+    public static Bitmap getBitmapFromDrawable(Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        } else if (drawable instanceof VectorDrawable || drawable instanceof VectorDrawableCompat) {
+            Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+            return bitmap;
+        } else {
+            throw new IllegalArgumentException("unsupported drawable type");
+        }
     }
 
     /**
@@ -871,9 +892,9 @@ public class MapboxMapOptions implements Parcelable {
         dest.writeByte((byte) (zoomGesturesEnabled ? 1 : 0));
 
         dest.writeByte((byte) (myLocationEnabled ? 1 : 0));
-        //myLocationForegroundDrawable;
-        //myLocationForegroundBearingDrawable;
-        //myLocationBackgroundDrawable;
+        dest.writeParcelable(getBitmapFromDrawable(myLocationForegroundDrawable), flags);
+        dest.writeParcelable(getBitmapFromDrawable(myLocationForegroundBearingDrawable), flags);
+        dest.writeParcelable(getBitmapFromDrawable(myLocationBackgroundDrawable), flags);
         dest.writeInt(myLocationForegroundTintColor);
         dest.writeInt(myLocationBackgroundTintColor);
         dest.writeIntArray(myLocationBackgroundPadding);
