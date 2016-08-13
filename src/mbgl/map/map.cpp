@@ -38,6 +38,7 @@ class Map::Impl : public style::Observer {
 public:
     Impl(View&, FileSource&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
 
+    void onSourceAttributionChanged(style::Source&, const std::string&) override;
     void onUpdate(Update) override;
     void onStyleLoaded() override;
     void onStyleError() override;
@@ -785,6 +786,10 @@ void Map::removeSource(const std::string& sourceID) {
     }
 }
 
+std::vector<std::string> Map::getAttributions() const {
+    return impl->style ? impl->style->getAttributions() : std::vector<std::string>();
+}
+
 style::Layer* Map::getLayer(const std::string& layerID) {
     if (impl->style) {
         impl->styleMutated = true;
@@ -978,6 +983,10 @@ void Map::onLowMemory() {
     if (!impl->style) return;
     impl->style->onLowMemory();
     impl->view.invalidate();
+}
+
+void Map::Impl::onSourceAttributionChanged(style::Source&, const std::string&) {
+    view.notifyMapChange(MapChangeSourceAttributionDidChange);
 }
 
 void Map::Impl::onUpdate(Update flags) {

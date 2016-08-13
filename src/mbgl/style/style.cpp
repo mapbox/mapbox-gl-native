@@ -18,6 +18,7 @@
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/style/cascade_parameters.hpp>
 #include <mbgl/style/calculation_parameters.hpp>
+#include <mbgl/style/tile_source_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -25,6 +26,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/tileset.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/math/minmax.hpp>
 
@@ -293,6 +295,28 @@ Source* Style::getSource(const std::string& id) const {
     return it != sources.end() ? it->get() : nullptr;
 }
 
+std::vector<std::string> Style::getAttributions() const {
+    std::vector<std::string> result;
+    for (const auto& source : sources) {
+        switch (source->baseImpl->type) {
+        case SourceType::Vector:
+        case SourceType::Raster: {
+            style::TileSourceImpl* tileSource = static_cast<style::TileSourceImpl*>(source->baseImpl.get());
+            auto attribution = tileSource->getAttribution();
+            if (!attribution.empty()) {
+                result.push_back(std::move(attribution));
+            }
+        }
+
+        case SourceType::GeoJSON:
+        case SourceType::Video:
+        case SourceType::Annotations:
+            break;
+        }
+    }
+    return result;
+}
+
 bool Style::hasTransitions() const {
     return hasPendingTransitions;
 }
@@ -463,6 +487,10 @@ void Style::onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRan
 void Style::onSourceLoaded(Source& source) {
     observer->onSourceLoaded(source);
     observer->onUpdate(Update::Repaint);
+}
+
+void Style::onSourceAttributionChanged(Source& source, const std::string& attribution) {
+    observer->onSourceAttributionChanged(source, attribution);
 }
 
 void Style::onSourceError(Source& source, std::exception_ptr error) {

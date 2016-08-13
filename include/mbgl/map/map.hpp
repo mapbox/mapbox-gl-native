@@ -155,6 +155,7 @@ public:
     style::Source* getSource(const std::string& sourceID);
     void addSource(std::unique_ptr<style::Source>);
     void removeSource(const std::string& sourceID);
+    std::vector<std::string> getAttributions() const;
 
     // Layers
     style::Layer* getLayer(const std::string& layerID);

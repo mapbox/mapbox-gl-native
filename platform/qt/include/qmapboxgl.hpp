@@ -95,7 +95,6 @@ public:
         NorthLeftwards,
     };
 
-
     QMapboxGL(QObject *parent = 0, const QMapboxGLSettings& = QMapboxGLSettings());
     virtual ~QMapboxGL();
 

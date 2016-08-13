@@ -82,6 +82,7 @@ void TileSourceImpl::loadDescription(FileSource& fileSource) {
             }
 
             // Check whether previous information specifies different tile
+            bool attributionChanged = false;
             if (tileset.tiles != newTileset.tiles) {
                 // Tile URLs changed: force tiles to be reloaded.
                 invalidateTiles();
@@ -95,8 +96,8 @@ void TileSourceImpl::loadDescription(FileSource& fileSource) {
                 // This is done automatically when we trigger the onSourceLoaded observer below.
 
                 // Attribution changed: We need to notify the embedding application that this
-                // changed. See https://github.com/mapbox/mapbox-gl-native/issues/2723
-                // This is not yet implemented.
+                // changed.
+                attributionChanged = true;
 
                 // Center/bounds changed: We're not using these values currently
             }
@@ -105,6 +106,9 @@ void TileSourceImpl::loadDescription(FileSource& fileSource) {
             loaded = true;
 
             observer->onSourceLoaded(base);
+            if (attributionChanged) {
+                observer->onSourceAttributionChanged(base, newTileset.attribution);
+            }
         }
     });
 }
@@ -112,6 +116,10 @@ void TileSourceImpl::loadDescription(FileSource& fileSource) {
 Range<uint8_t> TileSourceImpl::getZoomRange() {
     assert(loaded);
     return tileset.zoomRange;
+}
+
+std::string TileSourceImpl::getAttribution() const {
+    return loaded ? tileset.attribution : "";
 }
 
 } // namespace style
