@@ -36,6 +36,11 @@
     return self.layer.presentationLayer;
 }
 
+- (void)update
+{
+    // Left blank intentionally. Subclasses should usually override this in order to update the annotation’s appearance.
+}
+
 - (BOOL)isAccessibilityElement
 {
     return !self.hidden;
