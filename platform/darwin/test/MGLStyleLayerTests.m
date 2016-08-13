@@ -5,7 +5,7 @@
 - (void)setUp {
     [super setUp];
 #if TARGET_OS_IPHONE
-    UIApplication *app = [[UIApplication sharedApplication] delegate];
+    UIApplication *app = [UIApplication sharedApplication];
     UIViewController *vc = [[UIViewController alloc] init];
     app.keyWindow.rootViewController = vc;
     [vc view]; // Force load xib
