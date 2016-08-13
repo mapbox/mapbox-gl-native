@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Use this method to update the appearance of the user location annotation. This
  method is called by the associated map view when it has determined that the
- user location annotation needs to be updated. This can happen in response to a
+ user location annotation needs to be updated. This can happen in response to
  user interaction, a change in the user’s location, when the user tracking mode
  changes, or when the viewport changes.
 
