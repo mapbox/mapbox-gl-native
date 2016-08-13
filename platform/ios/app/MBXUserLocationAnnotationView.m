@@ -1,5 +1,4 @@
 #import "MBXUserLocationAnnotationView.h"
-#import <Mapbox/Mapbox.h>
 
 const CGFloat MBXUserLocationDotSize = 10;
 
@@ -23,14 +22,13 @@ const CGFloat MBXUserLocationDotSize = 10;
 - (CGSize)intrinsicContentSize
 {
     CGSize carSize = CGSizeMake(30, 60);
-    MGLUserTrackingMode userTrackingMode = self.mapView.userTrackingMode;
-    return (userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? carSize : [self dotSize];
+    return (self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? carSize : [self dotSize];
 }
 
 - (CGSize)dotSize
 {
     CGFloat minDotSize = 30;
-    CGFloat dotSize = MAX(minDotSize, self.horizontalAccuracy);
+    CGFloat dotSize = MAX(minDotSize, self.accuracyInPoints);
     return CGSizeMake(dotSize, dotSize);
 }
 
@@ -46,15 +44,10 @@ const CGFloat MBXUserLocationDotSize = 10;
     self.center = oldCenter;
 }
 
-- (CLLocationAccuracy)horizontalAccuracy
-{
-    return self.userLocation.location.horizontalAccuracy;
-}
-
 - (CGFloat)accuracyInPoints
 {
     CGFloat metersPerPoint = [self.mapView metersPerPointAtLatitude:self.userLocation.location.coordinate.latitude];
-    return self.horizontalAccuracy / metersPerPoint;
+    return self.userLocation.location.horizontalAccuracy / metersPerPoint;
 }
 
 - (void)drawRect:(CGRect)rect
