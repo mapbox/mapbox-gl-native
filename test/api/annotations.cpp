@@ -227,7 +227,7 @@ TEST(Annotations, QueryRenderedFeatures) {
     EXPECT_EQ(*features[0].id, 0);
 
     auto features2 = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 50, 0 }));
-    EXPECT_EQ(features2.size(), 1);
+    EXPECT_EQ(features2.size(), 1u);
     EXPECT_TRUE(!!features2[0].id);
     EXPECT_EQ(*features2[0].id, 1);
 }
