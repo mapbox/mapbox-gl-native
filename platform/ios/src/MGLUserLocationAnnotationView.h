@@ -38,12 +38,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, weak) CALayer *hitTestLayer;
 
 /**
- Called by associated map view to update the user location annotation.
+ Updates the user location annotation.
 
- This method is called by the associated map view when it has determined the
- user location annotation should update. This can happen in response to a change
- in the user’s location, when the user tracking mode changes, or when the
- viewport changes.
+ Use this method to update the appearance of the user location annotation. This
+ method is called by the associated map view when it has determined that the
+ user location annotation needs to be updated. This can happen in response to a
+ user interaction, a change in the user’s location, when the user tracking mode
+ changes, or when the viewport changes.
+
+ @warning During user interaction with the map, this method may be called many
+ times to update the user location annotation. Therefore, your implementation of
+ this method should be as lightweight as possible to avoid negatively affecting
+ performance.
  */
 - (void)update;
 
