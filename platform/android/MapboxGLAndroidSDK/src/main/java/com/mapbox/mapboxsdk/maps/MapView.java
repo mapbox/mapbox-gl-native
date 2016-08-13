@@ -77,7 +77,6 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
@@ -1156,7 +1155,6 @@ public class MapView extends FrameLayout {
             return new ArrayList<>();
         }
 
-        // TODO: filter in JNI using C++ parameter to queryPointAnnotations
         long[] ids = mNativeMapView.queryPointAnnotations(rect);
 
         List<Long> idsList = new ArrayList<>(ids.length);
@@ -1182,7 +1180,6 @@ public class MapView extends FrameLayout {
             return new ArrayList<>();
         }
 
-        // TODO: filter in JNI using C++ parameter to queryPointAnnotations
         long[] ids = mNativeMapView.queryPointAnnotations(rect);
 
         List<Long> idsList = new ArrayList<>(ids.length);
@@ -1727,11 +1724,12 @@ public class MapView extends FrameLayout {
             PointF tapPoint = new PointF(e.getX(), e.getY());
             float toleranceSides = 4 * mScreenDensity;
             float toleranceTopBottom = 10 * mScreenDensity;
-            RectF tapRect = new RectF(tapPoint.x - mAverageIconWidth / 2 - toleranceSides,
-                    tapPoint.y - mAverageIconHeight / 2 - toleranceTopBottom,
-                    tapPoint.x + mAverageIconWidth / 2 + toleranceSides,
-                    tapPoint.y + mAverageIconHeight / 2 + toleranceTopBottom);
 
+            RectF tapRect = new RectF((tapPoint.x - mAverageIconWidth / 2 - toleranceSides) / mScreenDensity,
+                    (tapPoint.y - mAverageIconHeight / 2 - toleranceTopBottom) / mScreenDensity,
+                    (tapPoint.x + mAverageIconWidth / 2 + toleranceSides) / mScreenDensity,
+                    (tapPoint.y + mAverageIconHeight / 2 + toleranceTopBottom) / mScreenDensity);
+            
             List<Marker> nearbyMarkers = getMarkersInRect(tapRect);
             long newSelectedMarkerId = -1;
 
