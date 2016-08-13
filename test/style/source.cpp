@@ -342,3 +342,42 @@ TEST(Source, VectorTileCancel) {
 
     test.run();
 }
+
+TEST(Source, RasterTileAttribution) {
+    SourceTest test;
+
+    std::string mapboxOSM = ("<a href='https://www.mapbox.com/about/maps/' target='_blank'>&copy; Mapbox</a> "
+                             "<a href='http://www.openstreetmap.org/about/' target='_blank'>©️ OpenStreetMap</a>");
+
+    test.fileSource.tileResponse = [&] (const Resource&) {
+        Response response;
+        response.noContent = true;
+        return response;
+    };
+
+    test.fileSource.sourceResponse = [&] (const Resource& resource) {
+        EXPECT_EQ("url", resource.url);
+        Response response;
+        response.data = std::make_unique<std::string>(R"TILEJSON({ "tilejson": "2.1.0", "attribution": ")TILEJSON" +
+                                                      mapboxOSM +
+                                                      R"TILEJSON(", "tiles": [ "tiles" ] })TILEJSON");
+        return response;
+    };
+
+    test.observer.sourceAttributionChanged = [&] (Source&, std::string attribution) {
+        EXPECT_EQ(mapboxOSM, attribution);
+        EXPECT_FALSE(mapboxOSM.find("©️ OpenStreetMap") == std::string::npos);
+        test.end();
+    };
+
+    test.observer.tileError = [&] (Source&, const OverscaledTileID&, std::exception_ptr) {
+        FAIL() << "Should never be called";
+    };
+
+    RasterSource source("source", "url", 512);
+    source.baseImpl->setObserver(&test.observer);
+    source.baseImpl->loadDescription(test.fileSource);
+    source.baseImpl->updateTiles(test.updateParameters);
+
+    test.run();
+}
