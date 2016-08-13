@@ -19,12 +19,6 @@
 /* Compass abbreviation for north */
 "COMPASS_NORTH" = "N";
 
-/* Copyright notice in attribution sheet */
-"COPY_MAPBOX" = "© Mapbox";
-
-/* Copyright notice in attribution sheet */
-"COPY_OSM" = "© OpenStreetMap";
-
 /* Instructions in Interface Builder designable; {key}, {plist file name} */
 "DESIGNABLE" = "To display a Mapbox-hosted map here, set %1$@ to your access token in %2$@\n\nFor detailed instructions, see:";
 

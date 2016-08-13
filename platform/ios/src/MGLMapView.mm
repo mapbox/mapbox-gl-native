@@ -55,6 +55,7 @@
 #import "MGLCompactCalloutView.h"
 #import "MGLAnnotationContainerView.h"
 #import "MGLAnnotationContainerView_Private.h"
+#import "MGLAttributionInfo.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -310,6 +311,8 @@ public:
     BOOL _delegateHasLineWidthsForShapeAnnotations;
 
     MGLCompassDirectionFormatter *_accessibilityCompassFormatter;
+    
+    NS_ARRAY_OF(MGLAttributionInfo *) *_attributionInfos;
 }
 
 #pragma mark - Setup & Teardown -
@@ -1714,44 +1717,34 @@ public:
 
 - (void)showAttribution
 {
-    if ( ! self.attributionSheet)
+    self.attributionSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"SDK_NAME", nil, nil, @"Mapbox iOS SDK", @"Action sheet title")
+                                                        delegate:self
+                                               cancelButtonTitle:NSLocalizedStringWithDefaultValue(@"CANCEL", nil, nil, @"Cancel", @"")
+                                          destructiveButtonTitle:nil
+                                               otherButtonTitles:nil];
+    
+    _attributionInfos = self.style.attributionInfos;
+    for (MGLAttributionInfo *info in _attributionInfos)
     {
-        self.attributionSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"SDK_NAME", nil, nil, @"Mapbox iOS SDK", @"Action sheet title")
-                                                            delegate:self
-                                                   cancelButtonTitle:NSLocalizedStringWithDefaultValue(@"CANCEL", nil, nil, @"Cancel", @"")
-                                              destructiveButtonTitle:nil
-                                                   otherButtonTitles:
-                                 NSLocalizedStringWithDefaultValue(@"COPY_MAPBOX", nil, nil, @"© Mapbox", @"Copyright notice in attribution sheet"),
-                                 NSLocalizedStringWithDefaultValue(@"COPY_OSM", nil, nil, @"© OpenStreetMap", @"Copyright notice in attribution sheet"),
-                                 NSLocalizedStringWithDefaultValue(@"MAP_FEEDBACK", nil, nil, @"Improve This Map", @"Action in attribution sheet"),
-                                 NSLocalizedStringWithDefaultValue(@"TELEMETRY_NAME", nil, nil, @"Mapbox Telemetry", @"Action in attribution sheet"),
-                                 nil];
-
+        [self.attributionSheet addButtonWithTitle:info.title];
     }
-
+    
+    [self.attributionSheet addButtonWithTitle:NSLocalizedStringWithDefaultValue(@"MAP_FEEDBACK", nil, nil, @"Improve This Map", @"Action in attribution sheet")];
+    [self.attributionSheet addButtonWithTitle:NSLocalizedStringWithDefaultValue(@"TELEMETRY_NAME", nil, nil, @"Mapbox Telemetry", @"Action in attribution sheet")];
+    
     [self.attributionSheet showFromRect:self.attributionButton.frame inView:self animated:YES];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex == actionSheet.firstOtherButtonIndex)
-    {
-        [[UIApplication sharedApplication] openURL:
-         [NSURL URLWithString:@"https://www.mapbox.com/about/maps/"]];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1)
-    {
-        [[UIApplication sharedApplication] openURL:
-         [NSURL URLWithString:@"http://www.openstreetmap.org/about/"]];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2)
+    if (buttonIndex == actionSheet.numberOfButtons - 2)
     {
         NSString *feedbackURL = [NSString stringWithFormat:@"https://www.mapbox.com/map-feedback/#/%.5f/%.5f/%i",
                                  self.longitude, self.latitude, (int)round(self.zoomLevel + 1)];
         [[UIApplication sharedApplication] openURL:
          [NSURL URLWithString:feedbackURL]];
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 3)
+    else if (buttonIndex == actionSheet.numberOfButtons - 1)
     {
         NSString *message;
         NSString *participate;
@@ -1776,6 +1769,11 @@ public:
                                               cancelButtonTitle:participate
                                               otherButtonTitles:NSLocalizedStringWithDefaultValue(@"TELEMETRY_MORE", nil, nil, @"Tell Me More", @"Telemetry prompt button"), optOut, nil];
         [alert show];
+    }
+    else if (buttonIndex > 0)
+    {
+        MGLAttributionInfo *info = _attributionInfos[buttonIndex + actionSheet.firstOtherButtonIndex];
+        [[UIApplication sharedApplication] openURL:info.URL];
     }
 }
 
@@ -4692,6 +4690,10 @@ public:
             {
                 [self.delegate mapView:self didFinishLoadingStyle:self.style];
             }
+            break;
+        }
+        case mbgl::MapChangeSourceDidChange:
+        {
             break;
         }
     }

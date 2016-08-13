@@ -1,5 +1,7 @@
 #import "MGLTileSet.h"
 
+#import "MGLAttributionInfo.h"
+
 #include <mbgl/util/tileset.hpp>
 
 @implementation MGLTileSet
@@ -55,6 +57,10 @@
     }
     
     _maximumZoomLevel = maximumZoomLevel;
+}
+
+- (NS_ARRAY_OF (MGLAttributionInfo *) *)attributionInfos {
+    return [MGLAttributionInfo attributionInfosFromHTMLString:self.attribution];
 }
 
 - (mbgl::Tileset)mbglTileset
