@@ -8,20 +8,24 @@
 
 @implementation MGLOfflineStorageTests
 
-- (void)testSharedObject {
-    XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage], [MGLOfflineStorage sharedOfflineStorage], @"There should only be one shared offline storage object.");
+- (void)setUp {
+    [super setUp];
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
+            NSKeyValueChange changeKind = [change[NSKeyValueChangeKindKey] unsignedIntegerValue];
+            return changeKind = NSKeyValueChangeSetting;
+        }];
+        
+        [self waitForExpectationsWithTimeout:1 handler:nil];
+        
+        XCTAssertNotNil([MGLOfflineStorage sharedOfflineStorage].packs, @"Shared offline storage object should have a non-nil collection of packs by this point.");
+    });
 }
 
-// This test needs to come first so it can test the initial loading of packs.
-- (void)testAAALoadPacks {
-    [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
-        NSKeyValueChange changeKind = [change[NSKeyValueChangeKindKey] unsignedIntegerValue];
-        return changeKind = NSKeyValueChangeSetting;
-    }];
-    
-    [self waitForExpectationsWithTimeout:1 handler:nil];
-    
-    XCTAssertNotNil([MGLOfflineStorage sharedOfflineStorage].packs, @"Shared offline storage object should have a non-nil collection of packs by this point.");
+- (void)testSharedObject {
+    XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage], [MGLOfflineStorage sharedOfflineStorage], @"There should only be one shared offline storage object.");
 }
 
 - (void)testAddPack {
