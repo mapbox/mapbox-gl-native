@@ -25,7 +25,9 @@
         [self sizeToFit];
         
         _URL = info.URL;
-        self.toolTip = _URL.absoluteString;
+        if (_URL) {
+            self.toolTip = _URL.absoluteString;
+        }
         
         self.target = self;
         self.action = @selector(openURL:);
@@ -38,12 +40,16 @@
 }
 
 - (void)resetCursorRects {
-    // The whole button gets a pointing hand cursor, just like a hyperlink.
-    [self addCursorRect:self.bounds cursor:[NSCursor pointingHandCursor]];
+    if (self.URL) {
+        // The whole button gets a pointing hand cursor, just like a hyperlink.
+        [self addCursorRect:self.bounds cursor:[NSCursor pointingHandCursor]];
+    }
 }
 
 - (IBAction)openURL:(__unused id)sender {
-    [[NSWorkspace sharedWorkspace] openURL:self.URL];
+    if (self.URL) {
+        [[NSWorkspace sharedWorkspace] openURL:self.URL];
+    }
 }
 
 @end

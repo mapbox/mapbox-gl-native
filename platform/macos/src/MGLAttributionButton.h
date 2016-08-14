@@ -1,5 +1,9 @@
 #import <Cocoa/Cocoa.h>
 
+#import "MGLTypes.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
 @class MGLAttributionInfo;
 
 /// Button that looks like a hyperlink and opens a URL.
@@ -9,9 +13,11 @@
 - (instancetype)initWithAttributionInfo:(MGLAttributionInfo *)info;
 
 /// The URL to open and display as a tooltip.
-@property (nonatomic) NSURL *URL;
+@property (nonatomic, readonly, nullable) NSURL *URL;
 
 /// Opens the URL.
-- (IBAction)openURL:(id)sender;
+- (IBAction)openURL:(nullable id)sender;
 
 @end
+
+NS_ASSUME_NONNULL_END

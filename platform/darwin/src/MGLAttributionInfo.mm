@@ -56,18 +56,19 @@ static NSString * const MGLAttributionFeedbackURLString = @"https://www.mapbox.c
                                  inRange:attributedString.mgl_wholeRange
                                  options:0
                               usingBlock:^(id _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-        if (!value) {
-            return;
-        }
-        
         // Omit the Map Feedback link because the SDK already provides the appropriate UI for giving feedback.
         // Ideally we’d look for class="mapbox-improve-map", but NSAttributedString loses that information.
-        NSCAssert([value isKindOfClass:[NSURL class]], @"URL attribute must be an NSURL.");
+        NSCAssert(!value || [value isKindOfClass:[NSURL class]], @"If present, URL attribute must be an NSURL.");
         if ([value isEqual:[NSURL URLWithString:MGLAttributionFeedbackURLString]]) {
             return;
         }
         
+        // Omit whitespace-only strings.
         NSAttributedString *title = [attributedString attributedSubstringFromRange:range];
+        if (![title.string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length) {
+            return;
+        }
+        
         MGLAttributionInfo *info = [[MGLAttributionInfo alloc] initWithTitle:title URL:value];
         [infos addObject:info];
     }];

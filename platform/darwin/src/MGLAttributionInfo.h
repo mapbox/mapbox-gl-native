@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithTitle:(NSAttributedString *)title URL:(NSURL *)URL;
 
 @property (nonatomic) NSAttributedString *title;
-@property (nonatomic) NSURL *URL;
+@property (nonatomic, nullable) NSURL *URL;
 
 @end
 
