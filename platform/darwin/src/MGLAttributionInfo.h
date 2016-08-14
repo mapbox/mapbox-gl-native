@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosFromHTMLString:(NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor;
 
-- (instancetype)initWithTitle:(NSAttributedString *)title URL:(NSURL *)URL;
+- (instancetype)initWithTitle:(NSAttributedString *)title URL:(nullable NSURL *)URL;
 
 @property (nonatomic) NSAttributedString *title;
 @property (nonatomic, nullable) NSURL *URL;
