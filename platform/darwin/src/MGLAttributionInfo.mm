@@ -83,4 +83,76 @@ static NSString * const MGLAttributionFeedbackURLString = @"https://www.mapbox.c
     return self;
 }
 
+- (BOOL)isEqual:(id)object {
+    return [object isKindOfClass:[self class]] && [[object title] isEqual:self.title] && [[object URL] isEqual:self.URL];
+}
+
+- (NSUInteger)hash {
+    return self.title.hash + self.URL.hash;
+}
+
+/**
+ Returns whether the given attribution info object overlaps with the receiver by
+ its plain text title.
+ 
+ @return `NSOrderedAscending` if the given object is a superset of the receiver,
+    `NSOrderedDescending` if it is a subset of the receiver, or `NSOrderedSame`
+    if there is no overlap.
+ */
+- (NSComparisonResult)subsetCompare:(MGLAttributionInfo *)otherInfo {
+    NSString *title = self.title.string;
+    NSString *otherTitle = otherInfo.title.string;
+    if ([title containsString:otherTitle]) {
+        return NSOrderedDescending;
+    }
+    if ([otherTitle containsString:title]) {
+        return NSOrderedAscending;
+    }
+    return NSOrderedSame;
+}
+
+@end
+
+@implementation NSMutableArray (MGLAttributionInfoAdditions)
+
+- (void)growArrayByAddingAttributionInfo:(MGLAttributionInfo *)info {
+    __block BOOL didInsertInfo = NO;
+    __block BOOL shouldAddInfo = YES;
+    [self enumerateObjectsUsingBlock:^(MGLAttributionInfo * _Nonnull existingInfo, NSUInteger idx, BOOL * _Nonnull stop) {
+        switch ([info subsetCompare:existingInfo]) {
+            case NSOrderedDescending:
+                // The existing info object is a subset of the one we’re adding.
+                // Replace the existing object the first time we find a subset;
+                // remove the existing object every time after that.
+                if (didInsertInfo) {
+                    [self removeObjectAtIndex:idx];
+                } else {
+                    [self replaceObjectAtIndex:idx withObject:info];
+                    didInsertInfo = YES;
+                }
+                break;
+                
+            case NSOrderedAscending:
+                // The info object we’re adding is a subset of the existing one.
+                // Don’t add the object and stop looking.
+                shouldAddInfo = NO;
+                *stop = YES;
+                break;
+                
+            default:
+                break;
+        }
+    }];
+    if (shouldAddInfo && !didInsertInfo) {
+        // No overlapping infos were found, so append the info object.
+        [self addObject:info];
+    }
+}
+
+- (void)growArrayByAddingAttributionInfosFromArray:(NS_ARRAY_OF(MGLAttributionInfo *) *)infos {
+    for (MGLAttributionInfo *info in infos) {
+        [self growArrayByAddingAttributionInfo:info];
+    }
+}
+
 @end
