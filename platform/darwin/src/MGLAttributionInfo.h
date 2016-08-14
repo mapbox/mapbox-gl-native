@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <CoreGraphics/CoreGraphics.h>
 
 #import "MGLTypes.h"
 
@@ -15,12 +16,16 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Parses and returns the attribution infos contained in the given HTML source
  code string.
+ 
+ @param htmlString The HTML source code to parse.
+ @param fontSize The default text size in points.
+ @param linkColor The default link color.
  */
-+ (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosFromHTMLString:(NSString *)htmlString;
++ (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosFromHTMLString:(NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor;
 
-- (instancetype)initWithTitle:(NSString *)title URL:(NSURL *)URL;
+- (instancetype)initWithTitle:(NSAttributedString *)title URL:(NSURL *)URL;
 
-@property (nonatomic) NSString *title;
+@property (nonatomic) NSAttributedString *title;
 @property (nonatomic) NSURL *URL;
 
 @end

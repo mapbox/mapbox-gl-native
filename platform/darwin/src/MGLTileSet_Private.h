@@ -11,8 +11,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  A structured representation of the `attribution` property. The default value is
  `nil`.
+ 
+ @param fontSize The default text size in points.
+ @param linkColor The default link color.
  */
-@property (nonatomic, copy, nullable) NS_ARRAY_OF(MGLAttributionInfo *) *attributionInfos;
+- (nullable NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor;
 
 - (mbgl::Tileset)mbglTileset;
 

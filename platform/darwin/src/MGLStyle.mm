@@ -202,7 +202,7 @@ static NSURL *MGLStyleURL_emerald;
     [source removeFromMapView:self.mapView];
 }
 
-- (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfos {
+- (nullable NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
     // It’d be incredibly convenient to use -sources here, but this operation
     // depends on the sources being sorted in ascending order by creation, as
     // with the std::vector used in mbgl.
@@ -216,13 +216,13 @@ static NSURL *MGLStyleURL_emerald;
             continue;
         }
         
-        NSArray *tileSetInfos = [(id)source tileSet].attributionInfos;
+        NSArray *tileSetInfos = [[(id)source tileSet] attributionInfosWithFontSize:fontSize linkColor:linkColor];
         for (MGLAttributionInfo *info in tileSetInfos) {
             // Omit redundant attribution strings.
-            if ([seenTitles containsObject:info.title]) {
+            if ([seenTitles containsObject:info.title.string]) {
                 continue;
             }
-            [seenTitles addObject:info.title];
+            [seenTitles addObject:info.title.string];
             [infos addObject:info];
         }
     }

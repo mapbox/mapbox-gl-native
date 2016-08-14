@@ -421,7 +421,11 @@ public:
     attributionView.subviews = @[];
     [attributionView removeConstraints:attributionView.constraints];
     
-    for (MGLAttributionInfo *info in self.style.attributionInfos) {
+    // Make the whole string mini by default.
+    // Force links to be black, because the default blue is distracting.
+    CGFloat miniSize = [NSFont systemFontSizeForControlSize:NSMiniControlSize];
+    NSArray *attributionInfos = [self.style attributionInfosWithFontSize:miniSize linkColor:[NSColor blackColor]];
+    for (MGLAttributionInfo *info in attributionInfos) {
         // For each attribution, add a borderless button that responds to clicks
         // and feels like a hyperlink.
         NSButton *button = [[MGLAttributionButton alloc] initWithAttributionInfo:info];
@@ -449,17 +453,17 @@ public:
                                       attribute:previousView ? NSLayoutAttributeTrailing : NSLayoutAttributeLeading
                                      multiplier:1
                                        constant:8]];
-    }
-    
-    if (attributionView.subviews.count) {
         [attributionView addConstraint:
-         [NSLayoutConstraint constraintWithItem:attributionView.subviews.firstObject
+         [NSLayoutConstraint constraintWithItem:button
                                       attribute:NSLayoutAttributeTop
                                       relatedBy:NSLayoutRelationEqual
                                          toItem:attributionView
                                       attribute:NSLayoutAttributeTop
                                      multiplier:1
                                        constant:0]];
+    }
+    
+    if (attributionView.subviews.count) {
         [attributionView addConstraint:
          [NSLayoutConstraint constraintWithItem:attributionView
                                       attribute:NSLayoutAttributeTrailing

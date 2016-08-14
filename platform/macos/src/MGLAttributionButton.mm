@@ -2,6 +2,7 @@
 #import "MGLAttributionInfo.h"
 
 #import "NSBundle+MGLAdditions.h"
+#import "NSString+MGLAdditions.h"
 
 @implementation MGLAttributionButton
 
@@ -11,24 +12,16 @@
         self.bezelStyle = NSRegularSquareBezelStyle;
         
         // Extract any prefix consisting of intellectual property symbols.
-        NSScanner *scanner = [NSScanner scannerWithString:info.title];
+        NSScanner *scanner = [NSScanner scannerWithString:info.title.string];
         NSCharacterSet *symbolSet = [NSCharacterSet characterSetWithCharactersInString:@"©℗®℠™ &"];
         NSString *symbol;
         [scanner scanCharactersFromSet:symbolSet intoString:&symbol];
-        NSString *title = [info.title substringFromIndex:symbol.length];
         
-        // Start with the symbol prefix, sans underlining for aesthetic reasons. The whole string will be mini.
-        NSMutableAttributedString *attributedTitle = [[NSMutableAttributedString alloc] initWithString:symbol ?: @"" attributes:@{
-            NSFontAttributeName: [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSMiniControlSize]],
-        }];
-        // Append the specified title, underlining it like a hyperlink.
-        [attributedTitle appendAttributedString:
-         [[NSAttributedString alloc] initWithString:title
-                                         attributes:@{
-            NSFontAttributeName: [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSMiniControlSize]],
-            NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
-        }]];
-        self.attributedTitle = attributedTitle;
+        // Remove the underline from the symbol for aesthetic reasons.
+        NSMutableAttributedString *title = info.title.mutableCopy;
+        [title removeAttribute:NSUnderlineStyleAttributeName range:NSMakeRange(0, symbol.length)];
+        
+        self.attributedTitle = title;
         [self sizeToFit];
         
         _URL = info.URL;

@@ -59,8 +59,10 @@
     _maximumZoomLevel = maximumZoomLevel;
 }
 
-- (NS_ARRAY_OF (MGLAttributionInfo *) *)attributionInfos {
-    return [MGLAttributionInfo attributionInfosFromHTMLString:self.attribution];
+- (nullable NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
+    return [MGLAttributionInfo attributionInfosFromHTMLString:self.attribution
+                                                     fontSize:fontSize
+                                                    linkColor:linkColor];
 }
 
 - (mbgl::Tileset)mbglTileset

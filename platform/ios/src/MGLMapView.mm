@@ -1723,10 +1723,10 @@ public:
                                           destructiveButtonTitle:nil
                                                otherButtonTitles:nil];
     
-    _attributionInfos = self.style.attributionInfos;
+    _attributionInfos = [self.style attributionInfosWithFontSize:[UIFont buttonFontSize] linkColor:nil];
     for (MGLAttributionInfo *info in _attributionInfos)
     {
-        [self.attributionSheet addButtonWithTitle:info.title];
+        [self.attributionSheet addButtonWithTitle:info.title.string];
     }
     
     [self.attributionSheet addButtonWithTitle:NSLocalizedStringWithDefaultValue(@"MAP_FEEDBACK", nil, nil, @"Improve This Map", @"Action in attribution sheet")];
