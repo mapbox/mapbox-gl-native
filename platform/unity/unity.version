@@ -1,0 +1,9 @@
+unity {
+    global:
+        CycleStyle;
+        SetTextureFromUnity;
+        SetTimeFromUnity;
+        UnityRenderEvent;
+        UnitySetGraphicsDevice;
+    local: *;
+};
