@@ -64,8 +64,9 @@ static NSString * const MGLAttributionFeedbackURLString = @"https://www.mapbox.c
         }
         
         // Omit whitespace-only strings.
-        NSAttributedString *title = [attributedString attributedSubstringFromRange:range];
-        if (![title.string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length) {
+        NSAttributedString *title = [[attributedString attributedSubstringFromRange:range]
+                                     mgl_attributedStringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (!title.length) {
             return;
         }
         

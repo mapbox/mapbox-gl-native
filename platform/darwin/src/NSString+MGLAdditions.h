@@ -17,6 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Returns the range spanning the entire receiver. */
 - (NSRange)mgl_wholeRange;
 
+/** Returns a copy of the receiver with leading and trailing members of the given set removed. */
+- (NSAttributedString *)mgl_attributedStringByTrimmingCharactersInSet:(NSCharacterSet *)set;
+
 @end
 
 NS_ASSUME_NONNULL_END
