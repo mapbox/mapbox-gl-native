@@ -509,8 +509,6 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
                             @14: @NO,
                             @15: @YES};
     waterLayer.fillAntialias = fillAntialias;
-    
-    [waterLayer update];
 }
 
 - (void)styleRoadLayer

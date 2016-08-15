@@ -14,9 +14,4 @@
  */
 @property (nonatomic, assign) float minimumZoomLevel;
 
-/**
- Updates the layer’s layout and paint properties.
- */
-- (void)update;
-
 @end

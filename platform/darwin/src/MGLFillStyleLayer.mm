@@ -1,6 +1,7 @@
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
+#import "MGLBaseStyleLayer_Private.hpp"
 #import "MGLStyleLayer_Private.hpp"
 #import "MGLStyleAttributeValue.h"
 #import "MGLFillStyleLayer.h"
@@ -32,6 +33,7 @@
 
 - (void)setFillAntialias:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillAntialias {
     self.layer->setFillAntialias(fillAntialias.mbgl_boolPropertyValue);
+    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)fillAntialias {
@@ -40,6 +42,7 @@
 
 - (void)setFillOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillOpacity {
     self.layer->setFillOpacity(fillOpacity.mbgl_floatPropertyValue);
+    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)fillOpacity {
@@ -48,6 +51,7 @@
 
 - (void)setFillColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillColor {
     self.layer->setFillColor(fillColor.mbgl_colorPropertyValue);
+    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)fillColor {
@@ -56,6 +60,7 @@
 
 - (void)setFillOutlineColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillOutlineColor {
     self.layer->setFillOutlineColor(fillOutlineColor.mbgl_colorPropertyValue);
+    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)fillOutlineColor {
@@ -64,6 +69,7 @@
 
 - (void)setFillTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslate {
     self.layer->setFillTranslate(fillTranslate.mbgl_offsetPropertyValue);
+    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)fillTranslate {
@@ -72,6 +78,7 @@
 
 - (void)setFillTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslateAnchor {
     MGLSetEnumProperty(fillTranslateAnchor, FillTranslateAnchor, TranslateAnchorType, MGLFillStyleLayerFillTranslateAnchor);
+    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)fillTranslateAnchor {
@@ -80,6 +87,7 @@
 
 - (void)setFillPattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillPattern {
     self.layer->setFillPattern(fillPattern.mbgl_stringPropertyValue);
+    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)fillPattern {

@@ -100,22 +100,31 @@ global.initLayer = function (layerType) {
 }
 
 global.setterImplementation = function(property, layerType) {
+    var implementation = '';
     switch (property.type) {
         case 'boolean':
-            return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_boolPropertyValue);`;
+            implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_boolPropertyValue);`;
+            break;
         case 'number':
-            return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_floatPropertyValue);`;
+            implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_floatPropertyValue);`;
+            break;
         case 'string':
-            return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_stringPropertyValue);`;
+            implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_stringPropertyValue);`;
+            break;
         case 'enum':
             var objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            return `MGLSetEnumProperty(${objCName(property)}, ${camelize(property.name)}, ${mbglType(property)}, ${objCType});`; 
+            implementation = `MGLSetEnumProperty(${objCName(property)}, ${camelize(property.name)}, ${mbglType(property)}, ${objCType});`;
+            break;
         case 'color':
-            return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_colorPropertyValue);`;
+            implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_colorPropertyValue);`;
+            break;
         case 'array':
-            return arraySetterImplementation(property);
+            implementation = arraySetterImplementation(property);
+            break;
         default: throw new Error(`unknown type for ${property.name}`)
     }
+    implementation += "\n    [self update];"
+    return implementation;
 }
 
 global.mbglType = function(property) {
