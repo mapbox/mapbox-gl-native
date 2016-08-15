@@ -22,6 +22,8 @@
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
+#include <mbgl/style/sources/raster_source.hpp>
 #include <mbgl/mbgl.hpp>
 
 @interface MGLStyle()
@@ -102,6 +104,33 @@ static NSURL *MGLStyleURL_emerald;
     styleLayer.mapView = self.mapView;
     
     return styleLayer;
+}
+
+- (MGLSource *)sourceWithIdentifier:(NSString *)identifier
+{
+    auto s = self.mapView.mbglMap->getSource(identifier.UTF8String);
+    
+    Class clazz = [self classFromSource:s];
+    
+    MGLSource *source = [[clazz alloc] init];
+    source.sourceIdentifier = identifier;
+    source.source = s;
+    
+    return source;
+}
+
+- (Class)classFromSource:(mbgl::style::Source *)source
+{
+    if (dynamic_cast<mbgl::style::VectorSource *>(source)) {
+        return MGLVectorSource.class;
+    } else if (dynamic_cast<mbgl::style::GeoJSONSource *>(source)) {
+        return MGLGeoJSONSource.class;
+    } else if (dynamic_cast<mbgl::style::RasterSource *>(source)) {
+        return MGLRasterSource.class;
+    }
+    
+    [NSException raise:@"Source type not handled" format:@""];
+    return Nil;
 }
 
 - (Class)classFromLayer:(mbgl::style::Layer *)layer

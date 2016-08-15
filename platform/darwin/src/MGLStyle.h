@@ -174,8 +174,16 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 - (nullable id <MGLStyleLayer>)layerWithIdentifier:(NSString *)identifier;
 
+
 /**
- Adds a new layer at the top of the hierarchy.
+ Returns a source if any source with the given identifier was found.
+ 
+ @return source An instance of an `MGLSource` subclass.
+ */
+- (MGLSource *)sourceWithIdentifier:(NSString *)identifier;
+
+/**
+ Adds a new layer on top of existing layers.
  
  @param styleLayer The layer object to add to the map view. This object
  must conform to the `MGLStyleLayer` protocol.
