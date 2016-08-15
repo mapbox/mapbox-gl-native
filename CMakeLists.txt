@@ -11,8 +11,6 @@ endif()
 
 include(.mason/mason.cmake)
 
-include(cmake/npm.cmake)
-
 option(WITH_CXX11ABI "Use cxx11abi mason packages" OFF)
 option(WITH_COVERAGE "Enable coverage reports" OFF)
 

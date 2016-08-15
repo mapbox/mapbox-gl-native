@@ -57,6 +57,7 @@ node_modules: package.json
 BUILD_DEPS += .mason/mason
 BUILD_DEPS += Makefile
 BUILD_DEPS += node_modules
+BUILD_DEPS += CMakeLists.txt
 
 #### macOS targets ##############################################################
 
