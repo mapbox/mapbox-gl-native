@@ -1,4 +1,4 @@
-#import "NSColor+MGLAdditions.hpp"
+#import "NSColor+MGLAdditions.h"
 
 @implementation NSColor (MGLAdditions)
 

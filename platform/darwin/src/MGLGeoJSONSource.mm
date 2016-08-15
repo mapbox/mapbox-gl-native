@@ -1,6 +1,6 @@
 #import "MGLGeoJSONSource.h"
 
-#import "MGLSource_Private.hpp"
+#import "MGLSource_Private.h"
 
 #include <mbgl/style/sources/geojson_source.hpp>
 

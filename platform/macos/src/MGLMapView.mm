@@ -1,4 +1,4 @@
-#import "MGLMapView_Private.hpp"
+#import "MGLMapView_Private.h"
 #import "MGLAnnotationImage_Private.h"
 #import "MGLAttributionButton.h"
 #import "MGLCompassCell.h"
@@ -9,7 +9,7 @@
 #import "MGLGeometry_Private.h"
 #import "MGLMultiPoint_Private.h"
 #import "MGLOfflineStorage_Private.h"
-#import "MGLStyle_Private.hpp"
+#import "MGLStyle_Private.h"
 
 #import "MGLAccountManager.h"
 #import "MGLMapCamera.h"
@@ -37,8 +37,8 @@
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
-#import "NSColor+MGLAdditions.hpp"
 #import "NSURL+MGLAdditions.h"
+#import "NSColor+MGLAdditions.h"
 
 #import <QuartzCore/QuartzCore.h>
 

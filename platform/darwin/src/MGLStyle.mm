@@ -1,6 +1,6 @@
 #import "MGLStyle.h"
 
-#import "MGLMapView_Private.hpp"
+#import "MGLMapView_Private.h"
 #import "MGLStyleLayer.h"
 #import "MGLFillStyleLayer.h"
 #import "MGLLineStyleLayer.h"
@@ -9,12 +9,12 @@
 #import "MGLRasterStyleLayer.h"
 #import "MGLBackgroundStyleLayer.h"
 
-#import "MGLStyle_Private.hpp"
-#import "MGLStyleLayer_Private.hpp"
-#import "MGLSource_Private.hpp"
+#import "MGLStyle_Private.h"
+#import "MGLStyleLayer_Private.h"
+#import "MGLSource_Private.h"
 #import "MGLSource.h"
 
-#import <mbgl/util/default_styles.hpp>
+#include <mbgl/util/default_styles.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>

@@ -1,7 +1,8 @@
 #import <Foundation/Foundation.h>
 
 #import "MGLTypes.h"
-#import "MGLStyleAttributeFunction_Private.hpp"
+#import "MGLStyleAttributeFunction_Private.h"
+
 #include <array>
 
 @protocol MGLStyleAttributeValue_Private <NSObject>

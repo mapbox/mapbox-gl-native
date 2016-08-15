@@ -1,6 +1,6 @@
 #import "NSValue+MGLStyleAttributeAdditions.h"
 
-#import "NSValue+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSValue+MGLStyleAttributeAdditions_Private.h"
 
 @implementation NSValue (MGLStyleAttributeAdditions)
 

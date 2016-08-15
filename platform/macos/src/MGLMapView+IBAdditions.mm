@@ -1,6 +1,6 @@
 #import "MGLMapView+IBAdditions.h"
 
-#import "MGLMapView_Private.hpp"
+#import "MGLMapView_Private.h"
 
 @implementation MGLMapView (IBAdditions)
 

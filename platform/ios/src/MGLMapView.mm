@@ -1,7 +1,7 @@
-#import "MGLMapView_Private.hpp"
+#import "MGLMapView_Private.h"
 
-#import <mbgl/platform/log.hpp>
-#import <mbgl/gl/gl.hpp>
+#include <mbgl/platform/log.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #import <GLKit/GLKit.h>
 #import <OpenGLES/EAGL.h>
@@ -35,7 +35,6 @@
 #import "NSString+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
-#import "UIColor+MGLAdditions.hpp"
 #import "NSURL+MGLAdditions.h"
 
 #import "MGLFaux3DUserLocationAnnotationView.h"
@@ -44,17 +43,17 @@
 #import "MGLUserLocation_Private.h"
 #import "MGLAnnotationImage_Private.h"
 #import "MGLAnnotationView_Private.h"
-#import "MGLStyle_Private.hpp"
-#import "MGLStyleLayer_Private.hpp"
+#import "MGLStyle_Private.h"
+#import "MGLStyleLayer_Private.h"
 #import "MGLMapboxEvents.h"
 #import "MGLCompactCalloutView.h"
 #import "MGLAnnotationContainerView.h"
 #import "MGLAnnotationContainerView_Private.h"
 
-#import <algorithm>
-#import <cstdlib>
-#import <map>
-#import <unordered_set>
+#include <algorithm>
+#include <cstdlib>
+#include <map>
+#include <unordered_set>
 
 class MBGLView;
 class MGLAnnotationContext;

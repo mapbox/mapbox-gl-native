@@ -1,7 +1,7 @@
-#import "UIColor+MGLAdditions.hpp"
+#import "UIColor+MGLAdditions.h"
 
 #import "MGLStyleAttributeValue.h"
-#import "MGLStyleAttributeValue_Private.hpp"
+#import "MGLStyleAttributeValue_Private.h"
 
 @implementation UIColor (MGLAdditions)
 

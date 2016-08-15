@@ -1,6 +1,6 @@
 #import "MGLRasterSource.h"
 
-#import "MGLSource_Private.hpp"
+#import "MGLSource_Private.h"
 
 #include <mbgl/style/sources/raster_source.hpp>
 

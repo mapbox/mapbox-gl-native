@@ -1,8 +1,8 @@
 #import <Foundation/Foundation.h>
 
 #import "MGLStyleAttributeValue.h"
-#import "MGLStyleLayer_Private.hpp"
-#import "MGLStyleAttributeValue_Private.hpp"
+#import "MGLStyleLayer_Private.h"
+#import "MGLStyleAttributeValue_Private.h"
 
 @interface MGLStyleAttribute : NSObject <MGLStyleAttributeValue>
 

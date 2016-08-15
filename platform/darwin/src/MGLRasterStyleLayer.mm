@@ -1,8 +1,8 @@
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
-#import "MGLBaseStyleLayer_Private.hpp"
-#import "MGLStyleLayer_Private.hpp"
+#import "MGLBaseStyleLayer_Private.h"
+#import "MGLStyleLayer_Private.h"
 #import "MGLStyleAttributeValue.h"
 #import "MGLRasterStyleLayer.h"
 

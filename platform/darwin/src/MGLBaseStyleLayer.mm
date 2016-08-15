@@ -1,8 +1,8 @@
 #import "MGLBaseStyleLayer.h"
 
-#import "MGLBaseStyleLayer_Private.hpp"
-#import "MGLStyleLayer_Private.hpp"
-#import "MGLMapView_Private.hpp"
+#import "MGLBaseStyleLayer_Private.h"
+#import "MGLStyleLayer_Private.h"
+#import "MGLMapView_Private.h"
 
 #include <mbgl/style/layer.hpp>
 

@@ -1,6 +1,6 @@
 #import "MGLOpenGLLayer.h"
 
-#import "MGLMapView_Private.hpp"
+#import "MGLMapView_Private.h"
 
 #import <mbgl/gl/gl.hpp>
 

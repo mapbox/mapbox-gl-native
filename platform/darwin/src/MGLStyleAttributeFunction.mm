@@ -1,8 +1,8 @@
 #import "MGLStyleAttributeFunction.h"
 
-#import "MGLStyleLayer_Private.hpp"
-#import "MGLStyleAttributeValue_Private.hpp"
-#import "MGLStyleAttributeFunction_Private.hpp"
+#import "MGLStyleLayer_Private.h"
+#import "MGLStyleAttributeValue_Private.h"
+#import "MGLStyleAttributeFunction_Private.h"
 
 @interface MGLStyleAttributeFunction() <MGLStyleAttributeValue_Private>
 @end

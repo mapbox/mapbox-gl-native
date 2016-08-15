@@ -1,6 +1,6 @@
 #import "NSString+MGLStyleAttributeAdditions.h"
 
-#import "NSString+MGLStyleAttributeAdditions_Private.hpp"
+#import "NSString+MGLStyleAttributeAdditions_Private.h"
 
 @implementation NSString (MGLStyleAttributeAdditions)
 
