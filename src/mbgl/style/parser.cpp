@@ -42,6 +42,43 @@ void Parser::parse(const std::string& json) {
         }
     }
 
+    if (document.HasMember("name")) {
+        const JSValue& value = document["name"];
+        if (value.IsString()) {
+            name = { value.GetString(), value.GetStringLength() };
+        }
+    }
+
+    if (document.HasMember("center")) {
+        const JSValue& value = document["center"];
+        if (value.IsArray() && value.Size() >= 2) {
+            // Style spec uses lon/lat order
+            latLng.longitude = value[0].IsNumber() ? value[0].GetDouble() : 0;
+            latLng.latitude = value[1].IsNumber() ? value[1].GetDouble() : 0;
+        }
+    }
+
+    if (document.HasMember("zoom")) {
+        const JSValue& value = document["zoom"];
+        if (value.IsNumber()) {
+            zoom = value.GetDouble();
+        }
+    }
+
+    if (document.HasMember("bearing")) {
+        const JSValue& value = document["bearing"];
+        if (value.IsNumber()) {
+            bearing = value.GetDouble();
+        }
+    }
+
+    if (document.HasMember("pitch")) {
+        const JSValue& value = document["pitch"];
+        if (value.IsNumber()) {
+            pitch = value.GetDouble();
+        }
+    }
+
     if (document.HasMember("sources")) {
         parseSources(document["sources"]);
     }

@@ -5,6 +5,7 @@
 
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/font_stack.hpp>
+#include <mbgl/util/geo.hpp>
 
 #include <vector>
 #include <memory>
@@ -26,6 +27,12 @@ public:
 
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<std::unique_ptr<Layer>> layers;
+
+    std::string name;
+    LatLng latLng;
+    double zoom = 0;
+    double bearing = 0;
+    double pitch = 0;
 
     // Statically evaluate layer properties to determine what font stacks are used.
     std::vector<FontStack> fontStacks() const;

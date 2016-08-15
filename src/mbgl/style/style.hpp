@@ -13,6 +13,7 @@
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/feature.hpp>
+#include <mbgl/util/geo.hpp>
 
 #include <cstdint>
 #include <string>
@@ -68,6 +69,12 @@ public:
                   optional<std::string> beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 
+    std::string getName() const;
+    LatLng getDefaultLatLng() const;
+    double getDefaultZoom() const;
+    double getDefaultBearing() const;
+    double getDefaultPitch() const;
+
     bool addClass(const std::string&, const TransitionOptions& = {});
     bool removeClass(const std::string&, const TransitionOptions& = {});
     bool hasClass(const std::string&) const;
@@ -97,6 +104,13 @@ private:
     std::vector<std::unique_ptr<Layer>> layers;
     std::vector<std::string> classes;
     optional<TransitionOptions> transitionProperties;
+
+    // Defaults
+    std::string name;
+    LatLng defaultLatLng;
+    double defaultZoom;
+    double defaultBearing;
+    double defaultPitch;
 
     std::vector<std::unique_ptr<Layer>>::const_iterator findLayer(const std::string& layerID) const;
 

@@ -781,6 +781,28 @@ void Map::removeLayer(const std::string& id) {
     impl->view.deactivate();
 }
 
+#pragma mark - Defaults
+
+std::string Map::getStyleName() const {
+    return impl->style->getName();
+}
+
+LatLng Map::getDefaultLatLng() const {
+    return impl->style->getDefaultLatLng();
+}
+
+double Map::getDefaultZoom() const {
+    return impl->style->getDefaultZoom();
+}
+
+double Map::getDefaultBearing() const {
+    return impl->style->getDefaultBearing();
+}
+
+double Map::getDefaultPitch() const {
+    return impl->style->getDefaultPitch();
+}
+
 #pragma mark - Toggles
 
 void Map::setDebug(MapDebugOptions debugOptions) {
