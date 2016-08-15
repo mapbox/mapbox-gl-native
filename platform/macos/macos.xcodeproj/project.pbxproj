@@ -86,13 +86,13 @@
 		DA8F25B21D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8F25A61D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA8F25B31D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA8F25A71D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.mm */; };
 		DA8F25B41D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = DA8F25A81D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions_Private.hpp */; };
-		DAB6924A1CC75A31005AAB54 /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */; };
 		DAC2ABC51CC6D343006D18C4 /* MGLAnnotationImage_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAC2ABC41CC6D343006D18C4 /* MGLAnnotationImage_Private.h */; };
 		DACC22141CF3D3E200D220D9 /* MGLFeature.h in Headers */ = {isa = PBXBuildFile; fileRef = DACC22121CF3D3E200D220D9 /* MGLFeature.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DACC22151CF3D3E200D220D9 /* MGLFeature.mm in Sources */ = {isa = PBXBuildFile; fileRef = DACC22131CF3D3E200D220D9 /* MGLFeature.mm */; };
 		DACC22181CF3D4F700D220D9 /* MGLFeature_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DACC22171CF3D4F700D220D9 /* MGLFeature_Private.h */; };
 		DAD165741CF4CD7A001FF4B9 /* MGLShapeCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = DAD165721CF4CD7A001FF4B9 /* MGLShapeCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DAD165751CF4CD7A001FF4B9 /* MGLShapeCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = DAD165731CF4CD7A001FF4B9 /* MGLShapeCollection.m */; };
+		DAE0DD7A1D5F015A005A6BB1 /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */; };
 		DAE6C2E21CC304F900DB3429 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = DAE6C2E11CC304F900DB3429 /* Credits.rtf */; };
 		DAE6C2ED1CC3050F00DB3429 /* DroppedPinAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = DAE6C2E41CC3050F00DB3429 /* DroppedPinAnnotation.m */; };
 		DAE6C2EE1CC3050F00DB3429 /* LocationCoordinate2DTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = DAE6C2E61CC3050F00DB3429 /* LocationCoordinate2DTransformer.m */; };
@@ -411,8 +411,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAE0DD7A1D5F015A005A6BB1 /* libmbgl-core.a in Frameworks */,
 				DAE6C3321CC30DB200DB3429 /* Mapbox.framework in Frameworks */,
-				5548BE7D1D0ACCD6005DDE81 /* libmbgl-core.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
