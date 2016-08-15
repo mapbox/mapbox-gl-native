@@ -31,6 +31,14 @@ public:
             result.tiles.push_back(std::move(*urlTemplate));
         }
 
+        auto schemeValue = objectMember(value, "scheme");
+        if (schemeValue) {
+            optional<std::string> scheme = toString(*schemeValue);
+            if (scheme && *scheme == "tms") {
+                result.scheme = Tileset::Scheme::TMS;
+            }
+        }
+
         auto minzoomValue = objectMember(value, "minzoom");
         if (minzoomValue) {
             optional<float> minzoom = toNumber(*minzoomValue);

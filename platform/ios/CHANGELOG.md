@@ -23,6 +23,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed crashes that could occur when loading a malformed stylesheet. ([#5736](https://github.com/mapbox/mapbox-gl-native/pull/5736))
 * Fixed a crash that sometimes occurred when initializing an MGLMapView. ([#5932](https://github.com/mapbox/mapbox-gl-native/pull/5932))
 * MGLMapDebugOverdrawVisualizationMask no longer has any effect in Release builds of the SDK. This debug mask has been disabled for performance reasons. ([#5555](https://github.com/mapbox/mapbox-gl-native/pull/5555))
+* Added support for `"scheme": "tms"` in TileJSON descriptions. ([#2270](https://github.com/mapbox/mapbox-gl-native/pull/2270))
 
 ## 3.3.4 - August 8, 2016
 

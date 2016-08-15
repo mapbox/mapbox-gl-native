@@ -11,6 +11,7 @@
 * Improved the precision of annotations at zoom levels greater than 18. ([#5517](https://github.com/mapbox/mapbox-gl-native/pull/5517))
 * Fixed an issue where the style zoom levels were not respected when deciding when to render a layer. ([#5811](https://github.com/mapbox/mapbox-gl-native/issues/5811))
 * Fixed crashes that could occur when loading a malformed stylesheet. ([#5736](https://github.com/mapbox/mapbox-gl-native/pull/5736))
+* Added support for `"scheme": "tms"` in TileJSON descriptions. ([#2270](https://github.com/mapbox/mapbox-gl-native/pull/2270))
 
 ## 0.2.1 - July 19, 2016
 

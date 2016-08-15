@@ -87,8 +87,12 @@ Resource Resource::tile(const std::string& urlTemplate,
                         int32_t x,
                         int32_t y,
                         int8_t z,
+                        Tileset::Scheme scheme,
                         Necessity necessity) {
     bool supportsRatio = urlTemplate.find("{ratio}") != std::string::npos;
+    if (scheme == Tileset::Scheme::TMS) {
+        y = (1 << z) - y - 1;
+    }
     return Resource {
         Resource::Kind::Tile,
         util::replaceTokens(urlTemplate, [&](const std::string& token) {

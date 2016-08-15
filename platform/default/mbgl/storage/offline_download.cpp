@@ -81,7 +81,7 @@ OfflineDownload::tileResources(SourceType type, uint16_t tileSize, const Tileset
 
     for (const auto& tile : definition.tileCover(type, tileSize, tileset.zoomRange)) {
         result.push_back(
-            Resource::tile(tileset.tiles[0], definition.pixelRatio, tile.x, tile.y, tile.z));
+            Resource::tile(tileset.tiles[0], definition.pixelRatio, tile.x, tile.y, tile.z, tileset.scheme));
     }
 
     return result;
