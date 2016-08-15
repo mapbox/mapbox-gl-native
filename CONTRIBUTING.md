@@ -18,22 +18,22 @@ If you want to contribute code:
 
 Please note the special instructions for contributing new source code files, asset files, or user-facing strings to the [iOS SDK](platform/ios/DEVELOPING.md#contributing) or [macOS SDK](platform/macos/DEVELOPING.md#contributing).
 
-### Github Issue Labels
+### Github issue labels
 
-Our labeling system is
+Our labeling system is:
 
- - **minimalistic:** Labels' usefulness are inversely proportional to how many we have.
- - **objective:** Labels should be objective enough that any two people would agree on a labeling decision.
- - **useful:** Labels should track state or capture semantic meaning that would otherwise be hard to search.
+ * **minimalistic:** Labels’ usefulness are inversely proportional to how many we have.
+ * **objective:** Labels should be objective enough that any two people would agree on a labeling decision.
+ * **useful:** Labels should track state or capture semantic meaning that would otherwise be hard to search for.
 
-We have divided our labels into categories to make them easier to use.
+We’ve color-coded our labels by facet to make them easier to use:
 
- - platform (purple)
- - type (blue)
- - actionable status (red)
- - non-actionable status (grey)
- - importance / urgency (green)
- - topic / project / misc (yellow)
+ * type (blue)
+ * platform (black)
+ * actionable status (red)
+ * non-actionable status (grey)
+ * importance / urgency (green)
+ * topic / project / misc (yellow)
 
 # Code of conduct
 Everyone is invited to participate in Mapbox’s open source projects and public discussions: we want to create a welcoming and friendly environment. Harassment of participants or other unethical and unprofessional behavior will not be tolerated in our spaces. The [Contributor Covenant](http://contributor-covenant.org) applies to all projects under the Mapbox organization and we ask that you please read [the full text](http://contributor-covenant.org/version/1/2/0/).
