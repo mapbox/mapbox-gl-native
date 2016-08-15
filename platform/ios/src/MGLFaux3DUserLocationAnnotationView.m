@@ -396,7 +396,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     {
         _dotLayer = [self circleLayerWithSize:MGLUserLocationAnnotationDotSize * 0.75];
         _dotLayer.backgroundColor = [self.mapView.tintColor CGColor];
-        _dotLayer.shouldRasterize = NO;
 
         // set defaults for the animations
         CAAnimationGroup *animationGroup = [self loopingAnimationGroupWithDuration:1.5];
