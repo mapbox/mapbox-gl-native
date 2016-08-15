@@ -6,7 +6,7 @@ endif()
 add_custom_command(
     OUTPUT ${MBGL_GENERATED}/include/mbgl/util/version.hpp
     DEPENDS ${MBGL_VERSION_DEPS}
-    COMMAND ${CMAKE_SOURCE_DIR}/scripts/build-version.py ${MBGL_GENERATED}
+    COMMAND ${NodeJS_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/build-version.js ${MBGL_GENERATED}
     VERBATIM
 )
 
