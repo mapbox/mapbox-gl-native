@@ -148,6 +148,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckDot.backgroundColor = [[UIColor whiteColor] CGColor];
         _puckDot.shadowColor = [[UIColor blackColor] CGColor];
         _puckDot.shadowOpacity = 0.25;
+        _puckDot.shadowPath = [[UIBezierPath bezierPathWithOvalInRect:_puckDot.bounds] CGPath];
 
         if (self.mapView.camera.pitch)
         {
@@ -374,6 +375,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _dotBorderLayer.backgroundColor = [[UIColor whiteColor] CGColor];
         _dotBorderLayer.shadowColor = [[UIColor blackColor] CGColor];
         _dotBorderLayer.shadowOpacity = 0.25;
+        _dotBorderLayer.shadowPath = [[UIBezierPath bezierPathWithOvalInRect:_dotBorderLayer.bounds] CGPath];
 
         if (self.mapView.camera.pitch)
         {
