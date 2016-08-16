@@ -330,6 +330,8 @@
 		DAA4E4341CBB730400178DFB /* MGLFaux3DUserLocationAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA88484E1CBAFB9800AB86E3 /* MGLFaux3DUserLocationAnnotationView.m */; };
 		DAA4E4351CBB730400178DFB /* SMCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA88488A1CBB037E00AB86E3 /* SMCalloutView.m */; };
 		DAABF73D1CBC59BB005B1825 /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAABF73B1CBC59BB005B1825 /* libmbgl-core.a */; };
+		DAB4F8301D63DD7600E27738 /* MGLBaseStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAB4F82F1D63DD7600E27738 /* MGLBaseStyleLayer_Private.h */; };
+		DAB4F8311D63DD7600E27738 /* MGLBaseStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAB4F82F1D63DD7600E27738 /* MGLBaseStyleLayer_Private.h */; };
 		DABCABAC1CB80692000A7C39 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DABCABAB1CB80692000A7C39 /* main.m */; };
 		DABCABAF1CB80692000A7C39 /* MBXBenchAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DABCABAE1CB80692000A7C39 /* MBXBenchAppDelegate.m */; };
 		DABCABB21CB80692000A7C39 /* MBXBenchViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = DABCABB11CB80692000A7C39 /* MBXBenchViewController.mm */; };
@@ -693,6 +695,7 @@
 		DAA4E4061CBB5CBF00178DFB /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		DAA4E4131CBB71D400178DFB /* libMapbox.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMapbox.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAABF73B1CBC59BB005B1825 /* libmbgl-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libmbgl-core.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAB4F82F1D63DD7600E27738 /* MGLBaseStyleLayer_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLBaseStyleLayer_Private.h; sourceTree = "<group>"; };
 		DABCABA81CB80692000A7C39 /* Bench GL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bench GL.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DABCABAB1CB80692000A7C39 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		DABCABAD1CB80692000A7C39 /* MBXBenchAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXBenchAppDelegate.h; sourceTree = "<group>"; };
@@ -798,6 +801,7 @@
 				353933FD1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h */,
 				35136D441D42275100C20EFD /* MGLSymbolStyleLayer.mm */,
 				3538AA1B1D542239008EC33D /* MGLBaseStyleLayer.h */,
+				DAB4F82F1D63DD7600E27738 /* MGLBaseStyleLayer_Private.h */,
 				3538AA1C1D542239008EC33D /* MGLBaseStyleLayer.mm */,
 			);
 			name = Layers;
@@ -1329,6 +1333,7 @@
 				404326891D5B9B27007111BD /* MGLAnnotationContainerView_Private.h in Headers */,
 				DA88483B1CBAFB8500AB86E3 /* MGLCalloutView.h in Headers */,
 				35E0CFE61D3E501500188327 /* MGLStyle_Private.h in Headers */,
+				DAB4F8301D63DD7600E27738 /* MGLBaseStyleLayer_Private.h in Headers */,
 				3593E5261D529EDC006D9365 /* UIColor+MGLStyleAttributeAdditions_Private.h in Headers */,
 				35599DF01D46F3A60048254D /* MGLStyleAttributeValue.h in Headers */,
 				DA8848531CBAFB9800AB86E3 /* MGLCompactCalloutView.h in Headers */,
@@ -1427,6 +1432,7 @@
 				DABFB8711CBE9A0F00D62B32 /* MGLMapView+MGLCustomStyleLayerAdditions.h in Headers */,
 				DABFB8611CBE99E500D62B32 /* MGLMultiPoint.h in Headers */,
 				35E0CFE71D3E501500188327 /* MGLStyle_Private.h in Headers */,
+				DAB4F8311D63DD7600E27738 /* MGLBaseStyleLayer_Private.h in Headers */,
 				DABFB86D1CBE9A0F00D62B32 /* MGLAnnotationImage.h in Headers */,
 				DABFB8721CBE9A0F00D62B32 /* MGLUserLocation.h in Headers */,
 				3566C7721D4A9198008152BC /* MGLSource_Private.h in Headers */,
