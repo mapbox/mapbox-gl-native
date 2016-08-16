@@ -12,7 +12,11 @@
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLSource_Private.h"
+
 #import "MGLSource.h"
+#import "MGLVectorSource.h"
+#import "MGLRasterSource.h"
+#import "MGLGeoJSONSource.h"
 
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
@@ -178,5 +182,59 @@ static NSURL *MGLStyleURL_emerald;
 {
     self.mapView.mbglMap->removeSource(source.sourceIdentifier.UTF8String);
 }
+
+- (NS_ARRAY_OF(NSString *) *)styleClasses
+{
+    NSMutableArray *returnArray = [NSMutableArray array];
+    
+    const std::vector<std::string> &appliedClasses = self.mapView.mbglMap->getClasses();
+    
+    for (auto class_it = appliedClasses.begin(); class_it != appliedClasses.end(); class_it++)
+    {
+        [returnArray addObject:@(class_it->c_str())];
+    }
+    
+    return returnArray;
+}
+
+- (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses
+{
+    [self setStyleClasses:appliedClasses transitionDuration:0];
+}
+
+- (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses transitionDuration:(NSTimeInterval)transitionDuration
+{
+    std::vector<std::string> newAppliedClasses;
+    
+    for (NSString *appliedClass in appliedClasses)
+    {
+        newAppliedClasses.insert(newAppliedClasses.end(), [appliedClass UTF8String]);
+    }
+    
+    mbgl::style::TransitionOptions transition { { MGLDurationInSeconds(transitionDuration) } };
+    self.mapView.mbglMap->setClasses(newAppliedClasses, transition);
+}
+
+- (BOOL)hasStyleClass:(NSString *)styleClass
+{
+    return styleClass && self.mapView.mbglMap->hasClass([styleClass UTF8String]);
+}
+
+- (void)addStyleClass:(NSString *)styleClass
+{
+    if (styleClass)
+    {
+        self.mapView.mbglMap->addClass([styleClass UTF8String]);
+    }
+}
+
+- (void)removeStyleClass:(NSString *)styleClass
+{
+    if (styleClass)
+    {
+        self.mapView.mbglMap->removeClass([styleClass UTF8String]);
+    }
+}
+
 
 @end

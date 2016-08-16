@@ -2710,16 +2710,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (NS_ARRAY_OF(NSString *) *)styleClasses
 {
-    NSMutableArray *returnArray = [NSMutableArray array];
-
-    const std::vector<std::string> &appliedClasses = _mbglMap->getClasses();
-
-    for (auto class_it = appliedClasses.begin(); class_it != appliedClasses.end(); class_it++)
-    {
-        [returnArray addObject:@(class_it->c_str())];
-    }
-
-    return returnArray;
+    return [self.style styleClasses];
 }
 
 - (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses
@@ -2729,36 +2720,22 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses transitionDuration:(NSTimeInterval)transitionDuration
 {
-    std::vector<std::string> newAppliedClasses;
-
-    for (NSString *appliedClass in appliedClasses)
-    {
-        newAppliedClasses.insert(newAppliedClasses.end(), [appliedClass UTF8String]);
-    }
-
-    mbgl::style::TransitionOptions transition { { MGLDurationInSeconds(transitionDuration) } };
-    _mbglMap->setClasses(newAppliedClasses, transition);
+    [self.style setStyleClasses:appliedClasses transitionDuration:transitionDuration];
 }
 
 - (BOOL)hasStyleClass:(NSString *)styleClass
 {
-    return styleClass && _mbglMap->hasClass([styleClass UTF8String]);
+    return [self.style hasStyleClass:styleClass];
 }
 
 - (void)addStyleClass:(NSString *)styleClass
 {
-    if (styleClass)
-    {
-        _mbglMap->addClass([styleClass UTF8String]);
-    }
+    [self.style addStyleClass:styleClass];
 }
 
 - (void)removeStyleClass:(NSString *)styleClass
 {
-    if (styleClass)
-    {
-        _mbglMap->removeClass([styleClass UTF8String]);
-    }
+    [self.style removeStyleClass:styleClass];
 }
 
 #pragma mark - Annotations -

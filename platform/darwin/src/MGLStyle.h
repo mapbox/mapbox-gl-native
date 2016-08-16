@@ -221,6 +221,34 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 - (void)removeSource:(MGLSource *)source;
 
+/**
+ Currently active style classes, represented as an array of string identifiers.
+ */
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses;
+
+/**
+ Returns a Boolean value indicating whether the style class with the given
+ identifier is currently active.
+ 
+ @param styleClass The style class to query for.
+ @return Whether the style class is currently active.
+ */
+- (BOOL)hasStyleClass:(NSString *)styleClass;
+
+/**
+ Activates the style class with the given identifier.
+ 
+ @param styleClass The style class to activate.
+ */
+- (void)addStyleClass:(NSString *)styleClass;
+
+/**
+ Deactivates the style class with the given identifier.
+ 
+ @param styleClass The style class to deactivate.
+ */
+- (void)removeStyleClass:(NSString *)styleClass;
+
 @end
 
 NS_ASSUME_NONNULL_END

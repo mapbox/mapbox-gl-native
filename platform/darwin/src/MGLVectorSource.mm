@@ -1,6 +1,6 @@
 #import "MGLVectorSource.h"
 
-#import "MGLSource_Private.hpp"
+#import "MGLSource_Private.h"
 
 #include <mbgl/style/sources/vector_source.hpp>
 
@@ -9,7 +9,7 @@
 static NSString *MGLVectorSourceType   = @"vector";
 
 - (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url {
-    if (self = [super initWithSourceIdentifier:sourceIdentifier sourceType:MGLVectorSourceType]) {
+    if (self = [super initWithSourceIdentifier:sourceIdentifier]) {
         _URL = url;
     }
     return self;

@@ -212,7 +212,7 @@ IB_DESIGNABLE
 /** 
  Currently active style classes, represented as an array of string identifiers.
  */
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses;
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("Use -style.styleClasses:.")));
 
 /**
  Returns a Boolean value indicating whether the style class with the given
@@ -221,21 +221,21 @@ IB_DESIGNABLE
  @param styleClass The style class to query for.
  @return Whether the style class is currently active.
  */
-- (BOOL)hasStyleClass:(NSString *)styleClass;
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("Use -style.hasStyleClass:.")));
 
 /**
  Activates the style class with the given identifier.
  
  @param styleClass The style class to activate.
  */
-- (void)addStyleClass:(NSString *)styleClass;
+- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("Use -style.addStyleClass:.")));
 
 /**
  Deactivates the style class with the given identifier.
  
  @param styleClass The style class to deactivate.
  */
-- (void)removeStyleClass:(NSString *)styleClass;
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("Use -style.removeStyleClass:.")));
 
 #pragma mark Displaying the User’s Location
 
