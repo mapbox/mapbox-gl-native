@@ -484,7 +484,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
 }
 
-- (IBAction)runtimeStyling:(id)sender {
+- (IBAction)manipulateStyle:(id)sender {
     MGLFillStyleLayer *fillStyleLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
     
     MGLStyleAttributeFunction *colorFunction = [[MGLStyleAttributeFunction alloc] init];
@@ -600,7 +600,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     if (menuItem.action == @selector(reload:)) {
         return YES;
     }
-    if (menuItem.action == @selector(runtimeStyling:)) {
+    if (menuItem.action == @selector(manipulateStyle:)) {
         return YES;
     }
     if (menuItem.action == @selector(dropPin:)) {
