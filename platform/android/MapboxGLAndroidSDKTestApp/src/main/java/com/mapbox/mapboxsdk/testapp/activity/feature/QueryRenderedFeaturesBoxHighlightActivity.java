@@ -11,22 +11,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.style.layers.FillLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.Polygon;
-import com.mapbox.services.commons.models.Position;
+import com.mapbox.services.commons.geojson.FeatureCollection;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
 
 /**
  * Demo's query rendered features
@@ -44,8 +43,6 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
         setContentView(R.layout.activity_query_features_box);
         setupActionBar();
 
-        final float density = getResources().getDisplayMetrics().density;
-
         final View selectionBox = findViewById(R.id.selection_box);
 
         //Initialize map as normal
@@ -57,6 +54,7 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
             public void onMapReady(final MapboxMap mapboxMap) {
                 QueryRenderedFeaturesBoxHighlightActivity.this.mapboxMap = mapboxMap;
 
+                //Add a fill layer to display stuff on
 
                 selectionBox.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -71,21 +69,17 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
                         //Show count
                         Toast.makeText(QueryRenderedFeaturesBoxHighlightActivity.this, String.format("%s features in box", features.size()), Toast.LENGTH_SHORT).show();
 
-                        for (Feature feature : features) {
-                            if (feature.getGeometry() instanceof Polygon) {
-                                Polygon building = (Polygon) feature.getGeometry();
-
-                                //Convert outer ring
-                                List<List<Position>> coordinates = building.getCoordinates();
-                                List<Position> outerRing = coordinates.get(0);
-                                List<LatLng> points = new ArrayList<LatLng>();
-                                for (Position position : outerRing) {
-                                    points.add(new LatLng(position.getLatitude(), position.getLongitude()));
-                                }
-
-                                mapboxMap.addPolygon(new PolygonOptions().addAll(points).fillColor(Color.RED));
-                            }
+                        //remove layer / source if already added
+                        try {
+                            mapboxMap.removeSource("highlighted-shapes-source");
+                            mapboxMap.removeLayer("highlighted-shapes-layer");
+                        } catch (Exception e) {
+                            //that's ok
                         }
+
+                        //Add layer / source
+                        mapboxMap.addSource(new GeoJsonSource("highlighted-shapes-source", FeatureCollection.fromFeatures(features)));
+                        mapboxMap.addLayer(new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source").withProperties(fillColor(Color.RED)));
                     }
                 });
 
