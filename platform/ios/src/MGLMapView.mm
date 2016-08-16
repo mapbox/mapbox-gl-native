@@ -36,6 +36,7 @@
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
 #import "UIColor+MGLAdditions.hpp"
+#import "NSURL+MGLAdditions.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
 #import "MGLAnnotationImage_Private.h"
@@ -345,12 +346,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
     }
 
-    if ( ! [styleURL scheme])
-    {
-        // Assume a relative path into the application bundle.
-        styleURL = [NSURL URLWithString:[@"asset://" stringByAppendingString:[styleURL absoluteString]]];
-    }
-
+    styleURL = styleURL.mgl_URLByStandardizingScheme;
     _mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
 }
 
