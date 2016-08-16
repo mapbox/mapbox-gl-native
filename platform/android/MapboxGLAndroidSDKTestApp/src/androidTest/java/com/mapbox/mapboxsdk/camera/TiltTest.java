@@ -20,8 +20,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 public class TiltTest extends BaseTest {
 
     @Test
+    // longer testing change param
     public void testTilt() {
-        onView(withId(R.id.mapView)).perform(new TiltAction(0, 60));
+        onView(withId(R.id.mapView)).perform(new TiltAction(0, 1));
     }
 
     @Override

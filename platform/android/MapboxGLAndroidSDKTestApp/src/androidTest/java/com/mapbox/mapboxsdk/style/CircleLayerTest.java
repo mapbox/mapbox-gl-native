@@ -9,9 +9,9 @@ import android.util.Log;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
-import com.mapbox.mapboxsdk.utils.OnMapReadyIdlingResource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
+import com.mapbox.mapboxsdk.utils.OnMapReadyIdlingResource;
 
 import org.junit.After;
 import org.junit.Before;

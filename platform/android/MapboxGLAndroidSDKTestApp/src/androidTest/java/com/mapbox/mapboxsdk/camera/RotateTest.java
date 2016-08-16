@@ -20,8 +20,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 public class RotateTest extends BaseTest {
 
     @Test
+    // longer testing change second param
     public void testRotate() {
-        onView(withId(R.id.mapView)).perform(new RotateAction(0, 180));
+        onView(withId(R.id.mapView)).perform(new RotateAction(0, 1));
     }
 
     @Override

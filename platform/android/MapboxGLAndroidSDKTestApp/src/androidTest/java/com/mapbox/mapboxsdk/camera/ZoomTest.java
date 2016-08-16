@@ -20,8 +20,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 public class ZoomTest extends BaseTest {
 
     @Test
+    // longer testing increase second param
     public void testZoom() throws Exception {
-        onView(withId(R.id.mapView)).perform(new ZoomAction(MapboxConstants.MINIMUM_ZOOM, MapboxConstants.MAXIMUM_ZOOM));
+        onView(withId(R.id.mapView)).perform(new ZoomAction(MapboxConstants.MINIMUM_ZOOM, MapboxConstants.MINIMUM_ZOOM - 1));
     }
 
     @Override

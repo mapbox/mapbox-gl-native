@@ -7,11 +7,11 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
-import com.mapbox.mapboxsdk.utils.OnMapReadyIdlingResource;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
+import com.mapbox.mapboxsdk.utils.OnMapReadyIdlingResource;
 
 import org.junit.After;
 import org.junit.Before;
@@ -19,28 +19,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static com.mapbox.mapboxsdk.style.layers.Property.LINE_CAP_BUTT;
-import static com.mapbox.mapboxsdk.style.layers.Property.LINE_JOIN_BEVEL;
-import static com.mapbox.mapboxsdk.style.layers.Property.LINE_TRANSLATE_ANCHOR_MAP;
-import static com.mapbox.mapboxsdk.style.layers.Property.NONE;
-import static com.mapbox.mapboxsdk.style.layers.Property.VISIBLE;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineBlur;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineCap;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineDasharray;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineGapWidth;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineJoin;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineMiterLimit;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineOffset;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineOpacity;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.linePattern;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineRoundLimit;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineTranslate;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineTranslateAnchor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
+import static com.mapbox.mapboxsdk.style.layers.Property.*;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
 /**
  * Basic smoke tests for LineLayer
@@ -261,8 +242,8 @@ public class LineLayerTest extends BaseTest {
         assertNotNull(layer);
 
         //Set and Get
-        layer.setProperties(lineTranslate(new Float[]{0f, 0f}));
-        assertEquals((Float[]) layer.getLineTranslate().getValue(), (Float[]) new Float[]{0f, 0f});
+        layer.setProperties(lineTranslate(new Float[]{0f,0f}));
+        assertEquals((Float[]) layer.getLineTranslate().getValue(), (Float[]) new Float[]{0f,0f});
     }
 
     @Test
@@ -420,8 +401,8 @@ public class LineLayerTest extends BaseTest {
     }
 
 
-    @After
-    public void unregisterIntentServiceIdlingResource() {
-        Espresso.unregisterIdlingResources(idlingResource);
-    }
+   @After
+   public void unregisterIntentServiceIdlingResource() {
+       Espresso.unregisterIdlingResources(idlingResource);
+   }
 }
