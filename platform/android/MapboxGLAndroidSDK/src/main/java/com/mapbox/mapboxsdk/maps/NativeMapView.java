@@ -19,6 +19,7 @@ import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
+import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.commons.geojson.Feature;
 
@@ -502,7 +503,7 @@ final class NativeMapView {
         nativeAddSource(mNativeMapViewPtr, source.getId(), source);
     }
 
-    public void removeSource(@NonNull String sourceId) {
+    public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
         nativeRemoveSource(mNativeMapViewPtr, sourceId);
     }
 
@@ -714,7 +715,7 @@ final class NativeMapView {
 
     private native void nativeAddSource(long mNativeMapViewPtr, String id, Source source);
 
-    private native void nativeRemoveSource(long mNativeMapViewPtr, String sourceId);
+    private native void nativeRemoveSource(long mNativeMapViewPtr, String sourceId) throws NoSuchSourceException;
 
     private native long nativeUpdatePolygon(long nativeMapViewPtr, long polygonId, Polygon polygon);
 

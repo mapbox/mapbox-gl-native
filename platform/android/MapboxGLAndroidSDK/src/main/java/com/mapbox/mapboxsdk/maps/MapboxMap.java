@@ -43,6 +43,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
+import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.commons.geojson.Feature;
 
@@ -157,7 +158,7 @@ public class MapboxMap {
     }
 
     @UiThread
-    public void removeSource(@NonNull String sourceId) {
+    public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
         getMapView().getNativeMapView().removeSource(sourceId);
     }
 
