@@ -38,6 +38,7 @@
 #import "NSException+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 #import "NSColor+MGLAdditions.hpp"
+#import "NSURL+MGLAdditions.h"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -543,11 +544,7 @@ public:
         styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
     }
     
-    if (![styleURL scheme]) {
-        // Assume a relative path into the application’s resource folder.
-        styleURL = [NSURL URLWithString:[@"asset://" stringByAppendingString:styleURL.absoluteString]];
-    }
-    
+    styleURL = styleURL.mgl_URLByStandardizingScheme;
     _mbglMap->setStyleURL(styleURL.absoluteString.UTF8String);
 }
 
