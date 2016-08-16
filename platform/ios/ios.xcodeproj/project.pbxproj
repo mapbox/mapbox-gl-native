@@ -820,8 +820,6 @@
 				3534C7941D4BD1D400D874A4 /* MGLStyleAttributeValue_Private.h */,
 				3593E51F1D529C29006D9365 /* MGLStyleAttribute.h */,
 				3593E5201D529C29006D9365 /* MGLStyleAttribute.mm */,
-				3538AA151D541C43008EC33D /* MGLStyleFilter.h */,
-				3538AA161D541C43008EC33D /* MGLStyleFilter.m */,
 			);
 			name = Styling;
 			sourceTree = "<group>";
@@ -1400,7 +1398,6 @@
 				35305D4A1D22AA6A0007D005 /* NSData+MGLAdditions.h in Headers */,
 				359F57461D2FDDA6005217F1 /* MGLUserLocationAnnotationView_Private.h in Headers */,
 				DA8848841CBB033F00AB86E3 /* FABAttributes.h in Headers */,
-				3538AA171D541C43008EC33D /* MGLStyleFilter.h in Headers */,
 				DA8847FD1CBAFA5100AB86E3 /* MGLTilePyramidOfflineRegion.h in Headers */,
 				DA88482F1CBAFA6200AB86E3 /* NSProcessInfo+MGLAdditions.h in Headers */,
 				DA8848601CBAFC2E00AB86E3 /* Mapbox.h in Headers */,
@@ -1481,7 +1478,6 @@
 				DABFB86E1CBE9A0F00D62B32 /* MGLCalloutView.h in Headers */,
 				DABFB8601CBE99E500D62B32 /* MGLMapCamera.h in Headers */,
 				DA737EE21D056A4E005BDA16 /* MGLMapViewDelegate.h in Headers */,
-				3538AA181D541C43008EC33D /* MGLStyleFilter.h in Headers */,
 				DABFB86A1CBE99E500D62B32 /* MGLStyle.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1825,7 +1821,6 @@
 				DA8848541CBAFB9800AB86E3 /* MGLCompactCalloutView.m in Sources */,
 				DA8848251CBAFA6200AB86E3 /* MGLPointAnnotation.m in Sources */,
 				35136D3C1D42272500C20EFD /* MGLCircleStyleLayer.mm in Sources */,
-				3538AA191D541C43008EC33D /* MGLStyleFilter.m in Sources */,
 				350098DE1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.mm in Sources */,
 				3566C7681D4A77BA008152BC /* MGLGeoJSONSource.mm in Sources */,
 				35136D421D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */,
@@ -1889,7 +1884,6 @@
 				DAA4E4291CBB730400178DFB /* NSBundle+MGLAdditions.m in Sources */,
 				DAA4E42E1CBB730400178DFB /* MGLAPIClient.m in Sources */,
 				35136D3D1D42272500C20EFD /* MGLCircleStyleLayer.mm in Sources */,
-				3538AA1A1D541C43008EC33D /* MGLStyleFilter.m in Sources */,
 				350098DF1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.mm in Sources */,
 				3566C7691D4A77BA008152BC /* MGLGeoJSONSource.mm in Sources */,
 				35136D431D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */,
