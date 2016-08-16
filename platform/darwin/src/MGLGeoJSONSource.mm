@@ -12,12 +12,9 @@
 
 @implementation MGLGeoJSONSource
 
-static NSString *MGLGeoJSONSourceType   = @"geojson";
-static NSString *MGLGeoJSONDataKey      = @"data";
-
 - (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url
 {
-    if (self = [super initWithSourceIdentifier:sourceIdentifier sourceType:MGLGeoJSONSourceType]) {
+    if (self = [super initWithSourceIdentifier:sourceIdentifier]) {
         _URL = url;
         if (url.isFileURL) {
             _data = [[NSString alloc] initWithContentsOfURL:url encoding:NSUTF8StringEncoding error:NULL];

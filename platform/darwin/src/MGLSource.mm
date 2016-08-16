@@ -4,10 +4,9 @@
 
 @implementation MGLSource
 
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier sourceType:(NSString *)sourceType {
+- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier {
     if (self = [super init]) {
         _sourceIdentifier = sourceIdentifier;
-        _sourceType = sourceType;
     }
     return self;
 }
