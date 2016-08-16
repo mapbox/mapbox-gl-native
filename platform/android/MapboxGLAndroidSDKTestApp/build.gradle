@@ -110,14 +110,23 @@ checkstyle {
     showViolations true
 }
 
+
+def getAccessKeyDeviceFarm() {
+    return hasProperty('AWS_ACCESS_KEY_ID_DEVICE_FARM') ? AWS_ACCESS_KEY_ID_DEVICE_FARM : ""
+}
+
+def getSecretAccessKeyDeviceFarm() {
+    return hasProperty('AWS_SECRET_ACCESS_KEY_DEVICE_FARM') ? AWS_SECRET_ACCESS_KEY_DEVICE_FARM : ""
+}
+
 devicefarm {
 
     projectName "Mapbox GL Android" // required: Must already exists.
     devicePool "sanity" // optional: Defaults to "Top Devices"
 
     authentication {
-        accessKey AWS_ACCESS_KEY_ID_DEVICE_FARM
-        secretKey AWS_SECRET_ACCESS_KEY_DEVICE_FARM
+        accessKey getAccessKeyDeviceFarm()
+        secretKey getSecretAccessKeyDeviceFarm()
     }
 
     // optional block, radios default to 'on' state, all parameters optional
@@ -129,7 +138,7 @@ devicefarm {
         gps "on"
         nfc "on"
         latitude 47.6204 // default
-        longitude -122.3491 // default
+        longitude - 122.3491 // default
     }
 
     // Instrumentation
@@ -139,6 +148,7 @@ devicefarm {
 
     }
 }
+
 
 android.applicationVariants.all { variant ->
     def name = variant.buildType.name
