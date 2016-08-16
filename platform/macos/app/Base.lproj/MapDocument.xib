@@ -129,7 +129,7 @@
                         <action selector="selectFeatures:" target="-1" id="ikt-CZ-yZT"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Runtime styling" id="qZJ-mM-bLj">
+                <menuItem title="Manipulate Style" id="qZJ-mM-bLj">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="runtimeStyling:" target="-1" id="gN9-lw-fG8"/>

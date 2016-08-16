@@ -203,7 +203,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         @"Start World Tour",
         @"Add Custom Callout Point",
         @"Remove Annotations",
-        @"Runtime Styling",
+        @"Manipulate Style",
         ((_customUserLocationAnnnotationEnabled)
          ? @"Disable Custom User Dot"
          : @"Enable Custom User Dot"),
@@ -479,7 +479,8 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 - (void)styleGeoJSONSource
 {
-    NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
+    NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
     [self.mapView.style addSource:source];
     
