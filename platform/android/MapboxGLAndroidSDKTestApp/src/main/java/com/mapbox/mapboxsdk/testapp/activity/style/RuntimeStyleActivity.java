@@ -39,7 +39,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import static com.mapbox.mapboxsdk.style.layers.Filter.eq;
+import static com.mapbox.mapboxsdk.style.layers.Filter.*;
 import static com.mapbox.mapboxsdk.style.layers.Function.Stop;
 import static com.mapbox.mapboxsdk.style.layers.Function.stop;
 import static com.mapbox.mapboxsdk.style.layers.Function.zoom;
@@ -244,8 +244,8 @@ public class RuntimeStyleActivity extends AppCompatActivity {
                 fillAntialias(true)
         );
 
-        //Only show me parks
-        layer.setFilter(eq("type", "park"));
+        //Only show me parks (except westerpark with stroke-width == 3)
+        layer.setFilter(all(eq("type", "park"), eq("stroke-width", 2)));
 
         mapboxMap.addLayer(layer, "building");
         //layer.setPaintProperty(fillColor(Color.RED)); //XXX But not after the object is attached
