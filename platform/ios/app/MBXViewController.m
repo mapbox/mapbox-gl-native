@@ -4,6 +4,7 @@
 #import "MBXCustomCalloutView.h"
 #import "MBXOfflinePacksTableViewController.h"
 #import "MBXAnnotationView.h"
+#import "MBXUserLocationAnnotationView.h"
 #import "MGLFillStyleLayer.h"
 
 #import <Mapbox/Mapbox.h>
@@ -42,6 +43,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 @property (nonatomic) IBOutlet MGLMapView *mapView;
 @property (nonatomic) NSInteger styleIndex;
 @property (nonatomic) BOOL debugLoggingEnabled;
+@property (nonatomic) BOOL customUserLocationAnnnotationEnabled;
 
 @end
 
@@ -201,7 +203,10 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         @"Start World Tour",
         @"Add Custom Callout Point",
         @"Remove Annotations",
-        @"Runtime styling",
+        @"Runtime Styling",
+        ((_customUserLocationAnnnotationEnabled)
+         ? @"Disable Custom User Dot"
+         : @"Enable Custom User Dot"),
         nil];
 
     if (self.debugLoggingEnabled)
@@ -282,6 +287,12 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 16)
     {
         [self testRuntimeStyling];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 17)
+    {
+        _customUserLocationAnnnotationEnabled = !_customUserLocationAnnnotationEnabled;
+        self.mapView.showsUserLocation = NO;
+        self.mapView.userTrackingMode = MGLUserTrackingModeFollow;
     }
     else if (buttonIndex == actionSheet.numberOfButtons - 2 && self.debugLoggingEnabled)
     {
@@ -697,6 +708,17 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
 {
+    if (annotation == mapView.userLocation)
+    {
+        if (_customUserLocationAnnnotationEnabled)
+        {
+            MBXUserLocationAnnotationView *annotationView = [[MBXUserLocationAnnotationView alloc] initWithFrame:CGRectZero];
+            annotationView.frame = CGRectMake(0, 0, annotationView.intrinsicContentSize.width, annotationView.intrinsicContentSize.height);
+            return annotationView;
+        }
+
+        return nil;
+    }
     // Use GL backed pins for dropped pin annotations
     if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]] || [annotation isKindOfClass:[MBXSpriteBackedAnnotation class]])
     {
