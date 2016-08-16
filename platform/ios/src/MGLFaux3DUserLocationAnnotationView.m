@@ -148,6 +148,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _puckDot.backgroundColor = [[UIColor whiteColor] CGColor];
         _puckDot.shadowColor = [[UIColor blackColor] CGColor];
         _puckDot.shadowOpacity = 0.25;
+        _puckDot.shadowPath = [[UIBezierPath bezierPathWithOvalInRect:_puckDot.bounds] CGPath];
 
         if (self.mapView.camera.pitch)
         {
@@ -291,6 +292,13 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         if (accuracyRingSize > MGLUserLocationAnnotationDotSize + 15)
         {
             _accuracyRingLayer.hidden = NO;
+
+            // disable implicit animation of the accuracy ring, unless triggered by a change in accuracy
+            id shouldDisableActions = (_oldHorizontalAccuracy == self.userLocation.location.horizontalAccuracy) ? (id)kCFBooleanTrue : (id)kCFBooleanFalse;
+
+            [CATransaction begin];
+            [CATransaction setValue:shouldDisableActions forKey:kCATransactionDisableActions];
+
             _accuracyRingLayer.bounds = CGRectMake(0, 0, accuracyRingSize, accuracyRingSize);
             _accuracyRingLayer.cornerRadius = accuracyRingSize / 2;
 
@@ -298,6 +306,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
             _haloLayer.bounds = _accuracyRingLayer.bounds;
             _haloLayer.cornerRadius = _accuracyRingLayer.cornerRadius;
             _haloLayer.shouldRasterize = NO;
+
+            [CATransaction commit];
         }
         else
         {
@@ -365,6 +375,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _dotBorderLayer.backgroundColor = [[UIColor whiteColor] CGColor];
         _dotBorderLayer.shadowColor = [[UIColor blackColor] CGColor];
         _dotBorderLayer.shadowOpacity = 0.25;
+        _dotBorderLayer.shadowPath = [[UIBezierPath bezierPathWithOvalInRect:_dotBorderLayer.bounds] CGPath];
 
         if (self.mapView.camera.pitch)
         {
@@ -385,7 +396,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     {
         _dotLayer = [self circleLayerWithSize:MGLUserLocationAnnotationDotSize * 0.75];
         _dotLayer.backgroundColor = [self.mapView.tintColor CGColor];
-        _dotLayer.shouldRasterize = NO;
 
         // set defaults for the animations
         CAAnimationGroup *animationGroup = [self loopingAnimationGroupWithDuration:1.5];
