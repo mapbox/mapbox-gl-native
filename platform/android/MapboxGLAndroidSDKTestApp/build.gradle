@@ -1,6 +1,7 @@
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
 apply plugin: 'checkstyle'
+apply plugin: 'devicefarm'
 
 task accessToken {
     def tokenFile = new File("MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml")
@@ -108,6 +109,46 @@ checkstyle {
     configFile project.file('../checks.xml')
     showViolations true
 }
+
+
+def getAccessKeyDeviceFarm() {
+    return hasProperty('AWS_ACCESS_KEY_ID_DEVICE_FARM') ? AWS_ACCESS_KEY_ID_DEVICE_FARM : ""
+}
+
+def getSecretAccessKeyDeviceFarm() {
+    return hasProperty('AWS_SECRET_ACCESS_KEY_DEVICE_FARM') ? AWS_SECRET_ACCESS_KEY_DEVICE_FARM : ""
+}
+
+devicefarm {
+
+    projectName "Mapbox GL Android" // required: Must already exists.
+    devicePool "sanity" // optional: Defaults to "Top Devices"
+
+    authentication {
+        accessKey getAccessKeyDeviceFarm()
+        secretKey getSecretAccessKeyDeviceFarm()
+    }
+
+    // optional block, radios default to 'on' state, all parameters optional
+    devicestate {
+        ///extraDataZipFile file("path/to/zip") // or ‘null’ if you have no extra data. Default is null.
+        //auxiliaryApps files(file("path/to/app"), file("path/to/app2")) // or ‘files()’ if you have no auxiliary apps. Default is an empty list.
+        wifi "on"
+        bluetooth "off"
+        gps "on"
+        nfc "on"
+        latitude 47.6204 // default
+        longitude - 122.3491 // default
+    }
+
+    // Instrumentation
+    // optional filter "my-filter"
+    // See AWS Developer docs
+    instrumentation {
+
+    }
+}
+
 
 android.applicationVariants.all { variant ->
     def name = variant.buildType.name

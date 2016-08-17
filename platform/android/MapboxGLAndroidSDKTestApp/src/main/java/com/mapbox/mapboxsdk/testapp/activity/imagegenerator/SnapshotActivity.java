@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.imagegenerator;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -12,15 +11,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
-public class SnapshotActivity extends AppCompatActivity {
+public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
 
     private MapView mapView;
+    private MapboxMap mapboxMap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,28 +39,31 @@ public class SnapshotActivity extends AppCompatActivity {
 
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
+        mapView.getMapAsync(this);
+    }
+
+    @Override
+    public void onMapReady(MapboxMap map) {
+        mapboxMap = map;
+        mapboxMap.setStyleUrl(Style.OUTDOORS);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        if (fab != null) {
+            fab.setColorFilter(ContextCompat.getColor(SnapshotActivity.this, R.color.primary));
+            fab.setOnClickListener(this);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        final long startTime = System.nanoTime();
+        mapboxMap.snapshot(new MapboxMap.SnapshotReadyCallback() {
             @Override
-            public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-                mapboxMap.setStyleUrl(Style.OUTDOORS);
-                FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-                fab.setColorFilter(ContextCompat.getColor(SnapshotActivity.this, R.color.primary));
-                fab.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        final long startTime = System.nanoTime();
-                        mapboxMap.snapshot(new MapboxMap.SnapshotReadyCallback() {
-                            @Override
-                            public void onSnapshotReady(Bitmap snapshot) {
-                                long endTime = System.nanoTime();
-                                long duration = (long) ((endTime - startTime) / 1e6);
-                                ImageView snapshotView = (ImageView) findViewById(R.id.imageView);
-                                snapshotView.setImageBitmap(snapshot);
-                                Toast.makeText(SnapshotActivity.this, String.format("Snapshot taken in %d ms", duration), Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                });
+            public void onSnapshotReady(Bitmap snapshot) {
+                long endTime = System.nanoTime();
+                long duration = (long) ((endTime - startTime) / 1e6);
+                ImageView snapshotView = (ImageView) findViewById(R.id.imageView);
+                snapshotView.setImageBitmap(snapshot);
+                Toast.makeText(SnapshotActivity.this, String.format("Snapshot taken in %d ms", duration), Toast.LENGTH_LONG).show();
             }
         });
     }

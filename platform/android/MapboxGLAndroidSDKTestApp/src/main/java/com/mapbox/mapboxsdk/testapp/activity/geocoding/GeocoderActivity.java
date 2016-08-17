@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.geocoding;
 
 import android.graphics.PointF;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
@@ -14,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -34,13 +34,14 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
-public class GeocoderActivity extends AppCompatActivity {
+public class GeocoderActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String LOG_TAG = "GeocoderActivity";
 
+    private MapboxMap mapboxMap;
     private MapView mapView;
+    private ImageView dropPinView;
     private TextView textView;
 
     @Override
@@ -64,34 +65,34 @@ public class GeocoderActivity extends AppCompatActivity {
         mapView.setStyleUrl(Style.MAPBOX_STREETS);
         mapView.onCreate(savedInstanceState);
 
-        final ImageView dropPinView = new ImageView(this);
+        dropPinView = new ImageView(this);
         dropPinView.setImageResource(R.drawable.ic_droppin_24dp);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
         dropPinView.setLayoutParams(params);
         mapView.addView(dropPinView);
+        mapView.getMapAsync(this);
+    }
 
-        mapView.getMapAsync(new OnMapReadyCallback() {
+    @Override
+    public void onMapReady(MapboxMap map) {
+        mapboxMap = map;
+        final Projection projection = mapboxMap.getProjection();
+        final int width = mapView.getMeasuredWidth();
+        final int height = mapView.getMeasuredHeight();
+
+        // Click listener
+        mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
             @Override
-            public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-                final Projection projection = mapboxMap.getProjection();
-                final int width = mapView.getMeasuredWidth();
-                final int height = mapView.getMeasuredHeight();
+            public void onMapClick(@NonNull LatLng point) {
+                PointF centerPoint = new PointF(width / 2, (height + dropPinView.getHeight()) / 2);
+                LatLng centerLatLng = new LatLng(projection.fromScreenLocation(centerPoint));
 
-                // Click listener
-                mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
-                    @Override
-                    public void onMapClick(@NonNull LatLng point) {
-                        PointF centerPoint = new PointF(width / 2, (height + dropPinView.getHeight()) / 2);
-                        LatLng centerLatLng = new LatLng(projection.fromScreenLocation(centerPoint));
+                setMessage("Geocoding...");
 
-                        setMessage("Geocoding...");
+                mapboxMap.removeAnnotations();
+                mapboxMap.addMarker(new MarkerOptions().position(centerLatLng));
 
-                        mapboxMap.removeAnnotations();
-                        mapboxMap.addMarker(new MarkerOptions().position(centerLatLng));
-
-                        geocode(centerLatLng);
-                    }
-                });
+                geocode(centerLatLng);
             }
         });
     }

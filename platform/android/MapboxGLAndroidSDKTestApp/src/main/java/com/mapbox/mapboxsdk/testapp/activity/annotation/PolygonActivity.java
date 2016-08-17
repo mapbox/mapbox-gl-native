@@ -23,7 +23,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PolygonActivity extends AppCompatActivity {
+public class PolygonActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final int BLUE_COLOR = Color.parseColor("#3bb2d0");
     private static final int RED_COLOR = Color.parseColor("#AF0000");
@@ -52,6 +52,7 @@ public class PolygonActivity extends AppCompatActivity {
     }};
 
     private MapView mapView;
+    private MapboxMap mapboxMap;
     private Polygon polygon;
 
     private boolean fullAlpha = true;
@@ -85,19 +86,21 @@ public class PolygonActivity extends AppCompatActivity {
 
         // create map
         mapView = new MapView(this, options);
+        mapView.setId(R.id.mapView);
         mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(MapboxMap mapboxMap) {
-                POINTS.addAll(ADDITIONAL_POINTS);
-                polygon = mapboxMap.addPolygon(new PolygonOptions()
-                        .addAll(POINTS)
-                        .fillColor(BLUE_COLOR));
-            }
-        });
+        mapView.getMapAsync(this);
 
         // add to layout
         ((ViewGroup) findViewById(R.id.container)).addView(mapView);
+    }
+
+    @Override
+    public void onMapReady(MapboxMap mapboxMap) {
+        this.mapboxMap = mapboxMap;
+        POINTS.addAll(ADDITIONAL_POINTS);
+        polygon = mapboxMap.addPolygon(new PolygonOptions()
+                .addAll(POINTS)
+                .fillColor(BLUE_COLOR));
     }
 
     @Override

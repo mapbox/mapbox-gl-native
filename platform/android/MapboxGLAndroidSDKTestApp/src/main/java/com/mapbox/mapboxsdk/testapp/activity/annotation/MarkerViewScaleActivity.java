@@ -21,10 +21,11 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.Locale;
 
-public class MarkerViewScaleActivity extends AppCompatActivity {
+public class MarkerViewScaleActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private MapView mMapView;
-    private View mMarkerView;
+    private MapboxMap mapboxMap;
+    private MapView mapView;
+    private View markerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,22 +45,23 @@ public class MarkerViewScaleActivity extends AppCompatActivity {
         TextView xText = (TextView) findViewById(R.id.textview_factor);
         xBar.setOnSeekBarChangeListener(new FactorChangeListener(xText));
 
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(MapboxMap mapboxMap) {
-                Icon icon = IconFactory.getInstance(MarkerViewScaleActivity.this)
-                        .fromResource(R.drawable.ic_circle);
+        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
+    }
 
-                MarkerView mMarker = mapboxMap.addMarker(new MarkerViewOptions()
-                        .position(new LatLng(38.907192, -77.036871))
-                        .icon(icon)
-                        .flat(true));
+    @Override
+    public void onMapReady(MapboxMap map) {
+        mapboxMap = map;
+        Icon icon = IconFactory.getInstance(MarkerViewScaleActivity.this)
+                .fromResource(R.drawable.ic_circle);
 
-                mMarkerView = mapboxMap.getMarkerViewManager().getView(mMarker);
-            }
-        });
+        MarkerView mMarker = mapboxMap.addMarker(new MarkerViewOptions()
+                .position(new LatLng(38.907192, -77.036871))
+                .icon(icon)
+                .flat(true));
+
+        markerView = mapboxMap.getMarkerViewManager().getView(mMarker);
     }
 
     @Override
@@ -76,31 +78,31 @@ public class MarkerViewScaleActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.onResume();
+        mapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        mapView.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mMapView.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        mapView.onLowMemory();
     }
 
     private class FactorChangeListener implements SeekBar.OnSeekBarChangeListener {
@@ -115,10 +117,9 @@ public class MarkerViewScaleActivity extends AppCompatActivity {
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             float newScale = getScale(progress);
             xText.setText(String.format(Locale.US, "Scale: %.1f", newScale));
-            if (MarkerViewScaleActivity.this.mMarkerView != null) {
-                mMarkerView.setScaleX(newScale);
-                mMarkerView.setScaleY(newScale);
-
+            if (MarkerViewScaleActivity.this.markerView != null) {
+                markerView.setScaleX(newScale);
+                markerView.setScaleY(newScale);
             }
         }
 

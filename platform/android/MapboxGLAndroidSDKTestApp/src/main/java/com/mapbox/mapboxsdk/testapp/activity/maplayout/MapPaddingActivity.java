@@ -22,7 +22,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 public class MapPaddingActivity extends AppCompatActivity {
 
     private MapView mMapView;
-    private MapboxMap mMapboxMap;
+    private MapboxMap mapboxMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public class MapPaddingActivity extends AppCompatActivity {
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                mMapboxMap = mapboxMap;
+                MapPaddingActivity.this.mapboxMap = mapboxMap;
 
                 int paddingLeft = (int) getResources().getDimension(R.dimen.map_padding_left);
                 int paddingBottom = (int) getResources().getDimension(R.dimen.map_padding_bottom);
@@ -96,9 +96,9 @@ public class MapPaddingActivity extends AppCompatActivity {
     private void toggleGps(boolean enable) {
         try {
             // Enable user location
-            mMapboxMap.setMyLocationEnabled(enable);
+            mapboxMap.setMyLocationEnabled(enable);
 
-            TrackingSettings trackingSettings = mMapboxMap.getTrackingSettings();
+            TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
             trackingSettings.setDismissTrackingOnGesture(false);
             trackingSettings.setMyLocationTrackingMode(enable ? MyLocationTracking.TRACKING_FOLLOW : MyLocationTracking.TRACKING_NONE);
         } catch (SecurityException e) {
@@ -118,8 +118,8 @@ public class MapPaddingActivity extends AppCompatActivity {
                 .tilt(45)
                 .build();
 
-        mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        mMapboxMap.addMarker(new MarkerOptions().title("Center map").position(bangalore));
+        mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        mapboxMap.addMarker(new MarkerOptions().title("Center map").position(bangalore));
     }
 
     @Override
@@ -130,13 +130,13 @@ public class MapPaddingActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_user_tracking:
-                if (mMapboxMap != null) {
+                if (mapboxMap != null) {
                     toggleGps(true);
                 }
                 return true;
 
             case R.id.action_bangalore:
-                if (mMapboxMap != null) {
+                if (mapboxMap != null) {
                     moveToBangalore();
                 }
                 return true;

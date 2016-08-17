@@ -22,16 +22,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:paddingBottom="8dp"
-                android:textSize="20sp"
+                android:text="Move the map by x/y pixels"
                 android:textColor="#FFFFFF"
-                android:text="Move the map by x/y pixels" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/textview_x"
-                android:layout_alignBottom="@+id/seekbar_move_x"
-                android:layout_below="@id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/seekbar_move_x"
+                android:layout_below="@id/title"
                 android:text="X: 0000" />
 
             <SeekBar
@@ -56,8 +56,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/seekbar_move_x"
                 android:layout_marginBottom="8dp"
-                android:layout_marginTop="16dp"
                 android:layout_marginLeft="56dp"
+                android:layout_marginTop="16dp"
                 android:max="50"
                 android:progress="0" />
 
@@ -77,13 +77,13 @@
             android:layout_height="match_parent">
 
             <com.mapbox.mapboxsdk.maps.MapView
-                android:id="@+id/mapView"
+                android:id="@id/mapView"
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 app:center_latitude="37.176546"
                 app:center_longitude="-3.599007"
                 app:style_url="@string/style_emerald"
-                app:zoom="15"
-                android:layout_height="match_parent" />
+                app:zoom="15" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"

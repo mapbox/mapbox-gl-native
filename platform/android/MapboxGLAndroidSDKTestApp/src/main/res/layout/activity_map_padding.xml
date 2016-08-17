@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/mapView"
+        android:id="@id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -27,7 +27,6 @@
         android:alpha="0.5"
         android:background="@color/mapbox_blue" />
 
-
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -40,8 +39,8 @@
         android:layout_width="@dimen/map_padding_right"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:alpha="0.5"
         android:layout_marginTop="?attr/actionBarSize"
+        android:alpha="0.5"
         android:background="@color/mapbox_blue" />
 
 </FrameLayout>

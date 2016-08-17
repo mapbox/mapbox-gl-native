@@ -40,7 +40,7 @@ public class PolylineActivity extends AppCompatActivity {
     private List<Polyline> mPolylines;
     private ArrayList<PolylineOptions> mPolylineOptions = new ArrayList<>();
     private MapView mMapView;
-    private MapboxMap mMapboxMap;
+    private MapboxMap mapboxMap;
 
     private boolean fullAlpha = true;
     private boolean visible = true;
@@ -72,7 +72,7 @@ public class PolylineActivity extends AppCompatActivity {
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                mMapboxMap = mapboxMap;
+                PolylineActivity.this.mapboxMap = mapboxMap;
                 mPolylines = mapboxMap.addPolylines(mPolylineOptions);
             }
         });
@@ -82,19 +82,19 @@ public class PolylineActivity extends AppCompatActivity {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mMapboxMap != null) {
+                    if (mapboxMap != null) {
                         if (mPolylines != null && mPolylines.size() > 0) {
                             if (mPolylines.size() == 1) {
                                 // test for removing annotation
-                                mMapboxMap.removeAnnotation(mPolylines.get(0));
+                                mapboxMap.removeAnnotation(mPolylines.get(0));
                             } else {
                                 // test for removing annotations
-                                mMapboxMap.removeAnnotations(mPolylines);
+                                mapboxMap.removeAnnotations(mPolylines);
                             }
                         }
                         mPolylineOptions.clear();
                         mPolylineOptions.addAll(getRandomLine());
-                        mPolylines = mMapboxMap.addPolylines(mPolylineOptions);
+                        mPolylines = mapboxMap.addPolylines(mPolylineOptions);
 
                     }
                 }
@@ -172,7 +172,7 @@ public class PolylineActivity extends AppCompatActivity {
             case R.id.action_id_remove:
                 // test to remove all annotations
                 mPolylineOptions.clear();
-                mMapboxMap.clear();
+                mapboxMap.clear();
                 return true;
 
             case R.id.action_id_alpha:

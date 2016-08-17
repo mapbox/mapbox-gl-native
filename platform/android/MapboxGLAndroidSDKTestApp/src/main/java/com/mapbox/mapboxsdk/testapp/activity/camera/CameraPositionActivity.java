@@ -30,6 +30,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 public class CameraPositionActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private MapView mapView;
+    private MapboxMap mapboxMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,7 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
 
     @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+        this.mapboxMap = mapboxMap;
         // add a listener to FAB
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setColorFilter(ContextCompat.getColor(CameraPositionActivity.this, R.color.primary));

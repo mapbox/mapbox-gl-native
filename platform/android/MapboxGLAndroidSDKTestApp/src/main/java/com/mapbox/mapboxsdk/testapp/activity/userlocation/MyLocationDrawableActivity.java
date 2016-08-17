@@ -7,7 +7,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.UiThread;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -17,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -70,6 +68,7 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
         mapboxMapOptions.myLocationAccuracyAlpha(155);
 
         mapView = new MapView(this, mapboxMapOptions);
+        mapView.setId(R.id.mapView);
         ViewGroup parent = (ViewGroup) findViewById(R.id.container);
         parent.addView(mapView);
 
@@ -102,7 +101,7 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
             Location location = mapboxMap.getMyLocation();
             if (location != null) {
                 onLocationChanged(location);
-            }else{
+            } else {
                 LocationServices.getLocationServices(this).addLocationListener(this);
             }
         } else {

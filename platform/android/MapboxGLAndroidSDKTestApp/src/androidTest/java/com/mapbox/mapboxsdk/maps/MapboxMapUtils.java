@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
 /**
- * Utility class to fetch a MapboxMap instance by bypassing package visibility
+ * Utility class to bypass package visibility
  */
 public class MapboxMapUtils {
 

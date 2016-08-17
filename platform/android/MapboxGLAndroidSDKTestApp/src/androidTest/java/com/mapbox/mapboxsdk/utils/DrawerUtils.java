@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.activity.utils;
+package com.mapbox.mapboxsdk.utils;
 
 import android.support.annotation.StringRes;
 import android.support.test.espresso.Espresso;

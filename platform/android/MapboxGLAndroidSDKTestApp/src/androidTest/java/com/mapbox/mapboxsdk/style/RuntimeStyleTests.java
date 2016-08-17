@@ -10,8 +10,7 @@ import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
-import com.mapbox.mapboxsdk.activity.BaseTest;
-import com.mapbox.mapboxsdk.activity.utils.OnMapReadyIdlingResource;
+import com.mapbox.mapboxsdk.utils.OnMapReadyIdlingResource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
 

@@ -464,6 +464,10 @@ apackage:
 style-code-android:
 	node platform/android/scripts/generate-style-code.js
 
+.PHONY: android-generate-test
+android-generate-test:
+	node platform/android/scripts/generate-test-code.js
+
 #### Miscellaneous targets #####################################################
 
 .PHONY: style-code

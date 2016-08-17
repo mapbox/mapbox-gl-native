@@ -13,20 +13,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CityStateMarker;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CityStateMarkerOptions;
-import com.mapbox.mapboxsdk.maps.MapView;
 
 public class InfoWindowAdapterActivity extends AppCompatActivity {
 
     private MapView mapView;
+    private MapboxMap mapboxMap;
     private IconFactory iconFactory;
     private Drawable iconDrawable;
 
@@ -51,14 +52,15 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                addMarkers(mapboxMap);
-                addCustomInfoWindowAdapter(mapboxMap);
+            public void onMapReady(@NonNull MapboxMap map) {
+                mapboxMap = map;
+                addMarkers();
+                addCustomInfoWindowAdapter();
             }
         });
     }
 
-    private void addMarkers(MapboxMap mapboxMap){
+    private void addMarkers() {
         mapboxMap.addMarker(generateCityStateMarker("Andorra", 42.505777, 1.52529, "#F44336"));
         mapboxMap.addMarker(generateCityStateMarker("Luxembourg", 49.815273, 6.129583, "#3F51B5"));
         mapboxMap.addMarker(generateCityStateMarker("Monaco", 43.738418, 7.424616, "#673AB7"));
@@ -79,7 +81,7 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         return marker;
     }
 
-    private void addCustomInfoWindowAdapter(MapboxMap mapboxMap){
+    private void addCustomInfoWindowAdapter() {
         mapboxMap.setInfoWindowAdapter(new MapboxMap.InfoWindowAdapter() {
 
             private int tenDp = (int) getResources().getDimension(R.dimen.attr_margin);
