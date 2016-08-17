@@ -70,6 +70,25 @@ void align(Shaping &shaping, const float justify, const float horizontalAlign,
         glyph.y += shiftY;
     }
 }
+    
+void reverse(std::vector<PositionedGlyph> &positionedGlyphs, const std::map<uint32_t, SDFGlyph> &sdfs, const float horizontalAlign, const uint32_t maxLineLength) {
+    auto first = positionedGlyphs.begin()->glyph;
+    auto last = positionedGlyphs.end()->glyph;
+    if ((first >= 0x600 && first <= 0x6ff) /* Arabic */
+        || (first >= 0x750 && first <= 0x77f) /* Arabic Supplement */
+        || (first >= 0x8a0 && first <= 0x8ff) /* Arabic Extended-A */
+        || (first >= 0x590 && first <= 0x5ff) /* Hebrew */
+        || (first >= 0x700 && first <= 0x74f) /* Syriac */
+        || (first >= 0x780 && first <= 0x7bf) /* Thaana */) {
+        for (auto& glyph : positionedGlyphs) {
+            glyph.x *= -1;
+            auto it = sdfs.find(glyph.glyph);
+            if (it != sdfs.end()) {
+                glyph.x -= it->second.metrics.advance;
+            }
+        }
+    }
+}
 
 void justifyLine(std::vector<PositionedGlyph> &positionedGlyphs, const std::map<uint32_t, SDFGlyph> &sdfs, uint32_t start,
                  uint32_t end, float justify) {
@@ -159,6 +178,7 @@ void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, const float ma
 
     justifyLine(positionedGlyphs, sdfs, lineStartIndex, uint32_t(positionedGlyphs.size()) - 1, justify);
     align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight, line, translate);
+    reverse(positionedGlyphs, sdfs, horizontalAlign, maxLineLength);
 
     // Calculate the bounding box
     shaping.top += -verticalAlign * height;
