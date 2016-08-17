@@ -1,6 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
