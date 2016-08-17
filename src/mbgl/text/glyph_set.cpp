@@ -70,21 +70,81 @@ void align(Shaping &shaping, const float justify, const float horizontalAlign,
         glyph.y += shiftY;
     }
 }
-    
-void reverse(std::vector<PositionedGlyph> &positionedGlyphs, const std::map<uint32_t, SDFGlyph> &sdfs, const float horizontalAlign, const uint32_t maxLineLength) {
-    auto first = positionedGlyphs.begin()->glyph;
-    auto last = positionedGlyphs.end()->glyph;
-    if ((first >= 0x600 && first <= 0x6ff) /* Arabic */
-        || (first >= 0x750 && first <= 0x77f) /* Arabic Supplement */
-        || (first >= 0x8a0 && first <= 0x8ff) /* Arabic Extended-A */
-        || (first >= 0x590 && first <= 0x5ff) /* Hebrew */
-        || (first >= 0x700 && first <= 0x74f) /* Syriac */
-        || (first >= 0x780 && first <= 0x7bf) /* Thaana */) {
+
+// Returns true if the glyph is a strong right-to-left glyph.
+bool isRTL(uint32_t glyph) {
+    // Use the major RTL Unicode code blocks as a rough approximation.
+    return ((glyph >= 0x600 && glyph <= 0x6ff) /* Arabic */
+            || (glyph >= 0x750 && glyph <= 0x77f) /* Arabic Supplement */
+            || (glyph >= 0x8a0 && glyph <= 0x8ff) /* Arabic Extended-A */
+            || (glyph >= 0x590 && glyph <= 0x5ff) /* Hebrew */
+            || (glyph >= 0x700 && glyph <= 0x74f) /* Syriac */
+            || (glyph >= 0x780 && glyph <= 0x7bf) /* Thaana */);
+}
+
+// Reverse the string to right-to-left orientation if necessary.
+void reverse(std::vector<PositionedGlyph> &positionedGlyphs, const std::map<uint32_t, SDFGlyph> &sdfs) {
+    size_t numRTLChars = 0;
+    for (auto& positionedGlyph : positionedGlyphs) {
+        auto glyph = positionedGlyph.glyph;
+        if (isRTL(glyph)) {
+            numRTLChars++;
+        }
+    }
+    // Treat the entire string as right-to-left if most characters are strong right-to-left characters.
+    bool isMostlyRTL = numRTLChars >= static_cast<float>(positionedGlyphs.size()) / 2.0f;
+    if (isMostlyRTL) {
+        // Reverse the entire string.
         for (auto& glyph : positionedGlyphs) {
             glyph.x *= -1;
             auto it = sdfs.find(glyph.glyph);
             if (it != sdfs.end()) {
                 glyph.x -= it->second.metrics.advance;
+            }
+        }
+        // For bilingual labels, unreverse short spans of LTR text in predominantly RTL strings.
+        for (auto start = positionedGlyphs.begin(), end = start; end != positionedGlyphs.end(); ++end) {
+            if (start != end && (isRTL(end->glyph) || end->y != (end - 1)->y)) {
+                // End of LTR run or line wrap.
+                auto left = (end - 1)->x;
+                auto right = start->x;
+                auto leftSDF = sdfs.find((end - 1)->glyph);
+                if (leftSDF != sdfs.end()) {
+                    right -= leftSDF->second.metrics.advance;
+                }
+                for (; start != end; ++start) {
+                    start->x = left + right - start->x;
+                    auto sdf = sdfs.find(start->glyph);
+                    if (sdf != sdfs.end()) {
+                        start->x += sdf->second.metrics.advance;
+                    }
+                }
+                ++start;
+            } else if (isRTL(end->glyph)) {
+                ++start;
+            }
+        }
+    } else {
+        // For bilingual labels, reverse short spans of RTL text in predominantly LTR strings.
+        for (auto start = positionedGlyphs.begin(), end = start; end != positionedGlyphs.end(); ++end) {
+            if (start != end && (!isRTL(end->glyph) || end->y != (end - 1)->y)) {
+                // End of RTL run or line wrap.
+                auto left = start->x;
+                auto right = (end - 1)->x;
+                auto rightSDF = sdfs.find((end - 1)->glyph);
+                if (rightSDF != sdfs.end()) {
+                    right += rightSDF->second.metrics.advance;
+                }
+                for (; start != end; ++start) {
+                    start->x = left + right - start->x;
+                    auto sdf = sdfs.find(start->glyph);
+                    if (sdf != sdfs.end()) {
+                        start->x -= sdf->second.metrics.advance;
+                    }
+                }
+                ++start;
+            } else if (!isRTL(end->glyph)) {
+                ++start;
             }
         }
     }
@@ -178,7 +238,7 @@ void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, const float ma
 
     justifyLine(positionedGlyphs, sdfs, lineStartIndex, uint32_t(positionedGlyphs.size()) - 1, justify);
     align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight, line, translate);
-    reverse(positionedGlyphs, sdfs, horizontalAlign, maxLineLength);
+    reverse(positionedGlyphs, sdfs);
 
     // Calculate the bounding box
     shaping.top += -verticalAlign * height;
