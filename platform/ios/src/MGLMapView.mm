@@ -2534,11 +2534,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if ( ! [self viewportWouldChangeWithCamera:camera]) return completion();
 
     self.userTrackingMode = MGLUserTrackingModeNone;
+
     _mbglMap->cancelTransitions();
-    if ([self.camera isEqual:camera])
-    {
-        return;
-    }
 
     mbgl::CameraOptions cameraOptions = [self cameraOptionsForAnimatingToCamera:camera edgePadding:self.contentInset];
     mbgl::AnimationOptions animationOptions;
