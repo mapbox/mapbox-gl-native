@@ -34,6 +34,18 @@
     return self;
 }
 
+<% if (type !== 'background' && type !== 'raster') { -%>
+- (void)setPredicate:(NSPredicate *)predicate
+{
+    self.layer->setFilter(predicate.mgl_filter);
+}
+
+- (NSPredicate *)predicate
+{
+    return [NSPredicate mgl_predicateWithFilter:self.layer->getFilter()];
+}
+
+<% } -%>
 <% if (layoutProperties.length) { -%>
 #pragma mark - Accessing the Layout Attributes
 

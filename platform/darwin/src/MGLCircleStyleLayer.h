@@ -18,6 +18,14 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
 
 @interface MGLCircleStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
 
+/**
+ A predicate that corresponds to the layer's <a href='https://www.mapbox.com/mapbox-gl-style-spec/#types-filter'>filter</a>.
+ 
+ The predicate's left expression must be a string that identifies a feature
+ property, or one of the special keys.
+ */
+@property (nonatomic, nullable) NSPredicate *predicate;
+
 #pragma mark - Accessing the Paint Attributes
 
 /**

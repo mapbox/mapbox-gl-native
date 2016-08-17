@@ -3,6 +3,7 @@
 #import "MGLPointAnnotation.h"
 #import "MGLPolyline.h"
 #import "MGLPolygon.h"
+#import "MGLValueEvaluator.h"
 
 #import "MGLMultiPoint_Private.h"
 
@@ -113,51 +114,7 @@
 
 @end
 
-/**
- Recursively transforms a C++ type into the corresponding Foundation type.
- */
-class PropertyValueEvaluator {
-public:
-    id operator()(const mbgl::NullValue &) const {
-        return [NSNull null];
-    }
-    
-    id operator()(const bool &value) const {
-        return value ? @YES : @NO;
-    }
-    
-    id operator()(const uint64_t &value) const {
-        return @(value);
-    }
-    
-    id operator()(const int64_t &value) const {
-        return @(value);
-    }
-    
-    id operator()(const double &value) const {
-        return @(value);
-    }
-    
-    id operator()(const std::string &value) const {
-        return @(value.c_str());
-    }
-    
-    id operator()(const std::vector<mbgl::Value> &values) const {
-        NSMutableArray *objects = [NSMutableArray arrayWithCapacity:values.size()];
-        for (const auto &v : values) {
-            [objects addObject:mbgl::Value::visit(v, *this)];
-        }
-        return objects;
-    }
-    
-    id operator()(const std::unordered_map<std::string, mbgl::Value> &items) const {
-        NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithCapacity:items.size()];
-        for (auto &item : items) {
-            attributes[@(item.first.c_str())] = mbgl::Value::visit(item.second, *this);
-        }
-        return attributes;
-    }
-};
+
 
 /**
  Transforms an `mbgl::geometry::geometry` type into an instance of the
@@ -253,14 +210,14 @@ NS_ARRAY_OF(MGLShape <MGLFeature> *) *MGLFeaturesFromMBGLFeatures(const std::vec
         NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithCapacity:feature.properties.size()];
         for (auto &pair : feature.properties) {
             auto &value = pair.second;
-            PropertyValueEvaluator evaluator;
+            ValueEvaluator evaluator;
             attributes[@(pair.first.c_str())] = mbgl::Value::visit(value, evaluator);
         }
         
         GeometryEvaluator<double> evaluator;
         MGLShape <MGLFeaturePrivate> *shape = mapbox::geometry::geometry<double>::visit(feature.geometry, evaluator);
         if (feature.id) {
-            shape.identifier = mbgl::FeatureIdentifier::visit(*feature.id, PropertyValueEvaluator());
+            shape.identifier = mbgl::FeatureIdentifier::visit(*feature.id, ValueEvaluator());
         }
         shape.attributes = attributes;
         [shapes addObject:shape];

@@ -162,7 +162,7 @@
         "fill": "#555555",
         "fill-opacity": 0.5,
         "name": "Jordaan",
-        "type": "neighborhood",
+        "type": "neighbourhood",
         "description": "The Jordan was originally a working-class neighbourhood, and has now become a more upscale neighborhood. It is home to many art galleries, particularly for modern art, and is also dotted with speciality shops and restaurants. Markets are held regularly at Noordermarkt, the Westerstraat and Lindengracht."
       },
       "geometry": {
@@ -214,7 +214,7 @@
         "fill": "#555555",
         "fill-opacity": 0.5,
         "name": "Prinseneiland",
-        "type": "neighborhood",
+        "type": "neighbourhood",
         "description": "Between 1610 and 1615 Prinseneiland was built as an extension of the harbor. Until the end of the 19th century this was an area with many wharfs, little industries and warehouses, related to the shipping trades. After the second World war the desolated area was discovered by many artists, who established their homes and studios in the vacant buildings. During the second half of the 20th century the old warehouses were transformed into apartments one after another, and new apartments were built. Nevertheless a lot of the atmosphere of the glorious past is still present in the old buildings and wooden drawbridges."
       },
       "geometry": {

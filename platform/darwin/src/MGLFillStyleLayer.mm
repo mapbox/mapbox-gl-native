@@ -29,6 +29,16 @@
     return self;
 }
 
+- (void)setPredicate:(NSPredicate *)predicate
+{
+    self.layer->setFilter(predicate.mgl_filter);
+}
+
+- (NSPredicate *)predicate
+{
+    return [NSPredicate mgl_predicateWithFilter:self.layer->getFilter()];
+}
+
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setFillAntialias:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillAntialias {

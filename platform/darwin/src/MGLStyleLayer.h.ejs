@@ -35,6 +35,16 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 <% } -%>
 @interface MGL<%- camelize(type) %>StyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
 
+<% if (type !== 'background' && type !== 'raster') { -%>
+/**
+ A predicate that corresponds to the layer's <a href='https://www.mapbox.com/mapbox-gl-style-spec/#types-filter'>filter</a>.
+ 
+ The predicate's left expression must be a string that identifies a feature
+ property, or one of the special keys.
+ */
+@property (nonatomic, nullable) NSPredicate *predicate;
+
+<% } -%>
 <% if (layoutProperties.length) { -%>
 #pragma mark - Accessing the Layout Attributes
 
@@ -53,6 +63,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 
 <% } -%>
 <% } -%>
+<% if (paintProperties.length) { -%>
 #pragma mark - Accessing the Paint Attributes
 
 <% for (const property of paintProperties) { -%>
@@ -68,6 +79,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
  */
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
 
+<% } -%>
 <% } -%>
 @end
 
