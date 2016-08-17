@@ -6,6 +6,8 @@ This document explains how to build the Mapbox iOS SDK from source. It is intend
 
 The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. The SDK is intended to run on iOS 7.0 and above, while iosapp is intended to run on iOS 8.0 and above due to the use of a dynamic framework. Both require Xcode on a computer running macOS.
 
+The Mapbox iOS SDK requires Xcode 7.3 or higher.
+
 ## Building the SDK
 
 Make sure that you have the [core dependencies](../../INSTALL.md) installed.
@@ -83,6 +85,7 @@ To add an Objective-C class, protocol, category, typedef, enumeration, or global
 To add an Objective-C header or implementation file to the iOS SDK:
 
 1. Add the file to the Headers or Compile Sources build phase, as appropriate, of both the “dynamic” and “static” targets. You can either use the Build Phases tab of the project editor or the Target Membership section of the File inspector.
+1. Audit new headers for nullability. Typically, you will wrap a header with `NS_ASSUME_NONNULL_BEGIN` and `NS_ASSUME_NONNULL_END`.
 1. _(Optional.)_ If it’s a public header, change its visibility from Project to Public and import it in [the iOS SDK’s umbrella header](./src/Mapbox.h).
 1. _(Optional.)_ If the file would also be used by the macOS SDK, make sure it’s in [platform/darwin/src/](../darwin/src/), then consult [the companion macOS document](../macos/DEVELOPING.md#adding-a-source-code-file) for further instructions.
 

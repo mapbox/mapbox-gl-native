@@ -2,16 +2,6 @@
 
 #pragma once
 
-#if !__has_feature(nullability)
-    #define NS_ASSUME_NONNULL_BEGIN
-    #define NS_ASSUME_NONNULL_END
-    #define nullable
-    #define nonnull
-    #define null_resettable
-    #define _Nullable
-    #define _Nonnull
-#endif
-
 #if TARGET_OS_IPHONE
 @class UIColor;
 #define MGLColor UIColor

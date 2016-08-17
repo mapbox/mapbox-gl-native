@@ -5,8 +5,6 @@
 #import "MGLPointAnnotation.h"
 #import "MGLShapeCollection.h"
 
-#import "MGLTypes.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**

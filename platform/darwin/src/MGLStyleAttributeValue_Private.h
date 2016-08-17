@@ -1,6 +1,5 @@
 #import <Foundation/Foundation.h>
 
-#import "MGLTypes.h"
 #import "MGLStyleAttributeFunction_Private.h"
 
 #include <array>

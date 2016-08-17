@@ -3,6 +3,8 @@
 #import "MGLStyleAttributeValue_Private.h"
 #import "MGLStyleAttributeFunction_Private.h"
 
+#import "MGLTypes.h"
+
 @interface MGLStyleAttribute()
 @end
 

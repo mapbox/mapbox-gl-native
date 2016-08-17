@@ -1,8 +1,8 @@
 #import <Foundation/Foundation.h>
 
-#import "MGLTypes.h"
-
 #import "MGLStyleLayer.h"
+
+#import "MGLTypes.h"
 
 @class MGLSource;
 

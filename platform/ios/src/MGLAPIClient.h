@@ -3,10 +3,14 @@
 #import "MGLMapboxEvents.h"
 #import "MGLTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface MGLAPIClient : NSObject <NSURLSessionDelegate>
 
-- (void)postEvents:(nonnull NS_ARRAY_OF(MGLMapboxEventAttributes *) *)events completionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler;
-- (void)postEvent:(nonnull MGLMapboxEventAttributes *)event completionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler;
+- (void)postEvents:(NS_ARRAY_OF(MGLMapboxEventAttributes *) *)events completionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler;
+- (void)postEvent:(MGLMapboxEventAttributes *)event completionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler;
 - (void)cancelAll;
 
 @end
+
+NS_ASSUME_NONNULL_END

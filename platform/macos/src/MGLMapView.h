@@ -1,6 +1,7 @@
 #import <Cocoa/Cocoa.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLTypes.h"
 #import "MGLGeometry.h"
 
 NS_ASSUME_NONNULL_BEGIN
