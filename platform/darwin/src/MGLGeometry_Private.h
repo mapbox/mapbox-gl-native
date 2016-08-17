@@ -34,6 +34,16 @@ NS_INLINE mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBo
                                     MGLLatLngFromLocationCoordinate2D(coordinateBounds.ne));
 }
 
+NS_INLINE CLLocationCoordinate2D* MGLLocationCoordinatesFromCoordinateBounds(MGLCoordinateBounds coordinateBounds) {
+    CLLocationCoordinate2D coordinates[] = {
+        {coordinateBounds.ne.latitude, coordinateBounds.sw.longitude},
+        coordinateBounds.sw,
+        {coordinateBounds.sw.latitude, coordinateBounds.ne.longitude},
+        coordinateBounds.ne,
+    };
+    return coordinates;
+}
+
 #if TARGET_OS_IPHONE
 NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(UIEdgeInsets insets) {
     return { insets.top, insets.left, insets.bottom, insets.right };

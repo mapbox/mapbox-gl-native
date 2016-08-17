@@ -2341,12 +2341,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                                     edgePadding:insets
                                                       direction:self.direction]) return;
 
-    CLLocationCoordinate2D coordinates[] = {
-        {bounds.ne.latitude, bounds.sw.longitude},
-        bounds.sw,
-        {bounds.sw.latitude, bounds.ne.longitude},
-        bounds.ne,
-    };
+    CLLocationCoordinate2D *coordinates = MGLLocationCoordinatesFromCoordinateBounds(bounds);
+
     [self setVisibleCoordinates:coordinates
                           count:sizeof(coordinates) / sizeof(coordinates[0])
                     edgePadding:insets
@@ -2359,12 +2355,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                                     edgePadding:insets
                                                       direction:direction]) return;
 
-    CLLocationCoordinate2D coordinates[] = {
-        {bounds.ne.latitude, bounds.sw.longitude},
-        bounds.sw,
-        {bounds.sw.latitude, bounds.ne.longitude},
-        bounds.ne,
-    };
+    CLLocationCoordinate2D *coordinates = MGLLocationCoordinatesFromCoordinateBounds(bounds);
+
     [self setVisibleCoordinates:coordinates
                           count:sizeof(coordinates) / sizeof(coordinates[0])
                     edgePadding:insets
@@ -2793,12 +2785,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (BOOL)viewportWouldChangeWithVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction
 {
-    CLLocationCoordinate2D coordinates[] = {
-        {bounds.ne.latitude, bounds.sw.longitude},
-        bounds.sw,
-        {bounds.sw.latitude, bounds.ne.longitude},
-        bounds.ne,
-    };
+    CLLocationCoordinate2D *coordinates = MGLLocationCoordinatesFromCoordinateBounds(bounds);
 
     const mbgl::CameraOptions cameraOptions = [self cameraOptionsForVisibleCoordinates:coordinates
                                                                                  count:sizeof(coordinates) / sizeof(coordinates[0])
