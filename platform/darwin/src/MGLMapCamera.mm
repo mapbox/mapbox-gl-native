@@ -98,28 +98,26 @@
             NSStringFromClass([self class]), (void *)self, _centerCoordinate.latitude, _centerCoordinate.longitude, _altitude, _heading, _pitch];
 }
 
-- (BOOL)isEqual:(id)other
+- (BOOL)isEqual:(id)otherCamera
 {
-    if ( ! [other isKindOfClass:[self class]])
-    {
-        return NO;
-    }
-    if (other == self)
-    {
-        return YES;
-    }
-    
-    MGLMapCamera *otherCamera = other;
-    return (_centerCoordinate.latitude == otherCamera.centerCoordinate.latitude
-            && _centerCoordinate.longitude == otherCamera.centerCoordinate.longitude
-            && _altitude == otherCamera.altitude
-            && _pitch == otherCamera.pitch && _heading == otherCamera.heading);
+    NSAssert([otherCamera isKindOfClass:[self class]], @"must compare two cameras");
+
+    return (otherCamera == self || self.hash == ((MGLMapCamera *)otherCamera).hash);
 }
 
 - (NSUInteger)hash
 {
-    return (@(_centerCoordinate.latitude).hash + @(_centerCoordinate.longitude).hash
-            + @(_altitude).hash + @(_pitch).hash + @(_heading).hash);
+    //
+    // We round here to six decimal places to account for float precision
+    // in roundtripping of camera & viewport values.
+    //
+    CGFloat factor = 1e6;
+
+    return (@(roundf(_centerCoordinate.latitude  * factor) / factor).hash +
+            @(roundf(_centerCoordinate.longitude * factor) / factor).hash +
+            @(roundf(_altitude * factor) / factor).hash +
+            @(roundf(_pitch * factor) / factor).hash +
+            @(roundf(_heading * factor) / factor).hash);
 }
 
 @end
