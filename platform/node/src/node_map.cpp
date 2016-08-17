@@ -30,6 +30,7 @@ struct NodeMap::RenderOptions {
     unsigned int height = 512;
     std::vector<std::string> classes;
     mbgl::MapDebugOptions debugOptions = mbgl::MapDebugOptions::NoDebug;
+    std::string id;
 };
 
 Nan::Persistent<v8::Function> NodeMap::constructor;
@@ -299,6 +300,10 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
         }
     }
 
+    if (Nan::Has(obj, Nan::New("id").ToLocalChecked()).FromJust()) {
+        options.id = std::string { *Nan::Utf8String(Nan::Get(obj, Nan::New("id").ToLocalChecked()).ToLocalChecked()) };
+    }
+
     return options;
 }
 
@@ -339,6 +344,8 @@ void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     auto options = ParseOptions(Nan::To<v8::Object>(info[0]).ToLocalChecked());
+
+    if (options.id.length()) nodeMap->id = options.id;
 
     assert(!nodeMap->callback);
     assert(!nodeMap->image.data);
@@ -765,6 +772,7 @@ std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resou
 
     Nan::Set(instance, Nan::New("url").ToLocalChecked(), Nan::New(resource.url).ToLocalChecked());
     Nan::Set(instance, Nan::New("kind").ToLocalChecked(), Nan::New<v8::Integer>(resource.kind));
+    Nan::Set(instance, Nan::New("id").ToLocalChecked(), Nan::New(this->id).ToLocalChecked());
 
     auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(instance);
     request->Execute();
