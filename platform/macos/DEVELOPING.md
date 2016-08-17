@@ -12,7 +12,7 @@ The Mapbox macOS SDK requires Xcode 7.3 or above.
 
 1. [Install core dependencies](../../INSTALL.md).
 1. Run `make xproj`.
-1. Switch to the “dynamic” or “macosapp” scheme. The former builds just the Cocoa framework, while the latter also builds a Cocoa demo application based on it.
+1. Switch to the “dynamic (macos project)” or “macOS app” scheme. The former builds just the Cocoa framework, while the latter also builds a Cocoa demo application based on it.
 
 ### Packaging builds
 

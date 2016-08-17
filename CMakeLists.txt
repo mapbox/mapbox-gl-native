@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.1)
-project(mbgl LANGUAGES CXX C)
+
+if(NOT MBGL_PROJECT_NAME)
+    set(MBGL_PROJECT_NAME mbgl)
+endif()
+
+project(${MBGL_PROJECT_NAME} LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD 14)
 
 include(cmake/mbgl.cmake)

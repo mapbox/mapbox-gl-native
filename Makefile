@@ -59,7 +59,7 @@ ifeq ($(HOST_PLATFORM), macos)
 export PATH := $(shell pwd)/platform/macos:$(PATH)
 
 MACOS_OUTPUT_PATH = build/macos
-MACOS_PROJ_PATH = $(MACOS_OUTPUT_PATH)/mbgl.xcodeproj
+MACOS_PROJ_PATH = $(MACOS_OUTPUT_PATH)/mbgl-macos.xcodeproj
 MACOS_WORK_PATH = platform/macos/macos.xcworkspace
 MACOS_USER_DATA_PATH = $(MACOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 MACOS_COMPDB_PATH = $(MACOS_OUTPUT_PATH)/compdb/$(BUILDTYPE)
@@ -76,23 +76,23 @@ MACOS_XCSCHEMES += platform/macos/scripts/node.xcscheme
 
 $(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(MACOS_XCSCHEMES)
 	mkdir -p $(MACOS_OUTPUT_PATH)
-	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode ../..)
+	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode -DMBGL_PROJECT_NAME=mbgl-macos ../..)
 
 	@# Create Xcode schemes so that we can use xcodebuild from the command line. CMake doesn't
 	@# create these automatically.
-	SCHEME_NAME=mbgl-test SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME=mbgl-benchmark SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME=mbgl-render SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME=mbgl-offline SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME=mbgl-glfw SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME=mbgl-core SCHEME_TYPE=library BUILDABLE_NAME=libmbgl-core.a BLUEPRINT_NAME=mbgl-core platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME=mbgl-node SCHEME_TYPE=library BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_PROJ_PATH) SCHEME_NAME="macOS unit tests" SCHEME_TYPE=executable BLUEPRINT_NAME=mbgl-test BUILDABLE_NAME=mbgl-test platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_PROJ_PATH) SCHEME_NAME="macOS benchmark" SCHEME_TYPE=executable BLUEPRINT_NAME=mbgl-benchmark BUILDABLE_NAME=mbgl-benchmark platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_PROJ_PATH) SCHEME_NAME="macOS render" SCHEME_TYPE=executable BLUEPRINT_NAME=mbgl-render BUILDABLE_NAME=mbgl-render platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_PROJ_PATH) SCHEME_NAME="macOS offline" SCHEME_TYPE=executable BLUEPRINT_NAME=mbgl-offline BUILDABLE_NAME=mbgl-offline platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_PROJ_PATH) SCHEME_NAME="macOS GLFW app" SCHEME_TYPE=executable BLUEPRINT_NAME=mbgl-glfw BUILDABLE_NAME=mbgl-glfw platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_PROJ_PATH) SCHEME_NAME="macOS core library" SCHEME_TYPE=library BLUEPRINT_NAME=mbgl-core BUILDABLE_NAME=libmbgl-core.a BLUEPRINT_NAME=mbgl-core platform/macos/scripts/create_scheme.sh
 
 	@# Create schemes for running node tests. These have all of the environment variables set to
 	@# launch in the correct location.
-	SCHEME_NAME="node tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="`npm bin tape`/tape platform/node/test/js/**/*.test.js" platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME="node render tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="platform/node/test/render.test.js" platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME="node query tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="platform/node/test/query.test.js" platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_PROJ_PATH) SCHEME_NAME="node module" SCHEME_TYPE=library BLUEPRINT_NAME=mbgl-node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_PROJ_PATH) SCHEME_NAME="node tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="`npm bin tape`/tape platform/node/test/js/**/*.test.js" platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_PROJ_PATH) SCHEME_NAME="node render tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="platform/node/test/render.test.js" platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_PROJ_PATH) SCHEME_NAME="node query tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="platform/node/test/query.test.js" platform/macos/scripts/create_scheme.sh
 
 $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/macos/WorkspaceSettings.xcsettings
 	mkdir -p "$(MACOS_USER_DATA_PATH)"
@@ -100,15 +100,11 @@ $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/macos/WorkspaceSe
 
 .PHONY: macos
 macos: $(MACOS_PROJ_PATH)
-	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'CI' build $(XCPRETTY)
-
-.PHONY: xproj
-xproj: $(MACOS_PROJ_PATH)
-	open $(MACOS_WORK_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'macOS CI' build $(XCPRETTY)
 
 .PHONY: test
 test: $(MACOS_PROJ_PATH)
-	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-test' build $(XCPRETTY)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'macOS unit tests' build $(XCPRETTY)
 
 .PHONY: benchmark
 benchmark: $(MACOS_PROJ_PATH)
@@ -120,7 +116,7 @@ run-test: run-test-*
 run-test-%: test
 	ulimit -c unlimited && ($(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-test --gtest_catch_exceptions=0 --gtest_filter=$* & pid=$$! && wait $$pid \
 	  || (lldb -c /cores/core.$$pid --batch --one-line 'thread backtrace all' --one-line 'quit' && exit 1))
-	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'CI' test $(XCPRETTY)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'macOS CI' test $(XCPRETTY)
 
 .PHONY: run-benchmark
 run-benchmark: run-benchmark-.
@@ -130,7 +126,7 @@ run-benchmark-%: benchmark
 
 .PHONY: glfw-app
 glfw-app: $(MACOS_PROJ_PATH)
-	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-glfw' build $(XCPRETTY)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'macOS GLFW app' build $(XCPRETTY)
 
 .PHONY: run-glfw-app
 run-glfw-app: glfw-app
@@ -138,15 +134,15 @@ run-glfw-app: glfw-app
 
 .PHONY: render
 render: $(MACOS_PROJ_PATH)
-	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-render' build $(XCPRETTY)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'macOS render' build $(XCPRETTY)
 
 .PHONY: offline
 offline: $(MACOS_PROJ_PATH)
-	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-offline' build $(XCPRETTY)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'macOS offline' build $(XCPRETTY)
 
 .PHONY: node
 node: $(MACOS_PROJ_PATH)
-	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-node' build $(XCPRETTY)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'node module' build $(XCPRETTY)
 
 .PHONY: macos-test
 macos-test: $(MACOS_PROJ_PATH)
@@ -191,46 +187,35 @@ tidy: compdb
 check: compdb
 	scripts/clang-tools.sh $(MACOS_COMPDB_PATH) --diff
 
-endif
-
 #### iOS targets ##############################################################
 
-ifeq ($(HOST_PLATFORM), macos)
-
 IOS_OUTPUT_PATH = build/ios
-IOS_PROJ_PATH = $(IOS_OUTPUT_PATH)/mbgl.xcodeproj
-IOS_WORK_PATH = platform/ios/ios.xcworkspace
-IOS_USER_DATA_PATH = $(IOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
+IOS_PROJ_PATH = $(IOS_OUTPUT_PATH)/mbgl-ios.xcodeproj
 
 IOS_XCODEBUILD_SIM = xcodebuild \
 	  ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
 	  -derivedDataPath $(IOS_OUTPUT_PATH) \
 	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
-	  -workspace $(IOS_WORK_PATH)
+	  -workspace $(MACOS_WORK_PATH)
 
-$(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEPS)
+$(IOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(MACOS_XCSCHEMES)
 	mkdir -p $(IOS_OUTPUT_PATH)
 	(cd $(IOS_OUTPUT_PATH) && cmake -G Xcode ../.. \
+		-DMBGL_PROJECT_NAME=mbgl-ios \
 		-DCMAKE_TOOLCHAIN_FILE=../../platform/ios/toolchain.cmake \
 		-DMBGL_PLATFORM=ios \
 		-DMASON_PLATFORM=ios)
 
-$(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/ios/WorkspaceSettings.xcsettings
-	mkdir -p "$(IOS_USER_DATA_PATH)"
-	cp platform/ios/WorkspaceSettings.xcsettings "$@"
+	XCODEPROJ=$(IOS_PROJ_PATH) SCHEME_NAME="iOS core library" SCHEME_TYPE=library BLUEPRINT_NAME=mbgl-core BUILDABLE_NAME=libmbgl-core.a BLUEPRINT_NAME=mbgl-core platform/macos/scripts/create_scheme.sh
 
 .PHONY: ios
 ios: $(IOS_PROJ_PATH)
-	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' build $(XCPRETTY)
-
-.PHONY: iproj
-iproj: $(IOS_PROJ_PATH)
-	open $(IOS_WORK_PATH)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'iOS CI' build $(XCPRETTY)
 
 .PHONY: ios-test
 ios-test: $(IOS_PROJ_PATH)
-	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' test $(XCPRETTY)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'iOS CI' test $(XCPRETTY)
 
 .PHONY: ipackage
 ipackage: $(IOS_PROJ_PATH)
@@ -238,7 +223,7 @@ ipackage: $(IOS_PROJ_PATH)
 	./platform/ios/scripts/package.sh
 
 .PHONY: ipackage-strip
-ipackage-strip: $(IOS_PROJ_PATH)
+ipackage-strip§: $(IOS_PROJ_PATH)
 	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO \
 	./platform/ios/scripts/package.sh
 
@@ -278,6 +263,11 @@ darwin-update-examples:
 .PHONY: check-public-symbols
 check-public-symbols:
 	node platform/darwin/scripts/check-public-symbols.js macOS
+
+.PHONY: xproj
+xproj: $(MACOS_PROJ_PATH) $(IOS_PROJ_PATH)
+	open $(MACOS_WORK_PATH)
+
 endif
 
 #### Linux targets #####################################################
@@ -390,10 +380,11 @@ $(QT_BUILD): $(BUILD_DEPS)
 
 ifeq ($(HOST_PLATFORM), macos)
 
-MACOS_QT_PROJ_PATH = $(QT_ROOT_PATH)/xcode/mbgl.xcodeproj
+MACOS_QT_PROJ_PATH = $(QT_ROOT_PATH)/xcode/mbgl-qt.xcodeproj
 $(MACOS_QT_PROJ_PATH): $(BUILD_DEPS)
 	mkdir -p $(QT_ROOT_PATH)/xcode
 	(cd $(QT_ROOT_PATH)/xcode && cmake -G Xcode ../../.. \
+		-DMBGL_PROJECT_NAME=mbgl-qt \
 		-DMBGL_PLATFORM=qt \
 		-DMASON_PLATFORM=$(MASON_PLATFORM) \
 		-DMASON_PLATFORM_VERSION=$(MASON_PLATFORM_VERSION) \

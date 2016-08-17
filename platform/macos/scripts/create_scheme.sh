@@ -2,7 +2,6 @@
 
 set -u
 
-XCODEPROJ=${XCODEPROJ:-build/macos/mbgl.xcodeproj}
 OUTPUT="${XCODEPROJ}/xcshareddata/xcschemes/${SCHEME_NAME}.xcscheme"
 
 # Required ENV vars:
@@ -23,8 +22,6 @@ fi
 NODE_ARGUMENT=${NODE_ARGUMENT:-}
 MAPBOX_ACCESS_TOKEN=${MAPBOX_ACCESS_TOKEN:-}
 BLUEPRINT_ID=${BLUEPRINT_ID:-$(hexdump -n 12 -v -e '/1 "%02X"' /dev/urandom)}
-BUILDABLE_NAME=${BUILDABLE_NAME:-${SCHEME_NAME}}
-BLUEPRINT_NAME=${BLUEPRINT_NAME:-${SCHEME_NAME}}
 
 mkdir -p "${XCODEPROJ}/xcshareddata/xcschemes"
 

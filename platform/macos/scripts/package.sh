@@ -31,7 +31,7 @@ xcodebuild \
     CURRENT_COMMIT_HASH=${HASH} \
     -derivedDataPath ${DERIVED_DATA} \
     -workspace ./platform/macos/macos.xcworkspace \
-    -scheme dynamic \
+    -scheme 'macOS dynamic framework' \
     -configuration ${BUILDTYPE} \
     -jobs ${JOBS} | xcpretty
 
