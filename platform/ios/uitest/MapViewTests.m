@@ -305,6 +305,34 @@
                                @"setting zoom should take effect");
 }
 
+- (void)testRedundantCameraSet {
+    //
+    // The idea here is that if a camera set is redundant, any completion handler
+    // will be called immediately since the setter should return early. If we setup
+    // an expectation to be fulfilled in that handler, waiting less than the
+    // animation duration should still fulfill it.
+    //
+    MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:CLLocationCoordinate2DMake(45, -122)
+                                                            fromDistance:100
+                                                                   pitch:30
+                                                                 heading:45];
+
+    [tester.mapView setCamera:camera animated:NO];
+
+    [tester waitForTimeInterval:0.25]; // settle
+
+    XCTestExpectation *completionExpectation = [self expectationWithDescription:@"completion handler that should be called immediately upon camera set"];
+
+    [tester.mapView setCamera:camera
+                 withDuration:2
+      animationTimingFunction:nil
+            completionHandler:^{
+                [completionExpectation fulfill];
+            }];
+
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+}
+
 - (void)testMarkerSelection {
     CGPoint point = CGPointMake(100, 100);
     MGLPointAnnotation *marker = [MGLPointAnnotation new];
