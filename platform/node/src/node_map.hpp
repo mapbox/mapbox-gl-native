@@ -60,6 +60,8 @@ public:
     uv_async_t *async;
 
     bool loaded = false;
+
+    std::string id;
 };
 
 }
