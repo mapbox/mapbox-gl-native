@@ -44,6 +44,7 @@ macro(mbgl_platform_test)
     target_sources(mbgl-test
         PRIVATE test/src/main.cpp
         PRIVATE platform/qt/test/headless_view_qt.cpp
+        PRIVATE platform/qt/test/qmapboxgl.cpp
         PRIVATE platform/default/headless_display.cpp
         PRIVATE platform/default/headless_view.cpp
     )
