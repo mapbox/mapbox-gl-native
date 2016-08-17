@@ -893,6 +893,16 @@ IB_DESIGNABLE
 @property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *annotations;
 
 /**
+ The complete list of annotations associated with the receiver that are 
+ currently visible. (read-only)
+ 
+ The objects in this array must adopt the `MGLAnnotation` protocol. If no
+ annotations are associated with the map view or if no annotations associated
+ with the map view are currently visible, the value of this property is `nil`.
+ */
+@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *visibleAnnotations;
+
+/**
  Adds an annotation to the map view.
  
  @note `MGLMultiPolyline`, `MGLMultiPolygon`, and `MGLShapeCollection` objects

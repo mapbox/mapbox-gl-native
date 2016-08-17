@@ -207,6 +207,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         ((_customUserLocationAnnnotationEnabled)
          ? @"Disable Custom User Dot"
          : @"Enable Custom User Dot"),
+        @"Query Annotations",
         nil];
 
     if (self.debugLoggingEnabled)
@@ -293,6 +294,10 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         _customUserLocationAnnnotationEnabled = !_customUserLocationAnnnotationEnabled;
         self.mapView.showsUserLocation = NO;
         self.mapView.userTrackingMode = MGLUserTrackingModeFollow;
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 18)
+    {
+        [self testQueryPointAnnotations];
     }
     else if (buttonIndex == actionSheet.numberOfButtons - 2 && self.debugLoggingEnabled)
     {
@@ -540,6 +545,20 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     roadLayer.visible = YES;
     roadLayer.maximumZoomLevel = 15;
     roadLayer.minimumZoomLevel = 13;
+}
+
+- (void)testQueryPointAnnotations {
+    NSNumber *visibleAnnotationCount = @(self.mapView.visibleAnnotations.count);
+    NSString *message;
+    if ([visibleAnnotationCount integerValue] == 1) {
+        message = [NSString stringWithFormat:@"There is %@ visible annotation.", visibleAnnotationCount];
+    } else {
+        message = [NSString stringWithFormat:@"There are %@ visible annotations.", visibleAnnotationCount];
+    }
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Visible Annotations" message:message preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer *)longPress
