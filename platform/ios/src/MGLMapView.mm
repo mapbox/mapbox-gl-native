@@ -2791,12 +2791,17 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             direction != self.direction);
 }
 
-- (BOOL)viewportWouldChangeWithVisibleCoordinateBounds:(MGLCoordinateBounds)coordinateBounds edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction
+- (BOOL)viewportWouldChangeWithVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction
 {
-    CLLocationCoordinate2D coordinates[] = { coordinateBounds.ne, coordinateBounds.sw };
+    CLLocationCoordinate2D coordinates[] = {
+        {bounds.ne.latitude, bounds.sw.longitude},
+        bounds.sw,
+        {bounds.sw.latitude, bounds.ne.longitude},
+        bounds.ne,
+    };
 
     const mbgl::CameraOptions cameraOptions = [self cameraOptionsForVisibleCoordinates:coordinates
-                                                                                 count:2
+                                                                                 count:sizeof(coordinates) / sizeof(coordinates[0])
                                                                            edgePadding:insets
                                                                              direction:direction];
 
