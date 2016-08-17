@@ -452,7 +452,7 @@ public class MapView extends FrameLayout {
         addOnMapChangedListener(new OnMapChangedListener() {
             @Override
             public void onMapChanged(@MapChange int change) {
-                if (change == WILL_START_RENDERING_MAP && initialLoad) {
+                if (change == DID_FINISH_LOADING_STYLE && initialLoad) {
                     initialLoad = false;
                     reloadIcons();
                     reloadMarkers();
@@ -2866,7 +2866,8 @@ public class MapView extends FrameLayout {
             DID_FINISH_RENDERING_FRAME_FULLY_RENDERED,
             WILL_START_RENDERING_MAP,
             DID_FINISH_RENDERING_MAP,
-            DID_FINISH_RENDERING_MAP_FULLY_RENDERED
+            DID_FINISH_RENDERING_MAP_FULLY_RENDERED,
+            DID_FINISH_LOADING_STYLE
     })
     @Retention(RetentionPolicy.SOURCE)
     public @interface MapChange {
@@ -3016,6 +3017,16 @@ public class MapView extends FrameLayout {
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_RENDERING_MAP_FULLY_RENDERED = 13;
+
+
+    /**
+     * <p>
+     * This {@link MapChange} is triggered when a style is loaded
+     * </p>
+     *
+     * @see MapView.OnMapChangedListener
+     */
+    public static final int DID_FINISH_LOADING_STYLE = 14;
 
     /**
      * Interface definition for a callback to be invoked when the displayed map view changes.
