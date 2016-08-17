@@ -7,6 +7,7 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.utils.MockParcel;
 
 import org.junit.Test;
 
@@ -177,13 +178,12 @@ public class MapboxMapOptionsTest {
         assertEquals(Color.BLUE, new MapboxMapOptions().myLocationBackgroundTintColor(Color.BLUE).getMyLocationBackgroundTintColor());
     }
 
-// Disabled test due to Bitmap parceable issue
-//    @Test
-//    public void testParceable() {
-//        MapboxMapOptions options = new MapboxMapOptions().camera(new CameraPosition.Builder().build()).styleUrl("s").accessToken("a").debugActive(true).compassMargins(new int[]{0, 1, 2, 3});
-//        MapboxMapOptions parceled = (MapboxMapOptions) MockParcel.obtain(options);
-//        assertEquals(options, parceled);
-//    }
+    @Test
+    public void testParceable() {
+        MapboxMapOptions options = new MapboxMapOptions().camera(new CameraPosition.Builder().build()).styleUrl("s").accessToken("a").debugActive(true).compassMargins(new int[]{0, 1, 2, 3});
+        MapboxMapOptions parceled = (MapboxMapOptions) MockParcel.obtain(options);
+        assertEquals(options, parceled);
+    }
 
     @Test
     public void testAccessToken() {

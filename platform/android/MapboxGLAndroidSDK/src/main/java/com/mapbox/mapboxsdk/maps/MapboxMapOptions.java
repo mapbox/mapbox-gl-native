@@ -116,9 +116,20 @@ public class MapboxMapOptions implements Parcelable {
 
         myLocationEnabled = in.readByte() != 0;
 
-        myLocationForegroundDrawable = new BitmapDrawable((Bitmap) in.readParcelable(getClass().getClassLoader()));
-        myLocationForegroundBearingDrawable = new BitmapDrawable((Bitmap) in.readParcelable(getClass().getClassLoader()));
-        myLocationBackgroundDrawable = new BitmapDrawable((Bitmap) in.readParcelable(getClass().getClassLoader()));
+        Bitmap foregroundBitmap = in.readParcelable(getClass().getClassLoader());
+        if (foregroundBitmap != null) {
+            myLocationForegroundDrawable = new BitmapDrawable(foregroundBitmap);
+        }
+
+        Bitmap foregroundBearingBitmap = in.readParcelable(getClass().getClassLoader());
+        if(foregroundBearingBitmap!=null) {
+            myLocationForegroundBearingDrawable = new BitmapDrawable(foregroundBearingBitmap);
+        }
+
+        Bitmap backgroundBitmap = in.readParcelable(getClass().getClassLoader());
+        if(backgroundBitmap!=null){
+            myLocationBackgroundDrawable = new BitmapDrawable(backgroundBitmap);
+        }
 
         myLocationForegroundTintColor = in.readInt();
         myLocationBackgroundTintColor = in.readInt();
@@ -892,9 +903,10 @@ public class MapboxMapOptions implements Parcelable {
         dest.writeByte((byte) (zoomGesturesEnabled ? 1 : 0));
 
         dest.writeByte((byte) (myLocationEnabled ? 1 : 0));
-        dest.writeParcelable(getBitmapFromDrawable(myLocationForegroundDrawable), flags);
-        dest.writeParcelable(getBitmapFromDrawable(myLocationForegroundBearingDrawable), flags);
-        dest.writeParcelable(getBitmapFromDrawable(myLocationBackgroundDrawable), flags);
+
+        dest.writeParcelable(myLocationForegroundDrawable != null ? getBitmapFromDrawable(myLocationForegroundDrawable) : null, flags);
+        dest.writeParcelable(myLocationForegroundBearingDrawable != null ? getBitmapFromDrawable(myLocationForegroundBearingDrawable) : null, flags);
+        dest.writeParcelable(myLocationBackgroundDrawable != null ? getBitmapFromDrawable(myLocationBackgroundDrawable) : null, flags);
         dest.writeInt(myLocationForegroundTintColor);
         dest.writeInt(myLocationBackgroundTintColor);
         dest.writeIntArray(myLocationBackgroundPadding);
@@ -917,6 +929,7 @@ public class MapboxMapOptions implements Parcelable {
         if (compassGravity != options.compassGravity) return false;
         if (logoEnabled != options.logoEnabled) return false;
         if (logoGravity != options.logoGravity) return false;
+        if (attributionTintColor != options.attributionTintColor) return false;
         if (attributionEnabled != options.attributionEnabled) return false;
         if (attributionGravity != options.attributionGravity) return false;
         if (Float.compare(options.minZoom, minZoom) != 0) return false;
@@ -946,6 +959,7 @@ public class MapboxMapOptions implements Parcelable {
             return false;
         if (style != null ? !style.equals(options.style) : options.style != null) return false;
         return accessToken != null ? accessToken.equals(options.accessToken) : options.accessToken == null;
+
     }
 
     @Override
@@ -958,6 +972,7 @@ public class MapboxMapOptions implements Parcelable {
         result = 31 * result + (logoEnabled ? 1 : 0);
         result = 31 * result + logoGravity;
         result = 31 * result + Arrays.hashCode(logoMargins);
+        result = 31 * result + attributionTintColor;
         result = 31 * result + (attributionEnabled ? 1 : 0);
         result = 31 * result + attributionGravity;
         result = 31 * result + Arrays.hashCode(attributionMargins);
