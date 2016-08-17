@@ -1,6 +1,9 @@
 #pragma once
 
-#ifdef __APPLE__
+#if defined(__QT__)
+#define MBGL_USE_QT 1
+class QGLWidget;
+#elif defined(__APPLE__)
 #include <TargetConditionals.h>
 #if TARGET_OS_IOS
 #define MBGL_USE_EAGL 1
@@ -62,6 +65,10 @@ private:
     bool needsResize = false;
     bool extensionsLoaded = false;
     bool active = false;
+
+#if MBGL_USE_QT
+    QGLWidget* glContext = nullptr;
+#endif
 
 #if MBGL_USE_CGL
     CGLContextObj glContext = nullptr;
