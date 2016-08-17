@@ -50,5 +50,10 @@ public:
     Impl* const impl;
 };
 
+template <>
+inline bool Source::is<GeoJSONSource>() const {
+    return type == SourceType::GeoJSON;
+}
+
 } // namespace style
 } // namespace mbgl

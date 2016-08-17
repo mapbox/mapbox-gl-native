@@ -16,5 +16,10 @@ public:
     class Impl;
 };
 
+template <>
+inline bool Source::is<RasterSource>() const {
+    return type == SourceType::Raster;
+}
+
 } // namespace style
 } // namespace mbgl
