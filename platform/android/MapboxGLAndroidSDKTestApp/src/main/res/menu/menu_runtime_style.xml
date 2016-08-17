@@ -23,6 +23,10 @@
         android:title="Add a parks layer"
         mapbox:showAsAction="never" />
     <item
+        android:id="@+id/action_add_dynamic_parks_layer"
+        android:title="Add a dynamic geojson source"
+        mapbox:showAsAction="never" />
+    <item
         android:id="@+id/action_remove_layer"
         android:title="Remove buildings layer"
         mapbox:showAsAction="never" />
