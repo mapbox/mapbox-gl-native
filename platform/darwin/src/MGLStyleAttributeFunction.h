@@ -10,8 +10,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NS_DICTIONARY_OF(NSNumber *, id) *stops;
 
-@property (nonatomic, copy, nullable) NSString *property;
-
 @property (nonatomic, copy, nullable) NSNumber *base;
 
 @end

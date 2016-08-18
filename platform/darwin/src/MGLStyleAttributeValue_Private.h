@@ -17,7 +17,6 @@
 - (mbgl::style::PropertyValue<std::array<float, 4>>)mbgl_paddingPropertyValue;
 - (mbgl::style::PropertyValue<std::vector<std::string> >)mbgl_stringArrayPropertyValue;
 - (mbgl::style::PropertyValue<std::vector<float> >)mbgl_numberArrayPropertyValue;
-- (mbgl::style::PropertyValue<uint8_t>)mbgl_enumPropertyValue;
 
 // Convert mbgl types to darwin types
 - (id <MGLStyleAttributeValue>)mbgl_colorPropertyValueWith:(mbgl::style::PropertyValue<mbgl::Color>)color;

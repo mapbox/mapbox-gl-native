@@ -37,14 +37,6 @@
     return NO;
 }
 
-- (mbgl::style::PropertyValue<uint8_t>)mbgl_enumPropertyValue
-{
-    NSAssert(strcmp(self.objCType, @encode(uint8_t)) == 0, @"Value does not represent a uint8_t");
-    uint8_t value = 0;
-    [self getValue:&value];
-    return mbgl::style::PropertyValue<uint8_t> { value };
-}
-
 - (mbgl::style::PropertyValue<std::array<float, 2>>)mbgl_offsetPropertyValue
 {
     return { self.mgl_offsetArrayValue };
