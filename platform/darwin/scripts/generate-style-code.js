@@ -176,7 +176,7 @@ global.describeValue = function (value, property, layerType) {
                 units = ` ${units}`.replace(/pixel/, 'point');
             }
             if (property.name.indexOf('padding') !== -1) {
-                if (value.reduce((a, b) => a + b, 0) === 0) {
+                if (value[0] === 0 && value[1] === 0 && value[2] === 0 && value[3] === 0) {
                     return '`NSEdgeInsetsZero` or `UIEdgeInsetsZero`';
                 }
                 return `${value[0]}${units} on the top, ${value[3]}${units} on the left, ${value[2]}${units} on the bottom, and ${value[1]}${units} on the right`;
