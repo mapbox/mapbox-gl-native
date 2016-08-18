@@ -145,7 +145,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic) id <MGLStyleAttributeValue> iconOffset;
 
 /**
- Aligns text to the plane of the `viewport` or the `map` when the map is pitched. Matches `text-rotation-alignment` if unspecified.
+ Aligns text to the plane of the `viewport` or the `map` when the map is pitched. Matches `textRotationAlignment` if unspecified.
  */
 @property (nonatomic) id <MGLStyleAttributeValue> textPitchAlignment;
 

@@ -87,6 +87,16 @@ global.testArrayImplementation = function (property) {
     }
 };
 
+global.propertyDoc = function (property, layerType) {
+    let doc = property.doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
+        if (!('values' in property && property.values.indexOf(symbol) !== -1) && str.substr(offset - 4, 3) !== 'CSS') {
+            symbol = camelizeWithLeadingLowercase(symbol);
+        }
+        return '`' + symbol + '`';
+    });
+    return doc;
+};
+
 global.propertyType = function (property, _private) {
     return _private ? `id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>` : `id <MGLStyleAttributeValue>`;
 };

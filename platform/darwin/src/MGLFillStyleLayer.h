@@ -29,7 +29,7 @@ typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
 @property (nonatomic) id <MGLStyleAttributeValue> fillColor;
 
 /**
- The outline color of the fill. Matches the value of `fill-color` if unspecified.
+ The outline color of the fill. Matches the value of `fillColor` if unspecified.
  */
 @property (nonatomic) id <MGLStyleAttributeValue> fillOutlineColor;
 
