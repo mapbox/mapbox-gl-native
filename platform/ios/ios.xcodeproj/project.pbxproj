@@ -72,6 +72,10 @@
 		353933FC1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933FA1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		353933FE1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933FD1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		353933FF1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 353933FD1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		353AFA141D65AB17005A69F4 /* NSDate+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 353AFA121D65AB17005A69F4 /* NSDate+MGLAdditions.h */; };
+		353AFA151D65AB17005A69F4 /* NSDate+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 353AFA121D65AB17005A69F4 /* NSDate+MGLAdditions.h */; };
+		353AFA161D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 353AFA131D65AB17005A69F4 /* NSDate+MGLAdditions.mm */; };
+		353AFA171D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 353AFA131D65AB17005A69F4 /* NSDate+MGLAdditions.mm */; };
 		353BAEF61D646370009A8DA9 /* amsterdam.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 353BAEF51D646370009A8DA9 /* amsterdam.geojson */; };
 		353BAEF71D646370009A8DA9 /* amsterdam.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 353BAEF51D646370009A8DA9 /* amsterdam.geojson */; };
 		353D23961D0B0DFE002BE09D /* MGLAnnotationViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */; };
@@ -488,6 +492,8 @@
 		353933F71D3FB79F003F57D7 /* MGLLineStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLineStyleLayer.h; sourceTree = "<group>"; };
 		353933FA1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLRasterStyleLayer.h; sourceTree = "<group>"; };
 		353933FD1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLSymbolStyleLayer.h; sourceTree = "<group>"; };
+		353AFA121D65AB17005A69F4 /* NSDate+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+MGLAdditions.h"; sourceTree = "<group>"; };
+		353AFA131D65AB17005A69F4 /* NSDate+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSDate+MGLAdditions.mm"; sourceTree = "<group>"; };
 		353BAEF51D646370009A8DA9 /* amsterdam.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = amsterdam.geojson; path = ../../darwin/test/amsterdam.geojson; sourceTree = "<group>"; };
 		353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLAnnotationViewTests.m; sourceTree = "<group>"; };
 		354B83941D2E873E005D9406 /* MGLUserLocationAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationAnnotationView.h; sourceTree = "<group>"; };
@@ -1241,6 +1247,8 @@
 		DAD165831CF4CFED001FF4B9 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				353AFA121D65AB17005A69F4 /* NSDate+MGLAdditions.h */,
+				353AFA131D65AB17005A69F4 /* NSDate+MGLAdditions.mm */,
 				DA8848121CBAFA6200AB86E3 /* NSBundle+MGLAdditions.h */,
 				DA8848131CBAFA6200AB86E3 /* NSBundle+MGLAdditions.m */,
 				35305D461D22AA450007D005 /* NSData+MGLAdditions.h */,
@@ -1325,6 +1333,7 @@
 				404326891D5B9B27007111BD /* MGLAnnotationContainerView_Private.h in Headers */,
 				DA88483B1CBAFB8500AB86E3 /* MGLCalloutView.h in Headers */,
 				35E0CFE61D3E501500188327 /* MGLStyle_Private.h in Headers */,
+				353AFA141D65AB17005A69F4 /* NSDate+MGLAdditions.h in Headers */,
 				DAB4F8301D63DD7600E27738 /* MGLBaseStyleLayer_Private.h in Headers */,
 				3593E5261D529EDC006D9365 /* UIColor+MGLStyleAttributeAdditions_Private.h in Headers */,
 				35599DF01D46F3A60048254D /* MGLStyleAttributeValue.h in Headers */,
@@ -1438,6 +1447,7 @@
 				DABFB8691CBE99E500D62B32 /* MGLShape.h in Headers */,
 				350098CB1D482D9C004B2AF0 /* NSArray+MGLStyleAttributeAdditions.h in Headers */,
 				DABFB8701CBE9A0F00D62B32 /* MGLMapView+IBAdditions.h in Headers */,
+				353AFA151D65AB17005A69F4 /* NSDate+MGLAdditions.h in Headers */,
 				350098D91D4830D5004B2AF0 /* NSString+MGLStyleAttributeAdditions_Private.h in Headers */,
 				35CE61831D4165D9004F2359 /* UIColor+MGLAdditions.h in Headers */,
 				350098B01D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.h in Headers */,
@@ -1849,6 +1859,7 @@
 				DA8848261CBAFA6200AB86E3 /* MGLPolygon.mm in Sources */,
 				DA8848521CBAFB9800AB86E3 /* MGLAPIClient.m in Sources */,
 				DA8848301CBAFA6200AB86E3 /* NSProcessInfo+MGLAdditions.m in Sources */,
+				353AFA161D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */,
 				35D13AC51D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */,
 				DA8848241CBAFA6200AB86E3 /* MGLOfflineStorage.mm in Sources */,
 				DA88482A1CBAFA6200AB86E3 /* MGLTilePyramidOfflineRegion.mm in Sources */,
@@ -1912,6 +1923,7 @@
 				DAA4E4341CBB730400178DFB /* MGLFaux3DUserLocationAnnotationView.m in Sources */,
 				DAA4E4311CBB730400178DFB /* MGLMapboxEvents.m in Sources */,
 				DAA4E4231CBB730400178DFB /* MGLPolygon.mm in Sources */,
+				353AFA171D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */,
 				35D13AC61D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */,
 				DAA4E42A1CBB730400178DFB /* NSProcessInfo+MGLAdditions.m in Sources */,
 				DAA4E4211CBB730400178DFB /* MGLOfflineStorage.mm in Sources */,

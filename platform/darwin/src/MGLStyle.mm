@@ -13,6 +13,8 @@
 #import "MGLStyleLayer_Private.h"
 #import "MGLSource_Private.h"
 
+#import "NSDate+MGLAdditions.h"
+
 #import "MGLSource.h"
 #import "MGLVectorSource.h"
 #import "MGLRasterSource.h"
@@ -125,11 +127,11 @@ static NSURL *MGLStyleURL_emerald;
 
 - (Class)classFromSource:(mbgl::style::Source *)source
 {
-    if (dynamic_cast<mbgl::style::VectorSource *>(source)) {
+    if (source->is<mbgl::style::VectorSource>()) {
         return MGLVectorSource.class;
-    } else if (dynamic_cast<mbgl::style::GeoJSONSource *>(source)) {
+    } else if (source->is<mbgl::style::GeoJSONSource>()) {
         return MGLGeoJSONSource.class;
-    } else if (dynamic_cast<mbgl::style::RasterSource *>(source)) {
+    } else if (source->is<mbgl::style::RasterSource>()) {
         return MGLRasterSource.class;
     }
     
@@ -185,13 +187,12 @@ static NSURL *MGLStyleURL_emerald;
 
 - (NS_ARRAY_OF(NSString *) *)styleClasses
 {
-    NSMutableArray *returnArray = [NSMutableArray array];
-    
     const std::vector<std::string> &appliedClasses = self.mapView.mbglMap->getClasses();
     
-    for (auto class_it = appliedClasses.begin(); class_it != appliedClasses.end(); class_it++)
-    {
-        [returnArray addObject:@(class_it->c_str())];
+    NSMutableArray *returnArray = [NSMutableArray arrayWithCapacity:appliedClasses.size()];
+    
+    for (auto appliedClass : appliedClasses) {
+       [returnArray addObject:@(appliedClass.c_str())];
     }
     
     return returnArray;
@@ -208,7 +209,7 @@ static NSURL *MGLStyleURL_emerald;
     
     for (NSString *appliedClass in appliedClasses)
     {
-        newAppliedClasses.insert(newAppliedClasses.end(), [appliedClass UTF8String]);
+        newAppliedClasses.push_back([appliedClass UTF8String]);
     }
     
     mbgl::style::TransitionOptions transition { { MGLDurationInSeconds(transitionDuration) } };

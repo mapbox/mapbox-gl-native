@@ -34,6 +34,7 @@
 #import <unordered_set>
 
 #import "NSBundle+MGLAdditions.h"
+#import "NSDate+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
@@ -108,11 +109,6 @@ NSImage *MGLDefaultMarkerImage() {
     NSString *path = [[NSBundle mgl_frameworkBundle] pathForResource:MGLDefaultStyleMarkerSymbolName
                                                               ofType:@"pdf"];
     return [[NSImage alloc] initWithContentsOfFile:path];
-}
-
-/// Converts from a duration in seconds to a duration object usable in mbgl.
-mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration) {
-    return std::chrono::duration_cast<mbgl::Duration>(std::chrono::duration<NSTimeInterval>(duration));
 }
 
 /// Converts a media timing function into a unit bezier object usable in mbgl.

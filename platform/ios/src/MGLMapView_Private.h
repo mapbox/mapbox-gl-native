@@ -15,9 +15,6 @@ extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;
 
 - (mbgl::Map *)mbglMap;
 
-/** Converts NSTimeInterval to mbgl::Duration */
-mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration);
-
 /** Returns whether the map view is currently loading or processing any assets required to render the map */
 - (BOOL)isFullyLoaded;
 

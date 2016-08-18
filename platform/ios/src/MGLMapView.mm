@@ -32,6 +32,7 @@
 #import "MGLOfflineStorage_Private.h"
 
 #import "NSBundle+MGLAdditions.h"
+#import "NSDate+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
@@ -292,11 +293,6 @@ public:
 }
 
 #pragma mark - Setup & Teardown -
-
-mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
-{
-    return std::chrono::duration_cast<mbgl::Duration>(std::chrono::duration<NSTimeInterval>(duration));
-}
 
 - (instancetype)initWithFrame:(CGRect)frame
 {

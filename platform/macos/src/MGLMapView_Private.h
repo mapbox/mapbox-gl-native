@@ -22,9 +22,6 @@
 /// Synchronously render a frame of the map.
 - (void)renderSync;
 
-/// Converts NSTimeInterval to mbgl::Duration
-mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration);
-
 - (mbgl::Map *)mbglMap;
 
 @end
