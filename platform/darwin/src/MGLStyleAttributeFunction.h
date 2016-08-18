@@ -8,7 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLStyleAttributeFunction : NSObject <MGLStyleAttributeValue>
 
-@property (nonatomic, copy) NSDictionary<NSNumber *, id> *stops;
+@property (nonatomic, copy) NS_DICTIONARY_OF(NSNumber *, id) *stops;
 
 @property (nonatomic, copy, nullable) NSString *property;
 
