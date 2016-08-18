@@ -37,7 +37,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 @interface MGLStyle : NSObject
 
-#pragma mark Default Style URLs
+#pragma mark Accessing Common Styles
 
 /**
  Returns the URL to version 8 of the
@@ -165,6 +165,8 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
+#pragma mark Accessing Metadata About the Style
+
 /**
  The name of the style.
 
@@ -172,25 +174,40 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 @property (readonly, copy, nullable) NSString *name;
 
-#pragma mark Runtime Styling
+#pragma mark Managing Sources
 
 /**
- Returns a layer that conforms to `MGLStyleLayer` if any layer with the given
- identifier was found.
-
- @return An instance of a concrete subclass of `MGLStyleLayer` associated with
-    the given identifier.
- */
-- (nullable MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier;
-
-
-/**
- Returns a source if any source with the given identifier was found.
+ Returns a source with the given identifier in the current style.
 
  @return An instance of a concrete subclass of `MGLSource` associated with the
-    given identifier.
+    given identifier, or `nil` if the current style contains no such source.
  */
 - (nullable MGLSource *)sourceWithIdentifier:(NSString *)identifier;
+
+/**
+ Adds a new source to the current style.
+ 
+ @param source The source to add to the current style.
+ */
+- (void)addSource:(MGLSource *)source;
+
+/**
+ Removes a source from the current style.
+ 
+ @param source The source to remove from the current style.
+ */
+- (void)removeSource:(MGLSource *)source;
+
+#pragma mark Managing Style Layers
+
+/**
+ Returns a style layer with the given identifier in the current style.
+ 
+ @return An instance of a concrete subclass of `MGLStyleLayer` associated with
+    the given identifier, or `nil` if the current style contains no such style
+    layer.
+ */
+- (nullable MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier;
 
 /**
  Adds a new layer on top of existing layers.
@@ -216,19 +233,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 - (void)removeLayer:(MGLStyleLayer *)layer;
 
-/**
- Adds a new source to the map view.
-
- @param source The source to add to the map view.
- */
-- (void)addSource:(MGLSource *)source;
-
-/**
- Removes a source from the map view.
-
- @param source The source to remove.
- */
-- (void)removeSource:(MGLSource *)source;
+#pragma mark Managing Style Classes
 
 /**
  Currently active style classes, represented as an array of string identifiers.
@@ -258,12 +263,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 - (void)removeStyleClass:(NSString *)styleClass;
 
+#pragma mark Managing a Style’s Images
+
 /**
-Adds or overrides an image used by the style’s layers.
-
-To use an image in a style layer, give it a unique name using this method,
-then set the `iconImage` property of an `MGLSymbolStyleLayer` object to that name.
-
+ Adds or overrides an image used by the style’s layers.
+ 
+ To use an image in a style layer, give it a unique name using this method, then
+ set the `iconImage` property of an `MGLSymbolStyleLayer` object to that name.
+ 
  @param image The image for the name.
  @param name The name of the image to set to the style.
  */
