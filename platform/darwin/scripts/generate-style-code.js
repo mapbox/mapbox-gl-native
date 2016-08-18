@@ -109,6 +109,19 @@ global.propertyDoc = function (property, layerType) {
     return doc.replace(/(p)ixel/gi, '$1oint').replace(/(\d)px\b/g, '$1pt');
 };
 
+global.propertyReqs = function (property, layoutPropertiesByName, type) {
+    return 'This property is only applied to the style if ' + property.requires.map(function (req) {
+        if (typeof req === 'string') {
+            return '`' + camelizeWithLeadingLowercase(req) + '` is non-`nil`';
+        } else if ('!' in req) {
+            return '`' + camelizeWithLeadingLowercase(req['!']) + '` is set to `nil`';
+        } else {
+            let name = Object.keys(req)[0];
+            return '`' + camelizeWithLeadingLowercase(name) + '` is set to ' + describeValue(req[Object.keys(req)[0]], layoutPropertiesByName[name], type);
+        }
+    }).join(', and ') + '. Otherwise, it is ignored.';
+};
+
 global.parseColor = function (str) {
     let m = str.match(/^#(\d\d)(\d\d)(\d\d)$/);
     if (m) {
@@ -131,18 +144,18 @@ global.parseColor = function (str) {
     }
 };
 
-global.propertyDefault = function (property, layerType) {
+global.describeValue = function (value, property, layerType) {
     switch (property.type) {
         case 'boolean':
-            return property.default ? '`YES`' : '`NO`';
+            return value ? '`YES`' : '`NO`';
         case 'number':
         case 'string':
-            return '`' + property.default + '`';
+            return '`' + value + '`';
         case 'enum':
             let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            return '`' + `${objCType}${camelize(property.default)}` + '`';
+            return '`' + `${objCType}${camelize(value)}` + '`';
         case 'color':
-            let color = parseColor(property.default);
+            let color = parseColor(value);
             if (!color) {
                 throw new Error(`unrecognized color format in default value of ${property.name}`);
             }
@@ -153,18 +166,22 @@ global.propertyDefault = function (property, layerType) {
                 units = ` ${units}`.replace(/pixel/, 'point');
             }
             if (property.name.indexOf('padding') !== -1) {
-                //if (property.default.reduce((a, b) => a + b, 0) === 0) {
+                //if (value.reduce((a, b) => a + b, 0) === 0) {
                 //    return '`NSEdgeInsetsZero` or `UIEdgeInsetsZero`';
                 //}
-                return `${property.default[0]}${units} on the top, ${property.default[1]}${units} on the right, ${property.default[2]}${units} on the bottom, and ${property.default[3]}${units} on the left`;
+                return `${value[0]}${units} on the top, ${value[1]}${units} on the right, ${value[2]}${units} on the bottom, and ${value[3]}${units} on the left`;
             }
             if (property.name.indexOf('offset') !== -1 || property.name.indexOf('translate') !== -1) {
-                return `${property.default[0]}${units} from the left and ${property.default[1]}${units} from the top`;
+                return `${value[0]}${units} from the left and ${value[1]}${units} from the top`;
             }
-            return '`' + property.default.join('`, `') + '`';
+            return '`' + value.join('`, `') + '`';
         default:
             throw new Error(`unknown type for ${property.name}`);
     }
+};
+
+global.propertyDefault = function (property, layerType) {
+    return describeValue(property.default, property, layerType);
 };
 
 global.propertyType = function (property, _private) {
@@ -290,6 +307,8 @@ const layers = spec.layer.type.values.map((type) => {
         type: type,
         layoutProperties: layoutProperties,
         paintProperties: paintProperties,
+        layoutPropertiesByName: spec[`layout_${type}`],
+        paintPropertiesByName: spec[`paint_${type}`],
     };
 });
 

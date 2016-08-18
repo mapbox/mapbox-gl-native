@@ -2,6 +2,8 @@
   const type = locals.type;
   const layoutProperties = locals.layoutProperties;
   const paintProperties = locals.paintProperties;
+  const layoutPropertiesByName = locals.layoutPropertiesByName;
+  const paintPropertiesByName = locals.paintPropertiesByName;
 -%>
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
@@ -39,8 +41,10 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 <% for (const property of layoutProperties) { -%>
 /**
  <%- propertyDoc(property, type) %><% if ('default' in property) { %>
-
- The default value of this property is <%= propertyDefault(property, type) %>.<% if (!property.required) { %> Set this property to `nil` to reset it to the default.<% } %><% } %>
+ 
+ The default value of this property is <%= propertyDefault(property, type) %>.<% if (!property.required) { %> Set this property to `nil` to reset it to the default.<% } %><% } %><% if (property.requires) { %>
+ 
+ <%= propertyReqs(property, layoutPropertiesByName, type) %><% } %>
  */
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
 
@@ -51,8 +55,10 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 <% for (const property of paintProperties) { -%>
 /**
  <%- propertyDoc(property, type) %><% if ('default' in property) { %>
-
- The default value of this property is <%= propertyDefault(property, type) %>.<% if (!property.required) { %> Set this property to `nil` to reset it to the default.<% } %><% } %>
+ 
+ The default value of this property is <%= propertyDefault(property, type) %>.<% if (!property.required) { %> Set this property to `nil` to reset it to the default.<% } %><% } %><% if (property.requires) { %>
+ 
+ <%= propertyReqs(property, paintPropertiesByName, type) %><% } %>
  */
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
 
