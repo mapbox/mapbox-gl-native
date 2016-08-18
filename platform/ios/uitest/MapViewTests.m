@@ -319,7 +319,7 @@
 
     [tester.mapView setCamera:camera animated:NO];
 
-    [tester waitForTimeInterval:0.25]; // settle
+    [tester waitForTimeInterval:0.25];
 
     XCTestExpectation *completionExpectation = [self expectationWithDescription:@"completion handler that should be called immediately upon camera set"];
 
