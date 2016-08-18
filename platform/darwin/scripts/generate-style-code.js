@@ -4,8 +4,8 @@ const fs = require('fs');
 const ejs = require('ejs');
 const spec = require('mapbox-gl-style-spec').latest;
 
-var prefix = 'MGL';
-var suffix = 'StyleLayer';
+const prefix = 'MGL';
+const suffix = 'StyleLayer';
 
 global.camelize = function (str) {
     return str.replace(/(?:^|-)(.)/g, function (_, x) {
@@ -30,8 +30,8 @@ global.testImplementation = function (property, layerType) {
         case 'string':
             return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testString;`;
         case 'enum':
-            var objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            var objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
+            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+            let objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
             return `layer.${objCName(property)} = [MGLRuntimeStylingHelper testEnum:${objCEnum} type:@encode(${objCType})];`;    
         case 'color':
             return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testColor;`;
@@ -50,8 +50,8 @@ global.testGetterImplementation = function (property, layerType) {
         case 'string':
             return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testString);`;
         case 'enum':
-            var objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            var objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
+            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+            let objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
             return `XCTAssert([(NSValue *)gLayer.${objCName(property)} objCType] == [[MGLRuntimeStylingHelper testEnum:${objCEnum} type:@encode(${objCType})] objCType]);`;
         case 'color':
             return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testColor);`;
@@ -100,7 +100,7 @@ global.initLayer = function (layerType) {
 }
 
 global.setterImplementation = function(property, layerType) {
-    var implementation = '';
+    let implementation = '';
     switch (property.type) {
         case 'boolean':
             implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_boolPropertyValue);`;
@@ -112,7 +112,7 @@ global.setterImplementation = function(property, layerType) {
             implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_stringPropertyValue);`;
             break;
         case 'enum':
-            var objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
             implementation = `MGLSetEnumProperty(${objCName(property)}, ${camelize(property.name)}, ${mbglType(property)}, ${objCType});`;
             break;
         case 'color':
@@ -128,7 +128,7 @@ global.setterImplementation = function(property, layerType) {
 }
 
 global.mbglType = function(property) {
-    var mbglType = camelize(property.name) + 'Type';
+    let mbglType = camelize(property.name) + 'Type';
     if (/-translate-anchor$/.test(property.name)) {
         mbglType = 'TranslateAnchorType';
     }
@@ -151,7 +151,7 @@ global.getterImplementation = function(property, layerType) {
         case 'string':
             return `return [MGLStyleAttribute mbgl_stringWithPropertyValueString:self.layer->get${camelize(property.name)}()];`
         case 'enum':
-            var objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
             return `MGLGetEnumProperty(${camelize(property.name)}, ${mbglType(property)}, ${objCType});`;
         case 'color':
             return `return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->get${camelize(property.name)}()];`
