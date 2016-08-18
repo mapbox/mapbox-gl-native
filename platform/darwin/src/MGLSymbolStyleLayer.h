@@ -81,6 +81,8 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Distance between two symbol anchors.
 
+ This property is measured in points.
+
  The default value of this property is `250`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> symbolSpacing;
@@ -137,7 +139,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Size of padding area around the text-fit size in clockwise order: top, right, bottom, left.
 
- The default value of this property is 0 on the top, 0 on the right, 0 on the bottom, and 0 on the left. Set this property to `nil` to reset it to the default.
+ This property is measured in points.
+
+ The default value of this property is 0 points on the top, 0 points on the right, 0 points on the bottom, and 0 points on the left. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconTextFitPadding;
 
@@ -149,12 +153,16 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Rotates the icon clockwise.
 
+ This property is measured in degrees.
+
  The default value of this property is `0`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconRotate;
 
 /**
  Size of the additional area around the icon bounding box used for detecting symbol collisions.
+
+ This property is measured in points.
 
  The default value of this property is `2`. Set this property to `nil` to reset it to the default.
  */
@@ -203,12 +211,16 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Font size.
 
+ This property is measured in points.
+
  The default value of this property is `16`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textSize;
 
 /**
  The maximum line width for text wrapping.
+
+ This property is measured in ems.
 
  The default value of this property is `10`. Set this property to `nil` to reset it to the default.
  */
@@ -217,12 +229,16 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Text leading value for multi-line text.
 
+ This property is measured in ems.
+
  The default value of this property is `1.2`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textLineHeight;
 
 /**
  Text tracking amount.
+
+ This property is measured in ems.
 
  The default value of this property is `0`. Set this property to `nil` to reset it to the default.
  */
@@ -245,6 +261,8 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Maximum angle change between adjacent characters.
 
+ This property is measured in degrees.
+
  The default value of this property is `45`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textMaxAngle;
@@ -252,12 +270,16 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Rotates the text clockwise.
 
+ This property is measured in degrees.
+
  The default value of this property is `0`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textRotate;
 
 /**
  Size of the additional area around the text bounding box used for detecting symbol collisions.
+
+ This property is measured in points.
 
  The default value of this property is `2`. Set this property to `nil` to reset it to the default.
  */
@@ -280,7 +302,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Offset distance of text from its anchor. Positive values indicate right and down, while negative values indicate left and up.
 
- The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default.
+ This property is measured in ems.
+
+ The default value of this property is 0 ems from the left and 0 ems from the top. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textOffset;
 
@@ -331,12 +355,16 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Distance of halo to the icon outline.
 
+ This property is measured in points.
+
  The default value of this property is `0`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconHaloWidth;
 
 /**
  Fade out the halo towards the outside.
+
+ This property is measured in points.
 
  The default value of this property is `0`. Set this property to `nil` to reset it to the default.
  */
@@ -345,7 +373,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Distance that the icon's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
 
- The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default.
+ This property is measured in points.
+
+ The default value of this property is 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconTranslate;
 
@@ -380,12 +410,16 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Distance of halo to the font outline. Max text halo width is 1/4 of the font-size.
 
+ This property is measured in points.
+
  The default value of this property is `0`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textHaloWidth;
 
 /**
  The halo's fadeout distance towards the outside.
+
+ This property is measured in points.
 
  The default value of this property is `0`. Set this property to `nil` to reset it to the default.
  */
@@ -394,7 +428,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Distance that the text's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
 
- The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default.
+ This property is measured in points.
+
+ The default value of this property is 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textTranslate;
 

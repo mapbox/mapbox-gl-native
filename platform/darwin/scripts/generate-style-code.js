@@ -98,7 +98,15 @@ global.propertyDoc = function (property, layerType) {
         }
         return '`' + symbol + '`';
     });
-    return doc;
+    if ('units' in property) {
+        if (!property.units.match(/s$/)) {
+            property.units += 's';
+        }
+        doc += `
+
+ This property is measured in ${property.units}.`;
+    }
+    return doc.replace(/(p)ixel/gi, '$1oint').replace(/(\d)px\b/g, '$1pt');
 };
 
 global.parseColor = function (str) {
@@ -140,14 +148,18 @@ global.propertyDefault = function (property, layerType) {
             }
             return 'an `NSColor` or `UIColor`' + `object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
         case 'array':
+            let units = property.units || '';
+            if (units) {
+                units = ` ${units}`.replace(/pixel/, 'point');
+            }
             if (property.name.indexOf('padding') !== -1) {
                 //if (property.default.reduce((a, b) => a + b, 0) === 0) {
                 //    return '`NSEdgeInsetsZero` or `UIEdgeInsetsZero`';
                 //}
-                return `${property.default[0]} on the top, ${property.default[1]} on the right, ${property.default[2]} on the bottom, and ${property.default[3]} on the left`;
+                return `${property.default[0]}${units} on the top, ${property.default[1]}${units} on the right, ${property.default[2]}${units} on the bottom, and ${property.default[3]}${units} on the left`;
             }
             if (property.name.indexOf('offset') !== -1 || property.name.indexOf('translate') !== -1) {
-                return `${property.default[0]} from the left and ${property.default[1]} from the top`;
+                return `${property.default[0]}${units} from the left and ${property.default[1]}${units} from the top`;
             }
             return '`' + property.default.join('`, `') + '`';
         default:

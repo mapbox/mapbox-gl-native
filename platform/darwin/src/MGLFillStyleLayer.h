@@ -23,14 +23,14 @@ typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillAntialias;
 
 /**
- The opacity of the entire fill layer. In contrast to the fill-color, this value will also affect the 1px stroke around the fill, if the stroke is used.
+ The opacity of the entire fill layer. In contrast to the fill-color, this value will also affect the 1pt stroke around the fill, if the stroke is used.
 
  The default value of this property is `1`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillOpacity;
 
 /**
- The color of the filled part of this layer. This color can be specified as rgba with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
+ The color of the filled part of this layer. This color can be specified as rgba with an alpha component and the color's opacity will not affect the opacity of the 1pt stroke, if it is used.
 
  The default value of this property is an `NSColor` or `UIColor`object whose RGB value is 0, 0, 0 and whose alpha value is 1. Set this property to `nil` to reset it to the default.
  */
@@ -44,7 +44,9 @@ typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
 /**
  The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
 
- The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default.
+ This property is measured in points.
+
+ The default value of this property is 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillTranslate;
 

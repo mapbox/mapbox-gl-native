@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Rotates hues around the color wheel.
 
+ This property is measured in degrees.
+
  The default value of this property is `0`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> rasterHueRotate;
@@ -54,6 +56,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Fade duration when a new tile is added.
+
+ This property is measured in milliseconds.
 
  The default value of this property is `300`. Set this property to `nil` to reset it to the default.
  */

@@ -23,6 +23,8 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
 /**
  Circle radius.
 
+ This property is measured in points.
+
  The default value of this property is `5`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleRadius;
@@ -51,7 +53,9 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
 /**
  The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
 
- The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default.
+ This property is measured in points.
+
+ The default value of this property is 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleTranslate;
 

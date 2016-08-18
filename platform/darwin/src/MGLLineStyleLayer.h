@@ -74,7 +74,9 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 /**
  The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
 
- The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default.
+ This property is measured in points.
+
+ The default value of this property is 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineTranslate;
 
@@ -88,12 +90,16 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 /**
  Stroke thickness.
 
+ This property is measured in points.
+
  The default value of this property is `1`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineWidth;
 
 /**
  Draws a line casing outside of a line's actual path. Value indicates the width of the inner gap.
+
+ This property is measured in points.
 
  The default value of this property is `0`. Set this property to `nil` to reset it to the default.
  */
@@ -102,19 +108,25 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 /**
  The line's offset perpendicular to its direction. Values may be positive or negative, where positive indicates "rightwards" (if you were moving in the direction of the line) and negative indicates "leftwards."
 
+ This property is measured in points.
+
  The default value of this property is `0`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineOffset;
 
 /**
- Blur applied to the line, in pixels.
+ Blur applied to the line, in points.
+
+ This property is measured in points.
 
  The default value of this property is `0`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineBlur;
 
 /**
- Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to pixels, multiply the length by the current line width.
+ Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to points, multiply the length by the current line width.
+
+ This property is measured in line widths.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineDasharray;
 
