@@ -18,7 +18,7 @@ typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
 /**
  Whether or not the fill should be antialiased.
 
- The default value of this property is `true`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `YES`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillAntialias;
 
@@ -32,7 +32,7 @@ typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
 /**
  The color of the filled part of this layer. This color can be specified as rgba with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
 
- The default value of this property is `#000000`. Set this property to `nil` to reset it to the default.
+ The default value of this property is an `NSColor` or `UIColor`object whose RGB value is 0, 0, 0 and whose alpha value is 1. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillColor;
 
@@ -44,14 +44,14 @@ typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
 /**
  The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
 
- The default value of this property is `0,0`. Set this property to `nil` to reset it to the default.
+ The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillTranslate;
 
 /**
  Control whether the translation is relative to the map (north) or viewport (screen)
 
- The default value of this property is `map`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLFillStyleLayerFillTranslateAnchorMap`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillTranslateAnchor;
 

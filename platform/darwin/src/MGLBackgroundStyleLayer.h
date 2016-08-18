@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The color with which the background will be drawn.
 
- The default value of this property is `#000000`. Set this property to `nil` to reset it to the default.
+ The default value of this property is an `NSColor` or `UIColor`object whose RGB value is 0, 0, 0 and whose alpha value is 1. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> backgroundColor;
 

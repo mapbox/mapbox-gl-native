@@ -72,9 +72,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 #pragma mark - Accessing the Layout Attributes
 
 /**
- Label placement relative to its geometry. `line` can only be used on LineStrings and Polygons.
+ Label placement relative to its geometry. `MGLSymbolStyleLayerSymbolPlacementLine` can only be used on LineStrings and Polygons.
 
- The default value of this property is `point`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLSymbolStyleLayerSymbolPlacementPoint`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> symbolPlacement;
 
@@ -88,35 +88,35 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  If true, the symbols will not cross tile edges to avoid mutual collisions. Recommended in layers that don't have enough padding in the vector tile to prevent collisions, or if it is a point symbol layer placed after a line symbol layer.
 
- The default value of this property is `false`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `NO`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> symbolAvoidEdges;
 
 /**
  If true, the icon will be visible even if it collides with other previously drawn symbols.
 
- The default value of this property is `false`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `NO`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconAllowOverlap;
 
 /**
  If true, other symbols can be visible even if they collide with the icon.
 
- The default value of this property is `false`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `NO`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconIgnorePlacement;
 
 /**
  If true, text will display without their corresponding icons when the icon collides with other symbols and the text does not.
 
- The default value of this property is `false`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `NO`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconOptional;
 
 /**
  Orientation of icon when map is rotated.
 
- The default value of this property is `viewport`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLSymbolStyleLayerIconRotationAlignmentViewport`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconRotationAlignment;
 
@@ -130,14 +130,14 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Position and scale an icon by the its corresponding text.
 
- The default value of this property is `none`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLSymbolStyleLayerIconTextFitNone`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconTextFit;
 
 /**
  Size of padding area around the text-fit size in clockwise order: top, right, bottom, left.
 
- The default value of this property is `0,0,0,0`. Set this property to `nil` to reset it to the default.
+ The default value of this property is 0 on the top, 0 on the right, 0 on the bottom, and 0 on the left. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconTextFitPadding;
 
@@ -163,26 +163,26 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  If true, the icon may be flipped to prevent it from being rendered upside-down.
 
- The default value of this property is `false`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `NO`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconKeepUpright;
 
 /**
  Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate left and up.
 
- The default value of this property is `0,0`. Set this property to `nil` to reset it to the default.
+ The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconOffset;
 
 /**
- Aligns text to the plane of the `viewport` or the `map` when the map is pitched. Matches `textRotationAlignment` if unspecified.
+ Aligns text to the plane of the `MGLSymbolStyleLayerTextPitchAlignmentViewport` or the `MGLSymbolStyleLayerTextPitchAlignmentMap` when the map is pitched. Matches `textRotationAlignment` if unspecified.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textPitchAlignment;
 
 /**
  Orientation of text when map is rotated.
 
- The default value of this property is `viewport`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLSymbolStyleLayerTextRotationAlignmentViewport`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textRotationAlignment;
 
@@ -196,7 +196,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Font stack to use for displaying text.
 
- The default value of this property is `Open Sans Regular,Arial Unicode MS Regular`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `Open Sans Regular`, `Arial Unicode MS Regular`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textFont;
 
@@ -231,14 +231,14 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Text justification options.
 
- The default value of this property is `center`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLSymbolStyleLayerTextJustifyCenter`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textJustify;
 
 /**
  Part of the text placed closest to the anchor.
 
- The default value of this property is `center`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLSymbolStyleLayerTextAnchorCenter`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textAnchor;
 
@@ -266,42 +266,42 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  If true, the text may be flipped vertically to prevent it from being rendered upside-down.
 
- The default value of this property is `true`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `YES`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textKeepUpright;
 
 /**
  Specifies how to capitalize text, similar to the CSS `text-transform` property.
 
- The default value of this property is `none`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLSymbolStyleLayerTextTransformNone`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textTransform;
 
 /**
  Offset distance of text from its anchor. Positive values indicate right and down, while negative values indicate left and up.
 
- The default value of this property is `0,0`. Set this property to `nil` to reset it to the default.
+ The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textOffset;
 
 /**
  If true, the text will be visible even if it collides with other previously drawn symbols.
 
- The default value of this property is `false`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `NO`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textAllowOverlap;
 
 /**
  If true, other symbols can be visible even if they collide with the text.
 
- The default value of this property is `false`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `NO`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textIgnorePlacement;
 
 /**
  If true, icons will display without their corresponding text when the text collides with other symbols and the icon does not.
 
- The default value of this property is `false`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `NO`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textOptional;
 
@@ -317,14 +317,14 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  The color of the icon. This can only be used with sdf icons.
 
- The default value of this property is `#000000`. Set this property to `nil` to reset it to the default.
+ The default value of this property is an `NSColor` or `UIColor`object whose RGB value is 0, 0, 0 and whose alpha value is 1. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconColor;
 
 /**
  The color of the icon's halo. Icon halos can only be used with sdf icons.
 
- The default value of this property is `rgba(0, 0, 0, 0)`. Set this property to `nil` to reset it to the default.
+ The default value of this property is an `NSColor` or `UIColor`object whose RGB value is 0, 0, 0 and whose alpha value is 0. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconHaloColor;
 
@@ -345,14 +345,14 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Distance that the icon's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
 
- The default value of this property is `0,0`. Set this property to `nil` to reset it to the default.
+ The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconTranslate;
 
 /**
  Control whether the translation is relative to the map (north) or viewport (screen).
 
- The default value of this property is `map`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLSymbolStyleLayerIconTranslateAnchorMap`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconTranslateAnchor;
 
@@ -366,14 +366,14 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  The color with which the text will be drawn.
 
- The default value of this property is `#000000`. Set this property to `nil` to reset it to the default.
+ The default value of this property is an `NSColor` or `UIColor`object whose RGB value is 0, 0, 0 and whose alpha value is 1. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textColor;
 
 /**
  The color of the text's halo, which helps it stand out from backgrounds.
 
- The default value of this property is `rgba(0, 0, 0, 0)`. Set this property to `nil` to reset it to the default.
+ The default value of this property is an `NSColor` or `UIColor`object whose RGB value is 0, 0, 0 and whose alpha value is 0. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textHaloColor;
 
@@ -394,14 +394,14 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Distance that the text's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
 
- The default value of this property is `0,0`. Set this property to `nil` to reset it to the default.
+ The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textTranslate;
 
 /**
  Control whether the translation is relative to the map (north) or viewport (screen).
 
- The default value of this property is `map`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLSymbolStyleLayerTextTranslateAnchorMap`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textTranslateAnchor;
 

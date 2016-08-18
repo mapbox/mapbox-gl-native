@@ -30,7 +30,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
 /**
  The color of the circle.
 
- The default value of this property is `#000000`. Set this property to `nil` to reset it to the default.
+ The default value of this property is an `NSColor` or `UIColor`object whose RGB value is 0, 0, 0 and whose alpha value is 1. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleColor;
 
@@ -51,21 +51,21 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
 /**
  The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
 
- The default value of this property is `0,0`. Set this property to `nil` to reset it to the default.
+ The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleTranslate;
 
 /**
  Control whether the translation is relative to the map (north) or viewport (screen)
 
- The default value of this property is `map`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLCircleStyleLayerCircleTranslateAnchorMap`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleTranslateAnchor;
 
 /**
- Controls the scaling behavior of the circle when the map is pitched. The value `map` scales circles according to their apparent distance to the camera. The value `viewport` results in no pitch-related scaling.
+ Controls the scaling behavior of the circle when the map is pitched. The value `MGLCircleStyleLayerCirclePitchScaleMap` scales circles according to their apparent distance to the camera. The value `MGLCircleStyleLayerCirclePitchScaleViewport` results in no pitch-related scaling.
 
- The default value of this property is `map`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLCircleStyleLayerCirclePitchScaleMap`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circlePitchScale;
 

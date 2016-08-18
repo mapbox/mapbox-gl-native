@@ -37,7 +37,7 @@ global.testImplementation = function (property, layerType) {
             return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testColor;`;
         case 'array':
             return testArrayImplementation(property);
-        default: throw new Error(`unknown type for ${property.name}`)
+        default: throw new Error(`unknown type for ${property.name}`);
     }
 }
 
@@ -57,7 +57,7 @@ global.testGetterImplementation = function (property, layerType) {
             return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testColor);`;
         case 'array':
             return testGetterArrayImplementation(property);
-        default: throw new Error(`unknown type for ${property.name}`)
+        default: throw new Error(`unknown type for ${property.name}`);
     }
 }
 
@@ -89,12 +89,70 @@ global.testArrayImplementation = function (property) {
 
 global.propertyDoc = function (property, layerType) {
     let doc = property.doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
-        if (!('values' in property && property.values.indexOf(symbol) !== -1) && str.substr(offset - 4, 3) !== 'CSS') {
+        if ('values' in property && property.values.indexOf(symbol) !== -1) {
+            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+            return '`' + `${objCType}${camelize(symbol)}` + '`';
+        }
+        if (str.substr(offset - 4, 3) !== 'CSS') {
             symbol = camelizeWithLeadingLowercase(symbol);
         }
         return '`' + symbol + '`';
     });
     return doc;
+};
+
+global.parseColor = function (str) {
+    let m = str.match(/^#(\d\d)(\d\d)(\d\d)$/);
+    if (m) {
+        return {
+            r: parseInt(m[1], 16) / 255,
+            g: parseInt(m[2], 16) / 255,
+            b: parseInt(m[3], 16) / 255,
+            a: 1.0,
+        };
+    }
+    
+    m = str.match(/^rgba\(\s*([-\d.]+),\s*([-\d.]+),\s*([-\d.]+),\s*([\d.]+)\s*\)$/);
+    if (m) {
+        return {
+            r: parseFloat(m[1]) / 255,
+            g: parseFloat(m[2]) / 255,
+            b: parseFloat(m[3]) / 255,
+            a: parseFloat(m[4]),
+        };
+    }
+};
+
+global.propertyDefault = function (property, layerType) {
+    switch (property.type) {
+        case 'boolean':
+            return property.default ? '`YES`' : '`NO`';
+        case 'number':
+        case 'string':
+            return '`' + property.default + '`';
+        case 'enum':
+            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+            return '`' + `${objCType}${camelize(property.default)}` + '`';
+        case 'color':
+            let color = parseColor(property.default);
+            if (!color) {
+                throw new Error(`unrecognized color format in default value of ${property.name}`);
+            }
+            return 'an `NSColor` or `UIColor`' + `object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
+        case 'array':
+            if (property.name.indexOf('padding') !== -1) {
+                //if (property.default.reduce((a, b) => a + b, 0) === 0) {
+                //    return '`NSEdgeInsetsZero` or `UIEdgeInsetsZero`';
+                //}
+                return `${property.default[0]} on the top, ${property.default[1]} on the right, ${property.default[2]} on the bottom, and ${property.default[3]} on the left`;
+            }
+            if (property.name.indexOf('offset') !== -1 || property.name.indexOf('translate') !== -1) {
+                return `${property.default[0]} from the left and ${property.default[1]} from the top`;
+            }
+            return '`' + property.default.join('`, `') + '`';
+        default:
+            throw new Error(`unknown type for ${property.name}`);
+    }
 };
 
 global.propertyType = function (property, _private) {

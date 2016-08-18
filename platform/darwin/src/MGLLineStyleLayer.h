@@ -30,14 +30,14 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 /**
  The display of line endings.
 
- The default value of this property is `butt`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLLineStyleLayerLineCapButt`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineCap;
 
 /**
  The display of lines when joining.
 
- The default value of this property is `miter`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLLineStyleLayerLineJoinMiter`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineJoin;
 
@@ -67,21 +67,21 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 /**
  The color with which the line will be drawn.
 
- The default value of this property is `#000000`. Set this property to `nil` to reset it to the default.
+ The default value of this property is an `NSColor` or `UIColor`object whose RGB value is 0, 0, 0 and whose alpha value is 1. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineColor;
 
 /**
  The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
 
- The default value of this property is `0,0`. Set this property to `nil` to reset it to the default.
+ The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineTranslate;
 
 /**
  Control whether the translation is relative to the map (north) or viewport (screen)
 
- The default value of this property is `map`. Set this property to `nil` to reset it to the default.
+ The default value of this property is `MGLLineStyleLayerLineTranslateAnchorMap`. Set this property to `nil` to reset it to the default.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineTranslateAnchor;
 
