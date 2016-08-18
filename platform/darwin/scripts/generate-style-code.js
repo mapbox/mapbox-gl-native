@@ -21,6 +21,10 @@ global.camelizeWithLeadingLowercase = function (str) {
 
 global.objCName = function (property) { return camelizeWithLeadingLowercase(property.name); }
 
+global.arrayType = function (property) {
+    return property.type === 'array' ? property.name.split('-').pop() : false;
+};
+
 global.testImplementation = function (property, layerType) {
     switch (property.type) {
         case 'boolean':
@@ -62,28 +66,34 @@ global.testGetterImplementation = function (property, layerType) {
 }
 
 global.testGetterArrayImplementation = function (property) {
-    switch (property.name) {
-        case 'icon-text-fit-padding':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testPadding);`;
-        case 'line-dasharray':
+    switch (arrayType(property)) {
+        case 'dasharray':
             return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testDashArray);`;
-        case 'text-font':
+        case 'font':
             return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testFont);`;
-        default:
+        case 'padding':
+            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testPadding);`;
+        case 'offset':
+        case 'translate':
             return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testOffset);`; // Default offset (dx, dy)
+        default:
+            throw new Error(`unknown array type for ${property.name}`);
     }
 };
 
 global.testArrayImplementation = function (property) {
-    switch (property.name) {
-        case 'icon-text-fit-padding':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testPadding;`;
-        case 'line-dasharray':
+    switch (arrayType(property)) {
+        case 'dasharray':
             return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testDashArray;`;
-        case 'text-font':
+        case 'font':
             return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testFont;`;
-        default:
+        case 'padding':
+            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testPadding;`;
+        case 'offset':
+        case 'translate':
             return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testOffset;`; // Default offset (dx, dy)
+        default:
+            throw new Error(`unknown array type for ${property.name}`);
     }
 };
 
@@ -264,15 +274,18 @@ global.arrayGetterImplementation = function(property) {
 }
 
 global.convertedType = function(property) {
-    switch (property.name) {
-        case 'icon-text-fit-padding':
-            return "padding";
-        case 'line-dasharray':
-            return "numberArray";
-        case 'text-font':
-            return "stringArray";
+    switch (arrayType(property)) {
+        case 'dasharray':
+            return 'numberArray';
+        case 'font':
+            return 'stringArray';
+        case 'padding':
+            return 'padding';
+        case 'offset':
+        case 'translate':
+            return 'offset';
         default:
-            return "offset";
+            throw new Error(`unknown array type for ${property.name}`);
     }
 }
 
