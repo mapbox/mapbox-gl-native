@@ -2340,12 +2340,15 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                                     edgePadding:insets
                                                       direction:self.direction]) return;
 
-    CLLocationCoordinate2D *coordinates = MGLLocationCoordinatesFromCoordinateBounds(bounds);
+    CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(4 * sizeof(CLLocationCoordinate2D));
+    MGLLocationCoordinatesFromCoordinateBounds(bounds, coordinates);
 
     [self setVisibleCoordinates:coordinates
-                          count:sizeof(coordinates) / sizeof(coordinates[0])
+                          count:4
                     edgePadding:insets
                        animated:animated];
+
+    free(coordinates);
 }
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction animated:(BOOL)animated
@@ -2354,13 +2357,16 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                                     edgePadding:insets
                                                       direction:direction]) return;
 
-    CLLocationCoordinate2D *coordinates = MGLLocationCoordinatesFromCoordinateBounds(bounds);
+    CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(4 * sizeof(CLLocationCoordinate2D));
+    MGLLocationCoordinatesFromCoordinateBounds(bounds, coordinates);
 
     [self setVisibleCoordinates:coordinates
-                          count:sizeof(coordinates) / sizeof(coordinates[0])
+                          count:4
                     edgePadding:insets
                       direction:direction
                        animated:animated];
+
+    free(coordinates);
 }
 
 - (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated
@@ -2781,12 +2787,15 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (BOOL)viewportWouldChangeWithVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction
 {
-    CLLocationCoordinate2D *coordinates = MGLLocationCoordinatesFromCoordinateBounds(bounds);
+    CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(4 * sizeof(CLLocationCoordinate2D));
+    MGLLocationCoordinatesFromCoordinateBounds(bounds, coordinates);
 
     const mbgl::CameraOptions cameraOptions = [self cameraOptionsForVisibleCoordinates:coordinates
-                                                                                 count:sizeof(coordinates) / sizeof(coordinates[0])
+                                                                                 count:4
                                                                            edgePadding:insets
                                                                              direction:direction];
+
+    free(coordinates);
 
     return [self viewportWouldChangeWithCamera:[self cameraForCameraOptions:cameraOptions]];
 }
