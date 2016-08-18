@@ -265,14 +265,6 @@ global.arrayGetterImplementation = function(property) {
 
 global.convertedType = function(property) {
     switch (property.name) {
-        case 'boolean':
-            return 'bool';
-        case 'number':
-            return 'number';
-        case 'color':
-            return 'color';
-        case 'string':
-            return 'string';
         case 'icon-text-fit-padding':
             return "padding";
         case 'line-dasharray':
