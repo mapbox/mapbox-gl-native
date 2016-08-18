@@ -456,6 +456,10 @@ android: android-arm-v7
 android-test:
 	cd platform/android && ./gradlew testReleaseUnitTest --continue
 
+.PHONY: android-test-apk
+android-test-apk:
+	cd platform/android && ./gradlew assembleDebug --continue && ./gradlew assembleAndroidTest --continue
+
 .PHONY: apackage
 apackage:
 	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)

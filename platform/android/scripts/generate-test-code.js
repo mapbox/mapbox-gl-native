@@ -14,7 +14,7 @@ global.camelize = function (str) {
 }
 
 
-const excludeActivities = ["GeoJsonClusteringActivity","RuntimeStyleTestActivity", "AnimatedMarkerActivity", "ViewPagerActivity","MapFragmentActivity","SupportMapFragmentActivity","SnapshotActivity","NavigationDrawerActivity"];
+const excludeActivities = ["MyLocationTrackingModeActivity","MyLocationToggleActivity","MyLocationTintActivity","MyLocationDrawableActivity","DoubleMapActivity", "LocationPickerActivity","GeoJsonClusteringActivity","RuntimeStyleTestActivity", "AnimatedMarkerActivity", "ViewPagerActivity","MapFragmentActivity","SupportMapFragmentActivity","SnapshotActivity","NavigationDrawerActivity"];
 const appBasePath = 'platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity';
 const testBasePath = 'platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/activity/gen';
 const subPackages = fs.readdirSync(appBasePath);
@@ -24,6 +24,7 @@ if (!fs.existsSync(testBasePath)){
   fs.mkdirSync(testBasePath);
 }
 
+console.log("Generating test activities:");
 for(const subPackage of subPackages) {
   if(!(subPackage.slice(-5) == '.java')) {
     const activities = fs.readdirSync(appBasePath+'/'+subPackage);
@@ -53,6 +54,8 @@ for(const subPackage of subPackages) {
       if (!(excludeActivities.indexOf(activityName) > -1)) {
         console.log("Created file:  "+filePath);
         fs.writeFileSync(filePath, ejsConversionTask([activityName, subPackage]));
+      }else{
+        console.log("Excluding file:  "+filePath);
       }
     }
   }
