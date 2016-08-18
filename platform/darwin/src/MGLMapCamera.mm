@@ -100,7 +100,7 @@
 
 - (BOOL)isEqual:(id)otherCamera
 {
-    NSAssert([otherCamera isKindOfClass:[self class]], @"must compare two cameras");
+    if ( ! [otherCamera isKindOfClass:[self class]]) return NO;
 
     return (otherCamera == self || self.hash == ((MGLMapCamera *)otherCamera).hash);
 }
