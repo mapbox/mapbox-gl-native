@@ -9,6 +9,8 @@
 #import "MGLStyleAttributeValue.h"
 #import "MGLBaseStyleLayer.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 <% for (const property of layoutProperties) { -%>
 <% if (property.type == "enum") { -%>
 typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %>) {
@@ -36,9 +38,11 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 
 <% for (const property of layoutProperties) { -%>
 /**
- <%- propertyDoc(property, type) %>
+ <%- propertyDoc(property, type) %><% if ('default' in property) { %>
+
+ The default value of this property is `<%= property.default %>`.<% if (!property.required) { %> Set this property to `nil` to reset it to the default.<% } %><% } %>
  */
-@property (nonatomic) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 <% } -%>
@@ -46,9 +50,13 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 
 <% for (const property of paintProperties) { -%>
 /**
- <%- propertyDoc(property, type) %>
+ <%- propertyDoc(property, type) %><% if ('default' in property) { %>
+
+ The default value of this property is `<%= property.default %>`.<% if (!property.required) { %> Set this property to `nil` to reset it to the default.<% } %><% } %>
  */
-@property (nonatomic) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 @end
+
+NS_ASSUME_NONNULL_END
