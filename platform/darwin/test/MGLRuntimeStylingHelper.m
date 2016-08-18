@@ -1,21 +1,30 @@
 #import "MGLRuntimeStylingHelper.h"
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-#import <UIKit/UIKit.h>
+    #import <UIKit/UIKit.h>
+    #define MGLEdgeInsets UIEdgeInsets
 #else
-#import <Cocoa/Cocoa.h>
+    #import <Cocoa/Cocoa.h>
+    #define MGLEdgeInsets NSEdgeInsets
 #endif
 
 @implementation MGLRuntimeStylingHelper
 
-+ (NSArray *)testPadding
++ (NSValue *)testPadding
 {
-    return @[@1.0f, @1.0f, @1.0f, @1.0f];
+    MGLEdgeInsets insets = {
+        .top = 1,
+        .left = 1,
+        .bottom = 1,
+        .right = 1,
+    };
+    return [NSValue value:&insets withObjCType:@encode(MGLEdgeInsets)];
 }
 
-+ (NSArray *)testOffset
++ (NSValue *)testOffset
 {
-    return @[@1.0f, @1.0f];
+    CGVector vector = CGVectorMake(1, 1);
+    return [NSValue value:&vector withObjCType:@encode(CGVector)];
 }
 
 + (NSArray *)testFont

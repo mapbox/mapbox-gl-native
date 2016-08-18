@@ -2,8 +2,7 @@
 
 #import "MGLStyleAttributeValue_Private.h"
 #import "MGLStyleAttributeFunction_Private.h"
-
-#import "MGLTypes.h"
+#import "NSValue+MGLStyleAttributeAdditions_Private.h"
 
 @interface MGLStyleAttribute()
 @end
@@ -58,7 +57,7 @@
 {
     if (property.isConstant()) {
         auto offset = property.asConstant();
-        return @[@(offset[0]), @(offset[1])];
+        return [NSValue mgl_valueWithOffsetArray:offset];
     } else if (property.isFunction()) {
         return [MGLStyleAttributeFunction functionWithOffsetPropertyValue:property.asFunction()];
     } else {
@@ -70,7 +69,7 @@
 {
     if (property.isConstant()) {
         auto padding = property.asConstant();
-        return @[@(padding[0]), @(padding[1]), @(padding[2]), @(padding[3])];
+        return [NSValue mgl_valueWithPaddingArray:padding];
     } else if (property.isFunction()) {
         return [MGLStyleAttributeFunction functionWithPaddingPropertyValue:property.asFunction()];
     } else {

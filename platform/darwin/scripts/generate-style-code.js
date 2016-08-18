@@ -176,10 +176,10 @@ global.describeValue = function (value, property, layerType) {
                 units = ` ${units}`.replace(/pixel/, 'point');
             }
             if (property.name.indexOf('padding') !== -1) {
-                //if (value.reduce((a, b) => a + b, 0) === 0) {
-                //    return '`NSEdgeInsetsZero` or `UIEdgeInsetsZero`';
-                //}
-                return `${value[0]}${units} on the top, ${value[1]}${units} on the right, ${value[2]}${units} on the bottom, and ${value[3]}${units} on the left`;
+                if (value.reduce((a, b) => a + b, 0) === 0) {
+                    return '`NSEdgeInsetsZero` or `UIEdgeInsetsZero`';
+                }
+                return `${value[0]}${units} on the top, ${value[3]}${units} on the left, ${value[2]}${units} on the bottom, and ${value[1]}${units} on the right`;
             }
             if (property.name.indexOf('offset') !== -1 || property.name.indexOf('translate') !== -1) {
                 return `${value[0]}${units} from the left and ${value[1]}${units} from the top`;

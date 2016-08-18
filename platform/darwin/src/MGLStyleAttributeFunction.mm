@@ -93,14 +93,9 @@
 - (mbgl::style::PropertyValue<std::array<float, 4> >)mbgl_paddingPropertyValue
 {
     __block std::vector<std::pair<float, std::array<float, 4>>> stops;
-    [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSArray *  _Nonnull padding, BOOL * _Nonnull stop) {
-        NSAssert([padding isKindOfClass:[NSArray class]], @"Stops should be NSArray");
-        NSNumber *top = padding[0];
-        NSNumber *left = padding[1];
-        NSNumber *bottom = padding[2];
-        NSNumber *right = padding[2];
-        auto pad = std::array<float, 4>({{top.floatValue, left.floatValue, bottom.floatValue, right.floatValue}});
-        stops.emplace_back(zoomKey.floatValue, pad);
+    [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSValue * _Nonnull padding, BOOL * _Nonnull stop) {
+        NSAssert([padding isKindOfClass:[NSArray class]], @"Stops should be NSValue");
+        stops.emplace_back(zoomKey.floatValue, padding.mgl_paddingArrayValue);
     }];
     return mbgl::style::Function<std::array<float, 4>>({{stops}}, _base.floatValue);
 }
@@ -108,12 +103,9 @@
 - (mbgl::style::PropertyValue<std::array<float, 2> >)mbgl_offsetPropertyValue
 {
     __block std::vector<std::pair<float, std::array<float, 2>>> stops;
-    [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSArray *  _Nonnull offset, BOOL * _Nonnull stop) {
-        NSAssert([offset isKindOfClass:[NSArray class]], @"Stops should be NSArray");
-        NSNumber *dx = offset[0];
-        NSNumber *dy = offset[1];
-        auto off = std::array<float, 2>({{dx.floatValue, dy.floatValue}});
-        stops.emplace_back(zoomKey.floatValue, off);
+    [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSValue * _Nonnull offset, BOOL * _Nonnull stop) {
+        NSAssert([offset isKindOfClass:[NSValue class]], @"Stops should be NSValue");
+        stops.emplace_back(zoomKey.floatValue, offset.mgl_offsetArrayValue);
     }];
     return mbgl::style::Function<std::array<float, 2>>({{stops}}, _base.floatValue);
 }
@@ -176,7 +168,7 @@
     auto stops = property.getStops();
     NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
     for (auto stop : stops) {
-        convertedStops[@(stop.first)] = @[@(stop.second[0]), @(stop.second[1])];
+        convertedStops[@(stop.first)] = [NSValue mgl_valueWithOffsetArray:stop.second];
     }
     function.base = @(property.getBase());
     function.stops = convertedStops;
