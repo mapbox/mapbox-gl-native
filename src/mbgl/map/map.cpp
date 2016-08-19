@@ -21,6 +21,7 @@
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/stopwatch.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 
 namespace mbgl {
@@ -241,6 +242,7 @@ void Map::Impl::update() {
     if (mode == MapMode::Continuous) {
         view.invalidate();
     } else if (callback && style->isLoaded()) {
+        util::stopwatch stopwatch2("render", Event::General);
         view.activate();
         render();
         view.deactivate();
