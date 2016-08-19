@@ -474,6 +474,12 @@
                                     <action selector="showStencilBuffer:" target="-1" id="WkN-t9-Mpv"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Depth Buffer" keyEquivalent="d" id="CDq-70-oPa">
+                                <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="showDepthBuffer:" target="-1" id="h7r-eM-ZEu"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="dYw-bb-tr1"/>
                             <menuItem title="Show Tooltips on Dropped Pins" id="uir-Rx-zmw">
                                 <modifierMask key="keyEquivalentModifierMask"/>

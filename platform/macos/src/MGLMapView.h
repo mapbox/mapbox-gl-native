@@ -32,6 +32,11 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
         @note This option does nothing in Release builds of the SDK.
      */
     MGLMapDebugStencilBufferMask = 1 << 6,
+
+    /** The depth buffer is shown instead of the color buffer.
+        @note This option does nothing in Release builds of the SDK.
+     */
+    MGLMapDebugDepthBufferMask = 1 << 7,
 };
 
 @class MGLAnnotationImage;

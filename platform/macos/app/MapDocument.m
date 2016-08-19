@@ -283,10 +283,17 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 - (IBAction)showColorBuffer:(id)sender {
     self.mapView.debugMask &= ~MGLMapDebugStencilBufferMask;
+    self.mapView.debugMask &= ~MGLMapDebugDepthBufferMask;
 }
 
 - (IBAction)showStencilBuffer:(id)sender {
+    self.mapView.debugMask &= ~MGLMapDebugDepthBufferMask;
     self.mapView.debugMask |= MGLMapDebugStencilBufferMask;
+}
+
+- (IBAction)showDepthBuffer:(id)sender {
+    self.mapView.debugMask &= ~MGLMapDebugStencilBufferMask;
+    self.mapView.debugMask |= MGLMapDebugDepthBufferMask;
 }
 
 - (IBAction)toggleShowsToolTipsOnDroppedPins:(id)sender {
@@ -642,12 +649,17 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return YES;
     }
     if (menuItem.action == @selector(showColorBuffer:)) {
-        BOOL enabled = self.mapView.debugMask & MGLMapDebugStencilBufferMask;
+        BOOL enabled = self.mapView.debugMask & (MGLMapDebugStencilBufferMask | MGLMapDebugDepthBufferMask);
         menuItem.state = enabled ? NSOffState : NSOnState;
         return YES;
     }
     if (menuItem.action == @selector(showStencilBuffer:)) {
         BOOL enabled = self.mapView.debugMask & MGLMapDebugStencilBufferMask;
+        menuItem.state = enabled ? NSOnState : NSOffState;
+        return YES;
+    }
+    if (menuItem.action == @selector(showDepthBuffer:)) {
+        BOOL enabled = self.mapView.debugMask & MGLMapDebugDepthBufferMask;
         menuItem.state = enabled ? NSOnState : NSOffState;
         return YES;
     }

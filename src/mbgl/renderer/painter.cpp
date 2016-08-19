@@ -198,6 +198,12 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         }
     }
 
+#ifndef NDEBUG
+    if (frame.debugOptions & MapDebugOptions::DepthBuffer) {
+        renderDepthBuffer();
+    }
+#endif
+
     // TODO: Find a better way to unbind VAOs after we're done with them without introducing
     // unnecessary bind(0)/bind(N) sequences.
     {

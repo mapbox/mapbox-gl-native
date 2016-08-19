@@ -2450,6 +2450,9 @@ public:
     if (options & mbgl::MapDebugOptions::StencilClip) {
         mask |= MGLMapDebugStencilBufferMask;
     }
+    if (options & mbgl::MapDebugOptions::DepthBuffer) {
+        mask |= MGLMapDebugDepthBufferMask;
+    }
     return mask;
 }
 
@@ -2472,6 +2475,9 @@ public:
     }
     if (debugMask & MGLMapDebugStencilBufferMask) {
         options |= mbgl::MapDebugOptions::StencilClip;
+    }
+    if (debugMask & MGLMapDebugDepthBufferMask) {
+        options |= mbgl::MapDebugOptions::DepthBuffer;
     }
     _mbglMap->setDebug(options);
 }
