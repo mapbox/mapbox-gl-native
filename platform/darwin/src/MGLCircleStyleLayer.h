@@ -25,55 +25,55 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
 
  This property is measured in points.
  
- The default value of this property is `5`. Set this property to `nil` to reset it to the default.
+ If this property is set to `nil`, the layer uses an implicit default value of `5`.
  */
-@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleRadius;
+@property (nonatomic, nullable) id <MGLStyleAttributeValue> circleRadius;
 
 /**
  The color of the circle.
  
- The default value of this property is an `NSColor` or `UIColor`object whose RGB value is 0, 0, 0 and whose alpha value is 1. Set this property to `nil` to reset it to the default.
+ If this property is set to `nil`, the layer uses an implicit default value of an `NSColor` or `UIColor`object whose RGB value is 0, 0, 0 and whose alpha value is 1.
  */
-@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleColor;
+@property (nonatomic, nullable) id <MGLStyleAttributeValue> circleColor;
 
 /**
  Amount to blur the circle. 1 blurs the circle such that only the centerpoint is full opacity.
  
- The default value of this property is `0`. Set this property to `nil` to reset it to the default.
+ If this property is set to `nil`, the layer uses an implicit default value of `0`.
  */
-@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleBlur;
+@property (nonatomic, nullable) id <MGLStyleAttributeValue> circleBlur;
 
 /**
  The opacity at which the circle will be drawn.
  
- The default value of this property is `1`. Set this property to `nil` to reset it to the default.
+ If this property is set to `nil`, the layer uses an implicit default value of `1`.
  */
-@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleOpacity;
+@property (nonatomic, nullable) id <MGLStyleAttributeValue> circleOpacity;
 
 /**
  The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
 
  This property is measured in points.
  
- The default value of this property is 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default.
+ If this property is set to `nil`, the layer uses an implicit default value of 0 points from the left and 0 points from the top.
  */
-@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleTranslate;
+@property (nonatomic, nullable) id <MGLStyleAttributeValue> circleTranslate;
 
 /**
  Control whether the translation is relative to the map (north) or viewport (screen)
  
- The default value of this property is `MGLCircleStyleLayerCircleTranslateAnchorMap`. Set this property to `nil` to reset it to the default.
- 
+ If this property is set to `nil`, the layer uses an implicit default value of `MGLCircleStyleLayerCircleTranslateAnchorMap`.
+
  This property is only applied to the style if `circleTranslate` is non-`nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleTranslateAnchor;
+@property (nonatomic, nullable) id <MGLStyleAttributeValue> circleTranslateAnchor;
 
 /**
  Controls the scaling behavior of the circle when the map is pitched. The value `MGLCircleStyleLayerCirclePitchScaleMap` scales circles according to their apparent distance to the camera. The value `MGLCircleStyleLayerCirclePitchScaleViewport` results in no pitch-related scaling.
  
- The default value of this property is `MGLCircleStyleLayerCirclePitchScaleMap`. Set this property to `nil` to reset it to the default.
+ If this property is set to `nil`, the layer uses an implicit default value of `MGLCircleStyleLayerCirclePitchScaleMap`.
  */
-@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circlePitchScale;
+@property (nonatomic, nullable) id <MGLStyleAttributeValue> circlePitchScale;
 
 @end
 

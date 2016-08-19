@@ -42,11 +42,11 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 /**
  <%- propertyDoc(property, type) %><% if ('default' in property) { %>
  
- The default value of this property is <%= propertyDefault(property, type) %>.<% if (!property.required) { %> Set this property to `nil` to reset it to the default.<% } %><% } %><% if (property.requires) { %>
+ <% if (property.required) { %>The default value of this property is <%= propertyDefault(property, type) %>.<% } else { %>If this property is set to `nil`, the layer uses an implicit default value of <%= propertyDefault(property, type) %>.<% } %><% } %><% if (property.requires) { %>
  
  <%= propertyReqs(property, layoutPropertiesByName, type) %><% } %>
  */
-@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic<% if (!property.required) { %>, nullable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 <% } -%>
@@ -56,11 +56,11 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 /**
  <%- propertyDoc(property, type) %><% if ('default' in property) { %>
  
- The default value of this property is <%= propertyDefault(property, type) %>.<% if (!property.required) { %> Set this property to `nil` to reset it to the default.<% } %><% } %><% if (property.requires) { %>
- 
+ <% if (property.required) { %>The default value of this property is <%= propertyDefault(property, type) %>.<% } else { %>If this property is set to `nil`, the layer uses an implicit default value of <%= propertyDefault(property, type) %>.<% } %><% } %><% if (property.requires) { %>
+
  <%= propertyReqs(property, paintPropertiesByName, type) %><% } %>
  */
-@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic<% if (!property.required) { %>, nullable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 @end
