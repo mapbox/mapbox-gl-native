@@ -1,5 +1,6 @@
-#include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/util/stopwatch.hpp>
 
 #include <cassert>
 #include <cstring>
@@ -41,21 +42,28 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height) {
 }
 
 PremultipliedImage HeadlessView::readStillImage() {
+    util::stopwatch stopwatch("readStillImage", Event::General);
     assert(active);
 
     const unsigned int w = dimensions[0] * pixelRatio;
     const unsigned int h = dimensions[1] * pixelRatio;
 
     PremultipliedImage image { w, h };
-    MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
+    {
+        util::stopwatch stopwatch2("glReadPixels", Event::General);
+        MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
+    }
 
     const auto stride = image.stride();
     auto tmp = std::make_unique<uint8_t[]>(stride);
     uint8_t* rgba = image.data.get();
-    for (int i = 0, j = h - 1; i < j; i++, j--) {
-        std::memcpy(tmp.get(), rgba + i * stride, stride);
-        std::memcpy(rgba + i * stride, rgba + j * stride, stride);
-        std::memcpy(rgba + j * stride, tmp.get(), stride);
+    {
+        util::stopwatch stopwatch3("memcpy", Event::General);
+        for (int i = 0, j = h - 1; i < j; i++, j--) {
+            std::memcpy(tmp.get(), rgba + i * stride, stride);
+            std::memcpy(rgba + i * stride, rgba + j * stride, stride);
+            std::memcpy(rgba + j * stride, tmp.get(), stride);
+        }
     }
 
     return image;
