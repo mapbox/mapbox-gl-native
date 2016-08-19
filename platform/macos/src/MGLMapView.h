@@ -89,6 +89,14 @@ IB_DESIGNABLE
 #pragma mark Configuring the Map’s Appearance
 
 /**
+ The style currently displayed in the receiver.
+ 
+ Unlike the `styleURL` property, this property is set to an object that allows
+ you to manipulate every aspect of the style locally.
+ */
+@property (nonatomic, readonly) MGLStyle *style;
+
+/**
  URL of the style currently displayed in the receiver.
  
  The URL may be a full HTTP or HTTPS URL, a Mapbox URL indicating the style’s
@@ -97,6 +105,9 @@ IB_DESIGNABLE
  
  If you set this property to `nil`, the receiver will use the default style and
  this property will automatically be set to that style’s URL.
+ 
+ If you want to modify the current style without replacing it outright, or if
+ you want to introspect individual style attributes, use the `style` property.
  */
 @property (nonatomic, null_resettable) NSURL *styleURL;
 
@@ -925,10 +936,6 @@ IB_DESIGNABLE
  released software for performance and aesthetic reasons.
  */
 @property (nonatomic) MGLMapDebugMaskOptions debugMask;
-
-#pragma mark Runtime styling API
-
-- (MGLStyle *)style;
 
 @end
 

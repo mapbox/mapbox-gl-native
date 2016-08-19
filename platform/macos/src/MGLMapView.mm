@@ -152,6 +152,8 @@ public:
 @property (nonatomic, readwrite) NSImageView *logoView;
 @property (nonatomic, readwrite) NSView *attributionView;
 
+@property (nonatomic, readwrite) MGLStyle *style;
+
 /// Mapping from reusable identifiers to annotation images.
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImagesByIdentifier;
 /// Currently shown popover representing the selected annotation.
@@ -186,6 +188,8 @@ public:
     BOOL _wantsToolTipRects;
     /// True if any annotation images that have custom cursors have been installed.
     BOOL _wantsCursorRects;
+    /// True if a willChange notification has been issued for shape annotation layers and a didChange notification is pending.
+    BOOL _isChangingAnnotationLayers;
 
     // Cached checks for delegate method implementations that may be called from
     // MGLMultiPointDelegate methods.
@@ -576,7 +580,7 @@ public:
     if (_isTargetingInterfaceBuilder) {
         return;
     }
-
+    
     // Default to Streets.
     if (!styleURL) {
         // An access token is required to load any default style, including
@@ -588,7 +592,10 @@ public:
     }
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
+    [self willChangeValueForKey:@"style"];
+    _style = [[MGLStyle alloc] initWithMapView:self];
     _mbglMap->setStyleURL(styleURL.absoluteString.UTF8String);
+    [self didChangeValueForKey:@"style"];
 }
 
 - (IBAction)reloadStyle:(__unused id)sender {
@@ -849,6 +856,10 @@ public:
         }
         case mbgl::MapChangeDidFinishLoadingMap:
         {
+            [self.style willChangeValueForKey:@"sources"];
+            [self.style didChangeValueForKey:@"sources"];
+            [self.style willChangeValueForKey:@"layers"];
+            [self.style didChangeValueForKey:@"layers"];
             if ([self.delegate respondsToSelector:@selector(mapViewDidFinishLoadingMap:)]) {
                 [self.delegate mapViewDidFinishLoadingMap:self];
             }
@@ -888,6 +899,10 @@ public:
         case mbgl::MapChangeDidFinishRenderingFrame:
         case mbgl::MapChangeDidFinishRenderingFrameFullyRendered:
         {
+            if (_isChangingAnnotationLayers) {
+                _isChangingAnnotationLayers = NO;
+                [self.style didChangeValueForKey:@"layers"];
+            }
             if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingFrame:fullyRendered:)]) {
                 BOOL fullyRendered = change == mbgl::MapChangeDidFinishRenderingFrameFullyRendered;
                 [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:fullyRendered];
@@ -896,6 +911,11 @@ public:
         }
         case mbgl::MapChangeDidFinishLoadingStyle:
         {
+            [self.style willChangeValueForKey:@"name"];
+            [self.style willChangeValueForKey:@"sources"];
+            [self.style didChangeValueForKey:@"sources"];
+            [self.style willChangeValueForKey:@"layers"];
+            [self.style didChangeValueForKey:@"layers"];
             if ([self.delegate respondsToSelector:@selector(mapView:didFinishLoadingStyle:)])
             {
                 [self.delegate mapView:self didFinishLoadingStyle:self.style];
@@ -1705,6 +1725,7 @@ public:
                 continue;
             }
 
+            _isChangingAnnotationLayers = YES;
             MGLAnnotationTag annotationTag = _mbglMap->addAnnotation([multiPoint annotationObjectWithDelegate:self]);
             MGLAnnotationContext context;
             context.annotation = annotation;
@@ -1762,6 +1783,9 @@ public:
     }
 
     [self didChangeValueForKey:@"annotations"];
+    if (_isChangingAnnotationLayers) {
+        [self.style willChangeValueForKey:@"layers"];
+    }
 
     [self updateAnnotationTrackingAreas];
 }
@@ -1843,10 +1867,14 @@ public:
             [(NSObject *)annotation removeObserver:self forKeyPath:@"coordinates" context:(void *)(NSUInteger)annotationTag];
         }
 
+        _isChangingAnnotationLayers = YES;
         _mbglMap->removeAnnotation(annotationTag);
     }
 
     [self didChangeValueForKey:@"annotations"];
+    if (_isChangingAnnotationLayers) {
+        [self.style willChangeValueForKey:@"layers"];
+    }
 
     [self updateAnnotationTrackingAreas];
 }
@@ -2199,13 +2227,6 @@ public:
 }
 
 #pragma mark - Runtime styling
-
-- (MGLStyle *)style
-{
-    MGLStyle *style = [[MGLStyle alloc] init];
-    style.mapView = self;
-    return style;
-}
 
 - (mbgl::Map *)mbglMap
 {

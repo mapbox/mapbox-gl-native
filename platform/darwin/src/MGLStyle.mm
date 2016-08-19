@@ -40,8 +40,10 @@
 #endif
 
 @interface MGLStyle()
-@property (nonatomic, weak) MGLMapView *mapView;
+
+@property (nonatomic, readwrite, weak) MGLMapView *mapView;
 @property (readonly, copy, nullable) NSURL *URL;
+
 @end
 
 @implementation MGLStyle
@@ -98,15 +100,22 @@ static NSURL *MGLStyleURL_emerald;
     return MGLStyleURL_emerald;
 }
 
-#pragma mark Metadata
+#pragma mark -
 
-- (NSString *)name {
-    std::string name = self.mapView.mbglMap->getStyleName();
-    return name.empty() ? nil : @(name.c_str());
+- (instancetype)initWithMapView:(MGLMapView *)mapView {
+    if (self = [super init]) {
+        _mapView = mapView;
+    }
+    return self;
 }
 
 - (NSURL *)URL {
     return [NSURL URLWithString:@(self.mapView.mbglMap->getStyleURL().c_str())];
+}
+
+- (NSString *)name {
+    std::string name = self.mapView.mbglMap->getStyleName();
+    return name.empty() ? nil : @(name.c_str());
 }
 
 #pragma mark Sources
@@ -158,8 +167,7 @@ static NSURL *MGLStyleURL_emerald;
     } else if (mbglSource->is<mbgl::style::RasterSource>()) {
         source = [[MGLRasterSource alloc] initWithIdentifier:identifier];
     } else {
-        NSAssert(NO, @"Unrecognized source type");
-        return nil;
+        source = [[MGLSource alloc] initWithIdentifier:identifier];
     }
     
     source.rawSource = mbglSource;
@@ -320,7 +328,9 @@ static NSURL *MGLStyleURL_emerald;
          @"Make sure the style layer was created as a member of a concrete subclass of MGLStyleLayer.",
          layer];
     }
-    [layer removeFromMapView:self.mapView];    
+    [self willChangeValueForKey:@"layers"];
+    [layer removeFromMapView:self.mapView];
+    [self didChangeValueForKey:@"layers"];
 }
 
 - (void)addLayer:(MGLStyleLayer *)layer
@@ -331,7 +341,9 @@ static NSURL *MGLStyleURL_emerald;
          @"Make sure the style layer was created as a member of a concrete subclass of MGLStyleLayer.",
          layer];
     }
+    [self willChangeValueForKey:@"layers"];
     [layer addToMapView:self.mapView];
+    [self didChangeValueForKey:@"layers"];
 }
 
 - (void)insertLayer:(MGLStyleLayer *)layer atIndex:(NSUInteger)index {

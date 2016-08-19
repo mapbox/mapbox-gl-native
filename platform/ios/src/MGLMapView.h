@@ -118,6 +118,14 @@ IB_DESIGNABLE
 #pragma mark Configuring the Map’s Appearance
 
 /**
+ The style currently displayed in the receiver.
+ 
+ Unlike the `styleURL` property, this property is set to an object that allows
+ you to manipulate every aspect of the style locally.
+ */
+@property (nonatomic, readonly) MGLStyle *style;
+
+/**
  URLs of the styles bundled with the library.
  
  @deprecated Call the relevant class method of `MGLStyle` for the URL of a
@@ -134,6 +142,9 @@ IB_DESIGNABLE
  
  If you set this property to `nil`, the receiver will use the default style
  and this property will automatically be set to that style’s URL.
+ 
+ If you want to modify the current style without replacing it outright, or if
+ you want to introspect individual style attributes, use the `style` property.
  */
 @property (nonatomic, null_resettable) NSURL *styleURL;
 
@@ -1076,10 +1087,6 @@ IB_DESIGNABLE
     protocol.
  */
 - (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
-
-#pragma mark - Runtime styling API
-
-- (MGLStyle *)style;
 
 #pragma mark Accessing the Underlying Map Data
 
