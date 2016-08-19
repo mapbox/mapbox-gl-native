@@ -101,7 +101,8 @@ static NSURL *MGLStyleURL_emerald;
 #pragma mark Metadata
 
 - (NSString *)name {
-    return @(self.mapView.mbglMap->getStyleName().c_str());
+    std::string name = self.mapView.mbglMap->getStyleName();
+    return name.empty() ? nil : @(name.c_str());
 }
 
 - (NSURL *)URL {
@@ -110,13 +111,43 @@ static NSURL *MGLStyleURL_emerald;
 
 #pragma mark Sources
 
+- (NS_MUTABLE_SET_OF(MGLSource *) *)sources {
+    auto rawSources = self.mapView.mbglMap->getSources();
+    NSMutableSet *sources = [NSMutableSet setWithCapacity:rawSources.size()];
+    for (auto rawSource = rawSources.begin(); rawSource != rawSources.end(); ++rawSource) {
+        MGLSource *source = [self sourceFromMBGLSource:*rawSource];
+        [sources addObject:source];
+    }
+    return sources;
+}
+
+- (void)setSources:(NS_MUTABLE_SET_OF(MGLSource *) *)sources {
+    for (MGLSource *source in self.sources) {
+        [self removeSource:source];
+    }
+    for (MGLSource *source in sources) {
+        [self addSource:source];
+    }
+}
+
+- (NSUInteger)countOfSources {
+    auto rawSources = self.mapView.mbglMap->getSources();
+    return rawSources.size();
+}
+
+- (MGLSource *)memberOfSources:(MGLSource *)object {
+    return [self sourceWithIdentifier:object.identifier];
+}
+
 - (MGLSource *)sourceWithIdentifier:(NSString *)identifier
 {
-    auto mbglSource = self.mapView.mbglMap->getSource(identifier.UTF8String);
-    if (!mbglSource) {
-        return nil;
-    }
+    auto rawSource = self.mapView.mbglMap->getSource(identifier.UTF8String);
+    return rawSource ? [self sourceFromMBGLSource:rawSource] : nil;
+}
 
+- (MGLSource *)sourceFromMBGLSource:(mbgl::style::Source *)mbglSource {
+    NSString *identifier = @(mbglSource->getID().c_str());
+    
     // TODO: Fill in options specific to the respective source classes
     // https://github.com/mapbox/mapbox-gl-native/issues/6584
     MGLSource *source;
@@ -160,13 +191,93 @@ static NSURL *MGLStyleURL_emerald;
 
 #pragma mark Style layers
 
-- (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier
+- (NS_MUTABLE_ARRAY_OF(MGLStyleLayer *) *)layers
 {
-    auto mbglLayer = self.mapView.mbglMap->getLayer(identifier.UTF8String);
-    if (!mbglLayer) {
+    auto layers = self.mapView.mbglMap->getLayers();
+    NSMutableArray *styleLayers = [NSMutableArray arrayWithCapacity:layers.size()];
+    for (auto layer = layers.rbegin(); layer != layers.rend(); ++layer) {
+        MGLStyleLayer *styleLayer = [self layerFromMBGLLayer:*layer];
+        [styleLayers addObject:styleLayer];
+    }
+    return styleLayers;
+}
+
+- (void)setLayers:(NS_MUTABLE_ARRAY_OF(MGLStyleLayer *) *)layers {
+    for (MGLStyleLayer *layer in self.layers.reverseObjectEnumerator) {
+        [self removeLayer:layer];
+    }
+    for (MGLStyleLayer *layer in layers.reverseObjectEnumerator) {
+        [self addLayer:layer];
+    }
+}
+
+- (NSUInteger)countOfLayers
+{
+    return self.mapView.mbglMap->getLayers().size();
+}
+
+- (MGLStyleLayer *)objectInLayersAtIndex:(NSUInteger)index
+{
+    auto layers = self.mapView.mbglMap->getLayers();
+    if (index > layers.size() - 1) {
+        [NSException raise:NSRangeException
+                    format:@"No style layer at index %lu.", (unsigned long)index];
         return nil;
     }
+    auto layer = layers.at(layers.size() - 1 - index);
+    return [self layerFromMBGLLayer:layer];
+}
 
+- (void)getLayers:(MGLStyleLayer **)buffer range:(NSRange)inRange
+{
+    auto layers = self.mapView.mbglMap->getLayers();
+    if (NSMaxRange(inRange) > layers.size()) {
+        [NSException raise:NSRangeException
+                    format:@"Style layer range %@ is out of bounds.", NSStringFromRange(inRange)];
+    }
+    NSUInteger i = 0;
+    for (auto layer = *(layers.rbegin() + inRange.location); i < inRange.length; ++layer, ++i) {
+        MGLStyleLayer *styleLayer = [self layerFromMBGLLayer:layer];
+        buffer[i] = styleLayer;
+    }
+}
+
+- (void)insertObject:(MGLStyleLayer *)styleLayer inLayersAtIndex:(NSUInteger)index
+{
+    if (!styleLayer.rawLayer) {
+        [NSException raise:NSInvalidArgumentException format:
+         @"The style layer %@ cannot be inserted into the style. "
+         @"Make sure the style layer was created as a member of a concrete subclass of MGLStyleLayer.",
+         styleLayer];
+    }
+    auto layers = self.mapView.mbglMap->getLayers();
+    if (index > layers.size()) {
+        [NSException raise:NSRangeException
+                    format:@"Cannot insert style layer at out-of-bounds index %lu.", (unsigned long)index];
+    } else if (index == 0) {
+        [styleLayer addToMapView:self.mapView];
+    } else {
+        MGLStyleLayer *sibling = [self layerFromMBGLLayer:layers.at(layers.size() - index)];
+        [styleLayer addToMapView:self.mapView belowLayer:sibling];
+    }
+}
+
+- (void)removeObjectFromLayersAtIndex:(NSUInteger)index
+{
+    auto layers = self.mapView.mbglMap->getLayers();
+    if (index > layers.size() - 1) {
+        [NSException raise:NSRangeException
+                    format:@"Cannot remove style layer at out-of-bounds index %lu.", (unsigned long)index];
+    }
+    auto layer = layers.at(layers.size() - 1 - index);
+    self.mapView.mbglMap->removeLayer(layer->getID());
+}
+
+- (MGLStyleLayer *)layerFromMBGLLayer:(mbgl::style::Layer *)mbglLayer
+{
+    NSParameterAssert(mbglLayer);
+    
+    NSString *identifier = @(mbglLayer->getID().c_str());
     MGLStyleLayer *styleLayer;
     if (auto fillLayer = mbglLayer->as<mbgl::style::FillLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(fillLayer->getSourceID().c_str())];
@@ -195,6 +306,12 @@ static NSURL *MGLStyleURL_emerald;
     return styleLayer;
 }
 
+- (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier
+{
+    auto mbglLayer = self.mapView.mbglMap->getLayer(identifier.UTF8String);
+    return mbglLayer ? [self layerFromMBGLLayer:mbglLayer] : nil;
+}
+
 - (void)removeLayer:(MGLStyleLayer *)layer
 {
     if (!layer.rawLayer) {
@@ -217,7 +334,11 @@ static NSURL *MGLStyleURL_emerald;
     [layer addToMapView:self.mapView];
 }
 
-- (void)insertLayer:(MGLStyleLayer *)layer belowLayer:(MGLStyleLayer *)otherLayer
+- (void)insertLayer:(MGLStyleLayer *)layer atIndex:(NSUInteger)index {
+    [self insertObject:layer inLayersAtIndex:index];
+}
+
+- (void)insertLayer:(MGLStyleLayer *)layer belowLayer:(MGLStyleLayer *)sibling
 {
     if (!layer.rawLayer) {
         [NSException raise:NSInvalidArgumentException
@@ -226,14 +347,58 @@ static NSURL *MGLStyleURL_emerald;
          @"Make sure the style layer was created as a member of a concrete subclass of MGLStyleLayer.",
          layer];
     }
-    if (!otherLayer.rawLayer) {
+    if (!sibling.rawLayer) {
         [NSException raise:NSInvalidArgumentException
                     format:
-         @"A style layer cannot be placed before %@ in the style. "
-         @"Make sure otherLayer was obtained using -[MGLStyle layerWithIdentifier:].",
-         otherLayer];
+         @"A style layer cannot be placed below %@ in the style. "
+         @"Make sure sibling was obtained using -[MGLStyle layerWithIdentifier:].",
+         sibling];
     }
-    [layer addToMapView:self.mapView belowLayer:otherLayer];
+    [self willChangeValueForKey:@"layers"];
+    [layer addToMapView:self.mapView belowLayer:sibling];
+    [self didChangeValueForKey:@"layers"];
+}
+
+- (void)insertLayer:(MGLStyleLayer *)layer aboveLayer:(MGLStyleLayer *)sibling {
+    if (!layer.rawLayer) {
+        [NSException raise:NSInvalidArgumentException
+                    format:
+         @"The style layer %@ cannot be added to the style. "
+         @"Make sure the style layer was created as a member of a concrete subclass of MGLStyleLayer.",
+         layer];
+    }
+    if (!sibling.rawLayer) {
+        [NSException raise:NSInvalidArgumentException
+                    format:
+         @"A style layer cannot be placed above %@ in the style. "
+         @"Make sure sibling was obtained using -[MGLStyle layerWithIdentifier:].",
+         sibling];
+    }
+    
+    auto layers = self.mapView.mbglMap->getLayers();
+    std::string siblingIdentifier = sibling.identifier.UTF8String;
+    NSUInteger index = 0;
+    for (auto layer : layers) {
+        if (layer->getID() == siblingIdentifier) {
+            break;
+        }
+        index++;
+    }
+    
+    [self willChangeValueForKey:@"layers"];
+    if (index + 1 > layers.size()) {
+        [NSException raise:NSInvalidArgumentException
+                    format:
+         @"A style layer cannot be placed above %@ in the style. "
+         @"Make sure sibling was obtained using -[MGLStyle layerWithIdentifier:].",
+         sibling];
+    } else if (index + 1 == layers.size()) {
+        [layer addToMapView:self.mapView];
+    } else {
+        MGLStyleLayer *sibling = [self layerFromMBGLLayer:layers.at(index + 1)];
+        [layer addToMapView:self.mapView belowLayer:sibling];
+    }
+    [self didChangeValueForKey:@"layers"];
 }
 
 #pragma mark Style classes
@@ -268,6 +433,11 @@ static NSURL *MGLStyleURL_emerald;
     mbgl::style::TransitionOptions transition { { MGLDurationInSeconds(transitionDuration) } };
     self.mapView.mbglMap->setTransitionOptions(transition);
     self.mapView.mbglMap->setClasses(newAppliedClasses);
+}
+
+- (NSUInteger)countOfStyleClasses {
+    const auto &classes = self.mapView.mbglMap->getClasses();
+    return classes.size();
 }
 
 - (BOOL)hasStyleClass:(NSString *)styleClass

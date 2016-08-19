@@ -177,6 +177,11 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 #pragma mark Managing Sources
 
 /**
+ A set containing the style’s sources.
+ */
+@property (nonatomic, strong) NS_MUTABLE_SET_OF(MGLSource *) *sources;
+
+/**
  Returns a source with the given identifier in the current style.
 
  @return An instance of a concrete subclass of `MGLSource` associated with the
@@ -201,6 +206,12 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 #pragma mark Managing Style Layers
 
 /**
+ The layers included in the style, arranged according to their front-to-back
+ ordering on the screen.
+ */
+@property (nonatomic, strong) NS_MUTABLE_ARRAY_OF(MGLStyleLayer *) *layers;
+
+/**
  Returns a style layer with the given identifier in the current style.
  
  @return An instance of a concrete subclass of `MGLStyleLayer` associated with
@@ -218,12 +229,30 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 - (void)addLayer:(MGLStyleLayer *)layer;
 
 /**
+ Inserts a new layer into the style at the given index.
+ 
+ @param layer The layer to insert.
+ @param index The index at which to insert the layer. An index of 0 would send
+    the layer to the back; an index equal to the number of objects in the
+    `layers` property would bring the layer to the front.
+ */
+- (void)insertLayer:(MGLStyleLayer *)layer atIndex:(NSUInteger)index;
+
+/**
  Inserts a new layer below another layer.
 
- @param layer Layer to be inserted.
- @param belowLayer A layer that's already on the map view.
+ @param layer The layer to insert.
+ @param sibling An existing layer in the style.
  */
-- (void)insertLayer:(MGLStyleLayer *)layer belowLayer:(MGLStyleLayer *)otherLayer;
+- (void)insertLayer:(MGLStyleLayer *)layer belowLayer:(MGLStyleLayer *)sibling;
+
+/**
+ Inserts a new layer above another layer.
+
+ @param layer The layer to insert.
+ @param sibling An existing layer in the style.
+ */
+- (void)insertLayer:(MGLStyleLayer *)layer aboveLayer:(MGLStyleLayer *)sibling;
 
 /**
  Removes a layer from the map view.

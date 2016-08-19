@@ -18,8 +18,6 @@
     std::unique_ptr<mbgl::style::VectorSource> _pendingSource;
 }
 
-static NSString *MGLVectorSourceType   = @"vector";
-
 - (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url
 {
     if (self = [super initWithIdentifier:identifier])

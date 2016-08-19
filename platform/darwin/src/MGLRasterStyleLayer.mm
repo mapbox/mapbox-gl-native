@@ -50,6 +50,9 @@
 - (void)removeFromMapView:(MGLMapView *)mapView
 {
     auto removedLayer = mapView.mbglMap->removeLayer(self.identifier.UTF8String);
+    if (!removedLayer) {
+        return;
+    }
     _pendingLayer = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::RasterLayer> &>(removedLayer));
     _rawLayer = _pendingLayer.get();
 }
