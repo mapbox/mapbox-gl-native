@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.VectorDrawable;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -144,14 +145,12 @@ public class MapboxMapOptions implements Parcelable {
     public static Bitmap getBitmapFromDrawable(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable) drawable).getBitmap();
-        } else if (drawable instanceof VectorDrawable || drawable instanceof VectorDrawableCompat) {
+        } else {
             Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
             drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
             drawable.draw(canvas);
             return bitmap;
-        } else {
-            throw new IllegalArgumentException("unsupported drawable type");
         }
     }
 
