@@ -58,12 +58,14 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
         drawing operations appear more prominent to help diagnose overdrawing.
         @note This option does nothing in Release builds of the SDK. */
     MGLMapDebugOverdrawVisualizationMask = 1 << 5,
+#if TARGET_OS_OSX
     /** The stencil buffer is shown instead of the color buffer.
         @note This option does nothing in Release builds of the SDK. */
     MGLMapDebugStencilBufferMask = 1 << 6,
     /** The depth buffer is shown instead of the color buffer.
         @note This option does nothing in Release builds of the SDK. */
     MGLMapDebugDepthBufferMask = 1 << 7,
+#endif
 };
 
 NS_ASSUME_NONNULL_END
