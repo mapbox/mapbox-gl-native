@@ -129,20 +129,15 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         for (int i = 0; i < amount; i++) {
             randomIndex = random.nextInt(mLocations.size());
             LatLng latLng = mLocations.get(randomIndex);
-            MarkerViewOptions markerOptions = new MarkerViewOptions()
+            markerOptionsList.add(new MarkerViewOptions()
                     .position(latLng)
                     .icon(icon)
                     .title(String.valueOf(i))
-                    .snippet(formatter.format(latLng.getLatitude()) + ", " + formatter.format(latLng.getLongitude()));
-            markerOptionsList.add(markerOptions);
+                    .snippet(formatter.format(latLng.getLatitude()) + ", " + formatter.format(latLng.getLongitude())));
         }
-        long t1 = System.currentTimeMillis();
-//        for (MarkerViewOptions markerViewOptions : markerOptionsList) {
-//            mapboxMap.addMarker(markerViewOptions);
-//        }
-        mapboxMap.addMarkerViews(markerOptionsList);
-        long t2 = System.currentTimeMillis();
-        Log.d("time", "amount:"+amount+", time:"+(t2-t1));
+        for (MarkerViewOptions markerViewOptions : markerOptionsList) {
+            mapboxMap.addMarker(markerViewOptions);
+        }
     }
 
     private void showGlMarkers(int amount) {

@@ -294,7 +294,7 @@
         <activity
             android:name=".activity.maplayout.NavigationDrawerActivity"
             android:description="@string/description_navigation_drawer"
-            android:label="@string/title_activity_navigation_drawer"
+            android:label="@string/activity_navigation_drawer"
             android:theme="@style/AppTheme.ActionBar.Transparent">
             <meta-data
                 android:name="@string/category"
@@ -304,6 +304,14 @@
             android:name=".activity.style.RuntimeStyleActivity"
             android:description="@string/description_runtime_style"
             android:label="@string/activity_runtime_style">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style" />
+        </activity>
+        <activity
+            android:name=".activity.style.CircleLayerActivity"
+            android:description="@string/description_circle"
+            android:label="@string/activity_circle">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_style" />
