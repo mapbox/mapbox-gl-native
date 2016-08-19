@@ -13,4 +13,13 @@
     return nil;
 }
 
+- (NSString *)description {
+    return [NSString stringWithFormat:
+            @"<%@: %p; identifier = %@; sourceIdentifier = %@; "
+            @"sourceLayerIdentifier = %@; predicate = %@; visible = %@>",
+            NSStringFromClass([self class]), (void *)self, self.identifier,
+            self.sourceIdentifier, self.sourceLayerIdentifier, self.predicate,
+            self.visible ? @"YES" : @"NO"];
+}
+
 @end

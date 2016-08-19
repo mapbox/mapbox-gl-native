@@ -73,4 +73,12 @@
     self.rawSource = _pendingSource.get();
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:
+            @"<%@: %p; identifier = %@; URL = %@; tileSet = %@; tileSize = %lu>",
+            NSStringFromClass([self class]), (void *)self, self.identifier, self.URL,
+            self.tileSet, (unsigned long)self.tileSize];
+}
+
 @end

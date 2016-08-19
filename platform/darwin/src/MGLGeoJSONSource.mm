@@ -192,4 +192,10 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
     _features = MGLFeaturesFromMBGLFeatures(featureCollection);
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; geoJSONData = %@; features = %@>",
+            NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.geoJSONData, self.features];
+}
+
 @end

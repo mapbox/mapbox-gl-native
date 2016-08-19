@@ -72,4 +72,10 @@ static NSString *MGLVectorSourceType   = @"vector";
     self.rawSource = _pendingSource.get();
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; tileSet = %@>",
+            NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.tileSet];
+}
+
 @end

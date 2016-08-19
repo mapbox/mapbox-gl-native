@@ -51,4 +51,11 @@
     return self.rawLayer->getMinZoom();
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; visible = %@>",
+            NSStringFromClass([self class]), (void *)self, self.identifier,
+            self.visible ? @"YES" : @"NO"];
+}
+
 @end
