@@ -25,7 +25,7 @@
 		3538AA231D542685008EC33D /* MGLBaseStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3538AA211D542685008EC33D /* MGLBaseStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3538AA241D542685008EC33D /* MGLBaseStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3538AA221D542685008EC33D /* MGLBaseStyleLayer.mm */; };
 		353BAEF81D6463B8009A8DA9 /* amsterdam.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 358EB3AE1D61F0DB00E46D9C /* amsterdam.geojson */; };
-		355BA4ED1D41633E00CCC6D5 /* NSColor+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 355BA4EB1D41633E00CCC6D5 /* NSColor+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		355BA4ED1D41633E00CCC6D5 /* NSColor+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 355BA4EB1D41633E00CCC6D5 /* NSColor+MGLAdditions.h */; };
 		355BA4EE1D41633E00CCC6D5 /* NSColor+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 355BA4EC1D41633E00CCC6D5 /* NSColor+MGLAdditions.mm */; };
 		35602BFA1D3EA99F0050646F /* MGLFillStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 35602BF81D3EA99F0050646F /* MGLFillStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		35602BFB1D3EA99F0050646F /* MGLFillStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35602BF91D3EA99F0050646F /* MGLFillStyleLayer.mm */; };
