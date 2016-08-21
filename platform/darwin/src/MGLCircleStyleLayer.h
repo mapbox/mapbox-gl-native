@@ -32,7 +32,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
 /**
  The color of the circle.
  
- If this property is set to `nil`, the layer uses an implicit default value of an `NSColor` or `UIColor`object whose RGB value is 0, 0, 0 and whose alpha value is 1.
+ If this property is set to `nil`, the layer uses an implicit default value of `blackColor` with an alpha value of 1.
  */
 @property (nonatomic, nullable) id <MGLStyleAttributeValue> circleColor;
 
