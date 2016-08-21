@@ -169,7 +169,7 @@ global.describeValue = function (value, property, layerType) {
             if (!color) {
                 throw new Error(`unrecognized color format in default value of ${property.name}`);
             }
-            return 'an `NSColor` or `UIColor`' + `object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
+            return 'an `NSColor` or `UIColor`' + ` object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
         case 'array':
             let units = property.units || '';
             if (units) {
