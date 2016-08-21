@@ -429,6 +429,11 @@
                                     <action selector="toggleToolbarShown:" target="-1" id="BXY-wc-z0C"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Show Layers" keyEquivalent="L" id="qtg-l9-BH3">
+                                <connections>
+                                    <action selector="toggleLayers:" target="-1" id="YdA-Mr-MHi"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
