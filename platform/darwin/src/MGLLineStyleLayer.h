@@ -134,7 +134,7 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
 #endif
 
 /**
- The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
+ The geometry's offset.
 
  This property is measured in points.
  
@@ -197,7 +197,7 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDasharray;
 
 /**
- Name of image in sprite to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512).
+ Name of image in style images to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512).
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *linePattern;
 

@@ -88,7 +88,7 @@ typedef NS_ENUM(NSUInteger, MGLCirclePitchScale) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleOpacity;
 
 /**
- The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
+ The geometry's offset.
 
  This property is measured in points.
  
