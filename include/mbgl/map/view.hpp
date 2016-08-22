@@ -52,7 +52,7 @@ public:
 
     // Reads the pixel data from the current framebuffer. If your View implementation
     // doesn't support reading from the framebuffer, return a null pointer.
-    virtual PremultipliedImage readStillImage();
+    virtual PremultipliedImage readStillImage(std::array<uint16_t, 2> size = {{ 0, 0 }});
 
     // Notifies a watcher of map x/y/scale/rotation changes.
     virtual void notifyMapChange(MapChange change);

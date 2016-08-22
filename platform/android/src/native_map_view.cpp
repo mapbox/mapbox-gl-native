@@ -208,7 +208,7 @@ void NativeMapView::render() {
          // take snapshot
          const unsigned int w = fbWidth;
          const unsigned int h = fbHeight;
-         mbgl::PremultipliedImage image { w, h };
+         mbgl::PremultipliedImage image { static_cast<uint16_t>(w), static_cast<uint16_t>(h) };
          MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
          const size_t stride = image.stride();
          auto tmp = std::make_unique<uint8_t[]>(stride);
