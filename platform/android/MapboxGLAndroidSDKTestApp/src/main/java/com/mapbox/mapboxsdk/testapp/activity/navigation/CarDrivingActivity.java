@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.testapp.activity.navigation;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -33,10 +32,11 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 public class CarDrivingActivity extends AppCompatActivity implements MapboxMap.OnMyLocationChangeListener {
 
+    private static final int PERMISSIONS_LOCATION = 0;
+
     private MapView mMapView;
     private MapboxMap mapboxMap;
-    private Location mLocation;
-    private static final int PERMISSIONS_LOCATION = 0;
+    private Location location;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -61,7 +61,7 @@ public class CarDrivingActivity extends AppCompatActivity implements MapboxMap.O
 
                 // view settings
                 MyLocationViewSettings settings = mapboxMap.getMyLocationViewSettings();
-                settings.setPadding(getWindow().getDecorView().getMeasuredHeight() / 3, getWindow().getDecorView().getMeasuredHeight() / 3, 0, 0);
+                settings.setPadding(0, getWindow().getDecorView().getMeasuredHeight() / 3, 0, 0);
 
                 // get car
                 Drawable car = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_taxi_top_small, getTheme());
@@ -129,17 +129,17 @@ public class CarDrivingActivity extends AppCompatActivity implements MapboxMap.O
 
         TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
         trackingSettings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
-      //§  trackingSettings.setMyBearingTrackingMode(MyBearingTracking.GPS);
+        trackingSettings.setMyBearingTrackingMode(MyBearingTracking.GPS);
     }
 
     @Override
     public void onMyLocationChange(@Nullable Location location) {
         if (location != null) {
-            if (mLocation == null) {
+            if (this.location == null) {
                 // initial location to reposition map
                 setInitialPosition(new LatLng(location));
             }
-            mLocation = location;
+            this.location = location;
         }
     }
 
