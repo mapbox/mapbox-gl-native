@@ -562,19 +562,19 @@ public class MyLocationView extends View {
                 return;
             }
 
-            if( event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR ){
+            if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
 
                 // calculate the rotation matrix
-                SensorManager.getRotationMatrixFromVector(matrix, event.values );
-                SensorManager.getOrientation(matrix, orientation );
+                SensorManager.getRotationMatrixFromVector(matrix, event.values);
+                SensorManager.getOrientation(matrix, orientation);
 
-                float magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation )[0]);
+                float magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation)[0]);
                 currentDegree = (int) (magneticHeading);
 
                 // Change the user location view orientation to reflect the device orientation
                 setCompass(currentDegree);
 
-                if(myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW){
+                if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
                     rotateCamera();
                 }
 
