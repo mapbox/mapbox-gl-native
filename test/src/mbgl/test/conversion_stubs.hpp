@@ -16,9 +16,10 @@ class Holder;
 using HolderMap = std::unordered_map<std::string, Holder>;
 using HolderVector = std::vector<Holder>;
 class Holder : public mbgl::variant<std::string, float, bool, HolderMap, HolderVector> {
+     using variant::variant;
 };
 
-inline bool isUndefined(const Holder& value) {
+inline bool isUndefined(const Holder&) {
     //Variant is always intialized
     return false;
 }
