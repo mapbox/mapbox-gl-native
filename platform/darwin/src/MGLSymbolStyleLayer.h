@@ -171,7 +171,7 @@ typedef NS_ENUM(NSUInteger, MGLTextAnchor) {
 };
 
 /**
- Specifies how to capitalize text, similar to the CSS `text-transform` property.
+ Specifies how to capitalize text.
  
  Values of this type are used in the `textTransform` property of `MGLSymbolStyleLayer`.
  */
@@ -312,7 +312,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFit;
 
 /**
- Size of the additional area added to dimensions determined by `iconTextFit`, in clockwise order: top, right, bottom, left.
+ Size of the additional area added to dimensions determined by `iconTextFit`.
 
  This property is measured in points.
  
@@ -359,7 +359,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconKeepUpright;
 
 /**
- Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate left and up.
+ Offset distance of icon from its anchor.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing a `CGVector` struct set to 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default value.
  
@@ -506,7 +506,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textKeepUpright;
 
 /**
- Specifies how to capitalize text, similar to the CSS `text-transform` property.
+ Specifies how to capitalize text.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextTransformNone`. Set this property to `nil` to reset it to the default value.
  
@@ -515,7 +515,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTransform;
 
 /**
- Offset distance of text from its anchor. Positive values indicate right and down, while negative values indicate left and up.
+ Offset distance of text from its anchor.
 
  This property is measured in ems.
  
@@ -626,7 +626,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloBlur;
 
 /**
- Distance that the icon's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
+ Distance that the icon's anchor is moved from its original placement.
 
  This property is measured in points.
  
@@ -717,7 +717,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloBlur;
 
 /**
- Distance that the text's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
+ Distance that the text's anchor is moved from its original placement.
 
  This property is measured in points.
  

@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 
 /**
- Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
+ Name of image in style images to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *backgroundPattern;
 

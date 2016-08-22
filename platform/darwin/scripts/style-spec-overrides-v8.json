@@ -1,0 +1,55 @@
+{
+  "layout_symbol": {
+    "icon-text-fit-padding": {
+      "doc": "Size of the additional area added to dimensions determined by `icon-text-fit`."
+    },
+    "icon-offset": {
+      "doc": "Offset distance of icon from its anchor."
+    },
+    "text-offset": {
+      "doc": "Offset distance of text from its anchor."
+    },
+    "text-transform": {
+      "doc": "Specifies how to capitalize text."
+    }
+  },
+  "paint_background": {
+    "background-pattern": {
+      "doc": "Name of image in style images to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512)."
+    }
+  },
+  "paint_fill": {
+    "fill-pattern": {
+      "doc": "Name of image in style images to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512)."
+    }
+  },
+  "paint_line": {
+    "line-pattern": {
+      "doc": "Name of image in style images to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512)."
+    },
+    "line-translate": {
+      "doc": "The geometry's offset."
+    }
+  },
+  "paint_circle": {
+    "circle-translate": {
+      "doc": "The geometry's offset."
+    }
+  },
+  "paint_fill": {
+    "fill-translate": {
+      "doc": "The geometry's offset."
+    },
+    "fill-color": {
+      "doc": "The color of the filled part of this layer."
+    }
+  },
+  "paint_symbol": {
+    "icon-translate": {
+      "doc": "Distance that the icon's anchor is moved from its original placement."
+    },
+    "text-translate": {
+      "doc": "Distance that the text's anchor is moved from its original placement."
+    }
+  }
+}
