@@ -5,6 +5,7 @@
 #include <mbgl/util/optional.hpp>
 
 #include <atomic>
+#include <array>
 
 namespace mbgl {
 
@@ -33,9 +34,16 @@ public:
     // loaded status
     bool isLoaded() const;
 
+    // returns the OpenGL texture ID
+    GLuint getID() const;
+
+    // size of uploaded image.
+    std::array<size_t, 2> getSize() const;
+
 private:
     // raw pixels have been loaded
     std::atomic<bool> loaded { false };
+    std::array<size_t, 2> size = {{ 0, 0 }};
 
     // filters
     Scaling filter = Scaling::Nearest;
