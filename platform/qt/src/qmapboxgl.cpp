@@ -119,11 +119,13 @@ std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
     auto img = std::make_unique<uint8_t[]>(swapped.byteCount());
     memcpy(img.get(), swapped.constBits(), swapped.byteCount());
 
-    return std::make_unique<mbgl::SpriteImage>(mbgl::PremultipliedImage
-        { size_t(swapped.width()), size_t(swapped.height()), std::move(img) }, 1.0);
+    return std::make_unique<mbgl::SpriteImage>(
+        mbgl::PremultipliedImage{ static_cast<uint16_t>(swapped.width()),
+                                  static_cast<uint16_t>(swapped.height()), std::move(img) },
+        1.0);
 }
 
-}
+} // namespace
 
 /*!
     \class QMapboxGLSettings
