@@ -35,4 +35,7 @@
 # Package telemetry
 -keep class com.mapbox.mapboxsdk.telemetry.** { *; }
 
+# Keep external project mapbox-java,
+# Needs to be removed after https://github.com/mapbox/mapbox-java/issues/178 is resolved
+-keep class com.mapbox.services.** { *; }
 
