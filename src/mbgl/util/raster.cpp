@@ -14,9 +14,15 @@ bool Raster::isLoaded() const {
     return loaded;
 }
 
-void Raster::load(PremultipliedImage image, uint32_t mipmapLevel) {
-    assert(image.data.get());
+GLuint Raster::getID() const {
+    return texture ? *texture : 0;
+}
 
+std::array<size_t, 2> Raster::getSize() const {
+    return size;
+}
+
+void Raster::load(PremultipliedImage image, uint32_t mipmapLevel) {
     if (images.size() <= mipmapLevel) {
         images.resize(mipmapLevel + 1);
     }
@@ -74,11 +80,11 @@ void Raster::upload(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         GLint level = 0;
         for (auto& img : images) {
-            assert(img.data.get());
             MBGL_CHECK_ERROR(glTexImage2D(
                 GL_TEXTURE_2D, level++, GL_RGBA, static_cast<GLsizei>(img.width),
                 static_cast<GLsizei>(img.height), 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data.get()));
         }
+        size = { { images.front().width, images.front().height } };
         images.clear();
         images.shrink_to_fit();
     }
