@@ -26,6 +26,7 @@ struct CustomLayerRenderParameters {
     double bearing;
     double pitch;
     double altitude;
+    int framebuffer;
 };
 
 /**

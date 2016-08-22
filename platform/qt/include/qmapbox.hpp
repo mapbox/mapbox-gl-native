@@ -51,6 +51,7 @@ struct Q_DECL_EXPORT CustomLayerRenderParameters {
     double bearing;
     double pitch;
     double altitude;
+    int framebuffer;
 };
 
 struct Q_DECL_EXPORT TransitionOptions {

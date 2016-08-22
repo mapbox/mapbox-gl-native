@@ -41,11 +41,17 @@ struct VAODeleter {
     void operator()(GLuint) const;
 };
 
+struct FBODeleter {
+    ObjectStore* store;
+    void operator()(GLuint) const;
+};
+
 using UniqueProgram = std_experimental::unique_resource<GLuint, ProgramDeleter>;
 using UniqueShader = std_experimental::unique_resource<GLuint, ShaderDeleter>;
 using UniqueBuffer = std_experimental::unique_resource<GLuint, BufferDeleter>;
 using UniqueTexture = std_experimental::unique_resource<GLuint, TextureDeleter>;
 using UniqueVAO = std_experimental::unique_resource<GLuint, VAODeleter>;
+using UniqueFBO = std_experimental::unique_resource<GLuint, FBODeleter>;
 
 class ObjectStore : private util::noncopyable {
 public:
@@ -82,6 +88,12 @@ public:
         return UniqueVAO { std::move(id), { this } };
     }
 
+    UniqueFBO createFBO() {
+        GLuint id = 0;
+        MBGL_CHECK_ERROR(glGenFramebuffers(1, &id));
+        return UniqueFBO { std::move(id), { this } };
+    }
+
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
     void performCleanup();
@@ -96,7 +108,8 @@ public:
             && abandonedShaders.empty()
             && abandonedBuffers.empty()
             && abandonedTextures.empty()
-            && abandonedVAOs.empty();
+            && abandonedVAOs.empty()
+            && abandonedFBOs.empty();
     }
 
 private:
@@ -105,6 +118,7 @@ private:
     friend BufferDeleter;
     friend TextureDeleter;
     friend VAODeleter;
+    friend FBODeleter;
 
     std::vector<GLuint> pooledTextures;
 
@@ -113,6 +127,7 @@ private:
     std::vector<GLuint> abandonedBuffers;
     std::vector<GLuint> abandonedTextures;
     std::vector<GLuint> abandonedVAOs;
+    std::vector<GLuint> abandonedFBOs;
 };
 
 } // namespace gl
