@@ -23,7 +23,8 @@ PremultipliedImage decodeWebP(const uint8_t* data, size_t size) {
         throw std::runtime_error("failed to decode WebP data");
     }
 
-    UnassociatedImage image { size_t(width), size_t(height), std::move(webp) };
+    UnassociatedImage image{ static_cast<uint16_t>(width), static_cast<uint16_t>(height),
+                             std::move(webp) };
     return util::premultiply(std::move(image));
 }
 

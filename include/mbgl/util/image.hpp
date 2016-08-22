@@ -18,12 +18,12 @@ class Image : private util::noncopyable {
 public:
     Image() = default;
 
-    Image(size_t w, size_t h)
+    Image(uint16_t w, uint16_t h)
         : width(w),
           height(h),
           data(std::make_unique<uint8_t[]>(size())) {}
 
-    Image(size_t w, size_t h, std::unique_ptr<uint8_t[]> data_)
+    Image(uint16_t w, uint16_t h, std::unique_ptr<uint8_t[]> data_)
         : width(w),
           height(h),
           data(std::move(data_)) {}
@@ -46,11 +46,11 @@ public:
                           rhs.data.get() + rhs.size());
     }
 
-    size_t stride() const { return width * 4; }
-    size_t size() const { return width * height * 4; }
+    size_t stride() const { return static_cast<size_t>(width) * 4; }
+    size_t size() const { return static_cast<size_t>(width) * height * 4; }
 
-    size_t width = 0;
-    size_t height = 0;
+    uint16_t width = 0;
+    uint16_t height = 0;
     std::unique_ptr<uint8_t[]> data;
 };
 

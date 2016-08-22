@@ -92,7 +92,8 @@ PremultipliedImage decodeImage(const std::string &source_data) {
         throw std::runtime_error("CGColorSpaceCreateDeviceRGB failed");
     }
 
-    PremultipliedImage result { CGImageGetWidth(image), CGImageGetHeight(image) };
+    PremultipliedImage result{ static_cast<uint16_t>(CGImageGetWidth(image)),
+                               static_cast<uint16_t>(CGImageGetHeight(image)) };
 
     CGContextRef context = CGBitmapContextCreate(result.data.get(), result.width, result.height, 8, result.stride(),
         color_space, kCGImageAlphaPremultipliedLast);
