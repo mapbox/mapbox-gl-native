@@ -1,6 +1,6 @@
 'use strict';
 
-var test = require('tape');
+var test = require('tape').test;
 var mbgl = require('../../../../lib/mapbox-gl-native');
 var fs = require('fs');
 var path = require('path');
@@ -42,7 +42,7 @@ function readFile(req, callback) {
     }
 }
 
-test.skip('Slow tiles', function(t) {
+test('Slow tiles', function(t) {
     var options = {
         request: function(req, callback) {
             switch (req.kind) {
@@ -85,7 +85,7 @@ test('Partial tiles with slow resources', function(t) {
         ratio: 1
     };
 
-    t.skip('Slow glyphs', function(t) {
+    t.test('Slow glyphs', function(t) {
         var map = new mbgl.Map(options);
         map.load(glyphs);
 
@@ -95,7 +95,7 @@ test('Partial tiles with slow resources', function(t) {
         });
     });
 
-    t.skip('Slow sprite', function(t) {
+    t.test('Slow sprite', function(t) {
         var map = new mbgl.Map(options);
         map.load(sprite);
 
@@ -107,7 +107,7 @@ test('Partial tiles with slow resources', function(t) {
 
     t.test('Many slow resources', function(t) {
         var map = new mbgl.Map(options);
-        map.load(satellite);
+        map.load(streets);
 
         map.render({
             center: [-122.4403, 37.7497],
