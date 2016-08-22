@@ -42,7 +42,7 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height) {
 }
 
 PremultipliedImage HeadlessView::readStillImage() {
-    util::stopwatch stopwatch("readStillImage", Event::General);
+    util::stopwatch stopwatch("readStillImage", EventSeverity::Info, Event::General);
     assert(active);
 
     const unsigned int w = dimensions[0] * pixelRatio;
@@ -50,7 +50,7 @@ PremultipliedImage HeadlessView::readStillImage() {
 
     PremultipliedImage image { w, h };
     {
-        util::stopwatch stopwatch2("glReadPixels", Event::General);
+        util::stopwatch stopwatch2("glReadPixels", EventSeverity::Info, Event::General);
         MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
     }
 
@@ -58,7 +58,7 @@ PremultipliedImage HeadlessView::readStillImage() {
     auto tmp = std::make_unique<uint8_t[]>(stride);
     uint8_t* rgba = image.data.get();
     {
-        util::stopwatch stopwatch3("memcpy", Event::General);
+        util::stopwatch stopwatch3("memcpy", EventSeverity::Info, Event::General);
         for (int i = 0, j = h - 1; i < j; i++, j--) {
             std::memcpy(tmp.get(), rgba + i * stride, stride);
             std::memcpy(rgba + i * stride, rgba + j * stride, stride);

@@ -242,7 +242,7 @@ void Map::Impl::update() {
     if (mode == MapMode::Continuous) {
         view.invalidate();
     } else if (callback && style->isLoaded()) {
-        util::stopwatch stopwatch2("render", Event::General);
+        util::stopwatch stopwatch("render", EventSeverity::Info, Event::General);
         Log::Info(Event::General, "[Map::Impl::update] Activating view and rendering");
         view.activate();
         render();
