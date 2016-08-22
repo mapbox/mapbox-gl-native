@@ -38,6 +38,7 @@
 
     <!-- Navigation -->
     <string name="activity_location_picker">Location Picker</string>
+    <string name="activity_car_driving">Driving animation</string>
 
     <!-- Other -->
     <string name="activity_double_map">Double Map Activity</string>
@@ -106,6 +107,7 @@
     <string name="description_query_rendered_feature_properties_point">Query rendered feature properties on click</string>
     <string name="description_query_rendered_features_box_count">Count all rendered features in box</string>
     <string name="description_query_rendered_features_box_highlight">Hightligh buildings in box</string>
+    <string name="description_car_driving">MyLocationView follow map update example</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
     <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>
