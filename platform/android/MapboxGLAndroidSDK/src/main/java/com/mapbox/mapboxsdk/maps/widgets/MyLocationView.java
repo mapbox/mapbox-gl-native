@@ -494,11 +494,11 @@ public class MyLocationView extends View {
     }
 
     public float getCenterX() {
-        return getX() + getMeasuredWidth() / 2;
+        return (getX() + contentPadding[0] - contentPadding[2] + getMeasuredWidth()) / 2;
     }
 
     public float getCenterY() {
-        return getY() + getMeasuredHeight() / 2;
+        return (getY() + contentPadding[1] - contentPadding[3] + getMeasuredHeight()) / 2;
     }
 
     public void setContentPadding(int[] padding) {
