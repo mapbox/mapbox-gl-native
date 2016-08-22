@@ -36,7 +36,7 @@ void Raster::bind(gl::ObjectStore& store,
                   uint32_t unit,
                   Scaling newFilter,
                   MipMap newMipMap) {
-    bool updateFilter = false;
+    bool filterNeedsUpdate = false;
 
     if (!texture) {
         if (images.empty()) {
@@ -44,28 +44,31 @@ void Raster::bind(gl::ObjectStore& store,
             return;
         } else {
             upload(store, config, unit);
-            updateFilter = true;
+            filterNeedsUpdate = true;
         }
     } else {
         if (config.texture[unit] != *texture) {
             config.activeTexture = unit;
-            config.texture[unit] = *texture;
+            config.texture[unit] = *texture; 
         }
-        updateFilter = (filter != newFilter || mipmap != newMipMap);
+        filterNeedsUpdate = (filter != newFilter || mipmap != newMipMap);
     }
 
-    if (updateFilter) {
+    if (filterNeedsUpdate) {
         filter = newFilter;
         mipmap = newMipMap;
-        config.activeTexture = unit;
-        MBGL_CHECK_ERROR(glTexParameteri(
-            GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-            filter == Scaling::Linear
-                ? (mipmap == MipMap::Yes ? GL_LINEAR_MIPMAP_NEAREST : GL_LINEAR)
-                : (mipmap == MipMap::Yes ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST)));
-        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                                         filter == Scaling::Linear ? GL_LINEAR : GL_NEAREST));
+        updateFilter();
     }
+}
+
+void Raster::updateFilter() {
+    MBGL_CHECK_ERROR(glTexParameteri(
+        GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+        filter == Scaling::Linear
+            ? (mipmap == MipMap::Yes ? GL_LINEAR_MIPMAP_NEAREST : GL_LINEAR)
+            : (mipmap == MipMap::Yes ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST)));
+    MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                                     filter == Scaling::Linear ? GL_LINEAR : GL_NEAREST));
 }
 
 void Raster::upload(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
@@ -73,6 +76,7 @@ void Raster::upload(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
         texture = store.createTexture();
         config.activeTexture = unit;
         config.texture[unit] = *texture;
+        updateFilter();
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, images.size()));
 #endif
