@@ -74,7 +74,7 @@ void align(Shaping &shaping, const float justify, const float horizontalAlign,
 // Returns true if the glyph is a strong right-to-left glyph.
 bool isRTL(uint32_t glyph) {
     // Use the major RTL Unicode code blocks as a rough approximation.
-    return ((glyph >= 0x600 && glyph <= 0x6ff) /* Arabic */
+    return ((glyph >= 0x600 && glyph <= 0x6ff && (glyph < 0x660 || glyph > 0x669) && glyph != 0x66b && glyph != 0x66c && (glyph < 0x6f0 || glyph > 0x6f9)) /* Arabic */
             || (glyph >= 0x750 && glyph <= 0x77f) /* Arabic Supplement */
             || (glyph >= 0x8a0 && glyph <= 0x8ff) /* Arabic Extended-A */
             || (glyph >= 0x590 && glyph <= 0x5ff) /* Hebrew */
