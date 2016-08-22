@@ -48,7 +48,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
 
 #if TARGET_OS_IPHONE
 /**
- The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the color's opacity will not affect the opacity of the 1pt stroke, if it is used.
+ The color of the filled part of this layer.
  
  The default value of this property is an `MGLStyleValue` object containing `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
@@ -57,7 +57,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *fillColor;
 #else
 /**
- The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the color's opacity will not affect the opacity of the 1pt stroke, if it is used.
+ The color of the filled part of this layer.
  
  The default value of this property is an `MGLStyleValue` object containing `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
@@ -74,7 +74,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *fillOutlineColor;
 
 /**
- The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
+ The geometry's offset.
 
  This property is measured in points.
  
