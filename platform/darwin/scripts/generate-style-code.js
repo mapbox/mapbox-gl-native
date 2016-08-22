@@ -2,8 +2,9 @@
 
 const fs = require('fs');
 const ejs = require('ejs');
-const spec = require('mapbox-gl-style-spec').latest;
+const _ = require('lodash');
 const colorParser = require('csscolorparser');
+const spec = _.merge(require('mapbox-gl-style-spec').latest, require('./style-spec-overrides-v8.json'));
 
 const prefix = 'MGL';
 const suffix = 'StyleLayer';
