@@ -263,6 +263,11 @@ void Painter::renderPass(PaintParameters& parameters,
         } else if (layer.is<CustomLayer>()) {
             MBGL_DEBUG_GROUP(layer.baseImpl->id + " - custom");
             VertexArrayObject::Unbind();
+            config.depthFunc.reset();
+            config.depthTest = GL_TRUE;
+            config.depthMask = GL_FALSE;
+            config.stencilTest = GL_FALSE;
+            setDepthSublayer(0);
             layer.as<CustomLayer>()->impl->render(state);
             config.setDirty();
         } else {

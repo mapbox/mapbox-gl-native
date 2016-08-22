@@ -1,11 +1,12 @@
 #include <mbgl/test/util.hpp>
-#include <mbgl/test/stub_file_source.hpp>
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -13,8 +14,20 @@
 using namespace mbgl;
 using namespace mbgl::style;
 
-static const GLchar * vertexShaderSource = "attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0, 1); }";
-static const GLchar * fragmentShaderSource = "void main() { gl_FragColor = vec4(0, 1, 0, 1); }";
+// Note that custom layers need to draw geometry with a z value of 1 to take advantage of
+// depth-based fragment culling.
+static const GLchar* vertexShaderSource = R"MBGL_SHADER(
+attribute vec2 a_pos;
+void main() {
+    gl_Position = vec4(a_pos, 1, 1);
+}
+)MBGL_SHADER";
+
+static const GLchar* fragmentShaderSource = R"MBGL_SHADER(
+void main() {
+    gl_FragColor = vec4(0, 0.5, 0, 0.5);
+}
+)MBGL_SHADER";
 
 // Not using any mbgl-specific stuff (other than a basic error-checking macro) in the
 // layer implementation because it is intended to reflect how someone using custom layers
@@ -47,10 +60,10 @@ public:
         MBGL_CHECK_ERROR(glLinkProgram(program));
         a_pos = glGetAttribLocation(program, "a_pos");
 
-        GLfloat background[] = { -1,-1, 1,-1, -1,1, 1,1 };
+        GLfloat triangle[] = { 0, 0.5, 0.5, -0.5, -0.5, -0.5 };
         MBGL_CHECK_ERROR(glGenBuffers(1, &buffer));
         MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, buffer));
-        MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), background, GL_STATIC_DRAW));
+        MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(GLfloat), triangle, GL_STATIC_DRAW));
     }
 
     void render() {
@@ -58,9 +71,7 @@ public:
         MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, buffer));
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
         MBGL_CHECK_ERROR(glVertexAttribPointer(a_pos, 2, GL_FLOAT, GL_FALSE, 0, nullptr));
-        MBGL_CHECK_ERROR(glDisable(GL_STENCIL_TEST));
-        MBGL_CHECK_ERROR(glDisable(GL_DEPTH_TEST));
-        MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+        MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 3));
     }
 
     GLuint program = 0;
@@ -75,10 +86,17 @@ TEST(CustomLayer, Basic) {
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    StubFileSource fileSource;
+
+#ifdef MBGL_ASSET_ZIP
+    // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
+    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
+#else
+    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
+#endif
 
     Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));
+    map.setLatLngZoom({ 37.8, -122.5 }, 10);
     map.addLayer(std::make_unique<CustomLayer>(
         "custom",
         [] (void* context) {
@@ -91,5 +109,10 @@ TEST(CustomLayer, Basic) {
             delete reinterpret_cast<TestLayer*>(context);
         }, new TestLayer()));
 
-    test::checkImage("test/fixtures/custom_layer/basic", test::render(map));
+    auto layer = std::make_unique<FillLayer>("landcover", "mapbox");
+    layer->setSourceLayer("landcover");
+    layer->setFillColor(Color{ 1.0, 1.0, 0.0, 1.0 });
+    map.addLayer(std::move(layer));
+
+    test::checkImage("test/fixtures/custom_layer/basic", test::render(map), 0.0006, 0.1);
 }
