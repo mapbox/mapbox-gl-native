@@ -18,7 +18,7 @@ GLuint Raster::getID() const {
     return texture ? *texture : 0;
 }
 
-std::array<size_t, 2> Raster::getSize() const {
+std::array<uint16_t, 2> Raster::getSize() const {
     return size;
 }
 

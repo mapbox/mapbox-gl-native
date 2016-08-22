@@ -45,7 +45,7 @@ public:
     void deactivate() override;
     void notifyMapChange(MapChange) override;
 
-    PremultipliedImage readStillImage() override;
+    PremultipliedImage readStillImage(std::array<uint16_t, 2> size = {{ 0, 0 }}) override;
 
     void resize(uint16_t width, uint16_t height);
     void setMapChangeCallback(std::function<void(MapChange)>&& cb) { mapChangeCallback = std::move(cb); }
