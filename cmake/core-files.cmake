@@ -456,6 +456,8 @@ set(MBGL_CORE_FILES
     src/mbgl/util/mat4.hpp
     src/mbgl/util/math.cpp
     src/mbgl/util/math.hpp
+    src/mbgl/util/offscreen_texture.cpp
+    src/mbgl/util/offscreen_texture.hpp
     src/mbgl/util/premultiply.cpp
     src/mbgl/util/premultiply.hpp
     src/mbgl/util/rapidjson.hpp

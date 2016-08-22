@@ -97,6 +97,7 @@ set(MBGL_TEST_FILES
     test/util/memory.cpp
     test/util/merge_lines.cpp
     test/util/number_conversions.cpp
+    test/util/offscreen_texture.cpp
     test/util/projection.cpp
     test/util/run_loop.cpp
     test/util/text_conversions.cpp
