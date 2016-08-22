@@ -106,7 +106,7 @@ private:
 
         Result<GeoJSONOptions> options = convert<GeoJSONOptions>(value);
         if (!options) {
-            return Error{ "Could not parse GeoJSONOptions" };
+            return options.error();
         }
 
         auto result = std::make_unique<GeoJSONSource>(id, *options);
