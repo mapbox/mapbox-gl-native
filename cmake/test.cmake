@@ -31,3 +31,5 @@ target_add_mason_package(mbgl-test PRIVATE geojson)
 target_add_mason_package(mbgl-test PRIVATE geojsonvt)
 
 mbgl_platform_test()
+
+create_source_groups(mbgl-test)
