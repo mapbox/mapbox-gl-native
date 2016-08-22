@@ -41,6 +41,9 @@ public:
     std::array<uint16_t, 2> getSize() const;
 
 private:
+    void updateFilter();
+
+private:
     // raw pixels have been loaded
     std::atomic<bool> loaded { false };
     std::array<uint16_t, 2> size = {{ 0, 0 }};
