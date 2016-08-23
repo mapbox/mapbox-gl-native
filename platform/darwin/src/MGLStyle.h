@@ -164,6 +164,13 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
+/**
+ The name of the style.
+ 
+ You can customize the style’s name in Mapbox Studio.
+ */
+@property (readonly, copy, nullable) NSString *name;
+
 #pragma mark Runtime Styling
 
 /**
