@@ -1,6 +1,8 @@
 package com.mapbox.mapboxsdk;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.text.TextUtils;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -78,5 +80,23 @@ public class MapboxAccountManager {
         if (TextUtils.isEmpty(accessToken) || (!accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("pk.") && !accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("sk."))) {
             throw new InvalidAccessTokenException();
         }
+    }
+
+    /**
+     * Determines whether we have an Internet connection available.
+     *
+     * @return true if there is an Internet connection, false otherwise
+     */
+    public boolean isConnected() {
+        if (applicationContext == null) {
+            // Assume connection if MapboxAccountManager contains an empty Context
+            return true;
+        }
+
+        // Check actual connectivity via ConnectivityManager. Code adapted from:
+        // https://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html#DetermineConnection
+        ConnectivityManager cm = (ConnectivityManager) applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
     }
 }

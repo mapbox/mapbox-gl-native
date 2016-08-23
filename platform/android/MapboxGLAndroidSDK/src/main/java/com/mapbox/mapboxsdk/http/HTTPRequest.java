@@ -3,10 +3,12 @@ package com.mapbox.mapboxsdk.http;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.net.NoRouteToHostException;
 import java.net.ProtocolException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -47,6 +49,12 @@ class HTTPRequest implements Callback {
         mNativePtr = nativePtr;
 
         try {
+            // Don't try a request if we aren't connected
+            MapboxAccountManager mapboxAccountManager = MapboxAccountManager.getInstance();
+            if (mapboxAccountManager != null && !mapboxAccountManager.isConnected()) {
+                throw new NoRouteToHostException("No Internet connection available.");
+            }
+
             HttpUrl httpUrl = HttpUrl.parse(resourceUrl);
             final String host = httpUrl.host().toLowerCase(MapboxConstants.MAPBOX_LOCALE);
             if (host.equals("mapbox.com") || host.endsWith(".mapbox.com")) {
@@ -124,7 +132,7 @@ class HTTPRequest implements Callback {
         Log.w(LOG_TAG, String.format("[HTTP] Request could not be executed: %s", e.getMessage()));
 
         int type = PERMANENT_ERROR;
-        if ((e instanceof UnknownHostException) || (e instanceof SocketException) || (e instanceof ProtocolException) || (e instanceof SSLException)) {
+        if ((e instanceof NoRouteToHostException) || (e instanceof UnknownHostException) || (e instanceof SocketException) || (e instanceof ProtocolException) || (e instanceof SSLException)) {
             type = CONNECTION_ERROR;
         } else if ((e instanceof InterruptedIOException)) {
             type = TEMPORARY_ERROR;
