@@ -56,8 +56,6 @@ public:
 
     const std::map<UnwrappedTileID, RenderTile>& getRenderTiles() const;
 
-    Tile* getTile(const OverscaledTileID&) const;
-
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const QueryParameters&) const;
 

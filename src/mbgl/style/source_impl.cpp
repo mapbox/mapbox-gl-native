@@ -77,15 +77,6 @@ const std::map<UnwrappedTileID, RenderTile>& Source::Impl::getRenderTiles() cons
     return renderTiles;
 }
 
-Tile* Source::Impl::getTile(const OverscaledTileID& overscaledTileID) const {
-    auto it = tiles.find(overscaledTileID);
-    if (it != tiles.end()) {
-        return it->second.get();
-    } else {
-        return nullptr;
-    }
-}
-
 bool Source::Impl::update(const UpdateParameters& parameters) {
     bool allTilesUpdated = true;
 
@@ -123,8 +114,9 @@ bool Source::Impl::update(const UpdateParameters& parameters) {
         tile.setNecessity(required ? Tile::Necessity::Required
                                    : Tile::Necessity::Optional);
     };
-    auto getTileFn = [this](const OverscaledTileID& dataTileID) -> Tile* {
-        return getTile(dataTileID);
+    auto getTileFn = [this](const OverscaledTileID& tileID) -> Tile* {
+        auto it = tiles.find(tileID);
+        return it == tiles.end() ? nullptr : it->second.get();
     };
     auto createTileFn = [this, &parameters](const OverscaledTileID& dataTileID) -> Tile* {
         std::unique_ptr<Tile> data = cache.get(dataTileID);
