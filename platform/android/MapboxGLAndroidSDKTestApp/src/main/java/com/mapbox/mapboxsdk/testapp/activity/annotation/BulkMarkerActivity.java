@@ -125,15 +125,24 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         drawable.setColorFilter(redColor, PorterDuff.Mode.SRC_IN);
         Icon icon = IconFactory.getInstance(this).fromDrawable(drawable);
 
+        List<MarkerViewOptions> markerOptionsList = new ArrayList<>();
         for (int i = 0; i < amount; i++) {
             randomIndex = random.nextInt(mLocations.size());
             LatLng latLng = mLocations.get(randomIndex);
-            mapboxMap.addMarker(new MarkerViewOptions()
+            MarkerViewOptions markerOptions = new MarkerViewOptions()
                     .position(latLng)
                     .icon(icon)
                     .title(String.valueOf(i))
-                    .snippet(formatter.format(latLng.getLatitude()) + ", " + formatter.format(latLng.getLongitude())));
+                    .snippet(formatter.format(latLng.getLatitude()) + ", " + formatter.format(latLng.getLongitude()));
+            markerOptionsList.add(markerOptions);
         }
+        long t1 = System.currentTimeMillis();
+//        for (MarkerViewOptions markerViewOptions : markerOptionsList) {
+//            mapboxMap.addMarker(markerViewOptions);
+//        }
+        mapboxMap.addMarkerViews(markerOptionsList);
+        long t2 = System.currentTimeMillis();
+        Log.d("time", "amount:"+amount+", time:"+(t2-t1));
     }
 
     private void showGlMarkers(int amount) {
