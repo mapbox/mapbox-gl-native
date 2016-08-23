@@ -1899,9 +1899,13 @@ public:
 
 - (void)resetPosition
 {
-    MGLMapCamera *camera = [MGLMapCamera camera];
-    camera.altitude = MGLAltitudeForZoomLevel(0, 0, 0, self.frame.size);
-    self.camera = camera;
+    CGFloat pitch = _mbglMap->getDefaultPitch();
+    CLLocationDirection heading = mbgl::util::wrap(_mbglMap->getDefaultBearing(), 0., 360.);
+    CLLocationDistance distance = MGLAltitudeForZoomLevel(_mbglMap->getDefaultZoom(), pitch, 0, self.frame.size);
+    self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(_mbglMap->getDefaultLatLng())
+                                                   fromDistance:distance
+                                                          pitch:pitch
+                                                        heading:heading];
 }
 
 - (void)emptyMemoryCache
