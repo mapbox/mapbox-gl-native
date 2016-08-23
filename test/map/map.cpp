@@ -126,6 +126,32 @@ TEST(Map, StyleExpired) {
     EXPECT_NE(nullptr, map.getLayer("bg"));
 }
 
+TEST(Map, StyleExpiredWithAnnotations) {
+    // Adding an annotation should not prevent revalidation of an expired style.
+
+    using namespace std::chrono_literals;
+
+    MapTest test;
+    FakeFileSource fileSource;
+
+    Map map(test.view, fileSource, MapMode::Still);
+    map.setStyleURL("mapbox://styles/test");
+    EXPECT_EQ(1u, fileSource.requests.size());
+
+    Response response;
+    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
+    response.expires = util::now() - 1h;
+
+    fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(1u, fileSource.requests.size());
+
+    map.addAnnotation(LineAnnotation { LineString<double> {{ { 0, 0 }, { 10, 10 } }} });
+    EXPECT_EQ(1u, fileSource.requests.size());
+
+    fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(1u, fileSource.requests.size());
+}
+
 TEST(Map, StyleEarlyMutation) {
     // An early mutation should not prevent the initial style load.
 
