@@ -77,10 +77,16 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 {
     if (self.mapView.camera.pitch != _oldPitch)
     {
+        // disable implicit animation
+        [CATransaction begin];
+        [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+
         CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(self.mapView.camera.pitch), 1.0, 0, 0);
         self.layer.sublayerTransform = t;
 
         [self updateFaux3DEffect];
+
+        [CATransaction commit];
 
         _oldPitch = self.mapView.camera.pitch;
     }
