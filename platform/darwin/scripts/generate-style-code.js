@@ -169,11 +169,14 @@ global.describeValue = function (value, property, layerType) {
             if (!color) {
                 throw new Error(`unrecognized color format in default value of ${property.name}`);
             }
-            if (color.r === 0 && color.g === 0 && color.b === 0) {
-                return '`blackColor`' + ` with an alpha value of ${color.a}`;
+            if (color.r === 0 && color.g === 0 && color.b === 0 && color.a === 0) {
+                return '`clearColor`';
             }
-            if (color.r === 1 && color.g === 1 && color.b === 1) {
-                return '`whiteColor`' + ` with an alpha value of ${color.a}`;
+            if (color.r === 0 && color.g === 0 && color.b === 0 && color.a === 1) {
+                return '`blackColor`';
+            }
+            if (color.r === 1 && color.g === 1 && color.b === 1 && color.a === 1) {
+                return '`whiteColor`';
             }
             return 'an `NSColor` or `UIColor`' + ` object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
         case 'array':

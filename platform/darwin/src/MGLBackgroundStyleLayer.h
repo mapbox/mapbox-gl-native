@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The color with which the background will be drawn.
  
- If this property is set to `nil`, the layer uses an implicit default value of `blackColor` with an alpha value of 1.
+ If this property is set to `nil`, the layer uses an implicit default value of `blackColor`.
 
  This property is only applied to the style if `backgroundPattern` is set to `nil`. Otherwise, it is ignored.
  */
