@@ -256,6 +256,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/filter.hpp
     include/mbgl/style/conversion/function.hpp
     include/mbgl/style/conversion/geojson.hpp
+    include/mbgl/style/conversion/geojson_options.hpp
     include/mbgl/style/conversion/layer.hpp
     include/mbgl/style/conversion/make_property_setters.hpp
     include/mbgl/style/conversion/property_setter.hpp
