@@ -23,7 +23,7 @@ import okhttp3.Response;
 
 class HTTPRequest implements Callback {
 
-    private static OkHttpClient mClient = new OkHttpClient();
+    private static OkHttpClient httpClient = new OkHttpClient();
     private final String LOG_TAG = HTTPRequest.class.getName();
 
     private static final int CONNECTION_ERROR = 0;
@@ -32,19 +32,19 @@ class HTTPRequest implements Callback {
 
     // Reentrancy is not needed, but "Lock" is an
     // abstract class.
-    private ReentrantLock mLock = new ReentrantLock();
+    private ReentrantLock lock = new ReentrantLock();
 
-    private long mNativePtr = 0;
+    private long nativePtr = 0;
 
-    private Call mCall;
-    private Request mRequest;
+    private Call call;
+    private Request request;
 
     private native void nativeOnFailure(int type, String message);
 
     private native void nativeOnResponse(int code, String etag, String modified, String cacheControl, String expires, byte[] body);
 
     private HTTPRequest(long nativePtr, String resourceUrl, String userAgent, String etag, String modified) {
-        mNativePtr = nativePtr;
+        this.nativePtr = nativePtr;
 
         try {
             HttpUrl httpUrl = HttpUrl.parse(resourceUrl);
@@ -64,25 +64,25 @@ class HTTPRequest implements Callback {
             } else if (modified.length() > 0) {
                 builder = builder.addHeader("If-Modified-Since", modified);
             }
-            mRequest = builder.build();
-            mCall = mClient.newCall(mRequest);
-            mCall.enqueue(this);
+            request = builder.build();
+            call = httpClient.newCall(request);
+            call.enqueue(this);
         } catch (Exception e) {
             onFailure(e);
         }
     }
 
     public void cancel() {
-        mCall.cancel();
+        call.cancel();
 
         // TODO: We need a lock here because we can try
         // to cancel at the same time the request is getting
         // answered on the OkHTTP thread. We could get rid of
         // this lock by using Runnable when we move Android
         // implementation of mbgl::RunLoop to Looper.
-        mLock.lock();
-        mNativePtr = 0;
-        mLock.unlock();
+        lock.lock();
+        nativePtr = 0;
+        lock.unlock();
     }
 
     @Override
@@ -108,11 +108,11 @@ class HTTPRequest implements Callback {
             response.body().close();
         }
 
-        mLock.lock();
-        if (mNativePtr != 0) {
+        lock.lock();
+        if (nativePtr != 0) {
             nativeOnResponse(response.code(), response.header("ETag"), response.header("Last-Modified"), response.header("Cache-Control"), response.header("Expires"), body);
         }
-        mLock.unlock();
+        lock.unlock();
     }
 
     @Override
@@ -132,10 +132,10 @@ class HTTPRequest implements Callback {
 
         String errorMessage = e.getMessage() != null ? e.getMessage() : "Error processing the request";
 
-        mLock.lock();
-        if (mNativePtr != 0) {
+        lock.lock();
+        if (nativePtr != 0) {
             nativeOnFailure(type, errorMessage);
         }
-        mLock.unlock();
+        lock.unlock();
     }
 }

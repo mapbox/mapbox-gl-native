@@ -46,9 +46,9 @@ public class OfflineActivity extends AppCompatActivity
     /*
      * UI elements
      */
-    private MapView mMapView;
+    private MapView mapView;
     private MapboxMap mapboxMap;
-    private ProgressBar mProgressBar;
+    private ProgressBar progressBar;
     private Button downloadRegion;
     private Button listRegions;
 
@@ -57,8 +57,8 @@ public class OfflineActivity extends AppCompatActivity
     /*
      * Offline objects
      */
-    private OfflineManager mOfflineManager;
-    private OfflineRegion mOfflineRegion;
+    private OfflineManager offlineManager;
+    private OfflineRegion offlineRegion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,10 +75,10 @@ public class OfflineActivity extends AppCompatActivity
         }
 
         // Set up map
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setStyleUrl(Style.MAPBOX_STREETS);
-        mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(new OnMapReadyCallback() {
+        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.setStyleUrl(Style.MAPBOX_STREETS);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 Log.d(LOG_TAG, "Map is ready");
@@ -96,7 +96,7 @@ public class OfflineActivity extends AppCompatActivity
         });
 
         // The progress bar
-        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         // Set up button listeners
         downloadRegion = (Button) findViewById(R.id.button_download_region);
@@ -116,37 +116,37 @@ public class OfflineActivity extends AppCompatActivity
         });
 
         // Set up the OfflineManager
-        mOfflineManager = OfflineManager.getInstance(this);
+        offlineManager = OfflineManager.getInstance(this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.onResume();
+        mapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        mapView.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mMapView.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        mapView.onLowMemory();
     }
 
     @Override
@@ -176,7 +176,7 @@ public class OfflineActivity extends AppCompatActivity
         Log.d(LOG_TAG, "handleListRegions");
 
         // Query the DB asynchronously
-        mOfflineManager.listOfflineRegions(new OfflineManager.ListOfflineRegionsCallback() {
+        offlineManager.listOfflineRegions(new OfflineManager.ListOfflineRegionsCallback() {
             @Override
             public void onList(OfflineRegion[] offlineRegions) {
                 // Check result
@@ -261,11 +261,11 @@ public class OfflineActivity extends AppCompatActivity
         }
 
         // Create region
-        mOfflineManager.createOfflineRegion(definition, metadata, new OfflineManager.CreateOfflineRegionCallback() {
+        offlineManager.createOfflineRegion(definition, metadata, new OfflineManager.CreateOfflineRegionCallback() {
             @Override
             public void onCreate(OfflineRegion offlineRegion) {
                 Log.d(LOG_TAG, "Offline region created: " + regionName);
-                mOfflineRegion = offlineRegion;
+                OfflineActivity.this.offlineRegion = offlineRegion;
                 launchDownload();
             }
 
@@ -278,7 +278,7 @@ public class OfflineActivity extends AppCompatActivity
 
     private void launchDownload() {
         // Set an observer
-        mOfflineRegion.setObserver(new OfflineRegion.OfflineRegionObserver() {
+        offlineRegion.setObserver(new OfflineRegion.OfflineRegionObserver() {
             @Override
             public void onStatusChanged(OfflineRegionStatus status) {
                 // Compute a percentage
@@ -315,7 +315,7 @@ public class OfflineActivity extends AppCompatActivity
         });
 
         // Change the region state
-        mOfflineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
+        offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
     }
 
     /*
@@ -329,13 +329,13 @@ public class OfflineActivity extends AppCompatActivity
 
         // Start and show the progress bar
         isEndNotified = false;
-        mProgressBar.setIndeterminate(true);
-        mProgressBar.setVisibility(View.VISIBLE);
+        progressBar.setIndeterminate(true);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     private void setPercentage(final int percentage) {
-        mProgressBar.setIndeterminate(false);
-        mProgressBar.setProgress(percentage);
+        progressBar.setIndeterminate(false);
+        progressBar.setProgress(percentage);
     }
 
     private void endProgress(final String message) {
@@ -348,8 +348,8 @@ public class OfflineActivity extends AppCompatActivity
 
         // Stop and hide the progress bar
         isEndNotified = true;
-        mProgressBar.setIndeterminate(false);
-        mProgressBar.setVisibility(View.GONE);
+        progressBar.setIndeterminate(false);
+        progressBar.setVisibility(View.GONE);
 
         // Show a toast
         Toast.makeText(OfflineActivity.this, message, Toast.LENGTH_LONG).show();

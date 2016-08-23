@@ -22,13 +22,12 @@ import java.util.ArrayList;
 
 public class PressForMarkerActivity extends AppCompatActivity {
 
+    private static final DecimalFormat LAT_LON_FORMATTER = new DecimalFormat("#.#####");
+    private static final String STATE_MARKER_LIST = "markerList";
+
     private MapView mapView;
     private MapboxMap mapboxMap;
-    private ArrayList<MarkerOptions> mMarkerList = new ArrayList<>();
-
-    private static final DecimalFormat LAT_LON_FORMATTER = new DecimalFormat("#.#####");
-
-    private static String STATE_MARKER_LIST = "markerList";
+    private ArrayList<MarkerOptions> markerList;
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -52,6 +51,13 @@ public class PressForMarkerActivity extends AppCompatActivity {
                 mapboxMap = map;
                 resetMap();
 
+                if (savedInstanceState != null) {
+                    markerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);
+                    mapboxMap.addMarkers(markerList);
+                }else{
+                    markerList = new ArrayList<>();
+                }
+
                 mapboxMap.setOnMapLongClickListener(new MapboxMap.OnMapLongClickListener() {
                     @Override
                     public void onMapLongClick(@NonNull LatLng point) {
@@ -65,15 +71,12 @@ public class PressForMarkerActivity extends AppCompatActivity {
                                 .title(title)
                                 .snippet(snippet);
 
-                        mMarkerList.add(marker);
+                        markerList.add(marker);
                         mapboxMap.addMarker(marker);
                     }
                 });
 
-                if (savedInstanceState != null) {
-                    mMarkerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);
-                    mapboxMap.addMarkers(mMarkerList);
-                }
+
             }
         });
     }
@@ -96,7 +99,7 @@ public class PressForMarkerActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
 
         mapView.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(STATE_MARKER_LIST, mMarkerList);
+        outState.putParcelableArrayList(STATE_MARKER_LIST, markerList);
     }
 
     @Override

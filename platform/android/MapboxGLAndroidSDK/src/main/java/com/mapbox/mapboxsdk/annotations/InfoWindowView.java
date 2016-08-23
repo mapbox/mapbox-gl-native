@@ -9,7 +9,7 @@ import com.mapbox.mapboxsdk.R;
 
 class InfoWindowView extends RelativeLayout {
 
-    private InfoWindowTipView mTipView;
+    private InfoWindowTipView tipView;
 
     public InfoWindowView(Context context) {
         this(context, null);
@@ -26,11 +26,11 @@ class InfoWindowView extends RelativeLayout {
 
     private void initialize(Context context) {
         LayoutInflater.from(context).inflate(R.layout.infowindow_content, this);
-        mTipView = (InfoWindowTipView) findViewById(R.id.infowindow_tipview);
+        tipView = (InfoWindowTipView) findViewById(R.id.infowindow_tipview);
     }
 
     void setTipViewMarginLeft(int marginLeft) {
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mTipView.getLayoutParams();
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) tipView.getLayoutParams();
         layoutParams.leftMargin = marginLeft;
         // This is a bit of a hack but prevents an occasional gap between the InfoWindow
         layoutParams.topMargin = (int) getResources().getDimension(R.dimen.infowindow_offset);

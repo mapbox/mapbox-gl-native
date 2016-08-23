@@ -44,9 +44,9 @@ import java.util.Random;
 public class BulkMarkerActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private MapboxMap mapboxMap;
-    private MapView mMapView;
-    private boolean mCustomMarkerView;
-    private List<LatLng> mLocations;
+    private MapView mapView;
+    private boolean customMarkerView;
+    private List<LatLng> locations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +63,9 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(new OnMapReadyCallback() {
+        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 BulkMarkerActivity.this.mapboxMap = mapboxMap;
@@ -89,7 +89,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         int amount = Integer.valueOf(getResources().getStringArray(R.array.bulk_marker_list)[position]);
-        if (mLocations == null) {
+        if (locations == null) {
             new LoadLocationTask(this, amount).execute();
         } else {
             showMarkers(amount);
@@ -97,18 +97,18 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     }
 
     private void onLatLngListLoaded(List<LatLng> latLngs, int amount) {
-        mLocations = latLngs;
+        locations = latLngs;
         showMarkers(amount);
     }
 
     private void showMarkers(int amount) {
         mapboxMap.clear();
 
-        if (mLocations.size() < amount) {
-            amount = mLocations.size();
+        if (locations.size() < amount) {
+            amount = locations.size();
         }
 
-        if (mCustomMarkerView) {
+        if (customMarkerView) {
             showViewMarkers(amount);
         } else {
             showGlMarkers(amount);
@@ -126,8 +126,8 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         Icon icon = IconFactory.getInstance(this).fromDrawable(drawable);
 
         for (int i = 0; i < amount; i++) {
-            randomIndex = random.nextInt(mLocations.size());
-            LatLng latLng = mLocations.get(randomIndex);
+            randomIndex = random.nextInt(locations.size());
+            LatLng latLng = locations.get(randomIndex);
             mapboxMap.addMarker(new MarkerViewOptions()
                     .position(latLng)
                     .icon(icon)
@@ -143,8 +143,8 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         int randomIndex;
 
         for (int i = 0; i < amount; i++) {
-            randomIndex = random.nextInt(mLocations.size());
-            LatLng latLng = mLocations.get(randomIndex);
+            randomIndex = random.nextInt(locations.size());
+            LatLng latLng = locations.get(randomIndex);
             markerOptionsList.add(new MarkerOptions()
                     .position(latLng)
                     .title(String.valueOf(i))
@@ -162,31 +162,31 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.onResume();
+        mapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        mapView.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mMapView.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        mapView.onLowMemory();
     }
 
     @Override
@@ -204,7 +204,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         @Override
         public void onClick(final View v) {
             if (mapboxMap != null) {
-                mCustomMarkerView = true;
+                customMarkerView = true;
 
                 // remove fab
                 v.animate().alpha(0).setListener(new AnimatorListenerAdapter() {
@@ -222,13 +222,13 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                     showMarkers(amount);
                 }
 
-                mMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+                mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
                     @Override
                     public void onMapChanged(@MapView.MapChange int change) {
                         if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
                             if (!mapboxMap.getMarkerViewManager().getMarkerViewAdapters().isEmpty()) {
                                 TextView viewCountView = (TextView) findViewById(R.id.countView);
-                                viewCountView.setText("ViewCache size " + (mMapView.getChildCount() - 5));
+                                viewCountView.setText("ViewCache size " + (mapView.getChildCount() - 5));
                             }
                         }
                     }

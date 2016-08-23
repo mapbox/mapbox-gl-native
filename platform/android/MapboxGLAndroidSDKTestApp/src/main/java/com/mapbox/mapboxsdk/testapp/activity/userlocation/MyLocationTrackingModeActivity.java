@@ -34,11 +34,12 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 public class MyLocationTrackingModeActivity extends AppCompatActivity implements MapboxMap.OnMyLocationChangeListener, AdapterView.OnItemSelectedListener {
 
-    private MapView mMapView;
-    private MapboxMap mapboxMap;
-    private Spinner mLocationSpinner, mBearingSpinner;
-    private Location mLocation;
     private static final int PERMISSIONS_LOCATION = 0;
+
+    private MapView mapView;
+    private MapboxMap mapboxMap;
+    private Spinner locationSpinner, bearingSpinner;
+    private Location location;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -55,9 +56,9 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(new OnMapReadyCallback() {
+        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 MyLocationTrackingModeActivity.this.mapboxMap = mapboxMap;
@@ -71,23 +72,23 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
 
                 ArrayAdapter<CharSequence> locationTrackingAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.user_tracking_mode, android.R.layout.simple_spinner_item);
                 locationTrackingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                mLocationSpinner = (Spinner) findViewById(R.id.spinner_location);
-                mLocationSpinner.setAdapter(locationTrackingAdapter);
-                mLocationSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
+                locationSpinner = (Spinner) findViewById(R.id.spinner_location);
+                locationSpinner.setAdapter(locationTrackingAdapter);
+                locationSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
 
                 ArrayAdapter<CharSequence> bearingTrackingAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.user_bearing_mode, android.R.layout.simple_spinner_item);
                 bearingTrackingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                mBearingSpinner = (Spinner) findViewById(R.id.spinner_bearing);
-                mBearingSpinner.setAdapter(bearingTrackingAdapter);
-                mBearingSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
+                bearingSpinner = (Spinner) findViewById(R.id.spinner_bearing);
+                bearingSpinner.setAdapter(bearingTrackingAdapter);
+                bearingSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
 
                 mapboxMap.setOnMyLocationTrackingModeChangeListener(new MapboxMap.OnMyLocationTrackingModeChangeListener() {
                     @Override
                     public void onMyLocationTrackingModeChange(@MyLocationTracking.Mode int myLocationTrackingMode) {
                         if (MyLocationTracking.TRACKING_NONE == myLocationTrackingMode) {
-                            mLocationSpinner.setOnItemSelectedListener(null);
-                            mLocationSpinner.setSelection(0);
-                            mLocationSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
+                            locationSpinner.setOnItemSelectedListener(null);
+                            locationSpinner.setSelection(0);
+                            locationSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
                         }
                     }
                 });
@@ -96,9 +97,9 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
                     @Override
                     public void onMyBearingTrackingModeChange(@MyBearingTracking.Mode int myBearingTrackingMode) {
                         if (MyBearingTracking.NONE == myBearingTrackingMode) {
-                            mBearingSpinner.setOnItemSelectedListener(null);
-                            mBearingSpinner.setSelection(0);
-                            mBearingSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
+                            bearingSpinner.setOnItemSelectedListener(null);
+                            bearingSpinner.setSelection(0);
+                            bearingSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
                         }
                     }
                 });
@@ -150,18 +151,18 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
     private void setInitialPosition(LatLng latLng) {
         mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
         mapboxMap.setMyLocationEnabled(true);
-        mLocationSpinner.setEnabled(true);
-        mBearingSpinner.setEnabled(true);
+        locationSpinner.setEnabled(true);
+        bearingSpinner.setEnabled(true);
     }
 
     @Override
     public void onMyLocationChange(@Nullable Location location) {
         if (location != null) {
-            if (mLocation == null) {
+            if (this.location == null) {
                 // initial location to reposition map
                 setInitialPosition(new LatLng(location));
             }
-            mLocation = location;
+            this.location = location;
             showSnackBar();
         }
     }
@@ -169,16 +170,16 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
     private void showSnackBar() {
         String desc = "Loc Chg: ";
         boolean noInfo = true;
-        if (mLocation.hasSpeed()) {
-            desc += String.format(MapboxConstants.MAPBOX_LOCALE, "Spd = %.1f km/h ", mLocation.getSpeed() * 3.6f);
+        if (location.hasSpeed()) {
+            desc += String.format(MapboxConstants.MAPBOX_LOCALE, "Spd = %.1f km/h ", location.getSpeed() * 3.6f);
             noInfo = false;
         }
-        if (mLocation.hasAltitude()) {
-            desc += String.format(MapboxConstants.MAPBOX_LOCALE, "Alt = %.0f m ", mLocation.getAltitude());
+        if (location.hasAltitude()) {
+            desc += String.format(MapboxConstants.MAPBOX_LOCALE, "Alt = %.0f m ", location.getAltitude());
             noInfo = false;
         }
-        if (mLocation.hasAccuracy()) {
-            desc += String.format(MapboxConstants.MAPBOX_LOCALE, "Acc = %.0f m", mLocation.getAccuracy());
+        if (location.hasAccuracy()) {
+            desc += String.format(MapboxConstants.MAPBOX_LOCALE, "Acc = %.0f m", location.getAccuracy());
         }
 
         if (noInfo) {
@@ -225,31 +226,31 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.onResume();
+        mapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        mapView.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mMapView.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        mapView.onLowMemory();
     }
 
     @Override

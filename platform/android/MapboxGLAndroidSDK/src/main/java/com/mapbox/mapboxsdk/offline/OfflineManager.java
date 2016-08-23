@@ -41,7 +41,7 @@ public class OfflineManager {
     private final static long DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
 
     // Holds the pointer to JNI DefaultFileSource
-    private long mDefaultFileSourcePtr = 0;
+    private long defaultFileSourcePtr = 0;
 
     // Makes sure callbacks come back to the main thread
     private Handler handler;
@@ -97,10 +97,10 @@ public class OfflineManager {
         // Get a pointer to the DefaultFileSource instance
         String assetRoot = getDatabasePath(context);
         String cachePath = assetRoot + File.separator + DATABASE_NAME;
-        mDefaultFileSourcePtr = createDefaultFileSource(cachePath, assetRoot, DEFAULT_MAX_CACHE_SIZE);
+        defaultFileSourcePtr = createDefaultFileSource(cachePath, assetRoot, DEFAULT_MAX_CACHE_SIZE);
 
         if (MapboxAccountManager.getInstance() != null) {
-            setAccessToken(mDefaultFileSourcePtr, MapboxAccountManager.getInstance().getAccessToken());
+            setAccessToken(defaultFileSourcePtr, MapboxAccountManager.getInstance().getAccessToken());
         }
 
         // Delete any existing previous ambient cache database
@@ -200,7 +200,7 @@ public class OfflineManager {
      */
     @Deprecated
     public void setAccessToken(String accessToken) {
-        setAccessToken(mDefaultFileSourcePtr, accessToken);
+        setAccessToken(defaultFileSourcePtr, accessToken);
     }
 
     /**
@@ -211,7 +211,7 @@ public class OfflineManager {
      */
     @Deprecated
     public String getAccessToken() {
-        return getAccessToken(mDefaultFileSourcePtr);
+        return getAccessToken(defaultFileSourcePtr);
     }
 
     private Handler getHandler() {
@@ -232,7 +232,7 @@ public class OfflineManager {
      * @param callback the callback to be invoked
      */
     public void listOfflineRegions(@NonNull final ListOfflineRegionsCallback callback) {
-        listOfflineRegions(mDefaultFileSourcePtr, new ListOfflineRegionsCallback() {
+        listOfflineRegions(defaultFileSourcePtr, new ListOfflineRegionsCallback() {
             @Override
             public void onList(final OfflineRegion[] offlineRegions) {
                 getHandler().post(new Runnable() {
@@ -276,7 +276,7 @@ public class OfflineManager {
             @NonNull byte[] metadata,
             @NonNull final CreateOfflineRegionCallback callback) {
 
-        createOfflineRegion(mDefaultFileSourcePtr, definition, metadata, new CreateOfflineRegionCallback() {
+        createOfflineRegion(defaultFileSourcePtr, definition, metadata, new CreateOfflineRegionCallback() {
             @Override
             public void onCreate(final OfflineRegion offlineRegion) {
                 getHandler().post(new Runnable() {
@@ -304,7 +304,7 @@ public class OfflineManager {
     * by the Mapbox Terms of Service.
     */
     public void setOfflineMapboxTileCountLimit(long limit) {
-        setOfflineMapboxTileCountLimit(mDefaultFileSourcePtr, limit);
+        setOfflineMapboxTileCountLimit(defaultFileSourcePtr, limit);
     }
 
 
