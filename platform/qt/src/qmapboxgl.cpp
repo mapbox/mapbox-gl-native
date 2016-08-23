@@ -126,6 +126,7 @@ QMapboxGLSettings::QMapboxGLSettings()
     , m_cacheMaximumSize(mbgl::util::DEFAULT_MAX_CACHE_SIZE)
     , m_cacheDatabasePath(":memory:")
     , m_assetPath(QCoreApplication::applicationDirPath())
+    , m_accessToken(qgetenv("MAPBOX_ACCESS_TOKEN"))
 {
 }
 
