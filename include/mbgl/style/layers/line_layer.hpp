@@ -28,47 +28,61 @@ public:
 
     // Layout properties
 
+    static PropertyValue<LineCapType> getDefaultLineCap();
     PropertyValue<LineCapType> getLineCap() const;
     void setLineCap(PropertyValue<LineCapType>);
 
+    static PropertyValue<LineJoinType> getDefaultLineJoin();
     PropertyValue<LineJoinType> getLineJoin() const;
     void setLineJoin(PropertyValue<LineJoinType>);
 
+    static PropertyValue<float> getDefaultLineMiterLimit();
     PropertyValue<float> getLineMiterLimit() const;
     void setLineMiterLimit(PropertyValue<float>);
 
+    static PropertyValue<float> getDefaultLineRoundLimit();
     PropertyValue<float> getLineRoundLimit() const;
     void setLineRoundLimit(PropertyValue<float>);
 
     // Paint properties
 
+    static PropertyValue<float> getDefaultLineOpacity();
     PropertyValue<float> getLineOpacity() const;
     void setLineOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
 
+    static PropertyValue<Color> getDefaultLineColor();
     PropertyValue<Color> getLineColor() const;
     void setLineColor(PropertyValue<Color>, const optional<std::string>& klass = {});
 
+    static PropertyValue<std::array<float, 2>> getDefaultLineTranslate();
     PropertyValue<std::array<float, 2>> getLineTranslate() const;
     void setLineTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
 
+    static PropertyValue<TranslateAnchorType> getDefaultLineTranslateAnchor();
     PropertyValue<TranslateAnchorType> getLineTranslateAnchor() const;
     void setLineTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
 
+    static PropertyValue<float> getDefaultLineWidth();
     PropertyValue<float> getLineWidth() const;
     void setLineWidth(PropertyValue<float>, const optional<std::string>& klass = {});
 
+    static PropertyValue<float> getDefaultLineGapWidth();
     PropertyValue<float> getLineGapWidth() const;
     void setLineGapWidth(PropertyValue<float>, const optional<std::string>& klass = {});
 
+    static PropertyValue<float> getDefaultLineOffset();
     PropertyValue<float> getLineOffset() const;
     void setLineOffset(PropertyValue<float>, const optional<std::string>& klass = {});
 
+    static PropertyValue<float> getDefaultLineBlur();
     PropertyValue<float> getLineBlur() const;
     void setLineBlur(PropertyValue<float>, const optional<std::string>& klass = {});
 
+    static PropertyValue<std::vector<float>> getDefaultLineDasharray();
     PropertyValue<std::vector<float>> getLineDasharray() const;
     void setLineDasharray(PropertyValue<std::vector<float>>, const optional<std::string>& klass = {});
 
+    static PropertyValue<std::string> getDefaultLinePattern();
     PropertyValue<std::string> getLinePattern() const;
     void setLinePattern(PropertyValue<std::string>, const optional<std::string>& klass = {});
 

@@ -61,12 +61,20 @@ const Filter& CircleLayer::getFilter() const {
 
 // Paint properties
 
+PropertyValue<float> CircleLayer::getDefaultCircleRadius() {
+    return { 5 };
+}
+
 PropertyValue<float> CircleLayer::getCircleRadius() const {
     return impl->paint.circleRadius.get();
 }
 
 void CircleLayer::setCircleRadius(PropertyValue<float> value, const optional<std::string>& klass) {
     impl->paint.circleRadius.set(value, klass);
+}
+
+PropertyValue<Color> CircleLayer::getDefaultCircleColor() {
+    return { Color::black() };
 }
 
 PropertyValue<Color> CircleLayer::getCircleColor() const {
@@ -77,12 +85,20 @@ void CircleLayer::setCircleColor(PropertyValue<Color> value, const optional<std:
     impl->paint.circleColor.set(value, klass);
 }
 
+PropertyValue<float> CircleLayer::getDefaultCircleBlur() {
+    return { 0 };
+}
+
 PropertyValue<float> CircleLayer::getCircleBlur() const {
     return impl->paint.circleBlur.get();
 }
 
 void CircleLayer::setCircleBlur(PropertyValue<float> value, const optional<std::string>& klass) {
     impl->paint.circleBlur.set(value, klass);
+}
+
+PropertyValue<float> CircleLayer::getDefaultCircleOpacity() {
+    return { 1 };
 }
 
 PropertyValue<float> CircleLayer::getCircleOpacity() const {
@@ -93,6 +109,10 @@ void CircleLayer::setCircleOpacity(PropertyValue<float> value, const optional<st
     impl->paint.circleOpacity.set(value, klass);
 }
 
+PropertyValue<std::array<float, 2>> CircleLayer::getDefaultCircleTranslate() {
+    return { {{ 0, 0 }} };
+}
+
 PropertyValue<std::array<float, 2>> CircleLayer::getCircleTranslate() const {
     return impl->paint.circleTranslate.get();
 }
@@ -101,12 +121,20 @@ void CircleLayer::setCircleTranslate(PropertyValue<std::array<float, 2>> value, 
     impl->paint.circleTranslate.set(value, klass);
 }
 
+PropertyValue<TranslateAnchorType> CircleLayer::getDefaultCircleTranslateAnchor() {
+    return { TranslateAnchorType::Map };
+}
+
 PropertyValue<TranslateAnchorType> CircleLayer::getCircleTranslateAnchor() const {
     return impl->paint.circleTranslateAnchor.get();
 }
 
 void CircleLayer::setCircleTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
     impl->paint.circleTranslateAnchor.set(value, klass);
+}
+
+PropertyValue<CirclePitchScaleType> CircleLayer::getDefaultCirclePitchScale() {
+    return { CirclePitchScaleType::Map };
 }
 
 PropertyValue<CirclePitchScaleType> CircleLayer::getCirclePitchScale() const {
