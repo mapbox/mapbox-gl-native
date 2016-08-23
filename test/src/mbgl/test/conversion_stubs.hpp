@@ -12,36 +12,36 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
-class Holder;
-using HolderMap = std::map<std::string, Holder>;
-using HolderVector = std::vector<Holder>;
-class Holder : public mbgl::variant<std::string, float, bool, HolderMap, HolderVector> {
+class Value;
+using ValueMap = std::map<std::string, Value>;
+using ValueVector = std::vector<Value>;
+class Value : public mbgl::variant<std::string, float, bool, ValueMap, ValueVector> {
      using variant::variant;
 };
 
-inline bool isUndefined(const Holder&) {
+inline bool isUndefined(const Value&) {
     //Variant is always intialized
     return false;
 }
 
-inline bool isArray(const Holder& value) {
-    return value.is<HolderVector>();
+inline bool isArray(const Value& value) {
+    return value.is<ValueVector>();
 }
 
-inline std::size_t arrayLength(const Holder& value) {
-    return value.get<HolderVector>().size();
+inline std::size_t arrayLength(const Value& value) {
+    return value.get<ValueVector>().size();
 }
 
-inline Holder arrayMember(const Holder& value, std::size_t i) {
-    return value.get<HolderVector>()[i];
+inline Value arrayMember(const Value& value, std::size_t i) {
+    return value.get<ValueVector>()[i];
 }
 
-inline bool isObject(const Holder& value) {
-    return value.is<HolderMap>();
+inline bool isObject(const Value& value) {
+    return value.is<ValueMap>();
 }
 
-inline optional<Holder> objectMember(const Holder& value, const char* key) {
-    auto map = value.get<HolderMap>();
+inline optional<Value> objectMember(const Value& value, const char* key) {
+    auto map = value.get<ValueMap>();
     auto iter = map.find(key);
 
     if (iter != map.end()) {
@@ -51,10 +51,10 @@ inline optional<Holder> objectMember(const Holder& value, const char* key) {
     }
 }
 
-using EachMemberFn = std::function<optional<Error>(const std::string&, const Holder&)>;
+using EachMemberFn = std::function<optional<Error>(const std::string&, const Value&)>;
 
-optional<Error> eachMember(const Holder& value, EachMemberFn&& fn) {
-    auto map = value.get<HolderMap>();
+optional<Error> eachMember(const Value& value, EachMemberFn&& fn) {
+    auto map = value.get<ValueMap>();
     auto iter = map.begin();
 
     while (iter != map.end()) {
@@ -69,7 +69,7 @@ optional<Error> eachMember(const Holder& value, EachMemberFn&& fn) {
     return {};
 }
 
-inline optional<bool> toBool(const Holder& value) {
+inline optional<bool> toBool(const Value& value) {
     if (value.is<bool>()) {
         return value.get<bool>();
     } else {
@@ -77,7 +77,7 @@ inline optional<bool> toBool(const Holder& value) {
     }
 }
 
-inline optional<float> toNumber(const Holder& value) {
+inline optional<float> toNumber(const Value& value) {
     if (value.is<float>()) {
         return value.get<float>();
     } else {
@@ -86,7 +86,7 @@ inline optional<float> toNumber(const Holder& value) {
     return {};
 }
 
-inline optional<std::string> toString(const Holder& value) {
+inline optional<std::string> toString(const Value& value) {
     if (value.is<std::string>()) {
         return value.get<std::string>();
     } else {
@@ -94,7 +94,7 @@ inline optional<std::string> toString(const Holder& value) {
     }
 }
 
-inline optional<Value> toValue(const Holder& value) {
+inline optional<mbgl::Value> toValue(const Value& value) {
     if (value.is<bool>()) {
         return { value.get<bool>() };
     } else if (value.is<std::string>()) {

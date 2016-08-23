@@ -10,22 +10,22 @@ using namespace mbgl::style;
 using namespace mbgl::style::conversion;
 
 TEST(GeoJSONOptions, Basic) {
-    HolderMap map;
-    Holder raw(map);
+    ValueMap map;
+    Value raw(map);
     Result<GeoJSONOptions> converted = convert<GeoJSONOptions>(raw);
     ASSERT_TRUE((bool) converted);
 }
 
 TEST(GeoJSONOptions, ErrorHandling) {
-    HolderMap map {{"maxzoom", "should not be a string"}};
-    Holder raw(map);
+    ValueMap map {{"maxzoom", "should not be a string"}};
+    Value raw(map);
     Result<GeoJSONOptions> converted = convert<GeoJSONOptions>(raw);
     ASSERT_FALSE((bool) converted);
 }
 
 TEST(GeoJSONOptions, RetainsDefaults) {
-    HolderMap map;
-    Holder raw(map);
+    ValueMap map;
+    Value raw(map);
     GeoJSONOptions converted = *convert<GeoJSONOptions>(raw);
     GeoJSONOptions defaults;
     
@@ -42,7 +42,7 @@ TEST(GeoJSONOptions, RetainsDefaults) {
 
 
 TEST(GeoJSONOptions, FullConversion) {
-    HolderMap map {
+    ValueMap map {
         //GeoJSON-VT
         {"maxzoom", 1},
         {"buffer", 2},
@@ -53,7 +53,7 @@ TEST(GeoJSONOptions, FullConversion) {
         {"clusterRadius", 4},
         {"clusterMaxZoom", 5}
     };
-    Holder raw(map);
+    Value raw(map);
     GeoJSONOptions converted = *convert<GeoJSONOptions>(raw);
     
     //GeoJSON-VT
