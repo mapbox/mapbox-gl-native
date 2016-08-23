@@ -502,10 +502,10 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 {
     CGFloat accuracy = self.userLocation.heading.headingAccuracy;
 
-    // size the mask using exagerated accuracy, but keep within a good display range
-    CGFloat clippingDegrees = 90 - (accuracy * 1.5);
-    clippingDegrees = fmin(clippingDegrees, 55);
-    clippingDegrees = fmax(clippingDegrees, 10);
+    // size the mask using accuracy, but keep within a good display range
+    CGFloat clippingDegrees = 90 - accuracy;
+    clippingDegrees = fmin(clippingDegrees, 70); // most accurate
+    clippingDegrees = fmax(clippingDegrees, 10); // least accurate
 
     CGRect ovalRect = CGRectMake(0, 0, MGLUserLocationAnnotationHaloSize, MGLUserLocationAnnotationHaloSize);
     UIBezierPath *ovalPath = UIBezierPath.bezierPath;
