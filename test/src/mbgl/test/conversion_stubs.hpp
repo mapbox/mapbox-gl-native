@@ -6,14 +6,14 @@
 #include <mbgl/util/variant.hpp>
 
 #include <string>
-#include <unordered_map>
+#include <map>
 
 namespace mbgl {
 namespace style {
 namespace conversion {
 
 class Holder;
-using HolderMap = std::unordered_map<std::string, Holder>;
+using HolderMap = std::map<std::string, Holder>;
 using HolderVector = std::vector<Holder>;
 class Holder : public mbgl::variant<std::string, float, bool, HolderMap, HolderVector> {
      using variant::variant;
