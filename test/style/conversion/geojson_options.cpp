@@ -17,8 +17,52 @@ TEST(GeoJSONOptions, Basic) {
 }
 
 TEST(GeoJSONOptions, ErrorHandling) {
-    HolderMap map {{"maxzoom","should not be a string"}};
+    HolderMap map {{"maxzoom", "should not be a string"}};
     Holder raw(map);
     Result<GeoJSONOptions> converted = convert<GeoJSONOptions>(raw);
     ASSERT_FALSE((bool) converted);
+}
+
+TEST(GeoJSONOptions, RetainsDefaults) {
+    HolderMap map;
+    Holder raw(map);
+    GeoJSONOptions converted = *convert<GeoJSONOptions>(raw);
+    GeoJSONOptions defaults;
+    
+    //GeoJSON-VT
+    ASSERT_EQ(converted.maxzoom, defaults.maxzoom);
+    ASSERT_EQ(converted.buffer, defaults.buffer);
+    ASSERT_EQ(converted.tolerance, defaults.tolerance);
+    
+    //Supercluster
+    ASSERT_EQ(converted.cluster, defaults.cluster);
+    ASSERT_EQ(converted.clusterRadius, defaults.clusterRadius);
+    ASSERT_EQ(converted.clusterMaxZoom, defaults.clusterMaxZoom);
+}
+
+
+TEST(GeoJSONOptions, FullConversion) {
+    HolderMap map {
+        //GeoJSON-VT
+        {"maxzoom", 1},
+        {"buffer", 2},
+        {"tolerance", 3},
+        
+        //Supercluster
+        {"cluster", true},
+        {"clusterRadius", 4},
+        {"clusterMaxZoom", 5}
+    };
+    Holder raw(map);
+    GeoJSONOptions converted = *convert<GeoJSONOptions>(raw);
+    
+    //GeoJSON-VT
+    ASSERT_EQ(converted.maxzoom, 1);
+    ASSERT_EQ(converted.buffer, 2);
+    ASSERT_EQ(converted.tolerance, 3);
+    
+    //Supercluster
+    ASSERT_EQ(converted.cluster, true);
+    ASSERT_EQ(converted.clusterRadius, 4);
+    ASSERT_EQ(converted.clusterMaxZoom, 5);
 }
