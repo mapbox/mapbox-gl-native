@@ -156,7 +156,7 @@ void DefaultFileSource::setAccessToken(const std::string& accessToken) {
 }
 
 std::string DefaultFileSource::getAccessToken() const {
-    return thread->invokeSync<std::string>(&Impl::getAccessToken);
+    return thread->invokeSync(&Impl::getAccessToken);
 }
 
 std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
