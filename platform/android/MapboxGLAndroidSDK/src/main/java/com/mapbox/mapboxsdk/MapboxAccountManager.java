@@ -9,6 +9,7 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
 import com.mapbox.mapboxsdk.exceptions.MapboxAccountManagerNotStartedException;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
+import com.mapbox.mapboxsdk.utils.IOUtils;
 
 public class MapboxAccountManager {
 
@@ -42,6 +43,7 @@ public class MapboxAccountManager {
         if (mapboxAccountManager == null) {
             mapboxAccountManager = new MapboxAccountManager(context, accessToken);
         }
+        IOUtils.getInstance(mapboxAccountManager.applicationContext);
         MapboxEventManager eventManager = MapboxEventManager.getMapboxEventManager();
         eventManager.initialize(mapboxAccountManager.applicationContext, mapboxAccountManager.accessToken);
         return mapboxAccountManager;
@@ -80,23 +82,5 @@ public class MapboxAccountManager {
         if (TextUtils.isEmpty(accessToken) || (!accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("pk.") && !accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("sk."))) {
             throw new InvalidAccessTokenException();
         }
-    }
-
-    /**
-     * Determines whether we have an Internet connection available.
-     *
-     * @return true if there is an Internet connection, false otherwise
-     */
-    public boolean isConnected() {
-        if (applicationContext == null) {
-            // Assume connection if MapboxAccountManager contains an empty Context
-            return true;
-        }
-
-        // Check actual connectivity via ConnectivityManager. Code adapted from:
-        // https://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html#DetermineConnection
-        ConnectivityManager cm = (ConnectivityManager) applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
     }
 }

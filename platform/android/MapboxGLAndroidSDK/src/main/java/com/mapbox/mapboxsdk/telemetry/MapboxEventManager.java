@@ -30,6 +30,7 @@ import com.mapbox.mapboxsdk.constants.GeoConstants;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
 import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.utils.IOUtils;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -629,9 +630,7 @@ public class MapboxEventManager {
             }
 
             // Check for NetworkConnectivity
-            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-            if (networkInfo == null || !networkInfo.isConnected()) {
+            if (!IOUtils.getInstance(null).isConnected()) {
                 Log.w(TAG, "Not connected to network, so empty events cache and return without attempting to send events");
                 // Make sure that events don't pile up when Offline
                 // and thus impact available memory over time.
