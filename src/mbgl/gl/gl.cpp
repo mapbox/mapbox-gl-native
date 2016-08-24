@@ -2,6 +2,7 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/platform/log.hpp>
 
+#include <cstring>
 #include <cassert>
 #include <iostream>
 #include <map>
@@ -61,30 +62,41 @@ void InitializeExtensions(glProc (*getProcAddress)(const char *)) {
     });
 }
 
-void checkError(const char *cmd, const char *file, int line) {
-    const GLenum err = glGetError();
-    if (err != GL_NO_ERROR) {
-        const char *error = nullptr;
+char* parseErrors(std::vector<GLenum> errors) {
+    char* error = nullptr;
+
+    for (auto &err : errors) {
         switch (err) {
-            case GL_INVALID_ENUM: error = "INVALID_ENUM"; break;
-            case GL_INVALID_VALUE: error = "INVALID_VALUE"; break;
-            case GL_INVALID_OPERATION: error = "INVALID_OPERATION"; break;
+            case GL_INVALID_ENUM: strcat(error, "INVALID_ENUM"); break;
+            case GL_INVALID_VALUE: strcat(error, "INVALID_VALUE"); break;
+            case GL_INVALID_OPERATION: strcat(error, "INVALID_OPERATION"); break;
 #ifdef GL_STACK_OVERFLOW
-            case GL_STACK_OVERFLOW:  error = "STACK_OVERFLOW";  break;
+            case GL_STACK_OVERFLOW: strcat(error, "STACK_OVERFLOW");  break;
 #endif
 #ifdef GL_STACK_UNDERFLOW
-            case GL_STACK_UNDERFLOW:  error = "STACK_UNDERFLOW";  break;
+            case GL_STACK_UNDERFLOW: strcat(error, "STACK_UNDERFLOW");  break;
 #endif
-            case GL_OUT_OF_MEMORY: error = "OUT_OF_MEMORY"; break;
-            case GL_INVALID_FRAMEBUFFER_OPERATION:  error = "INVALID_FRAMEBUFFER_OPERATION";  break;
+            case GL_OUT_OF_MEMORY: strcat(error, "OUT_OF_MEMORY"); break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION: strcat(error, "INVALID_FRAMEBUFFER_OPERATION");  break;
 #ifdef GL_CONTEXT_LOST
-            case GL_CONTEXT_LOST:  error = "CONTEXT_LOST";  break;
+            case GL_CONTEXT_LOST: strcat(error, "CONTEXT_LOST");  break;
 #endif
-            default: error = "(unknown)"; break;
+            default: strcat(error, "(unknown)"); break;
         }
-
-        throw ::mbgl::gl::Error(err, std::string(cmd) + ": Error GL_" + error + " - " + file + ":" + util::toString(line));
     }
+
+    return error;
+}
+
+void checkError(const char *cmd, const char *file, int line) {
+    std::vector<GLenum> errors;
+    GLenum err = GL_NO_ERROR;
+
+    while((err = glGetError()) != GL_NO_ERROR) {
+        errors.push_back(err);
+    }
+
+    if (!errors.empty()) throw ::mbgl::gl::Error(err, std::string(cmd) + ": Error GL_" + parseErrors(errors) + " - " + file + ":" + util::toString(line));
 }
 } // namespace gl
 } // namespace mbgl
