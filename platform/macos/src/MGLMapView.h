@@ -6,39 +6,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** Options for enabling debugging features in an MGLMapView instance. */
-typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
-    /** Edges of tile boundaries are shown as thick, red lines to help diagnose
-        tile clipping issues. */
-    MGLMapDebugTileBoundariesMask = 1 << 1,
-    
-    /** Each tile shows its tile coordinate (x/y/z) in the upper-left corner. */
-    MGLMapDebugTileInfoMask = 1 << 2,
-    
-    /** Each tile shows a timestamp indicating when it was loaded. */
-    MGLMapDebugTimestampsMask = 1 << 3,
-    
-    /** Edges of glyphs and symbols are shown as faint, green lines to help
-        diagnose collision and label placement issues. */
-    MGLMapDebugCollisionBoxesMask = 1 << 4,
-    
-    /** Each drawing operation is replaced by a translucent fill. Overlapping
-        drawing operations appear more prominent to help diagnose overdrawing.
-        @note This option does nothing in Release builds of the SDK.
-     */
-    MGLMapDebugOverdrawVisualizationMask = 1 << 5,
-    
-    /** The stencil buffer is shown instead of the color buffer.
-        @note This option does nothing in Release builds of the SDK.
-     */
-    MGLMapDebugStencilBufferMask = 1 << 6,
-
-    /** The depth buffer is shown instead of the color buffer.
-        @note This option does nothing in Release builds of the SDK.
-     */
-    MGLMapDebugDepthBufferMask = 1 << 7,
-};
-
 @class MGLAnnotationImage;
 @class MGLMapCamera;
 @class MGLStyle;
