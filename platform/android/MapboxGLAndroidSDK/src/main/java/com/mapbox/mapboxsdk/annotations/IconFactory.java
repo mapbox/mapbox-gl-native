@@ -30,23 +30,23 @@ public final class IconFactory {
 
     private static final String ICON_ID_PREFIX = "com.mapbox.icons.icon_";
 
-    private Context mContext;
-    private static IconFactory sInstance;
-    private Icon mDefaultMarker;
-    private Icon mDefaultMarkerView;
-    private BitmapFactory.Options mOptions;
+    private static IconFactory instance;
 
-    private int mNextId = 0;
+    private Context context;
+    private Icon defaultMarker;
+    private Icon defaultMarkerView;
+    private BitmapFactory.Options options;
+    private int nextId = 0;
 
     public static synchronized IconFactory getInstance(@NonNull Context context) {
-        if (sInstance == null) {
-            sInstance = new IconFactory(context.getApplicationContext());
+        if (instance == null) {
+            instance = new IconFactory(context.getApplicationContext());
         }
-        return sInstance;
+        return instance;
     }
 
     private IconFactory(@NonNull Context context) {
-        mContext = context;
+        this.context = context;
         DisplayMetrics realMetrics = null;
         DisplayMetrics metrics = new DisplayMetrics();
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -57,20 +57,20 @@ public final class IconFactory {
         }
         wm.getDefaultDisplay().getMetrics(metrics);
 
-        mOptions = new BitmapFactory.Options();
-        mOptions.inScaled = true;
-        mOptions.inDensity = DisplayMetrics.DENSITY_DEFAULT;
-        mOptions.inTargetDensity = metrics.densityDpi;
+        options = new BitmapFactory.Options();
+        options.inScaled = true;
+        options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
+        options.inTargetDensity = metrics.densityDpi;
         if (realMetrics != null) {
-            mOptions.inScreenDensity = realMetrics.densityDpi;
+            options.inScreenDensity = realMetrics.densityDpi;
         }
     }
 
     public Icon fromBitmap(@NonNull Bitmap bitmap) {
-        if (mNextId < 0) {
+        if (nextId < 0) {
             throw new TooManyIconsException();
         }
-        String id = ICON_ID_PREFIX + ++mNextId;
+        String id = ICON_ID_PREFIX + ++nextId;
         return new Icon(id, bitmap);
     }
 
@@ -96,7 +96,7 @@ public final class IconFactory {
     }
 
     public Icon fromResource(@DrawableRes int resourceId) {
-        Drawable drawable = ContextCompat.getDrawable(mContext, resourceId);
+        Drawable drawable = ContextCompat.getDrawable(context, resourceId);
         Bitmap bitmap;
         if (drawable instanceof BitmapDrawable) {
             BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
@@ -116,28 +116,28 @@ public final class IconFactory {
     }
 
     public Icon defaultMarker() {
-        if (mDefaultMarker == null) {
-            mDefaultMarker = fromResource(R.drawable.default_marker);
+        if (defaultMarker == null) {
+            defaultMarker = fromResource(R.drawable.default_marker);
         }
-        return mDefaultMarker;
+        return defaultMarker;
     }
 
     public Icon defaultMarkerView() {
-        if (mDefaultMarkerView == null) {
-            mDefaultMarkerView = fromResource(R.drawable.default_markerview);
+        if (defaultMarkerView == null) {
+            defaultMarkerView = fromResource(R.drawable.default_markerview);
         }
-        return mDefaultMarkerView;
+        return defaultMarkerView;
     }
 
     private Icon fromInputStream(@NonNull InputStream is) {
-        Bitmap bitmap = BitmapFactory.decodeStream(is, null, mOptions);
+        Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
         return fromBitmap(bitmap);
     }
 
     public Icon fromAsset(@NonNull String assetName) {
         InputStream is;
         try {
-            is = mContext.getAssets().open(assetName);
+            is = context.getAssets().open(assetName);
         } catch (IOException e) {
             return null;
         }
@@ -145,14 +145,14 @@ public final class IconFactory {
     }
 
     public Icon fromPath(@NonNull String absolutePath) {
-        Bitmap bitmap = BitmapFactory.decodeFile(absolutePath, mOptions);
+        Bitmap bitmap = BitmapFactory.decodeFile(absolutePath, options);
         return fromBitmap(bitmap);
     }
 
     public Icon fromFile(@NonNull String fileName) {
         FileInputStream is;
         try {
-            is = mContext.openFileInput(fileName);
+            is = context.openFileInput(fileName);
         } catch (FileNotFoundException e) {
             return null;
         }

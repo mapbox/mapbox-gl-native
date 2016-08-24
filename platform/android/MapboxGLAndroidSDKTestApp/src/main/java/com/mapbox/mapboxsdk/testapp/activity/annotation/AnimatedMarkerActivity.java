@@ -31,10 +31,10 @@ import java.util.Random;
 
 public class AnimatedMarkerActivity extends AppCompatActivity {
 
-    private MapView mMapView;
-    private MapboxMap mapboxMap;
+    private final static LatLng DUPONT_CIRCLE = new LatLng(38.90962, -77.04341);
 
-    private LatLng dupontCircle = new LatLng(38.90962, -77.04341);
+    private MapView mapView;
+    private MapboxMap mapboxMap;
 
     private Marker passengerMarker = null;
     private MarkerView carMarker = null;
@@ -53,9 +53,9 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(new OnMapReadyCallback() {
+        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
 
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
@@ -75,7 +75,7 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
 
     private void setupMap() {
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(dupontCircle)
+                .target(DUPONT_CIRCLE)
                 .zoom(15)
                 .build();
         mapboxMap.setCameraPosition(cameraPosition);
@@ -187,31 +187,31 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.onResume();
+        mapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        mapView.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mMapView.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        mapView.onLowMemory();
     }
 
     /**

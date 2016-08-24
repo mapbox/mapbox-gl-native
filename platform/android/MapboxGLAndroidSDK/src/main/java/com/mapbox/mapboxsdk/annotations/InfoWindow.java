@@ -26,21 +26,21 @@ import java.lang.ref.WeakReference;
  */
 public class InfoWindow {
 
-    private WeakReference<Marker> mBoundMarker;
-    private WeakReference<MapboxMap> mMapboxMap;
-    protected WeakReference<View> mView;
+    private WeakReference<Marker> boundMarker;
+    private WeakReference<MapboxMap> mapboxMap;
+    protected WeakReference<View> view;
 
-    private float mMarkerHeightOffset;
-    private float mMarkerWidthOffset;
-    private float mViewWidthOffset;
-    private PointF mCoordinates;
-    private boolean mIsVisible;
+    private float markerHeightOffset;
+    private float markerWidthOffset;
+    private float viewWidthOffset;
+    private PointF coordinates;
+    private boolean isVisible;
 
     @LayoutRes
-    private int mLayoutRes;
+    private int layoutRes;
 
     InfoWindow(MapView mapView, int layoutResId, MapboxMap mapboxMap) {
-        mLayoutRes = layoutResId;
+        layoutRes = layoutResId;
         View view = LayoutInflater.from(mapView.getContext()).inflate(layoutResId, mapView, false);
         initialize(view, mapboxMap);
     }
@@ -50,14 +50,14 @@ public class InfoWindow {
     }
 
     private void initialize(View view, MapboxMap mapboxMap) {
-        mMapboxMap = new WeakReference<>(mapboxMap);
-        mIsVisible = false;
-        mView = new WeakReference<>(view);
+        this.mapboxMap = new WeakReference<>(mapboxMap);
+        isVisible = false;
+        this.view = new WeakReference<>(view);
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MapboxMap mapboxMap = mMapboxMap.get();
+                MapboxMap mapboxMap = InfoWindow.this.mapboxMap.get();
                 if (mapboxMap != null) {
                     MapboxMap.OnInfoWindowClickListener onInfoWindowClickListener = mapboxMap.getOnInfoWindowClickListener();
                     boolean handledDefaultClick = false;
@@ -76,7 +76,7 @@ public class InfoWindow {
         view.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                MapboxMap mapboxMap = mMapboxMap.get();
+                MapboxMap mapboxMap = InfoWindow.this.mapboxMap.get();
                 if (mapboxMap != null) {
                     MapboxMap.OnInfoWindowLongClickListener listener = mapboxMap.getOnInfoWindowLongClickListener();
                     if (listener != null) {
@@ -103,19 +103,19 @@ public class InfoWindow {
 
         MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT);
 
-        MapboxMap mapboxMap = mMapboxMap.get();
-        View view = mView.get();
+        MapboxMap mapboxMap = this.mapboxMap.get();
+        View view = this.view.get();
         if (view != null && mapboxMap != null) {
             view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
             // Calculate y-offset for update method
-            mMarkerHeightOffset = -view.getMeasuredHeight() + offsetY;
-            mMarkerWidthOffset = -offsetX;
+            markerHeightOffset = -view.getMeasuredHeight() + offsetY;
+            markerWidthOffset = -offsetX;
 
             // Calculate default Android x,y coordinate
-            mCoordinates = mapboxMap.getProjection().toScreenLocation(position);
-            float x = mCoordinates.x - (view.getMeasuredWidth() / 2) + offsetX;
-            float y = mCoordinates.y - view.getMeasuredHeight() + offsetY;
+            coordinates = mapboxMap.getProjection().toScreenLocation(position);
+            float x = coordinates.x - (view.getMeasuredWidth() / 2) + offsetX;
+            float y = coordinates.y - view.getMeasuredHeight() + offsetY;
 
             if (view instanceof InfoWindowView) {
                 // only apply repositioning/margin for InfoWindowView
@@ -175,11 +175,11 @@ public class InfoWindow {
             view.setY(y);
 
             // Calculate x-offset for update method
-            mViewWidthOffset = x - mCoordinates.x - offsetX;
+            viewWidthOffset = x - coordinates.x - offsetX;
 
             close(); //if it was already opened
             mapView.addView(view, lp);
-            mIsVisible = true;
+            isVisible = true;
         }
         return this;
     }
@@ -190,10 +190,10 @@ public class InfoWindow {
      * @return this info window
      */
     InfoWindow close() {
-        MapboxMap mapboxMap = mMapboxMap.get();
-        if (mIsVisible && mapboxMap != null) {
-            mIsVisible = false;
-            View view = mView.get();
+        MapboxMap mapboxMap = this.mapboxMap.get();
+        if (isVisible && mapboxMap != null) {
+            isVisible = false;
+            View view = this.view.get();
             if (view != null && view.getParent() != null) {
                 ((ViewGroup) view.getParent()).removeView(view);
             }
@@ -216,12 +216,12 @@ public class InfoWindow {
      * @param overlayItem the tapped overlay item
      */
     void adaptDefaultMarker(Marker overlayItem, MapboxMap mapboxMap, MapView mapView) {
-        View view = mView.get();
+        View view = this.view.get();
         if (view == null) {
-            view = LayoutInflater.from(mapView.getContext()).inflate(mLayoutRes, mapView, false);
+            view = LayoutInflater.from(mapView.getContext()).inflate(layoutRes, mapView, false);
             initialize(view, mapboxMap);
         }
-        mMapboxMap = new WeakReference<>(mapboxMap);
+        this.mapboxMap = new WeakReference<>(mapboxMap);
         String title = overlayItem.getTitle();
         TextView titleTextView = ((TextView) view.findViewById(R.id.infowindow_title));
         if (!TextUtils.isEmpty(title)) {
@@ -242,39 +242,39 @@ public class InfoWindow {
     }
 
     InfoWindow setBoundMarker(Marker boundMarker) {
-        mBoundMarker = new WeakReference<>(boundMarker);
+        this.boundMarker = new WeakReference<>(boundMarker);
         return this;
     }
 
     Marker getBoundMarker() {
-        if (mBoundMarker == null) {
+        if (boundMarker == null) {
             return null;
         }
-        return mBoundMarker.get();
+        return boundMarker.get();
     }
 
     public void update() {
-        MapboxMap mapboxMap = mMapboxMap.get();
-        Marker marker = mBoundMarker.get();
-        View view = mView.get();
+        MapboxMap mapboxMap = this.mapboxMap.get();
+        Marker marker = boundMarker.get();
+        View view = this.view.get();
         if (mapboxMap != null && marker != null && view != null) {
-            mCoordinates = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
+            coordinates = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
 
             if (view instanceof InfoWindowView) {
-                view.setX(mCoordinates.x + mViewWidthOffset - mMarkerWidthOffset);
+                view.setX(coordinates.x + viewWidthOffset - markerWidthOffset);
             } else {
-                view.setX(mCoordinates.x - (view.getMeasuredWidth() / 2) - mMarkerWidthOffset);
+                view.setX(coordinates.x - (view.getMeasuredWidth() / 2) - markerWidthOffset);
             }
-            view.setY(mCoordinates.y + mMarkerHeightOffset);
+            view.setY(coordinates.y + markerHeightOffset);
         }
     }
 
     public View getView() {
-        return mView != null ? mView.get() : null;
+        return view != null ? view.get() : null;
     }
 
     boolean isVisible() {
-        return mIsVisible;
+        return isVisible;
     }
 
 }

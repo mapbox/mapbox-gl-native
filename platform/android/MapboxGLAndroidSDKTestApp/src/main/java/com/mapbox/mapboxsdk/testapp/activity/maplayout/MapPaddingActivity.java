@@ -21,7 +21,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 public class MapPaddingActivity extends AppCompatActivity {
 
-    private MapView mMapView;
+    private MapView mapView;
     private MapboxMap mapboxMap;
 
     @Override
@@ -38,11 +38,11 @@ public class MapPaddingActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setTag(true);
-        mMapView.onCreate(savedInstanceState);
+        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.setTag(true);
+        mapView.onCreate(savedInstanceState);
 
-        mMapView.getMapAsync(new OnMapReadyCallback() {
+        mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 MapPaddingActivity.this.mapboxMap = mapboxMap;
@@ -60,31 +60,31 @@ public class MapPaddingActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.onResume();
+        mapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        mapView.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mMapView.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        mapView.onLowMemory();
     }
 
     @Override
