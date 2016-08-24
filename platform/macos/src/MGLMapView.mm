@@ -807,7 +807,10 @@ public:
         }
         case mbgl::MapChangeDidFailLoadingMap:
         {
-            // Not yet implemented.
+            if ([self.delegate respondsToSelector:@selector(mapViewDidFailLoadingMap:withError:)]) {
+                NSError *error = [NSError errorWithDomain:MGLErrorDomain code:0 userInfo:nil];
+                [self.delegate mapViewDidFailLoadingMap:self withError:error];
+            }
             break;
         }
         case mbgl::MapChangeWillStartRenderingMap:

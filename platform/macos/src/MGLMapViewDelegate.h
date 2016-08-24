@@ -83,6 +83,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView;
 
+/**
+ Tells the delegate that the map view was unable to load data needed for
+ displaying the map.
+ 
+ This method may be called for a variety of reasons, including a network
+ connection failure or a failure to fetch the style from the server. You can use
+ the given error message to notify the user that map data is unavailable.
+ 
+ @param mapView The map view that is unable to load the data.
+ @param error The reason the data could not be loaded.
+ */
+- (void)mapViewDidFailLoadingMap:(MGLMapView *)mapView withError:(NSError *)error;
+
 - (void)mapViewWillStartRenderingMap:(MGLMapView *)mapView;
 - (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
 
