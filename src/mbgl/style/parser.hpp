@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <forward_list>
@@ -16,11 +17,13 @@
 namespace mbgl {
 namespace style {
 
+using StyleParseResult = std::exception_ptr;
+
 class Parser {
 public:
     ~Parser();
 
-    void parse(const std::string&);
+    StyleParseResult parse(const std::string&);
 
     std::string spriteURL;
     std::string glyphURL;

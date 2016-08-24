@@ -38,6 +38,7 @@ public:
     Impl(View&, FileSource&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
 
     void onNeedsRepaint() override;
+    void onStyleError() override;
     void onResourceError(std::exception_ptr) override;
 
     void update();
@@ -316,6 +317,8 @@ void Map::setStyleURL(const std::string& url) {
             } else {
                 Log::Error(Event::Setup, "loading style failed: %s", res.error->message.c_str());
             }
+            impl->onStyleError();
+            impl->onResourceError(std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified || res.noContent) {
             return;
         } else {
@@ -343,8 +346,8 @@ void Map::setStyleJSON(const std::string& json) {
 }
 
 void Map::Impl::loadStyleJSON(const std::string& json) {
-    style->setJSON(json);
     style->setObserver(this);
+    style->setJSON(json);
     styleJSON = json;
 
     // force style cascade, causing all pending transitions to complete.
@@ -906,6 +909,10 @@ void Map::onLowMemory() {
 void Map::Impl::onNeedsRepaint() {
     updateFlags |= Update::Repaint;
     asyncUpdate.send();
+}
+
+void Map::Impl::onStyleError() {
+    view.notifyMapChange(MapChangeDidFailLoadingMap);
 }
 
 void Map::Impl::onResourceError(std::exception_ptr error) {

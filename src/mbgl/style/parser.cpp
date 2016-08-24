@@ -14,24 +14,27 @@
 
 #include <algorithm>
 #include <set>
+#include <sstream>
 
 namespace mbgl {
 namespace style {
 
 Parser::~Parser() = default;
 
-void Parser::parse(const std::string& json) {
+StyleParseResult Parser::parse(const std::string& json) {
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
     document.Parse<0>(json.c_str());
 
     if (document.HasParseError()) {
-        Log::Error(Event::ParseStyle, "Error parsing style JSON at %i: %s", document.GetErrorOffset(), rapidjson::GetParseError_En(document.GetParseError()));
-        return;
+        std::stringstream message;
+        message <<  document.GetErrorOffset() << " - "
+            << rapidjson::GetParseError_En(document.GetParseError());
+
+        return std::make_exception_ptr(std::runtime_error(message.str()));
     }
 
     if (!document.IsObject()) {
-        Log::Error(Event::ParseStyle, "Style JSON must be an object");
-        return;
+        return std::make_exception_ptr(std::runtime_error("style must be an object"));
     }
 
     if (document.HasMember("version")) {
@@ -100,6 +103,8 @@ void Parser::parse(const std::string& json) {
             glyphURL = { glyphs.GetString(), glyphs.GetStringLength() };
         }
     }
+
+    return nullptr;
 }
 
 void Parser::parseSources(const JSValue& value) {
