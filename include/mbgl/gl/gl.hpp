@@ -66,11 +66,7 @@ struct Error : ::std::runtime_error {
 
 void checkError(const char *cmd, const char *file, int line);
 
-#ifndef NDEBUG
 #define MBGL_CHECK_ERROR(cmd) ([&]() { struct __MBGL_C_E { ~__MBGL_C_E() { ::mbgl::gl::checkError(#cmd, __FILE__, __LINE__); } } __MBGL_C_E; return cmd; }())
-#else
-#define MBGL_CHECK_ERROR(cmd) (cmd)
-#endif
 
 class ExtensionFunctionBase {
 public:
