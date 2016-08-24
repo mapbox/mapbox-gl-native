@@ -2,6 +2,7 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/platform/log.hpp>
 
+#include <cstring>
 #include <cassert>
 #include <iostream>
 #include <map>
@@ -61,30 +62,46 @@ void InitializeExtensions(glProc (*getProcAddress)(const char *)) {
     });
 }
 
-void checkError(const char *cmd, const char *file, int line) {
-    const GLenum err = glGetError();
-    if (err != GL_NO_ERROR) {
-        const char *error = nullptr;
+std::string parseErrors(std::vector<GLenum> errors) {
+    std::string error = "";
+
+    while (auto err = errors.back()) {
         switch (err) {
-            case GL_INVALID_ENUM: error = "INVALID_ENUM"; break;
-            case GL_INVALID_VALUE: error = "INVALID_VALUE"; break;
-            case GL_INVALID_OPERATION: error = "INVALID_OPERATION"; break;
+            case GL_INVALID_ENUM: error.append("GL_INVALID_ENUM"); break;
+            case GL_INVALID_VALUE: error.append("GL_INVALID_VALUE"); break;
+            case GL_INVALID_OPERATION: error.append("GL_INVALID_OPERATION"); break;
 #ifdef GL_STACK_OVERFLOW
-            case GL_STACK_OVERFLOW:  error = "STACK_OVERFLOW";  break;
+            case GL_STACK_OVERFLOW: error.append("GL_STACK_OVERFLOW");  break;
 #endif
 #ifdef GL_STACK_UNDERFLOW
-            case GL_STACK_UNDERFLOW:  error = "STACK_UNDERFLOW";  break;
+            case GL_STACK_UNDERFLOW: error.append("GL_STACK_UNDERFLOW");  break;
 #endif
-            case GL_OUT_OF_MEMORY: error = "OUT_OF_MEMORY"; break;
-            case GL_INVALID_FRAMEBUFFER_OPERATION:  error = "INVALID_FRAMEBUFFER_OPERATION";  break;
+            case GL_OUT_OF_MEMORY: error.append("GL_OUT_OF_MEMORY"); break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION: error.append("GL_INVALID_FRAMEBUFFER_OPERATION");  break;
 #ifdef GL_CONTEXT_LOST
-            case GL_CONTEXT_LOST:  error = "CONTEXT_LOST";  break;
+            case GL_CONTEXT_LOST: error.append("GL_CONTEXT_LOST");  break;
 #endif
-            default: error = "(unknown)"; break;
+            default: error.append("GL_UNKNOWN"); break;
         }
 
-        throw ::mbgl::gl::Error(err, std::string(cmd) + ": Error GL_" + error + " - " + file + ":" + util::toString(line));
+        // Remove error from vector
+        errors.pop_back();
+
+        if (!errors.empty()) error.append(" ");
     }
+
+    return error;
+}
+
+void checkError(const char *cmd, const char *file, int line) {
+    std::vector<GLenum> errors;
+    GLenum err = GL_NO_ERROR;
+
+    while((err = glGetError()) != GL_NO_ERROR) {
+        errors.push_back(err);
+    }
+
+    if (!errors.empty()) throw ::mbgl::gl::Error(err, std::string(cmd) + ": Error " + parseErrors(errors) + " - " + file + ":" + util::toString(line));
 }
 } // namespace gl
 } // namespace mbgl
