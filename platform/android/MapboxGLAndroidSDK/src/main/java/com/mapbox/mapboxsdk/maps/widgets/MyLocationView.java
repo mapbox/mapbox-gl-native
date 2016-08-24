@@ -484,7 +484,7 @@ public class MyLocationView extends View {
         invalidate();
         update();
     }
-    
+
     private void setCompass(float bearing) {
         float oldDir = previousDirection;
         if (directionAnimator != null) {

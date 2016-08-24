@@ -511,6 +511,7 @@ public class MarkerViewManager {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             viewHolder.imageView.setImageBitmap(marker.getIcon().getBitmap());
+            convertView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
             return convertView;
         }
 
