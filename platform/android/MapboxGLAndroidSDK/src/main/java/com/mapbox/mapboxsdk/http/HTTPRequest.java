@@ -2,8 +2,10 @@ package com.mapbox.mapboxsdk.http;
 
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.utils.IOUtils;
+
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.NoRouteToHostException;
@@ -11,7 +13,9 @@ import java.net.ProtocolException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.concurrent.locks.ReentrantLock;
+
 import javax.net.ssl.SSLException;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -46,7 +50,7 @@ class HTTPRequest implements Callback {
 
         try {
             // Don't try a request if we aren't connected
-            if (!IOUtils.getInstance(null).isConnected()) {
+            if (!MapboxAccountManager.getInstance().isConnected()) {
                 throw new NoRouteToHostException("No Internet connection available.");
             }
 
