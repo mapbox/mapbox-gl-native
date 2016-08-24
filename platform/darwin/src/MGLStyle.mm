@@ -88,6 +88,10 @@ static NSURL *MGLStyleURL_emerald;
     return MGLStyleURL_emerald;
 }
 
+- (NSString *)name {
+    return @(self.mapView.mbglMap->getStyleName().c_str());
+}
+
 - (mbgl::style::Layer *)mbglLayerWithIdentifier:(NSString *)identifier
 {
     return self.mapView.mbglMap->getLayer(identifier.UTF8String);

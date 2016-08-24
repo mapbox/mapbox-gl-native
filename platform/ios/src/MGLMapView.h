@@ -540,6 +540,14 @@ IB_DESIGNABLE
 - (IBAction)resetNorth;
 
 /**
+ Resets the map to the current style’s default viewport.
+ 
+ If the style doesn’t specify a default viewport, the map resets to a minimum
+ zoom level, a center coordinate of (0, 0), and a northern heading.
+ */
+- (IBAction)resetPosition;
+
+/**
  The coordinate bounds visible in the receiver’s viewport.
  
  Changing the value of this property updates the receiver immediately. If you
@@ -1194,12 +1202,6 @@ IB_DESIGNABLE
 - (void)toggleDebug __attribute__((deprecated("Use -setDebugMask:.")));
 
 - (void)emptyMemoryCache __attribute__((deprecated));
-
-/**
-    Resets the map to the minimum zoom level, a center coordinate of (0, 0), and
-    a northern heading.
- */
-- (void)resetPosition;
 
 @end
 
