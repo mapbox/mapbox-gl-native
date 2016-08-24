@@ -107,4 +107,10 @@ void HeadlessView::invalidate() {
     assert(false);
 }
 
+void HeadlessView::notifyMapChange(MapChange change) {
+    if (mapChangeCallback) {
+        mapChangeCallback(change);
+    }
+}
+
 } // namespace mbgl

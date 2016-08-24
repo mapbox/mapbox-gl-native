@@ -60,10 +60,19 @@ TEST(Map, SetStyleInvalidJSON) {
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
+    bool fail = false;
+    test.view.setMapChangeCallback([&](MapChange change) {
+        if (change == mbgl::MapChangeDidFailLoadingMap) {
+            fail = true;
+        }
+    });
+
     {
         Map map(test.view, test.fileSource, MapMode::Still);
         map.setStyleJSON("invalid");
     }
+
+    EXPECT_TRUE(fail);
 
     auto observer = Log::removeObserver();
     auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
@@ -71,6 +80,29 @@ TEST(Map, SetStyleInvalidJSON) {
         "Failed to parse style: 0 - Invalid value." }));
     auto unchecked = flo->unchecked();
     EXPECT_TRUE(unchecked.empty()) << unchecked;
+}
+
+TEST(Map, SetStyleInvalidURL) {
+    MapTest test;
+
+    test.fileSource.styleResponse = [] (const Resource&) {
+        Response response;
+        response.error = std::make_unique<Response::Error>(
+            Response::Error::Reason::Other,
+            "Failed by the test case");
+        return response;
+    };
+
+    test.view.setMapChangeCallback([&](MapChange change) {
+        if (change == mbgl::MapChangeDidFailLoadingMap) {
+            test.runLoop.stop();
+        }
+    });
+
+    Map map(test.view, test.fileSource, MapMode::Still);
+    map.setStyleURL("mapbox://bar");
+
+    test.runLoop.run();
 }
 
 TEST(Map, DoubleStyleLoad) {

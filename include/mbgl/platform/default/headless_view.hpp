@@ -43,10 +43,12 @@ public:
     void invalidate() override;
     void activate() override;
     void deactivate() override;
+    void notifyMapChange(MapChange) override;
 
     PremultipliedImage readStillImage() override;
 
     void resize(uint16_t width, uint16_t height);
+    void setMapChangeCallback(std::function<void(MapChange)>&& cb) { mapChangeCallback = std::move(cb); }
 
 private:
     // Implementation specific functions
@@ -84,6 +86,8 @@ private:
     GLXContext glContext = nullptr;
     GLXPbuffer glxPbuffer = 0;
 #endif
+
+    std::function<void(MapChange)> mapChangeCallback;
 
     GLuint fbo = 0;
     GLuint fboDepthStencil = 0;
