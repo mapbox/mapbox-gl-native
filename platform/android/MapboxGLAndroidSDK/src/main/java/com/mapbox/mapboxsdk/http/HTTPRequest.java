@@ -76,7 +76,10 @@ class HTTPRequest implements Callback {
     }
 
     public void cancel() {
-        mCall.cancel();
+        // mCall can be null if the constructor gets aborted (e.g, under a NoRouteToHostException).
+        if (mCall != null) {
+            mCall.cancel();
+        }
 
         // TODO: We need a lock here because we can try
         // to cancel at the same time the request is getting
