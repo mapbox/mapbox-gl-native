@@ -32,7 +32,7 @@ typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
 /**
  The color of the filled part of this layer. This color can be specified as rgba with an alpha component and the color's opacity will not affect the opacity of the 1pt stroke, if it is used.
  
- If this property is set to `nil`, the layer uses an implicit default value of `blackColor` with an alpha value of 1.
+ If this property is set to `nil`, the layer uses an implicit default value of `blackColor`.
 
  This property is only applied to the style if `fillPattern` is set to `nil`. Otherwise, it is ignored.
  */
