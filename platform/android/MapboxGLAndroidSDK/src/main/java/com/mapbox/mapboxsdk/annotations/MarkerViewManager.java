@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
@@ -316,12 +317,32 @@ public class MarkerViewManager {
      * @param markerViewAdapter the MarkerViewAdapter to add
      */
     public void addMarkerViewAdapter(MapboxMap.MarkerViewAdapter markerViewAdapter) {
+        addMarkerViewAdapter(markerViewAdapter, 0);
+    }
+
+
+    /**
+     * Add a MarkerViewAdapter to the MarkerViewManager.
+     * <p>
+     * The provided MarkerViewAdapter must use supply a generic subclass of MarkerView.
+     * </p>
+     *
+     * @param markerViewAdapter the MarkerViewAdapter to add
+     */
+    public void addMarkerViewAdapter(MapboxMap.MarkerViewAdapter markerViewAdapter, int index) {
         if (markerViewAdapter.getMarkerClass().equals(MarkerView.class)) {
             throw new RuntimeException("Providing a custom MarkerViewAdapter requires subclassing MarkerView");
         }
 
         if (!markerViewAdapters.contains(markerViewAdapter)) {
+
+            // add container
+            mapView.addMarkerViewContainer(markerViewAdapter.getMarkerClass(), index);
+
+            // add to adapter list
             markerViewAdapters.add(markerViewAdapter);
+
+            // invalidate adapters
             invalidateViewMarkersInVisibleRegion();
         }
     }
@@ -438,7 +459,7 @@ public class MarkerViewManager {
                             markerViewMap.put(marker, adaptedView);
                             if (convertView == null) {
                                 adaptedView.setVisibility(View.GONE);
-                                mapView.getMarkerViewContainer().addView(adaptedView);
+                                mapView.getMarkerViewContainer(adapter.getMarkerClass()).addView(adaptedView);
                             }
                         }
                     }

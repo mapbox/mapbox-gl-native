@@ -32,6 +32,7 @@ import android.support.annotation.UiThread;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -123,7 +124,8 @@ public class MapView extends FrameLayout {
     private NativeMapView mNativeMapView;
     private boolean mHasSurface = false;
 
-    private ViewGroup mMarkerViewContainer;
+    private ViewGroup mMarkerViewParentContainer;
+    private List<ViewGroup> mMarkerViewContainers;
     private CompassView mCompassView;
     private ImageView mLogoView;
     private ImageView mAttributionsView;
@@ -227,7 +229,8 @@ public class MapView extends FrameLayout {
         // Connectivity
         onConnectivityChanged(isConnected());
 
-        mMarkerViewContainer = (ViewGroup) view.findViewById(R.id.markerViewContainer);
+        mMarkerViewParentContainer = (ViewGroup) view.findViewById(R.id.markerViewContainer);
+        mMarkerViewContainers = new ArrayList<>();
 
         mMyLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
         mMyLocationView.setMapboxMap(mMapboxMap);
@@ -1203,8 +1206,21 @@ public class MapView extends FrameLayout {
     /**
      * @return the ViewGroup containing the marker views
      */
-    public ViewGroup getMarkerViewContainer() {
-        return mMarkerViewContainer;
+    public ViewGroup getMarkerViewContainer(Class markerViewClass) {
+        for (ViewGroup container : mMarkerViewContainers) {
+            if ((container.getTag().equals(markerViewClass))) {
+                return container;
+            }
+        }
+        throw new IllegalStateException("Container should be availlable for "+markerViewClass.toString());
+    }
+
+    public void addMarkerViewContainer(Class markerClass, int index){
+        FrameLayout markerViewContainer = new FrameLayout(getContext());
+        markerViewContainer.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        markerViewContainer.setTag(markerClass);
+        mMarkerViewParentContainer.addView(markerViewContainer, index);
+        mMarkerViewContainers.add(markerViewContainer);
     }
 
 
@@ -1729,7 +1745,7 @@ public class MapView extends FrameLayout {
                     (tapPoint.y - mAverageIconHeight / 2 - toleranceTopBottom) / mScreenDensity,
                     (tapPoint.x + mAverageIconWidth / 2 + toleranceSides) / mScreenDensity,
                     (tapPoint.y + mAverageIconHeight / 2 + toleranceTopBottom) / mScreenDensity);
-            
+
             List<Marker> nearbyMarkers = getMarkersInRect(tapRect);
             long newSelectedMarkerId = -1;
 

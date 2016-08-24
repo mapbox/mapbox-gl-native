@@ -367,6 +367,15 @@
                 android:name="@string/category"
                 android:value="@string/category_navigation" />
         </activity>
+        <activity
+            android:name=".activity.annotation.MarkerViewZOrderingActivity"
+            android:description="@string/description_marker_view_z_ordering"
+            android:label="@string/activity_view_marker_z_ordering">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_annotation" />
+
+        </activity>
         <!-- For Unit tests -->
         <activity android:name=".activity.style.RuntimeStyleTestActivity" />
         <activity android:name=".activity.style.RuntimeStyleTimingTestActivity" />
