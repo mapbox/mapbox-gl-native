@@ -94,7 +94,7 @@ public class MapboxAccountManager {
         ConnectivityManager cm = (ConnectivityManager) applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean result = (activeNetwork != null && activeNetwork.isConnected());
-        Log.i("IOUtils", "isConnected result = " + result);
+        Log.v("IOUtils", "isConnected result = " + result);
         return result;
     }
 
