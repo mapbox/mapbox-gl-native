@@ -273,6 +273,11 @@ NS_ASSUME_NONNULL_BEGIN
  Touch frameworks. On the other hand, static annotation images use less memory
  and draw more quickly than annotation views.
  
+ The user location annotation view can also be customized via this method. When
+ `annotation` is an instance of `MGLUserLocation` (or equal to the map view’s
+ `userLocation` property), return an instance of `MGLUserLocationAnnotationView`
+ (or a subclass thereof).
+
  @param mapView The map view that requested the annotation view.
  @param annotation The object representing the annotation that is about to be
     displayed.
