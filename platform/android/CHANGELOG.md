@@ -2,9 +2,25 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 4.2.0-beta.2 - August 25, 2016
+
+Mapbox Android 4.2.0 introduces the Runtime Style API and improves performance.
+
+* Runtime Style API [#5610](https://github.com/mapbox/mapbox-gl-native/issues/5610)
+* Query rendered features [#5869](https://github.com/mapbox/mapbox-gl-native/issues/5869)
+* Clustering [#5852](https://github.com/mapbox/mapbox-gl-native/issues/5852)
+* Integrated support for [Mapbox Android Services](https://www.mapbox.com/android-sdk/#mapbox_android_services)
+* Map view rendered with `SurfaceView` [#5000](https://github.com/mapbox/mapbox-gl-native/issues/5000)
+* Earcut [#2444](https://github.com/mapbox/mapbox-gl-native/pull/2444)
+* Offline improvements:
+  - Enable external storage to host the tiles database [#5589](https://github.com/mapbox/mapbox-gl-native/issues/5589)
+  - Stop delivering status updates when offline download is canceled [#5538](https://github.com/mapbox/mapbox-gl-native/issues/5538)
+  - Update SQLite schema with WAL journal mode and normal sync [#5796](https://github.com/mapbox/mapbox-gl-native/pull/5796)
+  - Check for network connectivity before requesting resources [#6123](https://github.com/mapbox/mapbox-gl-native/pull/6123)
+
 ## 4.2.0-beta.1 - August 6, 2016
 
-Mabox Android 4.2.0 introduces the Runtime Style API and improves performance.
+Mapbox Android 4.2.0 introduces the Runtime Style API and improves performance.
 
 * Runtime Style API ([#5610](https://github.com/mapbox/mapbox-gl-native/issues/5610))
 * Earcut ([#2444](https://github.com/mapbox/mapbox-gl-native/pull/2444))
