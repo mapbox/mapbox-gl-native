@@ -231,22 +231,22 @@ void QMapboxGL::cycleDebugOptions()
     d_ptr->mapObj->cycleDebugOptions();
 }
 
-QString QMapboxGL::styleJSON() const
+QString QMapboxGL::styleJson() const
 {
     return QString::fromStdString(d_ptr->mapObj->getStyleJSON());
 }
 
-QString QMapboxGL::styleURL() const
+QString QMapboxGL::styleUrl() const
 {
     return QString::fromStdString(d_ptr->mapObj->getStyleURL());
 }
 
-void QMapboxGL::setStyleJSON(const QString &style)
+void QMapboxGL::setStyleJson(const QString &style)
 {
     d_ptr->mapObj->setStyleJSON(style.toStdString());
 }
 
-void QMapboxGL::setStyleURL(const QString &url)
+void QMapboxGL::setStyleUrl(const QString &url)
 {
     d_ptr->mapObj->setStyleURL(url.toStdString());
 }
