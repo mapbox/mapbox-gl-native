@@ -104,6 +104,21 @@ test('Map', function(t) {
             t.end();
         });
 
+        t.test('requires a map style to be a valid style JSON', function(t) {
+            var map = new mbgl.Map(options);
+
+            t.throws(function() {
+                map.load('foo bar');
+            }, /Requires a map style to be a valid style JSON/);
+
+            t.throws(function() {
+                map.load('""');
+            }, /Requires a map style to be a valid style JSON/);
+
+            map.release();
+            t.end();
+        });
+
         t.test('expect either an object or array at root', { timeout: 1000 }, function(t) {
             var map = new mbgl.Map(options);
 
@@ -116,7 +131,9 @@ test('Map', function(t) {
                 t.end();
             });
 
-            map.load('invalid');
+            t.throws(function() {
+                map.load('invalid');
+            }, /Requires a map style to be a valid style JSON/);
         });
 
         t.test('accepts an empty stylesheet string', function(t) {
