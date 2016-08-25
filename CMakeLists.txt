@@ -27,7 +27,7 @@ mason_use(geojsonvt VERSION 6.1.3 HEADER_ONLY)
 mason_use(supercluster VERSION 0.2.0 HEADER_ONLY)
 mason_use(kdbush VERSION 0.1.1 HEADER_ONLY)
 mason_use(earcut VERSION 0.11 HEADER_ONLY)
-mason_use(protozero VERSION 1.3.0 HEADER_ONLY)
+mason_use(protozero VERSION 1.4.0 HEADER_ONLY)
 mason_use(pixelmatch VERSION 0.9.0 HEADER_ONLY)
 mason_use(geojson VERSION 0.1.4${MASON_CXXABI_SUFFIX})
 

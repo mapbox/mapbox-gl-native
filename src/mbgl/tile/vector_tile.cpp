@@ -14,8 +14,7 @@ namespace mbgl {
 
 class VectorTileLayer;
 
-using pbf_iter_type = protozero::pbf_reader::const_uint32_iterator;
-using packed_iter_type = std::pair<pbf_iter_type,pbf_iter_type>;
+using packed_iter_type = protozero::iterator_range<protozero::pbf_reader::const_uint32_iterator>;
 
 class VectorTileFeature : public GeometryTileFeature {
 public:
@@ -144,8 +143,8 @@ optional<Value> VectorTileFeature::getValue(const std::string& key) const {
         return optional<Value>();
     }
 
-    auto start_itr = tags_iter.first;
-    const auto & end_itr = tags_iter.second;
+    auto start_itr = tags_iter.begin();
+    const auto & end_itr = tags_iter.end();
     while (start_itr != end_itr) {
         uint32_t tag_key = static_cast<uint32_t>(*start_itr++);
 
@@ -172,8 +171,8 @@ optional<Value> VectorTileFeature::getValue(const std::string& key) const {
 
 std::unordered_map<std::string,Value> VectorTileFeature::getProperties() const {
     std::unordered_map<std::string,Value> properties;
-    auto start_itr = tags_iter.first;
-    const auto & end_itr = tags_iter.second;
+    auto start_itr = tags_iter.begin();
+    const auto & end_itr = tags_iter.end();
     while (start_itr != end_itr) {
         uint32_t tag_key = static_cast<uint32_t>(*start_itr++);
         if (start_itr == end_itr) {
@@ -201,10 +200,10 @@ GeometryCollection VectorTileFeature::getGeometries() const {
     lines.emplace_back();
     GeometryCoordinates* line = &lines.back();
 
-    auto g_itr = geometry_iter;
-    while (g_itr.first != g_itr.second) {
+    auto g_itr = geometry_iter.begin();
+    while (g_itr != geometry_iter.end()) {
         if (length == 0) {
-            uint32_t cmd_length = static_cast<uint32_t>(*g_itr.first++);
+            uint32_t cmd_length = static_cast<uint32_t>(*g_itr++);
             cmd = cmd_length & 0x7;
             length = cmd_length >> 3;
         }
@@ -212,8 +211,8 @@ GeometryCollection VectorTileFeature::getGeometries() const {
         --length;
 
         if (cmd == 1 || cmd == 2) {
-            x += protozero::decode_zigzag32(static_cast<uint32_t>(*g_itr.first++));
-            y += protozero::decode_zigzag32(static_cast<uint32_t>(*g_itr.first++));
+            x += protozero::decode_zigzag32(static_cast<uint32_t>(*g_itr++));
+            y += protozero::decode_zigzag32(static_cast<uint32_t>(*g_itr++));
 
             if (cmd == 1 && !line->empty()) { // moveTo
                 lines.emplace_back();
