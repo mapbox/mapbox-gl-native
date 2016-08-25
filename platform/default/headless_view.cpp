@@ -55,10 +55,35 @@ PremultipliedImage HeadlessView::readStillImage() {
     MBGL_CHECK_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, bufferId));
     MBGL_CHECK_ERROR(glBufferData(GL_PIXEL_PACK_BUFFER, h * image.stride(), 0, GL_STREAM_READ));
 
+    // Create a fence just before glReadPixels so we can delay mapping
+    // the buffer until all prior GL calls have completed.
+    GLsync fence = MBGL_CHECK_ERROR(glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
+
     {
         util::stopwatch stopwatch2("glReadPixels", EventSeverity::Info, Event::General);
         MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, 0));
     }
+
+    {
+        util::stopwatch stopwatch3("glFenceSync", EventSeverity::Info, Event::General);
+        // Timeout measued in nanoseconds, 100ms
+        GLenum syncStatus = MBGL_CHECK_ERROR(glClientWaitSync(fence, 0, 100000000));
+
+        // TODO: Log why glClientWaitSync unblocked
+        switch (syncStatus) {
+            case GL_ALREADY_SIGNALED:
+            case GL_CONDITION_SATISFIED:
+                break;
+            case GL_TIMEOUT_EXPIRED:
+                break;
+            case GL_WAIT_FAILED:
+                break;
+            default:
+                break;
+        }
+    }
+
+    MBGL_CHECK_ERROR(glDeleteSync(fence));
 
     // map the PBO to process its data by CPU
     GLubyte* ptr = (GLubyte*)glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
@@ -69,7 +94,7 @@ PremultipliedImage HeadlessView::readStillImage() {
         uint8_t* rgba = image.data.get();
 
         {
-            util::stopwatch stopwatch3("memcpy", EventSeverity::Info, Event::General);
+            util::stopwatch stopwatch4("memcpy", EventSeverity::Info, Event::General);
             for (unsigned int i = 0, j = h - 1; i < h; i++, j--) {
                 std::memcpy(rgba + i * stride, ptr + j * stride, stride);
             }
