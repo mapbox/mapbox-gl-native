@@ -1,6 +1,7 @@
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/gl/types.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <cassert>
 #include <cstring>
@@ -55,7 +56,35 @@ PremultipliedImage HeadlessView::readStillImage(std::array<uint16_t, 2> size) {
     MBGL_CHECK_ERROR(glGenBuffers(1, &bufferId));
     MBGL_CHECK_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, bufferId));
     MBGL_CHECK_ERROR(glBufferData(GL_PIXEL_PACK_BUFFER, size[1] * image.stride(), 0, GL_STREAM_READ));
+
+    // Create a fence just before glReadPixels so we can delay mapping
+    // the buffer until all prior GL calls have completed.
+    GLsync fence = MBGL_CHECK_ERROR(glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
+
     MBGL_CHECK_ERROR(glReadPixels(0, 0, size[0], size[1], GL_RGBA, GL_UNSIGNED_BYTE, 0));
+
+    // Timeout measued in nanoseconds, 100ms
+    GLenum syncStatus = MBGL_CHECK_ERROR(glClientWaitSync(fence, 0, 100000000));
+
+    switch (syncStatus) {
+        case GL_ALREADY_SIGNALED:
+            Log::Debug(Event::General, "GL_ALREADY_SIGNALED");
+            break;
+        case GL_CONDITION_SATISFIED:
+            Log::Debug(Event::General, "GL_CONDITION_SATISFIED");
+            break;
+        case GL_TIMEOUT_EXPIRED:
+            Log::Warning(Event::General, "GL_TIMEOUT_EXPIRED");
+            break;
+        case GL_WAIT_FAILED:
+            Log::Warning(Event::General, "GL_WAIT_FAILED");
+            break;
+        default:
+            Log::Warning(Event::General, "GL_WAIT_UNKNOWN");
+            break;
+    }
+
+    MBGL_CHECK_ERROR(glDeleteSync(fence));
 
     // Map the PBO to process its data by CPU
     GLubyte* ptr = (GLubyte*)glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
