@@ -44,6 +44,10 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 @property (nonatomic) NSInteger styleIndex;
 @property (nonatomic) BOOL debugLoggingEnabled;
 @property (nonatomic) BOOL customUserLocationAnnnotationEnabled;
+@property (nonatomic) BOOL isTestingFeaturesInBox;
+@property (nonatomic) UIView *featuresInBoxView;
+@property (nonatomic) CLLocationCoordinate2D countPointCoordinate;
+@property (nonatomic) UILabel *countLabel;
 
 @end
 
@@ -208,6 +212,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
          ? @"Disable Custom User Dot"
          : @"Enable Custom User Dot"),
         @"Query Annotations",
+        @"Count Features in Box",
         nil];
 
     if (self.debugLoggingEnabled)
@@ -298,6 +303,10 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 18)
     {
         [self testQueryPointAnnotations];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 19)
+    {
+        [self testCountFeaturesInBox];
     }
     else if (buttonIndex == actionSheet.numberOfButtons - 2 && self.debugLoggingEnabled)
     {
@@ -559,6 +568,39 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Visible Annotations" message:message preferredStyle:UIAlertControllerStyleAlert];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)testCountFeaturesInBox {
+    self.isTestingFeaturesInBox = YES;
+    
+    // disable user dot
+    self.mapView.showsUserLocation = NO;
+    /// zoom in
+    [self.mapView setZoomLevel:15];
+    
+    // visualize the target area
+    if (!self.featuresInBoxView) {
+        self.featuresInBoxView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMidX(self.view.bounds)-50, CGRectGetMidY(self.view.bounds)-50, 100, 100)];
+        self.featuresInBoxView.backgroundColor = [UIColor grayColor];
+        self.featuresInBoxView.alpha = 0.5;
+        [self.view addSubview:self.featuresInBoxView];
+    }
+    
+    // add some target features
+    MGLPointAnnotation *pointAnnotation = [[MGLPointAnnotation alloc] init];
+    CLLocationCoordinate2D pointCoordinate = self.mapView.centerCoordinate;
+    pointCoordinate.latitude += 0.004;
+    pointAnnotation.coordinate = pointCoordinate;
+    [self.mapView addAnnotation:pointAnnotation];
+   
+    CLLocationCoordinate2D polygonStartingCoordinate = self.mapView.centerCoordinate;
+    polygonStartingCoordinate.latitude -= 0.001;
+    CLLocationCoordinate2D coords[2] = {
+        polygonStartingCoordinate,
+        CLLocationCoordinate2DMake(polygonStartingCoordinate.latitude - 15.001, polygonStartingCoordinate.longitude - 15.001)
+    };
+    MGLPolyline *polyline = [MGLPolyline polylineWithCoordinates:coords count:2];
+    [self.mapView addAnnotation:polyline];
 }
 
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer *)longPress
@@ -923,6 +965,34 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     
     MGLPointAnnotation *point = annotation;
     point.coordinate = [self.mapView convertPoint:self.mapView.center toCoordinateFromView:self.mapView];
+}
+
+- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
+    if (self.isTestingFeaturesInBox) {
+        
+        
+        if (!self.countLabel) {
+            self.countLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 150, 21)];
+            self.countLabel.center = CGPointMake(CGRectGetMidX(self.view.bounds), CGRectGetHeight(self.view.bounds) - 100);
+            self.countLabel.textAlignment = NSTextAlignmentCenter;
+            self.countLabel.backgroundColor = [UIColor whiteColor];
+            [self.view addSubview:self.countLabel];
+        }
+        
+        NSArray *features = [self.mapView visibleFeaturesInRect:self.featuresInBoxView.frame];
+        BOOL foundPoint = NO;
+        BOOL foundLine = NO;
+        for (id<MGLFeature> feature in features) {
+            if ([feature isMemberOfClass:[MGLPolylineFeature class]] && feature.attributes.count == 0) {
+                foundLine = YES;
+            }
+            if ([feature isMemberOfClass:[MGLPointFeature class]] && feature.attributes.count == 0) {
+                foundPoint = YES;
+            }
+        }
+        
+        self.countLabel.text = [NSString stringWithFormat:@"point: %@, line: %@", @(foundPoint), @(foundLine)];
+    }
 }
 
 @end
