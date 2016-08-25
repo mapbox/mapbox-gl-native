@@ -118,6 +118,38 @@ auto fromQStringList(const QStringList &list)
 
 }
 
+/*!
+    \class QMapboxGLSettings
+    \brief The QMapboxGLSettings class stores the initial configuration for QMapboxGL.
+
+    \inmodule Mapbox Qt SDK
+
+    QMapboxGLSettings is used to configure QMapboxGL at the moment of its creation.
+    Once created, the QMapboxGLSettings of a QMapboxGL can no longer be changed.
+
+    \since 4.7
+*/
+
+/*!
+    \enum QMapboxGLSettings::GLContextMode
+
+    This enum set the expectations towards the GL state.
+
+    \value UniqueGLContext  The GL context is only used by QMapboxGL, so it is not
+    reset before each rendering. Use this mode if the intention is to only draw a
+    fullscreen map.
+
+    \value SharedGLContext  The GL context is shared and the state will be restored
+    before rendering. This mode is safer when GL calls are performed prior of after
+    we call QMapboxGL::render for rendering a map.
+
+    \sa contextMode()
+*/
+
+/*!
+    Constructs a QMapboxGLSettings object with the default values. The default
+    configuration is valid for initializing a QMapboxGL.
+*/
 QMapboxGLSettings::QMapboxGLSettings()
     : m_mapMode(QMapboxGLSettings::ContinuousMap)
     , m_contextMode(QMapboxGLSettings::SharedGLContext)
@@ -209,6 +241,27 @@ void QMapboxGLSettings::setAccessToken(const QString &token)
     m_accessToken = token;
 }
 
+/*!
+    \class QMapboxGL
+    \brief The QMapboxGL class is a Qt wrapper for the Mapbox GL Native engine.
+
+    \inmodule Mapbox Qt SDK
+
+    QMapboxGL is a Qt friendly version the Mapbox GL Native engine using Qt types
+    and deep integration with Qt event loop. QMapboxGL relies as much as possible
+    on Qt, trying to minimize the external dependencies. For instance it will use
+    QNetworkAccessManager for HTTP requests and QString for UTF-8 manipulation.
+
+    QMapboxGL is not thread-safe and it is assumed that it will be accessed from
+    the same thread as the thread where the GL context lives.
+
+    \since 4.7
+*/
+
+/*!
+    Constructs a QMapboxGL object with \a settings and sets \a parent as the parent
+    object. The \a settings cannot be changed after the object is constructed.
+*/
 QMapboxGL::QMapboxGL(QObject *parent_, const QMapboxGLSettings &settings)
     : QObject(parent_)
 {
@@ -241,11 +294,31 @@ QString QMapboxGL::styleUrl() const
     return QString::fromStdString(d_ptr->mapObj->getStyleURL());
 }
 
+/*!
+    Sets a new \a style from a JSON that must conform with the
+    \l {https://www.mapbox.com/mapbox-gl-style-spec/}
+    {Mapbox Style Specification}.
+
+    \note In case of a invalid style it will trigger a mapChanged
+    signal with QMapboxGL::MapChangeDidFailLoadingMap as argument.
+*/
 void QMapboxGL::setStyleJson(const QString &style)
 {
     d_ptr->mapObj->setStyleJSON(style.toStdString());
 }
 
+/*!
+    Sets a URL for fetching a JSON that will be later feed to
+    setStyleJson. URLs using the Mapbox scheme (\a mapbox://) are
+    also accepted and translated automatically to an actual HTTPS
+    request.
+
+    The Mapbox scheme is not enforced by any means and a style can
+    be fetched from anything that QNetworkAccessManager can handle.
+
+    \note In case of a invalid style it will trigger a mapChanged
+    signal with QMapboxGL::MapChangeDidFailLoadingMap as argument.
+*/
 void QMapboxGL::setStyleUrl(const QString &url)
 {
     d_ptr->mapObj->setStyleURL(url.toStdString());
