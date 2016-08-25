@@ -29,7 +29,7 @@ dependencies {
     compile 'com.mapzen.android:lost:1.1.0'
 
     // Mapbox Android Services
-    compile('com.mapbox.mapboxsdk:mapbox-android-services:2.0.0-SNAPSHOT@aar') {
+    compile('com.mapbox.mapboxsdk:mapbox-java-services:1.3.0@jar') {
         transitive = true
     }
 }
