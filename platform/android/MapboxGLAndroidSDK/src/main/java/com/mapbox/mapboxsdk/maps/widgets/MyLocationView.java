@@ -272,7 +272,6 @@ public class MyLocationView extends View {
         // apply tilt to camera
         camera.save();
         camera.rotate(tilt, 0, bearing);
-        Log.d("ANMA-3976", "onDraw bearing=" + bearing);
         // map camera matrix on our matrix
         camera.getMatrix(matrix);
 
@@ -598,8 +597,6 @@ public class MyLocationView extends View {
                     break;
             }
             bearing = (newBearing - screen_adjustment) % 360;
-
-            Log.d("ANMA-3976", "setBearing newBearing=" + newBearing + " bearing=" + bearing + " screen_adjustment=" + screen_adjustment);
         }
 
         private void rotateCamera() {
