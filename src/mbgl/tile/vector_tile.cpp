@@ -59,7 +59,7 @@ class VectorTileData : public GeometryTileData {
 public:
     VectorTileData(std::shared_ptr<const std::string> data);
 
-    util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
+    util::ptr<const GeometryTileLayer> getLayer(const std::string&) const override;
 
 private:
     std::shared_ptr<const std::string> data;
@@ -242,7 +242,7 @@ VectorTileData::VectorTileData(std::shared_ptr<const std::string> data_)
     : data(std::move(data_)) {
 }
 
-util::ptr<GeometryTileLayer> VectorTileData::getLayer(const std::string& name) const {
+util::ptr<const GeometryTileLayer> VectorTileData::getLayer(const std::string& name) const {
     if (!parsed) {
         parsed = true;
         protozero::pbf_reader tile_pbf(*data);

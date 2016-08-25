@@ -41,7 +41,7 @@ public:
 
     Request parseGeometryTile(TileWorker&,
                               std::vector<std::unique_ptr<style::Layer>>,
-                              std::unique_ptr<GeometryTileData>,
+                              std::unique_ptr<const GeometryTileData>,
                               PlacementConfig,
                               std::function<void(TileParseResult)> callback);
 

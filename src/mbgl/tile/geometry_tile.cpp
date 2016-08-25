@@ -60,7 +60,7 @@ std::vector<std::unique_ptr<Layer>> GeometryTile::cloneStyleLayers() const {
     return result;
 }
 
-void GeometryTile::setData(std::unique_ptr<GeometryTileData> data_) {
+void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
     if (!data_) {
         // This is a 404 response. We're treating these as empty tiles.
         workRequest.reset();

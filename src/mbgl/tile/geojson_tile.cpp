@@ -40,7 +40,7 @@ private:
 class GeoJSONTileData : public GeometryTileData {
 public:
     GeoJSONTileData(std::shared_ptr<GeoJSONTileLayer>);
-    util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
+    util::ptr<const GeometryTileLayer> getLayer(const std::string&) const override;
 
 private:
     const std::shared_ptr<GeoJSONTileLayer> layer;
@@ -136,7 +136,7 @@ util::ptr<const GeometryTileFeature> GeoJSONTileLayer::getFeature(std::size_t i)
 GeoJSONTileData::GeoJSONTileData(std::shared_ptr<GeoJSONTileLayer> layer_) : layer(std::move(layer_)) {
 }
 
-util::ptr<GeometryTileLayer> GeoJSONTileData::getLayer(const std::string&) const {
+util::ptr<const GeometryTileLayer> GeoJSONTileData::getLayer(const std::string&) const {
     // We're ignoring the layer name because GeoJSON tiles only have one layer.
     return layer;
 }

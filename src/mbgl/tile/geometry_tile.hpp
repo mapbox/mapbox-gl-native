@@ -31,7 +31,7 @@ public:
     ~GeometryTile() override;
 
     void setError(std::exception_ptr err);
-    void setData(std::unique_ptr<GeometryTileData>);
+    void setData(std::unique_ptr<const GeometryTileData>);
 
     Bucket* getBucket(const style::Layer&) override;
 
