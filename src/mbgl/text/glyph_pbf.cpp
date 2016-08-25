@@ -10,7 +10,11 @@
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/url.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wshadow"
 #include <protozero/pbf_reader.hpp>
+#pragma GCC diagnostic pop
 
 namespace {
 
