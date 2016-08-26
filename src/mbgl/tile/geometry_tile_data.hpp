@@ -51,6 +51,7 @@ public:
 class GeometryTileData {
 public:
     virtual ~GeometryTileData() = default;
+    virtual std::unique_ptr<GeometryTileData> clone() const = 0;
     virtual const GeometryTileLayer* getLayer(const std::string&) const = 0;
 };
 

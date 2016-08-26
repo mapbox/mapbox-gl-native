@@ -66,6 +66,8 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
         workRequest.reset();
         availableData = DataAvailability::All;
         buckets.clear();
+        featureIndex.reset();
+        data.reset();
         redoPlacement();
         observer->onTileLoaded(*this, true);
         return;

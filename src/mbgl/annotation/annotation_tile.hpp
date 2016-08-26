@@ -56,6 +56,7 @@ private:
 
 class AnnotationTileData : public GeometryTileData {
 public:
+    std::unique_ptr<GeometryTileData> clone() const override;
     const GeometryTileLayer* getLayer(const std::string&) const override;
 
     std::unordered_map<std::string, AnnotationTileLayer> layers;

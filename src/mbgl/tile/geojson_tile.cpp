@@ -55,6 +55,10 @@ public:
         : features(std::move(features_)) {
     }
 
+    std::unique_ptr<GeometryTileData> clone() const override {
+        return std::make_unique<GeoJSONTileData>(*this);
+    }
+
     const GeometryTileLayer* getLayer(const std::string&) const override {
         return this;
     }

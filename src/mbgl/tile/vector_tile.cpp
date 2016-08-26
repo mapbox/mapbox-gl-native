@@ -59,6 +59,10 @@ class VectorTileData : public GeometryTileData {
 public:
     VectorTileData(std::shared_ptr<const std::string> data);
 
+    std::unique_ptr<GeometryTileData> clone() const override {
+        return std::make_unique<VectorTileData>(*this);
+    }
+
     const GeometryTileLayer* getLayer(const std::string&) const override;
 
 private:
