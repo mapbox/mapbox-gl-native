@@ -37,8 +37,10 @@ inline const JSValue* objectMember(const JSValue& value, const char * name) {
 
 template <class Fn>
 optional<Error> eachMember(const JSValue& value, Fn&& fn) {
-    for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it) {
-        optional<Error> result = fn({it->name.GetString(), it->name.GetStringLength()}, it->value);
+    assert(value.IsObject());
+    for (const auto& property : value.GetObject()) {
+        optional<Error> result =
+            fn({ property.name.GetString(), property.name.GetStringLength() }, property.value);
         if (result) {
             return result;
         }

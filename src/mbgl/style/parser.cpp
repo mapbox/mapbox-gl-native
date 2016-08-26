@@ -113,11 +113,11 @@ void Parser::parseSources(const JSValue& value) {
         return;
     }
 
-    for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it) {
-        std::string id = *conversion::toString(it->name);
+    for (const auto& property : value.GetObject()) {
+        std::string id = *conversion::toString(property.name);
 
-        conversion::Result<std::unique_ptr<Source>> source
-            = conversion::convert<std::unique_ptr<Source>>(it->value, id);
+        conversion::Result<std::unique_ptr<Source>> source =
+            conversion::convert<std::unique_ptr<Source>>(property.value, id);
         if (!source) {
             Log::Warning(Event::ParseStyle, source.error().message);
             continue;
@@ -136,9 +136,7 @@ void Parser::parseLayers(const JSValue& value) {
         return;
     }
 
-    for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-        const JSValue& layerValue = value[i];
-
+    for (auto& layerValue : value.GetArray()) {
         if (!layerValue.IsObject()) {
             Log::Warning(Event::ParseStyle, "layer must be an object");
             continue;
