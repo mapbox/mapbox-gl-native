@@ -74,7 +74,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Label placement relative to its geometry. `MGLSymbolStyleLayerSymbolPlacementLine` can only be used on LineStrings and Polygons.
  
- The default value of this property is `MGLSymbolStyleLayerSymbolPlacementPoint`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerSymbolPlacementPoint`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> symbolPlacement;
 
@@ -83,23 +83,23 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is `250`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `250`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `symbolPlacement` is set to `MGLSymbolStyleLayerSymbolPlacementLine`. Otherwise, it is ignored.
+ This property is only applied to the style if `symbolPlacement` is set to an `NSValue` object containing `MGLSymbolStyleLayerSymbolPlacementLine`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> symbolSpacing;
 
 /**
  If true, the symbols will not cross tile edges to avoid mutual collisions. Recommended in layers that don't have enough padding in the vector tile to prevent collisions, or if it is a point symbol layer placed after a line symbol layer.
  
- The default value of this property is `NO`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> symbolAvoidEdges;
 
 /**
  If true, the icon will be visible even if it collides with other previously drawn symbols.
  
- The default value of this property is `NO`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -108,7 +108,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  If true, other symbols can be visible even if they collide with the icon.
  
- The default value of this property is `NO`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -117,7 +117,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  If true, text will display without their corresponding icons when the icon collides with other symbols and the text does not.
  
- The default value of this property is `NO`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImage` is non-`nil`, and `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -126,7 +126,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Orientation of icon when map is rotated.
  
- The default value of this property is `MGLSymbolStyleLayerIconRotationAlignmentViewport`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerIconRotationAlignmentViewport`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -135,7 +135,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Scale factor for icon. 1 is original size, 3 triples the size.
  
- The default value of this property is `1`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -144,7 +144,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Position and scale an icon by the its corresponding text.
  
- The default value of this property is `MGLSymbolStyleLayerIconTextFitNone`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerIconTextFitNone`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImage` is non-`nil`, and `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -155,7 +155,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is `NSEdgeInsetsZero` or `UIEdgeInsetsZero`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `NSEdgeInsetsZero` or `UIEdgeInsetsZero`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImage` is non-`nil`, and `iconTextFit` is non-`nil`, and `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -171,7 +171,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in degrees.
  
- The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -182,7 +182,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is `2`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `2`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -191,16 +191,16 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  If true, the icon may be flipped to prevent it from being rendered upside-down.
  
- The default value of this property is `NO`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`, and `iconRotationAlignment` is set to `MGLSymbolStyleLayerIconRotationAlignmentMap`, and `symbolPlacement` is set to `MGLSymbolStyleLayerSymbolPlacementLine`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImage` is non-`nil`, and `iconRotationAlignment` is set to an `NSValue` object containing `MGLSymbolStyleLayerIconRotationAlignmentMap`, and `symbolPlacement` is set to an `NSValue` object containing `MGLSymbolStyleLayerSymbolPlacementLine`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconKeepUpright;
 
 /**
  Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate left and up.
  
- The default value of this property is 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing a `CGVector` struct set to 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -216,7 +216,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Orientation of text when map is rotated.
  
- The default value of this property is `MGLSymbolStyleLayerTextRotationAlignmentViewport`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerTextRotationAlignmentViewport`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -225,14 +225,14 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Value to use for a text label. Feature properties are specified using tokens like {field_name}.
  
- The default value of this property is ``. Set this property to `nil` to reset it to the default value.
+ The default value of this property is the string ``. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textField;
 
 /**
  Font stack to use for displaying text.
  
- The default value of this property is `Open Sans Regular`, `Arial Unicode MS Regular`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is the array `Open Sans Regular`, `Arial Unicode MS Regular`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -243,7 +243,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is `16`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `16`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -254,7 +254,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in ems.
  
- The default value of this property is `10`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `10`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -265,7 +265,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in ems.
  
- The default value of this property is `1.2`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `1.2`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -276,7 +276,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in ems.
  
- The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -285,7 +285,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Text justification options.
  
- The default value of this property is `MGLSymbolStyleLayerTextJustifyCenter`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerTextJustifyCenter`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -294,7 +294,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Part of the text placed closest to the anchor.
  
- The default value of this property is `MGLSymbolStyleLayerTextAnchorCenter`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerTextAnchorCenter`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -305,9 +305,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in degrees.
  
- The default value of this property is `45`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `45`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`, and `symbolPlacement` is set to `MGLSymbolStyleLayerSymbolPlacementLine`. Otherwise, it is ignored.
+ This property is only applied to the style if `textField` is non-`nil`, and `symbolPlacement` is set to an `NSValue` object containing `MGLSymbolStyleLayerSymbolPlacementLine`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textMaxAngle;
 
@@ -316,7 +316,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in degrees.
  
- The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -327,7 +327,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is `2`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `2`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -336,16 +336,16 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  If true, the text may be flipped vertically to prevent it from being rendered upside-down.
  
- The default value of this property is `YES`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing `YES`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`, and `textRotationAlignment` is set to `MGLSymbolStyleLayerTextRotationAlignmentMap`, and `symbolPlacement` is set to `MGLSymbolStyleLayerSymbolPlacementLine`. Otherwise, it is ignored.
+ This property is only applied to the style if `textField` is non-`nil`, and `textRotationAlignment` is set to an `NSValue` object containing `MGLSymbolStyleLayerTextRotationAlignmentMap`, and `symbolPlacement` is set to an `NSValue` object containing `MGLSymbolStyleLayerSymbolPlacementLine`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textKeepUpright;
 
 /**
  Specifies how to capitalize text, similar to the CSS `text-transform` property.
  
- The default value of this property is `MGLSymbolStyleLayerTextTransformNone`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerTextTransformNone`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -356,7 +356,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in ems.
  
- The default value of this property is 0 ems from the left and 0 ems from the top. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing a `CGVector` struct set to 0 ems from the left and 0 ems from the top. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -365,7 +365,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  If true, the text will be visible even if it collides with other previously drawn symbols.
  
- The default value of this property is `NO`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -374,7 +374,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  If true, other symbols can be visible even if they collide with the text.
  
- The default value of this property is `NO`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -383,7 +383,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  If true, icons will display without their corresponding text when the text collides with other symbols and the icon does not.
  
- The default value of this property is `NO`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`, and `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -394,7 +394,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  The opacity at which the icon will be drawn.
  
- The default value of this property is `1`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -403,7 +403,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  The color of the icon. This can only be used with sdf icons.
  
- The default value of this property is `blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is `NSColor.blackColor` or `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -412,7 +412,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  The color of the icon's halo. Icon halos can only be used with sdf icons.
  
- The default value of this property is `clearColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is `NSColor.clearColor` or `UIColor.clearColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -423,7 +423,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -434,7 +434,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -445,7 +445,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing a `CGVector` struct set to 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -454,7 +454,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Control whether the translation is relative to the map (north) or viewport (screen).
  
- The default value of this property is `MGLSymbolStyleLayerIconTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerIconTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `iconImage` is non-`nil`, and `iconTranslate` is non-`nil`. Otherwise, it is ignored.
  */
@@ -463,7 +463,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  The opacity at which the text will be drawn.
  
- The default value of this property is `1`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -472,7 +472,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  The color with which the text will be drawn.
  
- The default value of this property is `blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is `NSColor.blackColor` or `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -481,7 +481,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  The color of the text's halo, which helps it stand out from backgrounds.
  
- The default value of this property is `clearColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is `NSColor.clearColor` or `UIColor.clearColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -492,7 +492,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -503,7 +503,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -514,7 +514,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing a `CGVector` struct set to 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
@@ -523,7 +523,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 /**
  Control whether the translation is relative to the map (north) or viewport (screen).
  
- The default value of this property is `MGLSymbolStyleLayerTextTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerTextTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `textField` is non-`nil`, and `textTranslate` is non-`nil`. Otherwise, it is ignored.
  */

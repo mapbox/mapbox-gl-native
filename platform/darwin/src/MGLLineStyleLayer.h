@@ -30,32 +30,32 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 /**
  The display of line endings.
  
- The default value of this property is `MGLLineStyleLayerLineCapButt`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLLineStyleLayerLineCapButt`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineCap;
 
 /**
  The display of lines when joining.
  
- The default value of this property is `MGLLineStyleLayerLineJoinMiter`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLLineStyleLayerLineJoinMiter`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineJoin;
 
 /**
  Used to automatically convert miter joins to bevel joins for sharp angles.
  
- The default value of this property is `2`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `2`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `lineJoin` is set to `MGLLineStyleLayerLineJoinMiter`. Otherwise, it is ignored.
+ This property is only applied to the style if `lineJoin` is set to an `NSValue` object containing `MGLLineStyleLayerLineJoinMiter`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineMiterLimit;
 
 /**
  Used to automatically convert round joins to miter joins for shallow angles.
  
- The default value of this property is `1.05`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `1.05`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `lineJoin` is set to `MGLLineStyleLayerLineJoinRound`. Otherwise, it is ignored.
+ This property is only applied to the style if `lineJoin` is set to an `NSValue` object containing `MGLLineStyleLayerLineJoinRound`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineRoundLimit;
 
@@ -64,14 +64,14 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 /**
  The opacity at which the line will be drawn.
  
- The default value of this property is `1`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineOpacity;
 
 /**
  The color with which the line will be drawn.
  
- The default value of this property is `blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is `NSColor.blackColor` or `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `linePattern` is set to `nil`. Otherwise, it is ignored.
  */
@@ -82,14 +82,14 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing a `CGVector` struct set to 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineTranslate;
 
 /**
  Control whether the translation is relative to the map (north) or viewport (screen)
  
- The default value of this property is `MGLLineStyleLayerLineTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLLineStyleLayerLineTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `lineTranslate` is non-`nil`. Otherwise, it is ignored.
  */
@@ -100,7 +100,7 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is `1`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineWidth;
 
@@ -109,7 +109,7 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineGapWidth;
 
@@ -118,7 +118,7 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineOffset;
 
@@ -127,7 +127,7 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 
  This property is measured in points.
  
- The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineBlur;
 

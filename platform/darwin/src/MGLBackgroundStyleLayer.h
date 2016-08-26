@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The color with which the background will be drawn.
  
- The default value of this property is `blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is `NSColor.blackColor` or `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `backgroundPattern` is set to `nil`. Otherwise, it is ignored.
  */
@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The opacity at which the background will be drawn.
  
- The default value of this property is `1`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> backgroundOpacity;
 

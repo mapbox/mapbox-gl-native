@@ -157,26 +157,27 @@ global.parseColor = function (str) {
 global.describeValue = function (value, property, layerType) {
     switch (property.type) {
         case 'boolean':
-            return value ? '`YES`' : '`NO`';
+            return 'an `NSNumber` object containing ' + (value ? '`YES`' : '`NO`');
         case 'number':
+            return 'an `NSNumber` object containing the float `' + value + '`';
         case 'string':
-            return '`' + value + '`';
+            return 'the string `' + value + '`';
         case 'enum':
             let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            return '`' + `${objCType}${camelize(value)}` + '`';
+            return 'an `NSValue` object containing `' + `${objCType}${camelize(value)}` + '`';
         case 'color':
             let color = parseColor(value);
             if (!color) {
                 throw new Error(`unrecognized color format in default value of ${property.name}`);
             }
             if (color.r === 0 && color.g === 0 && color.b === 0 && color.a === 0) {
-                return '`clearColor`';
+                return '`NSColor.clearColor` or `UIColor.clearColor`';
             }
             if (color.r === 0 && color.g === 0 && color.b === 0 && color.a === 1) {
-                return '`blackColor`';
+                return '`NSColor.blackColor` or `UIColor.blackColor`';
             }
             if (color.r === 1 && color.g === 1 && color.b === 1 && color.a === 1) {
-                return '`whiteColor`';
+                return '`NSColor.whiteColor` or `UIColor.whiteColor`';
             }
             return 'an `NSColor` or `UIColor`' + ` object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
         case 'array':
@@ -186,14 +187,14 @@ global.describeValue = function (value, property, layerType) {
             }
             if (property.name.indexOf('padding') !== -1) {
                 if (value[0] === 0 && value[1] === 0 && value[2] === 0 && value[3] === 0) {
-                    return '`NSEdgeInsetsZero` or `UIEdgeInsetsZero`';
+                    return 'an `NSValue` object containing `NSEdgeInsetsZero` or `UIEdgeInsetsZero`';
                 }
-                return `${value[0]}${units} on the top, ${value[3]}${units} on the left, ${value[2]}${units} on the bottom, and ${value[1]}${units} on the right`;
+                return 'an `NSValue` object containing an `NSEdgeInsets` or `UIEdgeInsets` struct set to' + ` ${value[0]}${units} on the top, ${value[3]}${units} on the left, ${value[2]}${units} on the bottom, and ${value[1]}${units} on the right`;
             }
             if (property.name.indexOf('offset') !== -1 || property.name.indexOf('translate') !== -1) {
-                return `${value[0]}${units} from the left and ${value[1]}${units} from the top`;
+                return 'an `NSValue` object containing a `CGVector` struct set to' + ` ${value[0]}${units} from the left and ${value[1]}${units} from the top`;
             }
-            return '`' + value.join('`, `') + '`';
+            return 'the array `' + value.join('`, `') + '`';
         default:
             throw new Error(`unknown type for ${property.name}`);
     }
