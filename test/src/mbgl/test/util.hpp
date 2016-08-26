@@ -36,6 +36,12 @@
 #define TEST_REQUIRES_SERVER(name) DISABLED_ ## name
 #endif
 
+#if !CI_BUILD
+#define TEST_DISABLED_ON_CI(name) name
+#else
+#define TEST_DISABLED_ON_CI(name) DISABLED_ ## name
+#endif
+
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/chrono.hpp>
 

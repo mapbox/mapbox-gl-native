@@ -16,6 +16,12 @@ target_include_directories(mbgl-test
     PRIVATE platform/default
 )
 
+if(DEFINED ENV{CI})
+    target_compile_definitions(mbgl-test
+        PRIVATE -DCI_BUILD=1
+    )
+endif()
+
 target_link_libraries(mbgl-test
     PRIVATE mbgl-core
 )
