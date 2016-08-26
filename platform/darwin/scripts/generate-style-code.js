@@ -25,45 +25,49 @@ global.arrayType = function (property) {
     return property.type === 'array' ? property.name.split('-').pop() : false;
 };
 
-global.testImplementation = function (property, layerType) {
-    let helperMsg = testHelperMessage(property, layerType);
+global.testImplementation = function (property, layerType, isFunction) {
+    let helperMsg = testHelperMessage(property, layerType, isFunction);
     return `layer.${objCName(property)} = [MGLRuntimeStylingHelper ${helperMsg}];`;
 }
 
-global.testGetterImplementation = function (property, layerType) {
-    let helperMsg = testHelperMessage(property, layerType);
+global.testGetterImplementation = function (property, layerType, isFunction) {
+    let helperMsg = testHelperMessage(property, layerType, isFunction);
     let value = `[MGLRuntimeStylingHelper ${helperMsg}]`;
     if (property.type === 'enum') {
-        return `XCTAssert([(NSValue *)gLayer.${objCName(property)} isEqualToValue:${value}]);`;
+        if (isFunction) {
+            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, ${value});`;
+        }
+        return `XCTAssert([(NSValue *)gLayer.${objCName(property)} isEqualToValue:${value}], @"%@ is not equal to %@", gLayer.${objCName(property)}, ${value});`;
     }
     return `XCTAssertEqualObjects(gLayer.${objCName(property)}, ${value});`;
 }
 
-global.testHelperMessage = function (property, layerType) {
+global.testHelperMessage = function (property, layerType, isFunction) {
+    let fnSuffix = isFunction ? 'Function' : '';
     switch (property.type) {
         case 'boolean':
-            return 'testBool';
+            return 'testBool' + fnSuffix;
         case 'number':
-            return 'testNumber';
+            return 'testNumber' + fnSuffix;
         case 'string':
-            return 'testString';
+            return 'testString' + fnSuffix;
         case 'enum':
             let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
             let objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
-            return `testEnum:${objCEnum} type:@encode(${objCType})`;
+            return `testEnum${fnSuffix}:${objCEnum} type:@encode(${objCType})`;
         case 'color':
-            return 'testColor';
+            return 'testColor' + fnSuffix;
         case 'array':
             switch (arrayType(property)) {
                 case 'dasharray':
-                    return `testDashArray`;
+                    return 'testDashArray' + fnSuffix;
                 case 'font':
-                    return `testFont`;
+                    return 'testFont' + fnSuffix;
                 case 'padding':
-                    return `testPadding`;
+                    return 'testPadding' + fnSuffix;
                 case 'offset':
                 case 'translate':
-                    return `testOffset`;
+                    return 'testOffset' + fnSuffix;
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }

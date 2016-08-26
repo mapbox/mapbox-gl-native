@@ -24,6 +24,14 @@
     XCTAssertEqualObjects(gLayer.backgroundColor, [MGLRuntimeStylingHelper testColor]);
     XCTAssertEqualObjects(gLayer.backgroundPattern, [MGLRuntimeStylingHelper testString]);
     XCTAssertEqualObjects(gLayer.backgroundOpacity, [MGLRuntimeStylingHelper testNumber]);
+
+    layer.backgroundColor = [MGLRuntimeStylingHelper testColorFunction];
+    layer.backgroundPattern = [MGLRuntimeStylingHelper testStringFunction];
+    layer.backgroundOpacity = [MGLRuntimeStylingHelper testNumberFunction];
+
+    XCTAssertEqualObjects(gLayer.backgroundColor, [MGLRuntimeStylingHelper testColorFunction]);
+    XCTAssertEqualObjects(gLayer.backgroundPattern, [MGLRuntimeStylingHelper testStringFunction]);
+    XCTAssertEqualObjects(gLayer.backgroundOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
 }
 
 @end

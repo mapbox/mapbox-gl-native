@@ -35,6 +35,20 @@
 <% for (const property of paintProperties) { -%>
     <%- testGetterImplementation(property, type) %>
 <% } -%>
+
+<% for (const property of layoutProperties) { -%>
+    <%- testImplementation(property, type, true) %>
+<% } -%>
+<% for (const property of paintProperties) { -%>
+    <%- testImplementation(property, type, true) %>
+<% } -%>
+
+<% for (const property of layoutProperties) { -%>
+    <%- testGetterImplementation(property, type, true) %>
+<% } -%>
+<% for (const property of paintProperties) { -%>
+    <%- testGetterImplementation(property, type, true) %>
+<% } -%>
 }
 
 @end

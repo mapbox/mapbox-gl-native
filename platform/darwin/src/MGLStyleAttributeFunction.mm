@@ -232,4 +232,16 @@
             self.stops];
 }
 
+- (BOOL)isEqual:(MGLStyleAttributeFunction *)other
+{
+    return ([other isKindOfClass:[self class]]
+            && (other.base == self.base || [other.base isEqualToNumber:self.base])
+            && [other.stops isEqualToDictionary:self.stops]);
+}
+
+- (NSUInteger)hash
+{
+    return self.base.hash + self.stops.hash;
+}
+
 @end
