@@ -1,6 +1,7 @@
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/util/stopwatch.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <cassert>
 #include <cstring>
@@ -51,34 +52,50 @@ PremultipliedImage HeadlessView::readStillImage() {
     PremultipliedImage image { w, h };
     GLuint bufferId;
 
-    MBGL_CHECK_ERROR(glGenBuffers(1, &bufferId));
-    MBGL_CHECK_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, bufferId));
-    MBGL_CHECK_ERROR(glBufferData(GL_PIXEL_PACK_BUFFER, h * image.stride(), 0, GL_STREAM_READ));
+    {
+        util::stopwatch stopwatch2("glGenBuffers", EventSeverity::Info, Event::General);
+        MBGL_CHECK_ERROR(glGenBuffers(1, &bufferId));
+    }
+
+    {
+        util::stopwatch stopwatch3("glBindBuffer", EventSeverity::Info, Event::General);
+        MBGL_CHECK_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, bufferId));
+    }
+
+    {
+        util::stopwatch stopwatch4("glBufferData", EventSeverity::Info, Event::General);
+        MBGL_CHECK_ERROR(glBufferData(GL_PIXEL_PACK_BUFFER, h * image.stride(), 0, GL_STREAM_READ));
+    }
 
     // Create a fence just before glReadPixels so we can delay mapping
     // the buffer until all prior GL calls have completed.
     GLsync fence = MBGL_CHECK_ERROR(glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
 
     {
-        util::stopwatch stopwatch2("glReadPixels", EventSeverity::Info, Event::General);
+        util::stopwatch stopwatch6("glReadPixels", EventSeverity::Info, Event::General);
         MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, 0));
     }
 
     {
-        util::stopwatch stopwatch3("glFenceSync", EventSeverity::Info, Event::General);
+        util::stopwatch stopwatch7("glClientWaitSync", EventSeverity::Info, Event::General);
         // Timeout measued in nanoseconds, 100ms
         GLenum syncStatus = MBGL_CHECK_ERROR(glClientWaitSync(fence, 0, 100000000));
 
-        // TODO: Log why glClientWaitSync unblocked
         switch (syncStatus) {
             case GL_ALREADY_SIGNALED:
+                Log::Info(Event::General, "GL_ALREADY_SIGNALED");
+                break;
             case GL_CONDITION_SATISFIED:
+                Log::Info(Event::General, "GL_CONDITION_SATISFIED");
                 break;
             case GL_TIMEOUT_EXPIRED:
+                Log::Info(Event::General, "GL_TIMEOUT_EXPIRED");
                 break;
             case GL_WAIT_FAILED:
+                Log::Info(Event::General, "GL_WAIT_FAILED");
                 break;
             default:
+                Log::Info(Event::General, "GL_WAIT_UNKNOWN");
                 break;
         }
     }
@@ -93,11 +110,8 @@ PremultipliedImage HeadlessView::readStillImage() {
         auto tmp = std::make_unique<uint8_t[]>(stride);
         uint8_t* rgba = image.data.get();
 
-        {
-            util::stopwatch stopwatch4("memcpy", EventSeverity::Info, Event::General);
-            for (unsigned int i = 0, j = h - 1; i < h; i++, j--) {
-                std::memcpy(rgba + i * stride, ptr + j * stride, stride);
-            }
+        for (unsigned int i = 0, j = h - 1; i < h; i++, j--) {
+            std::memcpy(rgba + i * stride, ptr + j * stride, stride);
         }
 
         MBGL_CHECK_ERROR(glUnmapBuffer(GL_PIXEL_PACK_BUFFER));

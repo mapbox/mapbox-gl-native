@@ -245,19 +245,11 @@ void Map::Impl::update() {
         view.invalidate();
     } else if (callback && style->isLoaded()) {
         util::stopwatch stopwatch("render", EventSeverity::Info, Event::General);
-        Log::Info(Event::General, "[Map::Impl::update] Activating view and rendering");
         view.activate();
         render();
         view.deactivate();
-    } else {
-        // Is this redundant with the early return above?
-        if (!callback) {
-            Log::Info(Event::General, "[Map::Impl::update] Missing callback");
-        }
-
-        if (!style->isLoaded()) {
+    } else if (!style->isLoaded()) {
             Log::Info(Event::General, "[Map::Impl::update] Style not finished loading");
-        }
     }
 
     updateFlags = Update::Nothing;
