@@ -94,7 +94,7 @@
 {
     __block std::vector<std::pair<float, std::array<float, 4>>> stops;
     [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSValue * _Nonnull padding, BOOL * _Nonnull stop) {
-        NSAssert([padding isKindOfClass:[NSArray class]], @"Stops should be NSValue");
+        NSAssert([padding isKindOfClass:[NSValue class]], @"Stops should be NSValue");
         stops.emplace_back(zoomKey.floatValue, padding.mgl_paddingArrayValue);
     }];
     return mbgl::style::Function<std::array<float, 4>>({{stops}}, _base.floatValue);
@@ -181,7 +181,7 @@
     auto stops = property.getStops();
     NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
     for (auto stop : stops) {
-        convertedStops[@(stop.first)] = @[@(stop.second[0]), @(stop.second[1]), @(stop.second[2]), @(stop.second[3])];
+        convertedStops[@(stop.first)] = [NSValue mgl_valueWithPaddingArray:stop.second];
     }
     function.base = @(property.getBase());
     function.stops = convertedStops;
