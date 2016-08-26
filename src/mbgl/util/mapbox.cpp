@@ -11,14 +11,15 @@ namespace util {
 namespace mapbox {
 
 const std::string protocol = "mapbox://";
-    
+const std::size_t protocolLength = protocol.length();
+
 bool isMapboxURL(const std::string& url) {
     return std::equal(protocol.begin(), protocol.end(), url.begin());
 }
 
-std::vector<std::string> getMapboxURLPathname(const std::string& url) {
+static std::vector<std::string> getMapboxURLPathname(const std::string& url) {
     std::vector<std::string> pathname;
-    auto startIndex = protocol.length();
+    auto startIndex = protocolLength;
     auto end = url.find_first_of("?#");
     if (end == std::string::npos) {
         end = url.length();
@@ -34,6 +35,20 @@ std::vector<std::string> getMapboxURLPathname(const std::string& url) {
     return pathname;
 }
 
+static std::pair<std::string, std::size_t> normalizeQuery(const std::string& url) {
+    std::string query;
+
+    auto queryIdx = url.find("?");
+    if (queryIdx != std::string::npos) {
+        query = url.substr(queryIdx + 1, url.length() - queryIdx + 1);
+        if (!query.empty()) {
+            query = "&" + query;
+        }
+    }
+
+    return std::make_pair(query, queryIdx);
+}
+
 std::string normalizeSourceURL(const std::string& baseURL, const std::string& url, const std::string& accessToken) {
     if (!isMapboxURL(url)) {
         return url;
@@ -42,7 +57,9 @@ std::string normalizeSourceURL(const std::string& baseURL, const std::string& ur
     if (accessToken.empty()) {
         throw std::runtime_error("You must provide a Mapbox API access token for Mapbox tile sources");
     }
-    return baseURL + "/v4/" + url.substr(protocol.length()) + ".json?access_token=" + accessToken + "&secure";
+
+    auto query = normalizeQuery(url);
+    return baseURL + "/v4/" + url.substr(protocolLength, query.second - protocolLength) + ".json?access_token=" + accessToken + "&secure" + query.first;
 }
 
 std::string normalizeStyleURL(const std::string& baseURL, const std::string& url, const std::string& accessToken) {
@@ -59,7 +76,7 @@ std::string normalizeStyleURL(const std::string& baseURL, const std::string& url
     const auto& user = pathname[1];
     const auto& id = pathname[2];
     const bool isDraft = pathname.size() > 3;
-    return baseURL + "/styles/v1/" + user + "/" + id + (isDraft ? "/draft" : "") + "?access_token=" + accessToken;
+    return baseURL + "/styles/v1/" + user + "/" + id + (isDraft ? "/draft" : "") + "?access_token=" + accessToken + normalizeQuery(url).first;
 }
 
 std::string normalizeSpriteURL(const std::string& baseURL, const std::string& url, const std::string& accessToken) {
@@ -119,7 +136,8 @@ std::string normalizeTileURL(const std::string& baseURL, const std::string& url,
         return url;
     }
 
-    return baseURL + "/v4/" + url.substr(sizeof("mapbox://tiles/") - 1) + "?access_token=" + accessToken;
+    auto query = normalizeQuery(url);
+    return baseURL + "/v4/" + url.substr(sizeof("mapbox://tiles/") - 1, query.second - sizeof("mapbox://tiles/") + 1) + "?access_token=" + accessToken + normalizeQuery(url).first;
 }
 
 std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_t tileSize) {
