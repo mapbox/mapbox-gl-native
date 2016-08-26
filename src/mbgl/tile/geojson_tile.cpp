@@ -63,51 +63,38 @@ class GeoJSONTileData : public GeometryTileData {
 public:
     std::shared_ptr<GeoJSONTileLayer> layer = std::make_shared<GeoJSONTileLayer>();
 
+    GeoJSONTileData(const mapbox::geometry::feature_collection<int16_t>& features) {
+        for (auto& feature : features) {
+            const FeatureType featureType = apply_visitor(ToFeatureType(), feature.geometry);
+
+            if (featureType == FeatureType::Unknown) {
+                continue;
+            }
+
+            GeometryCollection geometry = apply_visitor(ToGeometryCollection(), feature.geometry);
+
+            // https://github.com/mapbox/geojson-vt-cpp/issues/44
+            if (featureType == FeatureType::Polygon) {
+                geometry = fixupPolygons(geometry);
+            }
+
+            layer->features.emplace_back(std::make_shared<GeoJSONTileFeature>(
+                featureType, std::move(geometry), PropertyMap(feature.properties)));
+        }
+    }
+
     util::ptr<const GeometryTileLayer> getLayer(const std::string&) const override {
         // We're ignoring the layer name because GeoJSON tiles only have one layer.
         return layer;
     }
 };
 
-// Converts the geojsonvt::Tile to a a GeoJSONTile. They have a differing internal structure.
-std::unique_ptr<GeoJSONTileData> convertTile(const mapbox::geometry::feature_collection<int16_t>& features) {
-    auto result = std::make_unique<GeoJSONTileData>();
-
-    for (auto& feature : features) {
-        const FeatureType featureType = apply_visitor(ToFeatureType(), feature.geometry);
-
-        if (featureType == FeatureType::Unknown) {
-            continue;
-        }
-
-        GeometryCollection geometry = apply_visitor(ToGeometryCollection(), feature.geometry);
-
-        // https://github.com/mapbox/geojson-vt-cpp/issues/44
-        if (featureType == FeatureType::Polygon) {
-            geometry = fixupPolygons(geometry);
-        }
-
-        result->layer->features.emplace_back(std::make_shared<GeoJSONTileFeature>(
-            featureType, std::move(geometry), PropertyMap(feature.properties)));
-    }
-
-    return result;
-}
-
 GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
                          std::string sourceID_,
                          const style::UpdateParameters& parameters,
-                         mapbox::geojsonvt::GeoJSONVT& geojsonvt)
+                         const mapbox::geometry::feature_collection<int16_t>& features)
     : GeometryTile(overscaledTileID, sourceID_, parameters.style, parameters.mode) {
-    setData(convertTile(geojsonvt.getTile(id.canonical.z, id.canonical.x, id.canonical.y).features));
-}
-
-GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
-                         std::string sourceID_,
-                         const style::UpdateParameters& parameters,
-                         mapbox::supercluster::Supercluster& supercluster)
-    : GeometryTile(overscaledTileID, sourceID_, parameters.style, parameters.mode) {
-    setData(convertTile(supercluster.getTile(id.canonical.z, id.canonical.x, id.canonical.y)));
+    setData(std::make_unique<GeoJSONTileData>(features));
 }
 
 void GeoJSONTile::setNecessity(Necessity) {}
