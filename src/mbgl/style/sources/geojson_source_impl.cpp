@@ -36,13 +36,12 @@ GeoJSONSource::Impl::Impl(std::string id_, Source& base_, const GeoJSONOptions o
 
 GeoJSONSource::Impl::~Impl() = default;
 
-void GeoJSONSource::Impl::setURL(std::string url) {
-    urlOrGeoJSON = std::move(url);
+void GeoJSONSource::Impl::setURL(std::string url_) {
+    url = std::move(url_);
 }
 
-std::string GeoJSONSource::Impl::getURL() {
-    assert(urlOrGeoJSON.is<std::string>());
-    return urlOrGeoJSON.get<std::string>();
+optional<std::string> GeoJSONSource::Impl::getURL() {
+    return url;
 }
 
 void GeoJSONSource::Impl::setGeoJSON(const GeoJSON& geoJSON) {
@@ -54,7 +53,7 @@ void GeoJSONSource::Impl::setGeoJSON(const GeoJSON& geoJSON) {
         vtOptions.extent = util::EXTENT;
         vtOptions.buffer = std::round(scale * options.buffer);
         vtOptions.tolerance = scale * options.tolerance;
-        urlOrGeoJSON = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(geoJSON, vtOptions);
+        geoJSONOrSupercluster = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(geoJSON, vtOptions);
 
     } else {
         mapbox::supercluster::Options clusterOptions;
@@ -63,13 +62,13 @@ void GeoJSONSource::Impl::setGeoJSON(const GeoJSON& geoJSON) {
         clusterOptions.radius = std::round(scale * options.clusterRadius);
 
         const auto& features = geoJSON.get<mapbox::geometry::feature_collection<double>>();
-        urlOrGeoJSON =
+        geoJSONOrSupercluster =
             std::make_unique<mapbox::supercluster::Supercluster>(features, clusterOptions);
     }
 }
 
 void GeoJSONSource::Impl::load(FileSource& fileSource) {
-    if (!urlOrGeoJSON.is<std::string>()) {
+    if (!url) {
         loaded = true;
         return;
     }
@@ -78,8 +77,7 @@ void GeoJSONSource::Impl::load(FileSource& fileSource) {
         return;
     }
 
-    const std::string& url = urlOrGeoJSON.get<std::string>();
-    req = fileSource.request(Resource::source(url), [this](Response res) {
+    req = fileSource.request(Resource::source(*url), [this](Response res) {
         if (res.error) {
             observer->onSourceError(
                 base, std::make_exception_ptr(std::runtime_error(res.error->message)));
@@ -128,13 +126,13 @@ Range<uint8_t> GeoJSONSource::Impl::getZoomRange() {
 std::unique_ptr<Tile> GeoJSONSource::Impl::createTile(const OverscaledTileID& tileID,
                                                       const UpdateParameters& parameters) {
     assert(loaded);
-    if (urlOrGeoJSON.is<GeoJSONVTPointer>()) {
+    if (geoJSONOrSupercluster.is<GeoJSONVTPointer>()) {
         return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters,
-                                             *urlOrGeoJSON.get<GeoJSONVTPointer>());
+                                             *geoJSONOrSupercluster.get<GeoJSONVTPointer>());
     } else {
-        assert(urlOrGeoJSON.is<SuperclusterPointer>());
+        assert(geoJSONOrSupercluster.is<SuperclusterPointer>());
         return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters,
-                                             *urlOrGeoJSON.get<SuperclusterPointer>());
+                                             *geoJSONOrSupercluster.get<SuperclusterPointer>());
     }
 }
 

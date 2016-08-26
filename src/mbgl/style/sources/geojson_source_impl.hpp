@@ -16,9 +16,9 @@ public:
     ~Impl() final;
 
     void setURL(std::string);
-    void setGeoJSON(const GeoJSON&);
+    optional<std::string> getURL();
 
-    std::string getURL();
+    void setGeoJSON(const GeoJSON&);
 
     void load(FileSource&) final;
 
@@ -30,10 +30,10 @@ private:
     Range<uint8_t> getZoomRange() final;
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
 
-    variant<std::string, GeoJSONVTPointer, SuperclusterPointer> urlOrGeoJSON;
-    std::unique_ptr<AsyncRequest> req;
-
     GeoJSONOptions options;
+    optional<std::string> url;
+    std::unique_ptr<AsyncRequest> req;
+    variant<GeoJSONVTPointer, SuperclusterPointer> geoJSONOrSupercluster;
 };
 
 } // namespace style

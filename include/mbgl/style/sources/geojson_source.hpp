@@ -2,6 +2,7 @@
 
 #include <mbgl/style/source.hpp>
 #include <mbgl/util/geojson.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <mapbox/geojson.hpp>
 
@@ -42,7 +43,7 @@ public:
     void setURL(const std::string& url);
     void setGeoJSON(const GeoJSON&);
 
-    std::string getURL();
+    optional<std::string> getURL();
 
     // Private implementation
 
