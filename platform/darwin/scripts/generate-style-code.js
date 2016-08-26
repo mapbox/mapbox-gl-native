@@ -258,28 +258,32 @@ global.arraySetterImplementation = function(property) {
     return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_${convertedType(property)}PropertyValue);`;
 }
 
-global.getterImplementation = function(property, layerType) {
+global.styleAttributeFactory = function (property, layerType) {
     switch (property.type) {
         case 'boolean':
-            return `return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->get${camelize(property.name)}()];`
+            return 'mbgl_boolWithPropertyValueBool';
         case 'number':
-            return `return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->get${camelize(property.name)}()];`
+            return 'mbgl_numberWithPropertyValueNumber';
         case 'string':
-            return `return [MGLStyleAttribute mbgl_stringWithPropertyValueString:self.layer->get${camelize(property.name)}()];`
+            return 'mbgl_stringWithPropertyValueString';
         case 'enum':
-            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            return `MGLGetEnumProperty(${camelize(property.name)}, ${mbglType(property)}, ${objCType});`;
+            throw new Error('Use MGLGetEnumProperty() for enums.');
         case 'color':
-            return `return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->get${camelize(property.name)}()];`
+            return 'mbgl_colorWithPropertyValueColor';
         case 'array':
-            return arrayGetterImplementation(property);
+            return `mbgl_${convertedType(property)}WithPropertyValue${camelize(convertedType(property))}`;
         default:
-            throw new Error(`unknown type for ${property.name}`)
+            throw new Error(`unknown type for ${property.name}`);
     }
-}
+};
 
-global.arrayGetterImplementation = function(property) {
-    return `return [MGLStyleAttribute mbgl_${convertedType(property)}WithPropertyValue${camelize(convertedType(property))}:self.layer->get${camelize(property.name)}()];`
+global.getterImplementation = function(property, layerType) {
+    if (property.type === 'enum') {
+        let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+        return `MGLGetEnumProperty(${camelize(property.name)}, ${mbglType(property)}, ${objCType});`;
+    }
+    let rawValue = `self.layer->get${camelize(property.name)}() ?: self.layer->getDefault${camelize(property.name)}()`;
+    return `return [MGLStyleAttribute ${styleAttributeFactory(property, layerType)}:${rawValue}];`;
 }
 
 global.convertedType = function(property) {

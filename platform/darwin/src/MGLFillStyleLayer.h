@@ -18,55 +18,55 @@ typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
 /**
  Whether or not the fill should be antialiased.
  
- If this property is set to `nil`, the layer uses an implicit default value of `YES`.
+ The default value of this property is `YES`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> fillAntialias;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillAntialias;
 
 /**
  The opacity of the entire fill layer. In contrast to the fill-color, this value will also affect the 1pt stroke around the fill, if the stroke is used.
  
- If this property is set to `nil`, the layer uses an implicit default value of `1`.
+ The default value of this property is `1`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> fillOpacity;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillOpacity;
 
 /**
  The color of the filled part of this layer. This color can be specified as rgba with an alpha component and the color's opacity will not affect the opacity of the 1pt stroke, if it is used.
  
- If this property is set to `nil`, the layer uses an implicit default value of `blackColor`.
+ The default value of this property is `blackColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `fillPattern` is set to `nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> fillColor;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillColor;
 
 /**
  The outline color of the fill. Matches the value of `fillColor` if unspecified.
 
  This property is only applied to the style if `fillPattern` is set to `nil`, and `fillAntialias` is set to `YES`. Otherwise, it is ignored.
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> fillOutlineColor;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillOutlineColor;
 
 /**
  The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
 
  This property is measured in points.
  
- If this property is set to `nil`, the layer uses an implicit default value of 0 points from the left and 0 points from the top.
+ The default value of this property is 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> fillTranslate;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillTranslate;
 
 /**
  Control whether the translation is relative to the map (north) or viewport (screen)
  
- If this property is set to `nil`, the layer uses an implicit default value of `MGLFillStyleLayerFillTranslateAnchorMap`.
+ The default value of this property is `MGLFillStyleLayerFillTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `fillTranslate` is non-`nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> fillTranslateAnchor;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillTranslateAnchor;
 
 /**
  Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> fillPattern;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillPattern;
 
 @end
 

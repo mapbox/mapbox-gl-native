@@ -29,7 +29,7 @@
 
 #define MGLGetEnumProperty(Name, MBGLType, ObjCType) \
     const char *type = @encode(ObjCType); \
-    mbgl::style::PropertyValue<mbgl::style::MBGLType> property = self.layer->get##Name(); \
+    mbgl::style::PropertyValue<mbgl::style::MBGLType> property = self.layer->get##Name() ?: self.layer->getDefault##Name(); \
     if (property.isConstant()) { \
         return [NSValue value:&property.asConstant() withObjCType:type]; \
     } else if (property.isFunction()) { \

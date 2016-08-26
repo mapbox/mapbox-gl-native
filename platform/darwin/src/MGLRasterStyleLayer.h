@@ -13,55 +13,55 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The opacity at which the image will be drawn.
  
- If this property is set to `nil`, the layer uses an implicit default value of `1`.
+ The default value of this property is `1`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> rasterOpacity;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> rasterOpacity;
 
 /**
  Rotates hues around the color wheel.
 
  This property is measured in degrees.
  
- If this property is set to `nil`, the layer uses an implicit default value of `0`.
+ The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> rasterHueRotate;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> rasterHueRotate;
 
 /**
  Increase or reduce the brightness of the image. The value is the minimum brightness.
  
- If this property is set to `nil`, the layer uses an implicit default value of `0`.
+ The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> rasterBrightnessMin;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> rasterBrightnessMin;
 
 /**
  Increase or reduce the brightness of the image. The value is the maximum brightness.
  
- If this property is set to `nil`, the layer uses an implicit default value of `1`.
+ The default value of this property is `1`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> rasterBrightnessMax;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> rasterBrightnessMax;
 
 /**
  Increase or reduce the saturation of the image.
  
- If this property is set to `nil`, the layer uses an implicit default value of `0`.
+ The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> rasterSaturation;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> rasterSaturation;
 
 /**
  Increase or reduce the contrast of the image.
  
- If this property is set to `nil`, the layer uses an implicit default value of `0`.
+ The default value of this property is `0`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> rasterContrast;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> rasterContrast;
 
 /**
  Fade duration when a new tile is added.
 
  This property is measured in milliseconds.
  
- If this property is set to `nil`, the layer uses an implicit default value of `300`.
+ The default value of this property is `300`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, nullable) id <MGLStyleAttributeValue> rasterFadeDuration;
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> rasterFadeDuration;
 
 @end
 
