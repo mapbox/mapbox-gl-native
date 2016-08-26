@@ -20,24 +20,28 @@
             [(MGLStyleAttributeFunction *)name base].floatValue, \
         }; \
         self.layer->set##Name(function); \
-    } else { \
+    } else if (name) { \
         NSAssert([name isKindOfClass:[NSValue class]], @"" #name @"should be an NSValue"); \
         ObjCType value; \
         [(NSValue *)name getValue:&value]; \
         self.layer->set##Name({ static_cast<mbgl::style::MBGLType>(value) }); \
+    } else { \
+        self.layer->set##Name({}); \
     }
 
 #define MGLGetEnumProperty(Name, MBGLType, ObjCType) \
     const char *type = @encode(ObjCType); \
     mbgl::style::PropertyValue<mbgl::style::MBGLType> property = self.layer->get##Name() ?: self.layer->getDefault##Name(); \
     if (property.isConstant()) { \
-        return [NSValue value:&property.asConstant() withObjCType:type]; \
+        ObjCType value = static_cast<ObjCType>(property.asConstant()); \
+        return [NSValue value:&value withObjCType:type]; \
     } else if (property.isFunction()) { \
         MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init]; \
         auto stops = property.asFunction().getStops(); \
         NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()]; \
         for (auto stop : stops) { \
-            convertedStops[@(stop.first)] = [NSValue value:&stop.second withObjCType:type]; \
+            ObjCType value = static_cast<ObjCType>(stop.second); \
+            convertedStops[@(stop.first)] = [NSValue value:&value withObjCType:type]; \
         } \
         function.base = @(property.asFunction().getBase()); \
         function.stops = convertedStops; \
