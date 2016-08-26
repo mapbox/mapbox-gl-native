@@ -30,7 +30,7 @@
     XCTAssertEqualObjects(gLayer.fillColor, [MGLRuntimeStylingHelper testColor]);
     XCTAssertEqualObjects(gLayer.fillOutlineColor, [MGLRuntimeStylingHelper testColor]);
     XCTAssertEqualObjects(gLayer.fillTranslate, [MGLRuntimeStylingHelper testOffset]);
-    XCTAssert([(NSValue *)gLayer.fillTranslateAnchor objCType] == [[MGLRuntimeStylingHelper testEnum:MGLFillStyleLayerFillTranslateAnchorViewport type:@encode(MGLFillStyleLayerFillTranslateAnchor)] objCType]);
+    XCTAssert([(NSValue *)gLayer.fillTranslateAnchor isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLFillStyleLayerFillTranslateAnchorViewport type:@encode(MGLFillStyleLayerFillTranslateAnchor)]]);
     XCTAssertEqualObjects(gLayer.fillPattern, [MGLRuntimeStylingHelper testString]);
 }
 

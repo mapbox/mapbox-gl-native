@@ -34,9 +34,7 @@ global.testGetterImplementation = function (property, layerType) {
     let helperMsg = testHelperMessage(property, layerType);
     let value = `[MGLRuntimeStylingHelper ${helperMsg}]`;
     if (property.type === 'enum') {
-        let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-        let objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
-        return `XCTAssert([(NSValue *)gLayer.${objCName(property)} objCType] == [${value} objCType]);`;
+        return `XCTAssert([(NSValue *)gLayer.${objCName(property)} isEqualToValue:${value}]);`;
     }
     return `XCTAssertEqualObjects(gLayer.${objCName(property)}, ${value});`;
 }

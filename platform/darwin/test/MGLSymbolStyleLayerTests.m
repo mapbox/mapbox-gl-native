@@ -66,36 +66,36 @@
     layer.textTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextTranslateAnchorViewport type:@encode(MGLSymbolStyleLayerTextTranslateAnchor)];
 
     MGLSymbolStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
-    XCTAssert([(NSValue *)gLayer.symbolPlacement objCType] == [[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerSymbolPlacementLine type:@encode(MGLSymbolStyleLayerSymbolPlacement)] objCType]);
+    XCTAssert([(NSValue *)gLayer.symbolPlacement isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerSymbolPlacementLine type:@encode(MGLSymbolStyleLayerSymbolPlacement)]]);
     XCTAssertEqualObjects(gLayer.symbolSpacing, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.symbolAvoidEdges, [MGLRuntimeStylingHelper testBool]);
     XCTAssertEqualObjects(gLayer.iconAllowOverlap, [MGLRuntimeStylingHelper testBool]);
     XCTAssertEqualObjects(gLayer.iconIgnorePlacement, [MGLRuntimeStylingHelper testBool]);
     XCTAssertEqualObjects(gLayer.iconOptional, [MGLRuntimeStylingHelper testBool]);
-    XCTAssert([(NSValue *)gLayer.iconRotationAlignment objCType] == [[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconRotationAlignmentViewport type:@encode(MGLSymbolStyleLayerIconRotationAlignment)] objCType]);
+    XCTAssert([(NSValue *)gLayer.iconRotationAlignment isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconRotationAlignmentViewport type:@encode(MGLSymbolStyleLayerIconRotationAlignment)]]);
     XCTAssertEqualObjects(gLayer.iconSize, [MGLRuntimeStylingHelper testNumber]);
-    XCTAssert([(NSValue *)gLayer.iconTextFit objCType] == [[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTextFitHeight type:@encode(MGLSymbolStyleLayerIconTextFit)] objCType]);
+    XCTAssert([(NSValue *)gLayer.iconTextFit isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTextFitHeight type:@encode(MGLSymbolStyleLayerIconTextFit)]]);
     XCTAssertEqualObjects(gLayer.iconTextFitPadding, [MGLRuntimeStylingHelper testPadding]);
     XCTAssertEqualObjects(gLayer.iconImage, [MGLRuntimeStylingHelper testString]);
     XCTAssertEqualObjects(gLayer.iconRotate, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.iconPadding, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.iconKeepUpright, [MGLRuntimeStylingHelper testBool]);
     XCTAssertEqualObjects(gLayer.iconOffset, [MGLRuntimeStylingHelper testOffset]);
-    XCTAssert([(NSValue *)gLayer.textPitchAlignment objCType] == [[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextPitchAlignmentViewport type:@encode(MGLSymbolStyleLayerTextPitchAlignment)] objCType]);
-    XCTAssert([(NSValue *)gLayer.textRotationAlignment objCType] == [[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextRotationAlignmentViewport type:@encode(MGLSymbolStyleLayerTextRotationAlignment)] objCType]);
+    XCTAssert([(NSValue *)gLayer.textPitchAlignment isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextPitchAlignmentViewport type:@encode(MGLSymbolStyleLayerTextPitchAlignment)]]);
+    XCTAssert([(NSValue *)gLayer.textRotationAlignment isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextRotationAlignmentViewport type:@encode(MGLSymbolStyleLayerTextRotationAlignment)]]);
     XCTAssertEqualObjects(gLayer.textField, [MGLRuntimeStylingHelper testString]);
     XCTAssertEqualObjects(gLayer.textFont, [MGLRuntimeStylingHelper testFont]);
     XCTAssertEqualObjects(gLayer.textSize, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.textMaxWidth, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.textLineHeight, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.textLetterSpacing, [MGLRuntimeStylingHelper testNumber]);
-    XCTAssert([(NSValue *)gLayer.textJustify objCType] == [[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextJustifyRight type:@encode(MGLSymbolStyleLayerTextJustify)] objCType]);
-    XCTAssert([(NSValue *)gLayer.textAnchor objCType] == [[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextAnchorBottomRight type:@encode(MGLSymbolStyleLayerTextAnchor)] objCType]);
+    XCTAssert([(NSValue *)gLayer.textJustify isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextJustifyRight type:@encode(MGLSymbolStyleLayerTextJustify)]]);
+    XCTAssert([(NSValue *)gLayer.textAnchor isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextAnchorBottomRight type:@encode(MGLSymbolStyleLayerTextAnchor)]]);
     XCTAssertEqualObjects(gLayer.textMaxAngle, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.textRotate, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.textPadding, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.textKeepUpright, [MGLRuntimeStylingHelper testBool]);
-    XCTAssert([(NSValue *)gLayer.textTransform objCType] == [[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextTransformLowercase type:@encode(MGLSymbolStyleLayerTextTransform)] objCType]);
+    XCTAssert([(NSValue *)gLayer.textTransform isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextTransformLowercase type:@encode(MGLSymbolStyleLayerTextTransform)]]);
     XCTAssertEqualObjects(gLayer.textOffset, [MGLRuntimeStylingHelper testOffset]);
     XCTAssertEqualObjects(gLayer.textAllowOverlap, [MGLRuntimeStylingHelper testBool]);
     XCTAssertEqualObjects(gLayer.textIgnorePlacement, [MGLRuntimeStylingHelper testBool]);
@@ -106,14 +106,14 @@
     XCTAssertEqualObjects(gLayer.iconHaloWidth, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.iconHaloBlur, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.iconTranslate, [MGLRuntimeStylingHelper testOffset]);
-    XCTAssert([(NSValue *)gLayer.iconTranslateAnchor objCType] == [[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTranslateAnchorViewport type:@encode(MGLSymbolStyleLayerIconTranslateAnchor)] objCType]);
+    XCTAssert([(NSValue *)gLayer.iconTranslateAnchor isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTranslateAnchorViewport type:@encode(MGLSymbolStyleLayerIconTranslateAnchor)]]);
     XCTAssertEqualObjects(gLayer.textOpacity, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.textColor, [MGLRuntimeStylingHelper testColor]);
     XCTAssertEqualObjects(gLayer.textHaloColor, [MGLRuntimeStylingHelper testColor]);
     XCTAssertEqualObjects(gLayer.textHaloWidth, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.textHaloBlur, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.textTranslate, [MGLRuntimeStylingHelper testOffset]);
-    XCTAssert([(NSValue *)gLayer.textTranslateAnchor objCType] == [[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextTranslateAnchorViewport type:@encode(MGLSymbolStyleLayerTextTranslateAnchor)] objCType]);
+    XCTAssert([(NSValue *)gLayer.textTranslateAnchor isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextTranslateAnchorViewport type:@encode(MGLSymbolStyleLayerTextTranslateAnchor)]]);
 }
 
 @end
