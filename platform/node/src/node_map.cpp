@@ -203,7 +203,7 @@ void NodeMap::Load(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     if (info[1]->IsString()) {
-        nodeMap->id = *Nan::Utf8String(info[1]);
+        nodeMap->map->setID(*Nan::Utf8String(info[1]));
     }
 
     try {
@@ -349,7 +349,7 @@ void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     auto options = ParseOptions(Nan::To<v8::Object>(info[0]).ToLocalChecked());
 
-    if (options.id.length()) nodeMap->id = options.id;
+    if (options.id.length()) nodeMap->map->setID(options.id);
 
     assert(!nodeMap->callback);
     assert(!nodeMap->image.data);
@@ -782,7 +782,7 @@ std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resou
 
     Nan::Set(instance, Nan::New("url").ToLocalChecked(), Nan::New(resource.url).ToLocalChecked());
     Nan::Set(instance, Nan::New("kind").ToLocalChecked(), Nan::New<v8::Integer>(resource.kind));
-    Nan::Set(instance, Nan::New("id").ToLocalChecked(), Nan::New(this->id).ToLocalChecked());
+    Nan::Set(instance, Nan::New("id").ToLocalChecked(), Nan::New(this->map->getID()).ToLocalChecked());
 
     auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(instance);
     request->Execute();

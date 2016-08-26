@@ -77,6 +77,8 @@ public:
     size_t sourceCacheSize;
     TimePoint timePoint;
     bool loading = false;
+
+    std::string id;
 };
 
 Map::Map(View& view, FileSource& fileSource, MapMode mapMode, GLContextMode contextMode, ConstrainMode constrainMode, ViewportMode viewportMode)
@@ -195,6 +197,14 @@ void Map::render() {
     }
 }
 
+void Map::setID(std::string id) {
+    impl->id = id;
+}
+
+std::string Map::getID() {
+    return impl->id;
+}
+
 void Map::Impl::update() {
     if (!style) {
         updateFlags = Update::Nothing;
@@ -244,7 +254,7 @@ void Map::Impl::update() {
     if (mode == MapMode::Continuous) {
         view.invalidate();
     } else if (callback && style->isLoaded()) {
-        util::stopwatch stopwatch("render", EventSeverity::Info, Event::General);
+        util::stopwatch stopwatch("[" + id + "] render", EventSeverity::Info, Event::General);
         view.activate();
         render();
         view.deactivate();
@@ -273,7 +283,7 @@ void Map::Impl::render() {
 
     if (mode == MapMode::Still) {
         Log::Info(Event::General, "[Map::Impl::render] Pass view.readStillImage() to callback");
-        callback(nullptr, view.readStillImage());
+        callback(nullptr, view.readStillImage(this->id));
         callback = nullptr;
     }
 

@@ -42,8 +42,8 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height) {
     needsResize = true;
 }
 
-PremultipliedImage HeadlessView::readStillImage() {
-    util::stopwatch stopwatch("readStillImage", EventSeverity::Info, Event::General);
+PremultipliedImage HeadlessView::readStillImage(std::string id) {
+    util::stopwatch stopwatch("[" + id + "] readStillImage", EventSeverity::Info, Event::General);
     assert(active);
 
     const unsigned int w = dimensions[0] * pixelRatio;
@@ -53,17 +53,17 @@ PremultipliedImage HeadlessView::readStillImage() {
     GLuint bufferId;
 
     {
-        util::stopwatch stopwatch2("glGenBuffers", EventSeverity::Info, Event::General);
+        util::stopwatch stopwatch2("[" + id + "] glGenBuffers", EventSeverity::Info, Event::General);
         MBGL_CHECK_ERROR(glGenBuffers(1, &bufferId));
     }
 
     {
-        util::stopwatch stopwatch3("glBindBuffer", EventSeverity::Info, Event::General);
+        util::stopwatch stopwatch3("[" + id + "] glBindBuffer", EventSeverity::Info, Event::General);
         MBGL_CHECK_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, bufferId));
     }
 
     {
-        util::stopwatch stopwatch4("glBufferData", EventSeverity::Info, Event::General);
+        util::stopwatch stopwatch4("[" + id + "] glBufferData", EventSeverity::Info, Event::General);
         MBGL_CHECK_ERROR(glBufferData(GL_PIXEL_PACK_BUFFER, h * image.stride(), 0, GL_STREAM_READ));
     }
 
@@ -72,30 +72,30 @@ PremultipliedImage HeadlessView::readStillImage() {
     GLsync fence = MBGL_CHECK_ERROR(glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
 
     {
-        util::stopwatch stopwatch6("glReadPixels", EventSeverity::Info, Event::General);
+        util::stopwatch stopwatch6("[" + id + "] glReadPixels", EventSeverity::Info, Event::General);
         MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, 0));
     }
 
     {
-        util::stopwatch stopwatch7("glClientWaitSync", EventSeverity::Info, Event::General);
+        util::stopwatch stopwatch7("[" + id + "] glClientWaitSync", EventSeverity::Info, Event::General);
         // Timeout measued in nanoseconds, 100ms
         GLenum syncStatus = MBGL_CHECK_ERROR(glClientWaitSync(fence, 0, 100000000));
 
         switch (syncStatus) {
             case GL_ALREADY_SIGNALED:
-                Log::Info(Event::General, "GL_ALREADY_SIGNALED");
+                Log::Info(Event::General, "[" + id + "] GL_ALREADY_SIGNALED");
                 break;
             case GL_CONDITION_SATISFIED:
-                Log::Info(Event::General, "GL_CONDITION_SATISFIED");
+                Log::Info(Event::General, "[" + id + "] GL_CONDITION_SATISFIED");
                 break;
             case GL_TIMEOUT_EXPIRED:
-                Log::Info(Event::General, "GL_TIMEOUT_EXPIRED");
+                Log::Info(Event::General, "[" + id + "] GL_TIMEOUT_EXPIRED");
                 break;
             case GL_WAIT_FAILED:
-                Log::Info(Event::General, "GL_WAIT_FAILED");
+                Log::Info(Event::General, "[" + id + "] GL_WAIT_FAILED");
                 break;
             default:
-                Log::Info(Event::General, "GL_WAIT_UNKNOWN");
+                Log::Info(Event::General, "[" + id + "] GL_WAIT_UNKNOWN");
                 break;
         }
     }

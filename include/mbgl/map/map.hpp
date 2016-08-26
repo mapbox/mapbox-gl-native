@@ -182,6 +182,9 @@ public:
     bool isFullyLoaded() const;
     void dumpDebugLogs() const;
 
+    void setID(std::string id);
+    std::string getID();
+
 private:
     class Impl;
     const std::unique_ptr<Impl> impl;
