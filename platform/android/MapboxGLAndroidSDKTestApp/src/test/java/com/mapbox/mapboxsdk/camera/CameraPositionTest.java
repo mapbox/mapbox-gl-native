@@ -90,11 +90,11 @@ public class CameraPositionTest {
     public void testHashcode() {
         LatLng latLng = new LatLng(1, 2);
         CameraPosition cameraPosition = new CameraPosition(latLng, 3, 4, 5);
-        assertEquals("toString should match", -1007681505, cameraPosition.hashCode());
+        assertEquals("hashCode should match", -1007681505, cameraPosition.hashCode());
     }
 
     @Test
-    public void testRadiantBuilder() {
+    public void testRadianBuilder() {
         LatLng latLng = new LatLng(1, 2);
         CameraPosition.Builder builder = new CameraPosition.Builder(true);
         builder.target(latLng);
@@ -106,12 +106,12 @@ public class CameraPositionTest {
     }
 
     @Test
-    public void testDegreesRadiantBuilder() {
+    public void testDegreesRadianBuilder() {
         LatLng latLng = new LatLng(1, 2);
         float tilt = 4;
         float bearing = 5;
-        float bearingRadiant = (float) (-bearing * MathConstants.DEG2RAD);
-        float tiltRadiant = (float) (MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT) * MathConstants.DEG2RAD);
+        float bearingRadian = (float) (-bearing * MathConstants.DEG2RAD);
+        float tiltRadian = (float) (MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT) * MathConstants.DEG2RAD);
 
         CameraPosition.Builder degreeBuilder = new CameraPosition.Builder(false);
         degreeBuilder.target(latLng);
@@ -119,12 +119,12 @@ public class CameraPositionTest {
         degreeBuilder.tilt(tilt);
         degreeBuilder.bearing(bearing);
 
-        CameraPosition.Builder radiantBuilder = new CameraPosition.Builder(true);
-        radiantBuilder.target(latLng);
-        radiantBuilder.zoom(3);
-        radiantBuilder.tilt(tiltRadiant);
-        radiantBuilder.bearing(bearingRadiant);
-        assertEquals("CameraPosition should match", radiantBuilder.build(), degreeBuilder.build());
+        CameraPosition.Builder radianBuilder = new CameraPosition.Builder(true);
+        radianBuilder.target(latLng);
+        radianBuilder.zoom(3);
+        radianBuilder.tilt(tiltRadian);
+        radianBuilder.bearing(bearingRadian);
+        assertEquals("CameraPosition should match", radianBuilder.build(), degreeBuilder.build());
     }
 
     @Test
