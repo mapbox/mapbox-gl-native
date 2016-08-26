@@ -125,7 +125,7 @@ public final class CameraPosition implements Parcelable {
         private LatLng target = null;
         private double tilt = -1;
         private double zoom = -1;
-        private boolean isRadiant;
+        private boolean isRadian;
 
         /**
          * Creates an empty builder.
@@ -135,12 +135,12 @@ public final class CameraPosition implements Parcelable {
         }
 
         /**
-         * Creates a builder for building CameraPosition objects using radiants.
+         * Creates a builder for building CameraPosition objects using radians.
          *
-         * @param isRadiant true if heading is in radiants
+         * @param isRadian true if heading is in radians
          */
-        public Builder(boolean isRadiant) {
-            this.isRadiant = isRadiant;
+        public Builder(boolean isRadian) {
+            this.isRadian = isRadian;
         }
 
         /**
@@ -224,10 +224,10 @@ public final class CameraPosition implements Parcelable {
          * @return Builder
          */
         public Builder bearing(double bearing) {
-            if (isRadiant) {
+            if (isRadian) {
                 this.bearing = bearing;
             } else {
-                // converting degrees to radiant
+                // converting degrees to radians
                 this.bearing = (float) (-bearing * MathConstants.DEG2RAD);
             }
             return this;
@@ -261,10 +261,10 @@ public final class CameraPosition implements Parcelable {
          */
         @FloatRange(from = 0.0, to = 60.0)
         public Builder tilt(double tilt) {
-            if (isRadiant) {
+            if (isRadian) {
                 this.tilt = tilt;
             } else {
-                // converting degrees to radiant
+                // converting degrees to radians
                 this.tilt = (float) (MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT) * MathConstants.DEG2RAD);
             }
             return this;
