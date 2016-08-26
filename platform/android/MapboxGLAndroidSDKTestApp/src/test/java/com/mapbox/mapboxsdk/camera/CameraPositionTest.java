@@ -90,7 +90,7 @@ public class CameraPositionTest {
     public void testHashcode() {
         LatLng latLng = new LatLng(1, 2);
         CameraPosition cameraPosition = new CameraPosition(latLng, 3, 4, 5);
-        assertEquals("toString should match", -1007681505, cameraPosition.hashCode());
+        assertEquals("hashCode should match", -1007681505, cameraPosition.hashCode());
     }
 
     @Test
