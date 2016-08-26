@@ -33,7 +33,15 @@
     if (property.isConstant()) { \
         return [NSValue value:&property.asConstant() withObjCType:type]; \
     } else if (property.isFunction()) { \
-        return nil; \
+        MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init]; \
+        auto stops = property.asFunction().getStops(); \
+        NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()]; \
+        for (auto stop : stops) { \
+            convertedStops[@(stop.first)] = [NSValue value:&stop.second withObjCType:type]; \
+        } \
+        function.base = @(property.asFunction().getBase()); \
+        function.stops = convertedStops; \
+        return function; \
     } else { \
         return nil; \
     }
