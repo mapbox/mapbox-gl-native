@@ -103,6 +103,7 @@ public class MarkerViewActivity extends AppCompatActivity {
                 options.title("Hello");
                 options.position(new LatLng(38.899774, -77.023237));
                 options.flat(true);
+                options.zIndex(20);
                 mapboxMap.addMarker(options);
 
                 MarkerViewActivity.this.mapboxMap.addMarker(new MarkerOptions()
@@ -113,15 +114,18 @@ public class MarkerViewActivity extends AppCompatActivity {
                 MarkerViewActivity.this.mapboxMap.addMarker(new TextMarkerViewOptions()
                         .text("A")
                         .position(new LatLng(38.889876, -77.008849))
+                        .zIndex(0)
                 );
 
                 MarkerViewActivity.this.mapboxMap.addMarker(new TextMarkerViewOptions()
                         .text("B")
                         .position(new LatLng(38.907327, -77.041293))
+                        .zIndex(1)
                 );
 
                 MarkerViewActivity.this.mapboxMap.addMarker(new TextMarkerViewOptions()
                         .text("C")
+                        .zIndex(2)
                         .position(new LatLng(38.897642, -77.041980))
                 );
 
