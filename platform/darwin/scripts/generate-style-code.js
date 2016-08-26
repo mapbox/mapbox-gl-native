@@ -26,74 +26,51 @@ global.arrayType = function (property) {
 };
 
 global.testImplementation = function (property, layerType) {
-    switch (property.type) {
-        case 'boolean':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testBool;`;
-        case 'number':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testNumber;`;
-        case 'string':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testString;`;
-        case 'enum':
-            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            let objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
-            return `layer.${objCName(property)} = [MGLRuntimeStylingHelper testEnum:${objCEnum} type:@encode(${objCType})];`;    
-        case 'color':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testColor;`;
-        case 'array':
-            return testArrayImplementation(property);
-        default: throw new Error(`unknown type for ${property.name}`);
-    }
+    let helperMsg = testHelperMessage(property, layerType);
+    return `layer.${objCName(property)} = [MGLRuntimeStylingHelper ${helperMsg}];`;
 }
 
 global.testGetterImplementation = function (property, layerType) {
+    let helperMsg = testHelperMessage(property, layerType);
+    let value = `[MGLRuntimeStylingHelper ${helperMsg}]`;
+    if (property.type === 'enum') {
+        let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+        let objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
+        return `XCTAssert([(NSValue *)gLayer.${objCName(property)} objCType] == [${value} objCType]);`;
+    }
+    return `XCTAssertEqualObjects(gLayer.${objCName(property)}, ${value});`;
+}
+
+global.testHelperMessage = function (property, layerType) {
     switch (property.type) {
         case 'boolean':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testBool);`;
+            return 'testBool';
         case 'number':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testNumber);`;
+            return 'testNumber';
         case 'string':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testString);`;
+            return 'testString';
         case 'enum':
             let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
             let objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
-            return `XCTAssert([(NSValue *)gLayer.${objCName(property)} objCType] == [[MGLRuntimeStylingHelper testEnum:${objCEnum} type:@encode(${objCType})] objCType]);`;
+            return `testEnum:${objCEnum} type:@encode(${objCType})`;
         case 'color':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testColor);`;
+            return 'testColor';
         case 'array':
-            return testGetterArrayImplementation(property);
-        default: throw new Error(`unknown type for ${property.name}`);
-    }
-}
-
-global.testGetterArrayImplementation = function (property) {
-    switch (arrayType(property)) {
-        case 'dasharray':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testDashArray);`;
-        case 'font':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testFont);`;
-        case 'padding':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testPadding);`;
-        case 'offset':
-        case 'translate':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testOffset);`; // Default offset (dx, dy)
+            switch (arrayType(property)) {
+                case 'dasharray':
+                    return `testDashArray`;
+                case 'font':
+                    return `testFont`;
+                case 'padding':
+                    return `testPadding`;
+                case 'offset':
+                case 'translate':
+                    return `testOffset`;
+                default:
+                    throw new Error(`unknown array type for ${property.name}`);
+            }
         default:
-            throw new Error(`unknown array type for ${property.name}`);
-    }
-};
-
-global.testArrayImplementation = function (property) {
-    switch (arrayType(property)) {
-        case 'dasharray':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testDashArray;`;
-        case 'font':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testFont;`;
-        case 'padding':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testPadding;`;
-        case 'offset':
-        case 'translate':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testOffset;`; // Default offset (dx, dy)
-        default:
-            throw new Error(`unknown array type for ${property.name}`);
+            throw new Error(`unknown type for ${property.name}`);
     }
 };
 

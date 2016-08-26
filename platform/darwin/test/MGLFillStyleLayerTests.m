@@ -16,22 +16,22 @@
     [self.mapView.style addSource:source];
     [self.mapView.style addLayer:layer];
 
-    layer.fillAntialias = MGLRuntimeStylingHelper.testBool;
-    layer.fillOpacity = MGLRuntimeStylingHelper.testNumber;
-    layer.fillColor = MGLRuntimeStylingHelper.testColor;
-    layer.fillOutlineColor = MGLRuntimeStylingHelper.testColor;
-    layer.fillTranslate = MGLRuntimeStylingHelper.testOffset;
+    layer.fillAntialias = [MGLRuntimeStylingHelper testBool];
+    layer.fillOpacity = [MGLRuntimeStylingHelper testNumber];
+    layer.fillColor = [MGLRuntimeStylingHelper testColor];
+    layer.fillOutlineColor = [MGLRuntimeStylingHelper testColor];
+    layer.fillTranslate = [MGLRuntimeStylingHelper testOffset];
     layer.fillTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLFillStyleLayerFillTranslateAnchorViewport type:@encode(MGLFillStyleLayerFillTranslateAnchor)];
-    layer.fillPattern = MGLRuntimeStylingHelper.testString;
+    layer.fillPattern = [MGLRuntimeStylingHelper testString];
 
     MGLFillStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
-    XCTAssertEqualObjects(gLayer.fillAntialias, MGLRuntimeStylingHelper.testBool);
-    XCTAssertEqualObjects(gLayer.fillOpacity, MGLRuntimeStylingHelper.testNumber);
-    XCTAssertEqualObjects(gLayer.fillColor, MGLRuntimeStylingHelper.testColor);
-    XCTAssertEqualObjects(gLayer.fillOutlineColor, MGLRuntimeStylingHelper.testColor);
-    XCTAssertEqualObjects(gLayer.fillTranslate, MGLRuntimeStylingHelper.testOffset);
+    XCTAssertEqualObjects(gLayer.fillAntialias, [MGLRuntimeStylingHelper testBool]);
+    XCTAssertEqualObjects(gLayer.fillOpacity, [MGLRuntimeStylingHelper testNumber]);
+    XCTAssertEqualObjects(gLayer.fillColor, [MGLRuntimeStylingHelper testColor]);
+    XCTAssertEqualObjects(gLayer.fillOutlineColor, [MGLRuntimeStylingHelper testColor]);
+    XCTAssertEqualObjects(gLayer.fillTranslate, [MGLRuntimeStylingHelper testOffset]);
     XCTAssert([(NSValue *)gLayer.fillTranslateAnchor objCType] == [[MGLRuntimeStylingHelper testEnum:MGLFillStyleLayerFillTranslateAnchorViewport type:@encode(MGLFillStyleLayerFillTranslateAnchor)] objCType]);
-    XCTAssertEqualObjects(gLayer.fillPattern, MGLRuntimeStylingHelper.testString);
+    XCTAssertEqualObjects(gLayer.fillPattern, [MGLRuntimeStylingHelper testString]);
 }
 
 @end

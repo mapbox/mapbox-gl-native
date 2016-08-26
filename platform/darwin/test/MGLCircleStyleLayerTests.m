@@ -16,20 +16,20 @@
     [self.mapView.style addSource:source];
     [self.mapView.style addLayer:layer];
 
-    layer.circleRadius = MGLRuntimeStylingHelper.testNumber;
-    layer.circleColor = MGLRuntimeStylingHelper.testColor;
-    layer.circleBlur = MGLRuntimeStylingHelper.testNumber;
-    layer.circleOpacity = MGLRuntimeStylingHelper.testNumber;
-    layer.circleTranslate = MGLRuntimeStylingHelper.testOffset;
+    layer.circleRadius = [MGLRuntimeStylingHelper testNumber];
+    layer.circleColor = [MGLRuntimeStylingHelper testColor];
+    layer.circleBlur = [MGLRuntimeStylingHelper testNumber];
+    layer.circleOpacity = [MGLRuntimeStylingHelper testNumber];
+    layer.circleTranslate = [MGLRuntimeStylingHelper testOffset];
     layer.circleTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCircleTranslateAnchorViewport type:@encode(MGLCircleStyleLayerCircleTranslateAnchor)];
     layer.circlePitchScale = [MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCirclePitchScaleViewport type:@encode(MGLCircleStyleLayerCirclePitchScale)];
 
     MGLCircleStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
-    XCTAssertEqualObjects(gLayer.circleRadius, MGLRuntimeStylingHelper.testNumber);
-    XCTAssertEqualObjects(gLayer.circleColor, MGLRuntimeStylingHelper.testColor);
-    XCTAssertEqualObjects(gLayer.circleBlur, MGLRuntimeStylingHelper.testNumber);
-    XCTAssertEqualObjects(gLayer.circleOpacity, MGLRuntimeStylingHelper.testNumber);
-    XCTAssertEqualObjects(gLayer.circleTranslate, MGLRuntimeStylingHelper.testOffset);
+    XCTAssertEqualObjects(gLayer.circleRadius, [MGLRuntimeStylingHelper testNumber]);
+    XCTAssertEqualObjects(gLayer.circleColor, [MGLRuntimeStylingHelper testColor]);
+    XCTAssertEqualObjects(gLayer.circleBlur, [MGLRuntimeStylingHelper testNumber]);
+    XCTAssertEqualObjects(gLayer.circleOpacity, [MGLRuntimeStylingHelper testNumber]);
+    XCTAssertEqualObjects(gLayer.circleTranslate, [MGLRuntimeStylingHelper testOffset]);
     XCTAssert([(NSValue *)gLayer.circleTranslateAnchor objCType] == [[MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCircleTranslateAnchorViewport type:@encode(MGLCircleStyleLayerCircleTranslateAnchor)] objCType]);
     XCTAssert([(NSValue *)gLayer.circlePitchScale objCType] == [[MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCirclePitchScaleViewport type:@encode(MGLCircleStyleLayerCirclePitchScale)] objCType]);
 }
