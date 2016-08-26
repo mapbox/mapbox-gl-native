@@ -262,8 +262,8 @@ void QMapboxGLSettings::setAccessToken(const QString &token)
     Constructs a QMapboxGL object with \a settings and sets \a parent as the parent
     object. The \a settings cannot be changed after the object is constructed.
 */
-QMapboxGL::QMapboxGL(QObject *parent_, const QMapboxGLSettings &settings)
-    : QObject(parent_)
+QMapboxGL::QMapboxGL(QObject *parent, const QMapboxGLSettings &settings)
+    : QObject(parent)
 {
     // Multiple QMapboxGL running on the same thread
     // will share the same mbgl::util::RunLoop
