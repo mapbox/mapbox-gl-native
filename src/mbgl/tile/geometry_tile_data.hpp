@@ -2,19 +2,12 @@
 
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/feature.hpp>
-#include <mbgl/util/chrono.hpp>
-#include <mbgl/util/ptr.hpp>
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/variant.hpp>
-#include <mbgl/util/constants.hpp>
 
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <unordered_map>
-#include <functional>
-#include <iostream>
+#include <memory>
 
 namespace mbgl {
 
@@ -37,7 +30,7 @@ public:
     using std::vector<GeometryCoordinates>::vector;
 };
 
-class GeometryTileFeature : private util::noncopyable {
+class GeometryTileFeature {
 public:
     virtual ~GeometryTileFeature() = default;
     virtual FeatureType getType() const = 0;
@@ -47,18 +40,18 @@ public:
     virtual GeometryCollection getGeometries() const = 0;
 };
 
-class GeometryTileLayer : private util::noncopyable {
+class GeometryTileLayer {
 public:
     virtual ~GeometryTileLayer() = default;
     virtual std::size_t featureCount() const = 0;
-    virtual util::ptr<const GeometryTileFeature> getFeature(std::size_t) const = 0;
+    virtual std::unique_ptr<GeometryTileFeature> getFeature(std::size_t) const = 0;
     virtual std::string getName() const = 0;
 };
 
-class GeometryTileData : private util::noncopyable {
+class GeometryTileData {
 public:
     virtual ~GeometryTileData() = default;
-    virtual util::ptr<const GeometryTileLayer> getLayer(const std::string&) const = 0;
+    virtual const GeometryTileLayer* getLayer(const std::string&) const = 0;
 };
 
 // classifies an array of rings into polygons with outer rings and holes

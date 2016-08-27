@@ -39,7 +39,7 @@ public:
     VectorTileLayer(protozero::pbf_reader);
 
     std::size_t featureCount() const override { return features.size(); }
-    util::ptr<const GeometryTileFeature> getFeature(std::size_t) const override;
+    std::unique_ptr<GeometryTileFeature> getFeature(std::size_t) const override;
     std::string getName() const override;
 
 private:
@@ -59,12 +59,12 @@ class VectorTileData : public GeometryTileData {
 public:
     VectorTileData(std::shared_ptr<const std::string> data);
 
-    util::ptr<const GeometryTileLayer> getLayer(const std::string&) const override;
+    const GeometryTileLayer* getLayer(const std::string&) const override;
 
 private:
     std::shared_ptr<const std::string> data;
     mutable bool parsed = false;
-    mutable std::map<std::string, util::ptr<GeometryTileLayer>> layers;
+    mutable std::map<std::string, VectorTileLayer> layers;
 };
 
 VectorTile::VectorTile(const OverscaledTileID& id_,
@@ -242,21 +242,20 @@ VectorTileData::VectorTileData(std::shared_ptr<const std::string> data_)
     : data(std::move(data_)) {
 }
 
-util::ptr<const GeometryTileLayer> VectorTileData::getLayer(const std::string& name) const {
+const GeometryTileLayer* VectorTileData::getLayer(const std::string& name) const {
     if (!parsed) {
         parsed = true;
         protozero::pbf_reader tile_pbf(*data);
         while (tile_pbf.next(3)) {
-            util::ptr<VectorTileLayer> layer = std::make_shared<VectorTileLayer>(tile_pbf.get_message());
-            layers.emplace(layer->name, layer);
+            VectorTileLayer layer(tile_pbf.get_message());
+            layers.emplace(layer.name, std::move(layer));
         }
     }
 
-    auto layer_it = layers.find(name);
-    if (layer_it != layers.end()) {
-        return layer_it->second;
+    auto it = layers.find(name);
+    if (it != layers.end()) {
+        return &it->second;
     }
-
     return nullptr;
 }
 
@@ -291,8 +290,8 @@ VectorTileLayer::VectorTileLayer(protozero::pbf_reader layer_pbf) {
     }
 }
 
-util::ptr<const GeometryTileFeature> VectorTileLayer::getFeature(std::size_t i) const {
-    return std::make_shared<VectorTileFeature>(features.at(i), *this);
+std::unique_ptr<GeometryTileFeature> VectorTileLayer::getFeature(std::size_t i) const {
+    return std::make_unique<VectorTileFeature>(features.at(i), *this);
 }
 
 std::string VectorTileLayer::getName() const {

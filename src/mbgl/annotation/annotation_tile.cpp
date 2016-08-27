@@ -40,10 +40,10 @@ optional<Value> AnnotationTileFeature::getValue(const std::string& key) const {
 AnnotationTileLayer::AnnotationTileLayer(std::string name_)
     : name(std::move(name_)) {}
 
-util::ptr<const GeometryTileLayer> AnnotationTileData::getLayer(const std::string& name) const {
+const GeometryTileLayer* AnnotationTileData::getLayer(const std::string& name) const {
     auto it = layers.find(name);
     if (it != layers.end()) {
-        return it->second;
+        return &it->second;
     }
     return nullptr;
 }
