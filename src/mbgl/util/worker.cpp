@@ -51,6 +51,17 @@ public:
         }
     }
 
+    void redoLayout(TileWorker* worker,
+                    std::vector<std::unique_ptr<style::Layer>> layers,
+                    PlacementConfig config,
+                    std::function<void(TileParseResult)> callback) {
+        try {
+            callback(worker->redoLayout(std::move(layers), config));
+        } catch (...) {
+            callback(std::current_exception());
+        }
+    }
+
     void redoPlacement(TileWorker* worker,
                        const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
                        PlacementConfig config,
@@ -95,6 +106,16 @@ Worker::parsePendingGeometryTileLayers(TileWorker& worker,
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::parsePendingGeometryTileLayers,
                                                 callback, &worker, config);
+}
+
+std::unique_ptr<AsyncRequest>
+Worker::redoLayout(TileWorker& worker,
+                   std::vector<std::unique_ptr<style::Layer>> layers,
+                   PlacementConfig config,
+                   std::function<void(TileParseResult)> callback) {
+    current = (current + 1) % threads.size();
+    return threads[current]->invokeWithCallback(&Worker::Impl::redoLayout, callback, &worker,
+                                                std::move(layers), config);
 }
 
 std::unique_ptr<AsyncRequest>

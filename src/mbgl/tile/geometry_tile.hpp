@@ -37,6 +37,7 @@ public:
 
     bool parsePending() override;
 
+    void redoLayout() override;
     void redoPlacement(PlacementConfig) override;
 
     void queryRenderedFeatures(
@@ -50,6 +51,8 @@ public:
 private:
     std::vector<std::unique_ptr<style::Layer>> cloneStyleLayers() const;
     void redoPlacement();
+
+    void tileLoaded(TileParseResult, PlacementConfig);
 
     const std::string sourceID;
     style::Style& style;

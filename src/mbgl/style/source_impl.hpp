@@ -50,6 +50,10 @@ public:
     void loadTiles(const UpdateParameters&);
     bool parseTiles(const UpdateParameters&);
 
+    // Request that all loaded tiles re-run the layout operation on the existing source
+    // data with fresh style information.
+    void reload();
+
     void startRender(algorithm::ClipIDGenerator&,
                      const mat4& projMatrix,
                      const TransformState&);

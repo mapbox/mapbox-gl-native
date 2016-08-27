@@ -48,6 +48,7 @@ public:
     virtual Bucket* getBucket(const style::Layer&) = 0;
 
     virtual bool parsePending() { return true; }
+    virtual void redoLayout() {}
     virtual void redoPlacement(PlacementConfig) {}
 
     virtual void queryRenderedFeatures(

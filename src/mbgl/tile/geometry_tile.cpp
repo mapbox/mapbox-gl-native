@@ -83,33 +83,52 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
     // when tile data changed. Replacing the workdRequest will cancel a pending work
     // request in case there is one.
     workRequest.reset();
-    workRequest = worker.parseGeometryTile(tileWorker, cloneStyleLayers(), std::move(data_), targetConfig, [this, config = targetConfig] (TileParseResult result) {
-        workRequest.reset();
+    workRequest = worker.parseGeometryTile(tileWorker, cloneStyleLayers(), std::move(data_), targetConfig,
+        [this, config = targetConfig] (TileParseResult result) {
+            tileLoaded(std::move(result), config);
+        });
+}
 
-        if (result.is<TileParseResultData>()) {
-            auto& resultBuckets = result.get<TileParseResultData>();
-            availableData = resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
+void GeometryTile::redoLayout() {
+    // Mark the tile as pending again if it was complete before to prevent signaling a complete
+    // state despite pending parse operations.
+    if (availableData == DataAvailability::All) {
+        availableData = DataAvailability::Some;
+    }
 
-            // Persist the configuration we just placed so that we can later check whether we need to
-            // place again in case the configuration has changed.
-            placedConfig = config;
+    workRequest.reset();
+    workRequest = worker.redoLayout(tileWorker, cloneStyleLayers(), targetConfig,
+        [this, config = targetConfig] (TileParseResult result) {
+            tileLoaded(std::move(result), config);
+        });
+}
 
-            // Move over all buckets we received in this parse request, potentially overwriting
-            // existing buckets in case we got a refresh parse.
-            buckets = std::move(resultBuckets.buckets);
+void GeometryTile::tileLoaded(TileParseResult result, PlacementConfig config) {
+    workRequest.reset();
 
-            if (isComplete()) {
-                featureIndex = std::move(resultBuckets.featureIndex);
-                data = std::move(resultBuckets.tileData);
-            }
+    if (result.is<TileParseResultData>()) {
+        auto& resultBuckets = result.get<TileParseResultData>();
+        availableData = resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
 
-            redoPlacement();
-            observer->onTileLoaded(*this, true);
-        } else {
-            availableData = DataAvailability::All;
-            observer->onTileError(*this, result.get<std::exception_ptr>());
+        // Persist the configuration we just placed so that we can later check whether we need to
+        // place again in case the configuration has changed.
+        placedConfig = config;
+
+        // Move over all buckets we received in this parse request, potentially overwriting
+        // existing buckets in case we got a refresh parse.
+        buckets = std::move(resultBuckets.buckets);
+
+        if (isComplete()) {
+            featureIndex = std::move(resultBuckets.featureIndex);
+            data = std::move(resultBuckets.tileData);
         }
-    });
+
+        redoPlacement();
+        observer->onTileLoaded(*this, true);
+    } else {
+        availableData = DataAvailability::All;
+        observer->onTileError(*this, result.get<std::exception_ptr>());
+    }
 }
 
 bool GeometryTile::parsePending() {

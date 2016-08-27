@@ -39,15 +39,19 @@ TileWorker::~TileWorker() {
 TileParseResult TileWorker::parseAllLayers(std::vector<std::unique_ptr<Layer>> layers_,
                                            std::unique_ptr<const GeometryTileData> tileData_,
                                            PlacementConfig config) {
-    // We're doing a fresh parse of the tile, because the underlying data has changed.
+    tileData = std::move(tileData_);
+    return redoLayout(std::move(layers_), config);
+}
+
+TileParseResult TileWorker::redoLayout(std::vector<std::unique_ptr<Layer>> layers_,
+                                       const PlacementConfig config) {
+    layers = std::move(layers_);
+
+    // We're doing a fresh parse of the tile, because the underlying data or style has changed.
     pending.clear();
     placementPending.clear();
     partialParse = false;
     featureIndex = std::make_unique<FeatureIndex>();
-    tileData = std::move(tileData_);
-
-    // Store the layers for use in redoPlacement.
-    layers = std::move(layers_);
 
     // We're storing a set of bucket names we've parsed to avoid parsing a bucket twice that is
     // referenced from more than one layer

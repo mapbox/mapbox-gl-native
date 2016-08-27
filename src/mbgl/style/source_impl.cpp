@@ -182,6 +182,15 @@ bool Source::Impl::parseTiles(const UpdateParameters& parameters) {
     return allTilesUpdated;
 }
 
+void Source::Impl::reload() {
+    cache.clear();
+
+    for (auto& pair : tiles) {
+        auto tile = pair.second.get();
+        tile->redoLayout();
+    }
+}
+
 static Point<int16_t> coordinateToTilePoint(const UnwrappedTileID& tileID, const Point<double>& p) {
     auto zoomedCoord = TileCoordinate { p, 0 }.zoomTo(tileID.canonical.z);
     return {
