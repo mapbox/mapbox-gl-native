@@ -65,8 +65,8 @@ public:
 
     std::vector<const Layer*> getLayers() const;
     Layer* getLayer(const std::string& id) const;
-    void addLayer(std::unique_ptr<Layer>,
-                  optional<std::string> beforeLayerID = {});
+    Layer* addLayer(std::unique_ptr<Layer>,
+                    optional<std::string> beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 
     std::string getName() const;
