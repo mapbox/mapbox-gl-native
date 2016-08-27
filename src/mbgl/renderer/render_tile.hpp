@@ -2,7 +2,6 @@
 
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/util/ptr.hpp>
 #include <mbgl/util/clip_id.hpp>
 #include <mbgl/style/types.hpp>
 

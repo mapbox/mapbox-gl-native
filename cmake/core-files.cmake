@@ -438,7 +438,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/merge_lines.hpp
     src/mbgl/util/premultiply.cpp
     src/mbgl/util/premultiply.hpp
-    src/mbgl/util/ptr.hpp
     src/mbgl/util/rapidjson.hpp
     src/mbgl/util/raster.cpp
     src/mbgl/util/raster.hpp

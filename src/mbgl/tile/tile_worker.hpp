@@ -4,7 +4,6 @@
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/variant.hpp>
-#include <mbgl/util/ptr.hpp>
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 

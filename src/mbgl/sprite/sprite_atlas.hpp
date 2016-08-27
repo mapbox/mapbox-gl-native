@@ -4,7 +4,6 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/ptr.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <atomic>
