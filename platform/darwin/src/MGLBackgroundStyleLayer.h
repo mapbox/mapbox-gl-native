@@ -10,14 +10,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Accessing the Paint Attributes
 
+#if TARGET_OS_IPHONE
 /**
  The color with which the background will be drawn.
  
- The default value of this property is `NSColor.blackColor` or `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `backgroundPattern` is set to `nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> backgroundColor;
+#else
+/**
+ The color with which the background will be drawn.
+ 
+ The default value of this property is `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
+
+ This property is only applied to the style if `backgroundPattern` is set to `nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> backgroundColor;
+#endif
 
 /**
  Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).

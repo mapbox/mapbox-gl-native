@@ -150,15 +150,15 @@ global.describeValue = function (value, property, layerType) {
                 throw new Error(`unrecognized color format in default value of ${property.name}`);
             }
             if (color.r === 0 && color.g === 0 && color.b === 0 && color.a === 0) {
-                return '`NSColor.clearColor` or `UIColor.clearColor`';
+                return '`MGLColor.clearColor`';
             }
             if (color.r === 0 && color.g === 0 && color.b === 0 && color.a === 1) {
-                return '`NSColor.blackColor` or `UIColor.blackColor`';
+                return '`MGLColor.blackColor`';
             }
             if (color.r === 1 && color.g === 1 && color.b === 1 && color.a === 1) {
-                return '`NSColor.whiteColor` or `UIColor.whiteColor`';
+                return '`MGLColor.whiteColor`';
             }
-            return 'an `NSColor` or `UIColor`' + ` object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
+            return 'an `MGLColor`' + ` object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
         case 'array':
             let units = property.units || '';
             if (units) {
@@ -310,8 +310,27 @@ const layers = spec.layer.type.values.map((type) => {
     };
 });
 
-for (const layer of layers) {
-    fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, layerH(layer));
+function duplicatePlatformDecls(src) {
+    // Look for a documentation comment that contains “MGLColor” and the
+    // subsequent function, method, or property declaration. Try not to match
+    // greedily.
+    return src.replace(/(\/\*\*(?:\*[^\/]|[^*])*?\bMGLColor\b[\s\S]*?\*\/)(\s*.+?;)/g,
+                       (match, comment, decl) => {
+        let iosComment = comment.replace(/\bMGLColor\b/g, 'UIColor')
+            // Use the correct indefinite article.
+            .replace(/\b(a)n(\s+`?UIColor)\b/gi, '$1$2');
+        let macosComment = comment.replace(/\bMGLColor\b/g, 'NSColor');
+        return `\
+#if TARGET_OS_IPHONE
+${iosComment}${decl}
+#else
+${macosComment}${decl}
+#endif`;
+    });
+}
+
+for (var layer of layers) {
+    fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, duplicatePlatformDecls(layerH(layer)));
     fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
     fs.writeFileSync(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.m`, testLayers(layer));
 }

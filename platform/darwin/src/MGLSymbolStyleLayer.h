@@ -400,23 +400,45 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconOpacity;
 
+#if TARGET_OS_IPHONE
 /**
  The color of the icon. This can only be used with sdf icons.
  
- The default value of this property is `NSColor.blackColor` or `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconColor;
+#else
+/**
+ The color of the icon. This can only be used with sdf icons.
+ 
+ The default value of this property is `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
+ This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconColor;
+#endif
+
+#if TARGET_OS_IPHONE
 /**
  The color of the icon's halo. Icon halos can only be used with sdf icons.
  
- The default value of this property is `NSColor.clearColor` or `UIColor.clearColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is `UIColor.clearColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconHaloColor;
+#else
+/**
+ The color of the icon's halo. Icon halos can only be used with sdf icons.
+ 
+ The default value of this property is `NSColor.clearColor`. Set this property to `nil` to reset it to the default value.
+
+ This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconHaloColor;
+#endif
 
 /**
  Distance of halo to the icon outline.
@@ -469,23 +491,45 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textOpacity;
 
+#if TARGET_OS_IPHONE
 /**
  The color with which the text will be drawn.
  
- The default value of this property is `NSColor.blackColor` or `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textColor;
+#else
+/**
+ The color with which the text will be drawn.
+ 
+ The default value of this property is `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
+ This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textColor;
+#endif
+
+#if TARGET_OS_IPHONE
 /**
  The color of the text's halo, which helps it stand out from backgrounds.
  
- The default value of this property is `NSColor.clearColor` or `UIColor.clearColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is `UIColor.clearColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textHaloColor;
+#else
+/**
+ The color of the text's halo, which helps it stand out from backgrounds.
+ 
+ The default value of this property is `NSColor.clearColor`. Set this property to `nil` to reset it to the default value.
+
+ This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textHaloColor;
+#endif
 
 /**
  Distance of halo to the font outline. Max text halo width is 1/4 of the font-size.

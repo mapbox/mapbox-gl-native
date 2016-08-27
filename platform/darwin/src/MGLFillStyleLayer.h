@@ -29,14 +29,25 @@ typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillOpacity;
 
+#if TARGET_OS_IPHONE
 /**
  The color of the filled part of this layer. This color can be specified as rgba with an alpha component and the color's opacity will not affect the opacity of the 1pt stroke, if it is used.
  
- The default value of this property is `NSColor.blackColor` or `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `fillPattern` is set to `nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillColor;
+#else
+/**
+ The color of the filled part of this layer. This color can be specified as rgba with an alpha component and the color's opacity will not affect the opacity of the 1pt stroke, if it is used.
+ 
+ The default value of this property is `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
+
+ This property is only applied to the style if `fillPattern` is set to `nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> fillColor;
+#endif
 
 /**
  The outline color of the fill. Matches the value of `fillColor` if unspecified.
