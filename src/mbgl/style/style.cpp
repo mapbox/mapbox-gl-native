@@ -154,7 +154,7 @@ Layer* Style::getLayer(const std::string& id) const {
     return it != layers.end() ? it->get() : nullptr;
 }
 
-void Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> before) {
+Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> before) {
     // TODO: verify source
 
     if (SymbolLayer* symbolLayer = layer->as<SymbolLayer>()) {
@@ -167,7 +167,7 @@ void Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> before)
         customLayer->impl->initialize();
     }
 
-    layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer));
+    return layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer))->get();
 }
 
 void Style::removeLayer(const std::string& id) {

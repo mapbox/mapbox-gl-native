@@ -42,7 +42,7 @@ void AnnotationManager::removeAnnotation(const AnnotationID& id) {
         symbolTree.remove(symbolAnnotations.at(id));
         symbolAnnotations.erase(id);
     } else if (shapeAnnotations.find(id) != shapeAnnotations.end()) {
-        obsoleteShapeAnnotationLayers.push_back(shapeAnnotations.at(id)->layerID);
+        obsoleteShapeAnnotationLayers.insert(shapeAnnotations.at(id)->layerID);
         shapeAnnotations.erase(id);
     }
 }
@@ -54,18 +54,21 @@ void AnnotationManager::add(const AnnotationID& id, const SymbolAnnotation& anno
 }
 
 void AnnotationManager::add(const AnnotationID& id, const LineAnnotation& annotation, const uint8_t maxZoom) {
-    shapeAnnotations.emplace(id,
-        std::make_unique<LineAnnotationImpl>(id, annotation, maxZoom));
+    ShapeAnnotationImpl& impl = *shapeAnnotations.emplace(id,
+        std::make_unique<LineAnnotationImpl>(id, annotation, maxZoom)).first->second;
+    obsoleteShapeAnnotationLayers.erase(impl.layerID);
 }
 
 void AnnotationManager::add(const AnnotationID& id, const FillAnnotation& annotation, const uint8_t maxZoom) {
-    shapeAnnotations.emplace(id,
-        std::make_unique<FillAnnotationImpl>(id, annotation, maxZoom));
+    ShapeAnnotationImpl& impl = *shapeAnnotations.emplace(id,
+        std::make_unique<FillAnnotationImpl>(id, annotation, maxZoom)).first->second;
+    obsoleteShapeAnnotationLayers.erase(impl.layerID);
 }
 
 void AnnotationManager::add(const AnnotationID& id, const StyleSourcedAnnotation& annotation, const uint8_t maxZoom) {
-    shapeAnnotations.emplace(id,
-        std::make_unique<StyleSourcedAnnotationImpl>(id, annotation, maxZoom));
+    ShapeAnnotationImpl& impl = *shapeAnnotations.emplace(id,
+        std::make_unique<StyleSourcedAnnotationImpl>(id, annotation, maxZoom)).first->second;
+    obsoleteShapeAnnotationLayers.erase(impl.layerID);
 }
 
 Update AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t maxZoom) {

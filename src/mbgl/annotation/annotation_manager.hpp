@@ -73,7 +73,7 @@ private:
     SymbolAnnotationTree symbolTree;
     SymbolAnnotationMap symbolAnnotations;
     ShapeAnnotationMap shapeAnnotations;
-    std::vector<std::string> obsoleteShapeAnnotationLayers;
+    std::set<std::string> obsoleteShapeAnnotationLayers;
     std::set<AnnotationTile*> tiles;
 
     SpriteStore spriteStore;
