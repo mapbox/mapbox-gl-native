@@ -163,7 +163,7 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
             case R.id.action_id_color:
                 color = !color;
                 polygon.setFillColor(color ? BLUE_COLOR : RED_COLOR);
-
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

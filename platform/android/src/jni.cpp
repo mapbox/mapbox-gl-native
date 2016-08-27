@@ -796,40 +796,30 @@ jni::jarray<jlong>* nativeAddPolygons(JNIEnv *env, jni::jobject* obj, jlong nati
     return std_vector_uint_to_jobject(env, ids);
 }
 
-jlong nativeUpdatePolygon(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlong polygonId, jni::jobject* polygon) {
+void nativeUpdatePolygon(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlong polygonId, jni::jobject* polygon) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeUpdatePolygon");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    if (polygonId == -1) {
-       return polygonId;
-    }
     jni::jobject* points = jni::GetField<jni::jobject*>(*env, polygon, *polygonPointsId);
 
     mbgl::FillAnnotation annotation { mbgl::Polygon<double> { toGeometry<mbgl::LinearRing<double>>(env, points) } };
     annotation.opacity = { jni::GetField<jfloat>(*env, polygon, *polygonAlphaId) };
     annotation.outlineColor = { toColor(jni::GetField<jint>(*env, polygon, *polygonStrokeColorId)) };
     annotation.color = { toColor(jni::GetField<jint>(*env, polygon, *polygonFillColorId)) };
-    //TODO replace remove add with updateAnnotation, https://github.com/mapbox/mapbox-gl-native/issues/5844
-    nativeMapView->getMap().removeAnnotation(polygonId);
-    return nativeMapView->getMap().addAnnotation(annotation);
+    nativeMapView->getMap().updateAnnotation(polygonId, annotation);
 }
 
-jlong nativeUpdatePolyline(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlong polylineId, jni::jobject* polyline) {
+void nativeUpdatePolyline(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlong polylineId, jni::jobject* polyline) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeUpdatePolyline");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    if (polylineId == -1) {
-       return polylineId;
-    }
     jni::jobject* points = jni::GetField<jni::jobject*>(*env, polyline, *polylinePointsId);
 
     mbgl::LineAnnotation annotation { toGeometry<mbgl::LineString<double>>(env, points) };
     annotation.opacity = { jni::GetField<jfloat>(*env, polyline, *polylineAlphaId) };
     annotation.color = { toColor(jni::GetField<jint>(*env, polyline, *polylineColorId)) };
     annotation.width = { jni::GetField<jfloat>(*env, polyline, *polylineWidthId) };
-    //TODO replace remove add with updateAnnotation, https://github.com/mapbox/mapbox-gl-native/issues/5844
-    nativeMapView->getMap().removeAnnotation(polylineId);
-    return nativeMapView->getMap().addAnnotation(annotation);
+    nativeMapView->getMap().updateAnnotation(polylineId, annotation);
 }
 
 void nativeRemoveAnnotations(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jarray<jlong>* jarray) {
@@ -1814,8 +1804,8 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeAddPolylines, "(J[Lcom/mapbox/mapboxsdk/annotations/Polyline;)[J"),
         MAKE_NATIVE_METHOD(nativeAddPolygons, "(J[Lcom/mapbox/mapboxsdk/annotations/Polygon;)[J"),
         MAKE_NATIVE_METHOD(nativeUpdateMarker, "(JJDDLjava/lang/String;)V"),
-        MAKE_NATIVE_METHOD(nativeUpdatePolygon, "(JJLcom/mapbox/mapboxsdk/annotations/Polygon;)J"),
-        MAKE_NATIVE_METHOD(nativeUpdatePolyline, "(JJLcom/mapbox/mapboxsdk/annotations/Polyline;)J"),
+        MAKE_NATIVE_METHOD(nativeUpdatePolygon, "(JJLcom/mapbox/mapboxsdk/annotations/Polygon;)V"),
+        MAKE_NATIVE_METHOD(nativeUpdatePolyline, "(JJLcom/mapbox/mapboxsdk/annotations/Polyline;)V"),
         MAKE_NATIVE_METHOD(nativeRemoveAnnotations, "(J[J)V"),
         MAKE_NATIVE_METHOD(nativeQueryPointAnnotations, "(JLandroid/graphics/RectF;)[J"),
         MAKE_NATIVE_METHOD(nativeAddAnnotationIcon, "(JLjava/lang/String;IIF[B)V"),
