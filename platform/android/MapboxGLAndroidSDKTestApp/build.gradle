@@ -103,6 +103,7 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.4.1'
     androidTestCompile 'com.android.support.test:rules:0.4.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    androidTestCompile 'com.squareup.spoon:spoon-client:1.6.2'
 }
 
 checkstyle {
@@ -160,3 +161,7 @@ android.applicationVariants.all { variant ->
     checkstyle.exclude('**/R.java')
     project.tasks.getByName("check").dependsOn checkstyle
 }
+
+
+apply from: 'gradle-spoon.gradle'
+
