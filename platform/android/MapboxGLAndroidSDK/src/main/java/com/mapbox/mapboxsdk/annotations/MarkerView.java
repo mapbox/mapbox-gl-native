@@ -61,6 +61,7 @@ public class MarkerView extends Marker {
      */
     public MarkerView(BaseMarkerViewOptions baseMarkerViewOptions) {
         super(baseMarkerViewOptions);
+        this.alpha = baseMarkerViewOptions.getAlpha();
         this.anchorU = baseMarkerViewOptions.getAnchorU();
         this.anchorV = baseMarkerViewOptions.getAnchorV();
         this.infoWindowAnchorU = baseMarkerViewOptions.getInfoWindowAnchorU();

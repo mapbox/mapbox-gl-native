@@ -118,7 +118,7 @@ public class MarkerViewManager {
                 PointF point = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
                 if (marker.getOffsetX() == MapboxConstants.UNMEASURED) {
                     // ensure view is measured first
-                    if (convertView.getMeasuredWidth() == 0) {
+                    if (convertView.getWidth() == 0) {
                         convertView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
                     }
                     if (convertView.getMeasuredWidth() != 0) {
@@ -133,9 +133,7 @@ public class MarkerViewManager {
 
                 // animate visibility
                 if (marker.isVisible() && convertView.getVisibility() == View.GONE) {
-                    convertView.animate().cancel();
-                    convertView.setAlpha(0);
-                    AnimatorUtils.alpha(convertView, 1);
+                    animateVisible(marker, true);
                 }
             }
         }
