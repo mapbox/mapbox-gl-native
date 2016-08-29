@@ -50,14 +50,6 @@ public class VideoViewActivity extends AppCompatActivity {
 
         mapView = (MapView) findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(MapboxMap mapboxMap) {
-
-
-
-            }
-        });
     }
 
     @Override
