@@ -25,13 +25,11 @@ void RasterTile::setError(std::exception_ptr err) {
     observer->onTileError(*this, err);
 }
 
-void RasterTile::setData(std::shared_ptr<const std::string> data,
-                             optional<Timestamp> modified_,
-                             optional<Timestamp> expires_) {
-    modified = modified_;
-    expires = expires_;
+void RasterTile::setData(const Response& res) {
+    modified = res.modified;
+    expires = res.expires;
 
-    if (!data) {
+    if (res.noContent) {
         // This is a 404 response. We're treating these as empty tiles.
         workRequest.reset();
         availableData = DataAvailability::All;
@@ -41,7 +39,7 @@ void RasterTile::setData(std::shared_ptr<const std::string> data,
     }
 
     workRequest.reset();
-    workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(), data, [this] (RasterTileParseResult result) {
+    workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(), res.data, [this, reportBad = res.reportBad] (RasterTileParseResult result) {
         workRequest.reset();
 
         availableData = DataAvailability::All;
@@ -50,6 +48,7 @@ void RasterTile::setData(std::shared_ptr<const std::string> data,
             bucket = std::move(result.get<std::unique_ptr<Bucket>>());
             observer->onTileLoaded(*this, true);
         } else {
+            reportBad();
             bucket.reset();
             observer->onTileError(*this, result.get<std::exception_ptr>());
         }

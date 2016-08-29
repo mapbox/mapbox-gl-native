@@ -81,6 +81,7 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
             try {
                 parseGlyphPBF(**store->getGlyphSet(fontStack), *res.data);
             } catch (...) {
+                res.reportBad();
                 observer->onGlyphsError(fontStack, glyphRange, std::current_exception());
                 return;
             }

@@ -323,6 +323,7 @@ void Map::setStyleURL(const std::string& url) {
             return;
         } else {
             impl->loadStyleJSON(*res.data);
+            if (!impl->style->loaded) res.reportBad();
         }
     });
 }

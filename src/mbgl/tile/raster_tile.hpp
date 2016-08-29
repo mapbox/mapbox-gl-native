@@ -25,9 +25,7 @@ public:
 
     void setError(std::exception_ptr err);
 
-    void setData(std::shared_ptr<const std::string> data,
-                 optional<Timestamp> modified_,
-                 optional<Timestamp> expires_);
+    void setData(const Response& response);
 
     void cancel() override;
     Bucket* getBucket(const style::Layer&) override;

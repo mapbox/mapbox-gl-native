@@ -99,7 +99,7 @@ void TileLoader<T>::loadedData(const Response& res) {
         resource.priorModified = res.modified;
         resource.priorExpires = res.expires;
         resource.priorEtag = res.etag;
-        tile.setData(res.noContent ? nullptr : res.data, res.modified, res.expires);
+        tile.setData(res);
     }
 }
 
