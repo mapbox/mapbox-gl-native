@@ -772,7 +772,23 @@ public class MapboxMap {
         mMarkerViewManager.invalidateViewMarkersInVisibleRegion();
         return marker;
     }
-    
+
+    @UiThread
+    @NonNull
+    public List<MarkerView> addMarkerViews(@NonNull List<? extends BaseMarkerViewOptions> markerViewOptions) {
+        List<MarkerView> markers = new ArrayList<>();
+        for (BaseMarkerViewOptions markerViewOption : markerViewOptions) {
+            MarkerView marker = prepareViewMarker(markerViewOption);
+            marker.setMapboxMap(this);
+            long id = mMapView.addMarker(marker);
+            marker.setId(id);
+            mAnnotations.put(id, marker);
+            markers.add(marker);
+        }
+        mMarkerViewManager.invalidateViewMarkersInVisibleRegion();
+        return markers;
+    }
+
     /**
      * <p>
      * Adds multiple markers to this map.

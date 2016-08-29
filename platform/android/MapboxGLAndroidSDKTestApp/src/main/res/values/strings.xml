@@ -167,6 +167,7 @@
     <string-array name="bulk_marker_list">
         <item>10</item>
         <item>100</item>
+        <item>500</item>
         <item>1000</item>
         <item>10000</item>
     </string-array>
