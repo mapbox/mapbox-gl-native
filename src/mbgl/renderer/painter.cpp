@@ -198,6 +198,12 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         }
     }
 
+#ifndef NDEBUG
+    if (frame.debugOptions & MapDebugOptions::DepthBuffer) {
+        renderDepthBuffer();
+    }
+#endif
+
     // TODO: Find a better way to unbind VAOs after we're done with them without introducing
     // unnecessary bind(0)/bind(N) sequences.
     {
@@ -257,6 +263,11 @@ void Painter::renderPass(PaintParameters& parameters,
         } else if (layer.is<CustomLayer>()) {
             MBGL_DEBUG_GROUP(layer.baseImpl->id + " - custom");
             VertexArrayObject::Unbind();
+            config.depthFunc.reset();
+            config.depthTest = GL_TRUE;
+            config.depthMask = GL_FALSE;
+            config.stencilTest = GL_FALSE;
+            setDepthSublayer(0);
             layer.as<CustomLayer>()->impl->render(state);
             config.setDirty();
         } else {

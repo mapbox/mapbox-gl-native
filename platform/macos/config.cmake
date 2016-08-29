@@ -1,4 +1,4 @@
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
 
 mason_use(glfw VERSION 3.1.2)
 mason_use(boost_libprogram_options VERSION 1.60.0)

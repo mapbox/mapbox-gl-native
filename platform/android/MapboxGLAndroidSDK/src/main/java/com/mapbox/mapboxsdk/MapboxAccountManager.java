@@ -1,7 +1,10 @@
 package com.mapbox.mapboxsdk;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
@@ -40,6 +43,7 @@ public class MapboxAccountManager {
         if (mapboxAccountManager == null) {
             mapboxAccountManager = new MapboxAccountManager(context, accessToken);
         }
+
         MapboxEventManager eventManager = MapboxEventManager.getMapboxEventManager();
         eventManager.initialize(mapboxAccountManager.applicationContext, mapboxAccountManager.accessToken);
         return mapboxAccountManager;
@@ -79,4 +83,19 @@ public class MapboxAccountManager {
             throw new InvalidAccessTokenException();
         }
     }
+
+    /**
+     * Determines whether we have an Internet connection available. Please do not rely on this
+     * method in your apps, this method is used internally by the SDK.
+     *
+     * @return true if there is an Internet connection, false otherwise
+     */
+    public boolean isConnected() {
+        ConnectivityManager cm = (ConnectivityManager) applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean result = (activeNetwork != null && activeNetwork.isConnected());
+        Log.v("IOUtils", "isConnected result = " + result);
+        return result;
+    }
+
 }

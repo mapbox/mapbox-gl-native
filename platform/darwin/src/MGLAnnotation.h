@@ -2,8 +2,6 @@
 #import <CoreLocation/CoreLocation.h>
 #import <TargetConditionals.h>
 
-#import "MGLTypes.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**

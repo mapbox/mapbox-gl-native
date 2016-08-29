@@ -14,24 +14,27 @@
 
 #include <algorithm>
 #include <set>
+#include <sstream>
 
 namespace mbgl {
 namespace style {
 
 Parser::~Parser() = default;
 
-void Parser::parse(const std::string& json) {
+StyleParseResult Parser::parse(const std::string& json) {
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
     document.Parse<0>(json.c_str());
 
     if (document.HasParseError()) {
-        Log::Error(Event::ParseStyle, "Error parsing style JSON at %i: %s", document.GetErrorOffset(), rapidjson::GetParseError_En(document.GetParseError()));
-        return;
+        std::stringstream message;
+        message <<  document.GetErrorOffset() << " - "
+            << rapidjson::GetParseError_En(document.GetParseError());
+
+        return std::make_exception_ptr(std::runtime_error(message.str()));
     }
 
     if (!document.IsObject()) {
-        Log::Error(Event::ParseStyle, "Style JSON must be an object");
-        return;
+        return std::make_exception_ptr(std::runtime_error("style must be an object"));
     }
 
     if (document.HasMember("version")) {
@@ -39,6 +42,43 @@ void Parser::parse(const std::string& json) {
         const int version = versionValue.IsNumber() ? versionValue.GetInt() : 0;
         if (version != 8) {
             Log::Warning(Event::ParseStyle, "current renderer implementation only supports style spec version 8; using an outdated style will cause rendering errors");
+        }
+    }
+
+    if (document.HasMember("name")) {
+        const JSValue& value = document["name"];
+        if (value.IsString()) {
+            name = { value.GetString(), value.GetStringLength() };
+        }
+    }
+
+    if (document.HasMember("center")) {
+        const JSValue& value = document["center"];
+        if (value.IsArray() && value.Size() >= 2) {
+            // Style spec uses lon/lat order
+            latLng.longitude = value[0].IsNumber() ? value[0].GetDouble() : 0;
+            latLng.latitude = value[1].IsNumber() ? value[1].GetDouble() : 0;
+        }
+    }
+
+    if (document.HasMember("zoom")) {
+        const JSValue& value = document["zoom"];
+        if (value.IsNumber()) {
+            zoom = value.GetDouble();
+        }
+    }
+
+    if (document.HasMember("bearing")) {
+        const JSValue& value = document["bearing"];
+        if (value.IsNumber()) {
+            bearing = value.GetDouble();
+        }
+    }
+
+    if (document.HasMember("pitch")) {
+        const JSValue& value = document["pitch"];
+        if (value.IsNumber()) {
+            pitch = value.GetDouble();
         }
     }
 
@@ -63,6 +103,8 @@ void Parser::parse(const std::string& json) {
             glyphURL = { glyphs.GetString(), glyphs.GetStringLength() };
         }
     }
+
+    return nullptr;
 }
 
 void Parser::parseSources(const JSValue& value) {

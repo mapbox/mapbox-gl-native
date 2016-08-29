@@ -76,6 +76,10 @@ const Filter& <%- camelize(type) %>Layer::getFilter() const {
 // Layout properties
 
 <% for (const property of layoutProperties) { -%>
+PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::getDefault<%- camelize(property.name) %>() {
+    return { <%- defaultValue(property) %> };
+}
+
 PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
     return impl->layout.<%- camelizeWithLeadingLowercase(property.name) %>.get();
 }
@@ -87,6 +91,10 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue
 
 // Paint properties
 <% for (const property of paintProperties) { %>
+PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::getDefault<%- camelize(property.name) %>() {
+    return { <%- defaultValue(property) %> };
+}
+
 PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
     return impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.get();
 }

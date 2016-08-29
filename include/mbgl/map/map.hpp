@@ -158,6 +158,13 @@ public:
     void addLayer(std::unique_ptr<style::Layer>, const optional<std::string>& beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 
+    // Defaults
+    std::string getStyleName() const;
+    LatLng getDefaultLatLng() const;
+    double getDefaultZoom() const;
+    double getDefaultBearing() const;
+    double getDefaultPitch() const;
+
     // Feature queries
     std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const optional<std::vector<std::string>>& layerIDs = {});
     std::vector<Feature> queryRenderedFeatures(const ScreenBox&,        const optional<std::vector<std::string>>& layerIDs = {});

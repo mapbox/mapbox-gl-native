@@ -41,6 +41,11 @@ public class MapboxConstants {
     public final static boolean DEFAULT_SET_STORAGE_EXTERNAL = false;
 
     /**
+     * Unmeasured state
+     */
+    public final static float UNMEASURED = -1f;
+
+    /**
      * Default animation time
      */
     public static final int ANIMATION_DURATION = 300;

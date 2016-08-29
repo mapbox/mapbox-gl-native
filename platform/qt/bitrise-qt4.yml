@@ -36,6 +36,7 @@ workflows:
             export BUILDTYPE=Debug
             export WITH_QT_4=1
             make qt-app
+            make run-qt-test
         - is_debug: 'yes'
     - slack:
         title: Post to Slack

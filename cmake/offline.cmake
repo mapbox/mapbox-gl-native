@@ -19,3 +19,5 @@ target_add_mason_package(mbgl-offline PRIVATE boost)
 target_add_mason_package(mbgl-offline PRIVATE boost_libprogram_options)
 
 mbgl_platform_offline()
+
+create_source_groups(mbgl-offline)

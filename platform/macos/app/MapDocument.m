@@ -283,10 +283,17 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 - (IBAction)showColorBuffer:(id)sender {
     self.mapView.debugMask &= ~MGLMapDebugStencilBufferMask;
+    self.mapView.debugMask &= ~MGLMapDebugDepthBufferMask;
 }
 
 - (IBAction)showStencilBuffer:(id)sender {
+    self.mapView.debugMask &= ~MGLMapDebugDepthBufferMask;
     self.mapView.debugMask |= MGLMapDebugStencilBufferMask;
+}
+
+- (IBAction)showDepthBuffer:(id)sender {
+    self.mapView.debugMask &= ~MGLMapDebugStencilBufferMask;
+    self.mapView.debugMask |= MGLMapDebugDepthBufferMask;
 }
 
 - (IBAction)toggleShowsToolTipsOnDroppedPins:(id)sender {
@@ -484,7 +491,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
 }
 
-- (IBAction)runtimeStyling:(id)sender {
+- (IBAction)manipulateStyle:(id)sender {
     MGLFillStyleLayer *fillStyleLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
     
     MGLStyleAttributeFunction *colorFunction = [[MGLStyleAttributeFunction alloc] init];
@@ -495,7 +502,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     };
     fillStyleLayer.fillColor = colorFunction;
     
-    NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
+    NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
     [self.mapView.style addSource:source];
     
@@ -599,7 +607,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     if (menuItem.action == @selector(reload:)) {
         return YES;
     }
-    if (menuItem.action == @selector(runtimeStyling:)) {
+    if (menuItem.action == @selector(manipulateStyle:)) {
         return YES;
     }
     if (menuItem.action == @selector(dropPin:)) {
@@ -641,12 +649,17 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return YES;
     }
     if (menuItem.action == @selector(showColorBuffer:)) {
-        BOOL enabled = self.mapView.debugMask & MGLMapDebugStencilBufferMask;
+        BOOL enabled = self.mapView.debugMask & (MGLMapDebugStencilBufferMask | MGLMapDebugDepthBufferMask);
         menuItem.state = enabled ? NSOffState : NSOnState;
         return YES;
     }
     if (menuItem.action == @selector(showStencilBuffer:)) {
         BOOL enabled = self.mapView.debugMask & MGLMapDebugStencilBufferMask;
+        menuItem.state = enabled ? NSOnState : NSOffState;
+        return YES;
+    }
+    if (menuItem.action == @selector(showDepthBuffer:)) {
+        BOOL enabled = self.mapView.debugMask & MGLMapDebugDepthBufferMask;
         menuItem.state = enabled ? NSOnState : NSOffState;
         return YES;
     }

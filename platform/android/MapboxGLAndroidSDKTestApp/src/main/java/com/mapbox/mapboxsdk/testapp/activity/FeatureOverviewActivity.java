@@ -208,6 +208,7 @@ public class FeatureOverviewActivity extends AppCompatActivity {
                 {
                     add(resources.getString(R.string.activity_double_map));
                     add(getString(R.string.activity_location_picker));
+                    add(getString(R.string.activity_car_driving));
                 }
             };
 

@@ -205,8 +205,8 @@ void OfflineDownload::activateDownload() {
                 style::GeoJSONSource::Impl* geojsonSource =
                     static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
 
-                if (!geojsonSource->loaded) {
-                    ensureResource(Resource::source(geojsonSource->getURL()));
+                if (geojsonSource->getURL()) {
+                    ensureResource(Resource::source(*geojsonSource->getURL()));
                 }
                 break;
             }

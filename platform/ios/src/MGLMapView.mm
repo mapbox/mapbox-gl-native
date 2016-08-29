@@ -32,6 +32,7 @@
 #import "MGLOfflineStorage_Private.h"
 
 #import "NSBundle+MGLAdditions.h"
+#import "NSDate+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
@@ -292,11 +293,6 @@ public:
 }
 
 #pragma mark - Setup & Teardown -
-
-mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
-{
-    return std::chrono::duration_cast<mbgl::Duration>(std::chrono::duration<NSTimeInterval>(duration));
-}
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
@@ -1903,9 +1899,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (void)resetPosition
 {
-    MGLMapCamera *camera = [MGLMapCamera camera];
-    camera.altitude = MGLAltitudeForZoomLevel(0, 0, 0, self.frame.size);
-    self.camera = camera;
+    CGFloat pitch = _mbglMap->getDefaultPitch();
+    CLLocationDirection heading = mbgl::util::wrap(_mbglMap->getDefaultBearing(), 0., 360.);
+    CLLocationDistance distance = MGLAltitudeForZoomLevel(_mbglMap->getDefaultZoom(), pitch, 0, self.frame.size);
+    self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(_mbglMap->getDefaultLatLng())
+                                                   fromDistance:distance
+                                                          pitch:pitch
+                                                        heading:heading];
 }
 
 - (void)emptyMemoryCache
@@ -2710,16 +2710,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (NS_ARRAY_OF(NSString *) *)styleClasses
 {
-    NSMutableArray *returnArray = [NSMutableArray array];
-
-    const std::vector<std::string> &appliedClasses = _mbglMap->getClasses();
-
-    for (auto class_it = appliedClasses.begin(); class_it != appliedClasses.end(); class_it++)
-    {
-        [returnArray addObject:@(class_it->c_str())];
-    }
-
-    return returnArray;
+    return [self.style styleClasses];
 }
 
 - (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses
@@ -2729,36 +2720,22 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses transitionDuration:(NSTimeInterval)transitionDuration
 {
-    std::vector<std::string> newAppliedClasses;
-
-    for (NSString *appliedClass in appliedClasses)
-    {
-        newAppliedClasses.insert(newAppliedClasses.end(), [appliedClass UTF8String]);
-    }
-
-    mbgl::style::TransitionOptions transition { { MGLDurationInSeconds(transitionDuration) } };
-    _mbglMap->setClasses(newAppliedClasses, transition);
+    [self.style setStyleClasses:appliedClasses transitionDuration:transitionDuration];
 }
 
 - (BOOL)hasStyleClass:(NSString *)styleClass
 {
-    return styleClass && _mbglMap->hasClass([styleClass UTF8String]);
+    return [self.style hasStyleClass:styleClass];
 }
 
 - (void)addStyleClass:(NSString *)styleClass
 {
-    if (styleClass)
-    {
-        _mbglMap->addClass([styleClass UTF8String]);
-    }
+    [self.style addStyleClass:styleClass];
 }
 
 - (void)removeStyleClass:(NSString *)styleClass
 {
-    if (styleClass)
-    {
-        _mbglMap->removeClass([styleClass UTF8String]);
-    }
+    [self.style removeStyleClass:styleClass];
 }
 
 #pragma mark - Annotations -
@@ -3847,10 +3824,14 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         if ([self.delegate respondsToSelector:@selector(mapView:viewForAnnotation:)])
         {
             userLocationAnnotationView = (MGLUserLocationAnnotationView *)[self.delegate mapView:self viewForAnnotation:self.userLocation];
-            if (userLocationAnnotationView)
+            if (userLocationAnnotationView && ! [userLocationAnnotationView isKindOfClass:MGLUserLocationAnnotationView.class])
             {
-                NSAssert([userLocationAnnotationView.class isSubclassOfClass:MGLUserLocationAnnotationView.class],
-                         @"User location annotation view must be a subclass of MGLUserLocationAnnotationView");
+                static dispatch_once_t onceToken;
+                dispatch_once(&onceToken, ^{
+                    NSLog(@"Ignoring user location annotation view with type %@. User location annotation view must be a kind of MGLUserLocationAnnotationView. This warning is only shown once and will become an error in a future version.", NSStringFromClass(userLocationAnnotationView.class));
+                });
+
+                userLocationAnnotationView = nil;
             }
         }
         

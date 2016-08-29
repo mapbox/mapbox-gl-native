@@ -140,7 +140,9 @@ matrix:
       dist: trusty
       language: cpp
       compiler: "qt5-gcc5-release"
-      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
+      # Qt 5 gets confused with fglrx that is installed by default on Travis
+      # trusty bots. This way we force both Qt and Xvfb to load on mesa drivers.
+      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5 LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/mesa
       addons: *qt5
       script:
         - make qt-app

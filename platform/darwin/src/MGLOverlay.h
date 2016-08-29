@@ -4,8 +4,6 @@
 #import "MGLAnnotation.h"
 #import "MGLGeometry.h"
 
-#import "MGLTypes.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**

@@ -125,4 +125,39 @@ void Painter::renderClipMasks() {
 }
 #endif // NDEBUG
 
+#ifndef NDEBUG
+void Painter::renderDepthBuffer() {
+    config.stencilTest = GL_FALSE;
+    config.depthTest = GL_FALSE;
+    config.program = 0;
+    config.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
+
+#ifndef GL_ES_VERSION_2_0
+    config.pixelZoom = { 1, 1 };
+    config.rasterPos = {{ -1, -1, 0, 0 }};
+
+    // Read the stencil buffer
+    const auto& fbSize = frame.framebufferSize;
+    auto pixels = std::make_unique<GLubyte[]>(fbSize[0] * fbSize[1]);
+
+    const double base = 1.0 / (1.0 - depthRangeSize);
+    glPixelTransferf(GL_DEPTH_SCALE, base);
+    glPixelTransferf(GL_DEPTH_BIAS, 1.0 - base);
+
+    MBGL_CHECK_ERROR(glReadPixels(
+                0,                  // GLint x
+                0,                  // GLint y
+                fbSize[0],          // GLsizei width
+                fbSize[1],          // GLsizei height
+                GL_DEPTH_COMPONENT, // GLenum format
+                GL_UNSIGNED_BYTE,   // GLenum type
+                pixels.get()        // GLvoid * data
+                ));
+
+    MBGL_CHECK_ERROR(glWindowPos2i(0, 0));
+    MBGL_CHECK_ERROR(glDrawPixels(fbSize[0], fbSize[1], GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels.get()));
+#endif // GL_ES_VERSION_2_0
+}
+#endif // NDEBUG
+
 } // namespace mbgl

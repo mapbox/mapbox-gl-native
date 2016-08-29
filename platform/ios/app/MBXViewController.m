@@ -203,7 +203,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         @"Start World Tour",
         @"Add Custom Callout Point",
         @"Remove Annotations",
-        @"Runtime Styling",
+        @"Manipulate Style",
         ((_customUserLocationAnnnotationEnabled)
          ? @"Disable Custom User Dot"
          : @"Enable Custom User Dot"),
@@ -479,7 +479,8 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 - (void)styleGeoJSONSource
 {
-    NSURL *geoJSONURL = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/5285447/amsterdam.geojson"];
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
+    NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
     [self.mapView.style addSource:source];
     
@@ -731,15 +732,17 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         annotationView = [[MBXAnnotationView alloc] initWithReuseIdentifier:MBXViewControllerAnnotationViewReuseIdentifer];
         annotationView.frame = CGRectMake(0, 0, 10, 10);
         annotationView.backgroundColor = [UIColor whiteColor];
-        
-        // uncomment to make the annotation view draggable
-        // also note that having two long press gesture recognizers on overlapping views (`self.view` & `annotationView`) will cause weird behaviour
-        // comment out the pin dropping functionality in the handleLongPress: method in this class to make draggable annotation views play nice
+
+        // Note that having two long press gesture recognizers on overlapping
+        // views (`self.view` & `annotationView`) will cause weird behaviour.
+        // Comment out the pin dropping functionality in the handleLongPress:
+        // method in this class to make draggable annotation views play nice.
         annotationView.draggable = YES;
         
-        // uncomment to force annotation view to maintain a constant size when the map is tilted
-        // by default, annotation views will shrink and grow as the move towards and away from the
-        // horizon. Relatedly, annotations backed by GL sprites ONLY scale with viewing distance currently.
+        // Uncomment to force annotation view to maintain a constant size when
+        // the map is tilted. By default, annotation views will shrink and grow
+        // as they move towards and away from the horizon. Relatedly, annotations
+        // backed by GL sprites currently ONLY scale with viewing distance.
         // annotationView.scalesWithViewingDistance = NO;
     } else {
         // orange indicates that the annotation view was reused

@@ -89,6 +89,8 @@ public:
 #ifndef NDEBUG
     // Renders tile clip boundaries, using stencil buffer to calculate fill color.
     void renderClipMasks();
+    // Renders the depth buffer.
+    void renderDepthBuffer();
 #endif
 
     void renderDebugText(Tile&, const mat4&);

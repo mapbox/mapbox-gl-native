@@ -5,9 +5,11 @@
 
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/font_stack.hpp>
+#include <mbgl/util/geo.hpp>
 
 #include <vector>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <forward_list>
@@ -15,17 +17,25 @@
 namespace mbgl {
 namespace style {
 
+using StyleParseResult = std::exception_ptr;
+
 class Parser {
 public:
     ~Parser();
 
-    void parse(const std::string&);
+    StyleParseResult parse(const std::string&);
 
     std::string spriteURL;
     std::string glyphURL;
 
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<std::unique_ptr<Layer>> layers;
+
+    std::string name;
+    LatLng latLng;
+    double zoom = 0;
+    double bearing = 0;
+    double pitch = 0;
 
     // Statically evaluate layer properties to determine what font stacks are used.
     std::vector<FontStack> fontStacks() const;

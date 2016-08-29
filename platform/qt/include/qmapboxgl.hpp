@@ -119,11 +119,11 @@ public:
 
     void cycleDebugOptions();
 
-    QString styleJSON() const;
-    QString styleURL() const;
+    QString styleJson() const;
+    QString styleUrl() const;
 
-    void setStyleJSON(const QString &);
-    void setStyleURL(const QString &);
+    void setStyleJson(const QString &);
+    void setStyleUrl(const QString &);
 
     double latitude() const;
     void setLatitude(double latitude);

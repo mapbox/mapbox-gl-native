@@ -124,7 +124,7 @@ public class MyLocationView extends View {
     }
 
     private void init(Context context) {
-        if(isInEditMode()){
+        if (isInEditMode()) {
             return;
         }
 
@@ -168,7 +168,6 @@ public class MyLocationView extends View {
 
         foregroundDrawable = defaultDrawable;
         foregroundBearingDrawable = bearingDrawable;
-        setForegroundDrawableTint(foregroundTintColor);
 
         invalidateBounds();
     }
@@ -199,7 +198,6 @@ public class MyLocationView extends View {
         backgroundOffsetTop = top;
         backgroundOffsetRight = right;
         backgroundOffsetBottom = bottom;
-        setShadowDrawableTint(backgroundTintColor);
 
         invalidateBounds();
     }
@@ -389,8 +387,8 @@ public class MyLocationView extends View {
     }
 
     @Override
-    public void onRestoreInstanceState(Parcelable state){
-        if (state instanceof Bundle){
+    public void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
             tilt = bundle.getFloat("tilt");
             state = bundle.getParcelable("superState");
@@ -496,11 +494,11 @@ public class MyLocationView extends View {
     }
 
     public float getCenterX() {
-        return getX() + getMeasuredWidth() / 2;
+        return (getX() + contentPadding[0] - contentPadding[2] + getMeasuredWidth()) / 2;
     }
 
     public float getCenterY() {
-        return getY() + getMeasuredHeight() / 2;
+        return (getY() + contentPadding[1] - contentPadding[3] + getMeasuredHeight()) / 2;
     }
 
     public void setContentPadding(int[] padding) {
@@ -564,19 +562,19 @@ public class MyLocationView extends View {
                 return;
             }
 
-            if( event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR ){
+            if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
 
                 // calculate the rotation matrix
-                SensorManager.getRotationMatrixFromVector(matrix, event.values );
-                SensorManager.getOrientation(matrix, orientation );
+                SensorManager.getRotationMatrixFromVector(matrix, event.values);
+                SensorManager.getOrientation(matrix, orientation);
 
-                float magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation )[0]);
+                float magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation)[0]);
                 currentDegree = (int) (magneticHeading);
 
                 // Change the user location view orientation to reflect the device orientation
                 setCompass(currentDegree);
 
-                if(myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW){
+                if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
                     rotateCamera();
                 }
 
@@ -584,14 +582,15 @@ public class MyLocationView extends View {
             }
         }
 
-        private void rotateCamera(){
+        private void rotateCamera() {
             CameraPosition.Builder builder = new CameraPosition.Builder();
             builder.bearing(currentDegree);
             mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), COMPASS_UPDATE_RATE_MS, false /*linear interpolator*/);
         }
 
         @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
 
     }
 

@@ -13,7 +13,6 @@ set(MBGL_TEST_FILES
     test/api/custom_layer.cpp
     test/api/render_missing.cpp
     test/api/repeated_render.cpp
-    test/api/set_style.cpp
 
     # geometry
     test/geometry/binpack.cpp
@@ -42,6 +41,7 @@ set(MBGL_TEST_FILES
     test/src/main.cpp
 
     # src/mbgl/test
+    test/src/mbgl/test/conversion_stubs.hpp
     test/src/mbgl/test/fixture_log_observer.cpp
     test/src/mbgl/test/fixture_log_observer.hpp
     test/src/mbgl/test/stub_file_source.cpp
@@ -72,6 +72,9 @@ set(MBGL_TEST_FILES
     test/style/style_parser.cpp
     test/style/tile_source.cpp
     test/style/variant.cpp
+    
+    # style conversion
+    test/style/conversion/geojson_options.cpp
 
     # text
     test/text/quads.cpp

@@ -2,8 +2,6 @@
 #import <CoreLocation/CoreLocation.h>
 #import <Mapbox/Mapbox.h>
 
-#import "MGLTypes.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
 @class MGLMapView;

@@ -11,6 +11,7 @@
 
 @property (nonatomic, readwrite, nullable) NSString *reuseIdentifier;
 @property (nonatomic, readwrite, nullable) id <MGLAnnotation> annotation;
+@property (nonatomic, readwrite) CATransform3D lastAppliedScaleTransform;
 @property (nonatomic, weak) UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, weak) UILongPressGestureRecognizer *longPressRecognizer;
 @property (nonatomic, weak) MGLMapView *mapView;
@@ -24,6 +25,7 @@
     self = [self initWithFrame:CGRectZero];
     if (self)
     {
+        _lastAppliedScaleTransform = CATransform3DIdentity;
         _reuseIdentifier = [reuseIdentifier copy];
         _scalesWithViewingDistance = YES;
         _enabled = YES;
@@ -68,7 +70,7 @@
     center.y += _centerOffset.dy;
     
     super.center = center;
-    [self updateTransform];
+    [self updateScaleTransformForViewingDistance];
 }
 
 - (void)setScalesWithViewingDistance:(BOOL)scalesWithViewingDistance
@@ -76,24 +78,14 @@
     if (_scalesWithViewingDistance != scalesWithViewingDistance)
     {
         _scalesWithViewingDistance = scalesWithViewingDistance;
-        [self updateTransform];
+        [self updateScaleTransformForViewingDistance];
     }
 }
 
-- (void)updateTransform
+- (void)updateScaleTransformForViewingDistance
 {
-    // Omit applying a new transformation while the view is being dragged.
-    if (self.dragState == MGLAnnotationViewDragStateDragging)
-    {
-        return;
-    }
-    
-    self.layer.transform = CATransform3DIdentity;
-    if ( ! self.scalesWithViewingDistance)
-    {
-        return;
-    }
-    
+    if (self.scalesWithViewingDistance == NO || self.dragState == MGLAnnotationViewDragStateDragging) return;
+
     CGFloat superviewHeight = CGRectGetHeight(self.superview.frame);
     if (superviewHeight > 0.0) {
         // Find the maximum amount of scale reduction to apply as the view's center moves from the top
@@ -115,9 +107,15 @@
         // map view is 50% pitched then the annotation view should be reduced by 37.5% (.75 * .5). The
         // reduction is then normalized for a scale of 1.0.
         CGFloat pitchAdjustedScale = 1.0 - maxScaleReduction * pitchIntensity;
-        
-        CATransform3D transform = CATransform3DIdentity;
-        self.layer.transform = CATransform3DScale(transform, pitchAdjustedScale, pitchAdjustedScale, 1);
+
+        // We keep track of each viewing distance scale transform that we apply. Each iteration,
+        // we can account for it so that we don't get cumulative scaling every time we move.
+        // We also avoid clobbering any existing transform passed in by the client, too.
+        CATransform3D undoOfLastScaleTransform = CATransform3DInvert(_lastAppliedScaleTransform);
+        CATransform3D newScaleTransform = CATransform3DMakeScale(pitchAdjustedScale, pitchAdjustedScale, 1);
+        CATransform3D effectiveTransform = CATransform3DConcat(undoOfLastScaleTransform, newScaleTransform);
+        self.layer.transform = CATransform3DConcat(self.layer.transform, effectiveTransform);
+        _lastAppliedScaleTransform = newScaleTransform;
     }
 }
 
