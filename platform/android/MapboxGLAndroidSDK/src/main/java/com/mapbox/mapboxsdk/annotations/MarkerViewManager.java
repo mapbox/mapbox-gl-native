@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
@@ -115,14 +116,16 @@ public class MarkerViewManager {
             final View convertView = markerViewMap.get(marker);
             if (convertView != null) {
                 PointF point = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
-                if (marker.getOffsetX() == -1) {
+                if (marker.getOffsetX() == MapboxConstants.UNMEASURED) {
                     // ensure view is measured first
                     if (convertView.getMeasuredWidth() == 0) {
                         convertView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
                     }
-                    int x = (int) (marker.getAnchorU() * convertView.getMeasuredWidth());
-                    int y = (int) (marker.getAnchorV() * convertView.getMeasuredHeight());
-                    marker.setOffset(x, y);
+                    if (convertView.getMeasuredWidth() != 0) {
+                        int x = (int) (marker.getAnchorU() * convertView.getMeasuredWidth());
+                        int y = (int) (marker.getAnchorV() * convertView.getMeasuredHeight());
+                        marker.setOffset(x, y);
+                    }
                 }
 
                 convertView.setX(point.x - marker.getOffsetX());
