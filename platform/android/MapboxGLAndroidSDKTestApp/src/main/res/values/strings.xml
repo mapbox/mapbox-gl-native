@@ -63,6 +63,7 @@
     <string name="activity_query_rendered_features_box_highlight">Highlight features in box</string>
     <string name="activity_circle">Add Circle</string>
     <string name="activity_navigation_drawer">Android SDK View integration</string>
+    <string name="activity_video_view">Video View</string>
 
     <!-- Description -->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
@@ -110,6 +111,7 @@
     <string name="description_query_rendered_features_box_count">Count all rendered features in box</string>
     <string name="description_query_rendered_features_box_highlight">Hightligh buildings in box</string>
     <string name="description_car_driving">MyLocationView follow map update example</string>
+    <string name="description_video_view">Android video view on top of the map view</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
     <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>
