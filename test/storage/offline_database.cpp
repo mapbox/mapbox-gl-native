@@ -224,15 +224,38 @@ TEST(OfflineDatabase, PutResourceNoContent) {
 
     OfflineDatabase db(":memory:");
 
-    Resource resource { Resource::Style, "http://example.com/" };
     Response response;
     response.noContent = true;
 
-    db.put(resource, response);
-    auto res = db.get(resource);
-    EXPECT_EQ(nullptr, res->error);
-    EXPECT_TRUE(res->noContent);
-    EXPECT_FALSE(res->data.get());
+    Resource style { Resource::Style, "http://example.com/" };
+    db.put(style, response);
+    EXPECT_FALSE(db.get(style));
+
+    Resource source { Resource::Source, "http://example.com/" };
+    db.put(source, response);
+    EXPECT_FALSE(db.get(source));
+
+    Resource glyphs { Resource::Glyphs, "http://example.com/" };
+    db.put(glyphs, response);
+    EXPECT_FALSE(db.get(glyphs));
+
+    Resource spriteImage { Resource::SpriteImage, "http://example.com/" };
+    db.put(spriteImage, response);
+    EXPECT_FALSE(db.get(spriteImage));
+
+    Resource spriteJSON { Resource::SpriteJSON, "http://example.com/" };
+    db.put(spriteJSON, response);
+    EXPECT_FALSE(db.get(spriteJSON));
+
+    Resource tile { Resource::Tile, "http://example.com/" };
+    tile.tileData = Resource::TileData { "http://example.com/", 1, 0, 0, 0 };
+
+    db.put(tile, response);
+    auto tileResponse = db.get(tile);
+
+    EXPECT_EQ(nullptr, tileResponse->error);
+    EXPECT_TRUE(tileResponse->noContent);
+    EXPECT_FALSE(tileResponse->data.get());
 }
 
 TEST(OfflineDatabase, PutTileNotFound) {
@@ -353,7 +376,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
 
     Resource resource { Resource::Style, "http://example.com/" };
     Response response;
-    response.noContent = true;
+    response.data = std::make_shared<std::string>("foobar");
 
     std::thread thread1([&] {
         for (auto i = 0; i < 100; i++) {
