@@ -772,7 +772,7 @@ public class MapboxMap {
         mMarkerViewManager.invalidateViewMarkersInVisibleRegion();
         return marker;
     }
-
+    
     /**
      * <p>
      * Adds multiple markers to this map.
