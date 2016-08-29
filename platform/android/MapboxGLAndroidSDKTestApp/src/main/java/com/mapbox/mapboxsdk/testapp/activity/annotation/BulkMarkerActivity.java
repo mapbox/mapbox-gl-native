@@ -136,13 +136,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                     .snippet(formatter.format(latLng.getLatitude()) + ", " + formatter.format(latLng.getLongitude()));
             markerOptionsList.add(markerOptions);
         }
-        long t1 = System.currentTimeMillis();
-//        for (MarkerViewOptions markerViewOptions : markerOptionsList) {
-//            mapboxMap.addMarker(markerViewOptions);
-//        }
         mapboxMap.addMarkerViews(markerOptionsList);
-        long t2 = System.currentTimeMillis();
-        Log.d("time", "amount:"+amount+", time:"+(t2-t1));
     }
 
     private void showGlMarkers(int amount) {
