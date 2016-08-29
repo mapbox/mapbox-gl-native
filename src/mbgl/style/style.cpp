@@ -7,6 +7,10 @@
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/parser.hpp>
 #include <mbgl/style/transition_options.hpp>
@@ -483,17 +487,36 @@ void Style::onSpriteError(std::exception_ptr error) {
     observer->onResourceError(error);
 }
 
-void Style::onLayerFilterChanged(Layer&) {
-    // TODO: reload source
+struct LayerSourceReloadVisitor {
+    Style& style;
+
+    void operator()(CustomLayer&) { assert(false); }
+    void operator()(RasterLayer&) { assert(false); }
+    void operator()(BackgroundLayer&) { assert(false); }
+
+    template <class VectorLayer>
+    void operator()(VectorLayer& layer) {
+        Source* source = style.getSource(layer.getSourceID());
+        if (!source) return;
+        source->baseImpl->reload();
+    }
+};
+
+void Style::reloadLayerSource(Layer& layer) {
+    layer.accept(LayerSourceReloadVisitor { *this });
+}
+
+void Style::onLayerFilterChanged(Layer& layer) {
+    reloadLayerSource(layer);
 }
 
 void Style::onLayerPaintPropertyChanged(Layer&) {
     observer->onUpdate(Update::RecalculateStyle | Update::Classes);
 }
 
-void Style::onLayerLayoutPropertyChanged(Layer&) {
+void Style::onLayerLayoutPropertyChanged(Layer& layer) {
     observer->onUpdate(Update::RecalculateStyle);
-    // TODO: reload source
+    reloadLayerSource(layer);
 }
 
 void Style::dumpDebugLogs() const {

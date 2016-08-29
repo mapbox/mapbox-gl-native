@@ -22,7 +22,7 @@
     "express": "^4.11.1",
     "mapbox-gl-shaders": "mapbox/mapbox-gl-shaders#de2ab007455aa2587c552694c68583f94c9f2747",
     "mapbox-gl-style-spec": "mapbox/mapbox-gl-style-spec#83b1a3e5837d785af582efd5ed1a212f2df6a4ae",
-    "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#b8354e386693a4045aa309e1e85507de4d9aadec",
+    "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#ac0e1907ff628e662dafeb44cdab6e594b59a59b",
     "mkdirp": "^0.5.1",
     "node-cmake": "^1.2.1",
     "request": "^2.72.0",

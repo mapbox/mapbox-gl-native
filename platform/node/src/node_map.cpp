@@ -619,6 +619,27 @@ void NodeMap::SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>& info)
     info.GetReturnValue().SetUndefined();
 }
 
+struct SetFilterVisitor {
+    mbgl::style::Filter& filter;
+
+    void operator()(mbgl::style::CustomLayer&) {
+        Nan::ThrowTypeError("layer doesn't support filters");
+    }
+
+    void operator()(mbgl::style::RasterLayer&) {
+        Nan::ThrowTypeError("layer doesn't support filters");
+    }
+
+    void operator()(mbgl::style::BackgroundLayer&) {
+        Nan::ThrowTypeError("layer doesn't support filters");
+    }
+
+    template <class VectorLayer>
+    void operator()(VectorLayer& layer) {
+        layer.setFilter(filter);
+    }
+};
+
 void NodeMap::SetFilter(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
@@ -650,28 +671,7 @@ void NodeMap::SetFilter(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         filter = std::move(*converted);
     }
 
-    if (layer->is<FillLayer>()) {
-        layer->as<FillLayer>()->setFilter(filter);
-        info.GetReturnValue().SetUndefined();
-        return;
-    }
-    if (layer->is<LineLayer>()) {
-        layer->as<LineLayer>()->setFilter(filter);
-        info.GetReturnValue().SetUndefined();
-        return;
-    }
-    if (layer->is<SymbolLayer>()) {
-        layer->as<SymbolLayer>()->setFilter(filter);
-        info.GetReturnValue().SetUndefined();
-        return;
-    }
-    if (layer->is<CircleLayer>()) {
-        layer->as<CircleLayer>()->setFilter(filter);
-        info.GetReturnValue().SetUndefined();
-        return;
-    }
-
-    Nan::ThrowTypeError("layer doesn't support filters");
+    layer->accept(SetFilterVisitor { filter });
 }
 
 void NodeMap::DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>& info) {

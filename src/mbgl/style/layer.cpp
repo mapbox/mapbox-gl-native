@@ -5,7 +5,7 @@ namespace mbgl {
 namespace style {
 
 Layer::Layer(Type type_, std::unique_ptr<Impl> baseImpl_)
-    : baseImpl(std::move(baseImpl_)), type(type_) {
+    : type(type_), baseImpl(std::move(baseImpl_)) {
 }
 
 Layer::~Layer() = default;

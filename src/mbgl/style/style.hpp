@@ -115,6 +115,7 @@ private:
     double defaultPitch;
 
     std::vector<std::unique_ptr<Layer>>::const_iterator findLayer(const std::string& layerID) const;
+    void reloadLayerSource(Layer&);
 
     // GlyphStoreObserver implementation.
     void onGlyphsLoaded(const FontStack&, const GlyphRange&) override;
