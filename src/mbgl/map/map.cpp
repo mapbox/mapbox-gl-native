@@ -37,7 +37,7 @@ class Map::Impl : public style::Observer {
 public:
     Impl(View&, FileSource&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
 
-    void onNeedsRepaint() override;
+    void onUpdate(Update) override;
     void onStyleError() override;
     void onResourceError(std::exception_ptr) override;
 
@@ -149,12 +149,7 @@ void Map::renderStill(StillImageCallback callback) {
 }
 
 void Map::update(Update flags) {
-    if (flags & Update::Dimensions) {
-        impl->transform.resize(impl->view.getSize());
-    }
-
-    impl->updateFlags |= flags;
-    impl->asyncUpdate.send();
+    impl->onUpdate(flags);
 }
 
 void Map::render() {
@@ -905,8 +900,12 @@ void Map::onLowMemory() {
     impl->view.invalidate();
 }
 
-void Map::Impl::onNeedsRepaint() {
-    updateFlags |= Update::Repaint;
+void Map::Impl::onUpdate(Update flags) {
+    if (flags & Update::Dimensions) {
+        transform.resize(view.getSize());
+    }
+
+    updateFlags |= flags;
     asyncUpdate.send();
 }
 

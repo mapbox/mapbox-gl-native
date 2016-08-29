@@ -213,7 +213,7 @@ void GeometryTile::redoPlacement() {
         if (placedConfig != targetConfig) {
             redoPlacement();
         } else {
-            observer->onNeedsRepaint();
+            observer->onTileUpdated(*this);
         }
     });
 }

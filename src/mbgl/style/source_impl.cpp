@@ -266,8 +266,8 @@ void Source::Impl::onTileError(Tile& tile, std::exception_ptr error) {
     observer->onTileError(base, tile.id, error);
 }
 
-void Source::Impl::onNeedsRepaint() {
-    observer->onNeedsRepaint();
+void Source::Impl::onTileUpdated(Tile& tile) {
+    observer->onTileUpdated(base, tile.id);
 }
 
 void Source::Impl::dumpDebugLogs() const {

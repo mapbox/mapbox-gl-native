@@ -423,7 +423,7 @@ void Style::setObserver(style::Observer* observer_) {
 void Style::onGlyphsLoaded(const FontStack& fontStack, const GlyphRange& glyphRange) {
     shouldReparsePartialTiles = true;
     observer->onGlyphsLoaded(fontStack, glyphRange);
-    observer->onNeedsRepaint();
+    observer->onUpdate(Update::Repaint);
 }
 
 void Style::onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
@@ -436,7 +436,7 @@ void Style::onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRan
 
 void Style::onSourceLoaded(Source& source) {
     observer->onSourceLoaded(source);
-    observer->onNeedsRepaint();
+    observer->onUpdate(Update::Repaint);
 }
 
 void Style::onSourceError(Source& source, std::exception_ptr error) {
@@ -453,7 +453,7 @@ void Style::onTileLoaded(Source& source, const OverscaledTileID& tileID, bool is
     }
 
     observer->onTileLoaded(source, tileID, isNewTile);
-    observer->onNeedsRepaint();
+    observer->onUpdate(Update::Repaint);
 }
 
 void Style::onTileError(Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
@@ -464,14 +464,14 @@ void Style::onTileError(Source& source, const OverscaledTileID& tileID, std::exc
     observer->onResourceError(error);
 }
 
-void Style::onNeedsRepaint() {
-    observer->onNeedsRepaint();
+void Style::onTileUpdated(Source&, const OverscaledTileID&) {
+    observer->onUpdate(Update::Repaint);
 }
 
 void Style::onSpriteLoaded() {
     shouldReparsePartialTiles = true;
     observer->onSpriteLoaded();
-    observer->onNeedsRepaint();
+    observer->onUpdate(Update::Repaint);
 }
 
 void Style::onSpriteError(std::exception_ptr error) {

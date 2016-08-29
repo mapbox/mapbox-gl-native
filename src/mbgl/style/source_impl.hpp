@@ -86,7 +86,7 @@ private:
     // TileObserver implementation.
     void onTileLoaded(Tile&, bool isNewTile) override;
     void onTileError(Tile&, std::exception_ptr) override;
-    void onNeedsRepaint() override;
+    void onTileUpdated(Tile&) override;
 
     virtual uint16_t getTileSize() const = 0;
     virtual Range<uint8_t> getZoomRange() = 0;

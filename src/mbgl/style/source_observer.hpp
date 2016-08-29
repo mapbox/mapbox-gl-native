@@ -16,9 +16,10 @@ public:
 
     virtual void onSourceLoaded(Source&) {}
     virtual void onSourceError(Source&, std::exception_ptr) {}
+
     virtual void onTileLoaded(Source&, const OverscaledTileID&, bool /* isNewTile */) {}
     virtual void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) {}
-    virtual void onNeedsRepaint() {}
+    virtual void onTileUpdated(Source&, const OverscaledTileID&) {}
 };
 
 } // namespace style

@@ -127,7 +127,7 @@ private:
     void onSourceError(Source&, std::exception_ptr) override;
     void onTileLoaded(Source&, const OverscaledTileID&, bool isNewTile) override;
     void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) override;
-    void onNeedsRepaint() override;
+    void onTileUpdated(Source&, const OverscaledTileID&) override;
 
     Observer nullObserver;
     Observer* observer = &nullObserver;
