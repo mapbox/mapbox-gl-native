@@ -67,10 +67,7 @@ public class MarkerView extends Marker {
         this.infoWindowAnchorU = baseMarkerViewOptions.getInfoWindowAnchorU();
         this.infoWindowAnchorV = baseMarkerViewOptions.getInfoWindowAnchorV();
         this.flat = baseMarkerViewOptions.isFlat();
-        this.infoWindowAnchorU = baseMarkerViewOptions.infoWindowAnchorU;
-        this.infoWindowAnchorV = baseMarkerViewOptions.infoWindowAnchorV;
-        this.anchorU = baseMarkerViewOptions.anchorU;
-        this.anchorV = baseMarkerViewOptions.anchorV;
+        this.rotation = baseMarkerViewOptions.getRotation();
         this.selected = baseMarkerViewOptions.selected;
     }
 
