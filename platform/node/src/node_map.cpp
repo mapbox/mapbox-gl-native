@@ -579,7 +579,6 @@ void NodeMap::SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>& info
         return Nan::ThrowTypeError(error->message.c_str());
     }
 
-    nodeMap->map->update(mbgl::Update::RecalculateStyle);
     info.GetReturnValue().SetUndefined();
 }
 
@@ -617,7 +616,6 @@ void NodeMap::SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>& info)
         return Nan::ThrowTypeError(error->message.c_str());
     }
 
-    nodeMap->map->update(mbgl::Update::RecalculateStyle | mbgl::Update::Classes);
     info.GetReturnValue().SetUndefined();
 }
 

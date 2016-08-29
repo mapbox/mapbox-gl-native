@@ -24,18 +24,14 @@ public abstract class Layer {
             return;
         }
 
-        boolean updateClasses = false;
         for (Property<?> property : properties) {
             Object converted = convertValue(property.value);
             if (property instanceof PaintProperty) {
-                updateClasses = true;
                 nativeSetPaintProperty(property.name, converted);
             } else {
                 nativeSetLayoutProperty(property.name, converted);
             }
         }
-
-        nativeUpdateStyle(updateClasses);
     }
 
     public String getId() {
@@ -82,8 +78,6 @@ public abstract class Layer {
     protected native void nativeSetFilter(Object[] filter);
 
     protected native void nativeSetSourceLayer(String sourceLayer);
-
-    protected native void nativeUpdateStyle(boolean updateClasses);
 
     protected native float nativeGetMinZoom();
 

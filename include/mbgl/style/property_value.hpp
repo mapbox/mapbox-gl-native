@@ -8,11 +8,16 @@ namespace style {
 
 class Undefined {};
 
+inline bool operator==(const Undefined&, const Undefined&) { return true; }
+inline bool operator!=(const Undefined&, const Undefined&) { return false; }
+
 template <class T>
 class PropertyValue {
 private:
     using Value = variant<Undefined, T, Function<T>>;
     Value value;
+
+    template <class S> friend bool operator==(const PropertyValue<S>&, const PropertyValue<S>&);
 
 public:
     PropertyValue()                     : value()         {}
@@ -33,6 +38,16 @@ public:
         return Value::visit(value.value, visitor);
     }
 };
+
+template <class T>
+bool operator==(const PropertyValue<T>& lhs, const PropertyValue<T>& rhs) {
+    return lhs.value == rhs.value;
+}
+
+template <class T>
+bool operator!=(const PropertyValue<T>& lhs, const PropertyValue<T>& rhs) {
+    return !(lhs == rhs);
+}
 
 } // namespace style
 } // namespace mbgl

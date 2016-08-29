@@ -53,7 +53,10 @@ PropertyValue<float> RasterLayer::getRasterOpacity(const optional<std::string>& 
 }
 
 void RasterLayer::setRasterOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getRasterOpacity(klass))
+        return;
     impl->paint.rasterOpacity.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterHueRotate() {
@@ -65,7 +68,10 @@ PropertyValue<float> RasterLayer::getRasterHueRotate(const optional<std::string>
 }
 
 void RasterLayer::setRasterHueRotate(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getRasterHueRotate(klass))
+        return;
     impl->paint.rasterHueRotate.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMin() {
@@ -77,7 +83,10 @@ PropertyValue<float> RasterLayer::getRasterBrightnessMin(const optional<std::str
 }
 
 void RasterLayer::setRasterBrightnessMin(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getRasterBrightnessMin(klass))
+        return;
     impl->paint.rasterBrightnessMin.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMax() {
@@ -89,7 +98,10 @@ PropertyValue<float> RasterLayer::getRasterBrightnessMax(const optional<std::str
 }
 
 void RasterLayer::setRasterBrightnessMax(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getRasterBrightnessMax(klass))
+        return;
     impl->paint.rasterBrightnessMax.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterSaturation() {
@@ -101,7 +113,10 @@ PropertyValue<float> RasterLayer::getRasterSaturation(const optional<std::string
 }
 
 void RasterLayer::setRasterSaturation(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getRasterSaturation(klass))
+        return;
     impl->paint.rasterSaturation.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterContrast() {
@@ -113,7 +128,10 @@ PropertyValue<float> RasterLayer::getRasterContrast(const optional<std::string>&
 }
 
 void RasterLayer::setRasterContrast(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getRasterContrast(klass))
+        return;
     impl->paint.rasterContrast.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterFadeDuration() {
@@ -125,7 +143,10 @@ PropertyValue<float> RasterLayer::getRasterFadeDuration(const optional<std::stri
 }
 
 void RasterLayer::setRasterFadeDuration(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getRasterFadeDuration(klass))
+        return;
     impl->paint.rasterFadeDuration.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 } // namespace style

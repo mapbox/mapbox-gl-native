@@ -219,7 +219,6 @@ global.setterImplementation = function(property, layerType) {
             break;
         default: throw new Error(`unknown type for ${property.name}`)
     }
-    implementation += "\n    [self update];"
     return implementation;
 }
 

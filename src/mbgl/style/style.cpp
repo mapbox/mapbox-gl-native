@@ -167,6 +167,8 @@ Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> befor
         customLayer->impl->initialize();
     }
 
+    layer->baseImpl->setObserver(this);
+
     return layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer))->get();
 }
 
@@ -479,6 +481,19 @@ void Style::onSpriteError(std::exception_ptr error) {
     Log::Error(Event::Style, "Failed to load sprite: %s", util::toString(error).c_str());
     observer->onSpriteError(error);
     observer->onResourceError(error);
+}
+
+void Style::onLayerFilterChanged(Layer&) {
+    // TODO: reload source
+}
+
+void Style::onLayerPaintPropertyChanged(Layer&) {
+    observer->onUpdate(Update::RecalculateStyle | Update::Classes);
+}
+
+void Style::onLayerLayoutPropertyChanged(Layer&) {
+    observer->onUpdate(Update::RecalculateStyle);
+    // TODO: reload source
 }
 
 void Style::dumpDebugLogs() const {

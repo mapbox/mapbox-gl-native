@@ -1,6 +1,5 @@
 #import "MGLBaseStyleLayer.h"
 
-#import "MGLBaseStyleLayer_Private.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLMapView_Private.h"
 
@@ -14,14 +13,6 @@
 @synthesize layerIdentifier;
 @synthesize mapView;
 @synthesize layer;
-
-- (void)update
-{
-    // A style layer's map view can be nil when first created at runtime
-    // before being added to a map style. In these cases, just no-op since
-    // the addition of the layer will trigger a visual refresh. 
-    if (self.mapView) self.mapView.mbglMap->update(mbgl::Update::RecalculateStyle | mbgl::Update::Classes);
-}
 
 - (void)setVisible:(BOOL)visible
 {

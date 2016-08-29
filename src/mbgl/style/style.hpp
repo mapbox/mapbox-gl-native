@@ -3,6 +3,7 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/source_observer.hpp>
+#include <mbgl/style/layer_observer.hpp>
 #include <mbgl/text/glyph_store_observer.hpp>
 #include <mbgl/sprite/sprite_store_observer.hpp>
 #include <mbgl/map/mode.hpp>
@@ -35,6 +36,7 @@ class QueryParameters;
 class Style : public GlyphStoreObserver,
               public SpriteStoreObserver,
               public SourceObserver,
+              public LayerObserver,
               public util::noncopyable {
 public:
     Style(FileSource&, float pixelRatio);
@@ -128,6 +130,11 @@ private:
     void onTileLoaded(Source&, const OverscaledTileID&, bool isNewTile) override;
     void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) override;
     void onTileUpdated(Source&, const OverscaledTileID&) override;
+
+    // LayerObserver implementation.
+    void onLayerFilterChanged(Layer&) override;
+    void onLayerPaintPropertyChanged(Layer&) override;
+    void onLayerLayoutPropertyChanged(Layer&) override;
 
     Observer nullObserver;
     Observer* observer = &nullObserver;

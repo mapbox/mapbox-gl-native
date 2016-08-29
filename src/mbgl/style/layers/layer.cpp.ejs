@@ -65,6 +65,7 @@ const std::string& <%- camelize(type) %>Layer::getSourceLayer() const {
 
 void <%- camelize(type) %>Layer::setFilter(const Filter& filter) {
     impl->filter = filter;
+    impl->observer->onLayerFilterChanged(*this);
 }
 
 const Filter& <%- camelize(type) %>Layer::getFilter() const {
@@ -85,7 +86,10 @@ PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- 
 }
 
 void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>> value) {
+    if (value == get<%- camelize(property.name) %>())
+        return;
     impl->layout.<%- camelizeWithLeadingLowercase(property.name) %>.set(value);
+    impl->observer->onLayerLayoutPropertyChanged(*this);
 }
 <% } -%>
 
@@ -100,7 +104,10 @@ PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- 
 }
 
 void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>> value, const optional<std::string>& klass) {
+    if (value == get<%- camelize(property.name) %>(klass))
+        return;
     impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 <% } -%>
 

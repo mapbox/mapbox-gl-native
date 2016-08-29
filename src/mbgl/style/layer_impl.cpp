@@ -28,5 +28,9 @@ bool Layer::Impl::needsRendering(float zoom) const {
         && maxZoom >= zoom;
 }
 
+void Layer::Impl::setObserver(LayerObserver* observer_) {
+    observer = observer_;
+}
+
 } // namespace style
 } // namespace mbgl

@@ -229,6 +229,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/layer.cpp
     src/mbgl/style/layer_impl.cpp
     src/mbgl/style/layer_impl.hpp
+    src/mbgl/style/layer_observer.hpp
     src/mbgl/style/layout_property.hpp
     src/mbgl/style/observer.hpp
     src/mbgl/style/paint_property.hpp

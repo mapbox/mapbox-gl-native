@@ -1,4 +1,5 @@
 #include <mbgl/test/util.hpp>
+#include <mbgl/test/stub_layer_observer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
@@ -209,4 +210,47 @@ TEST(Layer, RasterProperties) {
 
     layer->setRasterFadeDuration(duration);
     EXPECT_EQ(layer->getRasterFadeDuration().asConstant(), duration.asConstant());
+}
+
+TEST(Layer, Observer) {
+    auto layer = std::make_unique<LineLayer>("line", "source");
+    StubLayerObserver observer;
+    layer->baseImpl->setObserver(&observer);
+
+    // Notifies observer on filter change.
+    bool filterChanged = false;
+    observer.layerFilterChanged = [&] (Layer& layer_) {
+        EXPECT_EQ(layer.get(), &layer_);
+        filterChanged = true;
+    };
+    layer->setFilter(NullFilter());
+    EXPECT_TRUE(filterChanged);
+
+    // Notifies observer on paint property change.
+    bool paintPropertyChanged = false;
+    observer.layerPaintPropertyChanged = [&] (Layer& layer_) {
+        EXPECT_EQ(layer.get(), &layer_);
+        paintPropertyChanged = true;
+    };
+    layer->setLineColor(color);
+    EXPECT_TRUE(paintPropertyChanged);
+
+    // Notifies observer on layout property change.
+    bool layoutPropertyChanged = false;
+    observer.layerLayoutPropertyChanged = [&] (Layer& layer_) {
+        EXPECT_EQ(layer.get(), &layer_);
+        layoutPropertyChanged = true;
+    };
+    layer->setLineCap(lineCap);
+    EXPECT_TRUE(layoutPropertyChanged);
+
+    // Does not notify observer on no-op paint property change.
+    paintPropertyChanged = false;
+    layer->setLineColor(color);
+    EXPECT_FALSE(paintPropertyChanged);
+
+    // Does not notify observer on no-op layout property change.
+    layoutPropertyChanged = false;
+    layer->setLineCap(lineCap);
+    EXPECT_FALSE(layoutPropertyChanged);
 }

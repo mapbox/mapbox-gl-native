@@ -541,8 +541,6 @@ void QMapboxGL::setLayoutProperty(const QString& layer_, const QString& property
         qWarning() << "Error setting layout property:" << layer_ << "-" << property;
         return;
     }
-
-    d_ptr->mapObj->update(mbgl::Update::RecalculateStyle);
 }
 
 void QMapboxGL::setPaintProperty(const QString& layer_, const QString& property, const QVariant& value, const QString& klass_)
@@ -564,8 +562,6 @@ void QMapboxGL::setPaintProperty(const QString& layer_, const QString& property,
         qWarning() << "Error setting paint property:" << layer_ << "-" << property;
         return;
     }
-
-    d_ptr->mapObj->update(mbgl::Update::RecalculateStyle | mbgl::Update::Classes);
 }
 
 bool QMapboxGL::isRotating() const

@@ -63,19 +63,6 @@ namespace android {
         }
     }
 
-    void Layer::updateStyle(jni::JNIEnv&, jni::jboolean updateClasses) {
-        //Update the style only if attached
-        if (ownedLayer == nullptr) {
-            Update flags = mbgl::Update::RecalculateStyle;
-            if(updateClasses) {
-                flags = flags | mbgl::Update::Classes;
-            }
-            map->update(flags);
-        } else {
-            mbgl::Log::Debug(mbgl::Event::JNI, "Not updating as layer is not attached to map (yet)");
-        }
-    }
-
     void Layer::setFilter(jni::JNIEnv& env, jni::Array<jni::Object<>> jfilter) {
         using namespace mbgl::style;
         using namespace mbgl::style::conversion;
@@ -155,7 +142,6 @@ namespace android {
             METHOD(&Layer::getId, "nativeGetId"),
             METHOD(&Layer::setLayoutProperty, "nativeSetLayoutProperty"),
             METHOD(&Layer::setPaintProperty, "nativeSetPaintProperty"),
-            METHOD(&Layer::updateStyle, "nativeUpdateStyle"),
             METHOD(&Layer::setFilter, "nativeSetFilter"),
             METHOD(&Layer::setSourceLayer, "nativeSetSourceLayer"),
             METHOD(&Layer::getMinZoom, "nativeGetMinZoom"),

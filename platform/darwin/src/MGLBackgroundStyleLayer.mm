@@ -1,7 +1,7 @@
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
-#import "MGLBaseStyleLayer_Private.h"
+#import "NSPredicate+MGLAdditions.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLStyleAttributeValue.h"
 #import "MGLBackgroundStyleLayer.h"
@@ -33,7 +33,6 @@
 
 - (void)setBackgroundColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundColor {
     self.layer->setBackgroundColor(backgroundColor.mbgl_colorPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)backgroundColor {
@@ -42,7 +41,6 @@
 
 - (void)setBackgroundPattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundPattern {
     self.layer->setBackgroundPattern(backgroundPattern.mbgl_stringPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)backgroundPattern {
@@ -51,7 +49,6 @@
 
 - (void)setBackgroundOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundOpacity {
     self.layer->setBackgroundOpacity(backgroundOpacity.mbgl_floatPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)backgroundOpacity {

@@ -1,7 +1,7 @@
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
-#import "MGLBaseStyleLayer_Private.h"
+#import "NSPredicate+MGLAdditions.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLStyleAttributeValue.h"
 #import "MGLLineStyleLayer.h"
@@ -43,7 +43,6 @@
 
 - (void)setLineCap:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineCap {
     MGLSetEnumProperty(lineCap, LineCap, LineCapType, MGLLineStyleLayerLineCap);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)lineCap {
@@ -52,7 +51,6 @@
 
 - (void)setLineJoin:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineJoin {
     MGLSetEnumProperty(lineJoin, LineJoin, LineJoinType, MGLLineStyleLayerLineJoin);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)lineJoin {
@@ -61,7 +59,6 @@
 
 - (void)setLineMiterLimit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineMiterLimit {
     self.layer->setLineMiterLimit(lineMiterLimit.mbgl_floatPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)lineMiterLimit {
@@ -70,7 +67,6 @@
 
 - (void)setLineRoundLimit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineRoundLimit {
     self.layer->setLineRoundLimit(lineRoundLimit.mbgl_floatPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)lineRoundLimit {
@@ -81,7 +77,6 @@
 
 - (void)setLineOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineOpacity {
     self.layer->setLineOpacity(lineOpacity.mbgl_floatPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)lineOpacity {
@@ -90,7 +85,6 @@
 
 - (void)setLineColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineColor {
     self.layer->setLineColor(lineColor.mbgl_colorPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)lineColor {
@@ -99,7 +93,6 @@
 
 - (void)setLineTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineTranslate {
     self.layer->setLineTranslate(lineTranslate.mbgl_offsetPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)lineTranslate {
@@ -108,7 +101,6 @@
 
 - (void)setLineTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineTranslateAnchor {
     MGLSetEnumProperty(lineTranslateAnchor, LineTranslateAnchor, TranslateAnchorType, MGLLineStyleLayerLineTranslateAnchor);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)lineTranslateAnchor {
@@ -117,7 +109,6 @@
 
 - (void)setLineWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineWidth {
     self.layer->setLineWidth(lineWidth.mbgl_floatPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)lineWidth {
@@ -126,7 +117,6 @@
 
 - (void)setLineGapWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineGapWidth {
     self.layer->setLineGapWidth(lineGapWidth.mbgl_floatPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)lineGapWidth {
@@ -135,7 +125,6 @@
 
 - (void)setLineOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineOffset {
     self.layer->setLineOffset(lineOffset.mbgl_floatPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)lineOffset {
@@ -144,7 +133,6 @@
 
 - (void)setLineBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineBlur {
     self.layer->setLineBlur(lineBlur.mbgl_floatPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)lineBlur {
@@ -153,7 +141,6 @@
 
 - (void)setLineDasharray:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineDasharray {
     self.layer->setLineDasharray(lineDasharray.mbgl_numberArrayPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)lineDasharray {
@@ -162,7 +149,6 @@
 
 - (void)setLinePattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)linePattern {
     self.layer->setLinePattern(linePattern.mbgl_stringPropertyValue);
-    [self update];
 }
 
 - (id <MGLStyleAttributeValue>)linePattern {
