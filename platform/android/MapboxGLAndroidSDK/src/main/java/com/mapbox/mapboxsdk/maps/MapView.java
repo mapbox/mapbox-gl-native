@@ -556,8 +556,10 @@ public class MapView extends FrameLayout {
     @UiThread
     public void onPause() {
         // Register for connectivity changes
-        getContext().unregisterReceiver(mConnectivityReceiver);
-        mConnectivityReceiver = null;
+        if (mConnectivityReceiver != null) {
+            getContext().unregisterReceiver(mConnectivityReceiver);
+            mConnectivityReceiver = null;
+        }
 
         mMyLocationView.onPause();
     }
