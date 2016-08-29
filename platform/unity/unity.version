@@ -1,0 +1,10 @@
+unity {
+    global:
+        CycleStyle;
+        GetRenderEventFunc;
+        SetTextureFromUnity;
+        SetTimeFromUnity;
+        UnityPluginLoad;
+        UnityPluginUnload;
+    local: *;
+};
