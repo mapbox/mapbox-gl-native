@@ -2,11 +2,9 @@
 
 #include <mbgl/util/traits.hpp>
 
-#include <cstdint>
-
 namespace mbgl {
 
-enum class Update : uint8_t {
+enum class Update {
     Nothing                   = 0,
     Dimensions                = 1 << 1,
     Classes                   = 1 << 2,
@@ -15,6 +13,7 @@ enum class Update : uint8_t {
     Repaint                   = 1 << 5,
     AnnotationStyle           = 1 << 6,
     AnnotationData            = 1 << 7,
+    Layout                    = 1 << 8
 };
 
 constexpr Update operator|(Update lhs, Update rhs) {

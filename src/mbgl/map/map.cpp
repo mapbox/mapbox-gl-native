@@ -212,6 +212,10 @@ void Map::Impl::update() {
         annotationManager->updateData();
     }
 
+    if (updateFlags & Update::Layout) {
+        style->relayout();
+    }
+
     if (updateFlags & Update::Classes) {
         style->cascade(timePoint, mode);
     }

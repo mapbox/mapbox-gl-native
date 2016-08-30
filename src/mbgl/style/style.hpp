@@ -4,6 +4,7 @@
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/layer_observer.hpp>
+#include <mbgl/style/update_batch.hpp>
 #include <mbgl/text/glyph_store_observer.hpp>
 #include <mbgl/sprite/sprite_store_observer.hpp>
 #include <mbgl/map/mode.hpp>
@@ -52,6 +53,7 @@ public:
     // a tile is ready so observers can render the tile.
     void updateTiles(const UpdateParameters&);
 
+    void relayout();
     void cascade(const TimePoint&, MapMode);
     void recalculate(float z, const TimePoint&, MapMode);
 
@@ -142,6 +144,7 @@ private:
 
     std::exception_ptr lastError;
 
+    UpdateBatch updateBatch;
     ZoomHistory zoomHistory;
     bool hasPendingTransitions = false;
 

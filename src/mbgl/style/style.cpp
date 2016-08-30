@@ -92,6 +92,7 @@ void Style::setJSON(const std::string& json) {
     sources.clear();
     layers.clear();
     classes.clear();
+    updateBatch = {};
 
     Parser parser;
     auto error = parser.parse(json);
@@ -133,9 +134,13 @@ void Style::removeSource(const std::string& id) {
     auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& source) {
         return source->getID() == id;
     });
-    if (it == sources.end())
+
+    if (it == sources.end()) {
         throw std::runtime_error("no such source");
+    }
+
     sources.erase(it);
+    updateBatch.sourceIDs.erase(id);
 }
 
 std::vector<const Layer*> Style::getLayers() const {
@@ -218,6 +223,15 @@ void Style::updateTiles(const UpdateParameters& parameters) {
     if (allTilesUpdated) {
         shouldReparsePartialTiles = false;
     }
+}
+
+void Style::relayout() {
+    for (const auto& sourceID : updateBatch.sourceIDs) {
+        Source* source = getSource(sourceID);
+        if (!source) continue;
+        source->baseImpl->reload();
+    }
+    updateBatch.sourceIDs.clear();
 }
 
 void Style::cascade(const TimePoint& timePoint, MapMode mode) {
@@ -487,8 +501,8 @@ void Style::onSpriteError(std::exception_ptr error) {
     observer->onResourceError(error);
 }
 
-struct LayerSourceReloadVisitor {
-    Style& style;
+struct QueueSourceReloadVisitor {
+    UpdateBatch& updateBatch;
 
     void operator()(CustomLayer&) { assert(false); }
     void operator()(RasterLayer&) { assert(false); }
@@ -496,18 +510,13 @@ struct LayerSourceReloadVisitor {
 
     template <class VectorLayer>
     void operator()(VectorLayer& layer) {
-        Source* source = style.getSource(layer.getSourceID());
-        if (!source) return;
-        source->baseImpl->reload();
+        updateBatch.sourceIDs.insert(layer.getSourceID());
     }
 };
 
-void Style::reloadLayerSource(Layer& layer) {
-    layer.accept(LayerSourceReloadVisitor { *this });
-}
-
 void Style::onLayerFilterChanged(Layer& layer) {
-    reloadLayerSource(layer);
+    layer.accept(QueueSourceReloadVisitor { updateBatch });
+    observer->onUpdate(Update::Layout);
 }
 
 void Style::onLayerPaintPropertyChanged(Layer&) {
@@ -515,8 +524,8 @@ void Style::onLayerPaintPropertyChanged(Layer&) {
 }
 
 void Style::onLayerLayoutPropertyChanged(Layer& layer) {
-    observer->onUpdate(Update::RecalculateStyle);
-    reloadLayerSource(layer);
+    layer.accept(QueueSourceReloadVisitor { updateBatch });
+    observer->onUpdate(Update::Layout);
 }
 
 void Style::dumpDebugLogs() const {
