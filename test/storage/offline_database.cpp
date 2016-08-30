@@ -185,6 +185,36 @@ TEST(OfflineDatabase, PutResource) {
     EXPECT_EQ("second", *updateGetResult->data);
 }
 
+TEST(OfflineDatabase, RemoveResource) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:");
+
+    Response response;
+    response.data = std::make_shared<std::string>("data");
+
+    Resource style { Resource::Style, "http://example.com/" };
+    db.put(style, response);
+    EXPECT_EQ(*db.get(style)->data, "data");
+
+    db.remove(style);
+    EXPECT_FALSE(db.get(style));
+
+    // Should not fail/crash.
+    db.remove(style);
+
+    Resource tile { Resource::Tile, "http://example.com/" };
+    tile.tileData = Resource::TileData { "http://example.com/", 1, 0, 0, 0 };
+    db.put(tile, response);
+    EXPECT_EQ(*db.get(tile)->data, "data");
+
+    db.remove(tile);
+    EXPECT_FALSE(db.get(tile));
+
+    // Should not fail/crash.
+    db.remove(tile);
+}
+
 TEST(OfflineDatabase, PutTile) {
     using namespace mbgl;
 
