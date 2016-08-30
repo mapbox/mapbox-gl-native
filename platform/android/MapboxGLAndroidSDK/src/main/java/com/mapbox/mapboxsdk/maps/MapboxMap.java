@@ -408,7 +408,11 @@ public class MapboxMap {
             @Override
             public void onCancel() {
                 if (callback != null) {
-                    callback.onCancel();
+                    mMapView.post(new Runnable() {
+                        @Override public void run() {
+                            callback.onCancel();
+                        }
+                    });
                 }
                 invalidateCameraPosition();
             }
@@ -416,7 +420,12 @@ public class MapboxMap {
             @Override
             public void onFinish() {
                 if (callback != null) {
-                    callback.onFinish();
+                    mMapView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onFinish();
+                        }
+                    });
                 }
                 invalidateCameraPosition();
             }
