@@ -130,6 +130,15 @@ OfflineDatabase::Statement OfflineDatabase::getStatement(const char * sql) {
     return Statement(*statements.emplace(sql, std::make_unique<mapbox::sqlite::Statement>(db->prepare(sql))).first->second);
 }
 
+void OfflineDatabase::remove(const Resource& resource) {
+    if (resource.kind == Resource::Kind::Tile) {
+        assert(resource.tileData);
+        removeTile(*resource.tileData);
+    } else {
+        removeResource(resource);
+    }
+}
+
 optional<Response> OfflineDatabase::get(const Resource& resource) {
     auto result = getInternal(resource);
     return result ? result->first : optional<Response>();
@@ -186,6 +195,15 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
     }
 
     return { inserted, size };
+}
+
+void OfflineDatabase::removeResource(const Resource& resource) {
+    // clang-format off
+    Statement stmt = getStatement("DELETE FROM resources WHERE url = ?1");
+    // clang-format on
+
+    stmt->bind(1, resource.url);
+    stmt->run();
 }
 
 optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resource& resource) {
@@ -318,6 +336,25 @@ bool OfflineDatabase::putResource(const Resource& resource,
     transaction.commit();
 
     return true;
+}
+
+void OfflineDatabase::removeTile(const Resource::TileData& tile) {
+    // clang-format off
+    Statement update = getStatement(
+        "DELETE FROM tiles "
+        "WHERE url_template = ?1 "
+        "  AND pixel_ratio  = ?2 "
+        "  AND x            = ?3 "
+        "  AND y            = ?4 "
+        "  AND z            = ?5 ");
+    // clang-format on
+
+    update->bind(1, tile.urlTemplate);
+    update->bind(2, tile.pixelRatio);
+    update->bind(3, tile.x);
+    update->bind(4, tile.y);
+    update->bind(5, tile.z);
+    update->run();
 }
 
 optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource::TileData& tile) {

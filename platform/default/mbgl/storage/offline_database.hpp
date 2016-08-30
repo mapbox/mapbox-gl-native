@@ -30,6 +30,7 @@ public:
     OfflineDatabase(std::string path, uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
     ~OfflineDatabase();
 
+    void remove(const Resource&);
     optional<Response> get(const Resource&);
 
     // Return value is (inserted, stored size)
@@ -77,10 +78,12 @@ private:
 
     Statement getStatement(const char *);
 
+    void removeTile(const Resource::TileData& tile);
     optional<std::pair<Response, uint64_t>> getTile(const Resource::TileData&);
     bool putTile(const Resource::TileData&, const Response&,
                  const std::string&, bool compressed);
 
+    void removeResource(const Resource&);
     optional<std::pair<Response, uint64_t>> getResource(const Resource&);
     bool putResource(const Resource&, const Response&,
                      const std::string&, bool compressed);
