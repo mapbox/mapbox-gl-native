@@ -17,6 +17,14 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGLPolygon : MGLMultiPoint <MGLOverlay>
 
 /**
+ The first coordinate of the polygon.
+
+ In a future release, this will be changed to represent the visual center of the
+ polygon.
+ */
+@property (nonatomic, readonly) CLLocationCoordinate2D coordinate;
+
+/**
  The array of polygons nested inside the receiver.
  
  The area occupied by any interior polygons is excluded from the overall shape.

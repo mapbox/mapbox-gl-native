@@ -17,6 +17,14 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGLPolyline : MGLMultiPoint <MGLOverlay>
 
 /**
+ The first coordinate of the polyline.
+ 
+ In a future release, this will be changed to represent the visual center of the
+ polyline.
+ */
+@property (nonatomic, readonly) CLLocationCoordinate2D coordinate;
+
+/**
  Creates and returns an `MGLPolyline` object from the specified set of
  coordinates.
  

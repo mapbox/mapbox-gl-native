@@ -5,6 +5,7 @@
 
 @implementation MGLPolygon
 
+@dynamic coordinate;
 @dynamic overlayBounds;
 
 + (instancetype)polygonWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count {
