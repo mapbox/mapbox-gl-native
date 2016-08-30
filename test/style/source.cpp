@@ -95,16 +95,20 @@ TEST(Source, LoadingFail) {
 TEST(Source, LoadingCorrupt) {
     SourceTest test;
 
+    bool badResourceReported = false;
+
     test.fileSource.sourceResponse = [&] (const Resource& resource) {
         EXPECT_EQ("url", resource.url);
         Response response;
         response.data = std::make_unique<std::string>("CORRUPTED");
+        response.reportBad = [&]() { badResourceReported = true; };
         return response;
     };
 
     test.observer.sourceError = [&] (Source& source, std::exception_ptr error) {
         EXPECT_EQ("source", source.getID());
         EXPECT_EQ("0 - Invalid value.", util::toString(error));
+        ASSERT_TRUE(badResourceReported);
         test.end();
     };
 
@@ -234,9 +238,12 @@ TEST(Source, VectorTileFail) {
 TEST(Source, RasterTileCorrupt) {
     SourceTest test;
 
+    bool badResourceReported = false;
+
     test.fileSource.tileResponse = [&] (const Resource&) {
         Response response;
         response.data = std::make_unique<std::string>("CORRUPTED");
+        response.reportBad = [&]() { badResourceReported = true; };
         return response;
     };
 
@@ -244,6 +251,7 @@ TEST(Source, RasterTileCorrupt) {
         EXPECT_EQ(source.baseImpl->type, SourceType::Raster);
         EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_TRUE(bool(error));
+        ASSERT_TRUE(badResourceReported);
         // Not asserting on platform-specific error text.
         test.end();
     };
@@ -262,9 +270,12 @@ TEST(Source, RasterTileCorrupt) {
 TEST(Source, VectorTileCorrupt) {
     SourceTest test;
 
+    bool badResourceReported = false;
+
     test.fileSource.tileResponse = [&] (const Resource&) {
         Response response;
         response.data = std::make_unique<std::string>("CORRUPTED");
+        response.reportBad = [&]() { badResourceReported = true; };
         return response;
     };
 

@@ -197,12 +197,6 @@ Response failedSpriteResponse(const Resource&) {
     return response;
 }
 
-Response corruptSpriteResponse(const Resource&) {
-    Response response;
-    response.data = std::make_shared<std::string>("CORRUPT");
-    return response;
-}
-
 TEST(SpriteStore, LoadingSuccess) {
     SpriteStoreTest test;
 
@@ -259,13 +253,21 @@ TEST(SpriteStore, ImageLoadingFail) {
 TEST(SpriteStore, JSONLoadingCorrupted) {
     SpriteStoreTest test;
 
+    bool badResourceReported = false;
+
     test.fileSource.spriteImageResponse = successfulSpriteImageResponse;
-    test.fileSource.spriteJSONResponse = corruptSpriteResponse;
+    test.fileSource.spriteJSONResponse = [&](const Resource&) {
+        Response response;
+        response.data = std::make_shared<std::string>("CORRUPTED");
+        response.reportBad = [&]() { badResourceReported = true; };
+        return response;
+    };
 
     test.observer.spriteError = [&] (std::exception_ptr error) {
         EXPECT_TRUE(error != nullptr);
         EXPECT_EQ("Failed to parse JSON: Invalid value. at offset 0", util::toString(error));
         EXPECT_FALSE(test.spriteStore.isLoaded());
+        ASSERT_TRUE(badResourceReported);
         test.end();
     };
 
@@ -275,13 +277,21 @@ TEST(SpriteStore, JSONLoadingCorrupted) {
 TEST(SpriteStore, ImageLoadingCorrupted) {
     SpriteStoreTest test;
 
-    test.fileSource.spriteImageResponse = corruptSpriteResponse;
+    bool badResourceReported = false;
+
     test.fileSource.spriteJSONResponse = successfulSpriteJSONResponse;
+    test.fileSource.spriteImageResponse = [&](const Resource&) {
+        Response response;
+        response.data = std::make_shared<std::string>("CORRUPTED");
+        response.reportBad = [&]() { badResourceReported = true; };
+        return response;
+    };
 
     test.observer.spriteError = [&] (std::exception_ptr error) {
         EXPECT_TRUE(error != nullptr);
         // Not asserting on platform-specific error text.
         EXPECT_FALSE(test.spriteStore.isLoaded());
+        ASSERT_TRUE(badResourceReported);
         test.end();
     };
 

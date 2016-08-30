@@ -105,6 +105,32 @@ TEST(Map, SetStyleInvalidURL) {
     test.runLoop.run();
 }
 
+TEST(Map, SetStyleURLCorruptJSON) {
+    MapTest test;
+
+    bool badResourceReported = false;
+
+    test.fileSource.styleResponse = [&] (const Resource&) {
+        Response response;
+        response.data = std::make_shared<std::string>("CORRUPTED");
+        response.reportBad = [&]() { badResourceReported = true; };
+        return response;
+    };
+
+    test.view.setMapChangeCallback([&](MapChange change) {
+        if (change == mbgl::MapChangeDidFailLoadingMap) {
+            test.runLoop.stop();
+        }
+    });
+
+    Map map(test.view, test.fileSource, MapMode::Still);
+    map.setStyleURL("mapbox://bar");
+
+    test.runLoop.run();
+
+    ASSERT_TRUE(badResourceReported);
+}
+
 TEST(Map, DoubleStyleLoad) {
     MapTest test;
 
