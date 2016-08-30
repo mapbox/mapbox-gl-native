@@ -102,11 +102,6 @@ android.libraryVariants.all { variant ->
     }
 }
 
-checkstyle {
-    configFile project.file('../checks.xml')
-    showViolations true
-}
-
 /*
 task cleanJNIBuilds {
     def jniLibsDir = new File("MapboxGLAndroidSDK/src/main/jniLibs")
