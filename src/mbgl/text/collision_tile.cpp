@@ -159,8 +159,23 @@ std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const mapbox:
     std::unordered_map<std::string, std::set<std::size_t>> sourceLayerFeatures;
 
     auto anchor = util::matrixMultiply(rotationMatrix, convertPoint<float>(box.min));
-    CollisionBox queryBox(anchor, 0, 0, box.max.x - box.min.x, box.max.y - box.min.y, scale);
-    auto predicates = bgi::intersects(getTreeBox(anchor, queryBox));
+    
+    const Point<float> tl = { 0, 0 };
+    const Point<float> tr = { float(box.max.x - box.min.x), 0 };
+    const Point<float> bl = { 0, float(box.max.y - box.min.y) };
+    const Point<float> br = { float(box.max.x - box.min.x), float(box.max.y - box.min.y) };
+    const Point<float> rtl = util::matrixMultiply(rotationMatrix, tl);
+    const Point<float> rtr = util::matrixMultiply(rotationMatrix, tr);
+    const Point<float> rbl = util::matrixMultiply(rotationMatrix, bl);
+    const Point<float> rbr = util::matrixMultiply(rotationMatrix, br);
+    CollisionBox queryBox(anchor,
+                            ::fmin(::fmin(rtl.x, rtr.x), ::fmin(rbl.x, rbr.x)),
+                            ::fmin(::fmin(rtl.y, rtr.y), ::fmin(rbl.y, rbr.y)),
+                            ::fmax(::fmax(rtl.x, rtr.x), ::fmax(rbl.x, rbr.x)),
+                            ::fmax(::fmax(rtl.y, rtr.y), ::fmax(rbl.y, rbr.y)),
+                            scale);
+    Box treeBox = getTreeBox(anchor, queryBox);
+    auto predicates = bgi::intersects(treeBox);
 
     auto fn = [&] (const Tree& tree_) {
         for (auto it = tree_.qbegin(predicates); it != tree_.qend(); ++it) {
