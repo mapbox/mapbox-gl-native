@@ -5,7 +5,6 @@
 
 @implementation MGLPolyline
 
-@dynamic coordinate;
 @dynamic overlayBounds;
 
 + (instancetype)polylineWithCoordinates:(CLLocationCoordinate2D *)coords

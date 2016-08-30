@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLOverlay <MGLAnnotation>
 
 /**
- The approximate center point of the overlay area. (required) (read-only)
+ A coordinate representing the overlay. (required) (read-only)
  */
 @property (nonatomic, readonly) CLLocationCoordinate2D coordinate;
 
