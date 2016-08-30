@@ -241,7 +241,13 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resou
     if (!data) {
         response.noContent = true;
     } else if (stmt->get<int>(4)) {
-        response.data = std::make_shared<std::string>(util::decompress(*data));
+        try {
+            response.data = std::make_shared<std::string>(util::decompress(*data));
+        } catch (std::exception const& ex) {
+            Log::Error(Event::Database, "Error decompressing resource: %s", ex.what());
+            removeResource(resource);
+            return {};
+        }
         size = data->length();
     } else {
         response.data = std::make_shared<std::string>(*data);
@@ -410,7 +416,13 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource:
     if (!data) {
         response.noContent = true;
     } else if (stmt->get<int>(4)) {
-        response.data = std::make_shared<std::string>(util::decompress(*data));
+        try {
+            response.data = std::make_shared<std::string>(util::decompress(*data));
+        } catch (std::exception const& ex) {
+            Log::Error(Event::Database, "Error decompressing tile: %s", ex.what());
+            removeTile(tile);
+            return {};
+        }
         size = data->length();
     } else {
         response.data = std::make_shared<std::string>(*data);
