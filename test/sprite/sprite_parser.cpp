@@ -60,8 +60,8 @@ TEST(Sprite, SpriteImageCreation1x) {
         ASSERT_TRUE(sprite.get());
         EXPECT_EQ(18, sprite->getWidth());
         EXPECT_EQ(18, sprite->getHeight());
-        EXPECT_EQ(18, sprite->image.width);
-        EXPECT_EQ(18, sprite->image.height);
+        EXPECT_EQ(18u, sprite->image.width);
+        EXPECT_EQ(18u, sprite->image.height);
         EXPECT_EQ(1, sprite->pixelRatio);
         EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteimagecreation1x-museum.png"),
                   sprite->image);
@@ -76,8 +76,8 @@ TEST(Sprite, SpriteImageCreation2x) {
     ASSERT_TRUE(sprite.get());
     EXPECT_EQ(18, sprite->getWidth());
     EXPECT_EQ(18, sprite->getHeight());
-    EXPECT_EQ(36, sprite->image.width);
-    EXPECT_EQ(36, sprite->image.height);
+    EXPECT_EQ(36u, sprite->image.width);
+    EXPECT_EQ(36u, sprite->image.height);
     EXPECT_EQ(2, sprite->pixelRatio);
     EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteimagecreation2x.png"),
               sprite->image);
@@ -91,8 +91,8 @@ TEST(Sprite, SpriteImageCreation1_5x) {
     ASSERT_TRUE(sprite.get());
     EXPECT_EQ(24, sprite->getWidth());
     EXPECT_EQ(24, sprite->getHeight());
-    EXPECT_EQ(36, sprite->image.width);
-    EXPECT_EQ(36, sprite->image.height);
+    EXPECT_EQ(36u, sprite->image.width);
+    EXPECT_EQ(36u, sprite->image.height);
     EXPECT_EQ(1.5, sprite->pixelRatio);
     EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteimagecreation1_5x-museum.png"),
               sprite->image);
@@ -102,8 +102,8 @@ TEST(Sprite, SpriteImageCreation1_5x) {
     ASSERT_TRUE(sprite2.get());
     EXPECT_EQ(float(35 / 1.5), sprite2->getWidth());
     EXPECT_EQ(float(35 / 1.5), sprite2->getHeight());
-    EXPECT_EQ(35, sprite2->image.width);
-    EXPECT_EQ(35, sprite2->image.height);
+    EXPECT_EQ(35u, sprite2->image.width);
+    EXPECT_EQ(35u, sprite2->image.height);
     EXPECT_EQ(1.5, sprite2->pixelRatio);
     EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteimagecreation1_5x-hospital.png"),
               sprite2->image);
@@ -198,8 +198,8 @@ TEST(Sprite, SpriteParsing) {
         auto sprite = images.find("generic-metro")->second;
         EXPECT_EQ(18, sprite->getWidth());
         EXPECT_EQ(18, sprite->getHeight());
-        EXPECT_EQ(18, sprite->image.width);
-        EXPECT_EQ(18, sprite->image.height);
+        EXPECT_EQ(18u, sprite->image.width);
+        EXPECT_EQ(18u, sprite->image.height);
         EXPECT_EQ(1, sprite->pixelRatio);
         EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteparsing.png"), sprite->image);
     }

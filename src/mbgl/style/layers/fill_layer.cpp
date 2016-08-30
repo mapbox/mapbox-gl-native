@@ -6,10 +6,11 @@
 namespace mbgl {
 namespace style {
 
-FillLayer::FillLayer(const std::string& layerID)
+FillLayer::FillLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(Type::Fill, std::make_unique<Impl>())
     , impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
+    impl->source = sourceID;
 }
 
 FillLayer::FillLayer(const Impl& other)
@@ -23,15 +24,22 @@ std::unique_ptr<Layer> FillLayer::Impl::clone() const {
     return std::make_unique<FillLayer>(*this);
 }
 
-// Source
-
-void FillLayer::setSource(const std::string& sourceID, const std::string& sourceLayer) {
-    impl->source = sourceID;
-    impl->sourceLayer = sourceLayer;
+std::unique_ptr<Layer> FillLayer::Impl::cloneRef(const std::string& id_) const {
+    auto result = std::make_unique<FillLayer>(*this);
+    result->impl->id = id_;
+    result->impl->ref = this->id;
+    result->impl->paint = FillPaintProperties();
+    return std::move(result);
 }
+
+// Source
 
 const std::string& FillLayer::getSourceID() const {
     return impl->source;
+}
+
+void FillLayer::setSourceLayer(const std::string& sourceLayer) {
+    impl->sourceLayer = sourceLayer;
 }
 
 const std::string& FillLayer::getSourceLayer() const {
@@ -57,56 +65,56 @@ PropertyValue<bool> FillLayer::getFillAntialias() const {
     return impl->paint.fillAntialias.get();
 }
 
-void FillLayer::setFillAntialias(PropertyValue<bool> value) {
-    impl->paint.fillAntialias.set(value);
+void FillLayer::setFillAntialias(PropertyValue<bool> value, const optional<std::string>& klass) {
+    impl->paint.fillAntialias.set(value, klass);
 }
 
 PropertyValue<float> FillLayer::getFillOpacity() const {
     return impl->paint.fillOpacity.get();
 }
 
-void FillLayer::setFillOpacity(PropertyValue<float> value) {
-    impl->paint.fillOpacity.set(value);
+void FillLayer::setFillOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
+    impl->paint.fillOpacity.set(value, klass);
 }
 
 PropertyValue<Color> FillLayer::getFillColor() const {
     return impl->paint.fillColor.get();
 }
 
-void FillLayer::setFillColor(PropertyValue<Color> value) {
-    impl->paint.fillColor.set(value);
+void FillLayer::setFillColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+    impl->paint.fillColor.set(value, klass);
 }
 
 PropertyValue<Color> FillLayer::getFillOutlineColor() const {
     return impl->paint.fillOutlineColor.get();
 }
 
-void FillLayer::setFillOutlineColor(PropertyValue<Color> value) {
-    impl->paint.fillOutlineColor.set(value);
+void FillLayer::setFillOutlineColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+    impl->paint.fillOutlineColor.set(value, klass);
 }
 
 PropertyValue<std::array<float, 2>> FillLayer::getFillTranslate() const {
     return impl->paint.fillTranslate.get();
 }
 
-void FillLayer::setFillTranslate(PropertyValue<std::array<float, 2>> value) {
-    impl->paint.fillTranslate.set(value);
+void FillLayer::setFillTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
+    impl->paint.fillTranslate.set(value, klass);
 }
 
 PropertyValue<TranslateAnchorType> FillLayer::getFillTranslateAnchor() const {
     return impl->paint.fillTranslateAnchor.get();
 }
 
-void FillLayer::setFillTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
-    impl->paint.fillTranslateAnchor.set(value);
+void FillLayer::setFillTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
+    impl->paint.fillTranslateAnchor.set(value, klass);
 }
 
 PropertyValue<std::string> FillLayer::getFillPattern() const {
     return impl->paint.fillPattern.get();
 }
 
-void FillLayer::setFillPattern(PropertyValue<std::string> value) {
-    impl->paint.fillPattern.set(value);
+void FillLayer::setFillPattern(PropertyValue<std::string> value, const optional<std::string>& klass) {
+    impl->paint.fillPattern.set(value, klass);
 }
 
 } // namespace style

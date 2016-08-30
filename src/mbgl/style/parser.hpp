@@ -2,7 +2,6 @@
 
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/source.hpp>
-#include <mbgl/style/filter.hpp>
 
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/font_stack.hpp>
@@ -15,13 +14,6 @@
 
 namespace mbgl {
 namespace style {
-
-std::unique_ptr<Tileset> parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType, uint16_t tileSize);
-std::unique_ptr<Tileset> parseTileJSON(const JSValue&);
-
-std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> parseGeoJSON(const JSValue&);
-
-Filter parseFilter(const JSValue&);
 
 class Parser {
 public:
@@ -42,7 +34,6 @@ private:
     void parseSources(const JSValue&);
     void parseLayers(const JSValue&);
     void parseLayer(const std::string& id, const JSValue&, std::unique_ptr<Layer>&);
-    void parseVisibility(Layer&, const JSValue& value);
 
     std::unordered_map<std::string, const Source*> sourcesMap;
     std::unordered_map<std::string, std::pair<const JSValue&, std::unique_ptr<Layer>>> layersMap;

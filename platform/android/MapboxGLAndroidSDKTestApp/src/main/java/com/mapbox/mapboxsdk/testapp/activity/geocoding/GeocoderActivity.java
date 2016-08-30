@@ -14,26 +14,27 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.mapbox.geocoder.GeocoderCriteria;
-import com.mapbox.geocoder.MapboxGeocoder;
-import com.mapbox.geocoder.service.models.GeocoderFeature;
-import com.mapbox.geocoder.service.models.GeocoderResponse;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
+import com.mapbox.services.commons.ServicesException;
+import com.mapbox.services.commons.models.Position;
+import com.mapbox.services.geocoding.v5.GeocodingCriteria;
+import com.mapbox.services.geocoding.v5.MapboxGeocoding;
+import com.mapbox.services.geocoding.v5.models.GeocodingFeature;
+import com.mapbox.services.geocoding.v5.models.GeocodingResponse;
 
 import java.util.List;
 
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class GeocoderActivity extends AppCompatActivity {
 
@@ -60,7 +61,7 @@ public class GeocoderActivity extends AppCompatActivity {
         setMessage(getString(R.string.geocoder_instructions));
 
         mapView = (MapView) findViewById(R.id.mapView);
-        mapView.setStyleUrl(Style.getMapboxStreetsUrl(AppConstant.STYLE_VERSION));
+        mapView.setStyleUrl(Style.MAPBOX_STREETS);
         mapView.onCreate(savedInstanceState);
 
         final ImageView dropPinView = new ImageView(this);
@@ -124,40 +125,38 @@ public class GeocoderActivity extends AppCompatActivity {
      */
 
     private void geocode(final LatLng point) {
-        new AsyncTask<Void, Void, Void>() {
 
-            @Override
-            protected Void doInBackground(Void... params) {
-                MapboxGeocoder client = new MapboxGeocoder.Builder()
-                        .setAccessToken(getString(R.string.mapbox_access_token))
-                        .setCoordinates(point.getLongitude(), point.getLatitude())
-                        .setType(GeocoderCriteria.TYPE_POI)
-                        .build();
+        try {
+            MapboxGeocoding client = new MapboxGeocoding.Builder()
+                    .setAccessToken(getString(R.string.mapbox_access_token))
+                    .setCoordinates(Position.fromCoordinates(point.getLongitude(), point.getLatitude()))
+                    .setType(GeocodingCriteria.TYPE_POI)
+                    .build();
 
-                client.enqueue(new Callback<GeocoderResponse>()
+            client.enqueueCall(new Callback<GeocodingResponse>() {
+                @Override
+                public void onResponse(Call<GeocodingResponse> call, Response<GeocodingResponse> response) {
 
-                               {
-                                   @Override
-                                   public void onResponse(Response<GeocoderResponse> response, Retrofit retrofit) {
-                                       List<GeocoderFeature> results = response.body().getFeatures();
-                                       if (results.size() > 0) {
-                                           String placeName = results.get(0).getPlaceName();
-                                           setSuccess(placeName);
-                                       } else {
-                                           setMessage("No results.");
-                                       }
-                                   }
+                    List<GeocodingFeature> results = response.body().getFeatures();
+                    if (results.size() > 0) {
+                        String placeName = results.get(0).getPlaceName();
+                        setSuccess(placeName);
+                    } else {
+                        setMessage("No results.");
+                    }
 
-                                   @Override
-                                   public void onFailure(Throwable t) {
-                                       setError(t.getMessage());
-                                   }
-                               }
+                }
 
-                );
-                return null;
-            }
-        }.execute();
+                @Override
+                public void onFailure(Call<GeocodingResponse> call, Throwable t) {
+                    setError(t.getMessage());
+                }
+            });
+        } catch (ServicesException e) {
+            Log.e(LOG_TAG, "Error geocoding: " + e.toString());
+            e.printStackTrace();
+            setError(e.getMessage());
+        }
     }
 
     /*

@@ -13,8 +13,7 @@ void VertexArrayObject::Unbind() {
 VertexArrayObject::VertexArrayObject() {
 }
 
-VertexArrayObject::~VertexArrayObject() {
-}
+VertexArrayObject::~VertexArrayObject() = default;
 
 void VertexArrayObject::bindVertexArrayObject(gl::ObjectStore& store) {
     if (!gl::GenVertexArrays || !gl::BindVertexArray) {
@@ -32,7 +31,7 @@ void VertexArrayObject::bindVertexArrayObject(gl::ObjectStore& store) {
     MBGL_CHECK_ERROR(gl::BindVertexArray(*vao));
 }
 
-void VertexArrayObject::verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer,
+void VertexArrayObject::verifyBinding(Shader& shader, GLuint vertexBuffer, GLuint elementsBuffer,
                                       GLbyte *offset) {
     if (bound_shader != shader.getID()) {
         throw std::runtime_error(std::string("trying to rebind VAO to another shader from " +

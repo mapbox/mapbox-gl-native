@@ -1,6 +1,6 @@
 {
   "name": "mapbox-gl-native",
-  "version": "3.2.1",
+  "version": "3.3.2",
   "description": "Renders map tiles with Mapbox GL",
   "keywords": [
     "mapbox",
@@ -21,9 +21,9 @@
     "csscolorparser": "^1.0.2",
     "ejs": "^2.4.1",
     "express": "^4.11.1",
-    "mapbox-gl-shaders": "mapbox/mapbox-gl-shaders#8dfd9653e6659cb2837a4b98f3e8e1d559b29a09",
-    "mapbox-gl-style-spec": "^8.5.1",
-    "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#f45fd7aba98650c7f3bf778c9cbbfd3b548a4ee8",
+    "mapbox-gl-shaders": "mapbox/mapbox-gl-shaders#4d1f89514bf03536c8e682439df165c33a37122a",
+    "mapbox-gl-style-spec": "mapbox/mapbox-gl-style-spec#83b1a3e5837d785af582efd5ed1a212f2df6a4ae",
+    "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#8e38705747dee1279a8503d05593543eb9af3ce1",
     "node-gyp": "^3.3.1",
     "request": "^2.72.0",
     "tape": "^4.5.1"
@@ -35,6 +35,7 @@
     "preinstall": "npm install node-pre-gyp",
     "install": "node-pre-gyp install --fallback-to-build=false || make node",
     "test": "tape platform/node/test/js/**/*.test.js",
+    "test-memory": "node --expose-gc platform/node/test/memory.test.js",
     "test-suite": "node platform/node/test/render.test.js && node platform/node/test/query.test.js"
   },
   "gypfile": true,

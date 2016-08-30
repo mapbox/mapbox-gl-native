@@ -1,4 +1,5 @@
 #include <mbgl/shader/uniform.hpp>
+#include <mbgl/util/color.hpp>
 
 namespace mbgl {
 
@@ -25,6 +26,12 @@ void Uniform<std::array<GLfloat, 3>>::bind(const std::array<GLfloat, 3>& t) {
 template <>
 void Uniform<std::array<GLfloat, 4>>::bind(const std::array<GLfloat, 4>& t) {
     MBGL_CHECK_ERROR(glUniform4fv(location, 1, t.data()));
+}
+
+template <>
+void Uniform<Color>::bind(const Color& t) {
+    std::array<GLfloat, 4> a = {{ t.r, t.g, t.b, t.a }};
+    MBGL_CHECK_ERROR(glUniform4fv(location, 1, a.data()));
 }
 
 template <>

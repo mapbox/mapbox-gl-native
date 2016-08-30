@@ -6,23 +6,23 @@ namespace mbgl {
 namespace util {
 
 struct Exception : std::runtime_error {
-    inline Exception(const char *msg) : std::runtime_error(msg) {}
-    inline Exception(const std::string &msg) : std::runtime_error(msg) {}
+    Exception(const char *msg) : std::runtime_error(msg) {}
+    Exception(const std::string &msg) : std::runtime_error(msg) {}
 };
 
 struct SpriteImageException : Exception {
-    inline SpriteImageException(const char *msg) : Exception(msg) {}
-    inline SpriteImageException(const std::string &msg) : Exception(msg) {}
+    SpriteImageException(const char *msg) : Exception(msg) {}
+    SpriteImageException(const std::string &msg) : Exception(msg) {}
 };
 
 struct MisuseException : Exception {
-    inline MisuseException(const char *msg) : Exception(msg) {}
-    inline MisuseException(const std::string &msg) : Exception(msg) {}
+    MisuseException(const char *msg) : Exception(msg) {}
+    MisuseException(const std::string &msg) : Exception(msg) {}
 };
 
 struct ShaderException : Exception {
-    inline ShaderException(const char *msg) : Exception(msg) {}
-    inline ShaderException(const std::string &msg) : Exception(msg) {}
+    ShaderException(const char *msg) : Exception(msg) {}
+    ShaderException(const std::string &msg) : Exception(msg) {}
 };
 
 } // namespace util

@@ -33,6 +33,11 @@ std::unique_ptr<Layer> CustomLayer::Impl::clone() const {
     return std::make_unique<CustomLayer>(*this);
 }
 
+std::unique_ptr<Layer> CustomLayer::Impl::cloneRef(const std::string&) const {
+    assert(false);
+    return std::make_unique<CustomLayer>(*this);
+}
+
 void CustomLayer::Impl::initialize() {
     assert(initializeFn);
     initializeFn(context);

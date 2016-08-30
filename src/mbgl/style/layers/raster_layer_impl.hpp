@@ -10,9 +10,7 @@ namespace style {
 class RasterLayer::Impl : public Layer::Impl {
 public:
     std::unique_ptr<Layer> clone() const override;
-
-    void parseLayout(const JSValue&) override {};
-    void parsePaints(const JSValue&) override;
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const override;
 
     void cascade(const CascadeParameters&) override;
     bool recalculate(const CalculationParameters&) override;

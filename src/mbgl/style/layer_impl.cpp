@@ -3,6 +3,16 @@
 namespace mbgl {
 namespace style {
 
+std::unique_ptr<Layer> Layer::Impl::copy(const std::string& id_,
+                                         const std::string& ref_,
+                                         const std::string& source_) const {
+    std::unique_ptr<Layer> result = clone();
+    result->baseImpl->id = id_;
+    result->baseImpl->ref = ref_;
+    result->baseImpl->source = source_;
+    return result;
+}
+
 const std::string& Layer::Impl::bucketName() const {
     return ref.empty() ? id : ref;
 }
@@ -12,11 +22,11 @@ bool Layer::Impl::hasRenderPass(RenderPass pass) const {
 }
 
 bool Layer::Impl::needsRendering(float zoom) const {
-        return passes != RenderPass::None
+    return passes != RenderPass::None
         && visibility != VisibilityType::None
         && minZoom <= zoom
         && maxZoom >= zoom;
-    }
+}
 
 } // namespace style
 } // namespace mbgl

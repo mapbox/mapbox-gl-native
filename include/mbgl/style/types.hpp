@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/util/enum.hpp>
+#include <cstdint>
 
 namespace mbgl {
 
@@ -12,14 +12,6 @@ enum class SourceType : uint8_t {
     Video,
     Annotations
 };
-
-MBGL_DEFINE_ENUM_CLASS(SourceTypeClass, SourceType, {
-    { SourceType::Vector, "vector" },
-    { SourceType::Raster, "raster" },
-    { SourceType::GeoJSON, "geojson" },
-    { SourceType::Video, "video" },
-    { SourceType::Annotations, "annotations" },
-});
 
 namespace style {
 
@@ -53,14 +45,20 @@ enum class RotateAnchorType : bool {
     Viewport,
 };
 
+enum class CirclePitchScaleType : bool {
+    Map,
+    Viewport,
+};
+
 enum class SymbolPlacementType : bool {
     Point,
     Line,
 };
 
-enum class RotationAlignmentType : bool {
+enum class AlignmentType : uint8_t {
     Map,
     Viewport,
+    Undefined,
 };
 
 enum class TextJustifyType : uint8_t {
@@ -85,6 +83,13 @@ enum class TextTransformType : uint8_t {
     None,
     Uppercase,
     Lowercase,
+};
+
+enum class IconTextFitType : uint8_t {
+    None,
+    Both,
+    Width,
+    Height
 };
 
 } // namespace style

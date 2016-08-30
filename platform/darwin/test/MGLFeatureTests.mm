@@ -1,6 +1,7 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
 
+#import <mbgl/util/geometry.hpp>
 #import "../../darwin/src/MGLFeature_Private.h"
 
 @interface MGLFeatureTests : XCTestCase
@@ -12,16 +13,16 @@
 - (void)testGeometryConversion {
     std::vector<mbgl::Feature> features;
     
-    mapbox::geometry::point<double> point = { -90.066667, 29.95 };
-    features.emplace_back(point);
+    mbgl::Point<double> point = { -90.066667, 29.95 };
+    features.push_back(mbgl::Feature { point });
     
-    mapbox::geometry::line_string<double> lineString = {
+    mbgl::LineString<double> lineString = {
         { -84.516667, 39.1 },
         { -90.066667, 29.95 },
     };
-    features.emplace_back(lineString);
+    features.push_back(mbgl::Feature { lineString });
     
-    mapbox::geometry::polygon<double> polygon = {
+    mbgl::Polygon<double> polygon = {
         {
             { 1, 1 },
             { 4, 1 },
@@ -35,7 +36,7 @@
             { 2, 3 },
         },
     };
-    features.emplace_back(polygon);
+    features.push_back(mbgl::Feature { polygon });
     
     NS_ARRAY_OF(MGLShape <MGLFeature> *) *shapes = MGLFeaturesFromMBGLFeatures(features);
     XCTAssertEqual(shapes.count, 3, @"All features should be converted into shapes");
@@ -87,9 +88,9 @@
 - (void)testPropertyConversion {
     std::vector<mbgl::Feature> features;
     
-    mapbox::geometry::point<double> point = { -90.066667, 29.95 };
-    mbgl::Feature pointFeature(point);
-    pointFeature.id = UINT64_MAX;
+    mbgl::Point<double> point = { -90.066667, 29.95 };
+    mbgl::Feature pointFeature { point };
+    pointFeature.id = { UINT64_MAX };
     pointFeature.properties["null"] = nullptr;
     pointFeature.properties["bool"] = true;
     pointFeature.properties["unsigned int"] = UINT64_MAX;

@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class MapboxEvent implements Serializable {
     public static final int VERSION_NUMBER = 2;
-    public static final String MAPBOX_EVENTS_BASE_URL = "https://api.mapbox.com";
+    public static final String MAPBOX_EVENTS_BASE_URL = "https://events.mapbox.com";
     public static final String SOURCE_MAPBOX = "mapbox";
 
     // Event Types

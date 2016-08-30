@@ -2,6 +2,7 @@
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
+#include <mbgl/gl/gl_config.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
@@ -9,7 +10,7 @@
 #include <algorithm>
 
 
-using namespace mbgl;
+namespace mbgl {
 
 GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
     : width(width_),
@@ -19,8 +20,7 @@ GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
       dirty(true) {
 }
 
-GlyphAtlas::~GlyphAtlas() {
-}
+GlyphAtlas::~GlyphAtlas() = default;
 
 void GlyphAtlas::addGlyphs(uintptr_t tileUID,
                            const std::u32string& text,
@@ -53,7 +53,7 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
     const uint8_t buffer = 3;
 
     std::map<uint32_t, GlyphValue>& face = index[fontStack];
-    std::map<uint32_t, GlyphValue>::iterator it = face.find(glyph.id);
+    auto it = face.find(glyph.id);
 
     // The glyph is already in this texture.
     if (it != face.end()) {
@@ -142,13 +142,14 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
     }
 }
 
-void GlyphAtlas::upload(gl::ObjectStore& store) {
+void GlyphAtlas::upload(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
     if (dirty) {
         const bool first = !texture;
-        bind(store);
+        bind(store, config, unit);
 
         std::lock_guard<std::mutex> lock(mtx);
 
+        config.activeTexture = unit;
         if (first) {
             MBGL_CHECK_ERROR(glTexImage2D(
                 GL_TEXTURE_2D, // GLenum target
@@ -183,10 +184,11 @@ void GlyphAtlas::upload(gl::ObjectStore& store) {
     }
 }
 
-void GlyphAtlas::bind(gl::ObjectStore& store) {
+void GlyphAtlas::bind(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
     if (!texture) {
         texture = store.createTexture();
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
+        config.activeTexture = unit;
+        config.texture[unit] = *texture;
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
@@ -194,7 +196,10 @@ void GlyphAtlas::bind(gl::ObjectStore& store) {
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-    } else {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
+    } else if (config.texture[unit] != *texture) {
+        config.activeTexture = unit;
+        config.texture[unit] = *texture;
     }
-};
+}
+
+} // namespace mbgl

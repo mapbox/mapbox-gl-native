@@ -7,7 +7,7 @@ namespace mbgl {
 
 class StyleSourcedAnnotationImpl : public ShapeAnnotationImpl {
 public:
-    StyleSourcedAnnotationImpl(const AnnotationID, const StyleSourcedAnnotation&, const uint8_t maxZoom);
+    StyleSourcedAnnotationImpl(AnnotationID, StyleSourcedAnnotation, uint8_t maxZoom);
 
     void updateStyle(style::Style&) const final;
     const ShapeAnnotationGeometry& geometry() const final;

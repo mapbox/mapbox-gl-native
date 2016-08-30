@@ -11,8 +11,8 @@ uint32_t ceil_log2(uint64_t x) {
     uint32_t y = (((x & (x - 1)) == 0) ? 0 : 1);
     uint32_t j = 32;
 
-    for (int32_t i = 0; i < 6; i++) {
-        const uint32_t k = (((x & t[i]) == 0) ? 0 : j);
+    for (const auto& i : t) {
+        const uint32_t k = (((x & i) == 0) ? 0 : j);
         y += k;
         x >>= k;
         j >>= 1;
@@ -24,7 +24,7 @@ uint32_t ceil_log2(uint64_t x) {
 double log2(double x) {
 // log2() is producing wrong results on ARMv5 binaries
 // running on ARMv7+ CPUs.
-#if defined(__ANDROID__) && defined(__ARM_ARCH_5TE__)
+#if defined(__ANDROID__)
     return std::log(x) / 0.6931471805599453; // log(x) / log(2)
 #else
     return ::log2(x);

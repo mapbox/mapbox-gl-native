@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
-#include <mbgl/util/rapidjson.hpp>
 
 namespace mbgl {
 namespace style {
@@ -14,11 +14,10 @@ class CalculationParameters;
 
 class BackgroundPaintProperties {
 public:
-    void parse(const JSValue&);
     void cascade(const CascadeParameters&);
     bool recalculate(const CalculationParameters&);
 
-    PaintProperty<Color> backgroundColor { {{ 0, 0, 0, 1 }} };
+    PaintProperty<Color> backgroundColor { Color::black() };
     PaintProperty<std::string, CrossFadedPropertyEvaluator> backgroundPattern { "" };
     PaintProperty<float> backgroundOpacity { 1 };
 };

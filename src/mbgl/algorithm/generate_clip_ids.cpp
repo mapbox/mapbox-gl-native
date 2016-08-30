@@ -2,7 +2,6 @@
 #include <mbgl/algorithm/covered_by_children.hpp>
 
 #include <mbgl/util/std.hpp>
-#include <mbgl/tile/tile.hpp>
 
 #include <list>
 #include <vector>

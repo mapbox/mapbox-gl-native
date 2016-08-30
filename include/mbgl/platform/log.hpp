@@ -37,27 +37,27 @@ private:
 
 public:
     template <typename ...Args>
-    static inline void Debug(Event event, Args&& ...args) {
+    static void Debug(Event event, Args&& ...args) {
         Record(EventSeverity::Debug, event, ::std::forward<Args>(args)...);
     }
 
     template <typename ...Args>
-    static inline void Info(Event event, Args&& ...args) {
+    static void Info(Event event, Args&& ...args) {
         Record(EventSeverity::Info, event, ::std::forward<Args>(args)...);
     }
 
     template <typename ...Args>
-    static inline void Warning(Event event, Args&& ...args) {
+    static void Warning(Event event, Args&& ...args) {
         Record(EventSeverity::Warning, event, ::std::forward<Args>(args)...);
     }
 
     template <typename ...Args>
-    static inline void Error(Event event, Args&& ...args) {
+    static void Error(Event event, Args&& ...args) {
         Record(EventSeverity::Error, event, ::std::forward<Args>(args)...);
     }
 
     template <typename ...Args>
-    static inline void Record(EventSeverity severity, Event event, Args&& ...args) {
+    static void Record(EventSeverity severity, Event event, Args&& ...args) {
         if (!includes(severity, disabledEventSeverities) &&
             !includes(event, disabledEvents) &&
             !includes({ severity, event }, disabledEventPermutations)) {

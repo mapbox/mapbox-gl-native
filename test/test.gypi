@@ -22,6 +22,7 @@
         'util/geo.cpp',
         'util/image.cpp',
         'util/mapbox.cpp',
+        'util/memory.cpp',
         'util/merge_lines.cpp',
         'util/run_loop.cpp',
         'util/number_conversions.cpp',
@@ -32,6 +33,7 @@
         'util/timer.cpp',
         'util/token.cpp',
         'util/work_queue.cpp',
+        'util/projection.cpp',
 
         'algorithm/covered_by_children.cpp',
         'algorithm/generate_clip_ids.cpp',
@@ -55,7 +57,9 @@
         'math/minmax.cpp',
         'math/clamp.cpp',
 
-        'tile/geometry_tile.cpp',
+        'text/quads.cpp',
+
+        'tile/geometry_tile_data.cpp',
         'tile/tile_id.cpp',
 
         'storage/offline.cpp',
@@ -72,6 +76,7 @@
         'style/source.cpp',
         'style/style.cpp',
         'style/style_layer.cpp',
+        'style/tile_source.cpp',
         'style/filter.cpp',
         'style/functions.cpp',
         'style/style_parser.cpp',
@@ -98,6 +103,8 @@
           '<@(boost_cflags)',
           '<@(sqlite_cflags)',
           '<@(geojsonvt_cflags)',
+          '<@(supercluster_cflags)',
+          '<@(kdbush_cflags)',
           '<@(rapidjson_cflags)',
           '<@(pixelmatch_cflags)',
           '<@(earcut_cflags)',
@@ -108,8 +115,7 @@
         ],
         'libraries': [
           '<@(gtest_static_libs)',
-          '<@(sqlite_static_libs)',
-          '<@(geojsonvt_static_libs)',
+          '<@(sqlite_static_libs)'
         ],
       },
 

@@ -56,7 +56,7 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
 
     auto observer = Log::removeObserver();
     auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-    EXPECT_EQ(1, flo->count(FixtureLog::Message(
+    EXPECT_EQ(1u, flo->count(FixtureLog::Message(
                      EventSeverity::Error, Event::Style, -1,
                      std::string("Failed to load tile 0/0/0=>0 for source mapbox: " + message))));
     auto unchecked = flo->unchecked();

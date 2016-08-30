@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 
-CXX11ABI=$(scripts/check-cxx11abi.sh)
+CXX11ABI=${CXX11ABI:-$(scripts/check-cxx11abi.sh)}
 
 UNIQUE_RESOURCE_VERSION=dev
 PROTOZERO_VERSION=1.3.0
 BOOST_VERSION=1.60.0
-GEOMETRY_VERSION=0.5.0
-GEOJSONVT_VERSION=4.1.2${CXX11ABI:-}
+GEOMETRY_VERSION=0.8.0
+GEOJSON_VERSION=0.1.4${CXX11ABI:-}
+GEOJSONVT_VERSION=6.1.2
+SUPERCLUSTER_VERSION=0.2.0
+KDBUSH_VERSION=0.1.1
 GTEST_VERSION=1.7.0${CXX11ABI:-}
 LIBJPEG_TURBO_VERSION=1.4.2
-NUNICODE_VERSION=1.6
 PIXELMATCH_VERSION=0.9.0
 RAPIDJSON_VERSION=1.0.2
 SQLITE_VERSION=3.9.1
@@ -19,12 +21,15 @@ WEBP_VERSION=0.5.0
 EARCUT_VERSION=0.11
 
 function print_default_flags {
-    CONFIG+="    'cflags': $(quote_flags -fvisibility=hidden),"$LN
+    CONFIG+="    'cflags': $(quote_flags -fvisibility=hidden -D__QT__),"$LN
 }
 
 if [ "$MASON_PLATFORM" == "osx" ]; then
+    # XXX: Argh, adding the __QT__ flag here because GYP for OSX does
+    # not respect the `cflags` variable above and we need it to reach
+    # the utests somehow. Gonna be fixed properly when we move to CMake.
     function print_opengl_flags {
-        CONFIG+="    'opengl_cflags%': [],"$LN
+        CONFIG+="    'opengl_cflags%': ['-D__QT__'],"$LN
         CONFIG+="    'opengl_ldflags%': ['-framework OpenGL', '-framework CoreFoundation'],"$LN
     }
 else
@@ -37,7 +42,12 @@ fi
 function print_qt_flags {
     mason install Qt system
 
-    QT_VERSION_MAJOR=$(qmake -query QT_VERSION | cut -d. -f1)
+    QMAKE="qmake"
+    if [ ! $(which ${QMAKE} 2>/dev/null) ]; then
+        QMAKE="qmake-qt5"
+    fi
+
+    QT_VERSION_MAJOR=$(${QMAKE} -query QT_VERSION | cut -d. -f1)
     CONFIG+="    'qt_version_major%': ['${QT_VERSION_MAJOR}'],"$LN
     CONFIG+="    'qt_image_decoders%': [0],"$LN
 

@@ -88,7 +88,11 @@ public class MapboxEventManager {
     private static long flushDelayInMillis = 1000 * 60 * 3;  // 3 Minutes
     private static final int SESSION_ID_ROTATION_HOURS = 24;
 
+    private static final int FLUSH_EVENTS_CAP = 1000;
+
     private static MessageDigest messageDigest = null;
+
+    private static final double locationEventAccuracy = 10000000;
 
     private Timer timer = null;
 
@@ -159,10 +163,12 @@ public class MapboxEventManager {
             ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             String stagingURL = appInfo.metaData.getString(MapboxConstants.KEY_META_DATA_STAGING_SERVER);
             String stagingAccessToken = appInfo.metaData.getString(MapboxConstants.KEY_META_DATA_STAGING_ACCESS_TOKEN);
-            String appName = context.getPackageManager().getApplicationLabel(appInfo).toString();
-            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            String versionName = packageInfo.versionName;
-            int versionCode = packageInfo.versionCode;
+
+            if (TextUtils.isEmpty(stagingURL) || TextUtils.isEmpty(stagingAccessToken)) {
+                Log.d(TAG, "Looking in SharedPreferences for Staging Credentials");
+                stagingURL = prefs.getString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_URL, null);
+                stagingAccessToken = prefs.getString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_ACCESS_TOKEN, null);
+            }
 
             if (!TextUtils.isEmpty(stagingURL)) {
                 eventsURL = stagingURL;
@@ -171,6 +177,11 @@ public class MapboxEventManager {
             if (!TextUtils.isEmpty(stagingAccessToken)) {
                 this.accessToken = stagingAccessToken;
             }
+
+            String appName = context.getPackageManager().getApplicationLabel(appInfo).toString();
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            String versionName = packageInfo.versionName;
+            int versionCode = packageInfo.versionCode;
 
             // Build User Agent
             if (TextUtils.equals(userAgent, BuildConfig.MAPBOX_EVENTS_USER_AGENT_BASE) && !TextUtils.isEmpty(appName) && !TextUtils.isEmpty(versionName)) {
@@ -309,23 +320,48 @@ public class MapboxEventManager {
     }
 
     /**
+     * Centralized method for adding populated event to the queue allowing for cap size checking
+     * @param event Event to add to the Events Queue
+     */
+    private void putEventOnQueue(@NonNull Hashtable<String, Object> event) {
+        if (event == null) {
+            return;
+        }
+        events.add(event);
+        if (events.size() == FLUSH_EVENTS_CAP) {
+            Log.d(TAG, "eventsSize == flushCap so send data.");
+            flushEventsQueueImmediately();
+        }
+    }
+
+    /**
      * Adds a Location Event to the system for processing
      * @param location Location event
      */
     public void addLocationEvent(Location location) {
+
+        // NaN and Infinite checks to prevent JSON errors at send to server time
+        if (Double.isNaN(location.getLatitude()) ||  Double.isNaN(location.getLongitude()) ||  Double.isNaN(location.getAltitude())) {
+            return;
+        }
+
+        if (Double.isInfinite(location.getLatitude()) ||  Double.isInfinite(location.getLongitude()) ||  Double.isInfinite(location.getAltitude())) {
+            return;
+        }
+
         // Add Location even to queue
         Hashtable<String, Object> event = new Hashtable<>();
         event.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_LOCATION);
         event.put(MapboxEvent.ATTRIBUTE_CREATED, generateCreateDate());
         event.put(MapboxEvent.ATTRIBUTE_SOURCE, MapboxEvent.SOURCE_MAPBOX);
         event.put(MapboxEvent.ATTRIBUTE_SESSION_ID, encodeString(mapboxSessionId));
-        event.put(MapboxEvent.KEY_LATITUDE, location.getLatitude());
-        event.put(MapboxEvent.KEY_LONGITUDE, location.getLongitude());
+        event.put(MapboxEvent.KEY_LATITUDE, Math.floor(location.getLatitude() * locationEventAccuracy) / locationEventAccuracy);
+        event.put(MapboxEvent.KEY_LONGITUDE, Math.floor(location.getLongitude() * locationEventAccuracy) / locationEventAccuracy);
         event.put(MapboxEvent.KEY_ALTITUDE, location.getAltitude());
         event.put(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, operatingSystem);
         event.put(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, getApplicationState());
 
-        events.add(event);
+        putEventOnQueue(event);
 
         rotateSessionId();
     }
@@ -364,7 +400,7 @@ public class MapboxEventManager {
             eventWithAttributes.put(MapboxEvent.ATTRIBUTE_WIFI, getConnectedToWifi());
 
             // Put Map Load on events before Turnstile clears it
-            events.add(eventWithAttributes);
+            putEventOnQueue(eventWithAttributes);
 
             // Turnstile
             pushTurnstileEvent();
@@ -391,7 +427,7 @@ public class MapboxEventManager {
             return;
         }
 
-       events.add(eventWithAttributes);
+       putEventOnQueue(eventWithAttributes);
     }
 
     /**
@@ -608,7 +644,9 @@ public class MapboxEventManager {
                 // =========
                 JSONArray jsonArray = new JSONArray();
 
-                for (Hashtable<String, Object> evt : events) {
+                Vector<Hashtable<String, Object>> eventsClone = (Vector<Hashtable<String, Object>>) events.clone();
+
+                for (Hashtable<String, Object> evt : eventsClone) {
                     JSONObject jsonObject = new JSONObject();
 
                     // Build the JSON but only if there's a value for it in the evt
@@ -686,19 +724,23 @@ public class MapboxEventManager {
                         .add("cloudfront-staging.tilestream.net", "sha256/sPbNCVpVasMJxps3IqFfLTRKkVnRCLrTlZVc5kspqlkw=")
                         .add("cloudfront-staging.tilestream.net", "sha256/h6801m+z8v3zbgkRHpq6L29Esgfzhj89C1SyUCOQmqU=")
                         // Prod - Geotrust
-                        .add("api.mapbox.com", "sha256/svaiYM/ZVIfxC+CMDe4kj1KsviQmzyZ9To8nQqUJwFI=")
-                        .add("api.mapbox.com", "sha256/owrR9U9FWDWtrFF+myoRIu75JwU4sJwzvhCNLZoY37g=")
-                        .add("api.mapbox.com", "sha256/SQVGZiOrQXi+kqxcvWWE96HhfydlLVqFr4lQTqI5qqo=")
+                        .add("events.mapbox.com", "sha256/BhynraKizavqoC5U26qgYuxLZst6pCu9J5stfL6RSYY=")
+                        .add("events.mapbox.com", "sha256/owrR9U9FWDWtrFF+myoRIu75JwU4sJwzvhCNLZoY37g=")
+                        .add("events.mapbox.com", "sha256/SQVGZiOrQXi+kqxcvWWE96HhfydlLVqFr4lQTqI5qqo=")
                         // Prod - DigiCert
-                        .add("api.mapbox.com", "sha256/JL+uwAwpA2U1UVl/AFdZy1ZnvkZJ1P1hRfmfPaPVSLU=")
-                        .add("api.mapbox.com", "sha256/RRM1dGqnDFsCJXBTHky16vi1obOlCgFFn/yOhI/y+ho=")
-                        .add("api.mapbox.com", "sha256/WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=")
+                        .add("events.mapbox.com", "sha256/Tb0uHZ/KQjWh8N9+CZFLc4zx36LONQ55l6laDi1qtT4=")
+                        .add("events.mapbox.com", "sha256/RRM1dGqnDFsCJXBTHky16vi1obOlCgFFn/yOhI/y+ho=")
+                        .add("events.mapbox.com", "sha256/WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=")
                         .build();
 
-                OkHttpClient client = new OkHttpClient.Builder().certificatePinner(certificatePinner).build();
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .certificatePinner(certificatePinner)
+                        .addInterceptor(new GzipRequestInterceptor())
+                        .build();
                 RequestBody body = RequestBody.create(JSON, jsonArray.toString());
 
                 String url = eventsURL + "/events/v2?access_token=" + accessToken;
+//                Log.d(TAG, "Events URL = " + url);
 
                 Request request = new Request.Builder()
                         .url(url)

@@ -9,8 +9,6 @@
 namespace mbgl {
 namespace style {
 
-class TransitionOptions;
-
 class CascadeParameters {
 public:
     std::vector<ClassID> classes;

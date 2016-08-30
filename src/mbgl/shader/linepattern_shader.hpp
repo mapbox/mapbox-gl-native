@@ -7,7 +7,7 @@ namespace mbgl {
 
 class LinepatternShader : public Shader {
 public:
-    LinepatternShader(gl::ObjectStore&);
+    LinepatternShader(gl::ObjectStore&, Defines defines = None);
 
     void bind(GLbyte *offset) final;
 
@@ -30,8 +30,6 @@ public:
     Uniform<GLfloat>                u_offset         = {"u_offset",         *this};
     Uniform<GLint>                  u_image          = {"u_image",          *this};
     UniformMatrix<2>                u_antialiasingmatrix  = {"u_antialiasingmatrix",  *this};
-
-private:
-    GLint a_data = -1;
 };
+
 } // namespace mbgl

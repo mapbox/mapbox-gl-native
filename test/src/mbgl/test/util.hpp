@@ -73,5 +73,5 @@ void checkImage(const std::string& base,
                 double imageThreshold = 0,
                 double pixelThreshold = 0);
 
-}
-}
+} // namespace test
+} // namespace mbgl

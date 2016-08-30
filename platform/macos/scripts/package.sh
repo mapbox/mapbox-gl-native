@@ -38,7 +38,7 @@ xcodebuild \
 
 step "Copying dynamic framework into place"
 mkdir -p "${OUTPUT}/${NAME}.framework"
-cp -r ${PRODUCTS}/${BUILDTYPE}/${NAME}.framework/* "${OUTPUT}/${NAME}.framework"
+ditto ${PRODUCTS}/${BUILDTYPE}/${NAME}.framework "${OUTPUT}/${NAME}.framework"
 if [[ -e ${PRODUCTS}/${BUILDTYPE}/${NAME}.framework.dSYM ]]; then
     cp -r ${PRODUCTS}/${BUILDTYPE}/${NAME}.framework.dSYM "${OUTPUT}"
 fi

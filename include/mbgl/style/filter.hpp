@@ -2,6 +2,7 @@
 
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/feature.hpp>
+#include <mbgl/util/geometry.hpp>
 
 #include <string>
 #include <vector>
@@ -9,22 +10,7 @@
 namespace mbgl {
 namespace style {
 
-typedef variant<
-    class NullFilter,
-    class EqualsFilter,
-    class NotEqualsFilter,
-    class LessThanFilter,
-    class LessThanEqualsFilter,
-    class GreaterThanFilter,
-    class GreaterThanEqualsFilter,
-    class InFilter,
-    class NotInFilter,
-    class AnyFilter,
-    class AllFilter,
-    class NoneFilter,
-    class HasFilter,
-    class NotHasFilter
-    > Filter;
+class Filter;
 
 class NullFilter {};
 
@@ -99,6 +85,32 @@ public:
 class NotHasFilter {
 public:
     std::string key;
+};
+
+using FilterBase = variant<
+    class NullFilter,
+    class EqualsFilter,
+    class NotEqualsFilter,
+    class LessThanFilter,
+    class LessThanEqualsFilter,
+    class GreaterThanFilter,
+    class GreaterThanEqualsFilter,
+    class InFilter,
+    class NotInFilter,
+    class AnyFilter,
+    class AllFilter,
+    class NoneFilter,
+    class HasFilter,
+    class NotHasFilter>;
+
+class Filter : public FilterBase {
+public:
+    using FilterBase::FilterBase;
+
+    bool operator()(const Feature&) const;
+
+    template <class PropertyAccessor>
+    bool operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor) const;
 };
 
 } // namespace style

@@ -13,6 +13,7 @@ public:
     ~StubFileSource() override;
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
+    void remove(AsyncRequest*);
 
     using ResponseFunction = std::function<optional<Response> (const Resource&)>;
 
@@ -30,8 +31,6 @@ public:
     ResponseFunction spriteImageResponse;
 
 private:
-    friend class StubFileRequest;
-
     // The default behavior is to throw if no per-kind callback has been set.
     optional<Response> defaultResponse(const Resource&);
 

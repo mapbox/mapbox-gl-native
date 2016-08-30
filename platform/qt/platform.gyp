@@ -46,11 +46,10 @@
         '../default/mbgl/storage/offline_download.cpp',
         '../default/online_file_source.cpp',
         '../default/sqlite3.cpp',
-        '../default/string_stdlib.cpp',
-        '../default/thread.cpp',
         'include/qmapbox.hpp',
         'include/qmapboxgl.hpp',
         'include/qquickmapboxgl.hpp',
+        'include/qquickmapboxglstyleproperty.hpp',
         'qmapbox.qrc',
         'src/async_task.cpp',
         'src/async_task_impl.hpp',
@@ -63,10 +62,12 @@
         'src/qmapboxgl.cpp',
         'src/qmapboxgl_p.hpp',
         'src/qquickmapboxgl.cpp',
+        'src/qquickmapboxglstyleproperty.cpp',
         'src/qquickmapboxglrenderer.cpp',
         'src/qquickmapboxglrenderer.hpp',
         'src/run_loop.cpp',
         'src/run_loop_impl.hpp',
+        'src/string_stdlib.cpp',
         'src/timer.cpp',
         'src/timer_impl.hpp',
       ],
@@ -74,6 +75,8 @@
       'variables': {
         'cflags': [
           '<@(boost_cflags)',
+          '<@(geojson_cflags)',
+          '<@(libjpeg-turbo_cflags)',
           '<@(nunicode_cflags)',
           '<@(opengl_cflags)',
           '<@(qt_core_cflags)',
@@ -93,6 +96,8 @@
           '<@(zlib_ldflags)',
         ],
         'libraries': [
+          '<@(geojson_static_libs)',
+          '<@(libjpeg-turbo_static_libs)',
           '<@(nunicode_static_libs)',
           '<@(sqlite_static_libs)',
           '<@(zlib_static_libs)',
@@ -124,6 +129,12 @@
             'libraries': [
               '<@(libjpeg-turbo_static_libs)',
               '<@(webp_static_libs)',
+            ],
+          },
+        }, {
+          'variables': {
+            'cflags': [
+              '-DQT_IMAGE_DECODERS',
             ],
           },
         }],
@@ -158,16 +169,25 @@
         ['OS == "mac"', {
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags)' ],
-          }
+          },
+          'sources': [
+            '../darwin/src/nsthread.mm',
+          ],
         }, {
           'cflags_cc': [ '<@(cflags)' ],
+          'sources': [
+            '../default/thread.cpp',
+          ],
         }]
       ],
 
       'link_settings': {
         'conditions': [
           ['OS == "mac"', {
-            'libraries': [ '<@(libraries)' ],
+            'libraries': [
+              '<@(libraries)',
+              '$(SDKROOT)/System/Library/Frameworks/Cocoa.framework',
+            ],
             'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
           }, {
             'libraries': [ '<@(libraries)', '<@(ldflags)' ],

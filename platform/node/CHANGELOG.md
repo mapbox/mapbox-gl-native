@@ -1,25 +1,41 @@
-# 3.2.1
+# 3.3.2 - August 1, 2016
+
+- Fixes Node.js binary publishing to build with `BUILDTYPE=Release` ([#5838](https://github.com/mapbox/mapbox-gl-native/pull/5838))
+
+# 3.3.1 - July 29, 2016
+
+- Fixes `minzoom` and `maxzoom` properties ([#5828](https://github.com/mapbox/mapbox-gl-native/pull/5828))
+- Fixes `RunLoop::runOnce()` to use `UV_RUN_NOWAIT` instead of `UV_RUN_ONCE` (which can block the libuv threadpool) ([#5758](https://github.com/mapbox/mapbox-gl-native/pull/5758))
+- Map debug options 'overdraw' and 'stencil clip' are now disabled (no-ops) in release mode ([#5555](https://github.com/mapbox/mapbox-gl-native/pull/5555))
+
+# 3.3.0 - July 14, 2016
+
+- Adds runtime styling API ([#5318](https://github.com/mapbox/mapbox-gl-native/pull/5318), [#5380](https://github.com/mapbox/mapbox-gl-native/pull/5380), [#5428](https://github.com/mapbox/mapbox-gl-native/pull/5428), [#5429](https://github.com/mapbox/mapbox-gl-native/pull/5429), [#5462](https://github.com/mapbox/mapbox-gl-native/pull/5462), [#5614](https://github.com/mapbox/mapbox-gl-native/pull/5614), [#5670](https://github.com/mapbox/mapbox-gl-native/pull/5670))
+- Adds `BUILDTYPE=Debug` support to `make node` ([#5474](https://github.com/mapbox/mapbox-gl-native/pull/5474))
+- Fixes a memory leak in `NodeRequest` ([#5529](https://github.com/mapbox/mapbox-gl-native/pull/5529))
+
+# 3.2.1 - June 7, 2016
 
 - Fixes a memory leak in raster image data ([#5269](https://github.com/mapbox/mapbox-gl-native/pull/5269))
 
-# 3.2.0
+# 3.2.0 - June 3, 2016
 
 - Switches to [earcut.hpp](https://github.com/mapbox/earcut.hpp) for tessellation ([#2444](https://github.com/mapbox/mapbox-gl-native/pull/2444))
 
-# 3.1.3
+# 3.1.3 - May 27, 2016
 
 - Fixes a leak in TexturePoolHolder ([#5141](https://github.com/mapbox/mapbox-gl-native/pull/5141))
 - Fixes a bug where a callback would be fired after an AsyncRequest had been cancelled ([#5162](https://github.com/mapbox/mapbox-gl-native/pull/5162))
 
-# 3.1.2
+# 3.1.2 - April 26, 2016
 
 - Fixes a race condition with animated transitions ([#4836](https://github.com/mapbox/mapbox-gl-native/pull/4836))
 
-# 3.1.1
+# 3.1.1 - April 11, 2016
 
 - Moves node-pre-gyp from `bundledDependencies` to `preinstall` ([#4680](https://github.com/mapbox/mapbox-gl-native/pull/4680))
 
-# 3.1.0
+# 3.1.0 - April 8, 2016
 
 - Adds debug render options ([#3840](https://github.com/mapbox/mapbox-gl-native/pull/3840))
 - Fixes circle bucket rendering on tile boundaries ([#3764](https://github.com/mapbox/mapbox-gl-native/issues/3764))
@@ -29,45 +45,44 @@
 - Fixes intermittent `stencil mask overflow` error ([#962](https://github.com/mapbox/mapbox-gl-native/issues/962))
 - Drops support for Node.js v5.x prebuilt binaries due to ongoing npm3 instability ([#4370](https://github.com/mapbox/mapbox-gl-native/issues/4370))
 
-# 3.0.2
+# 3.0.2 - February 4, 2016
 
 - Fixes a memory leak in `NodeMap::request` ([#3829](https://github.com/mapbox/mapbox-gl-native/pull/3829))
 - Increases default max zoom level from 18 to 20 ([#3712](https://github.com/mapbox/mapbox-gl-native/pull/3712))
 - Support tiles with non-4096 extents ([#3766](https://github.com/mapbox/mapbox-gl-native/pull/3766))
 
-# 3.0.1
+# 3.0.1 - January 26, 2016
 
 - Fixes missing icon collision boxes ([#3672](https://github.com/mapbox/mapbox-gl-native/pull/3672))
 - Fixes texture filtering to draw sharper icons ([#3669](https://github.com/mapbox/mapbox-gl-native/pull/3669))
 
-
-# 3.0.0
+# 3.0.0 - January 21, 2016
 
 - Drops support for Node.js v0.10.x ([#3635](https://github.com/mapbox/mapbox-gl-native/pull/3635))
 - Fixes label clipping issues with `symbol-avoid-edges` ([#3623](https://github.com/mapbox/mapbox-gl-native/pull/3623))
 - Avoids label placement around sharp zig-zags ([#3640](https://github.com/mapbox/mapbox-gl-native/pull/3640))
 
-# 2.2.2
+# 2.2.2 - January 19, 2016
 
 - Fixes a bug with non-deterministic label placement [#3543](https://github.com/mapbox/mapbox-gl-native/pull/3543)
 
-# 2.2.1
+# 2.2.1 - January 7, 2016
 
 - Fixes a bug which clipped labels at tile boundaries [#2829](https://github.com/mapbox/mapbox-gl-native/pull/2829)
 
-# 2.2.0
+# 2.2.0 - December 16, 2015
 
 - Adds support for GeoJSON sources [#2161](https://github.com/mapbox/mapbox-gl-native/pull/2161)
 
-# 2.1.0
+# 2.1.0 - December 8, 2015
 
 - Adds [`line-offset`](https://github.com/mapbox/mapbox-gl/issues/3) style property support
 
-# 2.0.1
+# 2.0.1 - November 25, 2015
 
 - Test and publish binaries for Node.js v5.x. ([#3129](https://github.com/mapbox/mapbox-gl-native/pull/3129))
 
-# 2.0.0
+# 2.0.0 - November 24, 2015
 
 - Integrates Node.js bindings into core mapbox-gl-native project. ([#2179](https://github.com/mapbox/mapbox-gl-native/pull/2179))
 - Adds Node.js v4.x and io.js v3.x support. ([#2261](https://github.com/mapbox/mapbox-gl-native/pull/2261))
@@ -89,11 +104,11 @@
 - Fade transitions are now ignored to prevent half faded labels. ([#942](https://github.com/mapbox/mapbox-gl-native/pull/942))
 - Labels can now line wrap on hyphens and other punctuation. ([#2598](https://github.com/mapbox/mapbox-gl-native/pull/2598))
 
-# 1.1.3
+# 1.1.3 - June 25, 2015
 
 - Removes deprecated mbgl::Environment from NodeLogObserver.
 
-# 1.1.2
+# 1.1.2 - June 22, 2015
 
 - Check libuv version semver-ishly, fixes segfaults in Node.js 0.12.x
   and io.js.
@@ -101,11 +116,11 @@
   render without first loading a style.
 - Bumps mbgl submodule to v0.4.0
 
-# 1.1.1
+# 1.1.1 - June 16, 2015
 
 - Bumps mbgl submodule to v0.3.5
 
-# 1.1.0
+# 1.1.0 - June 15, 2015
 
 - Adds Node.js v0.12.x and io.js support.
 - Adds `map.release()` method for manual cleanup of map resources.
@@ -121,23 +136,23 @@
 - Fixes uncaught exception from missing sprites.
 - Fixes Unicode glyph range end.
 
-# 1.0.3
+# 1.0.3 - April 3, 2015
 
 - Fixes crash during garbage collection by assigning FileSource handle 
   to a v8::Persistent in NodeMap constructor.
 
-# 1.0.2
+# 1.0.2 - April 2, 2015
 
 - Initialize shared display connection at module load time to avoid 
   race condition when display connection is initialized on-demand.
 
-# 1.0.1
+# 1.0.1 - March 19, 2015
 
 - Adapts NodeFileSource around mbgl::Environment additions.
 - Adapts to minor changes in mapbox-gl-test-suite.
 - Adds tests for gzipped vector tile handling.
 - Cleans up documentation.
 
-# 1.0.0
+# 1.0.0 - February 25, 2015
 
 - Initial release.

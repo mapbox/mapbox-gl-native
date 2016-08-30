@@ -2,12 +2,26 @@ export BUILDTYPE ?= Debug
 
 ifeq ($(shell uname -s), Darwin)
   HOST_PLATFORM = macos
+  HOST_PLATFORM_VERSION = $(shell uname -m)
   export JOBS ?= $(shell sysctl -n hw.ncpu)
 else ifeq ($(shell uname -s), Linux)
   HOST_PLATFORM = linux
+  HOST_PLATFORM_VERSION = $(shell uname -m)
   export JOBS ?= $(shell grep --count processor /proc/cpuinfo)
 else
   $(error Cannot determine host platform)
+endif
+
+ifeq ($(MASON_PLATFORM),)
+  BUILD_PLATFORM = $(HOST_PLATFORM)
+else
+  BUILD_PLATFORM = $(MASON_PLATFORM)
+endif
+
+ifeq ($(MASON_PLATFORM_VERSION),)
+  BUILD_PLATFORM_VERSION = $(HOST_PLATFORM_VERSION)
+else
+  BUILD_PLATFORM_VERSION = $(MASON_PLATFORM_VERSION)
 endif
 
 ifeq ($(V), 1)
@@ -16,7 +30,7 @@ else
   export XCPRETTY ?= | xcpretty
 endif
 
-default: test-$(HOST_PLATFORM)
+default: test-$(BUILD_PLATFORM)
 
 ifneq (,$(wildcard .git/.))
 .mason/mason:
@@ -25,6 +39,7 @@ else
 .mason/mason: ;
 endif
 
+.NOTPARALLEL: node_modules
 node_modules: package.json
 	npm update # Install dependencies but don't run our own install script.
 
@@ -152,6 +167,9 @@ idocument:
 ANDROID_ENV = platform/android/scripts/toolchain.sh
 ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
 
+style-code-android:
+	node platform/android/scripts/generate-style-code.js
+
 define ANDROID_RULES
 build/android-$1/config.gypi: platform/android/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	$$(shell $(ANDROID_ENV) $1) ./configure $$< $$@ android $1
@@ -163,7 +181,7 @@ build/android-$1/Makefile: platform/android/platform.gyp build/android-$1/config
 android-lib-$1: build/android-$1/Makefile
 	$$(shell $(ANDROID_ENV) $1) $(MAKE) -j$(JOBS) -C build/android-$1 all
 
-android-$1: android-lib-$1
+android-$1: android-lib-$1 style-code-android
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
 apackage: android-lib-$1
@@ -182,13 +200,17 @@ apackage:
 #### Node targets #####################################################
 
 NODE_PRE_GYP = $(shell npm bin)/node-pre-gyp
-NODE_OUTPUT_PATH = build/node-$(HOST_PLATFORM)-$(shell uname -m)
+NODE_OUTPUT_PATH = build/node-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
 
-$(NODE_OUTPUT_PATH)/config.gypi: platform/$(HOST_PLATFORM)/scripts/configure.sh $(CONFIG_DEPENDENCIES)
-	./configure $< $@ $(HOST_PLATFORM) $(shell uname -m)
+ifeq ($(BUILDTYPE), Debug)
+	NODE_DEBUG = "--debug"
+endif
+
+$(NODE_OUTPUT_PATH)/config.gypi: platform/$(BUILD_PLATFORM)/scripts/configure.sh $(CONFIG_DEPENDENCIES)
+	./configure $< $@ $(BUILD_PLATFORM) $(BUILD_PLATFORM_VERSION)
 
 node: $(NODE_OUTPUT_PATH)/config.gypi node_modules $(GYP_DEPENDENCIES)
-	$(NODE_PRE_GYP) configure --clang -- -I$< \
+	$(NODE_PRE_GYP) configure --clang $(NODE_DEBUG) -- -I$< \
 	  -Dcoverage= -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
 	$(NODE_PRE_GYP) build --clang
 
@@ -203,21 +225,31 @@ xnode: $(NODE_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
 .PHONY: test-node
 test-node: node
 	npm test
+	npm run test-memory
 	npm run test-suite
 
 #### Qt targets #####################################################
 
-QT_OUTPUT_PATH = build/qt-$(HOST_PLATFORM)-$(shell uname -m)
+QT_OUTPUT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
 QT_MAKEFILE = $(QT_OUTPUT_PATH)/Makefile
 
 # Cross compilation support
-QT_ENV = $(shell MASON_PLATFORM_VERSION=$(shell uname -m) ./platform/qt/scripts/toolchain.sh)
+QT_ENV = $(shell MASON_PLATFORM_VERSION=$(BUILD_PLATFORM_VERSION) ./platform/qt/scripts/toolchain.sh)
 
 $(QT_OUTPUT_PATH)/config.gypi: platform/qt/scripts/configure.sh $(CONFIG_DEPENDENCIES)
-	$(QT_ENV) ./configure $< $@ $(HOST_PLATFORM) $(shell uname -m)
+	$(QT_ENV) ./configure $< $@ $(BUILD_PLATFORM) $(BUILD_PLATFORM_VERSION)
+
+GYP_FLAVOR = make
+ifneq ($(HOST_PLATFORM),$(BUILD_PLATFORM))
+  ifeq ($(BUILD_PLATFORM), linux)
+    GYP_FLAVOR = make-linux
+  else ifeq ($(BUILD_PLATFORM), macos)
+    GYP_FLAVOR = make-mac
+  endif
+endif
 
 $(QT_MAKEFILE): platform/qt/platform.gyp $(QT_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
-	$(QT_ENV) $(GYP) -f make -I $(QT_OUTPUT_PATH)/config.gypi \
+	$(QT_ENV) $(GYP) -f $(GYP_FLAVOR) -I $(QT_OUTPUT_PATH)/config.gypi \
 	  --generator-output=$(QT_OUTPUT_PATH) $<
 
 qt-lib: $(QT_MAKEFILE)
@@ -229,9 +261,11 @@ qt-app: $(QT_MAKEFILE)
 qt-qml-app: $(QT_MAKEFILE)
 	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) qt-qml-app
 
-test-qt: $(QT_MAKEFILE) node_modules
+test-qt-%: $(QT_MAKEFILE) node_modules
 	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) test
-	$(GDB) $(QT_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=*
+	$(GDB) $(QT_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=$*
+
+test-qt: test-qt-*
 
 run-qt-app: qt-app
 	cd $(QT_OUTPUT_PATH)/$(BUILDTYPE) && ./qmapboxgl
@@ -239,13 +273,24 @@ run-qt-app: qt-app
 run-qt-qml-app: qt-qml-app
 	cd $(QT_OUTPUT_PATH)/$(BUILDTYPE) && ./qquickmapboxgl
 
+test-valgrind-qt-%: $(QT_MAKEFILE) node_modules
+	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) test
+	.mason/mason install valgrind latest
+	./scripts/valgrind.sh $(QT_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=$*
+
+test-valgrind-qt: test-valgrind-qt-*
+
+run-valgrind-qt-app: qt-app
+	.mason/mason install valgrind latest
+	./scripts/valgrind.sh $(QT_OUTPUT_PATH)/$(BUILDTYPE)/qmapboxgl --test -platform offscreen
+
 #### Linux targets #####################################################
 
-LINUX_OUTPUT_PATH = build/linux-$(shell uname -m)
+LINUX_OUTPUT_PATH = build/linux-$(BUILD_PLATFORM_VERSION)
 LINUX_MAKEFILE = $(LINUX_OUTPUT_PATH)/Makefile
 
 $(LINUX_OUTPUT_PATH)/config.gypi: platform/linux/scripts/configure.sh $(CONFIG_DEPENDENCIES)
-	./configure $< $@ linux $(shell uname -m)
+	./configure $< $@ linux $(BUILD_PLATFORM_VERSION)
 
 $(LINUX_MAKEFILE): platform/linux/platform.gyp $(LINUX_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
 	$(GYP) -f make -I $(LINUX_OUTPUT_PATH)/config.gypi \
@@ -270,9 +315,6 @@ test: $(LINUX_MAKEFILE)
 run-glfw-app: glfw-app
 	cd $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) && ./mapbox-glfw
 
-run-valgrind-glfw-app: glfw-app
-	cd $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup ./mapbox-glfw
-
 ifneq (,$(shell which gdb))
   GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
 endif
@@ -280,19 +322,49 @@ endif
 test-%: test
 	$(GDB) $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=$*
 
-check: test
+coverage: test
 	scripts/collect-coverage.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
 
 # Generates a compilation database with ninja for use in clang tooling
-compdb: platform/linux/platform.gyp $(LINUX_OUTPUT_PATH)/config.gypi
+compdb: node_modules compdb-$(BUILD_PLATFORM)
+
+compdb-linux: platform/linux/platform.gyp $(LINUX_OUTPUT_PATH)/config.gypi
 	$(GYP) -f ninja -I $(LINUX_OUTPUT_PATH)/config.gypi \
 	  --generator-output=$(LINUX_OUTPUT_PATH) $<
 	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) \
 		-t compdb cc cc_s cxx objc objcxx > $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)/compile_commands.json
 
-tidy: compdb
-	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) version shaders
-	scripts/clang-tidy.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
+compdb-macos: platform/macos/platform.gyp $(MACOS_OUTPUT_PATH)/config.gypi
+	$(GYP) -f ninja -I $(MACOS_OUTPUT_PATH)/config.gypi \
+	  --generator-output=$(MACOS_OUTPUT_PATH) $<
+	deps/ninja/ninja-macos -C $(MACOS_OUTPUT_PATH)/$(BUILDTYPE) \
+		-t compdb cc cc_s cxx objc objcxx > $(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/compile_commands.json
+
+tidy: compdb tidy-$(BUILD_PLATFORM)
+
+clang-tools-linux:
+	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
+	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
+	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) headers
+
+tidy-linux: clang-tools-linux
+	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
+
+clang-tools-macos:
+	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
+	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
+	deps/ninja/ninja-macos -C $(MACOS_OUTPUT_PATH)/$(BUILDTYPE) headers
+
+tidy-macos: clang-tools-macos
+	scripts/clang-tools.sh $(MACOS_OUTPUT_PATH)/$(BUILDTYPE)
+
+check: compdb check-$(BUILD_PLATFORM)
+
+check-linux: clang-tools-linux
+	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) --diff
+
+check-macos: clang-tools-macos
+	scripts/clang-tools.sh $(MACOS_OUTPUT_PATH)/$(BUILDTYPE) --diff
 
 #### Miscellaneous targets #####################################################
 

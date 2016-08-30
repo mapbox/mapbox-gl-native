@@ -63,8 +63,8 @@ public:
 
 class HTTPRequest : public AsyncRequest {
 public:
-    HTTPRequest(HTTPFileSource::Impl*, const Resource&, FileSource::Callback);
-    ~HTTPRequest();
+    HTTPRequest(HTTPFileSource::Impl*, Resource, FileSource::Callback);
+    ~HTTPRequest() override;
 
     void handleResult(CURLcode code);
 
@@ -219,10 +219,10 @@ int HTTPFileSource::Impl::startTimeout(CURLM * /* multi */, long timeout_ms, voi
     return 0;
 }
 
-HTTPRequest::HTTPRequest(HTTPFileSource::Impl* context_, const Resource& resource_, FileSource::Callback callback_)
+HTTPRequest::HTTPRequest(HTTPFileSource::Impl* context_, Resource resource_, FileSource::Callback callback_)
     : context(context_),
-      resource(resource_),
-      callback(callback_),
+      resource(std::move(resource_)),
+      callback(std::move(callback_)),
       handle(context->getHandle()) {
 
     // If there's already a response, set the correct etags/modified headers to make sure we are

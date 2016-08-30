@@ -90,13 +90,8 @@ dependencies {
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta1'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta1'
 
-    // Directions SDK
-    compile('com.mapbox.mapboxsdk:mapbox-android-directions:1.0.0@aar') {
-        transitive = true
-    }
-
-    // Geocoder SDK
-    compile('com.mapbox.mapboxsdk:mapbox-android-geocoder:1.0.0@aar') {
+    // Mapbox Android Services
+    compile('com.mapbox.mapboxsdk:mapbox-android-services:1.1.0@aar') {
         transitive = true
     }
 
@@ -107,7 +102,6 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.4.1'
     androidTestCompile 'com.android.support.test:rules:0.4.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
-    androidTestCompile 'com.jayway.android.robotium:robotium-solo:5.5.4'
 }
 
 checkstyle {

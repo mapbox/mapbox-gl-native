@@ -11,7 +11,7 @@ export PATH="${MASON_DIR}:${PATH}"
 export MASON_ANDROID_ABI=x86
 export MASON_ANDROID_ARCH=x86
 export MASON_ANDROID_PLATFORM=9
-export MASON_NDK_PACKAGE_VERSION=${MASON_ANDROID_ARCH}-${MASON_ANDROID_PLATFORM}-r10e
+export MASON_NDK_PACKAGE_VERSION=${MASON_ANDROID_ARCH}-${MASON_ANDROID_PLATFORM}-r12b
 
 if [[ $1 == '--prepare' ]]; then
   mkdir -p ~/.android/debugging/{vendor,system}_lib

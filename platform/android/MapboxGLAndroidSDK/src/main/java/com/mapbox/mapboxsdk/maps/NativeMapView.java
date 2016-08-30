@@ -5,15 +5,21 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.Surface;
 
+import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
-import com.mapbox.mapboxsdk.layers.CustomLayer;
+import com.mapbox.mapboxsdk.offline.OfflineManager;
+import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
+import com.mapbox.mapboxsdk.style.sources.Source;
 
 import java.util.List;
 
@@ -50,7 +56,7 @@ final class NativeMapView {
 
     public NativeMapView(MapView mapView) {
         Context context = mapView.getContext();
-        String dataPath = context.getFilesDir().getAbsolutePath();
+        String dataPath = OfflineManager.getDatabasePath(context);
 
         // With the availability of offline, we're unifying the ambient (cache) and the offline
         // databases to be in the same folder, outside cache, to avoid automatic deletion from
@@ -230,7 +236,7 @@ final class NativeMapView {
     }
 
     public void setLatLng(LatLng latLng, long duration) {
-        nativeSetLatLng(mNativeMapViewPtr, latLng, duration);
+        nativeSetLatLng(mNativeMapViewPtr, latLng.getLatitude(), latLng.getLongitude(), duration);
     }
 
     public LatLng getLatLng() {
@@ -343,7 +349,7 @@ final class NativeMapView {
     }
 
     public long addMarker(Marker marker) {
-        Marker[] markers = { marker };
+        Marker[] markers = {marker};
         return nativeAddMarkers(mNativeMapViewPtr, markers)[0];
     }
 
@@ -352,7 +358,7 @@ final class NativeMapView {
     }
 
     public long addPolyline(Polyline polyline) {
-        Polyline[] polylines = { polyline };
+        Polyline[] polylines = {polyline};
         return nativeAddPolylines(mNativeMapViewPtr, polylines)[0];
     }
 
@@ -361,7 +367,7 @@ final class NativeMapView {
     }
 
     public long addPolygon(Polygon polygon) {
-        Polygon[] polygons = { polygon };
+        Polygon[] polygons = {polygon};
         return nativeAddPolygons(mNativeMapViewPtr, polygons)[0];
     }
 
@@ -370,11 +376,25 @@ final class NativeMapView {
     }
 
     public void updateMarker(Marker marker) {
-        nativeUpdateMarker(mNativeMapViewPtr, marker);
+        LatLng position = marker.getPosition();
+        Icon icon = marker.getIcon();
+        nativeUpdateMarker(mNativeMapViewPtr, marker.getId(), position.getLatitude(), position.getLongitude(), icon.getId());
+    }
+
+    public void updatePolygon(Polygon polygon) {
+        //TODO remove new id assignment, https://github.com/mapbox/mapbox-gl-native/issues/5844
+        long newId = nativeUpdatePolygon(mNativeMapViewPtr, polygon.getId(), polygon);
+        polygon.setId(newId);
+    }
+
+    public void updatePolyline(Polyline polyline) {
+        //TODO remove new id assignment, https://github.com/mapbox/mapbox-gl-native/issues/5844
+        long newId = nativeUpdatePolyline(mNativeMapViewPtr, polyline.getId(), polyline);
+        polyline.setId(newId);
     }
 
     public void removeAnnotation(long id) {
-        long[] ids = { id };
+        long[] ids = {id};
         removeAnnotations(ids);
     }
 
@@ -423,19 +443,19 @@ final class NativeMapView {
     }
 
     public ProjectedMeters projectedMetersForLatLng(LatLng latLng) {
-        return nativeProjectedMetersForLatLng(mNativeMapViewPtr, latLng);
+        return nativeProjectedMetersForLatLng(mNativeMapViewPtr, latLng.getLatitude(), latLng.getLongitude());
     }
 
     public LatLng latLngForProjectedMeters(ProjectedMeters projectedMeters) {
-        return nativeLatLngForProjectedMeters(mNativeMapViewPtr, projectedMeters);
+        return nativeLatLngForProjectedMeters(mNativeMapViewPtr, projectedMeters.getNorthing(), projectedMeters.getEasting());
     }
 
     public PointF pixelForLatLng(LatLng latLng) {
-        return nativePixelForLatLng(mNativeMapViewPtr, latLng);
+        return nativePixelForLatLng(mNativeMapViewPtr, latLng.getLatitude(), latLng.getLongitude());
     }
 
     public LatLng latLngForPixel(PointF pixel) {
-        return nativeLatLngForPixel(mNativeMapViewPtr, pixel);
+        return nativeLatLngForPixel(mNativeMapViewPtr, pixel.x, pixel.y);
     }
 
     public double getTopOffsetPixelsForAnnotationSymbol(String symbolName) {
@@ -443,27 +463,46 @@ final class NativeMapView {
     }
 
     public void jumpTo(double angle, LatLng center, double pitch, double zoom) {
-        nativeJumpTo(mNativeMapViewPtr, angle, center, pitch, zoom);
+        nativeJumpTo(mNativeMapViewPtr, angle, center.getLatitude(), center.getLongitude(), pitch, zoom);
     }
 
     public void easeTo(double angle, LatLng center, long duration, double pitch, double zoom, boolean easingInterpolator) {
-        nativeEaseTo(mNativeMapViewPtr, angle, center, duration, pitch, zoom, easingInterpolator);
+        nativeEaseTo(mNativeMapViewPtr, angle, center.getLatitude(), center.getLongitude(), duration, pitch, zoom, easingInterpolator);
     }
 
     public void flyTo(double angle, LatLng center, long duration, double pitch, double zoom) {
-        nativeFlyTo(mNativeMapViewPtr, angle, center, duration, pitch, zoom);
+        nativeFlyTo(mNativeMapViewPtr, angle, center.getLatitude(), center.getLongitude(), duration, pitch, zoom);
     }
 
-    public void addCustomLayer(CustomLayer customLayer, String before) {
-        nativeAddCustomLayer(mNativeMapViewPtr, customLayer, before);
-    }
-
-    public void removeCustomLayer(String id) {
-        nativeRemoveCustomLayer(mNativeMapViewPtr, id);
-    }
-
-    public double[] getCameraValues(){
+    public double[] getCameraValues() {
         return nativeGetCameraValues(mNativeMapViewPtr);
+    }
+
+    // Runtime style Api
+
+    public Layer getLayer(String layerId) {
+        return nativeGetLayer(mNativeMapViewPtr, layerId);
+    }
+
+    public void addLayer(@NonNull Layer layer, @Nullable String before) {
+        nativeAddLayer(mNativeMapViewPtr, layer.getNativePtr(), before);
+        layer.invalidate();
+    }
+
+    public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
+        nativeRemoveLayer(mNativeMapViewPtr, layerId);
+    }
+
+    public void addSource(@NonNull Source source) {
+        nativeAddSource(mNativeMapViewPtr, source.getId(), source);
+    }
+
+    public void removeSource(@NonNull String sourceId) {
+        nativeRemoveSource(mNativeMapViewPtr, sourceId);
+    }
+
+    public void scheduleTakeSnapshot() {
+        nativeScheduleTakeSnapshot(mNativeMapViewPtr);
     }
 
     //
@@ -480,6 +519,10 @@ final class NativeMapView {
 
     protected void onFpsChanged(double fps) {
         mMapView.onFpsChanged(fps);
+    }
+
+    protected void onSnapshotReady(byte[] bytes) {
+        mMapView.onSnapshotReady(bytes);
     }
 
     //
@@ -539,7 +582,7 @@ final class NativeMapView {
     private native void nativeMoveBy(long nativeMapViewPtr, double dx,
                                      double dy, long duration);
 
-    private native void nativeSetLatLng(long nativeMapViewPtr, LatLng latLng,
+    private native void nativeSetLatLng(long nativeMapViewPtr, double latitude, double longitude,
                                         long duration);
 
     private native LatLng nativeGetLatLng(long nativeMapViewPtr);
@@ -588,7 +631,7 @@ final class NativeMapView {
 
     private native void nativeResetNorth(long nativeMapViewPtr);
 
-    private native void nativeUpdateMarker(long nativeMapViewPtr, Marker marker);
+    private native void nativeUpdateMarker(long nativeMapViewPtr, long markerId, double lat, double lon, String iconId);
 
     private native long[] nativeAddMarkers(long nativeMapViewPtr, Marker[] markers);
 
@@ -620,25 +663,37 @@ final class NativeMapView {
 
     private native double nativeGetMetersPerPixelAtLatitude(long nativeMapViewPtr, double lat, double zoom);
 
-    private native ProjectedMeters nativeProjectedMetersForLatLng(long nativeMapViewPtr, LatLng latLng);
+    private native ProjectedMeters nativeProjectedMetersForLatLng(long nativeMapViewPtr, double latitude, double longitude);
 
-    private native LatLng nativeLatLngForProjectedMeters(long nativeMapViewPtr, ProjectedMeters projectedMeters);
+    private native LatLng nativeLatLngForProjectedMeters(long nativeMapViewPtr, double northing, double easting);
 
-    private native PointF nativePixelForLatLng(long nativeMapViewPtr, LatLng latLng);
+    private native PointF nativePixelForLatLng(long nativeMapViewPtr, double lat, double lon);
 
-    private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, PointF pixel);
+    private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, float x, float y);
 
     private native double nativeGetTopOffsetPixelsForAnnotationSymbol(long nativeMapViewPtr, String symbolName);
 
-    private native void nativeJumpTo(long nativeMapViewPtr, double angle, LatLng center, double pitch, double zoom);
+    private native void nativeJumpTo(long nativeMapViewPtr, double angle, double latitude, double longitude, double pitch, double zoom);
 
-    private native void nativeEaseTo(long nativeMapViewPtr, double angle, LatLng center, long duration, double pitch, double zoom, boolean easingInterpolator);
+    private native void nativeEaseTo(long nativeMapViewPtr, double angle, double latitude, double longitude, long duration, double pitch, double zoom, boolean easingInterpolator);
 
-    private native void nativeFlyTo(long nativeMapViewPtr, double angle, LatLng center, long duration, double pitch, double zoom);
-
-    private native void nativeAddCustomLayer(long nativeMapViewPtr, CustomLayer customLayer, String before);
-
-    private native void nativeRemoveCustomLayer(long nativeMapViewPtr, String id);
+    private native void nativeFlyTo(long nativeMapViewPtr, double angle, double latitude, double longitude, long duration, double pitch, double zoom);
 
     private native double[] nativeGetCameraValues(long mNativeMapViewPtr);
+
+    private native Layer nativeGetLayer(long nativeMapViewPtr, String layerId);
+
+    private native void nativeAddLayer(long nativeMapViewPtr, long layerPtr, String before);
+
+    private native void nativeRemoveLayer(long nativeMapViewPtr, String layerId) throws NoSuchLayerException;
+
+    private native void nativeAddSource(long mNativeMapViewPtr, String id, Source source);
+
+    private native void nativeRemoveSource(long mNativeMapViewPtr, String sourceId);
+
+    private native long nativeUpdatePolygon(long nativeMapViewPtr, long polygonId, Polygon polygon);
+
+    private native long nativeUpdatePolyline(long nativeMapviewPtr, long polylineId, Polyline polyline);
+
+    private native void nativeScheduleTakeSnapshot(long nativeMapViewPtr);
 }

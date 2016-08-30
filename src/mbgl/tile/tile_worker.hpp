@@ -2,13 +2,13 @@
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/tile/tile_id.hpp>
-#include <mbgl/util/atomic.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 
+#include <atomic>
 #include <string>
 #include <memory>
 #include <mutex>
@@ -18,7 +18,7 @@
 namespace mbgl {
 
 class CollisionTile;
-class GeometryTile;
+class GeometryTileData;
 class SpriteStore;
 class GlyphAtlas;
 class GlyphStore;
@@ -27,7 +27,7 @@ class Bucket;
 namespace style {
 class Layer;
 class SymbolLayer;
-}
+} // namespace style
 
 // We're using this class to shuttle the resulting buckets from the worker thread to the MapContext
 // thread. This class is movable-only because the vector contains movable-only value elements.
@@ -36,7 +36,7 @@ public:
     bool complete = false;
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
     std::unique_ptr<FeatureIndex> featureIndex;
-    std::unique_ptr<const GeometryTile> geometryTile;
+    std::unique_ptr<const GeometryTileData> tileData;
 };
 
 using TileParseResult = variant<
@@ -45,17 +45,16 @@ using TileParseResult = variant<
 
 class TileWorker : public util::noncopyable {
 public:
-    TileWorker(const OverscaledTileID&,
-               std::string sourceID,
+    TileWorker(OverscaledTileID,
                SpriteStore&,
                GlyphAtlas&,
                GlyphStore&,
-               const util::Atomic<bool>&,
+               const std::atomic<bool>&,
                const MapMode);
     ~TileWorker();
 
     TileParseResult parseAllLayers(std::vector<std::unique_ptr<style::Layer>>,
-                                   std::unique_ptr<const GeometryTile> geometryTile,
+                                   std::unique_ptr<const GeometryTileData> tileData,
                                    PlacementConfig);
 
     TileParseResult parsePendingLayers(PlacementConfig);
@@ -70,12 +69,11 @@ private:
     std::unique_ptr<CollisionTile> placeLayers(PlacementConfig);
 
     const OverscaledTileID id;
-    const std::string sourceID;
 
     SpriteStore& spriteStore;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
-    const util::Atomic<bool>& obsolete;
+    const std::atomic<bool>& obsolete;
     const MapMode mode;
 
     bool partialParse = false;
@@ -83,7 +81,7 @@ private:
     std::vector<std::unique_ptr<style::Layer>> layers;
 
     std::unique_ptr<FeatureIndex> featureIndex;
-    std::unique_ptr<const GeometryTile> geometryTile;
+    std::unique_ptr<const GeometryTileData> tileData;
 
     // Contains buckets that we couldn't parse so far due to missing resources.
     // They will be attempted on subsequent parses.

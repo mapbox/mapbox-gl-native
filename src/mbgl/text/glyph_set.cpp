@@ -6,11 +6,11 @@
 
 namespace mbgl {
 
-void GlyphSet::insert(uint32_t id, const SDFGlyph &glyph) {
+void GlyphSet::insert(uint32_t id, SDFGlyph&& glyph) {
     auto it = sdfs.find(id);
     if (it == sdfs.end()) {
         // Glyph doesn't exist yet.
-        sdfs.emplace(id, glyph);
+        sdfs.emplace(id, std::move(glyph));
     } else if (it->second.metrics == glyph.metrics) {
         if (it->second.bitmap != glyph.bitmap) {
             // The actual bitmap was updated; this is unsupported.
@@ -18,7 +18,7 @@ void GlyphSet::insert(uint32_t id, const SDFGlyph &glyph) {
         }
         // At least try to update it in case it's currently unsused.
         // If it is already used; we won't attempt to update the glyph atlas texture.
-        it->second.bitmap = glyph.bitmap;
+        it->second.bitmap = std::move(glyph.bitmap);
     } else {
         // The metrics were updated; this is unsupported.
         Log::Warning(Event::Glyph, "Modified glyph has different metrics");

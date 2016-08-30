@@ -1,4 +1,6 @@
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/enum.hpp>
+#include <mbgl/util/thread.hpp>
 
 #include <cstdio>
 #include <cstdarg>
@@ -48,13 +50,8 @@ void Log::record(EventSeverity severity, Event event, int64_t code, const std::s
 
     std::stringstream logStream;
 
-    #if !defined(__ANDROID__) && (defined( __APPLE__) || defined(__linux__))
-    char name[32];
-    pthread_getname_np(pthread_self(), name, sizeof(name));
-    logStream << "{" << name << "}";
-    #endif
-
-    logStream << "[" << event << "]";
+    logStream << "{" << platform::getCurrentThreadName() << "}";
+    logStream << "[" << Enum<Event>::toString(event) << "]";
 
     if (code >= 0) {
         logStream << "(" << code << ")";

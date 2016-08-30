@@ -14,6 +14,8 @@
         android:textColor="@android:color/white"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:layout_centerInParent="true" />
+        android:layout_alignBottom="@id/imageView"
+        android:layout_centerHorizontal="true"
+        android:padding="2dp"/>
 
 </RelativeLayout>

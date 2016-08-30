@@ -5,16 +5,6 @@
 namespace mbgl {
 namespace style {
 
-void RasterPaintProperties::parse(const JSValue& value) {
-    rasterOpacity.parse("raster-opacity", value);
-    rasterHueRotate.parse("raster-hue-rotate", value);
-    rasterBrightnessMin.parse("raster-brightness-min", value);
-    rasterBrightnessMax.parse("raster-brightness-max", value);
-    rasterSaturation.parse("raster-saturation", value);
-    rasterContrast.parse("raster-contrast", value);
-    rasterFadeDuration.parse("raster-fade-duration", value);
-}
-
 void RasterPaintProperties::cascade(const CascadeParameters& parameters) {
     rasterOpacity.cascade(parameters);
     rasterHueRotate.cascade(parameters);

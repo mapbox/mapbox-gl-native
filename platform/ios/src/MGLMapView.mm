@@ -134,11 +134,11 @@ mbgl::Color MGLColorObjectFromUIColor(UIColor *color)
 {
     if (!color)
     {
-        return {{ 0, 0, 0, 0 }};
+        return { 0, 0, 0, 0 };
     }
     CGFloat r, g, b, a;
     [color getRed:&r green:&g blue:&b alpha:&a];
-    return {{ (float)r, (float)g, (float)b, (float)a }};
+    return { (float)r, (float)g, (float)b, (float)a };
 }
 
 @interface MGLAnnotationAccessibilityElement : UIAccessibilityElement
@@ -1819,7 +1819,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         mask |= MGLMapDebugCollisionBoxesMask;
     }
-    if (options & mbgl::MapDebugOptions::Wireframe)
+    if (options & mbgl::MapDebugOptions::Overdraw)
     {
         mask |= MGLMapDebugOverdrawVisualizationMask;
     }
@@ -1847,7 +1847,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
     if (debugMask & MGLMapDebugOverdrawVisualizationMask)
     {
-        options |= mbgl::MapDebugOptions::Wireframe;
+        options |= mbgl::MapDebugOptions::Overdraw;
     }
     _mbglMap->setDebug(options);
 }
@@ -2186,8 +2186,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     mbgl::AnimationOptions animationOptions;
     if (duration)
     {
-        animationOptions.duration = MGLDurationInSeconds(duration);
-        animationOptions.easing = MGLUnitBezierForMediaTimingFunction(function);
+        animationOptions.duration.emplace(MGLDurationInSeconds(duration));
+        animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
     if (completion)
     {
@@ -2339,8 +2339,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     mbgl::AnimationOptions animationOptions;
     if (duration > 0)
     {
-        animationOptions.duration = MGLDurationInSeconds(duration);
-        animationOptions.easing = MGLUnitBezierForMediaTimingFunction(function);
+        animationOptions.duration.emplace(MGLDurationInSeconds(duration));
+        animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
     if (completion)
     {
@@ -2446,8 +2446,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     mbgl::AnimationOptions animationOptions;
     if (duration > 0)
     {
-        animationOptions.duration = MGLDurationInSeconds(duration);
-        animationOptions.easing = MGLUnitBezierForMediaTimingFunction(function);
+        animationOptions.duration.emplace(MGLDurationInSeconds(duration));
+        animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
     if (completion)
     {
@@ -4560,7 +4560,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         
         MGLAnnotationContext &annotationContext = pair.second;
         MGLAnnotationView *annotationView = annotationContext.annotationView;
-       
+
+        // Defer to the shape/polygon styling delegate methods
+        if ([annotationContext.annotation isKindOfClass:[MGLMultiPoint class]])
+        {
+            continue;
+        }
+
         if (!annotationView)
         {
             MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotationContext.annotation];

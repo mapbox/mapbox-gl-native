@@ -16,7 +16,7 @@
     "paint": {
       "line-color": "#008",
       "line-width": 0.9,
-      "line-opacity": null
+      "line-opacity": "no"
     }
   }]
 }

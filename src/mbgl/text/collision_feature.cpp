@@ -5,9 +5,9 @@ namespace mbgl {
 
 CollisionFeature::CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
         const float top, const float bottom, const float left, const float right,
-        const float boxScale, const float padding, const bool alongLine, const IndexedSubfeature& indexedFeature_,
+        const float boxScale, const float padding, const bool alongLine, IndexedSubfeature indexedFeature_,
         const bool straight)
-        : indexedFeature(indexedFeature_) {
+        : indexedFeature(std::move(indexedFeature_)) {
 
     if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
 

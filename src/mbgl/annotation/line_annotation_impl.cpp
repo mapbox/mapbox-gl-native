@@ -7,17 +7,17 @@ namespace mbgl {
 
 using namespace style;
 
-LineAnnotationImpl::LineAnnotationImpl(const AnnotationID id_, const LineAnnotation& annotation_, const uint8_t maxZoom_)
+LineAnnotationImpl::LineAnnotationImpl(AnnotationID id_, LineAnnotation annotation_, uint8_t maxZoom_)
     : ShapeAnnotationImpl(id_, maxZoom_),
-      annotation(annotation_) {
+      annotation({ ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.width, annotation_.color }) {
 }
 
 void LineAnnotationImpl::updateStyle(Style& style) const {
     if (style.getLayer(layerID))
         return;
 
-    std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>(layerID);
-    layer->setSource(AnnotationManager::SourceID, layerID);
+    std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>(layerID, AnnotationManager::SourceID);
+    layer->setSourceLayer(layerID);
     layer->setLineJoin(LineJoinType::Round);
     layer->setLineOpacity(annotation.opacity);
     layer->setLineWidth(annotation.width);

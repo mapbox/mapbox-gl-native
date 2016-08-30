@@ -2,15 +2,19 @@
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/stub_style_observer.hpp>
 
-#include <mbgl/style/source.hpp>
+#include <mbgl/style/source_impl.hpp>
+#include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
+
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/tileset.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/map/transform.hpp>
 #include <mbgl/util/worker.hpp>
-#include <mbgl/gl/texture_pool.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
@@ -28,7 +32,6 @@ public:
     Transform transform;
     TransformState transformState;
     Worker worker { 1 };
-    gl::TexturePool texturePool;
     AnnotationManager annotationManager { 1.0 };
     style::Style style { fileSource, 1.0 };
 
@@ -39,7 +42,6 @@ public:
         transformState,
         worker,
         fileSource,
-        texturePool,
         true,
         MapMode::Continuous,
         annotationManager,
@@ -78,14 +80,14 @@ TEST(Source, LoadingFail) {
     };
 
     test.observer.sourceError = [&] (Source& source, std::exception_ptr error) {
-        EXPECT_EQ("url", source.url);
+        EXPECT_EQ("source", source.getID());
         EXPECT_EQ("Failed by the test case", util::toString(error));
         test.end();
     };
 
-    Source source(SourceType::Vector, "source", "url", 512, nullptr, nullptr);
-    source.setObserver(&test.observer);
-    source.load(test.fileSource);
+    VectorSource source("source", "url");
+    source.baseImpl->setObserver(&test.observer);
+    source.baseImpl->load(test.fileSource);
 
     test.run();
 }
@@ -101,14 +103,14 @@ TEST(Source, LoadingCorrupt) {
     };
 
     test.observer.sourceError = [&] (Source& source, std::exception_ptr error) {
-        EXPECT_EQ("url", source.url);
+        EXPECT_EQ("source", source.getID());
         EXPECT_EQ("0 - Invalid value.", util::toString(error));
         test.end();
     };
 
-    Source source(SourceType::Vector, "source", "url", 512, nullptr, nullptr);
-    source.setObserver(&test.observer);
-    source.load(test.fileSource);
+    VectorSource source("source", "url");
+    source.baseImpl->setObserver(&test.observer);
+    source.baseImpl->load(test.fileSource);
 
     test.run();
 }
@@ -123,7 +125,7 @@ TEST(Source, RasterTileEmpty) {
     };
 
     test.observer.tileLoaded = [&] (Source& source, const OverscaledTileID&, bool) {
-        EXPECT_EQ("source", source.id);
+        EXPECT_EQ("source", source.getID());
         test.end();
     };
 
@@ -131,13 +133,13 @@ TEST(Source, RasterTileEmpty) {
         FAIL() << "Should never be called";
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    Source source(SourceType::Raster, "source", "", 512, std::move(tileset), nullptr);
-    source.setObserver(&test.observer);
-    source.load(test.fileSource);
-    source.update(test.updateParameters);
+    RasterSource source("source", tileset, 512);
+    source.baseImpl->setObserver(&test.observer);
+    source.baseImpl->load(test.fileSource);
+    source.baseImpl->update(test.updateParameters);
 
     test.run();
 }
@@ -152,7 +154,7 @@ TEST(Source, VectorTileEmpty) {
     };
 
     test.observer.tileLoaded = [&] (Source& source, const OverscaledTileID&, bool) {
-        EXPECT_EQ("source", source.id);
+        EXPECT_EQ("source", source.getID());
         test.end();
     };
 
@@ -160,13 +162,13 @@ TEST(Source, VectorTileEmpty) {
         FAIL() << "Should never be called";
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    Source source(SourceType::Vector, "source", "", 512, std::move(tileset), nullptr);
-    source.setObserver(&test.observer);
-    source.load(test.fileSource);
-    source.update(test.updateParameters);
+    VectorSource source("source", tileset);
+    source.baseImpl->setObserver(&test.observer);
+    source.baseImpl->load(test.fileSource);
+    source.baseImpl->update(test.updateParameters);
 
     test.run();
 }
@@ -183,19 +185,19 @@ TEST(Source, RasterTileFail) {
     };
 
     test.observer.tileError = [&] (Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
-        EXPECT_EQ(SourceType::Raster, source.type);
+        EXPECT_EQ(SourceType::Raster, source.baseImpl->type);
         EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_EQ("Failed by the test case", util::toString(error));
         test.end();
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    Source source(SourceType::Raster, "source", "", 512, std::move(tileset), nullptr);
-    source.setObserver(&test.observer);
-    source.load(test.fileSource);
-    source.update(test.updateParameters);
+    RasterSource source("source", tileset, 512);
+    source.baseImpl->setObserver(&test.observer);
+    source.baseImpl->load(test.fileSource);
+    source.baseImpl->update(test.updateParameters);
 
     test.run();
 }
@@ -212,19 +214,19 @@ TEST(Source, VectorTileFail) {
     };
 
     test.observer.tileError = [&] (Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
-        EXPECT_EQ(SourceType::Vector, source.type);
+        EXPECT_EQ(SourceType::Vector, source.baseImpl->type);
         EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_EQ("Failed by the test case", util::toString(error));
         test.end();
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    Source source(SourceType::Vector, "source", "", 512, std::move(tileset), nullptr);
-    source.setObserver(&test.observer);
-    source.load(test.fileSource);
-    source.update(test.updateParameters);
+    VectorSource source("source", tileset);
+    source.baseImpl->setObserver(&test.observer);
+    source.baseImpl->load(test.fileSource);
+    source.baseImpl->update(test.updateParameters);
 
     test.run();
 }
@@ -239,20 +241,20 @@ TEST(Source, RasterTileCorrupt) {
     };
 
     test.observer.tileError = [&] (Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
-        EXPECT_EQ(source.type, SourceType::Raster);
+        EXPECT_EQ(source.baseImpl->type, SourceType::Raster);
         EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_TRUE(bool(error));
         // Not asserting on platform-specific error text.
         test.end();
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    Source source(SourceType::Raster, "source", "", 512, std::move(tileset), nullptr);
-    source.setObserver(&test.observer);
-    source.load(test.fileSource);
-    source.update(test.updateParameters);
+    RasterSource source("source", tileset, 512);
+    source.baseImpl->setObserver(&test.observer);
+    source.baseImpl->load(test.fileSource);
+    source.baseImpl->update(test.updateParameters);
 
     test.run();
 }
@@ -267,24 +269,24 @@ TEST(Source, VectorTileCorrupt) {
     };
 
     test.observer.tileError = [&] (Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
-        EXPECT_EQ(source.type, SourceType::Vector);
+        EXPECT_EQ(source.baseImpl->type, SourceType::Vector);
         EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_EQ(util::toString(error), "unknown pbf field type exception");
         test.end();
     };
 
     // Need to have at least one layer that uses the source.
-    auto layer = std::make_unique<LineLayer>("id");
-    layer->setSource("source", "water");
+    auto layer = std::make_unique<LineLayer>("id", "source");
+    layer->setSourceLayer("water");
     test.style.addLayer(std::move(layer));
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    Source source(SourceType::Vector, "source", "", 512, std::move(tileset), nullptr);
-    source.setObserver(&test.observer);
-    source.load(test.fileSource);
-    source.update(test.updateParameters);
+    VectorSource source("source", tileset);
+    source.baseImpl->setObserver(&test.observer);
+    source.baseImpl->load(test.fileSource);
+    source.baseImpl->update(test.updateParameters);
 
     test.run();
 }
@@ -305,13 +307,13 @@ TEST(Source, RasterTileCancel) {
         FAIL() << "Should never be called";
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    Source source(SourceType::Raster, "source", "", 512, std::move(tileset), nullptr);
-    source.setObserver(&test.observer);
-    source.load(test.fileSource);
-    source.update(test.updateParameters);
+    RasterSource source("source", tileset, 512);
+    source.baseImpl->setObserver(&test.observer);
+    source.baseImpl->load(test.fileSource);
+    source.baseImpl->update(test.updateParameters);
 
     test.run();
 }
@@ -332,13 +334,13 @@ TEST(Source, VectorTileCancel) {
         FAIL() << "Should never be called";
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    Source source(SourceType::Vector, "source", "", 512, std::move(tileset), nullptr);
-    source.setObserver(&test.observer);
-    source.load(test.fileSource);
-    source.update(test.updateParameters);
+    VectorSource source("source", tileset);
+    source.baseImpl->setObserver(&test.observer);
+    source.baseImpl->load(test.fileSource);
+    source.baseImpl->update(test.updateParameters);
 
     test.run();
 }

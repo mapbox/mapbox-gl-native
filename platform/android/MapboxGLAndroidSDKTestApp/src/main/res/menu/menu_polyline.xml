@@ -6,4 +6,20 @@
         android:icon="@drawable/ic_delete_24dp"
         android:title="@string/action_remove_polylines"
         mapbox:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_id_width"
+        android:title="@string/action_width_polyline"
+        mapbox:showAsAction="never" />
+    <item
+        android:id="@+id/action_id_alpha"
+        android:title="@string/action_alpha_polygon"
+        mapbox:showAsAction="never" />
+    <item
+        android:id="@+id/action_id_color"
+        android:title="@string/action_color_polygon"
+        mapbox:showAsAction="never" />
+    <item
+        android:id="@+id/action_id_visible"
+        android:title="@string/action_visibility_polygon"
+        mapbox:showAsAction="never" />
 </menu>

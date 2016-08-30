@@ -8,7 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class MGLMapView;
 @class MGLUserLocation;
 
-/** View representing an MGLUserLocation on screen. */
+/** View representing an `MGLUserLocation` on screen. */
 @interface MGLUserLocationAnnotationView : UIView
 
 @property (nonatomic, weak) MGLMapView *mapView;

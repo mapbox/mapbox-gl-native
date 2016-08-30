@@ -1,5 +1,9 @@
 import UIKit
-import XCPlayground
+#if swift(>=3)
+    import PlaygroundSupport
+#else
+    import XCPlayground
+#endif
 import Mapbox
 
 let width: CGFloat = 700
@@ -9,7 +13,11 @@ class Responder: NSObject {
     var mapView: MGLMapView?
     func togglePitch(sender: UISwitch)  {
         let camera = mapView!.camera
-        camera.pitch = sender.on ? 60 : 0
+        #if swift(>=3)
+            camera.pitch = sender.isOn ? 60 : 0
+        #else
+            camera.pitch = sender.on ? 60 : 0
+        #endif
         mapView!.setCamera(camera, animated: false)
     }
 }
@@ -18,7 +26,11 @@ class Responder: NSObject {
 let panelWidth: CGFloat = 200
 let panel = UIView(frame: CGRect(x: width - panelWidth, y: 0, width: 200, height: 100))
 panel.alpha = 0.8
-panel.backgroundColor = UIColor.whiteColor()
+#if swift(>=3)
+    panel.backgroundColor = .white
+#else
+    panel.backgroundColor = UIColor.whiteColor()
+#endif
 
 // Delete markers
 let deleteSwitchLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: 30))
@@ -41,7 +53,11 @@ let pitchLabel = UILabel(frame: CGRect(x: 0, y: 60, width: 100, height: 30))
 pitchLabel.text = "Pitch"
 let pitchSwitch = UISwitch(frame: CGRect(x: panelWidth-panelWidth / 2.0, y: 60, width: 100, height: 50))
 let responder = Responder()
-pitchSwitch.addTarget(responder, action: #selector(responder.togglePitch(_:)), forControlEvents: .ValueChanged)
+#if swift(>=3)
+    pitchSwitch.addTarget(responder, action: #selector(responder.togglePitch(sender:)), for: .valueChanged)
+#else
+    pitchSwitch.addTarget(responder, action: #selector(responder.togglePitch(_:)), forControlEvents: .ValueChanged)
+#endif
 panel.addSubview(pitchLabel)
 panel.addSubview(pitchSwitch)
 
@@ -56,7 +72,11 @@ MGLAccountManager.setAccessToken(accessToken)
 class PlaygroundAnnotationView: MGLAnnotationView {
     
     override func prepareForReuse() {
-        hidden = hideMarkerSwitchView.on
+        #if swift(>=3)
+            isHidden = hideMarkerSwitchView.isOn
+        #else
+            hidden = hideMarkerSwitchView.on
+        #endif
     }
     
 }
@@ -67,6 +87,29 @@ class MapDelegate: NSObject, MGLMapViewDelegate {
     
     var annotationViewByAnnotation = [MGLPointAnnotation: PlaygroundAnnotationView]()
     
+    #if swift(>=3)
+    func mapView(_ mapView: MGLMapView, viewFor annotation: MGLAnnotation) -> MGLAnnotationView? {
+        
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "annotation") as? PlaygroundAnnotationView
+        
+        if (annotationView == nil) {
+            let av = PlaygroundAnnotationView(reuseIdentifier: "annotation")
+            av.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+            av.centerOffset = CGVector(dx: -15, dy: -15)
+            let centerView = UIView(frame: av.bounds.insetBy(dx: 3, dy: 3))
+            centerView.backgroundColor = .white
+            av.addSubview(centerView)
+            av.backgroundColor = .purple
+            annotationView = av
+        } else {
+            annotationView!.subviews.first?.backgroundColor = .green
+        }
+        
+        annotationViewByAnnotation[annotation as! MGLPointAnnotation] = annotationView
+        
+        return annotationView
+    }
+    #else
     func mapView(mapView: MGLMapView, viewForAnnotation annotation: MGLAnnotation) -> MGLAnnotationView? {
         
         var annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier("annotation") as? PlaygroundAnnotationView
@@ -83,12 +126,40 @@ class MapDelegate: NSObject, MGLMapViewDelegate {
         } else {
             annotationView!.subviews.first?.backgroundColor = UIColor.greenColor()
         }
-       
+    
         annotationViewByAnnotation[annotation as! MGLPointAnnotation] = annotationView
         
         return annotationView
     }
+    #endif
     
+    #if swift(>=3)
+    func mapView(_ mapView: MGLMapView, didSelect annotation: MGLAnnotation) {
+        let pointAnnotation = annotation as! MGLPointAnnotation
+        let annotationView: PlaygroundAnnotationView  = annotationViewByAnnotation[pointAnnotation]!
+        
+        for view in annotationViewByAnnotation.values {
+            view.layer.zPosition = -1
+        }
+        
+        annotationView.layer.zPosition = 1
+        
+        UIView.animate(withDuration: 1.25, delay: 0, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.6, options: .curveEaseOut, animations: {
+            annotationView.transform = CGAffineTransform(scaleX: 1.8, y: 1.8)
+        }) { _ in
+            annotationView.transform = CGAffineTransform(scaleX: 1, y: 1)
+            
+            if deleteMarkerSwitchView.isOn {
+                mapView.removeAnnotation(pointAnnotation)
+                return
+            }
+            
+            if hideMarkerSwitchView.isOn {
+                annotationView.isHidden = true
+            }
+        }
+    }
+    #else
     func mapView(mapView: MGLMapView, didSelectAnnotation annotation: MGLAnnotation) {
         let pointAnnotation = annotation as! MGLPointAnnotation
         let annotationView: PlaygroundAnnotationView  = annotationViewByAnnotation[pointAnnotation]!
@@ -114,15 +185,25 @@ class MapDelegate: NSObject, MGLMapViewDelegate {
             }
         }
     }
+    #endif
     
     func handleTap(press: UILongPressGestureRecognizer) {
         let mapView: MGLMapView = press.view as! MGLMapView
         
-        if (press.state == .Recognized) {
-            let coordiante: CLLocationCoordinate2D = mapView.convertPoint(press.locationInView(mapView), toCoordinateFromView: mapView)
+        #if swift(>=3)
+            let isRecognized = press.state == .recognized
+        #else
+            let isRecognized = press.state == .Recognized
+        #endif
+        if (isRecognized) {
+            #if swift(>=3)
+                let coordinate: CLLocationCoordinate2D = mapView.convert(press.location(in: mapView), toCoordinateFrom: mapView)
+            #else
+                let coordinate: CLLocationCoordinate2D = mapView.convertPoint(press.locationInView(mapView), toCoordinateFromView: mapView)
+            #endif
             let annotation = MGLPointAnnotation()
             annotation.title = "Dropped Marker"
-            annotation.coordinate = coordiante
+            annotation.coordinate = coordinate
             mapView.addAnnotation(annotation)
             mapView.showAnnotations([annotation], animated: true)
         }
@@ -132,14 +213,16 @@ class MapDelegate: NSObject, MGLMapViewDelegate {
 
 //: Create a map and its delegate
 
-let lat: CLLocationDegrees = 37.174057
-let lng: CLLocationDegrees = -104.490984
-let centerCoordinate = CLLocationCoordinate2D(latitude: lat, longitude: lng)
+let centerCoordinate = CLLocationCoordinate2D(latitude: 37.174057, longitude: -104.490984)
 
 let mapView = MGLMapView(frame: CGRect(x: 0, y: 0, width: width, height: height))
 mapView.frame = CGRect(x: 0, y: 0, width: width, height: height)
 
-XCPlaygroundPage.currentPage.liveView = mapView
+#if swift(>=3)
+    PlaygroundPage.current.liveView = mapView
+#else
+    XCPlaygroundPage.currentPage.liveView = mapView
+#endif
 
 let mapDelegate = MapDelegate()
 mapView.delegate = mapDelegate
@@ -150,7 +233,11 @@ mapView.addGestureRecognizer(tapGesture)
 
 //: Zoom in to a location
 
-mapView.setCenterCoordinate(centerCoordinate, zoomLevel: 12, animated: false)
+#if swift(>=3)
+    mapView.setCenter(centerCoordinate, zoomLevel: 12, animated: false)
+#else
+    mapView.setCenterCoordinate(centerCoordinate, zoomLevel: 12, animated: false)
+#endif
 
 //: Add control panel
 

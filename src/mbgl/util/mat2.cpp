@@ -24,7 +24,7 @@
 
 #include <cmath>
 
-using namespace mbgl;
+namespace mbgl {
 
 void matrix::identity(mat2& out) {
     out[0] = 1.0f;
@@ -41,7 +41,7 @@ void matrix::rotate(mat2& out, const mat2& a, double rad) {
     out[1] = a1 *  c + a3 * s;
     out[2] = a0 * -s + a2 * c;
     out[3] = a1 * -s + a3 * c;
-};
+}
 
 void matrix::scale(mat2& out, const mat2& a, double v0, double v1) {
     double a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
@@ -50,3 +50,5 @@ void matrix::scale(mat2& out, const mat2& a, double v0, double v1) {
     out[2] = a2 * v1;
     out[3] = a3 * v1;
 }
+
+} // namespace mbgl

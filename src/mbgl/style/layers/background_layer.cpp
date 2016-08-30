@@ -23,6 +23,14 @@ std::unique_ptr<Layer> BackgroundLayer::Impl::clone() const {
     return std::make_unique<BackgroundLayer>(*this);
 }
 
+std::unique_ptr<Layer> BackgroundLayer::Impl::cloneRef(const std::string& id_) const {
+    auto result = std::make_unique<BackgroundLayer>(*this);
+    result->impl->id = id_;
+    result->impl->ref = this->id;
+    result->impl->paint = BackgroundPaintProperties();
+    return std::move(result);
+}
+
 
 // Layout properties
 
@@ -33,24 +41,24 @@ PropertyValue<Color> BackgroundLayer::getBackgroundColor() const {
     return impl->paint.backgroundColor.get();
 }
 
-void BackgroundLayer::setBackgroundColor(PropertyValue<Color> value) {
-    impl->paint.backgroundColor.set(value);
+void BackgroundLayer::setBackgroundColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+    impl->paint.backgroundColor.set(value, klass);
 }
 
 PropertyValue<std::string> BackgroundLayer::getBackgroundPattern() const {
     return impl->paint.backgroundPattern.get();
 }
 
-void BackgroundLayer::setBackgroundPattern(PropertyValue<std::string> value) {
-    impl->paint.backgroundPattern.set(value);
+void BackgroundLayer::setBackgroundPattern(PropertyValue<std::string> value, const optional<std::string>& klass) {
+    impl->paint.backgroundPattern.set(value, klass);
 }
 
 PropertyValue<float> BackgroundLayer::getBackgroundOpacity() const {
     return impl->paint.backgroundOpacity.get();
 }
 
-void BackgroundLayer::setBackgroundOpacity(PropertyValue<float> value) {
-    impl->paint.backgroundOpacity.set(value);
+void BackgroundLayer::setBackgroundOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
+    impl->paint.backgroundOpacity.set(value, klass);
 }
 
 } // namespace style

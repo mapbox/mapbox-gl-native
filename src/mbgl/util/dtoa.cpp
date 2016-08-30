@@ -9,7 +9,7 @@ namespace {
 
 // From https://github.com/miloyip/rapidjson/blob/master/include/rapidjson/internal/dtoa.h
 
-inline char* Prettify(char* buffer, int length, int k) {
+char* Prettify(char* buffer, int length, int k) {
     constexpr int maxDecimalPlaces = 324;
     const int kk = length + k;  // 10^(kk-1) <= v < 10^kk
 
@@ -91,6 +91,14 @@ char* dtoa(double value, char* buffer) {
         rapidjson::internal::Grisu2(value, buffer, &length, &K);
         return Prettify(buffer, length, K);
     }
+}
+
+std::string dtoa(double value) {
+    std::string data;
+    data.resize(25);
+    auto end = dtoa(value, const_cast<char*>(data.data()));
+    data.resize(end - data.data());
+    return data;
 }
 
 } // namespace util

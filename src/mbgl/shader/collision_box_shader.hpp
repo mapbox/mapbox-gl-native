@@ -16,10 +16,6 @@ public:
     Uniform<GLfloat>              u_scale       = {"u_scale",       *this};
     Uniform<GLfloat>              u_zoom        = {"u_zoom",        *this};
     Uniform<GLfloat>              u_maxzoom     = {"u_maxzoom",     *this};
-
-protected:
-    GLint a_extrude = -1;
-    GLint a_data = -1;
 };
 
 } // namespace mbgl

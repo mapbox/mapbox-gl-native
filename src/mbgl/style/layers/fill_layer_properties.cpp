@@ -5,16 +5,6 @@
 namespace mbgl {
 namespace style {
 
-void FillPaintProperties::parse(const JSValue& value) {
-    fillAntialias.parse("fill-antialias", value);
-    fillOpacity.parse("fill-opacity", value);
-    fillColor.parse("fill-color", value);
-    fillOutlineColor.parse("fill-outline-color", value);
-    fillTranslate.parse("fill-translate", value);
-    fillTranslateAnchor.parse("fill-translate-anchor", value);
-    fillPattern.parse("fill-pattern", value);
-}
-
 void FillPaintProperties::cascade(const CascadeParameters& parameters) {
     fillAntialias.cascade(parameters);
     fillOpacity.cascade(parameters);

@@ -3,15 +3,13 @@
 #include <mbgl/shader/icon.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-#include <cstdio>
+namespace mbgl {
 
-using namespace mbgl;
-
-IconShader::IconShader(gl::ObjectStore& store)
-    : Shader("icon", shaders::icon::vertex, shaders::icon::fragment, store)
-    , a_offset(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_offset")))
-    , a_data1(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data1")))
-    , a_data2(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data2"))) {
+IconShader::IconShader(gl::ObjectStore& store, Defines defines)
+    : Shader(shaders::icon::name,
+             shaders::icon::vertex,
+             shaders::icon::fragment,
+             store, defines) {
 }
 
 void IconShader::bind(GLbyte* offset) {
@@ -29,3 +27,5 @@ void IconShader::bind(GLbyte* offset) {
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_data2));
     MBGL_CHECK_ERROR(glVertexAttribPointer(a_data2, 4, GL_UNSIGNED_BYTE, false, stride, offset + 12));
 }
+
+} // namespace mbgl

@@ -1,7 +1,7 @@
 #include <mbgl/platform/default/settings_json.hpp>
 #include <fstream>
 
-using namespace mbgl;
+namespace mbgl {
 
 Settings_JSON::Settings_JSON() { load(); }
 
@@ -37,3 +37,5 @@ void Settings_JSON::clear() {
     pitch = 0;
     debug = 0;
 }
+
+} // namespace mbgl

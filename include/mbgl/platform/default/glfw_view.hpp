@@ -14,7 +14,7 @@
 class GLFWView : public mbgl::View {
 public:
     GLFWView(bool fullscreen = false, bool benchmark = false);
-    ~GLFWView();
+    ~GLFWView() override;
 
     float getPixelRatio() const override;
     std::array<uint16_t, 2> getSize() const override;
@@ -44,6 +44,7 @@ public:
     void report(float duration);
 
 private:
+    mbgl::Color makeRandomColor() const;
     mbgl::Point<double> makeRandomPoint() const;
     static std::shared_ptr<const mbgl::SpriteImage>
     makeSpriteImage(int width, int height, float pixelRatio);
@@ -51,6 +52,7 @@ private:
     void nextOrientation();
 
     void addRandomPointAnnotations(int count);
+    void addRandomLineAnnotations(int count);
     void addRandomShapeAnnotations(int count);
     void addRandomCustomPointAnnotations(int count);
 

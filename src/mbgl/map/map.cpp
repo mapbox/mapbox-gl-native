@@ -5,6 +5,7 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/transition_options.hpp>
@@ -15,7 +16,6 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/gl/object_store.hpp>
-#include <mbgl/gl/texture_pool.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/exception.hpp>
@@ -37,7 +37,7 @@ class Map::Impl : public style::Observer {
 public:
     Impl(View&, FileSource&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
 
-    void onResourceLoaded() override;
+    void onNeedsRepaint() override;
     void onResourceError(std::exception_ptr) override;
 
     void update();
@@ -62,7 +62,6 @@ public:
     util::AsyncTask asyncUpdate;
 
     std::unique_ptr<AnnotationManager> annotationManager;
-    std::unique_ptr<gl::TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
     std::unique_ptr<Style> style;
 
@@ -98,8 +97,7 @@ Map::Impl::Impl(View& view_,
       contextMode(contextMode_),
       pixelRatio(view.getPixelRatio()),
       asyncUpdate([this] { update(); }),
-      annotationManager(std::make_unique<AnnotationManager>(pixelRatio)),
-      texturePool(std::make_unique<gl::TexturePool>()) {
+      annotationManager(std::make_unique<AnnotationManager>(pixelRatio)) {
 }
 
 Map::~Map() {
@@ -108,13 +106,11 @@ Map::~Map() {
     impl->styleRequest = nullptr;
 
     // Explicit resets currently necessary because these abandon resources that need to be
-    // cleaned up by store.performCleanup();
+    // cleaned up by store.reset();
     impl->style.reset();
     impl->painter.reset();
-    impl->texturePool.reset();
     impl->annotationManager.reset();
-
-    impl->store.performCleanup();
+    impl->store.reset();
 
     impl->view.deactivate();
 }
@@ -210,9 +206,13 @@ void Map::Impl::update() {
     // - Hint style sources to notify when all its tiles are loaded;
     timePoint = Clock::now();
 
-    if (style->loaded && updateFlags & Update::Annotations) {
+    if (style->loaded && updateFlags & Update::AnnotationStyle) {
         annotationManager->updateStyle(*style);
         updateFlags |= Update::Classes;
+    }
+
+    if (updateFlags & Update::AnnotationData) {
+        annotationManager->updateData();
     }
 
     if (updateFlags & Update::Classes) {
@@ -229,7 +229,6 @@ void Map::Impl::update() {
                                        transform.getState(),
                                        style->workers,
                                        fileSource,
-                                       *texturePool,
                                        style->shouldReparsePartialTiles,
                                        mode,
                                        *annotationManager,
@@ -337,7 +336,7 @@ void Map::Impl::loadStyleJSON(const std::string& json) {
     // force style cascade, causing all pending transitions to complete.
     style->cascade(Clock::now(), mode);
 
-    updateFlags |= Update::Classes | Update::RecalculateStyle | Update::Annotations;
+    updateFlags |= Update::Classes | Update::RecalculateStyle | Update::AnnotationStyle;
     asyncUpdate.send();
 }
 
@@ -378,7 +377,7 @@ bool Map::isPanning() const {
 }
 
 #pragma mark -
-    
+
 CameraOptions Map::getCameraOptions(optional<EdgeInsets> padding) const {
     return impl->transform.getCameraOptions(padding);
 }
@@ -691,18 +690,17 @@ double Map::getTopOffsetPixelsForAnnotationIcon(const std::string& name) {
 
 AnnotationID Map::addAnnotation(const Annotation& annotation) {
     auto result = impl->annotationManager->addAnnotation(annotation, getMaxZoom());
-    update(Update::Annotations);
+    update(Update::AnnotationStyle | Update::AnnotationData);
     return result;
 }
 
 void Map::updateAnnotation(AnnotationID id, const Annotation& annotation) {
-    impl->annotationManager->updateAnnotation(id, annotation, getMaxZoom());
-    update(Update::Annotations);
+    update(impl->annotationManager->updateAnnotation(id, annotation, getMaxZoom()));
 }
 
 void Map::removeAnnotation(AnnotationID annotation) {
     impl->annotationManager->removeAnnotation(annotation);
-    update(Update::Annotations);
+    update(Update::AnnotationStyle | Update::AnnotationData);
 }
 
 AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
@@ -739,6 +737,22 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const opti
 
 #pragma mark - Style API
 
+style::Source* Map::getSource(const std::string& sourceID) {
+    return impl->style ? impl->style->getSource(sourceID) : nullptr;
+}
+
+void Map::addSource(std::unique_ptr<style::Source> source) {
+    impl->style->addSource(std::move(source));
+}
+
+void Map::removeSource(const std::string& sourceID) {
+    impl->style->removeSource(sourceID);
+}
+
+style::Layer* Map::getLayer(const std::string& layerID) {
+    return impl->style ? impl->style->getLayer(layerID) : nullptr;
+}
+
 void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& before) {
     impl->view.activate();
 
@@ -770,14 +784,14 @@ void Map::cycleDebugOptions() {
 #ifndef GL_ES_VERSION_2_0
     if (impl->debugOptions & MapDebugOptions::StencilClip)
         impl->debugOptions = MapDebugOptions::NoDebug;
-    else if (impl->debugOptions & MapDebugOptions::Wireframe)
+    else if (impl->debugOptions & MapDebugOptions::Overdraw)
         impl->debugOptions = MapDebugOptions::StencilClip;
 #else
-    if (impl->debugOptions & MapDebugOptions::Wireframe)
+    if (impl->debugOptions & MapDebugOptions::Overdraw)
         impl->debugOptions = MapDebugOptions::NoDebug;
 #endif // GL_ES_VERSION_2_0
     else if (impl->debugOptions & MapDebugOptions::Collision)
-        impl->debugOptions = MapDebugOptions::Collision | MapDebugOptions::Wireframe;
+        impl->debugOptions = MapDebugOptions::Overdraw;
     else if (impl->debugOptions & MapDebugOptions::Timestamps)
         impl->debugOptions = impl->debugOptions | MapDebugOptions::Collision;
     else if (impl->debugOptions & MapDebugOptions::ParseStatus)
@@ -839,7 +853,7 @@ void Map::onLowMemory() {
     impl->view.invalidate();
 }
 
-void Map::Impl::onResourceLoaded() {
+void Map::Impl::onNeedsRepaint() {
     updateFlags |= Update::Repaint;
     asyncUpdate.send();
 }

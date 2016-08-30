@@ -12,7 +12,7 @@
     "type": "circle",
     "source": "mapbox",
     "paint": {
-      "circle-color": null
+      "circle-color": 1
     }
   }]
 }

@@ -1,10 +1,11 @@
 #include <mbgl/util/thread_context.hpp>
+#include <utility>
 
 namespace mbgl {
 namespace util {
 
-ThreadContext::ThreadContext(const std::string& name_, ThreadPriority priority_)
-    : name(name_),
+ThreadContext::ThreadContext(std::string name_, ThreadPriority priority_)
+    : name(std::move(name_)),
       priority(priority_) {
 }
 

@@ -1,0 +1,7 @@
+{
+    "default": {
+        "log": [
+            [1, "WARNING", "ParseStyle", "current renderer implementation only supports style spec version 8; using an outdated style will cause rendering errors"]
+        ]
+    }
+}

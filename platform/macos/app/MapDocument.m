@@ -65,6 +65,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     BOOL _randomizesCursorsOnDroppedPins;
     BOOL _isTouringWorld;
     BOOL _isShowingPolygonAndPolylineAnnotations;
+    BOOL _isShowingAnimatedAnnotation;
 }
 
 #pragma mark Lifecycle
@@ -180,7 +181,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 - (IBAction)chooseCustomStyle:(id)sender {
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = @"Apply custom style";
-    alert.informativeText = @"Enter the URL to a JSON file that conforms to the Mapbox GL style specification, such as a style designed in Mapbox Studio:";
+    alert.informativeText = @"Enter the URL to a JSON file that conforms to the Mapbox Style Specification, such as a style designed in Mapbox Studio:";
     NSTextField *textField = [[NSTextField alloc] initWithFrame:NSZeroRect];
     [textField sizeToFit];
     NSRect textFieldFrame = textField.frame;
@@ -307,7 +308,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         }
     }
     
-    [NSTimer scheduledTimerWithTimeInterval:1/60
+    [NSTimer scheduledTimerWithTimeInterval:1.0/60.0
                                      target:self
                                    selector:@selector(dropOneOfManyPins:)
                                    userInfo:annotations
@@ -329,9 +330,14 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
 }
 
+- (IBAction)showAllAnnotations:(id)sender {
+    [self.mapView showAnnotations:self.mapView.annotations animated:YES];
+}
+
 - (IBAction)removeAllAnnotations:(id)sender {
     [self.mapView removeAnnotations:self.mapView.annotations];
     _isShowingPolygonAndPolylineAnnotations = NO;
+    _isShowingAnimatedAnnotation = NO;
 }
 
 - (IBAction)startWorldTour:(id)sender {
@@ -403,6 +409,27 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     };
     MGLPolyline *line = [MGLPolyline polylineWithCoordinates:lineCoordinates count:4];
     [self.mapView addAnnotation:line];
+}
+
+- (IBAction)drawAnimatedAnnotation:(id)sender {
+    DroppedPinAnnotation *annotation = [[DroppedPinAnnotation alloc] init];
+    [self.mapView addAnnotation:annotation];
+
+    _isShowingAnimatedAnnotation = YES;
+
+    [NSTimer scheduledTimerWithTimeInterval:1.0/60.0
+                                     target:self
+                                   selector:@selector(updateAnimatedAnnotation:)
+                                   userInfo:annotation
+                                    repeats:YES];
+}
+
+- (void)updateAnimatedAnnotation:(NSTimer *)timer {
+    DroppedPinAnnotation *annotation = timer.userInfo;
+    double angle = timer.fireDate.timeIntervalSinceReferenceDate;
+    annotation.coordinate = CLLocationCoordinate2DMake(
+        sin(angle) * 20,
+        cos(angle) * 20);
 }
 
 #pragma mark Offline packs
@@ -613,7 +640,13 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     if (menuItem.action == @selector(dropManyPins:)) {
         return YES;
     }
-    if (menuItem.action == @selector(removeAllAnnotations:)) {
+    if (menuItem.action == @selector(drawPolygonAndPolyLineAnnotations:)) {
+        return !_isShowingPolygonAndPolylineAnnotations;
+    }
+    if (menuItem.action == @selector(drawAnimatedAnnotation:)) {
+        return !_isShowingAnimatedAnnotation;
+    }
+    if (menuItem.action == @selector(showAllAnnotations:) || menuItem.action == @selector(removeAllAnnotations:)) {
         return self.mapView.annotations.count > 0;
     }
     if (menuItem.action == @selector(startWorldTour:)) {
@@ -621,9 +654,6 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     if (menuItem.action == @selector(stopWorldTour:)) {
         return _isTouringWorld;
-    }
-    if (menuItem.action == @selector(drawPolygonAndPolyLineAnnotations:)) {
-        return !_isShowingPolygonAndPolylineAnnotations;
     }
     if (menuItem.action == @selector(addOfflinePack:)) {
         NSURL *styleURL = self.mapView.styleURL;

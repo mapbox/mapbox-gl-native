@@ -13,14 +13,13 @@ namespace style {
 
 class FillLayer : public Layer {
 public:
-    FillLayer(const std::string& layerID);
+    FillLayer(const std::string& layerID, const std::string& sourceID);
     ~FillLayer() final;
 
     // Source
-
-    void setSource(const std::string& sourceID, const std::string& sourceLayer);
     const std::string& getSourceID() const;
     const std::string& getSourceLayer() const;
+    void setSourceLayer(const std::string& sourceLayer);
 
     void setFilter(const Filter&);
     const Filter& getFilter() const;
@@ -28,25 +27,25 @@ public:
     // Paint properties
 
     PropertyValue<bool> getFillAntialias() const;
-    void setFillAntialias(PropertyValue<bool>);
+    void setFillAntialias(PropertyValue<bool>, const optional<std::string>& klass = {});
 
     PropertyValue<float> getFillOpacity() const;
-    void setFillOpacity(PropertyValue<float>);
+    void setFillOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
 
     PropertyValue<Color> getFillColor() const;
-    void setFillColor(PropertyValue<Color>);
+    void setFillColor(PropertyValue<Color>, const optional<std::string>& klass = {});
 
     PropertyValue<Color> getFillOutlineColor() const;
-    void setFillOutlineColor(PropertyValue<Color>);
+    void setFillOutlineColor(PropertyValue<Color>, const optional<std::string>& klass = {});
 
     PropertyValue<std::array<float, 2>> getFillTranslate() const;
-    void setFillTranslate(PropertyValue<std::array<float, 2>>);
+    void setFillTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
 
     PropertyValue<TranslateAnchorType> getFillTranslateAnchor() const;
-    void setFillTranslateAnchor(PropertyValue<TranslateAnchorType>);
+    void setFillTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
 
     PropertyValue<std::string> getFillPattern() const;
-    void setFillPattern(PropertyValue<std::string>);
+    void setFillPattern(PropertyValue<std::string>, const optional<std::string>& klass = {});
 
     // Private implementation
 

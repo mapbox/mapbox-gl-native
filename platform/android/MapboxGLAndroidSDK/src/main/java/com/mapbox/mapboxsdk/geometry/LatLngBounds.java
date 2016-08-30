@@ -290,6 +290,13 @@ public class LatLngBounds implements Parcelable {
             return LatLngBounds.fromLatLngs(mLatLngList);
         }
 
+        public Builder includes(List<LatLng> latLngs){
+            for (LatLng point : latLngs) {
+                mLatLngList.add(point);
+            }
+            return this;
+        }
+
         public Builder include(@NonNull LatLng latLng) {
             mLatLngList.add(latLng);
             return this;

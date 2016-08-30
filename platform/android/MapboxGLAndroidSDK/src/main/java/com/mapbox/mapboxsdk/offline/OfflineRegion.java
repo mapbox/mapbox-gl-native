@@ -140,6 +140,34 @@ public class OfflineRegion {
     public static final int STATE_INACTIVE = 0;
     public static final int STATE_ACTIVE = 1;
 
+    // Keep track of the region state
+    private int state = STATE_INACTIVE;
+
+    private boolean deliverInactiveMessages = false;
+
+    /**
+     * Gets whether or not the `OfflineRegionObserver` will continue to deliver messages even if
+     * the region state has been set as STATE_INACTIVE.
+     */
+    public boolean isDeliveringInactiveMessages() {
+        return deliverInactiveMessages;
+    }
+
+    /**
+     * When set true, the `OfflineRegionObserver` will continue to deliver messages even if
+     * the region state has been set as STATE_INACTIVE (operations happen asynchronously). If set
+     * false, the client won't be notified of further messages.
+     */
+    public void setDeliverInactiveMessages(boolean deliverInactiveMessages) {
+        this.deliverInactiveMessages = deliverInactiveMessages;
+    }
+
+    private boolean deliverMessages() {
+        if (state == STATE_ACTIVE) return true;
+        if (isDeliveringInactiveMessages()) return true;
+        return false;
+    }
+
     /*
      * Constructor
      */
@@ -180,32 +208,38 @@ public class OfflineRegion {
         setOfflineRegionObserver(new OfflineRegionObserver() {
             @Override
             public void onStatusChanged(final OfflineRegionStatus status) {
-                getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        observer.onStatusChanged(status);
-                    }
-                });
+                if (deliverMessages()) {
+                    getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            observer.onStatusChanged(status);
+                        }
+                    });
+                }
             }
 
             @Override
             public void onError(final OfflineRegionError error) {
-                getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        observer.onError(error);
-                    }
-                });
+                if (deliverMessages()) {
+                    getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            observer.onError(error);
+                        }
+                    });
+                }
             }
 
             @Override
             public void mapboxTileCountLimitExceeded(final long limit) {
-                getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        observer.mapboxTileCountLimitExceeded(limit);
-                    }
-                });
+                if (deliverMessages()) {
+                    getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            observer.mapboxTileCountLimitExceeded(limit);
+                        }
+                    });
+                }
             }
         });
     }
@@ -214,6 +248,7 @@ public class OfflineRegion {
      * Pause or resume downloading of regional resources.
      */
     public void setDownloadState(@DownloadState int state) {
+        this.state = state;
         setOfflineRegionDownloadState(state);
     }
 

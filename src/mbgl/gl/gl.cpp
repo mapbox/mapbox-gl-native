@@ -121,7 +121,7 @@ namespace mbgl {
         void mbx_trapExtension(const char *, GLenum, GLuint, GLsizei, const GLchar *) { }
         void mbx_trapExtension(const char *, GLDEBUGPROC, const void *) { }
         void mbx_trapExtension(const char *, GLuint, GLuint, GLuint, GLuint, GLint, const char *, const void*) { }
-        
+
         void mbx_trapExtension(const char *name, GLuint array) {
             if(strncasecmp(name, "glBindVertexArray", 17) == 0) {
                 currentVertexArray = array;
@@ -188,7 +188,7 @@ void mbx_glBufferData(GLenum target,
     }
     std::cout << "GL glBufferData: " << currentBinding << " using " << bufferBindingToSizeMap[currentBinding] << " bytes current total " << currentUsedBufferBytes << " high water mark " << largestAmountUsedSoFar << "\n";
     lock.unlock();
-    
+
     glBufferData(target, size, data, usage);
 }
 

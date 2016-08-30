@@ -5,9 +5,7 @@
 
 #include <unique_resource.hpp>
 
-#include <array>
 #include <algorithm>
-#include <cassert>
 #include <memory>
 #include <vector>
 
@@ -43,19 +41,11 @@ struct VAODeleter {
     void operator()(GLuint) const;
 };
 
-using ObjectPool = std::array<GLuint, TextureMax>;
-
-struct TexturePoolDeleter {
-    ObjectStore* store;
-    void operator()(ObjectPool ids) const;
-};
-
 using UniqueProgram = std_experimental::unique_resource<GLuint, ProgramDeleter>;
 using UniqueShader = std_experimental::unique_resource<GLuint, ShaderDeleter>;
 using UniqueBuffer = std_experimental::unique_resource<GLuint, BufferDeleter>;
 using UniqueTexture = std_experimental::unique_resource<GLuint, TextureDeleter>;
 using UniqueVAO = std_experimental::unique_resource<GLuint, VAODeleter>;
-using UniqueTexturePool = std_experimental::unique_resource<ObjectPool, TexturePoolDeleter>;
 
 class ObjectStore : private util::noncopyable {
 public:
@@ -76,8 +66,13 @@ public:
     }
 
     UniqueTexture createTexture() {
-        GLuint id = 0;
-        MBGL_CHECK_ERROR(glGenTextures(1, &id));
+        if (pooledTextures.empty()) {
+            pooledTextures.resize(TextureMax);
+            MBGL_CHECK_ERROR(glGenTextures(TextureMax, pooledTextures.data()));
+        }
+
+        GLuint id = pooledTextures.back();
+        pooledTextures.pop_back();
         return UniqueTexture { std::move(id), { this } };
     }
 
@@ -87,19 +82,17 @@ public:
         return UniqueVAO { std::move(id), { this } };
     }
 
-    UniqueTexturePool createTexturePool() {
-        ObjectPool ids;
-        MBGL_CHECK_ERROR(glGenTextures(TextureMax, ids.data()));
-        assert(ids.size() == size_t(TextureMax));
-        return UniqueTexturePool { std::move(ids), { this } };
-    }
-
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
     void performCleanup();
 
+    // Drain pools and remove abandoned objects, in preparation for destroying the store.
+    // Only call this while the OpenGL context is exclusive to this thread.
+    void reset();
+
     bool empty() const {
-        return abandonedPrograms.empty()
+        return pooledTextures.empty()
+            && abandonedPrograms.empty()
             && abandonedShaders.empty()
             && abandonedBuffers.empty()
             && abandonedTextures.empty()
@@ -112,7 +105,8 @@ private:
     friend BufferDeleter;
     friend TextureDeleter;
     friend VAODeleter;
-    friend TexturePoolDeleter;
+
+    std::vector<GLuint> pooledTextures;
 
     std::vector<GLuint> abandonedPrograms;
     std::vector<GLuint> abandonedShaders;

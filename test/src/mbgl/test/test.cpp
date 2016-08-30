@@ -14,4 +14,4 @@ int runTests(int argc, char *argv[]) {
     return RUN_ALL_TESTS();
 }
 
-}
+} // namespace mbgl

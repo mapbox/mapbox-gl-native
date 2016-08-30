@@ -33,10 +33,10 @@ public:
         Required = true,
     };
 
-    Resource(Kind kind_, const std::string& url_, optional<TileData> tileData_ = {}, Necessity necessity_ = Required)
+    Resource(Kind kind_, std::string url_, optional<TileData> tileData_ = {}, Necessity necessity_ = Required)
         : kind(kind_),
           necessity(necessity_),
-          url(url_),
+          url(std::move(url_)),
           tileData(std::move(tileData_)) {
     }
 

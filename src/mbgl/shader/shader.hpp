@@ -3,15 +3,14 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/optional.hpp>
 
 namespace mbgl {
 
 class Shader : private util::noncopyable {
 public:
-    Shader(const GLchar *name, const GLchar *vertex, const GLchar *fragment, gl::ObjectStore&);
-
     ~Shader();
-    const GLchar *name;
+    const char* name;
 
     GLuint getID() const {
         return program.get();
@@ -19,11 +18,28 @@ public:
 
     virtual void bind(GLbyte *offset) = 0;
 
+    enum Defines : bool {
+        None = false,
+        Overdraw = true,
+    };
+
 protected:
-    GLint a_pos = -1;
+    Shader(const char* name_,
+           const char* vertex,
+           const char* fragment,
+           gl::ObjectStore&,
+           Defines defines = Defines::None);
+
+    static constexpr GLint         a_pos = 0;
+    static constexpr GLint     a_extrude = 1;
+    static constexpr GLint      a_offset = 2;
+    static constexpr GLint        a_data = 3;
+    static constexpr GLint       a_data1 = 4;
+    static constexpr GLint       a_data2 = 5;
+    static constexpr GLint a_texture_pos = 6;
 
 private:
-    bool compileShader(gl::UniqueShader&, const GLchar *source[]);
+    bool compileShader(gl::UniqueShader&, const GLchar *source);
 
     gl::UniqueProgram program;
     gl::UniqueShader vertexShader;

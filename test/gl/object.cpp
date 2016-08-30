@@ -6,7 +6,6 @@
 #include <mbgl/gl/gl_helper.hpp>
 #include <mbgl/gl/gl_config.hpp>
 #include <mbgl/gl/object_store.hpp>
-#include <mbgl/gl/texture_pool.hpp>
 
 #include <memory>
 
@@ -15,14 +14,16 @@ namespace {
 static bool getFlag = false;
 static bool setFlag = false;
 
-}; // namespace
+} // namespace
 
 struct MockGLObject {
     using Type = bool;
-    static const Type Default = false;
+    static const Type Default;
     static Type Get() { getFlag = true; return true; }
     static void Set(const Type&) { setFlag = true; }
 };
+
+const bool MockGLObject::Default = false;
 
 TEST(GLObject, Preserve) {
     getFlag = false;
@@ -62,7 +63,7 @@ TEST(GLObject, Value) {
 
     object->reset();
     EXPECT_EQ(object->getCurrent(), false);
-    EXPECT_TRUE(object->getDirty());
+    EXPECT_FALSE(object->getDirty());
     EXPECT_TRUE(setFlag);
 }
 
@@ -74,118 +75,43 @@ TEST(GLObject, Store) {
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueProgram program = store.createProgram();
-    EXPECT_NE(program.get(), 0);
+    EXPECT_NE(program.get(), 0u);
     program.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueShader shader = store.createShader(GL_VERTEX_SHADER);
-    EXPECT_NE(shader.get(), 0);
+    EXPECT_NE(shader.get(), 0u);
     shader.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueBuffer buffer = store.createBuffer();
-    EXPECT_NE(buffer.get(), 0);
+    EXPECT_NE(buffer.get(), 0u);
     buffer.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueTexture texture = store.createTexture();
-    EXPECT_NE(texture.get(), 0);
+    EXPECT_NE(texture.get(), 0u);
     texture.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
+    EXPECT_FALSE(store.empty());
+    store.reset();
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueVAO vao = store.createVAO();
-    EXPECT_NE(vao.get(), 0);
+    EXPECT_NE(vao.get(), 0u);
     vao.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
     EXPECT_TRUE(store.empty());
 
-    mbgl::gl::UniqueTexturePool texturePool = store.createTexturePool();
-    for (auto& id : texturePool.get()) {
-        EXPECT_NE(id, 0);
-    }
-    EXPECT_TRUE(texturePool.get().size() == size_t(mbgl::gl::TextureMax));
-    texturePool.reset();
-    EXPECT_FALSE(store.empty());
-    store.performCleanup();
-    EXPECT_TRUE(store.empty());
-
-    view.deactivate();
-}
-
-TEST(GLObject, TexturePool) {
-    mbgl::HeadlessView view(std::make_shared<mbgl::HeadlessDisplay>(), 1);
-    view.activate();
-
-    mbgl::gl::ObjectStore store;
-    EXPECT_TRUE(store.empty());
-
-    mbgl::gl::TexturePool pool;
-
-    std::vector<mbgl::gl::PooledTexture> ids;
-
-    // Fill an entire texture pool.
-    for (auto i = 0; i != mbgl::gl::TextureMax; ++i) {
-        ids.push_back(pool.acquireTexture(store));
-        EXPECT_EQ(ids.back().get(), GLuint(i + 1));
-        EXPECT_TRUE(store.empty());
-    }
-
-    // Reuse texture ids from the same pool.
-    for (auto i = 0; i != mbgl::gl::TextureMax; ++i) {
-        ids[i].reset();
-        ids.push_back(pool.acquireTexture(store));
-        EXPECT_EQ(ids.back().get(), GLuint(i + 1));
-        EXPECT_TRUE(store.empty());
-    }
-
-    // Trigger a new texture pool creation.
-    {
-        mbgl::gl::PooledTexture id = pool.acquireTexture(store);
-        EXPECT_EQ(id, mbgl::gl::TextureMax + 1);
-        EXPECT_TRUE(store.empty());
-
-        id.reset();
-
-        // Last used texture from pool triggers pool recycling.
-        EXPECT_FALSE(store.empty());
-
-        store.performCleanup();
-        EXPECT_TRUE(store.empty());
-    }
-
-    // First pool is still full, thus creating a new pool.
-    mbgl::gl::PooledTexture id1 = pool.acquireTexture(store);
-    EXPECT_GT(id1.get(), mbgl::gl::TextureMax);
-    EXPECT_TRUE(store.empty());
-
-    // Release all textures from the first pool.
-    ids.clear();
-    EXPECT_FALSE(store.empty());
-
-    store.performCleanup();
-    EXPECT_TRUE(store.empty());
-
-    // The first pool is now gone, the next pool is now in use.
-    mbgl::gl::PooledTexture id2 = pool.acquireTexture(store);
-    EXPECT_GT(id2.get(), id1.get());
-
-    id2.reset();
-    EXPECT_TRUE(store.empty());
-
-    // Last used texture from the pool triggers pool recycling.
-    id1.reset();
-    EXPECT_FALSE(store.empty());
-
-    store.performCleanup();
+    store.reset();
     EXPECT_TRUE(store.empty());
 
     view.deactivate();

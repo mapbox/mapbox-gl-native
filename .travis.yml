@@ -18,13 +18,13 @@ addons_shortcuts:
   addons_qt4: &qt4
     apt:
       sources:  [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-5', 'gcc-5',
+      packages: [ 'g++-5', 'gcc-5', 'libjemalloc-dev',
                   'mesa-utils', 'qt4-default' ]
   addons_qt5: &qt5
     apt:
       sources:  [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-5', 'gcc-5',
-                  'mesa-utils', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev', 'qtpositioning5-dev', 'qtlocation5-dev' ]
+      packages: [ 'g++-5', 'gcc-5',
+                  'mesa-utils', 'libc6-dbg', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev', 'qtpositioning5-dev', 'qtlocation5-dev' ]
 
 env:
   global:
@@ -50,19 +50,23 @@ after_script:
 
 matrix:
   include:
-    # Clang 3.5 - Release - Node
+    # Clang 3.5 - Debug - Node
     - os: linux
       sudo: required
       dist: trusty
       language: node
-      compiler: "node4-clang35-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
+      compiler: "node4-clang35-debug"
+      env: _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
+      before_script:
+        - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
+        - export PUBLISH=$([[ ${TAG} == "node-v${PACKAGE_JSON_VERSION}" ]] && echo 1 || echo 0)
+        - export BUILDTYPE=$([[ ${PUBLISH} ]] && echo "Release" || echo "Debug")
       script:
         - nvm install 4
         - nvm use 4
         - make node
-        - make test-node
+        - if [[ ! ${PUBLISH} ]]; then make test-node; fi
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
@@ -104,15 +108,28 @@ matrix:
       env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
 
+    # Clang 3.5 - tidy
+    - os: linux
+      sudo: required
+      dist: trusty
+      language: cpp
+      compiler: "tidy-clang35-release"
+      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
+      addons: *clang35
+      script:
+        - make tidy
+
     # Qt 4 - Release
     - os: linux
-      sudo: false
+      sudo: required
+      dist: trusty
       language: cpp
       compiler: "qt4-gcc5-release"
       env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt4
       script:
-        - make qt-app test-qt
+        - make qt-app
+        - LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so make test-qt-Memory.*:*.Load
 
     # Qt 5 - Release
     - os: linux
@@ -123,7 +140,9 @@ matrix:
       env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt5
       script:
-        - make qt-app qt-qml-app test-qt
+        - make qt-app
+        - make qt-qml-app
+        - make test-valgrind-qt--*.Load
 
 cache:
   directories:

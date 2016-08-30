@@ -14,7 +14,7 @@
     "source-layer": "waterway",
     "filter": ["in", "type", "river", "canal"],
     "paint": {
-      "line-width": null
+      "line-width": "no"
     }
   }]
 }

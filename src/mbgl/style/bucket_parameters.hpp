@@ -3,8 +3,8 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/style/filter.hpp>
-#include <mbgl/util/atomic.hpp>
 
+#include <atomic>
 #include <functional>
 
 namespace mbgl {
@@ -24,7 +24,7 @@ class BucketParameters {
 public:
     BucketParameters(const OverscaledTileID& tileID_,
                           const GeometryTileLayer& layer_,
-                          const util::Atomic<bool>& obsolete_,
+                          const std::atomic<bool>& obsolete_,
                           uintptr_t tileUID_,
                           bool& partialParse_,
                           SpriteStore& spriteStore_,
@@ -51,7 +51,7 @@ public:
 
     const OverscaledTileID& tileID;
     const GeometryTileLayer& layer;
-    const util::Atomic<bool>& obsolete;
+    const std::atomic<bool>& obsolete;
     uintptr_t tileUID;
     bool& partialParse;
     SpriteStore& spriteStore;

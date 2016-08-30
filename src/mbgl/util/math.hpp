@@ -14,18 +14,18 @@ namespace util {
 // Find the angle of the two vectors, solving the formula for the cross product
 // a x b = |a||b|sin(θ) for θ.
 template <typename T = double, typename S>
-inline T angle_between(const Point<S>& a, const Point<S>& b) {
+T angle_between(const Point<S>& a, const Point<S>& b) {
     return std::atan2((a.x * b.y - a.y * b.x), a.x * b.x + a.y * b.y);
 }
 
 template <typename T = double, typename S>
-inline T angle_to(const Point<S>& a, const Point<S>& b) {
+T angle_to(const Point<S>& a, const Point<S>& b) {
     return std::atan2(a.y - b.y, a.x - b.x);
 }
 
 // Reflect an angle around 0 degrees
 template <typename T>
-inline std::array<T, 2> flip(const std::array<T, 2>& c) {
+std::array<T, 2> flip(const std::array<T, 2>& c) {
     return {{
         static_cast<T>(2 * M_PI - c[0]),
         static_cast<T>(2 * M_PI - c[1])
@@ -33,7 +33,7 @@ inline std::array<T, 2> flip(const std::array<T, 2>& c) {
 }
 
 template <typename T, typename S1, typename S2>
-inline Point<T> normal(const S1& a, const S2& b) {
+Point<T> normal(const S1& a, const S2& b) {
     T dx = b.x - a.x;
     T dy = b.y - a.y;
     T c = std::sqrt(dx * dx + dy * dy);
@@ -41,12 +41,12 @@ inline Point<T> normal(const S1& a, const S2& b) {
 }
 
 template <typename T>
-inline T perp(const T& a) {
+T perp(const T& a) {
     return T(-a.y, a.x);
 }
 
 template <typename T, typename S1, typename S2>
-inline T dist(const S1& a, const S2& b) {
+T dist(const S1& a, const S2& b) {
     T dx = b.x - a.x;
     T dy = b.y - a.y;
     T c = std::sqrt(dx * dx + dy * dy);
@@ -54,7 +54,7 @@ inline T dist(const S1& a, const S2& b) {
 }
 
 template <typename T, typename S1, typename S2>
-inline T distSqr(const S1& a, const S2& b) {
+T distSqr(const S1& a, const S2& b) {
     T dx = b.x - a.x;
     T dy = b.y - a.y;
     T c = dx * dx + dy * dy;
@@ -62,23 +62,23 @@ inline T distSqr(const S1& a, const S2& b) {
 }
 
 template <typename T>
-inline T round(const T& a) {
+T round(const T& a) {
     return T(::round(a.x), ::round(a.y));
 }
 
 template <typename T>
-inline T length(T a, T b) {
+T length(T a, T b) {
     return std::sqrt(a * a + b * b);
 }
 
 // Take the magnitude of vector a.
 template <typename T = double, typename S>
-inline T mag(const S& a) {
+T mag(const S& a) {
     return std::sqrt(a.x * a.x + a.y * a.y);
 }
 
 template <typename S>
-inline S unit(const S& a) {
+S unit(const S& a) {
     auto magnitude = mag(a);
     if (magnitude == 0) {
         return a;
@@ -87,7 +87,7 @@ inline S unit(const S& a) {
 }
 
 template <typename T, typename S = double>
-inline T rotate(const T& a, S angle) {
+T rotate(const T& a, S angle) {
     S cos = std::cos(angle);
     S sin = std::sin(angle);
     S x = cos * a.x - sin * a.y;
@@ -96,7 +96,7 @@ inline T rotate(const T& a, S angle) {
 }
 
 template <typename T>
-inline Point<T> matrixMultiply(const std::array<T, 4>& m, const Point<T>& p) {
+Point<T> matrixMultiply(const std::array<T, 4>& m, const Point<T>& p) {
     return Point<T>(m[0] * p.x + m[1] * p.y, m[2] * p.x + m[3] * p.y);
 }
 

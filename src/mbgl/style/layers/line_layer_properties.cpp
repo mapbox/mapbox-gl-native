@@ -5,31 +5,11 @@
 namespace mbgl {
 namespace style {
 
-void LineLayoutProperties::parse(const JSValue& value) {
-    lineCap.parse("line-cap", value);
-    lineJoin.parse("line-join", value);
-    lineMiterLimit.parse("line-miter-limit", value);
-    lineRoundLimit.parse("line-round-limit", value);
-}
-
 void LineLayoutProperties::recalculate(const CalculationParameters& parameters) {
     lineCap.calculate(parameters);
     lineJoin.calculate(parameters);
     lineMiterLimit.calculate(parameters);
     lineRoundLimit.calculate(parameters);
-}
-
-void LinePaintProperties::parse(const JSValue& value) {
-    lineOpacity.parse("line-opacity", value);
-    lineColor.parse("line-color", value);
-    lineTranslate.parse("line-translate", value);
-    lineTranslateAnchor.parse("line-translate-anchor", value);
-    lineWidth.parse("line-width", value);
-    lineGapWidth.parse("line-gap-width", value);
-    lineOffset.parse("line-offset", value);
-    lineBlur.parse("line-blur", value);
-    lineDasharray.parse("line-dasharray", value);
-    linePattern.parse("line-pattern", value);
 }
 
 void LinePaintProperties::cascade(const CascadeParameters& parameters) {

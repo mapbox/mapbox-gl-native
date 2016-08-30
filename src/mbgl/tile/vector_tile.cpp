@@ -1,13 +1,93 @@
 #include <mbgl/tile/vector_tile.hpp>
-#include <mbgl/style/source.hpp>
-#include <mbgl/storage/resource.hpp>
-#include <mbgl/storage/response.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/util/url.hpp>
+#include <mbgl/tile/tile_loader_impl.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/style/update_parameters.hpp>
 
+#include <protozero/pbf_reader.hpp>
+
+#include <map>
+#include <unordered_map>
+#include <functional>
 #include <utility>
 
 namespace mbgl {
+
+class VectorTileLayer;
+
+using pbf_iter_type = protozero::pbf_reader::const_uint32_iterator;
+using packed_iter_type = std::pair<pbf_iter_type,pbf_iter_type>;
+
+class VectorTileFeature : public GeometryTileFeature {
+public:
+    VectorTileFeature(protozero::pbf_reader, const VectorTileLayer&);
+
+    FeatureType getType() const override { return type; }
+    optional<Value> getValue(const std::string&) const override;
+    std::unordered_map<std::string,Value> getProperties() const override;
+    optional<FeatureIdentifier> getID() const override;
+    GeometryCollection getGeometries() const override;
+
+private:
+    const VectorTileLayer& layer;
+    optional<FeatureIdentifier> id;
+    FeatureType type = FeatureType::Unknown;
+    packed_iter_type tags_iter;
+    packed_iter_type geometry_iter;
+};
+
+class VectorTileLayer : public GeometryTileLayer {
+public:
+    VectorTileLayer(protozero::pbf_reader);
+
+    std::size_t featureCount() const override { return features.size(); }
+    util::ptr<const GeometryTileFeature> getFeature(std::size_t) const override;
+    std::string getName() const override;
+
+private:
+    friend class VectorTileData;
+    friend class VectorTileFeature;
+
+    std::string name;
+    uint32_t version = 1;
+    uint32_t extent = 4096;
+    std::map<std::string, uint32_t> keysMap;
+    std::vector<std::reference_wrapper<const std::string>> keys;
+    std::vector<Value> values;
+    std::vector<protozero::pbf_reader> features;
+};
+
+class VectorTileData : public GeometryTileData {
+public:
+    VectorTileData(std::shared_ptr<const std::string> data);
+
+    util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
+
+private:
+    std::shared_ptr<const std::string> data;
+    mutable bool parsed = false;
+    mutable std::map<std::string, util::ptr<GeometryTileLayer>> layers;
+};
+
+VectorTile::VectorTile(const OverscaledTileID& id_,
+                       std::string sourceID_,
+                       const style::UpdateParameters& parameters,
+                       const Tileset& tileset)
+    : GeometryTile(id_, sourceID_, parameters.style, parameters.mode),
+      loader(*this, id_, parameters, tileset) {
+}
+
+void VectorTile::setNecessity(Necessity necessity) {
+    loader.setNecessity(necessity);
+}
+
+void VectorTile::setData(std::shared_ptr<const std::string> data_,
+                         optional<Timestamp> modified_,
+                         optional<Timestamp> expires_) {
+    modified = modified_;
+    expires = expires_;
+
+    GeometryTile::setData(data_ ? std::make_unique<VectorTileData>(data_) : nullptr);
+}
 
 Value parseValue(protozero::pbf_reader data) {
     while (data.next())
@@ -40,7 +120,7 @@ VectorTileFeature::VectorTileFeature(protozero::pbf_reader feature_pbf, const Ve
     while (feature_pbf.next()) {
         switch (feature_pbf.tag()) {
         case 1: // id
-            id = feature_pbf.get_uint64();
+            id = { feature_pbf.get_uint64() };
             break;
         case 2: // tags
             tags_iter = feature_pbf.get_packed_uint32();
@@ -105,7 +185,7 @@ std::unordered_map<std::string,Value> VectorTileFeature::getProperties() const {
     return properties;
 }
 
-optional<uint64_t> VectorTileFeature::getID() const {
+optional<FeatureIdentifier> VectorTileFeature::getID() const {
     return id;
 }
 
@@ -159,11 +239,11 @@ GeometryCollection VectorTileFeature::getGeometries() const {
     return fixupPolygons(lines);
 }
 
-VectorTile::VectorTile(std::shared_ptr<const std::string> data_)
+VectorTileData::VectorTileData(std::shared_ptr<const std::string> data_)
     : data(std::move(data_)) {
 }
 
-util::ptr<GeometryTileLayer> VectorTile::getLayer(const std::string& name) const {
+util::ptr<GeometryTileLayer> VectorTileData::getLayer(const std::string& name) const {
     if (!parsed) {
         parsed = true;
         protozero::pbf_reader tile_pbf(*data);
@@ -218,30 +298,6 @@ util::ptr<const GeometryTileFeature> VectorTileLayer::getFeature(std::size_t i) 
 
 std::string VectorTileLayer::getName() const {
     return name;
-}
-
-VectorTileMonitor::VectorTileMonitor(const OverscaledTileID& tileID_, float pixelRatio_,
-                                     const std::string& urlTemplate_, FileSource& fileSource_)
-    : tileID(tileID_),
-      pixelRatio(pixelRatio_),
-      urlTemplate(urlTemplate_),
-      fileSource(fileSource_) {
-}
-
-std::unique_ptr<AsyncRequest> VectorTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback) {
-    const Resource resource = Resource::tile(urlTemplate, pixelRatio, tileID.canonical.x,
-                                             tileID.canonical.y, tileID.canonical.z);
-    return fileSource.request(resource, [callback, this](Response res) {
-        if (res.error) {
-            callback(std::make_exception_ptr(std::runtime_error(res.error->message)), nullptr, res.modified, res.expires);
-        } else if (res.notModified) {
-            return;
-        } else if (res.noContent) {
-            callback(nullptr, nullptr, res.modified, res.expires);
-        } else {
-            callback(nullptr, std::make_unique<VectorTile>(res.data), res.modified, res.expires);
-        }
-    });
 }
 
 } // namespace mbgl

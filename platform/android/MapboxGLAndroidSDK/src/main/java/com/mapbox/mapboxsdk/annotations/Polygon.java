@@ -2,10 +2,7 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Color;
 
-import com.mapbox.mapboxsdk.geometry.LatLng;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**
  * Polygon is a geometry annotation that's a closed loop of coordinates.
@@ -19,19 +16,49 @@ public final class Polygon extends MultiPoint {
         super();
     }
 
+    /**
+     * Get the color of the fill region of the polygon.
+     *
+     * @return the color of the fill
+     */
     public int getFillColor() {
         return fillColor;
     }
 
+    /**
+     * Get the color fo the stroke of the polygon.
+     *
+     * @return the color of the stroke
+     */
     public int getStrokeColor() {
         return strokeColor;
     }
 
-    void setFillColor(int color) {
+    /**
+     * Sets the color of the fill region of the polygon.
+     *
+     * @param color - the color in ARGB format
+     */
+    public void setFillColor(int color) {
         fillColor = color;
+        update();
     }
 
-    void setStrokeColor(int color) {
+    /**
+     * Sets the color of the stroke of the polygon.
+     *
+     * @param color - the color in ARGB format
+     */
+    public void setStrokeColor(int color) {
         strokeColor = color;
+        update();
+    }
+
+    @Override
+    void update() {
+        MapboxMap mapboxMap = getMapboxMap();
+        if (mapboxMap != null) {
+            mapboxMap.updatePolygon(this);
+        }
     }
 }

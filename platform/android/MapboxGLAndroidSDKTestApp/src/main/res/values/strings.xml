@@ -18,10 +18,12 @@
     <string name="activity_polygon">Polygon</string>
     <string name="activity_press_for_marker">Press Map For Marker</string>
     <string name="activity_view_marker">View Marker API</string>
+    <string name="activity_view_marker_scale">Scaling in the View Marker API</string>
 
     <!-- InfoWindow-->
-    <string name="activity_info_window">Standard InfoWindow example</string>
-    <string name="activity_infowindow_adapter">Custom InfoWindow Adapter</string>
+    <string name="activity_info_window">Standard InfoWindow</string>
+    <string name="activity_infowindow_adapter">Custom InfoWindow</string>
+    <string name="activity_dynamic_infowindow_adapter">Custom Dynamic InfoWindow</string>
 
     <!-- Camera -->
     <string name="activity_camera_animation_types">Animation Types</string>
@@ -34,11 +36,15 @@
     <string name="activity_directions">Directions</string>
     <string name="activity_geocoder">Geocoder</string>
 
+    <!-- Navigation -->
+    <string name="activity_location_picker">Location Picker</string>
+
     <!-- Other -->
     <string name="activity_double_map">Double Map Activity</string>
+    <string name="activity_back_to_map">Back to map activity</string>
     <string name="activity_snapshot">Snapshot Activity</string>
     <string name="activity_user_tracking_mode">User tracking mode</string>
-    <string name="activity_user_tracking_customization">User location customization</string>
+    <string name="activity_user_tracking_customization">User location drawable</string>
     <string name="activity_user_dot_color">User location tint color</string>
     <string name="activity_user_location_toggle">User location toggle</string>
     <string name="activity_custom_layer">Custom Layer</string>
@@ -46,6 +52,11 @@
     <string name="activity_debug_mode">Debug Mode</string>
     <string name="activity_offline">Offline Map</string>
     <string name="activity_minmax_zoom">Min/Max Zoom</string>
+    <string name="activity_viewpager">ViewPager</string>
+    <string name="activity_runtime_style">Runtime Style</string>
+    <string name="activity_print">Print a map</string>
+    <string name="activity_surfaceview_overlay">SurfaceView MediaOverlay</string>
+    <string name="title_activity_navigation_drawer">Android SDK View integration</string>
 
     <!-- Description -->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
@@ -77,9 +88,19 @@
     <string name="description_scroll_by">Scroll with pixels in x,y direction</string>
     <string name="description_snapshot">Example to make a snapshot of the map</string>
     <string name="description_doublemap">2 maps in a view hierarchy</string>
+    <string name="description_back_to_map">Restart map view after temporarily leaving to another activity</string>
     <string name="description_view_marker">Use an Android SDK View as marker</string>
+    <string name="description_view_marker_scale">Scale a View Marker</string>
+    <string name="description_dynamic_info_window_adapter">Learn how to create a dynamic custom InfoWindow</string>
+    <string name="description_location_picker">Use a fixed Marker to select your location</string>
+    <string name="description_viewpager">Use SupportMapFragments in a ViewPager</string>
+    <string name="description_runtime_style">Adopt the map style on the fly</string>
+    <string name="description_print">Shows how to print a map</string>
+    <string name="description_navigation_drawer">Test animation of Android SDK View components</string>
+    <string name="description_surfaceview_mediacontrols">Test overlaying SurfaceView</string>
 
-    <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>r
+    <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
+    <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>
     <string name="menuitem_title_tracking_mode_dismiss_on_gesture">Dismiss location tracking on gesture</string>
     <string name="menuitem_title_bearing_mode_dismiss_on_gesture">Dismiss bearing tracking on gesture</string>
     <string name="menuitem_title_reset">Reset</string>
@@ -96,9 +117,17 @@
     <string name="category_maplayout">Map Layout</string>
     <string name="category_offline">Offline</string>
     <string name="category_userlocation">User Location</string>
+    <string name="category_navigation">Navigation</string>
+    <string name="category_style">Styling</string>
 
     <string name="action_visible_bounds_explanation">Center map around 2 markers</string>
     <string name="action_remove_polylines">Remove polylines</string>
+
+    <string name="action_visibility_polygon">Change visibility</string>
+    <string name="action_alpha_polygon">Change alpha</string>
+    <string name="action_points_polygon">Change points</string>
+    <string name="action_color_polygon">Change color</string>
+    <string name="action_width_polyline">Change width</string>
 
     <string name="button_camera_move">Move</string>
     <string name="button_camera_ease">Ease</string>
@@ -151,5 +180,22 @@
     <string name="dialog_camera_position">Animate to new position</string>
 
     <string name="geocoder_instructions">Tap Map To Geocode Where Black Marker Is Currently Located</string>
+
+    <string name="dynamic_marker_chelsea_title">Chelsea</string>
+    <string name="dynamic_marker_chelsea_snippet">Stamford Bridge</string>
+    <string name="dynamic_marker_arsenal_title">Arsenal</string>
+    <string name="dynamic_marker_arsenal_snippet">Emirates Stadium</string>
+
+    <string name="navigation_select_location_button_text">Select Location!</string>
+
+    <string name="title_section1">Different style</string>
+    <string name="title_section2">Show Snackbar</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Example action</string>
+
+    <string name="action_settings">Settings</string>
 
 </resources>

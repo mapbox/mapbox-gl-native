@@ -40,9 +40,9 @@ TEST(Sprite, SpriteImage) {
     PremultipliedImage image(32, 24);
     SpriteImage sprite(std::move(image), 2.0);
     EXPECT_EQ(16, sprite.getWidth());
-    EXPECT_EQ(32, sprite.image.width);
+    EXPECT_EQ(32u, sprite.image.width);
     EXPECT_EQ(12, sprite.getHeight());
-    EXPECT_EQ(24, sprite.image.height);
+    EXPECT_EQ(24u, sprite.image.height);
     EXPECT_EQ(2, sprite.pixelRatio);
 }
 
@@ -50,8 +50,8 @@ TEST(Sprite, SpriteImageFractionalRatio) {
     PremultipliedImage image(20, 12);
     SpriteImage sprite(std::move(image), 1.5);
     EXPECT_EQ(float(20.0 / 1.5), sprite.getWidth());
-    EXPECT_EQ(20, sprite.image.width);
+    EXPECT_EQ(20u, sprite.image.width);
     EXPECT_EQ(float(12.0 / 1.5), sprite.getHeight());
-    EXPECT_EQ(12, sprite.image.height);
+    EXPECT_EQ(12u, sprite.image.height);
     EXPECT_EQ(1.5, sprite.pixelRatio);
 }
