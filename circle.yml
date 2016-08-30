@@ -1,0 +1,8 @@
+dependencies:
+  pre:
+    - scripts/ci/${CIRCLE_NODE_INDEX}/deps.sh
+
+test:
+  override:
+    - scripts/ci/${CIRCLE_NODE_INDEX}/test.sh:
+        parallel: true
