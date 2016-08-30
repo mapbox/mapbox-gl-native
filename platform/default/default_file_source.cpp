@@ -7,6 +7,7 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/url.hpp>
 #include <mbgl/util/thread.hpp>
+#include <mbgl/util/work_queue.hpp>
 #include <mbgl/util/work_request.hpp>
 
 #include <cassert>
@@ -84,6 +85,10 @@ public:
     void request(AsyncRequest* req, Resource resource, Callback callback) {
         Resource revalidation = resource;
 
+        auto reportBad = [this, resource]() {
+            queue.push([this, resource]() { offlineDatabase.remove(resource); });
+        };
+
         const bool hasPrior = resource.priorEtag || resource.priorModified || resource.priorExpires;
         if (!hasPrior || resource.necessity == Resource::Optional) {
             auto offlineResponse = offlineDatabase.get(resource);
@@ -98,6 +103,7 @@ public:
             }
 
             if (offlineResponse) {
+                offlineResponse->reportBad = reportBad;
                 revalidation.priorModified = offlineResponse->modified;
                 revalidation.priorExpires = offlineResponse->expires;
                 revalidation.priorEtag = offlineResponse->etag;
@@ -108,6 +114,7 @@ public:
         if (resource.necessity == Resource::Required) {
             tasks[req] = onlineFileSource.request(revalidation, [=] (Response onlineResponse) {
                 this->offlineDatabase.put(revalidation, onlineResponse);
+                onlineResponse.reportBad = reportBad;
                 callback(onlineResponse);
             });
         }
@@ -134,6 +141,8 @@ private:
         return *downloads.emplace(regionID,
             std::make_unique<OfflineDownload>(regionID, offlineDatabase.getRegionDefinition(regionID), offlineDatabase, onlineFileSource)).first->second;
     }
+
+    util::WorkQueue queue;
 
     OfflineDatabase offlineDatabase;
     OnlineFileSource onlineFileSource;

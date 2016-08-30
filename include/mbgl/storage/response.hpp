@@ -36,6 +36,9 @@ public:
     bool isFresh() const {
         return !expires || *expires > util::now();
     }
+
+    using ReportBadCallback = std::function<void(void)>;
+    ReportBadCallback reportBad = []{};
 };
 
 class Response::Error {
