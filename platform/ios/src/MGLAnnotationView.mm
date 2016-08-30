@@ -246,16 +246,6 @@
     return otherGestureRecognizer == _longPressRecognizer || otherGestureRecognizer == _panGestureRecognizer;
 }
 
-- (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
-{
-    // Allow mbgl to drive animation of this view’s bounds.
-    if ([event isEqualToString:@"bounds"] || [event isEqualToString:@"position"])
-    {
-        return [NSNull null];
-    }
-    return [super actionForLayer:layer forKey:event];
-}
-
 #pragma mark UIAccessibility methods
 
 - (BOOL)isAccessibilityElement {
