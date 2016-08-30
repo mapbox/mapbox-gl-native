@@ -3767,7 +3767,7 @@ public:
         }
 #endif
 
-        self.locationManager.headingFilter = 5.0;
+        self.locationManager.headingFilter = 1.0;
         self.locationManager.delegate = self;
         [self.locationManager startUpdatingLocation];
 
