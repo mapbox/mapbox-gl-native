@@ -1195,7 +1195,16 @@ public class MapView extends FrameLayout {
         for (int i = 0; i < count; i++) {
             Annotation annotation = annotationList.get(i);
             if (annotation instanceof MarkerView) {
-                annotations.add((MarkerView) annotation);
+                MarkerView aboveMarkerView = ((MarkerView) annotation).getAboveMarkerView();
+                int index = -1;
+                if (aboveMarkerView != null) {
+                    index = annotations.indexOf(aboveMarkerView);
+                }
+                if (index != -1) {
+                    annotations.add(index + 1, (MarkerView) annotation);
+                } else {
+                    annotations.add((MarkerView) annotation);
+                }
             }
         }
 
