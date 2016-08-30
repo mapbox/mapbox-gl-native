@@ -311,6 +311,47 @@ TEST(OfflineDatabase, PutTileNotFound) {
     EXPECT_FALSE(res->data.get());
 }
 
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(PutCompressedCorrupted)) {
+    using namespace mbgl;
+
+    createDir("test/fixtures/offline_database");
+    deleteFile("test/fixtures/offline_database/offline.db");
+    std::string path("test/fixtures/offline_database/offline.db");
+
+    Resource resource { Resource::Style, "http://example.com/" };
+
+    Resource tile { Resource::Tile, "http://example.com/" };
+    tile.tileData = Resource::TileData { "http://example.com/", 1, 0, 0, 0 };
+
+    {
+        Response response;
+        response.data = std::make_shared<std::string>("CORRUPTED");
+
+        OfflineDatabase db(path);
+        db.put(resource, response);
+        db.put(tile, response);
+    }
+
+    {
+        sqlite3* db = nullptr;
+        sqlite3_open_v2(path.c_str(), &db, SQLITE_OPEN_READWRITE, nullptr);
+        sqlite3_exec(db, "UPDATE resources SET compressed = 1", nullptr, nullptr, nullptr);
+        sqlite3_exec(db, "UPDATE tiles SET compressed = 1", nullptr, nullptr, nullptr);
+        sqlite3_close_v2(db);
+    }
+
+    Log::setObserver(std::make_unique<FixtureLogObserver>());
+    OfflineDatabase db(path);
+
+    EXPECT_FALSE(db.get(resource));
+    EXPECT_FALSE(db.get(tile));
+
+    auto observer = Log::removeObserver();
+    auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
+    EXPECT_EQ(1u, flo->count({ EventSeverity::Error, Event::Database, -1, "Error decompressing resource: incorrect header check" }));
+    EXPECT_EQ(1u, flo->count({ EventSeverity::Error, Event::Database, -1, "Error decompressing tile: incorrect header check" }));
+}
+
 TEST(OfflineDatabase, CreateRegion) {
     using namespace mbgl;
 
