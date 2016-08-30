@@ -52,6 +52,8 @@ If your application targets iOS 7.x, you’ll need to install the static framewo
    - libsqlite3.tbd
    - libz.tbd
 
+1. In the Build Settings tab, find the Other Linker Flags setting and add `-ObjC`.
+
 {{/STATIC}}
 
 ## Configuration
