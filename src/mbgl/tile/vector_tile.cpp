@@ -75,11 +75,23 @@ VectorTile::VectorTile(const OverscaledTileID& id_,
       loader(*this, id_, parameters, tileset) {
 }
 
+void VectorTile::firstParseFinished(bool succeed) {
+    assert(response);
+
+    if (!succeed) {
+        response->reportBad();
+    }
+
+    response = optional<Response>();
+}
+
 void VectorTile::setNecessity(Necessity necessity) {
     loader.setNecessity(necessity);
 }
 
 void VectorTile::setData(const Response& res) {
+    response = res;
+
     modified = res.modified;
     expires = res.expires;
 

@@ -102,9 +102,11 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
             }
 
             redoPlacement();
+            firstParseFinished(true);
             observer->onTileLoaded(*this, true);
         } else {
             availableData = DataAvailability::All;
+            firstParseFinished(false);
             observer->onTileError(*this, result.get<std::exception_ptr>());
         }
     });

@@ -18,10 +18,12 @@ public:
                const style::UpdateParameters&,
                const Tileset&);
 
+    void firstParseFinished(bool succeed) final;
     void setNecessity(Necessity) final;
     void setData(const Response& response);
 
 private:
+    optional<Response> response;
     TileLoader<VectorTile> loader;
 };
 

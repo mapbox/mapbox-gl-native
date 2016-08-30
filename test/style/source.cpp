@@ -283,6 +283,7 @@ TEST(Source, VectorTileCorrupt) {
         EXPECT_EQ(source.baseImpl->type, SourceType::Vector);
         EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_EQ(util::toString(error), "unknown pbf field type exception");
+        ASSERT_TRUE(badResourceReported);
         test.end();
     };
 
