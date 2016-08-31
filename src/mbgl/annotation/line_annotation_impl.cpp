@@ -14,16 +14,15 @@ LineAnnotationImpl::LineAnnotationImpl(AnnotationID id_, LineAnnotation annotati
 
 void LineAnnotationImpl::updateStyle(Style& style) const {
     Layer* layer = style.getLayer(layerID);
-    LineLayer* lineLayer = layer ? layer->as<LineLayer>() : nullptr;
 
-    if (!lineLayer) {
-        lineLayer = style.addLayer(
-            std::make_unique<LineLayer>(layerID, AnnotationManager::SourceID),
-            AnnotationManager::PointLayerID)->as<LineLayer>();
-        lineLayer->setSourceLayer(layerID);
+    if (!layer) {
+        auto newLayer = std::make_unique<LineLayer>(layerID, AnnotationManager::SourceID);
+        newLayer->setSourceLayer(layerID);
+        newLayer->setLineJoin(LineJoinType::Round);
+        layer = style.addLayer(std::move(newLayer), AnnotationManager::PointLayerID);
     }
 
-    lineLayer->setLineJoin(LineJoinType::Round);
+    LineLayer* lineLayer = layer->as<LineLayer>();
     lineLayer->setLineOpacity(annotation.opacity);
     lineLayer->setLineWidth(annotation.width);
     lineLayer->setLineColor(annotation.color);
