@@ -114,5 +114,6 @@ endmacro()
 macro(mbgl_platform_node)
     target_link_libraries(mbgl-node
         PRIVATE "-framework Foundation"
+        PRIVATE "-framework OpenGL"
     )
 endmacro()
