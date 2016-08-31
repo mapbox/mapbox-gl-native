@@ -14,11 +14,12 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
-import static android.media.MediaPlayer.*;
+import static android.media.MediaPlayer.OnPreparedListener;
 
 public class VideoViewActivity extends AppCompatActivity {
 
     private MapView mapView;
+    private MapboxMap mapboxMap;
     private VideoView videoView;
 
     @Override
@@ -48,8 +49,14 @@ public class VideoViewActivity extends AppCompatActivity {
             }
         });
 
-        mapView = (MapView) findViewById(R.id.map_view);
+        mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap mapboxMap) {
+                VideoViewActivity.this.mapboxMap = mapboxMap;
+            }
+        });
     }
 
     @Override
