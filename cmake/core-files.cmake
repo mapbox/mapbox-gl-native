@@ -421,6 +421,8 @@ set(MBGL_CORE_FILES
     src/mbgl/util/grid_index.hpp
     src/mbgl/util/http_header.cpp
     src/mbgl/util/http_header.hpp
+    src/mbgl/util/http_timeout.cpp
+    src/mbgl/util/http_timeout.hpp
     src/mbgl/util/interpolate.hpp
     src/mbgl/util/intersection_tests.cpp
     src/mbgl/util/intersection_tests.hpp

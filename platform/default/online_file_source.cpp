@@ -13,6 +13,7 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/timer.hpp>
+#include <mbgl/util/http_timeout.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -48,6 +49,7 @@ public:
     // backoff when retrying requests.
     uint32_t failedRequests = 0;
     Response::Error::Reason failedRequestReason = Response::Error::Reason::Success;
+    optional<Timestamp> retryAfter;
 };
 
 class OnlineFileSource::Impl {
@@ -200,30 +202,6 @@ OnlineFileRequest::~OnlineFileRequest() {
     impl.remove(this);
 }
 
-static Duration errorRetryTimeout(Response::Error::Reason failedRequestReason, uint32_t failedRequests) {
-    if (failedRequestReason == Response::Error::Reason::Server) {
-        // Retry after one second three times, then start exponential backoff.
-        return Seconds(failedRequests <= 3 ? 1 : 1 << std::min(failedRequests - 3, 31u));
-    } else if (failedRequestReason == Response::Error::Reason::Connection) {
-        // Immediate exponential backoff.
-        assert(failedRequests > 0);
-        return Seconds(1 << std::min(failedRequests - 1, 31u));
-    } else {
-        // No error, or not an error that triggers retries.
-        return Duration::max();
-    }
-}
-
-static Duration expirationTimeout(optional<Timestamp> expires, uint32_t expiredRequests) {
-    if (expiredRequests) {
-        return Seconds(1 << std::min(expiredRequests - 1, 31u));
-    } else if (expires) {
-        return std::max(Seconds::zero(), *expires - util::now());
-    } else {
-        return Duration::max();
-    }
-}
-
 Timestamp interpolateExpiration(const Timestamp& current,
                                 optional<Timestamp> prior,
                                 bool& expired) {
@@ -267,8 +245,9 @@ void OnlineFileRequest::schedule(optional<Timestamp> expires) {
 
     // If we're not being asked for a forced refresh, calculate a timeout that depends on how many
     // consecutive errors we've encountered, and on the expiration time, if present.
-    Duration timeout = std::min(errorRetryTimeout(failedRequestReason, failedRequests),
-        expirationTimeout(expires, expiredRequests));
+    Duration timeout = std::min(
+                            http::errorRetryTimeout(failedRequestReason, failedRequests, retryAfter),
+                            http::expirationTimeout(expires, expiredRequests));
 
     if (timeout == Duration::max()) {
         return;
@@ -321,6 +300,7 @@ void OnlineFileRequest::completed(Response response) {
     if (response.error) {
         failedRequests++;
         failedRequestReason = response.error->reason;
+        retryAfter = response.error->retryAfter;
     } else {
         failedRequests = 0;
         failedRequestReason = Response::Error::Reason::Success;

@@ -359,3 +359,47 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusOnlineOffline)) {
 
     loop.run();
 }
+
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitStandard)) {
+    util::RunLoop loop;
+    OnlineFileSource fs;
+    
+    auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/rate-limit?std=true" }, [&](Response res) {
+        ASSERT_NE(nullptr, res.error);
+        EXPECT_EQ(Response::Error::Reason::RateLimit, res.error->reason);
+        ASSERT_EQ(true, bool(res.error->retryAfter));
+        ASSERT_LT(util::now(), res.error->retryAfter);
+        loop.stop();
+    });
+    
+    loop.run();
+}
+
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitMBX)) {
+    util::RunLoop loop;
+    OnlineFileSource fs;
+    
+    auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/rate-limit?mbx=true" }, [&](Response res) {
+        ASSERT_NE(nullptr, res.error);
+        EXPECT_EQ(Response::Error::Reason::RateLimit, res.error->reason);
+        ASSERT_EQ(true, bool(res.error->retryAfter));
+        ASSERT_LT(util::now(), res.error->retryAfter);
+        loop.stop();
+    });
+    
+    loop.run();
+}
+
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitDefault)) {
+    util::RunLoop loop;
+    OnlineFileSource fs;
+    
+    auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/rate-limit" }, [&](Response res) {
+        ASSERT_NE(nullptr, res.error);
+        EXPECT_EQ(Response::Error::Reason::RateLimit, res.error->reason);
+        ASSERT_EQ(false, bool(res.error->retryAfter));
+        loop.stop();
+    });
+    
+    loop.run();
+}

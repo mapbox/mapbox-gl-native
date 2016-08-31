@@ -17,6 +17,9 @@ public:
 
     optional<Timestamp> toTimePoint() const;
 };
+    
+optional<Timestamp> parseRetryHeaders(const optional<std::string>& retryAfter,
+                                      const optional<std::string>& xRateLimitReset);
 
 } // namespace http
 } // namespace mbgl
