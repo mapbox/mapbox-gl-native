@@ -1,6 +1,7 @@
 #import "MGLSource.h"
 
 #import "MGLTypes.h"
+#import "MGLGeoJSONOptions.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -38,6 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, nullable) NSURL *URL;
 
+@property (nonatomic, readonly, nullable) MGLGeoJSONOptions *geoJSONOptions;
+
 /**
  Initializes a source with the given identifier and GeoJSON data.
  
@@ -45,6 +48,8 @@ NS_ASSUME_NONNULL_BEGIN
  @param geoJSONData An NSData object representing GeoJSON source code.
  */
 - (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier geoJSONData:(NSData *)data NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier geoJSONData:(NSData *)data options:(MGLGeoJSONOptions *)options NS_DESIGNATED_INITIALIZER;
 
 /**
  Initializes a source with the given identifier and URL.

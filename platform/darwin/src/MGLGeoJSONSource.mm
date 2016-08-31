@@ -16,6 +16,15 @@
     return self;
 }
 
+- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier geoJSONData:(NSData *)data options:(MGLGeoJSONOptions *)options
+{
+    if (self = [super initWithSourceIdentifier:sourceIdentifier]) {
+        _geoJSONData = data;
+        _geoJSONOptions = options;
+    }
+    return self;
+}
+
 - (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url {
     if (self = [super initWithSourceIdentifier:sourceIdentifier]) {
         _URL = url;
@@ -23,9 +32,24 @@
     return self;
 }
 
+- (mbgl::style::GeoJSONOptions)mbgl_geoJSONOptions
+{
+    auto options = mbgl::style::GeoJSONOptions();
+    options.maxzoom = self.geoJSONOptions.maximumZoom;
+    options.buffer = self.geoJSONOptions.buffer;
+    options.tolerance = self.geoJSONOptions.tolerance;
+    options.cluster = self.geoJSONOptions.cluster;
+    options.clusterRadius = self.geoJSONOptions.clusterRadius;
+    options.clusterMaxZoom = self.geoJSONOptions.clusterMaximumZoom;
+    return options;
+}
+
 - (std::unique_ptr<mbgl::style::Source>)mbgl_source
 {
-    auto source = std::make_unique<mbgl::style::GeoJSONSource>(self.sourceIdentifier.UTF8String);
+    auto source = self.geoJSONOptions
+    ? std::make_unique<mbgl::style::GeoJSONSource>(self.sourceIdentifier.UTF8String, [self mbgl_geoJSONOptions])
+    : std::make_unique<mbgl::style::GeoJSONSource>(self.sourceIdentifier.UTF8String);
+    
     if (self.URL) {
         NSURL *url = self.URL.mgl_URLByStandardizingScheme;
         source->setURL(url.absoluteString.UTF8String);
@@ -35,6 +59,7 @@
         source->setGeoJSON(geojson);
         _features = MGLFeaturesFromMBGLFeatures(geojson);
     }
+    
     return std::move(source);
 }
 
