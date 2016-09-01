@@ -181,7 +181,7 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)addSource:(MGLSource *)source
 {
-    self.mapView.mbglMap->addSource([source mbgl_source]);
+    self.mapView.mbglMap->addSource([source mbglSource]);
 }
 
 - (void)removeSource:(MGLSource *)source

@@ -5,7 +5,7 @@
 
 @interface MGLSource (Private)
 
-- (std::unique_ptr<mbgl::style::Source>)mbgl_source;
+- (std::unique_ptr<mbgl::style::Source>)mbglSource;
 
 @property (nonatomic) mbgl::style::Source *source;
 

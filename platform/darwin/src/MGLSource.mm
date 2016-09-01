@@ -11,7 +11,7 @@
     return self;
 }
 
-- (std::unique_ptr<mbgl::style::Source>)mbgl_source {
+- (std::unique_ptr<mbgl::style::Source>)mbglSource {
     [NSException raise:@"Subclasses must override this method" format:@""];
     return nil;
 }
