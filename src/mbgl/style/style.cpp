@@ -305,7 +305,9 @@ bool Style::isLoaded() const {
     }
 
     for (const auto& source: sources) {
-        if (source->baseImpl->enabled && !source->baseImpl->isLoaded()) return false;
+        if (source->baseImpl->enabled && !source->baseImpl->isLoaded()) {
+            return false;
+        }
     }
 
     if (!spriteStore->isLoaded()) {

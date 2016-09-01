@@ -74,7 +74,11 @@ public:
     const std::string id;
 
     bool loaded = false;
-    bool enabled = false;
+
+    // Tracks whether the source is used by any layers visible at the current zoom level. Must
+    // be initialized to true so that Style::isLoaded() does not produce false positives if
+    // called before Style::recalculate().
+    bool enabled = true;
 
 protected:
     void invalidateTiles();

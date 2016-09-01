@@ -17,6 +17,10 @@ TEST(Style, UnusedSource) {
     auto now = Clock::now();
 
     style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
+
+    // If we haven't calculated whether the source is used, we have to assume it is used.
+    EXPECT_FALSE(style.isLoaded());
+
     style.cascade(now, MapMode::Still);
     style.recalculate(0, now, MapMode::Still);
 
