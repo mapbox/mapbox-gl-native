@@ -95,8 +95,8 @@ PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::getDefa
     return { <%- defaultValue(property) %> };
 }
 
-PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
-    return impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.get();
+PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>(const optional<std::string>& klass) const {
+    return impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.get(klass);
 }
 
 void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>> value, const optional<std::string>& klass) {

@@ -43,9 +43,9 @@ public:
         return values.find(ClassID::Default) == values.end();
     }
 
-    const PropertyValue<T>& get() const {
+    const PropertyValue<T>& get(const optional<std::string>& klass) const {
         static const PropertyValue<T> staticValue;
-        const auto it = values.find(ClassID::Default);
+        const auto it = values.find(klass ? ClassDictionary::Get().lookup(*klass) : ClassID::Default);
         return it == values.end() ? staticValue : it->second;
     }
 
