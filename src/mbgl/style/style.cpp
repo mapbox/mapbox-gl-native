@@ -506,9 +506,11 @@ void Style::onSpriteError(std::exception_ptr error) {
 struct QueueSourceReloadVisitor {
     UpdateBatch& updateBatch;
 
-    void operator()(CustomLayer&) { assert(false); }
-    void operator()(RasterLayer&) { assert(false); }
-    void operator()(BackgroundLayer&) { assert(false); }
+    // No need to reload sources for these types; their visibility can change but
+    // they don't participate in layout.
+    void operator()(CustomLayer&) {}
+    void operator()(RasterLayer&) {}
+    void operator()(BackgroundLayer&) {}
 
     template <class VectorLayer>
     void operator()(VectorLayer& layer) {
@@ -517,6 +519,11 @@ struct QueueSourceReloadVisitor {
 };
 
 void Style::onLayerFilterChanged(Layer& layer) {
+    layer.accept(QueueSourceReloadVisitor { updateBatch });
+    observer->onUpdate(Update::Layout);
+}
+
+void Style::onLayerVisibilityChanged(Layer& layer) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
     observer->onUpdate(Update::Layout);
 }

@@ -10,6 +10,7 @@ public:
     virtual ~LayerObserver() = default;
 
     virtual void onLayerFilterChanged(Layer&) {}
+    virtual void onLayerVisibilityChanged(Layer&) {}
     virtual void onLayerPaintPropertyChanged(Layer&) {}
     virtual void onLayerLayoutPropertyChanged(Layer&) {}
 };

@@ -19,7 +19,10 @@ VisibilityType Layer::getVisibility() const {
 }
 
 void Layer::setVisibility(VisibilityType value) {
+    if (value == getVisibility())
+        return;
     baseImpl->visibility = value;
+    baseImpl->observer->onLayerVisibilityChanged(*this);
 }
 
 float Layer::getMinZoom() const {

@@ -136,6 +136,7 @@ private:
 
     // LayerObserver implementation.
     void onLayerFilterChanged(Layer&) override;
+    void onLayerVisibilityChanged(Layer&) override;
     void onLayerPaintPropertyChanged(Layer&) override;
     void onLayerLayoutPropertyChanged(Layer&) override;
 

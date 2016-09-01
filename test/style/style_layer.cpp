@@ -226,6 +226,15 @@ TEST(Layer, Observer) {
     layer->setFilter(NullFilter());
     EXPECT_TRUE(filterChanged);
 
+    // Notifies observer on visibility change.
+    bool visibilityChanged = false;
+    observer.layerVisibilityChanged = [&] (Layer& layer_) {
+        EXPECT_EQ(layer.get(), &layer_);
+        visibilityChanged = true;
+    };
+    layer->setVisibility(VisibilityType::None);
+    EXPECT_TRUE(visibilityChanged);
+
     // Notifies observer on paint property change.
     bool paintPropertyChanged = false;
     observer.layerPaintPropertyChanged = [&] (Layer& layer_) {
@@ -243,6 +252,11 @@ TEST(Layer, Observer) {
     };
     layer->setLineCap(lineCap);
     EXPECT_TRUE(layoutPropertyChanged);
+
+    // Does not notify observer on no-op visibility change.
+    visibilityChanged = false;
+    layer->setVisibility(VisibilityType::None);
+    EXPECT_FALSE(visibilityChanged);
 
     // Does not notify observer on no-op paint property change.
     paintPropertyChanged = false;

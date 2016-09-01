@@ -14,6 +14,10 @@ public:
         if (layerFilterChanged) layerFilterChanged(layer);
     }
 
+    void onLayerVisibilityChanged(Layer& layer) override {
+        if (layerVisibilityChanged) layerVisibilityChanged(layer);
+    }
+
     void onLayerPaintPropertyChanged(Layer& layer) override {
         if (layerPaintPropertyChanged) layerPaintPropertyChanged(layer);
     }
@@ -23,6 +27,7 @@ public:
     }
 
     std::function<void (Layer&)> layerFilterChanged;
+    std::function<void (Layer&)> layerVisibilityChanged;
     std::function<void (Layer&)> layerPaintPropertyChanged;
     std::function<void (Layer&)> layerLayoutPropertyChanged;
 };
