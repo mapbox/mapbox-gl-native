@@ -30,7 +30,6 @@ import com.mapbox.mapboxsdk.testapp.R;
 public class CameraPositionActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private MapView mapView;
-    private MapboxMap mapboxMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +52,6 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
 
     @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-        this.mapboxMap = mapboxMap;
         // add a listener to FAB
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setColorFilter(ContextCompat.getColor(CameraPositionActivity.this, R.color.primary));
@@ -62,17 +60,23 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
             public void onClick(View v) {
                 Context context = v.getContext();
                 final View dialogContent = LayoutInflater.from(context).inflate(R.layout.dialog_camera_position, null);
-                AlertDialog.Builder builder = new AlertDialog.Builder(context, com.mapbox.mapboxsdk.R.style.AttributionAlertDialogStyle);
+                AlertDialog.Builder builder = new AlertDialog.Builder(
+                    context, com.mapbox.mapboxsdk.R.style.AttributionAlertDialogStyle);
                 builder.setTitle(R.string.dialog_camera_position);
                 builder.setView(onInflateDialogContent(dialogContent));
                 builder.setPositiveButton("Animate", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        double latitude = Double.parseDouble(((TextView) dialogContent.findViewById(R.id.value_lat)).getText().toString());
-                        double longitude = Double.parseDouble(((TextView) dialogContent.findViewById(R.id.value_lon)).getText().toString());
-                        double zoom = Double.parseDouble(((TextView) dialogContent.findViewById(R.id.value_zoom)).getText().toString());
-                        double bearing = Double.parseDouble(((TextView) dialogContent.findViewById(R.id.value_bearing)).getText().toString());
-                        double tilt = Double.parseDouble(((TextView) dialogContent.findViewById(R.id.value_tilt)).getText().toString());
+                        double latitude = Double.parseDouble(
+                            ((TextView) dialogContent.findViewById(R.id.value_lat)).getText().toString());
+                        double longitude = Double.parseDouble(
+                            ((TextView) dialogContent.findViewById(R.id.value_lon)).getText().toString());
+                        double zoom = Double.parseDouble(
+                            ((TextView) dialogContent.findViewById(R.id.value_zoom)).getText().toString());
+                        double bearing = Double.parseDouble(
+                            ((TextView) dialogContent.findViewById(R.id.value_bearing)).getText().toString());
+                        double tilt = Double.parseDouble(
+                            ((TextView) dialogContent.findViewById(R.id.value_tilt)).getText().toString());
 
                         CameraPosition cameraPosition = new CameraPosition.Builder()
                                 .target(new LatLng(latitude, longitude))
@@ -136,7 +140,8 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
         return view;
     }
 
-    private void linkTextView(View view, @IdRes int textViewRes, @IdRes int seekBarRes, ValueChangeListener listener, int defaultValue) {
+    private void linkTextView(
+        View view, @IdRes int textViewRes, @IdRes int seekBarRes, ValueChangeListener listener, int defaultValue) {
         final TextView value = (TextView) view.findViewById(textViewRes);
         SeekBar seekBar = (SeekBar) view.findViewById(seekBarRes);
         listener.setLinkedValueView(value);

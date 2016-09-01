@@ -42,8 +42,8 @@ public class MarkerViewScaleActivity extends AppCompatActivity implements OnMapR
         }
 
         final SeekBar xBar = (SeekBar) findViewById(R.id.seekbar_factor);
-        TextView xText = (TextView) findViewById(R.id.textview_factor);
-        xBar.setOnSeekBarChangeListener(new FactorChangeListener(xText));
+        TextView textView = (TextView) findViewById(R.id.textview_factor);
+        xBar.setOnSeekBarChangeListener(new FactorChangeListener(textView));
 
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
@@ -56,12 +56,12 @@ public class MarkerViewScaleActivity extends AppCompatActivity implements OnMapR
         Icon icon = IconFactory.getInstance(MarkerViewScaleActivity.this)
                 .fromResource(R.drawable.ic_circle);
 
-        MarkerView mMarker = mapboxMap.addMarker(new MarkerViewOptions()
+        MarkerView marker = mapboxMap.addMarker(new MarkerViewOptions()
                 .position(new LatLng(38.907192, -77.036871))
                 .icon(icon)
                 .flat(true));
 
-        markerView = mapboxMap.getMarkerViewManager().getView(mMarker);
+        markerView = mapboxMap.getMarkerViewManager().getView(marker);
     }
 
     @Override
@@ -107,16 +107,16 @@ public class MarkerViewScaleActivity extends AppCompatActivity implements OnMapR
 
     private class FactorChangeListener implements SeekBar.OnSeekBarChangeListener {
 
-        private TextView xText;
+        private TextView textView;
 
-        public FactorChangeListener(TextView xText) {
-            this.xText = xText;
+        public FactorChangeListener(TextView textView) {
+            this.textView = textView;
         }
 
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             float newScale = getScale(progress);
-            xText.setText(String.format(Locale.US, "Scale: %.1f", newScale));
+            textView.setText(String.format(Locale.US, "Scale: %.1f", newScale));
             if (MarkerViewScaleActivity.this.markerView != null) {
                 markerView.setScaleX(newScale);
                 markerView.setScaleY(newScale);

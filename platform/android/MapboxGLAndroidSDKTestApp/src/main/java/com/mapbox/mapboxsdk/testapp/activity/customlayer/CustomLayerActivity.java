@@ -13,11 +13,10 @@ import android.view.View;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.style.layers.CustomLayer;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.layers.CustomLayer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.customlayer.ExampleCustomLayer;
@@ -54,7 +53,7 @@ public class CustomLayerActivity extends AppCompatActivity {
         fab.setColorFilter(ContextCompat.getColor(this, R.color.primary));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 if (mapboxMap != null) {
                     swapCustomLayer();
                 }
@@ -67,7 +66,7 @@ public class CustomLayerActivity extends AppCompatActivity {
         if (isShowingCustomLayer) {
             try {
                 mapboxMap.removeLayer("custom");
-            } catch (NoSuchLayerException e) {
+            } catch (NoSuchLayerException noSuchLayerException) {
                 Log.e(TAG, "No custom layer to remove");
             }
             fab.setImageResource(R.drawable.ic_layers_24dp);

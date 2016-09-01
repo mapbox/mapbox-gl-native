@@ -43,13 +43,15 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
         add(new LatLng(45.510677, -122.648792));
         add(new LatLng(45.515008, -122.664070));
         add(new LatLng(45.502496, -122.669048));
-    }};
+    }
+    };
 
     private List<LatLng> ADDITIONAL_POINTS = new ArrayList<LatLng>() {{
         add(new LatLng(45.515369, -122.678489));
         add(new LatLng(45.506346, -122.702007));
         add(new LatLng(45.522585, -122.685699));
-    }};
+    }
+    };
 
     private MapView mapView;
     private MapboxMap mapboxMap;
