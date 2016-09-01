@@ -36,9 +36,9 @@ There are several ways to install custom builds of the Mapbox iOS SDK:
 
 #### Dynamic framework
 
-This is the recommended workflow for manually integrating the SDK into an application targeting iOS 8 and above:
+This is the recommended workflow for manually integrating custom builds of the SDK into an application targeting iOS 8 and above:
 
-1. Build from source manually per above.
+1. Build from source manually, per above.
 
 1. Open the project editor, select your application target, then go to the General tab. Drag Mapbox.framework from the `build/ios/pkg/dynamic/` directory into the “Embedded Binaries” section. (Don’t drag it into the “Linked Frameworks and Libraries” section; Xcode will add it there automatically.) In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
 
@@ -54,7 +54,7 @@ bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework/strip-fra
 
 If your application targets iOS 7.x, you’ll need to install the static framework instead:
 
-1. Build from source manually per above.
+1. Build from source manually, per above.
 
 1. Drag the Mapbox.bundle and Mapbox.framework from the `build/ios/pkg/static/` directory into the Project navigator. In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish. Open the project editor and select your application target to verify that the following changes occurred automatically:
 
@@ -87,36 +87,17 @@ pod 'Mapbox-iOS-SDK', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-
 
 ##### Using your own build with CocoaPods
 
-To install a _development version_ of this SDK using CocoaPods you will need to build it from source manually per above, then include that build product in your Podfile.
+1. Build from source manually, per above.
 
-1. Zip up the build product.
-
-    ```bash
-    cd build/ios/pkg/
-    ZIP=mapbox-ios-sdk.zip
-    rm -f ../${ZIP}
-    zip -r ../${ZIP} *
-    ```
-
-1. Customize [`Mapbox-iOS-SDK.podspec`](../ios/Mapbox-iOS-SDK.podspec) to download this zip file.
+1. Update your app’s `Podfile` to point to `Mapbox-iOS-SDK.podspec`.
 
     ```rb
-    {...}
-
-    m.source = {
-        :path => "{...}/mapbox-ios-sdk.zip"
-    }
-
-    {...}
-    ```
-
-1. Update your app's `Podfile` to point to the `Mapbox-iOS-SDK.podspec`.
-
-    ```rb
-    pod 'Mapbox-iOS-SDK', :path => '{...}/Mapbox-iOS-SDK.podspec'
+    pod 'Mapbox-iOS-SDK', :path => '{...}/build/ios/pkg/{dynamic|static}/Mapbox-iOS-SDK.podspec'
     ```
 
 1. Run `pod update` to grab the newly-built library.
+
+If using the static framework, add `$(inherited)` to your target’s Other Linker Flags in the Build Settings tab.
 
 ### Configuration
 
