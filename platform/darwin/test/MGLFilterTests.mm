@@ -42,6 +42,7 @@
     NSPredicate *typePredicate = [NSPredicate predicateWithFormat:@"%K == %@", @"$type", @"Feature"];
     NSPredicate *idPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @"$id", @"1234123"];
     NSPredicate *specialCharsPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @"ty-’pè", @"sŒm-ethįng"];
+    NSPredicate *booleanPredicate = [NSPredicate predicateWithFormat:@"%K != %@", @"cluster", [NSNumber numberWithBool:YES]];
     return @[equalPredicate,
              notEqualPredicate,
              greaterThanPredicate,
@@ -53,7 +54,8 @@
              inNotInPredicate,
              typePredicate,
              idPredicate,
-             specialCharsPredicate];
+             specialCharsPredicate,
+             booleanPredicate];
 }
 
 - (void)testAllPredicates

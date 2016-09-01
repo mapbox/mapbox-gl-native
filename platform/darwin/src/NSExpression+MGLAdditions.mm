@@ -31,7 +31,7 @@
             return { number.intValue };
         } else if ((strcmp([number objCType], @encode(double))) == 0) {
             return { number.doubleValue };
-        } else if ((strcmp([number objCType], @encode(bool))) == 0) {
+        } else if ((strcmp([number objCType], @encode(char))) == 0) {
             return { number.boolValue };
         }
     }
