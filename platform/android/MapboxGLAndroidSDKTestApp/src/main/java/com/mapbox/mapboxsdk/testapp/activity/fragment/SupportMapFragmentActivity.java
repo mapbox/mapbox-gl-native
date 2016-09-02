@@ -75,7 +75,8 @@ public class SupportMapFragmentActivity extends AppCompatActivity implements OnM
     @Override
     public void onMapReady(MapboxMap map) {
         mapboxMap = map;
-        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().tilt(45.0).build()), 10000);
+        mapboxMap.animateCamera(
+            CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().tilt(45.0).build()), 10000);
     }
 
     @Override

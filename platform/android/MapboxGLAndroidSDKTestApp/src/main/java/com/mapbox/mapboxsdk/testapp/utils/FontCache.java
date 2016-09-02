@@ -18,7 +18,7 @@ public class FontCache {
             try {
                 tf = Typeface.createFromAsset(context.getAssets(), name);
                 fontCache.put(name, tf);
-            } catch (Exception e) {
+            } catch (Exception exception) {
                 Log.e(MapboxConstants.TAG, "Font not found");
             }
         }

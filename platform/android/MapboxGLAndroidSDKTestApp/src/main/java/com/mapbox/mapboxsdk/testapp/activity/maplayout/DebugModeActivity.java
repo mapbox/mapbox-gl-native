@@ -63,7 +63,7 @@ public class DebugModeActivity extends AppCompatActivity {
         FloatingActionButton fabDebug = (FloatingActionButton) findViewById(R.id.fabDebug);
         fabDebug.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 if (mapboxMap != null) {
                     Log.d(TAG, "Debug FAB: isDebug Active? " + mapboxMap.isDebugActive());
                     mapboxMap.cycleDebugOptions();
@@ -74,7 +74,7 @@ public class DebugModeActivity extends AppCompatActivity {
         FloatingActionButton fabStyles = (FloatingActionButton) findViewById(R.id.fabStyles);
         fabStyles.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 if (mapboxMap != null) {
                     currentStyleIndex++;
                     if (currentStyleIndex == STYLES.length) {

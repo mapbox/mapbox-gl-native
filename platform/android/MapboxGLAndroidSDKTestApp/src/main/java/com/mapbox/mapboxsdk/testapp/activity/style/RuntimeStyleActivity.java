@@ -39,7 +39,8 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import static com.mapbox.mapboxsdk.style.layers.Filter.*;
+import static com.mapbox.mapboxsdk.style.layers.Filter.all;
+import static com.mapbox.mapboxsdk.style.layers.Filter.eq;
 import static com.mapbox.mapboxsdk.style.layers.Function.Stop;
 import static com.mapbox.mapboxsdk.style.layers.Function.stop;
 import static com.mapbox.mapboxsdk.style.layers.Function.zoom;
@@ -219,8 +220,8 @@ public class RuntimeStyleActivity extends AppCompatActivity {
         //Zoom to see buildings first
         try {
             mapboxMap.removeLayer("building");
-        } catch (NoSuchLayerException e) {
-            Toast.makeText(RuntimeStyleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        } catch (NoSuchLayerException noSuchLayerException) {
+            Toast.makeText(RuntimeStyleActivity.this, noSuchLayerException.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -229,8 +230,11 @@ public class RuntimeStyleActivity extends AppCompatActivity {
         Source source;
         try {
             source = new GeoJsonSource("amsterdam-spots", readRawResource(R.raw.amsterdam));
-        } catch (IOException e) {
-            Toast.makeText(RuntimeStyleActivity.this, "Couldn't add source: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        } catch (IOException ioException) {
+            Toast.makeText(
+                RuntimeStyleActivity.this,
+                "Couldn't add source: " + ioException.getMessage(),
+                Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -292,7 +296,8 @@ public class RuntimeStyleActivity extends AppCompatActivity {
         layer.setMaxZoom(15);
 
         layer = (LineLayer) mapboxMap.getLayer("terrainLayer");
-        Toast.makeText(this, String.format("Set min/max zoom to %s - %s", layer.getMinZoom(), layer.getMaxZoom()), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, String.format(
+            "Set min/max zoom to %s - %s", layer.getMinZoom(), layer.getMaxZoom()), Toast.LENGTH_SHORT).show();
     }
 
     private void addSatelliteLayer() {

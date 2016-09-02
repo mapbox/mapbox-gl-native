@@ -115,8 +115,8 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
                             .withClusterMaxZoom(14)
                             .withClusterRadius(50)
             );
-        } catch (MalformedURLException e) {
-            Log.e(TAG, "That's not an url... " + e.getMessage());
+        } catch (MalformedURLException malformedUrlException) {
+            Log.e(TAG, "That's not an url... " + malformedUrlException.getMessage());
         }
 
         //Add unclustered layer
@@ -138,8 +138,8 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
                     circleRadius(18f)
             );
             circles.setFilter(
-                    i == 0 ?
-                            gte("point_count", layers[i][0]) :
+                    i == 0
+                        ? gte("point_count", layers[i][0]) :
                             all(gte("point_count", layers[i][0]), lt("point_count", layers[i - 1][0]))
             );
             mapboxMap.addLayer(circles);

@@ -42,15 +42,16 @@ import java.util.Random;
 public class MarkerViewActivity extends AppCompatActivity {
 
     private MapboxMap mapboxMap;
-    private MapView mMapView;
+    private MapView mapView;
 
-    private MarkerView movingMarkerOne, movingMarkerTwo;
+    private MarkerView movingMarkerOne;
+    private MarkerView movingMarkerTwo;
     private Random randomAnimator = new Random();
     private Handler locationUpdateHandler = new Handler();
     private Runnable moveMarkerRunnable = new MoveMarkerRunnable();
     private int rotation = 0;
 
-    private final static LatLng[] LAT_LNGS = new LatLng[]{
+    private static final LatLng[] LAT_LNGS = new LatLng[]{
             new LatLng(38.897424, -77.036508),
             new LatLng(38.909698, -77.029642),
             new LatLng(38.907227, -77.036530),
@@ -74,9 +75,9 @@ public class MarkerViewActivity extends AppCompatActivity {
         }
 
         final TextView viewCountView = (TextView) findViewById(R.id.countView);
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(new OnMapReadyCallback() {
+        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 MarkerViewActivity.this.mapboxMap = mapboxMap;
@@ -131,12 +132,12 @@ public class MarkerViewActivity extends AppCompatActivity {
                 markerViewManager.addMarkerViewAdapter(new TextAdapter(MarkerViewActivity.this, mapboxMap));
 
                 // add a change listener to validate the size of amount of child views
-                mMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+                mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
                     @Override
                     public void onMapChanged(@MapView.MapChange int change) {
                         if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
                             if (!markerViewManager.getMarkerViewAdapters().isEmpty() && viewCountView != null) {
-                                viewCountView.setText("ViewCache size " + (mMapView.getChildCount() - 5));
+                                viewCountView.setText("ViewCache size " + (mapView.getChildCount() - 5));
                             }
                         }
                     }
@@ -153,13 +154,13 @@ public class MarkerViewActivity extends AppCompatActivity {
 
                 movingMarkerOne = MarkerViewActivity.this.mapboxMap.addMarker(new MarkerViewOptions()
                         .position(CarLocation.CAR_0_LNGS[0])
-                        .icon(IconFactory.getInstance(mMapView.getContext())
+                        .icon(IconFactory.getInstance(mapView.getContext())
                                 .fromResource(R.drawable.ic_chelsea))
                 );
 
                 movingMarkerTwo = mapboxMap.addMarker(new MarkerViewOptions()
                         .position(CarLocation.CAR_1_LNGS[0])
-                        .icon(IconFactory.getInstance(mMapView.getContext())
+                        .icon(IconFactory.getInstance(mapView.getContext())
                                 .fromResource(R.drawable.ic_arsenal))
                 );
             }
@@ -227,7 +228,8 @@ public class MarkerViewActivity extends AppCompatActivity {
         }
 
         @Override
-        public boolean onSelect(@NonNull final CountryMarkerView marker, @NonNull final View convertView, boolean reselectionForViewReuse) {
+        public boolean onSelect(
+            @NonNull final CountryMarkerView marker, @NonNull final View convertView, boolean reselectionForViewReuse) {
             convertView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             ObjectAnimator rotateAnimator = ObjectAnimator.ofFloat(convertView, View.ROTATION, 0, 360);
             rotateAnimator.setDuration(reselectionForViewReuse ? 0 : 350);
@@ -295,7 +297,8 @@ public class MarkerViewActivity extends AppCompatActivity {
         }
 
         @Override
-        public boolean onSelect(@NonNull final TextMarkerView marker, @NonNull final View convertView, boolean reselectionForViewReuse) {
+        public boolean onSelect(
+            @NonNull final TextMarkerView marker, @NonNull final View convertView, boolean reselectionForViewReuse) {
             animateGrow(marker, convertView, 0);
 
             // false indicates that we are calling selectMarker after our animation ourselves
@@ -366,31 +369,31 @@ public class MarkerViewActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.onResume();
+        mapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        mapView.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mMapView.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        mapView.onLowMemory();
     }
 
     @Override
