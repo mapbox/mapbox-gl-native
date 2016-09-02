@@ -559,18 +559,18 @@ TEST(OfflineDatabase, MigrateFromV2Schema) {
 
     // v2.db is a v2 database containing a single offline region with a small number of resources.
 
-    deleteFile("test/fixtures/offline_database/v3.db");
-    writeFile("test/fixtures/offline_database/v3.db", util::read_file("test/fixtures/offline_database/v2.db"));
+    deleteFile("test/fixtures/offline_database/v4.db");
+    writeFile("test/fixtures/offline_database/v4.db", util::read_file("test/fixtures/offline_database/v2.db"));
 
     {
-        OfflineDatabase db("test/fixtures/offline_database/v3.db", 0);
+        OfflineDatabase db("test/fixtures/offline_database/v4.db", 0);
         auto regions = db.listRegions();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
         }
     }
 
-    EXPECT_EQ(3, databaseUserVersion("test/fixtures/offline_database/v3.db"));
-    EXPECT_LT(databasePageCount("test/fixtures/offline_database/v3.db"),
+    EXPECT_EQ(4, databaseUserVersion("test/fixtures/offline_database/v4.db"));
+    EXPECT_LT(databasePageCount("test/fixtures/offline_database/v4.db"),
               databasePageCount("test/fixtures/offline_database/v2.db"));
 }

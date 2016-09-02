@@ -23,6 +23,10 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
 
 @interface MGLTestCalloutView: UIView<MGLCalloutView>
 @property (nonatomic) BOOL didCallDismissCalloutAnimated;
+@property (nonatomic, strong) id <MGLAnnotation> representedObject;
+@property (nonatomic, strong) UIView *leftAccessoryView;
+@property (nonatomic, strong) UIView *rightAccessoryView;
+@property (nonatomic, weak) id<MGLCalloutViewDelegate> delegate;
 @end
 
 @implementation MGLTestCalloutView
@@ -31,6 +35,8 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
 {
     _didCallDismissCalloutAnimated = YES;
 }
+
+- (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated { }
 
 @end
 

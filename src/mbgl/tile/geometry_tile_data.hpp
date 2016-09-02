@@ -58,7 +58,7 @@ public:
 class GeometryTileData : private util::noncopyable {
 public:
     virtual ~GeometryTileData() = default;
-    virtual util::ptr<GeometryTileLayer> getLayer(const std::string&) const = 0;
+    virtual util::ptr<const GeometryTileLayer> getLayer(const std::string&) const = 0;
 };
 
 // classifies an array of rings into polygons with outer rings and holes

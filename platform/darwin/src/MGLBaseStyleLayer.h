@@ -1,5 +1,9 @@
 #import <Foundation/Foundation.h>
 
+#import "MGLTypes.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface MGLBaseStyleLayer : NSObject
 
 @property (nonatomic, assign, getter=isVisible) BOOL visible;
@@ -15,3 +19,5 @@
 @property (nonatomic, assign) float minimumZoomLevel;
 
 @end
+
+NS_ASSUME_NONNULL_END

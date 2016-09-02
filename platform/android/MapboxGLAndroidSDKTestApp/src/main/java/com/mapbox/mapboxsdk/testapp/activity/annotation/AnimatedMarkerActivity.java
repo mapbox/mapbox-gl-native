@@ -31,7 +31,7 @@ import java.util.Random;
 
 public class AnimatedMarkerActivity extends AppCompatActivity {
 
-    private MapView mMapView;
+    private MapView mapView;
     private MapboxMap mapboxMap;
 
     private LatLng dupontCircle = new LatLng(38.90962, -77.04341);
@@ -53,9 +53,9 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(new OnMapReadyCallback() {
+        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
 
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
@@ -75,9 +75,9 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
 
     private void setupMap() {
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(dupontCircle)
-                .zoom(15)
-                .build();
+            .target(dupontCircle)
+            .zoom(15)
+            .build();
         mapboxMap.setCameraPosition(cameraPosition);
     }
 
@@ -86,10 +86,10 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
 
         if (passengerMarker == null) {
             Icon icon = IconFactory.getInstance(AnimatedMarkerActivity.this)
-                    .fromResource(R.drawable.ic_directions_run_black_24dp);
+                .fromResource(R.drawable.ic_directions_run_black_24dp);
             passengerMarker = mapboxMap.addMarker(new MarkerViewOptions()
-                    .position(randomLatLng)
-                    .icon(icon));
+                .position(randomLatLng)
+                .icon(icon));
         } else {
             passengerMarker.setPosition(randomLatLng);
         }
@@ -139,7 +139,8 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
     private ValueAnimator animateMoveMarker(final MarkerView marker, LatLng to) {
         marker.setRotation((float) getBearing(marker.getPosition(), to));
 
-        final ValueAnimator markerAnimator = ObjectAnimator.ofObject(marker, "position", new LatLngEvaluator(), marker.getPosition(), to);
+        final ValueAnimator markerAnimator = ObjectAnimator.ofObject(
+            marker, "position", new LatLngEvaluator(), marker.getPosition(), to);
         markerAnimator.setDuration((long) (10 * marker.getPosition().distanceTo(to)));
         markerAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 
@@ -151,12 +152,12 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
 
     private MarkerView createCarMarker(LatLng start, @DrawableRes int carResource) {
         Icon icon = IconFactory.getInstance(AnimatedMarkerActivity.this)
-                .fromResource(carResource);
+            .fromResource(carResource);
 
         //View Markers
         return mapboxMap.addMarker(new MarkerViewOptions()
-                .position(start)
-                .icon(icon));
+            .position(start)
+            .icon(icon));
 
         //GL Markers
 //        return mapboxMap.addMarker(new MarkerOptions()
@@ -168,8 +169,10 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
     private LatLng getLatLngInBounds() {
         LatLngBounds bounds = mapboxMap.getProjection().getVisibleRegion().latLngBounds;
         Random generator = new Random();
-        double randomLat = bounds.getLatSouth() + generator.nextDouble() * (bounds.getLatNorth() - bounds.getLatSouth());
-        double randomLon = bounds.getLonWest() + generator.nextDouble() * (bounds.getLonEast() - bounds.getLonWest());
+        double randomLat = bounds.getLatSouth() + generator.nextDouble()
+            * (bounds.getLatNorth() - bounds.getLatSouth());
+        double randomLon = bounds.getLonWest() + generator.nextDouble()
+            * (bounds.getLonEast() - bounds.getLonWest());
         return new LatLng(randomLat, randomLon);
     }
 
@@ -187,31 +190,31 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.onResume();
+        mapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        mapView.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mMapView.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        mapView.onLowMemory();
     }
 
     /**
@@ -219,13 +222,15 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
      */
     private static class LatLngEvaluator implements TypeEvaluator<LatLng> {
 
-        private LatLng mLatLng = new LatLng();
+        private LatLng latLng = new LatLng();
 
         @Override
         public LatLng evaluate(float fraction, LatLng startValue, LatLng endValue) {
-            mLatLng.setLatitude(startValue.getLatitude() + ((endValue.getLatitude() - startValue.getLatitude()) * fraction));
-            mLatLng.setLongitude(startValue.getLongitude() + ((endValue.getLongitude() - startValue.getLongitude()) * fraction));
-            return mLatLng;
+            latLng.setLatitude(startValue.getLatitude()
+                + ((endValue.getLatitude() - startValue.getLatitude()) * fraction));
+            latLng.setLongitude(startValue.getLongitude()
+                + ((endValue.getLongitude() - startValue.getLongitude()) * fraction));
+            return latLng;
         }
     }
 
@@ -238,8 +243,8 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
         double lat1 = degrees2radians * from.getLatitude();
         double lat2 = degrees2radians * to.getLatitude();
         double a = Math.sin(lon2 - lon1) * Math.cos(lat2);
-        double b = Math.cos(lat1) * Math.sin(lat2) -
-                Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+        double b = Math.cos(lat1) * Math.sin(lat2)
+            - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
 
         return radians2degrees * Math.atan2(a, b);
     }

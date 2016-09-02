@@ -29,10 +29,6 @@ set(MBGL_QT_FILES
     # Misc
     PRIVATE platform/default/log_stderr.cpp
 
-    # Headless headless_view_cgl
-    PRIVATE platform/default/headless_display.cpp
-    PRIVATE platform/default/headless_view.cpp
-
     # Platform integration
     PRIVATE platform/qt/src/async_task.cpp
     PRIVATE platform/qt/src/async_task_impl.hpp
@@ -77,7 +73,6 @@ endif()
 if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     list(APPEND MBGL_QT_FILES
         PRIVATE platform/darwin/src/nsthread.mm
-        PRIVATE platform/darwin/src/headless_view_cgl.cpp
     )
     list(APPEND MBGL_QT_LIBRARIES
         PRIVATE "-framework Foundation"
@@ -86,10 +81,8 @@ if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
 else()
     list(APPEND MBGL_QT_FILES
         PRIVATE platform/default/thread.cpp
-        PRIVATE platform/default/headless_view_glx.cpp
     )
     list(APPEND MBGL_QT_LIBRARIES
         PRIVATE -lGL
-        PRIVATE -lX11
     )
 endif()

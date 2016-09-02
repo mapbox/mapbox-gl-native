@@ -61,12 +61,20 @@ const Filter& FillLayer::getFilter() const {
 
 // Paint properties
 
+PropertyValue<bool> FillLayer::getDefaultFillAntialias() {
+    return { true };
+}
+
 PropertyValue<bool> FillLayer::getFillAntialias() const {
     return impl->paint.fillAntialias.get();
 }
 
 void FillLayer::setFillAntialias(PropertyValue<bool> value, const optional<std::string>& klass) {
     impl->paint.fillAntialias.set(value, klass);
+}
+
+PropertyValue<float> FillLayer::getDefaultFillOpacity() {
+    return { 1 };
 }
 
 PropertyValue<float> FillLayer::getFillOpacity() const {
@@ -77,12 +85,20 @@ void FillLayer::setFillOpacity(PropertyValue<float> value, const optional<std::s
     impl->paint.fillOpacity.set(value, klass);
 }
 
+PropertyValue<Color> FillLayer::getDefaultFillColor() {
+    return { Color::black() };
+}
+
 PropertyValue<Color> FillLayer::getFillColor() const {
     return impl->paint.fillColor.get();
 }
 
 void FillLayer::setFillColor(PropertyValue<Color> value, const optional<std::string>& klass) {
     impl->paint.fillColor.set(value, klass);
+}
+
+PropertyValue<Color> FillLayer::getDefaultFillOutlineColor() {
+    return { {} };
 }
 
 PropertyValue<Color> FillLayer::getFillOutlineColor() const {
@@ -93,6 +109,10 @@ void FillLayer::setFillOutlineColor(PropertyValue<Color> value, const optional<s
     impl->paint.fillOutlineColor.set(value, klass);
 }
 
+PropertyValue<std::array<float, 2>> FillLayer::getDefaultFillTranslate() {
+    return { {{ 0, 0 }} };
+}
+
 PropertyValue<std::array<float, 2>> FillLayer::getFillTranslate() const {
     return impl->paint.fillTranslate.get();
 }
@@ -101,12 +121,20 @@ void FillLayer::setFillTranslate(PropertyValue<std::array<float, 2>> value, cons
     impl->paint.fillTranslate.set(value, klass);
 }
 
+PropertyValue<TranslateAnchorType> FillLayer::getDefaultFillTranslateAnchor() {
+    return { TranslateAnchorType::Map };
+}
+
 PropertyValue<TranslateAnchorType> FillLayer::getFillTranslateAnchor() const {
     return impl->paint.fillTranslateAnchor.get();
 }
 
 void FillLayer::setFillTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
     impl->paint.fillTranslateAnchor.set(value, klass);
+}
+
+PropertyValue<std::string> FillLayer::getDefaultFillPattern() {
+    return { "" };
 }
 
 PropertyValue<std::string> FillLayer::getFillPattern() const {

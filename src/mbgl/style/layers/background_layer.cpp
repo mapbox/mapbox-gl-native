@@ -37,6 +37,10 @@ std::unique_ptr<Layer> BackgroundLayer::Impl::cloneRef(const std::string& id_) c
 
 // Paint properties
 
+PropertyValue<Color> BackgroundLayer::getDefaultBackgroundColor() {
+    return { Color::black() };
+}
+
 PropertyValue<Color> BackgroundLayer::getBackgroundColor() const {
     return impl->paint.backgroundColor.get();
 }
@@ -45,12 +49,20 @@ void BackgroundLayer::setBackgroundColor(PropertyValue<Color> value, const optio
     impl->paint.backgroundColor.set(value, klass);
 }
 
+PropertyValue<std::string> BackgroundLayer::getDefaultBackgroundPattern() {
+    return { "" };
+}
+
 PropertyValue<std::string> BackgroundLayer::getBackgroundPattern() const {
     return impl->paint.backgroundPattern.get();
 }
 
 void BackgroundLayer::setBackgroundPattern(PropertyValue<std::string> value, const optional<std::string>& klass) {
     impl->paint.backgroundPattern.set(value, klass);
+}
+
+PropertyValue<float> BackgroundLayer::getDefaultBackgroundOpacity() {
+    return { 1 };
 }
 
 PropertyValue<float> BackgroundLayer::getBackgroundOpacity() const {

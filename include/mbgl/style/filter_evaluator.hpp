@@ -9,14 +9,11 @@ namespace mbgl {
 namespace style {
 
 /*
-   A visitor that evaluates a `Filter` for a given feature type and properties. For maximum
-   flexibility, it is templated on the PropertyAccessor type, which must be a callable type with
-   function signature `optional<Value> (const std::string&)`, returning the value for the given
-   key, if it exists.
+   A visitor that evaluates a `Filter` for a given feature.
 
    Use via `Filter::operator()`. For example:
 
-       if (filter(feature.getType(), [&] (const std::string& key) { return feature.getValue(key); })) {
+       if (filter(feature)) {
            // matches the filter
        } else {
            // does not match

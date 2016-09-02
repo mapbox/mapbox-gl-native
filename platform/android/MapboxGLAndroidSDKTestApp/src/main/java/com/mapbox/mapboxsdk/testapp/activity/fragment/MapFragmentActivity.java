@@ -48,9 +48,6 @@ public class MapFragmentActivity extends AppCompatActivity implements OnMapReady
             options.rotateGesturesEnabled(false);
 
             options.debugActive(false);
-//            options.compassEnabled(false);
-//            options.attributionEnabled(false);
-//            options.logoEnabled(false);
 
             LatLng dc = new LatLng(38.90252, -77.02291);
 
@@ -75,7 +72,8 @@ public class MapFragmentActivity extends AppCompatActivity implements OnMapReady
     @Override
     public void onMapReady(MapboxMap map) {
         mapboxMap = map;
-        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().tilt(45.0).build()), 10000);
+        mapboxMap.animateCamera(
+            CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().tilt(45.0).build()), 10000);
     }
 
     @Override

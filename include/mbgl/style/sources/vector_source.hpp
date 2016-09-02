@@ -16,5 +16,10 @@ public:
     class Impl;
 };
 
+template <>
+inline bool Source::is<VectorSource>() const {
+    return type == SourceType::Vector;
+}
+
 } // namespace style
 } // namespace mbgl

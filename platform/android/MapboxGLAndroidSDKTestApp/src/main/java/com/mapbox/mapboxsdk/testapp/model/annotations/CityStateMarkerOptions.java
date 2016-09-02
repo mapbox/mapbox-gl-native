@@ -11,10 +11,10 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 
 public class CityStateMarkerOptions extends BaseMarkerOptions<CityStateMarker, CityStateMarkerOptions> {
 
-    private String mInfoWindowBackgroundColor;
+    private String infoWindowBackgroundColor;
 
     public CityStateMarkerOptions infoWindowBackground(String color) {
-        mInfoWindowBackgroundColor = color;
+        infoWindowBackgroundColor = color;
         return getThis();
     }
 
@@ -38,7 +38,7 @@ public class CityStateMarkerOptions extends BaseMarkerOptions<CityStateMarker, C
 
     @Override
     public CityStateMarker getMarker() {
-        return new CityStateMarker(this, mInfoWindowBackgroundColor);
+        return new CityStateMarker(this, infoWindowBackgroundColor);
     }
 
     public static final Parcelable.Creator<CityStateMarkerOptions> CREATOR

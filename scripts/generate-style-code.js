@@ -58,6 +58,10 @@ global.defaultValue = function (property) {
     return 1;
   }
 
+  if (property.name === 'fill-outline-color') {
+    return '{}';
+  }
+
   switch (property.type) {
   case 'number':
     return property.default;
@@ -70,7 +74,17 @@ global.defaultValue = function (property) {
       return `${propertyType(property)}::${camelize(property.default)}`;
     }
   case 'color':
-    return `{ ${parseCSSColor(property.default).join(', ')} }`
+    var color = parseCSSColor(property.default).join(', ');
+    switch (color) {
+    case '0, 0, 0, 0':
+      return '{}';
+    case '0, 0, 0, 1':
+      return 'Color::black()';
+    case '1, 1, 1, 1':
+      return 'Color::white()';
+    default:
+      return `{ ${color} }`;
+    }
   case 'array':
     const defaults = (property.default || []).map((e) => defaultValue({ type: property.value, default: e }));
     if (property.length) {

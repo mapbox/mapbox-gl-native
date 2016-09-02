@@ -69,7 +69,7 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
         fab.setColorFilter(ContextCompat.getColor(this, R.color.primary));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 if (mapboxMap != null) {
                     updateMarker();
                 }
@@ -85,8 +85,10 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
         // update marker
         marker.setPosition(first ? LAT_LNG_CHELSEA : LAT_LNG_ARSENAL);
         marker.setIcon(iconFactory.fromResource(first ? R.drawable.ic_chelsea : R.drawable.ic_arsenal));
-        marker.setTitle(first ? getString(R.string.dynamic_marker_chelsea_title) : getString(R.string.dynamic_marker_arsenal_title));
-        marker.setSnippet(first ? getString(R.string.dynamic_marker_chelsea_snippet) : getString(R.string.dynamic_marker_arsenal_snippet));
+        marker.setTitle(first
+            ? getString(R.string.dynamic_marker_chelsea_title) : getString(R.string.dynamic_marker_arsenal_title));
+        marker.setSnippet(first
+            ? getString(R.string.dynamic_marker_chelsea_snippet) : getString(R.string.dynamic_marker_arsenal_snippet));
     }
 
     @Override

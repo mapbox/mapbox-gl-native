@@ -42,3 +42,5 @@ add_custom_command(
 )
 
 mbgl_platform_node()
+
+create_source_groups(mbgl-node)

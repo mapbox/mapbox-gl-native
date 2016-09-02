@@ -37,6 +37,18 @@ workflows:
             export BUILDTYPE=Release
             make android
             make android-test
+            make android-generate-test
+            wget -O platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml "$BITRISEIO_TEST_ACCESS_TOKEN_UI_TEST_URL"
+            make android-test-apk
+            cd platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
+            wget -O secret.json "$BITRISEIO_GCLOUD_SERVICE_ACCOUNT_JSON_URL"
+            export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+            echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+            curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+            sudo apt-get update && sudo apt-get install google-cloud-sdk
+            gcloud auth activate-service-account --key-file secret.json --project android-gl-native
+            gcloud beta test android devices list
+            gcloud beta test android run --type instrumentation --app MapboxGLAndroidSDKTestApp-debug.apk --test MapboxGLAndroidSDKTestApp-debug-androidTest-unaligned.apk --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 10m
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'

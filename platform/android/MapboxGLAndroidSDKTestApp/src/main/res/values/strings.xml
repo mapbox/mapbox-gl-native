@@ -38,6 +38,7 @@
 
     <!-- Navigation -->
     <string name="activity_location_picker">Location Picker</string>
+    <string name="activity_car_driving">Driving animation</string>
 
     <!-- Other -->
     <string name="activity_double_map">Double Map Activity</string>
@@ -60,7 +61,9 @@
     <string name="activity_query_rendered_feature_properties">Query feature properties</string>
     <string name="activity_query_rendered_features_box_count">Count features in box</string>
     <string name="activity_query_rendered_features_box_highlight">Highlight features in box</string>
-    <string name="title_activity_navigation_drawer">Android SDK View integration</string>
+    <string name="activity_circle">Add Circle</string>
+    <string name="activity_navigation_drawer">Android SDK View integration</string>
+    <string name="activity_video_view">Video View</string>
 
     <!-- Description -->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
@@ -99,6 +102,7 @@
     <string name="description_location_picker">Use a fixed Marker to select your location</string>
     <string name="description_viewpager">Use SupportMapFragments in a ViewPager</string>
     <string name="description_runtime_style">Adopt the map style on the fly</string>
+    <string name="description_circle">Use GeoJson source to show a circle</string>
     <string name="description_geojson_clustering">Use GeoJson sources and dynamic layers to cluster information</string>
     <string name="description_print">Shows how to print a map</string>
     <string name="description_navigation_drawer">Test animation of Android SDK View components</string>
@@ -106,6 +110,8 @@
     <string name="description_query_rendered_feature_properties_point">Query rendered feature properties on click</string>
     <string name="description_query_rendered_features_box_count">Count all rendered features in box</string>
     <string name="description_query_rendered_features_box_highlight">Hightligh buildings in box</string>
+    <string name="description_car_driving">MyLocationView follow map update example</string>
+    <string name="description_video_view">Android video view on top of the map view</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
     <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>
@@ -163,6 +169,7 @@
     <string-array name="bulk_marker_list">
         <item>10</item>
         <item>100</item>
+        <item>500</item>
         <item>1000</item>
         <item>10000</item>
     </string-array>

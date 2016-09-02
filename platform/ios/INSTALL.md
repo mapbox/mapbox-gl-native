@@ -1,14 +1,16 @@
-# Integrating the Mapbox iOS SDK into your application
+# Integrating custom builds of the Mapbox iOS SDK into your application
 
-This document explains how to build a development version of Mapbox iOS SDK for use in your own Cocoa Touch application. To use a production-ready version of the SDK, see the [Mapbox iOS SDK homepage](https://github.com/mapbox/ios-sdk).
+This document explains how to build a development version of Mapbox iOS SDK for use in your own Cocoa Touch application. To use a production-ready version of the SDK, see the [Mapbox iOS SDK homepage](https://mapbox.com/ios-sdk).
 
 ### Requirements
 
-The Mapbox iOS SDK application builds against the iOS 7.0 SDK. It is intended to run on iOS 7.0 and above on the following devices and their simulators:
+The Mapbox iOS SDK builds against the iOS 7.0 SDK. It is intended to run on iOS 7.0 and above on the following devices and their simulators:
 
 * iPhone 4S and above (5, 5c, 5s, 6, 6 Plus)
 * iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2)
 * iPod touch 5th generation and above
+
+The Mapbox iOS SDK requires Xcode 7.3 or higher.
 
 ### Building the SDK
 
@@ -26,57 +28,17 @@ The Mapbox iOS SDK application builds against the iOS 7.0 SDK. It is intended to
   - a `documentation` folder with HTML API documentation
   - an example `Settings.bundle` containing an optional Mapbox Telemetry opt-out setting
 
+See the [packaging documentation](DEVELOPING.md#packaging-builds) for other build options.
+
 ### Installation
 
-There are a few ways to install the Mapbox iOS SDK:
-
-#### CocoaPods
-
-Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437) is completed, to install a _development version_ of Mapbox GL using CocoaPods you will need to build it from source manually per above.
-
-1. Zip up the build product.
-
-    ```bash
-    cd build/ios/pkg/
-    ZIP=mapbox-ios-sdk.zip
-    rm -f ../${ZIP}
-    zip -r ../${ZIP} *
-    ```
-
-1. Customize [`Mapbox-iOS-SDK.podspec`](../ios/Mapbox-iOS-SDK.podspec) to download this zip file.
-
-    ```rb
-    {...}
-
-    m.source = {
-        :http => "http://{...}/mapbox-ios-sdk.zip",
-        :flatten => true
-    }
-
-    {...}
-    ```
-
-1. Update your app's `Podfile` to point to the `Mapbox-iOS-SDK.podspec`.
-
-    ```rb
-    pod 'Mapbox-iOS-SDK', :podspec => 'http://{...}/Mapbox-iOS-SDK.podspec'
-    ```
-
-1. Run `pod update` to grab the newly-built library.
-
-##### Testing pre-releases with CocoaPods
-
-To test pre-releases and/or betas, you can reference the pre-release like so in your Podfile:
-
-```rb
-pod 'Mapbox-iOS-SDK', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/<insert branch or tag>/ios/Mapbox-iOS-SDK.podspec'
-```
+There are several ways to install custom builds of the Mapbox iOS SDK:
 
 #### Dynamic framework
 
-This is the recommended workflow for manually integrating the SDK into an application targeting iOS 8 and above:
+This is the recommended workflow for manually integrating custom builds of the SDK into an application targeting iOS 8 and above:
 
-1. Build from source manually per above.
+1. Build from source manually, per above.
 
 1. Open the project editor, select your application target, then go to the General tab. Drag Mapbox.framework from the `build/ios/pkg/dynamic/` directory into the “Embedded Binaries” section. (Don’t drag it into the “Linked Frameworks and Libraries” section; Xcode will add it there automatically.) In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
 
@@ -92,7 +54,7 @@ bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework/strip-fra
 
 If your application targets iOS 7.x, you’ll need to install the static framework instead:
 
-1. Build from source manually per above.
+1. Build from source manually, per above.
 
 1. Drag the Mapbox.bundle and Mapbox.framework from the `build/ios/pkg/static/` directory into the Project navigator. In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish. Open the project editor and select your application target to verify that the following changes occurred automatically:
 
@@ -110,6 +72,32 @@ If your application targets iOS 7.x, you’ll need to install the static framewo
    - libc++.tbd
    - libsqlite3.tbd
    - libz.tbd
+
+1. In the Build Settings tab, find the Other Linker Flags setting and add `-ObjC`.
+
+#### CocoaPods
+
+##### Testing pre-releases with CocoaPods
+
+To test pre-releases and/or betas, you can reference the pre-release like so in your Podfile:
+
+```rb
+pod 'Mapbox-iOS-SDK', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/<insert branch or tag>/ios/Mapbox-iOS-SDK.podspec'
+```
+
+##### Using your own build with CocoaPods
+
+1. Build from source manually, per above.
+
+1. Update your app’s `Podfile` to point to `Mapbox-iOS-SDK.podspec`.
+
+    ```rb
+    pod 'Mapbox-iOS-SDK', :path => '{...}/build/ios/pkg/{dynamic|static}/Mapbox-iOS-SDK.podspec'
+    ```
+
+1. Run `pod update` to grab the newly-built library.
+
+If using the static framework, add `$(inherited)` to your target’s Other Linker Flags in the Build Settings tab.
 
 ### Configuration
 

@@ -12,11 +12,29 @@ namespace mbgl {
 
 class GeoJSONTileFeature : public GeometryTileFeature {
 public:
-    GeoJSONTileFeature(FeatureType, GeometryCollection&&, PropertyMap&&);
-    FeatureType getType() const override;
-    optional<Value> getValue(const std::string&) const override;
-    PropertyMap getProperties() const override { return properties; }
-    GeometryCollection getGeometries() const override;
+    GeoJSONTileFeature(FeatureType type_, GeometryCollection&& geometries_, PropertyMap&& properties_)
+        : type(type_), geometries(std::move(geometries_)), properties(std::move(properties_)) {
+    }
+
+    FeatureType getType() const override  {
+        return type;
+    }
+
+    PropertyMap getProperties() const override {
+        return properties;
+    }
+
+    GeometryCollection getGeometries() const override {
+        return geometries;
+    }
+
+    optional<Value> getValue(const std::string& key) const override {
+        auto it = properties.find(key);
+        if (it != properties.end()) {
+            return optional<Value>(it->second);
+        }
+        return optional<Value>();
+    }
 
 private:
     const FeatureType type;
@@ -26,119 +44,59 @@ private:
 
 class GeoJSONTileLayer : public GeometryTileLayer {
 public:
-    using Features = std::vector<std::shared_ptr<const GeoJSONTileFeature>>;
+    std::vector<std::shared_ptr<const GeoJSONTileFeature>> features;
 
-    GeoJSONTileLayer(Features&&);
-    std::size_t featureCount() const override;
-    util::ptr<const GeometryTileFeature> getFeature(std::size_t) const override;
-    std::string getName() const override { return ""; };
+    std::string getName() const override {
+        return "";
+    }
 
-private:
-    const Features features;
+    std::size_t featureCount() const override {
+        return features.size();
+    }
+
+    util::ptr<const GeometryTileFeature> getFeature(std::size_t i) const override {
+        return features[i];
+    }
 };
 
 class GeoJSONTileData : public GeometryTileData {
 public:
-    GeoJSONTileData(std::shared_ptr<GeoJSONTileLayer>);
-    util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
+    std::shared_ptr<GeoJSONTileLayer> layer = std::make_shared<GeoJSONTileLayer>();
 
-private:
-    const std::shared_ptr<GeoJSONTileLayer> layer;
-};
-
-// Converts the geojsonvt::Tile to a a GeoJSONTile. They have a differing internal structure.
-std::unique_ptr<GeoJSONTileData> convertTile(const mapbox::geometry::feature_collection<int16_t>& features) {
-    std::shared_ptr<GeoJSONTileLayer> layer;
-
-    if (!features.empty()) {
-        std::vector<std::shared_ptr<const GeoJSONTileFeature>> convertedFeatures;
-
-        ToFeatureType toFeatureType;
-        ToGeometryCollection toGeometryCollection;
-
+    GeoJSONTileData(const mapbox::geometry::feature_collection<int16_t>& features) {
         for (auto& feature : features) {
-            const FeatureType featureType = apply_visitor(toFeatureType, feature.geometry);
+            const FeatureType featureType = apply_visitor(ToFeatureType(), feature.geometry);
 
             if (featureType == FeatureType::Unknown) {
                 continue;
             }
 
-            GeometryCollection geometry = apply_visitor(toGeometryCollection, feature.geometry);
+            GeometryCollection geometry = apply_visitor(ToGeometryCollection(), feature.geometry);
 
             // https://github.com/mapbox/geojson-vt-cpp/issues/44
             if (featureType == FeatureType::Polygon) {
                 geometry = fixupPolygons(geometry);
             }
 
-            PropertyMap properties = feature.properties;
-
-            convertedFeatures.emplace_back(std::make_shared<GeoJSONTileFeature>(
-                featureType, std::move(geometry), std::move(properties)));
+            layer->features.emplace_back(std::make_shared<GeoJSONTileFeature>(
+                featureType, std::move(geometry), PropertyMap(feature.properties)));
         }
-
-        layer = std::make_unique<GeoJSONTileLayer>(std::move(convertedFeatures));
     }
 
-    return std::make_unique<GeoJSONTileData>(layer);
-}
+    util::ptr<const GeometryTileLayer> getLayer(const std::string&) const override {
+        // We're ignoring the layer name because GeoJSON tiles only have one layer.
+        return layer;
+    }
+};
 
 GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
                          std::string sourceID_,
                          const style::UpdateParameters& parameters,
-                         mapbox::geojsonvt::GeoJSONVT& geojsonvt)
+                         const mapbox::geometry::feature_collection<int16_t>& features)
     : GeometryTile(overscaledTileID, sourceID_, parameters.style, parameters.mode) {
-    setData(convertTile(geojsonvt.getTile(id.canonical.z, id.canonical.x, id.canonical.y).features));
-}
-
-GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
-                         std::string sourceID_,
-                         const style::UpdateParameters& parameters,
-                         mapbox::supercluster::Supercluster& supercluster)
-    : GeometryTile(overscaledTileID, sourceID_, parameters.style, parameters.mode) {
-    setData(convertTile(supercluster.getTile(id.canonical.z, id.canonical.x, id.canonical.y)));
+    setData(std::make_unique<GeoJSONTileData>(features));
 }
 
 void GeoJSONTile::setNecessity(Necessity) {}
-
-GeoJSONTileFeature::GeoJSONTileFeature(FeatureType type_,
-                                       GeometryCollection&& geometries_,
-                                       PropertyMap&& properties_)
-    : type(type_), geometries(std::move(geometries_)), properties(std::move(properties_)) {
-}
-
-FeatureType GeoJSONTileFeature::getType() const {
-    return type;
-}
-
-optional<Value> GeoJSONTileFeature::getValue(const std::string& key) const {
-    auto it = properties.find(key);
-    if (it != properties.end()) {
-        return optional<Value>(it->second);
-    }
-    return optional<Value>();
-}
-
-GeometryCollection GeoJSONTileFeature::getGeometries() const {
-    return geometries;
-}
-
-GeoJSONTileLayer::GeoJSONTileLayer(Features&& features_) : features(std::move(features_)) {
-}
-
-std::size_t GeoJSONTileLayer::featureCount() const {
-    return features.size();
-}
-
-util::ptr<const GeometryTileFeature> GeoJSONTileLayer::getFeature(std::size_t i) const {
-    return features[i];
-}
-
-GeoJSONTileData::GeoJSONTileData(std::shared_ptr<GeoJSONTileLayer> layer_) : layer(std::move(layer_)) {
-}
-
-util::ptr<GeometryTileLayer> GeoJSONTileData::getLayer(const std::string&) const {
-    // We're ignoring the layer name because GeoJSON tiles only have one layer.
-    return layer;
-}
 
 } // namespace mbgl

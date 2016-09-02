@@ -1,8 +1,8 @@
 #import <Foundation/Foundation.h>
 
-#import "MGLTypes.h"
-
 #import "MGLStyleLayer.h"
+
+#import "MGLTypes.h"
 
 @class MGLSource;
 
@@ -164,6 +164,13 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
+/**
+ The name of the style.
+ 
+ You can customize the style’s name in Mapbox Studio.
+ */
+@property (readonly, copy, nullable) NSString *name;
+
 #pragma mark Runtime Styling
 
 /**
@@ -174,8 +181,16 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 - (nullable id <MGLStyleLayer>)layerWithIdentifier:(NSString *)identifier;
 
+
 /**
- Adds a new layer at the top of the hierarchy.
+ Returns a source if any source with the given identifier was found.
+ 
+ @return source An instance of an `MGLSource` subclass.
+ */
+- (MGLSource *)sourceWithIdentifier:(NSString *)identifier;
+
+/**
+ Adds a new layer on top of existing layers.
  
  @param styleLayer The layer object to add to the map view. This object
  must conform to the `MGLStyleLayer` protocol.
@@ -212,6 +227,34 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  @param source The source to remove.
  */
 - (void)removeSource:(MGLSource *)source;
+
+/**
+ Currently active style classes, represented as an array of string identifiers.
+ */
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses;
+
+/**
+ Returns a Boolean value indicating whether the style class with the given
+ identifier is currently active.
+ 
+ @param styleClass The style class to query for.
+ @return Whether the style class is currently active.
+ */
+- (BOOL)hasStyleClass:(NSString *)styleClass;
+
+/**
+ Activates the style class with the given identifier.
+ 
+ @param styleClass The style class to activate.
+ */
+- (void)addStyleClass:(NSString *)styleClass;
+
+/**
+ Deactivates the style class with the given identifier.
+ 
+ @param styleClass The style class to deactivate.
+ */
+- (void)removeStyleClass:(NSString *)styleClass;
 
 @end
 

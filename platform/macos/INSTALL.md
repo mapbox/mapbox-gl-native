@@ -4,7 +4,7 @@ This document explains how to build the Mapbox macOS SDK and integrate it into y
 
 ### Requirements
 
-The Mapbox macOS SDK requires the macOS 10.10.0 SDK or above.
+The Mapbox macOS SDK requires the macOS 10.10.0 SDK (or above) and Xcode 7.3 (or above).
 
 ### Building the SDK
 

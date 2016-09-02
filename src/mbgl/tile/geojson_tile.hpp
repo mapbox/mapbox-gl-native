@@ -1,18 +1,7 @@
 #pragma once
 
 #include <mbgl/tile/geometry_tile.hpp>
-
-namespace mapbox {
-
-namespace geojsonvt {
-class GeoJSONVT;
-} // namespace geojsonvt
-
-namespace supercluster {
-class Supercluster;
-} // namespace supercluster
-
-} // namespace mapbox
+#include <mbgl/util/feature.hpp>
 
 namespace mbgl {
 
@@ -25,12 +14,7 @@ public:
     GeoJSONTile(const OverscaledTileID&,
                 std::string sourceID,
                 const style::UpdateParameters&,
-                mapbox::geojsonvt::GeoJSONVT&);
-
-    GeoJSONTile(const OverscaledTileID&,
-                std::string sourceID,
-                const style::UpdateParameters&,
-                mapbox::supercluster::Supercluster&);
+                const mapbox::geometry::feature_collection<int16_t>&);
 
     void setNecessity(Necessity) final;
 };

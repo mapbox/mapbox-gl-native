@@ -1,4 +1,4 @@
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
 
 mason_use(glfw VERSION 3.1.2)
 mason_use(boost_libprogram_options VERSION 1.60.0)
@@ -114,5 +114,6 @@ endmacro()
 macro(mbgl_platform_node)
     target_link_libraries(mbgl-node
         PRIVATE "-framework Foundation"
+        PRIVATE "-framework OpenGL"
     )
 endmacro()

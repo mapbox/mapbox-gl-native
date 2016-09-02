@@ -4,15 +4,15 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 
 public class CityStateMarker extends Marker {
 
-    private String mInfoWindowBackgroundColor;
+    private String infoWindowBackgroundColor;
 
     public CityStateMarker(CityStateMarkerOptions cityStateOptions, String color) {
         super(cityStateOptions);
-        mInfoWindowBackgroundColor = color;
+        infoWindowBackgroundColor = color;
     }
 
     public String getInfoWindowBackgroundColor() {
-        return mInfoWindowBackgroundColor;
+        return infoWindowBackgroundColor;
     }
 
 }

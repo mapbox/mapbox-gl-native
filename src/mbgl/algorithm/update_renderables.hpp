@@ -2,6 +2,7 @@
 
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/range.hpp>
+#include <mbgl/storage/resource.hpp>
 
 #include <set>
 
@@ -31,30 +32,30 @@ void updateRenderables(GetTileFn getTile,
         assert(dataTileZoom >= idealRenderTileID.canonical.z);
 
         const OverscaledTileID idealDataTileID(dataTileZoom, idealRenderTileID.canonical);
-        auto data = getTile(idealDataTileID);
-        if (!data) {
-            data = createTile(idealDataTileID);
-            assert(data);
+        auto tile = getTile(idealDataTileID);
+        if (!tile) {
+            tile = createTile(idealDataTileID);
+            assert(tile);
         }
 
         // if (source has the tile and bucket is loaded) {
-        if (data->isRenderable()) {
-            retainTile(*data, true);
-            renderTile(idealRenderTileID, *data);
+        if (tile->isRenderable()) {
+            retainTile(*tile, Resource::Necessity::Required);
+            renderTile(idealRenderTileID, *tile);
         } else {
-            bool triedPrevious = data->hasTriedOptional();
+            bool triedPrevious = tile->hasTriedOptional();
 
             // The tile isn't loaded yet, but retain it anyway because it's an ideal tile.
-            retainTile(*data, true);
+            retainTile(*tile, Resource::Necessity::Required);
             covered = true;
             overscaledZ = dataTileZoom + 1;
             if (overscaledZ > zoomRange.max) {
                 // We're looking for an overzoomed child tile.
                 const auto childDataTileID = idealDataTileID.scaledTo(overscaledZ);
-                data = getTile(childDataTileID);
-                if (data && data->isRenderable()) {
-                    retainTile(*data, false);
-                    renderTile(idealRenderTileID, *data);
+                tile = getTile(childDataTileID);
+                if (tile && tile->isRenderable()) {
+                    retainTile(*tile, Resource::Necessity::Optional);
+                    renderTile(idealRenderTileID, *tile);
                 } else {
                     covered = false;
                 }
@@ -62,10 +63,10 @@ void updateRenderables(GetTileFn getTile,
                 // Check all four actual child tiles.
                 for (const auto& childTileID : idealDataTileID.canonical.children()) {
                     const OverscaledTileID childDataTileID(overscaledZ, childTileID);
-                    data = getTile(childDataTileID);
-                    if (data && data->isRenderable()) {
-                        retainTile(*data, false);
-                        renderTile(childDataTileID.unwrapTo(idealRenderTileID.wrap), *data);
+                    tile = getTile(childDataTileID);
+                    if (tile && tile->isRenderable()) {
+                        retainTile(*tile, Resource::Necessity::Optional);
+                        renderTile(childDataTileID.unwrapTo(idealRenderTileID.wrap), *tile);
                     } else {
                         // At least one child tile doesn't exist, so we are going to look for
                         // parents as well.
@@ -89,17 +90,17 @@ void updateRenderables(GetTileFn getTile,
                         checked.emplace(parentRenderTileID);
                     }
 
-                    data = getTile(parentDataTileID);
-                    if (!data && triedPrevious) {
-                        data = createTile(parentDataTileID);
+                    tile = getTile(parentDataTileID);
+                    if (!tile && triedPrevious) {
+                        tile = createTile(parentDataTileID);
                     }
 
-                    if (data) {
-                        triedPrevious = data->hasTriedOptional();
-                        retainTile(*data, false);
+                    if (tile) {
+                        triedPrevious = tile->hasTriedOptional();
+                        retainTile(*tile, Resource::Necessity::Optional);
 
-                        if (data->isRenderable()) {
-                            renderTile(parentRenderTileID, *data);
+                        if (tile->isRenderable()) {
+                            renderTile(parentRenderTileID, *tile);
                             // Break parent tile ascent, since we found one.
                             break;
                         }

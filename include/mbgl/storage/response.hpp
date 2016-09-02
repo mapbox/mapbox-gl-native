@@ -32,6 +32,10 @@ public:
     optional<Timestamp> modified;
     optional<Timestamp> expires;
     optional<std::string> etag;
+
+    bool isFresh() const {
+        return !expires || *expires > util::now();
+    }
 };
 
 class Response::Error {

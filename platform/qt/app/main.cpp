@@ -7,7 +7,6 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
 
     QMapboxGLSettings settings;
-    settings.setAccessToken(qgetenv("MAPBOX_ACCESS_TOKEN"));
     settings.setCacheDatabasePath("/tmp/mbgl-cache.db");
     settings.setCacheDatabaseMaximumSize(20 * 1024 * 1024);
 

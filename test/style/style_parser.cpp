@@ -4,6 +4,7 @@
 #include <mbgl/style/parser.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/enum.hpp>
+#include <mbgl/util/string.hpp>
 #include <mbgl/util/tileset.hpp>
 
 #include <rapidjson/document.h>
@@ -32,7 +33,11 @@ TEST_P(StyleParserTest, ParseStyle) {
     Log::setObserver(std::unique_ptr<Log::Observer>(observer));
 
     style::Parser parser;
-    parser.parse(util::read_file(base + ".style.json"));
+    auto error = parser.parse(util::read_file(base + ".style.json"));
+
+    if (error) {
+        Log::Error(Event::ParseStyle, "Failed to parse style: %s", util::toString(error).c_str());
+    }
 
     for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
         const std::string name { it->name.GetString(), it->name.GetStringLength() };

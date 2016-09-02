@@ -54,7 +54,7 @@ public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(View view) {
         final long startTime = System.nanoTime();
         mapboxMap.snapshot(new MapboxMap.SnapshotReadyCallback() {
             @Override
@@ -63,7 +63,10 @@ public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCal
                 long duration = (long) ((endTime - startTime) / 1e6);
                 ImageView snapshotView = (ImageView) findViewById(R.id.imageView);
                 snapshotView.setImageBitmap(snapshot);
-                Toast.makeText(SnapshotActivity.this, String.format("Snapshot taken in %d ms", duration), Toast.LENGTH_LONG).show();
+                Toast.makeText(
+                    SnapshotActivity.this,
+                    String.format("Snapshot taken in %d ms", duration),
+                    Toast.LENGTH_LONG).show();
             }
         });
     }

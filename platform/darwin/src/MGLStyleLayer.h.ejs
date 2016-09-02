@@ -2,13 +2,16 @@
   const type = locals.type;
   const layoutProperties = locals.layoutProperties;
   const paintProperties = locals.paintProperties;
+  const layoutPropertiesByName = locals.layoutPropertiesByName;
+  const paintPropertiesByName = locals.paintPropertiesByName;
 -%>
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
-#import "MGLTypes.h"
 #import "MGLStyleAttributeValue.h"
 #import "MGLBaseStyleLayer.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 <% for (const property of layoutProperties) { -%>
 <% if (property.type == "enum") { -%>
@@ -37,9 +40,16 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 
 <% for (const property of layoutProperties) { -%>
 /**
- <%- property.doc %>
+ <%- propertyDoc(property, type) %>
+<% if ('default' in property) { -%>
+ 
+ The default value of this property is <%- propertyDefault(property, type) %>.<% if (!property.required) { %> Set this property to `nil` to reset it to the default value.<% } %>
+<% } if (property.requires) { -%>
+ 
+ <%- propertyReqs(property, layoutPropertiesByName, type) %>
+<% } -%>
  */
-@property (nonatomic) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 <% } -%>
@@ -47,9 +57,18 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 
 <% for (const property of paintProperties) { -%>
 /**
- <%- property.doc %>
+ <%- propertyDoc(property, type) %>
+<% if ('default' in property) { -%>
+ 
+ The default value of this property is <%- propertyDefault(property, type) %>.<% if (!property.required) { %> Set this property to `nil` to reset it to the default value.<% } %>
+<% } if (property.requires) { -%>
+
+ <%- propertyReqs(property, paintPropertiesByName, type) %>
+<% } -%>
  */
-@property (nonatomic) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 @end
+
+NS_ASSUME_NONNULL_END

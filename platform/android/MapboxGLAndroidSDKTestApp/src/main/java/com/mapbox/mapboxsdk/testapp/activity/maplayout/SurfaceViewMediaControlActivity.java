@@ -21,7 +21,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class SurfaceViewMediaControlActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private MapView mMapView;
+    private MapView mapView;
     private MapboxMap mapboxMap;
 
     @Override
@@ -38,9 +38,9 @@ public class SurfaceViewMediaControlActivity extends AppCompatActivity implement
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(this);
+        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
 
         // add another SurfaceView to the Layout
         FrameLayout container = (FrameLayout) findViewById(R.id.container);
@@ -57,31 +57,31 @@ public class SurfaceViewMediaControlActivity extends AppCompatActivity implement
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.onResume();
+        mapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        mapView.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mMapView.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        mapView.onLowMemory();
     }
 
     @Override
@@ -103,18 +103,18 @@ public class SurfaceViewMediaControlActivity extends AppCompatActivity implement
 
     class ClearGLSurfaceView extends GLSurfaceView {
 
-        private ClearRenderer mRenderer;
+        private ClearRenderer renderer;
 
         public ClearGLSurfaceView(Context context) {
             super(context);
-            mRenderer = new ClearRenderer();
-            setRenderer(mRenderer);
+            renderer = new ClearRenderer();
+            setRenderer(renderer);
         }
 
         public boolean onTouchEvent(final MotionEvent event) {
             queueEvent(new Runnable() {
                 public void run() {
-                    mRenderer.setColor(event.getRawX() / getWidth(),
+                    renderer.setColor(event.getRawX() / getWidth(),
                             event.getRawY() / getHeight(), 1.0f);
                 }
             });
@@ -124,27 +124,27 @@ public class SurfaceViewMediaControlActivity extends AppCompatActivity implement
 
     class ClearRenderer implements GLSurfaceView.Renderer {
 
-        private float mRed;
-        private float mGreen;
-        private float mBlue;
+        private float red;
+        private float green;
+        private float blue;
 
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             // Do nothing special.
         }
 
-        public void onSurfaceChanged(GL10 gl, int w, int h) {
-            gl.glViewport(0, 0, w, h);
+        public void onSurfaceChanged(GL10 gl, int width, int height) {
+            gl.glViewport(0, 0, width, height);
         }
 
         public void onDrawFrame(GL10 gl) {
-            gl.glClearColor(mRed, mGreen, mBlue, 1.0f);
+            gl.glClearColor(red, green, blue, 1.0f);
             gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
         }
 
-        public void setColor(float r, float g, float b) {
-            mRed = r;
-            mGreen = g;
-            mBlue = b;
+        public void setColor(float red, float green, float blue) {
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
         }
     }
 }

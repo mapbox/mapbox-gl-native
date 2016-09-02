@@ -7,4 +7,6 @@
 
 - (std::unique_ptr<mbgl::style::Source>)mbgl_source;
 
+@property (nonatomic) mbgl::style::Source *source;
+
 @end

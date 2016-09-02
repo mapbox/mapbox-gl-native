@@ -14,7 +14,6 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.style.layers.Layer;
@@ -388,15 +387,11 @@ final class NativeMapView {
     }
 
     public void updatePolygon(Polygon polygon) {
-        //TODO remove new id assignment, https://github.com/mapbox/mapbox-gl-native/issues/5844
-        long newId = nativeUpdatePolygon(mNativeMapViewPtr, polygon.getId(), polygon);
-        polygon.setId(newId);
+        nativeUpdatePolygon(mNativeMapViewPtr, polygon.getId(), polygon);
     }
 
     public void updatePolyline(Polyline polyline) {
-        //TODO remove new id assignment, https://github.com/mapbox/mapbox-gl-native/issues/5844
-        long newId = nativeUpdatePolyline(mNativeMapViewPtr, polyline.getId(), polyline);
-        polyline.setId(newId);
+        nativeUpdatePolyline(mNativeMapViewPtr, polyline.getId(), polyline);
     }
 
     public void removeAnnotation(long id) {
@@ -717,9 +712,9 @@ final class NativeMapView {
 
     private native void nativeRemoveSource(long mNativeMapViewPtr, String sourceId) throws NoSuchSourceException;
 
-    private native long nativeUpdatePolygon(long nativeMapViewPtr, long polygonId, Polygon polygon);
+    private native void nativeUpdatePolygon(long nativeMapViewPtr, long polygonId, Polygon polygon);
 
-    private native long nativeUpdatePolyline(long nativeMapviewPtr, long polylineId, Polyline polyline);
+    private native void nativeUpdatePolyline(long nativeMapviewPtr, long polylineId, Polyline polyline);
 
     private native void nativeScheduleTakeSnapshot(long nativeMapViewPtr);
 

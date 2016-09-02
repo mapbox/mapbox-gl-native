@@ -34,6 +34,7 @@
 #import <unordered_set>
 
 #import "NSBundle+MGLAdditions.h"
+#import "NSDate+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
@@ -108,11 +109,6 @@ NSImage *MGLDefaultMarkerImage() {
     NSString *path = [[NSBundle mgl_frameworkBundle] pathForResource:MGLDefaultStyleMarkerSymbolName
                                                               ofType:@"pdf"];
     return [[NSImage alloc] initWithContentsOfFile:path];
-}
-
-/// Converts from a duration in seconds to a duration object usable in mbgl.
-mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration) {
-    return std::chrono::duration_cast<mbgl::Duration>(std::chrono::duration<NSTimeInterval>(duration));
 }
 
 /// Converts a media timing function into a unit bezier object usable in mbgl.
@@ -811,7 +807,10 @@ public:
         }
         case mbgl::MapChangeDidFailLoadingMap:
         {
-            // Not yet implemented.
+            if ([self.delegate respondsToSelector:@selector(mapViewDidFailLoadingMap:withError:)]) {
+                NSError *error = [NSError errorWithDomain:MGLErrorDomain code:0 userInfo:nil];
+                [self.delegate mapViewDidFailLoadingMap:self withError:error];
+            }
             break;
         }
         case mbgl::MapChangeWillStartRenderingMap:
@@ -1184,8 +1183,8 @@ public:
         NSRect contentLayoutRect = [self convertRect:self.window.contentLayoutRect fromView:nil];
         if (NSMaxX(contentLayoutRect) > 0 && NSMaxY(contentLayoutRect) > 0) {
             contentInsets = NSEdgeInsetsMake(NSHeight(self.bounds) - NSMaxY(contentLayoutRect),
-                                             NSMinX(contentLayoutRect),
-                                             NSMinY(contentLayoutRect),
+                                             MAX(NSMinX(contentLayoutRect), 0),
+                                             MAX(NSMinY(contentLayoutRect), 0),
                                              NSWidth(self.bounds) - NSMaxX(contentLayoutRect));
         }
     } else {
@@ -2454,6 +2453,9 @@ public:
     if (options & mbgl::MapDebugOptions::StencilClip) {
         mask |= MGLMapDebugStencilBufferMask;
     }
+    if (options & mbgl::MapDebugOptions::DepthBuffer) {
+        mask |= MGLMapDebugDepthBufferMask;
+    }
     return mask;
 }
 
@@ -2476,6 +2478,9 @@ public:
     }
     if (debugMask & MGLMapDebugStencilBufferMask) {
         options |= mbgl::MapDebugOptions::StencilClip;
+    }
+    if (debugMask & MGLMapDebugDepthBufferMask) {
+        options |= mbgl::MapDebugOptions::DepthBuffer;
     }
     _mbglMap->setDebug(options);
 }

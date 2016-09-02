@@ -81,7 +81,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView;
 
-// TODO
+/**
+ Tells the delegate that the map view was unable to load data needed for
+ displaying the map.
+ 
+ This method may be called for a variety of reasons, including a network
+ connection failure or a failure to fetch the style from the server. You can use
+ the given error message to notify the user that map data is unavailable.
+ 
+ @param mapView The map view that is unable to load the data.
+ @param error The reason the data could not be loaded.
+ */
 - (void)mapViewDidFailLoadingMap:(MGLMapView *)mapView withError:(NSError *)error;
 
 // TODO
@@ -263,6 +273,11 @@ NS_ASSUME_NONNULL_BEGIN
  Touch frameworks. On the other hand, static annotation images use less memory
  and draw more quickly than annotation views.
  
+ The user location annotation view can also be customized via this method. When
+ `annotation` is an instance of `MGLUserLocation` (or equal to the map view’s
+ `userLocation` property), return an instance of `MGLUserLocationAnnotationView`
+ (or a subclass thereof).
+
  @param mapView The map view that requested the annotation view.
  @param annotation The object representing the annotation that is about to be
     displayed.

@@ -18,7 +18,7 @@ void GeoJSONSource::setGeoJSON(const mapbox::geojson::geojson& geoJSON) {
     impl->setGeoJSON(geoJSON);
 }
 
-std::string GeoJSONSource::getURL() {
+optional<std::string> GeoJSONSource::getURL() {
     return impl->getURL();
 }
 

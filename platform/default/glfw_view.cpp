@@ -97,6 +97,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Press `Z` to cycle through north orientations\n");
     printf("- Prezz `X` to cycle through the viewport modes\n");
     printf("- Press `A` to cycle through Mapbox offices in the world + dateline monument\n");
+    printf("- Press `B` to cycle through the color, stencil, and depth buffer\n");
     printf("\n");
     printf("- Press `1` through `6` to add increasing numbers of point annotations for testing\n");
     printf("- Press `7` through `0` to add increasing numbers of shape annotations for testing\n");
@@ -155,6 +156,18 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
                 }
             }
             break;
+        case GLFW_KEY_B: {
+            auto debug = view->map->getDebug();
+            if (debug & mbgl::MapDebugOptions::StencilClip) {
+                debug &= ~mbgl::MapDebugOptions::StencilClip;
+                debug |= mbgl::MapDebugOptions::DepthBuffer;
+            } else if (debug & mbgl::MapDebugOptions::DepthBuffer) {
+                debug &= ~mbgl::MapDebugOptions::DepthBuffer;
+            } else {
+                debug |= mbgl::MapDebugOptions::StencilClip;
+            }
+            view->map->setDebug(debug);
+        } break;
         case GLFW_KEY_N:
             if (!mods)
                 view->map->resetNorth();

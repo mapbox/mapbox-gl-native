@@ -7,5 +7,6 @@
   m.resource_bundle = { 'Mapbox' => 'Mapbox.bundle/*' }
   m.vendored_frameworks = 'Mapbox.framework'
   m.module_name = 'Mapbox'
+  m.xcconfig = { 'OTHER_LDFLAGS' => '-ObjC' }
 
 end

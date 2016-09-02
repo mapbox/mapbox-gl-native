@@ -1,8 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
-#import <Mapbox/Mapbox.h>
 
-#import "MGLTypes.h"
+#import "MGLAnnotationView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
