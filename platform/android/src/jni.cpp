@@ -1508,6 +1508,9 @@ void setOfflineRegionObserver(JNIEnv *env, jni::jobject* offlineRegion_, jni::jo
                 case mbgl::Response::Error::Reason::Connection:
                     errorReason = "REASON_CONNECTION";
                     break;
+                case mbgl::Response::Error::Reason::RateLimit:
+                    errorReason = "REASON_RATE_LIMIT";
+                    break;
                 case mbgl::Response::Error::Reason::Other:
                     errorReason = "REASON_OTHER";
                     break;
