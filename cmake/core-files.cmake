@@ -400,6 +400,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/variant.hpp
     include/mbgl/util/work_request.hpp
     include/mbgl/util/work_task.hpp
+    include/mbgl/util/work_task_impl.hpp
     src/mbgl/util/async_task.hpp
     src/mbgl/util/chrono.cpp
     src/mbgl/util/clip_id.cpp
