@@ -87,12 +87,14 @@ int main(int argc, char *argv[]) {
                 bytesPerSecond = util::toString(status.completedResourceSize / elapsedSeconds);
             }
 
-            std::cout << status.completedResourceCount << " / " << status.requiredResourceCount
-                      << " resources"
-                      << (status.requiredResourceCountIsPrecise ? "; " : " (indeterminate); ")
-                      << status.completedResourceSize << " bytes downloaded"
-                      << " (" << bytesPerSecond << " bytes/sec)"
-                      << std::endl;
+            if (status.completedResourceCount % 1000 == 0) {
+                std::cout << status.completedResourceCount << " / " << status.requiredResourceCount
+                          << " resources"
+                          << (status.requiredResourceCountIsPrecise ? "; " : " (indeterminate); ")
+                          << status.completedResourceSize << " bytes downloaded"
+                          << " (" << bytesPerSecond << " bytes/sec)"
+                          << std::endl;
+            }
 
             if (status.complete()) {
                 std::cout << "Finished" << std::endl;
