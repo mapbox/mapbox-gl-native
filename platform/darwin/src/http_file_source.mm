@@ -10,6 +10,7 @@
 #import <Foundation/Foundation.h>
 
 #include <mutex>
+#include <chrono>
 
 @interface MBGLBundleCanary : NSObject
 @end
@@ -293,6 +294,22 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
                     } else if (responseCode == 404) {
                         response.error =
                             std::make_unique<Error>(Error::Reason::NotFound, "HTTP status code 404");
+                    } else if (responseCode == 429) {
+                        //Get the standard header
+                        optional<std::string> retryAfter;
+                        NSString *retryAfterHeader = headers[@"Retry-After"];
+                        if (retryAfterHeader) {
+                            retryAfter = std::string([retryAfterHeader UTF8String]);
+                        }
+                        
+                        //Fallback mapbox specific header
+                        optional<std::string> xRateLimitReset;
+                        NSString *xReset = headers[@"x-rate-limit-reset"];
+                        if (xReset) {
+                            xRateLimitReset = std::string([xReset UTF8String]);
+                        }
+                        
+                        response.error = std::make_unique<Error>(Error::Reason::RateLimit, "HTTP status code 429", http::parseRetryHeaders(retryAfter, xRateLimitReset));
                     } else if (responseCode >= 500 && responseCode < 600) {
                         response.error =
                             std::make_unique<Error>(Error::Reason::Server, std::string{ "HTTP status code " } +
