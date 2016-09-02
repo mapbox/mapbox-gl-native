@@ -15,7 +15,8 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
  * @param <U> Type of the marker view to be composed
  * @param <T> Type of the builder to be used for composing
  */
-public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends BaseMarkerViewOptions<U, T>> implements Parcelable {
+public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends BaseMarkerViewOptions<U, T>>
+    implements Parcelable {
 
     protected LatLng position;
     protected String snippet;

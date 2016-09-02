@@ -35,8 +35,8 @@ import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
  */
 public final class MapFragment extends Fragment {
 
-    private MapView mMap;
-    private OnMapReadyCallback mOnMapReadyCallback;
+    private MapView map;
+    private OnMapReadyCallback onMapReadyCallback;
 
     /**
      * Creates a MapFragment instance
@@ -106,7 +106,7 @@ public final class MapFragment extends Fragment {
             options.myLocationBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mylocationview_background));
         }
 
-        return mMap = new MapView(inflater.getContext(), options);
+        return map = new MapView(inflater.getContext(), options);
     }
 
     /**
@@ -150,7 +150,7 @@ public final class MapFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mMap.onCreate(savedInstanceState);
+        map.onCreate(savedInstanceState);
     }
 
     /**
@@ -159,7 +159,7 @@ public final class MapFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        mMap.getMapAsync(mOnMapReadyCallback);
+        map.getMapAsync(onMapReadyCallback);
     }
 
     /**
@@ -168,7 +168,7 @@ public final class MapFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mMap.onResume();
+        map.onResume();
     }
 
     /**
@@ -177,7 +177,7 @@ public final class MapFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        mMap.onPause();
+        map.onPause();
     }
 
     /**
@@ -188,7 +188,7 @@ public final class MapFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        mMap.onSaveInstanceState(outState);
+        map.onSaveInstanceState(outState);
     }
 
     /**
@@ -205,7 +205,7 @@ public final class MapFragment extends Fragment {
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMap.onLowMemory();
+        map.onLowMemory();
     }
 
     /**
@@ -214,7 +214,7 @@ public final class MapFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mMap.onDestroy();
+        map.onDestroy();
     }
 
     /**
@@ -223,6 +223,6 @@ public final class MapFragment extends Fragment {
      * @param onMapReadyCallback The callback to be invoked.
      */
     public void getMapAsync(@NonNull final OnMapReadyCallback onMapReadyCallback) {
-        mOnMapReadyCallback = onMapReadyCallback;
+        this.onMapReadyCallback = onMapReadyCallback;
     }
 }

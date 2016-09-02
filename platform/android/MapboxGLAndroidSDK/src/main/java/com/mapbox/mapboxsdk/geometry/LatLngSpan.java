@@ -9,12 +9,12 @@ import android.support.annotation.NonNull;
  */
 public class LatLngSpan implements Parcelable {
 
-    private double mLatitudeSpan;
-    private double mLongitudeSpan;
+    private double latitudeSpan;
+    private double longitudeSpan;
 
     private LatLngSpan(@NonNull Parcel in) {
-        mLatitudeSpan = in.readDouble();
-        mLongitudeSpan = in.readDouble();
+        latitudeSpan = in.readDouble();
+        longitudeSpan = in.readDouble();
     }
 
     /**
@@ -24,8 +24,8 @@ public class LatLngSpan implements Parcelable {
      * @param longitudeSpan The span used for longitude.
      */
     public LatLngSpan(double latitudeSpan, double longitudeSpan) {
-        mLatitudeSpan = latitudeSpan;
-        mLongitudeSpan = longitudeSpan;
+        this.latitudeSpan = latitudeSpan;
+        this.longitudeSpan = longitudeSpan;
     }
 
     /**
@@ -34,7 +34,7 @@ public class LatLngSpan implements Parcelable {
      * @return The latitude span.
      */
     public double getLatitudeSpan() {
-        return mLatitudeSpan;
+        return latitudeSpan;
     }
 
     /**
@@ -43,7 +43,7 @@ public class LatLngSpan implements Parcelable {
      * @param latitudeSpan The latitude span to set.
      */
     public void setLatitudeSpan(double latitudeSpan) {
-        mLatitudeSpan = latitudeSpan;
+        this.latitudeSpan = latitudeSpan;
     }
 
     /**
@@ -52,7 +52,7 @@ public class LatLngSpan implements Parcelable {
      * @return The longitude span.
      */
     public double getLongitudeSpan() {
-        return mLongitudeSpan;
+        return longitudeSpan;
     }
 
     /**
@@ -61,16 +61,18 @@ public class LatLngSpan implements Parcelable {
      * @param longitudeSpan The longitude span to set.
      */
     public void setLongitudeSpan(double longitudeSpan) {
-        mLongitudeSpan = longitudeSpan;
+        this.longitudeSpan = longitudeSpan;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o instanceof LatLngSpan) {
-            LatLngSpan other = (LatLngSpan) o;
-            return mLongitudeSpan == other.getLongitudeSpan()
-                    && mLatitudeSpan == other.getLatitudeSpan();
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object instanceof LatLngSpan) {
+            LatLngSpan other = (LatLngSpan) object;
+            return longitudeSpan == other.getLongitudeSpan()
+                    && latitudeSpan == other.getLatitudeSpan();
         }
         return false;
     }
@@ -95,7 +97,7 @@ public class LatLngSpan implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int arg1) {
-        out.writeDouble(mLatitudeSpan);
-        out.writeDouble(mLongitudeSpan);
+        out.writeDouble(latitudeSpan);
+        out.writeDouble(longitudeSpan);
     }
 }

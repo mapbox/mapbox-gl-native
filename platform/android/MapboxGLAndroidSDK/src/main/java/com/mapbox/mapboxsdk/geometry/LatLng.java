@@ -8,8 +8,6 @@ import com.mapbox.mapboxsdk.constants.GeoConstants;
 import com.mapbox.mapboxsdk.constants.MathConstants;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
-import java.io.Serializable;
-
 /**
  * A geographical location which contains a single latitude, longitude pair, with
  * optional altitude.
@@ -124,27 +122,29 @@ public class LatLng implements ILatLng, Parcelable {
      * to remain unchanged.
      * @return New LatLng object with wrapped Longitude
      */
-    public LatLng wrap(){
+    public LatLng wrap() {
         LatLng wrappedVersion = new LatLng(this);
         double lon = wrappedVersion.getLongitude();
         if (lon < GeoConstants.MIN_LONGITUDE || lon > GeoConstants.MAX_LONGITUDE) {
-            wrappedVersion.setLongitude(MathUtils.wrap(wrappedVersion.getLongitude(), GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE));
+            wrappedVersion.setLongitude(
+              MathUtils.wrap(wrappedVersion.getLongitude(), GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE));
         }
         return wrappedVersion;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (object == null || getClass() != object.getClass()) {
             return false;
         }
 
-        LatLng latLng = (LatLng) o;
+        LatLng latLng = (LatLng) object;
 
-        return Double.compare(latLng.altitude, altitude) == 0 && Double.compare(latLng.latitude, latitude) == 0 && Double.compare(latLng.longitude, longitude) == 0;
+        return Double.compare(latLng.altitude, altitude) == 0 && Double.compare(latLng.latitude, latitude) == 0
+          && Double.compare(latLng.longitude, longitude) == 0;
     }
 
     @Override
@@ -183,7 +183,7 @@ public class LatLng implements ILatLng, Parcelable {
      * @return distance in meters
      */
     public double distanceTo(LatLng other) {
-        if(latitude == other.latitude && longitude == other.longitude){
+        if (latitude == other.latitude && longitude == other.longitude) {
             // return 0.0 to avoid a NaN
             return 0.0;
         }

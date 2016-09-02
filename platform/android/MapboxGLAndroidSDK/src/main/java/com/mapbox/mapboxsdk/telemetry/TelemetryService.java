@@ -141,14 +141,14 @@ public class TelemetryService extends Service {
         // Undesired, but needed trick to keep app alive long enough for data to get to server
         try {
             Thread.sleep(1000);
-        } catch (Exception e) {
-            Log.e(TAG, "Error while trying to sleep for 1 second: " + e);
+        } catch (Exception exception) {
+            Log.e(TAG, "Error while trying to sleep for 1 second: " + exception);
         }
 
         try {
             unregisterReceiver(telemetryLocationReceiver);
-        } catch (IllegalArgumentException e) {
-            Log.e(TAG, "Error when unregisterReceiver: " + e);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            Log.e(TAG, "Error when unregisterReceiver: " + illegalArgumentException);
         }
 
     }

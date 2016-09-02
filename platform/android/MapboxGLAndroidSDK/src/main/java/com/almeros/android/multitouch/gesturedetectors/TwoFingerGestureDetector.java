@@ -37,23 +37,23 @@ import android.view.ViewConfiguration;
  */
 public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
 
-    private final float mEdgeSlop;
+    private final float edgeSlop;
 
-    protected float mPrevFingerDiffX;
-    protected float mPrevFingerDiffY;
-    protected float mCurrFingerDiffX;
-    protected float mCurrFingerDiffY;
+    protected float prevFingerDiffX;
+    protected float prevFingerDiffY;
+    protected float currFingerDiffX;
+    protected float currFingerDiffY;
 
-    private float mCurrLen;
-    private float mPrevLen;
+    private float currLen;
+    private float prevLen;
 
-    private PointF mFocus;
+    private PointF focus;
 
     public TwoFingerGestureDetector(Context context) {
         super(context);
 
         ViewConfiguration config = ViewConfiguration.get(context);
-        mEdgeSlop = config.getScaledEdgeSlop();
+        edgeSlop = config.getScaledEdgeSlop();
     }
 
     @Override
@@ -67,10 +67,10 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
     protected void updateStateByEvent(MotionEvent curr) {
         super.updateStateByEvent(curr);
 
-        final MotionEvent prev = mPrevEvent;
+        final MotionEvent prev = prevEvent;
 
-        mCurrLen = -1;
-        mPrevLen = -1;
+        currLen = -1;
+        prevLen = -1;
 
         // Previous
         final float px0 = prev.getX(0);
@@ -79,8 +79,8 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
         final float py1 = prev.getY(1);
         final float pvx = px1 - px0;
         final float pvy = py1 - py0;
-        mPrevFingerDiffX = pvx;
-        mPrevFingerDiffY = pvy;
+        prevFingerDiffX = pvx;
+        prevFingerDiffY = pvy;
 
         // Current
         final float cx0 = curr.getX(0);
@@ -89,9 +89,9 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
         final float cy1 = curr.getY(1);
         final float cvx = cx1 - cx0;
         final float cvy = cy1 - cy0;
-        mCurrFingerDiffX = cvx;
-        mCurrFingerDiffY = cvy;
-        mFocus = determineFocalPoint(curr);
+        currFingerDiffX = cvx;
+        currFingerDiffY = cvy;
+        focus = determineFocalPoint(curr);
     }
 
     /**
@@ -101,12 +101,12 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
      * @return Distance between pointers in pixels.
      */
     public float getCurrentSpan() {
-        if (mCurrLen == -1) {
-            final float cvx = mCurrFingerDiffX;
-            final float cvy = mCurrFingerDiffY;
-            mCurrLen = (float) Math.sqrt(cvx * cvx + cvy * cvy);
+        if (currLen == -1) {
+            final float cvx = currFingerDiffX;
+            final float cvy = currFingerDiffY;
+            currLen = (float) Math.sqrt(cvx * cvx + cvy * cvy);
         }
-        return mCurrLen;
+        return currLen;
     }
 
     /**
@@ -116,12 +116,12 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
      * @return Previous distance between pointers in pixels.
      */
     public float getPreviousSpan() {
-        if (mPrevLen == -1) {
-            final float pvx = mPrevFingerDiffX;
-            final float pvy = mPrevFingerDiffY;
-            mPrevLen = (float) Math.sqrt(pvx * pvx + pvy * pvy);
+        if (prevLen == -1) {
+            final float pvx = prevFingerDiffX;
+            final float pvy = prevFingerDiffY;
+            prevLen = (float) Math.sqrt(pvx * pvx + pvy * pvy);
         }
-        return mPrevLen;
+        return prevLen;
     }
 
     /**
@@ -165,21 +165,21 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
      */
     protected boolean isSloppyGesture(MotionEvent event) {
         // As orientation can change, query the metrics in touch down
-        DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
-        float mRightSlopEdge = metrics.widthPixels - mEdgeSlop;
-        float mBottomSlopEdge = metrics.heightPixels - mEdgeSlop;
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        float rightSlopEdge = metrics.widthPixels - edgeSlop;
+        float bottomSlopEdge = metrics.heightPixels - edgeSlop;
 
-        final float edgeSlop = mEdgeSlop;
+        final float edgeSlop = this.edgeSlop;
 
         final float x0 = event.getRawX();
         final float y0 = event.getRawY();
         final float x1 = getRawX(event, 1);
         final float y1 = getRawY(event, 1);
 
-        boolean p0sloppy = x0 < edgeSlop || y0 < edgeSlop || x0 > mRightSlopEdge
-                || y0 > mBottomSlopEdge;
-        boolean p1sloppy = x1 < edgeSlop || y1 < edgeSlop || x1 > mRightSlopEdge
-                || y1 > mBottomSlopEdge;
+        boolean p0sloppy = x0 < edgeSlop || y0 < edgeSlop || x0 > rightSlopEdge
+                || y0 > bottomSlopEdge;
+        boolean p1sloppy = x1 < edgeSlop || y1 < edgeSlop || x1 > rightSlopEdge
+                || y1 > bottomSlopEdge;
 
         if (p0sloppy && p1sloppy) {
             return true;
@@ -195,29 +195,29 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
      * Determine (multi)finger focal point (a.k.a. center point between all
      * fingers)
      *
-     * @param e Motion Event
+     * @param motionEvent Motion Event
      * @return PointF focal point
      */
-    public static PointF determineFocalPoint(MotionEvent e) {
+    public static PointF determineFocalPoint(MotionEvent motionEvent) {
         // Number of fingers on screen
-        final int pCount = e.getPointerCount();
+        final int pCount = motionEvent.getPointerCount();
         float x = 0.0f;
         float y = 0.0f;
 
         for (int i = 0; i < pCount; i++) {
-            x += e.getX(i);
-            y += e.getY(i);
+            x += motionEvent.getX(i);
+            y += motionEvent.getY(i);
         }
 
         return new PointF(x / pCount, y / pCount);
     }
 
     public float getFocusX() {
-        return mFocus.x;
+        return focus.x;
     }
 
     public float getFocusY() {
-        return mFocus.y;
+        return focus.y;
     }
 
 }

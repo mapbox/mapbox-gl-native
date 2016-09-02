@@ -26,7 +26,7 @@ import okhttp3.Response;
 class HTTPRequest implements Callback {
 
     private static OkHttpClient mClient = new OkHttpClient();
-    private final String LOG_TAG = HTTPRequest.class.getName();
+    private static final String LOG_TAG = HTTPRequest.class.getName();
 
     private static final int CONNECTION_ERROR = 0;
     private static final int TEMPORARY_ERROR = 1;
@@ -34,19 +34,19 @@ class HTTPRequest implements Callback {
 
     // Reentrancy is not needed, but "Lock" is an
     // abstract class.
-    private ReentrantLock mLock = new ReentrantLock();
+    private ReentrantLock reentrantLock = new ReentrantLock();
 
-    private long mNativePtr = 0;
+    private long nativePtr = 0;
 
-    private Call mCall;
-    private Request mRequest;
+    private Call call;
+    private Request request;
 
     private native void nativeOnFailure(int type, String message);
 
     private native void nativeOnResponse(int code, String etag, String modified, String cacheControl, String expires, byte[] body);
 
     private HTTPRequest(long nativePtr, String resourceUrl, String userAgent, String etag, String modified) {
-        mNativePtr = nativePtr;
+        this.nativePtr = nativePtr;
 
         try {
             // Don't try a request if we aren't connected
@@ -71,18 +71,18 @@ class HTTPRequest implements Callback {
             } else if (modified.length() > 0) {
                 builder = builder.addHeader("If-Modified-Since", modified);
             }
-            mRequest = builder.build();
-            mCall = mClient.newCall(mRequest);
-            mCall.enqueue(this);
-        } catch (Exception e) {
-            onFailure(e);
+            request = builder.build();
+            call = mClient.newCall(request);
+            call.enqueue(this);
+        } catch (Exception exception) {
+            onFailure(exception);
         }
     }
 
     public void cancel() {
-        // mCall can be null if the constructor gets aborted (e.g, under a NoRouteToHostException).
-        if (mCall != null) {
-            mCall.cancel();
+        // call can be null if the constructor gets aborted (e.g, under a NoRouteToHostException).
+        if (call != null) {
+            call.cancel();
         }
 
         // TODO: We need a lock here because we can try
@@ -90,9 +90,9 @@ class HTTPRequest implements Callback {
         // answered on the OkHTTP thread. We could get rid of
         // this lock by using Runnable when we move Android
         // implementation of mbgl::RunLoop to Looper.
-        mLock.lock();
-        mNativePtr = 0;
-        mLock.unlock();
+        reentrantLock.lock();
+        nativePtr = 0;
+        reentrantLock.unlock();
     }
 
     @Override
@@ -110,42 +110,42 @@ class HTTPRequest implements Callback {
         byte[] body;
         try {
             body = response.body().bytes();
-        } catch (IOException e) {
-            onFailure(e);
-            //throw e;
+        } catch (IOException ioException) {
+            onFailure(ioException);
+            //throw ioException;
             return;
         } finally {
             response.body().close();
         }
 
-        mLock.lock();
-        if (mNativePtr != 0) {
+        reentrantLock.lock();
+        if (nativePtr != 0) {
             nativeOnResponse(response.code(), response.header("ETag"), response.header("Last-Modified"), response.header("Cache-Control"), response.header("Expires"), body);
         }
-        mLock.unlock();
+        reentrantLock.unlock();
     }
 
     @Override
-    public void onFailure(Call call, IOException e) {
-        onFailure(e);
+    public void onFailure(Call call, IOException ioException) {
+        onFailure(ioException);
     }
 
-    private void onFailure(Exception e) {
-        Log.w(LOG_TAG, String.format("[HTTP] Request could not be executed: %s", e.getMessage()));
+    private void onFailure(Exception exception) {
+        Log.w(LOG_TAG, String.format("[HTTP] Request could not be executed: %s", exception.getMessage()));
 
         int type = PERMANENT_ERROR;
-        if ((e instanceof NoRouteToHostException) || (e instanceof UnknownHostException) || (e instanceof SocketException) || (e instanceof ProtocolException) || (e instanceof SSLException)) {
+        if ((exception instanceof NoRouteToHostException) || (exception instanceof UnknownHostException) || (exception instanceof SocketException) || (exception instanceof ProtocolException) || (exception instanceof SSLException)) {
             type = CONNECTION_ERROR;
-        } else if ((e instanceof InterruptedIOException)) {
+        } else if ((exception instanceof InterruptedIOException)) {
             type = TEMPORARY_ERROR;
         }
 
-        String errorMessage = e.getMessage() != null ? e.getMessage() : "Error processing the request";
+        String errorMessage = exception.getMessage() != null ? exception.getMessage() : "Error processing the request";
 
-        mLock.lock();
-        if (mNativePtr != 0) {
+        reentrantLock.lock();
+        if (nativePtr != 0) {
             nativeOnFailure(type, errorMessage);
         }
-        mLock.unlock();
+        reentrantLock.unlock();
     }
 }

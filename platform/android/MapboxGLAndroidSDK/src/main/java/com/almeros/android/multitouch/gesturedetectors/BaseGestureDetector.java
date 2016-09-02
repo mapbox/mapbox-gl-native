@@ -33,15 +33,15 @@ import android.view.MotionEvent;
  *         POSSIBILITY OF SUCH DAMAGE.
  */
 public abstract class BaseGestureDetector {
-    protected final Context mContext;
-    protected boolean mGestureInProgress;
+    protected final Context context;
+    protected boolean gestureInProgress;
 
-    protected MotionEvent mPrevEvent;
-    protected MotionEvent mCurrEvent;
+    protected MotionEvent prevEvent;
+    protected MotionEvent currEvent;
 
-    protected float mCurrPressure;
-    protected float mPrevPressure;
-    protected long mTimeDelta;
+    protected float currPressure;
+    protected float prevPressure;
+    protected long timeDelta;
 
     /**
      * This value is the threshold ratio between the previous combined pressure
@@ -53,7 +53,7 @@ public abstract class BaseGestureDetector {
     protected static final float PRESSURE_THRESHOLD = 0.67f;
 
     public BaseGestureDetector(Context context) {
-        mContext = context;
+        this.context = context;
     }
 
     /**
@@ -67,7 +67,7 @@ public abstract class BaseGestureDetector {
      */
     public boolean onTouchEvent(MotionEvent event) {
         final int actionCode = event.getAction() & MotionEvent.ACTION_MASK;
-        if (!mGestureInProgress) {
+        if (!gestureInProgress) {
             handleStartProgressEvent(actionCode, event);
         } else {
             handleInProgressEvent(actionCode, event);
@@ -78,7 +78,7 @@ public abstract class BaseGestureDetector {
     /**
      * Called when the current event occurred when NO gesture is in progress
      * yet. The handling in this implementation may set the gesture in progress
-     * (via mGestureInProgress) or out of progress
+     * (via gestureInProgress) or out of progress
      *
      * @param actionCode Action Code from MotionEvent
      * @param event MotionEvent
@@ -89,7 +89,7 @@ public abstract class BaseGestureDetector {
     /**
      * Called when the current event occurred when a gesture IS in progress. The
      * handling in this implementation may set the gesture out of progress (via
-     * mGestureInProgress).
+     * gestureInProgress).
      *
      *
      * @param actionCode Action Code from MotionEvent
@@ -99,33 +99,33 @@ public abstract class BaseGestureDetector {
             MotionEvent event);
 
     protected void updateStateByEvent(MotionEvent curr) {
-        final MotionEvent prev = mPrevEvent;
+        final MotionEvent prev = prevEvent;
 
-        // Reset mCurrEvent
-        if (mCurrEvent != null) {
-            mCurrEvent.recycle();
-            mCurrEvent = null;
+        // Reset currEvent
+        if (currEvent != null) {
+            currEvent.recycle();
+            currEvent = null;
         }
-        mCurrEvent = MotionEvent.obtain(curr);
+        currEvent = MotionEvent.obtain(curr);
 
         // Delta time
-        mTimeDelta = curr.getEventTime() - prev.getEventTime();
+        timeDelta = curr.getEventTime() - prev.getEventTime();
 
         // Pressure
-        mCurrPressure = curr.getPressure(curr.getActionIndex());
-        mPrevPressure = prev.getPressure(prev.getActionIndex());
+        currPressure = curr.getPressure(curr.getActionIndex());
+        prevPressure = prev.getPressure(prev.getActionIndex());
     }
 
     protected void resetState() {
-        if (mPrevEvent != null) {
-            mPrevEvent.recycle();
-            mPrevEvent = null;
+        if (prevEvent != null) {
+            prevEvent.recycle();
+            prevEvent = null;
         }
-        if (mCurrEvent != null) {
-            mCurrEvent.recycle();
-            mCurrEvent = null;
+        if (currEvent != null) {
+            currEvent.recycle();
+            currEvent = null;
         }
-        mGestureInProgress = false;
+        gestureInProgress = false;
     }
 
     /**
@@ -135,7 +135,7 @@ public abstract class BaseGestureDetector {
      *         otherwise.
      */
     public boolean isInProgress() {
-        return mGestureInProgress;
+        return gestureInProgress;
     }
 
     /**
@@ -145,7 +145,7 @@ public abstract class BaseGestureDetector {
      * @return Time difference since the last move event in milliseconds.
      */
     public long getTimeDelta() {
-        return mTimeDelta;
+        return timeDelta;
     }
 
     /**
@@ -155,7 +155,7 @@ public abstract class BaseGestureDetector {
      * @return Current GestureDetector event time in milliseconds.
      */
     public long getEventTime() {
-        return mCurrEvent.getEventTime();
+        return currEvent.getEventTime();
     }
 
 }

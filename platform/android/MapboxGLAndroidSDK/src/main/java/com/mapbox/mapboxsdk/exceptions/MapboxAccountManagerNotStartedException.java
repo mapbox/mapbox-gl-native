@@ -17,7 +17,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 public class MapboxAccountManagerNotStartedException extends RuntimeException {
 
     public MapboxAccountManagerNotStartedException() {
-        super("\nMapboxAccountManager was not started correctly. Use MapboxAccountManager#start(Context, String) to initialise. " +
-                "\nMore information in this guide https://www.mapbox.com/help/first-steps-android-sdk/#access-tokens.");
+        super("\nMapboxAccountManager was not started correctly. Use MapboxAccountManager#start(Context, String) to initialise. "
+          + "\nMore information in this guide https://www.mapbox.com/help/first-steps-android-sdk/#access-tokens.");
     }
 }

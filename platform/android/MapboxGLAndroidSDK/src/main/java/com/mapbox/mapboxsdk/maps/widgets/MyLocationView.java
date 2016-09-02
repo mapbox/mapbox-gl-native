@@ -507,10 +507,10 @@ public class MyLocationView extends View {
 
     private static class GpsLocationListener implements LocationListener {
 
-        private WeakReference<MyLocationView> mUserLocationView;
+        private WeakReference<MyLocationView> userLocationView;
 
         public GpsLocationListener(MyLocationView myLocationView) {
-            mUserLocationView = new WeakReference<>(myLocationView);
+            userLocationView = new WeakReference<>(myLocationView);
         }
 
         /**
@@ -520,7 +520,7 @@ public class MyLocationView extends View {
          */
         @Override
         public void onLocationChanged(Location location) {
-            MyLocationView locationView = mUserLocationView.get();
+            MyLocationView locationView = userLocationView.get();
             if (locationView != null) {
                 locationView.setLocation(location);
             }
@@ -585,7 +585,8 @@ public class MyLocationView extends View {
         private void rotateCamera() {
             CameraPosition.Builder builder = new CameraPosition.Builder();
             builder.bearing(currentDegree);
-            mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), COMPASS_UPDATE_RATE_MS, false /*linear interpolator*/);
+            mapboxMap.easeCamera(
+              CameraUpdateFactory.newCameraPosition(builder.build()), COMPASS_UPDATE_RATE_MS, false /*linear interpolator*/);
         }
 
         @Override

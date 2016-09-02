@@ -179,8 +179,8 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
      * @return True if granted to the app, False if not
      */
     public boolean areLocationPermissionsGranted() {
-        if ((ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
-                (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+        if ((ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+          && (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
             Log.w(TAG, "Location Permissions Not Granted Yet.  Try again after requesting.");
             return false;
         }

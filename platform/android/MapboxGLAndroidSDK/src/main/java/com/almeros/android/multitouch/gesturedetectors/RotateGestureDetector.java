@@ -6,19 +6,19 @@ import android.view.MotionEvent;
 /**
  * @author Almer Thie (code.almeros.com) Copyright (c) 2013, Almer Thie
  *         (code.almeros.com)
- * 
+ *
  *         All rights reserved.
- * 
+ *
  *         Redistribution and use in source and binary forms, with or without
  *         modification, are permitted provided that the following conditions
  *         are met:
- * 
+ *
  *         Redistributions of source code must retain the above copyright
  *         notice, this list of conditions and the following disclaimer.
  *         Redistributions in binary form must reproduce the above copyright
  *         notice, this list of conditions and the following disclaimer in the
  *         documentation and/or other materials provided with the distribution.
- * 
+ *
  *         THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *         "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *         LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -38,7 +38,7 @@ public class RotateGestureDetector extends TwoFingerGestureDetector {
      * Listener which must be implemented which is used by RotateGestureDetector
      * to perform callbacks to any implementing class which is registered to a
      * RotateGestureDetector via the constructor.
-     * 
+     *
      * @see RotateGestureDetector.SimpleOnRotateGestureListener
      */
     public interface OnRotateGestureListener {
@@ -69,13 +69,13 @@ public class RotateGestureDetector extends TwoFingerGestureDetector {
         }
     }
 
-    private final OnRotateGestureListener mListener;
-    private boolean mSloppyGesture;
+    private final OnRotateGestureListener listener;
+    private boolean sloppyGesture;
 
     public RotateGestureDetector(Context context,
             OnRotateGestureListener listener) {
         super(context);
-        mListener = listener;
+        this.listener = listener;
     }
 
     @Override
@@ -85,35 +85,35 @@ public class RotateGestureDetector extends TwoFingerGestureDetector {
             // At least the second finger is on screen now
 
             resetState(); // In case we missed an UP/CANCEL event
-            mPrevEvent = MotionEvent.obtain(event);
-            mTimeDelta = 0;
+            prevEvent = MotionEvent.obtain(event);
+            timeDelta = 0;
 
             updateStateByEvent(event);
 
             // See if we have a sloppy gesture
-            mSloppyGesture = isSloppyGesture(event);
-            if (!mSloppyGesture) {
+            sloppyGesture = isSloppyGesture(event);
+            if (!sloppyGesture) {
                 // No, start gesture now
-                mGestureInProgress = mListener.onRotateBegin(this);
+                gestureInProgress = listener.onRotateBegin(this);
             }
             break;
 
         case MotionEvent.ACTION_MOVE:
-            if (!mSloppyGesture) {
+            if (!sloppyGesture) {
                 break;
             }
 
             // See if we still have a sloppy gesture
-            mSloppyGesture = isSloppyGesture(event);
-            if (!mSloppyGesture) {
+            sloppyGesture = isSloppyGesture(event);
+            if (!sloppyGesture) {
                 // No, start normal gesture now
-                mGestureInProgress = mListener.onRotateBegin(this);
+                gestureInProgress = listener.onRotateBegin(this);
             }
 
             break;
 
         case MotionEvent.ACTION_POINTER_UP:
-            if (!mSloppyGesture) {
+            if (!sloppyGesture) {
                 break;
             }
 
@@ -128,16 +128,16 @@ public class RotateGestureDetector extends TwoFingerGestureDetector {
             // Gesture ended but
             updateStateByEvent(event);
 
-            if (!mSloppyGesture) {
-                mListener.onRotateEnd(this);
+            if (!sloppyGesture) {
+                listener.onRotateEnd(this);
             }
 
             resetState();
             break;
 
         case MotionEvent.ACTION_CANCEL:
-            if (!mSloppyGesture) {
-                mListener.onRotateEnd(this);
+            if (!sloppyGesture) {
+                listener.onRotateEnd(this);
             }
 
             resetState();
@@ -149,11 +149,11 @@ public class RotateGestureDetector extends TwoFingerGestureDetector {
             // Only accept the event if our relative pressure is within
             // a certain limit. This can help filter shaky data as a
             // finger is lifted.
-            if (mCurrPressure / mPrevPressure > PRESSURE_THRESHOLD) {
-                final boolean updatePrevious = mListener.onRotate(this);
+            if (currPressure / prevPressure > PRESSURE_THRESHOLD) {
+                final boolean updatePrevious = listener.onRotate(this);
                 if (updatePrevious) {
-                    mPrevEvent.recycle();
-                    mPrevEvent = MotionEvent.obtain(event);
+                    prevEvent.recycle();
+                    prevEvent = MotionEvent.obtain(event);
                 }
             }
             break;
@@ -163,18 +163,18 @@ public class RotateGestureDetector extends TwoFingerGestureDetector {
     @Override
     protected void resetState() {
         super.resetState();
-        mSloppyGesture = false;
+        sloppyGesture = false;
     }
 
     /**
      * Return the rotation difference from the previous rotate event to the
      * current event.
-     * 
+     *
      * @return The current rotation //difference in degrees.
      */
     public float getRotationDegreesDelta() {
-        double diffRadians = Math.atan2(mPrevFingerDiffY, mPrevFingerDiffX)
-                - Math.atan2(mCurrFingerDiffY, mCurrFingerDiffX);
+        double diffRadians = Math.atan2(prevFingerDiffY, prevFingerDiffX)
+                - Math.atan2(currFingerDiffY, currFingerDiffX);
         return (float) (diffRadians * 180.0 / Math.PI);
     }
 }

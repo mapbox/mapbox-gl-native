@@ -42,7 +42,8 @@ public final class CameraPosition implements Parcelable {
     public final LatLng target;
 
     /**
-     * The angle, in degrees, of the camera angle from the nadir (directly facing the Earth). See tilt(float) for details of restrictions on the range of values.
+     * The angle, in degrees, of the camera angle from the nadir (directly facing the Earth). See tilt(float) for
+     * details of restrictions on the range of values.
      */
     public final double tilt;
 
@@ -87,16 +88,16 @@ public final class CameraPosition implements Parcelable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (object == null || getClass() != object.getClass()) {
             return false;
         }
 
-        CameraPosition cameraPosition = (CameraPosition) o;
+        CameraPosition cameraPosition = (CameraPosition) object;
         if (target != null && !target.equals(cameraPosition.target)) {
             return false;
         } else if (zoom != cameraPosition.zoom) {

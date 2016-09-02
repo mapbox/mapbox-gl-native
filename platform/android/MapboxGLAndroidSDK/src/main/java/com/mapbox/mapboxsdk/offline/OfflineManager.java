@@ -20,7 +20,7 @@ import java.io.File;
  */
 public class OfflineManager {
 
-    private final static String LOG_TAG = "OfflineManager";
+    private static final String LOG_TAG = "OfflineManager";
 
     //
     // Static methods
@@ -31,17 +31,17 @@ public class OfflineManager {
     }
 
     // Default database name
-    private final static String DATABASE_NAME = "mbgl-offline.db";
+    private static final String DATABASE_NAME = "mbgl-offline.db";
 
     /*
      * The maximumCacheSize parameter is a limit applied to non-offline resources only,
      * i.e. resources added to the database for the "ambient use" caching functionality.
      * There is no size limit for offline resources.
      */
-    private final static long DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
+    private static final long DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
 
     // Holds the pointer to JNI DefaultFileSource
-    private long mDefaultFileSourcePtr = 0;
+    private long defaultFileSourcePtr = 0;
 
     // Makes sure callbacks come back to the main thread
     private Handler handler;
@@ -97,10 +97,10 @@ public class OfflineManager {
         // Get a pointer to the DefaultFileSource instance
         String assetRoot = getDatabasePath(context);
         String cachePath = assetRoot + File.separator + DATABASE_NAME;
-        mDefaultFileSourcePtr = createDefaultFileSource(cachePath, assetRoot, DEFAULT_MAX_CACHE_SIZE);
+        defaultFileSourcePtr = createDefaultFileSource(cachePath, assetRoot, DEFAULT_MAX_CACHE_SIZE);
 
         if (MapboxAccountManager.getInstance() != null) {
-            setAccessToken(mDefaultFileSourcePtr, MapboxAccountManager.getInstance().getAccessToken());
+            setAccessToken(defaultFileSourcePtr, MapboxAccountManager.getInstance().getAccessToken());
         }
 
         // Delete any existing previous ambient cache database
@@ -118,10 +118,10 @@ public class OfflineManager {
             setStorageExternal = appInfo.metaData.getBoolean(
                     MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
                     MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL);
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(LOG_TAG, "Failed to read the package metadata: " + e.getMessage());
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Failed to read the storage key: " + e.getMessage());
+        } catch (PackageManager.NameNotFoundException nameNotFoundException) {
+            Log.e(LOG_TAG, "Failed to read the package metadata: " + nameNotFoundException.getMessage());
+        } catch (Exception exception) {
+            Log.e(LOG_TAG, "Failed to read the storage key: " + exception.getMessage());
         }
 
         String databasePath = null;
@@ -129,8 +129,8 @@ public class OfflineManager {
             try {
                 // Try getting the external storage path
                 databasePath = context.getExternalFilesDir(null).getAbsolutePath();
-            } catch (NullPointerException e) {
-                Log.e(LOG_TAG, "Failed to obtain the external storage path: " + e.getMessage());
+            } catch (NullPointerException nullPointerException) {
+                Log.e(LOG_TAG, "Failed to obtain the external storage path: " + nullPointerException.getMessage());
             }
         }
 
@@ -177,8 +177,8 @@ public class OfflineManager {
                         file.delete();
                         Log.d(LOG_TAG, "Old ambient cache database deleted to save space: " + path);
                     }
-                } catch (Exception e) {
-                    Log.e(LOG_TAG, "Failed to delete old ambient cache database: " + e.getMessage());
+                } catch (Exception exception) {
+                    Log.e(LOG_TAG, "Failed to delete old ambient cache database: " + exception.getMessage());
                 }
             }
         }).start();
@@ -200,7 +200,7 @@ public class OfflineManager {
      */
     @Deprecated
     public void setAccessToken(String accessToken) {
-        setAccessToken(mDefaultFileSourcePtr, accessToken);
+        setAccessToken(defaultFileSourcePtr, accessToken);
     }
 
     /**
@@ -211,7 +211,7 @@ public class OfflineManager {
      */
     @Deprecated
     public String getAccessToken() {
-        return getAccessToken(mDefaultFileSourcePtr);
+        return getAccessToken(defaultFileSourcePtr);
     }
 
     private Handler getHandler() {
@@ -232,7 +232,7 @@ public class OfflineManager {
      * @param callback the callback to be invoked
      */
     public void listOfflineRegions(@NonNull final ListOfflineRegionsCallback callback) {
-        listOfflineRegions(mDefaultFileSourcePtr, new ListOfflineRegionsCallback() {
+        listOfflineRegions(defaultFileSourcePtr, new ListOfflineRegionsCallback() {
             @Override
             public void onList(final OfflineRegion[] offlineRegions) {
                 getHandler().post(new Runnable() {
@@ -276,7 +276,7 @@ public class OfflineManager {
             @NonNull byte[] metadata,
             @NonNull final CreateOfflineRegionCallback callback) {
 
-        createOfflineRegion(mDefaultFileSourcePtr, definition, metadata, new CreateOfflineRegionCallback() {
+        createOfflineRegion(defaultFileSourcePtr, definition, metadata, new CreateOfflineRegionCallback() {
             @Override
             public void onCreate(final OfflineRegion offlineRegion) {
                 getHandler().post(new Runnable() {
@@ -304,7 +304,7 @@ public class OfflineManager {
     * by the Mapbox Terms of Service.
     */
     public void setOfflineMapboxTileCountLimit(long limit) {
-        setOfflineMapboxTileCountLimit(mDefaultFileSourcePtr, limit);
+        setOfflineMapboxTileCountLimit(defaultFileSourcePtr, limit);
     }
 
 

@@ -1,18 +1,12 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.animation.AnimatorSet;
 import android.graphics.Bitmap;
-import android.graphics.PointF;
 import android.support.annotation.FloatRange;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.View;
-import android.view.animation.AnimationUtils;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
 /**
  * MarkerView is an annotation that shows an View at a geographical location.
@@ -330,7 +324,8 @@ public class MarkerView extends Marker {
     /**
      * Set the MapboxMap associated tot the MapView containing the MarkerView.
      * <p>
-     * This method is used to instantiate the MarkerView and provide an instance of {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter}
+     * This method is used to instantiate the MarkerView and provide an instance of
+     * {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter}
      * </p>
      *
      * @param mapboxMap the MapboxMap instances
@@ -339,7 +334,7 @@ public class MarkerView extends Marker {
     public void setMapboxMap(MapboxMap mapboxMap) {
         super.setMapboxMap(mapboxMap);
 
-        if(isFlat()) {
+        if (isFlat()) {
             // initial tilt value if MapboxMap is started with a tilt attribute
             tiltValue = (float) mapboxMap.getCameraPosition().tilt;
         }

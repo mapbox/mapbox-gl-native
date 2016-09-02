@@ -1,5 +1,5 @@
-// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
 package com.mapbox.mapboxsdk.style.layers;
+// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
 
 import com.mapbox.mapboxsdk.exceptions.ConversionException;
 
