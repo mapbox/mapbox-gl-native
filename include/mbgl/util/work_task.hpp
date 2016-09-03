@@ -17,10 +17,10 @@ public:
     virtual void cancel() = 0;
 
     template <class Fn, class... Args>
-    static std::shared_ptr<WorkTask> make(Fn&& fn, Args&&... args);
+    static std::shared_ptr<WorkTask> make(Fn&&, Args&&...);
 
-    template <class Fn, class Cb, class... Args>
-    static std::shared_ptr<WorkTask> makeWithCallback(Fn&& fn, Cb&& callback, Args&&... args);
+    template <class Fn, class... Args>
+    static std::shared_ptr<WorkTask> makeWithCallback(Fn&&, Args&&...);
 };
 
 } // namespace mbgl

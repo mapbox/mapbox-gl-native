@@ -107,7 +107,7 @@ AssetFileSource::AssetFileSource(const std::string& root)
 AssetFileSource::~AssetFileSource() = default;
 
 std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource, Callback callback) {
-    return thread->invokeWithCallback(&Impl::request, callback, resource.url);
+    return thread->invokeWithCallback(&Impl::request, resource.url, callback);
 }
 
 }

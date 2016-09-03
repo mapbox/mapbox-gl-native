@@ -62,10 +62,12 @@ std::shared_ptr<WorkTask> WorkTask::make(Fn&& fn, Args&&... args) {
         flag);
 }
 
-template <class Fn, class Cb, class... Args>
-std::shared_ptr<WorkTask> WorkTask::makeWithCallback(Fn&& fn, Cb&& callback, Args&&... args) {
-    auto flag = std::make_shared<std::atomic<bool>>();
-    *flag = false;
+namespace detail {
+template <class Tuple, size_t... Indexes>
+auto packageArgumentsAndCallback(std::shared_ptr<std::atomic<bool>> flag,
+                                 Tuple&& args,
+                                 std::index_sequence<Indexes...>) {
+    auto callback = std::get<sizeof...(Indexes)>(args);
 
     // Create a lambda L1 that invokes another lambda L2 on the current RunLoop R, that calls
     // the callback C. Both lambdas check the flag before proceeding. L1 needs to check the flag
@@ -82,7 +84,19 @@ std::shared_ptr<WorkTask> WorkTask::makeWithCallback(Fn&& fn, Cb&& callback, Arg
         }
     };
 
-    auto tuple = std::make_tuple(std::move(args)..., after);
+    return std::make_tuple(std::move(std::get<Indexes>(args))..., after);
+}
+} // namespace detail
+
+template <class Fn, class... Args>
+std::shared_ptr<WorkTask> WorkTask::makeWithCallback(Fn&& fn, Args&&... args) {
+    auto flag = std::make_shared<std::atomic<bool>>();
+    *flag = false;
+
+    auto tuple = detail::packageArgumentsAndCallback(flag,
+        std::forward_as_tuple(std::forward<Args>(args)...),
+        std::make_index_sequence<sizeof...(Args) - 1>());
+
     return std::make_shared<WorkTaskImpl<Fn, decltype(tuple)>>(
         std::move(fn),
         std::move(tuple),

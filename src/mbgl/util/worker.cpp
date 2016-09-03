@@ -84,8 +84,8 @@ Worker::parseRasterTile(std::unique_ptr<RasterBucket> bucket,
                         const std::shared_ptr<const std::string> data,
                         std::function<void(RasterTileParseResult)> callback) {
     current = (current + 1) % threads.size();
-    return threads[current]->invokeWithCallback(&Worker::Impl::parseRasterTile, callback, bucket,
-                                                data);
+    return threads[current]->invokeWithCallback(&Worker::Impl::parseRasterTile, bucket,
+                                                data, callback);
 }
 
 std::unique_ptr<AsyncRequest>
@@ -95,8 +95,8 @@ Worker::parseGeometryTile(TileWorker& worker,
                           PlacementConfig config,
                           std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
-    return threads[current]->invokeWithCallback(&Worker::Impl::parseGeometryTile, callback, &worker,
-                                                std::move(layers), std::move(tileData), config);
+    return threads[current]->invokeWithCallback(&Worker::Impl::parseGeometryTile, &worker,
+                                                std::move(layers), std::move(tileData), config, callback);
 }
 
 std::unique_ptr<AsyncRequest>
@@ -105,7 +105,7 @@ Worker::parsePendingGeometryTileLayers(TileWorker& worker,
                                        std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::parsePendingGeometryTileLayers,
-                                                callback, &worker, config);
+                                                &worker, config, callback);
 }
 
 std::unique_ptr<AsyncRequest>
@@ -114,8 +114,8 @@ Worker::redoLayout(TileWorker& worker,
                    PlacementConfig config,
                    std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
-    return threads[current]->invokeWithCallback(&Worker::Impl::redoLayout, callback, &worker,
-                                                std::move(layers), config);
+    return threads[current]->invokeWithCallback(&Worker::Impl::redoLayout, &worker,
+                                                std::move(layers), config, callback);
 }
 
 std::unique_ptr<AsyncRequest>
@@ -124,8 +124,8 @@ Worker::redoPlacement(TileWorker& worker,
                       PlacementConfig config,
                       std::function<void(std::unique_ptr<CollisionTile>)> callback) {
     current = (current + 1) % threads.size();
-    return threads[current]->invokeWithCallback(&Worker::Impl::redoPlacement, callback, &worker,
-                                                &buckets, config);
+    return threads[current]->invokeWithCallback(&Worker::Impl::redoPlacement, &worker,
+                                                &buckets, config, callback);
 }
 
 } // end namespace mbgl

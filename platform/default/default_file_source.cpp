@@ -164,7 +164,7 @@ std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resourc
     public:
         DefaultFileRequest(Resource resource_, FileSource::Callback callback_, util::Thread<DefaultFileSource::Impl>& thread_)
             : thread(thread_),
-              workRequest(thread.invokeWithCallback(&DefaultFileSource::Impl::request, callback_, this, resource_)) {
+              workRequest(thread.invokeWithCallback(&DefaultFileSource::Impl::request, this, resource_, callback_)) {
         }
 
         ~DefaultFileRequest() override {
