@@ -3,7 +3,8 @@
 /**
  A vector tile source. Tiles must be in Mapbox Vector Tile format.
  
- @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-vector">the style specification</a>
+ @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-vector">The
+    style specification.</a>
  */
 @interface MGLVectorSource : MGLSource
 
