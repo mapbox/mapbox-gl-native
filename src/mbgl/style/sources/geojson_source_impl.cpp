@@ -91,6 +91,7 @@ void GeoJSONSource::Impl::load(FileSource& fileSource) {
             d.Parse<0>(res.data->c_str());
 
             if (d.HasParseError()) {
+                res.reportBad();
                 std::stringstream message;
                 message << d.GetErrorOffset() << " - "
                         << rapidjson::GetParseError_En(d.GetParseError());

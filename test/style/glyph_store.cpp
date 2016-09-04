@@ -99,9 +99,12 @@ TEST(GlyphStore, LoadingFail) {
 TEST(GlyphStore, LoadingCorrupted) {
     GlyphStoreTest test;
 
+    bool badResourceReported = false;
+
     test.fileSource.glyphsResponse = [&] (const Resource&) {
         Response response;
         response.data = std::make_unique<std::string>("CORRUPTED");
+        response.reportBad = [&]() { badResourceReported = true; };
         return response;
     };
 
@@ -111,10 +114,11 @@ TEST(GlyphStore, LoadingCorrupted) {
 
         EXPECT_TRUE(error != nullptr);
         EXPECT_EQ(util::toString(error), "unknown pbf field type exception");
-
         auto glyphSet = test.glyphStore.getGlyphSet({{"Test Stack"}});
         ASSERT_TRUE(glyphSet->getSDFs().empty());
         ASSERT_FALSE(test.glyphStore.hasGlyphRanges({{"Test Stack"}}, {{0, 255}}));
+
+        ASSERT_TRUE(badResourceReported);
 
         test.end();
     };

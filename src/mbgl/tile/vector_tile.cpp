@@ -75,17 +75,27 @@ VectorTile::VectorTile(const OverscaledTileID& id_,
       loader(*this, id_, parameters, tileset) {
 }
 
+void VectorTile::firstParseFinished(bool succeed) {
+    assert(response);
+
+    if (!succeed) {
+        response->reportBad();
+    }
+
+    response = optional<Response>();
+}
+
 void VectorTile::setNecessity(Necessity necessity) {
     loader.setNecessity(necessity);
 }
 
-void VectorTile::setData(std::shared_ptr<const std::string> data_,
-                         optional<Timestamp> modified_,
-                         optional<Timestamp> expires_) {
-    modified = modified_;
-    expires = expires_;
+void VectorTile::setData(const Response& res) {
+    response = res;
 
-    GeometryTile::setData(data_ ? std::make_unique<VectorTileData>(data_) : nullptr);
+    modified = res.modified;
+    expires = res.expires;
+
+    GeometryTile::setData(res.noContent ? nullptr : std::make_unique<VectorTileData>(res.data));
 }
 
 Value parseValue(protozero::pbf_reader data) {

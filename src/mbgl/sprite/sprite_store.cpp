@@ -15,8 +15,8 @@ namespace mbgl {
 static SpriteStoreObserver nullObserver;
 
 struct SpriteStore::Loader {
-    std::shared_ptr<const std::string> image;
-    std::shared_ptr<const std::string> json;
+    optional<Response> image;
+    optional<Response> json;
     std::unique_ptr<AsyncRequest> jsonRequest;
     std::unique_ptr<AsyncRequest> spriteRequest;
 };
@@ -39,30 +39,29 @@ void SpriteStore::load(const std::string& url, FileSource& fileSource) {
     loader->jsonRequest = fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
         if (res.error) {
             observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified) {
             return;
-        } else if (res.noContent) {
-            loader->json = std::make_shared<const std::string>();
-            emitSpriteLoadedIfComplete();
-        } else {
-            // Only trigger a sprite loaded event we got new data.
-            loader->json = res.data;
-            emitSpriteLoadedIfComplete();
         }
+
+        if (res.notModified) {
+            return;
+        }
+
+        loader->json = res;
+        emitSpriteLoadedIfComplete();
     });
 
     loader->spriteRequest = fileSource.request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
         if (res.error) {
             observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified) {
             return;
-        } else if (res.noContent) {
-            loader->image = std::make_shared<const std::string>();
-            emitSpriteLoadedIfComplete();
-        } else {
-            loader->image = res.data;
-            emitSpriteLoadedIfComplete();
         }
+
+        if (res.notModified) {
+            return;
+        }
+
+        loader->image = res;
+        emitSpriteLoadedIfComplete();
     });
 }
 
@@ -73,14 +72,25 @@ void SpriteStore::emitSpriteLoadedIfComplete() {
         return;
     }
 
-    auto result = parseSprite(*loader->image, *loader->json);
+    auto image = loader->image->data ? loader->image->data : std::make_shared<std::string>();
+    auto json = loader->json->data ? loader->json->data : std::make_shared<std::string>();
+    auto result = parseSprite(*image, *json);
+
     if (result.is<Sprites>()) {
         loaded = true;
         setSprites(result.get<Sprites>());
         observer->onSpriteLoaded();
     } else {
+        // FIXME: Report bad only the resource that failed parsing. Now
+        // we parse both at once, so no good way to make the distinction.
+        loader->image->reportBad();
+        loader->json->reportBad();
+
         observer->onSpriteError(result.get<std::exception_ptr>());
     }
+
+    loader->image = optional<Response>();
+    loader->json = optional<Response>();
 }
 
 void SpriteStore::setObserver(SpriteStoreObserver* observer_) {

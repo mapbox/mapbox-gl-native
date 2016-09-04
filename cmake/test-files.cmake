@@ -71,7 +71,6 @@ set(MBGL_TEST_FILES
     test/style/style_layer.cpp
     test/style/style_parser.cpp
     test/style/tile_source.cpp
-    test/style/variant.cpp
     
     # style conversion
     test/style/conversion/geojson_options.cpp

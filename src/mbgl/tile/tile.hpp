@@ -45,6 +45,8 @@ public:
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel() = 0;
 
+    virtual void firstParseFinished(bool /* succeed */) {}
+
     virtual Bucket* getBucket(const style::Layer&) = 0;
 
     virtual bool parsePending() { return true; }

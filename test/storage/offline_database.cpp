@@ -185,6 +185,36 @@ TEST(OfflineDatabase, PutResource) {
     EXPECT_EQ("second", *updateGetResult->data);
 }
 
+TEST(OfflineDatabase, RemoveResource) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:");
+
+    Response response;
+    response.data = std::make_shared<std::string>("data");
+
+    Resource style { Resource::Style, "http://example.com/" };
+    db.put(style, response);
+    EXPECT_EQ(*db.get(style)->data, "data");
+
+    db.remove(style);
+    EXPECT_FALSE(db.get(style));
+
+    // Should not fail/crash.
+    db.remove(style);
+
+    Resource tile { Resource::Tile, "http://example.com/" };
+    tile.tileData = Resource::TileData { "http://example.com/", 1, 0, 0, 0 };
+    db.put(tile, response);
+    EXPECT_EQ(*db.get(tile)->data, "data");
+
+    db.remove(tile);
+    EXPECT_FALSE(db.get(tile));
+
+    // Should not fail/crash.
+    db.remove(tile);
+}
+
 TEST(OfflineDatabase, PutTile) {
     using namespace mbgl;
 
@@ -224,15 +254,38 @@ TEST(OfflineDatabase, PutResourceNoContent) {
 
     OfflineDatabase db(":memory:");
 
-    Resource resource { Resource::Style, "http://example.com/" };
     Response response;
     response.noContent = true;
 
-    db.put(resource, response);
-    auto res = db.get(resource);
-    EXPECT_EQ(nullptr, res->error);
-    EXPECT_TRUE(res->noContent);
-    EXPECT_FALSE(res->data.get());
+    Resource style { Resource::Style, "http://example.com/" };
+    db.put(style, response);
+    EXPECT_FALSE(db.get(style));
+
+    Resource source { Resource::Source, "http://example.com/" };
+    db.put(source, response);
+    EXPECT_FALSE(db.get(source));
+
+    Resource glyphs { Resource::Glyphs, "http://example.com/" };
+    db.put(glyphs, response);
+    EXPECT_FALSE(db.get(glyphs));
+
+    Resource spriteImage { Resource::SpriteImage, "http://example.com/" };
+    db.put(spriteImage, response);
+    EXPECT_FALSE(db.get(spriteImage));
+
+    Resource spriteJSON { Resource::SpriteJSON, "http://example.com/" };
+    db.put(spriteJSON, response);
+    EXPECT_FALSE(db.get(spriteJSON));
+
+    Resource tile { Resource::Tile, "http://example.com/" };
+    tile.tileData = Resource::TileData { "http://example.com/", 1, 0, 0, 0 };
+
+    db.put(tile, response);
+    auto tileResponse = db.get(tile);
+
+    EXPECT_EQ(nullptr, tileResponse->error);
+    EXPECT_TRUE(tileResponse->noContent);
+    EXPECT_FALSE(tileResponse->data.get());
 }
 
 TEST(OfflineDatabase, PutTileNotFound) {
@@ -256,6 +309,47 @@ TEST(OfflineDatabase, PutTileNotFound) {
     EXPECT_EQ(nullptr, res->error);
     EXPECT_TRUE(res->noContent);
     EXPECT_FALSE(res->data.get());
+}
+
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(PutCompressedCorrupted)) {
+    using namespace mbgl;
+
+    createDir("test/fixtures/offline_database");
+    deleteFile("test/fixtures/offline_database/offline.db");
+    std::string path("test/fixtures/offline_database/offline.db");
+
+    Resource resource { Resource::Style, "http://example.com/" };
+
+    Resource tile { Resource::Tile, "http://example.com/" };
+    tile.tileData = Resource::TileData { "http://example.com/", 1, 0, 0, 0 };
+
+    {
+        Response response;
+        response.data = std::make_shared<std::string>("CORRUPTED");
+
+        OfflineDatabase db(path);
+        db.put(resource, response);
+        db.put(tile, response);
+    }
+
+    {
+        sqlite3* db = nullptr;
+        sqlite3_open_v2(path.c_str(), &db, SQLITE_OPEN_READWRITE, nullptr);
+        sqlite3_exec(db, "UPDATE resources SET compressed = 1", nullptr, nullptr, nullptr);
+        sqlite3_exec(db, "UPDATE tiles SET compressed = 1", nullptr, nullptr, nullptr);
+        sqlite3_close_v2(db);
+    }
+
+    Log::setObserver(std::make_unique<FixtureLogObserver>());
+    OfflineDatabase db(path);
+
+    EXPECT_FALSE(db.get(resource));
+    EXPECT_FALSE(db.get(tile));
+
+    auto observer = Log::removeObserver();
+    auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
+    EXPECT_EQ(1u, flo->count({ EventSeverity::Error, Event::Database, -1, "Error decompressing resource: incorrect header check" }));
+    EXPECT_EQ(1u, flo->count({ EventSeverity::Error, Event::Database, -1, "Error decompressing tile: incorrect header check" }));
 }
 
 TEST(OfflineDatabase, CreateRegion) {
@@ -353,7 +447,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
 
     Resource resource { Resource::Style, "http://example.com/" };
     Response response;
-    response.noContent = true;
+    response.data = std::make_shared<std::string>("foobar");
 
     std::thread thread1([&] {
         for (auto i = 0; i < 100; i++) {

@@ -77,6 +77,7 @@ void TileSourceImpl::load(FileSource& fileSource) {
             try {
                 newTileset = parseTileJSON(*res.data, url, type, tileSize);
             } catch (...) {
+                res.reportBad();
                 observer->onSourceError(base, std::current_exception());
                 return;
             }
