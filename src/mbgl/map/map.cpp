@@ -227,7 +227,6 @@ void Map::Impl::update() {
 
     style::UpdateParameters parameters(pixelRatio,
                                        debugOptions,
-                                       timePoint,
                                        transform.getState(),
                                        style->workers,
                                        fileSource,

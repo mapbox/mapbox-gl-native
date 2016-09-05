@@ -88,9 +88,6 @@ private:
     virtual Range<uint8_t> getZoomRange() = 0;
     virtual std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) = 0;
 
-    // Stores the time when this source was most recently updated.
-    TimePoint updated = TimePoint::min();
-
     std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
     std::map<UnwrappedTileID, RenderTile> renderTiles;
     TileCache cache;

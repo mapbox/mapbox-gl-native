@@ -38,7 +38,6 @@ public:
     style::UpdateParameters updateParameters {
         1.0,
         MapDebugOptions(),
-        TimePoint(),
         transformState,
         worker,
         fileSource,

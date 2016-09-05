@@ -179,8 +179,6 @@ bool Source::Impl::parseTiles(const UpdateParameters& parameters) {
         }
     }
 
-    updated = parameters.animationTime;
-
     return allTilesUpdated;
 }
 
