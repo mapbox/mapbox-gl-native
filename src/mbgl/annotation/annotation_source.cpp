@@ -18,7 +18,7 @@ Range<uint8_t> AnnotationSource::Impl::getZoomRange() {
     return { 0, 22 };
 }
 
-void AnnotationSource::Impl::load(FileSource&) {
+void AnnotationSource::Impl::loadDescription(FileSource&) {
     loaded = true;
 }
 

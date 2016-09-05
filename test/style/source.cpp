@@ -87,7 +87,7 @@ TEST(Source, LoadingFail) {
 
     VectorSource source("source", "url");
     source.baseImpl->setObserver(&test.observer);
-    source.baseImpl->load(test.fileSource);
+    source.baseImpl->loadDescription(test.fileSource);
 
     test.run();
 }
@@ -110,7 +110,7 @@ TEST(Source, LoadingCorrupt) {
 
     VectorSource source("source", "url");
     source.baseImpl->setObserver(&test.observer);
-    source.baseImpl->load(test.fileSource);
+    source.baseImpl->loadDescription(test.fileSource);
 
     test.run();
 }
@@ -138,8 +138,8 @@ TEST(Source, RasterTileEmpty) {
 
     RasterSource source("source", tileset, 512);
     source.baseImpl->setObserver(&test.observer);
-    source.baseImpl->load(test.fileSource);
-    source.baseImpl->update(test.updateParameters);
+    source.baseImpl->loadDescription(test.fileSource);
+    source.baseImpl->loadTiles(test.updateParameters);
 
     test.run();
 }
@@ -167,8 +167,8 @@ TEST(Source, VectorTileEmpty) {
 
     VectorSource source("source", tileset);
     source.baseImpl->setObserver(&test.observer);
-    source.baseImpl->load(test.fileSource);
-    source.baseImpl->update(test.updateParameters);
+    source.baseImpl->loadDescription(test.fileSource);
+    source.baseImpl->loadTiles(test.updateParameters);
 
     test.run();
 }
@@ -196,8 +196,8 @@ TEST(Source, RasterTileFail) {
 
     RasterSource source("source", tileset, 512);
     source.baseImpl->setObserver(&test.observer);
-    source.baseImpl->load(test.fileSource);
-    source.baseImpl->update(test.updateParameters);
+    source.baseImpl->loadDescription(test.fileSource);
+    source.baseImpl->loadTiles(test.updateParameters);
 
     test.run();
 }
@@ -225,8 +225,8 @@ TEST(Source, VectorTileFail) {
 
     VectorSource source("source", tileset);
     source.baseImpl->setObserver(&test.observer);
-    source.baseImpl->load(test.fileSource);
-    source.baseImpl->update(test.updateParameters);
+    source.baseImpl->loadDescription(test.fileSource);
+    source.baseImpl->loadTiles(test.updateParameters);
 
     test.run();
 }
@@ -253,8 +253,8 @@ TEST(Source, RasterTileCorrupt) {
 
     RasterSource source("source", tileset, 512);
     source.baseImpl->setObserver(&test.observer);
-    source.baseImpl->load(test.fileSource);
-    source.baseImpl->update(test.updateParameters);
+    source.baseImpl->loadDescription(test.fileSource);
+    source.baseImpl->loadTiles(test.updateParameters);
 
     test.run();
 }
@@ -285,8 +285,8 @@ TEST(Source, VectorTileCorrupt) {
 
     VectorSource source("source", tileset);
     source.baseImpl->setObserver(&test.observer);
-    source.baseImpl->load(test.fileSource);
-    source.baseImpl->update(test.updateParameters);
+    source.baseImpl->loadDescription(test.fileSource);
+    source.baseImpl->loadTiles(test.updateParameters);
 
     test.run();
 }
@@ -312,8 +312,8 @@ TEST(Source, RasterTileCancel) {
 
     RasterSource source("source", tileset, 512);
     source.baseImpl->setObserver(&test.observer);
-    source.baseImpl->load(test.fileSource);
-    source.baseImpl->update(test.updateParameters);
+    source.baseImpl->loadDescription(test.fileSource);
+    source.baseImpl->loadTiles(test.updateParameters);
 
     test.run();
 }
@@ -339,8 +339,8 @@ TEST(Source, VectorTileCancel) {
 
     VectorSource source("source", tileset);
     source.baseImpl->setObserver(&test.observer);
-    source.baseImpl->load(test.fileSource);
-    source.baseImpl->update(test.updateParameters);
+    source.baseImpl->loadDescription(test.fileSource);
+    source.baseImpl->loadTiles(test.updateParameters);
 
     test.run();
 }

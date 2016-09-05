@@ -48,7 +48,7 @@ public:
 
     // Fetch the tiles needed by the current viewport and emit a signal when
     // a tile is ready so observers can render the tile.
-    void update(const UpdateParameters&);
+    void updateTiles(const UpdateParameters&);
 
     void cascade(const TimePoint&, MapMode);
     void recalculate(float z, const TimePoint&, MapMode);

@@ -236,7 +236,7 @@ void Map::Impl::update() {
                                        *annotationManager,
                                        *style);
 
-    style->update(parameters);
+    style->updateTiles(parameters);
 
     if (mode == MapMode::Continuous) {
         view.invalidate();

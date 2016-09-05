@@ -16,7 +16,7 @@ class AnnotationSource::Impl : public style::Source::Impl {
 public:
     Impl(Source&);
 
-    void load(FileSource&) final;
+    void loadDescription(FileSource&) final;
 
 private:
     uint16_t getTileSize() const final { return util::tileSize; }

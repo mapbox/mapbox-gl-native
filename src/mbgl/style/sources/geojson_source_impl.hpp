@@ -20,7 +20,7 @@ public:
 
     void setGeoJSON(const GeoJSON&);
 
-    void load(FileSource&) final;
+    void loadDescription(FileSource&) final;
 
     uint16_t getTileSize() const final {
         return util::tileSize;

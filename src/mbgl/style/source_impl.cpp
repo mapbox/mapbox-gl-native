@@ -77,11 +77,9 @@ const std::map<UnwrappedTileID, RenderTile>& Source::Impl::getRenderTiles() cons
     return renderTiles;
 }
 
-bool Source::Impl::update(const UpdateParameters& parameters) {
-    bool allTilesUpdated = true;
-
-    if (!loaded || parameters.animationTime <= updated) {
-        return allTilesUpdated;
+void Source::Impl::loadTiles(const UpdateParameters& parameters) {
+    if (!loaded) {
+        return;
     }
 
     const uint16_t tileSize = getTileSize();
@@ -163,7 +161,10 @@ bool Source::Impl::update(const UpdateParameters& parameters) {
             ++retainIt;
         }
     }
+}
 
+bool Source::Impl::parseTiles(const UpdateParameters& parameters) {
+    bool allTilesUpdated = true;
     const PlacementConfig newConfig{ parameters.transformState.getAngle(),
                                      parameters.transformState.getPitch(),
                                      parameters.debugOptions & MapDebugOptions::Collision };

@@ -197,11 +197,12 @@ double Style::getDefaultPitch() const {
     return defaultPitch;
 }
 
-void Style::update(const UpdateParameters& parameters) {
+void Style::updateTiles(const UpdateParameters& parameters) {
     bool allTilesUpdated = true;
 
     for (const auto& source : sources) {
-        if (!source->baseImpl->update(parameters)) {
+        source->baseImpl->loadTiles(parameters);
+        if (!source->baseImpl->parseTiles(parameters)) {
             allTilesUpdated = false;
         }
     }
@@ -260,7 +261,7 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
         if (source && layer->baseImpl->needsRendering(z)) {
             source->baseImpl->enabled = true;
             if (!source->baseImpl->loaded) {
-                source->baseImpl->load(fileSource);
+                source->baseImpl->loadDescription(fileSource);
             }
         }
     }

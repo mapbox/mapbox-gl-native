@@ -40,14 +40,15 @@ public:
     Impl(SourceType, std::string id, Source&);
     ~Impl() override;
 
-    virtual void load(FileSource&) = 0;
+    virtual void loadDescription(FileSource&) = 0;
     bool isLoaded() const;
 
     // Request or parse all the tiles relevant for the "TransformState". This method
     // will return true if all the tiles were scheduled for updating of false if
     // they were not. shouldReparsePartialTiles must be set to "true" if there is
     // new data available that a tile in the "partial" state might be interested at.
-    bool update(const UpdateParameters&);
+    void loadTiles(const UpdateParameters&);
+    bool parseTiles(const UpdateParameters&);
 
     void startRender(algorithm::ClipIDGenerator&,
                      const mat4& projMatrix,

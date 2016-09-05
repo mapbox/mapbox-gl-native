@@ -67,7 +67,7 @@ void GeoJSONSource::Impl::setGeoJSON(const GeoJSON& geoJSON) {
     }
 }
 
-void GeoJSONSource::Impl::load(FileSource& fileSource) {
+void GeoJSONSource::Impl::loadDescription(FileSource& fileSource) {
     if (!url) {
         loaded = true;
         return;
