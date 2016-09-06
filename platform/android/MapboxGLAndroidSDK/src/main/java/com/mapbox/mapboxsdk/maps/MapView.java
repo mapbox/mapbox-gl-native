@@ -15,6 +15,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.PixelFormat;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
@@ -1413,6 +1414,8 @@ public class MapView extends FrameLayout {
             if (mDestroyed) {
                 return;
             }
+            Log.e(MapboxConstants.TAG, "PixelFormat Transparent");
+            holder.setFormat(PixelFormat.TRANSPARENT);
             mNativeMapView.resizeFramebuffer(width, height);
         }
 
