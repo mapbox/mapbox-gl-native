@@ -6,7 +6,6 @@
 #include <mbgl/util/feature.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/renderer/bucket.hpp>
-#include <mbgl/text/placement_config.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/storage/resource.hpp>
 
@@ -17,10 +16,10 @@
 
 namespace mbgl {
 
-class Worker;
 class DebugBucket;
 class TransformState;
 class TileObserver;
+class PlacementConfig;
 
 namespace style {
 class Layer;
@@ -47,9 +46,8 @@ public:
 
     virtual Bucket* getBucket(const style::Layer&) = 0;
 
-    virtual bool parsePending() { return true; }
+    virtual void setPlacementConfig(const PlacementConfig&) {}
     virtual void redoLayout() {}
-    virtual void redoPlacement(PlacementConfig) {}
 
     virtual void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,

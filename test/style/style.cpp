@@ -4,6 +4,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;

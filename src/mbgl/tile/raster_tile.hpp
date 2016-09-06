@@ -2,11 +2,11 @@
 
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/tile_loader.hpp>
-#include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/tile/raster_tile_worker.hpp>
+#include <mbgl/actor/actor.hpp>
 
 namespace mbgl {
 
-class AsyncRequest;
 class Tileset;
 
 namespace style {
@@ -32,11 +32,13 @@ public:
     void cancel() override;
     Bucket* getBucket(const style::Layer&) override;
 
-private:
-    Worker& worker;
+    void onParsed(std::unique_ptr<Bucket> result);
 
+private:
     TileLoader<RasterTile> loader;
-    std::unique_ptr<AsyncRequest> workRequest;
+
+    std::shared_ptr<Mailbox> mailbox;
+    Actor<RasterTileWorker> worker;
 
     // Contains the Bucket object for the tile. Buckets are render
     // objects and they get added by tile parsing operations.

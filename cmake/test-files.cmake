@@ -1,6 +1,10 @@
 # Do not edit. Regenerate this with ./scripts/generate-test-files.sh
 
 set(MBGL_TEST_FILES
+    # actor
+    test/actor/actor.cpp
+    test/actor/actor_ref.cpp
+
     # algorithm
     test/algorithm/covered_by_children.cpp
     test/algorithm/generate_clip_ids.cpp
@@ -43,10 +47,12 @@ set(MBGL_TEST_FILES
 
     # src/mbgl/test
     test/src/mbgl/test/conversion_stubs.hpp
+    test/src/mbgl/test/fake_file_source.hpp
     test/src/mbgl/test/fixture_log_observer.cpp
     test/src/mbgl/test/fixture_log_observer.hpp
     test/src/mbgl/test/stub_file_source.cpp
     test/src/mbgl/test/stub_file_source.hpp
+    test/src/mbgl/test/stub_layer_observer.hpp
     test/src/mbgl/test/stub_style_observer.hpp
     test/src/mbgl/test/test.cpp
     test/src/mbgl/test/util.cpp
@@ -63,6 +69,9 @@ set(MBGL_TEST_FILES
     test/storage/online_file_source.cpp
     test/storage/resource.cpp
 
+    # style/conversion
+    test/style/conversion/geojson_options.cpp
+
     # style
     test/style/filter.cpp
     test/style/functions.cpp
@@ -73,9 +82,6 @@ set(MBGL_TEST_FILES
     test/style/style_parser.cpp
     test/style/tile_source.cpp
     test/style/variant.cpp
-    
-    # style conversion
-    test/style/conversion/geojson_options.cpp
 
     # text
     test/text/quads.cpp

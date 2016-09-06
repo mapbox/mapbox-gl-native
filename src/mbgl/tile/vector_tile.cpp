@@ -1,7 +1,6 @@
 #include <mbgl/tile/vector_tile.hpp>
 #include <mbgl/tile/tile_loader_impl.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/style/update_parameters.hpp>
 
 #include <protozero/pbf_reader.hpp>
 
@@ -75,7 +74,7 @@ VectorTile::VectorTile(const OverscaledTileID& id_,
                        std::string sourceID_,
                        const style::UpdateParameters& parameters,
                        const Tileset& tileset)
-    : GeometryTile(id_, sourceID_, parameters.style, parameters.mode),
+    : GeometryTile(id_, sourceID_, parameters),
       loader(*this, id_, parameters, tileset) {
 }
 

@@ -1,9 +1,10 @@
 #pragma once
 
 #include <mbgl/tile/tile.hpp>
-#include <mbgl/tile/tile_worker.hpp>
+#include <mbgl/tile/geometry_tile_worker.hpp>
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/util/feature.hpp>
+#include <mbgl/actor/actor.hpp>
 
 #include <atomic>
 #include <memory>
@@ -12,33 +13,30 @@
 
 namespace mbgl {
 
-class AsyncRequest;
 class GeometryTileData;
 class FeatureIndex;
+class CollisionTile;
 
 namespace style {
 class Style;
 class Layer;
+class UpdateParameters;
 } // namespace style
 
 class GeometryTile : public Tile {
 public:
     GeometryTile(const OverscaledTileID&,
                  std::string sourceID,
-                 style::Style&,
-                 const MapMode);
+                 const style::UpdateParameters&);
 
     ~GeometryTile() override;
 
     void setError(std::exception_ptr err);
     void setData(std::unique_ptr<const GeometryTileData>);
+    void setPlacementConfig(const PlacementConfig&) override;
+    void redoLayout() override;
 
     Bucket* getBucket(const style::Layer&) override;
-
-    bool parsePending() override;
-
-    void redoLayout() override;
-    void redoPlacement(PlacementConfig) override;
 
     void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,
@@ -48,35 +46,40 @@ public:
 
     void cancel() override;
 
+    class LayoutResult {
+    public:
+        std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+        std::unique_ptr<FeatureIndex> featureIndex;
+        std::unique_ptr<GeometryTileData> tileData;
+        uint64_t correlationID;
+    };
+    void onLayout(LayoutResult);
+
+    class PlacementResult {
+    public:
+        std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+        std::unique_ptr<CollisionTile> collisionTile;
+        PlacementConfig placedConfig;
+        uint64_t correlationID;
+    };
+    void onPlacement(PlacementResult);
+
 private:
-    std::vector<std::unique_ptr<style::Layer>> cloneStyleLayers() const;
-    void redoPlacement();
-
-    void tileLoaded(TileParseResult, PlacementConfig);
-
     const std::string sourceID;
     style::Style& style;
-    Worker& worker;
-    TileWorker tileWorker;
-
-    std::unique_ptr<AsyncRequest> workRequest;
-
-    // Contains all the Bucket objects for the tile. Buckets are render
-    // objects and they get added by tile parsing operations.
-    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
-
-    std::unique_ptr<FeatureIndex> featureIndex;
-    std::unique_ptr<const GeometryTileData> data;
-
-    // Stores the placement configuration of the text that is currently placed on the screen.
-    PlacementConfig placedConfig;
-
-    // Stores the placement configuration of how the text should be placed. This isn't necessarily
-    // the one that is being displayed.
-    PlacementConfig targetConfig;
 
     // Used to signal the worker that it should abandon parsing this tile as soon as possible.
     std::atomic<bool> obsolete { false };
+
+    std::shared_ptr<Mailbox> mailbox;
+    Actor<GeometryTileWorker> worker;
+
+    uint64_t correlationID = 0;
+    optional<PlacementConfig> placedConfig;
+
+    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+    std::unique_ptr<FeatureIndex> featureIndex;
+    std::unique_ptr<const GeometryTileData> data;
 };
 
 } // namespace mbgl

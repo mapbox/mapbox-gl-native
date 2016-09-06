@@ -1,16 +1,17 @@
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/tile/tile_observer.hpp>
+#include <mbgl/tile/geometry_tile_worker.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/tile/tile_observer.hpp>
+#include <mbgl/style/update_parameters.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
-#include <mbgl/util/worker.hpp>
-#include <mbgl/util/work_request.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 namespace mbgl {
 
@@ -18,30 +19,63 @@ using namespace style;
 
 GeometryTile::GeometryTile(const OverscaledTileID& id_,
                            std::string sourceID_,
-                           Style& style_,
-                           const MapMode mode_)
+                           const style::UpdateParameters& parameters)
     : Tile(id_),
       sourceID(std::move(sourceID_)),
-      style(style_),
-      worker(style_.workers),
-      tileWorker(id_,
-                 *style_.spriteStore,
-                 *style_.glyphAtlas,
-                 *style_.glyphStore,
-                 obsolete,
-                 mode_) {
+      style(parameters.style),
+      mailbox(std::make_shared<Mailbox>(*util::RunLoop::Get())),
+      worker(parameters.workerScheduler,
+             ActorRef<GeometryTile>(*this, mailbox),
+             id_,
+             *parameters.style.spriteStore,
+             *parameters.style.glyphAtlas,
+             *parameters.style.glyphStore,
+             obsolete,
+             parameters.mode) {
 }
 
 GeometryTile::~GeometryTile() {
     cancel();
 }
 
+void GeometryTile::cancel() {
+    obsolete = true;
+}
+
 void GeometryTile::setError(std::exception_ptr err) {
+    availableData = DataAvailability::All;
     observer->onTileError(*this, err);
 }
 
-std::vector<std::unique_ptr<Layer>> GeometryTile::cloneStyleLayers() const {
-    std::vector<std::unique_ptr<Layer>> result;
+void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
+    // Mark the tile as pending again if it was complete before to prevent signaling a complete
+    // state despite pending parse operations.
+    if (availableData == DataAvailability::All) {
+        availableData = DataAvailability::Some;
+    }
+
+    ++correlationID;
+    worker.invoke(&GeometryTileWorker::setData, std::move(data_), correlationID);
+    redoLayout();
+}
+
+void GeometryTile::setPlacementConfig(const PlacementConfig& desiredConfig) {
+    if (placedConfig == desiredConfig) {
+        return;
+    }
+
+    ++correlationID;
+    worker.invoke(&GeometryTileWorker::setPlacementConfig, desiredConfig, correlationID);
+}
+
+void GeometryTile::redoLayout() {
+    // Mark the tile as pending again if it was complete before to prevent signaling a complete
+    // state despite pending parse operations.
+    if (availableData == DataAvailability::All) {
+        availableData = DataAvailability::Some;
+    }
+
+    std::vector<std::unique_ptr<Layer>> copy;
 
     for (const Layer* layer : style.getLayers()) {
         // Avoid cloning and including irrelevant layers.
@@ -54,121 +88,31 @@ std::vector<std::unique_ptr<Layer>> GeometryTile::cloneStyleLayers() const {
             continue;
         }
 
-        result.push_back(layer->baseImpl->clone());
+        copy.push_back(layer->baseImpl->clone());
     }
 
-    return result;
+    ++correlationID;
+    worker.invoke(&GeometryTileWorker::setLayers, std::move(copy), correlationID);
 }
 
-void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
-    if (!data_) {
-        // This is a 404 response. We're treating these as empty tiles.
-        workRequest.reset();
+void GeometryTile::onLayout(LayoutResult result) {
+    availableData = DataAvailability::Some;
+    buckets = std::move(result.buckets);
+    featureIndex = std::move(result.featureIndex);
+    data = std::move(result.tileData);
+    observer->onTileChanged(*this);
+}
+
+void GeometryTile::onPlacement(PlacementResult result) {
+    if (result.correlationID == correlationID) {
         availableData = DataAvailability::All;
-        buckets.clear();
-        featureIndex.reset();
-        data.reset();
-        redoPlacement();
-        observer->onTileLoaded(*this, TileLoadState::First);
-        return;
     }
-
-    // Mark the tile as pending again if it was complete before to prevent signaling a complete
-    // state despite pending parse operations.
-    if (availableData == DataAvailability::All) {
-        availableData = DataAvailability::Some;
+    for (auto& bucket : result.buckets) {
+        buckets[bucket.first] = std::move(bucket.second);
     }
-
-    // Kick off a fresh parse of this tile. This happens when the tile is new, or
-    // when tile data changed. Replacing the workdRequest will cancel a pending work
-    // request in case there is one.
-    workRequest.reset();
-    workRequest = worker.parseGeometryTile(tileWorker, cloneStyleLayers(), std::move(data_), targetConfig,
-        [this, config = targetConfig] (TileParseResult result) {
-            tileLoaded(std::move(result), config);
-        });
-}
-
-void GeometryTile::redoLayout() {
-    // Mark the tile as pending again if it was complete before to prevent signaling a complete
-    // state despite pending parse operations.
-    if (availableData == DataAvailability::All) {
-        availableData = DataAvailability::Some;
-    }
-
-    workRequest.reset();
-    workRequest = worker.redoLayout(tileWorker, cloneStyleLayers(), targetConfig,
-        [this, config = targetConfig] (TileParseResult result) {
-            tileLoaded(std::move(result), config);
-        });
-}
-
-void GeometryTile::tileLoaded(TileParseResult result, PlacementConfig config) {
-    workRequest.reset();
-
-    if (result.is<TileParseResultData>()) {
-        auto& resultBuckets = result.get<TileParseResultData>();
-        availableData = resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
-
-        // Persist the configuration we just placed so that we can later check whether we need to
-        // place again in case the configuration has changed.
-        placedConfig = config;
-
-        // Move over all buckets we received in this parse request, potentially overwriting
-        // existing buckets in case we got a refresh parse.
-        buckets = std::move(resultBuckets.buckets);
-
-        if (isComplete()) {
-            featureIndex = std::move(resultBuckets.featureIndex);
-            data = std::move(resultBuckets.tileData);
-        }
-
-        redoPlacement();
-        observer->onTileLoaded(*this, TileLoadState::First);
-    } else {
-        availableData = DataAvailability::All;
-        observer->onTileError(*this, result.get<std::exception_ptr>());
-    }
-}
-
-bool GeometryTile::parsePending() {
-    if (workRequest) {
-        // There's already parsing or placement going on.
-        return false;
-    }
-
-    workRequest.reset();
-    workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, config = targetConfig] (TileParseResult result) {
-        workRequest.reset();
-
-        if (result.is<TileParseResultData>()) {
-            auto& resultBuckets = result.get<TileParseResultData>();
-            availableData = resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
-
-            // Move over all buckets we received in this parse request, potentially overwriting
-            // existing buckets in case we got a refresh parse.
-            for (auto& bucket : resultBuckets.buckets) {
-                buckets[bucket.first] = std::move(bucket.second);
-            }
-
-            // Persist the configuration we just placed so that we can later check whether we need to
-            // place again in case the configuration has changed.
-            placedConfig = config;
-
-            if (isComplete()) {
-                featureIndex = std::move(resultBuckets.featureIndex);
-                data = std::move(resultBuckets.tileData);
-            }
-
-            redoPlacement();
-            observer->onTileLoaded(*this, TileLoadState::Subsequent);
-        } else {
-            availableData = DataAvailability::All;
-            observer->onTileError(*this, result.get<std::exception_ptr>());
-        }
-    });
-
-    return true;
+    featureIndex->setCollisionTile(std::move(result.collisionTile));
+    placedConfig = result.placedConfig;
+    observer->onTileChanged(*this);
 }
 
 Bucket* GeometryTile::getBucket(const Layer& layer) {
@@ -179,43 +123,6 @@ Bucket* GeometryTile::getBucket(const Layer& layer) {
 
     assert(it->second);
     return it->second.get();
-}
-
-void GeometryTile::redoPlacement(const PlacementConfig newConfig) {
-    targetConfig = newConfig;
-    redoPlacement();
-}
-
-void GeometryTile::redoPlacement() {
-    // Don't start a new placement request when the current one hasn't completed yet, or when
-    // we are parsing buckets.
-    if (workRequest || targetConfig == placedConfig) {
-        return;
-    }
-
-    workRequest = worker.redoPlacement(tileWorker, targetConfig, [this, config = targetConfig](TilePlacementResult result) {
-        workRequest.reset();
-
-        // Persist the configuration we just placed so that we can later check whether we need to
-        // place again in case the configuration has changed.
-        placedConfig = config;
-
-        for (auto& bucket : result.buckets) {
-            buckets[bucket.first] = std::move(bucket.second);
-        }
-
-        if (featureIndex) {
-            featureIndex->setCollisionTile(std::move(result.collisionTile));
-        }
-
-        // The target configuration could have changed since we started placement. In this case,
-        // we're starting another placement run.
-        if (placedConfig != targetConfig) {
-            redoPlacement();
-        } else {
-            observer->onTileUpdated(*this);
-        }
-    });
 }
 
 void GeometryTile::queryRenderedFeatures(
@@ -235,11 +142,6 @@ void GeometryTile::queryRenderedFeatures(
                         *data,
                         id.canonical,
                         style);
-}
-
-void GeometryTile::cancel() {
-    obsolete = true;
-    workRequest.reset();
 }
 
 } // namespace mbgl

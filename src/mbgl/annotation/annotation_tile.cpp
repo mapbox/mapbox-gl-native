@@ -10,7 +10,7 @@ namespace mbgl {
 
 AnnotationTile::AnnotationTile(const OverscaledTileID& overscaledTileID,
                                const style::UpdateParameters& parameters)
-    : GeometryTile(overscaledTileID, AnnotationManager::SourceID, parameters.style, parameters.mode),
+    : GeometryTile(overscaledTileID, AnnotationManager::SourceID, parameters),
       annotationManager(parameters.annotationManager) {
     annotationManager.addTile(*this);
 }

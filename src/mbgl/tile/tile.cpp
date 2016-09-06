@@ -18,7 +18,7 @@ void Tile::setObserver(TileObserver* observer_) {
 
 void Tile::setTriedOptional() {
     triedOptional = true;
-    observer->onTileUpdated(*this);
+    observer->onTileChanged(*this);
 }
 
 void Tile::dumpDebugLogs() const {

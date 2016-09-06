@@ -1,6 +1,5 @@
 #include <mbgl/tile/geojson_tile.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/style/update_parameters.hpp>
 
 #include <mapbox/geojsonvt.hpp>
 #include <supercluster.hpp>
@@ -80,7 +79,7 @@ GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
                          std::string sourceID_,
                          const style::UpdateParameters& parameters,
                          const mapbox::geometry::feature_collection<int16_t>& features)
-    : GeometryTile(overscaledTileID, sourceID_, parameters.style, parameters.mode) {
+    : GeometryTile(overscaledTileID, sourceID_, parameters) {
     setData(std::make_unique<GeoJSONTileData>(features));
 }
 

@@ -5,6 +5,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/style/query_parameters.hpp>
+#include <mbgl/text/placement_config.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/math/clamp.hpp>
 #include <mbgl/util/tile_cover.hpp>
@@ -77,7 +78,7 @@ const std::map<UnwrappedTileID, RenderTile>& Source::Impl::getRenderTiles() cons
     return renderTiles;
 }
 
-void Source::Impl::loadTiles(const UpdateParameters& parameters) {
+void Source::Impl::updateTiles(const UpdateParameters& parameters) {
     if (!loaded) {
         return;
     }
@@ -161,28 +162,17 @@ void Source::Impl::loadTiles(const UpdateParameters& parameters) {
             ++retainIt;
         }
     }
-}
 
-bool Source::Impl::parseTiles(const UpdateParameters& parameters) {
-    bool allTilesUpdated = true;
-    const PlacementConfig newConfig{ parameters.transformState.getAngle(),
-                                     parameters.transformState.getPitch(),
-                                     parameters.debugOptions & MapDebugOptions::Collision };
+    const PlacementConfig config { parameters.transformState.getAngle(),
+                                   parameters.transformState.getPitch(),
+                                   parameters.debugOptions & MapDebugOptions::Collision };
+
     for (auto& pair : tiles) {
-        auto tile = pair.second.get();
-        if (parameters.shouldReparsePartialTiles && tile->isIncomplete()) {
-            if (!tile->parsePending()) {
-                allTilesUpdated = false;
-            }
-        } else {
-            tile->redoPlacement(newConfig);
-        }
+        pair.second->setPlacementConfig(config);
     }
-
-    return allTilesUpdated;
 }
 
-void Source::Impl::reload() {
+void Source::Impl::reloadTiles() {
     cache.clear();
 
     for (auto& pair : tiles) {
@@ -258,16 +248,12 @@ void Source::Impl::setObserver(SourceObserver* observer_) {
     observer = observer_;
 }
 
-void Source::Impl::onTileLoaded(Tile& tile, TileLoadState loadState) {
-    observer->onTileLoaded(base, tile.id, loadState);
+void Source::Impl::onTileChanged(Tile& tile) {
+    observer->onTileChanged(base, tile.id);
 }
 
 void Source::Impl::onTileError(Tile& tile, std::exception_ptr error) {
     observer->onTileError(base, tile.id, error);
-}
-
-void Source::Impl::onTileUpdated(Tile& tile) {
-    observer->onTileUpdated(base, tile.id);
 }
 
 void Source::Impl::dumpDebugLogs() const {
