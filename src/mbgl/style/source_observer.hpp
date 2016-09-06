@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/tile/tile_observer.hpp>
+
 #include <exception>
 
 namespace mbgl {
@@ -17,7 +19,7 @@ public:
     virtual void onSourceLoaded(Source&) {}
     virtual void onSourceError(Source&, std::exception_ptr) {}
 
-    virtual void onTileLoaded(Source&, const OverscaledTileID&, bool /* isNewTile */) {}
+    virtual void onTileLoaded(Source&, const OverscaledTileID&, TileLoadState) {}
     virtual void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) {}
     virtual void onTileUpdated(Source&, const OverscaledTileID&) {}
 };

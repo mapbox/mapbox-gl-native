@@ -258,8 +258,8 @@ void Source::Impl::setObserver(SourceObserver* observer_) {
     observer = observer_;
 }
 
-void Source::Impl::onTileLoaded(Tile& tile, bool isNewTile) {
-    observer->onTileLoaded(base, tile.id, isNewTile);
+void Source::Impl::onTileLoaded(Tile& tile, TileLoadState loadState) {
+    observer->onTileLoaded(base, tile.id, loadState);
 }
 
 void Source::Impl::onTileError(Tile& tile, std::exception_ptr error) {

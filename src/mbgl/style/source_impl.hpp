@@ -88,7 +88,7 @@ protected:
 
 private:
     // TileObserver implementation.
-    void onTileLoaded(Tile&, bool isNewTile) override;
+    void onTileLoaded(Tile&, TileLoadState) override;
     void onTileError(Tile&, std::exception_ptr) override;
     void onTileUpdated(Tile&) override;
 

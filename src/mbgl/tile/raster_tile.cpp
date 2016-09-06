@@ -36,7 +36,7 @@ void RasterTile::setData(std::shared_ptr<const std::string> data,
         workRequest.reset();
         availableData = DataAvailability::All;
         bucket.reset();
-        observer->onTileLoaded(*this, true);
+        observer->onTileLoaded(*this, TileLoadState::First);
         return;
     }
 
@@ -48,7 +48,7 @@ void RasterTile::setData(std::shared_ptr<const std::string> data,
 
         if (result.is<std::unique_ptr<Bucket>>()) {
             bucket = std::move(result.get<std::unique_ptr<Bucket>>());
-            observer->onTileLoaded(*this, true);
+            observer->onTileLoaded(*this, TileLoadState::First);
         } else {
             bucket.reset();
             observer->onTileError(*this, result.get<std::exception_ptr>());

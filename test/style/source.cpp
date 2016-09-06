@@ -123,7 +123,7 @@ TEST(Source, RasterTileEmpty) {
         return response;
     };
 
-    test.observer.tileLoaded = [&] (Source& source, const OverscaledTileID&, bool) {
+    test.observer.tileLoaded = [&] (Source& source, const OverscaledTileID&, TileLoadState) {
         EXPECT_EQ("source", source.getID());
         test.end();
     };
@@ -152,7 +152,7 @@ TEST(Source, VectorTileEmpty) {
         return response;
     };
 
-    test.observer.tileLoaded = [&] (Source& source, const OverscaledTileID&, bool) {
+    test.observer.tileLoaded = [&] (Source& source, const OverscaledTileID&, TileLoadState) {
         EXPECT_EQ("source", source.getID());
         test.end();
     };
@@ -298,7 +298,7 @@ TEST(Source, RasterTileCancel) {
         return optional<Response>();
     };
 
-    test.observer.tileLoaded = [&] (Source&, const OverscaledTileID&, bool) {
+    test.observer.tileLoaded = [&] (Source&, const OverscaledTileID&, TileLoadState) {
         FAIL() << "Should never be called";
     };
 
@@ -325,7 +325,7 @@ TEST(Source, VectorTileCancel) {
         return optional<Response>();
     };
 
-    test.observer.tileLoaded = [&] (Source&, const OverscaledTileID&, bool) {
+    test.observer.tileLoaded = [&] (Source&, const OverscaledTileID&, TileLoadState) {
         FAIL() << "Should never be called";
     };
 
