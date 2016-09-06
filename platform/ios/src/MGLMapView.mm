@@ -2198,7 +2198,7 @@ public:
     [self setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:direction animated:animated completionHandler:NULL];
 }
 
-- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable dispatch_block_t)completion
 {
     if ( ! [self viewportWouldChangeWithCenterCoordinate:centerCoordinate
                                                zoomLevel:zoomLevel
@@ -2218,7 +2218,7 @@ public:
     [self _setCenterCoordinate:centerCoordinate edgePadding:self.contentInset zoomLevel:self.zoomLevel direction:self.direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:NULL];
 }
 
-- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate edgePadding:(UIEdgeInsets)insets zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
+- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate edgePadding:(UIEdgeInsets)insets zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable dispatch_block_t)completion
 {
     if ( ! [self viewportWouldChangeWithCenterCoordinate:centerCoordinate
                                                zoomLevel:zoomLevel
@@ -2247,9 +2247,7 @@ public:
             // Must run asynchronously after the transition is completely over.
             // Otherwise, a call to -setCenterCoordinate: within the completion
             // handler would reenter the completion handler’s caller.
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion();
-            });
+            MGLPerformAsyncOnMainThread(completion);
         };
     }
     _mbglMap->easeTo(cameraOptions, animationOptions);
@@ -2399,22 +2397,22 @@ public:
     [self setVisibleCoordinates:coordinates count:count edgePadding:insets direction:direction duration:duration animationTimingFunction:function completionHandler:NULL];
 }
 
-- (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
+- (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable dispatch_block_t)completion
 {
     if ( ! [self viewportWouldChangeWithVisibleCoordinates:coordinates
                                                      count:count
                                                edgePadding:insets
-                                                 direction:direction]) return completion();
+                                                 direction:direction]) return MGLPerformAsyncOnMainThread(completion);
 
     self.userTrackingMode = MGLUserTrackingModeNone;
     [self _setVisibleCoordinates:coordinates count:count edgePadding:insets direction:direction duration:duration animationTimingFunction:function completionHandler:completion];
 }
 
-- (void)_setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
+- (void)_setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable dispatch_block_t)completion
 {
     const mbgl::CameraOptions cameraOptions = [self cameraOptionsForVisibleCoordinates:coordinates count:count edgePadding:insets direction:direction];
 
-    if ( ! [self viewportWouldChangeWithCamera:[self cameraForCameraOptions:cameraOptions]]) return completion();
+    if ( ! [self viewportWouldChangeWithCamera:[self cameraForCameraOptions:cameraOptions]])         return MGLPerformAsyncOnMainThread(completion);
 
     _mbglMap->cancelTransitions();
 
@@ -2428,9 +2426,7 @@ public:
     if (completion)
     {
         animationOptions.transitionFinishFn = [completion]() {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion();
-            });
+            MGLPerformAsyncOnMainThread(completion);
         };
     }
 
@@ -2535,7 +2531,7 @@ public:
     [self setCamera:camera withDuration:duration animationTimingFunction:function completionHandler:NULL];
 }
 
-- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
+- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable dispatch_block_t)completion
 {
     if ( ! [self viewportWouldChangeWithCamera:camera]) return completion();
 
@@ -2553,9 +2549,7 @@ public:
     if (completion)
     {
         animationOptions.transitionFinishFn = [completion]() {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion();
-            });
+            MGLPerformAsyncOnMainThread(completion);
         };
     }
     
@@ -2564,21 +2558,21 @@ public:
     [self didChangeValueForKey:@"camera"];
 }
 
-- (void)flyToCamera:(MGLMapCamera *)camera completionHandler:(nullable void (^)(void))completion
+- (void)flyToCamera:(MGLMapCamera *)camera completionHandler:(nullable dispatch_block_t)completion
 {
     if ( ! [self viewportWouldChangeWithCamera:camera]) return completion();
 
     [self flyToCamera:camera withDuration:-1 completionHandler:completion];
 }
 
-- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable void (^)(void))completion
+- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable dispatch_block_t)completion
 {
     if ( ! [self viewportWouldChangeWithCamera:camera]) return completion();
 
     [self flyToCamera:camera withDuration:duration peakAltitude:-1 completionHandler:completion];
 }
 
-- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion
+- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable dispatch_block_t)completion
 {
     if ( ! [self viewportWouldChangeWithCamera:camera]) return completion();
 
@@ -2587,7 +2581,7 @@ public:
     [self _flyToCamera:camera edgePadding:self.contentInset withDuration:duration peakAltitude:peakAltitude completionHandler:completion];
 }
 
-- (void)_flyToCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)insets withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion
+- (void)_flyToCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)insets withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable dispatch_block_t)completion
 {
     const mbgl::CameraOptions cameraOptions = [self cameraOptionsForAnimatingToCamera:camera edgePadding:insets];
 
@@ -2610,9 +2604,7 @@ public:
     if (completion)
     {
         animationOptions.transitionFinishFn = [completion]() {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion();
-            });
+            MGLPerformAsyncOnMainThread(completion);
         };
     }
     
@@ -4270,7 +4262,7 @@ public:
 - (void)didUpdateLocationWithTargetAnimated:(BOOL)animated
 {
     BOOL firstUpdate = self.userTrackingState == MGLUserTrackingStatePossible;
-    void (^completion)(void);
+    dispatch_block_t completion;
     if (animated && firstUpdate)
     {
         self.userTrackingState = MGLUserTrackingStateBegan;
@@ -4490,7 +4482,12 @@ public:
 
 #pragma mark - Utility -
 
-- (void)animateWithDelay:(NSTimeInterval)delay animations:(void (^)(void))animations
+void MGLPerformAsyncOnMainThread(dispatch_block_t completion)
+{
+    dispatch_async(dispatch_get_main_queue(), completion);
+}
+
+- (void)animateWithDelay:(NSTimeInterval)delay animations:(dispatch_block_t)animations
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), animations);
 }
@@ -5263,7 +5260,7 @@ void MGLFinishCustomStyleLayer(void *context)
 
 @implementation MGLMapView (MGLCustomStyleLayerAdditions)
 
-- (void)insertCustomStyleLayerWithIdentifier:(NSString *)identifier preparationHandler:(void (^)())preparation drawingHandler:(MGLCustomStyleLayerDrawingHandler)drawing completionHandler:(void (^)())completion belowStyleLayerWithIdentifier:(nullable NSString *)otherIdentifier
+- (void)insertCustomStyleLayerWithIdentifier:(NSString *)identifier preparationHandler:(void (^)())preparation drawingHandler:(MGLCustomStyleLayerDrawingHandler)drawing completionHandler:(dispatch_block_t)completion belowStyleLayerWithIdentifier:(nullable NSString *)otherIdentifier
 {
     NSAssert(identifier, @"Style layer needs an identifier");
     MGLCustomStyleLayerHandlers *context = new MGLCustomStyleLayerHandlers(preparation, drawing, completion);
