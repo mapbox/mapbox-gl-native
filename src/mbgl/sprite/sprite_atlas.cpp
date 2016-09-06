@@ -46,10 +46,11 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const SpriteImage& sprit
     return rect;
 }
 
-optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name, const bool wrap) {
+optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
+                                                   const SpritePatternMode mode) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    auto rect_it = images.find({ name, wrap });
+    auto rect_it = images.find({ name, mode });
     if (rect_it != images.end()) {
         return SpriteAtlasElement { rect_it->second.pos, rect_it->second.spriteImage, rect_it->second.spriteImage->pixelRatio / pixelRatio };
     }
@@ -67,16 +68,17 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name, cons
         return {};
     }
 
-    const Holder& holder = images.emplace(Key{ name, wrap }, Holder{ sprite, rect }).first->second;
-    copy(holder, wrap);
+    const Holder& holder = images.emplace(Key{ name, mode }, Holder{ sprite, rect }).first->second;
+    copy(holder, mode);
 
     return SpriteAtlasElement { rect, sprite, sprite->pixelRatio / pixelRatio };
 }
 
-optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name, bool repeating) {
+optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name,
+                                                       const SpritePatternMode mode) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    auto img = getImage(name, repeating);
+    auto img = getImage(name, mode);
     if (!img) {
         return {};
     }
@@ -98,13 +100,13 @@ optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name, 
 
 void copyBitmap(const uint32_t *src, const uint32_t srcStride, const uint32_t srcX, const uint32_t srcY,
         uint32_t *const dst, const uint32_t dstStride, const uint32_t dstX, const uint32_t dstY, int dstSize,
-        const int width, const int height, const bool wrap) {
+        const int width, const int height, const SpritePatternMode mode) {
 
     int srcI = srcY * srcStride + srcX;
     int dstI = dstY * dstStride + dstX;
     int x, y;
 
-    if (wrap) {
+    if (mode == SpritePatternMode::Repeating) {
         // add 1 pixel wrapped padding on each side of the image
         dstI -= dstStride;
         for (y = -1; y <= height; y++, srcI = ((y + height) % height + srcY) * srcStride + srcX, dstI += dstStride) {
@@ -124,7 +126,7 @@ void copyBitmap(const uint32_t *src, const uint32_t srcStride, const uint32_t sr
     }
 }
 
-void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
+void SpriteAtlas::copy(const Holder& holder, const SpritePatternMode mode) {
     if (!data) {
         data = std::make_unique<uint32_t[]>(pixelWidth * pixelHeight);
         std::fill(data.get(), data.get() + pixelWidth * pixelHeight, 0);
@@ -138,7 +140,7 @@ void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
 
     copyBitmap(srcData, uint32_t(holder.spriteImage->image.width), 0, 0,
             dstData, pixelWidth, (holder.pos.x + padding) * pixelRatio, (holder.pos.y + padding) * pixelRatio, pixelWidth * pixelHeight,
-            uint32_t(holder.spriteImage->image.width), uint32_t(holder.spriteImage->image.height), wrap);
+            uint32_t(holder.spriteImage->image.width), uint32_t(holder.spriteImage->image.height), mode);
 
     dirty = true;
 }

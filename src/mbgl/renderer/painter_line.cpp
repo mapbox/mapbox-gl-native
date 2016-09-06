@@ -99,8 +99,10 @@ void Painter::renderLine(PaintParameters& parameters,
         bucket.drawLineSDF(linesdfShader, store, isOverdraw());
 
     } else if (!properties.linePattern.value.from.empty()) {
-        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.linePattern.value.from, true);
-        optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.linePattern.value.to, true);
+        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(
+            properties.linePattern.value.from, SpritePatternMode::Repeating);
+        optional<SpriteAtlasPosition> imagePosB =
+            spriteAtlas->getPosition(properties.linePattern.value.to, SpritePatternMode::Repeating);
 
         if (!imagePosA || !imagePosB)
             return;

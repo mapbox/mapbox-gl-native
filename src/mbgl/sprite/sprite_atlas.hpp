@@ -35,6 +35,11 @@ struct SpriteAtlasElement {
     float relativePixelRatio;
 };
 
+enum class SpritePatternMode : bool {
+    Single = false,
+    Repeating = true,
+};
+
 class SpriteAtlas : public util::noncopyable {
 public:
     typedef uint16_t dimension;
@@ -44,10 +49,11 @@ public:
 
     // If the sprite is loaded, copies the requsted image from it into the atlas and returns
     // the resulting icon measurements. If not, returns an empty optional.
-    optional<SpriteAtlasElement> getImage(const std::string& name, const bool wrap);
+    optional<SpriteAtlasElement> getImage(const std::string& name, SpritePatternMode mode);
 
     // This function is used for getting the position during render time.
-    optional<SpriteAtlasPosition> getPosition(const std::string& name, bool repeating = false);
+    optional<SpriteAtlasPosition> getPosition(const std::string& name,
+                                              SpritePatternMode mode = SpritePatternMode::Single);
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
     void bind(bool linear, gl::ObjectStore&, gl::Config&, uint32_t unit);
@@ -80,10 +86,10 @@ private:
         const Rect<dimension> pos;
     };
 
-    using Key = std::pair<std::string, bool>;
+    using Key = std::pair<std::string, SpritePatternMode>;
 
     Rect<SpriteAtlas::dimension> allocateImage(const SpriteImage&);
-    void copy(const Holder& holder, const bool wrap);
+    void copy(const Holder& holder, SpritePatternMode mode);
 
     std::recursive_mutex mtx;
     SpriteStore& store;

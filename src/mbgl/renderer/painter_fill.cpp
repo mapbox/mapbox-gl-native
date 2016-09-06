@@ -73,8 +73,10 @@ void Painter::renderFill(PaintParameters& parameters,
     }
 
     if (pattern) {
-        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.fillPattern.value.from, true);
-        optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.fillPattern.value.to, true);
+        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(
+            properties.fillPattern.value.from, SpritePatternMode::Repeating);
+        optional<SpriteAtlasPosition> imagePosB =
+            spriteAtlas->getPosition(properties.fillPattern.value.to, SpritePatternMode::Repeating);
 
         // Image fill.
         if (pass == RenderPass::Translucent && imagePosA && imagePosB) {
