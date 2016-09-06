@@ -40,9 +40,14 @@ unsigned int mergeFromLeft(std::vector<SymbolFeature> &features,
     return index;
 }
 
+enum class Side {
+    Left = false,
+    Right = true,
+};
+
 size_t
-getKey(const std::u32string& text, const GeometryCollection& geom, bool onRight) {
-    const GeometryCoordinate& coord = onRight ? geom[0].back() : geom[0].front();
+getKey(const std::u32string& text, const GeometryCollection& geom, Side side) {
+    const GeometryCoordinate& coord = side == Side::Right ? geom[0].back() : geom[0].front();
 
     auto hash = std::hash<std::u32string>()(text);
     boost::hash_combine(hash, coord.x);
@@ -63,8 +68,8 @@ void mergeLines(std::vector<SymbolFeature> &features) {
             continue;
         }
 
-        const auto leftKey = getKey(feature.label, geometry, false);
-        const auto rightKey = getKey(feature.label, geometry, true);
+        const auto leftKey = getKey(feature.label, geometry, Side::Left);
+        const auto rightKey = getKey(feature.label, geometry, Side::Right);
 
         const auto left = rightIndex.find(leftKey);
         const auto right = leftIndex.find(rightKey);
@@ -79,7 +84,7 @@ void mergeLines(std::vector<SymbolFeature> &features) {
 
             leftIndex.erase(leftKey);
             rightIndex.erase(rightKey);
-            rightIndex[getKey(feature.label, features[i].geometry, true)] = i;
+            rightIndex[getKey(feature.label, features[i].geometry, Side::Right)] = i;
 
         } else if (left != rightIndex.end()) {
             // found mergeable line adjacent to the start of the current line, merge
