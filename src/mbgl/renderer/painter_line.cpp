@@ -72,8 +72,10 @@ void Painter::renderLine(PaintParameters& parameters,
         linesdfShader.u_color = color;
         linesdfShader.u_opacity = opacity;
 
-        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round);
-        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round);
+        const LinePatternCap cap =
+            layout.lineCap == LineCapType::Round ? LinePatternCap::Round : LinePatternCap::Square;
+        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, cap);
+        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, cap);
 
         const float widthA = posA.width * properties.lineDasharray.value.fromScale * layer.impl->dashLineWidth;
         const float widthB = posB.width * properties.lineDasharray.value.toScale * layer.impl->dashLineWidth;

@@ -19,6 +19,11 @@ typedef struct {
     float y;
 } LinePatternPos;
 
+enum class LinePatternCap : bool {
+    Square = false,
+    Round = true,
+};
+
 class LineAtlas {
 public:
     LineAtlas(GLsizei width, GLsizei height);
@@ -31,8 +36,8 @@ public:
     // the texture is only bound when the data is out of date (=dirty).
     void upload(gl::ObjectStore&, gl::Config&, uint32_t unit);
 
-    LinePatternPos getDashPosition(const std::vector<float>&, bool);
-    LinePatternPos addDash(const std::vector<float>& dasharray, bool round);
+    LinePatternPos getDashPosition(const std::vector<float>&, LinePatternCap);
+    LinePatternPos addDash(const std::vector<float>& dasharray, LinePatternCap);
 
     const GLsizei width;
     const GLsizei height;
