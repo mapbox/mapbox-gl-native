@@ -68,7 +68,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
 
     PaintParameters parameters {
 #ifndef NDEBUG
-        isOverdraw() ? *overdrawShaders : *shaders
+        paintMode() == PaintMode::Overdraw ? *overdrawShaders : *shaders
 #else
         *shaders
 #endif
@@ -127,7 +127,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         config.depthMask = GL_TRUE;
         config.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
 
-        if (isOverdraw()) {
+        if (paintMode() == PaintMode::Overdraw) {
             config.blend = GL_TRUE;
             config.blendFunc = { GL_CONSTANT_COLOR, GL_ONE };
             const float overdraw = 1.0f / 8.0f;
@@ -245,7 +245,7 @@ void Painter::renderPass(PaintParameters& parameters,
         if (!layer.baseImpl->hasRenderPass(pass))
             continue;
 
-        if (isOverdraw()) {
+        if (paintMode() == PaintMode::Overdraw) {
             config.blend = GL_TRUE;
         } else if (pass == RenderPass::Translucent) {
             config.blendFunc.reset();

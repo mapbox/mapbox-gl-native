@@ -24,4 +24,10 @@ constexpr RenderPass operator&(RenderPass a, RenderPass b) {
     return RenderPass(mbgl::underlying_type(a) & mbgl::underlying_type(b));
 }
 
+// Defines whether the overdraw shaders should be used instead of the regular shaders.
+enum class PaintMode : bool {
+    Regular = false,
+    Overdraw = true,
+};
+
 } // namespace mbgl

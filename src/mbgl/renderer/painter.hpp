@@ -125,7 +125,7 @@ private:
                    float scaleDivisor,
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, bool),
+                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, PaintMode),
 
                    // Layout
                    style::AlignmentType rotationAlignment,
@@ -145,9 +145,14 @@ private:
     void setDepthSublayer(int n);
 
 #ifndef NDEBUG
-    bool isOverdraw() const { return frame.debugOptions & MapDebugOptions::Overdraw; }
+    PaintMode paintMode() const {
+        return frame.debugOptions & MapDebugOptions::Overdraw ? PaintMode::Overdraw
+                                                              : PaintMode::Regular;
+    }
 #else
-    bool isOverdraw() const { return false; }
+    PaintMode paintMode() const {
+        return PaintMode::Regular;
+    }
 #endif
 
     mat4 projMatrix;

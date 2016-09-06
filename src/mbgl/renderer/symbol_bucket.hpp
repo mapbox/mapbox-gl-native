@@ -82,9 +82,9 @@ public:
                      GlyphAtlas&,
                      GlyphStore&);
 
-    void drawGlyphs(SDFShader&, gl::ObjectStore&, bool overdraw);
-    void drawIcons(SDFShader&, gl::ObjectStore&, bool overdraw);
-    void drawIcons(IconShader&, gl::ObjectStore&, bool overdraw);
+    void drawGlyphs(SDFShader&, gl::ObjectStore&, PaintMode);
+    void drawIcons(SDFShader&, gl::ObjectStore&, PaintMode);
+    void drawIcons(IconShader&, gl::ObjectStore&, PaintMode);
     void drawCollisionBoxes(CollisionBoxShader&, gl::ObjectStore&);
 
     void parseFeatures(const GeometryTileLayer&, const style::Filter&);
