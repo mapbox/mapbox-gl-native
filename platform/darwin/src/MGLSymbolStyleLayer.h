@@ -14,6 +14,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerSymbolPlacement) {
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconRotationAlignment) {
     MGLSymbolStyleLayerIconRotationAlignmentMap,
     MGLSymbolStyleLayerIconRotationAlignmentViewport,
+    MGLSymbolStyleLayerIconRotationAlignmentAuto,
 };
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconTextFit) {
@@ -26,11 +27,13 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconTextFit) {
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextPitchAlignment) {
     MGLSymbolStyleLayerTextPitchAlignmentMap,
     MGLSymbolStyleLayerTextPitchAlignmentViewport,
+    MGLSymbolStyleLayerTextPitchAlignmentAuto,
 };
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextRotationAlignment) {
     MGLSymbolStyleLayerTextRotationAlignmentMap,
     MGLSymbolStyleLayerTextRotationAlignmentViewport,
+    MGLSymbolStyleLayerTextRotationAlignmentAuto,
 };
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextJustify) {
@@ -137,9 +140,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconOptional;
 
 /**
- Orientation of icon when map is rotated.
+ Orientation of icon when map is rotated. Aligns icon to the plane of the viewport when set to `MGLSymbolStyleLayerIconRotationAlignmentViewport` or the plane of the map when set to `MGLSymbolStyleLayerIconRotationAlignmentMap`. Selecting `MGLSymbolStyleLayerIconRotationAlignmentAuto` defaults to `MGLSymbolStyleLayerIconRotationAlignmentMap` for line placement and `MGLSymbolStyleLayerIconRotationAlignmentViewport` for symbol placement
  
- The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerIconRotationAlignmentViewport`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerIconRotationAlignmentAuto`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
@@ -220,16 +223,18 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconOffset;
 
 /**
- Aligns text to the plane of the `MGLSymbolStyleLayerTextPitchAlignmentViewport` or the `MGLSymbolStyleLayerTextPitchAlignmentMap` when the map is pitched. Matches `textRotationAlignment` if unspecified.
+ Orientation of text when map is pitched. Aligns text to the plane of the viewport when set to `MGLSymbolStyleLayerTextPitchAlignmentViewport` or the plane of the map when set to `MGLSymbolStyleLayerTextPitchAlignmentMap`. Matches `textRotationAlignment` if `MGLSymbolStyleLayerTextPitchAlignmentAuto`.
+ 
+ The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerTextPitchAlignmentAuto`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textPitchAlignment;
 
 /**
- Orientation of text when map is rotated.
+ Orientation of text when map is rotated. Aligns text to the plane of the viewport when set to `MGLSymbolStyleLayerTextRotationAlignmentViewport` or the plane of the map when set to `MGLSymbolStyleLayerTextRotationAlignmentMap`. Selecting `MGLSymbolStyleLayerTextRotationAlignmentAuto` defaults to the plane of the `MGLSymbolStyleLayerTextRotationAlignmentMap` for line placement and the `MGLSymbolStyleLayerTextRotationAlignmentViewport` for symbol placement.
  
- The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerTextRotationAlignmentViewport`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerTextRotationAlignmentAuto`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */

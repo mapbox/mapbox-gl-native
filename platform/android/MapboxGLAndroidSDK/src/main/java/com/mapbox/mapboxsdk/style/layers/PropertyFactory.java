@@ -322,7 +322,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The line's offset perpendicular to its direction. Values may be positive or negative, where positive indicates "rightwards" (if you were moving in the direction of the line) and negative indicates "leftwards."
+     * The line's offset. For linear features, a positive value offsets the line to the right, relative to the direction of the line, and a negative value to the left. For polygon features, a positive value results in an inset, and a negative value results in an outset.
      *
      * @param value a Float value
      * @return property wrapper around Float
@@ -332,7 +332,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The line's offset perpendicular to its direction. Values may be positive or negative, where positive indicates "rightwards" (if you were moving in the direction of the line) and negative indicates "leftwards."
+     * The line's offset. For linear features, a positive value offsets the line to the right, relative to the direction of the line, and a negative value to the left. For polygon features, a positive value results in an inset, and a negative value results in an outset.
      *
      * @param function a wrapper function for Float
      * @return property wrapper around a Float function
@@ -1282,7 +1282,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Orientation of icon when map is rotated.
+     * Orientation of icon when map is rotated. Aligns icon to the plane of the viewport when set to `viewport` or the plane of the map when set to `map`. Selecting `auto` defaults to `map` for line placement and `viewport` for symbol placement
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1292,7 +1292,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Orientation of icon when map is rotated.
+     * Orientation of icon when map is rotated. Aligns icon to the plane of the viewport when set to `viewport` or the plane of the map when set to `map`. Selecting `auto` defaults to `map` for line placement and `viewport` for symbol placement
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -1462,7 +1462,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Aligns text to the plane of the `viewport` or the `map` when the map is pitched. Matches `text-rotation-alignment` if unspecified.
+     * Orientation of text when map is pitched. Aligns text to the plane of the viewport when set to `viewport` or the plane of the map when set to `map`. Matches `text-rotation-alignment` if `auto`.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1472,7 +1472,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Aligns text to the plane of the `viewport` or the `map` when the map is pitched. Matches `text-rotation-alignment` if unspecified.
+     * Orientation of text when map is pitched. Aligns text to the plane of the viewport when set to `viewport` or the plane of the map when set to `map`. Matches `text-rotation-alignment` if `auto`.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -1482,7 +1482,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Orientation of text when map is rotated.
+     * Orientation of text when map is rotated. Aligns text to the plane of the viewport when set to `viewport` or the plane of the map when set to `map`. Selecting `auto` defaults to the plane of the `map` for line placement and the `viewport` for symbol placement.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1492,7 +1492,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Orientation of text when map is rotated.
+     * Orientation of text when map is rotated. Aligns text to the plane of the viewport when set to `viewport` or the plane of the map when set to `map`. Selecting `auto` defaults to the plane of the `map` for line placement and the `viewport` for symbol placement.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
