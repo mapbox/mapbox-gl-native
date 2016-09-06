@@ -35,22 +35,22 @@ namespace mbgl {
             // for text
             explicit CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
                     const Shaping &shapedText,
-                    const float boxScale, const float padding, const bool alongLine, const IndexedSubfeature& indexedFeature_)
+                    const float boxScale, const float padding, const style::SymbolPlacementType placement, const IndexedSubfeature& indexedFeature_)
                 : CollisionFeature(line, anchor,
                         shapedText.top, shapedText.bottom, shapedText.left, shapedText.right,
-                        boxScale, padding, alongLine, indexedFeature_, false) {}
+                        boxScale, padding, placement, indexedFeature_, false) {}
 
             // for icons
             explicit CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
                     const PositionedIcon &shapedIcon,
-                    const float boxScale, const float padding, const bool alongLine, const IndexedSubfeature& indexedFeature_)
+                    const float boxScale, const float padding, const style::SymbolPlacementType placement, const IndexedSubfeature& indexedFeature_)
                 : CollisionFeature(line, anchor,
                         shapedIcon.top, shapedIcon.bottom, shapedIcon.left, shapedIcon.right,
-                        boxScale, padding, alongLine, indexedFeature_, true) {}
+                        boxScale, padding, placement, indexedFeature_, true) {}
 
             explicit CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
                     const float top, const float bottom, const float left, const float right,
-                    const float boxScale, const float padding, const bool alongLine,
+                    const float boxScale, const float padding, const style::SymbolPlacementType placement,
                     IndexedSubfeature, const bool straight);
 
 

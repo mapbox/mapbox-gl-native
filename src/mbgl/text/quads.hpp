@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/text/glyph.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <vector>
@@ -40,10 +41,10 @@ typedef std::vector<SymbolQuad> SymbolQuads;
 
 SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
         const GeometryCoordinates& line, const style::SymbolLayoutProperties&,
-        const bool alongLine, const Shaping& shapedText);
+        style::SymbolPlacementType placement, const Shaping& shapedText);
 
 SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
         const float boxScale, const GeometryCoordinates& line, const style::SymbolLayoutProperties&,
-        const bool alongLine, const GlyphPositions& face);
+        style::SymbolPlacementType placement, const GlyphPositions& face);
 
 } // namespace mbgl

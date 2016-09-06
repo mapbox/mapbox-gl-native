@@ -21,8 +21,9 @@ TEST(getIconQuads, normal) {
     GeometryCoordinates line;
     Shaping shapedText;
 
-    SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
-    
+    SymbolQuads quads =
+        getIconQuads(anchor, shapedIcon, line, layout, SymbolPlacementType::Point, shapedText);
+
     ASSERT_EQ(quads.size(), 1u);
     ASSERT_EQ(quads[0].anchorPoint.x, 2);
     ASSERT_EQ(quads[0].anchorPoint.y, 3);
@@ -58,7 +59,8 @@ TEST(getIconQuads, style) {
     // none
     {
         SymbolLayoutProperties layout;
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
+        SymbolQuads quads =
+            getIconQuads(anchor, shapedIcon, line, layout, SymbolPlacementType::Point, shapedText);
 
         ASSERT_EQ(quads.size(), 1u);
         ASSERT_EQ(quads[0].anchorPoint.x, 0);
@@ -81,7 +83,8 @@ TEST(getIconQuads, style) {
         SymbolLayoutProperties layout;
         layout.textSize = LayoutProperty<float>(24.0f);
         layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Width);
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
+        SymbolQuads quads =
+            getIconQuads(anchor, shapedIcon, line, layout, SymbolPlacementType::Point, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -60);
         ASSERT_EQ(quads[0].tl.y, 0);
@@ -98,7 +101,8 @@ TEST(getIconQuads, style) {
         SymbolLayoutProperties layout;
         layout.textSize = LayoutProperty<float>(12.0f);
         layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Width);
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
+        SymbolQuads quads =
+            getIconQuads(anchor, shapedIcon, line, layout, SymbolPlacementType::Point, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -30);
         ASSERT_EQ(quads[0].tl.y, -5);
@@ -119,7 +123,8 @@ TEST(getIconQuads, style) {
         layout.iconTextFitPadding.value[1] = 10.0f;
         layout.iconTextFitPadding.value[2] = 5.0f;
         layout.iconTextFitPadding.value[3] = 10.0f;
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
+        SymbolQuads quads =
+            getIconQuads(anchor, shapedIcon, line, layout, SymbolPlacementType::Point, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -40);
         ASSERT_EQ(quads[0].tl.y, -10);
@@ -136,7 +141,8 @@ TEST(getIconQuads, style) {
         SymbolLayoutProperties layout;
         layout.textSize = LayoutProperty<float>(24.0f);
         layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Height);
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
+        SymbolQuads quads =
+            getIconQuads(anchor, shapedIcon, line, layout, SymbolPlacementType::Point, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -30);
         ASSERT_EQ(quads[0].tl.y, -10);
@@ -153,7 +159,8 @@ TEST(getIconQuads, style) {
         SymbolLayoutProperties layout;
         layout.textSize = LayoutProperty<float>(12.0f);
         layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Height);
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
+        SymbolQuads quads =
+            getIconQuads(anchor, shapedIcon, line, layout, SymbolPlacementType::Point, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -20);
         ASSERT_EQ(quads[0].tl.y, -5);
@@ -174,7 +181,8 @@ TEST(getIconQuads, style) {
         layout.iconTextFitPadding.value[1] = 10.0f;
         layout.iconTextFitPadding.value[2] = 5.0f;
         layout.iconTextFitPadding.value[3] = 10.0f;
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
+        SymbolQuads quads =
+            getIconQuads(anchor, shapedIcon, line, layout, SymbolPlacementType::Point, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -30);
         ASSERT_EQ(quads[0].tl.y, -10);
@@ -191,7 +199,8 @@ TEST(getIconQuads, style) {
         SymbolLayoutProperties layout;
         layout.textSize = LayoutProperty<float>(24.0f);
         layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Both);
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
+        SymbolQuads quads =
+            getIconQuads(anchor, shapedIcon, line, layout, SymbolPlacementType::Point, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -60);
         ASSERT_EQ(quads[0].tl.y, -10);
@@ -208,7 +217,8 @@ TEST(getIconQuads, style) {
         SymbolLayoutProperties layout;
         layout.textSize = LayoutProperty<float>(12.0f);
         layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Both);
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
+        SymbolQuads quads =
+            getIconQuads(anchor, shapedIcon, line, layout, SymbolPlacementType::Point, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -30);
         ASSERT_EQ(quads[0].tl.y, -5);
@@ -229,7 +239,8 @@ TEST(getIconQuads, style) {
         layout.iconTextFitPadding.value[1] = 10.0f;
         layout.iconTextFitPadding.value[2] = 5.0f;
         layout.iconTextFitPadding.value[3] = 10.0f;
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
+        SymbolQuads quads =
+            getIconQuads(anchor, shapedIcon, line, layout, SymbolPlacementType::Point, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -40);
         ASSERT_EQ(quads[0].tl.y, -10);
@@ -250,7 +261,8 @@ TEST(getIconQuads, style) {
         layout.iconTextFitPadding.value[1] = 5.0f;
         layout.iconTextFitPadding.value[2] = 10.0f;
         layout.iconTextFitPadding.value[3] = 15.0f;
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
+        SymbolQuads quads =
+            getIconQuads(anchor, shapedIcon, line, layout, SymbolPlacementType::Point, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -45);
         ASSERT_EQ(quads[0].tl.y, -5);

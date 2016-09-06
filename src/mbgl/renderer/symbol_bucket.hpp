@@ -47,8 +47,8 @@ class SymbolInstance {
         explicit SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
                 const Shaping& shapedText, const PositionedIcon& shapedIcon,
                 const style::SymbolLayoutProperties&, const bool inside, const uint32_t index,
-                const float textBoxScale, const float textPadding, const float textAlongLine,
-                const float iconBoxScale, const float iconPadding, const float iconAlongLine,
+                const float textBoxScale, const float textPadding, style::SymbolPlacementType textPlacement,
+                const float iconBoxScale, const float iconPadding, style::SymbolPlacementType iconPlacement,
                 const GlyphPositions& face, const IndexedSubfeature& indexedfeature);
         Point<float> point;
         uint32_t index;
@@ -106,7 +106,7 @@ private:
     // Adds placed items to the buffer.
     template <typename Buffer, typename GroupType>
     void addSymbols(Buffer &buffer, const SymbolQuads &symbols, float scale,
-            const bool keepUpright, const bool alongLine, const float placementAngle);
+            const bool keepUpright, const style::SymbolPlacementType placement, const float placementAngle);
 
 public:
     style::SymbolLayoutProperties layout;
