@@ -66,25 +66,24 @@ private:
 
     bool needsResize = false;
     bool extensionsLoaded = false;
-    bool active = false;
 
 #if MBGL_USE_QT
-    QGLWidget* glContext = nullptr;
+    static QGLWidget* glContext;
 #endif
 
 #if MBGL_USE_CGL
-    CGLContextObj glContext = nullptr;
+    static CGLContextObj glContext;
 #endif
 
 #if MBGL_USE_EAGL
-    void *glContext = nullptr;
+    static void *glContext;
 #endif
 
 #if MBGL_USE_GLX
-    Display *xDisplay = nullptr;
-    GLXFBConfig *fbConfigs = nullptr;
-    GLXContext glContext = nullptr;
-    GLXPbuffer glxPbuffer = 0;
+    static Display *xDisplay;
+    static GLXFBConfig *fbConfigs;
+    static GLXContext glContext;
+    static GLXPbuffer glxPbuffer;
 #endif
 
     std::function<void(MapChange)> mapChangeCallback;
