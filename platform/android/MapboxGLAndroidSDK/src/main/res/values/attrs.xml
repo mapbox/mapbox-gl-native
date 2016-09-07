@@ -110,5 +110,6 @@
         <attr name="attribution_margin_bottom" format="dimension" />
         <attr name="attribution_enabled" format="boolean" />
         <attr name="attribution_tint" format="color" />
+        <attr name="texture_mode" format="boolean" />
     </declare-styleable>
 </resources>

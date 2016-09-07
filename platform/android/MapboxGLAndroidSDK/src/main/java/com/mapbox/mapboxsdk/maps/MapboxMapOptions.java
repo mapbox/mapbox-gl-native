@@ -7,15 +7,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.VectorDrawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -79,6 +76,8 @@ public class MapboxMapOptions implements Parcelable {
     private int myLocationAccuracyTintColor;
     private int myLocationAccuracyAlpha;
 
+    private boolean textureMode;
+
     private String style;
     @Deprecated
     private String accessToken;
@@ -123,12 +122,12 @@ public class MapboxMapOptions implements Parcelable {
         }
 
         Bitmap foregroundBearingBitmap = in.readParcelable(getClass().getClassLoader());
-        if(foregroundBearingBitmap!=null) {
+        if (foregroundBearingBitmap != null) {
             myLocationForegroundBearingDrawable = new BitmapDrawable(foregroundBearingBitmap);
         }
 
         Bitmap backgroundBitmap = in.readParcelable(getClass().getClassLoader());
-        if(backgroundBitmap!=null){
+        if (backgroundBitmap != null) {
             myLocationBackgroundDrawable = new BitmapDrawable(backgroundBitmap);
         }
 
@@ -140,6 +139,7 @@ public class MapboxMapOptions implements Parcelable {
 
         style = in.readString();
         accessToken = in.readString();
+        textureMode = in.readByte() != 0;
     }
 
     public static Bitmap getBitmapFromDrawable(Drawable drawable) {
@@ -231,6 +231,7 @@ public class MapboxMapOptions implements Parcelable {
                     , (int) (typedArray.getDimension(R.styleable.MapView_my_location_background_bottom, 0) * screenDensity)});
             mapboxMapOptions.myLocationAccuracyAlpha(typedArray.getInt(R.styleable.MapView_my_location_accuracy_alpha, 100));
             mapboxMapOptions.myLocationAccuracyTint(typedArray.getColor(R.styleable.MapView_my_location_accuracy_tint, ColorUtils.getPrimaryColor(context)));
+            mapboxMapOptions.textureMode(typedArray.getBoolean(R.styleable.MapView_texture_mode, false));
         } finally {
             typedArray.recycle();
         }
@@ -583,6 +584,11 @@ public class MapboxMapOptions implements Parcelable {
         return this;
     }
 
+    public MapboxMapOptions textureMode(boolean textureMode) {
+        this.textureMode = textureMode;
+        return this;
+    }
+
     /**
      * Get the current configured initial camera position for a map view.
      *
@@ -858,6 +864,10 @@ public class MapboxMapOptions implements Parcelable {
         return debugActive;
     }
 
+    public boolean getTextureMode() {
+        return textureMode;
+    }
+
     public static final Parcelable.Creator<MapboxMapOptions> CREATOR
             = new Parcelable.Creator<MapboxMapOptions>() {
         public MapboxMapOptions createFromParcel(Parcel in) {
@@ -914,6 +924,7 @@ public class MapboxMapOptions implements Parcelable {
 
         dest.writeString(style);
         dest.writeString(accessToken);
+        dest.writeByte((byte) (textureMode ? 1 : 0));
     }
 
     @Override
