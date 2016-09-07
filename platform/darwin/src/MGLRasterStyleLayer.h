@@ -8,6 +8,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLRasterStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
 
+
+- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source;
+
+
 #pragma mark - Accessing the Paint Attributes
 
 /**

@@ -13,6 +13,32 @@
 @synthesize layerIdentifier;
 @synthesize mapView;
 @synthesize layer;
+@synthesize sourceIdentifier;
+@synthesize sourceLayerIdentifier;
+
+- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier
+{
+    [[NSException exceptionWithName:@"MGLAbstractClassException"
+                             reason:@"MGLBaseStyleLayer is an abstract class"
+                           userInfo:nil] raise];
+    return nil;
+}
+
+- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier sourceIdentifier:(NSString *)sourceIdentifier
+{
+    [[NSException exceptionWithName:@"MGLAbstractClassException"
+                             reason:@"MGLBaseStyleLayer is an abstract class"
+                           userInfo:nil] raise];
+    return nil;
+}
+
+- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier sourceIdentifier:(NSString *)sourceIdentifier sourceLayer:(NSString *)sourceLayer
+{
+    [[NSException exceptionWithName:@"MGLAbstractClassException"
+                             reason:@"MGLBaseStyleLayer is an abstract class"
+                           userInfo:nil] raise];
+    return nil;
+}
 
 - (void)setVisible:(BOOL)visible
 {

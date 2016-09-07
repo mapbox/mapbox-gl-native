@@ -19,7 +19,7 @@
     NSData *geoJSONData = [NSData dataWithContentsOfURL:url];
     source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"test-source" geoJSONData:geoJSONData];
     [self.mapView.style addSource:source];
-    layer = [[MGLLineStyleLayer alloc] initWithLayerIdentifier:@"test-layer" sourceIdentifier:@"test-source"];
+    layer = [[MGLLineStyleLayer alloc] initWithLayerIdentifier:@"test-layer" source:source];
 }
 
 - (void)tearDown

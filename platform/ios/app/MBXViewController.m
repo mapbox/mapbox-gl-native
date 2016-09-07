@@ -484,7 +484,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
     [self.mapView.style addSource:source];
     
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" sourceIdentifier:@"ams"];
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" source:source];
     fillLayer.fillColor = [UIColor purpleColor];
     [self.mapView.style addLayer:fillLayer];
 }
@@ -495,7 +495,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithSourceIdentifier:@"my-raster-source" URL:rasterURL tileSize:512];
     [self.mapView.style addSource:rasterSource];
     
-    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerIdentifier:@"my-raster-layer" sourceIdentifier:@"my-raster-source"];
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerIdentifier:@"my-raster-layer" source:rasterSource];
     MGLStyleAttributeFunction *opacityFunction = [[MGLStyleAttributeFunction alloc] init];
     opacityFunction.stops = @{@20.0f: @1.0f,
                               @5.0f: @0.0f};

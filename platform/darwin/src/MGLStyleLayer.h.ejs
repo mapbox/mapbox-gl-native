@@ -35,6 +35,16 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 <% } -%>
 @interface MGL<%- camelize(type) %>StyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
 
+<% if (type == 'background') { -%>
+- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier;
+<% } -%>
+
+- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source;
+
+<% if (type !== 'background' && type !== 'raster') { -%>
+- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source sourceLayer:(NSString *)sourceLayer;
+<% } -%>
+
 <% if (type !== 'background' && type !== 'raster') { -%>
 /**
  A predicate that corresponds to the layer's <a href='https://www.mapbox.com/mapbox-gl-style-spec/#types-filter'>filter</a>.
