@@ -1,4 +1,4 @@
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
 
 mason_use(glfw VERSION 3.1.2)
 mason_use(boost_libprogram_options VERSION 1.60.0)
@@ -37,6 +37,8 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/headless_display.cpp
         PRIVATE platform/default/headless_view.cpp
     )
+
+    target_add_mason_package(mbgl-core PUBLIC geojson)
 
     target_compile_options(mbgl-core
         PRIVATE -fobjc-arc

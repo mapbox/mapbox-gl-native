@@ -1,9 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.activity.imagegenerator;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v4.print.PrintHelper;
 import android.support.v7.app.ActionBar;
@@ -11,19 +9,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.activity.annotation.BulkMarkerActivity;
 
 public class PrintActivity extends AppCompatActivity implements MapboxMap.SnapshotReadyCallback {
 
     private MapView mMapView;
-    private MapboxMap mMapboxMap;
+    private MapboxMap mapboxMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +39,7 @@ public class PrintActivity extends AppCompatActivity implements MapboxMap.Snapsh
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                mMapboxMap = mapboxMap;
+                PrintActivity.this.mapboxMap = mapboxMap;
             }
         });
 
@@ -53,8 +48,8 @@ public class PrintActivity extends AppCompatActivity implements MapboxMap.Snapsh
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mMapboxMap!=null) {
-                        mMapboxMap.snapshot(PrintActivity.this);
+                    if(mapboxMap !=null) {
+                        mapboxMap.snapshot(PrintActivity.this);
                     }
                 }
             });

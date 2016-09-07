@@ -16,7 +16,8 @@ xcuserdata
 /test/fixtures/api/2.png
 /test/fixtures/offline_database/offline.db
 /test/fixtures/offline_database/invalid.db
-/test/fixtures/offline_database/v3.db
+/test/fixtures/offline_database/v*.db
+/test/fixtures/offline_database/v*.db-*
 /test/fixtures/**/actual.png
 /test/fixtures/**/diff.png
 /test/output
@@ -25,3 +26,4 @@ xcuserdata
 /platform/ios/benchmark/assets/tiles/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6
 **/token
 /platform/macos/macos.xcworkspace/xcshareddata/macos.xcscmblueprint
+/platform/ios/ios.xcworkspace/xcshareddata/ios.xcscmblueprint

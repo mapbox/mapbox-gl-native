@@ -1,118 +1,97 @@
 #include <QQuickMapboxGLStyleProperty>
-#include <QQuickMapboxGL>
 
-QQuickMapboxGLStyleProperty::QQuickMapboxGLStyleProperty(QQuickItem *parent_)
+// QQuickMapboxGLStyleProperty
+
+QQuickMapboxGLStyleProperty::QQuickMapboxGLStyleProperty(QQuickItem *parent_, Type type)
     : QQuickItem(parent_)
 {
+    m_map["type"] = type;
 }
 
-QQuickMapboxGLLayoutStyleProperty::QQuickMapboxGLLayoutStyleProperty(QQuickItem *parent_)
-    : QQuickMapboxGLStyleProperty(parent_)
+void QQuickMapboxGLStyleProperty::checkUpdated()
 {
-}
-
-QQuickMapboxGLPaintStyleProperty::QQuickMapboxGLPaintStyleProperty(QQuickItem *parent_)
-    : QQuickMapboxGLStyleProperty(parent_)
-{
-}
-
-void QQuickMapboxGLLayoutStyleProperty::updateParent()
-{
-    if (m_layer.isNull() || m_property.isNull() || m_value.isNull()) {
-        return;
-    }
-
-    QQuickMapboxGL *map = qobject_cast<QQuickMapboxGL *>(parentItem());
-    if (map) {
-        map->setLayoutProperty(layer(), property(), m_value);
-    } else {
-        qWarning() << "Style property requires QQuickMapboxGL as parent item.";
-    }
-}
-
-void QQuickMapboxGLPaintStyleProperty::updateParent()
-{
-    if (m_layer.isNull() || m_property.isNull() || m_value.isNull()) {
-        return;
-    }
-
-    QQuickMapboxGL *map = qobject_cast<QQuickMapboxGL *>(parentItem());
-    if (map) {
-        map->setPaintProperty(layer(), property(), m_value, styleClass());
-    } else {
-        qWarning() << "Style property requires QQuickMapboxGL as parent item.";
-    }
-}
-
-void QQuickMapboxGLStyleProperty::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &data)
-{
-    QQuickItem::itemChange(change, data);
-
-    if (change == QQuickItem::ItemParentHasChanged) {
-        updateParent();
+    if (m_map.value("type").isValid()
+            && m_map.value("layer").isValid()
+            && m_map.value("property").isValid()
+            && m_map.value("value").isValid()) {
+        emit updated(m_map);
     }
 }
 
 void QQuickMapboxGLStyleProperty::setLayer(const QString &layer)
 {
-    if (layer == m_layer.toString()) {
+    if (m_map.value("layer").toString() == layer) {
         return;
     }
 
-    m_layer = layer;
+    m_map["layer"] = layer;
     emit layerChanged(layer);
-    updateParent();
+    checkUpdated();
 }
 
 QString QQuickMapboxGLStyleProperty::layer() const
 {
-    return m_layer.toString();
+    return m_map.value("layer").toString();
 }
 
 void QQuickMapboxGLStyleProperty::setProperty(const QString &property)
 {
-    if (property == m_property.toString()) {
+    if (m_map.value("property").toString() == property) {
         return;
     }
 
-    m_property = property;
+    m_map["property"] = property;
     emit propertyChanged(property);
-    updateParent();
+    checkUpdated();
 }
 
 QString QQuickMapboxGLStyleProperty::property() const
 {
-    return m_property.toString();
+    return m_map.value("property").toString();
 }
 
 void QQuickMapboxGLStyleProperty::setValue(const QVariant &value)
 {
-    if (value == m_value) {
+    if (m_map.value("value") == value) {
         return;
     }
 
-    m_value = value;
+    m_map["value"] = value;
     emit valueChanged(value);
-    updateParent();
+    checkUpdated();
 }
 
 QVariant QQuickMapboxGLStyleProperty::value() const
 {
-    return m_value;
+    return m_map.value("value");
 }
 
 void QQuickMapboxGLPaintStyleProperty::setStyleClass(const QString &styleClass)
 {
-    if (styleClass == m_class.toString()) {
+    if (m_map.value("class").toString() == styleClass) {
         return;
     }
 
-    m_class = styleClass;
+    m_map["class"] = styleClass;
     emit classChanged(styleClass);
-    updateParent();
+    checkUpdated();
 }
 
 QString QQuickMapboxGLPaintStyleProperty::styleClass() const
 {
-    return m_class.toString();
+    return m_map.value("class").toString();
+}
+
+// QQuickMapboxGLLayoutStyleProperty
+
+QQuickMapboxGLLayoutStyleProperty::QQuickMapboxGLLayoutStyleProperty(QQuickItem *parent_)
+    : QQuickMapboxGLStyleProperty(parent_, LayoutType)
+{
+}
+
+// QQuickMapboxGLPaintStyleProperty
+
+QQuickMapboxGLPaintStyleProperty::QQuickMapboxGLPaintStyleProperty(QQuickItem *parent_)
+    : QQuickMapboxGLStyleProperty(parent_, PaintType)
+{
 }

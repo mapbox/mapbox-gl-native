@@ -20,7 +20,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 public class ManualZoomActivity extends AppCompatActivity {
 
-    private MapboxMap mMapboxMap;
+    private MapboxMap mapboxMap;
     private MapView mMapView;
 
     @Override
@@ -37,15 +37,15 @@ public class ManualZoomActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.manualZoomMapView);
+        mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setStyleUrl(Style.SATELLITE);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-                mMapboxMap = mapboxMap;
+                ManualZoomActivity.this.mapboxMap = mapboxMap;
 
-                UiSettings uiSettings = mMapboxMap.getUiSettings();
+                UiSettings uiSettings = ManualZoomActivity.this.mapboxMap.getUiSettings();
                 uiSettings.setAllGesturesEnabled(false);
             }
         });
@@ -67,23 +67,23 @@ public class ManualZoomActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_zoom_in:
-                mMapboxMap.animateCamera(CameraUpdateFactory.zoomIn());
+                mapboxMap.animateCamera(CameraUpdateFactory.zoomIn());
                 return true;
 
             case R.id.action_zoom_out:
-                mMapboxMap.animateCamera(CameraUpdateFactory.zoomOut());
+                mapboxMap.animateCamera(CameraUpdateFactory.zoomOut());
                 return true;
 
             case R.id.action_zoom_by:
-                mMapboxMap.animateCamera(CameraUpdateFactory.zoomBy(2));
+                mapboxMap.animateCamera(CameraUpdateFactory.zoomBy(2));
                 return true;
             case R.id.action_zoom_to:
-                mMapboxMap.animateCamera(CameraUpdateFactory.zoomTo(2));
+                mapboxMap.animateCamera(CameraUpdateFactory.zoomTo(2));
                 return true;
 
             case R.id.action_zoom_to_point:
                 View view = getWindow().getDecorView();
-                mMapboxMap.animateCamera(CameraUpdateFactory.zoomBy(1, new Point(view.getMeasuredWidth() / 4, view.getMeasuredHeight() / 4)));
+                mapboxMap.animateCamera(CameraUpdateFactory.zoomBy(1, new Point(view.getMeasuredWidth() / 4, view.getMeasuredHeight() / 4)));
                 return true;
 
             default:

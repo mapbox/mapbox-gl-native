@@ -17,50 +17,98 @@ import static com.mapbox.mapboxsdk.utils.ColorUtils.*;
  */
 public class <%- camelize(type) %>Layer extends Layer {
 
+    /**
+     * Creates a <%- camelize(type) %>Layer.
+     *
+     * @param nativePtr pointer used by core
+     */
     public <%- camelize(type) %>Layer(long nativePtr) {
         super(nativePtr);
     }
 
 <% if (type === 'background') { -%>
+    /**
+     * Creates a <%- camelize(type) %>Layer.
+     *
+     * @param layerId  the id of the layer
+     */
     public <%- camelize(type) %>Layer(String layerId) {
         initialize(layerId);
     }
 
     protected native void initialize(String layerId);
 <% } else { -%>
+    /**
+     * Creates a <%- camelize(type) %>Layer.
+     *
+     * @param layerId  the id of the layer
+     * @param sourceId the id of the source
+     */
     public <%- camelize(type) %>Layer(String layerId, String sourceId) {
         initialize(layerId, sourceId);
     }
 
     protected native void initialize(String layerId, String sourceId);
 
+   /**
+     * Set the source layer.
+     *
+     * @param sourceLayer the source layer to set
+     */
     public void setSourceLayer(String sourceLayer) {
         checkValidity();
         nativeSetSourceLayer(sourceLayer);
     }
 
+    /**
+     * Set the source Layer.
+     *
+     * @param sourceLayer the source layer to set
+     * @return This
+     */
     public <%- camelize(type) %>Layer withSourceLayer(String sourceLayer) {
         setSourceLayer(sourceLayer);
         return this;
     }
 <% } -%>
-
 <% if (type !== 'background' && type !== 'raster') { -%>
+    /**
+     * Set a single filter.
+     *
+     * @param filter the filter to set
+     */
     public void setFilter(Filter.Statement filter) {
         checkValidity();
         this.setFilter(filter.toArray());
     }
 
+    /**
+     * Set an array of filters.
+     *
+     * @param filter the filter array to set
+     */
     public void setFilter(Object[] filter) {
         checkValidity();
         nativeSetFilter(filter);
     }
 
+    /**
+     * Set an array of filters.
+     *
+     * @param filter tthe filter array to set
+     * @return This
+     */
     public <%- camelize(type) %>Layer withFilter(Object[] filter) {
         setFilter(filter);
         return this;
     }
 
+    /**
+     * Set a single filter.
+     *
+     * @param filter the filter to set
+     * @return This
+     */
     public <%- camelize(type) %>Layer withFilter(Filter.Statement filter) {
         setFilter(filter);
         return this;
@@ -68,6 +116,12 @@ public class <%- camelize(type) %>Layer extends Layer {
 
 <% } -%>
 
+    /**
+     * Set a property or properties.
+     *
+     * @param properties the var-args properties
+     * @return This
+     */
     public <%- camelize(type) %>Layer withProperties(@NonNull Property<?>... properties) {
         setProperties(properties);
         return this;
@@ -76,16 +130,23 @@ public class <%- camelize(type) %>Layer extends Layer {
     // Property getters
 
 <% for (const property of properties) { -%>
+    /**
+     * Get the <%- camelize(property.name) %> property
+     *
+     * @return property wrapper value around <%- propertyType(property) %>
+     */
     @SuppressWarnings("unchecked")
     public PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() {
         checkValidity();
         return (PropertyValue<<%- propertyType(property) %>>) new PropertyValue(nativeGet<%- camelize(property.name) %>());
     }
  <% if (property.type == 'color') { -%>
-     /**
-      * <%- property.doc %>
-      * @throws RuntimeException
-      */
+    /**
+     * <%- property.doc %>
+     *
+     * @return int representation of a rgba string color
+     * @throws RuntimeException thrown if property isn't a value
+     */
     @ColorInt
     public int get<%- camelize(property.name) %>AsInt() {
         checkValidity();

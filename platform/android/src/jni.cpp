@@ -14,6 +14,10 @@
 #include "style/layers/layers.hpp"
 #include "style/sources/sources.hpp"
 
+#include "conversion/conversion.hpp"
+#include "conversion/collection.hpp"
+#include "geometry/conversion/feature.hpp"
+
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/annotation/annotation.hpp>
@@ -23,8 +27,11 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/run_loop.hpp>
+
+#include <mapbox/geometry.hpp>
 
 #include <jni/jni.hpp>
 
@@ -843,20 +850,24 @@ void nativeRemoveAnnotations(JNIEnv *env, jni::jobject* obj, jlong nativeMapView
     }
 }
 
-jni::jarray<jlong>* nativeGetAnnotationsInBounds(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jobject* latLngBounds_) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetAnnotationsInBounds");
+jni::jarray<jlong>* nativeQueryPointAnnotations(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jobject* rect) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeQueryPointAnnotations");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
     // Conversion
-    mbgl::LatLngBounds latLngBounds = latlngbounds_from_java(env, latLngBounds_);
-    if (latLngBounds.isEmpty()) {
-        return nullptr;
-    }
+    jfloat left = jni::GetField<jfloat>(*env, rect, *rectFLeftId);
+    jfloat right = jni::GetField<jfloat>(*env, rect, *rectFRightId);
+    jfloat top = jni::GetField<jfloat>(*env, rect, *rectFTopId);
+    jfloat bottom = jni::GetField<jfloat>(*env, rect, *rectFBottomId);
+    mbgl::ScreenBox box = {
+        { left, top },
+        { right, bottom },
+    };
 
     // Assume only points for now
-    std::vector<uint32_t> annotations = nativeMapView->getMap().getPointAnnotationsInBounds(
-        latLngBounds);
+    std::vector<uint32_t> annotations = nativeMapView->getMap().queryPointAnnotations(
+        box);
 
     return std_vector_uint_to_jobject(env, annotations);
 }
@@ -924,6 +935,40 @@ void nativeSetVisibleCoordinateBounds(JNIEnv *env, jni::jobject* obj, jlong nati
     }
 
     nativeMapView->getMap().easeTo(cameraOptions, animationOptions);
+}
+
+jni::jarray<jni::jobject>* nativeQueryRenderedFeaturesForPoint(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jfloat x, jni::jfloat y, jni::jarray<jni::jobject>*  layerIds) {
+    using namespace mbgl::android::conversion;
+    using namespace mapbox::geometry;
+
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeQueryRenderedFeatures for Point");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    mbgl::optional<std::vector<std::string>> layers;
+    if (layerIds != nullptr && jni::GetArrayLength(*env, *layerIds) > 0) {
+        layers = toVector(*env, *layerIds);
+    }
+    point<double> point = {x, y};
+
+    return *convert<jni::jarray<jni::jobject>*, std::vector<mbgl::Feature>>(*env, nativeMapView->getMap().queryRenderedFeatures(point, layers));
+}
+
+jni::jarray<jni::jobject>* nativeQueryRenderedFeaturesForBox(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jfloat left, jni::jfloat top, jni::jfloat right, jni::jfloat bottom, jni::jarray<jni::jobject>*  layerIds) {
+    using namespace mbgl::android::conversion;
+    using namespace mapbox::geometry;
+
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeQueryRenderedFeatures for Box %.2f %.2f %.2f %.2f", left, top, right, bottom);
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    mbgl::optional<std::vector<std::string>> layers;
+    if (layerIds != nullptr && jni::GetArrayLength(*env, *layerIds) > 0) {
+        layers = toVector(*env, *layerIds);
+    }
+    box<double> box = { point<double>{ left, top}, point<double>{ right, bottom } };
+
+    return *convert<jni::jarray<jni::jobject>*, std::vector<mbgl::Feature>>(*env, nativeMapView->getMap().queryRenderedFeatures(box, layers));
 }
 
 void nativeOnLowMemory(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
@@ -1773,7 +1818,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeUpdatePolygon, "(JJLcom/mapbox/mapboxsdk/annotations/Polygon;)J"),
         MAKE_NATIVE_METHOD(nativeUpdatePolyline, "(JJLcom/mapbox/mapboxsdk/annotations/Polyline;)J"),
         MAKE_NATIVE_METHOD(nativeRemoveAnnotations, "(J[J)V"),
-        MAKE_NATIVE_METHOD(nativeGetAnnotationsInBounds, "(JLcom/mapbox/mapboxsdk/geometry/LatLngBounds;)[J"),
+        MAKE_NATIVE_METHOD(nativeQueryPointAnnotations, "(JLandroid/graphics/RectF;)[J"),
         MAKE_NATIVE_METHOD(nativeAddAnnotationIcon, "(JLjava/lang/String;IIF[B)V"),
         MAKE_NATIVE_METHOD(nativeSetVisibleCoordinateBounds, "(J[Lcom/mapbox/mapboxsdk/geometry/LatLng;Landroid/graphics/RectF;DJ)V"),
         MAKE_NATIVE_METHOD(nativeOnLowMemory, "(J)V"),
@@ -1797,7 +1842,9 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeAddSource, "(JLjava/lang/String;Lcom/mapbox/mapboxsdk/style/sources/Source;)V"),
         MAKE_NATIVE_METHOD(nativeRemoveSource, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeSetContentPadding, "(JDDDD)V"),
-        MAKE_NATIVE_METHOD(nativeScheduleTakeSnapshot, "(J)V")
+        MAKE_NATIVE_METHOD(nativeScheduleTakeSnapshot, "(J)V"),
+        MAKE_NATIVE_METHOD(nativeQueryRenderedFeaturesForPoint, "(JFF[Ljava/lang/String;)[Lcom/mapbox/services/commons/geojson/Feature;"),
+        MAKE_NATIVE_METHOD(nativeQueryRenderedFeaturesForBox, "(JFFFF[Ljava/lang/String;)[Lcom/mapbox/services/commons/geojson/Feature;")
     );
 
     // Offline begin

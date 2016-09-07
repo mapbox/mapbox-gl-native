@@ -4,11 +4,13 @@ This document explains how to build a development version of Mapbox iOS SDK for 
 
 ### Requirements
 
-The Mapbox iOS SDK application builds against the iOS 7.0 SDK. It is intended to run on iOS 7.0 and above on the following devices and their simulators:
+The Mapbox iOS SDK builds against the iOS 7.0 SDK. It is intended to run on iOS 7.0 and above on the following devices and their simulators:
 
 * iPhone 4S and above (5, 5c, 5s, 6, 6 Plus)
 * iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2)
 * iPod touch 5th generation and above
+
+The Mapbox iOS SDK requires Xcode 7.3 or higher.
 
 ### Building the SDK
 

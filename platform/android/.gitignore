@@ -27,3 +27,7 @@ fabric.properties
 
 # Capture files
 captures/
+
+# Generated test cases
+MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/activity/gen/
+

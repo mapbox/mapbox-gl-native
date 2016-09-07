@@ -323,7 +323,7 @@ TEST(OfflineDatabase, DeleteRegion) {
     response.noContent = true;
 
     db.putRegionResource(region.getID(), Resource::style("http://example.com/"), response);
-    db.putRegionResource(region.getID(), Resource::tile("http://example.com/", 1.0, 0, 0, 0), response);
+    db.putRegionResource(region.getID(), Resource::tile("http://example.com/", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), response);
 
     db.deleteRegion(std::move(region));
 
@@ -474,7 +474,7 @@ TEST(OfflineDatabase, GetRegionCompletedStatus) {
     EXPECT_EQ(0u, status2.completedTileCount);
     EXPECT_EQ(0u, status2.completedTileSize);
 
-    uint64_t tileSize = db.putRegionResource(region.getID(), Resource::tile("http://example.com/", 1.0, 0, 0, 0), response);
+    uint64_t tileSize = db.putRegionResource(region.getID(), Resource::tile("http://example.com/", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), response);
 
     OfflineRegionStatus status3 = db.getRegionCompletedStatus(region.getID());
     EXPECT_EQ(2u, status3.completedResourceCount);
@@ -493,9 +493,9 @@ TEST(OfflineDatabase, OfflineMapboxTileCount) {
     OfflineRegion region1 = db.createRegion(definition, metadata);
     OfflineRegion region2 = db.createRegion(definition, metadata);
 
-    Resource nonMapboxTile = Resource::tile("http://example.com/", 1.0, 0, 0, 0);
-    Resource mapboxTile1 = Resource::tile("mapbox://tiles/1", 1.0, 0, 0, 0);
-    Resource mapboxTile2 = Resource::tile("mapbox://tiles/2", 1.0, 0, 0, 1);
+    Resource nonMapboxTile = Resource::tile("http://example.com/", 1.0, 0, 0, 0, Tileset::Scheme::XYZ);
+    Resource mapboxTile1 = Resource::tile("mapbox://tiles/1", 1.0, 0, 0, 0, Tileset::Scheme::XYZ);
+    Resource mapboxTile2 = Resource::tile("mapbox://tiles/2", 1.0, 0, 0, 1, Tileset::Scheme::XYZ);
 
     Response response;
     response.data = std::make_shared<std::string>("data");
@@ -559,18 +559,18 @@ TEST(OfflineDatabase, MigrateFromV2Schema) {
 
     // v2.db is a v2 database containing a single offline region with a small number of resources.
 
-    deleteFile("test/fixtures/offline_database/v3.db");
-    writeFile("test/fixtures/offline_database/v3.db", util::read_file("test/fixtures/offline_database/v2.db"));
+    deleteFile("test/fixtures/offline_database/v4.db");
+    writeFile("test/fixtures/offline_database/v4.db", util::read_file("test/fixtures/offline_database/v2.db"));
 
     {
-        OfflineDatabase db("test/fixtures/offline_database/v3.db", 0);
+        OfflineDatabase db("test/fixtures/offline_database/v4.db", 0);
         auto regions = db.listRegions();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
         }
     }
 
-    EXPECT_EQ(3, databaseUserVersion("test/fixtures/offline_database/v3.db"));
-    EXPECT_LT(databasePageCount("test/fixtures/offline_database/v3.db"),
+    EXPECT_EQ(4, databaseUserVersion("test/fixtures/offline_database/v4.db"));
+    EXPECT_LT(databasePageCount("test/fixtures/offline_database/v4.db"),
               databasePageCount("test/fixtures/offline_database/v2.db"));
 }

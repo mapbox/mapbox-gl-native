@@ -21,7 +21,8 @@ TileLoader<T>::TileLoader(T& tile_,
         parameters.pixelRatio,
         id.canonical.x,
         id.canonical.y,
-        id.canonical.z)),
+        id.canonical.z,
+        tileset.scheme)),
       fileSource(parameters.fileSource) {
     assert(!request);
     if (fileSource.supportsOptionalRequests()) {

@@ -10,6 +10,8 @@ For more information, check out the [Mapbox iOS SDK homepage](https://www.mapbox
 
 The Mapbox iOS SDK may be installed as either a dynamic framework or a static framework. (To reduce the download size, the static framework is omitted from some distributions; you may need to download the full package from the [release page](https://github.com/mapbox/mapbox-gl-native/releases/).)
 
+Integrating the Mapbox iOS SDK requires Xcode 7.3 or higher.
+
 {{DYNAMIC}}
 
 ### Dynamic framework

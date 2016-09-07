@@ -2,8 +2,6 @@
 #import <CoreLocation/CoreLocation.h>
 #import <CoreGraphics/CGBase.h>
 
-#import "MGLTypes.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
 /** Defines the area spanned by an `MGLCoordinateBounds`. */

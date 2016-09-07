@@ -57,6 +57,7 @@ node_modules: package.json
 BUILD_DEPS += .mason/mason
 BUILD_DEPS += Makefile
 BUILD_DEPS += node_modules
+BUILD_DEPS += CMakeLists.txt
 
 #### macOS targets ##############################################################
 
@@ -253,6 +254,8 @@ ifabric: $(IOS_PROJ_PATH)
 idocument:
 	OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
 
+style-code-darwin:
+	node platform/darwin/scripts/generate-style-code.js
 endif
 
 #### Linux targets #####################################################
@@ -453,6 +456,10 @@ android: android-arm-v7
 android-test:
 	cd platform/android && ./gradlew testReleaseUnitTest --continue
 
+.PHONY: android-test-apk
+android-test-apk:
+	cd platform/android && ./gradlew assembleDebug --continue && ./gradlew assembleAndroidTest --continue
+
 .PHONY: apackage
 apackage:
 	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
@@ -460,6 +467,10 @@ apackage:
 .PHONY: style-code-android
 style-code-android:
 	node platform/android/scripts/generate-style-code.js
+
+.PHONY: android-generate-test
+android-generate-test:
+	node platform/android/scripts/generate-test-code.js
 
 #### Miscellaneous targets #####################################################
 

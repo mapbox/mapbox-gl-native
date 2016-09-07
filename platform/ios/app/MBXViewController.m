@@ -4,6 +4,8 @@
 #import "MBXCustomCalloutView.h"
 #import "MBXOfflinePacksTableViewController.h"
 #import "MBXAnnotationView.h"
+#import "MBXUserLocationAnnotationView.h"
+#import "MGLFillStyleLayer.h"
 
 #import <Mapbox/Mapbox.h>
 
@@ -41,6 +43,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 @property (nonatomic) IBOutlet MGLMapView *mapView;
 @property (nonatomic) NSInteger styleIndex;
 @property (nonatomic) BOOL debugLoggingEnabled;
+@property (nonatomic) BOOL customUserLocationAnnnotationEnabled;
 
 @end
 
@@ -200,6 +203,10 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         @"Start World Tour",
         @"Add Custom Callout Point",
         @"Remove Annotations",
+        @"Manipulate Style",
+        ((_customUserLocationAnnnotationEnabled)
+         ? @"Disable Custom User Dot"
+         : @"Enable Custom User Dot"),
         nil];
 
     if (self.debugLoggingEnabled)
@@ -276,6 +283,16 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 15)
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 16)
+    {
+        [self testRuntimeStyling];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 17)
+    {
+        _customUserLocationAnnnotationEnabled = !_customUserLocationAnnnotationEnabled;
+        self.mapView.showsUserLocation = NO;
+        self.mapView.userTrackingMode = MGLUserTrackingModeFollow;
     }
     else if (buttonIndex == actionSheet.numberOfButtons - 2 && self.debugLoggingEnabled)
     {
@@ -434,6 +451,95 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     
     [self.mapView addAnnotation:annotation];
     [self.mapView showAnnotations:@[annotation] animated:YES];
+}
+
+- (void)testRuntimeStyling
+{
+    [self styleWaterLayer];
+    [self styleRoadLayer];
+    [self styleRasterLayer];
+    [self styleGeoJSONSource];
+    [self styleSymbolLayer];
+    
+    MGLFillStyleLayer *buildingLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"building"];
+    buildingLayer.fillColor = [UIColor blackColor];
+    
+    MGLLineStyleLayer *ferryLineLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"ferry"];
+    ferryLineLayer.lineColor = [UIColor redColor];
+    
+    MGLFillStyleLayer *parkLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"park"];
+    [self.mapView.style removeLayer:parkLayer];
+}
+
+- (void)styleSymbolLayer
+{
+    MGLSymbolStyleLayer *stateLayer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:@"state-label-lg"];
+    stateLayer.textColor = [UIColor redColor];
+}
+
+- (void)styleGeoJSONSource
+{
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
+    NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
+    [self.mapView.style addSource:source];
+    
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" sourceIdentifier:@"ams"];
+    fillLayer.fillColor = [UIColor purpleColor];
+    [self.mapView.style addLayer:fillLayer];
+}
+
+- (void)styleRasterLayer
+{
+    NSURL *rasterURL = [NSURL URLWithString:@"mapbox://mapbox.satellite"];
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithSourceIdentifier:@"my-raster-source" URL:rasterURL tileSize:512];
+    [self.mapView.style addSource:rasterSource];
+    
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerIdentifier:@"my-raster-layer" sourceIdentifier:@"my-raster-source"];
+    MGLStyleAttributeFunction *opacityFunction = [[MGLStyleAttributeFunction alloc] init];
+    opacityFunction.stops = @{@20.0f: @1.0f,
+                              @5.0f: @0.0f};
+    rasterLayer.rasterOpacity = opacityFunction;
+    [self.mapView.style addLayer:rasterLayer];
+}
+
+- (void)styleWaterLayer
+{
+    MGLFillStyleLayer *waterLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
+    MGLStyleAttributeFunction *waterColorFunction = [[MGLStyleAttributeFunction alloc] init];
+    waterColorFunction.stops = @{@6.0f: [UIColor yellowColor],
+                                 @8.0f: [UIColor blueColor],
+                                 @10.0f: [UIColor redColor],
+                                 @12.0f: [UIColor greenColor],
+                                 @14.0f: [UIColor blueColor]};
+    waterLayer.fillColor = waterColorFunction;
+    
+    MGLStyleAttributeFunction *fillAntialias = [[MGLStyleAttributeFunction alloc] init];
+    fillAntialias.stops = @{@11: @YES,
+                            @12: @NO,
+                            @13: @YES,
+                            @14: @NO,
+                            @15: @YES};
+    waterLayer.fillAntialias = fillAntialias;
+}
+
+- (void)styleRoadLayer
+{
+    MGLLineStyleLayer *roadLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"road-primary"];
+    roadLayer.lineColor = [UIColor blackColor];
+    MGLStyleAttributeFunction *lineWidthFunction = [[MGLStyleAttributeFunction alloc] init];
+    
+    MGLStyleAttributeFunction *roadLineColor = [[MGLStyleAttributeFunction alloc] init];
+    roadLineColor.stops = @{@10: [UIColor purpleColor],
+                            @13: [UIColor yellowColor],
+                            @16: [UIColor cyanColor]};
+    roadLayer.lineColor = roadLineColor;
+    roadLayer.lineWidth = lineWidthFunction;
+    roadLayer.lineGapWidth = lineWidthFunction;
+    
+    roadLayer.visible = YES;
+    roadLayer.maximumZoomLevel = 15;
+    roadLayer.minimumZoomLevel = 13;
 }
 
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer *)longPress
@@ -603,6 +709,17 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
 {
+    if (annotation == mapView.userLocation)
+    {
+        if (_customUserLocationAnnnotationEnabled)
+        {
+            MBXUserLocationAnnotationView *annotationView = [[MBXUserLocationAnnotationView alloc] initWithFrame:CGRectZero];
+            annotationView.frame = CGRectMake(0, 0, annotationView.intrinsicContentSize.width, annotationView.intrinsicContentSize.height);
+            return annotationView;
+        }
+
+        return nil;
+    }
     // Use GL backed pins for dropped pin annotations
     if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]] || [annotation isKindOfClass:[MBXSpriteBackedAnnotation class]])
     {

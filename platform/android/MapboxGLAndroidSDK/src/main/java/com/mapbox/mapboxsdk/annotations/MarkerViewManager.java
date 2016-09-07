@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.content.Context;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -321,7 +322,7 @@ public class MarkerViewManager {
 
         if (!markerViewAdapters.contains(markerViewAdapter)) {
             markerViewAdapters.add(markerViewAdapter);
-            invalidateViewMarkersInBounds();
+            invalidateViewMarkersInVisibleRegion();
         }
     }
 
@@ -346,7 +347,7 @@ public class MarkerViewManager {
     /**
      * Schedule that ViewMarkers found in the viewport are invalidated.
      * <p>
-     * This method is rate limited, and {@link #invalidateViewMarkersInBounds} will only be called
+     * This method is rate limited, and {@link #invalidateViewMarkersInVisibleRegion} will only be called
      * once each 250 ms.
      * </p>
      */
@@ -356,7 +357,7 @@ public class MarkerViewManager {
             if (currentTime < viewMarkerBoundsUpdateTime) {
                 return;
             }
-            invalidateViewMarkersInBounds();
+            invalidateViewMarkersInVisibleRegion();
             viewMarkerBoundsUpdateTime = currentTime + 250;
         }
     }
@@ -368,9 +369,9 @@ public class MarkerViewManager {
      * ones for each found Marker in the changed viewport.
      * </p>
      */
-    public void invalidateViewMarkersInBounds() {
-        Projection projection = mapboxMap.getProjection();
-        List<MarkerView> markers = mapView.getMarkerViewsInBounds(projection.getVisibleRegion().latLngBounds);
+    public void invalidateViewMarkersInVisibleRegion() {
+        RectF mapViewRect = new RectF(0, 0, mapView.getWidth(), mapView.getHeight());
+        List<MarkerView> markers = mapView.getMarkerViewsInRect(mapViewRect);
         View convertView;
 
         // remove old markers

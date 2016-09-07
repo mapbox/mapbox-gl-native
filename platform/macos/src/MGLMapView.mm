@@ -9,6 +9,7 @@
 #import "MGLGeometry_Private.h"
 #import "MGLMultiPoint_Private.h"
 #import "MGLOfflineStorage_Private.h"
+#import "MGLStyle_Private.h"
 
 #import "MGLAccountManager.h"
 #import "MGLMapCamera.h"
@@ -33,9 +34,12 @@
 #import <unordered_set>
 
 #import "NSBundle+MGLAdditions.h"
+#import "NSDate+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
+#import "NSURL+MGLAdditions.h"
+#import "NSColor+MGLAdditions.h"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -107,11 +111,6 @@ NSImage *MGLDefaultMarkerImage() {
     return [[NSImage alloc] initWithContentsOfFile:path];
 }
 
-/// Converts from a duration in seconds to a duration object usable in mbgl.
-mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration) {
-    return std::chrono::duration_cast<mbgl::Duration>(std::chrono::duration<NSTimeInterval>(duration));
-}
-
 /// Converts a media timing function into a unit bezier object usable in mbgl.
 mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction *function) {
     if (!function) {
@@ -121,16 +120,6 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
     [function getControlPointAtIndex:0 values:p1];
     [function getControlPointAtIndex:1 values:p2];
     return { p1[0], p1[1], p2[0], p2[1] };
-}
-
-/// Converts the given color into an mbgl::Color in calibrated RGB space.
-mbgl::Color MGLColorObjectFromNSColor(NSColor *color) {
-    if (!color) {
-        return { 0, 0, 0, 0 };
-    }
-    CGFloat r, g, b, a;
-    [[color colorUsingColorSpaceName:NSCalibratedRGBColorSpace] getRed:&r green:&g blue:&b alpha:&a];
-    return { (float)r, (float)g, (float)b, (float)a };
 }
 
 /// Lightweight container for metadata about an annotation, including the annotation itself.
@@ -551,11 +540,7 @@ public:
         styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
     }
     
-    if (![styleURL scheme]) {
-        // Assume a relative path into the application’s resource folder.
-        styleURL = [NSURL URLWithString:[@"asset://" stringByAppendingString:styleURL.absoluteString]];
-    }
-    
+    styleURL = styleURL.mgl_URLByStandardizingScheme;
     _mbglMap->setStyleURL(styleURL.absoluteString.UTF8String);
 }
 
@@ -822,7 +807,10 @@ public:
         }
         case mbgl::MapChangeDidFailLoadingMap:
         {
-            // Not yet implemented.
+            if ([self.delegate respondsToSelector:@selector(mapViewDidFailLoadingMap:withError:)]) {
+                NSError *error = [NSError errorWithDomain:MGLErrorDomain code:0 userInfo:nil];
+                [self.delegate mapViewDidFailLoadingMap:self withError:error];
+            }
             break;
         }
         case mbgl::MapChangeWillStartRenderingMap:
@@ -1195,8 +1183,8 @@ public:
         NSRect contentLayoutRect = [self convertRect:self.window.contentLayoutRect fromView:nil];
         if (NSMaxX(contentLayoutRect) > 0 && NSMaxY(contentLayoutRect) > 0) {
             contentInsets = NSEdgeInsetsMake(NSHeight(self.bounds) - NSMaxY(contentLayoutRect),
-                                             NSMinX(contentLayoutRect),
-                                             NSMinY(contentLayoutRect),
+                                             MAX(NSMinX(contentLayoutRect), 0),
+                                             MAX(NSMinY(contentLayoutRect), 0),
                                              NSWidth(self.bounds) - NSMaxX(contentLayoutRect));
         }
     } else {
@@ -1905,8 +1893,11 @@ public:
 
 /// Returns the tags of the annotations coincident with the given rectangle.
 - (std::vector<MGLAnnotationTag>)annotationTagsInRect:(NSRect)rect {
-    mbgl::LatLngBounds queryBounds = [self convertRect:rect toLatLngBoundsFromView:self];
-    return _mbglMap->getPointAnnotationsInBounds(queryBounds);
+    // Cocoa origin is at the lower-left corner.
+    return _mbglMap->queryPointAnnotations({
+        { NSMinX(rect), NSHeight(self.bounds) - NSMaxY(rect) },
+        { NSMaxX(rect), NSHeight(self.bounds) - NSMinY(rect) },
+    });
 }
 
 - (id <MGLAnnotation>)selectedAnnotation {
@@ -2127,6 +2118,20 @@ public:
     }
 }
 
+#pragma mark - Runtime styling
+
+- (MGLStyle *)style
+{
+    MGLStyle *style = [[MGLStyle alloc] init];
+    style.mapView = self;
+    return style;
+}
+
+- (mbgl::Map *)mbglMap
+{
+    return _mbglMap;
+}
+
 #pragma mark MGLMultiPointDelegate methods
 
 - (double)alphaForShapeAnnotation:(MGLShape *)annotation {
@@ -2140,14 +2145,14 @@ public:
     NSColor *color = (_delegateHasStrokeColorsForShapeAnnotations
                       ? [self.delegate mapView:self strokeColorForShapeAnnotation:annotation]
                       : [NSColor selectedMenuItemColor]);
-    return MGLColorObjectFromNSColor(color);
+    return color.mbgl_color;
 }
 
 - (mbgl::Color)fillColorForPolygonAnnotation:(MGLPolygon *)annotation {
     NSColor *color = (_delegateHasFillColorsForShapeAnnotations
                       ? [self.delegate mapView:self fillColorForPolygonAnnotation:annotation]
                       : [NSColor selectedMenuItemColor]);
-    return MGLColorObjectFromNSColor(color);
+    return color.mbgl_color;
 }
 
 - (CGFloat)lineWidthForPolylineAnnotation:(MGLPolyline *)annotation {
@@ -2448,6 +2453,9 @@ public:
     if (options & mbgl::MapDebugOptions::StencilClip) {
         mask |= MGLMapDebugStencilBufferMask;
     }
+    if (options & mbgl::MapDebugOptions::DepthBuffer) {
+        mask |= MGLMapDebugDepthBufferMask;
+    }
     return mask;
 }
 
@@ -2470,6 +2478,9 @@ public:
     }
     if (debugMask & MGLMapDebugStencilBufferMask) {
         options |= mbgl::MapDebugOptions::StencilClip;
+    }
+    if (debugMask & MGLMapDebugDepthBufferMask) {
+        options |= mbgl::MapDebugOptions::DepthBuffer;
     }
     _mbglMap->setDebug(options);
 }

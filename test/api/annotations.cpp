@@ -79,6 +79,48 @@ TEST(Annotations, FillAnnotation) {
     test.checkRendering("fill_annotation_max_zoom");
 }
 
+TEST(Annotations, AntimeridianAnnotationSmall) {
+    AnnotationTest test;
+
+    double antimeridian = 180;
+    test.map.setLatLngZoom(mbgl::LatLng(0, antimeridian), 0);
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+
+    LineString<double> line = {{ { antimeridian, 20 }, { antimeridian, -20 } }};
+    LineAnnotation lineAnnotation { line };
+    lineAnnotation.color = { { 255, 0, 0, 1 } };
+    lineAnnotation.width = { 2 };
+    test.map.addAnnotation(lineAnnotation);
+
+    Polygon<double> polygon = {{ {{ { antimeridian+10, 0 }, { antimeridian - 10, 10 }, { antimeridian-10, -10 } }} }};
+    FillAnnotation polygonAnnotation { polygon };
+    polygonAnnotation.color = { { 0, 0, 255, 1 } };
+    test.map.addAnnotation(polygonAnnotation);
+
+    test.checkRendering("antimeridian_annotation_small");
+}
+
+TEST(Annotations, AntimeridianAnnotationLarge) {
+    AnnotationTest test;
+
+    double antimeridian = 180;
+    test.map.setLatLngZoom(mbgl::LatLng(0, antimeridian), 0);
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+
+    LineString<double> line = {{ { antimeridian, 20 }, { antimeridian, -20 } }};
+    LineAnnotation lineAnnotation { line };
+    lineAnnotation.color = { { 255, 0, 0, 1 } };
+    lineAnnotation.width = { 2 };
+    test.map.addAnnotation(lineAnnotation);
+
+    Polygon<double> polygon = {{ {{ { antimeridian-10, 0 }, { -antimeridian+10, 10 }, { -antimeridian+10, -10 } }} }};
+    FillAnnotation polygonAnnotation { polygon };
+    polygonAnnotation.color = { { 0, 0, 255, 1 } };
+    test.map.addAnnotation(polygonAnnotation);
+
+    test.checkRendering("antimeridian_annotation_large");
+}
+
 TEST(Annotations, OverlappingFillAnnotation) {
     AnnotationTest test;
 
@@ -217,9 +259,17 @@ TEST(Annotations, QueryRenderedFeatures) {
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
+    test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 50 }, "default_marker" });
 
     test::render(test.map);
 
     auto features = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 0, 0 }));
     EXPECT_EQ(features.size(), 1u);
+    EXPECT_TRUE(!!features[0].id);
+    EXPECT_EQ(*features[0].id, 0);
+
+    auto features2 = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 50, 0 }));
+    EXPECT_EQ(features2.size(), 1u);
+    EXPECT_TRUE(!!features2[0].id);
+    EXPECT_EQ(*features2[0].id, 1);
 }

@@ -32,3 +32,5 @@ add_custom_command(
 target_add_mason_package(mbgl-glfw PRIVATE glfw)
 
 mbgl_platform_glfw()
+
+create_source_groups(mbgl-glfw)

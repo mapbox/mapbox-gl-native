@@ -1,6 +1,10 @@
 #import <Foundation/Foundation.h>
 
+#import "MGLStyleLayer.h"
+
 #import "MGLTypes.h"
+
+@class MGLSource;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,6 +35,8 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  <a href="https://www.mapbox.com/maps/">Learn more about Mapbox default styles</a>.
  */
 @interface MGLStyle : NSObject
+
+#pragma mark Default Style URLs
 
 /**
  Returns the URL to version 8 of the
@@ -158,7 +164,97 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
-- (instancetype)init NS_UNAVAILABLE;
+/**
+ The name of the style.
+ 
+ You can customize the style’s name in Mapbox Studio.
+ */
+@property (readonly, copy, nullable) NSString *name;
+
+#pragma mark Runtime Styling
+
+/**
+ Returns a layer that conforms to `MGLStyleLayer` if any layer with the given
+ identifier was found.
+ 
+ @return layer A layer instance of the corresponding type.
+ */
+- (nullable id <MGLStyleLayer>)layerWithIdentifier:(NSString *)identifier;
+
+
+/**
+ Returns a source if any source with the given identifier was found.
+ 
+ @return source An instance of an `MGLSource` subclass.
+ */
+- (MGLSource *)sourceWithIdentifier:(NSString *)identifier;
+
+/**
+ Adds a new layer on top of existing layers.
+ 
+ @param styleLayer The layer object to add to the map view. This object
+ must conform to the `MGLStyleLayer` protocol.
+ */
+- (void)addLayer:(id <MGLStyleLayer>)styleLayer;
+
+/**
+ Inserts a new layer below another layer.
+ 
+ @param styleLayer Layer to be inserted.
+ @param belowLayer A layer that's already on the map view.
+ */
+- (void)insertLayer:(id <MGLStyleLayer>)styleLayer
+         belowLayer:(id <MGLStyleLayer>)belowLayer;
+
+/**
+ Removes a layer from the map view.
+ 
+ @param styleLayer The layer object to remove from the map view. This object
+ must conform to the `MGLStyleLayer` protocol.
+ */
+- (void)removeLayer:(id <MGLStyleLayer>)styleLayer;
+
+/**
+ Adds a new source to the map view.
+ 
+ @param source The source to add to the map view.
+ */
+- (void)addSource:(MGLSource *)source;
+
+/**
+ Removes a source from the map view.
+ 
+ @param source The source to remove.
+ */
+- (void)removeSource:(MGLSource *)source;
+
+/**
+ Currently active style classes, represented as an array of string identifiers.
+ */
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses;
+
+/**
+ Returns a Boolean value indicating whether the style class with the given
+ identifier is currently active.
+ 
+ @param styleClass The style class to query for.
+ @return Whether the style class is currently active.
+ */
+- (BOOL)hasStyleClass:(NSString *)styleClass;
+
+/**
+ Activates the style class with the given identifier.
+ 
+ @param styleClass The style class to activate.
+ */
+- (void)addStyleClass:(NSString *)styleClass;
+
+/**
+ Deactivates the style class with the given identifier.
+ 
+ @param styleClass The style class to deactivate.
+ */
+- (void)removeStyleClass:(NSString *)styleClass;
 
 @end
 

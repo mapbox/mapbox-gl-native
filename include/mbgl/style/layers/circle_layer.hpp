@@ -26,24 +26,31 @@ public:
 
     // Paint properties
 
+    static PropertyValue<float> getDefaultCircleRadius();
     PropertyValue<float> getCircleRadius() const;
     void setCircleRadius(PropertyValue<float>, const optional<std::string>& klass = {});
 
+    static PropertyValue<Color> getDefaultCircleColor();
     PropertyValue<Color> getCircleColor() const;
     void setCircleColor(PropertyValue<Color>, const optional<std::string>& klass = {});
 
+    static PropertyValue<float> getDefaultCircleBlur();
     PropertyValue<float> getCircleBlur() const;
     void setCircleBlur(PropertyValue<float>, const optional<std::string>& klass = {});
 
+    static PropertyValue<float> getDefaultCircleOpacity();
     PropertyValue<float> getCircleOpacity() const;
     void setCircleOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
 
+    static PropertyValue<std::array<float, 2>> getDefaultCircleTranslate();
     PropertyValue<std::array<float, 2>> getCircleTranslate() const;
     void setCircleTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
 
+    static PropertyValue<TranslateAnchorType> getDefaultCircleTranslateAnchor();
     PropertyValue<TranslateAnchorType> getCircleTranslateAnchor() const;
     void setCircleTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
 
+    static PropertyValue<CirclePitchScaleType> getDefaultCirclePitchScale();
     PropertyValue<CirclePitchScaleType> getCirclePitchScale() const;
     void setCirclePitchScale(PropertyValue<CirclePitchScaleType>, const optional<std::string>& klass = {});
 

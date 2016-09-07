@@ -4,8 +4,7 @@ import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.mapbox.mapboxsdk.activity.BaseTest;
-import com.mapbox.mapboxsdk.activity.utils.OnMapReadyIdlingResource;
+import com.mapbox.mapboxsdk.utils.OnMapReadyIdlingResource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTimingTestActivity;
 

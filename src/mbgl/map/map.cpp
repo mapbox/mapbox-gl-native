@@ -38,6 +38,7 @@ public:
     Impl(View&, FileSource&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
 
     void onNeedsRepaint() override;
+    void onStyleError() override;
     void onResourceError(std::exception_ptr) override;
 
     void update();
@@ -67,6 +68,7 @@ public:
 
     std::string styleURL;
     std::string styleJSON;
+    bool styleMutated = false;
 
     std::unique_ptr<AsyncRequest> styleRequest;
 
@@ -293,10 +295,21 @@ void Map::setStyleURL(const std::string& url) {
     impl->styleRequest = nullptr;
     impl->styleURL = url;
     impl->styleJSON.clear();
+    impl->styleMutated = false;
 
     impl->style = std::make_unique<Style>(impl->fileSource, impl->pixelRatio);
 
     impl->styleRequest = impl->fileSource.request(Resource::style(impl->styleURL), [this](Response res) {
+        // Once we get a fresh style, or the style is mutated, stop revalidating.
+        if (res.isFresh() || impl->styleMutated) {
+            impl->styleRequest.reset();
+        }
+
+        // Don't allow a loaded, mutated style to be overwritten with a new version.
+        if (impl->styleMutated && impl->style->loaded) {
+            return;
+        }
+
         if (res.error) {
             if (res.error->reason == Response::Error::Reason::NotFound &&
                 util::mapbox::isMapboxURL(impl->styleURL)) {
@@ -304,6 +317,8 @@ void Map::setStyleURL(const std::string& url) {
             } else {
                 Log::Error(Event::Setup, "loading style failed: %s", res.error->message.c_str());
             }
+            impl->onStyleError();
+            impl->onResourceError(std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified || res.noContent) {
             return;
         } else {
@@ -323,14 +338,16 @@ void Map::setStyleJSON(const std::string& json) {
 
     impl->styleURL.clear();
     impl->styleJSON.clear();
+    impl->styleMutated = false;
+
     impl->style = std::make_unique<Style>(impl->fileSource, impl->pixelRatio);
 
     impl->loadStyleJSON(json);
 }
 
 void Map::Impl::loadStyleJSON(const std::string& json) {
-    style->setJSON(json);
     style->setObserver(this);
+    style->setJSON(json);
     styleJSON = json;
 
     // force style cascade, causing all pending transitions to complete.
@@ -703,10 +720,6 @@ void Map::removeAnnotation(AnnotationID annotation) {
     update(Update::AnnotationStyle | Update::AnnotationData);
 }
 
-AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
-    return impl->annotationManager->getPointAnnotationsInBounds(bounds);
-}
-
 #pragma mark - Feature query api
 
 std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const optional<std::vector<std::string>>& layerIDs) {
@@ -735,25 +748,42 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const opti
     });
 }
 
+AnnotationIDs Map::queryPointAnnotations(const ScreenBox& box) {
+    auto features = queryRenderedFeatures(box, {{ AnnotationManager::PointLayerID }});
+    AnnotationIDs ids;
+    ids.reserve(features.size());
+    for (auto &feature : features) {
+        assert(feature.id);
+        assert(*feature.id <= std::numeric_limits<AnnotationID>::max());
+        ids.push_back(static_cast<AnnotationID>(feature.id->get<uint64_t>()));
+    }
+    return ids;
+}
+
 #pragma mark - Style API
 
 style::Source* Map::getSource(const std::string& sourceID) {
+    impl->styleMutated = true;
     return impl->style ? impl->style->getSource(sourceID) : nullptr;
 }
 
 void Map::addSource(std::unique_ptr<style::Source> source) {
+    impl->styleMutated = true;
     impl->style->addSource(std::move(source));
 }
 
 void Map::removeSource(const std::string& sourceID) {
+    impl->styleMutated = true;
     impl->style->removeSource(sourceID);
 }
 
 style::Layer* Map::getLayer(const std::string& layerID) {
+    impl->styleMutated = true;
     return impl->style ? impl->style->getLayer(layerID) : nullptr;
 }
 
 void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& before) {
+    impl->styleMutated = true;
     impl->view.activate();
 
     impl->style->addLayer(std::move(layer), before);
@@ -764,6 +794,7 @@ void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& be
 }
 
 void Map::removeLayer(const std::string& id) {
+    impl->styleMutated = true;
     impl->view.activate();
 
     impl->style->removeLayer(id);
@@ -771,6 +802,28 @@ void Map::removeLayer(const std::string& id) {
     impl->asyncUpdate.send();
 
     impl->view.deactivate();
+}
+
+#pragma mark - Defaults
+
+std::string Map::getStyleName() const {
+    return impl->style->getName();
+}
+
+LatLng Map::getDefaultLatLng() const {
+    return impl->style->getDefaultLatLng();
+}
+
+double Map::getDefaultZoom() const {
+    return impl->style->getDefaultZoom();
+}
+
+double Map::getDefaultBearing() const {
+    return impl->style->getDefaultBearing();
+}
+
+double Map::getDefaultPitch() const {
+    return impl->style->getDefaultPitch();
 }
 
 #pragma mark - Toggles
@@ -856,6 +909,10 @@ void Map::onLowMemory() {
 void Map::Impl::onNeedsRepaint() {
     updateFlags |= Update::Repaint;
     asyncUpdate.send();
+}
+
+void Map::Impl::onStyleError() {
+    view.notifyMapChange(MapChangeDidFailLoadingMap);
 }
 
 void Map::Impl::onResourceError(std::exception_ptr error) {

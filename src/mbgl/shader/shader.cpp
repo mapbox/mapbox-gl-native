@@ -48,8 +48,6 @@ Shader::Shader(const char* name_, const char* vertexSource, const char* fragment
     MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_extrude, "a_extrude"));
     MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_offset, "a_offset"));
     MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_data, "a_data"));
-    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_data1, "a_data1"));
-    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_data2, "a_data2"));
     MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_texture_pos, "a_texture_pos"));
 
     // Link program

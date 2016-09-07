@@ -309,6 +309,15 @@
                 android:value="@string/category_style" />
         </activity>
         <activity
+            android:name=".activity.style.GeoJsonClusteringActivity"
+            android:description="@string/description_geojson_clustering"
+            android:label="@string/activity_geojson_clustering">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style" />
+        </activity>
+
+        <activity
             android:name=".activity.imagegenerator.PrintActivity"
             android:description="@string/description_print"
             android:label="@string/activity_print">
@@ -325,6 +334,39 @@
                 android:value="@string/category_maplayout" />
         </activity>
 
+        <!-- Features -->
+        <activity
+            android:name=".activity.feature.QueryRenderedFeaturesPropertiesActivity"
+            android:description="@string/description_query_rendered_feature_properties_point"
+            android:label="@string/activity_query_rendered_feature_properties">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_features" />
+        </activity>
+        <activity
+            android:name=".activity.feature.QueryRenderedFeaturesBoxCountActivity"
+            android:description="@string/description_query_rendered_features_box_count"
+            android:label="@string/activity_query_rendered_features_box_count">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_features" />
+        </activity>
+        <activity
+            android:name=".activity.feature.QueryRenderedFeaturesBoxHighlightActivity"
+            android:description="@string/description_query_rendered_features_box_highlight"
+            android:label="@string/activity_query_rendered_features_box_highlight">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_features" />
+        </activity>
+        <activity
+            android:name=".activity.navigation.CarDrivingActivity"
+            android:description="@string/description_car_driving"
+            android:label="@string/activity_car_driving">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_navigation" />
+        </activity>
         <!-- For Unit tests -->
         <activity android:name=".activity.style.RuntimeStyleTestActivity" />
         <activity android:name=".activity.style.RuntimeStyleTimingTestActivity" />

@@ -283,10 +283,17 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 - (IBAction)showColorBuffer:(id)sender {
     self.mapView.debugMask &= ~MGLMapDebugStencilBufferMask;
+    self.mapView.debugMask &= ~MGLMapDebugDepthBufferMask;
 }
 
 - (IBAction)showStencilBuffer:(id)sender {
+    self.mapView.debugMask &= ~MGLMapDebugDepthBufferMask;
     self.mapView.debugMask |= MGLMapDebugStencilBufferMask;
+}
+
+- (IBAction)showDepthBuffer:(id)sender {
+    self.mapView.debugMask &= ~MGLMapDebugStencilBufferMask;
+    self.mapView.debugMask |= MGLMapDebugDepthBufferMask;
 }
 
 - (IBAction)toggleShowsToolTipsOnDroppedPins:(id)sender {
@@ -484,6 +491,27 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
 }
 
+- (IBAction)manipulateStyle:(id)sender {
+    MGLFillStyleLayer *fillStyleLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
+    
+    MGLStyleAttributeFunction *colorFunction = [[MGLStyleAttributeFunction alloc] init];
+    colorFunction.stops = @{
+        @0.0: [NSColor redColor],
+        @10.0: [NSColor yellowColor],
+        @20.0: [NSColor blackColor],
+    };
+    fillStyleLayer.fillColor = colorFunction;
+    
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
+    NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
+    [self.mapView.style addSource:source];
+    
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" sourceIdentifier:@"ams"];
+    fillLayer.fillColor = [NSColor purpleColor];
+    [self.mapView.style addLayer:fillLayer];
+}
+
 - (IBAction)dropPin:(NSMenuItem *)sender {
     [self dropPinAtPoint:_mouseLocationForMapViewContextMenu];
 }
@@ -579,6 +607,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     if (menuItem.action == @selector(reload:)) {
         return YES;
     }
+    if (menuItem.action == @selector(manipulateStyle:)) {
+        return YES;
+    }
     if (menuItem.action == @selector(dropPin:)) {
         id <MGLAnnotation> annotationUnderCursor = [self.mapView annotationAtPoint:_mouseLocationForMapViewContextMenu];
         menuItem.hidden = annotationUnderCursor != nil;
@@ -618,12 +649,17 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return YES;
     }
     if (menuItem.action == @selector(showColorBuffer:)) {
-        BOOL enabled = self.mapView.debugMask & MGLMapDebugStencilBufferMask;
+        BOOL enabled = self.mapView.debugMask & (MGLMapDebugStencilBufferMask | MGLMapDebugDepthBufferMask);
         menuItem.state = enabled ? NSOffState : NSOnState;
         return YES;
     }
     if (menuItem.action == @selector(showStencilBuffer:)) {
         BOOL enabled = self.mapView.debugMask & MGLMapDebugStencilBufferMask;
+        menuItem.state = enabled ? NSOnState : NSOffState;
+        return YES;
+    }
+    if (menuItem.action == @selector(showDepthBuffer:)) {
+        BOOL enabled = self.mapView.debugMask & MGLMapDebugDepthBufferMask;
         menuItem.state = enabled ? NSOnState : NSOffState;
         return YES;
     }

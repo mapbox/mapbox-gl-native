@@ -13,14 +13,15 @@
 
     <ProgressBar
         android:id="@+id/progress_bar"
-        android:visibility="gone"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="25dp"
         android:layout_below="@+id/toolbar"
-        style="@android:style/Widget.Material.ProgressBar.Horizontal" />
+        android:indeterminate="true"
+        android:visibility="gone" />
 
     <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/mapView"
+        android:id="@id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/progress_bar" />

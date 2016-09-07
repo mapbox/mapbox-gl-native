@@ -47,7 +47,7 @@ public class OfflineActivity extends AppCompatActivity
      * UI elements
      */
     private MapView mMapView;
-    private MapboxMap mMapboxMap;
+    private MapboxMap mapboxMap;
     private ProgressBar mProgressBar;
     private Button downloadRegion;
     private Button listRegions;
@@ -82,7 +82,7 @@ public class OfflineActivity extends AppCompatActivity
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 Log.d(LOG_TAG, "Map is ready");
-                mMapboxMap = mapboxMap;
+                OfflineActivity.this.mapboxMap = mapboxMap;
 
                 // Set initial position to UNHQ in NYC
                 mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
@@ -240,10 +240,10 @@ public class OfflineActivity extends AppCompatActivity
         startProgress();
 
         // Definition
-        String styleURL = mMapboxMap.getStyleUrl();
-        LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
-        double minZoom = mMapboxMap.getCameraPosition().zoom;
-        double maxZoom = mMapboxMap.getMaxZoom();
+        String styleURL = mapboxMap.getStyleUrl();
+        LatLngBounds bounds = mapboxMap.getProjection().getVisibleRegion().latLngBounds;
+        double minZoom = mapboxMap.getCameraPosition().zoom;
+        double maxZoom = mapboxMap.getMaxZoom();
         float pixelRatio = this.getResources().getDisplayMetrics().density;
         OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
                 styleURL, bounds, minZoom, maxZoom, pixelRatio);

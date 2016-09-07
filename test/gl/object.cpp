@@ -3,6 +3,7 @@
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/gl_helper.hpp>
 #include <mbgl/gl/gl_config.hpp>
 #include <mbgl/gl/object_store.hpp>

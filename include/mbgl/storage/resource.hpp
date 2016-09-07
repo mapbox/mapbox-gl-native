@@ -3,6 +3,7 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/font_stack.hpp>
+#include <mbgl/util/tileset.hpp>
 
 #include <string>
 
@@ -47,6 +48,7 @@ public:
                          int32_t x,
                          int32_t y,
                          int8_t z,
+                         Tileset::Scheme scheme,
                          Necessity = Required);
     static Resource glyphs(const std::string& urlTemplate,
                            const FontStack& fontStack,

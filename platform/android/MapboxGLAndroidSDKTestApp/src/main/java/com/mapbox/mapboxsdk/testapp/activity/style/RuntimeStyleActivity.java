@@ -40,12 +40,28 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import static com.mapbox.mapboxsdk.style.layers.Filter.*;
-import static com.mapbox.mapboxsdk.style.layers.Function.*;
-import static com.mapbox.mapboxsdk.style.layers.Property.*;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
+import static com.mapbox.mapboxsdk.style.layers.Function.Stop;
+import static com.mapbox.mapboxsdk.style.layers.Function.stop;
+import static com.mapbox.mapboxsdk.style.layers.Function.zoom;
+import static com.mapbox.mapboxsdk.style.layers.Property.FILL_TRANSLATE_ANCHOR_MAP;
+import static com.mapbox.mapboxsdk.style.layers.Property.NONE;
+import static com.mapbox.mapboxsdk.style.layers.Property.SYMBOL_PLACEMENT_POINT;
+import static com.mapbox.mapboxsdk.style.layers.Property.VISIBLE;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.backgroundOpacity;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillAntialias;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOutlineColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillTranslateAnchor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineCap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineJoin;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.symbolPlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
 
 /**
- * Sample Activity to show a typical location picker use case
+ * Sample Activity to show off the runtime style api
  */
 public class RuntimeStyleActivity extends AppCompatActivity {
     private static final String TAG = RuntimeStyleActivity.class.getSimpleName();
@@ -228,8 +244,8 @@ public class RuntimeStyleActivity extends AppCompatActivity {
                 fillAntialias(true)
         );
 
-        //Only show me parks
-        layer.setFilter(eq("type", "park"));
+        //Only show me parks (except westerpark with stroke-width == 3)
+        layer.setFilter(all(eq("type", "park"), eq("stroke-width", 2)));
 
         mapboxMap.addLayer(layer, "building");
         //layer.setPaintProperty(fillColor(Color.RED)); //XXX But not after the object is attached
@@ -307,8 +323,15 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
         PropertyValue<String> fillColor = layer.getFillColor();
         Function<String> function = fillColor.getFunction();
-        Log.d(TAG, "Fill color base: " + function.getBase());
-        Log.d(TAG, "Fill color #stops: " + function.getStops().length);
+        if (function != null) {
+            Log.d(TAG, "Fill color base: " + function.getBase());
+            Log.d(TAG, "Fill color #stops: " + function.getStops().length);
+            if (function.getStops() != null) {
+                for (Stop stop : function.getStops()) {
+                    Log.d(TAG, "Fill color #stops: " + stop);
+                }
+            }
+        }
     }
 
     private String readRawResource(@RawRes int rawResource) throws IOException {

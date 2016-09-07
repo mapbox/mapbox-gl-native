@@ -476,7 +476,7 @@ TEST(OfflineDownload, WithPreviouslyExistingTile) {
     };
 
     test.db.put(
-        Resource::tile("http://127.0.0.1:3000/{z}-{x}-{y}.vector.pbf", 1, 0, 0, 0),
+        Resource::tile("http://127.0.0.1:3000/{z}-{x}-{y}.vector.pbf", 1, 0, 0, 0, Tileset::Scheme::XYZ),
         test.response("0-0-0.vector.pbf"));
 
     auto observer = std::make_unique<MockObserver>();
@@ -510,7 +510,7 @@ TEST(OfflineDownload, ReactivatePreviouslyCompletedDownload) {
     };
 
     test.db.put(
-        Resource::tile("http://127.0.0.1:3000/{z}-{x}-{y}.vector.pbf", 1, 0, 0, 0),
+        Resource::tile("http://127.0.0.1:3000/{z}-{x}-{y}.vector.pbf", 1, 0, 0, 0, Tileset::Scheme::XYZ),
         test.response("0-0-0.vector.pbf"));
 
     auto observer = std::make_unique<MockObserver>();

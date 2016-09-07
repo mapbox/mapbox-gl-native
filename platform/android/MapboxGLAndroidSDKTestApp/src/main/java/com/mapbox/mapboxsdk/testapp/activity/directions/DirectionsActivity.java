@@ -35,7 +35,7 @@ public class DirectionsActivity extends AppCompatActivity {
     private final static String LOG_TAG = "DirectionsActivity";
 
     private MapView mMapView;
-    private MapboxMap mMapboxMap;
+    private MapboxMap mapboxMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +56,7 @@ public class DirectionsActivity extends AppCompatActivity {
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                mMapboxMap = mapboxMap;
+                DirectionsActivity.this.mapboxMap = mapboxMap;
                 loadRoute();
             }
         });
@@ -74,17 +74,17 @@ public class DirectionsActivity extends AppCompatActivity {
                 (origin.getLatitude() + destination.getLatitude()) / 2,
                 (origin.getLongitude() + destination.getLongitude()) / 2);
 
-        mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+        mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
                 .target(centroid)
                 .zoom(14)
                 .build()));
 
         // Add origin and destination to the map
-        mMapboxMap.addMarker(new MarkerOptions()
+        mapboxMap.addMarker(new MarkerOptions()
                 .position(new LatLng(origin.getLatitude(), origin.getLongitude()))
                 .title("Origin")
                 .snippet("Dupont Circle"));
-        mMapboxMap.addMarker(new MarkerOptions()
+        mapboxMap.addMarker(new MarkerOptions()
                 .position(new LatLng(destination.getLatitude(), destination.getLongitude()))
                 .title("Destination")
                 .snippet("The White House"));
@@ -142,7 +142,7 @@ public class DirectionsActivity extends AppCompatActivity {
         }
 
         // Draw Points on MapView
-        mMapboxMap.addPolyline(builder);
+        mapboxMap.addPolyline(builder);
     }
 
     @Override

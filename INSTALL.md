@@ -26,7 +26,8 @@ targets.
  - Modern C++ compiler that supports `-std=c++14`
    - clang++ 3.5 or later _or_
    - g++-5 or later
- - Python 2.x (for build only)
+ - [CMake](https://cmake.org/) 3.1 or later (for build only)
+ - [cURL](https://curl.haxx.se) (for build only)
  - [Node.js](https://nodejs.org/) (for build only)
  - [`pkg-config`](https://wiki.freedesktop.org/www/Software/pkg-config/) (for build only)
 

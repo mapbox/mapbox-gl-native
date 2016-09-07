@@ -37,7 +37,7 @@ public:
     }
 };
 
-template <class T, class V>
+template <class T, class V, class Enable = void>
 struct Converter;
 
 template <class T, typename V, class...Args>

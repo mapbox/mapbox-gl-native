@@ -11,8 +11,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
-import com.mapbox.mapboxsdk.activity.BaseTest;
-import com.mapbox.mapboxsdk.activity.utils.OnMapReadyIdlingResource;
+import com.mapbox.mapboxsdk.utils.OnMapReadyIdlingResource;
 
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +24,7 @@ import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
 /**
- * Basic smoke tests for SymbolLayera
+ * Basic smoke tests for SymbolLayer
  */
 @RunWith(AndroidJUnit4.class)
 public class SymbolLayerTest extends BaseTest {

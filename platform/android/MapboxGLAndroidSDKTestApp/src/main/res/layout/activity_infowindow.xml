@@ -13,12 +13,12 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/mapView"
+        android:id="@id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:style_url="@string/style_mapbox_streets"
         app:center_latitude="38.897705003219784"
         app:center_longitude="-77.03655168667463"
+        app:style_url="@string/style_mapbox_streets"
         app:zoom="15" />
 
 </LinearLayout>

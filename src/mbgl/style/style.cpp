@@ -35,7 +35,7 @@ static Observer nullObserver;
 Style::Style(FileSource& fileSource_, float pixelRatio)
     : fileSource(fileSource_),
       glyphStore(std::make_unique<GlyphStore>(fileSource)),
-      glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
+      glyphAtlas(std::make_unique<GlyphAtlas>(2048, 2048)),
       spriteStore(std::make_unique<SpriteStore>(pixelRatio)),
       spriteAtlas(std::make_unique<SpriteAtlas>(1024, 1024, pixelRatio, *spriteStore)),
       lineAtlas(std::make_unique<LineAtlas>(256, 512)),
@@ -90,7 +90,15 @@ void Style::setJSON(const std::string& json) {
     classes.clear();
 
     Parser parser;
-    parser.parse(json);
+    auto error = parser.parse(json);
+
+    if (error) {
+        Log::Error(Event::ParseStyle, "Failed to parse style: %s", util::toString(error).c_str());
+        observer->onStyleError();
+        observer->onResourceError(error);
+
+        return;
+    }
 
     for (auto& source : parser.sources) {
         addSource(std::move(source));
@@ -99,6 +107,12 @@ void Style::setJSON(const std::string& json) {
     for (auto& layer : parser.layers) {
         addLayer(std::move(layer));
     }
+
+    name = parser.name;
+    defaultLatLng = parser.latLng;
+    defaultZoom = parser.zoom;
+    defaultBearing = parser.bearing;
+    defaultPitch = parser.pitch;
 
     glyphStore->setURL(parser.glyphURL);
     spriteStore->load(parser.spriteURL, fileSource);
@@ -161,6 +175,26 @@ void Style::removeLayer(const std::string& id) {
     if (it == layers.end())
         throw std::runtime_error("no such layer");
     layers.erase(it);
+}
+
+std::string Style::getName() const {
+    return name;
+}
+
+LatLng Style::getDefaultLatLng() const {
+    return defaultLatLng;
+}
+
+double Style::getDefaultZoom() const {
+    return defaultZoom;
+}
+
+double Style::getDefaultBearing() const {
+    return defaultBearing;
+}
+
+double Style::getDefaultPitch() const {
+    return defaultPitch;
 }
 
 void Style::update(const UpdateParameters& parameters) {

@@ -621,12 +621,12 @@ QMargins QMapboxGL::margins() const
     );
 }
 
-void QMapboxGL::addSource(const QString& sourceID, const QVariant& value)
+void QMapboxGL::addSource(const QString &sourceID, const QVariantMap &params)
 {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
-    Result<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(value, sourceID.toStdString());
+    Result<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(QVariant(params), sourceID.toStdString());
     if (!source) {
         qWarning() << "Unable to add source:" << source.error().message.c_str();
         return;
@@ -658,12 +658,12 @@ void QMapboxGL::addCustomLayer(const QString &id,
             before ? mbgl::optional<std::string>(before) : mbgl::optional<std::string>());
 }
 
-void QMapboxGL::addLayer(const QVariant& value)
+void QMapboxGL::addLayer(const QVariantMap &params)
 {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
-    Result<std::unique_ptr<Layer>> layer = convert<std::unique_ptr<Layer>>(value);
+    Result<std::unique_ptr<Layer>> layer = convert<std::unique_ptr<Layer>>(QVariant(params));
     if (!layer) {
         qWarning() << "Unable to add layer:" << layer.error().message.c_str();
         return;

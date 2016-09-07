@@ -80,7 +80,8 @@ inline optional<Value> toValue(const mbgl::android::Value& value) {
     } else if (value.isString()) {
         return { value.toString() };
     } else if (value.isNumber()) {
-       return { value.toNumber() };
+        //Need to cast to a double here as the float is otherwise considered a bool...
+       return { (double) value.toNumber() };
     } else {
         return {};
     }

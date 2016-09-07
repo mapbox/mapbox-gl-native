@@ -43,7 +43,7 @@ import java.util.Random;
 
 public class BulkMarkerActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    private MapboxMap mMapboxMap;
+    private MapboxMap mapboxMap;
     private MapView mMapView;
     private boolean mCustomMarkerView;
     private List<LatLng> mLocations;
@@ -68,7 +68,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                mMapboxMap = mapboxMap;
+                BulkMarkerActivity.this.mapboxMap = mapboxMap;
 
                 if (actionBar != null) {
                     ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.bulk_marker_list, android.R.layout.simple_spinner_item);
@@ -102,7 +102,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     }
 
     private void showMarkers(int amount) {
-        mMapboxMap.clear();
+        mapboxMap.clear();
 
         if (mLocations.size() < amount) {
             amount = mLocations.size();
@@ -128,7 +128,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         for (int i = 0; i < amount; i++) {
             randomIndex = random.nextInt(mLocations.size());
             LatLng latLng = mLocations.get(randomIndex);
-            mMapboxMap.addMarker(new MarkerViewOptions()
+            mapboxMap.addMarker(new MarkerViewOptions()
                     .position(latLng)
                     .icon(icon)
                     .title(String.valueOf(i))
@@ -151,7 +151,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                     .snippet(formatter.format(latLng.getLatitude()) + ", " + formatter.format(latLng.getLongitude())));
         }
 
-        mMapboxMap.addMarkers(markerOptionsList);
+        mapboxMap.addMarkers(markerOptionsList);
     }
 
     @Override
@@ -203,7 +203,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     private class FabClickListener implements View.OnClickListener {
         @Override
         public void onClick(final View v) {
-            if (mMapboxMap != null) {
+            if (mapboxMap != null) {
                 mCustomMarkerView = true;
 
                 // remove fab
@@ -226,7 +226,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                     @Override
                     public void onMapChanged(@MapView.MapChange int change) {
                         if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
-                            if (!mMapboxMap.getMarkerViewManager().getMarkerViewAdapters().isEmpty()) {
+                            if (!mapboxMap.getMarkerViewManager().getMarkerViewAdapters().isEmpty()) {
                                 TextView viewCountView = (TextView) findViewById(R.id.countView);
                                 viewCountView.setText("ViewCache size " + (mMapView.getChildCount() - 5));
                             }
@@ -234,7 +234,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                     }
                 });
 
-                mMapboxMap.getMarkerViewManager().setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
+                mapboxMap.getMarkerViewManager().setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
                     @Override
                     public boolean onMarkerClick(@NonNull Marker marker, @NonNull View view, @NonNull MapboxMap.MarkerViewAdapter adapter) {
                         Toast.makeText(BulkMarkerActivity.this, "Hello " + marker.getId(), Toast.LENGTH_SHORT).show();

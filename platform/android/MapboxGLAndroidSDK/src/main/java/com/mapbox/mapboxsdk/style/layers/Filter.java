@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.style.layers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Utility to build filter expressions more easily:
@@ -36,7 +37,7 @@ public class Filter {
             ArrayList<Object> array = new ArrayList<>(2 + values.length);
             array.add(operator);
             array.add(key);
-            array.addAll(Arrays.asList(values));
+            Collections.addAll(array, values);
             return array.toArray();
         }
     }

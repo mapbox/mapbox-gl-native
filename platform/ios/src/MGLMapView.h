@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class MGLPolyline;
 @class MGLPolygon;
 @class MGLShape;
+@class MGLStyle;
 
 @protocol MGLMapViewDelegate;
 @protocol MGLAnnotation;
@@ -41,25 +42,6 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
     MGLAnnotationVerticalAlignmentTop,
     /** Aligns the annotation vertically at the bottom of the map view. */
     MGLAnnotationVerticalAlignmentBottom,
-};
-
-/** Options for enabling debugging features in an `MGLMapView` instance. */
-typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
-    /** Edges of tile boundaries are shown as thick, red lines to help diagnose
-        tile clipping issues. */
-    MGLMapDebugTileBoundariesMask = 1 << 1,
-    /** Each tile shows its tile coordinate (x/y/z) in the upper-left corner. */
-    MGLMapDebugTileInfoMask = 1 << 2,
-    /** Each tile shows a timestamp indicating when it was loaded. */
-    MGLMapDebugTimestampsMask = 1 << 3,
-    /** Edges of glyphs and symbols are shown as faint, green lines to help
-        diagnose collision and label placement issues. */
-    MGLMapDebugCollisionBoxesMask = 1 << 4,
-    /** Each drawing operation is replaced by a translucent fill. Overlapping
-        drawing operations appear more prominent to help diagnose overdrawing.
-        @note This option does nothing in Release builds of the SDK.
-     */
-    MGLMapDebugOverdrawVisualizationMask = 1 << 5,
 };
 
 /**
@@ -208,33 +190,13 @@ IB_DESIGNABLE
  */
 @property (nonatomic, readonly) UIButton *attributionButton;
 
-/** 
- Currently active style classes, represented as an array of string identifiers.
- */
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses;
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("Use style.styleClasses.")));
 
-/**
- Returns a Boolean value indicating whether the style class with the given
- identifier is currently active.
- 
- @param styleClass The style class to query for.
- @return Whether the style class is currently active.
- */
-- (BOOL)hasStyleClass:(NSString *)styleClass;
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("Use style.hasStyleClass:.")));
 
-/**
- Activates the style class with the given identifier.
- 
- @param styleClass The style class to activate.
- */
-- (void)addStyleClass:(NSString *)styleClass;
+- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("Use style.addStyleClass:.")));
 
-/**
- Deactivates the style class with the given identifier.
- 
- @param styleClass The style class to deactivate.
- */
-- (void)removeStyleClass:(NSString *)styleClass;
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("Use style.removeStyleClass:.")));
 
 #pragma mark Displaying the User’s Location
 
@@ -576,6 +538,14 @@ IB_DESIGNABLE
  Resets the map rotation to a northern heading — a `direction` of `0` degrees.
  */
 - (IBAction)resetNorth;
+
+/**
+ Resets the map to the current style’s default viewport.
+ 
+ If the style doesn’t specify a default viewport, the map resets to a minimum
+ zoom level, a center coordinate of (0, 0), and a northern heading.
+ */
+- (IBAction)resetPosition;
 
 /**
  The coordinate bounds visible in the receiver’s viewport.
@@ -1087,6 +1057,10 @@ IB_DESIGNABLE
  */
 - (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
 
+#pragma mark - Runtime styling API
+
+- (MGLStyle *)style;
+
 #pragma mark Accessing the Underlying Map Data
 
 /**
@@ -1228,12 +1202,6 @@ IB_DESIGNABLE
 - (void)toggleDebug __attribute__((deprecated("Use -setDebugMask:.")));
 
 - (void)emptyMemoryCache __attribute__((deprecated));
-
-/**
-    Resets the map to the minimum zoom level, a center coordinate of (0, 0), and
-    a northern heading.
- */
-- (void)resetPosition;
 
 @end
 

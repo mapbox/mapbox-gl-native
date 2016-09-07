@@ -2,6 +2,8 @@
 format_version: 1.0.0
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 trigger_map:
+- pattern: devicefarmUpload
+  workflow: devicefarmUpload
 - pattern: scheduled
   workflow: scheduled
 - pattern: "*"
@@ -35,6 +37,18 @@ workflows:
             export BUILDTYPE=Release
             make android
             make android-test
+            make android-generate-test
+            wget -O platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml "$BITRISEIO_TEST_ACCESS_TOKEN_UI_TEST_URL"
+            make android-test-apk
+            cd platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
+            wget -O secret.json "$BITRISEIO_GCLOUD_SERVICE_ACCOUNT_JSON_URL"
+            export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+            echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+            curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+            sudo apt-get update && sudo apt-get install google-cloud-sdk
+            gcloud auth activate-service-account --key-file secret.json --project android-gl-native
+            gcloud beta test android devices list
+            gcloud beta test android run --type instrumentation --app MapboxGLAndroidSDKTestApp-debug.apk --test MapboxGLAndroidSDKTestApp-debug-androidTest-unaligned.apk --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 10m
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
@@ -79,3 +93,37 @@ workflows:
 
             cd platform/android
             ./gradlew uploadArchives
+  devicefarmUpload:
+    steps:
+    - script:
+        title: Build
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -eu -o pipefail
+            curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+            sudo apt-get install -y pkg-config nodejs cmake
+            
+            echo "AWS_ACCESS_KEY_ID_DEVICE_FARM=$AWS_ACCESS_KEY_ID_DEVICE_FARM
+            AWS_SECRET_ACCESS_KEY_DEVICE_FARM=$AWS_SECRET_ACCESS_KEY_DEVICE_FARM"
+            >> platform/android/MapboxGLAndroidSDK/gradle.properties
+
+            export BUILDTYPE=Release
+            make apackage
+            
+            make android-generate-test
+            cd platform/android/
+            ./gradlew devicefarmUpload
+    - slack:
+        title: Post to Slack
+        inputs:
+        - webhook_url: "$SLACK_HOOK_URL"
+        - channel: "#gl-bots"
+        - from_username: 'Bitrise Android'
+        - from_username_on_error: 'Bitrise Android'
+        - message: '<${BITRISE_BUILD_URL}|Build #${BITRISE_BUILD_NUMBER}>
+            for devicefarmUpload passed'
+        - message_on_error: '<${BITRISE_BUILD_URL}|Build #${BITRISE_BUILD_NUMBER}>
+            for devicefarmUpload failed'
+        - icon_url: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-icon-128.png
+        - icon_url_on_error: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-error-icon-128.png

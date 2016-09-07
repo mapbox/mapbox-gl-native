@@ -30,7 +30,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 public class MyLocationTintActivity extends AppCompatActivity implements LocationListener {
 
     private MapView mapView;
-    private MapboxMap map;
+    private MapboxMap mapboxMap;
     private boolean firstRun;
 
     private static final int PERMISSIONS_LOCATION = 0;
@@ -53,14 +53,14 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMapReady(MapboxMap mapboxMap) {
-                map = mapboxMap;
+            public void onMapReady(MapboxMap map) {
+                mapboxMap = map;
                 toggleGps(!mapboxMap.isMyLocationEnabled());
 
                 final MyLocationViewSettings myLocationViewSettings = mapboxMap.getMyLocationViewSettings();
 
                 // handle default button clicks
-                ViewUtils.attachClickListener(MyLocationTintActivity.this, R.id.default_user_dot_coloring_button,new View.OnClickListener() {
+                ViewUtils.attachClickListener(MyLocationTintActivity.this, R.id.default_user_dot_coloring_button, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         myLocationViewSettings.setAccuracyTintColor(ContextCompat.getColor(MyLocationTintActivity.this, R.color.my_location_ring));
@@ -69,7 +69,7 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
                 });
 
                 // handle tint user dot button clicks
-                ViewUtils.attachClickListener(MyLocationTintActivity.this, R.id.tint_user_dot_button,new View.OnClickListener() {
+                ViewUtils.attachClickListener(MyLocationTintActivity.this, R.id.tint_user_dot_button, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         myLocationViewSettings.setAccuracyTintColor(ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapbox_green));
@@ -78,7 +78,7 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
                 });
 
                 // handle tint accuracy ring button clicks
-                ViewUtils.attachClickListener(MyLocationTintActivity.this, R.id.user_accuracy_ring_tint_button,new View.OnClickListener() {
+                ViewUtils.attachClickListener(MyLocationTintActivity.this, R.id.user_accuracy_ring_tint_button, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         myLocationViewSettings.setAccuracyTintColor(ContextCompat.getColor(MyLocationTintActivity.this, R.color.accent));
@@ -88,15 +88,20 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
             }
         });
 
-        LocationServices.getLocationServices(this).addLocationListener(this);
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        if (map != null && firstRun) {
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 15));
+        if (mapboxMap != null && firstRun) {
+            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 15));
             firstRun = false;
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocationServices.getLocationServices(this).addLocationListener(this);
     }
 
     @Override
@@ -109,6 +114,12 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
     public void onPause() {
         super.onPause();
         mapView.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocationServices.getLocationServices(this).removeLocationListener(this);
     }
 
     @Override
@@ -156,12 +167,14 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
 
     private void enableLocation(boolean enabled) {
         if (enabled) {
-            map.setMyLocationEnabled(true);
-            if (map.getMyLocation() != null) {
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(map.getMyLocation().getLatitude(), map.getMyLocation().getLongitude()), 15));
+            mapboxMap.setMyLocationEnabled(true);
+            if (mapboxMap.getMyLocation() != null) {
+                mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(mapboxMap.getMyLocation().getLatitude(),
+                                mapboxMap.getMyLocation().getLongitude()), 15));
             }
         } else {
-            map.setMyLocationEnabled(false);
+            mapboxMap.setMyLocationEnabled(false);
         }
     }
 
@@ -180,7 +193,7 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
 
         public static void attachClickListener(@NonNull Activity activity, @IdRes int buttonId, @Nullable View.OnClickListener clickListener) {
             View view = activity.findViewById(buttonId);
-            if(view!=null){
+            if (view != null) {
                 view.setOnClickListener(clickListener);
             }
         }

@@ -45,6 +45,7 @@ public:
     // Layout properties
 
 <% for (const property of layoutProperties) { -%>
+    static PropertyValue<<%- propertyType(property) %>> getDefault<%- camelize(property.name) %>();
     PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() const;
     void set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>>);
 
@@ -53,6 +54,7 @@ public:
     // Paint properties
 
 <% for (const property of paintProperties) { -%>
+    static PropertyValue<<%- propertyType(property) %>> getDefault<%- camelize(property.name) %>();
     PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() const;
     void set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>>, const optional<std::string>& klass = {});
 

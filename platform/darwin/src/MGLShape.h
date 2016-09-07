@@ -2,8 +2,6 @@
 
 #import "MGLAnnotation.h"
 
-#import "MGLTypes.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**

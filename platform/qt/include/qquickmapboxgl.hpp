@@ -8,6 +8,8 @@
 #include <QPointF>
 #include <QQuickFramebufferObject>
 
+#include <QQuickMapboxGLStyle>
+
 class QDeclarativeGeoServiceProvider;
 class QQuickItem;
 
@@ -29,24 +31,11 @@ class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
     // MapboxGL QML Type interface.
-    Q_PROPERTY(QString style READ style WRITE setStyle NOTIFY styleChanged)
+    Q_PROPERTY(QQuickMapboxGLStyle *style READ style WRITE setStyle NOTIFY styleChanged)
     Q_PROPERTY(qreal bearing READ bearing WRITE setBearing NOTIFY bearingChanged)
     Q_PROPERTY(qreal pitch READ pitch WRITE setPitch NOTIFY pitchChanged)
 
 public:
-    struct LayoutPropertyChange {
-        QString layer;
-        QString property;
-        QVariant value;
-    };
-
-    struct PaintPropertyChange {
-        QString layer;
-        QString property;
-        QVariant value;
-        QString klass;
-    };
-
     QQuickMapboxGL(QQuickItem *parent = 0);
     virtual ~QQuickMapboxGL();
 
@@ -82,12 +71,12 @@ public:
 
     Q_INVOKABLE void pan(int dx, int dy);
 
-    QList<LayoutPropertyChange>& layoutPropertyChanges() { return m_layoutChanges; }
-    QList<PaintPropertyChange>& paintPropertyChanges() { return m_paintChanges; }
+    QList<QVariantMap>& layoutPropertyChanges() { return m_layoutChanges; }
+    QList<QVariantMap>& paintPropertyChanges() { return m_paintChanges; }
 
     // MapboxGL QML Type interface.
-    void setStyle(const QString &style);
-    QString style() const;
+    void setStyle(QQuickMapboxGLStyle *);
+    QQuickMapboxGLStyle* style() const;
 
     void setBearing(qreal bearing);
     qreal bearing() const;
@@ -96,9 +85,6 @@ public:
     qreal pitch() const;
 
     QPointF swapPan();
-
-    void setLayoutProperty(const QString &layer, const QString &property, const QVariant &value);
-    void setPaintProperty(const QString &layer, const QString &property, const QVariant &value, const QString &klass = QString());
 
     enum SyncState {
         NothingNeedsSync = 0,
@@ -112,6 +98,10 @@ public:
     };
 
     int swapSyncState();
+
+protected:
+    // QQuickItem implementation.
+    virtual void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value);
 
 signals:
     void minimumZoomLevelChanged();
@@ -133,6 +123,10 @@ signals:
 public slots:
     void setCenter(const QGeoCoordinate &center);
 
+private slots:
+    void onStyleChanged();
+    void onStylePropertyUpdated(const QVariantMap &params);
+
 private:
     qreal m_minimumZoomLevel = 0;
     qreal m_maximumZoomLevel = 20;
@@ -143,10 +137,10 @@ private:
     QGeoCoordinate m_center;
     QGeoShape m_visibleRegion;
     QColor m_color;
-    QList<LayoutPropertyChange> m_layoutChanges;
-    QList<PaintPropertyChange> m_paintChanges;
+    QList<QVariantMap> m_layoutChanges;
+    QList<QVariantMap> m_paintChanges;
 
-    QString m_style;
+    QQuickMapboxGLStyle *m_style = 0;
     qreal m_bearing = 0;
     qreal m_pitch = 0;
 

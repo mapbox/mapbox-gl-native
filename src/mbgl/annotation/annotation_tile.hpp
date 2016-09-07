@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/annotation/annotation.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
@@ -25,13 +26,15 @@ private:
 
 class AnnotationTileFeature : public GeometryTileFeature {
 public:
-    AnnotationTileFeature(FeatureType, GeometryCollection,
+    AnnotationTileFeature(AnnotationID, FeatureType, GeometryCollection,
                           std::unordered_map<std::string, std::string> properties = {{}});
 
     FeatureType getType() const override { return type; }
     optional<Value> getValue(const std::string&) const override;
+    optional<FeatureIdentifier> getID() const override { return { id }; }
     GeometryCollection getGeometries() const override { return geometries; }
 
+    const AnnotationID id;
     const FeatureType type;
     const std::unordered_map<std::string, std::string> properties;
     const GeometryCollection geometries;

@@ -2,6 +2,8 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
+import android.graphics.RectF;
 import android.location.Location;
 import android.os.SystemClock;
 import android.support.annotation.FloatRange;
@@ -42,7 +44,9 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
+import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
+import com.mapbox.services.commons.geojson.Feature;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -117,7 +121,11 @@ public class MapboxMap {
     }
 
     /**
-     * Tries to cast the Layer to T, returns null if it's another type
+     * Tries to cast the Layer to T, returns null if it's another type.
+     *
+     * @param layerId the layer id used to look up a layer
+     * @param <T>     the generic attribute of a Layer
+     * @return the casted Layer, null if another type
      */
     @Nullable
     @UiThread
@@ -152,7 +160,7 @@ public class MapboxMap {
     }
 
     @UiThread
-    public void removeSource(@NonNull String sourceId) {
+    public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
         getMapView().getNativeMapView().removeSource(sourceId);
     }
 
@@ -235,7 +243,7 @@ public class MapboxMap {
     /**
      * Gets the user interface settings for the map.
      *
-     * @return
+     * @return the UiSettings associated with this map
      */
     public UiSettings getUiSettings() {
         return mUiSettings;
@@ -248,7 +256,7 @@ public class MapboxMap {
     /**
      * Gets the tracking interface settings for the map.
      *
-     * @return
+     * @return the TrackingSettings asssociated with this map
      */
     public TrackingSettings getTrackingSettings() {
         return mTrackingSettings;
@@ -260,6 +268,8 @@ public class MapboxMap {
 
     /**
      * Gets the settings of the user location for the map.
+     *
+     * @return the MyLocationViewSettings associated with this map
      */
     public MyLocationViewSettings getMyLocationViewSettings() {
         if (myLocationViewSettings == null) {
@@ -274,6 +284,8 @@ public class MapboxMap {
 
     /**
      * Get the Projection object that you can use to convert between screen coordinates and latitude/longitude coordinates.
+     *
+     * @return the Projection associated with this map
      */
     public Projection getProjection() {
         return mProjection;
@@ -301,7 +313,7 @@ public class MapboxMap {
      * The move is instantaneous, and a subsequent getCameraPosition() will reflect the new position.
      * See CameraUpdateFactory for a set of updates.
      *
-     * @param cameraPosition
+     * @param cameraPosition the camera position to set
      */
     public void setCameraPosition(@NonNull CameraPosition cameraPosition) {
         moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -324,7 +336,8 @@ public class MapboxMap {
      * The move is instantaneous, and a subsequent getCameraPosition() will reflect the new position.
      * See CameraUpdateFactory for a set of updates.
      *
-     * @param update The change that should be applied to the camera.
+     * @param update   The change that should be applied to the camera
+     * @param callback the callback to be invoked when an animation finishes or is canceled
      */
     @UiThread
     public final void moveCamera(CameraUpdate update, MapboxMap.CancelableCallback callback) {
@@ -758,7 +771,7 @@ public class MapboxMap {
         long id = mMapView.addMarker(marker);
         marker.setId(id);
         mAnnotations.put(id, marker);
-        mMarkerViewManager.invalidateViewMarkersInBounds();
+        mMarkerViewManager.invalidateViewMarkersInVisibleRegion();
         return marker;
     }
 
@@ -1139,7 +1152,8 @@ public class MapboxMap {
     /**
      * Return a annotation based on its id.
      *
-     * @return An annotation with a matched id, null is returned if no match was found.
+     * @param id the id used to look up an annotation
+     * @return An annotation with a matched id, null is returned if no match was found
      */
     @Nullable
     public Annotation getAnnotation(long id) {
@@ -1150,7 +1164,7 @@ public class MapboxMap {
      * Returns a list of all the annotations on the map.
      *
      * @return A list of all the annotation objects. The returned object is a copy so modifying this
-     * list will not update the map.
+     * list will not update the map
      */
     @NonNull
     public List<Annotation> getAnnotations() {
@@ -1289,6 +1303,8 @@ public class MapboxMap {
 
     /**
      * Deselects a currently selected marker. The selected marker will have it's info window closed.
+     *
+     * @param marker the marker to deselect
      */
     @UiThread
     public void deselectMarker(@NonNull Marker marker) {
@@ -1750,6 +1766,33 @@ public class MapboxMap {
         mMapView.snapshot(callback, null);
     }
 
+    /**
+     * Queries the map for rendered features
+     *
+     * @param coordinates the point to query
+     * @param layerIds    optionally - only query these layers
+     * @return the list of feature
+     */
+    @UiThread
+    @NonNull
+    public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates, @Nullable String... layerIds) {
+        return mMapView.getNativeMapView().queryRenderedFeatures(coordinates, layerIds);
+    }
+
+    /**
+     * Queries the map for rendered features
+     *
+     * @param coordinates the box to query
+     * @param layerIds    optionally - only query these layers
+     * @return the list of feature
+     */
+    @UiThread
+    @NonNull
+    public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates, @Nullable String... layerIds) {
+        return mMapView.getNativeMapView().queryRenderedFeatures(coordinates, layerIds);
+    }
+
+
     //
     // Interfaces
     //
@@ -2029,9 +2072,6 @@ public class MapboxMap {
 
     /**
      * Interface definition for a callback to be invoked when the user clicks on a MarkerView.
-     * </p>
-     * {@link MarkerViewManager#setOnMarkerViewClickListener(OnMarkerViewClickListener)}
-     * </p>
      */
     public interface OnMarkerViewClickListener {
 
@@ -2126,6 +2166,8 @@ public class MapboxMap {
     public interface SnapshotReadyCallback {
         /**
          * Invoked when the snapshot has been taken.
+         *
+         * @param snapshot the snapshot bitmap
          */
         void onSnapshotReady(Bitmap snapshot);
     }

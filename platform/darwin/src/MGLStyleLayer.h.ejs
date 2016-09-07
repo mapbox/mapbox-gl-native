@@ -1,0 +1,68 @@
+<%
+  const type = locals.type;
+  const layoutProperties = locals.layoutProperties;
+  const paintProperties = locals.paintProperties;
+  const layoutPropertiesByName = locals.layoutPropertiesByName;
+  const paintPropertiesByName = locals.paintPropertiesByName;
+-%>
+// This file is generated. 
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
+
+#import "MGLStyleAttributeValue.h"
+#import "MGLBaseStyleLayer.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+<% for (const property of layoutProperties) { -%>
+<% if (property.type == "enum") { -%>
+typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %>) {
+<% for (const value of property.values) { -%>
+    MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
+<% } -%>
+};
+
+<% } -%>
+<% } -%>
+<% for (const property of paintProperties) { -%>
+<% if (property.type == "enum") { -%>
+typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %>) {
+<% for (const value of property.values) { -%>
+    MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
+<% } -%>
+};
+
+<% } -%>
+<% } -%>
+@interface MGL<%- camelize(type) %>StyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
+
+<% if (layoutProperties.length) { -%>
+#pragma mark - Accessing the Layout Attributes
+
+<% for (const property of layoutProperties) { -%>
+/**
+ <%- propertyDoc(property, type) %><% if ('default' in property) { %>
+ 
+ <% if (property.required) { %>The default value of this property is <%= propertyDefault(property, type) %>.<% } else { %>If this property is set to `nil`, the layer uses an implicit default value of <%= propertyDefault(property, type) %>.<% } %><% } %><% if (property.requires) { %>
+ 
+ <%= propertyReqs(property, layoutPropertiesByName, type) %><% } %>
+ */
+@property (nonatomic<% if (!property.required) { %>, nullable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+
+<% } -%>
+<% } -%>
+#pragma mark - Accessing the Paint Attributes
+
+<% for (const property of paintProperties) { -%>
+/**
+ <%- propertyDoc(property, type) %><% if ('default' in property) { %>
+ 
+ <% if (property.required) { %>The default value of this property is <%= propertyDefault(property, type) %>.<% } else { %>If this property is set to `nil`, the layer uses an implicit default value of <%= propertyDefault(property, type) %>.<% } %><% } %><% if (property.requires) { %>
+
+ <%= propertyReqs(property, paintPropertiesByName, type) %><% } %>
+ */
+@property (nonatomic<% if (!property.required) { %>, nullable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+
+<% } -%>
+@end
+
+NS_ASSUME_NONNULL_END

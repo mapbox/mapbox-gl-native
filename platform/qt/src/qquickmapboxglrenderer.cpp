@@ -2,6 +2,7 @@
 
 #include <QMapboxGL>
 #include <QQuickMapboxGL>
+#include <QQuickMapboxGLStyle>
 
 #include <QSize>
 #include <QOpenGLFramebufferObject>
@@ -28,9 +29,24 @@ QQuickMapboxGLRenderer::~QQuickMapboxGLRenderer()
 
 void QQuickMapboxGLRenderer::onMapChanged(QMapboxGL::MapChange change)
 {
-    if (change == QMapboxGL::MapChangeDidFinishLoadingMap) {
+    auto onMapChangeWillStartLoadingMap = [&]() {
+        m_styleLoaded = false;
+    };
+
+    auto onMapChangeDidFinishLoadingMap = [&]() {
         m_styleLoaded = true;
-        update();
+        emit styleChanged();
+    };
+
+    switch (change) {
+    case QMapboxGL::MapChangeWillStartLoadingMap:
+        onMapChangeWillStartLoadingMap();
+        break;
+    case QMapboxGL::MapChangeDidFinishLoadingMap:
+        onMapChangeDidFinishLoadingMap();
+        break;
+    default:
+        break;
     }
 }
 
@@ -68,8 +84,8 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
         m_map->setCoordinateZoom({ center.latitude(), center.longitude() }, quickMap->zoomLevel());
     }
 
-    if (syncStatus & QQuickMapboxGL::StyleNeedsSync) {
-        m_map->setStyleURL(quickMap->style());
+    if (syncStatus & QQuickMapboxGL::StyleNeedsSync && quickMap->style()) {
+        m_map->setStyleURL(quickMap->style()->url());
         m_styleLoaded = false;
     }
 
@@ -89,14 +105,14 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
     if (m_styleLoaded) {
         if (!quickMap->layoutPropertyChanges().empty()) {
             for (const auto& change: quickMap->layoutPropertyChanges()) {
-                m_map->setLayoutProperty(change.layer, change.property, change.value);
+                m_map->setLayoutProperty(change.value("layer").toString(), change.value("property").toString(), change.value("value"));
             }
             quickMap->layoutPropertyChanges().clear();
         }
 
         if (!quickMap->paintPropertyChanges().empty()) {
             for (const auto& change: quickMap->paintPropertyChanges()) {
-                m_map->setPaintProperty(change.layer, change.property, change.value, change.klass);
+                m_map->setPaintProperty(change.value("layer").toString(), change.value("property").toString(), change.value("value"), change.value("class").toString());
             }
             quickMap->paintPropertyChanges().clear();
         }

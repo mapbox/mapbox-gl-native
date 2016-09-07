@@ -1,7 +1,6 @@
 #import "MGLMultiPoint.h"
 
 #import "MGLGeometry.h"
-#import "MGLTypes.h"
 
 #import <mbgl/annotation/annotation.hpp>
 #import <vector>

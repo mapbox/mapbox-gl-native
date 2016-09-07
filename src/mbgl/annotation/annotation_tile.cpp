@@ -21,9 +21,11 @@ AnnotationTile::~AnnotationTile() {
 
 void AnnotationTile::setNecessity(Necessity) {}
 
-AnnotationTileFeature::AnnotationTileFeature(FeatureType type_, GeometryCollection geometries_,
-                                 std::unordered_map<std::string, std::string> properties_)
-    : type(type_),
+AnnotationTileFeature::AnnotationTileFeature(const AnnotationID id_,
+                                             FeatureType type_, GeometryCollection geometries_,
+                                             std::unordered_map<std::string, std::string> properties_)
+    : id(id_),
+      type(type_),
       properties(std::move(properties_)),
       geometries(std::move(geometries_)) {}
 

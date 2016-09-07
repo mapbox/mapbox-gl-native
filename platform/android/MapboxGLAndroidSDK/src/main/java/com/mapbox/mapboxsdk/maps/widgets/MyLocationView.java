@@ -165,7 +165,6 @@ public class MyLocationView extends View {
 
         foregroundDrawable = defaultDrawable;
         foregroundBearingDrawable = bearingDrawable;
-        setForegroundDrawableTint(foregroundTintColor);
 
         invalidateBounds();
     }
@@ -195,7 +194,6 @@ public class MyLocationView extends View {
         backgroundOffsetTop = top;
         backgroundOffsetRight = right;
         backgroundOffsetBottom = bottom;
-        setShadowDrawableTint(backgroundTintColor);
 
         invalidateBounds();
     }
@@ -322,17 +320,43 @@ public class MyLocationView extends View {
         // setBearing(position.bearing);
     }
 
-    public void onPause() {
-        compassListener.onPause();
-        toggleGps(false);
-    }
-
     public void onResume() {
         if (isEnabled()) {
             if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
                 compassListener.onResume();
             }
             toggleGps(true);
+        }
+    }
+
+    public void onPause() {
+        compassListener.onPause();
+        toggleGps(false);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        // cleanup to prevent memory leaks
+        if (locationChangeAnimator != null) {
+            locationChangeAnimator.cancel();
+            locationChangeAnimator = null;
+        }
+
+        if (accuracyAnimator != null) {
+            accuracyAnimator.cancel();
+            accuracyAnimator = null;
+        }
+
+        if (directionAnimator != null) {
+            directionAnimator.cancel();
+            directionAnimator = null;
+        }
+
+        if (userLocationListener != null) {
+            LocationServices services = LocationServices.getLocationServices(getContext());
+            services.removeLocationListener(userLocationListener);
+            userLocationListener = null;
         }
     }
 
@@ -485,11 +509,11 @@ public class MyLocationView extends View {
     }
 
     public float getCenterX() {
-        return getX() + getMeasuredWidth() / 2;
+        return (getX() + contentPadding[0] - contentPadding[2] + getMeasuredWidth()) / 2;
     }
 
     public float getCenterY() {
-        return getY() + getMeasuredHeight() / 2;
+        return (getY() + contentPadding[1] - contentPadding[3] + getMeasuredHeight()) / 2;
     }
 
     public void setContentPadding(int[] padding) {
@@ -560,19 +584,18 @@ public class MyLocationView extends View {
                 SensorManager.getOrientation(matrix, orientation);
 
                 float magneticHeading = (float) Math.toDegrees(orientation[0]);
+
                 currentDegree = (int) (magneticHeading);
 
                 /**
                  * Mappy, the bearing of the sensor doesn't allow to rotate the map
                  // Change the user location view orientation to reflect the device orientation
-                 setCompass(currentDegree);
+                 setBearing(currentDegree);
 
                  if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-                 rotateCamera();
+                    rotateCamera();
                  }
                  */
-
-                setBearing(currentDegree);
 
                 compassUpdateNextTimestamp = currentTime + COMPASS_UPDATE_RATE_MS;
             }
