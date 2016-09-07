@@ -36,8 +36,6 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
     }
 }
 
-HeadlessView::~HeadlessView() {}
-
 void HeadlessView::resize(const uint16_t width, const uint16_t height) {
     if(dimensions[0] == width &&
        dimensions[1] == height) {
@@ -114,8 +112,8 @@ void HeadlessView::notifyMapChange(MapChange change) {
 #endif
 
 #if MBGL_USE_GLX
-    Display* HeadlessView::xDisplay = nullptr;
-    GLXFBConfig* HeadlessView::fbConfigs = nullptr;
+    Display *HeadlessView::xDisplay = nullptr;
+    GLXFBConfig *HeadlessView::fbConfigs = nullptr;
     GLXContext HeadlessView::glContext = nullptr;
     GLXPbuffer HeadlessView::glxPbuffer = 0;
 #endif
