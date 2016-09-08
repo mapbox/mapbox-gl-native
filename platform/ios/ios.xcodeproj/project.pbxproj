@@ -397,6 +397,7 @@
 		DAED38641D62D0FC00D7640F /* NSURL+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DAED38611D62D0FC00D7640F /* NSURL+MGLAdditions.h */; };
 		DAED38651D62D0FC00D7640F /* NSURL+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DAED38621D62D0FC00D7640F /* NSURL+MGLAdditions.m */; };
 		DAED38661D62D0FC00D7640F /* NSURL+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DAED38621D62D0FC00D7640F /* NSURL+MGLAdditions.m */; };
+		DD58A4C61D822BD000E1F038 /* MGLExpressionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DD58A4C51D822BD000E1F038 /* MGLExpressionTests.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -746,6 +747,7 @@
 		DAD165771CF4CDFF001FF4B9 /* MGLShapeCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLShapeCollection.m; sourceTree = "<group>"; };
 		DAED38611D62D0FC00D7640F /* NSURL+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+MGLAdditions.h"; sourceTree = "<group>"; };
 		DAED38621D62D0FC00D7640F /* NSURL+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+MGLAdditions.m"; sourceTree = "<group>"; };
+		DD58A4C51D822BD000E1F038 /* MGLExpressionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLExpressionTests.mm; path = ../../darwin/test/MGLExpressionTests.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -882,7 +884,7 @@
 			children = (
 				3575798F1D513EF1000B822E /* Layers */,
 				35B8E08B1D6C8B5100E768D2 /* MGLFilterTests.mm */,
-                40CFA64E1D78754A008103BD /* Sources */,
+				40CFA64E1D78754A008103BD /* Sources */,
 			);
 			name = Styling;
 			sourceTree = "<group>";
@@ -1037,6 +1039,7 @@
 				DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */,
 				DA2E885F1CC0382C00F24E7B /* MGLOfflineStorageTests.m */,
 				DA2E88601CC0382C00F24E7B /* MGLStyleTests.mm */,
+				DD58A4C51D822BD000E1F038 /* MGLExpressionTests.mm */,
 				DA2E88551CC036F400F24E7B /* Info.plist */,
 			);
 			name = "SDK Tests";
@@ -1860,6 +1863,7 @@
 				40CFA6511D7875BB008103BD /* MGLGeoJSONSourceTests.mm in Sources */,
 				DA35A2C51CCA9F8300E826B2 /* MGLClockDirectionFormatterTests.m in Sources */,
 				35B8E08C1D6C8B5100E768D2 /* MGLFilterTests.mm in Sources */,
+				DD58A4C61D822BD000E1F038 /* MGLExpressionTests.mm in Sources */,
 				3575798B1D502B0C000B822E /* MGLBackgroundStyleLayerTests.m in Sources */,
 				DA2E88621CC0382C00F24E7B /* MGLOfflinePackTests.m in Sources */,
 				DA35A2AA1CCA058D00E826B2 /* MGLCoordinateFormatterTests.m in Sources */,
