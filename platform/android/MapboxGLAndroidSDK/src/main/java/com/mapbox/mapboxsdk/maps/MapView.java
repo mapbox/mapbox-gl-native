@@ -834,6 +834,12 @@ public class MapView extends FrameLayout {
         if (mDestroyed) {
             return;
         }
+
+        // stopgap for https://github.com/mapbox/mapbox-gl-native/issues/6242
+        if (TextUtils.isEmpty(mNativeMapView.getAccessToken())) {
+            setAccessToken(MapboxAccountManager.getInstance().getAccessToken());
+        }
+
         mStyleUrl = url;
         mNativeMapView.setStyleUrl(url);
     }
