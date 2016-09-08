@@ -1,6 +1,7 @@
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/tile/tile_worker.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/style/bucket_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
@@ -12,7 +13,7 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/exception.hpp>
 
-#include <utility>
+#include <unordered_set>
 
 namespace mbgl {
 
@@ -38,149 +39,141 @@ TileWorker::~TileWorker() {
 
 TileParseResult TileWorker::parseAllLayers(std::vector<std::unique_ptr<Layer>> layers_,
                                            std::unique_ptr<const GeometryTileData> tileData_,
-                                           PlacementConfig config) {
+                                           const PlacementConfig& config) {
     tileData = std::move(tileData_);
     return redoLayout(std::move(layers_), config);
 }
 
 TileParseResult TileWorker::redoLayout(std::vector<std::unique_ptr<Layer>> layers_,
-                                       const PlacementConfig config) {
+                                       const PlacementConfig& config) {
     layers = std::move(layers_);
 
     // We're doing a fresh parse of the tile, because the underlying data or style has changed.
-    pending.clear();
-    placementPending.clear();
-    partialParse = false;
     featureIndex = std::make_unique<FeatureIndex>();
+    symbolLayouts.clear();
 
     // We're storing a set of bucket names we've parsed to avoid parsing a bucket twice that is
     // referenced from more than one layer
-    std::set<std::string> parsed;
+    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+    std::unordered_set<std::string> parsed;
 
     for (auto i = layers.rbegin(); i != layers.rend(); i++) {
-        const Layer* layer = i->get();
-        if (parsed.find(layer->baseImpl->bucketName()) == parsed.end()) {
-            parsed.emplace(layer->baseImpl->bucketName());
-            parseLayer(layer);
+        if (obsolete) {
+            break;
         }
-        featureIndex->addBucketLayerName(layer->baseImpl->bucketName(), layer->baseImpl->id);
-    }
 
-    return prepareResult(config);
-}
+        // Temporary prevention for crashing due to https://github.com/mapbox/mapbox-gl-native/issues/6263.
+        // Instead, the race condition will produce a blank tile.
+        if (!tileData) {
+            break;
+        }
 
-TileParseResult TileWorker::parsePendingLayers(const PlacementConfig config) {
-    // Try parsing the remaining layers that we couldn't parse in the first step due to missing
-    // dependencies.
-    for (auto it = pending.begin(); it != pending.end();) {
-        const SymbolLayer& symbolLayer = *it->first;
-        SymbolBucket* symbolBucket = dynamic_cast<SymbolBucket*>(it->second.get());
+        const Layer* layer = i->get();
+        const std::string& bucketName = layer->baseImpl->bucketName();
 
-        if (!symbolBucket->needsDependencies(glyphStore, spriteStore)) {
-            symbolBucket->addFeatures(reinterpret_cast<uintptr_t>(this),
-                                      *symbolLayer.impl->spriteAtlas,
-                                      glyphAtlas,
-                                      glyphStore);
-            placementPending.emplace(symbolLayer.impl->bucketName(), std::move(it->second));
-            pending.erase(it++);
+        featureIndex->addBucketLayerName(bucketName, layer->baseImpl->id);
+
+        if (parsed.find(bucketName) != parsed.end()) {
             continue;
         }
 
-        // Advance the iterator here; we're skipping this when erasing an element from this list.
-        ++it;
+        parsed.emplace(bucketName);
+
+        auto geometryLayer = tileData->getLayer(layer->baseImpl->sourceLayer);
+        if (!geometryLayer) {
+            continue;
+        }
+
+        BucketParameters parameters(id,
+                                    *geometryLayer,
+                                    obsolete,
+                                    reinterpret_cast<uintptr_t>(this),
+                                    spriteStore,
+                                    glyphAtlas,
+                                    glyphStore,
+                                    *featureIndex,
+                                    mode);
+
+        if (layer->is<SymbolLayer>()) {
+            symbolLayouts.push_back(layer->as<SymbolLayer>()->impl->createLayout(parameters));
+        } else {
+            std::unique_ptr<Bucket> bucket = layer->baseImpl->createBucket(parameters);
+            if (bucket->hasData()) {
+                buckets.emplace(layer->baseImpl->bucketName(), std::move(bucket));
+            }
+        }
     }
 
-    return prepareResult(config);
+    return parsePendingLayers(config, std::move(buckets));
 }
 
-TileParseResult TileWorker::prepareResult(const PlacementConfig& config) {
-    result.complete = pending.empty();
+TileParseResult TileWorker::parsePendingLayers(const PlacementConfig& config) {
+    return parsePendingLayers(config, std::unordered_map<std::string, std::unique_ptr<Bucket>>());
+}
 
+TileParseResult TileWorker::parsePendingLayers(const PlacementConfig& config,
+                                               std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets) {
+    TileParseResultData result;
+
+    result.complete = true;
+    result.buckets = std::move(buckets);
+
+    // Prepare as many SymbolLayouts as possible.
+    for (auto& symbolLayout : symbolLayouts) {
+        if (symbolLayout->state == SymbolLayout::Pending) {
+            if (symbolLayout->canPrepare(glyphStore, spriteStore)) {
+                symbolLayout->state = SymbolLayout::Prepared;
+                symbolLayout->prepare(reinterpret_cast<uintptr_t>(this),
+                                      glyphAtlas,
+                                      glyphStore);
+            } else {
+                result.complete = false;
+            }
+        }
+    }
+
+    // If all SymbolLayouts are prepared, then perform placement. Otherwise, parsePendingLayers
+    // will eventually be re-run.
     if (result.complete) {
-        featureIndex->setCollisionTile(placeLayers(config));
+        TilePlacementResult placementResult = redoPlacement(config);
+
+        featureIndex->setCollisionTile(std::move(placementResult.collisionTile));
+
+        for (auto& bucket : placementResult.buckets) {
+            result.buckets.emplace(std::move(bucket));
+        }
+
         result.featureIndex = std::move(featureIndex);
-        result.tileData = tileData ? tileData->clone() : nullptr;
+
+        if (tileData) {
+            result.tileData = tileData->clone();
+        }
     }
 
     return std::move(result);
 }
 
-std::unique_ptr<CollisionTile> TileWorker::placeLayers(const PlacementConfig config) {
-    auto collisionTile = redoPlacement(&placementPending, config);
-    for (auto &p : placementPending) {
-        p.second->swapRenderData();
-        insertBucket(p.first, std::move(p.second));
-    }
-    placementPending.clear();
-    return collisionTile;
-}
+TilePlacementResult TileWorker::redoPlacement(const PlacementConfig& config) {
+    TilePlacementResult result;
 
-std::unique_ptr<CollisionTile> TileWorker::redoPlacement(
-    const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
-    PlacementConfig config) {
+    result.collisionTile = std::make_unique<CollisionTile>(config);
 
-    auto collisionTile = std::make_unique<CollisionTile>(config);
-
-    for (auto i = layers.rbegin(); i != layers.rend(); i++) {
-        const auto it = buckets->find((*i)->baseImpl->id);
-        if (it != buckets->end()) {
-            it->second->placeFeatures(*collisionTile);
+    for (auto& symbolLayout : symbolLayouts) {
+        if (symbolLayout->state == SymbolLayout::Pending) {
+            // Can't do placement until all layouts are prepared.
+            return result;
         }
     }
 
-    return collisionTile;
-}
-
-void TileWorker::parseLayer(const Layer* layer) {
-    // Cancel early when parsing.
-    if (obsolete)
-        return;
-
-    // Temporary prevention for crashing due to https://github.com/mapbox/mapbox-gl-native/issues/6263.
-    // Instead, the race condition will produce a blank tile.
-    if (!tileData) {
-        return;
-    }
-
-    auto geometryLayer = tileData->getLayer(layer->baseImpl->sourceLayer);
-    if (!geometryLayer) {
-        // The layer specified in the bucket does not exist. Do nothing.
-        if (debug::tileParseWarnings) {
-            Log::Warning(Event::ParseTile, "layer '%s' does not exist in tile %s",
-                    layer->baseImpl->sourceLayer.c_str(), util::toString(id).c_str());
+    for (auto& symbolLayout : symbolLayouts) {
+        symbolLayout->state = SymbolLayout::Placed;
+        std::unique_ptr<Bucket> bucket = symbolLayout->place(*result.collisionTile);
+        if (bucket->hasData() || symbolLayout->hasSymbolInstances()) {
+            result.buckets.emplace(symbolLayout->bucketName, std::move(bucket));
         }
-        return;
     }
 
-    BucketParameters parameters(id,
-                                     *geometryLayer,
-                                     obsolete,
-                                     reinterpret_cast<uintptr_t>(this),
-                                     partialParse,
-                                     spriteStore,
-                                     glyphAtlas,
-                                     glyphStore,
-                                     *featureIndex,
-                                     mode);
-
-    std::unique_ptr<Bucket> bucket = layer->baseImpl->createBucket(parameters);
-
-    if (layer->is<SymbolLayer>()) {
-        if (partialParse) {
-            // We cannot parse this bucket yet. Instead, we're saving it for later.
-            pending.emplace_back(layer->as<SymbolLayer>(), std::move(bucket));
-        } else {
-            placementPending.emplace(layer->baseImpl->bucketName(), std::move(bucket));
-        }
-    } else {
-        insertBucket(layer->baseImpl->bucketName(), std::move(bucket));
-    }
-}
-
-void TileWorker::insertBucket(const std::string& name, std::unique_ptr<Bucket> bucket) {
-    if (bucket->hasData()) {
-        result.buckets.emplace(name, std::move(bucket));
-    }
+    return result;
 }
 
 } // namespace mbgl

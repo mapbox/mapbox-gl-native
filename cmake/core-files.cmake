@@ -79,6 +79,10 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/object_store.cpp
     src/mbgl/gl/object_store.hpp
 
+    # layout
+    src/mbgl/layout/symbol_layout.cpp
+    src/mbgl/layout/symbol_layout.hpp
+
     # map
     include/mbgl/map/camera.hpp
     include/mbgl/map/map.hpp
@@ -250,6 +254,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/tile_source_impl.cpp
     src/mbgl/style/tile_source_impl.hpp
     src/mbgl/style/types.cpp
+    src/mbgl/style/update_batch.hpp
     src/mbgl/style/update_parameters.hpp
 
     # style/conversion

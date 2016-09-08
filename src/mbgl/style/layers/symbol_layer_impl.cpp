@@ -1,6 +1,7 @@
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/style/bucket_parameters.hpp>
+#include <mbgl/layout/symbol_layout.hpp>
+#include <mbgl/renderer/bucket.hpp>
 
 namespace mbgl {
 namespace style {
@@ -25,54 +26,44 @@ bool SymbolLayer::Impl::recalculate(const CalculationParameters& parameters) {
     return hasTransitions;
 }
 
-std::unique_ptr<Bucket> SymbolLayer::Impl::createBucket(BucketParameters& parameters) const {
-    auto bucket = std::make_unique<SymbolBucket>(parameters.tileID.overscaleFactor(),
-                                                 parameters.tileID.overscaledZ,
-                                                 parameters.mode,
-                                                 id,
-                                                 parameters.layer.getName());
+std::unique_ptr<Bucket> SymbolLayer::Impl::createBucket(BucketParameters&) const {
+    assert(false); // Should be calling createLayout() instead.
+    return nullptr;
+}
 
-    bucket->layout = layout;
+std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(BucketParameters& parameters) const {
+    SymbolLayoutProperties layoutProperties = layout;
 
     CalculationParameters p(parameters.tileID.overscaledZ);
-    bucket->layout.symbolPlacement.calculate(p);
-    if (bucket->layout.symbolPlacement.value == SymbolPlacementType::Line) {
-        bucket->layout.iconRotationAlignment.value = AlignmentType::Map;
-        bucket->layout.textRotationAlignment.value = AlignmentType::Map;
-    };
+    layoutProperties.symbolPlacement.calculate(p);
+    if (layoutProperties.symbolPlacement.value == SymbolPlacementType::Line) {
+        layoutProperties.iconRotationAlignment.value = AlignmentType::Map;
+        layoutProperties.textRotationAlignment.value = AlignmentType::Map;
+    }
 
     // If unspecified `text-pitch-alignment` inherits `text-rotation-alignment`
-    if (bucket->layout.textPitchAlignment.value == AlignmentType::Undefined) {
-        bucket->layout.textPitchAlignment.value = bucket->layout.textRotationAlignment.value;
-    };
-
-    bucket->layout.recalculate(p);
-
-    bucket->layout.iconSize.calculate(CalculationParameters(18));
-    bucket->layout.textSize.calculate(CalculationParameters(18));
-    bucket->iconMaxSize = bucket->layout.iconSize;
-    bucket->textMaxSize = bucket->layout.textSize;
-    bucket->layout.iconSize.calculate(CalculationParameters(p.z + 1));
-    bucket->layout.textSize.calculate(CalculationParameters(p.z + 1));
-
-    bucket->parseFeatures(parameters.layer, filter);
-
-    if (bucket->needsDependencies(parameters.glyphStore, parameters.spriteStore)) {
-        parameters.partialParse = true;
+    if (layoutProperties.textPitchAlignment.value == AlignmentType::Undefined) {
+        layoutProperties.textPitchAlignment.value = layoutProperties.textRotationAlignment.value;
     }
 
-    // We do not add features if the parser is in a "partial" state because
-    // the layer ordering needs to be respected when calculating text
-    // collisions. Although, at this point, we requested all the resources
-    // needed by this tile.
-    if (!parameters.partialParse) {
-        bucket->addFeatures(parameters.tileUID,
-                            *spriteAtlas,
-                            parameters.glyphAtlas,
-                            parameters.glyphStore);
-    }
+    layoutProperties.recalculate(p);
 
-    return std::move(bucket);
+    layoutProperties.textSize.calculate(CalculationParameters(18));
+    float textMaxSize = layoutProperties.textSize;
+
+    layoutProperties.iconSize.calculate(CalculationParameters(p.z + 1));
+    layoutProperties.textSize.calculate(CalculationParameters(p.z + 1));
+
+    return std::make_unique<SymbolLayout>(id,
+                                          parameters.layer.getName(),
+                                          parameters.tileID.overscaleFactor(),
+                                          parameters.tileID.overscaledZ,
+                                          parameters.mode,
+                                          parameters.layer,
+                                          filter,
+                                          layoutProperties,
+                                          textMaxSize,
+                                          *spriteAtlas);
 }
 
 } // namespace style

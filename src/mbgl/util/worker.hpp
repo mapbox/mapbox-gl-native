@@ -55,9 +55,8 @@ public:
                        std::function<void(TileParseResult)> callback);
 
     Request redoPlacement(TileWorker&,
-                          const std::unordered_map<std::string, std::unique_ptr<Bucket>>&,
                           PlacementConfig config,
-                          std::function<void(std::unique_ptr<CollisionTile>)> callback);
+                          std::function<void(TilePlacementResult)> callback);
 
 private:
     class Impl;

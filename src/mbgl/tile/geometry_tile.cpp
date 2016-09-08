@@ -193,19 +193,19 @@ void GeometryTile::redoPlacement() {
         return;
     }
 
-    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, config = targetConfig](std::unique_ptr<CollisionTile> collisionTile) {
+    workRequest = worker.redoPlacement(tileWorker, targetConfig, [this, config = targetConfig](TilePlacementResult result) {
         workRequest.reset();
 
         // Persist the configuration we just placed so that we can later check whether we need to
         // place again in case the configuration has changed.
         placedConfig = config;
 
-        for (auto& bucket : buckets) {
-            bucket.second->swapRenderData();
+        for (auto& bucket : result.buckets) {
+            buckets[bucket.first] = std::move(bucket.second);
         }
 
         if (featureIndex) {
-            featureIndex->setCollisionTile(std::move(collisionTile));
+            featureIndex->setCollisionTile(std::move(result.collisionTile));
         }
 
         // The target configuration could have changed since we started placement. In this case,

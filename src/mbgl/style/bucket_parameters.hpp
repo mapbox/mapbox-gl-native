@@ -26,7 +26,6 @@ public:
                           const GeometryTileLayer& layer_,
                           const std::atomic<bool>& obsolete_,
                           uintptr_t tileUID_,
-                          bool& partialParse_,
                           SpriteStore& spriteStore_,
                           GlyphAtlas& glyphAtlas_,
                           GlyphStore& glyphStore_,
@@ -36,7 +35,6 @@ public:
           layer(layer_),
           obsolete(obsolete_),
           tileUID(tileUID_),
-          partialParse(partialParse_),
           spriteStore(spriteStore_),
           glyphAtlas(glyphAtlas_),
           glyphStore(glyphStore_),
@@ -53,7 +51,6 @@ public:
     const GeometryTileLayer& layer;
     const std::atomic<bool>& obsolete;
     uintptr_t tileUID;
-    bool& partialParse;
     SpriteStore& spriteStore;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
