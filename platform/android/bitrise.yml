@@ -38,13 +38,12 @@ workflows:
             set -eu -o pipefail
             curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
             sudo apt-get install -y pkg-config nodejs cmake
-            export BUILDTYPE=Release
+            export BUILDTYPE=Debug
             make android
             make android-test
             make android-generate-test
             wget -O platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml "$BITRISEIO_TEST_ACCESS_TOKEN_UI_TEST_URL"
             make android-test-apk
-            cd platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
             wget -O secret.json "$BITRISEIO_GCLOUD_SERVICE_ACCOUNT_JSON_URL"
             export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
             echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
@@ -52,24 +51,30 @@ workflows:
             sudo apt-get update && sudo apt-get install google-cloud-sdk
             gcloud auth activate-service-account --key-file secret.json --project android-gl-native
             gcloud beta test android devices list
-            gcloud beta test android run --type instrumentation --app MapboxGLAndroidSDKTestApp-debug.apk --test MapboxGLAndroidSDKTestApp-debug-androidTest-unaligned.apk --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 10m
+            gcloud beta test android run --type instrumentation --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest-unaligned.apk --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 10m
     - script:
         title: Download test results
         is_always_run: true
         inputs:
         - content: |-
             #!/bin/bash
-            cd platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
-            rm -f secret.json
             testUri="gs://test-lab-wrrntqk05p31w-h3y1qk44vuunw/"
             testUri=$(gsutil ls $testUri | tail -n1)
             echo "Downloading from : "$testUri
-            gsutil -m cp -R -Z $testUri .
+            cd platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk && gsutil -m cp -R -Z $testUri .
     - deploy-to-bitrise-io@1.2.3:
         inputs:
         - deploy_path: "platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk"
         - notify_user_groups: none
         - is_compress: 'true'
+    - script:
+        title: Run ndk-stack
+        is_always_run: true
+        inputs:
+        - content: |-
+            #!/bin/bash
+            find platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk -type f -name "logcat" -print0 | xargs -0 -Imylogcat mv -i mylogcat ./
+            cat logcat | ndk-stack -sym build/android-arm-v7/Debug
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
