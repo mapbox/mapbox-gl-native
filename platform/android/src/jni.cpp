@@ -11,6 +11,7 @@
 #include "jni.hpp"
 #include "java_types.hpp"
 #include "native_map_view.hpp"
+#include "connectivity_listener.hpp"
 #include "style/layers/layers.hpp"
 #include "style/sources/sources.hpp"
 
@@ -1701,6 +1702,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     java::registerNatives(env);
     registerNativeLayers(env);
     registerNativeSources(env);
+    ConnectivityListener::registerNative(env);
 
     latLngClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/geometry/LatLng");
     latLngClass = jni::NewGlobalRef(env, latLngClass).release();
