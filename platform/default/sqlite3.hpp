@@ -51,6 +51,7 @@ public:
 
 private:
     sqlite3 *db = nullptr;
+    static void errorLogCallback(void *arg, const int err, const char *msg);
 };
 
 class Statement {

@@ -7,6 +7,8 @@
 #include <chrono>
 #include <experimental/optional>
 
+#include <mbgl/platform/log.hpp>
+
 const static bool sqliteVersionCheck __attribute__((unused)) = []() {
     if (sqlite3_libversion_number() / 1000000 != SQLITE_VERSION_NUMBER / 1000000) {
         char message[96];
@@ -26,6 +28,7 @@ template <typename T>
 using optional = std::experimental::optional<T>;
 
 Database::Database(const std::string &filename, int flags) {
+    sqlite3_config(SQLITE_CONFIG_LOG, errorLogCallback, nullptr);
     const int err = sqlite3_open_v2(filename.c_str(), &db, flags, nullptr);
     if (err != SQLITE_OK) {
         const auto message = sqlite3_errmsg(db);
@@ -53,6 +56,16 @@ Database::~Database() {
 
 Database::operator bool() const {
     return db != nullptr;
+}
+
+void Database::errorLogCallback(void *, const int err, const char *msg) {
+    if (err == SQLITE_ERROR) {
+        mbgl::Log::Error(mbgl::Event::Database, "%s (Code %i)", msg, err);
+    } else if (err == SQLITE_WARNING) {
+        mbgl::Log::Warning(mbgl::Event::Database, "%s (Code %i)", msg, err);
+    } else {
+        mbgl::Log::Info(mbgl::Event::Database, "%s (Code %i)", msg, err);
+    }
 }
 
 void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
