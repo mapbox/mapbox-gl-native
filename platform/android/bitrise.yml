@@ -74,7 +74,7 @@ workflows:
         - content: |-
             #!/bin/bash
             find platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk -type f -name "logcat" -print0 | xargs -0 -Imylogcat mv -i mylogcat ./
-            cat logcat | ndk-stack -sym build/android-arm-v7/Debug/obj.target/android
+            cat logcat | ndk-stack -sym build/android-arm-v7/Debug
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
