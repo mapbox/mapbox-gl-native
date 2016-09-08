@@ -103,10 +103,14 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
     };
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MarkerViewOptions that = (MarkerViewOptions) o;
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        MarkerViewOptions that = (MarkerViewOptions) object;
         return marker != null ? marker.equals(that.marker) : that.marker == null;
     }
 

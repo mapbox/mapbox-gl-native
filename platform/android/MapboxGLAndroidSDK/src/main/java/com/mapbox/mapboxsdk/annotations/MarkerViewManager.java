@@ -15,7 +15,6 @@ import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
 import java.util.ArrayList;
@@ -172,7 +171,8 @@ public class MarkerViewManager {
     /**
      * Animate a MarkerView to a deselected state.
      * <p>
-     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onDeselect(MarkerView, View)} will be called to execute an animation.
+     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onDeselect(MarkerView, View)} will be called
+     * to execute an animation.
      * </p>
      *
      * @param marker the MarkerView to deselect
@@ -184,7 +184,8 @@ public class MarkerViewManager {
     /**
      * Animate a MarkerView to a deselected state.
      * <p>
-     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onDeselect(MarkerView, View)} will be called to execute an animation.
+     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onDeselect(MarkerView, View)} will be called
+     * to execute an animation.
      * </p>
      *
      * @param marker        the MarkerView to deselect
@@ -232,7 +233,8 @@ public class MarkerViewManager {
     /**
      * Animate a MarkerView to a selected state.
      * <p>
-     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onSelect(MarkerView, View, boolean)} will be called to execute an animation.
+     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onSelect(MarkerView, View, boolean)} will be
+     * called to execute an animation.
      * </p>
      *
      * @param marker      the MarkerView object to select
@@ -247,7 +249,8 @@ public class MarkerViewManager {
     /**
      * Animate a MarkerView to a selected state.
      * <p>
-     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onSelect(MarkerView, View, boolean)} will be called to execute an animation.
+     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onSelect(MarkerView, View, boolean)} will be
+     * called to execute an animation.
      * </p>
      *
      * @param marker        the MarkerView object to select
@@ -378,13 +381,13 @@ public class MarkerViewManager {
         // remove old markers
         Iterator<MarkerView> iterator = markerViewMap.keySet().iterator();
         while (iterator.hasNext()) {
-            MarkerView m = iterator.next();
-            if (!markers.contains(m)) {
+            MarkerView markerView = iterator.next();
+            if (!markers.contains(markerView)) {
                 // remove marker
-                convertView = markerViewMap.get(m);
+                convertView = markerViewMap.get(markerView);
                 for (MapboxMap.MarkerViewAdapter adapter : markerViewAdapters) {
-                    if (adapter.getMarkerClass().equals(m.getClass())) {
-                        adapter.prepareViewForReuse(m, convertView);
+                    if (adapter.getMarkerClass().equals(markerView.getClass())) {
+                        adapter.prepareViewForReuse(markerView, convertView);
                         adapter.releaseView(convertView);
                         iterator.remove();
                     }
@@ -423,15 +426,15 @@ public class MarkerViewManager {
 
                             adaptedView.setOnClickListener(new View.OnClickListener() {
                                 @Override
-                                public void onClick(final View v) {
+                                public void onClick(final View view) {
                                     boolean clickHandled = false;
                                     if (onMarkerViewClickListener != null) {
-                                        clickHandled = onMarkerViewClickListener.onMarkerClick(marker, v, adapter);
+                                        clickHandled = onMarkerViewClickListener.onMarkerClick(marker, view, adapter);
                                     }
 
                                     if (!clickHandled) {
                                         ensureInfoWindowOffset(marker);
-                                        select(marker, v, adapter);
+                                        select(marker, view, adapter);
                                     }
                                 }
                             });

@@ -127,15 +127,25 @@ public final class PolygonOptions implements Parcelable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
 
-        PolygonOptions polygon = (PolygonOptions) o;
+        PolygonOptions polygon = (PolygonOptions) object;
 
-        if (Float.compare(polygon.getAlpha(), getAlpha()) != 0) return false;
-        if (getFillColor() != polygon.getFillColor()) return false;
-        if (getStrokeColor() != polygon.getStrokeColor()) return false;
+        if (Float.compare(polygon.getAlpha(), getAlpha()) != 0) {
+            return false;
+        }
+        if (getFillColor() != polygon.getFillColor()) {
+            return false;
+        }
+        if (getStrokeColor() != polygon.getStrokeColor()) {
+            return false;
+        }
         return !(getPoints() != null ? !getPoints().equals(polygon.getPoints()) : polygon.getPoints() != null);
     }
 

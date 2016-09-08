@@ -33,17 +33,17 @@ public class MapboxConstants {
     /**
      * Key used to switch storage to external in AndroidManifest.xml
      */
-    public final static String KEY_META_DATA_SET_STORAGE_EXTERNAL = "com.mapbox.SetStorageExternal";
+    public static final String KEY_META_DATA_SET_STORAGE_EXTERNAL = "com.mapbox.SetStorageExternal";
 
     /**
      * Default value for KEY_META_DATA_SET_STORAGE_EXTERNAL (default is internal storage)
      */
-    public final static boolean DEFAULT_SET_STORAGE_EXTERNAL = false;
+    public static final boolean DEFAULT_SET_STORAGE_EXTERNAL = false;
 
     /**
      * Unmeasured state
      */
-    public final static float UNMEASURED = -1f;
+    public static final float UNMEASURED = -1f;
 
     /**
      * Default animation time

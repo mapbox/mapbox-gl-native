@@ -14,10 +14,10 @@ import java.util.List;
  */
 public class LatLngBounds implements Parcelable {
 
-    private final double mLatNorth;
-    private final double mLatSouth;
-    private final double mLonEast;
-    private final double mLonWest;
+    private final double latNorth;
+    private final double latSouth;
+    private final double lonEast;
+    private final double lonWest;
 
     /**
      * Construct a new LatLngBounds based on its corners, given in NESW
@@ -29,10 +29,10 @@ public class LatLngBounds implements Parcelable {
      * @param westLongitude Western Longitude
      */
     LatLngBounds(final double northLatitude, final double eastLongitude, final double southLatitude, final double westLongitude) {
-        this.mLatNorth = northLatitude;
-        this.mLonEast = eastLongitude;
-        this.mLatSouth = southLatitude;
-        this.mLonWest = westLongitude;
+        this.latNorth = northLatitude;
+        this.lonEast = eastLongitude;
+        this.latSouth = southLatitude;
+        this.lonWest = westLongitude;
     }
 
     /**
@@ -42,24 +42,24 @@ public class LatLngBounds implements Parcelable {
      * @return LatLng center of this LatLngBounds
      */
     public LatLng getCenter() {
-        return new LatLng((this.mLatNorth + this.mLatSouth) / 2,
-                (this.mLonEast + this.mLonWest) / 2);
+        return new LatLng((this.latNorth + this.latSouth) / 2,
+                (this.lonEast + this.lonWest) / 2);
     }
 
     public double getLatNorth() {
-        return this.mLatNorth;
+        return this.latNorth;
     }
 
     public double getLatSouth() {
-        return this.mLatSouth;
+        return this.latSouth;
     }
 
     public double getLonEast() {
-        return this.mLonEast;
+        return this.lonEast;
     }
 
     public double getLonWest() {
-        return this.mLonWest;
+        return this.lonWest;
     }
 
     /**
@@ -78,7 +78,7 @@ public class LatLngBounds implements Parcelable {
      * @return Span distance
      */
     public double getLatitudeSpan() {
-        return Math.abs(this.mLatNorth - this.mLatSouth);
+        return Math.abs(this.latNorth - this.latSouth);
     }
 
     /**
@@ -88,7 +88,7 @@ public class LatLngBounds implements Parcelable {
      * @return Span distance
      */
     public double getLongitudeSpan() {
-        return Math.abs(this.mLonEast - this.mLonWest);
+        return Math.abs(this.lonEast - this.lonWest);
     }
 
 
@@ -103,7 +103,7 @@ public class LatLngBounds implements Parcelable {
 
     @Override
     public String toString() {
-        return "N:" + this.mLatNorth + "; E:" + this.mLonEast + "; S:" + this.mLatSouth + "; W:" + this.mLonWest;
+        return "N:" + this.latNorth + "; E:" + this.lonEast + "; S:" + this.latSouth + "; W:" + this.lonWest;
     }
 
     /**
@@ -114,10 +114,10 @@ public class LatLngBounds implements Parcelable {
      * @return LatLngBounds
      */
     static LatLngBounds fromLatLngs(final List<? extends ILatLng> latLngs) {
-        double minLat = 90,
-                minLon = 180,
-                maxLat = -90,
-                maxLon = -180;
+        double minLat = 90;
+        double minLon = 180;
+        double maxLat = -90;
+        double maxLon = -180;
 
         for (final ILatLng gp : latLngs) {
             final double latitude = gp.getLatitude();
@@ -133,24 +133,26 @@ public class LatLngBounds implements Parcelable {
     }
 
     public LatLng[] toLatLngs() {
-        return new LatLng[]{new LatLng(mLatNorth, mLonEast), new LatLng(mLatSouth, mLonWest)};
+        return new LatLng[]{new LatLng(latNorth, lonEast), new LatLng(latSouth, lonWest)};
     }
 
     /**
      * Determines whether this LatLngBounds matches another one via LatLng.
      *
-     * @param o another object
+     * @param object another object
      * @return a boolean indicating whether the LatLngBounds are equal
      */
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o instanceof LatLngBounds) {
-            LatLngBounds other = (LatLngBounds) o;
-            return mLatNorth == other.getLatNorth()
-                    && mLatSouth == other.getLatSouth()
-                    && mLonEast == other.getLonEast()
-                    && mLonWest == other.getLonWest();
+    public boolean equals(final Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object instanceof LatLngBounds) {
+            LatLngBounds other = (LatLngBounds) object;
+            return latNorth == other.getLatNorth()
+                    && latSouth == other.getLatSouth()
+                    && lonEast == other.getLonEast()
+                    && lonWest == other.getLonWest();
         }
         return false;
     }
@@ -165,10 +167,10 @@ public class LatLngBounds implements Parcelable {
     public boolean contains(final ILatLng latLng) {
         final double latitude = latLng.getLatitude();
         final double longitude = latLng.getLongitude();
-        return ((latitude < this.mLatNorth)
-                && (latitude > this.mLatSouth))
-                && ((longitude < this.mLonEast)
-                && (longitude > this.mLonWest));
+        return ((latitude < this.latNorth)
+                && (latitude > this.latSouth))
+                && ((longitude < this.lonEast)
+                && (longitude > this.lonWest));
     }
 
     /**
@@ -192,10 +194,10 @@ public class LatLngBounds implements Parcelable {
      * @return BoundingBox
      */
     public LatLngBounds union(final double lonNorth, final double latEast, final double lonSouth, final double latWest) {
-        return new LatLngBounds((this.mLatNorth < lonNorth) ? lonNorth : this.mLatNorth,
-                (this.mLonEast < latEast) ? latEast : this.mLonEast,
-                (this.mLatSouth > lonSouth) ? lonSouth : this.mLatSouth,
-                (this.mLonWest > latWest) ? latWest : this.mLonWest);
+        return new LatLngBounds((this.latNorth < lonNorth) ? lonNorth : this.latNorth,
+                (this.lonEast < latEast) ? latEast : this.lonEast,
+                (this.latSouth > lonSouth) ? lonSouth : this.latSouth,
+                (this.lonWest > latWest) ? latWest : this.lonWest);
     }
 
     /**
@@ -245,10 +247,10 @@ public class LatLngBounds implements Parcelable {
 
     @Override
     public int hashCode() {
-        return (int) ((mLatNorth + 90)
-                + ((mLatSouth + 90) * 1000)
-                + ((mLonEast + 180) * 1000000)
-                + ((mLonEast + 180) * 1000000000));
+        return (int) ((latNorth + 90)
+                + ((latSouth + 90) * 1000)
+                + ((lonEast + 180) * 1000000)
+                + ((lonEast + 180) * 1000000000));
     }
 
     @Override
@@ -258,10 +260,10 @@ public class LatLngBounds implements Parcelable {
 
     @Override
     public void writeToParcel(final Parcel out, final int arg1) {
-        out.writeDouble(this.mLatNorth);
-        out.writeDouble(this.mLonEast);
-        out.writeDouble(this.mLatSouth);
-        out.writeDouble(this.mLonWest);
+        out.writeDouble(this.latNorth);
+        out.writeDouble(this.lonEast);
+        out.writeDouble(this.latSouth);
+        out.writeDouble(this.lonWest);
     }
 
     private static LatLngBounds readFromParcel(final Parcel in) {
@@ -277,28 +279,28 @@ public class LatLngBounds implements Parcelable {
      */
     public static final class Builder {
 
-        private List<LatLng> mLatLngList;
+        private List<LatLng> latLngList;
 
         public Builder() {
-            mLatLngList = new ArrayList<>();
+            latLngList = new ArrayList<>();
         }
 
         public LatLngBounds build() {
-            if (mLatLngList.size() < 2) {
-                throw new InvalidLatLngBoundsException(mLatLngList.size());
+            if (latLngList.size() < 2) {
+                throw new InvalidLatLngBoundsException(latLngList.size());
             }
-            return LatLngBounds.fromLatLngs(mLatLngList);
+            return LatLngBounds.fromLatLngs(latLngList);
         }
 
-        public Builder includes(List<LatLng> latLngs){
+        public Builder includes(List<LatLng> latLngs) {
             for (LatLng point : latLngs) {
-                mLatLngList.add(point);
+                latLngList.add(point);
             }
             return this;
         }
 
         public Builder include(@NonNull LatLng latLng) {
-            mLatLngList.add(latLng);
+            latLngList.add(latLng);
             return this;
         }
     }

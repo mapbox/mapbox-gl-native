@@ -7,19 +7,19 @@ import android.view.MotionEvent;
 /**
  * @author Almer Thie (code.almeros.com) Copyright (c) 2013, Almer Thie
  *         (code.almeros.com)
- * 
+ *
  *         All rights reserved.
- * 
+ *
  *         Redistribution and use in source and binary forms, with or without
  *         modification, are permitted provided that the following conditions
  *         are met:
- * 
+ *
  *         Redistributions of source code must retain the above copyright
  *         notice, this list of conditions and the following disclaimer.
  *         Redistributions in binary form must reproduce the above copyright
  *         notice, this list of conditions and the following disclaimer in the
  *         documentation and/or other materials provided with the distribution.
- * 
+ *
  *         THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *         "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *         LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -39,7 +39,7 @@ public class MoveGestureDetector extends BaseGestureDetector {
      * Listener which must be implemented which is used by MoveGestureDetector
      * to perform callbacks to any implementing class which is registered to a
      * MoveGestureDetector via the constructor.
-     * 
+     *
      * @see MoveGestureDetector.SimpleOnMoveGestureListener
      */
     public interface OnMoveGestureListener {
@@ -72,14 +72,14 @@ public class MoveGestureDetector extends BaseGestureDetector {
 
     private static final PointF FOCUS_DELTA_ZERO = new PointF();
 
-    private final OnMoveGestureListener mListener;
+    private final OnMoveGestureListener listener;
 
-    private PointF mFocusExternal = new PointF();
-    private PointF mFocusDeltaExternal = new PointF();
+    private PointF focusExternal = new PointF();
+    private PointF focusDeltaExternal = new PointF();
 
     public MoveGestureDetector(Context context, OnMoveGestureListener listener) {
         super(context);
-        mListener = listener;
+        this.listener = listener;
     }
 
     @Override
@@ -88,14 +88,14 @@ public class MoveGestureDetector extends BaseGestureDetector {
         case MotionEvent.ACTION_DOWN:
             resetState(); // In case we missed an UP/CANCEL event
 
-            mPrevEvent = MotionEvent.obtain(event);
-            mTimeDelta = 0;
+            prevEvent = MotionEvent.obtain(event);
+            timeDelta = 0;
 
             updateStateByEvent(event);
             break;
 
         case MotionEvent.ACTION_MOVE:
-            mGestureInProgress = mListener.onMoveBegin(this);
+            gestureInProgress = listener.onMoveBegin(this);
             break;
         }
     }
@@ -105,7 +105,7 @@ public class MoveGestureDetector extends BaseGestureDetector {
         switch (actionCode) {
         case MotionEvent.ACTION_UP:
         case MotionEvent.ACTION_CANCEL:
-            mListener.onMoveEnd(this);
+            listener.onMoveEnd(this);
             resetState();
             break;
 
@@ -115,11 +115,11 @@ public class MoveGestureDetector extends BaseGestureDetector {
             // Only accept the event if our relative pressure is within
             // a certain limit. This can help filter shaky data as a
             // finger is lifted.
-            if (mCurrPressure / mPrevPressure > PRESSURE_THRESHOLD) {
-                final boolean updatePrevious = mListener.onMove(this);
+            if (currPressure / prevPressure > PRESSURE_THRESHOLD) {
+                final boolean updatePrevious = listener.onMove(this);
                 if (updatePrevious) {
-                    mPrevEvent.recycle();
-                    mPrevEvent = MotionEvent.obtain(event);
+                    prevEvent.recycle();
+                    prevEvent = MotionEvent.obtain(event);
                 }
             }
             break;
@@ -129,57 +129,57 @@ public class MoveGestureDetector extends BaseGestureDetector {
     protected void updateStateByEvent(MotionEvent curr) {
         super.updateStateByEvent(curr);
 
-        final MotionEvent prev = mPrevEvent;
+        final MotionEvent prev = prevEvent;
 
         // Focus intenal
-        PointF mCurrFocusInternal = determineFocalPoint(curr);
-        PointF mPrevFocusInternal = determineFocalPoint(prev);
+        PointF currFocusInternal = determineFocalPoint(curr);
+        PointF prevFocusInternal = determineFocalPoint(prev);
 
         // Focus external
         // - Prevent skipping of focus delta when a finger is added or removed
-        boolean mSkipNextMoveEvent = prev.getPointerCount() != curr
+        boolean skipNextMoveEvent = prev.getPointerCount() != curr
                 .getPointerCount();
-        mFocusDeltaExternal = mSkipNextMoveEvent ? FOCUS_DELTA_ZERO
-                : new PointF(mCurrFocusInternal.x - mPrevFocusInternal.x,
-                        mCurrFocusInternal.y - mPrevFocusInternal.y);
+        focusDeltaExternal = skipNextMoveEvent ? FOCUS_DELTA_ZERO
+                : new PointF(currFocusInternal.x - prevFocusInternal.x,
+                        currFocusInternal.y - prevFocusInternal.y);
 
         // - Don't directly use mFocusInternal (or skipping will occur). Add
-        // unskipped delta values to mFocusExternal instead.
-        mFocusExternal.x += mFocusDeltaExternal.x;
-        mFocusExternal.y += mFocusDeltaExternal.y;
+        // unskipped delta values to focusExternal instead.
+        focusExternal.x += focusDeltaExternal.x;
+        focusExternal.y += focusDeltaExternal.y;
     }
 
     /**
      * Determine (multi)finger focal point (a.k.a. center point between all
      * fingers)
-     * 
-     * @param e
+     *
+     * @param motionEvent
      * @return PointF focal point
      */
-    private PointF determineFocalPoint(MotionEvent e) {
+    private PointF determineFocalPoint(MotionEvent motionEvent) {
         // Number of fingers on screen
-        final int pCount = e.getPointerCount();
+        final int pCount = motionEvent.getPointerCount();
         float x = 0.0f;
         float y = 0.0f;
 
         for (int i = 0; i < pCount; i++) {
-            x += e.getX(i);
-            y += e.getY(i);
+            x += motionEvent.getX(i);
+            y += motionEvent.getY(i);
         }
 
         return new PointF(x / pCount, y / pCount);
     }
 
     public float getFocusX() {
-        return mFocusExternal.x;
+        return focusExternal.x;
     }
 
     public float getFocusY() {
-        return mFocusExternal.y;
+        return focusExternal.y;
     }
 
     public PointF getFocusDelta() {
-        return mFocusDeltaExternal;
+        return focusDeltaExternal;
     }
 
 }

@@ -104,10 +104,14 @@ public abstract class Annotation implements Comparable<Annotation> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || !(o instanceof Annotation)) return false;
-        Annotation that = (Annotation) o;
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || !(object instanceof Annotation)) {
+            return false;
+        }
+        Annotation that = (Annotation) object;
         return id == that.getId();
     }
 

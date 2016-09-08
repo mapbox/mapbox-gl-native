@@ -126,15 +126,25 @@ public final class PolylineOptions implements Parcelable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
 
-        PolylineOptions polyline = (PolylineOptions) o;
+        PolylineOptions polyline = (PolylineOptions) object;
 
-        if (Float.compare(polyline.getAlpha(), getAlpha()) != 0) return false;
-        if (getColor() != polyline.getColor()) return false;
-        if (Float.compare(polyline.getWidth(), getWidth()) != 0) return false;
+        if (Float.compare(polyline.getAlpha(), getAlpha()) != 0) {
+            return false;
+        }
+        if (getColor() != polyline.getColor()) {
+            return false;
+        }
+        if (Float.compare(polyline.getWidth(), getWidth()) != 0) {
+            return false;
+        }
         return !(getPoints() != null ? !getPoints().equals(polyline.getPoints()) : polyline.getPoints() != null);
     }
 

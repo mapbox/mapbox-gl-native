@@ -110,11 +110,11 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
     };
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
 
-        MarkerOptions marker = (MarkerOptions) o;
+        MarkerOptions marker = (MarkerOptions) object;
 
         if (getPosition() != null ? !getPosition().equals(marker.getPosition()) : marker.getPosition() != null)
             return false;

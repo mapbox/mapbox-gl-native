@@ -193,8 +193,8 @@ public class MapboxEventManager {
                 userAgent = Util.toHumanReadableAscii(userAgent);
             }
 
-        } catch (Exception e) {
-            Log.e(TAG, "Error Trying to load Staging Credentials: " + e.toString());
+        } catch (Exception exception) {
+            Log.e(TAG, "Error Trying to load Staging Credentials: " + exception.toString());
         }
 
         // Register for battery updates
@@ -228,8 +228,8 @@ public class MapboxEventManager {
                     }
                 }
             }
-        } catch (Exception e) {
-            Log.w(MapboxConstants.TAG, "Error checking for Telemetry Service Config: " + e);
+        } catch (Exception exception) {
+            Log.w(MapboxConstants.TAG, "Error checking for Telemetry Service Config: " + exception);
         }
         throw new TelemetryServiceNotConfiguredException();
     }
@@ -472,8 +472,8 @@ public class MapboxEventManager {
 
                 return hex;
             }
-        } catch (Exception e) {
-            Log.w(TAG, "Error encoding string, will return in original form." + e);
+        } catch (Exception exception) {
+            Log.w(TAG, "Error encoding string, will return in original form." + exception);
         }
         return string;
     }
@@ -605,11 +605,11 @@ public class MapboxEventManager {
         if (wifiMgr.isWifiEnabled()) {
             try {
                 WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-                if (wifiInfo.getNetworkId() != -1){
+                if (wifiInfo.getNetworkId() != -1) {
                     status = true;
                 }
-            } catch (Exception e) {
-                Log.w(TAG, "Error getting Wifi Connection Status: " + e);
+            } catch (Exception exception) {
+                Log.w(TAG, "Error getting Wifi Connection Status: " + exception);
                 status = false;
             }
         }
@@ -751,9 +751,9 @@ public class MapboxEventManager {
                 Response response = client.newCall(request).execute();
                 Log.d(TAG, "response code = " + response.code() + " for events " + events.size());
 
-            } catch (Exception e) {
-                Log.e(TAG, "FlushTheEventsTask borked: " + e);
-                e.printStackTrace();
+            } catch (Exception exception) {
+                Log.e(TAG, "FlushTheEventsTask borked: " + exception);
+                exception.printStackTrace();
             } finally {
                 // Reset Events
                 // ============
