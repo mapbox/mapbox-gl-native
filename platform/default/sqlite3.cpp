@@ -9,6 +9,12 @@
 
 #include <mbgl/platform/log.hpp>
 
+namespace mapbox {
+namespace sqlite {
+
+template <typename T>
+using optional = std::experimental::optional<T>;
+
 const static bool sqliteVersionCheck __attribute__((unused)) = []() {
     if (sqlite3_libversion_number() / 1000000 != SQLITE_VERSION_NUMBER / 1000000) {
         char message[96];
@@ -18,17 +24,13 @@ const static bool sqliteVersionCheck __attribute__((unused)) = []() {
         throw std::runtime_error(message);
     }
 
+    // Enable SQLite logging before initializing the database.
+    sqlite3_config(SQLITE_CONFIG_LOG, Database::errorLogCallback, nullptr);
+
     return true;
 }();
 
-namespace mapbox {
-namespace sqlite {
-
-template <typename T>
-using optional = std::experimental::optional<T>;
-
 Database::Database(const std::string &filename, int flags) {
-    sqlite3_config(SQLITE_CONFIG_LOG, errorLogCallback, nullptr);
     const int err = sqlite3_open_v2(filename.c_str(), &db, flags, nullptr);
     if (err != SQLITE_OK) {
         const auto message = sqlite3_errmsg(db);
