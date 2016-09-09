@@ -23,7 +23,7 @@
             android:layout_weight="0.5"
             mapbox:center_latitude="38.913187"
             mapbox:center_longitude="-77.032546"
-            mapbox:style_url="mapbox://styles/mapbox/streets-v9"
+            mapbox:style_url="mapbox://styles/mapbox/streets-v10"
             mapbox:zoom="12"/>
 
         <!-- SF -->
@@ -35,7 +35,7 @@
             android:layout_weight="0.5"
             mapbox:center_latitude="37.775732"
             mapbox:center_longitude="-122.413985"
-            mapbox:style_url="mapbox://styles/mapbox/outdoors-v9"
+            mapbox:style_url="mapbox://styles/mapbox/outdoors-v10"
             mapbox:zoom="13"/>
     </LinearLayout>
 
