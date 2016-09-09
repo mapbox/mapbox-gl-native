@@ -119,19 +119,6 @@
     XCTAssertNil(versionedMethodError, @"Error compiling regular expression to search for versioned methods.");
     NSUInteger numVersionedMethodDeclarations = [versionedMethodExpression numberOfMatchesInString:styleHeader options:0 range:NSMakeRange(0, styleHeader.length)];
     XCTAssertEqual(numVersionedMethodDeclarations, numVersionedMethods);
-
-    // Test that “current version is” statements are present and current for all versioned style methods.
-    NSError *versionError;
-    NSString *versionExpressionString = @(R"RE(current version is `(\d+)`)RE");
-    NSRegularExpression *versionExpression = [NSRegularExpression regularExpressionWithPattern:versionExpressionString options:0 error:&versionError];
-    XCTAssertNil(versionError, @"Error compiling regular expression to search for current version statements.");
-    NSUInteger numVersionDeclarations = [versionExpression numberOfMatchesInString:styleHeader options:0 range:NSMakeRange(0, styleHeader.length)];
-    XCTAssertEqual(numVersionDeclarations, numVersionedMethods);
-    [versionExpression enumerateMatchesInString:styleHeader options:0 range:NSMakeRange(0, styleHeader.length) usingBlock:^(NSTextCheckingResult * _Nullable result, NSMatchingFlags flags, BOOL * _Nonnull stop) {
-        XCTAssertEqual(result.numberOfRanges, 2, @"Regular expression should have one capture group.");
-        NSString *version = [styleHeader substringWithRange:[result rangeAtIndex:1]];
-        XCTAssertEqual([version integerValue], MGLStyleDefaultVersion, @"Versioned style URL method should document current version as %ld, not %ld.", MGLStyleDefaultVersion, version.integerValue);
-    }];
 }
 
 - (void)testName {
