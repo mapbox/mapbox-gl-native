@@ -10,9 +10,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A version number identifying the default version of the suite of default styles
- provided by Mapbox. This version number may be passed into one of the
- “StyleURLWithVersion” class methods of MGLStyle.
+ A version number identifying the default version of the Mapbox Streets style
+ obtained through the `-streetsStyleURL` method. This version number may also be
+ passed into the `-streetsStyleURLWithVersion:` method.
 
  The value of this constant generally corresponds to the latest released version
  as of the date on which this SDK was published. You can use this constant to
@@ -72,7 +72,7 @@ MGL_EXPORT
  is specified explicitly.
 
  @param version The style’s latest released version. As of publication, the
-    current version is `9`.
+    current version is `10`.
  */
 + (NSURL *)streetsStyleURLWithVersion:(NSInteger)version;
 
@@ -91,7 +91,7 @@ MGL_EXPORT
  Outdoors is a general-purpose style tailored to outdoor activities.
 
  @param version The style’s latest released version. As of publication, the
-    current version is `9`.
+    current version is `10`.
  */
 + (NSURL *)outdoorsStyleURLWithVersion:(NSInteger)version;
 
@@ -173,7 +173,7 @@ MGL_EXPORT
  Streets.
 
  @param version The style’s latest released version. As of publication, the
-    current version is `9`.
+    current version is `10`.
  */
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
