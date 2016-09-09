@@ -61,6 +61,9 @@ private:
     void removeExisting();
     void migrateToVersion3();
     void migrateToVersion4();
+    void migrateToVersion5();
+
+    void echoPragmas();
 
     class Statement {
     public:
