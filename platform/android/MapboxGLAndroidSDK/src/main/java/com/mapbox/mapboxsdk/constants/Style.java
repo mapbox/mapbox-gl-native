@@ -35,13 +35,13 @@ public class Style {
    * constant means your map style will always use the latest version and may change as we
    * improve the style.
    */
-  public static final String MAPBOX_STREETS = "mapbox://styles/mapbox/streets-v9";
+  public static final String MAPBOX_STREETS = "mapbox://styles/mapbox/streets-v10";
 
   /**
    * Outdoors: A general-purpose style tailored to outdoor activities. Using this constant means
    * your map style will always use the latest version and may change as we improve the style.
    */
-  public static final String OUTDOORS = "mapbox://styles/mapbox/outdoors-v9";
+  public static final String OUTDOORS = "mapbox://styles/mapbox/outdoors-v10";
 
   /**
    * Light: Subtle light backdrop for data visualizations. Using this constant means your map
@@ -66,5 +66,5 @@ public class Style {
    * constant means your map style will always use the latest version and may change as we
    * improve the style.
    */
-  public static final String SATELLITE_STREETS = "mapbox://styles/mapbox/satellite-streets-v9";
+  public static final String SATELLITE_STREETS = "mapbox://styles/mapbox/satellite-streets-v10";
 }
