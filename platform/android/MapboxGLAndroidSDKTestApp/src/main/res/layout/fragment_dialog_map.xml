@@ -13,6 +13,6 @@
         mapbox:mapbox_cameraTargetLng="-122.3421"
         mapbox:mapbox_cameraZoom="11"
         mapbox:mapbox_renderTextureMode="true"
-        mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v9" />
+        mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10" />
 
 </LinearLayout>

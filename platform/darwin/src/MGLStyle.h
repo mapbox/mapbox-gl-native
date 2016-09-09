@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
     the constant itself. Such details may change significantly from version to
     version.
  */
-static MGL_EXPORT const NSInteger MGLStyleDefaultVersion = 9;
+static MGL_EXPORT const NSInteger MGLStyleDefaultVersion = 10;
 
 /**
  The proxy object for the current map style.
