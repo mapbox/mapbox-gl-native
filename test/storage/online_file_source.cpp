@@ -4,6 +4,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <gtest/gtest.h>
 
@@ -402,4 +403,14 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitDefault)) {
     });
     
     loop.run();
+}
+
+TEST(OnlineFileSource, ChangeAPIBaseURL){
+    util::RunLoop loop;
+    OnlineFileSource fs;
+    
+    EXPECT_EQ(mbgl::util::API_BASE_URL, fs.getAPIBaseURL());
+    const std::string customURL = "test.domain";
+    fs.setAPIBaseURL(customURL);
+    EXPECT_EQ(customURL, fs.getAPIBaseURL());
 }

@@ -2,6 +2,7 @@
 
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/constants.hpp>
 #include <regex>
 #include <iostream>
 
@@ -10,85 +11,100 @@ using namespace mbgl;
 TEST(Mapbox, SourceURL) {
     EXPECT_EQ(
         "https://api.mapbox.com/v4/user.map.json?access_token=key&secure",
-        mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", "key"));
+        mbgl::util::mapbox::normalizeSourceURL(util::API_BASE_URL, "mapbox://user.map", "key"));
+    EXPECT_EQ(
+        "https://api.example.com/v4/user.map.json?access_token=key&secure",
+        mbgl::util::mapbox::normalizeSourceURL("https://api.example.com", "mapbox://user.map", "key"));
     EXPECT_EQ(
         "http://path",
-        mbgl::util::mapbox::normalizeSourceURL("http://path", "key"));
+        mbgl::util::mapbox::normalizeSourceURL(util::API_BASE_URL, "http://path", "key"));
     EXPECT_THROW(
-        mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", ""),
+        mbgl::util::mapbox::normalizeSourceURL(util::API_BASE_URL, "mapbox://user.map", ""),
         std::runtime_error);
 }
 
 TEST(Mapbox, GlyphsURL) {
     EXPECT_EQ(
         "https://api.mapbox.com/fonts/v1/boxmap/Comic%20Sans/0-255.pbf?access_token=key",
-        mbgl::util::mapbox::normalizeGlyphsURL("mapbox://fonts/boxmap/Comic%20Sans/0-255.pbf", "key"));
+        mbgl::util::mapbox::normalizeGlyphsURL(util::API_BASE_URL, "mapbox://fonts/boxmap/Comic%20Sans/0-255.pbf", "key"));
+    EXPECT_EQ(
+        "https://api.example.com/fonts/v1/boxmap/Comic%20Sans/0-255.pbf?access_token=key",
+         mbgl::util::mapbox::normalizeGlyphsURL("https://api.example.com", "mapbox://fonts/boxmap/Comic%20Sans/0-255.pbf", "key"));
     EXPECT_EQ(
         "https://api.mapbox.com/fonts/v1/boxmap/{fontstack}/{range}.pbf?access_token=key",
-        mbgl::util::mapbox::normalizeGlyphsURL("mapbox://fonts/boxmap/{fontstack}/{range}.pbf", "key"));
+        mbgl::util::mapbox::normalizeGlyphsURL(util::API_BASE_URL, "mapbox://fonts/boxmap/{fontstack}/{range}.pbf", "key"));
     EXPECT_EQ(
         "http://path",
-        mbgl::util::mapbox::normalizeGlyphsURL("http://path", "key"));
+        mbgl::util::mapbox::normalizeGlyphsURL(util::API_BASE_URL, "http://path", "key"));
     EXPECT_EQ(
         "mapbox://path",
-        mbgl::util::mapbox::normalizeGlyphsURL("mapbox://path", "key"));
+        mbgl::util::mapbox::normalizeGlyphsURL(util::API_BASE_URL, "mapbox://path", "key"));
 }
 
 TEST(Mapbox, StyleURL) {
     EXPECT_EQ(
         "mapbox://foo",
-        mbgl::util::mapbox::normalizeStyleURL("mapbox://foo", "key"));
+        mbgl::util::mapbox::normalizeStyleURL(util::API_BASE_URL, "mapbox://foo", "key"));
     EXPECT_EQ(
         "https://api.mapbox.com/styles/v1/user/style?access_token=key",
-        mbgl::util::mapbox::normalizeStyleURL("mapbox://styles/user/style", "key"));
+        mbgl::util::mapbox::normalizeStyleURL(util::API_BASE_URL, "mapbox://styles/user/style", "key"));
+    EXPECT_EQ(
+        "https://api.example.com/styles/v1/user/style?access_token=key",
+        mbgl::util::mapbox::normalizeStyleURL("https://api.example.com", "mapbox://styles/user/style", "key"));
     EXPECT_EQ(
         "https://api.mapbox.com/styles/v1/user/style/draft?access_token=key",
-        mbgl::util::mapbox::normalizeStyleURL("mapbox://styles/user/style/draft", "key"));
+        mbgl::util::mapbox::normalizeStyleURL(util::API_BASE_URL, "mapbox://styles/user/style/draft", "key"));
     EXPECT_EQ(
         "http://path",
-        mbgl::util::mapbox::normalizeStyleURL("http://path", "key"));
+        mbgl::util::mapbox::normalizeStyleURL(util::API_BASE_URL, "http://path", "key"));
 }
 
 TEST(Mapbox, SpriteURL) {
     EXPECT_EQ(
         "map/box/sprites@2x.json",
-        mbgl::util::mapbox::normalizeSpriteURL("map/box/sprites@2x.json", "key"));
+        mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL, "map/box/sprites@2x.json", "key"));
     EXPECT_EQ(
         "mapbox://foo",
-        mbgl::util::mapbox::normalizeSpriteURL("mapbox://foo", "key"));
+        mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL, "mapbox://foo", "key"));
     EXPECT_EQ(
         "https://api.mapbox.com/styles/v1/mapbox/streets-v8/sprite.json?access_token=key",
-        mbgl::util::mapbox::normalizeSpriteURL("mapbox://sprites/mapbox/streets-v8.json", "key"));
+        mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL, "mapbox://sprites/mapbox/streets-v8.json", "key"));
+    EXPECT_EQ(
+        "https://api.example.com/styles/v1/mapbox/streets-v8/sprite.json?access_token=key",
+        mbgl::util::mapbox::normalizeSpriteURL("https://api.example.com", "mapbox://sprites/mapbox/streets-v8.json", "key"));
     EXPECT_EQ(
         "https://api.mapbox.com/styles/v1/mapbox/streets-v8/sprite@2x.png?access_token=key",
-        mbgl::util::mapbox::normalizeSpriteURL("mapbox://sprites/mapbox/streets-v8@2x.png", "key"));
+        mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL, "mapbox://sprites/mapbox/streets-v8@2x.png", "key"));
     EXPECT_EQ(
         "https://api.mapbox.com/styles/v1/mapbox/streets-v8/draft/sprite@2x.png?access_token=key",
-        mbgl::util::mapbox::normalizeSpriteURL("mapbox://sprites/mapbox/streets-v8/draft@2x.png", "key"));
+        mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL, "mapbox://sprites/mapbox/streets-v8/draft@2x.png", "key"));
     EXPECT_EQ(
         "mapbox://sprites/mapbox/streets-v9?fresh=true.png",
-        mbgl::util::mapbox::normalizeSpriteURL(
+        mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL,
             "mapbox://sprites/mapbox/streets-v9?fresh=true.png",
             "key"));
-    EXPECT_EQ("mapbox://////", mbgl::util::mapbox::normalizeSpriteURL("mapbox://////", "key"));
+    EXPECT_EQ("mapbox://////", mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL, "mapbox://////", "key"));
 }
 
 TEST(Mapbox, TileURL) {
     EXPECT_EQ(
         "https://api.mapbox.com/v4/a.b/0/0/0.pbf?access_token=key",
-        mbgl::util::mapbox::normalizeTileURL("mapbox://tiles/a.b/0/0/0.pbf", "key"));
+        mbgl::util::mapbox::normalizeTileURL(util::API_BASE_URL, "mapbox://tiles/a.b/0/0/0.pbf", "key"));
     EXPECT_EQ(
         "https://api.mapbox.com/v4/a.b/0/0/0.png?access_token=key",
-        mbgl::util::mapbox::normalizeTileURL("mapbox://tiles/a.b/0/0/0.png", "key"));
+        mbgl::util::mapbox::normalizeTileURL(util::API_BASE_URL, "mapbox://tiles/a.b/0/0/0.png", "key"));
+    EXPECT_EQ(
+        "https://api.example.com/v4/a.b/0/0/0.png?access_token=key",
+        mbgl::util::mapbox::normalizeTileURL("https://api.example.com", "mapbox://tiles/a.b/0/0/0.png", "key"));
     EXPECT_EQ(
         "https://api.mapbox.com/v4/a.b/0/0/0@2x.webp?access_token=key",
-        mbgl::util::mapbox::normalizeTileURL("mapbox://tiles/a.b/0/0/0@2x.webp", "key"));
+        mbgl::util::mapbox::normalizeTileURL(util::API_BASE_URL, "mapbox://tiles/a.b/0/0/0@2x.webp", "key"));
     EXPECT_EQ(
         "https://api.mapbox.com/v4/a.b,c.d/0/0/0.pbf?access_token=key",
-        mbgl::util::mapbox::normalizeTileURL("mapbox://tiles/a.b,c.d/0/0/0.pbf", "key"));
+        mbgl::util::mapbox::normalizeTileURL(util::API_BASE_URL, "mapbox://tiles/a.b,c.d/0/0/0.pbf", "key"));
     EXPECT_EQ(
         "http://path",
-        mbgl::util::mapbox::normalizeSpriteURL("http://path", "key"));
+        mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL, "http://path", "key"));
 }
 
 TEST(Mapbox, CanonicalURL) {

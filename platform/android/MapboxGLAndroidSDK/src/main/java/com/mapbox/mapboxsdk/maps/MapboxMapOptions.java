@@ -7,15 +7,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.VectorDrawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -79,6 +76,7 @@ public class MapboxMapOptions implements Parcelable {
     private int myLocationAccuracyTintColor;
     private int myLocationAccuracyAlpha;
 
+    private String apiBaseUrl;
     private String style;
     @Deprecated
     private String accessToken;
@@ -123,12 +121,12 @@ public class MapboxMapOptions implements Parcelable {
         }
 
         Bitmap foregroundBearingBitmap = in.readParcelable(getClass().getClassLoader());
-        if(foregroundBearingBitmap!=null) {
+        if (foregroundBearingBitmap != null) {
             myLocationForegroundBearingDrawable = new BitmapDrawable(foregroundBearingBitmap);
         }
 
         Bitmap backgroundBitmap = in.readParcelable(getClass().getClassLoader());
-        if(backgroundBitmap!=null){
+        if (backgroundBitmap != null) {
             myLocationBackgroundDrawable = new BitmapDrawable(backgroundBitmap);
         }
 
@@ -140,6 +138,7 @@ public class MapboxMapOptions implements Parcelable {
 
         style = in.readString();
         accessToken = in.readString();
+        apiBaseUrl = in.readString();
     }
 
     public static Bitmap getBitmapFromDrawable(Drawable drawable) {
@@ -172,6 +171,7 @@ public class MapboxMapOptions implements Parcelable {
 
             mapboxMapOptions.accessToken(typedArray.getString(R.styleable.MapView_access_token));
             mapboxMapOptions.styleUrl(typedArray.getString(R.styleable.MapView_style_url));
+            mapboxMapOptions.apiBaseUrl(typedArray.getString(R.styleable.MapView_api_base_url));
 
             mapboxMapOptions.zoomGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_enabled, true));
             mapboxMapOptions.scrollGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_scroll_enabled, true));
@@ -235,6 +235,17 @@ public class MapboxMapOptions implements Parcelable {
             typedArray.recycle();
         }
         return mapboxMapOptions;
+    }
+
+    /**
+     * Specifies the URL used for API endpoint.
+     *
+     * @param apiBaseUrl The base of our API endpoint
+     * @return This
+     */
+    public MapboxMapOptions apiBaseUrl(String apiBaseUrl) {
+        this.apiBaseUrl = apiBaseUrl;
+        return this;
     }
 
     /**
@@ -584,6 +595,15 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
+     * Get the current configured API endpoint base URL.
+     *
+     * @return Base URL to be used API endpoint.
+     */
+    public String getApiBaseUrl() {
+        return apiBaseUrl;
+    }
+
+    /**
      * Get the current configured initial camera position for a map view.
      *
      * @return CameraPosition to be initially used.
@@ -914,6 +934,7 @@ public class MapboxMapOptions implements Parcelable {
 
         dest.writeString(style);
         dest.writeString(accessToken);
+        dest.writeString(apiBaseUrl);
     }
 
     @Override
@@ -957,6 +978,8 @@ public class MapboxMapOptions implements Parcelable {
         if (!Arrays.equals(myLocationBackgroundPadding, options.myLocationBackgroundPadding))
             return false;
         if (style != null ? !style.equals(options.style) : options.style != null) return false;
+        if (apiBaseUrl != null ? !apiBaseUrl.equals(options.apiBaseUrl) : options.apiBaseUrl != null)
+            return false;
         return accessToken != null ? accessToken.equals(options.accessToken) : options.accessToken == null;
 
     }
@@ -993,6 +1016,7 @@ public class MapboxMapOptions implements Parcelable {
         result = 31 * result + myLocationAccuracyAlpha;
         result = 31 * result + (style != null ? style.hashCode() : 0);
         result = 31 * result + (accessToken != null ? accessToken.hashCode() : 0);
+        result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
         return result;
     }
 }
