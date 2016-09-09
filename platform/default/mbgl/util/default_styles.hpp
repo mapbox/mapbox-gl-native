@@ -24,7 +24,7 @@ const DefaultStyle orderedStyles[] = {
 };
 const size_t numOrderedStyles = sizeof(orderedStyles) / sizeof(DefaultStyle);
 
-static const unsigned currentVersion = 9;
+static const unsigned currentVersion = 10;
 
 } // end namespace default_styles
 } // end namespace util
