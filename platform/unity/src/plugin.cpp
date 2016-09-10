@@ -33,6 +33,8 @@ struct UnityPluginContext {
     std::unique_ptr<mbgl::Map> map;
 
     GLuint texture = 0;
+    int textureWidth = 0;
+    int textureHeight = 0;
 
     std::atomic<bool> cycleStyle;
     float time = 0;
@@ -146,14 +148,10 @@ void DoRendering() {
 
     MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, context.texture));
 
-    int width, height;
-    MBGL_CHECK_ERROR(glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width));
-    MBGL_CHECK_ERROR(glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height));
-
-    context.view->resize(width, height);
+    context.view->resize(context.textureWidth, context.textureHeight);
     context.view->setTexture(context.texture);
 
-    MBGL_CHECK_ERROR(glViewport(0, 0, width, height));
+    MBGL_CHECK_ERROR(glViewport(0, 0, context.textureWidth, context.textureHeight));
 
     if (context.view->swapDirtyState(false)) {
         context.map->render();
@@ -205,8 +203,10 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetTimeFromUnity(floa
 }
 
 // Set the texture we are going to render the map at.
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetTextureFromUnity(void* handle, int, int) {
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetTextureFromUnity(void* handle, int width, int height) {
     context.texture = reinterpret_cast<size_t>(handle);
+    context.textureWidth = width;
+    context.textureHeight = height;
 }
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API CycleStyle() {
