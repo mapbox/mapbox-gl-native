@@ -5,7 +5,7 @@
 
 #include <protozero/pbf_reader.hpp>
 
-#include <map>
+#include <unordered_map>
 #include <unordered_map>
 #include <functional>
 #include <utility>
@@ -49,7 +49,7 @@ private:
     std::string name;
     uint32_t version = 1;
     uint32_t extent = 4096;
-    std::map<std::string, uint32_t> keysMap;
+    std::unordered_map<std::string, uint32_t> keysMap;
     std::vector<std::reference_wrapper<const std::string>> keys;
     std::vector<Value> values;
     std::vector<protozero::pbf_reader> features;
@@ -68,7 +68,7 @@ public:
 private:
     std::shared_ptr<const std::string> data;
     mutable bool parsed = false;
-    mutable std::map<std::string, VectorTileLayer> layers;
+    mutable std::unordered_map<std::string, VectorTileLayer> layers;
 };
 
 VectorTile::VectorTile(const OverscaledTileID& id_,

@@ -6,14 +6,14 @@
 #include <mbgl/util/variant.hpp>
 
 #include <string>
-#include <map>
+#include <unordered_map>
 
 namespace mbgl {
 namespace style {
 namespace conversion {
 
 class Value;
-using ValueMap = std::map<std::string, Value>;
+using ValueMap = std::unordered_map<std::string, Value>;
 using ValueVector = std::vector<Value>;
 class Value : public mbgl::variant<std::string, float, bool, ValueMap, ValueVector> {
      using variant::variant;

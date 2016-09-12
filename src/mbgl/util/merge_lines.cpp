@@ -5,7 +5,7 @@
 namespace mbgl {
 namespace util {
 
-using Index = std::map<size_t, unsigned int>;
+using Index = std::unordered_map<size_t, unsigned int>;
 
 unsigned int mergeFromRight(std::vector<SymbolFeature> &features,
                             Index &rightIndex,

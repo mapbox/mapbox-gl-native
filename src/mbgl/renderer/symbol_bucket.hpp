@@ -45,7 +45,6 @@ public:
     const bool iconsNeedLinear;
 
 private:
-    friend class SymbolLayout;
 
     typedef ElementGroup<2> TextElementGroup;
     typedef ElementGroup<4> IconElementGroup;

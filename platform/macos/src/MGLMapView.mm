@@ -30,7 +30,7 @@
 #import <mbgl/util/constants.hpp>
 #import <mbgl/util/chrono.hpp>
 
-#import <map>
+#import <unordered_map>
 #import <unordered_set>
 
 #import "NSBundle+MGLAdditions.h"
@@ -102,7 +102,7 @@ enum { MGLAnnotationTagNotFound = UINT32_MAX };
 
 /// Mapping from an annotation tag to metadata about that annotation, including
 /// the annotation itself.
-typedef std::map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationContextMap;
+typedef std::unordered_map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationContextMap;
 
 /// Returns an NSImage for the default marker image.
 NSImage *MGLDefaultMarkerImage() {

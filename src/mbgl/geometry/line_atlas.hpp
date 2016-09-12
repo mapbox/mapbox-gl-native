@@ -5,7 +5,7 @@
 #include <mbgl/util/optional.hpp>
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 namespace mbgl {
 
@@ -47,7 +47,7 @@ private:
     bool dirty;
     mbgl::optional<gl::UniqueTexture> texture;
     int nextRow = 0;
-    std::map<size_t, LinePatternPos> positions;
+    std::unordered_map<size_t, LinePatternPos> positions;
 };
 
 } // namespace mbgl
