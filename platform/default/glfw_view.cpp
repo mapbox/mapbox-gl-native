@@ -149,10 +149,11 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_R:
             if (!mods) {
                 static const mbgl::style::TransitionOptions transition { { mbgl::Milliseconds(300) } };
+                view->map->setTransitionOptions(transition);
                 if (view->map->hasClass("night")) {
-                    view->map->removeClass("night", transition);
+                    view->map->removeClass("night");
                 } else {
-                    view->map->addClass("night", transition);
+                    view->map->addClass("night");
                 }
             }
             break;
