@@ -30,6 +30,7 @@ set(MBGL_TEST_FILES
     # math
     test/math/clamp.cpp
     test/math/minmax.cpp
+    test/math/wrap.cpp
 
     # sprite
     test/sprite/sprite_atlas.cpp
