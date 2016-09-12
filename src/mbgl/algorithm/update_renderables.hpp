@@ -4,7 +4,7 @@
 #include <mbgl/util/range.hpp>
 #include <mbgl/storage/resource.hpp>
 
-#include <set>
+#include <unordered_set>
 
 namespace mbgl {
 namespace algorithm {
@@ -21,7 +21,7 @@ void updateRenderables(GetTileFn getTile,
                        const IdealTileIDs& idealTileIDs,
                        const Range<uint8_t>& zoomRange,
                        const uint8_t dataTileZoom) {
-    std::set<UnwrappedTileID> checked;
+    std::unordered_set<UnwrappedTileID> checked;
     bool covered;
     int32_t overscaledZ;
 
