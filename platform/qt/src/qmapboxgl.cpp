@@ -119,9 +119,10 @@ auto toQMapboxTransitionOptions(const mbgl::style::TransitionOptions &options) {
 
 auto fromQStringList(const QStringList &list)
 {
-    std::vector<std::string> strings(list.size());
+    std::vector<std::string> strings;
+    strings.reserve(list.size());
     for (const QString &string : list) {
-        strings.emplace_back(string.toStdString());
+        strings.push_back(string.toStdString());
     }
     return strings;
 }
