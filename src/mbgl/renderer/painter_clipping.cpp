@@ -16,7 +16,7 @@ void Painter::drawClippingMasks(PaintParameters& parameters, const std::map<Unwr
     auto& arrayCoveringPlain = parameters.shaders.coveringPlainArray;
 
     mat4 matrix;
-    const GLuint mask = 0b11111111;
+    const GLuint mask = 0xFFFFFFFF;
 
     config.program = plainShader.getID();
     config.stencilOp.reset();

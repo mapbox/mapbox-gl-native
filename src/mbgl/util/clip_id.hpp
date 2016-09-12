@@ -15,8 +15,8 @@ struct ClipID {
     ClipID() {}
     ClipID(const std::string &mask_, const std::string &reference_) : mask(mask_), reference(reference_) {}
 
-    std::bitset<8> mask;
-    std::bitset<8> reference;
+    std::bitset<32> mask;
+    std::bitset<32> reference;
 
     bool operator==(const ClipID &other) const {
         return mask == other.mask && reference == other.reference;

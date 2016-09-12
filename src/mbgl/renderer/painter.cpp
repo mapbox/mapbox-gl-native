@@ -122,7 +122,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         MBGL_DEBUG_GROUP("clear");
         config.stencilFunc.reset();
         config.stencilTest = GL_TRUE;
-        config.stencilMask = 0xFF;
+        config.stencilMask = 0xFFFFFFFF;
         config.depthTest = GL_FALSE;
         config.depthMask = GL_TRUE;
         config.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
