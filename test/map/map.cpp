@@ -228,3 +228,37 @@ TEST(Map, RemoveLayer) {
 
     test::checkImage("test/fixtures/map/remove_layer", test::render(map));
 }
+
+TEST(Map, Classes) {
+    MapTest test;
+
+    Map map(test.view, test.fileSource, MapMode::Still);
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+
+    EXPECT_FALSE(map.getTransitionOptions().duration);
+
+    auto duration = mbgl::Duration(mbgl::Milliseconds(300));
+    map.setTransitionOptions({ duration });
+    EXPECT_EQ(map.getTransitionOptions().duration, duration);
+
+    map.addClass("test");
+    EXPECT_TRUE(map.hasClass("test"));
+
+    map.removeClass("test");
+    EXPECT_TRUE(map.getClasses().empty());
+
+    std::vector<std::string> classes = { "foo", "bar" };
+    map.setClasses(classes);
+    EXPECT_FALSE(map.hasClass("test"));
+    EXPECT_TRUE(map.hasClass("foo"));
+    EXPECT_TRUE(map.hasClass("bar"));
+
+    // Does nothing - same style JSON.
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    EXPECT_TRUE(map.hasClass("foo"));
+    EXPECT_EQ(map.getTransitionOptions().duration, duration);
+
+    map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));
+    EXPECT_TRUE(map.getClasses().empty());
+    EXPECT_FALSE(map.getTransitionOptions().duration);
+}
