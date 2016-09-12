@@ -51,7 +51,7 @@ void ClipIDGenerator::update(Renderables& renderables) {
 
     if (size > 0) {
         const uint32_t bit_count = util::ceil_log2(size + 1);
-        const std::bitset<8> mask = uint64_t(((1ul << bit_count) - 1) << bit_offset);
+        const std::bitset<32> mask = uint64_t(((1ul << bit_count) - 1) << bit_offset);
 
         // We are starting our count with 1 since we need at least 1 bit set to distinguish between
         // areas without any tiles whatsoever and the current area.
@@ -69,7 +69,7 @@ void ClipIDGenerator::update(Renderables& renderables) {
         bit_offset += bit_count;
     }
 
-    if (bit_offset > 8) {
+    if (bit_offset > 32) {
         Log::Error(Event::OpenGL, "stencil mask overflow");
     }
 }
