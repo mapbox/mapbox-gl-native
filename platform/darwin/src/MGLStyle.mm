@@ -217,7 +217,8 @@ static NSURL *MGLStyleURL_emerald;
     }
     
     mbgl::style::TransitionOptions transition { { MGLDurationInSeconds(transitionDuration) } };
-    self.mapView.mbglMap->setClasses(newAppliedClasses, transition);
+    self.mapView.mbglMap->setTransitionOptions(transition);
+    self.mapView.mbglMap->setClasses(newAppliedClasses);
 }
 
 - (BOOL)hasStyleClass:(NSString *)styleClass
