@@ -51,9 +51,12 @@ public:
     void update(Update update);
 
     // Styling
-    void addClass(const std::string&, const style::TransitionOptions& = {});
-    void removeClass(const std::string&, const style::TransitionOptions& = {});
-    void setClasses(const std::vector<std::string>&, const style::TransitionOptions& = {});
+    void addClass(const std::string&);
+    void removeClass(const std::string&);
+    void setClasses(const std::vector<std::string>&);
+
+    style::TransitionOptions getTransitionOptions() const;
+    void setTransitionOptions(const style::TransitionOptions&);
 
     bool hasClass(const std::string&) const;
     std::vector<std::string> getClasses() const;

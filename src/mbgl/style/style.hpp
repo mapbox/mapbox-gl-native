@@ -79,10 +79,14 @@ public:
     double getDefaultBearing() const;
     double getDefaultPitch() const;
 
-    bool addClass(const std::string&, const TransitionOptions& = {});
-    bool removeClass(const std::string&, const TransitionOptions& = {});
+    bool addClass(const std::string&);
+    bool removeClass(const std::string&);
+    void setClasses(const std::vector<std::string>&);
+
+    TransitionOptions getTransitionOptions() const;
+    void setTransitionOptions(const TransitionOptions&);
+
     bool hasClass(const std::string&) const;
-    void setClasses(const std::vector<std::string>&, const TransitionOptions& = {});
     std::vector<std::string> getClasses() const;
 
     RenderData getRenderData(MapDebugOptions) const;
@@ -107,7 +111,7 @@ private:
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<std::unique_ptr<Layer>> layers;
     std::vector<std::string> classes;
-    optional<TransitionOptions> transitionProperties;
+    TransitionOptions transitionOptions;
 
     // Defaults
     std::string name;

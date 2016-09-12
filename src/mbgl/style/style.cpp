@@ -58,10 +58,9 @@ Style::~Style() {
     spriteStore->setObserver(nullptr);
 }
 
-bool Style::addClass(const std::string& className, const TransitionOptions& properties) {
+bool Style::addClass(const std::string& className) {
     if (hasClass(className)) return false;
     classes.push_back(className);
-    transitionProperties = properties;
     return true;
 }
 
@@ -69,29 +68,36 @@ bool Style::hasClass(const std::string& className) const {
     return std::find(classes.begin(), classes.end(), className) != classes.end();
 }
 
-bool Style::removeClass(const std::string& className, const TransitionOptions& properties) {
+bool Style::removeClass(const std::string& className) {
     const auto it = std::find(classes.begin(), classes.end(), className);
     if (it != classes.end()) {
         classes.erase(it);
-        transitionProperties = properties;
         return true;
     }
     return false;
 }
 
-void Style::setClasses(const std::vector<std::string>& classNames, const TransitionOptions& properties) {
+void Style::setClasses(const std::vector<std::string>& classNames) {
     classes = classNames;
-    transitionProperties = properties;
 }
 
 std::vector<std::string> Style::getClasses() const {
     return classes;
 }
 
+void Style::setTransitionOptions(const TransitionOptions& options) {
+    transitionOptions = options;
+}
+
+TransitionOptions Style::getTransitionOptions() const {
+    return transitionOptions;
+}
+
 void Style::setJSON(const std::string& json) {
     sources.clear();
     layers.clear();
     classes.clear();
+    transitionOptions = {};
     updateBatch = {};
 
     Parser parser;
@@ -249,10 +255,8 @@ void Style::cascade(const TimePoint& timePoint, MapMode mode) {
     const CascadeParameters parameters {
         classIDs,
         mode == MapMode::Continuous ? timePoint : Clock::time_point::max(),
-        mode == MapMode::Continuous ? transitionProperties.value_or(immediateTransition) : immediateTransition
+        mode == MapMode::Continuous ? transitionOptions : immediateTransition
     };
-
-    transitionProperties = {};
 
     for (const auto& layer : layers) {
         layer->baseImpl->cascade(parameters);

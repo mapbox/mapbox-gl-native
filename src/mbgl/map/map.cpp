@@ -896,22 +896,35 @@ bool Map::isFullyLoaded() const {
     return impl->style ? impl->style->isLoaded() : false;
 }
 
-void Map::addClass(const std::string& className, const TransitionOptions& properties) {
-    if (impl->style && impl->style->addClass(className, properties)) {
+void Map::addClass(const std::string& className) {
+    if (impl->style && impl->style->addClass(className)) {
         update(Update::Classes);
     }
 }
 
-void Map::removeClass(const std::string& className, const TransitionOptions& properties) {
-    if (impl->style && impl->style->removeClass(className, properties)) {
+void Map::removeClass(const std::string& className) {
+    if (impl->style && impl->style->removeClass(className)) {
         update(Update::Classes);
     }
 }
 
-void Map::setClasses(const std::vector<std::string>& classNames, const TransitionOptions& properties) {
+void Map::setClasses(const std::vector<std::string>& classNames) {
     if (impl->style) {
-        impl->style->setClasses(classNames, properties);
+        impl->style->setClasses(classNames);
         update(Update::Classes);
+    }
+}
+
+style::TransitionOptions Map::getTransitionOptions() const {
+    if (impl->style) {
+        return impl->style->getTransitionOptions();
+    }
+    return {};
+}
+
+void Map::setTransitionOptions(const style::TransitionOptions& options) {
+    if (impl->style) {
+        impl->style->setTransitionOptions(options);
     }
 }
 
