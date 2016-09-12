@@ -18,6 +18,12 @@ Build with:
 $ make unity
 ```
 
+It should produce the following plugin depending on your target architecture:
+
+```
+build/unity-[linux/macos]-x86_64/Debug/libRenderingPlugin.so
+```
+
 ### Running
 
 Build the original example as instructed on the Unity documentation. You will see a ball and a plasma effect like this:
@@ -30,7 +36,13 @@ Set the environment variable `MAPBOX_ACCESS_TOKEN` to your [Mapbox access token]
 $ export MAPBOX_ACCESS_TOKEN=MYTOKEN
 ```
 
-Replace the plugin `libRenderingPlugin.so` in the example with `libMapboxGLPlugin.so` and run it again. It should look like:
+On Linux, replace `UnityProject/Assets/Plugins/x86_64/libRenderingPlugin.so` in the example with `libRenderingPlugin.so`.
+On macOS, replace `UnityProject/Assets/Plugins/RenderingPlugin.bundle/Contents/MacOS/RenderingPlugin` in the example with `libRenderingPlugin.so`.
+
+On Linux (only), make sure to copy `common/ca-bundle.crt` to the root of the game runtime before running it.
+
+
+Build the example again, it should look like:
 
 ![Now rendering a map](https://c1.staticflickr.com/9/8839/27951118054_5fb1ec3920_n.jpg)
 
@@ -39,3 +51,5 @@ The plugin was written for OpenGL, you might need to force it when running the U
 ```
 $ ./mygame -force-opengl
 ```
+
+You can also change the texture size on `UseRenderingPlugin.cs` to get a better resolution map. The file `plugin.log` will be created with logs of possible runtime errors.
