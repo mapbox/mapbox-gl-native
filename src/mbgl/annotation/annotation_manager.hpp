@@ -8,7 +8,7 @@
 
 #include <string>
 #include <vector>
-#include <set>
+#include <unordered_set>
 #include <unordered_map>
 
 namespace mbgl {
@@ -72,8 +72,8 @@ private:
     SymbolAnnotationTree symbolTree;
     SymbolAnnotationMap symbolAnnotations;
     ShapeAnnotationMap shapeAnnotations;
-    std::set<std::string> obsoleteShapeAnnotationLayers;
-    std::set<AnnotationTile*> tiles;
+    std::unordered_set<std::string> obsoleteShapeAnnotationLayers;
+    std::unordered_set<AnnotationTile*> tiles;
     SpriteAtlas spriteAtlas;
 };
 
