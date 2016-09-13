@@ -14,8 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy) NSURL *URL;
 
 @property (nonatomic, readonly, copy) NS_ARRAY_OF(NSString *) *tileURLTemplates;
-@property (nonatomic, readonly) NSUInteger minimumZoomLevel;
-@property (nonatomic, readonly) NSUInteger maximumZoomLevel;
+@property (nonatomic, readonly) uint8_t minimumZoomLevel;
+@property (nonatomic, readonly) uint8_t maximumZoomLevel;
 
 /**
  Initializes and returns a vector source from a remote url.
