@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <cstdint>
+#include <unordered_set>
 #include <boost/functional/hash.hpp>
 
 namespace mbgl {
@@ -13,6 +14,8 @@ struct GlyphRangeHash {
         return boost::hash_value(glyphRange);
     }
 };
+
+typedef std::unordered_set<GlyphRange, GlyphRangeHash> GlyphRangeSet;
     
 } // end namespace mbgl
 

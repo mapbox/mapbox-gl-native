@@ -88,7 +88,7 @@ private:
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
 
-    std::unordered_set<GlyphRange, GlyphRangeHash> ranges;
+    GlyphRangeSet ranges;
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 };
