@@ -136,6 +136,12 @@ void TileWorker::parseLayer(const Layer* layer) {
     if (obsolete)
         return;
 
+    // Temporary prevention for crashing due to https://github.com/mapbox/mapbox-gl-native/issues/6263.
+    // Instead, the race condition will produce a blank tile.
+    if (!tileData) {
+        return;
+    }
+
     auto geometryLayer = tileData->getLayer(layer->baseImpl->sourceLayer);
     if (!geometryLayer) {
         // The layer specified in the bucket does not exist. Do nothing.
