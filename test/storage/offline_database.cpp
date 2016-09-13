@@ -554,6 +554,20 @@ static int databaseUserVersion(const std::string& path) {
     return stmt.get<int>(0);
 }
 
+static std::string databaseJournalMode(const std::string& path) {
+    mapbox::sqlite::Database db(path, mapbox::sqlite::ReadOnly);
+    mapbox::sqlite::Statement stmt = db.prepare("pragma journal_mode");
+    stmt.run();
+    return stmt.get<std::string>(0);
+}
+
+static int databaseSyncMode(const std::string& path) {
+    mapbox::sqlite::Database db(path, mapbox::sqlite::ReadOnly);
+    mapbox::sqlite::Statement stmt = db.prepare("pragma synchronous");
+    stmt.run();
+    return stmt.get<int>(0);
+}
+
 TEST(OfflineDatabase, MigrateFromV2Schema) {
     using namespace mbgl;
 
@@ -573,4 +587,48 @@ TEST(OfflineDatabase, MigrateFromV2Schema) {
     EXPECT_EQ(5, databaseUserVersion("test/fixtures/offline_database/v5.db"));
     EXPECT_LT(databasePageCount("test/fixtures/offline_database/v5.db"),
               databasePageCount("test/fixtures/offline_database/v2.db"));
+}
+
+TEST(OfflineDatabase, MigrateFromV3Schema) {
+    using namespace mbgl;
+
+    // v3.db is a v3 database, migrated from v2.
+
+    deleteFile("test/fixtures/offline_database/v5.db");
+    writeFile("test/fixtures/offline_database/v5.db", util::read_file("test/fixtures/offline_database/v3.db"));
+
+    {
+        OfflineDatabase db("test/fixtures/offline_database/v5.db", 0);
+        auto regions = db.listRegions();
+        for (auto& region : regions) {
+            db.deleteRegion(std::move(region));
+        }
+    }
+
+    EXPECT_EQ(5, databaseUserVersion("test/fixtures/offline_database/v5.db"));
+}
+
+TEST(OfflineDatabase, MigrateFromV4Schema) {
+    using namespace mbgl;
+
+    // v4.db is a v4 database, migrated from v2 & v3. This database used `journal_mode = WAL` and `synchronous = NORMAL`.
+
+    deleteFile("test/fixtures/offline_database/v5.db");
+    writeFile("test/fixtures/offline_database/v5.db", util::read_file("test/fixtures/offline_database/v4.db"));
+
+    {
+        OfflineDatabase db("test/fixtures/offline_database/v5.db", 0);
+        auto regions = db.listRegions();
+        for (auto& region : regions) {
+            db.deleteRegion(std::move(region));
+        }
+    }
+
+    EXPECT_EQ(5, databaseUserVersion("test/fixtures/offline_database/v5.db"));
+
+    // Journal mode should be DELETE after migration to v5.
+    EXPECT_EQ("delete", databaseJournalMode("test/fixtures/offline_database/v5.db"));
+
+    // Synchronous setting should be FULL (2) after migration to v5.
+    EXPECT_EQ(2, databaseSyncMode("test/fixtures/offline_database/v5.db"));
 }
