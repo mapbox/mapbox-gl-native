@@ -91,11 +91,9 @@ SymbolLayout::SymbolLayout(std::string bucketName_,
 
             ft.label = util::utf8_to_utf32::convert(u8string);
 
-            if (!ft.label.empty()) {
-                // Loop through all characters of this text and collect unique codepoints.
-                for (char32_t chr : ft.label) {
-                    ranges.insert(getGlyphRange(chr));
-                }
+            // Loop through all characters of this text and collect unique codepoints.
+            for (char32_t chr : *ft.label) {
+                ranges.insert(getGlyphRange(chr));
             }
         }
 
@@ -103,8 +101,7 @@ SymbolLayout::SymbolLayout(std::string bucketName_,
             ft.sprite = util::replaceTokens(layout.iconImage, getValue);
         }
 
-        if (ft.label.length() || ft.sprite.length()) {
-
+        if (ft.label || ft.sprite) {
             auto &multiline = ft.geometry;
 
             GeometryCollection geometryCollection = feature->getGeometries();
@@ -194,9 +191,9 @@ void SymbolLayout::prepare(uintptr_t tileUID,
         GlyphPositions face;
 
         // if feature has text, shape the text
-        if (feature.label.length()) {
+        if (feature.label) {
             shapedText = glyphSet->getShaping(
-                /* string */ feature.label,
+                /* string */ *feature.label,
                 /* maxWidth: ems */ layout.symbolPlacement != SymbolPlacementType::Line ?
                     layout.textMaxWidth * 24 : 0,
                 /* lineHeight: ems */ layout.textLineHeight * 24,
@@ -208,13 +205,13 @@ void SymbolLayout::prepare(uintptr_t tileUID,
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shapedText) {
-                glyphAtlas.addGlyphs(tileUID, feature.label, layout.textFont, **glyphSet, face);
+                glyphAtlas.addGlyphs(tileUID, *feature.label, layout.textFont, **glyphSet, face);
             }
         }
 
         // if feature has icon, get sprite atlas position
-        if (feature.sprite.length()) {
-            auto image = spriteAtlas.getImage(feature.sprite, SpritePatternMode::Single);
+        if (feature.sprite) {
+            auto image = spriteAtlas.getImage(*feature.sprite, SpritePatternMode::Single);
             if (image) {
                 shapedIcon = shapeIcon(*image, layout);
                 assert((*image).spriteImage);
