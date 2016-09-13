@@ -40,7 +40,9 @@ AnnotationManager::~AnnotationManager() = default;
 
 AnnotationID AnnotationManager::addAnnotation(const Annotation& annotation, const uint8_t maxZoom) {
     AnnotationID id = nextID++;
-    updateAnnotation(id, annotation, maxZoom);
+    Annotation::visit(annotation, [&] (const auto& annotation_) {
+        this->add(id, annotation_, maxZoom);
+    });
     return id;
 }
 
@@ -57,6 +59,8 @@ void AnnotationManager::removeAnnotation(const AnnotationID& id) {
     } else if (shapeAnnotations.find(id) != shapeAnnotations.end()) {
         obsoleteShapeAnnotationLayers.insert(shapeAnnotations.at(id)->layerID);
         shapeAnnotations.erase(id);
+    } else {
+        assert(false); // Should never happen
     }
 }
 
@@ -85,13 +89,14 @@ void AnnotationManager::add(const AnnotationID& id, const StyleSourcedAnnotation
 }
 
 Update AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t maxZoom) {
+    Update result = Update::Nothing;
+    
     auto it = symbolAnnotations.find(id);
     if (it == symbolAnnotations.end()) {
-        removeAndAdd(id, annotation, maxZoom);
-        return Update::AnnotationData | Update::AnnotationStyle;
+        assert(false); // Attempt to update a non-existent symbol annotation
+        return result;
     }
 
-    Update result = Update::Nothing;
     const SymbolAnnotation& existing = it->second->annotation;
 
     if (existing.geometry != annotation.geometry) {
@@ -110,16 +115,31 @@ Update AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation&
 }
 
 Update AnnotationManager::update(const AnnotationID& id, const LineAnnotation& annotation, const uint8_t maxZoom) {
+    auto it = shapeAnnotations.find(id);
+    if (it == shapeAnnotations.end()) {
+        assert(false); // Attempt to update a non-existent shape annotation
+        return Update::Nothing;
+    }
     removeAndAdd(id, annotation, maxZoom);
     return Update::AnnotationData | Update::AnnotationStyle;
 }
 
 Update AnnotationManager::update(const AnnotationID& id, const FillAnnotation& annotation, const uint8_t maxZoom) {
+    auto it = shapeAnnotations.find(id);
+    if (it == shapeAnnotations.end()) {
+        assert(false); // Attempt to update a non-existent shape annotation
+        return Update::Nothing;
+    }
     removeAndAdd(id, annotation, maxZoom);
     return Update::AnnotationData | Update::AnnotationStyle;
 }
 
 Update AnnotationManager::update(const AnnotationID& id, const StyleSourcedAnnotation& annotation, const uint8_t maxZoom) {
+    auto it = shapeAnnotations.find(id);
+    if (it == shapeAnnotations.end()) {
+        assert(false); // Attempt to update a non-existent shape annotation
+        return Update::Nothing;
+    }
     removeAndAdd(id, annotation, maxZoom);
     return Update::AnnotationData | Update::AnnotationStyle;
 }
