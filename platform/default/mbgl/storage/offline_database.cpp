@@ -49,7 +49,8 @@ void OfflineDatabase::ensureSchema() {
             case 1: break; // cache-only database; ok to delete
             case 2: migrateToVersion3(); // fall through
             case 3: migrateToVersion4(); // fall through
-            case 4: return;
+            case 4: migrateToVersion5(); // fall through
+            case 5: return;
             default: throw std::runtime_error("unknown schema version");
             }
 
@@ -80,10 +81,11 @@ void OfflineDatabase::ensureSchema() {
 
         // If you change the schema you must write a migration from the previous version.
         db->exec("PRAGMA auto_vacuum = INCREMENTAL");
-        db->exec("PRAGMA synchronous = NORMAL");
         db->exec("PRAGMA journal_mode = WAL");
+        db->exec("PRAGMA synchronous = NORMAL");
+        db->exec("PRAGMA temp_store = MEMORY");
         db->exec(schema);
-        db->exec("PRAGMA user_version = 4");
+        db->exec("PRAGMA user_version = 5");
     } catch (...) {
         Log::Error(Event::Database, "Unexpected error creating database schema: %s", util::toString(std::current_exception()).c_str());
         throw;
@@ -115,9 +117,14 @@ void OfflineDatabase::migrateToVersion3() {
 }
 
 void OfflineDatabase::migrateToVersion4() {
-    db->exec("PRAGMA synchronous = NORMAL");
     db->exec("PRAGMA journal_mode = WAL");
+    db->exec("PRAGMA synchronous = NORMAL");
     db->exec("PRAGMA user_version = 4");
+}
+
+void OfflineDatabase::migrateToVersion5() {
+    db->exec("PRAGMA temp_store = MEMORY");
+    db->exec("PRAGMA user_version = 5");
 }
 
 OfflineDatabase::Statement OfflineDatabase::getStatement(const char * sql) {
