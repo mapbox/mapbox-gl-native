@@ -1514,11 +1514,14 @@ public class MapView extends FrameLayout {
         }
 
         // Required by ZoomButtonController (from Android SDK documentation)
-        if (mMapboxMap.getUiSettings().isZoomControlsEnabled() && (visibility != View.VISIBLE)) {
-            mZoomButtonsController.setVisible(false);
-        }
-        if (mMapboxMap.getUiSettings().isZoomControlsEnabled() && (visibility == View.VISIBLE)) {
-            mZoomButtonsController.setVisible(true);
+        if (visibility == View.VISIBLE) {
+            if (mMapboxMap != null && mMapboxMap.getUiSettings().isZoomControlsEnabled()) {
+                mZoomButtonsController.setVisible(true);
+            }
+        } else {
+            if (mMapboxMap != null && mMapboxMap.getUiSettings().isZoomControlsEnabled()) {
+                mZoomButtonsController.setVisible(false);
+            }
         }
     }
 
