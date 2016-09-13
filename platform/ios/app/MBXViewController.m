@@ -908,4 +908,15 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     point.coordinate = [self.mapView convertPoint:self.mapView.center toCoordinateFromView:self.mapView];
 }
 
+- (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView
+{
+#warning debug code
+    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithSourceIdentifier:@"mapzen" tileURLTemplates:@[@"https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"] minimumZoomLevel:0 maximumZoomLevel:18];
+    [self.mapView.style addSource:vectorSource];
+    
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"filllayer" source:vectorSource sourceLayer:@"buildings"];
+    fillLayer.fillColor = [UIColor magentaColor];
+    [self.mapView.style addLayer:fillLayer];
+}
+
 @end
