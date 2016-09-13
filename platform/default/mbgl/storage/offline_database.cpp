@@ -40,8 +40,6 @@ void OfflineDatabase::connect(int flags) {
 }
 
 void OfflineDatabase::ensureSchema() {
-    Log::Info(Event::Database, "ensureSchema");
-
     if (path != ":memory:") {
         try {
             connect(mapbox::sqlite::ReadWrite);
@@ -88,25 +86,10 @@ void OfflineDatabase::ensureSchema() {
         db->exec("PRAGMA temp_store = MEMORY");
         db->exec(schema);
         db->exec("PRAGMA user_version = 5");
-
-        Log::Info(Event::Database, "Initial install.");
-        echoPragmas();
     } catch (...) {
         Log::Error(Event::Database, "Unexpected error creating database schema: %s", util::toString(std::current_exception()).c_str());
         throw;
     }
-}
-
-void OfflineDatabase::echoPragmas() {
-    // PRAGMA schema.synchronous = 0 | OFF | 1 | NORMAL | 2 | FULL | 3 | EXTRA;
-    auto stmt = getStatement("PRAGMA synchronous;");
-    stmt->run();
-    Log::Info(Event::Database, "synchronous = %s", stmt->get<std::string>(0).c_str());
-
-    // PRAGMA temp_store = 0 | DEFAULT | 1 | FILE | 2 | MEMORY;
-    auto stmt2 = getStatement("PRAGMA temp_store;");
-    stmt2->run();
-    Log::Info(Event::Database, "temp_store = %s", stmt2->get<std::string>(0).c_str());
 }
 
 int OfflineDatabase::userVersion() {
@@ -131,26 +114,17 @@ void OfflineDatabase::migrateToVersion3() {
     db->exec("PRAGMA auto_vacuum = INCREMENTAL");
     db->exec("VACUUM");
     db->exec("PRAGMA user_version = 3");
-
-    Log::Info(Event::Database, "migrateToVersion3");
-    echoPragmas();
 }
 
 void OfflineDatabase::migrateToVersion4() {
     db->exec("PRAGMA journal_mode = WAL");
     db->exec("PRAGMA synchronous = NORMAL");
     db->exec("PRAGMA user_version = 4");
-
-    Log::Info(Event::Database, "migrateToVersion4");
-    echoPragmas();
 }
 
 void OfflineDatabase::migrateToVersion5() {
     db->exec("PRAGMA temp_store = MEMORY");
     db->exec("PRAGMA user_version = 5");
-
-    Log::Info(Event::Database, "migrateToVersion5");
-    echoPragmas();
 }
 
 OfflineDatabase::Statement OfflineDatabase::getStatement(const char * sql) {
