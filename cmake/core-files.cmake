@@ -84,6 +84,9 @@ set(MBGL_CORE_FILES
     src/mbgl/layout/clip_lines.hpp
     src/mbgl/layout/merge_lines.cpp
     src/mbgl/layout/merge_lines.hpp
+    src/mbgl/layout/symbol_feature.hpp
+    src/mbgl/layout/symbol_instance.cpp
+    src/mbgl/layout/symbol_instance.hpp
     src/mbgl/layout/symbol_layout.cpp
     src/mbgl/layout/symbol_layout.hpp
 

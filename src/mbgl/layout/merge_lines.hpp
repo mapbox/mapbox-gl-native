@@ -1,11 +1,15 @@
 #pragma once
 
+#include <mbgl/tile/geometry_tile_data.hpp>
+
 #include <unordered_map>
 #include <string>
 #include <vector>
-#include <mbgl/layout/symbol_layout.hpp>
 
 namespace mbgl {
+
+class SymbolFeature;
+
 namespace util {
 
 unsigned int mergeFromRight(std::vector<SymbolFeature> &features,

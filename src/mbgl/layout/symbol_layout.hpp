@@ -1,10 +1,9 @@
 #pragma once
 
-#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/map/mode.hpp>
-#include <mbgl/text/collision_feature.hpp>
-#include <mbgl/text/quads.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/layout/symbol_feature.hpp>
+#include <mbgl/layout/symbol_instance.hpp>
 
 #include <memory>
 #include <map>
@@ -13,46 +12,19 @@
 
 namespace mbgl {
 
+class GeometryTileLayer;
 class CollisionTile;
 class SpriteAtlas;
 class SpriteStore;
 class GlyphAtlas;
 class GlyphStore;
-class IndexedSubfeature;
 class SymbolBucket;
 
 namespace style {
 class Filter;
 } // namespace style
 
-class SymbolFeature {
-public:
-    GeometryCollection geometry;
-    std::u32string label;
-    std::string sprite;
-    std::size_t index;
-};
-
 struct Anchor;
-
-class SymbolInstance {
-public:
-    explicit SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
-            const Shaping& shapedText, const PositionedIcon& shapedIcon,
-            const style::SymbolLayoutProperties&, const bool inside, const uint32_t index,
-            const float textBoxScale, const float textPadding, style::SymbolPlacementType textPlacement,
-            const float iconBoxScale, const float iconPadding, style::SymbolPlacementType iconPlacement,
-            const GlyphPositions& face, const IndexedSubfeature& indexedfeature);
-
-    Point<float> point;
-    uint32_t index;
-    bool hasText;
-    bool hasIcon;
-    SymbolQuads glyphQuads;
-    SymbolQuads iconQuads;
-    CollisionFeature textCollisionFeature;
-    CollisionFeature iconCollisionFeature;
-};
 
 class SymbolLayout {
 public:

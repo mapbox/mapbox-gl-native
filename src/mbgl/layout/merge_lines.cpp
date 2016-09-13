@@ -1,4 +1,5 @@
 #include <mbgl/layout/merge_lines.hpp>
+#include <mbgl/layout/symbol_feature.hpp>
 
 #include <boost/functional/hash.hpp>
 
