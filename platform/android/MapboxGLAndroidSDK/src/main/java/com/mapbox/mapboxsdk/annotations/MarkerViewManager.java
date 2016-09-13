@@ -117,9 +117,9 @@ public class MarkerViewManager {
                 PointF point = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
                 if (marker.getOffsetX() == -1) {
                     // ensure view is measured first
-                    if (convertView.getMeasuredWidth() == 0) {
+                    //if (convertView.getMeasuredWidth() == 0) {
                         convertView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-                    }
+                    //}
                     int x = (int) (marker.getAnchorU() * convertView.getMeasuredWidth());
                     int y = (int) (marker.getAnchorV() * convertView.getMeasuredHeight());
                     marker.setOffset(x, y);
