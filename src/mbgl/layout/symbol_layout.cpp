@@ -1,4 +1,6 @@
 #include <mbgl/layout/symbol_layout.hpp>
+#include <mbgl/layout/merge_lines.hpp>
+#include <mbgl/layout/clip_lines.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
@@ -10,8 +12,6 @@
 #include <mbgl/util/utf.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/math.hpp>
-#include <mbgl/util/merge_lines.hpp>
-#include <mbgl/util/clip_lines.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>

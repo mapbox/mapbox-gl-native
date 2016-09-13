@@ -1,6 +1,6 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/util/merge_lines.hpp>
+#include <mbgl/layout/merge_lines.hpp>
 
 const std::u32string aaa = U"a";
 const std::u32string bbb = U"b";

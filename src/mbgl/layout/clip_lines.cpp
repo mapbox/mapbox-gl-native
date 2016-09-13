@@ -1,4 +1,4 @@
-#include <mbgl/util/clip_lines.hpp>
+#include <mbgl/layout/clip_lines.hpp>
 
 #include <cmath>
 

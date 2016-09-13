@@ -1,4 +1,4 @@
-#include "merge_lines.hpp"
+#include <mbgl/layout/merge_lines.hpp>
 
 #include <boost/functional/hash.hpp>
 

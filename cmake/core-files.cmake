@@ -80,6 +80,10 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/object_store.hpp
 
     # layout
+    src/mbgl/layout/clip_lines.cpp
+    src/mbgl/layout/clip_lines.hpp
+    src/mbgl/layout/merge_lines.cpp
+    src/mbgl/layout/merge_lines.hpp
     src/mbgl/layout/symbol_layout.cpp
     src/mbgl/layout/symbol_layout.hpp
 
@@ -410,8 +414,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/chrono.cpp
     src/mbgl/util/clip_id.cpp
     src/mbgl/util/clip_id.hpp
-    src/mbgl/util/clip_lines.cpp
-    src/mbgl/util/clip_lines.hpp
     src/mbgl/util/color.cpp
     src/mbgl/util/compression.cpp
     src/mbgl/util/constants.cpp
@@ -443,8 +445,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/mat4.hpp
     src/mbgl/util/math.cpp
     src/mbgl/util/math.hpp
-    src/mbgl/util/merge_lines.cpp
-    src/mbgl/util/merge_lines.hpp
     src/mbgl/util/premultiply.cpp
     src/mbgl/util/premultiply.hpp
     src/mbgl/util/rapidjson.hpp
