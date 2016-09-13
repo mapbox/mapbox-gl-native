@@ -11,7 +11,7 @@
 #include <string>
 #include <map>
 #include <mutex>
-#include <set>
+#include <unordered_set>
 #include <array>
 #include <memory>
 
@@ -140,7 +140,7 @@ private:
     std::recursive_mutex mtx;
     BinPack<dimension> bin;
     std::map<Key, Holder> images;
-    std::set<std::string> uninitialized;
+    std::unordered_set<std::string> uninitialized;
     std::unique_ptr<uint32_t[]> data;
     std::atomic<bool> dirtyFlag;
     bool fullUploadRequired = true;
