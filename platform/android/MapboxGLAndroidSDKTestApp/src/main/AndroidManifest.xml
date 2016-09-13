@@ -383,6 +383,16 @@
                 android:name="@string/category"
                 android:value="@string/category_navigation" />
         </activity>
+        <activity
+            android:name=".activity.annotation.AddRemoveMarkerActivity"
+            android:description="@string/description_add_remove_markers"
+            android:label="@string/activity_add_remove_markers">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_annotation" />
+        </activity>
+
+
         <!-- For Unit tests -->
         <activity android:name=".activity.style.RuntimeStyleTestActivity" />
         <activity android:name=".activity.style.RuntimeStyleTimingTestActivity" />
