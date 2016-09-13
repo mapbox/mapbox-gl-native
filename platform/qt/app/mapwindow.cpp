@@ -71,6 +71,8 @@ void MapWindow::changeStyle()
     if (++currentStyleIndex == styles.size()) {
         currentStyleIndex = 0;
     }
+
+    m_sourceAdded = false;
 }
 
 void MapWindow::keyPressEvent(QKeyEvent *ev)
@@ -82,30 +84,115 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
         changeStyle();
         break;
     case Qt::Key_L: {
-            m_map.setPaintProperty("water", "fill-color", QColor(255, 0, 0));
-            m_map.setPaintProperty("building", "fill-color", "red");
-            m_map.setPaintProperty("road-secondary-tertiary", "line-color", "red");
+            if (m_sourceAdded) {
+                return;
+            }
 
-            m_map.setLayoutProperty("road-label-small", "symbol-placement", "point");
-            m_map.setLayoutProperty("road-label-medium", "symbol-placement", "point");
-            m_map.setLayoutProperty("road-label-large", "symbol-placement", "point");
+            m_sourceAdded = true;
 
             QFile geojson(":source.geojson");
             geojson.open(QIODevice::ReadOnly);
 
-            QVariantMap testSource;
-            testSource["type"] = "geojson";
-            testSource["data"] = geojson.readAll();
+            // The data source for the route line and markers
+            QVariantMap routeSource;
+            routeSource["type"] = "geojson";
+            routeSource["data"] = geojson.readAll();
+            m_map.addSource("routeSource", routeSource);
 
-            m_map.addSource("testSource", testSource);
+            // The route case, painted before the route
+            QVariantMap routeCase;
+            routeCase["id"] = "routeCase";
+            routeCase["type"] = "line";
+            routeCase["source"] = "routeSource";
+            m_map.addLayer(routeCase);
 
-            QVariantMap testLayer;
-            testLayer["id"] = "testLayer";
-            testLayer["type"] = "fill";
-            testLayer["source"] = "testSource";
+            m_map.setPaintProperty("routeCase", "line-color", QColor("white"));
+            m_map.setPaintProperty("routeCase", "line-width", 20.0);
+            m_map.setLayoutProperty("routeCase", "line-join", "round");
+            m_map.setLayoutProperty("routeCase", "line-cap", "round");
 
-            m_map.addLayer(testLayer);
-            m_map.setPaintProperty("testLayer", "fill-color", QColor("blue"));
+            // The route, painted on top of the route case
+            QVariantMap route;
+            route["id"] = "route";
+            route["type"] = "line";
+            route["source"] = "routeSource";
+            m_map.addLayer(route);
+
+            m_map.setPaintProperty("route", "line-color", QColor("blue"));
+            m_map.setPaintProperty("route", "line-width", 8.0);
+            m_map.setLayoutProperty("route", "line-join", "round");
+            m_map.setLayoutProperty("route", "line-cap", "round");
+
+            // Markers at the beginning and end of the route
+            m_map.addImage("label-arrow", QImage(":label-arrow.svg"));
+            m_map.addImage("label-background", QImage(":label-background.svg"));
+
+            QVariantMap makerArrow;
+            makerArrow["id"] = "makerArrow";
+            makerArrow["type"] = "symbol";
+            makerArrow["source"] = "routeSource";
+            m_map.addLayer(makerArrow);
+
+            m_map.setLayoutProperty("makerArrow", "icon-image", "label-arrow");
+            m_map.setLayoutProperty("makerArrow", "icon-size", 0.5);
+            m_map.setLayoutProperty("makerArrow", "icon-ignore-placement", true);
+
+            QVariantList arrowOffset;
+            arrowOffset.append(0.0);
+            arrowOffset.append(-15.0);
+            m_map.setLayoutProperty("makerArrow", "icon-offset", arrowOffset);
+
+            QVariantMap makerBackground;
+            makerBackground["id"] = "makerBackground";
+            makerBackground["type"] = "symbol";
+            makerBackground["source"] = "routeSource";
+            m_map.addLayer(makerBackground);
+
+            m_map.setLayoutProperty("makerBackground", "icon-image", "label-background");
+            m_map.setLayoutProperty("makerBackground", "text-field", "{name}");
+            m_map.setLayoutProperty("makerBackground", "icon-text-fit", "both");
+            m_map.setLayoutProperty("makerBackground", "icon-ignore-placement", true);
+            m_map.setLayoutProperty("makerBackground", "text-ignore-placement", true);
+            m_map.setLayoutProperty("makerBackground", "text-anchor", "left");
+            m_map.setLayoutProperty("makerBackground", "text-size", 16.0);
+            m_map.setLayoutProperty("makerBackground", "text-padding", 0.0);
+            m_map.setLayoutProperty("makerBackground", "text-line-height", 1.0);
+            m_map.setLayoutProperty("makerBackground", "text-max-width", 8.0);
+
+            QVariantList iconTextFitPadding;
+            iconTextFitPadding.append(15.0);
+            iconTextFitPadding.append(10.0);
+            iconTextFitPadding.append(15.0);
+            iconTextFitPadding.append(10.0);
+            m_map.setLayoutProperty("makerBackground", "icon-text-fit-padding", iconTextFitPadding);
+
+            QVariantList backgroundOffset;
+            backgroundOffset.append(-0.5);
+            backgroundOffset.append(-1.5);
+            m_map.setLayoutProperty("makerBackground", "text-offset", backgroundOffset);
+
+            m_map.setPaintProperty("makerBackground", "text-color", QColor("white"));
+
+            QVariantList filterExpression;
+            filterExpression.append("==");
+            filterExpression.append("$type");
+            filterExpression.append("Point");
+
+            QVariantList filter;
+            filter.append(filterExpression);
+
+            m_map.setFilter("makerArrow", filter);
+            m_map.setFilter("makerBackground", filter);
+
+            // Tilt the labels when tilting the map and make them larger
+            m_map.setLayoutProperty("road-label-large", "text-size", 30.0);
+            m_map.setLayoutProperty("road-label-large", "text-pitch-alignment", "viewport");
+
+            m_map.setLayoutProperty("road-label-medium", "text-size", 30.0);
+            m_map.setLayoutProperty("road-label-medium", "text-pitch-alignment", "viewport");
+
+            m_map.setLayoutProperty("road-label-small", "text-pitch-alignment", "viewport");
+            m_map.setLayoutProperty("road-label-small", "text-size", 30.0);
         }
         break;
     case Qt::Key_Tab:

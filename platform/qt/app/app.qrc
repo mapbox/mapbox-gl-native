@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>source.geojson</file>
+        <file>label-arrow.svg</file>
+        <file>label-background.svg</file>
     </qresource>
 </RCC>
