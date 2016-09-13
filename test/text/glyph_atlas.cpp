@@ -18,7 +18,7 @@ public:
     StubStyleObserver observer;
     GlyphAtlas glyphAtlas { 32, 32, fileSource };
 
-    void run(const std::string& url, const FontStack& fontStack, const std::set<GlyphRange>& glyphRanges) {
+    void run(const std::string& url, const FontStack& fontStack, const std::unordered_set<GlyphRange, GlyphRangeHash>& glyphRanges) {
         // Squelch logging.
         Log::setObserver(std::make_unique<Log::NullObserver>());
 

@@ -41,7 +41,7 @@ public:
     // made and when the glyph if finally parsed, it gets added to the respective
     // GlyphSet and a signal is emitted to notify the observers. This method
     // can be called from any thread.
-    bool hasGlyphRanges(const FontStack&, const std::set<GlyphRange>&);
+    bool hasGlyphRanges(const FontStack&, const std::unordered_set<GlyphRange>&);
 
     void setURL(const std::string &url) {
         glyphURL = url;
