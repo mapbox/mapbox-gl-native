@@ -148,9 +148,15 @@ int main(int argc, char *argv[]) {
 
     // Load style
     if (style.empty()) {
-        mbgl::util::default_styles::DefaultStyle newStyle = mbgl::util::default_styles::orderedStyles[0];
-        style = newStyle.url;
-        view->setWindowTitle(newStyle.name);
+        const char *url = getenv("MAPBOX_STYLE_URL");
+        if (url == nullptr) {
+            mbgl::util::default_styles::DefaultStyle newStyle = mbgl::util::default_styles::orderedStyles[0];
+            style = newStyle.url;
+            view->setWindowTitle(newStyle.name);
+        } else {
+            style = url;
+            view->setWindowTitle(url);
+        }
     }
 
     map.setStyleURL(style);
