@@ -127,6 +127,18 @@ auto fromQStringList(const QStringList &list)
     return strings;
 }
 
+std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
+    const QImage swapped = sprite
+        .rgbSwapped()
+        .convertToFormat(QImage::Format_ARGB32_Premultiplied);
+
+    auto img = std::make_unique<uint8_t[]>(swapped.byteCount());
+    memcpy(img.get(), swapped.constBits(), swapped.byteCount());
+
+    return std::make_unique<mbgl::SpriteImage>(mbgl::PremultipliedImage
+        { size_t(swapped.width()), size_t(swapped.height()), std::move(img) }, 1.0);
+}
+
 }
 
 /*!
@@ -619,15 +631,7 @@ void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &sprite)
 {
     if (sprite.isNull()) return;
 
-    const QImage swapped = sprite
-        .rgbSwapped()
-        .convertToFormat(QImage::Format_ARGB32_Premultiplied);
-
-    auto img = std::make_unique<uint8_t[]>(swapped.byteCount());
-    memcpy(img.get(), swapped.constBits(), swapped.byteCount());
-
-    d_ptr->mapObj->addAnnotationIcon(name.toStdString(), std::make_shared<mbgl::SpriteImage>(
-        mbgl::PremultipliedImage { size_t(swapped.width()), size_t(swapped.height()), std::move(img) }, 1.0));
+    d_ptr->mapObj->addAnnotationIcon(name.toStdString(), std::move(toSpriteImage(sprite)));
 }
 
 QPointF QMapboxGL::pixelForCoordinate(const Coordinate &coordinate_) const
@@ -749,6 +753,18 @@ void QMapboxGL::addLayer(const QVariantMap &params)
 void QMapboxGL::removeLayer(const QString& id)
 {
     d_ptr->mapObj->removeLayer(id.toStdString());
+}
+
+void QMapboxGL::addImage(const QString &name, const QImage &sprite)
+{
+    if (sprite.isNull()) return;
+
+    d_ptr->mapObj->addImage(name.toStdString(), toSpriteImage(sprite));
+}
+
+void QMapboxGL::removeImage(const QString &name)
+{
+    d_ptr->mapObj->removeImage(name.toStdString());
 }
 
 void QMapboxGL::setFilter(const QString& layer_, const QVariant& filter_)

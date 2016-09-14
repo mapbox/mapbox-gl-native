@@ -202,6 +202,9 @@ public:
     void addSource(const QString &sourceID, const QVariantMap& params);
     void removeSource(const QString &sourceID);
 
+    void addImage(const QString &name, const QImage &sprite);
+    void removeImage(const QString &name);
+
     void addCustomLayer(const QString &id,
         QMapbox::CustomLayerInitializeFunction,
         QMapbox::CustomLayerRenderFunction,
