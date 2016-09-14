@@ -48,7 +48,7 @@ void OfflineDatabase::ensureSchema() {
             case 0: break; // cache-only database; ok to delete
             case 1: break; // cache-only database; ok to delete
             case 2: migrateToVersion3(); // fall through
-            case 3: migrateToVersion4(); // fall through
+            case 3: // no-op and fall through
             case 4: migrateToVersion5(); // fall through
             case 5: return;
             default: throw std::runtime_error("unknown schema version");
@@ -115,11 +115,11 @@ void OfflineDatabase::migrateToVersion3() {
     db->exec("PRAGMA user_version = 3");
 }
 
-void OfflineDatabase::migrateToVersion4() {
-    db->exec("PRAGMA journal_mode = WAL");
-    db->exec("PRAGMA synchronous = NORMAL");
-    db->exec("PRAGMA user_version = 4");
-}
+// Schema version 4 was WAL journal + NORMAL sync. It was reverted during pre-
+// release development and the migration was removed entirely to avoid potential
+// conflicts from quickly (and needlessly) switching journal and sync modes.
+//
+// See: https://github.com/mapbox/mapbox-gl-native/pull/6320
 
 void OfflineDatabase::migrateToVersion5() {
     db->exec("PRAGMA journal_mode = DELETE");
