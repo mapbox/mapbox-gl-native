@@ -911,7 +911,9 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 - (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView
 {
 #warning debug code
-    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithSourceIdentifier:@"mapzen" tileURLTemplates:@[@"https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"] minimumZoomLevel:0 maximumZoomLevel:18];
+   
+    MGLTileSet *tileSet = [[MGLTileSet alloc] initWithTileURLTemplates:@[@"https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]];
+    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithSourceIdentifier:@"mapzen" tileSet:tileSet];
     [self.mapView.style addSource:vectorSource];
     
     MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"filllayer" source:vectorSource sourceLayer:@"buildings"];

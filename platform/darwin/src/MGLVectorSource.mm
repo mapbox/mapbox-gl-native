@@ -1,6 +1,7 @@
 #import "MGLVectorSource.h"
 
 #import "MGLSource_Private.h"
+#import "MGLTileSet_Private.h"
 
 #include <mbgl/style/sources/vector_source.hpp>
 
@@ -17,13 +18,11 @@ static NSString *MGLVectorSourceType   = @"vector";
     return self;
 }
 
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates minimumZoomLevel:(NSUInteger)minimumZoomLevel maximumZoomLevel:(NSUInteger)maximumZoomLevel
+- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier tileSet:(MGLTileSet *)tileSet
 {
     if (self = [super initWithSourceIdentifier:sourceIdentifier])
     {
-        _tileURLTemplates = tileURLTemplates;
-        _minimumZoomLevel = minimumZoomLevel;
-        _maximumZoomLevel = maximumZoomLevel;
+        _tileSet = tileSet;
     }
     return self;
 }
@@ -38,13 +37,7 @@ static NSString *MGLVectorSourceType   = @"vector";
     }
     else
     {
-        mbgl::Tileset tileSource;
-        tileSource.zoomRange = mbgl::Range<uint8_t>(self.minimumZoomLevel, self.maximumZoomLevel);
-        for (NSString *tileURLTemplate in self.tileURLTemplates)
-        {
-            tileSource.tiles.push_back(tileURLTemplate.UTF8String);
-        }
-        source = std::make_unique<mbgl::style::VectorSource>(self.sourceIdentifier.UTF8String, tileSource);
+        source = std::make_unique<mbgl::style::VectorSource>(self.sourceIdentifier.UTF8String, self.tileSet.mbglTileset);
     }
     
     return std::move(source);
