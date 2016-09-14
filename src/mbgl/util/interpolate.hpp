@@ -57,8 +57,8 @@ public:
 
 struct Uninterpolated {
     template <class T>
-    T operator()(const T&, const T& b, const double) const {
-        return b;
+    T operator()(const T& a, const T&, const double) const {
+        return a;
     }
 };
 
