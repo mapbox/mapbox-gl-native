@@ -20,14 +20,14 @@ QQuickMapboxGLRenderer::QQuickMapboxGLRenderer()
     settings.setViewportMode(QMapboxGLSettings::FlippedYViewport);
 
     m_map.reset(new QMapboxGL(nullptr, settings));
-    connect(m_map.data(), SIGNAL(mapChanged(QMapboxGL::MapChange)), this, SLOT(onMapChanged(QMapboxGL::MapChange)));
+    connect(m_map.data(), SIGNAL(mapChanged(QMapbox::MapChange)), this, SLOT(onMapChanged(QMapbox::MapChange)));
 }
 
 QQuickMapboxGLRenderer::~QQuickMapboxGLRenderer()
 {
 }
 
-void QQuickMapboxGLRenderer::onMapChanged(QMapboxGL::MapChange change)
+void QQuickMapboxGLRenderer::onMapChanged(QMapbox::MapChange change)
 {
     auto onMapChangeWillStartLoadingMap = [&]() {
         m_styleLoaded = false;
@@ -39,10 +39,10 @@ void QQuickMapboxGLRenderer::onMapChanged(QMapboxGL::MapChange change)
     };
 
     switch (change) {
-    case QMapboxGL::MapChangeWillStartLoadingMap:
+    case QMapbox::MapChangeWillStartLoadingMap:
         onMapChangeWillStartLoadingMap();
         break;
-    case QMapboxGL::MapChangeDidFinishLoadingMap:
+    case QMapbox::MapChangeDidFinishLoadingMap:
         onMapChangeDidFinishLoadingMap();
         break;
     default:

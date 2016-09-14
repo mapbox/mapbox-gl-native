@@ -42,5 +42,5 @@ public slots:
 
 signals:
     void needsRendering();
-    void mapChanged(QMapboxGL::MapChange);
+    void mapChanged(QMapbox::MapChange);
 };

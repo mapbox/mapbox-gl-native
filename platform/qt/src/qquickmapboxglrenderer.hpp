@@ -28,7 +28,7 @@ signals:
     void styleChanged();
 
 public slots:
-    void onMapChanged(QMapboxGL::MapChange);
+    void onMapChanged(QMapbox::MapChange);
 
 private:
     bool m_initialized = false;
