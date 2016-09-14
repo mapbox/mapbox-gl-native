@@ -21,7 +21,13 @@ MapWindow::MapWindow(const QMapboxGLSettings &settings)
     // Set default location to Helsinki.
     m_map.setCoordinateZoom(QMapbox::Coordinate(60.170448, 24.942046), 14);
 
-    changeStyle();
+    QString styleUrl = qgetenv("MAPBOX_STYLE_URL");
+    if (styleUrl.isEmpty()) {
+        changeStyle();
+    } else {
+        m_map.setStyleUrl(styleUrl);
+        setWindowTitle(QString("Mapbox GL: ") + styleUrl);
+    }
 
     connect(&m_zoomAnimation, SIGNAL(finished()), this, SLOT(animationFinished()));
     connect(&m_zoomAnimation, SIGNAL(valueChanged(const QVariant&)), this, SLOT(animationValueChanged()));
