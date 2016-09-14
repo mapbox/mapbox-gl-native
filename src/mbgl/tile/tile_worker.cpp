@@ -99,7 +99,7 @@ TileParseResult TileWorker::prepareResult(const PlacementConfig& config) {
     if (result.complete) {
         featureIndex->setCollisionTile(placeLayers(config));
         result.featureIndex = std::move(featureIndex);
-        result.tileData = tileData->clone();
+        result.tileData = tileData ? tileData->clone() : nullptr;
     }
 
     return std::move(result);
