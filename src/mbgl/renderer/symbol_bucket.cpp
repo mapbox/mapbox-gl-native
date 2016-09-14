@@ -40,7 +40,8 @@ void SymbolBucket::render(Painter& painter,
 }
 
 bool SymbolBucket::hasData() const {
-    return hasTextData() || hasIconData();
+    assert(false); // Should be calling SymbolLayout::hasSymbolInstances() instead.
+    return false;
 }
 
 bool SymbolBucket::hasTextData() const {

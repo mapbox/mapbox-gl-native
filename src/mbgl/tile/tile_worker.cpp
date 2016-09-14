@@ -167,9 +167,9 @@ TilePlacementResult TileWorker::redoPlacement(const PlacementConfig& config) {
 
     for (auto& symbolLayout : symbolLayouts) {
         symbolLayout->state = SymbolLayout::Placed;
-        std::unique_ptr<Bucket> bucket = symbolLayout->place(*result.collisionTile);
-        if (bucket->hasData() || symbolLayout->hasSymbolInstances()) {
-            result.buckets.emplace(symbolLayout->bucketName, std::move(bucket));
+        if (symbolLayout->hasSymbolInstances()) {
+            result.buckets.emplace(symbolLayout->bucketName,
+                                   symbolLayout->place(*result.collisionTile));
         }
     }
 
