@@ -823,6 +823,30 @@ void Map::removeLayer(const std::string& id) {
     impl->view.deactivate();
 }
 
+void Map::addImage(const std::string& name, std::unique_ptr<const SpriteImage> image) {
+    if (!impl->style) {
+        return;
+    }
+
+    impl->styleMutated = true;
+    impl->style->spriteAtlas->setSprite(name, std::move(image));
+    impl->style->spriteAtlas->updateDirty();
+
+    update(Update::Repaint);
+}
+
+void Map::removeImage(const std::string& name) {
+    if (!impl->style) {
+        return;
+    }
+
+    impl->styleMutated = true;
+    impl->style->spriteAtlas->removeSprite(name);
+    impl->style->spriteAtlas->updateDirty();
+
+    update(Update::Repaint);
+}
+
 #pragma mark - Defaults
 
 std::string Map::getStyleName() const {
