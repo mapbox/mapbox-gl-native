@@ -274,6 +274,19 @@ TEST(OfflineDatabase, CreateRegion) {
     EXPECT_EQ(metadata, region.getMetadata());
 }
 
+TEST(OfflineDatabase, UpdateMetadata) {
+    using namespace mbgl;
+    
+    OfflineDatabase db(":memory:");
+    OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
+    OfflineRegionMetadata metadata {{ 1, 2, 3 }};
+    OfflineRegion region = db.createRegion(definition, metadata);
+    
+    OfflineRegionMetadata newmetadata {{ 4, 5, 6 }};
+    db.updateMetadata(region.getID(), newmetadata);
+    EXPECT_EQ(db.listRegions().at(0).getMetadata(), newmetadata);
+}
+
 TEST(OfflineDatabase, ListRegions) {
     using namespace mbgl;
 
