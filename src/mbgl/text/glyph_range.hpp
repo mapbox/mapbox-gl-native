@@ -16,6 +16,5 @@ struct GlyphRangeHash {
 };
 
 typedef std::unordered_set<GlyphRange, GlyphRangeHash> GlyphRangeSet;
-    
-} // end namespace mbgl
 
+} // end namespace mbgl
