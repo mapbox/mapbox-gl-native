@@ -1,5 +1,6 @@
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/sprite/sprite_store.hpp>
+#include <mbgl/sprite/sprite_atlas_observer.hpp>
+#include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/gl_config.hpp>
 #include <mbgl/platform/log.hpp>
@@ -7,6 +8,10 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/exception.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/response.hpp>
 
 #include <cassert>
 #include <cmath>
@@ -14,15 +19,147 @@
 
 namespace mbgl {
 
-SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, float pixelRatio_, SpriteStore& store_)
+static SpriteAtlasObserver nullObserver;
+
+struct SpriteAtlas::Loader {
+    std::shared_ptr<const std::string> image;
+    std::shared_ptr<const std::string> json;
+    std::unique_ptr<AsyncRequest> jsonRequest;
+    std::unique_ptr<AsyncRequest> spriteRequest;
+};
+
+SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, float pixelRatio_)
     : width(width_),
       height(height_),
       pixelWidth(std::ceil(width * pixelRatio_)),
       pixelHeight(std::ceil(height * pixelRatio_)),
       pixelRatio(pixelRatio_),
-      store(store_),
+      observer(&nullObserver),
       bin(width_, height_),
-      dirty(true) {
+      dirtyFlag(true) {
+}
+
+SpriteAtlas::~SpriteAtlas() = default;
+
+void SpriteAtlas::load(const std::string& url, FileSource& fileSource) {
+    if (url.empty()) {
+        // Treat a non-existent sprite as a successfully loaded empty sprite.
+        loaded = true;
+        return;
+    }
+
+    loader = std::make_unique<Loader>();
+
+    loader->jsonRequest = fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
+        if (res.error) {
+            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+        } else if (res.notModified) {
+            return;
+        } else if (res.noContent) {
+            loader->json = std::make_shared<const std::string>();
+            emitSpriteLoadedIfComplete();
+        } else {
+            // Only trigger a sprite loaded event we got new data.
+            loader->json = res.data;
+            emitSpriteLoadedIfComplete();
+        }
+    });
+
+    loader->spriteRequest = fileSource.request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
+        if (res.error) {
+            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+        } else if (res.notModified) {
+            return;
+        } else if (res.noContent) {
+            loader->image = std::make_shared<const std::string>();
+            emitSpriteLoadedIfComplete();
+        } else {
+            loader->image = res.data;
+            emitSpriteLoadedIfComplete();
+        }
+    });
+}
+
+void SpriteAtlas::emitSpriteLoadedIfComplete() {
+    assert(loader);
+
+    if (!loader->image || !loader->json) {
+        return;
+    }
+
+    auto result = parseSprite(*loader->image, *loader->json);
+    if (result.is<Sprites>()) {
+        loaded = true;
+        setSprites(result.get<Sprites>());
+        observer->onSpriteLoaded();
+    } else {
+        observer->onSpriteError(result.get<std::exception_ptr>());
+    }
+}
+
+void SpriteAtlas::setObserver(SpriteAtlasObserver* observer_) {
+    observer = observer_;
+}
+
+void SpriteAtlas::dumpDebugLogs() const {
+    Log::Info(Event::General, "SpriteAtlas::loaded: %d", loaded);
+}
+
+void SpriteAtlas::setSprites(const Sprites& newSprites) {
+    std::lock_guard<std::mutex> lock(mutex);
+    for (const auto& pair : newSprites) {
+        _setSprite(pair.first, pair.second);
+    }
+}
+
+void SpriteAtlas::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
+    std::lock_guard<std::mutex> lock(mutex);
+    _setSprite(name, sprite);
+}
+
+void SpriteAtlas::removeSprite(const std::string& name) {
+    std::lock_guard<std::mutex> lock(mutex);
+    _setSprite(name);
+}
+
+void SpriteAtlas::_setSprite(const std::string& name,
+                             const std::shared_ptr<const SpriteImage>& sprite) {
+    if (sprite) {
+        auto it = sprites.find(name);
+        if (it != sprites.end()) {
+            // There is already a sprite with that name in our store.
+            if ((it->second->image.width != sprite->image.width || it->second->image.height != sprite->image.height)) {
+                Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", name.c_str());
+                return;
+            }
+            it->second = sprite;
+        } else {
+            sprites.emplace(name, sprite);
+        }
+
+        // Always add/replace the value in the dirty list.
+        auto dirty_it = dirtySprites.find(name);
+        if (dirty_it != dirtySprites.end()) {
+            dirty_it->second = sprite;
+        } else {
+            dirtySprites.emplace(name, sprite);
+        }
+    } else if (sprites.erase(name) > 0) {
+        dirtySprites.emplace(name, nullptr);
+    }
+}
+
+std::shared_ptr<const SpriteImage> SpriteAtlas::getSprite(const std::string& name) {
+    std::lock_guard<std::mutex> lock(mutex);
+    const auto it = sprites.find(name);
+    if (it != sprites.end()) {
+        return it->second;
+    } else {
+        if (!sprites.empty()) {
+            Log::Info(Event::Sprite, "Can't find sprite named '%s'", name.c_str());
+        }
+        return nullptr;
+    }
 }
 
 Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const SpriteImage& spriteImage) {
@@ -55,7 +192,7 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
         return SpriteAtlasElement { rect_it->second.pos, rect_it->second.spriteImage, rect_it->second.spriteImage->pixelRatio / pixelRatio };
     }
 
-    auto sprite = store.getSprite(name);
+    auto sprite = getSprite(name);
     if (!sprite) {
         return {};
     }
@@ -142,21 +279,16 @@ void SpriteAtlas::copy(const Holder& holder, const SpritePatternMode mode) {
             dstData, pixelWidth, (holder.pos.x + padding) * pixelRatio, (holder.pos.y + padding) * pixelRatio, pixelWidth * pixelHeight,
             uint32_t(holder.spriteImage->image.width), uint32_t(holder.spriteImage->image.height), mode);
 
-    dirty = true;
+    dirtyFlag = true;
 }
 
 void SpriteAtlas::upload(gl::ObjectStore& objectStore, gl::Config& config, uint32_t unit) {
-    if (dirty) {
+    if (dirtyFlag) {
         bind(false, objectStore, config, unit);
     }
 }
 
 void SpriteAtlas::updateDirty() {
-    auto dirtySprites = store.getDirty();
-    if (dirtySprites.empty()) {
-        return;
-    }
-
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     auto imageIterator = images.begin();
@@ -180,6 +312,8 @@ void SpriteAtlas::updateDirty() {
             // name, but a different wrap value.
         }
     }
+
+    dirtySprites.clear();
 }
 
 void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore, gl::Config& config, uint32_t unit) {
@@ -212,7 +346,7 @@ void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore, gl::Config& co
         filter = filter_val;
     }
 
-    if (dirty) {
+    if (dirtyFlag) {
         std::lock_guard<std::recursive_mutex> lock(mtx);
 
         config.activeTexture = unit;
@@ -243,7 +377,7 @@ void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore, gl::Config& co
             ));
         }
 
-        dirty = false;
+        dirtyFlag = false;
 
 #ifndef GL_ES_VERSION_2_0
         // platform::showColorDebugImage("Sprite Atlas", reinterpret_cast<const char*>(data.get()),
@@ -251,8 +385,6 @@ void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore, gl::Config& co
 #endif
     }
 }
-
-SpriteAtlas::~SpriteAtlas() = default;
 
 SpriteAtlas::Holder::Holder(std::shared_ptr<const SpriteImage> spriteImage_, Rect<dimension> pos_)
     : spriteImage(std::move(spriteImage_)), pos(std::move(pos_)) {

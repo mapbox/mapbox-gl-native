@@ -40,7 +40,6 @@ set(MBGL_TEST_FILES
     test/sprite/sprite_atlas.cpp
     test/sprite/sprite_image.cpp
     test/sprite/sprite_parser.cpp
-    test/sprite/sprite_store.cpp
 
     # src
     test/src/main.cpp
@@ -81,7 +80,6 @@ set(MBGL_TEST_FILES
     test/style/style_layer.cpp
     test/style/style_parser.cpp
     test/style/tile_source.cpp
-    test/style/variant.cpp
 
     # text
     test/text/quads.cpp

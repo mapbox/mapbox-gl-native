@@ -15,7 +15,6 @@ namespace mbgl {
 class GeometryTileLayer;
 class CollisionTile;
 class SpriteAtlas;
-class SpriteStore;
 class GlyphAtlas;
 class GlyphStore;
 class SymbolBucket;
@@ -39,7 +38,7 @@ public:
                  float textMaxSize,
                  SpriteAtlas&);
 
-    bool canPrepare(GlyphStore&, SpriteStore&);
+    bool canPrepare(GlyphStore&);
 
     void prepare(uintptr_t tileUID,
                  GlyphAtlas&,

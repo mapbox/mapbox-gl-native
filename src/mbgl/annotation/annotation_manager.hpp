@@ -2,7 +2,6 @@
 
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/annotation/symbol_annotation_impl.hpp>
-#include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -75,8 +74,6 @@ private:
     ShapeAnnotationMap shapeAnnotations;
     std::set<std::string> obsoleteShapeAnnotationLayers;
     std::set<AnnotationTile*> tiles;
-
-    SpriteStore spriteStore;
     SpriteAtlas spriteAtlas;
 };
 

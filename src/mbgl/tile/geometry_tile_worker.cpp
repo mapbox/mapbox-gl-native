@@ -6,7 +6,6 @@
 #include <mbgl/style/bucket_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/platform/log.hpp>
@@ -23,7 +22,6 @@ using namespace style;
 GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
                                        ActorRef<GeometryTile> parent_,
                                        OverscaledTileID id_,
-                                       SpriteStore& spriteStore_,
                                        GlyphAtlas& glyphAtlas_,
                                        GlyphStore& glyphStore_,
                                        const std::atomic<bool>& obsolete_,
@@ -31,7 +29,6 @@ GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
     : self(std::move(self_)),
       parent(std::move(parent_)),
       id(std::move(id_)),
-      spriteStore(spriteStore_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
       obsolete(obsolete_),
@@ -219,7 +216,6 @@ void GeometryTileWorker::redoLayout() {
                                     *geometryLayer,
                                     obsolete,
                                     reinterpret_cast<uintptr_t>(this),
-                                    spriteStore,
                                     glyphAtlas,
                                     glyphStore,
                                     *featureIndex,
@@ -259,7 +255,7 @@ void GeometryTileWorker::attemptPlacement() {
         }
 
         if (symbolLayout->state == SymbolLayout::Pending) {
-            if (symbolLayout->canPrepare(glyphStore, spriteStore)) {
+            if (symbolLayout->canPrepare(glyphStore)) {
                 symbolLayout->state = SymbolLayout::Prepared;
                 symbolLayout->prepare(reinterpret_cast<uintptr_t>(this),
                                       glyphAtlas,

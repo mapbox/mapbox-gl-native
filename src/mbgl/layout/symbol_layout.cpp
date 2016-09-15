@@ -3,7 +3,6 @@
 #include <mbgl/layout/clip_lines.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
-#include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/text/get_anchors.hpp>
@@ -125,12 +124,12 @@ bool SymbolLayout::hasSymbolInstances() const {
     return !symbolInstances.empty();
 }
 
-bool SymbolLayout::canPrepare(GlyphStore& glyphStore, SpriteStore& spriteStore) {
+bool SymbolLayout::canPrepare(GlyphStore& glyphStore) {
     if (!layout.textField.value.empty() && !layout.textFont.value.empty() && !glyphStore.hasGlyphRanges(layout.textFont, ranges)) {
         return false;
     }
 
-    if (!layout.iconImage.value.empty() && !spriteStore.isLoaded()) {
+    if (!layout.iconImage.value.empty() && !spriteAtlas.isLoaded()) {
         return false;
     }
 

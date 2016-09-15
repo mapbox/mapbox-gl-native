@@ -4,9 +4,9 @@
 
 namespace mbgl {
 
-class SpriteStoreObserver {
+class SpriteAtlasObserver {
 public:
-    virtual ~SpriteStoreObserver() = default;
+    virtual ~SpriteAtlasObserver() = default;
 
     virtual void onSpriteLoaded() {}
     virtual void onSpriteError(std::exception_ptr) {}

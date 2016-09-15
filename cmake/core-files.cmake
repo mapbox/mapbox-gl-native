@@ -210,12 +210,10 @@ set(MBGL_CORE_FILES
     include/mbgl/sprite/sprite_image.hpp
     src/mbgl/sprite/sprite_atlas.cpp
     src/mbgl/sprite/sprite_atlas.hpp
+    src/mbgl/sprite/sprite_atlas_observer.hpp
     src/mbgl/sprite/sprite_image.cpp
     src/mbgl/sprite/sprite_parser.cpp
     src/mbgl/sprite/sprite_parser.hpp
-    src/mbgl/sprite/sprite_store.cpp
-    src/mbgl/sprite/sprite_store.hpp
-    src/mbgl/sprite/sprite_store_observer.hpp
 
     # storage
     include/mbgl/storage/default_file_source.hpp

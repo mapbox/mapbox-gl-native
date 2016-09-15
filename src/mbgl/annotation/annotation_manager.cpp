@@ -8,6 +8,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/storage/file_source.hpp>
 
 #include <boost/function_output_iterator.hpp>
 
@@ -19,8 +20,20 @@ const std::string AnnotationManager::SourceID = "com.mapbox.annotations";
 const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.points";
 
 AnnotationManager::AnnotationManager(float pixelRatio)
-    : spriteStore(pixelRatio),
-      spriteAtlas(1024, 1024, pixelRatio, spriteStore) {
+    : spriteAtlas(1024, 1024, pixelRatio) {
+
+    struct NullFileSource : public FileSource {
+        std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override {
+            assert(false);
+            return nullptr;
+        }
+    };
+
+    NullFileSource nullFileSource;
+
+    // This is a special atlas, holding only images added via addIcon. But we need its isLoaded()
+    // method to return true.
+    spriteAtlas.load("", nullFileSource);
 }
 
 AnnotationManager::~AnnotationManager() = default;
@@ -187,17 +200,17 @@ void AnnotationManager::removeTile(AnnotationTile& tile) {
 }
 
 void AnnotationManager::addIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    spriteStore.setSprite(name, sprite);
+    spriteAtlas.setSprite(name, sprite);
     spriteAtlas.updateDirty();
 }
 
 void AnnotationManager::removeIcon(const std::string& name) {
-    spriteStore.removeSprite(name);
+    spriteAtlas.removeSprite(name);
     spriteAtlas.updateDirty();
 }
 
 double AnnotationManager::getTopOffsetPixelsForIcon(const std::string& name) {
-    auto sprite = spriteStore.getSprite(name);
+    auto sprite = spriteAtlas.getSprite(name);
     return sprite ? -(sprite->image.height / sprite->pixelRatio) / 2 : 0;
 }
 

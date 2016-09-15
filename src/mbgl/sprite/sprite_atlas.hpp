@@ -5,6 +5,7 @@
 #include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/sprite/sprite_image.hpp>
 
 #include <atomic>
 #include <string>
@@ -12,14 +13,17 @@
 #include <mutex>
 #include <set>
 #include <array>
+#include <memory>
 
 namespace mbgl {
+
+class FileSource;
+class SpriteAtlasObserver;
 
 namespace gl {
 class Config;
 } // namespace gl
 
-class SpriteStore;
 class SpriteImage;
 class SpritePosition;
 
@@ -43,9 +47,32 @@ enum class SpritePatternMode : bool {
 class SpriteAtlas : public util::noncopyable {
 public:
     typedef uint16_t dimension;
+    using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
 
-    SpriteAtlas(dimension width, dimension height, float pixelRatio, SpriteStore& store);
+    SpriteAtlas(dimension width, dimension height, float pixelRatio);
     ~SpriteAtlas();
+
+    void load(const std::string& url, FileSource&);
+
+    bool isLoaded() const {
+        return loaded;
+    }
+
+    void dumpDebugLogs() const;
+
+    void setObserver(SpriteAtlasObserver*);
+
+    // Adds/replaces a Sprite image.
+    void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
+
+    // Adds/replaces mutliple Sprite images.
+    void setSprites(const Sprites& sprites);
+
+    // Removes a Sprite.
+    void removeSprite(const std::string&);
+
+    // Obtains a Sprite image.
+    std::shared_ptr<const SpriteImage> getSprite(const std::string&);
 
     // If the sprite is loaded, copies the requsted image from it into the atlas and returns
     // the resulting icon measurements. If not, returns an empty optional.
@@ -58,7 +85,7 @@ public:
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
     void bind(bool linear, gl::ObjectStore&, gl::Config&, uint32_t unit);
 
-    // Updates sprites in the atlas texture that may have changed in the source SpriteStore object.
+    // Updates sprites in the atlas texture that may have changed.
     void updateDirty();
 
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
@@ -75,9 +102,28 @@ public:
     const uint32_t* getData() const { return data.get(); }
 
 private:
+    void _setSprite(const std::string&, const std::shared_ptr<const SpriteImage>& = nullptr);
+    void emitSpriteLoadedIfComplete();
+
     const GLsizei width, height;
     const dimension pixelWidth, pixelHeight;
     const float pixelRatio;
+
+    struct Loader;
+    std::unique_ptr<Loader> loader;
+
+    bool loaded = false;
+
+    SpriteAtlasObserver* observer = nullptr;
+
+    // Lock for sprites and dirty maps.
+    std::mutex mutex;
+
+    // Stores all current sprites.
+    Sprites sprites;
+
+    // Stores all Sprite IDs that changed since the last invocation.
+    Sprites dirtySprites;
 
     struct Holder : private util::noncopyable {
         Holder(std::shared_ptr<const SpriteImage>, Rect<dimension>);
@@ -92,12 +138,11 @@ private:
     void copy(const Holder& holder, SpritePatternMode mode);
 
     std::recursive_mutex mtx;
-    SpriteStore& store;
     BinPack<dimension> bin;
     std::map<Key, Holder> images;
     std::set<std::string> uninitialized;
     std::unique_ptr<uint32_t[]> data;
-    std::atomic<bool> dirty;
+    std::atomic<bool> dirtyFlag;
     bool fullUploadRequired = true;
     mbgl::optional<gl::UniqueTexture> texture;
     uint32_t filter = 0;
