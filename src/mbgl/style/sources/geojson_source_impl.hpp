@@ -3,6 +3,7 @@
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/util/variant.hpp>
+#include <mbgl/tile/geojson_tile.hpp>
 
 namespace mbgl {
 
@@ -19,6 +20,7 @@ public:
     optional<std::string> getURL();
 
     void setGeoJSON(const GeoJSON&);
+    void setTileData(GeoJSONTile&, const OverscaledTileID& tileID);
 
     void loadDescription(FileSource&) final;
 
