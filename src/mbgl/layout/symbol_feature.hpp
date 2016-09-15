@@ -10,8 +10,8 @@ namespace mbgl {
 class SymbolFeature {
 public:
     GeometryCollection geometry;
-    optional<std::u32string> label;
-    optional<std::string> sprite;
+    optional<std::u32string> text;
+    optional<std::string> icon;
     std::size_t index;
 };
 

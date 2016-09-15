@@ -65,12 +65,12 @@ void mergeLines(std::vector<SymbolFeature> &features) {
         SymbolFeature &feature = features[k];
         GeometryCollection &geometry = feature.geometry;
 
-        if (!feature.label) {
+        if (!feature.text) {
             continue;
         }
 
-        const auto leftKey = getKey(*feature.label, geometry, Side::Left);
-        const auto rightKey = getKey(*feature.label, geometry, Side::Right);
+        const auto leftKey = getKey(*feature.text, geometry, Side::Left);
+        const auto rightKey = getKey(*feature.text, geometry, Side::Right);
 
         const auto left = rightIndex.find(leftKey);
         const auto right = leftIndex.find(rightKey);
@@ -85,7 +85,7 @@ void mergeLines(std::vector<SymbolFeature> &features) {
 
             leftIndex.erase(leftKey);
             rightIndex.erase(rightKey);
-            rightIndex[getKey(*feature.label, features[i].geometry, Side::Right)] = i;
+            rightIndex[getKey(*feature.text, features[i].geometry, Side::Right)] = i;
 
         } else if (left != rightIndex.end()) {
             // found mergeable line adjacent to the start of the current line, merge
