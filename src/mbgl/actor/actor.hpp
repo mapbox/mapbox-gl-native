@@ -22,12 +22,6 @@ namespace mbgl {
     to R is *not* guaranteed (and can't be: S1 and S2 may be acting asynchronously with respect
     to each other).
 
-    Construction and destruction of an actor is currently synchronous: the corresponding `O`
-    object is constructed synchronously by the `Actor` constructor, and destructed synchronously
-    by the `~Actor` destructor, after ensuring that the `O` is not currently receiving an
-    asynchronous message. (Construction and destruction may change to be asynchronous in the
-    future.)
-
     An `Actor<O>` can be converted to an `ActorRef<O>`, a non-owning value object representing
     a (weak) reference to the actor. Messages can be sent via the `Ref` as well.
 
@@ -37,6 +31,13 @@ namespace mbgl {
     It's safe for a `Ref` to outlive its `Actor` -- the reference is "weak", and does not extend
     the lifetime of the owning Actor, and sending a message to a `Ref` whose `Actor` has died is
     a no-op. (In the future, a dead-letters queue or log may be implemented.)
+
+    Construction and destruction of an actor is currently synchronous: the corresponding `O`
+    object is constructed synchronously by the `Actor` constructor, and destructed synchronously
+    by the `~Actor` destructor, after ensuring that the `O` is not currently receiving an
+    asynchronous message. (Construction and destruction may change to be asynchronous in the
+    future.) The constructor of `O` is passed an `ActorRef<O>` referring to itself (which it
+    can use to self-send messages), followed by the forwarded arguments passed to `Actor<O>`.
 
     Please don't send messages that contain shared pointers or references. That subverts the
     purpose of the actor model: prohibiting direct concurrent access to shared state.
