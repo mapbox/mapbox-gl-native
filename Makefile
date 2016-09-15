@@ -1,4 +1,4 @@
-export BUILDTYPE ?= Debug
+export BUILDTYPE = Release
 
 ifeq ($(BUILDTYPE), Release)
 else ifeq ($(BUILDTYPE), Debug)
