@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ -z `which iconoblast` ]]; then
-    echo "Requires https://github.com/mapbox/iconoblast!"
+    echo "Requires https://github.com/mapbox/iconoblast"
     exit 1
 fi
 
@@ -10,7 +10,7 @@ branch=`git rev-parse --abbrev-ref HEAD`
 repo=`git remote show origin | grep 'Fetch URL' | sed -e 's/.*github\.com:mapbox\///' -e 's/\.git$//' -e 's/^mapbox-//'`
 
 pwd=`pwd`
-cd platform/android/java/app/src/main/res
+cd src/main/res
 for folder in `find . -maxdepth 1 -type d -name drawable-\*`
 do
     cd ${folder}
