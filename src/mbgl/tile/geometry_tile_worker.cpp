@@ -2,11 +2,11 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/text/collision_tile.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/style/bucket_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/constants.hpp>
@@ -23,14 +23,12 @@ GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
                                        ActorRef<GeometryTile> parent_,
                                        OverscaledTileID id_,
                                        GlyphAtlas& glyphAtlas_,
-                                       GlyphStore& glyphStore_,
                                        const std::atomic<bool>& obsolete_,
                                        const MapMode mode_)
     : self(std::move(self_)),
       parent(std::move(parent_)),
       id(std::move(id_)),
       glyphAtlas(glyphAtlas_),
-      glyphStore(glyphStore_),
       obsolete(obsolete_),
       mode(mode_) {
 }
@@ -217,7 +215,6 @@ void GeometryTileWorker::redoLayout() {
                                     obsolete,
                                     reinterpret_cast<uintptr_t>(this),
                                     glyphAtlas,
-                                    glyphStore,
                                     *featureIndex,
                                     mode);
 
@@ -255,11 +252,10 @@ void GeometryTileWorker::attemptPlacement() {
         }
 
         if (symbolLayout->state == SymbolLayout::Pending) {
-            if (symbolLayout->canPrepare(glyphStore)) {
+            if (symbolLayout->canPrepare(glyphAtlas)) {
                 symbolLayout->state = SymbolLayout::Prepared;
                 symbolLayout->prepare(reinterpret_cast<uintptr_t>(this),
-                                      glyphAtlas,
-                                      glyphStore);
+                                      glyphAtlas);
             } else {
                 canPlace = false;
             }

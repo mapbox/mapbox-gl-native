@@ -8,9 +8,9 @@
 
 namespace mbgl {
 
-class GlyphStoreObserver {
+class GlyphAtlasObserver {
 public:
-    virtual ~GlyphStoreObserver() = default;
+    virtual ~GlyphAtlasObserver() = default;
 
     virtual void onGlyphsLoaded(const FontStack&, const GlyphRange&) {}
     virtual void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr) {}

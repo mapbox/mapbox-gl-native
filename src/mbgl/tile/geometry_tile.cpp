@@ -28,7 +28,6 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
              ActorRef<GeometryTile>(*this, mailbox),
              id_,
              *parameters.style.glyphAtlas,
-             *parameters.style.glyphStore,
              obsolete,
              parameters.mode) {
 }

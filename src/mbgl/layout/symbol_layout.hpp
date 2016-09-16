@@ -16,7 +16,6 @@ class GeometryTileLayer;
 class CollisionTile;
 class SpriteAtlas;
 class GlyphAtlas;
-class GlyphStore;
 class SymbolBucket;
 
 namespace style {
@@ -38,11 +37,10 @@ public:
                  float textMaxSize,
                  SpriteAtlas&);
 
-    bool canPrepare(GlyphStore&);
+    bool canPrepare(GlyphAtlas&);
 
     void prepare(uintptr_t tileUID,
-                 GlyphAtlas&,
-                 GlyphStore&);
+                 GlyphAtlas&);
 
     std::unique_ptr<SymbolBucket> place(CollisionTile&);
 

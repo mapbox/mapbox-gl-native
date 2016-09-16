@@ -15,7 +15,6 @@ namespace mbgl {
 class GeometryTile;
 class GeometryTileData;
 class GlyphAtlas;
-class GlyphStore;
 class SymbolLayout;
 
 namespace style {
@@ -28,7 +27,6 @@ public:
                        ActorRef<GeometryTile> parent,
                        OverscaledTileID,
                        GlyphAtlas&,
-                       GlyphStore&,
                        const std::atomic<bool>&,
                        const MapMode);
     ~GeometryTileWorker();
@@ -48,7 +46,6 @@ private:
 
     const OverscaledTileID id;
     GlyphAtlas& glyphAtlas;
-    GlyphStore& glyphStore;
     const std::atomic<bool>& obsolete;
     const MapMode mode;
 

@@ -19,7 +19,7 @@
 #include <mbgl/style/cascade_parameters.hpp>
 #include <mbgl/style/calculation_parameters.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/geometry/glyph_atlas.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/render_tile.hpp>
@@ -37,12 +37,11 @@ static Observer nullObserver;
 
 Style::Style(FileSource& fileSource_, float pixelRatio)
     : fileSource(fileSource_),
-      glyphStore(std::make_unique<GlyphStore>(fileSource)),
-      glyphAtlas(std::make_unique<GlyphAtlas>(2048, 2048)),
+      glyphAtlas(std::make_unique<GlyphAtlas>(2048, 2048, fileSource)),
       spriteAtlas(std::make_unique<SpriteAtlas>(1024, 1024, pixelRatio)),
       lineAtlas(std::make_unique<LineAtlas>(256, 512)),
       observer(&nullObserver) {
-    glyphStore->setObserver(this);
+    glyphAtlas->setObserver(this);
     spriteAtlas->setObserver(this);
 }
 
@@ -51,7 +50,7 @@ Style::~Style() {
         source->baseImpl->setObserver(nullptr);
     }
 
-    glyphStore->setObserver(nullptr);
+    glyphAtlas->setObserver(nullptr);
     spriteAtlas->setObserver(nullptr);
 }
 
@@ -122,7 +121,7 @@ void Style::setJSON(const std::string& json) {
     defaultBearing = parser.bearing;
     defaultPitch = parser.pitch;
 
-    glyphStore->setURL(parser.glyphURL);
+    glyphAtlas->setURL(parser.glyphURL);
     spriteAtlas->load(parser.spriteURL, fileSource);
 
     loaded = true;

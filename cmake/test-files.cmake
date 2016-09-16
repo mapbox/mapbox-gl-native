@@ -74,7 +74,6 @@ set(MBGL_TEST_FILES
     # style
     test/style/filter.cpp
     test/style/functions.cpp
-    test/style/glyph_store.cpp
     test/style/source.cpp
     test/style/style.cpp
     test/style/style_layer.cpp
@@ -82,6 +81,7 @@ set(MBGL_TEST_FILES
     test/style/tile_source.cpp
 
     # text
+    test/text/glyph_atlas.cpp
     test/text/quads.cpp
 
     # tile

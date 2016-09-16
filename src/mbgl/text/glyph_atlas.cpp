@@ -1,5 +1,6 @@
-#include <mbgl/geometry/glyph_atlas.hpp>
-
+#include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/text/glyph_atlas_observer.hpp>
+#include <mbgl/text/glyph_pbf.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
 #include <mbgl/gl/gl_config.hpp>
@@ -9,18 +10,79 @@
 #include <cassert>
 #include <algorithm>
 
-
 namespace mbgl {
 
-GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
+static GlyphAtlasObserver nullObserver;
+
+GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_, FileSource& fileSource_)
     : width(width_),
       height(height_),
+      fileSource(fileSource_),
+      observer(&nullObserver),
       bin(width_, height_),
       data(std::make_unique<uint8_t[]>(width_ * height_)),
       dirty(true) {
 }
 
 GlyphAtlas::~GlyphAtlas() = default;
+
+void GlyphAtlas::requestGlyphRange(const FontStack& fontStack, const GlyphRange& range) {
+    std::lock_guard<std::mutex> lock(rangesMutex);
+    auto& rangeSets = ranges[fontStack];
+
+    const auto& rangeSetsIt = rangeSets.find(range);
+    if (rangeSetsIt != rangeSets.end()) {
+        return;
+    }
+
+    rangeSets.emplace(range,
+        std::make_unique<GlyphPBF>(this, fontStack, range, observer, fileSource));
+}
+
+bool GlyphAtlas::hasGlyphRanges(const FontStack& fontStack, const std::set<GlyphRange>& glyphRanges) {
+    if (glyphRanges.empty()) {
+        return true;
+    }
+
+    std::lock_guard<std::mutex> lock(rangesMutex);
+    const auto& rangeSets = ranges[fontStack];
+
+    bool hasRanges = true;
+    for (const auto& range : glyphRanges) {
+        const auto& rangeSetsIt = rangeSets.find(range);
+        if (rangeSetsIt == rangeSets.end()) {
+            // Push the request to the MapThread, so we can easly cancel
+            // if it is still pending when we destroy this object.
+            workQueue.push(std::bind(&GlyphAtlas::requestGlyphRange, this, fontStack, range));
+
+            hasRanges = false;
+            continue;
+        }
+
+        if (!rangeSetsIt->second->isParsed()) {
+            hasRanges = false;
+        }
+    }
+
+    return hasRanges;
+}
+
+util::exclusive<GlyphSet> GlyphAtlas::getGlyphSet(const FontStack& fontStack) {
+    auto lock = std::make_unique<std::lock_guard<std::mutex>>(glyphSetsMutex);
+
+    auto it = glyphSets.find(fontStack);
+    if (it == glyphSets.end()) {
+        it = glyphSets.emplace(fontStack, std::make_unique<GlyphSet>()).first;
+    }
+
+    // FIXME: We lock all GlyphSets, but what we should
+    // really do is lock only the one we are returning.
+    return { it->second.get(), std::move(lock) };
+}
+
+void GlyphAtlas::setObserver(GlyphAtlasObserver* observer_) {
+    observer = observer_;
+}
 
 void GlyphAtlas::addGlyphs(uintptr_t tileUID,
                            const std::u32string& text,

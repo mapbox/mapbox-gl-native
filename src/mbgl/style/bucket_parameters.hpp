@@ -13,7 +13,6 @@ class TileID;
 class GeometryTileLayer;
 class GeometryTileFeature;
 class GlyphAtlas;
-class GlyphStore;
 class CollisionTile;
 class FeatureIndex;
 
@@ -26,7 +25,6 @@ public:
                           const std::atomic<bool>& obsolete_,
                           uintptr_t tileUID_,
                           GlyphAtlas& glyphAtlas_,
-                          GlyphStore& glyphStore_,
                           FeatureIndex& featureIndex_,
                           const MapMode mode_)
         : tileID(tileID_),
@@ -34,7 +32,6 @@ public:
           obsolete(obsolete_),
           tileUID(tileUID_),
           glyphAtlas(glyphAtlas_),
-          glyphStore(glyphStore_),
           featureIndex(featureIndex_),
           mode(mode_) {}
 
@@ -49,7 +46,6 @@ public:
     const std::atomic<bool>& obsolete;
     uintptr_t tileUID;
     GlyphAtlas& glyphAtlas;
-    GlyphStore& glyphStore;
     FeatureIndex& featureIndex;
     const MapMode mode;
 };

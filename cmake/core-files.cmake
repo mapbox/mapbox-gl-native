@@ -62,8 +62,6 @@ set(MBGL_CORE_FILES
     src/mbgl/geometry/feature_index.hpp
     src/mbgl/geometry/fill_buffer.cpp
     src/mbgl/geometry/fill_buffer.hpp
-    src/mbgl/geometry/glyph_atlas.cpp
-    src/mbgl/geometry/glyph_atlas.hpp
     src/mbgl/geometry/icon_buffer.cpp
     src/mbgl/geometry/icon_buffer.hpp
     src/mbgl/geometry/line_atlas.cpp
@@ -352,14 +350,14 @@ set(MBGL_CORE_FILES
     src/mbgl/text/get_anchors.hpp
     src/mbgl/text/glyph.cpp
     src/mbgl/text/glyph.hpp
+    src/mbgl/text/glyph_atlas.cpp
+    src/mbgl/text/glyph_atlas.hpp
+    src/mbgl/text/glyph_atlas_observer.hpp
     src/mbgl/text/glyph_pbf.cpp
     src/mbgl/text/glyph_pbf.hpp
     src/mbgl/text/glyph_range.hpp
     src/mbgl/text/glyph_set.cpp
     src/mbgl/text/glyph_set.hpp
-    src/mbgl/text/glyph_store.cpp
-    src/mbgl/text/glyph_store.hpp
-    src/mbgl/text/glyph_store_observer.hpp
     src/mbgl/text/placement_config.hpp
     src/mbgl/text/quads.cpp
     src/mbgl/text/quads.hpp

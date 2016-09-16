@@ -3,7 +3,7 @@
 #include <mbgl/test/stub_style_observer.hpp>
 
 #include <mbgl/text/glyph_set.hpp>
-#include <mbgl/text/glyph_store.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/io.hpp>
@@ -11,20 +11,20 @@
 
 using namespace mbgl;
 
-class GlyphStoreTest {
+class GlyphAtlasTest {
 public:
     util::RunLoop loop;
     StubFileSource fileSource;
     StubStyleObserver observer;
-    GlyphStore glyphStore { fileSource };
+    GlyphAtlas glyphAtlas { 32, 32, fileSource };
 
     void run(const std::string& url, const FontStack& fontStack, const std::set<GlyphRange>& glyphRanges) {
         // Squelch logging.
         Log::setObserver(std::make_unique<Log::NullObserver>());
 
-        glyphStore.setObserver(&observer);
-        glyphStore.setURL(url);
-        glyphStore.hasGlyphRanges(fontStack, glyphRanges);
+        glyphAtlas.setObserver(&observer);
+        glyphAtlas.setURL(url);
+        glyphAtlas.hasGlyphRanges(fontStack, glyphRanges);
 
         loop.run();
     }
@@ -34,8 +34,8 @@ public:
     }
 };
 
-TEST(GlyphStore, LoadingSuccess) {
-    GlyphStoreTest test;
+TEST(GlyphAtlas, LoadingSuccess) {
+    GlyphAtlasTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
@@ -50,10 +50,10 @@ TEST(GlyphStore, LoadingSuccess) {
     };
 
     test.observer.glyphsLoaded = [&] (const FontStack&, const GlyphRange&) {
-        if (!test.glyphStore.hasGlyphRanges({{"Test Stack"}}, {{0, 255}, {256, 511}}))
+        if (!test.glyphAtlas.hasGlyphRanges({{"Test Stack"}}, {{0, 255}, {256, 511}}))
             return;
 
-        auto glyphSet = test.glyphStore.getGlyphSet({{"Test Stack"}});
+        auto glyphSet = test.glyphAtlas.getGlyphSet({{"Test Stack"}});
         ASSERT_FALSE(glyphSet->getSDFs().empty());
 
         test.end();
@@ -65,8 +65,8 @@ TEST(GlyphStore, LoadingSuccess) {
         {{0, 255}, {256, 511}});
 }
 
-TEST(GlyphStore, LoadingFail) {
-    GlyphStoreTest test;
+TEST(GlyphAtlas, LoadingFail) {
+    GlyphAtlasTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource&) {
         Response response;
@@ -83,9 +83,9 @@ TEST(GlyphStore, LoadingFail) {
         EXPECT_TRUE(error != nullptr);
         EXPECT_EQ(util::toString(error), "Failed by the test case");
 
-        auto glyphSet = test.glyphStore.getGlyphSet({{"Test Stack"}});
+        auto glyphSet = test.glyphAtlas.getGlyphSet({{"Test Stack"}});
         ASSERT_TRUE(glyphSet->getSDFs().empty());
-        ASSERT_FALSE(test.glyphStore.hasGlyphRanges({{"Test Stack"}}, {{0, 255}}));
+        ASSERT_FALSE(test.glyphAtlas.hasGlyphRanges({{"Test Stack"}}, {{0, 255}}));
 
         test.end();
     };
@@ -96,8 +96,8 @@ TEST(GlyphStore, LoadingFail) {
         {{0, 255}});
 }
 
-TEST(GlyphStore, LoadingCorrupted) {
-    GlyphStoreTest test;
+TEST(GlyphAtlas, LoadingCorrupted) {
+    GlyphAtlasTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource&) {
         Response response;
@@ -112,9 +112,9 @@ TEST(GlyphStore, LoadingCorrupted) {
         EXPECT_TRUE(error != nullptr);
         EXPECT_EQ(util::toString(error), "unknown pbf field type exception");
 
-        auto glyphSet = test.glyphStore.getGlyphSet({{"Test Stack"}});
+        auto glyphSet = test.glyphAtlas.getGlyphSet({{"Test Stack"}});
         ASSERT_TRUE(glyphSet->getSDFs().empty());
-        ASSERT_FALSE(test.glyphStore.hasGlyphRanges({{"Test Stack"}}, {{0, 255}}));
+        ASSERT_FALSE(test.glyphAtlas.hasGlyphRanges({{"Test Stack"}}, {{0, 255}}));
 
         test.end();
     };
@@ -125,8 +125,8 @@ TEST(GlyphStore, LoadingCorrupted) {
         {{0, 255}});
 }
 
-TEST(GlyphStore, LoadingCancel) {
-    GlyphStoreTest test;
+TEST(GlyphAtlas, LoadingCancel) {
+    GlyphAtlasTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource&) {
         test.end();
