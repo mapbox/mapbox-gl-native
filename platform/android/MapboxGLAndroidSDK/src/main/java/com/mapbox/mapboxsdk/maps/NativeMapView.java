@@ -526,6 +526,10 @@ final class NativeMapView {
         nativeScheduleTakeSnapshot(mNativeMapViewPtr);
     }
 
+    public void setApiBaseUrl(String baseUrl) {
+        nativeSetAPIBaseURL(mNativeMapViewPtr, baseUrl);
+    }
+
     //
     // Callbacks
     //
@@ -721,4 +725,6 @@ final class NativeMapView {
     private native Feature[] nativeQueryRenderedFeaturesForPoint(long nativeMapViewPtr, float x, float y, String[] layerIds);
 
     private native Feature[] nativeQueryRenderedFeaturesForBox(long mNativeMapViewPtr, float left, float top, float right, float bottom, String[] layerIds);
+
+    private native void nativeSetAPIBaseURL(long nativeMapViewPtr, String baseUrl);
 }

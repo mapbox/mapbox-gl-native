@@ -424,6 +424,13 @@ jni::jobject* nativeGetClasses(JNIEnv *env, jni::jobject* obj, jlong nativeMapVi
     return std_vector_string_to_jobject(env, nativeMapView->getMap().getClasses());
 }
 
+void nativeSetAPIBaseURL(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* url) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetAPIBaseURL");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getFileSource().setAPIBaseURL(std_string_from_jstring(env, url));
+}
+
 void nativeSetStyleUrl(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* url) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetStyleURL");
     assert(nativeMapViewPtr != 0);
@@ -1836,7 +1843,8 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeSetContentPadding, "(JDDDD)V"),
         MAKE_NATIVE_METHOD(nativeScheduleTakeSnapshot, "(J)V"),
         MAKE_NATIVE_METHOD(nativeQueryRenderedFeaturesForPoint, "(JFF[Ljava/lang/String;)[Lcom/mapbox/services/commons/geojson/Feature;"),
-        MAKE_NATIVE_METHOD(nativeQueryRenderedFeaturesForBox, "(JFFFF[Ljava/lang/String;)[Lcom/mapbox/services/commons/geojson/Feature;")
+        MAKE_NATIVE_METHOD(nativeQueryRenderedFeaturesForBox, "(JFFFF[Ljava/lang/String;)[Lcom/mapbox/services/commons/geojson/Feature;"),
+        MAKE_NATIVE_METHOD(nativeSetAPIBaseURL, "(JLjava/lang/String;)V")
     );
 
     // Offline begin

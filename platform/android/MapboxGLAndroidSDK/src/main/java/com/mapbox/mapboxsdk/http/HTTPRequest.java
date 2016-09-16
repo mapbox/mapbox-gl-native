@@ -56,7 +56,7 @@ class HTTPRequest implements Callback {
 
             HttpUrl httpUrl = HttpUrl.parse(resourceUrl);
             final String host = httpUrl.host().toLowerCase(MapboxConstants.MAPBOX_LOCALE);
-            if (host.equals("mapbox.com") || host.endsWith(".mapbox.com")) {
+            if (host.equals("mapbox.com") || host.endsWith(".mapbox.com") || host.equals("mapbox.cn") || host.endsWith(".mapbox.cn")) {
                 if (httpUrl.querySize() == 0) {
                     resourceUrl = resourceUrl + "?";
                 } else {
