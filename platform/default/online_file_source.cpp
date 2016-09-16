@@ -77,6 +77,7 @@ public:
                 pendingRequestsMap.erase(it);
             }
         }
+        assert(pendingRequestsMap.size() == pendingRequestsList.size());
     }
 
     void activateOrQueueRequest(OnlineFileRequest* request) {
@@ -94,6 +95,7 @@ public:
     void queueRequest(OnlineFileRequest* request) {
         auto it = pendingRequestsList.insert(pendingRequestsList.end(), request);
         pendingRequestsMap.emplace(request, std::move(it));
+        assert(pendingRequestsMap.size() == pendingRequestsList.size());
     }
 
     void activateRequest(OnlineFileRequest* request) {
@@ -104,6 +106,7 @@ public:
             request->request.reset();
             request->completed(response);
         });
+        assert(pendingRequestsMap.size() == pendingRequestsList.size());
     }
 
     void activatePendingRequest() {
@@ -117,6 +120,15 @@ public:
         pendingRequestsMap.erase(request);
 
         activateRequest(request);
+        assert(pendingRequestsMap.size() == pendingRequestsList.size());
+    }
+    
+    bool isPending(OnlineFileRequest* request) {
+        return pendingRequestsMap.find(request) != pendingRequestsMap.end();
+    }
+    
+    bool isActive(OnlineFileRequest* request) {
+        return activeRequests.find(request) != activeRequests.end();
     }
 
 private:
@@ -238,7 +250,7 @@ Timestamp interpolateExpiration(const Timestamp& current,
 }
 
 void OnlineFileRequest::schedule(optional<Timestamp> expires) {
-    if (request) {
+    if (impl.isPending(this) || impl.isActive(this)) {
         // There's already a request in progress; don't start another one.
         return;
     }
