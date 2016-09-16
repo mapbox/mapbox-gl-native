@@ -27,12 +27,33 @@
         return { std::string([(NSString *)value UTF8String]) };
     } else if ([value isKindOfClass:NSNumber.class]) {
         NSNumber *number = (NSNumber *)value;
-        if((strcmp([number objCType], @encode(int))) == 0) {
-            return { number.intValue };
-        } else if ((strcmp([number objCType], @encode(double))) == 0) {
-            return { number.doubleValue };
-        } else if ((strcmp([number objCType], @encode(char))) == 0) {
-            return { number.boolValue };
+        if ((strcmp([number objCType], @encode(char)) == 0) ||
+            (strcmp([number objCType], @encode(BOOL)) == 0)) {
+            // char: 32-bit boolean
+            // BOOL: 64-bit boolean
+            return { (bool)number.boolValue };
+        } else if (strcmp([number objCType], @encode(double)) == 0) {
+            // Double values on all platforms are interpreted precisely.
+            return { (double)number.doubleValue };
+        } else if (strcmp([number objCType], @encode(float)) == 0) {
+            // Float values when taken as double introduce precision problems,
+            // so warn the user to avoid them. This would require them to
+            // explicitly use -[NSNumber numberWithFloat:] arguments anyway.
+            // We still do this conversion in order to provide a valid value.
+            static dispatch_once_t onceToken;
+            dispatch_once(&onceToken, ^{
+                NSLog(@"One-time warning: Float values are converted to double and can introduce imprecision; please use double values explicitly in predicate arguments.");
+            });
+            return { (double)number.doubleValue };
+        } else if ([number compare:@(0)] == NSOrderedDescending ||
+                   [number compare:@(0)] == NSOrderedSame) {
+            // Positive integer or zero; use uint64_t per mbgl::Value definition.
+            // We use unsigned long long here to avoid any truncation.
+            return { (uint64_t)number.unsignedLongLongValue };
+        } else if ([number compare:@(0)] == NSOrderedAscending) {
+            // Negative integer; use int64_t per mbgl::Value definition.
+            // We use long long here to avoid any truncation.
+            return { (int64_t)number.longLongValue };
         }
     }
     [NSException raise:@"Value not handled"
