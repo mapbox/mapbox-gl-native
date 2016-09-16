@@ -3,6 +3,7 @@ IndentWidth: 4
 AccessModifierOffset: -4
 UseTab: Never
 BinPackParameters: false
+AlignTrailingComments: true
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 AllowShortBlocksOnASingleLine: false
@@ -16,3 +17,4 @@ BreakBeforeBraces: Attach
 ColumnLimit: 100
 Cpp11BracedListStyle: false
 SpacesBeforeTrailingComments: 1
+SortIncludes: false

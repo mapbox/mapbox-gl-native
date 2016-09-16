@@ -185,6 +185,10 @@ tidy: clang-tools
 check: clang-tools
 	scripts/clang-tools.sh $(MACOS_COMPDB_PATH) --diff
 
+.PHONY: format
+format: clang-tools
+	scripts/clang-tools.sh $(MACOS_COMPDB_PATH) --format
+
 endif
 
 #### iOS targets ##############################################################
@@ -328,6 +332,10 @@ tidy: clang-tools
 .PHONY: check
 check: clang-tools
 	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH) --diff
+
+.PHONY: check
+format: clang-tools
+	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH) --format
 
 endif
 
