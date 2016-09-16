@@ -13,28 +13,24 @@
 
 namespace mbgl {
 
-HTTPRequest::HTTPRequest(HTTPFileSource::Impl* context, const Resource& resource, FileSource::Callback callback)
-    : m_context(context)
-    , m_resource(resource)
-    , m_callback(callback)
-{
+HTTPRequest::HTTPRequest(HTTPFileSource::Impl* context,
+                         const Resource& resource,
+                         FileSource::Callback callback)
+    : m_context(context), m_resource(resource), m_callback(callback) {
     m_context->request(this);
 }
 
-HTTPRequest::~HTTPRequest()
-{
+HTTPRequest::~HTTPRequest() {
     if (!m_handled) {
         m_context->cancel(this);
     }
 }
 
-QUrl HTTPRequest::requestUrl() const
-{
+QUrl HTTPRequest::requestUrl() const {
     return QUrl::fromPercentEncoding(QByteArray(m_resource.url.data(), m_resource.url.size()));
 }
 
-QNetworkRequest HTTPRequest::networkRequest() const
-{
+QNetworkRequest HTTPRequest::networkRequest() const {
     QNetworkRequest req = QNetworkRequest(requestUrl());
     req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
     req.setRawHeader("User-Agent", "MapboxGL/1.0 [Qt]");
@@ -49,8 +45,7 @@ QNetworkRequest HTTPRequest::networkRequest() const
     return req;
 }
 
-void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
-{
+void HTTPRequest::handleNetworkReply(QNetworkReply* reply) {
     m_handled = true;
 
     // Calling `callback` may result in deleting `this`.
@@ -62,8 +57,8 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
 
     // Handle non-HTTP errors (i.e. like connection).
     if (reply->error() && reply->error() < 100) {
-        response.error = std::make_unique<Error>(
-            Error::Reason::Connection, reply->errorString().toStdString());
+        response.error =
+            std::make_unique<Error>(Error::Reason::Connection, reply->errorString().toStdString());
         callback(response);
         return;
     }
@@ -71,7 +66,7 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
     QPair<QByteArray, QByteArray> line;
     optional<std::string> retryAfter;
     optional<std::string> xRateLimitReset;
-    foreach(line, reply->rawHeaderPairs()) {
+    foreach (line, reply->rawHeaderPairs()) {
         QString header = QString(line.first).toLower();
 
         if (header == "last-modified") {
@@ -91,7 +86,7 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
 
     int responseCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
-    switch(responseCode) {
+    switch (responseCode) {
     case 200: {
         QByteArray bytes = reply->readAll();
         if (bytes.isEmpty()) {
@@ -111,22 +106,23 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
         if (m_resource.kind == Resource::Kind::Tile) {
             response.noContent = true;
         } else {
-            response.error = std::make_unique<Error>(
-                Error::Reason::NotFound, "HTTP status code 404");
+            response.error =
+                std::make_unique<Error>(Error::Reason::NotFound, "HTTP status code 404");
         }
         break;
     }
     case 429:
-        response.error = std::make_unique<Error>(
-                Error::Reason::RateLimit, "HTTP status code 429", 
-                http::parseRetryHeaders(retryAfter, xRateLimitReset));
+        response.error =
+            std::make_unique<Error>(Error::Reason::RateLimit, "HTTP status code 429",
+                                    http::parseRetryHeaders(retryAfter, xRateLimitReset));
         break;
     default:
-        Response::Error::Reason reason = (responseCode >= 500 && responseCode < 600) ?
-            Error::Reason::Server : Error::Reason::Other;
+        Response::Error::Reason reason = (responseCode >= 500 && responseCode < 600)
+                                             ? Error::Reason::Server
+                                             : Error::Reason::Other;
 
-        response.error = std::make_unique<Error>(
-            reason, "HTTP status code " + util::toString(responseCode));
+        response.error =
+            std::make_unique<Error>(reason, "HTTP status code " + util::toString(responseCode));
     }
 
     callback(response);

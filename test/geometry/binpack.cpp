@@ -6,7 +6,8 @@
 #include <array>
 
 namespace mbgl {
-template <typename T> ::std::ostream& operator<<(::std::ostream& os, const Rect<T>& t) {
+template <typename T>
+::std::ostream& operator<<(::std::ostream& os, const Rect<T>& t) {
     return os << "Rect { " << t.x << ", " << t.y << ", " << t.w << ", " << t.h << " }";
 }
 } // namespace mbgl
@@ -29,7 +30,6 @@ TEST(BinPack, Allocating) {
     ASSERT_EQ(mbgl::Rect<uint16_t>(32, 17, 32, 24), rects[3]);
 }
 
-
 TEST(BinPack, Full) {
     mbgl::BinPack<uint16_t> bin(128, 128);
     std::vector<mbgl::Rect<uint16_t>> rects;
@@ -43,7 +43,7 @@ TEST(BinPack, Full) {
 
         ASSERT_FALSE(bin.allocate(8, 8).hasArea());
 
-        for (auto& rect: rects) {
+        for (auto& rect : rects) {
             bin.release(rect);
         }
         rects.clear();

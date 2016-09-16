@@ -15,10 +15,10 @@ public:
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
     void remove(AsyncRequest*);
 
-    using ResponseFunction = std::function<optional<Response> (const Resource&)>;
+    using ResponseFunction = std::function<optional<Response>(const Resource&)>;
 
     // You can set the response callback on a global level by assigning this callback:
-    ResponseFunction response = [this] (const Resource& resource) {
+    ResponseFunction response = [this](const Resource& resource) {
         return defaultResponse(resource);
     };
 

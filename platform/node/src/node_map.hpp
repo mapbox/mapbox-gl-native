@@ -12,8 +12,7 @@
 
 namespace node_mbgl {
 
-class NodeMap : public Nan::ObjectWrap,
-                public mbgl::FileSource {
+class NodeMap : public Nan::ObjectWrap, public mbgl::FileSource {
 public:
     struct RenderOptions;
     class RenderWorker;
@@ -57,9 +56,8 @@ public:
     std::unique_ptr<Nan::Callback> callback;
 
     // Async for delivering the notifications of render completion.
-    uv_async_t *async;
+    uv_async_t* async;
 
     bool loaded = false;
 };
-
 }

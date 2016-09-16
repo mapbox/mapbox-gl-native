@@ -47,15 +47,19 @@ public:
 
     virtual Bucket* getBucket(const style::Layer&) = 0;
 
-    virtual bool parsePending() { return true; }
-    virtual void redoLayout() {}
-    virtual void redoPlacement(PlacementConfig) {}
+    virtual bool parsePending() {
+        return true;
+    }
+    virtual void redoLayout() {
+    }
+    virtual void redoPlacement(PlacementConfig) {
+    }
 
-    virtual void queryRenderedFeatures(
-            std::unordered_map<std::string, std::vector<Feature>>& result,
-            const GeometryCoordinates& queryGeometry,
-            const TransformState&,
-            const optional<std::vector<std::string>>& layerIDs);
+    virtual void
+    queryRenderedFeatures(std::unordered_map<std::string, std::vector<Feature>>& result,
+                          const GeometryCoordinates& queryGeometry,
+                          const TransformState&,
+                          const optional<std::vector<std::string>>& layerIDs);
 
     void setTriedOptional();
 

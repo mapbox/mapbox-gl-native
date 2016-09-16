@@ -80,8 +80,8 @@ OfflineDownload::tileResources(SourceType type, uint16_t tileSize, const Tileset
     std::vector<Resource> result;
 
     for (const auto& tile : definition.tileCover(type, tileSize, tileset.zoomRange)) {
-        result.push_back(
-            Resource::tile(tileset.tiles[0], definition.pixelRatio, tile.x, tile.y, tile.z, tileset.scheme));
+        result.push_back(Resource::tile(tileset.tiles[0], definition.pixelRatio, tile.x, tile.y,
+                                        tile.z, tileset.scheme));
     }
 
     return result;

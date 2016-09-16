@@ -16,14 +16,14 @@ class Style;
 class UpdateParameters {
 public:
     UpdateParameters(float pixelRatio_,
-                          MapDebugOptions debugOptions_,
-                          const TransformState& transformState_,
-                          Worker& worker_,
-                          FileSource& fileSource_,
-                          bool shouldReparsePartialTiles_,
-                          const MapMode mode_,
-                          AnnotationManager& annotationManager_,
-                          Style& style_)
+                     MapDebugOptions debugOptions_,
+                     const TransformState& transformState_,
+                     Worker& worker_,
+                     FileSource& fileSource_,
+                     bool shouldReparsePartialTiles_,
+                     const MapMode mode_,
+                     AnnotationManager& annotationManager_,
+                     Style& style_)
         : pixelRatio(pixelRatio_),
           debugOptions(debugOptions_),
           transformState(transformState_),
@@ -32,7 +32,8 @@ public:
           shouldReparsePartialTiles(shouldReparsePartialTiles_),
           mode(mode_),
           annotationManager(annotationManager_),
-          style(style_) {}
+          style(style_) {
+    }
 
     float pixelRatio;
     MapDebugOptions debugOptions;

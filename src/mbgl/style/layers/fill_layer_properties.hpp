@@ -17,13 +17,13 @@ public:
     void cascade(const CascadeParameters&);
     bool recalculate(const CalculationParameters&);
 
-    PaintProperty<bool> fillAntialias { true };
-    PaintProperty<float> fillOpacity { 1 };
-    PaintProperty<Color> fillColor { Color::black() };
-    PaintProperty<Color> fillOutlineColor { {} };
-    PaintProperty<std::array<float, 2>> fillTranslate { {{ 0, 0 }} };
-    PaintProperty<TranslateAnchorType> fillTranslateAnchor { TranslateAnchorType::Map };
-    PaintProperty<std::string, CrossFadedPropertyEvaluator> fillPattern { "" };
+    PaintProperty<bool> fillAntialias{true};
+    PaintProperty<float> fillOpacity{1};
+    PaintProperty<Color> fillColor{Color::black()};
+    PaintProperty<Color> fillOutlineColor{{}};
+    PaintProperty<std::array<float, 2>> fillTranslate{{{0, 0}}};
+    PaintProperty<TranslateAnchorType> fillTranslateAnchor{TranslateAnchorType::Map};
+    PaintProperty<std::string, CrossFadedPropertyEvaluator> fillPattern{""};
 };
 
 } // namespace style

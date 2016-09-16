@@ -2,8 +2,7 @@
 #include <mbgl/util/premultiply.hpp>
 #include <mbgl/platform/log.hpp>
 
-extern "C"
-{
+extern "C" {
 #include <webp/decode.h>
 }
 
@@ -23,7 +22,7 @@ PremultipliedImage decodeWebP(const uint8_t* data, size_t size) {
         throw std::runtime_error("failed to decode WebP data");
     }
 
-    UnassociatedImage image { size_t(width), size_t(height), std::move(webp) };
+    UnassociatedImage image{size_t(width), size_t(height), std::move(webp)};
     return util::premultiply(std::move(image));
 }
 

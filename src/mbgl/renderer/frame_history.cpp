@@ -65,33 +65,28 @@ void FrameHistory::upload(gl::ObjectStore& store, gl::Config& config, uint32_t u
         bind(store, config, unit);
 
         if (first) {
-            MBGL_CHECK_ERROR(glTexImage2D(
-                        GL_TEXTURE_2D, // GLenum target
-                        0, // GLint level
-                        GL_ALPHA, // GLint internalformat
-                        width, // GLsizei width
-                        height, // GLsizei height
-                        0, // GLint border
-                        GL_ALPHA, // GLenum format
-                        GL_UNSIGNED_BYTE, // GLenum type
-                        opacities.data()
-                        ));
+            MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D,    // GLenum target
+                                          0,                // GLint level
+                                          GL_ALPHA,         // GLint internalformat
+                                          width,            // GLsizei width
+                                          height,           // GLsizei height
+                                          0,                // GLint border
+                                          GL_ALPHA,         // GLenum format
+                                          GL_UNSIGNED_BYTE, // GLenum type
+                                          opacities.data()));
         } else {
-            MBGL_CHECK_ERROR(glTexSubImage2D(
-                        GL_TEXTURE_2D, // GLenum target
-                        0, // GLint level
-                        0, // GLint xoffset
-                        0, // GLint yoffset
-                        width, // GLsizei width
-                        height, // GLsizei height
-                        GL_ALPHA, // GLenum format
-                        GL_UNSIGNED_BYTE, // GLenum type
-                        opacities.data()
-                        ));
+            MBGL_CHECK_ERROR(glTexSubImage2D(GL_TEXTURE_2D,    // GLenum target
+                                             0,                // GLint level
+                                             0,                // GLint xoffset
+                                             0,                // GLint yoffset
+                                             width,            // GLsizei width
+                                             height,           // GLsizei height
+                                             GL_ALPHA,         // GLenum format
+                                             GL_UNSIGNED_BYTE, // GLenum type
+                                             opacities.data()));
         }
 
         changed = false;
-
     }
 }
 

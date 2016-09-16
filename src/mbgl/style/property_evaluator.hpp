@@ -14,11 +14,15 @@ public:
     using ResultType = T;
 
     PropertyEvaluator(const CalculationParameters& parameters_, T defaultValue_)
-        : parameters(parameters_),
-          defaultValue(std::move(defaultValue_)) {}
+        : parameters(parameters_), defaultValue(std::move(defaultValue_)) {
+    }
 
-    T operator()(const Undefined&) const { return defaultValue; }
-    T operator()(const T& constant) const { return constant; }
+    T operator()(const Undefined&) const {
+        return defaultValue;
+    }
+    T operator()(const T& constant) const {
+        return constant;
+    }
     T operator()(const Function<T>&) const;
 
 private:
@@ -41,8 +45,8 @@ public:
     using ResultType = Faded<T>;
 
     CrossFadedPropertyEvaluator(const CalculationParameters& parameters_, T defaultValue_)
-        : parameters(parameters_),
-          defaultValue(std::move(defaultValue_)) {}
+        : parameters(parameters_), defaultValue(std::move(defaultValue_)) {
+    }
 
     Faded<T> operator()(const Undefined&) const;
     Faded<T> operator()(const T& constant) const;
@@ -59,8 +63,7 @@ private:
 
 namespace util {
 template <typename T>
-struct Interpolator<style::Faded<T>>
-    : Uninterpolated {};
+struct Interpolator<style::Faded<T>> : Uninterpolated {};
 } // namespace util
 
 } // namespace mbgl

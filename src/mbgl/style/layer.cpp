@@ -19,8 +19,9 @@ VisibilityType Layer::getVisibility() const {
 }
 
 void Layer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
+    if (value == getVisibility()) {
         return;
+    }
     baseImpl->visibility = value;
     baseImpl->observer->onLayerVisibilityChanged(*this);
 }

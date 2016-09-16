@@ -11,9 +11,7 @@ template <class F, class P>
 class WorkTaskImpl : public WorkTask {
 public:
     WorkTaskImpl(F f, P p, std::shared_ptr<std::atomic<bool>> canceled_)
-      : canceled(std::move(canceled_)),
-        func(std::move(f)),
-        params(std::move(p)) {
+        : canceled(std::move(canceled_)), func(std::move(f)), params(std::move(p)) {
     }
 
     void operator()() override {
@@ -57,9 +55,7 @@ std::shared_ptr<WorkTask> WorkTask::make(Fn&& fn, Args&&... args) {
 
     auto tuple = std::make_tuple(std::forward<Args>(args)...);
     return std::make_shared<WorkTaskImpl<std::decay_t<Fn>, decltype(tuple)>>(
-        std::forward<Fn>(fn),
-        std::move(tuple),
-        flag);
+        std::forward<Fn>(fn), std::move(tuple), flag);
 }
 
 namespace detail {
@@ -75,13 +71,13 @@ auto packageArgumentsAndCallback(std::shared_ptr<std::atomic<bool>> flag,
     // the flag because the request may have been cancelled after L2 was invoked but before it
     // began executing.
 
-    auto l2 = [flag, callback] (auto&&... results) {
+    auto l2 = [flag, callback](auto&&... results) {
         if (!*flag) {
             callback(std::forward<decltype(results)>(results)...);
         }
     };
 
-    auto l1 = [flag, current = util::RunLoop::Get(), l2_ = l2] (auto&&... results) {
+    auto l1 = [ flag, current = util::RunLoop::Get(), l2_ = l2 ](auto&&... results) {
         if (!*flag) {
             current->invoke(l2_, std::forward<decltype(results)>(results)...);
         }
@@ -96,14 +92,12 @@ std::shared_ptr<WorkTask> WorkTask::makeWithCallback(Fn&& fn, Args&&... args) {
     auto flag = std::make_shared<std::atomic<bool>>();
     *flag = false;
 
-    auto tuple = detail::packageArgumentsAndCallback(flag,
-        std::forward_as_tuple(std::forward<Args>(args)...),
-        std::make_index_sequence<sizeof...(Args) - 1>());
+    auto tuple = detail::packageArgumentsAndCallback(
+        flag, std::forward_as_tuple(std::forward<Args>(args)...),
+        std::make_index_sequence<sizeof...(Args)-1>());
 
     return std::make_shared<WorkTaskImpl<std::decay_t<Fn>, decltype(tuple)>>(
-        std::forward<Fn>(fn),
-        std::move(tuple),
-        flag);
+        std::forward<Fn>(fn), std::move(tuple), flag);
 }
 
 } // namespace mbgl

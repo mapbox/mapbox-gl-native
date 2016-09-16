@@ -70,7 +70,6 @@ struct Converter<GeoJSONOptions> {
 
         return { options };
     }
-
 };
 
 } // namespace conversion

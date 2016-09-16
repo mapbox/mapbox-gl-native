@@ -55,12 +55,16 @@ public:
     void setLineColor(PropertyValue<Color>, const optional<std::string>& klass = {});
 
     static PropertyValue<std::array<float, 2>> getDefaultLineTranslate();
-    PropertyValue<std::array<float, 2>> getLineTranslate(const optional<std::string>& klass = {}) const;
-    void setLineTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
+    PropertyValue<std::array<float, 2>>
+    getLineTranslate(const optional<std::string>& klass = {}) const;
+    void setLineTranslate(PropertyValue<std::array<float, 2>>,
+                          const optional<std::string>& klass = {});
 
     static PropertyValue<TranslateAnchorType> getDefaultLineTranslateAnchor();
-    PropertyValue<TranslateAnchorType> getLineTranslateAnchor(const optional<std::string>& klass = {}) const;
-    void setLineTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
+    PropertyValue<TranslateAnchorType>
+    getLineTranslateAnchor(const optional<std::string>& klass = {}) const;
+    void setLineTranslateAnchor(PropertyValue<TranslateAnchorType>,
+                                const optional<std::string>& klass = {});
 
     static PropertyValue<float> getDefaultLineWidth();
     PropertyValue<float> getLineWidth(const optional<std::string>& klass = {}) const;
@@ -79,8 +83,10 @@ public:
     void setLineBlur(PropertyValue<float>, const optional<std::string>& klass = {});
 
     static PropertyValue<std::vector<float>> getDefaultLineDasharray();
-    PropertyValue<std::vector<float>> getLineDasharray(const optional<std::string>& klass = {}) const;
-    void setLineDasharray(PropertyValue<std::vector<float>>, const optional<std::string>& klass = {});
+    PropertyValue<std::vector<float>>
+    getLineDasharray(const optional<std::string>& klass = {}) const;
+    void setLineDasharray(PropertyValue<std::vector<float>>,
+                          const optional<std::string>& klass = {});
 
     static PropertyValue<std::string> getDefaultLinePattern();
     PropertyValue<std::string> getLinePattern(const optional<std::string>& klass = {}) const;

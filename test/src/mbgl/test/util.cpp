@@ -46,12 +46,14 @@ Server::Server(const char* script) {
         // This is the child process.
 
         // Connect the parent => child pipe to stdin.
-        while ((dup2(input[0], STDIN_FILENO) == -1) && (errno == EINTR)) {}
+        while ((dup2(input[0], STDIN_FILENO) == -1) && (errno == EINTR)) {
+        }
         close(input[0]);
         close(input[1]);
 
         // Move the child => parent side of the pipe to stdout.
-        while ((dup2(output[1], STDOUT_FILENO) == -1) && (errno == EINTR)) {}
+        while ((dup2(output[1], STDOUT_FILENO) == -1) && (errno == EINTR)) {
+        }
         close(output[1]);
         close(output[0]);
 
@@ -99,9 +101,8 @@ Server::~Server() {
 
 PremultipliedImage render(Map& map) {
     PremultipliedImage result;
-    map.renderStill([&result](std::exception_ptr, PremultipliedImage&& image) {
-        result = std::move(image);
-    });
+    map.renderStill(
+        [&result](std::exception_ptr, PremultipliedImage&& image) { result = std::move(image); });
 
     while (!result.size()) {
         util::RunLoop::Get()->runOnce();
@@ -122,17 +123,13 @@ void checkImage(const std::string& base,
 #endif
 
     PremultipliedImage expected = decodeImage(util::read_file(base + "/expected.png"));
-    PremultipliedImage diff { expected.width, expected.height };
+    PremultipliedImage diff{expected.width, expected.height};
 
     ASSERT_EQ(expected.width, actual.width);
     ASSERT_EQ(expected.height, actual.height);
 
-    double pixels = mapbox::pixelmatch(actual.data.get(),
-                                       expected.data.get(),
-                                       expected.width,
-                                       expected.height,
-                                       diff.data.get(),
-                                       pixelThreshold);
+    double pixels = mapbox::pixelmatch(actual.data.get(), expected.data.get(), expected.width,
+                                       expected.height, diff.data.get(), pixelThreshold);
 
     EXPECT_LE(pixels / (expected.width * expected.height), imageThreshold);
 

@@ -3,13 +3,22 @@
 
 namespace mbgl {
 
-CollisionFeature::CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
-        const float top, const float bottom, const float left, const float right,
-        const float boxScale, const float padding, const style::SymbolPlacementType placement, IndexedSubfeature indexedFeature_,
-        const bool straight)
-        : indexedFeature(std::move(indexedFeature_)) {
+CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
+                                   const Anchor& anchor,
+                                   const float top,
+                                   const float bottom,
+                                   const float left,
+                                   const float right,
+                                   const float boxScale,
+                                   const float padding,
+                                   const style::SymbolPlacementType placement,
+                                   IndexedSubfeature indexedFeature_,
+                                   const bool straight)
+    : indexedFeature(std::move(indexedFeature_)) {
 
-    if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
+    if (top == 0 && bottom == 0 && left == 0 && right == 0) {
+        return;
+    }
 
     const float y1 = top * boxScale - padding;
     const float y2 = bottom * boxScale + padding;
@@ -20,7 +29,9 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates &line, const Anchor
         float height = y2 - y1;
         const double length = x2 - x1;
 
-        if (height <= 0.0f) return;
+        if (height <= 0.0f) {
+            return;
+        }
 
         height = std::max(10.0f * boxScale, height);
 
@@ -28,7 +39,9 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates &line, const Anchor
 
         if (straight) {
             // used for icon labels that are aligned with the line, but don't curve along it
-            const GeometryCoordinate vector = convertPoint<int16_t>(util::unit(convertPoint<double>(line[anchor.segment + 1] - line[anchor.segment])) * length);
+            const GeometryCoordinate vector = convertPoint<int16_t>(
+                util::unit(convertPoint<double>(line[anchor.segment + 1] - line[anchor.segment])) *
+                length);
             const GeometryCoordinates newLine({ anchorPoint - vector, anchorPoint + vector });
             bboxifyLabel(newLine, anchorPoint, 0, length, height);
         } else {
@@ -40,8 +53,11 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates &line, const Anchor
     }
 }
 
-void CollisionFeature::bboxifyLabel(const GeometryCoordinates &line,
-        GeometryCoordinate &anchorPoint, const int segment, const float labelLength, const float boxSize) {
+void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line,
+                                    GeometryCoordinate& anchorPoint,
+                                    const int segment,
+                                    const float labelLength,
+                                    const float boxSize) {
 
     const float step = boxSize / 2;
     const unsigned int nBoxes = std::floor(labelLength / step);
@@ -50,7 +66,7 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates &line,
     // box is at the edge of the label.
     const float firstBoxOffset = -boxSize / 2;
 
-    GeometryCoordinate &p = anchorPoint;
+    GeometryCoordinate& p = anchorPoint;
     int index = segment + 1;
     float anchorDistance = firstBoxOffset;
 
@@ -60,7 +76,9 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates &line,
 
         // there isn't enough room for the label after the beginning of the line
         // checkMaxAngle should have already caught this
-        if (index < 0) return;
+        if (index < 0) {
+            return;
+        }
 
         anchorDistance -= util::dist<float>(line[index], p);
         p = line[index];
@@ -78,7 +96,9 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates &line,
             index++;
 
             // There isn't enough room before the end of the line.
-            if (index + 1 >= (int)line.size()) return;
+            if (index + 1 >= (int)line.size()) {
+                return;
+            }
 
             segmentLength = util::dist<float>(line[index], line[index + 1]);
         }
@@ -89,17 +109,16 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates &line,
         const auto& p0 = line[index];
         const auto& p1 = line[index + 1];
 
-        Point<float> boxAnchor = {
-            p0.x + segmentBoxDistance / segmentLength * (p1.x - p0.x),
-            p0.y + segmentBoxDistance / segmentLength * (p1.y - p0.y)
-        };
+        Point<float> boxAnchor = { p0.x + segmentBoxDistance / segmentLength * (p1.x - p0.x),
+                                   p0.y + segmentBoxDistance / segmentLength * (p1.y - p0.y) };
 
-        const float distanceToInnerEdge = std::max(std::fabs(boxDistanceToAnchor - firstBoxOffset) - step / 2, 0.0f);
+        const float distanceToInnerEdge =
+            std::max(std::fabs(boxDistanceToAnchor - firstBoxOffset) - step / 2, 0.0f);
         const float maxScale = labelLength / 2 / distanceToInnerEdge;
 
-        boxes.emplace_back(boxAnchor, -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, maxScale);
+        boxes.emplace_back(boxAnchor, -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2,
+                           maxScale);
     }
 }
-
 
 } // namespace mbgl

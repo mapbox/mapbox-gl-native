@@ -11,11 +11,10 @@
 
 int kAnimationDuration = 10000;
 
-MapWindow::MapWindow(const QMapboxGLSettings &settings)
-    : m_map(nullptr, settings)
-    , m_bearingAnimation(&m_map, "bearing")
-    , m_zoomAnimation(&m_map, "zoom")
-{
+MapWindow::MapWindow(const QMapboxGLSettings& settings)
+    : m_map(nullptr, settings),
+      m_bearingAnimation(&m_map, "bearing"),
+      m_zoomAnimation(&m_map, "zoom") {
     connect(&m_map, SIGNAL(needsRendering()), this, SLOT(updateGL()));
 
     // Set default location to Helsinki.
@@ -24,13 +23,13 @@ MapWindow::MapWindow(const QMapboxGLSettings &settings)
     changeStyle();
 
     connect(&m_zoomAnimation, SIGNAL(finished()), this, SLOT(animationFinished()));
-    connect(&m_zoomAnimation, SIGNAL(valueChanged(const QVariant&)), this, SLOT(animationValueChanged()));
+    connect(&m_zoomAnimation, SIGNAL(valueChanged(const QVariant&)), this,
+            SLOT(animationValueChanged()));
 
     setWindowIcon(QIcon(":icon.png"));
 }
 
-void MapWindow::selfTest()
-{
+void MapWindow::selfTest() {
     m_bearingAnimation.setDuration(kAnimationDuration);
     m_bearingAnimation.setEndValue(m_map.bearing() + 360 * 4);
     m_bearingAnimation.start();
@@ -40,21 +39,19 @@ void MapWindow::selfTest()
     m_zoomAnimation.start();
 }
 
-void MapWindow::animationFinished()
-{
-    qDebug() << "Animation ticks/s: " <<  m_animationTicks / static_cast<float>(kAnimationDuration) * 1000.;
-    qDebug() << "Frame draws/s: " <<  m_frameDraws / static_cast<float>(kAnimationDuration) * 1000.;
+void MapWindow::animationFinished() {
+    qDebug() << "Animation ticks/s: "
+             << m_animationTicks / static_cast<float>(kAnimationDuration) * 1000.;
+    qDebug() << "Frame draws/s: " << m_frameDraws / static_cast<float>(kAnimationDuration) * 1000.;
 
     qApp->quit();
 }
 
-void MapWindow::animationValueChanged()
-{
+void MapWindow::animationValueChanged() {
     m_animationTicks++;
 }
 
-void MapWindow::changeStyle()
-{
+void MapWindow::changeStyle() {
     static uint8_t currentStyleIndex;
 
     auto& styles = QMapbox::defaultStyles();
@@ -67,41 +64,39 @@ void MapWindow::changeStyle()
     }
 }
 
-void MapWindow::keyPressEvent(QKeyEvent *ev)
-{
-    static const QMapbox::TransitionOptions transition { 300, {} };
+void MapWindow::keyPressEvent(QKeyEvent* ev) {
+    static const QMapbox::TransitionOptions transition{300, {}};
 
     switch (ev->key()) {
     case Qt::Key_S:
         changeStyle();
         break;
     case Qt::Key_L: {
-            m_map.setPaintProperty("water", "fill-color", QColor(255, 0, 0));
-            m_map.setPaintProperty("building", "fill-color", "red");
-            m_map.setPaintProperty("road-secondary-tertiary", "line-color", "red");
+        m_map.setPaintProperty("water", "fill-color", QColor(255, 0, 0));
+        m_map.setPaintProperty("building", "fill-color", "red");
+        m_map.setPaintProperty("road-secondary-tertiary", "line-color", "red");
 
-            m_map.setLayoutProperty("road-label-small", "symbol-placement", "point");
-            m_map.setLayoutProperty("road-label-medium", "symbol-placement", "point");
-            m_map.setLayoutProperty("road-label-large", "symbol-placement", "point");
+        m_map.setLayoutProperty("road-label-small", "symbol-placement", "point");
+        m_map.setLayoutProperty("road-label-medium", "symbol-placement", "point");
+        m_map.setLayoutProperty("road-label-large", "symbol-placement", "point");
 
-            QFile geojson(":source.geojson");
-            geojson.open(QIODevice::ReadOnly);
+        QFile geojson(":source.geojson");
+        geojson.open(QIODevice::ReadOnly);
 
-            QVariantMap testSource;
-            testSource["type"] = "geojson";
-            testSource["data"] = geojson.readAll();
+        QVariantMap testSource;
+        testSource["type"] = "geojson";
+        testSource["data"] = geojson.readAll();
 
-            m_map.addSource("testSource", testSource);
+        m_map.addSource("testSource", testSource);
 
-            QVariantMap testLayer;
-            testLayer["id"] = "testLayer";
-            testLayer["type"] = "fill";
-            testLayer["source"] = "testSource";
+        QVariantMap testLayer;
+        testLayer["id"] = "testLayer";
+        testLayer["type"] = "fill";
+        testLayer["source"] = "testSource";
 
-            m_map.addLayer(testLayer);
-            m_map.setPaintProperty("testLayer", "fill-color", QColor("blue"));
-        }
-        break;
+        m_map.addLayer(testLayer);
+        m_map.setPaintProperty("testLayer", "fill-color", QColor("blue"));
+    } break;
     case Qt::Key_Tab:
         m_map.cycleDebugOptions();
         break;
@@ -120,8 +115,7 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
     ev->accept();
 }
 
-void MapWindow::mousePressEvent(QMouseEvent *ev)
-{
+void MapWindow::mousePressEvent(QMouseEvent* ev) {
 #if QT_VERSION < 0x050000
     m_lastPos = ev->posF();
 #else
@@ -145,8 +139,7 @@ void MapWindow::mousePressEvent(QMouseEvent *ev)
     ev->accept();
 }
 
-void MapWindow::mouseMoveEvent(QMouseEvent *ev)
-{
+void MapWindow::mouseMoveEvent(QMouseEvent* ev) {
 #if QT_VERSION < 0x050000
     QPointF delta = ev->posF() - m_lastPos;
 #else
@@ -173,8 +166,7 @@ void MapWindow::mouseMoveEvent(QMouseEvent *ev)
     ev->accept();
 }
 
-void MapWindow::wheelEvent(QWheelEvent *ev)
-{
+void MapWindow::wheelEvent(QWheelEvent* ev) {
     if (ev->orientation() == Qt::Horizontal) {
         return;
     }
@@ -188,19 +180,16 @@ void MapWindow::wheelEvent(QWheelEvent *ev)
     ev->accept();
 }
 
-void MapWindow::initializeGL()
-{
+void MapWindow::initializeGL() {
     QMapbox::initializeGLExtensions();
 }
 
-void MapWindow::resizeGL(int w, int h)
-{
+void MapWindow::resizeGL(int w, int h) {
     QSize size(w, h);
     m_map.resize(size);
 }
 
-void MapWindow::paintGL()
-{
+void MapWindow::paintGL() {
     m_frameDraws++;
     m_map.render();
 }

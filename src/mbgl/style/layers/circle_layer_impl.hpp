@@ -18,11 +18,10 @@ public:
     std::unique_ptr<Bucket> createBucket(BucketParameters&) const override;
 
     float getQueryRadius() const override;
-    bool queryIntersectsGeometry(
-            const GeometryCollection& queryGeometry,
-            const GeometryCollection& geometry,
-            const float bearing,
-            const float pixelsToTileUnits) const override;
+    bool queryIntersectsGeometry(const GeometryCollection& queryGeometry,
+                                 const GeometryCollection& geometry,
+                                 const float bearing,
+                                 const float pixelsToTileUnits) const override;
 
     CirclePaintProperties paint;
 };

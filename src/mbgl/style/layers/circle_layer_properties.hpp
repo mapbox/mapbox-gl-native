@@ -17,13 +17,13 @@ public:
     void cascade(const CascadeParameters&);
     bool recalculate(const CalculationParameters&);
 
-    PaintProperty<float> circleRadius { 5 };
-    PaintProperty<Color> circleColor { Color::black() };
-    PaintProperty<float> circleBlur { 0 };
-    PaintProperty<float> circleOpacity { 1 };
-    PaintProperty<std::array<float, 2>> circleTranslate { {{ 0, 0 }} };
-    PaintProperty<TranslateAnchorType> circleTranslateAnchor { TranslateAnchorType::Map };
-    PaintProperty<CirclePitchScaleType> circlePitchScale { CirclePitchScaleType::Map };
+    PaintProperty<float> circleRadius{5};
+    PaintProperty<Color> circleColor{Color::black()};
+    PaintProperty<float> circleBlur{0};
+    PaintProperty<float> circleOpacity{1};
+    PaintProperty<std::array<float, 2>> circleTranslate{{{0, 0}}};
+    PaintProperty<TranslateAnchorType> circleTranslateAnchor{TranslateAnchorType::Map};
+    PaintProperty<CirclePitchScaleType> circlePitchScale{CirclePitchScaleType::Map};
 };
 
 } // namespace style

@@ -14,8 +14,7 @@ namespace mbgl {
 
 class AssetFileSource::Impl {
 public:
-    Impl(std::string root_)
-        : root(std::move(root_)) {
+    Impl(std::string root_) : root(std::move(root_)) {
     }
 
     void request(const std::string& url, FileSource::Callback callback) {
@@ -43,8 +42,7 @@ public:
                 response.data = std::make_shared<std::string>(util::read_file(path));
             } catch (...) {
                 response.error = std::make_unique<Response::Error>(
-                    Response::Error::Reason::Other,
-                    util::toString(std::current_exception()));
+                    Response::Error::Reason::Other, util::toString(std::current_exception()));
             }
         }
 
@@ -57,13 +55,13 @@ private:
 
 AssetFileSource::AssetFileSource(const std::string& root)
     : thread(std::make_unique<util::Thread<Impl>>(
-        util::ThreadContext{"AssetFileSource", util::ThreadPriority::Low},
-        root)) {
+          util::ThreadContext{"AssetFileSource", util::ThreadPriority::Low}, root)) {
 }
 
 AssetFileSource::~AssetFileSource() = default;
 
-std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource,
+                                                       Callback callback) {
     return thread->invokeWithCallback(&Impl::request, resource.url, callback);
 }
 

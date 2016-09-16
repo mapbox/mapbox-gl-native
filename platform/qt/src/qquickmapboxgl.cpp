@@ -12,35 +12,27 @@
 
 #include <cmath>
 
-QQuickMapboxGL::QQuickMapboxGL(QQuickItem *parent_)
-    : QQuickFramebufferObject(parent_)
-{
+QQuickMapboxGL::QQuickMapboxGL(QQuickItem* parent_) : QQuickFramebufferObject(parent_) {
 }
 
-QQuickMapboxGL::~QQuickMapboxGL()
-{
+QQuickMapboxGL::~QQuickMapboxGL() {
 }
 
-QQuickFramebufferObject::Renderer *QQuickMapboxGL::createRenderer() const
-{
-    QQuickMapboxGLRenderer *renderer = new QQuickMapboxGLRenderer();
+QQuickFramebufferObject::Renderer* QQuickMapboxGL::createRenderer() const {
+    QQuickMapboxGLRenderer* renderer = new QQuickMapboxGLRenderer();
     connect(renderer, SIGNAL(styleChanged()), this, SIGNAL(styleChanged()));
     return renderer;
 }
 
-void QQuickMapboxGL::setPlugin(QDeclarativeGeoServiceProvider *)
-{
-    qWarning() << __PRETTY_FUNCTION__
-        << "Not implemented.";
+void QQuickMapboxGL::setPlugin(QDeclarativeGeoServiceProvider*) {
+    qWarning() << __PRETTY_FUNCTION__ << "Not implemented.";
 }
 
-QDeclarativeGeoServiceProvider *QQuickMapboxGL::plugin() const
-{
+QDeclarativeGeoServiceProvider* QQuickMapboxGL::plugin() const {
     return nullptr;
 }
 
-void QQuickMapboxGL::setMinimumZoomLevel(qreal zoom)
-{
+void QQuickMapboxGL::setMinimumZoomLevel(qreal zoom) {
     zoom = qMax(mbgl::util::MIN_ZOOM, zoom);
     zoom = qMin(m_maximumZoomLevel, zoom);
 
@@ -54,13 +46,11 @@ void QQuickMapboxGL::setMinimumZoomLevel(qreal zoom)
     emit minimumZoomLevelChanged();
 }
 
-qreal QQuickMapboxGL::minimumZoomLevel() const
-{
+qreal QQuickMapboxGL::minimumZoomLevel() const {
     return m_minimumZoomLevel;
 }
 
-void QQuickMapboxGL::setMaximumZoomLevel(qreal zoom)
-{
+void QQuickMapboxGL::setMaximumZoomLevel(qreal zoom) {
     zoom = qMin(mbgl::util::MAX_ZOOM, zoom);
     zoom = qMax(m_minimumZoomLevel, zoom);
 
@@ -74,13 +64,11 @@ void QQuickMapboxGL::setMaximumZoomLevel(qreal zoom)
     emit maximumZoomLevelChanged();
 }
 
-qreal QQuickMapboxGL::maximumZoomLevel() const
-{
+qreal QQuickMapboxGL::maximumZoomLevel() const {
     return m_maximumZoomLevel;
 }
 
-void QQuickMapboxGL::setZoomLevel(qreal zoom)
-{
+void QQuickMapboxGL::setZoomLevel(qreal zoom) {
     zoom = qMin(m_maximumZoomLevel, zoom);
     zoom = qMax(m_minimumZoomLevel, zoom);
 
@@ -96,13 +84,11 @@ void QQuickMapboxGL::setZoomLevel(qreal zoom)
     emit zoomLevelChanged(m_zoomLevel);
 }
 
-qreal QQuickMapboxGL::zoomLevel() const
-{
+qreal QQuickMapboxGL::zoomLevel() const {
     return m_zoomLevel;
 }
 
-void QQuickMapboxGL::setCenter(const QGeoCoordinate &coordinate)
-{
+void QQuickMapboxGL::setCenter(const QGeoCoordinate& coordinate) {
     if (m_center == coordinate) {
         return;
     }
@@ -115,44 +101,35 @@ void QQuickMapboxGL::setCenter(const QGeoCoordinate &coordinate)
     emit centerChanged(m_center);
 }
 
-QGeoCoordinate QQuickMapboxGL::center() const
-{
+QGeoCoordinate QQuickMapboxGL::center() const {
     return m_center;
 }
 
-QGeoServiceProvider::Error QQuickMapboxGL::error() const
-{
+QGeoServiceProvider::Error QQuickMapboxGL::error() const {
     return QGeoServiceProvider::NoError;
 }
 
-QString QQuickMapboxGL::errorString() const
-{
+QString QQuickMapboxGL::errorString() const {
     return QString();
 }
 
-void QQuickMapboxGL::setVisibleRegion(const QGeoShape &shape)
-{
+void QQuickMapboxGL::setVisibleRegion(const QGeoShape& shape) {
     m_visibleRegion = shape;
 }
 
-QGeoShape QQuickMapboxGL::visibleRegion() const
-{
+QGeoShape QQuickMapboxGL::visibleRegion() const {
     return m_visibleRegion;
 }
 
-void QQuickMapboxGL::setCopyrightsVisible(bool)
-{
-    qWarning() << __PRETTY_FUNCTION__
-        << "Not implemented.";
+void QQuickMapboxGL::setCopyrightsVisible(bool) {
+    qWarning() << __PRETTY_FUNCTION__ << "Not implemented.";
 }
 
-bool QQuickMapboxGL::copyrightsVisible() const
-{
+bool QQuickMapboxGL::copyrightsVisible() const {
     return false;
 }
 
-void QQuickMapboxGL::setColor(const QColor &color)
-{
+void QQuickMapboxGL::setColor(const QColor& color) {
     if (m_color == color) {
         return;
     }
@@ -169,33 +146,32 @@ void QQuickMapboxGL::setColor(const QColor &color)
     emit colorChanged(m_color);
 }
 
-QColor QQuickMapboxGL::color() const
-{
+QColor QQuickMapboxGL::color() const {
     return m_color;
 }
 
-void QQuickMapboxGL::pan(int dx, int dy)
-{
+void QQuickMapboxGL::pan(int dx, int dy) {
     m_pan += QPointF(dx, -dy);
 
     m_syncState |= PanNeedsSync;
     update();
 }
 
-void QQuickMapboxGL::setStyle(QQuickMapboxGLStyle *style)
-{
+void QQuickMapboxGL::setStyle(QQuickMapboxGLStyle* style) {
     if (style == m_style) {
         return;
     }
 
     disconnect(style, SIGNAL(urlChanged(QString)), this, SLOT(onStyleChanged()));
-    disconnect(style, SIGNAL(propertyUpdated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
+    disconnect(style, SIGNAL(propertyUpdated(QVariantMap)), this,
+               SLOT(onStylePropertyUpdated(QVariantMap)));
     delete m_style;
     m_style = style;
     if (style) {
         style->setParentItem(this);
         connect(style, SIGNAL(urlChanged(QString)), this, SLOT(onStyleChanged()));
-        connect(style, SIGNAL(propertyUpdated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
+        connect(style, SIGNAL(propertyUpdated(QVariantMap)), this,
+                SLOT(onStylePropertyUpdated(QVariantMap)));
     }
 
     m_syncState |= StyleNeedsSync;
@@ -204,13 +180,11 @@ void QQuickMapboxGL::setStyle(QQuickMapboxGLStyle *style)
     emit styleChanged();
 }
 
-QQuickMapboxGLStyle *QQuickMapboxGL::style() const
-{
+QQuickMapboxGLStyle* QQuickMapboxGL::style() const {
     return m_style;
 }
 
-void QQuickMapboxGL::setBearing(qreal angle)
-{
+void QQuickMapboxGL::setBearing(qreal angle) {
     angle = std::fmod(angle, 360.);
 
     if (m_bearing == angle) {
@@ -225,13 +199,11 @@ void QQuickMapboxGL::setBearing(qreal angle)
     emit bearingChanged(m_bearing);
 }
 
-qreal QQuickMapboxGL::bearing() const
-{
+qreal QQuickMapboxGL::bearing() const {
     return m_bearing;
 }
 
-void QQuickMapboxGL::setPitch(qreal angle)
-{
+void QQuickMapboxGL::setPitch(qreal angle) {
     angle = qMin(qMax(0., angle), mbgl::util::PITCH_MAX * mbgl::util::RAD2DEG);
 
     if (m_pitch == angle) {
@@ -246,13 +218,11 @@ void QQuickMapboxGL::setPitch(qreal angle)
     emit pitchChanged(m_pitch);
 }
 
-qreal QQuickMapboxGL::pitch() const
-{
+qreal QQuickMapboxGL::pitch() const {
     return m_pitch;
 }
 
-QPointF QQuickMapboxGL::swapPan()
-{
+QPointF QQuickMapboxGL::swapPan() {
     QPointF oldPan = m_pan;
 
     m_pan = QPointF(0, 0);
@@ -260,8 +230,7 @@ QPointF QQuickMapboxGL::swapPan()
     return oldPan;
 }
 
-int QQuickMapboxGL::swapSyncState()
-{
+int QQuickMapboxGL::swapSyncState() {
     int oldState = m_syncState;
 
     m_syncState = NothingNeedsSync;
@@ -269,20 +238,24 @@ int QQuickMapboxGL::swapSyncState()
     return oldState;
 }
 
-void QQuickMapboxGL::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
-{
+void QQuickMapboxGL::itemChange(QQuickItem::ItemChange change,
+                                const QQuickItem::ItemChangeData& value) {
     QQuickFramebufferObject::itemChange(change, value);
 
     switch (change) {
     case QQuickItem::ItemChildAddedChange:
-        if (QQuickMapboxGLStyleProperty *property = qobject_cast<QQuickMapboxGLStyleProperty *>(value.item)) {
-            connect(property, SIGNAL(updated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
+        if (QQuickMapboxGLStyleProperty* property =
+                qobject_cast<QQuickMapboxGLStyleProperty*>(value.item)) {
+            connect(property, SIGNAL(updated(QVariantMap)), this,
+                    SLOT(onStylePropertyUpdated(QVariantMap)));
             connect(this, SIGNAL(styleChanged()), property, SLOT(checkUpdated()));
         }
         break;
     case QQuickItem::ItemChildRemovedChange:
-        if (QQuickMapboxGLStyleProperty *property = qobject_cast<QQuickMapboxGLStyleProperty *>(value.item)) {
-            disconnect(property, SIGNAL(updated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
+        if (QQuickMapboxGLStyleProperty* property =
+                qobject_cast<QQuickMapboxGLStyleProperty*>(value.item)) {
+            disconnect(property, SIGNAL(updated(QVariantMap)), this,
+                       SLOT(onStylePropertyUpdated(QVariantMap)));
             disconnect(this, SIGNAL(styleChanged()), property, SLOT(checkUpdated()));
         }
     default:
@@ -290,8 +263,7 @@ void QQuickMapboxGL::itemChange(QQuickItem::ItemChange change, const QQuickItem:
     }
 }
 
-void QQuickMapboxGL::onStylePropertyUpdated(const QVariantMap &params)
-{
+void QQuickMapboxGL::onStylePropertyUpdated(const QVariantMap& params) {
     switch (params.value("type").toInt()) {
     case QQuickMapboxGLStyleProperty::LayoutType:
         m_layoutChanges << params;
@@ -304,8 +276,7 @@ void QQuickMapboxGL::onStylePropertyUpdated(const QVariantMap &params)
     update();
 }
 
-void QQuickMapboxGL::onStyleChanged()
-{
+void QQuickMapboxGL::onStyleChanged() {
     m_syncState |= StyleNeedsSync;
     update();
 

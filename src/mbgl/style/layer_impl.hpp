@@ -23,8 +23,10 @@ class CalculationParameters;
 class BucketParameters;
 
 /**
- * `Layer::Impl` contains the internal implementation of `Layer`: the details that need to be accessible to other parts
- * of the code, but hidden from the public API. Like `Layer`, it is an abstract base class, with derived classes for
+ * `Layer::Impl` contains the internal implementation of `Layer`: the details that need to be
+ * accessible to other parts
+ * of the code, but hidden from the public API. Like `Layer`, it is an abstract base class, with
+ * derived classes for
  * each layer type.
  *
  * Members that are public in `Layer` are part of the public API for all layers.
@@ -39,9 +41,8 @@ public:
 
     // Create a new layer with the specified `id`, `ref`, and `sourceID`. All other properties
     // are copied from this layer.
-    std::unique_ptr<Layer> copy(const std::string& id,
-                                const std::string& ref,
-                                const std::string& sourceID) const;
+    std::unique_ptr<Layer>
+    copy(const std::string& id, const std::string& ref, const std::string& sourceID) const;
 
     // Create an identical copy of this layer.
     virtual std::unique_ptr<Layer> clone() const = 0;
@@ -67,12 +68,15 @@ public:
     // Checks whether this layer can be rendered.
     bool needsRendering(float zoom) const;
 
-    virtual float getQueryRadius() const { return 0; }
-    virtual bool queryIntersectsGeometry(
-            const GeometryCollection&,
-            const GeometryCollection&,
-            const float,
-            const float) const { return false; };
+    virtual float getQueryRadius() const {
+        return 0;
+    }
+    virtual bool queryIntersectsGeometry(const GeometryCollection&,
+                                         const GeometryCollection&,
+                                         const float,
+                                         const float) const {
+        return false;
+    };
 
     void setObserver(LayerObserver*);
 

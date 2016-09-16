@@ -24,12 +24,8 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
       sourceID(std::move(sourceID_)),
       style(style_),
       worker(style_.workers),
-      tileWorker(id_,
-                 *style_.spriteStore,
-                 *style_.glyphAtlas,
-                 *style_.glyphStore,
-                 obsolete,
-                 mode_) {
+      tileWorker(
+          id_, *style_.spriteStore, *style_.glyphAtlas, *style_.glyphStore, obsolete, mode_) {
 }
 
 GeometryTile::~GeometryTile() {
@@ -45,8 +41,7 @@ std::vector<std::unique_ptr<Layer>> GeometryTile::cloneStyleLayers() const {
 
     for (const Layer* layer : style.getLayers()) {
         // Avoid cloning and including irrelevant layers.
-        if (layer->is<BackgroundLayer>() ||
-            layer->is<CustomLayer>() ||
+        if (layer->is<BackgroundLayer>() || layer->is<CustomLayer>() ||
             layer->baseImpl->source != sourceID ||
             id.overscaledZ < std::floor(layer->baseImpl->minZoom) ||
             id.overscaledZ >= std::ceil(layer->baseImpl->maxZoom) ||
@@ -83,10 +78,11 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
     // when tile data changed. Replacing the workdRequest will cancel a pending work
     // request in case there is one.
     workRequest.reset();
-    workRequest = worker.parseGeometryTile(tileWorker, cloneStyleLayers(), std::move(data_), targetConfig,
-        [this, config = targetConfig] (TileParseResult result) {
-            tileLoaded(std::move(result), config);
-        });
+    workRequest =
+        worker.parseGeometryTile(tileWorker, cloneStyleLayers(), std::move(data_), targetConfig,
+                                 [ this, config = targetConfig ](TileParseResult result) {
+                                     tileLoaded(std::move(result), config);
+                                 });
 }
 
 void GeometryTile::redoLayout() {
@@ -98,9 +94,9 @@ void GeometryTile::redoLayout() {
 
     workRequest.reset();
     workRequest = worker.redoLayout(tileWorker, cloneStyleLayers(), targetConfig,
-        [this, config = targetConfig] (TileParseResult result) {
-            tileLoaded(std::move(result), config);
-        });
+                                    [ this, config = targetConfig ](TileParseResult result) {
+                                        tileLoaded(std::move(result), config);
+                                    });
 }
 
 void GeometryTile::tileLoaded(TileParseResult result, PlacementConfig config) {
@@ -138,35 +134,38 @@ bool GeometryTile::parsePending() {
     }
 
     workRequest.reset();
-    workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, config = targetConfig] (TileParseResult result) {
-        workRequest.reset();
+    workRequest = worker.parsePendingGeometryTileLayers(
+        tileWorker, targetConfig, [ this, config = targetConfig ](TileParseResult result) {
+            workRequest.reset();
 
-        if (result.is<TileParseResultData>()) {
-            auto& resultBuckets = result.get<TileParseResultData>();
-            availableData = resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
+            if (result.is<TileParseResultData>()) {
+                auto& resultBuckets = result.get<TileParseResultData>();
+                availableData =
+                    resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
 
-            // Move over all buckets we received in this parse request, potentially overwriting
-            // existing buckets in case we got a refresh parse.
-            for (auto& bucket : resultBuckets.buckets) {
-                buckets[bucket.first] = std::move(bucket.second);
+                // Move over all buckets we received in this parse request, potentially overwriting
+                // existing buckets in case we got a refresh parse.
+                for (auto& bucket : resultBuckets.buckets) {
+                    buckets[bucket.first] = std::move(bucket.second);
+                }
+
+                // Persist the configuration we just placed so that we can later check whether we
+                // need to
+                // place again in case the configuration has changed.
+                placedConfig = config;
+
+                if (isComplete()) {
+                    featureIndex = std::move(resultBuckets.featureIndex);
+                    data = std::move(resultBuckets.tileData);
+                }
+
+                redoPlacement();
+                observer->onTileLoaded(*this, TileLoadState::Subsequent);
+            } else {
+                availableData = DataAvailability::All;
+                observer->onTileError(*this, result.get<std::exception_ptr>());
             }
-
-            // Persist the configuration we just placed so that we can later check whether we need to
-            // place again in case the configuration has changed.
-            placedConfig = config;
-
-            if (isComplete()) {
-                featureIndex = std::move(resultBuckets.featureIndex);
-                data = std::move(resultBuckets.tileData);
-            }
-
-            redoPlacement();
-            observer->onTileLoaded(*this, TileLoadState::Subsequent);
-        } else {
-            availableData = DataAvailability::All;
-            observer->onTileError(*this, result.get<std::exception_ptr>());
-        }
-    });
+        });
 
     return true;
 }
@@ -193,29 +192,31 @@ void GeometryTile::redoPlacement() {
         return;
     }
 
-    workRequest = worker.redoPlacement(tileWorker, targetConfig, [this, config = targetConfig](TilePlacementResult result) {
-        workRequest.reset();
+    workRequest = worker.redoPlacement(
+        tileWorker, targetConfig, [ this, config = targetConfig ](TilePlacementResult result) {
+            workRequest.reset();
 
-        // Persist the configuration we just placed so that we can later check whether we need to
-        // place again in case the configuration has changed.
-        placedConfig = config;
+            // Persist the configuration we just placed so that we can later check whether we need
+            // to
+            // place again in case the configuration has changed.
+            placedConfig = config;
 
-        for (auto& bucket : result.buckets) {
-            buckets[bucket.first] = std::move(bucket.second);
-        }
+            for (auto& bucket : result.buckets) {
+                buckets[bucket.first] = std::move(bucket.second);
+            }
 
-        if (featureIndex) {
-            featureIndex->setCollisionTile(std::move(result.collisionTile));
-        }
+            if (featureIndex) {
+                featureIndex->setCollisionTile(std::move(result.collisionTile));
+            }
 
-        // The target configuration could have changed since we started placement. In this case,
-        // we're starting another placement run.
-        if (placedConfig != targetConfig) {
-            redoPlacement();
-        } else {
-            observer->onTileUpdated(*this);
-        }
-    });
+            // The target configuration could have changed since we started placement. In this case,
+            // we're starting another placement run.
+            if (placedConfig != targetConfig) {
+                redoPlacement();
+            } else {
+                observer->onTileUpdated(*this);
+            }
+        });
 }
 
 void GeometryTile::queryRenderedFeatures(
@@ -224,17 +225,14 @@ void GeometryTile::queryRenderedFeatures(
     const TransformState& transformState,
     const optional<std::vector<std::string>>& layerIDs) {
 
-    if (!featureIndex || !data) return;
+    if (!featureIndex || !data) {
+        return;
+    }
 
-    featureIndex->query(result,
-                        { queryGeometry },
-                        transformState.getAngle(),
+    featureIndex->query(result, { queryGeometry }, transformState.getAngle(),
                         util::tileSize * id.overscaleFactor(),
-                        std::pow(2, transformState.getZoom() - id.overscaledZ),
-                        layerIDs,
-                        *data,
-                        id.canonical,
-                        style);
+                        std::pow(2, transformState.getZoom() - id.overscaledZ), layerIDs, *data,
+                        id.canonical, style);
 }
 
 void GeometryTile::cancel() {

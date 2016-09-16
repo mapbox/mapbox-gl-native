@@ -11,15 +11,7 @@ namespace mbgl {
 
 class Resource {
 public:
-    enum Kind : uint8_t {
-        Unknown = 0,
-        Style,
-        Source,
-        Tile,
-        Glyphs,
-        SpriteImage,
-        SpriteJSON
-    };
+    enum Kind : uint8_t { Unknown = 0, Style, Source, Tile, Glyphs, SpriteImage, SpriteJSON };
 
     struct TileData {
         std::string urlTemplate;
@@ -34,11 +26,11 @@ public:
         Required = true,
     };
 
-    Resource(Kind kind_, std::string url_, optional<TileData> tileData_ = {}, Necessity necessity_ = Required)
-        : kind(kind_),
-          necessity(necessity_),
-          url(std::move(url_)),
-          tileData(std::move(tileData_)) {
+    Resource(Kind kind_,
+             std::string url_,
+             optional<TileData> tileData_ = {},
+             Necessity necessity_ = Required)
+        : kind(kind_), necessity(necessity_), url(std::move(url_)), tileData(std::move(tileData_)) {
     }
 
     static Resource style(const std::string& url);

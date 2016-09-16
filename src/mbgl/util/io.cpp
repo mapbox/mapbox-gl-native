@@ -11,8 +11,8 @@
 namespace mbgl {
 namespace util {
 
-void write_file(const std::string &filename, const std::string &data) {
-    FILE *fd = fopen(filename.c_str(), "wb");
+void write_file(const std::string& filename, const std::string& data) {
+    FILE* fd = fopen(filename.c_str(), "wb");
     if (fd) {
         fwrite(data.data(), sizeof(std::string::value_type), data.size(), fd);
         fclose(fd);
@@ -21,7 +21,7 @@ void write_file(const std::string &filename, const std::string &data) {
     }
 }
 
-std::string read_file(const std::string &filename) {
+std::string read_file(const std::string& filename) {
     std::ifstream file(filename);
     if (file.good()) {
         std::stringstream data;

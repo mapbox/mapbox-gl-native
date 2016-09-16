@@ -6,19 +6,17 @@
 
 namespace mbgl {
 
-
 template <class T>
-GridIndex<T>::GridIndex(int32_t extent_, int32_t n_, int32_t padding_) :
-    extent(extent_),
-    n(n_),
-    padding(padding_),
-    d(n + 2 * padding),
-    scale(double(n) / double(extent)),
-    min(-double(padding) / n * extent),
-    max(extent + double(padding) / n * extent)
-    {
-        cells.resize(d * d);
-    }
+GridIndex<T>::GridIndex(int32_t extent_, int32_t n_, int32_t padding_)
+    : extent(extent_),
+      n(n_),
+      padding(padding_),
+      d(n + 2 * padding),
+      scale(double(n) / double(extent)),
+      min(-double(padding) / n * extent),
+      max(extent + double(padding) / n * extent) {
+    cells.resize(d * d);
+}
 
 template <class T>
 void GridIndex<T>::insert(T&& t, const BBox& bbox) {
@@ -60,10 +58,8 @@ std::vector<T> GridIndex<T>::query(const BBox& queryBBox) const {
 
                     auto& pair = elements.at(uid);
                     auto& bbox = pair.second;
-                    if (queryBBox.min.x <= bbox.max.x &&
-                        queryBBox.min.y <= bbox.max.y &&
-                        queryBBox.max.x >= bbox.min.x &&
-                        queryBBox.max.y >= bbox.min.y) {
+                    if (queryBBox.min.x <= bbox.max.x && queryBBox.min.y <= bbox.max.y &&
+                        queryBBox.max.x >= bbox.min.x && queryBBox.max.y >= bbox.min.y) {
 
                         result.push_back(pair.first);
                     }
@@ -74,7 +70,6 @@ std::vector<T> GridIndex<T>::query(const BBox& queryBBox) const {
 
     return result;
 }
-
 
 template <class T>
 int32_t GridIndex<T>::convertToCellCoord(int32_t x) const {

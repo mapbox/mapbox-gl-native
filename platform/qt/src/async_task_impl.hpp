@@ -16,7 +16,7 @@ class AsyncTask::Impl : public QObject {
     Q_OBJECT
 
 public:
-    Impl(std::function<void()> &&);
+    Impl(std::function<void()>&&);
 
     void maySend();
 
@@ -32,7 +32,6 @@ private:
     std::function<void()> task;
     std::atomic_flag queued = ATOMIC_FLAG_INIT;
 };
-
 
 } // namespace util
 } // namespace mbgl

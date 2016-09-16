@@ -39,9 +39,11 @@ public:
     explicit CollisionTile(PlacementConfig);
 
     float placeFeature(const CollisionFeature&, const bool allowOverlap, const bool avoidEdges);
-    void insertFeature(CollisionFeature&, const float minPlacementScale, const bool ignorePlacement);
+    void
+    insertFeature(CollisionFeature&, const float minPlacementScale, const bool ignorePlacement);
 
-    std::vector<IndexedSubfeature> queryRenderedSymbols(const mapbox::geometry::box<int16_t>&, const float scale);
+    std::vector<IndexedSubfeature> queryRenderedSymbols(const mapbox::geometry::box<int16_t>&,
+                                                        const float scale);
 
     const PlacementConfig config;
 
@@ -51,8 +53,10 @@ public:
 
 private:
     float findPlacementScale(float minPlacementScale,
-            const Point<float>& anchor, const CollisionBox& box,
-            const Point<float>& blockingAnchor, const CollisionBox& blocking);
+                             const Point<float>& anchor,
+                             const CollisionBox& box,
+                             const Point<float>& blockingAnchor,
+                             const CollisionBox& blocking);
     Box getTreeBox(const Point<float>& anchor, const CollisionBox& box, const float scale = 1.0);
 
     Tree tree;

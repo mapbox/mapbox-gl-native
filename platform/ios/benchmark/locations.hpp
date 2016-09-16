@@ -15,6 +15,5 @@ struct Location {
 };
 
 extern const std::vector<Location> locations;
-
 }
 }

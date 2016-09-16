@@ -22,7 +22,8 @@ auto readImage(const std::string& name) {
 TEST(Sprite, SpriteImageCreationInvalid) {
     FixtureLog log;
 
-    const PremultipliedImage image_1x = decodeImage(util::read_file("test/fixtures/annotations/emerald.png"));
+    const PremultipliedImage image_1x =
+        decodeImage(util::read_file("test/fixtures/annotations/emerald.png"));
 
     ASSERT_EQ(200u, image_1x.width);
     ASSERT_EQ(299u, image_1x.height);
@@ -38,19 +39,20 @@ TEST(Sprite, SpriteImageCreationInvalid) {
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 16, 1025, 1, false)); // too tall
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, -1, 0, 16, 16, 1, false));  // srcX < 0
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, -1, 16, 16, 1, false));  // srcY < 0
-    ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, image_1x.width + 1, 16, 1, false));   // right edge out of bounds
-    ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 16, image_1x.height + 1, 1, false));  // bottom edge out of bounds
+    ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, image_1x.width + 1, 16, 1,
+                                         false)); // right edge out of bounds
+    ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 16, image_1x.height + 1, 1,
+                                         false)); // bottom edge out of bounds
 
     EXPECT_EQ(13u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't create sprite with invalid metrics",
-                  }));
+                       EventSeverity::Error, Event::Sprite, int64_t(-1),
+                       "Can't create sprite with invalid metrics",
+                   }));
 }
 
 TEST(Sprite, SpriteImageCreation1x) {
-    const PremultipliedImage image_1x = decodeImage(util::read_file("test/fixtures/annotations/emerald.png"));
+    const PremultipliedImage image_1x =
+        decodeImage(util::read_file("test/fixtures/annotations/emerald.png"));
 
     ASSERT_EQ(200u, image_1x.width);
     ASSERT_EQ(299u, image_1x.height);
@@ -69,7 +71,8 @@ TEST(Sprite, SpriteImageCreation1x) {
 }
 
 TEST(Sprite, SpriteImageCreation2x) {
-    const PremultipliedImage image_2x = decodeImage(util::read_file("test/fixtures/annotations/emerald@2x.png"));
+    const PremultipliedImage image_2x =
+        decodeImage(util::read_file("test/fixtures/annotations/emerald@2x.png"));
 
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite = createSpriteImage(image_2x, 354, 374, 36, 36, 2, false);
@@ -84,7 +87,8 @@ TEST(Sprite, SpriteImageCreation2x) {
 }
 
 TEST(Sprite, SpriteImageCreation1_5x) {
-    const PremultipliedImage image_2x = decodeImage(util::read_file("test/fixtures/annotations/emerald@2x.png"));
+    const PremultipliedImage image_2x =
+        decodeImage(util::read_file("test/fixtures/annotations/emerald@2x.png"));
 
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite = createSpriteImage(image_2x, 354, 374, 36, 36, 1.5, false);
@@ -119,79 +123,79 @@ TEST(Sprite, SpriteParsing) {
     std::transform(images.begin(), images.end(), std::inserter(names, names.begin()),
                    [](const auto& pair) { return pair.first; });
 
-    EXPECT_EQ(std::set<std::string>({ "airfield_icon",
-                                      "airport_icon",
-                                      "background",
-                                      "cemetery_icon",
-                                      "college_icon",
-                                      "default_1",
-                                      "default_2",
-                                      "default_3",
-                                      "default_4",
-                                      "default_5",
-                                      "default_6",
-                                      "default_marker",
-                                      "dlr",
-                                      "dlr.london-overground.london-underground.national-rail",
-                                      "dlr.london-underground",
-                                      "dlr.london-underground.national-rail",
-                                      "dlr.national-rail",
-                                      "dot",
-                                      "embassy_icon",
-                                      "fire-station_icon",
-                                      "generic-metro",
-                                      "generic-rail",
-                                      "generic_icon",
-                                      "golf_icon",
-                                      "government_icon",
-                                      "grass_pattern",
-                                      "harbor_icon",
-                                      "hospital_icon",
-                                      "hospital_striped",
-                                      "interstate_1",
-                                      "interstate_2",
-                                      "interstate_3",
-                                      "library_icon",
-                                      "london-overground",
-                                      "london-overground.london-underground",
-                                      "london-overground.london-underground.national-rail",
-                                      "london-overground.national-rail",
-                                      "london-underground",
-                                      "london-underground.national-rail",
-                                      "marker_icon",
-                                      "metro",
-                                      "metro.rer",
-                                      "monument_icon",
-                                      "moscow-metro",
-                                      "museum_icon",
-                                      "national-rail",
-                                      "oneway_motorway",
-                                      "oneway_road",
-                                      "park_icon",
-                                      "police_icon",
-                                      "post_icon",
-                                      "prison_icon",
-                                      "religious-christian_icon",
-                                      "religious-jewish_icon",
-                                      "religious-muslim_icon",
-                                      "rer",
-                                      "rer.transilien",
-                                      "s-bahn",
-                                      "s-bahn.u-bahn",
-                                      "sand_noise",
-                                      "school_icon",
-                                      "school_striped",
-                                      "secondary_marker",
-                                      "u-bahn",
-                                      "us_highway_1",
-                                      "us_highway_2",
-                                      "us_highway_3",
-                                      "us_state_1",
-                                      "us_state_2",
-                                      "us_state_3",
-                                      "washington-metro",
-                                      "wiener-linien",
-                                      "zoo_icon" }),
+    EXPECT_EQ(std::set<std::string>({"airfield_icon",
+                                     "airport_icon",
+                                     "background",
+                                     "cemetery_icon",
+                                     "college_icon",
+                                     "default_1",
+                                     "default_2",
+                                     "default_3",
+                                     "default_4",
+                                     "default_5",
+                                     "default_6",
+                                     "default_marker",
+                                     "dlr",
+                                     "dlr.london-overground.london-underground.national-rail",
+                                     "dlr.london-underground",
+                                     "dlr.london-underground.national-rail",
+                                     "dlr.national-rail",
+                                     "dot",
+                                     "embassy_icon",
+                                     "fire-station_icon",
+                                     "generic-metro",
+                                     "generic-rail",
+                                     "generic_icon",
+                                     "golf_icon",
+                                     "government_icon",
+                                     "grass_pattern",
+                                     "harbor_icon",
+                                     "hospital_icon",
+                                     "hospital_striped",
+                                     "interstate_1",
+                                     "interstate_2",
+                                     "interstate_3",
+                                     "library_icon",
+                                     "london-overground",
+                                     "london-overground.london-underground",
+                                     "london-overground.london-underground.national-rail",
+                                     "london-overground.national-rail",
+                                     "london-underground",
+                                     "london-underground.national-rail",
+                                     "marker_icon",
+                                     "metro",
+                                     "metro.rer",
+                                     "monument_icon",
+                                     "moscow-metro",
+                                     "museum_icon",
+                                     "national-rail",
+                                     "oneway_motorway",
+                                     "oneway_road",
+                                     "park_icon",
+                                     "police_icon",
+                                     "post_icon",
+                                     "prison_icon",
+                                     "religious-christian_icon",
+                                     "religious-jewish_icon",
+                                     "religious-muslim_icon",
+                                     "rer",
+                                     "rer.transilien",
+                                     "s-bahn",
+                                     "s-bahn.u-bahn",
+                                     "sand_noise",
+                                     "school_icon",
+                                     "school_striped",
+                                     "secondary_marker",
+                                     "u-bahn",
+                                     "us_highway_1",
+                                     "us_highway_2",
+                                     "us_highway_3",
+                                     "us_state_1",
+                                     "us_state_2",
+                                     "us_state_3",
+                                     "washington-metro",
+                                     "wiener-linien",
+                                     "zoo_icon"}),
               names);
 
     {
@@ -211,8 +215,10 @@ TEST(Sprite, SpriteParsingInvalidJSON) {
 
     const auto error = parseSprite(image_1x, json_1x).get<std::exception_ptr>();
 
-    EXPECT_EQ(util::toString(error),
-              std::string("Failed to parse JSON: Missing a closing quotation mark in string. at offset 14"));
+    EXPECT_EQ(
+        util::toString(error),
+        std::string(
+            "Failed to parse JSON: Missing a closing quotation mark in string. at offset 14"));
 }
 
 TEST(Sprite, SpriteParsingEmptyImage) {
@@ -225,9 +231,7 @@ TEST(Sprite, SpriteParsingEmptyImage) {
     EXPECT_EQ(0u, images.size());
 
     EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
+                      EventSeverity::Error, Event::Sprite, int64_t(-1),
                       "Can't create sprite with invalid metrics",
                   }));
 }
@@ -252,15 +256,11 @@ TEST(Sprite, SpriteParsingWidthTooBig) {
     EXPECT_EQ(0u, images.size());
 
     EXPECT_EQ(1u, log.count({
-                      EventSeverity::Warning,
-                      Event::Sprite,
-                      int64_t(-1),
+                      EventSeverity::Warning, Event::Sprite, int64_t(-1),
                       "Value of 'width' must be an integer between 0 and 65535",
                   }));
     EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
+                      EventSeverity::Error, Event::Sprite, int64_t(-1),
                       "Can't create sprite with invalid metrics",
                   }));
 }
@@ -275,15 +275,11 @@ TEST(Sprite, SpriteParsingNegativeWidth) {
     EXPECT_EQ(0u, images.size());
 
     EXPECT_EQ(1u, log.count({
-                      EventSeverity::Warning,
-                      Event::Sprite,
-                      int64_t(-1),
+                      EventSeverity::Warning, Event::Sprite, int64_t(-1),
                       "Value of 'width' must be an integer between 0 and 65535",
                   }));
     EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
+                      EventSeverity::Error, Event::Sprite, int64_t(-1),
                       "Can't create sprite with invalid metrics",
                   }));
 }
@@ -298,9 +294,7 @@ TEST(Sprite, SpriteParsingNullRatio) {
     EXPECT_EQ(0u, images.size());
 
     EXPECT_EQ(1u, log.count({
-                      EventSeverity::Error,
-                      Event::Sprite,
-                      int64_t(-1),
+                      EventSeverity::Error, Event::Sprite, int64_t(-1),
                       "Can't create sprite with invalid metrics",
                   }));
 }

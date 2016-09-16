@@ -2,24 +2,19 @@
 
 // QQuickMapboxGLStyleProperty
 
-QQuickMapboxGLStyleProperty::QQuickMapboxGLStyleProperty(QQuickItem *parent_, Type type)
-    : QQuickItem(parent_)
-{
+QQuickMapboxGLStyleProperty::QQuickMapboxGLStyleProperty(QQuickItem* parent_, Type type)
+    : QQuickItem(parent_) {
     m_map["type"] = type;
 }
 
-void QQuickMapboxGLStyleProperty::checkUpdated()
-{
-    if (m_map.value("type").isValid()
-            && m_map.value("layer").isValid()
-            && m_map.value("property").isValid()
-            && m_map.value("value").isValid()) {
+void QQuickMapboxGLStyleProperty::checkUpdated() {
+    if (m_map.value("type").isValid() && m_map.value("layer").isValid() &&
+        m_map.value("property").isValid() && m_map.value("value").isValid()) {
         emit updated(m_map);
     }
 }
 
-void QQuickMapboxGLStyleProperty::setLayer(const QString &layer)
-{
+void QQuickMapboxGLStyleProperty::setLayer(const QString& layer) {
     if (m_map.value("layer").toString() == layer) {
         return;
     }
@@ -29,13 +24,11 @@ void QQuickMapboxGLStyleProperty::setLayer(const QString &layer)
     checkUpdated();
 }
 
-QString QQuickMapboxGLStyleProperty::layer() const
-{
+QString QQuickMapboxGLStyleProperty::layer() const {
     return m_map.value("layer").toString();
 }
 
-void QQuickMapboxGLStyleProperty::setProperty(const QString &property)
-{
+void QQuickMapboxGLStyleProperty::setProperty(const QString& property) {
     if (m_map.value("property").toString() == property) {
         return;
     }
@@ -45,13 +38,11 @@ void QQuickMapboxGLStyleProperty::setProperty(const QString &property)
     checkUpdated();
 }
 
-QString QQuickMapboxGLStyleProperty::property() const
-{
+QString QQuickMapboxGLStyleProperty::property() const {
     return m_map.value("property").toString();
 }
 
-void QQuickMapboxGLStyleProperty::setValue(const QVariant &value)
-{
+void QQuickMapboxGLStyleProperty::setValue(const QVariant& value) {
     if (m_map.value("value") == value) {
         return;
     }
@@ -61,13 +52,11 @@ void QQuickMapboxGLStyleProperty::setValue(const QVariant &value)
     checkUpdated();
 }
 
-QVariant QQuickMapboxGLStyleProperty::value() const
-{
+QVariant QQuickMapboxGLStyleProperty::value() const {
     return m_map.value("value");
 }
 
-void QQuickMapboxGLPaintStyleProperty::setStyleClass(const QString &styleClass)
-{
+void QQuickMapboxGLPaintStyleProperty::setStyleClass(const QString& styleClass) {
     if (m_map.value("class").toString() == styleClass) {
         return;
     }
@@ -77,21 +66,18 @@ void QQuickMapboxGLPaintStyleProperty::setStyleClass(const QString &styleClass)
     checkUpdated();
 }
 
-QString QQuickMapboxGLPaintStyleProperty::styleClass() const
-{
+QString QQuickMapboxGLPaintStyleProperty::styleClass() const {
     return m_map.value("class").toString();
 }
 
 // QQuickMapboxGLLayoutStyleProperty
 
-QQuickMapboxGLLayoutStyleProperty::QQuickMapboxGLLayoutStyleProperty(QQuickItem *parent_)
-    : QQuickMapboxGLStyleProperty(parent_, LayoutType)
-{
+QQuickMapboxGLLayoutStyleProperty::QQuickMapboxGLLayoutStyleProperty(QQuickItem* parent_)
+    : QQuickMapboxGLStyleProperty(parent_, LayoutType) {
 }
 
 // QQuickMapboxGLPaintStyleProperty
 
-QQuickMapboxGLPaintStyleProperty::QQuickMapboxGLPaintStyleProperty(QQuickItem *parent_)
-    : QQuickMapboxGLStyleProperty(parent_, PaintType)
-{
+QQuickMapboxGLPaintStyleProperty::QQuickMapboxGLPaintStyleProperty(QQuickItem* parent_)
+    : QQuickMapboxGLStyleProperty(parent_, PaintType) {
 }

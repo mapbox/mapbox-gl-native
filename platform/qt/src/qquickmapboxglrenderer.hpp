@@ -10,21 +10,20 @@ class QGeoCoordinate;
 class QOpenGLFramebufferObject;
 class QSize;
 
-class QQuickMapboxGLRenderer : public QObject, public QQuickFramebufferObject::Renderer
-{
+class QQuickMapboxGLRenderer : public QObject, public QQuickFramebufferObject::Renderer {
     Q_OBJECT
 
 public:
     QQuickMapboxGLRenderer();
     virtual ~QQuickMapboxGLRenderer();
 
-    virtual QOpenGLFramebufferObject * createFramebufferObject(const QSize &);
+    virtual QOpenGLFramebufferObject* createFramebufferObject(const QSize&);
 
     virtual void render();
-    virtual void synchronize(QQuickFramebufferObject *);
+    virtual void synchronize(QQuickFramebufferObject*);
 
 signals:
-    void centerChanged(const QGeoCoordinate &);
+    void centerChanged(const QGeoCoordinate&);
     void styleChanged();
 
 public slots:

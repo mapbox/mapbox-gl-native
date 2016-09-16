@@ -17,11 +17,7 @@ class FileSource;
 
 class GlyphPBF : private util::noncopyable {
 public:
-    GlyphPBF(GlyphStore*,
-             const FontStack&,
-             const GlyphRange&,
-             GlyphStoreObserver*,
-             FileSource&);
+    GlyphPBF(GlyphStore*, const FontStack&, const GlyphRange&, GlyphStoreObserver*, FileSource&);
     ~GlyphPBF();
 
     bool isParsed() const {

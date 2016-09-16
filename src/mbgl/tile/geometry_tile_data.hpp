@@ -35,8 +35,12 @@ public:
     virtual ~GeometryTileFeature() = default;
     virtual FeatureType getType() const = 0;
     virtual optional<Value> getValue(const std::string& key) const = 0;
-    virtual PropertyMap getProperties() const { return PropertyMap(); }
-    virtual optional<FeatureIdentifier> getID() const { return {}; }
+    virtual PropertyMap getProperties() const {
+        return PropertyMap();
+    }
+    virtual optional<FeatureIdentifier> getID() const {
+        return {};
+    }
     virtual GeometryCollection getGeometries() const = 0;
 };
 
@@ -70,7 +74,7 @@ GeometryCollection fixupPolygons(const GeometryCollection&);
 
 struct ToGeometryCollection {
     GeometryCollection operator()(const mapbox::geometry::point<int16_t>& geom) const {
-        return { { geom } };
+        return {{geom}};
     }
     GeometryCollection operator()(const mapbox::geometry::multi_point<int16_t>& geom) const {
         GeometryCoordinates coordinates;
@@ -78,7 +82,7 @@ struct ToGeometryCollection {
         for (const auto& point : geom) {
             coordinates.emplace_back(point);
         }
-        return { coordinates };
+        return {coordinates};
     }
     GeometryCollection operator()(const mapbox::geometry::line_string<int16_t>& geom) const {
         GeometryCoordinates coordinates;
@@ -86,7 +90,7 @@ struct ToGeometryCollection {
         for (const auto& point : geom) {
             coordinates.emplace_back(point);
         }
-        return { coordinates };
+        return {coordinates};
     }
     GeometryCollection operator()(const mapbox::geometry::multi_line_string<int16_t>& geom) const {
         GeometryCollection collection;

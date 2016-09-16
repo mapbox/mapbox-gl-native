@@ -13,10 +13,7 @@
 namespace mbgl {
 
 LineAtlas::LineAtlas(GLsizei w, GLsizei h)
-    : width(w),
-      height(h),
-      data(std::make_unique<GLbyte[]>(w * h)),
-      dirty(true) {
+    : width(w), height(h), data(std::make_unique<GLbyte[]>(w * h)), dirty(true) {
 }
 
 LineAtlas::~LineAtlas() = default;
@@ -146,31 +143,28 @@ void LineAtlas::bind(gl::ObjectStore& store, gl::Config& config, uint32_t unit) 
     if (dirty) {
         config.activeTexture = unit;
         if (first) {
-            MBGL_CHECK_ERROR(glTexImage2D(
-                GL_TEXTURE_2D, // GLenum target
-                0, // GLint level
-                GL_ALPHA, // GLint internalformat
-                width, // GLsizei width
-                height, // GLsizei height
-                0, // GLint border
-                GL_ALPHA, // GLenum format
-                GL_UNSIGNED_BYTE, // GLenum type
-                data.get() // const GLvoid * data
-            ));
+            MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D,    // GLenum target
+                                          0,                // GLint level
+                                          GL_ALPHA,         // GLint internalformat
+                                          width,            // GLsizei width
+                                          height,           // GLsizei height
+                                          0,                // GLint border
+                                          GL_ALPHA,         // GLenum format
+                                          GL_UNSIGNED_BYTE, // GLenum type
+                                          data.get()        // const GLvoid * data
+                                          ));
         } else {
-            MBGL_CHECK_ERROR(glTexSubImage2D(
-                GL_TEXTURE_2D, // GLenum target
-                0, // GLint level
-                0, // GLint xoffset
-                0, // GLint yoffset
-                width, // GLsizei width
-                height, // GLsizei height
-                GL_ALPHA, // GLenum format
-                GL_UNSIGNED_BYTE, // GLenum type
-                data.get() // const GLvoid *pixels
-            ));
+            MBGL_CHECK_ERROR(glTexSubImage2D(GL_TEXTURE_2D,    // GLenum target
+                                             0,                // GLint level
+                                             0,                // GLint xoffset
+                                             0,                // GLint yoffset
+                                             width,            // GLsizei width
+                                             height,           // GLsizei height
+                                             GL_ALPHA,         // GLenum format
+                                             GL_UNSIGNED_BYTE, // GLenum type
+                                             data.get()        // const GLvoid *pixels
+                                             ));
         }
-
 
         dirty = false;
     }

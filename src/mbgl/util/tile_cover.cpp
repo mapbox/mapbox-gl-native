@@ -17,7 +17,9 @@ struct edge {
     double dx = 0, dy = 0;
 
     edge(Point<double> a, Point<double> b) {
-        if (a.y > b.y) std::swap(a, b);
+        if (a.y > b.y) {
+            std::swap(a, b);
+        }
         x0 = a.x;
         y0 = a.y;
         x1 = b.x;
@@ -35,9 +37,8 @@ static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine sca
     double y1 = ::fmin(ymax, std::ceil(e1.y1));
 
     // sort edges by x-coordinate
-    if ((e0.x0 == e1.x0 && e0.y0 == e1.y0) ?
-        (e0.x0 + e1.dy / e0.dy * e0.dx < e1.x1) :
-        (e0.x1 - e1.dy / e0.dy * e0.dx < e1.x0)) {
+    if ((e0.x0 == e1.x0 && e0.y0 == e1.y0) ? (e0.x0 + e1.dy / e0.dy * e0.dx < e1.x1)
+                                           : (e0.x1 - e1.dy / e0.dy * e0.dx < e1.x0)) {
         std::swap(e0, e1);
     }
 
@@ -54,19 +55,34 @@ static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine sca
 }
 
 // scan-line conversion
-static void scanTriangle(const Point<double>& a, const Point<double>& b, const Point<double>& c, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
+static void scanTriangle(const Point<double>& a,
+                         const Point<double>& b,
+                         const Point<double>& c,
+                         int32_t ymin,
+                         int32_t ymax,
+                         ScanLine& scanLine) {
     edge ab = edge(a, b);
     edge bc = edge(b, c);
     edge ca = edge(c, a);
 
     // sort edges by y-length
-    if (ab.dy > bc.dy) { std::swap(ab, bc); }
-    if (ab.dy > ca.dy) { std::swap(ab, ca); }
-    if (bc.dy > ca.dy) { std::swap(bc, ca); }
+    if (ab.dy > bc.dy) {
+        std::swap(ab, bc);
+    }
+    if (ab.dy > ca.dy) {
+        std::swap(ab, ca);
+    }
+    if (bc.dy > ca.dy) {
+        std::swap(bc, ca);
+    }
 
     // scan span! scan span!
-    if (ab.dy) scanSpans(ca, ab, ymin, ymax, scanLine);
-    if (bc.dy) scanSpans(ca, bc, ymin, ymax, scanLine);
+    if (ab.dy) {
+        scanSpans(ca, ab, ymin, ymax, scanLine);
+    }
+    if (bc.dy) {
+        scanSpans(ca, bc, ymin, ymax, scanLine);
+    }
 }
 
 } // namespace
@@ -114,9 +130,9 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
     });
 
     // Erase duplicate tile IDs (they typically occur at the common side of both triangles).
-    t.erase(std::unique(t.begin(), t.end(), [](const ID& a, const ID& b) {
-                return a.x == b.x && a.y == b.y;
-            }), t.end());
+    t.erase(std::unique(t.begin(), t.end(),
+                        [](const ID& a, const ID& b) { return a.x == b.x && a.y == b.y; }),
+            t.end());
 
     std::vector<UnwrappedTileID> result;
     for (const auto& id : t) {
@@ -137,36 +153,31 @@ int32_t coveringZoomLevel(double zoom, SourceType type, uint16_t size) {
 }
 
 std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
-    if (bounds_.isEmpty() ||
-        bounds_.south() >  util::LATITUDE_MAX ||
+    if (bounds_.isEmpty() || bounds_.south() > util::LATITUDE_MAX ||
         bounds_.north() < -util::LATITUDE_MAX) {
         return {};
     }
 
-    LatLngBounds bounds = LatLngBounds::hull(
-        { std::max(bounds_.south(), -util::LATITUDE_MAX), bounds_.west() },
-        { std::min(bounds_.north(),  util::LATITUDE_MAX), bounds_.east() });
+    LatLngBounds bounds =
+        LatLngBounds::hull({ std::max(bounds_.south(), -util::LATITUDE_MAX), bounds_.west() },
+                           { std::min(bounds_.north(), util::LATITUDE_MAX), bounds_.east() });
 
     const TransformState state;
-    return tileCover(
-        TileCoordinate::fromLatLng(state, z, bounds.northwest()).p,
-        TileCoordinate::fromLatLng(state, z, bounds.northeast()).p,
-        TileCoordinate::fromLatLng(state, z, bounds.southeast()).p,
-        TileCoordinate::fromLatLng(state, z, bounds.southwest()).p,
-        TileCoordinate::fromLatLng(state, z, bounds.center()).p,
-        z);
+    return tileCover(TileCoordinate::fromLatLng(state, z, bounds.northwest()).p,
+                     TileCoordinate::fromLatLng(state, z, bounds.northeast()).p,
+                     TileCoordinate::fromLatLng(state, z, bounds.southeast()).p,
+                     TileCoordinate::fromLatLng(state, z, bounds.southwest()).p,
+                     TileCoordinate::fromLatLng(state, z, bounds.center()).p, z);
 }
 
 std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
     const double w = state.getWidth();
     const double h = state.getHeight();
-    return tileCover(
-        TileCoordinate::fromScreenCoordinate(state, z, { 0,   0   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w,   0   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w,   h   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { 0,   h   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w/2, h/2 }).p,
-        z);
+    return tileCover(TileCoordinate::fromScreenCoordinate(state, z, { 0, 0 }).p,
+                     TileCoordinate::fromScreenCoordinate(state, z, { w, 0 }).p,
+                     TileCoordinate::fromScreenCoordinate(state, z, { w, h }).p,
+                     TileCoordinate::fromScreenCoordinate(state, z, { 0, h }).p,
+                     TileCoordinate::fromScreenCoordinate(state, z, { w / 2, h / 2 }).p, z);
 }
 
 } // namespace util

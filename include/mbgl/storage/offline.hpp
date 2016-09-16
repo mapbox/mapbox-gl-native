@@ -30,7 +30,8 @@ public:
     OfflineTilePyramidRegionDefinition(std::string, LatLngBounds, double, double, float);
 
     /* Private */
-    std::vector<CanonicalTileID> tileCover(SourceType, uint16_t tileSize, const Range<uint8_t>& zoomRange) const;
+    std::vector<CanonicalTileID>
+    tileCover(SourceType, uint16_t tileSize, const Range<uint8_t>& zoomRange) const;
 
     const std::string styleURL;
     const LatLngBounds bounds;
@@ -69,10 +70,7 @@ using OfflineRegionMetadata = std::vector<uint8_t>;
  * is currently available for offline use. To check if that is the case, use
  * `OfflineRegionStatus::complete()`.
  */
-enum class OfflineRegionDownloadState {
-    Inactive,
-    Active
-};
+enum class OfflineRegionDownloadState { Inactive, Active };
 
 /*
  * A region's status includes its active/inactive state as well as counts
@@ -150,7 +148,8 @@ public:
      * responsibility of the SDK bindings to wrap this object in an interface that
      * re-executes the user-provided implementation on the main thread.
      */
-    virtual void statusChanged(OfflineRegionStatus) {}
+    virtual void statusChanged(OfflineRegionStatus) {
+    }
 
     /*
      * Implement this method to be notified of errors encountered while downloading
@@ -162,7 +161,8 @@ public:
      * responsibility of the SDK bindings to wrap this object in an interface that
      * re-executes the user-provided implementation on the main thread.
      */
-    virtual void responseError(Response::Error) {}
+    virtual void responseError(Response::Error) {
+    }
 
     /*
      * Implement this method to be notified when the limit on the number of Mapbox
@@ -178,7 +178,8 @@ public:
      * responsibility of the SDK bindings to wrap this object in an interface that
      * re-executes the user-provided implementation on the main thread.
      */
-    virtual void mapboxTileCountLimitExceeded(uint64_t /* limit */) {}
+    virtual void mapboxTileCountLimitExceeded(uint64_t /* limit */) {
+    }
 };
 
 class OfflineRegion {
@@ -199,9 +200,7 @@ public:
 private:
     friend class OfflineDatabase;
 
-    OfflineRegion(int64_t id,
-                  OfflineRegionDefinition,
-                  OfflineRegionMetadata);
+    OfflineRegion(int64_t id, OfflineRegionDefinition, OfflineRegionMetadata);
 
     const int64_t id;
     const OfflineRegionDefinition definition;

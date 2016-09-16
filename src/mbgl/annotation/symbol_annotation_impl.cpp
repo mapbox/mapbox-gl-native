@@ -6,13 +6,14 @@
 namespace mbgl {
 
 SymbolAnnotationImpl::SymbolAnnotationImpl(AnnotationID id_, SymbolAnnotation annotation_)
-: id(id_),
-  annotation(std::move(annotation_)) {
+    : id(id_), annotation(std::move(annotation_)) {
 }
 
-void SymbolAnnotationImpl::updateLayer(const CanonicalTileID& tileID, AnnotationTileLayer& layer) const {
+void SymbolAnnotationImpl::updateLayer(const CanonicalTileID& tileID,
+                                       AnnotationTileLayer& layer) const {
     std::unordered_map<std::string, std::string> featureProperties;
-    featureProperties.emplace("sprite", annotation.icon.empty() ? std::string("default_marker") : annotation.icon);
+    featureProperties.emplace("sprite", annotation.icon.empty() ? std::string("default_marker")
+                                                                : annotation.icon);
 
     const Point<double>& p = annotation.geometry;
 
@@ -30,9 +31,8 @@ void SymbolAnnotationImpl::updateLayer(const CanonicalTileID& tileID, Annotation
     projected.y = std::fmod(projected.y, 1);
     projected *= double(util::EXTENT);
 
-    layer.features.emplace_back(id,
-                                FeatureType::Point,
-                                GeometryCollection {{ {{ convertPoint<int16_t>(projected) }} }},
+    layer.features.emplace_back(id, FeatureType::Point,
+                                GeometryCollection{ { { { convertPoint<int16_t>(projected) } } } },
                                 featureProperties);
 }
 

@@ -9,7 +9,8 @@ CircleShader::CircleShader(gl::ObjectStore& store, Defines defines)
     : Shader(shaders::circle::name,
              shaders::circle::vertex,
              shaders::circle::fragment,
-             store, defines) {
+             store,
+             defines) {
 }
 
 void CircleShader::bind(GLbyte* offset) {

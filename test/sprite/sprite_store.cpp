@@ -25,7 +25,7 @@ TEST(SpriteStore, SpriteStore) {
     // Adding single
     store.setSprite("one", sprite1);
     EXPECT_EQ(Sprites({
-                  { "one", sprite1 },
+                  {"one", sprite1},
               }),
               store.getDirty());
     EXPECT_EQ(Sprites(), store.getDirty());
@@ -34,7 +34,7 @@ TEST(SpriteStore, SpriteStore) {
     store.setSprite("two", sprite2);
     store.setSprite("three", sprite3);
     EXPECT_EQ(Sprites({
-                  { "two", sprite2 }, { "three", sprite3 },
+                  {"two", sprite2}, {"three", sprite3},
               }),
               store.getDirty());
     EXPECT_EQ(Sprites(), store.getDirty());
@@ -43,7 +43,7 @@ TEST(SpriteStore, SpriteStore) {
     store.removeSprite("one");
     store.removeSprite("two");
     EXPECT_EQ(Sprites({
-                  { "one", nullptr }, { "two", nullptr },
+                  {"one", nullptr}, {"two", nullptr},
               }),
               store.getDirty());
     EXPECT_EQ(Sprites(), store.getDirty());
@@ -56,23 +56,19 @@ TEST(SpriteStore, SpriteStore) {
     EXPECT_EQ(nullptr, store.getSprite("two"));
     EXPECT_EQ(nullptr, store.getSprite("four"));
 
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Info,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't find sprite named 'two'",
-                  }));
-    EXPECT_EQ(1u, log.count({
-                      EventSeverity::Info,
-                      Event::Sprite,
-                      int64_t(-1),
-                      "Can't find sprite named 'four'",
-                  }));
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Info, Event::Sprite, int64_t(-1), "Can't find sprite named 'two'",
+              }));
+    EXPECT_EQ(1u,
+              log.count({
+                  EventSeverity::Info, Event::Sprite, int64_t(-1), "Can't find sprite named 'four'",
+              }));
 
     // Overwriting
     store.setSprite("three", sprite1);
     EXPECT_EQ(Sprites({
-                  { "three", sprite1 },
+                  {"three", sprite1},
               }),
               store.getDirty());
     EXPECT_EQ(Sprites(), store.getDirty());
@@ -88,7 +84,7 @@ TEST(SpriteStore, OtherPixelRatio) {
 
     // Adding mismatched sprite image
     store.setSprite("one", sprite1);
-    EXPECT_EQ(Sprites({ { "one", sprite1 } }), store.getDirty());
+    EXPECT_EQ(Sprites({{"one", sprite1}}), store.getDirty());
 }
 
 TEST(SpriteStore, Multiple) {
@@ -99,10 +95,10 @@ TEST(SpriteStore, Multiple) {
     SpriteStore store(1);
 
     store.setSprites({
-        { "one", sprite1 }, { "two", sprite2 },
+        {"one", sprite1}, {"two", sprite2},
     });
     EXPECT_EQ(Sprites({
-                  { "one", sprite1 }, { "two", sprite2 },
+                  {"one", sprite1}, {"two", sprite2},
               }),
               store.getDirty());
     EXPECT_EQ(Sprites(), store.getDirty());
@@ -122,7 +118,7 @@ TEST(SpriteStore, Replace) {
     store.setSprite("sprite", sprite2);
     EXPECT_EQ(sprite2, store.getSprite("sprite"));
 
-    EXPECT_EQ(Sprites({ { "sprite", sprite2 } }), store.getDirty());
+    EXPECT_EQ(Sprites({{"sprite", sprite2}}), store.getDirty());
 }
 
 TEST(SpriteStore, ReplaceWithDifferentDimensions) {
@@ -140,15 +136,13 @@ TEST(SpriteStore, ReplaceWithDifferentDimensions) {
     store.setSprite("sprite", sprite2);
 
     EXPECT_EQ(1u, log.count({
-                      EventSeverity::Warning,
-                      Event::Sprite,
-                      int64_t(-1),
+                      EventSeverity::Warning, Event::Sprite, int64_t(-1),
                       "Can't change sprite dimensions for 'sprite'",
                   }));
 
     EXPECT_EQ(sprite1, store.getSprite("sprite"));
 
-    EXPECT_EQ(Sprites({ { "sprite", sprite1 } }), store.getDirty());
+    EXPECT_EQ(Sprites({{"sprite", sprite1}}), store.getDirty());
 }
 
 class SpriteStoreTest {
@@ -158,7 +152,7 @@ public:
     util::RunLoop loop;
     StubFileSource fileSource;
     StubStyleObserver observer;
-    SpriteStore spriteStore = { 1.0 };
+    SpriteStore spriteStore = {1.0};
 
     void run() {
         // Squelch logging.
@@ -191,9 +185,8 @@ Response successfulSpriteJSONResponse(const Resource& resource) {
 
 Response failedSpriteResponse(const Resource&) {
     Response response;
-    response.error = std::make_unique<Response::Error>(
-        Response::Error::Reason::Other,
-        "Failed by the test case");
+    response.error = std::make_unique<Response::Error>(Response::Error::Reason::Other,
+                                                       "Failed by the test case");
     return response;
 }
 
@@ -209,12 +202,12 @@ TEST(SpriteStore, LoadingSuccess) {
     test.fileSource.spriteImageResponse = successfulSpriteImageResponse;
     test.fileSource.spriteJSONResponse = successfulSpriteJSONResponse;
 
-    test.observer.spriteError = [&] (std::exception_ptr error) {
+    test.observer.spriteError = [&](std::exception_ptr error) {
         FAIL() << util::toString(error);
         test.end();
     };
 
-    test.observer.spriteLoaded = [&] () {
+    test.observer.spriteLoaded = [&]() {
         EXPECT_TRUE(!test.spriteStore.getDirty().empty());
         EXPECT_EQ(1.0, test.spriteStore.pixelRatio);
         EXPECT_TRUE(test.spriteStore.isLoaded());
@@ -230,7 +223,7 @@ TEST(SpriteStore, JSONLoadingFail) {
     test.fileSource.spriteImageResponse = successfulSpriteImageResponse;
     test.fileSource.spriteJSONResponse = failedSpriteResponse;
 
-    test.observer.spriteError = [&] (std::exception_ptr error) {
+    test.observer.spriteError = [&](std::exception_ptr error) {
         EXPECT_TRUE(error != nullptr);
         EXPECT_EQ("Failed by the test case", util::toString(error));
         EXPECT_FALSE(test.spriteStore.isLoaded());
@@ -246,7 +239,7 @@ TEST(SpriteStore, ImageLoadingFail) {
     test.fileSource.spriteImageResponse = failedSpriteResponse;
     test.fileSource.spriteJSONResponse = successfulSpriteJSONResponse;
 
-    test.observer.spriteError = [&] (std::exception_ptr error) {
+    test.observer.spriteError = [&](std::exception_ptr error) {
         EXPECT_TRUE(error != nullptr);
         EXPECT_EQ("Failed by the test case", util::toString(error));
         EXPECT_FALSE(test.spriteStore.isLoaded());
@@ -262,7 +255,7 @@ TEST(SpriteStore, JSONLoadingCorrupted) {
     test.fileSource.spriteImageResponse = successfulSpriteImageResponse;
     test.fileSource.spriteJSONResponse = corruptSpriteResponse;
 
-    test.observer.spriteError = [&] (std::exception_ptr error) {
+    test.observer.spriteError = [&](std::exception_ptr error) {
         EXPECT_TRUE(error != nullptr);
         EXPECT_EQ("Failed to parse JSON: Invalid value. at offset 0", util::toString(error));
         EXPECT_FALSE(test.spriteStore.isLoaded());
@@ -278,7 +271,7 @@ TEST(SpriteStore, ImageLoadingCorrupted) {
     test.fileSource.spriteImageResponse = corruptSpriteResponse;
     test.fileSource.spriteJSONResponse = successfulSpriteJSONResponse;
 
-    test.observer.spriteError = [&] (std::exception_ptr error) {
+    test.observer.spriteError = [&](std::exception_ptr error) {
         EXPECT_TRUE(error != nullptr);
         // Not asserting on platform-specific error text.
         EXPECT_FALSE(test.spriteStore.isLoaded());
@@ -292,14 +285,12 @@ TEST(SpriteStore, LoadingCancel) {
     SpriteStoreTest test;
 
     test.fileSource.spriteImageResponse =
-    test.fileSource.spriteJSONResponse = [&] (const Resource&) {
-        test.end();
-        return optional<Response>();
-    };
+        test.fileSource.spriteJSONResponse = [&](const Resource&) {
+            test.end();
+            return optional<Response>();
+        };
 
-    test.observer.spriteLoaded = [&] () {
-        FAIL() << "Should never be called";
-    };
+    test.observer.spriteLoaded = [&]() { FAIL() << "Should never be called"; };
 
     test.run();
 }

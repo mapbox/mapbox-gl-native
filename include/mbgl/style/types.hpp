@@ -5,13 +5,7 @@
 namespace mbgl {
 
 // TODO: should be in public source.hpp header and style namespace
-enum class SourceType : uint8_t {
-    Vector,
-    Raster,
-    GeoJSON,
-    Video,
-    Annotations
-};
+enum class SourceType : uint8_t { Vector, Raster, GeoJSON, Video, Annotations };
 
 namespace style {
 
@@ -35,10 +29,7 @@ enum class LineJoinType : uint8_t {
     FlipBevel
 };
 
-enum class TranslateAnchorType : bool {
-    Map,
-    Viewport
-};
+enum class TranslateAnchorType : bool { Map, Viewport };
 
 enum class RotateAnchorType : bool {
     Map,
@@ -61,11 +52,7 @@ enum class AlignmentType : uint8_t {
     Undefined,
 };
 
-enum class TextJustifyType : uint8_t {
-    Center,
-    Left,
-    Right
-};
+enum class TextJustifyType : uint8_t { Center, Left, Right };
 
 enum class TextAnchorType : uint8_t {
     Center,
@@ -85,12 +72,7 @@ enum class TextTransformType : uint8_t {
     Lowercase,
 };
 
-enum class IconTextFitType : uint8_t {
-    None,
-    Both,
-    Width,
-    Height
-};
+enum class IconTextFitType : uint8_t { None, Both, Width, Height };
 
 } // namespace style
 } // namespace mbgl

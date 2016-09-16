@@ -17,9 +17,14 @@ namespace style {
 */
 class TileSourceImpl : public Source::Impl {
 public:
-    static Tileset parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType, uint16_t tileSize);
+    static Tileset parseTileJSON(const std::string& json,
+                                 const std::string& sourceURL,
+                                 SourceType,
+                                 uint16_t tileSize);
 
-    TileSourceImpl(SourceType, std::string id, Source&,
+    TileSourceImpl(SourceType,
+                   std::string id,
+                   Source&,
                    variant<std::string, Tileset> urlOrTileset,
                    uint16_t tileSize);
     ~TileSourceImpl() override;

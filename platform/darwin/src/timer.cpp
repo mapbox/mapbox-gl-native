@@ -16,16 +16,10 @@ CFAbsoluteTime toCFAbsoluteTime(Duration duration) {
 class Timer::Impl {
 public:
     Impl(Duration timeout, Duration repeat, std::function<void()>&& fn)
-        : task(std::move(fn)),
-          loop(CFRunLoopGetCurrent()) {
-        CFRunLoopTimerContext context = {
-            0,
-            this,
-            nullptr,
-            nullptr,
-            nullptr
-        };
-        timer = CFRunLoopTimerCreate(kCFAllocatorDefault, toCFAbsoluteTime(timeout), toCFTimeInterval(repeat), 0, 0, perform, &context);
+        : task(std::move(fn)), loop(CFRunLoopGetCurrent()) {
+        CFRunLoopTimerContext context = {0, this, nullptr, nullptr, nullptr};
+        timer = CFRunLoopTimerCreate(kCFAllocatorDefault, toCFAbsoluteTime(timeout),
+                                     toCFTimeInterval(repeat), 0, 0, perform, &context);
         CFRunLoopAddTimer(loop, timer, kCFRunLoopDefaultMode);
     }
 

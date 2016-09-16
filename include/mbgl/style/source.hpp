@@ -10,17 +10,20 @@ namespace mbgl {
 namespace style {
 
 /**
- * The runtime representation of a [source](https://www.mapbox.com/mapbox-gl-style-spec/#sources) from the Mapbox Style
+ * The runtime representation of a [source](https://www.mapbox.com/mapbox-gl-style-spec/#sources)
+ * from the Mapbox Style
  * Specification.
  *
- * `Source` is an abstract base class; concrete derived classes are provided for each source type. `Source` contains
+ * `Source` is an abstract base class; concrete derived classes are provided for each source type.
+ * `Source` contains
  * functionality that is common to all layer types:
  *
  * * Runtime type information: type predicates and casting
  * * Accessors for properties common to all source types: ID, etc.
  * * Cloning and copying
  *
- * All other functionality lives in the derived classes. To instantiate a source, create an instance of the desired
+ * All other functionality lives in the derived classes. To instantiate a source, create an instance
+ * of the desired
  * type, passing the ID:
  *
  *     auto vectorSource = std::make_unique<VectorSource>("my-vector-source");

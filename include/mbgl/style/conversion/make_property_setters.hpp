@@ -23,7 +23,6 @@ auto makeLayoutPropertySetters() {
 
     result["visibility"] = &setVisibility<V>;
 
-
     result["line-cap"] = makePropertySetter<V>(&LineLayer::setLineCap);
     result["line-join"] = makePropertySetter<V>(&LineLayer::setLineJoin);
     result["line-miter-limit"] = makePropertySetter<V>(&LineLayer::setLineMiterLimit);
@@ -35,7 +34,8 @@ auto makeLayoutPropertySetters() {
     result["icon-allow-overlap"] = makePropertySetter<V>(&SymbolLayer::setIconAllowOverlap);
     result["icon-ignore-placement"] = makePropertySetter<V>(&SymbolLayer::setIconIgnorePlacement);
     result["icon-optional"] = makePropertySetter<V>(&SymbolLayer::setIconOptional);
-    result["icon-rotation-alignment"] = makePropertySetter<V>(&SymbolLayer::setIconRotationAlignment);
+    result["icon-rotation-alignment"] =
+        makePropertySetter<V>(&SymbolLayer::setIconRotationAlignment);
     result["icon-size"] = makePropertySetter<V>(&SymbolLayer::setIconSize);
     result["icon-text-fit"] = makePropertySetter<V>(&SymbolLayer::setIconTextFit);
     result["icon-text-fit-padding"] = makePropertySetter<V>(&SymbolLayer::setIconTextFitPadding);
@@ -45,7 +45,8 @@ auto makeLayoutPropertySetters() {
     result["icon-keep-upright"] = makePropertySetter<V>(&SymbolLayer::setIconKeepUpright);
     result["icon-offset"] = makePropertySetter<V>(&SymbolLayer::setIconOffset);
     result["text-pitch-alignment"] = makePropertySetter<V>(&SymbolLayer::setTextPitchAlignment);
-    result["text-rotation-alignment"] = makePropertySetter<V>(&SymbolLayer::setTextRotationAlignment);
+    result["text-rotation-alignment"] =
+        makePropertySetter<V>(&SymbolLayer::setTextRotationAlignment);
     result["text-field"] = makePropertySetter<V>(&SymbolLayer::setTextField);
     result["text-font"] = makePropertySetter<V>(&SymbolLayer::setTextFont);
     result["text-size"] = makePropertySetter<V>(&SymbolLayer::setTextSize);
@@ -63,9 +64,6 @@ auto makeLayoutPropertySetters() {
     result["text-allow-overlap"] = makePropertySetter<V>(&SymbolLayer::setTextAllowOverlap);
     result["text-ignore-placement"] = makePropertySetter<V>(&SymbolLayer::setTextIgnorePlacement);
     result["text-optional"] = makePropertySetter<V>(&SymbolLayer::setTextOptional);
-
-
-
 
     return result;
 }
@@ -113,7 +111,8 @@ auto makePaintPropertySetters() {
     result["circle-blur"] = makePropertySetter<V>(&CircleLayer::setCircleBlur);
     result["circle-opacity"] = makePropertySetter<V>(&CircleLayer::setCircleOpacity);
     result["circle-translate"] = makePropertySetter<V>(&CircleLayer::setCircleTranslate);
-    result["circle-translate-anchor"] = makePropertySetter<V>(&CircleLayer::setCircleTranslateAnchor);
+    result["circle-translate-anchor"] =
+        makePropertySetter<V>(&CircleLayer::setCircleTranslateAnchor);
     result["circle-pitch-scale"] = makePropertySetter<V>(&CircleLayer::setCirclePitchScale);
 
     result["raster-opacity"] = makePropertySetter<V>(&RasterLayer::setRasterOpacity);

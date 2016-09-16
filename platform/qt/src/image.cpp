@@ -7,8 +7,7 @@
 namespace mbgl {
 
 std::string encodePNG(const PremultipliedImage& pre) {
-    QImage image(pre.data.get(), pre.width, pre.height,
-        QImage::Format_ARGB32_Premultiplied);
+    QImage image(pre.data.get(), pre.width, pre.height, QImage::Format_ARGB32_Premultiplied);
 
     QByteArray array;
     QBuffer buffer(&array);
@@ -45,10 +44,9 @@ PremultipliedImage decodeImage(const std::string& string) {
     }
 #endif
 
-    QImage image =
-        QImage::fromData(data, size)
-        .rgbSwapped()
-        .convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    QImage image = QImage::fromData(data, size)
+                       .rgbSwapped()
+                       .convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
     if (image.isNull()) {
         throw std::runtime_error("Unsupported image type");
@@ -57,7 +55,6 @@ PremultipliedImage decodeImage(const std::string& string) {
     auto img = std::make_unique<uint8_t[]>(image.byteCount());
     memcpy(img.get(), image.constBits(), image.byteCount());
 
-    return { size_t(image.width()), size_t(image.height()), std::move(img) };
+    return {size_t(image.width()), size_t(image.height()), std::move(img)};
 }
-
 }

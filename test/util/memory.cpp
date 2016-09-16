@@ -26,9 +26,8 @@ long getRSS() {
     std::vector<std::string> stats;
     std::istringstream stream(statm);
 
-    std::copy(std::istream_iterator<std::string>(stream),
-        std::istream_iterator<std::string>(),
-        std::back_inserter(stats));
+    std::copy(std::istream_iterator<std::string>(stream), std::istream_iterator<std::string>(),
+              std::back_inserter(stats));
 
     return std::stol(stats[1]) * getpagesize();
 }
@@ -46,17 +45,23 @@ bool isUsingJemalloc() {
 class MemoryTest {
 public:
     MemoryTest() {
-        fileSource.styleResponse = [&](const Resource& res) { return response("style_" + getType(res) + ".json");};
-        fileSource.tileResponse = [&](const Resource& res) { return response(getType(res) + ".tile"); };
-        fileSource.sourceResponse = [&](const Resource& res) { return response("source_" + getType(res) + ".json"); };
+        fileSource.styleResponse = [&](const Resource& res) {
+            return response("style_" + getType(res) + ".json");
+        };
+        fileSource.tileResponse = [&](const Resource& res) {
+            return response(getType(res) + ".tile");
+        };
+        fileSource.sourceResponse = [&](const Resource& res) {
+            return response("source_" + getType(res) + ".json");
+        };
         fileSource.glyphsResponse = [&](const Resource&) { return response("glyphs.pbf"); };
         fileSource.spriteJSONResponse = [&](const Resource&) { return response("sprite.json"); };
         fileSource.spriteImageResponse = [&](const Resource&) { return response("sprite.png"); };
     }
 
     util::RunLoop runLoop;
-    std::shared_ptr<HeadlessDisplay> display { std::make_shared<mbgl::HeadlessDisplay>() };
-    HeadlessView view { display, 2 };
+    std::shared_ptr<HeadlessDisplay> display{std::make_shared<mbgl::HeadlessDisplay>()};
+    HeadlessView view{display, 2};
     StubFileSource fileSource;
 
 private:
@@ -67,8 +72,8 @@ private:
         if (it != cache.end()) {
             result.data = it->second;
         } else {
-            auto data = std::make_shared<std::string>(
-                util::read_file("test/fixtures/resources/"s + path));
+            auto data =
+                std::make_shared<std::string>(util::read_file("test/fixtures/resources/"s + path));
 
             cache.insert(it, std::make_pair(path, data));
             result.data = data;
@@ -181,7 +186,7 @@ TEST(Memory, Footprint) {
 
     MemoryTest test;
 
-    auto renderMap = [](Map* map, const char* style){
+    auto renderMap = [](Map* map, const char* style) {
         map->setZoom(16);
 
         map->setStyleURL(style);

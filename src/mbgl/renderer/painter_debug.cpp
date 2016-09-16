@@ -13,7 +13,7 @@
 namespace mbgl {
 
 void Painter::renderTileDebug(const RenderTile& tile) {
-    MBGL_DEBUG_GROUP(std::string { "debug " } + util::toString(tile.id));
+    MBGL_DEBUG_GROUP(std::string{ "debug " } + util::toString(tile.id));
     if (frame.debugOptions != MapDebugOptions::NoDebug) {
         setClipping(tile.clip);
         if (frame.debugOptions & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
@@ -25,7 +25,7 @@ void Painter::renderTileDebug(const RenderTile& tile) {
     }
 }
 
-void Painter::renderDebugText(Tile& tile, const mat4 &matrix) {
+void Painter::renderDebugText(Tile& tile, const mat4& matrix) {
     MBGL_DEBUG_GROUP("debug text");
 
     config.depthTest = GL_FALSE;
@@ -35,9 +35,9 @@ void Painter::renderDebugText(Tile& tile, const mat4 &matrix) {
         !(tile.debugBucket->modified == tile.modified) ||
         !(tile.debugBucket->expires == tile.expires) ||
         tile.debugBucket->debugMode != frame.debugOptions) {
-        tile.debugBucket = std::make_unique<DebugBucket>(
-            tile.id, tile.isRenderable(), tile.isComplete(), tile.modified,
-            tile.expires, frame.debugOptions);
+        tile.debugBucket =
+            std::make_unique<DebugBucket>(tile.id, tile.isRenderable(), tile.isComplete(),
+                                          tile.modified, tile.expires, frame.debugOptions);
     }
 
     auto& plainShader = shaders->plain;
@@ -65,7 +65,7 @@ void Painter::renderDebugText(Tile& tile, const mat4 &matrix) {
     config.depthTest = GL_TRUE;
 }
 
-void Painter::renderDebugFrame(const mat4 &matrix) {
+void Painter::renderDebugFrame(const mat4& matrix) {
     MBGL_DEBUG_GROUP("debug frame");
 
     // Disable depth test and don't count this towards the depth buffer,
@@ -96,20 +96,19 @@ void Painter::renderClipMasks() {
 
 #ifndef GL_ES_VERSION_2_0
     config.pixelZoom = { 1, 1 };
-    config.rasterPos = {{ -1, -1, 0, 0 }};
+    config.rasterPos = { { -1, -1, 0, 0 } };
 
     // Read the stencil buffer
     const auto& fbSize = frame.framebufferSize;
     auto pixels = std::make_unique<uint8_t[]>(fbSize[0] * fbSize[1]);
-    MBGL_CHECK_ERROR(glReadPixels(
-                0,                // GLint x
-                0,                // GLint y
-                fbSize[0],        // GLsizei width
-                fbSize[1],        // GLsizei height
-                GL_STENCIL_INDEX, // GLenum format
-                GL_UNSIGNED_BYTE, // GLenum type
-                pixels.get()      // GLvoid * data
-                ));
+    MBGL_CHECK_ERROR(glReadPixels(0,                // GLint x
+                                  0,                // GLint y
+                                  fbSize[0],        // GLsizei width
+                                  fbSize[1],        // GLsizei height
+                                  GL_STENCIL_INDEX, // GLenum format
+                                  GL_UNSIGNED_BYTE, // GLenum type
+                                  pixels.get()      // GLvoid * data
+                                  ));
 
     // Scale the Stencil buffer to cover the entire color space.
     auto it = pixels.get();
@@ -120,7 +119,8 @@ void Painter::renderClipMasks() {
     }
 
     MBGL_CHECK_ERROR(glWindowPos2i(0, 0));
-    MBGL_CHECK_ERROR(glDrawPixels(fbSize[0], fbSize[1], GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels.get()));
+    MBGL_CHECK_ERROR(
+        glDrawPixels(fbSize[0], fbSize[1], GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels.get()));
 #endif // GL_ES_VERSION_2_0
 }
 #endif // NDEBUG
@@ -134,7 +134,7 @@ void Painter::renderDepthBuffer() {
 
 #ifndef GL_ES_VERSION_2_0
     config.pixelZoom = { 1, 1 };
-    config.rasterPos = {{ -1, -1, 0, 0 }};
+    config.rasterPos = { { -1, -1, 0, 0 } };
 
     // Read the stencil buffer
     const auto& fbSize = frame.framebufferSize;
@@ -144,18 +144,18 @@ void Painter::renderDepthBuffer() {
     glPixelTransferf(GL_DEPTH_SCALE, base);
     glPixelTransferf(GL_DEPTH_BIAS, 1.0 - base);
 
-    MBGL_CHECK_ERROR(glReadPixels(
-                0,                  // GLint x
-                0,                  // GLint y
-                fbSize[0],          // GLsizei width
-                fbSize[1],          // GLsizei height
-                GL_DEPTH_COMPONENT, // GLenum format
-                GL_UNSIGNED_BYTE,   // GLenum type
-                pixels.get()        // GLvoid * data
-                ));
+    MBGL_CHECK_ERROR(glReadPixels(0,                  // GLint x
+                                  0,                  // GLint y
+                                  fbSize[0],          // GLsizei width
+                                  fbSize[1],          // GLsizei height
+                                  GL_DEPTH_COMPONENT, // GLenum format
+                                  GL_UNSIGNED_BYTE,   // GLenum type
+                                  pixels.get()        // GLvoid * data
+                                  ));
 
     MBGL_CHECK_ERROR(glWindowPos2i(0, 0));
-    MBGL_CHECK_ERROR(glDrawPixels(fbSize[0], fbSize[1], GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels.get()));
+    MBGL_CHECK_ERROR(
+        glDrawPixels(fbSize[0], fbSize[1], GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels.get()));
 #endif // GL_ES_VERSION_2_0
 }
 #endif // NDEBUG

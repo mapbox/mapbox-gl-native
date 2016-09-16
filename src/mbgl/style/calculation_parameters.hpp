@@ -8,8 +8,8 @@ namespace style {
 
 class CalculationParameters {
 public:
-    explicit CalculationParameters(float z_)
-        : z(z_) {}
+    explicit CalculationParameters(float z_) : z(z_) {
+    }
 
     CalculationParameters(float z_,
                           TimePoint now_,
@@ -18,7 +18,8 @@ public:
         : z(z_),
           now(std::move(now_)),
           zoomHistory(std::move(zoomHistory_)),
-          defaultFadeDuration(std::move(defaultFadeDuration_)) {}
+          defaultFadeDuration(std::move(defaultFadeDuration_)) {
+    }
 
     float z;
     TimePoint now;

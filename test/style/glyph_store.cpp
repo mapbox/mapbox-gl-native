@@ -16,9 +16,11 @@ public:
     util::RunLoop loop;
     StubFileSource fileSource;
     StubStyleObserver observer;
-    GlyphStore glyphStore { fileSource };
+    GlyphStore glyphStore{fileSource};
 
-    void run(const std::string& url, const FontStack& fontStack, const std::set<GlyphRange>& glyphRanges) {
+    void run(const std::string& url,
+             const FontStack& fontStack,
+             const std::set<GlyphRange>& glyphRanges) {
         // Squelch logging.
         Log::setObserver(std::make_unique<Log::NullObserver>());
 
@@ -37,19 +39,20 @@ public:
 TEST(GlyphStore, LoadingSuccess) {
     GlyphStoreTest test;
 
-    test.fileSource.glyphsResponse = [&] (const Resource& resource) {
+    test.fileSource.glyphsResponse = [&](const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        response.data =
+            std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
         return response;
     };
 
-    test.observer.glyphsError = [&] (const FontStack&, const GlyphRange&, std::exception_ptr) {
+    test.observer.glyphsError = [&](const FontStack&, const GlyphRange&, std::exception_ptr) {
         FAIL();
         test.end();
     };
 
-    test.observer.glyphsLoaded = [&] (const FontStack&, const GlyphRange&) {
+    test.observer.glyphsLoaded = [&](const FontStack&, const GlyphRange&) {
         if (!test.glyphStore.hasGlyphRanges({{"Test Stack"}}, {{0, 255}, {256, 511}}))
             return;
 
@@ -59,24 +62,21 @@ TEST(GlyphStore, LoadingSuccess) {
         test.end();
     };
 
-    test.run(
-        "test/fixtures/resources/glyphs.pbf",
-        {{"Test Stack"}},
-        {{0, 255}, {256, 511}});
+    test.run("test/fixtures/resources/glyphs.pbf", {{"Test Stack"}}, {{0, 255}, {256, 511}});
 }
 
 TEST(GlyphStore, LoadingFail) {
     GlyphStoreTest test;
 
-    test.fileSource.glyphsResponse = [&] (const Resource&) {
+    test.fileSource.glyphsResponse = [&](const Resource&) {
         Response response;
-        response.error = std::make_unique<Response::Error>(
-            Response::Error::Reason::Other,
-            "Failed by the test case");
+        response.error = std::make_unique<Response::Error>(Response::Error::Reason::Other,
+                                                           "Failed by the test case");
         return response;
     };
 
-    test.observer.glyphsError = [&] (const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
+    test.observer.glyphsError = [&](const FontStack& fontStack, const GlyphRange& glyphRange,
+                                    std::exception_ptr error) {
         EXPECT_EQ(fontStack, FontStack({"Test Stack"}));
         EXPECT_EQ(glyphRange, GlyphRange(0, 255));
 
@@ -90,22 +90,20 @@ TEST(GlyphStore, LoadingFail) {
         test.end();
     };
 
-    test.run(
-        "test/fixtures/resources/glyphs.pbf",
-        {{"Test Stack"}},
-        {{0, 255}});
+    test.run("test/fixtures/resources/glyphs.pbf", {{"Test Stack"}}, {{0, 255}});
 }
 
 TEST(GlyphStore, LoadingCorrupted) {
     GlyphStoreTest test;
 
-    test.fileSource.glyphsResponse = [&] (const Resource&) {
+    test.fileSource.glyphsResponse = [&](const Resource&) {
         Response response;
         response.data = std::make_unique<std::string>("CORRUPTED");
         return response;
     };
 
-    test.observer.glyphsError = [&] (const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
+    test.observer.glyphsError = [&](const FontStack& fontStack, const GlyphRange& glyphRange,
+                                    std::exception_ptr error) {
         EXPECT_EQ(fontStack, FontStack({"Test Stack"}));
         EXPECT_EQ(glyphRange, GlyphRange(0, 255));
 
@@ -119,26 +117,20 @@ TEST(GlyphStore, LoadingCorrupted) {
         test.end();
     };
 
-    test.run(
-        "test/fixtures/resources/glyphs.pbf",
-        {{"Test Stack"}},
-        {{0, 255}});
+    test.run("test/fixtures/resources/glyphs.pbf", {{"Test Stack"}}, {{0, 255}});
 }
 
 TEST(GlyphStore, LoadingCancel) {
     GlyphStoreTest test;
 
-    test.fileSource.glyphsResponse = [&] (const Resource&) {
+    test.fileSource.glyphsResponse = [&](const Resource&) {
         test.end();
         return optional<Response>();
     };
 
-    test.observer.glyphsLoaded = [&] (const FontStack&, const GlyphRange&) {
+    test.observer.glyphsLoaded = [&](const FontStack&, const GlyphRange&) {
         FAIL() << "Should never be called";
     };
 
-    test.run(
-        "test/fixtures/resources/glyphs.pbf",
-        {{"Test Stack"}},
-        {{0, 255}});
+    test.run("test/fixtures/resources/glyphs.pbf", {{"Test Stack"}}, {{0, 255}});
 }

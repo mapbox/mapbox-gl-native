@@ -10,7 +10,8 @@ using namespace mbgl::util;
 
 class TestThread {
 public:
-    TestThread(WorkQueue* queue_) : queue(queue_) {}
+    TestThread(WorkQueue* queue_) : queue(queue_) {
+    }
 
     void send(std::function<void()>&& fn) {
         queue->push(std::move(fn));
@@ -47,9 +48,7 @@ TEST(WorkQueue, cancel) {
 
     WorkQueue queue;
 
-    auto work = [&]() {
-        FAIL() << "Should never be called";
-    };
+    auto work = [&]() { FAIL() << "Should never be called"; };
 
     queue.push(work);
     queue.push(work);

@@ -20,7 +20,7 @@ auto imageFromAtlas(const SpriteAtlas& atlas) {
     auto data = std::make_unique<uint8_t[]>(bytes);
     const auto src = reinterpret_cast<const uint8_t*>(atlas.getData());
     std::copy(src, src + bytes, data.get());
-    return PremultipliedImage{ atlas.getTextureWidth(), atlas.getTextureHeight(), std::move(data) };
+    return PremultipliedImage{atlas.getTextureWidth(), atlas.getTextureHeight(), std::move(data)};
 }
 
 } // namespace
@@ -70,9 +70,7 @@ TEST(Sprite, SpriteAtlas) {
     EXPECT_FALSE(missing);
 
     EXPECT_EQ(1u, log.count({
-                      EventSeverity::Info,
-                      Event::Sprite,
-                      int64_t(-1),
+                      EventSeverity::Info, Event::Sprite, int64_t(-1),
                       "Can't find sprite named 'doesnotexist'",
                   }));
 

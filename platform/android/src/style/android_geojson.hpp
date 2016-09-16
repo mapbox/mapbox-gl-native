@@ -19,10 +19,10 @@ namespace conversion {
 template <>
 Result<GeoJSON> convertGeoJSON(const mbgl::android::Value& value) {
 
-    //Value should be a string wrapped in an object
+    // Value should be a string wrapped in an object
     mbgl::android::Value jsonValue = value.get("data");
-    if(value.isNull()) {
-        return Error { "no json data found" };
+    if (value.isNull()) {
+        return Error{"no json data found"};
     }
     std::string jsonString = value.get("data").toString();
 
@@ -32,12 +32,12 @@ Result<GeoJSON> convertGeoJSON(const mbgl::android::Value& value) {
     if (d.HasParseError()) {
         std::stringstream message;
         message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
-        return Error { message.str() };
+        return Error{message.str()};
     }
 
     conversion::Result<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d);
     if (!geoJSON) {
-        return Error { geoJSON.error().message };
+        return Error{geoJSON.error().message};
     }
 
     return geoJSON;

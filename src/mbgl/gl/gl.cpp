@@ -10,26 +10,20 @@
 namespace mbgl {
 namespace gl {
 
-ExtensionFunction<void (GLuint array)>
-    BindVertexArray({
-        {"GL_ARB_vertex_array_object", "glBindVertexArray"},
-        {"GL_OES_vertex_array_object", "glBindVertexArrayOES"},
-        {"GL_APPLE_vertex_array_object", "glBindVertexArrayAPPLE"}
-    });
+ExtensionFunction<void(GLuint array)>
+    BindVertexArray({ { "GL_ARB_vertex_array_object", "glBindVertexArray" },
+                      { "GL_OES_vertex_array_object", "glBindVertexArrayOES" },
+                      { "GL_APPLE_vertex_array_object", "glBindVertexArrayAPPLE" } });
 
-ExtensionFunction<void (GLsizei n, const GLuint* arrays)>
-    DeleteVertexArrays({
-        {"GL_ARB_vertex_array_object", "glDeleteVertexArrays"},
-        {"GL_OES_vertex_array_object", "glDeleteVertexArraysOES"},
-        {"GL_APPLE_vertex_array_object", "glDeleteVertexArraysAPPLE"}
-    });
+ExtensionFunction<void(GLsizei n, const GLuint* arrays)>
+    DeleteVertexArrays({ { "GL_ARB_vertex_array_object", "glDeleteVertexArrays" },
+                         { "GL_OES_vertex_array_object", "glDeleteVertexArraysOES" },
+                         { "GL_APPLE_vertex_array_object", "glDeleteVertexArraysAPPLE" } });
 
-ExtensionFunction<void (GLsizei n, GLuint* arrays)>
-    GenVertexArrays({
-        {"GL_ARB_vertex_array_object", "glGenVertexArrays"},
-        {"GL_OES_vertex_array_object", "glGenVertexArraysOES"},
-        {"GL_APPLE_vertex_array_object", "glGenVertexArraysAPPLE"}
-    });
+ExtensionFunction<void(GLsizei n, GLuint* arrays)>
+    GenVertexArrays({ { "GL_ARB_vertex_array_object", "glGenVertexArrays" },
+                      { "GL_OES_vertex_array_object", "glGenVertexArraysOES" },
+                      { "GL_APPLE_vertex_array_object", "glGenVertexArraysAPPLE" } });
 
 std::vector<ExtensionFunctionBase*>& ExtensionFunctionBase::functions() {
     static std::vector<ExtensionFunctionBase*> functions;
@@ -38,13 +32,14 @@ std::vector<ExtensionFunctionBase*>& ExtensionFunctionBase::functions() {
 
 static std::once_flag initializeExtensionsOnce;
 
-void InitializeExtensions(glProc (*getProcAddress)(const char *)) {
+void InitializeExtensions(glProc (*getProcAddress)(const char*)) {
     std::call_once(initializeExtensionsOnce, [getProcAddress] {
-        const char * extensionsPtr = reinterpret_cast<const char *>(
-            MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
+        const char* extensionsPtr =
+            reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)));
 
-        if (!extensionsPtr)
+        if (!extensionsPtr) {
             return;
+        }
 
         const std::string extensions = extensionsPtr;
         for (auto fn : ExtensionFunctionBase::functions()) {
@@ -61,26 +56,43 @@ void InitializeExtensions(glProc (*getProcAddress)(const char *)) {
     });
 }
 
-void checkError(const char *cmd, const char *file, int line) {
+void checkError(const char* cmd, const char* file, int line) {
     const GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
-        const char *error = nullptr;
+        const char* error = nullptr;
         switch (err) {
-            case GL_INVALID_ENUM: error = "INVALID_ENUM"; break;
-            case GL_INVALID_VALUE: error = "INVALID_VALUE"; break;
-            case GL_INVALID_OPERATION: error = "INVALID_OPERATION"; break;
-            case GL_INVALID_FRAMEBUFFER_OPERATION:  error = "INVALID_FRAMEBUFFER_OPERATION";  break;
-            case GL_OUT_OF_MEMORY: error = "OUT_OF_MEMORY"; break;
+        case GL_INVALID_ENUM:
+            error = "INVALID_ENUM";
+            break;
+        case GL_INVALID_VALUE:
+            error = "INVALID_VALUE";
+            break;
+        case GL_INVALID_OPERATION:
+            error = "INVALID_OPERATION";
+            break;
+        case GL_INVALID_FRAMEBUFFER_OPERATION:
+            error = "INVALID_FRAMEBUFFER_OPERATION";
+            break;
+        case GL_OUT_OF_MEMORY:
+            error = "OUT_OF_MEMORY";
+            break;
 #ifdef GL_STACK_UNDERFLOW
-            case GL_STACK_UNDERFLOW:  error = "STACK_UNDERFLOW";  break;
+        case GL_STACK_UNDERFLOW:
+            error = "STACK_UNDERFLOW";
+            break;
 #endif
 #ifdef GL_STACK_OVERFLOW
-            case GL_STACK_OVERFLOW:  error = "STACK_OVERFLOW";  break;
+        case GL_STACK_OVERFLOW:
+            error = "STACK_OVERFLOW";
+            break;
 #endif
-            default: error = "(unknown)"; break;
+        default:
+            error = "(unknown)";
+            break;
         }
 
-        throw ::mbgl::gl::Error(err, std::string(cmd) + ": Error GL_" + error + " - " + file + ":" + util::toString(line));
+        throw ::mbgl::gl::Error(err, std::string(cmd) + ": Error GL_" + error + " - " + file + ":" +
+                                         util::toString(line));
     }
 }
 } // namespace gl
@@ -112,37 +124,49 @@ static GLuint currentVertexArray = 0;
 static std::mutex gDebugMutex;
 
 namespace mbgl {
-    namespace gl {
-        void mbx_trapExtension(const char *) { }
-        void mbx_trapExtension(const char *, GLint, const char *) { }
-        void mbx_trapExtension(const char *, GLsizei, GLuint *) { }
-        void mbx_trapExtension(const char *, GLsizei, const GLuint *) { }
-        void mbx_trapExtension(const char *, GLenum, GLenum, GLenum, GLsizei, const GLuint *, GLboolean) { }
-        void mbx_trapExtension(const char *, GLenum, GLuint, GLsizei, const GLchar *) { }
-        void mbx_trapExtension(const char *, GLDEBUGPROC, const void *) { }
-        void mbx_trapExtension(const char *, GLuint, GLuint, GLuint, GLuint, GLint, const char *, const void*) { }
-
-        void mbx_trapExtension(const char *name, GLuint array) {
-            if(strncasecmp(name, "glBindVertexArray", 17) == 0) {
-                currentVertexArray = array;
-                std::cout << name << ": " << array << std::endl;
-            }
-        }
-    }
+namespace gl {
+void mbx_trapExtension(const char*) {
+}
+void mbx_trapExtension(const char*, GLint, const char*) {
+}
+void mbx_trapExtension(const char*, GLsizei, GLuint*) {
+}
+void mbx_trapExtension(const char*, GLsizei, const GLuint*) {
+}
+void mbx_trapExtension(const char*, GLenum, GLenum, GLenum, GLsizei, const GLuint*, GLboolean) {
+}
+void mbx_trapExtension(const char*, GLenum, GLuint, GLsizei, const GLchar*) {
+}
+void mbx_trapExtension(const char*, GLDEBUGPROC, const void*) {
+}
+void mbx_trapExtension(
+    const char*, GLuint, GLuint, GLuint, GLuint, GLint, const char*, const void*) {
 }
 
-void mbx_glBindBuffer(GLenum target,
-                      GLuint buffer) {
+void mbx_trapExtension(const char* name, GLuint array) {
+    if (strncasecmp(name, "glBindVertexArray", 17) == 0) {
+        currentVertexArray = array;
+        std::cout << name << ": " << array << std::endl;
+    }
+}
+}
+}
+
+void mbx_glBindBuffer(GLenum target, GLuint buffer) {
     std::unique_lock<std::mutex> lock(gDebugMutex);
     if (target == GL_ARRAY_BUFFER) {
         currentArrayBuffer = buffer;
         if (currentVertexArray != 0) {
-            if (vertexArrayToArrayBufferMap.find(currentVertexArray) != vertexArrayToArrayBufferMap.end()) {
+            if (vertexArrayToArrayBufferMap.find(currentVertexArray) !=
+                vertexArrayToArrayBufferMap.end()) {
                 if (vertexArrayToArrayBufferMap[currentVertexArray] != currentArrayBuffer) {
-                    std::cout << "glBindBuffer: ERROR: You are re-binding a VAO to point to a new array buffer.  This is almost certainly unintended." << std::endl;
+                    std::cout << "glBindBuffer: ERROR: You are re-binding a VAO to point to a new "
+                                 "array buffer.  This is almost certainly unintended."
+                              << std::endl;
                 }
             }
-            std::cout << "glBindBuffer: binding VAO " << currentVertexArray << " to array buffer " << currentArrayBuffer << std::endl;
+            std::cout << "glBindBuffer: binding VAO " << currentVertexArray << " to array buffer "
+                      << currentArrayBuffer << std::endl;
             vertexArrayToArrayBufferMap[currentVertexArray] = currentArrayBuffer;
         }
     } else if (target == GL_ELEMENT_ARRAY_BUFFER) {
@@ -152,13 +176,14 @@ void mbx_glBindBuffer(GLenum target,
     glBindBuffer(target, buffer);
 }
 
-void mbx_glDeleteBuffers(GLsizei n,
-                     const GLuint * buffers) {
+void mbx_glDeleteBuffers(GLsizei n, const GLuint* buffers) {
     std::unique_lock<std::mutex> lock(gDebugMutex);
     for (int i = 0; i < n; ++i) {
         if (bufferBindingToSizeMap.find(buffers[i]) != bufferBindingToSizeMap.end()) {
             currentUsedBufferBytes -= bufferBindingToSizeMap[buffers[i]];
-            std::cout << "GL glDeleteBuffers: " << buffers[i] << " freeing " << bufferBindingToSizeMap[buffers[i]] << " bytes current total " << currentUsedBufferBytes << "\n";
+            std::cout << "GL glDeleteBuffers: " << buffers[i] << " freeing "
+                      << bufferBindingToSizeMap[buffers[i]] << " bytes current total "
+                      << currentUsedBufferBytes << "\n";
             bufferBindingToSizeMap.erase(buffers[i]);
         }
     }
@@ -166,10 +191,7 @@ void mbx_glDeleteBuffers(GLsizei n,
     glDeleteBuffers(n, buffers);
 }
 
-void mbx_glBufferData(GLenum target,
-                      GLsizeiptr size,
-                      const GLvoid * data,
-                      GLenum usage) {
+void mbx_glBufferData(GLenum target, GLsizeiptr size, const GLvoid* data, GLenum usage) {
     std::unique_lock<std::mutex> lock(gDebugMutex);
     GLuint currentBinding = 0;
     if (target == GL_ARRAY_BUFFER) {
@@ -179,35 +201,37 @@ void mbx_glBufferData(GLenum target,
     }
     if (bufferBindingToSizeMap.find(currentBinding) != bufferBindingToSizeMap.end()) {
         currentUsedBufferBytes -= bufferBindingToSizeMap[currentBinding];
-        std::cout << "GL glBufferData: " << currentBinding << " freeing " << bufferBindingToSizeMap[currentBinding] << " bytes current total " << currentUsedBufferBytes << "\n";
+        std::cout << "GL glBufferData: " << currentBinding << " freeing "
+                  << bufferBindingToSizeMap[currentBinding] << " bytes current total "
+                  << currentUsedBufferBytes << "\n";
     }
     bufferBindingToSizeMap[currentBinding] = size;
     currentUsedBufferBytes += size;
     if (currentUsedBufferBytes > largestAmountUsedSoFar) {
         largestAmountUsedSoFar = currentUsedBufferBytes;
     }
-    std::cout << "GL glBufferData: " << currentBinding << " using " << bufferBindingToSizeMap[currentBinding] << " bytes current total " << currentUsedBufferBytes << " high water mark " << largestAmountUsedSoFar << "\n";
+    std::cout << "GL glBufferData: " << currentBinding << " using "
+              << bufferBindingToSizeMap[currentBinding] << " bytes current total "
+              << currentUsedBufferBytes << " high water mark " << largestAmountUsedSoFar << "\n";
     lock.unlock();
 
     glBufferData(target, size, data, usage);
 }
 
-
 void mbx_glShaderSource(GLuint shader,
                         GLsizei count,
-                        const GLchar * const *string,
-                        const GLint *length) {
-    //std::cout << "Calling glShaderSource: " << *string << std::endl;
-    glShaderSource(shader, count, const_cast<const GLchar **>(string), length);
+                        const GLchar* const* string,
+                        const GLint* length) {
+    // std::cout << "Calling glShaderSource: " << *string << std::endl;
+    glShaderSource(shader, count, const_cast<const GLchar**>(string), length);
 }
 
 void mbx_glClear(GLbitfield mask) {
-    //std::cout << "Calling glClear" << std::endl;
+    // std::cout << "Calling glClear" << std::endl;
     glClear(mask);
 }
 
-void mbx_glBindTexture(	GLenum target,
-                       GLuint texture) {
+void mbx_glBindTexture(GLenum target, GLuint texture) {
     std::unique_lock<std::mutex> lock(gDebugMutex);
     if (target == GL_TEXTURE_2D) {
         currentBoundTexture = texture;
@@ -216,12 +240,13 @@ void mbx_glBindTexture(	GLenum target,
     glBindTexture(target, texture);
 }
 
-void mbx_glDeleteTextures(GLsizei n,
-                          const GLuint * textures) {
+void mbx_glDeleteTextures(GLsizei n, const GLuint* textures) {
     std::unique_lock<std::mutex> lock(gDebugMutex);
     for (int i = 0; i < n; ++i) {
         if (bindingToSizeMap.find(textures[i]) != bindingToSizeMap.end()) {
-            std::cout << "GL deleteTexture:" << textures[i] << "freeing " << bindingToSizeMap[textures[i]] << " bytes current total " << currentUsedBytes << "\n";
+            std::cout << "GL deleteTexture:" << textures[i] << "freeing "
+                      << bindingToSizeMap[textures[i]] << " bytes current total "
+                      << currentUsedBytes << "\n";
             currentUsedBytes -= bindingToSizeMap[textures[i]];
             bindingToSizeMap.erase(textures[i]);
         }
@@ -238,20 +263,22 @@ void mbx_glTexImage2D(GLenum target,
                       GLint border,
                       GLenum format,
                       GLenum type,
-                      const GLvoid * data) {
+                      const GLvoid* data) {
     std::unique_lock<std::mutex> lock(gDebugMutex);
-    if (internalformat == GL_RGBA &&
-        type == GL_UNSIGNED_BYTE) {
+    if (internalformat == GL_RGBA && type == GL_UNSIGNED_BYTE) {
         if (bindingToSizeMap.find(currentBoundTexture) != bindingToSizeMap.end()) {
             currentUsedBytes -= bindingToSizeMap[currentBoundTexture];
-            std::cout << "GL glTexImage2D: " << currentBoundTexture << " freeing " << bindingToSizeMap[currentBoundTexture] << " bytes current total " << currentUsedBytes << "\n";
+            std::cout << "GL glTexImage2D: " << currentBoundTexture << " freeing "
+                      << bindingToSizeMap[currentBoundTexture] << " bytes current total "
+                      << currentUsedBytes << "\n";
         }
         bindingToSizeMap[currentBoundTexture] = width * height * 4;
         currentUsedBytes += bindingToSizeMap[currentBoundTexture];
-        std::cout << "GL glTexImage2D: " << currentBoundTexture << " freeing " << bindingToSizeMap[currentBoundTexture] << " bytes current total " << currentUsedBytes << "\n";
+        std::cout << "GL glTexImage2D: " << currentBoundTexture << " freeing "
+                  << bindingToSizeMap[currentBoundTexture] << " bytes current total "
+                  << currentUsedBytes << "\n";
     }
     lock.unlock();
     glTexImage2D(target, level, internalformat, width, height, border, format, type, data);
 }
 #endif
-

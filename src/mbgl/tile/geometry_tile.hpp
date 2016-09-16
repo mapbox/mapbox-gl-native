@@ -23,10 +23,7 @@ class Layer;
 
 class GeometryTile : public Tile {
 public:
-    GeometryTile(const OverscaledTileID&,
-                 std::string sourceID,
-                 style::Style&,
-                 const MapMode);
+    GeometryTile(const OverscaledTileID&, std::string sourceID, style::Style&, const MapMode);
 
     ~GeometryTile() override;
 
@@ -40,11 +37,10 @@ public:
     void redoLayout() override;
     void redoPlacement(PlacementConfig) override;
 
-    void queryRenderedFeatures(
-            std::unordered_map<std::string, std::vector<Feature>>& result,
-            const GeometryCoordinates& queryGeometry,
-            const TransformState&,
-            const optional<std::vector<std::string>>& layerIDs) override;
+    void queryRenderedFeatures(std::unordered_map<std::string, std::vector<Feature>>& result,
+                               const GeometryCoordinates& queryGeometry,
+                               const TransformState&,
+                               const optional<std::vector<std::string>>& layerIDs) override;
 
     void cancel() override;
 
@@ -76,7 +72,7 @@ private:
     PlacementConfig targetConfig;
 
     // Used to signal the worker that it should abandon parsing this tile as soon as possible.
-    std::atomic<bool> obsolete { false };
+    std::atomic<bool> obsolete{false};
 };
 
 } // namespace mbgl

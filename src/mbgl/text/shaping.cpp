@@ -3,7 +3,8 @@
 
 namespace mbgl {
 
-PositionedIcon shapeIcon(const SpriteAtlasElement& image, const style::SymbolLayoutProperties& layout) {
+PositionedIcon shapeIcon(const SpriteAtlasElement& image,
+                         const style::SymbolLayoutProperties& layout) {
     float dx = layout.iconOffset.value[0];
     float dy = layout.iconOffset.value[1];
     float x1 = dx - image.spriteImage->getWidth() / 2.0f;

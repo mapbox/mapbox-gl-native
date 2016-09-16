@@ -24,16 +24,15 @@ namespace style {
 static SourceObserver nullObserver;
 
 Source::Impl::Impl(SourceType type_, std::string id_, Source& base_)
-    : type(type_),
-      id(std::move(id_)),
-      base(base_),
-      observer(&nullObserver) {
+    : type(type_), id(std::move(id_)), base(base_), observer(&nullObserver) {
 }
 
 Source::Impl::~Impl() = default;
 
 bool Source::Impl::isLoaded() const {
-    if (!loaded) return false;
+    if (!loaded) {
+        return false;
+    }
 
     for (const auto& pair : tiles) {
         if (!pair.second->isComplete()) {
@@ -51,10 +50,9 @@ void Source::Impl::invalidateTiles() {
 }
 
 void Source::Impl::startRender(algorithm::ClipIDGenerator& generator,
-                         const mat4& projMatrix,
-                         const TransformState& transform) {
-    if (type == SourceType::Vector ||
-        type == SourceType::GeoJSON ||
+                               const mat4& projMatrix,
+                               const TransformState& transform) {
+    if (type == SourceType::Vector || type == SourceType::GeoJSON ||
         type == SourceType::Annotations) {
         generator.update(renderTiles);
     }
@@ -86,7 +84,8 @@ void Source::Impl::loadTiles(const UpdateParameters& parameters) {
     const Range<uint8_t> zoomRange = getZoomRange();
 
     // Determine the overzooming/underzooming amounts and required tiles.
-    int32_t overscaledZoom = util::coveringZoomLevel(parameters.transformState.getZoom(), type, tileSize);
+    int32_t overscaledZoom =
+        util::coveringZoomLevel(parameters.transformState.getZoom(), type, tileSize);
     int32_t tileZoom = overscaledZoom;
 
     std::vector<UnwrappedTileID> idealTiles;
@@ -133,8 +132,8 @@ void Source::Impl::loadTiles(const UpdateParameters& parameters) {
     };
 
     renderTiles.clear();
-    algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn,
-                                 idealTiles, zoomRange, tileZoom);
+    algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn, idealTiles,
+                                 zoomRange, tileZoom);
 
     if (type != SourceType::Raster && type != SourceType::Annotations && cache.getSize() == 0) {
         size_t conservativeCacheSize =
@@ -192,18 +191,19 @@ void Source::Impl::reload() {
 }
 
 static Point<int16_t> coordinateToTilePoint(const UnwrappedTileID& tileID, const Point<double>& p) {
-    auto zoomedCoord = TileCoordinate { p, 0 }.zoomTo(tileID.canonical.z);
-    return {
-        int16_t(util::clamp<int64_t>((zoomedCoord.p.x - tileID.canonical.x - tileID.wrap * std::pow(2, tileID.canonical.z)) * util::EXTENT,
-                    std::numeric_limits<int16_t>::min(),
-                    std::numeric_limits<int16_t>::max())),
-        int16_t(util::clamp<int64_t>((zoomedCoord.p.y - tileID.canonical.y) * util::EXTENT,
-                    std::numeric_limits<int16_t>::min(),
-                    std::numeric_limits<int16_t>::max()))
-    };
+    auto zoomedCoord = TileCoordinate{ p, 0 }.zoomTo(tileID.canonical.z);
+    return { int16_t(util::clamp<int64_t>((zoomedCoord.p.x - tileID.canonical.x -
+                                           tileID.wrap * std::pow(2, tileID.canonical.z)) *
+                                              util::EXTENT,
+                                          std::numeric_limits<int16_t>::min(),
+                                          std::numeric_limits<int16_t>::max())),
+             int16_t(util::clamp<int64_t>((zoomedCoord.p.y - tileID.canonical.y) * util::EXTENT,
+                                          std::numeric_limits<int16_t>::min(),
+                                          std::numeric_limits<int16_t>::max())) };
 }
 
-std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRenderedFeatures(const QueryParameters& parameters) const {
+std::unordered_map<std::string, std::vector<Feature>>
+Source::Impl::queryRenderedFeatures(const QueryParameters& parameters) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
     if (renderTiles.empty()) {
         return result;
@@ -212,8 +212,10 @@ std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRendere
     LineString<double> queryGeometry;
 
     for (const auto& p : parameters.geometry) {
-        queryGeometry.push_back(TileCoordinate::fromScreenCoordinate(
-            parameters.transformState, 0, { p.x, parameters.transformState.getHeight() - p.y }).p);
+        queryGeometry.push_back(
+            TileCoordinate::fromScreenCoordinate(
+                parameters.transformState, 0, { p.x, parameters.transformState.getHeight() - p.y })
+                .p);
     }
 
     if (queryGeometry.empty()) {
@@ -229,7 +231,9 @@ std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRendere
         Point<int16_t> tileSpaceBoundsMax = coordinateToTilePoint(tile.id, box.max);
 
         if (tileSpaceBoundsMin.x >= util::EXTENT || tileSpaceBoundsMin.y >= util::EXTENT ||
-            tileSpaceBoundsMax.x < 0 || tileSpaceBoundsMax.y < 0) continue;
+            tileSpaceBoundsMax.x < 0 || tileSpaceBoundsMax.y < 0) {
+            continue;
+        }
 
         GeometryCoordinates tileSpaceQueryGeometry;
 
@@ -237,9 +241,7 @@ std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRendere
             tileSpaceQueryGeometry.push_back(coordinateToTilePoint(tile.id, c));
         }
 
-        tile.tile.queryRenderedFeatures(result,
-                                        tileSpaceQueryGeometry,
-                                        parameters.transformState,
+        tile.tile.queryRenderedFeatures(result, tileSpaceQueryGeometry, parameters.transformState,
                                         parameters.layerIDs);
     }
 

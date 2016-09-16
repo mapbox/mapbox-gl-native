@@ -67,28 +67,31 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
                    const GlyphRange& glyphRange,
                    GlyphStoreObserver* observer_,
                    FileSource& fileSource)
-    : parsed(false),
-      observer(observer_) {
-    req = fileSource.request(Resource::glyphs(store->getURL(), fontStack, glyphRange), [this, store, fontStack, glyphRange](Response res) {
-        if (res.error) {
-            observer->onGlyphsError(fontStack, glyphRange, std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified) {
-            return;
-        } else if (res.noContent) {
-            parsed = true;
-            observer->onGlyphsLoaded(fontStack, glyphRange);
-        } else {
-            try {
-                parseGlyphPBF(**store->getGlyphSet(fontStack), *res.data);
-            } catch (...) {
-                observer->onGlyphsError(fontStack, glyphRange, std::current_exception());
+    : parsed(false), observer(observer_) {
+    req = fileSource.request(
+        Resource::glyphs(store->getURL(), fontStack, glyphRange),
+        [this, store, fontStack, glyphRange](Response res) {
+            if (res.error) {
+                observer->onGlyphsError(
+                    fontStack, glyphRange,
+                    std::make_exception_ptr(std::runtime_error(res.error->message)));
+            } else if (res.notModified) {
                 return;
-            }
+            } else if (res.noContent) {
+                parsed = true;
+                observer->onGlyphsLoaded(fontStack, glyphRange);
+            } else {
+                try {
+                    parseGlyphPBF(**store->getGlyphSet(fontStack), *res.data);
+                } catch (...) {
+                    observer->onGlyphsError(fontStack, glyphRange, std::current_exception());
+                    return;
+                }
 
-            parsed = true;
-            observer->onGlyphsLoaded(fontStack, glyphRange);
-        }
-    });
+                parsed = true;
+                observer->onGlyphsLoaded(fontStack, glyphRange);
+            }
+        });
 }
 
 GlyphPBF::~GlyphPBF() = default;

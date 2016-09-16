@@ -13,7 +13,6 @@ namespace {
 
 using namespace mbgl::util;
 static ThreadLocal<RunLoop>& current = *new ThreadLocal<RunLoop>;
-
 }
 
 namespace mbgl {
@@ -38,7 +37,7 @@ RunLoop::RunLoop(Type type) : impl(std::make_unique<Impl>()) {
     // tests to work, as you always need a QCoreApplication
     // prior to run a Qt app.
     if (!QCoreApplication::instance()) {
-        static const char* argv[] = { "mbgl" };
+        static const char* argv[] = {"mbgl"};
         static int argc = 1;
 
         // We need to keep this around because it would otherwise crash
@@ -115,13 +114,15 @@ void RunLoop::addWatch(int fd, Event event, std::function<void(int, Event)>&& cb
 
     if (event == Event::Read || event == Event::ReadWrite) {
         auto notifier = std::make_unique<QSocketNotifier>(fd, QSocketNotifier::Read);
-        QObject::connect(notifier.get(), SIGNAL(activated(int)), impl.get(), SLOT(onReadEvent(int)));
+        QObject::connect(notifier.get(), SIGNAL(activated(int)), impl.get(),
+                         SLOT(onReadEvent(int)));
         impl->readPoll[fd] = WatchPair(std::move(notifier), std::move(cb));
     }
 
     if (event == Event::Write || event == Event::ReadWrite) {
         auto notifier = std::make_unique<QSocketNotifier>(fd, QSocketNotifier::Write);
-        QObject::connect(notifier.get(), SIGNAL(activated(int)), impl.get(), SLOT(onWriteEvent(int)));
+        QObject::connect(notifier.get(), SIGNAL(activated(int)), impl.get(),
+                         SLOT(onWriteEvent(int)));
         impl->writePoll[fd] = WatchPair(std::move(notifier), std::move(cb));
     }
 }
@@ -139,6 +140,5 @@ void RunLoop::removeWatch(int fd) {
         impl->readPoll.erase(readPollIter);
     }
 }
-
 }
 }

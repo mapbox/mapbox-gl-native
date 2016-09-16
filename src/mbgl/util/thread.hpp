@@ -41,16 +41,15 @@ public:
     // must have a RunLoop), once for each time the invocation of fn invokes the wrapper, each
     // time forwarding the passed arguments, until such time as the AsyncRequest is cancelled.
     template <typename Fn, class... Args>
-    std::unique_ptr<AsyncRequest>
-    invokeWithCallback(Fn fn, Args&&... args) {
+    std::unique_ptr<AsyncRequest> invokeWithCallback(Fn fn, Args&&... args) {
         return loop->invokeWithCallback(bind(fn), std::forward<Args>(args)...);
     }
 
     // Invoke object->fn(args...) asynchronously, but wait for the result.
     template <typename Fn, class... Args>
     auto invokeSync(Fn fn, Args&&... args) {
-        using R = std::result_of_t<Fn(Object, Args&&...)>;
-        std::packaged_task<R ()> task(std::bind(fn, object, args...));
+        using R = std::result_of_t<Fn(Object, Args && ...)>;
+        std::packaged_task<R()> task(std::bind(fn, object, args...));
         std::future<R> future = task.get_future();
         loop->invoke(std::move(task));
         return future.get();
@@ -64,7 +63,7 @@ private:
 
     template <typename Fn>
     auto bind(Fn fn) {
-        return [fn, this] (auto &&... args) {
+        return [fn, this](auto&&... args) {
             return (object->*fn)(std::forward<decltype(args)>(args)...);
         };
     }

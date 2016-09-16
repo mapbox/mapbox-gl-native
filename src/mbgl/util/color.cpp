@@ -9,12 +9,7 @@ optional<Color> Color::parse(const std::string& s) {
 
     // Premultiply the color.
     const float factor = css_color.a / 255;
-    return {{
-        css_color.r * factor,
-        css_color.g * factor,
-        css_color.b * factor,
-        css_color.a
-    }};
+    return { { css_color.r * factor, css_color.g * factor, css_color.b * factor, css_color.a } };
 }
 
 } // namespace mbgl

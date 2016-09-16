@@ -6,7 +6,9 @@
 namespace mbgl {
 
 void VertexArrayObject::Unbind() {
-    if (!gl::BindVertexArray) return;
+    if (!gl::BindVertexArray) {
+        return;
+    }
     MBGL_CHECK_ERROR(gl::BindVertexArray(0));
 }
 
@@ -31,12 +33,15 @@ void VertexArrayObject::bindVertexArrayObject(gl::ObjectStore& store) {
     MBGL_CHECK_ERROR(gl::BindVertexArray(*vao));
 }
 
-void VertexArrayObject::verifyBinding(Shader& shader, GLuint vertexBuffer, GLuint elementsBuffer,
-                                      GLbyte *offset) {
+void VertexArrayObject::verifyBinding(Shader& shader,
+                                      GLuint vertexBuffer,
+                                      GLuint elementsBuffer,
+                                      GLbyte* offset) {
     if (bound_shader != shader.getID()) {
-        throw std::runtime_error(std::string("trying to rebind VAO to another shader from " +
-                                             util::toString(bound_shader) + "(" + bound_shader_name + ") to " +
-                                             util::toString(shader.getID()) + "(" + shader.name + ")" ));
+        throw std::runtime_error(
+            std::string("trying to rebind VAO to another shader from " +
+                        util::toString(bound_shader) + "(" + bound_shader_name + ") to " +
+                        util::toString(shader.getID()) + "(" + shader.name + ")"));
     } else if (bound_offset != offset) {
         throw std::runtime_error("trying to bind VAO to another offset");
     } else if (bound_vertex_buffer != vertexBuffer) {
@@ -46,8 +51,10 @@ void VertexArrayObject::verifyBinding(Shader& shader, GLuint vertexBuffer, GLuin
     }
 }
 
-void VertexArrayObject::storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer,
-                                     GLbyte *offset) {
+void VertexArrayObject::storeBinding(Shader& shader,
+                                     GLuint vertexBuffer,
+                                     GLuint elementsBuffer,
+                                     GLbyte* offset) {
     bound_shader = shader.getID();
     bound_shader_name = shader.name;
     bound_offset = offset;

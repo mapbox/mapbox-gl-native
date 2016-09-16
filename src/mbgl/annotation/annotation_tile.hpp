@@ -14,8 +14,7 @@ class UpdateParameters;
 
 class AnnotationTile : public GeometryTile {
 public:
-    AnnotationTile(const OverscaledTileID&,
-                   const style::UpdateParameters&);
+    AnnotationTile(const OverscaledTileID&, const style::UpdateParameters&);
     ~AnnotationTile() override;
 
     void setNecessity(Necessity) final;
@@ -26,13 +25,21 @@ private:
 
 class AnnotationTileFeature : public GeometryTileFeature {
 public:
-    AnnotationTileFeature(AnnotationID, FeatureType, GeometryCollection,
+    AnnotationTileFeature(AnnotationID,
+                          FeatureType,
+                          GeometryCollection,
                           std::unordered_map<std::string, std::string> properties = {{}});
 
-    FeatureType getType() const override { return type; }
+    FeatureType getType() const override {
+        return type;
+    }
     optional<Value> getValue(const std::string&) const override;
-    optional<FeatureIdentifier> getID() const override { return { id }; }
-    GeometryCollection getGeometries() const override { return geometries; }
+    optional<FeatureIdentifier> getID() const override {
+        return {id};
+    }
+    GeometryCollection getGeometries() const override {
+        return geometries;
+    }
 
     const AnnotationID id;
     const FeatureType type;
@@ -44,9 +51,15 @@ class AnnotationTileLayer : public GeometryTileLayer {
 public:
     AnnotationTileLayer(std::string);
 
-    std::size_t featureCount() const override { return features.size(); }
-    std::unique_ptr<GeometryTileFeature> getFeature(std::size_t i) const override { return std::make_unique<AnnotationTileFeature>(features[i]); }
-    std::string getName() const override { return name; };
+    std::size_t featureCount() const override {
+        return features.size();
+    }
+    std::unique_ptr<GeometryTileFeature> getFeature(std::size_t i) const override {
+        return std::make_unique<AnnotationTileFeature>(features[i]);
+    }
+    std::string getName() const override {
+        return name;
+    };
 
     std::vector<AnnotationTileFeature> features;
 

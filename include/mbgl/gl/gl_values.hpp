@@ -77,7 +77,9 @@ struct DepthMask {
 };
 
 struct ColorMask {
-    struct Type { bool r, g, b, a; };
+    struct Type {
+        bool r, g, b, a;
+    };
     static const Type Default;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glColorMask(value.r, value.g, value.b, value.a));
@@ -95,7 +97,11 @@ constexpr bool operator!=(const ColorMask::Type& a, const ColorMask::Type& b) {
 }
 
 struct StencilFunc {
-    struct Type { GLenum func; GLint ref; GLuint mask; };
+    struct Type {
+        GLenum func;
+        GLint ref;
+        GLuint mask;
+    };
     static const Type Default;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glStencilFunc(value.func, value.ref, value.mask));
@@ -127,7 +133,9 @@ struct StencilTest {
 };
 
 struct StencilOp {
-    struct Type { GLenum sfail, dpfail, dppass; };
+    struct Type {
+        GLenum sfail, dpfail, dppass;
+    };
     static const Type Default;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glStencilOp(value.sfail, value.dpfail, value.dppass));
@@ -137,7 +145,8 @@ struct StencilOp {
         MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_FAIL, &sfail));
         MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_PASS_DEPTH_FAIL, &dpfail));
         MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_PASS_DEPTH_PASS, &dppass));
-        return { static_cast<GLenum>(sfail), static_cast<GLenum>(dpfail), static_cast<GLuint>(dppass) };
+        return { static_cast<GLenum>(sfail), static_cast<GLenum>(dpfail),
+                 static_cast<GLuint>(dppass) };
     }
 };
 
@@ -146,7 +155,9 @@ constexpr bool operator!=(const StencilOp::Type& a, const StencilOp::Type& b) {
 }
 
 struct DepthRange {
-    struct Type { GLfloat near, far; };
+    struct Type {
+        GLfloat near, far;
+    };
     static const Type Default;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glDepthRange(value.near, value.far));
@@ -202,7 +213,9 @@ struct Blend {
 };
 
 struct BlendFunc {
-    struct Type { GLenum sfactor, dfactor; };
+    struct Type {
+        GLenum sfactor, dfactor;
+    };
     static const Type Default;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glBlendFunc(value.sfactor, value.dfactor));
@@ -274,7 +287,10 @@ struct ActiveTexture {
 #ifndef GL_ES_VERSION_2_0
 
 struct PixelZoom {
-    struct Type { GLfloat xfactor; GLfloat yfactor; };
+    struct Type {
+        GLfloat xfactor;
+        GLfloat yfactor;
+    };
     static const Type Default;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glPixelZoom(value.xfactor, value.yfactor));

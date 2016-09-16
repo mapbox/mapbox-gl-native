@@ -1,4 +1,5 @@
-// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
+// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make
+// style-code-android`.
 
 #pragma once
 
@@ -11,8 +12,9 @@ namespace android {
 
 class FillLayer : public Layer {
 public:
-
-    static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/FillLayer"; };
+    static constexpr auto Name() {
+        return "com/mapbox/mapboxsdk/style/layers/FillLayer";
+    };
 
     static jni::Class<FillLayer> javaClass;
 

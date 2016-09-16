@@ -17,8 +17,7 @@ void initResources() {
 
 namespace mbgl {
 
-HTTPFileSource::Impl::Impl() : m_manager(new QNetworkAccessManager(this))
-{
+HTTPFileSource::Impl::Impl() : m_manager(new QNetworkAccessManager(this)) {
     initResources();
 
     QNetworkProxyFactory::setUseSystemConfiguration(true);
@@ -32,14 +31,14 @@ HTTPFileSource::Impl::Impl() : m_manager(new QNetworkAccessManager(this))
 
     m_ssl.setCaCertificates(QSslCertificate::fromPath(":ca-bundle.crt"));
     if (m_ssl.caCertificates().isEmpty()) {
-        mbgl::Log::Warning(mbgl::Event::HttpRequest, "Could not load list of certificate authorities");
+        mbgl::Log::Warning(mbgl::Event::HttpRequest,
+                           "Could not load list of certificate authorities");
     }
 
     connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinish(QNetworkReply*)));
 }
 
-void HTTPFileSource::Impl::request(HTTPRequest* req)
-{
+void HTTPFileSource::Impl::request(HTTPRequest* req) {
     QUrl url = req->requestUrl();
 
     QPair<QNetworkReply*, QVector<HTTPRequest*>>& data = m_pending[url];
@@ -56,8 +55,7 @@ void HTTPFileSource::Impl::request(HTTPRequest* req)
     data.first = m_manager->get(networkRequest);
 }
 
-void HTTPFileSource::Impl::cancel(HTTPRequest* req)
-{
+void HTTPFileSource::Impl::cancel(HTTPRequest* req) {
     QUrl url = req->requestUrl();
 
     auto it = m_pending.find(url);
@@ -90,8 +88,7 @@ void HTTPFileSource::Impl::cancel(HTTPRequest* req)
     }
 }
 
-void HTTPFileSource::Impl::replyFinish(QNetworkReply* reply)
-{
+void HTTPFileSource::Impl::replyFinish(QNetworkReply* reply) {
     const QUrl& url = reply->request().url();
 
     auto it = m_pending.find(url);
@@ -109,14 +106,12 @@ void HTTPFileSource::Impl::replyFinish(QNetworkReply* reply)
     reply->deleteLater();
 }
 
-HTTPFileSource::HTTPFileSource()
-    : impl(std::make_unique<Impl>()) {
+HTTPFileSource::HTTPFileSource() : impl(std::make_unique<Impl>()) {
 }
 
 HTTPFileSource::~HTTPFileSource() = default;
 
-std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, Callback callback)
-{
+std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, Callback callback) {
     return std::make_unique<HTTPRequest>(impl.get(), resource, callback);
 }
 

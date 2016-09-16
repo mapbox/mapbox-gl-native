@@ -34,7 +34,7 @@ struct EventPermutation {
     const EventSeverity severity;
     const Event event;
 
-    constexpr bool operator==(const EventPermutation &rhs) const {
+    constexpr bool operator==(const EventPermutation& rhs) const {
         return severity == rhs.severity && event == rhs.event;
     }
 };
@@ -51,8 +51,7 @@ constexpr Event disabledEvents[] = {
     Event(-1) // Avoid zero size array
 };
 
-constexpr EventPermutation disabledEventPermutations[] = {
-    { EventSeverity::Debug, Event::Shader }
-};
+constexpr EventPermutation disabledEventPermutations[] = { { EventSeverity::Debug,
+                                                             Event::Shader } };
 
 } // namespace mbgl

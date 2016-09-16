@@ -9,13 +9,12 @@ CustomLayer::CustomLayer(const std::string& layerID,
                          CustomLayerRenderFunction render,
                          CustomLayerDeinitializeFunction deinit,
                          void* context)
-    : Layer(Type::Custom, std::make_unique<Impl>(layerID, init, render, deinit, context))
-    , impl(static_cast<Impl*>(baseImpl.get())) {
+    : Layer(Type::Custom, std::make_unique<Impl>(layerID, init, render, deinit, context)),
+      impl(static_cast<Impl*>(baseImpl.get())) {
 }
 
 CustomLayer::CustomLayer(const Impl& other)
-    : Layer(Type::Custom, std::make_unique<Impl>(other))
-    , impl(static_cast<Impl*>(baseImpl.get())) {
+    : Layer(Type::Custom, std::make_unique<Impl>(other)), impl(static_cast<Impl*>(baseImpl.get())) {
 }
 
 CustomLayer::~CustomLayer() = default;

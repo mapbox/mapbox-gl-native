@@ -17,7 +17,8 @@ public:
 
         // When an observer is set, this function will be called for every log
         // message. Returning true will consume the message.
-        virtual bool onRecord(EventSeverity severity, Event event, int64_t code, const std::string &msg) = 0;
+        virtual bool
+        onRecord(EventSeverity severity, Event event, int64_t code, const std::string& msg) = 0;
     };
 
     class NullObserver : public Observer {
@@ -36,45 +37,44 @@ private:
     }
 
 public:
-    template <typename ...Args>
-    static void Debug(Event event, Args&& ...args) {
+    template <typename... Args>
+    static void Debug(Event event, Args&&... args) {
         Record(EventSeverity::Debug, event, ::std::forward<Args>(args)...);
     }
 
-    template <typename ...Args>
-    static void Info(Event event, Args&& ...args) {
+    template <typename... Args>
+    static void Info(Event event, Args&&... args) {
         Record(EventSeverity::Info, event, ::std::forward<Args>(args)...);
     }
 
-    template <typename ...Args>
-    static void Warning(Event event, Args&& ...args) {
+    template <typename... Args>
+    static void Warning(Event event, Args&&... args) {
         Record(EventSeverity::Warning, event, ::std::forward<Args>(args)...);
     }
 
-    template <typename ...Args>
-    static void Error(Event event, Args&& ...args) {
+    template <typename... Args>
+    static void Error(Event event, Args&&... args) {
         Record(EventSeverity::Error, event, ::std::forward<Args>(args)...);
     }
 
-    template <typename ...Args>
-    static void Record(EventSeverity severity, Event event, Args&& ...args) {
-        if (!includes(severity, disabledEventSeverities) &&
-            !includes(event, disabledEvents) &&
+    template <typename... Args>
+    static void Record(EventSeverity severity, Event event, Args&&... args) {
+        if (!includes(severity, disabledEventSeverities) && !includes(event, disabledEvents) &&
             !includes({ severity, event }, disabledEventPermutations)) {
-                record(severity, event, ::std::forward<Args>(args)...);
+            record(severity, event, ::std::forward<Args>(args)...);
         }
     }
 
 private:
-    static void record(EventSeverity severity, Event event, const std::string &msg);
+    static void record(EventSeverity severity, Event event, const std::string& msg);
     static void record(EventSeverity severity, Event event, const char* format, ...);
     static void record(EventSeverity severity, Event event, int64_t code);
-    static void record(EventSeverity severity, Event event, int64_t code, const std::string &msg);
+    static void record(EventSeverity severity, Event event, int64_t code, const std::string& msg);
 
     // This method is the data sink that must be implemented by each platform we
     // support. It should ideally output the error message in a human readable
     // format to the developer.
-    static void platformRecord(EventSeverity severity, const std::string &msg);
+    static void platformRecord(EventSeverity severity, const std::string& msg);
 };
 
 } // namespace mbgl

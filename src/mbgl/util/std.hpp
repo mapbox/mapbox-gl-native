@@ -8,7 +8,7 @@ namespace mbgl {
 namespace util {
 
 template <typename Container, typename ForwardIterator, typename Predicate>
-void erase_if(Container &container, ForwardIterator it, const ForwardIterator end, Predicate pred) {
+void erase_if(Container& container, ForwardIterator it, const ForwardIterator end, Predicate pred) {
     while (it != end) {
         if (pred(*it)) {
             container.erase(it++);
@@ -19,7 +19,7 @@ void erase_if(Container &container, ForwardIterator it, const ForwardIterator en
 }
 
 template <typename Container, typename Predicate>
-void erase_if(Container &container, Predicate pred) {
+void erase_if(Container& container, Predicate pred) {
     erase_if(container, container.begin(), container.end(), pred);
 }
 

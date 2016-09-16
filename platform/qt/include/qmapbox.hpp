@@ -29,14 +29,14 @@ enum NetworkMode {
 };
 
 struct Q_DECL_EXPORT CameraOptions {
-    QVariant center;  // Coordinate
-    QVariant anchor;  // QPointF
-    QVariant zoom;    // double
-    QVariant angle;   // double
-    QVariant pitch;   // double
+    QVariant center; // Coordinate
+    QVariant anchor; // QPointF
+    QVariant zoom;   // double
+    QVariant angle;  // double
+    QVariant pitch;  // double
 };
 
-Q_DECL_EXPORT QList<QPair<QString, QString> >& defaultStyles();
+Q_DECL_EXPORT QList<QPair<QString, QString>>& defaultStyles();
 
 Q_DECL_EXPORT NetworkMode networkMode();
 Q_DECL_EXPORT void setNetworkMode(NetworkMode);
@@ -55,15 +55,14 @@ struct Q_DECL_EXPORT CustomLayerRenderParameters {
 
 struct Q_DECL_EXPORT TransitionOptions {
     QVariant duration; // qint64
-    QVariant delay; // qint64
+    QVariant delay;    // qint64
 };
 
-typedef void (*CustomLayerInitializeFunction)(void* context) ;
+typedef void (*CustomLayerInitializeFunction)(void* context);
 typedef void (*CustomLayerRenderFunction)(void* context, const CustomLayerRenderParameters&);
 typedef void (*CustomLayerDeinitializeFunction)(void* context);
 
 Q_DECL_EXPORT void initializeGLExtensions();
-
 }
 
 Q_DECLARE_METATYPE(QMapbox::Coordinate);

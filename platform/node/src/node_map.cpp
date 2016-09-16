@@ -15,7 +15,7 @@
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
 #define UV_ASYNC_PARAMS(handle) uv_async_t *handle, int
 #else
-#define UV_ASYNC_PARAMS(handle) uv_async_t *handle
+#define UV_ASYNC_PARAMS(handle) uv_async_t* handle
 #endif
 
 namespace node_mbgl {
@@ -124,18 +124,18 @@ void NodeMap::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     // Check that 'request' is set. If 'cancel' is set it must be a
     // function and if 'ratio' is set it must be a number.
-    if (!Nan::Has(options, Nan::New("request").ToLocalChecked()).FromJust()
-     || !Nan::Get(options, Nan::New("request").ToLocalChecked()).ToLocalChecked()->IsFunction()) {
+    if (!Nan::Has(options, Nan::New("request").ToLocalChecked()).FromJust() ||
+        !Nan::Get(options, Nan::New("request").ToLocalChecked()).ToLocalChecked()->IsFunction()) {
         return Nan::ThrowError("Options object must have a 'request' method");
     }
 
-    if (Nan::Has(options, Nan::New("cancel").ToLocalChecked()).FromJust()
-     && !Nan::Get(options, Nan::New("cancel").ToLocalChecked()).ToLocalChecked()->IsFunction()) {
+    if (Nan::Has(options, Nan::New("cancel").ToLocalChecked()).FromJust() &&
+        !Nan::Get(options, Nan::New("cancel").ToLocalChecked()).ToLocalChecked()->IsFunction()) {
         return Nan::ThrowError("Options object 'cancel' property must be a function");
     }
 
-    if (Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust()
-     && !Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->IsNumber()) {
+    if (Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust() &&
+        !Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->IsNumber()) {
         return Nan::ThrowError("Options object 'ratio' property must be a number");
     }
 
@@ -144,7 +144,7 @@ void NodeMap::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     try {
         auto nodeMap = new NodeMap(options);
         nodeMap->Wrap(info.This());
-    } catch(std::exception &ex) {
+    } catch (std::exception& ex) {
         return Nan::ThrowError(ex.what());
     }
 
@@ -154,12 +154,10 @@ void NodeMap::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
     Nan::HandleScope scope;
 
-    v8::Local<v8::Object> JSON = Nan::To<v8::Object>(
-        Nan::Get(
-            Nan::GetCurrentContext()->Global(),
-            Nan::New("JSON").ToLocalChecked()
-        ).ToLocalChecked()
-    ).ToLocalChecked();
+    v8::Local<v8::Object> JSON = Nan::To<v8::Object>(Nan::Get(Nan::GetCurrentContext()->Global(),
+                                                              Nan::New("JSON").ToLocalChecked())
+                                                         .ToLocalChecked())
+                                     .ToLocalChecked();
 
     return *Nan::Utf8String(Nan::MakeCallback(JSON, "stringify", 1, &styleHandle));
 }
@@ -181,7 +179,8 @@ std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
  */
 void NodeMap::Load(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map)
+        return Nan::ThrowError(releasedMessage());
 
     // Reset the flag as this could be the second time
     // we are calling this (being the previous successful).
@@ -203,7 +202,7 @@ void NodeMap::Load(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     try {
         nodeMap->map->setStyleJSON(style);
-    } catch (const std::exception &ex) {
+    } catch (const std::exception& ex) {
         return Nan::ThrowError(ex.what());
     }
 
@@ -214,13 +213,14 @@ void NodeMap::Load(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
 void NodeMap::Loaded(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map)
+        return Nan::ThrowError(releasedMessage());
 
     bool loaded = false;
 
     try {
         loaded = nodeMap->map->isFullyLoaded();
-    } catch (const std::exception &ex) {
+    } catch (const std::exception& ex) {
         return Nan::ThrowError(ex.what());
     }
 
@@ -233,67 +233,92 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
     NodeMap::RenderOptions options;
 
     if (Nan::Has(obj, Nan::New("zoom").ToLocalChecked()).FromJust()) {
-        options.zoom = Nan::Get(obj, Nan::New("zoom").ToLocalChecked()).ToLocalChecked()->NumberValue();
+        options.zoom =
+            Nan::Get(obj, Nan::New("zoom").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
 
     if (Nan::Has(obj, Nan::New("bearing").ToLocalChecked()).FromJust()) {
-        options.bearing = Nan::Get(obj, Nan::New("bearing").ToLocalChecked()).ToLocalChecked()->NumberValue();
+        options.bearing =
+            Nan::Get(obj, Nan::New("bearing").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
 
     if (Nan::Has(obj, Nan::New("pitch").ToLocalChecked()).FromJust()) {
-        options.pitch = Nan::Get(obj, Nan::New("pitch").ToLocalChecked()).ToLocalChecked()->NumberValue();
+        options.pitch =
+            Nan::Get(obj, Nan::New("pitch").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
 
     if (Nan::Has(obj, Nan::New("center").ToLocalChecked()).FromJust()) {
         auto centerObj = Nan::Get(obj, Nan::New("center").ToLocalChecked()).ToLocalChecked();
         if (centerObj->IsArray()) {
             auto center = centerObj.As<v8::Array>();
-            if (center->Length() > 0) { options.longitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue(); }
-            if (center->Length() > 1) { options.latitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue(); }
+            if (center->Length() > 0) {
+                options.longitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue();
+            }
+            if (center->Length() > 1) {
+                options.latitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue();
+            }
         }
     }
 
     if (Nan::Has(obj, Nan::New("width").ToLocalChecked()).FromJust()) {
-        options.width = Nan::Get(obj, Nan::New("width").ToLocalChecked()).ToLocalChecked()->IntegerValue();
+        options.width =
+            Nan::Get(obj, Nan::New("width").ToLocalChecked()).ToLocalChecked()->IntegerValue();
     }
 
     if (Nan::Has(obj, Nan::New("height").ToLocalChecked()).FromJust()) {
-        options.height = Nan::Get(obj, Nan::New("height").ToLocalChecked()).ToLocalChecked()->IntegerValue();
+        options.height =
+            Nan::Get(obj, Nan::New("height").ToLocalChecked()).ToLocalChecked()->IntegerValue();
     }
 
     if (Nan::Has(obj, Nan::New("classes").ToLocalChecked()).FromJust()) {
-        auto classes = Nan::To<v8::Object>(Nan::Get(obj, Nan::New("classes").ToLocalChecked()).ToLocalChecked()).ToLocalChecked().As<v8::Array>();
+        auto classes = Nan::To<v8::Object>(
+                           Nan::Get(obj, Nan::New("classes").ToLocalChecked()).ToLocalChecked())
+                           .ToLocalChecked()
+                           .As<v8::Array>();
         const int length = classes->Length();
         options.classes.reserve(length);
         for (int i = 0; i < length; i++) {
-            options.classes.push_back(std::string { *Nan::Utf8String(Nan::To<v8::String>(Nan::Get(classes, i).ToLocalChecked()).ToLocalChecked()) });
+            options.classes.push_back(std::string{*Nan::Utf8String(
+                Nan::To<v8::String>(Nan::Get(classes, i).ToLocalChecked()).ToLocalChecked())});
         }
     }
 
     if (Nan::Has(obj, Nan::New("debug").ToLocalChecked()).FromJust()) {
-        auto debug = Nan::To<v8::Object>(Nan::Get(obj, Nan::New("debug").ToLocalChecked()).ToLocalChecked()).ToLocalChecked();
+        auto debug =
+            Nan::To<v8::Object>(Nan::Get(obj, Nan::New("debug").ToLocalChecked()).ToLocalChecked())
+                .ToLocalChecked();
         if (Nan::Has(debug, Nan::New("tileBorders").ToLocalChecked()).FromJust()) {
-            if (Nan::Get(debug, Nan::New("tileBorders").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
+            if (Nan::Get(debug, Nan::New("tileBorders").ToLocalChecked())
+                    .ToLocalChecked()
+                    ->BooleanValue()) {
                 options.debugOptions = options.debugOptions | mbgl::MapDebugOptions::TileBorders;
             }
         }
         if (Nan::Has(debug, Nan::New("parseStatus").ToLocalChecked()).FromJust()) {
-            if (Nan::Get(debug, Nan::New("parseStatus").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
+            if (Nan::Get(debug, Nan::New("parseStatus").ToLocalChecked())
+                    .ToLocalChecked()
+                    ->BooleanValue()) {
                 options.debugOptions = options.debugOptions | mbgl::MapDebugOptions::ParseStatus;
             }
         }
         if (Nan::Has(debug, Nan::New("timestamps").ToLocalChecked()).FromJust()) {
-            if (Nan::Get(debug, Nan::New("timestamps").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
+            if (Nan::Get(debug, Nan::New("timestamps").ToLocalChecked())
+                    .ToLocalChecked()
+                    ->BooleanValue()) {
                 options.debugOptions = options.debugOptions | mbgl::MapDebugOptions::Timestamps;
             }
         }
         if (Nan::Has(debug, Nan::New("collision").ToLocalChecked()).FromJust()) {
-            if (Nan::Get(debug, Nan::New("collision").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
+            if (Nan::Get(debug, Nan::New("collision").ToLocalChecked())
+                    .ToLocalChecked()
+                    ->BooleanValue()) {
                 options.debugOptions = options.debugOptions | mbgl::MapDebugOptions::Collision;
             }
         }
         if (Nan::Has(debug, Nan::New("overdraw").ToLocalChecked()).FromJust()) {
-            if (Nan::Get(debug, Nan::New("overdraw").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
+            if (Nan::Get(debug, Nan::New("overdraw").ToLocalChecked())
+                    .ToLocalChecked()
+                    ->BooleanValue()) {
                 options.debugOptions = mbgl::MapDebugOptions::Overdraw;
             }
         }
@@ -320,7 +345,8 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
  */
 void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map)
+        return Nan::ThrowError(releasedMessage());
 
     if (info.Length() <= 0 || !info[0]->IsObject()) {
         return Nan::ThrowTypeError("First argument must be an options object");
@@ -346,7 +372,7 @@ void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     try {
         nodeMap->startRender(std::move(options));
-    } catch (mbgl::util::Exception &ex) {
+    } catch (mbgl::util::Exception& ex) {
         return Nan::ThrowError(ex.what());
     }
 
@@ -379,14 +405,14 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
 
     // Similarly, we're now waiting for the async to be called, so we need to make sure that it
     // keeps the loop alive.
-    uv_ref(reinterpret_cast<uv_handle_t *>(async));
+    uv_ref(reinterpret_cast<uv_handle_t*>(async));
 }
 
 void NodeMap::renderFinished() {
     Nan::HandleScope scope;
 
     // We're done with this render call, so we're unrefing so that the loop could close.
-    uv_unref(reinterpret_cast<uv_handle_t *>(async));
+    uv_unref(reinterpret_cast<uv_handle_t*>(async));
 
     // There is no render pending anymore, we the GC could now delete this object if it went out
     // of scope.
@@ -410,9 +436,7 @@ void NodeMap::renderFinished() {
             errorMessage = ex.what();
         }
 
-        v8::Local<v8::Value> argv[] = {
-            Nan::Error(errorMessage.c_str())
-        };
+        v8::Local<v8::Value> argv[] = {Nan::Error(errorMessage.c_str())};
 
         // This must be empty to be prepared for the next render call.
         error = nullptr;
@@ -420,25 +444,18 @@ void NodeMap::renderFinished() {
 
         cb->Call(1, argv);
     } else if (img.data) {
-        v8::Local<v8::Object> pixels = Nan::NewBuffer(
-            reinterpret_cast<char *>(img.data.get()), img.size(),
-            // Retain the data until the buffer is deleted.
-            [](char *, void * hint) {
-                delete [] reinterpret_cast<uint8_t*>(hint);
-            },
-            img.data.get()
-        ).ToLocalChecked();
+        v8::Local<v8::Object> pixels =
+            Nan::NewBuffer(reinterpret_cast<char*>(img.data.get()), img.size(),
+                           // Retain the data until the buffer is deleted.
+                           [](char*, void* hint) { delete[] reinterpret_cast<uint8_t*>(hint); },
+                           img.data.get())
+                .ToLocalChecked();
         img.data.release();
 
-        v8::Local<v8::Value> argv[] = {
-            Nan::Null(),
-            pixels
-        };
+        v8::Local<v8::Value> argv[] = {Nan::Null(), pixels};
         cb->Call(2, argv);
     } else {
-        v8::Local<v8::Value> argv[] = {
-            Nan::Error("Didn't get an image")
-        };
+        v8::Local<v8::Value> argv[] = {Nan::Error("Didn't get an image")};
         cb->Call(1, argv);
     }
 }
@@ -450,11 +467,12 @@ void NodeMap::renderFinished() {
  */
 void NodeMap::Release(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map)
+        return Nan::ThrowError(releasedMessage());
 
     try {
         nodeMap->release();
-    } catch (const std::exception &ex) {
+    } catch (const std::exception& ex) {
         return Nan::ThrowError(ex.what());
     }
 
@@ -462,18 +480,19 @@ void NodeMap::Release(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 }
 
 void NodeMap::release() {
-    if (!map) throw mbgl::util::Exception(releasedMessage());
+    if (!map)
+        throw mbgl::util::Exception(releasedMessage());
 
-    uv_close(reinterpret_cast<uv_handle_t *>(async), [] (uv_handle_t *h) {
-        delete reinterpret_cast<uv_async_t *>(h);
-    });
+    uv_close(reinterpret_cast<uv_handle_t*>(async),
+             [](uv_handle_t* h) { delete reinterpret_cast<uv_async_t*>(h); });
 
     map.reset();
 }
 
 void NodeMap::AddClass(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map)
+        return Nan::ThrowError(releasedMessage());
 
     if (info.Length() <= 0 || !info[0]->IsString()) {
         return Nan::ThrowTypeError("First argument must be a string");
@@ -481,7 +500,7 @@ void NodeMap::AddClass(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     try {
         nodeMap->map->addClass(*Nan::Utf8String(info[0]));
-    } catch (const std::exception &ex) {
+    } catch (const std::exception& ex) {
         return Nan::ThrowError(ex.what());
     }
 
@@ -493,7 +512,8 @@ void NodeMap::AddSource(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style::conversion;
 
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map)
+        return Nan::ThrowError(releasedMessage());
 
     if (info.Length() != 2) {
         return Nan::ThrowTypeError("Two argument required");
@@ -503,7 +523,8 @@ void NodeMap::AddSource(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         return Nan::ThrowTypeError("First argument must be a string");
     }
 
-    Result<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(info[1], *Nan::Utf8String(info[0]));
+    Result<std::unique_ptr<Source>> source =
+        convert<std::unique_ptr<Source>>(info[1], *Nan::Utf8String(info[0]));
     if (!source) {
         Nan::ThrowTypeError(source.error().message.c_str());
         return;
@@ -517,7 +538,8 @@ void NodeMap::AddLayer(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style::conversion;
 
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map)
+        return Nan::ThrowError(releasedMessage());
 
     if (info.Length() != 1) {
         return Nan::ThrowTypeError("One argument required");
@@ -537,7 +559,8 @@ void NodeMap::RemoveLayer(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style::conversion;
 
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map)
+        return Nan::ThrowError(releasedMessage());
 
     if (info.Length() != 1) {
         return Nan::ThrowTypeError("One argument required");
@@ -555,7 +578,8 @@ void NodeMap::SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>& info
     using namespace mbgl::style::conversion;
 
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map)
+        return Nan::ThrowError(releasedMessage());
 
     if (info.Length() < 3) {
         return Nan::ThrowTypeError("Three arguments required");
@@ -587,7 +611,8 @@ void NodeMap::SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>& info)
     using namespace mbgl::style::conversion;
 
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map)
+        return Nan::ThrowError(releasedMessage());
 
     if (info.Length() < 3) {
         return Nan::ThrowTypeError("Three arguments required");
@@ -611,7 +636,8 @@ void NodeMap::SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>& info)
         klass = std::string(*Nan::Utf8String(info[3]));
     }
 
-    mbgl::optional<Error> error = setPaintProperty(*layer, *Nan::Utf8String(info[1]), info[2], klass);
+    mbgl::optional<Error> error =
+        setPaintProperty(*layer, *Nan::Utf8String(info[1]), info[2], klass);
     if (error) {
         return Nan::ThrowTypeError(error->message.c_str());
     }
@@ -645,7 +671,8 @@ void NodeMap::SetFilter(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style::conversion;
 
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map)
+        return Nan::ThrowError(releasedMessage());
 
     if (info.Length() < 2) {
         return Nan::ThrowTypeError("Two arguments required");
@@ -671,12 +698,13 @@ void NodeMap::SetFilter(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         filter = std::move(*converted);
     }
 
-    layer->accept(SetFilterVisitor { filter });
+    layer->accept(SetFilterVisitor{filter});
 }
 
 void NodeMap::DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map)
+        return Nan::ThrowError(releasedMessage());
 
     nodeMap->map->dumpDebugLogs();
     info.GetReturnValue().SetUndefined();
@@ -684,7 +712,8 @@ void NodeMap::DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
 void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map)
+        return Nan::ThrowError(releasedMessage());
 
     if (info.Length() <= 0 || !info[0]->IsArray()) {
         return Nan::ThrowTypeError("First argument must be an array");
@@ -703,21 +732,16 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
             auto pos0 = Nan::Get(posOrBox, 0).ToLocalChecked().As<v8::Array>();
             auto pos1 = Nan::Get(posOrBox, 1).ToLocalChecked().As<v8::Array>();
 
-            result = nodeMap->map->queryRenderedFeatures(mbgl::ScreenBox {
-                {
-                    Nan::Get(pos0, 0).ToLocalChecked()->NumberValue(),
-                    Nan::Get(pos0, 1).ToLocalChecked()->NumberValue()
-                }, {
-                    Nan::Get(pos1, 0).ToLocalChecked()->NumberValue(),
-                    Nan::Get(pos1, 1).ToLocalChecked()->NumberValue()
-                }
-            });
+            result = nodeMap->map->queryRenderedFeatures(
+                mbgl::ScreenBox{{Nan::Get(pos0, 0).ToLocalChecked()->NumberValue(),
+                                 Nan::Get(pos0, 1).ToLocalChecked()->NumberValue()},
+                                {Nan::Get(pos1, 0).ToLocalChecked()->NumberValue(),
+                                 Nan::Get(pos1, 1).ToLocalChecked()->NumberValue()}});
 
         } else {
-            result = nodeMap->map->queryRenderedFeatures(mbgl::ScreenCoordinate {
-                Nan::Get(posOrBox, 0).ToLocalChecked()->NumberValue(),
-                Nan::Get(posOrBox, 1).ToLocalChecked()->NumberValue()
-            });
+            result = nodeMap->map->queryRenderedFeatures(
+                mbgl::ScreenCoordinate{Nan::Get(posOrBox, 0).ToLocalChecked()->NumberValue(),
+                                       Nan::Get(posOrBox, 1).ToLocalChecked()->NumberValue()});
         }
 
         auto array = Nan::New<v8::Array>();
@@ -725,18 +749,23 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
             array->Set(i, toJS(result[i]));
         }
         info.GetReturnValue().Set(array);
-    } catch (const std::exception &ex) {
+    } catch (const std::exception& ex) {
         return Nan::ThrowError(ex.what());
     }
 }
 
-NodeMap::NodeMap(v8::Local<v8::Object> options) :
-    view(sharedDisplay(), [&] {
-        Nan::HandleScope scope;
-        return Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust() ? Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue() : 1.0;
-    }()),
-    map(std::make_unique<mbgl::Map>(view, *this, mbgl::MapMode::Still)),
-    async(new uv_async_t) {
+NodeMap::NodeMap(v8::Local<v8::Object> options)
+    : view(sharedDisplay(),
+           [&] {
+               Nan::HandleScope scope;
+               return Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust()
+                          ? Nan::Get(options, Nan::New("ratio").ToLocalChecked())
+                                .ToLocalChecked()
+                                ->NumberValue()
+                          : 1.0;
+           }()),
+      map(std::make_unique<mbgl::Map>(view, *this, mbgl::MapMode::Still)),
+      async(new uv_async_t) {
 
     view.setMapChangeCallback([&](mbgl::MapChange change) {
         if (change == mbgl::MapChangeDidFailLoadingMap) {
@@ -746,24 +775,24 @@ NodeMap::NodeMap(v8::Local<v8::Object> options) :
 
     async->data = this;
     uv_async_init(uv_default_loop(), async, [](UV_ASYNC_PARAMS(h)) {
-        reinterpret_cast<NodeMap *>(h->data)->renderFinished();
+        reinterpret_cast<NodeMap*>(h->data)->renderFinished();
     });
 
     // Make sure the async handle doesn't keep the loop alive.
-    uv_unref(reinterpret_cast<uv_handle_t *>(async));
+    uv_unref(reinterpret_cast<uv_handle_t*>(async));
 }
 
 NodeMap::~NodeMap() {
-    if (map) release();
+    if (map)
+        release();
 }
 
-std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resource, mbgl::FileSource::Callback callback_) {
+std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resource,
+                                                     mbgl::FileSource::Callback callback_) {
     Nan::HandleScope scope;
 
-    v8::Local<v8::Value> argv[] = {
-        Nan::New<v8::External>(this),
-        Nan::New<v8::External>(&callback_)
-    };
+    v8::Local<v8::Value> argv[] = {Nan::New<v8::External>(this),
+                                   Nan::New<v8::External>(&callback_)};
 
     auto instance = Nan::New(NodeRequest::constructor)->NewInstance(2, argv);
 

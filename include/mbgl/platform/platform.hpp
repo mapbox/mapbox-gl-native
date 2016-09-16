@@ -9,10 +9,10 @@ namespace platform {
 class Request;
 
 // Uppercase a string, potentially using platform-specific routines.
-std::string uppercase(const std::string &string);
+std::string uppercase(const std::string& string);
 
 // Lowercase a string, potentially using platform-specific routines.
-std::string lowercase(const std::string &string);
+std::string lowercase(const std::string& string);
 
 // Gets the name of the current thread.
 std::string getCurrentThreadName();
@@ -24,9 +24,14 @@ void setCurrentThreadName(const std::string& name);
 void makeThreadLowPriority();
 
 // Shows an alpha image with the specified dimensions in a named window.
-void showDebugImage(std::string name, const char *data, size_t width, size_t height);
+void showDebugImage(std::string name, const char* data, size_t width, size_t height);
 
 // Shows an alpha image with the specified dimensions in a named window.
-void showColorDebugImage(std::string name, const char *data, size_t logical_width, size_t logical_height, size_t width, size_t height);
+void showColorDebugImage(std::string name,
+                         const char* data,
+                         size_t logical_width,
+                         size_t logical_height,
+                         size_t width,
+                         size_t height);
 } // namespace platform
 } // namespace mbgl

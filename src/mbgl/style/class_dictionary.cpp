@@ -5,20 +5,20 @@
 namespace mbgl {
 namespace style {
 
-ClassDictionary::ClassDictionary() {}
+ClassDictionary::ClassDictionary() {
+}
 
-ClassDictionary &ClassDictionary::Get() {
+ClassDictionary& ClassDictionary::Get() {
     static pthread_once_t store_once = PTHREAD_ONCE_INIT;
     static pthread_key_t store_key;
 
     // Create the key.
     pthread_once(&store_once, []() {
-        pthread_key_create(&store_key, [](void *ptr) {
-            delete reinterpret_cast<ClassDictionary *>(ptr);
-        });
+        pthread_key_create(&store_key,
+                           [](void* ptr) { delete reinterpret_cast<ClassDictionary*>(ptr); });
     });
 
-    ClassDictionary *ptr = reinterpret_cast<ClassDictionary *>(pthread_getspecific(store_key));
+    ClassDictionary* ptr = reinterpret_cast<ClassDictionary*>(pthread_getspecific(store_key));
     if (ptr == nullptr) {
         ptr = new ClassDictionary();
         pthread_setspecific(store_key, ptr);
@@ -27,7 +27,7 @@ ClassDictionary &ClassDictionary::Get() {
     return *ptr;
 }
 
-ClassID ClassDictionary::lookup(const std::string &class_name) {
+ClassID ClassDictionary::lookup(const std::string& class_name) {
     auto it = store.find(class_name);
     if (it == store.end()) {
         // Insert the class name into the store.

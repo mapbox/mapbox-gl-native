@@ -28,12 +28,12 @@ public:
     Impl(const std::string& cachePath, uint64_t maximumCacheSize)
         : offlineDatabase(cachePath, maximumCacheSize) {
     }
-    
+
     void setAPIBaseURL(const std::string& url) {
         onlineFileSource.setAPIBaseURL(url);
     }
-    
-    std::string getAPIBaseURL() const{
+
+    std::string getAPIBaseURL() const {
         return onlineFileSource.getAPIBaseURL();
     }
 
@@ -45,7 +45,8 @@ public:
         return onlineFileSource.getAccessToken();
     }
 
-    void listRegions(std::function<void (std::exception_ptr, optional<std::vector<OfflineRegion>>)> callback) {
+    void listRegions(
+        std::function<void(std::exception_ptr, optional<std::vector<OfflineRegion>>)> callback) {
         try {
             callback({}, offlineDatabase.listRegions());
         } catch (...) {
@@ -55,7 +56,7 @@ public:
 
     void createRegion(const OfflineRegionDefinition& definition,
                       const OfflineRegionMetadata& metadata,
-                      std::function<void (std::exception_ptr, optional<OfflineRegion>)> callback) {
+                      std::function<void(std::exception_ptr, optional<OfflineRegion>)> callback) {
         try {
             callback({}, offlineDatabase.createRegion(definition, metadata));
         } catch (...) {
@@ -63,7 +64,9 @@ public:
         }
     }
 
-    void getRegionStatus(int64_t regionID, std::function<void (std::exception_ptr, optional<OfflineRegionStatus>)> callback) {
+    void getRegionStatus(
+        int64_t regionID,
+        std::function<void(std::exception_ptr, optional<OfflineRegionStatus>)> callback) {
         try {
             callback({}, getDownload(regionID).getStatus());
         } catch (...) {
@@ -71,7 +74,7 @@ public:
         }
     }
 
-    void deleteRegion(OfflineRegion&& region, std::function<void (std::exception_ptr)> callback) {
+    void deleteRegion(OfflineRegion&& region, std::function<void(std::exception_ptr)> callback) {
         try {
             downloads.erase(region.getID());
             offlineDatabase.deleteRegion(std::move(region));
@@ -114,7 +117,7 @@ public:
         }
 
         if (resource.necessity == Resource::Required) {
-            tasks[req] = onlineFileSource.request(revalidation, [=] (Response onlineResponse) {
+            tasks[req] = onlineFileSource.request(revalidation, [=](Response onlineResponse) {
                 this->offlineDatabase.put(revalidation, onlineResponse);
                 callback(onlineResponse);
             });
@@ -139,8 +142,11 @@ private:
         if (it != downloads.end()) {
             return *it->second;
         }
-        return *downloads.emplace(regionID,
-            std::make_unique<OfflineDownload>(regionID, offlineDatabase.getRegionDefinition(regionID), offlineDatabase, onlineFileSource)).first->second;
+        return *downloads
+                    .emplace(regionID, std::make_unique<OfflineDownload>(
+                                           regionID, offlineDatabase.getRegionDefinition(regionID),
+                                           offlineDatabase, onlineFileSource))
+                    .first->second;
     }
 
     OfflineDatabase offlineDatabase;
@@ -152,8 +158,10 @@ private:
 DefaultFileSource::DefaultFileSource(const std::string& cachePath,
                                      const std::string& assetRoot,
                                      uint64_t maximumCacheSize)
-    : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"DefaultFileSource", util::ThreadPriority::Low},
-            cachePath, maximumCacheSize)),
+    : thread(std::make_unique<util::Thread<Impl>>(
+          util::ThreadContext{"DefaultFileSource", util::ThreadPriority::Low},
+          cachePath,
+          maximumCacheSize)),
       assetFileSource(std::make_unique<AssetFileSource>(assetRoot)) {
 }
 
@@ -162,11 +170,11 @@ DefaultFileSource::~DefaultFileSource() = default;
 void DefaultFileSource::setAPIBaseURL(const std::string& baseURL) {
     thread->invokeSync(&Impl::setAPIBaseURL, baseURL);
 }
-    
+
 std::string DefaultFileSource::getAPIBaseURL() const {
     return thread->invokeSync(&Impl::getAPIBaseURL);
 }
-    
+
 void DefaultFileSource::setAccessToken(const std::string& accessToken) {
     thread->invokeSync(&Impl::setAccessToken, accessToken);
 }
@@ -175,12 +183,16 @@ std::string DefaultFileSource::getAccessToken() const {
     return thread->invokeSync(&Impl::getAccessToken);
 }
 
-std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resource,
+                                                         Callback callback) {
     class DefaultFileRequest : public AsyncRequest {
     public:
-        DefaultFileRequest(Resource resource_, FileSource::Callback callback_, util::Thread<DefaultFileSource::Impl>& thread_)
+        DefaultFileRequest(Resource resource_,
+                           FileSource::Callback callback_,
+                           util::Thread<DefaultFileSource::Impl>& thread_)
             : thread(thread_),
-              workRequest(thread.invokeWithCallback(&DefaultFileSource::Impl::request, this, resource_, callback_)) {
+              workRequest(thread.invokeWithCallback(
+                  &DefaultFileSource::Impl::request, this, resource_, callback_)) {
         }
 
         ~DefaultFileRequest() override {
@@ -198,29 +210,36 @@ std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resourc
     }
 }
 
-void DefaultFileSource::listOfflineRegions(std::function<void (std::exception_ptr, optional<std::vector<OfflineRegion>>)> callback) {
+void DefaultFileSource::listOfflineRegions(
+    std::function<void(std::exception_ptr, optional<std::vector<OfflineRegion>>)> callback) {
     thread->invoke(&Impl::listRegions, callback);
 }
 
-void DefaultFileSource::createOfflineRegion(const OfflineRegionDefinition& definition,
-                                            const OfflineRegionMetadata& metadata,
-                                            std::function<void (std::exception_ptr, optional<OfflineRegion>)> callback) {
+void DefaultFileSource::createOfflineRegion(
+    const OfflineRegionDefinition& definition,
+    const OfflineRegionMetadata& metadata,
+    std::function<void(std::exception_ptr, optional<OfflineRegion>)> callback) {
     thread->invoke(&Impl::createRegion, definition, metadata, callback);
 }
 
-void DefaultFileSource::deleteOfflineRegion(OfflineRegion&& region, std::function<void (std::exception_ptr)> callback) {
+void DefaultFileSource::deleteOfflineRegion(OfflineRegion&& region,
+                                            std::function<void(std::exception_ptr)> callback) {
     thread->invoke(&Impl::deleteRegion, std::move(region), callback);
 }
 
-void DefaultFileSource::setOfflineRegionObserver(OfflineRegion& region, std::unique_ptr<OfflineRegionObserver> observer) {
+void DefaultFileSource::setOfflineRegionObserver(OfflineRegion& region,
+                                                 std::unique_ptr<OfflineRegionObserver> observer) {
     thread->invoke(&Impl::setRegionObserver, region.getID(), std::move(observer));
 }
 
-void DefaultFileSource::setOfflineRegionDownloadState(OfflineRegion& region, OfflineRegionDownloadState state) {
+void DefaultFileSource::setOfflineRegionDownloadState(OfflineRegion& region,
+                                                      OfflineRegionDownloadState state) {
     thread->invoke(&Impl::setRegionDownloadState, region.getID(), state);
 }
 
-void DefaultFileSource::getOfflineRegionStatus(OfflineRegion& region, std::function<void (std::exception_ptr, optional<OfflineRegionStatus>)> callback) const {
+void DefaultFileSource::getOfflineRegionStatus(
+    OfflineRegion& region,
+    std::function<void(std::exception_ptr, optional<OfflineRegionStatus>)> callback) const {
     thread->invoke(&Impl::getRegionStatus, region.getID(), callback);
 }
 

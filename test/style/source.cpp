@@ -31,27 +31,19 @@ public:
     StubStyleObserver observer;
     Transform transform;
     TransformState transformState;
-    Worker worker { 1 };
-    AnnotationManager annotationManager { 1.0 };
-    style::Style style { fileSource, 1.0 };
+    Worker worker{1};
+    AnnotationManager annotationManager{1.0};
+    style::Style style{fileSource, 1.0};
 
-    style::UpdateParameters updateParameters {
-        1.0,
-        MapDebugOptions(),
-        transformState,
-        worker,
-        fileSource,
-        true,
-        MapMode::Continuous,
-        annotationManager,
-        style
-    };
+    style::UpdateParameters updateParameters{
+        1.0,  MapDebugOptions(),   transformState,    worker, fileSource,
+        true, MapMode::Continuous, annotationManager, style};
 
     SourceTest() {
         // Squelch logging.
         Log::setObserver(std::make_unique<Log::NullObserver>());
 
-        transform.resize({{ 512, 512 }});
+        transform.resize({{512, 512}});
         transform.setLatLngZoom({0, 0}, 0);
 
         transformState = transform.getState();
@@ -69,16 +61,15 @@ public:
 TEST(Source, LoadingFail) {
     SourceTest test;
 
-    test.fileSource.sourceResponse = [&] (const Resource& resource) {
+    test.fileSource.sourceResponse = [&](const Resource& resource) {
         EXPECT_EQ("url", resource.url);
         Response response;
-        response.error = std::make_unique<Response::Error>(
-            Response::Error::Reason::Other,
-            "Failed by the test case");
+        response.error = std::make_unique<Response::Error>(Response::Error::Reason::Other,
+                                                           "Failed by the test case");
         return response;
     };
 
-    test.observer.sourceError = [&] (Source& source, std::exception_ptr error) {
+    test.observer.sourceError = [&](Source& source, std::exception_ptr error) {
         EXPECT_EQ("source", source.getID());
         EXPECT_EQ("Failed by the test case", util::toString(error));
         test.end();
@@ -94,14 +85,14 @@ TEST(Source, LoadingFail) {
 TEST(Source, LoadingCorrupt) {
     SourceTest test;
 
-    test.fileSource.sourceResponse = [&] (const Resource& resource) {
+    test.fileSource.sourceResponse = [&](const Resource& resource) {
         EXPECT_EQ("url", resource.url);
         Response response;
         response.data = std::make_unique<std::string>("CORRUPTED");
         return response;
     };
 
-    test.observer.sourceError = [&] (Source& source, std::exception_ptr error) {
+    test.observer.sourceError = [&](Source& source, std::exception_ptr error) {
         EXPECT_EQ("source", source.getID());
         EXPECT_EQ("0 - Invalid value.", util::toString(error));
         test.end();
@@ -117,23 +108,23 @@ TEST(Source, LoadingCorrupt) {
 TEST(Source, RasterTileEmpty) {
     SourceTest test;
 
-    test.fileSource.tileResponse = [&] (const Resource&) {
+    test.fileSource.tileResponse = [&](const Resource&) {
         Response response;
         response.noContent = true;
         return response;
     };
 
-    test.observer.tileLoaded = [&] (Source& source, const OverscaledTileID&, TileLoadState) {
+    test.observer.tileLoaded = [&](Source& source, const OverscaledTileID&, TileLoadState) {
         EXPECT_EQ("source", source.getID());
         test.end();
     };
 
-    test.observer.tileError = [&] (Source&, const OverscaledTileID&, std::exception_ptr) {
+    test.observer.tileError = [&](Source&, const OverscaledTileID&, std::exception_ptr) {
         FAIL() << "Should never be called";
     };
 
     Tileset tileset;
-    tileset.tiles = { "tiles" };
+    tileset.tiles = {"tiles"};
 
     RasterSource source("source", tileset, 512);
     source.baseImpl->setObserver(&test.observer);
@@ -146,23 +137,23 @@ TEST(Source, RasterTileEmpty) {
 TEST(Source, VectorTileEmpty) {
     SourceTest test;
 
-    test.fileSource.tileResponse = [&] (const Resource&) {
+    test.fileSource.tileResponse = [&](const Resource&) {
         Response response;
         response.noContent = true;
         return response;
     };
 
-    test.observer.tileLoaded = [&] (Source& source, const OverscaledTileID&, TileLoadState) {
+    test.observer.tileLoaded = [&](Source& source, const OverscaledTileID&, TileLoadState) {
         EXPECT_EQ("source", source.getID());
         test.end();
     };
 
-    test.observer.tileError = [&] (Source&, const OverscaledTileID&, std::exception_ptr) {
+    test.observer.tileError = [&](Source&, const OverscaledTileID&, std::exception_ptr) {
         FAIL() << "Should never be called";
     };
 
     Tileset tileset;
-    tileset.tiles = { "tiles" };
+    tileset.tiles = {"tiles"};
 
     VectorSource source("source", tileset);
     source.baseImpl->setObserver(&test.observer);
@@ -175,15 +166,15 @@ TEST(Source, VectorTileEmpty) {
 TEST(Source, RasterTileFail) {
     SourceTest test;
 
-    test.fileSource.tileResponse = [&] (const Resource&) {
+    test.fileSource.tileResponse = [&](const Resource&) {
         Response response;
-        response.error = std::make_unique<Response::Error>(
-            Response::Error::Reason::Other,
-            "Failed by the test case");
+        response.error = std::make_unique<Response::Error>(Response::Error::Reason::Other,
+                                                           "Failed by the test case");
         return response;
     };
 
-    test.observer.tileError = [&] (Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
+    test.observer.tileError = [&](Source& source, const OverscaledTileID& tileID,
+                                  std::exception_ptr error) {
         EXPECT_EQ(SourceType::Raster, source.baseImpl->type);
         EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_EQ("Failed by the test case", util::toString(error));
@@ -191,7 +182,7 @@ TEST(Source, RasterTileFail) {
     };
 
     Tileset tileset;
-    tileset.tiles = { "tiles" };
+    tileset.tiles = {"tiles"};
 
     RasterSource source("source", tileset, 512);
     source.baseImpl->setObserver(&test.observer);
@@ -204,15 +195,15 @@ TEST(Source, RasterTileFail) {
 TEST(Source, VectorTileFail) {
     SourceTest test;
 
-    test.fileSource.tileResponse = [&] (const Resource&) {
+    test.fileSource.tileResponse = [&](const Resource&) {
         Response response;
-        response.error = std::make_unique<Response::Error>(
-            Response::Error::Reason::Other,
-            "Failed by the test case");
+        response.error = std::make_unique<Response::Error>(Response::Error::Reason::Other,
+                                                           "Failed by the test case");
         return response;
     };
 
-    test.observer.tileError = [&] (Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
+    test.observer.tileError = [&](Source& source, const OverscaledTileID& tileID,
+                                  std::exception_ptr error) {
         EXPECT_EQ(SourceType::Vector, source.baseImpl->type);
         EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_EQ("Failed by the test case", util::toString(error));
@@ -220,7 +211,7 @@ TEST(Source, VectorTileFail) {
     };
 
     Tileset tileset;
-    tileset.tiles = { "tiles" };
+    tileset.tiles = {"tiles"};
 
     VectorSource source("source", tileset);
     source.baseImpl->setObserver(&test.observer);
@@ -233,13 +224,14 @@ TEST(Source, VectorTileFail) {
 TEST(Source, RasterTileCorrupt) {
     SourceTest test;
 
-    test.fileSource.tileResponse = [&] (const Resource&) {
+    test.fileSource.tileResponse = [&](const Resource&) {
         Response response;
         response.data = std::make_unique<std::string>("CORRUPTED");
         return response;
     };
 
-    test.observer.tileError = [&] (Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
+    test.observer.tileError = [&](Source& source, const OverscaledTileID& tileID,
+                                  std::exception_ptr error) {
         EXPECT_EQ(source.baseImpl->type, SourceType::Raster);
         EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_TRUE(bool(error));
@@ -248,7 +240,7 @@ TEST(Source, RasterTileCorrupt) {
     };
 
     Tileset tileset;
-    tileset.tiles = { "tiles" };
+    tileset.tiles = {"tiles"};
 
     RasterSource source("source", tileset, 512);
     source.baseImpl->setObserver(&test.observer);
@@ -261,13 +253,14 @@ TEST(Source, RasterTileCorrupt) {
 TEST(Source, VectorTileCorrupt) {
     SourceTest test;
 
-    test.fileSource.tileResponse = [&] (const Resource&) {
+    test.fileSource.tileResponse = [&](const Resource&) {
         Response response;
         response.data = std::make_unique<std::string>("CORRUPTED");
         return response;
     };
 
-    test.observer.tileError = [&] (Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
+    test.observer.tileError = [&](Source& source, const OverscaledTileID& tileID,
+                                  std::exception_ptr error) {
         EXPECT_EQ(source.baseImpl->type, SourceType::Vector);
         EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_EQ(util::toString(error), "unknown pbf field type exception");
@@ -280,7 +273,7 @@ TEST(Source, VectorTileCorrupt) {
     test.style.addLayer(std::move(layer));
 
     Tileset tileset;
-    tileset.tiles = { "tiles" };
+    tileset.tiles = {"tiles"};
 
     VectorSource source("source", tileset);
     source.baseImpl->setObserver(&test.observer);
@@ -293,21 +286,21 @@ TEST(Source, VectorTileCorrupt) {
 TEST(Source, RasterTileCancel) {
     SourceTest test;
 
-    test.fileSource.tileResponse = [&] (const Resource&) {
+    test.fileSource.tileResponse = [&](const Resource&) {
         test.end();
         return optional<Response>();
     };
 
-    test.observer.tileLoaded = [&] (Source&, const OverscaledTileID&, TileLoadState) {
+    test.observer.tileLoaded = [&](Source&, const OverscaledTileID&, TileLoadState) {
         FAIL() << "Should never be called";
     };
 
-    test.observer.tileError = [&] (Source&, const OverscaledTileID&, std::exception_ptr) {
+    test.observer.tileError = [&](Source&, const OverscaledTileID&, std::exception_ptr) {
         FAIL() << "Should never be called";
     };
 
     Tileset tileset;
-    tileset.tiles = { "tiles" };
+    tileset.tiles = {"tiles"};
 
     RasterSource source("source", tileset, 512);
     source.baseImpl->setObserver(&test.observer);
@@ -320,21 +313,21 @@ TEST(Source, RasterTileCancel) {
 TEST(Source, VectorTileCancel) {
     SourceTest test;
 
-    test.fileSource.tileResponse = [&] (const Resource&) {
+    test.fileSource.tileResponse = [&](const Resource&) {
         test.end();
         return optional<Response>();
     };
 
-    test.observer.tileLoaded = [&] (Source&, const OverscaledTileID&, TileLoadState) {
+    test.observer.tileLoaded = [&](Source&, const OverscaledTileID&, TileLoadState) {
         FAIL() << "Should never be called";
     };
 
-    test.observer.tileError = [&] (Source&, const OverscaledTileID&, std::exception_ptr) {
+    test.observer.tileError = [&](Source&, const OverscaledTileID&, std::exception_ptr) {
         FAIL() << "Should never be called";
     };
 
     Tileset tileset;
-    tileset.tiles = { "tiles" };
+    tileset.tiles = {"tiles"};
 
     VectorSource source("source", tileset);
     source.baseImpl->setObserver(&test.observer);

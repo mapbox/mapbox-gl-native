@@ -17,17 +17,20 @@ class BackgroundLayer;
 class CustomLayer;
 
 /**
- * The runtime representation of a [layer](https://www.mapbox.com/mapbox-gl-style-spec/#layers) from the Mapbox Style
+ * The runtime representation of a [layer](https://www.mapbox.com/mapbox-gl-style-spec/#layers) from
+ * the Mapbox Style
  * Specification.
  *
- * `Layer` is an abstract base class; concrete derived classes are provided for each layer type. `Layer` contains
+ * `Layer` is an abstract base class; concrete derived classes are provided for each layer type.
+ * `Layer` contains
  * functionality that is common to all layer types:
  *
  * * Runtime type information: type predicates and casting
  * * Accessors for properties common to all layer types: ID, visibility, etc.
  * * Cloning and copying
  *
- * All other functionality lives in the derived classes. To instantiate a layer, create an instance of the desired
+ * All other functionality lives in the derived classes. To instantiate a layer, create an instance
+ * of the desired
  * type, passing the ID:
  *
  *     auto circleLayer = std::make_unique<CircleLayer>("my-circle-layer");

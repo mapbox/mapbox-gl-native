@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-int runTests(int argc, char *argv[]) {
+int runTests(int argc, char* argv[]) {
 #if TEST_HAS_SERVER
     auto server = std::make_unique<test::Server>("test/storage/server.js");
 #endif

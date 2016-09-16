@@ -10,26 +10,31 @@ namespace mbgl {
 
 using namespace style;
 
-StyleSourcedAnnotationImpl::StyleSourcedAnnotationImpl(AnnotationID id_, StyleSourcedAnnotation annotation_, uint8_t maxZoom_)
-    : ShapeAnnotationImpl(id_, maxZoom_),
-      annotation(std::move(annotation_)) {
+StyleSourcedAnnotationImpl::StyleSourcedAnnotationImpl(AnnotationID id_,
+                                                       StyleSourcedAnnotation annotation_,
+                                                       uint8_t maxZoom_)
+    : ShapeAnnotationImpl(id_, maxZoom_), annotation(std::move(annotation_)) {
 }
 
 void StyleSourcedAnnotationImpl::updateStyle(Style& style) const {
-    if (style.getLayer(layerID))
+    if (style.getLayer(layerID)) {
         return;
+    }
 
     const Layer* sourceLayer = style.getLayer(annotation.layerID);
-    if (!sourceLayer)
+    if (!sourceLayer) {
         return;
+    }
 
     if (sourceLayer->is<LineLayer>()) {
-        std::unique_ptr<Layer> layer = sourceLayer->baseImpl->copy(layerID, "", AnnotationManager::SourceID);
+        std::unique_ptr<Layer> layer =
+            sourceLayer->baseImpl->copy(layerID, "", AnnotationManager::SourceID);
         layer->as<LineLayer>()->setSourceLayer(layerID);
         layer->as<LineLayer>()->setVisibility(VisibilityType::Visible);
         style.addLayer(std::move(layer), sourceLayer->getID());
     } else if (sourceLayer->is<FillLayer>()) {
-        std::unique_ptr<Layer> layer = sourceLayer->baseImpl->copy(layerID, "", AnnotationManager::SourceID);
+        std::unique_ptr<Layer> layer =
+            sourceLayer->baseImpl->copy(layerID, "", AnnotationManager::SourceID);
         layer->as<FillLayer>()->setSourceLayer(layerID);
         layer->as<FillLayer>()->setVisibility(VisibilityType::Visible);
         style.addLayer(std::move(layer), sourceLayer->getID());

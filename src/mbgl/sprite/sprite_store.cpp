@@ -36,34 +36,38 @@ void SpriteStore::load(const std::string& url, FileSource& fileSource) {
 
     loader = std::make_unique<Loader>();
 
-    loader->jsonRequest = fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
-        if (res.error) {
-            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified) {
-            return;
-        } else if (res.noContent) {
-            loader->json = std::make_shared<const std::string>();
-            emitSpriteLoadedIfComplete();
-        } else {
-            // Only trigger a sprite loaded event we got new data.
-            loader->json = res.data;
-            emitSpriteLoadedIfComplete();
-        }
-    });
+    loader->jsonRequest =
+        fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
+            if (res.error) {
+                observer->onSpriteError(
+                    std::make_exception_ptr(std::runtime_error(res.error->message)));
+            } else if (res.notModified) {
+                return;
+            } else if (res.noContent) {
+                loader->json = std::make_shared<const std::string>();
+                emitSpriteLoadedIfComplete();
+            } else {
+                // Only trigger a sprite loaded event we got new data.
+                loader->json = res.data;
+                emitSpriteLoadedIfComplete();
+            }
+        });
 
-    loader->spriteRequest = fileSource.request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
-        if (res.error) {
-            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified) {
-            return;
-        } else if (res.noContent) {
-            loader->image = std::make_shared<const std::string>();
-            emitSpriteLoadedIfComplete();
-        } else {
-            loader->image = res.data;
-            emitSpriteLoadedIfComplete();
-        }
-    });
+    loader->spriteRequest =
+        fileSource.request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
+            if (res.error) {
+                observer->onSpriteError(
+                    std::make_exception_ptr(std::runtime_error(res.error->message)));
+            } else if (res.notModified) {
+                return;
+            } else if (res.noContent) {
+                loader->image = std::make_shared<const std::string>();
+                emitSpriteLoadedIfComplete();
+            } else {
+                loader->image = res.data;
+                emitSpriteLoadedIfComplete();
+            }
+        });
 }
 
 void SpriteStore::emitSpriteLoadedIfComplete() {
@@ -102,8 +106,10 @@ void SpriteStore::_setSprite(const std::string& name,
         auto it = sprites.find(name);
         if (it != sprites.end()) {
             // There is already a sprite with that name in our store.
-            if ((it->second->image.width != sprite->image.width || it->second->image.height != sprite->image.height)) {
-                Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", name.c_str());
+            if ((it->second->image.width != sprite->image.width ||
+                 it->second->image.height != sprite->image.height)) {
+                Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'",
+                             name.c_str());
                 return;
             }
             it->second = sprite;

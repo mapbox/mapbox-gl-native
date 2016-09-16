@@ -34,9 +34,9 @@ public:
 
         // Log::Observer implementation
         bool onRecord(EventSeverity severity,
-                              Event event,
-                              int64_t code,
-                              const std::string& msg) override;
+                      Event event,
+                      int64_t code,
+                      const std::string& msg) override;
 
         bool empty() const;
         size_t count(const Message& message) const;
@@ -59,9 +59,9 @@ private:
     Observer* observer;
 };
 
-::std::ostream &operator<<(::std::ostream &os,
-                           const std::vector<FixtureLog::Observer::LogMessage> &messages);
-::std::ostream &operator<<(::std::ostream &os, const FixtureLog::Observer::LogMessage &message);
+::std::ostream& operator<<(::std::ostream& os,
+                           const std::vector<FixtureLog::Observer::LogMessage>& messages);
+::std::ostream& operator<<(::std::ostream& os, const FixtureLog::Observer::LogMessage& message);
 
 using FixtureLogObserver = FixtureLog::Observer;
 

@@ -7,7 +7,7 @@ namespace mbgl {
 namespace {
 
 int severityToPriority(EventSeverity severity) {
-    switch(severity) {
+    switch (severity) {
     case EventSeverity::Debug:
         return ANDROID_LOG_DEBUG;
 
@@ -27,8 +27,7 @@ int severityToPriority(EventSeverity severity) {
 
 } // namespace
 
-void Log::platformRecord(EventSeverity severity, const std::string &msg) {
+void Log::platformRecord(EventSeverity severity, const std::string& msg) {
     __android_log_print(severityToPriority(severity), "mbgl", "%s", msg.c_str());
 }
-
 }

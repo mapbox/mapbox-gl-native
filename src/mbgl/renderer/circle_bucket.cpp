@@ -23,9 +23,9 @@ void CircleBucket::upload(gl::ObjectStore& store, gl::Config&) {
 }
 
 void CircleBucket::render(Painter& painter,
-                        PaintParameters& parameters, 
-                        const Layer& layer,
-                        const RenderTile& tile) {
+                          PaintParameters& parameters,
+                          const Layer& layer,
+                          const RenderTile& tile) {
     painter.renderCircle(parameters, *this, *layer.as<CircleLayer>(), tile);
 }
 
@@ -39,7 +39,7 @@ bool CircleBucket::needsClipping() const {
 
 void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
     for (auto& circle : geometryCollection) {
-        for(auto & geometry : circle) {
+        for (auto& geometry : circle) {
             auto x = geometry.x;
             auto y = geometry.y;
 
@@ -47,7 +47,9 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
             // Include all points in Still mode. You need to include points from
             // neighbouring tiles so that they are not clipped at tile boundaries.
             if ((mode != MapMode::Still) &&
-                (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT)) continue;
+                (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT)) {
+                continue;
+            }
 
             // this geometry will be of the Point type, and we'll derive
             // two triangles from it.
@@ -59,9 +61,9 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
             // └─────────┘
             //
             vertexBuffer_.add(x, y, -1, -1); // 1
-            vertexBuffer_.add(x, y, 1, -1); // 2
-            vertexBuffer_.add(x, y, 1, 1); // 3
-            vertexBuffer_.add(x, y, -1, 1); // 4
+            vertexBuffer_.add(x, y, 1, -1);  // 2
+            vertexBuffer_.add(x, y, 1, 1);   // 3
+            vertexBuffer_.add(x, y, -1, 1);  // 4
 
             if (!triangleGroups_.size() || (triangleGroups_.back()->vertex_length + 4 > 65535)) {
                 // Move to a new group because the old one can't hold the geometry.
@@ -89,11 +91,14 @@ void CircleBucket::drawCircles(CircleShader& shader, gl::ObjectStore& store) {
     for (auto& group : triangleGroups_) {
         assert(group);
 
-        if (!group->elements_length) continue;
+        if (!group->elements_length) {
+            continue;
+        }
 
         group->array[0].bind(shader, vertexBuffer_, elementsBuffer_, vertexIndex, store);
 
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elementsIndex));
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elementsIndex));
 
         vertexIndex += group->vertex_length * vertexBuffer_.itemSize;
         elementsIndex += group->elements_length * elementsBuffer_.itemSize;

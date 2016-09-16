@@ -7,9 +7,8 @@
 namespace mbgl {
 namespace android {
 
-class Value  {
+class Value {
 public:
-
     Value(jni::JNIEnv&, jni::jobject*);
     virtual ~Value();
 
@@ -25,11 +24,10 @@ public:
     bool toBool() const;
     Value get(const char* key) const;
     int getLength() const;
-    Value get(const int index ) const;
+    Value get(const int index) const;
 
     jni::JNIEnv& jenv;
     jni::jobject* value;
 };
-
 }
 }

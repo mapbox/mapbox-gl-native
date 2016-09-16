@@ -10,7 +10,8 @@ namespace mbgl {
 
 AnnotationTile::AnnotationTile(const OverscaledTileID& overscaledTileID,
                                const style::UpdateParameters& parameters)
-    : GeometryTile(overscaledTileID, AnnotationManager::SourceID, parameters.style, parameters.mode),
+    : GeometryTile(
+          overscaledTileID, AnnotationManager::SourceID, parameters.style, parameters.mode),
       annotationManager(parameters.annotationManager) {
     annotationManager.addTile(*this);
 }
@@ -19,15 +20,16 @@ AnnotationTile::~AnnotationTile() {
     annotationManager.removeTile(*this);
 }
 
-void AnnotationTile::setNecessity(Necessity) {}
+void AnnotationTile::setNecessity(Necessity) {
+}
 
-AnnotationTileFeature::AnnotationTileFeature(const AnnotationID id_,
-                                             FeatureType type_, GeometryCollection geometries_,
-                                             std::unordered_map<std::string, std::string> properties_)
-    : id(id_),
-      type(type_),
-      properties(std::move(properties_)),
-      geometries(std::move(geometries_)) {}
+AnnotationTileFeature::AnnotationTileFeature(
+    const AnnotationID id_,
+    FeatureType type_,
+    GeometryCollection geometries_,
+    std::unordered_map<std::string, std::string> properties_)
+    : id(id_), type(type_), properties(std::move(properties_)), geometries(std::move(geometries_)) {
+}
 
 optional<Value> AnnotationTileFeature::getValue(const std::string& key) const {
     auto it = properties.find(key);
@@ -37,8 +39,8 @@ optional<Value> AnnotationTileFeature::getValue(const std::string& key) const {
     return optional<Value>();
 }
 
-AnnotationTileLayer::AnnotationTileLayer(std::string name_)
-    : name(std::move(name_)) {}
+AnnotationTileLayer::AnnotationTileLayer(std::string name_) : name(std::move(name_)) {
+}
 
 std::unique_ptr<GeometryTileData> AnnotationTileData::clone() const {
     return std::make_unique<AnnotationTileData>(*this);

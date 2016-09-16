@@ -15,17 +15,20 @@
 
 namespace mbgl {
 
-Shader::Shader(const char* name_, const char* vertexSource, const char* fragmentSource, gl::ObjectStore& store, Defines defines)
-    : name(name_)
-    , program(store.createProgram())
-    , vertexShader(store.createShader(GL_VERTEX_SHADER))
-    , fragmentShader(store.createShader(GL_FRAGMENT_SHADER))
-{
+Shader::Shader(const char* name_,
+               const char* vertexSource,
+               const char* fragmentSource,
+               gl::ObjectStore& store,
+               Defines defines)
+    : name(name_),
+      program(store.createProgram()),
+      vertexShader(store.createShader(GL_VERTEX_SHADER)),
+      fragmentShader(store.createShader(GL_FRAGMENT_SHADER)) {
     util::stopwatch stopwatch("shader compilation", Event::Shader);
 
     if (!compileShader(vertexShader, vertexSource)) {
         Log::Error(Event::Shader, "Vertex shader %s failed to compile: %s", name, vertexSource);
-        throw util::ShaderException(std::string { "Vertex shader " } + name + " failed to compile");
+        throw util::ShaderException(std::string{ "Vertex shader " } + name + " failed to compile");
     }
 
     std::string fragment(fragmentSource);
@@ -36,7 +39,8 @@ Shader::Shader(const char* name_, const char* vertexSource, const char* fragment
 
     if (!compileShader(fragmentShader, fragment.c_str())) {
         Log::Error(Event::Shader, "Fragment shader %s failed to compile: %s", name, fragmentSource);
-        throw util::ShaderException(std::string { "Fragment shader " } + name + " failed to compile");
+        throw util::ShaderException(std::string{ "Fragment shader " } + name +
+                                    " failed to compile");
     }
 
     // Attach shaders
@@ -52,7 +56,7 @@ Shader::Shader(const char* name_, const char* vertexSource, const char* fragment
 
     // Link program
     GLint status;
-     MBGL_CHECK_ERROR(glLinkProgram(program.get()));
+    MBGL_CHECK_ERROR(glLinkProgram(program.get()));
 
     MBGL_CHECK_ERROR(glGetProgramiv(program.get(), GL_LINK_STATUS, &status));
     if (status == 0) {
@@ -63,11 +67,12 @@ Shader::Shader(const char* name_, const char* vertexSource, const char* fragment
             MBGL_CHECK_ERROR(glGetProgramInfoLog(program.get(), logLength, &logLength, log.get()));
             Log::Error(Event::Shader, "Program failed to link: %s", log.get());
         }
-        throw util::ShaderException(std::string { "Program " } + name + " failed to link: " + log.get());
+        throw util::ShaderException(std::string{ "Program " } + name + " failed to link: " +
+                                    log.get());
     }
 }
 
-bool Shader::compileShader(gl::UniqueShader& shader, const GLchar *source) {
+bool Shader::compileShader(gl::UniqueShader& shader, const GLchar* source) {
     GLint status = 0;
 
     const GLsizei lengths = static_cast<GLsizei>(std::strlen(source));

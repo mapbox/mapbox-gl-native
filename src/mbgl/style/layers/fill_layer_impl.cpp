@@ -21,7 +21,8 @@ bool FillLayer::Impl::recalculate(const CalculationParameters& parameters) {
         passes |= RenderPass::Translucent;
     }
 
-    if (!paint.fillPattern.value.from.empty() || (paint.fillColor.value.a * paint.fillOpacity) < 1.0f) {
+    if (!paint.fillPattern.value.from.empty() ||
+        (paint.fillColor.value.a * paint.fillOpacity) < 1.0f) {
         passes |= RenderPass::Translucent;
     } else {
         passes |= RenderPass::Opaque;
@@ -34,11 +35,12 @@ std::unique_ptr<Bucket> FillLayer::Impl::createBucket(BucketParameters& paramete
     auto bucket = std::make_unique<FillBucket>();
 
     auto& name = bucketName();
-    parameters.eachFilteredFeature(filter, [&] (const auto& feature, std::size_t index, const std::string& layerName) {
-        auto geometries = feature.getGeometries();
-        bucket->addGeometry(geometries);
-        parameters.featureIndex.insert(geometries, index, layerName, name);
-    });
+    parameters.eachFilteredFeature(
+        filter, [&](const auto& feature, std::size_t index, const std::string& layerName) {
+            auto geometries = feature.getGeometries();
+            bucket->addGeometry(geometries);
+            parameters.featureIndex.insert(geometries, index, layerName, name);
+        });
 
     return std::move(bucket);
 }
@@ -48,16 +50,16 @@ float FillLayer::Impl::getQueryRadius() const {
     return util::length(translate[0], translate[1]);
 }
 
-bool FillLayer::Impl::queryIntersectsGeometry(
-        const GeometryCollection& queryGeometry,
-        const GeometryCollection& geometry,
-        const float bearing,
-        const float pixelsToTileUnits) const {
+bool FillLayer::Impl::queryIntersectsGeometry(const GeometryCollection& queryGeometry,
+                                              const GeometryCollection& geometry,
+                                              const float bearing,
+                                              const float pixelsToTileUnits) const {
 
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
-            queryGeometry, paint.fillTranslate, paint.fillTranslateAnchor, bearing, pixelsToTileUnits);
+        queryGeometry, paint.fillTranslate, paint.fillTranslateAnchor, bearing, pixelsToTileUnits);
 
-    return util::multiPolygonIntersectsMultiPolygon(translatedQueryGeometry.value_or(queryGeometry), geometry);
+    return util::multiPolygonIntersectsMultiPolygon(translatedQueryGeometry.value_or(queryGeometry),
+                                                    geometry);
 }
 
 } // namespace style

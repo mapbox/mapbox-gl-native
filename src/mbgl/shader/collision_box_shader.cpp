@@ -12,7 +12,7 @@ CollisionBoxShader::CollisionBoxShader(gl::ObjectStore& store)
              store) {
 }
 
-void CollisionBoxShader::bind(GLbyte *offset) {
+void CollisionBoxShader::bind(GLbyte* offset) {
     const GLint stride = 12;
 
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));

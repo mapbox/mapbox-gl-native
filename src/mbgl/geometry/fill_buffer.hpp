@@ -6,9 +6,8 @@
 
 namespace mbgl {
 
-class FillVertexBuffer : public Buffer<
-    4 // bytes per coordinates (2 * unsigned short == 4 bytes)
-> {
+class FillVertexBuffer : public Buffer<4 // bytes per coordinates (2 * unsigned short == 4 bytes)
+                                       > {
 public:
     typedef int16_t vertex_type;
 

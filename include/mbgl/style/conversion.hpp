@@ -37,7 +37,8 @@ namespace conversion {
       * `arrayMember(v)` -- called only if `isArray(v)`; returns `V` or `V&`
 
       * `isObject(v)` -- returns a boolean indicating whether `v` represents a JSON object
-      * `objectMember(v, name)` -- called only if `isObject(v)`; `name` is `const char *`; return value:
+      * `objectMember(v, name)` -- called only if `isObject(v)`; `name` is `const char *`; return
+   value:
          * is true when evaluated in a boolean context iff the named member exists
          * is convertable to a `V` or `V&` when dereferenced
       * `eachMember(v, [] (const std::string&, const V&) -> optional<Error> {...})` -- called
@@ -46,7 +47,8 @@ namespace conversion {
 
       * `toBool(v)` -- returns `optional<bool>`, absence indicating `v` is not a JSON boolean
       * `toNumber(v)` -- returns `optional<float>`, absence indicating `v` is not a JSON number
-      * `toString(v)` -- returns `optional<std::string>`, absence indicating `v` is not a JSON string
+      * `toString(v)` -- returns `optional<std::string>`, absence indicating `v` is not a JSON
+   string
       * `toValue(v)` -- returns `optional<mbgl::Value>`, a variant type, for generic conversion,
         absence indicating `v` is not a boolean, number, or string. Numbers should be converted to
         unsigned integer, signed integer, or floating point, in descending preference.
@@ -55,7 +57,9 @@ namespace conversion {
    them for v8 types.
 */
 
-struct Error { std::string message; };
+struct Error {
+    std::string message;
+};
 
 template <class T>
 class Result : private variant<T, Error> {
@@ -85,8 +89,8 @@ public:
 template <class T, class Enable = void>
 struct Converter;
 
-template <class T, class V, class...Args>
-Result<T> convert(const V& value, Args&&...args) {
+template <class T, class V, class... Args>
+Result<T> convert(const V& value, Args&&... args) {
     return Converter<T>()(value, std::forward<Args>(args)...);
 }
 

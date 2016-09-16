@@ -8,7 +8,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/cache" };
+    const Resource resource{Resource::Unknown, "http://127.0.0.1:3000/cache"};
     Response response;
 
     std::unique_ptr<AsyncRequest> req1;
@@ -46,7 +46,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource revalidateSame { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    const Resource revalidateSame{Resource::Unknown, "http://127.0.0.1:3000/revalidate-same"};
     std::unique_ptr<AsyncRequest> req1;
     std::unique_ptr<AsyncRequest> req2;
     uint16_t counter = 0;
@@ -90,8 +90,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource revalidateModified{ Resource::Unknown,
-                                       "http://127.0.0.1:3000/revalidate-modified" };
+    const Resource revalidateModified{Resource::Unknown,
+                                      "http://127.0.0.1:3000/revalidate-modified"};
     std::unique_ptr<AsyncRequest> req1;
     std::unique_ptr<AsyncRequest> req2;
     uint16_t counter = 0;
@@ -104,7 +104,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response", *res.data);
         EXPECT_FALSE(bool(res.expires));
-        EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
+        EXPECT_EQ(Timestamp{Seconds(1420070400)}, *res.modified);
         EXPECT_FALSE(res.etag);
 
         // Second request returns the cached response, then immediately revalidates.
@@ -119,7 +119,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
                 EXPECT_TRUE(res2.notModified);
                 ASSERT_FALSE(res2.data.get());
                 EXPECT_TRUE(bool(res2.expires));
-                EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res2.modified);
+                EXPECT_EQ(Timestamp{Seconds(1420070400)}, *res2.modified);
                 EXPECT_FALSE(res2.etag);
 
                 loop.stop();
@@ -134,7 +134,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource revalidateEtag { Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag" };
+    const Resource revalidateEtag{Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag"};
     std::unique_ptr<AsyncRequest> req1;
     std::unique_ptr<AsyncRequest> req2;
     uint16_t counter = 0;
@@ -189,11 +189,10 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
+    const Resource resource{Resource::Unknown, "http://127.0.0.1:3000/test"};
 
-    auto req = fs.request(resource, [&](Response) {
-        ADD_FAILURE() << "Callback should not be called";
-    });
+    auto req =
+        fs.request(resource, [&](Response) { ADD_FAILURE() << "Callback should not be called"; });
     req.reset();
     req = fs.request(resource, [&](Response res) {
         req.reset();
@@ -213,7 +212,8 @@ TEST(DefaultFileSource, OptionalNonExpired) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
+    const Resource optionalResource{
+        Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional};
 
     using namespace std::chrono_literals;
 
@@ -242,7 +242,8 @@ TEST(DefaultFileSource, OptionalExpired) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
+    const Resource optionalResource{
+        Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional};
 
     using namespace std::chrono_literals;
 
@@ -271,7 +272,8 @@ TEST(DefaultFileSource, OptionalNotFound) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
+    const Resource optionalResource{
+        Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional};
 
     using namespace std::chrono_literals;
 
@@ -297,7 +299,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    Resource resource{Resource::Unknown, "http://127.0.0.1:3000/revalidate-same"};
     resource.priorEtag.emplace("snowfall");
 
     using namespace std::chrono_literals;
@@ -331,7 +333,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    Resource resource{Resource::Unknown, "http://127.0.0.1:3000/revalidate-same"};
     resource.priorEtag.emplace("sunshine");
 
     using namespace std::chrono_literals;
@@ -365,7 +367,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    Resource resource{Resource::Unknown, "http://127.0.0.1:3000/revalidate-same"};
     // Setting any prior field results in skipping the cache.
     resource.priorExpires.emplace(Seconds(0));
 
@@ -400,7 +402,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified))
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
+    Resource resource{Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified"};
     resource.priorModified.emplace(Seconds(1420070400)); // January 1, 2015
 
     using namespace std::chrono_literals;
@@ -420,7 +422,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified))
         ASSERT_TRUE(bool(res.expires));
         EXPECT_LT(util::now(), *res.expires);
         ASSERT_TRUE(bool(res.modified));
-        EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
+        EXPECT_EQ(Timestamp{Seconds(1420070400)}, *res.modified);
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
     });
@@ -434,7 +436,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
+    Resource resource{Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified"};
     resource.priorModified.emplace(Seconds(1417392000)); // December 1, 2014
 
     using namespace std::chrono_literals;
@@ -453,7 +455,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response", *res.data);
         EXPECT_FALSE(bool(res.expires));
-        EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
+        EXPECT_EQ(Timestamp{Seconds(1420070400)}, *res.modified);
         EXPECT_FALSE(res.etag);
         loop.stop();
     });

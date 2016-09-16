@@ -22,10 +22,8 @@ bool Layer::Impl::hasRenderPass(RenderPass pass) const {
 }
 
 bool Layer::Impl::needsRendering(float zoom) const {
-    return passes != RenderPass::None
-        && visibility != VisibilityType::None
-        && minZoom <= zoom
-        && maxZoom >= zoom;
+    return passes != RenderPass::None && visibility != VisibilityType::None && minZoom <= zoom &&
+           maxZoom >= zoom;
 }
 
 void Layer::Impl::setObserver(LayerObserver* observer_) {

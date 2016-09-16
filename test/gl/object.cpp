@@ -20,8 +20,13 @@ static bool setFlag = false;
 struct MockGLObject {
     using Type = bool;
     static const Type Default;
-    static Type Get() { getFlag = true; return true; }
-    static void Set(const Type&) { setFlag = true; }
+    static Type Get() {
+        getFlag = true;
+        return true;
+    }
+    static void Set(const Type&) {
+        setFlag = true;
+    }
 };
 
 const bool MockGLObject::Default = false;

@@ -14,7 +14,10 @@
 
 namespace mbgl {
 
-SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, float pixelRatio_, SpriteStore& store_)
+SpriteAtlas::SpriteAtlas(dimension width_,
+                         dimension height_,
+                         float pixelRatio_,
+                         SpriteStore& store_)
     : width(width_),
       height(height_),
       pixelWidth(std::ceil(width * pixelRatio_)),
@@ -52,7 +55,8 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
 
     auto rect_it = images.find({ name, mode });
     if (rect_it != images.end()) {
-        return SpriteAtlasElement { rect_it->second.pos, rect_it->second.spriteImage, rect_it->second.spriteImage->pixelRatio / pixelRatio };
+        return SpriteAtlasElement{ rect_it->second.pos, rect_it->second.spriteImage,
+                                   rect_it->second.spriteImage->pixelRatio / pixelRatio };
     }
 
     auto sprite = store.getSprite(name);
@@ -71,7 +75,7 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
     const Holder& holder = images.emplace(Key{ name, mode }, Holder{ sprite, rect }).first->second;
     copy(holder, mode);
 
-    return SpriteAtlasElement { rect, sprite, sprite->pixelRatio / pixelRatio };
+    return SpriteAtlasElement{ rect, sprite, sprite->pixelRatio / pixelRatio };
 }
 
 optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name,
@@ -91,16 +95,25 @@ optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name,
     const float w = spriteImage->getWidth() * (*img).relativePixelRatio;
     const float h = spriteImage->getHeight() * (*img).relativePixelRatio;
 
-    return SpriteAtlasPosition {
-        {{ float(spriteImage->getWidth()), spriteImage->getHeight() }},
-        {{ float(rect.x + padding)     / width, float(rect.y + padding)     / height }},
-        {{ float(rect.x + padding + w) / width, float(rect.y + padding + h) / height }}
+    return SpriteAtlasPosition{
+        { { float(spriteImage->getWidth()), spriteImage->getHeight() } },
+        { { float(rect.x + padding) / width, float(rect.y + padding) / height } },
+        { { float(rect.x + padding + w) / width, float(rect.y + padding + h) / height } }
     };
 }
 
-void copyBitmap(const uint32_t *src, const uint32_t srcStride, const uint32_t srcX, const uint32_t srcY,
-        uint32_t *const dst, const uint32_t dstStride, const uint32_t dstX, const uint32_t dstY, int dstSize,
-        const int width, const int height, const SpritePatternMode mode) {
+void copyBitmap(const uint32_t* src,
+                const uint32_t srcStride,
+                const uint32_t srcX,
+                const uint32_t srcY,
+                uint32_t* const dst,
+                const uint32_t dstStride,
+                const uint32_t dstX,
+                const uint32_t dstY,
+                int dstSize,
+                const int width,
+                const int height,
+                const SpritePatternMode mode) {
 
     int srcI = srcY * srcStride + srcX;
     int dstI = dstY * dstStride + dstX;
@@ -109,7 +122,8 @@ void copyBitmap(const uint32_t *src, const uint32_t srcStride, const uint32_t sr
     if (mode == SpritePatternMode::Repeating) {
         // add 1 pixel wrapped padding on each side of the image
         dstI -= dstStride;
-        for (y = -1; y <= height; y++, srcI = ((y + height) % height + srcY) * srcStride + srcX, dstI += dstStride) {
+        for (y = -1; y <= height;
+             y++, srcI = ((y + height) % height + srcY) * srcStride + srcX, dstI += dstStride) {
             for (x = -1; x <= width; x++) {
                 const int dstIndex = (dstI + x + dstSize) % dstSize;
                 dst[dstIndex] = src[srcI + ((x + width) % width)];
@@ -132,15 +146,19 @@ void SpriteAtlas::copy(const Holder& holder, const SpritePatternMode mode) {
         std::fill(data.get(), data.get() + pixelWidth * pixelHeight, 0);
     }
 
-    const uint32_t *srcData = reinterpret_cast<const uint32_t *>(holder.spriteImage->image.data.get());
-    if (!srcData) return;
-    uint32_t *const dstData = data.get();
+    const uint32_t* srcData =
+        reinterpret_cast<const uint32_t*>(holder.spriteImage->image.data.get());
+    if (!srcData) {
+        return;
+    }
+    uint32_t* const dstData = data.get();
 
     const int padding = 1;
 
-    copyBitmap(srcData, uint32_t(holder.spriteImage->image.width), 0, 0,
-            dstData, pixelWidth, (holder.pos.x + padding) * pixelRatio, (holder.pos.y + padding) * pixelRatio, pixelWidth * pixelHeight,
-            uint32_t(holder.spriteImage->image.width), uint32_t(holder.spriteImage->image.height), mode);
+    copyBitmap(srcData, uint32_t(holder.spriteImage->image.width), 0, 0, dstData, pixelWidth,
+               (holder.pos.x + padding) * pixelRatio, (holder.pos.y + padding) * pixelRatio,
+               pixelWidth * pixelHeight, uint32_t(holder.spriteImage->image.width),
+               uint32_t(holder.spriteImage->image.height), mode);
 
     dirty = true;
 }
@@ -182,7 +200,10 @@ void SpriteAtlas::updateDirty() {
     }
 }
 
-void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore, gl::Config& config, uint32_t unit) {
+void SpriteAtlas::bind(bool linear,
+                       gl::ObjectStore& objectStore,
+                       gl::Config& config,
+                       uint32_t unit) {
     if (!data) {
         return; // Empty atlas
     }
@@ -217,37 +238,35 @@ void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore, gl::Config& co
 
         config.activeTexture = unit;
         if (fullUploadRequired) {
-            MBGL_CHECK_ERROR(glTexImage2D(
-                GL_TEXTURE_2D, // GLenum target
-                0, // GLint level
-                GL_RGBA, // GLint internalformat
-                pixelWidth, // GLsizei width
-                pixelHeight, // GLsizei height
-                0, // GLint border
-                GL_RGBA, // GLenum format
-                GL_UNSIGNED_BYTE, // GLenum type
-                data.get() // const GLvoid * data
-            ));
+            MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D,    // GLenum target
+                                          0,                // GLint level
+                                          GL_RGBA,          // GLint internalformat
+                                          pixelWidth,       // GLsizei width
+                                          pixelHeight,      // GLsizei height
+                                          0,                // GLint border
+                                          GL_RGBA,          // GLenum format
+                                          GL_UNSIGNED_BYTE, // GLenum type
+                                          data.get()        // const GLvoid * data
+                                          ));
             fullUploadRequired = false;
         } else {
-            MBGL_CHECK_ERROR(glTexSubImage2D(
-                GL_TEXTURE_2D, // GLenum target
-                0, // GLint level
-                0, // GLint xoffset
-                0, // GLint yoffset
-                pixelWidth, // GLsizei width
-                pixelHeight, // GLsizei height
-                GL_RGBA, // GLenum format
-                GL_UNSIGNED_BYTE, // GLenum type
-                data.get() // const GLvoid *pixels
-            ));
+            MBGL_CHECK_ERROR(glTexSubImage2D(GL_TEXTURE_2D,    // GLenum target
+                                             0,                // GLint level
+                                             0,                // GLint xoffset
+                                             0,                // GLint yoffset
+                                             pixelWidth,       // GLsizei width
+                                             pixelHeight,      // GLsizei height
+                                             GL_RGBA,          // GLenum format
+                                             GL_UNSIGNED_BYTE, // GLenum type
+                                             data.get()        // const GLvoid *pixels
+                                             ));
         }
 
         dirty = false;
 
 #ifndef GL_ES_VERSION_2_0
-        // platform::showColorDebugImage("Sprite Atlas", reinterpret_cast<const char*>(data.get()),
-        //                               pixelWidth, pixelHeight, pixelWidth, pixelHeight);
+// platform::showColorDebugImage("Sprite Atlas", reinterpret_cast<const char*>(data.get()),
+//                               pixelWidth, pixelHeight, pixelWidth, pixelHeight);
 #endif
     }
 }

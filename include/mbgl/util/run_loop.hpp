@@ -14,7 +14,7 @@
 namespace mbgl {
 namespace util {
 
-typedef void * LOOP_HANDLE;
+typedef void* LOOP_HANDLE;
 
 class RunLoop : private util::noncopyable {
 public:
@@ -24,9 +24,9 @@ public:
     };
 
     enum class Event : uint8_t {
-        None      = 0,
-        Read      = 1,
-        Write     = 2,
+        None = 0,
+        Read = 1,
+        Write = 2,
         ReadWrite = Read | Write,
     };
 
@@ -47,24 +47,25 @@ public:
     // Invoke fn(args...) on this RunLoop.
     template <class Fn, class... Args>
     void invoke(Fn&& fn, Args&&... args) {
-        std::shared_ptr<WorkTask> task = WorkTask::make(std::forward<Fn>(fn), std::forward<Args>(args)...);
+        std::shared_ptr<WorkTask> task =
+            WorkTask::make(std::forward<Fn>(fn), std::forward<Args>(args)...);
         push(task);
     }
 
     // Post the cancellable work fn(args...) to this RunLoop.
     template <class Fn, class... Args>
-    std::unique_ptr<AsyncRequest>
-    invokeCancellable(Fn&& fn, Args&&... args) {
-        std::shared_ptr<WorkTask> task = WorkTask::make(std::forward<Fn>(fn), std::forward<Args>(args)...);
+    std::unique_ptr<AsyncRequest> invokeCancellable(Fn&& fn, Args&&... args) {
+        std::shared_ptr<WorkTask> task =
+            WorkTask::make(std::forward<Fn>(fn), std::forward<Args>(args)...);
         push(task);
         return std::make_unique<WorkRequest>(task);
     }
 
     // Invoke fn(args...) on this RunLoop, then invoke callback(results...) on the current RunLoop.
     template <class Fn, class... Args>
-    std::unique_ptr<AsyncRequest>
-    invokeWithCallback(Fn&& fn, Args&&... args) {
-        std::shared_ptr<WorkTask> task = WorkTask::makeWithCallback(std::forward<Fn>(fn), std::forward<Args>(args)...);
+    std::unique_ptr<AsyncRequest> invokeWithCallback(Fn&& fn, Args&&... args) {
+        std::shared_ptr<WorkTask> task =
+            WorkTask::makeWithCallback(std::forward<Fn>(fn), std::forward<Args>(args)...);
         push(task);
         return std::make_unique<WorkRequest>(task);
     }

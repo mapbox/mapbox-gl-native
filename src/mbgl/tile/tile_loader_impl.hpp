@@ -16,13 +16,12 @@ TileLoader<T>::TileLoader(T& tile_,
                           const Tileset& tileset)
     : tile(tile_),
       necessity(Necessity::Optional),
-      resource(Resource::tile(
-        tileset.tiles.at(0),
-        parameters.pixelRatio,
-        id.canonical.x,
-        id.canonical.y,
-        id.canonical.z,
-        tileset.scheme)),
+      resource(Resource::tile(tileset.tiles.at(0),
+                              parameters.pixelRatio,
+                              id.canonical.x,
+                              id.canonical.y,
+                              id.canonical.z,
+                              tileset.scheme)),
       fileSource(parameters.fileSource) {
     assert(!request);
     if (fileSource.supportsOptionalRequests()) {
@@ -61,7 +60,7 @@ void TileLoader<T>::loadOptional() {
             // When the optional request could not be satisfied, don't treat it as an error.
             // Instead, we make sure that the next request knows that there has been an optional
             // request before by setting one of the prior* fields.
-            resource.priorExpires = Timestamp{ Seconds::zero() };
+            resource.priorExpires = Timestamp{Seconds::zero()};
         } else {
             loadedData(res);
         }

@@ -24,9 +24,9 @@ class SpriteImage;
 class SpritePosition;
 
 struct SpriteAtlasPosition {
-    std::array<float, 2> size = {{ 0, 0 }};
-    std::array<float, 2> tl = {{ 0, 0 }};
-    std::array<float, 2> br = {{ 0, 0 }};
+    std::array<float, 2> size = {{0, 0}};
+    std::array<float, 2> tl = {{0, 0}};
+    std::array<float, 2> br = {{0, 0}};
 };
 
 struct SpriteAtlasElement {
@@ -65,14 +65,26 @@ public:
     // the texture is only bound when the data is out of date (=dirty).
     void upload(gl::ObjectStore&, gl::Config&, uint32_t unit);
 
-    dimension getWidth() const { return width; }
-    dimension getHeight() const { return height; }
-    dimension getTextureWidth() const { return pixelWidth; }
-    dimension getTextureHeight() const { return pixelHeight; }
-    float getPixelRatio() const { return pixelRatio; }
+    dimension getWidth() const {
+        return width;
+    }
+    dimension getHeight() const {
+        return height;
+    }
+    dimension getTextureWidth() const {
+        return pixelWidth;
+    }
+    dimension getTextureHeight() const {
+        return pixelHeight;
+    }
+    float getPixelRatio() const {
+        return pixelRatio;
+    }
 
     // Only for use in tests.
-    const uint32_t* getData() const { return data.get(); }
+    const uint32_t* getData() const {
+        return data.get();
+    }
 
 private:
     const GLsizei width, height;

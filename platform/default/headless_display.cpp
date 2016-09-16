@@ -14,15 +14,14 @@ HeadlessDisplay::HeadlessDisplay() {
     // TODO: test if OpenGL 4.1 with GL_ARB_ES2_compatibility is supported
     // If it is, use kCGLOGLPVersion_3_2_Core and enable that extension.
     CGLPixelFormatAttribute attributes[] = {
-        kCGLPFAOpenGLProfile,
-        static_cast<CGLPixelFormatAttribute>(kCGLOGLPVersion_Legacy),
-        static_cast<CGLPixelFormatAttribute>(0)
-    };
+        kCGLPFAOpenGLProfile, static_cast<CGLPixelFormatAttribute>(kCGLOGLPVersion_Legacy),
+        static_cast<CGLPixelFormatAttribute>(0)};
 
     GLint num;
     CGLError error = CGLChoosePixelFormat(attributes, &pixelFormat, &num);
     if (error != kCGLNoError) {
-        throw std::runtime_error(std::string("Error choosing pixel format:") + CGLErrorString(error) + "\n");
+        throw std::runtime_error(std::string("Error choosing pixel format:") +
+                                 CGLErrorString(error) + "\n");
     }
     if (num <= 0) {
         throw std::runtime_error("No pixel formats found.");
@@ -39,11 +38,12 @@ HeadlessDisplay::HeadlessDisplay() {
         throw std::runtime_error("Failed to open X display.");
     }
 
-    const char *extensions = reinterpret_cast<const char *>(glXQueryServerString(xDisplay, DefaultScreen(xDisplay), GLX_EXTENSIONS));
+    const char* extensions = reinterpret_cast<const char*>(
+        glXQueryServerString(xDisplay, DefaultScreen(xDisplay), GLX_EXTENSIONS));
     if (!extensions) {
         throw std::runtime_error("Cannot read GLX extensions.");
     }
-    if (!strstr(extensions,"GLX_SGIX_fbconfig")) {
+    if (!strstr(extensions, "GLX_SGIX_fbconfig")) {
         throw std::runtime_error("Extension GLX_SGIX_fbconfig was not found.");
     }
     if (!strstr(extensions, "GLX_SGIX_pbuffer")) {
@@ -51,10 +51,7 @@ HeadlessDisplay::HeadlessDisplay() {
     }
 
     // We're creating a dummy pbuffer anyway that we're not using.
-    static int pixelFormat[] = {
-        GLX_DRAWABLE_TYPE, GLX_PBUFFER_BIT,
-        None
-    };
+    static int pixelFormat[] = {GLX_DRAWABLE_TYPE, GLX_PBUFFER_BIT, None};
 
     int configs = 0;
     fbConfigs = glXChooseFBConfig(xDisplay, DefaultScreen(xDisplay), pixelFormat, &configs);

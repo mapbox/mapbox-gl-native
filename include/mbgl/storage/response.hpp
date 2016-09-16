@@ -53,7 +53,7 @@ public:
     // An error message from the request handler, e.g. a server message or a system message
     // informing the user about the reason for the failure.
     std::string message;
-    
+
     optional<Timestamp> retryAfter;
 
 public:

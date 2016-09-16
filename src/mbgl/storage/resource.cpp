@@ -35,51 +35,40 @@ static std::string getTileBBox(int32_t x, int32_t y, int8_t z) {
     auto min = getMercCoord(x * 256, y * 256, z);
     auto max = getMercCoord((x + 1) * 256, (y + 1) * 256, z);
 
-    return (util::toString(min.x) + "," + util::toString(min.y) + "," +
-            util::toString(max.x) + "," + util::toString(max.y));
+    return (util::toString(min.x) + "," + util::toString(min.y) + "," + util::toString(max.x) +
+            "," + util::toString(max.y));
 }
 
 Resource Resource::style(const std::string& url) {
-    return Resource {
-        Resource::Kind::Style,
-        url
-    };
+    return Resource{ Resource::Kind::Style, url };
 }
 
 Resource Resource::source(const std::string& url) {
-    return Resource {
-        Resource::Kind::Source,
-        url
-    };
+    return Resource{ Resource::Kind::Source, url };
 }
 
 Resource Resource::spriteImage(const std::string& base, float pixelRatio) {
-    return Resource {
-        Resource::Kind::SpriteImage,
-        base + (pixelRatio > 1 ? "@2x" : "") + ".png"
-    };
+    return Resource{ Resource::Kind::SpriteImage, base + (pixelRatio > 1 ? "@2x" : "") + ".png" };
 }
 
 Resource Resource::spriteJSON(const std::string& base, float pixelRatio) {
-    return Resource {
-        Resource::Kind::SpriteJSON,
-        base + (pixelRatio > 1 ? "@2x" : "") + ".json"
-    };
+    return Resource{ Resource::Kind::SpriteJSON, base + (pixelRatio > 1 ? "@2x" : "") + ".json" };
 }
 
-Resource Resource::glyphs(const std::string& urlTemplate, const FontStack& fontStack, const std::pair<uint16_t, uint16_t>& glyphRange) {
-    return Resource {
-        Resource::Kind::Glyphs,
-        util::replaceTokens(urlTemplate, [&](const std::string& token) {
-            if (token == "fontstack") {
-                return util::percentEncode(fontStackToString(fontStack));
-            } else if (token == "range") {
-                return util::toString(glyphRange.first) + "-" + util::toString(glyphRange.second);
-            } else {
-                return std::string();
-            }
-        })
-    };
+Resource Resource::glyphs(const std::string& urlTemplate,
+                          const FontStack& fontStack,
+                          const std::pair<uint16_t, uint16_t>& glyphRange) {
+    return Resource{ Resource::Kind::Glyphs,
+                     util::replaceTokens(urlTemplate, [&](const std::string& token) {
+                         if (token == "fontstack") {
+                             return util::percentEncode(fontStackToString(fontStack));
+                         } else if (token == "range") {
+                             return util::toString(glyphRange.first) + "-" +
+                                    util::toString(glyphRange.second);
+                         } else {
+                             return std::string();
+                         }
+                     }) };
 }
 
 Resource Resource::tile(const std::string& urlTemplate,
@@ -93,39 +82,33 @@ Resource Resource::tile(const std::string& urlTemplate,
     if (scheme == Tileset::Scheme::TMS) {
         y = (1 << z) - y - 1;
     }
-    return Resource {
-        Resource::Kind::Tile,
-        util::replaceTokens(urlTemplate, [&](const std::string& token) {
-            if (token == "z") {
-                return util::toString(z);
-            } else if (token == "x") {
-                return util::toString(x);
-            } else if (token == "y") {
-                return util::toString(y);
-            } else if (token == "quadkey") {
-                return getQuadKey(x, y, z);
-            } else if (token == "bbox-epsg-3857") {
-                return getTileBBox(x, y, z);
-            } else if (token == "prefix") {
-                std::string prefix{ 2 };
-                prefix[0] = "0123456789abcdef"[x % 16];
-                prefix[1] = "0123456789abcdef"[y % 16];
-                return prefix;
-            } else if (token == "ratio") {
-                return std::string(pixelRatio > 1.0 ? "@2x" : "");
-            } else {
-                return std::string();
-            }
-        }),
-        Resource::TileData {
-            urlTemplate,
-            uint8_t(supportsRatio && pixelRatio > 1.0 ? 2 : 1),
-            x,
-            y,
-            z
-        },
-        necessity
-    };
+    return Resource{ Resource::Kind::Tile,
+                     util::replaceTokens(urlTemplate,
+                                         [&](const std::string& token) {
+                                             if (token == "z") {
+                                                 return util::toString(z);
+                                             } else if (token == "x") {
+                                                 return util::toString(x);
+                                             } else if (token == "y") {
+                                                 return util::toString(y);
+                                             } else if (token == "quadkey") {
+                                                 return getQuadKey(x, y, z);
+                                             } else if (token == "bbox-epsg-3857") {
+                                                 return getTileBBox(x, y, z);
+                                             } else if (token == "prefix") {
+                                                 std::string prefix{ 2 };
+                                                 prefix[0] = "0123456789abcdef"[x % 16];
+                                                 prefix[1] = "0123456789abcdef"[y % 16];
+                                                 return prefix;
+                                             } else if (token == "ratio") {
+                                                 return std::string(pixelRatio > 1.0 ? "@2x" : "");
+                                             } else {
+                                                 return std::string();
+                                             }
+                                         }),
+                     Resource::TileData{
+                         urlTemplate, uint8_t(supportsRatio && pixelRatio > 1.0 ? 2 : 1), x, y, z },
+                     necessity };
 }
 
 } // namespace mbgl

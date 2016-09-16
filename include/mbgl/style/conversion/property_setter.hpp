@@ -13,17 +13,18 @@ namespace style {
 namespace conversion {
 
 template <class V>
-using LayoutPropertySetter = std::function<optional<Error> (Layer&, const V&)>;
+using LayoutPropertySetter = std::function<optional<Error>(Layer&, const V&)>;
 
 template <class V>
-using PaintPropertySetter = std::function<optional<Error> (Layer&, const V&, const optional<std::string>&)>;
+using PaintPropertySetter =
+    std::function<optional<Error>(Layer&, const V&, const optional<std::string>&)>;
 
-template <class V, class L, class T, class...Args>
-auto makePropertySetter(void (L::*setter)(PropertyValue<T>, const Args&...args)) {
-    return [setter] (Layer& layer, const V& value, const Args&...args) -> optional<Error> {
+template <class V, class L, class T, class... Args>
+auto makePropertySetter(void (L::*setter)(PropertyValue<T>, const Args&... args)) {
+    return [setter](Layer& layer, const V& value, const Args&... args) -> optional<Error> {
         L* typedLayer = layer.as<L>();
         if (!typedLayer) {
-            return Error { "layer doesn't support this property" };
+            return Error{ "layer doesn't support this property" };
         }
 
         Result<PropertyValue<T>> typedValue = convert<PropertyValue<T>>(value);

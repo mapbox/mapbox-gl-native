@@ -37,8 +37,7 @@ public:
 
     std::vector<OfflineRegion> listRegions();
 
-    OfflineRegion createRegion(const OfflineRegionDefinition&,
-                               const OfflineRegionMetadata&);
+    OfflineRegion createRegion(const OfflineRegionDefinition&, const OfflineRegionMetadata&);
 
     void deleteRegion(OfflineRegion&&);
 
@@ -64,26 +63,27 @@ private:
 
     class Statement {
     public:
-        explicit Statement(mapbox::sqlite::Statement& stmt_) : stmt(stmt_) {}
+        explicit Statement(mapbox::sqlite::Statement& stmt_) : stmt(stmt_) {
+        }
         Statement(Statement&&) = default;
         Statement(const Statement&) = delete;
         ~Statement();
 
-        mapbox::sqlite::Statement* operator->() { return &stmt; };
+        mapbox::sqlite::Statement* operator->() {
+            return &stmt;
+        };
 
     private:
         mapbox::sqlite::Statement& stmt;
     };
 
-    Statement getStatement(const char *);
+    Statement getStatement(const char*);
 
     optional<std::pair<Response, uint64_t>> getTile(const Resource::TileData&);
-    bool putTile(const Resource::TileData&, const Response&,
-                 const std::string&, bool compressed);
+    bool putTile(const Resource::TileData&, const Response&, const std::string&, bool compressed);
 
     optional<std::pair<Response, uint64_t>> getResource(const Resource&);
-    bool putResource(const Resource&, const Response&,
-                     const std::string&, bool compressed);
+    bool putResource(const Resource&, const Response&, const std::string&, bool compressed);
 
     optional<std::pair<Response, uint64_t>> getInternal(const Resource&);
     std::pair<bool, uint64_t> putInternal(const Resource&, const Response&, bool evict);
@@ -96,10 +96,10 @@ private:
 
     const std::string path;
     std::unique_ptr<::mapbox::sqlite::Database> db;
-    std::unordered_map<const char *, std::unique_ptr<::mapbox::sqlite::Statement>> statements;
+    std::unordered_map<const char*, std::unique_ptr<::mapbox::sqlite::Statement>> statements;
 
     template <class T>
-    T getPragma(const char *);
+    T getPragma(const char*);
 
     uint64_t maximumCacheSize;
 

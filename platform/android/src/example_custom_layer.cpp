@@ -3,8 +3,9 @@
 
 #include <mbgl/style/layers/custom_layer.hpp>
 
-static const GLchar * vertexShaderSource = "attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0, 1); }";
-static const GLchar * fragmentShaderSource = "void main() { gl_FragColor = vec4(0, 1, 0, 1); }";
+static const GLchar* vertexShaderSource =
+    "attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0, 1); }";
+static const GLchar* fragmentShaderSource = "void main() { gl_FragColor = vec4(0, 1, 0, 1); }";
 
 class ExampleCustomLayer {
 public:
@@ -33,7 +34,7 @@ public:
         glLinkProgram(program);
         a_pos = glGetAttribLocation(program, "a_pos");
 
-        GLfloat background[] = { -1,-1, 1,-1, -1,1, 1,1 };
+        GLfloat background[] = {-1, -1, 1, -1, -1, 1, 1, 1};
         glGenBuffers(1, &buffer);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
         glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), background, GL_STATIC_DRAW);
@@ -60,27 +61,27 @@ jlong JNICALL nativeCreateContext(JNIEnv*, jobject) {
     return reinterpret_cast<jlong>(new ExampleCustomLayer());
 }
 
-void nativeInitialize(void *context) {
+void nativeInitialize(void* context) {
     reinterpret_cast<ExampleCustomLayer*>(context)->initialize();
 }
 
-void nativeRender(void *context, const mbgl::style::CustomLayerRenderParameters& /*parameters*/) {
+void nativeRender(void* context, const mbgl::style::CustomLayerRenderParameters& /*parameters*/) {
     reinterpret_cast<ExampleCustomLayer*>(context)->render();
 }
 
-void nativeDenitialize(void *context) {
+void nativeDenitialize(void* context) {
     delete reinterpret_cast<ExampleCustomLayer*>(context);
 }
 
-extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *) {
-    JNIEnv *env = nullptr;
-    vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
+extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
+    JNIEnv* env = nullptr;
+    vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6);
 
-    jclass customLayerClass = env->FindClass("com/mapbox/mapboxsdk/testapp/model/customlayer/ExampleCustomLayer");
+    jclass customLayerClass =
+        env->FindClass("com/mapbox/mapboxsdk/testapp/model/customlayer/ExampleCustomLayer");
 
     JNINativeMethod methods[] = {
-        {"createContext", "()J", reinterpret_cast<void *>(&nativeCreateContext)}
-    };
+        {"createContext", "()J", reinterpret_cast<void*>(&nativeCreateContext)}};
 
     if (env->RegisterNatives(customLayerClass, methods, 1) < 0) {
         env->ExceptionDescribe();
@@ -88,19 +89,19 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *) {
     }
 
     env->SetStaticLongField(customLayerClass,
-        env->GetStaticFieldID(customLayerClass, "InitializeFunction", "J"),
-        reinterpret_cast<jlong>(nativeInitialize));
+                            env->GetStaticFieldID(customLayerClass, "InitializeFunction", "J"),
+                            reinterpret_cast<jlong>(nativeInitialize));
 
     env->SetStaticLongField(customLayerClass,
-        env->GetStaticFieldID(customLayerClass, "RenderFunction", "J"),
-        reinterpret_cast<jlong>(nativeRender));
+                            env->GetStaticFieldID(customLayerClass, "RenderFunction", "J"),
+                            reinterpret_cast<jlong>(nativeRender));
 
     env->SetStaticLongField(customLayerClass,
-        env->GetStaticFieldID(customLayerClass, "DeinitializeFunction", "J"),
-        reinterpret_cast<jlong>(nativeDenitialize));
+                            env->GetStaticFieldID(customLayerClass, "DeinitializeFunction", "J"),
+                            reinterpret_cast<jlong>(nativeDenitialize));
 
     return JNI_VERSION_1_6;
 }
 
-extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *, void *) {
+extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM*, void*) {
 }

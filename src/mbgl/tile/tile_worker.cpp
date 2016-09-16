@@ -62,7 +62,8 @@ TileParseResult TileWorker::redoLayout(std::vector<std::unique_ptr<Layer>> layer
             break;
         }
 
-        // Temporary prevention for crashing due to https://github.com/mapbox/mapbox-gl-native/issues/6263.
+        // Temporary prevention for crashing due to
+        // https://github.com/mapbox/mapbox-gl-native/issues/6263.
         // Instead, the race condition will produce a blank tile.
         if (!tileData) {
             break;
@@ -84,15 +85,8 @@ TileParseResult TileWorker::redoLayout(std::vector<std::unique_ptr<Layer>> layer
             continue;
         }
 
-        BucketParameters parameters(id,
-                                    *geometryLayer,
-                                    obsolete,
-                                    reinterpret_cast<uintptr_t>(this),
-                                    spriteStore,
-                                    glyphAtlas,
-                                    glyphStore,
-                                    *featureIndex,
-                                    mode);
+        BucketParameters parameters(id, *geometryLayer, obsolete, reinterpret_cast<uintptr_t>(this),
+                                    spriteStore, glyphAtlas, glyphStore, *featureIndex, mode);
 
         if (layer->is<SymbolLayer>()) {
             symbolLayouts.push_back(layer->as<SymbolLayer>()->impl->createLayout(parameters));
@@ -111,8 +105,9 @@ TileParseResult TileWorker::parsePendingLayers(const PlacementConfig& config) {
     return parsePendingLayers(config, std::unordered_map<std::string, std::unique_ptr<Bucket>>());
 }
 
-TileParseResult TileWorker::parsePendingLayers(const PlacementConfig& config,
-                                               std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets) {
+TileParseResult
+TileWorker::parsePendingLayers(const PlacementConfig& config,
+                               std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets) {
     TileParseResultData result;
 
     result.complete = true;
@@ -123,9 +118,7 @@ TileParseResult TileWorker::parsePendingLayers(const PlacementConfig& config,
         if (symbolLayout->state == SymbolLayout::Pending) {
             if (symbolLayout->canPrepare(glyphStore, spriteStore)) {
                 symbolLayout->state = SymbolLayout::Prepared;
-                symbolLayout->prepare(reinterpret_cast<uintptr_t>(this),
-                                      glyphAtlas,
-                                      glyphStore);
+                symbolLayout->prepare(reinterpret_cast<uintptr_t>(this), glyphAtlas, glyphStore);
             } else {
                 result.complete = false;
             }

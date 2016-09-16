@@ -8,8 +8,10 @@ class SpriteStoreObserver {
 public:
     virtual ~SpriteStoreObserver() = default;
 
-    virtual void onSpriteLoaded() {}
-    virtual void onSpriteError(std::exception_ptr) {}
+    virtual void onSpriteLoaded() {
+    }
+    virtual void onSpriteError(std::exception_ptr) {
+    }
 };
 
 } // namespace mbgl

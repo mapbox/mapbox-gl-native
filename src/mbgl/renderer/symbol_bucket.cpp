@@ -61,9 +61,9 @@ bool SymbolBucket::needsClipping() const {
 }
 
 void SymbolBucket::drawGlyphs(SDFShader& shader, gl::ObjectStore& store, PaintMode paintMode) {
-    GLbyte *vertex_index = BUFFER_OFFSET_0;
-    GLbyte *elements_index = BUFFER_OFFSET_0;
-    for (auto &group : text.groups) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    for (auto& group : text.groups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
             shader, text.vertices, text.triangles, vertex_index, store);
@@ -75,9 +75,9 @@ void SymbolBucket::drawGlyphs(SDFShader& shader, gl::ObjectStore& store, PaintMo
 }
 
 void SymbolBucket::drawIcons(SDFShader& shader, gl::ObjectStore& store, PaintMode paintMode) {
-    GLbyte *vertex_index = BUFFER_OFFSET_0;
-    GLbyte *elements_index = BUFFER_OFFSET_0;
-    for (auto &group : icon.groups) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    for (auto& group : icon.groups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
             shader, icon.vertices, icon.triangles, vertex_index, store);
@@ -89,9 +89,9 @@ void SymbolBucket::drawIcons(SDFShader& shader, gl::ObjectStore& store, PaintMod
 }
 
 void SymbolBucket::drawIcons(IconShader& shader, gl::ObjectStore& store, PaintMode paintMode) {
-    GLbyte *vertex_index = BUFFER_OFFSET_0;
-    GLbyte *elements_index = BUFFER_OFFSET_0;
-    for (auto &group : icon.groups) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    for (auto& group : icon.groups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
             shader, icon.vertices, icon.triangles, vertex_index, store);
@@ -103,8 +103,8 @@ void SymbolBucket::drawIcons(IconShader& shader, gl::ObjectStore& store, PaintMo
 }
 
 void SymbolBucket::drawCollisionBoxes(CollisionBoxShader& shader, gl::ObjectStore& store) {
-    GLbyte *vertex_index = BUFFER_OFFSET_0;
-    for (auto &group : collisionBox.groups) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    for (auto& group : collisionBox.groups) {
         group->array[0].bind(shader, collisionBox.vertices, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, group->vertex_length));
     }

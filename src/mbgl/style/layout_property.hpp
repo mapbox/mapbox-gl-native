@@ -12,9 +12,8 @@ namespace style {
 template <typename T>
 class LayoutProperty {
 public:
-    explicit LayoutProperty(T v)
-        : value(std::move(v)),
-          defaultValue(value) {}
+    explicit LayoutProperty(T v) : value(std::move(v)), defaultValue(value) {
+    }
 
     const PropertyValue<T>& get() const {
         return currentValue;
@@ -32,7 +31,9 @@ public:
     }
 
     // TODO: remove / privatize
-    operator T() const { return value; }
+    operator T() const {
+        return value;
+    }
     T value;
 
 private:

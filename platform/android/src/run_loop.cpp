@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 #define PIPE_OUT 0
-#define PIPE_IN  1
+#define PIPE_IN 1
 
 namespace {
 
@@ -27,7 +27,8 @@ static ThreadLocal<RunLoop>& current = *new ThreadLocal<RunLoop>;
 
 int looperCallbackNew(int fd, int, void* data) {
     int buffer[1];
-    while (read(fd, buffer, sizeof(buffer)) > 0) {}
+    while (read(fd, buffer, sizeof(buffer)) > 0) {
+    }
 
     auto loop = reinterpret_cast<ALooper*>(data);
     ALooper_wake(loop);
@@ -37,7 +38,8 @@ int looperCallbackNew(int fd, int, void* data) {
 
 int looperCallbackDefault(int fd, int, void* data) {
     int buffer[1];
-    while (read(fd, buffer, sizeof(buffer)) > 0) {}
+    while (read(fd, buffer, sizeof(buffer)) > 0) {
+    }
 
     auto runLoopImpl = reinterpret_cast<RunLoop::Impl*>(data);
     auto runLoop = runLoopImpl->runLoop;
@@ -63,7 +65,8 @@ namespace util {
 // with an external file descriptor event coming from this thread.
 class Alarm {
 public:
-    Alarm(RunLoop::Impl* loop_) : loop(loop_) {}
+    Alarm(RunLoop::Impl* loop_) : loop(loop_) {
+    }
 
     void set(const Milliseconds& timeout) {
         alarm.start(timeout, mbgl::Duration::zero(), [this]() { loop->wake(); });
@@ -95,12 +98,12 @@ RunLoop::Impl::Impl(RunLoop* runLoop_, RunLoop::Type type) : runLoop(runLoop_) {
 
     switch (type) {
     case Type::New:
-        ret = ALooper_addFd(loop, fds[PIPE_OUT], ALOOPER_POLL_CALLBACK,
-            ALOOPER_EVENT_INPUT, looperCallbackNew, loop);
+        ret = ALooper_addFd(loop, fds[PIPE_OUT], ALOOPER_POLL_CALLBACK, ALOOPER_EVENT_INPUT,
+                            looperCallbackNew, loop);
         break;
     case Type::Default:
-        ret = ALooper_addFd(loop, fds[PIPE_OUT], ALOOPER_POLL_CALLBACK,
-            ALOOPER_EVENT_INPUT, looperCallbackDefault, this);
+        ret = ALooper_addFd(loop, fds[PIPE_OUT], ALOOPER_POLL_CALLBACK, ALOOPER_EVENT_INPUT,
+                            looperCallbackDefault, this);
         alarm = std::make_unique<Thread<Alarm>>(ThreadContext{"Alarm"}, this);
         running = true;
         break;
@@ -222,7 +225,7 @@ void RunLoop::run() {
     impl->running = true;
 
     int outFd, outEvents;
-    char *outData = nullptr;
+    char* outData = nullptr;
 
     while (impl->running) {
         process();

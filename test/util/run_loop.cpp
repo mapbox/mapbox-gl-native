@@ -9,9 +9,7 @@ TEST(RunLoop, Stop) {
     RunLoop loop(RunLoop::Type::New);
 
     Timer timer;
-    timer.start(mbgl::Duration::zero(), mbgl::Duration::zero(), [&] {
-        loop.stop();
-    });
+    timer.start(mbgl::Duration::zero(), mbgl::Duration::zero(), [&] { loop.stop(); });
 
     loop.run();
 }
@@ -34,9 +32,7 @@ TEST(RunLoop, MultipleRun) {
     RunLoop loop(RunLoop::Type::New);
 
     Timer timer;
-    timer.start(mbgl::Duration::zero(), mbgl::Duration::zero(), [&] {
-        loop.stop();
-    });
+    timer.start(mbgl::Duration::zero(), mbgl::Duration::zero(), [&] { loop.stop(); });
 
     loop.run();
 

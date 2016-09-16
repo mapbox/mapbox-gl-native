@@ -60,10 +60,11 @@ public:
         MBGL_CHECK_ERROR(glLinkProgram(program));
         a_pos = glGetAttribLocation(program, "a_pos");
 
-        GLfloat triangle[] = { 0, 0.5, 0.5, -0.5, -0.5, -0.5 };
+        GLfloat triangle[] = {0, 0.5, 0.5, -0.5, -0.5, -0.5};
         MBGL_CHECK_ERROR(glGenBuffers(1, &buffer));
         MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, buffer));
-        MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(GLfloat), triangle, GL_STATIC_DRAW));
+        MBGL_CHECK_ERROR(
+            glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(GLfloat), triangle, GL_STATIC_DRAW));
     }
 
     void render() {
@@ -96,22 +97,17 @@ TEST(CustomLayer, Basic) {
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));
-    map.setLatLngZoom({ 37.8, -122.5 }, 10);
+    map.setLatLngZoom({37.8, -122.5}, 10);
     map.addLayer(std::make_unique<CustomLayer>(
-        "custom",
-        [] (void* context) {
-            reinterpret_cast<TestLayer*>(context)->initialize();
-        },
-        [] (void* context, const CustomLayerRenderParameters&) {
+        "custom", [](void* context) { reinterpret_cast<TestLayer*>(context)->initialize(); },
+        [](void* context, const CustomLayerRenderParameters&) {
             reinterpret_cast<TestLayer*>(context)->render();
         },
-        [] (void* context) {
-            delete reinterpret_cast<TestLayer*>(context);
-        }, new TestLayer()));
+        [](void* context) { delete reinterpret_cast<TestLayer*>(context); }, new TestLayer()));
 
     auto layer = std::make_unique<FillLayer>("landcover", "mapbox");
     layer->setSourceLayer("landcover");
-    layer->setFillColor(Color{ 1.0, 1.0, 0.0, 1.0 });
+    layer->setFillColor(Color{1.0, 1.0, 0.0, 1.0});
     map.addLayer(std::move(layer));
 
     test::checkImage("test/fixtures/custom_layer/basic", test::render(map), 0.0006, 0.1);

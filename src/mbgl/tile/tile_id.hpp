@@ -93,7 +93,8 @@ namespace util {
 std::string toString(const UnwrappedTileID&);
 } // namespace util
 
-inline CanonicalTileID::CanonicalTileID(uint8_t z_, uint32_t x_, uint32_t y_) : z(z_), x(x_), y(y_) {
+inline CanonicalTileID::CanonicalTileID(uint8_t z_, uint32_t x_, uint32_t y_)
+    : z(z_), x(x_), y(y_) {
     assert(z <= 32);
     assert(x < (1ull << z));
     assert(y < (1ull << z));
@@ -124,9 +125,9 @@ inline bool CanonicalTileID::isChildOf(const CanonicalTileID& parent) const {
 
 inline CanonicalTileID CanonicalTileID::scaledTo(uint8_t targetZ) const {
     if (targetZ <= z) {
-        return { targetZ, x >> (z - targetZ), y >> (z - targetZ) }; // parent or same
+        return {targetZ, x >> (z - targetZ), y >> (z - targetZ)}; // parent or same
     } else {
-        return { targetZ, x << (targetZ - z), y << (targetZ - z) }; // child
+        return {targetZ, x << (targetZ - z), y << (targetZ - z)}; // child
     }
 }
 
@@ -134,12 +135,12 @@ inline std::array<CanonicalTileID, 4> CanonicalTileID::children() const {
     const uint8_t childZ = z + 1;
     const uint32_t childX = x * 2;
     const uint32_t childY = y * 2;
-    return { {
-        { childZ, childX, childY },
-        { childZ, childX, childY + 1 },
-        { childZ, childX + 1, childY },
-        { childZ, childX + 1, childY + 1 },
-    } };
+    return {{
+        {childZ, childX, childY},
+        {childZ, childX, childY + 1},
+        {childZ, childX + 1, childY},
+        {childZ, childX + 1, childY + 1},
+    }};
 }
 
 inline OverscaledTileID::OverscaledTileID(uint8_t overscaledZ_, CanonicalTileID canonical_)
@@ -192,14 +193,14 @@ inline bool OverscaledTileID::isChildOf(const OverscaledTileID& rhs) const {
 
 inline OverscaledTileID OverscaledTileID::scaledTo(uint8_t z) const {
     if (z >= canonical.z) {
-        return { z, canonical };
+        return {z, canonical};
     } else {
-        return { z, canonical.scaledTo(z) };
+        return {z, canonical.scaledTo(z)};
     }
 }
 
 inline UnwrappedTileID OverscaledTileID::unwrapTo(int16_t wrap) const {
-    return { wrap, canonical };
+    return {wrap, canonical};
 }
 
 inline UnwrappedTileID::UnwrappedTileID(uint8_t z_, int64_t x_, int64_t y_)
@@ -237,17 +238,17 @@ inline std::array<UnwrappedTileID, 4> UnwrappedTileID::children() const {
     const uint8_t childZ = canonical.z + 1;
     const uint32_t childX = canonical.x * 2;
     const uint32_t childY = canonical.y * 2;
-    return { {
-        { wrap, { childZ, childX, childY } },
-        { wrap, { childZ, childX, childY + 1 } },
-        { wrap, { childZ, childX + 1, childY } },
-        { wrap, { childZ, childX + 1, childY + 1 } },
-    } };
+    return {{
+        {wrap, {childZ, childX, childY}},
+        {wrap, {childZ, childX, childY + 1}},
+        {wrap, {childZ, childX + 1, childY}},
+        {wrap, {childZ, childX + 1, childY + 1}},
+    }};
 }
 
 inline OverscaledTileID UnwrappedTileID::overscaleTo(const uint8_t overscaledZ) const {
     assert(overscaledZ >= canonical.z);
-    return { overscaledZ, canonical };
+    return {overscaledZ, canonical};
 }
 
 inline float UnwrappedTileID::pixelsToTileUnits(const float pixelValue, const float zoom) const {
@@ -258,8 +259,9 @@ inline float UnwrappedTileID::pixelsToTileUnits(const float pixelValue, const fl
 
 namespace std {
 
-template <> struct hash<mbgl::CanonicalTileID> {
-    size_t operator()(const mbgl::CanonicalTileID &id) const {
+template <>
+struct hash<mbgl::CanonicalTileID> {
+    size_t operator()(const mbgl::CanonicalTileID& id) const {
         std::size_t seed = 0;
         boost::hash_combine(seed, id.x);
         boost::hash_combine(seed, id.y);
@@ -267,18 +269,20 @@ template <> struct hash<mbgl::CanonicalTileID> {
         return seed;
     }
 };
-    
-template <> struct hash<mbgl::UnwrappedTileID> {
-    size_t operator()(const mbgl::UnwrappedTileID &id) const {
+
+template <>
+struct hash<mbgl::UnwrappedTileID> {
+    size_t operator()(const mbgl::UnwrappedTileID& id) const {
         std::size_t seed = 0;
         boost::hash_combine(seed, std::hash<mbgl::CanonicalTileID>{}(id.canonical));
         boost::hash_combine(seed, id.wrap);
         return seed;
     }
 };
-    
-template <> struct hash<mbgl::OverscaledTileID> {
-    size_t operator()(const mbgl::OverscaledTileID &id) const {
+
+template <>
+struct hash<mbgl::OverscaledTileID> {
+    size_t operator()(const mbgl::OverscaledTileID& id) const {
         std::size_t seed = 0;
         boost::hash_combine(seed, std::hash<mbgl::CanonicalTileID>{}(id.canonical));
         boost::hash_combine(seed, id.overscaledZ);
@@ -287,4 +291,3 @@ template <> struct hash<mbgl::OverscaledTileID> {
 };
 
 } // namespace std
-

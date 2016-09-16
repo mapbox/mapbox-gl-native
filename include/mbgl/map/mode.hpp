@@ -10,7 +10,7 @@ using EnumType = uint32_t;
 
 enum class MapMode : EnumType {
     Continuous, // continually updating map
-    Still, // a once-off still image
+    Still,      // a once-off still image
 };
 
 // We can avoid redundant GL calls when it is known that the GL context is not
@@ -38,12 +38,12 @@ enum class ViewportMode : EnumType {
 };
 
 enum class MapDebugOptions : EnumType {
-    NoDebug     = 0,
+    NoDebug = 0,
     TileBorders = 1 << 1,
     ParseStatus = 1 << 2,
-    Timestamps  = 1 << 3,
-    Collision   = 1 << 4,
-    Overdraw    = 1 << 5,
+    Timestamps = 1 << 3,
+    Collision = 1 << 4,
+    Overdraw = 1 << 5,
 // FIXME: https://github.com/mapbox/mapbox-gl-native/issues/5117
 #ifndef GL_ES_VERSION_2_0
     StencilClip = 1 << 6,

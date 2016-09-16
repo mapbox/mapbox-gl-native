@@ -28,14 +28,12 @@ LatLng::LatLng(const UnwrappedTileID& id)
 }
 
 LatLngBounds::LatLngBounds(const CanonicalTileID& id)
-    : sw({ lat(id.z, id.y + 1), lon(id.z, id.x) }),
-      ne({ lat(id.z, id.y), lon(id.z, id.x + 1) }) {
+    : sw({ lat(id.z, id.y + 1), lon(id.z, id.x) }), ne({ lat(id.z, id.y), lon(id.z, id.x + 1) }) {
 }
 
 ScreenCoordinate EdgeInsets::getCenter(uint16_t width, uint16_t height) const {
     return {
-        (width - left - right) / 2.0f + left,
-        (height - top - bottom) / 2.0f + top,
+        (width - left - right) / 2.0f + left, (height - top - bottom) / 2.0f + top,
     };
 }
 

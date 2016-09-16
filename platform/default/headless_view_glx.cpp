@@ -34,11 +34,7 @@ void HeadlessView::createContext() {
 
     // Create a dummy pbuffer. We will render to framebuffers anyway, but we need a pbuffer to
     // activate the context.
-    int pbufferAttributes[] = {
-        GLX_PBUFFER_WIDTH, 8,
-        GLX_PBUFFER_HEIGHT, 8,
-        None
-    };
+    int pbufferAttributes[] = {GLX_PBUFFER_WIDTH, 8, GLX_PBUFFER_HEIGHT, 8, None};
     glxPbuffer = glXCreatePbuffer(xDisplay, fbConfigs[0], pbufferAttributes);
 }
 
@@ -69,22 +65,40 @@ void HeadlessView::resizeFramebuffer() {
     MBGL_CHECK_ERROR(glGenFramebuffersEXT(1, &fbo));
     MBGL_CHECK_ERROR(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo));
 
-    MBGL_CHECK_ERROR(glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, fboColor));
-    MBGL_CHECK_ERROR(glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER_EXT, fboDepthStencil));
+    MBGL_CHECK_ERROR(glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+                                                  GL_RENDERBUFFER_EXT, fboColor));
+    MBGL_CHECK_ERROR(glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_STENCIL_ATTACHMENT,
+                                                  GL_RENDERBUFFER_EXT, fboDepthStencil));
 
     GLenum status = MBGL_CHECK_ERROR(glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT));
 
     if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
         std::string error("Couldn't create framebuffer: ");
         switch (status) {
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT: (error += "incomplete attachment"); break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT: error += "incomplete missing attachment"; break;
-            case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT: error += "incomplete dimensions"; break;
-            case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT: error += "incomplete formats"; break;
-            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT: error += "incomplete draw buffer"; break;
-            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT: error += "incomplete read buffer"; break;
-            case GL_FRAMEBUFFER_UNSUPPORTED: error += "unsupported"; break;
-            default: error += "other"; break;
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
+            (error += "incomplete attachment");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
+            error += "incomplete missing attachment";
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+            error += "incomplete dimensions";
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+            error += "incomplete formats";
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
+            error += "incomplete draw buffer";
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
+            error += "incomplete read buffer";
+            break;
+        case GL_FRAMEBUFFER_UNSUPPORTED:
+            error += "unsupported";
+            break;
+        default:
+            error += "other";
+            break;
         }
         throw std::runtime_error(error);
     }

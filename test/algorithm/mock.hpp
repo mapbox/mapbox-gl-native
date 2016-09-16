@@ -12,7 +12,7 @@
 struct MockTileData;
 
 struct MockSource {
-    mbgl::Range<uint8_t> zoomRange { 0, 16 };
+    mbgl::Range<uint8_t> zoomRange{0, 16};
     std::map<mbgl::OverscaledTileID, std::unique_ptr<MockTileData>> dataTiles;
     std::set<mbgl::UnwrappedTileID> idealTiles;
 
@@ -22,9 +22,9 @@ struct MockSource {
 
 struct MockBucket {};
 
-
 struct MockTileData {
-    MockTileData(const mbgl::OverscaledTileID& tileID_) : tileID(tileID_) {}
+    MockTileData(const mbgl::OverscaledTileID& tileID_) : tileID(tileID_) {
+    }
 
     bool hasTriedOptional() const {
         return triedOptional;

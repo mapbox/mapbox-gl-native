@@ -26,11 +26,11 @@ Layer* initializeLayerPeer(mbgl::Map& map, mbgl::style::Layer& coreLayer) {
     } else if (coreLayer.is<mbgl::style::CircleLayer>()) {
         layer = new CircleLayer(map, *coreLayer.as<mbgl::style::CircleLayer>());
     } else if (coreLayer.is<mbgl::style::FillLayer>()) {
-            layer = new FillLayer(map, *coreLayer.as<mbgl::style::FillLayer>());
+        layer = new FillLayer(map, *coreLayer.as<mbgl::style::FillLayer>());
     } else if (coreLayer.is<mbgl::style::LineLayer>()) {
-            layer = new LineLayer(map, *coreLayer.as<mbgl::style::LineLayer>());
+        layer = new LineLayer(map, *coreLayer.as<mbgl::style::LineLayer>());
     } else if (coreLayer.is<mbgl::style::RasterLayer>()) {
-            layer = new RasterLayer(map, *coreLayer.as<mbgl::style::RasterLayer>());
+        layer = new RasterLayer(map, *coreLayer.as<mbgl::style::RasterLayer>());
     } else if (coreLayer.is<mbgl::style::SymbolLayer>()) {
         layer = new SymbolLayer(map, *coreLayer.as<mbgl::style::SymbolLayer>());
     } else if (coreLayer.is<mbgl::style::CustomLayer>()) {
@@ -60,5 +60,5 @@ void registerNativeLayers(jni::JNIEnv& env) {
     CustomLayer::registerNative(env);
 }
 
-} //android
-} //mbgl
+} // android
+} // mbgl

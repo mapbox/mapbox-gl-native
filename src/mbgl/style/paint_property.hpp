@@ -21,15 +21,12 @@ class PaintProperty {
 public:
     using Result = typename Evaluator<T>::ResultType;
 
-    explicit PaintProperty(T defaultValue_)
-        : defaultValue(defaultValue_) {
+    explicit PaintProperty(T defaultValue_) : defaultValue(defaultValue_) {
         values.emplace(ClassID::Fallback, defaultValue_);
     }
 
     PaintProperty(const PaintProperty& other)
-        : defaultValue(other.defaultValue),
-          values(other.values),
-          transitions(other.transitions) {
+        : defaultValue(other.defaultValue), values(other.values), transitions(other.transitions) {
     }
 
     PaintProperty& operator=(const PaintProperty& other) {
@@ -45,7 +42,8 @@ public:
 
     const PropertyValue<T>& get(const optional<std::string>& klass) const {
         static const PropertyValue<T> staticValue;
-        const auto it = values.find(klass ? ClassDictionary::Get().lookup(*klass) : ClassID::Default);
+        const auto it =
+            values.find(klass ? ClassDictionary::Get().lookup(*klass) : ClassID::Default);
         return it == values.end() ? staticValue : it->second;
     }
 
@@ -63,19 +61,23 @@ public:
         Duration duration = params.transition.duration.value_or(Duration::zero());
 
         for (const auto classID : params.classes) {
-            if (values.find(classID) == values.end())
+            if (values.find(classID) == values.end()) {
                 continue;
+}
 
             if (overrideTransition && transitions.find(classID) != transitions.end()) {
                 const TransitionOptions& transition = transitions[classID];
-                if (transition.delay) delay = *transition.delay;
-                if (transition.duration) duration = *transition.duration;
+                if (transition.delay) {
+                    delay = *transition.delay;
+}
+                if (transition.duration) {
+                    duration = *transition.duration;
+}
             }
 
-            cascaded = std::make_unique<CascadedValue>(std::move(cascaded),
-                                                       params.now + delay,
-                                                       params.now + delay + duration,
-                                                       values.at(classID));
+            cascaded =
+                std::make_unique<CascadedValue>(std::move(cascaded), params.now + delay,
+                                                params.now + delay + duration, values.at(classID));
 
             break;
         }
@@ -91,7 +93,9 @@ public:
     }
 
     // TODO: remove / privatize
-    operator T() const { return value; }
+    operator T() const {
+        return value;
+    }
     Result value;
 
 private:
@@ -122,7 +126,8 @@ private:
             } else {
                 // Interpolate between recursively-calculated prior value and final.
                 float t = std::chrono::duration<float>(now - begin) / (end - begin);
-                return util::interpolate(prior->calculate(evaluator, now), finalValue, util::DEFAULT_TRANSITION_EASE.solve(t, 0.001));
+                return util::interpolate(prior->calculate(evaluator, now), finalValue,
+                                         util::DEFAULT_TRANSITION_EASE.solve(t, 0.001));
             }
         }
 

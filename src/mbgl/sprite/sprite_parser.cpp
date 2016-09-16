@@ -20,8 +20,7 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
                                  const double ratio,
                                  const bool sdf) {
     // Disallow invalid parameter configurations.
-    if (width <= 0 || height <= 0 || width > 1024 || height > 1024 ||
-        ratio <= 0 || ratio > 10 ||
+    if (width <= 0 || height <= 0 || width > 1024 || height > 1024 || ratio <= 0 || ratio > 10 ||
         srcX + width > image.width || srcY + height > image.height) {
         Log::Error(Event::Sprite, "Can't create sprite with invalid metrics");
         return nullptr;
@@ -103,7 +102,8 @@ SpriteParseResult parseSprite(const std::string& image, const std::string& json)
 
     if (doc.HasParseError()) {
         std::stringstream message;
-        message << "Failed to parse JSON: " << rapidjson::GetParseError_En(doc.GetParseError()) << " at offset " << doc.GetErrorOffset();
+        message << "Failed to parse JSON: " << rapidjson::GetParseError_En(doc.GetParseError())
+                << " at offset " << doc.GetErrorOffset();
         return std::make_exception_ptr(std::runtime_error(message.str()));
     } else if (!doc.IsObject()) {
         return std::make_exception_ptr(std::runtime_error("Sprite JSON root must be an object"));

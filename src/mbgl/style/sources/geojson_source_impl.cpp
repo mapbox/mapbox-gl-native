@@ -127,18 +127,17 @@ std::unique_ptr<Tile> GeoJSONSource::Impl::createTile(const OverscaledTileID& ti
                                                       const UpdateParameters& parameters) {
     assert(loaded);
     if (geoJSONOrSupercluster.is<GeoJSONVTPointer>()) {
-        return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters,
-            geoJSONOrSupercluster.get<GeoJSONVTPointer>()->getTile(
-                tileID.canonical.z,
-                tileID.canonical.x,
-                tileID.canonical.y).features);
+        return std::make_unique<GeoJSONTile>(
+            tileID, base.getID(), parameters,
+            geoJSONOrSupercluster.get<GeoJSONVTPointer>()
+                ->getTile(tileID.canonical.z, tileID.canonical.x, tileID.canonical.y)
+                .features);
     } else {
         assert(geoJSONOrSupercluster.is<SuperclusterPointer>());
-        return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters,
+        return std::make_unique<GeoJSONTile>(
+            tileID, base.getID(), parameters,
             geoJSONOrSupercluster.get<SuperclusterPointer>()->getTile(
-                tileID.canonical.z,
-                tileID.canonical.x,
-                tileID.canonical.y));
+                tileID.canonical.z, tileID.canonical.x, tileID.canonical.y));
     }
 }
 

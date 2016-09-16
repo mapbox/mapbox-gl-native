@@ -4,23 +4,28 @@
 
 #include <queue>
 
-namespace mbgl{
+namespace mbgl {
 
 struct Corner {
-    Corner(float _distance, float _angleDelta) :
-        distance(_distance), angleDelta(_angleDelta) {}
+    Corner(float _distance, float _angleDelta) : distance(_distance), angleDelta(_angleDelta) {
+    }
     float distance;
     float angleDelta;
 };
 
-bool checkMaxAngle(const GeometryCoordinates &line, Anchor &anchor, const float labelLength,
-        const float windowSize, const float maxAngle) {
+bool checkMaxAngle(const GeometryCoordinates& line,
+                   Anchor& anchor,
+                   const float labelLength,
+                   const float windowSize,
+                   const float maxAngle) {
 
     // horizontal labels always pass
-    if (anchor.segment < 0) return true;
+    if (anchor.segment < 0) {
+        return true;
+    }
 
     GeometryCoordinate anchorPoint = convertPoint<int16_t>(anchor.point);
-    GeometryCoordinate &p = anchorPoint;
+    GeometryCoordinate& p = anchorPoint;
     int index = anchor.segment + 1;
     float anchorDistance = 0;
 
@@ -29,7 +34,9 @@ bool checkMaxAngle(const GeometryCoordinates &line, Anchor &anchor, const float 
         index--;
 
         // there isn't enough room for the label after the beginning of the line
-        if (index < 0) return false;
+        if (index < 0) {
+            return false;
+        }
 
         anchorDistance -= util::dist<float>(line[index], p);
         p = line[index];
@@ -42,11 +49,13 @@ bool checkMaxAngle(const GeometryCoordinates &line, Anchor &anchor, const float 
     std::queue<Corner> recentCorners;
     float recentAngleDelta = 0;
 
-     // move forwards by the length of the label and check angles along the way
+    // move forwards by the length of the label and check angles along the way
     while (anchorDistance < labelLength / 2) {
 
         // there isn't enough room for the label before the end of the line
-        if (index + 1 >= (int)line.size()) return false;
+        if (index + 1 >= (int)line.size()) {
+            return false;
+        }
 
         auto& prev = line[index - 1];
         auto& current = line[index];
@@ -66,7 +75,9 @@ bool checkMaxAngle(const GeometryCoordinates &line, Anchor &anchor, const float 
         }
 
         // the sum of angles within the window area exceeds the maximum allowed value. check fails.
-        if (recentAngleDelta > maxAngle) return false;
+        if (recentAngleDelta > maxAngle) {
+            return false;
+        }
 
         index++;
         anchorDistance += util::dist<float>(current, next);
@@ -74,8 +85,6 @@ bool checkMaxAngle(const GeometryCoordinates &line, Anchor &anchor, const float 
 
     // no part of the line had an angle greater than the maximum allowed. check passes.
     return true;
-
-
 }
 
 } // namespace mbgl

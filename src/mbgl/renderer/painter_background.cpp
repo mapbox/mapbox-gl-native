@@ -17,7 +17,7 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
     // glClear rather than this method.
     const BackgroundPaintProperties& properties = layer.impl->paint;
 
-    bool isPatterned = !properties.backgroundPattern.value.to.empty();// && false;
+    bool isPatterned = !properties.backgroundPattern.value.to.empty(); // && false;
     optional<SpriteAtlasPosition> imagePosA;
     optional<SpriteAtlasPosition> imagePosB;
 
@@ -72,13 +72,17 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
             patternShader.u_pattern_size_b = imagePosB->size;
             patternShader.u_scale_a = properties.backgroundPattern.value.fromScale;
             patternShader.u_scale_b = properties.backgroundPattern.value.toScale;
-            patternShader.u_tile_units_to_pixels = 1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom());
+            patternShader.u_tile_units_to_pixels =
+                1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom());
 
-            GLint tileSizeAtNearestZoom = util::tileSize * state.zoomScale(state.getIntegerZoom() - tileID.canonical.z);
-            GLint pixelX = tileSizeAtNearestZoom * (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
+            GLint tileSizeAtNearestZoom =
+                util::tileSize * state.zoomScale(state.getIntegerZoom() - tileID.canonical.z);
+            GLint pixelX = tileSizeAtNearestZoom *
+                           (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
             GLint pixelY = tileSizeAtNearestZoom * tileID.canonical.y;
-            patternShader.u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
-            patternShader.u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
+            patternShader.u_pixel_coord_upper = { { float(pixelX >> 16), float(pixelY >> 16) } };
+            patternShader.u_pixel_coord_lower = { { float(pixelX & 0xFFFF),
+                                                    float(pixelY & 0xFFFF) } };
         } else {
             plainShader.u_matrix = vertexMatrix;
         }

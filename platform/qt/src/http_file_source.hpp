@@ -16,23 +16,22 @@ namespace mbgl {
 
 class HTTPRequest;
 
-class HTTPFileSource::Impl : public QObject
-{
+class HTTPFileSource::Impl : public QObject {
     Q_OBJECT
 
 public:
     Impl();
     virtual ~Impl() = default;
 
-    void request(HTTPRequest *);
-    void cancel(HTTPRequest *);
+    void request(HTTPRequest*);
+    void cancel(HTTPRequest*);
 
 public slots:
-    void replyFinish(QNetworkReply *);
+    void replyFinish(QNetworkReply*);
 
 private:
-    QMap<QUrl, QPair<QNetworkReply *, QVector<HTTPRequest *>>> m_pending;
-    QNetworkAccessManager *m_manager;
+    QMap<QUrl, QPair<QNetworkReply*, QVector<HTTPRequest*>>> m_pending;
+    QNetworkAccessManager* m_manager;
     QSslConfiguration m_ssl;
 };
 

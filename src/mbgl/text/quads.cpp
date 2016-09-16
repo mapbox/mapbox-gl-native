@@ -13,9 +13,12 @@ using namespace style;
 
 const float globalMinScale = 0.5f; // underscale by 1 zoom level
 
-SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
-        const GeometryCoordinates& line, const SymbolLayoutProperties& layout,
-        const style::SymbolPlacementType placement, const Shaping& shapedText) {
+SymbolQuads getIconQuads(Anchor& anchor,
+                         const PositionedIcon& shapedIcon,
+                         const GeometryCoordinates& line,
+                         const SymbolLayoutProperties& layout,
+                         const style::SymbolPlacementType placement,
+                         const Shaping& shapedText) {
 
     auto image = *(shapedIcon.image);
 
@@ -38,49 +41,57 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
         auto textTop = shapedText.top * size;
         auto textBottom = shapedText.bottom * size;
         auto textWidth = textRight - textLeft;
-        auto textHeight = textBottom - textTop;;
+        auto textHeight = textBottom - textTop;
+        ;
         auto padT = layout.iconTextFitPadding.value[0];
         auto padR = layout.iconTextFitPadding.value[1];
         auto padB = layout.iconTextFitPadding.value[2];
         auto padL = layout.iconTextFitPadding.value[3];
-        auto offsetY = layout.iconTextFit == IconTextFitType::Width ? (textHeight - iconHeight) * 0.5 : 0;
-        auto offsetX = layout.iconTextFit == IconTextFitType::Height ? (textWidth - iconWidth) * 0.5 : 0;
-        auto width = layout.iconTextFit == IconTextFitType::Width || layout.iconTextFit == IconTextFitType::Both ? textWidth : iconWidth;
-        auto height = layout.iconTextFit == IconTextFitType::Height || layout.iconTextFit == IconTextFitType::Both ? textHeight : iconHeight;
+        auto offsetY =
+            layout.iconTextFit == IconTextFitType::Width ? (textHeight - iconHeight) * 0.5 : 0;
+        auto offsetX =
+            layout.iconTextFit == IconTextFitType::Height ? (textWidth - iconWidth) * 0.5 : 0;
+        auto width = layout.iconTextFit == IconTextFitType::Width ||
+                             layout.iconTextFit == IconTextFitType::Both
+                         ? textWidth
+                         : iconWidth;
+        auto height = layout.iconTextFit == IconTextFitType::Height ||
+                              layout.iconTextFit == IconTextFitType::Both
+                          ? textHeight
+                          : iconHeight;
         left = textLeft + offsetX - padL;
         top = textTop + offsetY - padT;
         right = textLeft + offsetX + padR + width;
         bottom = textTop + offsetY + padB + height;
-        tl = {left, top};
-        tr = {right, top};
-        br = {right, bottom};
-        bl = {left, bottom};
+        tl = { left, top };
+        tr = { right, top };
+        br = { right, bottom };
+        bl = { left, bottom };
     } else {
-        tl = {left, top};
-        tr = {right, top};
-        br = {right, bottom};
-        bl = {left, bottom};
+        tl = { left, top };
+        tr = { right, top };
+        br = { right, bottom };
+        bl = { left, bottom };
     }
 
     float angle = layout.iconRotate * util::DEG2RAD;
     if (placement == style::SymbolPlacementType::Line) {
         assert(static_cast<unsigned int>(anchor.segment) < line.size());
-        const GeometryCoordinate &prev= line[anchor.segment];
+        const GeometryCoordinate& prev = line[anchor.segment];
         if (anchor.point.y == prev.y && anchor.point.x == prev.x &&
             static_cast<unsigned int>(anchor.segment + 1) < line.size()) {
-            const GeometryCoordinate &next= line[anchor.segment + 1];
+            const GeometryCoordinate& next = line[anchor.segment + 1];
             angle += std::atan2(anchor.point.y - next.y, anchor.point.x - next.x) + M_PI;
         } else {
             angle += std::atan2(anchor.point.y - prev.y, anchor.point.x - prev.x);
         }
     }
 
-
     if (angle) {
         // Compute the transformation matrix.
         float angle_sin = std::sin(angle);
         float angle_cos = std::cos(angle);
-        std::array<float, 4> matrix = {{angle_cos, -angle_sin, angle_sin, angle_cos}};
+        std::array<float, 4> matrix = { { angle_cos, -angle_sin, angle_sin, angle_cos } };
 
         tl = util::matrixMultiply(matrix, tl);
         tr = util::matrixMultiply(matrix, tr);
@@ -89,15 +100,22 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
     }
 
     SymbolQuads quads;
-    quads.emplace_back(tl, tr, bl, br, image.pos, 0, 0, anchor.point, globalMinScale, std::numeric_limits<float>::infinity());
+    quads.emplace_back(tl, tr, bl, br, image.pos, 0, 0, anchor.point, globalMinScale,
+                       std::numeric_limits<float>::infinity());
     return quads;
 }
 
 struct GlyphInstance {
-    explicit GlyphInstance(Point<float> anchorPoint_) : anchorPoint(std::move(anchorPoint_)) {}
-    explicit GlyphInstance(Point<float> anchorPoint_, float offset_, float minScale_, float maxScale_,
-            float angle_)
-        : anchorPoint(std::move(anchorPoint_)), offset(offset_), minScale(minScale_), maxScale(maxScale_), angle(angle_) {}
+    explicit GlyphInstance(Point<float> anchorPoint_) : anchorPoint(std::move(anchorPoint_)) {
+    }
+    explicit GlyphInstance(
+        Point<float> anchorPoint_, float offset_, float minScale_, float maxScale_, float angle_)
+        : anchorPoint(std::move(anchorPoint_)),
+          offset(offset_),
+          minScale(minScale_),
+          maxScale(maxScale_),
+          angle(angle_) {
+    }
 
     const Point<float> anchorPoint;
     const float offset = 0.0f;
@@ -108,8 +126,12 @@ struct GlyphInstance {
 
 typedef std::vector<GlyphInstance> GlyphInstances;
 
-void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &anchor,
-        float offset, const GeometryCoordinates &line, int segment, bool forward) {
+void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
+                      Anchor& anchor,
+                      float offset,
+                      const GeometryCoordinates& line,
+                      int segment,
+                      bool forward) {
 
     const bool upsideDown = !forward;
 
@@ -135,12 +157,12 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
         if (!forward)
             angle += M_PI;
 
-        glyphs = GlyphInstance{
-            /* anchor */ newAnchorPoint,
-            /* offset */ static_cast<float>(upsideDown ? M_PI : 0.0),
-            /* minScale */ scale,
-            /* maxScale */ prevscale,
-            /* angle */ static_cast<float>(std::fmod((angle + 2.0 * M_PI), (2.0 * M_PI)))};
+        glyphs = GlyphInstance{ /* anchor */ newAnchorPoint,
+                                /* offset */ static_cast<float>(upsideDown ? M_PI : 0.0),
+                                /* minScale */ scale,
+                                /* maxScale */ prevscale,
+                                /* angle */ static_cast<float>(
+                                    std::fmod((angle + 2.0 * M_PI), (2.0 * M_PI))) };
 
         if (scale <= placementScale)
             break;
@@ -164,21 +186,25 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
     }
 }
 
-SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
-        const float boxScale, const GeometryCoordinates& line, const SymbolLayoutProperties& layout,
-        const style::SymbolPlacementType placement, const GlyphPositions& face) {
+SymbolQuads getGlyphQuads(Anchor& anchor,
+                          const Shaping& shapedText,
+                          const float boxScale,
+                          const GeometryCoordinates& line,
+                          const SymbolLayoutProperties& layout,
+                          const style::SymbolPlacementType placement,
+                          const GlyphPositions& face) {
 
     const float textRotate = layout.textRotate * util::DEG2RAD;
     const bool keepUpright = layout.textKeepUpright;
 
     SymbolQuads quads;
 
-    for (const PositionedGlyph &positionedGlyph: shapedText.positionedGlyphs) {
+    for (const PositionedGlyph& positionedGlyph : shapedText.positionedGlyphs) {
         auto face_it = face.find(positionedGlyph.glyph);
         if (face_it == face.end())
             continue;
-        const Glyph &glyph = face_it->second;
-        const Rect<uint16_t> &rect = glyph.rect;
+        const Glyph& glyph = face_it->second;
+        const Rect<uint16_t>& rect = glyph.rect;
 
         if (!glyph)
             continue;
@@ -190,12 +216,14 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
 
         GlyphInstances glyphInstances;
         if (placement == style::SymbolPlacementType::Line) {
-            getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, true);
+            getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line,
+                             anchor.segment, true);
             if (keepUpright)
-                getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, false);
+                getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line,
+                                 anchor.segment, false);
 
         } else {
-            glyphInstances.emplace_back(GlyphInstance{anchor.point});
+            glyphInstances.emplace_back(GlyphInstance{ anchor.point });
         }
 
         // The rects have an addditional buffer that is not included in their size;
@@ -207,12 +235,12 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
         const float x2 = x1 + rect.w;
         const float y2 = y1 + rect.h;
 
-        const Point<float> otl{x1, y1};
-        const Point<float> otr{x2, y1};
-        const Point<float> obl{x1, y2};
-        const Point<float> obr{x2, y2};
+        const Point<float> otl{ x1, y1 };
+        const Point<float> otr{ x2, y1 };
+        const Point<float> obl{ x1, y2 };
+        const Point<float> obr{ x2, y2 };
 
-        for (const GlyphInstance &instance : glyphInstances) {
+        for (const GlyphInstance& instance : glyphInstances) {
 
             Point<float> tl = otl;
             Point<float> tr = otr;
@@ -223,7 +251,7 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
                 // Compute the transformation matrix.
                 float angle_sin = std::sin(textRotate);
                 float angle_cos = std::cos(textRotate);
-                std::array<float, 4> matrix = {{angle_cos, -angle_sin, angle_sin, angle_cos}};
+                std::array<float, 4> matrix = { { angle_cos, -angle_sin, angle_sin, angle_cos } };
 
                 tl = util::matrixMultiply(matrix, tl);
                 tr = util::matrixMultiply(matrix, tr);
@@ -234,12 +262,13 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
             // Prevent label from extending past the end of the line
             const float glyphMinScale = std::max(instance.minScale, anchor.scale);
 
-            const float anchorAngle = std::fmod((anchor.angle + instance.offset + 2 * M_PI), (2 * M_PI));
-            const float glyphAngle = std::fmod((instance.angle + instance.offset + 2 * M_PI), (2 * M_PI));
-            quads.emplace_back(tl, tr, bl, br, rect, anchorAngle, glyphAngle, instance.anchorPoint, glyphMinScale, instance.maxScale);
-
+            const float anchorAngle =
+                std::fmod((anchor.angle + instance.offset + 2 * M_PI), (2 * M_PI));
+            const float glyphAngle =
+                std::fmod((instance.angle + instance.offset + 2 * M_PI), (2 * M_PI));
+            quads.emplace_back(tl, tr, bl, br, rect, anchorAngle, glyphAngle, instance.anchorPoint,
+                               glyphMinScale, instance.maxScale);
         }
-
     }
 
     return quads;

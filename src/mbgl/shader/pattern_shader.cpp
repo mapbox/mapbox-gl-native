@@ -9,10 +9,11 @@ PatternShader::PatternShader(gl::ObjectStore& store, Defines defines)
     : Shader(shaders::pattern::name,
              shaders::pattern::vertex,
              shaders::pattern::fragment,
-             store, defines) {
+             store,
+             defines) {
 }
 
-void PatternShader::bind(GLbyte *offset) {
+void PatternShader::bind(GLbyte* offset) {
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
     MBGL_CHECK_ERROR(glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset));
 }

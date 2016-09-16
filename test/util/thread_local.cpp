@@ -10,7 +10,7 @@ namespace {
 
 class TestThread {
 public:
-    TestThread(int *number_) {
+    TestThread(int* number_) {
         number.set(number_);
     }
 
@@ -57,8 +57,10 @@ TEST(ThreadLocalStorage, NotSetReturnsNull) {
 namespace {
 
 struct DtorCounter {
-    ~DtorCounter() { ++(*value); }
-    unsigned *value;
+    ~DtorCounter() {
+        ++(*value);
+    }
+    unsigned* value;
 };
 
 class TestThreadReclaim {
@@ -80,8 +82,8 @@ TEST(ThreadLocalStorage, AutoReclaim) {
 
     unsigned counter = 0;
 
-    auto dtorCounter1 = new DtorCounter{ &counter };
-    auto dtorCounter2 = new DtorCounter{ &counter };
+    auto dtorCounter1 = new DtorCounter{&counter};
+    auto dtorCounter2 = new DtorCounter{&counter};
 
     ThreadContext context = {"Test"};
 

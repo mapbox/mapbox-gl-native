@@ -18,7 +18,8 @@ void Painter::renderLine(PaintParameters& parameters,
                          const LineLayer& layer,
                          const RenderTile& tile) {
     // Abort early.
-    if (pass == RenderPass::Opaque) return;
+    if (pass == RenderPass::Opaque)
+        return;
 
     config.stencilOp.reset();
     config.stencilTest = GL_TRUE;
@@ -46,13 +47,13 @@ void Painter::renderLine(PaintParameters& parameters,
 
     // calculate how much longer the real world distance is at the top of the screen
     // than at the middle of the screen.
-    float topedgelength = std::sqrt(std::pow(state.getHeight(), 2.0f) / 4.0f  * (1.0f + std::pow(state.getAltitude(), 2.0f)));
+    float topedgelength = std::sqrt(std::pow(state.getHeight(), 2.0f) / 4.0f *
+                                    (1.0f + std::pow(state.getAltitude(), 2.0f)));
     float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
     float extra = (topedgelength + x) / topedgelength - 1.0f;
 
-    mat4 vtxMatrix = tile.translatedMatrix(properties.lineTranslate,
-                                           properties.lineTranslateAnchor,
-                                           state);
+    mat4 vtxMatrix =
+        tile.translatedMatrix(properties.lineTranslate, properties.lineTranslateAnchor, state);
 
     setDepthSublayer(0);
 
@@ -77,19 +78,22 @@ void Painter::renderLine(PaintParameters& parameters,
         LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, cap);
         LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, cap);
 
-        const float widthA = posA.width * properties.lineDasharray.value.fromScale * layer.impl->dashLineWidth;
-        const float widthB = posB.width * properties.lineDasharray.value.toScale * layer.impl->dashLineWidth;
+        const float widthA =
+            posA.width * properties.lineDasharray.value.fromScale * layer.impl->dashLineWidth;
+        const float widthB =
+            posB.width * properties.lineDasharray.value.toScale * layer.impl->dashLineWidth;
 
         float scaleXA = 1.0 / tile.id.pixelsToTileUnits(widthA, state.getIntegerZoom());
         float scaleYA = -posA.height / 2.0;
         float scaleXB = 1.0 / tile.id.pixelsToTileUnits(widthB, state.getIntegerZoom());
         float scaleYB = -posB.height / 2.0;
 
-        linesdfShader.u_patternscale_a = {{ scaleXA, scaleYA }};
+        linesdfShader.u_patternscale_a = { { scaleXA, scaleYA } };
         linesdfShader.u_tex_y_a = posA.y;
-        linesdfShader.u_patternscale_b = {{ scaleXB, scaleYB }};
+        linesdfShader.u_patternscale_b = { { scaleXB, scaleYB } };
         linesdfShader.u_tex_y_b = posB.y;
-        linesdfShader.u_sdfgamma = lineAtlas->width / (std::min(widthA, widthB) * 256.0 * frame.pixelRatio) / 2;
+        linesdfShader.u_sdfgamma =
+            lineAtlas->width / (std::min(widthA, widthB) * 256.0 * frame.pixelRatio) / 2;
         linesdfShader.u_mix = properties.lineDasharray.value.t;
         linesdfShader.u_extra = extra;
         linesdfShader.u_offset = -properties.lineOffset;
@@ -118,17 +122,19 @@ void Painter::renderLine(PaintParameters& parameters,
         linepatternShader.u_ratio = ratio;
         linepatternShader.u_blur = blur;
 
-        linepatternShader.u_pattern_size_a = {{
-            tile.id.pixelsToTileUnits((*imagePosA).size[0] * properties.linePattern.value.fromScale, state.getIntegerZoom()),
-            (*imagePosA).size[1]
-        }};
+        linepatternShader.u_pattern_size_a = { { tile.id.pixelsToTileUnits(
+                                                     (*imagePosA).size[0] *
+                                                         properties.linePattern.value.fromScale,
+                                                     state.getIntegerZoom()),
+                                                 (*imagePosA).size[1] } };
         linepatternShader.u_pattern_tl_a = (*imagePosA).tl;
         linepatternShader.u_pattern_br_a = (*imagePosA).br;
 
-        linepatternShader.u_pattern_size_b = {{
-            tile.id.pixelsToTileUnits((*imagePosB).size[0] * properties.linePattern.value.toScale, state.getIntegerZoom()),
-            (*imagePosB).size[1]
-        }};
+        linepatternShader.u_pattern_size_b = {
+            { tile.id.pixelsToTileUnits((*imagePosB).size[0] * properties.linePattern.value.toScale,
+                                        state.getIntegerZoom()),
+              (*imagePosB).size[1] }
+        };
         linepatternShader.u_pattern_tl_b = (*imagePosB).tl;
         linepatternShader.u_pattern_br_b = (*imagePosB).br;
 

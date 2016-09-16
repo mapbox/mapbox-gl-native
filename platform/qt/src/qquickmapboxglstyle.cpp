@@ -1,25 +1,27 @@
 #include <QQuickMapboxGLStyle>
 #include <QQuickMapboxGLStyleProperty>
 
-QQuickMapboxGLStyle::QQuickMapboxGLStyle(QQuickItem *parent)
-    : QQuickItem(parent)
-{
+QQuickMapboxGLStyle::QQuickMapboxGLStyle(QQuickItem* parent) : QQuickItem(parent) {
 }
 
-void QQuickMapboxGLStyle::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
-{
+void QQuickMapboxGLStyle::itemChange(QQuickItem::ItemChange change,
+                                     const QQuickItem::ItemChangeData& value) {
     QQuickItem::itemChange(change, value);
 
     switch (change) {
     case QQuickItem::ItemChildAddedChange:
-        if (QQuickMapboxGLStyleProperty *property = qobject_cast<QQuickMapboxGLStyleProperty *>(value.item)) {
-            connect(property, SIGNAL(updated(QVariantMap)), this, SIGNAL(propertyUpdated(QVariantMap)));
+        if (QQuickMapboxGLStyleProperty* property =
+                qobject_cast<QQuickMapboxGLStyleProperty*>(value.item)) {
+            connect(property, SIGNAL(updated(QVariantMap)), this,
+                    SIGNAL(propertyUpdated(QVariantMap)));
             connect(this, SIGNAL(urlChanged(QString)), property, SLOT(checkUpdated()));
         }
         break;
     case QQuickItem::ItemChildRemovedChange:
-        if (QQuickMapboxGLStyleProperty *property = qobject_cast<QQuickMapboxGLStyleProperty *>(value.item)) {
-            disconnect(property, SIGNAL(updated(QVariantMap)), this, SIGNAL(propertyUpdated(QVariantMap)));
+        if (QQuickMapboxGLStyleProperty* property =
+                qobject_cast<QQuickMapboxGLStyleProperty*>(value.item)) {
+            disconnect(property, SIGNAL(updated(QVariantMap)), this,
+                       SIGNAL(propertyUpdated(QVariantMap)));
             disconnect(this, SIGNAL(urlChanged(QString)), property, SLOT(checkUpdated()));
         }
         break;
@@ -28,8 +30,7 @@ void QQuickMapboxGLStyle::itemChange(QQuickItem::ItemChange change, const QQuick
     }
 }
 
-void QQuickMapboxGLStyle::setUrl(const QString &url)
-{
+void QQuickMapboxGLStyle::setUrl(const QString& url) {
     if (url == m_url) {
         return;
     }
@@ -38,13 +39,11 @@ void QQuickMapboxGLStyle::setUrl(const QString &url)
     emit urlChanged(url);
 }
 
-QString QQuickMapboxGLStyle::url() const
-{
+QString QQuickMapboxGLStyle::url() const {
     return m_url;
 }
 
-void QQuickMapboxGLStyle::setStyleClass(const QString &styleClass)
-{
+void QQuickMapboxGLStyle::setStyleClass(const QString& styleClass) {
     if (styleClass == m_class) {
         return;
     }
@@ -53,7 +52,6 @@ void QQuickMapboxGLStyle::setStyleClass(const QString &styleClass)
     emit classChanged(styleClass);
 }
 
-QString QQuickMapboxGLStyle::styleClass() const
-{
+QString QQuickMapboxGLStyle::styleClass() const {
     return m_class;
 }

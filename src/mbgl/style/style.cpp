@@ -59,7 +59,8 @@ Style::~Style() {
 }
 
 bool Style::addClass(const std::string& className) {
-    if (hasClass(className)) return false;
+    if (hasClass(className))
+        return false;
     classes.push_back(className);
     return true;
 }
@@ -137,9 +138,8 @@ void Style::addSource(std::unique_ptr<Source> source) {
 }
 
 void Style::removeSource(const std::string& id) {
-    auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& source) {
-        return source->getID() == id;
-    });
+    auto it = std::find_if(sources.begin(), sources.end(),
+                           [&](const auto& source) { return source->getID() == id; });
 
     if (it == sources.end()) {
         throw std::runtime_error("no such source");
@@ -159,9 +159,8 @@ std::vector<const Layer*> Style::getLayers() const {
 }
 
 std::vector<std::unique_ptr<Layer>>::const_iterator Style::findLayer(const std::string& id) const {
-    return std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
-        return layer->baseImpl->id == id;
-    });
+    return std::find_if(layers.begin(), layers.end(),
+                        [&](const auto& layer) { return layer->baseImpl->id == id; });
 }
 
 Layer* Style::getLayer(const std::string& id) const {
@@ -234,7 +233,8 @@ void Style::updateTiles(const UpdateParameters& parameters) {
 void Style::relayout() {
     for (const auto& sourceID : updateBatch.sourceIDs) {
         Source* source = getSource(sourceID);
-        if (!source) continue;
+        if (!source)
+            continue;
         source->baseImpl->reload();
     }
     updateBatch.sourceIDs.clear();
@@ -243,7 +243,7 @@ void Style::relayout() {
 void Style::cascade(const TimePoint& timePoint, MapMode mode) {
     // When in continuous mode, we can either have user- or style-defined
     // transitions. Still mode is always immediate.
-    static const TransitionOptions immediateTransition {};
+    static const TransitionOptions immediateTransition{};
 
     std::vector<ClassID> classIDs;
     for (const auto& className : classes) {
@@ -252,9 +252,8 @@ void Style::cascade(const TimePoint& timePoint, MapMode mode) {
     classIDs.push_back(ClassID::Default);
     classIDs.push_back(ClassID::Fallback);
 
-    const CascadeParameters parameters {
-        classIDs,
-        mode == MapMode::Continuous ? timePoint : Clock::time_point::max(),
+    const CascadeParameters parameters{
+        classIDs, mode == MapMode::Continuous ? timePoint : Clock::time_point::max(),
         mode == MapMode::Continuous ? transitionOptions : immediateTransition
     };
 
@@ -270,10 +269,8 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
 
     zoomHistory.update(z, timePoint);
 
-    const CalculationParameters parameters {
-        z,
-        mode == MapMode::Continuous ? timePoint : Clock::time_point::max(),
-        zoomHistory,
+    const CalculationParameters parameters{
+        z, mode == MapMode::Continuous ? timePoint : Clock::time_point::max(), zoomHistory,
         mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
     };
 
@@ -292,9 +289,8 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
 }
 
 Source* Style::getSource(const std::string& id) const {
-    const auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& source) {
-        return source->getID() == id;
-    });
+    const auto it = std::find_if(sources.begin(), sources.end(),
+                                 [&](const auto& source) { return source->getID() == id; });
 
     return it != sources.end() ? it->get() : nullptr;
 }
@@ -308,7 +304,7 @@ bool Style::isLoaded() const {
         return false;
     }
 
-    for (const auto& source: sources) {
+    for (const auto& source : sources) {
         if (source->baseImpl->enabled && !source->baseImpl->isLoaded()) {
             return false;
         }
@@ -345,7 +341,8 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
                 // This is a solid background. We can use glClear().
                 result.backgroundColor = paint.backgroundColor * paint.backgroundOpacity;
             } else {
-                // This is a textured background, or not the bottommost layer. We need to render it with a quad.
+                // This is a textured background, or not the bottommost layer. We need to render it
+                // with a quad.
                 result.order.emplace_back(*layer);
             }
             continue;
@@ -358,7 +355,8 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
 
         Source* source = getSource(layer->baseImpl->source);
         if (!source) {
-            Log::Warning(Event::Render, "can't find source for layer '%s'", layer->baseImpl->id.c_str());
+            Log::Warning(Event::Render, "can't find source for layer '%s'",
+                         layer->baseImpl->id.c_str());
             continue;
         }
 
@@ -376,7 +374,8 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
                 // Look back through the buckets we decided to render to find out whether there is
                 // already a bucket from this layer that is a parent of this tile. Tiles are ordered
                 // by zoom level when we obtain them from getTiles().
-                for (auto it = result.order.rbegin(); it != result.order.rend() && (&it->layer == layer.get()); ++it) {
+                for (auto it = result.order.rbegin();
+                     it != result.order.rend() && (&it->layer == layer.get()); ++it) {
                     if (tile.tile.id.isChildOf(it->tile->tile.id)) {
                         skip = true;
                         break;
@@ -403,7 +402,8 @@ std::vector<Feature> Style::queryRenderedFeatures(const QueryParameters& paramet
 
     for (const auto& source : sources) {
         auto sourceResults = source->baseImpl->queryRenderedFeatures(parameters);
-        std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
+        std::move(sourceResults.begin(), sourceResults.end(),
+                  std::inserter(resultsByLayer, resultsByLayer.begin()));
     }
 
     if (resultsByLayer.empty()) {
@@ -429,7 +429,6 @@ float Style::getQueryRadius() const {
     return additionalRadius;
 }
 
-
 void Style::setSourceTileCacheSize(size_t size) {
     for (const auto& source : sources) {
         source->baseImpl->setCacheSize(size);
@@ -452,10 +451,13 @@ void Style::onGlyphsLoaded(const FontStack& fontStack, const GlyphRange& glyphRa
     observer->onUpdate(Update::Repaint);
 }
 
-void Style::onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
+void Style::onGlyphsError(const FontStack& fontStack,
+                          const GlyphRange& glyphRange,
+                          std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load glyph range %d-%d for font stack %s: %s",
-               glyphRange.first, glyphRange.second, fontStackToString(fontStack).c_str(), util::toString(error).c_str());
+               glyphRange.first, glyphRange.second, fontStackToString(fontStack).c_str(),
+               util::toString(error).c_str());
     observer->onGlyphsError(fontStack, glyphRange, error);
     observer->onResourceError(error);
 }
@@ -467,8 +469,8 @@ void Style::onSourceLoaded(Source& source) {
 
 void Style::onSourceError(Source& source, std::exception_ptr error) {
     lastError = error;
-    Log::Error(Event::Style, "Failed to load source %s: %s",
-               source.getID().c_str(), util::toString(error).c_str());
+    Log::Error(Event::Style, "Failed to load source %s: %s", source.getID().c_str(),
+               util::toString(error).c_str());
     observer->onSourceError(source, error);
     observer->onResourceError(error);
 }
@@ -485,7 +487,8 @@ void Style::onTileLoaded(Source& source, const OverscaledTileID& tileID, TileLoa
 void Style::onTileError(Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load tile %s for source %s: %s",
-               util::toString(tileID).c_str(), source.getID().c_str(), util::toString(error).c_str());
+               util::toString(tileID).c_str(), source.getID().c_str(),
+               util::toString(error).c_str());
     observer->onTileError(source, tileID, error);
     observer->onResourceError(error);
 }
@@ -512,9 +515,12 @@ struct QueueSourceReloadVisitor {
 
     // No need to reload sources for these types; their visibility can change but
     // they don't participate in layout.
-    void operator()(CustomLayer&) {}
-    void operator()(RasterLayer&) {}
-    void operator()(BackgroundLayer&) {}
+    void operator()(CustomLayer&) {
+    }
+    void operator()(RasterLayer&) {
+    }
+    void operator()(BackgroundLayer&) {
+    }
 
     template <class VectorLayer>
     void operator()(VectorLayer& layer) {
@@ -523,12 +529,12 @@ struct QueueSourceReloadVisitor {
 };
 
 void Style::onLayerFilterChanged(Layer& layer) {
-    layer.accept(QueueSourceReloadVisitor { updateBatch });
+    layer.accept(QueueSourceReloadVisitor{ updateBatch });
     observer->onUpdate(Update::Layout);
 }
 
 void Style::onLayerVisibilityChanged(Layer& layer) {
-    layer.accept(QueueSourceReloadVisitor { updateBatch });
+    layer.accept(QueueSourceReloadVisitor{ updateBatch });
     observer->onUpdate(Update::Layout);
 }
 
@@ -537,7 +543,7 @@ void Style::onLayerPaintPropertyChanged(Layer&) {
 }
 
 void Style::onLayerLayoutPropertyChanged(Layer& layer) {
-    layer.accept(QueueSourceReloadVisitor { updateBatch });
+    layer.accept(QueueSourceReloadVisitor{ updateBatch });
     observer->onUpdate(Update::Layout);
 }
 

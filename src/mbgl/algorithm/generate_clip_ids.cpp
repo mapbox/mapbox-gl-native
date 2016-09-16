@@ -52,8 +52,8 @@ std::map<UnwrappedTileID, ClipID> ClipIDGenerator::getStencils() const {
 
         // Loop through all preceding stencils, and find all parents.
 
-        for (auto parentIt = std::reverse_iterator<decltype(it)>(it);
-             parentIt != stencils.rend(); ++parentIt) {
+        for (auto parentIt = std::reverse_iterator<decltype(it)>(it); parentIt != stencils.rend();
+             ++parentIt) {
             auto& parentId = parentIt->first;
             if (childId.isChildOf(parentId)) {
                 // Once we have a parent, we add the bits  that this ID hasn't set yet.
