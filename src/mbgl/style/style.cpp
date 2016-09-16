@@ -265,10 +265,18 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
 
     hasPendingTransitions = false;
     for (const auto& layer : layers) {
-        hasPendingTransitions |= layer->baseImpl->recalculate(parameters);
+        const bool hasTransitions = layer->baseImpl->recalculate(parameters);
 
-        Source* source = getSource(layer->baseImpl->source);
-        if (source && layer->baseImpl->needsRendering(z)) {
+        // Disable this layer if it doesn't need to be rendered.
+        const bool needsRendering = layer->baseImpl->needsRendering(zoomHistory.lastZoom);
+        if (!needsRendering) {
+            continue;
+        }
+
+        hasPendingTransitions |= hasTransitions;
+
+        // If this layer has a source, make sure that it gets loaded.
+        if (Source* source = getSource(layer->baseImpl->source)) {
             source->baseImpl->enabled = true;
             if (!source->baseImpl->loaded) {
                 source->baseImpl->loadDescription(fileSource);
@@ -317,8 +325,9 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
     }
 
     for (const auto& layer : layers) {
-        if (layer->baseImpl->visibility == VisibilityType::None)
+        if (!layer->baseImpl->needsRendering(zoomHistory.lastZoom)) {
             continue;
+        }
 
         if (const BackgroundLayer* background = layer->as<BackgroundLayer>()) {
             if (debugOptions & MapDebugOptions::Overdraw) {
@@ -398,6 +407,9 @@ std::vector<Feature> Style::queryRenderedFeatures(const QueryParameters& paramet
 
     // Combine all results based on the style layer order.
     for (const auto& layer : layers) {
+        if (!layer->baseImpl->needsRendering(zoomHistory.lastZoom)) {
+            continue;
+        }
         auto it = resultsByLayer.find(layer->baseImpl->id);
         if (it != resultsByLayer.end()) {
             std::move(it->second.begin(), it->second.end(), std::back_inserter(result));
@@ -410,6 +422,9 @@ std::vector<Feature> Style::queryRenderedFeatures(const QueryParameters& paramet
 float Style::getQueryRadius() const {
     float additionalRadius = 0;
     for (auto& layer : layers) {
+        if (!layer->baseImpl->needsRendering(zoomHistory.lastZoom)) {
+            continue;
+        }
         additionalRadius = util::max(additionalRadius, layer->baseImpl->getQueryRadius());
     }
     return additionalRadius;
