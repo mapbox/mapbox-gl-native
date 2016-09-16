@@ -6,8 +6,7 @@
 #include <istream>
 #include <sstream>
 
-extern "C"
-{
+extern "C" {
 #include <png.h>
 }
 
@@ -25,19 +24,18 @@ static void png_read_data(png_structp png_ptr, png_bytep data, png_size_t length
     std::istream* fin = reinterpret_cast<std::istream*>(png_get_io_ptr(png_ptr));
     fin->read(reinterpret_cast<char*>(data), length);
     std::streamsize read_count = fin->gcount();
-    if (read_count < 0 || static_cast<png_size_t>(read_count) != length)
-    {
+    if (read_count < 0 || static_cast<png_size_t>(read_count) != length) {
         png_error(png_ptr, "Read Error");
     }
 }
 
 struct png_struct_guard {
     png_struct_guard(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
-        : p_(png_ptr_ptr),
-          i_(info_ptr_ptr) {}
+        : p_(png_ptr_ptr), i_(info_ptr_ptr) {
+    }
 
     ~png_struct_guard() {
-        png_destroy_read_struct(p_,i_,nullptr);
+        png_destroy_read_struct(p_, i_, nullptr);
     }
 
     png_structpp p_;
@@ -45,10 +43,10 @@ struct png_struct_guard {
 };
 
 PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
-    util::CharArrayBuffer dataBuffer { reinterpret_cast<const char*>(data), size };
+    util::CharArrayBuffer dataBuffer{reinterpret_cast<const char*>(data), size};
     std::istream stream(&dataBuffer);
 
-    png_byte header[8] = { 0 };
+    png_byte header[8] = {0};
     stream.read(reinterpret_cast<char*>(header), 8);
     if (stream.gcount() != 8)
         throw std::runtime_error("PNG reader: Could not read image");
@@ -78,9 +76,10 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
     png_uint_32 height = 0;
     int bit_depth = 0;
     int color_type = 0;
-    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, nullptr, nullptr, nullptr);
+    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, nullptr, nullptr,
+                 nullptr);
 
-    UnassociatedImage image { width, height };
+    UnassociatedImage image{width, height};
 
     if (color_type == PNG_COLOR_TYPE_PALETTE)
         png_set_expand(png_ptr);
@@ -94,13 +93,12 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
     if (bit_depth == 16)
         png_set_strip_16(png_ptr);
 
-    if (color_type == PNG_COLOR_TYPE_GRAY ||
-        color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+    if (color_type == PNG_COLOR_TYPE_GRAY || color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
         png_set_gray_to_rgb(png_ptr);
 
     png_set_add_alpha(png_ptr, 0xff, PNG_FILLER_AFTER);
 
-    if (png_get_interlace_type(png_ptr,info_ptr) == PNG_INTERLACE_ADAM7) {
+    if (png_get_interlace_type(png_ptr, info_ptr) == PNG_INTERLACE_ADAM7) {
         png_set_interlace_handling(png_ptr); // FIXME: libpng bug?
         // according to docs png_read_image
         // "..automatically handles interlacing,

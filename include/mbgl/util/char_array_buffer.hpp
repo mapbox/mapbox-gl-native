@@ -7,11 +7,11 @@ namespace util {
 
 // ref https://artofcode.wordpress.com/2010/12/12/deriving-from-stdstreambuf/
 
-class CharArrayBuffer : public std::streambuf
-{
+class CharArrayBuffer : public std::streambuf {
 public:
     CharArrayBuffer(char const* data, std::size_t size)
-        : begin_(data), end_(data + size), current_(data) {}
+        : begin_(data), end_(data + size), current_(data) {
+    }
 
 private:
     int_type underflow() final {
@@ -40,15 +40,18 @@ private:
     }
 
     pos_type seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode) final {
-        if (dir == std::ios_base::beg) current_ = std::min(begin_ + off, end_);
-        else if (dir == std::ios_base::cur) current_ = std::min(current_ + off, end_);
-        else current_ = std::max(end_ - off, begin_); // dir == std::ios_base::end
+        if (dir == std::ios_base::beg)
+            current_ = std::min(begin_ + off, end_);
+        else if (dir == std::ios_base::cur)
+            current_ = std::min(current_ + off, end_);
+        else
+            current_ = std::max(end_ - off, begin_); // dir == std::ios_base::end
         return pos_type(off_type(current_ - begin_));
     }
 
-    char const * const begin_;
-    char const * const end_;
-    char const * current_;
+    char const* const begin_;
+    char const* const end_;
+    char const* current_;
 };
 
 } // namespace util

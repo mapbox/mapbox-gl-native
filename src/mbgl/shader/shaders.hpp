@@ -33,8 +33,8 @@ public:
           sdfGlyph(store, defines),
           sdfIcon(store, defines),
           collisionBox(store),
-          circle(store, defines)
-          {}
+          circle(store, defines) {
+    }
 
     PlainShader plain;
     OutlineShader outline;

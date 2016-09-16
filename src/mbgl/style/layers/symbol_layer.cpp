@@ -7,15 +7,13 @@ namespace mbgl {
 namespace style {
 
 SymbolLayer::SymbolLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(Type::Symbol, std::make_unique<Impl>())
-    , impl(static_cast<Impl*>(baseImpl.get())) {
+    : Layer(Type::Symbol, std::make_unique<Impl>()), impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
     impl->source = sourceID;
 }
 
 SymbolLayer::SymbolLayer(const Impl& other)
-    : Layer(Type::Symbol, std::make_unique<Impl>(other))
-    , impl(static_cast<Impl*>(baseImpl.get())) {
+    : Layer(Type::Symbol, std::make_unique<Impl>(other)), impl(static_cast<Impl*>(baseImpl.get())) {
 }
 
 SymbolLayer::~SymbolLayer() = default;
@@ -186,7 +184,7 @@ void SymbolLayer::setIconTextFit(PropertyValue<IconTextFitType> value) {
     impl->observer->onLayerLayoutPropertyChanged(*this);
 }
 PropertyValue<std::array<float, 4>> SymbolLayer::getDefaultIconTextFitPadding() {
-    return { {{ 0, 0, 0, 0 }} };
+    return { { { 0, 0, 0, 0 } } };
 }
 
 PropertyValue<std::array<float, 4>> SymbolLayer::getIconTextFitPadding() const {
@@ -256,7 +254,7 @@ void SymbolLayer::setIconKeepUpright(PropertyValue<bool> value) {
     impl->observer->onLayerLayoutPropertyChanged(*this);
 }
 PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultIconOffset() {
-    return { {{ 0, 0 }} };
+    return { { { 0, 0 } } };
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getIconOffset() const {
@@ -480,7 +478,7 @@ void SymbolLayer::setTextTransform(PropertyValue<TextTransformType> value) {
     impl->observer->onLayerLayoutPropertyChanged(*this);
 }
 PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultTextOffset() {
-    return { {{ 0, 0 }} };
+    return { { { 0, 0 } } };
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getTextOffset() const {
@@ -614,14 +612,16 @@ void SymbolLayer::setIconHaloBlur(PropertyValue<float> value, const optional<std
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultIconTranslate() {
-    return { {{ 0, 0 }} };
+    return { { { 0, 0 } } };
 }
 
-PropertyValue<std::array<float, 2>> SymbolLayer::getIconTranslate(const optional<std::string>& klass) const {
+PropertyValue<std::array<float, 2>>
+SymbolLayer::getIconTranslate(const optional<std::string>& klass) const {
     return impl->paint.iconTranslate.get(klass);
 }
 
-void SymbolLayer::setIconTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
+void SymbolLayer::setIconTranslate(PropertyValue<std::array<float, 2>> value,
+                                   const optional<std::string>& klass) {
     if (value == getIconTranslate(klass))
         return;
     impl->paint.iconTranslate.set(value, klass);
@@ -632,11 +632,13 @@ PropertyValue<TranslateAnchorType> SymbolLayer::getDefaultIconTranslateAnchor() 
     return { TranslateAnchorType::Map };
 }
 
-PropertyValue<TranslateAnchorType> SymbolLayer::getIconTranslateAnchor(const optional<std::string>& klass) const {
+PropertyValue<TranslateAnchorType>
+SymbolLayer::getIconTranslateAnchor(const optional<std::string>& klass) const {
     return impl->paint.iconTranslateAnchor.get(klass);
 }
 
-void SymbolLayer::setIconTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
+void SymbolLayer::setIconTranslateAnchor(PropertyValue<TranslateAnchorType> value,
+                                         const optional<std::string>& klass) {
     if (value == getIconTranslateAnchor(klass))
         return;
     impl->paint.iconTranslateAnchor.set(value, klass);
@@ -719,14 +721,16 @@ void SymbolLayer::setTextHaloBlur(PropertyValue<float> value, const optional<std
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultTextTranslate() {
-    return { {{ 0, 0 }} };
+    return { { { 0, 0 } } };
 }
 
-PropertyValue<std::array<float, 2>> SymbolLayer::getTextTranslate(const optional<std::string>& klass) const {
+PropertyValue<std::array<float, 2>>
+SymbolLayer::getTextTranslate(const optional<std::string>& klass) const {
     return impl->paint.textTranslate.get(klass);
 }
 
-void SymbolLayer::setTextTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
+void SymbolLayer::setTextTranslate(PropertyValue<std::array<float, 2>> value,
+                                   const optional<std::string>& klass) {
     if (value == getTextTranslate(klass))
         return;
     impl->paint.textTranslate.set(value, klass);
@@ -737,11 +741,13 @@ PropertyValue<TranslateAnchorType> SymbolLayer::getDefaultTextTranslateAnchor() 
     return { TranslateAnchorType::Map };
 }
 
-PropertyValue<TranslateAnchorType> SymbolLayer::getTextTranslateAnchor(const optional<std::string>& klass) const {
+PropertyValue<TranslateAnchorType>
+SymbolLayer::getTextTranslateAnchor(const optional<std::string>& klass) const {
     return impl->paint.textTranslateAnchor.get(klass);
 }
 
-void SymbolLayer::setTextTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
+void SymbolLayer::setTextTranslateAnchor(PropertyValue<TranslateAnchorType> value,
+                                         const optional<std::string>& klass) {
     if (value == getTextTranslateAnchor(klass))
         return;
     impl->paint.textTranslateAnchor.set(value, klass);

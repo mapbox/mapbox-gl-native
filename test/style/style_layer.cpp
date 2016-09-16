@@ -21,7 +21,8 @@ using namespace mbgl::style;
 
 namespace {
 
-template <class T, class... Params> void testClone(Params... params) {
+template <class T, class... Params>
+void testClone(Params... params) {
     auto layer = std::make_unique<T>(std::forward<Params>(params)...);
     auto clone = layer->baseImpl->clone();
     EXPECT_NE(layer.get(), clone.get());
@@ -30,35 +31,36 @@ template <class T, class... Params> void testClone(Params... params) {
     EXPECT_EQ("test", layer->baseImpl->clone()->getID());
 }
 
-const auto color = PropertyValue<Color> {{ 1, 0, 0, 1 }};
-const auto opacity = PropertyValue<float> { 1.0f };
-const auto radius = PropertyValue<float> { 1.0f };
-const auto blur = PropertyValue<float> { 1.0f };
-const auto pattern = PropertyValue<std::string> { "foo" };
-const auto antialias = PropertyValue<bool> { false };
-const auto translate = PropertyValue<std::array<float, 2>> {{{ 0, 0 }}};
-const auto translateAnchor = PropertyValue<TranslateAnchorType> { TranslateAnchorType::Map };
-const auto lineCap = PropertyValue<LineCapType> { LineCapType::Round };
-const auto lineJoin = PropertyValue<LineJoinType> { LineJoinType::Miter };
-const auto miterLimit = PropertyValue<float> { 1.0f };
-const auto roundLimit = PropertyValue<float> { 1.0f };
-const auto width = PropertyValue<float> { 1.0f };
-const auto gapWidth = PropertyValue<float> { 1.0f };
-const auto offset = PropertyValue<float> { 1.0f };
-const auto dashArray = PropertyValue<std::vector<float>> {{}};
-const auto hueRotate = PropertyValue<float> { 1.0f };
-const auto brightness = PropertyValue<float> { 1.0f };
-const auto saturation = PropertyValue<float> { 1.0f };
-const auto contrast = PropertyValue<float> { 1.0f };
-const auto duration = PropertyValue<float> { 1.0f };
+const auto color = PropertyValue<Color>{{1, 0, 0, 1}};
+const auto opacity = PropertyValue<float>{1.0f};
+const auto radius = PropertyValue<float>{1.0f};
+const auto blur = PropertyValue<float>{1.0f};
+const auto pattern = PropertyValue<std::string>{"foo"};
+const auto antialias = PropertyValue<bool>{false};
+const auto translate = PropertyValue<std::array<float, 2>>{{{0, 0}}};
+const auto translateAnchor = PropertyValue<TranslateAnchorType>{TranslateAnchorType::Map};
+const auto lineCap = PropertyValue<LineCapType>{LineCapType::Round};
+const auto lineJoin = PropertyValue<LineJoinType>{LineJoinType::Miter};
+const auto miterLimit = PropertyValue<float>{1.0f};
+const auto roundLimit = PropertyValue<float>{1.0f};
+const auto width = PropertyValue<float>{1.0f};
+const auto gapWidth = PropertyValue<float>{1.0f};
+const auto offset = PropertyValue<float>{1.0f};
+const auto dashArray = PropertyValue<std::vector<float>>{{}};
+const auto hueRotate = PropertyValue<float>{1.0f};
+const auto brightness = PropertyValue<float>{1.0f};
+const auto saturation = PropertyValue<float>{1.0f};
+const auto contrast = PropertyValue<float>{1.0f};
+const auto duration = PropertyValue<float>{1.0f};
 
 } // namespace
 
 TEST(Layer, Clone) {
     testClone<BackgroundLayer>("background");
     testClone<CircleLayer>("circle", "source");
-    testClone<CustomLayer>("custom", [](void*){}, [](void*, const CustomLayerRenderParameters&){}, [](void*){}, nullptr),
-    testClone<FillLayer>("fill", "source");
+    testClone<CustomLayer>("custom", [](void*) {}, [](void*, const CustomLayerRenderParameters&) {},
+                           [](void*) {}, nullptr),
+        testClone<FillLayer>("fill", "source");
     testClone<LineLayer>("line", "source");
     testClone<RasterLayer>("raster", "source");
     testClone<SymbolLayer>("symbol", "source");
@@ -219,7 +221,7 @@ TEST(Layer, Observer) {
 
     // Notifies observer on filter change.
     bool filterChanged = false;
-    observer.layerFilterChanged = [&] (Layer& layer_) {
+    observer.layerFilterChanged = [&](Layer& layer_) {
         EXPECT_EQ(layer.get(), &layer_);
         filterChanged = true;
     };
@@ -228,7 +230,7 @@ TEST(Layer, Observer) {
 
     // Notifies observer on visibility change.
     bool visibilityChanged = false;
-    observer.layerVisibilityChanged = [&] (Layer& layer_) {
+    observer.layerVisibilityChanged = [&](Layer& layer_) {
         EXPECT_EQ(layer.get(), &layer_);
         visibilityChanged = true;
     };
@@ -237,7 +239,7 @@ TEST(Layer, Observer) {
 
     // Notifies observer on paint property change.
     bool paintPropertyChanged = false;
-    observer.layerPaintPropertyChanged = [&] (Layer& layer_) {
+    observer.layerPaintPropertyChanged = [&](Layer& layer_) {
         EXPECT_EQ(layer.get(), &layer_);
         paintPropertyChanged = true;
     };
@@ -246,7 +248,7 @@ TEST(Layer, Observer) {
 
     // Notifies observer on layout property change.
     bool layoutPropertyChanged = false;
-    observer.layerLayoutPropertyChanged = [&] (Layer& layer_) {
+    observer.layerLayoutPropertyChanged = [&](Layer& layer_) {
         EXPECT_EQ(layer.get(), &layer_);
         layoutPropertyChanged = true;
     };

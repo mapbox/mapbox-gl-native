@@ -7,15 +7,13 @@ namespace mbgl {
 namespace style {
 
 LineLayer::LineLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(Type::Line, std::make_unique<Impl>())
-    , impl(static_cast<Impl*>(baseImpl.get())) {
+    : Layer(Type::Line, std::make_unique<Impl>()), impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
     impl->source = sourceID;
 }
 
 LineLayer::LineLayer(const Impl& other)
-    : Layer(Type::Line, std::make_unique<Impl>(other))
-    , impl(static_cast<Impl*>(baseImpl.get())) {
+    : Layer(Type::Line, std::make_unique<Impl>(other)), impl(static_cast<Impl*>(baseImpl.get())) {
 }
 
 LineLayer::~LineLayer() = default;
@@ -149,14 +147,16 @@ void LineLayer::setLineColor(PropertyValue<Color> value, const optional<std::str
 }
 
 PropertyValue<std::array<float, 2>> LineLayer::getDefaultLineTranslate() {
-    return { {{ 0, 0 }} };
+    return { { { 0, 0 } } };
 }
 
-PropertyValue<std::array<float, 2>> LineLayer::getLineTranslate(const optional<std::string>& klass) const {
+PropertyValue<std::array<float, 2>>
+LineLayer::getLineTranslate(const optional<std::string>& klass) const {
     return impl->paint.lineTranslate.get(klass);
 }
 
-void LineLayer::setLineTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
+void LineLayer::setLineTranslate(PropertyValue<std::array<float, 2>> value,
+                                 const optional<std::string>& klass) {
     if (value == getLineTranslate(klass))
         return;
     impl->paint.lineTranslate.set(value, klass);
@@ -167,11 +167,13 @@ PropertyValue<TranslateAnchorType> LineLayer::getDefaultLineTranslateAnchor() {
     return { TranslateAnchorType::Map };
 }
 
-PropertyValue<TranslateAnchorType> LineLayer::getLineTranslateAnchor(const optional<std::string>& klass) const {
+PropertyValue<TranslateAnchorType>
+LineLayer::getLineTranslateAnchor(const optional<std::string>& klass) const {
     return impl->paint.lineTranslateAnchor.get(klass);
 }
 
-void LineLayer::setLineTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
+void LineLayer::setLineTranslateAnchor(PropertyValue<TranslateAnchorType> value,
+                                       const optional<std::string>& klass) {
     if (value == getLineTranslateAnchor(klass))
         return;
     impl->paint.lineTranslateAnchor.set(value, klass);
@@ -239,14 +241,16 @@ void LineLayer::setLineBlur(PropertyValue<float> value, const optional<std::stri
 }
 
 PropertyValue<std::vector<float>> LineLayer::getDefaultLineDasharray() {
-    return { {  } };
+    return { {} };
 }
 
-PropertyValue<std::vector<float>> LineLayer::getLineDasharray(const optional<std::string>& klass) const {
+PropertyValue<std::vector<float>>
+LineLayer::getLineDasharray(const optional<std::string>& klass) const {
     return impl->paint.lineDasharray.get(klass);
 }
 
-void LineLayer::setLineDasharray(PropertyValue<std::vector<float>> value, const optional<std::string>& klass) {
+void LineLayer::setLineDasharray(PropertyValue<std::vector<float>> value,
+                                 const optional<std::string>& klass) {
     if (value == getLineDasharray(klass))
         return;
     impl->paint.lineDasharray.set(value, klass);
@@ -261,7 +265,8 @@ PropertyValue<std::string> LineLayer::getLinePattern(const optional<std::string>
     return impl->paint.linePattern.get(klass);
 }
 
-void LineLayer::setLinePattern(PropertyValue<std::string> value, const optional<std::string>& klass) {
+void LineLayer::setLinePattern(PropertyValue<std::string> value,
+                               const optional<std::string>& klass) {
     if (value == getLinePattern(klass))
         return;
     impl->paint.linePattern.set(value, klass);

@@ -14,8 +14,8 @@ class ClipIDGenerator {
 private:
     struct Leaf {
         Leaf(ClipID&);
-        void add(const CanonicalTileID &p);
-        bool operator==(const Leaf &other) const;
+        void add(const CanonicalTileID& p);
+        bool operator==(const Leaf& other) const;
 
         std::unordered_set<CanonicalTileID> children;
         ClipID& clip;

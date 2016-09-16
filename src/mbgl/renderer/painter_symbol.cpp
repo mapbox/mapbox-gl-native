@@ -35,8 +35,7 @@ void Painter::renderSDF(SymbolBucket& bucket,
                         float haloBlur,
                         std::array<float, 2> translate,
                         TranslateAnchorType translateAnchor,
-                        float paintSize)
-{
+                        float paintSize) {
     mat4 vtxMatrix = tile.translatedMatrix(translate, translateAnchor, state);
 
     // If layerStyle.size > bucket.info.fontSize then labels may collide
@@ -54,10 +53,8 @@ void Painter::renderSDF(SymbolBucket& bucket,
         extrudeScale.fill(tile.id.pixelsToTileUnits(1, state.getZoom()) * fontScale);
     } else {
         gammaScale = 1.0;
-        extrudeScale = {{
-            pixelsToGLUnits[0] * fontScale * state.getAltitude(),
-            pixelsToGLUnits[1] * fontScale * state.getAltitude()
-        }};
+        extrudeScale = { { pixelsToGLUnits[0] * fontScale * state.getAltitude(),
+                           pixelsToGLUnits[1] * fontScale * state.getAltitude() } };
     }
 
     config.program = sdfShader.getID();
@@ -126,8 +123,10 @@ void Painter::renderSymbol(PaintParameters& parameters,
     config.depthMask = GL_FALSE;
 
     // TODO remove the `true ||` when #1673 is implemented
-    const bool drawAcrossEdges = (frame.mapMode == MapMode::Continuous) && (true || !(layout.textAllowOverlap || layout.iconAllowOverlap ||
-          layout.textIgnorePlacement || layout.iconIgnorePlacement));
+    const bool drawAcrossEdges = (frame.mapMode == MapMode::Continuous) &&
+                                 (true ||
+                                  !(layout.textAllowOverlap || layout.iconAllowOverlap ||
+                                    layout.textIgnorePlacement || layout.iconIgnorePlacement));
 
     // Disable the stencil test so that labels aren't clipped to tile boundaries.
     //
@@ -152,42 +151,33 @@ void Painter::renderSymbol(PaintParameters& parameters,
         bool sdf = bucket.sdfIcons;
 
         const float angleOffset =
-            layout.iconRotationAlignment == AlignmentType::Map
-                ? state.getAngle()
-                : 0;
+            layout.iconRotationAlignment == AlignmentType::Map ? state.getAngle() : 0;
 
         const float fontSize = layer.impl->iconSize;
         const float fontScale = fontSize / 1.0f;
 
         SpriteAtlas* activeSpriteAtlas = layer.impl->spriteAtlas;
-        const bool iconScaled = fontScale != 1 || frame.pixelRatio != activeSpriteAtlas->getPixelRatio() || bucket.iconsNeedLinear;
-        const bool iconTransformed = layout.iconRotationAlignment == AlignmentType::Map || angleOffset != 0 || state.getPitch() != 0;
-        activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed, store, config, 0);
+        const bool iconScaled = fontScale != 1 ||
+                                frame.pixelRatio != activeSpriteAtlas->getPixelRatio() ||
+                                bucket.iconsNeedLinear;
+        const bool iconTransformed = layout.iconRotationAlignment == AlignmentType::Map ||
+                                     angleOffset != 0 || state.getPitch() != 0;
+        activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed, store,
+                                config, 0);
 
         if (sdf) {
-            renderSDF(bucket,
-                      tile,
-                      1.0f,
-                      {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }},
-                      parameters.shaders.sdfIcon,
-                      &SymbolBucket::drawIcons,
+            renderSDF(bucket, tile, 1.0f, { { float(activeSpriteAtlas->getWidth()) / 4.0f,
+                                              float(activeSpriteAtlas->getHeight()) / 4.0f } },
+                      parameters.shaders.sdfIcon, &SymbolBucket::drawIcons,
                       layout.iconRotationAlignment,
                       // icon-pitch-alignment is not yet implemented
                       // and we simply inherit the rotation alignment
-                      layout.iconRotationAlignment,
-                      layout.iconSize,
-                      paint.iconOpacity,
-                      paint.iconColor,
-                      paint.iconHaloColor,
-                      paint.iconHaloWidth,
-                      paint.iconHaloBlur,
-                      paint.iconTranslate,
-                      paint.iconTranslateAnchor,
-                      layer.impl->iconSize);
+                      layout.iconRotationAlignment, layout.iconSize, paint.iconOpacity,
+                      paint.iconColor, paint.iconHaloColor, paint.iconHaloWidth, paint.iconHaloBlur,
+                      paint.iconTranslate, paint.iconTranslateAnchor, layer.impl->iconSize);
         } else {
-            mat4 vtxMatrix = tile.translatedMatrix(paint.iconTranslate,
-                                                   paint.iconTranslateAnchor,
-                                                   state);
+            mat4 vtxMatrix =
+                tile.translatedMatrix(paint.iconTranslate, paint.iconTranslateAnchor, state);
 
             std::array<float, 2> extrudeScale;
 
@@ -195,10 +185,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
             if (alignedWithMap) {
                 extrudeScale.fill(tile.id.pixelsToTileUnits(1, state.getZoom()) * fontScale);
             } else {
-                extrudeScale = {{
-                    pixelsToGLUnits[0] * fontScale * state.getAltitude(),
-                    pixelsToGLUnits[1] * fontScale * state.getAltitude()
-                }};
+                extrudeScale = { { pixelsToGLUnits[0] * fontScale * state.getAltitude(),
+                                   pixelsToGLUnits[1] * fontScale * state.getAltitude() } };
             }
 
             auto& iconShader = parameters.shaders.icon;
@@ -206,7 +194,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
             config.program = iconShader.getID();
             iconShader.u_matrix = vtxMatrix;
             iconShader.u_extrude_scale = extrudeScale;
-            iconShader.u_texsize = {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }};
+            iconShader.u_texsize = { { float(activeSpriteAtlas->getWidth()) / 4.0f,
+                                       float(activeSpriteAtlas->getHeight()) / 4.0f } };
             iconShader.u_rotate_with_map = alignedWithMap;
             iconShader.u_texture = 0;
 
@@ -233,22 +222,12 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         glyphAtlas->bind(store, config, 0);
 
-        renderSDF(bucket,
-                  tile,
-                  24.0f,
-                  {{ float(glyphAtlas->width) / 4, float(glyphAtlas->height) / 4 }},
-                  parameters.shaders.sdfGlyph,
-                  &SymbolBucket::drawGlyphs,
-                  layout.textRotationAlignment,
-                  layout.textPitchAlignment,
-                  layout.textSize,
-                  paint.textOpacity,
-                  paint.textColor,
-                  paint.textHaloColor,
-                  paint.textHaloWidth,
-                  paint.textHaloBlur,
-                  paint.textTranslate,
-                  paint.textTranslateAnchor,
+        renderSDF(bucket, tile, 24.0f,
+                  { { float(glyphAtlas->width) / 4, float(glyphAtlas->height) / 4 } },
+                  parameters.shaders.sdfGlyph, &SymbolBucket::drawGlyphs,
+                  layout.textRotationAlignment, layout.textPitchAlignment, layout.textSize,
+                  paint.textOpacity, paint.textColor, paint.textHaloColor, paint.textHaloWidth,
+                  paint.textHaloBlur, paint.textTranslate, paint.textTranslateAnchor,
                   layer.impl->textSize);
     }
 
@@ -267,7 +246,6 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         setDepthSublayer(0);
         bucket.drawCollisionBoxes(collisionBoxShader, store);
-
     }
 }
 

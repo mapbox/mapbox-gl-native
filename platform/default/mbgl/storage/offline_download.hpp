@@ -26,7 +26,10 @@ class Parser;
  */
 class OfflineDownload {
 public:
-    OfflineDownload(int64_t id, OfflineRegionDefinition&&, OfflineDatabase& offline, FileSource& online);
+    OfflineDownload(int64_t id,
+                    OfflineRegionDefinition&&,
+                    OfflineDatabase& offline,
+                    FileSource& online);
     ~OfflineDownload();
 
     void setObserver(std::unique_ptr<OfflineRegionObserver>);
@@ -47,10 +50,10 @@ private:
      * While the request is in progress, it is recorded in `requests`. If the download
      * is deactivated, all in progress requests are cancelled.
      */
-    void ensureResource(const Resource&, std::function<void (Response)> = {});
+    void ensureResource(const Resource&, std::function<void(Response)> = {});
     void ensureTiles(SourceType, uint16_t, const Tileset&);
     bool checkTileCountLimit(const Resource& resource);
-    
+
     int64_t id;
     OfflineRegionDefinition definition;
     OfflineDatabase& offlineDatabase;

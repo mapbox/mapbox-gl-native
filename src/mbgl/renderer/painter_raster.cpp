@@ -15,7 +15,8 @@ void Painter::renderRaster(PaintParameters& parameters,
                            RasterBucket& bucket,
                            const RasterLayer& layer,
                            const RenderTile& tile) {
-    if (pass != RenderPass::Translucent) return;
+    if (pass != RenderPass::Translucent)
+        return;
 
     const RasterPaintProperties& properties = layer.impl->paint;
 
@@ -39,7 +40,7 @@ void Painter::renderRaster(PaintParameters& parameters,
 
         rasterShader.u_image0 = 0; // GL_TEXTURE0
         rasterShader.u_image1 = 1; // GL_TEXTURE1
-        rasterShader.u_tl_parent = {{ 0.0f, 0.0f }};
+        rasterShader.u_tl_parent = { { 0.0f, 0.0f } };
         rasterShader.u_scale_parent = 1.0f;
 
         config.depthFunc.reset();
@@ -71,11 +72,8 @@ std::array<float, 3> Painter::spinWeights(float spin) {
     spin *= util::DEG2RAD;
     float s = std::sin(spin);
     float c = std::cos(spin);
-    std::array<float, 3> spin_weights = {{
-        (2 * c + 1) / 3,
-        (-std::sqrt(3.0f) * s - c + 1) / 3,
-        (std::sqrt(3.0f) * s - c + 1) / 3
-    }};
+    std::array<float, 3> spin_weights = { { (2 * c + 1) / 3, (-std::sqrt(3.0f) * s - c + 1) / 3,
+                                            (std::sqrt(3.0f) * s - c + 1) / 3 } };
     return spin_weights;
 }
 

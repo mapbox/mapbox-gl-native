@@ -7,8 +7,8 @@
 
 namespace mbgl {
 
-void DebugFontBuffer::addText(const char *text, double left, double baseline, double scale) {
-    uint16_t *coords = nullptr;
+void DebugFontBuffer::addText(const char* text, double left, double baseline, double scale) {
+    uint16_t* coords = nullptr;
 
     const size_t len = strlen(text);
     for (size_t i = 0; i < len; ++i) {
@@ -26,15 +26,17 @@ void DebugFontBuffer::addText(const char *text, double left, double baseline, do
                 int16_t x = ::round(left + glyph.data[j] * scale);
                 int16_t y = ::round(baseline - glyph.data[j + 1] * scale);
                 if (prev) {
-                    coords = static_cast<uint16_t *>(addElement());
+                    coords = static_cast<uint16_t*>(addElement());
                     coords[0] = prev_x;
                     coords[1] = prev_y;
 
-                    coords = static_cast<uint16_t *>(addElement());
+                    coords = static_cast<uint16_t*>(addElement());
                     coords[0] = x;
                     coords[1] = y;
                 }
-                prev_x = x; prev_y = y; prev = true;
+                prev_x = x;
+                prev_y = y;
+                prev = true;
             }
         }
         left += glyph.width * scale;

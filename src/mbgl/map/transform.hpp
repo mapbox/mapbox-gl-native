@@ -49,7 +49,10 @@ public:
     void setLatLng(const LatLng&, optional<EdgeInsets>, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, optional<ScreenCoordinate>, const Duration& = Duration::zero());
     void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
-    void setLatLngZoom(const LatLng&, double zoom, optional<EdgeInsets>, const Duration& = Duration::zero());
+    void setLatLngZoom(const LatLng&,
+                       double zoom,
+                       optional<EdgeInsets>,
+                       const Duration& = Duration::zero());
     LatLng getLatLng(optional<EdgeInsets> = {}) const;
     ScreenCoordinate getScreenCoordinate(optional<EdgeInsets> = {}) const;
 
@@ -70,7 +73,8 @@ public:
         @param scale The new scale factor.
         @param anchor A point relative to the top-left corner of the view.
             If unspecified, the center point is fixed within the view. */
-    void setScale(double scale, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
+    void
+    setScale(double scale, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
     /** Sets the scale factor, keeping the center point fixed within the inset view.
         @param scale The new scale factor.
         @param padding The viewport padding that affects the fixed center point. */
@@ -82,7 +86,8 @@ public:
         @param zoom The new zoom level.
         @param anchor A point relative to the top-left corner of the view.
             If unspecified, the center point is fixed within the view. */
-    void setZoom(double zoom, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
+    void
+    setZoom(double zoom, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
     /** Sets the zoom level, keeping the center point fixed within the inset view.
         @param zoom The new zoom level.
         @param padding The viewport padding that affects the fixed center point. */
@@ -97,7 +102,9 @@ public:
 
     // Angle
 
-    void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const Duration& = Duration::zero());
+    void rotateBy(const ScreenCoordinate& first,
+                  const ScreenCoordinate& second,
+                  const Duration& = Duration::zero());
     /** Sets the angle of rotation.
         @param angle The new angle of rotation, measured in radians
             counterclockwise from true north. */
@@ -106,7 +113,8 @@ public:
         @param angle The new angle of rotation, measured in radians
             counterclockwise from true north.
         @param anchor A point relative to the top-left corner of the view. */
-    void setAngle(double angle, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
+    void
+    setAngle(double angle, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
     /** Sets the angle of rotation, keeping the center point fixed within the inset view.
         @param angle The new angle of rotation, measured in radians
             counterclockwise from true north.
@@ -126,7 +134,8 @@ public:
         @param angle The new pitch angle, measured in radians toward the
             horizon.
         @param anchor A point relative to the top-left corner of the view. */
-    void setPitch(double pitch, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
+    void
+    setPitch(double pitch, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
     double getPitch() const;
 
     // North Orientation
@@ -144,19 +153,33 @@ public:
     // Transitions
     bool inTransition() const;
     Update updateTransitions(const TimePoint& now);
-    TimePoint getTransitionStart() const { return transitionStart; }
-    Duration getTransitionDuration() const { return transitionDuration; }
+    TimePoint getTransitionStart() const {
+        return transitionStart;
+    }
+    Duration getTransitionDuration() const {
+        return transitionDuration;
+    }
     void cancelTransitions();
 
     // Gesture
     void setGestureInProgress(bool);
-    bool isGestureInProgress() const { return state.isGestureInProgress(); }
+    bool isGestureInProgress() const {
+        return state.isGestureInProgress();
+    }
 
     // Transform state
-    const TransformState& getState() const { return state; }
-    bool isRotating() const { return state.isRotating(); }
-    bool isScaling() const { return state.isScaling(); }
-    bool isPanning() const { return state.isPanning(); }
+    const TransformState& getState() const {
+        return state;
+    }
+    bool isRotating() const {
+        return state.isRotating();
+    }
+    bool isScaling() const {
+        return state.isScaling();
+    }
+    bool isPanning() const {
+        return state.isPanning();
+    }
 
     // Conversion and projection
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;

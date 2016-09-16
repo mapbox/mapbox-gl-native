@@ -10,7 +10,10 @@
 
 namespace node_mbgl {
 
-namespace util { template <typename T> class AsyncQueue; }
+namespace util {
+template <typename T>
+class AsyncQueue;
+}
 
 class NodeLogObserver : public mbgl::Log::Observer {
 public:
@@ -18,14 +21,16 @@ public:
     ~NodeLogObserver();
 
     // Log::Observer implementation
-    virtual bool onRecord(mbgl::EventSeverity severity, mbgl::Event event, int64_t code, const std::string &msg) override;
+    virtual bool onRecord(mbgl::EventSeverity severity,
+                          mbgl::Event event,
+                          int64_t code,
+                          const std::string& msg) override;
 
 private:
     Nan::Persistent<v8::Object> module;
 
     struct LogMessage;
     using Queue = util::AsyncQueue<LogMessage>;
-    Queue *queue = nullptr;
+    Queue* queue = nullptr;
 };
-
 }

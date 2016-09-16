@@ -7,34 +7,34 @@ namespace util {
 
 using Index = std::unordered_map<size_t, unsigned int>;
 
-unsigned int mergeFromRight(std::vector<SymbolFeature> &features,
-                            Index &rightIndex,
+unsigned int mergeFromRight(std::vector<SymbolFeature>& features,
+                            Index& rightIndex,
                             Index::iterator left,
                             size_t rightKey,
-                            GeometryCollection &geom) {
+                            GeometryCollection& geom) {
 
     unsigned int index = left->second;
     rightIndex.erase(left);
     rightIndex[rightKey] = index;
     features[index].geometry[0].pop_back();
-    features[index].geometry[0].insert(
-        features[index].geometry[0].end(), geom[0].begin(), geom[0].end());
+    features[index].geometry[0].insert(features[index].geometry[0].end(), geom[0].begin(),
+                                       geom[0].end());
     geom[0].clear();
     return index;
 }
 
-unsigned int mergeFromLeft(std::vector<SymbolFeature> &features,
-                           Index &leftIndex,
+unsigned int mergeFromLeft(std::vector<SymbolFeature>& features,
+                           Index& leftIndex,
                            size_t leftKey,
                            Index::iterator right,
-                           GeometryCollection &geom) {
+                           GeometryCollection& geom) {
 
     unsigned int index = right->second;
     leftIndex.erase(right);
     leftIndex[leftKey] = index;
     geom[0].pop_back();
-    geom[0].insert(
-        geom[0].end(), features[index].geometry[0].begin(), features[index].geometry[0].end());
+    geom[0].insert(geom[0].end(), features[index].geometry[0].begin(),
+                   features[index].geometry[0].end());
     features[index].geometry[0].clear();
     std::swap(features[index].geometry[0], geom[0]);
     return index;
@@ -45,8 +45,7 @@ enum class Side {
     Right = true,
 };
 
-size_t
-getKey(const std::u32string& text, const GeometryCollection& geom, Side side) {
+size_t getKey(const std::u32string& text, const GeometryCollection& geom, Side side) {
     const GeometryCoordinate& coord = side == Side::Right ? geom[0].back() : geom[0].front();
 
     auto hash = std::hash<std::u32string>()(text);
@@ -55,14 +54,14 @@ getKey(const std::u32string& text, const GeometryCollection& geom, Side side) {
     return hash;
 }
 
-void mergeLines(std::vector<SymbolFeature> &features) {
+void mergeLines(std::vector<SymbolFeature>& features) {
 
     Index leftIndex;
     Index rightIndex;
 
     for (unsigned int k = 0; k < features.size(); k++) {
-        SymbolFeature &feature = features[k];
-        GeometryCollection &geometry = feature.geometry;
+        SymbolFeature& feature = features[k];
+        GeometryCollection& geometry = feature.geometry;
 
         if (!feature.label.length()) {
             continue;

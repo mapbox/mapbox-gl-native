@@ -26,10 +26,7 @@ T angle_to(const Point<S>& a, const Point<S>& b) {
 // Reflect an angle around 0 degrees
 template <typename T>
 std::array<T, 2> flip(const std::array<T, 2>& c) {
-    return {{
-        static_cast<T>(2 * M_PI - c[0]),
-        static_cast<T>(2 * M_PI - c[1])
-    }};
+    return {{static_cast<T>(2 * M_PI - c[0]), static_cast<T>(2 * M_PI - c[1])}};
 }
 
 template <typename T, typename S1, typename S2>
@@ -37,7 +34,7 @@ Point<T> normal(const S1& a, const S2& b) {
     T dx = b.x - a.x;
     T dy = b.y - a.y;
     T c = std::sqrt(dx * dx + dy * dy);
-    return { dx / c, dy / c };
+    return {dx / c, dy / c};
 }
 
 template <typename T>

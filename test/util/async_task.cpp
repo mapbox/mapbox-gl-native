@@ -12,8 +12,8 @@ namespace {
 
 class TestWorker {
 public:
-    TestWorker(AsyncTask *async_)
-        : async(async_) {}
+    TestWorker(AsyncTask* async_) : async(async_) {
+    }
 
     void run() {
         for (unsigned i = 0; i < 100000; ++i) {
@@ -30,7 +30,7 @@ public:
     }
 
 private:
-    AsyncTask *async;
+    AsyncTask* async;
 };
 
 } // namespace
@@ -139,8 +139,7 @@ TEST(AsyncTask, ThreadSafety) {
         std::unique_ptr<Thread<TestWorker>> thread =
             std::make_unique<Thread<TestWorker>>(context, &async);
 
-        requests.push_back(
-            thread->invokeWithCallback(&TestWorker::runWithCallback, callback));
+        requests.push_back(thread->invokeWithCallback(&TestWorker::runWithCallback, callback));
 
         threads.push_back(std::move(thread));
     }

@@ -87,21 +87,20 @@ public:
     std::string key;
 };
 
-using FilterBase = variant<
-    class NullFilter,
-    class EqualsFilter,
-    class NotEqualsFilter,
-    class LessThanFilter,
-    class LessThanEqualsFilter,
-    class GreaterThanFilter,
-    class GreaterThanEqualsFilter,
-    class InFilter,
-    class NotInFilter,
-    class AnyFilter,
-    class AllFilter,
-    class NoneFilter,
-    class HasFilter,
-    class NotHasFilter>;
+using FilterBase = variant<class NullFilter,
+                           class EqualsFilter,
+                           class NotEqualsFilter,
+                           class LessThanFilter,
+                           class LessThanEqualsFilter,
+                           class GreaterThanFilter,
+                           class GreaterThanEqualsFilter,
+                           class InFilter,
+                           class NotInFilter,
+                           class AnyFilter,
+                           class AllFilter,
+                           class NoneFilter,
+                           class HasFilter,
+                           class NotHasFilter>;
 
 class Filter : public FilterBase {
 public:
@@ -110,7 +109,8 @@ public:
     bool operator()(const Feature&) const;
 
     template <class PropertyAccessor>
-    bool operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor) const;
+    bool
+    operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor) const;
 };
 
 } // namespace style

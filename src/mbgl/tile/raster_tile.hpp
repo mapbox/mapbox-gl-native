@@ -16,9 +16,7 @@ class UpdateParameters;
 
 class RasterTile : public Tile {
 public:
-    RasterTile(const OverscaledTileID&,
-                   const style::UpdateParameters&,
-                   const Tileset&);
+    RasterTile(const OverscaledTileID&, const style::UpdateParameters&, const Tileset&);
     ~RasterTile() final;
 
     void setNecessity(Necessity) final;

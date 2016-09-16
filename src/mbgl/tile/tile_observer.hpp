@@ -15,9 +15,12 @@ class TileObserver {
 public:
     virtual ~TileObserver() = default;
 
-    virtual void onTileLoaded(Tile&, TileLoadState) {}
-    virtual void onTileError(Tile&, std::exception_ptr) {}
-    virtual void onTileUpdated(Tile&) {}
+    virtual void onTileLoaded(Tile&, TileLoadState) {
+    }
+    virtual void onTileError(Tile&, std::exception_ptr) {
+    }
+    virtual void onTileUpdated(Tile&) {
+    }
 };
 
 } // namespace mbgl

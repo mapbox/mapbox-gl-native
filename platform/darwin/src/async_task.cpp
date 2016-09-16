@@ -9,21 +9,9 @@ namespace util {
 
 class AsyncTask::Impl {
 public:
-    Impl(std::function<void()>&& fn)
-        : task(std::move(fn)),
-          loop(CFRunLoopGetCurrent()) {
-        CFRunLoopSourceContext context = {
-            0,
-            this,
-            nullptr,
-            nullptr,
-            nullptr,
-            nullptr,
-            nullptr,
-            nullptr,
-            nullptr,
-            perform
-        };
+    Impl(std::function<void()>&& fn) : task(std::move(fn)), loop(CFRunLoopGetCurrent()) {
+        CFRunLoopSourceContext context = {0,       this,    nullptr, nullptr, nullptr,
+                                          nullptr, nullptr, nullptr, nullptr, perform};
         source = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &context);
         CFRunLoopAddSource(loop, source, kCFRunLoopCommonModes);
     }
@@ -57,8 +45,7 @@ private:
     CFRunLoopSourceRef source;
 };
 
-AsyncTask::AsyncTask(std::function<void()>&& fn)
-    : impl(std::make_unique<Impl>(std::move(fn))) {
+AsyncTask::AsyncTask(std::function<void()>&& fn) : impl(std::make_unique<Impl>(std::move(fn))) {
 }
 
 AsyncTask::~AsyncTask() = default;

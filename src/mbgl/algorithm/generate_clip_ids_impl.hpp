@@ -16,7 +16,7 @@ void ClipIDGenerator::update(Renderables& renderables) {
         auto& tileID = it->first;
         auto& renderable = it->second;
         renderable.clip = {};
-        Leaf leaf{ renderable.clip };
+        Leaf leaf{renderable.clip};
 
         // Try to add all remaining ids as children. We sorted the tile list
         // by z earlier, so all preceding items cannot be children of the current
@@ -24,7 +24,7 @@ void ClipIDGenerator::update(Renderables& renderables) {
         // can never be children of the current wrap.
         auto child_it = std::next(it);
         const auto children_end = std::lower_bound(
-            child_it, end, UnwrappedTileID{ static_cast<int16_t>(tileID.wrap + 1), { 0, 0, 0 } },
+            child_it, end, UnwrappedTileID{static_cast<int16_t>(tileID.wrap + 1), {0, 0, 0}},
             [](auto& a, auto& b) { return a.first < b; });
         for (; child_it != children_end; ++child_it) {
             auto& childTileID = child_it->first;

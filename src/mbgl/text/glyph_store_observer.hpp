@@ -12,8 +12,10 @@ class GlyphStoreObserver {
 public:
     virtual ~GlyphStoreObserver() = default;
 
-    virtual void onGlyphsLoaded(const FontStack&, const GlyphRange&) {}
-    virtual void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr) {}
+    virtual void onGlyphsLoaded(const FontStack&, const GlyphRange&) {
+    }
+    virtual void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr) {
+    }
 };
 
 } // namespace mbgl

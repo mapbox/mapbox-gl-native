@@ -18,10 +18,7 @@ class UpdateParameters;
 template <typename T>
 class TileLoader : private util::noncopyable {
 public:
-    TileLoader(T&,
-               const OverscaledTileID&,
-               const style::UpdateParameters&,
-               const Tileset&);
+    TileLoader(T&, const OverscaledTileID&, const style::UpdateParameters&, const Tileset&);
     ~TileLoader();
 
     using Necessity = Resource::Necessity;
@@ -38,7 +35,8 @@ public:
     }
 
 private:
-    // called when the tile is one of the ideal tiles that we want to show definitely. the tile source
+    // called when the tile is one of the ideal tiles that we want to show definitely. the tile
+    // source
     // should try to make every effort (e.g. fetch from internet, or revalidate existing resources).
     void makeRequired();
 

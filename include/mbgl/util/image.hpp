@@ -8,30 +8,22 @@
 
 namespace mbgl {
 
-enum ImageAlphaMode {
-    Unassociated,
-    Premultiplied
-};
+enum ImageAlphaMode { Unassociated, Premultiplied };
 
 template <ImageAlphaMode Mode>
 class Image : private util::noncopyable {
 public:
     Image() = default;
 
-    Image(size_t w, size_t h)
-        : width(w),
-          height(h),
-          data(std::make_unique<uint8_t[]>(size())) {}
+    Image(size_t w, size_t h) : width(w), height(h), data(std::make_unique<uint8_t[]>(size())) {
+    }
 
     Image(size_t w, size_t h, std::unique_ptr<uint8_t[]> data_)
-        : width(w),
-          height(h),
-          data(std::move(data_)) {}
+        : width(w), height(h), data(std::move(data_)) {
+    }
 
-    Image(Image&& o)
-        : width(o.width),
-          height(o.height),
-          data(std::move(o.data)) {}
+    Image(Image&& o) : width(o.width), height(o.height), data(std::move(o.data)) {
+    }
 
     Image& operator=(Image&& o) {
         width = o.width;
@@ -46,8 +38,12 @@ public:
                           rhs.data.get() + rhs.size());
     }
 
-    size_t stride() const { return width * 4; }
-    size_t size() const { return width * height * 4; }
+    size_t stride() const {
+        return width * 4;
+    }
+    size_t size() const {
+        return width * height * 4;
+    }
 
     size_t width = 0;
     size_t height = 0;

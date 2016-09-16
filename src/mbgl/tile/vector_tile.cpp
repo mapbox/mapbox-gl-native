@@ -20,9 +20,11 @@ class VectorTileFeature : public GeometryTileFeature {
 public:
     VectorTileFeature(protozero::pbf_reader, const VectorTileLayer&);
 
-    FeatureType getType() const override { return type; }
+    FeatureType getType() const override {
+        return type;
+    }
     optional<Value> getValue(const std::string&) const override;
-    std::unordered_map<std::string,Value> getProperties() const override;
+    std::unordered_map<std::string, Value> getProperties() const override;
     optional<FeatureIdentifier> getID() const override;
     GeometryCollection getGeometries() const override;
 
@@ -38,7 +40,9 @@ class VectorTileLayer : public GeometryTileLayer {
 public:
     VectorTileLayer(protozero::pbf_reader);
 
-    std::size_t featureCount() const override { return features.size(); }
+    std::size_t featureCount() const override {
+        return features.size();
+    }
     std::unique_ptr<GeometryTileFeature> getFeature(std::size_t) const override;
     std::string getName() const override;
 
@@ -93,8 +97,7 @@ void VectorTile::setData(std::shared_ptr<const std::string> data_,
 }
 
 Value parseValue(protozero::pbf_reader data) {
-    while (data.next())
-    {
+    while (data.next()) {
         switch (data.tag()) {
         case 1: // string_value
             return data.get_string();
@@ -118,7 +121,8 @@ Value parseValue(protozero::pbf_reader data) {
     return false;
 }
 
-VectorTileFeature::VectorTileFeature(protozero::pbf_reader feature_pbf, const VectorTileLayer& layer_)
+VectorTileFeature::VectorTileFeature(protozero::pbf_reader feature_pbf,
+                                     const VectorTileLayer& layer_)
     : layer(layer_) {
     while (feature_pbf.next()) {
         switch (feature_pbf.tag()) {
@@ -148,7 +152,7 @@ optional<Value> VectorTileFeature::getValue(const std::string& key) const {
     }
 
     auto start_itr = tags_iter.begin();
-    const auto & end_itr = tags_iter.end();
+    const auto& end_itr = tags_iter.end();
     while (start_itr != end_itr) {
         uint32_t tag_key = static_cast<uint32_t>(*start_itr++);
 
@@ -160,7 +164,8 @@ optional<Value> VectorTileFeature::getValue(const std::string& key) const {
             throw std::runtime_error("uneven number of feature tag ids");
         }
 
-        uint32_t tag_val = static_cast<uint32_t>(*start_itr++);;
+        uint32_t tag_val = static_cast<uint32_t>(*start_itr++);
+        ;
         if (layer.values.size() <= tag_val) {
             throw std::runtime_error("feature referenced out of range value");
         }
@@ -173,10 +178,10 @@ optional<Value> VectorTileFeature::getValue(const std::string& key) const {
     return optional<Value>();
 }
 
-std::unordered_map<std::string,Value> VectorTileFeature::getProperties() const {
-    std::unordered_map<std::string,Value> properties;
+std::unordered_map<std::string, Value> VectorTileFeature::getProperties() const {
+    std::unordered_map<std::string, Value> properties;
     auto start_itr = tags_iter.begin();
-    const auto & end_itr = tags_iter.end();
+    const auto& end_itr = tags_iter.end();
     while (start_itr != end_itr) {
         uint32_t tag_key = static_cast<uint32_t>(*start_itr++);
         if (start_itr == end_itr) {
@@ -242,8 +247,7 @@ GeometryCollection VectorTileFeature::getGeometries() const {
     return fixupPolygons(lines);
 }
 
-VectorTileData::VectorTileData(std::shared_ptr<const std::string> data_)
-    : data(std::move(data_)) {
+VectorTileData::VectorTileData(std::shared_ptr<const std::string> data_) : data(std::move(data_)) {
 }
 
 const GeometryTileLayer* VectorTileData::getLayer(const std::string& name) const {
@@ -273,11 +277,10 @@ VectorTileLayer::VectorTileLayer(protozero::pbf_reader layer_pbf) {
             features.push_back(layer_pbf.get_message());
             break;
         case 3: // keys
-            {
-                auto iter = keysMap.emplace(layer_pbf.get_string(), keysMap.size());
-                keys.emplace_back(std::reference_wrapper<const std::string>(iter.first->first));
-            }
-            break;
+        {
+            auto iter = keysMap.emplace(layer_pbf.get_string(), keysMap.size());
+            keys.emplace_back(std::reference_wrapper<const std::string>(iter.first->first));
+        } break;
         case 4: // values
             values.emplace_back(parseValue(layer_pbf.get_message()));
             break;

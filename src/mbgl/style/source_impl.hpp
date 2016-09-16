@@ -54,9 +54,7 @@ public:
     // data with fresh style information.
     void reload();
 
-    void startRender(algorithm::ClipIDGenerator&,
-                     const mat4& projMatrix,
-                     const TransformState&);
+    void startRender(algorithm::ClipIDGenerator&, const mat4& projMatrix, const TransformState&);
     void finishRender(Painter&);
 
     const std::map<UnwrappedTileID, RenderTile>& getRenderTiles() const;

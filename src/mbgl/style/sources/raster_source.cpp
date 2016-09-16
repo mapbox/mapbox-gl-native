@@ -4,8 +4,12 @@
 namespace mbgl {
 namespace style {
 
-RasterSource::RasterSource(std::string id, variant<std::string, Tileset> urlOrTileset, uint16_t tileSize)
-    : Source(SourceType::Raster, std::make_unique<RasterSource::Impl>(std::move(id), *this, std::move(urlOrTileset), tileSize)) {
+RasterSource::RasterSource(std::string id,
+                           variant<std::string, Tileset> urlOrTileset,
+                           uint16_t tileSize)
+    : Source(SourceType::Raster,
+             std::make_unique<RasterSource::Impl>(
+                 std::move(id), *this, std::move(urlOrTileset), tileSize)) {
 }
 
 } // namespace style

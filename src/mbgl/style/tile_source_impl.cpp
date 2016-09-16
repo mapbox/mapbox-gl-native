@@ -14,13 +14,17 @@
 namespace mbgl {
 namespace style {
 
-Tileset TileSourceImpl::parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType type, uint16_t tileSize) {
+Tileset TileSourceImpl::parseTileJSON(const std::string& json,
+                                      const std::string& sourceURL,
+                                      SourceType type,
+                                      uint16_t tileSize) {
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
     document.Parse<0>(json.c_str());
 
     if (document.HasParseError()) {
         std::stringstream message;
-        message << document.GetErrorOffset() << " - " << rapidjson::GetParseError_En(document.GetParseError());
+        message << document.GetErrorOffset() << " - "
+                << rapidjson::GetParseError_En(document.GetParseError());
         throw std::runtime_error(message.str());
     }
 
@@ -39,7 +43,9 @@ Tileset TileSourceImpl::parseTileJSON(const std::string& json, const std::string
     return *result;
 }
 
-TileSourceImpl::TileSourceImpl(SourceType type_, std::string id_, Source& base_,
+TileSourceImpl::TileSourceImpl(SourceType type_,
+                               std::string id_,
+                               Source& base_,
                                variant<std::string, Tileset> urlOrTileset_,
                                uint16_t tileSize_)
     : Impl(type_, std::move(id_), base_),
@@ -63,11 +69,13 @@ void TileSourceImpl::loadDescription(FileSource& fileSource) {
     const std::string& url = urlOrTileset.get<std::string>();
     req = fileSource.request(Resource::source(url), [this, url](Response res) {
         if (res.error) {
-            observer->onSourceError(base, std::make_exception_ptr(std::runtime_error(res.error->message)));
+            observer->onSourceError(
+                base, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
             return;
         } else if (res.noContent) {
-            observer->onSourceError(base, std::make_exception_ptr(std::runtime_error("unexpectedly empty TileJSON")));
+            observer->onSourceError(
+                base, std::make_exception_ptr(std::runtime_error("unexpectedly empty TileJSON")));
         } else {
             Tileset newTileset;
 

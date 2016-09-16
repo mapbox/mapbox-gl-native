@@ -52,7 +52,8 @@ TEST(HTTPHeader, Parsing) {
     EXPECT_EQ(0u, *cc.maxAge);
     EXPECT_FALSE(cc.mustRevalidate);
 
-    cc = http::CacheControl::parse(R"#(,   private   , max-bar=3 , no-cache,  "\,",,foo=",",,max-age=32)#");
+    cc = http::CacheControl::parse(
+        R"#(,   private   , max-bar=3 , no-cache,  "\,",,foo=",",,max-age=32)#");
     ASSERT_TRUE(bool(cc.maxAge));
     EXPECT_EQ(32u, *cc.maxAge);
     EXPECT_FALSE(cc.mustRevalidate);

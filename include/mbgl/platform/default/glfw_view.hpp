@@ -25,12 +25,12 @@ public:
     void deactivate() override;
     void invalidate() override;
 
-    static void onKey(GLFWwindow *window, int key, int scancode, int action, int mods);
-    static void onScroll(GLFWwindow *window, double xoffset, double yoffset);
-    static void onWindowResize(GLFWwindow *window, int width, int height);
-    static void onFramebufferResize(GLFWwindow *window, int width, int height);
-    static void onMouseClick(GLFWwindow *window, int button, int action, int modifiers);
-    static void onMouseMove(GLFWwindow *window, double x, double y);
+    static void onKey(GLFWwindow* window, int key, int scancode, int action, int mods);
+    static void onScroll(GLFWwindow* window, double xoffset, double yoffset);
+    static void onWindowResize(GLFWwindow* window, int width, int height);
+    static void onFramebufferResize(GLFWwindow* window, int width, int height);
+    static void onMouseClick(GLFWwindow* window, int button, int action, int modifiers);
+    static void onMouseMove(GLFWwindow* window, double x, double y);
 
     // Callback called when the user presses the key mapped to style change.
     // The expected action is to set a new style, different to the current one.
@@ -89,6 +89,6 @@ private:
     mbgl::util::RunLoop runLoop;
     mbgl::util::Timer frameTick;
 
-    GLFWwindow *window = nullptr;
+    GLFWwindow* window = nullptr;
     bool dirty = false;
 };

@@ -4,9 +4,8 @@
 
 namespace mbgl {
 
-class CircleVertexBuffer : public Buffer<
-    4 // 2 bytes per short * 4 of them.
-> {
+class CircleVertexBuffer : public Buffer<4 // 2 bytes per short * 4 of them.
+                                         > {
 public:
     typedef int16_t vertex_type;
 

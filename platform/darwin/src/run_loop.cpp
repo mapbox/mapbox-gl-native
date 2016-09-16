@@ -20,8 +20,7 @@ RunLoop* RunLoop::Get() {
     return current.get();
 }
 
-RunLoop::RunLoop(Type)
-  : impl(std::make_unique<Impl>()) {
+RunLoop::RunLoop(Type) : impl(std::make_unique<Impl>()) {
     current.set(this);
     impl->async = std::make_unique<AsyncTask>(std::bind(&RunLoop::process, this));
 }

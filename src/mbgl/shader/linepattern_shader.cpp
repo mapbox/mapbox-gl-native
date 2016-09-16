@@ -9,7 +9,8 @@ LinepatternShader::LinepatternShader(gl::ObjectStore& store, Defines defines)
     : Shader(shaders::linepattern::name,
              shaders::linepattern::vertex,
              shaders::linepattern::fragment,
-             store, defines) {
+             store,
+             defines) {
 }
 
 void LinepatternShader::bind(GLbyte* offset) {

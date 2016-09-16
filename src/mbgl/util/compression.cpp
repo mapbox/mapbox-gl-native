@@ -8,7 +8,7 @@
 
 // Check zlib library version.
 const static bool zlibVersionCheck __attribute__((unused)) = []() {
-    const char *const version = zlibVersion();
+    const char* const version = zlibVersion();
     if (version[0] != ZLIB_VERSION[0]) {
         char message[96];
         snprintf(message, 96, "zlib version mismatch: headers report %s, but library reports %s",
@@ -22,7 +22,7 @@ const static bool zlibVersionCheck __attribute__((unused)) = []() {
 namespace mbgl {
 namespace util {
 
-std::string compress(const std::string &raw) {
+std::string compress(const std::string& raw) {
     z_stream deflate_stream;
     memset(&deflate_stream, 0, sizeof(deflate_stream));
 
@@ -31,7 +31,7 @@ std::string compress(const std::string &raw) {
         throw std::runtime_error("failed to initialize deflate");
     }
 
-    deflate_stream.next_in = (Bytef *)raw.data();
+    deflate_stream.next_in = (Bytef*)raw.data();
     deflate_stream.avail_in = uInt(raw.size());
 
     std::string result;
@@ -39,7 +39,7 @@ std::string compress(const std::string &raw) {
 
     int code;
     do {
-        deflate_stream.next_out = reinterpret_cast<Bytef *>(out);
+        deflate_stream.next_out = reinterpret_cast<Bytef*>(out);
         deflate_stream.avail_out = sizeof(out);
         code = deflate(&deflate_stream, Z_FINISH);
         if (result.size() < deflate_stream.total_out) {
@@ -57,7 +57,7 @@ std::string compress(const std::string &raw) {
     return result;
 }
 
-std::string decompress(const std::string &raw) {
+std::string decompress(const std::string& raw) {
     z_stream inflate_stream;
     memset(&inflate_stream, 0, sizeof(inflate_stream));
 
@@ -66,7 +66,7 @@ std::string decompress(const std::string &raw) {
         throw std::runtime_error("failed to initialize inflate");
     }
 
-    inflate_stream.next_in = (Bytef *)raw.data();
+    inflate_stream.next_in = (Bytef*)raw.data();
     inflate_stream.avail_in = uInt(raw.size());
 
     std::string result;
@@ -74,7 +74,7 @@ std::string decompress(const std::string &raw) {
 
     int code;
     do {
-        inflate_stream.next_out = reinterpret_cast<Bytef *>(out);
+        inflate_stream.next_out = reinterpret_cast<Bytef*>(out);
         inflate_stream.avail_out = sizeof(out);
         code = inflate(&inflate_stream, 0);
         // result.append(out, sizeof(out) - inflate_stream.avail_out);

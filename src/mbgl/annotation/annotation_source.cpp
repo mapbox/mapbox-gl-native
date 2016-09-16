@@ -22,8 +22,9 @@ void AnnotationSource::Impl::loadDescription(FileSource&) {
     loaded = true;
 }
 
-std::unique_ptr<Tile> AnnotationSource::Impl::createTile(const OverscaledTileID& tileID,
-                                                         const style::UpdateParameters& parameters) {
+std::unique_ptr<Tile>
+AnnotationSource::Impl::createTile(const OverscaledTileID& tileID,
+                                   const style::UpdateParameters& parameters) {
     return std::make_unique<AnnotationTile>(tileID, parameters);
 }
 

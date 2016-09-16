@@ -31,14 +31,15 @@ namespace mbgl {
 namespace util {
 
 struct UnitBezier {
-    // Calculate the polynomial coefficients, implicit first and last control points are (0,0) and (1,1).
+    // Calculate the polynomial coefficients, implicit first and last control points are (0,0) and
+    // (1,1).
     constexpr UnitBezier(double p1x, double p1y, double p2x, double p2y)
-        : cx(3.0 * p1x)
-        , bx(3.0 * (p2x - p1x) - cx)
-        , ax(1.0 - cx - bx)
-        , cy(3.0 * p1y)
-        , by(3.0 * (p2y - p1y) - cy)
-        , ay(1.0 - cy - by) {
+        : cx(3.0 * p1x),
+          bx(3.0 * (p2x - p1x) - cx),
+          ax(1.0 - cx - bx),
+          cy(3.0 * p1y),
+          by(3.0 * (p2y - p1y) - cy),
+          ay(1.0 - cy - by) {
     }
 
     double sampleCurveX(double t) const {
@@ -66,11 +67,13 @@ struct UnitBezier {
         // First try a few iterations of Newton's method -- normally very fast.
         for (t2 = x, i = 0; i < 8; ++i) {
             x2 = sampleCurveX(t2) - x;
-            if (fabs (x2) < epsilon)
+            if (fabs(x2) < epsilon) {
                 return t2;
+            }
             d2 = sampleCurveDerivativeX(t2);
-            if (fabs(d2) < 1e-6)
+            if (fabs(d2) < 1e-6) {
                 break;
+            }
             t2 = t2 - x2 / d2;
         }
 
@@ -79,19 +82,23 @@ struct UnitBezier {
         t1 = 1.0;
         t2 = x;
 
-        if (t2 < t0)
+        if (t2 < t0) {
             return t0;
-        if (t2 > t1)
+        }
+        if (t2 > t1) {
             return t1;
+        }
 
         while (t0 < t1) {
             x2 = sampleCurveX(t2);
-            if (fabs(x2 - x) < epsilon)
+            if (fabs(x2 - x) < epsilon) {
                 return t2;
-            if (x > x2)
+            }
+            if (x > x2) {
                 t0 = t2;
-            else
+            } else {
                 t1 = t2;
+            }
             t2 = (t1 - t0) * .5 + t0;
         }
 

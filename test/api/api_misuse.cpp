@@ -29,11 +29,8 @@ TEST(API, RenderWithoutCallback) {
     // Force Map thread to join.
     map.reset();
 
-    const FixtureLogObserver::LogMessage logMessage {
-        EventSeverity::Error,
-        Event::General,
-        int64_t(-1),
-        "StillImageCallback not set",
+    const FixtureLogObserver::LogMessage logMessage{
+        EventSeverity::Error, Event::General, int64_t(-1), "StillImageCallback not set",
     };
 
     EXPECT_EQ(log->count(logMessage), 1u);

@@ -14,9 +14,8 @@ class RasterBucket;
 class GeometryTileLoader;
 class CollisionTile;
 
-using RasterTileParseResult = variant<
-    std::unique_ptr<Bucket>, // success
-    std::exception_ptr>;     // error
+using RasterTileParseResult = variant<std::unique_ptr<Bucket>, // success
+                                      std::exception_ptr>;     // error
 
 class Worker : public mbgl::util::noncopyable {
 public:

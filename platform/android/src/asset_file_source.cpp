@@ -12,25 +12,28 @@
 namespace {
 
 struct ZipHolder {
-    ZipHolder(struct zip* archive_) : archive(archive_) {}
+    ZipHolder(struct zip* archive_) : archive(archive_) {
+    }
 
     ~ZipHolder() {
-        if (archive) ::zip_close(archive);
+        if (archive)
+            ::zip_close(archive);
     }
 
     struct zip* archive;
 };
 
 struct ZipFileHolder {
-    ZipFileHolder(struct zip_file* file_) : file(file_) {}
+    ZipFileHolder(struct zip_file* file_) : file(file_) {
+    }
 
     ~ZipFileHolder() {
-        if (file) ::zip_fclose(file);
+        if (file)
+            ::zip_fclose(file);
     }
 
     struct zip_file* file;
 };
-
 }
 
 namespace mbgl {
@@ -46,8 +49,7 @@ public:
 
 class AssetFileSource::Impl {
 public:
-    Impl(const std::string& root_)
-        : root(root_) {
+    Impl(const std::string& root_) : root(root_) {
     }
 
     void request(const std::string& url, FileSource::Callback callback) {
@@ -64,13 +66,15 @@ public:
 
         int ret = ::zip_stat(archive.archive, path.c_str(), 0, &stat);
         if (ret < 0 || !(stat.valid & ZIP_STAT_SIZE)) {
-            reportError(Response::Error::Reason::NotFound, "Could not stat file in zip archive", callback);
+            reportError(Response::Error::Reason::NotFound, "Could not stat file in zip archive",
+                        callback);
             return;
         }
 
         ZipFileHolder file = ::zip_fopen(archive.archive, path.c_str(), 0);
         if (!file.file) {
-            reportError(Response::Error::Reason::NotFound, "Could not open file in zip archive", callback);
+            reportError(Response::Error::Reason::NotFound, "Could not open file in zip archive",
+                        callback);
             return;
         }
 
@@ -79,7 +83,8 @@ public:
 
         ret = ::zip_fread(file.file, &buf->front(), stat.size);
         if (ret < 0) {
-            reportError(Response::Error::Reason::Other, "Could not read file in zip archive", callback);
+            reportError(Response::Error::Reason::Other, "Could not read file in zip archive",
+                        callback);
             return;
         }
 
@@ -88,7 +93,9 @@ public:
         callback(response);
     }
 
-    void reportError(Response::Error::Reason reason, const char * message, FileSource::Callback callback) {
+    void reportError(Response::Error::Reason reason,
+                     const char* message,
+                     FileSource::Callback callback) {
         Response response;
         response.error = std::make_unique<Response::Error>(reason, message);
         callback(response);
@@ -100,14 +107,13 @@ private:
 
 AssetFileSource::AssetFileSource(const std::string& root)
     : thread(std::make_unique<util::Thread<Impl>>(
-        util::ThreadContext{"AssetFileSource", util::ThreadPriority::Low},
-        root)) {
+          util::ThreadContext{"AssetFileSource", util::ThreadPriority::Low}, root)) {
 }
 
 AssetFileSource::~AssetFileSource() = default;
 
-std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource,
+                                                       Callback callback) {
     return thread->invokeWithCallback(&Impl::request, resource.url, callback);
 }
-
 }

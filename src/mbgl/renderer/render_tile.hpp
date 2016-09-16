@@ -14,7 +14,8 @@ class TransformState;
 
 class RenderTile {
 public:
-    RenderTile(UnwrappedTileID id_, Tile& tile_) : id(std::move(id_)), tile(tile_) {}
+    RenderTile(UnwrappedTileID id_, Tile& tile_) : id(std::move(id_)), tile(tile_) {
+    }
     RenderTile(const RenderTile&) = delete;
     RenderTile(RenderTile&&) = default;
     RenderTile& operator=(const RenderTile&) = delete;

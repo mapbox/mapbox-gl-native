@@ -3,7 +3,7 @@
 namespace mbgl {
 namespace style {
 
-optional<TransitionOptions> parseTransitionOptions(const char *, const JSValue& value) {
+optional<TransitionOptions> parseTransitionOptions(const char*, const JSValue& value) {
     if (!value.IsObject()) {
         return {};
     }
@@ -22,7 +22,7 @@ optional<TransitionOptions> parseTransitionOptions(const char *, const JSValue& 
         return {};
     }
 
-    return TransitionOptions { duration, delay };
+    return TransitionOptions{ duration, delay };
 }
 
 } // namespace style

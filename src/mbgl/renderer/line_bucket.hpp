@@ -38,15 +38,24 @@ public:
 
 private:
     struct TriangleElement {
-        TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}
+        TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {
+        }
         uint16_t a, b, c;
     };
-    void addCurrentVertex(const GeometryCoordinate& currentVertex, double& distance,
-            const Point<double>& normal, double endLeft, double endRight, bool round,
-            GLint startVertex, std::vector<LineBucket::TriangleElement>& triangleStore);
-    void addPieSliceVertex(const GeometryCoordinate& currentVertex, double distance,
-            const Point<double>& extrude, bool lineTurnsLeft, GLint startVertex,
-            std::vector<TriangleElement>& triangleStore);
+    void addCurrentVertex(const GeometryCoordinate& currentVertex,
+                          double& distance,
+                          const Point<double>& normal,
+                          double endLeft,
+                          double endRight,
+                          bool round,
+                          GLint startVertex,
+                          std::vector<LineBucket::TriangleElement>& triangleStore);
+    void addPieSliceVertex(const GeometryCoordinate& currentVertex,
+                           double distance,
+                           const Point<double>& extrude,
+                           bool lineTurnsLeft,
+                           GLint startVertex,
+                           std::vector<TriangleElement>& triangleStore);
 
 public:
     style::LineLayoutProperties layout;

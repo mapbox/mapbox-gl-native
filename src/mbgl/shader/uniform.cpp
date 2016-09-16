@@ -30,7 +30,7 @@ void Uniform<std::array<GLfloat, 4>>::bind(const std::array<GLfloat, 4>& t) {
 
 template <>
 void Uniform<Color>::bind(const Color& t) {
-    std::array<GLfloat, 4> a = {{ t.r, t.g, t.b, t.a }};
+    std::array<GLfloat, 4> a = { { t.r, t.g, t.b, t.a } };
     MBGL_CHECK_ERROR(glUniform4fv(location, 1, a.data()));
 }
 

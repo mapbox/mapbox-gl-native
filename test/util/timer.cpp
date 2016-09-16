@@ -138,7 +138,7 @@ TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(StartOverrides)) {
 
     auto interval1 = mbgl::Milliseconds(50);
     auto interval2 = mbgl::Milliseconds(250);
-    auto expectedTotalTime = interval1  + interval2;
+    auto expectedTotalTime = interval1 + interval2;
 
     int count = 0;
 

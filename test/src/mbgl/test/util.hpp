@@ -21,25 +21,25 @@
 #if !TEST_IS_SIMULATOR
 #define TEST_REQUIRES_ACCURATE_TIMING(name) name
 #else
-#define TEST_REQUIRES_ACCURATE_TIMING(name) DISABLED_ ## name
+#define TEST_REQUIRES_ACCURATE_TIMING(name) DISABLED_##name
 #endif
 
 #if !TEST_READ_ONLY
 #define TEST_REQUIRES_WRITE(name) name
 #else
-#define TEST_REQUIRES_WRITE(name) DISABLED_ ## name
+#define TEST_REQUIRES_WRITE(name) DISABLED_##name
 #endif
 
 #if TEST_HAS_SERVER
 #define TEST_REQUIRES_SERVER(name) name
 #else
-#define TEST_REQUIRES_SERVER(name) DISABLED_ ## name
+#define TEST_REQUIRES_SERVER(name) DISABLED_##name
 #endif
 
 #if !CI_BUILD
 #define TEST_DISABLED_ON_CI(name) name
 #else
-#define TEST_DISABLED_ON_CI(name) DISABLED_ ## name
+#define TEST_DISABLED_ON_CI(name) DISABLED_##name
 #endif
 
 #include <mbgl/util/image.hpp>

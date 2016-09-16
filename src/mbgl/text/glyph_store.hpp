@@ -36,7 +36,7 @@ public:
     // can be called from any thread.
     bool hasGlyphRanges(const FontStack&, const std::set<GlyphRange>&);
 
-    void setURL(const std::string &url) {
+    void setURL(const std::string& url) {
         glyphURL = url;
     }
 
@@ -52,7 +52,8 @@ private:
     FileSource& fileSource;
     std::string glyphURL;
 
-    std::unordered_map<FontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>, FontStackHash> ranges;
+    std::unordered_map<FontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>, FontStackHash>
+        ranges;
     std::mutex rangesMutex;
 
     std::unordered_map<FontStack, std::unique_ptr<GlyphSet>, FontStackHash> glyphSets;

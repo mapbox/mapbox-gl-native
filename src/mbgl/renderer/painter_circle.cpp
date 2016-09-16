@@ -17,7 +17,8 @@ void Painter::renderCircle(PaintParameters& parameters,
                            const CircleLayer& layer,
                            const RenderTile& tile) {
     // Abort early.
-    if (pass == RenderPass::Opaque) return;
+    if (pass == RenderPass::Opaque)
+        return;
 
     config.stencilTest = frame.mapMode == MapMode::Still ? GL_TRUE : GL_FALSE;
     config.depthFunc.reset();
@@ -30,15 +31,12 @@ void Painter::renderCircle(PaintParameters& parameters,
 
     config.program = circleShader.getID();
 
-    circleShader.u_matrix = tile.translatedMatrix(properties.circleTranslate,
-                                                  properties.circleTranslateAnchor,
-                                                  state);
+    circleShader.u_matrix =
+        tile.translatedMatrix(properties.circleTranslate, properties.circleTranslateAnchor, state);
 
     if (properties.circlePitchScale == CirclePitchScaleType::Map) {
-        circleShader.u_extrude_scale = {{
-            pixelsToGLUnits[0] * state.getAltitude(),
-            pixelsToGLUnits[1] * state.getAltitude()
-        }};
+        circleShader.u_extrude_scale = { { pixelsToGLUnits[0] * state.getAltitude(),
+                                           pixelsToGLUnits[1] * state.getAltitude() } };
         circleShader.u_scale_with_map = true;
     } else {
         circleShader.u_extrude_scale = pixelsToGLUnits;

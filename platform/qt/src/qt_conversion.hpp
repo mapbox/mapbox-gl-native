@@ -88,15 +88,15 @@ inline optional<std::string> toString(const QVariant& value) {
 
 inline optional<Value> toValue(const QVariant& value) {
     if (value.type() == QVariant::Bool) {
-        return { value.toBool() };
+        return {value.toBool()};
     } else if (value.type() == QVariant::String) {
-        return { value.toString().toStdString() };
+        return {value.toString().toStdString()};
     } else if (value.type() == QVariant::Color) {
-        return { value.value<QColor>().name().toStdString() };
+        return {value.value<QColor>().name().toStdString()};
     } else if (value.type() == QVariant::Int) {
-        return { value.toInt() };
+        return {value.toInt()};
     } else if (value.canConvert(QVariant::Double)) {
-        return { value.toFloat() };
+        return {value.toFloat()};
     } else {
         return {};
     }

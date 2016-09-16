@@ -22,8 +22,12 @@ public:
     // Whether this image should be interpreted as a signed distance field icon.
     const bool sdf;
 
-    float getWidth() const { return image.width / pixelRatio; }
-    float getHeight() const { return image.height / pixelRatio; }
+    float getWidth() const {
+        return image.width / pixelRatio;
+    }
+    float getHeight() const {
+        return image.height / pixelRatio;
+    }
 };
 
 } // namespace mbgl

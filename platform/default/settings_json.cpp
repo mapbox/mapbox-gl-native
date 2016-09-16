@@ -3,7 +3,9 @@
 
 namespace mbgl {
 
-Settings_JSON::Settings_JSON() { load(); }
+Settings_JSON::Settings_JSON() {
+    load();
+}
 
 void Settings_JSON::load() {
     std::ifstream file("/tmp/mbgl-native.cfg");

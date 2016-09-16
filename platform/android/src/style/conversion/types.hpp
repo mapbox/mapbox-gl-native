@@ -1,4 +1,5 @@
-// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
+// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make
+// style-code-android`.
 #pragma once
 
 #include "types_string_values.hpp"
@@ -17,81 +18,91 @@ namespace conversion {
 
 template <>
 struct Converter<jni::jobject*, mbgl::style::VisibilityType> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::VisibilityType& value) const {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env,
+                                     const mbgl::style::VisibilityType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };
 
 template <>
 struct Converter<jni::jobject*, mbgl::style::LineCapType> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::LineCapType& value) const {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env,
+                                     const mbgl::style::LineCapType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };
 
 template <>
 struct Converter<jni::jobject*, mbgl::style::LineJoinType> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::LineJoinType& value) const {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env,
+                                     const mbgl::style::LineJoinType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };
 
 template <>
 struct Converter<jni::jobject*, mbgl::style::SymbolPlacementType> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::SymbolPlacementType& value) const {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env,
+                                     const mbgl::style::SymbolPlacementType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };
 
 template <>
 struct Converter<jni::jobject*, mbgl::style::AlignmentType> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::AlignmentType& value) const {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env,
+                                     const mbgl::style::AlignmentType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };
 
 template <>
 struct Converter<jni::jobject*, mbgl::style::IconTextFitType> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::IconTextFitType& value) const {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env,
+                                     const mbgl::style::IconTextFitType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };
 
 template <>
 struct Converter<jni::jobject*, mbgl::style::TextJustifyType> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::TextJustifyType& value) const {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env,
+                                     const mbgl::style::TextJustifyType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };
 
 template <>
 struct Converter<jni::jobject*, mbgl::style::TextAnchorType> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::TextAnchorType& value) const {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env,
+                                     const mbgl::style::TextAnchorType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };
 
 template <>
 struct Converter<jni::jobject*, mbgl::style::TextTransformType> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::TextTransformType& value) const {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env,
+                                     const mbgl::style::TextTransformType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };
 
 template <>
 struct Converter<jni::jobject*, mbgl::style::TranslateAnchorType> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::TranslateAnchorType& value) const {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env,
+                                     const mbgl::style::TranslateAnchorType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };
 
 template <>
 struct Converter<jni::jobject*, mbgl::style::CirclePitchScaleType> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::CirclePitchScaleType& value) const {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env,
+                                     const mbgl::style::CirclePitchScaleType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };
-
 
 } // namespace conversion
 } // namespace android

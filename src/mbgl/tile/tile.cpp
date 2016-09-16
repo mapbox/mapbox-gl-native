@@ -27,10 +27,10 @@ void Tile::dumpDebugLogs() const {
     Log::Info(Event::General, "Tile::complete: %s", isComplete() ? "yes" : "no");
 }
 
-void Tile::queryRenderedFeatures(
-        std::unordered_map<std::string, std::vector<Feature>>&,
-        const GeometryCoordinates&,
-        const TransformState&,
-        const optional<std::vector<std::string>>&) {}
+void Tile::queryRenderedFeatures(std::unordered_map<std::string, std::vector<Feature>>&,
+                                 const GeometryCoordinates&,
+                                 const TransformState&,
+                                 const optional<std::vector<std::string>>&) {
+}
 
 } // namespace mbgl

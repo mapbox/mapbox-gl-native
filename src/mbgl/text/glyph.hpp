@@ -24,13 +24,14 @@ struct GlyphMetrics {
     int32_t left = 0;
     int32_t top = 0;
     uint32_t advance = 0;
-
 };
 
 struct Glyph {
-    explicit Glyph() : rect(0, 0, 0, 0), metrics() {}
+    explicit Glyph() : rect(0, 0, 0, 0), metrics() {
+    }
     explicit Glyph(Rect<uint16_t> rect_, GlyphMetrics metrics_)
-        : rect(std::move(rect_)), metrics(std::move(metrics_)) {}
+        : rect(std::move(rect_)), metrics(std::move(metrics_)) {
+    }
 
     operator bool() const {
         return metrics || rect.hasArea();
@@ -44,8 +45,8 @@ typedef std::map<uint32_t, Glyph> GlyphPositions;
 
 class PositionedGlyph {
 public:
-    explicit PositionedGlyph(uint32_t glyph_, float x_, float y_)
-        : glyph(glyph_), x(x_), y(y_) {}
+    explicit PositionedGlyph(uint32_t glyph_, float x_, float y_) : glyph(glyph_), x(x_), y(y_) {
+    }
 
     uint32_t glyph = 0;
     float x = 0;
@@ -53,10 +54,12 @@ public:
 };
 
 class Shaping {
-    public:
-    explicit Shaping() : top(0), bottom(0), left(0), right(0) {}
+public:
+    explicit Shaping() : top(0), bottom(0), left(0), right(0) {
+    }
     explicit Shaping(float x, float y, std::u32string text_)
-        : text(std::move(text_)), top(y), bottom(y), left(x), right(x) {}
+        : text(std::move(text_)), top(y), bottom(y), left(x), right(x) {
+    }
     std::vector<PositionedGlyph> positionedGlyphs;
     std::u32string text;
     int32_t top;
@@ -64,7 +67,9 @@ class Shaping {
     int32_t left;
     int32_t right;
 
-    operator bool() const { return !positionedGlyphs.empty(); }
+    operator bool() const {
+        return !positionedGlyphs.empty();
+    }
 };
 
 class SDFGlyph {

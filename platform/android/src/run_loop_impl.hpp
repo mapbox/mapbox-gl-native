@@ -50,7 +50,7 @@ private:
 
     int fds[2];
 
-    JNIEnv *env = nullptr;
+    JNIEnv* env = nullptr;
     bool detach = false;
 
     std::unique_ptr<Thread<Alarm>> alarm;

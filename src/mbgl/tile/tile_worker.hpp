@@ -38,9 +38,8 @@ public:
     std::unique_ptr<const GeometryTileData> tileData;
 };
 
-using TileParseResult = variant<
-    TileParseResultData, // success
-    std::exception_ptr>;    // error
+using TileParseResult = variant<TileParseResultData, // success
+                                std::exception_ptr>; // error
 
 class TilePlacementResult {
 public:
@@ -64,8 +63,7 @@ public:
 
     TileParseResult parsePendingLayers(const PlacementConfig&);
 
-    TileParseResult redoLayout(std::vector<std::unique_ptr<style::Layer>>,
-                               const PlacementConfig&);
+    TileParseResult redoLayout(std::vector<std::unique_ptr<style::Layer>>, const PlacementConfig&);
 
     TilePlacementResult redoPlacement(const PlacementConfig&);
 

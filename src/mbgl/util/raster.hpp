@@ -35,7 +35,7 @@ public:
 
 private:
     // raw pixels have been loaded
-    std::atomic<bool> loaded { false };
+    std::atomic<bool> loaded{false};
 
     // filters
     Scaling filter = Scaling::Nearest;

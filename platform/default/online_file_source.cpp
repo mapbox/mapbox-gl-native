@@ -25,7 +25,7 @@ namespace mbgl {
 
 class OnlineFileRequest : public AsyncRequest {
 public:
-    using Callback = std::function<void (Response)>;
+    using Callback = std::function<void(Response)>;
 
     OnlineFileRequest(Resource, Callback, OnlineFileSource::Impl&);
     ~OnlineFileRequest() override;
@@ -98,7 +98,7 @@ public:
 
     void activateRequest(OnlineFileRequest* request) {
         activeRequests.insert(request);
-        request->request = httpFileSource.request(request->resource, [=] (Response response) {
+        request->request = httpFileSource.request(request->resource, [=](Response response) {
             activeRequests.erase(request);
             activatePendingRequest();
             request->request.reset();
@@ -139,20 +139,21 @@ private:
      */
     std::unordered_set<OnlineFileRequest*> allRequests;
     std::list<OnlineFileRequest*> pendingRequestsList;
-    std::unordered_map<OnlineFileRequest*, std::list<OnlineFileRequest*>::iterator> pendingRequestsMap;
+    std::unordered_map<OnlineFileRequest*, std::list<OnlineFileRequest*>::iterator>
+        pendingRequestsMap;
     std::unordered_set<OnlineFileRequest*> activeRequests;
 
     HTTPFileSource httpFileSource;
-    util::AsyncTask reachability { std::bind(&Impl::networkIsReachableAgain, this) };
+    util::AsyncTask reachability{std::bind(&Impl::networkIsReachableAgain, this)};
 };
 
-OnlineFileSource::OnlineFileSource()
-    : impl(std::make_unique<Impl>()) {
+OnlineFileSource::OnlineFileSource() : impl(std::make_unique<Impl>()) {
 }
 
 OnlineFileSource::~OnlineFileSource() = default;
 
-std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource,
+                                                        Callback callback) {
     Resource res = resource;
 
     switch (resource.kind) {
@@ -184,10 +185,10 @@ std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource
     return std::make_unique<OnlineFileRequest>(res, callback, *impl);
 }
 
-OnlineFileRequest::OnlineFileRequest(Resource resource_, Callback callback_, OnlineFileSource::Impl& impl_)
-    : impl(impl_),
-      resource(std::move(resource_)),
-      callback(std::move(callback_)) {
+OnlineFileRequest::OnlineFileRequest(Resource resource_,
+                                     Callback callback_,
+                                     OnlineFileSource::Impl& impl_)
+    : impl(impl_), resource(std::move(resource_)), callback(std::move(callback_)) {
     impl.add(this);
 
     // Force an immediate first request if we don't have an expiration time.
@@ -202,9 +203,8 @@ OnlineFileRequest::~OnlineFileRequest() {
     impl.remove(this);
 }
 
-Timestamp interpolateExpiration(const Timestamp& current,
-                                optional<Timestamp> prior,
-                                bool& expired) {
+Timestamp
+interpolateExpiration(const Timestamp& current, optional<Timestamp> prior, bool& expired) {
     auto now = util::now();
     if (current > now) {
         return current;
@@ -245,9 +245,9 @@ void OnlineFileRequest::schedule(optional<Timestamp> expires) {
 
     // If we're not being asked for a forced refresh, calculate a timeout that depends on how many
     // consecutive errors we've encountered, and on the expiration time, if present.
-    Duration timeout = std::min(
-                            http::errorRetryTimeout(failedRequestReason, failedRequests, retryAfter),
-                            http::expirationTimeout(expires, expiredRequests));
+    Duration timeout =
+        std::min(http::errorRetryTimeout(failedRequestReason, failedRequests, retryAfter),
+                 http::expirationTimeout(expires, expiredRequests));
 
     if (timeout == Duration::max()) {
         return;
@@ -262,9 +262,7 @@ void OnlineFileRequest::schedule(optional<Timestamp> expires) {
         timeout = Duration::max();
     }
 
-    timer.start(timeout, Duration::zero(), [&] {
-        impl.activateOrQueueRequest(this);
-    });
+    timer.start(timeout, Duration::zero(), [&] { impl.activateOrQueueRequest(this); });
 }
 
 void OnlineFileRequest::completed(Response response) {

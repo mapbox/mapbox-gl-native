@@ -24,7 +24,7 @@ class Value : public mbgl::variant<std::string,
 };
 
 inline bool isUndefined(const Value&) {
-    //Variant is always intialized
+    // Variant is always intialized
     return false;
 }
 
@@ -100,11 +100,11 @@ inline optional<std::string> toString(const Value& value) {
 
 inline optional<mbgl::Value> toValue(const Value& value) {
     if (value.is<bool>()) {
-        return { value.get<bool>() };
+        return {value.get<bool>()};
     } else if (value.is<std::string>()) {
-        return { value.get<std::string>() };
+        return {value.get<std::string>()};
     } else if (value.is<float>()) {
-        return { value.get<float>() };
+        return {value.get<float>()};
     } else {
         return {};
     }

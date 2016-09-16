@@ -187,12 +187,16 @@ public:
     void setIconHaloBlur(PropertyValue<float>, const optional<std::string>& klass = {});
 
     static PropertyValue<std::array<float, 2>> getDefaultIconTranslate();
-    PropertyValue<std::array<float, 2>> getIconTranslate(const optional<std::string>& klass = {}) const;
-    void setIconTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
+    PropertyValue<std::array<float, 2>>
+    getIconTranslate(const optional<std::string>& klass = {}) const;
+    void setIconTranslate(PropertyValue<std::array<float, 2>>,
+                          const optional<std::string>& klass = {});
 
     static PropertyValue<TranslateAnchorType> getDefaultIconTranslateAnchor();
-    PropertyValue<TranslateAnchorType> getIconTranslateAnchor(const optional<std::string>& klass = {}) const;
-    void setIconTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
+    PropertyValue<TranslateAnchorType>
+    getIconTranslateAnchor(const optional<std::string>& klass = {}) const;
+    void setIconTranslateAnchor(PropertyValue<TranslateAnchorType>,
+                                const optional<std::string>& klass = {});
 
     static PropertyValue<float> getDefaultTextOpacity();
     PropertyValue<float> getTextOpacity(const optional<std::string>& klass = {}) const;
@@ -215,12 +219,16 @@ public:
     void setTextHaloBlur(PropertyValue<float>, const optional<std::string>& klass = {});
 
     static PropertyValue<std::array<float, 2>> getDefaultTextTranslate();
-    PropertyValue<std::array<float, 2>> getTextTranslate(const optional<std::string>& klass = {}) const;
-    void setTextTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
+    PropertyValue<std::array<float, 2>>
+    getTextTranslate(const optional<std::string>& klass = {}) const;
+    void setTextTranslate(PropertyValue<std::array<float, 2>>,
+                          const optional<std::string>& klass = {});
 
     static PropertyValue<TranslateAnchorType> getDefaultTextTranslateAnchor();
-    PropertyValue<TranslateAnchorType> getTextTranslateAnchor(const optional<std::string>& klass = {}) const;
-    void setTextTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
+    PropertyValue<TranslateAnchorType>
+    getTextTranslateAnchor(const optional<std::string>& klass = {}) const;
+    void setTextTranslateAnchor(PropertyValue<TranslateAnchorType>,
+                                const optional<std::string>& klass = {});
 
     // Private implementation
 

@@ -14,12 +14,18 @@
 
 namespace mapbox {
 namespace util {
-template <> struct nth<0, mbgl::GeometryCoordinate> {
-    static int64_t get(const mbgl::GeometryCoordinate& t) { return t.x; };
+template <>
+struct nth<0, mbgl::GeometryCoordinate> {
+    static int64_t get(const mbgl::GeometryCoordinate& t) {
+        return t.x;
+    };
 };
 
-template <> struct nth<1, mbgl::GeometryCoordinate> {
-    static int64_t get(const mbgl::GeometryCoordinate& t) { return t.y; };
+template <>
+struct nth<1, mbgl::GeometryCoordinate> {
+    static int64_t get(const mbgl::GeometryCoordinate& t) {
+        return t.y;
+    };
 };
 } // namespace util
 } // namespace mapbox
@@ -44,18 +50,21 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
 
         for (const auto& ring : polygon) {
             totalVertices += ring.size();
-            if (totalVertices > 65535)
+            if (totalVertices > 65535) {
                 throw GeometryTooLongException();
+            }
         }
 
         for (const auto& ring : polygon) {
             std::size_t nVertices = ring.size();
 
-            if (nVertices == 0)
+            if (nVertices == 0) {
                 continue;
+            }
 
-            if (lineGroups.empty() || lineGroups.back()->vertex_length + nVertices > 65535)
+            if (lineGroups.empty() || lineGroups.back()->vertex_length + nVertices > 65535) {
                 lineGroups.emplace_back(std::make_unique<LineGroup>());
+            }
 
             LineGroup& lineGroup = *lineGroups.back();
             GLsizei lineIndex = lineGroup.vertex_length;
@@ -77,7 +86,8 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
         std::size_t nIndicies = indices.size();
         assert(nIndicies % 3 == 0);
 
-        if (triangleGroups.empty() || triangleGroups.back()->vertex_length + totalVertices > 65535) {
+        if (triangleGroups.empty() ||
+            triangleGroups.back()->vertex_length + totalVertices > 65535) {
             triangleGroups.emplace_back(std::make_unique<TriangleGroup>());
         }
 
@@ -85,8 +95,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
         GLsizei triangleIndex = triangleGroup.vertex_length;
 
         for (uint32_t i = 0; i < nIndicies; i += 3) {
-            triangleElementsBuffer.add(triangleIndex + indices[i],
-                                       triangleIndex + indices[i + 1],
+            triangleElementsBuffer.add(triangleIndex + indices[i], triangleIndex + indices[i + 1],
                                        triangleIndex + indices[i + 2]);
         }
 
@@ -161,7 +170,9 @@ void FillBucket::drawVertices(OutlineShader& shader, gl::ObjectStore& store, Pai
     }
 }
 
-void FillBucket::drawVertices(OutlinePatternShader& shader, gl::ObjectStore& store, PaintMode paintMode) {
+void FillBucket::drawVertices(OutlinePatternShader& shader,
+                              gl::ObjectStore& store,
+                              PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : lineGroups) {

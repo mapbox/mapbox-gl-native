@@ -76,15 +76,13 @@ public:
     Painter(const TransformState&, gl::ObjectStore&);
     ~Painter();
 
-    void render(const style::Style&,
-                const FrameData&,
-                SpriteAtlas& annotationSpriteAtlas);
+    void render(const style::Style&, const FrameData&, SpriteAtlas& annotationSpriteAtlas);
 
     // Renders debug information for a tile.
     void renderTileDebug(const RenderTile&);
 
     // Renders the red debug frame around a tile, visualizing its perimeter.
-    void renderDebugFrame(const mat4 &matrix);
+    void renderDebugFrame(const mat4& matrix);
 
 #ifndef NDEBUG
     // Renders tile clip boundaries, using stencil buffer to calculate fill color.
@@ -96,9 +94,12 @@ public:
     void renderDebugText(Tile&, const mat4&);
     void renderFill(PaintParameters&, FillBucket&, const style::FillLayer&, const RenderTile&);
     void renderLine(PaintParameters&, LineBucket&, const style::LineLayer&, const RenderTile&);
-    void renderCircle(PaintParameters&, CircleBucket&, const style::CircleLayer&, const RenderTile&);
-    void renderSymbol(PaintParameters&, SymbolBucket&, const style::SymbolLayer&, const RenderTile&);
-    void renderRaster(PaintParameters&, RasterBucket&, const style::RasterLayer&, const RenderTile&);
+    void
+    renderCircle(PaintParameters&, CircleBucket&, const style::CircleLayer&, const RenderTile&);
+    void
+    renderSymbol(PaintParameters&, SymbolBucket&, const style::SymbolLayer&, const RenderTile&);
+    void
+    renderRaster(PaintParameters&, RasterBucket&, const style::RasterLayer&, const RenderTile&);
     void renderBackground(PaintParameters&, const style::BackgroundLayer&);
 
     float saturationFactor(float saturation);
@@ -113,10 +114,8 @@ private:
     std::vector<RenderItem> determineRenderOrder(const style::Style&);
 
     template <class Iterator>
-    void renderPass(PaintParameters&,
-                    RenderPass,
-                    Iterator it, Iterator end,
-                    GLsizei i, int8_t increment);
+    void renderPass(
+        PaintParameters&, RenderPass, Iterator it, Iterator end, GLsizei i, int8_t increment);
 
     void setClipping(const ClipID&);
 
@@ -159,7 +158,7 @@ private:
 
     std::array<float, 2> pixelsToGLUnits;
 
-    const mat4 identityMatrix = []{
+    const mat4 identityMatrix = [] {
         mat4 identity;
         matrix::identity(identity);
         return identity;
@@ -193,32 +192,29 @@ private:
 #endif
 
     // Set up the stencil quad we're using to generate the stencil mask.
-    StaticVertexBuffer tileStencilBuffer {
+    StaticVertexBuffer tileStencilBuffer{
         // top left triangle
-        {{ 0, 0 }},
-        {{ util::EXTENT, 0 }},
-        {{ 0, util::EXTENT }},
+        {{0, 0}},
+        {{util::EXTENT, 0}},
+        {{0, util::EXTENT}},
 
         // bottom right triangle
-        {{ util::EXTENT, 0 }},
-        {{ 0, util::EXTENT }},
-        {{ util::EXTENT, util::EXTENT }},
+        {{util::EXTENT, 0}},
+        {{0, util::EXTENT}},
+        {{util::EXTENT, util::EXTENT}},
     };
 
-    StaticRasterVertexBuffer rasterBoundsBuffer {
-        {{ 0, 0, 0, 0 }},
-        {{ util::EXTENT, 0, 32767, 0 }},
-        {{ 0, util::EXTENT, 0, 32767 }},
-        {{ util::EXTENT, util::EXTENT, 32767, 32767 }},
+    StaticRasterVertexBuffer rasterBoundsBuffer{
+        {{0, 0, 0, 0}},
+        {{util::EXTENT, 0, 32767, 0}},
+        {{0, util::EXTENT, 0, 32767}},
+        {{util::EXTENT, util::EXTENT, 32767, 32767}},
     };
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
-    StaticVertexBuffer tileBorderBuffer {
-        {{ 0, 0 }},
-        {{ util::EXTENT, 0 }},
-        {{ util::EXTENT, util::EXTENT }},
-        {{ 0, util::EXTENT }},
-        {{ 0, 0 }},
+    StaticVertexBuffer tileBorderBuffer{
+        {{0, 0}}, {{util::EXTENT, 0}}, {{util::EXTENT, util::EXTENT}}, {{0, util::EXTENT}},
+        {{0, 0}},
     };
 
     VertexArrayObject tileBorderArray;

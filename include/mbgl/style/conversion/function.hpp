@@ -13,16 +13,16 @@ struct Converter<Function<T>> {
     template <class V>
     Result<Function<T>> operator()(const V& value) const {
         if (!isObject(value)) {
-            return Error { "function must be an object" };
+            return Error{ "function must be an object" };
         }
 
         auto stopsValue = objectMember(value, "stops");
         if (!stopsValue) {
-            return Error { "function value must specify stops" };
+            return Error{ "function value must specify stops" };
         }
 
         if (!isArray(*stopsValue)) {
-            return Error { "function stops must be an array" };
+            return Error{ "function stops must be an array" };
         }
 
         std::vector<std::pair<float, T>> stops;
@@ -30,16 +30,16 @@ struct Converter<Function<T>> {
             const auto& stopValue = arrayMember(*stopsValue, i);
 
             if (!isArray(stopValue)) {
-                return Error { "function stop must be an array" };
+                return Error{ "function stop must be an array" };
             }
 
             if (arrayLength(stopValue) != 2) {
-                return Error { "function stop must have two elements" };
+                return Error{ "function stop must have two elements" };
             }
 
             optional<float> z = toNumber(arrayMember(stopValue, 0));
             if (!z) {
-                return Error { "function stop zoom level must be a number" };
+                return Error{ "function stop zoom level must be a number" };
             }
 
             Result<T> v = convert<T>(arrayMember(stopValue, 1));
@@ -57,7 +57,7 @@ struct Converter<Function<T>> {
 
         optional<float> base = toNumber(*baseValue);
         if (!base) {
-            return Error { "function base must be a number"};
+            return Error{ "function base must be a number" };
         }
 
         return Function<T>(stops, *base);

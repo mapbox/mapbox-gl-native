@@ -9,7 +9,8 @@ LineSDFShader::LineSDFShader(gl::ObjectStore& store, Defines defines)
     : Shader(shaders::linesdfpattern::name,
              shaders::linesdfpattern::vertex,
              shaders::linesdfpattern::fragment,
-             store, defines) {
+             store,
+             defines) {
 }
 
 void LineSDFShader::bind(GLbyte* offset) {

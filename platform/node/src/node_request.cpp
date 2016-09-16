@@ -7,12 +7,8 @@
 
 namespace node_mbgl {
 
-NodeRequest::NodeRequest(
-    NodeMap* target_,
-    mbgl::FileSource::Callback callback_)
-    : AsyncWorker(nullptr),
-    target(target_),
-    callback(std::move(callback_)) {
+NodeRequest::NodeRequest(NodeMap* target_, mbgl::FileSource::Callback callback_)
+    : AsyncWorker(nullptr), target(target_), callback(std::move(callback_)) {
 }
 
 NodeRequest::~NodeRequest() {
@@ -42,7 +38,8 @@ NAN_MODULE_INIT(NodeRequest::Init) {
 
 void NodeRequest::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto target = reinterpret_cast<NodeMap*>(info[0].As<v8::External>()->Value());
-    auto callback = reinterpret_cast<mbgl::FileSource::Callback*>(info[1].As<v8::External>()->Value());
+    auto callback =
+        reinterpret_cast<mbgl::FileSource::Callback*>(info[1].As<v8::External>()->Value());
 
     auto request = new NodeRequest(target, *callback);
 
@@ -68,8 +65,7 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
         auto msg = Nan::New("message").ToLocalChecked();
 
         if (Nan::Has(err, msg).FromJust()) {
-            request->SetErrorMessage(*Nan::Utf8String(
-                Nan::Get(err, msg).ToLocalChecked()));
+            request->SetErrorMessage(*Nan::Utf8String(Nan::Get(err, msg).ToLocalChecked()));
         }
     } else if (info[0]->IsString()) {
         request->SetErrorMessage(*Nan::Utf8String(info[0]));
@@ -79,33 +75,38 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
         auto res = Nan::To<v8::Object>(info[1]).ToLocalChecked();
 
         if (Nan::Has(res, Nan::New("modified").ToLocalChecked()).FromJust()) {
-            const double modified = Nan::To<double>(Nan::Get(res, Nan::New("modified").ToLocalChecked()).ToLocalChecked()).FromJust();
+            const double modified =
+                Nan::To<double>(
+                    Nan::Get(res, Nan::New("modified").ToLocalChecked()).ToLocalChecked())
+                    .FromJust();
             if (!std::isnan(modified)) {
-                response.modified = mbgl::Timestamp{ mbgl::Seconds(
-                    static_cast<mbgl::Seconds::rep>(modified / 1000)) };
+                response.modified = mbgl::Timestamp{
+                    mbgl::Seconds(static_cast<mbgl::Seconds::rep>(modified / 1000))};
             }
         }
 
         if (Nan::Has(res, Nan::New("expires").ToLocalChecked()).FromJust()) {
-            const double expires = Nan::To<double>(Nan::Get(res, Nan::New("expires").ToLocalChecked()).ToLocalChecked()).FromJust();
+            const double expires =
+                Nan::To<double>(
+                    Nan::Get(res, Nan::New("expires").ToLocalChecked()).ToLocalChecked())
+                    .FromJust();
             if (!std::isnan(expires)) {
-                response.expires = mbgl::Timestamp{ mbgl::Seconds(
-                    static_cast<mbgl::Seconds::rep>(expires / 1000)) };
+                response.expires =
+                    mbgl::Timestamp{mbgl::Seconds(static_cast<mbgl::Seconds::rep>(expires / 1000))};
             }
         }
 
         if (Nan::Has(res, Nan::New("etag").ToLocalChecked()).FromJust()) {
-            const Nan::Utf8String etag(Nan::Get(res, Nan::New("etag").ToLocalChecked()).ToLocalChecked());
-            response.etag = std::string { *etag, size_t(etag.length()) };
+            const Nan::Utf8String etag(
+                Nan::Get(res, Nan::New("etag").ToLocalChecked()).ToLocalChecked());
+            response.etag = std::string{*etag, size_t(etag.length())};
         }
 
         if (Nan::Has(res, Nan::New("data").ToLocalChecked()).FromJust()) {
             auto data = Nan::Get(res, Nan::New("data").ToLocalChecked()).ToLocalChecked();
             if (node::Buffer::HasInstance(data)) {
-                response.data = std::make_shared<std::string>(
-                    node::Buffer::Data(data),
-                    node::Buffer::Length(data)
-                );
+                response.data = std::make_shared<std::string>(node::Buffer::Data(data),
+                                                              node::Buffer::Length(data));
             } else {
                 return Nan::ThrowTypeError("Response data must be a Buffer");
             }
@@ -114,9 +115,7 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
 
     if (request->ErrorMessage()) {
         response.error = std::make_unique<mbgl::Response::Error>(
-            mbgl::Response::Error::Reason::Other,
-            request->ErrorMessage()
-        );
+            mbgl::Response::Error::Reason::Other, request->ErrorMessage());
     }
 
     // Send the response object to the NodeFileSource object
@@ -125,9 +124,10 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
 }
 
 void NodeRequest::Execute() {
-    v8::Local<v8::Value> argv[] = { handle() };
+    v8::Local<v8::Value> argv[] = {handle()};
 
-    Nan::MakeCallback(Nan::To<v8::Object>(target->handle()->GetInternalField(1)).ToLocalChecked(), "request", 1, argv);
+    Nan::MakeCallback(Nan::To<v8::Object>(target->handle()->GetInternalField(1)).ToLocalChecked(),
+                      "request", 1, argv);
 }
 
 NodeRequest::NodeAsyncRequest::NodeAsyncRequest(NodeRequest* request_) : request(request_) {

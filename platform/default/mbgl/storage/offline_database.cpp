@@ -17,8 +17,7 @@ OfflineDatabase::Statement::~Statement() {
 }
 
 OfflineDatabase::OfflineDatabase(std::string path_, uint64_t maximumCacheSize_)
-    : path(std::move(path_)),
-      maximumCacheSize(maximumCacheSize_) {
+    : path(std::move(path_)), maximumCacheSize(maximumCacheSize_) {
     ensureSchema();
 }
 
@@ -45,20 +44,27 @@ void OfflineDatabase::ensureSchema() {
             connect(mapbox::sqlite::ReadWrite);
 
             switch (userVersion()) {
-            case 0: break; // cache-only database; ok to delete
-            case 1: break; // cache-only database; ok to delete
-            case 2: migrateToVersion3(); // fall through
-            case 3: // no-op and fall through
-            case 4: migrateToVersion5(); // fall through
-            case 5: return;
-            default: throw std::runtime_error("unknown schema version");
+            case 0:
+                break; // cache-only database; ok to delete
+            case 1:
+                break; // cache-only database; ok to delete
+            case 2:
+                migrateToVersion3(); // fall through
+            case 3:                  // no-op and fall through
+            case 4:
+                migrateToVersion5(); // fall through
+            case 5:
+                return;
+            default:
+                throw std::runtime_error("unknown schema version");
             }
 
             removeExisting();
             connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
         } catch (mapbox::sqlite::Exception& ex) {
             if (ex.code != SQLITE_CANTOPEN && ex.code != SQLITE_NOTADB) {
-                Log::Error(Event::Database, "Unexpected error connecting to database: %s", ex.what());
+                Log::Error(Event::Database, "Unexpected error connecting to database: %s",
+                           ex.what());
                 throw;
             }
 
@@ -68,14 +74,15 @@ void OfflineDatabase::ensureSchema() {
                 }
                 connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
             } catch (...) {
-                Log::Error(Event::Database, "Unexpected error creating database: %s", util::toString(std::current_exception()).c_str());
+                Log::Error(Event::Database, "Unexpected error creating database: %s",
+                           util::toString(std::current_exception()).c_str());
                 throw;
             }
         }
     }
 
     try {
-        #include "offline_schema.cpp.include"
+#include "offline_schema.cpp.include"
 
         connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
 
@@ -86,7 +93,8 @@ void OfflineDatabase::ensureSchema() {
         db->exec(schema);
         db->exec("PRAGMA user_version = 5");
     } catch (...) {
-        Log::Error(Event::Database, "Unexpected error creating database schema: %s", util::toString(std::current_exception()).c_str());
+        Log::Error(Event::Database, "Unexpected error creating database schema: %s",
+                   util::toString(std::current_exception()).c_str());
         throw;
     }
 }
@@ -127,14 +135,16 @@ void OfflineDatabase::migrateToVersion5() {
     db->exec("PRAGMA user_version = 5");
 }
 
-OfflineDatabase::Statement OfflineDatabase::getStatement(const char * sql) {
+OfflineDatabase::Statement OfflineDatabase::getStatement(const char* sql) {
     auto it = statements.find(sql);
 
     if (it != statements.end()) {
         return Statement(*it->second);
     }
 
-    return Statement(*statements.emplace(sql, std::make_unique<mapbox::sqlite::Statement>(db->prepare(sql))).first->second);
+    return Statement(
+        *statements.emplace(sql, std::make_unique<mapbox::sqlite::Statement>(db->prepare(sql)))
+             .first->second);
 }
 
 optional<Response> OfflineDatabase::get(const Resource& resource) {
@@ -155,9 +165,10 @@ std::pair<bool, uint64_t> OfflineDatabase::put(const Resource& resource, const R
     return putInternal(resource, response, true);
 }
 
-std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource, const Response& response, bool evict_) {
+std::pair<bool, uint64_t>
+OfflineDatabase::putInternal(const Resource& resource, const Response& response, bool evict_) {
     if (response.error) {
-        return { false, 0 };
+        return {false, 0};
     }
 
     std::string compressedData;
@@ -172,7 +183,7 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
 
     if (evict_ && !evict(size)) {
         Log::Debug(Event::Database, "Unable to make space for entry");
-        return { false, 0 };
+        return {false, 0};
     }
 
     bool inserted;
@@ -180,15 +191,13 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
     if (resource.kind == Resource::Kind::Tile) {
         assert(resource.tileData);
         inserted = putTile(*resource.tileData, response,
-                compressed ? compressedData : *response.data,
-                compressed);
+                           compressed ? compressedData : *response.data, compressed);
     } else {
-        inserted = putResource(resource, response,
-                compressed ? compressedData : *response.data,
-                compressed);
+        inserted = putResource(resource, response, compressed ? compressedData : *response.data,
+                               compressed);
     }
 
-    return { inserted, size };
+    return {inserted, size};
 }
 
 optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resource& resource) {
@@ -218,8 +227,8 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resou
     Response response;
     uint64_t size = 0;
 
-    response.etag     = stmt->get<optional<std::string>>(0);
-    response.expires  = stmt->get<optional<Timestamp>>(1);
+    response.etag = stmt->get<optional<std::string>>(0);
+    response.expires = stmt->get<optional<Timestamp>>(1);
     response.modified = stmt->get<optional<Timestamp>>(2);
 
     optional<std::string> data = stmt->get<optional<std::string>>(3);
@@ -368,8 +377,8 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource:
     Response response;
     uint64_t size = 0;
 
-    response.etag     = stmt->get<optional<std::string>>(0);
-    response.expires  = stmt->get<optional<Timestamp>>(1);
+    response.etag = stmt->get<optional<std::string>>(0);
+    response.expires = stmt->get<optional<Timestamp>>(1);
     response.modified = stmt->get<optional<Timestamp>>(2);
 
     optional<std::string> data = stmt->get<optional<std::string>>(3);
@@ -499,10 +508,9 @@ std::vector<OfflineRegion> OfflineDatabase::listRegions() {
     std::vector<OfflineRegion> result;
 
     while (stmt->run()) {
-        result.push_back(OfflineRegion(
-            stmt->get<int64_t>(0),
-            decodeOfflineRegionDefinition(stmt->get<std::string>(1)),
-            stmt->get<std::vector<uint8_t>>(2)));
+        result.push_back(OfflineRegion(stmt->get<int64_t>(0),
+                                       decodeOfflineRegionDefinition(stmt->get<std::string>(1)),
+                                       stmt->get<std::vector<uint8_t>>(2)));
     }
 
     return result;
@@ -539,7 +547,8 @@ void OfflineDatabase::deleteRegion(OfflineRegion&& region) {
     offlineMapboxTileCount = {};
 }
 
-optional<std::pair<Response, uint64_t>> OfflineDatabase::getRegionResource(int64_t regionID, const Resource& resource) {
+optional<std::pair<Response, uint64_t>>
+OfflineDatabase::getRegionResource(int64_t regionID, const Resource& resource) {
     auto response = getInternal(resource);
 
     if (response) {
@@ -549,14 +558,14 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getRegionResource(int64
     return response;
 }
 
-uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& resource, const Response& response) {
+uint64_t OfflineDatabase::putRegionResource(int64_t regionID,
+                                            const Resource& resource,
+                                            const Response& response) {
     uint64_t size = putInternal(resource, response, false).second;
     bool previouslyUnused = markUsed(regionID, resource);
 
-    if (offlineMapboxTileCount
-        && resource.kind == Resource::Kind::Tile
-        && util::mapbox::isMapboxURL(resource.url)
-        && previouslyUnused) {
+    if (offlineMapboxTileCount && resource.kind == Resource::Kind::Tile &&
+        util::mapbox::isMapboxURL(resource.url) && previouslyUnused) {
         *offlineMapboxTileCount += 1;
     }
 
@@ -657,10 +666,10 @@ OfflineRegionDefinition OfflineDatabase::getRegionDefinition(int64_t regionID) {
 OfflineRegionStatus OfflineDatabase::getRegionCompletedStatus(int64_t regionID) {
     OfflineRegionStatus result;
 
-    std::tie(result.completedResourceCount, result.completedResourceSize)
-        = getCompletedResourceCountAndSize(regionID);
-    std::tie(result.completedTileCount, result.completedTileSize)
-        = getCompletedTileCountAndSize(regionID);
+    std::tie(result.completedResourceCount, result.completedResourceSize) =
+        getCompletedResourceCountAndSize(regionID);
+    std::tie(result.completedTileCount, result.completedTileSize) =
+        getCompletedTileCountAndSize(regionID);
 
     result.completedResourceCount += result.completedTileCount;
     result.completedResourceSize += result.completedTileSize;
@@ -678,7 +687,7 @@ std::pair<int64_t, int64_t> OfflineDatabase::getCompletedResourceCountAndSize(in
     // clang-format on
     stmt->bind(1, regionID);
     stmt->run();
-    return { stmt->get<int64_t>(0), stmt->get<int64_t>(1) };
+    return {stmt->get<int64_t>(0), stmt->get<int64_t>(1)};
 }
 
 std::pair<int64_t, int64_t> OfflineDatabase::getCompletedTileCountAndSize(int64_t regionID) {
@@ -691,11 +700,11 @@ std::pair<int64_t, int64_t> OfflineDatabase::getCompletedTileCountAndSize(int64_
     // clang-format on
     stmt->bind(1, regionID);
     stmt->run();
-    return { stmt->get<int64_t>(0), stmt->get<int64_t>(1) };
+    return {stmt->get<int64_t>(0), stmt->get<int64_t>(1)};
 }
 
 template <class T>
-T OfflineDatabase::getPragma(const char * sql) {
+T OfflineDatabase::getPragma(const char* sql) {
     Statement stmt = getStatement(sql);
     stmt->run();
     return stmt->get<T>(0);

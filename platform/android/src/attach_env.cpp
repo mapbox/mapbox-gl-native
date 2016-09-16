@@ -14,9 +14,8 @@ UniqueEnv AttachEnv() {
     case JNI_EDETACHED:
         return UniqueEnv(jni::AttachCurrentThread(*theJVM).release(), JNIEnvDeleter(*theJVM, true));
     default:
-        throw std::system_error(err,  jni::ErrorCategory());
+        throw std::system_error(err, jni::ErrorCategory());
     }
 }
-
 }
 }

@@ -9,8 +9,9 @@ namespace android {
 
 class CustomLayer : public Layer {
 public:
-
-    static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/CustomLayer"; };
+    static constexpr auto Name() {
+        return "com/mapbox/mapboxsdk/style/layers/CustomLayer";
+    };
 
     static jni::Class<CustomLayer> javaClass;
 

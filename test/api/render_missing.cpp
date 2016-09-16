@@ -14,7 +14,7 @@
 #if TEST_HAS_SERVER
 #define TEST_REQUIRES_SERVER(name) name
 #else
-#define TEST_REQUIRES_SERVER(name) DISABLED_ ## name
+#define TEST_REQUIRES_SERVER(name) DISABLED_##name
 #endif
 
 TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
@@ -58,8 +58,8 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
     auto observer = Log::removeObserver();
     auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
     EXPECT_EQ(1u, flo->count(FixtureLog::Message(
-                     EventSeverity::Error, Event::Style, -1,
-                     std::string("Failed to load tile 0/0/0=>0 for source mapbox: " + message))));
+                      EventSeverity::Error, Event::Style, -1,
+                      std::string("Failed to load tile 0/0/0=>0 for source mapbox: " + message))));
     auto unchecked = flo->unchecked();
     EXPECT_TRUE(unchecked.empty()) << unchecked;
 }

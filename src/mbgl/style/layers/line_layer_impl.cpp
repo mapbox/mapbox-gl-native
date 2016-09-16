@@ -22,7 +22,8 @@ bool LineLayer::Impl::recalculate(const CalculationParameters& parameters) {
     bool hasTransitions = paint.recalculate(parameters);
 
     passes = (paint.lineOpacity > 0 && paint.lineColor.value.a > 0 && paint.lineWidth > 0)
-        ? RenderPass::Translucent : RenderPass::None;
+                 ? RenderPass::Translucent
+                 : RenderPass::None;
 
     return hasTransitions;
 }
@@ -34,11 +35,12 @@ std::unique_ptr<Bucket> LineLayer::Impl::createBucket(BucketParameters& paramete
     bucket->layout.recalculate(CalculationParameters(parameters.tileID.overscaledZ));
 
     auto& name = bucketName();
-    parameters.eachFilteredFeature(filter, [&] (const auto& feature, std::size_t index, const std::string& layerName) {
-        auto geometries = feature.getGeometries();
-        bucket->addGeometry(geometries);
-        parameters.featureIndex.insert(geometries, index, layerName, name);
-    });
+    parameters.eachFilteredFeature(
+        filter, [&](const auto& feature, std::size_t index, const std::string& layerName) {
+            auto geometries = feature.getGeometries();
+            bucket->addGeometry(geometries);
+            parameters.featureIndex.insert(geometries, index, layerName, name);
+        });
 
     return std::move(bucket);
 }
@@ -52,7 +54,8 @@ float LineLayer::Impl::getLineWidth() const {
 }
 
 optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {
-    if (offset == 0) return {};
+    if (offset == 0)
+        return {};
 
     GeometryCollection newRings;
     Point<double> zero(0, 0);
@@ -63,12 +66,12 @@ optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const d
         for (auto i = ring.begin(); i != ring.end(); i++) {
             auto& p = *i;
 
-            Point<double> aToB = i == ring.begin() ?
-                zero :
-                util::perp(util::unit(convertPoint<double>(p - *(i - 1))));
-            Point<double> bToC = i + 1 == ring.end() ?
-                zero :
-                util::perp(util::unit(convertPoint<double>(*(i + 1) - p)));
+            Point<double> aToB = i == ring.begin()
+                                     ? zero
+                                     : util::perp(util::unit(convertPoint<double>(p - *(i - 1))));
+            Point<double> bToC = i + 1 == ring.end()
+                                     ? zero
+                                     : util::perp(util::unit(convertPoint<double>(*(i + 1) - p)));
             Point<double> extrude = util::unit(aToB + bToC);
 
             const double cosHalfAngle = extrude.x * bToC.x + extrude.y * bToC.y;
@@ -83,25 +86,24 @@ optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const d
 
 float LineLayer::Impl::getQueryRadius() const {
     const std::array<float, 2>& translate = paint.lineTranslate;
-    return getLineWidth() / 2.0 + std::abs(paint.lineOffset) + util::length(translate[0], translate[1]);
+    return getLineWidth() / 2.0 + std::abs(paint.lineOffset) +
+           util::length(translate[0], translate[1]);
 }
 
-bool LineLayer::Impl::queryIntersectsGeometry(
-        const GeometryCollection& queryGeometry,
-        const GeometryCollection& geometry,
-        const float bearing,
-        const float pixelsToTileUnits) const {
+bool LineLayer::Impl::queryIntersectsGeometry(const GeometryCollection& queryGeometry,
+                                              const GeometryCollection& geometry,
+                                              const float bearing,
+                                              const float pixelsToTileUnits) const {
 
     const float halfWidth = getLineWidth() / 2.0 * pixelsToTileUnits;
 
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
-            queryGeometry, paint.lineTranslate, paint.lineTranslateAnchor, bearing, pixelsToTileUnits);
+        queryGeometry, paint.lineTranslate, paint.lineTranslateAnchor, bearing, pixelsToTileUnits);
     auto offsetGeometry = offsetLine(geometry, paint.lineOffset * pixelsToTileUnits);
 
     return util::multiPolygonIntersectsBufferedMultiLine(
-            translatedQueryGeometry.value_or(queryGeometry),
-            offsetGeometry.value_or(geometry),
-            halfWidth);
+        translatedQueryGeometry.value_or(queryGeometry), offsetGeometry.value_or(geometry),
+        halfWidth);
 }
 
 } // namespace style

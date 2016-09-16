@@ -12,17 +12,22 @@ public:
     using Stop = std::pair<float, T>;
     using Stops = std::vector<Stop>;
 
-    explicit Function(Stops stops_, float base_)
-        : base(base_), stops(std::move(stops_)) {}
+    explicit Function(Stops stops_, float base_) : base(base_), stops(std::move(stops_)) {
+    }
 
-    float getBase() const { return base; }
-    const std::vector<std::pair<float, T>>& getStops() const { return stops; }
+    float getBase() const {
+        return base;
+    }
+    const std::vector<std::pair<float, T>>& getStops() const {
+        return stops;
+    }
 
 private:
     float base = 1;
     std::vector<std::pair<float, T>> stops;
 
-    template <class S> friend bool operator==(const Function<S>&, const Function<S>&);
+    template <class S>
+    friend bool operator==(const Function<S>&, const Function<S>&);
 };
 
 template <class T>

@@ -20,26 +20,23 @@ public:
     std::string icon;
 };
 
-using ShapeAnnotationGeometry = variant<
-    LineString<double>,
-    Polygon<double>,
-    MultiLineString<double>,
-    MultiPolygon<double>>;
+using ShapeAnnotationGeometry =
+    variant<LineString<double>, Polygon<double>, MultiLineString<double>, MultiPolygon<double>>;
 
 class LineAnnotation {
 public:
     ShapeAnnotationGeometry geometry;
-    style::PropertyValue<float> opacity { 1.0f };
-    style::PropertyValue<float> width { 1.0f };
-    style::PropertyValue<Color> color { Color::black() };
+    style::PropertyValue<float> opacity{ 1.0f };
+    style::PropertyValue<float> width{ 1.0f };
+    style::PropertyValue<Color> color{ Color::black() };
 };
 
 class FillAnnotation {
 public:
     ShapeAnnotationGeometry geometry;
-    style::PropertyValue<float> opacity { 1.0f };
-    style::PropertyValue<Color> color { Color::black() };
-    style::PropertyValue<Color> outlineColor {};
+    style::PropertyValue<float> opacity{ 1.0f };
+    style::PropertyValue<Color> color{ Color::black() };
+    style::PropertyValue<Color> outlineColor{};
 };
 
 // An annotation whose type and properties are sourced from a style layer.
@@ -49,10 +46,7 @@ public:
     std::string layerID;
 };
 
-using Annotation = variant<
-    SymbolAnnotation,
-    LineAnnotation,
-    FillAnnotation,
-    StyleSourcedAnnotation>;
+using Annotation =
+    variant<SymbolAnnotation, LineAnnotation, FillAnnotation, StyleSourcedAnnotation>;
 
 } // namespace mbgl

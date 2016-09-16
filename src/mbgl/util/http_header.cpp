@@ -17,18 +17,21 @@ CacheControl CacheControl::parse(const std::string& value) {
     namespace phoenix = boost::phoenix;
 
     CacheControl result;
-    qi::phrase_parse(value.begin(), value.end(), (
-        (qi::lit("must-revalidate") [ phoenix::ref(result.mustRevalidate) = true ]) |
-        (qi::lit("max-age") >> '=' >> qi::ulong_long [ phoenix::ref(result.maxAge) = qi::_1 ]) |
-        (*(('"' >> *(('\\' >> qi::char_) | (qi::char_ - '"')) >> '"') | (qi::char_ - '"' - ',')))
-    ) % ',', qi::ascii::space);
+    qi::phrase_parse(
+        value.begin(), value.end(),
+        ((qi::lit("must-revalidate")[phoenix::ref(result.mustRevalidate) = true]) |
+         (qi::lit("max-age") >> '=' >> qi::ulong_long[phoenix::ref(result.maxAge) = qi::_1]) |
+         (*(('"' >> *(('\\' >> qi::char_) | (qi::char_ - '"')) >> '"') |
+            (qi::char_ - '"' - ',')))) %
+            ',',
+        qi::ascii::space);
     return result;
 }
 
 optional<Timestamp> CacheControl::toTimePoint() const {
     return maxAge ? util::now() + Seconds(*maxAge) : optional<Timestamp>{};
 }
-    
+
 optional<Timestamp> parseRetryHeaders(const optional<std::string>& retryAfter,
                                       const optional<std::string>& xRateLimitReset) {
     if (retryAfter) {
@@ -45,7 +48,7 @@ optional<Timestamp> parseRetryHeaders(const optional<std::string>& retryAfter,
             return {};
         }
     }
-    
+
     return {};
 }
 

@@ -14,9 +14,7 @@ namespace mbgl {
 RasterTile::RasterTile(const OverscaledTileID& id_,
                        const style::UpdateParameters& parameters,
                        const Tileset& tileset)
-    : Tile(id_),
-      worker(parameters.worker),
-      loader(*this, id_, parameters, tileset) {
+    : Tile(id_), worker(parameters.worker), loader(*this, id_, parameters, tileset) {
 }
 
 RasterTile::~RasterTile() = default;
@@ -26,8 +24,8 @@ void RasterTile::setError(std::exception_ptr err) {
 }
 
 void RasterTile::setData(std::shared_ptr<const std::string> data,
-                             optional<Timestamp> modified_,
-                             optional<Timestamp> expires_) {
+                         optional<Timestamp> modified_,
+                         optional<Timestamp> expires_) {
     modified = modified_;
     expires = expires_;
 
@@ -41,19 +39,20 @@ void RasterTile::setData(std::shared_ptr<const std::string> data,
     }
 
     workRequest.reset();
-    workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(), data, [this] (RasterTileParseResult result) {
-        workRequest.reset();
+    workRequest = worker.parseRasterTile(
+        std::make_unique<RasterBucket>(), data, [this](RasterTileParseResult result) {
+            workRequest.reset();
 
-        availableData = DataAvailability::All;
+            availableData = DataAvailability::All;
 
-        if (result.is<std::unique_ptr<Bucket>>()) {
-            bucket = std::move(result.get<std::unique_ptr<Bucket>>());
-            observer->onTileLoaded(*this, TileLoadState::First);
-        } else {
-            bucket.reset();
-            observer->onTileError(*this, result.get<std::exception_ptr>());
-        }
-    });
+            if (result.is<std::unique_ptr<Bucket>>()) {
+                bucket = std::move(result.get<std::unique_ptr<Bucket>>());
+                observer->onTileLoaded(*this, TileLoadState::First);
+            } else {
+                bucket.reset();
+                observer->onTileError(*this, result.get<std::exception_ptr>());
+            }
+        });
 }
 
 Bucket* RasterTile::getBucket(const style::Layer&) {

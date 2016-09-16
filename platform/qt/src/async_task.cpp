@@ -9,9 +9,7 @@
 namespace mbgl {
 namespace util {
 
-AsyncTask::Impl::Impl(std::function<void()>&& fn)
-    : runLoop(RunLoop::Get()),
-      task(std::move(fn)) {
+AsyncTask::Impl::Impl(std::function<void()>&& fn) : runLoop(RunLoop::Get()), task(std::move(fn)) {
     connect(this, SIGNAL(send(void)), this, SLOT(runTask(void)), Qt::QueuedConnection);
 }
 
@@ -28,8 +26,7 @@ void AsyncTask::Impl::runTask() {
     task();
 }
 
-AsyncTask::AsyncTask(std::function<void()>&& fn)
-    : impl(std::make_unique<Impl>(std::move(fn))) {
+AsyncTask::AsyncTask(std::function<void()>&& fn) : impl(std::make_unique<Impl>(std::move(fn))) {
 }
 
 AsyncTask::~AsyncTask() {
@@ -38,6 +35,5 @@ AsyncTask::~AsyncTask() {
 void AsyncTask::send() {
     impl->maySend();
 }
-
 }
 }

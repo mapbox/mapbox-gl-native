@@ -6,30 +6,30 @@ namespace mbgl {
 namespace android {
 namespace java {
 
-    struct ObjectArray {
-        static jni::jclass* jclass;
-    };
+struct ObjectArray {
+    static jni::jclass* jclass;
+};
 
-    struct String {
-        static jni::jclass* jclass;
-    };
+struct String {
+    static jni::jclass* jclass;
+};
 
-    struct Boolean {
-        static jni::jclass* jclass;
-        static jni::jmethodID* booleanValueMethodId;
-    };
+struct Boolean {
+    static jni::jclass* jclass;
+    static jni::jmethodID* booleanValueMethodId;
+};
 
-    struct Number {
-        static jni::jclass* jclass;
-        static jni::jmethodID* floatValueMethodId;
-    };
+struct Number {
+    static jni::jclass* jclass;
+    static jni::jmethodID* floatValueMethodId;
+};
 
-    struct Map {
-        static jni::jclass* jclass;
-        static jni::jmethodID* getMethodId;
-    };
+struct Map {
+    static jni::jclass* jclass;
+    static jni::jmethodID* getMethodId;
+};
 
-    void registerNatives(JNIEnv&);
+void registerNatives(JNIEnv&);
 }
 }
 }

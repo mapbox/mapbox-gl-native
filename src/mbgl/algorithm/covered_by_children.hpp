@@ -24,7 +24,7 @@ template <typename Container>
 bool coveredByChildren(const UnwrappedTileID& id, const Container& container) {
     return coveredByChildren(
         id, container.upper_bound(id),
-        container.lower_bound(UnwrappedTileID{ static_cast<int16_t>(id.wrap + 1), { 0, 0, 0 } }));
+        container.lower_bound(UnwrappedTileID{static_cast<int16_t>(id.wrap + 1), {0, 0, 0}}));
 }
 
 } // namespace algorithm

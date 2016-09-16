@@ -13,26 +13,83 @@ namespace style {
 template <typename T>
 T defaultStopsValue();
 
-template <> bool defaultStopsValue() { return true; }
-template <> float defaultStopsValue() { return 1.0f; }
-template <> Color defaultStopsValue() { return { 0, 0, 0, 1 }; }
-template <> std::vector<float> defaultStopsValue() { return {{ 1, 0 }}; }
-template <> std::vector<std::string> defaultStopsValue() { return {{}}; }
-template <> std::array<float, 2> defaultStopsValue() { return {{ 0, 0 }}; }
-template <> std::array<float, 4> defaultStopsValue() { return {{ 0, 0, 0, 0 }}; }
+template <>
+bool defaultStopsValue() {
+    return true;
+}
+template <>
+float defaultStopsValue() {
+    return 1.0f;
+}
+template <>
+Color defaultStopsValue() {
+    return { 0, 0, 0, 1 };
+}
+template <>
+std::vector<float> defaultStopsValue() {
+    return { { 1, 0 } };
+}
+template <>
+std::vector<std::string> defaultStopsValue() {
+    return { {} };
+}
+template <>
+std::array<float, 2> defaultStopsValue() {
+    return { { 0, 0 } };
+}
+template <>
+std::array<float, 4> defaultStopsValue() {
+    return { { 0, 0, 0, 0 } };
+}
 
-template <> std::string defaultStopsValue() { return {}; }
-template <> TranslateAnchorType defaultStopsValue() { return {}; }
-template <> RotateAnchorType defaultStopsValue() { return {}; }
-template <> CirclePitchScaleType defaultStopsValue() { return {}; }
-template <> LineCapType defaultStopsValue() { return {}; }
-template <> LineJoinType defaultStopsValue() { return {}; }
-template <> SymbolPlacementType defaultStopsValue() { return {}; }
-template <> TextAnchorType defaultStopsValue() { return {}; }
-template <> TextJustifyType defaultStopsValue() { return {}; }
-template <> TextTransformType defaultStopsValue() { return {}; }
-template <> AlignmentType defaultStopsValue() { return {}; }
-template <> IconTextFitType defaultStopsValue() { return {}; };
+template <>
+std::string defaultStopsValue() {
+    return {};
+}
+template <>
+TranslateAnchorType defaultStopsValue() {
+    return {};
+}
+template <>
+RotateAnchorType defaultStopsValue() {
+    return {};
+}
+template <>
+CirclePitchScaleType defaultStopsValue() {
+    return {};
+}
+template <>
+LineCapType defaultStopsValue() {
+    return {};
+}
+template <>
+LineJoinType defaultStopsValue() {
+    return {};
+}
+template <>
+SymbolPlacementType defaultStopsValue() {
+    return {};
+}
+template <>
+TextAnchorType defaultStopsValue() {
+    return {};
+}
+template <>
+TextJustifyType defaultStopsValue() {
+    return {};
+}
+template <>
+TextTransformType defaultStopsValue() {
+    return {};
+}
+template <>
+AlignmentType defaultStopsValue() {
+    return {};
+}
+template <>
+IconTextFitType defaultStopsValue() {
+    return {};
+};
 
 template <typename T>
 T PropertyEvaluator<T>::operator()(const Function<T>& fn) const {
@@ -138,11 +195,12 @@ Faded<T> CrossFadedPropertyEvaluator<T>::calculate(const T& min, const T& mid, c
     const float z = parameters.z;
     const float fraction = z - std::floor(z);
     const std::chrono::duration<float> d = parameters.defaultFadeDuration;
-    const float t = std::min((parameters.now - parameters.zoomHistory.lastIntegerZoomTime) / d, 1.0f);
+    const float t =
+        std::min((parameters.now - parameters.zoomHistory.lastIntegerZoomTime) / d, 1.0f);
 
     return z > parameters.zoomHistory.lastIntegerZoom
-        ? Faded<T> { min, mid, 2.0f, 1.0f, fraction + (1.0f - fraction) * t }
-        : Faded<T> { max, mid, 0.5f, 1.0f, 1 - (1 - t) * fraction };
+               ? Faded<T>{ min, mid, 2.0f, 1.0f, fraction + (1.0f - fraction) * t }
+               : Faded<T>{ max, mid, 0.5f, 1.0f, 1 - (1 - t) * fraction };
 }
 
 template class CrossFadedPropertyEvaluator<std::string>;

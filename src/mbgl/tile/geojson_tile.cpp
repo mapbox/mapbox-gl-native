@@ -14,11 +14,10 @@ class GeoJSONTileFeature : public GeometryTileFeature {
 public:
     const mapbox::geometry::feature<int16_t>& feature;
 
-    GeoJSONTileFeature(const mapbox::geometry::feature<int16_t>& feature_)
-        : feature(feature_) {
+    GeoJSONTileFeature(const mapbox::geometry::feature<int16_t>& feature_) : feature(feature_) {
     }
 
-    FeatureType getType() const override  {
+    FeatureType getType() const override {
         return apply_visitor(ToFeatureType(), feature.geometry);
     }
 
@@ -46,8 +45,7 @@ public:
     }
 };
 
-class GeoJSONTileData : public GeometryTileData,
-                        public GeometryTileLayer {
+class GeoJSONTileData : public GeometryTileData, public GeometryTileLayer {
 public:
     mapbox::geometry::feature_collection<int16_t> features;
 
@@ -84,6 +82,7 @@ GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
     setData(std::make_unique<GeoJSONTileData>(features));
 }
 
-void GeoJSONTile::setNecessity(Necessity) {}
+void GeoJSONTile::setNecessity(Necessity) {
+}
 
 } // namespace mbgl

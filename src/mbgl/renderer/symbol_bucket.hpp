@@ -21,10 +21,7 @@ class CollisionBoxShader;
 
 class SymbolBucket : public Bucket {
 public:
-    SymbolBucket(const MapMode,
-                 style::SymbolLayoutProperties,
-                 bool sdfIcons,
-                 bool iconsNeedLinear);
+    SymbolBucket(const MapMode, style::SymbolLayoutProperties, bool sdfIcons, bool iconsNeedLinear);
 
     void upload(gl::ObjectStore&, gl::Config&) override;
     void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;

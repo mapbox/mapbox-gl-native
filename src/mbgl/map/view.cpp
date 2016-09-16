@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-void View::initialize(Map *map_) {
+void View::initialize(Map* map_) {
     assert(map_);
     map = map_;
 }
@@ -17,6 +17,5 @@ PremultipliedImage View::readStillImage() {
 void View::notifyMapChange(MapChange) {
     // no-op
 }
-
 
 } // namespace mbgl

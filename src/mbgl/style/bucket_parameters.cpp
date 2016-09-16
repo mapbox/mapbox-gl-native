@@ -5,13 +5,17 @@
 namespace mbgl {
 namespace style {
 
-void BucketParameters::eachFilteredFeature(const Filter& filter,
-                                                std::function<void (const GeometryTileFeature&, std::size_t index, const std::string& layerName)> function) {
+void BucketParameters::eachFilteredFeature(
+    const Filter& filter,
+    std::function<void(const GeometryTileFeature&, std::size_t index, const std::string& layerName)>
+        function) {
     auto name = layer.getName();
     for (std::size_t i = 0; !cancelled() && i < layer.featureCount(); i++) {
         auto feature = layer.getFeature(i);
-        if (!filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
+        if (!filter(feature->getType(), feature->getID(),
+                    [&](const auto& key) { return feature->getValue(key); })) {
             continue;
+        }
         function(*feature, i, name);
     }
 }

@@ -13,8 +13,9 @@ namespace android {
 
 class Layer : private mbgl::util::noncopyable {
 public:
-
-    static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/Layer"; };
+    static constexpr auto Name() {
+        return "com/mapbox/mapboxsdk/style/layers/Layer";
+    };
 
     static jni::Class<Layer> javaClass;
 
@@ -36,14 +37,14 @@ public:
 
     jni::String getId(jni::JNIEnv&);
 
-    //Release the owned view and return it
+    // Release the owned view and return it
     std::unique_ptr<mbgl::style::Layer> releaseCoreLayer();
 
     void setLayoutProperty(jni::JNIEnv&, jni::String, jni::Object<> value);
 
     void setPaintProperty(jni::JNIEnv&, jni::String, jni::Object<> value);
 
-    //Zoom
+    // Zoom
 
     jni::jfloat getMinZoom(jni::JNIEnv&);
 
@@ -59,7 +60,7 @@ public:
 
     void setSourceLayer(jni::JNIEnv& env, jni::String sourceLayer);
 
-    //Property getters
+    // Property getters
 
     jni::Object<jni::ObjectTag> getVisibility(jni::JNIEnv&);
 
@@ -67,12 +68,7 @@ protected:
     std::unique_ptr<mbgl::style::Layer> ownedLayer;
     mbgl::style::Layer& layer;
     mbgl::Map* map;
-
 };
 
-} //android
-} //mbgl
-
-
-
-
+} // android
+} // mbgl

@@ -34,11 +34,9 @@ void matrix::identity(mat2& out) {
 }
 
 void matrix::rotate(mat2& out, const mat2& a, double rad) {
-    double a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3],
-        s = std::sin(rad),
-        c = std::cos(rad);
-    out[0] = a0 *  c + a2 * s;
-    out[1] = a1 *  c + a3 * s;
+    double a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3], s = std::sin(rad), c = std::cos(rad);
+    out[0] = a0 * c + a2 * s;
+    out[1] = a1 * c + a3 * s;
     out[2] = a0 * -s + a2 * c;
     out[3] = a1 * -s + a3 * c;
 }

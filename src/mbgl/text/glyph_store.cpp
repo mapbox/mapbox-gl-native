@@ -8,8 +8,7 @@ namespace mbgl {
 
 static GlyphStoreObserver nullObserver;
 
-GlyphStore::GlyphStore(FileSource& fileSource_)
-    : fileSource(fileSource_), observer(&nullObserver) {
+GlyphStore::GlyphStore(FileSource& fileSource_) : fileSource(fileSource_), observer(&nullObserver) {
 }
 
 GlyphStore::~GlyphStore() = default;
@@ -24,11 +23,11 @@ void GlyphStore::requestGlyphRange(const FontStack& fontStack, const GlyphRange&
     }
 
     rangeSets.emplace(range,
-        std::make_unique<GlyphPBF>(this, fontStack, range, observer, fileSource));
+                      std::make_unique<GlyphPBF>(this, fontStack, range, observer, fileSource));
 }
 
-
-bool GlyphStore::hasGlyphRanges(const FontStack& fontStack, const std::set<GlyphRange>& glyphRanges) {
+bool GlyphStore::hasGlyphRanges(const FontStack& fontStack,
+                                const std::set<GlyphRange>& glyphRanges) {
     if (glyphRanges.empty()) {
         return true;
     }

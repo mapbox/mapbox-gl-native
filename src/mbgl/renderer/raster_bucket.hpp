@@ -19,7 +19,11 @@ public:
 
     void setImage(PremultipliedImage);
 
-    void drawRaster(RasterShader&, StaticRasterVertexBuffer&, VertexArrayObject&, gl::Config&, gl::ObjectStore&);
+    void drawRaster(RasterShader&,
+                    StaticRasterVertexBuffer&,
+                    VertexArrayObject&,
+                    gl::Config&,
+                    gl::ObjectStore&);
 
     Raster raster;
 };

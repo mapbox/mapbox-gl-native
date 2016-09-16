@@ -18,9 +18,7 @@ public:
     }
 
     ThreadLocal() {
-        int ret = pthread_key_create(&key, [](void *ptr) {
-            delete reinterpret_cast<T *>(ptr);
-        });
+        int ret = pthread_key_create(&key, [](void* ptr) { delete reinterpret_cast<T*>(ptr); });
 
         if (ret) {
             throw std::runtime_error("Failed to init local storage key.");

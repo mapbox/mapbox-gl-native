@@ -13,12 +13,10 @@
 
 namespace mbgl {
 
-template <
-    GLsizei item_size,
-    GLenum bufferType = GL_ARRAY_BUFFER,
-    GLsizei defaultLength = 8192,
-    bool retainAfterUpload = false
->
+template <GLsizei item_size,
+          GLenum bufferType = GL_ARRAY_BUFFER,
+          GLsizei defaultLength = 8192,
+          bool retainAfterUpload = false>
 class Buffer : private util::noncopyable {
 public:
     ~Buffer() {
@@ -73,19 +71,21 @@ public:
 
 protected:
     // increase the buffer size by at least /required/ bytes.
-    void *addElement() {
+    void* addElement() {
         if (buffer) {
             throw std::runtime_error("Can't add elements after buffer was bound to GPU");
         }
         if (length < pos + itemSize) {
-            while (length < pos + itemSize) length += defaultLength;
+            while (length < pos + itemSize) {
+                length += defaultLength;
+}
             array = realloc(array, length);
             if (array == nullptr) {
                 throw std::runtime_error("Buffer reallocation failed");
             }
         }
         pos += itemSize;
-        return reinterpret_cast<char *>(array) + (pos - itemSize);
+        return reinterpret_cast<char*>(array) + (pos - itemSize);
     }
 
 public:
@@ -93,7 +93,7 @@ public:
 
 private:
     // CPU buffer
-    GLvoid *array = nullptr;
+    GLvoid* array = nullptr;
 
     // Byte position where we are writing.
     GLsizeiptr pos = 0;

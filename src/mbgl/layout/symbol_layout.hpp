@@ -37,12 +37,21 @@ struct Anchor;
 
 class SymbolInstance {
 public:
-    explicit SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
-            const Shaping& shapedText, const PositionedIcon& shapedIcon,
-            const style::SymbolLayoutProperties&, const bool inside, const uint32_t index,
-            const float textBoxScale, const float textPadding, style::SymbolPlacementType textPlacement,
-            const float iconBoxScale, const float iconPadding, style::SymbolPlacementType iconPlacement,
-            const GlyphPositions& face, const IndexedSubfeature& indexedfeature);
+    explicit SymbolInstance(Anchor& anchor,
+                            const GeometryCoordinates& line,
+                            const Shaping& shapedText,
+                            const PositionedIcon& shapedIcon,
+                            const style::SymbolLayoutProperties&,
+                            const bool inside,
+                            const uint32_t index,
+                            const float textBoxScale,
+                            const float textPadding,
+                            style::SymbolPlacementType textPlacement,
+                            const float iconBoxScale,
+                            const float iconPadding,
+                            style::SymbolPlacementType iconPlacement,
+                            const GlyphPositions& face,
+                            const IndexedSubfeature& indexedfeature);
 
     Point<float> point;
     uint32_t index;
@@ -69,9 +78,7 @@ public:
 
     bool canPrepare(GlyphStore&, SpriteStore&);
 
-    void prepare(uintptr_t tileUID,
-                 GlyphAtlas&,
-                 GlyphStore&);
+    void prepare(uintptr_t tileUID, GlyphAtlas&, GlyphStore&);
 
     std::unique_ptr<SymbolBucket> place(CollisionTile&);
 
@@ -102,8 +109,12 @@ private:
 
     // Adds placed items to the buffer.
     template <typename Buffer, typename GroupType>
-    void addSymbols(Buffer&, const SymbolQuads&, float scale,
-                    const bool keepUpright, const style::SymbolPlacementType, const float placementAngle);
+    void addSymbols(Buffer&,
+                    const SymbolQuads&,
+                    float scale,
+                    const bool keepUpright,
+                    const style::SymbolPlacementType,
+                    const float placementAngle);
 
     const float overscaling;
     const float zoom;

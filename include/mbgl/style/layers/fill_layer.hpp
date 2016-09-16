@@ -43,12 +43,16 @@ public:
     void setFillOutlineColor(PropertyValue<Color>, const optional<std::string>& klass = {});
 
     static PropertyValue<std::array<float, 2>> getDefaultFillTranslate();
-    PropertyValue<std::array<float, 2>> getFillTranslate(const optional<std::string>& klass = {}) const;
-    void setFillTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
+    PropertyValue<std::array<float, 2>>
+    getFillTranslate(const optional<std::string>& klass = {}) const;
+    void setFillTranslate(PropertyValue<std::array<float, 2>>,
+                          const optional<std::string>& klass = {});
 
     static PropertyValue<TranslateAnchorType> getDefaultFillTranslateAnchor();
-    PropertyValue<TranslateAnchorType> getFillTranslateAnchor(const optional<std::string>& klass = {}) const;
-    void setFillTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
+    PropertyValue<TranslateAnchorType>
+    getFillTranslateAnchor(const optional<std::string>& klass = {}) const;
+    void setFillTranslateAnchor(PropertyValue<TranslateAnchorType>,
+                                const optional<std::string>& klass = {});
 
     static PropertyValue<std::string> getDefaultFillPattern();
     PropertyValue<std::string> getFillPattern(const optional<std::string>& klass = {}) const;

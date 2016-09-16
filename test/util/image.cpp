@@ -7,7 +7,7 @@
 using namespace mbgl;
 
 TEST(Image, PNGRoundTrip) {
-    PremultipliedImage rgba { 1, 1 };
+    PremultipliedImage rgba{1, 1};
     rgba.data[0] = 128;
     rgba.data[1] = 0;
     rgba.data[2] = 0;
@@ -21,7 +21,7 @@ TEST(Image, PNGRoundTrip) {
 }
 
 TEST(Image, PNGRoundTripAlpha) {
-    PremultipliedImage rgba { 1, 1 };
+    PremultipliedImage rgba{1, 1};
     rgba.data[0] = 128;
     rgba.data[1] = 0;
     rgba.data[2] = 0;
@@ -43,7 +43,8 @@ TEST(Image, PNGReadNoProfile) {
 }
 
 TEST(Image, PNGReadNoProfileAlpha) {
-    PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/no_profile_alpha.png"));
+    PremultipliedImage image =
+        decodeImage(util::read_file("test/fixtures/image/no_profile_alpha.png"));
     EXPECT_EQ(64, image.data[0]);
     EXPECT_EQ(0, image.data[1]);
     EXPECT_EQ(0, image.data[2]);
@@ -59,7 +60,8 @@ TEST(Image, PNGReadProfile) {
 }
 
 TEST(Image, PNGReadProfileAlpha) {
-    PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/profile_alpha.png"));
+    PremultipliedImage image =
+        decodeImage(util::read_file("test/fixtures/image/profile_alpha.png"));
     EXPECT_EQ(64, image.data[0]);
     EXPECT_EQ(0, image.data[1]);
     EXPECT_EQ(0, image.data[2]);
@@ -87,7 +89,7 @@ TEST(Image, WebPTile) {
 #endif // !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
 
 TEST(Image, Premultiply) {
-    UnassociatedImage rgba { 1, 1 };
+    UnassociatedImage rgba{1, 1};
     rgba.data[0] = 255;
     rgba.data[1] = 254;
     rgba.data[2] = 253;

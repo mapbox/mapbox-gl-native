@@ -36,7 +36,7 @@ function check_tidy() {
 
 function check_format() {
     echo "Running clang-format on $0..."
-    ${CLANG_FORMAT} -i ${CDUP}/$0
+    ${CLANG_FORMAT} -i $0
 }
 
 export CLANG_TIDY CLANG_FORMAT
@@ -54,13 +54,18 @@ if [[ -n $2 ]] && [[ $2 == "--diff" ]]; then
     if [[ -n $DIFF_FILES ]]; then
         echo "${DIFF_FILES}" | xargs -I{} -P ${JOBS} bash -c 'check_tidy --fix' {}
         # XXX disabled until we run clang-format over the entire codebase.
-        #echo "${DIFF_FILES}" | xargs -I{} -P ${JOBS} bash -c 'check_format' {}
+        echo "${DIFF_FILES}" | xargs -I{} -P ${JOBS} bash -c 'check_format' {}
         git diff-index --quiet HEAD || {
             echo "Changes were made to source files - please review them before committing."
             exit 1
         }
     fi
     echo "All looks good!"
+elif [[ -n $2 ]] && [[ $2 == "--format" ]]; then
+    HEADERS=("${CDUP}/include/*.hpp" "${CDUP}/src/mbgl/*.hpp" "${CDUP}/platform/*.hpp" "${CDUP}/test/*.hpp")
+    SOURCES=("${CDUP}/src/mbgl/*.cpp" "${CDUP}/platform/*.cpp" "${CDUP}/test/*.cpp" "${CDUP}/bin/*.cpp")
+    git ls-files ${SOURCES} | xargs -n1 -P ${JOBS} -t ${CLANG_TIDY} -fix -checks="readability-braces-around-statements"
+    git ls-files ${SOURCES} ${HEADERS} | xargs -n1 -P ${JOBS} -t ${CLANG_FORMAT} -i
 else
     git ls-files "${CDUP}/src/mbgl/*.cpp" "${CDUP}/platform/*.cpp" "${CDUP}/test/*.cpp" | \
         xargs -I{} -P ${JOBS} bash -c 'check_tidy' {}

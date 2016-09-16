@@ -7,8 +7,7 @@ using namespace mbgl::util;
 
 class TestObject {
 public:
-    TestObject(std::thread::id otherTid)
-        : tid(std::this_thread::get_id()) {
+    TestObject(std::thread::id otherTid) : tid(std::this_thread::get_id()) {
         EXPECT_NE(tid, otherTid);
     }
 
@@ -17,7 +16,7 @@ public:
         EXPECT_EQ(val, 1);
     }
 
-    void fn2(std::function<void (int)> cb) {
+    void fn2(std::function<void(int)> cb) {
         EXPECT_EQ(tid, std::this_thread::get_id());
         cb(1);
     }
@@ -27,12 +26,12 @@ public:
         EXPECT_EQ(*val, 1);
     }
 
-    void transferOut(std::function<void (std::unique_ptr<int>)> cb) {
+    void transferOut(std::function<void(std::unique_ptr<int>)> cb) {
         EXPECT_EQ(tid, std::this_thread::get_id());
         cb(std::make_unique<int>(1));
     }
 
-    void transferInOut(std::unique_ptr<int> val, std::function<void (std::unique_ptr<int>)> cb) {
+    void transferInOut(std::unique_ptr<int> val, std::function<void(std::unique_ptr<int>)> cb) {
         EXPECT_EQ(tid, std::this_thread::get_id());
         EXPECT_EQ(*val, 1);
         cb(std::move(val));
@@ -43,18 +42,18 @@ public:
         EXPECT_EQ(*val, 1);
     }
 
-    void transferOutShared(std::function<void (std::shared_ptr<int>)> cb) {
+    void transferOutShared(std::function<void(std::shared_ptr<int>)> cb) {
         EXPECT_EQ(tid, std::this_thread::get_id());
         cb(std::make_shared<int>(1));
     }
 
-    void transferString(const std::string& string, std::function<void (std::string)> cb) {
+    void transferString(const std::string& string, std::function<void(std::string)> cb) {
         EXPECT_EQ(tid, std::this_thread::get_id());
         EXPECT_EQ(string, "test");
         cb(string);
     }
 
-    void checkContext(std::function<void (bool)> cb) const {
+    void checkContext(std::function<void(bool)> cb) const {
         cb(tid == std::this_thread::get_id());
     }
 
@@ -72,39 +71,41 @@ TEST(Thread, invoke) {
         Thread<TestObject> thread({"Test"}, tid);
 
         thread.invoke(&TestObject::fn1, 1);
-        requests.push_back(thread.invokeWithCallback(&TestObject::fn2, [&] (int result) {
+        requests.push_back(thread.invokeWithCallback(&TestObject::fn2, [&](int result) {
             EXPECT_EQ(tid, std::this_thread::get_id());
             EXPECT_EQ(result, 1);
         }));
 
         thread.invoke(&TestObject::transferIn, std::make_unique<int>(1));
-        requests.push_back(thread.invokeWithCallback(&TestObject::transferOut, [&] (std::unique_ptr<int> result) {
-            EXPECT_EQ(tid, std::this_thread::get_id());
-            EXPECT_EQ(*result, 1);
-        }));
+        requests.push_back(
+            thread.invokeWithCallback(&TestObject::transferOut, [&](std::unique_ptr<int> result) {
+                EXPECT_EQ(tid, std::this_thread::get_id());
+                EXPECT_EQ(*result, 1);
+            }));
 
-        requests.push_back(thread.invokeWithCallback(&TestObject::transferInOut, std::make_unique<int>(1), [&] (std::unique_ptr<int> result) {
-            EXPECT_EQ(tid, std::this_thread::get_id());
-            EXPECT_EQ(*result, 1);
-        }));
+        requests.push_back(thread.invokeWithCallback(
+            &TestObject::transferInOut, std::make_unique<int>(1), [&](std::unique_ptr<int> result) {
+                EXPECT_EQ(tid, std::this_thread::get_id());
+                EXPECT_EQ(*result, 1);
+            }));
 
         thread.invoke(&TestObject::transferInShared, std::make_shared<int>(1));
-        requests.push_back(thread.invokeWithCallback(&TestObject::transferOutShared, [&] (std::shared_ptr<int> result) {
-            EXPECT_EQ(tid, std::this_thread::get_id());
-            EXPECT_EQ(*result, 1);
-        }));
+        requests.push_back(thread.invokeWithCallback(&TestObject::transferOutShared,
+                                                     [&](std::shared_ptr<int> result) {
+                                                         EXPECT_EQ(tid, std::this_thread::get_id());
+                                                         EXPECT_EQ(*result, 1);
+                                                     }));
 
         // Cancelled request
-        thread.invokeWithCallback(&TestObject::fn2, [&] (int) {
-            ADD_FAILURE();
-        });
+        thread.invokeWithCallback(&TestObject::fn2, [&](int) { ADD_FAILURE(); });
 
         std::string test("test");
-        requests.push_back(thread.invokeWithCallback(&TestObject::transferString, test, [&] (std::string result){
-            EXPECT_EQ(tid, std::this_thread::get_id());
-            EXPECT_EQ(result, "test");
-            loop.stop();
-        }));
+        requests.push_back(
+            thread.invokeWithCallback(&TestObject::transferString, test, [&](std::string result) {
+                EXPECT_EQ(tid, std::this_thread::get_id());
+                EXPECT_EQ(result, "test");
+                loop.stop();
+            }));
         test.clear();
     });
 
@@ -120,10 +121,11 @@ TEST(Thread, context) {
     loop.invoke([&] {
         Thread<TestObject> thread({"Test"}, tid);
 
-        requests.push_back(thread.invokeWithCallback(&TestObject::checkContext, [&] (bool inTestThreadContext) {
-            EXPECT_EQ(inTestThreadContext, true);
-            loop.stop();
-        }));
+        requests.push_back(
+            thread.invokeWithCallback(&TestObject::checkContext, [&](bool inTestThreadContext) {
+                EXPECT_EQ(inTestThreadContext, true);
+                loop.stop();
+            }));
     });
 
     loop.run();
@@ -133,7 +135,7 @@ class TestWorker {
 public:
     TestWorker() = default;
 
-    void send(std::function<void ()> fn, std::function<void ()> cb) {
+    void send(std::function<void()> fn, std::function<void()> cb) {
         fn();
         cb();
     }
@@ -146,12 +148,11 @@ TEST(Thread, ExecutesAfter) {
     bool didWork = false;
     bool didAfter = false;
 
-    auto request = thread.invokeWithCallback(&TestWorker::send, [&] {
-        didWork = true;
-    }, [&] {
-        didAfter = true;
-        loop.stop();
-    });
+    auto request = thread.invokeWithCallback(&TestWorker::send, [&] { didWork = true; },
+                                             [&] {
+                                                 didAfter = true;
+                                                 loop.stop();
+                                             });
 
     loop.run();
 
@@ -167,11 +168,13 @@ TEST(Thread, WorkRequestDeletionWaitsForWorkToComplete) {
     std::promise<void> started;
     bool didWork = false;
 
-    auto request = thread.invokeWithCallback(&TestWorker::send, [&] {
-        started.set_value();
-        usleep(10000);
-        didWork = true;
-    }, [&] {});
+    auto request = thread.invokeWithCallback(&TestWorker::send,
+                                             [&] {
+                                                 started.set_value();
+                                                 usleep(10000);
+                                                 didWork = true;
+                                             },
+                                             [&] {});
 
     started.get_future().get();
     request.reset();
@@ -185,11 +188,8 @@ TEST(Thread, WorkRequestDeletionCancelsAfter) {
     std::promise<void> started;
     bool didAfter = false;
 
-    auto request = thread.invokeWithCallback(&TestWorker::send, [&] {
-        started.set_value();
-    }, [&] {
-        didAfter = true;
-    });
+    auto request = thread.invokeWithCallback(&TestWorker::send, [&] { started.set_value(); },
+                                             [&] { didAfter = true; });
 
     started.get_future().get();
     request.reset();
@@ -203,14 +203,16 @@ TEST(Thread, WorkRequestDeletionCancelsImmediately) {
 
     std::promise<void> started;
 
-    auto request1 = thread.invokeWithCallback(&TestWorker::send, [&] {
-        usleep(10000);
-        started.set_value();
-    }, [&] {});
+    auto request1 = thread.invokeWithCallback(&TestWorker::send,
+                                              [&] {
+                                                  usleep(10000);
+                                                  started.set_value();
+                                              },
+                                              [&] {});
 
-    auto request2 = thread.invokeWithCallback(&TestWorker::send, [&] {
-        ADD_FAILURE() << "Second work item should not be invoked";
-    }, [&] {});
+    auto request2 = thread.invokeWithCallback(
+        &TestWorker::send, [&] { ADD_FAILURE() << "Second work item should not be invoked"; },
+        [&] {});
     request2.reset();
 
     started.get_future().get();

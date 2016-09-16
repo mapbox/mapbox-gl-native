@@ -10,7 +10,9 @@ namespace mbgl {
 namespace android {
 namespace conversion {
 
-struct Error { std::string message; };
+struct Error {
+    std::string message;
+};
 
 template <class T>
 class Result : private variant<T, Error> {
@@ -40,8 +42,8 @@ public:
 template <class T, class V, class Enable = void>
 struct Converter;
 
-template <class T, typename V, class...Args>
-Result<T> convert(jni::JNIEnv& env, const V& value, Args&&...args) {
+template <class T, typename V, class... Args>
+Result<T> convert(jni::JNIEnv& env, const V& value, Args&&... args) {
     return Converter<T, V>()(env, value, std::forward<Args>(args)...);
 }
 

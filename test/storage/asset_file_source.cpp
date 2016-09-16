@@ -26,7 +26,7 @@ TEST(AssetFileSource, Load) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    // iOS seems to run out of file descriptors...
+// iOS seems to run out of file descriptors...
 #if TARGET_OS_IPHONE
     unsigned numThreads = 30;
 #else
@@ -41,7 +41,8 @@ TEST(AssetFileSource, Load) {
 
     class TestWorker {
     public:
-        TestWorker(mbgl::AssetFileSource* fs_) : fs(fs_) {}
+        TestWorker(mbgl::AssetFileSource* fs_) : fs(fs_) {
+        }
 
         void run(std::function<void()> endCallback) {
             const std::string asset("asset://nonempty");
@@ -55,11 +56,11 @@ TEST(AssetFileSource, Load) {
                     endCallback();
                     request.reset();
                 } else {
-                    request = fs->request({ mbgl::Resource::Unknown, asset }, requestCallback);
+                    request = fs->request({mbgl::Resource::Unknown, asset}, requestCallback);
                 }
             };
 
-            request = fs->request({ mbgl::Resource::Unknown, asset }, requestCallback);
+            request = fs->request({mbgl::Resource::Unknown, asset}, requestCallback);
         }
 
     private:
@@ -73,14 +74,13 @@ TEST(AssetFileSource, Load) {
 
     std::vector<std::unique_ptr<util::Thread<TestWorker>>> threads;
     std::vector<std::unique_ptr<mbgl::AsyncRequest>> requests;
-    util::ThreadContext context = { "Test" };
+    util::ThreadContext context = {"Test"};
 
     for (unsigned i = 0; i < numThreads; ++i) {
         std::unique_ptr<util::Thread<TestWorker>> thread =
             std::make_unique<util::Thread<TestWorker>>(context, &fs);
 
-        requests.push_back(
-            thread->invokeWithCallback(&TestWorker::run, callback));
+        requests.push_back(thread->invokeWithCallback(&TestWorker::run, callback));
 
         threads.push_back(std::move(thread));
     }
@@ -93,13 +93,14 @@ TEST(AssetFileSource, EmptyFile) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://empty" }, [&](Response res) {
-        req.reset();
-        EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("", *res.data);
-        loop.stop();
-    });
+    std::unique_ptr<AsyncRequest> req = fs.request({Resource::Unknown, "asset://empty"},
+                                                   [&](Response res) {
+                                                       req.reset();
+                                                       EXPECT_EQ(nullptr, res.error);
+                                                       ASSERT_TRUE(res.data.get());
+                                                       EXPECT_EQ("", *res.data);
+                                                       loop.stop();
+                                                   });
 
     loop.run();
 }
@@ -109,13 +110,14 @@ TEST(AssetFileSource, NonEmptyFile) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://nonempty" }, [&](Response res) {
-        req.reset();
-        EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("content is here\n", *res.data);
-        loop.stop();
-    });
+    std::unique_ptr<AsyncRequest> req = fs.request({Resource::Unknown, "asset://nonempty"},
+                                                   [&](Response res) {
+                                                       req.reset();
+                                                       EXPECT_EQ(nullptr, res.error);
+                                                       ASSERT_TRUE(res.data.get());
+                                                       EXPECT_EQ("content is here\n", *res.data);
+                                                       loop.stop();
+                                                   });
 
     loop.run();
 }
@@ -125,14 +127,16 @@ TEST(AssetFileSource, NonExistentFile) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://does_not_exist" }, [&](Response res) {
-        req.reset();
-        ASSERT_NE(nullptr, res.error);
-        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
-        ASSERT_FALSE(res.data.get());
-        // Do not assert on platform-specific error message.
-        loop.stop();
-    });
+    std::unique_ptr<AsyncRequest> req =
+        fs.request({Resource::Unknown, "asset://does_not_exist"},
+                   [&](Response res) {
+                       req.reset();
+                       ASSERT_NE(nullptr, res.error);
+                       EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
+                       ASSERT_FALSE(res.data.get());
+                       // Do not assert on platform-specific error message.
+                       loop.stop();
+                   });
 
     loop.run();
 }
@@ -142,14 +146,16 @@ TEST(AssetFileSource, ReadDirectory) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://directory" }, [&](Response res) {
-        req.reset();
-        ASSERT_NE(nullptr, res.error);
-        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
-        ASSERT_FALSE(res.data.get());
-        // Do not assert on platform-specific error message.
-        loop.stop();
-    });
+    std::unique_ptr<AsyncRequest> req =
+        fs.request({Resource::Unknown, "asset://directory"},
+                   [&](Response res) {
+                       req.reset();
+                       ASSERT_NE(nullptr, res.error);
+                       EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
+                       ASSERT_FALSE(res.data.get());
+                       // Do not assert on platform-specific error message.
+                       loop.stop();
+                   });
 
     loop.run();
 }
@@ -159,13 +165,14 @@ TEST(AssetFileSource, URLEncoding) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://%6eonempty" }, [&](Response res) {
-        req.reset();
-        EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("content is here\n", *res.data);
-        loop.stop();
-    });
+    std::unique_ptr<AsyncRequest> req = fs.request({Resource::Unknown, "asset://%6eonempty"},
+                                                   [&](Response res) {
+                                                       req.reset();
+                                                       EXPECT_EQ(nullptr, res.error);
+                                                       ASSERT_TRUE(res.data.get());
+                                                       EXPECT_EQ("content is here\n", *res.data);
+                                                       loop.stop();
+                                                   });
 
     loop.run();
 }

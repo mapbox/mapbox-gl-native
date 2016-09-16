@@ -13,9 +13,7 @@ using namespace style;
 namespace geojsonvt = mapbox::geojsonvt;
 
 ShapeAnnotationImpl::ShapeAnnotationImpl(const AnnotationID id_, const uint8_t maxZoom_)
-    : id(id_),
-      maxZoom(maxZoom_),
-      layerID("com.mapbox.annotations.shape." + util::toString(id)) {
+    : id(id_), maxZoom(maxZoom_), layerID("com.mapbox.annotations.shape." + util::toString(id)) {
 }
 
 void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, AnnotationTileData& data) {
@@ -23,9 +21,8 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
 
     if (!shapeTiler) {
         mapbox::geometry::feature_collection<double> features;
-        features.emplace_back(ShapeAnnotationGeometry::visit(geometry(), [] (auto&& geom) {
-            return Feature { std::move(geom) };
-        }));
+        features.emplace_back(ShapeAnnotationGeometry::visit(
+            geometry(), [](auto&& geom) { return Feature{ std::move(geom) }; }));
         mapbox::geojsonvt::Options options;
         options.maxZoom = maxZoom;
         options.buffer = 255u;
@@ -35,8 +32,9 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
     }
 
     const auto& shapeTile = shapeTiler->getTile(tileID.z, tileID.x, tileID.y);
-    if (shapeTile.features.empty())
+    if (shapeTile.features.empty()) {
         return;
+    }
 
     AnnotationTileLayer& layer = data.layers.emplace(layerID, layerID).first->second;
 
@@ -44,7 +42,8 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
     ToFeatureType toFeatureType;
     for (const auto& shapeFeature : shapeTile.features) {
         FeatureType featureType = apply_visitor(toFeatureType, shapeFeature.geometry);
-        GeometryCollection renderGeometry = apply_visitor(toGeometryCollection, shapeFeature.geometry);
+        GeometryCollection renderGeometry =
+            apply_visitor(toGeometryCollection, shapeFeature.geometry);
 
         assert(featureType != FeatureType::Unknown);
 

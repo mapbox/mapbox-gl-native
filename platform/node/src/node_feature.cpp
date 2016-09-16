@@ -52,7 +52,8 @@ private:
 template <class T>
 struct ToCoordinatesOrGeometries {
 public:
-    // Handles line_string, polygon, multi_point, multi_line_string, multi_polygon, and geometry_collection.
+    // Handles line_string, polygon, multi_point, multi_line_string, multi_polygon, and
+    // geometry_collection.
     template <class E>
     v8::Local<v8::Object> operator()(const std::vector<E>& vector) {
         Nan::EscapableHandleScope scope;
@@ -124,11 +125,11 @@ v8::Local<v8::Object> toJS(const Geometry& geometry) {
 
     v8::Local<v8::Object> result = Nan::New<v8::Object>();
 
-    Nan::Set(result,
-        Nan::New("type").ToLocalChecked(),
-        Geometry::visit(geometry, ToType<double>()));
+    Nan::Set(result, Nan::New("type").ToLocalChecked(),
+             Geometry::visit(geometry, ToType<double>()));
 
-    Nan::Set(result,
+    Nan::Set(
+        result,
         Nan::New(geometry.is<GeometryCollection>() ? "geometries" : "coordinates").ToLocalChecked(),
         Geometry::visit(geometry, ToCoordinatesOrGeometries<double>()));
 
@@ -160,7 +161,8 @@ v8::Local<v8::Object> toJS(const Feature& feature) {
     Nan::Set(result, Nan::New("properties").ToLocalChecked(), toJS(feature.properties));
 
     if (feature.id) {
-        Nan::Set(result, Nan::New("id").ToLocalChecked(), FeatureIdentifier::visit(*feature.id, ToValue()));
+        Nan::Set(result, Nan::New("id").ToLocalChecked(),
+                 FeatureIdentifier::visit(*feature.id, ToValue()));
     }
 
     return scope.Escape(result);

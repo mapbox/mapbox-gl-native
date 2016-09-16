@@ -4,9 +4,10 @@
 
 namespace mbgl {
 
-class LineVertexBuffer : public Buffer<
-    8 // 2 coordinates per vertex + 1 linesofar + 1 extrude coord pair == 4 (== 8 bytes)
-> {
+class LineVertexBuffer
+    : public Buffer<
+          8 // 2 coordinates per vertex + 1 linesofar + 1 extrude coord pair == 4 (== 8 bytes)
+          > {
 public:
     typedef int16_t vertex_type;
 
@@ -30,8 +31,14 @@ public:
      * @param {number} ty texture normal
      * @param {number} dir direction of the line cap (-1/0/1)
      */
-    GLsizei add(vertex_type x, vertex_type y, float ex, float ey, bool tx, bool ty, int8_t dir, int32_t linesofar = 0);
+    GLsizei add(vertex_type x,
+                vertex_type y,
+                float ex,
+                float ey,
+                bool tx,
+                bool ty,
+                int8_t dir,
+                int32_t linesofar = 0);
 };
-
 
 } // namespace mbgl

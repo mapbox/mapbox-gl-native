@@ -13,7 +13,7 @@ public:
     enum class Scheme : bool { XYZ, TMS };
 
     std::vector<std::string> tiles;
-    Range<uint8_t> zoomRange { 0, 22 };
+    Range<uint8_t> zoomRange{ 0, 22 };
     std::string attribution;
     Scheme scheme = Scheme::XYZ;
 

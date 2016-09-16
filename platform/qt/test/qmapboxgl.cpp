@@ -11,10 +11,9 @@ class QMapboxGLTest : public QObject, public ::testing::Test {
 
 public:
     QMapboxGLTest() : app(argc, const_cast<char**>(&argv)), map(nullptr, settings) {
-        connect(&map, SIGNAL(mapChanged(QMapboxGL::MapChange)),
-                this, SLOT(onMapChanged(QMapboxGL::MapChange)));
-        connect(&map, SIGNAL(needsRendering()),
-                this, SLOT(onNeedsRendering()));
+        connect(&map, SIGNAL(mapChanged(QMapboxGL::MapChange)), this,
+                SLOT(onMapChanged(QMapboxGL::MapChange)));
+        connect(&map, SIGNAL(needsRendering()), this, SLOT(onNeedsRendering()));
 
         widget.makeCurrent();
         QMapbox::initializeGLExtensions();
@@ -60,8 +59,8 @@ private slots:
 };
 
 TEST_F(QMapboxGLTest, TEST_DISABLED_ON_CI(styleJson)) {
-    QString json = QString::fromStdString(
-        mbgl::util::read_file("test/fixtures/resources/style_vector.json"));
+    QString json =
+        QString::fromStdString(mbgl::util::read_file("test/fixtures/resources/style_vector.json"));
 
     map.setStyleJson(json);
     ASSERT_EQ(map.styleJson(), json);

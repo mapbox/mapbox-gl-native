@@ -19,7 +19,7 @@ struct Converter<bool> {
     Result<bool> operator()(const V& value) const {
         optional<bool> converted = toBool(value);
         if (!converted) {
-            return Error { "value must be a boolean" };
+            return Error{ "value must be a boolean" };
         }
         return *converted;
     }
@@ -31,7 +31,7 @@ struct Converter<float> {
     Result<float> operator()(const V& value) const {
         optional<float> converted = toNumber(value);
         if (!converted) {
-            return Error { "value must be a number" };
+            return Error{ "value must be a number" };
         }
         return *converted;
     }
@@ -43,7 +43,7 @@ struct Converter<std::string> {
     Result<std::string> operator()(const V& value) const {
         optional<std::string> converted = toString(value);
         if (!converted) {
-            return Error { "value must be a string" };
+            return Error{ "value must be a string" };
         }
         return *converted;
     }
@@ -55,12 +55,12 @@ struct Converter<T, typename std::enable_if_t<std::is_enum<T>::value>> {
     Result<T> operator()(const V& value) const {
         optional<std::string> string = toString(value);
         if (!string) {
-            return Error { "value must be a string" };
+            return Error{ "value must be a string" };
         }
 
         const auto result = Enum<T>::toEnum(*string);
         if (!result) {
-            return Error { "value must be a valid enumeration value" };
+            return Error{ "value must be a valid enumeration value" };
         }
 
         return *result;
@@ -73,12 +73,12 @@ struct Converter<Color> {
     Result<Color> operator()(const V& value) const {
         optional<std::string> string = toString(value);
         if (!string) {
-            return Error { "value must be a string" };
+            return Error{ "value must be a string" };
         }
 
         optional<Color> color = Color::parse(*string);
         if (!color) {
-            return Error { "value must be a valid color" };
+            return Error{ "value must be a valid color" };
         }
 
         return *color;
@@ -90,16 +90,16 @@ struct Converter<std::array<float, 2>> {
     template <class V>
     Result<std::array<float, 2>> operator()(const V& value) const {
         if (!isArray(value) || arrayLength(value) != 2) {
-            return Error { "value must be an array of two numbers" };
+            return Error{ "value must be an array of two numbers" };
         }
 
         optional<float> first = toNumber(arrayMember(value, 0));
         optional<float> second = toNumber(arrayMember(value, 1));
         if (!first || !second) {
-            return Error { "value must be an array of two numbers" };
+            return Error{ "value must be an array of two numbers" };
         }
 
-        return std::array<float, 2> {{ *first, *second }};
+        return std::array<float, 2>{ { *first, *second } };
     }
 };
 
@@ -108,7 +108,7 @@ struct Converter<std::array<float, 4>> {
     template <class V>
     Result<std::array<float, 4>> operator()(const V& value) const {
         if (!isArray(value) || arrayLength(value) != 4) {
-            return Error { "value must be an array of four numbers" };
+            return Error{ "value must be an array of four numbers" };
         }
 
         optional<float> first = toNumber(arrayMember(value, 0));
@@ -116,10 +116,10 @@ struct Converter<std::array<float, 4>> {
         optional<float> third = toNumber(arrayMember(value, 2));
         optional<float> fourth = toNumber(arrayMember(value, 3));
         if (!first || !second) {
-            return Error { "value must be an array of four numbers" };
+            return Error{ "value must be an array of four numbers" };
         }
 
-        return std::array<float, 4> {{ *first, *second, *third, *fourth }};
+        return std::array<float, 4>{ { *first, *second, *third, *fourth } };
     }
 };
 
@@ -128,7 +128,7 @@ struct Converter<std::vector<float>> {
     template <class V>
     Result<std::vector<float>> operator()(const V& value) const {
         if (!isArray(value)) {
-            return Error { "value must be an array" };
+            return Error{ "value must be an array" };
         }
 
         std::vector<float> result;
@@ -137,7 +137,7 @@ struct Converter<std::vector<float>> {
         for (std::size_t i = 0; i < arrayLength(value); ++i) {
             optional<float> number = toNumber(arrayMember(value, i));
             if (!number) {
-                return Error { "value must be an array of numbers" };
+                return Error{ "value must be an array of numbers" };
             }
             result.push_back(*number);
         }
@@ -151,7 +151,7 @@ struct Converter<std::vector<std::string>> {
     template <class V>
     Result<std::vector<std::string>> operator()(const V& value) const {
         if (!isArray(value)) {
-            return Error { "value must be an array" };
+            return Error{ "value must be an array" };
         }
 
         std::vector<std::string> result;
@@ -160,7 +160,7 @@ struct Converter<std::vector<std::string>> {
         for (std::size_t i = 0; i < arrayLength(value); ++i) {
             optional<std::string> string = toString(arrayMember(value, i));
             if (!string) {
-                return Error { "value must be an array of strings" };
+                return Error{ "value must be an array of strings" };
             }
             result.push_back(*string);
         }

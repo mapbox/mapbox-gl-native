@@ -16,7 +16,7 @@ public:
         return program.get();
     }
 
-    virtual void bind(GLbyte *offset) = 0;
+    virtual void bind(GLbyte* offset) = 0;
 
     enum Defines : bool {
         None = false,
@@ -30,14 +30,14 @@ protected:
            gl::ObjectStore&,
            Defines defines = Defines::None);
 
-    static constexpr GLint         a_pos = 0;
-    static constexpr GLint     a_extrude = 1;
-    static constexpr GLint      a_offset = 2;
-    static constexpr GLint        a_data = 3;
+    static constexpr GLint a_pos = 0;
+    static constexpr GLint a_extrude = 1;
+    static constexpr GLint a_offset = 2;
+    static constexpr GLint a_data = 3;
     static constexpr GLint a_texture_pos = 4;
 
 private:
-    bool compileShader(gl::UniqueShader&, const GLchar *source);
+    bool compileShader(gl::UniqueShader&, const GLchar* source);
 
     gl::UniqueProgram program;
     gl::UniqueShader vertexShader;

@@ -6,7 +6,7 @@
 
 #include <atomic>
 
-#define BUFFER_OFFSET_0  ((GLbyte*)nullptr)
+#define BUFFER_OFFSET_0 ((GLbyte*)nullptr)
 #define BUFFER_OFFSET(i) ((BUFFER_OFFSET_0) + (i))
 
 namespace mbgl {
@@ -47,7 +47,7 @@ public:
     }
 
 protected:
-    std::atomic<bool> uploaded { false };
+    std::atomic<bool> uploaded{false};
 };
 
 } // namespace mbgl

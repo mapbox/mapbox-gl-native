@@ -8,7 +8,8 @@ using namespace mbgl;
 using namespace mbgl::style;
 
 float evaluate(PropertyValue<float> value, float zoom) {
-    return PropertyValue<float>::visit(value, PropertyEvaluator<float>(CalculationParameters(zoom), 0));
+    return PropertyValue<float>::visit(value,
+                                       PropertyEvaluator<float>(CalculationParameters(zoom), 0));
 }
 
 TEST(Function, Constant) {
@@ -25,7 +26,7 @@ TEST(Function, Constant) {
 
 TEST(Function, Stops) {
     // Explicit constant slope in fringe regions.
-    Function<float> slope_1({ { 0, 1.5 }, { 6, 1.5 }, { 8, 3 }, { 22, 3 } }, 1.75);
+    Function<float> slope_1({{0, 1.5}, {6, 1.5}, {8, 3}, {22, 3}}, 1.75);
     EXPECT_EQ(1.5, evaluate(slope_1, 0));
     EXPECT_EQ(1.5, evaluate(slope_1, 4));
     EXPECT_EQ(1.5, evaluate(slope_1, 6));
@@ -35,9 +36,8 @@ TEST(Function, Stops) {
     EXPECT_EQ(3.0, evaluate(slope_1, 15));
     EXPECT_EQ(3.0, evaluate(slope_1, 22));
 
-
     // Test constant values in fringe regions.
-    Function<float> slope_2({ { 6, 1.5 }, { 8, 3 } }, 1.75);
+    Function<float> slope_2({{6, 1.5}, {8, 3}}, 1.75);
     EXPECT_EQ(1.5, evaluate(slope_2, 0));
     EXPECT_EQ(1.5, evaluate(slope_2, 4));
     EXPECT_EQ(1.5, evaluate(slope_2, 6));
@@ -53,9 +53,8 @@ TEST(Function, Stops) {
     EXPECT_EQ(1, evaluate(slope_3, 6));
     EXPECT_EQ(1, evaluate(slope_3, 12));
 
-
     // Explicit constant slope in fringe regions.
-    Function<float> slope_4({ { 0, 2 }, { 8, 10 } }, 1);
+    Function<float> slope_4({{0, 2}, {8, 10}}, 1);
     EXPECT_EQ(2, evaluate(slope_4, 0));
     EXPECT_EQ(3, evaluate(slope_4, 1));
     EXPECT_EQ(4, evaluate(slope_4, 2));

@@ -36,7 +36,9 @@ public:
     void addIcon(const std::string& name, std::shared_ptr<const SpriteImage>);
     void removeIcon(const std::string& name);
     double getTopOffsetPixelsForIcon(const std::string& name);
-    SpriteAtlas& getSpriteAtlas() { return spriteAtlas; }
+    SpriteAtlas& getSpriteAtlas() {
+        return spriteAtlas;
+    }
 
     void updateStyle(style::Style&);
     void updateData();
@@ -64,8 +66,11 @@ private:
 
     AnnotationID nextID = 0;
 
-    using SymbolAnnotationTree = boost::geometry::index::rtree<std::shared_ptr<const SymbolAnnotationImpl>, boost::geometry::index::rstar<16, 4>>;
-    // Unlike std::unordered_map, std::map is guaranteed to sort by AnnotationID, ensuring that older annotations are below newer annotations.
+    using SymbolAnnotationTree =
+        boost::geometry::index::rtree<std::shared_ptr<const SymbolAnnotationImpl>,
+                                      boost::geometry::index::rstar<16, 4>>;
+    // Unlike std::unordered_map, std::map is guaranteed to sort by AnnotationID, ensuring that
+    // older annotations are below newer annotations.
     // <https://github.com/mapbox/mapbox-gl-native/issues/5691>
     using SymbolAnnotationMap = std::map<AnnotationID, std::shared_ptr<SymbolAnnotationImpl>>;
     using ShapeAnnotationMap = std::map<AnnotationID, std::unique_ptr<ShapeAnnotationImpl>>;

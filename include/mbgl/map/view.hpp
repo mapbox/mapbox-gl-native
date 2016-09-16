@@ -58,6 +58,6 @@ public:
     virtual void notifyMapChange(MapChange change);
 
 protected:
-    mbgl::Map *map = nullptr;
+    mbgl::Map* map = nullptr;
 };
 } // namespace mbgl

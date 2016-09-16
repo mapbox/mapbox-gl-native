@@ -9,12 +9,11 @@
 #include <QObject>
 #include <QSize>
 
-class QMapboxGLPrivate : public QObject, public mbgl::View
-{
+class QMapboxGLPrivate : public QObject, public mbgl::View {
     Q_OBJECT
 
 public:
-    explicit QMapboxGLPrivate(QMapboxGL *, const QMapboxGLSettings &);
+    explicit QMapboxGLPrivate(QMapboxGL*, const QMapboxGLSettings&);
     virtual ~QMapboxGLPrivate();
 
     // mbgl::View implementation.
@@ -22,20 +21,22 @@ public:
     std::array<uint16_t, 2> getSize() const final;
     std::array<uint16_t, 2> getFramebufferSize() const final;
 
-    void activate() final {}
-    void deactivate() final {}
+    void activate() final {
+    }
+    void deactivate() final {
+    }
     void invalidate() final;
     void notifyMapChange(mbgl::MapChange) final;
 
     mbgl::EdgeInsets margins;
-    QSize size { 0, 0 };
+    QSize size{0, 0};
 
-    QMapboxGL *q_ptr { nullptr };
+    QMapboxGL* q_ptr{nullptr};
 
     std::unique_ptr<mbgl::DefaultFileSource> fileSourceObj;
     std::unique_ptr<mbgl::Map> mapObj;
 
-    bool dirty { false };
+    bool dirty{false};
 
 public slots:
     void connectionEstablished();

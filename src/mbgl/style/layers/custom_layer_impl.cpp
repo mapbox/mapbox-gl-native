@@ -6,10 +6,10 @@ namespace mbgl {
 namespace style {
 
 CustomLayer::Impl::Impl(const std::string& id_,
-                         CustomLayerInitializeFunction initializeFn_,
-                         CustomLayerRenderFunction renderFn_,
-                         CustomLayerDeinitializeFunction deinitializeFn_,
-                         void* context_) {
+                        CustomLayerInitializeFunction initializeFn_,
+                        CustomLayerRenderFunction renderFn_,
+                        CustomLayerDeinitializeFunction deinitializeFn_,
+                        void* context_) {
     id = id_;
     initializeFn = initializeFn_;
     renderFn = renderFn_;
@@ -17,8 +17,7 @@ CustomLayer::Impl::Impl(const std::string& id_,
     context = context_;
 }
 
-CustomLayer::Impl::Impl(const CustomLayer::Impl& other)
-    : Layer::Impl(other) {
+CustomLayer::Impl::Impl(const CustomLayer::Impl& other) : Layer::Impl(other) {
     id = other.id;
     // Don't copy anything else.
 }

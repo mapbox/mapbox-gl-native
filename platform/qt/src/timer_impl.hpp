@@ -14,7 +14,7 @@ class Timer::Impl : public QObject {
 public:
     Impl();
 
-    void start(uint64_t timeout, uint64_t repeat, std::function<void ()> &&);
+    void start(uint64_t timeout, uint64_t repeat, std::function<void()>&&);
     void stop();
 
 public slots:

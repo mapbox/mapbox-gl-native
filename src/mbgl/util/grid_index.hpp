@@ -32,7 +32,6 @@ private:
 
     std::vector<std::pair<T, BBox>> elements;
     std::vector<std::vector<size_t>> cells;
-
 };
 
 } // namespace mbgl

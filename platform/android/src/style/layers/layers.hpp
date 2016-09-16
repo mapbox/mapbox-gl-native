@@ -15,6 +15,5 @@ mbgl::android::Layer* initializeLayerPeer(mbgl::Map&, mbgl::style::Layer&);
 jni::jobject* createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&);
 
 void registerNativeLayers(jni::JNIEnv&);
-
 }
 }

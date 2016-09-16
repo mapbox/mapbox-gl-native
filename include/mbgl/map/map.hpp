@@ -32,7 +32,8 @@ class Layer;
 
 class Map : private util::noncopyable {
 public:
-    explicit Map(View&, FileSource&,
+    explicit Map(View&,
+                 FileSource&,
                  MapMode mapMode = MapMode::Continuous,
                  GLContextMode contextMode = GLContextMode::Unique,
                  ConstrainMode constrainMode = ConstrainMode::HeightOnly,
@@ -41,7 +42,7 @@ public:
 
     // Register a callback that will get called (on the render thread) when all resources have
     // been loaded and a complete render occurs.
-    using StillImageCallback = std::function<void (std::exception_ptr, PremultipliedImage&&)>;
+    using StillImageCallback = std::function<void(std::exception_ptr, PremultipliedImage&&)>;
     void renderStill(StillImageCallback callback);
 
     // Main render function.
@@ -90,13 +91,17 @@ public:
 
     // Scale
     void scaleBy(double ds, optional<ScreenCoordinate> = {}, const Duration& = Duration::zero());
-    void setScale(double scale, optional<ScreenCoordinate> = {}, const Duration& = Duration::zero());
+    void
+    setScale(double scale, optional<ScreenCoordinate> = {}, const Duration& = Duration::zero());
     double getScale() const;
     void setZoom(double zoom, const Duration& = Duration::zero());
     void setZoom(double zoom, optional<EdgeInsets>, const Duration& = Duration::zero());
     double getZoom() const;
     void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
-    void setLatLngZoom(const LatLng&, double zoom, optional<EdgeInsets>, const Duration& = Duration::zero());
+    void setLatLngZoom(const LatLng&,
+                       double zoom,
+                       optional<EdgeInsets>,
+                       const Duration& = Duration::zero());
     CameraOptions cameraForLatLngBounds(const LatLngBounds&, optional<EdgeInsets>) const;
     CameraOptions cameraForLatLngs(const std::vector<LatLng>&, optional<EdgeInsets>) const;
     void resetZoom();
@@ -106,7 +111,9 @@ public:
     double getMaxZoom() const;
 
     // Rotation
-    void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const Duration& = Duration::zero());
+    void rotateBy(const ScreenCoordinate& first,
+                  const ScreenCoordinate& second,
+                  const Duration& = Duration::zero());
     void setBearing(double degrees, const Duration& = Duration::zero());
     void setBearing(double degrees, optional<ScreenCoordinate>, const Duration& = Duration::zero());
     void setBearing(double degrees, optional<EdgeInsets>, const Duration& = Duration::zero());
@@ -169,8 +176,12 @@ public:
     double getDefaultPitch() const;
 
     // Feature queries
-    std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const optional<std::vector<std::string>>& layerIDs = {});
-    std::vector<Feature> queryRenderedFeatures(const ScreenBox&,        const optional<std::vector<std::string>>& layerIDs = {});
+    std::vector<Feature>
+    queryRenderedFeatures(const ScreenCoordinate&,
+                          const optional<std::vector<std::string>>& layerIDs = {});
+    std::vector<Feature>
+    queryRenderedFeatures(const ScreenBox&,
+                          const optional<std::vector<std::string>>& layerIDs = {});
     AnnotationIDs queryPointAnnotations(const ScreenBox&);
 
     // Memory

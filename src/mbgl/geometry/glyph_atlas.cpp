@@ -9,7 +9,6 @@
 #include <cassert>
 #include <algorithm>
 
-
 namespace mbgl {
 
 GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
@@ -26,14 +25,12 @@ void GlyphAtlas::addGlyphs(uintptr_t tileUID,
                            const std::u32string& text,
                            const FontStack& fontStack,
                            const GlyphSet& glyphSet,
-                           GlyphPositions& face)
-{
+                           GlyphPositions& face) {
     std::lock_guard<std::mutex> lock(mtx);
 
     const std::map<uint32_t, SDFGlyph>& sdfs = glyphSet.getSDFs();
 
-    for (uint32_t chr : text)
-    {
+    for (uint32_t chr : text) {
         auto sdf_it = sdfs.find(chr);
         if (sdf_it == sdfs.end()) {
             continue;
@@ -41,14 +38,12 @@ void GlyphAtlas::addGlyphs(uintptr_t tileUID,
 
         const SDFGlyph& sdf = sdf_it->second;
         Rect<uint16_t> rect = addGlyph(tileUID, fontStack, sdf);
-        face.emplace(chr, Glyph{rect, sdf.metrics});
+        face.emplace(chr, Glyph{ rect, sdf.metrics });
     }
 }
 
-Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
-                                    const FontStack& fontStack,
-                                    const SDFGlyph& glyph)
-{
+Rect<uint16_t>
+GlyphAtlas::addGlyph(uintptr_t tileUID, const FontStack& fontStack, const SDFGlyph& glyph) {
     // Use constant value for now.
     const uint8_t buffer = 3;
 
@@ -90,7 +85,7 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
     assert(rect.x + rect.w <= width);
     assert(rect.y + rect.h <= height);
 
-    face.emplace(glyph.id, GlyphValue { rect, tileUID });
+    face.emplace(glyph.id, GlyphValue{ rect, tileUID });
 
     // Copy the bitmap
     const uint8_t* source = reinterpret_cast<const uint8_t*>(glyph.bitmap.data());
@@ -120,7 +115,7 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
                 const Rect<uint16_t>& rect = value.rect;
 
                 // Clear out the bitmap.
-                uint8_t *target = data.get();
+                uint8_t* target = data.get();
                 for (uint32_t y = 0; y < rect.h; y++) {
                     uint32_t y1 = width * (rect.y + y) + rect.x;
                     for (uint32_t x = 0; x < rect.w; x++) {
@@ -151,29 +146,27 @@ void GlyphAtlas::upload(gl::ObjectStore& store, gl::Config& config, uint32_t uni
 
         config.activeTexture = unit;
         if (first) {
-            MBGL_CHECK_ERROR(glTexImage2D(
-                GL_TEXTURE_2D, // GLenum target
-                0, // GLint level
-                GL_ALPHA, // GLint internalformat
-                width, // GLsizei width
-                height, // GLsizei height
-                0, // GLint border
-                GL_ALPHA, // GLenum format
-                GL_UNSIGNED_BYTE, // GLenum type
-                data.get() // const GLvoid* data
-            ));
+            MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D,    // GLenum target
+                                          0,                // GLint level
+                                          GL_ALPHA,         // GLint internalformat
+                                          width,            // GLsizei width
+                                          height,           // GLsizei height
+                                          0,                // GLint border
+                                          GL_ALPHA,         // GLenum format
+                                          GL_UNSIGNED_BYTE, // GLenum type
+                                          data.get()        // const GLvoid* data
+                                          ));
         } else {
-            MBGL_CHECK_ERROR(glTexSubImage2D(
-                GL_TEXTURE_2D, // GLenum target
-                0, // GLint level
-                0, // GLint xoffset
-                0, // GLint yoffset
-                width, // GLsizei width
-                height, // GLsizei height
-                GL_ALPHA, // GLenum format
-                GL_UNSIGNED_BYTE, // GLenum type
-                data.get() // const GLvoid* data
-            ));
+            MBGL_CHECK_ERROR(glTexSubImage2D(GL_TEXTURE_2D,    // GLenum target
+                                             0,                // GLint level
+                                             0,                // GLint xoffset
+                                             0,                // GLint yoffset
+                                             width,            // GLsizei width
+                                             height,           // GLsizei height
+                                             GL_ALPHA,         // GLenum format
+                                             GL_UNSIGNED_BYTE, // GLenum type
+                                             data.get()        // const GLvoid* data
+                                             ));
         }
 
         dirty = false;

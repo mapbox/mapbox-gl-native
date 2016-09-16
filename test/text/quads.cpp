@@ -12,11 +12,8 @@ using namespace mbgl::style;
 TEST(getIconQuads, normal) {
     SymbolLayoutProperties layout;
     Anchor anchor(2.0, 3.0, 0.0, 0.5f, 0);
-    SpriteAtlasElement image = {
-        Rect<uint16_t>( 0, 0, 15, 11 ),
-        std::shared_ptr<const SpriteImage>(),
-        1.0f
-    };
+    SpriteAtlasElement image = {Rect<uint16_t>(0, 0, 15, 11), std::shared_ptr<const SpriteImage>(),
+                                1.0f};
     PositionedIcon shapedIcon(image, -5.0, 6.0, -7.0, 8.0);
     GeometryCoordinates line;
     Shaping shapedText;
@@ -42,11 +39,8 @@ TEST(getIconQuads, normal) {
 
 TEST(getIconQuads, style) {
     Anchor anchor(0.0, 0.0, 0.0, 0.5f, 0);
-    SpriteAtlasElement image = {
-        Rect<uint16_t>( 0, 0, 20, 20 ),
-        std::shared_ptr<const SpriteImage>(),
-        1.0f
-    };
+    SpriteAtlasElement image = {Rect<uint16_t>(0, 0, 20, 20), std::shared_ptr<const SpriteImage>(),
+                                1.0f};
     PositionedIcon shapedIcon(image, -10.0, 10.0, -10.0, 10.0);
     GeometryCoordinates line;
     Shaping shapedText;
@@ -274,4 +268,3 @@ TEST(getIconQuads, style) {
         ASSERT_EQ(quads[0].br.y, 25);
     }
 }
-

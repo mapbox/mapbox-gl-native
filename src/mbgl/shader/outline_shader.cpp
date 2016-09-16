@@ -9,7 +9,8 @@ OutlineShader::OutlineShader(gl::ObjectStore& store, Defines defines)
     : Shader(shaders::outline::name,
              shaders::outline::vertex,
              shaders::outline::fragment,
-             store, defines) {
+             store,
+             defines) {
 }
 
 void OutlineShader::bind(GLbyte* offset) {

@@ -38,13 +38,13 @@ public:
     Impl();
     ~Impl();
 
-    static int handleSocket(CURL *handle, curl_socket_t s, int action, void *userp, void *socketp);
-    static int startTimeout(CURLM *multi, long timeout_ms, void *userp);
-    static void onTimeout(HTTPFileSource::Impl *context);
+    static int handleSocket(CURL* handle, curl_socket_t s, int action, void* userp, void* socketp);
+    static int startTimeout(CURLM* multi, long timeout_ms, void* userp);
+    static void onTimeout(HTTPFileSource::Impl* context);
 
     void perform(curl_socket_t s, util::RunLoop::Event event);
-    CURL *getHandle();
-    void returnHandle(CURL *handle);
+    CURL* getHandle();
+    void returnHandle(CURL* handle);
     void checkMultiInfo();
 
     // Used as the CURL timer function to periodically check for socket updates.
@@ -52,14 +52,14 @@ public:
 
     // CURL multi handle that we use to request multiple URLs at the same time, without having to
     // block and spawn threads.
-    CURLM *multi = nullptr;
+    CURLM* multi = nullptr;
 
     // CURL share handles are used for sharing session state (e.g.)
-    CURLSH *share = nullptr;
+    CURLSH* share = nullptr;
 
     // A queue that we use for storing resuable CURL easy handles to avoid creating and destroying
     // them all the time.
-    std::queue<CURL *> handles;
+    std::queue<CURL*> handles;
 };
 
 class HTTPRequest : public AsyncRequest {
@@ -70,8 +70,10 @@ public:
     void handleResult(CURLcode code);
 
 private:
-    static size_t headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp);
-    static size_t writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp);
+    static size_t
+    headerCallback(char* const buffer, const size_t size, const size_t nmemb, void* userp);
+    static size_t
+    writeCallback(void* const contents, const size_t size, const size_t nmemb, void* userp);
 
     HTTPFileSource::Impl* context = nullptr;
     Resource resource;
@@ -84,10 +86,10 @@ private:
     optional<std::string> retryAfter;
     optional<std::string> xRateLimitReset;
 
-    CURL *handle = nullptr;
-    curl_slist *headers = nullptr;
+    CURL* handle = nullptr;
+    curl_slist* headers = nullptr;
 
-    char error[CURL_ERROR_SIZE] = { 0 };
+    char error[CURL_ERROR_SIZE] = {0};
 };
 
 HTTPFileSource::Impl::Impl() {
@@ -119,7 +121,7 @@ HTTPFileSource::Impl::~Impl() {
     timeout.stop();
 }
 
-CURL *HTTPFileSource::Impl::getHandle() {
+CURL* HTTPFileSource::Impl::getHandle() {
     if (!handles.empty()) {
         auto handle = handles.front();
         handles.pop();
@@ -129,20 +131,20 @@ CURL *HTTPFileSource::Impl::getHandle() {
     }
 }
 
-void HTTPFileSource::Impl::returnHandle(CURL *handle) {
+void HTTPFileSource::Impl::returnHandle(CURL* handle) {
     curl_easy_reset(handle);
     handles.push(handle);
 }
 
 void HTTPFileSource::Impl::checkMultiInfo() {
-    CURLMsg *message = nullptr;
+    CURLMsg* message = nullptr;
     int pending = 0;
 
     while ((message = curl_multi_info_read(multi, &pending))) {
         switch (message->msg) {
         case CURLMSG_DONE: {
-            HTTPRequest *baton = nullptr;
-            curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char *)&baton);
+            HTTPRequest* baton = nullptr;
+            curl_easy_getinfo(message->easy_handle, CURLINFO_PRIVATE, (char*)&baton);
             assert(baton);
             baton->handleResult(message->data.result);
         } break;
@@ -164,28 +166,27 @@ void HTTPFileSource::Impl::perform(curl_socket_t s, util::RunLoop::Event events)
         flags |= CURL_CSELECT_OUT;
     }
 
-
     int running_handles = 0;
     curl_multi_socket_action(multi, s, flags, &running_handles);
     checkMultiInfo();
 }
 
-int HTTPFileSource::Impl::handleSocket(CURL * /* handle */, curl_socket_t s, int action, void *userp,
-                              void * /* socketp */) {
+int HTTPFileSource::Impl::handleSocket(
+    CURL* /* handle */, curl_socket_t s, int action, void* userp, void* /* socketp */) {
     assert(userp);
-    auto context = reinterpret_cast<Impl *>(userp);
+    auto context = reinterpret_cast<Impl*>(userp);
 
     switch (action) {
     case CURL_POLL_IN: {
         using namespace std::placeholders;
         util::RunLoop::Get()->addWatch(s, util::RunLoop::Event::Read,
-                std::bind(&Impl::perform, context, _1, _2));
+                                       std::bind(&Impl::perform, context, _1, _2));
         break;
     }
     case CURL_POLL_OUT: {
         using namespace std::placeholders;
         util::RunLoop::Get()->addWatch(s, util::RunLoop::Event::Write,
-                std::bind(&Impl::perform, context, _1, _2));
+                                       std::bind(&Impl::perform, context, _1, _2));
         break;
     }
     case CURL_POLL_REMOVE:
@@ -198,18 +199,19 @@ int HTTPFileSource::Impl::handleSocket(CURL * /* handle */, curl_socket_t s, int
     return 0;
 }
 
-void HTTPFileSource::Impl::onTimeout(Impl *context) {
+void HTTPFileSource::Impl::onTimeout(Impl* context) {
     int running_handles;
-    CURLMcode error = curl_multi_socket_action(context->multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
+    CURLMcode error =
+        curl_multi_socket_action(context->multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
     if (error != CURLM_OK) {
         throw std::runtime_error(std::string("CURL multi error: ") + curl_multi_strerror(error));
     }
     context->checkMultiInfo();
 }
 
-int HTTPFileSource::Impl::startTimeout(CURLM * /* multi */, long timeout_ms, void *userp) {
+int HTTPFileSource::Impl::startTimeout(CURLM* /* multi */, long timeout_ms, void* userp) {
     assert(userp);
-    auto context = reinterpret_cast<Impl *>(userp);
+    auto context = reinterpret_cast<Impl*>(userp);
 
     if (timeout_ms < 0) {
         // A timeout of 0 ms means that the timer will invoked in the next loop iteration.
@@ -218,12 +220,14 @@ int HTTPFileSource::Impl::startTimeout(CURLM * /* multi */, long timeout_ms, voi
 
     context->timeout.stop();
     context->timeout.start(mbgl::Milliseconds(timeout_ms), Duration::zero(),
-        std::bind(&Impl::onTimeout, context));
+                           std::bind(&Impl::onTimeout, context));
 
     return 0;
 }
 
-HTTPRequest::HTTPRequest(HTTPFileSource::Impl* context_, Resource resource_, FileSource::Callback callback_)
+HTTPRequest::HTTPRequest(HTTPFileSource::Impl* context_,
+                         Resource resource_,
+                         FileSource::Callback callback_)
     : context(context_),
       resource(std::move(resource_)),
       callback(std::move(callback_)),
@@ -278,15 +282,18 @@ HTTPRequest::~HTTPRequest() {
 
 // This function is called when we have new data for a request. We just append it to the string
 // containing the previous data.
-size_t HTTPRequest::writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp) {
+size_t HTTPRequest::writeCallback(void* const contents,
+                                  const size_t size,
+                                  const size_t nmemb,
+                                  void* userp) {
     assert(userp);
-    auto impl = reinterpret_cast<HTTPRequest *>(userp);
+    auto impl = reinterpret_cast<HTTPRequest*>(userp);
 
     if (!impl->data) {
         impl->data = std::make_shared<std::string>();
     }
 
-    impl->data->append((char *)contents, size * nmemb);
+    impl->data->append((char*)contents, size * nmemb);
     return size * nmemb;
 }
 
@@ -294,7 +301,7 @@ size_t HTTPRequest::writeCallback(void *const contents, const size_t size, const
 // header string. If the data buffer contains the header string at the beginning, it returns
 // the length of the header string == begin of the value, otherwise it returns npos.
 // The comparison of the header is ASCII-case-insensitive.
-size_t headerMatches(const char *const header, const char *const buffer, const size_t length) {
+size_t headerMatches(const char* const header, const char* const buffer, const size_t length) {
     const size_t headerLength = strlen(header);
     if (length < headerLength) {
         return std::string::npos;
@@ -306,9 +313,12 @@ size_t headerMatches(const char *const header, const char *const buffer, const s
     return i == headerLength ? i : std::string::npos;
 }
 
-size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp) {
+size_t HTTPRequest::headerCallback(char* const buffer,
+                                   const size_t size,
+                                   const size_t nmemb,
+                                   void* userp) {
     assert(userp);
-    auto baton = reinterpret_cast<HTTPRequest *>(userp);
+    auto baton = reinterpret_cast<HTTPRequest*>(userp);
 
     if (!baton->response) {
         baton->response = std::make_unique<Response>();
@@ -319,19 +329,20 @@ size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const 
     if ((begin = headerMatches("last-modified: ", buffer, length)) != std::string::npos) {
         // Always overwrite the modification date; We might already have a value here from the
         // Date header, but this one is more accurate.
-        const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->modified = Timestamp{ Seconds(curl_getdate(value.c_str(), nullptr)) };
+        const std::string value{buffer + begin, length - begin - 2}; // remove \r\n
+        baton->response->modified = Timestamp{Seconds(curl_getdate(value.c_str(), nullptr))};
     } else if ((begin = headerMatches("etag: ", buffer, length)) != std::string::npos) {
         baton->response->etag = std::string(buffer + begin, length - begin - 2); // remove \r\n
     } else if ((begin = headerMatches("cache-control: ", buffer, length)) != std::string::npos) {
-        const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
+        const std::string value{buffer + begin, length - begin - 2}; // remove \r\n
         baton->response->expires = http::CacheControl::parse(value.c_str()).toTimePoint();
     } else if ((begin = headerMatches("expires: ", buffer, length)) != std::string::npos) {
-        const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->expires = Timestamp{ Seconds(curl_getdate(value.c_str(), nullptr)) };
+        const std::string value{buffer + begin, length - begin - 2}; // remove \r\n
+        baton->response->expires = Timestamp{Seconds(curl_getdate(value.c_str(), nullptr))};
     } else if ((begin = headerMatches("retry-after: ", buffer, length)) != std::string::npos) {
         baton->retryAfter = std::string(buffer + begin, length - begin - 2); // remove \r\n
-    } else if ((begin = headerMatches("x-rate-limit-reset: ", buffer, length)) != std::string::npos) {
+    } else if ((begin = headerMatches("x-rate-limit-reset: ", buffer, length)) !=
+               std::string::npos) {
         baton->xRateLimitReset = std::string(buffer + begin, length - begin - 2); // remove \r\n
     }
 
@@ -355,12 +366,12 @@ void HTTPRequest::handleResult(CURLcode code) {
         case CURLE_OPERATION_TIMEDOUT:
 
             response->error = std::make_unique<Error>(
-                Error::Reason::Connection, std::string{ curl_easy_strerror(code) } + ": " + error);
+                Error::Reason::Connection, std::string{curl_easy_strerror(code)} + ": " + error);
             break;
 
         default:
             response->error = std::make_unique<Error>(
-                Error::Reason::Other, std::string{ curl_easy_strerror(code) } + ": " + error);
+                Error::Reason::Other, std::string{curl_easy_strerror(code)} + ": " + error);
             break;
         }
     } else {
@@ -373,7 +384,8 @@ void HTTPRequest::handleResult(CURLcode code) {
             } else {
                 response->data = std::make_shared<std::string>();
             }
-        } else if (responseCode == 204 || (responseCode == 404 && resource.kind == Resource::Kind::Tile)) {
+        } else if (responseCode == 204 ||
+                   (responseCode == 404 && resource.kind == Resource::Kind::Tile)) {
             response->noContent = true;
         } else if (responseCode == 304) {
             response->notModified = true;
@@ -386,11 +398,11 @@ void HTTPRequest::handleResult(CURLcode code) {
                                         http::parseRetryHeaders(retryAfter, xRateLimitReset));
         } else if (responseCode >= 500 && responseCode < 600) {
             response->error =
-                std::make_unique<Error>(Error::Reason::Server, std::string{ "HTTP status code " } +
+                std::make_unique<Error>(Error::Reason::Server, std::string{"HTTP status code "} +
                                                                    util::toString(responseCode));
         } else {
             response->error =
-                std::make_unique<Error>(Error::Reason::Other, std::string{ "HTTP status code " } +
+                std::make_unique<Error>(Error::Reason::Other, std::string{"HTTP status code "} +
                                                                   util::toString(responseCode));
         }
     }
@@ -401,8 +413,7 @@ void HTTPRequest::handleResult(CURLcode code) {
     callback_(response_);
 }
 
-HTTPFileSource::HTTPFileSource()
-    : impl(std::make_unique<Impl>()) {
+HTTPFileSource::HTTPFileSource() : impl(std::make_unique<Impl>()) {
 }
 
 HTTPFileSource::~HTTPFileSource() = default;

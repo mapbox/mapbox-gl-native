@@ -7,15 +7,13 @@ namespace mbgl {
 namespace style {
 
 FillLayer::FillLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(Type::Fill, std::make_unique<Impl>())
-    , impl(static_cast<Impl*>(baseImpl.get())) {
+    : Layer(Type::Fill, std::make_unique<Impl>()), impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
     impl->source = sourceID;
 }
 
 FillLayer::FillLayer(const Impl& other)
-    : Layer(Type::Fill, std::make_unique<Impl>(other))
-    , impl(static_cast<Impl*>(baseImpl.get())) {
+    : Layer(Type::Fill, std::make_unique<Impl>(other)), impl(static_cast<Impl*>(baseImpl.get())) {
 }
 
 FillLayer::~FillLayer() = default;
@@ -58,7 +56,6 @@ const Filter& FillLayer::getFilter() const {
 }
 
 // Layout properties
-
 
 // Paint properties
 
@@ -115,7 +112,8 @@ PropertyValue<Color> FillLayer::getFillOutlineColor(const optional<std::string>&
     return impl->paint.fillOutlineColor.get(klass);
 }
 
-void FillLayer::setFillOutlineColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+void FillLayer::setFillOutlineColor(PropertyValue<Color> value,
+                                    const optional<std::string>& klass) {
     if (value == getFillOutlineColor(klass))
         return;
     impl->paint.fillOutlineColor.set(value, klass);
@@ -123,14 +121,16 @@ void FillLayer::setFillOutlineColor(PropertyValue<Color> value, const optional<s
 }
 
 PropertyValue<std::array<float, 2>> FillLayer::getDefaultFillTranslate() {
-    return { {{ 0, 0 }} };
+    return { { { 0, 0 } } };
 }
 
-PropertyValue<std::array<float, 2>> FillLayer::getFillTranslate(const optional<std::string>& klass) const {
+PropertyValue<std::array<float, 2>>
+FillLayer::getFillTranslate(const optional<std::string>& klass) const {
     return impl->paint.fillTranslate.get(klass);
 }
 
-void FillLayer::setFillTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
+void FillLayer::setFillTranslate(PropertyValue<std::array<float, 2>> value,
+                                 const optional<std::string>& klass) {
     if (value == getFillTranslate(klass))
         return;
     impl->paint.fillTranslate.set(value, klass);
@@ -141,11 +141,13 @@ PropertyValue<TranslateAnchorType> FillLayer::getDefaultFillTranslateAnchor() {
     return { TranslateAnchorType::Map };
 }
 
-PropertyValue<TranslateAnchorType> FillLayer::getFillTranslateAnchor(const optional<std::string>& klass) const {
+PropertyValue<TranslateAnchorType>
+FillLayer::getFillTranslateAnchor(const optional<std::string>& klass) const {
     return impl->paint.fillTranslateAnchor.get(klass);
 }
 
-void FillLayer::setFillTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
+void FillLayer::setFillTranslateAnchor(PropertyValue<TranslateAnchorType> value,
+                                       const optional<std::string>& klass) {
     if (value == getFillTranslateAnchor(klass))
         return;
     impl->paint.fillTranslateAnchor.set(value, klass);
@@ -160,7 +162,8 @@ PropertyValue<std::string> FillLayer::getFillPattern(const optional<std::string>
     return impl->paint.fillPattern.get(klass);
 }
 
-void FillLayer::setFillPattern(PropertyValue<std::string> value, const optional<std::string>& klass) {
+void FillLayer::setFillPattern(PropertyValue<std::string> value,
+                               const optional<std::string>& klass) {
     if (value == getFillPattern(klass))
         return;
     impl->paint.fillPattern.set(value, klass);

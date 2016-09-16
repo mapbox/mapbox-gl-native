@@ -32,7 +32,11 @@ public:
     }
 
     template <typename VertexBuffer, typename ElementsBuffer>
-    void bind(Shader& shader, VertexBuffer& vertexBuffer, ElementsBuffer& elementsBuffer, GLbyte* offset, gl::ObjectStore& store) {
+    void bind(Shader& shader,
+              VertexBuffer& vertexBuffer,
+              ElementsBuffer& elementsBuffer,
+              GLbyte* offset,
+              gl::ObjectStore& store) {
         bindVertexArrayObject(store);
         if (bound_shader == 0) {
             vertexBuffer.bind(store);
@@ -52,8 +56,8 @@ public:
 
 private:
     void bindVertexArrayObject(gl::ObjectStore&);
-    void storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
-    void verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
+    void storeBinding(Shader& shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte* offset);
+    void verifyBinding(Shader& shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte* offset);
 
     mbgl::optional<gl::UniqueVAO> vao;
 
@@ -63,7 +67,7 @@ private:
     const char* bound_shader_name = "";
     GLuint bound_vertex_buffer = 0;
     GLuint bound_elements_buffer = 0;
-    GLbyte *bound_offset = nullptr;
+    GLbyte* bound_offset = nullptr;
 };
 
 } // namespace mbgl

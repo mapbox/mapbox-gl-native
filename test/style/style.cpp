@@ -12,7 +12,7 @@ TEST(Style, UnusedSource) {
     util::RunLoop loop;
 
     StubFileSource fileSource;
-    Style style { fileSource, 1.0 };
+    Style style{fileSource, 1.0};
 
     auto now = Clock::now();
 
@@ -24,11 +24,11 @@ TEST(Style, UnusedSource) {
     style.cascade(now, MapMode::Still);
     style.recalculate(0, now, MapMode::Still);
 
-    Source *usedSource = style.getSource("usedsource");
+    Source* usedSource = style.getSource("usedsource");
     EXPECT_TRUE(usedSource);
     EXPECT_TRUE(usedSource->baseImpl->isLoaded());
 
-    Source *unusedSource = style.getSource("unusedsource");
+    Source* unusedSource = style.getSource("unusedsource");
     EXPECT_TRUE(unusedSource);
     EXPECT_FALSE(unusedSource->baseImpl->isLoaded());
 }
@@ -37,7 +37,7 @@ TEST(Style, UnusedSourceActiveViaClassUpdate) {
     util::RunLoop loop;
 
     StubFileSource fileSource;
-    Style style { fileSource, 1.0 };
+    Style style{fileSource, 1.0};
 
     style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
     EXPECT_TRUE(style.addClass("visible"));
@@ -48,7 +48,7 @@ TEST(Style, UnusedSourceActiveViaClassUpdate) {
     style.cascade(now, MapMode::Still);
     style.recalculate(0, now, MapMode::Still);
 
-    Source *unusedSource = style.getSource("unusedsource");
+    Source* unusedSource = style.getSource("unusedsource");
     EXPECT_TRUE(unusedSource);
     EXPECT_TRUE(unusedSource->baseImpl->isLoaded());
 
@@ -70,7 +70,7 @@ TEST(Style, Properties) {
     util::RunLoop loop;
 
     StubFileSource fileSource;
-    Style style { fileSource, 1.0 };
+    Style style{fileSource, 1.0};
 
     style.setJSON(R"STYLE({"name": "Test"})STYLE");
     ASSERT_EQ("Test", style.getName());
@@ -92,7 +92,8 @@ TEST(Style, Properties) {
     ASSERT_EQ("", style.getName());
     ASSERT_EQ(60, style.getDefaultPitch());
 
-    style.setJSON(R"STYLE({"name": 23, "center": {}, "bearing": "north", "zoom": null, "pitch": "wide"})STYLE");
+    style.setJSON(
+        R"STYLE({"name": 23, "center": {}, "bearing": "north", "zoom": null, "pitch": "wide"})STYLE");
     ASSERT_EQ("", style.getName());
     ASSERT_EQ((LatLng{0, 0}), style.getDefaultLatLng());
     ASSERT_EQ(0, style.getDefaultBearing());

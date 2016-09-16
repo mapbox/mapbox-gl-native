@@ -9,9 +9,7 @@ using namespace mbgl::style;
 TEST(TileSourceImpl, ParseTileJSONRaster) {
     auto result = TileSourceImpl::parseTileJSON(
         util::read_file("test/fixtures/style_parser/tilejson.raster.json"),
-        "mapbox://mapbox.satellite",
-        SourceType::Raster,
-        256);
+        "mapbox://mapbox.satellite", SourceType::Raster, 256);
 
     EXPECT_EQ(0, result.zoomRange.min);
     EXPECT_EQ(15, result.zoomRange.max);
@@ -26,9 +24,7 @@ TEST(TileSourceImpl, ParseTileJSONRaster) {
 TEST(TileSourceImpl, ParseTileJSONVector) {
     auto result = TileSourceImpl::parseTileJSON(
         util::read_file("test/fixtures/style_parser/tilejson.vector.json"),
-        "mapbox://mapbox.streets",
-        SourceType::Vector,
-        256);
+        "mapbox://mapbox.streets", SourceType::Vector, 256);
 
     EXPECT_EQ(0, result.zoomRange.min);
     EXPECT_EQ(15, result.zoomRange.max);

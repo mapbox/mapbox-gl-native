@@ -7,7 +7,9 @@
 namespace mbgl {
 namespace http {
 
-Duration errorRetryTimeout(Response::Error::Reason failedRequestReason, uint32_t failedRequests, optional<Timestamp> retryAfter = {});
+Duration errorRetryTimeout(Response::Error::Reason failedRequestReason,
+                           uint32_t failedRequests,
+                           optional<Timestamp> retryAfter = {});
 
 Duration expirationTimeout(optional<Timestamp> expires, uint32_t expiredRequests);
 

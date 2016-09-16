@@ -14,9 +14,11 @@ using namespace mbgl::util;
 static ThreadLocal<RunLoop>& current = *new ThreadLocal<RunLoop>;
 
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void dummyCallback(uv_async_t*, int) {}
+void dummyCallback(uv_async_t*, int) {
+}
 #else
-void dummyCallback(uv_async_t*) {}
+void dummyCallback(uv_async_t*) {
+}
 #endif
 
 } // namespace
@@ -44,7 +46,7 @@ struct Watch {
         watch->eventCallback(watch->fd, watchEvent);
     };
 
-    static void onClose(uv_handle_t *poll) {
+    static void onClose(uv_handle_t* poll) {
         auto watch = reinterpret_cast<Watch*>(poll->data);
         watch->closeCallback();
     };
@@ -63,16 +65,14 @@ RunLoop* RunLoop::Get() {
 class RunLoop::Impl {
 public:
     void closeHolder() {
-        uv_close(holderHandle(), [](uv_handle_t* h) {
-            delete reinterpret_cast<uv_async_t*>(h);
-        });
+        uv_close(holderHandle(), [](uv_handle_t* h) { delete reinterpret_cast<uv_async_t*>(h); });
     }
 
     uv_handle_t* holderHandle() {
         return reinterpret_cast<uv_handle_t*>(holder);
     }
 
-    uv_loop_t *loop = nullptr;
+    uv_loop_t* loop = nullptr;
     uv_async_t* holder = new uv_async_t;
 
     RunLoop::Type type;
@@ -168,7 +168,7 @@ void RunLoop::stop() {
 void RunLoop::addWatch(int fd, Event event, std::function<void(int, Event)>&& callback) {
     MBGL_VERIFY_THREAD(tid);
 
-    Watch *watch = nullptr;
+    Watch* watch = nullptr;
     auto watchPollIter = impl->watchPoll.find(fd);
 
     if (watchPollIter == impl->watchPoll.end()) {
@@ -219,9 +219,7 @@ void RunLoop::removeWatch(int fd) {
     Watch* watch = watchPollIter->second.release();
     impl->watchPoll.erase(watchPollIter);
 
-    watch->closeCallback = [watch] {
-        delete watch;
-    };
+    watch->closeCallback = [watch] { delete watch; };
 
     if (uv_poll_stop(&watch->poll)) {
         throw std::runtime_error("Failed to stop poll on file descriptor.");

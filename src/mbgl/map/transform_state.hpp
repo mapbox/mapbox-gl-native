@@ -67,10 +67,12 @@ public:
 
     // Conversion and projection
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
-    LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Unwrapped) const;
+    LatLng screenCoordinateToLatLng(const ScreenCoordinate&,
+                                    LatLng::WrapMode = LatLng::Unwrapped) const;
 
     Point<double> project(const LatLng&) const;
-    LatLng unproject(const Point<double>&, double worldSize, LatLng::WrapMode = LatLng::Unwrapped) const;
+    LatLng
+    unproject(const Point<double>&, double worldSize, LatLng::WrapMode = LatLng::Unwrapped) const;
 
     double zoomScale(double zoom) const;
     double scaleZoom(double scale) const;
@@ -96,7 +98,7 @@ private:
     /** Recenter the map so that the given coordinate is located at the given
         point on screen. */
     void moveLatLng(const LatLng&, const ScreenCoordinate&);
-    void setLatLngZoom(const LatLng &latLng, double zoom);
+    void setLatLngZoom(const LatLng& latLng, double zoom);
     void setScalePoint(const double scale, const ScreenCoordinate& point);
 
 private:

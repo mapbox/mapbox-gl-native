@@ -18,7 +18,7 @@ public:
         stop();
     }
 
-    void start(Duration timeout, Duration repeat_, std::function<void ()>&& task_) {
+    void start(Duration timeout, Duration repeat_, std::function<void()>&& task_) {
         stop();
 
         repeat = repeat_;
@@ -59,8 +59,7 @@ private:
     std::function<void()> task;
 };
 
-Timer::Timer()
-    : impl(std::make_unique<Impl>()) {
+Timer::Timer() : impl(std::make_unique<Impl>()) {
 }
 
 Timer::~Timer() = default;

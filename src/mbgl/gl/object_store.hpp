@@ -52,17 +52,17 @@ public:
     ~ObjectStore();
 
     UniqueProgram createProgram() {
-        return UniqueProgram { MBGL_CHECK_ERROR(glCreateProgram()), { this } };
+        return UniqueProgram{MBGL_CHECK_ERROR(glCreateProgram()), {this}};
     }
 
     UniqueShader createShader(GLenum type) {
-        return UniqueShader { MBGL_CHECK_ERROR(glCreateShader(type)), { this } };
+        return UniqueShader{MBGL_CHECK_ERROR(glCreateShader(type)), {this}};
     }
 
     UniqueBuffer createBuffer() {
         GLuint id = 0;
         MBGL_CHECK_ERROR(glGenBuffers(1, &id));
-        return UniqueBuffer { std::move(id), { this } };
+        return UniqueBuffer{std::move(id), {this}};
     }
 
     UniqueTexture createTexture() {
@@ -73,13 +73,13 @@ public:
 
         GLuint id = pooledTextures.back();
         pooledTextures.pop_back();
-        return UniqueTexture { std::move(id), { this } };
+        return UniqueTexture{std::move(id), {this}};
     }
 
     UniqueVAO createVAO() {
         GLuint id = 0;
         MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
-        return UniqueVAO { std::move(id), { this } };
+        return UniqueVAO{std::move(id), {this}};
     }
 
     // Actually remove the objects we marked as abandoned with the above methods.
@@ -91,12 +91,8 @@ public:
     void reset();
 
     bool empty() const {
-        return pooledTextures.empty()
-            && abandonedPrograms.empty()
-            && abandonedShaders.empty()
-            && abandonedBuffers.empty()
-            && abandonedTextures.empty()
-            && abandonedVAOs.empty();
+        return pooledTextures.empty() && abandonedPrograms.empty() && abandonedShaders.empty() &&
+               abandonedBuffers.empty() && abandonedTextures.empty() && abandonedVAOs.empty();
     }
 
 private:

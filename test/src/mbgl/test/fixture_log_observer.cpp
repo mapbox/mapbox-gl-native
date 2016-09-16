@@ -4,10 +4,7 @@
 
 namespace mbgl {
 
-FixtureLog::Message::Message(EventSeverity severity_,
-                             Event event_,
-                             int64_t code_,
-                             std::string msg_)
+FixtureLog::Message::Message(EventSeverity severity_, Event event_, int64_t code_, std::string msg_)
     : severity(severity_), event(event_), code(code_), msg(std::move(msg_)) {
 }
 

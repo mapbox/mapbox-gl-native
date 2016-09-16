@@ -25,7 +25,7 @@ const BindTexture::Type BindTexture::Default = 0;
 
 #ifndef GL_ES_VERSION_2_0
 const PixelZoom::Type PixelZoom::Default = { 1, 1 };
-const RasterPos::Type RasterPos::Default = {{ 0, 0, 0, 0 }};
+const RasterPos::Type RasterPos::Default = { { 0, 0, 0, 0 } };
 #endif // GL_ES_VERSION_2_0
 
 } // namespace gl

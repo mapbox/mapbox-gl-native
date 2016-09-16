@@ -17,7 +17,7 @@ namespace conversion {
 template <>
 Result<GeoJSON> convertGeoJSON(const QVariant& value) {
     if (value.type() != QVariant::ByteArray) {
-        return Error { "JSON data must be in QByteArray" };
+        return Error{"JSON data must be in QByteArray"};
     }
 
     auto data = value.toByteArray();
@@ -33,12 +33,12 @@ Result<GeoJSON> convertGeoJSON(const QVariant& value) {
         std::stringstream message;
         message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
 
-        return Error { message.str() };
+        return Error{message.str()};
     }
 
     conversion::Result<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d);
     if (!geoJSON) {
-        return Error { geoJSON.error().message };
+        return Error{geoJSON.error().message};
     }
 
     return geoJSON;

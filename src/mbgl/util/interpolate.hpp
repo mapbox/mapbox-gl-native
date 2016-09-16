@@ -18,7 +18,6 @@ T interpolate(const T& a, const T& b, const double t) {
     return Interpolator<T>()(a, b, t);
 }
 
-
 template <class T, class Enabled>
 struct Interpolator {
     T operator()(const T& a, const T& b, const double t) const {
@@ -33,7 +32,7 @@ private:
 
     template <std::size_t... I>
     Array operator()(const Array& a, const Array& b, const double t, std::index_sequence<I...>) {
-        return {{ interpolate(a[I], b[I], t)... }};
+        return {{interpolate(a[I], b[I], t)...}};
     }
 
 public:
@@ -46,12 +45,8 @@ template <>
 struct Interpolator<Color> {
 public:
     Color operator()(const Color& a, const Color& b, const double t) {
-        return {
-            interpolate(a.r, b.r, t),
-            interpolate(a.g, b.g, t),
-            interpolate(a.b, b.b, t),
-            interpolate(a.a, b.a, t)
-        };
+        return {interpolate(a.r, b.r, t), interpolate(a.g, b.g, t), interpolate(a.b, b.b, t),
+                interpolate(a.a, b.a, t)};
     }
 };
 
@@ -63,16 +58,13 @@ struct Uninterpolated {
 };
 
 template <class T>
-struct Interpolator<T, typename std::enable_if_t<std::is_enum<T>::value>>
-    : Uninterpolated {};
+struct Interpolator<T, typename std::enable_if_t<std::is_enum<T>::value>> : Uninterpolated {};
 
 template <>
-struct Interpolator<std::string>
-    : Uninterpolated {};
+struct Interpolator<std::string> : Uninterpolated {};
 
 template <class T>
-struct Interpolator<std::vector<T>>
-    : Uninterpolated {};
+struct Interpolator<std::vector<T>> : Uninterpolated {};
 
 } // namespace util
 } // namespace mbgl

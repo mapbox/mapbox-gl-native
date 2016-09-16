@@ -6,10 +6,7 @@
 namespace mbgl {
 
 SDFShader::SDFShader(gl::ObjectStore& store, Defines defines)
-    : Shader(shaders::sdf::name,
-             shaders::sdf::vertex,
-             shaders::sdf::fragment,
-             store, defines) {
+    : Shader(shaders::sdf::name, shaders::sdf::vertex, shaders::sdf::fragment, store, defines) {
 }
 
 void SDFShader::bind(GLbyte* offset) {
@@ -22,10 +19,12 @@ void SDFShader::bind(GLbyte* offset) {
     MBGL_CHECK_ERROR(glVertexAttribPointer(a_offset, 2, GL_SHORT, false, stride, offset + 4));
 
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_texture_pos));
-    MBGL_CHECK_ERROR(glVertexAttribPointer(a_texture_pos, 2, GL_UNSIGNED_SHORT, false, stride, offset + 8));
+    MBGL_CHECK_ERROR(
+        glVertexAttribPointer(a_texture_pos, 2, GL_UNSIGNED_SHORT, false, stride, offset + 8));
 
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_data));
-    MBGL_CHECK_ERROR(glVertexAttribPointer(a_data, 4, GL_UNSIGNED_BYTE, false, stride, offset + 12));
+    MBGL_CHECK_ERROR(
+        glVertexAttribPointer(a_data, 4, GL_UNSIGNED_BYTE, false, stride, offset + 12));
 }
 
 } // namespace mbgl

@@ -15,7 +15,8 @@ namespace android {
 
 class NativeMapView : public mbgl::View, private mbgl::util::noncopyable {
 public:
-    NativeMapView(JNIEnv *env, jobject obj, float pixelRatio, int availableProcessors, size_t totalMemory);
+    NativeMapView(
+        JNIEnv* env, jobject obj, float pixelRatio, int availableProcessors, size_t totalMemory);
     virtual ~NativeMapView();
 
     float getPixelRatio() const override;
@@ -27,8 +28,8 @@ public:
 
     void notifyMapChange(mbgl::MapChange) override;
 
-    mbgl::Map &getMap();
-    mbgl::DefaultFileSource &getFileSource();
+    mbgl::Map& getMap();
+    mbgl::DefaultFileSource& getFileSource();
 
     void initializeDisplay();
     void terminateDisplay();
@@ -36,7 +37,7 @@ public:
     void initializeContext();
     void terminateContext();
 
-    void createSurface(ANativeWindow *window);
+    void createSurface(ANativeWindow* window);
     void destroySurface();
 
     void render();
@@ -46,7 +47,9 @@ public:
 
     void resizeView(int width, int height);
     void resizeFramebuffer(int width, int height);
-    mbgl::EdgeInsets getInsets() { return insets;}
+    mbgl::EdgeInsets getInsets() {
+        return insets;
+    }
     void setInsets(mbgl::EdgeInsets insets_);
 
     void scheduleTakeSnapshot();
@@ -57,11 +60,11 @@ private:
     bool inEmulator();
 
 private:
-    JavaVM *vm = nullptr;
-    JNIEnv *env = nullptr;
+    JavaVM* vm = nullptr;
+    JNIEnv* env = nullptr;
     jweak obj = nullptr;
 
-    ANativeWindow *window = nullptr;
+    ANativeWindow* window = nullptr;
 
     EGLDisplay oldDisplay = EGL_NO_DISPLAY;
     EGLSurface oldReadSurface = EGL_NO_SURFACE;

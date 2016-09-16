@@ -11,7 +11,8 @@ namespace mbgl {
    a pre hoc, "pull" model. You pass it to code that makes requests, it records what requests are
    made, then you can examine them, make assertions about them, and respond as desired.
 
-   This is particularly useful if you want to simulate multiple responses, e.g. as part of a resource
+   This is particularly useful if you want to simulate multiple responses, e.g. as part of a
+   resource
    revalidation flow. StubFileSource allows only a single response.
 */
 class FakeFileSource : public FileSource {
@@ -41,7 +42,7 @@ public:
     }
 
     bool respond(Resource::Kind kind, const Response& response) {
-        auto it = std::find_if(requests.begin(), requests.end(), [&] (FakeFileRequest* request) {
+        auto it = std::find_if(requests.begin(), requests.end(), [&](FakeFileRequest* request) {
             return request->resource.kind == kind;
         });
 

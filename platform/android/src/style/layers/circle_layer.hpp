@@ -1,4 +1,5 @@
-// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
+// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make
+// style-code-android`.
 
 #pragma once
 
@@ -11,8 +12,9 @@ namespace android {
 
 class CircleLayer : public Layer {
 public:
-
-    static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/CircleLayer"; };
+    static constexpr auto Name() {
+        return "com/mapbox/mapboxsdk/style/layers/CircleLayer";
+    };
 
     static jni::Class<CircleLayer> javaClass;
 

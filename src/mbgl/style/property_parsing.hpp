@@ -20,7 +20,7 @@ PropertyValue<T> parseProperty(const char* name, const JSValue& value) {
     return *result;
 }
 
-optional<TransitionOptions> parseTransitionOptions(const char * name, const JSValue&);
+optional<TransitionOptions> parseTransitionOptions(const char* name, const JSValue&);
 
 } // namespace style
 } // namespace mbgl

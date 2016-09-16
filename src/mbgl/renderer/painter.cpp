@@ -36,8 +36,7 @@ namespace mbgl {
 
 using namespace style;
 
-Painter::Painter(const TransformState& state_,
-                 gl::ObjectStore& store_)
+Painter::Painter(const TransformState& state_, gl::ObjectStore& store_)
     : state(state_), store(store_) {
     gl::debugging::enable();
 
@@ -63,10 +62,12 @@ void Painter::setClipping(const ClipID& clip) {
     config.stencilFunc = { GL_EQUAL, ref, mask };
 }
 
-void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& annotationSpriteAtlas) {
+void Painter::render(const Style& style,
+                     const FrameData& frame_,
+                     SpriteAtlas& annotationSpriteAtlas) {
     frame = frame_;
 
-    PaintParameters parameters {
+    PaintParameters parameters{
 #ifndef NDEBUG
         paintMode() == PaintMode::Overdraw ? *overdrawShaders : *shaders
 #else
@@ -86,13 +87,14 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     // Update the default matrices to the current viewport dimensions.
     state.getProjMatrix(projMatrix);
 
-    pixelsToGLUnits = {{ 2.0f  / state.getWidth(), -2.0f / state.getHeight() }};
+    pixelsToGLUnits = { { 2.0f / state.getWidth(), -2.0f / state.getHeight() } };
     if (state.getViewportMode() == ViewportMode::FlippedY) {
         pixelsToGLUnits[1] *= -1;
     }
 
-    frameHistory.record(frame.timePoint, state.getZoom(),
-        frame.mapMode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Milliseconds(0));
+    frameHistory.record(frame.timePoint, state.getZoom(), frame.mapMode == MapMode::Continuous
+                                                              ? util::DEFAULT_FADE_DURATION
+                                                              : Milliseconds(0));
 
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
@@ -138,7 +140,8 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         }
         config.clearStencil = 0;
         config.clearDepth = 1;
-        MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+        MBGL_CHECK_ERROR(
+            glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
     // - CLIPPING MASKS ----------------------------------------------------------------------------
@@ -163,26 +166,27 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
 #endif
 
     // Actually render the layers
-    if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
+    if (debug::renderTree) {
+        Log::Info(Event::Render, "{");
+        indent++;
+    }
 
     // TODO: Correctly compute the number of layers recursively beforehand.
     depthRangeSize = 1 - (order.size() + 2) * numSublayers * depthEpsilon;
 
     // - OPAQUE PASS -------------------------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
-    renderPass(parameters,
-               RenderPass::Opaque,
-               order.rbegin(), order.rend(),
-               0, 1);
+    renderPass(parameters, RenderPass::Opaque, order.rbegin(), order.rend(), 0, 1);
 
     // - TRANSLUCENT PASS --------------------------------------------------------------------------
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
-    renderPass(parameters,
-               RenderPass::Translucent,
-               order.begin(), order.end(),
+    renderPass(parameters, RenderPass::Translucent, order.begin(), order.end(),
                static_cast<GLsizei>(order.size()) - 1, -1);
 
-    if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
+    if (debug::renderTree) {
+        Log::Info(Event::Render, "}");
+        indent--;
+    }
 
     // - DEBUG PASS --------------------------------------------------------------------------------
     // Renders debug overlays.
@@ -225,8 +229,10 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
 template <class Iterator>
 void Painter::renderPass(PaintParameters& parameters,
                          RenderPass pass_,
-                         Iterator it, Iterator end,
-                         GLsizei i, int8_t increment) {
+                         Iterator it,
+                         Iterator end,
+                         GLsizei i,
+                         int8_t increment) {
     pass = pass_;
 
     MBGL_DEBUG_GROUP(pass == RenderPass::Opaque ? "opaque" : "translucent");
@@ -242,8 +248,9 @@ void Painter::renderPass(PaintParameters& parameters,
         const auto& item = *it;
         const Layer& layer = item.layer;
 
-        if (!layer.baseImpl->hasRenderPass(pass))
+        if (!layer.baseImpl->hasRenderPass(pass)) {
             continue;
+        }
 
         if (paintMode() == PaintMode::Overdraw) {
             config.blend = GL_TRUE;
