@@ -6,17 +6,21 @@
 #include <mbgl/util/variant.hpp>
 
 #include <string>
-#include <map>
+#include <unordered_map>
 
 namespace mbgl {
 namespace style {
 namespace conversion {
 
 class Value;
-using ValueMap = std::map<std::string, Value>;
+using ValueMap = std::unordered_map<std::string, Value>;
 using ValueVector = std::vector<Value>;
-class Value : public mbgl::variant<std::string, float, bool, ValueMap, ValueVector> {
-     using variant::variant;
+class Value : public mbgl::variant<std::string,
+                                   float,
+                                   bool,
+                                   mapbox::util::recursive_wrapper<ValueMap>,
+                                   mapbox::util::recursive_wrapper<ValueVector>> {
+    using variant::variant;
 };
 
 inline bool isUndefined(const Value&) {
@@ -25,19 +29,19 @@ inline bool isUndefined(const Value&) {
 }
 
 inline bool isArray(const Value& value) {
-    return value.is<ValueVector>();
+    return value.is<mapbox::util::recursive_wrapper<ValueVector>>();
 }
 
 inline std::size_t arrayLength(const Value& value) {
-    return value.get<ValueVector>().size();
+    return value.get<mapbox::util::recursive_wrapper<ValueVector>>().get().size();
 }
 
 inline Value arrayMember(const Value& value, std::size_t i) {
-    return value.get<ValueVector>()[i];
+    return value.get<mapbox::util::recursive_wrapper<ValueVector>>().get()[i];
 }
 
 inline bool isObject(const Value& value) {
-    return value.is<ValueMap>();
+    return value.is<mapbox::util::recursive_wrapper<ValueMap>>();
 }
 
 inline optional<Value> objectMember(const Value& value, const char* key) {

@@ -60,7 +60,7 @@ private:
     void ensureSchema();
     void removeExisting();
     void migrateToVersion3();
-    void migrateToVersion4();
+    void migrateToVersion5();
 
     class Statement {
     public:

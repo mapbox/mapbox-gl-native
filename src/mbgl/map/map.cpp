@@ -22,6 +22,7 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/actor/thread_pool.hpp>
 
 namespace mbgl {
 
@@ -61,6 +62,7 @@ public:
     gl::ObjectStore store;
     Update updateFlags = Update::Nothing;
     util::AsyncTask asyncUpdate;
+    ThreadPool workerThreadPool;
 
     std::unique_ptr<AnnotationManager> annotationManager;
     std::unique_ptr<Painter> painter;
@@ -99,6 +101,7 @@ Map::Impl::Impl(View& view_,
       contextMode(contextMode_),
       pixelRatio(view.getPixelRatio()),
       asyncUpdate([this] { update(); }),
+      workerThreadPool(4),
       annotationManager(std::make_unique<AnnotationManager>(pixelRatio)) {
 }
 
@@ -227,9 +230,8 @@ void Map::Impl::update() {
     style::UpdateParameters parameters(pixelRatio,
                                        debugOptions,
                                        transform.getState(),
-                                       style->workers,
+                                       workerThreadPool,
                                        fileSource,
-                                       style->shouldReparsePartialTiles,
                                        mode,
                                        *annotationManager,
                                        *style);

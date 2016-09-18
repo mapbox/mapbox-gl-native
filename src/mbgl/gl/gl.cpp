@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <iostream>
-#include <map>
+#include <unordered_map>
 #include <mutex>
 
 namespace mbgl {
@@ -98,15 +98,15 @@ void checkError(const char *cmd, const char *file, int line) {
 #undef glBufferData
 static unsigned int currentUsedBytes = 0;
 static GLint currentBoundTexture = 0;
-static std::map<GLint, unsigned int> bindingToSizeMap;
+static std::unordered_map<GLint, unsigned int> bindingToSizeMap;
 
 static GLuint currentArrayBuffer = 0;
 static GLuint currentElementArrayBuffer = 0;
-static std::map<GLint, GLsizeiptr> bufferBindingToSizeMap;
+static std::unordered_map<GLint, GLsizeiptr> bufferBindingToSizeMap;
 static unsigned int currentUsedBufferBytes = 0;
 static unsigned int largestAmountUsedSoFar = 0;
 
-static std::map<GLuint, GLuint> vertexArrayToArrayBufferMap;
+static std::unordered_map<GLuint, GLuint> vertexArrayToArrayBufferMap;
 static GLuint currentVertexArray = 0;
 
 static std::mutex gDebugMutex;

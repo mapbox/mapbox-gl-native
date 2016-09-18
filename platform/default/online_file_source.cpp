@@ -160,24 +160,24 @@ std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource
         break;
 
     case Resource::Kind::Style:
-        res.url = mbgl::util::mapbox::normalizeStyleURL(resource.url, accessToken);
+        res.url = mbgl::util::mapbox::normalizeStyleURL(apiBaseURL, resource.url, accessToken);
         break;
 
     case Resource::Kind::Source:
-        res.url = util::mapbox::normalizeSourceURL(resource.url, accessToken);
+        res.url = util::mapbox::normalizeSourceURL(apiBaseURL, resource.url, accessToken);
         break;
 
     case Resource::Kind::Glyphs:
-        res.url = util::mapbox::normalizeGlyphsURL(resource.url, accessToken);
+        res.url = util::mapbox::normalizeGlyphsURL(apiBaseURL, resource.url, accessToken);
         break;
 
     case Resource::Kind::SpriteImage:
     case Resource::Kind::SpriteJSON:
-        res.url = util::mapbox::normalizeSpriteURL(resource.url, accessToken);
+        res.url = util::mapbox::normalizeSpriteURL(apiBaseURL, resource.url, accessToken);
         break;
 
     case Resource::Kind::Tile:
-        res.url = util::mapbox::normalizeTileURL(resource.url, accessToken);
+        res.url = util::mapbox::normalizeTileURL(apiBaseURL, resource.url, accessToken);
         break;
     }
 

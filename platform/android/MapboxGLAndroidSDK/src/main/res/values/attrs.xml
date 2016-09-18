@@ -5,6 +5,7 @@
         <!--Configuration-->
         <attr name="access_token" format="string" />
         <attr name="style_url" format="string" />
+        <attr name="api_base_url" format="string" />
 
         <!--Camera-->
         <attr name="center_longitude" format="float" />

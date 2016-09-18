@@ -43,16 +43,14 @@ public:
     virtual void loadDescription(FileSource&) = 0;
     bool isLoaded() const;
 
-    // Request or parse all the tiles relevant for the "TransformState". This method
-    // will return true if all the tiles were scheduled for updating of false if
-    // they were not. shouldReparsePartialTiles must be set to "true" if there is
-    // new data available that a tile in the "partial" state might be interested at.
-    void loadTiles(const UpdateParameters&);
-    bool parseTiles(const UpdateParameters&);
+    // Called when the camera has changed or icons or glyphs are loaded. May load new
+    // tiles, unload obsolete tiles, and trigger further parsing of incomplete tiles or
+    // re-placement of existing complete tiles.
+    void updateTiles(const UpdateParameters&);
 
     // Request that all loaded tiles re-run the layout operation on the existing source
     // data with fresh style information.
-    void reload();
+    void reloadTiles();
 
     void startRender(algorithm::ClipIDGenerator&,
                      const mat4& projMatrix,
@@ -88,9 +86,8 @@ protected:
 
 private:
     // TileObserver implementation.
-    void onTileLoaded(Tile&, TileLoadState) override;
+    void onTileChanged(Tile&) override;
     void onTileError(Tile&, std::exception_ptr) override;
-    void onTileUpdated(Tile&) override;
 
     virtual uint16_t getTileSize() const = 0;
     virtual Range<uint8_t> getZoomRange() = 0;

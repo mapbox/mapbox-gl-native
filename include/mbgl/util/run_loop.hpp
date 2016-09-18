@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/actor/scheduler.hpp>
+#include <mbgl/actor/mailbox.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/work_task.hpp>
@@ -16,7 +18,8 @@ namespace util {
 
 typedef void * LOOP_HANDLE;
 
-class RunLoop : private util::noncopyable {
+class RunLoop : public Scheduler,
+                private util::noncopyable {
 public:
     enum class Type : uint8_t {
         Default,
@@ -31,7 +34,7 @@ public:
     };
 
     RunLoop(Type type = Type::Default);
-    ~RunLoop();
+    ~RunLoop() override;
 
     static RunLoop* Get();
     static LOOP_HANDLE getLoopHandle();
@@ -77,6 +80,14 @@ private:
     using Queue = std::queue<std::shared_ptr<WorkTask>>;
 
     void push(std::shared_ptr<WorkTask>);
+
+    void schedule(std::weak_ptr<Mailbox> mailbox) override {
+        invoke([mailbox] () {
+            if (auto locked = mailbox.lock()) {
+                locked->receive();
+            }
+        });
+    }
 
     void withMutex(std::function<void()>&& fn) {
         std::lock_guard<std::mutex> lock(mutex);

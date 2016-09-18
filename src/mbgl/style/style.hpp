@@ -12,25 +12,28 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/worker.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geo.hpp>
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
 namespace mbgl {
 
 class FileSource;
+class GlyphStore;
 class GlyphAtlas;
+class SpriteStore;
 class SpriteAtlas;
 class LineAtlas;
 class RenderData;
 
 namespace style {
 
+class Layer;
 class UpdateParameters;
 class QueryParameters;
 
@@ -134,9 +137,8 @@ private:
     // SourceObserver implementation.
     void onSourceLoaded(Source&) override;
     void onSourceError(Source&, std::exception_ptr) override;
-    void onTileLoaded(Source&, const OverscaledTileID&, TileLoadState) override;
+    void onTileChanged(Source&, const OverscaledTileID&) override;
     void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) override;
-    void onTileUpdated(Source&, const OverscaledTileID&) override;
 
     // LayerObserver implementation.
     void onLayerFilterChanged(Layer&) override;
@@ -154,9 +156,7 @@ private:
     bool hasPendingTransitions = false;
 
 public:
-    bool shouldReparsePartialTiles = false;
     bool loaded = false;
-    Worker workers;
 };
 
 } // namespace style

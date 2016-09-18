@@ -65,11 +65,11 @@ TEST(Function, Stops) {
     EXPECT_EQ(4.75, evaluate(slope_4, 2.75));
     EXPECT_EQ(10, evaluate(slope_4, 8));
 
-	// discrete values
-	Function<std::string> discrete_0({{ 3, "string0"}, {6, "string1"}, {9, "string2"}}, 1);
-	EXPECT_EQ("string0", evaluate(discrete_0, 2));
-	EXPECT_EQ("string0", evaluate(discrete_0, 4));
-	EXPECT_EQ("string1", evaluate(discrete_0, 7));
-	EXPECT_EQ("string2", evaluate(discrete_0, 9));
-	EXPECT_EQ("string2", evaluate(discrete_0, 10));
+    // discrete values
+    Function<std::string> discrete_0({{ 3, "string0"}, {6, "string1"}, {9, "string2"}}, 1);
+    EXPECT_EQ("string0", evaluate(discrete_0, 2));
+    EXPECT_EQ("string0", evaluate(discrete_0, 4));
+    EXPECT_EQ("string1", evaluate(discrete_0, 7));
+    EXPECT_EQ("string2", evaluate(discrete_0, 9));
+    EXPECT_EQ("string2", evaluate(discrete_0, 10));
 }

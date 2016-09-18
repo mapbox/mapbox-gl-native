@@ -1,11 +1,12 @@
-#include "merge_lines.hpp"
+#include <mbgl/layout/merge_lines.hpp>
+#include <mbgl/layout/symbol_feature.hpp>
 
 #include <boost/functional/hash.hpp>
 
 namespace mbgl {
 namespace util {
 
-using Index = std::map<size_t, unsigned int>;
+using Index = std::unordered_map<size_t, unsigned int>;
 
 unsigned int mergeFromRight(std::vector<SymbolFeature> &features,
                             Index &rightIndex,
@@ -64,12 +65,12 @@ void mergeLines(std::vector<SymbolFeature> &features) {
         SymbolFeature &feature = features[k];
         GeometryCollection &geometry = feature.geometry;
 
-        if (!feature.label.length()) {
+        if (!feature.text) {
             continue;
         }
 
-        const auto leftKey = getKey(feature.label, geometry, Side::Left);
-        const auto rightKey = getKey(feature.label, geometry, Side::Right);
+        const auto leftKey = getKey(*feature.text, geometry, Side::Left);
+        const auto rightKey = getKey(*feature.text, geometry, Side::Right);
 
         const auto left = rightIndex.find(leftKey);
         const auto right = leftIndex.find(rightKey);
@@ -84,7 +85,7 @@ void mergeLines(std::vector<SymbolFeature> &features) {
 
             leftIndex.erase(leftKey);
             rightIndex.erase(rightKey);
-            rightIndex[getKey(feature.label, features[i].geometry, Side::Right)] = i;
+            rightIndex[getKey(*feature.text, features[i].geometry, Side::Right)] = i;
 
         } else if (left != rightIndex.end()) {
             // found mergeable line adjacent to the start of the current line, merge

@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 
 namespace mbgl {
 namespace util {

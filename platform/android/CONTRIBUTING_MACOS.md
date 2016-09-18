@@ -57,11 +57,11 @@ Run:
     // Makes arm7 ABI version of Core GL
     // Can be run on most Android phones and arm emulator
     make android
-    
+
     // Make x86 version of Core GL
     // Useful for running faster Anroid x86 emulator on Macs
     make android-lib-x86
 
 Once Core GL has been built, the TestApp can be run by selecting `MapboxGLAndroidSDKTestApp` from the Run menu or toolbar in Android Studio.
 
-**Next: get your app [running on a hardware Android Device](docs/ANDROID_DEVICE.md) or [simulator](docs/ANDROID_SIMULATOR.md)**
+**Next: get your app [running on a hardware Android Device](platform/android/README.md#running-mapbox-gl-native-on-a-hardware-android-device) or [simulator](platform/android/README.md#setting-up-the-android-emulator)**

@@ -1,4 +1,6 @@
-#include "clip_lines.hpp"
+#include <mbgl/layout/clip_lines.hpp>
+
+#include <cmath>
 
 namespace mbgl {
 namespace util {
