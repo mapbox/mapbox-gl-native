@@ -98,7 +98,7 @@ class HTTPRequest implements Callback {
     @Override
     public void onResponse(Call call, Response response) throws IOException {
         if (response.isSuccessful()) {
-            Log.v(LOG_TAG, String.format("[HTTP] Request was successful (code = %d).", response.code()));
+            //Log.v(LOG_TAG, String.format("[HTTP] Request was successful (code = %d).", response.code()));
         } else {
             // We don't want to call this unsuccessful because a 304 isn't really an error
             String message = !TextUtils.isEmpty(response.message()) ? response.message() : "No additional information";
