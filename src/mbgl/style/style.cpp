@@ -251,6 +251,8 @@ void Style::cascade(const TimePoint& timePoint, MapMode mode) {
 }
 
 void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
+    // Disable all sources first. If we find an enabled layer that uses this source, we will
+    // re-enable it later.
     for (const auto& source : sources) {
         source->baseImpl->enabled = false;
     }
@@ -282,6 +284,13 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
             if (!source->baseImpl->loaded) {
                 source->baseImpl->loadDescription(fileSource);
             }
+        }
+    }
+
+    // Remove the existing tiles if we didn't end up re-enabling the source.
+    for (const auto& source : sources) {
+        if (!source->baseImpl->enabled) {
+            source->baseImpl->removeTiles();
         }
     }
 }
