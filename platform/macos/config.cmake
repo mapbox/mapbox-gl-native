@@ -1,6 +1,6 @@
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
 
-mason_use(glfw VERSION 3.1.2)
+mason_use(glfw VERSION 3.2.1)
 mason_use(boost_libprogram_options VERSION 1.60.0)
 mason_use(gtest VERSION 1.7.0${MASON_CXXABI_SUFFIX})
 
@@ -57,6 +57,7 @@ endmacro()
 macro(mbgl_platform_glfw)
     target_link_libraries(mbgl-glfw
         PRIVATE mbgl-loop
+        PRIVATE "-framework OpenGL"
         PRIVATE "-lsqlite3"
     )
 endmacro()

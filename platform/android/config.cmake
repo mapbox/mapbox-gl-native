@@ -6,7 +6,7 @@ mason_use(libjpeg-turbo VERSION 1.4.2)
 mason_use(libpng VERSION 1.6.20)
 mason_use(libzip VERSION 0.11.2)
 mason_use(nunicode VERSION 1.6)
-mason_use(sqlite VERSION 3.9.1)
+mason_use(sqlite VERSION 3.14.2)
 
 macro(mbgl_platform_core)
 

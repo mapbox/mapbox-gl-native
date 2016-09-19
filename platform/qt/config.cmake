@@ -1,12 +1,12 @@
 include(platform/qt/qt.cmake)
 
-mason_use(sqlite VERSION 3.9.1)
+mason_use(sqlite VERSION 3.14.2)
 mason_use(gtest VERSION 1.7.0${MASON_CXXABI_SUFFIX})
 
 if(NOT WITH_QT_DECODERS)
     mason_use(libjpeg-turbo VERSION 1.4.2)
     mason_use(libpng VERSION 1.6.20)
-    mason_use(webp VERSION 0.5.0)
+    mason_use(webp VERSION 0.5.1)
 endif()
 
 macro(mbgl_platform_core)
