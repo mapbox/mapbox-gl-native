@@ -37,13 +37,13 @@ final class NativeMapView {
     // Instance members
     //
 
-    boolean mDestroyed = false;
+    boolean destroyed = false;
 
     // Holds the pointer to JNI NativeMapView
-    private long mNativeMapViewPtr = 0;
+    private long nativeMapViewPtr = 0;
 
     // Used for callbacks
-    private MapView mMapView;
+    private MapView mapView;
 
     private final float pixelRatio;
 
@@ -87,8 +87,8 @@ final class NativeMapView {
             throw new IllegalArgumentException("totalMemory cannot be negative.");
         }
 
-        mMapView = mapView;
-        mNativeMapViewPtr = nativeCreate(cachePath, dataPath, apkPath, pixelRatio, availableProcessors, totalMemory);
+        this.mapView = mapView;
+        nativeMapViewPtr = nativeCreate(cachePath, dataPath, apkPath, pixelRatio, availableProcessors, totalMemory);
     }
 
     //
@@ -96,46 +96,46 @@ final class NativeMapView {
     //
 
     public void destroy() {
-        nativeDestroy(mNativeMapViewPtr);
-        mNativeMapViewPtr = 0;
-        mMapView = null;
-        mDestroyed = true;
+        nativeDestroy(nativeMapViewPtr);
+        nativeMapViewPtr = 0;
+        mapView = null;
+        destroyed = true;
     }
 
     public boolean wasDestroyed() {
-        return mDestroyed;
+        return destroyed;
     }
 
     public void initializeDisplay() {
-        nativeInitializeDisplay(mNativeMapViewPtr);
+        nativeInitializeDisplay(nativeMapViewPtr);
     }
 
     public void terminateDisplay() {
-        nativeTerminateDisplay(mNativeMapViewPtr);
+        nativeTerminateDisplay(nativeMapViewPtr);
     }
 
     public void initializeContext() {
-        nativeInitializeContext(mNativeMapViewPtr);
+        nativeInitializeContext(nativeMapViewPtr);
     }
 
     public void terminateContext() {
-        nativeTerminateContext(mNativeMapViewPtr);
+        nativeTerminateContext(nativeMapViewPtr);
     }
 
     public void createSurface(Surface surface) {
-        nativeCreateSurface(mNativeMapViewPtr, surface);
+        nativeCreateSurface(nativeMapViewPtr, surface);
     }
 
     public void destroySurface() {
-        nativeDestroySurface(mNativeMapViewPtr);
+        nativeDestroySurface(nativeMapViewPtr);
     }
 
     public void update() {
-        nativeUpdate(mNativeMapViewPtr);
+        nativeUpdate(nativeMapViewPtr);
     }
 
     public void render() {
-        nativeRender(mNativeMapViewPtr);
+        nativeRender(nativeMapViewPtr);
     }
 
     public void resizeView(int width, int height) {
@@ -156,7 +156,7 @@ final class NativeMapView {
             throw new IllegalArgumentException(
                     "height cannot be greater than 65535.");
         }
-        nativeViewResize(mNativeMapViewPtr, width, height);
+        nativeViewResize(nativeMapViewPtr, width, height);
     }
 
     public void resizeFramebuffer(int fbWidth, int fbHeight) {
@@ -177,55 +177,55 @@ final class NativeMapView {
             throw new IllegalArgumentException(
                     "fbHeight cannot be greater than 65535.");
         }
-        nativeFramebufferResize(mNativeMapViewPtr, fbWidth, fbHeight);
+        nativeFramebufferResize(nativeMapViewPtr, fbWidth, fbHeight);
     }
 
     public void addClass(String clazz) {
-        nativeAddClass(mNativeMapViewPtr, clazz);
+        nativeAddClass(nativeMapViewPtr, clazz);
     }
 
     public void removeClass(String clazz) {
-        nativeRemoveClass(mNativeMapViewPtr, clazz);
+        nativeRemoveClass(nativeMapViewPtr, clazz);
     }
 
     public boolean hasClass(String clazz) {
-        return nativeHasClass(mNativeMapViewPtr, clazz);
+        return nativeHasClass(nativeMapViewPtr, clazz);
     }
 
     public void setClasses(List<String> classes) {
-        nativeSetClasses(mNativeMapViewPtr, classes);
+        nativeSetClasses(nativeMapViewPtr, classes);
     }
 
     public List<String> getClasses() {
-        return nativeGetClasses(mNativeMapViewPtr);
+        return nativeGetClasses(nativeMapViewPtr);
     }
 
     public void setStyleUrl(String url) {
-        nativeSetStyleUrl(mNativeMapViewPtr, url);
+        nativeSetStyleUrl(nativeMapViewPtr, url);
     }
 
     public void setStyleJson(String newStyleJson) {
-        nativeSetStyleJson(mNativeMapViewPtr, newStyleJson);
+        nativeSetStyleJson(nativeMapViewPtr, newStyleJson);
     }
 
     public String getStyleJson() {
-        return nativeGetStyleJson(mNativeMapViewPtr);
+        return nativeGetStyleJson(nativeMapViewPtr);
     }
 
     public void setAccessToken(String accessToken) {
-        nativeSetAccessToken(mNativeMapViewPtr, accessToken);
+        nativeSetAccessToken(nativeMapViewPtr, accessToken);
     }
 
     public String getAccessToken() {
-        return nativeGetAccessToken(mNativeMapViewPtr);
+        return nativeGetAccessToken(nativeMapViewPtr);
     }
 
     public void cancelTransitions() {
-        nativeCancelTransitions(mNativeMapViewPtr);
+        nativeCancelTransitions(nativeMapViewPtr);
     }
 
     public void setGestureInProgress(boolean inProgress) {
-        nativeSetGestureInProgress(mNativeMapViewPtr, inProgress);
+        nativeSetGestureInProgress(nativeMapViewPtr, inProgress);
     }
 
     public void moveBy(double dx, double dy) {
@@ -233,7 +233,7 @@ final class NativeMapView {
     }
 
     public void moveBy(double dx, double dy, long duration) {
-        nativeMoveBy(mNativeMapViewPtr, dx, dy, duration);
+        nativeMoveBy(nativeMapViewPtr, dx, dy, duration);
     }
 
     public void setLatLng(LatLng latLng) {
@@ -241,23 +241,23 @@ final class NativeMapView {
     }
 
     public void setLatLng(LatLng latLng, long duration) {
-        nativeSetLatLng(mNativeMapViewPtr, latLng.getLatitude(), latLng.getLongitude(), duration);
+        nativeSetLatLng(nativeMapViewPtr, latLng.getLatitude(), latLng.getLongitude(), duration);
     }
 
     public LatLng getLatLng() {
-        return nativeGetLatLng(mNativeMapViewPtr);
+        return nativeGetLatLng(nativeMapViewPtr);
     }
 
     public void resetPosition() {
-        nativeResetPosition(mNativeMapViewPtr);
+        nativeResetPosition(nativeMapViewPtr);
     }
 
     public double getPitch() {
-        return nativeGetPitch(mNativeMapViewPtr);
+        return nativeGetPitch(nativeMapViewPtr);
     }
 
     public void setPitch(double pitch, long duration) {
-        nativeSetPitch(mNativeMapViewPtr, pitch, duration);
+        nativeSetPitch(nativeMapViewPtr, pitch, duration);
     }
 
     public void scaleBy(double ds) {
@@ -269,7 +269,7 @@ final class NativeMapView {
     }
 
     public void scaleBy(double ds, double cx, double cy, long duration) {
-        nativeScaleBy(mNativeMapViewPtr, ds, cx, cy, duration);
+        nativeScaleBy(nativeMapViewPtr, ds, cx, cy, duration);
     }
 
     public void setScale(double scale) {
@@ -281,11 +281,11 @@ final class NativeMapView {
     }
 
     public void setScale(double scale, double cx, double cy, long duration) {
-        nativeSetScale(mNativeMapViewPtr, scale, cx, cy, duration);
+        nativeSetScale(nativeMapViewPtr, scale, cx, cy, duration);
     }
 
     public double getScale() {
-        return nativeGetScale(mNativeMapViewPtr);
+        return nativeGetScale(nativeMapViewPtr);
     }
 
     public void setZoom(double zoom) {
@@ -293,31 +293,31 @@ final class NativeMapView {
     }
 
     public void setZoom(double zoom, long duration) {
-        nativeSetZoom(mNativeMapViewPtr, zoom, duration);
+        nativeSetZoom(nativeMapViewPtr, zoom, duration);
     }
 
     public double getZoom() {
-        return nativeGetZoom(mNativeMapViewPtr);
+        return nativeGetZoom(nativeMapViewPtr);
     }
 
     public void resetZoom() {
-        nativeResetZoom(mNativeMapViewPtr);
+        nativeResetZoom(nativeMapViewPtr);
     }
 
     public void setMinZoom(double zoom) {
-        nativeSetMinZoom(mNativeMapViewPtr, zoom);
+        nativeSetMinZoom(nativeMapViewPtr, zoom);
     }
 
     public double getMinZoom() {
-        return nativeGetMinZoom(mNativeMapViewPtr);
+        return nativeGetMinZoom(nativeMapViewPtr);
     }
 
     public void setMaxZoom(double zoom) {
-        nativeSetMaxZoom(mNativeMapViewPtr, zoom);
+        nativeSetMaxZoom(nativeMapViewPtr, zoom);
     }
 
     public double getMaxZoom() {
-        return nativeGetMaxZoom(mNativeMapViewPtr);
+        return nativeGetMaxZoom(nativeMapViewPtr);
     }
 
     public void rotateBy(double sx, double sy, double ex, double ey) {
@@ -326,11 +326,11 @@ final class NativeMapView {
 
     public void rotateBy(double sx, double sy, double ex, double ey,
                          long duration) {
-        nativeRotateBy(mNativeMapViewPtr, sx, sy, ex, ey, duration);
+        nativeRotateBy(nativeMapViewPtr, sx, sy, ex, ey, duration);
     }
 
     public void setContentPadding(double top, double left, double bottom, double right) {
-        nativeSetContentPadding(mNativeMapViewPtr, top, left, bottom, right);
+        nativeSetContentPadding(nativeMapViewPtr, top, left, bottom, right);
     }
 
     public void setBearing(double degrees) {
@@ -338,60 +338,60 @@ final class NativeMapView {
     }
 
     public void setBearing(double degrees, long duration) {
-        nativeSetBearing(mNativeMapViewPtr, degrees, duration);
+        nativeSetBearing(nativeMapViewPtr, degrees, duration);
     }
 
     public void setBearing(double degrees, double cx, double cy) {
-        nativeSetBearingXY(mNativeMapViewPtr, degrees, cx, cy);
+        nativeSetBearingXY(nativeMapViewPtr, degrees, cx, cy);
     }
 
     public double getBearing() {
-        return nativeGetBearing(mNativeMapViewPtr);
+        return nativeGetBearing(nativeMapViewPtr);
     }
 
     public void resetNorth() {
-        nativeResetNorth(mNativeMapViewPtr);
+        nativeResetNorth(nativeMapViewPtr);
     }
 
     public long addMarker(Marker marker) {
         Marker[] markers = {marker};
-        return nativeAddMarkers(mNativeMapViewPtr, markers)[0];
+        return nativeAddMarkers(nativeMapViewPtr, markers)[0];
     }
 
     public long[] addMarkers(List<Marker> markers) {
-        return nativeAddMarkers(mNativeMapViewPtr, markers.toArray(new Marker[markers.size()]));
+        return nativeAddMarkers(nativeMapViewPtr, markers.toArray(new Marker[markers.size()]));
     }
 
     public long addPolyline(Polyline polyline) {
         Polyline[] polylines = {polyline};
-        return nativeAddPolylines(mNativeMapViewPtr, polylines)[0];
+        return nativeAddPolylines(nativeMapViewPtr, polylines)[0];
     }
 
     public long[] addPolylines(List<Polyline> polylines) {
-        return nativeAddPolylines(mNativeMapViewPtr, polylines.toArray(new Polyline[polylines.size()]));
+        return nativeAddPolylines(nativeMapViewPtr, polylines.toArray(new Polyline[polylines.size()]));
     }
 
     public long addPolygon(Polygon polygon) {
         Polygon[] polygons = {polygon};
-        return nativeAddPolygons(mNativeMapViewPtr, polygons)[0];
+        return nativeAddPolygons(nativeMapViewPtr, polygons)[0];
     }
 
     public long[] addPolygons(List<Polygon> polygons) {
-        return nativeAddPolygons(mNativeMapViewPtr, polygons.toArray(new Polygon[polygons.size()]));
+        return nativeAddPolygons(nativeMapViewPtr, polygons.toArray(new Polygon[polygons.size()]));
     }
 
     public void updateMarker(Marker marker) {
         LatLng position = marker.getPosition();
         Icon icon = marker.getIcon();
-        nativeUpdateMarker(mNativeMapViewPtr, marker.getId(), position.getLatitude(), position.getLongitude(), icon.getId());
+        nativeUpdateMarker(nativeMapViewPtr, marker.getId(), position.getLatitude(), position.getLongitude(), icon.getId());
     }
 
     public void updatePolygon(Polygon polygon) {
-        nativeUpdatePolygon(mNativeMapViewPtr, polygon.getId(), polygon);
+        nativeUpdatePolygon(nativeMapViewPtr, polygon.getId(), polygon);
     }
 
     public void updatePolyline(Polyline polyline) {
-        nativeUpdatePolyline(mNativeMapViewPtr, polyline.getId(), polyline);
+        nativeUpdatePolyline(nativeMapViewPtr, polyline.getId(), polyline);
     }
 
     public void removeAnnotation(long id) {
@@ -400,120 +400,120 @@ final class NativeMapView {
     }
 
     public void removeAnnotations(long[] ids) {
-        nativeRemoveAnnotations(mNativeMapViewPtr, ids);
+        nativeRemoveAnnotations(nativeMapViewPtr, ids);
     }
 
     public long[] queryPointAnnotations(RectF rect) {
-        return nativeQueryPointAnnotations(mNativeMapViewPtr, rect);
+        return nativeQueryPointAnnotations(nativeMapViewPtr, rect);
     }
 
     public void addAnnotationIcon(String symbol, int width, int height, float scale, byte[] pixels) {
-        nativeAddAnnotationIcon(mNativeMapViewPtr, symbol, width, height, scale, pixels);
+        nativeAddAnnotationIcon(nativeMapViewPtr, symbol, width, height, scale, pixels);
     }
 
     public void setVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction, long duration) {
-        nativeSetVisibleCoordinateBounds(mNativeMapViewPtr, coordinates, padding, direction, duration);
+        nativeSetVisibleCoordinateBounds(nativeMapViewPtr, coordinates, padding, direction, duration);
     }
 
     public void onLowMemory() {
-        nativeOnLowMemory(mNativeMapViewPtr);
+        nativeOnLowMemory(nativeMapViewPtr);
     }
 
     public void setDebug(boolean debug) {
-        nativeSetDebug(mNativeMapViewPtr, debug);
+        nativeSetDebug(nativeMapViewPtr, debug);
     }
 
     public void cycleDebugOptions() {
-        nativeToggleDebug(mNativeMapViewPtr);
+        nativeToggleDebug(nativeMapViewPtr);
     }
 
     public boolean getDebug() {
-        return nativeGetDebug(mNativeMapViewPtr);
+        return nativeGetDebug(nativeMapViewPtr);
     }
 
     public boolean isFullyLoaded() {
-        return nativeIsFullyLoaded(mNativeMapViewPtr);
+        return nativeIsFullyLoaded(nativeMapViewPtr);
     }
 
     public void setReachability(boolean status) {
-        nativeSetReachability(mNativeMapViewPtr, status);
+        nativeSetReachability(nativeMapViewPtr, status);
     }
 
     public double getMetersPerPixelAtLatitude(double lat, double zoom) {
-        return nativeGetMetersPerPixelAtLatitude(mNativeMapViewPtr, lat, zoom);
+        return nativeGetMetersPerPixelAtLatitude(nativeMapViewPtr, lat, zoom);
     }
 
     public ProjectedMeters projectedMetersForLatLng(LatLng latLng) {
-        return nativeProjectedMetersForLatLng(mNativeMapViewPtr, latLng.getLatitude(), latLng.getLongitude());
+        return nativeProjectedMetersForLatLng(nativeMapViewPtr, latLng.getLatitude(), latLng.getLongitude());
     }
 
     public LatLng latLngForProjectedMeters(ProjectedMeters projectedMeters) {
-        return nativeLatLngForProjectedMeters(mNativeMapViewPtr, projectedMeters.getNorthing(), projectedMeters.getEasting());
+        return nativeLatLngForProjectedMeters(nativeMapViewPtr, projectedMeters.getNorthing(), projectedMeters.getEasting());
     }
 
     public PointF pixelForLatLng(LatLng latLng) {
-        return nativePixelForLatLng(mNativeMapViewPtr, latLng.getLatitude(), latLng.getLongitude());
+        return nativePixelForLatLng(nativeMapViewPtr, latLng.getLatitude(), latLng.getLongitude());
     }
 
     public LatLng latLngForPixel(PointF pixel) {
-        return nativeLatLngForPixel(mNativeMapViewPtr, pixel.x, pixel.y);
+        return nativeLatLngForPixel(nativeMapViewPtr, pixel.x, pixel.y);
     }
 
     public double getTopOffsetPixelsForAnnotationSymbol(String symbolName) {
-        return nativeGetTopOffsetPixelsForAnnotationSymbol(mNativeMapViewPtr, symbolName);
+        return nativeGetTopOffsetPixelsForAnnotationSymbol(nativeMapViewPtr, symbolName);
     }
 
     public void jumpTo(double angle, LatLng center, double pitch, double zoom) {
-        nativeJumpTo(mNativeMapViewPtr, angle, center.getLatitude(), center.getLongitude(), pitch, zoom);
+        nativeJumpTo(nativeMapViewPtr, angle, center.getLatitude(), center.getLongitude(), pitch, zoom);
     }
 
     public void easeTo(double angle, LatLng center, long duration, double pitch, double zoom, boolean easingInterpolator) {
-        nativeEaseTo(mNativeMapViewPtr, angle, center.getLatitude(), center.getLongitude(), duration, pitch, zoom, easingInterpolator);
+        nativeEaseTo(nativeMapViewPtr, angle, center.getLatitude(), center.getLongitude(), duration, pitch, zoom, easingInterpolator);
     }
 
     public void flyTo(double angle, LatLng center, long duration, double pitch, double zoom) {
-        nativeFlyTo(mNativeMapViewPtr, angle, center.getLatitude(), center.getLongitude(), duration, pitch, zoom);
+        nativeFlyTo(nativeMapViewPtr, angle, center.getLatitude(), center.getLongitude(), duration, pitch, zoom);
     }
 
     public double[] getCameraValues() {
-        return nativeGetCameraValues(mNativeMapViewPtr);
+        return nativeGetCameraValues(nativeMapViewPtr);
     }
 
     // Runtime style Api
 
     public Layer getLayer(String layerId) {
-        return nativeGetLayer(mNativeMapViewPtr, layerId);
+        return nativeGetLayer(nativeMapViewPtr, layerId);
     }
 
     public void addLayer(@NonNull Layer layer, @Nullable String before) {
-        nativeAddLayer(mNativeMapViewPtr, layer.getNativePtr(), before);
+        nativeAddLayer(nativeMapViewPtr, layer.getNativePtr(), before);
         layer.invalidate();
     }
 
     public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
-        nativeRemoveLayer(mNativeMapViewPtr, layerId);
+        nativeRemoveLayer(nativeMapViewPtr, layerId);
     }
 
     public void addSource(@NonNull Source source) {
-        nativeAddSource(mNativeMapViewPtr, source.getId(), source);
+        nativeAddSource(nativeMapViewPtr, source.getId(), source);
     }
 
     public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
-        nativeRemoveSource(mNativeMapViewPtr, sourceId);
+        nativeRemoveSource(nativeMapViewPtr, sourceId);
     }
 
     // Feature querying
 
     @NonNull
     public List<Feature> queryRenderedFeatures(PointF coordinates, String... layerIds) {
-        Feature[] features = nativeQueryRenderedFeaturesForPoint(mNativeMapViewPtr, coordinates.x / pixelRatio, coordinates.y / pixelRatio, layerIds);
+        Feature[] features = nativeQueryRenderedFeaturesForPoint(nativeMapViewPtr, coordinates.x / pixelRatio, coordinates.y / pixelRatio, layerIds);
         return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
     }
 
     @NonNull
     public List<Feature> queryRenderedFeatures(RectF coordinates, String... layerIds) {
         Feature[] features = nativeQueryRenderedFeaturesForBox(
-                mNativeMapViewPtr,
+          nativeMapViewPtr,
                 coordinates.left / pixelRatio,
                 coordinates.top / pixelRatio,
                 coordinates.right / pixelRatio,
@@ -523,11 +523,11 @@ final class NativeMapView {
     }
 
     public void scheduleTakeSnapshot() {
-        nativeScheduleTakeSnapshot(mNativeMapViewPtr);
+        nativeScheduleTakeSnapshot(nativeMapViewPtr);
     }
 
     public void setApiBaseUrl(String baseUrl) {
-        nativeSetAPIBaseURL(mNativeMapViewPtr, baseUrl);
+        nativeSetAPIBaseURL(nativeMapViewPtr, baseUrl);
     }
 
     //
@@ -535,19 +535,19 @@ final class NativeMapView {
     //
 
     protected void onInvalidate() {
-        mMapView.onInvalidate();
+        mapView.onInvalidate();
     }
 
     protected void onMapChanged(int rawChange) {
-        mMapView.onMapChanged(rawChange);
+        mapView.onMapChanged(rawChange);
     }
 
     protected void onFpsChanged(double fps) {
-        mMapView.onFpsChanged(fps);
+        mapView.onFpsChanged(fps);
     }
 
     protected void onSnapshotReady(byte[] bytes) {
-        mMapView.onSnapshotReady(bytes);
+        mapView.onSnapshotReady(bytes);
     }
 
     //
@@ -660,18 +660,18 @@ final class NativeMapView {
 
     private native long[] nativeAddMarkers(long nativeMapViewPtr, Marker[] markers);
 
-    private native long[] nativeAddPolylines(long mNativeMapViewPtr, Polyline[] polylines);
+    private native long[] nativeAddPolylines(long nativeMapViewPtr, Polyline[] polylines);
 
-    private native long[] nativeAddPolygons(long mNativeMapViewPtr, Polygon[] polygons);
+    private native long[] nativeAddPolygons(long nativeMapViewPtr, Polygon[] polygons);
 
     private native void nativeRemoveAnnotations(long nativeMapViewPtr, long[] id);
 
-    private native long[] nativeQueryPointAnnotations(long mNativeMapViewPtr, RectF rect);
+    private native long[] nativeQueryPointAnnotations(long nativeMapViewPtr, RectF rect);
 
     private native void nativeAddAnnotationIcon(long nativeMapViewPtr, String symbol,
                                                 int width, int height, float scale, byte[] pixels);
 
-    private native void nativeSetVisibleCoordinateBounds(long mNativeMapViewPtr, LatLng[] coordinates,
+    private native void nativeSetVisibleCoordinateBounds(long nativeMapViewPtr, LatLng[] coordinates,
                                                          RectF padding, double direction, long duration);
 
     private native void nativeOnLowMemory(long nativeMapViewPtr);
@@ -704,7 +704,7 @@ final class NativeMapView {
 
     private native void nativeFlyTo(long nativeMapViewPtr, double angle, double latitude, double longitude, long duration, double pitch, double zoom);
 
-    private native double[] nativeGetCameraValues(long mNativeMapViewPtr);
+    private native double[] nativeGetCameraValues(long nativeMapViewPtr);
 
     private native Layer nativeGetLayer(long nativeMapViewPtr, String layerId);
 
@@ -712,9 +712,9 @@ final class NativeMapView {
 
     private native void nativeRemoveLayer(long nativeMapViewPtr, String layerId) throws NoSuchLayerException;
 
-    private native void nativeAddSource(long mNativeMapViewPtr, String id, Source source);
+    private native void nativeAddSource(long nativeMapViewPtr, String id, Source source);
 
-    private native void nativeRemoveSource(long mNativeMapViewPtr, String sourceId) throws NoSuchSourceException;
+    private native void nativeRemoveSource(long nativeMapViewPtr, String sourceId) throws NoSuchSourceException;
 
     private native void nativeUpdatePolygon(long nativeMapViewPtr, long polygonId, Polygon polygon);
 
@@ -724,7 +724,7 @@ final class NativeMapView {
 
     private native Feature[] nativeQueryRenderedFeaturesForPoint(long nativeMapViewPtr, float x, float y, String[] layerIds);
 
-    private native Feature[] nativeQueryRenderedFeaturesForBox(long mNativeMapViewPtr, float left, float top, float right, float bottom, String[] layerIds);
+    private native Feature[] nativeQueryRenderedFeaturesForBox(long nativeMapViewPtr, float left, float top, float right, float bottom, String[] layerIds);
 
     private native void nativeSetAPIBaseURL(long nativeMapViewPtr, String baseUrl);
 }

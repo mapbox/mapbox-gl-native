@@ -45,17 +45,17 @@ public class MapboxMapOptions implements Parcelable {
 
     private boolean compassEnabled = true;
     private int compassGravity = Gravity.TOP | Gravity.END;
-    private int compassMargins[];
+    private int[] compassMargins;
 
     private boolean logoEnabled = true;
     private int logoGravity = Gravity.BOTTOM | Gravity.START;
-    private int logoMargins[];
+    private int[] logoMargins;
 
     @ColorInt
     private int attributionTintColor = -1;
     private boolean attributionEnabled = true;
     private int attributionGravity = Gravity.BOTTOM;
-    private int attributionMargins[];
+    private int[] attributionMargins;
 
     private float minZoom = MapboxConstants.MINIMUM_ZOOM;
     private float maxZoom = MapboxConstants.MAXIMUM_ZOOM;
