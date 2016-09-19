@@ -146,6 +146,19 @@ void Source::Impl::updateTiles(const UpdateParameters& parameters) {
         cache.setSize(conservativeCacheSize);
     }
 
+    removeStaleTiles(retain);
+
+    const PlacementConfig config { parameters.transformState.getAngle(),
+                                   parameters.transformState.getPitch(),
+                                   parameters.debugOptions & MapDebugOptions::Collision };
+
+    for (auto& pair : tiles) {
+        pair.second->setPlacementConfig(config);
+    }
+}
+
+// Moves all tiles to the cache except for those specified in the retain set.
+void Source::Impl::removeStaleTiles(const std::set<OverscaledTileID>& retain) {
     // Remove stale tiles. This goes through the (sorted!) tiles map and retain set in lockstep
     // and removes items from tiles that don't have the corresponding key in the retain set.
     auto tilesIt = tiles.begin();
@@ -162,13 +175,12 @@ void Source::Impl::updateTiles(const UpdateParameters& parameters) {
             ++retainIt;
         }
     }
+}
 
-    const PlacementConfig config { parameters.transformState.getAngle(),
-                                   parameters.transformState.getPitch(),
-                                   parameters.debugOptions & MapDebugOptions::Collision };
-
-    for (auto& pair : tiles) {
-        pair.second->setPlacementConfig(config);
+void Source::Impl::removeTiles() {
+    renderTiles.clear();
+    if (!tiles.empty()) {
+        removeStaleTiles({});
     }
 }
 
