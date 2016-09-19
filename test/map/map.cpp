@@ -202,6 +202,26 @@ TEST(Map, StyleEarlyMutation) {
     EXPECT_NE(nullptr, map.getLayer("water"));
 }
 
+TEST(Map, StyleLoadedSignal) {
+    MapTest test;
+    Map map(test.view, test.fileSource, MapMode::Still);
+    
+    // The map should emit a signal on style loaded
+    bool emitted = false;
+    test.view.setMapChangeCallback([&](MapChange change) {
+        if (change == mbgl::MapChangeDidFinishLoadingStyle) {
+            emitted = true;
+        }
+    });
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    EXPECT_TRUE(emitted);
+    
+    // But not when the style couldn't be parsed
+    emitted = false;
+    map.setStyleJSON("invalid");
+    EXPECT_FALSE(emitted);
+}
+
 TEST(Map, AddLayer) {
     MapTest test;
 

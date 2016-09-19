@@ -108,6 +108,8 @@ void Style::setJSON(const std::string& json) {
         observer->onResourceError(error);
 
         return;
+    } else {
+        observer->onStyleLoaded();
     }
 
     for (auto& source : parser.sources) {

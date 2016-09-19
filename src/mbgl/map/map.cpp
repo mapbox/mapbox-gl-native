@@ -39,6 +39,7 @@ public:
     Impl(View&, FileSource&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
 
     void onUpdate(Update) override;
+    void onStyleLoaded() override;
     void onStyleError() override;
     void onResourceError(std::exception_ptr) override;
 
@@ -964,6 +965,10 @@ void Map::Impl::onUpdate(Update flags) {
 
     updateFlags |= flags;
     asyncUpdate.send();
+}
+    
+void Map::Impl::onStyleLoaded() {
+    view.notifyMapChange(MapChangeDidFinishLoadingStyle);
 }
 
 void Map::Impl::onStyleError() {
