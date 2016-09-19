@@ -138,8 +138,6 @@ class HTTPRequest implements Callback {
     }
 
     private void onFailure(Exception e) {
-        Log.w(LOG_TAG, String.format("[HTTP] Request could not be executed: %s", e.getMessage()));
-
         int type = PERMANENT_ERROR;
         if ((e instanceof NoRouteToHostException) || (e instanceof UnknownHostException) || (e instanceof SocketException) || (e instanceof ProtocolException) || (e instanceof SSLException)) {
             type = CONNECTION_ERROR;
@@ -148,6 +146,18 @@ class HTTPRequest implements Callback {
         }
 
         String errorMessage = e.getMessage() != null ? e.getMessage() : "Error processing the request";
+
+        if (type == TEMPORARY_ERROR) {
+            Log.d(LOG_TAG, String.format(MapboxConstants.MAPBOX_LOCALE,
+                "Request failed due to a temporary error: %s", errorMessage));
+        } else if (type == CONNECTION_ERROR) {
+            Log.i(LOG_TAG, String.format(MapboxConstants.MAPBOX_LOCALE,
+                "Request failed due to a connection error: %s", errorMessage));
+        } else {
+            // PERMANENT_ERROR
+            Log.w(LOG_TAG, String.format(MapboxConstants.MAPBOX_LOCALE,
+                "Request failed due to a permanent error: %s", errorMessage));
+        }
 
         mLock.lock();
         if (mNativePtr != 0) {
