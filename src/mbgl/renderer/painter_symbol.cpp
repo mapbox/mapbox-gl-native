@@ -224,7 +224,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
     }
 
     if (bucket.hasTextData()) {
-        if (layout.textRotationAlignment == AlignmentType::Map) {
+        if (layout.textPitchAlignment == AlignmentType::Map) {
             config.depthFunc.reset();
             config.depthTest = GL_TRUE;
         } else {
