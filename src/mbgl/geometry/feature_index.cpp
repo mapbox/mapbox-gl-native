@@ -78,8 +78,11 @@ void FeatureIndex::query(
         addFeature(result, indexedFeature, queryGeometry, filterLayerIDs, geometryTileData, tileID, style, bearing, pixelsToTileUnits);
     }
 
-    // query symbol features
-    assert(collisionTile);
+    // Query symbol features, if they've been placed.
+    if (!collisionTile) {
+        return;
+    }
+
     std::vector<IndexedSubfeature> symbolFeatures = collisionTile->queryRenderedSymbols(box, scale);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
