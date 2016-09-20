@@ -2,7 +2,7 @@
 
 #include <mbgl/util/color.hpp>
 
-#include <set>
+#include <unordered_set>
 #include <vector>
 
 namespace mbgl {
@@ -31,7 +31,7 @@ public:
 class RenderData {
 public:
     Color backgroundColor;
-    std::set<style::Source*> sources;
+    std::unordered_set<style::Source*> sources;
     std::vector<RenderItem> order;
 };
 

@@ -10,7 +10,6 @@
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 
 #include <memory>
-#include <set>
 #include <vector>
 
 namespace mbgl {

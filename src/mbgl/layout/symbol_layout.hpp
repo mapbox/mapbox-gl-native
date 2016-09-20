@@ -7,7 +7,7 @@
 
 #include <memory>
 #include <map>
-#include <set>
+#include <unordered_set>
 #include <vector>
 
 namespace mbgl {
@@ -88,7 +88,7 @@ private:
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
 
-    std::set<GlyphRange> ranges;
+    GlyphRangeSet ranges;
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 };

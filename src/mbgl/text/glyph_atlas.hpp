@@ -13,7 +13,7 @@
 
 #include <atomic>
 #include <string>
-#include <set>
+#include <unordered_set>
 #include <unordered_map>
 #include <mutex>
 #include <exception>
@@ -41,7 +41,7 @@ public:
     // made and when the glyph if finally parsed, it gets added to the respective
     // GlyphSet and a signal is emitted to notify the observers. This method
     // can be called from any thread.
-    bool hasGlyphRanges(const FontStack&, const std::set<GlyphRange>&);
+    bool hasGlyphRanges(const FontStack&, const GlyphRangeSet&);
 
     void setURL(const std::string &url) {
         glyphURL = url;
@@ -95,7 +95,7 @@ private:
         GlyphValue(Rect<uint16_t> rect_, uintptr_t id)
             : rect(std::move(rect_)), ids({ id }) {}
         Rect<uint16_t> rect;
-        std::set<uintptr_t> ids;
+        std::unordered_set<uintptr_t> ids;
     };
 
     std::mutex mtx;

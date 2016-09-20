@@ -39,7 +39,7 @@ void GlyphAtlas::requestGlyphRange(const FontStack& fontStack, const GlyphRange&
         std::make_unique<GlyphPBF>(this, fontStack, range, observer, fileSource));
 }
 
-bool GlyphAtlas::hasGlyphRanges(const FontStack& fontStack, const std::set<GlyphRange>& glyphRanges) {
+bool GlyphAtlas::hasGlyphRanges(const FontStack& fontStack, const GlyphRangeSet& glyphRanges) {
     if (glyphRanges.empty()) {
         return true;
     }
