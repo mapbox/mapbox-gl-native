@@ -54,6 +54,8 @@ macro(mbgl_platform_test)
         PROPERTIES COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
     )
 
+    target_add_mason_package(mbgl-test PRIVATE sqlite)
+
     target_link_libraries(mbgl-test
         ${MBGL_QT_LIBRARIES}
     )
