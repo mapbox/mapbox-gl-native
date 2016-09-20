@@ -523,6 +523,19 @@ OfflineRegion OfflineDatabase::createRegion(const OfflineRegionDefinition& defin
     return OfflineRegion(db->lastInsertRowid(), definition, metadata);
 }
 
+OfflineRegionMetadata OfflineDatabase::updateMetadata(const int64_t regionID, const OfflineRegionMetadata& metadata) {
+    // clang-format off
+    Statement stmt = getStatement(
+                                  "UPDATE regions SET description = ?1"
+                                  "WHERE id = ?2");
+    // clang-format on
+    stmt->bindBlob(1, metadata);
+    stmt->bind(2, regionID);
+    stmt->run();
+    
+    return metadata;
+}
+
 void OfflineDatabase::deleteRegion(OfflineRegion&& region) {
     // clang-format off
     Statement stmt = getStatement(

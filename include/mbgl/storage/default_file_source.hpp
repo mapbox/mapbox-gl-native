@@ -65,6 +65,13 @@ public:
                                                  optional<OfflineRegion>)>);
 
     /*
+     * Update an offline region metadata in the database.
+     */
+    void updateOfflineMetadata(const int64_t regionID,
+                               const OfflineRegionMetadata& metadata,
+                               std::function<void (std::exception_ptr,
+                                                   optional<OfflineRegionMetadata>)>);
+    /*
      * Register an observer to be notified when the state of the region changes.
      */
     void setOfflineRegionObserver(OfflineRegion&, std::unique_ptr<OfflineRegionObserver>);
