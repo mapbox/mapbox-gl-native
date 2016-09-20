@@ -2,7 +2,6 @@
 
 #include <mbgl/actor/scheduler.hpp>
 
-#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
@@ -22,7 +21,7 @@ private:
     std::queue<std::weak_ptr<Mailbox>> queue;
     std::mutex mutex;
     std::condition_variable cv;
-    std::atomic_bool terminate { false };
+    bool terminate { false };
 };
 
 } // namespace mbgl
