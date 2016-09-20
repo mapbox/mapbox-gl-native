@@ -1,18 +1,13 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.animation.AnimatorSet;
 import android.graphics.Bitmap;
-import android.graphics.PointF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.View;
-import android.view.animation.AnimationUtils;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
 /**
  * MarkerView is an annotation that shows an View at a geographical location.
@@ -39,6 +34,7 @@ public class MarkerView extends Marker {
 
     private boolean flat;
     private boolean visible = true;
+    private float zIndex;
 
     private float tiltValue;
     private float rotation;
@@ -69,6 +65,7 @@ public class MarkerView extends Marker {
         this.flat = baseMarkerViewOptions.isFlat();
         this.rotation = baseMarkerViewOptions.getRotation();
         this.selected = baseMarkerViewOptions.selected;
+        this.zIndex = baseMarkerViewOptions.zIndex;
     }
 
     /**
@@ -310,6 +307,14 @@ public class MarkerView extends Marker {
         return selected;
     }
 
+    public float getzIndex() {
+        return zIndex;
+    }
+
+    public void setzIndex(float zIndex) {
+        this.zIndex = zIndex;
+    }
+
     /**
      * For internal use only, use {@link MapboxMap#selectMarker(Marker)} instead.
      */
@@ -339,7 +344,7 @@ public class MarkerView extends Marker {
     public void setMapboxMap(MapboxMap mapboxMap) {
         super.setMapboxMap(mapboxMap);
 
-        if(isFlat()) {
+        if (isFlat()) {
             // initial tilt value if MapboxMap is started with a tilt attribute
             tiltValue = (float) mapboxMap.getCameraPosition().tilt;
         }
@@ -355,5 +360,18 @@ public class MarkerView extends Marker {
     @Override
     public String toString() {
         return "MarkerView [position[" + getPosition() + "]]";
+    }
+
+    @Override
+    public int compareTo(@NonNull Annotation annotation) {
+        if (annotation instanceof MarkerView) {
+            MarkerView other = (MarkerView) annotation;
+            if (zIndex < other.getzIndex()) {
+                return 1;
+            } else if (zIndex > other.getzIndex()) {
+                return -1;
+            }
+        }
+        return super.compareTo(annotation);
     }
 }

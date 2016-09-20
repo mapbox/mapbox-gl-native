@@ -123,7 +123,6 @@ public class MapView extends FrameLayout {
     private NativeMapView mNativeMapView;
     private boolean mHasSurface = false;
 
-    private ViewGroup mMarkerViewContainer;
     private CompassView mCompassView;
     private ImageView mLogoView;
     private ImageView mAttributionsView;
@@ -193,10 +192,11 @@ public class MapView extends FrameLayout {
         mInitialLoad = true;
         mOnMapReadyCallbackList = new ArrayList<>();
         mOnMapChangedListener = new CopyOnWriteArrayList<>();
-        mMapboxMap = new MapboxMap(this);
         mIcons = new ArrayList<>();
         View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
         setWillNotDraw(false);
+
+        mMapboxMap = new MapboxMap(this);
 
         // Reference the TextureView
         SurfaceView surfaceView = (SurfaceView) view.findViewById(R.id.surfaceView);
@@ -226,9 +226,6 @@ public class MapView extends FrameLayout {
 
         // Connectivity
         onConnectivityChanged(isConnected());
-
-        mMarkerViewContainer = (ViewGroup) view.findViewById(R.id.markerViewContainer);
-
         mMyLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
         mMyLocationView.setMapboxMap(mMapboxMap);
 
@@ -1222,14 +1219,6 @@ public class MapView extends FrameLayout {
 
         return new ArrayList<>(annotations);
     }
-
-    /**
-     * @return the ViewGroup containing the marker views
-     */
-    public ViewGroup getMarkerViewContainer() {
-        return mMarkerViewContainer;
-    }
-
 
     int getTopOffsetPixelsForIcon(Icon icon) {
         if (mDestroyed) {
