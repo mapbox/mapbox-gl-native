@@ -507,10 +507,10 @@ public class MyLocationView extends View {
 
     private static class GpsLocationListener implements LocationListener {
 
-        private WeakReference<MyLocationView> mUserLocationView;
+        private WeakReference<MyLocationView> userLocationView;
 
         public GpsLocationListener(MyLocationView myLocationView) {
-            mUserLocationView = new WeakReference<>(myLocationView);
+            userLocationView = new WeakReference<>(myLocationView);
         }
 
         /**
@@ -520,7 +520,7 @@ public class MyLocationView extends View {
          */
         @Override
         public void onLocationChanged(Location location) {
-            MyLocationView locationView = mUserLocationView.get();
+            MyLocationView locationView = userLocationView.get();
             if (locationView != null) {
                 locationView.setLocation(location);
             }
