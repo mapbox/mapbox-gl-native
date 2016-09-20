@@ -103,10 +103,7 @@ void Style::setJSON(const std::string& json) {
         Log::Error(Event::ParseStyle, "Failed to parse style: %s", util::toString(error).c_str());
         observer->onStyleError();
         observer->onResourceError(error);
-
         return;
-    } else {
-        observer->onStyleLoaded();
     }
 
     for (auto& source : parser.sources) {
@@ -127,6 +124,8 @@ void Style::setJSON(const std::string& json) {
     spriteAtlas->load(parser.spriteURL, fileSource);
 
     loaded = true;
+    
+    observer->onStyleLoaded();
 }
 
 void Style::addSource(std::unique_ptr<Source> source) {
