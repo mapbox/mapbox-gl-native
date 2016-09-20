@@ -2,10 +2,10 @@
 include(${CMAKE_CURRENT_BINARY_DIR}/toolchain.cmake)
 
 mason_use(jni.hpp VERSION 2.0.0 HEADER_ONLY)
-mason_use(libjpeg-turbo VERSION 1.4.2)
-mason_use(libpng VERSION 1.6.20)
-mason_use(libzip VERSION 0.11.2)
-mason_use(nunicode VERSION 1.6)
+mason_use(libjpeg-turbo VERSION 1.5.0)
+mason_use(libpng VERSION 1.6.25)
+mason_use(libzip VERSION 1.1.3)
+mason_use(nunicode VERSION 1.7.1)
 mason_use(sqlite VERSION 3.14.2)
 
 macro(mbgl_platform_core)
