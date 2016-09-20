@@ -22,14 +22,10 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
  */
 public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions> implements Parcelable {
 
-    private Marker marker;
-
     public MarkerOptions() {
-        marker = new Marker();
     }
 
     protected MarkerOptions(Parcel in) {
-        marker = new Marker();
         position((LatLng) in.readParcelable(LatLng.class.getClassLoader()));
         snippet(in.readString());
         title(in.readString());
@@ -75,11 +71,7 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
             throw new InvalidMarkerPositionException();
         }
 
-        marker.setPosition(position);
-        marker.setSnippet(snippet);
-        marker.setTitle(title);
-        marker.setIcon(icon);
-        return marker;
+        return new Marker(position, icon, title, snippet);
     }
 
     public LatLng getPosition() {

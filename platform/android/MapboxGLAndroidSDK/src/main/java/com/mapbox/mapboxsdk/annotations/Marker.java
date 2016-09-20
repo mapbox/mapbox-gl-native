@@ -49,6 +49,13 @@ public class Marker extends Annotation {
         title = baseMarkerViewOptions.title;
     }
 
+    Marker(LatLng position, Icon icon, String title, String snippet) {
+        this.position = position;
+        this.icon = icon;
+        this.title = title;
+        this.snippet = snippet;
+    }
+
     public LatLng getPosition() {
         return position;
     }
