@@ -136,7 +136,6 @@ android.libraryVariants.all { variant ->
         exclude "**/BuildConfig.class"
     }
     jarTask.dependsOn variant.javaCompile
-    artifacts.add('archives', jarTask);
 }
 
 // From https://raw.github.com/mcxiaoke/gradle-mvn-push/master/gradle-mvn-push.gradle
