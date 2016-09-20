@@ -107,68 +107,6 @@ TEST(Memory, Raster) {
     test::render(map);
 }
 
-// This test will render 3 map objects alternating
-// between a raster and a vector style. Memory is
-// expected to grow between the renderings due to
-// fragmentation. A good allocator for Mapbox GL
-// Native will keep memory growth within acceptable
-// levels and stable in the long run.
-TEST(Memory, Fragmentation) {
-    if (!isUsingJemalloc()) {
-        return;
-    }
-
-    MemoryTest test;
-
-    Map map1(test.view, test.fileSource, MapMode::Still);
-    Map map2(test.view, test.fileSource, MapMode::Still);
-    Map map3(test.view, test.fileSource, MapMode::Still);
-
-    map1.setZoom(16);
-    map2.setZoom(16);
-    map3.setZoom(16);
-
-    auto renderMap = [&] {
-        map1.setStyleURL("mapbox://satellite");
-        test::render(map1);
-
-        map2.setStyleURL("mapbox://satellite");
-        test::render(map2);
-
-        map3.setStyleURL("mapbox://satellite");
-        test::render(map3);
-
-        map1.setStyleURL("mapbox://streets");
-        test::render(map1);
-
-        map2.setStyleURL("mapbox://streets");
-        test::render(map2);
-
-        map3.setStyleURL("mapbox://streets");
-        test::render(map3);
-    };
-
-    // Warm up buffers and cache.
-    for (unsigned i = 0; i < 5; ++i) {
-        renderMap();
-    }
-
-    long lastRSS = getRSS();
-    long memoryFragments = 0;
-
-    for (unsigned i = 0; i < 20; ++i) {
-        renderMap();
-
-        long currentRSS = getRSS();
-
-        memoryFragments += currentRSS - lastRSS;
-        lastRSS = currentRSS;
-    }
-
-    ASSERT_LT(memoryFragments, 10 * 1024 * 1024) << "\
-        Abnormal memory growth detected.";
-}
-
 // This test will measure the size of a Map object
 // after rendering a raster and a vector style. The
 // idea is to try to keep the memory footprint within
