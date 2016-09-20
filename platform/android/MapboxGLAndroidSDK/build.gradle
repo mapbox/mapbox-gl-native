@@ -177,9 +177,6 @@ task apklib(type: Zip) {
     }
 }
 
-artifacts {
-    archives apklib
-}
 
 uploadArchives() {
     repositories {
