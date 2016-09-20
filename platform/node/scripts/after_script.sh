@@ -4,10 +4,9 @@ set -e
 set -o pipefail
 
 JOB=$1
-TAG=$2
 
-if [[ ${PUBLISH} ]]; then
-    if [[ "$BUILDTYPE" == "Debug" ]]; then
+if [[ -n ${PUBLISH:-} ]]; then
+    if [[ "${BUILDTYPE}" == "Debug" ]]; then
         echo "Please run this script in release mode (BUILDTYPE=Release)."
         exit 1
     else
