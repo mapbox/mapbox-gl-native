@@ -14,6 +14,7 @@ class Observer : public GlyphAtlasObserver,
 public:
     virtual void onUpdate(Update) {}
     virtual void onStyleError() {}
+    virtual void onStyleLoaded() {}
     virtual void onResourceError(std::exception_ptr) {}
 };
 
