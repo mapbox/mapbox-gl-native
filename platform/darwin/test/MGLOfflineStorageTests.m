@@ -20,7 +20,7 @@
         if ([MGLOfflineStorage sharedOfflineStorage].packs) {
             [expectation fulfill];
         } else {
-            [self waitForExpectationsWithTimeout:1 handler:nil];
+            [self waitForExpectationsWithTimeout:2 handler:nil];
         }
         
         XCTAssertNotNil([MGLOfflineStorage sharedOfflineStorage].packs, @"Shared offline storage object should have a non-nil collection of packs by this point.");
@@ -63,7 +63,7 @@
         pack = completionHandlerPack;
         [additionCompletionHandlerExpectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:2 handler:nil];
     
     XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Added pack should have been added to the canonical collection of packs owned by the shared offline storage object. This assertion can fail if this test is run before -testAAALoadPacks.");
     
