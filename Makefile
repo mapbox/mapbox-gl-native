@@ -462,7 +462,7 @@ android: android-arm-v7
 
 .PHONY: android-test
 android-test:
-	cd platform/android && ./gradlew testReleaseUnitTest --continue
+	cd platform/android && ./gradlew testDebugUnitTest --continue
 
 .PHONY: android-test-apk
 android-test-apk:
