@@ -11,10 +11,10 @@ ThreadPool::ThreadPool(std::size_t count) {
                 std::unique_lock<std::mutex> lock(mutex);
 
                 cv.wait(lock, [this] {
-                    return !queue.empty() || terminate.load();
+                    return !queue.empty() || terminate;
                 });
 
-                if (terminate.load()) {
+                if (terminate) {
                     return;
                 }
 
@@ -31,7 +31,11 @@ ThreadPool::ThreadPool(std::size_t count) {
 }
 
 ThreadPool::~ThreadPool() {
-    terminate.store(true);
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        terminate = true;
+    }
+
     cv.notify_all();
 
     for (auto& thread : threads) {
@@ -40,8 +44,11 @@ ThreadPool::~ThreadPool() {
 }
 
 void ThreadPool::schedule(std::weak_ptr<Mailbox> mailbox) {
-    std::lock_guard<std::mutex> lock(mutex);
-    queue.push(mailbox);
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        queue.push(mailbox);
+    }
+
     cv.notify_one();
 }
 
