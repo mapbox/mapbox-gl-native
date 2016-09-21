@@ -15,16 +15,16 @@ extern NSString * const MGLGeoJSONClusterOption;
 
 /**
  An `NSNumber` object containing an integer; specifies the radius of each
- cluster when clustering points, measured in <sup>1</sup>/<sub>512</sub>ths of a
- tile. The default value is 50.
+ cluster if clustering is enabled. A value of 512 produces a radius equal to
+ the width of a tile. The default value is 50.
  */
 extern NSString * const MGLGeoJSONClusterRadiusOption;
 
 /**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
- which to cluster points. Defaults to one zoom level less than the value of
- `MGLGeoJSONMaximumZoomLevelOption`, so that at the last zoom level, the
- features are not clustered.
+ which to cluster points if clustering is enabled. Defaults to one zoom level 
+ less than the value of `MGLGeoJSONMaximumZoomLevelOption` so that, at the 
+ maximum zoom level, the features are not clustered.
  */
 extern NSString * const MGLGeoJSONClusterMaximumZoomLevelOption;
 
@@ -36,10 +36,10 @@ extern NSString * const MGLGeoJSONClusterMaximumZoomLevelOption;
 extern NSString * const MGLGeoJSONMaximumZoomLevelOption;
 
 /**
- An `NSNumber` object containing an integer; specifies the tile buffer size on
- each side. This option is measured in <sup>1</sup>/<sub>512</sub>ths of a tile.
- A higher value reduces rendering artifacts near tile edges but may impact
- performance. The default value is 128.
+ An `NSNumber` object containing an integer; specifies the size of the tile
+ buffer on each side. A value of 0 produces no buffer. A value of 512 produces a 
+ buffer as wide as the tile itself. Larger values produce fewer rendering 
+ artifacts near tile edges and slower performance. The default value is 128.
  */
 extern NSString * const MGLGeoJSONBufferOption;
 
