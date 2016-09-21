@@ -165,6 +165,7 @@
 		404C26E51D89B877000AA13D /* MGLTileSet.mm in Sources */ = {isa = PBXBuildFile; fileRef = 404C26E11D89B877000AA13D /* MGLTileSet.mm */; };
 		404C26E71D89C55D000AA13D /* MGLTileSet_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 404C26E61D89C515000AA13D /* MGLTileSet_Private.h */; };
 		404C26E81D89C55D000AA13D /* MGLTileSet_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 404C26E61D89C515000AA13D /* MGLTileSet_Private.h */; };
+		4085AF091D933DEA00F11B22 /* MGLTileSetTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4085AF081D933DEA00F11B22 /* MGLTileSetTests.mm */; };
 		40CFA6511D7875BB008103BD /* MGLGeoJSONSourceTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 40CFA6501D787579008103BD /* MGLGeoJSONSourceTests.mm */; };
 		40EDA1C01CFE0E0200D9EA68 /* MGLAnnotationContainerView.h in Headers */ = {isa = PBXBuildFile; fileRef = 40EDA1BD1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.h */; };
 		40EDA1C11CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 40EDA1BE1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.m */; };
@@ -577,6 +578,7 @@
 		404C26E01D89B877000AA13D /* MGLTileSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLTileSet.h; sourceTree = "<group>"; };
 		404C26E11D89B877000AA13D /* MGLTileSet.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLTileSet.mm; sourceTree = "<group>"; };
 		404C26E61D89C515000AA13D /* MGLTileSet_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTileSet_Private.h; sourceTree = "<group>"; };
+		4085AF081D933DEA00F11B22 /* MGLTileSetTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLTileSetTests.mm; sourceTree = "<group>"; };
 		40CFA6501D787579008103BD /* MGLGeoJSONSourceTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLGeoJSONSourceTests.mm; sourceTree = "<group>"; };
 		40EDA1BD1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationContainerView.h; sourceTree = "<group>"; };
 		40EDA1BE1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLAnnotationContainerView.m; sourceTree = "<group>"; };
@@ -939,6 +941,7 @@
 			isa = PBXGroup;
 			children = (
 				40CFA6501D787579008103BD /* MGLGeoJSONSourceTests.mm */,
+				4085AF081D933DEA00F11B22 /* MGLTileSetTests.mm */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -1873,6 +1876,7 @@
 				DA2DBBCE1D51E80400D38FF9 /* MGLStyleLayerTests.m in Sources */,
 				DA35A2C61CCA9F8300E826B2 /* MGLCompassDirectionFormatterTests.m in Sources */,
 				3575798E1D502EC7000B822E /* MGLRuntimeStylingHelper.m in Sources */,
+				4085AF091D933DEA00F11B22 /* MGLTileSetTests.mm in Sources */,
 				357579851D502AF5000B822E /* MGLSymbolStyleLayerTests.m in Sources */,
 				357579871D502AFE000B822E /* MGLLineStyleLayerTests.m in Sources */,
 				357579891D502B06000B822E /* MGLCircleStyleLayerTests.m in Sources */,
