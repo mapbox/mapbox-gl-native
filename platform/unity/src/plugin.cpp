@@ -21,6 +21,29 @@ namespace {
 
 class UnityPluginView;
 
+enum SyncStatus : uint8_t {
+    Nothing    = 0,
+    Token      = 1 << 1,
+    Style      = 1 << 2,
+    Zoom       = 1 << 3,
+    Bearing    = 1 << 4,
+    Pan        = 1 << 5,
+    Coordinate = 1 << 6,
+    Everything = 255,
+};
+
+struct MapState {
+    // Temporary token, will get rotated, do not use in production.
+    std::string token = "pk.eyJ1IjoidG1wc2FudG9zIiwiYSI6ImNpdGN0M2I3MjAwNW0yeG1pajg4bWhqY3YifQ.0hqdgg6Hl_lG9ZkTqkB7-w";
+    std::string style = mbgl::util::default_styles::orderedStyles[0].url;
+
+    double zoom = 15;
+    double bearing = 0;
+
+    mbgl::LatLng center = { 40.7636974, -73.9815443 };
+    mbgl::ScreenCoordinate pan = { 0, 0 };
+};
+
 struct UnityPluginContext {
     IUnityInterfaces* interfaces = nullptr;
     IUnityGraphics* graphics = nullptr;
@@ -36,8 +59,13 @@ struct UnityPluginContext {
     int textureWidth = 0;
     int textureHeight = 0;
 
-    std::atomic<bool> cycleStyle;
     float time = 0;
+
+    // State accessed from the main thread and
+    // from the render thread. Needs r/w locking.
+    MapState mapState;
+    SyncStatus syncStatus = SyncStatus::Everything;
+    std::mutex syncLock;
 };
 
 // Global plugin context.
@@ -123,22 +151,41 @@ private:
 };
 
 void DoSyncState() {
-    using namespace mbgl::util;
+    static SyncStatus syncStatus;
+    static MapState mapState;
 
-    if (!context.cycleStyle) {
-        return;
+    {
+        std::lock_guard<std::mutex> lock(context.syncLock);
+
+        if (context.syncStatus == SyncStatus::Nothing) {
+            return;
+        }
+
+        mapState = context.mapState;
+        syncStatus = context.syncStatus;
+
+        context.syncStatus = SyncStatus::Nothing;
     }
 
-    static uint8_t current;
-
-    if (++current == default_styles::numOrderedStyles) {
-        current = 0;
+    if (syncStatus & SyncStatus::Token) {
+        context.fileSource->setAccessToken(mapState.token);
     }
 
-    default_styles::DefaultStyle newStyle = default_styles::orderedStyles[current];
+    if (syncStatus & SyncStatus::Style) {
+        context.map->setStyleURL(mapState.style);
+    }
 
-    context.map->setStyleURL(newStyle.url);
-    context.cycleStyle = false;
+    if (syncStatus & SyncStatus::Zoom || syncStatus & SyncStatus::Coordinate) {
+        context.map->setLatLngZoom(mapState.center, mapState.zoom);
+    }
+
+    if (syncStatus & SyncStatus::Bearing) {
+        context.map->setBearing(mapState.bearing);
+    }
+
+    if (syncStatus & SyncStatus::Pan) {
+        context.map->moveBy(mapState.pan);
+    }
 }
 
 void DoRendering() {
@@ -167,12 +214,6 @@ void InitializePluginIfNeeded() {
         return;
     }
 
-    const char *token = getenv("MAPBOX_ACCESS_TOKEN");
-    if (!token) {
-        // Temporary token, will get rotated. Do not use in production.
-        token = "pk.eyJ1IjoidG1wc2FudG9zIiwiYSI6ImNpdGN0M2I3MjAwNW0yeG1pajg4bWhqY3YifQ.0hqdgg6Hl_lG9ZkTqkB7-w";
-    }
-
     context.view = std::make_unique<UnityPluginView>();
     context.loop = std::make_unique<mbgl::util::RunLoop>(mbgl::util::RunLoop::Type::New);
     context.fileSource = std::make_unique<mbgl::DefaultFileSource>(":memory:", ".");
@@ -180,14 +221,6 @@ void InitializePluginIfNeeded() {
     // Sharing the GL context with Unity
     context.map = std::make_unique<mbgl::Map>(*context.view, *context.fileSource,
             mbgl::MapMode::Continuous, mbgl::GLContextMode::Shared);
-
-    context.fileSource->setAccessToken(std::string(token));
-
-    context.cycleStyle = true;
-    DoSyncState();
-
-    // Set to Manhattan
-    context.map->setLatLngZoom(mbgl::LatLng{ 40.7636974, -73.9815443 }, 15);
 
     initialized = true;
 
@@ -209,8 +242,58 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetTextureFromUnity(v
     context.textureHeight = height;
 }
 
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetToken(const char *token) {
+    std::lock_guard<std::mutex> lock(context.syncLock);
+    context.mapState.token = token;
+    context.syncStatus = static_cast<SyncStatus>(context.syncStatus | SyncStatus::Token);
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetStyle(const char *style) {
+    std::lock_guard<std::mutex> lock(context.syncLock);
+    context.mapState.style = style;
+    context.syncStatus = static_cast<SyncStatus>(context.syncStatus | SyncStatus::Style);
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetZoom(double zoom) {
+    std::lock_guard<std::mutex> lock(context.syncLock);
+    context.mapState.zoom = zoom;
+    context.syncStatus = static_cast<SyncStatus>(context.syncStatus | SyncStatus::Zoom);
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetBearing(double bearing) {
+    std::lock_guard<std::mutex> lock(context.syncLock);
+    context.mapState.bearing = bearing;
+    context.syncStatus = static_cast<SyncStatus>(context.syncStatus | SyncStatus::Bearing);
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API MoveBy(double dx, double dy) {
+    std::lock_guard<std::mutex> lock(context.syncLock);
+    context.mapState.pan = { dx, dy };
+    context.syncStatus = static_cast<SyncStatus>(context.syncStatus | SyncStatus::Pan);
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetCoordinate(double lat, double lng) {
+    std::lock_guard<std::mutex> lock(context.syncLock);
+    context.mapState.center = { lat, lng };
+    context.syncStatus = static_cast<SyncStatus>(context.syncStatus | SyncStatus::Coordinate);
+}
+
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API CycleStyle() {
-    context.cycleStyle = true;
+    using namespace mbgl::util;
+
+    static uint8_t current = 1;
+
+    if (++current == default_styles::numOrderedStyles) {
+        current = 0;
+    }
+
+    default_styles::DefaultStyle newStyle = default_styles::orderedStyles[current];
+
+    {
+        std::lock_guard<std::mutex> lock(context.syncLock);
+        context.mapState.style = newStyle.url;
+        context.syncStatus = static_cast<SyncStatus>(context.syncStatus | SyncStatus::Style);
+    }
 }
 
 static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType) {

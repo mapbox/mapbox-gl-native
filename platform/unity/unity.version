@@ -2,8 +2,14 @@ unity {
     global:
         CycleStyle;
         GetRenderEventFunc;
+        MoveBy;
+        SetBearing;
+        SetCoordinate;
+        SetStyle;
         SetTextureFromUnity;
         SetTimeFromUnity;
+        SetToken;
+        SetZoom;
         UnityPluginLoad;
         UnityPluginUnload;
     local: *;
