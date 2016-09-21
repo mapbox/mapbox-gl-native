@@ -23,7 +23,7 @@ workflows:
                 envman add --key SKIPCI --value false
             fi
     - script:
-        title: Run build
+        title: Install Dependencies
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
@@ -32,12 +32,28 @@ workflows:
             brew install cmake
             brew tap mapbox/homebrew-ios-sim-3
             brew install mapbox/homebrew-ios-sim-3/ios-sim
-            gem install xcpretty --no-rdoc --no-ri
-            gem install jazzy --no-rdoc --no-ri
-            export BUILDTYPE=Debug
-            make ios
-            make ios-test
         - is_debug: 'yes'
+    - script:
+        title: Generate Workspace
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -eu -o pipefail
+            export BUILDTYPE=Debug
+            make iproj
+        - is_debug: 'yes'
+    - xcode-test:
+        title: Run SDK Unit Tests
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - project_path: platform/ios/ios.xcworkspace
+        - scheme: CI
+    - deploy-to-bitrise-io:
+        title: Deploy to Bitrise.io
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - notify_user_groups: none
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
