@@ -3,6 +3,7 @@
 #import "NSPredicate+MGLAdditions.h"
 #import "MGLValueEvaluator.h"
 
+
 @interface MGLFilterTests : MGLStyleLayerTests {
     MGLGeoJSONSource *source;
     MGLLineStyleLayer *layer;
@@ -42,8 +43,11 @@
     NSPredicate *typePredicate = [NSPredicate predicateWithFormat:@"%K == %@", @"$type", @"Feature"];
     NSPredicate *idPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @"$id", @"1234123"];
     NSPredicate *specialCharsPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @"ty-’pè", @"sŒm-ethįng"];
-    NSPredicate *booleanPredicate = [NSPredicate predicateWithFormat:@"%K != %@", @"cluster", [NSNumber numberWithBool:YES]];
-    return @[equalPredicate,
+    NSPredicate *booleanPredicate = [NSPredicate predicateWithFormat:@"cluster != YES"];
+    NSPredicate *nilEqualsPredicate = [NSPredicate predicateWithFormat:@"type == %@", nil];
+    NSPredicate *nilNotEqualsPredicate = [NSPredicate predicateWithFormat:@"type != %@", nil];
+    return @[
+             equalPredicate,
              notEqualPredicate,
              greaterThanPredicate,
              greaterThanOrEqualToPredicate,
@@ -55,7 +59,10 @@
              typePredicate,
              idPredicate,
              specialCharsPredicate,
-             booleanPredicate];
+             booleanPredicate,
+             nilEqualsPredicate,
+             nilNotEqualsPredicate
+             ];
 }
 
 - (void)testAllPredicates
@@ -64,6 +71,50 @@
         layer.predicate = predicate;
         XCTAssertEqualObjects(layer.predicate, predicate);
     }
+    [self.mapView.style addLayer:layer];
+}
+
+- (void)testContainsPredicate
+{
+    // core does not have a "contains" filter but we can achieve the equivalent by creating an `mbgl::style::InFilter`
+    // and searching the value for the key
+    NSPredicate *expectedPredicate = [NSPredicate predicateWithFormat:@"park IN %@", @[@"park", @"neighbourhood"]];
+    NSPredicate *containsPredicate = [NSPredicate predicateWithFormat:@"%@ CONTAINS %@", @[@"park", @"neighbourhood"], @"park"];
+    
+    layer.predicate = containsPredicate;
+    XCTAssertEqualObjects(layer.predicate, expectedPredicate);
+    [self.mapView.style addLayer:layer];
+}
+
+- (void)testBetweenPredicate
+{
+    // core does not have a "between" filter but we can achieve the equivalent by creating a set of greater than or equal / less than or equal
+    // filters for the lower and upper bounds (inclusive)
+    NSPredicate *expectedPredicate = [NSCompoundPredicate predicateWithFormat:@"%K >= 2 AND %K <= 3", @"stroke-width", @"stroke-width"];
+    NSPredicate *betweenPredicate = [NSPredicate predicateWithFormat:@"%K BETWEEN %@", @"stroke-width", @[@2.0, @3.0]];
+    
+    layer.predicate = betweenPredicate;
+    XCTAssertEqualObjects(layer.predicate, expectedPredicate);
+    [self.mapView.style addLayer:layer];
+}
+
+- (void)testTruePredicate
+{
+    // This comes out of the class cluster as an NSTruePredicate and it is equal to `[NSPredicate predicateWithValue:YES]`
+    NSPredicate *truePredicate = [NSPredicate predicateWithFormat:@"TRUEPREDICATE"];
+    
+    layer.predicate = truePredicate;
+    XCTAssertEqualObjects(layer.predicate.description, truePredicate.description);
+    [self.mapView.style addLayer:layer];
+}
+
+- (void)testFalsePredicate
+{
+    // This comes out of the class cluster as an NSFalsePredicate and it is equal to `[NSPredicate predicateWithValue:NO]`
+    NSPredicate *falsePredicate = [NSPredicate predicateWithFormat:@"FALSEPREDICATE"];
+    
+    layer.predicate = falsePredicate;
+    XCTAssertEqualObjects(layer.predicate.description, falsePredicate.description);
     [self.mapView.style addLayer:layer];
 }
 

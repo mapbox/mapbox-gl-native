@@ -76,15 +76,11 @@ public:
     }
     
     NSPredicate* operator()(mbgl::style::HasFilter filter) {
-        [NSException raise:@"Unsupported filter type"
-                    format:@"Cannot convert mbgl::style::HasFilter to NSPredicate"];
-        return nil;
+        return [NSPredicate predicateWithFormat:@"%K != nil", @(filter.key.c_str())];
     }
     
     NSPredicate* operator()(mbgl::style::NotHasFilter filter) {
-        [NSException raise:@"Unsupported filter type"
-                    format:@"Cannot convert mbgl::style::NotHasFilter to NSPredicate"];
-        return nil;
+        return [NSPredicate predicateWithFormat:@"%K == nil", @(filter.key.c_str())];
     }
     
 };
@@ -93,8 +89,20 @@ public:
 
 - (mbgl::style::Filter)mgl_filter
 {
+    if ([self isEqual:[NSPredicate predicateWithValue:YES]])
+    {
+        auto filter = mbgl::style::AllFilter();
+        return filter;
+    }
+    
+    if ([self isEqual:[NSPredicate predicateWithValue:NO]])
+    {
+        auto filter = mbgl::style::AnyFilter();
+        return filter;
+    }
+    
     [NSException raise:@"Not supported"
-                format:@"NSPredicate doesn't implement ’-mgl_filter’. Try with NSComparisonPredicate or NSCompoundPredicate instead."];
+                format:@"Try with NSComparisonPredicate or NSCompoundPredicate instead."];
     return {};
 }
 
