@@ -2,6 +2,7 @@
 
 #import "MGLSource_Private.h"
 #import "MGLTileSet_Private.h"
+#import "NSURL+MGLAdditions.h"
 
 #include <mbgl/style/sources/vector_source.hpp>
 
@@ -33,11 +34,13 @@ static NSString *MGLVectorSourceType   = @"vector";
     
     if (self.URL)
     {
-        source = std::make_unique<mbgl::style::VectorSource>(self.sourceIdentifier.UTF8String, self.URL.absoluteString.UTF8String);
+        source = std::make_unique<mbgl::style::VectorSource>(self.sourceIdentifier.UTF8String,
+                                                             self.URL.mgl_URLByStandardizingScheme.absoluteString.UTF8String);
     }
     else
     {
-        source = std::make_unique<mbgl::style::VectorSource>(self.sourceIdentifier.UTF8String, self.tileSet.mbglTileset);
+        source = std::make_unique<mbgl::style::VectorSource>(self.sourceIdentifier.UTF8String,
+                                                             self.tileSet.mbglTileset);
     }
     
     return std::move(source);

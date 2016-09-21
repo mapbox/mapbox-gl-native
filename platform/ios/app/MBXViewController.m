@@ -910,15 +910,26 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 - (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView
 {
+    
 #warning debug code
    
-    MGLTileSet *tileSet = [[MGLTileSet alloc] initWithTileURLTemplates:@[@"https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]];
-    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithSourceIdentifier:@"mapzen" tileSet:tileSet];
+    // Use raster tile URL templates directly (i.e. mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png)
+    // This is Stamen's terrain
+    MGLTileSet *rasterTileSet = [[MGLTileSet alloc] initWithTileURLTemplates:@[@"http://a.tile.stamen.com/terrain-background/{z}/{x}/{y}.jpg"]];
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithSourceIdentifier:@"raster-source" tileSize:256 tileSet:rasterTileSet];
+    [self.mapView.style addSource:rasterSource];
+    
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerIdentifier:@"raster-layer" source:rasterSource];
+    [self.mapView.style addLayer:rasterLayer];
+    
+    // Use vector tile URL templates directly. This is Mapzen's vector tile service
+    MGLTileSet *vectorTileSet = [[MGLTileSet alloc] initWithTileURLTemplates:@[@"https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]];
+    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithSourceIdentifier:@"mapzen" tileSet:vectorTileSet];
     [self.mapView.style addSource:vectorSource];
     
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"filllayer" source:vectorSource sourceLayer:@"buildings"];
-    fillLayer.fillColor = [UIColor magentaColor];
-    [self.mapView.style addLayer:fillLayer];
+    MGLFillStyleLayer *buildingsFillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"filllayer" source:vectorSource sourceLayer:@"buildings"];
+    buildingsFillLayer.fillColor = [UIColor magentaColor];
+    [self.mapView.style addLayer:buildingsFillLayer];
 }
 
 @end
