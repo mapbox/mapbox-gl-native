@@ -3,6 +3,7 @@ unity {
         CycleStyle;
         GetRenderEventFunc;
         MoveBy;
+        ScaleBy;
         SetBearing;
         SetCoordinate;
         SetStyle;

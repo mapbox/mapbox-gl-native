@@ -29,6 +29,7 @@ enum SyncStatus : uint8_t {
     Bearing    = 1 << 4,
     Pan        = 1 << 5,
     Coordinate = 1 << 6,
+    Scale      = 1 << 7,
     Everything = 255,
 };
 
@@ -39,6 +40,7 @@ struct MapState {
 
     double zoom = 15;
     double bearing = 0;
+    double scale = 1;
 
     mbgl::LatLng center = { 40.7636974, -73.9815443 };
     mbgl::ScreenCoordinate pan = { 0, 0 };
@@ -186,6 +188,10 @@ void DoSyncState() {
     if (syncStatus & SyncStatus::Pan) {
         context.map->moveBy(mapState.pan);
     }
+
+    if (syncStatus & SyncStatus::Scale) {
+        context.map->scaleBy(mapState.scale);
+    }
 }
 
 void DoRendering() {
@@ -276,6 +282,12 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetCoordinate(double 
     std::lock_guard<std::mutex> lock(context.syncLock);
     context.mapState.center = { lat, lng };
     context.syncStatus = static_cast<SyncStatus>(context.syncStatus | SyncStatus::Coordinate);
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API ScaleBy(double ds) {
+    std::lock_guard<std::mutex> lock(context.syncLock);
+    context.mapState.scale = ds;
+    context.syncStatus = static_cast<SyncStatus>(context.syncStatus | SyncStatus::Scale);
 }
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API CycleStyle() {
