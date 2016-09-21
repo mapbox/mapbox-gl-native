@@ -1,6 +1,7 @@
 #import "MGLSource.h"
-#import "MGLTileSet.h"
 #import "MGLTypes.h"
+
+@class MGLTileSet;
 
 NS_ASSUME_NONNULL_BEGIN
 
