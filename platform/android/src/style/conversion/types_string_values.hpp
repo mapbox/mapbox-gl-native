@@ -81,6 +81,9 @@ namespace conversion {
           case mbgl::style::AlignmentType::Viewport:
             return "viewport";
             break;
+          case mbgl::style::AlignmentType::Auto:
+            return "auto";
+            break;
           default:
             throw std::runtime_error("Not implemented");
         }

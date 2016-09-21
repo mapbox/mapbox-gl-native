@@ -62,10 +62,12 @@ public abstract class Property<T> {
     //icon-rotation-alignment
     public static final String ICON_ROTATION_ALIGNMENT_MAP = "map";
     public static final String ICON_ROTATION_ALIGNMENT_VIEWPORT = "viewport";
+    public static final String ICON_ROTATION_ALIGNMENT_AUTO = "auto";
 
     @StringDef({
             ICON_ROTATION_ALIGNMENT_MAP,
             ICON_ROTATION_ALIGNMENT_VIEWPORT,
+            ICON_ROTATION_ALIGNMENT_AUTO,
         })
     @Retention(RetentionPolicy.SOURCE)
     public @interface ICON_ROTATION_ALIGNMENT {}
@@ -88,10 +90,12 @@ public abstract class Property<T> {
     //text-pitch-alignment
     public static final String TEXT_PITCH_ALIGNMENT_MAP = "map";
     public static final String TEXT_PITCH_ALIGNMENT_VIEWPORT = "viewport";
+    public static final String TEXT_PITCH_ALIGNMENT_AUTO = "auto";
 
     @StringDef({
             TEXT_PITCH_ALIGNMENT_MAP,
             TEXT_PITCH_ALIGNMENT_VIEWPORT,
+            TEXT_PITCH_ALIGNMENT_AUTO,
         })
     @Retention(RetentionPolicy.SOURCE)
     public @interface TEXT_PITCH_ALIGNMENT {}
@@ -99,10 +103,12 @@ public abstract class Property<T> {
     //text-rotation-alignment
     public static final String TEXT_ROTATION_ALIGNMENT_MAP = "map";
     public static final String TEXT_ROTATION_ALIGNMENT_VIEWPORT = "viewport";
+    public static final String TEXT_ROTATION_ALIGNMENT_AUTO = "auto";
 
     @StringDef({
             TEXT_ROTATION_ALIGNMENT_MAP,
             TEXT_ROTATION_ALIGNMENT_VIEWPORT,
+            TEXT_ROTATION_ALIGNMENT_AUTO,
         })
     @Retention(RetentionPolicy.SOURCE)
     public @interface TEXT_ROTATION_ALIGNMENT {}
