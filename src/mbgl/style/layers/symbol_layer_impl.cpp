@@ -35,9 +35,8 @@ std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(BucketParameters& 
     SymbolLayoutProperties layoutProperties = layout;
 
     CalculationParameters p(parameters.tileID.overscaledZ);
-    layoutProperties.symbolPlacement.calculate(p);
-   
-    layoutProperties.iconRotationAlignment.calculate(p);
+    layoutProperties.recalculate(p);
+
     if (layoutProperties.iconRotationAlignment.value == AlignmentType::Auto) {
         if (layoutProperties.symbolPlacement.value == SymbolPlacementType::Line) {
             layoutProperties.iconRotationAlignment.value = AlignmentType::Map;
@@ -46,7 +45,6 @@ std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(BucketParameters& 
         }
     }
 
-    layoutProperties.textRotationAlignment.calculate(p);
     if (layoutProperties.textRotationAlignment.value == AlignmentType::Auto) {
         if (layoutProperties.symbolPlacement.value == SymbolPlacementType::Line) {
             layoutProperties.textRotationAlignment.value = AlignmentType::Map;
@@ -56,12 +54,9 @@ std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(BucketParameters& 
     }
 
     // If unspecified `text-pitch-alignment` inherits `text-rotation-alignment`
-    layoutProperties.textPitchAlignment.calculate(p);
     if (layoutProperties.textPitchAlignment.value == AlignmentType::Auto) {
         layoutProperties.textPitchAlignment.value = layoutProperties.textRotationAlignment.value;
     }
-
-    layoutProperties.recalculate(p);
 
     layoutProperties.textSize.calculate(CalculationParameters(18));
     float textMaxSize = layoutProperties.textSize;
