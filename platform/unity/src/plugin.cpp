@@ -21,7 +21,7 @@ namespace {
 
 class UnityPluginView;
 
-enum SyncStatus : uint8_t {
+enum SyncStatus : uint16_t {
     Nothing    = 0,
     Token      = 1 << 1,
     Style      = 1 << 2,
@@ -30,6 +30,7 @@ enum SyncStatus : uint8_t {
     Pan        = 1 << 5,
     Coordinate = 1 << 6,
     Scale      = 1 << 7,
+    Texture    = 1 << 8,
     Everything = 255,
 };
 
@@ -192,6 +193,10 @@ void DoSyncState() {
     if (syncStatus & SyncStatus::Scale) {
         context.map->scaleBy(mapState.scale);
     }
+
+    if (syncStatus & SyncStatus::Texture) {
+        context.view->invalidate();
+    }
 }
 
 void DoRendering() {
@@ -246,6 +251,9 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetTextureFromUnity(v
     context.texture = reinterpret_cast<size_t>(handle);
     context.textureWidth = width;
     context.textureHeight = height;
+
+    std::lock_guard<std::mutex> lock(context.syncLock);
+    context.syncStatus = static_cast<SyncStatus>(context.syncStatus | SyncStatus::Texture);
 }
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetToken(const char *token) {
