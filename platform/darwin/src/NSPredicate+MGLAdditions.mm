@@ -76,11 +76,11 @@ public:
     }
     
     NSPredicate* operator()(mbgl::style::HasFilter filter) {
-        return [NSPredicate predicateWithFormat:@"%K == nil", @(filter.key.c_str())];
+        return [NSPredicate predicateWithFormat:@"%K != nil", @(filter.key.c_str())];
     }
     
     NSPredicate* operator()(mbgl::style::NotHasFilter filter) {
-        return [NSPredicate predicateWithFormat:@"%K != nil", @(filter.key.c_str())];
+        return [NSPredicate predicateWithFormat:@"%K == nil", @(filter.key.c_str())];
     }
     
 };

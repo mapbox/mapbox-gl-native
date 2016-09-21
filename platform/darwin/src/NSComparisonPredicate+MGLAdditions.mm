@@ -18,7 +18,7 @@
             }
             else
             {
-                auto filter = mbgl::style::HasFilter();
+                auto filter = mbgl::style::NotHasFilter();
                 filter.key = self.leftExpression.keyPath.UTF8String;
                 return filter;
             }
@@ -33,7 +33,7 @@
             }
             else
             {
-                auto filter = mbgl::style::NotHasFilter();
+                auto filter = mbgl::style::HasFilter();
                 filter.key = self.leftExpression.keyPath.UTF8String;
                 return filter;
             }

@@ -76,7 +76,7 @@
 
 - (void)testContainsPredicate
 {
-    // core does not have a "contains" filter but we can achieve the equivilant by creating an `mbgl::style::InFilter`
+    // core does not have a "contains" filter but we can achieve the equivalent by creating an `mbgl::style::InFilter`
     // and searching the value for the key
     NSPredicate *expectedPredicate = [NSPredicate predicateWithFormat:@"park IN %@", @[@"park", @"neighbourhood"]];
     NSPredicate *containsPredicate = [NSPredicate predicateWithFormat:@"%@ CONTAINS %@", @[@"park", @"neighbourhood"], @"park"];
@@ -88,10 +88,9 @@
 
 - (void)testBetweenPredicate
 {
-    // core does not have a "contains" filter but we can achieve the equivilant by creating a set of greater than or equal / less than or equal
+    // core does not have a "between" filter but we can achieve the equivalent by creating a set of greater than or equal / less than or equal
     // filters for the lower and upper bounds (inclusive)
-    NSPredicate *expectedPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[[NSPredicate predicateWithFormat:@"%K >= 2", @"stroke-width"],
-                                                                                          [NSPredicate predicateWithFormat:@"%K <= 3", @"stroke-width"]]];
+    NSPredicate *expectedPredicate = [NSCompoundPredicate predicateWithFormat:@"%K >= 2 AND %K <= 3", @"stroke-width", @"stroke-width"];
     NSPredicate *betweenPredicate = [NSPredicate predicateWithFormat:@"%K BETWEEN %@", @"stroke-width", @[@2.0, @3.0]];
     
     layer.predicate = betweenPredicate;
