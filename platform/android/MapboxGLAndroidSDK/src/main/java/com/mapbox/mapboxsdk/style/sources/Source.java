@@ -2,15 +2,38 @@ package com.mapbox.mapboxsdk.style.sources;
 
 import java.util.HashMap;
 
-public abstract class Source extends HashMap<String, Object> {
-    private final String id;
+/**
+ * Base Peer class for sources. see source.hpp for the other half of the peer.
+ */
+public abstract class Source {
+    private long nativePtr;
+    private boolean invalidated;
 
-    protected Source(String id, String type) {
-        this.put("type", type);
-        this.id = id;
+    public Source(long nativePtr) {
+        this.nativePtr = nativePtr;
+    }
+
+    public Source() {
     }
 
     public String getId() {
-        return id;
+        checkValidity();
+        return nativeGetId();
+    }
+
+    public long getNativePtr() {
+        return nativePtr;
+    }
+
+    protected native String nativeGetId();
+
+    protected void checkValidity() {
+        if (invalidated) {
+            throw new RuntimeException("Layer has been invalidated. Request a new reference after adding");
+        }
+    }
+
+    public final void invalidate() {
+        this.invalidated = true;
     }
 }

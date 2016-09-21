@@ -1,28 +1,46 @@
 #include "sources.hpp"
 
-#include "../value.hpp"
-#include "../android_conversion.hpp"
-#include "../android_geojson.hpp"
+#include <mbgl/style/source.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
 
-#include <mbgl/util/constants.hpp>
-#include <mbgl/style/conversion.hpp>
-#include <mbgl/style/conversion/source.hpp>
-
-#include <string>
+#include "source.hpp"
+#include "geojson_source.hpp"
+#include "raster_source.hpp"
+#include "vector_source.hpp"
 
 namespace mbgl {
 namespace android {
 
-    mbgl::optional<std::unique_ptr<mbgl::style::Source>> convertToNativeSource(jni::JNIEnv& env, jni::Object<jni::jobject> jvalue, jni::String id) {
-        using namespace mbgl::style;
-
-        Value value(env, jvalue);
-        conversion::Result<std::unique_ptr<Source>> source = conversion::convert<std::unique_ptr<Source>>(value, jni::Make<std::string>(env, id));
-        if (!source) {
-            mbgl::Log::Error(mbgl::Event::JNI, "Unable to add source: " + source.error().message);
-            return {};
-        }
-        return std::move(*source);
+Source* initializeSourcePeer(mbgl::Map& map, mbgl::style::Source& coreSource) {
+    Source* source;
+    if (coreSource.is<mbgl::style::VectorSource>()) {
+        source = new VectorSource(map, *coreSource.as<mbgl::style::VectorSource>());
+    } else if (coreSource.is<mbgl::style::RasterSource>()) {
+        source = new RasterSource(map, *coreSource.as<mbgl::style::RasterSource>());
+    } else if (coreSource.is<mbgl::style::GeoJSONSource>()) {
+        source = new GeoJSONSource(map, *coreSource.as<mbgl::style::GeoJSONSource>());
+    } else {
+        throw new std::runtime_error("Source type not implemented");
     }
+
+    return source;
+}
+
+jni::jobject* createJavaSourcePeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Source& coreSource) {
+    std::unique_ptr<Source> peerSource = std::unique_ptr<Source>(initializeSourcePeer(map, coreSource));
+    jni::jobject* result = peerSource->createJavaPeer(env);
+    peerSource.release();
+    return result;
+}
+
+void registerNativeSources(jni::JNIEnv& env) {
+    Source::registerNative(env);
+    VectorSource::registerNative(env);
+    RasterSource::registerNative(env);
+    GeoJSONSource::registerNative(env);
+}
+
 }
 }

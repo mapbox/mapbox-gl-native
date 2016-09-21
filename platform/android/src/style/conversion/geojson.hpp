@@ -1,6 +1,6 @@
 #pragma once
 
-#include "value.hpp"
+#include "../value.hpp"
 
 #include <mapbox/geojson.hpp>
 #include <mbgl/style/conversion.hpp>
@@ -42,6 +42,15 @@ Result<GeoJSON> convertGeoJSON(const mbgl::android::Value& value) {
 
     return geoJSON;
 }
+
+template <>
+struct Converter<GeoJSON> {
+
+    Result<GeoJSON> operator()(const mbgl::android::Value& value) const {
+        return convertGeoJSON(value);
+    }
+
+};
 
 } // namespace conversion
 } // namespace style

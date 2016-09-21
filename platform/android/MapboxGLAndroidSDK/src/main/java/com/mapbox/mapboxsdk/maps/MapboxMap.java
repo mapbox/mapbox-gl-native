@@ -152,6 +152,31 @@ public class MapboxMap {
         getMapView().getNativeMapView().removeLayer(layerId);
     }
 
+    @Nullable
+    @UiThread
+    public Source getSource(@NonNull String sourceId) {
+        return getMapView().getNativeMapView().getSource(sourceId);
+    }
+
+    /**
+     * Tries to cast the Source to T, returns null if it's another type.
+     *
+     * @param sourceId the id used to look up a layer
+     * @param <T>      the generic type of a Source
+     * @return the casted Source, null if another type
+     */
+    @Nullable
+    @UiThread
+    public <T extends Source> T getSourceAs(@NonNull String sourceId) {
+        try {
+            //noinspection unchecked
+            return (T) getMapView().getNativeMapView().getSource(sourceId);
+        } catch (ClassCastException e) {
+            Log.e(TAG, String.format("Source: %s is a different type: %s", sourceId, e.getMessage()));
+            return null;
+        }
+    }
+
     @UiThread
     public void addSource(@NonNull Source source) {
         getMapView().getNativeMapView().addSource(source);

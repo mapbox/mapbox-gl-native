@@ -1,14 +1,20 @@
 #pragma once
 
+#include <mbgl/map/map.hpp>
 #include <mbgl/style/source.hpp>
-#include <mbgl/util/optional.hpp>
+
+#include "source.hpp"
 
 #include <jni/jni.hpp>
 
 namespace mbgl {
 namespace android {
-
-    mbgl::optional<std::unique_ptr<mbgl::style::Source>> convertToNativeSource(jni::JNIEnv& env, jni::Object<jni::jobject> jsource, jni::String id);
+    
+    mbgl::android::Source* initializeSourcePeer(mbgl::Map&, mbgl::style::Source&);
+    
+    jni::jobject* createJavaSourcePeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Source&);
+    
+    void registerNativeSources(jni::JNIEnv&);
 
 }
 }

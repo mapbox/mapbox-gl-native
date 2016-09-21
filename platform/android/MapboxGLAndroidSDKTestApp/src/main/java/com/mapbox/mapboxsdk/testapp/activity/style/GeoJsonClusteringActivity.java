@@ -16,6 +16,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
 
@@ -110,10 +111,13 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
         //Add a clustered source
         try {
             mapboxMap.addSource(
-                    new GeoJsonSource("earthquakes", new URL("https://www.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"))
-                            .withCluster(true)
-                            .withClusterMaxZoom(14)
-                            .withClusterRadius(50)
+                    new GeoJsonSource("earthquakes",
+                            new URL("https://www.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"),
+                            new GeoJsonOptions()
+                                    .withCluster(true)
+                                    .withClusterMaxZoom(14)
+                                    .withClusterRadius(50)
+                    )
             );
         } catch (MalformedURLException malformedUrlException) {
             Log.e(TAG, "That's not an url... " + malformedUrlException.getMessage());

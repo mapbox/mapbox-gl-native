@@ -86,9 +86,10 @@ add_library(mapbox-gl SHARED
 
     # Style conversion Java -> C++
     platform/android/src/style/android_conversion.hpp
-    platform/android/src/style/android_geojson.hpp
+    platform/android/src/style/conversion/geojson.hpp
     platform/android/src/style/value.cpp
     platform/android/src/style/value.hpp
+    platform/android/src/style/conversion/url_or_tileset.hpp
 
     # Style
     platform/android/src/style/layers/background_layer.cpp
@@ -109,8 +110,16 @@ add_library(mapbox-gl SHARED
     platform/android/src/style/layers/raster_layer.hpp
     platform/android/src/style/layers/symbol_layer.cpp
     platform/android/src/style/layers/symbol_layer.hpp
+    platform/android/src/style/sources/geojson_source.cpp
+    platform/android/src/style/sources/geojson_source.hpp
+    platform/android/src/style/sources/source.cpp
+    platform/android/src/style/sources/source.hpp
     platform/android/src/style/sources/sources.cpp
     platform/android/src/style/sources/sources.hpp
+    platform/android/src/style/sources/raster_source.cpp
+    platform/android/src/style/sources/raster_source.hpp
+    platform/android/src/style/sources/vector_source.cpp
+    platform/android/src/style/sources/vector_source.hpp
 
     # Native map
     platform/android/src/native_map_view.cpp
