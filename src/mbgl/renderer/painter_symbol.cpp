@@ -94,8 +94,6 @@ void Painter::renderSDF(SymbolBucket& bucket,
         sdfShader.u_color = haloColor;
         sdfShader.u_opacity = opacity;
         sdfShader.u_buffer = (haloOffset - haloWidth / fontScale) / sdfPx;
-
-        setDepthSublayer(0);
         (bucket.*drawSDF)(sdfShader, store, paintMode());
     }
 
@@ -105,8 +103,6 @@ void Painter::renderSDF(SymbolBucket& bucket,
         sdfShader.u_color = color;
         sdfShader.u_opacity = opacity;
         sdfShader.u_buffer = (256.0f - 64.0f) / 256.0f;
-
-        setDepthSublayer(1);
         (bucket.*drawSDF)(sdfShader, store, paintMode());
     }
 }
@@ -140,6 +136,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
         config.stencilOp.reset();
         config.stencilTest = GL_TRUE;
     }
+
+    setDepthSublayer(0);
 
     if (bucket.hasIconData()) {
         if (layout.iconRotationAlignment == AlignmentType::Map) {
@@ -218,7 +216,6 @@ void Painter::renderSymbol(PaintParameters& parameters,
             frameHistory.bind(store, config, 1);
             iconShader.u_fadetexture = 1;
 
-            setDepthSublayer(0);
             bucket.drawIcons(iconShader, store, paintMode());
         }
     }
@@ -265,7 +262,6 @@ void Painter::renderSymbol(PaintParameters& parameters,
         collisionBoxShader.u_maxzoom = (tile.id.canonical.z + 1) * 10;
         config.lineWidth = 1.0f;
 
-        setDepthSublayer(0);
         bucket.drawCollisionBoxes(collisionBoxShader, store);
 
     }
