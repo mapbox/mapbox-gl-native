@@ -387,6 +387,10 @@ qtproj: $(MACOS_QT_PROJ_PATH)
 
 endif
 
+.PHONY: qt-lib
+qt-lib: $(QT_BUILD)
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QT_OUTPUT_PATH) qmapboxgl
+
 .PHONY: qt-app
 qt-app: $(QT_BUILD)
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-qt
