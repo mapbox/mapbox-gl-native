@@ -23,9 +23,7 @@ QQuickMapboxGL::~QQuickMapboxGL()
 
 QQuickFramebufferObject::Renderer *QQuickMapboxGL::createRenderer() const
 {
-    QQuickMapboxGLRenderer *renderer = new QQuickMapboxGLRenderer();
-    connect(renderer, SIGNAL(styleChanged()), this, SIGNAL(styleChanged()));
-    return renderer;
+    return new QQuickMapboxGLRenderer;
 }
 
 void QQuickMapboxGL::setPlugin(QDeclarativeGeoServiceProvider *)
@@ -199,6 +197,7 @@ void QQuickMapboxGL::setStyle(QQuickMapboxGLStyle *style)
     }
 
     m_syncState |= StyleNeedsSync;
+    m_styleLoaded = false;
     update();
 
     emit styleChanged();
@@ -251,24 +250,6 @@ qreal QQuickMapboxGL::pitch() const
     return m_pitch;
 }
 
-QPointF QQuickMapboxGL::swapPan()
-{
-    QPointF oldPan = m_pan;
-
-    m_pan = QPointF(0, 0);
-
-    return oldPan;
-}
-
-int QQuickMapboxGL::swapSyncState()
-{
-    int oldState = m_syncState;
-
-    m_syncState = NothingNeedsSync;
-
-    return oldState;
-}
-
 void QQuickMapboxGL::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
 {
     QQuickFramebufferObject::itemChange(change, value);
@@ -287,6 +268,14 @@ void QQuickMapboxGL::itemChange(QQuickItem::ItemChange change, const QQuickItem:
         }
     default:
         break;
+    }
+}
+
+void QQuickMapboxGL::onMapChanged(QMapbox::MapChange change)
+{
+    if (change == QMapbox::MapChangeDidFinishLoadingStyle) {
+        m_styleLoaded = true;
+        update();
     }
 }
 

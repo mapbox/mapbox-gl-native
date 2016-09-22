@@ -25,14 +25,9 @@ public:
 
 signals:
     void centerChanged(const QGeoCoordinate &);
-    void styleChanged();
-
-public slots:
-    void onMapChanged(QMapbox::MapChange);
 
 private:
     bool m_initialized = false;
-    bool m_styleLoaded = false;
 
     QScopedPointer<QMapboxGL> m_map;
 };

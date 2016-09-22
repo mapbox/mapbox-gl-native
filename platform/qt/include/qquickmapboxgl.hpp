@@ -8,10 +8,12 @@
 #include <QPointF>
 #include <QQuickFramebufferObject>
 
+#include <QMapbox>
 #include <QQuickMapboxGLStyle>
 
 class QDeclarativeGeoServiceProvider;
 class QQuickItem;
+class QQuickMapboxGLRenderer;
 
 class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
 {
@@ -71,9 +73,6 @@ public:
 
     Q_INVOKABLE void pan(int dx, int dy);
 
-    QList<QVariantMap>& layoutPropertyChanges() { return m_layoutChanges; }
-    QList<QVariantMap>& paintPropertyChanges() { return m_paintChanges; }
-
     // MapboxGL QML Type interface.
     void setStyle(QQuickMapboxGLStyle *);
     QQuickMapboxGLStyle* style() const;
@@ -84,8 +83,36 @@ public:
     void setPitch(qreal pitch);
     qreal pitch() const;
 
-    QPointF swapPan();
+protected:
+    // QQuickItem implementation.
+    virtual void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value);
 
+signals:
+    void minimumZoomLevelChanged();
+    void maximumZoomLevelChanged();
+    void zoomLevelChanged(qreal zoomLevel);
+    void centerChanged(const QGeoCoordinate &coordinate);
+    void colorChanged(const QColor &color);
+
+    // Compatibility with Map QML Type, but no-op.
+    void pluginChanged(QDeclarativeGeoServiceProvider *plugin);
+    void errorChanged();
+    void copyrightLinkActivated(const QString &link);
+    void copyrightsVisibleChanged(bool visible);
+
+    void styleChanged();
+    void bearingChanged(qreal angle);
+    void pitchChanged(qreal angle);
+
+public slots:
+    void setCenter(const QGeoCoordinate &center);
+
+private slots:
+    void onMapChanged(QMapbox::MapChange);
+    void onStyleChanged();
+    void onStylePropertyUpdated(const QVariantMap &params);
+
+private:
     enum SyncState {
         NothingNeedsSync = 0,
         ZoomNeedsSync    = 1 << 0,
@@ -96,42 +123,11 @@ public:
         PitchNeedsSync   = 1 << 5,
     };
 
-    int swapSyncState();
-
-protected:
-    // QQuickItem implementation.
-    virtual void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value);
-
-signals:
-    void minimumZoomLevelChanged();
-    void maximumZoomLevelChanged();
-    void zoomLevelChanged(qreal zoomLevel);
-    void centerChanged(const QGeoCoordinate &coordinate);
-
-    // Compatibility with Map QML Type, but no-op.
-    void pluginChanged(QDeclarativeGeoServiceProvider *plugin);
-    void errorChanged();
-    void copyrightLinkActivated(const QString &link);
-    void copyrightsVisibleChanged(bool visible);
-    void colorChanged(const QColor &color);
-
-    void styleChanged();
-    void bearingChanged(qreal angle);
-    void pitchChanged(qreal angle);
-
-public slots:
-    void setCenter(const QGeoCoordinate &center);
-
-private slots:
-    void onStyleChanged();
-    void onStylePropertyUpdated(const QVariantMap &params);
-
-private:
     qreal m_minimumZoomLevel = 0;
     qreal m_maximumZoomLevel = 20;
     qreal m_zoomLevel = 20;
 
-    QPointF m_pan = QPointF(0, 0);
+    QPointF m_pan;
 
     QGeoCoordinate m_center;
     QGeoShape m_visibleRegion;
@@ -144,6 +140,9 @@ private:
     qreal m_pitch = 0;
 
     int m_syncState = NothingNeedsSync;
+    bool m_styleLoaded = false;
+
+    friend class QQuickMapboxGLRenderer;
 };
 
 #endif // QQUICKMAPBOXGL_H
