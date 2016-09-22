@@ -18,14 +18,10 @@ set(MBGL_QT_LIBRARIES
 add_library(qmapboxgl SHARED
     platform/qt/include/qquickmapboxgl.hpp
     platform/qt/include/qquickmapboxglmapparameter.hpp
-    platform/qt/include/qquickmapboxglstyle.hpp
-    platform/qt/include/qquickmapboxglstyleproperty.hpp
     platform/qt/src/qquickmapboxgl.cpp
     platform/qt/src/qquickmapboxglmapparameter.cpp
     platform/qt/src/qquickmapboxglrenderer.cpp
     platform/qt/src/qquickmapboxglrenderer.hpp
-    platform/qt/src/qquickmapboxglstyle.cpp
-    platform/qt/src/qquickmapboxglstyleproperty.cpp
 )
 
 target_link_libraries(qmapboxgl

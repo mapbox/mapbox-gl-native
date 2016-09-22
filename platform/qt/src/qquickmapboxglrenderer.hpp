@@ -4,6 +4,7 @@
 #include <QQuickFramebufferObject>
 #include <QScopedPointer>
 
+#include <QMapbox>
 #include <QMapboxGL>
 
 class QGeoCoordinate;

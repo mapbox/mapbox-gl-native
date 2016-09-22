@@ -16,34 +16,13 @@ ApplicationWindow {
     ColorDialog {
         id: landColorDialog
         title: "Land color"
-        onCurrentColorChanged: { mapFront.color = currentColor }
+        color: "#e0ded8"
     }
 
     ColorDialog {
         id: waterColorDialog
         title: "Water color"
-        onCurrentColorChanged: { waterColor.value = currentColor }
-    }
-
-    MapboxLayoutStyleProperty {
-        parent: styleStreets
-        layer: "road-label-large"
-        property: "visibility"
-        value: roadLabel.checked ? "visible" : "none"
-    }
-
-    MapboxLayoutStyleProperty {
-        parent: styleStreets
-        layer: "road-label-medium"
-        property: "visibility"
-        value: roadLabel.checked ? "visible" : "none"
-    }
-
-    MapboxLayoutStyleProperty {
-        parent: styleStreets
-        layer: "road-label-small"
-        property: "visibility"
-        value: roadLabel.checked ? "visible" : "none"
+        color: "#63c5ee"
     }
 
     RowLayout {
@@ -75,10 +54,55 @@ ApplicationWindow {
                     anchors.fill: parent
                     visible: false
 
-                    style: MapboxStyle {
-                        id: styleStreets
-                        url: "mapbox://styles/mapbox/streets-v9"
-                    }
+                    parameters: [
+                        MapParameter {
+                            id: styleStreets
+                            property var type: "style"
+                            property var url: "mapbox://styles/mapbox/streets-v9"
+                        },
+                        MapParameter {
+                            property var type: "source"
+                            property var id: "testSource"
+                            property var sourceType: "geojson"
+                            property var data: ":source.geojson"
+                        },
+                        MapParameter {
+                            property var type: "layer"
+                            property var id: "testLayer"
+                            property var layerType: "fill"
+                            property var source: "testSource"
+                        },
+                        MapParameter {
+                            property var type: "paint"
+                            property var layer: "testLayer"
+                            property var fillColor: Qt.rgba(0, 0, 1, 1)
+                        },
+                        MapParameter {
+                            property var type: "paint"
+                            property var layer: "water"
+                            property var fillColor: waterColorDialog.color
+                        },
+                        MapParameter {
+                            property var type: "layout"
+                            property var layer: "road-label-large"
+                            property var visibility: roadLabel.checked ? "visible" : "none"
+                        },
+                        MapParameter {
+                            property var type: "layout"
+                            property var layer: "road-label-medium"
+                            property var visibility: roadLabel.checked ? "visible" : "none"
+                        },
+                        MapParameter {
+                            property var type: "layout"
+                            property var layer: "road-label-small"
+                            property var visibility: roadLabel.checked ? "visible" : "none"
+                        },
+                        MapParameter {
+                            property var type: "filter"
+                            property var layer: "road-label-small"
+                            property var filter: [ "==", "$type", "Point" ]
+                        }
+                    ]
 
                     center: QtPositioning.coordinate(60.170448, 24.942046) // Helsinki
                     zoomLevel: 14
@@ -90,12 +114,6 @@ ApplicationWindow {
 
                     color: landColorDialog.color
                     copyrightsVisible: true
-
-                    MapboxPaintStyleProperty {
-                        id: waterColor
-                        layer: "water"
-                        property: "fill-color"
-                    }
 
                     Image {
                         id: logo
@@ -162,10 +180,12 @@ ApplicationWindow {
                     anchors.fill: parent
                     visible: false
 
-                    style: MapboxStyle {
-                        id: styleSatellite
-                        url: "mapbox://styles/mapbox/satellite-streets-v9"
-                    }
+                    parameters: [
+                        MapParameter {
+                            property var type: "style"
+                            property var url: "mapbox://styles/mapbox/satellite-streets-v9"
+                        }
+                    ]
 
                     center: mapFront.center
                     zoomLevel: mapFront.zoomLevel

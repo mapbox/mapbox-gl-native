@@ -28,7 +28,6 @@ void QQuickMapboxGLMapParameter::componentComplete()
         QObject::connect(this, signalName, mapper, SLOT(map()));
         QObject::connect(mapper, SIGNAL(mapped(int)), this, SLOT(onPropertyUpdated(int)));
     }
-    emit propertiesReady();
 }
 
 void QQuickMapboxGLMapParameter::onPropertyUpdated(int index)

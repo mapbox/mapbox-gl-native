@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>source.geojson</file>
     </qresource>
 </RCC>

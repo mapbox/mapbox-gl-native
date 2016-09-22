@@ -18,7 +18,6 @@ public:
     int propertyOffset() const { return m_metaPropertyOffset; }
 
 signals:
-    void propertiesReady();
     void propertyUpdated(const QString &name);
 
 protected:
