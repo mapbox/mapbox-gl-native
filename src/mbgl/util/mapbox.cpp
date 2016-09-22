@@ -141,7 +141,6 @@ std::string normalizeTileURL(const std::string& baseURL, const std::string& url,
 }
 
 std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_t tileSize) {
-
     auto tilesetStartIdx = url.find("/v4/");
     if (tilesetStartIdx == std::string::npos) {
         return url;
@@ -190,11 +189,16 @@ std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_
     result += "." + extension;
 
     // get the query and remove access_token, if more parameters exist, add them to the final result
-    const auto query = normalizeQuery(url);
-    if (query.first.length() > query.second) {
-        auto queryIdx = ((query.first.at(query.second) == *"&") ? query.second + 1 : query.second);
-        auto subQuery = query.first.substr(queryIdx, std::string::npos);
-        result += "?" + subQuery;
+    if (queryIdx != url.length()) {
+        const auto query = url.substr(queryIdx);
+        // get access token index
+        const auto accessTokenIdx = (query.find("access_token") == 0) ? 0 : query.find("access_token") - 1; // if it's not the first param, grab the & as well
+        const auto accessTokenEndIdx = (accessTokenIdx == 0) ? query.find("&", accessTokenIdx) + 1 : query.find("&", accessTokenIdx);
+        if (query.length() > accessTokenEndIdx - accessTokenIdx) { // only keep going if there is more query to handle
+            auto subQuery = query.substr(0, accessTokenIdx);
+            if (accessTokenEndIdx != std::string::npos) subQuery += query.substr(accessTokenEndIdx, query.length());
+            result += "?" + subQuery;
+        }
     }
 
     return result;
