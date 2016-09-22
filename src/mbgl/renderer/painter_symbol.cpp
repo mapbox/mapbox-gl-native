@@ -67,7 +67,7 @@ void Painter::renderSDF(SymbolBucket& bucket,
     sdfShader.u_rotate_with_map = rotateWithMap;
     sdfShader.u_pitch_with_map = pitchWithMap;
     sdfShader.u_texture = 0;
-    sdfShader.u_pitch = state.getPitch() * util::DEG2RAD;
+    sdfShader.u_pitch = state.getPitch();
     sdfShader.u_bearing = -1.0f * state.getAngle();
     sdfShader.u_aspect_ratio = (state.getWidth() * 1.0f) / (state.getHeight() * 1.0f);
 
