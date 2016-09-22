@@ -141,6 +141,7 @@ std::string normalizeTileURL(const std::string& baseURL, const std::string& url,
 }
 
 std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_t tileSize) {
+
     auto tilesetStartIdx = url.find("/v4/");
     if (tilesetStartIdx == std::string::npos) {
         return url;
@@ -187,6 +188,15 @@ std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_
     }
 
     result += "." + extension;
+
+    // get the query and remove access_token, if more parameters exist, add them to the final result
+    const auto query = normalizeQuery(url);
+    if (query.first.length() > query.second) {
+        auto queryIdx = ((query.first.at(query.second) == *"&") ? query.second + 1 : query.second);
+        auto subQuery = query.first.substr(queryIdx, std::string::npos);
+        result += "?" + subQuery;
+    }
+
     return result;
 }
 
