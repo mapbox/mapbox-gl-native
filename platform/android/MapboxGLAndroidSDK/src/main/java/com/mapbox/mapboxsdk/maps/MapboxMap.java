@@ -368,6 +368,11 @@ public class MapboxMap {
      */
     @UiThread
     public final void moveCamera(CameraUpdate update, MapboxMap.CancelableCallback callback) {
+        // dismiss tracking, moving camera is equal to a gesture
+        if (!trackingSettings.isLocationTrackingDisabled()) {
+            mapView.resetTrackingModesIfRequired();
+        }
+
         cameraPosition = update.getCameraPosition(this);
         mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
         if (callback != null) {
@@ -433,6 +438,11 @@ public class MapboxMap {
     @UiThread
     public final void easeCamera(
       CameraUpdate update, int durationMs, boolean easingInterpolator, final MapboxMap.CancelableCallback callback) {
+        // dismiss tracking, moving camera is equal to a gesture
+        if (!trackingSettings.isLocationTrackingDisabled()) {
+            mapView.resetTrackingModesIfRequired();
+        }
+
         cameraPosition = update.getCameraPosition(this);
         mapView.easeTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
           cameraPosition.zoom, easingInterpolator, new CancelableCallback() {
@@ -521,6 +531,11 @@ public class MapboxMap {
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
+        // dismiss tracking, moving camera is equal to a gesture
+        if (!trackingSettings.isLocationTrackingDisabled() && trackingSettings.isDismissLocationTrackingOnGesture()) {
+            mapView.resetTrackingModesIfRequired();
+        }
+        
         cameraPosition = update.getCameraPosition(this);
         mapView.flyTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
           cameraPosition.zoom, new CancelableCallback() {
