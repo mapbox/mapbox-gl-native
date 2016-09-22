@@ -910,12 +910,11 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 - (void)mapViewDidFinishLoadingMap:(MGLMapView *)mapView
 {
-    
 #warning debug code
-   
     // Use raster tile URL templates directly (i.e. mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png)
     // This is Stamen's terrain
-    MGLTileSet *rasterTileSet = [[MGLTileSet alloc] initWithTileURLTemplates:@[@"http://a.tile.stamen.com/terrain-background/{z}/{x}/{y}.jpg"]];
+    
+    MGLTileSet *rasterTileSet = [[MGLTileSet alloc] initWithTileURLTemplates:@[@"http://a.tile.stamen.com/terrain-background/{z}/{x}/{y}.jpg"] minimumZoomLevel:10 maximumZoomLevel:22];
     MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithSourceIdentifier:@"raster-source" tileSize:256 tileSet:rasterTileSet];
     [self.mapView.style addSource:rasterSource];
     

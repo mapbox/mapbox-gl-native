@@ -13,15 +13,48 @@
     return self;
 }
 
-- (instancetype)initWithTileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates minimumZoomLevel:(NSNumber *)minimumZoomLevel maximumZoomLevel:(NSNumber *)maximumZoomLevel
+- (instancetype)initWithTileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates minimumZoomLevel:(NSUInteger)minimumZoomLevel maximumZoomLevel:(NSUInteger)maximumZoomLevel
 {
+    if (minimumZoomLevel > maximumZoomLevel)
+    {
+        [[NSException exceptionWithName:@"Invalid minimumZoomLevel"
+                                 reason:@"minimumZoomLevel must be less than maximumZoomLevel"
+                               userInfo:nil] raise];
+        return nil;
+    }
+    
     if (self = [super init])
     {
         _tileURLTemplates = tileURLTemplates;
-        _minimumZoomLevel = minimumZoomLevel;
-        _maximumZoomLevel = maximumZoomLevel;
+        _minimumZoomLevel = @(minimumZoomLevel);
+        _maximumZoomLevel = @(maximumZoomLevel);
     }
     return self;
+}
+
+- (void)setMinimumZoomLevel:(NSNumber *)minimumZoomLevel
+{
+    if (self.maximumZoomLevel && [minimumZoomLevel integerValue] > [self.maximumZoomLevel integerValue])
+    {
+        [[NSException exceptionWithName:@"Invalid minimumZoomLevel"
+                                 reason:@"minimumZoomLevel must be less than maximumZoomLevel"
+                               userInfo:nil] raise];
+        return;
+    }
+    
+    _minimumZoomLevel = minimumZoomLevel;
+}
+
+- (void)setMaximumZoomLevel:(NSNumber *)maximumZoomLevel
+{
+    if (self.maximumZoomLevel && [maximumZoomLevel integerValue] < [self.maximumZoomLevel integerValue])
+    {
+        [[NSException exceptionWithName:@"Invalid minimumZoomLevel"
+                                 reason:@"minimumZoomLevel must be less than maximumZoomLevel"
+                               userInfo:nil] raise];
+    }
+    
+    _maximumZoomLevel = maximumZoomLevel;
 }
 
 - (mbgl::Tileset)mbglTileset
