@@ -2,13 +2,17 @@
 
 #include <mbgl/util/constants.hpp>
 
+#include <QMapbox>
 #include <QQuickMapboxGL>
 #include <QQuickMapboxGLStyleProperty>
+#include <QQuickMapboxGLMapParameter>
 
 #include <QDebug>
 #include <QQuickItem>
+#include <QRegularExpression>
 #include <QString>
 #include <QtGlobal>
+#include <QQmlListProperty>
 
 #include <cmath>
 
@@ -299,4 +303,40 @@ void QQuickMapboxGL::onStyleChanged()
     update();
 
     emit styleChanged();
+}
+
+void QQuickMapboxGL::appendParameter(QQmlListProperty<QQuickMapboxGLMapParameter> *prop, QQuickMapboxGLMapParameter *param)
+{
+    QQuickMapboxGL *map = static_cast<QQuickMapboxGL *>(prop->object);
+    map->m_parameters.append(param);
+}
+
+int QQuickMapboxGL::countParameters(QQmlListProperty<QQuickMapboxGLMapParameter> *prop)
+{
+    QQuickMapboxGL *map = static_cast<QQuickMapboxGL *>(prop->object);
+    return map->m_parameters.count();
+}
+
+QQuickMapboxGLMapParameter *QQuickMapboxGL::parameterAt(QQmlListProperty<QQuickMapboxGLMapParameter> *prop, int index)
+{
+    QQuickMapboxGL *map = static_cast<QQuickMapboxGL *>(prop->object);
+    return map->m_parameters[index];
+}
+
+void QQuickMapboxGL::clearParameter(QQmlListProperty<QQuickMapboxGLMapParameter> *prop)
+{
+    QQuickMapboxGL *map = static_cast<QQuickMapboxGL *>(prop->object);
+    for (auto param : map->m_parameters) {
+    }
+    map->m_parameters.clear();
+}
+
+QQmlListProperty<QQuickMapboxGLMapParameter> QQuickMapboxGL::parameters()
+{
+    return QQmlListProperty<QQuickMapboxGLMapParameter>(this,
+            nullptr,
+            appendParameter,
+            countParameters,
+            parameterAt,
+            clearParameter);
 }
