@@ -802,8 +802,7 @@ void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& be
     impl->view.activate();
 
     impl->style->addLayer(std::move(layer), before);
-    impl->updateFlags |= Update::Classes;
-    impl->asyncUpdate.send();
+    update(Update::Classes);
 
     impl->view.deactivate();
 }
@@ -817,8 +816,7 @@ void Map::removeLayer(const std::string& id) {
     impl->view.activate();
 
     impl->style->removeLayer(id);
-    impl->updateFlags |= Update::Classes;
-    impl->asyncUpdate.send();
+    update(Update::Classes);
 
     impl->view.deactivate();
 }
