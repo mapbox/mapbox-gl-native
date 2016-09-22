@@ -24,7 +24,7 @@
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_add_dynamic_parks_layer"
-        android:title="Add a dynamic geojson source"
+        android:title="Add a dynamic GeoJSON source"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_remove_layer"
@@ -45,5 +45,17 @@
     <item
         android:id="@+id/action_add_custom_tiles"
         android:title="Custom tiles"
+        mapbox:showAsAction="never" />
+    <item
+        android:id="@+id/action_fill_filter"
+        android:title="Apply filtered fill"
+        mapbox:showAsAction="never" />
+    <item
+        android:id="@+id/action_line_filter"
+        android:title="Apply filtered line"
+        mapbox:showAsAction="never" />
+    <item
+        android:id="@+id/action_numeric_filter"
+        android:title="Apply numeric fill filter"
         mapbox:showAsAction="never" />
 </menu>
