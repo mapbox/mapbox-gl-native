@@ -112,7 +112,7 @@ global.propertyReqs = function (property, layoutPropertiesByName, type) {
 };
 
 global.parseColor = function (str) {
-    let m = str.match(/^#(\d\d)(\d\d)(\d\d)$/);
+    let m = str.match(/^#([0-9a-z]{2}])([0-9a-z]{2}])([0-9a-z]{2}])$/i);
     if (m) {
         return {
             r: parseInt(m[1], 16) / 255,
