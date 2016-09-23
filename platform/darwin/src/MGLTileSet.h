@@ -26,7 +26,7 @@ typedef NS_ENUM(NSUInteger, MGLTileSetScheme) {
  An `NSNumber` object containing an integer; specifies the minimum zoom level at 
  which the source will display tiles. The value should be in the range of 0 to 
  22. The default value is 0 and the source will use the default value
- if `minimumZoomLevel` is nil;
+ if `minimumZoomLevel` is nil.
  */
 @property (nonatomic, nullable) NSNumber *minimumZoomLevel;
 
@@ -34,18 +34,18 @@ typedef NS_ENUM(NSUInteger, MGLTileSetScheme) {
  An `NSNumber` object containing an integer; specifies the maximum zoom level at 
  which to display tiles. The value should be in the range of 0 to 22 and greater 
  than `minimumZoomLevel`. The default value is 22 and the source will use the 
- default value if `maximumZoomLevel` is nil;
+ default value if `maximumZoomLevel` is nil.
  */
 @property (nonatomic, nullable) NSNumber *maximumZoomLevel;
 
 /**
- An `NSString` object; Contains an attribution to be displayed when the map is 
- shown to a user. The default value is nil;
+ An `NSString` object that contains an attribution to be displayed when the map is
+ shown to a user. The default value is nil.
  */
 @property (nonatomic, copy, nullable) NSString *attribution;
 
 /**
- An `MGLTileSetScheme` value; Contains an enumeration (either 
+ An `MGLTileSetScheme` value that contains an enumeration (either
  `MGLTileSetSchemeXYZ` or `MGLTileSetSchemeTMS`) that influences the y direction 
  of the tile coordinates. The default is `MGLTileSetSchemeXYZ`.
  */

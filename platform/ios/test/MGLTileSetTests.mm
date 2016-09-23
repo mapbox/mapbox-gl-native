@@ -44,7 +44,7 @@
     XCTAssertEqual([tileSet mbglTileset].zoomRange.max, 2);
     
     // when the tile set has an attribution
-    tileSet.attribution = @"my tileset ©";
+    tileSet.attribution = @"my tileset © ©️🎈";
     
     // the attribution is reflected by the mbgl tileset
     XCTAssertEqual([tileSet mbglTileset].attribution, tileSet.attribution.UTF8String);
