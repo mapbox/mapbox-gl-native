@@ -3,6 +3,7 @@
 const fs = require('fs');
 const ejs = require('ejs');
 const spec = require('mapbox-gl-style-spec').latest;
+const colorParser = require('csscolorparser');
 
 const prefix = 'MGL';
 const suffix = 'StyleLayer';
@@ -112,25 +113,13 @@ global.propertyReqs = function (property, layoutPropertiesByName, type) {
 };
 
 global.parseColor = function (str) {
-    let m = str.match(/^#(\d\d)(\d\d)(\d\d)$/);
-    if (m) {
-        return {
-            r: parseInt(m[1], 16) / 255,
-            g: parseInt(m[2], 16) / 255,
-            b: parseInt(m[3], 16) / 255,
-            a: 1.0,
-        };
-    }
-    
-    m = str.match(/^rgba\(\s*([-\d.]+),\s*([-\d.]+),\s*([-\d.]+),\s*([\d.]+)\s*\)$/);
-    if (m) {
-        return {
-            r: parseFloat(m[1]) / 255,
-            g: parseFloat(m[2]) / 255,
-            b: parseFloat(m[3]) / 255,
-            a: parseFloat(m[4]),
-        };
-    }
+    let color = colorParser.parseCSSColor(str);
+    return {
+        r: color[0] / 255,
+        g: color[1] / 255,
+        b: color[2] / 255,
+        a: color[3],
+    };
 };
 
 global.describeValue = function (value, property, layerType) {
