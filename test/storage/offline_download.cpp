@@ -1,8 +1,10 @@
 #include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/test/fake_file_source.hpp>
 
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/offline_download.hpp>
+#include <mbgl/storage/http_file_source.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/compression.hpp>
@@ -238,6 +240,29 @@ TEST(OfflineDownload, Activate) {
     download.setState(OfflineRegionDownloadState::Active);
 
     test.loop.run();
+}
+
+TEST(OfflineDownload, DoesNotFloodTheFileSourceWithRequests) {
+    FakeFileSource fileSource;
+    OfflineTest test;
+    OfflineRegion region = test.createRegion();
+    OfflineDownload download(
+        region.getID(),
+        OfflineTilePyramidRegionDefinition("http://127.0.0.1:3000/style.json", LatLngBounds::world(), 0.0, 0.0, 1.0),
+        test.db, fileSource);
+
+    auto observer = std::make_unique<MockObserver>();
+
+    download.setObserver(std::move(observer));
+    download.setState(OfflineRegionDownloadState::Active);
+    test.loop.runOnce();
+
+    EXPECT_EQ(1u, fileSource.requests.size());
+
+    fileSource.respond(Resource::Kind::Style, test.response("style.json"));
+    test.loop.runOnce();
+
+    EXPECT_EQ(HTTPFileSource::maximumConcurrentRequests(), fileSource.requests.size());
 }
 
 TEST(OfflineDownload, GetStatusNoResources) {
