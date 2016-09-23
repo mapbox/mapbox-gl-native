@@ -742,7 +742,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The color of the circle.
+     * The fill color of the circle.
      *
      * @param value a int color value
      * @return property wrapper around String color
@@ -752,7 +752,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The color of the circle.
+     * The fill color of the circle.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -762,7 +762,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The color of the circle.
+     * The fill color of the circle.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -1282,7 +1282,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Orientation of icon when map is rotated. Aligns icon to the plane of the viewport when set to `viewport` or the plane of the map when set to `map`. Selecting `auto` defaults to `map` for line placement and `viewport` for symbol placement
+     * In combination with `symbol-placement`, determines the rotation behavior of icons. The value `viewport` produces icons whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbol-placement`. When `symbol-placement` is set to `point`, the value `map` produces icons whose x-axes are aligned east-west, and the value `auto` is equivalent to `viewport`. When `symbol-placement` is set to `line`, the value `map` produces icons whose x-axes are aligned with the line, and the value `auto` is equivalent to `map`.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1292,7 +1292,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Orientation of icon when map is rotated. Aligns icon to the plane of the viewport when set to `viewport` or the plane of the map when set to `map`. Selecting `auto` defaults to `map` for line placement and `viewport` for symbol placement
+     * In combination with `symbol-placement`, determines the rotation behavior of icons. The value `viewport` produces icons whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbol-placement`. When `symbol-placement` is set to `point`, the value `map` produces icons whose x-axes are aligned east-west, and the value `auto` is equivalent to `viewport`. When `symbol-placement` is set to `line`, the value `map` produces icons whose x-axes are aligned with the line, and the value `auto` is equivalent to `map`.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -1322,7 +1322,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Position and scale an icon by the its corresponding text.
+     * Scales the icon to fit around the associated text. The value `none` performs no scaling. The values `width` and `height` scale the x- or y-dimension, respectively, to fit the text's dimensions. The value `both` scales in both dimensions.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1332,7 +1332,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Position and scale an icon by the its corresponding text.
+     * Scales the icon to fit around the associated text. The value `none` performs no scaling. The values `width` and `height` scale the x- or y-dimension, respectively, to fit the text's dimensions. The value `both` scales in both dimensions.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -1342,7 +1342,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Size of padding area around the text-fit size in clockwise order: top, right, bottom, left.
+     * Size of the additional area added to dimensions determined by `icon-text-fix`, in clockwise order: top, right, bottom, left.
      *
      * @param value a Float[] value
      * @return property wrapper around Float[]
@@ -1352,7 +1352,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Size of padding area around the text-fit size in clockwise order: top, right, bottom, left.
+     * Size of the additional area added to dimensions determined by `icon-text-fix`, in clockwise order: top, right, bottom, left.
      *
      * @param function a wrapper function for Float[]
      * @return property wrapper around a Float[] function
@@ -1482,7 +1482,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Orientation of text when map is rotated. Aligns text to the plane of the viewport when set to `viewport` or the plane of the map when set to `map`. Selecting `auto` defaults to the plane of the `map` for line placement and the `viewport` for symbol placement.
+     * In combination with `symbol-placement`, determines the rotation behavior of the individual glyphs forming the text. The value `viewport` produces glyphs whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbol-placement`. When `symbol-placement` is set to `point`, the value `map` produces glyphs whose x-axes are aligned east-west, and the value `auto` is equivalent to `viewport`. When `symbol-placement` is set to `line`, the value `map` produces glyphs whose x-axes are aligned with the line at the point where each glyph is placed, and the value `auto` is equivalent to `map`.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1492,7 +1492,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Orientation of text when map is rotated. Aligns text to the plane of the viewport when set to `viewport` or the plane of the map when set to `map`. Selecting `auto` defaults to the plane of the `map` for line placement and the `viewport` for symbol placement.
+     * In combination with `symbol-placement`, determines the rotation behavior of the individual glyphs forming the text. The value `viewport` produces glyphs whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbol-placement`. When `symbol-placement` is set to `point`, the value `map` produces glyphs whose x-axes are aligned east-west, and the value `auto` is equivalent to `viewport`. When `symbol-placement` is set to `line`, the value `map` produces glyphs whose x-axes are aligned with the line at the point where each glyph is placed, and the value `auto` is equivalent to `map`.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function

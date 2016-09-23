@@ -132,7 +132,7 @@ public class CircleLayer extends Layer {
         return (PropertyValue<String>) new PropertyValue(nativeGetCircleColor());
     }
      /**
-     * The color of the circle.
+     * The fill color of the circle.
      *
      * @return int representation of a rgba string color
      * @throws RuntimeException thrown if property isn't a value

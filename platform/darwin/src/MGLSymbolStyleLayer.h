@@ -140,7 +140,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconOptional;
 
 /**
- Orientation of icon when map is rotated. Aligns icon to the plane of the viewport when set to `MGLSymbolStyleLayerIconRotationAlignmentViewport` or the plane of the map when set to `MGLSymbolStyleLayerIconRotationAlignmentMap`. Selecting `MGLSymbolStyleLayerIconRotationAlignmentAuto` defaults to `MGLSymbolStyleLayerIconRotationAlignmentMap` for line placement and `MGLSymbolStyleLayerIconRotationAlignmentViewport` for symbol placement
+ In combination with `symbolPlacement`, determines the rotation behavior of icons. The value `MGLSymbolStyleLayerIconRotationAlignmentViewport` produces icons whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbolPlacement`. When `symbolPlacement` is set to `point`, the value `MGLSymbolStyleLayerIconRotationAlignmentMap` produces icons whose x-axes are aligned east-west, and the value `MGLSymbolStyleLayerIconRotationAlignmentAuto` is equivalent to `MGLSymbolStyleLayerIconRotationAlignmentViewport`. When `symbolPlacement` is set to `line`, the value `MGLSymbolStyleLayerIconRotationAlignmentMap` produces icons whose x-axes are aligned with the line, and the value `MGLSymbolStyleLayerIconRotationAlignmentAuto` is equivalent to `MGLSymbolStyleLayerIconRotationAlignmentMap`.
  
  The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerIconRotationAlignmentAuto`. Set this property to `nil` to reset it to the default value.
  
@@ -158,7 +158,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconSize;
 
 /**
- Position and scale an icon by the its corresponding text.
+ Scales the icon to fit around the associated text. The value `MGLSymbolStyleLayerIconTextFitNone` performs no scaling. The values `MGLSymbolStyleLayerIconTextFitWidth` and `MGLSymbolStyleLayerIconTextFitHeight` scale the x- or y-dimension, respectively, to fit the text's dimensions. The value `MGLSymbolStyleLayerIconTextFitBoth` scales in both dimensions.
  
  The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerIconTextFitNone`. Set this property to `nil` to reset it to the default value.
  
@@ -167,7 +167,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconTextFit;
 
 /**
- Size of padding area around the text-fit size in clockwise order: top, right, bottom, left.
+ Size of the additional area added to dimensions determined by `iconTextFix`, in clockwise order: top, right, bottom, left.
 
  This property is measured in points.
  
@@ -232,7 +232,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textPitchAlignment;
 
 /**
- Orientation of text when map is rotated. Aligns text to the plane of the viewport when set to `MGLSymbolStyleLayerTextRotationAlignmentViewport` or the plane of the map when set to `MGLSymbolStyleLayerTextRotationAlignmentMap`. Selecting `MGLSymbolStyleLayerTextRotationAlignmentAuto` defaults to the plane of the `MGLSymbolStyleLayerTextRotationAlignmentMap` for line placement and the `MGLSymbolStyleLayerTextRotationAlignmentViewport` for symbol placement.
+ In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text. The value `MGLSymbolStyleLayerTextRotationAlignmentViewport` produces glyphs whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbolPlacement`. When `symbolPlacement` is set to `point`, the value `MGLSymbolStyleLayerTextRotationAlignmentMap` produces glyphs whose x-axes are aligned east-west, and the value `MGLSymbolStyleLayerTextRotationAlignmentAuto` is equivalent to `MGLSymbolStyleLayerTextRotationAlignmentViewport`. When `symbolPlacement` is set to `line`, the value `MGLSymbolStyleLayerTextRotationAlignmentMap` produces glyphs whose x-axes are aligned with the line at the point where each glyph is placed, and the value `MGLSymbolStyleLayerTextRotationAlignmentAuto` is equivalent to `MGLSymbolStyleLayerTextRotationAlignmentMap`.
  
  The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerTextRotationAlignmentAuto`. Set this property to `nil` to reset it to the default value.
  
