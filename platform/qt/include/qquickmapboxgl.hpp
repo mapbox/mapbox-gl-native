@@ -2,6 +2,7 @@
 #define QQUICKMAPBOXGL_H
 
 #include <QColor>
+#include <QImage>
 #include <QGeoCoordinate>
 #include <QGeoServiceProvider>
 #include <QGeoShape>
@@ -132,6 +133,11 @@ private:
         PitchNeedsSync   = 1 << 5,
     };
 
+    struct Image {
+        QString name;
+        QImage sprite;
+    };
+
     struct StyleProperty {
         enum Type {
             Paint = 0,
@@ -146,6 +152,7 @@ private:
     };
 
     void processMapParameter(QQuickMapboxGLMapParameter *);
+    bool parseImage(QQuickMapboxGLMapParameter *);
     bool parseStyle(QQuickMapboxGLMapParameter *);
     bool parseStyleProperty(QQuickMapboxGLMapParameter *, const QString &name);
     bool parseStyleLayer(QQuickMapboxGLMapParameter *);
@@ -162,6 +169,7 @@ private:
     QGeoShape m_visibleRegion;
     QColor m_color;
     QString m_styleUrl;
+    QList<Image> m_imageChanges;
     QList<StyleProperty> m_stylePropertyChanges;
     QList<QVariantMap> m_layerChanges;
     QList<QVariantMap> m_sourceChanges;

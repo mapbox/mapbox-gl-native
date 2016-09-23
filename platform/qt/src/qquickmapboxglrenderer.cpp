@@ -96,6 +96,11 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
     }
     quickMap->m_filterChanges.clear();
 
+    for (const auto& change : quickMap->m_imageChanges) {
+        m_map->addImage(change.name, change.sprite);
+    }
+    quickMap->m_imageChanges.clear();
+
     for (const auto& change : quickMap->m_stylePropertyChanges) {
         if (change.type == QQuickMapboxGL::StyleProperty::Paint) {
             m_map->setPaintProperty(change.layer, change.property, change.value, change.klass);
