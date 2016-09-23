@@ -615,7 +615,7 @@ void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &sprite)
 {
     if (sprite.isNull()) return;
 
-    d_ptr->mapObj->addAnnotationIcon(name.toStdString(), std::move(toSpriteImage(sprite)));
+    d_ptr->mapObj->addAnnotationIcon(name.toStdString(), toSpriteImage(sprite));
 }
 
 QPointF QMapboxGL::pixelForCoordinate(const Coordinate &coordinate_) const
