@@ -1,4 +1,9 @@
 #import "MGLSource.h"
+#import "MGLTypes.h"
+
+@class MGLTileSet;
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  A vector tile source. Tiles must be in Mapbox Vector Tile format.
@@ -9,6 +14,7 @@
 @interface MGLVectorSource : MGLSource
 
 @property (nonatomic, readonly, copy) NSURL *URL;
+@property (nonatomic, readonly, nullable) MGLTileSet *tileSet;
 
 /**
  Initializes and returns a vector source from a remote url.
@@ -20,4 +26,8 @@
  */
 - (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url;
 
+- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier tileSet:(MGLTileSet *)tileSet;
+
 @end
+
+NS_ASSUME_NONNULL_END

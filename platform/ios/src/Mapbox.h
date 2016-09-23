@@ -56,3 +56,4 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import "NSValue+MGLStyleAttributeAdditions.h"
 #import "NSString+MGLStyleAttributeAdditions.h"
 #import "NSArray+MGLStyleAttributeAdditions.h"
+#import "MGLTileSet.h"
