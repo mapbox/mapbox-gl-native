@@ -61,51 +61,122 @@ ApplicationWindow {
                             property var url: "mapbox://styles/mapbox/streets-v9"
                         },
                         MapParameter {
-                            property var type: "source"
-                            property var id: "testSource"
-                            property var sourceType: "geojson"
-                            property var data: ":source.geojson"
-                        },
-                        MapParameter {
-                            property var type: "layer"
-                            property var id: "testLayer"
-                            property var layerType: "fill"
-                            property var source: "testSource"
-                        },
-                        MapParameter {
-                            property var type: "paint"
-                            property var layer: "testLayer"
-                            property var fillColor: Qt.rgba(0, 0, 1, 1)
-                        },
-                        MapParameter {
+                            id: waterPaint
                             property var type: "paint"
                             property var layer: "water"
                             property var fillColor: waterColorDialog.color
                         },
                         MapParameter {
-                            property var type: "layout"
-                            property var layer: "road-label-large"
-                            property var visibility: roadLabel.checked ? "visible" : "none"
+                            property var type: "source"
+                            property var name: "routeSource"
+                            property var sourceType: "geojson"
+                            property var data: ":source.geojson"
+                        },
+                        MapParameter {
+                            property var type: "layer"
+                            property var name: "routeCase"
+                            property var layerType: "line"
+                            property var source: "routeSource"
+                        },
+                        MapParameter {
+                            property var type: "paint"
+                            property var layer: "routeCase"
+                            property var lineColor: "white"
+                            property var lineWidth: 20.0
                         },
                         MapParameter {
                             property var type: "layout"
-                            property var layer: "road-label-medium"
-                            property var visibility: roadLabel.checked ? "visible" : "none"
+                            property var layer: "routeCase"
+                            property var lineJoin: "round"
+                            property var lineCap: lineJoin
+                            property var visibility: toggleRoute.checked ? "visible" : "none"
+                        },
+                        MapParameter {
+                            property var type: "layer"
+                            property var name: "route"
+                            property var layerType: "line"
+                            property var source: "routeSource"
+                        },
+                        MapParameter {
+                            property var type: "paint"
+                            property var layer: "route"
+                            property var lineColor: "blue"
+                            property var lineWidth: 8.0
                         },
                         MapParameter {
                             property var type: "layout"
-                            property var layer: "road-label-small"
-                            property var visibility: roadLabel.checked ? "visible" : "none"
+                            property var layer: "route"
+                            property var lineJoin: "round"
+                            property var lineCap: "round"
+                            property var visibility: toggleRoute.checked ? "visible" : "none"
+                        },
+                        MapParameter {
+                            property var type: "image"
+                            property var name: "label-arrow"
+                            property var sprite: ":label-arrow.svg"
+                        },
+                        MapParameter {
+                            property var type: "image"
+                            property var name: "label-background"
+                            property var sprite: ":label-background.svg"
+                        },
+                        MapParameter {
+                            property var type: "layer"
+                            property var name: "markerArrow"
+                            property var layerType: "symbol"
+                            property var source: "routeSource"
+                        },
+                        MapParameter {
+                            property var type: "layout"
+                            property var layer: "markerArrow"
+                            property var iconImage: "label-arrow"
+                            property var iconSize: 0.5
+                            property var iconIgnorePlacement: true
+                            property var iconOffset: [ 0.0, -15.0 ]
+                            property var visibility: toggleRoute.checked ? "visible" : "none"
+                        },
+                        MapParameter {
+                            property var type: "layer"
+                            property var name: "markerBackground"
+                            property var layerType: "symbol"
+                            property var source: "routeSource"
+                        },
+                        MapParameter {
+                            property var type: "layout"
+                            property var layer: "markerBackground"
+                            property var iconImage: "label-background"
+                            property var textField: "{name}"
+                            property var iconTextFit: "both"
+                            property var iconIgnorePlacement: true
+                            property var textIgnorePlacement: true
+                            property var textAnchor: "left"
+                            property var textSize: 16.0
+                            property var textPadding: 0.0
+                            property var textLineHeight: 1.0
+                            property var textMaxWidth: 8.0
+                            property var iconTextFitPadding: [ 15.0, 10.0, 15.0, 10.0 ]
+                            property var textOffset: [ -0.5, -1.5 ]
+                            property var visibility: toggleRoute.checked ? "visible" : "none"
+                        },
+                        MapParameter {
+                            property var type: "paint"
+                            property var layer: "markerBackground"
+                            property var textColor: "white"
                         },
                         MapParameter {
                             property var type: "filter"
-                            property var layer: "road-label-small"
+                            property var layer: "markerArrow"
+                            property var filter: [ "==", "$type", "Point" ]
+                        },
+                        MapParameter {
+                            property var type: "filter"
+                            property var layer: "markerBackground"
                             property var filter: [ "==", "$type", "Point" ]
                         }
                     ]
 
                     center: QtPositioning.coordinate(60.170448, 24.942046) // Helsinki
-                    zoomLevel: 14
+                    zoomLevel: 12.25
                     minimumZoomLevel: 0
                     maximumZoomLevel: 20
 
@@ -306,22 +377,41 @@ ApplicationWindow {
             Button {
                 anchors.left: parent.left
                 anchors.right: parent.right
+                text: "Streets style"
+                onClicked: {
+                    styleStreets.url = "mapbox://styles/mapbox/streets-v9"
+                    landColorDialog.color = "#e0ded8"
+                    waterColorDialog.color = "#63c5ee"
+                }
+            }
+
+            Button {
+                anchors.left: parent.left
+                anchors.right: parent.right
                 text: "Light style"
-                onClicked: { styleStreets.url = "mapbox://styles/mapbox/light-v9" }
+                onClicked: {
+                    styleStreets.url = "mapbox://styles/mapbox/light-v9"
+                    landColorDialog.color = "#f6f6f4"
+                    waterColorDialog.color = "#cad2d3"
+                }
             }
 
             Button {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: "Dark style"
-                onClicked: { styleStreets.url = "mapbox://styles/mapbox/dark-v9" }
+                onClicked: {
+                    styleStreets.url = "mapbox://styles/mapbox/dark-v9"
+                    landColorDialog.color = "#343332"
+                    waterColorDialog.color = "#191a1a"
+                }
             }
 
             CheckBox {
-                id: roadLabel
+                id: toggleRoute
                 anchors.left: parent.left
                 anchors.right: parent.right
-                text: "Toggle road label"
+                text: "Toggle route"
                 checked: true
             }
         }

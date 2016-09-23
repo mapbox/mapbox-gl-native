@@ -43,6 +43,7 @@ target_link_libraries(mbgl-qt
 add_executable(mbgl-qt-qml
     platform/qt/qmlapp/main.cpp
     platform/qt/qmlapp/qml.qrc
+    platform/qt/resources/common.qrc
 )
 
 target_link_libraries(mbgl-qt-qml
