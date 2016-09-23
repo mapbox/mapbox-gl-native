@@ -2,6 +2,7 @@
 
 #include <mbgl/storage/file_source.hpp>
 
+#include <algorithm>
 #include <list>
 
 namespace mbgl {
