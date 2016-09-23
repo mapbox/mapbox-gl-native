@@ -58,6 +58,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingBuildings,
     MBXSettingsRuntimeStylingFerry,
     MBXSettingsRuntimeStylingParks,
+    MBXSettingsRuntimeStylingFilteredFill,
+    MBXSettingsRuntimeStylingFilteredLines,
+    MBXSettingsRuntimeStylingNumericFilteredFill,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
@@ -290,14 +293,17 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             break;
         case MBXSettingsRuntimeStyling:
             [settingsTitles addObjectsFromArray:@[
-                @"Apply Water Functions",
-                @"Apply Road Line Functions",
-                @"Create Raster & Apply Function",
-                @"Create GeoJSON & Apply Fill",
-                @"Apply Symbol Color",
-                @"Apply Building Fill Color",
-                @"Apply Ferry Line Color",
-                @"Remove Park Layer",
+                @"Style Water With Function",
+                @"Style Roads With Function",
+                @"Add Raster & Apply Function",
+                @"Add GeoJSON & Apply Fill",
+                @"Style Symbol Color",
+                @"Style Building Fill Color",
+                @"Style Ferry Line Color",
+                @"Remove Parks",
+                @"Style Fill With Filter",
+                @"Style Lines With Filter",
+                @"Style Fill With Numeric Filter",
             ]];
             break;
         case MBXSettingsMiscellaneous:
@@ -413,6 +419,15 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingParks:
                     [self removeParkLayer];
+                    break;
+                case MBXSettingsRuntimeStylingFilteredFill:
+                    [self styleFilteredFill];
+                    break;
+                case MBXSettingsRuntimeStylingFilteredLines:
+                    [self styleFilteredLines];
+                    break;
+                case MBXSettingsRuntimeStylingNumericFilteredFill:
+                    [self styleNumericFilteredFills];
                     break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
@@ -707,6 +722,67 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 {
     MGLFillStyleLayer *parkLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"park"];
     [self.mapView.style removeLayer:parkLayer];
+}
+
+- (void)styleFilteredFill
+{
+    // set style and focus on Texas
+    [self.mapView setStyleURL:[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"fill_filter_style" ofType:@"json"]]];
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(31, -100) zoomLevel:3 animated:NO];
+
+    // after slight delay, fill in Texas (atypical use; we want to clearly see the change for test purposes)
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^
+    {
+        MGLFillStyleLayer *statesLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"states"];
+
+        // filter
+        statesLayer.predicate = [NSPredicate predicateWithFormat:@"name == 'Texas'"];
+
+        // paint properties
+        statesLayer.fillColor = [UIColor redColor];
+        statesLayer.fillOpacity = @(0.25);
+    });
+}
+
+- (void)styleFilteredLines
+{
+    // set style and focus on lower 48
+    [self.mapView setStyleURL:[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"line_filter_style" ofType:@"json"]]];
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(40, -97) zoomLevel:5 animated:NO];
+
+    // after slight delay, change styling for all Washington-named counties  (atypical use; we want to clearly see the change for test purposes)
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^
+    {
+        MGLLineStyleLayer *countiesLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"counties"];
+
+        // filter
+        countiesLayer.predicate = [NSPredicate predicateWithFormat:@"NAME10 == 'Washington'"];
+
+        // paint properties
+        countiesLayer.lineColor = [UIColor redColor];
+        countiesLayer.lineOpacity = @(0.75);
+        countiesLayer.lineWidth = @(5);
+    });
+}
+
+- (void)styleNumericFilteredFills
+{
+    // set style and focus on lower 48
+    [self.mapView setStyleURL:[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"numeric_filter_style" ofType:@"json"]]];
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(40, -97) zoomLevel:5 animated:NO];
+
+    // after slight delay, change styling for regions 200-299 (atypical use; we want to clearly see the change for test purposes)
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^
+    {
+        MGLFillStyleLayer *regionsLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"regions"];
+
+        // filter (testing both inline and format strings)
+        regionsLayer.predicate = [NSPredicate predicateWithFormat:@"HRRNUM >= %@ AND HRRNUM < 300", @(200)];
+
+        // paint properties
+        regionsLayer.fillColor = [UIColor blueColor];
+        regionsLayer.fillOpacity = @(0.5);
+    });
 }
 
 - (IBAction)startWorldTour
