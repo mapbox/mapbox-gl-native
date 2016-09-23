@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/color_lab.hpp>
 
 #include <string>
 
@@ -13,6 +14,8 @@ public:
     float g = 0.0f;
     float b = 0.0f;
     float a = 0.0f;
+
+    optional<ColorLAB> to_lab();
 
     static constexpr Color black() { return { 0.0f, 0.0f, 0.0f, 1.0f }; };
     static constexpr Color white() { return { 1.0f, 1.0f, 1.0f, 1.0f }; };

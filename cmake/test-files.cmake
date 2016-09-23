@@ -95,6 +95,7 @@ set(MBGL_TEST_FILES
 
     # util
     test/util/async_task.test.cpp
+    test/util/color.cpp
     test/util/geo.test.cpp
     test/util/http_timeout.test.cpp
     test/util/image.test.cpp
