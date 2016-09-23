@@ -44,14 +44,14 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
 
 #if TARGET_OS_IPHONE
 /**
- The color of the circle.
+ The fill color of the circle.
  
  The default value of this property is `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleColor;
 #else
 /**
- The color of the circle.
+ The fill color of the circle.
  
  The default value of this property is `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
  */

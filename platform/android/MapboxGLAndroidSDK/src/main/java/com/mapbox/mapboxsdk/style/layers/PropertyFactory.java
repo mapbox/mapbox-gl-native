@@ -742,7 +742,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The color of the circle.
+     * The fill color of the circle.
      *
      * @param value a int color value
      * @return property wrapper around String color
@@ -752,7 +752,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The color of the circle.
+     * The fill color of the circle.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -762,7 +762,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The color of the circle.
+     * The fill color of the circle.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
