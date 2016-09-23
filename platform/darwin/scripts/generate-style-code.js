@@ -107,7 +107,7 @@ global.propertyReqs = function (property, layoutPropertiesByName, type) {
             return '`' + camelizeWithLeadingLowercase(req['!']) + '` is set to `nil`';
         } else {
             let name = Object.keys(req)[0];
-            return '`' + camelizeWithLeadingLowercase(name) + '` is set to ' + describeValue(req[Object.keys(req)[0]], layoutPropertiesByName[name], type);
+            return '`' + camelizeWithLeadingLowercase(name) + '` is set to ' + describeValue(req[name], layoutPropertiesByName[name], type);
         }
     }).join(', and ') + '. Otherwise, it is ignored.';
 };
@@ -131,8 +131,21 @@ global.describeValue = function (value, property, layerType) {
         case 'string':
             return 'the string `' + value + '`';
         case 'enum':
-            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            return 'an `NSValue` object containing `' + `${objCType}${camelize(value)}` + '`';
+            let displayValue;
+            if (Array.isArray(value)) {
+              let separator = (value.length === 2) ? ' ' : ', ';
+              displayValue = value.map((possibleValue, i) => {
+                let conjunction = '';
+                if (value.length === 2 && i === 0) conjunction = 'either ';
+                if (i === value.length - 1) conjunction = 'or ';
+                let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+                return `${conjunction}\`${objCType}${camelize(possibleValue)}\``;
+              }).join(separator);
+            } else {
+              let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+              displayValue = `\`${objCType}${camelize(value)}\``;
+            }
+            return `an \`NSValue\` object containing ${displayValue}`;
         case 'color':
             let color = parseColor(value);
             if (!color) {
@@ -182,14 +195,14 @@ global.initLayerIdentifierOnly = function (layerType) {
 
 global.initLayer = function (layerType) {
     if (layerType == "background") {
-       return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String);` 
+       return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String);`
     } else {
         return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String, source.sourceIdentifier.UTF8String);`
     }
 }
 
 global.initLayerWithSourceLayer = function(layerType) {
-    return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String, source.sourceIdentifier.UTF8String);`  
+    return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String, source.sourceIdentifier.UTF8String);`
 }
 
 global.setSourceLayer = function() {
