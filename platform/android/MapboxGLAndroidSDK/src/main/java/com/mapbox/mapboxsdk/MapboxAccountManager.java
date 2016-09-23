@@ -101,4 +101,12 @@ public class MapboxAccountManager {
         return (activeNetwork != null && activeNetwork.isConnected());
     }
 
+    /**
+     * Not public API
+     * @return the Application Context
+     */
+    public Context getApplicationContext() {
+        return applicationContext;
+    }
+
 }

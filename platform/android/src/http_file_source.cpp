@@ -83,12 +83,11 @@ HTTPRequest::HTTPRequest(jni::JNIEnv& env, const Resource& resource_, FileSource
     jni::UniqueLocalFrame frame = jni::PushLocalFrame(env, 10);
 
     static auto constructor =
-        javaClass.GetConstructor<jni::jlong, jni::String, jni::String, jni::String, jni::String>(env);
+        javaClass.GetConstructor<jni::jlong, jni::String, jni::String, jni::String>(env);
 
     javaRequest = javaClass.New(env, constructor,
         reinterpret_cast<jlong>(this),
         jni::Make<jni::String>(env, resource.url),
-        jni::Make<jni::String>(env, "MapboxGL/1.0"),
         jni::Make<jni::String>(env, etagStr),
         jni::Make<jni::String>(env, modifiedStr)).NewGlobalRef(env);
 }
