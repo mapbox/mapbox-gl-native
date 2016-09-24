@@ -520,7 +520,7 @@ void Style::onLayerFilterChanged(Layer& layer) {
 
 void Style::onLayerVisibilityChanged(Layer& layer) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
-    observer->onUpdate(Update::Layout);
+    observer->onUpdate(Update::RecalculateStyle | Update::Layout);
 }
 
 void Style::onLayerPaintPropertyChanged(Layer&) {

@@ -3,6 +3,7 @@
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/source_impl.hpp>
+#include <mbgl/style/layer.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -25,13 +26,25 @@ TEST(Style, UnusedSource) {
     style.cascade(now, MapMode::Still);
     style.recalculate(0, now, MapMode::Still);
 
-    Source *usedSource = style.getSource("usedsource");
+    Source* usedSource = style.getSource("usedsource");
     EXPECT_TRUE(usedSource);
     EXPECT_TRUE(usedSource->baseImpl->isLoaded());
 
-    Source *unusedSource = style.getSource("unusedsource");
+    Source* unusedSource = style.getSource("unusedsource");
     EXPECT_TRUE(unusedSource);
     EXPECT_FALSE(unusedSource->baseImpl->isLoaded());
+
+    Layer* unusedLayer = style.getLayer("unusedlayervisibility");
+    EXPECT_TRUE(unusedLayer);
+
+    unusedLayer->setVisibility(mbgl::style::VisibilityType::Visible);
+
+    style.relayout();
+    EXPECT_FALSE(unusedSource->baseImpl->isLoaded());
+
+    // Style loads sources upon request when recalculating style.
+    style.recalculate(0, now, MapMode::Still);
+    EXPECT_TRUE(unusedSource->baseImpl->isLoaded());
 }
 
 TEST(Style, UnusedSourceActiveViaClassUpdate) {
