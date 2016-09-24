@@ -3,6 +3,7 @@
 
 #import "MGLStyleAttributeValue.h"
 #import "MGLVectorStyleLayer.h"
+#import "MGLStyleAttributeFunction.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -84,7 +85,7 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
  
  The default value of this property is an `NSValue` object containing `MGLLineJoinMiter`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineJoin;
+@property (nonatomic, null_resettable) MGLStyleValue <NSValue *> *lineJoin;
 
 /**
  Used to automatically convert miter joins to bevel joins for sharp angles.
@@ -93,7 +94,7 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
  
  This property is only applied to the style if `lineJoin` is set to an `NSValue` object containing `MGLLineJoinMiter`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineMiterLimit;
+@property (nonatomic, null_resettable) MGLStyleValue <NSNumber *> *lineMiterLimit;
 
 /**
  Used to automatically convert round joins to miter joins for shallow angles.

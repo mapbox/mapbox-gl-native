@@ -56,20 +56,24 @@
     MGLGetEnumProperty(LineCap, LineCapType, MGLLineCap);
 }
 
-- (void)setLineJoin:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineJoin {
-    MGLSetEnumProperty(lineJoin, LineJoin, LineJoinType, MGLLineJoin);
+- (void)setLineJoin:(MGLStyleValue <NSValue *> *)lineJoin {
+    auto propertyValue = MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *>().toPropertyValue(lineJoin);
+    self.layer->setLineJoin(propertyValue);
 }
 
-- (id <MGLStyleAttributeValue>)lineJoin {
-    MGLGetEnumProperty(LineJoin, LineJoinType, MGLLineJoin);
+- (MGLStyleValue <NSValue *> *)lineJoin {
+    auto propertyValue = self.layer->getLineJoin() ?: self.layer->getDefaultLineJoin();
+    return MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *>().toStyleValue(propertyValue);
 }
 
-- (void)setLineMiterLimit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineMiterLimit {
-    self.layer->setLineMiterLimit(lineMiterLimit.mbgl_floatPropertyValue);
+- (void)setLineMiterLimit:(MGLStyleValue <NSNumber *> *)lineMiterLimit {
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineMiterLimit);
+    self.layer->setLineMiterLimit(mbglValue);
 }
 
-- (id <MGLStyleAttributeValue>)lineMiterLimit {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getLineMiterLimit() ?: self.layer->getDefaultLineMiterLimit()];
+- (MGLStyleValue <NSNumber *> *)lineMiterLimit {
+    auto propertyValue = self.layer->getLineMiterLimit() ?: self.layer->getDefaultLineMiterLimit();
+    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
 - (void)setLineRoundLimit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineRoundLimit {
