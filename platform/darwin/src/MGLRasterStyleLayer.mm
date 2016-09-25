@@ -4,7 +4,7 @@
 #import "MGLSource.h"
 #import "NSPredicate+MGLAdditions.h"
 #import "MGLStyleLayer_Private.h"
-#import "MGLStyleAttributeValue.h"
+#import "MGLStyleValue_Private.h"
 #import "MGLRasterStyleLayer.h"
 
 #include <mbgl/style/layers/raster_layer.hpp>
@@ -27,60 +27,74 @@
 
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setRasterOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)rasterOpacity {
-    self.layer->setRasterOpacity(rasterOpacity.mbgl_floatPropertyValue);
+- (void)setRasterOpacity:(MGLStyleValue<NSNumber *> *)rasterOpacity {
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(rasterOpacity);
+    self.layer->setRasterOpacity(mbglValue);
 }
 
-- (id <MGLStyleAttributeValue>)rasterOpacity {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getRasterOpacity() ?: self.layer->getDefaultRasterOpacity()];
+- (MGLStyleValue<NSNumber *> *)rasterOpacity {
+    auto propertyValue = self.layer->getRasterOpacity() ?: self.layer->getDefaultRasterOpacity();
+    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-- (void)setRasterHueRotate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)rasterHueRotate {
-    self.layer->setRasterHueRotate(rasterHueRotate.mbgl_floatPropertyValue);
+- (void)setRasterHueRotate:(MGLStyleValue<NSNumber *> *)rasterHueRotate {
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(rasterHueRotate);
+    self.layer->setRasterHueRotate(mbglValue);
 }
 
-- (id <MGLStyleAttributeValue>)rasterHueRotate {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getRasterHueRotate() ?: self.layer->getDefaultRasterHueRotate()];
+- (MGLStyleValue<NSNumber *> *)rasterHueRotate {
+    auto propertyValue = self.layer->getRasterHueRotate() ?: self.layer->getDefaultRasterHueRotate();
+    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-- (void)setRasterBrightnessMin:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)rasterBrightnessMin {
-    self.layer->setRasterBrightnessMin(rasterBrightnessMin.mbgl_floatPropertyValue);
+- (void)setRasterBrightnessMin:(MGLStyleValue<NSNumber *> *)rasterBrightnessMin {
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(rasterBrightnessMin);
+    self.layer->setRasterBrightnessMin(mbglValue);
 }
 
-- (id <MGLStyleAttributeValue>)rasterBrightnessMin {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getRasterBrightnessMin() ?: self.layer->getDefaultRasterBrightnessMin()];
+- (MGLStyleValue<NSNumber *> *)rasterBrightnessMin {
+    auto propertyValue = self.layer->getRasterBrightnessMin() ?: self.layer->getDefaultRasterBrightnessMin();
+    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-- (void)setRasterBrightnessMax:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)rasterBrightnessMax {
-    self.layer->setRasterBrightnessMax(rasterBrightnessMax.mbgl_floatPropertyValue);
+- (void)setRasterBrightnessMax:(MGLStyleValue<NSNumber *> *)rasterBrightnessMax {
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(rasterBrightnessMax);
+    self.layer->setRasterBrightnessMax(mbglValue);
 }
 
-- (id <MGLStyleAttributeValue>)rasterBrightnessMax {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getRasterBrightnessMax() ?: self.layer->getDefaultRasterBrightnessMax()];
+- (MGLStyleValue<NSNumber *> *)rasterBrightnessMax {
+    auto propertyValue = self.layer->getRasterBrightnessMax() ?: self.layer->getDefaultRasterBrightnessMax();
+    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-- (void)setRasterSaturation:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)rasterSaturation {
-    self.layer->setRasterSaturation(rasterSaturation.mbgl_floatPropertyValue);
+- (void)setRasterSaturation:(MGLStyleValue<NSNumber *> *)rasterSaturation {
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(rasterSaturation);
+    self.layer->setRasterSaturation(mbglValue);
 }
 
-- (id <MGLStyleAttributeValue>)rasterSaturation {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getRasterSaturation() ?: self.layer->getDefaultRasterSaturation()];
+- (MGLStyleValue<NSNumber *> *)rasterSaturation {
+    auto propertyValue = self.layer->getRasterSaturation() ?: self.layer->getDefaultRasterSaturation();
+    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-- (void)setRasterContrast:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)rasterContrast {
-    self.layer->setRasterContrast(rasterContrast.mbgl_floatPropertyValue);
+- (void)setRasterContrast:(MGLStyleValue<NSNumber *> *)rasterContrast {
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(rasterContrast);
+    self.layer->setRasterContrast(mbglValue);
 }
 
-- (id <MGLStyleAttributeValue>)rasterContrast {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getRasterContrast() ?: self.layer->getDefaultRasterContrast()];
+- (MGLStyleValue<NSNumber *> *)rasterContrast {
+    auto propertyValue = self.layer->getRasterContrast() ?: self.layer->getDefaultRasterContrast();
+    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-- (void)setRasterFadeDuration:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)rasterFadeDuration {
-    self.layer->setRasterFadeDuration(rasterFadeDuration.mbgl_floatPropertyValue);
+- (void)setRasterFadeDuration:(MGLStyleValue<NSNumber *> *)rasterFadeDuration {
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(rasterFadeDuration);
+    self.layer->setRasterFadeDuration(mbglValue);
 }
 
-- (id <MGLStyleAttributeValue>)rasterFadeDuration {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getRasterFadeDuration() ?: self.layer->getDefaultRasterFadeDuration()];
+- (MGLStyleValue<NSNumber *> *)rasterFadeDuration {
+    auto propertyValue = self.layer->getRasterFadeDuration() ?: self.layer->getDefaultRasterFadeDuration();
+    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
 @end

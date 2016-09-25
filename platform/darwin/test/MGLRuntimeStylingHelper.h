@@ -1,35 +1,35 @@
 #import <Foundation/Foundation.h>
 
 #import "MGLTypes.h"
-#import "MGLStyleAttributeFunction.h"
+#import "MGLStyleValue.h"
 
 @interface MGLRuntimeStylingHelper : NSObject
 
-+ (NSArray *)testPadding;
-+ (MGLStyleAttributeFunction *)testPaddingFunction;
++ (MGLStyleConstantValue<NSValue *> *)testPadding;
++ (MGLStyleFunction<NSValue *> *)testPaddingFunction;
 
-+ (NSArray *)testOffset;
-+ (MGLStyleAttributeFunction *)testOffsetFunction;
++ (MGLStyleConstantValue<NSValue *> *)testOffset;
++ (MGLStyleFunction<NSValue *> *)testOffsetFunction;
 
-+ (NSArray *)testFont;
-+ (MGLStyleAttributeFunction *)testFontFunction;
++ (MGLStyleConstantValue<NSArray<NSString *> *> *)testFont;
++ (MGLStyleFunction<NSArray<NSString *> *> *)testFontFunction;
 
-+ (NSArray *)testDashArray;
-+ (MGLStyleAttributeFunction *)testDashArrayFunction;
++ (MGLStyleConstantValue<NSArray<NSNumber *> *> *)testDashArray;
++ (MGLStyleFunction<NSArray<NSNumber *> *> *)testDashArrayFunction;
 
-+ (NSNumber *)testNumber;
-+ (MGLStyleAttributeFunction *)testNumberFunction;
++ (MGLStyleConstantValue<NSNumber *> *)testNumber;
++ (MGLStyleFunction<NSNumber *> *)testNumberFunction;
 
-+ (NSNumber *)testBool;
-+ (MGLStyleAttributeFunction *)testBoolFunction;
++ (MGLStyleConstantValue<NSNumber *> *)testBool;
++ (MGLStyleFunction<NSNumber *> *)testBoolFunction;
 
-+ (NSString *)testString;
-+ (MGLStyleAttributeFunction *)testStringFunction;
++ (MGLStyleConstantValue<NSString *> *)testString;
++ (MGLStyleFunction<NSString *> *)testStringFunction;
 
-+ (MGLColor *)testColor;
-+ (MGLStyleAttributeFunction *)testColorFunction;
++ (MGLStyleConstantValue<MGLColor *> *)testColor;
++ (MGLStyleFunction<MGLColor *> *)testColorFunction;
 
-+ (NSValue *)testEnum:(NSUInteger)value type:(const char *)type;
-+ (MGLStyleAttributeFunction *)testEnumFunction:(NSUInteger)value type:(const char *)type;
++ (MGLStyleConstantValue<NSValue *> *)testEnum:(NSUInteger)value type:(const char *)type;
++ (MGLStyleFunction<NSValue *> *)testEnumFunction:(NSUInteger)value type:(const char *)type;
 
 @end

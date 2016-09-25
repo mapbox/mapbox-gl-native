@@ -9,7 +9,7 @@
 #import "MGLSource.h"
 #import "NSPredicate+MGLAdditions.h"
 #import "MGLStyleLayer_Private.h"
-#import "MGLStyleAttributeValue.h"
+#import "MGLStyleValue_Private.h"
 #import "MGL<%- camelize(type) %>StyleLayer.h"
 
 #include <mbgl/style/layers/<%- type %>_layer.hpp>
@@ -67,12 +67,14 @@
 #pragma mark - Accessing the Layout Attributes
 
 <% for (const property of layoutProperties) { -%>
-- (void)set<%- camelize(property.name) %>:(<%- propertyType(property, true, type) %>)<%- objCName(property) %> {
-    <%- setterImplementation(property, type) %>
+- (void)set<%- camelize(property.name) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
+    auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue(<%- objCName(property) %>);
+    self.layer->set<%- camelize(property.name) %>(mbglValue);
 }
 
-- (<%- propertyType(property, false, type) %>)<%- objCName(property) %> {
-    <%- getterImplementation(property, type) %>
+- (MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
+    auto propertyValue = self.layer->get<%- camelize(property.name) %>() ?: self.layer->getDefault<%- camelize(property.name) %>();
+    return MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toStyleValue(propertyValue);
 }
 
 <% } -%>
@@ -81,12 +83,14 @@
 #pragma mark - Accessing the Paint Attributes
 
 <% for (const property of paintProperties) { -%>
-- (void)set<%- camelize(property.name) %>:(<%- propertyType(property, true, type) %>)<%- objCName(property) %> {
-    <%- setterImplementation(property, type) %>
+- (void)set<%- camelize(property.name) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
+    auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue(<%- objCName(property) %>);
+    self.layer->set<%- camelize(property.name) %>(mbglValue);
 }
 
-- (<%- propertyType(property, false, type) %>)<%- objCName(property) %> {
-    <%- getterImplementation(property, type) %>
+- (MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
+    auto propertyValue = self.layer->get<%- camelize(property.name) %>() ?: self.layer->getDefault<%- camelize(property.name) %>();
+    return MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toStyleValue(propertyValue);
 }
 
 <% } -%>
