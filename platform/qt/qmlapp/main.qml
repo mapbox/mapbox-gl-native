@@ -172,6 +172,14 @@ ApplicationWindow {
                             property var type: "filter"
                             property var layer: "markerBackground"
                             property var filter: [ "==", "$type", "Point" ]
+                        },
+                        MapParameter {
+                            property var type: "bearing"
+                            property var angle: bearingSlider.value
+                        },
+                        MapParameter {
+                            property var type: "pitch"
+                            property var angle: pitchSlider.value
                         }
                     ]
 
@@ -179,9 +187,6 @@ ApplicationWindow {
                     zoomLevel: 12.25
                     minimumZoomLevel: 0
                     maximumZoomLevel: 20
-
-                    bearing: bearingSlider.value
-                    pitch: pitchSlider.value
 
                     color: landColorDialog.color
                     copyrightsVisible: true
@@ -255,6 +260,14 @@ ApplicationWindow {
                         MapParameter {
                             property var type: "style"
                             property var url: "mapbox://styles/mapbox/satellite-streets-v9"
+                        },
+                        MapParameter {
+                            property var type: "bearing"
+                            property var angle: bearingSlider.value
+                        },
+                        MapParameter {
+                            property var type: "pitch"
+                            property var angle: pitchSlider.value
                         }
                     ]
 
@@ -262,9 +275,6 @@ ApplicationWindow {
                     zoomLevel: mapFront.zoomLevel
                     minimumZoomLevel: mapFront.minimumZoomLevel
                     maximumZoomLevel: mapFront.maximumZoomLevel
-
-                    bearing: mapFront.bearing
-                    pitch: mapFront.pitch
 
                     Image {
                         anchors.right: parent.right

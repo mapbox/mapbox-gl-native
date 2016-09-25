@@ -34,10 +34,6 @@ class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
     Q_PROPERTY(bool copyrightsVisible READ copyrightsVisible WRITE setCopyrightsVisible NOTIFY copyrightsVisibleChanged)
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
-    // MapboxGL QML Type interface.
-    Q_PROPERTY(qreal bearing READ bearing WRITE setBearing NOTIFY bearingChanged)
-    Q_PROPERTY(qreal pitch READ pitch WRITE setPitch NOTIFY pitchChanged)
-
     // Proposed Qt interface - based on the example documentation below:
     // http://doc.qt.io/qt-5/qtqml-referenceexamples-properties-example.html
     Q_PROPERTY(QQmlListProperty<QQuickMapboxGLMapParameter> parameters READ parameters)
@@ -78,13 +74,6 @@ public:
 
     Q_INVOKABLE void pan(int dx, int dy);
 
-    // MapboxGL QML Type interface.
-    void setBearing(qreal bearing);
-    qreal bearing() const;
-
-    void setPitch(qreal pitch);
-    qreal pitch() const;
-
     // Proposed Qt interface implementation.
     QQmlListProperty<QQuickMapboxGLMapParameter> parameters();
 
@@ -105,10 +94,6 @@ signals:
     void errorChanged();
     void copyrightLinkActivated(const QString &link);
     void copyrightsVisibleChanged(bool visible);
-
-    // Mapbox-specific signals.
-    void bearingChanged(qreal angle);
-    void pitchChanged(qreal angle);
 
 public slots:
     void setCenter(const QGeoCoordinate &center);
@@ -158,6 +143,8 @@ private:
     bool parseStyleLayer(QQuickMapboxGLMapParameter *);
     bool parseStyleSource(QQuickMapboxGLMapParameter *);
     bool parseStyleFilter(QQuickMapboxGLMapParameter *);
+    bool parseBearing(QQuickMapboxGLMapParameter *);
+    bool parsePitch(QQuickMapboxGLMapParameter *);
 
     qreal m_minimumZoomLevel = 0;
     qreal m_maximumZoomLevel = 20;

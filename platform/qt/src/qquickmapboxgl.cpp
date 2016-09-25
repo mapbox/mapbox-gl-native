@@ -18,7 +18,9 @@
 namespace {
 
 static const QRegularExpression s_camelCase {"([a-z0-9])([A-Z])"};
-static const QStringList s_parameterTypes = QStringList() << "style" << "paint" << "layout" << "layer" << "source" << "filter" << "image";
+static const QStringList s_parameterTypes = QStringList()
+    << "style" << "paint" << "layout" << "layer" << "source" << "filter" << "image"
+    << "bearing" << "pitch";
 
 } // namespace
 
@@ -201,48 +203,6 @@ void QQuickMapboxGL::pan(int dx, int dy)
     update();
 }
 
-void QQuickMapboxGL::setBearing(qreal angle)
-{
-    angle = std::fmod(angle, 360.);
-
-    if (m_bearing == angle) {
-        return;
-    }
-
-    m_bearing = angle;
-
-    m_syncState |= BearingNeedsSync;
-    update();
-
-    emit bearingChanged(m_bearing);
-}
-
-qreal QQuickMapboxGL::bearing() const
-{
-    return m_bearing;
-}
-
-void QQuickMapboxGL::setPitch(qreal angle)
-{
-    angle = qMin(qMax(0., angle), mbgl::util::PITCH_MAX * mbgl::util::RAD2DEG);
-
-    if (m_pitch == angle) {
-        return;
-    }
-
-    m_pitch = angle;
-
-    m_syncState |= PitchNeedsSync;
-    update();
-
-    emit pitchChanged(m_pitch);
-}
-
-qreal QQuickMapboxGL::pitch() const
-{
-    return m_pitch;
-}
-
 void QQuickMapboxGL::onMapChanged(QMapbox::MapChange change)
 {
     if (change == QMapbox::MapChangeDidFinishLoadingStyle) {
@@ -351,6 +311,27 @@ bool QQuickMapboxGL::parseStyleFilter(QQuickMapboxGLMapParameter *param)
     return true;
 }
 
+bool QQuickMapboxGL::parseBearing(QQuickMapboxGLMapParameter *param)
+{
+    qreal angle = param->property("angle").toReal();
+    if (m_bearing == angle) return false;
+    m_bearing = angle;
+    m_syncState |= BearingNeedsSync;
+    update();
+    return true;
+}
+
+bool QQuickMapboxGL::parsePitch(QQuickMapboxGLMapParameter *param)
+{
+    qreal angle = param->property("angle").toReal();
+    angle = qMin(qMax(0., angle), mbgl::util::PITCH_MAX * mbgl::util::RAD2DEG);
+    if (m_pitch == angle) return false;
+    m_pitch = angle;
+    m_syncState |= PitchNeedsSync;
+    update();
+    return true;
+}
+
 void QQuickMapboxGL::processMapParameter(QQuickMapboxGLMapParameter *param)
 {
     bool needsUpdate = false;
@@ -378,6 +359,12 @@ void QQuickMapboxGL::processMapParameter(QQuickMapboxGLMapParameter *param)
         break;
     case 6: // image
         needsUpdate |= parseImage(param);
+        break;
+    case 7: // bearing
+        needsUpdate |= parseBearing(param);
+        break;
+    case 8: // pitch
+        needsUpdate |= parsePitch(param);
         break;
     }
     if (needsUpdate) update();
@@ -419,6 +406,12 @@ void QQuickMapboxGL::onParameterPropertyUpdated(const QString &propertyName)
         break;
     case 6: // image
         needsUpdate |= parseImage(param);
+        break;
+    case 7: // bearing
+        needsUpdate |= parseBearing(param);
+        break;
+    case 8: // pitch
+        needsUpdate |= parsePitch(param);
         break;
     }
     if (needsUpdate) update();

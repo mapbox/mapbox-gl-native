@@ -70,11 +70,11 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
     }
 
     if (syncStatus & QQuickMapboxGL::BearingNeedsSync) {
-        m_map->setBearing(quickMap->bearing());
+        m_map->setBearing(quickMap->m_bearing);
     }
 
     if (syncStatus & QQuickMapboxGL::PitchNeedsSync) {
-        m_map->setPitch(quickMap->pitch());
+        m_map->setPitch(quickMap->m_pitch);
     }
 
     if (!quickMap->m_styleLoaded) {
