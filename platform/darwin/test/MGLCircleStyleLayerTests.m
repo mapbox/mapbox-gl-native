@@ -31,8 +31,10 @@
     XCTAssertEqualObjects(gLayer.circleBlur, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.circleOpacity, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.circleTranslate, [MGLRuntimeStylingHelper testOffset]);
-    XCTAssert([(NSValue *)gLayer.circleTranslateAnchor isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLCircleTranslateAnchorViewport type:@encode(MGLCircleTranslateAnchor)]], @"%@ is not equal to %@", gLayer.circleTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLCircleTranslateAnchorViewport type:@encode(MGLCircleTranslateAnchor)]);
-    XCTAssert([(NSValue *)gLayer.circlePitchScale isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLCirclePitchScaleViewport type:@encode(MGLCirclePitchScale)]], @"%@ is not equal to %@", gLayer.circlePitchScale, [MGLRuntimeStylingHelper testEnum:MGLCirclePitchScaleViewport type:@encode(MGLCirclePitchScale)]);
+    XCTAssert([gLayer.circleTranslateAnchor isKindOfClass:[MGLStyleConstantValue class]]);
+    XCTAssertEqualObjects(gLayer.circleTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLCircleTranslateAnchorViewport type:@encode(MGLCircleTranslateAnchor)]);
+    XCTAssert([gLayer.circlePitchScale isKindOfClass:[MGLStyleConstantValue class]]);
+    XCTAssertEqualObjects(gLayer.circlePitchScale, [MGLRuntimeStylingHelper testEnum:MGLCirclePitchScaleViewport type:@encode(MGLCirclePitchScale)]);
 
     layer.circleRadius = [MGLRuntimeStylingHelper testNumberFunction];
     layer.circleColor = [MGLRuntimeStylingHelper testColorFunction];

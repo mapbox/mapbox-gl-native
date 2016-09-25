@@ -8,7 +8,7 @@
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
-#import "MGLStyleAttributeValue.h"
+#import "MGLStyleValue.h"
 #import "MGL<%-
 (type === 'background' ? '' :
  (type === 'raster' ? 'Foreground' :
@@ -92,7 +92,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
  <%- propertyReqs(property, layoutPropertiesByName, type) %>
 <% } -%>
  */
-@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 <% } -%>
@@ -110,7 +110,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
  <%- propertyReqs(property, paintPropertiesByName, type) %>
 <% } -%>
  */
-@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) <%- propertyType(property, false, type) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% } -%>
 <% } -%>

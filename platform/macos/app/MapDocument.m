@@ -494,12 +494,11 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 - (IBAction)manipulateStyle:(id)sender {
     MGLFillStyleLayer *fillStyleLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
     
-    MGLStyleAttributeFunction *colorFunction = [[MGLStyleAttributeFunction alloc] init];
-    colorFunction.stops = @{
-        @0.0: [NSColor redColor],
-        @10.0: [NSColor yellowColor],
-        @20.0: [NSColor blackColor],
-    };
+    MGLStyleValue *colorFunction = [MGLStyleValue<NSColor *> valueWithStops:@{
+        @0.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor redColor]],
+        @10.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor yellowColor]],
+        @20.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor blackColor]],
+    }];
     fillStyleLayer.fillColor = colorFunction;
     
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
@@ -508,7 +507,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     [self.mapView.style addSource:source];
     
     MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"test" source:source];
-    fillLayer.fillColor = [NSColor greenColor];
+    fillLayer.fillColor = [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor greenColor]];
     fillLayer.predicate = [NSPredicate predicateWithFormat:@"%K == %@", @"type", @"park"];
     [self.mapView.style addLayer:fillLayer];
 }

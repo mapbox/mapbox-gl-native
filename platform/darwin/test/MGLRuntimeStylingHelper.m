@@ -10,7 +10,7 @@
 
 @implementation MGLRuntimeStylingHelper
 
-+ (NSValue *)testPadding
++ (MGLStyleConstantValue<NSValue *> *)testPadding
 {
     MGLEdgeInsets insets = {
         .top = 1,
@@ -18,129 +18,105 @@
         .bottom = 1,
         .right = 1,
     };
-    return [NSValue value:&insets withObjCType:@encode(MGLEdgeInsets)];
+    return [MGLStyleConstantValue<NSValue *> valueWithRawValue:[NSValue value:&insets withObjCType:@encode(MGLEdgeInsets)]];
 }
 
-+ (MGLStyleAttributeFunction *)testPaddingFunction
++ (MGLStyleFunction<NSValue *> *)testPaddingFunction
 {
-    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
-    function.stops = @{
-        @(18): self.testPadding,
-    };
-    return function;
+    return [MGLStyleFunction<NSValue *> functionWithStops:@{@(18): self.testPadding}];
 }
 
-+ (NSValue *)testOffset
++ (MGLStyleConstantValue<NSValue *> *)testOffset
 {
     CGVector vector = CGVectorMake(1, 1);
-    return [NSValue value:&vector withObjCType:@encode(CGVector)];
+    return [MGLStyleConstantValue<NSValue *> valueWithRawValue:[NSValue value:&vector withObjCType:@encode(CGVector)]];
 }
 
-+ (MGLStyleAttributeFunction *)testOffsetFunction
++ (MGLStyleFunction<NSValue *> *)testOffsetFunction
 {
-    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
-    function.stops = @{
-        @(18): self.testOffset,
-    };
-    return function;
+    return [MGLStyleFunction<NSValue *> valueWithStops:@{ @(18): self.testOffset }];
 }
 
-+ (NSArray *)testFont
++ (MGLStyleConstantValue<NSArray<NSString *> *> *)testFont
 {
-    return @[@"Open Sans Regular", @"Arial Unicode MS Regular"];
+    return [MGLStyleConstantValue<NSArray<NSString *> *> valueWithRawValue:@[@"Open Sans Regular", @"Arial Unicode MS Regular"]];
 }
 
-+ (MGLStyleAttributeFunction *)testFontFunction
++ (MGLStyleFunction<NSArray<NSString *> *> *)testFontFunction
 {
-    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
-    function.stops = @{
-        @(18): self.testFont,
-    };
-    return function;
+    return [MGLStyleFunction<NSArray<NSString *> *> valueWithStops:@{ @18: self.testFont }];
 }
 
-+ (NSArray *)testDashArray
++ (MGLStyleConstantValue<NSArray<NSNumber *> *> *)testDashArray
 {
-    return @[@1, @2];
+    return [MGLStyleConstantValue<NSArray<NSNumber *> *> valueWithRawValue:@[@1, @2]];
 }
 
-+ (MGLStyleAttributeFunction *)testDashArrayFunction
++ (MGLStyleFunction<NSArray<NSNumber *> *> *)testDashArrayFunction
 {
-    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
-    function.stops = @{
-        @(18): self.testDashArray,
-    };
-    return function;
+    return [MGLStyleFunction<NSArray<NSNumber *> *> valueWithStops:@{
+        @18: self.testDashArray,
+    }];
 }
 
-+ (NSNumber *)testNumber
++ (MGLStyleConstantValue<NSNumber *> *)testNumber
 {
-    return @1;
+    return [MGLStyleConstantValue<NSNumber *> valueWithRawValue:@1];
 }
 
-+ (MGLStyleAttributeFunction *)testNumberFunction
++ (MGLStyleFunction<NSNumber *> *)testNumberFunction
 {
-    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
-    function.stops = @{
-        @(18): self.testNumber,
-    };
-    return function;
+    return [MGLStyleFunction<NSNumber *> valueWithStops:@{
+        @18: self.testNumber,
+    }];
 }
 
-+ (NSNumber *)testBool
++ (MGLStyleConstantValue<NSNumber *> *)testBool
 {
-    return @YES;
+    return [MGLStyleConstantValue<NSNumber *> valueWithRawValue:@YES];
 }
 
-+ (MGLStyleAttributeFunction *)testBoolFunction
++ (MGLStyleFunction<NSNumber *> *)testBoolFunction
 {
-    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
-    function.stops = @{
-        @(18): self.testBool,
-    };
-    return function;
+    return [MGLStyleFunction<NSNumber *> valueWithStops:@{
+        @18: self.testBool,
+    }];
 }
 
-+ (NSString *)testString
++ (MGLStyleConstantValue<NSString *> *)testString
 {
-    return @"test";
+    return [MGLStyleConstantValue<NSString *> valueWithRawValue:@"test"];
 }
 
-+ (MGLStyleAttributeFunction *)testStringFunction
++ (MGLStyleFunction<NSString *> *)testStringFunction
 {
-    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
-    function.stops = @{
-        @(18): self.testString,
-    };
-    return function;
+    return [MGLStyleFunction<NSString *> valueWithStops:@{
+        @18: self.testString,
+    }];
 }
 
-+ (MGLColor *)testColor
++ (MGLStyleConstantValue<MGLColor *> *)testColor
 {
-    return [MGLColor redColor];
+    return [MGLStyleConstantValue<MGLColor *> valueWithRawValue:[MGLColor redColor]];
 }
 
-+ (MGLStyleAttributeFunction *)testColorFunction
++ (MGLStyleFunction<MGLColor *> *)testColorFunction
 {
-    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
-    function.stops = @{
-        @(18): self.testColor,
-    };
-    return function;
+    return [MGLStyleFunction<MGLColor *> valueWithStops:@{
+        @18: self.testColor,
+    }];
 }
 
-+ (NSValue *)testEnum:(NSUInteger)value type:(const char *)type
++ (MGLStyleConstantValue<NSValue *> *)testEnum:(NSUInteger)value type:(const char *)type
 {
-    return [NSValue value:&value withObjCType:type];
+    return [MGLStyleConstantValue<NSValue *> valueWithRawValue:[NSValue value:&value withObjCType:type]];
 }
 
-+ (MGLStyleAttributeFunction *)testEnumFunction:(NSUInteger)value type:(const char *)type
++ (MGLStyleFunction<NSValue *> *)testEnumFunction:(NSUInteger)value type:(const char *)type
 {
-    MGLStyleAttributeFunction *function = [[MGLStyleAttributeFunction alloc] init];
-    function.stops = @{
-        @(18): [self testEnum:value type:type],
-    };
-    return function;
+    return [MGLStyleFunction<NSValue *> valueWithStops:@{
+        @18: [self testEnum:value type:type],
+    }];
 }
 
 @end

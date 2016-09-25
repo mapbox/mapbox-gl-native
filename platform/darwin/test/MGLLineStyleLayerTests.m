@@ -33,14 +33,17 @@
 
     MGLLineStyleLayer *gLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"layerID"];
     XCTAssertTrue([gLayer isKindOfClass:[MGLLineStyleLayer class]]);
-    XCTAssert([(NSValue *)gLayer.lineCap isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLLineCapSquare type:@encode(MGLLineCap)]], @"%@ is not equal to %@", gLayer.lineCap, [MGLRuntimeStylingHelper testEnum:MGLLineCapSquare type:@encode(MGLLineCap)]);
-    XCTAssert([(NSValue *)gLayer.lineJoin isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLLineJoinMiter type:@encode(MGLLineJoin)]], @"%@ is not equal to %@", gLayer.lineJoin, [MGLRuntimeStylingHelper testEnum:MGLLineJoinMiter type:@encode(MGLLineJoin)]);
+    XCTAssert([gLayer.lineCap isKindOfClass:[MGLStyleConstantValue class]]);
+    XCTAssertEqualObjects(gLayer.lineCap, [MGLRuntimeStylingHelper testEnum:MGLLineCapSquare type:@encode(MGLLineCap)]);
+    XCTAssert([gLayer.lineJoin isKindOfClass:[MGLStyleConstantValue class]]);
+    XCTAssertEqualObjects(gLayer.lineJoin, [MGLRuntimeStylingHelper testEnum:MGLLineJoinMiter type:@encode(MGLLineJoin)]);
     XCTAssertEqualObjects(gLayer.lineMiterLimit, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineRoundLimit, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineOpacity, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineColor, [MGLRuntimeStylingHelper testColor]);
     XCTAssertEqualObjects(gLayer.lineTranslate, [MGLRuntimeStylingHelper testOffset]);
-    XCTAssert([(NSValue *)gLayer.lineTranslateAnchor isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLLineTranslateAnchorViewport type:@encode(MGLLineTranslateAnchor)]], @"%@ is not equal to %@", gLayer.lineTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLLineTranslateAnchorViewport type:@encode(MGLLineTranslateAnchor)]);
+    XCTAssert([gLayer.lineTranslateAnchor isKindOfClass:[MGLStyleConstantValue class]]);
+    XCTAssertEqualObjects(gLayer.lineTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLLineTranslateAnchorViewport type:@encode(MGLLineTranslateAnchor)]);
     XCTAssertEqualObjects(gLayer.lineWidth, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineGapWidth, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineOffset, [MGLRuntimeStylingHelper testNumber]);

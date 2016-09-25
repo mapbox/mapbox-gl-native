@@ -1,7 +1,7 @@
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
-#import "MGLStyleAttributeValue.h"
+#import "MGLStyleValue.h"
 #import "MGLStyleLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -22,33 +22,33 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The color with which the background will be drawn.
  
- The default value of this property is `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `backgroundPattern` is set to `nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> backgroundColor;
+@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *backgroundColor;
 #else
 /**
  The color with which the background will be drawn.
  
- The default value of this property is `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `backgroundPattern` is set to `nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> backgroundColor;
+@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *backgroundColor;
 #endif
 
 /**
  Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
  */
-@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> backgroundPattern;
+@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *backgroundPattern;
 
 /**
  The opacity at which the background will be drawn.
  
- The default value of this property is an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, null_resettable) id <MGLStyleAttributeValue> backgroundOpacity;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *backgroundOpacity;
 
 @end
 
