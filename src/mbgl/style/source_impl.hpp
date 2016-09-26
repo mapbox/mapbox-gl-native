@@ -71,6 +71,8 @@ public:
     const SourceType type;
     const std::string id;
 
+    virtual optional<std::string> getAttribution() const { return {}; };
+
     bool loaded = false;
 
     // Tracks whether the source is used by any layers visible at the current zoom level. Must

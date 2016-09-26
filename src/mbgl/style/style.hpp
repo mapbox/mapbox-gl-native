@@ -67,7 +67,6 @@ public:
     Source* getSource(const std::string& id) const;
     void addSource(std::unique_ptr<Source>);
     void removeSource(const std::string& sourceID);
-    std::vector<std::string> getAttributions() const;
 
     std::vector<const Layer*> getLayers() const;
     Layer* getLayer(const std::string& id) const;

@@ -118,8 +118,12 @@ Range<uint8_t> TileSourceImpl::getZoomRange() {
     return tileset.zoomRange;
 }
 
-std::string TileSourceImpl::getAttribution() const {
-    return loaded ? tileset.attribution : "";
+optional<std::string> TileSourceImpl::getAttribution() const {
+    if (loaded && !tileset.attribution.empty()) {
+        return tileset.attribution;
+    } else {
+        return {};
+    }
 }
 
 } // namespace style

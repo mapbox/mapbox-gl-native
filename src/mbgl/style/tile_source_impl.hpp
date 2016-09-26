@@ -34,7 +34,7 @@ public:
         return urlOrTileset;
     }
     
-    std::string getAttribution() const;
+    optional<std::string> getAttribution() const override;
 
 protected:
     Range<uint8_t> getZoomRange() final;

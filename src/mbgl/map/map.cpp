@@ -786,10 +786,6 @@ void Map::removeSource(const std::string& sourceID) {
     }
 }
 
-std::vector<std::string> Map::getAttributions() const {
-    return impl->style ? impl->style->getAttributions() : std::vector<std::string>();
-}
-
 style::Layer* Map::getLayer(const std::string& layerID) {
     if (impl->style) {
         impl->styleMutated = true;
