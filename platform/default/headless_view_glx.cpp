@@ -93,8 +93,6 @@ void HeadlessView::resizeFramebuffer() {
 }
 
 void HeadlessView::clearBuffers() {
-    assert(active);
-
     MBGL_CHECK_ERROR(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0));
 
     if (fbo) {

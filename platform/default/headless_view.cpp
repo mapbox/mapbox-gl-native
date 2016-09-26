@@ -21,14 +21,19 @@ HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
     , pixelRatio(pixelRatio_)
     , dimensions({{ width, height }})
     , needsResize(true) {
-}
+    if (!glContext) {
+        if (!display) {
+            throw std::runtime_error("Display is not set");
+        }
 
-HeadlessView::~HeadlessView() {
-    activate();
-    clearBuffers();
-    deactivate();
+        createContext();
+        activateContext();
 
-    destroyContext();
+        if (!extensionsLoaded) {
+            gl::InitializeExtensions(initializeExtension);
+            extensionsLoaded = true;
+        }
+    }
 }
 
 void HeadlessView::resize(const uint16_t width, const uint16_t height) {
@@ -41,8 +46,6 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height) {
 }
 
 PremultipliedImage HeadlessView::readStillImage() {
-    assert(active);
-
     const unsigned int w = dimensions[0] * pixelRatio;
     const unsigned int h = dimensions[1] * pixelRatio;
 
@@ -75,22 +78,6 @@ std::array<uint16_t, 2> HeadlessView::getFramebufferSize() const {
 }
 
 void HeadlessView::activate() {
-    active = true;
-
-    if (!glContext) {
-        if (!display) {
-            throw std::runtime_error("Display is not set");
-        }
-        createContext();
-    }
-
-    activateContext();
-
-    if (!extensionsLoaded) {
-        gl::InitializeExtensions(initializeExtension);
-        extensionsLoaded = true;
-    }
-
     if (needsResize) {
         clearBuffers();
         resizeFramebuffer();
@@ -99,8 +86,7 @@ void HeadlessView::activate() {
 }
 
 void HeadlessView::deactivate() {
-    deactivateContext();
-    active = false;
+    // no-op
 }
 
 void HeadlessView::invalidate() {
@@ -112,5 +98,24 @@ void HeadlessView::notifyMapChange(MapChange change) {
         mapChangeCallback(change);
     }
 }
+
+#if MBGL_USE_QT
+    QGLWidget* HeadlessView::glContext = nullptr;
+#endif
+
+#if MBGL_USE_CGL
+    CGLContextObj HeadlessView::glContext = nullptr;
+#endif
+
+#if MBGL_USE_EAGL
+    void* HeadlessView::glContext = nullptr;
+#endif
+
+#if MBGL_USE_GLX
+    Display *HeadlessView::xDisplay = nullptr;
+    GLXFBConfig *HeadlessView::fbConfigs = nullptr;
+    GLXContext HeadlessView::glContext = nullptr;
+    GLXPbuffer HeadlessView::glxPbuffer = 0;
+#endif
 
 } // namespace mbgl
