@@ -436,6 +436,7 @@ set(MBGL_CORE_FILES
     src/mbgl/util/exclusive.hpp
     src/mbgl/util/font_stack.cpp
     src/mbgl/util/geo.cpp
+    src/mbgl/util/geojson.cpp
     src/mbgl/util/grid_index.cpp
     src/mbgl/util/grid_index.hpp
     src/mbgl/util/http_header.cpp
