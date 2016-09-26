@@ -85,18 +85,4 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
       vertexBuffer(context.createVertexBuffer(buildTextVertices(id, renderable_, complete_, modified_, expires_, debugMode_))) {
 }
 
-void DebugBucket::drawLines(FillShader& shader, gl::Context& context) {
-    if (vertexBuffer.vertexCount != 0) {
-        array.bind(shader, vertexBuffer, BUFFER_OFFSET_0, context);
-        MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(vertexBuffer.vertexCount)));
-    }
-}
-
-void DebugBucket::drawPoints(FillShader& shader, gl::Context& context) {
-    if (vertexBuffer.vertexCount != 0) {
-        array.bind(shader, vertexBuffer, BUFFER_OFFSET_0, context);
-        MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(vertexBuffer.vertexCount)));
-    }
-}
-
 } // namespace mbgl

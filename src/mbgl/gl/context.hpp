@@ -8,7 +8,7 @@
 #include <mbgl/gl/framebuffer.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/gl/attribute.hpp>
+#include <mbgl/gl/drawable.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <memory>
@@ -78,13 +78,15 @@ public:
                      TextureFilter = TextureFilter::Nearest,
                      TextureMipMap = TextureMipMap::No);
 
-    template <class Shader, class Vertex>
-    void bindAttributes(const Shader& shader, const VertexBuffer<Vertex>&, const int8_t* offset) {
-        static_assert(std::is_same<typename Shader::VertexType, Vertex>::value, "vertex type mismatch");
-        for (const auto& binding : AttributeBindings<Shader, Vertex>()(shader)) {
-            bindAttribute(binding, sizeof(Vertex), offset);
-        }
-    }
+    void clear(optional<mbgl::Color> color,
+               optional<float> depth,
+               optional<int32_t> stencil);
+
+    void draw(const Drawable&);
+
+    void setDepthMode(const DepthMode&);
+    void setStencilMode(const StencilMode&);
+    void setColorMode(const ColorMode&);
 
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
@@ -106,6 +108,19 @@ public:
 
     void setDirtyState();
 
+    State<value::ActiveTexture> activeTexture;
+    State<value::BindFramebuffer> bindFramebuffer;
+    State<value::Viewport> viewport;
+    std::array<State<value::BindTexture>, 2> texture;
+    State<value::BindVertexArray> vertexArrayObject;
+    State<value::Program> program;
+
+#if not MBGL_USE_GLES2
+    State<value::PixelZoom> pixelZoom;
+    State<value::RasterPos> rasterPos;
+#endif // MBGL_USE_GLES2
+
+private:
     State<value::StencilFunc> stencilFunc;
     State<value::StencilMask> stencilMask;
     State<value::StencilTest> stencilTest;
@@ -115,34 +130,32 @@ public:
     State<value::DepthTest> depthTest;
     State<value::DepthFunc> depthFunc;
     State<value::Blend> blend;
+    State<value::BlendEquation> blendEquation;
     State<value::BlendFunc> blendFunc;
     State<value::BlendColor> blendColor;
     State<value::ColorMask> colorMask;
     State<value::ClearDepth> clearDepth;
     State<value::ClearColor> clearColor;
     State<value::ClearStencil> clearStencil;
-    State<value::Program> program;
     State<value::LineWidth> lineWidth;
-    State<value::ActiveTexture> activeTexture;
-    State<value::BindFramebuffer> bindFramebuffer;
-    State<value::Viewport> viewport;
     State<value::BindRenderbuffer> bindRenderbuffer;
 #if not MBGL_USE_GLES2
-    State<value::PixelZoom> pixelZoom;
-    State<value::RasterPos> rasterPos;
+    State<value::PointSize> pointSize;
 #endif // MBGL_USE_GLES2
-    std::array<State<value::BindTexture>, 2> texture;
     State<value::BindVertexBuffer> vertexBuffer;
     State<value::BindElementBuffer> elementBuffer;
-    State<value::BindVertexArray> vertexArrayObject;
 
-private:
     UniqueBuffer createVertexBuffer(const void* data, std::size_t size);
     UniqueBuffer createIndexBuffer(const void* data, std::size_t size);
     UniqueTexture createTexture(Size size, const void* data, TextureUnit);
     UniqueFramebuffer createFramebuffer();
     UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);
-    void bindAttribute(const AttributeBinding&, std::size_t stride, const int8_t* offset);
+
+    PrimitiveType operator()(const Points&);
+    PrimitiveType operator()(const Lines&);
+    PrimitiveType operator()(const LineStrip&);
+    PrimitiveType operator()(const Triangles&);
+    PrimitiveType operator()(const TriangleStrip&);
 
     friend detail::ProgramDeleter;
     friend detail::ShaderDeleter;

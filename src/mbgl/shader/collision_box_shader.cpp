@@ -9,7 +9,9 @@ CollisionBoxShader::CollisionBoxShader(gl::Context& context)
     : Shader(shaders::collision_box::name,
              shaders::collision_box::vertex,
              shaders::collision_box::fragment,
-             context) {
+             context),
+      uniformsState(CollisionBoxUniforms::state(*this))
+{
 }
 
 } // namespace mbgl

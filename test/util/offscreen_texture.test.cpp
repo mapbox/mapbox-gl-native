@@ -107,21 +107,19 @@ void main() {
     // Make sure the texture gets destructed before we call context.reset();
     {
         OffscreenView view(context, { 512, 256 });
+        view.bind();
 
         // First, draw red to the bound FBO.
-        context.clearColor = { 1, 0, 0, 1 };
-        view.bind();
-        MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
+        context.clear(Color::red(), {}, {});
 
         // Then, create a texture, bind it, and render yellow to that texture. This should not
         // affect the originally bound FBO.
         OffscreenTexture texture(context, { 128, 128 });
         texture.bind();
 
-        context.clearColor = { 0, 0, 0, 0 };
-        MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
+        context.clear(Color(), {}, {});
 
-        context.program = paintShader.program;
+        MBGL_CHECK_ERROR(glUseProgram(paintShader.program));
         MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, triangleBuffer.buffer));
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(paintShader.a_pos));
         MBGL_CHECK_ERROR(
@@ -138,8 +136,8 @@ void main() {
         test::checkImage("test/fixtures/offscreen_texture/render-to-fbo", image, 0, 0);
 
         // Now, composite the Framebuffer texture we've rendered to onto the main FBO.
-        context.program = compositeShader.program;
         context.bindTexture(texture.getTexture(), 0, gl::TextureFilter::Linear);
+        MBGL_CHECK_ERROR(glUseProgram(compositeShader.program));
         MBGL_CHECK_ERROR(glUniform1i(u_texture, 0));
         MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, viewportBuffer.buffer));
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(compositeShader.a_pos));

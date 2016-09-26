@@ -48,11 +48,6 @@ public:
     SymbolSDFShader symbolGlyph;
 
     CollisionBoxShader collisionBox;
-
-    gl::VertexArrayObject coveringPlainArray;
-    gl::VertexArrayObject coveringRasterArray;
-    gl::VertexArrayObject backgroundPatternArray;
-    gl::VertexArrayObject backgroundArray;
 };
 
 } // namespace mbgl

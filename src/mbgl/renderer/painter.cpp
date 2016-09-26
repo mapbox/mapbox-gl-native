@@ -82,12 +82,6 @@ bool Painter::needsAnimation() const {
     return frameHistory.needsAnimation(util::DEFAULT_FADE_DURATION);
 }
 
-void Painter::setClipping(const ClipID& clip) {
-    const GLint ref = (GLint)clip.reference.to_ulong();
-    const GLuint mask = (GLuint)clip.mask.to_ulong();
-    context.stencilFunc = { gl::StencilTestFunction::Equal, ref, mask };
-}
-
 void Painter::cleanup() {
     context.performCleanup();
 }
@@ -114,7 +108,6 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     RenderData renderData = style.getRenderData(frame.debugOptions);
     const std::vector<RenderItem>& order = renderData.order;
     const std::unordered_set<Source*>& sources = renderData.sources;
-    const Color& background = renderData.backgroundColor;
 
     // Update the default matrices to the current viewport dimensions.
     state.getProjMatrix(projMatrix);
@@ -153,26 +146,11 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     {
         MBGL_DEBUG_GROUP("clear");
         view.bind();
-        context.stencilFunc = { gl::StencilTestFunction::Always, 0, ~0u };
-        context.stencilTest = true;
-        context.stencilMask = 0xFF;
-        context.depthTest = false;
-        context.depthMask = true;
-        context.colorMask = { true, true, true, true };
-
-        if (paintMode() == PaintMode::Overdraw) {
-            context.blend = true;
-            context.blendFunc = { gl::BlendSourceFactor::ConstantColor,
-                                  gl::BlendDestinationFactor::One };
-            const float overdraw = 1.0f / 8.0f;
-            context.blendColor = { overdraw, overdraw, overdraw, 0.0f };
-            context.clearColor = Color::black();
-        } else {
-            context.clearColor = background;
-        }
-        context.clearStencil = 0;
-        context.clearDepth = 1;
-        MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+        context.clear(paintMode() == PaintMode::Overdraw
+                        ? Color::black()
+                        : renderData.backgroundColor,
+                      1.0f,
+                      0);
     }
 
     // - CLIPPING MASKS ----------------------------------------------------------------------------
@@ -186,7 +164,12 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
             source->baseImpl->startRender(generator, projMatrix, state);
         }
 
-        drawClippingMasks(parameters, generator.getStencils());
+        MBGL_DEBUG_GROUP("clipping masks");
+
+        for (const auto& stencil : generator.getStencils()) {
+            MBGL_DEBUG_GROUP(std::string{ "mask: " } + util::toString(stencil.first));
+            renderClippingMask(stencil.first, stencil.second);
+        }
     }
 
 #if not MBGL_USE_GLES2 and not defined(NDEBUG)
@@ -275,19 +258,6 @@ void Painter::renderPass(PaintParameters& parameters,
         if (!layer.baseImpl->hasRenderPass(pass))
             continue;
 
-        if (paintMode() == PaintMode::Overdraw) {
-            context.blend = true;
-        } else if (pass == RenderPass::Translucent) {
-            context.blend = true;
-            context.blendFunc = { gl::BlendSourceFactor::One,
-                                  gl::BlendDestinationFactor::OneMinusSrcAlpha };
-        } else {
-            context.blend = false;
-        }
-
-        context.colorMask = { true, true, true, true };
-        context.stencilMask = 0x0;
-
         if (layer.is<BackgroundLayer>()) {
             MBGL_DEBUG_GROUP("background");
             renderBackground(parameters, *layer.as<BackgroundLayer>());
@@ -296,11 +266,9 @@ void Painter::renderPass(PaintParameters& parameters,
 
             // Reset GL state to a known state so the CustomLayer always has a clean slate.
             context.vertexArrayObject = 0;
-            context.depthFunc = gl::DepthTestFunction::LessEqual;
-            context.depthTest = true;
-            context.depthMask = false;
-            context.stencilTest = false;
-            setDepthSublayer(0);
+            context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadOnly));
+            context.setStencilMode(gl::StencilMode::disabled());
+            context.setColorMode(colorModeForRenderPass());
 
             layer.as<CustomLayer>()->impl->render(state);
 
@@ -310,9 +278,6 @@ void Painter::renderPass(PaintParameters& parameters,
             context.setDirtyState();
         } else {
             MBGL_DEBUG_GROUP(layer.baseImpl->id + " - " + util::toString(item.tile->id));
-            if (item.bucket->needsClipping()) {
-                setClipping(item.tile->clip);
-            }
             item.bucket->render(*this, parameters, layer, *item.tile);
         }
     }
@@ -322,10 +287,46 @@ void Painter::renderPass(PaintParameters& parameters,
     }
 }
 
-void Painter::setDepthSublayer(int n) {
+mat4 Painter::matrixForTile(const UnwrappedTileID& tileID) {
+    mat4 matrix;
+    state.matrixFor(matrix, tileID);
+    matrix::multiply(matrix, projMatrix, matrix);
+    return matrix;
+}
+
+gl::DepthMode Painter::depthModeForSublayer(uint8_t n, gl::DepthMode::Mask mask) const {
     float nearDepth = ((1 + currentLayer) * numSublayers + n) * depthEpsilon;
     float farDepth = nearDepth + depthRangeSize;
-    context.depthRange = { nearDepth, farDepth };
+    return gl::DepthMode { gl::DepthMode::LessEqual, mask, { nearDepth, farDepth } };
+}
+
+gl::StencilMode Painter::stencilModeForClipping(const ClipID& id) const {
+    return gl::StencilMode {
+        gl::StencilMode::Equal { static_cast<uint32_t>(id.mask.to_ulong()) },
+        static_cast<int32_t>(id.reference.to_ulong()),
+        0,
+        gl::StencilMode::Keep,
+        gl::StencilMode::Keep,
+        gl::StencilMode::Replace
+    };
+}
+
+gl::ColorMode Painter::colorModeForRenderPass() const {
+    if (paintMode() == PaintMode::Overdraw) {
+        const float overdraw = 1.0f / 8.0f;
+        return gl::ColorMode {
+            gl::ColorMode::Add {
+                gl::ColorMode::ConstantColor,
+                gl::ColorMode::One
+            },
+            Color { overdraw, overdraw, overdraw, 0.0f },
+            gl::ColorMode::Mask { true, true, true, true }
+        };
+    } else if (pass == RenderPass::Translucent) {
+        return gl::ColorMode::alphaBlended();
+    } else {
+        return gl::ColorMode::unblended();
+    }
 }
 
 } // namespace mbgl

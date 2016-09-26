@@ -9,7 +9,8 @@ LineShader::LineShader(gl::Context& context, Defines defines)
     : Shader(shaders::line::name,
              shaders::line::vertex,
              shaders::line::fragment,
-             context, defines) {
+             context, defines),
+      uniformsState(LineColorUniforms::state(*this)) {
 }
 
 } // namespace mbgl

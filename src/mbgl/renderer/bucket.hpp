@@ -5,9 +5,6 @@
 
 #include <atomic>
 
-#define BUFFER_OFFSET_0  ((int8_t*)nullptr)
-#define BUFFER_OFFSET(i) ((BUFFER_OFFSET_0) + (i))
-
 namespace mbgl {
 
 class Painter;
@@ -37,8 +34,6 @@ public:
     virtual ~Bucket() = default;
 
     virtual bool hasData() const = 0;
-
-    virtual bool needsClipping() const = 0;
 
     bool needsUpload() const {
         return !uploaded;

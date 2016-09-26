@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-struct SpriteAtlasElement;
+class SpriteAtlasElement;
 
 namespace style {
 class SymbolLayoutProperties;

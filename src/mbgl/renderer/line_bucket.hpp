@@ -1,10 +1,10 @@
 #pragma once
 
 #include <mbgl/renderer/bucket.hpp>
-#include <mbgl/renderer/element_group.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gl/segment.hpp>
 #include <mbgl/shader/line_vertex.hpp>
 #include <mbgl/style/layers/line_layer_properties.hpp>
 
@@ -12,12 +12,7 @@
 
 namespace mbgl {
 
-class LineShader;
-class LineSDFShader;
-class LinePatternShader;
-
 class LineBucket : public Bucket {
-
 public:
     LineBucket(uint32_t overscaling);
     ~LineBucket() override;
@@ -25,14 +20,18 @@ public:
     void upload(gl::Context&) override;
     void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
     bool hasData() const override;
-    bool needsClipping() const override;
 
     void addGeometry(const GeometryCollection&);
     void addGeometry(const GeometryCoordinates& line);
 
-    void drawLines(LineShader&, gl::Context&, PaintMode);
-    void drawLineSDF(LineSDFShader&, gl::Context&, PaintMode);
-    void drawLinePatterns(LinePatternShader&, gl::Context&, PaintMode);
+    style::LineLayoutProperties layout;
+
+    std::vector<LineVertex> vertices;
+    std::vector<gl::Triangle> triangles;
+    std::vector<gl::Segment> segments;
+
+    optional<gl::VertexBuffer<LineVertex>> vertexBuffer;
+    optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
 
 private:
     struct TriangleElement {
@@ -45,18 +44,6 @@ private:
     void addPieSliceVertex(const GeometryCoordinate& currentVertex, double distance,
             const Point<double>& extrude, bool lineTurnsLeft, std::size_t startVertex,
             std::vector<TriangleElement>& triangleStore);
-
-public:
-    style::LineLayoutProperties layout;
-
-private:
-    std::vector<LineVertex> vertices;
-    std::vector<gl::Triangle> triangles;
-
-    std::vector<ElementGroup<LineShader, LineSDFShader, LinePatternShader>> groups;
-
-    optional<gl::VertexBuffer<LineVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
 
     std::ptrdiff_t e1;
     std::ptrdiff_t e2;

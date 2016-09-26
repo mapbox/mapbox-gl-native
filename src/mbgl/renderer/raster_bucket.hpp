@@ -7,15 +7,6 @@
 
 namespace mbgl {
 
-class RasterShader;
-class RasterVertex;
-
-namespace gl {
-class Context;
-template <class> class VertexBuffer;
-class VertexArrayObject;
-} // namespace gl
-
 class RasterBucket : public Bucket {
 public:
     RasterBucket(PremultipliedImage&&);
@@ -23,11 +14,7 @@ public:
     void upload(gl::Context&) override;
     void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
     bool hasData() const override;
-    bool needsClipping() const override;
 
-    void drawRaster(RasterShader&, gl::VertexBuffer<RasterVertex>&, gl::VertexArrayObject&, gl::Context&);
-
-private:
     PremultipliedImage image;
     optional<gl::Texture> texture;
 };

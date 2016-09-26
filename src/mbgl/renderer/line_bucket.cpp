@@ -1,12 +1,8 @@
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/shader/line_shader.hpp>
-#include <mbgl/shader/line_sdf_shader.hpp>
-#include <mbgl/shader/line_pattern_shader.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/gl/gl.hpp>
 
 #include <cassert>
 
@@ -54,8 +50,8 @@ const float LINE_DISTANCE_SCALE = 1.0 / 2.0;
 const float MAX_LINE_DISTANCE = std::pow(2, LINE_DISTANCE_BUFFER_BITS) / LINE_DISTANCE_SCALE;
 
 void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
-    const GLsizei len = [&coordinates] {
-        GLsizei l = static_cast<GLsizei>(coordinates.size());
+    const std::size_t len = [&coordinates] {
+        std::size_t l = coordinates.size();
         // If the line has duplicate vertices at the end, adjust length to remove them.
         while (l > 2 && coordinates[l - 1] == coordinates[l - 2]) {
             l--;
@@ -103,7 +99,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
     const std::size_t startVertex = vertices.size();
     std::vector<TriangleElement> triangleStore;
 
-    for (GLsizei i = 0; i < len; ++i) {
+    for (std::size_t i = 0; i < len; ++i) {
         if (closed && i == len - 1) {
             // if the line is closed, we treat the last vertex like the first
             nextCoordinate = coordinates[1];
@@ -352,13 +348,12 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
     const std::size_t endVertex = vertices.size();
     const std::size_t vertexCount = endVertex - startVertex;
 
-    if (groups.empty() || groups.back().vertexLength + vertexCount > 65535) {
-        // Move to a new group because the old one can't hold the geometry.
-        groups.emplace_back();
+    if (segments.empty() || segments.back().vertexLength + vertexCount > 65535) {
+        segments.emplace_back(startVertex, triangles.size());
     }
 
-    auto& group = groups.back();
-    uint16_t index = group.vertexLength;
+    auto& segment = segments.back();
+    uint16_t index = segment.vertexLength;
 
     for (const auto& triangle : triangleStore) {
         triangles.emplace_back(static_cast<uint16_t>(index + triangle.a),
@@ -366,8 +361,8 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
                                static_cast<uint16_t>(index + triangle.c));
     }
 
-    group.vertexLength += vertexCount;
-    group.indexLength += triangleStore.size();
+    segment.vertexLength += vertexCount;
+    segment.primitiveLength += triangleStore.size();
 }
 
 void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
@@ -450,65 +445,7 @@ void LineBucket::render(Painter& painter,
 }
 
 bool LineBucket::hasData() const {
-    return !groups.empty();
-}
-
-bool LineBucket::needsClipping() const {
-    return true;
-}
-
-void LineBucket::drawLines(LineShader& shader,
-                           gl::Context& context,
-                           PaintMode paintMode) {
-    GLbyte* vertex_index = BUFFER_OFFSET(0);
-    GLbyte* elements_index = BUFFER_OFFSET(0);
-    for (auto& group : groups) {
-        if (!group.indexLength) {
-            continue;
-        }
-        group.getVAO(shader, paintMode).bind(
-            shader, *vertexBuffer, *indexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT,
-                                        elements_index));
-        vertex_index += group.vertexLength * vertexBuffer->vertexSize;
-        elements_index += group.indexLength * indexBuffer->primitiveSize;
-    }
-}
-
-void LineBucket::drawLineSDF(LineSDFShader& shader,
-                             gl::Context& context,
-                             PaintMode paintMode) {
-    GLbyte* vertex_index = BUFFER_OFFSET(0);
-    GLbyte* elements_index = BUFFER_OFFSET(0);
-    for (auto& group : groups) {
-        if (!group.indexLength) {
-            continue;
-        }
-        group.getVAO(shader, paintMode).bind(
-            shader, *vertexBuffer, *indexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT,
-                                        elements_index));
-        vertex_index += group.vertexLength * vertexBuffer->vertexSize;
-        elements_index += group.indexLength * indexBuffer->primitiveSize;
-    }
-}
-
-void LineBucket::drawLinePatterns(LinePatternShader& shader,
-                                  gl::Context& context,
-                                  PaintMode paintMode) {
-    GLbyte* vertex_index = BUFFER_OFFSET(0);
-    GLbyte* elements_index = BUFFER_OFFSET(0);
-    for (auto& group : groups) {
-        if (!group.indexLength) {
-            continue;
-        }
-        group.getVAO(shader, paintMode).bind(
-            shader, *vertexBuffer, *indexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT,
-                                        elements_index));
-        vertex_index += group.vertexLength * vertexBuffer->vertexSize;
-        elements_index += group.indexLength * indexBuffer->primitiveSize;
-    }
+    return !segments.empty();
 }
 
 } // namespace mbgl

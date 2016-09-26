@@ -76,5 +76,39 @@ std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(BucketParameters& 
                                           *spriteAtlas);
 }
 
+SymbolPropertyValues SymbolLayer::Impl::iconPropertyValues(const SymbolLayoutProperties& layout_) const {
+    return SymbolPropertyValues {
+        layout_.iconRotationAlignment.value, // icon-pitch-alignment is not yet implemented; inherit the rotation alignment
+        layout_.iconRotationAlignment.value,
+        layout_.iconSize.value,
+        paint.iconOpacity.value,
+        paint.iconColor.value,
+        paint.iconHaloColor.value,
+        paint.iconHaloWidth.value,
+        paint.iconHaloBlur.value,
+        paint.iconTranslate.value,
+        paint.iconTranslateAnchor.value,
+        iconSize,
+        1.0f
+    };
+}
+
+SymbolPropertyValues SymbolLayer::Impl::textPropertyValues(const SymbolLayoutProperties& layout_) const {
+    return SymbolPropertyValues {
+        layout_.textPitchAlignment.value,
+        layout_.textRotationAlignment.value,
+        layout_.textSize.value,
+        paint.textOpacity.value,
+        paint.textColor.value,
+        paint.textHaloColor.value,
+        paint.textHaloWidth.value,
+        paint.textHaloBlur.value,
+        paint.textTranslate.value,
+        paint.textTranslateAnchor.value,
+        textSize,
+        24.0f
+    };
+}
+
 } // namespace style
 } // namespace mbgl

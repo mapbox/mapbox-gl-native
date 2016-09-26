@@ -1,60 +1,87 @@
 #pragma once
 
 #include <mbgl/gl/shader.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <array>
+#include <functional>
+#include <tuple>
 
 namespace mbgl {
 namespace gl {
 
-template <typename T>
+template <class T>
+void bindUniform(UniformLocation, const T&);
+
+template <class Tag, class T>
 class Uniform {
 public:
-    Uniform(const char* name, const Shader& shader)
-        : current(), location(shader.getUniformLocation(name)) {
-    }
+    class Value {
+    public:
+        Value(T t_) : t(std::move(t_)) {}
+        T t;
+    };
 
-    void operator=(const T& t) {
-        if (current != t) {
-            current = t;
-            bind(t);
-        }
-    }
+    class State {
+    public:
+        State(const char* name, const Shader& shader)
+            : location(shader.getUniformLocation(name)) {}
 
-private:
-    void bind(const T&);
-
-    T current;
-    UniformLocation location;
-};
-
-template <size_t C, size_t R = C>
-class UniformMatrix {
-public:
-    typedef std::array<float, C*R> T;
-
-    UniformMatrix(const char* name, const Shader& shader)
-        : current(), location(shader.getUniformLocation(name)) {
-    }
-
-    void operator=(const std::array<double, C*R>& t) {
-        bool dirty = false;
-        for (unsigned int i = 0; i < C*R; i++) {
-            if (current[i] != t[i]) {
-                current[i] = t[i];
-                dirty = true;
+        void operator=(const Value& value) {
+            if (!current || *current != value.t) {
+                current = value.t;
+                bindUniform(location, value.t);
             }
         }
-        if (dirty) {
-            bind(current);
-        }
+
+    private:
+        optional<T> current;
+        UniformLocation location;
+    };
+};
+
+template <class Tag, class T>
+using UniformScalar = Uniform<Tag, T>;
+
+template <class Tag, class T, size_t N>
+using UniformVector = Uniform<Tag, std::array<T, N>>;
+
+template <class Tag, class T, size_t N>
+using UniformMatrix = Uniform<Tag, std::array<T, N*N>>;
+
+#define MBGL_DEFINE_UNIFORM_SCALAR(type_, name_) \
+    struct name_ : ::mbgl::gl::UniformScalar<name_, type_> { static constexpr auto name = #name_; }
+
+#define MBGL_DEFINE_UNIFORM_VECTOR(type_, n_, name_) \
+    struct name_ : ::mbgl::gl::UniformVector<name_, type_, n_> { static constexpr auto name = #name_; }
+
+#define MBGL_DEFINE_UNIFORM_MATRIX(type_, n_, name_) \
+    struct name_ : ::mbgl::gl::UniformMatrix<name_, type_, n_> { static constexpr auto name = #name_; }
+
+template <class... Us>
+class Uniforms {
+public:
+    using State = std::tuple<typename Us::State...>;
+    using Values = std::tuple<typename Us::Value...>;
+
+    static State state(const Shader& shader) {
+        return State { { Us::name, shader }... };
+    }
+
+    template <class... Args>
+    static Values values(Args&&... args) {
+        return Values { std::forward<Args>(args)... };
+    }
+
+    static std::function<void ()> binder(State& state, Values&& values_) {
+        return [&state, values = std::move(values_)] () mutable {
+            noop((std::get<typename Us::State>(state) = std::get<typename Us::Value>(values), 0)...);
+        };
     }
 
 private:
-    void bind(const T&);
-
-    T current;
-    UniformLocation location;
+    // This exists only to provide a varags context for unpacking the assignments in `binder`.
+    template <int...> static void noop(int...) {}
 };
 
 } // namespace gl

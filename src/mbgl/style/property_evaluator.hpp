@@ -27,7 +27,8 @@ private:
 };
 
 template <typename T>
-struct Faded {
+class Faded {
+public:
     T from;
     T to;
     float fromScale;
