@@ -1,7 +1,7 @@
 #include <mbgl/shader/linesdf_shader.hpp>
 #include <mbgl/shader/linesdfpattern.vertex.hpp>
 #include <mbgl/shader/linesdfpattern.fragment.hpp>
-#include <mbgl/gl/gl.hpp>
+#include <mbgl/shader/line_vertex.hpp>
 
 namespace mbgl {
 
@@ -12,12 +12,9 @@ LineSDFShader::LineSDFShader(gl::Context& context, Defines defines)
              context, defines) {
 }
 
-void LineSDFShader::bind(int8_t* offset) {
-    MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
-    MBGL_CHECK_ERROR(glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 8, offset + 0));
-
-    MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_data));
-    MBGL_CHECK_ERROR(glVertexAttribPointer(a_data, 4, GL_UNSIGNED_BYTE, false, 8, offset + 4));
+void LineSDFShader::bind(const gl::VertexBuffer<LineVertex>&,
+                         const int8_t* offset) {
+    LineVertex::bind(offset);
 }
 
 } // namespace mbgl

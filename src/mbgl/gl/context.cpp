@@ -91,10 +91,22 @@ UniqueShader Context::createFragmentShader() {
     return UniqueShader{ MBGL_CHECK_ERROR(glCreateShader(GL_FRAGMENT_SHADER)), { this } };
 }
 
-UniqueBuffer Context::createBuffer() {
+UniqueBuffer Context::createVertexBuffer(const void* data, std::size_t size) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
-    return UniqueBuffer{ std::move(id), { this } };
+    UniqueBuffer result { std::move(id), { this } };
+    vertexBuffer = result;
+    MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
+    return result;
+}
+
+UniqueBuffer Context::createIndexBuffer(const void* data, std::size_t size) {
+    BufferID id = 0;
+    MBGL_CHECK_ERROR(glGenBuffers(1, &id));
+    UniqueBuffer result { std::move(id), { this } };
+    elementBuffer = result;
+    MBGL_CHECK_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
+    return result;
 }
 
 UniqueTexture Context::createTexture() {
@@ -118,10 +130,6 @@ UniqueFramebuffer Context::createFramebuffer() {
     FramebufferID id = 0;
     MBGL_CHECK_ERROR(glGenFramebuffers(1, &id));
     return UniqueFramebuffer{ std::move(id), { this } };
-}
-
-void Context::uploadBuffer(BufferType type, size_t size, void* data) {
-    MBGL_CHECK_ERROR(glBufferData(static_cast<GLenum>(type), size, data, GL_STATIC_DRAW));
 }
 
 UniqueTexture

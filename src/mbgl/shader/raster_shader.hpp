@@ -5,11 +5,18 @@
 
 namespace mbgl {
 
+namespace gl {
+template <class> class VertexBuffer;
+} // namespace gl
+
+class RasterVertex;
+
 class RasterShader : public Shader {
 public:
     RasterShader(gl::Context&, Defines defines = None);
 
-    void bind(int8_t* offset) final;
+    void bind(const gl::VertexBuffer<RasterVertex>&,
+              const int8_t* offset);
 
     UniformMatrix<4>              u_matrix            = {"u_matrix",            *this};
     Uniform<int32_t>              u_image0            = {"u_image0",            *this};

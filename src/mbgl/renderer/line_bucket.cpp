@@ -1,6 +1,5 @@
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
-#include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/shader/line_shader.hpp>
 #include <mbgl/shader/linesdf_shader.hpp>
@@ -101,7 +100,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
         nextNormal = util::perp(util::unit(convertPoint<double>(firstCoordinate - *currentCoordinate)));
     }
 
-    const int32_t startVertex = vertexBuffer.index();
+    const std::size_t startVertex = vertices.size();
     std::vector<TriangleElement> triangleStore;
 
     for (GLsizei i = 0; i < len; ++i) {
@@ -350,8 +349,8 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
         startOfLine = false;
     }
 
-    const GLsizei endVertex = vertexBuffer.index();
-    const GLsizei vertexCount = endVertex - startVertex;
+    const std::size_t endVertex = vertices.size();
+    const std::size_t vertexCount = endVertex - startVertex;
 
     // Store the triangle/line groups.
     {
@@ -362,10 +361,12 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
 
         assert(triangleGroups.back());
         auto& group = *triangleGroups.back();
+        uint16_t index = group.vertex_length;
+
         for (const auto& triangle : triangleStore) {
-            triangleElementsBuffer.add(group.vertex_length + triangle.a,
-                                       group.vertex_length + triangle.b,
-                                       group.vertex_length + triangle.c);
+            triangles.emplace_back(static_cast<uint16_t>(index + triangle.a),
+                                   static_cast<uint16_t>(index + triangle.b),
+                                   static_cast<uint16_t>(index + triangle.c));
         }
 
         group.vertex_length += vertexCount;
@@ -379,15 +380,15 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
                                   double endLeft,
                                   double endRight,
                                   bool round,
-                                  int32_t startVertex,
+                                  std::size_t startVertex,
                                   std::vector<TriangleElement>& triangleStore) {
     int8_t tx = round ? 1 : 0;
 
     Point<double> extrude = normal;
     if (endLeft)
         extrude = extrude - (util::perp(normal) * endLeft);
-    e3 = vertexBuffer.add(currentCoordinate.x, currentCoordinate.y, extrude.x, extrude.y, tx, 0, endLeft, distance * LINE_DISTANCE_SCALE)
-         - startVertex;
+    vertices.emplace_back(currentCoordinate.x, currentCoordinate.y, extrude.x, extrude.y, tx, 0, endLeft, distance * LINE_DISTANCE_SCALE);
+    e3 = vertices.size() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
     }
@@ -397,8 +398,8 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
     extrude = normal * -1.0;
     if (endRight)
         extrude = extrude - (util::perp(normal) * endRight);
-    e3 = vertexBuffer.add(currentCoordinate.x, currentCoordinate.y, extrude.x, extrude.y, tx, 1, -endRight, distance * LINE_DISTANCE_SCALE)
-         - startVertex;
+    vertices.emplace_back(currentCoordinate.x, currentCoordinate.y, extrude.x, extrude.y, tx, 1, -endRight, distance * LINE_DISTANCE_SCALE);
+    e3 = vertices.size() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
     }
@@ -419,13 +420,13 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
                                    double distance,
                                    const Point<double>& extrude,
                                    bool lineTurnsLeft,
-                                   int32_t startVertex,
+                                   std::size_t startVertex,
                                    std::vector<TriangleElement>& triangleStore) {
     int8_t ty = lineTurnsLeft;
 
     Point<double> flippedExtrude = extrude * (lineTurnsLeft ? -1.0 : 1.0);
-    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, flippedExtrude.x, flippedExtrude.y, 0, ty, 0, distance * LINE_DISTANCE_SCALE)
-         - startVertex;
+    vertices.emplace_back(currentVertex.x, currentVertex.y, flippedExtrude.x, flippedExtrude.y, 0, ty, 0, distance * LINE_DISTANCE_SCALE);
+    e3 = vertices.size() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
     }
@@ -438,8 +439,8 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
 }
 
 void LineBucket::upload(gl::Context& context) {
-    vertexBuffer.upload(context);
-    triangleElementsBuffer.upload(context);
+    vertexBuffer = context.createVertexBuffer(std::move(vertices));
+    indexBuffer = context.createIndexBuffer(std::move(triangles));
 
     // From now on, we're only going to render during the translucent pass.
     uploaded = true;
@@ -471,11 +472,11 @@ void LineBucket::drawLines(LineShader& shader,
             continue;
         }
         group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
-            shader, vertexBuffer, triangleElementsBuffer, vertex_index, context);
+            shader, *vertexBuffer, *indexBuffer, vertex_index, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * triangleElementsBuffer.itemSize;
+        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
+        elements_index += group->elements_length * indexBuffer->primitiveSize;
     }
 }
 
@@ -490,11 +491,11 @@ void LineBucket::drawLineSDF(LineSDFShader& shader,
             continue;
         }
         group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
-            shader, vertexBuffer, triangleElementsBuffer, vertex_index, context);
+            shader, *vertexBuffer, *indexBuffer, vertex_index, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * triangleElementsBuffer.itemSize;
+        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
+        elements_index += group->elements_length * indexBuffer->primitiveSize;
     }
 }
 
@@ -509,11 +510,11 @@ void LineBucket::drawLinePatterns(LinepatternShader& shader,
             continue;
         }
         group->array[paintMode == PaintMode::Overdraw ? 5 : 4].bind(
-            shader, vertexBuffer, triangleElementsBuffer, vertex_index, context);
+            shader, *vertexBuffer, *indexBuffer, vertex_index, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * triangleElementsBuffer.itemSize;
+        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
+        elements_index += group->elements_length * indexBuffer->primitiveSize;
     }
 }
 

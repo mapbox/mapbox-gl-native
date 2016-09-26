@@ -6,9 +6,18 @@
 
 namespace mbgl {
 
+namespace gl {
+template <class> class VertexBuffer;
+} // namespace gl
+
+class TextureRectVertex;
+
 class SDFShader : public Shader {
 public:
     SDFShader(gl::Context&, Defines defines = None);
+
+    void bind(const gl::VertexBuffer<TextureRectVertex>&,
+              const int8_t* offset);
 
     UniformMatrix<4>              u_matrix          = {"u_matrix",          *this};
     Uniform<std::array<float, 2>> u_extrude_scale   = {"u_extrude_scale",   *this};
@@ -25,8 +34,6 @@ public:
     Uniform<int32_t>              u_pitch_with_map  = {"u_pitch_with_map",  *this};
     Uniform<int32_t>              u_texture         = {"u_texture",         *this};
     Uniform<int32_t>              u_fadetexture     = {"u_fadetexture",     *this};
-
-    void bind(int8_t* offset) final;
 };
 
 } // namespace mbgl

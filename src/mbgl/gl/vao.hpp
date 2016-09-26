@@ -2,6 +2,7 @@
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 
@@ -14,39 +15,39 @@ public:
     VertexArrayObject();
     ~VertexArrayObject();
 
-    template <typename VertexBuffer>
+    template <typename Shader, typename T>
     void bind(Shader& shader,
-              VertexBuffer& vertexBuffer,
+              const gl::VertexBuffer<T>& vertexBuffer,
               int8_t* offset,
               gl::Context& context) {
         bindVertexArrayObject(context);
         if (bound_shader == 0) {
-            vertexBuffer.bind(context);
-            shader.bind(offset);
+            context.vertexBuffer = vertexBuffer.buffer;
+            shader.bind(vertexBuffer, offset);
             if (vertexArray) {
-                storeBinding(shader, vertexBuffer.getID(), 0, offset);
+                storeBinding(shader, vertexBuffer.buffer, 0, offset);
             }
         } else {
-            verifyBinding(shader, vertexBuffer.getID(), 0, offset);
+            verifyBinding(shader, vertexBuffer.buffer, 0, offset);
         }
     }
 
-    template <typename VertexBuffer, typename ElementsBuffer>
+    template <typename Shader, typename T, typename P>
     void bind(Shader& shader,
-              VertexBuffer& vertexBuffer,
-              ElementsBuffer& elementsBuffer,
+              const gl::VertexBuffer<T>& vertexBuffer,
+              const gl::IndexBuffer<P>& indexBuffer,
               int8_t* offset,
               gl::Context& context) {
         bindVertexArrayObject(context);
         if (bound_shader == 0) {
-            vertexBuffer.bind(context);
-            elementsBuffer.bind(context);
-            shader.bind(offset);
+            context.vertexBuffer = vertexBuffer.buffer;
+            context.elementBuffer = indexBuffer.buffer;
+            shader.bind(vertexBuffer, offset);
             if (vertexArray) {
-                storeBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
+                storeBinding(shader, vertexBuffer.buffer, indexBuffer.buffer, offset);
             }
         } else {
-            verifyBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
+            verifyBinding(shader, vertexBuffer.buffer, indexBuffer.buffer, offset);
         }
     }
 

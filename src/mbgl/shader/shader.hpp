@@ -22,8 +22,6 @@ public:
 
     gl::UniformLocation getUniformLocation(const char* uniform) const;
 
-    virtual void bind(int8_t *offset) = 0;
-
     enum Defines : bool {
         None = false,
         Overdraw = true,
@@ -36,6 +34,7 @@ protected:
            gl::Context&,
            Defines defines = Defines::None);
 
+public:
     static constexpr gl::AttributeLocation         a_pos = 0;
     static constexpr gl::AttributeLocation     a_extrude = 1;
     static constexpr gl::AttributeLocation      a_offset = 2;

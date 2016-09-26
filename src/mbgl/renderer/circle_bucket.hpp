@@ -3,17 +3,16 @@
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/geometry/elements_buffer.hpp>
-#include <mbgl/geometry/circle_buffer.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gl/element_group.hpp>
+#include <mbgl/shader/circle_vertex.hpp>
 
 namespace mbgl {
 
-class CircleVertexBuffer;
 class CircleShader;
 
 class CircleBucket : public Bucket {
-    using TriangleGroup = ElementGroup<3>;
-
 public:
     CircleBucket(const MapMode);
     ~CircleBucket() override;
@@ -28,10 +27,14 @@ public:
     void drawCircles(CircleShader&, gl::Context&);
 
 private:
-    CircleVertexBuffer vertexBuffer_;
-    TriangleElementsBuffer elementsBuffer_;
+    std::vector<CircleVertex> vertices;
+    std::vector<gl::Triangle> triangles;
 
-    std::vector<std::unique_ptr<TriangleGroup>> triangleGroups_;
+    using TriangleGroup = gl::ElementGroup<3>;
+    std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
+
+    optional<gl::VertexBuffer<CircleVertex>> vertexBuffer;
+    optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
 
     const MapMode mode;
 };

@@ -87,13 +87,6 @@ TEST(GLObject, Store) {
     context.performCleanup();
     EXPECT_TRUE(context.empty());
 
-    mbgl::gl::UniqueBuffer buffer = context.createBuffer();
-    EXPECT_NE(buffer.get(), 0u);
-    buffer.reset();
-    EXPECT_FALSE(context.empty());
-    context.performCleanup();
-    EXPECT_TRUE(context.empty());
-
     mbgl::gl::UniqueTexture texture = context.createTexture();
     EXPECT_NE(texture.get(), 0u);
     texture.reset();

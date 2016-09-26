@@ -2,8 +2,10 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/geometry/elements_buffer.hpp>
-#include <mbgl/geometry/fill_buffer.hpp>
+#include <mbgl/gl/element_group.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/shader/plain_vertex.hpp>
 
 #include <vector>
 #include <memory>
@@ -33,15 +35,18 @@ public:
     void drawVertices(OutlinePatternShader&, gl::Context&, PaintMode);
 
 private:
-    FillVertexBuffer vertexBuffer;
-    TriangleElementsBuffer triangleElementsBuffer;
-    LineElementsBuffer lineElementsBuffer;
+    std::vector<PlainVertex> vertices;
+    std::vector<gl::Line> lines;
+    std::vector<gl::Triangle> triangles;
 
-    typedef ElementGroup<4> TriangleGroup;
-    typedef ElementGroup<4> LineGroup;
-
-    std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
+    typedef gl::ElementGroup<4> LineGroup;
+    typedef gl::ElementGroup<4> TriangleGroup;
     std::vector<std::unique_ptr<LineGroup>> lineGroups;
+    std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
+
+    optional<gl::VertexBuffer<PlainVertex>> vertexBuffer;
+    optional<gl::IndexBuffer<gl::Line>> lineIndexBuffer;
+    optional<gl::IndexBuffer<gl::Triangle>> triangleIndexBuffer;
 };
 
 } // namespace mbgl
