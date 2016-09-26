@@ -199,6 +199,23 @@ void OfflineDownload::activateDownload() {
     });
 }
 
+/*
+   Fill up our own request queue by requesting the next few resources. This is called
+   when activating the download, or when a request completes successfully.
+
+   Note "successfully"; it's not called when a requests receives an error. A request
+   that errors will be retried after some delay. So in that sense it's still "active"
+   and consuming resources, notably the request object, its timer, and network resources
+   when the timer fires.
+
+   We could try to squeeze in subsequent requests while we wait for the errored request
+   to retry. But that risks overloading the upstream request queue -- defeating our own
+   metering -- if there are a lot of errored requests that all come up for retry at the
+   same time. And many times, the cause of a request error will apply to many requests
+   of the same type. For instance if a server is unreachable, all the requests to that
+   host are going to error. In that case, continuing to try subsequent resources after
+   the first few errors is fruitless anyway.
+*/
 void OfflineDownload::continueDownload() {
     if (resourcesRemaining.empty() && status.complete()) {
         setState(OfflineRegionDownloadState::Inactive);
