@@ -193,7 +193,8 @@ std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_
         const auto query = url.substr(queryIdx);
         // get access token index
         const auto accessTokenIdx = (query.find("access_token") == 0) ? 0 : query.find("access_token") - 1; // if it's not the first param, grab the & as well
-        const auto accessTokenEndIdx = (accessTokenIdx == 0) ? query.find("&", accessTokenIdx) + 1 : query.find("&", accessTokenIdx);
+        const auto secondQueryIdx = query.find("&", accessTokenIdx);
+        const auto accessTokenEndIdx = (accessTokenIdx == 0 && secondQueryIdx != 0) ? query.length() : secondQueryIdx;
         if (query.length() > accessTokenEndIdx - accessTokenIdx) { // only keep going if there is more query to handle
             auto subQuery = query.substr(0, accessTokenIdx);
             if (accessTokenEndIdx != std::string::npos) subQuery += query.substr(accessTokenEndIdx, query.length());
