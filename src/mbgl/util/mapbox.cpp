@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <vector>
 #include <iostream>
+#include <regex>
 
 namespace mbgl {
 namespace util {
@@ -187,19 +188,14 @@ std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_
     }
 
     result += "." + extension;
-
+    
     // get the query and remove access_token, if more parameters exist, add them to the final result
     if (queryIdx != url.length()) {
-        const auto query = url.substr(queryIdx);
-        // get access token index
-        const auto accessTokenIdx = (query.find("access_token") == 0) ? 0 : query.find("access_token") - 1; // if it's not the first param, grab the & as well
-        const auto secondQueryIdx = query.find("&", accessTokenIdx);
-        const auto accessTokenEndIdx = (accessTokenIdx == 0 && secondQueryIdx != 0) ? query.length() : secondQueryIdx;
-        if (query.length() > accessTokenEndIdx - accessTokenIdx) { // only keep going if there is more query to handle
-            auto subQuery = query.substr(0, accessTokenIdx);
-            if (accessTokenEndIdx != std::string::npos) subQuery += query.substr(accessTokenEndIdx, query.length());
-            result += "?" + subQuery;
-        }
+        const auto query = url.substr(queryIdx + 1);
+        std::regex re ("&?access_token=([^&]*)");
+        std::string replace = std::regex_replace(query, re, "");
+        std::string subQuery = (replace.find("&") == 0) ? replace.substr(1, replace.length()) : replace;
+        if (subQuery.length() > 0) result += "?" + subQuery;
     }
 
     return result;
