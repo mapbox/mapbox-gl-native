@@ -114,7 +114,6 @@ workflows:
             signing.password=$SIGNING_PASSWORD
             signing.secretKeyRingFile=secring.gpg" >> platform/android/MapboxGLAndroidSDK/gradle.properties
 
-            export BUILDTYPE=Release
             make apackage
 
             cd platform/android
