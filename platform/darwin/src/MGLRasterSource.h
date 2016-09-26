@@ -1,6 +1,8 @@
 #import "MGLSource.h"
 #import "MGLTypes.h"
 
+#import <CoreGraphics/CoreGraphics.h>
+
 @class MGLTileSet;
 
 NS_ASSUME_NONNULL_BEGIN
