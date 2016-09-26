@@ -88,10 +88,10 @@ signals:
     void zoomLevelChanged(qreal zoomLevel);
     void centerChanged(const QGeoCoordinate &coordinate);
     void colorChanged(const QColor &color);
+    void errorChanged();
 
     // Compatibility with Map QML Type, but no-op.
     void pluginChanged(QDeclarativeGeoServiceProvider *plugin);
-    void errorChanged();
     void copyrightLinkActivated(const QString &link);
     void copyrightsVisibleChanged(bool visible);
 
@@ -162,6 +162,9 @@ private:
     QList<QVariantMap> m_sourceChanges;
     QList<QVariantMap> m_filterChanges;
     QList<QQuickMapboxGLMapParameter*> m_parameters;
+
+    QGeoServiceProvider::Error m_error = QGeoServiceProvider::NoError;
+    QString m_errorString;
 
     qreal m_bearing = 0;
     qreal m_pitch = 0;

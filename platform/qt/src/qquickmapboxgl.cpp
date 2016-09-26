@@ -40,8 +40,9 @@ QQuickFramebufferObject::Renderer *QQuickMapboxGL::createRenderer() const
 
 void QQuickMapboxGL::setPlugin(QDeclarativeGeoServiceProvider *)
 {
-    qWarning() << __PRETTY_FUNCTION__
-        << "Not implemented.";
+    m_error = QGeoServiceProvider::NotSupportedError;
+    m_errorString = "QQuickMapboxGL does not support plugins.";
+    emit errorChanged();
 }
 
 QDeclarativeGeoServiceProvider *QQuickMapboxGL::plugin() const
@@ -141,12 +142,12 @@ QGeoCoordinate QQuickMapboxGL::center() const
 
 QGeoServiceProvider::Error QQuickMapboxGL::error() const
 {
-    return QGeoServiceProvider::NoError;
+    return m_error;
 }
 
 QString QQuickMapboxGL::errorString() const
 {
-    return QString();
+    return m_errorString;
 }
 
 void QQuickMapboxGL::setVisibleRegion(const QGeoShape &shape)
@@ -161,8 +162,7 @@ QGeoShape QQuickMapboxGL::visibleRegion() const
 
 void QQuickMapboxGL::setCopyrightsVisible(bool)
 {
-    qWarning() << __PRETTY_FUNCTION__
-        << "Not implemented.";
+    qWarning() << Q_FUNC_INFO << "Not implemented.";
 }
 
 bool QQuickMapboxGL::copyrightsVisible() const
@@ -296,7 +296,9 @@ bool QQuickMapboxGL::parseStyleSource(QQuickMapboxGLMapParameter *param)
         source["data"] = geojson.readAll();
         m_sourceChanges << source;
     } else {
-        qWarning() << "Error: Unsupported source type '" << sourceType << "'.";
+        m_error = QGeoServiceProvider::UnknownParameterError;
+        m_errorString = "Invalid source type: " + sourceType;
+        emit errorChanged();
         return false;
     }
     return true;
@@ -337,7 +339,9 @@ void QQuickMapboxGL::processMapParameter(QQuickMapboxGLMapParameter *param)
     bool needsUpdate = false;
     switch (s_parameterTypes.indexOf(param->property("type").toString())) {
     case -1:
-        qWarning() << "Error: Invalid value for property 'type'.";
+        m_error = QGeoServiceProvider::UnknownParameterError;
+        m_errorString = "Invalid value for property 'type': " + param->property("type").toString();
+        emit errorChanged();
         break;
     case 0: // style
         needsUpdate |= parseStyle(param);
@@ -374,19 +378,25 @@ void QQuickMapboxGL::onParameterPropertyUpdated(const QString &propertyName)
 {
     QQuickMapboxGLMapParameter *param = qobject_cast<QQuickMapboxGLMapParameter *>(sender());
     if (!param) {
-        qWarning() << "Warning: Sender for QQuickMapboxGL::onParameterPropertyUpdated is not a QQuickMapboxGLMapParameter.";
+        m_error = QGeoServiceProvider::NotSupportedError;
+        m_errorString = "QQuickMapboxGL::onParameterPropertyUpdated should be called from a QQuickMapboxGLMapParameter.";
+        emit errorChanged();
         return;
     }
 
     if (propertyName == "type") {
-        qWarning() << "Error: Cannot modify property 'type'.";
+        m_error = QGeoServiceProvider::NotSupportedError;
+        m_errorString = "Property 'type' is a write-once.";
+        emit errorChanged();
         return;
     }
 
     bool needsUpdate = false;
     switch (s_parameterTypes.indexOf(param->property("type").toString())) {
     case -1:
-        qWarning() << "Error: Invalid value for property 'type'.";
+        m_error = QGeoServiceProvider::UnknownParameterError;
+        m_errorString = "Invalid value for property 'type': " + param->property("type").toString();
+        emit errorChanged();
         break;
     case 0: // style
         needsUpdate |= parseStyle(param);
