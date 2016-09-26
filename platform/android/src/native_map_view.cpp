@@ -129,8 +129,6 @@ void NativeMapView::activate() {
         return;
     }
 
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::activate");
-
     oldDisplay = eglGetCurrentDisplay();
     oldReadSurface = eglGetCurrentSurface(EGL_READ);
     oldDrawSurface = eglGetCurrentSurface(EGL_DRAW);
@@ -159,8 +157,6 @@ void NativeMapView::deactivate() {
         return;
     }
 
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::deactivate");
-
     assert(vm != nullptr);
 
     if (oldContext != context && oldContext != EGL_NO_CONTEXT) {
@@ -181,8 +177,6 @@ void NativeMapView::deactivate() {
 }
 
 void NativeMapView::invalidate() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::invalidate()");
-
     assert(vm != nullptr);
     assert(obj != nullptr);
 
@@ -678,8 +672,6 @@ EGLConfig NativeMapView::chooseConfig(const EGLConfig configs[], EGLint numConfi
 }
 
 void NativeMapView::notifyMapChange(mbgl::MapChange change) {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::notifyMapChange()");
-
     assert(vm != nullptr);
     assert(obj != nullptr);
 
@@ -696,8 +688,6 @@ void NativeMapView::enableFps(bool enable) {
 }
 
 void NativeMapView::updateFps() {
-    mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::updateFps()");
-
     if (!fpsEnabled) {
         return;
     }
