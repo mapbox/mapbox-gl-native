@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.testapp.activity.offline;
+package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -10,9 +10,9 @@ import org.json.JSONObject;
 import static com.mapbox.mapboxsdk.testapp.activity.offline.OfflineActivity.JSON_CHARSET;
 import static com.mapbox.mapboxsdk.testapp.activity.offline.OfflineActivity.JSON_FIELD_REGION_NAME;
 
-class OfflineUtils {
+public class OfflineUtils {
 
-    static String getRegionName(@NonNull  OfflineRegion offlineRegion) {
+    public static String getRegionName(@NonNull  OfflineRegion offlineRegion) {
         String regionName;
         try {
             byte[] metadata = offlineRegion.getMetadata();
@@ -26,7 +26,7 @@ class OfflineUtils {
         return regionName;
     }
 
-    static byte[] convertRegionName(String regionName) {
+    public static byte[] convertRegionName(String regionName) {
         byte[] metadata = null;
         try {
             JSONObject jsonObject = new JSONObject();

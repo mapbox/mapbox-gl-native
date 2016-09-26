@@ -244,6 +244,14 @@
                 android:value="@string/category_offline" />
         </activity>
         <activity
+            android:name=".activity.offline.UpdateMetadataActivity"
+            android:description="@string/description_update_metadata"
+            android:label="@string/activity_update_metadata">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_offline" />
+        </activity>
+        <activity
             android:name=".activity.imagegenerator.SnapshotActivity"
             android:description="@string/description_snapshot"
             android:label="@string/activity_snapshot">
