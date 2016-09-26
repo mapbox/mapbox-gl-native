@@ -53,8 +53,12 @@ void NodeRequest::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(info.Holder());
 
+    // Survived the garbage collection window
+    request->Unref();
+
     // Move out of the object so callback() can only be fired once.
     auto callback = std::move(request->callback);
+
     if (!callback) {
         return info.GetReturnValue().SetUndefined();
     }
@@ -126,6 +130,9 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
 
 void NodeRequest::Execute() {
     v8::Local<v8::Value> argv[] = { handle() };
+
+    // Prevent losing the NodeRequest to garbage collection
+    Ref();
 
     Nan::MakeCallback(Nan::To<v8::Object>(target->handle()->GetInternalField(1)).ToLocalChecked(), "request", 1, argv);
 }
