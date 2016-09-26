@@ -394,3 +394,51 @@ TEST(Map, RemoveImage) {
     map.removeImage("test-icon");
     test::checkImage("test/fixtures/map/remove_icon", test::render(map, test.view));
 }
+
+TEST(Map, DontLoadUnneededTiles) {
+    MapTest test;
+
+    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
+    map.setStyleJSON(R"STYLE({
+  "sources": {
+    "a": { "type": "vector", "tiles": [ "a/{z}/{x}/{y}" ] }
+  },
+  "layers": [{
+    "id": "a",
+    "type": "fill",
+    "source": "a",
+    "source-layer": "a",
+    "minzoom": 0.3,
+    "maxzoom": 1.6
+  }]
+})STYLE");
+
+    using Tiles = std::unordered_set<std::string>;
+    Tiles tiles;
+
+    test.fileSource.tileResponse = [&](const Resource& rsc) {
+        tiles.emplace(rsc.url);
+        Response res;
+        res.noContent = true;
+        return res;
+    };
+
+    std::unordered_map<double, Tiles> referenceTiles = {
+        // Since the layer's minzoom is 0.3, we shouldn't load tiles before z0.3
+        { 0.3, { "a/0/0/0" } },
+        { 1.0, { "a/1/1/0", "a/1/0/1", "a/1/0/0", "a/1/1/1" } },
+        // Since the layer's maxzoom is 1.6, we should never load z2 or z3 tiles.
+    };
+
+    // Loop through zoom levels from 0 to 3 and check that the correct tiles are loaded at every
+    // step. The source is marked with maxzoom 1.0, which means that it won't be visible anymore
+    // after z1.0, so we should under no circumstances attempt to load z2 tiles.
+    for (unsigned zoom = 0; zoom <= 30; zoom++) { // times 10
+        // Note: using z += 0.1 in the loop doesn't produce accurate floating point numbers.
+        const double z = double(zoom) / 10;
+        tiles.clear();
+        map.setZoom(z);
+        test::render(map, test.view);
+        EXPECT_EQ(referenceTiles[z], tiles) << "zoom level " << z;
+    }
+}

@@ -214,15 +214,18 @@ double Style::getDefaultPitch() const {
 
 void Style::updateTiles(const UpdateParameters& parameters) {
     for (const auto& source : sources) {
-        source->baseImpl->updateTiles(parameters);
+        if (source->baseImpl->enabled) {
+            source->baseImpl->updateTiles(parameters);
+        }
     }
 }
 
 void Style::relayout() {
     for (const auto& sourceID : updateBatch.sourceIDs) {
         Source* source = getSource(sourceID);
-        if (!source) continue;
-        source->baseImpl->reloadTiles();
+        if (source && source->baseImpl->enabled) {
+            source->baseImpl->reloadTiles();
+        }
     }
     updateBatch.sourceIDs.clear();
 }
