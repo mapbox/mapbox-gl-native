@@ -51,6 +51,21 @@ custom_categories:
       - MGLPolygonFeature
       - MGLPolylineFeature
       - MGLShapeCollectionFeature
+  - name: Runtime Styling
+    children:
+      - MGLStyleLayer
+      - MGLBaseStyleLayer
+      - MGLBackgroundStyleLayer
+      - MGLCircleStyleLayer
+      - MGLFillStyleLayer
+      - MGLLineStyleLayer
+      - MGLRasterStyleLayer
+      - MGLSymbolStyleLayer
+      - MGLSource
+      - MGLGeoJSONSource
+      - MGLRasterSource
+      - MGLTileSet
+      - MGLVectorSource
   - name: Offline Maps
     children:
       - MGLOfflineRegion
