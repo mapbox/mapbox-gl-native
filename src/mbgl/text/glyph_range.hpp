@@ -17,4 +17,7 @@ struct GlyphRangeHash {
 
 typedef std::unordered_set<GlyphRange, GlyphRangeHash> GlyphRangeSet;
 
+constexpr uint32_t GLYPHS_PER_GLYPH_RANGE = 256;
+constexpr uint32_t GLYPH_RANGES_PER_FONT_STACK = 256;
+
 } // end namespace mbgl
