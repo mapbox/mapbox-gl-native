@@ -6,15 +6,19 @@
 #include <vector>
 #include <iostream>
 
+namespace {
+
+const char* protocol = "mapbox://";
+const std::size_t protocolLength = 9;
+
+} // namespace
+
 namespace mbgl {
 namespace util {
 namespace mapbox {
 
-const std::string protocol = "mapbox://";
-const std::size_t protocolLength = protocol.length();
-
 bool isMapboxURL(const std::string& url) {
-    return std::equal(protocol.begin(), protocol.end(), url.begin());
+    return url.compare(0, protocolLength, protocol) == 0;
 }
 
 static std::vector<std::string> getMapboxURLPathname(const std::string& url) {
