@@ -8,7 +8,9 @@ NS_ASSUME_NONNULL_BEGIN
  The base style layer class from which all other layer types inherit. 
  Style layers allow runtime customization of all map styling properties. 
  
- You should use the concrete subclasses of MGLBaseStyleLayer (which conform to MGLStyleLayer) to style fill, line, symbol, and other layer types. 
+ You should use the concrete subclasses of MGLBaseStyleLayer (which 
+ conform to MGLStyleLayer) to style fill, line, symbol, and other layer 
+ types.
  */
 @interface MGLBaseStyleLayer : NSObject
 
