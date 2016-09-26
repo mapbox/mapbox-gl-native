@@ -46,7 +46,7 @@ enum MapChange {
     MapChangeDidFinishRenderingMap,
     MapChangeDidFinishRenderingMapFullyRendered,
     MapChangeDidFinishLoadingStyle,
-    MapChangeSourceAttributionDidChange
+    MapChangeSourceDidChange
 };
 
 struct Q_DECL_EXPORT CameraOptions {

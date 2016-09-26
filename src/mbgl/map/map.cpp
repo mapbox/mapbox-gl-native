@@ -982,7 +982,7 @@ void Map::onLowMemory() {
 }
 
 void Map::Impl::onSourceAttributionChanged(style::Source&, const std::string&) {
-    view.notifyMapChange(MapChangeSourceAttributionDidChange);
+    view.notifyMapChange(MapChangeSourceDidChange);
 }
 
 void Map::Impl::onUpdate(Update flags) {
