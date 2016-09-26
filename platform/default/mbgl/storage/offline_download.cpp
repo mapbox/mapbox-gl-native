@@ -114,7 +114,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
     }
 
     if (!parser.glyphURL.empty()) {
-        result.requiredResourceCount += parser.fontStacks().size() * 256;
+        result.requiredResourceCount += parser.fontStacks().size() * GLYPH_RANGES_PER_FONT_STACK;
     }
 
     if (!parser.spriteURL.empty()) {
@@ -184,8 +184,8 @@ void OfflineDownload::activateDownload() {
 
         if (!parser.glyphURL.empty()) {
             for (const auto& fontStack : parser.fontStacks()) {
-                for (uint32_t i = 0; i < 256; i++) {
-                    queueResource(Resource::glyphs(parser.glyphURL, fontStack, getGlyphRange(i * 256)));
+                for (uint32_t i = 0; i < GLYPH_RANGES_PER_FONT_STACK; i++) {
+                    queueResource(Resource::glyphs(parser.glyphURL, fontStack, getGlyphRange(i * GLYPHS_PER_GLYPH_RANGE)));
                 }
             }
         }
