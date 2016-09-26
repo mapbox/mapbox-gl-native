@@ -5,11 +5,18 @@
 
 namespace mbgl {
 
+namespace gl {
+template <class> class VertexBuffer;
+} // namespace gl
+
+class TextureRectVertex;
+
 class IconShader : public Shader {
 public:
     IconShader(gl::Context&, Defines defines = None);
 
-    void bind(int8_t* offset) final;
+    void bind(const gl::VertexBuffer<TextureRectVertex>&,
+              const int8_t* offset);
 
     UniformMatrix<4>              u_matrix          = {"u_matrix",          *this};
     Uniform<std::array<float, 2>> u_extrude_scale   = {"u_extrude_scale",   *this};

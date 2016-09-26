@@ -5,11 +5,18 @@
 
 namespace mbgl {
 
+namespace gl {
+template <class> class VertexBuffer;
+} // namespace gl
+
+class CollisionBoxVertex;
+
 class CollisionBoxShader : public Shader {
 public:
     CollisionBoxShader(gl::Context&);
 
-    void bind(int8_t* offset) final;
+    void bind(const gl::VertexBuffer<CollisionBoxVertex>&,
+              const int8_t* offset);
 
     UniformMatrix<4> u_matrix  = {"u_matrix",  *this};
     Uniform<float>   u_scale   = {"u_scale",   *this};

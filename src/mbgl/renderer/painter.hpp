@@ -8,10 +8,10 @@
 #include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/bucket.hpp>
 
-#include <mbgl/geometry/vao.hpp>
-#include <mbgl/geometry/static_vertex_buffer.hpp>
-
+#include <mbgl/gl/vao.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/shader/plain_vertex.hpp>
+#include <mbgl/shader/raster_vertex.hpp>
 
 #include <mbgl/style/style.hpp>
 
@@ -188,34 +188,9 @@ private:
     std::unique_ptr<Shaders> overdrawShaders;
 #endif
 
-    // Set up the stencil quad we're using to generate the stencil mask.
-    StaticVertexBuffer tileStencilBuffer {
-        // top left triangle
-        {{ 0, 0 }},
-        {{ util::EXTENT, 0 }},
-        {{ 0, util::EXTENT }},
-
-        // bottom right triangle
-        {{ util::EXTENT, 0 }},
-        {{ 0, util::EXTENT }},
-        {{ util::EXTENT, util::EXTENT }},
-    };
-
-    StaticRasterVertexBuffer rasterBoundsBuffer {
-        {{ 0, 0, 0, 0 }},
-        {{ util::EXTENT, 0, 32767, 0 }},
-        {{ 0, util::EXTENT, 0, 32767 }},
-        {{ util::EXTENT, util::EXTENT, 32767, 32767 }},
-    };
-
-    // Set up the tile boundary lines we're using to draw the tile outlines.
-    StaticVertexBuffer tileBorderBuffer {
-        {{ 0, 0 }},
-        {{ util::EXTENT, 0 }},
-        {{ util::EXTENT, util::EXTENT }},
-        {{ 0, util::EXTENT }},
-        {{ 0, 0 }},
-    };
+    gl::VertexBuffer<PlainVertex> tileTriangleVertexes;
+    gl::VertexBuffer<PlainVertex> tileLineStripVertexes;
+    gl::VertexBuffer<RasterVertex> rasterVertexes;
 
     VertexArrayObject tileBorderArray;
 };

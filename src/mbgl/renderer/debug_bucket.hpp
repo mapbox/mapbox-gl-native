@@ -1,9 +1,13 @@
 #pragma once
 
 #include <mbgl/map/mode.hpp>
-#include <mbgl/geometry/debug_font_buffer.hpp>
-#include <mbgl/geometry/vao.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/geometry.hpp>
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/noncopyable.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gl/vao.hpp>
+#include <mbgl/shader/plain_vertex.hpp>
 
 namespace mbgl {
 
@@ -21,7 +25,8 @@ public:
                 bool complete,
                 optional<Timestamp> modified,
                 optional<Timestamp> expires,
-                MapDebugOptions);
+                MapDebugOptions,
+                gl::Context&);
 
     void drawLines(PlainShader&, gl::Context&);
     void drawPoints(PlainShader&, gl::Context&);
@@ -33,7 +38,7 @@ public:
     const MapDebugOptions debugMode;
 
 private:
-    DebugFontBuffer fontBuffer;
+    gl::VertexBuffer<PlainVertex> textVertexes;
     VertexArrayObject array;
 };
 

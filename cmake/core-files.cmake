@@ -48,32 +48,11 @@ set(MBGL_CORE_FILES
     # geometry
     src/mbgl/geometry/anchor.hpp
     src/mbgl/geometry/binpack.hpp
-    src/mbgl/geometry/buffer.hpp
-    src/mbgl/geometry/circle_buffer.cpp
-    src/mbgl/geometry/circle_buffer.hpp
-    src/mbgl/geometry/collision_box_buffer.cpp
-    src/mbgl/geometry/collision_box_buffer.hpp
-    src/mbgl/geometry/debug_font_buffer.cpp
-    src/mbgl/geometry/debug_font_buffer.hpp
     src/mbgl/geometry/debug_font_data.hpp
-    src/mbgl/geometry/elements_buffer.cpp
-    src/mbgl/geometry/elements_buffer.hpp
     src/mbgl/geometry/feature_index.cpp
     src/mbgl/geometry/feature_index.hpp
-    src/mbgl/geometry/fill_buffer.cpp
-    src/mbgl/geometry/fill_buffer.hpp
-    src/mbgl/geometry/icon_buffer.cpp
-    src/mbgl/geometry/icon_buffer.hpp
     src/mbgl/geometry/line_atlas.cpp
     src/mbgl/geometry/line_atlas.hpp
-    src/mbgl/geometry/line_buffer.cpp
-    src/mbgl/geometry/line_buffer.hpp
-    src/mbgl/geometry/static_vertex_buffer.cpp
-    src/mbgl/geometry/static_vertex_buffer.hpp
-    src/mbgl/geometry/text_buffer.cpp
-    src/mbgl/geometry/text_buffer.hpp
-    src/mbgl/geometry/vao.cpp
-    src/mbgl/geometry/vao.hpp
 
     # gl
     include/mbgl/gl/gl.hpp
@@ -81,9 +60,11 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/context.hpp
     src/mbgl/gl/debugging.cpp
     src/mbgl/gl/debugging.hpp
+    src/mbgl/gl/element_group.hpp
     src/mbgl/gl/extension.cpp
     src/mbgl/gl/extension.hpp
     src/mbgl/gl/gl.cpp
+    src/mbgl/gl/index_buffer.hpp
     src/mbgl/gl/object.cpp
     src/mbgl/gl/object.hpp
     src/mbgl/gl/state.hpp
@@ -91,8 +72,11 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/types.hpp
     src/mbgl/gl/value.cpp
     src/mbgl/gl/value.hpp
+    src/mbgl/gl/vao.cpp
+    src/mbgl/gl/vao.hpp
     src/mbgl/gl/vertex_array.cpp
     src/mbgl/gl/vertex_array.hpp
+    src/mbgl/gl/vertex_buffer.hpp
 
     # layout
     src/mbgl/layout/clip_lines.cpp
@@ -183,12 +167,18 @@ set(MBGL_CORE_FILES
     # shader
     src/mbgl/shader/circle_shader.cpp
     src/mbgl/shader/circle_shader.hpp
+    src/mbgl/shader/circle_vertex.cpp
+    src/mbgl/shader/circle_vertex.hpp
     src/mbgl/shader/collision_box_shader.cpp
     src/mbgl/shader/collision_box_shader.hpp
+    src/mbgl/shader/collision_box_vertex.cpp
+    src/mbgl/shader/collision_box_vertex.hpp
     src/mbgl/shader/icon_shader.cpp
     src/mbgl/shader/icon_shader.hpp
     src/mbgl/shader/line_shader.cpp
     src/mbgl/shader/line_shader.hpp
+    src/mbgl/shader/line_vertex.cpp
+    src/mbgl/shader/line_vertex.hpp
     src/mbgl/shader/linepattern_shader.cpp
     src/mbgl/shader/linepattern_shader.hpp
     src/mbgl/shader/linesdf_shader.cpp
@@ -201,13 +191,19 @@ set(MBGL_CORE_FILES
     src/mbgl/shader/pattern_shader.hpp
     src/mbgl/shader/plain_shader.cpp
     src/mbgl/shader/plain_shader.hpp
+    src/mbgl/shader/plain_vertex.cpp
+    src/mbgl/shader/plain_vertex.hpp
     src/mbgl/shader/raster_shader.cpp
     src/mbgl/shader/raster_shader.hpp
+    src/mbgl/shader/raster_vertex.cpp
+    src/mbgl/shader/raster_vertex.hpp
     src/mbgl/shader/sdf_shader.cpp
     src/mbgl/shader/sdf_shader.hpp
     src/mbgl/shader/shader.cpp
     src/mbgl/shader/shader.hpp
     src/mbgl/shader/shaders.hpp
+    src/mbgl/shader/texture_rect_vertex.cpp
+    src/mbgl/shader/texture_rect_vertex.hpp
     src/mbgl/shader/uniform.cpp
     src/mbgl/shader/uniform.hpp
 

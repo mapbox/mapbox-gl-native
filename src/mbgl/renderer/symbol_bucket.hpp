@@ -2,10 +2,11 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/map/mode.hpp>
-#include <mbgl/geometry/elements_buffer.hpp>
-#include <mbgl/geometry/text_buffer.hpp>
-#include <mbgl/geometry/icon_buffer.hpp>
-#include <mbgl/geometry/collision_box_buffer.hpp>
+#include <mbgl/gl/element_group.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/shader/texture_rect_vertex.hpp>
+#include <mbgl/shader/collision_box_vertex.hpp>
 #include <mbgl/text/glyph_range.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 
@@ -46,25 +47,35 @@ public:
 private:
     friend class SymbolLayout;
 
-    typedef ElementGroup<2> TextElementGroup;
-    typedef ElementGroup<4> IconElementGroup;
-    typedef ElementGroup<1> CollisionBoxElementGroup;
+    typedef gl::ElementGroup<2> TextElementGroup;
+    typedef gl::ElementGroup<4> IconElementGroup;
+    typedef gl::ElementGroup<1> CollisionBoxElementGroup;
 
     struct TextBuffer {
-        TextVertexBuffer vertices;
-        TriangleElementsBuffer triangles;
+        std::vector<TextureRectVertex> vertices;
+        std::vector<gl::Triangle> triangles;
         std::vector<std::unique_ptr<TextElementGroup>> groups;
+
+        optional<gl::VertexBuffer<TextureRectVertex>> vertexBuffer;
+        optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
     } text;
 
     struct IconBuffer {
-        IconVertexBuffer vertices;
-        TriangleElementsBuffer triangles;
+        std::vector<TextureRectVertex> vertices;
+        std::vector<gl::Triangle> triangles;
         std::vector<std::unique_ptr<IconElementGroup>> groups;
+
+        optional<gl::VertexBuffer<TextureRectVertex>> vertexBuffer;
+        optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
     } icon;
 
     struct CollisionBoxBuffer {
-        CollisionBoxVertexBuffer vertices;
+        std::vector<CollisionBoxVertex> vertices;
+        std::vector<gl::Line> lines;
         std::vector<std::unique_ptr<CollisionBoxElementGroup>> groups;
+
+        optional<gl::VertexBuffer<CollisionBoxVertex>> vertexBuffer;
+        optional<gl::IndexBuffer<gl::Line>> indexBuffer;
     } collisionBox;
 };
 

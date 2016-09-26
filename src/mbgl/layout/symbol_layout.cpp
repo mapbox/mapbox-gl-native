@@ -464,18 +464,22 @@ void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);
 
         // coordinates (2 triangles)
-        buffer.vertices.add(anchorPoint.x, anchorPoint.y, tl.x, tl.y, tex.x, tex.y, minZoom,
+        buffer.vertices.emplace_back(anchorPoint.x, anchorPoint.y, tl.x, tl.y, tex.x, tex.y, minZoom,
                             maxZoom, placementZoom, glyphAngle);
-        buffer.vertices.add(anchorPoint.x, anchorPoint.y, tr.x, tr.y, tex.x + tex.w, tex.y,
+        buffer.vertices.emplace_back(anchorPoint.x, anchorPoint.y, tr.x, tr.y, tex.x + tex.w, tex.y,
                             minZoom, maxZoom, placementZoom, glyphAngle);
-        buffer.vertices.add(anchorPoint.x, anchorPoint.y, bl.x, bl.y, tex.x, tex.y + tex.h,
+        buffer.vertices.emplace_back(anchorPoint.x, anchorPoint.y, bl.x, bl.y, tex.x, tex.y + tex.h,
                             minZoom, maxZoom, placementZoom, glyphAngle);
-        buffer.vertices.add(anchorPoint.x, anchorPoint.y, br.x, br.y, tex.x + tex.w, tex.y + tex.h,
+        buffer.vertices.emplace_back(anchorPoint.x, anchorPoint.y, br.x, br.y, tex.x + tex.w, tex.y + tex.h,
                             minZoom, maxZoom, placementZoom, glyphAngle);
 
         // add the two triangles, referencing the four coordinates we just inserted.
-        buffer.triangles.add(triangleIndex + 0, triangleIndex + 1, triangleIndex + 2);
-        buffer.triangles.add(triangleIndex + 1, triangleIndex + 2, triangleIndex + 3);
+        buffer.triangles.emplace_back(static_cast<uint16_t>(triangleIndex + 0),
+                                      static_cast<uint16_t>(triangleIndex + 1),
+                                      static_cast<uint16_t>(triangleIndex + 2));
+        buffer.triangles.emplace_back(static_cast<uint16_t>(triangleIndex + 1),
+                                      static_cast<uint16_t>(triangleIndex + 2),
+                                      static_cast<uint16_t>(triangleIndex + 3));
 
         triangleGroup.vertex_length += glyph_vertex_length;
         triangleGroup.elements_length += 2;
@@ -517,14 +521,14 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                     collisionBox.groups.emplace_back(std::make_unique<SymbolBucket::CollisionBoxElementGroup>());
                 }
 
-                collisionBox.vertices.add(anchor.x, anchor.y, tl.x, tl.y, maxZoom, placementZoom);
-                collisionBox.vertices.add(anchor.x, anchor.y, tr.x, tr.y, maxZoom, placementZoom);
-                collisionBox.vertices.add(anchor.x, anchor.y, tr.x, tr.y, maxZoom, placementZoom);
-                collisionBox.vertices.add(anchor.x, anchor.y, br.x, br.y, maxZoom, placementZoom);
-                collisionBox.vertices.add(anchor.x, anchor.y, br.x, br.y, maxZoom, placementZoom);
-                collisionBox.vertices.add(anchor.x, anchor.y, bl.x, bl.y, maxZoom, placementZoom);
-                collisionBox.vertices.add(anchor.x, anchor.y, bl.x, bl.y, maxZoom, placementZoom);
-                collisionBox.vertices.add(anchor.x, anchor.y, tl.x, tl.y, maxZoom, placementZoom);
+                collisionBox.vertices.emplace_back(anchor.x, anchor.y, tl.x, tl.y, maxZoom, placementZoom);
+                collisionBox.vertices.emplace_back(anchor.x, anchor.y, tr.x, tr.y, maxZoom, placementZoom);
+                collisionBox.vertices.emplace_back(anchor.x, anchor.y, tr.x, tr.y, maxZoom, placementZoom);
+                collisionBox.vertices.emplace_back(anchor.x, anchor.y, br.x, br.y, maxZoom, placementZoom);
+                collisionBox.vertices.emplace_back(anchor.x, anchor.y, br.x, br.y, maxZoom, placementZoom);
+                collisionBox.vertices.emplace_back(anchor.x, anchor.y, bl.x, bl.y, maxZoom, placementZoom);
+                collisionBox.vertices.emplace_back(anchor.x, anchor.y, bl.x, bl.y, maxZoom, placementZoom);
+                collisionBox.vertices.emplace_back(anchor.x, anchor.y, tl.x, tl.y, maxZoom, placementZoom);
 
                 auto &group= *collisionBox.groups.back();
                 group.vertex_length += 8;

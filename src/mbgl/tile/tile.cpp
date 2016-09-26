@@ -2,6 +2,7 @@
 #include <mbgl/tile/tile_observer.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/platform/log.hpp>
 
 namespace mbgl {
 

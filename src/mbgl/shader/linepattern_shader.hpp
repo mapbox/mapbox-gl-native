@@ -5,11 +5,18 @@
 
 namespace mbgl {
 
+namespace gl {
+template <class> class VertexBuffer;
+} // namespace gl
+
+class LineVertex;
+
 class LinepatternShader : public Shader {
 public:
     LinepatternShader(gl::Context&, Defines defines = None);
 
-    void bind(int8_t* offset) final;
+    void bind(const gl::VertexBuffer<LineVertex>&,
+              const int8_t* offset);
 
     UniformMatrix<4>              u_matrix              = {"u_matrix",              *this};
     Uniform<float>                u_linewidth           = {"u_linewidth",           *this};

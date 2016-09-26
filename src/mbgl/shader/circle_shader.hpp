@@ -6,11 +6,18 @@
 
 namespace mbgl {
 
+namespace gl {
+template <class> class VertexBuffer;
+} // namespace gl
+
+class CircleVertex;
+
 class CircleShader : public Shader {
 public:
     CircleShader(gl::Context&, Defines defines = None);
 
-    void bind(int8_t* offset) final;
+    void bind(const gl::VertexBuffer<CircleVertex>&,
+              const int8_t* offset);
 
     UniformMatrix<4>              u_matrix           = {"u_matrix",           *this};
     Uniform<std::array<float, 2>> u_extrude_scale    = {"u_extrude_scale",    *this};

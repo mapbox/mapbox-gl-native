@@ -22,6 +22,7 @@
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/actor/thread_pool.hpp>
+#include <mbgl/platform/log.hpp>
 
 namespace mbgl {
 

@@ -58,14 +58,16 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
                 lineGroups.emplace_back(std::make_unique<LineGroup>());
 
             LineGroup& lineGroup = *lineGroups.back();
-            GLsizei lineIndex = lineGroup.vertex_length;
+            uint16_t lineIndex = lineGroup.vertex_length;
 
-            vertexBuffer.add(ring[0].x, ring[0].y);
-            lineElementsBuffer.add(lineIndex + nVertices - 1, lineIndex);
+            vertices.emplace_back(ring[0].x, ring[0].y);
+            lines.emplace_back(static_cast<uint16_t>(lineIndex + nVertices - 1),
+                               static_cast<uint16_t>(lineIndex));
 
             for (uint32_t i = 1; i < nVertices; i++) {
-                vertexBuffer.add(ring[i].x, ring[i].y);
-                lineElementsBuffer.add(lineIndex + i - 1, lineIndex + i);
+                vertices.emplace_back(ring[i].x, ring[i].y);
+                lines.emplace_back(static_cast<uint16_t>(lineIndex + i - 1),
+                                   static_cast<uint16_t>(lineIndex + i));
             }
 
             lineGroup.vertex_length += nVertices;
@@ -82,12 +84,12 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
         }
 
         TriangleGroup& triangleGroup = *triangleGroups.back();
-        GLsizei triangleIndex = triangleGroup.vertex_length;
+        uint16_t triangleIndex = triangleGroup.vertex_length;
 
         for (uint32_t i = 0; i < nIndicies; i += 3) {
-            triangleElementsBuffer.add(triangleIndex + indices[i],
-                                       triangleIndex + indices[i + 1],
-                                       triangleIndex + indices[i + 2]);
+            triangles.emplace_back(static_cast<uint16_t>(triangleIndex + indices[i]),
+                                   static_cast<uint16_t>(triangleIndex + indices[i + 1]),
+                                   static_cast<uint16_t>(triangleIndex + indices[i + 2]));
         }
 
         triangleGroup.vertex_length += totalVertices;
@@ -96,9 +98,9 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
 }
 
 void FillBucket::upload(gl::Context& context) {
-    vertexBuffer.upload(context);
-    triangleElementsBuffer.upload(context);
-    lineElementsBuffer.upload(context);
+    vertexBuffer = context.createVertexBuffer(std::move(vertices));
+    lineIndexBuffer = context.createIndexBuffer(std::move(lines));
+    triangleIndexBuffer = context.createIndexBuffer(std::move(triangles));
 
     // From now on, we're going to render during the opaque and translucent pass.
     uploaded = true;
@@ -127,11 +129,11 @@ void FillBucket::drawElements(PlainShader& shader,
     for (auto& group : triangleGroups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
-            shader, vertexBuffer, triangleElementsBuffer, vertex_index, context);
+            shader, *vertexBuffer, *triangleIndexBuffer, vertex_index, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * triangleElementsBuffer.itemSize;
+        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
+        elements_index += group->elements_length * triangleIndexBuffer->primitiveSize;
     }
 }
 
@@ -143,11 +145,11 @@ void FillBucket::drawElements(PatternShader& shader,
     for (auto& group : triangleGroups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
-            shader, vertexBuffer, triangleElementsBuffer, vertex_index, context);
+            shader, *vertexBuffer, *triangleIndexBuffer, vertex_index, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * triangleElementsBuffer.itemSize;
+        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
+        elements_index += group->elements_length * triangleIndexBuffer->primitiveSize;
     }
 }
 
@@ -159,11 +161,11 @@ void FillBucket::drawVertices(OutlineShader& shader,
     for (auto& group : lineGroups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
-            shader, vertexBuffer, lineElementsBuffer, vertex_index, context);
+            shader, *vertexBuffer, *lineIndexBuffer, vertex_index, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * lineElementsBuffer.itemSize;
+        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
+        elements_index += group->elements_length * lineIndexBuffer->primitiveSize;
     }
 }
 
@@ -175,11 +177,11 @@ void FillBucket::drawVertices(OutlinePatternShader& shader,
     for (auto& group : lineGroups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
-            shader, vertexBuffer, lineElementsBuffer, vertex_index, context);
+            shader, *vertexBuffer, *lineIndexBuffer, vertex_index, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * lineElementsBuffer.itemSize;
+        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
+        elements_index += group->elements_length * lineIndexBuffer->primitiveSize;
     }
 }
 

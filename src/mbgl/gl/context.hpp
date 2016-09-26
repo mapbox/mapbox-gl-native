@@ -4,6 +4,8 @@
 #include <mbgl/gl/state.hpp>
 #include <mbgl/gl/value.hpp>
 #include <mbgl/gl/texture.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <memory>
@@ -22,12 +24,24 @@ public:
     UniqueProgram createProgram();
     UniqueShader createVertexShader();
     UniqueShader createFragmentShader();
-    UniqueBuffer createBuffer();
     UniqueTexture createTexture();
     UniqueVertexArray createVertexArray();
     UniqueFramebuffer createFramebuffer();
 
-    void uploadBuffer(BufferType, size_t, void*);
+    template <class V>
+    VertexBuffer<V> createVertexBuffer(std::vector<V>&& v) {
+        return VertexBuffer<V> {
+            v.size(),
+            createVertexBuffer(v.data(), v.size() * sizeof(V))
+        };
+    }
+
+    template <class P>
+    IndexBuffer<P> createIndexBuffer(std::vector<P>&& v) {
+        return IndexBuffer<P> {
+            createIndexBuffer(v.data(), v.size() * sizeof(P))
+        };
+    }
 
     // Create a texture from an image with data.
     template <typename Image>
@@ -98,9 +112,10 @@ public:
     State<value::BindVertexArray> vertexArrayObject;
 
 private:
+    UniqueBuffer createVertexBuffer(const void* data, std::size_t size);
+    UniqueBuffer createIndexBuffer(const void* data, std::size_t size);
     UniqueTexture createTexture(uint16_t width, uint16_t height, const void* data, TextureUnit);
 
-private:
     friend detail::ProgramDeleter;
     friend detail::ShaderDeleter;
     friend detail::BufferDeleter;

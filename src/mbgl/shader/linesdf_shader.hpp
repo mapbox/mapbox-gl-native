@@ -6,11 +6,18 @@
 
 namespace mbgl {
 
+namespace gl {
+template <class> class VertexBuffer;
+} // namespace gl
+
+class LineVertex;
+
 class LineSDFShader : public Shader {
 public:
     LineSDFShader(gl::Context&, Defines defines = None);
 
-    void bind(int8_t* offset) final;
+    void bind(const gl::VertexBuffer<LineVertex>&,
+              const int8_t* offset);
 
     UniformMatrix<4>              u_matrix             = {"u_matrix",             *this};
     Uniform<Color>                u_color              = {"u_color",              *this};

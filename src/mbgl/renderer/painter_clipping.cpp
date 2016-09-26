@@ -29,7 +29,7 @@ void Painter::drawClippingMasks(PaintParameters& parameters, const std::map<Unwr
     context.colorMask = { false, false, false, false };
     context.stencilMask = mask;
 
-    arrayCoveringPlain.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET_0, context);
+    arrayCoveringPlain.bind(plainShader, tileTriangleVertexes, BUFFER_OFFSET_0, context);
 
     for (const auto& stencil : stencils) {
         const auto& id = stencil.first;
@@ -42,7 +42,7 @@ void Painter::drawClippingMasks(PaintParameters& parameters, const std::map<Unwr
 
         const GLint ref = (GLint)(clip.reference.to_ulong());
         context.stencilFunc = { gl::StencilTestFunction::Always, ref, mask };
-        MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index()));
+        MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(tileTriangleVertexes.vertexCount)));
     }
 }
 

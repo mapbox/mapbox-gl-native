@@ -46,14 +46,14 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
         patternShader.u_opacity = properties.backgroundOpacity;
 
         spriteAtlas->bind(true, context, 0);
-        arrayBackgroundPattern.bind(patternShader, tileStencilBuffer, BUFFER_OFFSET(0), context);
+        arrayBackgroundPattern.bind(patternShader, tileTriangleVertexes, BUFFER_OFFSET(0), context);
 
     } else {
         context.program = plainShader.getID();
         plainShader.u_color = properties.backgroundColor;
         plainShader.u_opacity = properties.backgroundOpacity;
 
-        arrayBackground.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET(0), context);
+        arrayBackground.bind(plainShader, tileTriangleVertexes, BUFFER_OFFSET(0), context);
     }
 
     context.stencilTest = false;
@@ -84,7 +84,7 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
             plainShader.u_matrix = vertexMatrix;
         }
 
-        MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)tileStencilBuffer.index()));
+        MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, static_cast<GLsizei>(tileTriangleVertexes.vertexCount)));
     }
 }
 
