@@ -51,7 +51,7 @@ custom_categories:
       - MGLPolygonFeature
       - MGLPolylineFeature
       - MGLShapeCollectionFeature
-  - name: Runtime Styling
+  - name: Style Layers
     children:
       - MGLStyleLayer
       - MGLBaseStyleLayer
@@ -61,6 +61,8 @@ custom_categories:
       - MGLLineStyleLayer
       - MGLRasterStyleLayer
       - MGLSymbolStyleLayer
+  - name: Data Sources
+    children:
       - MGLSource
       - MGLGeoJSONSource
       - MGLRasterSource
