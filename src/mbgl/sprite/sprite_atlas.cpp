@@ -2,7 +2,7 @@
 #include <mbgl/sprite/sprite_atlas_observer.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_config.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/math.hpp>
@@ -282,9 +282,9 @@ void SpriteAtlas::copy(const Holder& holder, const SpritePatternMode mode) {
     dirtyFlag = true;
 }
 
-void SpriteAtlas::upload(gl::ObjectStore& objectStore, gl::Config& config, uint32_t unit) {
+void SpriteAtlas::upload(gl::ObjectStore& objectStore, gl::Context& context, uint32_t unit) {
     if (dirtyFlag) {
-        bind(false, objectStore, config, unit);
+        bind(false, objectStore, context, unit);
     }
 }
 
@@ -316,15 +316,15 @@ void SpriteAtlas::updateDirty() {
     dirtySprites.clear();
 }
 
-void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore, gl::Config& config, uint32_t unit) {
+void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore, gl::Context& context, uint32_t unit) {
     if (!data) {
         return; // Empty atlas
     }
 
     if (!texture) {
         texture = objectStore.createTexture();
-        config.activeTexture = unit;
-        config.texture[unit] = *texture;
+        context.activeTexture = unit;
+        context.texture[unit] = *texture;
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
@@ -333,14 +333,14 @@ void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore, gl::Config& co
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         fullUploadRequired = true;
-    } else if (config.texture[unit] != *texture) {
-        config.activeTexture = unit;
-        config.texture[unit] = *texture;
+    } else if (context.texture[unit] != *texture) {
+        context.activeTexture = unit;
+        context.texture[unit] = *texture;
     }
 
     GLuint filter_val = linear ? GL_LINEAR : GL_NEAREST;
     if (filter_val != filter) {
-        config.activeTexture = unit;
+        context.activeTexture = unit;
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_val));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_val));
         filter = filter_val;
@@ -349,7 +349,7 @@ void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore, gl::Config& co
     if (dirtyFlag) {
         std::lock_guard<std::recursive_mutex> lock(mtx);
 
-        config.activeTexture = unit;
+        context.activeTexture = unit;
         if (fullUploadRequired) {
             MBGL_CHECK_ERROR(glTexImage2D(
                 GL_TEXTURE_2D, // GLenum target

@@ -437,9 +437,9 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
     }
 }
 
-void LineBucket::upload(gl::ObjectStore& store, gl::Config& config) {
-    vertexBuffer.upload(store, config);
-    triangleElementsBuffer.upload(store, config);
+void LineBucket::upload(gl::ObjectStore& store, gl::Context& context) {
+    vertexBuffer.upload(store, context);
+    triangleElementsBuffer.upload(store, context);
 
     // From now on, we're only going to render during the translucent pass.
     uploaded = true;
@@ -462,7 +462,7 @@ bool LineBucket::needsClipping() const {
 
 void LineBucket::drawLines(LineShader& shader,
                            gl::ObjectStore& store,
-                           gl::Config& config,
+                           gl::Context& context,
                            PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
@@ -472,7 +472,7 @@ void LineBucket::drawLines(LineShader& shader,
             continue;
         }
         group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
-            shader, vertexBuffer, triangleElementsBuffer, vertex_index, store, config);
+            shader, vertexBuffer, triangleElementsBuffer, vertex_index, store, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
                                         elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
@@ -482,7 +482,7 @@ void LineBucket::drawLines(LineShader& shader,
 
 void LineBucket::drawLineSDF(LineSDFShader& shader,
                              gl::ObjectStore& store,
-                             gl::Config& config,
+                             gl::Context& context,
                              PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
@@ -492,7 +492,7 @@ void LineBucket::drawLineSDF(LineSDFShader& shader,
             continue;
         }
         group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
-            shader, vertexBuffer, triangleElementsBuffer, vertex_index, store, config);
+            shader, vertexBuffer, triangleElementsBuffer, vertex_index, store, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
                                         elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
@@ -502,7 +502,7 @@ void LineBucket::drawLineSDF(LineSDFShader& shader,
 
 void LineBucket::drawLinePatterns(LinepatternShader& shader,
                                   gl::ObjectStore& store,
-                                  gl::Config& config,
+                                  gl::Context& context,
                                   PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
@@ -512,7 +512,7 @@ void LineBucket::drawLinePatterns(LinepatternShader& shader,
             continue;
         }
         group->array[paintMode == PaintMode::Overdraw ? 5 : 4].bind(
-            shader, vertexBuffer, triangleElementsBuffer, vertex_index, store, config);
+            shader, vertexBuffer, triangleElementsBuffer, vertex_index, store, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
                                         elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;

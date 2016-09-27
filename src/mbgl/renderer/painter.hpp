@@ -11,7 +11,7 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/static_vertex_buffer.hpp>
 
-#include <mbgl/gl/gl_config.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/gl/gl.hpp>
 
 #include <mbgl/style/style.hpp>
@@ -125,7 +125,7 @@ private:
                    float scaleDivisor,
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, gl::Config&, PaintMode),
+                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, gl::Context&, PaintMode),
 
                    // Layout
                    style::AlignmentType rotationAlignment,
@@ -172,7 +172,7 @@ private:
 
     int indent = 0;
 
-    gl::Config config;
+    gl::Context context;
 
     RenderPass pass = RenderPass::Opaque;
 

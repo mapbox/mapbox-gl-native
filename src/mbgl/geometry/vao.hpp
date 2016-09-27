@@ -3,7 +3,7 @@
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
-#include <mbgl/gl/gl_config.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 
@@ -21,10 +21,10 @@ public:
               VertexBuffer& vertexBuffer,
               GLbyte* offset,
               gl::ObjectStore& store,
-              gl::Config& config) {
-        bindVertexArrayObject(store, config);
+              gl::Context& context) {
+        bindVertexArrayObject(store, context);
         if (bound_shader == 0) {
-            vertexBuffer.bind(store, config);
+            vertexBuffer.bind(store, context);
             shader.bind(offset);
             if (vao) {
                 storeBinding(shader, vertexBuffer.getID(), 0, offset);
@@ -40,11 +40,11 @@ public:
               ElementsBuffer& elementsBuffer,
               GLbyte* offset,
               gl::ObjectStore& store,
-              gl::Config& config) {
-        bindVertexArrayObject(store, config);
+              gl::Context& context) {
+        bindVertexArrayObject(store, context);
         if (bound_shader == 0) {
-            vertexBuffer.bind(store, config);
-            elementsBuffer.bind(store, config);
+            vertexBuffer.bind(store, context);
+            elementsBuffer.bind(store, context);
             shader.bind(offset);
             if (vao) {
                 storeBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
@@ -59,7 +59,7 @@ public:
     }
 
 private:
-    void bindVertexArrayObject(gl::ObjectStore&, gl::Config&);
+    void bindVertexArrayObject(gl::ObjectStore&, gl::Context&);
     void storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
     void verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
 

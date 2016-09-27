@@ -48,8 +48,8 @@ Painter::Painter(const TransformState& state_,
 #endif
 
     // Reset GL values
-    config.setDirtyState();
-    config.resetState();
+    context.setDirtyState();
+    context.resetState();
 }
 
 Painter::~Painter() = default;
@@ -61,12 +61,12 @@ bool Painter::needsAnimation() const {
 void Painter::setClipping(const ClipID& clip) {
     const GLint ref = (GLint)clip.reference.to_ulong();
     const GLuint mask = (GLuint)clip.mask.to_ulong();
-    config.stencilFunc = { GL_EQUAL, ref, mask };
+    context.stencilFunc = { GL_EQUAL, ref, mask };
 }
 
 void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& annotationSpriteAtlas) {
     if (frame.framebufferSize != frame_.framebufferSize) {
-        config.viewport.setDefaultValue(
+        context.viewport.setDefaultValue(
             { { 0, 0, frame_.framebufferSize[0], frame_.framebufferSize[1] } });
     }
     frame = frame_;
@@ -104,18 +104,18 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     {
         MBGL_DEBUG_GROUP("upload");
 
-        tileStencilBuffer.upload(store, config);
-        rasterBoundsBuffer.upload(store, config);
-        tileBorderBuffer.upload(store, config);
-        spriteAtlas->upload(store, config, 0);
-        lineAtlas->upload(store, config, 0);
-        glyphAtlas->upload(store, config, 0);
-        frameHistory.upload(store, config, 0);
-        annotationSpriteAtlas.upload(store, config, 0);
+        tileStencilBuffer.upload(store, context);
+        rasterBoundsBuffer.upload(store, context);
+        tileBorderBuffer.upload(store, context);
+        spriteAtlas->upload(store, context, 0);
+        lineAtlas->upload(store, context, 0);
+        glyphAtlas->upload(store, context, 0);
+        frameHistory.upload(store, context, 0);
+        annotationSpriteAtlas.upload(store, context, 0);
 
         for (const auto& item : order) {
             if (item.bucket && item.bucket->needsUpload()) {
-                item.bucket->upload(store, config);
+                item.bucket->upload(store, context);
             }
         }
     }
@@ -125,26 +125,26 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     // tiles whatsoever.
     {
         MBGL_DEBUG_GROUP("clear");
-        config.bindFramebuffer.reset();
-        config.viewport.reset();
-        config.stencilFunc.reset();
-        config.stencilTest = GL_TRUE;
-        config.stencilMask = 0xFF;
-        config.depthTest = GL_FALSE;
-        config.depthMask = GL_TRUE;
-        config.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
+        context.bindFramebuffer.reset();
+        context.viewport.reset();
+        context.stencilFunc.reset();
+        context.stencilTest = GL_TRUE;
+        context.stencilMask = 0xFF;
+        context.depthTest = GL_FALSE;
+        context.depthMask = GL_TRUE;
+        context.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
 
         if (paintMode() == PaintMode::Overdraw) {
-            config.blend = GL_TRUE;
-            config.blendFunc = { GL_CONSTANT_COLOR, GL_ONE };
+            context.blend = GL_TRUE;
+            context.blendFunc = { GL_CONSTANT_COLOR, GL_ONE };
             const float overdraw = 1.0f / 8.0f;
-            config.blendColor = { overdraw, overdraw, overdraw, 0.0f };
-            config.clearColor = Color::black();
+            context.blendColor = { overdraw, overdraw, overdraw, 0.0f };
+            context.clearColor = Color::black();
         } else {
-            config.clearColor = background;
+            context.clearColor = background;
         }
-        config.clearStencil = 0;
-        config.clearDepth = 1;
+        context.clearStencil = 0;
+        context.clearDepth = 1;
         MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
@@ -216,16 +216,16 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     {
         MBGL_DEBUG_GROUP("cleanup");
 
-        config.activeTexture = 1;
-        config.texture[1] = 0;
-        config.activeTexture = 0;
-        config.texture[0] = 0;
+        context.activeTexture = 1;
+        context.texture[1] = 0;
+        context.activeTexture = 0;
+        context.texture[0] = 0;
 
-        config.vertexArrayObject = 0;
+        context.vertexArrayObject = 0;
     }
 
     if (frame.contextMode == GLContextMode::Shared) {
-        config.setDirtyState();
+        context.setDirtyState();
     }
 }
 
@@ -253,32 +253,32 @@ void Painter::renderPass(PaintParameters& parameters,
             continue;
 
         if (paintMode() == PaintMode::Overdraw) {
-            config.blend = GL_TRUE;
+            context.blend = GL_TRUE;
         } else if (pass == RenderPass::Translucent) {
-            config.blendFunc.reset();
-            config.blend = GL_TRUE;
+            context.blendFunc.reset();
+            context.blend = GL_TRUE;
         } else {
-            config.blend = GL_FALSE;
+            context.blend = GL_FALSE;
         }
 
-        config.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
-        config.stencilMask = 0x0;
+        context.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
+        context.stencilMask = 0x0;
 
         if (layer.is<BackgroundLayer>()) {
             MBGL_DEBUG_GROUP("background");
             renderBackground(parameters, *layer.as<BackgroundLayer>());
         } else if (layer.is<CustomLayer>()) {
             MBGL_DEBUG_GROUP(layer.baseImpl->id + " - custom");
-            config.vertexArrayObject = 0;
-            config.depthFunc.reset();
-            config.depthTest = GL_TRUE;
-            config.depthMask = GL_FALSE;
-            config.stencilTest = GL_FALSE;
+            context.vertexArrayObject = 0;
+            context.depthFunc.reset();
+            context.depthTest = GL_TRUE;
+            context.depthMask = GL_FALSE;
+            context.stencilTest = GL_FALSE;
             setDepthSublayer(0);
             layer.as<CustomLayer>()->impl->render(state);
-            config.setDirtyState();
-            config.bindFramebuffer.reset();
-            config.viewport.reset();
+            context.setDirtyState();
+            context.bindFramebuffer.reset();
+            context.viewport.reset();
         } else {
             MBGL_DEBUG_GROUP(layer.baseImpl->id + " - " + util::toString(item.tile->id));
             if (item.bucket->needsClipping()) {
@@ -296,7 +296,7 @@ void Painter::renderPass(PaintParameters& parameters,
 void Painter::setDepthSublayer(int n) {
     float nearDepth = ((1 + currentLayer) * numSublayers + n) * depthEpsilon;
     float farDepth = nearDepth + depthRangeSize;
-    config.depthRange = { nearDepth, farDepth };
+    context.depthRange = { nearDepth, farDepth };
 }
 
 } // namespace mbgl

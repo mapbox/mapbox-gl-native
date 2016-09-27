@@ -35,7 +35,7 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
         if (!imagePosA || !imagePosB)
             return;
 
-        config.program = patternShader.getID();
+        context.program = patternShader.getID();
         patternShader.u_matrix = identityMatrix;
         patternShader.u_pattern_tl_a = imagePosA->tl;
         patternShader.u_pattern_br_a = imagePosA->br;
@@ -44,21 +44,21 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
         patternShader.u_mix = properties.backgroundPattern.value.t;
         patternShader.u_opacity = properties.backgroundOpacity;
 
-        spriteAtlas->bind(true, store, config, 0);
-        arrayBackgroundPattern.bind(patternShader, tileStencilBuffer, BUFFER_OFFSET(0), store, config);
+        spriteAtlas->bind(true, store, context, 0);
+        arrayBackgroundPattern.bind(patternShader, tileStencilBuffer, BUFFER_OFFSET(0), store, context);
 
     } else {
-        config.program = plainShader.getID();
+        context.program = plainShader.getID();
         plainShader.u_color = properties.backgroundColor;
         plainShader.u_opacity = properties.backgroundOpacity;
 
-        arrayBackground.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET(0), store, config);
+        arrayBackground.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET(0), store, context);
     }
 
-    config.stencilTest = GL_FALSE;
-    config.depthFunc.reset();
-    config.depthTest = GL_TRUE;
-    config.depthMask = GL_FALSE;
+    context.stencilTest = GL_FALSE;
+    context.depthFunc.reset();
+    context.depthTest = GL_TRUE;
+    context.depthMask = GL_FALSE;
     setDepthSublayer(0);
 
     for (const auto& tileID : util::tileCover(state, state.getIntegerZoom())) {
