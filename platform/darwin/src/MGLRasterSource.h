@@ -25,7 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy) NSURL *URL;
 
 /**
- The minimum visual size to display tiles for this source. 
+ The minimum visual size to display tiles for this source. Units in pixels. 
+ Defaults to `512` on each tile side.
  */
 @property (nonatomic, readonly, assign) NSUInteger tileSize;
 
