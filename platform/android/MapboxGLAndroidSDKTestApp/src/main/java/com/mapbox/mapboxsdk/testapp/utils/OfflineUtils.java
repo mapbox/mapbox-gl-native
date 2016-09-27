@@ -3,8 +3,6 @@ package com.mapbox.mapboxsdk.testapp.utils;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.mapbox.mapboxsdk.offline.OfflineRegion;
-
 import org.json.JSONObject;
 
 import static com.mapbox.mapboxsdk.testapp.activity.offline.OfflineActivity.JSON_CHARSET;
@@ -12,18 +10,14 @@ import static com.mapbox.mapboxsdk.testapp.activity.offline.OfflineActivity.JSON
 
 public class OfflineUtils {
 
-    public static String getRegionName(@NonNull  OfflineRegion offlineRegion) {
-        String regionName;
+    public static String convertRegionName(@NonNull  byte[] metadata) {
         try {
-            byte[] metadata = offlineRegion.getMetadata();
             String json = new String(metadata, JSON_CHARSET);
             JSONObject jsonObject = new JSONObject(json);
-            regionName = jsonObject.getString(JSON_FIELD_REGION_NAME);
+            return jsonObject.getString(JSON_FIELD_REGION_NAME);
         } catch (Exception exception) {
-            Log.e("OfflineUtils", "Failed to decode metadata: " + exception.getMessage());
-            regionName = "Region " + offlineRegion.getID();
+            return null;
         }
-        return regionName;
     }
 
     public static byte[] convertRegionName(String regionName) {

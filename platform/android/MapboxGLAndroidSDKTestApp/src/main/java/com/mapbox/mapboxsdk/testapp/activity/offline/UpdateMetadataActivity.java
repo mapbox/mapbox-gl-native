@@ -58,7 +58,7 @@ public class UpdateMetadataActivity extends AppCompatActivity implements Adapter
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         final OfflineRegion region = adapter.getItem(position);
-        String metadata = OfflineUtils.getRegionName(region);
+        String metadata = OfflineUtils.convertRegionName(region.getMetadata());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Rename metadata");
@@ -175,7 +175,7 @@ public class UpdateMetadataActivity extends AppCompatActivity implements Adapter
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            holder.text.setText(OfflineUtils.getRegionName(getItem(position)));
+            holder.text.setText(OfflineUtils.convertRegionName(getItem(position).getMetadata()));
             return convertView;
         }
 

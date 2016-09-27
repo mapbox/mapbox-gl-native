@@ -187,7 +187,7 @@ public class OfflineActivity extends AppCompatActivity
                 // Get regions info
                 ArrayList<String> offlineRegionsNames = new ArrayList<>();
                 for (OfflineRegion offlineRegion : offlineRegions) {
-                    offlineRegionsNames.add(OfflineUtils.getRegionName(offlineRegion));
+                    offlineRegionsNames.add(OfflineUtils.convertRegionName(offlineRegion.getMetadata()));
                 }
 
                 // Create args
