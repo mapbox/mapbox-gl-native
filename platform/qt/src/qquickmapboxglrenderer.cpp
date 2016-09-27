@@ -1,7 +1,7 @@
 #include "qquickmapboxglrenderer.hpp"
 
-#include <QMapboxGL>
-#include <QQuickMapboxGL>
+#include "qmapboxgl.hpp"
+#include "qquickmapboxgl.hpp"
 
 #include <QSize>
 #include <QOpenGLFramebufferObject>

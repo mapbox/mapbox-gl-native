@@ -84,6 +84,7 @@ typedef void (*CustomLayerRenderFunction)(void* context, const CustomLayerRender
 typedef void (*CustomLayerDeinitializeFunction)(void* context);
 
 Q_DECL_EXPORT void initializeGLExtensions();
+Q_DECL_EXPORT void registerTypes();
 
 } // namespace QMapbox
 

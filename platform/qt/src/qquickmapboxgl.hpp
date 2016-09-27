@@ -1,17 +1,16 @@
-#ifndef QQUICKMAPBOXGL_H
-#define QQUICKMAPBOXGL_H
+#pragma once
+
+#include "qmapbox.hpp"
+#include "qquickmapboxglmapparameter.hpp"
 
 #include <QColor>
-#include <QImage>
 #include <QGeoCoordinate>
 #include <QGeoServiceProvider>
 #include <QGeoShape>
+#include <QImage>
 #include <QPointF>
-#include <QQuickFramebufferObject>
 #include <QQmlListProperty>
-
-#include <QMapbox>
-#include <QQuickMapboxGLMapParameter>
+#include <QQuickFramebufferObject>
 
 class QDeclarativeGeoServiceProvider;
 class QQuickItem;
@@ -174,5 +173,3 @@ private:
 
     friend class QQuickMapboxGLRenderer;
 };
-
-#endif // QQUICKMAPBOXGL_H

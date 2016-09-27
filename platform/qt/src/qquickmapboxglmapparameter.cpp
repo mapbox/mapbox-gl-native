@@ -1,10 +1,9 @@
-#include "QQuickMapboxGLMapParameter"
+#include "qquickmapboxglmapparameter.hpp"
 
 #include <QByteArray>
 #include <QMetaObject>
 #include <QMetaProperty>
 #include <QSignalMapper>
-
 
 QQuickMapboxGLMapParameter::QQuickMapboxGLMapParameter(QObject *parent)
     : QObject(parent)
