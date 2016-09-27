@@ -15,6 +15,11 @@
  */
 @property (nonatomic, copy) NSString *sourceIdentifier;
 
+/**
+ Initializes a source with the given identifier.
+
+ @param sourceIdentifier A string that uniquely identifies the source.
+ */
 - (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier;
 
 @end
