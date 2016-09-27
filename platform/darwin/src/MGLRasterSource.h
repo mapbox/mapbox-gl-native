@@ -55,10 +55,10 @@ NS_ASSUME_NONNULL_BEGIN
  URL template set.
 
  @param sourceIdentifier A string that uniquely identifies the source.
- @param tileSize The minimum visual size to display tiles for the source.
  @param tileSet A tile set describing where to download tiles.
+ @param tileSize The minimum visual size to display tiles for the source.
  */
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier tileSize:(CGFloat)tileSize tileSet:(MGLTileSet *)tileSet;
+- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier tileSet:(MGLTileSet *)tileSet tileSize:(CGFloat)tileSize;
 
 @end
 

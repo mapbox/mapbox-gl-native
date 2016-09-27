@@ -17,12 +17,12 @@
     return self;
 }
 
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier tileSize:(CGFloat)tileSize tileSet:(MGLTileSet *)tileSet;
+- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier tileSet:(MGLTileSet *)tileSet tileSize:(CGFloat)tileSize;
 {
     if (self = [super initWithSourceIdentifier:sourceIdentifier])
     {
-        _tileSize = tileSize;
         _tileSet = tileSet;
+        _tileSize = tileSize;
     }
     return self;
 }
