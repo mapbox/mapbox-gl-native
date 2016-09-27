@@ -4,10 +4,9 @@
 
 #include <QCoreApplication>
 
+#include <cassert>
 #include <functional>
 #include <utility>
-
-#include <cassert>
 
 namespace {
 

@@ -1,10 +1,10 @@
+#include "qquickmapboxgl.hpp"
+
+#include "qmapbox.hpp"
+#include "qquickmapboxglmapparameter.hpp"
 #include "qquickmapboxglrenderer.hpp"
 
 #include <mbgl/util/constants.hpp>
-
-#include <QMapbox>
-#include <QQuickMapboxGL>
-#include <QQuickMapboxGLMapParameter>
 
 #include <QDebug>
 #include <QQuickItem>
@@ -13,7 +13,6 @@
 #include <QtGlobal>
 #include <QQmlListProperty>
 #include <QJSValue>
-
 
 namespace {
 

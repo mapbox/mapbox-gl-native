@@ -57,6 +57,10 @@ macro(mbgl_platform_test)
     target_add_mason_package(mbgl-test PRIVATE sqlite)
 
     target_link_libraries(mbgl-test
+        PRIVATE qmapboxgl
         ${MBGL_QT_LIBRARIES}
     )
 endmacro()
+
+target_add_mason_package(qmapboxgl PRIVATE geojson)
+target_add_mason_package(qmapboxgl PRIVATE rapidjson)

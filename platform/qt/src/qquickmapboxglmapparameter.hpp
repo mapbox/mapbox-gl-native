@@ -1,5 +1,4 @@
-#ifndef QQUICKMAPBOXGLMAPPARAMETER_H
-#define QQUICKMAPBOXGLMAPPARAMETER_H
+#pragma once
 
 #include <QObject>
 #include <QQmlParserStatus>
@@ -33,5 +32,3 @@ private:
 };
 
 QML_DECLARE_TYPE(QQuickMapboxGLMapParameter)
-
-#endif // QQUICKMAPBOXGLMAPPARAMETER_H

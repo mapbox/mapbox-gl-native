@@ -1,3 +1,4 @@
+#include "qmapboxgl.hpp"
 #include "qmapboxgl_p.hpp"
 
 #include "qt_conversion.hpp"
@@ -28,7 +29,6 @@
 
 #include <QDebug>
 #include <QImage>
-#include <QMapboxGL>
 #include <QMargins>
 #include <QString>
 #include <QStringList>
