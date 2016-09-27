@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, assign) NSUInteger tileSize;
 
 /**
+ The tile set used to locate and download tiles. 
+ 
  A tile set holds the raster tile URL template strings and associated
  configuration for those strings. It can be passed in place of the URL
  to TileJSON in order to create a source configured to download tiles
