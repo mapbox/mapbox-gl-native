@@ -44,6 +44,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Improved the performance of relocating a non-view-backed point annotation by changing its `coordinate` property. ([#5385](https://github.com/mapbox/mapbox-gl-native/pull/5385))
 * Improved the precision of annotations at zoom levels greater than 18. ([#5517](https://github.com/mapbox/mapbox-gl-native/pull/5517))
 * Fixed an issue that could reset user-added transformations on annotation views. ([#6166](https://github.com/mapbox/mapbox-gl-native/pull/6166))
+* Fixed an issue that caused annotation views to be dropped if they did not fully participate in the view reuse queue system. ([#6485](https://github.com/mapbox/mapbox-gl-native/pull/6485))
 
 ### Other changes
 
