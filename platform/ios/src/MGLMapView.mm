@@ -4572,6 +4572,10 @@ public:
                 annotationView.mapView = self;
                 annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
                 annotationContext.annotationView = annotationView;
+                
+                if (!annotationView.superview) {
+                    [self.annotationContainerView insertSubview:annotationView atIndex:0];
+                }
             }
             else
             {
@@ -4581,7 +4585,7 @@ public:
         }
         
         bool annotationViewIsVisible = CGRectContainsRect(viewPort, annotationView.frame);
-        if (!annotationViewIsVisible)
+        if (!annotationViewIsVisible && annotationContext.viewReuseIdentifier)
         {
             [self enqueueAnnotationViewForAnnotationContext:annotationContext];
         }
