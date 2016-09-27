@@ -7,6 +7,9 @@
  */
 @interface MGLSource : NSObject
 
+/**
+ A string that uniquely identifies the source.
+ */
 @property (nonatomic, copy) NSString *sourceIdentifier;
 
 - (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier;
