@@ -1,6 +1,5 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/object_store.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -121,16 +120,16 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
     return position;
 }
 
-void LineAtlas::upload(gl::ObjectStore& store, gl::Context& context, uint32_t unit) {
+void LineAtlas::upload(gl::Context& context, uint32_t unit) {
     if (dirty) {
-        bind(store, context, unit);
+        bind(context, unit);
     }
 }
 
-void LineAtlas::bind(gl::ObjectStore& store, gl::Context& context, uint32_t unit) {
+void LineAtlas::bind(gl::Context& context, uint32_t unit) {
     bool first = false;
     if (!texture) {
-        texture = store.createTexture();
+        texture = context.createTexture();
         context.activeTexture = unit;
         context.texture[unit] = *texture;
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));

@@ -96,9 +96,9 @@ void Painter::renderLine(PaintParameters& parameters,
         linesdfShader.u_antialiasingmatrix = antialiasingMatrix;
 
         linesdfShader.u_image = 0;
-        lineAtlas->bind(store, context, 0);
+        lineAtlas->bind(context, 0);
 
-        bucket.drawLineSDF(linesdfShader, store, context, paintMode());
+        bucket.drawLineSDF(linesdfShader, context, paintMode());
 
     } else if (!properties.linePattern.value.from.empty()) {
         optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(
@@ -139,9 +139,9 @@ void Painter::renderLine(PaintParameters& parameters,
         linepatternShader.u_antialiasingmatrix = antialiasingMatrix;
 
         linepatternShader.u_image = 0;
-        spriteAtlas->bind(true, store, context, 0);
+        spriteAtlas->bind(true, context, 0);
 
-        bucket.drawLinePatterns(linepatternShader, store, context, paintMode());
+        bucket.drawLinePatterns(linepatternShader, context, paintMode());
 
     } else {
         context.program = lineShader.getID();
@@ -159,7 +159,7 @@ void Painter::renderLine(PaintParameters& parameters,
         lineShader.u_color = color;
         lineShader.u_opacity = opacity;
 
-        bucket.drawLines(lineShader, store, context, paintMode());
+        bucket.drawLines(lineShader, context, paintMode());
     }
 }
 

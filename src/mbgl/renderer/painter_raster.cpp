@@ -47,7 +47,7 @@ void Painter::renderRaster(PaintParameters& parameters,
         context.depthMask = GL_FALSE;
         setDepthSublayer(0);
 
-        bucket.drawRaster(rasterShader, rasterBoundsBuffer, rasterVAO, context, store);
+        bucket.drawRaster(rasterShader, rasterBoundsBuffer, rasterVAO, context);
     }
 }
 

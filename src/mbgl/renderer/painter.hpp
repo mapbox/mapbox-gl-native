@@ -47,10 +47,6 @@ class PaintParameters;
 
 struct ClipID;
 
-namespace util {
-class ObjectStore;
-} // namespace util
-
 namespace style {
 class Style;
 class Source;
@@ -73,12 +69,14 @@ struct FrameData {
 
 class Painter : private util::noncopyable {
 public:
-    Painter(const TransformState&, gl::ObjectStore&);
+    Painter(const TransformState&);
     ~Painter();
 
     void render(const style::Style&,
                 const FrameData&,
                 SpriteAtlas& annotationSpriteAtlas);
+
+    void cleanup();
 
     // Renders debug information for a tile.
     void renderTileDebug(const RenderTile&);
@@ -125,7 +123,7 @@ private:
                    float scaleDivisor,
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, gl::Context&, PaintMode),
+                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::Context&, PaintMode),
 
                    // Layout
                    style::AlignmentType rotationAlignment,
@@ -166,7 +164,6 @@ private:
     }();
 
     const TransformState& state;
-    gl::ObjectStore& store;
 
     FrameData frame;
 

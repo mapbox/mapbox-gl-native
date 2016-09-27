@@ -8,7 +8,7 @@ namespace mbgl {
 
 class SDFShader : public Shader {
 public:
-    SDFShader(gl::ObjectStore&, Defines defines = None);
+    SDFShader(gl::Context&, Defines defines = None);
 
     UniformMatrix<4>                u_matrix        = {"u_matrix",        *this};
     Uniform<std::array<GLfloat, 2>> u_extrude_scale = {"u_extrude_scale", *this};

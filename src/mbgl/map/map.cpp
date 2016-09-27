@@ -15,7 +15,6 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/exception.hpp>
@@ -61,7 +60,6 @@ public:
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
 
-    gl::ObjectStore store;
     Update updateFlags = Update::Nothing;
     util::AsyncTask asyncUpdate;
     ThreadPool workerThreadPool;
@@ -113,11 +111,10 @@ Map::~Map() {
     impl->styleRequest = nullptr;
 
     // Explicit resets currently necessary because these abandon resources that need to be
-    // cleaned up by store.reset();
+    // cleaned up by context.reset();
     impl->style.reset();
-    impl->painter.reset();
     impl->annotationManager.reset();
-    impl->store.reset();
+    impl->painter.reset();
 
     impl->view.deactivate();
 }
@@ -253,7 +250,7 @@ void Map::Impl::update() {
 
 void Map::Impl::render() {
     if (!painter) {
-        painter = std::make_unique<Painter>(transform.getState(), store);
+        painter = std::make_unique<Painter>(transform.getState());
     }
 
     FrameData frameData { view.getFramebufferSize(),
@@ -272,7 +269,7 @@ void Map::Impl::render() {
         callback = nullptr;
     }
 
-    store.performCleanup();
+    painter->cleanup();
 
     if (style->hasTransitions()) {
         updateFlags |= Update::RecalculateStyle;
@@ -975,10 +972,13 @@ void Map::setSourceTileCacheSize(size_t size) {
 }
 
 void Map::onLowMemory() {
-    impl->store.performCleanup();
-    if (!impl->style) return;
-    impl->style->onLowMemory();
-    impl->view.invalidate();
+    if (impl->painter) {
+        impl->painter->cleanup();
+    }
+    if (impl->style) {
+        impl->style->onLowMemory();
+        impl->view.invalidate();
+    }
 }
 
 void Map::Impl::onSourceAttributionChanged(style::Source&, const std::string&) {

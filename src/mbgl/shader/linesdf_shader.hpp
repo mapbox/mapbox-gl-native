@@ -8,7 +8,7 @@ namespace mbgl {
 
 class LineSDFShader : public Shader {
 public:
-    LineSDFShader(gl::ObjectStore&, Defines defines = None);
+    LineSDFShader(gl::Context&, Defines defines = None);
 
     void bind(GLbyte *offset) final;
 

@@ -26,7 +26,7 @@ void Painter::drawClippingMasks(PaintParameters& parameters, const std::map<Unwr
     context.colorMask = { GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE };
     context.stencilMask = mask;
 
-    arrayCoveringPlain.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET_0, store, context);
+    arrayCoveringPlain.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET_0, context);
 
     for (const auto& stencil : stencils) {
         const auto& id = stencil.first;

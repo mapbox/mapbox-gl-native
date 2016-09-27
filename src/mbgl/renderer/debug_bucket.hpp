@@ -11,7 +11,6 @@ class OverscaledTileID;
 class PlainShader;
 
 namespace gl {
-class ObjectStore;
 class Context;
 } // namespace gl
 
@@ -24,8 +23,8 @@ public:
                 optional<Timestamp> expires,
                 MapDebugOptions);
 
-    void drawLines(PlainShader&, gl::ObjectStore&, gl::Context&);
-    void drawPoints(PlainShader&, gl::ObjectStore&, gl::Context&);
+    void drawLines(PlainShader&, gl::Context&);
+    void drawPoints(PlainShader&, gl::Context&);
 
     const bool renderable;
     const bool complete;

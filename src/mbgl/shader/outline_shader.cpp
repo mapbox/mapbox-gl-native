@@ -5,11 +5,11 @@
 
 namespace mbgl {
 
-OutlineShader::OutlineShader(gl::ObjectStore& store, Defines defines)
+OutlineShader::OutlineShader(gl::Context& context, Defines defines)
     : Shader(shaders::outline::name,
              shaders::outline::vertex,
              shaders::outline::fragment,
-             store, defines) {
+             context, defines) {
 }
 
 void OutlineShader::bind(GLbyte* offset) {

@@ -31,8 +31,7 @@ void Raster::load(PremultipliedImage image, uint32_t mipmapLevel) {
     loaded = true;
 }
 
-void Raster::bind(gl::ObjectStore& store,
-                  gl::Context& context,
+void Raster::bind(gl::Context& context,
                   uint32_t unit,
                   Scaling newFilter,
                   MipMap newMipMap) {
@@ -43,7 +42,7 @@ void Raster::bind(gl::ObjectStore& store,
             Log::Error(Event::OpenGL, "trying to bind texture without images");
             return;
         } else {
-            upload(store, context, unit);
+            upload(context, unit);
             filterNeedsUpdate = true;
         }
     } else {
@@ -71,9 +70,9 @@ void Raster::updateFilter() {
                                      filter == Scaling::Linear ? GL_LINEAR : GL_NEAREST));
 }
 
-void Raster::upload(gl::ObjectStore& store, gl::Context& context, uint32_t unit) {
+void Raster::upload(gl::Context& context, uint32_t unit) {
     if (!images.empty() && !texture) {
-        texture = store.createTexture();
+        texture = context.createTexture();
         context.activeTexture = unit;
         context.texture[unit] = *texture;
         updateFilter();

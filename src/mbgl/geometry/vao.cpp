@@ -1,6 +1,5 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/platform/log.hpp>
-#include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/string.hpp>
 
 namespace mbgl {
@@ -10,7 +9,7 @@ VertexArrayObject::VertexArrayObject() {
 
 VertexArrayObject::~VertexArrayObject() = default;
 
-void VertexArrayObject::bindVertexArrayObject(gl::ObjectStore& store, gl::Context& context) {
+void VertexArrayObject::bindVertexArrayObject(gl::Context& context) {
     if (!gl::GenVertexArrays || !gl::BindVertexArray) {
         static bool reported = false;
         if (!reported) {
@@ -21,7 +20,7 @@ void VertexArrayObject::bindVertexArrayObject(gl::ObjectStore& store, gl::Contex
     }
 
     if (!vao) {
-        vao = store.createVAO();
+        vao = context.createVAO();
         context.vertexBuffer.setDirty();
         context.elementBuffer.setDirty();
     }

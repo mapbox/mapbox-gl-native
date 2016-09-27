@@ -45,10 +45,13 @@ public:
         return dirty || currentValue != value;
     }
 
+    // Explicitly resets the piece of OpenGL state to its default value.
     void reset() {
         *this = defaultValue;
     }
 
+    // Mark the state as dirty. This means that the next time we are assigning a value to this
+    // piece of OpenGL state will always result in an actual OpenGL call.
     void setDirty() {
         dirty = true;
     }

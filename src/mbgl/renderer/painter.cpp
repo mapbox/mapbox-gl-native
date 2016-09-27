@@ -37,19 +37,17 @@ namespace mbgl {
 
 using namespace style;
 
-Painter::Painter(const TransformState& state_,
-                 gl::ObjectStore& store_)
-    : state(state_), store(store_) {
+Painter::Painter(const TransformState& state_)
+    : state(state_) {
     gl::debugging::enable();
 
-    shaders = std::make_unique<Shaders>(store);
+    shaders = std::make_unique<Shaders>(context);
 #ifndef NDEBUG
-    overdrawShaders = std::make_unique<Shaders>(store, Shader::Overdraw);
+    overdrawShaders = std::make_unique<Shaders>(context, Shader::Overdraw);
 #endif
 
     // Reset GL values
     context.setDirtyState();
-    context.resetState();
 }
 
 Painter::~Painter() = default;
@@ -62,6 +60,10 @@ void Painter::setClipping(const ClipID& clip) {
     const GLint ref = (GLint)clip.reference.to_ulong();
     const GLuint mask = (GLuint)clip.mask.to_ulong();
     context.stencilFunc = { GL_EQUAL, ref, mask };
+}
+
+void Painter::cleanup() {
+    context.performCleanup();
 }
 
 void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& annotationSpriteAtlas) {
@@ -104,18 +106,18 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     {
         MBGL_DEBUG_GROUP("upload");
 
-        tileStencilBuffer.upload(store, context);
-        rasterBoundsBuffer.upload(store, context);
-        tileBorderBuffer.upload(store, context);
-        spriteAtlas->upload(store, context, 0);
-        lineAtlas->upload(store, context, 0);
-        glyphAtlas->upload(store, context, 0);
-        frameHistory.upload(store, context, 0);
-        annotationSpriteAtlas.upload(store, context, 0);
+        tileStencilBuffer.upload(context);
+        rasterBoundsBuffer.upload(context);
+        tileBorderBuffer.upload(context);
+        spriteAtlas->upload(context, 0);
+        lineAtlas->upload(context, 0);
+        glyphAtlas->upload(context, 0);
+        frameHistory.upload(context, 0);
+        annotationSpriteAtlas.upload(context, 0);
 
         for (const auto& item : order) {
             if (item.bucket && item.bucket->needsUpload()) {
-                item.bucket->upload(store, context);
+                item.bucket->upload(context);
             }
         }
     }

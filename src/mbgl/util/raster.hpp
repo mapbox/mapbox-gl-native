@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/gl/object_store.hpp>
+#include <mbgl/gl/object.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/optional.hpp>
 
@@ -22,14 +22,13 @@ public:
     void load(PremultipliedImage, uint32_t mipmapLevel = 0);
 
     // bind current texture
-    void bind(gl::ObjectStore&,
-              gl::Context&,
+    void bind(gl::Context&,
               uint32_t unit,
               Scaling = Scaling::Nearest,
               MipMap = MipMap::No);
 
     // uploads the texture if it hasn't been uploaded yet.
-    void upload(gl::ObjectStore&, gl::Context&, uint32_t unit);
+    void upload(gl::Context&, uint32_t unit);
 
     // loaded status
     bool isLoaded() const;

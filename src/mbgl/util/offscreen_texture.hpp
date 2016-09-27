@@ -10,7 +10,7 @@ class Context;
 
 class OffscreenTexture {
 public:
-    void bind(gl::ObjectStore&, gl::Context&, std::array<uint16_t, 2> size);
+    void bind(gl::Context&, std::array<uint16_t, 2> size);
 
     Raster& getTexture();
     std::array<uint16_t, 2> getSize() const;
