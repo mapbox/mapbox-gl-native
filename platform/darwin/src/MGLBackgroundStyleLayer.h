@@ -6,6 +6,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ A map style's background layer is the bottommost layer and is used to style a color 
+ or pattern to show below all other map features. You can query an `MGLMapView` for its 
+ `style` and obtain the background layer using the `-[MGLStyle layerWithIdentifier:]` 
+ method and passing `background` for the identifier. 
+ */
 @interface MGLBackgroundStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
 
 - (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier;

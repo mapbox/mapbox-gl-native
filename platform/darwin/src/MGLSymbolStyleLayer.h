@@ -70,8 +70,13 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
     MGLSymbolStyleLayerTextTranslateAnchorViewport,
 };
 
+/**
+ A symbol layer which allows customization of styling properties at runtime. You may 
+ instantiate a new symbol layer to add to a map style or you may query an 
+ `MGLMapView` for its `style` and obtain existing layers using the 
+ `-[MGLStyle layerWithIdentifier:]` method. 
+ */
 @interface MGLSymbolStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
-
 
 - (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source;
 
