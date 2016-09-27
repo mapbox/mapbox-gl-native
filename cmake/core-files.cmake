@@ -78,14 +78,15 @@ set(MBGL_CORE_FILES
     # gl
     include/mbgl/gl/gl.hpp
     include/mbgl/gl/gl_helper.hpp
-    include/mbgl/gl/gl_values.hpp
     src/mbgl/gl/debugging.cpp
     src/mbgl/gl/debugging.hpp
     src/mbgl/gl/gl.cpp
     src/mbgl/gl/gl_config.hpp
-    src/mbgl/gl/gl_values.cpp
     src/mbgl/gl/object_store.cpp
     src/mbgl/gl/object_store.hpp
+    src/mbgl/gl/state.hpp
+    src/mbgl/gl/value.cpp
+    src/mbgl/gl/value.hpp
 
     # layout
     src/mbgl/layout/clip_lines.cpp

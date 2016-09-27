@@ -1,72 +1,14 @@
 #pragma once
 
-#include <cstdint>
-#include <tuple>
-#include <array>
-
-#include <mbgl/gl/gl_values.hpp>
+#include <mbgl/gl/state.hpp>
+#include <mbgl/gl/value.hpp>
 
 namespace mbgl {
 namespace gl {
 
-
-template <typename T, typename = void>
-struct DefaultValue {
-    static typename T::Type Get() {
-        return T::Get();
-    }
-};
-template <typename T>
-struct DefaultValue<T, decltype((void)T::Default, void())> {
-    static typename T::Type Get() {
-        return T::Default;
-    }
-};
-
-template <typename T>
-class Value {
-public:
-    void operator=(const typename T::Type& value) {
-        if (*this != value) {
-            dirty = false;
-            current = value;
-            T::Set(current);
-        }
-    }
-
-    bool operator!=(const typename T::Type& value) const {
-        return dirty || current != value;
-    }
-
-    void reset() {
-        *this = defaultValue;
-    }
-
-    void setDirty() {
-        dirty = true;
-    }
-
-    typename T::Type getCurrent() const {
-        return current;
-    }
-
-    bool getDirty() const {
-        return dirty;
-    }
-
-    void setDefaultValue(const typename T::Type& value) {
-        defaultValue = value;
-    }
-
-private:
-    typename T::Type defaultValue = DefaultValue<T>::Get();
-    typename T::Type current = defaultValue;
-    bool dirty = false;
-};
-
 class Config {
 public:
-    void reset() {
+    void resetState() {
         stencilFunc.reset();
         stencilMask.reset();
         stencilTest.reset();
@@ -91,12 +33,15 @@ public:
         pixelZoom.reset();
         rasterPos.reset();
 #endif // GL_ES_VERSION_2_0
+        for (auto& tex : texture) {
+            tex.reset();
+        }
         vertexBuffer.reset();
         elementBuffer.reset();
         vertexArrayObject.reset();
     }
 
-    void setDirty() {
+    void setDirtyState() {
         stencilFunc.setDirty();
         stencilMask.setDirty();
         stencilTest.setDirty();
@@ -121,39 +66,42 @@ public:
         pixelZoom.setDirty();
         rasterPos.setDirty();
 #endif // GL_ES_VERSION_2_0
+        for (auto& tex : texture) {
+            tex.setDirty();
+        }
         vertexBuffer.setDirty();
         elementBuffer.setDirty();
         vertexArrayObject.setDirty();
     }
 
-    Value<StencilFunc> stencilFunc;
-    Value<StencilMask> stencilMask;
-    Value<StencilTest> stencilTest;
-    Value<StencilOp> stencilOp;
-    Value<DepthRange> depthRange;
-    Value<DepthMask> depthMask;
-    Value<DepthTest> depthTest;
-    Value<DepthFunc> depthFunc;
-    Value<Blend> blend;
-    Value<BlendFunc> blendFunc;
-    Value<BlendColor> blendColor;
-    Value<ColorMask> colorMask;
-    Value<ClearDepth> clearDepth;
-    Value<ClearColor> clearColor;
-    Value<ClearStencil> clearStencil;
-    Value<Program> program;
-    Value<LineWidth> lineWidth;
-    Value<ActiveTexture> activeTexture;
-    Value<BindFramebuffer> bindFramebuffer;
-    Value<Viewport> viewport;
+    State<value::StencilFunc> stencilFunc;
+    State<value::StencilMask> stencilMask;
+    State<value::StencilTest> stencilTest;
+    State<value::StencilOp> stencilOp;
+    State<value::DepthRange> depthRange;
+    State<value::DepthMask> depthMask;
+    State<value::DepthTest> depthTest;
+    State<value::DepthFunc> depthFunc;
+    State<value::Blend> blend;
+    State<value::BlendFunc> blendFunc;
+    State<value::BlendColor> blendColor;
+    State<value::ColorMask> colorMask;
+    State<value::ClearDepth> clearDepth;
+    State<value::ClearColor> clearColor;
+    State<value::ClearStencil> clearStencil;
+    State<value::Program> program;
+    State<value::LineWidth> lineWidth;
+    State<value::ActiveTexture> activeTexture;
+    State<value::BindFramebuffer> bindFramebuffer;
+    State<value::Viewport> viewport;
 #ifndef GL_ES_VERSION_2_0
-    Value<PixelZoom> pixelZoom;
-    Value<RasterPos> rasterPos;
+    State<value::PixelZoom> pixelZoom;
+    State<value::RasterPos> rasterPos;
 #endif // GL_ES_VERSION_2_0
-    std::array<Value<BindTexture>, 2> texture;
-    Value<BindBuffer<GL_ARRAY_BUFFER>> vertexBuffer;
-    Value<BindBuffer<GL_ELEMENT_ARRAY_BUFFER>> elementBuffer;
-    Value<BindVAO> vertexArrayObject;
+    std::array<State<value::BindTexture>, 2> texture;
+    State<value::BindBuffer<GL_ARRAY_BUFFER>> vertexBuffer;
+    State<value::BindBuffer<GL_ELEMENT_ARRAY_BUFFER>> elementBuffer;
+    State<value::BindVAO> vertexArrayObject;
 };
 
 } // namespace gl

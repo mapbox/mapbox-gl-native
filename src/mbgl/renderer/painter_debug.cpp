@@ -6,8 +6,6 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/gl/debugging.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_values.hpp>
-#include <mbgl/gl/gl_helper.hpp>
 #include <mbgl/util/color.hpp>
 
 namespace mbgl {
