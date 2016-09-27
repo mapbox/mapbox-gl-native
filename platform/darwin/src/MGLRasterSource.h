@@ -18,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  A URL to a TileJSON resource. Supported protocols are `http:`, `https:`, and 
  `mapbox://<mapid>`.
+ 
+ @see <a href="https://www.mapbox.com/help/an-open-platform/#tilejson">The 
+ TileJSON specification.</a>
  */
 @property (nonatomic, readonly, copy) NSURL *URL;
 
