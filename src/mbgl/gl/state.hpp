@@ -41,6 +41,10 @@ public:
         }
     }
 
+    bool operator==(const typename T::Type& value) const {
+        return !(*this != value);
+    }
+
     bool operator!=(const typename T::Type& value) const {
         return dirty || currentValue != value;
     }

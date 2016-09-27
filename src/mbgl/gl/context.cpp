@@ -61,6 +61,11 @@ void Context::setDirtyState() {
 
 void Context::performCleanup() {
     for (GLuint id : abandonedPrograms) {
+        for (const auto& p : abandonedPrograms) {
+            if (program == p) {
+                program.setDirty();
+            }
+        }
         MBGL_CHECK_ERROR(glDeleteProgram(id));
     }
     abandonedPrograms.clear();
@@ -71,21 +76,43 @@ void Context::performCleanup() {
     abandonedShaders.clear();
 
     if (!abandonedBuffers.empty()) {
+        for (const auto& b : abandonedBuffers) {
+            if (vertexBuffer == b) {
+                vertexBuffer.setDirty();
+            } else if (elementBuffer == b) {
+                elementBuffer.setDirty();
+            }
+        }
         MBGL_CHECK_ERROR(glDeleteBuffers(int(abandonedBuffers.size()), abandonedBuffers.data()));
         abandonedBuffers.clear();
     }
 
     if (!abandonedTextures.empty()) {
+        for (const auto& t : abandonedTextures) {
+            if (activeTexture == t) {
+                activeTexture.setDirty();
+            }
+        }
         MBGL_CHECK_ERROR(glDeleteTextures(int(abandonedTextures.size()), abandonedTextures.data()));
         abandonedTextures.clear();
     }
 
     if (!abandonedVAOs.empty()) {
+        for (const auto& v : abandonedVAOs) {
+            if (vertexArrayObject == v) {
+                vertexArrayObject.setDirty();
+            }
+        }
         MBGL_CHECK_ERROR(gl::DeleteVertexArrays(int(abandonedVAOs.size()), abandonedVAOs.data()));
         abandonedVAOs.clear();
     }
 
     if (!abandonedFBOs.empty()) {
+        for (const auto& f : abandonedFBOs) {
+            if (bindFramebuffer == f) {
+                bindFramebuffer.setDirty();
+            }
+        }
         MBGL_CHECK_ERROR(glDeleteFramebuffers(int(abandonedFBOs.size()), abandonedFBOs.data()));
         abandonedFBOs.clear();
     }
