@@ -5,12 +5,12 @@
 namespace mbgl {
 
 namespace gl {
-class Config;
+class Context;
 } // namespace gl
 
 class OffscreenTexture {
 public:
-    void bind(gl::ObjectStore&, gl::Config&, std::array<uint16_t, 2> size);
+    void bind(gl::ObjectStore&, gl::Context&, std::array<uint16_t, 2> size);
 
     Raster& getTexture();
     std::array<uint16_t, 2> getSize() const;

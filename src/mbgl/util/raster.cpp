@@ -1,6 +1,6 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_config.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/raster.hpp>
@@ -32,7 +32,7 @@ void Raster::load(PremultipliedImage image, uint32_t mipmapLevel) {
 }
 
 void Raster::bind(gl::ObjectStore& store,
-                  gl::Config& config,
+                  gl::Context& context,
                   uint32_t unit,
                   Scaling newFilter,
                   MipMap newMipMap) {
@@ -43,13 +43,13 @@ void Raster::bind(gl::ObjectStore& store,
             Log::Error(Event::OpenGL, "trying to bind texture without images");
             return;
         } else {
-            upload(store, config, unit);
+            upload(store, context, unit);
             filterNeedsUpdate = true;
         }
     } else {
-        if (config.texture[unit] != *texture) {
-            config.activeTexture = unit;
-            config.texture[unit] = *texture; 
+        if (context.texture[unit] != *texture) {
+            context.activeTexture = unit;
+            context.texture[unit] = *texture;
         }
         filterNeedsUpdate = (filter != newFilter || mipmap != newMipMap);
     }
@@ -71,11 +71,11 @@ void Raster::updateFilter() {
                                      filter == Scaling::Linear ? GL_LINEAR : GL_NEAREST));
 }
 
-void Raster::upload(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
+void Raster::upload(gl::ObjectStore& store, gl::Context& context, uint32_t unit) {
     if (!images.empty() && !texture) {
         texture = store.createTexture();
-        config.activeTexture = unit;
-        config.texture[unit] = *texture;
+        context.activeTexture = unit;
+        context.texture[unit] = *texture;
         updateFilter();
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, images.size()));

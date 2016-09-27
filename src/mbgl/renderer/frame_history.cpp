@@ -1,6 +1,6 @@
 #include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/math/minmax.hpp>
-#include <mbgl/gl/gl_config.hpp>
+#include <mbgl/gl/context.hpp>
 
 namespace mbgl {
 
@@ -58,11 +58,11 @@ bool FrameHistory::needsAnimation(const Duration& duration) const {
     return (time - previousTime) < duration;
 }
 
-void FrameHistory::upload(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
+void FrameHistory::upload(gl::ObjectStore& store, gl::Context& context, uint32_t unit) {
 
     if (changed) {
         const bool first = !texture;
-        bind(store, config, unit);
+        bind(store, context, unit);
 
         if (first) {
             MBGL_CHECK_ERROR(glTexImage2D(
@@ -95,11 +95,11 @@ void FrameHistory::upload(gl::ObjectStore& store, gl::Config& config, uint32_t u
     }
 }
 
-void FrameHistory::bind(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
+void FrameHistory::bind(gl::ObjectStore& store, gl::Context& context, uint32_t unit) {
     if (!texture) {
         texture = store.createTexture();
-        config.activeTexture = unit;
-        config.texture[unit] = *texture;
+        context.activeTexture = unit;
+        context.texture[unit] = *texture;
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
@@ -107,9 +107,9 @@ void FrameHistory::bind(gl::ObjectStore& store, gl::Config& config, uint32_t uni
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-    } else if (config.texture[unit] != *texture) {
-        config.activeTexture = unit;
-        config.texture[unit] = *texture;
+    } else if (context.texture[unit] != *texture) {
+        context.activeTexture = unit;
+        context.texture[unit] = *texture;
     }
 }
 

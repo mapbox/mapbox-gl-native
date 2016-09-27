@@ -1,4 +1,4 @@
-#include <mbgl/gl/gl_config.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/util/offscreen_texture.hpp>
 
 #include <cassert>
@@ -6,18 +6,18 @@
 namespace mbgl {
 
 void OffscreenTexture::bind(gl::ObjectStore& store,
-                            gl::Config& config,
+                            gl::Context& context,
                             std::array<uint16_t, 2> size) {
     assert(size[0] > 0 && size[1] > 0);
 
     if (raster.getSize() != size) {
         raster.load(PremultipliedImage(size[0], size[1], nullptr));
-        raster.upload(store, config, 0);
+        raster.upload(store, context, 0);
     }
 
     if (!fbo) {
         fbo = store.createFBO();
-        config.bindFramebuffer = *fbo;
+        context.bindFramebuffer = *fbo;
         MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                                                 raster.getID(), 0));
 
@@ -49,10 +49,10 @@ void OffscreenTexture::bind(gl::ObjectStore& store,
             }
         }
     } else {
-        config.bindFramebuffer = *fbo;
+        context.bindFramebuffer = *fbo;
     }
 
-    config.viewport = { { 0, 0, static_cast<GLint>(size[0]), static_cast<GLint>(size[1]) } };
+    context.viewport = { { 0, 0, static_cast<GLint>(size[0]), static_cast<GLint>(size[1]) } };
 }
 
 Raster& OffscreenTexture::getTexture() {

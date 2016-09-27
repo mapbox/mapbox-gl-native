@@ -77,11 +77,10 @@ set(MBGL_CORE_FILES
 
     # gl
     include/mbgl/gl/gl.hpp
-    include/mbgl/gl/gl_helper.hpp
+    src/mbgl/gl/context.hpp
     src/mbgl/gl/debugging.cpp
     src/mbgl/gl/debugging.hpp
     src/mbgl/gl/gl.cpp
-    src/mbgl/gl/gl_config.hpp
     src/mbgl/gl/object_store.cpp
     src/mbgl/gl/object_store.hpp
     src/mbgl/gl/state.hpp

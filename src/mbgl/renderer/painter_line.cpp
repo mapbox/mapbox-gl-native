@@ -20,11 +20,11 @@ void Painter::renderLine(PaintParameters& parameters,
     // Abort early.
     if (pass == RenderPass::Opaque) return;
 
-    config.stencilOp.reset();
-    config.stencilTest = GL_TRUE;
-    config.depthFunc.reset();
-    config.depthTest = GL_TRUE;
-    config.depthMask = GL_FALSE;
+    context.stencilOp.reset();
+    context.stencilTest = GL_TRUE;
+    context.depthFunc.reset();
+    context.depthTest = GL_TRUE;
+    context.depthMask = GL_FALSE;
 
     const auto& properties = layer.impl->paint;
     const auto& layout = bucket.layout;
@@ -61,7 +61,7 @@ void Painter::renderLine(PaintParameters& parameters,
     auto& lineShader = parameters.shaders.line;
 
     if (!properties.lineDasharray.value.from.empty()) {
-        config.program = linesdfShader.getID();
+        context.program = linesdfShader.getID();
 
         linesdfShader.u_matrix = vtxMatrix;
         linesdfShader.u_linewidth = properties.lineWidth / 2;
@@ -96,9 +96,9 @@ void Painter::renderLine(PaintParameters& parameters,
         linesdfShader.u_antialiasingmatrix = antialiasingMatrix;
 
         linesdfShader.u_image = 0;
-        lineAtlas->bind(store, config, 0);
+        lineAtlas->bind(store, context, 0);
 
-        bucket.drawLineSDF(linesdfShader, store, config, paintMode());
+        bucket.drawLineSDF(linesdfShader, store, context, paintMode());
 
     } else if (!properties.linePattern.value.from.empty()) {
         optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(
@@ -109,7 +109,7 @@ void Painter::renderLine(PaintParameters& parameters,
         if (!imagePosA || !imagePosB)
             return;
 
-        config.program = linepatternShader.getID();
+        context.program = linepatternShader.getID();
 
         linepatternShader.u_matrix = vtxMatrix;
         linepatternShader.u_linewidth = properties.lineWidth / 2;
@@ -139,12 +139,12 @@ void Painter::renderLine(PaintParameters& parameters,
         linepatternShader.u_antialiasingmatrix = antialiasingMatrix;
 
         linepatternShader.u_image = 0;
-        spriteAtlas->bind(true, store, config, 0);
+        spriteAtlas->bind(true, store, context, 0);
 
-        bucket.drawLinePatterns(linepatternShader, store, config, paintMode());
+        bucket.drawLinePatterns(linepatternShader, store, context, paintMode());
 
     } else {
-        config.program = lineShader.getID();
+        context.program = lineShader.getID();
 
         lineShader.u_matrix = vtxMatrix;
         lineShader.u_linewidth = properties.lineWidth / 2;
@@ -159,7 +159,7 @@ void Painter::renderLine(PaintParameters& parameters,
         lineShader.u_color = color;
         lineShader.u_opacity = opacity;
 
-        bucket.drawLines(lineShader, store, config, paintMode());
+        bucket.drawLines(lineShader, store, context, paintMode());
     }
 }
 

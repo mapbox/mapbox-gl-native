@@ -19,16 +19,16 @@ void Painter::renderCircle(PaintParameters& parameters,
     // Abort early.
     if (pass == RenderPass::Opaque) return;
 
-    config.stencilTest = frame.mapMode == MapMode::Still ? GL_TRUE : GL_FALSE;
-    config.depthFunc.reset();
-    config.depthTest = GL_TRUE;
-    config.depthMask = GL_FALSE;
+    context.stencilTest = frame.mapMode == MapMode::Still ? GL_TRUE : GL_FALSE;
+    context.depthFunc.reset();
+    context.depthTest = GL_TRUE;
+    context.depthMask = GL_FALSE;
     setDepthSublayer(0);
 
     const CirclePaintProperties& properties = layer.impl->paint;
     auto& circleShader = parameters.shaders.circle;
 
-    config.program = circleShader.getID();
+    context.program = circleShader.getID();
 
     circleShader.u_matrix = tile.translatedMatrix(properties.circleTranslate,
                                                   properties.circleTranslateAnchor,
@@ -51,7 +51,7 @@ void Painter::renderCircle(PaintParameters& parameters,
     circleShader.u_blur = properties.circleBlur;
     circleShader.u_opacity = properties.circleOpacity;
 
-    bucket.drawCircles(circleShader, store, config);
+    bucket.drawCircles(circleShader, store, context);
 }
 
 } // namespace mbgl

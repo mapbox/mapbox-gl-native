@@ -2,7 +2,7 @@
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
-#include <mbgl/gl/gl_config.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
@@ -40,16 +40,16 @@ public:
     }
 
     // Transfers this buffer to the GPU and binds the buffer to the GL context.
-    void bind(gl::ObjectStore& store, gl::Config& config) {
+    void bind(gl::ObjectStore& store, gl::Context& context) {
         const bool initialized { buffer };
         if (!initialized) {
             buffer = store.createBuffer();
         }
 
         if (target == GL_ARRAY_BUFFER) {
-            config.vertexBuffer = *buffer;
+            context.vertexBuffer = *buffer;
         } else {
-            config.elementBuffer = *buffer;
+            context.elementBuffer = *buffer;
         }
 
         if (!initialized) {
@@ -76,9 +76,9 @@ public:
     }
 
     // Uploads the buffer to the GPU to be available when we need it.
-    void upload(gl::ObjectStore& store, gl::Config& config) {
+    void upload(gl::ObjectStore& store, gl::Context& context) {
         if (!buffer) {
-            bind(store, config);
+            bind(store, context);
         }
     }
 

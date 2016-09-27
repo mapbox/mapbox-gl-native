@@ -3,7 +3,7 @@
 #include <mbgl/text/glyph_pbf.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
-#include <mbgl/gl/gl_config.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
@@ -204,14 +204,14 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
     }
 }
 
-void GlyphAtlas::upload(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
+void GlyphAtlas::upload(gl::ObjectStore& store, gl::Context& context, uint32_t unit) {
     if (dirty) {
         const bool first = !texture;
-        bind(store, config, unit);
+        bind(store, context, unit);
 
         std::lock_guard<std::mutex> lock(mtx);
 
-        config.activeTexture = unit;
+        context.activeTexture = unit;
         if (first) {
             MBGL_CHECK_ERROR(glTexImage2D(
                 GL_TEXTURE_2D, // GLenum target
@@ -242,11 +242,11 @@ void GlyphAtlas::upload(gl::ObjectStore& store, gl::Config& config, uint32_t uni
     }
 }
 
-void GlyphAtlas::bind(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
+void GlyphAtlas::bind(gl::ObjectStore& store, gl::Context& context, uint32_t unit) {
     if (!texture) {
         texture = store.createTexture();
-        config.activeTexture = unit;
-        config.texture[unit] = *texture;
+        context.activeTexture = unit;
+        context.texture[unit] = *texture;
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
@@ -254,9 +254,9 @@ void GlyphAtlas::bind(gl::ObjectStore& store, gl::Config& config, uint32_t unit)
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-    } else if (config.texture[unit] != *texture) {
-        config.activeTexture = unit;
-        config.texture[unit] = *texture;
+    } else if (context.texture[unit] != *texture) {
+        context.activeTexture = unit;
+        context.texture[unit] = *texture;
     }
 }
 

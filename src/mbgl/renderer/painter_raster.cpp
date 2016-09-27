@@ -23,7 +23,7 @@ void Painter::renderRaster(PaintParameters& parameters,
         auto& rasterShader = parameters.shaders.raster;
         auto& rasterVAO = parameters.shaders.coveringRasterArray;
 
-        config.program = rasterShader.getID();
+        context.program = rasterShader.getID();
         rasterShader.u_matrix = tile.matrix;
         rasterShader.u_buffer_scale = 1.0f;
         rasterShader.u_opacity0 = properties.rasterOpacity;
@@ -35,19 +35,19 @@ void Painter::renderRaster(PaintParameters& parameters,
         rasterShader.u_contrast_factor = contrastFactor(properties.rasterContrast);
         rasterShader.u_spin_weights = spinWeights(properties.rasterHueRotate);
 
-        config.stencilTest = GL_FALSE;
+        context.stencilTest = GL_FALSE;
 
         rasterShader.u_image0 = 0; // GL_TEXTURE0
         rasterShader.u_image1 = 1; // GL_TEXTURE1
         rasterShader.u_tl_parent = {{ 0.0f, 0.0f }};
         rasterShader.u_scale_parent = 1.0f;
 
-        config.depthFunc.reset();
-        config.depthTest = GL_TRUE;
-        config.depthMask = GL_FALSE;
+        context.depthFunc.reset();
+        context.depthTest = GL_TRUE;
+        context.depthMask = GL_FALSE;
         setDepthSublayer(0);
 
-        bucket.drawRaster(rasterShader, rasterBoundsBuffer, rasterVAO, config, store);
+        bucket.drawRaster(rasterShader, rasterBoundsBuffer, rasterVAO, context, store);
     }
 }
 

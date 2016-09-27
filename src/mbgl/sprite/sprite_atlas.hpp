@@ -21,7 +21,7 @@ class FileSource;
 class SpriteAtlasObserver;
 
 namespace gl {
-class Config;
+class Context;
 } // namespace gl
 
 class SpriteImage;
@@ -83,14 +83,14 @@ public:
                                               SpritePatternMode mode = SpritePatternMode::Single);
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
-    void bind(bool linear, gl::ObjectStore&, gl::Config&, uint32_t unit);
+    void bind(bool linear, gl::ObjectStore&, gl::Context&, uint32_t unit);
 
     // Updates sprites in the atlas texture that may have changed.
     void updateDirty();
 
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
-    void upload(gl::ObjectStore&, gl::Config&, uint32_t unit);
+    void upload(gl::ObjectStore&, gl::Context&, uint32_t unit);
 
     dimension getWidth() const { return width; }
     dimension getHeight() const { return height; }

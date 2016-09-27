@@ -25,7 +25,7 @@ public:
                  bool sdfIcons,
                  bool iconsNeedLinear);
 
-    void upload(gl::ObjectStore&, gl::Config&) override;
+    void upload(gl::ObjectStore&, gl::Context&) override;
     void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
     bool hasData() const override;
     bool hasTextData() const;
@@ -33,10 +33,10 @@ public:
     bool hasCollisionBoxData() const;
     bool needsClipping() const override;
 
-    void drawGlyphs(SDFShader&, gl::ObjectStore&, gl::Config&, PaintMode);
-    void drawIcons(SDFShader&, gl::ObjectStore&, gl::Config&, PaintMode);
-    void drawIcons(IconShader&, gl::ObjectStore&, gl::Config&, PaintMode);
-    void drawCollisionBoxes(CollisionBoxShader&, gl::ObjectStore&, gl::Config&);
+    void drawGlyphs(SDFShader&, gl::ObjectStore&, gl::Context&, PaintMode);
+    void drawIcons(SDFShader&, gl::ObjectStore&, gl::Context&, PaintMode);
+    void drawIcons(IconShader&, gl::ObjectStore&, gl::Context&, PaintMode);
+    void drawCollisionBoxes(CollisionBoxShader&, gl::ObjectStore&, gl::Context&);
 
     const MapMode mode;
     const style::SymbolLayoutProperties layout;

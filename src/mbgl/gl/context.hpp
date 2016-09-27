@@ -6,7 +6,7 @@
 namespace mbgl {
 namespace gl {
 
-class Config {
+class Context {
 public:
     void resetState() {
         stencilFunc.reset();

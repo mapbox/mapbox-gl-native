@@ -10,7 +10,7 @@
 namespace mbgl {
 
 namespace gl {
-class Config;
+class Context;
 } // namespace gl
 
 class Raster {
@@ -23,13 +23,13 @@ public:
 
     // bind current texture
     void bind(gl::ObjectStore&,
-              gl::Config&,
+              gl::Context&,
               uint32_t unit,
               Scaling = Scaling::Nearest,
               MipMap = MipMap::No);
 
     // uploads the texture if it hasn't been uploaded yet.
-    void upload(gl::ObjectStore&, gl::Config&, uint32_t unit);
+    void upload(gl::ObjectStore&, gl::Context&, uint32_t unit);
 
     // loaded status
     bool isLoaded() const;

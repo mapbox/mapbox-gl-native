@@ -18,15 +18,15 @@ void Painter::drawClippingMasks(PaintParameters& parameters, const std::map<Unwr
     mat4 matrix;
     const GLuint mask = 0b11111111;
 
-    config.program = plainShader.getID();
-    config.stencilOp.reset();
-    config.stencilTest = GL_TRUE;
-    config.depthTest = GL_FALSE;
-    config.depthMask = GL_FALSE;
-    config.colorMask = { GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE };
-    config.stencilMask = mask;
+    context.program = plainShader.getID();
+    context.stencilOp.reset();
+    context.stencilTest = GL_TRUE;
+    context.depthTest = GL_FALSE;
+    context.depthMask = GL_FALSE;
+    context.colorMask = { GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE };
+    context.stencilMask = mask;
 
-    arrayCoveringPlain.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET_0, store, config);
+    arrayCoveringPlain.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET_0, store, context);
 
     for (const auto& stencil : stencils) {
         const auto& id = stencil.first;
@@ -38,7 +38,7 @@ void Painter::drawClippingMasks(PaintParameters& parameters, const std::map<Unwr
         plainShader.u_matrix = matrix;
 
         const GLint ref = (GLint)(clip.reference.to_ulong());
-        config.stencilFunc = { GL_ALWAYS, ref, mask };
+        context.stencilFunc = { GL_ALWAYS, ref, mask };
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index()));
     }
 }

@@ -1,6 +1,6 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/gl/gl_config.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 
 #include <mbgl/util/offscreen_texture.hpp>
@@ -67,7 +67,7 @@ struct Buffer {
 TEST(OffscreenTexture, RenderToTexture) {
     HeadlessView view(1.0f, 512, 256);
     view.activate();
-    gl::Config config;
+    gl::Context context;
     gl::ObjectStore store;
 
 
@@ -108,18 +108,18 @@ void main() {
     // Make sure the texture gets destructed before we call store.reset();
     {
         // First, draw red to the bound FBO.
-        config.clearColor = { 1, 0, 0, 1 };
+        context.clearColor = { 1, 0, 0, 1 };
         MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
 
         // Then, create a texture, bind it, and render yellow to that texture. This should not
         // affect the originally bound FBO.
         OffscreenTexture texture;
-        texture.bind(store, config, {{ 128, 128 }});
+        texture.bind(store, context, {{ 128, 128 }});
 
-        config.clearColor = { 0, 0, 0, 0 };
+        context.clearColor = { 0, 0, 0, 0 };
         MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
 
-        config.program = paintShader.program;
+        context.program = paintShader.program;
         MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, triangleBuffer.buffer));
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(paintShader.a_pos));
         MBGL_CHECK_ERROR(
@@ -130,14 +130,14 @@ void main() {
         test::checkImage("test/fixtures/offscreen_texture/render-to-texture", image, 0, 0);
 
         // Now reset the FBO back to normal and retrieve the original (restored) framebuffer.
-        config.resetState();
+        context.resetState();
 
         image = view.readStillImage();
         test::checkImage("test/fixtures/offscreen_texture/render-to-fbo", image, 0, 0);
 
         // Now, composite the Framebuffer texture we've rendered to onto the main FBO.
-        config.program = compositeShader.program;
-        texture.getTexture().bind(store, config, 0, Raster::Scaling::Linear);
+        context.program = compositeShader.program;
+        texture.getTexture().bind(store, context, 0, Raster::Scaling::Linear);
         MBGL_CHECK_ERROR(glUniform1i(u_texture, 0));
         MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, viewportBuffer.buffer));
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(compositeShader.a_pos));

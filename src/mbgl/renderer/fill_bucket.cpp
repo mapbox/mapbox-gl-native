@@ -95,10 +95,10 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
     }
 }
 
-void FillBucket::upload(gl::ObjectStore& store, gl::Config& config) {
-    vertexBuffer.upload(store, config);
-    triangleElementsBuffer.upload(store, config);
-    lineElementsBuffer.upload(store, config);
+void FillBucket::upload(gl::ObjectStore& store, gl::Context& context) {
+    vertexBuffer.upload(store, context);
+    triangleElementsBuffer.upload(store, context);
+    lineElementsBuffer.upload(store, context);
 
     // From now on, we're going to render during the opaque and translucent pass.
     uploaded = true;
@@ -121,14 +121,14 @@ bool FillBucket::needsClipping() const {
 
 void FillBucket::drawElements(PlainShader& shader,
                               gl::ObjectStore& store,
-                              gl::Config& config,
+                              gl::Context& context,
                               PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
-            shader, vertexBuffer, triangleElementsBuffer, vertex_index, store, config);
+            shader, vertexBuffer, triangleElementsBuffer, vertex_index, store, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
                                         elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
@@ -138,14 +138,14 @@ void FillBucket::drawElements(PlainShader& shader,
 
 void FillBucket::drawElements(PatternShader& shader,
                               gl::ObjectStore& store,
-                              gl::Config& config,
+                              gl::Context& context,
                               PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
-            shader, vertexBuffer, triangleElementsBuffer, vertex_index, store, config);
+            shader, vertexBuffer, triangleElementsBuffer, vertex_index, store, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
                                         elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
@@ -155,14 +155,14 @@ void FillBucket::drawElements(PatternShader& shader,
 
 void FillBucket::drawVertices(OutlineShader& shader,
                               gl::ObjectStore& store,
-                              gl::Config& config,
+                              gl::Context& context,
                               PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : lineGroups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
-            shader, vertexBuffer, lineElementsBuffer, vertex_index, store, config);
+            shader, vertexBuffer, lineElementsBuffer, vertex_index, store, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT,
                                         elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
@@ -172,14 +172,14 @@ void FillBucket::drawVertices(OutlineShader& shader,
 
 void FillBucket::drawVertices(OutlinePatternShader& shader,
                               gl::ObjectStore& store,
-                              gl::Config& config,
+                              gl::Context& context,
                               PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : lineGroups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
-            shader, vertexBuffer, lineElementsBuffer, vertex_index, store, config);
+            shader, vertexBuffer, lineElementsBuffer, vertex_index, store, context);
         MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT,
                                         elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;

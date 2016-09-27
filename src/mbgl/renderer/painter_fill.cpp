@@ -33,12 +33,12 @@ void Painter::renderFill(PaintParameters& parameters,
     bool outline = properties.fillAntialias && !pattern && isOutlineColorDefined;
     bool fringeline = properties.fillAntialias && !pattern && !isOutlineColorDefined;
 
-    config.stencilOp.reset();
-    config.stencilTest = GL_TRUE;
-    config.depthFunc.reset();
-    config.depthTest = GL_TRUE;
-    config.depthMask = GL_TRUE;
-    config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
+    context.stencilOp.reset();
+    context.stencilTest = GL_TRUE;
+    context.depthFunc.reset();
+    context.depthTest = GL_TRUE;
+    context.depthMask = GL_TRUE;
+    context.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
     auto& outlineShader = parameters.shaders.outline;
     auto& patternShader = parameters.shaders.pattern;
@@ -48,7 +48,7 @@ void Painter::renderFill(PaintParameters& parameters,
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // befrom, we have to draw the outline first (!)
     if (outline && pass == RenderPass::Translucent) {
-        config.program = outlineShader.getID();
+        context.program = outlineShader.getID();
         outlineShader.u_matrix = vertexMatrix;
 
         outlineShader.u_outline_color = strokeColor;
@@ -69,7 +69,7 @@ void Painter::renderFill(PaintParameters& parameters,
             // the (non-antialiased) fill.
             setDepthSublayer(0); // OK
         }
-        bucket.drawVertices(outlineShader, store, config, paintMode());
+        bucket.drawVertices(outlineShader, store, context, paintMode());
     }
 
     if (pattern) {
@@ -80,7 +80,7 @@ void Painter::renderFill(PaintParameters& parameters,
 
         // Image fill.
         if (pass == RenderPass::Translucent && imagePosA && imagePosB) {
-            config.program = patternShader.getID();
+            context.program = patternShader.getID();
             patternShader.u_matrix = vertexMatrix;
             patternShader.u_pattern_tl_a = imagePosA->tl;
             patternShader.u_pattern_br_a = imagePosA->br;
@@ -101,14 +101,14 @@ void Painter::renderFill(PaintParameters& parameters,
             patternShader.u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
             patternShader.u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
 
-            spriteAtlas->bind(true, store, config, 0);
+            spriteAtlas->bind(true, store, context, 0);
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(0);
-            bucket.drawElements(patternShader, store, config, paintMode());
+            bucket.drawElements(patternShader, store, context, paintMode());
 
             if (properties.fillAntialias && !isOutlineColorDefined) {
-                config.program = outlinePatternShader.getID();
+                context.program = outlinePatternShader.getID();
                 outlinePatternShader.u_matrix = vertexMatrix;
 
                 outlinePatternShader.u_pattern_tl_a = imagePosA->tl;
@@ -129,10 +129,10 @@ void Painter::renderFill(PaintParameters& parameters,
                 // Draw the entire line
                 outlinePatternShader.u_world = worldSize;
 
-                spriteAtlas->bind(true, store, config, 0);
+                spriteAtlas->bind(true, store, context, 0);
 
                 setDepthSublayer(2);
-                bucket.drawVertices(outlinePatternShader, store, config, paintMode());
+                bucket.drawVertices(outlinePatternShader, store, context, paintMode());
             }
         }
     } else {
@@ -142,21 +142,21 @@ void Painter::renderFill(PaintParameters& parameters,
             // fragments or when it's translucent and we're drawing translucent
             // fragments
             // Draw filling rectangle.
-            config.program = plainShader.getID();
+            context.program = plainShader.getID();
             plainShader.u_matrix = vertexMatrix;
             plainShader.u_color = fillColor;
             plainShader.u_opacity = opacity;
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(1);
-            bucket.drawElements(plainShader, store, config, paintMode());
+            bucket.drawElements(plainShader, store, context, paintMode());
         }
     }
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (fringeline && pass == RenderPass::Translucent) {
-        config.program = outlineShader.getID();
+        context.program = outlineShader.getID();
         outlineShader.u_matrix = vertexMatrix;
 
         outlineShader.u_outline_color = fillColor;
@@ -166,7 +166,7 @@ void Painter::renderFill(PaintParameters& parameters,
         outlineShader.u_world = worldSize;
 
         setDepthSublayer(2);
-        bucket.drawVertices(outlineShader, store, config, paintMode());
+        bucket.drawVertices(outlineShader, store, context, paintMode());
     }
 }
 
