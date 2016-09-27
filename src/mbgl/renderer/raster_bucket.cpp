@@ -7,9 +7,9 @@ namespace mbgl {
 
 using namespace style;
 
-void RasterBucket::upload(gl::ObjectStore& store, gl::Context& context) {
+void RasterBucket::upload(gl::Context& context) {
     if (hasData()) {
-        raster.upload(store, context, 0);
+        raster.upload(context, 0);
         uploaded = true;
     }
 }
@@ -28,11 +28,10 @@ void RasterBucket::setImage(PremultipliedImage image) {
 void RasterBucket::drawRaster(RasterShader& shader,
                               StaticRasterVertexBuffer& vertices,
                               VertexArrayObject& array,
-                              gl::Context& context,
-                              gl::ObjectStore& store) {
-    raster.bind(store, context, 0, Raster::Scaling::Linear);
-    raster.bind(store, context, 1, Raster::Scaling::Linear);
-    array.bind(shader, vertices, BUFFER_OFFSET_0, store, context);
+                              gl::Context& context) {
+    raster.bind(context, 0, Raster::Scaling::Linear);
+    raster.bind(context, 1, Raster::Scaling::Linear);
+    array.bind(shader, vertices, BUFFER_OFFSET_0, context);
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)vertices.index()));
 }
 

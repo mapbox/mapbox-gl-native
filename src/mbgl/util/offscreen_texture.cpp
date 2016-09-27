@@ -5,18 +5,17 @@
 
 namespace mbgl {
 
-void OffscreenTexture::bind(gl::ObjectStore& store,
-                            gl::Context& context,
+void OffscreenTexture::bind(gl::Context& context,
                             std::array<uint16_t, 2> size) {
     assert(size[0] > 0 && size[1] > 0);
 
     if (raster.getSize() != size) {
         raster.load(PremultipliedImage(size[0], size[1], nullptr));
-        raster.upload(store, context, 0);
+        raster.upload(context, 0);
     }
 
     if (!fbo) {
-        fbo = store.createFBO();
+        fbo = context.createFBO();
         context.bindFramebuffer = *fbo;
         MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                                                 raster.getID(), 0));

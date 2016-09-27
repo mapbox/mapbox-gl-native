@@ -44,15 +44,15 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
         patternShader.u_mix = properties.backgroundPattern.value.t;
         patternShader.u_opacity = properties.backgroundOpacity;
 
-        spriteAtlas->bind(true, store, context, 0);
-        arrayBackgroundPattern.bind(patternShader, tileStencilBuffer, BUFFER_OFFSET(0), store, context);
+        spriteAtlas->bind(true, context, 0);
+        arrayBackgroundPattern.bind(patternShader, tileStencilBuffer, BUFFER_OFFSET(0), context);
 
     } else {
         context.program = plainShader.getID();
         plainShader.u_color = properties.backgroundColor;
         plainShader.u_opacity = properties.backgroundOpacity;
 
-        arrayBackground.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET(0), store, context);
+        arrayBackground.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET(0), context);
     }
 
     context.stencilTest = GL_FALSE;

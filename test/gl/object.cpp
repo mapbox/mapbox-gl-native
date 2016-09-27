@@ -5,7 +5,6 @@
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/context.hpp>
-#include <mbgl/gl/object_store.hpp>
 
 #include <memory>
 
@@ -71,48 +70,48 @@ TEST(GLObject, Store) {
     mbgl::HeadlessView view(std::make_shared<mbgl::HeadlessDisplay>(), 1);
     view.activate();
 
-    mbgl::gl::ObjectStore store;
-    EXPECT_TRUE(store.empty());
+    mbgl::gl::Context context;
+    EXPECT_TRUE(context.empty());
 
-    mbgl::gl::UniqueProgram program = store.createProgram();
+    mbgl::gl::UniqueProgram program = context.createProgram();
     EXPECT_NE(program.get(), 0u);
     program.reset();
-    EXPECT_FALSE(store.empty());
-    store.performCleanup();
-    EXPECT_TRUE(store.empty());
+    EXPECT_FALSE(context.empty());
+    context.performCleanup();
+    EXPECT_TRUE(context.empty());
 
-    mbgl::gl::UniqueShader shader = store.createShader(GL_VERTEX_SHADER);
+    mbgl::gl::UniqueShader shader = context.createShader(GL_VERTEX_SHADER);
     EXPECT_NE(shader.get(), 0u);
     shader.reset();
-    EXPECT_FALSE(store.empty());
-    store.performCleanup();
-    EXPECT_TRUE(store.empty());
+    EXPECT_FALSE(context.empty());
+    context.performCleanup();
+    EXPECT_TRUE(context.empty());
 
-    mbgl::gl::UniqueBuffer buffer = store.createBuffer();
+    mbgl::gl::UniqueBuffer buffer = context.createBuffer();
     EXPECT_NE(buffer.get(), 0u);
     buffer.reset();
-    EXPECT_FALSE(store.empty());
-    store.performCleanup();
-    EXPECT_TRUE(store.empty());
+    EXPECT_FALSE(context.empty());
+    context.performCleanup();
+    EXPECT_TRUE(context.empty());
 
-    mbgl::gl::UniqueTexture texture = store.createTexture();
+    mbgl::gl::UniqueTexture texture = context.createTexture();
     EXPECT_NE(texture.get(), 0u);
     texture.reset();
-    EXPECT_FALSE(store.empty());
-    store.performCleanup();
-    EXPECT_FALSE(store.empty());
-    store.reset();
-    EXPECT_TRUE(store.empty());
+    EXPECT_FALSE(context.empty());
+    context.performCleanup();
+    EXPECT_FALSE(context.empty());
+    context.reset();
+    EXPECT_TRUE(context.empty());
 
-    mbgl::gl::UniqueVAO vao = store.createVAO();
+    mbgl::gl::UniqueVAO vao = context.createVAO();
     EXPECT_NE(vao.get(), 0u);
     vao.reset();
-    EXPECT_FALSE(store.empty());
-    store.performCleanup();
-    EXPECT_TRUE(store.empty());
+    EXPECT_FALSE(context.empty());
+    context.performCleanup();
+    EXPECT_TRUE(context.empty());
 
-    store.reset();
-    EXPECT_TRUE(store.empty());
+    context.reset();
+    EXPECT_TRUE(context.empty());
 
     view.deactivate();
 }

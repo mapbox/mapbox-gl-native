@@ -1,5 +1,6 @@
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/util/stopwatch.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/platform/log.hpp>
@@ -15,12 +16,15 @@
 
 namespace mbgl {
 
-Shader::Shader(const char* name_, const char* vertexSource, const char* fragmentSource, gl::ObjectStore& store, Defines defines)
-    : name(name_)
-    , program(store.createProgram())
-    , vertexShader(store.createShader(GL_VERTEX_SHADER))
-    , fragmentShader(store.createShader(GL_FRAGMENT_SHADER))
-{
+Shader::Shader(const char* name_,
+               const char* vertexSource,
+               const char* fragmentSource,
+               gl::Context& context,
+               Defines defines)
+    : name(name_),
+      program(context.createProgram()),
+      vertexShader(context.createShader(GL_VERTEX_SHADER)),
+      fragmentShader(context.createShader(GL_FRAGMENT_SHADER)) {
     util::stopwatch stopwatch("shader compilation", Event::Shader);
 
     if (!compileShader(vertexShader, vertexSource)) {

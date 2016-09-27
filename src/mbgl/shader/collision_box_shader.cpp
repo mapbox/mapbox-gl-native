@@ -5,11 +5,11 @@
 
 namespace mbgl {
 
-CollisionBoxShader::CollisionBoxShader(gl::ObjectStore& store)
+CollisionBoxShader::CollisionBoxShader(gl::Context& context)
     : Shader(shaders::collisionbox::name,
              shaders::collisionbox::vertex,
              shaders::collisionbox::fragment,
-             store) {
+             context) {
 }
 
 void CollisionBoxShader::bind(GLbyte *offset) {

@@ -2,7 +2,6 @@
 #include <mbgl/text/glyph_atlas_observer.hpp>
 #include <mbgl/text/glyph_pbf.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/object_store.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -204,10 +203,10 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
     }
 }
 
-void GlyphAtlas::upload(gl::ObjectStore& store, gl::Context& context, uint32_t unit) {
+void GlyphAtlas::upload(gl::Context& context, uint32_t unit) {
     if (dirty) {
         const bool first = !texture;
-        bind(store, context, unit);
+        bind(context, unit);
 
         std::lock_guard<std::mutex> lock(mtx);
 
@@ -242,9 +241,9 @@ void GlyphAtlas::upload(gl::ObjectStore& store, gl::Context& context, uint32_t u
     }
 }
 
-void GlyphAtlas::bind(gl::ObjectStore& store, gl::Context& context, uint32_t unit) {
+void GlyphAtlas::bind(gl::Context& context, uint32_t unit) {
     if (!texture) {
-        texture = store.createTexture();
+        texture = context.createTexture();
         context.activeTexture = unit;
         context.texture[unit] = *texture;
 #ifndef GL_ES_VERSION_2_0

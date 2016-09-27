@@ -46,18 +46,18 @@ void Painter::renderDebugText(Tile& tile, const mat4 &matrix) {
     // Draw white outline
     plainShader.u_color = Color::white();
     context.lineWidth = 4.0f * frame.pixelRatio;
-    tile.debugBucket->drawLines(plainShader, store, context);
+    tile.debugBucket->drawLines(plainShader, context);
 
 #ifndef GL_ES_VERSION_2_0
     // Draw line "end caps"
     MBGL_CHECK_ERROR(glPointSize(2));
-    tile.debugBucket->drawPoints(plainShader, store, context);
+    tile.debugBucket->drawPoints(plainShader, context);
 #endif
 
     // Draw black text.
     plainShader.u_color = Color::black();
     context.lineWidth = 2.0f * frame.pixelRatio;
-    tile.debugBucket->drawLines(plainShader, store, context);
+    tile.debugBucket->drawLines(plainShader, context);
 
     context.depthFunc.reset();
     context.depthTest = GL_TRUE;
@@ -79,7 +79,7 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     plainShader.u_opacity = 1.0f;
 
     // draw tile outline
-    tileBorderArray.bind(plainShader, tileBorderBuffer, BUFFER_OFFSET_0, store, context);
+    tileBorderArray.bind(plainShader, tileBorderBuffer, BUFFER_OFFSET_0, context);
     plainShader.u_color = { 1.0f, 0.0f, 0.0f, 1.0f };
     context.lineWidth = 4.0f * frame.pixelRatio;
     MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index()));

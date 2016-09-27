@@ -5,11 +5,11 @@
 
 namespace mbgl {
 
-LinepatternShader::LinepatternShader(gl::ObjectStore& store, Defines defines)
+LinepatternShader::LinepatternShader(gl::Context& context, Defines defines)
     : Shader(shaders::linepattern::name,
              shaders::linepattern::vertex,
              shaders::linepattern::fragment,
-             store, defines) {
+             context, defines) {
 }
 
 void LinepatternShader::bind(GLbyte* offset) {

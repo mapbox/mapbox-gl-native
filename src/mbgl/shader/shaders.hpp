@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/object_store.hpp>
 
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/plain_shader.hpp>
@@ -20,21 +19,21 @@ namespace mbgl {
 
 class Shaders {
 public:
-    Shaders(gl::ObjectStore& store, Shader::Defines defines = Shader::None)
-        : plain(store, defines),
-          outline(store, defines),
-          outlinePattern(store, defines),
-          line(store, defines),
-          linesdf(store, defines),
-          linepattern(store, defines),
-          pattern(store, defines),
-          icon(store, defines),
-          raster(store, defines),
-          sdfGlyph(store, defines),
-          sdfIcon(store, defines),
-          collisionBox(store),
-          circle(store, defines)
-          {}
+    Shaders(gl::Context& context, Shader::Defines defines = Shader::None)
+        : plain(context, defines),
+          outline(context, defines),
+          outlinePattern(context, defines),
+          line(context, defines),
+          linesdf(context, defines),
+          linepattern(context, defines),
+          pattern(context, defines),
+          icon(context, defines),
+          raster(context, defines),
+          sdfGlyph(context, defines),
+          sdfIcon(context, defines),
+          collisionBox(context),
+          circle(context, defines) {
+    }
 
     PlainShader plain;
     OutlineShader outline;

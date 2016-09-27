@@ -282,9 +282,9 @@ void SpriteAtlas::copy(const Holder& holder, const SpritePatternMode mode) {
     dirtyFlag = true;
 }
 
-void SpriteAtlas::upload(gl::ObjectStore& objectStore, gl::Context& context, uint32_t unit) {
+void SpriteAtlas::upload(gl::Context& context, uint32_t unit) {
     if (dirtyFlag) {
-        bind(false, objectStore, context, unit);
+        bind(false, context, unit);
     }
 }
 
@@ -316,13 +316,13 @@ void SpriteAtlas::updateDirty() {
     dirtySprites.clear();
 }
 
-void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore, gl::Context& context, uint32_t unit) {
+void SpriteAtlas::bind(bool linear, gl::Context& context, uint32_t unit) {
     if (!data) {
         return; // Empty atlas
     }
 
     if (!texture) {
-        texture = objectStore.createTexture();
+        texture = context.createTexture();
         context.activeTexture = unit;
         context.texture[unit] = *texture;
 #ifndef GL_ES_VERSION_2_0

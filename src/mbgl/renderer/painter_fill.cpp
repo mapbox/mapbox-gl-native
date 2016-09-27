@@ -69,7 +69,7 @@ void Painter::renderFill(PaintParameters& parameters,
             // the (non-antialiased) fill.
             setDepthSublayer(0); // OK
         }
-        bucket.drawVertices(outlineShader, store, context, paintMode());
+        bucket.drawVertices(outlineShader, context, paintMode());
     }
 
     if (pattern) {
@@ -101,11 +101,11 @@ void Painter::renderFill(PaintParameters& parameters,
             patternShader.u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
             patternShader.u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
 
-            spriteAtlas->bind(true, store, context, 0);
+            spriteAtlas->bind(true, context, 0);
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(0);
-            bucket.drawElements(patternShader, store, context, paintMode());
+            bucket.drawElements(patternShader, context, paintMode());
 
             if (properties.fillAntialias && !isOutlineColorDefined) {
                 context.program = outlinePatternShader.getID();
@@ -129,10 +129,10 @@ void Painter::renderFill(PaintParameters& parameters,
                 // Draw the entire line
                 outlinePatternShader.u_world = worldSize;
 
-                spriteAtlas->bind(true, store, context, 0);
+                spriteAtlas->bind(true, context, 0);
 
                 setDepthSublayer(2);
-                bucket.drawVertices(outlinePatternShader, store, context, paintMode());
+                bucket.drawVertices(outlinePatternShader, context, paintMode());
             }
         }
     } else {
@@ -149,7 +149,7 @@ void Painter::renderFill(PaintParameters& parameters,
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(1);
-            bucket.drawElements(plainShader, store, context, paintMode());
+            bucket.drawElements(plainShader, context, paintMode());
         }
     }
 
@@ -166,7 +166,7 @@ void Painter::renderFill(PaintParameters& parameters,
         outlineShader.u_world = worldSize;
 
         setDepthSublayer(2);
-        bucket.drawVertices(outlineShader, store, context, paintMode());
+        bucket.drawVertices(outlineShader, context, paintMode());
     }
 }
 

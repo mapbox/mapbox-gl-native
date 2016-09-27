@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/object_store.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -40,10 +39,10 @@ public:
     }
 
     // Transfers this buffer to the GPU and binds the buffer to the GL context.
-    void bind(gl::ObjectStore& store, gl::Context& context) {
+    void bind(gl::Context& context) {
         const bool initialized { buffer };
         if (!initialized) {
-            buffer = store.createBuffer();
+            buffer = context.createBuffer();
         }
 
         if (target == GL_ARRAY_BUFFER) {
@@ -76,9 +75,9 @@ public:
     }
 
     // Uploads the buffer to the GPU to be available when we need it.
-    void upload(gl::ObjectStore& store, gl::Context& context) {
+    void upload(gl::Context& context) {
         if (!buffer) {
-            bind(store, context);
+            bind(context);
         }
     }
 

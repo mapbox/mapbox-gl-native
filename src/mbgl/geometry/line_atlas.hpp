@@ -1,11 +1,12 @@
 #pragma once
 
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/object_store.hpp>
+#include <mbgl/gl/object.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <vector>
 #include <unordered_map>
+#include <memory>
 
 namespace mbgl {
 
@@ -30,11 +31,11 @@ public:
     ~LineAtlas();
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
-    void bind(gl::ObjectStore&, gl::Context&, uint32_t unit);
+    void bind(gl::Context&, uint32_t unit);
 
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
-    void upload(gl::ObjectStore&, gl::Context&, uint32_t unit);
+    void upload(gl::Context&, uint32_t unit);
 
     LinePatternPos getDashPosition(const std::vector<float>&, LinePatternCap);
     LinePatternPos addDash(const std::vector<float>& dasharray, LinePatternCap);
