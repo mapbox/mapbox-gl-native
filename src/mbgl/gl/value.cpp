@@ -1,7 +1,8 @@
-#include <mbgl/gl/gl_values.hpp>
+#include <mbgl/gl/value.hpp>
 
 namespace mbgl {
 namespace gl {
+namespace value {
 
 const constexpr StencilFunc::Type StencilFunc::Default;
 const constexpr StencilMask::Type StencilMask::Default;
@@ -29,5 +30,6 @@ const constexpr PixelZoom::Type PixelZoom::Default;
 const constexpr RasterPos::Type RasterPos::Default;
 #endif // GL_ES_VERSION_2_0
 
+} // namespace value
 } // namespace gl
 } // namespace mbgl

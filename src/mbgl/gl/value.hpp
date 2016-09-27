@@ -10,6 +10,7 @@
 
 namespace mbgl {
 namespace gl {
+namespace value {
 
 struct ClearDepth {
     using Type = GLfloat;
@@ -376,5 +377,6 @@ struct BindVAO {
 };
 
 
+} // namespace value
 } // namespace gl
 } // namespace mbgl

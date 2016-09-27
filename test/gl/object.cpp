@@ -4,7 +4,6 @@
 #include <mbgl/platform/default/headless_view.hpp>
 
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_helper.hpp>
 #include <mbgl/gl/gl_config.hpp>
 #include <mbgl/gl/object_store.hpp>
 
@@ -26,11 +25,11 @@ struct MockGLObject {
 
 const bool MockGLObject::Default = false;
 
-TEST(GLObject, Preserve) {
+TEST(GLObject, PreserveState) {
     getFlag = false;
     setFlag = false;
 
-    auto object = std::make_unique<mbgl::gl::Preserve<MockGLObject>>();
+    auto object = std::make_unique<mbgl::gl::PreserveState<MockGLObject>>();
     EXPECT_TRUE(getFlag);
     EXPECT_FALSE(setFlag);
 
@@ -43,28 +42,28 @@ TEST(GLObject, Preserve) {
 TEST(GLObject, Value) {
     setFlag = false;
 
-    auto object = std::make_unique<mbgl::gl::Value<MockGLObject>>();
-    EXPECT_EQ(object->getCurrent(), false);
-    EXPECT_FALSE(object->getDirty());
+    auto object = std::make_unique<mbgl::gl::State<MockGLObject>>();
+    EXPECT_EQ(object->getCurrentValue(), false);
+    EXPECT_FALSE(object->isDirty());
     EXPECT_FALSE(setFlag);
 
     object->setDirty();
-    EXPECT_TRUE(object->getDirty());
+    EXPECT_TRUE(object->isDirty());
 
     *object = false;
-    EXPECT_EQ(object->getCurrent(), false);
-    EXPECT_FALSE(object->getDirty());
+    EXPECT_EQ(object->getCurrentValue(), false);
+    EXPECT_FALSE(object->isDirty());
     EXPECT_TRUE(setFlag);
 
     setFlag = false;
     *object = true;
-    EXPECT_EQ(object->getCurrent(), true);
-    EXPECT_FALSE(object->getDirty());
+    EXPECT_EQ(object->getCurrentValue(), true);
+    EXPECT_FALSE(object->isDirty());
     EXPECT_TRUE(setFlag);
 
     object->reset();
-    EXPECT_EQ(object->getCurrent(), false);
-    EXPECT_FALSE(object->getDirty());
+    EXPECT_EQ(object->getCurrentValue(), false);
+    EXPECT_FALSE(object->isDirty());
     EXPECT_TRUE(setFlag);
 }
 

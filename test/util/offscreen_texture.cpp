@@ -130,7 +130,7 @@ void main() {
         test::checkImage("test/fixtures/offscreen_texture/render-to-texture", image, 0, 0);
 
         // Now reset the FBO back to normal and retrieve the original (restored) framebuffer.
-        config.reset();
+        config.resetState();
 
         image = view.readStillImage();
         test::checkImage("test/fixtures/offscreen_texture/render-to-fbo", image, 0, 0);

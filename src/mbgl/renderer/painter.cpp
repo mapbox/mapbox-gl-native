@@ -48,8 +48,8 @@ Painter::Painter(const TransformState& state_,
 #endif
 
     // Reset GL values
-    config.setDirty();
-    config.reset();
+    config.setDirtyState();
+    config.resetState();
 }
 
 Painter::~Painter() = default;
@@ -225,7 +225,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     }
 
     if (frame.contextMode == GLContextMode::Shared) {
-        config.setDirty();
+        config.setDirtyState();
     }
 }
 
@@ -276,7 +276,7 @@ void Painter::renderPass(PaintParameters& parameters,
             config.stencilTest = GL_FALSE;
             setDepthSublayer(0);
             layer.as<CustomLayer>()->impl->render(state);
-            config.setDirty();
+            config.setDirtyState();
             config.bindFramebuffer.reset();
             config.viewport.reset();
         } else {

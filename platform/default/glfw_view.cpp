@@ -3,13 +3,14 @@
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_values.hpp>
-#include <mbgl/gl/gl_helper.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/map/camera.hpp>
+
+#include <mbgl/gl/state.hpp>
+#include <mbgl/gl/value.hpp>
 
 #include <cassert>
 #include <cstdlib>
@@ -533,8 +534,8 @@ void showDebugImage(std::string name, const char *data, size_t width, size_t hei
     float scale = static_cast<float>(fbWidth) / static_cast<float>(width);
 
     {
-        gl::Preserve<gl::PixelZoom> pixelZoom;
-        gl::Preserve<gl::RasterPos> rasterPos;
+        gl::PreserveState<gl::value::PixelZoom> pixelZoom;
+        gl::PreserveState<gl::value::RasterPos> rasterPos;
 
         MBGL_CHECK_ERROR(glPixelZoom(scale, -scale));
         MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
@@ -570,11 +571,11 @@ void showColorDebugImage(std::string name, const char *data, size_t logicalWidth
     float yScale = static_cast<float>(fbHeight) / static_cast<float>(height);
 
     {
-        gl::Preserve<gl::ClearColor> clearColor;
-        gl::Preserve<gl::Blend> blend;
-        gl::Preserve<gl::BlendFunc> blendFunc;
-        gl::Preserve<gl::PixelZoom> pixelZoom;
-        gl::Preserve<gl::RasterPos> rasterPos;
+        gl::PreserveState<gl::value::ClearColor> clearColor;
+        gl::PreserveState<gl::value::Blend> blend;
+        gl::PreserveState<gl::value::BlendFunc> blendFunc;
+        gl::PreserveState<gl::value::PixelZoom> pixelZoom;
+        gl::PreserveState<gl::value::RasterPos> rasterPos;
 
         MBGL_CHECK_ERROR(glClearColor(0.8, 0.8, 0.8, 1));
         MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
