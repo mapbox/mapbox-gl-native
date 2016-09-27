@@ -11,8 +11,13 @@ typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
     MGLFillStyleLayerFillTranslateAnchorViewport,
 };
 
+/**
+ A fill layer which allows customization of styling properties at runtime. You may 
+ instantiate a new fill layer to add to a map style or you may query an 
+ `MGLMapView` for its `style` and obtain existing layers using the 
+ `-[MGLStyle layerWithIdentifier:]` method. 
+ */
 @interface MGLFillStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
-
 
 - (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source;
 

@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nullable) MGLTileSet *tileSet;
 
 /**
- Initializes and returns a vector source from a remote url.
+ Initializes and returns a vector source from a remote URL.
  
  @param sourceIdentifier The source identifier.
  @param URL A remote URL holding the vector source data.
@@ -26,6 +26,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url;
 
+/**
+ Initializes a source with the given identifier, tile size, and tile
+ URL template set.
+
+ @param sourceIdentifier A string that uniquely identifies the source.
+ @param tileSet A tile set describing where to download tiles.
+ */
 - (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier tileSet:(MGLTileSet *)tileSet;
 
 @end

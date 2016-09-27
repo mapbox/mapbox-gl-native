@@ -16,8 +16,13 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
     MGLCircleStyleLayerCirclePitchScaleViewport,
 };
 
+/**
+ A circle layer which allows customization of styling properties at runtime. You may 
+ instantiate a new circle layer to add to a map style or you may query an 
+ `MGLMapView` for its `style` and obtain existing layers using the 
+ `-[MGLStyle layerWithIdentifier:]` method. 
+ */
 @interface MGLCircleStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
-
 
 - (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source;
 
