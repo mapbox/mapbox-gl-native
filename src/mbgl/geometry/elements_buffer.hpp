@@ -9,13 +9,13 @@
 
 namespace mbgl {
 
-template <size_t count>
+template <uint8_t count>
 struct ElementGroup : public util::noncopyable {
     std::array<VertexArrayObject, count> array;
-    size_t vertex_length;
-    size_t elements_length;
+    uint32_t vertex_length;
+    uint32_t elements_length;
 
-    ElementGroup(size_t vertex_length_ = 0, size_t elements_length_ = 0)
+    ElementGroup(uint32_t vertex_length_ = 0, uint32_t elements_length_ = 0)
         : vertex_length(vertex_length_)
         , elements_length(elements_length_)
     {
