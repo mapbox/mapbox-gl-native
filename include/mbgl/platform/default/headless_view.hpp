@@ -23,6 +23,7 @@ typedef XID GLXPbuffer;
 #include <mbgl/mbgl.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/types.hpp>
+#include <mbgl/gl/extension.hpp>
 
 #include <memory>
 #include <thread>

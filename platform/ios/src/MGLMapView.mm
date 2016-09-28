@@ -1,7 +1,7 @@
 #import "MGLMapView_Private.h"
 
 #include <mbgl/platform/log.hpp>
-#include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/extension.hpp>
 
 #import <GLKit/GLKit.h>
 #import <OpenGLES/EAGL.h>

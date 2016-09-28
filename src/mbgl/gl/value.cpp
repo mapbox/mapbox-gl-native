@@ -1,5 +1,6 @@
 #include <mbgl/gl/value.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/vertex_array.hpp>
 
 namespace mbgl {
 namespace gl {
