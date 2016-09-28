@@ -81,6 +81,8 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/context.hpp
     src/mbgl/gl/debugging.cpp
     src/mbgl/gl/debugging.hpp
+    src/mbgl/gl/extension.cpp
+    src/mbgl/gl/extension.hpp
     src/mbgl/gl/gl.cpp
     src/mbgl/gl/object.cpp
     src/mbgl/gl/object.hpp
@@ -88,6 +90,8 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/types.hpp
     src/mbgl/gl/value.cpp
     src/mbgl/gl/value.hpp
+    src/mbgl/gl/vertex_array.cpp
+    src/mbgl/gl/vertex_array.hpp
 
     # layout
     src/mbgl/layout/clip_lines.cpp

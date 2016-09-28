@@ -1,5 +1,6 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/util/traits.hpp>
 
 namespace mbgl {

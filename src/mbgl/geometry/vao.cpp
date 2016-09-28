@@ -1,4 +1,5 @@
 #include <mbgl/geometry/vao.hpp>
+#include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/gl/gl.hpp>
