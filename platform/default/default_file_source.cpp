@@ -1,5 +1,6 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/asset_file_source.hpp>
+#include <mbgl/storage/local_file_source.hpp>
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/offline_download.hpp>
@@ -164,7 +165,8 @@ DefaultFileSource::DefaultFileSource(const std::string& cachePath,
                                      uint64_t maximumCacheSize)
     : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"DefaultFileSource", util::ThreadPriority::Low},
             cachePath, maximumCacheSize)),
-      assetFileSource(std::make_unique<AssetFileSource>(assetRoot)) {
+      assetFileSource(std::make_unique<AssetFileSource>(assetRoot)),
+      localFileSource(std::make_unique<LocalFileSource>()) {
 }
 
 DefaultFileSource::~DefaultFileSource() = default;
@@ -203,6 +205,8 @@ std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resourc
 
     if (isAssetURL(resource.url)) {
         return assetFileSource->request(resource, callback);
+    } else if (LocalFileSource::acceptsURL(resource.url)) {
+        return localFileSource->request(resource, callback);
     } else {
         return std::make_unique<DefaultFileRequest>(resource, callback, *thread);
     }
