@@ -34,8 +34,6 @@ HTTPFileSource::Impl::Impl() : m_manager(new QNetworkAccessManager(this))
     if (m_ssl.caCertificates().isEmpty()) {
         mbgl::Log::Warning(mbgl::Event::HttpRequest, "Could not load list of certificate authorities");
     }
-
-    connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinish(QNetworkReply*)));
 }
 
 void HTTPFileSource::Impl::request(HTTPRequest* req)
@@ -54,6 +52,8 @@ void HTTPFileSource::Impl::request(HTTPRequest* req)
     networkRequest.setSslConfiguration(m_ssl);
 
     data.first = m_manager->get(networkRequest);
+    connect(data.first, SIGNAL(finished()), this, SLOT(onReplyFinished()));
+    connect(data.first, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onReplyFinished()));
 }
 
 void HTTPFileSource::Impl::cancel(HTTPRequest* req)
@@ -90,9 +90,10 @@ void HTTPFileSource::Impl::cancel(HTTPRequest* req)
     }
 }
 
-void HTTPFileSource::Impl::replyFinish(QNetworkReply* reply)
+void HTTPFileSource::Impl::onReplyFinished()
 {
-    const QUrl& url = reply->request().url();
+    QNetworkReply* reply = qobject_cast<QNetworkReply *>(sender());
+    const QUrl& url = reply->url();
 
     auto it = m_pending.find(url);
     if (it == m_pending.end()) {
