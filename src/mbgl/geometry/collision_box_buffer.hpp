@@ -13,7 +13,7 @@ class CollisionBoxVertexBuffer : public Buffer <
 public:
     typedef int16_t vertex_type;
 
-    size_t add(int16_t x, int16_t y, float ex, float ey, float maxzoom, float placementZoom);
+    uint32_t add(int16_t x, int16_t y, float ex, float ey, float maxzoom, float placementZoom);
 };
 
 

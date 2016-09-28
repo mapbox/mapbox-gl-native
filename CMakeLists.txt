@@ -26,10 +26,10 @@ mason_use(boost VERSION 1.60.0 HEADER_ONLY)
 mason_use(geojsonvt VERSION 6.1.3 HEADER_ONLY)
 mason_use(supercluster VERSION 0.2.0 HEADER_ONLY)
 mason_use(kdbush VERSION 0.1.1 HEADER_ONLY)
-mason_use(earcut VERSION 0.11 HEADER_ONLY)
+mason_use(earcut VERSION 0.12.1 HEADER_ONLY)
 mason_use(protozero VERSION 1.4.2 HEADER_ONLY)
-mason_use(pixelmatch VERSION 0.9.0 HEADER_ONLY)
-mason_use(geojson VERSION 0.3.1 HEADER_ONLY)
+mason_use(pixelmatch VERSION 0.10.0 HEADER_ONLY)
+mason_use(geojson VERSION 0.3.2 HEADER_ONLY)
 
 if(WITH_COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
@@ -37,7 +37,12 @@ if(WITH_COVERAGE)
 endif(WITH_COVERAGE)
 
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Wshadow -Wno-variadic-macros -Wno-unknown-pragmas")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Wshadow -Werror -Wno-variadic-macros -Wno-unknown-pragmas")
+if(APPLE)
+    # -Wno-error=unused-command-line-argument is required due to https://llvm.org/bugs/show_bug.cgi?id=7798
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=unused-command-line-argument")
+endif()
 
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/platform/${MBGL_PLATFORM}/config.cmake)
     message(ERROR "Can't find config.cmake file for platform ${MBGL_PLATFORM}")

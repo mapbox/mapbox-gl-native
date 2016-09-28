@@ -398,7 +398,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitDefault)) {
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/rate-limit" }, [&](Response res) {
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::RateLimit, res.error->reason);
-        ASSERT_EQ(false, bool(res.error->retryAfter));
+        ASSERT_FALSE(res.error->retryAfter);
         loop.stop();
     });
     
