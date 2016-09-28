@@ -7,7 +7,7 @@ echo "# Do not edit. Regenerate this with ./scripts/generate-core-files.sh" > cm
 echo "" >> cmake/core-files.cmake
 echo "set(MBGL_CORE_FILES" >> cmake/core-files.cmake
 PREFIX=
-for FILE in $(find include src -type f -a \( -name "*.hpp" -o -name "*.cpp" -o -name "*.h" -o -name "*.c" \) | perl -p -e "s/^((src|include)\/(mbgl\/)?(.+)\/\w+\.\w+)$/\$4#\$1/g" | sort) ; do
+for FILE in $(git ls-files "include/*.hpp" "include/*.h" "src/*.hpp" "src/*.cpp" "src/*.h" "src/*.c" | perl -p -e "s/^((src|include)\/(mbgl\/)?(.+)\/\w+\.\w+)$/\$4#\$1/g" | sort) ; do
     CURRENT_PREFIX="${FILE%#*}"
     if [ "${PREFIX}" != "${CURRENT_PREFIX}" ]; then
         if [ ! -z "${PREFIX}" ]; then echo "" >> cmake/core-files.cmake ; fi
