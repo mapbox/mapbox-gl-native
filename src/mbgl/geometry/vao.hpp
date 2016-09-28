@@ -2,7 +2,7 @@
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/object_store.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 
@@ -12,16 +12,17 @@ namespace mbgl {
 
 class VertexArrayObject : public util::noncopyable {
 public:
-    static void Unbind();
-
     VertexArrayObject();
     ~VertexArrayObject();
 
     template <typename VertexBuffer>
-    void bind(Shader& shader, VertexBuffer& vertexBuffer, GLbyte* offset, gl::ObjectStore& store) {
-        bindVertexArrayObject(store);
+    void bind(Shader& shader,
+              VertexBuffer& vertexBuffer,
+              GLbyte* offset,
+              gl::Context& context) {
+        bindVertexArrayObject(context);
         if (bound_shader == 0) {
-            vertexBuffer.bind(store);
+            vertexBuffer.bind(context);
             shader.bind(offset);
             if (vao) {
                 storeBinding(shader, vertexBuffer.getID(), 0, offset);
@@ -32,11 +33,15 @@ public:
     }
 
     template <typename VertexBuffer, typename ElementsBuffer>
-    void bind(Shader& shader, VertexBuffer& vertexBuffer, ElementsBuffer& elementsBuffer, GLbyte* offset, gl::ObjectStore& store) {
-        bindVertexArrayObject(store);
+    void bind(Shader& shader,
+              VertexBuffer& vertexBuffer,
+              ElementsBuffer& elementsBuffer,
+              GLbyte* offset,
+              gl::Context& context) {
+        bindVertexArrayObject(context);
         if (bound_shader == 0) {
-            vertexBuffer.bind(store);
-            elementsBuffer.bind(store);
+            vertexBuffer.bind(context);
+            elementsBuffer.bind(context);
             shader.bind(offset);
             if (vao) {
                 storeBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
@@ -51,7 +56,7 @@ public:
     }
 
 private:
-    void bindVertexArrayObject(gl::ObjectStore&);
+    void bindVertexArrayObject(gl::Context&);
     void storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
     void verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
 

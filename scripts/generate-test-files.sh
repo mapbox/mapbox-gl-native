@@ -7,7 +7,7 @@ echo "# Do not edit. Regenerate this with ./scripts/generate-test-files.sh" > cm
 echo "" >> cmake/test-files.cmake
 echo "set(MBGL_TEST_FILES" >> cmake/test-files.cmake
 PREFIX=
-for FILE in $(find test -type f -a \( -name "*.hpp" -o -name "*.cpp" -o -name "*.h" -o -name "*.c" \) | sort) ; do
+for FILE in $(git ls-files "test/*.hpp" "test/*.cpp" "test/*.h" "test/*.c" | sort) ; do
     CURRENT_PREFIX=$(dirname ${FILE#test/})
     if [ "${PREFIX}" != "${CURRENT_PREFIX}" ]; then
         if [ ! -z "${PREFIX}" ]; then echo "" >> cmake/test-files.cmake ; fi

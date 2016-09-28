@@ -59,7 +59,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
                                                              appropriateForURL:nil
                                                                         create:YES
                                                                          error:nil];
-    NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
+    NSString *bundleIdentifier = [self bundleIdentifier];
     if (!bundleIdentifier) {
         // There’s no main bundle identifier when running in a unit test bundle.
         bundleIdentifier = [NSBundle bundleForClass:self].bundleIdentifier;
@@ -93,7 +93,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
     NSString *legacyCachePath = [legacyPaths.firstObject stringByAppendingPathComponent:MGLOfflineStorageFileName3_2_0_beta_1];
 #elif TARGET_OS_MAC
     // ~/Library/Caches/tld.app.bundle.id/offline.db
-    NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
+    NSString *bundleIdentifier = [self bundleIdentifier];
     NSURL *legacyCacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory
                                                                             inDomain:NSUserDomainMask
                                                                    appropriateForURL:nil
@@ -135,6 +135,15 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
                                                context:NULL];
     }
     return self;
+}
+
++ (NSString *)bundleIdentifier {
+    NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
+    if (!bundleIdentifier) {
+        // There’s no main bundle identifier when running in a unit test bundle.
+        bundleIdentifier = [NSBundle bundleForClass:self].bundleIdentifier;
+    }
+    return bundleIdentifier;
 }
 
 - (void)dealloc {

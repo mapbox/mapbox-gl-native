@@ -3,6 +3,7 @@
 const fs = require('fs');
 const ejs = require('ejs');
 const spec = require('mapbox-gl-style-spec').latest;
+const colorParser = require('csscolorparser');
 
 const prefix = 'MGL';
 const suffix = 'StyleLayer';
@@ -106,31 +107,19 @@ global.propertyReqs = function (property, layoutPropertiesByName, type) {
             return '`' + camelizeWithLeadingLowercase(req['!']) + '` is set to `nil`';
         } else {
             let name = Object.keys(req)[0];
-            return '`' + camelizeWithLeadingLowercase(name) + '` is set to ' + describeValue(req[Object.keys(req)[0]], layoutPropertiesByName[name], type);
+            return '`' + camelizeWithLeadingLowercase(name) + '` is set to ' + describeValue(req[name], layoutPropertiesByName[name], type);
         }
     }).join(', and ') + '. Otherwise, it is ignored.';
 };
 
 global.parseColor = function (str) {
-    let m = str.match(/^#(\d\d)(\d\d)(\d\d)$/);
-    if (m) {
-        return {
-            r: parseInt(m[1], 16) / 255,
-            g: parseInt(m[2], 16) / 255,
-            b: parseInt(m[3], 16) / 255,
-            a: 1.0,
-        };
-    }
-    
-    m = str.match(/^rgba\(\s*([-\d.]+),\s*([-\d.]+),\s*([-\d.]+),\s*([\d.]+)\s*\)$/);
-    if (m) {
-        return {
-            r: parseFloat(m[1]) / 255,
-            g: parseFloat(m[2]) / 255,
-            b: parseFloat(m[3]) / 255,
-            a: parseFloat(m[4]),
-        };
-    }
+    let color = colorParser.parseCSSColor(str);
+    return {
+        r: color[0] / 255,
+        g: color[1] / 255,
+        b: color[2] / 255,
+        a: color[3],
+    };
 };
 
 global.describeValue = function (value, property, layerType) {
@@ -142,8 +131,21 @@ global.describeValue = function (value, property, layerType) {
         case 'string':
             return 'the string `' + value + '`';
         case 'enum':
-            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            return 'an `NSValue` object containing `' + `${objCType}${camelize(value)}` + '`';
+            let displayValue;
+            if (Array.isArray(value)) {
+              let separator = (value.length === 2) ? ' ' : ', ';
+              displayValue = value.map((possibleValue, i) => {
+                let conjunction = '';
+                if (value.length === 2 && i === 0) conjunction = 'either ';
+                if (i === value.length - 1) conjunction = 'or ';
+                let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+                return `${conjunction}\`${objCType}${camelize(possibleValue)}\``;
+              }).join(separator);
+            } else {
+              let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+              displayValue = `\`${objCType}${camelize(value)}\``;
+            }
+            return `an \`NSValue\` object containing ${displayValue}`;
         case 'color':
             let color = parseColor(value);
             if (!color) {
@@ -193,14 +195,14 @@ global.initLayerIdentifierOnly = function (layerType) {
 
 global.initLayer = function (layerType) {
     if (layerType == "background") {
-       return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String);` 
+       return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String);`
     } else {
         return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String, source.sourceIdentifier.UTF8String);`
     }
 }
 
 global.initLayerWithSourceLayer = function(layerType) {
-    return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String, source.sourceIdentifier.UTF8String);`  
+    return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String, source.sourceIdentifier.UTF8String);`
 }
 
 global.setSourceLayer = function() {

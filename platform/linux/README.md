@@ -33,6 +33,10 @@ Set the environment variable `MAPBOX_ACCESS_TOKEN` to your [Mapbox access token]
 
     export MAPBOX_ACCESS_TOKEN=MYTOKEN
 
+Optionally, you can specify a custom style to the test application:
+
+    export MAPBOX_STYLE_URL=MYSTYLEURL
+
 Then, you can then proceed to build the test application:
 
     make glfw-app

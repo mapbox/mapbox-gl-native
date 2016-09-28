@@ -44,6 +44,8 @@ private:
 
     unsigned m_animationTicks = 0;
     unsigned m_frameDraws = 0;
+
+    bool m_sourceAdded = false;
 };
 
 #endif

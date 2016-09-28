@@ -37,22 +37,24 @@ set(MBGL_QT_FILES
     PRIVATE platform/qt/src/http_request.cpp
     PRIVATE platform/qt/src/http_request.hpp
     PRIVATE platform/qt/src/image.cpp
-    PRIVATE platform/qt/src/qmapbox.cpp
-    PRIVATE platform/qt/src/qmapboxgl.cpp
-    PRIVATE platform/qt/src/qmapboxgl_p.hpp
     PRIVATE platform/qt/src/run_loop.cpp
     PRIVATE platform/qt/src/run_loop_impl.hpp
     PRIVATE platform/qt/src/string_stdlib.cpp
     PRIVATE platform/qt/src/timer.cpp
     PRIVATE platform/qt/src/timer_impl.hpp
-
-    # Public headers
-    PRIVATE platform/qt/include/qmapbox.hpp
-    PRIVATE platform/qt/include/qmapboxgl.hpp
 )
 
 include_directories(
     PRIVATE platform/qt/include
+)
+
+# Shared library
+add_library(qmapboxgl SHARED
+    platform/qt/include/qmapbox.hpp
+    platform/qt/include/qmapboxgl.hpp
+    platform/qt/src/qmapbox.cpp
+    platform/qt/src/qmapboxgl.cpp
+    platform/qt/src/qmapboxgl_p.hpp
 )
 
 # C++ app
@@ -60,7 +62,7 @@ add_executable(mbgl-qt
     platform/qt/app/main.cpp
     platform/qt/app/mapwindow.cpp
     platform/qt/app/mapwindow.hpp
-    platform/qt/app/source.qrc
+    platform/qt/resources/common.qrc
 )
 
 if(WITH_QT_4)

@@ -1,15 +1,16 @@
 #pragma once
 
-#include <mbgl/gl/object_store.hpp>
+#include <mbgl/gl/object.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <atomic>
+#include <array>
 
 namespace mbgl {
 
 namespace gl {
-class Config;
+class Context;
 } // namespace gl
 
 class Raster {
@@ -21,21 +22,30 @@ public:
     void load(PremultipliedImage, uint32_t mipmapLevel = 0);
 
     // bind current texture
-    void bind(gl::ObjectStore&,
-              gl::Config&,
+    void bind(gl::Context&,
               uint32_t unit,
               Scaling = Scaling::Nearest,
               MipMap = MipMap::No);
 
     // uploads the texture if it hasn't been uploaded yet.
-    void upload(gl::ObjectStore&, gl::Config&, uint32_t unit);
+    void upload(gl::Context&, uint32_t unit);
 
     // loaded status
     bool isLoaded() const;
 
+    // returns the OpenGL texture ID
+    GLuint getID() const;
+
+    // size of uploaded image.
+    std::array<uint16_t, 2> getSize() const;
+
+private:
+    void updateFilter();
+
 private:
     // raw pixels have been loaded
     std::atomic<bool> loaded { false };
+    std::array<uint16_t, 2> size = {{ 0, 0 }};
 
     // filters
     Scaling filter = Scaling::Nearest;

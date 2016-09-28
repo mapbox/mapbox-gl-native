@@ -57,7 +57,7 @@ PremultipliedImage decodeImage(const std::string& string) {
     auto img = std::make_unique<uint8_t[]>(image.byteCount());
     memcpy(img.get(), image.constBits(), image.byteCount());
 
-    return { size_t(image.width()), size_t(image.height()), std::move(img) };
+    return { static_cast<uint16_t>(image.width()), static_cast<uint16_t>(image.height()),
+             std::move(img) };
 }
-
 }

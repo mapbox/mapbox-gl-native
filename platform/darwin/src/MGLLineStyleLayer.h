@@ -23,8 +23,13 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
     MGLLineStyleLayerLineTranslateAnchorViewport,
 };
 
+/**
+ A line layer which allows customization of styling properties at runtime. You may 
+ instantiate a new line layer to add to a map style or you may query an 
+ `MGLMapView` for its `style` and obtain existing layers using the 
+ `-[MGLStyle layerWithIdentifier:]` method. 
+ */
 @interface MGLLineStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
-
 
 - (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source;
 
@@ -138,7 +143,7 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineGapWidth;
 
 /**
- The line's offset perpendicular to its direction. Values may be positive or negative, where positive indicates "rightwards" (if you were moving in the direction of the line) and negative indicates "leftwards."
+ The line's offset. For linear features, a positive value offsets the line to the right, relative to the direction of the line, and a negative value to the left. For polygon features, a positive value results in an inset, and a negative value results in an outset.
 
  This property is measured in points.
  

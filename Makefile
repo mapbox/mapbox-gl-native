@@ -144,6 +144,10 @@ offline: $(MACOS_PROJ_PATH)
 node: $(MACOS_PROJ_PATH)
 	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-node' build $(XCPRETTY)
 
+.PHONY: macos-test
+macos-test: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'CI' test $(XCPRETTY)
+
 .PHONY: xpackage
 xpackage: $(MACOS_PROJ_PATH)
 	SYMBOLS=$(SYMBOLS) ./platform/macos/scripts/package.sh
@@ -386,6 +390,10 @@ qtproj: $(MACOS_QT_PROJ_PATH)
 	open $(MACOS_QT_PROJ_PATH)
 
 endif
+
+.PHONY: qt-lib
+qt-lib: $(QT_BUILD)
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QT_OUTPUT_PATH) qmapboxgl
 
 .PHONY: qt-app
 qt-app: $(QT_BUILD)

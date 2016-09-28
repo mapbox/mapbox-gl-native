@@ -16,8 +16,13 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
     MGLCircleStyleLayerCirclePitchScaleViewport,
 };
 
+/**
+ A circle layer which allows customization of styling properties at runtime. You may 
+ instantiate a new circle layer to add to a map style or you may query an 
+ `MGLMapView` for its `style` and obtain existing layers using the 
+ `-[MGLStyle layerWithIdentifier:]` method. 
+ */
 @interface MGLCircleStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
-
 
 - (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source;
 
@@ -44,14 +49,14 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
 
 #if TARGET_OS_IPHONE
 /**
- The color of the circle.
+ The fill color of the circle.
  
  The default value of this property is `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleColor;
 #else
 /**
- The color of the circle.
+ The fill color of the circle.
  
  The default value of this property is `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
  */

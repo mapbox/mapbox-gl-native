@@ -2571,7 +2571,7 @@ public class MapView extends FrameLayout {
                 ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void resetTrackingModesIfRequired() {
+    void resetTrackingModesIfRequired() {
         TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
         if (trackingSettings.isDismissLocationTrackingOnGesture()) {
             resetLocationTrackingMode();
@@ -2592,7 +2592,8 @@ public class MapView extends FrameLayout {
 
     private void resetBearingTrackingMode() {
         try {
-            setMyBearingTrackingMode(MyBearingTracking.NONE);
+            TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
+            trackingSettings.setMyBearingTrackingMode(MyBearingTracking.NONE);
         } catch (SecurityException ignore) {
             // User did not accept location permissions
         }

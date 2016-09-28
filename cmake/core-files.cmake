@@ -77,15 +77,16 @@ set(MBGL_CORE_FILES
 
     # gl
     include/mbgl/gl/gl.hpp
-    include/mbgl/gl/gl_helper.hpp
-    include/mbgl/gl/gl_values.hpp
+    src/mbgl/gl/context.cpp
+    src/mbgl/gl/context.hpp
     src/mbgl/gl/debugging.cpp
     src/mbgl/gl/debugging.hpp
     src/mbgl/gl/gl.cpp
-    src/mbgl/gl/gl_config.cpp
-    src/mbgl/gl/gl_config.hpp
-    src/mbgl/gl/object_store.cpp
-    src/mbgl/gl/object_store.hpp
+    src/mbgl/gl/object.cpp
+    src/mbgl/gl/object.hpp
+    src/mbgl/gl/state.hpp
+    src/mbgl/gl/value.cpp
+    src/mbgl/gl/value.hpp
 
     # layout
     src/mbgl/layout/clip_lines.cpp
@@ -435,6 +436,7 @@ set(MBGL_CORE_FILES
     src/mbgl/util/exclusive.hpp
     src/mbgl/util/font_stack.cpp
     src/mbgl/util/geo.cpp
+    src/mbgl/util/geojson.cpp
     src/mbgl/util/grid_index.cpp
     src/mbgl/util/grid_index.hpp
     src/mbgl/util/http_header.cpp
@@ -456,6 +458,8 @@ set(MBGL_CORE_FILES
     src/mbgl/util/mat4.hpp
     src/mbgl/util/math.cpp
     src/mbgl/util/math.hpp
+    src/mbgl/util/offscreen_texture.cpp
+    src/mbgl/util/offscreen_texture.hpp
     src/mbgl/util/premultiply.cpp
     src/mbgl/util/premultiply.hpp
     src/mbgl/util/rapidjson.hpp

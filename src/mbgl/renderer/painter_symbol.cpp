@@ -20,7 +20,7 @@ void Painter::renderSDF(SymbolBucket& bucket,
                         float sdfFontSize,
                         std::array<float, 2> texsize,
                         SDFShader& sdfShader,
-                        void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, PaintMode),
+                        void (SymbolBucket::*drawSDF)(SDFShader&, gl::Context&, PaintMode),
 
                         // Layout
                         AlignmentType rotationAlignment,
@@ -60,14 +60,14 @@ void Painter::renderSDF(SymbolBucket& bucket,
         }};
     }
 
-    config.program = sdfShader.getID();
+    context.program = sdfShader.getID();
     sdfShader.u_matrix = vtxMatrix;
     sdfShader.u_extrude_scale = extrudeScale;
     sdfShader.u_texsize = texsize;
     sdfShader.u_rotate_with_map = rotateWithMap;
     sdfShader.u_pitch_with_map = pitchWithMap;
     sdfShader.u_texture = 0;
-    sdfShader.u_pitch = state.getPitch() * util::DEG2RAD;
+    sdfShader.u_pitch = state.getPitch();
     sdfShader.u_bearing = -1.0f * state.getAngle();
     sdfShader.u_aspect_ratio = (state.getWidth() * 1.0f) / (state.getHeight() * 1.0f);
 
@@ -76,7 +76,7 @@ void Painter::renderSDF(SymbolBucket& bucket,
 
     sdfShader.u_zoom = (state.getZoom() - zoomAdjust) * 10; // current zoom level
 
-    frameHistory.bind(store, config, 1);
+    frameHistory.bind(context, 1);
     sdfShader.u_fadetexture = 1;
 
     // The default gamma value has to be adjust for the current pixelratio so that we're not
@@ -94,9 +94,7 @@ void Painter::renderSDF(SymbolBucket& bucket,
         sdfShader.u_color = haloColor;
         sdfShader.u_opacity = opacity;
         sdfShader.u_buffer = (haloOffset - haloWidth / fontScale) / sdfPx;
-
-        setDepthSublayer(0);
-        (bucket.*drawSDF)(sdfShader, store, paintMode());
+        (bucket.*drawSDF)(sdfShader, context, paintMode());
     }
 
     // Then, we draw the text/icon over the halo
@@ -105,9 +103,7 @@ void Painter::renderSDF(SymbolBucket& bucket,
         sdfShader.u_color = color;
         sdfShader.u_opacity = opacity;
         sdfShader.u_buffer = (256.0f - 64.0f) / 256.0f;
-
-        setDepthSublayer(1);
-        (bucket.*drawSDF)(sdfShader, store, paintMode());
+        (bucket.*drawSDF)(sdfShader, context, paintMode());
     }
 }
 
@@ -123,7 +119,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
     const auto& paint = layer.impl->paint;
     const auto& layout = bucket.layout;
 
-    config.depthMask = GL_FALSE;
+    context.depthMask = GL_FALSE;
 
     // TODO remove the `true ||` when #1673 is implemented
     const bool drawAcrossEdges = (frame.mapMode == MapMode::Continuous) && (true || !(layout.textAllowOverlap || layout.iconAllowOverlap ||
@@ -135,18 +131,20 @@ void Painter::renderSymbol(PaintParameters& parameters,
     // layers are sorted in the y direction, and to draw the correct ordering near
     // tile edges the icons are included in both tiles and clipped when drawing.
     if (drawAcrossEdges) {
-        config.stencilTest = GL_FALSE;
+        context.stencilTest = GL_FALSE;
     } else {
-        config.stencilOp.reset();
-        config.stencilTest = GL_TRUE;
+        context.stencilOp.reset();
+        context.stencilTest = GL_TRUE;
     }
+
+    setDepthSublayer(0);
 
     if (bucket.hasIconData()) {
         if (layout.iconRotationAlignment == AlignmentType::Map) {
-            config.depthFunc.reset();
-            config.depthTest = GL_TRUE;
+            context.depthFunc.reset();
+            context.depthTest = GL_TRUE;
         } else {
-            config.depthTest = GL_FALSE;
+            context.depthTest = GL_FALSE;
         }
 
         bool sdf = bucket.sdfIcons;
@@ -162,7 +160,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
         SpriteAtlas* activeSpriteAtlas = layer.impl->spriteAtlas;
         const bool iconScaled = fontScale != 1 || frame.pixelRatio != activeSpriteAtlas->getPixelRatio() || bucket.iconsNeedLinear;
         const bool iconTransformed = layout.iconRotationAlignment == AlignmentType::Map || angleOffset != 0 || state.getPitch() != 0;
-        activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed, store, config, 0);
+        activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed, context, 0);
 
         if (sdf) {
             renderSDF(bucket,
@@ -203,7 +201,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
             auto& iconShader = parameters.shaders.icon;
 
-            config.program = iconShader.getID();
+            context.program = iconShader.getID();
             iconShader.u_matrix = vtxMatrix;
             iconShader.u_extrude_scale = extrudeScale;
             iconShader.u_texsize = {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }};
@@ -215,23 +213,22 @@ void Painter::renderSymbol(PaintParameters& parameters,
             iconShader.u_zoom = (state.getZoom() - zoomAdjust) * 10; // current zoom level
             iconShader.u_opacity = paint.iconOpacity;
 
-            frameHistory.bind(store, config, 1);
+            frameHistory.bind(context, 1);
             iconShader.u_fadetexture = 1;
 
-            setDepthSublayer(0);
-            bucket.drawIcons(iconShader, store, paintMode());
+            bucket.drawIcons(iconShader, context, paintMode());
         }
     }
 
     if (bucket.hasTextData()) {
-        if (layout.textRotationAlignment == AlignmentType::Map) {
-            config.depthFunc.reset();
-            config.depthTest = GL_TRUE;
+        if (layout.textPitchAlignment == AlignmentType::Map) {
+            context.depthFunc.reset();
+            context.depthTest = GL_TRUE;
         } else {
-            config.depthTest = GL_FALSE;
+            context.depthTest = GL_FALSE;
         }
 
-        glyphAtlas->bind(store, config, 0);
+        glyphAtlas->bind(context, 0);
 
         renderSDF(bucket,
                   tile,
@@ -253,21 +250,19 @@ void Painter::renderSymbol(PaintParameters& parameters,
     }
 
     if (bucket.hasCollisionBoxData()) {
-        config.stencilOp.reset();
-        config.stencilTest = GL_TRUE;
+        context.stencilOp.reset();
+        context.stencilTest = GL_TRUE;
 
         auto& collisionBoxShader = shaders->collisionBox;
-        config.program = collisionBoxShader.getID();
+        context.program = collisionBoxShader.getID();
         collisionBoxShader.u_matrix = tile.matrix;
         // TODO: This was the overscaled z instead of the canonical z.
         collisionBoxShader.u_scale = std::pow(2, state.getZoom() - tile.id.canonical.z);
         collisionBoxShader.u_zoom = state.getZoom() * 10;
         collisionBoxShader.u_maxzoom = (tile.id.canonical.z + 1) * 10;
-        config.lineWidth = 1.0f;
+        context.lineWidth = 1.0f;
 
-        setDepthSublayer(0);
-        bucket.drawCollisionBoxes(collisionBoxShader, store);
-
+        bucket.drawCollisionBoxes(collisionBoxShader, context);
     }
 }
 

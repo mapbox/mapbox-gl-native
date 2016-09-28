@@ -161,6 +161,10 @@ public:
     void addLayer(std::unique_ptr<style::Layer>, const optional<std::string>& beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 
+    // Add image, bound to the style
+    void addImage(const std::string&, std::unique_ptr<const SpriteImage>);
+    void removeImage(const std::string&);
+
     // Defaults
     std::string getStyleName() const;
     LatLng getDefaultLatLng() const;

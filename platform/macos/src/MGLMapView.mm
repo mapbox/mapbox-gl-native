@@ -2523,18 +2523,18 @@ public:
         [NSOpenGLContext clearCurrentContext];
     }
 
-    mbgl::PremultipliedImage readStillImage() override {
-        auto size = getFramebufferSize();
-        const unsigned int w = size[0];
-        const unsigned int h = size[1];
-        
-        mbgl::PremultipliedImage image { w, h };
-        MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
+    mbgl::PremultipliedImage readStillImage(std::array<uint16_t, 2> size = {{ 0, 0 }}) override {
+        if (!size[0] || !size[1]) {
+            size = getFramebufferSize();
+        }
+
+        mbgl::PremultipliedImage image { size[0], size[1] };
+        MBGL_CHECK_ERROR(glReadPixels(0, 0, size[0], size[1], GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
         
         const size_t stride = image.stride();
         auto tmp = std::make_unique<uint8_t[]>(stride);
         uint8_t *rgba = image.data.get();
-        for (int i = 0, j = h - 1; i < j; i++, j--) {
+        for (int i = 0, j = size[1] - 1; i < j; i++, j--) {
             std::memcpy(tmp.get(), rgba + i * stride, stride);
             std::memcpy(rgba + i * stride, rgba + j * stride, stride);
             std::memcpy(rgba + j * stride, tmp.get(), stride);

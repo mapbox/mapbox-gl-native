@@ -58,7 +58,7 @@ enum class SymbolPlacementType : bool {
 enum class AlignmentType : uint8_t {
     Map,
     Viewport,
-    Undefined,
+    Auto,
 };
 
 enum class TextJustifyType : uint8_t {

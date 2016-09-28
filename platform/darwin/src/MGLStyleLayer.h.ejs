@@ -33,9 +33,24 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 
 <% } -%>
 <% } -%>
-@interface MGL<%- camelize(type) %>StyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
-
 <% if (type == 'background') { -%>
+/**
+ A map style's background layer is the bottommost layer and is used to style a color 
+ or pattern to show below all other map features. You can query an `MGLMapView` for its 
+ `style` and obtain the background layer using the `-[MGLStyle layerWithIdentifier:]` 
+ method and passing `background` for the identifier. 
+ */
+<% } else { -%>
+/**
+ A <%- type %> layer which allows customization of styling properties at runtime. You may 
+ instantiate a new <%- type %> layer to add to a map style or you may query an 
+ `MGLMapView` for its `style` and obtain existing layers using the 
+ `-[MGLStyle layerWithIdentifier:]` method. 
+ */
+<% } -%>
+@interface MGL<%- camelize(type) %>StyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
+<% if (type == 'background') { -%>
+
 - (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier;
 <% } -%>
 

@@ -49,7 +49,7 @@ script:
   - make run-test
 after_script:
   - ccache --show-stats
-  - ./platform/linux/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
+  - ./platform/linux/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
 
 matrix:
   include:
@@ -63,16 +63,16 @@ matrix:
       addons: *clang35
       before_script:
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
-        - export PUBLISH=$([[ ${TAG} == "node-v${PACKAGE_JSON_VERSION}" ]] && echo 1 || echo 0)
-        - export BUILDTYPE=$([[ ${PUBLISH} ]] && echo "Release" || echo "Debug")
+        - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+        - export BUILDTYPE=$([[ -n ${PUBLISH:-} ]] && echo "Release" || echo "Debug")
       script:
         - nvm install 4
         - nvm use 4
         - make node
-        - if [[ ! ${PUBLISH} ]]; then make test-node; fi
+        - if [[ -z ${PUBLISH} ]]; then make test-node; fi
       after_script:
         - ccache --show-stats
-        - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
+        - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
 
     # GCC 5 - Debug - Coverage
     - os: linux

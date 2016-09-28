@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
 import com.mapbox.mapboxsdk.exceptions.MapboxAccountManagerNotStartedException;
+import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 
 public class MapboxAccountManager {
@@ -40,11 +41,16 @@ public class MapboxAccountManager {
      */
     public static MapboxAccountManager start(Context context, String accessToken) {
         if (mapboxAccountManager == null) {
+            //Create a new account manager
             mapboxAccountManager = new MapboxAccountManager(context, accessToken);
+
+            //Initialize the event manager
+            MapboxEventManager.getMapboxEventManager().initialize(context, accessToken);
+
+            //Register a receiver to listen for connectivity updates
+            ConnectivityReceiver.instance(context);
         }
 
-        MapboxEventManager eventManager = MapboxEventManager.getMapboxEventManager();
-        eventManager.initialize(mapboxAccountManager.applicationContext, mapboxAccountManager.accessToken);
         return mapboxAccountManager;
     }
 
@@ -92,8 +98,7 @@ public class MapboxAccountManager {
     public boolean isConnected() {
         ConnectivityManager cm = (ConnectivityManager) applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean result = (activeNetwork != null && activeNetwork.isConnected());
-        return result;
+        return (activeNetwork != null && activeNetwork.isConnected());
     }
 
 }

@@ -11,7 +11,7 @@ class OverscaledTileID;
 class PlainShader;
 
 namespace gl {
-class ObjectStore;
+class Context;
 } // namespace gl
 
 class DebugBucket : private util::noncopyable {
@@ -23,8 +23,8 @@ public:
                 optional<Timestamp> expires,
                 MapDebugOptions);
 
-    void drawLines(PlainShader&, gl::ObjectStore&);
-    void drawPoints(PlainShader&, gl::ObjectStore&);
+    void drawLines(PlainShader&, gl::Context&);
+    void drawPoints(PlainShader&, gl::Context&);
 
     const bool renderable;
     const bool complete;

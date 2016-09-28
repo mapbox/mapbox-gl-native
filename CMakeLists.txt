@@ -29,7 +29,7 @@ mason_use(kdbush VERSION 0.1.1 HEADER_ONLY)
 mason_use(earcut VERSION 0.11 HEADER_ONLY)
 mason_use(protozero VERSION 1.4.2 HEADER_ONLY)
 mason_use(pixelmatch VERSION 0.9.0 HEADER_ONLY)
-mason_use(geojson VERSION 0.3.0)
+mason_use(geojson VERSION 0.3.1 HEADER_ONLY)
 
 if(WITH_COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")

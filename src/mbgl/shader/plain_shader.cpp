@@ -5,11 +5,11 @@
 
 namespace mbgl {
 
-PlainShader::PlainShader(gl::ObjectStore& store, Defines defines)
+PlainShader::PlainShader(gl::Context& context, Defines defines)
     : Shader(shaders::fill::name,
              shaders::fill::vertex,
              shaders::fill::fragment,
-             store, defines) {
+             context, defines) {
 }
 
 void PlainShader::bind(GLbyte* offset) {

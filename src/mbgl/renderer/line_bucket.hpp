@@ -24,7 +24,7 @@ public:
     LineBucket(uint32_t overscaling);
     ~LineBucket() override;
 
-    void upload(gl::ObjectStore&, gl::Config&) override;
+    void upload(gl::Context&) override;
     void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
     bool hasData() const override;
     bool needsClipping() const override;
@@ -32,9 +32,9 @@ public:
     void addGeometry(const GeometryCollection&);
     void addGeometry(const GeometryCoordinates& line);
 
-    void drawLines(LineShader&, gl::ObjectStore&, PaintMode);
-    void drawLineSDF(LineSDFShader&, gl::ObjectStore&, PaintMode);
-    void drawLinePatterns(LinepatternShader&, gl::ObjectStore&, PaintMode);
+    void drawLines(LineShader&, gl::Context&, PaintMode);
+    void drawLineSDF(LineSDFShader&, gl::Context&, PaintMode);
+    void drawLinePatterns(LinepatternShader&, gl::Context&, PaintMode);
 
 private:
     struct TriangleElement {

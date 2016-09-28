@@ -79,7 +79,7 @@ MBGL_DEFINE_ENUM(TextTransformType, {
 MBGL_DEFINE_ENUM(AlignmentType, {
     { AlignmentType::Map, "map" },
     { AlignmentType::Viewport, "viewport" },
-    { AlignmentType::Undefined, "undefined" },
+    { AlignmentType::Auto, "auto" },
 });
 
 MBGL_DEFINE_ENUM(IconTextFitType, {

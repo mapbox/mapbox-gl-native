@@ -1,21 +1,15 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/platform/log.hpp>
-#include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/string.hpp>
 
 namespace mbgl {
-
-void VertexArrayObject::Unbind() {
-    if (!gl::BindVertexArray) return;
-    MBGL_CHECK_ERROR(gl::BindVertexArray(0));
-}
 
 VertexArrayObject::VertexArrayObject() {
 }
 
 VertexArrayObject::~VertexArrayObject() = default;
 
-void VertexArrayObject::bindVertexArrayObject(gl::ObjectStore& store) {
+void VertexArrayObject::bindVertexArrayObject(gl::Context& context) {
     if (!gl::GenVertexArrays || !gl::BindVertexArray) {
         static bool reported = false;
         if (!reported) {
@@ -26,9 +20,12 @@ void VertexArrayObject::bindVertexArrayObject(gl::ObjectStore& store) {
     }
 
     if (!vao) {
-        vao = store.createVAO();
+        vao = context.createVAO();
+        context.vertexBuffer.setDirty();
+        context.elementBuffer.setDirty();
     }
-    MBGL_CHECK_ERROR(gl::BindVertexArray(*vao));
+
+    context.vertexArrayObject = *vao;
 }
 
 void VertexArrayObject::verifyBinding(Shader& shader, GLuint vertexBuffer, GLuint elementsBuffer,

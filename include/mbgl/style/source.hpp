@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/style/types.hpp>
 
 #include <memory>
@@ -49,6 +50,8 @@ public:
     // Create a new source with the specified `id`. All other properties
     // are copied from this source.
     std::unique_ptr<Source> copy(const std::string& id) const;
+
+    optional<std::string> getAttribution() const;
 
     // Private implementation
     class Impl;

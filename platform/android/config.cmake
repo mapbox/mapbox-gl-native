@@ -125,6 +125,10 @@ add_library(mapbox-gl SHARED
     platform/android/src/native_map_view.cpp
     platform/android/src/native_map_view.hpp
 
+    # Connectivity
+    platform/android/src/connectivity_listener.cpp
+    platform/android/src/connectivity_listener.hpp
+
     # Main jni bindings
     platform/android/src/jni.cpp
     platform/android/src/jni.hpp

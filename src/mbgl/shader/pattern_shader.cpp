@@ -5,11 +5,11 @@
 
 namespace mbgl {
 
-PatternShader::PatternShader(gl::ObjectStore& store, Defines defines)
+PatternShader::PatternShader(gl::Context& context, Defines defines)
     : Shader(shaders::pattern::name,
              shaders::pattern::vertex,
              shaders::pattern::fragment,
-             store, defines) {
+             context, defines) {
 }
 
 void PatternShader::bind(GLbyte *offset) {

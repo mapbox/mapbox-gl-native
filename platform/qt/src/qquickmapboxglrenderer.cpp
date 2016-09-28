@@ -1,13 +1,13 @@
 #include "qquickmapboxglrenderer.hpp"
 
-#include <QMapboxGL>
-#include <QQuickMapboxGL>
-#include <QQuickMapboxGLStyle>
+#include "qmapboxgl.hpp"
+#include "qquickmapboxgl.hpp"
 
 #include <QSize>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLFramebufferObjectFormat>
 #include <QQuickWindow>
+#include <QThread>
 
 QQuickMapboxGLRenderer::QQuickMapboxGLRenderer()
 {
@@ -20,34 +20,10 @@ QQuickMapboxGLRenderer::QQuickMapboxGLRenderer()
     settings.setViewportMode(QMapboxGLSettings::FlippedYViewport);
 
     m_map.reset(new QMapboxGL(nullptr, settings));
-    connect(m_map.data(), SIGNAL(mapChanged(QMapboxGL::MapChange)), this, SLOT(onMapChanged(QMapboxGL::MapChange)));
 }
 
 QQuickMapboxGLRenderer::~QQuickMapboxGLRenderer()
 {
-}
-
-void QQuickMapboxGLRenderer::onMapChanged(QMapboxGL::MapChange change)
-{
-    auto onMapChangeWillStartLoadingMap = [&]() {
-        m_styleLoaded = false;
-    };
-
-    auto onMapChangeDidFinishLoadingMap = [&]() {
-        m_styleLoaded = true;
-        emit styleChanged();
-    };
-
-    switch (change) {
-    case QMapboxGL::MapChangeWillStartLoadingMap:
-        onMapChangeWillStartLoadingMap();
-        break;
-    case QMapboxGL::MapChangeDidFinishLoadingMap:
-        onMapChangeDidFinishLoadingMap();
-        break;
-    default:
-        break;
-    }
 }
 
 QOpenGLFramebufferObject* QQuickMapboxGLRenderer::createFramebufferObject(const QSize &size)
@@ -67,54 +43,70 @@ void QQuickMapboxGLRenderer::render()
 
 void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
 {
+    auto quickMap = qobject_cast<QQuickMapboxGL*>(item);
     if (!m_initialized) {
-        auto qquickMapbox = static_cast<QQuickMapboxGL*>(item);
-
-        QObject::connect(m_map.data(), &QMapboxGL::needsRendering, qquickMapbox, &QQuickMapboxGL::update);
-        QObject::connect(this, &QQuickMapboxGLRenderer::centerChanged, qquickMapbox, &QQuickMapboxGL::setCenter);
-
+        QObject::connect(m_map.data(), &QMapboxGL::needsRendering, quickMap, &QQuickMapboxGL::update);
+        QObject::connect(m_map.data(), SIGNAL(mapChanged(QMapbox::MapChange)), quickMap, SLOT(onMapChanged(QMapbox::MapChange)));
+        QObject::connect(this, &QQuickMapboxGLRenderer::centerChanged, quickMap, &QQuickMapboxGL::setCenter);
         m_initialized = true;
     }
 
-    auto quickMap = static_cast<QQuickMapboxGL*>(item);
-    auto syncStatus = quickMap->swapSyncState();
+    auto syncStatus = quickMap->m_syncState;
+    quickMap->m_syncState = QQuickMapboxGL::NothingNeedsSync;
 
     if (syncStatus & QQuickMapboxGL::CenterNeedsSync || syncStatus & QQuickMapboxGL::ZoomNeedsSync) {
         const auto& center = quickMap->center();
         m_map->setCoordinateZoom({ center.latitude(), center.longitude() }, quickMap->zoomLevel());
     }
 
-    if (syncStatus & QQuickMapboxGL::StyleNeedsSync && quickMap->style()) {
-        m_map->setStyleUrl(quickMap->style()->url());
-        m_styleLoaded = false;
+    if (syncStatus & QQuickMapboxGL::StyleNeedsSync && !quickMap->m_styleUrl.isEmpty()) {
+        m_map->setStyleUrl(quickMap->m_styleUrl);
     }
 
     if (syncStatus & QQuickMapboxGL::PanNeedsSync) {
-        m_map->moveBy(quickMap->swapPan());
+        m_map->moveBy(quickMap->m_pan);
+        quickMap->m_pan = QPointF();
         emit centerChanged(QGeoCoordinate(m_map->latitude(), m_map->longitude()));
     }
 
     if (syncStatus & QQuickMapboxGL::BearingNeedsSync) {
-        m_map->setBearing(quickMap->bearing());
+        m_map->setBearing(quickMap->m_bearing);
     }
 
     if (syncStatus & QQuickMapboxGL::PitchNeedsSync) {
-        m_map->setPitch(quickMap->pitch());
+        m_map->setPitch(quickMap->m_pitch);
     }
 
-    if (m_styleLoaded) {
-        if (!quickMap->layoutPropertyChanges().empty()) {
-            for (const auto& change: quickMap->layoutPropertyChanges()) {
-                m_map->setLayoutProperty(change.value("layer").toString(), change.value("property").toString(), change.value("value"));
-            }
-            quickMap->layoutPropertyChanges().clear();
-        }
+    if (!quickMap->m_styleLoaded) {
+        return;
+    }
 
-        if (!quickMap->paintPropertyChanges().empty()) {
-            for (const auto& change: quickMap->paintPropertyChanges()) {
-                m_map->setPaintProperty(change.value("layer").toString(), change.value("property").toString(), change.value("value"), change.value("class").toString());
-            }
-            quickMap->paintPropertyChanges().clear();
+    for (const auto& change : quickMap->m_sourceChanges) {
+        m_map->addSource(change.value("id").toString(), change);
+    }
+    quickMap->m_sourceChanges.clear();
+
+    for (const auto& change : quickMap->m_layerChanges) {
+        m_map->addLayer(change);
+    }
+    quickMap->m_layerChanges.clear();
+
+    for (const auto& change : quickMap->m_filterChanges) {
+        m_map->setFilter(change.value("layer").toString(), change.value("filter"));
+    }
+    quickMap->m_filterChanges.clear();
+
+    for (const auto& change : quickMap->m_imageChanges) {
+        m_map->addImage(change.name, change.sprite);
+    }
+    quickMap->m_imageChanges.clear();
+
+    for (const auto& change : quickMap->m_stylePropertyChanges) {
+        if (change.type == QQuickMapboxGL::StyleProperty::Paint) {
+            m_map->setPaintProperty(change.layer, change.property, change.value, change.klass);
+        } else {
+            m_map->setLayoutProperty(change.layer, change.property, change.value);
         }
     }
+    quickMap->m_stylePropertyChanges.clear();
 }

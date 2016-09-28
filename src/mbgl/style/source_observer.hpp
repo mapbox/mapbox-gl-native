@@ -17,6 +17,7 @@ public:
     virtual ~SourceObserver() = default;
 
     virtual void onSourceLoaded(Source&) {}
+    virtual void onSourceAttributionChanged(Source&, const std::string&) {}
     virtual void onSourceError(Source&, std::exception_ptr) {}
 
     virtual void onTileChanged(Source&, const OverscaledTileID&) {}

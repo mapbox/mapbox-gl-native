@@ -119,7 +119,7 @@ PremultipliedImage decodeJPEG(const uint8_t* data, size_t size) {
     size_t components = cinfo.output_components;
     size_t rowStride = components * width;
 
-    PremultipliedImage image { width, height };
+    PremultipliedImage image { static_cast<uint16_t>(width), static_cast<uint16_t>(height) };
     uint8_t* dst = image.data.get();
 
     JSAMPARRAY buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr) &cinfo, JPOOL_IMAGE, rowStride, 1);

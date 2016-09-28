@@ -30,8 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
- A collection of convenience methods for creating style URLs of default styles
- provided by Mapbox.
+ The proxy object for the current map style for customization purposes and a 
+ set of convenience methods for creating style URLs of default styles provided 
+ by Mapbox.
  <a href="https://www.mapbox.com/maps/">Learn more about Mapbox default styles</a>.
  */
 @interface MGLStyle : NSObject
@@ -187,7 +188,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  
  @return source An instance of an `MGLSource` subclass.
  */
-- (MGLSource *)sourceWithIdentifier:(NSString *)identifier;
+- (nullable MGLSource *)sourceWithIdentifier:(NSString *)identifier;
 
 /**
  Adds a new layer on top of existing layers.

@@ -1,11 +1,12 @@
 #pragma once
 
+#include "qmapboxgl.hpp"
+
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/geo.hpp>
 
-#include <QMapboxGL>
 #include <QObject>
 #include <QSize>
 
@@ -42,5 +43,5 @@ public slots:
 
 signals:
     void needsRendering();
-    void mapChanged(QMapboxGL::MapChange);
+    void mapChanged(QMapbox::MapChange);
 };

@@ -144,7 +144,7 @@ void SymbolLayer::setIconOptional(PropertyValue<bool> value) {
     impl->observer->onLayerLayoutPropertyChanged(*this);
 }
 PropertyValue<AlignmentType> SymbolLayer::getDefaultIconRotationAlignment() {
-    return { AlignmentType::Viewport };
+    return { AlignmentType::Auto };
 }
 
 PropertyValue<AlignmentType> SymbolLayer::getIconRotationAlignment() const {
@@ -270,7 +270,7 @@ void SymbolLayer::setIconOffset(PropertyValue<std::array<float, 2>> value) {
     impl->observer->onLayerLayoutPropertyChanged(*this);
 }
 PropertyValue<AlignmentType> SymbolLayer::getDefaultTextPitchAlignment() {
-    return { AlignmentType::Undefined };
+    return { AlignmentType::Auto };
 }
 
 PropertyValue<AlignmentType> SymbolLayer::getTextPitchAlignment() const {
@@ -284,7 +284,7 @@ void SymbolLayer::setTextPitchAlignment(PropertyValue<AlignmentType> value) {
     impl->observer->onLayerLayoutPropertyChanged(*this);
 }
 PropertyValue<AlignmentType> SymbolLayer::getDefaultTextRotationAlignment() {
-    return { AlignmentType::Viewport };
+    return { AlignmentType::Auto };
 }
 
 PropertyValue<AlignmentType> SymbolLayer::getTextRotationAlignment() const {

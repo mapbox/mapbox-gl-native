@@ -14,5 +14,9 @@ const std::string& Source::getID() const {
     return baseImpl->id;
 }
 
+optional<std::string> Source::getAttribution() const {
+    return baseImpl->getAttribution();
+}
+
 } // namespace style
 } // namespace mbgl

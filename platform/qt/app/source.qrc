@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>source.geojson</file>
-    </qresource>
-</RCC>

@@ -465,6 +465,10 @@ void Style::onSourceLoaded(Source& source) {
     observer->onUpdate(Update::Repaint);
 }
 
+void Style::onSourceAttributionChanged(Source& source, const std::string& attribution) {
+    observer->onSourceAttributionChanged(source, attribution);
+}
+
 void Style::onSourceError(Source& source, std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load source %s: %s",
@@ -520,7 +524,7 @@ void Style::onLayerFilterChanged(Layer& layer) {
 
 void Style::onLayerVisibilityChanged(Layer& layer) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
-    observer->onUpdate(Update::Layout);
+    observer->onUpdate(Update::RecalculateStyle | Update::Layout);
 }
 
 void Style::onLayerPaintPropertyChanged(Layer&) {

@@ -35,18 +35,28 @@ std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(BucketParameters& 
     SymbolLayoutProperties layoutProperties = layout;
 
     CalculationParameters p(parameters.tileID.overscaledZ);
-    layoutProperties.symbolPlacement.calculate(p);
-    if (layoutProperties.symbolPlacement.value == SymbolPlacementType::Line) {
-        layoutProperties.iconRotationAlignment.value = AlignmentType::Map;
-        layoutProperties.textRotationAlignment.value = AlignmentType::Map;
+    layoutProperties.recalculate(p);
+
+    if (layoutProperties.iconRotationAlignment.value == AlignmentType::Auto) {
+        if (layoutProperties.symbolPlacement.value == SymbolPlacementType::Line) {
+            layoutProperties.iconRotationAlignment.value = AlignmentType::Map;
+        } else {
+            layoutProperties.iconRotationAlignment.value = AlignmentType::Viewport;
+        }
+    }
+
+    if (layoutProperties.textRotationAlignment.value == AlignmentType::Auto) {
+        if (layoutProperties.symbolPlacement.value == SymbolPlacementType::Line) {
+            layoutProperties.textRotationAlignment.value = AlignmentType::Map;
+        } else {
+            layoutProperties.textRotationAlignment.value = AlignmentType::Viewport;
+        }
     }
 
     // If unspecified `text-pitch-alignment` inherits `text-rotation-alignment`
-    if (layoutProperties.textPitchAlignment.value == AlignmentType::Undefined) {
+    if (layoutProperties.textPitchAlignment.value == AlignmentType::Auto) {
         layoutProperties.textPitchAlignment.value = layoutProperties.textRotationAlignment.value;
     }
-
-    layoutProperties.recalculate(p);
 
     layoutProperties.textSize.calculate(CalculationParameters(18));
     float textMaxSize = layoutProperties.textSize;
