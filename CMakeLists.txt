@@ -18,7 +18,7 @@ if(WITH_CXX11ABI)
     set(MASON_CXXABI_SUFFIX -cxx11abi)
 endif()
 
-mason_use(geometry VERSION 0.8.0 HEADER_ONLY)
+mason_use(geometry VERSION 0.8.1 HEADER_ONLY)
 mason_use(variant VERSION 1.1.0 HEADER_ONLY)
 mason_use(unique_resource VERSION dev HEADER_ONLY)
 mason_use(rapidjson VERSION 1.1.0 HEADER_ONLY)
