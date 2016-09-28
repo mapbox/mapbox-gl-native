@@ -40,7 +40,9 @@ using namespace style;
 
 Painter::Painter(const TransformState& state_)
     : state(state_) {
+#ifndef NDEBUG
     gl::debugging::enable();
+#endif
 
     shaders = std::make_unique<Shaders>(context);
 #ifndef NDEBUG
