@@ -61,10 +61,8 @@ void Context::setDirtyState() {
 
 void Context::performCleanup() {
     for (GLuint id : abandonedPrograms) {
-        for (const auto& p : abandonedPrograms) {
-            if (program == p) {
-                program.setDirty();
-            }
+        if (program == id) {
+            program.setDirty();
         }
         MBGL_CHECK_ERROR(glDeleteProgram(id));
     }
