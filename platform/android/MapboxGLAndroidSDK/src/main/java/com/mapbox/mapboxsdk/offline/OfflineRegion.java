@@ -130,6 +130,26 @@ public class OfflineRegion {
     }
 
     /**
+     * This callback receives an asynchronous response containing the newly update
+     * OfflineMetadata in the database, or an error message otherwise.
+     */
+    public interface OfflineRegionUpdateMetadataCallback {
+        /**
+         * Receives the newly update offline region metadata.
+         *
+         * @param metadata the offline metadata to u[date
+         */
+        void onUpdate(byte[] metadata);
+
+        /**
+         * Receives the error message.
+         *
+         * @param error the error message to be shown
+         */
+        void onError(String error);
+    }
+
+    /**
      * A region is either inactive (not downloading, but previously-downloaded
      * resources are available for use), or active (resources are being downloaded
      * or will be downloaded, if necessary, when network access is available).
@@ -341,6 +361,43 @@ public class OfflineRegion {
         });
     }
 
+    /**
+     * Update an offline region metadata from the database.
+     * <p>
+     * When the operation is complete or encounters an error, the given callback will be
+     * executed on the main thread.
+     * </p>
+     * <p>
+     * After you call this method, you may not call any additional methods on this object.
+     * </p>
+     *
+     * @param callback the callback to be invoked
+     */
+    public void updateMetadata(@NonNull final byte[] bytes, @NonNull final OfflineRegionUpdateMetadataCallback callback) {
+        updateOfflineRegionMetadata(bytes, new OfflineRegionUpdateMetadataCallback() {
+            @Override
+            public void onUpdate(final byte[] metadata) {
+                getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMetadata = metadata;
+                        callback.onUpdate(metadata);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(final String error) {
+                getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onError(error);
+                    }
+                });
+            }
+        });
+    }
+
     @Override
     protected void finalize() {
         try {
@@ -368,5 +425,7 @@ public class OfflineRegion {
 
     private native void deleteOfflineRegion(
             OfflineRegionDeleteCallback deleteCallback);
+
+    private native void updateOfflineRegionMetadata(byte[] metadata, OfflineRegionUpdateMetadataCallback callback);
 
 }

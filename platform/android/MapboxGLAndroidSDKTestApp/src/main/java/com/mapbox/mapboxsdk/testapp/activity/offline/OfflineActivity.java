@@ -29,8 +29,7 @@ import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.other.OfflineDownloadRegionDialog;
 import com.mapbox.mapboxsdk.testapp.model.other.OfflineListRegionsDialog;
-
-import org.json.JSONObject;
+import com.mapbox.mapboxsdk.testapp.utils.OfflineUtils;
 
 import java.util.ArrayList;
 
@@ -188,7 +187,7 @@ public class OfflineActivity extends AppCompatActivity
                 // Get regions info
                 ArrayList<String> offlineRegionsNames = new ArrayList<>();
                 for (OfflineRegion offlineRegion : offlineRegions) {
-                    offlineRegionsNames.add(getRegionName(offlineRegion));
+                    offlineRegionsNames.add(OfflineUtils.convertRegionName(offlineRegion.getMetadata()));
                 }
 
                 // Create args
@@ -204,22 +203,6 @@ public class OfflineActivity extends AppCompatActivity
             @Override
             public void onError(String error) {
                 Log.e(LOG_TAG, "Error: " + error);
-            }
-
-            private String getRegionName(OfflineRegion offlineRegion) {
-                String regionName;
-
-                try {
-                    byte[] metadata = offlineRegion.getMetadata();
-                    String json = new String(metadata, JSON_CHARSET);
-                    JSONObject jsonObject = new JSONObject(json);
-                    regionName = jsonObject.getString(JSON_FIELD_REGION_NAME);
-                } catch (Exception exception) {
-                    Log.e(LOG_TAG, "Failed to decode metadata: " + exception.getMessage());
-                    regionName = "Region " + offlineRegion.getID();
-                }
-
-                return regionName;
             }
         });
     }
@@ -249,16 +232,7 @@ public class OfflineActivity extends AppCompatActivity
                 styleUrl, bounds, minZoom, maxZoom, pixelRatio);
 
         // Sample way of encoding metadata from a JSONObject
-        byte[] metadata;
-        try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put(JSON_FIELD_REGION_NAME, regionName);
-            String json = jsonObject.toString();
-            metadata = json.getBytes(JSON_CHARSET);
-        } catch (Exception exception) {
-            Log.e(LOG_TAG, "Failed to encode metadata: " + exception.getMessage());
-            metadata = null;
-        }
+        byte[] metadata =  OfflineUtils.convertRegionName(regionName);
 
         // Create region
         offlineManager.createOfflineRegion(definition, metadata, new OfflineManager.CreateOfflineRegionCallback() {
