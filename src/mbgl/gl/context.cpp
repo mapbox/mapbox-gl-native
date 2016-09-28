@@ -74,10 +74,10 @@ void Context::performCleanup() {
     abandonedShaders.clear();
 
     if (!abandonedBuffers.empty()) {
-        for (const auto& b : abandonedBuffers) {
-            if (vertexBuffer == b) {
+        for (const auto id : abandonedBuffers) {
+            if (vertexBuffer == id) {
                 vertexBuffer.setDirty();
-            } else if (elementBuffer == b) {
+            } else if (elementBuffer == id) {
                 elementBuffer.setDirty();
             }
         }
@@ -86,8 +86,8 @@ void Context::performCleanup() {
     }
 
     if (!abandonedTextures.empty()) {
-        for (const auto& t : abandonedTextures) {
-            if (activeTexture == t) {
+        for (const auto id : abandonedTextures) {
+            if (activeTexture == id) {
                 activeTexture.setDirty();
             }
         }
@@ -96,8 +96,8 @@ void Context::performCleanup() {
     }
 
     if (!abandonedVAOs.empty()) {
-        for (const auto& v : abandonedVAOs) {
-            if (vertexArrayObject == v) {
+        for (const auto id : abandonedVAOs) {
+            if (vertexArrayObject == id) {
                 vertexArrayObject.setDirty();
             }
         }
@@ -106,8 +106,8 @@ void Context::performCleanup() {
     }
 
     if (!abandonedFBOs.empty()) {
-        for (const auto& f : abandonedFBOs) {
-            if (bindFramebuffer == f) {
+        for (const auto id : abandonedFBOs) {
+            if (bindFramebuffer == id) {
                 bindFramebuffer.setDirty();
             }
         }
