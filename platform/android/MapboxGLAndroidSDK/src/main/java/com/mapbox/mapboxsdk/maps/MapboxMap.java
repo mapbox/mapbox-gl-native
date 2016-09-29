@@ -2011,7 +2011,7 @@ public class MapboxMap {
          * @return the View that is adapted to the contents of MarkerView
          */
         @Nullable
-        public abstract View getView(@NonNull U marker, @NonNull View convertView, @NonNull ViewGroup parent);
+        public abstract View getView(@NonNull U marker, @Nullable View convertView, @NonNull ViewGroup parent);
 
         /**
          * Called when an MarkerView is removed from the MapView or the View object is going to be reused.
