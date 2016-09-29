@@ -5,10 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.mapbox.mapboxsdk.constants.GeoConstants;
-import com.mapbox.mapboxsdk.constants.MathConstants;
 import com.mapbox.mapboxsdk.utils.MathUtils;
-
-import java.io.Serializable;
 
 /**
  * A geographical location which contains a single latitude, longitude pair, with
@@ -188,10 +185,10 @@ public class LatLng implements ILatLng, Parcelable {
             return 0.0;
         }
 
-        final double a1 = MathConstants.DEG2RAD * this.latitude;
-        final double a2 = MathConstants.DEG2RAD * this.longitude;
-        final double b1 = MathConstants.DEG2RAD * other.getLatitude();
-        final double b2 = MathConstants.DEG2RAD * other.getLongitude();
+        final double a1 = Math.toRadians(this.latitude);
+        final double a2 = Math.toRadians(this.longitude);
+        final double b1 = Math.toRadians(other.getLatitude());
+        final double b2 = Math.toRadians(other.getLongitude());
 
         final double cosa1 = Math.cos(a1);
         final double cosb1 = Math.cos(b1);

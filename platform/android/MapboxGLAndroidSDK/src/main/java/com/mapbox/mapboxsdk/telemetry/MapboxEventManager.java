@@ -181,16 +181,10 @@ public class MapboxEventManager {
                 this.accessToken = stagingAccessToken;
             }
 
-            String appName = context.getPackageManager().getApplicationLabel(appInfo).toString();
-            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            String versionName = packageInfo.versionName;
-            int versionCode = packageInfo.versionCode;
-
             // Build User Agent
-            if (TextUtils.equals(userAgent, BuildConfig.MAPBOX_EVENTS_USER_AGENT_BASE) && !TextUtils.isEmpty(appName) && !TextUtils.isEmpty(versionName)) {
-                userAgent = appName + "/" + versionName + "/" + versionCode + " " + userAgent;
-                // Ensure that only ASCII characters are sent
-                userAgent = Util.toHumanReadableAscii(userAgent);
+            String appIdentifier = getApplicationIdentifier();
+            if (TextUtils.equals(userAgent, BuildConfig.MAPBOX_EVENTS_USER_AGENT_BASE) && !TextUtils.isEmpty(appIdentifier)) {
+                userAgent = Util.toHumanReadableAscii(String.format(MapboxConstants.MAPBOX_LOCALE, "%s %s", appIdentifier, userAgent));
             }
 
         } catch (Exception e) {
@@ -777,6 +771,15 @@ public class MapboxEventManager {
         @Override
         public void run() {
             new FlushTheEventsTask().execute();
+        }
+    }
+
+    private String getApplicationIdentifier() {
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return String.format(MapboxConstants.MAPBOX_LOCALE, "%s/%s/%s", context.getPackageName(), packageInfo.versionName, packageInfo.versionCode);
+        } catch (Exception e) {
+            return "";
         }
     }
 }

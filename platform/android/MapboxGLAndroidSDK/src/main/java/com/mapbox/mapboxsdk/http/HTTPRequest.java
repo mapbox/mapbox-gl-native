@@ -1,8 +1,13 @@
 package com.mapbox.mapboxsdk.http;
 
+
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
@@ -22,11 +27,13 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.internal.Util;
 
 class HTTPRequest implements Callback {
 
     private static OkHttpClient mClient = new OkHttpClient();
-    private final String LOG_TAG = HTTPRequest.class.getName();
+    private static final String LOG_TAG = HTTPRequest.class.getName();
+    private String USER_AGENT_STRING = null;
 
     private static final int CONNECTION_ERROR = 0;
     private static final int TEMPORARY_ERROR = 1;
@@ -45,7 +52,7 @@ class HTTPRequest implements Callback {
 
     private native void nativeOnResponse(int code, String etag, String modified, String cacheControl, String expires, String retryAfter, String xRateLimitReset, byte[] body);
 
-    private HTTPRequest(long nativePtr, String resourceUrl, String userAgent, String etag, String modified) {
+    private HTTPRequest(long nativePtr, String resourceUrl, String etag, String modified) {
         mNativePtr = nativePtr;
 
         try {
@@ -65,7 +72,10 @@ class HTTPRequest implements Callback {
                 resourceUrl = resourceUrl + "events=true";
             }
 
-            Request.Builder builder = new Request.Builder().url(resourceUrl).tag(resourceUrl.toLowerCase(MapboxConstants.MAPBOX_LOCALE)).addHeader("User-Agent", userAgent);
+            Request.Builder builder = new Request.Builder()
+                    .url(resourceUrl)
+                    .tag(resourceUrl.toLowerCase(MapboxConstants.MAPBOX_LOCALE))
+                    .addHeader("User-Agent", getUserAgent());
             if (etag.length() > 0) {
                 builder = builder.addHeader("If-None-Match", etag);
             } else if (modified.length() > 0) {
@@ -164,5 +174,30 @@ class HTTPRequest implements Callback {
             nativeOnFailure(type, errorMessage);
         }
         mLock.unlock();
+    }
+
+    private String getUserAgent() {
+        if (USER_AGENT_STRING == null) {
+            return USER_AGENT_STRING = Util.toHumanReadableAscii(
+                    String.format("%s %s (%s) Android/%s (%s)",
+                            getApplicationIdentifier(),
+                            BuildConfig.MAPBOX_VERSION_STRING,
+                            BuildConfig.GIT_REVISION_SHORT,
+                            Build.VERSION.SDK_INT,
+                            Build.CPU_ABI)
+            );
+        } else {
+            return USER_AGENT_STRING;
+        }
+    }
+
+    private String getApplicationIdentifier() {
+        try {
+            Context context = MapboxAccountManager.getInstance().getApplicationContext();
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return String.format("%s/%s (%s)", context.getPackageName(), packageInfo.versionName, packageInfo.versionCode);
+        } catch (Exception e) {
+            return "";
+        }
     }
 }
