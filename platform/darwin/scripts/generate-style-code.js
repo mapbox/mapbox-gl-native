@@ -54,7 +54,7 @@ global.testHelperMessage = function (property, layerType, isFunction) {
             return 'testString' + fnSuffix;
         case 'enum':
             let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            let objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
+            let objCEnum = `${objCType}${camelize(Object.keys(property.values)[Object.keys(property.values).length-1])}`;
             return `testEnum${fnSuffix}:${objCEnum} type:@encode(${objCType})`;
         case 'color':
             return 'testColor' + fnSuffix;
@@ -79,7 +79,7 @@ global.testHelperMessage = function (property, layerType, isFunction) {
 
 global.propertyDoc = function (property, layerType) {
     let doc = property.doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
-        if ('values' in property && property.values.indexOf(symbol) !== -1) {
+        if ('values' in property && Object.keys(property.values).indexOf(symbol) !== -1) {
             let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
             return '`' + `${objCType}${camelize(symbol)}` + '`';
         }
@@ -299,7 +299,7 @@ const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
 const testLayers = ejs.compile(fs.readFileSync('platform/darwin/src/MGLRuntimeStylingTests.m.ejs', 'utf8'), { strict: true});
 
-const layers = spec.layer.type.values.map((type) => {
+const layers = Object.keys(spec.layer.type.values).map((type) => {
     const layoutProperties = Object.keys(spec[`layout_${type}`]).reduce((memo, name) => {
         if (name !== 'visibility') {
             spec[`layout_${type}`][name].name = name;

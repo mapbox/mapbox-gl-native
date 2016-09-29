@@ -16,7 +16,10 @@ NS_ASSUME_NONNULL_BEGIN
 <% for (const property of layoutProperties) { -%>
 <% if (property.type == "enum") { -%>
 typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %>) {
-<% for (const value of property.values) { -%>
+<% for (const value in property.values) { -%>
+    /**
+     <%- propertyDoc(property.values[value], type) %>
+     */
     MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
 <% } -%>
 };
@@ -26,7 +29,10 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 <% for (const property of paintProperties) { -%>
 <% if (property.type == "enum") { -%>
 typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %>) {
-<% for (const value of property.values) { -%>
+<% for (const value in property.values) { -%>
+    /**
+     <%- propertyDoc(property.values[value], type) %>
+     */
     MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
 <% } -%>
 };

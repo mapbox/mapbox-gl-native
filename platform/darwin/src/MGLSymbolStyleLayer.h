@@ -7,66 +7,168 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerSymbolPlacement) {
+    /**
+     The label is placed at the point where the geometry is located.
+     */
     MGLSymbolStyleLayerSymbolPlacementPoint,
+    /**
+     The label is placed along the line of the geometry. Can only be used on `LineString` and `Polygon` geometries.
+     */
     MGLSymbolStyleLayerSymbolPlacementLine,
 };
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconRotationAlignment) {
+    /**
+     When `symbolPlacement` is set to `point`, aligns icons east-west. When `symbolPlacement` is set to `line`, aligns icon x-axes with the line.
+     */
     MGLSymbolStyleLayerIconRotationAlignmentMap,
+    /**
+     Produces icons whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbolPlacement`.
+     */
     MGLSymbolStyleLayerIconRotationAlignmentViewport,
+    /**
+     When `symbolPlacement` is set to `point`, this is equivalent to `viewport`. When `symbolPlacement` is set to `line`, this is equivalent to `map`.
+     */
     MGLSymbolStyleLayerIconRotationAlignmentAuto,
 };
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconTextFit) {
+    /**
+     The icon is displayed at its intrinsic aspect ratio.
+     */
     MGLSymbolStyleLayerIconTextFitNone,
-    MGLSymbolStyleLayerIconTextFitBoth,
+    /**
+     The icon is scaled in the x-dimension to fit the width of the text.
+     */
     MGLSymbolStyleLayerIconTextFitWidth,
+    /**
+     The icon is scaled in the y-dimension to fit the height of the text.
+     */
     MGLSymbolStyleLayerIconTextFitHeight,
+    /**
+     The icon is scaled in both x- and y-dimensions.
+     */
+    MGLSymbolStyleLayerIconTextFitBoth,
 };
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextPitchAlignment) {
+    /**
+     The text is aligned to the plane of the map.
+     */
     MGLSymbolStyleLayerTextPitchAlignmentMap,
+    /**
+     The text is aligned to the plane of the viewport.
+     */
     MGLSymbolStyleLayerTextPitchAlignmentViewport,
+    /**
+     Automatically matches the value of `textRotationAlignment`.
+     */
     MGLSymbolStyleLayerTextPitchAlignmentAuto,
 };
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextRotationAlignment) {
+    /**
+     When `symbolPlacement` is set to `point`, aligns text east-west. When `symbolPlacement` is set to `line`, aligns text x-axes with the line.
+     */
     MGLSymbolStyleLayerTextRotationAlignmentMap,
+    /**
+     Produces glyphs whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbolPlacement`.
+     */
     MGLSymbolStyleLayerTextRotationAlignmentViewport,
+    /**
+     When `symbolPlacement` is set to `point`, this is equivalent to `viewport`. When `symbolPlacement` is set to `line`, this is equivalent to `map`.
+     */
     MGLSymbolStyleLayerTextRotationAlignmentAuto,
 };
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextJustify) {
+    /**
+     The text is aligned to the left.
+     */
     MGLSymbolStyleLayerTextJustifyLeft,
+    /**
+     The text is centered.
+     */
     MGLSymbolStyleLayerTextJustifyCenter,
+    /**
+     The text is aligned to the right.
+     */
     MGLSymbolStyleLayerTextJustifyRight,
 };
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextAnchor) {
+    /**
+     The center of the text is placed closest to the anchor.
+     */
     MGLSymbolStyleLayerTextAnchorCenter,
+    /**
+     The left side of the text is placed closest to the anchor.
+     */
     MGLSymbolStyleLayerTextAnchorLeft,
+    /**
+     The right side of the text is placed closest to the anchor.
+     */
     MGLSymbolStyleLayerTextAnchorRight,
+    /**
+     The top of the text is placed closest to the anchor.
+     */
     MGLSymbolStyleLayerTextAnchorTop,
+    /**
+     The bottom of the text is placed closest to the anchor.
+     */
     MGLSymbolStyleLayerTextAnchorBottom,
+    /**
+     The top left corner of the text is placed closest to the anchor.
+     */
     MGLSymbolStyleLayerTextAnchorTopLeft,
+    /**
+     The top right corner of the text is placed closest to the anchor.
+     */
     MGLSymbolStyleLayerTextAnchorTopRight,
+    /**
+     The bottom left corner of the text is placed closest to the anchor.
+     */
     MGLSymbolStyleLayerTextAnchorBottomLeft,
+    /**
+     The bottom right corner of the text is placed closest to the anchor.
+     */
     MGLSymbolStyleLayerTextAnchorBottomRight,
 };
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTransform) {
+    /**
+     The text is not altered.
+     */
     MGLSymbolStyleLayerTextTransformNone,
+    /**
+     Forces all letters to be displayed in uppercase.
+     */
     MGLSymbolStyleLayerTextTransformUppercase,
+    /**
+     Forces all letters to be displayed in lowercase.
+     */
     MGLSymbolStyleLayerTextTransformLowercase,
 };
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconTranslateAnchor) {
+    /**
+     Icons are translated relative to the map.
+     */
     MGLSymbolStyleLayerIconTranslateAnchorMap,
+    /**
+     Icons are translated relative to the viewport.
+     */
     MGLSymbolStyleLayerIconTranslateAnchorViewport,
 };
 
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
+    /**
+     The text is translated relative to the map.
+     */
     MGLSymbolStyleLayerTextTranslateAnchorMap,
+    /**
+     The text is translated relative to the viewport.
+     */
     MGLSymbolStyleLayerTextTranslateAnchorViewport,
 };
 
@@ -93,7 +195,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 #pragma mark - Accessing the Layout Attributes
 
 /**
- Label placement relative to its geometry. `MGLSymbolStyleLayerSymbolPlacementLine` can only be used on LineStrings and Polygons.
+ Label placement relative to its geometry.
  
  The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerSymbolPlacementPoint`. Set this property to `nil` to reset it to the default value.
  */
@@ -145,7 +247,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconOptional;
 
 /**
- In combination with `symbolPlacement`, determines the rotation behavior of icons. The value `MGLSymbolStyleLayerIconRotationAlignmentViewport` produces icons whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbolPlacement`. When `symbolPlacement` is set to `point`, the value `MGLSymbolStyleLayerIconRotationAlignmentMap` produces icons whose x-axes are aligned east-west, and the value `MGLSymbolStyleLayerIconRotationAlignmentAuto` is equivalent to `MGLSymbolStyleLayerIconRotationAlignmentViewport`. When `symbolPlacement` is set to `line`, the value `MGLSymbolStyleLayerIconRotationAlignmentMap` produces icons whose x-axes are aligned with the line, and the value `MGLSymbolStyleLayerIconRotationAlignmentAuto` is equivalent to `MGLSymbolStyleLayerIconRotationAlignmentMap`.
+ In combination with `symbolPlacement`, determines the rotation behavior of icons.
  
  The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerIconRotationAlignmentAuto`. Set this property to `nil` to reset it to the default value.
  
@@ -163,7 +265,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconSize;
 
 /**
- Scales the icon to fit around the associated text. The value `MGLSymbolStyleLayerIconTextFitNone` performs no scaling. The values `MGLSymbolStyleLayerIconTextFitWidth` and `MGLSymbolStyleLayerIconTextFitHeight` scale the x- or y-dimension, respectively, to fit the text's dimensions. The value `MGLSymbolStyleLayerIconTextFitBoth` scales in both dimensions.
+ Scales the icon to fit around the associated text.
  
  The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerIconTextFitNone`. Set this property to `nil` to reset it to the default value.
  
@@ -178,7 +280,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
  
  The default value of this property is an `NSValue` object containing `NSEdgeInsetsZero` or `UIEdgeInsetsZero`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`, and `iconTextFit` is non-`nil`, and `textField` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImage` is non-`nil`, and `textField` is non-`nil`, and `iconTextFit` is set to an `NSValue` object containing `MGLSymbolStyleLayerIconTextFitBoth`, `MGLSymbolStyleLayerIconTextFitWidth`, or `MGLSymbolStyleLayerIconTextFitHeight`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconTextFitPadding;
 
@@ -228,7 +330,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconOffset;
 
 /**
- Orientation of text when map is pitched. Aligns text to the plane of the viewport when set to `MGLSymbolStyleLayerTextPitchAlignmentViewport` or the plane of the map when set to `MGLSymbolStyleLayerTextPitchAlignmentMap`. Matches `textRotationAlignment` if `MGLSymbolStyleLayerTextPitchAlignmentAuto`.
+ Orientation of text when map is pitched.
  
  The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerTextPitchAlignmentAuto`. Set this property to `nil` to reset it to the default value.
  
@@ -237,7 +339,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textPitchAlignment;
 
 /**
- In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text. The value `MGLSymbolStyleLayerTextRotationAlignmentViewport` produces glyphs whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbolPlacement`. When `symbolPlacement` is set to `point`, the value `MGLSymbolStyleLayerTextRotationAlignmentMap` produces glyphs whose x-axes are aligned east-west, and the value `MGLSymbolStyleLayerTextRotationAlignmentAuto` is equivalent to `MGLSymbolStyleLayerTextRotationAlignmentViewport`. When `symbolPlacement` is set to `line`, the value `MGLSymbolStyleLayerTextRotationAlignmentMap` produces glyphs whose x-axes are aligned with the line at the point where each glyph is placed, and the value `MGLSymbolStyleLayerTextRotationAlignmentAuto` is equivalent to `MGLSymbolStyleLayerTextRotationAlignmentMap`.
+ In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text.
  
  The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerTextRotationAlignmentAuto`. Set this property to `nil` to reset it to the default value.
  
@@ -445,7 +547,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 
 #if TARGET_OS_IPHONE
 /**
- The color of the icon's halo. Icon halos can only be used with sdf icons.
+ The color of the icon's halo. Icon halos can only be used with SDF icons.
  
  The default value of this property is `UIColor.clearColor`. Set this property to `nil` to reset it to the default value.
 
@@ -454,7 +556,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconHaloColor;
 #else
 /**
- The color of the icon's halo. Icon halos can only be used with sdf icons.
+ The color of the icon's halo. Icon halos can only be used with SDF icons.
  
  The default value of this property is `NSColor.clearColor`. Set this property to `nil` to reset it to the default value.
 
@@ -497,7 +599,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconTranslate;
 
 /**
- Control whether the translation is relative to the map (north) or viewport (screen).
+ Controls the translation reference point.
  
  The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerIconTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
 
@@ -588,7 +690,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> textTranslate;
 
 /**
- Control whether the translation is relative to the map (north) or viewport (screen).
+ Controls the translation reference point.
  
  The default value of this property is an `NSValue` object containing `MGLSymbolStyleLayerTextTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
 

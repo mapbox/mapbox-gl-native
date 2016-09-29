@@ -24,7 +24,7 @@ MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithLayerIdentifie
     layer.iconOptional = [MGLRuntimeStylingHelper testBool];
     layer.iconRotationAlignment = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconRotationAlignmentAuto type:@encode(MGLSymbolStyleLayerIconRotationAlignment)];
     layer.iconSize = [MGLRuntimeStylingHelper testNumber];
-    layer.iconTextFit = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTextFitHeight type:@encode(MGLSymbolStyleLayerIconTextFit)];
+    layer.iconTextFit = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTextFitBoth type:@encode(MGLSymbolStyleLayerIconTextFit)];
     layer.iconTextFitPadding = [MGLRuntimeStylingHelper testPadding];
     layer.iconImage = [MGLRuntimeStylingHelper testString];
     layer.iconRotate = [MGLRuntimeStylingHelper testNumber];
@@ -74,7 +74,7 @@ MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithLayerIdentifie
     XCTAssertEqualObjects(gLayer.iconOptional, [MGLRuntimeStylingHelper testBool]);
     XCTAssert([(NSValue *)gLayer.iconRotationAlignment isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconRotationAlignmentAuto type:@encode(MGLSymbolStyleLayerIconRotationAlignment)]], @"%@ is not equal to %@", gLayer.iconRotationAlignment, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconRotationAlignmentAuto type:@encode(MGLSymbolStyleLayerIconRotationAlignment)]);
     XCTAssertEqualObjects(gLayer.iconSize, [MGLRuntimeStylingHelper testNumber]);
-    XCTAssert([(NSValue *)gLayer.iconTextFit isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTextFitHeight type:@encode(MGLSymbolStyleLayerIconTextFit)]], @"%@ is not equal to %@", gLayer.iconTextFit, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTextFitHeight type:@encode(MGLSymbolStyleLayerIconTextFit)]);
+    XCTAssert([(NSValue *)gLayer.iconTextFit isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTextFitBoth type:@encode(MGLSymbolStyleLayerIconTextFit)]], @"%@ is not equal to %@", gLayer.iconTextFit, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerIconTextFitBoth type:@encode(MGLSymbolStyleLayerIconTextFit)]);
     XCTAssertEqualObjects(gLayer.iconTextFitPadding, [MGLRuntimeStylingHelper testPadding]);
     XCTAssertEqualObjects(gLayer.iconImage, [MGLRuntimeStylingHelper testString]);
     XCTAssertEqualObjects(gLayer.iconRotate, [MGLRuntimeStylingHelper testNumber]);
@@ -123,7 +123,7 @@ MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithLayerIdentifie
     layer.iconOptional = [MGLRuntimeStylingHelper testBoolFunction];
     layer.iconRotationAlignment = [MGLRuntimeStylingHelper testEnumFunction:MGLSymbolStyleLayerIconRotationAlignmentAuto type:@encode(MGLSymbolStyleLayerIconRotationAlignment)];
     layer.iconSize = [MGLRuntimeStylingHelper testNumberFunction];
-    layer.iconTextFit = [MGLRuntimeStylingHelper testEnumFunction:MGLSymbolStyleLayerIconTextFitHeight type:@encode(MGLSymbolStyleLayerIconTextFit)];
+    layer.iconTextFit = [MGLRuntimeStylingHelper testEnumFunction:MGLSymbolStyleLayerIconTextFitBoth type:@encode(MGLSymbolStyleLayerIconTextFit)];
     layer.iconTextFitPadding = [MGLRuntimeStylingHelper testPaddingFunction];
     layer.iconImage = [MGLRuntimeStylingHelper testStringFunction];
     layer.iconRotate = [MGLRuntimeStylingHelper testNumberFunction];
@@ -172,7 +172,7 @@ MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithLayerIdentifie
     XCTAssertEqualObjects(gLayer.iconOptional, [MGLRuntimeStylingHelper testBoolFunction]);
     XCTAssertEqualObjects(gLayer.iconRotationAlignment, [MGLRuntimeStylingHelper testEnumFunction:MGLSymbolStyleLayerIconRotationAlignmentAuto type:@encode(MGLSymbolStyleLayerIconRotationAlignment)]);
     XCTAssertEqualObjects(gLayer.iconSize, [MGLRuntimeStylingHelper testNumberFunction]);
-    XCTAssertEqualObjects(gLayer.iconTextFit, [MGLRuntimeStylingHelper testEnumFunction:MGLSymbolStyleLayerIconTextFitHeight type:@encode(MGLSymbolStyleLayerIconTextFit)]);
+    XCTAssertEqualObjects(gLayer.iconTextFit, [MGLRuntimeStylingHelper testEnumFunction:MGLSymbolStyleLayerIconTextFitBoth type:@encode(MGLSymbolStyleLayerIconTextFit)]);
     XCTAssertEqualObjects(gLayer.iconTextFitPadding, [MGLRuntimeStylingHelper testPaddingFunction]);
     XCTAssertEqualObjects(gLayer.iconImage, [MGLRuntimeStylingHelper testStringFunction]);
     XCTAssertEqualObjects(gLayer.iconRotate, [MGLRuntimeStylingHelper testNumberFunction]);
