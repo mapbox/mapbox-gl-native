@@ -42,6 +42,15 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     return self;
 }
 
+- (instancetype)initWithIdentifier:(NSString *)identifier features:(NSArray<id<MGLFeature>> *)features options:(NS_DICTIONARY_OF(NSString *,id) *)options {
+    if (self = [super initWithIdentifier:identifier]) {
+        _features = features;
+        _options = options;
+    }
+    
+    return self;
+}
+
 - (mbgl::style::GeoJSONOptions)geoJSONOptions
 {
     auto mbglOptions = mbgl::style::GeoJSONOptions();
@@ -100,8 +109,26 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     if (self.URL) {
         NSURL *url = self.URL.mgl_URLByStandardizingScheme;
         source->setURL(url.absoluteString.UTF8String);
-    } else {
+    } else if (self.geoJSONData) {
         NSString *string = [[NSString alloc] initWithData:self.geoJSONData encoding:NSUTF8StringEncoding];
+        const auto geojson = mapbox::geojson::parse(string.UTF8String).get<mapbox::geojson::feature_collection>();
+        source->setGeoJSON(geojson);
+        _features = MGLFeaturesFromMBGLFeatures(geojson);
+    } else {
+    
+        NSMutableArray *featuresArray = [NSMutableArray array];
+        for (id<MGLFeature> feature in self.features) {
+            [featuresArray addObject:[feature featureDictionary]];
+        }
+        
+        NSDictionary *featureCollection = @{
+            @"type":@"FeatureCollection",
+            @"features":featuresArray};
+        
+        NSError *error;
+        NSData *featuresJSONData = [NSJSONSerialization dataWithJSONObject:featureCollection options:0 error:&error];
+        
+        NSString *string = [[NSString alloc] initWithData:featuresJSONData encoding:NSUTF8StringEncoding];
         const auto geojson = mapbox::geojson::parse(string.UTF8String).get<mapbox::geojson::feature_collection>();
         source->setGeoJSON(geojson);
         _features = MGLFeaturesFromMBGLFeatures(geojson);

@@ -83,6 +83,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, readonly) NS_DICTIONARY_OF(NSString *, id) *attributes;
 
+
+
+- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary;
+
 /**
  Returns the feature attribute for the given attribute name.
  
@@ -140,6 +144,11 @@ NS_ASSUME_NONNULL_BEGIN
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
 @interface MGLShapeCollectionFeature : MGLShapeCollection <MGLFeature>
+
+@property (nonatomic, copy, readonly) NS_ARRAY_OF(MGLShape<MGLFeature> *) *shapes;
+
++ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)shapes;
+
 @end
 
 NS_ASSUME_NONNULL_END

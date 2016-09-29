@@ -61,6 +61,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingFilteredFill,
     MBXSettingsRuntimeStylingFilteredLines,
     MBXSettingsRuntimeStylingNumericFilteredFill,
+    MBXSettingsRuntimeStylingStyleQuery,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
@@ -304,6 +305,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Style Fill With Filter",
                 @"Style Lines With Filter",
                 @"Style Fill With Numeric Filter",
+                @"Style Query For GeoJSON",
             ]];
             break;
         case MBXSettingsMiscellaneous:
@@ -428,6 +430,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingNumericFilteredFill:
                     [self styleNumericFilteredFills];
+                    break;
+                case MBXSettingsRuntimeStylingStyleQuery:
+                    [self styleQuery];
                     break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
@@ -783,6 +788,27 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         regionsLayer.fillColor = [UIColor blueColor];
         regionsLayer.fillOpacity = @(0.5);
     });
+}
+
+
+- (void)styleQuery
+{
+    CGRect queryRect = CGRectInset(self.mapView.bounds, 100, 200);
+    NSArray *features = [self.mapView visibleFeaturesInRect:queryRect];
+    
+//    NSMutableArray *polygonFeatures = [NSMutableArray array];
+//    for (id<MGLFeature> feature in features) {
+//        if ([feature isMemberOfClass:[MGLPolygonFeature class]]) {
+//            [polygonFeatures addObject:feature];
+//        }
+//    }
+    
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"query-id" features:features options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"query-layer-id" source:source];
+    fillLayer.fillColor = [UIColor blueColor];
+    [self.mapView.style addLayer:fillLayer];
 }
 
 - (IBAction)startWorldTour
