@@ -6,6 +6,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ Label placement relative to its geometry.
+ */
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerSymbolPlacement) {
     /**
      The label is placed at the point where the geometry is located.
@@ -17,6 +20,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerSymbolPlacement) {
     MGLSymbolStyleLayerSymbolPlacementLine,
 };
 
+/**
+ In combination with `symbolPlacement`, determines the rotation behavior of icons.
+ */
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconRotationAlignment) {
     /**
      When `symbolPlacement` is set to `point`, aligns icons east-west. When `symbolPlacement` is set to `line`, aligns icon x-axes with the line.
@@ -32,6 +38,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconRotationAlignment) {
     MGLSymbolStyleLayerIconRotationAlignmentAuto,
 };
 
+/**
+ Scales the icon to fit around the associated text.
+ */
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconTextFit) {
     /**
      The icon is displayed at its intrinsic aspect ratio.
@@ -51,6 +60,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconTextFit) {
     MGLSymbolStyleLayerIconTextFitBoth,
 };
 
+/**
+ Orientation of text when map is pitched.
+ */
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextPitchAlignment) {
     /**
      The text is aligned to the plane of the map.
@@ -66,6 +78,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextPitchAlignment) {
     MGLSymbolStyleLayerTextPitchAlignmentAuto,
 };
 
+/**
+ In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text.
+ */
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextRotationAlignment) {
     /**
      When `symbolPlacement` is set to `point`, aligns text east-west. When `symbolPlacement` is set to `line`, aligns text x-axes with the line.
@@ -81,6 +96,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextRotationAlignment) {
     MGLSymbolStyleLayerTextRotationAlignmentAuto,
 };
 
+/**
+ Text justification options.
+ */
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextJustify) {
     /**
      The text is aligned to the left.
@@ -96,6 +114,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextJustify) {
     MGLSymbolStyleLayerTextJustifyRight,
 };
 
+/**
+ Part of the text placed closest to the anchor.
+ */
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextAnchor) {
     /**
      The center of the text is placed closest to the anchor.
@@ -135,6 +156,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextAnchor) {
     MGLSymbolStyleLayerTextAnchorBottomRight,
 };
 
+/**
+ Specifies how to capitalize text, similar to the CSS `text-transform` property.
+ */
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTransform) {
     /**
      The text is not altered.
@@ -150,6 +174,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTransform) {
     MGLSymbolStyleLayerTextTransformLowercase,
 };
 
+/**
+ Controls the translation reference point.
+ */
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconTranslateAnchor) {
     /**
      Icons are translated relative to the map.
@@ -161,6 +188,9 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconTranslateAnchor) {
     MGLSymbolStyleLayerIconTranslateAnchorViewport,
 };
 
+/**
+ Controls the translation reference point.
+ */
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
     /**
      The text is translated relative to the map.

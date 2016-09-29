@@ -6,6 +6,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ Controls the translation reference point.
+ */
 typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
     /**
      The fill is translated relative to the map.

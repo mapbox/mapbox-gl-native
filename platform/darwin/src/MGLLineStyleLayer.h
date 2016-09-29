@@ -6,6 +6,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ The display of line endings.
+ */
 typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineCap) {
     /**
      A cap with a squared-off end which is drawn to the exact endpoint of the line.
@@ -21,6 +24,9 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineCap) {
     MGLLineStyleLayerLineCapSquare,
 };
 
+/**
+ The display of lines when joining.
+ */
 typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineJoin) {
     /**
      A join with a squared-off end which is drawn beyond the endpoint of the line at a distance of one-half of the line's width.
@@ -36,6 +42,9 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineJoin) {
     MGLLineStyleLayerLineJoinMiter,
 };
 
+/**
+ Controls the translation reference point.
+ */
 typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
     /**
      The line is translated relative to the map.

@@ -6,6 +6,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ Controls the translation reference point.
+ */
 typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCircleTranslateAnchor) {
     /**
      The circle is translated relative to the map.
@@ -17,6 +20,9 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCircleTranslateAnchor) {
     MGLCircleStyleLayerCircleTranslateAnchorViewport,
 };
 
+/**
+ Controls the scaling behavior of the circle when the map is pitched.
+ */
 typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
     /**
      Circles are scaled according to their apparent distance to the camera.
