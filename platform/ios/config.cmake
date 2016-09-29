@@ -15,6 +15,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/darwin/src/http_file_source.mm
         PRIVATE platform/default/asset_file_source.cpp
         PRIVATE platform/default/default_file_source.cpp
+        PRIVATE platform/default/local_file_source.cpp
         PRIVATE platform/default/online_file_source.cpp
 
         # Offline
