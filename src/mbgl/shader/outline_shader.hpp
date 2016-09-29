@@ -10,12 +10,12 @@ class OutlineShader : public Shader {
 public:
     OutlineShader(gl::Context&, Defines defines = None);
 
-    void bind(GLbyte *offset) final;
+    void bind(int8_t* offset) final;
 
-    UniformMatrix<4>                u_matrix         = {"u_matrix",        *this};
-    Uniform<Color>                  u_outline_color  = {"u_outline_color", *this};
-    Uniform<GLfloat>                u_opacity        = {"u_opacity",       *this};
-    Uniform<std::array<GLfloat, 2>> u_world          = {"u_world",         *this};
+    UniformMatrix<4>              u_matrix         = {"u_matrix",        *this};
+    Uniform<Color>                u_outline_color  = {"u_outline_color", *this};
+    Uniform<float>                u_opacity        = {"u_opacity",       *this};
+    Uniform<std::array<float, 2>> u_world          = {"u_world",         *this};
 };
 
 } // namespace mbgl

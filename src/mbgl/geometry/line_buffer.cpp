@@ -1,12 +1,11 @@
 #include <mbgl/geometry/line_buffer.hpp>
-#include <mbgl/gl/gl.hpp>
 
 #include <cmath>
 
 namespace mbgl {
 
-GLsizei LineVertexBuffer::add(vertex_type x, vertex_type y, float ex, float ey, bool tx, bool ty, int8_t dir, int32_t linesofar) {
-    GLsizei idx = index();
+size_t LineVertexBuffer::add(vertex_type x, vertex_type y, float ex, float ey, bool tx, bool ty, int8_t dir, int32_t linesofar) {
+    size_t idx = index();
     void *data = addElement();
 
     int16_t *coords = static_cast<int16_t *>(data);

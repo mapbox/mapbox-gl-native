@@ -12,7 +12,7 @@ CircleShader::CircleShader(gl::Context& context, Defines defines)
              context, defines) {
 }
 
-void CircleShader::bind(GLbyte* offset) {
+void CircleShader::bind(int8_t* offset) {
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
     MBGL_CHECK_ERROR(glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 4, offset));
 }

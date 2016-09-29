@@ -85,6 +85,7 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/object.cpp
     src/mbgl/gl/object.hpp
     src/mbgl/gl/state.hpp
+    src/mbgl/gl/types.hpp
     src/mbgl/gl/value.cpp
     src/mbgl/gl/value.hpp
 

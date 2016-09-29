@@ -1,5 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/gl/gl.hpp>
+
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
@@ -33,11 +35,12 @@ void Painter::renderFill(PaintParameters& parameters,
     bool outline = properties.fillAntialias && !pattern && isOutlineColorDefined;
     bool fringeline = properties.fillAntialias && !pattern && !isOutlineColorDefined;
 
-    context.stencilOp.reset();
-    context.stencilTest = GL_TRUE;
-    context.depthFunc.reset();
-    context.depthTest = GL_TRUE;
-    context.depthMask = GL_TRUE;
+    context.stencilOp = { gl::StencilTestOperation::Keep, gl::StencilTestOperation::Keep,
+                          gl::StencilTestOperation::Replace };
+    context.stencilTest = true;
+    context.depthFunc = gl::DepthTestFunction::LessEqual;
+    context.depthTest = true;
+    context.depthMask = true;
     context.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
     auto& outlineShader = parameters.shaders.outline;

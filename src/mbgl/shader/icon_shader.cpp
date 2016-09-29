@@ -12,7 +12,7 @@ IconShader::IconShader(gl::Context& context, Defines defines)
              context, defines) {
 }
 
-void IconShader::bind(GLbyte* offset) {
+void IconShader::bind(int8_t* offset) {
     const GLsizei stride = 16;
 
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));

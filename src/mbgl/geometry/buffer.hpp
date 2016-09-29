@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -13,15 +12,13 @@
 
 namespace mbgl {
 
-template <
-    GLsizei item_size,
-    GLenum target = GL_ARRAY_BUFFER,
-    GLsizei defaultLength = 8192,
-    bool retainAfterUpload = false
->
+template <size_t item_size,
+          gl::BufferType target = gl::BufferType::Vertex,
+          size_t defaultLength = 8192,
+          bool retainAfterUpload = false>
 class Buffer : private util::noncopyable {
-    static_assert(target == GL_ARRAY_BUFFER || target == GL_ELEMENT_ARRAY_BUFFER,
-                  "target must be one of GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER");
+    static_assert(target == gl::BufferType::Vertex || target == gl::BufferType::Element,
+                  "target must be one of gl::BufferType::Vertex or gl::BufferType::Element");
 
 public:
     ~Buffer() {
@@ -30,8 +27,8 @@ public:
 
     // Returns the number of elements in this buffer. This is not the number of
     // bytes, but rather the number of coordinates with associated information.
-    GLsizei index() const {
-        return static_cast<GLsizei>(pos / itemSize);
+    size_t index() const {
+        return static_cast<size_t>(pos / itemSize);
     }
 
     bool empty() const {
@@ -45,7 +42,7 @@ public:
             buffer = context.createBuffer();
         }
 
-        if (target == GL_ARRAY_BUFFER) {
+        if (target == gl::BufferType::Vertex) {
             context.vertexBuffer = *buffer;
         } else {
             context.elementBuffer = *buffer;
@@ -56,7 +53,7 @@ public:
                 Log::Debug(Event::OpenGL, "Buffer doesn't contain elements");
                 pos = 0;
             }
-            MBGL_CHECK_ERROR(glBufferData(target, pos, array, GL_STATIC_DRAW));
+            context.uploadBuffer(target, pos, array);
             if (!retainAfterUpload) {
                 cleanup();
             }
@@ -103,10 +100,10 @@ public:
 
 private:
     // CPU buffer
-    GLvoid *array = nullptr;
+    void* array = nullptr;
 
     // Byte position where we are writing.
-    GLsizeiptr pos = 0;
+    size_t pos = 0;
 
     // Number of bytes that are valid in this buffer.
     size_t length = 0;

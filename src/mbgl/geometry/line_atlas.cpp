@@ -11,10 +11,10 @@
 
 namespace mbgl {
 
-LineAtlas::LineAtlas(GLsizei w, GLsizei h)
+LineAtlas::LineAtlas(uint16_t w, uint16_t h)
     : width(w),
       height(h),
-      data(std::make_unique<GLbyte[]>(w * h)),
+      data(std::make_unique<char[]>(w * h)),
       dirty(true) {
 }
 
@@ -120,13 +120,13 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
     return position;
 }
 
-void LineAtlas::upload(gl::Context& context, uint32_t unit) {
+void LineAtlas::upload(gl::Context& context, gl::TextureUnit unit) {
     if (dirty) {
         bind(context, unit);
     }
 }
 
-void LineAtlas::bind(gl::Context& context, uint32_t unit) {
+void LineAtlas::bind(gl::Context& context, gl::TextureUnit unit) {
     bool first = false;
     if (!texture) {
         texture = context.createTexture();

@@ -2,6 +2,8 @@
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/gl/gl.hpp>
+
 
 namespace mbgl {
 

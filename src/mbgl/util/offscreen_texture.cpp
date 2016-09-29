@@ -1,4 +1,5 @@
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/util/offscreen_texture.hpp>
 
 #include <cassert>
@@ -51,7 +52,7 @@ void OffscreenTexture::bind(gl::Context& context,
         context.bindFramebuffer = *framebuffer;
     }
 
-    context.viewport = { { 0, 0, static_cast<GLint>(size[0]), static_cast<GLint>(size[1]) } };
+    context.viewport = { 0, 0, size[0], size[1] };
 }
 
 Raster& OffscreenTexture::getTexture() {

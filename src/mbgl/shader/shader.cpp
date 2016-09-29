@@ -107,4 +107,8 @@ Shader::~Shader() {
     }
 }
 
+gl::UniformLocation Shader::getUniformLocation(const char* uniform) const {
+    return MBGL_CHECK_ERROR(glGetUniformLocation(program.get(), uniform));
+}
+
 } // namespace mbgl

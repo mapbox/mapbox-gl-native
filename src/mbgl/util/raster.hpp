@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <array>
+#include <vector>
 
 namespace mbgl {
 

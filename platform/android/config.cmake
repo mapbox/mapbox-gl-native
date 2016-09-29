@@ -1,3 +1,5 @@
+add_definitions(-DMBGL_USE_GLES2=1)
+
 #Include to use build specific variables
 include(${CMAKE_CURRENT_BINARY_DIR}/toolchain.cmake)
 

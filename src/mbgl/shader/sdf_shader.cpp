@@ -12,7 +12,7 @@ SDFShader::SDFShader(gl::Context& context, Defines defines)
              context, defines) {
 }
 
-void SDFShader::bind(GLbyte* offset) {
+void SDFShader::bind(int8_t* offset) {
     const int stride = 16;
 
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));

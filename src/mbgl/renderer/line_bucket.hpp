@@ -43,9 +43,9 @@ private:
     };
     void addCurrentVertex(const GeometryCoordinate& currentVertex, double& distance,
             const Point<double>& normal, double endLeft, double endRight, bool round,
-            GLint startVertex, std::vector<LineBucket::TriangleElement>& triangleStore);
+            int32_t startVertex, std::vector<LineBucket::TriangleElement>& triangleStore);
     void addPieSliceVertex(const GeometryCoordinate& currentVertex, double distance,
-            const Point<double>& extrude, bool lineTurnsLeft, GLint startVertex,
+            const Point<double>& extrude, bool lineTurnsLeft, int32_t startVertex,
             std::vector<TriangleElement>& triangleStore);
 
 public:
@@ -55,9 +55,9 @@ private:
     LineVertexBuffer vertexBuffer;
     TriangleElementsBuffer triangleElementsBuffer;
 
-    GLint e1;
-    GLint e2;
-    GLint e3;
+    int32_t e1;
+    int32_t e2;
+    int32_t e3;
 
     std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
 
