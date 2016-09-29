@@ -179,6 +179,14 @@
 		40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 40FDA76A1CCAAA6800442548 /* MBXAnnotationView.m */; };
 		554180421D2E97DE00012372 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 554180411D2E97DE00012372 /* OpenGLES.framework */; };
 		55D8C9961D0F18CE00F42F10 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D8C9951D0F18CE00F42F10 /* libsqlite3.tbd */; };
+		7E016D7E1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E016D7C1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h */; };
+		7E016D7F1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E016D7C1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h */; };
+		7E016D801D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E016D7D1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m */; };
+		7E016D811D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E016D7D1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m */; };
+		7E016D841D9E890300A29A21 /* MGLPolygon+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E016D821D9E890300A29A21 /* MGLPolygon+MGLAdditions.h */; };
+		7E016D851D9E890300A29A21 /* MGLPolygon+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E016D821D9E890300A29A21 /* MGLPolygon+MGLAdditions.h */; };
+		7E016D861D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */; };
+		7E016D871D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */; };
 		DA0CD5901CF56F6A00A5F5A5 /* MGLFeatureTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */; };
 		DA17BE301CC4BAC300402C41 /* MGLMapView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA17BE2F1CC4BAC300402C41 /* MGLMapView_Private.h */; };
 		DA17BE311CC4BDAA00402C41 /* MGLMapView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA17BE2F1CC4BAC300402C41 /* MGLMapView_Private.h */; };
@@ -601,6 +609,10 @@
 		554180411D2E97DE00012372 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		55D8C9941D0F133500F42F10 /* config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = config.xcconfig; path = ../../build/ios/config.xcconfig; sourceTree = "<group>"; };
 		55D8C9951D0F18CE00F42F10 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		7E016D7C1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLPolyline+MGLAdditions.h"; sourceTree = "<group>"; };
+		7E016D7D1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLPolyline+MGLAdditions.m"; sourceTree = "<group>"; };
+		7E016D821D9E890300A29A21 /* MGLPolygon+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLPolygon+MGLAdditions.h"; sourceTree = "<group>"; };
+		7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLPolygon+MGLAdditions.m"; sourceTree = "<group>"; };
 		DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
 		DA17BE2F1CC4BAC300402C41 /* MGLMapView_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapView_Private.h; sourceTree = "<group>"; };
 		DA1DC94A1CB6C1C2006E619F /* Mapbox GL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1355,6 +1367,10 @@
 				3510FFEF1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm */,
 				3510FFF71D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.h */,
 				3510FFF81D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.mm */,
+				7E016D7C1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h */,
+				7E016D7D1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m */,
+				7E016D821D9E890300A29A21 /* MGLPolygon+MGLAdditions.h */,
+				7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -1419,6 +1435,7 @@
 				4018B1C91CDC288A00F666AF /* MGLAnnotationView_Private.h in Headers */,
 				35E1A4D81D74336F007AA97F /* MGLValueEvaluator.h in Headers */,
 				DA88482C1CBAFA6200AB86E3 /* NSBundle+MGLAdditions.h in Headers */,
+				7E016D7E1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h in Headers */,
 				35D13AB71D3D15E300AFB4E0 /* MGLStyleLayer.h in Headers */,
 				354D42DC1D4919F900F400A1 /* NSValue+MGLStyleAttributeAdditions_Private.h in Headers */,
 				DA88488E1CBB047F00AB86E3 /* reachability.h in Headers */,
@@ -1440,6 +1457,7 @@
 				DA8847FC1CBAFA5100AB86E3 /* MGLStyle.h in Headers */,
 				354B83961D2E873E005D9406 /* MGLUserLocationAnnotationView.h in Headers */,
 				DA8847F01CBAFA5100AB86E3 /* MGLAnnotation.h in Headers */,
+				7E016D841D9E890300A29A21 /* MGLPolygon+MGLAdditions.h in Headers */,
 				DA88483E1CBAFB8500AB86E3 /* MGLMapView+MGLCustomStyleLayerAdditions.h in Headers */,
 				4018B1CA1CDC288E00F666AF /* MGLAnnotationView.h in Headers */,
 				350098C61D48288B004B2AF0 /* NSNumber+MGLStyleAttributeAdditions_Private.h in Headers */,
@@ -1552,6 +1570,7 @@
 				350098CB1D482D9C004B2AF0 /* NSArray+MGLStyleAttributeAdditions.h in Headers */,
 				3510FFEB1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.h in Headers */,
 				35E1A4D91D74336F007AA97F /* MGLValueEvaluator.h in Headers */,
+				7E016D7F1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h in Headers */,
 				DABFB8701CBE9A0F00D62B32 /* MGLMapView+IBAdditions.h in Headers */,
 				353AFA151D65AB17005A69F4 /* NSDate+MGLAdditions.h in Headers */,
 				350098D91D4830D5004B2AF0 /* NSString+MGLStyleAttributeAdditions_Private.h in Headers */,
@@ -1583,6 +1602,7 @@
 				4018B1CB1CDC288E00F666AF /* MGLAnnotationView.h in Headers */,
 				DABFB85F1CBE99E500D62B32 /* MGLGeometry.h in Headers */,
 				354D42DD1D4919F900F400A1 /* NSValue+MGLStyleAttributeAdditions_Private.h in Headers */,
+				7E016D851D9E890300A29A21 /* MGLPolygon+MGLAdditions.h in Headers */,
 				353933F61D3FB785003F57D7 /* MGLBackgroundStyleLayer.h in Headers */,
 				DABFB85D1CBE99E500D62B32 /* MGLAccountManager.h in Headers */,
 				353933F91D3FB79F003F57D7 /* MGLLineStyleLayer.h in Headers */,
@@ -1932,6 +1952,7 @@
 			files = (
 				35136D391D42271A00C20EFD /* MGLBackgroundStyleLayer.mm in Sources */,
 				3510FFEC1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm in Sources */,
+				7E016D801D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m in Sources */,
 				350098D51D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.mm in Sources */,
 				3593E5231D529C29006D9365 /* MGLStyleAttribute.mm in Sources */,
 				350098B11D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.mm in Sources */,
@@ -1981,6 +2002,7 @@
 				DA88481D1CBAFA6200AB86E3 /* MGLMapCamera.mm in Sources */,
 				DA8848261CBAFA6200AB86E3 /* MGLPolygon.mm in Sources */,
 				35B82BFA1D6C5F8400B1B721 /* NSPredicate+MGLAdditions.mm in Sources */,
+				7E016D861D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */,
 				DA8848521CBAFB9800AB86E3 /* MGLAPIClient.m in Sources */,
 				DA8848301CBAFA6200AB86E3 /* NSProcessInfo+MGLAdditions.m in Sources */,
 				353AFA161D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */,
@@ -2003,6 +2025,7 @@
 			files = (
 				35136D3A1D42271A00C20EFD /* MGLBackgroundStyleLayer.mm in Sources */,
 				3510FFED1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm in Sources */,
+				7E016D811D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m in Sources */,
 				350098D61D4830A6004B2AF0 /* NSString+MGLStyleAttributeAdditions.mm in Sources */,
 				354B83991D2E873E005D9406 /* MGLUserLocationAnnotationView.m in Sources */,
 				DAA4E4221CBB730400178DFB /* MGLPointAnnotation.m in Sources */,
@@ -2052,6 +2075,7 @@
 				4018B1C81CDC287F00F666AF /* MGLAnnotationView.mm in Sources */,
 				DAA4E4341CBB730400178DFB /* MGLFaux3DUserLocationAnnotationView.m in Sources */,
 				35B82BFB1D6C5F8400B1B721 /* NSPredicate+MGLAdditions.mm in Sources */,
+				7E016D871D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */,
 				DAA4E4311CBB730400178DFB /* MGLMapboxEvents.m in Sources */,
 				DAA4E4231CBB730400178DFB /* MGLPolygon.mm in Sources */,
 				353AFA171D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */,

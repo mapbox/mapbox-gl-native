@@ -6,7 +6,8 @@
 #import "MGLValueEvaluator.h"
 
 #import "MGLMultiPoint_Private.h"
-
+#import "MGLPolyline+MGLAdditions.h"
+#import "MGLPolygon+MGLAdditions.h"
 #import <mbgl/util/geometry.hpp>
 
 @protocol MGLFeaturePrivate <MGLFeature>
@@ -28,6 +29,17 @@
     return self.attributes[key];
 }
 
+- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
+    
+    return @{@"type":@"Feature",
+             @"properties":(self.attributes) ? self.attributes : @{},
+                     @"geometry":@{
+                             @"type":@"Point",
+                             @"coordinates":@[@(self.coordinate.longitude), @(self.coordinate.latitude)]
+                             }
+            };
+}
+
 @end
 
 @interface MGLPolylineFeature () <MGLFeaturePrivate>
@@ -37,9 +49,20 @@
 
 @synthesize identifier;
 @synthesize attributes;
+// 
 
 - (id)attributeForKey:(NSString *)key {
     return self.attributes[key];
+}
+
+- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
+    return @{@"type":@"Feature",
+             @"properties":(self.attributes) ? self.attributes : @{},
+             @"geometry":@{
+                     @"type":@"LineString",
+                     @"coordinates":self.mgl_coordinates
+                     }
+             };;
 }
 
 @end
@@ -56,6 +79,16 @@
     return self.attributes[key];
 }
 
+- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
+    return @{@"type":@"Feature",
+             @"properties":(self.attributes) ? self.attributes : @{},
+             @"geometry":@{
+                    @"type":@"Polygon",
+                    @"coordinates":self.mgl_coordinates
+                    }
+            };
+}
+
 @end
 
 @interface MGLMultiPointFeature () <MGLFeaturePrivate>
@@ -68,6 +101,23 @@
 
 - (id)attributeForKey:(NSString *)key {
     return self.attributes[key];
+}
+
+- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
+    NSMutableArray *coordinates = [NSMutableArray array];
+    
+    for (NSUInteger index = 0; index < self.pointCount; index++) {
+        CLLocationCoordinate2D coordinate = self.coordinates[index];
+        [coordinates addObject:@[@(coordinate.longitude), @(coordinate.latitude)]];
+    }
+    
+    return @{@"type":@"Feature",
+             @"properties":(self.attributes) ? self.attributes : @{},
+             @"geometry":@{
+                     @"type":@"Multipoint",
+                     @"coordinates":coordinates
+                     }
+             };
 }
 
 @end
@@ -84,6 +134,21 @@
     return self.attributes[key];
 }
 
+- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
+    NSMutableArray *coordinates = [NSMutableArray array];
+    for (MGLPolylineFeature *feature in self.polylines) {
+        [coordinates addObject:feature.mgl_coordinates];
+    }
+    
+    return @{@"type":@"Feature",
+             @"properties":(self.attributes) ? self.attributes : @{},
+             @"geometry":@{
+                     @"type":@"MultiLineString",
+                     @"coordinates":coordinates
+                     }
+             };
+}
+
 @end
 
 @interface MGLMultiPolygonFeature () <MGLFeaturePrivate>
@@ -98,6 +163,21 @@
     return self.attributes[key];
 }
 
+- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
+    NSMutableArray *coordinates = [NSMutableArray array];
+    for (MGLPolygonFeature *feature in self.polygons) {
+        [coordinates addObject:feature.mgl_coordinates];
+    }
+    
+    return @{@"type":@"Feature",
+             @"properties":(self.attributes) ? self.attributes : @{},
+             @"geometry":@{
+                     @"type":@"MultiPolygon",
+                     @"coordinates":coordinates
+                     }
+             };
+}
+
 @end
 
 @interface MGLShapeCollectionFeature () <MGLFeaturePrivate>
@@ -108,10 +188,43 @@
 @synthesize identifier;
 @synthesize attributes;
 
+@dynamic shapes;
+
++ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)shapes {
+    return [super shapeCollectionWithShapes:shapes];
+}
+
 - (id)attributeForKey:(NSString *)key {
     return self.attributes[key];
 }
 
+- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
+    
+    return @{@"type":@"Feature",
+             @"properties":(self.attributes) ? self.attributes : @{},
+             @"geometry":@{
+                     @"type":@"GeometryCollection",
+                     @"geometries":[self geometryCollection:self.shapes]
+                     }
+             };
+}
+
+- (NS_MUTABLE_ARRAY_OF(NS_DICTIONARY_OF(NSString *, id) *) *)geometryCollection:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)shapes {
+    NSMutableArray *geometries = [NSMutableArray array];
+    
+    for (MGLShape<MGLFeature> *shape in shapes) {
+        if ([shape isKindOfClass:[MGLShapeCollectionFeature class]]) {
+            [geometries addObject:@{@"type":@"GeometryCollection",
+                                    @"geometries":[self geometryCollection:((MGLShapeCollectionFeature *)shape).shapes]}];
+        } else {
+            NSDictionary *geometry = shape.featureDictionary[@"geometry"];
+            [geometries addObject:@{@"type":geometry[@"type"],
+                                @"coordinates":geometry[@"coordinates"] }];
+        }
+    }
+    
+    return geometries;
+}
 @end
 
 
