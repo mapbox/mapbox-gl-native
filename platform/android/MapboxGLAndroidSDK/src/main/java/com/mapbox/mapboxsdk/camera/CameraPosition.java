@@ -3,11 +3,9 @@ package com.mapbox.mapboxsdk.camera;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.FloatRange;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.constants.MathConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
@@ -125,22 +123,12 @@ public final class CameraPosition implements Parcelable {
         private LatLng target = null;
         private double tilt = -1;
         private double zoom = -1;
-        private boolean isRadian;
 
         /**
          * Creates an empty builder.
          */
         public Builder() {
             super();
-        }
-
-        /**
-         * Creates a builder for building CameraPosition objects using radians.
-         *
-         * @param isRadian true if heading is in radians
-         */
-        public Builder(boolean isRadian) {
-            this.isRadian = isRadian;
         }
 
         /**
@@ -170,7 +158,7 @@ public final class CameraPosition implements Parcelable {
                 double lat = typedArray.getFloat(R.styleable.MapView_center_latitude, 0.0f);
                 double lng = typedArray.getFloat(R.styleable.MapView_center_longitude, 0.0f);
                 this.target = new LatLng(lat, lng);
-                this.tilt = typedArray.getFloat(R.styleable.MapView_tilt, 0.0f);
+                this.tilt = Math.toRadians(typedArray.getFloat(R.styleable.MapView_tilt, 0.0f));
                 this.zoom = typedArray.getFloat(R.styleable.MapView_zoom, 0.0f);
             }
         }
@@ -203,7 +191,7 @@ public final class CameraPosition implements Parcelable {
         }
 
         /**
-         * Create Builder from an exisiting array of doubles.
+         * Create Builder from an existing array of doubles.
          *
          * @param values Values containing target, bearing, tilt and zoom
          */
@@ -212,7 +200,7 @@ public final class CameraPosition implements Parcelable {
             if (values != null && values.length == 5) {
                 this.target = new LatLng(values[0], values[1]);
                 this.bearing = (float) values[2];
-                this.tilt = (float) values[3];
+                this.tilt = Math.toRadians(values[3]);
                 this.zoom = (float) values[4];
             }
         }
@@ -224,12 +212,7 @@ public final class CameraPosition implements Parcelable {
          * @return Builder
          */
         public Builder bearing(double bearing) {
-            if (isRadian) {
-                this.bearing = bearing;
-            } else {
-                // converting degrees to radians
-                this.bearing = (float) (-bearing * MathConstants.DEG2RAD);
-            }
+            this.bearing = bearing;
             return this;
         }
 
@@ -259,14 +242,8 @@ public final class CameraPosition implements Parcelable {
          * @param tilt Tilt value
          * @return Builder
          */
-        @FloatRange(from = 0.0, to = 60.0)
         public Builder tilt(double tilt) {
-            if (isRadian) {
-                this.tilt = tilt;
-            } else {
-                // converting degrees to radians
-                this.tilt = (float) (MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT) * MathConstants.DEG2RAD);
-            }
+            this.tilt = (float) Math.toRadians(MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT));
             return this;
         }
 

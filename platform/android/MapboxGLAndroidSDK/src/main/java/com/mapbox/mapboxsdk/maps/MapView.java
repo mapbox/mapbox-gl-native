@@ -382,7 +382,7 @@ public class MapView extends FrameLayout {
             // Get previous camera position
             CameraPosition cameraPosition = savedInstanceState.getParcelable(MapboxConstants.STATE_CAMERA_POSITION);
             if (cameraPosition != null) {
-                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder(cameraPosition).build()));
             }
 
             UiSettings uiSettings = mapboxMap.getUiSettings();
