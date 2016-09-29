@@ -19,13 +19,13 @@ void VertexArrayObject::bindVertexArrayObject(gl::Context& context) {
         return;
     }
 
-    if (!vao) {
-        vao = context.createVAO();
+    if (!vertexArray) {
+        vertexArray = context.createVertexArray();
         context.vertexBuffer.setDirty();
         context.elementBuffer.setDirty();
     }
 
-    context.vertexArrayObject = *vao;
+    context.vertexArrayObject = *vertexArray;
 }
 
 void VertexArrayObject::verifyBinding(Shader& shader, GLuint vertexBuffer, GLuint elementsBuffer,

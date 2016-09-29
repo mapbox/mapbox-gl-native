@@ -31,14 +31,14 @@ void TextureDeleter::operator()(GLuint id) const {
     }
 }
 
-void VAODeleter::operator()(GLuint id) const {
+void VertexArrayDeleter::operator()(GLuint id) const {
     assert(context);
-    context->abandonedVAOs.push_back(id);
+    context->abandonedVertexArrays.push_back(id);
 }
 
-void FBODeleter::operator()(GLuint id) const {
+void FramebufferDeleter::operator()(GLuint id) const {
     assert(context);
-    context->abandonedFBOs.push_back(id);
+    context->abandonedFramebuffers.push_back(id);
 }
 
 } // namespace detail

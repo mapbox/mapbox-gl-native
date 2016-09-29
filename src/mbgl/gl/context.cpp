@@ -95,24 +95,26 @@ void Context::performCleanup() {
         abandonedTextures.clear();
     }
 
-    if (!abandonedVAOs.empty()) {
-        for (const auto id : abandonedVAOs) {
+    if (!abandonedVertexArrays.empty()) {
+        for (const auto id : abandonedVertexArrays) {
             if (vertexArrayObject == id) {
                 vertexArrayObject.setDirty();
             }
         }
-        MBGL_CHECK_ERROR(gl::DeleteVertexArrays(int(abandonedVAOs.size()), abandonedVAOs.data()));
-        abandonedVAOs.clear();
+        MBGL_CHECK_ERROR(gl::DeleteVertexArrays(int(abandonedVertexArrays.size()),
+                                                abandonedVertexArrays.data()));
+        abandonedVertexArrays.clear();
     }
 
-    if (!abandonedFBOs.empty()) {
-        for (const auto id : abandonedFBOs) {
+    if (!abandonedFramebuffers.empty()) {
+        for (const auto id : abandonedFramebuffers) {
             if (bindFramebuffer == id) {
                 bindFramebuffer.setDirty();
             }
         }
-        MBGL_CHECK_ERROR(glDeleteFramebuffers(int(abandonedFBOs.size()), abandonedFBOs.data()));
-        abandonedFBOs.clear();
+        MBGL_CHECK_ERROR(
+            glDeleteFramebuffers(int(abandonedFramebuffers.size()), abandonedFramebuffers.data()));
+        abandonedFramebuffers.clear();
     }
 }
 

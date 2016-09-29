@@ -42,16 +42,16 @@ public:
         return UniqueTexture { std::move(id), { this } };
     }
 
-    UniqueVAO createVAO() {
+    UniqueVertexArray createVertexArray() {
         GLuint id = 0;
         MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
-        return UniqueVAO { std::move(id), { this } };
+        return UniqueVertexArray { std::move(id), { this } };
     }
 
-    UniqueFBO createFBO() {
+    UniqueFramebuffer createFramebuffer() {
         GLuint id = 0;
         MBGL_CHECK_ERROR(glGenFramebuffers(1, &id));
-        return UniqueFBO { std::move(id), { this } };
+        return UniqueFramebuffer { std::move(id), { this } };
     }
 
     // Actually remove the objects we marked as abandoned with the above methods.
@@ -68,8 +68,8 @@ public:
             && abandonedShaders.empty()
             && abandonedBuffers.empty()
             && abandonedTextures.empty()
-            && abandonedVAOs.empty()
-            && abandonedFBOs.empty();
+            && abandonedVertexArrays.empty()
+            && abandonedFramebuffers.empty();
     }
 
     void resetState();
@@ -103,15 +103,15 @@ public:
     std::array<State<value::BindTexture>, 2> texture;
     State<value::BindBuffer<GL_ARRAY_BUFFER>> vertexBuffer;
     State<value::BindBuffer<GL_ELEMENT_ARRAY_BUFFER>> elementBuffer;
-    State<value::BindVAO> vertexArrayObject;
+    State<value::BindVertexArray> vertexArrayObject;
 
 private:
     friend detail::ProgramDeleter;
     friend detail::ShaderDeleter;
     friend detail::BufferDeleter;
     friend detail::TextureDeleter;
-    friend detail::VAODeleter;
-    friend detail::FBODeleter;
+    friend detail::VertexArrayDeleter;
+    friend detail::FramebufferDeleter;
 
     std::vector<GLuint> pooledTextures;
 
@@ -119,8 +119,8 @@ private:
     std::vector<GLuint> abandonedShaders;
     std::vector<GLuint> abandonedBuffers;
     std::vector<GLuint> abandonedTextures;
-    std::vector<GLuint> abandonedVAOs;
-    std::vector<GLuint> abandonedFBOs;
+    std::vector<GLuint> abandonedVertexArrays;
+    std::vector<GLuint> abandonedFramebuffers;
 };
 
 } // namespace gl

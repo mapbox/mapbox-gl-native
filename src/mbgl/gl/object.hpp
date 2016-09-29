@@ -31,12 +31,12 @@ struct TextureDeleter {
     void operator()(GLuint) const;
 };
 
-struct VAODeleter {
+struct VertexArrayDeleter {
     Context* context;
     void operator()(GLuint) const;
 };
 
-struct FBODeleter {
+struct FramebufferDeleter {
     Context* context;
     void operator()(GLuint) const;
 };
@@ -47,8 +47,8 @@ using UniqueProgram = std_experimental::unique_resource<GLuint, detail::ProgramD
 using UniqueShader = std_experimental::unique_resource<GLuint, detail::ShaderDeleter>;
 using UniqueBuffer = std_experimental::unique_resource<GLuint, detail::BufferDeleter>;
 using UniqueTexture = std_experimental::unique_resource<GLuint, detail::TextureDeleter>;
-using UniqueVAO = std_experimental::unique_resource<GLuint, detail::VAODeleter>;
-using UniqueFBO = std_experimental::unique_resource<GLuint, detail::FBODeleter>;
+using UniqueVertexArray = std_experimental::unique_resource<GLuint, detail::VertexArrayDeleter>;
+using UniqueFramebuffer = std_experimental::unique_resource<GLuint, detail::FramebufferDeleter>;
 
 } // namespace gl
 } // namespace mbgl

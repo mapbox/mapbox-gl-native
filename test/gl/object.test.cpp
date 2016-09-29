@@ -103,7 +103,7 @@ TEST(GLObject, Store) {
     context.reset();
     EXPECT_TRUE(context.empty());
 
-    mbgl::gl::UniqueVAO vao = context.createVAO();
+    mbgl::gl::UniqueVertexArray vao = context.createVertexArray();
     EXPECT_NE(vao.get(), 0u);
     vao.reset();
     EXPECT_FALSE(context.empty());
