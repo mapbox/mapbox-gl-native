@@ -25,7 +25,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerSymbolPlacement) {
  */
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconRotationAlignment) {
     /**
-     When `symbolPlacement` is set to `point`, aligns icons east-west. When `symbolPlacement` is set to `line`, aligns icon x-axes with the line.
+     When `symbolPlacement` is set to `MGLSymbolStyleLayerSymbolPlacementPoint`, aligns icons east-west. When `symbolPlacement` is set to `MGLSymbolStyleLayerSymbolPlacementLine`, aligns icon x-axes with the line.
      */
     MGLSymbolStyleLayerIconRotationAlignmentMap,
     /**
@@ -33,7 +33,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerIconRotationAlignment) {
      */
     MGLSymbolStyleLayerIconRotationAlignmentViewport,
     /**
-     When `symbolPlacement` is set to `point`, this is equivalent to `viewport`. When `symbolPlacement` is set to `line`, this is equivalent to `map`.
+     When `symbolPlacement` is set to `MGLSymbolStyleLayerSymbolPlacementPoint`, this is equivalent to `MGLSymbolStyleLayerIconRotationAlignmentViewport`. When `symbolPlacement` is set to `MGLSymbolStyleLayerSymbolPlacementLine`, this is equivalent to `MGLSymbolStyleLayerIconRotationAlignmentMap`.
      */
     MGLSymbolStyleLayerIconRotationAlignmentAuto,
 };
@@ -83,7 +83,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextPitchAlignment) {
  */
 typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextRotationAlignment) {
     /**
-     When `symbolPlacement` is set to `point`, aligns text east-west. When `symbolPlacement` is set to `line`, aligns text x-axes with the line.
+     When `symbolPlacement` is set to `MGLSymbolStyleLayerSymbolPlacementPoint`, aligns text east-west. When `symbolPlacement` is set to `MGLSymbolStyleLayerSymbolPlacementLine`, aligns text x-axes with the line.
      */
     MGLSymbolStyleLayerTextRotationAlignmentMap,
     /**
@@ -91,7 +91,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextRotationAlignment) {
      */
     MGLSymbolStyleLayerTextRotationAlignmentViewport,
     /**
-     When `symbolPlacement` is set to `point`, this is equivalent to `viewport`. When `symbolPlacement` is set to `line`, this is equivalent to `map`.
+     When `symbolPlacement` is set to `MGLSymbolStyleLayerSymbolPlacementPoint`, this is equivalent to `MGLSymbolStyleLayerTextRotationAlignmentViewport`. When `symbolPlacement` is set to `MGLSymbolStyleLayerSymbolPlacementLine`, this is equivalent to `MGLSymbolStyleLayerTextRotationAlignmentMap`.
      */
     MGLSymbolStyleLayerTextRotationAlignmentAuto,
 };
