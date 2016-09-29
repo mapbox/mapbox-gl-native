@@ -19,13 +19,11 @@ double lon(const uint8_t z, const int64_t x) {
 
 } // end namespace
 
-LatLng::LatLng(const CanonicalTileID& id) : latitude(lat(id.z, id.y)), longitude(lon(id.z, id.x)) {
-}
+LatLng::LatLng(const CanonicalTileID& id) : Coordinate(lon(id.z, id.x), lat(id.z, id.y)) {}
 
 LatLng::LatLng(const UnwrappedTileID& id)
-    : latitude(lat(id.canonical.z, id.canonical.y)),
-      longitude(lon(id.canonical.z, id.canonical.x) + id.wrap * util::DEGREES_MAX) {
-}
+    : Coordinate(lon(id.canonical.z, id.canonical.x) + id.wrap * util::DEGREES_MAX,
+                 lat(id.canonical.z, id.canonical.y)) {}
 
 LatLngBounds::LatLngBounds(const CanonicalTileID& id)
     : sw({ lat(id.z, id.y + 1), lon(id.z, id.x) }),

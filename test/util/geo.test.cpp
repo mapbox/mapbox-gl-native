@@ -6,6 +6,11 @@
 
 using namespace mbgl;
 
+TEST(LatLng, MixedCoordinateTypes) {
+    static_assert(std::is_assignable<LatLng, ScreenCoordinate>::value == false, "LatLng and ScreenCoordinate cannot be interchangeable.");
+    static_assert(std::is_assignable<LatLng, ProjectedMeters>::value == false, "LatLng and ProjectedMeters cannot be interchangeable.");
+}
+
 TEST(LatLngBounds, World) {
     auto result = LatLngBounds::world();
     ASSERT_DOUBLE_EQ(-90,  result.south());

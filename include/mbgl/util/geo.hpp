@@ -19,21 +19,28 @@ using ScreenCoordinate = mapbox::geometry::point<double>;
 using ScreenLineString = mapbox::geometry::line_string<double>;
 using ScreenBox        = mapbox::geometry::box<double>;
 
-class LatLng {
+using Coordinate       = ScreenCoordinate;
+
+class LatLng : public Coordinate {
 public:
     struct null {};
 
-    double latitude;
-    double longitude;
+    double& latitude  = Coordinate::y;
+    double& longitude = Coordinate::x;
 
     enum WrapMode : bool { Unwrapped, Wrapped };
 
-    LatLng(null) : latitude(std::numeric_limits<double>::quiet_NaN()), longitude(latitude) {}
+    constexpr LatLng(null)
+        : Coordinate(std::numeric_limits<double>::quiet_NaN(),
+                     std::numeric_limits<double>::quiet_NaN()) {}
 
-    LatLng(double lat = 0, double lon = 0, WrapMode mode = Unwrapped)
-        : latitude(lat), longitude(lon) { if (mode == Wrapped) wrap(); }
+    constexpr LatLng(double lat = 0, double lon = 0, WrapMode mode = Unwrapped)
+        : Coordinate(lon, lat) { if (mode == Wrapped) wrap(); }
 
-    LatLng wrapped() const { return { latitude, longitude, Wrapped }; }
+    constexpr LatLng(const LatLng& o) : Coordinate(o.x, o.y) {}
+    constexpr LatLng& operator=(const LatLng& o) { x = o.x; y = o.y; return *this; }
+
+    constexpr LatLng wrapped() const { return { latitude, longitude, Wrapped }; }
 
     void wrap() {
         longitude = util::wrap(longitude, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
@@ -57,30 +64,24 @@ public:
     LatLng(const UnwrappedTileID& id);
 };
 
-constexpr bool operator==(const LatLng& a, const LatLng& b) {
-    return a.latitude == b.latitude && a.longitude == b.longitude;
-}
-
-constexpr bool operator!=(const LatLng& a, const LatLng& b) {
-    return !(a == b);
-}
-
-class ProjectedMeters {
+class ProjectedMeters : public Coordinate {
 public:
-    double northing;
-    double easting;
+    struct null {};
 
-    ProjectedMeters(double n = 0, double e = 0)
-        : northing(n), easting(e) {}
+    double& northing = Coordinate::x;
+    double& easting  = Coordinate::y;
+
+    constexpr ProjectedMeters(null)
+        : Coordinate(std::numeric_limits<double>::quiet_NaN(),
+                     std::numeric_limits<double>::quiet_NaN()) {}
+
+    constexpr ProjectedMeters(double n = 0, double e = 0) : Coordinate(n, e) {}
+    constexpr ProjectedMeters& operator=(const ProjectedMeters& o) { x = o.x; y = o.y; return *this; }
 
     explicit operator bool() const {
         return !(std::isnan(northing) || std::isnan(easting));
     }
 };
-
-constexpr bool operator==(const ProjectedMeters& a, const ProjectedMeters& b) {
-    return a.northing == b.northing && a.easting == b.easting;
-}
 
 class LatLngBounds {
 public:
@@ -104,8 +105,7 @@ public:
     // Return a bounds that may serve as the identity element for the extend operation.
     static LatLngBounds empty() {
         LatLngBounds bounds = world();
-        std::swap(bounds.sw, bounds.ne);
-        return bounds;
+        return { bounds.ne, bounds.sw };
     }
 
     // Constructs a LatLngBounds object with the tile's exact boundaries.
@@ -118,12 +118,12 @@ public:
 
     LatLng southwest() const { return sw; }
     LatLng northeast() const { return ne; }
-    LatLng southeast() const { return LatLng(south(), east()); }
-    LatLng northwest() const { return LatLng(north(), west()); }
+    LatLng southeast() const { return { south(), east() }; }
+    LatLng northwest() const { return { north(), west() }; }
 
     LatLng center() const {
-        return LatLng((sw.latitude + ne.latitude) / 2,
-                      (sw.longitude + ne.longitude) / 2);
+        return { (sw.latitude + ne.latitude) / 2.0,
+                 (sw.longitude + ne.longitude) / 2.0 };
     }
 
     void extend(const LatLng& point) {
