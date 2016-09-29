@@ -1,6 +1,7 @@
 #include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/gl.hpp>
 
 namespace mbgl {
 
@@ -100,7 +101,7 @@ void FrameHistory::bind(gl::Context& context, uint32_t unit) {
         texture = context.createTexture();
         context.activeTexture = unit;
         context.texture[unit] = *texture;
-#ifndef GL_ES_VERSION_2_0
+#if not MBGL_USE_GLES2
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));

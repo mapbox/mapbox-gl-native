@@ -6,6 +6,7 @@
 #include <mbgl/style/source_impl.hpp>
 
 #include <mbgl/platform/log.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/debugging.hpp>
 
 #include <mbgl/style/style.hpp>
@@ -59,7 +60,7 @@ bool Painter::needsAnimation() const {
 void Painter::setClipping(const ClipID& clip) {
     const GLint ref = (GLint)clip.reference.to_ulong();
     const GLuint mask = (GLuint)clip.mask.to_ulong();
-    context.stencilFunc = { GL_EQUAL, ref, mask };
+    context.stencilFunc = { gl::StencilTestFunction::Equal, ref, mask };
 }
 
 void Painter::cleanup() {
@@ -69,7 +70,7 @@ void Painter::cleanup() {
 void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& annotationSpriteAtlas) {
     if (frame.framebufferSize != frame_.framebufferSize) {
         context.viewport.setDefaultValue(
-            { { 0, 0, frame_.framebufferSize[0], frame_.framebufferSize[1] } });
+            { 0, 0, frame_.framebufferSize[0], frame_.framebufferSize[1] });
     }
     frame = frame_;
 
@@ -130,15 +131,16 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         context.bindFramebuffer.reset();
         context.viewport.reset();
         context.stencilFunc.reset();
-        context.stencilTest = GL_TRUE;
+        context.stencilTest = true;
         context.stencilMask = 0xFF;
-        context.depthTest = GL_FALSE;
-        context.depthMask = GL_TRUE;
-        context.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
+        context.depthTest = false;
+        context.depthMask = true;
+        context.colorMask = { true, true, true, true };
 
         if (paintMode() == PaintMode::Overdraw) {
-            context.blend = GL_TRUE;
-            context.blendFunc = { GL_CONSTANT_COLOR, GL_ONE };
+            context.blend = true;
+            context.blendFunc = { gl::BlendSourceFactor::ConstantColor,
+                                  gl::BlendDestinationFactor::One };
             const float overdraw = 1.0f / 8.0f;
             context.blendColor = { overdraw, overdraw, overdraw, 0.0f };
             context.clearColor = Color::black();
@@ -164,7 +166,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         drawClippingMasks(parameters, generator.getStencils());
     }
 
-#ifndef NDEBUG
+#if not MBGL_USE_GLES2 and not defined(NDEBUG)
     if (frame.debugOptions & MapDebugOptions::StencilClip) {
         renderClipMasks();
         return;
@@ -207,7 +209,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         }
     }
 
-#ifndef NDEBUG
+#if not MBGL_USE_GLES2 and not defined(NDEBUG)
     if (frame.debugOptions & MapDebugOptions::DepthBuffer) {
         renderDepthBuffer();
     }
@@ -235,7 +237,7 @@ template <class Iterator>
 void Painter::renderPass(PaintParameters& parameters,
                          RenderPass pass_,
                          Iterator it, Iterator end,
-                         GLsizei i, int8_t increment) {
+                         uint32_t i, int8_t increment) {
     pass = pass_;
 
     MBGL_DEBUG_GROUP(pass == RenderPass::Opaque ? "opaque" : "translucent");
@@ -255,15 +257,16 @@ void Painter::renderPass(PaintParameters& parameters,
             continue;
 
         if (paintMode() == PaintMode::Overdraw) {
-            context.blend = GL_TRUE;
+            context.blend = true;
         } else if (pass == RenderPass::Translucent) {
-            context.blendFunc.reset();
-            context.blend = GL_TRUE;
+            context.blend = true;
+            context.blendFunc = { gl::BlendSourceFactor::One,
+                                  gl::BlendDestinationFactor::OneMinusSrcAlpha };
         } else {
-            context.blend = GL_FALSE;
+            context.blend = false;
         }
 
-        context.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
+        context.colorMask = { true, true, true, true };
         context.stencilMask = 0x0;
 
         if (layer.is<BackgroundLayer>()) {
@@ -272,10 +275,10 @@ void Painter::renderPass(PaintParameters& parameters,
         } else if (layer.is<CustomLayer>()) {
             MBGL_DEBUG_GROUP(layer.baseImpl->id + " - custom");
             context.vertexArrayObject = 0;
-            context.depthFunc.reset();
-            context.depthTest = GL_TRUE;
-            context.depthMask = GL_FALSE;
-            context.stencilTest = GL_FALSE;
+            context.depthFunc = gl::DepthTestFunction::LessEqual;
+            context.depthTest = true;
+            context.depthMask = false;
+            context.stencilTest = false;
             setDepthSublayer(0);
             layer.as<CustomLayer>()->impl->render(state);
             context.setDirtyState();

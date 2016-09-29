@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object.hpp>
 #include <mbgl/util/optional.hpp>
 
@@ -27,24 +26,24 @@ enum class LinePatternCap : bool {
 
 class LineAtlas {
 public:
-    LineAtlas(GLsizei width, GLsizei height);
+    LineAtlas(uint16_t width, uint16_t height);
     ~LineAtlas();
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
-    void bind(gl::Context&, uint32_t unit);
+    void bind(gl::Context&, gl::TextureUnit unit);
 
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
-    void upload(gl::Context&, uint32_t unit);
+    void upload(gl::Context&, gl::TextureUnit unit);
 
     LinePatternPos getDashPosition(const std::vector<float>&, LinePatternCap);
     LinePatternPos addDash(const std::vector<float>& dasharray, LinePatternCap);
 
-    const GLsizei width;
-    const GLsizei height;
+    const uint16_t width;
+    const uint16_t height;
 
 private:
-    const std::unique_ptr<GLbyte[]> data;
+    const std::unique_ptr<char[]> data;
     bool dirty;
     mbgl::optional<gl::UniqueTexture> texture;
     int nextRow = 0;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/shader/shader.hpp>
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
@@ -18,7 +17,7 @@ public:
     template <typename VertexBuffer>
     void bind(Shader& shader,
               VertexBuffer& vertexBuffer,
-              GLbyte* offset,
+              int8_t* offset,
               gl::Context& context) {
         bindVertexArrayObject(context);
         if (bound_shader == 0) {
@@ -36,7 +35,7 @@ public:
     void bind(Shader& shader,
               VertexBuffer& vertexBuffer,
               ElementsBuffer& elementsBuffer,
-              GLbyte* offset,
+              int8_t* offset,
               gl::Context& context) {
         bindVertexArrayObject(context);
         if (bound_shader == 0) {
@@ -60,11 +59,11 @@ private:
     void storeBinding(Shader& shader,
                       gl::BufferID vertexBuffer,
                       gl::BufferID elementsBuffer,
-                      GLbyte* offset);
+                      int8_t* offset);
     void verifyBinding(Shader& shader,
                        gl::BufferID vertexBuffer,
                        gl::BufferID elementsBuffer,
-                       GLbyte* offset);
+                       int8_t* offset);
 
     mbgl::optional<gl::UniqueVertexArray> vertexArray;
 
@@ -74,7 +73,7 @@ private:
     const char* bound_shader_name = "";
     gl::BufferID bound_vertex_buffer = 0;
     gl::BufferID bound_elements_buffer = 0;
-    GLbyte *bound_offset = nullptr;
+    int8_t *bound_offset = nullptr;
 };
 
 } // namespace mbgl

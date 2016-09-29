@@ -12,7 +12,7 @@ OutlineShader::OutlineShader(gl::Context& context, Defines defines)
              context, defines) {
 }
 
-void OutlineShader::bind(GLbyte* offset) {
+void OutlineShader::bind(int8_t* offset) {
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
     MBGL_CHECK_ERROR(glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset));
 }

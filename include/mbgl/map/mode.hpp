@@ -45,10 +45,10 @@ enum class MapDebugOptions : EnumType {
     Collision   = 1 << 4,
     Overdraw    = 1 << 5,
 // FIXME: https://github.com/mapbox/mapbox-gl-native/issues/5117
-#ifndef GL_ES_VERSION_2_0
+#if not MBGL_USE_GLES2
     StencilClip = 1 << 6,
     DepthBuffer = 1 << 7,
-#endif // GL_ES_VERSION_2_0
+#endif // MBGL_USE_GLES2
 };
 
 constexpr MapDebugOptions operator|(MapDebugOptions lhs, MapDebugOptions rhs) {

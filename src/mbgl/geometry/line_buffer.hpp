@@ -30,7 +30,7 @@ public:
      * @param {number} ty texture normal
      * @param {number} dir direction of the line cap (-1/0/1)
      */
-    GLsizei add(vertex_type x, vertex_type y, float ex, float ey, bool tx, bool ty, int8_t dir, int32_t linesofar = 0);
+    size_t add(vertex_type x, vertex_type y, float ex, float ey, bool tx, bool ty, int8_t dir, int32_t linesofar = 0);
 };
 
 

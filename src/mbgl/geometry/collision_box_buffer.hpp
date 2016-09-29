@@ -7,7 +7,7 @@ namespace mbgl {
 
 class CollisionBoxVertexBuffer : public Buffer <
     12,
-    GL_ARRAY_BUFFER,
+    gl::BufferType::Vertex,
     32768
 > {
 public:

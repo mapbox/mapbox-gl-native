@@ -7,56 +7,26 @@
 
 #include <memory>
 #include <vector>
+#include <array>
 
 namespace mbgl {
 namespace gl {
 
-constexpr GLsizei TextureMax = 64;
+constexpr size_t TextureMax = 64;
 
 class Context : private util::noncopyable {
 public:
     ~Context();
 
-    UniqueProgram createProgram() {
-        return UniqueProgram { MBGL_CHECK_ERROR(glCreateProgram()), { this } };
-    }
+    UniqueProgram createProgram();
+    UniqueShader createVertexShader();
+    UniqueShader createFragmentShader();
+    UniqueBuffer createBuffer();
+    UniqueTexture createTexture();
+    UniqueVertexArray createVertexArray();
+    UniqueFramebuffer createFramebuffer();
 
-    UniqueShader createVertexShader() {
-        return UniqueShader { MBGL_CHECK_ERROR(glCreateShader(GL_VERTEX_SHADER)), { this } };
-    }
-
-    UniqueShader createFragmentShader() {
-        return UniqueShader { MBGL_CHECK_ERROR(glCreateShader(GL_FRAGMENT_SHADER)), { this } };
-    }
-
-    UniqueBuffer createBuffer() {
-        BufferID id = 0;
-        MBGL_CHECK_ERROR(glGenBuffers(1, &id));
-        return UniqueBuffer { std::move(id), { this } };
-    }
-
-    UniqueTexture createTexture() {
-        if (pooledTextures.empty()) {
-            pooledTextures.resize(TextureMax);
-            MBGL_CHECK_ERROR(glGenTextures(TextureMax, pooledTextures.data()));
-        }
-
-        TextureID id = pooledTextures.back();
-        pooledTextures.pop_back();
-        return UniqueTexture { std::move(id), { this } };
-    }
-
-    UniqueVertexArray createVertexArray() {
-        VertexArrayID id = 0;
-        MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
-        return UniqueVertexArray { std::move(id), { this } };
-    }
-
-    UniqueFramebuffer createFramebuffer() {
-        FramebufferID id = 0;
-        MBGL_CHECK_ERROR(glGenFramebuffers(1, &id));
-        return UniqueFramebuffer { std::move(id), { this } };
-    }
+    void uploadBuffer(BufferType, size_t, void*);
 
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
@@ -100,13 +70,13 @@ public:
     State<value::ActiveTexture> activeTexture;
     State<value::BindFramebuffer> bindFramebuffer;
     State<value::Viewport> viewport;
-#ifndef GL_ES_VERSION_2_0
+#if not MBGL_USE_GLES2
     State<value::PixelZoom> pixelZoom;
     State<value::RasterPos> rasterPos;
-#endif // GL_ES_VERSION_2_0
+#endif // MBGL_USE_GLES2
     std::array<State<value::BindTexture>, 2> texture;
-    State<value::BindBuffer<GL_ARRAY_BUFFER>> vertexBuffer;
-    State<value::BindBuffer<GL_ELEMENT_ARRAY_BUFFER>> elementBuffer;
+    State<value::BindVertexBuffer> vertexBuffer;
+    State<value::BindElementBuffer> elementBuffer;
     State<value::BindVertexArray> vertexArrayObject;
 
 private:

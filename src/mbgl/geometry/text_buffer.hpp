@@ -7,7 +7,7 @@ namespace mbgl {
 
 class TextVertexBuffer : public Buffer <
     16,
-    GL_ARRAY_BUFFER,
+    gl::BufferType::Vertex,
     32768
 > {
 public:

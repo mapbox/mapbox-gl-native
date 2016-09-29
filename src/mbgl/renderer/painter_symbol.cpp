@@ -119,7 +119,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
     const auto& paint = layer.impl->paint;
     const auto& layout = bucket.layout;
 
-    context.depthMask = GL_FALSE;
+    context.depthMask = false;
 
     // TODO remove the `true ||` when #1673 is implemented
     const bool drawAcrossEdges = (frame.mapMode == MapMode::Continuous) && (true || !(layout.textAllowOverlap || layout.iconAllowOverlap ||
@@ -131,20 +131,21 @@ void Painter::renderSymbol(PaintParameters& parameters,
     // layers are sorted in the y direction, and to draw the correct ordering near
     // tile edges the icons are included in both tiles and clipped when drawing.
     if (drawAcrossEdges) {
-        context.stencilTest = GL_FALSE;
+        context.stencilTest = false;
     } else {
-        context.stencilOp.reset();
-        context.stencilTest = GL_TRUE;
+        context.stencilOp = { gl::StencilTestOperation::Keep, gl::StencilTestOperation::Keep,
+                              gl::StencilTestOperation::Replace };
+        context.stencilTest = true;
     }
 
     setDepthSublayer(0);
 
     if (bucket.hasIconData()) {
         if (layout.iconRotationAlignment == AlignmentType::Map) {
-            context.depthFunc.reset();
-            context.depthTest = GL_TRUE;
+            context.depthFunc = gl::DepthTestFunction::LessEqual;
+            context.depthTest = true;
         } else {
-            context.depthTest = GL_FALSE;
+            context.depthTest = false;
         }
 
         bool sdf = bucket.sdfIcons;
@@ -222,10 +223,10 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
     if (bucket.hasTextData()) {
         if (layout.textPitchAlignment == AlignmentType::Map) {
-            context.depthFunc.reset();
-            context.depthTest = GL_TRUE;
+            context.depthFunc = gl::DepthTestFunction::LessEqual;
+            context.depthTest = true;
         } else {
-            context.depthTest = GL_FALSE;
+            context.depthTest = false;
         }
 
         glyphAtlas->bind(context, 0);
@@ -250,8 +251,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
     }
 
     if (bucket.hasCollisionBoxData()) {
-        context.stencilOp.reset();
-        context.stencilTest = GL_TRUE;
+        context.stencilOp = { gl::StencilTestOperation::Keep, gl::StencilTestOperation::Keep,
+                              gl::StencilTestOperation::Replace };
+        context.stencilTest = true;
 
         auto& collisionBoxShader = shaders->collisionBox;
         context.program = collisionBoxShader.getID();

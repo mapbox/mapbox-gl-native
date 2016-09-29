@@ -12,7 +12,6 @@
 #include <mbgl/geometry/static_vertex_buffer.hpp>
 
 #include <mbgl/gl/context.hpp>
-#include <mbgl/gl/gl.hpp>
 
 #include <mbgl/style/style.hpp>
 
@@ -114,7 +113,7 @@ private:
     void renderPass(PaintParameters&,
                     RenderPass,
                     Iterator it, Iterator end,
-                    GLsizei i, int8_t increment);
+                    uint32_t i, int8_t increment);
 
     void setClipping(const ClipID&);
 
@@ -174,7 +173,7 @@ private:
     RenderPass pass = RenderPass::Opaque;
 
     int numSublayers = 3;
-    GLsizei currentLayer;
+    uint32_t currentLayer;
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
 

@@ -5,7 +5,7 @@
 #include <mbgl/util/timer.hpp>
 #include <mbgl/util/geometry.hpp>
 
-#ifdef MBGL_USE_GLES2
+#if MBGL_USE_GLES2
 #define GLFW_INCLUDE_ES2
 #endif
 #define GL_GLEXT_PROTOTYPES

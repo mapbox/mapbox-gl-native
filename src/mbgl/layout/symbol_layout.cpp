@@ -53,8 +53,8 @@ SymbolLayout::SymbolLayout(std::string bucketName_,
     auto layerName = layer.getName();
 
     // Determine and load glyph ranges
-    const GLsizei featureCount = static_cast<GLsizei>(layer.featureCount());
-    for (GLsizei i = 0; i < featureCount; i++) {
+    const size_t featureCount = static_cast<size_t>(layer.featureCount());
+    for (size_t i = 0; i < featureCount; i++) {
         auto feature = layer.getFeature(i);
         if (!filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
             continue;
@@ -458,7 +458,7 @@ void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         // coordinate in this polygon.
         assert(buffer.groups.back());
         auto &triangleGroup = *buffer.groups.back();
-        GLsizei triangleIndex = triangleGroup.vertex_length;
+        size_t triangleIndex = triangleGroup.vertex_length;
 
         // Encode angle of glyph
         uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);

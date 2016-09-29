@@ -1,6 +1,7 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/gl/gl.hpp>
 
 namespace mbgl {
 
@@ -31,7 +32,7 @@ void VertexArrayObject::bindVertexArrayObject(gl::Context& context) {
 void VertexArrayObject::verifyBinding(Shader& shader,
                                       gl::BufferID vertexBuffer,
                                       gl::BufferID elementsBuffer,
-                                      GLbyte* offset) {
+                                      int8_t* offset) {
     if (bound_shader != shader.getID()) {
         throw std::runtime_error(std::string("trying to rebind VAO to another shader from " +
                                              util::toString(bound_shader) + "(" + bound_shader_name + ") to " +
@@ -48,7 +49,7 @@ void VertexArrayObject::verifyBinding(Shader& shader,
 void VertexArrayObject::storeBinding(Shader& shader,
                                      gl::BufferID vertexBuffer,
                                      gl::BufferID elementsBuffer,
-                                     GLbyte* offset) {
+                                     int8_t* offset) {
     bound_shader = shader.getID();
     bound_shader_name = shader.name;
     bound_offset = offset;

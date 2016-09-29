@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/types.hpp>
 #include <mbgl/gl/object.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
@@ -20,7 +20,9 @@ public:
         return program.get();
     }
 
-    virtual void bind(GLbyte *offset) = 0;
+    gl::UniformLocation getUniformLocation(const char* uniform) const;
+
+    virtual void bind(int8_t *offset) = 0;
 
     enum Defines : bool {
         None = false,
@@ -34,14 +36,14 @@ protected:
            gl::Context&,
            Defines defines = Defines::None);
 
-    static constexpr GLint         a_pos = 0;
-    static constexpr GLint     a_extrude = 1;
-    static constexpr GLint      a_offset = 2;
-    static constexpr GLint        a_data = 3;
-    static constexpr GLint a_texture_pos = 4;
+    static constexpr gl::AttributeLocation         a_pos = 0;
+    static constexpr gl::AttributeLocation     a_extrude = 1;
+    static constexpr gl::AttributeLocation      a_offset = 2;
+    static constexpr gl::AttributeLocation        a_data = 3;
+    static constexpr gl::AttributeLocation a_texture_pos = 4;
 
 private:
-    bool compileShader(gl::UniqueShader&, const GLchar *source);
+    bool compileShader(gl::UniqueShader&, const char *source);
 
     gl::UniqueProgram program;
     gl::UniqueShader vertexShader;

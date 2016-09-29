@@ -35,16 +35,16 @@ void Painter::renderRaster(PaintParameters& parameters,
         rasterShader.u_contrast_factor = contrastFactor(properties.rasterContrast);
         rasterShader.u_spin_weights = spinWeights(properties.rasterHueRotate);
 
-        context.stencilTest = GL_FALSE;
+        context.stencilTest = false;
 
         rasterShader.u_image0 = 0; // GL_TEXTURE0
         rasterShader.u_image1 = 1; // GL_TEXTURE1
         rasterShader.u_tl_parent = {{ 0.0f, 0.0f }};
         rasterShader.u_scale_parent = 1.0f;
 
-        context.depthFunc.reset();
-        context.depthTest = GL_TRUE;
-        context.depthMask = GL_FALSE;
+        context.depthFunc = gl::DepthTestFunction::LessEqual;
+        context.depthTest = true;
+        context.depthMask = false;
         setDepthSublayer(0);
 
         bucket.drawRaster(rasterShader, rasterBoundsBuffer, rasterVAO, context);

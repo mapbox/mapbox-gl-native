@@ -1,3 +1,5 @@
+add_definitions(-DMBGL_USE_GLES2=1)
+
 macro(mbgl_platform_core)
     set_xcode_property(mbgl-core IPHONEOS_DEPLOYMENT_TARGET "8.0")
     set_xcode_property(mbgl-core ENABLE_BITCODE "YES")

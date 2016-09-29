@@ -1,5 +1,6 @@
 #include <mbgl/renderer/circle_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #include <mbgl/shader/circle_shader.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>

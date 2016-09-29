@@ -4,6 +4,7 @@
 #include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/shader/collision_box_shader.hpp>
+#include <mbgl/gl/gl.hpp>
 
 namespace mbgl {
 

@@ -1,5 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/gl/gl.hpp>
+
 #include <mbgl/style/source.hpp>
 #include <mbgl/shader/shaders.hpp>
 #include <mbgl/util/clip_id.hpp>
@@ -19,11 +21,12 @@ void Painter::drawClippingMasks(PaintParameters& parameters, const std::map<Unwr
     const GLuint mask = 0b11111111;
 
     context.program = plainShader.getID();
-    context.stencilOp.reset();
-    context.stencilTest = GL_TRUE;
-    context.depthTest = GL_FALSE;
-    context.depthMask = GL_FALSE;
-    context.colorMask = { GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE };
+    context.stencilOp = { gl::StencilTestOperation::Keep, gl::StencilTestOperation::Keep,
+                          gl::StencilTestOperation::Replace };
+    context.stencilTest = true;
+    context.depthTest = false;
+    context.depthMask = false;
+    context.colorMask = { false, false, false, false };
     context.stencilMask = mask;
 
     arrayCoveringPlain.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET_0, context);
@@ -38,7 +41,7 @@ void Painter::drawClippingMasks(PaintParameters& parameters, const std::map<Unwr
         plainShader.u_matrix = matrix;
 
         const GLint ref = (GLint)(clip.reference.to_ulong());
-        context.stencilFunc = { GL_ALWAYS, ref, mask };
+        context.stencilFunc = { gl::StencilTestFunction::Always, ref, mask };
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index()));
     }
 }

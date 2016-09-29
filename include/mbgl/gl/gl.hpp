@@ -86,8 +86,3 @@ extern ExtensionFunction<void (GLsizei n, GLuint* arrays)>
 
 } // namespace gl
 } // namespace mbgl
-
-#ifdef GL_ES_VERSION_2_0
-    #define glClearDepth glClearDepthf
-    #define glDepthRange glDepthRangef
-#endif

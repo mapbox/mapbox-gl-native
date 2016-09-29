@@ -76,9 +76,9 @@ void Raster::upload(gl::Context& context, uint32_t unit) {
         context.activeTexture = unit;
         context.texture[unit] = *texture;
         updateFilter();
-#ifndef GL_ES_VERSION_2_0
+#if not MBGL_USE_GLES2
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, images.size()));
-#endif
+#endif // MBGL_USE_GLES2
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         GLint level = 0;
