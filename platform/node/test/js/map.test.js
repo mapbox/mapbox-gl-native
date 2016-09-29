@@ -114,6 +114,8 @@ test('Map', function(t) {
             'setLayoutProperty',
             'setPaintProperty',
             'setFilter',
+            'setCenter',
+            'setBearing',
             'dumpDebugLogs',
             'queryRenderedFeatures'
         ]);
