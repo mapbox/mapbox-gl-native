@@ -14,7 +14,9 @@ import java.lang.annotation.RetentionPolicy;
  */
 public abstract class Property<T> {
 
-    //visibility
+    /**
+     * Layer visibility
+     */
     public static final String VISIBLE = "visible";
     public static final String NONE = "none";
 
@@ -26,8 +28,11 @@ public abstract class Property<T> {
     public @interface VISIBILITY {}
 
 <% for (const property of properties) { -%>
-    //<%- property.name %>
-<% for (const value of Object.keys(property.values)) { -%>
+    /**
+     * `<%- property.name %>`: <%- property.doc %>
+     */
+<% for (const value in property.values) { -%>
+    //<%- property.values[value].doc %>
     public static final String <%- snakeCaseUpper(property.name) %>_<%- snakeCaseUpper(value) %> = "<%- value %>";
 <% } -%>
 
