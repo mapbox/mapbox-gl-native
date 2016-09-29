@@ -14,8 +14,10 @@
 #include <atomic>
 #include <memory>
 #include <utility>
+#include <vector>
 
 #include <stdlib.h>
+#include <string.h>
 
 namespace {
 
@@ -34,10 +36,17 @@ enum SyncStatus : uint16_t {
     Everything = 255,
 };
 
+struct UnityGameFeature {
+    char key[32];
+    char value[32];
+    double x;
+    double y;
+};
+
 struct MapState {
     // Temporary token, will get rotated, do not use in production.
     std::string token = "pk.eyJ1IjoidG1wc2FudG9zIiwiYSI6ImNpdGN0M2I3MjAwNW0yeG1pajg4bWhqY3YifQ.0hqdgg6Hl_lG9ZkTqkB7-w";
-    std::string style = mbgl::util::default_styles::orderedStyles[0].url;
+    std::string style = "mapbox://styles/tmpsantos/citpr3v6j001c2hmmoykatpzf";
 
     double zoom = 15;
     double bearing = 0;
@@ -69,6 +78,12 @@ struct UnityPluginContext {
     MapState mapState;
     SyncStatus syncStatus = SyncStatus::Everything;
     std::mutex syncLock;
+
+    // FIXME: Hardcoded
+    std::string layer = "game_objects";
+    std::vector<UnityGameFeature> featuresScriptThread;
+    std::vector<UnityGameFeature> featuresRenderThread;
+    std::mutex featuresLock;
 };
 
 // Global plugin context.
@@ -138,6 +153,38 @@ public:
 
     void invalidate() override {
         dirty = true;
+
+        auto features = context.map->queryRenderedFeatures(
+            mbgl::ScreenBox{{ 0, 0 }, { static_cast<double>(dimensions[0]), static_cast<double>(dimensions[1]) }},
+            {{ context.layer }} // hardcoded ATM
+        );
+
+        std::vector<UnityGameFeature> newFeatures;
+
+        for (auto feature : features) {
+            auto key = feature.properties["key"].get<std::string>();
+            auto value = feature.properties["value"].get<std::string>();
+
+            auto point = feature.geometry.get<mapbox::geometry::point<double>>();
+            auto pixel = context.map->pixelForLatLng({ point.y, point.x });
+
+            UnityGameFeature game;
+
+            game.x = pixel.x;
+            game.y = pixel.y;
+
+            strncpy(game.key, key.c_str(), sizeof(game.key));
+            strncpy(game.value, value.c_str(), sizeof(game.value));
+            game.key[sizeof(game.key) - 1] = 0;
+            game.value[sizeof(game.value) - 1] = 0;
+
+            newFeatures.push_back(std::move(game));
+        }
+
+        {
+            std::lock_guard<std::mutex> lock(context.featuresLock);
+            context.featuresRenderThread = std::move(newFeatures);
+        }
     }
 
     void activate() override {}
@@ -313,6 +360,23 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API CycleStyle() {
         std::lock_guard<std::mutex> lock(context.syncLock);
         context.mapState.style = newStyle.url;
         context.syncStatus = static_cast<SyncStatus>(context.syncStatus | SyncStatus::Style);
+    }
+}
+
+extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API CountGameFeatures() {
+    {
+        std::lock_guard<std::mutex> lock(context.featuresLock);
+        context.featuresScriptThread = context.featuresRenderThread;
+    }
+
+    return context.featuresScriptThread.size();
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetGameFeature(UnityGameFeature *feature, int index) {
+    if (static_cast<unsigned>(index) > context.featuresScriptThread.size() - 1) {
+        memset(feature, 0, sizeof(UnityGameFeature));
+    } else {
+        memcpy(feature, &context.featuresScriptThread[index], sizeof(UnityGameFeature));
     }
 }
 

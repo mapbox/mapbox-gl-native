@@ -1,6 +1,8 @@
 unity {
     global:
+        CountGameFeatures;
         CycleStyle;
+        GetGameFeature;
         GetRenderEventFunc;
         MoveBy;
         ScaleBy;
