@@ -102,7 +102,7 @@ const layerCpp = ejs.compile(fs.readFileSync('src/mbgl/style/layers/layer.cpp.ej
 const propertiesHpp = ejs.compile(fs.readFileSync('src/mbgl/style/layers/layer_properties.hpp.ejs', 'utf8'), {strict: true});
 const propertiesCpp = ejs.compile(fs.readFileSync('src/mbgl/style/layers/layer_properties.cpp.ejs', 'utf8'), {strict: true});
 
-const layers = spec.layer.type.values.map((type) => {
+const layers = Object.keys(spec.layer.type.values).map((type) => {
   const layoutProperties = Object.keys(spec[`layout_${type}`]).reduce((memo, name) => {
     if (name !== 'visibility') {
       spec[`layout_${type}`][name].name = name;
