@@ -80,7 +80,7 @@ TEST(GLObject, Store) {
     context.performCleanup();
     EXPECT_TRUE(context.empty());
 
-    mbgl::gl::UniqueShader shader = context.createShader(GL_VERTEX_SHADER);
+    mbgl::gl::UniqueShader shader = context.createVertexShader();
     EXPECT_NE(shader.get(), 0u);
     shader.reset();
     EXPECT_FALSE(context.empty());

@@ -70,7 +70,7 @@ public:
         }
     }
 
-    GLuint getID() const {
+    gl::BufferID getID() const {
         return buffer ? *buffer : 0;
     }
 

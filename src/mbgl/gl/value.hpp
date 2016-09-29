@@ -6,6 +6,7 @@
 #include <cassert>
 
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/types.hpp>
 #include <mbgl/util/color.hpp>
 
 namespace mbgl {
@@ -234,7 +235,7 @@ struct BlendColor {
 };
 
 struct Program {
-    using Type = GLuint;
+    using Type = gl::ProgramID;
     static const constexpr Type Default = 0;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glUseProgram(value));
@@ -333,7 +334,7 @@ struct RasterPos {
 #endif // GL_ES_VERSION_2_0
 
 struct BindTexture {
-    using Type = GLuint;
+    using Type = gl::TextureID;
     static const constexpr Type Default = 0;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, value));
@@ -341,7 +342,7 @@ struct BindTexture {
     static Type Get() {
         GLint texture;
         MBGL_CHECK_ERROR(glGetIntegerv(GL_TEXTURE_BINDING_2D, &texture));
-        return texture;
+        return static_cast<Type>(texture);
     }
 };
 
@@ -349,7 +350,7 @@ template <GLenum target>
 struct BindBuffer {
     static_assert(target == GL_ARRAY_BUFFER || target == GL_ELEMENT_ARRAY_BUFFER,
                   "target must be one of GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER");
-    using Type = GLuint;
+    using Type = gl::BufferID;
     static const constexpr Type Default = 0;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glBindBuffer(target, value));
@@ -359,7 +360,7 @@ struct BindBuffer {
         MBGL_CHECK_ERROR(glGetIntegerv(target == GL_ARRAY_BUFFER ? GL_ARRAY_BUFFER_BINDING
                                                                  : GL_ELEMENT_ARRAY_BUFFER_BINDING,
                                        &binding));
-        return binding;
+        return static_cast<Type>(binding);
     }
 };
 
@@ -367,7 +368,7 @@ template <GLenum target>
 const typename BindBuffer<target>::Type BindBuffer<target>::Default;
 
 struct BindVertexArray {
-    using Type = GLuint;
+    using Type = gl::VertexArrayID;
     static const constexpr Type Default = 0;
     static void Set(const Type& value) {
         if (gl::BindVertexArray) {

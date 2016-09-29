@@ -3,6 +3,14 @@
 namespace mbgl {
 namespace gl {
 
+static_assert(std::is_same<ProgramID, GLuint>::value, "OpenGL type mismatch");
+static_assert(std::is_same<ShaderID, GLuint>::value, "OpenGL type mismatch");
+static_assert(std::is_same<BufferID, GLuint>::value, "OpenGL type mismatch");
+static_assert(std::is_same<TextureID, GLuint>::value, "OpenGL type mismatch");
+static_assert(std::is_same<VertexArrayID, GLuint>::value, "OpenGL type mismatch");
+static_assert(std::is_same<FramebufferID, GLuint>::value, "OpenGL type mismatch");
+static_assert(std::is_same<RenderbufferID, GLuint>::value, "OpenGL type mismatch");
+
 Context::~Context() {
     reset();
 }
@@ -60,7 +68,7 @@ void Context::setDirtyState() {
 }
 
 void Context::performCleanup() {
-    for (GLuint id : abandonedPrograms) {
+    for (auto id : abandonedPrograms) {
         if (program == id) {
             program.setDirty();
         }
@@ -68,7 +76,7 @@ void Context::performCleanup() {
     }
     abandonedPrograms.clear();
 
-    for (GLuint id : abandonedShaders) {
+    for (auto id : abandonedShaders) {
         MBGL_CHECK_ERROR(glDeleteShader(id));
     }
     abandonedShaders.clear();

@@ -22,6 +22,7 @@ typedef XID GLXPbuffer;
 
 #include <mbgl/mbgl.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/types.hpp>
 
 #include <memory>
 #include <thread>
@@ -89,9 +90,9 @@ private:
 
     std::function<void(MapChange)> mapChangeCallback;
 
-    GLuint fbo = 0;
-    GLuint fboDepthStencil = 0;
-    GLuint fboColor = 0;
+    gl::FramebufferID fbo = 0;
+    gl::RenderbufferID fboDepthStencil = 0;
+    gl::RenderbufferID fboColor = 0;
 };
 
 } // namespace mbgl

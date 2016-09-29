@@ -23,8 +23,8 @@ Shader::Shader(const char* name_,
                Defines defines)
     : name(name_),
       program(context.createProgram()),
-      vertexShader(context.createShader(GL_VERTEX_SHADER)),
-      fragmentShader(context.createShader(GL_FRAGMENT_SHADER)) {
+      vertexShader(context.createVertexShader()),
+      fragmentShader(context.createFragmentShader()) {
     util::stopwatch stopwatch("shader compilation", Event::Shader);
 
     if (!compileShader(vertexShader, vertexSource)) {

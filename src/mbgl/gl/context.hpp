@@ -21,12 +21,16 @@ public:
         return UniqueProgram { MBGL_CHECK_ERROR(glCreateProgram()), { this } };
     }
 
-    UniqueShader createShader(GLenum type) {
-        return UniqueShader { MBGL_CHECK_ERROR(glCreateShader(type)), { this } };
+    UniqueShader createVertexShader() {
+        return UniqueShader { MBGL_CHECK_ERROR(glCreateShader(GL_VERTEX_SHADER)), { this } };
+    }
+
+    UniqueShader createFragmentShader() {
+        return UniqueShader { MBGL_CHECK_ERROR(glCreateShader(GL_FRAGMENT_SHADER)), { this } };
     }
 
     UniqueBuffer createBuffer() {
-        GLuint id = 0;
+        BufferID id = 0;
         MBGL_CHECK_ERROR(glGenBuffers(1, &id));
         return UniqueBuffer { std::move(id), { this } };
     }
@@ -37,19 +41,19 @@ public:
             MBGL_CHECK_ERROR(glGenTextures(TextureMax, pooledTextures.data()));
         }
 
-        GLuint id = pooledTextures.back();
+        TextureID id = pooledTextures.back();
         pooledTextures.pop_back();
         return UniqueTexture { std::move(id), { this } };
     }
 
     UniqueVertexArray createVertexArray() {
-        GLuint id = 0;
+        VertexArrayID id = 0;
         MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
         return UniqueVertexArray { std::move(id), { this } };
     }
 
     UniqueFramebuffer createFramebuffer() {
-        GLuint id = 0;
+        FramebufferID id = 0;
         MBGL_CHECK_ERROR(glGenFramebuffers(1, &id));
         return UniqueFramebuffer { std::move(id), { this } };
     }
@@ -113,14 +117,14 @@ private:
     friend detail::VertexArrayDeleter;
     friend detail::FramebufferDeleter;
 
-    std::vector<GLuint> pooledTextures;
+    std::vector<TextureID> pooledTextures;
 
-    std::vector<GLuint> abandonedPrograms;
-    std::vector<GLuint> abandonedShaders;
-    std::vector<GLuint> abandonedBuffers;
-    std::vector<GLuint> abandonedTextures;
-    std::vector<GLuint> abandonedVertexArrays;
-    std::vector<GLuint> abandonedFramebuffers;
+    std::vector<ProgramID> abandonedPrograms;
+    std::vector<ShaderID> abandonedShaders;
+    std::vector<BufferID> abandonedBuffers;
+    std::vector<TextureID> abandonedTextures;
+    std::vector<VertexArrayID> abandonedVertexArrays;
+    std::vector<FramebufferID> abandonedFramebuffers;
 };
 
 } // namespace gl

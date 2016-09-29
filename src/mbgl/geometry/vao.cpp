@@ -28,8 +28,10 @@ void VertexArrayObject::bindVertexArrayObject(gl::Context& context) {
     context.vertexArrayObject = *vertexArray;
 }
 
-void VertexArrayObject::verifyBinding(Shader& shader, GLuint vertexBuffer, GLuint elementsBuffer,
-                                      GLbyte *offset) {
+void VertexArrayObject::verifyBinding(Shader& shader,
+                                      gl::BufferID vertexBuffer,
+                                      gl::BufferID elementsBuffer,
+                                      GLbyte* offset) {
     if (bound_shader != shader.getID()) {
         throw std::runtime_error(std::string("trying to rebind VAO to another shader from " +
                                              util::toString(bound_shader) + "(" + bound_shader_name + ") to " +
@@ -43,8 +45,10 @@ void VertexArrayObject::verifyBinding(Shader& shader, GLuint vertexBuffer, GLuin
     }
 }
 
-void VertexArrayObject::storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer,
-                                     GLbyte *offset) {
+void VertexArrayObject::storeBinding(Shader& shader,
+                                     gl::BufferID vertexBuffer,
+                                     gl::BufferID elementsBuffer,
+                                     GLbyte* offset) {
     bound_shader = shader.getID();
     bound_shader_name = shader.name;
     bound_offset = offset;
