@@ -51,23 +51,29 @@ public:
         }
     }
 
-    GLuint getID() const {
+    gl::VertexArrayID getID() const {
         return *vertexArray;
     }
 
 private:
     void bindVertexArrayObject(gl::Context&);
-    void storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
-    void verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
+    void storeBinding(Shader& shader,
+                      gl::BufferID vertexBuffer,
+                      gl::BufferID elementsBuffer,
+                      GLbyte* offset);
+    void verifyBinding(Shader& shader,
+                       gl::BufferID vertexBuffer,
+                       gl::BufferID elementsBuffer,
+                       GLbyte* offset);
 
     mbgl::optional<gl::UniqueVertexArray> vertexArray;
 
     // For debug reasons, we're storing the bind information so that we can
     // detect errors and report
-    GLuint bound_shader = 0;
+    gl::ProgramID bound_shader = 0;
     const char* bound_shader_name = "";
-    GLuint bound_vertex_buffer = 0;
-    GLuint bound_elements_buffer = 0;
+    gl::BufferID bound_vertex_buffer = 0;
+    gl::BufferID bound_elements_buffer = 0;
     GLbyte *bound_offset = nullptr;
 };
 

@@ -14,7 +14,7 @@ bool Raster::isLoaded() const {
     return loaded;
 }
 
-GLuint Raster::getID() const {
+gl::TextureID Raster::getID() const {
     return texture ? *texture : 0;
 }
 

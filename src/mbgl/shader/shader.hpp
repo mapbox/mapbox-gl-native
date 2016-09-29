@@ -16,7 +16,7 @@ public:
     ~Shader();
     const char* name;
 
-    GLuint getID() const {
+    gl::ProgramID getID() const {
         return program.get();
     }
 
