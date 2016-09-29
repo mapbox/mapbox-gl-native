@@ -2,11 +2,13 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.DisplayMetrics;
 import android.view.Surface;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -22,6 +24,7 @@ import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.commons.geojson.Feature;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -506,6 +509,27 @@ final class NativeMapView {
         nativeRemoveSource(nativeMapViewPtr, sourceId);
     }
 
+    public void addImage(@NonNull String name, @NonNull Bitmap image) {
+        //Check/correct config
+        if (image.getConfig() != Bitmap.Config.ARGB_8888) {
+            image = image.copy(Bitmap.Config.ARGB_8888, false);
+        }
+
+        //Get pixels
+        ByteBuffer buffer = ByteBuffer.allocate(image.getByteCount());
+        image.copyPixelsToBuffer(buffer);
+
+        //Determine pixel ratio
+        float density = image.getDensity() == Bitmap.DENSITY_NONE ? Bitmap.DENSITY_NONE : image.getDensity();
+        float pixelRatio = density / DisplayMetrics.DENSITY_DEFAULT;
+
+        nativeAddImage(nativeMapViewPtr, name, image.getWidth(), image.getHeight(), pixelRatio, buffer.array());
+    }
+
+    public void removeImage(String name) {
+        nativeRemoveImage(nativeMapViewPtr, name);
+    }
+
     // Feature querying
 
     @NonNull
@@ -721,6 +745,10 @@ final class NativeMapView {
     private native void nativeAddSource(long nativeMapViewPtr, long nativeSourcePtr);
 
     private native void nativeRemoveSource(long nativeMapViewPtr, String sourceId) throws NoSuchSourceException;
+
+    private native void nativeAddImage(long nativeMapViewPtr, String name, int width, int height, float pixelRatio, byte[] array);
+
+    private native void nativeRemoveImage(long nativeMapViewPtr, String name);
 
     private native void nativeUpdatePolygon(long nativeMapViewPtr, long polygonId, Polygon polygon);
 
