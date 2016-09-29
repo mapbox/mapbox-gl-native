@@ -137,6 +137,16 @@ global.defaultValueJava = function(property) {
       }
 }
 
+global.propertyDoc = function (propertyName, property) {
+    let doc = property.doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
+        if (str.substr(offset - 4, 3) !== 'CSS') {
+            symbol = camelizeWithLeadingLowercase(symbol);
+        }
+        return '`' + symbol + '`';
+    });
+    return doc;
+};
+
 //Process Layers
 const layers = Object.keys(spec.layer.type.values).map((type) => {
   const layoutProperties = Object.keys(spec[`layout_${type}`]).reduce((memo, name) => {
