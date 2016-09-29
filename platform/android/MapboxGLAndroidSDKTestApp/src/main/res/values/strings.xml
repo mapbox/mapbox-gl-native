@@ -57,6 +57,7 @@
     <string name="activity_minmax_zoom">Min/Max Zoom</string>
     <string name="activity_viewpager">ViewPager</string>
     <string name="activity_runtime_style">Runtime Style</string>
+    <string name="activity_style_file">Local Style file</string>
     <string name="activity_geojson_clustering">GeoJson Clustering</string>
     <string name="activity_print">Print a map</string>
     <string name="activity_surfaceview_overlay">SurfaceView MediaOverlay</string>
@@ -116,6 +117,7 @@
     <string name="description_car_driving">MyLocationView follow map update example</string>
     <string name="description_video_view">Android video view on top of the map view</string>
     <string name="description_add_remove_markers">Based on zoom level</string>
+    <string name="description_style_file">Use a local file as the style</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
     <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>
