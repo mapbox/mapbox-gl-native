@@ -278,9 +278,9 @@ struct BindFramebuffer {
         MBGL_CHECK_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, value));
     }
     static Type Get() {
-        Type activeFBO;
-        MBGL_CHECK_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &activeFBO));
-        return activeFBO;
+        Type activeFramebuffer;
+        MBGL_CHECK_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &activeFramebuffer));
+        return activeFramebuffer;
     }
 };
 
@@ -366,7 +366,7 @@ struct BindBuffer {
 template <GLenum target>
 const typename BindBuffer<target>::Type BindBuffer<target>::Default;
 
-struct BindVAO {
+struct BindVertexArray {
     using Type = GLuint;
     static const constexpr Type Default = 0;
     static void Set(const Type& value) {

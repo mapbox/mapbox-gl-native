@@ -24,7 +24,7 @@ public:
         if (bound_shader == 0) {
             vertexBuffer.bind(context);
             shader.bind(offset);
-            if (vao) {
+            if (vertexArray) {
                 storeBinding(shader, vertexBuffer.getID(), 0, offset);
             }
         } else {
@@ -43,7 +43,7 @@ public:
             vertexBuffer.bind(context);
             elementsBuffer.bind(context);
             shader.bind(offset);
-            if (vao) {
+            if (vertexArray) {
                 storeBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
             }
         } else {
@@ -52,7 +52,7 @@ public:
     }
 
     GLuint getID() const {
-        return *vao;
+        return *vertexArray;
     }
 
 private:
@@ -60,7 +60,7 @@ private:
     void storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
     void verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
 
-    mbgl::optional<gl::UniqueVAO> vao;
+    mbgl::optional<gl::UniqueVertexArray> vertexArray;
 
     // For debug reasons, we're storing the bind information so that we can
     // detect errors and report

@@ -14,9 +14,9 @@ void OffscreenTexture::bind(gl::Context& context,
         raster.upload(context, 0);
     }
 
-    if (!fbo) {
-        fbo = context.createFBO();
-        context.bindFramebuffer = *fbo;
+    if (!framebuffer) {
+        framebuffer = context.createFramebuffer();
+        context.bindFramebuffer = *framebuffer;
         MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                                                 raster.getID(), 0));
 
@@ -48,7 +48,7 @@ void OffscreenTexture::bind(gl::Context& context,
             }
         }
     } else {
-        context.bindFramebuffer = *fbo;
+        context.bindFramebuffer = *framebuffer;
     }
 
     context.viewport = { { 0, 0, static_cast<GLint>(size[0]), static_cast<GLint>(size[1]) } };

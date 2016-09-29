@@ -16,7 +16,7 @@ public:
     std::array<uint16_t, 2> getSize() const;
 
 private:
-    mbgl::optional<gl::UniqueFBO> fbo;
+    mbgl::optional<gl::UniqueFramebuffer> framebuffer;
     Raster raster;
 };
 
