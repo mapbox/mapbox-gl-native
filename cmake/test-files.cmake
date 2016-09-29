@@ -15,6 +15,7 @@ set(MBGL_TEST_FILES
     test/api/annotations.test.cpp
     test/api/api_misuse.test.cpp
     test/api/custom_layer.test.cpp
+    test/api/query.test.cpp
     test/api/render_missing.test.cpp
     test/api/repeated_render.test.cpp
 
