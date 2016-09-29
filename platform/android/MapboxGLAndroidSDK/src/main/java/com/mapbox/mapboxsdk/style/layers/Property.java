@@ -25,7 +25,7 @@ public abstract class Property<T> {
     public @interface VISIBILITY {}
 
     /**
-     * `line-cap`: The display of line endings.
+     * LINE_CAP: The display of line endings.
      */
     //A cap with a squared-off end which is drawn to the exact endpoint of the line.
     public static final String LINE_CAP_BUTT = "butt";
@@ -43,7 +43,7 @@ public abstract class Property<T> {
     public @interface LINE_CAP {}
 
     /**
-     * `line-join`: The display of lines when joining.
+     * LINE_JOIN: The display of lines when joining.
      */
     //A join with a squared-off end which is drawn beyond the endpoint of the line at a distance of one-half of the line's width.
     public static final String LINE_JOIN_BEVEL = "bevel";
@@ -61,7 +61,7 @@ public abstract class Property<T> {
     public @interface LINE_JOIN {}
 
     /**
-     * `symbol-placement`: Label placement relative to its geometry.
+     * SYMBOL_PLACEMENT: Label placement relative to its geometry.
      */
     //The label is placed at the point where the geometry is located.
     public static final String SYMBOL_PLACEMENT_POINT = "point";
@@ -76,7 +76,7 @@ public abstract class Property<T> {
     public @interface SYMBOL_PLACEMENT {}
 
     /**
-     * `icon-rotation-alignment`: In combination with `symbol-placement`, determines the rotation behavior of icons.
+     * ICON_ROTATION_ALIGNMENT: In combination with `symbol-placement`, determines the rotation behavior of icons.
      */
     //When `symbol-placement` is set to `point`, aligns icons east-west. When `symbol-placement` is set to `line`, aligns icon x-axes with the line.
     public static final String ICON_ROTATION_ALIGNMENT_MAP = "map";
@@ -94,7 +94,7 @@ public abstract class Property<T> {
     public @interface ICON_ROTATION_ALIGNMENT {}
 
     /**
-     * `icon-text-fit`: Scales the icon to fit around the associated text.
+     * ICON_TEXT_FIT: Scales the icon to fit around the associated text.
      */
     //The icon is displayed at its intrinsic aspect ratio.
     public static final String ICON_TEXT_FIT_NONE = "none";
@@ -115,7 +115,7 @@ public abstract class Property<T> {
     public @interface ICON_TEXT_FIT {}
 
     /**
-     * `text-pitch-alignment`: Orientation of text when map is pitched.
+     * TEXT_PITCH_ALIGNMENT: Orientation of text when map is pitched.
      */
     //The text is aligned to the plane of the map.
     public static final String TEXT_PITCH_ALIGNMENT_MAP = "map";
@@ -133,7 +133,7 @@ public abstract class Property<T> {
     public @interface TEXT_PITCH_ALIGNMENT {}
 
     /**
-     * `text-rotation-alignment`: In combination with `symbol-placement`, determines the rotation behavior of the individual glyphs forming the text.
+     * TEXT_ROTATION_ALIGNMENT: In combination with `symbol-placement`, determines the rotation behavior of the individual glyphs forming the text.
      */
     //When `symbol-placement` is set to `point`, aligns text east-west. When `symbol-placement` is set to `line`, aligns text x-axes with the line.
     public static final String TEXT_ROTATION_ALIGNMENT_MAP = "map";
@@ -151,7 +151,7 @@ public abstract class Property<T> {
     public @interface TEXT_ROTATION_ALIGNMENT {}
 
     /**
-     * `text-justify`: Text justification options.
+     * TEXT_JUSTIFY: Text justification options.
      */
     //The text is aligned to the left.
     public static final String TEXT_JUSTIFY_LEFT = "left";
@@ -169,7 +169,7 @@ public abstract class Property<T> {
     public @interface TEXT_JUSTIFY {}
 
     /**
-     * `text-anchor`: Part of the text placed closest to the anchor.
+     * TEXT_ANCHOR: Part of the text placed closest to the anchor.
      */
     //The center of the text is placed closest to the anchor.
     public static final String TEXT_ANCHOR_CENTER = "center";
@@ -205,7 +205,7 @@ public abstract class Property<T> {
     public @interface TEXT_ANCHOR {}
 
     /**
-     * `text-transform`: Specifies how to capitalize text, similar to the CSS `text-transform` property.
+     * TEXT_TRANSFORM: Specifies how to capitalize text, similar to the CSS `text-transform` property.
      */
     //The text is not altered.
     public static final String TEXT_TRANSFORM_NONE = "none";
@@ -223,7 +223,7 @@ public abstract class Property<T> {
     public @interface TEXT_TRANSFORM {}
 
     /**
-     * `fill-translate-anchor`: Controls the translation reference point.
+     * FILL_TRANSLATE_ANCHOR: Controls the translation reference point.
      */
     //The fill is translated relative to the map.
     public static final String FILL_TRANSLATE_ANCHOR_MAP = "map";
@@ -238,7 +238,7 @@ public abstract class Property<T> {
     public @interface FILL_TRANSLATE_ANCHOR {}
 
     /**
-     * `line-translate-anchor`: Controls the translation reference point.
+     * LINE_TRANSLATE_ANCHOR: Controls the translation reference point.
      */
     //The line is translated relative to the map.
     public static final String LINE_TRANSLATE_ANCHOR_MAP = "map";
@@ -253,7 +253,7 @@ public abstract class Property<T> {
     public @interface LINE_TRANSLATE_ANCHOR {}
 
     /**
-     * `icon-translate-anchor`: Controls the translation reference point.
+     * ICON_TRANSLATE_ANCHOR: Controls the translation reference point.
      */
     //Icons are translated relative to the map.
     public static final String ICON_TRANSLATE_ANCHOR_MAP = "map";
@@ -268,7 +268,7 @@ public abstract class Property<T> {
     public @interface ICON_TRANSLATE_ANCHOR {}
 
     /**
-     * `text-translate-anchor`: Controls the translation reference point.
+     * TEXT_TRANSLATE_ANCHOR: Controls the translation reference point.
      */
     //The text is translated relative to the map.
     public static final String TEXT_TRANSLATE_ANCHOR_MAP = "map";
@@ -283,7 +283,7 @@ public abstract class Property<T> {
     public @interface TEXT_TRANSLATE_ANCHOR {}
 
     /**
-     * `circle-translate-anchor`: Controls the translation reference point.
+     * CIRCLE_TRANSLATE_ANCHOR: Controls the translation reference point.
      */
     //The circle is translated relative to the map.
     public static final String CIRCLE_TRANSLATE_ANCHOR_MAP = "map";
@@ -298,7 +298,7 @@ public abstract class Property<T> {
     public @interface CIRCLE_TRANSLATE_ANCHOR {}
 
     /**
-     * `circle-pitch-scale`: Controls the scaling behavior of the circle when the map is pitched.
+     * CIRCLE_PITCH_SCALE: Controls the scaling behavior of the circle when the map is pitched.
      */
     //Circles are scaled according to their apparent distance to the camera.
     public static final String CIRCLE_PITCH_SCALE_MAP = "map";
