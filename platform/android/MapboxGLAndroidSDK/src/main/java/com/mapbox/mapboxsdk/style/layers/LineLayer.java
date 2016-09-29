@@ -34,7 +34,7 @@ public class LineLayer extends Layer {
 
     protected native void initialize(String layerId, String sourceId);
 
-   /**
+    /**
      * Set the source layer.
      *
      * @param sourceLayer the source layer to set
