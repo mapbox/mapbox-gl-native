@@ -77,6 +77,10 @@ public class MapboxMapOptions implements Parcelable {
     private int myLocationAccuracyAlpha;
 
     private String apiBaseUrl;
+
+    @Deprecated
+    private boolean textureMode;
+
     private String style;
     @Deprecated
     private String accessToken;
@@ -139,6 +143,7 @@ public class MapboxMapOptions implements Parcelable {
         style = in.readString();
         accessToken = in.readString();
         apiBaseUrl = in.readString();
+        textureMode = in.readByte() != 0;
     }
 
     public static Bitmap getBitmapFromDrawable(Drawable drawable) {
@@ -231,6 +236,7 @@ public class MapboxMapOptions implements Parcelable {
                     , (int) (typedArray.getDimension(R.styleable.MapView_my_location_background_bottom, 0) * screenDensity)});
             mapboxMapOptions.myLocationAccuracyAlpha(typedArray.getInt(R.styleable.MapView_my_location_accuracy_alpha, 100));
             mapboxMapOptions.myLocationAccuracyTint(typedArray.getColor(R.styleable.MapView_my_location_accuracy_tint, ColorUtils.getPrimaryColor(context)));
+            mapboxMapOptions.textureMode(typedArray.getBoolean(R.styleable.MapView_texture_mode, false));
         } finally {
             typedArray.recycle();
         }
@@ -595,6 +601,22 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
+     * Enable TextureView as rendered surface.
+     * <p>
+     * Since the 4.2.0 release we replaced our TextureView with an SurfaceView implemenation.
+     * Enabling this option will use the deprecated TextureView instead.
+     * </p>
+     *
+     * @param textureMode True to enable texture mode
+     * @return This
+     * @deprecated As of the 4.2.0 release, using TextureView is deprecated.
+     */
+    public MapboxMapOptions textureMode(boolean textureMode) {
+        this.textureMode = textureMode;
+        return this;
+    }
+
+    /**
      * Get the current configured API endpoint base URL.
      *
      * @return Base URL to be used API endpoint.
@@ -878,6 +900,16 @@ public class MapboxMapOptions implements Parcelable {
         return debugActive;
     }
 
+    /**
+     * Returns true if TextureView is being used a render view.
+     *
+     * @return True if TextureView is used.
+     * @deprecated As of the 4.2.0 release, using TextureView is deprecated.
+     */
+    public boolean getTextureMode() {
+        return textureMode;
+    }
+
     public static final Parcelable.Creator<MapboxMapOptions> CREATOR
             = new Parcelable.Creator<MapboxMapOptions>() {
         public MapboxMapOptions createFromParcel(Parcel in) {
@@ -935,6 +967,7 @@ public class MapboxMapOptions implements Parcelable {
         dest.writeString(style);
         dest.writeString(accessToken);
         dest.writeString(apiBaseUrl);
+        dest.writeByte((byte) (textureMode ? 1 : 0));
     }
 
     @Override

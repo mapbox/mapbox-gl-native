@@ -79,6 +79,8 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
         // configure inital map state
         MapboxMapOptions options = new MapboxMapOptions()
                 .attributionTintColor(RED_COLOR)
+                // deprecated feature!
+                .textureMode(true)
                 .styleUrl(Style.MAPBOX_STREETS)
                 .camera(new CameraPosition.Builder()
                         .target(new LatLng(45.520486, -122.673541))

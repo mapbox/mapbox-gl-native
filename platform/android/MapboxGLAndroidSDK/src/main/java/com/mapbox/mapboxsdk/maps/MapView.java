@@ -17,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.graphics.SurfaceTexture;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -46,6 +47,7 @@ import android.view.ScaleGestureDetector;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
@@ -198,8 +200,15 @@ public class MapView extends FrameLayout {
         View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
         setWillNotDraw(false);
 
-        // Reference the TextureView
-        SurfaceView surfaceView = (SurfaceView) view.findViewById(R.id.surfaceView);
+        if (options.getTextureMode()) {
+            TextureView textureView = new TextureView(context);
+            textureView.setSurfaceTextureListener(new SurfaceTextureListener());
+            addView(textureView, 0);
+        } else {
+            SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+            surfaceView.getHolder().addCallback(new SurfaceCallback());
+            surfaceView.setVisibility(View.VISIBLE);
+        }
 
         nativeMapView = new NativeMapView(this);
 
@@ -210,7 +219,6 @@ public class MapView extends FrameLayout {
         setFocusableInTouchMode(true);
         requestFocus();
 
-        surfaceView.getHolder().addCallback(new SurfaceCallback());
 
         // Touch gesture detectors
         gestureDetector = new GestureDetectorCompat(context, new GestureListener());
@@ -1449,6 +1457,61 @@ public class MapView extends FrameLayout {
                 nativeMapView.destroySurface();
             }
             surface.release();
+        }
+    }
+
+    // This class handles TextureView callbacks
+    private class SurfaceTextureListener implements TextureView.SurfaceTextureListener {
+
+        private Surface surface;
+
+        // Called when the native surface texture has been created
+        // Must do all EGL/GL ES initialization here
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+            nativeMapView.createSurface(this.surface = new Surface(surface));
+            nativeMapView.resizeFramebuffer(width, height);
+            hasSurface = true;
+        }
+
+        // Called when the native surface texture has been destroyed
+        // Must do all EGL/GL ES destruction here
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+            hasSurface = false;
+
+            if (nativeMapView != null) {
+                nativeMapView.destroySurface();
+            }
+            this.surface.release();
+            return true;
+        }
+
+        // Called when the format or size of the native surface texture has been changed
+        // Must handle window resizing here.
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+            if (destroyed) {
+                return;
+            }
+
+            nativeMapView.resizeFramebuffer(width, height);
+        }
+
+        // Called when the SurfaceTexure frame is drawn to screen
+        // Must sync with UI here
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+            if (destroyed) {
+                return;
+            }
+            compassView.update(getDirection());
+            myLocationView.update();
+            mapboxMap.getMarkerViewManager().update();
+
+            for (InfoWindow infoWindow : mapboxMap.getInfoWindows()) {
+                infoWindow.update();
+            }
         }
     }
 
