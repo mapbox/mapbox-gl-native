@@ -27,12 +27,12 @@ public abstract class Property<T> {
 
 <% for (const property of properties) { -%>
     //<%- property.name %>
-<% for (const value of property.values) { -%>
+<% for (const value of Object.keys(property.values)) { -%>
     public static final String <%- snakeCaseUpper(property.name) %>_<%- snakeCaseUpper(value) %> = "<%- value %>";
 <% } -%>
 
     @StringDef({
-    <% for (const value of property.values) { -%>
+    <% for (const value of Object.keys(property.values)) { -%>
         <%- snakeCaseUpper(property.name) %>_<%- snakeCaseUpper(value) %>,
     <% } -%>
     })

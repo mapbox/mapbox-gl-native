@@ -74,15 +74,15 @@ public abstract class Property<T> {
 
     //icon-text-fit
     public static final String ICON_TEXT_FIT_NONE = "none";
-    public static final String ICON_TEXT_FIT_BOTH = "both";
     public static final String ICON_TEXT_FIT_WIDTH = "width";
     public static final String ICON_TEXT_FIT_HEIGHT = "height";
+    public static final String ICON_TEXT_FIT_BOTH = "both";
 
     @StringDef({
             ICON_TEXT_FIT_NONE,
-            ICON_TEXT_FIT_BOTH,
             ICON_TEXT_FIT_WIDTH,
             ICON_TEXT_FIT_HEIGHT,
+            ICON_TEXT_FIT_BOTH,
         })
     @Retention(RetentionPolicy.SOURCE)
     public @interface ICON_TEXT_FIT {}

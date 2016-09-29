@@ -31,7 +31,8 @@ namespace conversion {
     //<%- property.name %>
     inline std::string toString(mbgl::style::<%- propertyNativeType(property) %> value) {
         switch (value) {
-<% for (const value of property.values) { -%>
+<% for (const value in property.values) { -%>
+          //<%- property.values[value].doc %>
           case mbgl::style::<%- propertyNativeType(property) %>::<%- camelize(value) %>:
             return "<%- value %>";
             break;

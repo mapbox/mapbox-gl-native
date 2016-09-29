@@ -116,7 +116,7 @@ global.defaultValueJava = function(property) {
       case 'string':
         return '"' + property['default'] + '"';
       case 'enum':
-        return snakeCaseUpper(property.name) + "_" + snakeCaseUpper(property.values[0]);
+        return snakeCaseUpper(property.name) + "_" + snakeCaseUpper(Object.keys(property.values)[0]);
       case 'color':
         return '"rgba(0, 0, 0, 1)"';
       case 'array':
@@ -138,7 +138,7 @@ global.defaultValueJava = function(property) {
 }
 
 //Process Layers
-const layers = spec.layer.type.values.map((type) => {
+const layers = Object.keys(spec.layer.type.values).map((type) => {
   const layoutProperties = Object.keys(spec[`layout_${type}`]).reduce((memo, name) => {
     if (name !== 'visibility') {
       spec[`layout_${type}`][name].name = name;
