@@ -304,7 +304,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolStyleLayerTextTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> iconTextFit;
 
 /**
- Size of the additional area added to dimensions determined by `iconTextFix`, in clockwise order: top, right, bottom, left.
+ Size of the additional area added to dimensions determined by `iconTextFit`, in clockwise order: top, right, bottom, left.
 
  This property is measured in points.
  
