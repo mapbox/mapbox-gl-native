@@ -9,6 +9,7 @@
 #include <stdexcept>
 
 namespace mbgl {
+namespace gl {
 
 class VertexArrayObject : public util::noncopyable {
 public:
@@ -17,9 +18,9 @@ public:
 
     template <typename Shader, typename T>
     void bind(Shader& shader,
-              const gl::VertexBuffer<T>& vertexBuffer,
+              const VertexBuffer<T>& vertexBuffer,
               int8_t* offset,
-              gl::Context& context) {
+              Context& context) {
         bindVertexArrayObject(context);
         if (bound_shader == 0) {
             context.vertexBuffer = vertexBuffer.buffer;
@@ -34,10 +35,10 @@ public:
 
     template <typename Shader, typename T, typename P>
     void bind(Shader& shader,
-              const gl::VertexBuffer<T>& vertexBuffer,
-              const gl::IndexBuffer<P>& indexBuffer,
+              const VertexBuffer<T>& vertexBuffer,
+              const IndexBuffer<P>& indexBuffer,
               int8_t* offset,
-              gl::Context& context) {
+              Context& context) {
         bindVertexArrayObject(context);
         if (bound_shader == 0) {
             context.vertexBuffer = vertexBuffer.buffer;
@@ -51,30 +52,31 @@ public:
         }
     }
 
-    gl::VertexArrayID getID() const {
+    VertexArrayID getID() const {
         return *vertexArray;
     }
 
 private:
-    void bindVertexArrayObject(gl::Context&);
-    void storeBinding(gl::Shader& shader,
-                      gl::BufferID vertexBuffer,
-                      gl::BufferID elementsBuffer,
+    void bindVertexArrayObject(Context&);
+    void storeBinding(Shader& shader,
+                      BufferID vertexBuffer,
+                      BufferID elementsBuffer,
                       int8_t* offset);
-    void verifyBinding(gl::Shader& shader,
-                       gl::BufferID vertexBuffer,
-                       gl::BufferID elementsBuffer,
+    void verifyBinding(Shader& shader,
+                       BufferID vertexBuffer,
+                       BufferID elementsBuffer,
                        int8_t* offset);
 
-    mbgl::optional<gl::UniqueVertexArray> vertexArray;
+    optional<UniqueVertexArray> vertexArray;
 
     // For debug reasons, we're storing the bind information so that we can
     // detect errors and report
-    gl::ProgramID bound_shader = 0;
+    ProgramID bound_shader = 0;
     const char* bound_shader_name = "";
-    gl::BufferID bound_vertex_buffer = 0;
-    gl::BufferID bound_elements_buffer = 0;
+    BufferID bound_vertex_buffer = 0;
+    BufferID bound_elements_buffer = 0;
     int8_t *bound_offset = nullptr;
 };
 
+} // namespace gl
 } // namespace mbgl

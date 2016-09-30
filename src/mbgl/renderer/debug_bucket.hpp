@@ -39,7 +39,7 @@ public:
 
 private:
     gl::VertexBuffer<PlainVertex> textVertexes;
-    VertexArrayObject array;
+    gl::VertexArrayObject array;
 };
 
 } // namespace mbgl

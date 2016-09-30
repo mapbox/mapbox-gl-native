@@ -47,10 +47,10 @@ public:
     CollisionBoxShader collisionBox;
     CircleShader circle;
 
-    VertexArrayObject coveringPlainArray;
-    VertexArrayObject coveringRasterArray;
-    VertexArrayObject backgroundPatternArray;
-    VertexArrayObject backgroundArray;
+    gl::VertexArrayObject coveringPlainArray;
+    gl::VertexArrayObject coveringRasterArray;
+    gl::VertexArrayObject backgroundPatternArray;
+    gl::VertexArrayObject backgroundArray;
 };
 
 } // namespace mbgl

@@ -192,7 +192,7 @@ private:
     gl::VertexBuffer<PlainVertex> tileLineStripVertexes;
     gl::VertexBuffer<RasterVertex> rasterVertexes;
 
-    VertexArrayObject tileBorderArray;
+    gl::VertexArrayObject tileBorderArray;
 };
 
 } // namespace mbgl

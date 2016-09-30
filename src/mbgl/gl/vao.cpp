@@ -5,14 +5,15 @@
 #include <mbgl/gl/gl.hpp>
 
 namespace mbgl {
+namespace gl {
 
 VertexArrayObject::VertexArrayObject() {
 }
 
 VertexArrayObject::~VertexArrayObject() = default;
 
-void VertexArrayObject::bindVertexArrayObject(gl::Context& context) {
-    if (!gl::GenVertexArrays || !gl::BindVertexArray) {
+void VertexArrayObject::bindVertexArrayObject(Context& context) {
+    if (!GenVertexArrays || !BindVertexArray) {
         static bool reported = false;
         if (!reported) {
             Log::Warning(Event::OpenGL, "Not using Vertex Array Objects");
@@ -30,9 +31,9 @@ void VertexArrayObject::bindVertexArrayObject(gl::Context& context) {
     context.vertexArrayObject = *vertexArray;
 }
 
-void VertexArrayObject::verifyBinding(gl::Shader& shader,
-                                      gl::BufferID vertexBuffer,
-                                      gl::BufferID elementsBuffer,
+void VertexArrayObject::verifyBinding(Shader& shader,
+                                      BufferID vertexBuffer,
+                                      BufferID elementsBuffer,
                                       int8_t* offset) {
     if (bound_shader != shader.getID()) {
         throw std::runtime_error(std::string("trying to rebind VAO to another shader from " +
@@ -47,9 +48,9 @@ void VertexArrayObject::verifyBinding(gl::Shader& shader,
     }
 }
 
-void VertexArrayObject::storeBinding(gl::Shader& shader,
-                                     gl::BufferID vertexBuffer,
-                                     gl::BufferID elementsBuffer,
+void VertexArrayObject::storeBinding(Shader& shader,
+                                     BufferID vertexBuffer,
+                                     BufferID elementsBuffer,
                                      int8_t* offset) {
     bound_shader = shader.getID();
     bound_shader_name = shader.name;
@@ -58,4 +59,5 @@ void VertexArrayObject::storeBinding(gl::Shader& shader,
     bound_elements_buffer = elementsBuffer;
 }
 
+} // namespace gl
 } // namespace mbgl
