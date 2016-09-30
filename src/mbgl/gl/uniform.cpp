@@ -1,8 +1,9 @@
-#include <mbgl/shader/uniform.hpp>
-#include <mbgl/util/color.hpp>
+#include <mbgl/gl/uniform.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/util/color.hpp>
 
 namespace mbgl {
+namespace gl {
 
 template <>
 void Uniform<float>::bind(const float& t) {
@@ -52,4 +53,5 @@ void UniformMatrix<4>::bind(const std::array<float, 16>& t) {
 
 // Add more as needed.
 
+} // namespace gl
 } // namespace mbgl

@@ -1,5 +1,5 @@
 #include <mbgl/shader/texture_rect_vertex.hpp>
-#include <mbgl/shader/shader.hpp>
+#include <mbgl/gl/shader.hpp>
 #include <mbgl/gl/gl.hpp>
 
 namespace mbgl {

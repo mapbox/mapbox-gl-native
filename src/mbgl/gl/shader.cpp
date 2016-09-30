@@ -1,4 +1,4 @@
-#include <mbgl/shader/shader.hpp>
+#include <mbgl/gl/shader.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/util/stopwatch.hpp>
@@ -15,11 +15,12 @@
 #include <cassert>
 
 namespace mbgl {
+namespace gl {
 
 Shader::Shader(const char* name_,
                const char* vertexSource,
                const char* fragmentSource,
-               gl::Context& context,
+               Context& context,
                Defines defines)
     : name(name_),
       program(context.createProgram()),
@@ -71,7 +72,7 @@ Shader::Shader(const char* name_,
     }
 }
 
-bool Shader::compileShader(gl::UniqueShader& shader, const GLchar *source) {
+bool Shader::compileShader(UniqueShader& shader, const GLchar *source) {
     GLint status = 0;
 
     const GLsizei lengths = static_cast<GLsizei>(std::strlen(source));
@@ -107,8 +108,9 @@ Shader::~Shader() {
     }
 }
 
-gl::UniformLocation Shader::getUniformLocation(const char* uniform) const {
+UniformLocation Shader::getUniformLocation(const char* uniform) const {
     return MBGL_CHECK_ERROR(glGetUniformLocation(program.get(), uniform));
 }
 
+} // namespace gl
 } // namespace mbgl

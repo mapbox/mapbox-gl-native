@@ -1,10 +1,11 @@
 #pragma once
 
-#include <mbgl/shader/shader.hpp>
+#include <mbgl/gl/shader.hpp>
 
 #include <array>
 
 namespace mbgl {
+namespace gl {
 
 template <typename T>
 class Uniform {
@@ -24,7 +25,7 @@ private:
     void bind(const T&);
 
     T current;
-    gl::UniformLocation location;
+    UniformLocation location;
 };
 
 template <size_t C, size_t R = C>
@@ -53,7 +54,8 @@ private:
     void bind(const T&);
 
     T current;
-    gl::UniformLocation location;
+    UniformLocation location;
 };
 
+} // namespace gl
 } // namespace mbgl

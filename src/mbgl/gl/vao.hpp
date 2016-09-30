@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/shader/shader.hpp>
+#include <mbgl/gl/shader.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -57,11 +57,11 @@ public:
 
 private:
     void bindVertexArrayObject(gl::Context&);
-    void storeBinding(Shader& shader,
+    void storeBinding(gl::Shader& shader,
                       gl::BufferID vertexBuffer,
                       gl::BufferID elementsBuffer,
                       int8_t* offset);
-    void verifyBinding(Shader& shader,
+    void verifyBinding(gl::Shader& shader,
                        gl::BufferID vertexBuffer,
                        gl::BufferID elementsBuffer,
                        int8_t* offset);
