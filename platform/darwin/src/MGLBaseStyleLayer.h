@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGLBaseStyleLayer : NSObject
 
 /**
- The display of the layer. A value of `NO` hides the layer.
+ Whether this layer is displayed. A value of `NO` hides the layer.
  */
 @property (nonatomic, assign, getter=isVisible) BOOL visible;
 

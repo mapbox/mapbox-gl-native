@@ -1342,7 +1342,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Size of the additional area added to dimensions determined by `iconTextFix`, in clockwise order: top, right, bottom, left.
+     * Size of the additional area added to dimensions determined by `iconTextFit`, in clockwise order: top, right, bottom, left.
      *
      * @param value a Float[] value
      * @return property wrapper around Float[]
@@ -1352,7 +1352,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Size of the additional area added to dimensions determined by `iconTextFix`, in clockwise order: top, right, bottom, left.
+     * Size of the additional area added to dimensions determined by `iconTextFit`, in clockwise order: top, right, bottom, left.
      *
      * @param function a wrapper function for Float[]
      * @return property wrapper around a Float[] function
