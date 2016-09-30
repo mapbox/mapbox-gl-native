@@ -11,8 +11,15 @@ import java.lang.annotation.RetentionPolicy;
  */
 public abstract class Property<T> {
 
-    //visibility
+    //VISIBILITY: Whether this layer is displayed.
+
+    /**
+     * The layer is shown.
+     */
     public static final String VISIBLE = "visible";
+    /**
+     * The layer is hidden.
+     */
     public static final String NONE = "none";
 
     @StringDef({
@@ -22,9 +29,19 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface VISIBILITY {}
 
-    //line-cap
+    //LINE_CAP: The display of line endings.
+
+    /**
+     * A cap with a squared-off end which is drawn to the exact endpoint of the line.
+     */
     public static final String LINE_CAP_BUTT = "butt";
+    /**
+     * A cap with a rounded end which is drawn beyond the endpoint of the line at a radius of one-half of the line's width and centered on the endpoint of the line.
+     */
     public static final String LINE_CAP_ROUND = "round";
+    /**
+     * A cap with a squared-off end which is drawn beyond the endpoint of the line at a distance of one-half of the line's width.
+     */
     public static final String LINE_CAP_SQUARE = "square";
 
     @StringDef({
@@ -35,9 +52,19 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface LINE_CAP {}
 
-    //line-join
+    //LINE_JOIN: The display of lines when joining.
+
+    /**
+     * A join with a squared-off end which is drawn beyond the endpoint of the line at a distance of one-half of the line's width.
+     */
     public static final String LINE_JOIN_BEVEL = "bevel";
+    /**
+     * A join with a rounded end which is drawn beyond the endpoint of the line at a radius of one-half of the line's width and centered on the endpoint of the line.
+     */
     public static final String LINE_JOIN_ROUND = "round";
+    /**
+     * A join with a sharp, angled corner which is drawn with the outer sides beyond the endpoint of the path until they meet.
+     */
     public static final String LINE_JOIN_MITER = "miter";
 
     @StringDef({
@@ -48,8 +75,15 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface LINE_JOIN {}
 
-    //symbol-placement
+    //SYMBOL_PLACEMENT: Label placement relative to its geometry.
+
+    /**
+     * The label is placed at the point where the geometry is located.
+     */
     public static final String SYMBOL_PLACEMENT_POINT = "point";
+    /**
+     * The label is placed along the line of the geometry. Can only be used on `LineString` and `Polygon` geometries.
+     */
     public static final String SYMBOL_PLACEMENT_LINE = "line";
 
     @StringDef({
@@ -59,9 +93,19 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface SYMBOL_PLACEMENT {}
 
-    //icon-rotation-alignment
+    //ICON_ROTATION_ALIGNMENT: In combination with `symbol-placement`, determines the rotation behavior of icons.
+
+    /**
+     * When `symbol-placement` is set to `point`, aligns icons east-west. When `symbol-placement` is set to `line`, aligns icon x-axes with the line.
+     */
     public static final String ICON_ROTATION_ALIGNMENT_MAP = "map";
+    /**
+     * Produces icons whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbol-placement`.
+     */
     public static final String ICON_ROTATION_ALIGNMENT_VIEWPORT = "viewport";
+    /**
+     * When `symbol-placement` is set to `point`, this is equivalent to `viewport`. When `symbol-placement` is set to `line`, this is equivalent to `map`.
+     */
     public static final String ICON_ROTATION_ALIGNMENT_AUTO = "auto";
 
     @StringDef({
@@ -72,24 +116,47 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface ICON_ROTATION_ALIGNMENT {}
 
-    //icon-text-fit
+    //ICON_TEXT_FIT: Scales the icon to fit around the associated text.
+
+    /**
+     * The icon is displayed at its intrinsic aspect ratio.
+     */
     public static final String ICON_TEXT_FIT_NONE = "none";
-    public static final String ICON_TEXT_FIT_BOTH = "both";
+    /**
+     * The icon is scaled in the x-dimension to fit the width of the text.
+     */
     public static final String ICON_TEXT_FIT_WIDTH = "width";
+    /**
+     * The icon is scaled in the y-dimension to fit the height of the text.
+     */
     public static final String ICON_TEXT_FIT_HEIGHT = "height";
+    /**
+     * The icon is scaled in both x- and y-dimensions.
+     */
+    public static final String ICON_TEXT_FIT_BOTH = "both";
 
     @StringDef({
             ICON_TEXT_FIT_NONE,
-            ICON_TEXT_FIT_BOTH,
             ICON_TEXT_FIT_WIDTH,
             ICON_TEXT_FIT_HEIGHT,
+            ICON_TEXT_FIT_BOTH,
         })
     @Retention(RetentionPolicy.SOURCE)
     public @interface ICON_TEXT_FIT {}
 
-    //text-pitch-alignment
+    //TEXT_PITCH_ALIGNMENT: Orientation of text when map is pitched.
+
+    /**
+     * The text is aligned to the plane of the map.
+     */
     public static final String TEXT_PITCH_ALIGNMENT_MAP = "map";
+    /**
+     * The text is aligned to the plane of the viewport.
+     */
     public static final String TEXT_PITCH_ALIGNMENT_VIEWPORT = "viewport";
+    /**
+     * Automatically matches the value of `text-rotation-alignment`.
+     */
     public static final String TEXT_PITCH_ALIGNMENT_AUTO = "auto";
 
     @StringDef({
@@ -100,9 +167,19 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface TEXT_PITCH_ALIGNMENT {}
 
-    //text-rotation-alignment
+    //TEXT_ROTATION_ALIGNMENT: In combination with `symbol-placement`, determines the rotation behavior of the individual glyphs forming the text.
+
+    /**
+     * When `symbol-placement` is set to `point`, aligns text east-west. When `symbol-placement` is set to `line`, aligns text x-axes with the line.
+     */
     public static final String TEXT_ROTATION_ALIGNMENT_MAP = "map";
+    /**
+     * Produces glyphs whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbol-placement`.
+     */
     public static final String TEXT_ROTATION_ALIGNMENT_VIEWPORT = "viewport";
+    /**
+     * When `symbol-placement` is set to `point`, this is equivalent to `viewport`. When `symbol-placement` is set to `line`, this is equivalent to `map`.
+     */
     public static final String TEXT_ROTATION_ALIGNMENT_AUTO = "auto";
 
     @StringDef({
@@ -113,9 +190,19 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface TEXT_ROTATION_ALIGNMENT {}
 
-    //text-justify
+    //TEXT_JUSTIFY: Text justification options.
+
+    /**
+     * The text is aligned to the left.
+     */
     public static final String TEXT_JUSTIFY_LEFT = "left";
+    /**
+     * The text is centered.
+     */
     public static final String TEXT_JUSTIFY_CENTER = "center";
+    /**
+     * The text is aligned to the right.
+     */
     public static final String TEXT_JUSTIFY_RIGHT = "right";
 
     @StringDef({
@@ -126,15 +213,43 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface TEXT_JUSTIFY {}
 
-    //text-anchor
+    //TEXT_ANCHOR: Part of the text placed closest to the anchor.
+
+    /**
+     * The center of the text is placed closest to the anchor.
+     */
     public static final String TEXT_ANCHOR_CENTER = "center";
+    /**
+     * The left side of the text is placed closest to the anchor.
+     */
     public static final String TEXT_ANCHOR_LEFT = "left";
+    /**
+     * The right side of the text is placed closest to the anchor.
+     */
     public static final String TEXT_ANCHOR_RIGHT = "right";
+    /**
+     * The top of the text is placed closest to the anchor.
+     */
     public static final String TEXT_ANCHOR_TOP = "top";
+    /**
+     * The bottom of the text is placed closest to the anchor.
+     */
     public static final String TEXT_ANCHOR_BOTTOM = "bottom";
+    /**
+     * The top left corner of the text is placed closest to the anchor.
+     */
     public static final String TEXT_ANCHOR_TOP_LEFT = "top-left";
+    /**
+     * The top right corner of the text is placed closest to the anchor.
+     */
     public static final String TEXT_ANCHOR_TOP_RIGHT = "top-right";
+    /**
+     * The bottom left corner of the text is placed closest to the anchor.
+     */
     public static final String TEXT_ANCHOR_BOTTOM_LEFT = "bottom-left";
+    /**
+     * The bottom right corner of the text is placed closest to the anchor.
+     */
     public static final String TEXT_ANCHOR_BOTTOM_RIGHT = "bottom-right";
 
     @StringDef({
@@ -151,9 +266,19 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface TEXT_ANCHOR {}
 
-    //text-transform
+    //TEXT_TRANSFORM: Specifies how to capitalize text, similar to the CSS `text-transform` property.
+
+    /**
+     * The text is not altered.
+     */
     public static final String TEXT_TRANSFORM_NONE = "none";
+    /**
+     * Forces all letters to be displayed in uppercase.
+     */
     public static final String TEXT_TRANSFORM_UPPERCASE = "uppercase";
+    /**
+     * Forces all letters to be displayed in lowercase.
+     */
     public static final String TEXT_TRANSFORM_LOWERCASE = "lowercase";
 
     @StringDef({
@@ -164,8 +289,15 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface TEXT_TRANSFORM {}
 
-    //fill-translate-anchor
+    //FILL_TRANSLATE_ANCHOR: Controls the translation reference point.
+
+    /**
+     * The fill is translated relative to the map.
+     */
     public static final String FILL_TRANSLATE_ANCHOR_MAP = "map";
+    /**
+     * The fill is translated relative to the viewport.
+     */
     public static final String FILL_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
     @StringDef({
@@ -175,8 +307,15 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface FILL_TRANSLATE_ANCHOR {}
 
-    //line-translate-anchor
+    //LINE_TRANSLATE_ANCHOR: Controls the translation reference point.
+
+    /**
+     * The line is translated relative to the map.
+     */
     public static final String LINE_TRANSLATE_ANCHOR_MAP = "map";
+    /**
+     * The line is translated relative to the viewport.
+     */
     public static final String LINE_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
     @StringDef({
@@ -186,8 +325,15 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface LINE_TRANSLATE_ANCHOR {}
 
-    //icon-translate-anchor
+    //ICON_TRANSLATE_ANCHOR: Controls the translation reference point.
+
+    /**
+     * Icons are translated relative to the map.
+     */
     public static final String ICON_TRANSLATE_ANCHOR_MAP = "map";
+    /**
+     * Icons are translated relative to the viewport.
+     */
     public static final String ICON_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
     @StringDef({
@@ -197,8 +343,15 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface ICON_TRANSLATE_ANCHOR {}
 
-    //text-translate-anchor
+    //TEXT_TRANSLATE_ANCHOR: Controls the translation reference point.
+
+    /**
+     * The text is translated relative to the map.
+     */
     public static final String TEXT_TRANSLATE_ANCHOR_MAP = "map";
+    /**
+     * The text is translated relative to the viewport.
+     */
     public static final String TEXT_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
     @StringDef({
@@ -208,8 +361,15 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface TEXT_TRANSLATE_ANCHOR {}
 
-    //circle-translate-anchor
+    //CIRCLE_TRANSLATE_ANCHOR: Controls the translation reference point.
+
+    /**
+     * The circle is translated relative to the map.
+     */
     public static final String CIRCLE_TRANSLATE_ANCHOR_MAP = "map";
+    /**
+     * The circle is translated relative to the viewport.
+     */
     public static final String CIRCLE_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
     @StringDef({
@@ -219,8 +379,15 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface CIRCLE_TRANSLATE_ANCHOR {}
 
-    //circle-pitch-scale
+    //CIRCLE_PITCH_SCALE: Controls the scaling behavior of the circle when the map is pitched.
+
+    /**
+     * Circles are scaled according to their apparent distance to the camera.
+     */
     public static final String CIRCLE_PITCH_SCALE_MAP = "map";
+    /**
+     * Circles are not scaled.
+     */
     public static final String CIRCLE_PITCH_SCALE_VIEWPORT = "viewport";
 
     @StringDef({

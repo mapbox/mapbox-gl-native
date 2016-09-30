@@ -52,7 +52,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The opacity of the entire fill layer. In contrast to the fill-color, this value will also affect the 1px stroke around the fill, if the stroke is used.
+     * The opacity of the entire fill layer. In contrast to the `fillColor`, this value will also affect the 1px stroke around the fill, if the stroke is used.
      *
      * @param value a Float value
      * @return property wrapper around Float
@@ -62,7 +62,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The opacity of the entire fill layer. In contrast to the fill-color, this value will also affect the 1px stroke around the fill, if the stroke is used.
+     * The opacity of the entire fill layer. In contrast to the `fillColor`, this value will also affect the 1px stroke around the fill, if the stroke is used.
      *
      * @param function a wrapper function for Float
      * @return property wrapper around a Float function
@@ -72,7 +72,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The color of the filled part of this layer. This color can be specified as rgba with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
+     * The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
      *
      * @param value a int color value
      * @return property wrapper around String color
@@ -82,7 +82,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The color of the filled part of this layer. This color can be specified as rgba with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
+     * The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -92,7 +92,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The color of the filled part of this layer. This color can be specified as rgba with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
+     * The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -102,7 +102,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The outline color of the fill. Matches the value of `fill-color` if unspecified.
+     * The outline color of the fill. Matches the value of `fillColor` if unspecified.
      *
      * @param value a int color value
      * @return property wrapper around String color
@@ -112,7 +112,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The outline color of the fill. Matches the value of `fill-color` if unspecified.
+     * The outline color of the fill. Matches the value of `fillColor` if unspecified.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -122,7 +122,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The outline color of the fill. Matches the value of `fill-color` if unspecified.
+     * The outline color of the fill. Matches the value of `fillColor` if unspecified.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -152,7 +152,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Control whether the translation is relative to the map (north) or viewport (screen)
+     * Controls the translation reference point.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -162,7 +162,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Control whether the translation is relative to the map (north) or viewport (screen)
+     * Controls the translation reference point.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -262,7 +262,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Control whether the translation is relative to the map (north) or viewport (screen)
+     * Controls the translation reference point.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -272,7 +272,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Control whether the translation is relative to the map (north) or viewport (screen)
+     * Controls the translation reference point.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -452,7 +452,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The color of the icon's halo. Icon halos can only be used with sdf icons.
+     * The color of the icon's halo. Icon halos can only be used with SDF icons.
      *
      * @param value a int color value
      * @return property wrapper around String color
@@ -462,7 +462,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The color of the icon's halo. Icon halos can only be used with sdf icons.
+     * The color of the icon's halo. Icon halos can only be used with SDF icons.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -472,7 +472,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The color of the icon's halo. Icon halos can only be used with sdf icons.
+     * The color of the icon's halo. Icon halos can only be used with SDF icons.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -542,7 +542,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Control whether the translation is relative to the map (north) or viewport (screen).
+     * Controls the translation reference point.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -552,7 +552,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Control whether the translation is relative to the map (north) or viewport (screen).
+     * Controls the translation reference point.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -702,7 +702,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Control whether the translation is relative to the map (north) or viewport (screen).
+     * Controls the translation reference point.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -712,7 +712,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Control whether the translation is relative to the map (north) or viewport (screen).
+     * Controls the translation reference point.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -832,7 +832,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Control whether the translation is relative to the map (north) or viewport (screen)
+     * Controls the translation reference point.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -842,7 +842,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Control whether the translation is relative to the map (north) or viewport (screen)
+     * Controls the translation reference point.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -852,7 +852,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Controls the scaling behavior of the circle when the map is pitched. The value `map` scales circles according to their apparent distance to the camera. The value `viewport` results in no pitch-related scaling.
+     * Controls the scaling behavior of the circle when the map is pitched.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -862,7 +862,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Controls the scaling behavior of the circle when the map is pitched. The value `map` scales circles according to their apparent distance to the camera. The value `viewport` results in no pitch-related scaling.
+     * Controls the scaling behavior of the circle when the map is pitched.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -1162,7 +1162,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Label placement relative to its geometry. `line` can only be used on LineStrings and Polygons.
+     * Label placement relative to its geometry.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1172,7 +1172,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Label placement relative to its geometry. `line` can only be used on LineStrings and Polygons.
+     * Label placement relative to its geometry.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -1282,7 +1282,7 @@ public class PropertyFactory {
     }
 
     /**
-     * In combination with `symbol-placement`, determines the rotation behavior of icons. The value `viewport` produces icons whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbol-placement`. When `symbol-placement` is set to `point`, the value `map` produces icons whose x-axes are aligned east-west, and the value `auto` is equivalent to `viewport`. When `symbol-placement` is set to `line`, the value `map` produces icons whose x-axes are aligned with the line, and the value `auto` is equivalent to `map`.
+     * In combination with `symbolPlacement`, determines the rotation behavior of icons.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1292,7 +1292,7 @@ public class PropertyFactory {
     }
 
     /**
-     * In combination with `symbol-placement`, determines the rotation behavior of icons. The value `viewport` produces icons whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbol-placement`. When `symbol-placement` is set to `point`, the value `map` produces icons whose x-axes are aligned east-west, and the value `auto` is equivalent to `viewport`. When `symbol-placement` is set to `line`, the value `map` produces icons whose x-axes are aligned with the line, and the value `auto` is equivalent to `map`.
+     * In combination with `symbolPlacement`, determines the rotation behavior of icons.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -1322,7 +1322,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Scales the icon to fit around the associated text. The value `none` performs no scaling. The values `width` and `height` scale the x- or y-dimension, respectively, to fit the text's dimensions. The value `both` scales in both dimensions.
+     * Scales the icon to fit around the associated text.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1332,7 +1332,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Scales the icon to fit around the associated text. The value `none` performs no scaling. The values `width` and `height` scale the x- or y-dimension, respectively, to fit the text's dimensions. The value `both` scales in both dimensions.
+     * Scales the icon to fit around the associated text.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -1342,7 +1342,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Size of the additional area added to dimensions determined by `icon-text-fix`, in clockwise order: top, right, bottom, left.
+     * Size of the additional area added to dimensions determined by `iconTextFit`, in clockwise order: top, right, bottom, left.
      *
      * @param value a Float[] value
      * @return property wrapper around Float[]
@@ -1352,7 +1352,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Size of the additional area added to dimensions determined by `icon-text-fix`, in clockwise order: top, right, bottom, left.
+     * Size of the additional area added to dimensions determined by `iconTextFit`, in clockwise order: top, right, bottom, left.
      *
      * @param function a wrapper function for Float[]
      * @return property wrapper around a Float[] function
@@ -1462,7 +1462,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Orientation of text when map is pitched. Aligns text to the plane of the viewport when set to `viewport` or the plane of the map when set to `map`. Matches `text-rotation-alignment` if `auto`.
+     * Orientation of text when map is pitched.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1472,7 +1472,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Orientation of text when map is pitched. Aligns text to the plane of the viewport when set to `viewport` or the plane of the map when set to `map`. Matches `text-rotation-alignment` if `auto`.
+     * Orientation of text when map is pitched.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -1482,7 +1482,7 @@ public class PropertyFactory {
     }
 
     /**
-     * In combination with `symbol-placement`, determines the rotation behavior of the individual glyphs forming the text. The value `viewport` produces glyphs whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbol-placement`. When `symbol-placement` is set to `point`, the value `map` produces glyphs whose x-axes are aligned east-west, and the value `auto` is equivalent to `viewport`. When `symbol-placement` is set to `line`, the value `map` produces glyphs whose x-axes are aligned with the line at the point where each glyph is placed, and the value `auto` is equivalent to `map`.
+     * In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1492,7 +1492,7 @@ public class PropertyFactory {
     }
 
     /**
-     * In combination with `symbol-placement`, determines the rotation behavior of the individual glyphs forming the text. The value `viewport` produces glyphs whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbol-placement`. When `symbol-placement` is set to `point`, the value `map` produces glyphs whose x-axes are aligned east-west, and the value `auto` is equivalent to `viewport`. When `symbol-placement` is set to `line`, the value `map` produces glyphs whose x-axes are aligned with the line at the point where each glyph is placed, and the value `auto` is equivalent to `map`.
+     * In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function

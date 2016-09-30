@@ -20,7 +20,13 @@ global.camelizeWithLeadingLowercase = function (str) {
     });
 };
 
-global.objCName = function (property) { return camelizeWithLeadingLowercase(property.name); }
+global.objCName = function (property) {
+    return camelizeWithLeadingLowercase(property.name);
+}
+
+global.objCType = function (layerType, propertyName) {
+    return `${prefix}${camelize(layerType)}${suffix}${camelize(propertyName)}`;
+}
 
 global.arrayType = function (property) {
     return property.type === 'array' ? property.name.split('-').pop() : false;
@@ -53,8 +59,8 @@ global.testHelperMessage = function (property, layerType, isFunction) {
         case 'string':
             return 'testString' + fnSuffix;
         case 'enum':
-            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            let objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
+            let objCType = global.objCType(layerType, property.name);
+            let objCEnum = `${objCType}${camelize(Object.keys(property.values)[Object.keys(property.values).length-1])}`;
             return `testEnum${fnSuffix}:${objCEnum} type:@encode(${objCType})`;
         case 'color':
             return 'testColor' + fnSuffix;
@@ -77,10 +83,25 @@ global.testHelperMessage = function (property, layerType, isFunction) {
     }
 };
 
-global.propertyDoc = function (property, layerType) {
-    let doc = property.doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
-        if ('values' in property && property.values.indexOf(symbol) !== -1) {
-            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+global.propertyDoc = function (propertyName, property, layerType) {
+    // Match references to other property names & values. 
+    // Requires the format 'When `foo` is set to `bar`,'.
+    let doc = property.doc.replace(/When `(.+?)` is set to `(.+?)`,/g, function (m, peerPropertyName, propertyValue, offset, str) {
+        let otherProperty = camelizeWithLeadingLowercase(peerPropertyName);
+        let otherValue = objCType(layerType, peerPropertyName) + camelize(propertyValue);
+        return 'When `' + `${otherProperty}` + '` is set to `' + `${otherValue}` + '`,';
+    });
+    // Match references to our own property values.
+    // Requires the format 'is equivalent to `bar`'.
+    doc = doc.replace(/is equivalent to `(.+?)`/g, function(m, propertyValue, offset, str) {
+        propertyValue = objCType(layerType, propertyName) + camelize(propertyValue);
+        return 'is equivalent to `' + propertyValue + '`';
+    });
+    // Format everything else: our property name & its possible values.
+    // Requires symbols to be surrounded by backticks.
+    doc = doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
+        if ('values' in property && Object.keys(property.values).indexOf(symbol) !== -1) {
+            let objCType = objCType(layerType, property.name);
             return '`' + `${objCType}${camelize(symbol)}` + '`';
         }
         if (str.substr(offset - 4, 3) !== 'CSS') {
@@ -88,6 +109,7 @@ global.propertyDoc = function (property, layerType) {
         }
         return '`' + symbol + '`';
     });
+    // Format references to units.
     if ('units' in property) {
         if (!property.units.match(/s$/)) {
             property.units += 's';
@@ -138,11 +160,11 @@ global.describeValue = function (value, property, layerType) {
                 let conjunction = '';
                 if (value.length === 2 && i === 0) conjunction = 'either ';
                 if (i === value.length - 1) conjunction = 'or ';
-                let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+                let objCType = global.objCType(layerType, property.name);
                 return `${conjunction}\`${objCType}${camelize(possibleValue)}\``;
               }).join(separator);
             } else {
-              let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+              let objCType = global.objCType(layerType, property.name);
               displayValue = `\`${objCType}${camelize(value)}\``;
             }
             return `an \`NSValue\` object containing ${displayValue}`;
@@ -222,7 +244,7 @@ global.setterImplementation = function(property, layerType) {
             implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_stringPropertyValue);`;
             break;
         case 'enum':
-            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+            let objCType = global.objCType(layerType, property.name);
             implementation = `MGLSetEnumProperty(${objCName(property)}, ${camelize(property.name)}, ${mbglType(property)}, ${objCType});`;
             break;
         case 'color':
@@ -272,7 +294,7 @@ global.styleAttributeFactory = function (property, layerType) {
 
 global.getterImplementation = function(property, layerType) {
     if (property.type === 'enum') {
-        let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+        let objCType = global.objCType(layerType, property.name);
         return `MGLGetEnumProperty(${camelize(property.name)}, ${mbglType(property)}, ${objCType});`;
     }
     let rawValue = `self.layer->get${camelize(property.name)}() ?: self.layer->getDefault${camelize(property.name)}()`;
@@ -299,7 +321,7 @@ const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
 const testLayers = ejs.compile(fs.readFileSync('platform/darwin/src/MGLRuntimeStylingTests.m.ejs', 'utf8'), { strict: true});
 
-const layers = spec.layer.type.values.map((type) => {
+const layers = Object.keys(spec.layer.type.values).map((type) => {
     const layoutProperties = Object.keys(spec[`layout_${type}`]).reduce((memo, name) => {
         if (name !== 'visibility') {
             spec[`layout_${type}`][name].name = name;

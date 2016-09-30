@@ -34,7 +34,7 @@ public class FillLayer extends Layer {
 
     protected native void initialize(String layerId, String sourceId);
 
-   /**
+    /**
      * Set the source layer.
      *
      * @param sourceLayer the source layer to set
@@ -143,7 +143,7 @@ public class FillLayer extends Layer {
         return (PropertyValue<String>) new PropertyValue(nativeGetFillColor());
     }
      /**
-     * The color of the filled part of this layer. This color can be specified as rgba with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
+     * The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
      *
      * @return int representation of a rgba string color
      * @throws RuntimeException thrown if property isn't a value

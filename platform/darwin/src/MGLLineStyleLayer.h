@@ -6,20 +6,53 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ The display of line endings.
+ */
 typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineCap) {
+    /**
+     A cap with a squared-off end which is drawn to the exact endpoint of the line.
+     */
     MGLLineStyleLayerLineCapButt,
+    /**
+     A cap with a rounded end which is drawn beyond the endpoint of the line at a radius of one-half of the line's width and centered on the endpoint of the line.
+     */
     MGLLineStyleLayerLineCapRound,
+    /**
+     A cap with a squared-off end which is drawn beyond the endpoint of the line at a distance of one-half of the line's width.
+     */
     MGLLineStyleLayerLineCapSquare,
 };
 
+/**
+ The display of lines when joining.
+ */
 typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineJoin) {
+    /**
+     A join with a squared-off end which is drawn beyond the endpoint of the line at a distance of one-half of the line's width.
+     */
     MGLLineStyleLayerLineJoinBevel,
+    /**
+     A join with a rounded end which is drawn beyond the endpoint of the line at a radius of one-half of the line's width and centered on the endpoint of the line.
+     */
     MGLLineStyleLayerLineJoinRound,
+    /**
+     A join with a sharp, angled corner which is drawn with the outer sides beyond the endpoint of the path until they meet.
+     */
     MGLLineStyleLayerLineJoinMiter,
 };
 
+/**
+ Controls the translation reference point.
+ */
 typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
+    /**
+     The line is translated relative to the map.
+     */
     MGLLineStyleLayerLineTranslateAnchorMap,
+    /**
+     The line is translated relative to the viewport.
+     */
     MGLLineStyleLayerLineTranslateAnchorViewport,
 };
 
@@ -116,7 +149,7 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineTranslate;
 
 /**
- Control whether the translation is relative to the map (north) or viewport (screen)
+ Controls the translation reference point.
  
  The default value of this property is an `NSValue` object containing `MGLLineStyleLayerLineTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
 

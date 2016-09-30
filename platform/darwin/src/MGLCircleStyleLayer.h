@@ -6,13 +6,31 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ Controls the translation reference point.
+ */
 typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCircleTranslateAnchor) {
+    /**
+     The circle is translated relative to the map.
+     */
     MGLCircleStyleLayerCircleTranslateAnchorMap,
+    /**
+     The circle is translated relative to the viewport.
+     */
     MGLCircleStyleLayerCircleTranslateAnchorViewport,
 };
 
+/**
+ Controls the scaling behavior of the circle when the map is pitched.
+ */
 typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
+    /**
+     Circles are scaled according to their apparent distance to the camera.
+     */
     MGLCircleStyleLayerCirclePitchScaleMap,
+    /**
+     Circles are not scaled.
+     */
     MGLCircleStyleLayerCirclePitchScaleViewport,
 };
 
@@ -87,7 +105,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleTranslate;
 
 /**
- Control whether the translation is relative to the map (north) or viewport (screen)
+ Controls the translation reference point.
  
  The default value of this property is an `NSValue` object containing `MGLCircleStyleLayerCircleTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
 
@@ -96,7 +114,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleStyleLayerCirclePitchScale) {
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> circleTranslateAnchor;
 
 /**
- Controls the scaling behavior of the circle when the map is pitched. The value `MGLCircleStyleLayerCirclePitchScaleMap` scales circles according to their apparent distance to the camera. The value `MGLCircleStyleLayerCirclePitchScaleViewport` results in no pitch-related scaling.
+ Controls the scaling behavior of the circle when the map is pitched.
  
  The default value of this property is an `NSValue` object containing `MGLCircleStyleLayerCirclePitchScaleMap`. Set this property to `nil` to reset it to the default value.
  */
