@@ -10,7 +10,7 @@ DERIVED_DATA=build/macos
 PRODUCTS=${DERIVED_DATA}
 
 BUILDTYPE=${BUILDTYPE:-Release}
-GCC_GENERATE_DEBUGGING_SYMBOLS=${SYMBOLS:-YES}
+SYMBOLS=${SYMBOLS:-YES}
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
@@ -25,7 +25,6 @@ SHORT_VERSION=${SEM_VERSION%-*}
 
 step "Building targets (build ${PROJ_VERSION}, version ${SEM_VERSION})…"
 xcodebuild \
-    GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
     CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
     CURRENT_SHORT_VERSION=${SHORT_VERSION} \
     CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
@@ -43,7 +42,7 @@ if [[ -e ${PRODUCTS}/${BUILDTYPE}/${NAME}.framework.dSYM ]]; then
     cp -r ${PRODUCTS}/${BUILDTYPE}/${NAME}.framework.dSYM "${OUTPUT}"
 fi
 
-if [[ "${GCC_GENERATE_DEBUGGING_SYMBOLS}" == false ]]; then
+if [[ ${SYMBOLS} = NO ]]; then
     step "Stripping binaries…"
     strip -Sx "${OUTPUT}/${NAME}.framework/${NAME}"
 fi
