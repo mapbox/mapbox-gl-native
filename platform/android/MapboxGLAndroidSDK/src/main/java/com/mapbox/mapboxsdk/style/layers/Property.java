@@ -12,7 +12,14 @@ import java.lang.annotation.RetentionPolicy;
 public abstract class Property<T> {
 
     //VISIBILITY: Whether this layer is displayed.
+
+    /**
+     * The layer is shown.
+     */
     public static final String VISIBLE = "visible";
+    /**
+     * The layer is hidden.
+     */
     public static final String NONE = "none";
 
     @StringDef({
@@ -23,6 +30,7 @@ public abstract class Property<T> {
     public @interface VISIBILITY {}
 
     //LINE_CAP: The display of line endings.
+
     /**
      * A cap with a squared-off end which is drawn to the exact endpoint of the line.
      */
@@ -45,6 +53,7 @@ public abstract class Property<T> {
     public @interface LINE_CAP {}
 
     //LINE_JOIN: The display of lines when joining.
+
     /**
      * A join with a squared-off end which is drawn beyond the endpoint of the line at a distance of one-half of the line's width.
      */
@@ -67,6 +76,7 @@ public abstract class Property<T> {
     public @interface LINE_JOIN {}
 
     //SYMBOL_PLACEMENT: Label placement relative to its geometry.
+
     /**
      * The label is placed at the point where the geometry is located.
      */
@@ -84,6 +94,7 @@ public abstract class Property<T> {
     public @interface SYMBOL_PLACEMENT {}
 
     //ICON_ROTATION_ALIGNMENT: In combination with `symbol-placement`, determines the rotation behavior of icons.
+
     /**
      * When `symbol-placement` is set to `point`, aligns icons east-west. When `symbol-placement` is set to `line`, aligns icon x-axes with the line.
      */
@@ -106,6 +117,7 @@ public abstract class Property<T> {
     public @interface ICON_ROTATION_ALIGNMENT {}
 
     //ICON_TEXT_FIT: Scales the icon to fit around the associated text.
+
     /**
      * The icon is displayed at its intrinsic aspect ratio.
      */
@@ -133,6 +145,7 @@ public abstract class Property<T> {
     public @interface ICON_TEXT_FIT {}
 
     //TEXT_PITCH_ALIGNMENT: Orientation of text when map is pitched.
+
     /**
      * The text is aligned to the plane of the map.
      */
@@ -155,6 +168,7 @@ public abstract class Property<T> {
     public @interface TEXT_PITCH_ALIGNMENT {}
 
     //TEXT_ROTATION_ALIGNMENT: In combination with `symbol-placement`, determines the rotation behavior of the individual glyphs forming the text.
+
     /**
      * When `symbol-placement` is set to `point`, aligns text east-west. When `symbol-placement` is set to `line`, aligns text x-axes with the line.
      */
@@ -177,6 +191,7 @@ public abstract class Property<T> {
     public @interface TEXT_ROTATION_ALIGNMENT {}
 
     //TEXT_JUSTIFY: Text justification options.
+
     /**
      * The text is aligned to the left.
      */
@@ -199,6 +214,7 @@ public abstract class Property<T> {
     public @interface TEXT_JUSTIFY {}
 
     //TEXT_ANCHOR: Part of the text placed closest to the anchor.
+
     /**
      * The center of the text is placed closest to the anchor.
      */
@@ -251,6 +267,7 @@ public abstract class Property<T> {
     public @interface TEXT_ANCHOR {}
 
     //TEXT_TRANSFORM: Specifies how to capitalize text, similar to the CSS `text-transform` property.
+
     /**
      * The text is not altered.
      */
@@ -273,6 +290,7 @@ public abstract class Property<T> {
     public @interface TEXT_TRANSFORM {}
 
     //FILL_TRANSLATE_ANCHOR: Controls the translation reference point.
+
     /**
      * The fill is translated relative to the map.
      */
@@ -290,6 +308,7 @@ public abstract class Property<T> {
     public @interface FILL_TRANSLATE_ANCHOR {}
 
     //LINE_TRANSLATE_ANCHOR: Controls the translation reference point.
+
     /**
      * The line is translated relative to the map.
      */
@@ -307,6 +326,7 @@ public abstract class Property<T> {
     public @interface LINE_TRANSLATE_ANCHOR {}
 
     //ICON_TRANSLATE_ANCHOR: Controls the translation reference point.
+
     /**
      * Icons are translated relative to the map.
      */
@@ -324,6 +344,7 @@ public abstract class Property<T> {
     public @interface ICON_TRANSLATE_ANCHOR {}
 
     //TEXT_TRANSLATE_ANCHOR: Controls the translation reference point.
+
     /**
      * The text is translated relative to the map.
      */
@@ -341,6 +362,7 @@ public abstract class Property<T> {
     public @interface TEXT_TRANSLATE_ANCHOR {}
 
     //CIRCLE_TRANSLATE_ANCHOR: Controls the translation reference point.
+
     /**
      * The circle is translated relative to the map.
      */
@@ -358,6 +380,7 @@ public abstract class Property<T> {
     public @interface CIRCLE_TRANSLATE_ANCHOR {}
 
     //CIRCLE_PITCH_SCALE: Controls the scaling behavior of the circle when the map is pitched.
+
     /**
      * Circles are scaled according to their apparent distance to the camera.
      */

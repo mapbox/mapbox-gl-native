@@ -15,7 +15,14 @@ import java.lang.annotation.RetentionPolicy;
 public abstract class Property<T> {
 
     //VISIBILITY: Whether this layer is displayed.
+
+    /**
+     * The layer is shown.
+     */
     public static final String VISIBLE = "visible";
+    /**
+     * The layer is hidden.
+     */
     public static final String NONE = "none";
 
     @StringDef({
@@ -27,6 +34,7 @@ public abstract class Property<T> {
 
 <% for (const property of properties) { -%>
     //<%- snakeCaseUpper(property.name) %>: <%- property.doc %>
+
 <% for (const value in property.values) { -%>
     /**
      * <%- property.values[value].doc %>
