@@ -17,7 +17,7 @@ namespace mbgl {
 
 class Shaders {
 public:
-    Shaders(gl::Context& context, Shader::Defines defines = Shader::None)
+    Shaders(gl::Context& context, gl::Shader::Defines defines = gl::Shader::None)
         : plain(context, defines),
           outline(context, defines),
           outlinePattern(context, defines),

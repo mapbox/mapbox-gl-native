@@ -67,7 +67,7 @@ Painter::Painter(const TransformState& state_)
 
     shaders = std::make_unique<Shaders>(context);
 #ifndef NDEBUG
-    overdrawShaders = std::make_unique<Shaders>(context, Shader::Overdraw);
+    overdrawShaders = std::make_unique<Shaders>(context, gl::Shader::Overdraw);
 #endif
 
     // Reset GL values

@@ -73,7 +73,7 @@ void bindVertexAttribute(AttributeLocation location, const E (V::*)[N], const in
 
 // This has to be a macro because it uses the offsetof macro, which is the only legal way to get a member offset.
 #define MBGL_BIND_VERTEX_ATTRIBUTE(VertexType, member, offset) \
-    ::mbgl::gl::bindVertexAttribute<offsetof(VertexType, member)>(Shader::member, &VertexType::member, offset)
+    ::mbgl::gl::bindVertexAttribute<offsetof(VertexType, member)>(gl::Shader::member, &VertexType::member, offset)
 
 } // namespace gl
 } // namespace mbgl

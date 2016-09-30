@@ -30,7 +30,7 @@ void VertexArrayObject::bindVertexArrayObject(gl::Context& context) {
     context.vertexArrayObject = *vertexArray;
 }
 
-void VertexArrayObject::verifyBinding(Shader& shader,
+void VertexArrayObject::verifyBinding(gl::Shader& shader,
                                       gl::BufferID vertexBuffer,
                                       gl::BufferID elementsBuffer,
                                       int8_t* offset) {
@@ -47,7 +47,7 @@ void VertexArrayObject::verifyBinding(Shader& shader,
     }
 }
 
-void VertexArrayObject::storeBinding(Shader& shader,
+void VertexArrayObject::storeBinding(gl::Shader& shader,
                                      gl::BufferID vertexBuffer,
                                      gl::BufferID elementsBuffer,
                                      int8_t* offset) {
