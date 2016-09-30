@@ -348,6 +348,14 @@
                 android:name="@string/category"
                 android:value="@string/category_style" />
         </activity>
+        <activity
+            android:name=".activity.style.CustomSpriteActivity"
+            android:description="@string/description_custom_sprite"
+            android:label="@string/activity_add_sprite">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style" />
+        </activity>
 
         <activity
             android:name=".activity.imagegenerator.PrintActivity"
