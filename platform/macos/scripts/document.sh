@@ -19,8 +19,6 @@ BRANCH=$( git describe --tags --match=macos-v*.*.* --abbrev=0 )
 SHORT_VERSION=$( echo ${BRANCH} | sed 's/^macos-v//' )
 RELEASE_VERSION=$( echo ${SHORT_VERSION} | sed -e 's/^macos-v//' -e 's/-.*//' )
 
-SWIFT_VERSION=$(xcrun swift -version | head -n 1 | sed -e 's/^Apple Swift version //' -e 's/ .*$//')
-
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/README.md
@@ -37,7 +35,6 @@ cp platform/macos/screenshot.png "${OUTPUT}"
 jazzy \
     --config platform/macos/jazzy.yml \
     --sdk macosx \
-    --swift-version $SWIFT_VERSION \
     --github-file-prefix https://github.com/mapbox/mapbox-gl-native/tree/${BRANCH} \
     --module-version ${SHORT_VERSION} \
     --readme ${README} \
