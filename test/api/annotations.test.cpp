@@ -341,3 +341,37 @@ TEST(Annotations, QueryRenderedFeatures) {
     EXPECT_TRUE(!!features2[0].id);
     EXPECT_EQ(*features2[0].id, 1);
 }
+
+TEST(Annotations, VisibleFeatures) {
+    AnnotationTest test;
+
+    auto viewSize = test.view.getSize();
+    auto box = ScreenBox { {}, { double(viewSize[0]), double(viewSize[1]) } };
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    test.map.setZoom(3);
+
+    std::vector<mbgl::AnnotationID> ids;
+    for (int longitude = -5; longitude <= 5; ++longitude) {
+        for (int latitude = -5; latitude <= 5; ++latitude) {
+            ids.push_back(test.map.addAnnotation(SymbolAnnotation { { double(latitude), double(longitude) }, "default_marker" }));
+        }
+    }
+
+    // Change bearing *after* adding annotations cause them to be reordered,
+    // and some annotations become occluded by others.
+    test.map.setBearing(45);
+    // FIXME: https://github.com/mapbox/mapbox-gl-native/issues/5419
+    test.checkRendering("visible_features_rotated");
+
+    auto features = test.map.queryRenderedFeatures(box);
+    EXPECT_EQ(features.size(), ids.size());
+
+    test.map.setBearing(0);
+    test.map.setZoom(4);
+    // FIXME: https://github.com/mapbox/mapbox-gl-native/issues/5419
+    test.checkRendering("visible_features");
+    features = test.map.queryRenderedFeatures(box);
+    EXPECT_EQ(features.size(), ids.size());
+}
