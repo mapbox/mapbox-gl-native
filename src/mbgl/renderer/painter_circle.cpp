@@ -19,10 +19,10 @@ void Painter::renderCircle(PaintParameters& parameters,
     // Abort early.
     if (pass == RenderPass::Opaque) return;
 
-    context.stencilTest = frame.mapMode == MapMode::Still ? GL_TRUE : GL_FALSE;
-    context.depthFunc.reset();
-    context.depthTest = GL_TRUE;
-    context.depthMask = GL_FALSE;
+    context.stencilTest = frame.mapMode == MapMode::Still;
+    context.depthFunc = gl::DepthTestFunction::LessEqual;
+    context.depthTest = true;
+    context.depthMask = false;
     setDepthSublayer(0);
 
     const CirclePaintProperties& properties = layer.impl->paint;

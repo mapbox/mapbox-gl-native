@@ -1,12 +1,11 @@
 #pragma once
 
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <atomic>
 
-#define BUFFER_OFFSET_0  ((GLbyte*)nullptr)
+#define BUFFER_OFFSET_0  ((int8_t*)nullptr)
 #define BUFFER_OFFSET(i) ((BUFFER_OFFSET_0) + (i))
 
 namespace mbgl {

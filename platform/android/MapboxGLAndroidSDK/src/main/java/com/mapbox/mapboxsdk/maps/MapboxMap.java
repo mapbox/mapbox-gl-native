@@ -187,6 +187,27 @@ public class MapboxMap {
         getMapView().getNativeMapView().removeSource(sourceId);
     }
 
+    /**
+     * Add an image to be used int hte map's style
+     *
+     * @param name  the name of the image
+     * @param image the pre-multiplied Bitmap
+     */
+    @UiThread
+    public void addImage(@NonNull String name, @NonNull Bitmap image) {
+        getMapView().getNativeMapView().addImage(name, image);
+    }
+
+    /**
+     * Removes an image from the map's style
+     *
+     * @param name the name of the image to remove
+     */
+    @UiThread
+    public void removeImage(String name) {
+        getMapView().getNativeMapView().removeImage(name);
+    }
+
     //
     // MinZoom
     //

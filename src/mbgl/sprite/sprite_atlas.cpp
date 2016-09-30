@@ -282,7 +282,7 @@ void SpriteAtlas::copy(const Holder& holder, const SpritePatternMode mode) {
     dirtyFlag = true;
 }
 
-void SpriteAtlas::upload(gl::Context& context, uint32_t unit) {
+void SpriteAtlas::upload(gl::Context& context, gl::TextureUnit unit) {
     if (dirtyFlag) {
         bind(false, context, unit);
     }
@@ -316,7 +316,7 @@ void SpriteAtlas::updateDirty() {
     dirtySprites.clear();
 }
 
-void SpriteAtlas::bind(bool linear, gl::Context& context, uint32_t unit) {
+void SpriteAtlas::bind(bool linear, gl::Context& context, gl::TextureUnit unit) {
     if (!data) {
         return; // Empty atlas
     }
@@ -325,9 +325,9 @@ void SpriteAtlas::bind(bool linear, gl::Context& context, uint32_t unit) {
         texture = context.createTexture();
         context.activeTexture = unit;
         context.texture[unit] = *texture;
-#ifndef GL_ES_VERSION_2_0
+#if not MBGL_USE_GLES2
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
-#endif
+#endif // MBGL_USE_GLES2
         // We are using clamp to edge here since OpenGL ES doesn't allow GL_REPEAT on NPOT textures.
         // We use those when the pixelRatio isn't a power of two, e.g. on iPhone 6 Plus.
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
@@ -379,10 +379,10 @@ void SpriteAtlas::bind(bool linear, gl::Context& context, uint32_t unit) {
 
         dirtyFlag = false;
 
-#ifndef GL_ES_VERSION_2_0
+#if not MBGL_USE_GLES2
         // platform::showColorDebugImage("Sprite Atlas", reinterpret_cast<const char*>(data.get()),
         //                               pixelWidth, pixelHeight, pixelWidth, pixelHeight);
-#endif
+#endif // MBGL_USE_GLES2
     }
 }
 

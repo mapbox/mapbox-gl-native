@@ -101,7 +101,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
         nextNormal = util::perp(util::unit(convertPoint<double>(firstVertex - *currentVertex)));
     }
 
-    const GLint startVertex = vertexBuffer.index();
+    const int32_t startVertex = vertexBuffer.index();
     std::vector<TriangleElement> triangleStore;
 
     for (GLsizei i = 0; i < len; ++i) {
@@ -379,7 +379,7 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentVertex,
                                   double endLeft,
                                   double endRight,
                                   bool round,
-                                  GLint startVertex,
+                                  int32_t startVertex,
                                   std::vector<TriangleElement>& triangleStore) {
     int8_t tx = round ? 1 : 0;
 
@@ -419,8 +419,8 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
                                    double distance,
                                    const Point<double>& extrude,
                                    bool lineTurnsLeft,
-                                   GLint startVertex,
-                                  std::vector<TriangleElement>& triangleStore) {
+                                   int32_t startVertex,
+                                   std::vector<TriangleElement>& triangleStore) {
     int8_t ty = lineTurnsLeft;
 
     Point<double> flippedExtrude = extrude * (lineTurnsLeft ? -1.0 : 1.0);

@@ -1,3 +1,5 @@
+add_definitions(-DMBGL_USE_GLES2=1)
+
 macro(mbgl_platform_core)
     set_xcode_property(mbgl-core IPHONEOS_DEPLOYMENT_TARGET "8.0")
     set_xcode_property(mbgl-core ENABLE_BITCODE "YES")
@@ -13,6 +15,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/darwin/src/http_file_source.mm
         PRIVATE platform/default/asset_file_source.cpp
         PRIVATE platform/default/default_file_source.cpp
+        PRIVATE platform/default/local_file_source.cpp
         PRIVATE platform/default/online_file_source.cpp
 
         # Offline

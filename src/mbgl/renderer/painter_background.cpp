@@ -1,5 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
@@ -55,10 +56,10 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
         arrayBackground.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET(0), context);
     }
 
-    context.stencilTest = GL_FALSE;
-    context.depthFunc.reset();
-    context.depthTest = GL_TRUE;
-    context.depthMask = GL_FALSE;
+    context.stencilTest = false;
+    context.depthFunc = gl::DepthTestFunction::LessEqual;
+    context.depthTest = true;
+    context.depthMask = false;
     setDepthSublayer(0);
 
     for (const auto& tileID : util::tileCover(state, state.getIntegerZoom())) {

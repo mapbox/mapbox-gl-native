@@ -7,52 +7,26 @@
 
 #include <memory>
 #include <vector>
+#include <array>
 
 namespace mbgl {
 namespace gl {
 
-constexpr GLsizei TextureMax = 64;
+constexpr size_t TextureMax = 64;
 
 class Context : private util::noncopyable {
 public:
     ~Context();
 
-    UniqueProgram createProgram() {
-        return UniqueProgram { MBGL_CHECK_ERROR(glCreateProgram()), { this } };
-    }
+    UniqueProgram createProgram();
+    UniqueShader createVertexShader();
+    UniqueShader createFragmentShader();
+    UniqueBuffer createBuffer();
+    UniqueTexture createTexture();
+    UniqueVertexArray createVertexArray();
+    UniqueFramebuffer createFramebuffer();
 
-    UniqueShader createShader(GLenum type) {
-        return UniqueShader { MBGL_CHECK_ERROR(glCreateShader(type)), { this } };
-    }
-
-    UniqueBuffer createBuffer() {
-        GLuint id = 0;
-        MBGL_CHECK_ERROR(glGenBuffers(1, &id));
-        return UniqueBuffer { std::move(id), { this } };
-    }
-
-    UniqueTexture createTexture() {
-        if (pooledTextures.empty()) {
-            pooledTextures.resize(TextureMax);
-            MBGL_CHECK_ERROR(glGenTextures(TextureMax, pooledTextures.data()));
-        }
-
-        GLuint id = pooledTextures.back();
-        pooledTextures.pop_back();
-        return UniqueTexture { std::move(id), { this } };
-    }
-
-    UniqueVAO createVAO() {
-        GLuint id = 0;
-        MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
-        return UniqueVAO { std::move(id), { this } };
-    }
-
-    UniqueFBO createFBO() {
-        GLuint id = 0;
-        MBGL_CHECK_ERROR(glGenFramebuffers(1, &id));
-        return UniqueFBO { std::move(id), { this } };
-    }
+    void uploadBuffer(BufferType, size_t, void*);
 
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
@@ -68,8 +42,8 @@ public:
             && abandonedShaders.empty()
             && abandonedBuffers.empty()
             && abandonedTextures.empty()
-            && abandonedVAOs.empty()
-            && abandonedFBOs.empty();
+            && abandonedVertexArrays.empty()
+            && abandonedFramebuffers.empty();
     }
 
     void resetState();
@@ -96,31 +70,31 @@ public:
     State<value::ActiveTexture> activeTexture;
     State<value::BindFramebuffer> bindFramebuffer;
     State<value::Viewport> viewport;
-#ifndef GL_ES_VERSION_2_0
+#if not MBGL_USE_GLES2
     State<value::PixelZoom> pixelZoom;
     State<value::RasterPos> rasterPos;
-#endif // GL_ES_VERSION_2_0
+#endif // MBGL_USE_GLES2
     std::array<State<value::BindTexture>, 2> texture;
-    State<value::BindBuffer<GL_ARRAY_BUFFER>> vertexBuffer;
-    State<value::BindBuffer<GL_ELEMENT_ARRAY_BUFFER>> elementBuffer;
-    State<value::BindVAO> vertexArrayObject;
+    State<value::BindVertexBuffer> vertexBuffer;
+    State<value::BindElementBuffer> elementBuffer;
+    State<value::BindVertexArray> vertexArrayObject;
 
 private:
     friend detail::ProgramDeleter;
     friend detail::ShaderDeleter;
     friend detail::BufferDeleter;
     friend detail::TextureDeleter;
-    friend detail::VAODeleter;
-    friend detail::FBODeleter;
+    friend detail::VertexArrayDeleter;
+    friend detail::FramebufferDeleter;
 
-    std::vector<GLuint> pooledTextures;
+    std::vector<TextureID> pooledTextures;
 
-    std::vector<GLuint> abandonedPrograms;
-    std::vector<GLuint> abandonedShaders;
-    std::vector<GLuint> abandonedBuffers;
-    std::vector<GLuint> abandonedTextures;
-    std::vector<GLuint> abandonedVAOs;
-    std::vector<GLuint> abandonedFBOs;
+    std::vector<ProgramID> abandonedPrograms;
+    std::vector<ShaderID> abandonedShaders;
+    std::vector<BufferID> abandonedBuffers;
+    std::vector<TextureID> abandonedTextures;
+    std::vector<VertexArrayID> abandonedVertexArrays;
+    std::vector<FramebufferID> abandonedFramebuffers;
 };
 
 } // namespace gl

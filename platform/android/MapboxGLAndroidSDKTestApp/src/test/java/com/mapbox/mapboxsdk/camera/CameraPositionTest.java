@@ -72,7 +72,7 @@ public class CameraPositionTest {
 
         double[] cameraVars = new double[]{latitude, longitude, bearing, tilt, zoom};
         CameraPosition cameraPosition = new CameraPosition.Builder(cameraVars).build();
-        assertEquals("bearing should match", bearing, cameraPosition.bearing, DELTA);
+        assertEquals("bearing should match", Math.toDegrees(bearing), cameraPosition.bearing, DELTA);
         assertEquals("latlng should match", new LatLng(latitude, longitude), cameraPosition.target);
         assertEquals("tilt should match", Math.toRadians(tilt), cameraPosition.tilt, DELTA);
         assertEquals("zoom should match", zoom, cameraPosition.zoom, DELTA);

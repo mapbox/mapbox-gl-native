@@ -9,7 +9,7 @@ namespace mbgl {
 
 class StaticVertexBuffer : public Buffer<
     4, // bytes per vertex (2 * signed short == 4 bytes)
-    GL_ARRAY_BUFFER,
+    gl::BufferType::Vertex,
     32 // default length
 > {
 public:
@@ -19,7 +19,7 @@ public:
 
 class StaticRasterVertexBuffer : public Buffer<
     8, // bytes per vertex (4 * signed short == 8 bytes)
-    GL_ARRAY_BUFFER,
+    gl::BufferType::Vertex,
     32 // default length
 > {
 public:

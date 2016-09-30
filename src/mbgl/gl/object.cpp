@@ -7,22 +7,22 @@ namespace mbgl {
 namespace gl {
 namespace detail {
 
-void ProgramDeleter::operator()(GLuint id) const {
+void ProgramDeleter::operator()(ProgramID id) const {
     assert(context);
     context->abandonedPrograms.push_back(id);
 }
 
-void ShaderDeleter::operator()(GLuint id) const {
+void ShaderDeleter::operator()(ShaderID id) const {
     assert(context);
     context->abandonedShaders.push_back(id);
 }
 
-void BufferDeleter::operator()(GLuint id) const {
+void BufferDeleter::operator()(BufferID id) const {
     assert(context);
     context->abandonedBuffers.push_back(id);
 }
 
-void TextureDeleter::operator()(GLuint id) const {
+void TextureDeleter::operator()(TextureID id) const {
     assert(context);
     if (context->pooledTextures.size() >= TextureMax) {
         context->abandonedTextures.push_back(id);
@@ -31,14 +31,14 @@ void TextureDeleter::operator()(GLuint id) const {
     }
 }
 
-void VAODeleter::operator()(GLuint id) const {
+void VertexArrayDeleter::operator()(VertexArrayID id) const {
     assert(context);
-    context->abandonedVAOs.push_back(id);
+    context->abandonedVertexArrays.push_back(id);
 }
 
-void FBODeleter::operator()(GLuint id) const {
+void FramebufferDeleter::operator()(FramebufferID id) const {
     assert(context);
-    context->abandonedFBOs.push_back(id);
+    context->abandonedFramebuffers.push_back(id);
 }
 
 } // namespace detail

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <mbgl/gl/gl.hpp>
-
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/shader/outline_shader.hpp>

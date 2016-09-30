@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/shader/shader.hpp>
-#include <mbgl/gl/gl.hpp>
 
 #include <array>
 
@@ -10,8 +9,8 @@ namespace mbgl {
 template <typename T>
 class Uniform {
 public:
-    Uniform(const GLchar* name, const Shader& shader) : current() {
-         location = MBGL_CHECK_ERROR(glGetUniformLocation(shader.getID(), name));
+    Uniform(const char* name, const Shader& shader)
+        : current(), location(shader.getUniformLocation(name)) {
     }
 
     void operator=(const T& t) {
@@ -25,7 +24,7 @@ private:
     void bind(const T&);
 
     T current;
-    GLint location;
+    gl::UniformLocation location;
 };
 
 template <size_t C, size_t R = C>
@@ -33,8 +32,8 @@ class UniformMatrix {
 public:
     typedef std::array<float, C*R> T;
 
-    UniformMatrix(const GLchar* name, const Shader& shader) : current() {
-        location = MBGL_CHECK_ERROR(glGetUniformLocation(shader.getID(), name));
+    UniformMatrix(const char* name, const Shader& shader)
+        : current(), location(shader.getUniformLocation(name)) {
     }
 
     void operator=(const std::array<double, C*R>& t) {
@@ -54,7 +53,7 @@ private:
     void bind(const T&);
 
     T current;
-    GLint location;
+    gl::UniformLocation location;
 };
 
 } // namespace mbgl

@@ -1,14 +1,8 @@
 #pragma once
 
-#include <string>
-
 #ifndef NDEBUG
-#define __MBGL_DEBUG_GROUP_NAME2(counter) __MBGL_DEBUG_GROUP_##counter
-#define __MBGL_DEBUG_GROUP_NAME(counter) __MBGL_DEBUG_GROUP_NAME2(counter)
-#define MBGL_DEBUG_GROUP(string) ::mbgl::gl::debugging::group __MBGL_DEBUG_GROUP_NAME(__LINE__)(string);
-#else
-#define MBGL_DEBUG_GROUP(string)
-#endif
+
+#include <string>
 
 namespace mbgl {
 namespace gl {
@@ -24,3 +18,13 @@ struct group {
 } // namespace debugging
 } // namespace gl
 } // namespace mbgl
+
+#define __MBGL_DEBUG_GROUP_NAME2(counter) __MBGL_DEBUG_GROUP_##counter
+#define __MBGL_DEBUG_GROUP_NAME(counter) __MBGL_DEBUG_GROUP_NAME2(counter)
+#define MBGL_DEBUG_GROUP(string) ::mbgl::gl::debugging::group __MBGL_DEBUG_GROUP_NAME(__LINE__)(string);
+
+#else // ifndef NDEBUG
+
+#define MBGL_DEBUG_GROUP(string)
+
+#endif

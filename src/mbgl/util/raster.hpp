@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <array>
+#include <vector>
 
 namespace mbgl {
 
@@ -34,7 +35,7 @@ public:
     bool isLoaded() const;
 
     // returns the OpenGL texture ID
-    GLuint getID() const;
+    gl::TextureID getID() const;
 
     // size of uploaded image.
     std::array<uint16_t, 2> getSize() const;

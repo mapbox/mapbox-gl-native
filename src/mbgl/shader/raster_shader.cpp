@@ -12,7 +12,7 @@ RasterShader::RasterShader(gl::Context& context, Defines defines)
              context, defines) {
 }
 
-void RasterShader::bind(GLbyte* offset) {
+void RasterShader::bind(int8_t* offset) {
     const GLint stride = 8;
 
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));

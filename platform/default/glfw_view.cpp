@@ -3,6 +3,7 @@
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/extension.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/string.hpp>

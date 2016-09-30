@@ -23,8 +23,8 @@ Shader::Shader(const char* name_,
                Defines defines)
     : name(name_),
       program(context.createProgram()),
-      vertexShader(context.createShader(GL_VERTEX_SHADER)),
-      fragmentShader(context.createShader(GL_FRAGMENT_SHADER)) {
+      vertexShader(context.createVertexShader()),
+      fragmentShader(context.createFragmentShader()) {
     util::stopwatch stopwatch("shader compilation", Event::Shader);
 
     if (!compileShader(vertexShader, vertexSource)) {
@@ -105,6 +105,10 @@ Shader::~Shader() {
         MBGL_CHECK_ERROR(glDetachShader(program.get(), vertexShader.get()));
         MBGL_CHECK_ERROR(glDetachShader(program.get(), fragmentShader.get()));
     }
+}
+
+gl::UniformLocation Shader::getUniformLocation(const char* uniform) const {
+    return MBGL_CHECK_ERROR(glGetUniformLocation(program.get(), uniform));
 }
 
 } // namespace mbgl

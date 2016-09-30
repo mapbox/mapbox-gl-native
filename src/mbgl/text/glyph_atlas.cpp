@@ -203,7 +203,7 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
     }
 }
 
-void GlyphAtlas::upload(gl::Context& context, uint32_t unit) {
+void GlyphAtlas::upload(gl::Context& context, gl::TextureUnit unit) {
     if (dirty) {
         const bool first = !texture;
         bind(context, unit);
@@ -241,12 +241,12 @@ void GlyphAtlas::upload(gl::Context& context, uint32_t unit) {
     }
 }
 
-void GlyphAtlas::bind(gl::Context& context, uint32_t unit) {
+void GlyphAtlas::bind(gl::Context& context, gl::TextureUnit unit) {
     if (!texture) {
         texture = context.createTexture();
         context.activeTexture = unit;
         context.texture[unit] = *texture;
-#ifndef GL_ES_VERSION_2_0
+#if not MBGL_USE_GLES2
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));

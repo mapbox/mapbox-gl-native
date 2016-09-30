@@ -888,7 +888,7 @@ void Map::setDebug(MapDebugOptions debugOptions) {
 }
 
 void Map::cycleDebugOptions() {
-#ifndef GL_ES_VERSION_2_0
+#if not MBGL_USE_GLES2
     if (impl->debugOptions & MapDebugOptions::StencilClip)
         impl->debugOptions = MapDebugOptions::NoDebug;
     else if (impl->debugOptions & MapDebugOptions::Overdraw)
@@ -896,7 +896,7 @@ void Map::cycleDebugOptions() {
 #else
     if (impl->debugOptions & MapDebugOptions::Overdraw)
         impl->debugOptions = MapDebugOptions::NoDebug;
-#endif // GL_ES_VERSION_2_0
+#endif // MBGL_USE_GLES2
     else if (impl->debugOptions & MapDebugOptions::Collision)
         impl->debugOptions = MapDebugOptions::Overdraw;
     else if (impl->debugOptions & MapDebugOptions::Timestamps)

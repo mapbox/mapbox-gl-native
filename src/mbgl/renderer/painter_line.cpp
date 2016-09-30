@@ -20,11 +20,12 @@ void Painter::renderLine(PaintParameters& parameters,
     // Abort early.
     if (pass == RenderPass::Opaque) return;
 
-    context.stencilOp.reset();
-    context.stencilTest = GL_TRUE;
-    context.depthFunc.reset();
-    context.depthTest = GL_TRUE;
-    context.depthMask = GL_FALSE;
+    context.stencilOp = { gl::StencilTestOperation::Keep, gl::StencilTestOperation::Keep,
+                          gl::StencilTestOperation::Replace };
+    context.stencilTest = true;
+    context.depthFunc = gl::DepthTestFunction::LessEqual;
+    context.depthTest = true;
+    context.depthMask = false;
 
     const auto& properties = layer.impl->paint;
     const auto& layout = bucket.layout;
