@@ -26,6 +26,22 @@ struct MapTest {
     StubFileSource fileSource;
 };
 
+TEST(Map, LatLngBehavior) {
+    MapTest test;
+    Map map(test.view, test.fileSource, MapMode::Still);
+
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+
+    map.setLatLngZoom({ 1, 1 }, 0);
+    auto latLng1 = map.getLatLng();
+
+    map.setLatLng({ 1, 1 });
+    auto latLng2 = map.getLatLng();
+
+    ASSERT_DOUBLE_EQ(latLng1.latitude, latLng2.latitude);
+    ASSERT_DOUBLE_EQ(latLng1.longitude, latLng2.longitude);
+}
+
 TEST(Map, Offline) {
     MapTest test;
     DefaultFileSource fileSource(":memory:", ".");
