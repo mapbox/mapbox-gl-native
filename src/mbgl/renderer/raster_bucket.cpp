@@ -3,7 +3,7 @@
 #include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/gl/gl.hpp>
-
+#include <mbgl/gl/context.hpp>
 
 namespace mbgl {
 
@@ -27,7 +27,7 @@ void RasterBucket::render(Painter& painter,
 
 void RasterBucket::drawRaster(RasterShader& shader,
                               gl::VertexBuffer<RasterVertex>& vertices,
-                              VertexArrayObject& array,
+                              gl::VertexArrayObject& array,
                               gl::Context& context) {
     assert(texture);
     context.bindTexture(*texture, 0, gl::TextureFilter::Linear);
