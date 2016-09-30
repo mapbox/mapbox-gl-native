@@ -65,6 +65,7 @@
     <string name="activity_query_rendered_features_box_count">Count features in box</string>
     <string name="activity_query_rendered_features_box_highlight">Highlight features in box</string>
     <string name="activity_circle">Add Circle</string>
+    <string name="activity_add_sprite">Add Custom Sprite</string>
     <string name="activity_navigation_drawer">Android SDK View integration</string>
     <string name="activity_video_view">Video View</string>
 
@@ -107,6 +108,7 @@
     <string name="description_viewpager">Use SupportMapFragments in a ViewPager</string>
     <string name="description_runtime_style">Adopt the map style on the fly</string>
     <string name="description_circle">Use GeoJson source to show a circle</string>
+    <string name="description_custom_sprite">Use a custom sprite in a Symbol Layer</string>
     <string name="description_geojson_clustering">Use GeoJson sources and dynamic layers to cluster information</string>
     <string name="description_print">Shows how to print a map</string>
     <string name="description_navigation_drawer">Test animation of Android SDK View components</string>
