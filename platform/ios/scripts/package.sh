@@ -167,13 +167,34 @@ else
 fi
 
 if [[ ${SYMBOLS} = NO ]]; then
-    step "Stripping symbols from binaries…"
+    step "Stripping symbols from binaries"
     if [[ ${BUILD_STATIC} == true ]]; then
         strip -Sx "${OUTPUT}/static/${NAME}.framework/${NAME}"
     fi
     if [[ ${BUILD_DYNAMIC} == true ]]; then
         strip -Sx "${OUTPUT}/dynamic/${NAME}.framework/${NAME}"
     fi
+fi
+
+function get_comparable_uuid {
+    echo $(dwarfdump --uuid ${1} | sed -n 's/.*UUID:\([^\"]*\) .*/\1/p' | sort)
+}
+
+function validate_dsym {
+    step "Validating dSYM and framework UUIDs…"
+    DSYM_UUID=$(get_comparable_uuid "${1}")
+    FRAMEWORK_UUID=$(get_comparable_uuid "${2}")
+    echo -e "${1}\n  ${DSYM_UUID}\n${2}\n  ${FRAMEWORK_UUID}"
+    if [[ ${DSYM_UUID} != ${FRAMEWORK_UUID} ]]; then
+        echo "Error: dSYM and framework UUIDs do not match."
+        exit 1
+    fi
+}
+
+if [[ ${BUILD_DYNAMIC} == true && ${BUILDTYPE} == Release ]]; then
+    validate_dsym \
+        "${OUTPUT}/dynamic/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}" \
+        "${OUTPUT}/dynamic/${NAME}.framework/${NAME}"
 fi
 
 function create_podspec {
