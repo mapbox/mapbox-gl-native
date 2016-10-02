@@ -4,10 +4,12 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/feature.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/storage/resource.hpp>
+#include <mbgl/math/clamp.hpp>
 
 #include <string>
 #include <memory>
@@ -25,8 +27,22 @@ namespace style {
 class Layer;
 } // namespace style
 
+using TilePoint = Point<int16_t>;
+
 class Tile : private util::noncopyable {
 public:
+    static TilePoint pointFromTileCoordinate(const UnwrappedTileID& tileID, const TileCoordinatePoint& p) {
+        auto zoomed = TileCoordinate { p, 0 }.zoomTo(tileID.canonical.z);
+        return {
+            util::clamp(int16_t((zoomed.p.x - tileID.canonical.x - tileID.wrap * std::pow(2.0, tileID.canonical.z)) * util::EXTENT),
+                        std::numeric_limits<int16_t>::min(),
+                        std::numeric_limits<int16_t>::max()),
+            util::clamp(int16_t((zoomed.p.y - tileID.canonical.y) * util::EXTENT),
+                        std::numeric_limits<int16_t>::min(),
+                        std::numeric_limits<int16_t>::max())
+        };
+    }
+
     Tile(OverscaledTileID);
     virtual ~Tile();
 
