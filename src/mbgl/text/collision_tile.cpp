@@ -3,6 +3,9 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
 
+#include <mapbox/geometry/envelope.hpp>
+#include <mapbox/geometry/multi_point.hpp>
+
 #include <cmath>
 
 namespace mbgl {
@@ -152,12 +155,20 @@ Box CollisionTile::getTreeBox(const Point<float>& anchor, const CollisionBox& bo
     };
 }
 
-std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const mapbox::geometry::box<int16_t>& box, const float scale) {
+std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const float scale) {
 
     std::vector<IndexedSubfeature> result;
+    if (queryGeometry.empty()) return result;
+
     std::unordered_map<std::string, std::unordered_set<std::size_t>> sourceLayerFeatures;
 
-    auto anchor = util::matrixMultiply(rotationMatrix, convertPoint<float>(box.min));
+    mapbox::geometry::multi_point<float> rotatedPoints {};
+    rotatedPoints.reserve(queryGeometry.size());
+    std::transform(queryGeometry.cbegin(), queryGeometry.cend(), std::back_inserter(rotatedPoints),
+                   [&](const auto& c) { return util::matrixMultiply(rotationMatrix, convertPoint<float>(c)); });
+    const auto box = mapbox::geometry::envelope(rotatedPoints);
+
+    const auto& anchor = box.min;
     CollisionBox queryBox(anchor, 0, 0, box.max.x - box.min.x, box.max.y - box.min.y, scale);
     auto predicates = bgi::intersects(getTreeBox(anchor, queryBox));
 

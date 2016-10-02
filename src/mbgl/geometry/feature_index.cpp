@@ -83,7 +83,7 @@ void FeatureIndex::query(
         return;
     }
 
-    std::vector<IndexedSubfeature> symbolFeatures = collisionTile->queryRenderedSymbols(box, scale);
+    std::vector<IndexedSubfeature> symbolFeatures = collisionTile->queryRenderedSymbols(queryGeometry, scale);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
         addFeature(result, symbolFeature, queryGeometry, filterLayerIDs, geometryTileData, tileID, style, bearing, pixelsToTileUnits);

@@ -2,6 +2,7 @@
 
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/text/placement_config.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
@@ -41,7 +42,7 @@ public:
     float placeFeature(const CollisionFeature&, const bool allowOverlap, const bool avoidEdges);
     void insertFeature(CollisionFeature&, const float minPlacementScale, const bool ignorePlacement);
 
-    std::vector<IndexedSubfeature> queryRenderedSymbols(const mapbox::geometry::box<int16_t>&, const float scale);
+    std::vector<IndexedSubfeature> queryRenderedSymbols(const GeometryCoordinates&, const float scale);
 
     const PlacementConfig config;
 
