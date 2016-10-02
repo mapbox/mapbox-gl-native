@@ -60,6 +60,7 @@ set(MBGL_TEST_FILES
     # storage
     test/storage/asset_file_source.test.cpp
     test/storage/default_file_source.test.cpp
+    test/storage/local_file_source.test.cpp
     test/storage/headers.test.cpp
     test/storage/http_file_source.test.cpp
     test/storage/offline.test.cpp

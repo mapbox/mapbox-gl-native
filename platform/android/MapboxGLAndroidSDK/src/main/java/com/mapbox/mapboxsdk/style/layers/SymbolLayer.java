@@ -34,7 +34,7 @@ public class SymbolLayer extends Layer {
 
     protected native void initialize(String layerId, String sourceId);
 
-   /**
+    /**
      * Set the source layer.
      *
      * @param sourceLayer the source layer to set
@@ -534,7 +534,7 @@ public class SymbolLayer extends Layer {
         return (PropertyValue<String>) new PropertyValue(nativeGetIconHaloColor());
     }
      /**
-     * The color of the icon's halo. Icon halos can only be used with sdf icons.
+     * The color of the icon's halo. Icon halos can only be used with SDF icons.
      *
      * @return int representation of a rgba string color
      * @throws RuntimeException thrown if property isn't a value

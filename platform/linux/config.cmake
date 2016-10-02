@@ -15,6 +15,7 @@ macro(mbgl_platform_core)
         # File source
         PRIVATE platform/default/asset_file_source.cpp
         PRIVATE platform/default/default_file_source.cpp
+        PRIVATE platform/default/local_file_source.cpp
         PRIVATE platform/default/http_file_source.cpp
         PRIVATE platform/default/online_file_source.cpp
 

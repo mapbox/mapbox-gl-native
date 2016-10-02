@@ -15,8 +15,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 <% for (const property of layoutProperties) { -%>
 <% if (property.type == "enum") { -%>
+/**
+ <%- propertyDoc(property.name, property, type) %>
+ */
 typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %>) {
-<% for (const value of property.values) { -%>
+<% for (const value in property.values) { -%>
+    /**
+     <%- propertyDoc(property.name, property.values[value], type) %>
+     */
     MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
 <% } -%>
 };
@@ -25,8 +31,14 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 <% } -%>
 <% for (const property of paintProperties) { -%>
 <% if (property.type == "enum") { -%>
+/**
+ <%- propertyDoc(property.name, property, type) %>
+ */
 typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %>) {
-<% for (const value of property.values) { -%>
+<% for (const value in property.values) { -%>
+    /**
+     <%- propertyDoc(property.name, property.values[value], type) %>
+     */
     MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
 <% } -%>
 };
@@ -75,7 +87,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 
 <% for (const property of layoutProperties) { -%>
 /**
- <%- propertyDoc(property, type) %>
+ <%- propertyDoc(property.name, property, type) %>
 <% if ('default' in property) { -%>
  
  The default value of this property is <%- propertyDefault(property, type) %>.<% if (!property.required) { %> Set this property to `nil` to reset it to the default value.<% } %>
@@ -93,7 +105,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 
 <% for (const property of paintProperties) { -%>
 /**
- <%- propertyDoc(property, type) %>
+ <%- propertyDoc(property.name, property, type) %>
 <% if ('default' in property) { -%>
  
  The default value of this property is <%- propertyDefault(property, type) %>.<% if (!property.required) { %> Set this property to `nil` to reset it to the default value.<% } %>

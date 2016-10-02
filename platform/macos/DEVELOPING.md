@@ -14,6 +14,32 @@ The Mapbox macOS SDK requires Xcode 7.3 or above.
 1. Run `make xproj`.
 1. Switch to the “dynamic” or “macosapp” scheme. The former builds just the Cocoa framework, while the latter also builds a Cocoa demo application based on it.
 
+### Packaging builds
+
+Install [jazzy](https://github.com/realm/jazzy) for generating API documentation:
+
+```bash
+[sudo] gem install jazzy
+```
+
+Build and package the SDK by using one of the following commands:
+
+* `make xpackage` builds a dynamic framework in the Debug configuration, including debug symbols.
+* `make xdocument` generates API documentation using jazzy.
+
+You can customize the build output by passing the following arguments into the `make` invocation:
+
+* `BUILDTYPE=Release` will optimize for distribution. Defaults to `Debug`.
+* `SYMBOLS=NO` strips the build output of any debug symbols, yielding much smaller binaries. Defaults to `YES`.
+
+An example command that creates a dynamic framework suitable for distribution:
+
+```bash
+make xpackage BUILDTYPE=Release SYMBOLS=NO
+```
+
+The products of these build commands can be found in the `build/macos/pkg` folder at the base of the repository.
+
 ## Contributing
 
 ### Making any symbol public

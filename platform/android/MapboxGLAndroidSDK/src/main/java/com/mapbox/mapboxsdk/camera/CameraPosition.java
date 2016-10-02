@@ -199,7 +199,7 @@ public final class CameraPosition implements Parcelable {
             super();
             if (values != null && values.length == 5) {
                 this.target = new LatLng(values[0], values[1]);
-                this.bearing = (float) values[2];
+                this.bearing = Math.toDegrees(values[2]);
                 this.tilt = Math.toRadians(values[3]);
                 this.zoom = (float) values[4];
             }

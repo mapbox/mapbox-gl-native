@@ -1215,6 +1215,33 @@ void nativeRemoveSource(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, 
     }
 }
 
+void nativeAddImage(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* name, jni::jint width, jni::jint height, jni::jfloat pixelRatio, jni::jarray<jbyte>* data) {
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    // Create Pre-multiplied image from byte[]
+    NullCheck(*env, data);
+    std::size_t size = jni::GetArrayLength(*env, *data);
+    mbgl::PremultipliedImage premultipliedImage(width, height);
+
+    if (premultipliedImage.size() != uint32_t(size)) {
+        throw mbgl::util::SpriteImageException("Sprite image pixel count mismatch");
+    }
+
+    jni::GetArrayRegion(*env, *data, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
+
+    //Wrap in a SpriteImage with the correct pixel ratio
+    auto spriteImage = std::make_unique<mbgl::SpriteImage>(std::move(premultipliedImage), float(pixelRatio));
+
+    nativeMapView->getMap().addImage(std_string_from_jstring(env, name), std::move(spriteImage));
+}
+
+void nativeRemoveImage(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* name) {
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().removeImage(std_string_from_jstring(env, name));
+}
+
 void nativeScheduleTakeSnapshot(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeRenderToOffscreen");
     assert(nativeMapViewPtr != 0);
@@ -1890,6 +1917,8 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeGetSource, "(JLjava/lang/String;)Lcom/mapbox/mapboxsdk/style/sources/Source;"),
         MAKE_NATIVE_METHOD(nativeAddSource, "(JJ)V"),
         MAKE_NATIVE_METHOD(nativeRemoveSource, "(JLjava/lang/String;)V"),
+        MAKE_NATIVE_METHOD(nativeAddImage, "(JLjava/lang/String;IIF[B)V"),
+        MAKE_NATIVE_METHOD(nativeRemoveImage, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeSetContentPadding, "(JDDDD)V"),
         MAKE_NATIVE_METHOD(nativeScheduleTakeSnapshot, "(J)V"),
         MAKE_NATIVE_METHOD(nativeQueryRenderedFeaturesForPoint, "(JFF[Ljava/lang/String;)[Lcom/mapbox/services/commons/geojson/Feature;"),

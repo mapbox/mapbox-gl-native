@@ -4,8 +4,8 @@
 
 namespace mbgl {
 
-size_t LineVertexBuffer::add(vertex_type x, vertex_type y, float ex, float ey, bool tx, bool ty, int8_t dir, int32_t linesofar) {
-    size_t idx = index();
+uint32_t LineVertexBuffer::add(vertex_type x, vertex_type y, float ex, float ey, bool tx, bool ty, int8_t dir, int32_t linesofar) {
+    uint32_t idx = index();
     void *data = addElement();
 
     int16_t *coords = static_cast<int16_t *>(data);
