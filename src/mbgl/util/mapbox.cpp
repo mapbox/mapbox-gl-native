@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <vector>
 #include <iostream>
+#include <regex>
 
 namespace {
 
@@ -191,6 +192,16 @@ std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_
     }
 
     result += "." + extension;
+    
+    // get the query and remove access_token, if more parameters exist, add them to the final result
+    if (queryIdx != url.length()) {
+        const auto query = url.substr(queryIdx + 1);
+        std::regex re ("&?access_token=([^&]*)");
+        std::string replace = std::regex_replace(query, re, "");
+        std::string subQuery = (replace.find("&") == 0) ? replace.substr(1, replace.length()) : replace;
+        if (subQuery.length() > 0) result += "?" + subQuery;
+    }
+
     return result;
 }
 

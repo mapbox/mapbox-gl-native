@@ -142,6 +142,15 @@ TEST(Mapbox, CanonicalURL) {
         "mapbox://tiles/a.b,c.d/{z}/{x}/{y}.vector.pbf",
         mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b,c.d/{z}/{x}/{y}.vector.pbf?access_token=key", SourceType::Vector, 512));
     EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}.vector.pbf?custom=parameter",
+        mbgl::util::mapbox::canonicalizeTileURL("http://a.tiles.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf?access_token=key&custom=parameter", SourceType::Vector, 512));
+    EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}.vector.pbf?custom=parameter",
+        mbgl::util::mapbox::canonicalizeTileURL("http://a.tiles.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf?custom=parameter&access_token=key", SourceType::Vector, 512));
+    EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}.vector.pbf?custom=parameter&second=param",
+        mbgl::util::mapbox::canonicalizeTileURL("http://a.tiles.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf?custom=parameter&access_token=key&second=param", SourceType::Vector, 512));
+    EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.jpg",
         mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.jpg?access_token=key", SourceType::Raster, 256));
     EXPECT_EQ(
