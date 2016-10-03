@@ -72,13 +72,12 @@ void SymbolBucket::drawGlyphs(SDFShader& shader,
     GLbyte* vertex_index = BUFFER_OFFSET_0;
     GLbyte* elements_index = BUFFER_OFFSET_0;
     for (auto& group : text.groups) {
-        assert(group);
-        group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
+        group.getVAO(shader, paintMode).bind(
             shader, *text.vertexBuffer, *text.indexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * text.vertexBuffer->vertexSize;
-        elements_index += group->elements_length * text.indexBuffer->primitiveSize;
+        vertex_index += group.vertexLength * text.vertexBuffer->vertexSize;
+        elements_index += group.indexLength * text.indexBuffer->primitiveSize;
     }
 }
 
@@ -88,13 +87,12 @@ void SymbolBucket::drawIcons(SDFShader& shader,
     GLbyte* vertex_index = BUFFER_OFFSET_0;
     GLbyte* elements_index = BUFFER_OFFSET_0;
     for (auto& group : icon.groups) {
-        assert(group);
-        group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
+        group.getVAO(shader, paintMode).bind(
             shader, *icon.vertexBuffer, *icon.indexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * icon.vertexBuffer->vertexSize;
-        elements_index += group->elements_length * icon.indexBuffer->primitiveSize;
+        vertex_index += group.vertexLength * icon.vertexBuffer->vertexSize;
+        elements_index += group.indexLength * icon.indexBuffer->primitiveSize;
     }
 }
 
@@ -104,13 +102,12 @@ void SymbolBucket::drawIcons(IconShader& shader,
     GLbyte* vertex_index = BUFFER_OFFSET_0;
     GLbyte* elements_index = BUFFER_OFFSET_0;
     for (auto& group : icon.groups) {
-        assert(group);
-        group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
+        group.getVAO(shader, paintMode).bind(
             shader, *icon.vertexBuffer, *icon.indexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * icon.vertexBuffer->vertexSize;
-        elements_index += group->elements_length * icon.indexBuffer->primitiveSize;
+        vertex_index += group.vertexLength * icon.vertexBuffer->vertexSize;
+        elements_index += group.indexLength * icon.indexBuffer->primitiveSize;
     }
 }
 
@@ -118,8 +115,9 @@ void SymbolBucket::drawCollisionBoxes(CollisionBoxShader& shader,
                                       gl::Context& context) {
     GLbyte* vertex_index = BUFFER_OFFSET_0;
     for (auto& group : collisionBox.groups) {
-        group->array[0].bind(shader, *collisionBox.vertexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, group->vertex_length));
+        group.getVAO(shader, PaintMode::Regular).bind(
+            shader, *collisionBox.vertexBuffer, vertex_index, context);
+        MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(group.vertexLength)));
     }
 }
 

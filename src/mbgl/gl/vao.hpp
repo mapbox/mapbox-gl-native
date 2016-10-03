@@ -3,7 +3,6 @@
 #include <mbgl/gl/shader.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <stdexcept>
@@ -11,11 +10,8 @@
 namespace mbgl {
 namespace gl {
 
-class VertexArrayObject : public util::noncopyable {
+class VertexArrayObject {
 public:
-    VertexArrayObject();
-    ~VertexArrayObject();
-
     template <typename Shader, typename T>
     void bind(Shader& shader,
               const VertexBuffer<T>& vertexBuffer,
