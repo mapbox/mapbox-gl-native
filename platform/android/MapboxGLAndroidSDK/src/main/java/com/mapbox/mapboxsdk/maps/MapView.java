@@ -431,6 +431,7 @@ public class MapView extends FrameLayout {
             uiSettings.setScaleEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_SCALE_ENABLED));
             uiSettings.setScaleGravity(savedInstanceState.getInt(MapboxConstants.STATE_SCALE_GRAVITY));
             uiSettings.setScaleWidth(savedInstanceState.getFloat(MapboxConstants.STATE_SCALE_WIDTH));
+            uiSettings.setScaleColor(savedInstanceState.getInt(MapboxConstants.STATE_SCALE_COLOR));
             uiSettings.setScaleUnit(UiSettings.ScaleUnit.valueOf(savedInstanceState.getString(MapboxConstants.STATE_SCALE_UNIT)));
             uiSettings.setScaleMargins(savedInstanceState.getInt(MapboxConstants.STATE_SCALE_MARGIN_LEFT),
                     savedInstanceState.getInt(MapboxConstants.STATE_SCALE_MARGIN_TOP),
@@ -568,6 +569,7 @@ public class MapView extends FrameLayout {
         outState.putBoolean(MapboxConstants.STATE_SCALE_ENABLED, uiSettings.isScaleEnabled());
         outState.putInt(MapboxConstants.STATE_SCALE_GRAVITY, uiSettings.getScaleGravity());
         outState.putFloat(MapboxConstants.STATE_SCALE_WIDTH, uiSettings.getScaleWidth());
+        outState.putInt(MapboxConstants.STATE_SCALE_COLOR, uiSettings.getScaleColor());
         outState.putString(MapboxConstants.STATE_SCALE_UNIT, uiSettings.getScaleUnit().name());
         outState.putInt(MapboxConstants.STATE_SCALE_MARGIN_LEFT, uiSettings.getScaleMarginLeft());
         outState.putInt(MapboxConstants.STATE_SCALE_MARGIN_TOP, uiSettings.getScaleMarginTop());

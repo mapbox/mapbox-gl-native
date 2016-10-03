@@ -124,6 +124,7 @@ public class MapboxConstants {
     public static final String STATE_SCALE_MARGIN_BOTTOM = "scaleMarginBottom";
     public static final String STATE_SCALE_WIDTH = "scaleWidth";
     public static final String STATE_SCALE_UNIT = "scaleUnit";
+    public static final String STATE_SCALE_COLOR = "scaleColor";
     public static final String STATE_COMPASS_ENABLED = "compassEnabled";
     public static final String STATE_COMPASS_GRAVITY = "compassGravity";
     public static final String STATE_COMPASS_MARGIN_LEFT = "compassMarginLeft";

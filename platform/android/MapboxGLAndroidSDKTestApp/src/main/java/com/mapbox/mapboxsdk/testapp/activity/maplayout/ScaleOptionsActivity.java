@@ -21,6 +21,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 public class ScaleOptionsActivity extends AppCompatActivity {
 
     private static final String TAG = ScaleOptionsActivity.class.getSimpleName();
+    private static final String INDEX = "currentStyleIndex";
 
     private MapView mapView;
     private MapboxMap mapboxMap;
@@ -134,6 +135,13 @@ public class ScaleOptionsActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if(savedInstanceState != null)
+            currentStyleIndex = savedInstanceState.getInt(INDEX, 0);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         mapView.onResume();
@@ -148,6 +156,7 @@ public class ScaleOptionsActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putInt(INDEX, currentStyleIndex);
         mapView.onSaveInstanceState(outState);
     }
 

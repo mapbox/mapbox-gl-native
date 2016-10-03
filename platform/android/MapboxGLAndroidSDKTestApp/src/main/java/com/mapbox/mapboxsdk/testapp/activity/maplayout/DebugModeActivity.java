@@ -22,6 +22,7 @@ public class DebugModeActivity extends AppCompatActivity {
 
     private MapView mapView;
     private MapboxMap mapboxMap;
+    private static final String INDEX = "currentStyleIndex";
 
     private int currentStyleIndex = 0;
 
@@ -99,8 +100,16 @@ public class DebugModeActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if(savedInstanceState != null)
+            currentStyleIndex = savedInstanceState.getInt(INDEX, 0);
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putInt(INDEX, currentStyleIndex);
         mapView.onSaveInstanceState(outState);
     }
 
