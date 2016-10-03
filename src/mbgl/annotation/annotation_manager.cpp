@@ -161,7 +161,15 @@ std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const Canonic
 
     LatLngBounds tileBounds(tileID);
 
-    symbolTree.query(boost::geometry::index::intersects(tileBounds),
+    // Edge cases e.g. a point in null island (0, 0) makes the geometry
+    // intersectable by the four surrounding tiles. This makes sure only the
+    // tile that produces a valid projection in updateLayer() continues.
+    auto skipTileEdges = [&] (const auto& val) -> bool {
+        return val->annotation.geometry.x != tileBounds.east() &&
+               val->annotation.geometry.y != tileBounds.south();
+    };
+
+    symbolTree.query(bgi::intersects(tileBounds) && bgi::satisfies(skipTileEdges),
         boost::make_function_output_iterator([&](const auto& val){
             val->updateLayer(tileID, pointLayer);
         }));

@@ -27,6 +27,10 @@ public:
     StubFileSource fileSource;
     Map map { view, fileSource, MapMode::Still };
 
+    AnnotationTest() = default;
+    AnnotationTest(uint16_t width, uint16_t height)
+        : view({ display, 1, width, height }) {}
+
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/annotations/") + name,
                          test::render(map), 0.0002, 0.1);
@@ -375,3 +379,22 @@ TEST(Annotations, VisibleFeatures) {
     features = test.map.queryRenderedFeatures(box);
     EXPECT_EQ(features.size(), ids.size());
 }
+
+TEST(Annotations, TileEdges) {
+    // Create a view big enough to fit an entire tile inside of it.
+    AnnotationTest test(1024, 1024);
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    test.map.setZoom(3);
+
+    test.map.addAnnotation(SymbolAnnotation { {0, 1}, "default_marker" });
+    test.map.addAnnotation(SymbolAnnotation { {0, 0}, "default_marker" });
+    test.map.addAnnotation(SymbolAnnotation { {1, 0}, "default_marker" });
+
+    // FIXME: https://github.com/mapbox/mapbox-gl-native/issues/5419
+    // Expected image is borked because symbols are being clipped to their
+    // corresponding tiles, but enough to provide an usable expectation.
+    test.checkRendering("tile_edges");
+}
+
