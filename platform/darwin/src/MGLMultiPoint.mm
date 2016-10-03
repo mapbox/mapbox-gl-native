@@ -25,21 +25,28 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
 
     if (self)
     {
-        _count = count;
-        _coordinates = (CLLocationCoordinate2D *)malloc(_count * sizeof(CLLocationCoordinate2D));
-
-        mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
-
-        for (NSUInteger i = 0; i < _count; i++)
-        {
-            _coordinates[i] = coords[i];
-            bounds.extend(mbgl::LatLng(coords[i].latitude, coords[i].longitude));
-        }
-
-        _bounds = MGLCoordinateBoundsFromLatLngBounds(bounds);
+        [self setupWithCoordinates:coords count:count];
     }
 
     return self;
+}
+
+- (void)setupWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
+{
+    if (_coordinates) free(_coordinates);
+
+    _count = count;
+    _coordinates = (CLLocationCoordinate2D *)malloc(_count * sizeof(CLLocationCoordinate2D));
+
+    mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
+
+    for (NSUInteger i = 0; i < _count; i++)
+    {
+        _coordinates[i] = coords[i];
+        bounds.extend(mbgl::LatLng(coords[i].latitude, coords[i].longitude));
+    }
+
+    _bounds = MGLCoordinateBoundsFromLatLngBounds(bounds);
 }
 
 - (void)dealloc
@@ -91,6 +98,22 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
         coords[index] = _coordinates[i];
         index++;
     }
+}
+
+- (void)updateCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
+{
+    if ([self isMemberOfClass:[MGLMultiPoint class]])
+    {
+        [[NSException exceptionWithName:@"MGLAbstractClassException"
+                                 reason:@"MGLMultiPoint is an abstract class"
+                               userInfo:nil] raise];
+    }
+
+    assert(_count > 0);
+
+    [self willChangeValueForKey:@"coordinates"];
+    [self setupWithCoordinates:coords count:count];
+    [self didChangeValueForKey:@"coordinates"];
 }
 
 - (MGLCoordinateBounds)overlayBounds
