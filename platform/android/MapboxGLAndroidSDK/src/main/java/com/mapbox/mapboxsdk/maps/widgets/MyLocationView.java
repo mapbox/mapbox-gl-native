@@ -36,6 +36,7 @@ import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
+import com.mapbox.mapboxsdk.utils.MathUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -314,7 +315,7 @@ public class MyLocationView extends View {
     }
 
     public void setCameraPosition(CameraPosition position) {
-        setTilt(position.tilt);
+        setTilt(MathUtils.clamp(Math.toDegrees(position.tilt), 0.0, 60.0));
         setBearing(position.bearing);
     }
 
