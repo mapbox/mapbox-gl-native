@@ -31,7 +31,7 @@ void CircleBucket::render(Painter& painter,
 }
 
 bool CircleBucket::hasData() const {
-    return !triangleGroups.empty();
+    return !groups.empty();
 }
 
 bool CircleBucket::needsClipping() const {
@@ -64,13 +64,13 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
             vertices.emplace_back(x, y, 1, 1); // 3
             vertices.emplace_back(x, y, -1, 1); // 4
 
-            if (!triangleGroups.size() || (triangleGroups.back()->vertex_length + 4 > 65535)) {
+            if (!groups.size() || groups.back().vertexLength + 4 > 65535) {
                 // Move to a new group because the old one can't hold the geometry.
-                triangleGroups.emplace_back(std::make_unique<TriangleGroup>());
+                groups.emplace_back();
             }
 
-            TriangleGroup& group = *triangleGroups.back();
-            uint16_t index = group.vertex_length;
+            auto& group = groups.back();
+            uint16_t index = group.vertexLength;
 
             // 1, 2, 3
             // 1, 4, 3
@@ -81,27 +81,25 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
                                    static_cast<uint16_t>(index + 3),
                                    static_cast<uint16_t>(index + 2));
 
-            group.vertex_length += 4;
-            group.elements_length += 2;
+            group.vertexLength += 4;
+            group.indexLength += 2;
         }
     }
 }
 
-void CircleBucket::drawCircles(CircleShader& shader, gl::Context& context) {
+void CircleBucket::drawCircles(CircleShader& shader, gl::Context& context, PaintMode paintMode) {
     GLbyte* vertexIndex = BUFFER_OFFSET(0);
     GLbyte* elementsIndex = BUFFER_OFFSET(0);
 
-    for (auto& group : triangleGroups) {
-        assert(group);
+    for (auto& group : groups) {
+        if (!group.indexLength) continue;
 
-        if (!group->elements_length) continue;
+        group.getVAO(shader, paintMode).bind(shader, *vertexBuffer, *indexBuffer, vertexIndex, context);
 
-        group->array[0].bind(shader, *vertexBuffer, *indexBuffer, vertexIndex, context);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT, elementsIndex));
 
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elementsIndex));
-
-        vertexIndex += group->vertex_length * vertexBuffer->vertexSize;
-        elementsIndex += group->elements_length * indexBuffer->primitiveSize;
+        vertexIndex += group.vertexLength * vertexBuffer->vertexSize;
+        elementsIndex += group.indexLength * indexBuffer->primitiveSize;
     }
 }
 

@@ -54,11 +54,11 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
             if (nVertices == 0)
                 continue;
 
-            if (lineGroups.empty() || lineGroups.back()->vertex_length + nVertices > 65535)
-                lineGroups.emplace_back(std::make_unique<LineGroup>());
+            if (lineGroups.empty() || lineGroups.back().vertexLength + nVertices > 65535)
+                lineGroups.emplace_back();
 
-            LineGroup& lineGroup = *lineGroups.back();
-            uint16_t lineIndex = lineGroup.vertex_length;
+            auto& lineGroup = lineGroups.back();
+            uint16_t lineIndex = lineGroup.vertexLength;
 
             vertices.emplace_back(ring[0].x, ring[0].y);
             lines.emplace_back(static_cast<uint16_t>(lineIndex + nVertices - 1),
@@ -70,8 +70,8 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
                                    static_cast<uint16_t>(lineIndex + i));
             }
 
-            lineGroup.vertex_length += nVertices;
-            lineGroup.elements_length += nVertices;
+            lineGroup.vertexLength += nVertices;
+            lineGroup.indexLength += nVertices;
         }
 
         std::vector<uint32_t> indices = mapbox::earcut(polygon);
@@ -79,12 +79,12 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
         std::size_t nIndicies = indices.size();
         assert(nIndicies % 3 == 0);
 
-        if (triangleGroups.empty() || triangleGroups.back()->vertex_length + totalVertices > 65535) {
-            triangleGroups.emplace_back(std::make_unique<TriangleGroup>());
+        if (triangleGroups.empty() || triangleGroups.back().vertexLength + totalVertices > 65535) {
+            triangleGroups.emplace_back();
         }
 
-        TriangleGroup& triangleGroup = *triangleGroups.back();
-        uint16_t triangleIndex = triangleGroup.vertex_length;
+        auto& triangleGroup = triangleGroups.back();
+        uint16_t triangleIndex = triangleGroup.vertexLength;
 
         for (uint32_t i = 0; i < nIndicies; i += 3) {
             triangles.emplace_back(static_cast<uint16_t>(triangleIndex + indices[i]),
@@ -92,8 +92,8 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
                                    static_cast<uint16_t>(triangleIndex + indices[i + 2]));
         }
 
-        triangleGroup.vertex_length += totalVertices;
-        triangleGroup.elements_length += nIndicies / 3;
+        triangleGroup.vertexLength += totalVertices;
+        triangleGroup.indexLength += nIndicies / 3;
     }
 }
 
@@ -127,13 +127,12 @@ void FillBucket::drawElements(PlainShader& shader,
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
-        assert(group);
-        group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
+        group.getVAO(shader, paintMode).bind(
             shader, *vertexBuffer, *triangleIndexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
-        elements_index += group->elements_length * triangleIndexBuffer->primitiveSize;
+        vertex_index += group.vertexLength * vertexBuffer->vertexSize;
+        elements_index += group.indexLength * triangleIndexBuffer->primitiveSize;
     }
 }
 
@@ -143,13 +142,12 @@ void FillBucket::drawElements(PatternShader& shader,
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
-        assert(group);
-        group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
+        group.getVAO(shader, paintMode).bind(
             shader, *vertexBuffer, *triangleIndexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
-        elements_index += group->elements_length * triangleIndexBuffer->primitiveSize;
+        vertex_index += group.vertexLength * vertexBuffer->vertexSize;
+        elements_index += group.indexLength * triangleIndexBuffer->primitiveSize;
     }
 }
 
@@ -159,13 +157,12 @@ void FillBucket::drawVertices(OutlineShader& shader,
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : lineGroups) {
-        assert(group);
-        group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
+        group.getVAO(shader, paintMode).bind(
             shader, *vertexBuffer, *lineIndexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT,
+        MBGL_CHECK_ERROR(glDrawElements(GL_LINES, static_cast<GLsizei>(group.indexLength * 2), GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
-        elements_index += group->elements_length * lineIndexBuffer->primitiveSize;
+        vertex_index += group.vertexLength * vertexBuffer->vertexSize;
+        elements_index += group.indexLength * lineIndexBuffer->primitiveSize;
     }
 }
 
@@ -175,13 +172,12 @@ void FillBucket::drawVertices(OutlinePatternShader& shader,
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : lineGroups) {
-        assert(group);
-        group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
+        group.getVAO(shader, paintMode).bind(
             shader, *vertexBuffer, *lineIndexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT,
+        MBGL_CHECK_ERROR(glDrawElements(GL_LINES, static_cast<GLsizei>(group.indexLength * 2), GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
-        elements_index += group->elements_length * lineIndexBuffer->primitiveSize;
+        vertex_index += group.vertexLength * vertexBuffer->vertexSize;
+        elements_index += group.indexLength * lineIndexBuffer->primitiveSize;
     }
 }
 

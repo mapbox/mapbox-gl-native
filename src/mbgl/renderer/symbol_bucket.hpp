@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/element_group.hpp>
 #include <mbgl/map/mode.hpp>
-#include <mbgl/gl/element_group.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/shader/texture_rect_vertex.hpp>
@@ -47,14 +47,10 @@ public:
 private:
     friend class SymbolLayout;
 
-    typedef gl::ElementGroup<2> TextElementGroup;
-    typedef gl::ElementGroup<4> IconElementGroup;
-    typedef gl::ElementGroup<1> CollisionBoxElementGroup;
-
     struct TextBuffer {
         std::vector<TextureRectVertex> vertices;
         std::vector<gl::Triangle> triangles;
-        std::vector<std::unique_ptr<TextElementGroup>> groups;
+        std::vector<ElementGroup<SDFShader>> groups;
 
         optional<gl::VertexBuffer<TextureRectVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
@@ -63,7 +59,7 @@ private:
     struct IconBuffer {
         std::vector<TextureRectVertex> vertices;
         std::vector<gl::Triangle> triangles;
-        std::vector<std::unique_ptr<IconElementGroup>> groups;
+        std::vector<ElementGroup<SDFShader, IconShader>> groups;
 
         optional<gl::VertexBuffer<TextureRectVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
@@ -72,7 +68,7 @@ private:
     struct CollisionBoxBuffer {
         std::vector<CollisionBoxVertex> vertices;
         std::vector<gl::Line> lines;
-        std::vector<std::unique_ptr<CollisionBoxElementGroup>> groups;
+        std::vector<ElementGroup<CollisionBoxShader>> groups;
 
         optional<gl::VertexBuffer<CollisionBoxVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Line>> indexBuffer;

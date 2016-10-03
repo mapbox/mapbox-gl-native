@@ -7,11 +7,6 @@
 namespace mbgl {
 namespace gl {
 
-VertexArrayObject::VertexArrayObject() {
-}
-
-VertexArrayObject::~VertexArrayObject() = default;
-
 void VertexArrayObject::bindVertexArrayObject(Context& context) {
     if (!GenVertexArrays || !BindVertexArray) {
         static bool reported = false;

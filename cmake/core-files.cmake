@@ -61,7 +61,6 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/context.hpp
     src/mbgl/gl/debugging.cpp
     src/mbgl/gl/debugging.hpp
-    src/mbgl/gl/element_group.hpp
     src/mbgl/gl/extension.cpp
     src/mbgl/gl/extension.hpp
     src/mbgl/gl/gl.cpp
@@ -143,6 +142,7 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/circle_bucket.hpp
     src/mbgl/renderer/debug_bucket.cpp
     src/mbgl/renderer/debug_bucket.hpp
+    src/mbgl/renderer/element_group.hpp
     src/mbgl/renderer/fill_bucket.cpp
     src/mbgl/renderer/fill_bucket.hpp
     src/mbgl/renderer/frame_history.cpp

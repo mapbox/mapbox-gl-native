@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/element_group.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/gl/element_group.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/shader/plain_vertex.hpp>
@@ -39,10 +39,8 @@ private:
     std::vector<gl::Line> lines;
     std::vector<gl::Triangle> triangles;
 
-    typedef gl::ElementGroup<4> LineGroup;
-    typedef gl::ElementGroup<4> TriangleGroup;
-    std::vector<std::unique_ptr<LineGroup>> lineGroups;
-    std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
+    std::vector<ElementGroup<OutlineShader, OutlinePatternShader>> lineGroups;
+    std::vector<ElementGroup<PlainShader, PatternShader>> triangleGroups;
 
     optional<gl::VertexBuffer<PlainVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Line>> lineIndexBuffer;

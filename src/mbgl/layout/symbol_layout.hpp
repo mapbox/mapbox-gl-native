@@ -70,7 +70,7 @@ private:
     void addToDebugBuffers(CollisionTile&, SymbolBucket&);
 
     // Adds placed items to the buffer.
-    template <typename Buffer, typename GroupType>
+    template <typename Buffer>
     void addSymbols(Buffer&, const SymbolQuads&, float scale,
                     const bool keepUpright, const style::SymbolPlacementType, const float placementAngle);
 

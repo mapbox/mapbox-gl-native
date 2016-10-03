@@ -391,7 +391,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
         if (hasText) {
             collisionTile.insertFeature(symbolInstance.textCollisionFeature, glyphScale, layout.textIgnorePlacement);
             if (glyphScale < collisionTile.maxScale) {
-                addSymbols<SymbolBucket::TextBuffer, SymbolBucket::TextElementGroup>(
+                addSymbols(
                     bucket->text, symbolInstance.glyphQuads, glyphScale,
                     layout.textKeepUpright, textPlacement, collisionTile.config.angle);
             }
@@ -400,7 +400,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
         if (hasIcon) {
             collisionTile.insertFeature(symbolInstance.iconCollisionFeature, iconScale, layout.iconIgnorePlacement);
             if (iconScale < collisionTile.maxScale) {
-                addSymbols<SymbolBucket::IconBuffer, SymbolBucket::IconElementGroup>(
+                addSymbols(
                     bucket->icon, symbolInstance.iconQuads, iconScale,
                     layout.iconKeepUpright, iconPlacement, collisionTile.config.angle);
             }
@@ -414,7 +414,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
     return bucket;
 }
 
-template <typename Buffer, typename GroupType>
+template <typename Buffer>
 void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float scale, const bool keepUpright, const style::SymbolPlacementType placement, const float placementAngle) {
 
     const float placementZoom = ::fmax(std::log(scale) / std::log(2) + zoom, 0);
@@ -449,16 +449,15 @@ void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
 
         const int glyph_vertex_length = 4;
 
-        if (buffer.groups.empty() || (buffer.groups.back()->vertex_length + glyph_vertex_length > 65535)) {
+        if (buffer.groups.empty() || buffer.groups.back().vertexLength + glyph_vertex_length > 65535) {
             // Move to a new group because the old one can't hold the geometry.
-            buffer.groups.emplace_back(std::make_unique<GroupType>());
+            buffer.groups.emplace_back();
         }
 
         // We're generating triangle fans, so we always start with the first
         // coordinate in this polygon.
-        assert(buffer.groups.back());
-        auto &triangleGroup = *buffer.groups.back();
-        size_t triangleIndex = triangleGroup.vertex_length;
+        auto& group = buffer.groups.back();
+        size_t index = group.vertexLength;
 
         // Encode angle of glyph
         uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);
@@ -474,15 +473,15 @@ void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
                             minZoom, maxZoom, placementZoom, glyphAngle);
 
         // add the two triangles, referencing the four coordinates we just inserted.
-        buffer.triangles.emplace_back(static_cast<uint16_t>(triangleIndex + 0),
-                                      static_cast<uint16_t>(triangleIndex + 1),
-                                      static_cast<uint16_t>(triangleIndex + 2));
-        buffer.triangles.emplace_back(static_cast<uint16_t>(triangleIndex + 1),
-                                      static_cast<uint16_t>(triangleIndex + 2),
-                                      static_cast<uint16_t>(triangleIndex + 3));
+        buffer.triangles.emplace_back(static_cast<uint16_t>(index + 0),
+                                      static_cast<uint16_t>(index + 1),
+                                      static_cast<uint16_t>(index + 2));
+        buffer.triangles.emplace_back(static_cast<uint16_t>(index + 1),
+                                      static_cast<uint16_t>(index + 2),
+                                      static_cast<uint16_t>(index + 3));
 
-        triangleGroup.vertex_length += glyph_vertex_length;
-        triangleGroup.elements_length += 2;
+        group.vertexLength += glyph_vertex_length;
+        group.indexLength += 2;
     }
 }
 
@@ -518,7 +517,7 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 auto& collisionBox = bucket.collisionBox;
                 if (collisionBox.groups.empty()) {
                     // Move to a new group because the old one can't hold the geometry.
-                    collisionBox.groups.emplace_back(std::make_unique<SymbolBucket::CollisionBoxElementGroup>());
+                    collisionBox.groups.emplace_back();
                 }
 
                 collisionBox.vertices.emplace_back(anchor.x, anchor.y, tl.x, tl.y, maxZoom, placementZoom);
@@ -530,8 +529,8 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 collisionBox.vertices.emplace_back(anchor.x, anchor.y, bl.x, bl.y, maxZoom, placementZoom);
                 collisionBox.vertices.emplace_back(anchor.x, anchor.y, tl.x, tl.y, maxZoom, placementZoom);
 
-                auto &group= *collisionBox.groups.back();
-                group.vertex_length += 8;
+                auto& group= collisionBox.groups.back();
+                group.vertexLength += 8;
             }
         }
     }

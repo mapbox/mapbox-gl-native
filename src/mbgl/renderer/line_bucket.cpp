@@ -352,26 +352,22 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
     const std::size_t endVertex = vertices.size();
     const std::size_t vertexCount = endVertex - startVertex;
 
-    // Store the triangle/line groups.
-    {
-        if (triangleGroups.empty() || (triangleGroups.back()->vertex_length + vertexCount > 65535)) {
-            // Move to a new group because the old one can't hold the geometry.
-            triangleGroups.emplace_back(std::make_unique<TriangleGroup>());
-        }
-
-        assert(triangleGroups.back());
-        auto& group = *triangleGroups.back();
-        uint16_t index = group.vertex_length;
-
-        for (const auto& triangle : triangleStore) {
-            triangles.emplace_back(static_cast<uint16_t>(index + triangle.a),
-                                   static_cast<uint16_t>(index + triangle.b),
-                                   static_cast<uint16_t>(index + triangle.c));
-        }
-
-        group.vertex_length += vertexCount;
-        group.elements_length += triangleStore.size();
+    if (groups.empty() || groups.back().vertexLength + vertexCount > 65535) {
+        // Move to a new group because the old one can't hold the geometry.
+        groups.emplace_back();
     }
+
+    auto& group = groups.back();
+    uint16_t index = group.vertexLength;
+
+    for (const auto& triangle : triangleStore) {
+        triangles.emplace_back(static_cast<uint16_t>(index + triangle.a),
+                               static_cast<uint16_t>(index + triangle.b),
+                               static_cast<uint16_t>(index + triangle.c));
+    }
+
+    group.vertexLength += vertexCount;
+    group.indexLength += triangleStore.size();
 }
 
 void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
@@ -454,7 +450,7 @@ void LineBucket::render(Painter& painter,
 }
 
 bool LineBucket::hasData() const {
-    return !triangleGroups.empty();
+    return !groups.empty();
 }
 
 bool LineBucket::needsClipping() const {
@@ -466,17 +462,16 @@ void LineBucket::drawLines(LineShader& shader,
                            PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
-    for (auto& group : triangleGroups) {
-        assert(group);
-        if (!group->elements_length) {
+    for (auto& group : groups) {
+        if (!group.indexLength) {
             continue;
         }
-        group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
+        group.getVAO(shader, paintMode).bind(
             shader, *vertexBuffer, *indexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
-        elements_index += group->elements_length * indexBuffer->primitiveSize;
+        vertex_index += group.vertexLength * vertexBuffer->vertexSize;
+        elements_index += group.indexLength * indexBuffer->primitiveSize;
     }
 }
 
@@ -485,17 +480,16 @@ void LineBucket::drawLineSDF(LineSDFShader& shader,
                              PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
-    for (auto& group : triangleGroups) {
-        assert(group);
-        if (!group->elements_length) {
+    for (auto& group : groups) {
+        if (!group.indexLength) {
             continue;
         }
-        group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
+        group.getVAO(shader, paintMode).bind(
             shader, *vertexBuffer, *indexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
-        elements_index += group->elements_length * indexBuffer->primitiveSize;
+        vertex_index += group.vertexLength * vertexBuffer->vertexSize;
+        elements_index += group.indexLength * indexBuffer->primitiveSize;
     }
 }
 
@@ -504,17 +498,16 @@ void LineBucket::drawLinePatterns(LinepatternShader& shader,
                                   PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
-    for (auto& group : triangleGroups) {
-        assert(group);
-        if (!group->elements_length) {
+    for (auto& group : groups) {
+        if (!group.indexLength) {
             continue;
         }
-        group->array[paintMode == PaintMode::Overdraw ? 5 : 4].bind(
+        group.getVAO(shader, paintMode).bind(
             shader, *vertexBuffer, *indexBuffer, vertex_index, context);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT,
                                         elements_index));
-        vertex_index += group->vertex_length * vertexBuffer->vertexSize;
-        elements_index += group->elements_length * indexBuffer->primitiveSize;
+        vertex_index += group.vertexLength * vertexBuffer->vertexSize;
+        elements_index += group.indexLength * indexBuffer->primitiveSize;
     }
 }
 
