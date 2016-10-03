@@ -835,7 +835,7 @@ public class MapboxMapOptions implements Parcelable {
     /**
      * Get the current configured visibility state for logo for a map view.
      *
-     * @return Visibility state of the compass
+     * @return Visibility state of the logo
      */
     public boolean getLogoEnabled() {
         return logoEnabled;
@@ -1131,10 +1131,8 @@ public class MapboxMapOptions implements Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || this.getClass() != o.getClass()) return false;
 
         MapboxMapOptions options = (MapboxMapOptions) o;
 

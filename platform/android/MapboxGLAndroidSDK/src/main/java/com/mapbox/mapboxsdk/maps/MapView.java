@@ -2590,8 +2590,9 @@ public class MapView extends FrameLayout {
     protected void onMapChanged(int mapChange) {
         if (onMapChangedListener != null) {
             OnMapChangedListener listener;
-            for (OnMapChangedListener anOnMapChangedListener : onMapChangedListener) {
-                listener = anOnMapChangedListener;
+            final Iterator<OnMapChangedListener> iterator = onMapChangedListener.iterator();
+            while (iterator.hasNext()) {
+                listener = iterator.next();
                 listener.onMapChanged(mapChange);
             }
         }
@@ -2610,6 +2611,10 @@ public class MapView extends FrameLayout {
     }
 
     void setOnMyLocationChangeListener(@Nullable final MapboxMap.OnMyLocationChangeListener listener) {
+        if(myLocationListener != null) {
+            LocationServices.getLocationServices(getContext()).removeLocationListener(myLocationListener);
+            myLocationListener = null;
+        }
         if (listener != null) {
             myLocationListener = new LocationListener() {
                 @Override
@@ -2618,9 +2623,6 @@ public class MapView extends FrameLayout {
                 }
             };
             LocationServices.getLocationServices(getContext()).addLocationListener(myLocationListener);
-        } else {
-            LocationServices.getLocationServices(getContext()).removeLocationListener(myLocationListener);
-            myLocationListener = null;
         }
     }
 
