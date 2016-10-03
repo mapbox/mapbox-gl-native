@@ -12,9 +12,4 @@ PlainShader::PlainShader(gl::Context& context, Defines defines)
              context, defines) {
 }
 
-void PlainShader::bind(const gl::VertexBuffer<PlainVertex>&,
-                       const int8_t* offset) {
-    PlainVertex::bind(offset);
-}
-
 } // namespace mbgl

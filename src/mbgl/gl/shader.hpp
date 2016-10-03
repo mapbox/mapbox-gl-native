@@ -18,6 +18,7 @@ public:
         return program.get();
     }
 
+    AttributeLocation getAttributeLocation(const char* uniform) const;
     UniformLocation getUniformLocation(const char* uniform) const;
 
     enum Defines : bool {
@@ -31,13 +32,6 @@ protected:
            const char* fragment,
            Context&,
            Defines defines = Defines::None);
-
-public:
-    static constexpr AttributeLocation         a_pos = 0;
-    static constexpr AttributeLocation     a_extrude = 1;
-    static constexpr AttributeLocation      a_offset = 2;
-    static constexpr AttributeLocation        a_data = 3;
-    static constexpr AttributeLocation a_texture_pos = 4;
 
 private:
     bool compileShader(UniqueShader&, const char *source);

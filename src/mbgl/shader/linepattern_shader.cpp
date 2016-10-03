@@ -12,9 +12,4 @@ LinepatternShader::LinepatternShader(gl::Context& context, Defines defines)
              context, defines) {
 }
 
-void LinepatternShader::bind(const gl::VertexBuffer<LineVertex>&,
-                             const int8_t* offset) {
-    LineVertex::bind(offset);
-}
-
 } // namespace mbgl

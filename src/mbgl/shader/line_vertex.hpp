@@ -1,5 +1,8 @@
 #pragma once
 
+#include <mbgl/gl/attribute.hpp>
+
+#include <array>
 #include <cstdint>
 #include <cmath>
 
@@ -51,8 +54,19 @@ public:
      * the acute/bevelled line join.
      */
     static const int8_t extrudeScale = 63;
-
-    static void bind(const int8_t* offset);
 };
 
+namespace gl {
+
+template <class Shader>
+struct AttributeBindings<Shader, LineVertex> {
+    std::array<AttributeBinding, 2> operator()(const Shader& shader) {
+        return {{
+            MBGL_MAKE_ATTRIBUTE_BINDING(LineVertex, shader, a_pos),
+            MBGL_MAKE_ATTRIBUTE_BINDING(LineVertex, shader, a_data)
+        }};
+    };
+};
+
+} // namespace gl
 } // namespace mbgl

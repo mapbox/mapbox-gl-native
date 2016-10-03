@@ -109,6 +109,16 @@ UniqueBuffer Context::createIndexBuffer(const void* data, std::size_t size) {
     return result;
 }
 
+void Context::bindAttribute(const AttributeBinding& binding, std::size_t stride, const int8_t* offset) {
+    MBGL_CHECK_ERROR(glEnableVertexAttribArray(binding.location));
+    MBGL_CHECK_ERROR(glVertexAttribPointer(binding.location,
+                                           binding.count,
+                                           static_cast<GLenum>(binding.type),
+                                           false,
+                                           static_cast<GLsizei>(stride),
+                                           offset + binding.offset));
+}
+
 UniqueTexture Context::createTexture() {
     if (pooledTextures.empty()) {
         pooledTextures.resize(TextureMax);

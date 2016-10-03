@@ -1,14 +1,11 @@
 #pragma once
 
 #include <mbgl/gl/shader.hpp>
+#include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
 #include <mbgl/util/color.hpp>
 
 namespace mbgl {
-
-namespace gl {
-template <class> class VertexBuffer;
-} // namespace gl
 
 class CircleVertex;
 
@@ -16,8 +13,9 @@ class CircleShader : public gl::Shader {
 public:
     CircleShader(gl::Context&, Defines defines = None);
 
-    void bind(const gl::VertexBuffer<CircleVertex>&,
-              const int8_t* offset);
+    using VertexType = CircleVertex;
+
+    gl::Attribute<int16_t, 2> a_pos = {"a_pos", *this};
 
     gl::UniformMatrix<4>              u_matrix           = {"u_matrix",           *this};
     gl::Uniform<std::array<float, 2>> u_extrude_scale    = {"u_extrude_scale",    *this};

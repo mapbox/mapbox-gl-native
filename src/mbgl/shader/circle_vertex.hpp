@@ -1,5 +1,8 @@
 #pragma once
 
+#include <mbgl/gl/attribute.hpp>
+
+#include <array>
 #include <cstdint>
 
 namespace mbgl {
@@ -19,8 +22,18 @@ public:
         } {}
 
     const int16_t a_pos[2];
-
-    static void bind(const int8_t* offset);
 };
 
+namespace gl {
+
+template <class Shader>
+struct AttributeBindings<Shader, CircleVertex> {
+    std::array<AttributeBinding, 1> operator()(const Shader& shader) {
+        return {{
+            MBGL_MAKE_ATTRIBUTE_BINDING(CircleVertex, shader, a_pos)
+        }};
+    };
+};
+
+} // namespace gl
 } // namespace mbgl

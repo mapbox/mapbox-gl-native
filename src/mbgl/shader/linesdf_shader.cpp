@@ -12,9 +12,4 @@ LineSDFShader::LineSDFShader(gl::Context& context, Defines defines)
              context, defines) {
 }
 
-void LineSDFShader::bind(const gl::VertexBuffer<LineVertex>&,
-                         const int8_t* offset) {
-    LineVertex::bind(offset);
-}
-
 } // namespace mbgl

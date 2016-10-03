@@ -12,9 +12,4 @@ CircleShader::CircleShader(gl::Context& context, Defines defines)
              context, defines) {
 }
 
-void CircleShader::bind(const gl::VertexBuffer<CircleVertex>&,
-                        const int8_t* offset) {
-    CircleVertex::bind(offset);
-}
-
 } // namespace mbgl

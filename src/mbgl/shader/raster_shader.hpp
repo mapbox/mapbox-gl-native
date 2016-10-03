@@ -1,13 +1,10 @@
 #pragma once
 
 #include <mbgl/gl/shader.hpp>
+#include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
 
 namespace mbgl {
-
-namespace gl {
-template <class> class VertexBuffer;
-} // namespace gl
 
 class RasterVertex;
 
@@ -15,8 +12,10 @@ class RasterShader : public gl::Shader {
 public:
     RasterShader(gl::Context&, Defines defines = None);
 
-    void bind(const gl::VertexBuffer<RasterVertex>&,
-              const int8_t* offset);
+    using VertexType = RasterVertex;
+
+    gl::Attribute<int16_t, 2>  a_pos         = { "a_pos",         *this };
+    gl::Attribute<uint16_t, 2> a_texture_pos = { "a_texture_pos", *this };
 
     gl::UniformMatrix<4>              u_matrix            = {"u_matrix",            *this};
     gl::Uniform<int32_t>              u_image0            = {"u_image0",            *this};

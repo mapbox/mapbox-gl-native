@@ -12,9 +12,4 @@ CollisionBoxShader::CollisionBoxShader(gl::Context& context)
              context) {
 }
 
-void CollisionBoxShader::bind(const gl::VertexBuffer<CollisionBoxVertex>&,
-                              const int8_t* offset) {
-    CollisionBoxVertex::bind(offset);
-}
-
 } // namespace mbgl
