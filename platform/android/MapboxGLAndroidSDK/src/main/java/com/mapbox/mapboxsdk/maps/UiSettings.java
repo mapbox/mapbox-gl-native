@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.PointF;
 import android.support.annotation.ColorInt;
+import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -15,6 +16,7 @@ public class UiSettings {
 
     private MapView mapView;
 
+    private ViewSettings scaleSettings;
     private ViewSettings compassSettings;
     private ViewSettings logoSettings;
     private ViewSettings attributionSettings;
@@ -39,9 +41,179 @@ public class UiSettings {
 
     UiSettings(@NonNull MapView mapView) {
         this.mapView = mapView;
+        this.scaleSettings = new ViewSettings();
         this.compassSettings = new ViewSettings();
         this.logoSettings = new ViewSettings();
         this.attributionSettings = new ViewSettings();
+    }
+
+    /**
+     * <p>
+     * Enables or disables the scale. The scale is a widget on the map that shows a dynamically
+     * updated distance scale
+     * If disabled, the scale will never be displayed.
+     * </p>
+     * By default, the scale is enabled.
+     *
+     * @param scaleEnabled True to enable the scale; false to disable the scale.
+     */
+    public void setScaleEnabled(boolean scaleEnabled) {
+        scaleSettings.setEnabled(scaleEnabled);
+        mapView.setScaleEnabled(scaleEnabled);
+    }
+
+    /**
+     * Returns whether the scale is enabled.
+     *
+     * @return True if the scale is enabled; false if the scale is disabled.
+     */
+    public boolean isScaleEnabled() {
+        return scaleSettings.isEnabled();
+    }
+
+    /**
+     * Set the color of the scale widget. Choices are:
+     * MapboxConstants.SCALE_COLOR_BLACK (default)
+     * MapboxConstants.SCALE_COLOR_WHITE
+     *
+     * @param scaleColor
+     */
+
+    public void setScaleColor(int scaleColor) {
+        scaleSettings.setTintColor(scaleColor);
+        mapView.setScaleColor(scaleColor);
+    }
+
+    /**
+     * Returns whether the scale is enabled.
+     *
+     * @return True if the scale is enabled; false if the scale is disabled.
+     */
+    public int getScaleColor() {
+        return scaleSettings.getTintColor();
+    }
+
+    /**
+     * <p>
+     * Sets the gravity of the scale view. Use this to change the corner of the map view that the
+     * scale is displayed in.
+     * </p>
+     * By default, the scale is in the top right corner.
+     *
+     * @param gravity One of the values from {@link Gravity}.
+     * @see Gravity
+     */
+    @UiThread
+    public void setScaleGravity(int gravity) {
+        scaleSettings.setGravity(gravity);
+        mapView.setScaleGravity(gravity);
+    }
+
+    /**
+     * Returns the gravity value of the ScaleView
+     *
+     * @return The gravity
+     */
+    public int getScaleGravity() {
+        return scaleSettings.getGravity();
+    }
+
+    /**
+     * <p>
+     * Sets the width of the scale view as a fraction of the display.
+     * </p>
+     * By default, the scale occupies up to 0.4 (40%) of the width
+     *
+     * @param width - should be in the range 0.0 to 1.0
+     */
+    @UiThread
+    public void setScaleWidth(@FloatRange(from = 0f, to = 1f) float width) {
+        scaleSettings.setWidth(width);
+        mapView.setScaleWidth(width);
+    }
+
+    /**
+     * Returns the width of the scaleView
+     *
+     * @return The width as a fraction of the display width
+     */
+    public float getScaleWidth() {
+        return scaleSettings.getWidth();
+    }
+
+    /**
+     * <p>
+     * Sets the unit to use when displaying the scale. Choices are KM, MILE or NM
+     * </p>
+     * By default, the unit used is km
+     *
+     * @param unit
+     * @see ScaleUnit {@link ScaleUnit}
+     */
+    @UiThread
+    public void setScaleUnit(ScaleUnit unit) {
+        scaleSettings.setScaleUnit(unit);
+        mapView.setScaleUnit(unit);
+    }
+
+    /**
+     * Returns the unit currently used for the scale
+     *
+     * @return The ScaleUnit
+     */
+    public ScaleUnit getScaleUnit() {
+        return scaleSettings.getScaleUnit();
+    }
+
+    /**
+     * Sets the margins of the scale view. Use this to change the distance of the scale from the
+     * map view edge.
+     *
+     * @param left   The left margin in pixels.
+     * @param top    The top margin in pixels.
+     * @param right  The right margin in pixels.
+     * @param bottom The bottom margin in pixels.
+     */
+    @UiThread
+    public void setScaleMargins(int left, int top, int right, int bottom) {
+        scaleSettings.setMargins(new int[]{left, top, right, bottom});
+        mapView.setScaleMargins(left, top, right, bottom);
+    }
+
+    /**
+     * Returns the left side margin of ScaleView
+     *
+     * @return The left margin in pixels
+     */
+    public int getScaleMarginLeft() {
+        return scaleSettings.getMargins()[0];
+    }
+
+    /**
+     * Returns the top side margin of ScaleView
+     *
+     * @return The top margin in pixels
+     */
+    public int getScaleMarginTop() {
+        return scaleSettings.getMargins()[1];
+    }
+
+    /**
+     * Returns the right side margin of ScaleView
+     *
+     * @return The right margin in pixels
+     */
+    public int getScaleMarginRight() {
+        return scaleSettings.getMargins()[2];
+    }
+
+    /**
+     * Returns the bottom side margin of ScaleView
+     *
+     * @return The bottom margin in pixels
+     */
+    public int getScaleMarginBottom() {
+        return scaleSettings.getMargins()[3];
     }
 
     /**
@@ -596,7 +768,7 @@ public class UiSettings {
     /**
      * Returns the measured width of the MapView
      *
-     * @return widht in pixels
+     * @return width in pixels
      */
     public float getWidth() {
         return mapView.getMeasuredWidth();
@@ -608,6 +780,33 @@ public class UiSettings {
     public void invalidate() {
         mapView.setLogoMargins(getLogoMarginLeft(), getLogoMarginTop(), getLogoMarginRight(), getLogoMarginBottom());
         mapView.setCompassMargins(getCompassMarginLeft(), getCompassMarginTop(), getCompassMarginRight(), getCompassMarginBottom());
+        mapView.setScaleMargins(getScaleMarginLeft(), getScaleMarginTop(), getScaleMarginRight(), getScaleMarginBottom());
         mapView.setAttributionMargins(getAttributionMarginLeft(), getAttributionMarginTop(), getAttributionMarginRight(), getAttributionMarginBottom());
+    }
+
+    /**
+     * Choices for the distance unit displayed on the map scale.
+     */
+
+    public enum ScaleUnit {
+        KM("km", 1000.0f),      // kilometer
+        MILE("mi", 1609.344f),  // statute mile
+        NM("nm", 1852.0f);      // nautical mile
+
+        ScaleUnit(String unit, float ratio) {
+            this.unit = unit;
+            this.ratio = ratio;
+        }
+
+        /**
+         * The string to display as the unit name.
+         */
+        public String unit;
+        /**
+         * The number of meters in one of these units.
+         * Convert meters to this unit by dividing by the ratio.
+         */
+
+        public float ratio;
     }
 }

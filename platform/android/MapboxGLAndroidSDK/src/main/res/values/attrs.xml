@@ -112,6 +112,39 @@
         <attr name="attribution_enabled" format="boolean" />
         <attr name="attribution_tint" format="color" />
 
+        <!--Scale-->
+        <attr name="scale_gravity">
+            <flag name="top" value="0x30" />
+            <flag name="bottom" value="0x50" />
+            <flag name="left" value="0x03" />
+            <flag name="right" value="0x05" />
+            <flag name="center_vertical" value="0x10" />
+            <flag name="fill_vertical" value="0x70" />
+            <flag name="center_horizontal" value="0x01" />
+            <flag name="fill_horizontal" value="0x07" />
+            <flag name="center" value="0x11" />
+            <flag name="fill" value="0x77" />
+            <flag name="clip_vertical" value="0x80" />
+            <flag name="clip_horizontal" value="0x08" />
+            <flag name="start" value="0x00800003" />
+            <flag name="end" value="0x00800005" />
+        </attr>
+        <attr name="scale_width" format="float" />
+        <attr name="scale_margin_left" format="dimension" />
+        <attr name="scale_margin_top" format="dimension" />
+        <attr name="scale_margin_right" format="dimension" />
+        <attr name="scale_margin_bottom" format="dimension" />
+        <attr name="scale_enabled" format="boolean" />
+        <attr name="scale_color">
+            <enum name="black" value="0"/>
+            <enum name="white" value="1"/>
+        </attr>
+        <attr name="scale_unit">
+            <enum name="km" value="0"/>
+            <enum name="mile" value="1"/>
+            <enum name="nm" value="2"/>
+        </attr>
+
         <!-- Deprecated to use TextureView-->
         <attr name="texture_mode" format="boolean" />
     </declare-styleable>

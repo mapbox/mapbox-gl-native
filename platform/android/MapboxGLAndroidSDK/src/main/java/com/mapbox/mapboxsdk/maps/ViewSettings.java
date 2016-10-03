@@ -9,6 +9,9 @@ class ViewSettings {
     private int gravity;
     private int[] margins;
     private int tintColor;
+    private float width;
+
+    private UiSettings.ScaleUnit scaleUnit;
 
     public ViewSettings() {
         margins = new int[4];
@@ -45,4 +48,21 @@ class ViewSettings {
     public void setTintColor(int tintColor) {
         this.tintColor = tintColor;
     }
+
+    public UiSettings.ScaleUnit getScaleUnit() {
+        return scaleUnit;
+    }
+
+    public void setScaleUnit(UiSettings.ScaleUnit scaleUnit) {
+        this.scaleUnit = scaleUnit;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public void setWidth(float width) {
+        this.width = width;
+    }
+
 }

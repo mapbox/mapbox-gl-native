@@ -28,7 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Do not unregister in Activity.onSaveInstanceState(), because this won't be called if the user moves back in the history stack.
  * </p>
  */
-public class LocationServices implements com.mapzen.android.lost.api.LocationListener {
+public class LocationServices implements com.mapzen.android.lost.api.LocationListener, LostApiClient.ConnectionCallbacks {
 
     private static final String TAG = "LocationServices";
 
@@ -76,42 +76,17 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
             Log.w(TAG, "Location Permissions Not Granted Yet.  Try again after requesting.");
             return;
         }
+        isGPSEnabled = enableGPS;
 
         // Disconnect
         if (locationClient.isConnected()) {
             // Disconnect first to ensure that the new requests are GPS
-            com.mapzen.android.lost.api.LocationServices.FusedLocationApi.removeLocationUpdates(this);
+            com.mapzen.android.lost.api.LocationServices.FusedLocationApi.removeLocationUpdates(locationClient, this);
             locationClient.disconnect();
         }
 
         // Setup Fresh
         locationClient.connect();
-        Location lastLocation = com.mapzen.android.lost.api.LocationServices.FusedLocationApi.getLastLocation();
-        if (lastLocation != null) {
-            this.lastLocation = lastLocation;
-        }
-
-        LocationRequest locationRequest;
-
-        if (enableGPS) {
-            // LocationRequest Tuned for GPS
-            locationRequest = LocationRequest.create()
-                    .setFastestInterval(1000)
-                    .setSmallestDisplacement(3.0f)
-                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-            com.mapzen.android.lost.api.LocationServices.FusedLocationApi.requestLocationUpdates(locationRequest, this);
-        } else {
-            // LocationRequest Tuned for PASSIVE
-            locationRequest = LocationRequest.create()
-                    .setFastestInterval(1000)
-                    .setSmallestDisplacement(3.0f)
-                    .setPriority(LocationRequest.PRIORITY_NO_POWER);
-
-            com.mapzen.android.lost.api.LocationServices.FusedLocationApi.requestLocationUpdates(locationRequest, this);
-        }
-
-        isGPSEnabled = enableGPS;
     }
 
     /**
@@ -142,6 +117,16 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
         Intent locIntent = new Intent(TelemetryLocationReceiver.INTENT_STRING);
         locIntent.putExtra(LocationManager.KEY_LOCATION_CHANGED, location);
         context.sendBroadcast(locIntent);
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
     }
 
     /**
@@ -176,6 +161,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
 
     /**
      * Check status of Location Permissions
+     *
      * @return True if granted to the app, False if not
      */
     public boolean areLocationPermissionsGranted() {
@@ -185,5 +171,32 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
             return false;
         }
         return true;
+    }
+
+    /**
+     * Called when the LocationService is connected. Get the last location and start regular location updates.
+     */
+    @Override
+    public void onConnected() {
+        lastLocation = com.mapzen.android.lost.api.LocationServices.FusedLocationApi.getLastLocation(locationClient);
+        LocationRequest locationRequest;
+        if (isGPSEnabled) {
+            // LocationRequest Tuned for GPS
+            locationRequest = LocationRequest.create()
+                    .setFastestInterval(1000)
+                    .setSmallestDisplacement(3.0f)
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        } else {
+            // LocationRequest Tuned for PASSIVE
+            locationRequest = LocationRequest.create()
+                    .setFastestInterval(1000)
+                    .setSmallestDisplacement(3.0f)
+                    .setPriority(LocationRequest.PRIORITY_NO_POWER);
+        }
+        com.mapzen.android.lost.api.LocationServices.FusedLocationApi.requestLocationUpdates(locationClient, locationRequest, this);
+    }
+
+    @Override
+    public void onConnectionSuspended() {
     }
 }

@@ -17,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/toolbar"
+        app:scale_enabled="false"
         app:attribution_tint="@android:color/holo_green_dark"
         app:center_latitude="47.798202"
         app:center_longitude="7.573781"
