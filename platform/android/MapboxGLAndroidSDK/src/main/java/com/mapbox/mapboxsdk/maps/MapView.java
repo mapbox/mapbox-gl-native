@@ -1227,9 +1227,8 @@ public class MapView extends FrameLayout {
         long[] ids = nativeMapView.queryPointAnnotations(rect);
 
         Set<Long> idsList = new HashSet<>(ids.length);
-        for (int i = 0; i != ids.length; i++) {
-            idsList.add(ids[i]);
-        }
+        for(Long id : ids)
+            idsList.add(id);
 
         List<Marker> annotations = new ArrayList<>(ids.length);
         List<Annotation> annotationList = mapboxMap.getAnnotations();
@@ -1248,17 +1247,11 @@ public class MapView extends FrameLayout {
      * @return A list of MarkerViews in the specified area
      */
     public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rect) {
-        if (destroyed)
-            return new ArrayList<>();
-
-        long[] ids = nativeMapView.queryPointAnnotations(rect);
-        List<MarkerView> annotations = new ArrayList<>(ids.length);
-        List<Annotation> annotationList = mapboxMap.getAnnotations();
-        for (Annotation annotation : annotationList) {
-            if (annotation instanceof MarkerView) {
-                annotations.add((MarkerView) annotation);
-            }
-        }
+        List<Marker> markerList = getMarkersInRect(rect);
+        List<MarkerView> annotations = new ArrayList<>(markerList.size());
+        for(Marker marker : markerList)
+        if(marker instanceof MarkerView)
+            annotations.add((MarkerView) marker);
         return annotations;
     }
 
