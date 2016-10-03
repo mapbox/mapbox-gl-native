@@ -52,6 +52,7 @@
     <string name="activity_custom_layer">Custom Layer</string>
     <string name="activity_map_padding">Map Padding</string>
     <string name="activity_debug_mode">Debug Mode</string>
+    <string name="activity_scale_options">Map Scale Options</string>
     <string name="activity_offline">Offline Map</string>
     <string name="activity_update_metadata">Update metadata Map</string>
     <string name="activity_minmax_zoom">Min/Max Zoom</string>
@@ -90,6 +91,7 @@
     <string name="description_dynamic_marker">Update position and icon</string>
     <string name="description_map_padding">Map Padding example</string>
     <string name="description_debug_mode">Debug Mode</string>
+    <string name="description_scale_options">Test styles for map scale</string>
     <string name="description_offline">Offline Map example</string>
     <string name="description_update_metadata">Update metadata example</string>
     <string name="description_animated_marker">Animate the position change of a Marker</string>
