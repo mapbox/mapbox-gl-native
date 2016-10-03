@@ -86,6 +86,13 @@ public class MapboxConstants {
     public static final double MINIMUM_DIRECTION = 0;
 
     /**
+     * Color choices for the scale widget
+     */
+
+    public static final int SCALE_COLOR_BLACK = 0;
+    public static final int SCALE_COLOR_WHITE = 1;
+
+    /**
      * Fragment Argument Key for MapboxMapOptions
      */
     public static final String FRAG_ARG_MAPBOXMAPOPTIONS = "MapboxMapOptions";
@@ -107,6 +114,14 @@ public class MapboxConstants {
     public static final String STATE_MY_LOCATION_ENABLED = "myLocationEnabled";
     public static final String STATE_MY_LOCATION_TRACKING_MODE = "myLocationTracking";
     public static final String STATE_MY_BEARING_TRACKING_MODE = "myBearingTracking";
+    public static final String STATE_SCALE_ENABLED = "scaleEnabled";
+    public static final String STATE_SCALE_GRAVITY = "scaleGravity";
+    public static final String STATE_SCALE_MARGIN_LEFT = "scaleMarginLeft";
+    public static final String STATE_SCALE_MARGIN_TOP = "scaleMarginTop";
+    public static final String STATE_SCALE_MARGIN_RIGHT = "scaleMarginRight";
+    public static final String STATE_SCALE_MARGIN_BOTTOM = "scaleMarginBottom";
+    public static final String STATE_SCALE_WIDTH = "scaleWidth";
+    public static final String STATE_SCALE_UNIT = "scaleUnit";
     public static final String STATE_COMPASS_ENABLED = "compassEnabled";
     public static final String STATE_COMPASS_GRAVITY = "compassGravity";
     public static final String STATE_COMPASS_MARGIN_LEFT = "compassMarginLeft";

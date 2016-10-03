@@ -23,6 +23,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <com.mapbox.mapboxsdk.maps.widgets.ScaleView
+        android:id="@+id/scaleView"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_height="wrap_content" />
+
     <ImageView
         android:id="@+id/logoView"
         android:layout_width="wrap_content"
