@@ -2,6 +2,9 @@
 
 #import <mbgl/util/geojson.hpp>
 #import <mbgl/util/geometry.hpp>
+#import <mbgl/util/geo.hpp>
+
+bool operator==(const CLLocationCoordinate2D lhs, const CLLocationCoordinate2D rhs);
 
 @interface MGLShape (Private)
 

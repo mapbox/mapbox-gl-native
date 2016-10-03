@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
  you can add some kinds of shapes directly to a map view as annotations or
  overlays.
  */
-@interface MGLShape : NSObject <MGLAnnotation>
+@interface MGLShape : NSObject <MGLAnnotation, NSSecureCoding>
 
 #pragma mark Creating a Shape
 

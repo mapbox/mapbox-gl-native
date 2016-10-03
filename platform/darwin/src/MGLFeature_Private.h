@@ -37,3 +37,31 @@ mbgl::Feature mbglFeature(mbgl::Feature feature, id identifier, NSDictionary *at
 NS_DICTIONARY_OF(NSString *, id) *NSDictionaryFeatureForGeometry(NSDictionary *geometry, NSDictionary *attributes, id identifier);
 
 NS_ASSUME_NONNULL_END
+
+#define MGL_DEFINE_FEATURE_INIT_WITH_CODER() \
+    - (instancetype)initWithCoder:(NSCoder *)decoder { \
+        if (self = [super initWithCoder:decoder]) { \
+            NSSet<Class> *identifierClasses = [NSSet setWithArray:@[[NSString class], [NSNumber class]]]; \
+            identifier = [decoder decodeObjectOfClasses:identifierClasses forKey:@"identifier"]; \
+            attributes = [decoder decodeObjectOfClass:[NSDictionary class] forKey:@"attributes"]; \
+        } \
+        return self; \
+    }
+
+#define MGL_DEFINE_FEATURE_ENCODE() \
+    - (void)encodeWithCoder:(NSCoder *)coder { \
+        [super encodeWithCoder:coder]; \
+        [coder encodeObject:identifier forKey:@"identifier"]; \
+        [coder encodeObject:attributes forKey:@"attributes"]; \
+    }
+
+#define MGL_DEFINE_FEATURE_IS_EQUAL() \
+    - (BOOL)isEqual:(id)other { \
+        if (other == self) return YES; \
+        if (![other isKindOfClass:[self class]]) return NO; \
+        __typeof(self) otherFeature = other; \
+        return [super isEqual:other] && [self geoJSONObject] == [otherFeature geoJSONObject]; \
+    } \
+    - (NSUInteger)hash { \
+        return [super hash] + [[self geoJSONDictionary] hash]; \
+    }

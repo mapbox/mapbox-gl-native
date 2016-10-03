@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
  directly. Instead, you retrieve an existing MGLUserLocation object from the
  `userLocation` property of the map view displayed in your application.
  */
-@interface MGLUserLocation : NSObject <MGLAnnotation>
+@interface MGLUserLocation : NSObject <MGLAnnotation, NSSecureCoding>
 
 #pragma mark Determining the User’s Position
 

@@ -18,6 +18,35 @@
     return self;
 }
 
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    if (self = [super initWithCoder:decoder]) {
+        _shapes = [decoder decodeObjectOfClass:[NSArray class] forKey:@"shapes"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [super encodeWithCoder:coder];
+    [coder encodeObject:_shapes forKey:@"shapes"];
+}
+
+- (BOOL)isEqual:(id)other {
+    if (self == other) return YES;
+    if (![other isKindOfClass:[MGLShapeCollection class]]) return NO;
+    
+    MGLShapeCollection *otherShapeCollection = other;
+    return [super isEqual:otherShapeCollection]
+    && [_shapes isEqualToArray:otherShapeCollection.shapes];
+}
+
+- (NSUInteger)hash {
+    NSUInteger hash = [super hash];
+    for (MGLShape *shape in _shapes) {
+        hash += [shape hash];
+    }
+    return hash;
+}
+
 - (CLLocationCoordinate2D)coordinate {
     return _shapes.firstObject.coordinate;
 }

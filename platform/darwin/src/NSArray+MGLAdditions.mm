@@ -38,4 +38,28 @@
     return attributedString;
 }
 
++ (NSArray *)mgl_coordinatesFromCoordinates:(std::vector<CLLocationCoordinate2D>)coords {
+    NSMutableArray *coordinates = [NSMutableArray array];
+    for (auto coord : coords) {
+        [coordinates addObject:@{@"latitude": @(coord.latitude),
+                                 @"longitude": @(coord.longitude)}];
+    }
+    return coordinates;
+}
+
+- (std::vector<CLLocationCoordinate2D>)mgl_coordinates {
+    NSUInteger numberOfCoordinates = [self count];
+    CLLocationCoordinate2D *coords = (CLLocationCoordinate2D *)malloc(numberOfCoordinates * sizeof(CLLocationCoordinate2D));
+    
+    for (NSUInteger i = 0; i < numberOfCoordinates; i++) {
+        coords[i] = CLLocationCoordinate2DMake([self[i][@"latitude"] doubleValue],
+                                               [self[i][@"longitude"] doubleValue]);
+    }
+    
+    std::vector<CLLocationCoordinate2D> coordinates = { coords, coords + numberOfCoordinates };
+    free(coords);
+    
+    return coordinates;
+}
+
 @end
