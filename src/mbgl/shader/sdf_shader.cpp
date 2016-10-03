@@ -12,9 +12,4 @@ SDFShader::SDFShader(gl::Context& context, Defines defines)
              context, defines) {
 }
 
-void SDFShader::bind(const gl::VertexBuffer<TextureRectVertex>&,
-                     const int8_t* offset) {
-    TextureRectVertex::bind(offset);
-}
-
 } // namespace mbgl

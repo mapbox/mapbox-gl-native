@@ -12,9 +12,4 @@ RasterShader::RasterShader(gl::Context& context, Defines defines)
              context, defines) {
 }
 
-void RasterShader::bind(const gl::VertexBuffer<RasterVertex>&,
-                       const int8_t* offset) {
-    RasterVertex::bind(offset);
-}
-
 } // namespace mbgl

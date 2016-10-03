@@ -1,13 +1,10 @@
 #pragma once
 
 #include <mbgl/gl/shader.hpp>
+#include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
 
 namespace mbgl {
-
-namespace gl {
-template <class> class VertexBuffer;
-} // namespace gl
 
 class TextureRectVertex;
 
@@ -15,8 +12,12 @@ class IconShader : public gl::Shader {
 public:
     IconShader(gl::Context&, Defines defines = None);
 
-    void bind(const gl::VertexBuffer<TextureRectVertex>&,
-              const int8_t* offset);
+    using VertexType = TextureRectVertex;
+
+    gl::Attribute<int16_t, 2>  a_pos         = { "a_pos",         *this };
+    gl::Attribute<int16_t, 2>  a_offset      = { "a_offset",      *this };
+    gl::Attribute<uint16_t, 2> a_texture_pos = { "a_texture_pos", *this };
+    gl::Attribute<uint8_t, 4>  a_data        = { "a_data",        *this };
 
     gl::UniformMatrix<4>              u_matrix          = {"u_matrix",          *this};
     gl::Uniform<std::array<float, 2>> u_extrude_scale   = {"u_extrude_scale",   *this};

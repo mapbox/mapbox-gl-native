@@ -1,12 +1,15 @@
 #pragma once
 
+#include <mbgl/gl/attribute.hpp>
+
+#include <array>
 #include <cstdint>
 
 namespace mbgl {
 
 class RasterVertex {
 public:
-    RasterVertex(int16_t x, int16_t y, int16_t tx, int16_t ty)
+    RasterVertex(int16_t x, int16_t y, uint16_t tx, uint16_t ty)
         : a_pos {
               x,
               y
@@ -17,9 +20,20 @@ public:
           } {}
 
     const int16_t a_pos[2];
-    const int16_t a_texture_pos[2];
-
-    static void bind(const int8_t* offset);
+    const uint16_t a_texture_pos[2];
 };
 
+namespace gl {
+
+template <class Shader>
+struct AttributeBindings<Shader, RasterVertex> {
+    std::array<AttributeBinding, 2> operator()(const Shader& shader) {
+        return {{
+            MBGL_MAKE_ATTRIBUTE_BINDING(RasterVertex, shader, a_pos),
+            MBGL_MAKE_ATTRIBUTE_BINDING(RasterVertex, shader, a_texture_pos)
+        }};
+    };
+};
+
+} // namespace gl
 } // namespace mbgl

@@ -2,12 +2,9 @@
 
 #include <mbgl/gl/shader.hpp>
 #include <mbgl/gl/uniform.hpp>
+#include <mbgl/gl/attribute.hpp>
 
 namespace mbgl {
-
-namespace gl {
-template <class> class VertexBuffer;
-} // namespace gl
 
 class LineVertex;
 
@@ -15,8 +12,10 @@ class LinepatternShader : public gl::Shader {
 public:
     LinepatternShader(gl::Context&, Defines defines = None);
 
-    void bind(const gl::VertexBuffer<LineVertex>&,
-              const int8_t* offset);
+    using VertexType = LineVertex;
+
+    gl::Attribute<int16_t, 2> a_pos  = { "a_pos",  *this };
+    gl::Attribute<uint8_t, 4> a_data = { "a_data", *this };
 
     gl::UniformMatrix<4>              u_matrix              = {"u_matrix",              *this};
     gl::Uniform<float>                u_linewidth           = {"u_linewidth",           *this};

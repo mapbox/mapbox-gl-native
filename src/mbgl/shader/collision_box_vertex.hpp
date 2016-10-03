@@ -1,5 +1,8 @@
 #pragma once
 
+#include <mbgl/gl/attribute.hpp>
+
+#include <array>
 #include <cstdint>
 #include <cmath>
 
@@ -21,8 +24,20 @@ public:
     const int16_t a_pos[2];
     const int16_t a_extrude[2];
     const uint8_t a_data[2];
-
-    static void bind(const int8_t* offset);
 };
 
+namespace gl {
+
+template <class Shader>
+struct AttributeBindings<Shader, CollisionBoxVertex> {
+    std::array<AttributeBinding, 3> operator()(const Shader& shader) {
+        return {{
+            MBGL_MAKE_ATTRIBUTE_BINDING(CollisionBoxVertex, shader, a_pos),
+            MBGL_MAKE_ATTRIBUTE_BINDING(CollisionBoxVertex, shader, a_extrude),
+            MBGL_MAKE_ATTRIBUTE_BINDING(CollisionBoxVertex, shader, a_data)
+        }};
+    };
+};
+
+} // namespace gl
 } // namespace mbgl

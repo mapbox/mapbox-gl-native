@@ -12,9 +12,4 @@ OutlinePatternShader::OutlinePatternShader(gl::Context& context, Defines defines
              context, defines) {
 }
 
-void OutlinePatternShader::bind(const gl::VertexBuffer<PlainVertex>&,
-                                const int8_t* offset) {
-    PlainVertex::bind(offset);
-}
-
 } // namespace mbgl

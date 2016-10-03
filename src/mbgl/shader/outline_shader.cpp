@@ -12,9 +12,4 @@ OutlineShader::OutlineShader(gl::Context& context, Defines defines)
              context, defines) {
 }
 
-void OutlineShader::bind(const gl::VertexBuffer<PlainVertex>&,
-                       const int8_t* offset) {
-    PlainVertex::bind(offset);
-}
-
 } // namespace mbgl

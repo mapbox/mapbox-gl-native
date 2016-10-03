@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <type_traits>
 
 namespace mbgl {
 namespace gl {
@@ -21,6 +22,26 @@ using TextureUnit = uint8_t;
 using DepthValue = double;
 using StencilValue = int32_t;
 using StencilMaskValue = uint32_t;
+
+enum class DataType : uint32_t {
+    Byte = 0x1400,
+    UnsignedByte = 0x1401,
+    Short = 0x1402,
+    UnsignedShort = 0x1403,
+    Integer = 0x1404,
+    UnsignedInteger = 0x1405,
+    Float = 0x1406
+};
+
+template <typename T> struct DataTypeOf;
+
+template <> struct DataTypeOf<int8_t>   : std::integral_constant<DataType, DataType::Byte> {};
+template <> struct DataTypeOf<uint8_t>  : std::integral_constant<DataType, DataType::UnsignedByte> {};
+template <> struct DataTypeOf<int16_t>  : std::integral_constant<DataType, DataType::Short> {};
+template <> struct DataTypeOf<uint16_t> : std::integral_constant<DataType, DataType::UnsignedShort> {};
+template <> struct DataTypeOf<int32_t>  : std::integral_constant<DataType, DataType::Integer> {};
+template <> struct DataTypeOf<uint32_t> : std::integral_constant<DataType, DataType::UnsignedInteger> {};
+template <> struct DataTypeOf<float>    : std::integral_constant<DataType, DataType::Float> {};
 
 enum class BufferType : uint32_t {
     Vertex = 0x8892,

@@ -1,13 +1,10 @@
 #pragma once
 
 #include <mbgl/gl/shader.hpp>
+#include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
 
 namespace mbgl {
-
-namespace gl {
-template <class> class VertexBuffer;
-} // namespace gl
 
 class PlainVertex;
 
@@ -15,8 +12,9 @@ class OutlinePatternShader : public gl::Shader {
 public:
     OutlinePatternShader(gl::Context&, Defines defines = None);
 
-    void bind(const gl::VertexBuffer<PlainVertex>&,
-              const int8_t* offset);
+    using VertexType = PlainVertex;
+
+    gl::Attribute<int16_t, 2> a_pos = {"a_pos", *this};
 
     gl::UniformMatrix<4>              u_matrix               = {"u_matrix",               *this};
     gl::Uniform<std::array<float, 2>> u_pattern_tl_a         = {"u_pattern_tl_a",         *this};

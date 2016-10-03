@@ -24,7 +24,7 @@ public:
         bindVertexArrayObject(context);
         if (bound_shader == 0) {
             context.vertexBuffer = vertexBuffer.buffer;
-            shader.bind(vertexBuffer, offset);
+            context.bindAttributes(shader, vertexBuffer, offset);
             if (vertexArray) {
                 storeBinding(shader, vertexBuffer.buffer, 0, offset);
             }
@@ -43,7 +43,7 @@ public:
         if (bound_shader == 0) {
             context.vertexBuffer = vertexBuffer.buffer;
             context.elementBuffer = indexBuffer.buffer;
-            shader.bind(vertexBuffer, offset);
+            context.bindAttributes(shader, vertexBuffer, offset);
             if (vertexArray) {
                 storeBinding(shader, vertexBuffer.buffer, indexBuffer.buffer, offset);
             }

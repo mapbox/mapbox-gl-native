@@ -48,13 +48,6 @@ Shader::Shader(const char* name_,
     MBGL_CHECK_ERROR(glAttachShader(program.get(), vertexShader.get()));
     MBGL_CHECK_ERROR(glAttachShader(program.get(), fragmentShader.get()));
 
-    // Bind attribute variables
-    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_pos, "a_pos"));
-    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_extrude, "a_extrude"));
-    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_offset, "a_offset"));
-    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_data, "a_data"));
-    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_texture_pos, "a_texture_pos"));
-
     // Link program
     GLint status;
      MBGL_CHECK_ERROR(glLinkProgram(program.get()));
@@ -110,6 +103,10 @@ Shader::~Shader() {
 
 UniformLocation Shader::getUniformLocation(const char* uniform) const {
     return MBGL_CHECK_ERROR(glGetUniformLocation(program.get(), uniform));
+}
+
+AttributeLocation Shader::getAttributeLocation(const char* attribute) const {
+    return MBGL_CHECK_ERROR(glGetAttribLocation(program.get(), attribute));
 }
 
 } // namespace gl
