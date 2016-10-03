@@ -33,6 +33,34 @@
     return self;
 }
 
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    if (self = [super initWithCoder:decoder]) {
+        _reuseIdentifier = [decoder decodeObjectOfClass:[NSString class] forKey:@"reuseIdentifier"];
+        _annotation = [decoder decodeObjectOfClass:[NSObject class] forKey:@"annotation"];
+        _centerOffset = [decoder decodeCGVectorForKey:@"centerOffset"];
+        _scalesWithViewingDistance = [decoder decodeBoolForKey:@"scalesWithViewingDistance"];
+        _selected = [decoder decodeBoolForKey:@"selected"];
+        _enabled = [decoder decodeBoolForKey:@"enabled"];
+        self.draggable = [decoder decodeBoolForKey:@"draggable"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [super encodeWithCoder:coder];
+    [coder encodeObject:_reuseIdentifier forKey:@"reuseIdentifier"];
+    [coder encodeObject:_annotation forKey:@"annotation"];
+    [coder encodeCGVector:_centerOffset forKey:@"centerOffset"];
+    [coder encodeBool:_scalesWithViewingDistance forKey:@"scalesWithViewingDistance"];
+    [coder encodeBool:_selected forKey:@"selected"];
+    [coder encodeBool:_enabled forKey:@"enabled"];
+    [coder encodeBool:_draggable forKey:@"draggable"];
+}
+
 - (void)prepareForReuse
 {
     // Intentionally left blank. The default implementation of this method does nothing.
