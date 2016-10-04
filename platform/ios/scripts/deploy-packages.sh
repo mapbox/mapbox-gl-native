@@ -59,7 +59,7 @@ GITHUB_RELEASE=${GITHUB_RELEASE:-true}
 rm -rf ${BINARY_DIRECTORY}
 mkdir -p ${BINARY_DIRECTORY}
 
-if [[ ${GITHUB_RELEASE} = true ]]; then
+if [[ ${GITHUB_RELEASE} = "true" ]]; then
     GITHUB_RELEASE=true # Assign bool, not just a word
 fi
 
@@ -70,7 +70,7 @@ if [[ -z ${PUBLISH_VERSION} ]]; then
 fi
 
 step "Deploying version ${PUBLISH_VERSION}…"
- 
+
 make clean && make distclean
 
 if [[ "${GITHUB_RELEASE}" == true ]]; then
