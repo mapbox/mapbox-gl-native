@@ -43,10 +43,10 @@ void Painter::renderFill(PaintParameters& parameters,
     context.depthMask = true;
     context.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
-    auto& outlineShader = parameters.shaders.outline;
-    auto& patternShader = parameters.shaders.pattern;
-    auto& outlinePatternShader = parameters.shaders.outlinePattern;
-    auto& plainShader = parameters.shaders.plain;
+    auto& outlineShader = parameters.shaders.fillOutline;
+    auto& patternShader = parameters.shaders.fillPattern;
+    auto& outlinePatternShader = parameters.shaders.fillOutlinePattern;
+    auto& plainShader = parameters.shaders.fill;
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // befrom, we have to draw the outline first (!)

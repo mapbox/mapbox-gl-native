@@ -40,7 +40,7 @@ using namespace style;
 
 Painter::Painter(const TransformState& state_)
     : state(state_),
-      tileTriangleVertexBuffer(context.createVertexBuffer(std::vector<PlainVertex> {{
+      tileTriangleVertexBuffer(context.createVertexBuffer(std::vector<FillVertex> {{
             { 0,            0 },
             { util::EXTENT, 0 },
             { 0, util::EXTENT },
@@ -48,7 +48,7 @@ Painter::Painter(const TransformState& state_)
             { 0, util::EXTENT },
             { util::EXTENT, util::EXTENT }
       }})),
-      tileLineStripVertexBuffer(context.createVertexBuffer(std::vector<PlainVertex> {{
+      tileLineStripVertexBuffer(context.createVertexBuffer(std::vector<FillVertex> {{
             { 0, 0 },
             { util::EXTENT, 0 },
             { util::EXTENT, util::EXTENT },

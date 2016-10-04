@@ -19,8 +19,8 @@ void Painter::renderSDF(SymbolBucket& bucket,
                         const RenderTile& tile,
                         float sdfFontSize,
                         std::array<float, 2> texsize,
-                        SDFShader& sdfShader,
-                        void (SymbolBucket::*drawSDF)(SDFShader&, gl::Context&, PaintMode),
+                        SymbolSDFShader& sdfShader,
+                        void (SymbolBucket::*drawSDF)(SymbolSDFShader&, gl::Context&, PaintMode),
 
                         // Layout
                         AlignmentType rotationAlignment,
@@ -168,7 +168,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
                       tile,
                       1.0f,
                       {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }},
-                      parameters.shaders.sdfIcon,
+                      parameters.shaders.symbolIconSDF,
                       &SymbolBucket::drawIcons,
                       layout.iconRotationAlignment,
                       // icon-pitch-alignment is not yet implemented
@@ -200,7 +200,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
                 }};
             }
 
-            auto& iconShader = parameters.shaders.icon;
+            auto& iconShader = parameters.shaders.symbolIcon;
 
             context.program = iconShader.getID();
             iconShader.u_matrix = vtxMatrix;
@@ -235,7 +235,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
                   tile,
                   24.0f,
                   {{ float(glyphAtlas->width) / 4, float(glyphAtlas->height) / 4 }},
-                  parameters.shaders.sdfGlyph,
+                  parameters.shaders.symbolGlyph,
                   &SymbolBucket::drawGlyphs,
                   layout.textRotationAlignment,
                   layout.textPitchAlignment,

@@ -7,13 +7,13 @@
 
 namespace mbgl {
 
-class PlainVertex;
+class FillVertex;
 
-class OutlineShader : public gl::Shader {
+class FillOutlineShader : public gl::Shader {
 public:
-    OutlineShader(gl::Context&, Defines defines = None);
+    FillOutlineShader(gl::Context&, Defines defines = None);
 
-    using VertexType = PlainVertex;
+    using VertexType = FillVertex;
 
     gl::Attribute<int16_t, 2> a_pos = {"a_pos", *this};
 

@@ -57,8 +57,8 @@ void Painter::renderLine(PaintParameters& parameters,
 
     setDepthSublayer(0);
 
-    auto& linesdfShader = parameters.shaders.linesdf;
-    auto& linepatternShader = parameters.shaders.linepattern;
+    auto& linesdfShader = parameters.shaders.lineSDF;
+    auto& linepatternShader = parameters.shaders.linePattern;
     auto& lineShader = parameters.shaders.line;
 
     if (!properties.lineDasharray.value.from.empty()) {

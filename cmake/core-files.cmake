@@ -178,33 +178,33 @@ set(MBGL_CORE_FILES
     src/mbgl/shader/collision_box_shader.hpp
     src/mbgl/shader/collision_box_vertex.cpp
     src/mbgl/shader/collision_box_vertex.hpp
-    src/mbgl/shader/icon_shader.cpp
-    src/mbgl/shader/icon_shader.hpp
+    src/mbgl/shader/fill_outline_pattern_shader.cpp
+    src/mbgl/shader/fill_outline_pattern_shader.hpp
+    src/mbgl/shader/fill_outline_shader.cpp
+    src/mbgl/shader/fill_outline_shader.hpp
+    src/mbgl/shader/fill_pattern_shader.cpp
+    src/mbgl/shader/fill_pattern_shader.hpp
+    src/mbgl/shader/fill_shader.cpp
+    src/mbgl/shader/fill_shader.hpp
+    src/mbgl/shader/fill_vertex.cpp
+    src/mbgl/shader/fill_vertex.hpp
+    src/mbgl/shader/line_pattern_shader.cpp
+    src/mbgl/shader/line_pattern_shader.hpp
+    src/mbgl/shader/line_sdf_shader.cpp
+    src/mbgl/shader/line_sdf_shader.hpp
     src/mbgl/shader/line_shader.cpp
     src/mbgl/shader/line_shader.hpp
     src/mbgl/shader/line_vertex.cpp
     src/mbgl/shader/line_vertex.hpp
-    src/mbgl/shader/linepattern_shader.cpp
-    src/mbgl/shader/linepattern_shader.hpp
-    src/mbgl/shader/linesdf_shader.cpp
-    src/mbgl/shader/linesdf_shader.hpp
-    src/mbgl/shader/outline_shader.cpp
-    src/mbgl/shader/outline_shader.hpp
-    src/mbgl/shader/outlinepattern_shader.cpp
-    src/mbgl/shader/outlinepattern_shader.hpp
-    src/mbgl/shader/pattern_shader.cpp
-    src/mbgl/shader/pattern_shader.hpp
-    src/mbgl/shader/plain_shader.cpp
-    src/mbgl/shader/plain_shader.hpp
-    src/mbgl/shader/plain_vertex.cpp
-    src/mbgl/shader/plain_vertex.hpp
     src/mbgl/shader/raster_shader.cpp
     src/mbgl/shader/raster_shader.hpp
     src/mbgl/shader/raster_vertex.cpp
     src/mbgl/shader/raster_vertex.hpp
-    src/mbgl/shader/sdf_shader.cpp
-    src/mbgl/shader/sdf_shader.hpp
     src/mbgl/shader/shaders.hpp
+    src/mbgl/shader/symbol_icon_shader.cpp
+    src/mbgl/shader/symbol_icon_shader.hpp
+    src/mbgl/shader/symbol_sdf_shader.cpp
+    src/mbgl/shader/symbol_sdf_shader.hpp
     src/mbgl/shader/symbol_vertex.cpp
     src/mbgl/shader/symbol_vertex.hpp
 

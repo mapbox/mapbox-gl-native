@@ -14,7 +14,7 @@ namespace mbgl {
 void Painter::drawClippingMasks(PaintParameters& parameters, const std::map<UnwrappedTileID, ClipID>& stencils) {
     MBGL_DEBUG_GROUP("clipping masks");
 
-    auto& plainShader = parameters.shaders.plain;
+    auto& plainShader = parameters.shaders.fill;
     auto& arrayCoveringPlain = parameters.shaders.coveringPlainArray;
 
     mat4 matrix;

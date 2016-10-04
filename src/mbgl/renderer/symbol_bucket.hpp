@@ -15,8 +15,8 @@
 
 namespace mbgl {
 
-class SDFShader;
-class IconShader;
+class SymbolSDFShader;
+class SymbolIconShader;
 class CollisionBoxShader;
 
 class SymbolBucket : public Bucket {
@@ -34,9 +34,9 @@ public:
     bool hasCollisionBoxData() const;
     bool needsClipping() const override;
 
-    void drawGlyphs(SDFShader&, gl::Context&, PaintMode);
-    void drawIcons(SDFShader&, gl::Context&, PaintMode);
-    void drawIcons(IconShader&, gl::Context&, PaintMode);
+    void drawGlyphs(SymbolSDFShader&, gl::Context&, PaintMode);
+    void drawIcons(SymbolSDFShader&, gl::Context&, PaintMode);
+    void drawIcons(SymbolIconShader&, gl::Context&, PaintMode);
     void drawCollisionBoxes(CollisionBoxShader&, gl::Context&);
 
     const MapMode mode;
@@ -50,7 +50,7 @@ private:
     struct TextBuffer {
         std::vector<SymbolVertex> vertices;
         std::vector<gl::Triangle> triangles;
-        std::vector<ElementGroup<SDFShader>> groups;
+        std::vector<ElementGroup<SymbolSDFShader>> groups;
 
         optional<gl::VertexBuffer<SymbolVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
@@ -59,7 +59,7 @@ private:
     struct IconBuffer {
         std::vector<SymbolVertex> vertices;
         std::vector<gl::Triangle> triangles;
-        std::vector<ElementGroup<SDFShader, IconShader>> groups;
+        std::vector<ElementGroup<SymbolSDFShader, SymbolIconShader>> groups;
 
         optional<gl::VertexBuffer<SymbolVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;

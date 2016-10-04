@@ -7,12 +7,12 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/vao.hpp>
-#include <mbgl/shader/plain_vertex.hpp>
+#include <mbgl/shader/fill_vertex.hpp>
 
 namespace mbgl {
 
 class OverscaledTileID;
-class PlainShader;
+class FillShader;
 
 namespace gl {
 class Context;
@@ -28,8 +28,8 @@ public:
                 MapDebugOptions,
                 gl::Context&);
 
-    void drawLines(PlainShader&, gl::Context&);
-    void drawPoints(PlainShader&, gl::Context&);
+    void drawLines(FillShader&, gl::Context&);
+    void drawPoints(FillShader&, gl::Context&);
 
     const bool renderable;
     const bool complete;
@@ -38,7 +38,7 @@ public:
     const MapDebugOptions debugMode;
 
 private:
-    gl::VertexBuffer<PlainVertex> vertexBuffer;
+    gl::VertexBuffer<FillVertex> vertexBuffer;
     gl::VertexArrayObject array;
 };
 

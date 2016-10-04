@@ -8,9 +8,9 @@ namespace mbgl {
 
 class LineVertex;
 
-class LinepatternShader : public gl::Shader {
+class LinePatternShader : public gl::Shader {
 public:
-    LinepatternShader(gl::Context&, Defines defines = None);
+    LinePatternShader(gl::Context&, Defines defines = None);
 
     using VertexType = LineVertex;
 

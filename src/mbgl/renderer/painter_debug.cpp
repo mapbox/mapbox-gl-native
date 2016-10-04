@@ -38,7 +38,7 @@ void Painter::renderDebugText(Tile& tile, const mat4 &matrix) {
             tile.expires, frame.debugOptions, context);
     }
 
-    auto& plainShader = shaders->plain;
+    auto& plainShader = shaders->fill;
     context.program = plainShader.getID();
     plainShader.u_matrix = matrix;
     plainShader.u_opacity = 1.0f;
@@ -74,7 +74,7 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
                           gl::StencilTestOperation::Replace };
     context.stencilTest = true;
 
-    auto& plainShader = shaders->plain;
+    auto& plainShader = shaders->fill;
     context.program = plainShader.getID();
     plainShader.u_matrix = matrix;
     plainShader.u_opacity = 1.0f;

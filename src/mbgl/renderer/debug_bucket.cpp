@@ -1,7 +1,7 @@
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/shader/plain_shader.hpp>
-#include <mbgl/shader/plain_vertex.hpp>
+#include <mbgl/shader/fill_shader.hpp>
+#include <mbgl/shader/fill_vertex.hpp>
 #include <mbgl/geometry/debug_font_data.hpp>
 #include <mbgl/util/string.hpp>
 
@@ -13,13 +13,13 @@
 
 namespace mbgl {
 
-std::vector<PlainVertex> buildTextVertices(const OverscaledTileID& id,
+std::vector<FillVertex> buildTextVertices(const OverscaledTileID& id,
                                                      const bool renderable,
                                                      const bool complete,
                                                      optional<Timestamp> modified,
                                                      optional<Timestamp> expires,
                                                      MapDebugOptions debugMode) {
-    std::vector<PlainVertex> textPoints;
+    std::vector<FillVertex> textPoints;
 
     auto addText = [&] (const std::string& text, double left, double baseline, double scale) {
         for (uint8_t c : text) {
@@ -85,14 +85,14 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
       vertexBuffer(context.createVertexBuffer(buildTextVertices(id, renderable_, complete_, modified_, expires_, debugMode_))) {
 }
 
-void DebugBucket::drawLines(PlainShader& shader, gl::Context& context) {
+void DebugBucket::drawLines(FillShader& shader, gl::Context& context) {
     if (vertexBuffer.vertexCount != 0) {
         array.bind(shader, vertexBuffer, BUFFER_OFFSET_0, context);
         MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(vertexBuffer.vertexCount)));
     }
 }
 
-void DebugBucket::drawPoints(PlainShader& shader, gl::Context& context) {
+void DebugBucket::drawPoints(FillShader& shader, gl::Context& context) {
     if (vertexBuffer.vertexCount != 0) {
         array.bind(shader, vertexBuffer, BUFFER_OFFSET_0, context);
         MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(vertexBuffer.vertexCount)));

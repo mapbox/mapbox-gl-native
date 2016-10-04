@@ -22,8 +22,8 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
     optional<SpriteAtlasPosition> imagePosA;
     optional<SpriteAtlasPosition> imagePosB;
 
-    auto& patternShader = parameters.shaders.pattern;
-    auto& plainShader = parameters.shaders.plain;
+    auto& patternShader = parameters.shaders.fillPattern;
+    auto& plainShader = parameters.shaders.fill;
     auto& arrayBackgroundPattern = parameters.shaders.backgroundPatternArray;
     auto& arrayBackground = parameters.shaders.backgroundArray;
 

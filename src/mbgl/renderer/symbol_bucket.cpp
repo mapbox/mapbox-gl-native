@@ -1,8 +1,8 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
-#include <mbgl/shader/sdf_shader.hpp>
-#include <mbgl/shader/icon_shader.hpp>
+#include <mbgl/shader/symbol_sdf_shader.hpp>
+#include <mbgl/shader/symbol_icon_shader.hpp>
 #include <mbgl/shader/collision_box_shader.hpp>
 #include <mbgl/gl/gl.hpp>
 
@@ -66,7 +66,7 @@ bool SymbolBucket::needsClipping() const {
     return mode == MapMode::Still;
 }
 
-void SymbolBucket::drawGlyphs(SDFShader& shader,
+void SymbolBucket::drawGlyphs(SymbolSDFShader& shader,
                               gl::Context& context,
                               PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET_0;
@@ -81,7 +81,7 @@ void SymbolBucket::drawGlyphs(SDFShader& shader,
     }
 }
 
-void SymbolBucket::drawIcons(SDFShader& shader,
+void SymbolBucket::drawIcons(SymbolSDFShader& shader,
                              gl::Context& context,
                              PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET_0;
@@ -96,7 +96,7 @@ void SymbolBucket::drawIcons(SDFShader& shader,
     }
 }
 
-void SymbolBucket::drawIcons(IconShader& shader,
+void SymbolBucket::drawIcons(SymbolIconShader& shader,
                              gl::Context& context,
                              PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET_0;
