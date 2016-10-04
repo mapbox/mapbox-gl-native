@@ -6,10 +6,9 @@ set -u
 
 usage() {
 cat <<EOF
-# Usage: sh $0 version target_directory [argument]
+# Usage: sh $0 version [argument]
 
 # version: The semver version plus optional alpha beta distinction (i.e. {major.minor.patch}{-alpha.N})
-# target_directory: The directory where build output should be placed
 
 # argument:
 #     -g: Upload to github
@@ -44,7 +43,7 @@ buildPackageStyle() {
         file_name=mapbox-ios-sdk-${PUBLISH_VERSION}-${style}.zip        
     fi
     step "Downloading ${file_name} from s3 to ${BINARY_DIRECTORY}"
-    wget -P ${BINARY_DIRECTORY} http://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/${file_name}
+    wget -P ${BINARY_DIRECTORY} -O ${file_name} http://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/${file_name}
     if [[ "${GITHUB_RELEASE}" == true ]]; then
         step "Publishing ${file_name} to GitHub"
         github-release --verbose upload \
@@ -65,7 +64,7 @@ export GITHUB_USER=mapbox
 export GITHUB_REPO=mapbox-gl-native
 export BUILDTYPE=Release
 
-BINARY_DIRECTORY=$2
+BINARY_DIRECTORY='./build/ios/deploy'
 PUBLISH_PRE_FLAG=''
 GITHUB_RELEASE=false
 
