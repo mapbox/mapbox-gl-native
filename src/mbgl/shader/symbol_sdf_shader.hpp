@@ -9,9 +9,9 @@ namespace mbgl {
 
 class SymbolVertex;
 
-class SDFShader : public gl::Shader {
+class SymbolSDFShader : public gl::Shader {
 public:
-    SDFShader(gl::Context&, Defines defines = None);
+    SymbolSDFShader(gl::Context&, Defines defines = None);
 
     using VertexType = SymbolVertex;
 

@@ -10,7 +10,7 @@
 
 #include <mbgl/gl/vao.hpp>
 #include <mbgl/gl/context.hpp>
-#include <mbgl/shader/plain_vertex.hpp>
+#include <mbgl/shader/fill_vertex.hpp>
 #include <mbgl/shader/raster_vertex.hpp>
 
 #include <mbgl/style/style.hpp>
@@ -41,7 +41,7 @@ class SymbolBucket;
 class RasterBucket;
 
 class Shaders;
-class SDFShader;
+class SymbolSDFShader;
 class PaintParameters;
 
 struct ClipID;
@@ -121,8 +121,8 @@ private:
                    const RenderTile&,
                    float scaleDivisor,
                    std::array<float, 2> texsize,
-                   SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::Context&, PaintMode),
+                   SymbolSDFShader& sdfShader,
+                   void (SymbolBucket::*drawSDF)(SymbolSDFShader&, gl::Context&, PaintMode),
 
                    // Layout
                    style::AlignmentType rotationAlignment,
@@ -188,8 +188,8 @@ private:
     std::unique_ptr<Shaders> overdrawShaders;
 #endif
 
-    gl::VertexBuffer<PlainVertex> tileTriangleVertexBuffer;
-    gl::VertexBuffer<PlainVertex> tileLineStripVertexBuffer;
+    gl::VertexBuffer<FillVertex> tileTriangleVertexBuffer;
+    gl::VertexBuffer<FillVertex> tileLineStripVertexBuffer;
     gl::VertexBuffer<RasterVertex> rasterVertexBuffer;
 
     gl::VertexArrayObject tileBorderArray;

@@ -2,8 +2,8 @@
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/shader/line_shader.hpp>
-#include <mbgl/shader/linesdf_shader.hpp>
-#include <mbgl/shader/linepattern_shader.hpp>
+#include <mbgl/shader/line_sdf_shader.hpp>
+#include <mbgl/shader/line_pattern_shader.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/gl/gl.hpp>
@@ -493,7 +493,7 @@ void LineBucket::drawLineSDF(LineSDFShader& shader,
     }
 }
 
-void LineBucket::drawLinePatterns(LinepatternShader& shader,
+void LineBucket::drawLinePatterns(LinePatternShader& shader,
                                   gl::Context& context,
                                   PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);

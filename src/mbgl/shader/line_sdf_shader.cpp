@@ -1,4 +1,4 @@
-#include <mbgl/shader/linesdf_shader.hpp>
+#include <mbgl/shader/line_sdf_shader.hpp>
 #include <mbgl/shader/linesdfpattern.vertex.hpp>
 #include <mbgl/shader/linesdfpattern.fragment.hpp>
 #include <mbgl/shader/line_vertex.hpp>

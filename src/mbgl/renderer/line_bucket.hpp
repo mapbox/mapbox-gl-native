@@ -14,7 +14,7 @@ namespace mbgl {
 
 class LineShader;
 class LineSDFShader;
-class LinepatternShader;
+class LinePatternShader;
 
 class LineBucket : public Bucket {
 
@@ -32,7 +32,7 @@ public:
 
     void drawLines(LineShader&, gl::Context&, PaintMode);
     void drawLineSDF(LineSDFShader&, gl::Context&, PaintMode);
-    void drawLinePatterns(LinepatternShader&, gl::Context&, PaintMode);
+    void drawLinePatterns(LinePatternShader&, gl::Context&, PaintMode);
 
 private:
     struct TriangleElement {
@@ -53,7 +53,7 @@ private:
     std::vector<LineVertex> vertices;
     std::vector<gl::Triangle> triangles;
 
-    std::vector<ElementGroup<LineShader, LineSDFShader, LinepatternShader>> groups;
+    std::vector<ElementGroup<LineShader, LineSDFShader, LinePatternShader>> groups;
 
     optional<gl::VertexBuffer<LineVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;

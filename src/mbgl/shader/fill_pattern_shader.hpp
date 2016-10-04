@@ -6,13 +6,13 @@
 
 namespace mbgl {
 
-class PlainVertex;
+class FillVertex;
 
-class PatternShader : public gl::Shader {
+class FillPatternShader : public gl::Shader {
 public:
-    PatternShader(gl::Context&, Defines defines = None);
+    FillPatternShader(gl::Context&, Defines defines = None);
 
-    using VertexType = PlainVertex;
+    using VertexType = FillVertex;
 
     gl::Attribute<int16_t, 2> a_pos = {"a_pos", *this};
 

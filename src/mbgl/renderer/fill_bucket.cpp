@@ -1,10 +1,10 @@
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/shader/plain_shader.hpp>
-#include <mbgl/shader/pattern_shader.hpp>
-#include <mbgl/shader/outline_shader.hpp>
-#include <mbgl/shader/outlinepattern_shader.hpp>
+#include <mbgl/shader/fill_shader.hpp>
+#include <mbgl/shader/fill_pattern_shader.hpp>
+#include <mbgl/shader/fill_outline_shader.hpp>
+#include <mbgl/shader/fill_outline_pattern_shader.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/platform/log.hpp>
 
@@ -121,7 +121,7 @@ bool FillBucket::needsClipping() const {
     return true;
 }
 
-void FillBucket::drawElements(PlainShader& shader,
+void FillBucket::drawElements(FillShader& shader,
                               gl::Context& context,
                               PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
@@ -136,7 +136,7 @@ void FillBucket::drawElements(PlainShader& shader,
     }
 }
 
-void FillBucket::drawElements(PatternShader& shader,
+void FillBucket::drawElements(FillPatternShader& shader,
                               gl::Context& context,
                               PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
@@ -151,7 +151,7 @@ void FillBucket::drawElements(PatternShader& shader,
     }
 }
 
-void FillBucket::drawVertices(OutlineShader& shader,
+void FillBucket::drawVertices(FillOutlineShader& shader,
                               gl::Context& context,
                               PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
@@ -166,7 +166,7 @@ void FillBucket::drawVertices(OutlineShader& shader,
     }
 }
 
-void FillBucket::drawVertices(OutlinePatternShader& shader,
+void FillBucket::drawVertices(FillOutlinePatternShader& shader,
                               gl::Context& context,
                               PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);

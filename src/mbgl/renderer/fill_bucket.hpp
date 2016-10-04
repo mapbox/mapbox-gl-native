@@ -5,17 +5,17 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/shader/plain_vertex.hpp>
+#include <mbgl/shader/fill_vertex.hpp>
 
 #include <vector>
 #include <memory>
 
 namespace mbgl {
 
-class OutlinePatternShader;
-class PlainShader;
-class PatternShader;
-class OutlineShader;
+class FillShader;
+class FillPatternShader;
+class FillOutlineShader;
+class FillOutlinePatternShader;
 
 class FillBucket : public Bucket {
 public:
@@ -29,20 +29,20 @@ public:
 
     void addGeometry(const GeometryCollection&);
 
-    void drawElements(PlainShader&, gl::Context&, PaintMode);
-    void drawElements(PatternShader&, gl::Context&, PaintMode);
-    void drawVertices(OutlineShader&, gl::Context&, PaintMode);
-    void drawVertices(OutlinePatternShader&, gl::Context&, PaintMode);
+    void drawElements(FillShader&, gl::Context&, PaintMode);
+    void drawElements(FillPatternShader&, gl::Context&, PaintMode);
+    void drawVertices(FillOutlineShader&, gl::Context&, PaintMode);
+    void drawVertices(FillOutlinePatternShader&, gl::Context&, PaintMode);
 
 private:
-    std::vector<PlainVertex> vertices;
+    std::vector<FillVertex> vertices;
     std::vector<gl::Line> lines;
     std::vector<gl::Triangle> triangles;
 
-    std::vector<ElementGroup<OutlineShader, OutlinePatternShader>> lineGroups;
-    std::vector<ElementGroup<PlainShader, PatternShader>> triangleGroups;
+    std::vector<ElementGroup<FillOutlineShader, FillOutlinePatternShader>> lineGroups;
+    std::vector<ElementGroup<FillShader, FillPatternShader>> triangleGroups;
 
-    optional<gl::VertexBuffer<PlainVertex>> vertexBuffer;
+    optional<gl::VertexBuffer<FillVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Line>> lineIndexBuffer;
     optional<gl::IndexBuffer<gl::Triangle>> triangleIndexBuffer;
 };

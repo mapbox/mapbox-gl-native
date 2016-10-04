@@ -8,9 +8,9 @@ namespace mbgl {
 
 class SymbolVertex;
 
-class IconShader : public gl::Shader {
+class SymbolIconShader : public gl::Shader {
 public:
-    IconShader(gl::Context&, Defines defines = None);
+    SymbolIconShader(gl::Context&, Defines defines = None);
 
     using VertexType = SymbolVertex;
 
