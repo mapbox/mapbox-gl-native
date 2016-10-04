@@ -1,6 +1,9 @@
 # Do not edit. Regenerate this with ./scripts/generate-benchmark-files.sh
 
 set(MBGL_BENCHMARK_FILES
+    # api
+    benchmark/api/query.benchmark.cpp
+
     # include/mbgl
     benchmark/include/mbgl/benchmark.hpp
 
@@ -12,4 +15,6 @@ set(MBGL_BENCHMARK_FILES
 
     # src/mbgl/benchmark
     benchmark/src/mbgl/benchmark/benchmark.cpp
+    benchmark/src/mbgl/benchmark/util.cpp
+    benchmark/src/mbgl/benchmark/util.hpp
 )
