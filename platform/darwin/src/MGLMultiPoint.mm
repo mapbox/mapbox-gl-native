@@ -1,5 +1,6 @@
 #import "MGLMultiPoint_Private.h"
 #import "MGLGeometry_Private.h"
+#import "MGLTypes.h"
 
 #import <mbgl/util/geo.hpp>
 
@@ -62,6 +63,11 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 - (NSUInteger)pointCount
 {
     return _count;
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingPointCount
+{
+    return [NSSet setWithObjects:@"coordinates", nil];
 }
 
 - (void)getCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range
