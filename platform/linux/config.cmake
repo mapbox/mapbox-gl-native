@@ -7,6 +7,7 @@ mason_use(libpng VERSION 1.6.25)
 mason_use(libjpeg-turbo VERSION 1.5.0)
 mason_use(webp VERSION 0.5.1)
 mason_use(gtest VERSION 1.7.0${MASON_CXXABI_SUFFIX})
+mason_use(benchmark VERSION 1.0.0)
 
 include(cmake/loop-uv.cmake)
 
@@ -97,6 +98,23 @@ macro(mbgl_platform_test)
     )
 
     target_link_libraries(mbgl-test
+        PRIVATE mbgl-loop
+    )
+endmacro()
+
+
+macro(mbgl_platform_benchmark)
+    target_sources(mbgl-benchmark
+        PRIVATE benchmark/src/main.cpp
+    )
+
+    set_source_files_properties(
+        benchmark/src/main.cpp
+            PROPERTIES
+        COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
+    )
+
+    target_link_libraries(mbgl-benchmark
         PRIVATE mbgl-loop
     )
 endmacro()
