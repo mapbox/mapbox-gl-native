@@ -594,10 +594,10 @@ public class MapView extends FrameLayout {
         nativeMapView.update();
         myLocationView.onResume();
 
-        // Presumably there is (or was) a good reason for delaying this until onResume.
-        // A comment explaining why would be helpful.
-        if(!styleWasSet)
-            setStyleUrl(styleUrl);    // will set styleWasSet
+        // In case that no style was set or was loaded through MapboxMapOptions
+        if (!styleWasSet) {
+            setStyleUrl(styleUrl);
+        }
     }
 
     void setFocalPoint(PointF focalPoint) {
