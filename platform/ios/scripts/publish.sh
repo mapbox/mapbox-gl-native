@@ -34,5 +34,5 @@ zip -r ../${ZIP} *
 #
 step "Uploading to s3…"
 REPO_NAME=$(basename $TRAVIS_REPO_SLUG)
-aws s3 cp ../${ZIP} s3://mapbox/$REPO_NAME/ios/builds/ --acl public-read > /dev/null
+aws s3 cp ../${ZIP} s3://mapbox/$REPO_NAME/ios/builds/ --acl public-read
 echo http://mapbox.s3.amazonaws.com/$REPO_NAME/ios/builds/${ZIP}
