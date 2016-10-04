@@ -38,11 +38,10 @@ buildPackageStyle() {
     wget -O ${BINARY_DIRECTORY}/${file_name} http://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/${file_name}
     if [[ "${GITHUB_RELEASE}" == true ]]; then
         step "Uploading ${file_name} to GitHub"
-        github-release --verbose upload \
+        github-release upload \
             --tag "ios-v${PUBLISH_VERSION}" \
             --name ${file_name} \
             --file "${BINARY_DIRECTORY}/${file_name}"
-            # | sed '/^BODY/d'
     fi        
 }
 
@@ -60,7 +59,7 @@ rm -rf ${BINARY_DIRECTORY}
 mkdir -p ${BINARY_DIRECTORY}
 
 if [[ ${GITHUB_RELEASE} = "true" ]]; then
-    GITHUB_RELEASE=true # Assign bool, not just a word
+    GITHUB_RELEASE=true # Assign bool, not just a string
 fi
 
 if [[ -z ${PUBLISH_VERSION} ]]; then
@@ -78,11 +77,10 @@ if [[ "${GITHUB_RELEASE}" == true ]]; then
     if [[ $( echo ${PUBLISH_VERSION} | awk '/[0-9]-/' ) ]]; then
         PUBLISH_PRE_FLAG='--pre-release'
     fi
-    github-release --verbose release \
+    github-release release \
         --tag "ios-v${PUBLISH_VERSION}" \
         --name "ios-v${PUBLISH_VERSION}" \
         --draft ${PUBLISH_PRE_FLAG}
-        #| sed '/^BODY/d; /^GET/d'
 fi
 
 buildPackageStyle "ipackage" "symbols"
@@ -90,3 +88,5 @@ buildPackageStyle "ipackage-strip"
 buildPackageStyle "iframework" "symbols-dynamic"
 buildPackageStyle "iframework SYMBOLS=NO" "dynamic"
 buildPackageStyle "ifabric" "fabric"
+
+step "Finished deploying ${PUBLISH_VERSION}"
