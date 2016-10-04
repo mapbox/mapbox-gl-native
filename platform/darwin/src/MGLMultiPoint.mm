@@ -91,7 +91,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
     {
         [[NSException exceptionWithName:NSRangeException
                                  reason:[NSString stringWithFormat:
-                                            @"Invalid coordinate range %@ extends beyond coordinate count of %zu",
+                                            @"Invalid coordinate range %@ extends beyond current coordinate count of %zu",
                                             NSStringFromRange(range), _count]
                                userInfo:nil] raise];
     }
@@ -120,31 +120,30 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
                                  reason:[NSString stringWithFormat:@"Empty coordinate range %@", NSStringFromRange(range)]
                                userInfo:nil] raise];
     }
+    else if (range.location > _count)
+    {
+        [[NSException exceptionWithName:NSRangeException
+                                 reason:[NSString stringWithFormat:
+                                            @"Invalid range %@ for existing coordinate count %zu",
+                                            NSStringFromRange(range), _count]
+                               userInfo:nil] raise];
+    }
 
     [self willChangeValueForKey:@"coordinates"];
-    if (range.location >= _count)
-    {
-        // appending new coordinate(s)
-        NSUInteger newCount = _count + (_count - range.location) + range.length;
-        CLLocationCoordinate2D *newCoords = (CLLocationCoordinate2D *)malloc(newCount * sizeof(CLLocationCoordinate2D));
-        for (NSUInteger i = 0; i < range.location; i++)
-        {
-            newCoords[i] = _coordinates[i];
-        }
-        for (NSUInteger i = 0; i < range.length; i++)
-        {
-            newCoords[i + range.location] = coords[i];
-        }
-        [self setupWithCoordinates:newCoords count:newCount];
-        free(newCoords);
-    }
-    else
+    if (NSMaxRange(range) <= _count)
     {
         // replacing existing coordinate(s)
-        for (NSUInteger i = 0; i < range.length; i++)
-        {
-            _coordinates[i + range.location] = coords[i];
-        }
+        memcpy(_coordinates + range.location, coords, range.length * sizeof(CLLocationCoordinate2D));
+    }
+    else if (NSMaxRange(range) > _count)
+    {
+        // appending new coordinate(s)
+        NSUInteger newCount = NSMaxRange(range);
+        CLLocationCoordinate2D *newCoordinates = (CLLocationCoordinate2D *)malloc(newCount * sizeof(CLLocationCoordinate2D));
+        memcpy(newCoordinates, _coordinates, _count * sizeof(CLLocationCoordinate2D));
+        memcpy(newCoordinates + range.location, coords, range.length * sizeof(CLLocationCoordinate2D));
+        [self setupWithCoordinates:newCoordinates count:newCount];
+        free(newCoordinates);
     }
     [self didChangeValueForKey:@"coordinates"];
 }
