@@ -155,8 +155,8 @@ public class MapView extends FrameLayout {
 
     private PointF focalPoint;
 
-    private String styleUrl;
-    private String initalStyle;
+    private String styleUrl = Style.MAPBOX_STREETS;
+    private boolean styleWasSet = false;
 
     private List<OnMapReadyCallback> onMapReadyCallbackList;
     private SnapshotRequest snapshotRequest;
@@ -283,7 +283,7 @@ public class MapView extends FrameLayout {
         // style url
         String style = options.getStyle();
         if (!TextUtils.isEmpty(style)) {
-            initalStyle = style;
+            styleUrl = style;
         }
 
         // MyLocationView
@@ -429,7 +429,7 @@ public class MapView extends FrameLayout {
                     , savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_BOTTOM));
 
             mapboxMap.setDebugActive(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
-            mapboxMap.setStyleUrl(savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL));
+            styleUrl = savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL);
 
             // User location
             try {
@@ -573,7 +573,7 @@ public class MapView extends FrameLayout {
      */
     @UiThread
     public void onPause() {
-        // Register for connectivity changes
+        // Unregister for connectivity changes
         if (connectivityReceiver != null) {
             getContext().unregisterReceiver(connectivityReceiver);
             connectivityReceiver = null;
@@ -594,11 +594,10 @@ public class MapView extends FrameLayout {
         nativeMapView.update();
         myLocationView.onResume();
 
-        if (styleUrl == null) {
-            // user supplied style through xml
-            // user has failed to supply a style url
-            setStyleUrl(initalStyle == null ? Style.MAPBOX_STREETS : initalStyle);
-        }
+        // Presumably there is (or was) a good reason for delaying this until onResume.
+        // A comment explaining why would be helpful.
+        if(!styleWasSet)
+            setStyleUrl(styleUrl);    // will set styleWasSet
     }
 
     void setFocalPoint(PointF focalPoint) {
@@ -860,6 +859,7 @@ public class MapView extends FrameLayout {
 
         styleUrl = url;
         nativeMapView.setStyleUrl(url);
+        styleWasSet = true;
     }
 
     /**
