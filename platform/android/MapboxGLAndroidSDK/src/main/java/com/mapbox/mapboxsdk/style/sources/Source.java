@@ -1,7 +1,5 @@
 package com.mapbox.mapboxsdk.style.sources;
 
-import java.util.HashMap;
-
 /**
  * Base Peer class for sources. see source.hpp for the other half of the peer.
  */
@@ -9,6 +7,11 @@ public abstract class Source {
     private long nativePtr;
     private boolean invalidated;
 
+    /**
+     * Internal use
+     *
+     * @param nativePtr - pointer to native peer
+     */
     public Source(long nativePtr) {
         this.nativePtr = nativePtr;
     }
@@ -16,11 +19,21 @@ public abstract class Source {
     public Source() {
     }
 
+    /**
+     * Retrieve the source id
+     *
+     * @return the source id
+     */
     public String getId() {
         checkValidity();
         return nativeGetId();
     }
 
+    /**
+     * Internal use
+     *
+     * @return the native peer pointer
+     */
     public long getNativePtr() {
         return nativePtr;
     }
@@ -33,6 +46,9 @@ public abstract class Source {
         }
     }
 
+    /**
+     * Internal use - invalidates the source for further use (after adding it to the map)
+     */
     public final void invalidate() {
         this.invalidated = true;
     }

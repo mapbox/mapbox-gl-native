@@ -9,7 +9,9 @@ import android.support.annotation.NonNull;
 import static com.mapbox.mapboxsdk.utils.ColorUtils.*;
 
 /**
- * Fill Layer
+ * A filled polygon with an optional stroked border.
+ *
+ * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layers-fill">The online documentation</a>
  */
 public class FillLayer extends Layer {
 

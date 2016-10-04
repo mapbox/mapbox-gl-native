@@ -9,7 +9,9 @@ import android.support.annotation.NonNull;
 import static com.mapbox.mapboxsdk.utils.ColorUtils.*;
 
 /**
- * Raster Layer
+ * Raster map textures such as satellite imagery.
+ *
+ * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layers-raster">The online documentation</a>
  */
 public class RasterLayer extends Layer {
 

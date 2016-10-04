@@ -1,6 +1,7 @@
 <%
   const type = locals.type;
   const properties = locals.properties;
+  const doc = locals.doc;
 -%>
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
 package com.mapbox.mapboxsdk.style.layers;
@@ -13,7 +14,9 @@ import android.support.annotation.NonNull;
 import static com.mapbox.mapboxsdk.utils.ColorUtils.*;
 
 /**
- * <%- camelize(type) %> Layer
+ * <%- doc %>
+ *
+ * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layers-<%- type %>">The online documentation</a>
  */
 public class <%- camelize(type) %>Layer extends Layer {
 
