@@ -5,7 +5,7 @@ set -o pipefail
 set -u
 
 # dynamic environment variables:
-#     PUBLISH_VERSION={determined from tag}: Version string
+#     VERSION_TAG={determined automatically}: Version tag in format ios-vX.X.X-pre.X
 #     GITHUB_RELEASE=true: Upload to github
 #     BINARY_DIRECTORY=build/ios/deploy: Directory in which to save test packages
 
@@ -52,7 +52,8 @@ export GITHUB_USER=mapbox
 export GITHUB_REPO=mapbox-gl-native
 export BUILDTYPE=Release
 
-PUBLISH_VERSION=${PUBLISH_VERSION:-''}
+VERSION_TAG=${VERSION_TAG:-''}
+PUBLISH_VERSION=
 BINARY_DIRECTORY=${BINARY_DIRECTORY:-build/ios/deploy}
 GITHUB_RELEASE=${GITHUB_RELEASE:-true}
 PUBLISH_PRE_FLAG=''
@@ -73,13 +74,23 @@ if [[ ${GITHUB_RELEASE} = "true" ]]; then
     fi
 fi
 
-if [[ -z ${PUBLISH_VERSION} ]]; then
+if [[ -z ${VERSION_TAG} ]]; then
     step "Determining version number from most recent relevant git tag…"
-    PUBLISH_VERSION=$( git describe --tags --match=ios-v*.*.* --abbrev=0 | sed 's/^ios-v//' )
-    echo "${PUBLISH_VERSION}"
+    VERSION_TAG=$( git describe --tags --match=ios-v*.*.* --abbrev=0 )
+    echo "Found tag: ${VERSION_TAG}"
 fi
 
+if [[ $( echo ${VERSION_TAG} | grep -v ios-v ) ]]; then
+    echo "${VERSION_TAG} is not a valid iOS version tag"
+    exit 1
+fi
+
+PUBLISH_VERSION=$( echo ${VERSION_TAG} | sed 's/^ios-v//' )
+git checkout ${VERSION_TAG}
+
 step "Deploying version ${PUBLISH_VERSION}…"
+
+exit 1
 
 make clean && make distclean
 
