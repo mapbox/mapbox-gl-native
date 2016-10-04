@@ -4,7 +4,6 @@
 #include <mbgl/platform/default/headless_view.hpp>
 
 #include <mbgl/util/offscreen_texture.hpp>
-#include <mbgl/util/raster.hpp>
 
 using namespace mbgl;
 
@@ -137,7 +136,7 @@ void main() {
 
         // Now, composite the Framebuffer texture we've rendered to onto the main FBO.
         context.program = compositeShader.program;
-        texture.getTexture().bind(context, 0, Raster::Scaling::Linear);
+        context.bindTexture(texture.getTexture(), 0, gl::TextureFilter::Linear);
         MBGL_CHECK_ERROR(glUniform1i(u_texture, 0));
         MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, viewportBuffer.buffer));
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(compositeShader.a_pos));

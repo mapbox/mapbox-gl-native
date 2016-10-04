@@ -87,6 +87,7 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/object.cpp
     src/mbgl/gl/object.hpp
     src/mbgl/gl/state.hpp
+    src/mbgl/gl/texture.hpp
     src/mbgl/gl/types.hpp
     src/mbgl/gl/value.cpp
     src/mbgl/gl/value.hpp
@@ -229,6 +230,7 @@ set(MBGL_CORE_FILES
     include/mbgl/storage/response.hpp
     src/mbgl/storage/asset_file_source.hpp
     src/mbgl/storage/http_file_source.hpp
+    src/mbgl/storage/local_file_source.hpp
     src/mbgl/storage/network_status.cpp
     src/mbgl/storage/resource.cpp
     src/mbgl/storage/response.cpp
@@ -468,8 +470,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/premultiply.cpp
     src/mbgl/util/premultiply.hpp
     src/mbgl/util/rapidjson.hpp
-    src/mbgl/util/raster.cpp
-    src/mbgl/util/raster.hpp
     src/mbgl/util/rect.hpp
     src/mbgl/util/std.hpp
     src/mbgl/util/stopwatch.cpp

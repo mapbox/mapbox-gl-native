@@ -9,11 +9,13 @@ namespace mbgl {
 
 using namespace style;
 
+RasterBucket::RasterBucket(PremultipliedImage&& image_) : image(std::move(image_)) {
+}
+
 void RasterBucket::upload(gl::Context& context) {
-    if (hasData()) {
-        raster.upload(context, 0);
-        uploaded = true;
-    }
+    texture = context.createTexture(image);
+    image = {};
+    uploaded = true;
 }
 
 void RasterBucket::render(Painter& painter,
@@ -23,22 +25,19 @@ void RasterBucket::render(Painter& painter,
     painter.renderRaster(parameters, *this, *layer.as<RasterLayer>(), tile);
 }
 
-void RasterBucket::setImage(PremultipliedImage image) {
-    raster.load(std::move(image));
-}
-
 void RasterBucket::drawRaster(RasterShader& shader,
                               StaticRasterVertexBuffer& vertices,
                               VertexArrayObject& array,
                               gl::Context& context) {
-    raster.bind(context, 0, Raster::Scaling::Linear);
-    raster.bind(context, 1, Raster::Scaling::Linear);
+    assert(texture);
+    context.bindTexture(*texture, 0, gl::TextureFilter::Linear);
+    context.bindTexture(*texture, 1, gl::TextureFilter::Linear);
     array.bind(shader, vertices, BUFFER_OFFSET_0, context);
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)vertices.index()));
 }
 
 bool RasterBucket::hasData() const {
-    return raster.isLoaded();
+    return true;
 }
 
 bool RasterBucket::needsClipping() const {

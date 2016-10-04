@@ -3,6 +3,7 @@
 #include <mbgl/gl/object.hpp>
 #include <mbgl/gl/state.hpp>
 #include <mbgl/gl/value.hpp>
+#include <mbgl/gl/texture.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <memory>
@@ -27,6 +28,23 @@ public:
     UniqueFramebuffer createFramebuffer();
 
     void uploadBuffer(BufferType, size_t, void*);
+
+    // Create a texture from an image with data.
+    template <typename Image>
+    Texture createTexture(const Image& image, TextureUnit unit = 0) {
+        return { {{ image.width, image.height }},
+                 createTexture(image.width, image.height, image.data.get(), unit) };
+    }
+
+    // Creates an empty texture with the specified dimensions.
+    Texture createTexture(const std::array<uint16_t, 2>& size, TextureUnit unit = 0) {
+        return { size, createTexture(size[0], size[1], nullptr, unit) };
+    }
+
+    void bindTexture(Texture&,
+                     TextureUnit = 0,
+                     TextureFilter = TextureFilter::Nearest,
+                     TextureMipMap = TextureMipMap::No);
 
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
@@ -78,6 +96,9 @@ public:
     State<value::BindVertexBuffer> vertexBuffer;
     State<value::BindElementBuffer> elementBuffer;
     State<value::BindVertexArray> vertexArrayObject;
+
+private:
+    UniqueTexture createTexture(uint16_t width, uint16_t height, const void* data, TextureUnit);
 
 private:
     friend detail::ProgramDeleter;
