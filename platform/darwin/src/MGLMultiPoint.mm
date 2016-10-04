@@ -54,13 +54,6 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 
 - (CLLocationCoordinate2D)coordinate
 {
-    if ([self isMemberOfClass:[MGLMultiPoint class]])
-    {
-        [[NSException exceptionWithName:@"MGLAbstractClassException"
-                                 reason:@"MGLMultiPoint is an abstract class"
-                               userInfo:nil] raise];
-    }
-
     assert(_count > 0);
 
     return CLLocationCoordinate2DMake(_coordinates[0].latitude, _coordinates[0].longitude);
@@ -68,25 +61,11 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 
 - (NSUInteger)pointCount
 {
-    if ([self isMemberOfClass:[MGLMultiPoint class]])
-    {
-        [[NSException exceptionWithName:@"MGLAbstractClassException"
-                                 reason:@"MGLMultiPoint is an abstract class"
-                               userInfo:nil] raise];
-    }
-
     return _count;
 }
 
 - (void)getCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range
 {
-    if ([self isMemberOfClass:[MGLMultiPoint class]])
-    {
-        [[NSException exceptionWithName:@"MGLAbstractClassException"
-                                 reason:@"MGLMultiPoint is an abstract class"
-                               userInfo:nil] raise];
-    }
-
     if (range.location + range.length > _count)
     {
         [[NSException exceptionWithName:NSRangeException
@@ -109,9 +88,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 {
     if ([self isMemberOfClass:[MGLMultiPoint class]])
     {
-        [[NSException exceptionWithName:@"MGLAbstractClassException"
-                                 reason:@"MGLMultiPoint is an abstract class"
-                               userInfo:nil] raise];
+        [NSException raise:@"Unsupported method" format:@"The coordinates of a member of MGLMultiPoint are read-only."];
     }
 
     if (range.length == 0)
