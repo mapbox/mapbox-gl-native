@@ -43,7 +43,10 @@ buildPackageStyle() {
     wget -P ${BINARY_DIRECTORY} http://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/${file_name}
     if [[ "${GITHUB_RELEASE}" == true ]]; then
         echo "publish ${file_name} to GitHub"
-        github-release --verbose upload --tag "ios-v${PUBLISH_VERSION}" --name ${file_name} --file "${BINARY_DIRECTORY}/${file_name}"
+        github-release --verbose upload \
+            --tag "ios-v${PUBLISH_VERSION}" \
+            --name ${file_name} --file "${BINARY_DIRECTORY}/${file_name}" \
+            | sed '/^BODY/d; /^GET/d' # Omit overly verbose HTTP logging
     fi        
 }
 
@@ -75,7 +78,11 @@ if [[ "${GITHUB_RELEASE}" == true ]]; then
     if [[ $( echo ${PUBLISH_VERSION} | awk '/[0-9]-/' ) ]]; then
         PUBLISH_PRE_FLAG='--pre-release'
     fi
-    github-release --verbose release --tag "ios-v${PUBLISH_VERSION}" --name "ios-v${PUBLISH_VERSION}" --draft ${PUBLISH_PRE_FLAG}
+    github-release --verbose release \
+        --tag "ios-v${PUBLISH_VERSION}" \
+        --name "ios-v${PUBLISH_VERSION}" \
+        --draft ${PUBLISH_PRE_FLAG} \
+        | sed '/^BODY/d; /^GET/d' # Omit overly verbose HTTP logging
 fi
 
 buildPackageStyle "ipackage" "symbols"
