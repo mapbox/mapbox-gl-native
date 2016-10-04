@@ -89,7 +89,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
                                userInfo:nil] raise];
     }
 
-    assert(range.location + range.length <= _count);
+    NSAssert(range.location + range.length <= _count, @"Invalid coordinate range");
 
     NSUInteger index = 0;
 
@@ -109,8 +109,8 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
                                userInfo:nil] raise];
     }
 
-    assert(range.length > 0);
-    assert(sizeof(*coords) / sizeof(CLLocationCoordinate2D) == range.length);
+    NSAssert(range.length > 0, @"Empty coordinate range");
+    NSAssert(sizeof(*coords) / sizeof(CLLocationCoordinate2D) == range.length, @"Coordinate count doesn't match range length");
 
     [self willChangeValueForKey:@"coordinates"];
     if (range.location >= _count)
