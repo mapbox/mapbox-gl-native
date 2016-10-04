@@ -285,6 +285,10 @@ linux: glfw-app render offline
 test: $(LINUX_BUILD)
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-test
 
+.PHONY: benchmark
+benchmark: $(LINUX_BUILD)
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-benchmark
+
 ifneq (,$(shell which gdb))
   GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
 endif
@@ -294,6 +298,12 @@ run-test: run-test-*
 
 run-test-%: test
 	$(GDB) $(LINUX_OUTPUT_PATH)/mbgl-test --gtest_catch_exceptions=0 --gtest_filter=$*
+
+.PHONY: run-benchmark
+run-benchmark: run-benchmark-.
+
+run-benchmark-%: benchmark
+	$(GDB) $(LINUX_OUTPUT_PATH)/mbgl-benchmark --benchmark_filter=$*
 
 .PHONY: render
 render: $(LINUX_BUILD)

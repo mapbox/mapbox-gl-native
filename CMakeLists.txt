@@ -59,6 +59,11 @@ if(COMMAND mbgl_platform_test)
     include(cmake/test.cmake)
 endif()
 
+if(COMMAND mbgl_platform_benchmark)
+    include(cmake/benchmark-files.cmake)
+    include(cmake/benchmark.cmake)
+endif()
+
 if(COMMAND mbgl_platform_glfw)
     include(cmake/glfw.cmake)
 endif()

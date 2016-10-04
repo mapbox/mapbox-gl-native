@@ -45,6 +45,7 @@ before_script:
   - cmake --version
 script:
   - make linux
+  - make benchmark
   - make test
   - make run-test
 after_script:
