@@ -108,7 +108,6 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
     }
 
     NSAssert(range.length > 0, @"Empty coordinate range");
-    NSAssert(sizeof(*coords) / sizeof(CLLocationCoordinate2D) == range.length, @"Coordinate count doesn't match range length");
 
     [self willChangeValueForKey:@"coordinates"];
     if (range.location >= _count)
