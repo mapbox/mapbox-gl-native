@@ -10,16 +10,15 @@ void OffscreenTexture::bind(gl::Context& context,
                             std::array<uint16_t, 2> size) {
     assert(size[0] > 0 && size[1] > 0);
 
-    if (raster.getSize() != size) {
-        raster.load(PremultipliedImage(size[0], size[1], nullptr));
-        raster.upload(context, 0);
+    if (!texture || texture->size != size) {
+        texture = context.createTexture(size);
     }
 
     if (!framebuffer) {
         framebuffer = context.createFramebuffer();
         context.bindFramebuffer = *framebuffer;
         MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                                                raster.getID(), 0));
+                                                texture->texture, 0));
 
         GLenum status = MBGL_CHECK_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
         if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -55,12 +54,17 @@ void OffscreenTexture::bind(gl::Context& context,
     context.viewport = { 0, 0, size[0], size[1] };
 }
 
-Raster& OffscreenTexture::getTexture() {
-    return raster;
+gl::Texture& OffscreenTexture::getTexture() {
+    return *texture;
 }
 
 std::array<uint16_t, 2> OffscreenTexture::getSize() const {
-    return raster.getSize();
+    if (texture) {
+        // Use explicit dereference instead of -> due to clang 3.5 bug
+        return (*texture).size;
+    } else {
+        return {{ 0, 0 }};
+    }
 }
 
 } // namespace mbgl
