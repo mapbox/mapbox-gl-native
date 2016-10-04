@@ -41,7 +41,6 @@ void GeometryTile::cancel() {
 }
 
 void GeometryTile::setError(std::exception_ptr err) {
-    availableData = DataAvailability::All;
     observer->onTileError(*this, err);
 }
 
@@ -111,6 +110,11 @@ void GeometryTile::onPlacement(PlacementResult result) {
     featureIndex->setCollisionTile(std::move(result.collisionTile));
     placedConfig = result.placedConfig;
     observer->onTileChanged(*this);
+}
+
+void GeometryTile::onError(std::exception_ptr err) {
+    availableData = DataAvailability::All;
+    observer->onTileError(*this, err);
 }
 
 Bucket* GeometryTile::getBucket(const Layer& layer) {

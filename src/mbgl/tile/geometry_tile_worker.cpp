@@ -88,7 +88,7 @@ void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, 
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::setError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception());
     }
 }
 
@@ -112,7 +112,7 @@ void GeometryTileWorker::setLayers(std::vector<std::unique_ptr<Layer>> layers_, 
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::setError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception());
     }
 }
 
@@ -136,7 +136,7 @@ void GeometryTileWorker::setPlacementConfig(PlacementConfig placementConfig_, ui
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::setError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception());
     }
 }
 
@@ -162,7 +162,7 @@ void GeometryTileWorker::coalesced() {
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::setError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception());
     }
 }
 

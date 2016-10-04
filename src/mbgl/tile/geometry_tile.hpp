@@ -31,8 +31,9 @@ public:
 
     ~GeometryTile() override;
 
-    void setError(std::exception_ptr err);
+    void setError(std::exception_ptr);
     void setData(std::unique_ptr<const GeometryTileData>);
+
     void setPlacementConfig(const PlacementConfig&) override;
     void redoLayout() override;
 
@@ -63,6 +64,8 @@ public:
         uint64_t correlationID;
     };
     void onPlacement(PlacementResult);
+
+    void onError(std::exception_ptr);
 
 private:
     const std::string sourceID;

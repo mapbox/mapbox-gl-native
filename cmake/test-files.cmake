@@ -61,9 +61,9 @@ set(MBGL_TEST_FILES
     # storage
     test/storage/asset_file_source.test.cpp
     test/storage/default_file_source.test.cpp
-    test/storage/local_file_source.test.cpp
     test/storage/headers.test.cpp
     test/storage/http_file_source.test.cpp
+    test/storage/local_file_source.test.cpp
     test/storage/offline.test.cpp
     test/storage/offline_database.test.cpp
     test/storage/offline_download.test.cpp
@@ -88,7 +88,9 @@ set(MBGL_TEST_FILES
 
     # tile
     test/tile/geometry_tile_data.test.cpp
+    test/tile/raster_tile.test.cpp
     test/tile/tile_id.test.cpp
+    test/tile/vector_tile.test.cpp
 
     # util
     test/util/async_task.test.cpp
