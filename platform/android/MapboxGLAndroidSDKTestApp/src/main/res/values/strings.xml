@@ -221,5 +221,7 @@
     <string name="action_example">Example action</string>
 
     <string name="action_settings">Settings</string>
+    <string name="menuitem_title_rotate_gesture_enabled">Enable rotate gestures</string>
+    <string name="menuitem_title_scroll_gesture_enabled">Enable scroll gestures</string>
 
 </resources>

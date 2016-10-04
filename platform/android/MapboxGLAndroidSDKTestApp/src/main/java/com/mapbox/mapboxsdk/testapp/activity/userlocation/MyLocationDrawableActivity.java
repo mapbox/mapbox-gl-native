@@ -50,7 +50,6 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
         findViewById(R.id.progress).setVisibility(View.GONE);
 
         MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
-        mapboxMapOptions.accessToken(getString(R.string.mapbox_access_token));
         mapboxMapOptions.styleUrl(Style.MAPBOX_STREETS);
 
         // configure MyLocationView drawables
