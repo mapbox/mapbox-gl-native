@@ -457,16 +457,16 @@ public class MyLocationView extends View {
     }
 
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
-        this.myLocationTrackingMode = myLocationTrackingMode;
 
         MyLocationBehaviorFactory factory = new MyLocationBehaviorFactory();
         myLocationBehavior = factory.getBehavioralModel(myLocationTrackingMode);
 
-        if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && location != null) {
+        if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW && location != null) {
             // center map directly if we have a location fix
             myLocationBehavior.updateLatLng(location);
-            mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location)));
+            mapboxMap.easeCameraInternal(CameraUpdateFactory.newLatLng(new LatLng(location)).getCameraPosition(mapboxMap), 0, false, null);
         }
+        this.myLocationTrackingMode = myLocationTrackingMode;
         invalidate();
         update();
     }
@@ -586,7 +586,7 @@ public class MyLocationView extends View {
         private void rotateCamera() {
             CameraPosition.Builder builder = new CameraPosition.Builder();
             builder.bearing(currentDegree);
-            mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), COMPASS_UPDATE_RATE_MS, false /*linear interpolator*/);
+            mapboxMap.easeCameraInternal(CameraUpdateFactory.newCameraPosition(builder.build()).getCameraPosition(mapboxMap), COMPASS_UPDATE_RATE_MS, false /*linear interpolator*/, null);
         }
 
         @Override
@@ -702,7 +702,7 @@ public class MyLocationView extends View {
             updateAccuracy(location);
 
             // ease to new camera position with a linear interpolator
-            mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), (int) locationUpdateDuration, false /*linear interpolator*/);
+            mapboxMap.easeCameraInternal(CameraUpdateFactory.newCameraPosition(builder.build()).getCameraPosition(mapboxMap), (int) locationUpdateDuration, false /*linear interpolator*/, null);
         }
 
         @Override
@@ -765,7 +765,8 @@ public class MyLocationView extends View {
 
         @Override
         void invalidate() {
-            screenLocation = projection.toScreenLocation(latLng);
+            if(latLng != null)
+                screenLocation = projection.toScreenLocation(latLng);
             MyLocationView.this.invalidate();
         }
     }
