@@ -87,7 +87,14 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
                                userInfo:nil] raise];
     }
 
-    NSAssert(range.location + range.length <= _count, @"Invalid coordinate range");
+    if (range.location + range.length > _count)
+    {
+        [[NSException exceptionWithName:NSRangeException
+                                 reason:[NSString stringWithFormat:
+                                            @"Invalid coordinate range %@ extends beyond coordinate count of %zu",
+                                            NSStringFromRange(range), _count]
+                               userInfo:nil] raise];
+    }
 
     NSUInteger index = 0;
 
@@ -107,7 +114,12 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
                                userInfo:nil] raise];
     }
 
-    NSAssert(range.length > 0, @"Empty coordinate range");
+    if (range.length == 0)
+    {
+        [[NSException exceptionWithName:NSRangeException
+                                 reason:[NSString stringWithFormat:@"Empty coordinate range %@", NSStringFromRange(range)]
+                               userInfo:nil] raise];
+    }
 
     [self willChangeValueForKey:@"coordinates"];
     if (range.location >= _count)
