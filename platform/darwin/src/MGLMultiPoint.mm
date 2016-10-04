@@ -100,7 +100,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
     }
 }
 
-- (void)updateCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
+- (void)setCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range
 {
     if ([self isMemberOfClass:[MGLMultiPoint class]])
     {
@@ -109,10 +109,34 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
                                userInfo:nil] raise];
     }
 
-    assert(_count > 0);
+    assert(range.length > 0);
+    assert(sizeof(*coords) / sizeof(CLLocationCoordinate2D) == range.length);
 
     [self willChangeValueForKey:@"coordinates"];
-    [self setupWithCoordinates:coords count:count];
+    if (range.location >= _count)
+    {
+        // appending new coordinate(s)
+        NSUInteger newCount = _count + (_count - range.location) + range.length;
+        CLLocationCoordinate2D *newCoords = (CLLocationCoordinate2D *)malloc(newCount * sizeof(CLLocationCoordinate2D));
+        for (NSUInteger i = 0; i < range.location; i++)
+        {
+            newCoords[i] = _coordinates[i];
+        }
+        for (NSUInteger i = 0; i < range.length; i++)
+        {
+            newCoords[i + range.location] = coords[i];
+        }
+        [self setupWithCoordinates:newCoords count:newCount];
+        free(newCoords);
+    }
+    else
+    {
+        // replacing existing coordinate(s)
+        for (NSUInteger i = 0; i < range.length; i++)
+        {
+            _coordinates[i + range.location] = coords[i];
+        }
+    }
     [self didChangeValueForKey:@"coordinates"];
 }
 

@@ -36,14 +36,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range;
 
 /**
- Updates the coordinates for the shape, which will instantaneously redraw the 
- shape if it is currently visible on the map. 
+ Updates one or more coordinates for the shape, which will instantaneously 
+ cause the shape to be redrawn if it is currently visible on the map.
  
  @param coords The array of coordinates defining the shape. The data in this
  array is copied to the object.
- @param count The number of items in the `coords` array.
+ @param range The range of points to update. The `location` field indicates the
+ first point you are requesting, with `0` being the first point, `1` being
+ the second point, and so on. The `length` field indicates the number of
+ points to update. The array in _`coords`_ must be equal in number to the
+ length of the range.
  */
-- (void)updateCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
+- (void)setCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range;
 
 @end
 
