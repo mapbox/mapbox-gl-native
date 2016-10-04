@@ -112,7 +112,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
         // appending new coordinate(s)
         NSUInteger newCount = NSMaxRange(range);
         CLLocationCoordinate2D *newCoordinates = (CLLocationCoordinate2D *)malloc(newCount * sizeof(CLLocationCoordinate2D));
-        memcpy(newCoordinates, _coordinates, _count * sizeof(CLLocationCoordinate2D));
+        memcpy(newCoordinates, _coordinates, fmin(_count, range.location) * sizeof(CLLocationCoordinate2D));
         memcpy(newCoordinates + range.location, coords, range.length * sizeof(CLLocationCoordinate2D));
         [self setupWithCoordinates:newCoordinates count:newCount];
         free(newCoordinates);
