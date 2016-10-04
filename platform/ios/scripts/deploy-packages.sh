@@ -80,8 +80,15 @@ if [[ -z ${VERSION_TAG} ]]; then
     echo "Found tag: ${VERSION_TAG}"
 fi
 
-if [[ $( echo ${VERSION_TAG} | grep -v ios-v ) ]]; then
-    echo "${VERSION_TAG} is not a valid iOS version tag"
+if [[ $( echo ${VERSION_TAG} | grep --invert-match ios-v ) ]]; then
+    echo "Error: ${VERSION_TAG} is not a valid iOS version tag"
+    echo "VERSION_TAG should be in format: ios-vX.X.X-pre.X"
+    exit 1
+fi
+
+if [[ $( wget --spider -O- https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases/tags/${VERSION_TAG} 2>&1 | grep -c "404 Not Found" ) == 0 ]]; then
+    echo "Error: ${VERSION_TAG} has already been published on GitHub"
+    echo "See: https://github.com/${GITHUB_USER}/${GITHUB_REPO}/releases/tag/${VERSION_TAG}"
     exit 1
 fi
 
@@ -89,8 +96,6 @@ PUBLISH_VERSION=$( echo ${VERSION_TAG} | sed 's/^ios-v//' )
 git checkout ${VERSION_TAG}
 
 step "Deploying version ${PUBLISH_VERSION}…"
-
-exit 1
 
 make clean && make distclean
 
