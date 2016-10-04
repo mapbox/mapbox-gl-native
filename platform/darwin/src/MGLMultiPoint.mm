@@ -3,10 +3,9 @@
 
 #import <mbgl/util/geo.hpp>
 
-mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
-    if (!cgColor) {
-        return { 0, 0, 0, 0 };
-    }
+mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
+{
+    if (!cgColor) return { 0, 0, 0, 0 };
     NSCAssert(CGColorGetNumberOfComponents(cgColor) >= 4, @"Color must have at least 4 components");
     const CGFloat *components = CGColorGetComponents(cgColor);
     return { (float)components[0], (float)components[1], (float)components[2], (float)components[3] };
@@ -18,8 +17,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
     MGLCoordinateBounds _bounds;
 }
 
-- (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords
-                              count:(NSUInteger)count
+- (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
     self = [super init];
 
@@ -150,7 +148,8 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
     return MGLLatLngBoundsFromCoordinateBounds(_bounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
 }
 
-- (mbgl::Annotation)annotationObjectWithDelegate:(__unused id <MGLMultiPointDelegate>)delegate {
+- (mbgl::Annotation)annotationObjectWithDelegate:(__unused id <MGLMultiPointDelegate>)delegate
+{
     NSAssert(NO, @"Cannot add an annotation from an instance of %@", NSStringFromClass([self class]));
     return mbgl::SymbolAnnotation({mbgl::Point<double>()});
 }
