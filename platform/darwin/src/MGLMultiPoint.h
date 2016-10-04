@@ -15,7 +15,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MGLMultiPoint : MGLShape
 
-/** The array of coordinates associated with the shape. */
+/**
+ The array of coordinates associated with the shape.
+ 
+ This C array is a pointer to a structure inside the multipoint object, 
+ which may have a lifetime shorter than the multipoint object and will 
+ certainly not have a longer lifetime. Therefore, you should copy the C 
+ array if it needs to be stored outside of the memory context in which you 
+ use this property.
+ */
 @property (nonatomic, readonly) CLLocationCoordinate2D *coordinates NS_RETURNS_INNER_POINTER;
 
 /** The number of coordinates associated with the shape. (read-only) */
