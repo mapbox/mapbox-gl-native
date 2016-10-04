@@ -22,14 +22,18 @@ cat <<EOF
 EOF
 }
 
+function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
+function finish { >&2 echo -en "\033[0m"; }
+trap finish EXIT
+
 buildPackageStyle() {
     local package=$1 style=""     
     if [[ ${#} -eq 2 ]]; then
         style="$2"
     fi            
-    echo "make ${package} ${style}"
+    step "Building: make ${package} ${style}"
     make ${package}
-    echo "publish ${package} with ${style}"
+    step "Publishing ${package} with ${style}"
     local file_name=""
     if [ -z ${style} ] 
     then
@@ -39,10 +43,10 @@ buildPackageStyle() {
         ./platform/ios/scripts/publish.sh "${PUBLISH_VERSION}" ${style}
         file_name=mapbox-ios-sdk-${PUBLISH_VERSION}-${style}.zip        
     fi
-    echo "Downloading ${file_name} from s3... to ${BINARY_DIRECTORY}"
+    step "Downloading ${file_name} from s3 to ${BINARY_DIRECTORY}"
     wget -P ${BINARY_DIRECTORY} http://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/${file_name}
     if [[ "${GITHUB_RELEASE}" == true ]]; then
-        echo "publish ${file_name} to GitHub"
+        step "Publishing ${file_name} to GitHub"
         github-release --verbose upload \
             --tag "ios-v${PUBLISH_VERSION}" \
             --name ${file_name} --file "${BINARY_DIRECTORY}/${file_name}" \
@@ -65,7 +69,7 @@ BINARY_DIRECTORY=$2
 PUBLISH_PRE_FLAG=''
 GITHUB_RELEASE=false
 
-echo "Deploying version ${PUBLISH_VERSION}..."
+step "Deploying version ${PUBLISH_VERSION}..."
 
 if [[ ${#} -eq 3 &&  $3 == "-g" ]]; then
     GITHUB_RELEASE=true
