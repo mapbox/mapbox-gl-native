@@ -5,7 +5,7 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/shader/texture_rect_vertex.hpp>
+#include <mbgl/shader/symbol_vertex.hpp>
 #include <mbgl/shader/collision_box_vertex.hpp>
 #include <mbgl/text/glyph_range.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
@@ -48,20 +48,20 @@ private:
     friend class SymbolLayout;
 
     struct TextBuffer {
-        std::vector<TextureRectVertex> vertices;
+        std::vector<SymbolVertex> vertices;
         std::vector<gl::Triangle> triangles;
         std::vector<ElementGroup<SDFShader>> groups;
 
-        optional<gl::VertexBuffer<TextureRectVertex>> vertexBuffer;
+        optional<gl::VertexBuffer<SymbolVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
     } text;
 
     struct IconBuffer {
-        std::vector<TextureRectVertex> vertices;
+        std::vector<SymbolVertex> vertices;
         std::vector<gl::Triangle> triangles;
         std::vector<ElementGroup<SDFShader, IconShader>> groups;
 
-        optional<gl::VertexBuffer<TextureRectVertex>> vertexBuffer;
+        optional<gl::VertexBuffer<SymbolVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
     } icon;
 

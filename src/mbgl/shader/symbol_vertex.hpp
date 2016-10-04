@@ -8,10 +8,9 @@
 
 namespace mbgl {
 
-// A vertex that holds a position, offset and texture coordinate. Used for symbol layer icons and glyphs.
-class TextureRectVertex {
+class SymbolVertex {
 public:
-    TextureRectVertex(int16_t x, int16_t y, float ox, float oy, uint16_t tx, uint16_t ty, float minzoom, float maxzoom, float labelminzoom, uint8_t labelangle)
+    SymbolVertex(int16_t x, int16_t y, float ox, float oy, uint16_t tx, uint16_t ty, float minzoom, float maxzoom, float labelminzoom, uint8_t labelangle)
         : a_pos {
               x,
               y
@@ -40,13 +39,13 @@ public:
 namespace gl {
 
 template <class Shader>
-struct AttributeBindings<Shader, TextureRectVertex> {
+struct AttributeBindings<Shader, SymbolVertex> {
     std::array<AttributeBinding, 4> operator()(const Shader& shader) {
         return {{
-            MBGL_MAKE_ATTRIBUTE_BINDING(TextureRectVertex, shader, a_pos),
-            MBGL_MAKE_ATTRIBUTE_BINDING(TextureRectVertex, shader, a_offset),
-            MBGL_MAKE_ATTRIBUTE_BINDING(TextureRectVertex, shader, a_texture_pos),
-            MBGL_MAKE_ATTRIBUTE_BINDING(TextureRectVertex, shader, a_data)
+            MBGL_MAKE_ATTRIBUTE_BINDING(SymbolVertex, shader, a_pos),
+            MBGL_MAKE_ATTRIBUTE_BINDING(SymbolVertex, shader, a_offset),
+            MBGL_MAKE_ATTRIBUTE_BINDING(SymbolVertex, shader, a_texture_pos),
+            MBGL_MAKE_ATTRIBUTE_BINDING(SymbolVertex, shader, a_data)
         }};
     };
 };

@@ -1,7 +1,7 @@
 #include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/sdf.vertex.hpp>
 #include <mbgl/shader/sdf.fragment.hpp>
-#include <mbgl/shader/texture_rect_vertex.hpp>
+#include <mbgl/shader/symbol_vertex.hpp>
 
 namespace mbgl {
 

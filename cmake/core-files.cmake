@@ -205,8 +205,8 @@ set(MBGL_CORE_FILES
     src/mbgl/shader/sdf_shader.cpp
     src/mbgl/shader/sdf_shader.hpp
     src/mbgl/shader/shaders.hpp
-    src/mbgl/shader/texture_rect_vertex.cpp
-    src/mbgl/shader/texture_rect_vertex.hpp
+    src/mbgl/shader/symbol_vertex.cpp
+    src/mbgl/shader/symbol_vertex.hpp
 
     # sprite
     include/mbgl/sprite/sprite_image.hpp

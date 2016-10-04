@@ -7,13 +7,13 @@
 
 namespace mbgl {
 
-class TextureRectVertex;
+class SymbolVertex;
 
 class SDFShader : public gl::Shader {
 public:
     SDFShader(gl::Context&, Defines defines = None);
 
-    using VertexType = TextureRectVertex;
+    using VertexType = SymbolVertex;
 
     gl::Attribute<int16_t, 2>  a_pos         = { "a_pos",         *this };
     gl::Attribute<int16_t, 2>  a_offset      = { "a_offset",      *this };
