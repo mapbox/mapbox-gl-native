@@ -447,9 +447,13 @@ test-node: node
 ANDROID_ENV = platform/android/scripts/toolchain.sh
 ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
 
+.PHONY: style-code-android
+style-code-android: $(BUILD_DEPS)
+	node platform/android/scripts/generate-style-code.js
+
 define ANDROID_RULES
 
-build/android-$1/$(BUILDTYPE): $(BUILD_DEPS)
+build/android-$1/$(BUILDTYPE): style-code-android
 	mkdir -p build/android-$1/$(BUILDTYPE)
 
 build/android-$1/$(BUILDTYPE)/toolchain.cmake: platform/android/scripts/toolchain.sh build/android-$1/$(BUILDTYPE)
@@ -489,10 +493,6 @@ android-test-apk:
 .PHONY: apackage
 apackage:
 	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
-
-.PHONY: style-code-android
-style-code-android:
-	node platform/android/scripts/generate-style-code.js
 
 .PHONY: android-generate-test
 android-generate-test:
