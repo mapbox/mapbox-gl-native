@@ -23,8 +23,7 @@ public:
 
     void setNecessity(Necessity) final;
 
-    void setError(std::exception_ptr err);
-
+    void setError(std::exception_ptr);
     void setData(std::shared_ptr<const std::string> data,
                  optional<Timestamp> modified_,
                  optional<Timestamp> expires_);
@@ -33,6 +32,7 @@ public:
     Bucket* getBucket(const style::Layer&) override;
 
     void onParsed(std::unique_ptr<Bucket> result);
+    void onError(std::exception_ptr);
 
 private:
     TileLoader<RasterTile> loader;
