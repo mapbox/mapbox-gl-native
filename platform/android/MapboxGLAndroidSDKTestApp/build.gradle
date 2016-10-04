@@ -23,17 +23,17 @@ gradle.projectsEvaluated {
 }
 
 ext {
-    supportLibVersion = '23.4.0'
+    supportLibVersion = '24.2.1'
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         applicationId "com.mapbox.mapboxsdk.testapp"
         minSdkVersion 15
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 9
         versionName "4.1.0"
 
