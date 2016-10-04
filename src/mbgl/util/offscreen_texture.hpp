@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/util/raster.hpp>
+#include <mbgl/gl/texture.hpp>
 
 namespace mbgl {
 
@@ -12,12 +12,12 @@ class OffscreenTexture {
 public:
     void bind(gl::Context&, std::array<uint16_t, 2> size);
 
-    Raster& getTexture();
+    gl::Texture& getTexture();
     std::array<uint16_t, 2> getSize() const;
 
 private:
-    mbgl::optional<gl::UniqueFramebuffer> framebuffer;
-    Raster raster;
+    optional<gl::UniqueFramebuffer> framebuffer;
+    optional<gl::Texture> texture;
 };
 
 } // namespace mbgl
