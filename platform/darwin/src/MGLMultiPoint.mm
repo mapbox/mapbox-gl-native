@@ -86,11 +86,6 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 
 - (void)setCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range
 {
-    if ([self isMemberOfClass:[MGLMultiPoint class]])
-    {
-        [NSException raise:@"Unsupported method" format:@"The coordinates of a member of MGLMultiPoint are read-only."];
-    }
-
     if (range.length == 0)
     {
         [[NSException exceptionWithName:NSRangeException
