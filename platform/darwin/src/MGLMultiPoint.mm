@@ -68,11 +68,9 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 {
     if (range.location + range.length > _count)
     {
-        [[NSException exceptionWithName:NSRangeException
-                                 reason:[NSString stringWithFormat:
-                                            @"Invalid coordinate range %@ extends beyond current coordinate count of %zu",
-                                            NSStringFromRange(range), _count]
-                               userInfo:nil] raise];
+        [NSException raise:NSRangeException
+                    format:@"Invalid coordinate range %@ extends beyond current coordinate count of %zu",
+                        NSStringFromRange(range), _count];
     }
 
     NSUInteger index = 0;
@@ -88,17 +86,13 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 {
     if (range.length == 0)
     {
-        [[NSException exceptionWithName:NSRangeException
-                                 reason:[NSString stringWithFormat:@"Empty coordinate range %@", NSStringFromRange(range)]
-                               userInfo:nil] raise];
+        [NSException raise:NSRangeException format:@"Empty coordinate range %@", NSStringFromRange(range)];
     }
     else if (range.location > _count)
     {
-        [[NSException exceptionWithName:NSRangeException
-                                 reason:[NSString stringWithFormat:
-                                            @"Invalid range %@ for existing coordinate count %zu",
-                                            NSStringFromRange(range), _count]
-                               userInfo:nil] raise];
+        [NSException raise:NSRangeException
+                    format:@"Invalid range %@ for existing coordinate count %zu",
+                        NSStringFromRange(range), _count];
     }
 
     [self willChangeValueForKey:@"coordinates"];
@@ -139,7 +133,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p; count = %lu; bounds = %@>",
-            NSStringFromClass([self class]), (void *)self, (unsigned long)_count, MGLStringFromCoordinateBounds(_bounds)];
+               NSStringFromClass([self class]), (void *)self, (unsigned long)_count, MGLStringFromCoordinateBounds(_bounds)];
 }
 
 @end
