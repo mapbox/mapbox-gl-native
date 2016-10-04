@@ -6,13 +6,13 @@
 
 namespace mbgl {
 
-class TextureRectVertex;
+class SymbolVertex;
 
 class IconShader : public gl::Shader {
 public:
     IconShader(gl::Context&, Defines defines = None);
 
-    using VertexType = TextureRectVertex;
+    using VertexType = SymbolVertex;
 
     gl::Attribute<int16_t, 2>  a_pos         = { "a_pos",         *this };
     gl::Attribute<int16_t, 2>  a_offset      = { "a_offset",      *this };

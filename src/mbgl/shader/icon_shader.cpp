@@ -1,7 +1,7 @@
 #include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/shader/icon.vertex.hpp>
 #include <mbgl/shader/icon.fragment.hpp>
-#include <mbgl/shader/texture_rect_vertex.hpp>
+#include <mbgl/shader/symbol_vertex.hpp>
 
 namespace mbgl {
 
