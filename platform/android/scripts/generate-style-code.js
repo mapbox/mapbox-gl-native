@@ -5,6 +5,41 @@ const ejs = require('ejs');
 const spec = require('mapbox-gl-style-spec').latest;
 const _ = require('lodash');
 
+// Specification parsing //
+
+//Collect layer types from spec
+const layers = Object.keys(spec.layer.type.values).map((type) => {
+  const layoutProperties = Object.keys(spec[`layout_${type}`]).reduce((memo, name) => {
+    if (name !== 'visibility') {
+      spec[`layout_${type}`][name].name = name;
+      memo.push(spec[`layout_${type}`][name]);
+    }
+    return memo;
+  }, []);
+
+  const paintProperties = Object.keys(spec[`paint_${type}`]).reduce((memo, name) => {
+    spec[`paint_${type}`][name].name = name;
+    memo.push(spec[`paint_${type}`][name]);
+    return memo;
+  }, []);
+
+  return {
+    type: type,
+    doc: spec.layer.type.values[type].doc,
+    layoutProperties: layoutProperties,
+    paintProperties: paintProperties,
+    properties: layoutProperties.concat(paintProperties)
+  };
+});
+
+//Process all layer properties
+const layoutProperties = _(layers).map('layoutProperties').flatten().value();
+const paintProperties = _(layers).map('paintProperties').flatten().value();
+const allProperties = _(layoutProperties).union(paintProperties).value();
+const enumProperties = _(allProperties).filter({'type': 'enum'}).value();
+
+// Global functions //
+
 global.iff = function (condition, val) {
   return condition() ? val : "";
 }
@@ -137,40 +172,71 @@ global.defaultValueJava = function(property) {
       }
 }
 
-global.propertyDoc = function (propertyName, property) {
-    let doc = property.doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
-        if (str.substr(offset - 4, 3) !== 'CSS') {
-            symbol = camelizeWithLeadingLowercase(symbol);
+/**
+ * Produces documentation for property factory methods
+ */
+global.propertyFactoryMethodDoc = function (property) {
+    let doc = property.doc;
+    //Match other items in back ticks
+    doc = doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
+        if (str.substr(offset - 4, 3) !== 'CSS' && symbol[0].toUpperCase() != symbol[0] && _(enumProperties).filter({'name': symbol}).value().length > 0) {
+            //Property 'enums'
+            symbol = snakeCaseUpper(symbol);
+            return '{@link Property.' + symbol + '}';
+        } else if( _(allProperties).filter({'name': symbol}).value().length > 0) {
+            //Other properties
+            return '{@link PropertyFactory#' + camelizeWithLeadingLowercase(symbol) + '}';
+        } else {
+            //Left overs
+            return '`' + symbol + '`';
         }
-        return '`' + symbol + '`';
     });
     return doc;
 };
 
-//Process Layers
-const layers = Object.keys(spec.layer.type.values).map((type) => {
-  const layoutProperties = Object.keys(spec[`layout_${type}`]).reduce((memo, name) => {
-    if (name !== 'visibility') {
-      spec[`layout_${type}`][name].name = name;
-      memo.push(spec[`layout_${type}`][name]);
-    }
-    return memo;
-  }, []);
+/**
+ * Produces documentation for property value constants
+ */
+global.propertyValueDoc = function (property, value) {
 
-  const paintProperties = Object.keys(spec[`paint_${type}`]).reduce((memo, name) => {
-    spec[`paint_${type}`][name].name = name;
-    memo.push(spec[`paint_${type}`][name]);
-    return memo;
-  }, []);
+    // Match references to other property names & values.
+    // Requires the format 'When `foo` is set to `bar`,'.
+    let doc = property.values[value].doc.replace(/When `(.+?)` is set to `(.+?)`,/g, function (m, peerPropertyName, propertyValue, offset, str) {
+        let otherProperty = snakeCaseUpper(peerPropertyName);
+        let otherValue = snakeCaseUpper(peerPropertyName) + '_' + snakeCaseUpper(propertyValue);
+        return 'When {@link ' + `${otherProperty}` + '} is set to {@link Property#' + `${otherValue}` + '},';
+    });
 
-  return {
-    type: type,
-    layoutProperties: layoutProperties,
-    paintProperties: paintProperties,
-    properties: layoutProperties.concat(paintProperties)
-  };
-});
+    // Match references to our own property values.
+    // Requires the format 'is equivalent to `bar`'.
+    doc = doc.replace(/is equivalent to `(.+?)`/g, function(m, propertyValue, offset, str) {
+        propertyValue = snakeCaseUpper(property.name) + '_' + snakeCaseUpper(propertyValue);
+        return 'is equivalent to {@link Property#' + propertyValue + '}';
+    });
 
+    //Match other items in back ticks
+    doc = doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
+        if ('values' in property && Object.keys(property.values).indexOf(symbol) !== -1) {
+            //Property values
+            propertyValue = snakeCaseUpper(property.name) + '_' + snakeCaseUpper(symbol);
+            console.log("Transforming", symbol, propertyValue);
+            return '{@link Property#' + `${propertyValue}` + '}';
+        } else if (str.substr(offset - 4, 3) !== 'CSS' && symbol[0].toUpperCase() != symbol[0]) {
+            //Property 'enums'
+            symbol = snakeCaseUpper(symbol);
+            return '{@link ' + symbol + '}';
+        } else {
+            //Left overs
+            return symbol
+        }
+    });
+    return doc;
+};
+
+// Template processing //
+
+
+// Java + JNI Layers (Peer model)
 const layerHpp = ejs.compile(fs.readFileSync('platform/android/src/style/layers/layer.hpp.ejs', 'utf8'), {strict: true});
 const layerCpp = ejs.compile(fs.readFileSync('platform/android/src/style/layers/layer.cpp.ejs', 'utf8'), {strict: true});
 const layerJava = ejs.compile(fs.readFileSync('platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/layer.java.ejs', 'utf8'), {strict: true});
@@ -183,32 +249,32 @@ for (const layer of layers) {
   fs.writeFileSync(`platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/style/${camelize(layer.type)}LayerTest.java`, layerJavaUnitTests(layer));
 }
 
-//Process all layer properties
-const layoutProperties = _(layers).map('layoutProperties').flatten().value();
-const paintProperties = _(layers).map('paintProperties').flatten().value();
 
+// Java PropertyFactory
 const propertiesTemplate = ejs.compile(fs.readFileSync('platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/property_factory.java.ejs', 'utf8'), {strict: true});
 fs.writeFileSync(
     `platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/PropertyFactory.java`,
     propertiesTemplate({layoutProperties: layoutProperties, paintProperties: paintProperties})
 );
 
-//Create types for the enum properties
-const enumProperties = _(layoutProperties).union(paintProperties).filter({'type': 'enum'}).value();
+// Java Property
 const enumPropertyJavaTemplate = ejs.compile(fs.readFileSync('platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/property.java.ejs', 'utf8'), {strict: true});
 fs.writeFileSync(
     `platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/Property.java`,
     enumPropertyJavaTemplate({properties: enumProperties})
 );
 
-//De-dup types before generating cpp headers
+//De-duplicate enum properties before processing jni property templates
 const enumPropertiesDeDup = _(enumProperties).uniq(global.propertyNativeType).value();
+
+// JNI Enum property conversion templates
 const enumPropertyHppTypeStringValueTemplate = ejs.compile(fs.readFileSync('platform/android/src/style/conversion/types_string_values.hpp.ejs', 'utf8'), {strict: true});
 fs.writeFileSync(
     `platform/android/src/style/conversion/types_string_values.hpp`,
     enumPropertyHppTypeStringValueTemplate({properties: enumPropertiesDeDup})
 );
 
+// JNI property value types conversion templates
 const enumPropertyHppTypeTemplate = ejs.compile(fs.readFileSync('platform/android/src/style/conversion/types.hpp.ejs', 'utf8'), {strict: true});
 fs.writeFileSync(
     `platform/android/src/style/conversion/types.hpp`,

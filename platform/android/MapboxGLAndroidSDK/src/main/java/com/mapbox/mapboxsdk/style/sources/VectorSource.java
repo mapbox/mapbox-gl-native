@@ -3,7 +3,7 @@ package com.mapbox.mapboxsdk.style.sources;
 import java.net.URL;
 
 /**
- * A vector source.
+ * Vector source enables the use of vector tiles.
  *
  * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-vector">the style specification</a>
  */
@@ -11,6 +11,8 @@ public class VectorSource extends Source {
 
     /**
      * Internal use
+     *
+     * @param nativePtr - pointer to native peer
      */
     public VectorSource(long nativePtr) {
         super(nativePtr);

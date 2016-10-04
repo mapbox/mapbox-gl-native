@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * A GeoJson source.
+ * A GeoJson source. Exposes a {@link FeatureCollection} from Json.
  *
  * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson">the style specification</a>
  */
@@ -16,6 +16,8 @@ public class GeoJsonSource extends Source {
 
     /**
      * Internal use
+     *
+     * @param nativePtr - pointer to native peer
      */
     public GeoJsonSource(long nativePtr) {
         super(nativePtr);
@@ -32,7 +34,7 @@ public class GeoJsonSource extends Source {
     }
 
     /**
-     * Create an empty GeoJsonSource
+     * Create an empty GeoJsonSource with non-default {@link GeoJsonOptions}
      *
      * @param id      the source id
      * @param options options
@@ -46,7 +48,7 @@ public class GeoJsonSource extends Source {
      * Create a GeoJsonSource from a raw json string
      *
      * @param id      the source id
-     * @param geoJson raw Json body
+     * @param geoJson raw Json FeatureCollection
      */
     public GeoJsonSource(String id, String geoJson) {
         if (geoJson == null || geoJson.startsWith("http")) {
@@ -57,7 +59,7 @@ public class GeoJsonSource extends Source {
     }
 
     /**
-     * Create a GeoJsonSource from a raw json string
+     * Create a GeoJsonSource from a raw json string and non-default {@link GeoJsonOptions}
      *
      * @param id      the source id
      * @param geoJson raw Json body
@@ -83,7 +85,7 @@ public class GeoJsonSource extends Source {
     }
 
     /**
-     * Create a GeoJsonSource from a remote geo json file
+     * Create a GeoJsonSource from a remote geo json file and non-default {@link GeoJsonOptions}
      *
      * @param id      the source id
      * @param url     remote json file
@@ -95,7 +97,7 @@ public class GeoJsonSource extends Source {
     }
 
     /**
-     * Create a GeoJsonSource from a FeatureCollection
+     * Create a GeoJsonSource from a {@link FeatureCollection}
      *
      * @param id       the source id
      * @param features the features
@@ -106,7 +108,7 @@ public class GeoJsonSource extends Source {
     }
 
     /**
-     * Create a GeoJsonSource from a FeatureCollection
+     * Create a GeoJsonSource from a {@link FeatureCollection} and non-default {@link GeoJsonOptions}
      *
      * @param id       the source id
      * @param features the features
@@ -117,21 +119,41 @@ public class GeoJsonSource extends Source {
         setGeoJson(features);
     }
 
+    /**
+     * Updates the GeoJson
+     *
+     * @param features the GeoJSON {@link FeatureCollection}
+     */
     public void setGeoJson(FeatureCollection features) {
         checkValidity();
         setGeoJson(features.toJson());
     }
 
+    /**
+     * Updates the GeoJson
+     *
+     * @param json the raw GeoJson FeatureCollection string
+     */
     public void setGeoJson(String json) {
         checkValidity();
         setRawJson(json);
     }
 
+    /**
+     * Updates the url
+     *
+     * @param url the GeoJSON FeatureCollection url
+     */
     public void setUrl(URL url) {
         checkValidity();
         setUrl(url.toExternalForm());
     }
 
+    /**
+     * Updates the url
+     *
+     * @param url the GeoJSON FeatureCollection url
+     */
     public void setUrl(String url) {
         checkValidity();
         nativeSetUrl(url);

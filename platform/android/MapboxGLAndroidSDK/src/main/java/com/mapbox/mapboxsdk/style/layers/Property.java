@@ -44,6 +44,9 @@ public abstract class Property<T> {
      */
     public static final String LINE_CAP_SQUARE = "square";
 
+    /**
+     * The display of line endings.
+     */
     @StringDef({
             LINE_CAP_BUTT,
             LINE_CAP_ROUND,
@@ -67,6 +70,9 @@ public abstract class Property<T> {
      */
     public static final String LINE_JOIN_MITER = "miter";
 
+    /**
+     * The display of lines when joining.
+     */
     @StringDef({
             LINE_JOIN_BEVEL,
             LINE_JOIN_ROUND,
@@ -82,10 +88,13 @@ public abstract class Property<T> {
      */
     public static final String SYMBOL_PLACEMENT_POINT = "point";
     /**
-     * The label is placed along the line of the geometry. Can only be used on `LineString` and `Polygon` geometries.
+     * The label is placed along the line of the geometry. Can only be used on LineString and Polygon geometries.
      */
     public static final String SYMBOL_PLACEMENT_LINE = "line";
 
+    /**
+     * Label placement relative to its geometry.
+     */
     @StringDef({
             SYMBOL_PLACEMENT_POINT,
             SYMBOL_PLACEMENT_LINE,
@@ -96,18 +105,21 @@ public abstract class Property<T> {
     //ICON_ROTATION_ALIGNMENT: In combination with `symbol-placement`, determines the rotation behavior of icons.
 
     /**
-     * When `symbol-placement` is set to `point`, aligns icons east-west. When `symbol-placement` is set to `line`, aligns icon x-axes with the line.
+     * When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_POINT}, aligns icons east-west. When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_LINE}, aligns icon x-axes with the line.
      */
     public static final String ICON_ROTATION_ALIGNMENT_MAP = "map";
     /**
-     * Produces icons whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbol-placement`.
+     * Produces icons whose x-axes are aligned with the x-axis of the viewport, regardless of the value of {@link SYMBOL_PLACEMENT}.
      */
     public static final String ICON_ROTATION_ALIGNMENT_VIEWPORT = "viewport";
     /**
-     * When `symbol-placement` is set to `point`, this is equivalent to `viewport`. When `symbol-placement` is set to `line`, this is equivalent to `map`.
+     * When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_POINT}, this is equivalent to {@link Property#ICON_ROTATION_ALIGNMENT_VIEWPORT}. When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_LINE}, this is equivalent to {@link Property#ICON_ROTATION_ALIGNMENT_MAP}.
      */
     public static final String ICON_ROTATION_ALIGNMENT_AUTO = "auto";
 
+    /**
+     * In combination with `symbol-placement`, determines the rotation behavior of icons.
+     */
     @StringDef({
             ICON_ROTATION_ALIGNMENT_MAP,
             ICON_ROTATION_ALIGNMENT_VIEWPORT,
@@ -135,6 +147,9 @@ public abstract class Property<T> {
      */
     public static final String ICON_TEXT_FIT_BOTH = "both";
 
+    /**
+     * Scales the icon to fit around the associated text.
+     */
     @StringDef({
             ICON_TEXT_FIT_NONE,
             ICON_TEXT_FIT_WIDTH,
@@ -155,10 +170,13 @@ public abstract class Property<T> {
      */
     public static final String TEXT_PITCH_ALIGNMENT_VIEWPORT = "viewport";
     /**
-     * Automatically matches the value of `text-rotation-alignment`.
+     * Automatically matches the value of {@link TEXT_ROTATION_ALIGNMENT}.
      */
     public static final String TEXT_PITCH_ALIGNMENT_AUTO = "auto";
 
+    /**
+     * Orientation of text when map is pitched.
+     */
     @StringDef({
             TEXT_PITCH_ALIGNMENT_MAP,
             TEXT_PITCH_ALIGNMENT_VIEWPORT,
@@ -170,18 +188,21 @@ public abstract class Property<T> {
     //TEXT_ROTATION_ALIGNMENT: In combination with `symbol-placement`, determines the rotation behavior of the individual glyphs forming the text.
 
     /**
-     * When `symbol-placement` is set to `point`, aligns text east-west. When `symbol-placement` is set to `line`, aligns text x-axes with the line.
+     * When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_POINT}, aligns text east-west. When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_LINE}, aligns text x-axes with the line.
      */
     public static final String TEXT_ROTATION_ALIGNMENT_MAP = "map";
     /**
-     * Produces glyphs whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbol-placement`.
+     * Produces glyphs whose x-axes are aligned with the x-axis of the viewport, regardless of the value of {@link SYMBOL_PLACEMENT}.
      */
     public static final String TEXT_ROTATION_ALIGNMENT_VIEWPORT = "viewport";
     /**
-     * When `symbol-placement` is set to `point`, this is equivalent to `viewport`. When `symbol-placement` is set to `line`, this is equivalent to `map`.
+     * When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_POINT}, this is equivalent to {@link Property#TEXT_ROTATION_ALIGNMENT_VIEWPORT}. When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_LINE}, this is equivalent to {@link Property#TEXT_ROTATION_ALIGNMENT_MAP}.
      */
     public static final String TEXT_ROTATION_ALIGNMENT_AUTO = "auto";
 
+    /**
+     * In combination with `symbol-placement`, determines the rotation behavior of the individual glyphs forming the text.
+     */
     @StringDef({
             TEXT_ROTATION_ALIGNMENT_MAP,
             TEXT_ROTATION_ALIGNMENT_VIEWPORT,
@@ -205,6 +226,9 @@ public abstract class Property<T> {
      */
     public static final String TEXT_JUSTIFY_RIGHT = "right";
 
+    /**
+     * Text justification options.
+     */
     @StringDef({
             TEXT_JUSTIFY_LEFT,
             TEXT_JUSTIFY_CENTER,
@@ -252,6 +276,9 @@ public abstract class Property<T> {
      */
     public static final String TEXT_ANCHOR_BOTTOM_RIGHT = "bottom-right";
 
+    /**
+     * Part of the text placed closest to the anchor.
+     */
     @StringDef({
             TEXT_ANCHOR_CENTER,
             TEXT_ANCHOR_LEFT,
@@ -281,6 +308,9 @@ public abstract class Property<T> {
      */
     public static final String TEXT_TRANSFORM_LOWERCASE = "lowercase";
 
+    /**
+     * Specifies how to capitalize text, similar to the CSS `text-transform` property.
+     */
     @StringDef({
             TEXT_TRANSFORM_NONE,
             TEXT_TRANSFORM_UPPERCASE,
@@ -300,6 +330,9 @@ public abstract class Property<T> {
      */
     public static final String FILL_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
+    /**
+     * Controls the translation reference point.
+     */
     @StringDef({
             FILL_TRANSLATE_ANCHOR_MAP,
             FILL_TRANSLATE_ANCHOR_VIEWPORT,
@@ -318,6 +351,9 @@ public abstract class Property<T> {
      */
     public static final String LINE_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
+    /**
+     * Controls the translation reference point.
+     */
     @StringDef({
             LINE_TRANSLATE_ANCHOR_MAP,
             LINE_TRANSLATE_ANCHOR_VIEWPORT,
@@ -336,6 +372,9 @@ public abstract class Property<T> {
      */
     public static final String ICON_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
+    /**
+     * Controls the translation reference point.
+     */
     @StringDef({
             ICON_TRANSLATE_ANCHOR_MAP,
             ICON_TRANSLATE_ANCHOR_VIEWPORT,
@@ -354,6 +393,9 @@ public abstract class Property<T> {
      */
     public static final String TEXT_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
+    /**
+     * Controls the translation reference point.
+     */
     @StringDef({
             TEXT_TRANSLATE_ANCHOR_MAP,
             TEXT_TRANSLATE_ANCHOR_VIEWPORT,
@@ -372,6 +414,9 @@ public abstract class Property<T> {
      */
     public static final String CIRCLE_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
+    /**
+     * Controls the translation reference point.
+     */
     @StringDef({
             CIRCLE_TRANSLATE_ANCHOR_MAP,
             CIRCLE_TRANSLATE_ANCHOR_VIEWPORT,
@@ -390,6 +435,9 @@ public abstract class Property<T> {
      */
     public static final String CIRCLE_PITCH_SCALE_VIEWPORT = "viewport";
 
+    /**
+     * Controls the scaling behavior of the circle when the map is pitched.
+     */
     @StringDef({
             CIRCLE_PITCH_SCALE_MAP,
             CIRCLE_PITCH_SCALE_VIEWPORT,

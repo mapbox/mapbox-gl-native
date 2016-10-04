@@ -52,7 +52,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The opacity of the entire fill layer. In contrast to the `fillColor`, this value will also affect the 1px stroke around the fill, if the stroke is used.
+     * The opacity of the entire fill layer. In contrast to the {@link PropertyFactory#fillColor}, this value will also affect the 1px stroke around the fill, if the stroke is used.
      *
      * @param value a Float value
      * @return property wrapper around Float
@@ -62,7 +62,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The opacity of the entire fill layer. In contrast to the `fillColor`, this value will also affect the 1px stroke around the fill, if the stroke is used.
+     * The opacity of the entire fill layer. In contrast to the {@link PropertyFactory#fillColor}, this value will also affect the 1px stroke around the fill, if the stroke is used.
      *
      * @param function a wrapper function for Float
      * @return property wrapper around a Float function
@@ -102,7 +102,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The outline color of the fill. Matches the value of `fillColor` if unspecified.
+     * The outline color of the fill. Matches the value of {@link PropertyFactory#fillColor} if unspecified.
      *
      * @param value a int color value
      * @return property wrapper around String color
@@ -112,7 +112,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The outline color of the fill. Matches the value of `fillColor` if unspecified.
+     * The outline color of the fill. Matches the value of {@link PropertyFactory#fillColor} if unspecified.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -122,7 +122,7 @@ public class PropertyFactory {
     }
 
     /**
-     * The outline color of the fill. Matches the value of `fillColor` if unspecified.
+     * The outline color of the fill. Matches the value of {@link PropertyFactory#fillColor} if unspecified.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -1282,7 +1282,7 @@ public class PropertyFactory {
     }
 
     /**
-     * In combination with `symbolPlacement`, determines the rotation behavior of icons.
+     * In combination with {@link Property.SYMBOL_PLACEMENT}, determines the rotation behavior of icons.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1292,7 +1292,7 @@ public class PropertyFactory {
     }
 
     /**
-     * In combination with `symbolPlacement`, determines the rotation behavior of icons.
+     * In combination with {@link Property.SYMBOL_PLACEMENT}, determines the rotation behavior of icons.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -1342,7 +1342,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Size of the additional area added to dimensions determined by `iconTextFit`, in clockwise order: top, right, bottom, left.
+     * Size of the additional area added to dimensions determined by {@link Property.ICON_TEXT_FIT}, in clockwise order: top, right, bottom, left.
      *
      * @param value a Float[] value
      * @return property wrapper around Float[]
@@ -1352,7 +1352,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Size of the additional area added to dimensions determined by `iconTextFit`, in clockwise order: top, right, bottom, left.
+     * Size of the additional area added to dimensions determined by {@link Property.ICON_TEXT_FIT}, in clockwise order: top, right, bottom, left.
      *
      * @param function a wrapper function for Float[]
      * @return property wrapper around a Float[] function
@@ -1482,7 +1482,7 @@ public class PropertyFactory {
     }
 
     /**
-     * In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text.
+     * In combination with {@link Property.SYMBOL_PLACEMENT}, determines the rotation behavior of the individual glyphs forming the text.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1492,7 +1492,7 @@ public class PropertyFactory {
     }
 
     /**
-     * In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text.
+     * In combination with {@link Property.SYMBOL_PLACEMENT}, determines the rotation behavior of the individual glyphs forming the text.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
@@ -1742,7 +1742,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Specifies how to capitalize text, similar to the CSS `text-transform` property.
+     * Specifies how to capitalize text, similar to the CSS {@link PropertyFactory#textTransform} property.
      *
      * @param value a String value
      * @return property wrapper around String
@@ -1752,7 +1752,7 @@ public class PropertyFactory {
     }
 
     /**
-     * Specifies how to capitalize text, similar to the CSS `text-transform` property.
+     * Specifies how to capitalize text, similar to the CSS {@link PropertyFactory#textTransform} property.
      *
      * @param function a wrapper function for String
      * @return property wrapper around a String function
