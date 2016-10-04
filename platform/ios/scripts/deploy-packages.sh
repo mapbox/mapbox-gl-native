@@ -5,7 +5,9 @@ set -o pipefail
 set -u
 
 # dynamic environment variables:
+#     PUBLISH_VERSION={determined from tag}: Version string
 #     GITHUB_RELEASE=true: Upload to github
+#     BINARY_DIRECTORY=build/ios/deploy: Directory in which to save test packages
 
 # environment variables and dependencies: 
 #     - You must run "mbx auth ..." before running
@@ -50,10 +52,10 @@ export GITHUB_USER=mapbox
 export GITHUB_REPO=mapbox-gl-native
 export BUILDTYPE=Release
 
-PUBLISH_VERSION=
-BINARY_DIRECTORY='build/ios/deploy'
-PUBLISH_PRE_FLAG=''
+PUBLISH_VERSION=${PUBLISH_VERSION:-''}
+BINARY_DIRECTORY=${BINARY_DIRECTORY:-build/ios/deploy}
 GITHUB_RELEASE=${GITHUB_RELEASE:-true}
+PUBLISH_PRE_FLAG=''
 
 rm -rf ${BINARY_DIRECTORY}
 mkdir -p ${BINARY_DIRECTORY}
