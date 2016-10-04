@@ -101,7 +101,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
         // replacing existing coordinate(s)
         memcpy(_coordinates + range.location, coords, range.length * sizeof(CLLocationCoordinate2D));
     }
-    else if (NSMaxRange(range) > _count)
+    else
     {
         // appending new coordinate(s)
         NSUInteger newCount = NSMaxRange(range);
