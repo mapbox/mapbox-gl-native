@@ -11,7 +11,7 @@ set -u
 #     - You must run "mbx auth ..." before running
 #     - Set GITHUB_TOKEN to a GitHub API access token in your environment to use GITHUB_RELEASE
 #     - "wget" is required for downloading the zip files from s3
-#     - The "github-release" gem is required to use GITHUB_RELEASE
+#     - The "github-release" command is required to use GITHUB_RELEASE
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
@@ -60,6 +60,15 @@ mkdir -p ${BINARY_DIRECTORY}
 
 if [[ ${GITHUB_RELEASE} = "true" ]]; then
     GITHUB_RELEASE=true # Assign bool, not just a string
+
+    if [[ -z `which github-release` ]]; then
+        step "Installing github-release…"
+        brew install github-release
+        if [ -z `which github-release` ]; then
+            echo "Unable to install github-release. See: https://github.com/aktau/github-release"
+            exit 1
+        fi
+    fi
 fi
 
 if [[ -z ${PUBLISH_VERSION} ]]; then
