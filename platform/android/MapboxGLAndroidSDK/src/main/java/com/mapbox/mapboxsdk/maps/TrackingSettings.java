@@ -181,7 +181,7 @@ public class TrackingSettings {
     }
 
     /**
-     * Is bearing tracking disabled?
+     * Returns if bearing tracking disabled
      *
      * @return True if bearing tracking is disabled.
      */
@@ -190,26 +190,23 @@ public class TrackingSettings {
     }
 
     /**
-     *  Is the map currently in a state where rotate gestures are recognised?
-     *  This requires both that the user interface has such gestures enabled,
-     *  and that they are not currently blocked by a bearing tracking mode.
+     * Returns if rotate gesture are currently enabled.
+     *
+     * @return True if rotate gestures are currently enabled.
      */
-
     public boolean isRotateGestureCurrentlyEnabled() {
         // rotate gestures are recognised if:
         //    The user settings are enabled AND;
         //    EITHER bearing tracking is dismissed on gesture OR there is no bearing tracking
-
         return uiSettings.isRotateGesturesEnabled() &&
                 (dismissBearingTrackingOnGesture || myBearingTrackingMode == MyBearingTracking.NONE);
     }
 
     /**
-     *  Is the map currently in a state where scroll gestures are recognised?
-     *  This requires both that the user interface has such gestures enabled,
-     *  and that they are not currently blocked by a location tracking mode.
+     * Returns if scroll gesture are currently enabled.
+     *
+     * @return True if scroll gestures are currently enabled.
      */
-
     public boolean isScrollGestureCurrentlyEnabled() {
         return uiSettings.isScrollGesturesEnabled() &&
                 (dismissLocationTrackingOnGesture || myLocationTrackingMode == MyLocationTracking.TRACKING_NONE);

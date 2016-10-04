@@ -293,7 +293,7 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity
     }
 
     private void setCheckBoxes() {
-        if(mapboxMap != null && dismissBearingTrackingOnGestureItem != null) {
+        if (mapboxMap != null && dismissBearingTrackingOnGestureItem != null) {
             TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
             UiSettings uiSettings = mapboxMap.getUiSettings();
             dismissBearingTrackingOnGestureItem.setChecked(trackingSettings.isDismissBearingTrackingOnGesture());

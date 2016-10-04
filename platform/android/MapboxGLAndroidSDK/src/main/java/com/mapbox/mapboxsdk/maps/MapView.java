@@ -2052,8 +2052,9 @@ public class MapView extends FrameLayout {
         // Called when two fingers first touch the screen
         @Override
         public boolean onRotateBegin(RotateGestureDetector detector) {
-            if (destroyed || !mapboxMap.getTrackingSettings().isRotateGestureCurrentlyEnabled())
+            if (destroyed || !mapboxMap.getTrackingSettings().isRotateGestureCurrentlyEnabled()) {
                 return false;
+            }
 
             beginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_ROTATION_START, detector.getFocusX(), detector.getFocusY());
@@ -2072,10 +2073,7 @@ public class MapView extends FrameLayout {
         // Called for rotation
         @Override
         public boolean onRotate(RotateGestureDetector detector) {
-            if (destroyed || !mapboxMap.getTrackingSettings().isRotateGestureCurrentlyEnabled())
-                return false;
-
-            if (dragStarted) {
+            if (destroyed || !mapboxMap.getTrackingSettings().isRotateGestureCurrentlyEnabled() || dragStarted) {
                 return false;
             }
 
@@ -2648,14 +2646,17 @@ public class MapView extends FrameLayout {
         TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
 
         // if tracking is on, and we should dismiss tracking with gestures, and this is a scroll action, turn tracking off
-        if (translate && !trackingSettings.isLocationTrackingDisabled() && trackingSettings.isDismissLocationTrackingOnGesture())
+        if (translate && !trackingSettings.isLocationTrackingDisabled() && trackingSettings.isDismissLocationTrackingOnGesture()) {
             resetLocationTrackingMode();
-        // reset bearing tracking only on  rotate
-        if (rotate && !trackingSettings.isBearingTrackingDisabled() && trackingSettings.isDismissBearingTrackingOnGesture())
+        }
+
+        // reset bearing tracking only on rotate
+        if (rotate && !trackingSettings.isBearingTrackingDisabled() && trackingSettings.isDismissBearingTrackingOnGesture()) {
             resetBearingTrackingMode();
+        }
     }
 
-    void resetTrackingModesIfRequired(CameraPosition cameraPosition ) {
+    void resetTrackingModesIfRequired(CameraPosition cameraPosition) {
         resetTrackingModesIfRequired(cameraPosition.target != null, cameraPosition.bearing != -1);
     }
 

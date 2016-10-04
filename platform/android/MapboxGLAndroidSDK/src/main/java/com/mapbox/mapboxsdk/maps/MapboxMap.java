@@ -435,6 +435,7 @@ public class MapboxMap {
      * will return the current location of the camera in flight.
      * <p>
      * Note that this will cancel location tracking mode if enabled.
+     * </p>
      *
      * @param update     The change that should be applied to the camera.
      * @param durationMs The duration of the animation in milliseconds. This must be strictly
@@ -460,18 +461,18 @@ public class MapboxMap {
     public final void easeCamera(
             CameraUpdate update, int durationMs, boolean easingInterpolator, final MapboxMap.CancelableCallback callback) {
         // dismiss tracking, moving camera is equal to a gesture
-        CameraPosition cameraPosition = update.getCameraPosition(this);
-        mapView.resetTrackingModesIfRequired(cameraPosition);
-        easeCameraInternal(cameraPosition, durationMs, easingInterpolator, callback);
+        easeCamera(update, durationMs, easingInterpolator, true, callback);
     }
 
-    /**
-     * Internal use only.
-     * Used by tracking actions.
-     */
     @UiThread
-    public final void easeCameraInternal(
-            CameraPosition cameraPosition, int durationMs, boolean easingInterpolator, final MapboxMap.CancelableCallback callback) {
+    public final void easeCamera(
+            CameraUpdate update, int durationMs, boolean easingInterpolator, boolean resetTrackingMode, final MapboxMap.CancelableCallback callback) {
+        // dismiss tracking, moving camera is equal to a gesture
+        cameraPosition = update.getCameraPosition(this);
+        if (resetTrackingMode) {
+            mapView.resetTrackingModesIfRequired(cameraPosition);
+        }
+
         mapView.easeTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
                 cameraPosition.zoom, easingInterpolator, new CancelableCallback() {
                     @Override

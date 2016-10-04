@@ -464,7 +464,7 @@ public class MyLocationView extends View {
         if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW && location != null) {
             // center map directly if we have a location fix
             myLocationBehavior.updateLatLng(location);
-            mapboxMap.easeCameraInternal(CameraUpdateFactory.newLatLng(new LatLng(location)).getCameraPosition(mapboxMap), 0, false, null);
+            mapboxMap.easeCamera(CameraUpdateFactory.newLatLng(new LatLng(location)), 0, false /*linear interpolator*/, false /*do not disable tracking*/, null);
         }
         this.myLocationTrackingMode = myLocationTrackingMode;
         invalidate();
@@ -586,7 +586,7 @@ public class MyLocationView extends View {
         private void rotateCamera() {
             CameraPosition.Builder builder = new CameraPosition.Builder();
             builder.bearing(currentDegree);
-            mapboxMap.easeCameraInternal(CameraUpdateFactory.newCameraPosition(builder.build()).getCameraPosition(mapboxMap), COMPASS_UPDATE_RATE_MS, false /*linear interpolator*/, null);
+            mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), COMPASS_UPDATE_RATE_MS, false /*linear interpolator*/, false /*do not disable tracking*/, null);
         }
 
         @Override
@@ -702,7 +702,7 @@ public class MyLocationView extends View {
             updateAccuracy(location);
 
             // ease to new camera position with a linear interpolator
-            mapboxMap.easeCameraInternal(CameraUpdateFactory.newCameraPosition(builder.build()).getCameraPosition(mapboxMap), (int) locationUpdateDuration, false /*linear interpolator*/, null);
+            mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), (int) locationUpdateDuration, false /*linear interpolator*/, false /*do not disable tracking*/, null);
         }
 
         @Override
@@ -765,8 +765,9 @@ public class MyLocationView extends View {
 
         @Override
         void invalidate() {
-            if(latLng != null)
+            if (latLng != null) {
                 screenLocation = projection.toScreenLocation(latLng);
+            }
             MyLocationView.this.invalidate();
         }
     }
