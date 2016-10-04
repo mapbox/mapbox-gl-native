@@ -47,8 +47,6 @@ NS_ASSUME_NONNULL_BEGIN
  Updates one or more coordinates for the shape, which will instantaneously 
  cause the shape to be redrawn if it is currently visible on the map.
  
- @param coords The array of coordinates defining the shape. The data in this
- array is copied to the object.
  @param range The range of points to update. The `location` field indicates the
  first point you are replacing, with `0` being the first point, `1` being
  the second point, and so on. The `length` field indicates the number of
@@ -56,8 +54,10 @@ NS_ASSUME_NONNULL_BEGIN
  by specifying a range with a `location` at the end of the existing array 
  and/or a `length` which extends past the end of the existing array. The array 
  in _`coords`_ must be equal in number to the length of the range.
+ @param coords The array of coordinates defining the shape. The data in this
+ array is copied to the object.
  */
-- (void)setCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range;
+- (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(CLLocationCoordinate2D *)coords;
 
 @end
 

@@ -88,7 +88,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
     }
 }
 
-- (void)setCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range
+- (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(CLLocationCoordinate2D *)coords
 {
     if (coords == _coordinates)
     {
