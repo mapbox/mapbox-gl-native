@@ -8,6 +8,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Label placement relative to its geometry.
+ 
+ Values of this type are used in the `symbolPlacement` property of `MGLSymbolStyleLayer`.
  */
 typedef NS_ENUM(NSUInteger, MGLSymbolPlacement) {
     /**
@@ -22,6 +24,8 @@ typedef NS_ENUM(NSUInteger, MGLSymbolPlacement) {
 
 /**
  In combination with `symbolPlacement`, determines the rotation behavior of icons.
+ 
+ Values of this type are used in the `iconRotationAlignment` property of `MGLSymbolStyleLayer`.
  */
 typedef NS_ENUM(NSUInteger, MGLIconRotationAlignment) {
     /**
@@ -40,6 +44,8 @@ typedef NS_ENUM(NSUInteger, MGLIconRotationAlignment) {
 
 /**
  Scales the icon to fit around the associated text.
+ 
+ Values of this type are used in the `iconTextFit` property of `MGLSymbolStyleLayer`.
  */
 typedef NS_ENUM(NSUInteger, MGLIconTextFit) {
     /**
@@ -62,6 +68,8 @@ typedef NS_ENUM(NSUInteger, MGLIconTextFit) {
 
 /**
  Orientation of text when map is pitched.
+ 
+ Values of this type are used in the `textPitchAlignment` property of `MGLSymbolStyleLayer`.
  */
 typedef NS_ENUM(NSUInteger, MGLTextPitchAlignment) {
     /**
@@ -80,6 +88,8 @@ typedef NS_ENUM(NSUInteger, MGLTextPitchAlignment) {
 
 /**
  In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text.
+ 
+ Values of this type are used in the `textRotationAlignment` property of `MGLSymbolStyleLayer`.
  */
 typedef NS_ENUM(NSUInteger, MGLTextRotationAlignment) {
     /**
@@ -98,6 +108,8 @@ typedef NS_ENUM(NSUInteger, MGLTextRotationAlignment) {
 
 /**
  Text justification options.
+ 
+ Values of this type are used in the `textJustify` property of `MGLSymbolStyleLayer`.
  */
 typedef NS_ENUM(NSUInteger, MGLTextJustify) {
     /**
@@ -116,6 +128,8 @@ typedef NS_ENUM(NSUInteger, MGLTextJustify) {
 
 /**
  Part of the text placed closest to the anchor.
+ 
+ Values of this type are used in the `textAnchor` property of `MGLSymbolStyleLayer`.
  */
 typedef NS_ENUM(NSUInteger, MGLTextAnchor) {
     /**
@@ -158,6 +172,8 @@ typedef NS_ENUM(NSUInteger, MGLTextAnchor) {
 
 /**
  Specifies how to capitalize text, similar to the CSS `text-transform` property.
+ 
+ Values of this type are used in the `textTransform` property of `MGLSymbolStyleLayer`.
  */
 typedef NS_ENUM(NSUInteger, MGLTextTransform) {
     /**
@@ -176,6 +192,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTransform) {
 
 /**
  Controls the translation reference point.
+ 
+ Values of this type are used in the `iconTranslateAnchor` property of `MGLSymbolStyleLayer`.
  */
 typedef NS_ENUM(NSUInteger, MGLIconTranslateAnchor) {
     /**
@@ -190,6 +208,8 @@ typedef NS_ENUM(NSUInteger, MGLIconTranslateAnchor) {
 
 /**
  Controls the translation reference point.
+ 
+ Values of this type are used in the `textTranslateAnchor` property of `MGLSymbolStyleLayer`.
  */
 typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
     /**
