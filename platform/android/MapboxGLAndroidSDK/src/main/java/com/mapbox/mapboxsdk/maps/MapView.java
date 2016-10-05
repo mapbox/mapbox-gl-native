@@ -444,7 +444,11 @@ public class MapView extends FrameLayout {
               savedInstanceState.getInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
             //noinspection ResourceType
             trackingSettings.setMyBearingTrackingMode(
-              savedInstanceState.getInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
+                    savedInstanceState.getInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
+            trackingSettings.setDismissLocationTrackingOnGesture(
+                    savedInstanceState.getBoolean(MapboxConstants.STATE_MY_LOCATION_TRACKING_DISMISS, true));
+            trackingSettings.setDismissBearingTrackingOnGesture(
+                    savedInstanceState.getBoolean(MapboxConstants.STATE_MY_BEARING_TRACKING_DISMISS, true));
         } else if (savedInstanceState == null) {
             // Start Telemetry (authorization determined in initial MapboxEventManager constructor)
             Log.i(MapView.class.getCanonicalName(), "MapView start Telemetry...");
@@ -517,6 +521,8 @@ public class MapView extends FrameLayout {
         TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
         outState.putInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, trackingSettings.getMyLocationTrackingMode());
         outState.putInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, trackingSettings.getMyBearingTrackingMode());
+        outState.putBoolean(MapboxConstants.STATE_MY_LOCATION_TRACKING_DISMISS, trackingSettings.isDismissLocationTrackingOnGesture());
+        outState.putBoolean(MapboxConstants.STATE_MY_BEARING_TRACKING_DISMISS, trackingSettings.isDismissBearingTrackingOnGesture());
 
         // UiSettings
         UiSettings uiSettings = mapboxMap.getUiSettings();
@@ -1822,7 +1828,7 @@ public class MapView extends FrameLayout {
                     (tapPoint.y - averageIconHeight / 2 - toleranceTopBottom) / screenDensity,
                     (tapPoint.x + averageIconWidth / 2 + toleranceSides) / screenDensity,
                     (tapPoint.y + averageIconHeight / 2 + toleranceTopBottom) / screenDensity);
-            
+
             List<Marker> nearbyMarkers = getMarkersInRect(tapRect);
             long newSelectedMarkerId = -1;
 
@@ -1890,12 +1896,11 @@ public class MapView extends FrameLayout {
         // Called for flings
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            if (destroyed || !mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+            if (destroyed || !mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                 return false;
             }
 
-            // reset tracking modes if gesture occurs
-            resetTrackingModesIfRequired();
+            resetTrackingModesIfRequired(true, false);
 
             // Fling the map
             float ease = 0.25f;
@@ -1927,7 +1932,7 @@ public class MapView extends FrameLayout {
             if (!scrollInProgress) {
                 scrollInProgress = true;
             }
-            if (destroyed || !mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+            if (destroyed || !mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                 return false;
             }
 
@@ -1937,9 +1942,8 @@ public class MapView extends FrameLayout {
 
             requestDisallowInterceptTouchEvent(true);
 
-            // reset tracking modes if gesture occurs
-            resetTrackingModesIfRequired();
-
+            // reset tracking if needed
+            resetTrackingModesIfRequired(true, false);
             // Cancel any animation
             nativeMapView.cancelTransitions();
 
@@ -1966,9 +1970,6 @@ public class MapView extends FrameLayout {
             if (destroyed || !mapboxMap.getUiSettings().isZoomGesturesEnabled()) {
                 return false;
             }
-
-            // reset tracking modes if gesture occurs
-            resetTrackingModesIfRequired();
 
             beginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_PINCH_START, detector.getFocusX(), detector.getFocusY());
@@ -2020,6 +2021,11 @@ public class MapView extends FrameLayout {
             // Gesture is a quickzoom if there aren't two fingers
             quickZoom = !twoTap;
 
+            // make an assumption here; if the zoom center is specified by the gesture, it's NOT going
+            // to be in the center of the map. Therefore the zoom will translate the map center, so tracking
+            // should be disabled.
+
+            resetTrackingModesIfRequired(!quickZoom, false);
             // Scale the map
             if (focalPoint != null) {
                 // arround user provided focal point
@@ -2046,12 +2052,8 @@ public class MapView extends FrameLayout {
         // Called when two fingers first touch the screen
         @Override
         public boolean onRotateBegin(RotateGestureDetector detector) {
-            if (destroyed || !mapboxMap.getUiSettings().isRotateGesturesEnabled()) {
+            if (destroyed || !mapboxMap.getTrackingSettings().isRotateGestureCurrentlyEnabled())
                 return false;
-            }
-
-            // reset tracking modes if gesture occurs
-            resetTrackingModesIfRequired();
 
             beginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_ROTATION_START, detector.getFocusX(), detector.getFocusY());
@@ -2070,9 +2072,8 @@ public class MapView extends FrameLayout {
         // Called for rotation
         @Override
         public boolean onRotate(RotateGestureDetector detector) {
-            if (destroyed || !mapboxMap.getUiSettings().isRotateGesturesEnabled()) {
+            if (destroyed || !mapboxMap.getTrackingSettings().isRotateGestureCurrentlyEnabled())
                 return false;
-            }
 
             if (dragStarted) {
                 return false;
@@ -2099,6 +2100,11 @@ public class MapView extends FrameLayout {
 
             // Cancel any animation
             nativeMapView.cancelTransitions();
+
+            // rotation constitutes translation of anything except the center of
+            // rotation, so cancel both location and bearing tracking if required
+
+            resetTrackingModesIfRequired(true, true);
 
             // Get rotate value
             double bearing = nativeMapView.getBearing();
@@ -2129,9 +2135,6 @@ public class MapView extends FrameLayout {
             if (!mapboxMap.getUiSettings().isTiltGesturesEnabled()) {
                 return false;
             }
-
-            // reset tracking modes if gesture occurs
-            resetTrackingModesIfRequired();
 
             beginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_PITCH_START, detector.getFocusX(), detector.getFocusY());
@@ -2234,7 +2237,7 @@ public class MapView extends FrameLayout {
                 return true;
 
             case KeyEvent.KEYCODE_DPAD_LEFT:
-                if (!mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+                if (!mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                     return false;
                 }
 
@@ -2246,7 +2249,7 @@ public class MapView extends FrameLayout {
                 return true;
 
             case KeyEvent.KEYCODE_DPAD_RIGHT:
-                if (!mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+                if (!mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                     return false;
                 }
 
@@ -2258,7 +2261,7 @@ public class MapView extends FrameLayout {
                 return true;
 
             case KeyEvent.KEYCODE_DPAD_UP:
-                if (!mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+                if (!mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                     return false;
                 }
 
@@ -2270,7 +2273,7 @@ public class MapView extends FrameLayout {
                 return true;
 
             case KeyEvent.KEYCODE_DPAD_DOWN:
-                if (!mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+                if (!mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                     return false;
                 }
 
@@ -2350,7 +2353,7 @@ public class MapView extends FrameLayout {
         switch (event.getActionMasked()) {
             // The trackball was rotated
             case MotionEvent.ACTION_MOVE:
-                if (!mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+                if (!mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                     return false;
                 }
 
@@ -2634,14 +2637,26 @@ public class MapView extends FrameLayout {
                 ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    void resetTrackingModesIfRequired() {
+    /**
+     * Reset the tracking modes as necessary. Location tracking is reset if the map center is changed,
+     * bearing tracking if there is a rotation.
+     *
+     * @param translate
+     * @param rotate
+     */
+    void resetTrackingModesIfRequired(boolean translate, boolean rotate) {
         TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
-        if (trackingSettings.isDismissLocationTrackingOnGesture()) {
+
+        // if tracking is on, and we should dismiss tracking with gestures, and this is a scroll action, turn tracking off
+        if (translate && !trackingSettings.isLocationTrackingDisabled() && trackingSettings.isDismissLocationTrackingOnGesture())
             resetLocationTrackingMode();
-        }
-        if (trackingSettings.isDismissBearingTrackingOnGesture()) {
+        // reset bearing tracking only on  rotate
+        if (rotate && !trackingSettings.isBearingTrackingDisabled() && trackingSettings.isDismissBearingTrackingOnGesture())
             resetBearingTrackingMode();
-        }
+    }
+
+    void resetTrackingModesIfRequired(CameraPosition cameraPosition ) {
+        resetTrackingModesIfRequired(cameraPosition.target != null, cameraPosition.bearing != -1);
     }
 
     private void resetLocationTrackingMode() {

@@ -4,7 +4,7 @@
 
     <group android:checkableBehavior="all">
         <item
-            android:id="@+id/action_toggle_dismissible_tracking"
+            android:id="@+id/action_toggle_dismissible_location"
             android:checkable="true"
             android:checked="false"
             android:title="@string/menuitem_title_tracking_mode_dismiss_on_gesture"
@@ -14,6 +14,18 @@
             android:checkable="true"
             android:checked="false"
             android:title="@string/menuitem_title_bearing_mode_dismiss_on_gesture"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_toggle_rotate_gesture_enabled"
+            android:checkable="true"
+            android:checked="false"
+            android:title="@string/menuitem_title_rotate_gesture_enabled"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_toggle_scroll_gesture_enabled"
+            android:checkable="true"
+            android:checked="false"
+            android:title="@string/menuitem_title_scroll_gesture_enabled"
             app:showAsAction="never" />
     </group>
 
