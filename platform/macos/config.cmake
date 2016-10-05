@@ -3,6 +3,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
 mason_use(glfw VERSION 3.2.1)
 mason_use(boost_libprogram_options VERSION 1.60.0)
 mason_use(gtest VERSION 1.7.0${MASON_CXXABI_SUFFIX})
+mason_use(benchmark VERSION 1.0.0)
 
 include(cmake/loop-darwin.cmake)
 
@@ -112,6 +113,27 @@ macro(mbgl_platform_test)
     )
 endmacro()
 
+macro(mbgl_platform_benchmark)
+    target_sources(mbgl-benchmark
+        PRIVATE benchmark/src/main.cpp
+    )
+
+    set_source_files_properties(
+        benchmark/src/main.cpp
+            PROPERTIES
+        COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
+    )
+
+    target_link_libraries(mbgl-benchmark
+        PRIVATE mbgl-loop
+        PRIVATE "-framework Foundation"
+        PRIVATE "-framework CoreGraphics"
+        PRIVATE "-framework OpenGL"
+        PRIVATE "-framework ImageIO"
+        PRIVATE "-framework CoreServices"
+        PRIVATE "-lsqlite3"
+    )
+endmacro()
 
 macro(mbgl_platform_node)
     target_link_libraries(mbgl-node

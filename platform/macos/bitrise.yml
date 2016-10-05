@@ -43,6 +43,16 @@ workflows:
             make xproj
         - is_debug: 'yes'
     - script:
+        title: Build Benchmark Tests
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -eu -o pipefail
+            export BUILDTYPE=Debug
+            make benchmark
+        - is_debug: 'yes'
+    - script:
         title: Run Core Tests
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
