@@ -9,6 +9,10 @@
 namespace mbgl {
 
 void Log::platformRecord(EventSeverity severity, const std::string &msg) {
+#ifdef NDEBUG
+    (void) severity;
+    (void) msg;
+#else
     std::stringstream logStream;
 
     logStream << "[" << Enum<EventSeverity>::toString(severity) << "] " << msg << std::endl;
@@ -18,6 +22,7 @@ void Log::platformRecord(EventSeverity severity, const std::string &msg) {
         fprintf(file, "%s", logStream.str().c_str());
         fclose(file);
     }
+#endif
 }
 
 } // namespace mbgl
