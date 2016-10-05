@@ -10,16 +10,25 @@
  */
 @interface MGLSource : NSObject
 
-/**
- A string that uniquely identifies the source.
- */
-@property (nonatomic, copy) NSString *sourceIdentifier;
+#pragma mark Initializing a Source
 
 /**
- Initializes a source with the given identifier.
-
- @param sourceIdentifier A string that uniquely identifies the source.
+ Returns a source initialized with an identifier.
+ 
+ After initializing and configuring the source, add it to a map view’s style
+ using the `-[MGLStyle addSource:]` method.
+ 
+ @param identifier A string that uniquely identifies the source in the style to
+    which it is added.
+ @return An initialized source.
  */
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier;
+- (instancetype)initWithIdentifier:(NSString *)identifier;
+
+#pragma mark Identifying a Source
+
+/**
+ A string that uniquely identifies the source in the style to which it is added.
+ */
+@property (nonatomic, copy) NSString *identifier;
 
 @end

@@ -8,18 +8,18 @@
 
 @implementation MGLRasterSource
 
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url tileSize:(CGFloat)tileSize
+- (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url tileSize:(CGFloat)tileSize
 {
-    if (self = [super initWithSourceIdentifier:sourceIdentifier]) {
+    if (self = [super initWithIdentifier:identifier]) {
         _URL = url;
         _tileSize = tileSize;
     }
     return self;
 }
 
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier tileSet:(MGLTileSet *)tileSet tileSize:(CGFloat)tileSize;
+- (instancetype)initWithIdentifier:(NSString *)identifier tileSet:(MGLTileSet *)tileSet tileSize:(CGFloat)tileSize;
 {
-    if (self = [super initWithSourceIdentifier:sourceIdentifier])
+    if (self = [super initWithIdentifier:identifier])
     {
         _tileSet = tileSet;
         _tileSize = tileSize;
@@ -33,13 +33,13 @@
     
     if (self.URL)
     {
-        source = std::make_unique<mbgl::style::RasterSource>(self.sourceIdentifier.UTF8String,
+        source = std::make_unique<mbgl::style::RasterSource>(self.identifier.UTF8String,
                                                              self.URL.mgl_URLByStandardizingScheme.absoluteString.UTF8String,
                                                              uint16_t(self.tileSize));
     }
     else
     {
-        source = std::make_unique<mbgl::style::RasterSource>(self.sourceIdentifier.UTF8String,
+        source = std::make_unique<mbgl::style::RasterSource>(self.identifier.UTF8String,
                                                              self.tileSet.mbglTileset,
                                                              uint16_t(self.tileSize));
         

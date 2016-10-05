@@ -12,35 +12,18 @@
 @interface MGLBackgroundStyleLayer ()
 
 @property (nonatomic) mbgl::style::BackgroundLayer *layer;
-@property (nonatomic, readwrite) NSString *layerIdentifier;
-@property (nonatomic, readwrite) NSString *sourceIdentifier;
-@property (nonatomic, readwrite) NSString *sourceLayerIdentifier;
 
 @end
 
 @implementation MGLBackgroundStyleLayer
 
-@synthesize mapView;
-
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier
+- (instancetype)initWithIdentifier:(NSString *)identifier
 {
-    if (self = [super init]) {
-        _layerIdentifier = layerIdentifier;
-        _layer = new mbgl::style::BackgroundLayer(layerIdentifier.UTF8String);
+    if (self = [super initWithIdentifier:identifier]) {
+        _layer = new mbgl::style::BackgroundLayer(identifier.UTF8String);
     }
     return self;
 }
-
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source
-{
-    if (self = [super init]) {
-        _layerIdentifier = layerIdentifier;
-        _sourceIdentifier = source.sourceIdentifier;
-        _layer = new mbgl::style::BackgroundLayer(layerIdentifier.UTF8String);
-    }
-    return self;
-}
-
 
 #pragma mark - Accessing the Paint Attributes
 

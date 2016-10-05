@@ -211,20 +211,12 @@ global.propertyType = function (property, _private) {
     return _private ? `id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>` : `id <MGLStyleAttributeValue>`;
 };
 
-global.initLayerIdentifierOnly = function (layerType) {
-    return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String);`
-}
-
 global.initLayer = function (layerType) {
     if (layerType == "background") {
-       return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String);`
+       return `_layer = new mbgl::style::${camelize(layerType)}Layer(identifier.UTF8String);`
     } else {
-        return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String, source.sourceIdentifier.UTF8String);`
+        return `_layer = new mbgl::style::${camelize(layerType)}Layer(identifier.UTF8String, source.identifier.UTF8String);`
     }
-}
-
-global.initLayerWithSourceLayer = function(layerType) {
-    return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String, source.sourceIdentifier.UTF8String);`
 }
 
 global.setSourceLayer = function() {

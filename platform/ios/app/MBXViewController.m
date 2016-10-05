@@ -677,10 +677,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 - (void)styleRasterLayer
 {
     NSURL *rasterURL = [NSURL URLWithString:@"mapbox://mapbox.satellite"];
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithSourceIdentifier:@"my-raster-source" URL:rasterURL tileSize:512];
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"my-raster-source" URL:rasterURL tileSize:512];
     [self.mapView.style addSource:rasterSource];
 
-    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerIdentifier:@"my-raster-layer" source:rasterSource];
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"my-raster-layer" source:rasterSource];
     MGLStyleAttributeFunction *opacityFunction = [[MGLStyleAttributeFunction alloc] init];
     opacityFunction.stops = @{@20.0f: @1.0f,
                               @5.0f: @0.0f};
@@ -692,10 +692,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 {
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"ams" URL:geoJSONURL options:nil];
     [self.mapView.style addSource:source];
 
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" source:source];
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"test" source:source];
     fillLayer.fillColor = [UIColor purpleColor];
     [self.mapView.style addLayer:fillLayer];
 }

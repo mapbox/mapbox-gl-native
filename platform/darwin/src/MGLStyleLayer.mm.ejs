@@ -17,51 +17,41 @@
 @interface MGL<%- camelize(type) %>StyleLayer ()
 
 @property (nonatomic) mbgl::style::<%- camelize(type) %>Layer *layer;
-@property (nonatomic, readwrite) NSString *layerIdentifier;
-@property (nonatomic, readwrite) NSString *sourceIdentifier;
-@property (nonatomic, readwrite) NSString *sourceLayerIdentifier;
 
 @end
 
 @implementation MGL<%- camelize(type) %>StyleLayer
 
-@synthesize mapView;
-
 <% if (type == 'background') { -%>
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier
+- (instancetype)initWithIdentifier:(NSString *)identifier
 {
-    if (self = [super init]) {
-        _layerIdentifier = layerIdentifier;
-        <%- initLayerIdentifierOnly(type) %>
+    if (self = [super initWithIdentifier:identifier]) {
+        _layer = new mbgl::style::<%- camelize(type) %>Layer(identifier.UTF8String);
     }
     return self;
 }
-<% } -%>
-
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source
+<% } else { -%>
+- (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source
 {
-    if (self = [super init]) {
-        _layerIdentifier = layerIdentifier;
-        _sourceIdentifier = source.sourceIdentifier;
-        <%- initLayer(type) %>
-    }
-    return self;
-}
-
-<% if (type !== 'background' && type !== 'raster') { -%>
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source sourceLayer:(NSString *)sourceLayer
-{
-    if (self = [super init]) {
-        _layerIdentifier = layerIdentifier;
-        _sourceIdentifier = source.sourceIdentifier;
-        <%- initLayerWithSourceLayer(type) %>
-        <%- setSourceLayer() %>
+    if (self = [super initWithIdentifier:identifier source:source]) {
+        _layer = new mbgl::style::<%- camelize(type) %>Layer(identifier.UTF8String, source.identifier.UTF8String);
     }
     return self;
 }
 <% } -%>
 
 <% if (type !== 'background' && type !== 'raster') { -%>
+- (NSString *)sourceLayerIdentifier
+{
+    auto layerID = self.layer->getSourceLayer();
+    return layerID.empty() ? nil : @(layerID.c_str());
+}
+
+- (void)setSourceLayerIdentifier:(NSString *)sourceLayerIdentifier
+{
+    self.layer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
+}
+
 - (void)setPredicate:(NSPredicate *)predicate
 {
     self.layer->setFilter(predicate.mgl_filter);

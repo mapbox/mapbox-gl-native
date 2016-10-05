@@ -15,9 +15,49 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MGLRasterSource : MGLSource
 
+#pragma mark Initializing a Source
+
 /**
- A URL to a TileJSON resource. Supported protocols are `http:`, `https:`, and 
- `mapbox://<mapid>`.
+ Returns a raster source initialized with an identifier, TileJSON configuration
+ URL, and tile size.
+ 
+ After initializing and configuring the source, add it to a map view’s style
+ using the `-[MGLStyle addSource:]` method.
+ 
+ @param identifier A string that uniquely identifies the source in the style to
+    which it is added.
+ @param url A URL to a TileJSON configuration file describing the source’s
+    contents and other metadata.
+ @param tileSize The height and width (measured in points) at which to display
+    each tile in this source when the map’s zoom level is an integer.
+ @return An initialized raster source.
+ */
+- (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url tileSize:(CGFloat)tileSize NS_DESIGNATED_INITIALIZER;
+
+/**
+ Returns a raster source initialized with the given identifier, tile size, and
+ tile set.
+ 
+ After initializing and configuring the source, add it to a map view’s style
+ using the `-[MGLStyle addSource:]` method.
+
+ @param identifier A string that uniquely identifies the source in the style to
+    which it is added.
+ @param tileSet A tile set describing the source’s contents and other metadata.
+ @param tileSize The height and width (measured in points) at which to display
+    each tile in this source when the map’s zoom level is an integer.
+ @return An initialized raster source.
+ */
+- (instancetype)initWithIdentifier:(NSString *)identifier tileSet:(MGLTileSet *)tileSet tileSize:(CGFloat)tileSize NS_DESIGNATED_INITIALIZER;
+
+#pragma mark Accessing a Source’s Content
+
+/**
+ A URL to a TileJSON configuration file describing the source’s contents and
+ other metadata.
+ 
+ The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the tile
+ set’s map ID (`mapbox://<mapid>`).
  
  @see <a href="https://www.mapbox.com/help/an-open-platform/#tilejson">The 
  TileJSON specification.</a>
@@ -25,8 +65,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy) NSURL *URL;
 
 /**
- The minimum visual size to display tiles for this source. Units in pixels. 
- Defaults to `512` on each tile side.
+ The height and width (measured in points) at which to display each tile in this
+ source when the map’s zoom level is an integer.
+ 
+ A tile may be scaled up or down when the zoom level is between two integers.
+ 
+ The default value of this property is 512 points.
  */
 @property (nonatomic, readonly, assign) NSUInteger tileSize;
 
@@ -39,26 +83,6 @@ NS_ASSUME_NONNULL_BEGIN
  from ordinary web URLs.
  */
 @property (nonatomic, readonly, nullable) MGLTileSet *tileSet;
-
-/**
- Initializes a source with the given identifier, TileJSON configuration
- URL, and tile size.
-
- @param sourceIdentifier A string that uniquely identifies the source.
- @param url A URL to a TileJSON resource.
- @param tileSize The minimum visual size to display tiles for the source.
- */
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url tileSize:(CGFloat)tileSize;
-
-/**
- Initializes a source with the given identifier, tile size, and tile 
- URL template set.
-
- @param sourceIdentifier A string that uniquely identifies the source.
- @param tileSet A tile set describing where to download tiles.
- @param tileSize The minimum visual size to display tiles for the source.
- */
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier tileSet:(MGLTileSet *)tileSet tileSize:(CGFloat)tileSize;
 
 @end
 

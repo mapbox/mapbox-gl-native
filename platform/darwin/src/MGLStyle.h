@@ -178,42 +178,43 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  Returns a layer that conforms to `MGLStyleLayer` if any layer with the given
  identifier was found.
  
- @return layer A layer instance of the corresponding type.
+ @return An instance of a concrete subclass of `MGLStyleLayer` associated with
+    the given identifier.
  */
-- (nullable id <MGLStyleLayer>)layerWithIdentifier:(NSString *)identifier;
+- (nullable MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier;
 
 
 /**
  Returns a source if any source with the given identifier was found.
  
- @return source An instance of an `MGLSource` subclass.
+ @return An instance of a concrete subclass of `MGLSource` associated with the
+    given identifier.
  */
 - (nullable MGLSource *)sourceWithIdentifier:(NSString *)identifier;
 
 /**
  Adds a new layer on top of existing layers.
  
- @param styleLayer The layer object to add to the map view. This object
- must conform to the `MGLStyleLayer` protocol.
+ @param layer The layer object to add to the map view. This object must be an
+    instance of a concrete subclass of `MGLStyleLayer`.
  */
-- (void)addLayer:(id <MGLStyleLayer>)styleLayer;
+- (void)addLayer:(MGLStyleLayer *)layer;
 
 /**
  Inserts a new layer below another layer.
  
- @param styleLayer Layer to be inserted.
+ @param layer Layer to be inserted.
  @param belowLayer A layer that's already on the map view.
  */
-- (void)insertLayer:(id <MGLStyleLayer>)styleLayer
-         belowLayer:(id <MGLStyleLayer>)belowLayer;
+- (void)insertLayer:(MGLStyleLayer *)layer belowLayer:(MGLStyleLayer *)otherLayer;
 
 /**
  Removes a layer from the map view.
  
- @param styleLayer The layer object to remove from the map view. This object
+ @param layer The layer object to remove from the map view. This object
  must conform to the `MGLStyleLayer` protocol.
  */
-- (void)removeLayer:(id <MGLStyleLayer>)styleLayer;
+- (void)removeLayer:(MGLStyleLayer *)layer;
 
 /**
  Adds a new source to the map view.

@@ -11,9 +11,9 @@
 - (void)testCircleLayer {
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:url];
-MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithLayerIdentifier:@"layerID" source:source];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
     [self.mapView.style addSource:source];
+    MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     [self.mapView.style addLayer:layer];
 
     layer.circleRadius = [MGLRuntimeStylingHelper testNumber];
@@ -24,7 +24,8 @@ MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithLayerIdentifie
     layer.circleTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCircleTranslateAnchorViewport type:@encode(MGLCircleStyleLayerCircleTranslateAnchor)];
     layer.circlePitchScale = [MGLRuntimeStylingHelper testEnum:MGLCircleStyleLayerCirclePitchScaleViewport type:@encode(MGLCircleStyleLayerCirclePitchScale)];
 
-    MGLCircleStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
+    MGLCircleStyleLayer *gLayer = (MGLCircleStyleLayer *)[self.mapView.style layerWithIdentifier:@"layerID"];
+    XCTAssertTrue([gLayer isKindOfClass:[MGLCircleStyleLayer class]]);
     XCTAssertEqualObjects(gLayer.circleRadius, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.circleColor, [MGLRuntimeStylingHelper testColor]);
     XCTAssertEqualObjects(gLayer.circleBlur, [MGLRuntimeStylingHelper testNumber]);

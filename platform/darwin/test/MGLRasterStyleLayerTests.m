@@ -11,9 +11,9 @@
 - (void)testRasterLayer {
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:url];
-MGLRasterStyleLayer *layer = [[MGLRasterStyleLayer alloc] initWithLayerIdentifier:@"layerID" source:source];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
     [self.mapView.style addSource:source];
+    MGLRasterStyleLayer *layer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     [self.mapView.style addLayer:layer];
 
     layer.rasterOpacity = [MGLRuntimeStylingHelper testNumber];
@@ -24,7 +24,8 @@ MGLRasterStyleLayer *layer = [[MGLRasterStyleLayer alloc] initWithLayerIdentifie
     layer.rasterContrast = [MGLRuntimeStylingHelper testNumber];
     layer.rasterFadeDuration = [MGLRuntimeStylingHelper testNumber];
 
-    MGLRasterStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
+    MGLRasterStyleLayer *gLayer = (MGLRasterStyleLayer *)[self.mapView.style layerWithIdentifier:@"layerID"];
+    XCTAssertTrue([gLayer isKindOfClass:[MGLRasterStyleLayer class]]);
     XCTAssertEqualObjects(gLayer.rasterOpacity, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.rasterHueRotate, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.rasterBrightnessMin, [MGLRuntimeStylingHelper testNumber]);

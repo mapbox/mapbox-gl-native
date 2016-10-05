@@ -60,28 +60,16 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
  `-[MGLStyle layerWithIdentifier:]` method. 
  */
 <% } -%>
-@interface MGL<%- camelize(type) %>StyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
-<% if (type == 'background') { -%>
+@interface MGL<%- camelize(type) %>StyleLayer : <%-
+(type === 'background' ? 'MGLStyleLayer' :
+ (type === 'raster' ? 'MGLForegroundStyleLayer' :
+  'MGLVectorStyleLayer'))
+%>
+<% if (type === 'background') { -%>
 
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier;
+- (instancetype)initWithIdentifier:(NSString *)identifier NS_DESIGNATED_INITIALIZER;
 <% } -%>
 
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source;
-
-<% if (type !== 'background' && type !== 'raster') { -%>
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source sourceLayer:(NSString *)sourceLayer;
-<% } -%>
-
-<% if (type !== 'background' && type !== 'raster') { -%>
-/**
- A predicate that corresponds to the layer's <a href='https://www.mapbox.com/mapbox-gl-style-spec/#types-filter'>filter</a>.
- 
- The predicate's left expression must be a string that identifies a feature
- property, or one of the special keys.
- */
-@property (nonatomic, nullable) NSPredicate *predicate;
-
-<% } -%>
 <% if (layoutProperties.length) { -%>
 #pragma mark - Accessing the Layout Attributes
 

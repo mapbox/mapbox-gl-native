@@ -20,7 +20,7 @@
                               MGLGeoJSONMaximumZoomLevelOption: @99,
                               MGLGeoJSONBufferOption: @1976,
                               MGLGeoJSONToleranceOption: @0.42};
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"source-id" URL:url options:options];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" URL:url options:options];
     
     auto mbglOptions = [source geoJSONOptions];
     XCTAssertTrue(mbglOptions.cluster);
@@ -32,7 +32,7 @@
   
     // when the supplied option cluster value is not of the correct type
     options = @{MGLGeoJSONClusterOption: @"number 1"};
-    source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"source-id" URL:url options:options];
+    source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" URL:url options:options];
     XCTAssertThrows([source geoJSONOptions]);
 }
 

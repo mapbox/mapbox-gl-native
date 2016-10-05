@@ -12,36 +12,28 @@
 @interface MGLSymbolStyleLayer ()
 
 @property (nonatomic) mbgl::style::SymbolLayer *layer;
-@property (nonatomic, readwrite) NSString *layerIdentifier;
-@property (nonatomic, readwrite) NSString *sourceIdentifier;
-@property (nonatomic, readwrite) NSString *sourceLayerIdentifier;
 
 @end
 
 @implementation MGLSymbolStyleLayer
 
-@synthesize mapView;
-
-
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source
+- (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source
 {
-    if (self = [super init]) {
-        _layerIdentifier = layerIdentifier;
-        _sourceIdentifier = source.sourceIdentifier;
-        _layer = new mbgl::style::SymbolLayer(layerIdentifier.UTF8String, source.sourceIdentifier.UTF8String);
+    if (self = [super initWithIdentifier:identifier source:source]) {
+        _layer = new mbgl::style::SymbolLayer(identifier.UTF8String, source.identifier.UTF8String);
     }
     return self;
 }
 
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source sourceLayer:(NSString *)sourceLayer
+- (NSString *)sourceLayerIdentifier
 {
-    if (self = [super init]) {
-        _layerIdentifier = layerIdentifier;
-        _sourceIdentifier = source.sourceIdentifier;
-        _layer = new mbgl::style::SymbolLayer(layerIdentifier.UTF8String, source.sourceIdentifier.UTF8String);
-        _layer->setSourceLayer(sourceLayer.UTF8String);
-    }
-    return self;
+    auto layerID = self.layer->getSourceLayer();
+    return layerID.empty() ? nil : @(layerID.c_str());
+}
+
+- (void)setSourceLayerIdentifier:(NSString *)sourceLayerIdentifier
+{
+    self.layer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
 }
 
 - (void)setPredicate:(NSPredicate *)predicate

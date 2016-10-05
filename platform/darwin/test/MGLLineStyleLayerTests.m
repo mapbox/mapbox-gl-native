@@ -11,9 +11,9 @@
 - (void)testLineLayer {
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:url];
-MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithLayerIdentifier:@"layerID" source:source];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
     [self.mapView.style addSource:source];
+    MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     [self.mapView.style addLayer:layer];
 
     layer.lineCap = [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineCapSquare type:@encode(MGLLineStyleLayerLineCap)];
@@ -31,7 +31,8 @@ MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithLayerIdentifier:@"
     layer.lineDasharray = [MGLRuntimeStylingHelper testDashArray];
     layer.linePattern = [MGLRuntimeStylingHelper testString];
 
-    MGLLineStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
+    MGLLineStyleLayer *gLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"layerID"];
+    XCTAssertTrue([gLayer isKindOfClass:[MGLLineStyleLayer class]]);
     XCTAssert([(NSValue *)gLayer.lineCap isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineCapSquare type:@encode(MGLLineStyleLayerLineCap)]], @"%@ is not equal to %@", gLayer.lineCap, [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineCapSquare type:@encode(MGLLineStyleLayerLineCap)]);
     XCTAssert([(NSValue *)gLayer.lineJoin isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineJoinMiter type:@encode(MGLLineStyleLayerLineJoin)]], @"%@ is not equal to %@", gLayer.lineJoin, [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineJoinMiter type:@encode(MGLLineStyleLayerLineJoin)]);
     XCTAssertEqualObjects(gLayer.lineMiterLimit, [MGLRuntimeStylingHelper testNumber]);

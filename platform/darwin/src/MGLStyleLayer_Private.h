@@ -19,12 +19,9 @@
     #import "NSColor+MGLStyleAttributeAdditions_Private.h"
 #endif
 
-@class MGLMapView;
+@interface MGLStyleLayer (Private)
 
-@protocol MGLStyleLayer_Private <MGLStyleLayer>
-
-@property (nonatomic, weak) MGLMapView *mapView;
-@property (nonatomic, readwrite, copy) NSString *layerIdentifier;
+@property (nonatomic, readwrite, copy) NSString *identifier;
 @property (nonatomic) mbgl::style::Layer *layer;
 
 @end

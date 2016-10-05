@@ -10,18 +10,18 @@
 
 static NSString *MGLVectorSourceType   = @"vector";
 
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url
+- (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url
 {
-    if (self = [super initWithSourceIdentifier:sourceIdentifier])
+    if (self = [super initWithIdentifier:identifier])
     {
         _URL = url;
     }
     return self;
 }
 
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier tileSet:(MGLTileSet *)tileSet
+- (instancetype)initWithIdentifier:(NSString *)identifier tileSet:(MGLTileSet *)tileSet
 {
-    if (self = [super initWithSourceIdentifier:sourceIdentifier])
+    if (self = [super initWithIdentifier:identifier])
     {
         _tileSet = tileSet;
     }
@@ -34,12 +34,12 @@ static NSString *MGLVectorSourceType   = @"vector";
     
     if (self.URL)
     {
-        source = std::make_unique<mbgl::style::VectorSource>(self.sourceIdentifier.UTF8String,
+        source = std::make_unique<mbgl::style::VectorSource>(self.identifier.UTF8String,
                                                              self.URL.mgl_URLByStandardizingScheme.absoluteString.UTF8String);
     }
     else
     {
-        source = std::make_unique<mbgl::style::VectorSource>(self.sourceIdentifier.UTF8String,
+        source = std::make_unique<mbgl::style::VectorSource>(self.identifier.UTF8String,
                                                              self.tileSet.mbglTileset);
     }
     

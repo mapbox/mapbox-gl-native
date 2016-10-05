@@ -13,27 +13,56 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MGLVectorSource : MGLSource
 
+#pragma mark Initializing a Source
+
+/**
+ Returns a vector source initialized with an identifier and TileJSON URL.
+ 
+ After initializing and configuring the source, add it to a map view’s style
+ using the `-[MGLStyle addSource:]` method.
+ 
+ @param identifier A string that uniquely identifies the source in the style to
+    which it is added.
+ @param url A URL to a TileJSON configuration file describing the source’s
+    contents and other metadata.
+ @return An initialized vector source.
+ */
+- (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url NS_DESIGNATED_INITIALIZER;
+
+/**
+ Returns a vector source initialized an identifier and tile set.
+
+ After initializing and configuring the source, add it to a map view’s style
+ using the `-[MGLStyle addSource:]` method.
+ 
+ @param identifier A string that uniquely identifies the source in the style to
+    which it is added.
+ @param tileSet A tile set describing the source’s contents and other metadata.
+ @return An initialized vector source.
+ */
+- (instancetype)initWithIdentifier:(NSString *)identifier tileSet:(MGLTileSet *)tileSet NS_DESIGNATED_INITIALIZER;
+
+#pragma mark Accessing a Source’s Content
+
+/**
+ A URL to a TileJSON configuration file describing the source’s contents and
+ other metadata.
+ 
+ The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the tile
+ set’s map ID (`mapbox://<mapid>`).
+ 
+ If the receiver was initialized using `-initWithIdentifier:tileSet:`, this
+ property is set to `nil`.
+ */
 @property (nonatomic, readonly, copy) NSURL *URL;
+
+/**
+ A tile set describing the source’s contents and other metadata.
+ 
+ If the receiver was initialized using `-initWithIdentifier:URL:`, this property
+ is set to `nil`.
+ */
 @property (nonatomic, readonly, nullable) MGLTileSet *tileSet;
-
-/**
- Initializes and returns a vector source from a remote URL.
- 
- @param sourceIdentifier The source identifier.
- @param URL A remote URL holding the vector source data.
- 
- @return An `MGLVectorSource`.
- */
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url;
-
-/**
- Initializes a source with the given identifier, tile size, and tile
- URL template set.
-
- @param sourceIdentifier A string that uniquely identifies the source.
- @param tileSet A tile set describing where to download tiles.
- */
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier tileSet:(MGLTileSet *)tileSet;
 
 @end
 

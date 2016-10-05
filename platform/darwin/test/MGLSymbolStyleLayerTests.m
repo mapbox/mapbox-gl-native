@@ -11,9 +11,9 @@
 - (void)testSymbolLayer {
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:url];
-MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithLayerIdentifier:@"layerID" source:source];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
     [self.mapView.style addSource:source];
+    MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     [self.mapView.style addLayer:layer];
 
     layer.symbolPlacement = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerSymbolPlacementLine type:@encode(MGLSymbolStyleLayerSymbolPlacement)];
@@ -65,7 +65,8 @@ MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithLayerIdentifie
     layer.textTranslate = [MGLRuntimeStylingHelper testOffset];
     layer.textTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerTextTranslateAnchorViewport type:@encode(MGLSymbolStyleLayerTextTranslateAnchor)];
 
-    MGLSymbolStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
+    MGLSymbolStyleLayer *gLayer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:@"layerID"];
+    XCTAssertTrue([gLayer isKindOfClass:[MGLSymbolStyleLayer class]]);
     XCTAssert([(NSValue *)gLayer.symbolPlacement isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerSymbolPlacementLine type:@encode(MGLSymbolStyleLayerSymbolPlacement)]], @"%@ is not equal to %@", gLayer.symbolPlacement, [MGLRuntimeStylingHelper testEnum:MGLSymbolStyleLayerSymbolPlacementLine type:@encode(MGLSymbolStyleLayerSymbolPlacement)]);
     XCTAssertEqualObjects(gLayer.symbolSpacing, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.symbolAvoidEdges, [MGLRuntimeStylingHelper testBool]);

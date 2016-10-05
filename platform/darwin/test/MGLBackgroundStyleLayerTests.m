@@ -9,18 +9,15 @@
 @implementation MGLBackgroundLayerTests
 
 - (void)testBackgroundLayer {
-    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
-    NSURL *url = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:url];
-MGLBackgroundStyleLayer *layer = [[MGLBackgroundStyleLayer alloc] initWithLayerIdentifier:@"layerID" source:source];
-    [self.mapView.style addSource:source];
+    MGLBackgroundStyleLayer *layer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"layerID"];
     [self.mapView.style addLayer:layer];
 
     layer.backgroundColor = [MGLRuntimeStylingHelper testColor];
     layer.backgroundPattern = [MGLRuntimeStylingHelper testString];
     layer.backgroundOpacity = [MGLRuntimeStylingHelper testNumber];
 
-    MGLBackgroundStyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
+    MGLBackgroundStyleLayer *gLayer = (MGLBackgroundStyleLayer *)[self.mapView.style layerWithIdentifier:@"layerID"];
+    XCTAssertTrue([gLayer isKindOfClass:[MGLBackgroundStyleLayer class]]);
     XCTAssertEqualObjects(gLayer.backgroundColor, [MGLRuntimeStylingHelper testColor]);
     XCTAssertEqualObjects(gLayer.backgroundPattern, [MGLRuntimeStylingHelper testString]);
     XCTAssertEqualObjects(gLayer.backgroundOpacity, [MGLRuntimeStylingHelper testNumber]);

@@ -22,18 +22,9 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
 
 @implementation MGLGeoJSONSource
 
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier geoJSONData:(NSData *)data
+- (instancetype)initWithIdentifier:(NSString *)identifier geoJSONData:(NSData *)data options:(NS_DICTIONARY_OF(NSString *, id) *)options
 {
-    if (self = [super initWithSourceIdentifier:sourceIdentifier])
-    {
-        _geoJSONData = data;
-    }
-    return self;
-}
-
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier geoJSONData:(NSData *)data options:(NS_DICTIONARY_OF(NSString *, id) *)options
-{
-    if (self = [super initWithSourceIdentifier:sourceIdentifier])
+    if (self = [super initWithIdentifier:identifier])
     {
         _geoJSONData = data;
         _options = options;
@@ -41,18 +32,9 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     return self;
 }
 
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url
+- (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url options:(NS_DICTIONARY_OF(NSString *, id) *)options
 {
-    if (self = [super initWithSourceIdentifier:sourceIdentifier])
-    {
-        _URL = url;
-    }
-    return self;
-}
-
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url options:(NS_DICTIONARY_OF(NSString *, id) *)options
-{
-    if (self = [super initWithSourceIdentifier:sourceIdentifier])
+    if (self = [super initWithIdentifier:identifier])
     {
         _URL = url;
         _options = options;
@@ -113,7 +95,7 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
 
 - (std::unique_ptr<mbgl::style::Source>)mbglSource
 {
-    auto source = std::make_unique<mbgl::style::GeoJSONSource>(self.sourceIdentifier.UTF8String, [self geoJSONOptions]);
+    auto source = std::make_unique<mbgl::style::GeoJSONSource>(self.identifier.UTF8String, self.geoJSONOptions);
     
     if (self.URL) {
         NSURL *url = self.URL.mgl_URLByStandardizingScheme;

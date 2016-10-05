@@ -12,27 +12,18 @@
 @interface MGLRasterStyleLayer ()
 
 @property (nonatomic) mbgl::style::RasterLayer *layer;
-@property (nonatomic, readwrite) NSString *layerIdentifier;
-@property (nonatomic, readwrite) NSString *sourceIdentifier;
-@property (nonatomic, readwrite) NSString *sourceLayerIdentifier;
 
 @end
 
 @implementation MGLRasterStyleLayer
 
-@synthesize mapView;
-
-
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source
+- (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source
 {
-    if (self = [super init]) {
-        _layerIdentifier = layerIdentifier;
-        _sourceIdentifier = source.sourceIdentifier;
-        _layer = new mbgl::style::RasterLayer(layerIdentifier.UTF8String, source.sourceIdentifier.UTF8String);
+    if (self = [super initWithIdentifier:identifier source:source]) {
+        _layer = new mbgl::style::RasterLayer(identifier.UTF8String, source.identifier.UTF8String);
     }
     return self;
 }
-
 
 #pragma mark - Accessing the Paint Attributes
 

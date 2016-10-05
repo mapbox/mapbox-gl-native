@@ -504,10 +504,10 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"ams" URL:geoJSONURL options:nil];
     [self.mapView.style addSource:source];
     
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" source:source];
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"test" source:source];
     fillLayer.fillColor = [NSColor greenColor];
     fillLayer.predicate = [NSPredicate predicateWithFormat:@"%K == %@", @"type", @"park"];
     [self.mapView.style addLayer:fillLayer];

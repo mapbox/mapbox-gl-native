@@ -47,14 +47,15 @@ custom_categories:
       - MGLShapeCollectionFeature
   - name: Style Layers
     children:
-      - MGLStyleLayer
-      - MGLBaseStyleLayer
       - MGLBackgroundStyleLayer
       - MGLCircleStyleLayer
       - MGLFillStyleLayer
+      - MGLForegroundStyleLayer
       - MGLLineStyleLayer
       - MGLRasterStyleLayer
+      - MGLStyleLayer
       - MGLSymbolStyleLayer
+      - MGLVectorStyleLayer
   - name: Data Sources
     children:
       - MGLSource

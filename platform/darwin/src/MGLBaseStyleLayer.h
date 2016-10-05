@@ -5,15 +5,45 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- The base style layer class from which all other style layer classes 
- inherit. Style layers allow runtime customization of all map styling 
- properties.
+ `MGLStyleLayer` is an abstract base class for style layers. A style layer
+ manages the layout and appearance of content at a specific z-index in a style.
+ An `MGLStyle` object consists of one or more `MGLStyleLayer` objects.
  
- You should use the concrete subclasses of `MGLBaseStyleLayer` (which
- conform to `MGLStyleLayer`) to style fill, line, symbol, and other layer 
- types.
+ Each style layer defined by the style JSON file is represented at runtime by an
+ `MGLStyleLayer` object, which you can use to refine the map’s appearance. You
+ can also add and remove style layers dynamically.
+ 
+ Do not create instances of this class directly, and do not create your own
+ subclasses of this class. Instead, create instances of
+ `MGLBackgroundStyleLayer` and the concrete subclasses of
+ `MGLForegroundStyleLayer`.
  */
-@interface MGLBaseStyleLayer : NSObject
+@interface MGLStyleLayer : NSObject
+
+#pragma mark Initializing a Style Layer
+
+/**
+ Returns a style layer object initialized with the given identifier.
+ 
+ After initializing and configuring the style layer, add it to a map view’s
+ style using the `-[MGLStyle addLayer:]` or
+ `-[MGLStyle insertLayer:belowLayer:]` method.
+ 
+ @param identifier A string that uniquely identifies the layer in the style to
+    which it is added.
+ @return An initialized style layer.
+ */
+- (instancetype)initWithIdentifier:(NSString *)identifier;
+
+#pragma mark Identifying a Style Layer
+
+/**
+ A string that uniquely identifies the style layer in the style to which it is
+ added.
+ */
+@property (nonatomic, copy, readonly) NSString *identifier;
+
+#pragma mark Configuring a Style Layer’s Visibility
 
 /**
  Whether this layer is displayed. A value of `NO` hides the layer.

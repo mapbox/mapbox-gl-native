@@ -5,39 +5,14 @@
 
 #include <mbgl/style/layer.hpp>
 
-@interface MGLBaseStyleLayer() <MGLStyleLayer_Private>
-@end
+@implementation MGLStyleLayer
 
-@implementation MGLBaseStyleLayer
-
-@synthesize layerIdentifier;
-@synthesize mapView;
-@synthesize layer;
-@synthesize sourceIdentifier;
-@synthesize sourceLayerIdentifier;
-
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier
+- (instancetype)initWithIdentifier:(NSString *)identifier
 {
-    [[NSException exceptionWithName:@"MGLAbstractClassException"
-                             reason:@"MGLBaseStyleLayer is an abstract class"
-                           userInfo:nil] raise];
-    return nil;
-}
-
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier sourceIdentifier:(NSString *)sourceIdentifier
-{
-    [[NSException exceptionWithName:@"MGLAbstractClassException"
-                             reason:@"MGLBaseStyleLayer is an abstract class"
-                           userInfo:nil] raise];
-    return nil;
-}
-
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier sourceIdentifier:(NSString *)sourceIdentifier sourceLayer:(NSString *)sourceLayer
-{
-    [[NSException exceptionWithName:@"MGLAbstractClassException"
-                             reason:@"MGLBaseStyleLayer is an abstract class"
-                           userInfo:nil] raise];
-    return nil;
+    if (self = [super init]) {
+        _identifier = identifier;
+    }
+    return self;
 }
 
 - (void)setVisible:(BOOL)visible

@@ -12,12 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
  `style` and obtain the background layer using the `-[MGLStyle layerWithIdentifier:]` 
  method and passing `background` for the identifier. 
  */
-@interface MGLBackgroundStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
+@interface MGLBackgroundStyleLayer : MGLStyleLayer
 
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier;
-
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source;
-
+- (instancetype)initWithIdentifier:(NSString *)identifier NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - Accessing the Paint Attributes
 

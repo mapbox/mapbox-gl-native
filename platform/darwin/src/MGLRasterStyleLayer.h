@@ -12,10 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLMapView` for its `style` and obtain existing layers using the 
  `-[MGLStyle layerWithIdentifier:]` method. 
  */
-@interface MGLRasterStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
-
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source;
-
+@interface MGLRasterStyleLayer : MGLForegroundStyleLayer
 
 #pragma mark - Accessing the Paint Attributes
 

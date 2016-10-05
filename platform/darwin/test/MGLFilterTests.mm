@@ -18,9 +18,9 @@
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
     NSData *geoJSONData = [NSData dataWithContentsOfURL:url];
-    source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"test-source" geoJSONData:geoJSONData];
+    source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"test-source" geoJSONData:geoJSONData options:nil];
     [self.mapView.style addSource:source];
-    layer = [[MGLLineStyleLayer alloc] initWithLayerIdentifier:@"test-layer" source:source];
+    layer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"test-layer" source:source];
 }
 
 - (void)tearDown

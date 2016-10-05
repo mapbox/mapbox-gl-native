@@ -26,19 +26,7 @@ typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
  `MGLMapView` for its `style` and obtain existing layers using the 
  `-[MGLStyle layerWithIdentifier:]` method. 
  */
-@interface MGLFillStyleLayer : MGLBaseStyleLayer <MGLStyleLayer>
-
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source;
-
-- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier source:(MGLSource *)source sourceLayer:(NSString *)sourceLayer;
-
-/**
- A predicate that corresponds to the layer's <a href='https://www.mapbox.com/mapbox-gl-style-spec/#types-filter'>filter</a>.
- 
- The predicate's left expression must be a string that identifies a feature
- property, or one of the special keys.
- */
-@property (nonatomic, nullable) NSPredicate *predicate;
+@interface MGLFillStyleLayer : MGLVectorStyleLayer
 
 #pragma mark - Accessing the Paint Attributes
 
