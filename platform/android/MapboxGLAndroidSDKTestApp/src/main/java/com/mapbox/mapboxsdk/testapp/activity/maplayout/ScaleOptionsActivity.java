@@ -6,23 +6,25 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
-public class DebugModeActivity extends AppCompatActivity {
+public class ScaleOptionsActivity extends AppCompatActivity {
 
-    private static final String TAG = "DebugModeActivity";
+    private static final String TAG = ScaleOptionsActivity.class.getSimpleName();
+    private static final String INDEX = "currentStyleIndex";
 
     private MapView mapView;
     private MapboxMap mapboxMap;
-    private static final String INDEX = "currentStyleIndex";
 
     private int currentStyleIndex = 0;
 
@@ -31,16 +33,70 @@ public class DebugModeActivity extends AppCompatActivity {
             Style.OUTDOORS,
             Style.LIGHT,
             Style.DARK,
+            Style.SATELLITE_STREETS,
             Style.SATELLITE,
-            Style.SATELLITE_STREETS
     };
+
+    private static final int GRAVITIES[] = {
+            Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL,
+            Gravity.BOTTOM | Gravity.LEFT,
+            Gravity.TOP | Gravity.LEFT,
+            Gravity.TOP | Gravity.RIGHT,
+            Gravity.BOTTOM | Gravity.RIGHT,
+            Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL,
+    };
+
+    private static final int COLORS[] = {
+            MapboxConstants.SCALE_COLOR_BLACK,
+            MapboxConstants.SCALE_COLOR_BLACK,
+            MapboxConstants.SCALE_COLOR_BLACK,
+            MapboxConstants.SCALE_COLOR_WHITE,
+            MapboxConstants.SCALE_COLOR_WHITE,
+            MapboxConstants.SCALE_COLOR_BLACK,
+    };
+
+    private static final float WIDTHS[] = {
+            0.34f,
+            0.4f,
+            0.4f,
+            0.5f,
+            0.5f,
+            0.34f,
+    };
+
+    private static UiSettings.ScaleUnit UNITS[] = {
+            UiSettings.ScaleUnit.NM,
+            UiSettings.ScaleUnit.KM,
+            UiSettings.ScaleUnit.KM,
+            UiSettings.ScaleUnit.MILE,
+            UiSettings.ScaleUnit.MILE,
+            UiSettings.ScaleUnit.KM,
+    };
+
+    private static boolean ENABLED[] = {
+            true,
+            true,
+            true,
+            true,
+            true,
+            false
+    };
+
+    private void setStyles() {
+        UiSettings uiSettings = mapboxMap.getUiSettings();
+        uiSettings.setScaleEnabled(ENABLED[currentStyleIndex]);
+        uiSettings.setScaleUnit(UNITS[currentStyleIndex]);
+        uiSettings.setScaleWidth(WIDTHS[currentStyleIndex]);
+        uiSettings.setScaleGravity(GRAVITIES[currentStyleIndex]);
+        uiSettings.setScaleColor(COLORS[currentStyleIndex]);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_debug_mode);
+        setContentView(R.layout.activity_scale_options);
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -49,7 +105,7 @@ public class DebugModeActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mapView = (MapView) findViewById(R.id.mapView);
+        mapView = (MapView)findViewById(R.id.mapView);
         mapView.setTag(true);
         mapView.setStyleUrl(STYLES[currentStyleIndex]);
         mapView.onCreate(savedInstanceState);
@@ -58,21 +114,11 @@ public class DebugModeActivity extends AppCompatActivity {
             @Override
             public void onMapReady(@NonNull MapboxMap map) {
                 mapboxMap = map;
+                setStyles();
             }
         });
 
-        FloatingActionButton fabDebug = (FloatingActionButton) findViewById(R.id.fabDebug);
-        fabDebug.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mapboxMap != null) {
-                    Log.d(TAG, "Debug FAB: isDebug Active? " + mapboxMap.isDebugActive());
-                    mapboxMap.cycleDebugOptions();
-                }
-            }
-        });
-
-        FloatingActionButton fabStyles = (FloatingActionButton) findViewById(R.id.fabStyles);
+        FloatingActionButton fabStyles = (FloatingActionButton)findViewById(R.id.scaleChange);
         fabStyles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,10 +127,18 @@ public class DebugModeActivity extends AppCompatActivity {
                     if (currentStyleIndex == STYLES.length) {
                         currentStyleIndex = 0;
                     }
+                    setStyles();
                     mapboxMap.setStyleUrl(STYLES[currentStyleIndex]);
                 }
             }
         });
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if(savedInstanceState != null)
+            currentStyleIndex = savedInstanceState.getInt(INDEX, 0);
     }
 
     @Override
@@ -97,13 +151,6 @@ public class DebugModeActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         mapView.onPause();
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if(savedInstanceState != null)
-            currentStyleIndex = savedInstanceState.getInt(INDEX, 0);
     }
 
     @Override
