@@ -1722,7 +1722,7 @@ public class MapView extends FrameLayout {
 
                 if (twoTap && isTap && !inProgress) {
                     if (focalPoint != null) {
-                        zoom(false, focalPoint.x / screenDensity, focalPoint.y / screenDensity);
+                        zoom(false, focalPoint.x, focalPoint.y);
                     } else {
                         PointF focalPoint = TwoFingerGestureDetector.determineFocalPoint(event);
                         zoom(false, focalPoint.x, focalPoint.y);
