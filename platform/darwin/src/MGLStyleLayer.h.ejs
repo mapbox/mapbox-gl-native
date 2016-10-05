@@ -22,12 +22,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  <%- propertyDoc(property.name, property, type) %>
  */
-typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %>) {
+typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 <% for (const value in property.values) { -%>
     /**
      <%- propertyDoc(property.name, property.values[value], type) %>
      */
-    MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
+    MGL<%- camelize(property.name) %><%- camelize(value) %>,
 <% } -%>
 };
 
@@ -38,12 +38,12 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
 /**
  <%- propertyDoc(property.name, property, type) %>
  */
-typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %>) {
+typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 <% for (const value in property.values) { -%>
     /**
      <%- propertyDoc(property.name, property.values[value], type) %>
      */
-    MGL<%- camelize(type) %>StyleLayer<%- camelize(property.name) %><%- camelize(value) %>,
+    MGL<%- camelize(property.name) %><%- camelize(value) %>,
 <% } -%>
 };
 

@@ -25,7 +25,7 @@ global.objCName = function (property) {
 }
 
 global.objCType = function (layerType, propertyName) {
-    return `${prefix}${camelize(layerType)}${suffix}${camelize(propertyName)}`;
+    return `${prefix}${camelize(propertyName)}`;
 }
 
 global.arrayType = function (property) {

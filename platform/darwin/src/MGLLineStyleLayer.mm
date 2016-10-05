@@ -49,19 +49,19 @@
 #pragma mark - Accessing the Layout Attributes
 
 - (void)setLineCap:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineCap {
-    MGLSetEnumProperty(lineCap, LineCap, LineCapType, MGLLineStyleLayerLineCap);
+    MGLSetEnumProperty(lineCap, LineCap, LineCapType, MGLLineCap);
 }
 
 - (id <MGLStyleAttributeValue>)lineCap {
-    MGLGetEnumProperty(LineCap, LineCapType, MGLLineStyleLayerLineCap);
+    MGLGetEnumProperty(LineCap, LineCapType, MGLLineCap);
 }
 
 - (void)setLineJoin:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineJoin {
-    MGLSetEnumProperty(lineJoin, LineJoin, LineJoinType, MGLLineStyleLayerLineJoin);
+    MGLSetEnumProperty(lineJoin, LineJoin, LineJoinType, MGLLineJoin);
 }
 
 - (id <MGLStyleAttributeValue>)lineJoin {
-    MGLGetEnumProperty(LineJoin, LineJoinType, MGLLineStyleLayerLineJoin);
+    MGLGetEnumProperty(LineJoin, LineJoinType, MGLLineJoin);
 }
 
 - (void)setLineMiterLimit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineMiterLimit {
@@ -107,11 +107,11 @@
 }
 
 - (void)setLineTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineTranslateAnchor {
-    MGLSetEnumProperty(lineTranslateAnchor, LineTranslateAnchor, TranslateAnchorType, MGLLineStyleLayerLineTranslateAnchor);
+    MGLSetEnumProperty(lineTranslateAnchor, LineTranslateAnchor, TranslateAnchorType, MGLLineTranslateAnchor);
 }
 
 - (id <MGLStyleAttributeValue>)lineTranslateAnchor {
-    MGLGetEnumProperty(LineTranslateAnchor, TranslateAnchorType, MGLLineStyleLayerLineTranslateAnchor);
+    MGLGetEnumProperty(LineTranslateAnchor, TranslateAnchorType, MGLLineTranslateAnchor);
 }
 
 - (void)setLineWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineWidth {

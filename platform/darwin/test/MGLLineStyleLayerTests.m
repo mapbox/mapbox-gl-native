@@ -16,14 +16,14 @@
     MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     [self.mapView.style addLayer:layer];
 
-    layer.lineCap = [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineCapSquare type:@encode(MGLLineStyleLayerLineCap)];
-    layer.lineJoin = [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineJoinMiter type:@encode(MGLLineStyleLayerLineJoin)];
+    layer.lineCap = [MGLRuntimeStylingHelper testEnum:MGLLineCapSquare type:@encode(MGLLineCap)];
+    layer.lineJoin = [MGLRuntimeStylingHelper testEnum:MGLLineJoinMiter type:@encode(MGLLineJoin)];
     layer.lineMiterLimit = [MGLRuntimeStylingHelper testNumber];
     layer.lineRoundLimit = [MGLRuntimeStylingHelper testNumber];
     layer.lineOpacity = [MGLRuntimeStylingHelper testNumber];
     layer.lineColor = [MGLRuntimeStylingHelper testColor];
     layer.lineTranslate = [MGLRuntimeStylingHelper testOffset];
-    layer.lineTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineTranslateAnchorViewport type:@encode(MGLLineStyleLayerLineTranslateAnchor)];
+    layer.lineTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLLineTranslateAnchorViewport type:@encode(MGLLineTranslateAnchor)];
     layer.lineWidth = [MGLRuntimeStylingHelper testNumber];
     layer.lineGapWidth = [MGLRuntimeStylingHelper testNumber];
     layer.lineOffset = [MGLRuntimeStylingHelper testNumber];
@@ -33,14 +33,14 @@
 
     MGLLineStyleLayer *gLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"layerID"];
     XCTAssertTrue([gLayer isKindOfClass:[MGLLineStyleLayer class]]);
-    XCTAssert([(NSValue *)gLayer.lineCap isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineCapSquare type:@encode(MGLLineStyleLayerLineCap)]], @"%@ is not equal to %@", gLayer.lineCap, [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineCapSquare type:@encode(MGLLineStyleLayerLineCap)]);
-    XCTAssert([(NSValue *)gLayer.lineJoin isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineJoinMiter type:@encode(MGLLineStyleLayerLineJoin)]], @"%@ is not equal to %@", gLayer.lineJoin, [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineJoinMiter type:@encode(MGLLineStyleLayerLineJoin)]);
+    XCTAssert([(NSValue *)gLayer.lineCap isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLLineCapSquare type:@encode(MGLLineCap)]], @"%@ is not equal to %@", gLayer.lineCap, [MGLRuntimeStylingHelper testEnum:MGLLineCapSquare type:@encode(MGLLineCap)]);
+    XCTAssert([(NSValue *)gLayer.lineJoin isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLLineJoinMiter type:@encode(MGLLineJoin)]], @"%@ is not equal to %@", gLayer.lineJoin, [MGLRuntimeStylingHelper testEnum:MGLLineJoinMiter type:@encode(MGLLineJoin)]);
     XCTAssertEqualObjects(gLayer.lineMiterLimit, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineRoundLimit, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineOpacity, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineColor, [MGLRuntimeStylingHelper testColor]);
     XCTAssertEqualObjects(gLayer.lineTranslate, [MGLRuntimeStylingHelper testOffset]);
-    XCTAssert([(NSValue *)gLayer.lineTranslateAnchor isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineTranslateAnchorViewport type:@encode(MGLLineStyleLayerLineTranslateAnchor)]], @"%@ is not equal to %@", gLayer.lineTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLLineStyleLayerLineTranslateAnchorViewport type:@encode(MGLLineStyleLayerLineTranslateAnchor)]);
+    XCTAssert([(NSValue *)gLayer.lineTranslateAnchor isEqualToValue:[MGLRuntimeStylingHelper testEnum:MGLLineTranslateAnchorViewport type:@encode(MGLLineTranslateAnchor)]], @"%@ is not equal to %@", gLayer.lineTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLLineTranslateAnchorViewport type:@encode(MGLLineTranslateAnchor)]);
     XCTAssertEqualObjects(gLayer.lineWidth, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineGapWidth, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineOffset, [MGLRuntimeStylingHelper testNumber]);
@@ -48,14 +48,14 @@
     XCTAssertEqualObjects(gLayer.lineDasharray, [MGLRuntimeStylingHelper testDashArray]);
     XCTAssertEqualObjects(gLayer.linePattern, [MGLRuntimeStylingHelper testString]);
 
-    layer.lineCap = [MGLRuntimeStylingHelper testEnumFunction:MGLLineStyleLayerLineCapSquare type:@encode(MGLLineStyleLayerLineCap)];
-    layer.lineJoin = [MGLRuntimeStylingHelper testEnumFunction:MGLLineStyleLayerLineJoinMiter type:@encode(MGLLineStyleLayerLineJoin)];
+    layer.lineCap = [MGLRuntimeStylingHelper testEnumFunction:MGLLineCapSquare type:@encode(MGLLineCap)];
+    layer.lineJoin = [MGLRuntimeStylingHelper testEnumFunction:MGLLineJoinMiter type:@encode(MGLLineJoin)];
     layer.lineMiterLimit = [MGLRuntimeStylingHelper testNumberFunction];
     layer.lineRoundLimit = [MGLRuntimeStylingHelper testNumberFunction];
     layer.lineOpacity = [MGLRuntimeStylingHelper testNumberFunction];
     layer.lineColor = [MGLRuntimeStylingHelper testColorFunction];
     layer.lineTranslate = [MGLRuntimeStylingHelper testOffsetFunction];
-    layer.lineTranslateAnchor = [MGLRuntimeStylingHelper testEnumFunction:MGLLineStyleLayerLineTranslateAnchorViewport type:@encode(MGLLineStyleLayerLineTranslateAnchor)];
+    layer.lineTranslateAnchor = [MGLRuntimeStylingHelper testEnumFunction:MGLLineTranslateAnchorViewport type:@encode(MGLLineTranslateAnchor)];
     layer.lineWidth = [MGLRuntimeStylingHelper testNumberFunction];
     layer.lineGapWidth = [MGLRuntimeStylingHelper testNumberFunction];
     layer.lineOffset = [MGLRuntimeStylingHelper testNumberFunction];
@@ -63,14 +63,14 @@
     layer.lineDasharray = [MGLRuntimeStylingHelper testDashArrayFunction];
     layer.linePattern = [MGLRuntimeStylingHelper testStringFunction];
 
-    XCTAssertEqualObjects(gLayer.lineCap, [MGLRuntimeStylingHelper testEnumFunction:MGLLineStyleLayerLineCapSquare type:@encode(MGLLineStyleLayerLineCap)]);
-    XCTAssertEqualObjects(gLayer.lineJoin, [MGLRuntimeStylingHelper testEnumFunction:MGLLineStyleLayerLineJoinMiter type:@encode(MGLLineStyleLayerLineJoin)]);
+    XCTAssertEqualObjects(gLayer.lineCap, [MGLRuntimeStylingHelper testEnumFunction:MGLLineCapSquare type:@encode(MGLLineCap)]);
+    XCTAssertEqualObjects(gLayer.lineJoin, [MGLRuntimeStylingHelper testEnumFunction:MGLLineJoinMiter type:@encode(MGLLineJoin)]);
     XCTAssertEqualObjects(gLayer.lineMiterLimit, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.lineRoundLimit, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.lineOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.lineColor, [MGLRuntimeStylingHelper testColorFunction]);
     XCTAssertEqualObjects(gLayer.lineTranslate, [MGLRuntimeStylingHelper testOffsetFunction]);
-    XCTAssertEqualObjects(gLayer.lineTranslateAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLLineStyleLayerLineTranslateAnchorViewport type:@encode(MGLLineStyleLayerLineTranslateAnchor)]);
+    XCTAssertEqualObjects(gLayer.lineTranslateAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLLineTranslateAnchorViewport type:@encode(MGLLineTranslateAnchor)]);
     XCTAssertEqualObjects(gLayer.lineWidth, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.lineGapWidth, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.lineOffset, [MGLRuntimeStylingHelper testNumberFunction]);

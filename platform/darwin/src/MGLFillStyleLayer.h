@@ -9,15 +9,15 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Controls the translation reference point.
  */
-typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
+typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
     /**
      The fill is translated relative to the map.
      */
-    MGLFillStyleLayerFillTranslateAnchorMap,
+    MGLFillTranslateAnchorMap,
     /**
      The fill is translated relative to the viewport.
      */
-    MGLFillStyleLayerFillTranslateAnchorViewport,
+    MGLFillTranslateAnchorViewport,
 };
 
 /**
@@ -83,7 +83,7 @@ typedef NS_ENUM(NSUInteger, MGLFillStyleLayerFillTranslateAnchor) {
 /**
  Controls the translation reference point.
  
- The default value of this property is an `NSValue` object containing `MGLFillStyleLayerFillTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLFillTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `fillTranslate` is non-`nil`. Otherwise, it is ignored.
  */

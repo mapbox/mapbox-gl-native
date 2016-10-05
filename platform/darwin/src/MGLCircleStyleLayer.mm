@@ -89,19 +89,19 @@
 }
 
 - (void)setCircleTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circleTranslateAnchor {
-    MGLSetEnumProperty(circleTranslateAnchor, CircleTranslateAnchor, TranslateAnchorType, MGLCircleStyleLayerCircleTranslateAnchor);
+    MGLSetEnumProperty(circleTranslateAnchor, CircleTranslateAnchor, TranslateAnchorType, MGLCircleTranslateAnchor);
 }
 
 - (id <MGLStyleAttributeValue>)circleTranslateAnchor {
-    MGLGetEnumProperty(CircleTranslateAnchor, TranslateAnchorType, MGLCircleStyleLayerCircleTranslateAnchor);
+    MGLGetEnumProperty(CircleTranslateAnchor, TranslateAnchorType, MGLCircleTranslateAnchor);
 }
 
 - (void)setCirclePitchScale:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)circlePitchScale {
-    MGLSetEnumProperty(circlePitchScale, CirclePitchScale, CirclePitchScaleType, MGLCircleStyleLayerCirclePitchScale);
+    MGLSetEnumProperty(circlePitchScale, CirclePitchScale, CirclePitchScaleType, MGLCirclePitchScale);
 }
 
 - (id <MGLStyleAttributeValue>)circlePitchScale {
-    MGLGetEnumProperty(CirclePitchScale, CirclePitchScaleType, MGLCircleStyleLayerCirclePitchScale);
+    MGLGetEnumProperty(CirclePitchScale, CirclePitchScaleType, MGLCirclePitchScale);
 }
 
 @end

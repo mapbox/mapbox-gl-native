@@ -49,11 +49,11 @@
 #pragma mark - Accessing the Layout Attributes
 
 - (void)setSymbolPlacement:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)symbolPlacement {
-    MGLSetEnumProperty(symbolPlacement, SymbolPlacement, SymbolPlacementType, MGLSymbolStyleLayerSymbolPlacement);
+    MGLSetEnumProperty(symbolPlacement, SymbolPlacement, SymbolPlacementType, MGLSymbolPlacement);
 }
 
 - (id <MGLStyleAttributeValue>)symbolPlacement {
-    MGLGetEnumProperty(SymbolPlacement, SymbolPlacementType, MGLSymbolStyleLayerSymbolPlacement);
+    MGLGetEnumProperty(SymbolPlacement, SymbolPlacementType, MGLSymbolPlacement);
 }
 
 - (void)setSymbolSpacing:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)symbolSpacing {
@@ -97,11 +97,11 @@
 }
 
 - (void)setIconRotationAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconRotationAlignment {
-    MGLSetEnumProperty(iconRotationAlignment, IconRotationAlignment, AlignmentType, MGLSymbolStyleLayerIconRotationAlignment);
+    MGLSetEnumProperty(iconRotationAlignment, IconRotationAlignment, AlignmentType, MGLIconRotationAlignment);
 }
 
 - (id <MGLStyleAttributeValue>)iconRotationAlignment {
-    MGLGetEnumProperty(IconRotationAlignment, AlignmentType, MGLSymbolStyleLayerIconRotationAlignment);
+    MGLGetEnumProperty(IconRotationAlignment, AlignmentType, MGLIconRotationAlignment);
 }
 
 - (void)setIconSize:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconSize {
@@ -113,11 +113,11 @@
 }
 
 - (void)setIconTextFit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTextFit {
-    MGLSetEnumProperty(iconTextFit, IconTextFit, IconTextFitType, MGLSymbolStyleLayerIconTextFit);
+    MGLSetEnumProperty(iconTextFit, IconTextFit, IconTextFitType, MGLIconTextFit);
 }
 
 - (id <MGLStyleAttributeValue>)iconTextFit {
-    MGLGetEnumProperty(IconTextFit, IconTextFitType, MGLSymbolStyleLayerIconTextFit);
+    MGLGetEnumProperty(IconTextFit, IconTextFitType, MGLIconTextFit);
 }
 
 - (void)setIconTextFitPadding:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTextFitPadding {
@@ -169,19 +169,19 @@
 }
 
 - (void)setTextPitchAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textPitchAlignment {
-    MGLSetEnumProperty(textPitchAlignment, TextPitchAlignment, AlignmentType, MGLSymbolStyleLayerTextPitchAlignment);
+    MGLSetEnumProperty(textPitchAlignment, TextPitchAlignment, AlignmentType, MGLTextPitchAlignment);
 }
 
 - (id <MGLStyleAttributeValue>)textPitchAlignment {
-    MGLGetEnumProperty(TextPitchAlignment, AlignmentType, MGLSymbolStyleLayerTextPitchAlignment);
+    MGLGetEnumProperty(TextPitchAlignment, AlignmentType, MGLTextPitchAlignment);
 }
 
 - (void)setTextRotationAlignment:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textRotationAlignment {
-    MGLSetEnumProperty(textRotationAlignment, TextRotationAlignment, AlignmentType, MGLSymbolStyleLayerTextRotationAlignment);
+    MGLSetEnumProperty(textRotationAlignment, TextRotationAlignment, AlignmentType, MGLTextRotationAlignment);
 }
 
 - (id <MGLStyleAttributeValue>)textRotationAlignment {
-    MGLGetEnumProperty(TextRotationAlignment, AlignmentType, MGLSymbolStyleLayerTextRotationAlignment);
+    MGLGetEnumProperty(TextRotationAlignment, AlignmentType, MGLTextRotationAlignment);
 }
 
 - (void)setTextField:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textField {
@@ -233,19 +233,19 @@
 }
 
 - (void)setTextJustify:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textJustify {
-    MGLSetEnumProperty(textJustify, TextJustify, TextJustifyType, MGLSymbolStyleLayerTextJustify);
+    MGLSetEnumProperty(textJustify, TextJustify, TextJustifyType, MGLTextJustify);
 }
 
 - (id <MGLStyleAttributeValue>)textJustify {
-    MGLGetEnumProperty(TextJustify, TextJustifyType, MGLSymbolStyleLayerTextJustify);
+    MGLGetEnumProperty(TextJustify, TextJustifyType, MGLTextJustify);
 }
 
 - (void)setTextAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textAnchor {
-    MGLSetEnumProperty(textAnchor, TextAnchor, TextAnchorType, MGLSymbolStyleLayerTextAnchor);
+    MGLSetEnumProperty(textAnchor, TextAnchor, TextAnchorType, MGLTextAnchor);
 }
 
 - (id <MGLStyleAttributeValue>)textAnchor {
-    MGLGetEnumProperty(TextAnchor, TextAnchorType, MGLSymbolStyleLayerTextAnchor);
+    MGLGetEnumProperty(TextAnchor, TextAnchorType, MGLTextAnchor);
 }
 
 - (void)setTextMaxAngle:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textMaxAngle {
@@ -281,11 +281,11 @@
 }
 
 - (void)setTextTransform:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTransform {
-    MGLSetEnumProperty(textTransform, TextTransform, TextTransformType, MGLSymbolStyleLayerTextTransform);
+    MGLSetEnumProperty(textTransform, TextTransform, TextTransformType, MGLTextTransform);
 }
 
 - (id <MGLStyleAttributeValue>)textTransform {
-    MGLGetEnumProperty(TextTransform, TextTransformType, MGLSymbolStyleLayerTextTransform);
+    MGLGetEnumProperty(TextTransform, TextTransformType, MGLTextTransform);
 }
 
 - (void)setTextOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textOffset {
@@ -371,11 +371,11 @@
 }
 
 - (void)setIconTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)iconTranslateAnchor {
-    MGLSetEnumProperty(iconTranslateAnchor, IconTranslateAnchor, TranslateAnchorType, MGLSymbolStyleLayerIconTranslateAnchor);
+    MGLSetEnumProperty(iconTranslateAnchor, IconTranslateAnchor, TranslateAnchorType, MGLIconTranslateAnchor);
 }
 
 - (id <MGLStyleAttributeValue>)iconTranslateAnchor {
-    MGLGetEnumProperty(IconTranslateAnchor, TranslateAnchorType, MGLSymbolStyleLayerIconTranslateAnchor);
+    MGLGetEnumProperty(IconTranslateAnchor, TranslateAnchorType, MGLIconTranslateAnchor);
 }
 
 - (void)setTextOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textOpacity {
@@ -427,11 +427,11 @@
 }
 
 - (void)setTextTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)textTranslateAnchor {
-    MGLSetEnumProperty(textTranslateAnchor, TextTranslateAnchor, TranslateAnchorType, MGLSymbolStyleLayerTextTranslateAnchor);
+    MGLSetEnumProperty(textTranslateAnchor, TextTranslateAnchor, TranslateAnchorType, MGLTextTranslateAnchor);
 }
 
 - (id <MGLStyleAttributeValue>)textTranslateAnchor {
-    MGLGetEnumProperty(TextTranslateAnchor, TranslateAnchorType, MGLSymbolStyleLayerTextTranslateAnchor);
+    MGLGetEnumProperty(TextTranslateAnchor, TranslateAnchorType, MGLTextTranslateAnchor);
 }
 
 @end

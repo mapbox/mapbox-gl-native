@@ -89,11 +89,11 @@
 }
 
 - (void)setFillTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslateAnchor {
-    MGLSetEnumProperty(fillTranslateAnchor, FillTranslateAnchor, TranslateAnchorType, MGLFillStyleLayerFillTranslateAnchor);
+    MGLSetEnumProperty(fillTranslateAnchor, FillTranslateAnchor, TranslateAnchorType, MGLFillTranslateAnchor);
 }
 
 - (id <MGLStyleAttributeValue>)fillTranslateAnchor {
-    MGLGetEnumProperty(FillTranslateAnchor, TranslateAnchorType, MGLFillStyleLayerFillTranslateAnchor);
+    MGLGetEnumProperty(FillTranslateAnchor, TranslateAnchorType, MGLFillTranslateAnchor);
 }
 
 - (void)setFillPattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillPattern {

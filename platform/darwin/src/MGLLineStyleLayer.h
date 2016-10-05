@@ -9,51 +9,51 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The display of line endings.
  */
-typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineCap) {
+typedef NS_ENUM(NSUInteger, MGLLineCap) {
     /**
      A cap with a squared-off end which is drawn to the exact endpoint of the line.
      */
-    MGLLineStyleLayerLineCapButt,
+    MGLLineCapButt,
     /**
      A cap with a rounded end which is drawn beyond the endpoint of the line at a radius of one-half of the line's width and centered on the endpoint of the line.
      */
-    MGLLineStyleLayerLineCapRound,
+    MGLLineCapRound,
     /**
      A cap with a squared-off end which is drawn beyond the endpoint of the line at a distance of one-half of the line's width.
      */
-    MGLLineStyleLayerLineCapSquare,
+    MGLLineCapSquare,
 };
 
 /**
  The display of lines when joining.
  */
-typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineJoin) {
+typedef NS_ENUM(NSUInteger, MGLLineJoin) {
     /**
      A join with a squared-off end which is drawn beyond the endpoint of the line at a distance of one-half of the line's width.
      */
-    MGLLineStyleLayerLineJoinBevel,
+    MGLLineJoinBevel,
     /**
      A join with a rounded end which is drawn beyond the endpoint of the line at a radius of one-half of the line's width and centered on the endpoint of the line.
      */
-    MGLLineStyleLayerLineJoinRound,
+    MGLLineJoinRound,
     /**
      A join with a sharp, angled corner which is drawn with the outer sides beyond the endpoint of the path until they meet.
      */
-    MGLLineStyleLayerLineJoinMiter,
+    MGLLineJoinMiter,
 };
 
 /**
  Controls the translation reference point.
  */
-typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
+typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
     /**
      The line is translated relative to the map.
      */
-    MGLLineStyleLayerLineTranslateAnchorMap,
+    MGLLineTranslateAnchorMap,
     /**
      The line is translated relative to the viewport.
      */
-    MGLLineStyleLayerLineTranslateAnchorViewport,
+    MGLLineTranslateAnchorViewport,
 };
 
 /**
@@ -69,14 +69,14 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 /**
  The display of line endings.
  
- The default value of this property is an `NSValue` object containing `MGLLineStyleLayerLineCapButt`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLLineCapButt`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineCap;
 
 /**
  The display of lines when joining.
  
- The default value of this property is an `NSValue` object containing `MGLLineStyleLayerLineJoinMiter`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLLineJoinMiter`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineJoin;
 
@@ -85,7 +85,7 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
  
  The default value of this property is an `NSNumber` object containing the float `2`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `lineJoin` is set to an `NSValue` object containing `MGLLineStyleLayerLineJoinMiter`. Otherwise, it is ignored.
+ This property is only applied to the style if `lineJoin` is set to an `NSValue` object containing `MGLLineJoinMiter`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineMiterLimit;
 
@@ -94,7 +94,7 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
  
  The default value of this property is an `NSNumber` object containing the float `1.05`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `lineJoin` is set to an `NSValue` object containing `MGLLineStyleLayerLineJoinRound`. Otherwise, it is ignored.
+ This property is only applied to the style if `lineJoin` is set to an `NSValue` object containing `MGLLineJoinRound`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) id <MGLStyleAttributeValue> lineRoundLimit;
 
@@ -139,7 +139,7 @@ typedef NS_ENUM(NSUInteger, MGLLineStyleLayerLineTranslateAnchor) {
 /**
  Controls the translation reference point.
  
- The default value of this property is an `NSValue` object containing `MGLLineStyleLayerLineTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `NSValue` object containing `MGLLineTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `lineTranslate` is non-`nil`. Otherwise, it is ignored.
  */
