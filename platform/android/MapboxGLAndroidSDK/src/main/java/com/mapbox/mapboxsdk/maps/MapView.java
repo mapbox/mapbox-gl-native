@@ -1283,6 +1283,12 @@ public class MapView extends FrameLayout {
 
     public void invalidateContentPadding() {
         setContentPadding(contentPaddingLeft, contentPaddingTop, contentPaddingRight, contentPaddingBottom);
+
+        if (!mapboxMap.getTrackingSettings().isLocationTrackingDisabled()) {
+            setFocalPoint(new PointF(myLocationView.getCenterX(), myLocationView.getCenterY()));
+        } else {
+            setFocalPoint(null);
+        }
     }
 
     double getMetersPerPixelAtLatitude(@FloatRange(from = -180, to = 180) double latitude) {
