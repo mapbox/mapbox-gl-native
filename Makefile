@@ -303,7 +303,7 @@ run-test-%: test
 run-benchmark: run-benchmark-.
 
 run-benchmark-%: benchmark
-	$(GDB) $(LINUX_OUTPUT_PATH)/mbgl-benchmark --benchmark_filter=$*
+	$(LINUX_OUTPUT_PATH)/mbgl-benchmark --benchmark_filter=$*
 
 .PHONY: render
 render: $(LINUX_BUILD)
