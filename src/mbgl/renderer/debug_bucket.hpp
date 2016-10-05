@@ -38,7 +38,7 @@ public:
     const MapDebugOptions debugMode;
 
 private:
-    gl::VertexBuffer<PlainVertex> textVertexes;
+    gl::VertexBuffer<PlainVertex> vertexBuffer;
     gl::VertexArrayObject array;
 };
 

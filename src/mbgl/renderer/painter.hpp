@@ -188,9 +188,9 @@ private:
     std::unique_ptr<Shaders> overdrawShaders;
 #endif
 
-    gl::VertexBuffer<PlainVertex> tileTriangleVertexes;
-    gl::VertexBuffer<PlainVertex> tileLineStripVertexes;
-    gl::VertexBuffer<RasterVertex> rasterVertexes;
+    gl::VertexBuffer<PlainVertex> tileTriangleVertexBuffer;
+    gl::VertexBuffer<PlainVertex> tileLineStripVertexBuffer;
+    gl::VertexBuffer<RasterVertex> rasterVertexBuffer;
 
     gl::VertexArrayObject tileBorderArray;
 };

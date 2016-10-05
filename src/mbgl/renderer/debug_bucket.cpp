@@ -13,7 +13,7 @@
 
 namespace mbgl {
 
-std::vector<PlainVertex> buildTextVertexes(const OverscaledTileID& id,
+std::vector<PlainVertex> buildTextVertices(const OverscaledTileID& id,
                                                      const bool renderable,
                                                      const bool complete,
                                                      optional<Timestamp> modified,
@@ -82,20 +82,20 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
       modified(std::move(modified_)),
       expires(std::move(expires_)),
       debugMode(debugMode_),
-      textVertexes(context.createVertexBuffer(buildTextVertexes(id, renderable_, complete_, modified_, expires_, debugMode_))) {
+      vertexBuffer(context.createVertexBuffer(buildTextVertices(id, renderable_, complete_, modified_, expires_, debugMode_))) {
 }
 
 void DebugBucket::drawLines(PlainShader& shader, gl::Context& context) {
-    if (textVertexes.vertexCount != 0) {
-        array.bind(shader, textVertexes, BUFFER_OFFSET_0, context);
-        MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(textVertexes.vertexCount)));
+    if (vertexBuffer.vertexCount != 0) {
+        array.bind(shader, vertexBuffer, BUFFER_OFFSET_0, context);
+        MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(vertexBuffer.vertexCount)));
     }
 }
 
 void DebugBucket::drawPoints(PlainShader& shader, gl::Context& context) {
-    if (textVertexes.vertexCount != 0) {
-        array.bind(shader, textVertexes, BUFFER_OFFSET_0, context);
-        MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(textVertexes.vertexCount)));
+    if (vertexBuffer.vertexCount != 0) {
+        array.bind(shader, vertexBuffer, BUFFER_OFFSET_0, context);
+        MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(vertexBuffer.vertexCount)));
     }
 }
 
