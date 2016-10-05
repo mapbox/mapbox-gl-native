@@ -90,7 +90,8 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 
 - (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(CLLocationCoordinate2D *)coords
 {
-    if (coords == _coordinates)
+    if ((coords >= _coordinates && coords < _coordinates + _count) ||
+        (coords + range.length >= _coordinates && coords + range.length < _coordinates + _count))
     {
         [NSException raise:NSRangeException format:@"Reuse of existing coordinates array %p not supported", coords];
     }
