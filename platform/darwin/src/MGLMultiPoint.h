@@ -15,7 +15,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MGLMultiPoint : MGLShape
 
-/** The array of coordinates associated with the shape. */
+/**
+ The array of coordinates associated with the shape.
+ 
+ This C array is a pointer to a structure inside the multipoint object, 
+ which may have a lifetime shorter than the multipoint object and will 
+ certainly not have a longer lifetime. Therefore, you should copy the C 
+ array if it needs to be stored outside of the memory context in which you 
+ use this property.
+ */
 @property (nonatomic, readonly) CLLocationCoordinate2D *coordinates NS_RETURNS_INNER_POINTER;
 
 /** The number of coordinates associated with the shape. (read-only) */
@@ -34,6 +42,22 @@ NS_ASSUME_NONNULL_BEGIN
     the number of requested coordinates.
  */
 - (void)getCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range;
+
+/**
+ Updates one or more coordinates for the shape, which will instantaneously 
+ cause the shape to be redrawn if it is currently visible on the map.
+ 
+ @param range The range of points to update. The `location` field indicates the
+ first point you are replacing, with `0` being the first point, `1` being
+ the second point, and so on. The `length` field indicates the number of
+ points to update. You can append to an existing array of coordinates
+ by specifying a range with a `location` at the end of the existing array 
+ and/or a `length` which extends past the end of the existing array. The array 
+ in _`coords`_ must be equal in number to the length of the range.
+ @param coords The array of coordinates defining the shape. The data in this
+ array is copied to the object.
+ */
+- (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(CLLocationCoordinate2D *)coords;
 
 @end
 
