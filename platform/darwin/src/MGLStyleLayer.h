@@ -1,73 +1,64 @@
 #import <Foundation/Foundation.h>
 
-#import "MGLBaseStyleLayer.h"
+#import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class MGLSource;
-
 /**
- `MGLForegroundStyleLayer` is an abstract superclass for style layers whose
- content is defined by an `MGLSource` object.
+ `MGLStyleLayer` is an abstract base class for style layers. A style layer
+ manages the layout and appearance of content at a specific z-index in a style.
+ An `MGLStyle` object consists of one or more `MGLStyleLayer` objects.
+ 
+ Each style layer defined by the style JSON file is represented at runtime by an
+ `MGLStyleLayer` object, which you can use to refine the map’s appearance. You
+ can also add and remove style layers dynamically.
  
  Do not create instances of this class directly, and do not create your own
- subclasses of this class. Instead, create instances of `MGLRasterStyleLayer`
- and the concrete subclasses of `MGLVectorStyleLayer`.
+ subclasses of this class. Instead, create instances of
+ `MGLBackgroundStyleLayer` and the concrete subclasses of
+ `MGLForegroundStyleLayer`.
  */
-@interface MGLForegroundStyleLayer : MGLStyleLayer
+@interface MGLStyleLayer : NSObject
 
 #pragma mark Initializing a Style Layer
 
 /**
- Returns a foreground style layer initialized with an identifier and source.
+ Returns a style layer object initialized with the given identifier.
  
  After initializing and configuring the style layer, add it to a map view’s
  style using the `-[MGLStyle addLayer:]` or
  `-[MGLStyle insertLayer:belowLayer:]` method.
  
- @param identifier A string that uniquely identifies the source in the style to
+ @param identifier A string that uniquely identifies the layer in the style to
     which it is added.
- @param source The source from which to obtain the data to style. If the source
-    has not yet been added to the current style, the behavior is undefined.
- @return An initialized foreground style layer.
+ @return An initialized style layer.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier;
 
-#pragma mark Specifying a Style Layer’s Content
+#pragma mark Identifying a Style Layer
 
 /**
- Identifier of the source from which the receiver obtains the data to style.
+ A string that uniquely identifies the style layer in the style to which it is
+ added.
  */
-@property (nonatomic, readonly, nullable) NSString *sourceIdentifier;
+@property (nonatomic, copy, readonly) NSString *identifier;
 
-@end
+#pragma mark Configuring a Style Layer’s Visibility
 
 /**
- `MGLVectorStyleLayer` is an abstract superclass for style layers whose content
- is defined by an `MGLGeoJSONSource` or `MGLVectorSource` object.
- 
- Do not create instances of this class directly, and do not create your own
- subclasses of this class. Instead, create instances of the following concrete
- subclasses: `MGLCircleStyleLayer`, `MGLFillStyleLayer`, `MGLLineStyleLayer`,
- and `MGLSymbolStyleLayer`.
+ Whether this layer is displayed. A value of `NO` hides the layer.
  */
-@interface MGLVectorStyleLayer : MGLForegroundStyleLayer
-
-#pragma mark Refining a Style Layer’s Content
+@property (nonatomic, assign, getter=isVisible) BOOL visible;
 
 /**
- Identifier of the layer within the source identified by the `sourceIdentifier`
- property from which the receiver obtains the data to style.
+ The maximum zoom level at which the layer gets parsed and appears.
  */
-@property (nonatomic, nullable) NSString *sourceLayerIdentifier;
+@property (nonatomic, assign) float maximumZoomLevel;
 
 /**
- A predicate that corresponds to the layer's <a href='https://www.mapbox.com/mapbox-gl-style-spec/#types-filter'>filter</a>.
- 
- The predicate's left expression must be a string that identifies a feature
- property, or one of the special keys.
+ The minimum zoom level at which the layer gets parsed and appears.
  */
-@property (nonatomic, nullable) NSPredicate *predicate;
+@property (nonatomic, assign) float minimumZoomLevel;
 
 @end
 

@@ -9,7 +9,11 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleAttributeValue.h"
-#import "MGLBaseStyleLayer.h"
+#import "MGL<%-
+(type === 'background' ? '' :
+ (type === 'raster' ? 'Foreground' :
+  'Vector'))
+%>StyleLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -60,11 +64,11 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(type) %>StyleLayer<%- camelize(prope
  `-[MGLStyle layerWithIdentifier:]` method. 
  */
 <% } -%>
-@interface MGL<%- camelize(type) %>StyleLayer : <%-
-(type === 'background' ? 'MGLStyleLayer' :
- (type === 'raster' ? 'MGLForegroundStyleLayer' :
-  'MGLVectorStyleLayer'))
-%>
+@interface MGL<%- camelize(type) %>StyleLayer : MGL<%-
+(type === 'background' ? '' :
+ (type === 'raster' ? 'Foreground' :
+  'Vector'))
+%>StyleLayer
 <% if (type === 'background') { -%>
 
 - (instancetype)initWithIdentifier:(NSString *)identifier NS_DESIGNATED_INITIALIZER;

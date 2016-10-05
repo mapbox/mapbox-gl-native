@@ -2,7 +2,7 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleAttributeValue.h"
-#import "MGLBaseStyleLayer.h"
+#import "MGLForegroundStyleLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

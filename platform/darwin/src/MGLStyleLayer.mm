@@ -1,28 +1,50 @@
 #import "MGLStyleLayer_Private.h"
-#import "MGLSource.h"
+#import "MGLMapView_Private.h"
 
-@implementation MGLForegroundStyleLayer
+#include <mbgl/style/layer.hpp>
 
-- (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source {
-    if (self = [super initWithIdentifier:identifier]) {
-        _sourceIdentifier = source.identifier;
+@implementation MGLStyleLayer
+
+- (instancetype)initWithIdentifier:(NSString *)identifier
+{
+    if (self = [super init]) {
+        _identifier = identifier;
     }
     return self;
 }
 
-@end
-
-@implementation MGLVectorStyleLayer
-
-- (void)setPredicate:(NSPredicate *)predicate {
-    [NSException raise:@"MGLAbstractClassException"
-                format:@"MGLVectorLayer is an abstract class"];
+- (void)setVisible:(BOOL)visible
+{
+    mbgl::style::VisibilityType v = visible
+    ? mbgl::style::VisibilityType::Visible
+    : mbgl::style::VisibilityType::None;
+    self.layer->setVisibility(v);
 }
 
-- (NSPredicate *)predicate {
-    [NSException raise:@"MGLAbstractClassException"
-                format:@"MGLVectorLayer is an abstract class"];
-    return nil;
+- (BOOL)isVisible
+{
+    mbgl::style::VisibilityType v = self.layer->getVisibility();
+    return (v == mbgl::style::VisibilityType::Visible);
+}
+
+- (void)setMaximumZoomLevel:(float)maximumZoomLevel
+{
+    self.layer->setMaxZoom(maximumZoomLevel);
+}
+
+- (float)maximumZoomLevel
+{
+    return self.layer->getMaxZoom();
+}
+
+- (void)setMinimumZoomLevel:(float)minimumZoomLevel
+{
+    self.layer->setMinZoom(minimumZoomLevel);
+}
+
+- (float)minimumZoomLevel
+{
+    return self.layer->getMinZoom();
 }
 
 @end
