@@ -2,7 +2,7 @@
 #include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/platform/default/headless_backend.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
@@ -19,9 +19,8 @@ TEST(API, RepeatedRender) {
 
     const auto style = util::read_file("test/fixtures/api/water.json");
 
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1, 256, 512);
-
+    HeadlessBackend backend;
+    HeadlessView view(1, 256, 512);
 #ifdef MBGL_ASSET_ZIP
     // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
@@ -33,7 +32,7 @@ TEST(API, RepeatedRender) {
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    Map map(view, fileSource, threadPool, MapMode::Still);
+    Map map(backend, view, view.getPixelRatio(), fileSource, threadPool, MapMode::Still);
 
     {
         map.setStyleJSON(style);

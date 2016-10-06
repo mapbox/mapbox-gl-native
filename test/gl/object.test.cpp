@@ -1,6 +1,6 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/platform/default/headless_backend.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 
 #include <mbgl/gl/gl.hpp>
@@ -67,8 +67,8 @@ TEST(GLObject, Value) {
 }
 
 TEST(GLObject, Store) {
-    mbgl::HeadlessView view(std::make_shared<mbgl::HeadlessDisplay>(), 1);
-    view.activate();
+    mbgl::HeadlessBackend backend;
+    mbgl::HeadlessView view;
 
     mbgl::gl::Context context;
     EXPECT_TRUE(context.empty());
@@ -106,5 +106,5 @@ TEST(GLObject, Store) {
     context.reset();
     EXPECT_TRUE(context.empty());
 
-    view.deactivate();
+    backend.deactivate();
 }

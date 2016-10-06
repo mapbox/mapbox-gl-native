@@ -1,35 +1,14 @@
 #include <mbgl/platform/default/headless_view.hpp>
-#include <mbgl/platform/default/headless_display.hpp>
 
-#include <OpenGLES/EAGL.h>
+#include <mbgl/gl/gl.hpp>
+
+#include <cassert>
 
 namespace mbgl {
 
-gl::glProc HeadlessView::initializeExtension(const char* name) {
-    static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengles"));
-    if (!framework) {
-        throw std::runtime_error("Failed to load OpenGL framework.");
-    }
-
-    CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
-    void* symbol = CFBundleGetFunctionPointerForName(framework, str);
-    CFRelease(str);
-
-    return reinterpret_cast<gl::glProc>(symbol);
-}
-
-void HeadlessView::createContext() {
-    glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-    if (glContext == nil) {
-        throw std::runtime_error("Error creating GL context object");
-    }
-    [reinterpret_cast<EAGLContext*>(glContext) retain];
-    reinterpret_cast<EAGLContext*>(glContext).multiThreaded = YES;
-}
-
-void HeadlessView::destroyContext() {
-    [reinterpret_cast<EAGLContext*>(glContext) release];
-    glContext = nil;
+void HeadlessView::bindFramebuffer() {
+    assert(fbo);
+    MBGL_CHECK_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
 }
 
 void HeadlessView::resizeFramebuffer() {
@@ -72,8 +51,6 @@ void HeadlessView::resizeFramebuffer() {
 }
 
 void HeadlessView::clearBuffers() {
-    assert(active);
-
     MBGL_CHECK_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
     if (fbo) {
@@ -90,14 +67,6 @@ void HeadlessView::clearBuffers() {
         MBGL_CHECK_ERROR(glDeleteRenderbuffers(1, &fboDepthStencil));
         fboDepthStencil = 0;
     }
-}
-
-void HeadlessView::activateContext() {
-    [EAGLContext setCurrentContext:reinterpret_cast<EAGLContext*>(glContext)];
-}
-
-void HeadlessView::deactivateContext() {
-    [EAGLContext setCurrentContext:nil];
 }
 
 } // namespace mbgl

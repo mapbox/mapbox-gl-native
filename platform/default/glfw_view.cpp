@@ -129,6 +129,10 @@ void GLFWView::initialize(mbgl::Map *map_) {
     map->addAnnotationIcon("default_marker", makeSpriteImage(22, 22, 1));
 }
 
+void GLFWView::bind() {
+    MBGL_CHECK_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+}
+
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
 

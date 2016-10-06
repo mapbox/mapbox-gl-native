@@ -1,6 +1,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/view.hpp>
+#include <mbgl/map/backend.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
@@ -36,7 +37,15 @@ enum class RenderState : uint8_t {
 
 class Map::Impl : public style::Observer {
 public:
-    Impl(View&, FileSource&, Scheduler&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
+    Impl(Backend&,
+         View&,
+         float pixelRatio,
+         FileSource&,
+         Scheduler&,
+         MapMode,
+         GLContextMode,
+         ConstrainMode,
+         ViewportMode);
 
     void onSourceAttributionChanged(style::Source&, const std::string&) override;
     void onUpdate(Update) override;
@@ -49,6 +58,7 @@ public:
 
     void loadStyleJSON(const std::string&);
 
+    Backend& backend;
     View& view;
     FileSource& fileSource;
     Scheduler& scheduler;
@@ -81,34 +91,53 @@ public:
     bool loading = false;
 };
 
-Map::Map(View& view, FileSource& fileSource, Scheduler& scheduler, MapMode mapMode, GLContextMode contextMode, ConstrainMode constrainMode, ViewportMode viewportMode)
-    : impl(std::make_unique<Impl>(view, fileSource, scheduler, mapMode, contextMode, constrainMode, viewportMode)) {
+Map::Map(Backend& backend,
+         View& view,
+         const float pixelRatio,
+         FileSource& fileSource,
+         Scheduler& scheduler,
+         MapMode mapMode,
+         GLContextMode contextMode,
+         ConstrainMode constrainMode,
+         ViewportMode viewportMode)
+    : impl(std::make_unique<Impl>(backend,
+                                  view,
+                                  pixelRatio,
+                                  fileSource,
+                                  scheduler,
+                                  mapMode,
+                                  contextMode,
+                                  constrainMode,
+                                  viewportMode)) {
     view.initialize(this);
     update(Update::Dimensions);
 }
 
-Map::Impl::Impl(View& view_,
+Map::Impl::Impl(Backend& backend_,
+                View& view_,
+                float pixelRatio_,
                 FileSource& fileSource_,
                 Scheduler& scheduler_,
                 MapMode mode_,
                 GLContextMode contextMode_,
                 ConstrainMode constrainMode_,
                 ViewportMode viewportMode_)
-    : view(view_),
+    : backend(backend_),
+      view(view_),
       fileSource(fileSource_),
       scheduler(scheduler_),
-      transform([this](MapChange change) { view.notifyMapChange(change); },
+      transform([this](MapChange change) { backend.notifyMapChange(change); },
                 constrainMode_,
                 viewportMode_),
       mode(mode_),
       contextMode(contextMode_),
-      pixelRatio(view.getPixelRatio()),
+      pixelRatio(pixelRatio_),
       asyncUpdate([this] { update(); }),
       annotationManager(std::make_unique<AnnotationManager>(pixelRatio)) {
 }
 
 Map::~Map() {
-    impl->view.activate();
+    impl->backend.activate();
 
     impl->styleRequest = nullptr;
 
@@ -118,7 +147,7 @@ Map::~Map() {
     impl->annotationManager.reset();
     impl->painter.reset();
 
-    impl->view.deactivate();
+    impl->backend.deactivate();
 }
 
 void Map::renderStill(StillImageCallback callback) {
@@ -162,16 +191,16 @@ void Map::render() {
     }
 
     if (impl->renderState == RenderState::Never) {
-        impl->view.notifyMapChange(MapChangeWillStartRenderingMap);
+        impl->backend.notifyMapChange(MapChangeWillStartRenderingMap);
     }
 
-    impl->view.notifyMapChange(MapChangeWillStartRenderingFrame);
+    impl->backend.notifyMapChange(MapChangeWillStartRenderingFrame);
 
     const Update flags = impl->transform.updateTransitions(Clock::now());
 
     impl->render();
 
-    impl->view.notifyMapChange(isFullyLoaded() ?
+    impl->backend.notifyMapChange(isFullyLoaded() ?
         MapChangeDidFinishRenderingFrameFullyRendered :
         MapChangeDidFinishRenderingFrame);
 
@@ -179,10 +208,10 @@ void Map::render() {
         impl->renderState = RenderState::Partial;
     } else if (impl->renderState != RenderState::Fully) {
         impl->renderState = RenderState::Fully;
-        impl->view.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
+        impl->backend.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
         if (impl->loading) {
             impl->loading = false;
-            impl->view.notifyMapChange(MapChangeDidFinishLoadingMap);
+            impl->backend.notifyMapChange(MapChangeDidFinishLoadingMap);
         }
     }
 
@@ -240,11 +269,11 @@ void Map::Impl::update() {
     style->updateTiles(parameters);
 
     if (mode == MapMode::Continuous) {
-        view.invalidate();
+        backend.invalidate();
     } else if (callback && style->isLoaded()) {
-        view.activate();
+        backend.activate();
         render();
-        view.deactivate();
+        backend.deactivate();
     }
 
     updateFlags = Update::Nothing;
@@ -255,8 +284,7 @@ void Map::Impl::render() {
         painter = std::make_unique<Painter>(transform.getState());
     }
 
-    FrameData frameData { view.getFramebufferSize(),
-                          timePoint,
+    FrameData frameData { timePoint,
                           pixelRatio,
                           mode,
                           contextMode,
@@ -264,6 +292,7 @@ void Map::Impl::render() {
 
     painter->render(*style,
                     frameData,
+                    view,
                     annotationManager->getSpriteAtlas());
 
     if (mode == MapMode::Still) {
@@ -291,7 +320,7 @@ void Map::setStyleURL(const std::string& url) {
 
     impl->loading = true;
 
-    impl->view.notifyMapChange(MapChangeWillStartLoadingMap);
+    impl->backend.notifyMapChange(MapChangeWillStartLoadingMap);
 
     impl->styleRequest = nullptr;
     impl->styleURL = url;
@@ -335,7 +364,7 @@ void Map::setStyleJSON(const std::string& json) {
 
     impl->loading = true;
 
-    impl->view.notifyMapChange(MapChangeWillStartLoadingMap);
+    impl->backend.notifyMapChange(MapChangeWillStartLoadingMap);
 
     impl->styleURL.clear();
     impl->styleJSON.clear();
@@ -801,12 +830,12 @@ void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& be
     }
 
     impl->styleMutated = true;
-    impl->view.activate();
+    impl->backend.activate();
 
     impl->style->addLayer(std::move(layer), before);
     update(Update::Classes);
 
-    impl->view.deactivate();
+    impl->backend.deactivate();
 }
 
 void Map::removeLayer(const std::string& id) {
@@ -815,12 +844,12 @@ void Map::removeLayer(const std::string& id) {
     }
 
     impl->styleMutated = true;
-    impl->view.activate();
+    impl->backend.activate();
 
     impl->style->removeLayer(id);
     update(Update::Classes);
 
-    impl->view.deactivate();
+    impl->backend.deactivate();
 }
 
 void Map::addImage(const std::string& name, std::unique_ptr<const SpriteImage> image) {
@@ -971,7 +1000,7 @@ void Map::setSourceTileCacheSize(size_t size) {
         impl->sourceCacheSize = size;
         if (!impl->style) return;
         impl->style->setSourceTileCacheSize(size);
-        impl->view.invalidate();
+        impl->backend.invalidate();
     }
 }
 
@@ -981,12 +1010,12 @@ void Map::onLowMemory() {
     }
     if (impl->style) {
         impl->style->onLowMemory();
-        impl->view.invalidate();
+        impl->backend.invalidate();
     }
 }
 
 void Map::Impl::onSourceAttributionChanged(style::Source&, const std::string&) {
-    view.notifyMapChange(MapChangeSourceDidChange);
+    backend.notifyMapChange(MapChangeSourceDidChange);
 }
 
 void Map::Impl::onUpdate(Update flags) {
@@ -999,11 +1028,11 @@ void Map::Impl::onUpdate(Update flags) {
 }
     
 void Map::Impl::onStyleLoaded() {
-    view.notifyMapChange(MapChangeDidFinishLoadingStyle);
+    backend.notifyMapChange(MapChangeDidFinishLoadingStyle);
 }
 
 void Map::Impl::onStyleError() {
-    view.notifyMapChange(MapChangeDidFailLoadingMap);
+    backend.notifyMapChange(MapChangeDidFailLoadingMap);
 }
 
 void Map::Impl::onResourceError(std::exception_ptr error) {
