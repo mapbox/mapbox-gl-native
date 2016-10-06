@@ -43,6 +43,8 @@ public:
     void onStyleLoaded() override;
     void onStyleError() override;
     void onResourceError(std::exception_ptr) override;
+    
+    void setIgnoreInitialCameraOptions();
 
     void update();
     void render();
@@ -54,6 +56,7 @@ public:
 
     RenderState renderState = RenderState::Never;
     Transform transform;
+    std::unique_ptr<CameraOptions> initialCameraOptions;
 
     const MapMode mode;
     const GLContextMode contextMode;
@@ -104,6 +107,7 @@ Map::Impl::Impl(View& view_,
       asyncUpdate([this] { update(); }),
       workerThreadPool(4),
       annotationManager(std::make_unique<AnnotationManager>(pixelRatio)) {
+      initialCameraOptions = std::make_unique<CameraOptions>();
 }
 
 Map::~Map() {
@@ -400,16 +404,19 @@ CameraOptions Map::getCameraOptions(optional<EdgeInsets> padding) const {
 }
 
 void Map::jumpTo(const CameraOptions& camera) {
+    impl->setIgnoreInitialCameraOptions();
     impl->transform.jumpTo(camera);
     update(camera.zoom ? Update::RecalculateStyle : Update::Repaint);
 }
 
 void Map::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
+    impl->setIgnoreInitialCameraOptions();
     impl->transform.easeTo(camera, animation);
     update(camera.zoom ? Update::RecalculateStyle : Update::Repaint);
 }
 
 void Map::flyTo(const CameraOptions& camera, const AnimationOptions& animation) {
+    impl->setIgnoreInitialCameraOptions();
     impl->transform.flyTo(camera, animation);
     update(Update::RecalculateStyle);
 }
@@ -997,6 +1004,22 @@ void Map::Impl::onUpdate(Update flags) {
     
 void Map::Impl::onStyleLoaded() {
     view.notifyMapChange(MapChangeDidFinishLoadingStyle);
+    
+    if (initialCameraOptions == nullptr) {
+        // user manipulated camera before style was loaded
+        return;
+    }
+    
+    // move camera to default camera of style
+    initialCameraOptions->center = style->getDefaultLatLng();
+    initialCameraOptions->zoom = style->getDefaultZoom();
+    initialCameraOptions->angle = style->getDefaultBearing();
+    initialCameraOptions->pitch = style->getDefaultPitch();
+    transform.jumpTo(*initialCameraOptions);
+}
+
+void Map::Impl::setIgnoreInitialCameraOptions() {
+    initialCameraOptions = nullptr;
 }
 
 void Map::Impl::onStyleError() {
