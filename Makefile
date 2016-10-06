@@ -265,6 +265,10 @@ ifabric: $(IOS_PROJ_PATH)
 	FORMAT=static BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO SELF_CONTAINED=YES \
 	./platform/ios/scripts/package.sh
 
+.PHONY: ideploy
+ideploy:
+	caffeinate -i ./platform/ios/scripts/deploy-packages.sh
+
 .PHONY: idocument
 idocument:
 	OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh

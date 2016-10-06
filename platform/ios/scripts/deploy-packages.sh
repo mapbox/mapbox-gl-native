@@ -4,32 +4,29 @@ set -e
 set -o pipefail
 set -u
 
-usage() {
-cat <<EOF
-# Usage: sh $0 version target_directory [argument]
-
-# version: The semver version plus optional alpha beta distinction (i.e. {major.minor.patch}{-alpha.N})
-# target_directory: The directory where build output should be placed
-
-# argument:
-#     -g: Upload to github
+# dynamic environment variables:
+#     VERSION_TAG={determined automatically}: Version tag in format ios-vX.X.X-pre.X
+#     GITHUB_RELEASE=true: Upload to github
+#     BINARY_DIRECTORY=build/ios/deploy: Directory in which to save test packages
 
 # environment variables and dependencies: 
 #     - You must run "mbx auth ..." before running
 #     - Set GITHUB_TOKEN to a GitHub API access token in your environment to use GITHUB_RELEASE
 #     - "wget" is required for downloading the zip files from s3
-#     - The "github-release" gem is required to use GITHUB_RELEASE
-EOF
-}
+#     - The "github-release" command is required to use GITHUB_RELEASE
+
+function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
+function finish { >&2 echo -en "\033[0m"; }
+trap finish EXIT
 
 buildPackageStyle() {
     local package=$1 style=""     
     if [[ ${#} -eq 2 ]]; then
         style="$2"
     fi            
-    echo "make ${package} ${style}"
+    step "Building: make ${package} ${style}"
     make ${package}
-    echo "publish ${package} with ${style}"
+    step "Publishing ${package} with ${style}"
     local file_name=""
     if [ -z ${style} ] 
     then
@@ -39,43 +36,78 @@ buildPackageStyle() {
         ./platform/ios/scripts/publish.sh "${PUBLISH_VERSION}" ${style}
         file_name=mapbox-ios-sdk-${PUBLISH_VERSION}-${style}.zip        
     fi
-    echo "Downloading ${file_name} from s3... to ${BINARY_DIRECTORY}"
-    wget -P ${BINARY_DIRECTORY} http://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/${file_name}
+    step "Downloading ${file_name} from s3 to ${BINARY_DIRECTORY}"
+    wget -O ${BINARY_DIRECTORY}/${file_name} http://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/${file_name}
     if [[ "${GITHUB_RELEASE}" == true ]]; then
-        echo "publish ${file_name} to GitHub"
-        github-release --verbose upload --tag "ios-v${PUBLISH_VERSION}" --name ${file_name} --file "${BINARY_DIRECTORY}/${file_name}"
+        step "Uploading ${file_name} to GitHub"
+        github-release upload \
+            --tag "ios-v${PUBLISH_VERSION}" \
+            --name ${file_name} \
+            --file "${BINARY_DIRECTORY}/${file_name}"
     fi        
 }
 
-if [ ${#} -eq 0 -o ${#} -gt 3 ]; then
-    usage
-    exit 1
-fi
-
 export TRAVIS_REPO_SLUG=mapbox-gl-native
-export PUBLISH_VERSION=$1
 export GITHUB_USER=mapbox
 export GITHUB_REPO=mapbox-gl-native
 export BUILDTYPE=Release
 
-BINARY_DIRECTORY=$2
+VERSION_TAG=${VERSION_TAG:-''}
+PUBLISH_VERSION=
+BINARY_DIRECTORY=${BINARY_DIRECTORY:-build/ios/deploy}
+GITHUB_RELEASE=${GITHUB_RELEASE:-true}
 PUBLISH_PRE_FLAG=''
-GITHUB_RELEASE=false
 
-echo "Deploying version ${PUBLISH_VERSION}..."
+rm -rf ${BINARY_DIRECTORY}
+mkdir -p ${BINARY_DIRECTORY}
 
-if [[ ${#} -eq 3 &&  $3 == "-g" ]]; then
-    GITHUB_RELEASE=true
+if [[ ${GITHUB_RELEASE} = "true" ]]; then
+    GITHUB_RELEASE=true # Assign bool, not just a string
+
+    if [[ -z `which github-release` ]]; then
+        step "Installing github-release…"
+        brew install github-release
+        if [ -z `which github-release` ]; then
+            echo "Unable to install github-release. See: https://github.com/aktau/github-release"
+            exit 1
+        fi
+    fi
 fi
- 
+
+if [[ -z ${VERSION_TAG} ]]; then
+    step "Determining version number from most recent relevant git tag…"
+    VERSION_TAG=$( git describe --tags --match=ios-v*.*.* --abbrev=0 )
+    echo "Found tag: ${VERSION_TAG}"
+fi
+
+if [[ $( echo ${VERSION_TAG} | grep --invert-match ios-v ) ]]; then
+    echo "Error: ${VERSION_TAG} is not a valid iOS version tag"
+    echo "VERSION_TAG should be in format: ios-vX.X.X-pre.X"
+    exit 1
+fi
+
+if [[ $( wget --spider -O- https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases/tags/${VERSION_TAG} 2>&1 | grep -c "404 Not Found" ) == 0 ]]; then
+    echo "Error: ${VERSION_TAG} has already been published on GitHub"
+    echo "See: https://github.com/${GITHUB_USER}/${GITHUB_REPO}/releases/tag/${VERSION_TAG}"
+    exit 1
+fi
+
+PUBLISH_VERSION=$( echo ${VERSION_TAG} | sed 's/^ios-v//' )
+git checkout ${VERSION_TAG}
+
+step "Deploying version ${PUBLISH_VERSION}…"
+
 make clean && make distclean
 
 if [[ "${GITHUB_RELEASE}" == true ]]; then
-    echo "Create  GitHub release..."
+    step "Create GitHub release…"
     if [[ $( echo ${PUBLISH_VERSION} | awk '/[0-9]-/' ) ]]; then
         PUBLISH_PRE_FLAG='--pre-release'
     fi
-    github-release --verbose release --tag "ios-v${PUBLISH_VERSION}" --name "ios-v${PUBLISH_VERSION}" --draft ${PUBLISH_PRE_FLAG}
+    github-release release \
+        --tag "ios-v${PUBLISH_VERSION}" \
+        --name "ios-v${PUBLISH_VERSION}" \
+        --draft ${PUBLISH_PRE_FLAG}
 fi
 
 buildPackageStyle "ipackage" "symbols"
@@ -83,3 +115,5 @@ buildPackageStyle "ipackage-strip"
 buildPackageStyle "iframework" "symbols-dynamic"
 buildPackageStyle "iframework SYMBOLS=NO" "dynamic"
 buildPackageStyle "ifabric" "fabric"
+
+step "Finished deploying ${PUBLISH_VERSION}"
