@@ -393,10 +393,39 @@ test('Map', function(t) {
                     callback();
                 },
             });
+            map.id = 'foo';
             map.load(style);
             map.render({ zoom: 1 }, function(err, data) {
                 map.release();
                 t.ok(data, 'no error');
+                t.end();
+            });
+        });
+
+        t.test('req.map passed to request is a ref to map', function(t) {
+            var bar;
+
+            var map = new mbgl.Map({
+                request: function(req, callback) {
+                    req.map.foo = 'bar';
+                    bar = req.map.bar;
+                    callback();
+                },
+            });
+
+            map.bar = 'foo';
+
+            map.load(style);
+            map.render({}, function(err, data) {
+                map.release();
+
+                t.error(err);
+
+                // Safe because map.release only releases the underlying
+                // C++ resources, not the JavaScript shell
+                t.equal(map.foo, 'bar');
+                t.equal(bar, 'foo');
+
                 t.end();
             });
         });
