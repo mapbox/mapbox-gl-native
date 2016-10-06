@@ -4,6 +4,7 @@
 #include <mbgl/tile/tile_loader_impl.hpp>
 
 #include <mbgl/actor/thread_pool.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/update_parameters.hpp>
@@ -15,6 +16,7 @@ class RasterTileTest {
 public:
     FakeFileSource fileSource;
     TransformState transformState;
+    util::RunLoop loop;
     ThreadPool threadPool { 1 };
     AnnotationManager annotationManager { 1.0 };
     style::Style style { fileSource, 1.0 };

@@ -30,6 +30,7 @@
 #import <mbgl/math/wrap.hpp>
 #import <mbgl/util/constants.hpp>
 #import <mbgl/util/chrono.hpp>
+#import <mbgl/util/run_loop.hpp>
 
 #import <unordered_map>
 #import <unordered_set>
@@ -110,6 +111,11 @@ NSImage *MGLDefaultMarkerImage() {
     NSString *path = [[NSBundle mgl_frameworkBundle] pathForResource:MGLDefaultStyleMarkerSymbolName
                                                               ofType:@"pdf"];
     return [[NSImage alloc] initWithContentsOfFile:path];
+}
+
+/// Initializes the run loop shim that lives on the main thread.
+void MGLinitializeRunLoop() {
+    static mbgl::util::RunLoop mainRunLoop;
 }
 
 /// Converts a media timing function into a unit bezier object usable in mbgl.
@@ -234,6 +240,8 @@ public:
 }
 
 - (void)commonInit {
+    MGLinitializeRunLoop();
+
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
     
     // Set up cross-platform controllers and resources.

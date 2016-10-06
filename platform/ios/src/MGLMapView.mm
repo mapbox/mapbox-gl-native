@@ -24,6 +24,7 @@
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/util/chrono.hpp>
+#import <mbgl/util/run_loop.hpp>
 
 #import "Mapbox.h"
 #import "MGLFeature_Private.h"
@@ -125,6 +126,11 @@ enum { MGLAnnotationTagNotFound = UINT32_MAX };
 /// Mapping from an annotation tag to metadata about that annotation, including
 /// the annotation itself.
 typedef std::map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationContextMap;
+
+/// Initializes the run loop shim that lives on the main thread.
+void MGLinitializeRunLoop() {
+    static mbgl::util::RunLoop mainRunLoop;
+}
 
 mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction *function)
 {
@@ -357,6 +363,8 @@ public:
 
 - (void)commonInit
 {
+    MGLinitializeRunLoop();
+
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
     _opaque = YES;
 
