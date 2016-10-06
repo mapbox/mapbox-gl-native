@@ -8,7 +8,6 @@ namespace mbgl {
 namespace util {
 
 static ThreadLocal<RunLoop>& current = *new ThreadLocal<RunLoop>;
-static RunLoop mainRunLoop;
 
 class RunLoop::Impl {
 public:
@@ -22,6 +21,7 @@ RunLoop* RunLoop::Get() {
 
 RunLoop::RunLoop(Type)
   : impl(std::make_unique<Impl>()) {
+    assert(!current.get());
     current.set(this);
     impl->async = std::make_unique<AsyncTask>(std::bind(&RunLoop::process, this));
 }
