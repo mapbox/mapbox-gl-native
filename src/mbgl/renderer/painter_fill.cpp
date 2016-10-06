@@ -1,6 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/map/view.hpp>
 
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
@@ -29,7 +30,7 @@ void Painter::renderFill(PaintParameters& parameters,
     const bool isOutlineColorDefined = !properties.fillOutlineColor.isUndefined();
     Color strokeColor = isOutlineColorDefined? properties.fillOutlineColor : fillColor;
 
-    auto worldSize = util::convert<GLfloat>(frame.framebufferSize);
+    auto worldSize = util::convert<GLfloat>(parameters.view.getFramebufferSize());
 
     bool pattern = !properties.fillPattern.value.from.empty();
     bool outline = properties.fillAntialias && !pattern && isOutlineColorDefined;

@@ -4,7 +4,7 @@
 #include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/platform/default/headless_backend.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
@@ -22,15 +22,16 @@ using namespace std::literals::string_literals;
 
 struct MapTest {
     util::RunLoop runLoop;
-    std::shared_ptr<HeadlessDisplay> display { std::make_shared<mbgl::HeadlessDisplay>() };
-    HeadlessView view { display, 1 };
+    HeadlessBackend backend;
+    HeadlessView view;
     StubFileSource fileSource;
     ThreadPool threadPool { 4 };
 };
 
 TEST(Map, LatLngBehavior) {
     MapTest test;
-    Map map(test.view, test.fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource, test.threadPool,
+            MapMode::Still);
 
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
@@ -64,7 +65,8 @@ TEST(Map, Offline) {
     fileSource.put(Resource::glyphs(prefix + "{fontstack}/{range}.pbf", {{"Helvetica"}}, {0, 255}), expiredItem("glyph.pbf"));
     NetworkStatus::Set(NetworkStatus::Status::Offline);
 
-    Map map(test.view, fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), fileSource, test.threadPool,
+            MapMode::Still);
     map.setStyleURL(prefix + "style.json");
 
     test::checkImage("test/fixtures/map/offline",
@@ -81,14 +83,15 @@ TEST(Map, SetStyleInvalidJSON) {
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
     bool fail = false;
-    test.view.setMapChangeCallback([&](MapChange change) {
+    test.backend.setMapChangeCallback([&](MapChange change) {
         if (change == mbgl::MapChangeDidFailLoadingMap) {
             fail = true;
         }
     });
 
     {
-        Map map(test.view, test.fileSource, test.threadPool, MapMode::Still);
+        Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource,
+                test.threadPool, MapMode::Still);
         map.setStyleJSON("invalid");
     }
 
@@ -113,13 +116,14 @@ TEST(Map, SetStyleInvalidURL) {
         return response;
     };
 
-    test.view.setMapChangeCallback([&](MapChange change) {
+    test.backend.setMapChangeCallback([&](MapChange change) {
         if (change == mbgl::MapChangeDidFailLoadingMap) {
             test.runLoop.stop();
         }
     });
 
-    Map map(test.view, test.fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource, test.threadPool,
+            MapMode::Still);
     map.setStyleURL("mapbox://bar");
 
     test.runLoop.run();
@@ -128,7 +132,8 @@ TEST(Map, SetStyleInvalidURL) {
 TEST(Map, DoubleStyleLoad) {
     MapTest test;
 
-    Map map(test.view, test.fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource, test.threadPool,
+            MapMode::Still);
     map.setStyleJSON("");
     map.setStyleJSON("");
 }
@@ -139,7 +144,8 @@ TEST(Map, StyleFresh) {
     MapTest test;
     FakeFileSource fileSource;
 
-    Map map(test.view, fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), fileSource, test.threadPool,
+            MapMode::Still);
     map.setStyleURL("mapbox://styles/test");
     EXPECT_EQ(1u, fileSource.requests.size());
 
@@ -159,7 +165,8 @@ TEST(Map, StyleExpired) {
     MapTest test;
     FakeFileSource fileSource;
 
-    Map map(test.view, fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), fileSource, test.threadPool,
+            MapMode::Still);
     map.setStyleURL("mapbox://styles/test");
     EXPECT_EQ(1u, fileSource.requests.size());
 
@@ -186,7 +193,8 @@ TEST(Map, StyleExpiredWithAnnotations) {
     MapTest test;
     FakeFileSource fileSource;
 
-    Map map(test.view, fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), fileSource, test.threadPool,
+            MapMode::Still);
     map.setStyleURL("mapbox://styles/test");
     EXPECT_EQ(1u, fileSource.requests.size());
 
@@ -210,7 +218,8 @@ TEST(Map, StyleEarlyMutation) {
     MapTest test;
     FakeFileSource fileSource;
 
-    Map map(test.view, fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), fileSource, test.threadPool,
+            MapMode::Still);
     map.setStyleURL("mapbox://styles/test");
     map.addLayer(std::make_unique<style::BackgroundLayer>("bg"));
 
@@ -224,11 +233,12 @@ TEST(Map, StyleEarlyMutation) {
 
 TEST(Map, StyleLoadedSignal) {
     MapTest test;
-    Map map(test.view, test.fileSource, test.threadPool, MapMode::Still);
-    
+    Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource, test.threadPool,
+            MapMode::Still);
+
     // The map should emit a signal on style loaded
     bool emitted = false;
-    test.view.setMapChangeCallback([&](MapChange change) {
+    test.backend.setMapChangeCallback([&](MapChange change) {
         if (change == mbgl::MapChangeDidFinishLoadingStyle) {
             emitted = true;
         }
@@ -245,7 +255,8 @@ TEST(Map, StyleLoadedSignal) {
 TEST(Map, AddLayer) {
     MapTest test;
 
-    Map map(test.view, test.fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource, test.threadPool,
+            MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
@@ -258,7 +269,8 @@ TEST(Map, AddLayer) {
 TEST(Map, RemoveLayer) {
     MapTest test;
 
-    Map map(test.view, test.fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource, test.threadPool,
+            MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
@@ -283,7 +295,8 @@ TEST(Map, DisabledSources) {
         return {};
     };
 
-    Map map(test.view, test.fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource, test.threadPool,
+            MapMode::Still);
     map.setZoom(1);
 
     // This stylesheet has two raster layers, one that starts at zoom 1, the other at zoom 0.
@@ -333,7 +346,8 @@ TEST(Map, DisabledSources) {
 TEST(Map, Classes) {
     MapTest test;
 
-    Map map(test.view, test.fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource, test.threadPool,
+            MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
     EXPECT_FALSE(map.getTransitionOptions().duration);
@@ -367,7 +381,8 @@ TEST(Map, Classes) {
 TEST(Map, AddImage) {
     MapTest test;
 
-    Map map(test.view, test.fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource, test.threadPool,
+            MapMode::Still);
     auto decoded1 = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
     auto decoded2 = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
     auto image1 = std::make_unique<SpriteImage>(std::move(decoded1), 1.0);
@@ -384,7 +399,8 @@ TEST(Map, AddImage) {
 TEST(Map, RemoveImage) {
     MapTest test;
 
-    Map map(test.view, test.fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource, test.threadPool,
+            MapMode::Still);
     auto decoded = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
     auto image = std::make_unique<SpriteImage>(std::move(decoded), 1.0);
 

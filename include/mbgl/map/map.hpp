@@ -19,6 +19,7 @@
 
 namespace mbgl {
 
+class Backend;
 class View;
 class FileSource;
 class Scheduler;
@@ -33,7 +34,11 @@ class Layer;
 
 class Map : private util::noncopyable {
 public:
-    explicit Map(View&, FileSource&, Scheduler&,
+    explicit Map(Backend&,
+                 View&,
+                 float pixelRatio,
+                 FileSource&,
+                 Scheduler&,
                  MapMode mapMode = MapMode::Continuous,
                  GLContextMode contextMode = GLContextMode::Unique,
                  ConstrainMode constrainMode = ConstrainMode::HeightOnly,
