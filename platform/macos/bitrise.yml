@@ -61,6 +61,7 @@ workflows:
             set -eu -o pipefail
             export BUILDTYPE=Debug
             make test
+            make run-test
         - is_debug: 'yes'
     - script:
         title: Run SDK Unit Tests
