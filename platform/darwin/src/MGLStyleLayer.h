@@ -22,6 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark Initializing a Style Layer
 
+- (instancetype)init __attribute__((unavailable("Use -initWithIdentifier: instead.")));
+
 /**
  Returns a style layer object initialized with the given identifier.
  

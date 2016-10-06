@@ -18,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark Initializing a Style Layer
 
+- (instancetype)init __attribute__((unavailable("Use -initWithIdentifier:source: instead.")));
+- (instancetype)initWithIdentifier:(NSString *)identifier __attribute__((unavailable("Use -initWithIdentifier:source: instead.")));
+
 /**
  Returns a foreground style layer initialized with an identifier and source.
  
