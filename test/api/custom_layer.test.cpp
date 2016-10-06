@@ -2,7 +2,7 @@
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/platform/default/headless_backend.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
@@ -85,8 +85,8 @@ public:
 TEST(CustomLayer, Basic) {
     util::RunLoop loop;
 
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
+    HeadlessBackend backend;
+    HeadlessView view;
 
 #ifdef MBGL_ASSET_ZIP
     // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
@@ -97,7 +97,7 @@ TEST(CustomLayer, Basic) {
 
     ThreadPool threadPool(4);
 
-    Map map(view, fileSource, threadPool, MapMode::Still);
+    Map map(backend, view, view.getPixelRatio(), fileSource, threadPool, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));
     map.setLatLngZoom({ 37.8, -122.5 }, 10);
     map.addLayer(std::make_unique<CustomLayer>(

@@ -1,5 +1,6 @@
-#include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
+
+#include <mbgl/gl/gl.hpp>
 
 #include <QApplication>
 #include <QGLContext>
@@ -9,30 +10,13 @@
 #include <QOpenGLContext>
 #endif
 
+#include <cassert>
+
 namespace mbgl {
 
-gl::glProc HeadlessView::initializeExtension(const char* name) {
-#if QT_VERSION >= 0x050000
-        QOpenGLContext* thisContext = QOpenGLContext::currentContext();
-        return thisContext->getProcAddress(name);
-#else
-        const QGLContext* thisContext = QGLContext::currentContext();
-        return reinterpret_cast<mbgl::gl::glProc>(thisContext->getProcAddress(name));
-#endif
-}
-
-void HeadlessView::createContext() {
-    static const char* argv[] = { "mbgl" };
-    static int argc = 1;
-    static auto* app = new QApplication(argc, const_cast<char**>(argv));
-
-    Q_UNUSED(app);
-
-    glContext = new QGLWidget;
-}
-
-void HeadlessView::destroyContext() {
-    delete glContext;
+void HeadlessView::bindFramebuffer() {
+    assert(fbo);
+    MBGL_CHECK_ERROR(glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo));
 }
 
 void HeadlessView::resizeFramebuffer() {
@@ -93,14 +77,6 @@ void HeadlessView::clearBuffers() {
         MBGL_CHECK_ERROR(glDeleteRenderbuffersEXT(1, &fboDepthStencil));
         fboDepthStencil = 0;
     }
-}
-
-void HeadlessView::activateContext() {
-    glContext->makeCurrent();
-}
-
-void HeadlessView::deactivateContext() {
-    glContext->doneCurrent();
 }
 
 } // namespace mbgl

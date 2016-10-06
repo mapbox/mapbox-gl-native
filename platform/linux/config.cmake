@@ -41,9 +41,11 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/webp_reader.cpp
 
         # Headless view
+        PRIVATE platform/default/headless_backend_glx.cpp
+        PRIVATE platform/default/headless_view_glx.cpp
+        PRIVATE platform/default/headless_backend.cpp
         PRIVATE platform/default/headless_display.cpp
         PRIVATE platform/default/headless_view.cpp
-        PRIVATE platform/default/headless_view_glx.cpp
 
         # Thread pool
         PRIVATE platform/default/thread_pool.cpp

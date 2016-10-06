@@ -5,6 +5,8 @@
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/source_impl.hpp>
 
+#include <mbgl/map/view.hpp>
+
 #include <mbgl/platform/log.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/debugging.hpp>
@@ -90,19 +92,18 @@ void Painter::cleanup() {
     context.performCleanup();
 }
 
-void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& annotationSpriteAtlas) {
-    if (frame.framebufferSize != frame_.framebufferSize) {
-        context.viewport.setDefaultValue(
-            { 0, 0, frame_.framebufferSize[0], frame_.framebufferSize[1] });
-    }
+void Painter::render(const Style& style, const FrameData& frame_, View& view, SpriteAtlas& annotationSpriteAtlas) {
+    context.viewport.setDefaultValue(
+        { 0, 0, view.getFramebufferSize()[0], view.getFramebufferSize()[1] });
     frame = frame_;
 
     PaintParameters parameters {
 #ifndef NDEBUG
-        paintMode() == PaintMode::Overdraw ? *overdrawShaders : *shaders
+        paintMode() == PaintMode::Overdraw ? *overdrawShaders : *shaders,
 #else
-        *shaders
+        *shaders,
 #endif
+        view
     };
 
     glyphAtlas = style.glyphAtlas.get();
@@ -148,7 +149,8 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     // tiles whatsoever.
     {
         MBGL_DEBUG_GROUP("clear");
-        context.bindFramebuffer.reset();
+        context.bindFramebuffer.setDirty();
+        view.bind();
         context.viewport.reset();
         context.stencilFunc.reset();
         context.stencilTest = true;
@@ -188,7 +190,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
 
 #if not MBGL_USE_GLES2 and not defined(NDEBUG)
     if (frame.debugOptions & MapDebugOptions::StencilClip) {
-        renderClipMasks();
+        renderClipMasks(parameters);
         return;
     }
 #endif
@@ -231,7 +233,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
 
 #if not MBGL_USE_GLES2 and not defined(NDEBUG)
     if (frame.debugOptions & MapDebugOptions::DepthBuffer) {
-        renderDepthBuffer();
+        renderDepthBuffer(parameters);
     }
 #endif
 
@@ -302,7 +304,8 @@ void Painter::renderPass(PaintParameters& parameters,
             setDepthSublayer(0);
             layer.as<CustomLayer>()->impl->render(state);
             context.setDirtyState();
-            context.bindFramebuffer.reset();
+            context.bindFramebuffer.setDirty();
+            parameters.view.bind();
             context.viewport.reset();
         } else {
             MBGL_DEBUG_GROUP(layer.baseImpl->id + " - " + util::toString(item.tile->id));

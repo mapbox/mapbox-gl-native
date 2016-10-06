@@ -1,6 +1,8 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/map/view.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/shader/shaders.hpp>
 #include <mbgl/util/string.hpp>
@@ -87,7 +89,7 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
 }
 
 #ifndef NDEBUG
-void Painter::renderClipMasks() {
+void Painter::renderClipMasks(PaintParameters& parameters) {
     context.stencilTest = false;
     context.depthTest = false;
     context.program = 0;
@@ -98,7 +100,7 @@ void Painter::renderClipMasks() {
     context.rasterPos = { -1, -1, 0, 0 };
 
     // Read the stencil buffer
-    const auto& fbSize = frame.framebufferSize;
+    const auto& fbSize = parameters.view.getFramebufferSize();
     auto pixels = std::make_unique<uint8_t[]>(fbSize[0] * fbSize[1]);
     MBGL_CHECK_ERROR(glReadPixels(
                 0,                // GLint x
@@ -120,12 +122,14 @@ void Painter::renderClipMasks() {
 
     MBGL_CHECK_ERROR(glWindowPos2i(0, 0));
     MBGL_CHECK_ERROR(glDrawPixels(fbSize[0], fbSize[1], GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels.get()));
+#else
+    (void)parameters;
 #endif // MBGL_USE_GLES2
 }
 #endif // NDEBUG
 
 #ifndef NDEBUG
-void Painter::renderDepthBuffer() {
+void Painter::renderDepthBuffer(PaintParameters& parameters) {
     context.stencilTest = false;
     context.depthTest = false;
     context.program = 0;
@@ -136,7 +140,7 @@ void Painter::renderDepthBuffer() {
     context.rasterPos = { -1, -1, 0, 0 };
 
     // Read the stencil buffer
-    const auto& fbSize = frame.framebufferSize;
+    const auto& fbSize = parameters.view.getFramebufferSize();
     auto pixels = std::make_unique<GLubyte[]>(fbSize[0] * fbSize[1]);
 
     const double base = 1.0 / (1.0 - depthRangeSize);
@@ -155,6 +159,8 @@ void Painter::renderDepthBuffer() {
 
     MBGL_CHECK_ERROR(glWindowPos2i(0, 0));
     MBGL_CHECK_ERROR(glDrawPixels(fbSize[0], fbSize[1], GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels.get()));
+#else
+    (void)parameters;
 #endif // MBGL_USE_GLES2
 }
 #endif // NDEBUG

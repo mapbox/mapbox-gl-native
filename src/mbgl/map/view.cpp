@@ -5,18 +5,13 @@
 
 namespace mbgl {
 
-void View::initialize(Map *map_) {
-    assert(map_);
-    map = map_;
-}
-
 PremultipliedImage View::readStillImage(std::array<uint16_t, 2>) {
     return {};
 }
 
-void View::notifyMapChange(MapChange) {
-    // no-op
+void View::initialize(Map *map_) {
+    assert(map_);
+    map = map_;
 }
-
 
 } // namespace mbgl

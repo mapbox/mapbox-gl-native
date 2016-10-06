@@ -4,6 +4,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/platform/default/headless_backend.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 
 #pragma GCC diagnostic push
@@ -53,6 +54,7 @@ public:
 
     std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback);
 
+    mbgl::HeadlessBackend backend;
     mbgl::HeadlessView view;
     NodeThreadPool threadpool;
     std::unique_ptr<mbgl::Map> map;
