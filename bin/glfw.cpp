@@ -16,7 +16,7 @@
 
 namespace {
 
-std::unique_ptr<GLFWView> view;
+GLFWView* view = nullptr;
 
 }
 
@@ -104,7 +104,8 @@ int main(int argc, char *argv[]) {
         mbgl::Log::Info(mbgl::Event::General, "BENCHMARK MODE: Some optimizations are disabled.");
     }
 
-    view = std::make_unique<GLFWView>(fullscreen, benchmark);
+    GLFWView backend(fullscreen, benchmark);
+    view = &backend;
 
     mbgl::DefaultFileSource fileSource("/tmp/mbgl-cache.db", ".");
 
@@ -118,7 +119,7 @@ int main(int argc, char *argv[]) {
 
     mbgl::ThreadPool threadPool(4);
 
-    mbgl::Map map(*view, fileSource, threadPool);
+    mbgl::Map map(backend, backend, backend.getPixelRatio(), fileSource, threadPool);
 
     // Load settings
     mbgl::Settings_JSON settings;
@@ -181,5 +182,6 @@ int main(int argc, char *argv[]) {
                     "Exit location: --lat=\"%f\" --lon=\"%f\" --zoom=\"%f\" --bearing \"%f\"",
                     settings.latitude, settings.longitude, settings.zoom, settings.bearing);
 
+    view = nullptr;
     return 0;
 }

@@ -1,15 +1,18 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/gl/context.hpp>
+#include <mbgl/platform/default/headless_backend.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #include <mbgl/util/offscreen_texture.hpp>
 
 using namespace mbgl;
 
 TEST(OffscreenTexture, EmptyRed) {
+    HeadlessBackend backend;
     HeadlessView view(1.0f, 512, 256);
-    view.activate();
+    view.bind();
 
     MBGL_CHECK_ERROR(glClearColor(1.0f, 0.0f, 0.0f, 1.0f));
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
@@ -64,11 +67,11 @@ struct Buffer {
 
 
 TEST(OffscreenTexture, RenderToTexture) {
+    HeadlessBackend backend;
     HeadlessView view(1.0f, 512, 256);
-    view.activate();
+    view.bind();
     gl::Context context;
     context.viewport.setDefaultValue(gl::value::Viewport::Get());
-    context.bindFramebuffer.setDefaultValue(gl::value::BindFramebuffer::Get());
 
     MBGL_CHECK_ERROR(glEnable(GL_BLEND));
     MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -130,6 +133,8 @@ void main() {
 
         // Now reset the FBO back to normal and retrieve the original (restored) framebuffer.
         context.resetState();
+        context.bindFramebuffer.setDirty();
+        view.bind();
 
         image = view.readStillImage();
         test::checkImage("test/fixtures/offscreen_texture/render-to-fbo", image, 0, 0);

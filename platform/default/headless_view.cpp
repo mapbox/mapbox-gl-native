@@ -1,34 +1,27 @@
 #include <mbgl/platform/default/headless_view.hpp>
-#include <mbgl/platform/default/headless_display.hpp>
 
-#include <cassert>
+#include <mbgl/gl/gl.hpp>
+
 #include <cstring>
 
 namespace mbgl {
 
 HeadlessView::HeadlessView(float pixelRatio_, uint16_t width, uint16_t height)
-    : display(std::make_shared<HeadlessDisplay>())
-    , pixelRatio(pixelRatio_)
-    , dimensions({{ width, height }})
-    , needsResize(true) {
-}
-
-HeadlessView::HeadlessView(std::shared_ptr<HeadlessDisplay> display_,
-                           float pixelRatio_,
-                           uint16_t width,
-                           uint16_t height)
-    : display(std::move(display_))
-    , pixelRatio(pixelRatio_)
-    , dimensions({{ width, height }})
-    , needsResize(true) {
+    : pixelRatio(pixelRatio_), dimensions({ { width, height } }), needsResize(true) {
 }
 
 HeadlessView::~HeadlessView() {
-    activate();
     clearBuffers();
-    deactivate();
+}
 
-    destroyContext();
+void HeadlessView::bind() {
+    if (needsResize) {
+        clearBuffers();
+        resizeFramebuffer();
+        needsResize = false;
+    } else {
+        bindFramebuffer();
+    }
 }
 
 void HeadlessView::resize(const uint16_t width, const uint16_t height) {
@@ -41,8 +34,6 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height) {
 }
 
 PremultipliedImage HeadlessView::readStillImage(std::array<uint16_t, 2> size) {
-    assert(active);
-
     if (!size[0] || !size[1]) {
         size[0] = dimensions[0] * pixelRatio;
         size[1] = dimensions[1] * pixelRatio;
@@ -74,45 +65,6 @@ std::array<uint16_t, 2> HeadlessView::getSize() const {
 std::array<uint16_t, 2> HeadlessView::getFramebufferSize() const {
     return {{ static_cast<uint16_t>(dimensions[0] * pixelRatio),
               static_cast<uint16_t>(dimensions[1] * pixelRatio) }};
-}
-
-void HeadlessView::activate() {
-    active = true;
-
-    if (!glContext) {
-        if (!display) {
-            throw std::runtime_error("Display is not set");
-        }
-        createContext();
-    }
-
-    activateContext();
-
-    if (!extensionsLoaded) {
-        gl::InitializeExtensions(initializeExtension);
-        extensionsLoaded = true;
-    }
-
-    if (needsResize) {
-        clearBuffers();
-        resizeFramebuffer();
-        needsResize = false;
-    }
-}
-
-void HeadlessView::deactivate() {
-    deactivateContext();
-    active = false;
-}
-
-void HeadlessView::invalidate() {
-    assert(false);
-}
-
-void HeadlessView::notifyMapChange(MapChange change) {
-    if (mapChangeCallback) {
-        mapChangeCallback(change);
-    }
 }
 
 } // namespace mbgl

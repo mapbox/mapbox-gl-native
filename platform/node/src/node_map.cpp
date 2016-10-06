@@ -773,15 +773,16 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
 }
 
 NodeMap::NodeMap(v8::Local<v8::Object> options) :
-    view(sharedDisplay(), [&] {
+    backend(sharedDisplay()),
+    view([&] {
         Nan::HandleScope scope;
         return Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust() ? Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue() : 1.0;
     }()),
     threadpool(),
-    map(std::make_unique<mbgl::Map>(view, *this, threadpool, mbgl::MapMode::Still)),
+    map(std::make_unique<mbgl::Map>(backend, view, view.getPixelRatio(), *this, threadpool, mbgl::MapMode::Still)),
     async(new uv_async_t) {
 
-    view.setMapChangeCallback([&](mbgl::MapChange change) {
+    backend.setMapChangeCallback([&](mbgl::MapChange change) {
         if (change == mbgl::MapChangeDidFailLoadingMap) {
             throw std::runtime_error("Requires a map style to be a valid style JSON");
         }
