@@ -14,6 +14,8 @@ import com.mapbox.mapboxsdk.utils.MathUtils;
  */
 public final class CameraPosition implements Parcelable {
 
+    public final static CameraPosition DEFAULT = new CameraPosition(new LatLng(), 0, 0, 0);
+
     public static final Parcelable.Creator<CameraPosition> CREATOR
             = new Parcelable.Creator<CameraPosition>() {
         public CameraPosition createFromParcel(Parcel in) {
