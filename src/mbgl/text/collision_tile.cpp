@@ -179,25 +179,32 @@ std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const Geometr
     CollisionBox queryBox(anchor, 0, 0, box.max.x - box.min.x, box.max.y - box.min.y, scale);
     auto predicates = bgi::intersects(getTreeBox(anchor, queryBox));
 
-    auto fn = [&] (const Tree& tree_) {
+    auto fn = [&] (const Tree& tree_, bool ignorePlacement) {
         for (auto it = tree_.qbegin(predicates); it != tree_.qend(); ++it) {
             const CollisionBox& blocking = std::get<1>(*it);
             const IndexedSubfeature& indexedFeature = std::get<2>(*it);
 
             auto& seenFeatures = sourceLayerFeatures[indexedFeature.sourceLayerName];
             if (seenFeatures.find(indexedFeature.index) == seenFeatures.end()) {
-                auto blockingAnchor = util::matrixMultiply(rotationMatrix, blocking.anchor);
-                float minPlacementScale = findPlacementScale(minScale, anchor, queryBox, blockingAnchor, blocking);
-                if (minPlacementScale >= scale) {
+                if (ignorePlacement) {
                     seenFeatures.insert(indexedFeature.index);
                     result.push_back(indexedFeature);
+                } else {
+                    auto blockingAnchor = util::matrixMultiply(rotationMatrix, blocking.anchor);
+                    float minPlacementScale = findPlacementScale(minScale, anchor, queryBox, blockingAnchor, blocking);
+                    if (minPlacementScale >= scale) {
+                        seenFeatures.insert(indexedFeature.index);
+                        result.push_back(indexedFeature);
+                    }
                 }
             }
         }
     };
 
-    fn(tree);
-    fn(ignoredTree);
+    bool ignorePlacement = false;
+    fn(tree, ignorePlacement);
+    ignorePlacement = true;
+    fn(ignoredTree, ignorePlacement);
 
     return result;
 }
