@@ -6,14 +6,23 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- The `MGLMultiPoint` class is an abstract superclass used to define shapes
- composed of multiple points. You should not create instances of this class
- directly. Instead, you should create instances of the `MGLPolyline` or
- `MGLPolygon` classes. However, you can use the method and properties of this
- class to access information about the specific points associated with the line
- or polygon.
+ The `MGLMultiPoint` class is used to define shapes composed of multiple points. 
+ This class is also the superclass of `MGLPolyline` and `MGLPolygon`. The
+ methods and properties of this class can be used to access information about 
+ the specific points associated with a line or polygon.
  */
 @interface MGLMultiPoint : MGLShape
+
+/**
+ Creates and returns an `MGLMultiPoint` object from the specified set of
+ coordinates.
+ 
+ @param coords The array of coordinates defining the shape. The data in this
+ array is copied to the new object.
+ @param count The number of items in the `coords` array.
+ @return A new multipoint object.
+ */
++ (instancetype)multiPointWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
 
 /**
  The array of coordinates associated with the shape.

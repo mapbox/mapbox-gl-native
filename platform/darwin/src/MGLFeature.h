@@ -83,10 +83,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, readonly) NS_DICTIONARY_OF(NSString *, id) *attributes;
 
-
-
-- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary;
-
 /**
  Returns the feature attribute for the given attribute name.
  
@@ -94,6 +90,17 @@ NS_ASSUME_NONNULL_BEGIN
  associated with this method.
  */
 - (nullable id)attributeForKey:(NSString *)key;
+
+/**
+ Returns a dictionary that can be serialized as a GeoJSON Feature representation
+ of an instance of an `MGLFeature` subclass.
+ 
+ The dictionary includes a `geometry` key corresponding to the receiver’s 
+ underlying geometry data, a `properties` key corresponding to the receiver’s 
+ `attributes` property, and an `id` key corresponding to the receiver’s 
+ `identifier` property.
+ */
+- (NS_DICTIONARY_OF(NSString *, id) *)geoJSONDictionary;
 
 @end
 

@@ -1,5 +1,10 @@
 #import "MGLPointAnnotation.h"
 
+#import "MGLShape_Private.h"
+
+#import <mbgl/util/geometry.hpp>
+
+
 @implementation MGLPointAnnotation
 
 @synthesize coordinate;
@@ -13,4 +18,17 @@
             coordinate.latitude, coordinate.longitude];
 }
 
+- (NSDictionary *)geoJSONDictionary
+{
+    return @{@"type": @"Point",
+             @"coordinates": @[@(self.coordinate.longitude), @(self.coordinate.latitude)]};
+}
+
+- (mbgl::Feature)featureObject
+{
+    mbgl::Point<double> point = { self.coordinate.longitude, self.coordinate.latitude };
+    return mbgl::Feature {point};
+}
+
 @end
+
