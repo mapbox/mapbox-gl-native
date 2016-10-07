@@ -5,11 +5,13 @@
 
 namespace mbgl {
 
+using TileCoordinatePoint = Point<double>;
+
 // Has floating point x/y coordinates.
 // Used for computing the tiles that need to be visible in the viewport.
 class TileCoordinate {
 public:
-    Point<double> p;
+    TileCoordinatePoint p;
     double z;
 
     static TileCoordinate fromLatLng(const TransformState& state, double zoom, const LatLng& latLng) {
@@ -17,8 +19,8 @@ public:
         return { state.project(latLng) * scale / double(util::tileSize), zoom };
     }
 
-    static TileCoordinate fromScreenCoordinate(const TransformState& state, double zoom, const ScreenCoordinate& point) {
-        return fromLatLng(state, zoom, state.screenCoordinateToLatLng(point));
+    static TileCoordinate fromScreenCoordinate(const TransformState& state, double zoom, const ScreenCoordinate& screenCoordinate) {
+        return fromLatLng(state, zoom, state.screenCoordinateToLatLng(screenCoordinate));
     }
 
     TileCoordinate zoomTo(double zoom) const {

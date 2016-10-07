@@ -1,7 +1,13 @@
 #include <mbgl/test/util.hpp>
 
+#include <mbgl/map/change.hpp>
 #include <mbgl/map/transform.hpp>
+#include <mbgl/map/transform_state.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/geometry.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
+
 
 using namespace mbgl;
 
@@ -513,4 +519,63 @@ TEST(Transform, DefaultTransform) {
     ASSERT_TRUE(transform.resize({{ static_cast<uint16_t>(-1), static_cast<uint16_t>(-1) }}));
     ASSERT_FALSE(transform.resize({{ max, max }}));
     testConversions(nullIsland, center);
+}
+
+TEST(Transform, TileCoordinate)
+{
+    size_t changeCount = 0;
+    std::vector<MapChange> changes = {
+        MapChangeRegionWillChange,
+        MapChangeRegionDidChange,
+    };
+    auto onMapChange = [&](MapChange change) {
+        ASSERT_EQ(change, changes[changeCount]);
+        ++changeCount;
+    };
+
+    Transform transform(onMapChange);
+
+    const double max = util::tileSize;
+    const std::array<uint16_t, 2> size { { uint16_t(max), uint16_t(max) } };
+    transform.resize(size);
+
+    // Center, top-left, bottom-left, bottom-right, top-right edges.
+    std::vector<std::pair<LatLng, ScreenCoordinate>> edges {
+        { {}, { max / 2.0, max / 2.0 } },
+        { { util::LATITUDE_MAX, -util::LONGITUDE_MAX }, { 0, max } },
+        { { -util::LATITUDE_MAX, -util::LONGITUDE_MAX }, { 0, 0 } },
+        { { -util::LATITUDE_MAX, util::LONGITUDE_MAX }, { max, 0 } },
+        { { util::LATITUDE_MAX, util::LONGITUDE_MAX }, { max, max } },
+    };
+
+    for (const auto& pair : edges) {
+        const auto& latLng = pair.first;
+        const auto& screenCoordinate = pair.second;
+        const auto base = TileCoordinate::fromLatLng(transform.getState(), 0, latLng);
+
+        // 16 is the maximum zoom level where we actually compute placements.
+        for (uint8_t integerZoom = 0; integerZoom <= 16; ++integerZoom) {
+            const double zoom = integerZoom;
+            const double maxTilesPerAxis = std::pow(2.0, zoom);
+            const Point<double> tilePoint = {
+                latLng.longitude == 0 ? 0.5 : latLng.longitude == -util::LONGITUDE_MAX ? 0 : 1.0,
+                latLng.latitude  == 0 ? 0.5 : latLng.latitude  == -util::LATITUDE_MAX  ? 1.0 : 0,
+            };
+
+            const auto fromLatLng = TileCoordinate::fromLatLng(transform.getState(), zoom, latLng);
+            ASSERT_DOUBLE_EQ(fromLatLng.z, zoom);
+            ASSERT_DOUBLE_EQ(fromLatLng.p.x, tilePoint.x * maxTilesPerAxis);
+            ASSERT_NEAR(fromLatLng.p.y, tilePoint.y * maxTilesPerAxis, 1.0e-7);
+
+            const auto fromScreenCoordinate = TileCoordinate::fromScreenCoordinate(transform.getState(), zoom, screenCoordinate);
+            ASSERT_DOUBLE_EQ(fromScreenCoordinate.z, fromLatLng.z);
+            ASSERT_NEAR(fromScreenCoordinate.p.x, fromLatLng.p.x, 0.99);
+            ASSERT_NEAR(fromScreenCoordinate.p.y, fromLatLng.p.y, 0.99);
+
+            const auto zoomed = base.zoomTo(zoom);
+            ASSERT_DOUBLE_EQ(zoomed.z, zoom);
+            ASSERT_DOUBLE_EQ(zoomed.p.x, fromLatLng.p.x);
+            ASSERT_DOUBLE_EQ(zoomed.p.y, fromLatLng.p.y);
+        }
+    }
 }

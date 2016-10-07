@@ -23,6 +23,8 @@ namespace style {
 class Style;
 } // namespace style
 
+namespace bgi = boost::geometry::index;
+
 class AnnotationManager : private util::noncopyable {
 public:
     AnnotationManager(float pixelRatio);
@@ -63,7 +65,7 @@ private:
 
     AnnotationID nextID = 0;
 
-    using SymbolAnnotationTree = boost::geometry::index::rtree<std::shared_ptr<const SymbolAnnotationImpl>, boost::geometry::index::rstar<16, 4>>;
+    using SymbolAnnotationTree = bgi::rtree<std::shared_ptr<const SymbolAnnotationImpl>, bgi::rstar<16, 4>>;
     // Unlike std::unordered_map, std::map is guaranteed to sort by AnnotationID, ensuring that older annotations are below newer annotations.
     // <https://github.com/mapbox/mapbox-gl-native/issues/5691>
     using SymbolAnnotationMap = std::map<AnnotationID, std::shared_ptr<SymbolAnnotationImpl>>;

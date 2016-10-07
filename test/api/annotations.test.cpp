@@ -27,6 +27,10 @@ public:
     StubFileSource fileSource;
     Map map { view, fileSource, MapMode::Still };
 
+    AnnotationTest() = default;
+    AnnotationTest(uint16_t width, uint16_t height)
+        : view({ display, 1, width, height }) {}
+
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/annotations/") + name,
                          test::render(map), 0.0002, 0.1);
@@ -341,3 +345,81 @@ TEST(Annotations, QueryRenderedFeatures) {
     EXPECT_TRUE(!!features2[0].id);
     EXPECT_EQ(*features2[0].id, 1);
 }
+
+TEST(Annotations, VisibleFeatures) {
+    AnnotationTest test;
+
+    auto viewSize = test.view.getSize();
+    auto box = ScreenBox { {}, { double(viewSize[0]), double(viewSize[1]) } };
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    test.map.setZoom(3);
+
+    std::vector<mbgl::AnnotationID> ids;
+    for (int longitude = -5; longitude <= 5; ++longitude) {
+        for (int latitude = -5; latitude <= 5; ++latitude) {
+            ids.push_back(test.map.addAnnotation(SymbolAnnotation { { double(latitude), double(longitude) }, "default_marker" }));
+        }
+    }
+
+    // Change bearing *after* adding annotations cause them to be reordered,
+    // and some annotations become occluded by others.
+    test.map.setBearing(45);
+    // FIXME: https://github.com/mapbox/mapbox-gl-native/issues/5419
+    test.checkRendering("visible_features_rotated");
+
+    auto features = test.map.queryRenderedFeatures(box);
+    EXPECT_EQ(features.size(), ids.size());
+
+    test.map.setBearing(0);
+    test.map.setZoom(4);
+    // FIXME: https://github.com/mapbox/mapbox-gl-native/issues/5419
+    test.checkRendering("visible_features");
+    features = test.map.queryRenderedFeatures(box);
+    EXPECT_EQ(features.size(), ids.size());
+}
+
+TEST(Annotations, CollidingFeatures) {
+    AnnotationTest test;
+
+    auto viewSize = test.view.getSize();
+    auto box = ScreenBox { {}, { double(viewSize[0]), double(viewSize[1]) } };
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+
+    std::vector<mbgl::AnnotationID> ids;
+    for (int longitude = 0; longitude < 10; ++longitude) {
+        for (int latitude = 0; latitude < 10; ++latitude) {
+            ids.push_back(test.map.addAnnotation(SymbolAnnotation { { double(latitude), double(longitude) }, "default_marker" }));
+        }
+    }
+
+    test.map.setLatLng({ 5, 5 });
+    for (uint16_t zoomSteps = 0; zoomSteps <= 20; ++zoomSteps) {
+        test.map.setZoom(zoomSteps / 10.0);
+        test::render(test.map);
+        auto features = test.map.queryRenderedFeatures(box);
+        EXPECT_EQ(features.size(), ids.size());
+    }
+}
+
+TEST(Annotations, TileEdges) {
+    // Create a view big enough to fit an entire tile inside of it.
+    AnnotationTest test(1024, 1024);
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    test.map.setZoom(3);
+
+    test.map.addAnnotation(SymbolAnnotation { {0, 1}, "default_marker" });
+    test.map.addAnnotation(SymbolAnnotation { {0, 0}, "default_marker" });
+    test.map.addAnnotation(SymbolAnnotation { {1, 0}, "default_marker" });
+
+    // FIXME: https://github.com/mapbox/mapbox-gl-native/issues/5419
+    // Expected image is borked because symbols are being clipped to their
+    // corresponding tiles, but enough to provide an usable expectation.
+    test.checkRendering("tile_edges");
+}
+
