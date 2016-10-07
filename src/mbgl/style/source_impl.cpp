@@ -176,14 +176,13 @@ void Source::Impl::reloadTiles() {
     cache.clear();
 
     for (auto& pair : tiles) {
-        auto tile = pair.second.get();
-        tile->redoLayout();
+        pair.second->redoLayout();
     }
 }
 
 std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRenderedFeatures(const QueryParameters& parameters) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
-    if (renderTiles.empty()) {
+    if (renderTiles.empty() || parameters.geometry.empty()) {
         return result;
     }
 
@@ -194,21 +193,16 @@ std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRendere
             parameters.transformState, 0, { p.x, parameters.transformState.getHeight() - p.y }).p);
     }
 
-    if (queryGeometry.empty()) {
-        return result;
-    }
-
     mapbox::geometry::box<double> box = mapbox::geometry::envelope(queryGeometry);
 
     for (const auto& tilePtr : renderTiles) {
-        const RenderTile& tile = tilePtr.second;
-
-        GeometryCoordinate tileSpaceBoundsMin = TileCoordinate::toGeometryCoordinate(tile.id, box.min);
+        const RenderTile& renderTile = tilePtr.second;
+        GeometryCoordinate tileSpaceBoundsMin = TileCoordinate::toGeometryCoordinate(renderTile.id, box.min);
         if (tileSpaceBoundsMin.x >= util::EXTENT || tileSpaceBoundsMin.y >= util::EXTENT) {
             continue;
         }
 
-        GeometryCoordinate tileSpaceBoundsMax = TileCoordinate::toGeometryCoordinate(tile.id, box.max);
+        GeometryCoordinate tileSpaceBoundsMax = TileCoordinate::toGeometryCoordinate(renderTile.id, box.max);
         if (tileSpaceBoundsMax.x < 0 || tileSpaceBoundsMax.y < 0) {
             continue;
         }
@@ -216,13 +210,13 @@ std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRendere
         GeometryCoordinates tileSpaceQueryGeometry;
         tileSpaceQueryGeometry.reserve(queryGeometry.size());
         for (const auto& c : queryGeometry) {
-            tileSpaceQueryGeometry.push_back(TileCoordinate::toGeometryCoordinate(tile.id, c));
+            tileSpaceQueryGeometry.push_back(TileCoordinate::toGeometryCoordinate(renderTile.id, c));
         }
 
-        tile.tile.queryRenderedFeatures(result,
-                                        tileSpaceQueryGeometry,
-                                        parameters.transformState,
-                                        parameters.layerIDs);
+        renderTile.tile.queryRenderedFeatures(result,
+                                              tileSpaceQueryGeometry,
+                                              parameters.transformState,
+                                              parameters.layerIDs);
     }
 
     return result;
@@ -253,8 +247,7 @@ void Source::Impl::dumpDebugLogs() const {
     Log::Info(Event::General, "Source::loaded: %d", loaded);
 
     for (const auto& pair : tiles) {
-        auto& tile = pair.second;
-        tile->dumpDebugLogs();
+        pair.second->dumpDebugLogs();
     }
 }
 
