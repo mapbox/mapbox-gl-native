@@ -75,7 +75,9 @@ inline optional<std::string> toString(const mbgl::android::Value& value) {
 }
 
 inline optional<Value> toValue(const mbgl::android::Value& value) {
-    if (value.isBool()) {
+    if (value.isNull()) {
+        return {};
+    } else if (value.isBool()) {
         return { value.toBool() };
     } else if (value.isString()) {
         return { value.toString() };
