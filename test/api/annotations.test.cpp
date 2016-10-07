@@ -380,6 +380,31 @@ TEST(Annotations, VisibleFeatures) {
     EXPECT_EQ(features.size(), ids.size());
 }
 
+TEST(Annotations, CollidingFeatures) {
+    AnnotationTest test;
+
+    auto viewSize = test.view.getSize();
+    auto box = ScreenBox { {}, { double(viewSize[0]), double(viewSize[1]) } };
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+
+    std::vector<mbgl::AnnotationID> ids;
+    for (int longitude = 0; longitude < 10; ++longitude) {
+        for (int latitude = 0; latitude < 10; ++latitude) {
+            ids.push_back(test.map.addAnnotation(SymbolAnnotation { { double(latitude), double(longitude) }, "default_marker" }));
+        }
+    }
+
+    test.map.setLatLng({ 5, 5 });
+    for (uint16_t zoomSteps = 0; zoomSteps <= 20; ++zoomSteps) {
+        test.map.setZoom(zoomSteps / 10.0);
+        test::render(test.map);
+        auto features = test.map.queryRenderedFeatures(box);
+        EXPECT_EQ(features.size(), ids.size());
+    }
+}
+
 TEST(Annotations, TileEdges) {
     // Create a view big enough to fit an entire tile inside of it.
     AnnotationTest test(1024, 1024);

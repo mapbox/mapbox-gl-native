@@ -193,6 +193,7 @@ void AnnotationManager::updateStyle(Style& style) {
         layer->setSourceLayer(PointLayerID);
         layer->setIconImage({"{sprite}"});
         layer->setIconAllowOverlap(true);
+        layer->setIconIgnorePlacement(true);
 
         layer->impl->spriteAtlas = &spriteAtlas;
 
