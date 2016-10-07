@@ -785,7 +785,6 @@ public class MapboxMap {
     //
 
     void setTilt(double tilt) {
-        markerViewManager.setTilt((float) tilt);
         mapView.setTilt(tilt);
     }
 
