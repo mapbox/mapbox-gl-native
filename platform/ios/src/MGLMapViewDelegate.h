@@ -126,6 +126,23 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapViewDidFinishRenderingFrame:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
 
+/**
+ Tells the delegate that the map has just finished loading a style.
+ 
+ This method is called during the initialization of the map view and after any
+ subsequent loading of a new style. This method is called between the
+ `-mapViewWillStartRenderingMap:` and `-mapViewDidFinishRenderingMap:` delegate
+ methods. Changes to sources or layers of the current style do not cause this
+ method to be called.
+ 
+ This method is the earliest opportunity to modify the layout or appearance of
+ the current style before the map view is displayed to the user.
+
+ @param mapView The map view that has just loaded a style.
+ @param style The style that was loaded.
+ */
+- (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style;
+
 #pragma mark Tracking User Location
 
 /**
