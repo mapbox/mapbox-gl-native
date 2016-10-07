@@ -873,6 +873,14 @@ public:
             }
             break;
         }
+        case mbgl::MapChangeDidFinishLoadingStyle:
+        {
+            if ([self.delegate respondsToSelector:@selector(mapView:didFinishLoadingStyle:)])
+            {
+                [self.delegate mapView:self didFinishLoadingStyle:self.style];
+            }
+            break;
+        }
     }
 }
 
