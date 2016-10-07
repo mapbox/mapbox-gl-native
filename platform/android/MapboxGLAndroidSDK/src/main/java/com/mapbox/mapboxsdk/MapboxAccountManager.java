@@ -109,7 +109,7 @@ public class MapboxAccountManager {
      *
      * @return true if there is an Internet connection, false otherwise
      */
-    public boolean isConnected() {
+    public Boolean isConnected() {
         if (connected != null) {
             // Connectivity state overridden by app
             return connected;

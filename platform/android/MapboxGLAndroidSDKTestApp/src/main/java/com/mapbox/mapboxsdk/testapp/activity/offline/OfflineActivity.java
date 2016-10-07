@@ -78,7 +78,7 @@ public class OfflineActivity extends AppCompatActivity
         // You can use MapboxAccountManager.setConnected(Boolean) to manually set the connectivity
         // state of your app. This will override any checks performed via the ConnectivityManager.
         //MapboxAccountManager.getInstance().setConnected(false);
-        boolean connected = MapboxAccountManager.getInstance().isConnected();
+        Boolean connected = MapboxAccountManager.getInstance().isConnected();
         Log.d(LOG_TAG, String.format(MapboxConstants.MAPBOX_LOCALE,
                 "MapboxAccountManager is connected: %b", connected));
 
