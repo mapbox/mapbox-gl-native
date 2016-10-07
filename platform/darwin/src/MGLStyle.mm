@@ -34,6 +34,7 @@
 
 @interface MGLStyle()
 @property (nonatomic, weak) MGLMapView *mapView;
+@property (readonly, copy, nullable) NSURL *URL;
 @end
 
 @implementation MGLStyle
@@ -90,6 +91,10 @@ static NSURL *MGLStyleURL_emerald;
 
 - (NSString *)name {
     return @(self.mapView.mbglMap->getStyleName().c_str());
+}
+
+- (NSURL *)URL {
+    return [NSURL URLWithString:@(self.mapView.mbglMap->getStyleURL().c_str())];
 }
 
 - (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier
@@ -254,5 +259,12 @@ static NSURL *MGLStyleURL_emerald;
     }
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; name = %@, URL = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.name ? [NSString stringWithFormat:@"\"%@\"", self.name] : self.name,
+            self.URL ? [NSString stringWithFormat:@"\"%@\"", self.URL] : self.URL];
+}
 
 @end
