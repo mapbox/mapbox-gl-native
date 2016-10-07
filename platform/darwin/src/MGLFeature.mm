@@ -5,17 +5,16 @@
 #import "MGLPolygon.h"
 #import "MGLValueEvaluator.h"
 
+#import "MGLShape_Private.h"
 #import "MGLMultiPoint_Private.h"
 #import "MGLPolyline+MGLAdditions.h"
 #import "MGLPolygon+MGLAdditions.h"
+#import "NSDictionary+MGLAdditions.h"
+
+#import "NSExpression+MGLAdditions.h"
+
 #import <mbgl/util/geometry.hpp>
-
-@protocol MGLFeaturePrivate <MGLFeature>
-
-@property (nonatomic, copy, nullable, readwrite) id identifier;
-@property (nonatomic, copy, readwrite) NS_DICTIONARY_OF(NSString *, id) *attributes;
-
-@end
+#import <mapbox/geometry/feature.hpp>
 
 @interface MGLPointFeature () <MGLFeaturePrivate>
 @end
@@ -29,15 +28,12 @@
     return self.attributes[key];
 }
 
-- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
-    
-    return @{@"type":@"Feature",
-             @"properties":(self.attributes) ? self.attributes : @{},
-                     @"geometry":@{
-                             @"type":@"Point",
-                             @"coordinates":@[@(self.coordinate.longitude), @(self.coordinate.latitude)]
-                             }
-            };
+- (NSDictionary *)geoJSONDictionary {
+    return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
+}
+
+- (mbgl::Feature)mbglFeature {
+    return mbglFeature([self featureObject], identifier, self.attributes);
 }
 
 @end
@@ -49,20 +45,17 @@
 
 @synthesize identifier;
 @synthesize attributes;
-// 
 
 - (id)attributeForKey:(NSString *)key {
     return self.attributes[key];
 }
 
-- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
-    return @{@"type":@"Feature",
-             @"properties":(self.attributes) ? self.attributes : @{},
-             @"geometry":@{
-                     @"type":@"LineString",
-                     @"coordinates":self.mgl_coordinates
-                     }
-             };;
+- (NSDictionary *)geoJSONDictionary {
+    return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
+}
+
+- (mbgl::Feature)mbglFeature {
+    return mbglFeature([self featureObject], identifier, self.attributes);
 }
 
 @end
@@ -79,14 +72,12 @@
     return self.attributes[key];
 }
 
-- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
-    return @{@"type":@"Feature",
-             @"properties":(self.attributes) ? self.attributes : @{},
-             @"geometry":@{
-                    @"type":@"Polygon",
-                    @"coordinates":self.mgl_coordinates
-                    }
-            };
+- (NSDictionary *)geoJSONDictionary {
+    return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
+}
+
+- (mbgl::Feature)mbglFeature {
+    return mbglFeature([self featureObject], identifier, self.attributes);
 }
 
 @end
@@ -103,21 +94,12 @@
     return self.attributes[key];
 }
 
-- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
-    NSMutableArray *coordinates = [NSMutableArray array];
-    
-    for (NSUInteger index = 0; index < self.pointCount; index++) {
-        CLLocationCoordinate2D coordinate = self.coordinates[index];
-        [coordinates addObject:@[@(coordinate.longitude), @(coordinate.latitude)]];
-    }
-    
-    return @{@"type":@"Feature",
-             @"properties":(self.attributes) ? self.attributes : @{},
-             @"geometry":@{
-                     @"type":@"Multipoint",
-                     @"coordinates":coordinates
-                     }
-             };
+- (NSDictionary *)geoJSONDictionary {
+    return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
+}
+
+- (mbgl::Feature)mbglFeature {
+    return mbglFeature([self featureObject], identifier, self.attributes);
 }
 
 @end
@@ -134,19 +116,12 @@
     return self.attributes[key];
 }
 
-- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
-    NSMutableArray *coordinates = [NSMutableArray array];
-    for (MGLPolylineFeature *feature in self.polylines) {
-        [coordinates addObject:feature.mgl_coordinates];
-    }
-    
-    return @{@"type":@"Feature",
-             @"properties":(self.attributes) ? self.attributes : @{},
-             @"geometry":@{
-                     @"type":@"MultiLineString",
-                     @"coordinates":coordinates
-                     }
-             };
+- (NSDictionary *)geoJSONDictionary {
+    return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
+}
+
+- (mbgl::Feature)mbglFeature {
+    return mbglFeature([self featureObject], identifier, self.attributes);
 }
 
 @end
@@ -163,19 +138,12 @@
     return self.attributes[key];
 }
 
-- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
-    NSMutableArray *coordinates = [NSMutableArray array];
-    for (MGLPolygonFeature *feature in self.polygons) {
-        [coordinates addObject:feature.mgl_coordinates];
-    }
-    
-    return @{@"type":@"Feature",
-             @"properties":(self.attributes) ? self.attributes : @{},
-             @"geometry":@{
-                     @"type":@"MultiPolygon",
-                     @"coordinates":coordinates
-                     }
-             };
+- (NSDictionary *)geoJSONDictionary {
+    return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
+}
+
+- (mbgl::Feature)mbglFeature {
+    return mbglFeature([self featureObject], identifier, self.attributes);
 }
 
 @end
@@ -190,7 +158,7 @@
 
 @dynamic shapes;
 
-+ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)shapes {
++ (instancetype)shapeCollectionWithShapes:(NSArray *)shapes {
     return [super shapeCollectionWithShapes:shapes];
 }
 
@@ -198,36 +166,17 @@
     return self.attributes[key];
 }
 
-- (NS_DICTIONARY_OF(NSString *, id) *)featureDictionary {
-    
-    return @{@"type":@"Feature",
-             @"properties":(self.attributes) ? self.attributes : @{},
-             @"geometry":@{
-                     @"type":@"GeometryCollection",
-                     @"geometries":[self geometryCollection:self.shapes]
-                     }
-             };
+- (NSDictionary *)geoJSONDictionary {
+    return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
 }
 
-- (NS_MUTABLE_ARRAY_OF(NS_DICTIONARY_OF(NSString *, id) *) *)geometryCollection:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)shapes {
-    NSMutableArray *geometries = [NSMutableArray array];
-    
-    for (MGLShape<MGLFeature> *shape in shapes) {
-        if ([shape isKindOfClass:[MGLShapeCollectionFeature class]]) {
-            [geometries addObject:@{@"type":@"GeometryCollection",
-                                    @"geometries":[self geometryCollection:((MGLShapeCollectionFeature *)shape).shapes]}];
-        } else {
-            NSDictionary *geometry = shape.featureDictionary[@"geometry"];
-            [geometries addObject:@{@"type":geometry[@"type"],
-                                @"coordinates":geometry[@"coordinates"] }];
-        }
-    }
-    
-    return geometries;
+- (mbgl::Feature)mbglFeature {
+    [NSException raise:@"Method unavailable" format:@"%s is not available on %@.", __PRETTY_FUNCTION__, [self class]];
+    mbgl::Polygon<double> geometry;
+    return mbgl::Feature{geometry};
 }
+
 @end
-
-
 
 /**
  Transforms an `mbgl::geometry::geometry` type into an instance of the
@@ -336,4 +285,22 @@ NS_ARRAY_OF(MGLShape <MGLFeature> *) *MGLFeaturesFromMBGLFeatures(const std::vec
         [shapes addObject:shape];
     }
     return shapes;
+}
+
+mbgl::Feature mbglFeature(mbgl::Feature feature, id identifier, NSDictionary *attributes)
+{
+    if (identifier) {
+        NSExpression *identifierExpression = [NSExpression expressionForConstantValue:identifier];
+        feature.id = [identifierExpression mgl_featureIdentifier];
+    }
+    feature.properties = [attributes mgl_propertyMap];
+    return feature;
+}
+
+NS_DICTIONARY_OF(NSString *, id) *NSDictionaryFeatureForGeometry(NSDictionary *geometry, NSDictionary *attributes, id identifier) {
+    NSMutableDictionary *feature = [@{@"type": @"Feature",
+                                      @"properties": (attributes) ?: [NSNull null],
+                                      @"geometry": geometry} mutableCopy];
+    feature[@"id"] = identifier;
+    return [feature copy];
 }

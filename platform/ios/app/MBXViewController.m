@@ -796,19 +796,32 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     CGRect queryRect = CGRectInset(self.mapView.bounds, 100, 200);
     NSArray *features = [self.mapView visibleFeaturesInRect:queryRect];
     
-//    NSMutableArray *polygonFeatures = [NSMutableArray array];
-//    for (id<MGLFeature> feature in features) {
-//        if ([feature isMemberOfClass:[MGLPolygonFeature class]]) {
-//            [polygonFeatures addObject:feature];
-//        }
-//    }
+    NSString *querySourceID = @"query-source-id";
+    NSString *queryLayerID = @"query-layer-id";
     
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"query-id" features:features options:nil];
-    [self.mapView.style addSource:source];
+    // RTE if you don't remove the layer first
+    // RTE if you pass a nill layer to remove layer
+    MGLStyleLayer *layer = [self.mapView.style layerWithIdentifier:queryLayerID];
+    if (layer) {
+        [self.mapView.style removeLayer:layer];
+    }
     
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"query-layer-id" source:source];
-    fillLayer.fillColor = [UIColor blueColor];
-    [self.mapView.style addLayer:fillLayer];
+    // RTE if you pass a nill source to remove source
+    MGLSource *source = [self.mapView.style sourceWithIdentifier:querySourceID];
+    if (source) {
+        [self.mapView.style removeSource:source];
+    }
+    
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:querySourceID features:features options:nil];
+        [self.mapView.style addSource:source];
+        
+        MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:queryLayerID source:source];
+        fillLayer.fillColor = [UIColor blueColor];
+        fillLayer.fillOpacity = @(0.5);
+        [self.mapView.style addLayer:fillLayer];
+    });
 }
 
 - (IBAction)startWorldTour
