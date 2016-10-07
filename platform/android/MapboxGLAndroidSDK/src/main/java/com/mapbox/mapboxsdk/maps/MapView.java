@@ -469,6 +469,8 @@ public class MapView extends FrameLayout {
                     reloadIcons();
                     reloadMarkers();
                     adjustTopOffsetPixels();
+
+                    // Notify listeners the map is ready
                     if (onMapReadyCallbackList.size() > 0) {
                         Iterator<OnMapReadyCallback> iterator = onMapReadyCallbackList.iterator();
                         while (iterator.hasNext()) {
@@ -476,8 +478,11 @@ public class MapView extends FrameLayout {
                             callback.onMapReady(mapboxMap);
                             iterator.remove();
                         }
-                        mapboxMap.getMarkerViewManager().scheduleViewMarkerInvalidation();
                     }
+
+                    // invalidate camera to update overlain views with correct tilt value
+                    invalidateCameraPosition();
+
                 } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {
                     mapboxMap.getMarkerViewManager().scheduleViewMarkerInvalidation();
 
@@ -658,6 +663,7 @@ public class MapView extends FrameLayout {
     }
 
     void setTilt(Double pitch) {
+        mapboxMap.getMarkerViewManager().setTilt(pitch.floatValue());
         myLocationView.setTilt(pitch);
         nativeMapView.setPitch(pitch, 0);
     }
@@ -1533,6 +1539,7 @@ public class MapView extends FrameLayout {
         }
         CameraPosition position = new CameraPosition.Builder(nativeMapView.getCameraValues()).build();
         myLocationView.setCameraPosition(position);
+        mapboxMap.getMarkerViewManager().setTilt((float) Math.toDegrees(position.tilt));
         return position;
     }
 
