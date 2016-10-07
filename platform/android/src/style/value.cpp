@@ -9,7 +9,11 @@ namespace android {
 
     Value::Value(jni::JNIEnv& env, jni::jobject* _value) : jenv(env), value(_value) {}
 
-    Value::~Value() {}
+    Value::~Value() {
+        if (value) {
+            jni::DeleteLocalRef(jenv, value);
+        }
+    }
 
     bool Value::isNull() const {
         return value == nullptr;
