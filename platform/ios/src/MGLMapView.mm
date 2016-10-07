@@ -2187,13 +2187,21 @@ public:
     return [NSSet setWithObjects:@"latitude", @"longitude", @"camera", nil];
 }
 
-- (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate animated:(BOOL)animated
 {
-    [self setCenterCoordinate:coordinate zoomLevel:self.zoomLevel animated:animated];
+    if ( ! [self viewportWouldChangeWithCenterCoordinate:centerCoordinate
+                                               zoomLevel:self.zoomLevel
+                                               direction:self.direction]) return;
+
+    [self setCenterCoordinate:centerCoordinate zoomLevel:self.zoomLevel animated:animated];
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
 {
+    if ( ! [self viewportWouldChangeWithCenterCoordinate:centerCoordinate
+                                               zoomLevel:self.zoomLevel
+                                               direction:self.direction]) return;
+
     [self setCenterCoordinate:centerCoordinate animated:NO];
 }
 
@@ -2205,26 +2213,48 @@ public:
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
+    if ( ! [self viewportWouldChangeWithCenterCoordinate:centerCoordinate
+                                               zoomLevel:zoomLevel
+                                               direction:self.direction]) return;
+
     [self setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:self.direction animated:animated];
 }
 
-- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated {
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated
+{
+    if ( ! [self viewportWouldChangeWithCenterCoordinate:centerCoordinate
+                                               zoomLevel:zoomLevel
+                                               direction:direction]) return;
+
     [self setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:direction animated:animated completionHandler:NULL];
 }
 
-- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable dispatch_block_t)completion
 {
+    if ( ! [self viewportWouldChangeWithCenterCoordinate:centerCoordinate
+                                               zoomLevel:zoomLevel
+                                               direction:direction]) return completion();
+
     self.userTrackingMode = MGLUserTrackingModeNone;
 
     [self _setCenterCoordinate:centerCoordinate edgePadding:self.contentInset zoomLevel:zoomLevel direction:direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:completion];
 }
 
-- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate animated:(BOOL)animated {
+- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate animated:(BOOL)animated
+{
+    if ( ! [self viewportWouldChangeWithCenterCoordinate:centerCoordinate
+                                               zoomLevel:self.zoomLevel
+                                               direction:self.direction]) return;
+
     [self _setCenterCoordinate:centerCoordinate edgePadding:self.contentInset zoomLevel:self.zoomLevel direction:self.direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:NULL];
 }
 
-- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate edgePadding:(UIEdgeInsets)insets zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
+- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate edgePadding:(UIEdgeInsets)insets zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable dispatch_block_t)completion
 {
+    if ( ! [self viewportWouldChangeWithCenterCoordinate:centerCoordinate
+                                               zoomLevel:zoomLevel
+                                               direction:direction]) return completion();
+
     _mbglMap->cancelTransitions();
     
     mbgl::CameraOptions cameraOptions;
@@ -2248,9 +2278,7 @@ public:
             // Must run asynchronously after the transition is completely over.
             // Otherwise, a call to -setCenterCoordinate: within the completion
             // handler would reenter the completion handler’s caller.
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion();
-            });
+            MGLPerformAsyncOnMainThread(completion);
         };
     }
     _mbglMap->easeTo(cameraOptions, animationOptions);
@@ -2268,12 +2296,19 @@ public:
 
 - (void)setZoomLevel:(double)zoomLevel
 {
+    if ( ! [self viewportWouldChangeWithCenterCoordinate:self.centerCoordinate
+                                               zoomLevel:zoomLevel
+                                               direction:self.direction]) return;
+
     [self setZoomLevel:zoomLevel animated:NO];
 }
 
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
-    if (zoomLevel == self.zoomLevel) return;
+    if ( ! [self viewportWouldChangeWithCenterCoordinate:self.centerCoordinate
+                                               zoomLevel:zoomLevel
+                                               direction:self.direction]) return;
+
     _mbglMap->cancelTransitions();
     
     CGFloat duration = animated ? MGLAnimationDuration : 0;
@@ -2312,97 +2347,121 @@ public:
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds
 {
+    if ( ! [self viewportWouldChangeWithVisibleCoordinateBounds:bounds
+                                                    edgePadding:UIEdgeInsetsZero
+                                                      direction:self.direction]) return;
+
     [self setVisibleCoordinateBounds:bounds animated:NO];
 }
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated
 {
+    if ( ! [self viewportWouldChangeWithVisibleCoordinateBounds:bounds
+                                                    edgePadding:UIEdgeInsetsZero
+                                                      direction:self.direction]) return;
+
     [self setVisibleCoordinateBounds:bounds edgePadding:UIEdgeInsetsZero animated:animated];
 }
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated
 {
-    CLLocationCoordinate2D coordinates[] = {
-        {bounds.ne.latitude, bounds.sw.longitude},
-        bounds.sw,
-        {bounds.sw.latitude, bounds.ne.longitude},
-        bounds.ne,
-    };
+    if ( ! [self viewportWouldChangeWithVisibleCoordinateBounds:bounds
+                                                    edgePadding:insets
+                                                      direction:self.direction]) return;
+
+    CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(4 * sizeof(CLLocationCoordinate2D));
+    MGLLocationCoordinatesFromCoordinateBounds(bounds, coordinates);
+
     [self setVisibleCoordinates:coordinates
-                          count:sizeof(coordinates) / sizeof(coordinates[0])
+                          count:4
                     edgePadding:insets
                        animated:animated];
+
+    free(coordinates);
 }
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction animated:(BOOL)animated
 {
-    CLLocationCoordinate2D coordinates[] = {
-        {bounds.ne.latitude, bounds.sw.longitude},
-        bounds.sw,
-        {bounds.sw.latitude, bounds.ne.longitude},
-        bounds.ne,
-    };
+    if ( ! [self viewportWouldChangeWithVisibleCoordinateBounds:bounds
+                                                    edgePadding:insets
+                                                      direction:direction]) return;
+
+    CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(4 * sizeof(CLLocationCoordinate2D));
+    MGLLocationCoordinatesFromCoordinateBounds(bounds, coordinates);
+
     [self setVisibleCoordinates:coordinates
-                          count:sizeof(coordinates) / sizeof(coordinates[0])
+                          count:4
                     edgePadding:insets
                       direction:direction
                        animated:animated];
+
+    free(coordinates);
 }
 
 - (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated
 {
+    if ( ! [self viewportWouldChangeWithVisibleCoordinates:coordinates
+                                                     count:count
+                                               edgePadding:insets
+                                                 direction:self.direction]) return;
+
     [self setVisibleCoordinates:coordinates count:count edgePadding:insets direction:self.direction animated:animated];
 }
 
 - (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction animated:(BOOL)animated
 {
+    if ( ! [self viewportWouldChangeWithVisibleCoordinates:coordinates
+                                                     count:count
+                                               edgePadding:insets
+                                                 direction:direction]) return;
+
     [self setVisibleCoordinates:coordinates count:count edgePadding:insets direction:direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil];
 }
 
-- (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function {
+- (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function
+{
+    if ( ! [self viewportWouldChangeWithVisibleCoordinates:coordinates
+                                                     count:count
+                                               edgePadding:insets
+                                                 direction:direction]) return;
+
     [self setVisibleCoordinates:coordinates count:count edgePadding:insets direction:direction duration:duration animationTimingFunction:function completionHandler:NULL];
 }
 
-- (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
+- (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable dispatch_block_t)completion
 {
+    if ( ! [self viewportWouldChangeWithVisibleCoordinates:coordinates
+                                                     count:count
+                                               edgePadding:insets
+                                                 direction:direction]) return MGLPerformAsyncOnMainThread(completion);
+
     self.userTrackingMode = MGLUserTrackingModeNone;
     [self _setVisibleCoordinates:coordinates count:count edgePadding:insets direction:direction duration:duration animationTimingFunction:function completionHandler:completion];
 }
 
-- (void)_setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
+- (void)_setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable dispatch_block_t)completion
 {
+    const mbgl::CameraOptions cameraOptions = [self cameraOptionsForVisibleCoordinates:coordinates count:count edgePadding:insets direction:direction];
+
+    if ( ! [self viewportWouldChangeWithCamera:[self cameraForCameraOptions:cameraOptions]])         return MGLPerformAsyncOnMainThread(completion);
+
     _mbglMap->cancelTransitions();
-    
-    [self willChangeValueForKey:@"visibleCoordinateBounds"];
-    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
-    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
-    std::vector<mbgl::LatLng> latLngs;
-    latLngs.reserve(count);
-    for (NSUInteger i = 0; i < count; i++)
-    {
-        latLngs.push_back({coordinates[i].latitude, coordinates[i].longitude});
-    }
-    
-    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngs(latLngs, padding);
-    if (direction >= 0)
-    {
-        cameraOptions.angle = MGLRadiansFromDegrees(-direction);
-    }
-    
+
     mbgl::AnimationOptions animationOptions;
     if (duration > 0)
     {
         animationOptions.duration.emplace(MGLDurationInSeconds(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
+
     if (completion)
     {
         animationOptions.transitionFinishFn = [completion]() {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion();
-            });
+            MGLPerformAsyncOnMainThread(completion);
         };
     }
+
+    [self willChangeValueForKey:@"visibleCoordinateBounds"];
     _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"visibleCoordinateBounds"];
 }
@@ -2421,6 +2480,10 @@ public:
 {
     if ( ! animated && ! self.rotationAllowed) return;
 
+    if ( ! [self viewportWouldChangeWithCenterCoordinate:self.centerCoordinate
+                                               zoomLevel:self.zoomLevel
+                                               direction:direction]) return;
+
     if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
     {
         self.userTrackingMode = MGLUserTrackingModeFollow;
@@ -2431,7 +2494,10 @@ public:
 
 - (void)_setDirection:(CLLocationDirection)direction animated:(BOOL)animated
 {
-    if (direction == self.direction) return;
+    if ( ! [self viewportWouldChangeWithCenterCoordinate:self.centerCoordinate
+                                               zoomLevel:self.zoomLevel
+                                               direction:direction]) return;
+
     _mbglMap->cancelTransitions();
 
     CGFloat duration = animated ? MGLAnimationDuration : 0;
@@ -2452,6 +2518,10 @@ public:
 
 - (void)setDirection:(CLLocationDirection)direction
 {
+    if ( ! [self viewportWouldChangeWithCenterCoordinate:self.centerCoordinate
+                                               zoomLevel:self.zoomLevel
+                                               direction:direction]) return;
+
     [self setDirection:direction animated:NO];
 }
 
@@ -2473,29 +2543,34 @@ public:
 
 - (void)setCamera:(MGLMapCamera *)camera
 {
+    if ( ! [self viewportWouldChangeWithCamera:camera]) return;
+
     [self setCamera:camera animated:NO];
 }
 
 - (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated
 {
+    if ( ! [self viewportWouldChangeWithCamera:camera]) return;
+
     [self setCamera:camera withDuration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil];
 }
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function
 {
+    if ( ! [self viewportWouldChangeWithCamera:camera]) return;
+
     [self setCamera:camera withDuration:duration animationTimingFunction:function completionHandler:NULL];
 }
 
-- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
+- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable dispatch_block_t)completion
 {
-    self.userTrackingMode = MGLUserTrackingModeNone;
-    _mbglMap->cancelTransitions();
-    if ([self.camera isEqual:camera])
-    {
-        return;
-    }
+    if ( ! [self viewportWouldChangeWithCamera:camera]) return completion();
 
-    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:self.contentInset];
+    self.userTrackingMode = MGLUserTrackingModeNone;
+
+    _mbglMap->cancelTransitions();
+
+    mbgl::CameraOptions cameraOptions = [self cameraOptionsForAnimatingToCamera:camera edgePadding:self.contentInset];
     mbgl::AnimationOptions animationOptions;
     if (duration > 0)
     {
@@ -2505,9 +2580,7 @@ public:
     if (completion)
     {
         animationOptions.transitionFinishFn = [completion]() {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion();
-            });
+            MGLPerformAsyncOnMainThread(completion);
         };
     }
     
@@ -2516,32 +2589,37 @@ public:
     [self didChangeValueForKey:@"camera"];
 }
 
-- (void)flyToCamera:(MGLMapCamera *)camera completionHandler:(nullable void (^)(void))completion
+- (void)flyToCamera:(MGLMapCamera *)camera completionHandler:(nullable dispatch_block_t)completion
 {
+    if ( ! [self viewportWouldChangeWithCamera:camera]) return completion();
+
     [self flyToCamera:camera withDuration:-1 completionHandler:completion];
 }
 
-- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable void (^)(void))completion
+- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable dispatch_block_t)completion
 {
+    if ( ! [self viewportWouldChangeWithCamera:camera]) return completion();
+
     [self flyToCamera:camera withDuration:duration peakAltitude:-1 completionHandler:completion];
 }
 
-- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion
+- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable dispatch_block_t)completion
 {
+    if ( ! [self viewportWouldChangeWithCamera:camera]) return completion();
+
     self.userTrackingMode = MGLUserTrackingModeNone;
     
     [self _flyToCamera:camera edgePadding:self.contentInset withDuration:duration peakAltitude:peakAltitude completionHandler:completion];
 }
 
-- (void)_flyToCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)insets withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion
+- (void)_flyToCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)insets withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable dispatch_block_t)completion
 {
-    _mbglMap->cancelTransitions();
-    if ([self.camera isEqual:camera])
-    {
-        return;
-    }
+    const mbgl::CameraOptions cameraOptions = [self cameraOptionsForAnimatingToCamera:camera edgePadding:insets];
 
-    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:insets];
+    if ( ! [self viewportWouldChangeWithCamera:[self cameraForCameraOptions:cameraOptions]]) return completion();
+
+    _mbglMap->cancelTransitions();
+
     mbgl::AnimationOptions animationOptions;
     if (duration >= 0)
     {
@@ -2557,9 +2635,7 @@ public:
     if (completion)
     {
         animationOptions.transitionFinishFn = [completion]() {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion();
-            });
+            MGLPerformAsyncOnMainThread(completion);
         };
     }
     
@@ -2591,9 +2667,9 @@ public:
     return [MGLMapCamera cameraLookingAtCenterCoordinate:centerCoordinate fromDistance:altitude pitch:pitch heading:direction];
 }
 
-/// Returns a CameraOptions object that specifies parameters for animating to
+/// Returns a CameraOptions struct that specifies parameters for animating to
 /// the given camera.
-- (mbgl::CameraOptions)cameraOptionsObjectForAnimatingToCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)insets
+- (mbgl::CameraOptions)cameraOptionsForAnimatingToCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)insets
 {
     mbgl::CameraOptions options;
     if (CLLocationCoordinate2DIsValid(camera.centerCoordinate))
@@ -2612,6 +2688,25 @@ public:
     {
         options.pitch = MGLRadiansFromDegrees(camera.pitch);
     }
+    return options;
+}
+
+- (mbgl::CameraOptions)cameraOptionsForVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction
+{
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
+    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
+    std::vector<mbgl::LatLng> latLngs;
+    latLngs.reserve(count);
+    for (NSUInteger i = 0; i < count; i++)
+    {
+        latLngs.push_back({coordinates[i].latitude, coordinates[i].longitude});
+    }
+    mbgl::CameraOptions options = _mbglMap->cameraForLatLngs(latLngs, padding);
+    if (direction >= 0)
+    {
+        options.angle = MGLRadiansFromDegrees(-direction);
+    }
+
     return options;
 }
 
@@ -2703,6 +2798,44 @@ public:
 - (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude
 {
     return [self metersPerPointAtLatitude:latitude];
+}
+
+- (BOOL)viewportWouldChangeWithCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction
+{
+    return (centerCoordinate.latitude != self.centerCoordinate.latitude   ||
+            centerCoordinate.longitude != self.centerCoordinate.longitude ||
+            zoomLevel != self.zoomLevel                                   ||
+            direction != self.direction);
+}
+
+- (BOOL)viewportWouldChangeWithVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction
+{
+    CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(4 * sizeof(CLLocationCoordinate2D));
+    MGLLocationCoordinatesFromCoordinateBounds(bounds, coordinates);
+
+    const mbgl::CameraOptions cameraOptions = [self cameraOptionsForVisibleCoordinates:coordinates
+                                                                                 count:4
+                                                                           edgePadding:insets
+                                                                             direction:direction];
+
+    free(coordinates);
+
+    return [self viewportWouldChangeWithCamera:[self cameraForCameraOptions:cameraOptions]];
+}
+
+- (BOOL)viewportWouldChangeWithVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction
+{
+    const mbgl::CameraOptions cameraOptions = [self cameraOptionsForVisibleCoordinates:coordinates
+                                                                                 count:count
+                                                                           edgePadding:insets
+                                                                             direction:direction];
+
+    return [self viewportWouldChangeWithCamera:[self cameraForCameraOptions:cameraOptions]];
+}
+
+- (BOOL)viewportWouldChangeWithCamera:(MGLMapCamera *)camera
+{
+    return ( ! [camera isEqual:self.camera]);
 }
 
 #pragma mark - Styling -
@@ -4166,7 +4299,7 @@ public:
 - (void)didUpdateLocationWithTargetAnimated:(BOOL)animated
 {
     BOOL firstUpdate = self.userTrackingState == MGLUserTrackingStatePossible;
-    void (^completion)(void);
+    dispatch_block_t completion;
     if (animated && firstUpdate)
     {
         self.userTrackingState = MGLUserTrackingStateBegan;
@@ -4388,7 +4521,12 @@ public:
 
 #pragma mark - Utility -
 
-- (void)animateWithDelay:(NSTimeInterval)delay animations:(void (^)(void))animations
+void MGLPerformAsyncOnMainThread(dispatch_block_t completion)
+{
+    dispatch_async(dispatch_get_main_queue(), completion);
+}
+
+- (void)animateWithDelay:(NSTimeInterval)delay animations:(dispatch_block_t)animations
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), animations);
 }
@@ -5165,7 +5303,7 @@ void MGLFinishCustomStyleLayer(void *context)
 
 @implementation MGLMapView (MGLCustomStyleLayerAdditions)
 
-- (void)insertCustomStyleLayerWithIdentifier:(NSString *)identifier preparationHandler:(void (^)())preparation drawingHandler:(MGLCustomStyleLayerDrawingHandler)drawing completionHandler:(void (^)())completion belowStyleLayerWithIdentifier:(nullable NSString *)otherIdentifier
+- (void)insertCustomStyleLayerWithIdentifier:(NSString *)identifier preparationHandler:(void (^)())preparation drawingHandler:(MGLCustomStyleLayerDrawingHandler)drawing completionHandler:(dispatch_block_t)completion belowStyleLayerWithIdentifier:(nullable NSString *)otherIdentifier
 {
     NSAssert(identifier, @"Style layer needs an identifier");
     MGLCustomStyleLayerHandlers *context = new MGLCustomStyleLayerHandlers(preparation, drawing, completion);
