@@ -172,7 +172,8 @@ void Source::Impl::updateTiles(const UpdateParameters& parameters) {
                                    parameters.debugOptions & MapDebugOptions::Collision };
 
     for (auto& pair : tiles) {
-        pair.second->setPlacementConfig(config);
+        auto& tile = pair.second;
+        tile->setPlacementConfig(config);
     }
 }
 
@@ -187,7 +188,7 @@ void Source::Impl::reloadTiles() {
 
 std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRenderedFeatures(const QueryParameters& parameters) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
-    if (renderTiles.empty()) {
+    if (renderTiles.empty() || parameters.geometry.empty()) {
         return result;
     }
 
@@ -197,17 +198,13 @@ std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRendere
             parameters.transformState, 0, { p.x, parameters.transformState.getHeight() - p.y }).p);
     }
 
-    if (queryGeometry.empty()) {
-        return result;
-    }
-
     mapbox::geometry::box<double> box = mapbox::geometry::envelope(queryGeometry);
 
     for (const auto& tilePtr : renderTiles) {
-        const RenderTile& tile = tilePtr.second;
+        const RenderTile& renderTile = tilePtr.second;
 
-        TilePoint tileSpaceBoundsMin = Tile::pointFromTileCoordinate(tile.id, box.min);
-        TilePoint tileSpaceBoundsMax = Tile::pointFromTileCoordinate(tile.id, box.max);
+        TilePoint tileSpaceBoundsMin = Tile::pointFromTileCoordinate(renderTile.id, box.min);
+        TilePoint tileSpaceBoundsMax = Tile::pointFromTileCoordinate(renderTile.id, box.max);
 
         if (tileSpaceBoundsMin.x >= util::EXTENT || tileSpaceBoundsMin.y >= util::EXTENT ||
             tileSpaceBoundsMax.x < 0 || tileSpaceBoundsMax.y < 0) continue;
@@ -215,13 +212,14 @@ std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRendere
         GeometryCoordinates tileSpaceQueryGeometry;
 
         for (const auto& c : queryGeometry) {
-            tileSpaceQueryGeometry.push_back(Tile::pointFromTileCoordinate(tile.id, c));
+            tileSpaceQueryGeometry.push_back(Tile::pointFromTileCoordinate(renderTile.id, c));
         }
 
-        tile.tile.queryRenderedFeatures(result,
-                                        tileSpaceQueryGeometry,
-                                        parameters.transformState,
-                                        parameters.layerIDs);
+        auto& tile = renderTile.tile;
+        tile.queryRenderedFeatures(result,
+                                   tileSpaceQueryGeometry,
+                                   parameters.transformState,
+                                   parameters.layerIDs);
     }
 
     return result;
