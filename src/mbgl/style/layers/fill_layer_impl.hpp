@@ -19,7 +19,7 @@ public:
 
     float getQueryRadius() const override;
     bool queryIntersectsGeometry(
-            const GeometryCollection& queryGeometry,
+            const GeometryCoordinates& queryGeometry,
             const GeometryCollection& geometry,
             const float bearing,
             const float pixelsToTileUnits) const override;

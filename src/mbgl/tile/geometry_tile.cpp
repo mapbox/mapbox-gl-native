@@ -136,7 +136,7 @@ void GeometryTile::queryRenderedFeatures(
     if (!featureIndex || !data) return;
 
     featureIndex->query(result,
-                        { queryGeometry },
+                        queryGeometry,
                         transformState.getAngle(),
                         util::tileSize * id.overscaleFactor(),
                         std::pow(2, transformState.getZoom() - id.overscaledZ),

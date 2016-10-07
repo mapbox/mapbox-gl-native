@@ -52,7 +52,7 @@ static bool topDownSymbols(const IndexedSubfeature& a, const IndexedSubfeature& 
 
 void FeatureIndex::query(
         std::unordered_map<std::string, std::vector<Feature>>& result,
-        const GeometryCollection& queryGeometry,
+        const GeometryCoordinates& queryGeometry,
         const float bearing,
         const double tileSize,
         const double scale,
@@ -93,7 +93,7 @@ void FeatureIndex::query(
 void FeatureIndex::addFeature(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const IndexedSubfeature& indexedFeature,
-    const GeometryCollection& queryGeometry,
+    const GeometryCoordinates& queryGeometry,
     const optional<std::vector<std::string>>& filterLayerIDs,
     const GeometryTileData& geometryTileData,
     const CanonicalTileID& tileID,
@@ -128,8 +128,8 @@ void FeatureIndex::addFeature(
     }
 }
 
-optional<GeometryCollection> FeatureIndex::translateQueryGeometry(
-        const GeometryCollection& queryGeometry,
+optional<GeometryCoordinates> FeatureIndex::translateQueryGeometry(
+        const GeometryCoordinates& queryGeometry,
         const std::array<float, 2>& translate,
         const style::TranslateAnchorType anchorType,
         const float bearing,
@@ -143,13 +143,9 @@ optional<GeometryCollection> FeatureIndex::translateQueryGeometry(
         translateVec = util::rotate(translateVec, -bearing);
     }
 
-    GeometryCollection translated;
-    for (const auto& ring : queryGeometry) {
-        translated.emplace_back();
-        auto& translatedRing = translated.back();
-        for (const auto& p : ring) {
-            translatedRing.push_back(p - translateVec);
-        }
+    GeometryCoordinates translated;
+    for (const auto& p : queryGeometry) {
+        translated.push_back(p - translateVec);
     }
     return translated;
 }

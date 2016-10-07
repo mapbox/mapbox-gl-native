@@ -35,7 +35,7 @@ public:
 
     void query(
             std::unordered_map<std::string, std::vector<Feature>>& result,
-            const GeometryCollection& queryGeometry,
+            const GeometryCoordinates& queryGeometry,
             const float bearing,
             const double tileSize,
             const double scale,
@@ -44,8 +44,8 @@ public:
             const CanonicalTileID&,
             const style::Style&) const;
 
-    static optional<GeometryCollection> translateQueryGeometry(
-            const GeometryCollection& queryGeometry,
+    static optional<GeometryCoordinates> translateQueryGeometry(
+            const GeometryCoordinates& queryGeometry,
             const std::array<float, 2>& translate,
             const style::TranslateAnchorType,
             const float bearing,
@@ -59,7 +59,7 @@ private:
     void addFeature(
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const IndexedSubfeature&,
-            const GeometryCollection& queryGeometry,
+            const GeometryCoordinates& queryGeometry,
             const optional<std::vector<std::string>>& filterLayerIDs,
             const GeometryTileData&,
             const CanonicalTileID&,

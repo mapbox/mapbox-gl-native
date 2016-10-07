@@ -49,7 +49,7 @@ float FillLayer::Impl::getQueryRadius() const {
 }
 
 bool FillLayer::Impl::queryIntersectsGeometry(
-        const GeometryCollection& queryGeometry,
+        const GeometryCoordinates& queryGeometry,
         const GeometryCollection& geometry,
         const float bearing,
         const float pixelsToTileUnits) const {
@@ -57,7 +57,7 @@ bool FillLayer::Impl::queryIntersectsGeometry(
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry, paint.fillTranslate, paint.fillTranslateAnchor, bearing, pixelsToTileUnits);
 
-    return util::multiPolygonIntersectsMultiPolygon(translatedQueryGeometry.value_or(queryGeometry), geometry);
+    return util::polygonIntersectsMultiPolygon(translatedQueryGeometry.value_or(queryGeometry), geometry);
 }
 
 } // namespace style

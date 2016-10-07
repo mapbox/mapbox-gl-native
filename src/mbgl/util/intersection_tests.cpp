@@ -90,54 +90,47 @@ bool lineIntersectsBufferedLine(const GeometryCoordinates& lineA, const Geometry
     return false;
 }
 
-bool multiPolygonIntersectsBufferedMultiPoint(const GeometryCollection& multiPolygon, const GeometryCollection& rings, float radius) {
-    for (auto& polygon : multiPolygon) {
-        for (auto& ring : rings) {
-            for (auto& point : ring) {
-                if (polygonContainsPoint(polygon, point)) return true;
-                if (pointIntersectsBufferedLine(point, polygon, radius)) return true;
-            }
+bool polygonIntersectsBufferedMultiPoint(const GeometryCoordinates& polygon, const GeometryCollection& rings, float radius) {
+    for (auto& ring : rings) {
+        for (auto& point : ring) {
+            if (polygonContainsPoint(polygon, point)) return true;
+            if (pointIntersectsBufferedLine(point, polygon, radius)) return true;
         }
     }
     return false;
 }
 
-bool multiPolygonIntersectsBufferedMultiLine(const GeometryCollection& multiPolygon, const GeometryCollection& multiLine, float radius) {
+bool polygonIntersectsBufferedMultiLine(const GeometryCoordinates& polygon, const GeometryCollection& multiLine, float radius) {
     for (auto& line : multiLine) {
-        for (auto& polygon : multiPolygon) {
-
-            if (polygon.size() >= 3) {
-                for (auto& p : line) {
-                    if (polygonContainsPoint(polygon, p)) return true;
-                }
+        if (polygon.size() >= 3) {
+            for (auto& p : line) {
+                if (polygonContainsPoint(polygon, p)) return true;
             }
-
-            if (lineIntersectsBufferedLine(polygon, line, radius)) return true;
         }
+
+        if (lineIntersectsBufferedLine(polygon, line, radius)) return true;
     }
 
     return false;
 }
 
-bool multiPolygonIntersectsMultiPolygon(const GeometryCollection& multiPolygonA, const GeometryCollection& multiPolygonB) {
-    if (multiPolygonA.size() == 1 && multiPolygonA.at(0).size() == 1) {
-        return multiPolygonContainsPoint(multiPolygonB, multiPolygonA.at(0).at(0));
+bool polygonIntersectsMultiPolygon(const GeometryCoordinates& polygon, const GeometryCollection& multiPolygon) {
+    if (polygon.size() == 1) {
+        return multiPolygonContainsPoint(multiPolygon, polygon.at(0));
     }
 
-    for (auto& ring : multiPolygonB) {
+    for (auto& ring : multiPolygon) {
         for (auto& p : ring) {
-            if (multiPolygonContainsPoint(multiPolygonA, p)) return true;
+            if (polygonContainsPoint(polygon, p)) return true;
         }
     }
 
-    for (auto& polygon : multiPolygonA) {
-        for (auto& p : polygon) {
-            if (multiPolygonContainsPoint(multiPolygonB, p)) return true;
-        }
+    for (auto& p : polygon) {
+        if (multiPolygonContainsPoint(multiPolygon, p)) return true;
+    }
 
-        for (auto& polygonB : multiPolygonB) {
-            if (lineIntersectsLine(polygon, polygonB)) return true;
-        }
+    for (auto& polygonB : multiPolygon) {
+        if (lineIntersectsLine(polygon, polygonB)) return true;
     }
 
     return false;
