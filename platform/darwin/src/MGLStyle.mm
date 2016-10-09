@@ -21,6 +21,9 @@
 #import "MGLGeoJSONSource.h"
 
 #include <mbgl/util/default_styles.hpp>
+#include <mbgl/util/image.hpp>
+#include <mbgl/util/io.hpp>
+#include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
@@ -256,6 +259,24 @@ static NSURL *MGLStyleURL_emerald;
     if (styleClass)
     {
         self.mapView.mbglMap->removeClass([styleClass UTF8String]);
+    }
+}
+
+- (void)addImage:(NSString *)imagePath forName:(NSString *)name
+{
+    if (imagePath && name)
+    {
+      auto decoded = mbgl::decodeImage(mbgl::util::read_file([imagePath UTF8String]));
+      auto image = std::make_unique<mbgl::SpriteImage>(std::move(decoded), 1.0);
+      self.mapView.mbglMap->addImage([name UTF8String], std::move(image));
+    }
+}
+
+- (void)removeImage:(NSString *)name
+{
+    if (name)
+    {
+        self.mapView.mbglMap->removeImage([name UTF8String]);
     }
 }
 

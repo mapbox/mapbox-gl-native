@@ -258,6 +258,21 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 - (void)removeStyleClass:(NSString *)styleClass;
 
+/**
+ Adds an image to the sprite atlas by it's bundle URL.
+
+ @param imageURL The URL to the bundled image
+ @param name The unique identifier of this image
+ */
+- (void)addImage:(NSString *)imagePath forName:(NSString *)name;
+
+/**
+ Removes an image from the sprite atlas by its name.
+
+ @param name The unique identifier of the image to remove
+ */
+- (void)removeImage:(NSString *)name;
+
 @end
 
 NS_ASSUME_NONNULL_END
