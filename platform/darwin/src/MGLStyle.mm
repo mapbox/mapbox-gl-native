@@ -1,5 +1,7 @@
 #import "MGLStyle.h"
 
+#import "MGLTypes.h"
+
 #import "MGLMapView_Private.h"
 #import "MGLStyleLayer.h"
 #import "MGLFillStyleLayer.h"
@@ -21,8 +23,6 @@
 #import "MGLGeoJSONSource.h"
 
 #include <mbgl/util/default_styles.hpp>
-#include <mbgl/util/image.hpp>
-#include <mbgl/util/io.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
@@ -262,17 +262,16 @@ static NSURL *MGLStyleURL_emerald;
     }
 }
 
-- (void)addImage:(NSString *)imagePath forName:(NSString *)name
+- (void)setImage:(MGLImage *)image forName:(NSString *)name
 {
-    if (imagePath && name)
+    if (image && name)
     {
-      auto decoded = mbgl::decodeImage(mbgl::util::read_file([imagePath UTF8String]));
-      auto image = std::make_unique<mbgl::SpriteImage>(std::move(decoded), 1.0);
-      self.mapView.mbglMap->addImage([name UTF8String], std::move(image));
+        auto spriteImage = [MGLImage mbgl_spriteImageFromImage:image];
+        self.mapView.mbglMap->addImage([name UTF8String], std::move(spriteImage));
     }
 }
 
-- (void)removeImage:(NSString *)name
+- (void)removeImageForName:(NSString *)name
 {
     if (name)
     {

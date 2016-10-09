@@ -38,6 +38,7 @@
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
 #import "NSURL+MGLAdditions.h"
+#import "UIImage+MGLAdditions.h"
 
 #import "MGLFaux3DUserLocationAnnotationView.h"
 #import "MGLUserLocationAnnotationView.h"
@@ -3090,29 +3091,11 @@ public:
     NSString *iconIdentifier = annotationImage.styleIconIdentifier;
     self.annotationImagesByIdentifier[annotationImage.reuseIdentifier] = annotationImage;
     annotationImage.delegate = self;
-    
-    // retrieve pixels
-    CGImageRef image = annotationImage.image.CGImage;
-    size_t width = CGImageGetWidth(image);
-    size_t height = CGImageGetHeight(image);
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    mbgl::PremultipliedImage cPremultipliedImage(width, height);
-    size_t bytesPerPixel = 4;
-    size_t bytesPerRow = bytesPerPixel * width;
-    size_t bitsPerComponent = 8;
-    CGContextRef context = CGBitmapContextCreate(cPremultipliedImage.data.get(), width, height, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
-    CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
-    CGContextRelease(context);
-    CGColorSpaceRelease(colorSpace);
 
     // add sprite
-    auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(
-        std::move(cPremultipliedImage), 
-        float(annotationImage.image.scale));
+    std::shared_ptr<mbgl::SpriteImage> sprite([UIImage mbgl_spriteImageFromImage:annotationImage.image]);
+    _mbglMap->addAnnotationIcon(iconIdentifier.UTF8String, sprite);
 
-    // sprite upload
-    _mbglMap->addAnnotationIcon(iconIdentifier.UTF8String, cSpriteImage);
-    
     // Create a slop area with a “radius” equal in size to the annotation
     // image’s alignment rect, allowing the eventual tap to be on any point
     // within this image. Union this slop area with any existing slop areas.

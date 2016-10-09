@@ -42,6 +42,7 @@
 #import "NSString+MGLAdditions.h"
 #import "NSURL+MGLAdditions.h"
 #import "NSColor+MGLAdditions.h"
+#import "NSImage+MGLAdditions.h"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -1739,23 +1740,10 @@ public:
         // Can’t create an empty sprite. An image that hasn’t loaded is also useless.
         return;
     }
-    
-    // Create a bitmap image representation from the image, respecting backing
-    // scale factor and any resizing done on the image at runtime.
-    // http://www.cocoabuilder.com/archive/cocoa/82430-nsimage-getting-raw-bitmap-data.html#82431
-    [image lockFocus];
-    NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:{ NSZeroPoint, size }];
-    [image unlockFocus];
-    
-    // Get the image’s raw pixel data as an RGBA buffer.
-    std::string pixelString((const char *)rep.bitmapData, rep.pixelsWide * rep.pixelsHigh * 4 /* RGBA */);
 
-    mbgl::PremultipliedImage cPremultipliedImage(rep.pixelsWide, rep.pixelsHigh);
-    std::copy(rep.bitmapData, rep.bitmapData + cPremultipliedImage.size(), cPremultipliedImage.data.get());
-    auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(std::move(cPremultipliedImage),
-                                                            (float)(rep.pixelsWide / size.width));
-    _mbglMap->addAnnotationIcon(iconIdentifier.UTF8String, cSpriteImage);
-    
+    std::shared_ptr<mbgl::SpriteImage> sprite([NSImage mbgl_spriteImageFromImage:annotationImage.image]);
+    _mbglMap->addAnnotationIcon(iconIdentifier.UTF8String, sprite);
+
     // Create a slop area with a “radius” equal to the annotation image’s entire
     // size, allowing the eventual click to be on any point within this image.
     // Union this slop area with any existing slop areas.
