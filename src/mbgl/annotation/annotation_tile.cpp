@@ -12,7 +12,7 @@ AnnotationTile::AnnotationTile(const OverscaledTileID& overscaledTileID,
                                const style::UpdateParameters& parameters)
     : GeometryTile(overscaledTileID, AnnotationManager::SourceID, parameters),
       annotationManager(parameters.annotationManager) {
-    annotationManager.addTile(*this);
+    annotationManager.addTile(*this, parameters.transformState);
 }
 
 AnnotationTile::~AnnotationTile() {

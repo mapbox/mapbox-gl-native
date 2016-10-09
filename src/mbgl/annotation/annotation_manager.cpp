@@ -151,7 +151,7 @@ void AnnotationManager::removeAndAdd(const AnnotationID& id, const Annotation& a
     });
 }
 
-std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const CanonicalTileID& tileID) {
+std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const CanonicalTileID& tileID, const TransformState& state) {
     if (symbolAnnotations.empty() && shapeAnnotations.empty())
         return nullptr;
 
@@ -159,11 +159,9 @@ std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const Canonic
 
     AnnotationTileLayer& pointLayer = tileData->layers.emplace(PointLayerID, PointLayerID).first->second;
 
-    LatLngBounds tileBounds(tileID);
-
-    symbolTree.query(boost::geometry::index::intersects(tileBounds),
+    symbolTree.query(bgi::intersects(LatLngBounds { tileID }),
         boost::make_function_output_iterator([&](const auto& val){
-            val->updateLayer(tileID, pointLayer);
+            val->updateLayer(tileID, pointLayer, state);
         }));
 
     for (const auto& shape : shapeAnnotations) {
@@ -205,15 +203,15 @@ void AnnotationManager::updateStyle(Style& style) {
     obsoleteShapeAnnotationLayers.clear();
 }
 
-void AnnotationManager::updateData() {
+void AnnotationManager::updateData(const TransformState& state) {
     for (auto& tile : tiles) {
-        tile->setData(getTileData(tile->id.canonical));
+        tile->setData(getTileData(tile->id.canonical, state));
     }
 }
 
-void AnnotationManager::addTile(AnnotationTile& tile) {
+void AnnotationManager::addTile(AnnotationTile& tile, const TransformState& state) {
     tiles.insert(&tile);
-    tile.setData(getTileData(tile.id.canonical));
+    tile.setData(getTileData(tile.id.canonical, state));
 }
 
 void AnnotationManager::removeTile(AnnotationTile& tile) {

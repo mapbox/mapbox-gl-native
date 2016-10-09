@@ -212,7 +212,7 @@ void Map::Impl::update() {
     }
 
     if (updateFlags & Update::AnnotationData) {
-        annotationManager->updateData();
+        annotationManager->updateData(transform.getState());
     }
 
     if (updateFlags & Update::Layout) {

@@ -18,10 +18,13 @@ class AnnotationTile;
 class AnnotationTileData;
 class SymbolAnnotationImpl;
 class ShapeAnnotationImpl;
+class TransformState;
 
 namespace style {
 class Style;
 } // namespace style
+
+namespace bgi = boost::geometry::index;
 
 class AnnotationManager : private util::noncopyable {
 public:
@@ -38,9 +41,9 @@ public:
     SpriteAtlas& getSpriteAtlas() { return spriteAtlas; }
 
     void updateStyle(style::Style&);
-    void updateData();
+    void updateData(const TransformState&);
 
-    void addTile(AnnotationTile&);
+    void addTile(AnnotationTile&, const TransformState&);
     void removeTile(AnnotationTile&);
 
     static const std::string SourceID;
@@ -59,11 +62,11 @@ private:
 
     void removeAndAdd(const AnnotationID&, const Annotation&, const uint8_t);
 
-    std::unique_ptr<AnnotationTileData> getTileData(const CanonicalTileID&);
+    std::unique_ptr<AnnotationTileData> getTileData(const CanonicalTileID&, const TransformState&);
 
     AnnotationID nextID = 0;
 
-    using SymbolAnnotationTree = boost::geometry::index::rtree<std::shared_ptr<const SymbolAnnotationImpl>, boost::geometry::index::rstar<16, 4>>;
+    using SymbolAnnotationTree = bgi::rtree<std::shared_ptr<const SymbolAnnotationImpl>, boost::geometry::index::rstar<16, 4>>;
     // Unlike std::unordered_map, std::map is guaranteed to sort by AnnotationID, ensuring that older annotations are below newer annotations.
     // <https://github.com/mapbox/mapbox-gl-native/issues/5691>
     using SymbolAnnotationMap = std::map<AnnotationID, std::shared_ptr<SymbolAnnotationImpl>>;

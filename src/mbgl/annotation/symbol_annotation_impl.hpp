@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/annotation/annotation.hpp>
+#include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/geo.hpp>
 
 #include <string>
@@ -34,12 +35,13 @@ namespace mbgl {
 
 class AnnotationTileLayer;
 class CanonicalTileID;
+class TransformState;
 
 class SymbolAnnotationImpl {
 public:
     SymbolAnnotationImpl(AnnotationID, SymbolAnnotation);
 
-    void updateLayer(const CanonicalTileID&, AnnotationTileLayer&) const;
+    void updateLayer(const CanonicalTileID&, AnnotationTileLayer&, const TransformState&) const;
 
     const AnnotationID id;
     const SymbolAnnotation annotation;
