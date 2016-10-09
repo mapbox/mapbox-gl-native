@@ -43,28 +43,7 @@ workflows:
             make xproj
         - is_debug: 'yes'
     - script:
-        title: Build Benchmark Tests
-        run_if: '{{enveq "SKIPCI" "false"}}'
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -eu -o pipefail
-            export BUILDTYPE=Debug
-            make benchmark
-        - is_debug: 'yes'
-    - script:
-        title: Run Core Tests
-        run_if: '{{enveq "SKIPCI" "false"}}'
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -eu -o pipefail
-            export BUILDTYPE=Debug
-            make test
-            make run-test
-        - is_debug: 'yes'
-    - script:
-        title: Run SDK Unit Tests
+        title: Run Core and SDK Unit Tests
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
@@ -72,7 +51,7 @@ workflows:
             set -eu -o pipefail
             export BUILDTYPE=Debug
             export XCPRETTY="| tee ${BITRISE_DEPLOY_DIR}/raw-xcodebuild-output.txt | xcpretty --color --report html --output ${BITRISE_DEPLOY_DIR}/xcode-test-results.html"
-            make macos-test
+            make run-test
         - is_debug: 'yes'
     - deploy-to-bitrise-io:
         title: Deploy to Bitrise.io
