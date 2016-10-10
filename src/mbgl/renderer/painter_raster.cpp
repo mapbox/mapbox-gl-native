@@ -11,6 +11,34 @@ namespace mbgl {
 
 using namespace style;
 
+static float saturationFactor(float saturation) {
+    if (saturation > 0) {
+        return 1 - 1 / (1.001 - saturation);
+    } else {
+        return -saturation;
+    }
+}
+
+static float contrastFactor(float contrast) {
+    if (contrast > 0) {
+        return 1 / (1 - contrast);
+    } else {
+        return 1 + contrast;
+    }
+}
+
+static std::array<float, 3> spinWeights(float spin) {
+    spin *= util::DEG2RAD;
+    float s = std::sin(spin);
+    float c = std::cos(spin);
+    std::array<float, 3> spin_weights = {{
+        (2 * c + 1) / 3,
+        (-std::sqrt(3.0f) * s - c + 1) / 3,
+        (std::sqrt(3.0f) * s - c + 1) / 3
+    }};
+    return spin_weights;
+}
+
 void Painter::renderRaster(PaintParameters& parameters,
                            RasterBucket& bucket,
                            const RasterLayer& layer,
@@ -49,34 +77,6 @@ void Painter::renderRaster(PaintParameters& parameters,
 
         bucket.drawRaster(rasterShader, rasterVertexBuffer, rasterVAO, context);
     }
-}
-
-float Painter::saturationFactor(float saturation) {
-    if (saturation > 0) {
-        return 1 - 1 / (1.001 - saturation);
-    } else {
-        return -saturation;
-    }
-}
-
-float Painter::contrastFactor(float contrast) {
-    if (contrast > 0) {
-        return 1 / (1 - contrast);
-    } else {
-        return 1 + contrast;
-    }
-}
-
-std::array<float, 3> Painter::spinWeights(float spin) {
-    spin *= util::DEG2RAD;
-    float s = std::sin(spin);
-    float c = std::cos(spin);
-    std::array<float, 3> spin_weights = {{
-        (2 * c + 1) / 3,
-        (-std::sqrt(3.0f) * s - c + 1) / 3,
-        (std::sqrt(3.0f) * s - c + 1) / 3
-    }};
-    return spin_weights;
 }
 
 } // namespace mbgl
