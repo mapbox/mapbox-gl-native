@@ -42,6 +42,12 @@ public:
                 mbglStops.emplace_back(zoomKey.floatValue, mbglStopValue.asConstant());
             }];
             return mbgl::style::Function<MBGLType>({{mbglStops}}, function.base);
+        } else if (value) {
+            [NSException raise:@"MGLAbstractClassException" format:
+             @"The style value %@ cannot be applied to the style. "
+             @"Make sure the style value was created as a member of a concrete subclass of MGLStyleValue.",
+             NSStringFromClass([value class])];
+            return {};
         } else {
             return {};
         }

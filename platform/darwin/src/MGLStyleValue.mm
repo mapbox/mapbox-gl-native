@@ -33,6 +33,10 @@
     return [self.rawValue description];
 }
 
+- (NSString *)debugDescription {
+    return [self.rawValue debugDescription];
+}
+
 - (BOOL)isEqual:(MGLStyleConstantValue *)other {
     return [other isKindOfClass:[self class]] && [other.rawValue isEqual:self.rawValue];
 }
@@ -54,18 +58,31 @@
 }
 
 - (instancetype)init {
-    if (self = [super init]) {
-        _base = 1;
-    }
-    return self;
+    return [self initWithBase:1 stops:@{}];
 }
 
 - (instancetype)initWithBase:(CGFloat)base stops:(NSDictionary *)stops {
-    if (self = [self init]) {
+    if (self = [super init]) {
         _base = base;
         _stops = stops;
     }
     return self;
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<%@: %p, base = %f; stops = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.base,
+            self.stops];
+}
+
+- (BOOL)isEqual:(MGLStyleFunction *)other {
+    return ([other isKindOfClass:[self class]] && other.base == self.base
+            && [other.stops isEqualToDictionary:self.stops]);
+}
+
+- (NSUInteger)hash {
+    return self.base + self.stops.hash;
 }
 
 @end
