@@ -259,9 +259,10 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 - (void)removeStyleClass:(NSString *)styleClass;
 
 /**
- Sets the name and image to the style.
- The image can be used by setting the MGLSymbolStyleLayer.iconImage
- property to the name passed in here
+Adds or overrides an image used by the style’s layers.
+
+To use an image in a style layer, give it a unique name using this method,
+then set the `iconImage` property of an `MGLSymbolStyleLayer` object to that name.
 
  @param image The image for the name.
  @param name The name of the image to set to the style.
