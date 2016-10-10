@@ -14,6 +14,7 @@
 #include <memory>
 #include <vector>
 #include <array>
+#include <unordered_map>
 
 namespace mbgl {
 
@@ -31,7 +32,6 @@ public:
     UniqueShader createVertexShader();
     UniqueShader createFragmentShader();
     UniqueTexture createTexture();
-    UniqueVertexArray createVertexArray();
 
     template <class V>
     VertexBuffer<V> createVertexBuffer(std::vector<V>&& v) {
@@ -174,6 +174,20 @@ private:
     std::vector<VertexArrayID> abandonedVertexArrays;
     std::vector<FramebufferID> abandonedFramebuffers;
     std::vector<RenderbufferID> abandonedRenderbuffers;
+
+    using VertexArrayObjectKey = std::tuple<
+        ProgramID,  // Program
+        BufferID,   // Vertex buffer
+        BufferID,   // Index buffer
+        std::size_t // Vertex buffer offset
+    >;
+
+    struct VertexArrayObjectHash {
+        std::size_t operator()(const VertexArrayObjectKey&) const;
+    };
+
+    using VertexArrayObjectMap = std::unordered_map<VertexArrayObjectKey, UniqueVertexArray, VertexArrayObjectHash>;
+    VertexArrayObjectMap vaos;
 };
 
 } // namespace gl

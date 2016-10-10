@@ -3,6 +3,9 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/util/traits.hpp>
+#include <mbgl/util/std.hpp>
+
+#include <boost/functional/hash.hpp>
 
 namespace mbgl {
 namespace gl {
@@ -66,12 +69,6 @@ UniqueTexture Context::createTexture() {
     TextureID id = pooledTextures.back();
     pooledTextures.pop_back();
     return UniqueTexture{ std::move(id), { this } };
-}
-
-UniqueVertexArray Context::createVertexArray() {
-    VertexArrayID id = 0;
-    MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
-    return UniqueVertexArray{ std::move(id), { this } };
 }
 
 UniqueFramebuffer Context::createFramebuffer() {
@@ -319,6 +316,15 @@ PrimitiveType Context::operator()(const TriangleStrip&) {
     return PrimitiveType::TriangleStrip;
 }
 
+std::size_t Context::VertexArrayObjectHash::operator()(const VertexArrayObjectKey& key) const {
+    std::size_t seed = 0;
+    boost::hash_combine(seed, std::get<0>(key));
+    boost::hash_combine(seed, std::get<1>(key));
+    boost::hash_combine(seed, std::get<2>(key));
+    boost::hash_combine(seed, std::get<3>(key));
+    return seed;
+}
+
 void Context::setDepthMode(const DepthMode& depth) {
     if (depth.func == DepthMode::Always && !depth.mask) {
         depthTest = false;
@@ -374,18 +380,51 @@ void Context::draw(const Drawable& drawable) {
     drawable.bindUniforms();
 
     for (const auto& segment : drawable.segments) {
-        vertexBuffer = drawable.vertexBuffer;
-        elementBuffer = drawable.indexBuffer;
+        auto needAttributeBindings = [&] () {
+            if (!gl::GenVertexArrays || !gl::BindVertexArray) {
+                return true;
+            }
 
-        for (const auto& binding : drawable.attributeBindings) {
-            MBGL_CHECK_ERROR(glEnableVertexAttribArray(binding.location));
-            MBGL_CHECK_ERROR(glVertexAttribPointer(
-                binding.location,
-                binding.count,
-                static_cast<GLenum>(binding.type),
-                GL_FALSE,
-                static_cast<GLsizei>(drawable.vertexSize),
-                reinterpret_cast<GLvoid*>(binding.offset + (drawable.vertexSize * segment.vertexOffset))));
+            VertexArrayObjectKey vaoKey {
+                drawable.program,
+                drawable.vertexBuffer,
+                drawable.indexBuffer,
+                segment.vertexOffset
+            };
+
+            auto it = vaos.find(vaoKey);
+            if (it != vaos.end()) {
+                vertexArrayObject = it->second;
+                return false;
+            }
+
+            VertexArrayID id = 0;
+            MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
+            vertexArrayObject = id;
+            vaos.emplace(vaoKey, UniqueVertexArray(std::move(id), { this }));
+
+            // If we are initializing a new VAO, we need to force the buffers
+            // to be rebound. VAOs don't inherit the existing buffer bindings.
+            vertexBuffer.setDirty();
+            elementBuffer.setDirty();
+
+            return true;
+        };
+
+        if (needAttributeBindings()) {
+            vertexBuffer = drawable.vertexBuffer;
+            elementBuffer = drawable.indexBuffer;
+
+            for (const auto& binding : drawable.attributeBindings) {
+                MBGL_CHECK_ERROR(glEnableVertexAttribArray(binding.location));
+                MBGL_CHECK_ERROR(glVertexAttribPointer(
+                    binding.location,
+                    binding.count,
+                    static_cast<GLenum>(binding.type),
+                    GL_FALSE,
+                    static_cast<GLsizei>(drawable.vertexSize),
+                    reinterpret_cast<GLvoid*>(binding.offset + (drawable.vertexSize * segment.vertexOffset))));
+            }
         }
 
         if (drawable.indexBuffer) {
@@ -408,6 +447,9 @@ void Context::performCleanup() {
         if (program == id) {
             program.setDirty();
         }
+        mbgl::util::erase_if(vaos, [&] (const VertexArrayObjectMap::value_type& kv) {
+            return std::get<0>(kv.first) == id;
+        });
         MBGL_CHECK_ERROR(glDeleteProgram(id));
     }
     abandonedPrograms.clear();
@@ -424,6 +466,10 @@ void Context::performCleanup() {
             } else if (elementBuffer == id) {
                 elementBuffer.setDirty();
             }
+            mbgl::util::erase_if(vaos, [&] (const VertexArrayObjectMap::value_type& kv) {
+                return std::get<1>(kv.first) == id
+                    || std::get<2>(kv.first) == id;
+            });
         }
         MBGL_CHECK_ERROR(glDeleteBuffers(int(abandonedBuffers.size()), abandonedBuffers.data()));
         abandonedBuffers.clear();
