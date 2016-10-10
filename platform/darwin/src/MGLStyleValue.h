@@ -13,7 +13,9 @@
 
 + (instancetype)valueWithRawValue:(T)rawValue;
 
-- (instancetype)initWithRawValue:(T)rawValue;
+- (instancetype)init NS_UNAVAILABLE;
+
+- (instancetype)initWithRawValue:(T)rawValue NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic) T rawValue;
 
@@ -22,9 +24,10 @@
 @interface MGLStyleFunction<T> : MGLStyleValue
 
 + (instancetype)functionWithBase:(CGFloat)base stops:(NSDictionary<NSNumber *, MGLStyleValue<T> *> *)stops;
+
 + (instancetype)functionWithStops:(NSDictionary<NSNumber *, MGLStyleValue<T> *> *)stops;
 
-- (instancetype)initWithBase:(CGFloat)base stops:(NSDictionary<NSNumber *, MGLStyleValue<T> *> *)stops;
+- (instancetype)initWithBase:(CGFloat)base stops:(NSDictionary<NSNumber *, MGLStyleValue<T> *> *)stops NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic) CGFloat base;
 @property (nonatomic, copy) NSDictionary<NSNumber *, MGLStyleValue<T> *> *stops;
