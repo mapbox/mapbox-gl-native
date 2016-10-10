@@ -41,16 +41,6 @@ import java.util.Random;
 
 public class MarkerViewActivity extends AppCompatActivity {
 
-    private MapboxMap mapboxMap;
-    private MapView mapView;
-
-    private MarkerView movingMarkerOne;
-    private MarkerView movingMarkerTwo;
-    private Random randomAnimator = new Random();
-    private Handler locationUpdateHandler = new Handler();
-    private Runnable moveMarkerRunnable = new MoveMarkerRunnable();
-    private int rotation = 0;
-
     private static final LatLng[] LAT_LNGS = new LatLng[]{
             new LatLng(38.897424, -77.036508),
             new LatLng(38.909698, -77.029642),
@@ -59,6 +49,22 @@ public class MarkerViewActivity extends AppCompatActivity {
             new LatLng(38.889441, -77.050134),
             new LatLng(38.888000, -77.050000) //Slight overlap to show re-ordering on selection
     };
+
+    private MapboxMap mapboxMap;
+    private MapView mapView;
+
+    // MarkerView location updates
+    private MarkerView movingMarkerOne;
+    private MarkerView movingMarkerTwo;
+    private Random randomAnimator = new Random();
+    private Handler locationUpdateHandler = new Handler();
+    private Runnable moveMarkerRunnable = new MoveMarkerRunnable();
+
+    // MarkerView rotate updates
+    private MarkerView rotateMarker;
+    private Handler rotateUpdateHandler = new Handler();
+    private Runnable rotateMarkerRunnable = new RotateMarkerRunnable();
+    private int rotation = 360;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,10 +117,13 @@ public class MarkerViewActivity extends AppCompatActivity {
                         .position(new LatLng(38.902580, -77.050102))
                 );
 
-                MarkerViewActivity.this.mapboxMap.addMarker(new TextMarkerViewOptions()
+                rotateMarker = MarkerViewActivity.this.mapboxMap.addMarker(new TextMarkerViewOptions()
                         .text("A")
+                        .rotation(rotation = 270)
                         .position(new LatLng(38.889876, -77.008849))
                 );
+                loopMarkerRotate();
+
 
                 MarkerViewActivity.this.mapboxMap.addMarker(new TextMarkerViewOptions()
                         .text("B")
@@ -167,6 +176,10 @@ public class MarkerViewActivity extends AppCompatActivity {
         });
     }
 
+    private void loopMarkerRotate() {
+        rotateUpdateHandler.postDelayed(rotateMarkerRunnable, 800);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -183,27 +196,49 @@ public class MarkerViewActivity extends AppCompatActivity {
         locationUpdateHandler.removeCallbacks(moveMarkerRunnable);
     }
 
+    /**
+     * Updates the position of a Marker
+     */
     private class MoveMarkerRunnable implements Runnable {
         @Override
         public void run() {
             int i = randomAnimator.nextInt(9);
             if (randomAnimator.nextInt() % 2 == 0) {
                 movingMarkerOne.setPosition(CarLocation.CAR_0_LNGS[i]);
-                movingMarkerOne.setRotation(rotation = rotation + 45);
             } else {
                 movingMarkerTwo.setPosition(CarLocation.CAR_1_LNGS[i]);
-                movingMarkerTwo.setRotation(rotation = rotation + 90);
             }
             loopMarkerMove();
         }
     }
 
+    /**
+     * Updates the rotation of a Marker
+     */
+    private class RotateMarkerRunnable implements Runnable {
+
+        private final static int ROTATION_INCREASE_VALUE = 9;
+
+        @Override
+        public void run() {
+            rotation -= ROTATION_INCREASE_VALUE;
+            if (rotation >= 0) {
+                rotation += 360;
+            }
+            rotateMarker.setRotation(rotation);
+            loopMarkerRotate();
+        }
+    }
+
+    /**
+     * Adapts a MarkerView to display an abbreviated name in a TextView and a flag in an ImageView.
+     */
     private static class CountryAdapter extends MapboxMap.MarkerViewAdapter<CountryMarkerView> {
 
         private LayoutInflater inflater;
         private MapboxMap mapboxMap;
 
-        public CountryAdapter(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
+        CountryAdapter(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
             super(context);
             this.inflater = LayoutInflater.from(context);
             this.mapboxMap = mapboxMap;
@@ -229,7 +264,7 @@ public class MarkerViewActivity extends AppCompatActivity {
 
         @Override
         public boolean onSelect(
-            @NonNull final CountryMarkerView marker, @NonNull final View convertView, boolean reselectionForViewReuse) {
+                @NonNull final CountryMarkerView marker, @NonNull final View convertView, boolean reselectionForViewReuse) {
             convertView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             ObjectAnimator rotateAnimator = ObjectAnimator.ofFloat(convertView, View.ROTATION, 0, 360);
             rotateAnimator.setDuration(reselectionForViewReuse ? 0 : 350);
@@ -268,13 +303,15 @@ public class MarkerViewActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * Adapts a MarkerView to display text  in a TextView.
+     */
     private static class TextAdapter extends MapboxMap.MarkerViewAdapter<TextMarkerView> {
 
         private LayoutInflater inflater;
         private MapboxMap mapboxMap;
 
-        public TextAdapter(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
+        TextAdapter(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
             super(context);
             this.inflater = LayoutInflater.from(context);
             this.mapboxMap = mapboxMap;
@@ -298,7 +335,7 @@ public class MarkerViewActivity extends AppCompatActivity {
 
         @Override
         public boolean onSelect(
-            @NonNull final TextMarkerView marker, @NonNull final View convertView, boolean reselectionForViewReuse) {
+                @NonNull final TextMarkerView marker, @NonNull final View convertView, boolean reselectionForViewReuse) {
             animateGrow(marker, convertView, 0);
 
             // false indicates that we are calling selectMarker after our animation ourselves
@@ -409,7 +446,7 @@ public class MarkerViewActivity extends AppCompatActivity {
 
     private static class CarLocation {
 
-        public static LatLng[] CAR_0_LNGS = new LatLng[]{
+        static LatLng[] CAR_0_LNGS = new LatLng[]{
                 new LatLng(38.92334425495122, -77.0533673443786),
                 new LatLng(38.9234737236897, -77.05389484528261),
                 new LatLng(38.9257094658146, -76.98819752280579),
@@ -421,7 +458,7 @@ public class MarkerViewActivity extends AppCompatActivity {
                 new LatLng(38.862930274733635, -76.99647808241964)
         };
 
-        public static LatLng[] CAR_1_LNGS = new LatLng[]{
+        static LatLng[] CAR_1_LNGS = new LatLng[]{
                 new LatLng(38.94237975070426, -76.98324549005675),
                 new LatLng(38.941520236084486, -76.98234257804742),
                 new LatLng(38.85972219720714, -76.98955808483929),
@@ -432,6 +469,5 @@ public class MarkerViewActivity extends AppCompatActivity {
                 new LatLng(38.882869724926245, -77.02992539231113),
                 new LatLng(38.9371988177896, -76.97786740676564)
         };
-
     }
 }
