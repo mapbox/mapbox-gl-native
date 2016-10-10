@@ -14,7 +14,7 @@ global.camelize = function (str) {
 }
 
 
-const excludeActivities = ["UpdateMetadataActivity","CarDrivingActivity","MyLocationTrackingModeActivity","MyLocationToggleActivity","MyLocationTintActivity","MyLocationDrawableActivity","DoubleMapActivity", "LocationPickerActivity","GeoJsonClusteringActivity","RuntimeStyleTestActivity", "AnimatedMarkerActivity", "ViewPagerActivity","MapFragmentActivity","SupportMapFragmentActivity","SnapshotActivity","NavigationDrawerActivity", "QueryRenderedFeaturesBoxHighlightActivity"];
+const excludeActivities = ["UpdateMetadataActivity","CarDrivingActivity","MyLocationTrackingModeActivity","MyLocationToggleActivity","MyLocationTintActivity","MyLocationDrawableActivity","DoubleMapActivity", "LocationPickerActivity","GeoJsonClusteringActivity","RuntimeStyleTestActivity", "AnimatedMarkerActivity", "ViewPagerActivity","MapFragmentActivity","SupportMapFragmentActivity","SnapshotActivity","NavigationDrawerActivity", "QueryRenderedFeaturesBoxHighlightActivity", "MultiMapActivity"];
 const appBasePath = 'platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity';
 const testBasePath = 'platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/activity/gen';
 const subPackages = fs.readdirSync(appBasePath);
