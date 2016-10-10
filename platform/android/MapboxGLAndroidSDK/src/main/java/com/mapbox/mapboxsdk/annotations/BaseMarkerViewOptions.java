@@ -126,6 +126,12 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
      */
     public T rotation(float rotation) {
         this.rotation = rotation;
+        while (this.rotation > 360) {
+            this.rotation -= 360;
+        }
+        while (this.rotation < 0) {
+            this.rotation += 360;
+        }
         return getThis();
     }
 
