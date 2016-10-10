@@ -259,17 +259,19 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 - (void)removeStyleClass:(NSString *)styleClass;
 
 /**
- Sets an image to the sprite atlas with a unique identifier.
+ Sets the name and image to the style.
+ The image can be used by setting the MGLSymbolStyleLayer.iconImage
+ property to the name passed in here
 
- @param image
- @param name The unique identifier of this image
+ @param image The image for the name.
+ @param name The name of the image to set to the style.
  */
 - (void)setImage:(MGLImage *)image forName:(NSString *)name;
 
 /**
- Removes an image from the sprite atlas by its name.
+ Removes a name and its associated image from the style.
 
- @param name The unique identifier of the image to remove
+ @param name The name of the image to remove.
  */
 - (void)removeImageForName:(NSString *)name;
 
