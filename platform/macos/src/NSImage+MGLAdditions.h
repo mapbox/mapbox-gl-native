@@ -4,6 +4,6 @@
 
 @interface NSImage (MGLAdditions)
 
-+ (std::unique_ptr<mbgl::SpriteImage>)mgl_spriteImage:(NSImage *)image;
+- (std::unique_ptr<mbgl::SpriteImage>)mgl_spriteImage;
 
 @end

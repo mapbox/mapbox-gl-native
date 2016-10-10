@@ -2,9 +2,9 @@
 
 @implementation UIImage (MGLAdditions)
 
-+ (std::unique_ptr<mbgl::SpriteImage>)mgl_spriteImage:(UIImage *)image
+- (std::unique_ptr<mbgl::SpriteImage>)mgl_spriteImage
 {
-    CGImageRef cgImage = image.CGImage;
+    CGImageRef cgImage = self.CGImage;
     size_t width = CGImageGetWidth(cgImage);
     size_t height = CGImageGetHeight(cgImage);
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
@@ -21,7 +21,7 @@
     CGContextRelease(context);
     CGColorSpaceRelease(colorSpace);
 
-    return std::make_unique<mbgl::SpriteImage>(std::move(cPremultipliedImage), float(image.scale));
+    return std::make_unique<mbgl::SpriteImage>(std::move(cPremultipliedImage), float(self.scale));
 }
 
 @end

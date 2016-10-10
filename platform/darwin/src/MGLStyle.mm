@@ -268,8 +268,7 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)setImage:(MGLImage *)image forName:(NSString *)name
 {
-    auto spriteImage = [MGLImage mgl_spriteImage:image];
-    self.mapView.mbglMap->addImage([name UTF8String], std::move(spriteImage));
+    self.mapView.mbglMap->addImage([name UTF8String], image.mgl_spriteImage);
 }
 
 - (void)removeImageForName:(NSString *)name
