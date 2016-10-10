@@ -99,10 +99,6 @@ public:
     void renderRaster(PaintParameters&, RasterBucket&, const style::RasterLayer&, const RenderTile&);
     void renderBackground(PaintParameters&, const style::BackgroundLayer&);
 
-    float saturationFactor(float saturation);
-    float contrastFactor(float contrast);
-    std::array<float, 3> spinWeights(float spin_value);
-
     void drawClippingMasks(PaintParameters&, const std::map<UnwrappedTileID, ClipID>&);
 
     bool needsAnimation() const;
