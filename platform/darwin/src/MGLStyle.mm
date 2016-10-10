@@ -1,7 +1,5 @@
 #import "MGLStyle.h"
 
-#import "MGLTypes.h"
-
 #import "MGLMapView_Private.h"
 #import "MGLStyleLayer.h"
 #import "MGLFillStyleLayer.h"
@@ -34,6 +32,12 @@
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
 #include <mbgl/mbgl.hpp>
+
+#if TARGET_OS_IPHONE
+    #import "UIImage+MGLAdditions.h"
+#else
+    #import "NSImage+MGLAdditions.h"
+#endif
 
 @interface MGLStyle()
 @property (nonatomic, weak) MGLMapView *mapView;
