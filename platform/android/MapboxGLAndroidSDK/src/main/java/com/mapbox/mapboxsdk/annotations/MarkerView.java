@@ -1,18 +1,12 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.animation.AnimatorSet;
 import android.graphics.Bitmap;
-import android.graphics.PointF;
 import android.support.annotation.FloatRange;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.View;
-import android.view.animation.AnimationUtils;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
 /**
  * MarkerView is an annotation that shows an View at a geographical location.
@@ -231,7 +225,10 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Set the rotation value of the MarkerView.
+     * Set the rotation value of the MarkerView in degrees.
+     * <p>
+     * Input will be limited to 0 - 360 degrees
+     * </p>
      * <p>
      * This will result in animating the rotation of the MarkerView using an rotation animator
      * from current value to the provided parameter value.
@@ -240,9 +237,26 @@ public class MarkerView extends Marker {
      * @param rotation the rotation value to animate to
      */
     public void setRotation(float rotation) {
-        this.rotation = rotation;
+        // limit to 0 - 360 degrees
+        float newRotation = rotation;
+        while (newRotation > 360) {
+            newRotation -= 360;
+        }
+        while (newRotation < 0) {
+            newRotation += 360;
+        }
+
+        // calculate new direction
+        float diff = newRotation - this.rotation;
+        if (diff > 180.0f) {
+            diff -= 360.0f;
+        } else if (diff < -180.0f) {
+            diff += 360.f;
+        }
+
+        this.rotation = newRotation;
         if (markerViewManager != null) {
-            markerViewManager.animateRotation(this, rotation);
+            markerViewManager.animateRotationBy(this, diff);
         }
     }
 
@@ -339,7 +353,7 @@ public class MarkerView extends Marker {
     public void setMapboxMap(MapboxMap mapboxMap) {
         super.setMapboxMap(mapboxMap);
 
-        if(isFlat()) {
+        if (isFlat()) {
             // initial tilt value if MapboxMap is started with a tilt attribute
             tiltValue = (float) mapboxMap.getCameraPosition().tilt;
         }

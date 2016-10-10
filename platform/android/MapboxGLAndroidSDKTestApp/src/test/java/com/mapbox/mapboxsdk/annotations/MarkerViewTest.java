@@ -4,17 +4,35 @@ import android.os.Parcelable;
 
 import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.utils.MockParcel;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class MarkerViewTest {
+
+    @Mock
+    MapboxMap mapboxMap;
+
+    @Mock
+    MarkerViewManager markerViewManager;
+
+    @Before
+    public void beforeTest() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     public void testSanity() {
@@ -29,7 +47,7 @@ public class MarkerViewTest {
     }
 
     @Test(expected = InvalidMarkerPositionException.class)
-    public void testInvalidMarker(){
+    public void testInvalidMarker() {
         new MarkerViewOptions().getMarker();
     }
 
@@ -108,6 +126,88 @@ public class MarkerViewTest {
         MarkerViewOptions markerOptions = new MarkerViewOptions().position(new LatLng()).rotation(rotation);
         MarkerView marker = markerOptions.getMarker();
         assertEquals("rotation should match ", rotation, marker.getRotation(), 0);
+    }
+
+    @Test
+    public void testRotationAboveMax() {
+        MarkerViewOptions markerOptions = new MarkerViewOptions().rotation(390).position(new LatLng());
+        MarkerView marker = markerOptions.getMarker();
+        assertEquals(marker.getRotation(), 30, 0);
+    }
+
+    @Test
+    public void testRotationBelowMin() {
+        MarkerViewOptions markerOptions = new MarkerViewOptions().rotation(-10).position(new LatLng());
+        MarkerView marker = markerOptions.getMarker();
+        assertEquals(marker.getRotation(), 350, 0);
+    }
+
+    @Test
+    public void testRotationUpdatePositive() {
+        float startRotation = 45;
+        float endRotation = 180;
+        float animationValue = 135;
+
+        // allow calls to our mock
+        when(mapboxMap.getMarkerViewManager()).thenReturn(markerViewManager);
+
+        MarkerViewOptions markerOptions = new MarkerViewOptions().position(new LatLng()).rotation(startRotation);
+        MarkerView marker = markerOptions.getMarker();
+        marker.setMapboxMap(mapboxMap);
+
+        marker.setRotation(endRotation);
+        verify(markerViewManager, times(1)).animateRotationBy(marker, animationValue);
+    }
+
+    @Test
+    public void testRotationUpdateNegative() {
+        float startRotation = 10;
+        float endRotation = 270;
+        float animationValue = -100;
+
+        // allow calls to our mock
+        when(mapboxMap.getMarkerViewManager()).thenReturn(markerViewManager);
+
+        MarkerViewOptions markerOptions = new MarkerViewOptions().position(new LatLng()).rotation(startRotation);
+        MarkerView marker = markerOptions.getMarker();
+        marker.setMapboxMap(mapboxMap);
+
+        marker.setRotation(endRotation);
+        verify(markerViewManager, times(1)).animateRotationBy(marker, animationValue);
+    }
+
+    @Test
+    public void testRotationUpdateMax() {
+        float startRotation = 359;
+        float endRotation = 0;
+        float animationValue = 1;
+
+        // allow calls to our mock
+        when(mapboxMap.getMarkerViewManager()).thenReturn(markerViewManager);
+
+        MarkerViewOptions markerOptions = new MarkerViewOptions().position(new LatLng()).rotation(startRotation);
+        MarkerView marker = markerOptions.getMarker();
+        marker.setMapboxMap(mapboxMap);
+
+        marker.setRotation(endRotation);
+        verify(markerViewManager, times(1)).animateRotationBy(marker, animationValue);
+    }
+
+    @Test
+    public void testRotationUpdateMin() {
+        float startRotation = 0;
+        float endRotation = 359;
+        float animationValue = -1;
+
+        // allow calls to our mock
+        when(mapboxMap.getMarkerViewManager()).thenReturn(markerViewManager);
+
+        MarkerViewOptions markerOptions = new MarkerViewOptions().position(new LatLng()).rotation(startRotation);
+        MarkerView marker = markerOptions.getMarker();
+        marker.setMapboxMap(mapboxMap);
+
+        marker.setRotation(endRotation);
+        verify(markerViewManager, times(1)).animateRotationBy(marker, animationValue);
     }
 
     @Test
