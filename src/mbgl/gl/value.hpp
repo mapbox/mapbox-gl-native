@@ -180,6 +180,7 @@ struct Viewport {
         uint16_t width;
         uint16_t height;
     };
+    static const constexpr Type Default = { 0, 0, 0, 0 };
     static void Set(const Type&);
     static Type Get();
 };
@@ -190,6 +191,14 @@ constexpr bool operator!=(const Viewport::Type& a, const Viewport::Type& b) {
 
 struct BindFramebuffer {
     using Type = FramebufferID;
+    static const constexpr Type Default = 0;
+    static void Set(const Type&);
+    static Type Get();
+};
+
+struct BindRenderbuffer {
+    using Type = RenderbufferID;
+    static const constexpr Type Default = 0;
     static void Set(const Type&);
     static Type Get();
 };

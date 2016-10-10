@@ -38,10 +38,9 @@ macro(mbgl_platform_core)
 
         # Headless view
         PRIVATE platform/darwin/src/headless_backend_eagl.mm
-        PRIVATE platform/darwin/src/headless_view_eagl.cpp
         PRIVATE platform/default/headless_backend.cpp
         PRIVATE platform/default/headless_display.cpp
-        PRIVATE platform/default/headless_view.cpp
+        PRIVATE platform/default/offscreen_view.cpp
 
         # Thread pool
         PRIVATE platform/default/thread_pool.cpp

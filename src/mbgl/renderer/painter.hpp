@@ -68,7 +68,7 @@ struct FrameData {
 
 class Painter : private util::noncopyable {
 public:
-    Painter(const TransformState&);
+    Painter(gl::Context&, const TransformState&);
     ~Painter();
 
     void render(const style::Style&,
@@ -153,6 +153,9 @@ private:
     }
 #endif
 
+private:
+    gl::Context& context;
+
     mat4 projMatrix;
 
     std::array<float, 2> pixelsToGLUnits;
@@ -168,8 +171,6 @@ private:
     FrameData frame;
 
     int indent = 0;
-
-    gl::Context context;
 
     RenderPass pass = RenderPass::Opaque;
 

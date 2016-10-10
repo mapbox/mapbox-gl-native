@@ -3,7 +3,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_backend.hpp>
-#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/offscreen_view.hpp>
 #include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -57,7 +57,7 @@ public:
 
     util::RunLoop runLoop;
     HeadlessBackend backend;
-    HeadlessView view{ 2 };
+    OffscreenView view{ backend.getContext(), {{ 512, 512 }} };
     StubFileSource fileSource;
     ThreadPool threadPool { 4 };
 
@@ -93,22 +93,20 @@ private:
 TEST(Memory, Vector) {
     MemoryTest test;
 
-    Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource, test.threadPool,
-            MapMode::Still);
+    Map map(test.backend, { { 256, 256 } }, 2, test.fileSource, test.threadPool, MapMode::Still);
     map.setZoom(16); // more map features
     map.setStyleURL("mapbox://streets");
 
-    test::render(map);
+    test::render(map, test.view);
 }
 
 TEST(Memory, Raster) {
     MemoryTest test;
 
-    Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource, test.threadPool,
-            MapMode::Still);
+    Map map(test.backend, { { 256, 256 } }, 2, test.fileSource, test.threadPool, MapMode::Still);
     map.setStyleURL("mapbox://satellite");
 
-    test::render(map);
+    test::render(map, test.view);
 }
 
 // This test will measure the size of a Map object
@@ -123,19 +121,17 @@ TEST(Memory, Footprint) {
 
     MemoryTest test;
 
-    auto renderMap = [](Map* map, const char* style){
-        map->setZoom(16);
-
-        map->setStyleURL(style);
-        test::render(*map);
+    auto renderMap = [&](Map& map, const char* style){
+        map.setZoom(16);
+        map.setStyleURL(style);
+        test::render(map, test.view);
     };
 
     // Warm up buffers and cache.
     for (unsigned i = 0; i < 10; ++i) {
-        Map map(test.backend, test.view, test.view.getPixelRatio(), test.fileSource,
-                test.threadPool, MapMode::Still);
-        renderMap(&map, "mapbox://streets");
-        renderMap(&map, "mapbox://satellite");
+        Map map(test.backend, {{ 256, 256 }}, 2, test.fileSource, test.threadPool, MapMode::Still);
+        renderMap(map, "mapbox://streets");
+        renderMap(map, "mapbox://satellite");
     };
 
     // Process close callbacks, mostly needed by
@@ -147,9 +143,9 @@ TEST(Memory, Footprint) {
 
     long vectorInitialRSS = getRSS();
     for (unsigned i = 0; i < runs; ++i) {
-        auto vector = std::make_unique<Map>(test.backend, test.view, test.view.getPixelRatio(),
-                                            test.fileSource, test.threadPool, MapMode::Still);
-        renderMap(vector.get(), "mapbox://streets");
+        auto vector = std::make_unique<Map>(test.backend, std::array<uint16_t, 2>{ { 256, 256 } },
+                                            2, test.fileSource, test.threadPool, MapMode::Still);
+        renderMap(*vector, "mapbox://streets");
         maps.push_back(std::move(vector));
     };
 
@@ -157,9 +153,9 @@ TEST(Memory, Footprint) {
 
     long rasterInitialRSS = getRSS();
     for (unsigned i = 0; i < runs; ++i) {
-        auto raster = std::make_unique<Map>(test.backend, test.view, test.view.getPixelRatio(),
-                                            test.fileSource, test.threadPool, MapMode::Still);
-        renderMap(raster.get(), "mapbox://satellite");
+        auto raster = std::make_unique<Map>(test.backend, std::array<uint16_t, 2>{ { 256, 256 } },
+                                            2, test.fileSource, test.threadPool, MapMode::Still);
+        renderMap(*raster, "mapbox://satellite");
         maps.push_back(std::move(raster));
     };
 
