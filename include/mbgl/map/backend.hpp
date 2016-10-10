@@ -2,13 +2,21 @@
 
 #include <mbgl/map/change.hpp>
 
+#include <memory>
+
 namespace mbgl {
 
-class Map;
+namespace gl {
+class Context;
+} // namespace gl
 
 class Backend {
 public:
-    virtual ~Backend() = default;
+    Backend();
+    virtual ~Backend();
+
+    // Returns the backend's context which manages OpenGL state.
+    gl::Context& getContext();
 
     // Called when the backend's GL context needs to be made active or inactive. These are called,
     // as a matched pair, in four situations:
@@ -29,6 +37,9 @@ public:
 
     // Notifies a watcher of map x/y/scale/rotation changes.
     virtual void notifyMapChange(MapChange change);
+
+private:
+    const std::unique_ptr<gl::Context> context;
 };
 
 } // namespace mbgl

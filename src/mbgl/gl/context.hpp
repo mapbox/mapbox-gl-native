@@ -4,6 +4,8 @@
 #include <mbgl/gl/state.hpp>
 #include <mbgl/gl/value.hpp>
 #include <mbgl/gl/texture.hpp>
+#include <mbgl/gl/renderbuffer.hpp>
+#include <mbgl/gl/framebuffer.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/gl/attribute.hpp>
@@ -14,6 +16,9 @@
 #include <array>
 
 namespace mbgl {
+
+class View;
+
 namespace gl {
 
 constexpr size_t TextureMax = 64;
@@ -27,7 +32,6 @@ public:
     UniqueShader createFragmentShader();
     UniqueTexture createTexture();
     UniqueVertexArray createVertexArray();
-    UniqueFramebuffer createFramebuffer();
 
     template <class V>
     VertexBuffer<V> createVertexBuffer(std::vector<V>&& v) {
@@ -43,6 +47,20 @@ public:
             createIndexBuffer(v.data(), v.size() * sizeof(P))
         };
     }
+
+    template <RenderbufferType type>
+    Renderbuffer<type> createRenderbuffer(const std::array<uint16_t, 2>& size) {
+        static_assert(type == RenderbufferType::RGBA || type == RenderbufferType::DepthStencil,
+                      "invalid renderbuffer type");
+        return { size, createRenderbuffer(type, size[0], size[1]) };
+    }
+
+    Framebuffer createFramebuffer(const Renderbuffer<RenderbufferType::RGBA>&,
+                                  const Renderbuffer<RenderbufferType::DepthStencil>&);
+    Framebuffer createFramebuffer(const Renderbuffer<RenderbufferType::RGBA>&);
+    Framebuffer createFramebuffer(const Texture&,
+                                  const Renderbuffer<RenderbufferType::DepthStencil>&);
+    Framebuffer createFramebuffer(const Texture&);
 
     // Create a texture from an image with data.
     template <typename Image>
@@ -87,8 +105,6 @@ public:
             && abandonedFramebuffers.empty();
     }
 
-    void resetState();
-
     void setDirtyState();
 
     State<value::StencilFunc> stencilFunc;
@@ -111,6 +127,7 @@ public:
     State<value::ActiveTexture> activeTexture;
     State<value::BindFramebuffer> bindFramebuffer;
     State<value::Viewport> viewport;
+    State<value::BindRenderbuffer> bindRenderbuffer;
 #if not MBGL_USE_GLES2
     State<value::PixelZoom> pixelZoom;
     State<value::RasterPos> rasterPos;
@@ -124,6 +141,8 @@ private:
     UniqueBuffer createVertexBuffer(const void* data, std::size_t size);
     UniqueBuffer createIndexBuffer(const void* data, std::size_t size);
     UniqueTexture createTexture(uint16_t width, uint16_t height, const void* data, TextureUnit);
+    UniqueFramebuffer createFramebuffer();
+    UniqueRenderbuffer createRenderbuffer(RenderbufferType, uint16_t width, uint16_t height);
     void bindAttribute(const AttributeBinding&, std::size_t stride, const int8_t* offset);
 
     friend detail::ProgramDeleter;
@@ -132,6 +151,7 @@ private:
     friend detail::TextureDeleter;
     friend detail::VertexArrayDeleter;
     friend detail::FramebufferDeleter;
+    friend detail::RenderbufferDeleter;
 
     std::vector<TextureID> pooledTextures;
 
@@ -141,6 +161,7 @@ private:
     std::vector<TextureID> abandonedTextures;
     std::vector<VertexArrayID> abandonedVertexArrays;
     std::vector<FramebufferID> abandonedFramebuffers;
+    std::vector<RenderbufferID> abandonedRenderbuffers;
 };
 
 } // namespace gl

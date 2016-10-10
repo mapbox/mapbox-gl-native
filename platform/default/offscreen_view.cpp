@@ -1,4 +1,4 @@
-#include <mbgl/util/offscreen_texture.hpp>
+#include <mbgl/platform/default/offscreen_view.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/gl.hpp>
 
@@ -7,15 +7,16 @@
 
 namespace mbgl {
 
-OffscreenTexture::OffscreenTexture(gl::Context& context_, std::array<uint16_t, 2> size_)
+OffscreenView::OffscreenView(gl::Context& context_, std::array<uint16_t, 2> size_)
     : context(context_), size(std::move(size_)) {
     assert(size[0] > 0 && size[1] > 0);
 }
 
-void OffscreenTexture::bind() {
+void OffscreenView::bind() {
     if (!framebuffer) {
-        texture = context.createTexture(size);
-        framebuffer = context.createFramebuffer(*texture);
+        color = context.createRenderbuffer<gl::RenderbufferType::RGBA>(size);
+        depthStencil = context.createRenderbuffer<gl::RenderbufferType::DepthStencil>(size);
+        framebuffer = context.createFramebuffer(*color, *depthStencil);
     } else {
         context.bindFramebuffer = framebuffer->framebuffer;
     }
@@ -23,12 +24,7 @@ void OffscreenTexture::bind() {
     context.viewport = { 0, 0, size[0], size[1] };
 }
 
-gl::Texture& OffscreenTexture::getTexture() {
-    assert(texture);
-    return *texture;
-}
-
-PremultipliedImage OffscreenTexture::readStillImage() {
+PremultipliedImage OffscreenView::readStillImage() {
     PremultipliedImage image { size[0], size[1] };
     MBGL_CHECK_ERROR(glReadPixels(0, 0, size[0], size[1], GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
 
@@ -44,5 +40,8 @@ PremultipliedImage OffscreenTexture::readStillImage() {
     return image;
 }
 
+std::array<uint16_t, 2> OffscreenView::getSize() const {
+    return size;
+}
 
 } // namespace mbgl

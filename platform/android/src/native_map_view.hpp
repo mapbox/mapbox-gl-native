@@ -20,10 +20,9 @@ public:
     NativeMapView(JNIEnv *env, jobject obj, float pixelRatio, int availableProcessors, size_t totalMemory);
     virtual ~NativeMapView();
 
+    void updateViewBinding();
     void bind() override;
 
-    std::array<uint16_t, 2> getSize() const override;
-    std::array<uint16_t, 2> getFramebufferSize() const override;
     void activate() override;
     void deactivate() override;
     void invalidate() override;
@@ -83,7 +82,6 @@ private:
 
     bool firstTime = false;
     bool fpsEnabled = false;
-    bool sizeChanged = false;
     bool snapshot = false;
     double fps = 0.0;
 

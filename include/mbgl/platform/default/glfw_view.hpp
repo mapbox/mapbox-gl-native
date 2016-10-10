@@ -19,6 +19,8 @@ public:
 
     float getPixelRatio() const;
 
+    void setMap(mbgl::Map*);
+
     // Callback called when the user presses the key mapped to style change.
     // The expected action is to set a new style, different to the current one.
     void setChangeStyleCallback(std::function<void()> callback);
@@ -29,18 +31,18 @@ public:
 
     void run();
 
-private:
     // mbgl::View implementation
-    void initialize(mbgl::Map*) override;
+    void updateViewBinding();
     void bind() override;
-    std::array<uint16_t, 2> getSize() const override;
-    std::array<uint16_t, 2> getFramebufferSize() const override;
+    std::array<uint16_t, 2> getSize() const;
+    std::array<uint16_t, 2> getFramebufferSize() const;
 
     // mbgl::Backend implementation
     void activate() override;
     void deactivate() override;
     void invalidate() override;
 
+private:
     // Window callbacks
     static void onKey(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void onScroll(GLFWwindow *window, double xoffset, double yoffset);
@@ -76,6 +78,8 @@ private:
     std::function<void(mbgl::MapChange)> mapChangeCallback;
 
 private:
+    mbgl::Map* map = nullptr;
+
     bool fullscreen = false;
     const bool benchmark = false;
     bool tracking = false;
