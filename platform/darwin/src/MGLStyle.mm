@@ -268,19 +268,13 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)setImage:(MGLImage *)image forName:(NSString *)name
 {
-    if (image && name)
-    {
-        auto spriteImage = [MGLImage mbgl_spriteImageFromImage:image];
-        self.mapView.mbglMap->addImage([name UTF8String], std::move(spriteImage));
-    }
+    auto spriteImage = [MGLImage mgl_spriteImage:image];
+    self.mapView.mbglMap->addImage([name UTF8String], std::move(spriteImage));
 }
 
 - (void)removeImageForName:(NSString *)name
 {
-    if (name)
-    {
-        self.mapView.mbglMap->removeImage([name UTF8String]);
-    }
+    self.mapView.mbglMap->removeImage([name UTF8String]);
 }
 
 - (NSString *)description
