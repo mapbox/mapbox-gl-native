@@ -1,3 +1,4 @@
+#include <mbgl/map/view.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/vertex_array.hpp>
@@ -142,6 +143,113 @@ UniqueFramebuffer Context::createFramebuffer() {
     return UniqueFramebuffer{ std::move(id), { this } };
 }
 
+UniqueRenderbuffer Context::createRenderbuffer(const RenderbufferType type,
+                                               const uint16_t width,
+                                               const uint16_t height) {
+    RenderbufferID id = 0;
+    MBGL_CHECK_ERROR(glGenRenderbuffers(1, &id));
+    UniqueRenderbuffer renderbuffer{ std::move(id), { this } };
+
+    bindRenderbuffer = renderbuffer;
+    MBGL_CHECK_ERROR(
+        glRenderbufferStorage(GL_RENDERBUFFER, static_cast<GLenum>(type), width, height));
+    return renderbuffer;
+}
+
+namespace {
+
+void checkFramebuffer() {
+    GLenum status = MBGL_CHECK_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        switch (status) {
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            throw std::runtime_error("Couldn't create framebuffer: incomplete attachment");
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            throw std::runtime_error("Couldn't create framebuffer: incomplete missing attachment");
+#ifdef GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+            throw std::runtime_error("Couldn't create framebuffer: incomplete draw buffer");
+#endif
+#ifdef GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+            throw std::runtime_error("Couldn't create framebuffer: incomplete read buffer");
+#endif
+#ifdef GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS
+        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+            throw std::runtime_error("Couldn't create framebuffer: incomplete dimensions");
+#endif
+
+        case GL_FRAMEBUFFER_UNSUPPORTED:
+            throw std::runtime_error("Couldn't create framebuffer: unsupported");
+        default:
+            throw std::runtime_error("Couldn't create framebuffer: other");
+        }
+    }
+}
+
+void bindDepthStencilRenderbuffer(
+    const Renderbuffer<RenderbufferType::DepthStencil>& depthStencil) {
+#ifdef GL_DEPTH_STENCIL_ATTACHMENT
+    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+                                               GL_RENDERBUFFER, depthStencil.renderbuffer));
+#else
+    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,
+                                               depthStencil.renderbuffer));
+    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+                                               GL_RENDERBUFFER, depthStencil.renderbuffer));
+#endif
+}
+
+} // namespace
+
+Framebuffer
+Context::createFramebuffer(const Renderbuffer<RenderbufferType::RGBA>& color,
+                           const Renderbuffer<RenderbufferType::DepthStencil>& depthStencil) {
+    if (color.size != depthStencil.size) {
+        throw new std::runtime_error("Renderbuffer size mismatch");
+    }
+    auto fbo = createFramebuffer();
+    bindFramebuffer = fbo;
+    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                               GL_RENDERBUFFER, color.renderbuffer));
+    bindDepthStencilRenderbuffer(depthStencil);
+    checkFramebuffer();
+    return { color.size, std::move(fbo) };
+}
+
+Framebuffer Context::createFramebuffer(const Renderbuffer<RenderbufferType::RGBA>& color) {
+    auto fbo = createFramebuffer();
+    bindFramebuffer = fbo;
+    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                               GL_RENDERBUFFER, color.renderbuffer));
+    checkFramebuffer();
+    return { color.size, std::move(fbo) };
+}
+
+Framebuffer
+Context::createFramebuffer(const Texture& color,
+                           const Renderbuffer<RenderbufferType::DepthStencil>& depthStencil) {
+    if (color.size != depthStencil.size) {
+        throw new std::runtime_error("Renderbuffer size mismatch");
+    }
+    auto fbo = createFramebuffer();
+    bindFramebuffer = fbo;
+    MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                                            color.texture, 0));
+    bindDepthStencilRenderbuffer(depthStencil);
+    checkFramebuffer();
+    return { color.size, std::move(fbo) };
+}
+
+Framebuffer Context::createFramebuffer(const Texture& color) {
+    auto fbo = createFramebuffer();
+    bindFramebuffer = fbo;
+    MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                                            color.texture, 0));
+    checkFramebuffer();
+    return { color.size, std::move(fbo) };
+}
+
 UniqueTexture
 Context::createTexture(uint16_t width, uint16_t height, const void* data, TextureUnit unit) {
     auto obj = createTexture();
@@ -186,50 +294,37 @@ void Context::reset() {
     performCleanup();
 }
 
-namespace {
-
-template <typename Fn>
-void applyStateFunction(Context& context, Fn&& fn) {
-    fn(context.stencilFunc);
-    fn(context.stencilMask);
-    fn(context.stencilTest);
-    fn(context.stencilOp);
-    fn(context.depthRange);
-    fn(context.depthMask);
-    fn(context.depthTest);
-    fn(context.depthFunc);
-    fn(context.blend);
-    fn(context.blendFunc);
-    fn(context.blendColor);
-    fn(context.colorMask);
-    fn(context.clearDepth);
-    fn(context.clearColor);
-    fn(context.clearStencil);
-    fn(context.program);
-    fn(context.lineWidth);
-    fn(context.activeTexture);
-    fn(context.bindFramebuffer);
-    fn(context.viewport);
-#if not MBGL_USE_GLES2
-    fn(context.pixelZoom);
-    fn(context.rasterPos);
-#endif // MBGL_USE_GLES2
-    for (auto& tex : context.texture) {
-        fn(tex);
-    }
-    fn(context.vertexBuffer);
-    fn(context.elementBuffer);
-    fn(context.vertexArrayObject);
-}
-
-} // namespace
-
-void Context::resetState() {
-    applyStateFunction(*this, [](auto& state) { state.reset(); });
-}
-
 void Context::setDirtyState() {
-    applyStateFunction(*this, [](auto& state) { state.setDirty(); });
+    // Note: does not set viewport/bindFramebuffer to dirty since they are handled separately in
+    // the view object.
+    stencilFunc.setDirty();
+    stencilMask.setDirty();
+    stencilTest.setDirty();
+    stencilOp.setDirty();
+    depthRange.setDirty();
+    depthMask.setDirty();
+    depthTest.setDirty();
+    depthFunc.setDirty();
+    blend.setDirty();
+    blendFunc.setDirty();
+    blendColor.setDirty();
+    colorMask.setDirty();
+    clearDepth.setDirty();
+    clearColor.setDirty();
+    clearStencil.setDirty();
+    program.setDirty();
+    lineWidth.setDirty();
+    activeTexture.setDirty();
+#if not MBGL_USE_GLES2
+    pixelZoom.setDirty();
+    rasterPos.setDirty();
+#endif // MBGL_USE_GLES2
+    for (auto& tex : texture) {
+       tex.setDirty();
+    }
+    vertexBuffer.setDirty();
+    elementBuffer.setDirty();
+    vertexArrayObject.setDirty();
 }
 
 void Context::performCleanup() {
@@ -288,6 +383,12 @@ void Context::performCleanup() {
         MBGL_CHECK_ERROR(
             glDeleteFramebuffers(int(abandonedFramebuffers.size()), abandonedFramebuffers.data()));
         abandonedFramebuffers.clear();
+    }
+
+    if (!abandonedRenderbuffers.empty()) {
+        MBGL_CHECK_ERROR(glDeleteRenderbuffers(int(abandonedRenderbuffers.size()),
+                                               abandonedRenderbuffers.data()));
+        abandonedRenderbuffers.clear();
     }
 }
 

@@ -13,6 +13,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <cstdio>
+#include <array>
 
 namespace {
 
@@ -119,7 +120,9 @@ int main(int argc, char *argv[]) {
 
     mbgl::ThreadPool threadPool(4);
 
-    mbgl::Map map(backend, backend, backend.getPixelRatio(), fileSource, threadPool);
+    mbgl::Map map(backend, view->getSize(), view->getPixelRatio(), fileSource, threadPool);
+
+    backend.setMap(&map);
 
     // Load settings
     mbgl::Settings_JSON settings;
