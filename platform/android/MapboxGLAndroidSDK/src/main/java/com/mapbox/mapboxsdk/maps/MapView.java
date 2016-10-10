@@ -154,6 +154,7 @@ public class MapView extends FrameLayout {
     private int contentPaddingBottom;
 
     private PointF focalPoint;
+    private PointF fromScreenLocationTempPoint;
 
     private String styleUrl = Style.MAPBOX_STREETS;
     private boolean styleWasSet = false;
@@ -257,6 +258,8 @@ public class MapView extends FrameLayout {
         if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
             mapboxMap.getUiSettings().setZoomControlsEnabled(true);
         }
+
+        fromScreenLocationTempPoint = new PointF();
     }
 
     private void setInitialState(MapboxMapOptions options) {
@@ -979,8 +982,8 @@ public class MapView extends FrameLayout {
         if (destroyed) {
             return new LatLng();
         }
-        point.set(point.x / screenDensity, point.y / screenDensity);
-        return nativeMapView.latLngForPixel(point);
+        fromScreenLocationTempPoint.set(point.x / screenDensity, point.y / screenDensity);
+        return nativeMapView.latLngForPixel(fromScreenLocationTempPoint);
     }
 
     PointF toScreenLocation(@NonNull LatLng location) {
