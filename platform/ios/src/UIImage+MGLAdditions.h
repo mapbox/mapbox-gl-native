@@ -4,6 +4,6 @@
 
 @interface UIImage (MGLAdditions)
 
-+ (std::unique_ptr<mbgl::SpriteImage>)mbgl_spriteImageFromImage:(UIImage *)image;
++ (std::unique_ptr<mbgl::SpriteImage>)mgl_spriteImage:(UIImage *)image;
 
 @end

@@ -2,7 +2,7 @@
 
 @implementation NSImage (MGLAdditions)
 
-+ (std::unique_ptr<mbgl::SpriteImage>)mbgl_spriteImageFromImage:(NSImage *)image
++ (std::unique_ptr<mbgl::SpriteImage>)mgl_spriteImage:(NSImage *)image
 {
     // Create a bitmap image representation from the image, respecting backing
     // scale factor and any resizing done on the image at runtime.

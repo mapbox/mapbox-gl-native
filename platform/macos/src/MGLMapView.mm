@@ -1741,7 +1741,7 @@ public:
         return;
     }
 
-    std::shared_ptr<mbgl::SpriteImage> sprite([NSImage mbgl_spriteImageFromImage:annotationImage.image]);
+    std::shared_ptr<mbgl::SpriteImage> sprite([NSImage mgl_spriteImage:annotationImage.image]);
     _mbglMap->addAnnotationIcon(iconIdentifier.UTF8String, sprite);
 
     // Create a slop area with a “radius” equal to the annotation image’s entire
