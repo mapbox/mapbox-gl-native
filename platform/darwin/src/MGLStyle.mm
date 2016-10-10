@@ -110,7 +110,7 @@ static NSURL *MGLStyleURL_emerald;
     if (!mbglLayer) {
         return nil;
     }
-    
+
     MGLStyleLayer *styleLayer;
     if (auto fillLayer = mbglLayer->as<mbgl::style::FillLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(fillLayer->getSourceID().c_str())];
@@ -133,9 +133,9 @@ static NSURL *MGLStyleURL_emerald;
         NSAssert(NO, @"Unrecognized layer type");
         return nil;
     }
-    
+
     styleLayer.layer = mbglLayer;
-    
+
     return styleLayer;
 }
 
@@ -145,7 +145,7 @@ static NSURL *MGLStyleURL_emerald;
     if (!mbglSource) {
         return nil;
     }
-    
+
     // TODO: Fill in options specific to the respective source classes
     // https://github.com/mapbox/mapbox-gl-native/issues/6584
     MGLSource *source;
@@ -159,9 +159,9 @@ static NSURL *MGLStyleURL_emerald;
         NSAssert(NO, @"Unrecognized source type");
         return nil;
     }
-    
+
     source.source = mbglSource;
-    
+
     return source;
 }
 
@@ -178,7 +178,7 @@ static NSURL *MGLStyleURL_emerald;
          @"Make sure the style layer was created as a member of a concrete subclass of MGLStyleLayer.",
          NSStringFromClass(self)];
     }
-    
+
     self.mapView.mbglMap->addLayer(std::unique_ptr<mbgl::style::Layer>(layer.layer));
 }
 
@@ -198,7 +198,7 @@ static NSURL *MGLStyleURL_emerald;
          @"Make sure the style layer was created as a member of a concrete subclass of MGLStyleLayer.",
          NSStringFromClass(otherLayer)];
     }
-    
+
     const mbgl::optional<std::string> belowLayerId{otherLayer.identifier.UTF8String};
     self.mapView.mbglMap->addLayer(std::unique_ptr<mbgl::style::Layer>(layer.layer), belowLayerId);
 }
@@ -216,13 +216,13 @@ static NSURL *MGLStyleURL_emerald;
 - (NS_ARRAY_OF(NSString *) *)styleClasses
 {
     const std::vector<std::string> &appliedClasses = self.mapView.mbglMap->getClasses();
-    
+
     NSMutableArray *returnArray = [NSMutableArray arrayWithCapacity:appliedClasses.size()];
-    
+
     for (auto appliedClass : appliedClasses) {
        [returnArray addObject:@(appliedClass.c_str())];
     }
-    
+
     return returnArray;
 }
 
@@ -234,12 +234,12 @@ static NSURL *MGLStyleURL_emerald;
 - (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses transitionDuration:(NSTimeInterval)transitionDuration
 {
     std::vector<std::string> newAppliedClasses;
-    
+
     for (NSString *appliedClass in appliedClasses)
     {
         newAppliedClasses.push_back([appliedClass UTF8String]);
     }
-    
+
     mbgl::style::TransitionOptions transition { { MGLDurationInSeconds(transitionDuration) } };
     self.mapView.mbglMap->setTransitionOptions(transition);
     self.mapView.mbglMap->setClasses(newAppliedClasses);
