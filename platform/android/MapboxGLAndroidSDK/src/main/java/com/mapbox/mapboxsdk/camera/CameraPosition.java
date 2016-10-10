@@ -158,7 +158,7 @@ public final class CameraPosition implements Parcelable {
                 double lat = typedArray.getFloat(R.styleable.MapView_center_latitude, 0.0f);
                 double lng = typedArray.getFloat(R.styleable.MapView_center_longitude, 0.0f);
                 this.target = new LatLng(lat, lng);
-                this.tilt = Math.toRadians(typedArray.getFloat(R.styleable.MapView_tilt, 0.0f));
+                this.tilt = typedArray.getFloat(R.styleable.MapView_tilt, 0.0f);
                 this.zoom = typedArray.getFloat(R.styleable.MapView_zoom, 0.0f);
             }
         }
@@ -192,16 +192,19 @@ public final class CameraPosition implements Parcelable {
 
         /**
          * Create Builder from an existing array of doubles.
+         * <p>
+         * These values conform to map.ccp representation of a camera position.
+         * </p>
          *
-         * @param values Values containing target, bearing, tilt and zoom
+         * @param nativeCameraValues Values containing target, bearing, tilt and zoom
          */
-        public Builder(double[] values) {
+        public Builder(double[] nativeCameraValues) {
             super();
-            if (values != null && values.length == 5) {
-                this.target = new LatLng(values[0], values[1]);
-                this.bearing = Math.toDegrees(values[2]);
-                this.tilt = Math.toRadians(values[3]);
-                this.zoom = (float) values[4];
+            if (nativeCameraValues != null && nativeCameraValues.length == 5) {
+                target(new LatLng(nativeCameraValues[0], nativeCameraValues[1]));
+                bearing(-nativeCameraValues[2]);
+                tilt(nativeCameraValues[3]);
+                zoom((float) nativeCameraValues[4]);
             }
         }
 
@@ -212,7 +215,16 @@ public final class CameraPosition implements Parcelable {
          * @return Builder
          */
         public Builder bearing(double bearing) {
-            this.bearing = bearing;
+            double direction = bearing;
+
+            while (direction > 360) {
+                direction -= 360;
+            }
+            while (direction < 0) {
+                direction += 360;
+            }
+
+            this.bearing = direction;
             return this;
         }
 
@@ -237,13 +249,16 @@ public final class CameraPosition implements Parcelable {
         }
 
         /**
-         * Set the tilt
+         * Set the tilt in degrees
+         * <p>
+         * value is clamped to 0 and 60.
+         * <p/>
          *
          * @param tilt Tilt value
          * @return Builder
          */
         public Builder tilt(double tilt) {
-            this.tilt = (float) Math.toRadians(MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT));
+            this.tilt = (float) MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT);
             return this;
         }
 
