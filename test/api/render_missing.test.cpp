@@ -3,7 +3,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_backend.hpp>
-#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/offscreen_view.hpp>
 #include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/image.hpp>
@@ -26,7 +26,7 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
     const auto style = util::read_file("test/fixtures/api/water_missing_tiles.json");
 
     HeadlessBackend backend;
-    HeadlessView view(1, 256, 512);
+    OffscreenView view(backend.getContext(), {{ 256, 512 }});
 #ifdef MBGL_ASSET_ZIP
     // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
@@ -38,14 +38,14 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    Map map(backend, view, view.getPixelRatio(), fileSource, threadPool, MapMode::Still);
+    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
 
     std::string message;
 
     // This host does not respond (== connection error).
     // Are you seeing this test fail? Make sure you don't have a server running on port 3001!
     map.setStyleJSON(style);
-    map.renderStill([&](std::exception_ptr err, PremultipliedImage&&) {
+    map.renderStill(view, [&](std::exception_ptr err) {
         ASSERT_TRUE(err.operator bool());
         try {
             std::rethrow_exception(err);

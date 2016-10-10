@@ -4,7 +4,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_backend.hpp>
-#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/offscreen_view.hpp>
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/util/exception.hpp>
@@ -21,14 +21,13 @@ TEST(API, RenderWithoutCallback) {
     util::RunLoop loop;
 
     HeadlessBackend backend;
-    HeadlessView view;
-    view.resize(128, 512);
+    OffscreenView view(backend.getContext(), {{ 128, 512 }});
     StubFileSource fileSource;
     ThreadPool threadPool(4);
 
-    std::unique_ptr<Map> map = std::make_unique<Map>(backend, view, view.getPixelRatio(),
-                                                     fileSource, threadPool, MapMode::Still);
-    map->renderStill(nullptr);
+    std::unique_ptr<Map> map =
+        std::make_unique<Map>(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    map->renderStill(view, nullptr);
 
     // Force Map thread to join.
     map.reset();
@@ -47,15 +46,14 @@ TEST(API, RenderWithoutStyle) {
     util::RunLoop loop;
 
     HeadlessBackend backend;
-    HeadlessView view;
-    view.resize(128, 512);
+    OffscreenView view(backend.getContext(), {{ 128, 512 }});
     StubFileSource fileSource;
     ThreadPool threadPool(4);
 
-    Map map(backend, view, view.getPixelRatio(), fileSource, threadPool, MapMode::Still);
+    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
 
     std::exception_ptr error;
-    map.renderStill([&](std::exception_ptr error_, PremultipliedImage&&) {
+    map.renderStill(view, [&](std::exception_ptr error_) {
         error = error_;
         loop.stop();
     });

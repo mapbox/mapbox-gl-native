@@ -25,6 +25,7 @@
 #import <mbgl/platform/default/thread_pool.hpp>
 #import <mbgl/gl/extension.hpp>
 #import <mbgl/gl/gl.hpp>
+#import <mbgl/gl/context.hpp>
 #import <mbgl/map/backend.hpp>
 #import <mbgl/sprite/sprite_image.hpp>
 #import <mbgl/storage/default_file_source.hpp>
@@ -263,9 +264,12 @@ public:
     NSURL *legacyCacheURL = [cachesDirectoryURL URLByAppendingPathComponent:@"cache.db"];
     [[NSFileManager defaultManager] removeItemAtURL:legacyCacheURL error:NULL];
 
-    mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
+    mbgl::DefaultFileSource* mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
+
+    const std::array<uint16_t, 2> size = {{ static_cast<uint16_t>(self.bounds.size.width),
+                                            static_cast<uint16_t>(self.bounds.size.height) }};
     _mbglThreadPool = new mbgl::ThreadPool(4);
-    _mbglMap = new mbgl::Map(*_mbglView, *_mbglView, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
+    _mbglMap = new mbgl::Map(*_mbglView, size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
     [self validateTileCacheSize];
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
@@ -635,7 +639,8 @@ public:
         [self validateTileCacheSize];
     }
     if (!_isTargetingInterfaceBuilder) {
-        _mbglMap->update(mbgl::Update::Dimensions);
+        _mbglMap->setSize({{ static_cast<uint16_t>(self.bounds.size.width),
+                             static_cast<uint16_t>(self.bounds.size.height) }});
     }
 }
 
@@ -746,9 +751,8 @@ public:
             return reinterpret_cast<mbgl::gl::glProc>(symbol);
         });
 
-        _mbglView->updateFramebufferBinding();
-
-        _mbglMap->render();
+        _mbglView->updateViewBinding();
+        _mbglMap->render(*_mbglView);
 
         if (_isPrinting) {
             _isPrinting = NO;
@@ -2539,17 +2543,6 @@ public:
     MGLMapViewImpl(MGLMapView *nativeView_)
         : nativeView(nativeView_) {}
 
-    std::array<uint16_t, 2> getSize() const override {
-        return {{ static_cast<uint16_t>(nativeView.bounds.size.width),
-                  static_cast<uint16_t>(nativeView.bounds.size.height) }};
-    }
-
-    std::array<uint16_t, 2> getFramebufferSize() const override {
-        NSRect bounds = [nativeView convertRectToBacking:nativeView.bounds];
-        return {{ static_cast<uint16_t>(bounds.size.width),
-                  static_cast<uint16_t>(bounds.size.height) }};
-    }
-
     void notifyMapChange(mbgl::MapChange change) override {
         [nativeView notifyMapChange:change];
     }
@@ -2567,26 +2560,34 @@ public:
         [NSOpenGLContext clearCurrentContext];
     }
 
-    void updateFramebufferBinding() {
-        MBGL_CHECK_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo));
+    mbgl::gl::value::Viewport::Type getViewport() const {
+        return { 0, 0, static_cast<uint16_t>(nativeView.bounds.size.width),
+                 static_cast<uint16_t>(nativeView.bounds.size.height) };
+    }
+
+    void updateViewBinding() {
+        fbo = mbgl::gl::value::BindFramebuffer::Get();
+        getContext().bindFramebuffer.setCurrentValue(fbo);
+        getContext().viewport.setCurrentValue(getViewport());
     }
 
     void bind() override {
-        MBGL_CHECK_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
+        getContext().bindFramebuffer = fbo;
+        getContext().viewport = getViewport();
     }
 
-    mbgl::PremultipliedImage readStillImage(std::array<uint16_t, 2> size = {{ 0, 0 }}) override {
-        if (!size[0] || !size[1]) {
-            size = getFramebufferSize();
-        }
-
-        mbgl::PremultipliedImage image { size[0], size[1] };
-        MBGL_CHECK_ERROR(glReadPixels(0, 0, size[0], size[1], GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
+    mbgl::PremultipliedImage readStillImage() {
+        NSRect bounds = [nativeView convertRectToBacking:nativeView.bounds];
+        const uint16_t width = bounds.size.width;
+        const uint16_t height = bounds.size.height;
+        mbgl::PremultipliedImage image{ width, height };
+        MBGL_CHECK_ERROR(
+            glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
 
         const size_t stride = image.stride();
         auto tmp = std::make_unique<uint8_t[]>(stride);
         uint8_t *rgba = image.data.get();
-        for (int i = 0, j = size[1] - 1; i < j; i++, j--) {
+        for (int i = 0, j = height - 1; i < j; i++, j--) {
             std::memcpy(tmp.get(), rgba + i * stride, stride);
             std::memcpy(rgba + i * stride, rgba + j * stride, stride);
             std::memcpy(rgba + j * stride, tmp.get(), stride);

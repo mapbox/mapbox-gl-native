@@ -30,7 +30,9 @@ void Painter::renderFill(PaintParameters& parameters,
     const bool isOutlineColorDefined = !properties.fillOutlineColor.isUndefined();
     Color strokeColor = isOutlineColorDefined? properties.fillOutlineColor : fillColor;
 
-    auto worldSize = util::convert<GLfloat>(parameters.view.getFramebufferSize());
+    const auto viewport = context.viewport.getCurrentValue();
+    const std::array<GLfloat, 2> worldSize{ { static_cast<GLfloat>(viewport.width),
+                                              static_cast<GLfloat>(viewport.height) } };
 
     bool pattern = !properties.fillPattern.value.from.empty();
     bool outline = properties.fillAntialias && !pattern && isOutlineColorDefined;

@@ -358,7 +358,7 @@ void nativeDestroySurface(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr
 void nativeUpdate(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().update(mbgl::Update::Repaint);
+    nativeMapView->invalidate();
 }
 
 void nativeRender(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
