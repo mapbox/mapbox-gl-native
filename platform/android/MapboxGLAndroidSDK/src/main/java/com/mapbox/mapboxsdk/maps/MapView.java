@@ -87,6 +87,7 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
+import com.mapbox.mapboxsdk.utils.MathUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -1314,7 +1315,7 @@ public class MapView extends FrameLayout {
             return;
         }
         nativeMapView.cancelTransitions();
-        nativeMapView.jumpTo(bearing, center, pitch, zoom);
+        nativeMapView.jumpTo(Math.toRadians(bearing), center, Math.toRadians(MathUtils.clamp(pitch, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT)), zoom);
     }
 
     void easeTo(double bearing, LatLng center, long duration, double pitch, double zoom, boolean easingInterpolator, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
@@ -1338,7 +1339,7 @@ public class MapView extends FrameLayout {
             });
         }
 
-        nativeMapView.easeTo(bearing, center, duration, pitch, zoom, easingInterpolator);
+        nativeMapView.easeTo(Math.toRadians(bearing), center, duration, Math.toRadians(MathUtils.clamp(pitch, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT)), zoom, easingInterpolator);
     }
 
     void flyTo(double bearing, LatLng center, long duration, double pitch, double zoom, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
@@ -1362,7 +1363,7 @@ public class MapView extends FrameLayout {
             });
         }
 
-        nativeMapView.flyTo(bearing, center, duration, pitch, zoom);
+        nativeMapView.flyTo(Math.toRadians(bearing), center, duration, Math.toRadians(MathUtils.clamp(pitch, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT)), zoom);
     }
 
     private void adjustTopOffsetPixels() {
@@ -2503,6 +2504,7 @@ public class MapView extends FrameLayout {
                 if (mapboxMap.getUiSettings().isZoomControlsEnabled()) {
                     zoomButtonsController.setVisible(false);
                 }
+                return true;
 
             default:
                 // We are not interested in this event

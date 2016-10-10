@@ -4,9 +4,7 @@ import android.content.res.TypedArray;
 import android.os.Parcelable;
 
 import com.mapbox.mapboxsdk.R;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.utils.MathUtils;
 import com.mapbox.mapboxsdk.utils.MockParcel;
 
 import org.junit.Test;
@@ -58,7 +56,7 @@ public class CameraPositionTest {
         CameraPosition cameraPosition = new CameraPosition.Builder(typedArray).build();
         assertEquals("bearing should match", bearing, cameraPosition.bearing, DELTA);
         assertEquals("latlng should match", new LatLng(latitude, longitude), cameraPosition.target);
-        assertEquals("tilt should match", Math.toRadians(tilt), cameraPosition.tilt, DELTA);
+        assertEquals("tilt should match", tilt, cameraPosition.tilt, DELTA);
         assertEquals("zoom should match", zoom, cameraPosition.zoom, DELTA);
     }
 
@@ -72,9 +70,9 @@ public class CameraPositionTest {
 
         double[] cameraVars = new double[]{latitude, longitude, bearing, tilt, zoom};
         CameraPosition cameraPosition = new CameraPosition.Builder(cameraVars).build();
-        assertEquals("bearing should match", Math.toDegrees(bearing), cameraPosition.bearing, DELTA);
+        assertEquals("bearing should match", bearing, cameraPosition.bearing, DELTA);
         assertEquals("latlng should match", new LatLng(latitude, longitude), cameraPosition.target);
-        assertEquals("tilt should match", Math.toRadians(tilt), cameraPosition.tilt, DELTA);
+        assertEquals("tilt should match", tilt, cameraPosition.tilt, DELTA);
         assertEquals("zoom should match", zoom, cameraPosition.zoom, DELTA);
     }
 
