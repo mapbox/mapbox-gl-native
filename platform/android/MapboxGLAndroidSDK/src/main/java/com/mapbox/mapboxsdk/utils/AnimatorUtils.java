@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator;
 import android.support.annotation.AnimatorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.View;
 
 public class AnimatorUtils {
@@ -59,6 +60,17 @@ public class AnimatorUtils {
             }
         });
         rotateAnimator.start();
+    }
+
+    public static void rotateBy(@NonNull final View view, float rotationBy) {
+        view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        view.animate().rotationBy(rotationBy).setInterpolator(new FastOutSlowInInterpolator()).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                view.setLayerType(View.LAYER_TYPE_NONE, null);
+            }
+        });
     }
 
     public static void alpha(@NonNull final View convertView, float alpha, @Nullable final OnAnimationEndListener listener) {

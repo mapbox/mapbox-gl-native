@@ -15,7 +15,6 @@ import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
 import java.util.ArrayList;
@@ -68,6 +67,19 @@ public class MarkerViewManager {
         View convertView = markerViewMap.get(marker);
         if (convertView != null) {
             AnimatorUtils.rotate(convertView, rotation);
+        }
+    }
+
+    /**
+     * Animate a MarkerView with a given rotation.
+     *
+     * @param marker   the MarkerView to rotate by
+     * @param rotation the rotation by value
+     */
+    public void animateRotationBy(@NonNull MarkerView marker, float rotation) {
+        View convertView = markerViewMap.get(marker);
+        if (convertView != null) {
+            AnimatorUtils.rotateBy(convertView, rotation);
         }
     }
 
