@@ -18,6 +18,8 @@ public class MapboxAccountManager {
     private final String accessToken;
     private final Context applicationContext;
 
+    private Boolean connected = null;
+
     /**
      * MapboxAccountManager should NOT be instantiated directly.
      * Use @see MapboxAccountManager#getInstance() instead.
@@ -90,12 +92,29 @@ public class MapboxAccountManager {
     }
 
     /**
+     * Manually sets the connectivity state of the app. This is useful for apps that control their
+     * own connectivity state and want to bypass any checks to the ConnectivityManager.
+     *
+     * @param connected flag to determine the connectivity state, true for connected, false for
+     *                  disconnected, null for ConnectivityManager to determine.
+     */
+    public void setConnected(Boolean connected) {
+        // Connectivity state overridden by app
+        this.connected = connected;
+    }
+
+    /**
      * Determines whether we have an Internet connection available. Please do not rely on this
      * method in your apps, this method is used internally by the SDK.
      *
      * @return true if there is an Internet connection, false otherwise
      */
-    public boolean isConnected() {
+    public Boolean isConnected() {
+        if (connected != null) {
+            // Connectivity state overridden by app
+            return connected;
+        }
+
         ConnectivityManager cm = (ConnectivityManager) applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return (activeNetwork != null && activeNetwork.isConnected());

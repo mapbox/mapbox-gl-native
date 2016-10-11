@@ -9,6 +9,8 @@ import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.mapbox.mapboxsdk.MapboxAccountManager;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -80,6 +82,12 @@ public class ConnectivityReceiver extends BroadcastReceiver {
      * @return true if connected
      */
     public boolean isConnected(Context context) {
+        Boolean connected = MapboxAccountManager.getInstance().isConnected();
+        if (connected != null) {
+            // Connectivity state overridden by app
+            return connected;
+        }
+
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return (activeNetwork != null && activeNetwork.isConnected());

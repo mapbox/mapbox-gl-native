@@ -13,8 +13,10 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -72,6 +74,13 @@ public class OfflineActivity extends AppCompatActivity
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
+
+        // You can use MapboxAccountManager.setConnected(Boolean) to manually set the connectivity
+        // state of your app. This will override any checks performed via the ConnectivityManager.
+        //MapboxAccountManager.getInstance().setConnected(false);
+        Boolean connected = MapboxAccountManager.getInstance().isConnected();
+        Log.d(LOG_TAG, String.format(MapboxConstants.MAPBOX_LOCALE,
+                "MapboxAccountManager is connected: %b", connected));
 
         // Set up map
         mapView = (MapView) findViewById(R.id.mapView);
