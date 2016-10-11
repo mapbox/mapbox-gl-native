@@ -634,6 +634,8 @@ public class MapboxEventManager {
                 return null;
             }
 
+            Response response = null;
+
             try {
                 // Send data
                 // =========
@@ -742,13 +744,16 @@ public class MapboxEventManager {
                         .header("User-Agent", userAgent)
                         .post(body)
                         .build();
-                Response response = client.newCall(request).execute();
+                response = client.newCall(request).execute();
                 Log.d(TAG, "response code = " + response.code() + " for events " + events.size());
 
             } catch (Exception e) {
                 Log.e(TAG, "FlushTheEventsTask borked: " + e);
                 e.printStackTrace();
             } finally {
+                if (response != null && response.body() != null) {
+                    response.body().close();
+                }
                 // Reset Events
                 // ============
                 events.removeAllElements();
