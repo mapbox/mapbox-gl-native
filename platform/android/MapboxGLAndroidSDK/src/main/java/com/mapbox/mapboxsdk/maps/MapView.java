@@ -1539,7 +1539,7 @@ public class MapView extends FrameLayout {
         }
         CameraPosition position = new CameraPosition.Builder(nativeMapView.getCameraValues()).build();
         myLocationView.setCameraPosition(position);
-        mapboxMap.getMarkerViewManager().setTilt((float) Math.toDegrees(position.tilt));
+        mapboxMap.getMarkerViewManager().setTilt((float) position.tilt);
         return position;
     }
 
