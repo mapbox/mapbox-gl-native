@@ -41,6 +41,13 @@ workflows:
             make qt-qml-app
             make run-qt-test
         - is_debug: 'yes'
+    - deploy-to-bitrise-io:
+        title: Deploy to Bitrise.io
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - deploy_path: "test/fixtures"
+        - notify_user_groups: none
+        - is_compress: 'true'
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
