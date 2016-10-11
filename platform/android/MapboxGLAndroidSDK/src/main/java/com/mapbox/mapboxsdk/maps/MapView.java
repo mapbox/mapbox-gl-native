@@ -132,6 +132,8 @@ public class MapView extends FrameLayout {
     private MyLocationView myLocationView;
     private LocationListener myLocationListener;
 
+    private Projection projection;
+
     private CopyOnWriteArrayList<OnMapChangedListener> onMapChangedListener;
     private ZoomButtonsController zoomButtonsController;
     private ConnectivityReceiver connectivityReceiver;
@@ -154,7 +156,6 @@ public class MapView extends FrameLayout {
     private int contentPaddingBottom;
 
     private PointF focalPoint;
-    private PointF fromScreenLocationTempPoint;
 
     private String styleUrl = Style.MAPBOX_STREETS;
     private boolean styleWasSet = false;
@@ -197,6 +198,8 @@ public class MapView extends FrameLayout {
         onMapReadyCallbackList = new ArrayList<>();
         onMapChangedListener = new CopyOnWriteArrayList<>();
         mapboxMap = new MapboxMap(this);
+        projection = mapboxMap.getProjection();
+
         icons = new ArrayList<>();
         View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
         setWillNotDraw(false);
@@ -258,8 +261,6 @@ public class MapView extends FrameLayout {
         if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
             mapboxMap.getUiSettings().setZoomControlsEnabled(true);
         }
-
-        fromScreenLocationTempPoint = new PointF();
     }
 
     private void setInitialState(MapboxMapOptions options) {
@@ -978,21 +979,24 @@ public class MapView extends FrameLayout {
     // Projection
     //
 
-    LatLng fromScreenLocation(@NonNull PointF point) {
+    /*
+     * Internal use only, use Projection#fromScreenLocation instead
+     */
+    LatLng fromNativeScreenLocation(@NonNull PointF point) {
         if (destroyed) {
             return new LatLng();
         }
-        fromScreenLocationTempPoint.set(point.x / screenDensity, point.y / screenDensity);
-        return nativeMapView.latLngForPixel(fromScreenLocationTempPoint);
+        return nativeMapView.latLngForPixel(point);
     }
 
-    PointF toScreenLocation(@NonNull LatLng location) {
+    /*
+     * Internal use only, use Projection#toScreenLocation instead.
+     */
+    PointF toNativeScreenLocation(@NonNull LatLng location) {
         if (destroyed || location == null) {
             return new PointF();
         }
-        PointF pointF = nativeMapView.pixelForLatLng(location);
-        pointF.set(pointF.x * screenDensity, pointF.y * screenDensity);
-        return pointF;
+        return nativeMapView.pixelForLatLng(location);
     }
 
     //
@@ -1641,7 +1645,7 @@ public class MapView extends FrameLayout {
      * @param yCoordinate Original y screen cooridnate at start of gesture
      */
     private void trackGestureEvent(@NonNull String gestureId, @NonNull float xCoordinate, @NonNull float yCoordinate) {
-        LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
+        LatLng tapLatLng = projection.fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
         // NaN and Infinite checks to prevent JSON errors at send to server time
         if (Double.isNaN(tapLatLng.getLatitude()) || Double.isNaN(tapLatLng.getLongitude())) {
@@ -1673,7 +1677,7 @@ public class MapView extends FrameLayout {
      * @param yCoordinate Orginal y screen coordinate at end of drag
      */
     private void trackGestureDragEndEvent(@NonNull float xCoordinate, @NonNull float yCoordinate) {
-        LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
+        LatLng tapLatLng = projection.fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
         // NaN and Infinite checks to prevent JSON errors at send to server time
         if (Double.isNaN(tapLatLng.getLatitude()) || Double.isNaN(tapLatLng.getLongitude())) {
@@ -1890,7 +1894,7 @@ public class MapView extends FrameLayout {
                 // notify app of map click
                 MapboxMap.OnMapClickListener listener = mapboxMap.getOnMapClickListener();
                 if (listener != null) {
-                    LatLng point = fromScreenLocation(tapPoint);
+                    LatLng point = projection.fromScreenLocation(tapPoint);
                     listener.onMapClick(point);
                 }
             }
@@ -1904,7 +1908,7 @@ public class MapView extends FrameLayout {
         public void onLongPress(MotionEvent motionEvent) {
             MapboxMap.OnMapLongClickListener listener = mapboxMap.getOnMapLongClickListener();
             if (listener != null && !quickZoom) {
-                LatLng point = fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
+                LatLng point = projection.fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
                 listener.onMapLongClick(point);
             }
         }
