@@ -8,12 +8,14 @@
 #include <mbgl/text/get_anchors.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/collision_tile.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/utf.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/math/clamp.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/log.hpp>
@@ -53,8 +55,8 @@ SymbolLayout::SymbolLayout(std::string bucketName_,
     auto layerName = layer.getName();
 
     // Determine and load glyph ranges
-    const size_t featureCount = static_cast<size_t>(layer.featureCount());
-    for (size_t i = 0; i < featureCount; i++) {
+    const size_t featureCount = layer.featureCount();
+    for (size_t i = 0; i < featureCount; ++i) {
         auto feature = layer.getFeature(i);
         if (!filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
             continue;
@@ -487,18 +489,20 @@ void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
 
 void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket& bucket) {
 
+    if (!hasSymbolInstances()) {
+        return;
+    }
+
     const float yStretch = collisionTile.yStretch;
-    const float angle = collisionTile.config.angle;
-    float angle_sin = std::sin(-angle);
-    float angle_cos = std::cos(-angle);
-    std::array<float, 4> matrix = {{angle_cos, -angle_sin, angle_sin, angle_cos}};
+
+    auto& collisionBox = bucket.collisionBox;
+    if (collisionBox.groups.empty()) {
+        // Move to a new group because the old one can't hold the geometry.
+        collisionBox.groups.emplace_back();
+    }
 
     for (const SymbolInstance &symbolInstance : symbolInstances) {
-        for (int i = 0; i < 2; i++) {
-            auto& feature = i == 0 ?
-                symbolInstance.textCollisionFeature :
-                symbolInstance.iconCollisionFeature;
-
+        auto populateCollisionBox = [&](const auto& feature) {
             for (const CollisionBox &box : feature.boxes) {
                 auto& anchor = box.anchor;
 
@@ -506,19 +510,13 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 Point<float> tr{box.x2, box.y1 * yStretch};
                 Point<float> bl{box.x1, box.y2 * yStretch};
                 Point<float> br{box.x2, box.y2 * yStretch};
-                tl = util::matrixMultiply(matrix, tl);
-                tr = util::matrixMultiply(matrix, tr);
-                bl = util::matrixMultiply(matrix, bl);
-                br = util::matrixMultiply(matrix, br);
+                tl = util::matrixMultiply(collisionTile.reverseRotationMatrix, tl);
+                tr = util::matrixMultiply(collisionTile.reverseRotationMatrix, tr);
+                bl = util::matrixMultiply(collisionTile.reverseRotationMatrix, bl);
+                br = util::matrixMultiply(collisionTile.reverseRotationMatrix, br);
 
-                const float maxZoom = util::max(0.0f, util::min(25.0f, static_cast<float>(zoom + log(box.maxScale) / log(2))));
-                const float placementZoom= util::max(0.0f, util::min(25.0f, static_cast<float>(zoom + log(box.placementScale) / log(2))));
-
-                auto& collisionBox = bucket.collisionBox;
-                if (collisionBox.groups.empty()) {
-                    // Move to a new group because the old one can't hold the geometry.
-                    collisionBox.groups.emplace_back();
-                }
+                const float maxZoom = util::clamp(zoom + log(box.maxScale) / log(2), util::MIN_ZOOM, util::MAX_ZOOM);
+                const float placementZoom = util::clamp(zoom + log(box.placementScale) / log(2), util::MIN_ZOOM, util::MAX_ZOOM);
 
                 collisionBox.vertices.emplace_back(anchor.x, anchor.y, tl.x, tl.y, maxZoom, placementZoom);
                 collisionBox.vertices.emplace_back(anchor.x, anchor.y, tr.x, tr.y, maxZoom, placementZoom);
@@ -529,10 +527,12 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 collisionBox.vertices.emplace_back(anchor.x, anchor.y, bl.x, bl.y, maxZoom, placementZoom);
                 collisionBox.vertices.emplace_back(anchor.x, anchor.y, tl.x, tl.y, maxZoom, placementZoom);
 
-                auto& group= collisionBox.groups.back();
+                auto& group = collisionBox.groups.back();
                 group.vertexLength += 8;
             }
-        }
+        };
+        populateCollisionBox(symbolInstance.textCollisionFeature);
+        populateCollisionBox(symbolInstance.iconCollisionFeature);
     }
 }
 
