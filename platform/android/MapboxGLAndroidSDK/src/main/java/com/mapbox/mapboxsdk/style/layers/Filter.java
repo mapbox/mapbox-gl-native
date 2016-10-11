@@ -31,7 +31,7 @@ public class Filter {
     /**
      * Represents a {@link Filter} statement. Can be unary (eg `has()`, etc) or take any number of values.
      */
-    public static class SimpleStatement extends Statement {
+    private static class SimpleStatement extends Statement {
         private final String key;
         private final Object[] values;
 
@@ -40,7 +40,7 @@ public class Filter {
          * @param key      the property key
          * @param values   the values to operate on, if any
          */
-        public SimpleStatement(String operator, String key, Object... values) {
+        SimpleStatement(String operator, String key, Object... values) {
             super(operator);
             this.key = key;
             this.values = values;
@@ -63,14 +63,14 @@ public class Filter {
     /**
      * Represents a collection of {@link Statement}s with an operator that describes their relationship
      */
-    public static class CompoundStatement extends Statement {
+    private static class CompoundStatement extends Statement {
         private final Statement[] statements;
 
         /**
          * @param operator   the relationship operator
          * @param statements the statements to compound
          */
-        public CompoundStatement(String operator, Statement... statements) {
+        CompoundStatement(String operator, Statement... statements) {
             super(operator);
             this.statements = statements;
         }
