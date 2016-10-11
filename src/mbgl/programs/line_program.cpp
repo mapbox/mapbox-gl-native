@@ -12,13 +12,9 @@ static_assert(sizeof(LineAttributes::Vertex) == 8, "expected LineVertex size");
 
 template <class Values, class...Args>
 Values makeValues(const style::LinePaintProperties& properties,
-                  float pixelRatio,
                   const RenderTile& tile,
                   const TransformState& state,
                   Args&&... args) {
-    // the distance over which the line edge fades out.
-    // Retina devices need a smaller distance to avoid aliasing.
-    float antialiasing = 1.0 / pixelRatio;
 
     mat2 antialiasingMatrix;
     matrix::identity(antialiasingMatrix);
@@ -35,11 +31,10 @@ Values makeValues(const style::LinePaintProperties& properties,
                                    properties.lineTranslateAnchor.value,
                                    state) },
         uniforms::u_opacity::Value{ properties.lineOpacity.value },
-        uniforms::u_linewidth::Value{ properties.lineWidth.value / 2 },
+        uniforms::u_width::Value{ properties.lineWidth.value / 2 },
         uniforms::u_gapwidth::Value{ properties.lineGapWidth.value / 2 },
-        uniforms::u_blur::Value{ properties.lineBlur.value + antialiasing },
+        uniforms::u_blur::Value{ properties.lineBlur.value },
         uniforms::u_offset::Value{ -properties.lineOffset.value },
-        uniforms::u_antialiasing::Value{ antialiasing / 2 },
         uniforms::u_antialiasingmatrix::Value{ antialiasingMatrix },
         uniforms::u_ratio::Value{ 1.0f / tile.id.pixelsToTileUnits(1.0, state.getZoom()) },
         uniforms::u_extra::Value{ (topedgelength + x) / topedgelength - 1.0f },
@@ -49,12 +44,10 @@ Values makeValues(const style::LinePaintProperties& properties,
 
 LineProgram::UniformValues
 LineProgram::uniformValues(const style::LinePaintProperties& properties,
-                           float pixelRatio,
                            const RenderTile& tile,
                            const TransformState& state) {
     return makeValues<LineProgram::UniformValues>(
         properties,
-        pixelRatio,
         tile,
         state,
         uniforms::u_color::Value{ properties.lineColor.value }
@@ -85,7 +78,6 @@ LineSDFProgram::uniformValues(const style::LinePaintProperties& properties,
 
     return makeValues<LineSDFProgram::UniformValues>(
         properties,
-        pixelRatio,
         tile,
         state,
         uniforms::u_color::Value{ properties.lineColor.value },
@@ -101,7 +93,6 @@ LineSDFProgram::uniformValues(const style::LinePaintProperties& properties,
 
 LinePatternProgram::UniformValues
 LinePatternProgram::uniformValues(const style::LinePaintProperties& properties,
-                                  float pixelRatio,
                                   const RenderTile& tile,
                                   const TransformState& state,
                                   const SpriteAtlasPosition& posA,
@@ -118,7 +109,6 @@ LinePatternProgram::uniformValues(const style::LinePaintProperties& properties,
 
     return makeValues<LinePatternProgram::UniformValues>(
         properties,
-        pixelRatio,
         tile,
         state,
         uniforms::u_pattern_tl_a::Value{ posA.tl },

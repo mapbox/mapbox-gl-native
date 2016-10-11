@@ -45,8 +45,7 @@ void Painter::renderCircle(PaintParameters& parameters,
                     pixelsToGLUnits[0] * state.getAltitude(),
                     pixelsToGLUnits[1] * state.getAltitude()
                   }}
-                : pixelsToGLUnits },
-            uniforms::u_devicepixelratio::Value{ frame.pixelRatio },
+                : pixelsToGLUnits }
         },
         *bucket.vertexBuffer,
         *bucket.indexBuffer,

@@ -21,6 +21,7 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 
+#include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/programs/programs.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
@@ -73,7 +74,7 @@ static gl::VertexVector<RasterVertex, gl::TriangleStrip> rasterTriangleStrip() {
     return result;
 }
 
-Painter::Painter(gl::Context& context_, const TransformState& state_)
+Painter::Painter(gl::Context& context_, const TransformState& state_, float pixelRatio)
     : context(context_),
       state(state_),
       tileTriangleVertexBuffer(context.createVertexBuffer(tileTriangles())),
@@ -86,9 +87,12 @@ Painter::Painter(gl::Context& context_, const TransformState& state_)
     gl::debugging::enable();
 #endif
 
-    programs = std::make_unique<Programs>(context);
+    ProgramParameters programParameters = ProgramParameters{ pixelRatio, false };
+    programs = std::make_unique<Programs>(context, programParameters);
 #ifndef NDEBUG
-    overdrawPrograms = std::make_unique<Programs>(context, ProgramDefines::Overdraw);
+    
+    ProgramParameters programParametersOverdraw = ProgramParameters{ pixelRatio, true };
+    overdrawPrograms = std::make_unique<Programs>(context, programParametersOverdraw);
 #endif
 }
 
