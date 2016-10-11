@@ -9,6 +9,7 @@
     <!-- Fragment -->
     <string name="activity_map_fragment_suport">Support Map Fragment</string>
     <string name="activity_map_fragment">Map Fragment</string>
+    <string name="activity_multimap">Multiple Maps on Screen</string>
 
     <!-- Annotations -->
     <string name="activity_add_bulk_markers">Add Markers In Bulk</string>
@@ -79,6 +80,7 @@
     <string name="description_cameraposition">CameraPosition capabilities</string>
     <string name="description_map_fragment">Showcase MapFragment</string>
     <string name="description_map_fragment_support">Showcase SupportMapFragment</string>
+    <string name="description_multimap">Activity with multiple maps on screen</string>
     <string name="description_press_for_marker">Add marker to map on long press</string>
     <string name="description_camera_zoom">Different types of zoom methods</string>
     <string name="description_minmax_zoom">Configure a max and min zoomlevel</string>
