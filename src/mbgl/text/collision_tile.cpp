@@ -2,6 +2,7 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/math/minmax.hpp>
 
 #include <mapbox/geometry/envelope.hpp>
 #include <mapbox/geometry/multi_point.hpp>
@@ -53,7 +54,7 @@ float CollisionTile::findPlacementScale(float minPlacementScale, const Point<flo
     if (std::isnan(s1) || std::isnan(s2)) s1 = s2 = 1;
     if (std::isnan(s3) || std::isnan(s4)) s3 = s4 = 1;
 
-    float collisionFreeScale = ::fmin(::fmax(s1, s2), ::fmax(s3, s4));
+    float collisionFreeScale = util::min(util::max(s1, s2), util::max(s3, s4));
 
     if (collisionFreeScale > blocking.maxScale) {
         // After a box's maxScale the label has shrunk enough that the box is no longer needed to cover it,
@@ -106,10 +107,10 @@ float CollisionTile::placeFeature(const CollisionFeature& feature, const bool al
             const Point<float> rbl = util::matrixMultiply(reverseRotationMatrix, bl);
             const Point<float> rbr = util::matrixMultiply(reverseRotationMatrix, br);
             CollisionBox rotatedBox(box.anchor,
-                    ::fmin(::fmin(rtl.x, rtr.x), ::fmin(rbl.x, rbr.x)),
-                    ::fmin(::fmin(rtl.y, rtr.y), ::fmin(rbl.y, rbr.y)),
-                    ::fmax(::fmax(rtl.x, rtr.x), ::fmax(rbl.x, rbr.x)),
-                    ::fmax(::fmax(rtl.y, rtr.y), ::fmax(rbl.y, rbr.y)),
+                    util::min(rtl.x, rtr.x, rbl.x, rbr.x),
+                    util::min(rtl.y, rtr.y, rbl.y, rbr.y),
+                    util::max(rtl.x, rtr.x, rbl.x, rbr.x),
+                    util::max(rtl.y, rtr.y, rbl.y, rbr.y),
                     box.maxScale);
 
             for (auto& blocking : edges) {
