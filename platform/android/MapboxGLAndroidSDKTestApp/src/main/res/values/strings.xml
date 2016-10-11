@@ -65,6 +65,7 @@
     <string name="activity_surfaceview_overlay">SurfaceView MediaOverlay</string>
     <string name="activity_query_rendered_feature_properties">Query feature properties</string>
     <string name="activity_query_rendered_features_box_count">Count features in box</string>
+    <string name="activity_query_rendered_features_box_symbol_count">Count symbols in box</string>
     <string name="activity_query_rendered_features_box_highlight">Highlight features in box</string>
     <string name="activity_circle">Add Circle</string>
     <string name="activity_add_sprite">Add Custom Sprite</string>
@@ -120,6 +121,7 @@
     <string name="description_surfaceview_mediacontrols">Test overlaying SurfaceView</string>
     <string name="description_query_rendered_feature_properties_point">Query rendered feature properties on click</string>
     <string name="description_query_rendered_features_box_count">Count all rendered features in box</string>
+    <string name="description_query_rendered_features_box_symbol_count">Count all rendered symbols in box</string>
     <string name="description_query_rendered_features_box_highlight">Hightligh buildings in box</string>
     <string name="description_car_driving">MyLocationView follow map update example</string>
     <string name="description_video_view">Android video view on top of the map view</string>

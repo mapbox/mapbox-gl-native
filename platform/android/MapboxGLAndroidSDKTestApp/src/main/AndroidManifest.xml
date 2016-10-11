@@ -406,6 +406,14 @@
                 android:value="@string/category_features" />
         </activity>
         <activity
+            android:name=".activity.feature.QueryRenderedFeaturesBoxSymbolCountActivity"
+            android:description="@string/description_query_rendered_features_box_symbol_count"
+            android:label="@string/activity_query_rendered_features_box_symbol_count">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_features" />
+        </activity>
+        <activity
             android:name=".activity.feature.QueryRenderedFeaturesBoxHighlightActivity"
             android:description="@string/description_query_rendered_features_box_highlight"
             android:label="@string/activity_query_rendered_features_box_highlight">
