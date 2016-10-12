@@ -171,10 +171,10 @@ public final class CameraPosition implements Parcelable {
         public Builder(CameraUpdateFactory.CameraPositionUpdate update) {
             super();
             if (update != null) {
-                this.bearing = update.getBearing();
-                this.target = update.getTarget();
-                this.tilt = update.getTilt();
-                this.zoom = update.getZoom();
+                bearing(update.getBearing());
+                target(update.getTarget());
+                tilt(update.getTilt());
+                zoom(update.getZoom());
             }
         }
 

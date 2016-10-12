@@ -185,7 +185,7 @@ public final class CameraUpdateFactory {
             CameraPosition previousPosition = mapboxMap.getCameraPosition();
             if (target == null) {
                 return new CameraPosition.Builder()
-                        .tilt(Math.toDegrees(tilt))
+                        .tilt(tilt)
                         .zoom(zoom)
                         .bearing(bearing)
                         .target(previousPosition.target)
@@ -302,21 +302,12 @@ public final class CameraUpdateFactory {
             LatLng latLng = projection.fromScreenLocation(targetPoint);
 
             CameraPosition previousPosition = mapboxMap.getCameraPosition();
-            if (latLng != null) {
-                return new CameraPosition.Builder()
-                        .target(latLng)
-                        .zoom(previousPosition.zoom)
-                        .tilt(previousPosition.tilt)
-                        .bearing(previousPosition.bearing)
-                        .build();
-            } else {
-                return new CameraPosition.Builder()
-                        .tilt(Math.toDegrees(previousPosition.tilt))
-                        .zoom(previousPosition.zoom)
-                        .bearing(previousPosition.bearing)
-                        .target(previousPosition.target)
-                        .build();
-            }
+            return new CameraPosition.Builder()
+                    .target(latLng != null ? latLng : previousPosition.target)
+                    .zoom(previousPosition.zoom)
+                    .tilt(previousPosition.tilt)
+                    .bearing(previousPosition.bearing)
+                    .build();
         }
     }
 
