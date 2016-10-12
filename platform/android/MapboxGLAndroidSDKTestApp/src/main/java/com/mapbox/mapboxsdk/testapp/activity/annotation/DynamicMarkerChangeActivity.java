@@ -54,8 +54,6 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 DynamicMarkerChangeActivity.this.mapboxMap = mapboxMap;
-                mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.506675, -0.128699), 10));
-
                 // Create marker
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(LAT_LNG_CHELSEA)

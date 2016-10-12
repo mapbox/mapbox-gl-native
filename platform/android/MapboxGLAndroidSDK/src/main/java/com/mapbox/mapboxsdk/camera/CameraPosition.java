@@ -171,10 +171,10 @@ public final class CameraPosition implements Parcelable {
         public Builder(CameraUpdateFactory.CameraPositionUpdate update) {
             super();
             if (update != null) {
-                bearing(update.getBearing());
-                target(update.getTarget());
-                tilt(update.getTilt());
-                zoom(update.getZoom());
+                bearing = update.getBearing();
+                target = update.getTarget();
+                tilt = update.getTilt();
+                zoom = update.getZoom();
             }
         }
 
@@ -202,7 +202,7 @@ public final class CameraPosition implements Parcelable {
             super();
             if (nativeCameraValues != null && nativeCameraValues.length == 5) {
                 target(new LatLng(nativeCameraValues[0], nativeCameraValues[1]));
-                bearing(-nativeCameraValues[2]);
+                bearing(nativeCameraValues[2]);
                 tilt(nativeCameraValues[3]);
                 zoom((float) nativeCameraValues[4]);
             }
@@ -217,7 +217,7 @@ public final class CameraPosition implements Parcelable {
         public Builder bearing(double bearing) {
             double direction = bearing;
 
-            while (direction > 360) {
+            while (direction >= 360) {
                 direction -= 360;
             }
             while (direction < 0) {

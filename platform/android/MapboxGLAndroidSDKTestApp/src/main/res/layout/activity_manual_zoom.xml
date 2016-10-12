@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
@@ -13,6 +14,10 @@
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@id/mapView"
+        app:center_latitude="50.871062"
+        app:center_longitude="1.583210"
+        app:direction="220"
+        app:zoom="10"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar" />
