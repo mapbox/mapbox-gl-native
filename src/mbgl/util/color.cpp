@@ -77,4 +77,13 @@ optional<ColorHCL> Color::to_hcl() {
     };
 }
 
+optional<Color> ColorHCL::to_rgb() {
+    return Color{
+        h < 0 ? h + 360 : h,
+        std::sqrt(labColor->a * labColor->a + labColor->b * labColor->b),
+        labColor->l,
+        labColor->A
+    };
+}
+
 } // namespace mbgl

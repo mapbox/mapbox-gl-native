@@ -3,6 +3,14 @@
 #include <vector>
 #include <utility>
 
+using EnumType = uint32_t;
+
+enum class ColorSpace : EnumType {
+    RGB,
+    LAB,
+    HCL
+};
+
 namespace mbgl {
 namespace style {
 
@@ -16,10 +24,12 @@ public:
         : base(base_), stops(std::move(stops_)) {}
 
     float getBase() const { return base; }
+    ColorSpace getColorSpace() const { return colorSpace; }
     const std::vector<std::pair<float, T>>& getStops() const { return stops; }
 
 private:
     float base = 1;
+    ColorSpace colorSpace = ColorSpace::RGB;
     std::vector<std::pair<float, T>> stops;
 
     template <class S> friend bool operator==(const Function<S>&, const Function<S>&);
@@ -27,7 +37,9 @@ private:
 
 template <class T>
 bool operator==(const Function<T>& lhs, const Function<T>& rhs) {
-    return lhs.base == rhs.base && lhs.stops == rhs.stops;
+    return lhs.base == rhs.base &&
+        lhs.stops == rhs.stops &&
+        lhs.colorSpace == rhs.colorSpace;
 }
 
 template <class T>

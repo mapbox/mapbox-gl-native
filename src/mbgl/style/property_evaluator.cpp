@@ -84,6 +84,61 @@ T PropertyEvaluator<T>::operator()(const Function<T>& fn) const {
     }
 }
 
+template <>
+Color PropertyEvaluator<Color>::operator()(const Function<Color>& fn) const {
+    float base = fn.getBase();
+    const std::vector<std::pair<float, Color>>& stops = fn.getStops();
+    const ColorSpace colorSpace = fn.getColorSpace();
+    float z = parameters.z;
+    bool smaller = false;
+    float smaller_z = 0.0f;
+    Color smaller_val = Color();
+    bool larger = false;
+    float larger_z = 0.0f;
+    Color larger_val = Color();
+
+    for (uint32_t i = 0; i < stops.size(); i++) {
+        float stop_z = stops[i].first;
+        Color stop_val = stops[i].second;
+        if (stop_z <= z && (!smaller || smaller_z < stop_z)) {
+            smaller = true;
+            smaller_z = stop_z;
+            smaller_val = stop_val;
+        }
+        if (stop_z >= z && (!larger || larger_z > stop_z)) {
+            larger = true;
+            larger_z = stop_z;
+            larger_val = stop_val;
+        }
+    }
+
+    if (smaller && larger) {
+        if (larger_z == smaller_z || larger_val == smaller_val) {
+            return smaller_val;
+        }
+        const float zoomDiff = larger_z - smaller_z;
+        const float zoomProgress = z - smaller_z;
+
+        const float t = base == 1.0f ?
+            zoomProgress / zoomDiff :
+            (std::pow(base, zoomProgress) - 1) / (std::pow(base, zoomDiff) - 1);
+
+        if (colorSpace == ColorSpace::LAB) {
+            return util::interpolate(smaller_val.to_lab(), larger_val.to_lab(), t).to_rgb();
+        } else if (colorSpace == ColorSpace::HCL) {
+            return util::interpolate(smaller_val.to_hcl(), larger_val.to_hcl(), t).to_rgb();
+        }
+
+    } else if (larger) {
+        return larger_val;
+    } else if (smaller) {
+        return smaller_val;
+    } else {
+        // No stop defined.
+        return defaultStopsValue<Color>();
+    }
+}
+
 template class PropertyEvaluator<bool>;
 template class PropertyEvaluator<float>;
 template class PropertyEvaluator<Color>;
