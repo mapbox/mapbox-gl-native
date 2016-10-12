@@ -1169,4 +1169,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     point.coordinate = [self.mapView convertPoint:self.mapView.center toCoordinateFromView:self.mapView];
 }
 
+-(void)mapView:(MGLMapView *)mapView didSelectAnnotationView:(MGLAnnotationView *)annotationView
+{
+    annotationView.lockAxis = ( (int)annotationView.lockAxis + 1 ) % 4;
+    NSLog(@"lockAxis[%p]: 0x%x", annotationView, annotationView.lockAxis);
+}
+
 @end
