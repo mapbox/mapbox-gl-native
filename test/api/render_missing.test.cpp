@@ -2,8 +2,9 @@
 #include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
@@ -33,9 +34,11 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
 #endif
 
+    ThreadPool threadPool(4);
+
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    Map map(view, fileSource, MapMode::Still);
+    Map map(view, fileSource, threadPool, MapMode::Still);
 
     std::string message;
 

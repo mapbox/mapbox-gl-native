@@ -5,6 +5,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/storage/online_file_source.hpp>
+#include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -22,8 +23,9 @@ TEST(API, RenderWithoutCallback) {
     HeadlessView view(display, 1);
     view.resize(128, 512);
     StubFileSource fileSource;
+    ThreadPool threadPool(4);
 
-    std::unique_ptr<Map> map = std::make_unique<Map>(view, fileSource, MapMode::Still);
+    std::unique_ptr<Map> map = std::make_unique<Map>(view, fileSource, threadPool, MapMode::Still);
     map->renderStill(nullptr);
 
     // Force Map thread to join.
@@ -46,8 +48,9 @@ TEST(API, RenderWithoutStyle) {
     HeadlessView view(display, 1);
     view.resize(128, 512);
     StubFileSource fileSource;
+    ThreadPool threadPool(4);
 
-    Map map(view, fileSource, MapMode::Still);
+    Map map(view, fileSource, threadPool, MapMode::Still);
 
     std::exception_ptr error;
     map.renderStill([&](std::exception_ptr error_, PremultipliedImage&&) {

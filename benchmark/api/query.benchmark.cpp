@@ -4,6 +4,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -37,7 +38,8 @@ public:
     std::shared_ptr<HeadlessDisplay> display{ std::make_shared<HeadlessDisplay>() };
     HeadlessView view{ display, 1 };
     DefaultFileSource fileSource{ "benchmark/fixtures/api/cache.db", "." };
-    Map map{ view, fileSource, MapMode::Still };
+    ThreadPool threadPool{ 4 };
+    Map map{ view, fileSource, threadPool, MapMode::Still };
     ScreenBox box{{ 0, 0 }, { 1000, 1000 }};
 };
 

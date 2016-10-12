@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util/async_queue.hpp"
+
 #include <mbgl/platform/log.hpp>
 
 #pragma GCC diagnostic push
@@ -24,8 +26,7 @@ private:
     Nan::Persistent<v8::Object> module;
 
     struct LogMessage;
-    using Queue = util::AsyncQueue<LogMessage>;
-    Queue *queue = nullptr;
+    util::AsyncQueue<LogMessage>* queue;
 };
 
 }

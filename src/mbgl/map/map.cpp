@@ -21,7 +21,7 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
-#include <mbgl/actor/thread_pool.hpp>
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/platform/log.hpp>
 
 namespace mbgl {
@@ -36,7 +36,7 @@ enum class RenderState : uint8_t {
 
 class Map::Impl : public style::Observer {
 public:
-    Impl(View&, FileSource&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
+    Impl(View&, FileSource&, Scheduler&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
 
     void onSourceAttributionChanged(style::Source&, const std::string&) override;
     void onUpdate(Update) override;
@@ -51,6 +51,7 @@ public:
 
     View& view;
     FileSource& fileSource;
+    Scheduler& scheduler;
 
     RenderState renderState = RenderState::Never;
     Transform transform;
@@ -63,7 +64,6 @@ public:
 
     Update updateFlags = Update::Nothing;
     util::AsyncTask asyncUpdate;
-    ThreadPool workerThreadPool;
 
     std::unique_ptr<AnnotationManager> annotationManager;
     std::unique_ptr<Painter> painter;
@@ -81,20 +81,22 @@ public:
     bool loading = false;
 };
 
-Map::Map(View& view, FileSource& fileSource, MapMode mapMode, GLContextMode contextMode, ConstrainMode constrainMode, ViewportMode viewportMode)
-    : impl(std::make_unique<Impl>(view, fileSource, mapMode, contextMode, constrainMode, viewportMode)) {
+Map::Map(View& view, FileSource& fileSource, Scheduler& scheduler, MapMode mapMode, GLContextMode contextMode, ConstrainMode constrainMode, ViewportMode viewportMode)
+    : impl(std::make_unique<Impl>(view, fileSource, scheduler, mapMode, contextMode, constrainMode, viewportMode)) {
     view.initialize(this);
     update(Update::Dimensions);
 }
 
 Map::Impl::Impl(View& view_,
                 FileSource& fileSource_,
+                Scheduler& scheduler_,
                 MapMode mode_,
                 GLContextMode contextMode_,
                 ConstrainMode constrainMode_,
                 ViewportMode viewportMode_)
     : view(view_),
       fileSource(fileSource_),
+      scheduler(scheduler_),
       transform([this](MapChange change) { view.notifyMapChange(change); },
                 constrainMode_,
                 viewportMode_),
@@ -102,7 +104,6 @@ Map::Impl::Impl(View& view_,
       contextMode(contextMode_),
       pixelRatio(view.getPixelRatio()),
       asyncUpdate([this] { update(); }),
-      workerThreadPool(4),
       annotationManager(std::make_unique<AnnotationManager>(pixelRatio)) {
 }
 
@@ -230,7 +231,7 @@ void Map::Impl::update() {
     style::UpdateParameters parameters(pixelRatio,
                                        debugOptions,
                                        transform.getState(),
-                                       workerThreadPool,
+                                       scheduler,
                                        fileSource,
                                        mode,
                                        *annotationManager,

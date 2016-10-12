@@ -1,6 +1,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/util.hpp>
@@ -28,7 +29,8 @@ public:
     std::shared_ptr<HeadlessDisplay> display { std::make_shared<HeadlessDisplay>() };
     HeadlessView view { display, 1 };
     StubFileSource fileSource;
-    Map map { view, fileSource, MapMode::Still };
+    ThreadPool threadPool { 4 };
+    Map map { view, fileSource, threadPool, MapMode::Still };
 };
 
 } // end namespace

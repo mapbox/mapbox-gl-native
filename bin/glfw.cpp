@@ -4,6 +4,7 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/default/settings_json.hpp>
 #include <mbgl/platform/default/glfw_view.hpp>
+#include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
 #include <signal.h>
@@ -115,7 +116,9 @@ int main(int argc, char *argv[]) {
         fileSource.setAccessToken(std::string(token));
     }
 
-    mbgl::Map map(*view, fileSource);
+    mbgl::ThreadPool threadPool(4);
+
+    mbgl::Map map(*view, fileSource, threadPool);
 
     // Load settings
     mbgl::Settings_JSON settings;

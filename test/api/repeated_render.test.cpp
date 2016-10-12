@@ -2,8 +2,9 @@
 #include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
@@ -20,6 +21,7 @@ TEST(API, RepeatedRender) {
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1, 256, 512);
+
 #ifdef MBGL_ASSET_ZIP
     // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
@@ -27,9 +29,11 @@ TEST(API, RepeatedRender) {
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
 #endif
 
+    ThreadPool threadPool(4);
+
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    Map map(view, fileSource, MapMode::Still);
+    Map map(view, fileSource, threadPool, MapMode::Still);
 
     {
         map.setStyleJSON(style);
