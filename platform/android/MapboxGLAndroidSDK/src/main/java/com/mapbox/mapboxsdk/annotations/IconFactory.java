@@ -24,11 +24,14 @@ import java.io.InputStream;
 
 /**
  * Factory for creating {@link Icon} objects.
+ *
  * @see Icon
  */
 public final class IconFactory {
 
     private static final String ICON_ID_PREFIX = "com.mapbox.icons.icon_";
+    public static final Bitmap ICON_MARKERVIEW_BITMAP = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+    public static final String ICON_MARKERVIEW_ID = ICON_ID_PREFIX + "markerViewThunb";
 
     private Context mContext;
     private static IconFactory sInstance;

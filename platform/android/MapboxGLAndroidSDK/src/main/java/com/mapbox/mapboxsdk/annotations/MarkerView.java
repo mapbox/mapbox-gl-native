@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.graphics.Bitmap;
 import android.support.annotation.FloatRange;
 import android.support.annotation.Nullable;
 
@@ -302,10 +301,10 @@ public class MarkerView extends Marker {
     @Override
     public void setIcon(@Nullable Icon icon) {
         if (icon != null) {
-            markerViewIcon = IconFactory.recreate("icon", icon.getBitmap());
+            markerViewIcon = IconFactory.recreate(IconFactory.ICON_MARKERVIEW_ID, icon.getBitmap());
         }
-        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
-        Icon transparentIcon = IconFactory.recreate("markerViewSettings", bitmap);
+        Icon transparentIcon = IconFactory.recreate(IconFactory.ICON_MARKERVIEW_ID,
+                IconFactory.ICON_MARKERVIEW_BITMAP);
         if (markerViewManager != null) {
             markerViewManager.updateIcon(this);
         }
