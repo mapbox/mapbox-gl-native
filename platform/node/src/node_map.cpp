@@ -777,7 +777,8 @@ NodeMap::NodeMap(v8::Local<v8::Object> options) :
         Nan::HandleScope scope;
         return Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust() ? Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue() : 1.0;
     }()),
-    map(std::make_unique<mbgl::Map>(view, *this, mbgl::MapMode::Still)),
+    threadpool(),
+    map(std::make_unique<mbgl::Map>(view, *this, threadpool, mbgl::MapMode::Still)),
     async(new uv_async_t) {
 
     view.setMapChangeCallback([&](mbgl::MapChange change) {

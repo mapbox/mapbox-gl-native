@@ -11,6 +11,8 @@ target_sources(mbgl-node
     PRIVATE platform/node/src/node_request.cpp
     PRIVATE platform/node/src/node_feature.hpp
     PRIVATE platform/node/src/node_feature.cpp
+    PRIVATE platform/node/src/node_thread_pool.hpp
+    PRIVATE platform/node/src/node_thread_pool.cpp
     PRIVATE platform/node/src/util/async_queue.hpp
 
     # We are compiling with the uv loop, but since this target already has the headers for libuv,

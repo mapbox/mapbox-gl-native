@@ -1,5 +1,7 @@
 #pragma once
 
+#include "node_thread_pool.hpp"
+
 #include <mbgl/map/map.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
@@ -52,6 +54,7 @@ public:
     std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback);
 
     mbgl::HeadlessView view;
+    NodeThreadPool threadpool;
     std::unique_ptr<mbgl::Map> map;
 
     std::exception_ptr error;
