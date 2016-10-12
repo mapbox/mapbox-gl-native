@@ -87,6 +87,7 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
+import com.mapbox.mapboxsdk.view.TouchDispachableFrameLayout;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -125,7 +126,7 @@ public class MapView extends FrameLayout {
     private NativeMapView nativeMapView;
     private boolean hasSurface = false;
 
-    private ViewGroup markerViewContainer;
+    private TouchDispachableFrameLayout markerViewContainer;
     private CompassView compassView;
     private ImageView logoView;
     private ImageView attributionsView;
@@ -235,7 +236,8 @@ public class MapView extends FrameLayout {
         // Connectivity
         onConnectivityChanged(isConnected());
 
-        markerViewContainer = (ViewGroup) view.findViewById(R.id.markerViewContainer);
+        markerViewContainer = (TouchDispachableFrameLayout) view.findViewById(R.id.markerViewContainer);
+        markerViewContainer.setMapView(this);
 
         myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
         myLocationView.setMapboxMap(mapboxMap);
