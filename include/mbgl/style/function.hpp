@@ -23,14 +23,17 @@ public:
     explicit Function(Stops stops_, float base_)
         : base(base_), stops(std::move(stops_)) {}
 
+    explicit Function(Stops stops_, float base_, ColorSpace colorSpace_)
+        : base(base_), stops(std::move(stops_)), colorSpace(colorSpace_) {}
+
     float getBase() const { return base; }
     ColorSpace getColorSpace() const { return colorSpace; }
     const std::vector<std::pair<float, T>>& getStops() const { return stops; }
 
 private:
     float base = 1;
-    ColorSpace colorSpace = ColorSpace::RGB;
     std::vector<std::pair<float, T>> stops;
+    ColorSpace colorSpace = ColorSpace::RGB;
 
     template <class S> friend bool operator==(const Function<S>&, const Function<S>&);
 };
