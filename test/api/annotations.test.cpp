@@ -43,9 +43,19 @@ TEST(Annotations, SymbolAnnotation) {
     test.map.addAnnotation(SymbolAnnotation { Point<double>(0, 0), "default_marker" });
     test.checkRendering("point_annotation");
 
+    auto size = test.view.getSize();
+    auto screenBox = ScreenBox { {}, { double(size[0]), double(size[1]) } };
+    auto features = test.map.queryPointAnnotations(screenBox);
+    EXPECT_EQ(features.size(), 1u);
+
+    test.map.setZoom(test.map.getMaxZoom());
     // FIXME: https://github.com/mapbox/mapbox-gl-native/issues/5419
     //test.map.setZoom(test.map.getMaxZoom());
     //test.checkRendering("point_annotation");
+    test::render(test.map);
+
+    features = test.map.queryPointAnnotations(screenBox);
+    EXPECT_EQ(features.size(), 1u);
 }
 
 TEST(Annotations, LineAnnotation) {
