@@ -690,6 +690,13 @@ ScreenCoordinate Map::pixelForLatLng(const LatLng& latLng) const {
 LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
     return impl->transform.screenCoordinateToLatLng(pixel);
 }
+    
+#pragma mark - Transform
+    
+const TransformState& Map::getTransform() const
+{
+    return impl->transform.getState();
+}
 
 #pragma mark - Annotations
 

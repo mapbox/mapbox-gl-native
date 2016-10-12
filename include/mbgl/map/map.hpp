@@ -10,6 +10,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/transition_options.hpp>
+#include <mbgl/map/transform_state.hpp>
 
 #include <cstdint>
 #include <string>
@@ -141,6 +142,9 @@ public:
     LatLng latLngForProjectedMeters(const ProjectedMeters&) const;
     ScreenCoordinate pixelForLatLng(const LatLng&) const;
     LatLng latLngForPixel(const ScreenCoordinate&) const;
+    
+    // Transform
+    const TransformState& getTransform() const;
 
     // Annotations
     void addAnnotationIcon(const std::string&, std::shared_ptr<const SpriteImage>);
