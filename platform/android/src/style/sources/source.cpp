@@ -35,19 +35,6 @@ namespace android {
         return jni::Make<jni::String>(env, source.getID());
     }
 
-    void Source::updateStyle(jni::jboolean updateClasses) {
-        //Update the style only if attached
-        if (ownedSource == nullptr) {
-            Update flags = mbgl::Update::RecalculateStyle;
-            if(updateClasses) {
-                flags = flags | mbgl::Update::Classes;
-            }
-            map->update(flags);
-        } else {
-            mbgl::Log::Debug(mbgl::Event::JNI, "Not updating as source is not attached to map (yet)");
-        }
-    }
-
     std::unique_ptr<mbgl::style::Source> Source::releaseCoreSource() {
         assert(ownedSource != nullptr);
         return std::move(ownedSource);

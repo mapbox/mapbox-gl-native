@@ -40,8 +40,6 @@ public:
     std::unique_ptr<mbgl::style::Source> releaseCoreSource();
 
 protected:
-    void updateStyle(jni::jboolean);
-
     std::unique_ptr<mbgl::style::Source> ownedSource;
     mbgl::style::Source& source;
     mbgl::Map* map;
