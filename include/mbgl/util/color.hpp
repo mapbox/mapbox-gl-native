@@ -16,12 +16,14 @@ public:
     float b = 0.0f;
     float a = 0.0f;
 
-    optional<ColorLAB> to_lab();
-    optional<ColorHCL> to_hcl();
+    ColorLAB to_lab();
+    ColorHCL to_hcl();
 
     static constexpr Color black() { return { 0.0f, 0.0f, 0.0f, 1.0f }; };
     static constexpr Color white() { return { 1.0f, 1.0f, 1.0f, 1.0f }; };
 
+    static Color from_lab(const ColorLAB);
+    static Color from_hcl(const ColorHCL);
     static optional<Color> parse(const std::string&);
 };
 

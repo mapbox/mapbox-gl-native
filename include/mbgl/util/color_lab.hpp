@@ -13,7 +13,6 @@ public:
     float a = 0.0f;
     float b = 0.0f;
     float A = 0.0f;
-    optional<Color> to_rgb();
 };
 
 constexpr bool operator==(const ColorLAB& colorA, const ColorLAB& colorB) {

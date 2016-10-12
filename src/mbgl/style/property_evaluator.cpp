@@ -124,9 +124,11 @@ Color PropertyEvaluator<Color>::operator()(const Function<Color>& fn) const {
             (std::pow(base, zoomProgress) - 1) / (std::pow(base, zoomDiff) - 1);
 
         if (colorSpace == ColorSpace::LAB) {
-            return util::interpolate(smaller_val.to_lab(), larger_val.to_lab(), t).to_rgb();
+            return Color::from_lab(util::interpolate(smaller_val.to_lab(), larger_val.to_lab(), t));
         } else if (colorSpace == ColorSpace::HCL) {
-            return util::interpolate(smaller_val.to_hcl(), larger_val.to_hcl(), t).to_rgb();
+            return Color::from_hcl(util::interpolate(smaller_val.to_hcl(), larger_val.to_hcl(), t));
+        } else {
+            return util::interpolate(smaller_val, larger_val, t);
         }
 
     } else if (larger) {
