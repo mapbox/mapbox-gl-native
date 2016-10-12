@@ -13,7 +13,7 @@ const float t0 = 4 / 29;
 const float t1 = 6 / 29;
 const float t2 = 3 * t1 * t1;
 const float t3 = t1 * t1 * t1;
-// const float deg2rad = M_PI / 180;
+const float deg2rad = M_PI / 180;
 const float rad2deg = 180.0 / M_PI;
 
 float xyz2lab(float t) {
@@ -35,21 +35,27 @@ float rgb2xyz(float x) {
 namespace mbgl {
 
 Color Color::from_lab(const ColorLAB labColor) {
+    float y = (labColor.l + 16) / 116;
+    float x = y + labColor.a / 500;
+    float z = y - labColor.b / 200;
+    y = Yn * lab2xyz(y);
+    x = Xn * lab2xyz(x);
+    z = Zn * lab2xyz(z);
     return {
-        labColor.l,
-        labColor.a,
-        labColor.b,
+        xyz2rgb(3.2404542 * x - 1.5371385 * y - 0.4985314 * z), // D65 -> sRGB
+        xyz2rgb(-0.9692660 * x + 1.8760108 * y + 0.0415560 * z),
+        xyz2rgb(0.0556434 * x - 0.2040259 * y + 1.0572252 * z),
         labColor.A
     };
 }
 
 Color Color::from_hcl(const ColorHCL hclColor) {
-    return {
-        hclColor.h,
-        hclColor.c,
+    return Color::from_lab(ColorLAB{
         hclColor.l,
+        std::cos(hclColor.h * deg2rad) * hclColor.c,
+        std::sin(hclColor.h * deg2rad) * hclColor.c,
         hclColor.A
-    };
+    });
 }
 
 optional<Color> Color::parse(const std::string& s) {
