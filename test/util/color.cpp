@@ -29,3 +29,12 @@ TEST(Color, ColorLAB) {
     ASSERT_DOUBLE_EQ( labColor->a, 0);
     ASSERT_DOUBLE_EQ( labColor->b, 0);
 }
+
+TEST(Color, ColorHCL) {
+    optional<Color> result = Color::parse("#00ff00");
+    optional<ColorHCL> hclColor = result->to_hcl();
+
+    ASSERT_DOUBLE_EQ( hclColor->h, 0);
+    ASSERT_DOUBLE_EQ( hclColor->c, 0);
+    ASSERT_DOUBLE_EQ( hclColor->l, 100);
+}

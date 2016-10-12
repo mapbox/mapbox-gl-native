@@ -2,6 +2,7 @@
 
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/color_lab.hpp>
+#include <mbgl/util/color_hcl.hpp>
 
 #include <string>
 
@@ -16,6 +17,7 @@ public:
     float a = 0.0f;
 
     optional<ColorLAB> to_lab();
+    optional<ColorHCL> to_hcl();
 
     static constexpr Color black() { return { 0.0f, 0.0f, 0.0f, 1.0f }; };
     static constexpr Color white() { return { 1.0f, 1.0f, 1.0f, 1.0f }; };

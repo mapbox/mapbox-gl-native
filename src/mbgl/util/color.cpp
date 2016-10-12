@@ -1,10 +1,11 @@
 #include <cmath>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/color_lab.hpp>
+#include <mbgl/util/color_hcl.hpp>
 
 #include <csscolorparser/csscolorparser.hpp>
 
-const float Kn = 18;
+// const float Kn = 18;
 const float Xn = 0.950470; // D65 standard referent
 const float Yn = 1;
 const float Zn = 1.088830;
@@ -13,7 +14,7 @@ const float t1 = 6 / 29;
 const float t2 = 3 * t1 * t1;
 const float t3 = t1 * t1 * t1;
 // const float deg2rad = M_PI / 180;
-// const float rad2deg = 180 / M_PI;
+const float rad2deg = 180.0 / M_PI;
 
 float xyz2lab(float t) {
     return t > t3 ? std::pow(t, 1 / 3) : t / t2 + t0;
@@ -60,6 +61,19 @@ optional<ColorLAB> Color::to_lab() {
         500 * (x - y),
         200 * (y - z),
         a
+    };
+}
+
+optional<ColorHCL> Color::to_hcl() {
+
+    const optional<ColorLAB> labColor = to_lab();
+    const float h = std::atan2(labColor->b, labColor->a) * rad2deg;
+
+    return ColorHCL{
+        h < 0 ? h + 360 : h,
+        std::sqrt(labColor->a * labColor->a + labColor->b * labColor->b),
+        labColor->l,
+        labColor->A
     };
 }
 
