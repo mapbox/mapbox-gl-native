@@ -1,3 +1,7 @@
+# 3.4.0 - October 6, 2016
+
+- Adds a `NodeMap` reference to the `req` paramter passed to the `request` function to give resource requests visibility into the `NodeMap` object that triggered them ([#6614](https://github.com/mapbox/mapbox-gl-native/pull/6614))
+
 # 3.3.3 - September 6, 2016
 
 - Switches to using a NodeRequest member function (with a JavaScript shim in front to preserve the API) instead of a new `v8::Context` to avoid a memory leak ([#5704](https://github.com/mapbox/mapbox-gl-native/pull/5704))
