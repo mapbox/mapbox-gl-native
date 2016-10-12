@@ -244,13 +244,12 @@ jni::jobject* std_vector_string_to_jobject(JNIEnv *env, std::vector<std::string>
     return jlist;
 }
 
-jni::jarray<jlong>* std_vector_uint_to_jobject(JNIEnv *env, std::vector<uint32_t> vector) {
+jni::jarray<jlong>* std_vector_uint_to_jobject(JNIEnv *env, const std::vector<uint32_t>& vector) {
     jni::jarray<jlong>& jarray = jni::NewArray<jlong>(*env, vector.size());
 
     std::vector<jlong> v;
-    for (const uint32_t& id : vector) {
-        v.push_back(id);
-    }
+    v.reserve(vector.size());
+    std::move(vector.begin(), vector.end(), std::back_inserter(v));
 
     jni::SetArrayRegion(*env, jarray, 0, v);
 
@@ -684,7 +683,7 @@ jni::jarray<jlong>* nativeAddMarkers(JNIEnv *env, jni::jobject* obj, jlong nativ
     NullCheck(*env, jarray);
     std::size_t len = jni::GetArrayLength(*env, *jarray);
 
-    std::vector<mbgl::AnnotationID> ids;
+    mbgl::AnnotationIDs ids;
     ids.reserve(len);
 
     for (std::size_t i = 0; i < len; i++) {
@@ -755,7 +754,7 @@ jni::jarray<jlong>* nativeAddPolylines(JNIEnv *env, jni::jobject* obj, jlong nat
     NullCheck(*env, jarray);
     std::size_t len = jni::GetArrayLength(*env, *jarray);
 
-    std::vector<mbgl::AnnotationID> ids;
+    mbgl::AnnotationIDs ids;
     ids.reserve(len);
 
     for (std::size_t i = 0; i < len; i++) {
@@ -782,7 +781,7 @@ jni::jarray<jlong>* nativeAddPolygons(JNIEnv *env, jni::jobject* obj, jlong nati
     NullCheck(*env, jarray);
     std::size_t len = jni::GetArrayLength(*env, *jarray);
 
-    std::vector<mbgl::AnnotationID> ids;
+    mbgl::AnnotationIDs ids;
     ids.reserve(len);
 
     for (std::size_t i = 0; i < len; i++) {
@@ -860,10 +859,9 @@ jni::jarray<jlong>* nativeQueryPointAnnotations(JNIEnv *env, jni::jobject* obj, 
     };
 
     // Assume only points for now
-    std::vector<uint32_t> annotations = nativeMapView->getMap().queryPointAnnotations(
-        box);
+    mbgl::AnnotationIDs ids = nativeMapView->getMap().queryPointAnnotations(box);
 
-    return std_vector_uint_to_jobject(env, annotations);
+    return std_vector_uint_to_jobject(env, ids);
 }
 
 void nativeAddAnnotationIcon(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr,
