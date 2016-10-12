@@ -4554,7 +4554,23 @@ public:
                 || self.userTrackingMode == MGLUserTrackingModeNone
                 || self.userTrackingState != MGLUserTrackingStateChanged)
             {
-                [self deselectAnnotation:self.selectedAnnotation animated:NO];
+                // Deselect annotation if it lies outside the viewport
+                if (self.selectedAnnotation) {
+                    MGLAnnotationTag tag = [self annotationTagForAnnotation:self.selectedAnnotation];
+                    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(tag);
+                    MGLAnnotationView *annotationView = annotationContext.annotationView;
+                    
+                    CGRect rect = [self positioningRectForCalloutForAnnotationWithTag:tag];
+                    
+                    if (annotationView)
+                    {
+                        rect = annotationView.frame;
+                    }
+                    
+                    if ( ! CGRectIntersectsRect(rect, self.frame)) {
+                        [self deselectAnnotation:self.selectedAnnotation animated:NO];
+                    }
+                }
             }
 
             if ( ! [self isSuppressingChangeDelimiters] && [self.delegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)])
@@ -4653,6 +4669,7 @@ public:
                 [self.style didChangeValueForKey:@"layers"];
             }
             [self updateAnnotationViews];
+            [self updateCalloutView];
             if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingFrame:fullyRendered:)])
             {
                 [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:(change == mbgl::MapChangeDidFinishRenderingFrameFullyRendered)];
@@ -4785,6 +4802,36 @@ public:
         }
     }
 
+    [CATransaction commit];
+}
+
+- (void)updateCalloutView
+{
+    [CATransaction begin];
+    
+    UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
+    id <MGLAnnotation> annotation = calloutView.representedObject;
+    
+    if (calloutView && annotation)
+    {
+        MGLAnnotationTag tag = [self annotationTagForAnnotation:annotation];
+        MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(tag);
+        MGLAnnotationView *annotationView = annotationContext.annotationView;
+        
+        CGRect rect = [self positioningRectForCalloutForAnnotationWithTag:tag];
+        
+        if (annotationView)
+        {
+            rect = annotationView.frame;
+        }
+        
+        CGPoint point = CGPointMake(CGRectGetMidX(rect), CGRectGetMinY(rect));
+        
+        if ( ! CGPointEqualToPoint(calloutView.center, point)) {
+            calloutView.center = point;
+        }
+    }
+    
     [CATransaction commit];
 }
 
