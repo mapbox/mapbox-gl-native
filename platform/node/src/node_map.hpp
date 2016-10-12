@@ -25,7 +25,7 @@ public:
 
     static Nan::Persistent<v8::Function> constructor;
 
-    static void Init(v8::Local<v8::Object> exports);
+    static void Init(v8::Local<v8::Object>);
 
     static void New(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void Load(const Nan::FunctionCallbackInfo<v8::Value>&);
