@@ -251,9 +251,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
     }
 
     if (bucket.hasCollisionBoxData()) {
-        context.stencilOp = { gl::StencilTestOperation::Keep, gl::StencilTestOperation::Keep,
-                              gl::StencilTestOperation::Replace };
-        context.stencilTest = true;
+        context.stencilTest = false;
 
         auto& collisionBoxShader = shaders->collisionBox;
         context.program = collisionBoxShader.getID();
