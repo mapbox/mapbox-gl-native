@@ -26,7 +26,7 @@ NodeRequest::~NodeRequest() {
 
 Nan::Persistent<v8::Function> NodeRequest::constructor;
 
-NAN_MODULE_INIT(NodeRequest::Init) {
+void NodeRequest::Init() {
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
 
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
@@ -35,9 +35,6 @@ NAN_MODULE_INIT(NodeRequest::Init) {
     Nan::SetPrototypeMethod(tpl, "respond", HandleCallback);
 
     constructor.Reset(tpl->GetFunction());
-
-    // TODO: Remove this from the public JavaScript API
-    Nan::Set(target, Nan::New("Request").ToLocalChecked(), tpl->GetFunction());
 }
 
 void NodeRequest::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
