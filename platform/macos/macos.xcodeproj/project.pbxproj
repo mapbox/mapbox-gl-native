@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		30E5781B1DAA857E0050F07E /* NSImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */; };
+		30E5781C1DAA85820050F07E /* NSImage+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 30E578151DAA7D920050F07E /* NSImage+MGLAdditions.mm */; };
 		3508EC641D749D39009B0EE4 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */; };
 		3508EC651D749D39009B0EE4 /* NSExpression+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */; };
 		352742781D4C220900A1ECE6 /* MGLStyleAttributeValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 352742771D4C220900A1ECE6 /* MGLStyleAttributeValue.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -217,6 +219,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSImage+MGLAdditions.h"; path = "src/NSImage+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
+		30E578151DAA7D920050F07E /* NSImage+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "NSImage+MGLAdditions.mm"; path = "src/NSImage+MGLAdditions.mm"; sourceTree = SOURCE_ROOT; };
 		3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSExpression+MGLAdditions.h"; sourceTree = "<group>"; };
 		3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSExpression+MGLAdditions.mm"; sourceTree = "<group>"; };
 		352742771D4C220900A1ECE6 /* MGLStyleAttributeValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLStyleAttributeValue.h; sourceTree = "<group>"; };
@@ -713,6 +717,8 @@
 		DAD1657F1CF4CF50001FF4B9 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */,
+				30E578151DAA7D920050F07E /* NSImage+MGLAdditions.mm */,
 				DAE6C37D1CC31E2A00DB3429 /* NSBundle+MGLAdditions.h */,
 				DAE6C37E1CC31E2A00DB3429 /* NSBundle+MGLAdditions.m */,
 				35C5D8431D6DD66D00E95907 /* NSComparisonPredicate+MGLAdditions.h */,
@@ -887,6 +893,7 @@
 				DA8F25AE1D51CB270010E6B5 /* NSArray+MGLStyleAttributeAdditions_Private.h in Headers */,
 				DAE6C3991CC31E2A00DB3429 /* NSException+MGLAdditions.h in Headers */,
 				DA8F25871D51C9E10010E6B5 /* MGLBackgroundStyleLayer.h in Headers */,
+				30E5781B1DAA857E0050F07E /* NSImage+MGLAdditions.h in Headers */,
 				DAE6C3661CC31E0400DB3429 /* MGLShape.h in Headers */,
 				352742811D4C243B00A1ECE6 /* MGLSource.h in Headers */,
 				DAE6C3C21CC31F4500DB3429 /* Mapbox.h in Headers */,
@@ -1141,6 +1148,7 @@
 				DAE6C38A1CC31E2A00DB3429 /* MGLMultiPoint.mm in Sources */,
 				DAE6C3961CC31E2A00DB3429 /* MGLTypes.m in Sources */,
 				DA35A2A61CC9EB2700E826B2 /* MGLCoordinateFormatter.m in Sources */,
+				30E5781C1DAA85820050F07E /* NSImage+MGLAdditions.mm in Sources */,
 				352742821D4C243B00A1ECE6 /* MGLSource.mm in Sources */,
 				DAE6C3881CC31E2A00DB3429 /* MGLMapCamera.mm in Sources */,
 				DA6408D81DA4E5DA00908C90 /* MGLVectorStyleLayer.m in Sources */,

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		30E578171DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
+		30E578181DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
+		30E578191DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 30E578121DAA7D690050F07E /* UIImage+MGLAdditions.mm */; };
+		30E5781A1DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 30E578121DAA7D690050F07E /* UIImage+MGLAdditions.mm */; };
 		350098AF1D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098AD1D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		350098B01D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098AD1D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		350098B11D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 350098AE1D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.mm */; };
@@ -494,6 +498,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+MGLAdditions.h"; path = "src/UIImage+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
+		30E578121DAA7D690050F07E /* UIImage+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "UIImage+MGLAdditions.mm"; path = "src/UIImage+MGLAdditions.mm"; sourceTree = SOURCE_ROOT; };
 		350098AD1D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor+MGLStyleAttributeAdditions.h"; path = "src/UIColor+MGLStyleAttributeAdditions.h"; sourceTree = SOURCE_ROOT; };
 		350098AE1D47E6F4004B2AF0 /* UIColor+MGLStyleAttributeAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "UIColor+MGLStyleAttributeAdditions.mm"; path = "src/UIColor+MGLStyleAttributeAdditions.mm"; sourceTree = SOURCE_ROOT; };
 		350098B91D480108004B2AF0 /* MGLVectorSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLVectorSource.h; sourceTree = "<group>"; };
@@ -939,6 +945,8 @@
 			children = (
 				35CE61801D4165D9004F2359 /* UIColor+MGLAdditions.h */,
 				35CE61811D4165D9004F2359 /* UIColor+MGLAdditions.mm */,
+				30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */,
+				30E578121DAA7D690050F07E /* UIImage+MGLAdditions.mm */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -1473,6 +1481,7 @@
 				DA8847F81CBAFA5100AB86E3 /* MGLPointAnnotation.h in Headers */,
 				353933F21D3FB753003F57D7 /* MGLCircleStyleLayer.h in Headers */,
 				DA8847F31CBAFA5100AB86E3 /* MGLMultiPoint.h in Headers */,
+				30E578171DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */,
 				DAD1656C1CF41981001FF4B9 /* MGLFeature.h in Headers */,
 				40EDA1C01CFE0E0200D9EA68 /* MGLAnnotationContainerView.h in Headers */,
 				DA88484F1CBAFB9800AB86E3 /* MGLAnnotationImage_Private.h in Headers */,
@@ -1564,6 +1573,7 @@
 				353933F31D3FB753003F57D7 /* MGLCircleStyleLayer.h in Headers */,
 				3593E5271D529EDC006D9365 /* UIColor+MGLStyleAttributeAdditions_Private.h in Headers */,
 				3538AA1E1D542239008EC33D /* MGLForegroundStyleLayer.h in Headers */,
+				30E578181DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */,
 				40F887711D7A1E59008ECB67 /* MGLGeoJSONSource_Private.h in Headers */,
 				DABFB8631CBE99E500D62B32 /* MGLOfflineRegion.h in Headers */,
 				DA35A2B21CCA141D00E826B2 /* MGLCompassDirectionFormatter.h in Headers */,
@@ -1930,6 +1940,7 @@
 				DA88485D1CBAFB9800AB86E3 /* MGLFaux3DUserLocationAnnotationView.m in Sources */,
 				DAD165701CF41981001FF4B9 /* MGLFeature.mm in Sources */,
 				350098C31D48149E004B2AF0 /* NSNumber+MGLStyleAttributeAdditions.mm in Sources */,
+				30E578191DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */,
 				40EDA1C11CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */,
 				DA8848541CBAFB9800AB86E3 /* MGLCompactCalloutView.m in Sources */,
 				DA8848251CBAFA6200AB86E3 /* MGLPointAnnotation.m in Sources */,
@@ -2000,6 +2011,7 @@
 				DAED38661D62D0FC00D7640F /* NSURL+MGLAdditions.m in Sources */,
 				DAD165711CF41981001FF4B9 /* MGLFeature.mm in Sources */,
 				350098C41D48149E004B2AF0 /* NSNumber+MGLStyleAttributeAdditions.mm in Sources */,
+				30E5781A1DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */,
 				40EDA1C21CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */,
 				DAA4E4291CBB730400178DFB /* NSBundle+MGLAdditions.m in Sources */,
 				DAA4E42E1CBB730400178DFB /* MGLAPIClient.m in Sources */,
