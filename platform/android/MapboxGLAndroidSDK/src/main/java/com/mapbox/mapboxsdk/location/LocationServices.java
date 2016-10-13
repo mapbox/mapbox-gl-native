@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.telemetry.TelemetryLocationReceiver;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LostApiClient;
@@ -147,9 +148,11 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
         }
 
         // Update the Telemetry Receiver
-        Intent locIntent = new Intent(TelemetryLocationReceiver.INTENT_STRING);
-        locIntent.putExtra(LocationManager.KEY_LOCATION_CHANGED, location);
-        context.sendBroadcast(locIntent);
+        if(MapboxEventManager.ENABLE_METRICS_ON_MAPPY) {
+            Intent locIntent = new Intent(TelemetryLocationReceiver.INTENT_STRING);
+            locIntent.putExtra(LocationManager.KEY_LOCATION_CHANGED, location);
+            context.sendBroadcast(locIntent);
+        }
     }
 
     /**

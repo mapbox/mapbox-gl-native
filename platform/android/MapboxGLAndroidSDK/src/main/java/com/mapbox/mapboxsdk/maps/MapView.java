@@ -77,7 +77,6 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
@@ -473,7 +472,7 @@ public class MapView extends FrameLayout {
         });
 
         // Fire MapLoad
-        if (savedInstanceState == null) {
+        if (MapboxEventManager.ENABLE_METRICS_ON_MAPPY && savedInstanceState == null) {
             Hashtable<String, Object> evt = new Hashtable<>();
             evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_LOAD);
             evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
@@ -1540,15 +1539,17 @@ public class MapView extends FrameLayout {
             return;
         }
 
-        Hashtable<String, Object> evt = new Hashtable<>();
-        evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_CLICK);
-        evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
-        evt.put(MapboxEvent.KEY_GESTURE_ID, gestureId);
-        evt.put(MapboxEvent.KEY_LATITUDE, tapLatLng.getLatitude());
-        evt.put(MapboxEvent.KEY_LONGITUDE, tapLatLng.getLongitude());
-        evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
+        if (!MapboxEventManager.ENABLE_METRICS_ON_MAPPY) {
+            Hashtable<String, Object> evt = new Hashtable<>();
+            evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_CLICK);
+            evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
+            evt.put(MapboxEvent.KEY_GESTURE_ID, gestureId);
+            evt.put(MapboxEvent.KEY_LATITUDE, tapLatLng.getLatitude());
+            evt.put(MapboxEvent.KEY_LONGITUDE, tapLatLng.getLongitude());
+            evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
 
-        MapboxEventManager.getMapboxEventManager().pushEvent(evt);
+            MapboxEventManager.getMapboxEventManager().pushEvent(evt);
+        }
     }
 
     /**
@@ -1572,14 +1573,16 @@ public class MapView extends FrameLayout {
             return;
         }
 
-        Hashtable<String, Object> evt = new Hashtable<>();
-        evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_DRAGEND);
-        evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
-        evt.put(MapboxEvent.KEY_LATITUDE, tapLatLng.getLatitude());
-        evt.put(MapboxEvent.KEY_LONGITUDE, tapLatLng.getLongitude());
-        evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
+        if (!MapboxEventManager.ENABLE_METRICS_ON_MAPPY) {
+            Hashtable<String, Object> evt = new Hashtable<>();
+            evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_DRAGEND);
+            evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
+            evt.put(MapboxEvent.KEY_LATITUDE, tapLatLng.getLatitude());
+            evt.put(MapboxEvent.KEY_LONGITUDE, tapLatLng.getLongitude());
+            evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
 
-        MapboxEventManager.getMapboxEventManager().pushEvent(evt);
+            MapboxEventManager.getMapboxEventManager().pushEvent(evt);
+        }
     }
 
     // Called when user touches the screen, all positions are absolute

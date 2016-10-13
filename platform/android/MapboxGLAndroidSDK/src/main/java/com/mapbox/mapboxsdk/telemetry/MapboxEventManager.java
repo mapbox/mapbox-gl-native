@@ -59,7 +59,7 @@ import okhttp3.internal.Util;
  * Primary access is via MapboxEventManager.getMapboxEventManager()
  */
 public class MapboxEventManager {
-
+    public static final boolean ENABLE_METRICS_ON_MAPPY = false;
     private static final String TAG = "MapboxEventManager";
 
     private static MapboxEventManager mapboxEventManager = null;
@@ -68,7 +68,7 @@ public class MapboxEventManager {
     private boolean telemetryEnabled;
 
     private final Vector<Hashtable<String, Object>> events = new Vector<>();
-    private static final MediaType JSON  = MediaType.parse("application/json; charset=utf-8");
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", MapboxConstants.MAPBOX_LOCALE);
 
     private Context context = null;
@@ -108,7 +108,7 @@ public class MapboxEventManager {
 
     /**
      * Internal setup of MapboxEventsManager.  It needs to be called once before @link MapboxEventManager#getMapboxEventManager
-     *
+     * <p>
      * This allows for a cleaner getMapboxEventManager() that doesn't require context and accessToken
      *
      * @param context     The context associated with MapView
@@ -116,7 +116,11 @@ public class MapboxEventManager {
      */
     public void initialize(@NonNull Context context, @NonNull String accessToken) {
 
-        Log.i(TAG, "Telemetry initialize() called...");
+        Log.i(TAG, "Telemetry initialize() called... ENABLE_METRICS_ON_MAPPY="+MapboxEventManager.ENABLE_METRICS_ON_MAPPY);
+
+        if (!MapboxEventManager.ENABLE_METRICS_ON_MAPPY) {
+            return;
+        }
 
         if (initialized) {
             Log.i(TAG, "Mapbox Telemetry has already been initialized.");
@@ -159,7 +163,7 @@ public class MapboxEventManager {
 
         // Get DisplayMetrics Setup
         displayMetrics = new DisplayMetrics();
-        ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
+        ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
 
         // Check for Staging Server Information
         try {
@@ -244,6 +248,7 @@ public class MapboxEventManager {
 
     /**
      * Enables / Disables Telemetry
+     *
      * @param telemetryEnabled True to start telemetry, false to stop it
      */
     public void setTelemetryEnabled(boolean telemetryEnabled) {
@@ -253,7 +258,7 @@ public class MapboxEventManager {
             return;
         }
 
-        if (telemetryEnabled) {
+        if (!MapboxEventManager.ENABLE_METRICS_ON_MAPPY || telemetryEnabled) {
             Log.d(TAG, "Starting Telemetry Up!");
             // Start It Up
             context.startService(new Intent(context, TelemetryService.class));
@@ -314,16 +319,20 @@ public class MapboxEventManager {
 
     /**
      * Immediately attempt to send all events data in the queue to the server.
-     *
+     * <p>
      * NOTE: Permission set to package private to enable only telemetry code to use this.
      */
     void flushEventsQueueImmediately() {
         Log.i(TAG, "flushEventsQueueImmediately() called...");
-        new FlushTheEventsTask().execute();
+        //disable metrics on Mappy
+        if (MapboxEventManager.ENABLE_METRICS_ON_MAPPY) {
+            new FlushTheEventsTask().execute();
+        }
     }
 
     /**
      * Centralized method for adding populated event to the queue allowing for cap size checking
+     *
      * @param event Event to add to the Events Queue
      */
     private void putEventOnQueue(@NonNull Hashtable<String, Object> event) {
@@ -339,16 +348,21 @@ public class MapboxEventManager {
 
     /**
      * Adds a Location Event to the system for processing
+     *
      * @param location Location event
      */
     public void addLocationEvent(Location location) {
 
-        // NaN and Infinite checks to prevent JSON errors at send to server time
-        if (Double.isNaN(location.getLatitude()) ||  Double.isNaN(location.getLongitude()) ||  Double.isNaN(location.getAltitude())) {
+        if (!MapboxEventManager.ENABLE_METRICS_ON_MAPPY) {
             return;
         }
 
-        if (Double.isInfinite(location.getLatitude()) ||  Double.isInfinite(location.getLongitude()) ||  Double.isInfinite(location.getAltitude())) {
+        // NaN and Infinite checks to prevent JSON errors at send to server time
+        if (Double.isNaN(location.getLatitude()) || Double.isNaN(location.getLongitude()) || Double.isNaN(location.getAltitude())) {
+            return;
+        }
+
+        if (Double.isInfinite(location.getLatitude()) || Double.isInfinite(location.getLongitude()) || Double.isInfinite(location.getAltitude())) {
             return;
         }
 
@@ -375,7 +389,7 @@ public class MapboxEventManager {
      * @param eventWithAttributes Event with attributes
      */
     public void pushEvent(Hashtable<String, Object> eventWithAttributes) {
-        if (context == null || accessToken == null) {
+        if (!MapboxEventManager.ENABLE_METRICS_ON_MAPPY || context == null || accessToken == null) {
             return;
         }
 
@@ -430,7 +444,7 @@ public class MapboxEventManager {
             return;
         }
 
-       putEventOnQueue(eventWithAttributes);
+        putEventOnQueue(eventWithAttributes);
     }
 
     /**
@@ -453,6 +467,7 @@ public class MapboxEventManager {
 
     /**
      * SHA-1 Encoding for strings
+     *
      * @param string String to encode
      * @return String encoded if no error, original string if error
      */
@@ -466,7 +481,7 @@ public class MapboxEventManager {
                 // Get the Hex version of the digest
                 StringBuilder sb = new StringBuilder();
                 for (byte b : bytes) {
-                    sb.append( String.format("%02X", b) );
+                    sb.append(String.format("%02X", b));
                 }
                 String hex = sb.toString();
 
@@ -504,13 +519,14 @@ public class MapboxEventManager {
         int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
-        return Math.round((level / (float)scale) * 100);
+        return Math.round((level / (float) scale) * 100);
     }
 
     /**
      * Determine if device is plugged in to power via USB or AC or not.
-     *
+     * <p>
      * http://developer.android.com/reference/android/os/BatteryManager.html#EXTRA_PLUGGED
+     *
      * @return true if plugged in, false if not
      */
     private boolean isPluggedIn() {
@@ -550,7 +566,7 @@ public class MapboxEventManager {
     }
 
     private String getCellularCarrier() {
-        TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         String carrierName = manager.getNetworkOperatorName();
         if (TextUtils.isEmpty(carrierName)) {
             carrierName = "";
@@ -558,8 +574,8 @@ public class MapboxEventManager {
         return carrierName;
     }
 
-    private String getCellularNetworkType () {
-        TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+    private String getCellularNetworkType() {
+        TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         switch (manager.getNetworkType()) {
             case TelephonyManager.NETWORK_TYPE_1xRTT:
                 return "1xRTT";
@@ -605,7 +621,7 @@ public class MapboxEventManager {
         if (wifiMgr.isWifiEnabled()) {
             try {
                 WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-                if (wifiInfo.getNetworkId() != -1){
+                if (wifiInfo.getNetworkId() != -1) {
                     status = true;
                 }
             } catch (Exception e) {
@@ -626,7 +642,7 @@ public class MapboxEventManager {
         @Override
         protected Void doInBackground(Void... voids) {
 
-             if (events.isEmpty()) {
+            if (events.isEmpty()) {
                 Log.d(TAG, "No events in the queue to send so returning.");
                 return null;
             }
@@ -661,7 +677,7 @@ public class MapboxEventManager {
 
                     // Make sure Longitude Is Wrapped
                     if (evt.containsKey(MapboxEvent.KEY_LONGITUDE)) {
-                        double lon = (double)evt.get(MapboxEvent.KEY_LONGITUDE);
+                        double lon = (double) evt.get(MapboxEvent.KEY_LONGITUDE);
                         if ((lon < GeoConstants.MIN_LONGITUDE) || (lon > GeoConstants.MAX_LONGITUDE)) {
                             lon = MathUtils.wrap(lon, GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE);
                         }
@@ -682,19 +698,19 @@ public class MapboxEventManager {
                     // Special Cases where empty string is denoting null and therefore should not be sent at all
                     // This arises as thread safe Hashtable does not accept null values (nor keys)
                     if (evt.containsKey(MapboxEvent.ATTRIBUTE_ORIENTATION)) {
-                        String orientation =  (String)evt.get(MapboxEvent.ATTRIBUTE_ORIENTATION);
+                        String orientation = (String) evt.get(MapboxEvent.ATTRIBUTE_ORIENTATION);
                         if (!TextUtils.isEmpty(orientation)) {
                             jsonObject.putOpt(MapboxEvent.ATTRIBUTE_ORIENTATION, orientation);
                         }
                     }
                     if (evt.containsKey(MapboxEvent.ATTRIBUTE_CARRIER)) {
-                        String carrier =  (String)evt.get(MapboxEvent.ATTRIBUTE_CARRIER);
+                        String carrier = (String) evt.get(MapboxEvent.ATTRIBUTE_CARRIER);
                         if (!TextUtils.isEmpty(carrier)) {
                             jsonObject.putOpt(MapboxEvent.ATTRIBUTE_CARRIER, carrier);
                         }
                     }
                     if (evt.containsKey(MapboxEvent.ATTRIBUTE_APPLICATION_STATE)) {
-                        String appState = (String)evt.get(MapboxEvent.ATTRIBUTE_APPLICATION_STATE);
+                        String appState = (String) evt.get(MapboxEvent.ATTRIBUTE_APPLICATION_STATE);
                         if (!TextUtils.isEmpty(appState)) {
                             jsonObject.putOpt(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, evt.get(MapboxEvent.ATTRIBUTE_APPLICATION_STATE));
                         }
@@ -702,12 +718,12 @@ public class MapboxEventManager {
 
                     // Special Cases where null has to be passed if no value exists
                     // Requires using put() instead of putOpt()
-                    String eventType = (String)evt.get(MapboxEvent.ATTRIBUTE_EVENT);
+                    String eventType = (String) evt.get(MapboxEvent.ATTRIBUTE_EVENT);
                     if (!TextUtils.isEmpty(eventType) && eventType.equalsIgnoreCase(MapboxEvent.TYPE_MAP_CLICK)) {
                         jsonObject.put(MapboxEvent.KEY_GESTURE_ID, evt.get(MapboxEvent.KEY_GESTURE_ID));
                     }
                     if (evt.containsKey(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE)) {
-                        String cellularNetworkType = (String)evt.get(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE);
+                        String cellularNetworkType = (String) evt.get(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE);
                         if (TextUtils.isEmpty(cellularNetworkType)) {
                             jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, null);
                         } else {
