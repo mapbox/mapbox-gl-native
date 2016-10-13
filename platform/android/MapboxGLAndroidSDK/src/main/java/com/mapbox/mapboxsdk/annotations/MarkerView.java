@@ -1,13 +1,10 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.animation.AnimatorSet;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.support.annotation.FloatRange;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.view.animation.AnimationUtils;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -87,6 +84,9 @@ public class MarkerView extends Marker {
         this.anchorU = u;
         this.anchorV = v;
         setOffset(-1, -1);
+        if (markerViewManager != null) {
+            markerViewManager.updateMarker(this);
+        }
     }
 
     /**
@@ -304,7 +304,7 @@ public class MarkerView extends Marker {
     public void setPosition(LatLng position) {
         super.setPosition(position);
         if (markerViewManager != null) {
-            markerViewManager.update();
+            markerViewManager.updateMarker(this);
         }
     }
 
@@ -341,12 +341,37 @@ public class MarkerView extends Marker {
     public void setMapboxMap(MapboxMap mapboxMap) {
         super.setMapboxMap(mapboxMap);
 
-        if(isFlat()) {
+        if (isFlat()) {
             // initial tilt value if MapboxMap is started with a tilt attribute
             tiltValue = (float) mapboxMap.getCameraPosition().tilt;
         }
 
         markerViewManager = mapboxMap.getMarkerViewManager();
+    }
+
+    public void update(View view) {
+        if (view != null) {
+            PointF point = mapboxMap.getProjection().toScreenLocation(getPosition());
+            if (offsetX == -1) {
+                // ensure view is measured first
+                if (view.getMeasuredWidth() == 0) {
+                    view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                }
+                int x = (int) (getAnchorU() * view.getMeasuredWidth());
+                int y = (int) (getAnchorV() * view.getMeasuredHeight());
+                setOffset(x, y);
+            }
+
+            view.setX(point.x - offsetX);
+            view.setY(point.y - offsetY);
+
+            // animate visibility
+            if (visible && view.getVisibility() == View.GONE) {
+                view.animate().cancel();
+                view.setAlpha(0);
+                AnimatorUtils.alpha(view, 1);
+            }
+        }
     }
 
     /**
