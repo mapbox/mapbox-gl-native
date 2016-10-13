@@ -222,7 +222,9 @@ void OfflineDownload::continueDownload() {
         return;
     }
 
-    while (!resourcesRemaining.empty() && requests.size() < 3/*(HTTPFileSource::maximumConcurrentRequests() / 2)*/) {
+    // use less than HTTPFileSource::maximumConcurrentRequests for offline fetching to
+    // have some spare resources ready for interactive use.
+    while (!resourcesRemaining.empty() && requests.size() < 3) {
         ensureResource(resourcesRemaining.front());
         resourcesRemaining.pop_front();
     }
