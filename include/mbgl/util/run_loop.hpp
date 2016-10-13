@@ -83,9 +83,7 @@ private:
 
     void schedule(std::weak_ptr<Mailbox> mailbox) override {
         invoke([mailbox] () {
-            if (auto locked = mailbox.lock()) {
-                locked->receive();
-            }
+            Mailbox::maybeReceive(mailbox);
         });
     }
 
