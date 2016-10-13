@@ -32,7 +32,9 @@ CREATE TABLE regions (
   definition TEXT NOT NULL,   -- JSON formatted definition of region. Regions may be of variant types:
                               -- e.g. bbox and zoom range, route path, flyTo parameters, etc. Note that
                               -- the set of tiles required for a region may span multiple sources.
-  description BLOB            -- User provided data in user-defined format
+  description BLOB,           -- User provided data in user-defined format
+  tiles_count,                -- count(region_tiles) for performance
+  tiles_size                  -- sum(length(region_tiles.tile.data)) for performance
 );
 
 CREATE TABLE region_resources (
