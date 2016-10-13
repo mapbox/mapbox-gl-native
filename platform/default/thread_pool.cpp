@@ -22,9 +22,7 @@ ThreadPool::ThreadPool(std::size_t count) {
                 queue.pop();
                 lock.unlock();
 
-                if (auto locked = mailbox.lock()) {
-                    locked->receive();
-                }
+                Mailbox::maybeReceive(mailbox);
             }
         });
     }

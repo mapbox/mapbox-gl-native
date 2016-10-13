@@ -27,9 +27,7 @@ NodeThreadPool::Worker::Worker(std::weak_ptr<mbgl::Mailbox> mailbox_)
     mailbox(std::move(mailbox_)) {};
 
 void NodeThreadPool::Worker::Execute() {
-    if (auto locked = mailbox.lock()) {
-        locked->receive();
-    }
+    mbgl::Mailbox::maybeReceive(mailbox);
 }
 
 void NodeThreadPool::Worker::WorkComplete() {

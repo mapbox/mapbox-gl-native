@@ -18,6 +18,8 @@ public:
     void close();
     void receive();
 
+    static void maybeReceive(std::weak_ptr<Mailbox>);
+
 private:
     Scheduler& scheduler;
 
