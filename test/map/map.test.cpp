@@ -12,8 +12,12 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/util/color.hpp>
+
+#include <mapbox/geojson.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -392,3 +396,21 @@ TEST(Map, RemoveImage) {
     test::checkImage("test/fixtures/map/remove_icon", test::render(map));
 }
 
+TEST(Map, GeoJSONSourceInline) {
+    MapTest test;
+
+    Map map(test.view, test.fileSource, MapMode::Still);
+
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+
+    map.addSource(std::make_unique<GeoJSONSource>("geojson"));
+    map.addLayer(std::make_unique<LineLayer>("line", "geojson"));
+
+    test::checkImage("test/fixtures/map/empty", test::render(map));
+
+    auto geojson = mapbox::geojson::parse(
+        R"GEOJSON({"type": "LineString", "coordinates": [[-10, 10], [10, 10], [-10, -10], [10, -10]]})GEOJSON");
+    map.getSource("geojson")->as<GeoJSONSource>()->setGeoJSON(geojson);
+
+    test::checkImage("test/fixtures/map/geojson", test::render(map));
+}

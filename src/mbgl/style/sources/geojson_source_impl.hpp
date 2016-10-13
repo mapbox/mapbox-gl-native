@@ -20,7 +20,6 @@ public:
     optional<std::string> getURL();
 
     void setGeoJSON(const GeoJSON&);
-    void setTileData(GeoJSONTile&, const OverscaledTileID& tileID);
 
     void loadDescription(FileSource&) final;
 

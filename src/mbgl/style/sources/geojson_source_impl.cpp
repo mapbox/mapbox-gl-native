@@ -65,24 +65,10 @@ void GeoJSONSource::Impl::setGeoJSON(const GeoJSON& geoJSON) {
         geoJSONOrSupercluster =
             std::make_unique<mapbox::supercluster::Supercluster>(features, clusterOptions);
     }
-    
-    for (auto const &item : tiles) {
-        GeoJSONTile* geoJSONTile = static_cast<GeoJSONTile*>(item.second.get());
-        setTileData(*geoJSONTile, geoJSONTile->id);
-    }
-}
 
-void GeoJSONSource::Impl::setTileData(GeoJSONTile& tile, const OverscaledTileID& tileID) {
-    if (geoJSONOrSupercluster.is<GeoJSONVTPointer>()) {
-        tile.updateData(geoJSONOrSupercluster.get<GeoJSONVTPointer>()->getTile(tileID.canonical.z,
-                                                                               tileID.canonical.x,
-                                                                               tileID.canonical.y).features);
-    } else {
-        assert(geoJSONOrSupercluster.is<SuperclusterPointer>());
-        tile.updateData(geoJSONOrSupercluster.get<SuperclusterPointer>()->getTile(tileID.canonical.z,
-                                                                                  tileID.canonical.x,
-                                                                                  tileID.canonical.y));
-    }
+    invalidateTiles();
+    loaded = true;
+    observer->onSourceLoaded(base);
 }
 
 void GeoJSONSource::Impl::loadDescription(FileSource& fileSource) {
@@ -129,9 +115,6 @@ void GeoJSONSource::Impl::loadDescription(FileSource& fileSource) {
             } else {
                 setGeoJSON(*geoJSON);
             }
-
-            loaded = true;
-            observer->onSourceLoaded(base);
         }
     });
 }
@@ -144,9 +127,27 @@ Range<uint8_t> GeoJSONSource::Impl::getZoomRange() {
 std::unique_ptr<Tile> GeoJSONSource::Impl::createTile(const OverscaledTileID& tileID,
                                                       const UpdateParameters& parameters) {
     assert(loaded);
-    auto tilePointer = std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters);
-    setTileData(*tilePointer.get(), tileID);
-    return std::move(tilePointer);
+    auto tile = std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters);
+    if (geoJSONOrSupercluster.is<GeoJSONVTPointer>()) {
+        if (auto& geojsonvt = geoJSONOrSupercluster.get<GeoJSONVTPointer>()) {
+            tile->updateData(
+                geojsonvt->getTile(tileID.canonical.z, tileID.canonical.x, tileID.canonical.y)
+                    .features);
+        } else {
+            Log::Error(Event::ParseStyle, "GeoJSON source does not have data");
+            tile->updateData({});
+        }
+    } else {
+        assert(geoJSONOrSupercluster.is<SuperclusterPointer>());
+        if (auto& supercluster = geoJSONOrSupercluster.get<SuperclusterPointer>()) {
+            tile->updateData(
+                supercluster->getTile(tileID.canonical.z, tileID.canonical.x, tileID.canonical.y));
+        } else {
+            Log::Error(Event::ParseStyle, "GeoJSON source does not have data");
+            tile->updateData({});
+        }
+    }
+    return std::move(tile);
 }
 
 } // namespace style
