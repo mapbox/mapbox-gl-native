@@ -3080,7 +3080,7 @@ public:
     UIColor *color = (_delegateHasStrokeColorsForShapeAnnotations
                       ? [self.delegate mapView:self strokeColorForShapeAnnotation:annotation]
                       : self.tintColor);
-    return color.mbgl_color;
+    return color.mgl_color;
 }
 
 - (mbgl::Color)fillColorForPolygonAnnotation:(MGLPolygon *)annotation
@@ -3088,7 +3088,7 @@ public:
     UIColor *color = (_delegateHasFillColorsForShapeAnnotations
                       ? [self.delegate mapView:self fillColorForPolygonAnnotation:annotation]
                       : self.tintColor);
-    return color.mbgl_color;
+    return color.mgl_color;
 }
 
 - (CGFloat)lineWidthForPolylineAnnotation:(MGLPolyline *)annotation

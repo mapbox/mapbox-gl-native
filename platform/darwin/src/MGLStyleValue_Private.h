@@ -100,7 +100,7 @@ private:
     }
     
     MGLColor *toMGLRawStyleValue(const mbgl::Color mbglStopValue) {
-        return [MGLColor mbgl_colorWithColor:mbglStopValue];
+        return [MGLColor mgl_colorWithColor:mbglStopValue];
     }
     
     ObjCType toMGLRawStyleValue(const std::vector<MBGLElement> &mbglStopValue) {
@@ -142,7 +142,7 @@ private:
     }
     
     void getMBGLValue(MGLColor *rawValue, mbgl::Color &mbglValue) {
-        mbglValue = rawValue.mbgl_color;
+        mbglValue = rawValue.mgl_color;
     }
     
     void getMBGLValue(ObjCType rawValue, std::vector<MBGLElement> &mbglValue) {
