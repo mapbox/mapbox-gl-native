@@ -13,6 +13,7 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/reachability.h>
+#include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/style/transition_options.hpp>
@@ -397,7 +398,8 @@ public:
 
     // setup mbgl map
     mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
-    _mbglMap = new mbgl::Map(*_mbglView, *mbglFileSource, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
+    mbgl::ThreadPool workerThreadPool(4);
+    _mbglMap = new mbgl::Map(*_mbglView, *mbglFileSource, workerThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
     [self validateTileCacheSize];
 
     // start paused if in IB

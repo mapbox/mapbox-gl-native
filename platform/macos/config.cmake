@@ -38,6 +38,9 @@ macro(mbgl_platform_core)
         PRIVATE platform/darwin/src/headless_view_cgl.cpp
         PRIVATE platform/default/headless_display.cpp
         PRIVATE platform/default/headless_view.cpp
+
+        # Thread pool
+        PRIVATE platform/default/thread_pool.cpp
     )
 
     target_add_mason_package(mbgl-core PUBLIC geojson)

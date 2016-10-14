@@ -811,8 +811,9 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
         settings.cacheDatabasePath().toStdString(),
         settings.assetPath().toStdString(),
         settings.cacheDatabaseMaximumSize()))
+    , workerThreadPool(4)
     , mapObj(std::make_unique<mbgl::Map>(
-        *this, *fileSourceObj,
+        *this, *fileSourceObj, workerThreadPool,
         static_cast<mbgl::MapMode>(settings.mapMode()),
         static_cast<mbgl::GLContextMode>(settings.contextMode()),
         static_cast<mbgl::ConstrainMode>(settings.constrainMode()),

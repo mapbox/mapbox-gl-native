@@ -3,7 +3,7 @@
 #include <mbgl/tile/raster_tile.hpp>
 #include <mbgl/tile/tile_loader_impl.hpp>
 
-#include <mbgl/actor/thread_pool.hpp>
+#include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/style/style.hpp>

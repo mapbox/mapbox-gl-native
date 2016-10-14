@@ -81,7 +81,9 @@ NativeMapView::NativeMapView(JNIEnv *env_, jobject obj_, float pixelRatio_, int 
         mbgl::android::cachePath + "/mbgl-offline.db",
         mbgl::android::apkPath);
 
-    map = std::make_unique<mbgl::Map>(*this, *fileSource, MapMode::Continuous);
+    workerThreadPool = std::make_unique<mbgl::ThreadPool>(4);
+
+    map = std::make_unique<mbgl::Map>(*this, *fileSource, *workerThreadPool, MapMode::Continuous);
 
     float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
     float cpuFactor    = availableProcessors;

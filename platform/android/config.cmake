@@ -48,6 +48,9 @@ macro(mbgl_platform_core)
 
         # Headless view
         # TODO
+
+        # Thread pool
+        PRIVATE platform/default/thread_pool.cpp
     )
 
     target_include_directories(mbgl-core

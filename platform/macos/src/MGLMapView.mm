@@ -22,6 +22,7 @@
 #import <mbgl/annotation/annotation.hpp>
 #import <mbgl/map/camera.hpp>
 #import <mbgl/platform/darwin/reachability.h>
+#import <mbgl/platform/default/thread_pool.hpp>
 #import <mbgl/gl/extension.hpp>
 #import <mbgl/gl/gl.hpp>
 #import <mbgl/sprite/sprite_image.hpp>
@@ -261,7 +262,8 @@ public:
     [[NSFileManager defaultManager] removeItemAtURL:legacyCacheURL error:NULL];
 
     mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
-    _mbglMap = new mbgl::Map(*_mbglView, *mbglFileSource, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
+    mbgl::ThreadPool workerThreadPool(4);
+    _mbglMap = new mbgl::Map(*_mbglView, *mbglFileSource, workerThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
     [self validateTileCacheSize];
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
