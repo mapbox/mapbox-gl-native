@@ -8,13 +8,13 @@
 /**
  Converts the color into an mbgl::Color in calibrated RGB space.
  */
-- (mbgl::Color)mbgl_color;
+- (mbgl::Color)mgl_color;
 
 /**
  Instantiates `NSColor` from an `mbgl::Color`
  */
-+ (NSColor *)mbgl_colorWithColor:(mbgl::Color)color;
++ (NSColor *)mgl_colorWithColor:(mbgl::Color)color;
 
-- (mbgl::style::PropertyValue<mbgl::Color>)mbgl_colorPropertyValue;
+- (mbgl::style::PropertyValue<mbgl::Color>)mgl_colorPropertyValue;
 
 @end

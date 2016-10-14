@@ -49,43 +49,43 @@
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setFillAntialias:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillAntialias {
-    self.layer->setFillAntialias(fillAntialias.mbgl_boolPropertyValue);
+    self.layer->setFillAntialias(fillAntialias.mgl_boolPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)fillAntialias {
-    return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->getFillAntialias() ?: self.layer->getDefaultFillAntialias()];
+    return [MGLStyleAttribute mgl_boolWithPropertyValueBool:self.layer->getFillAntialias() ?: self.layer->getDefaultFillAntialias()];
 }
 
 - (void)setFillOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillOpacity {
-    self.layer->setFillOpacity(fillOpacity.mbgl_floatPropertyValue);
+    self.layer->setFillOpacity(fillOpacity.mgl_floatPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)fillOpacity {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getFillOpacity() ?: self.layer->getDefaultFillOpacity()];
+    return [MGLStyleAttribute mgl_numberWithPropertyValueNumber:self.layer->getFillOpacity() ?: self.layer->getDefaultFillOpacity()];
 }
 
 - (void)setFillColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillColor {
-    self.layer->setFillColor(fillColor.mbgl_colorPropertyValue);
+    self.layer->setFillColor(fillColor.mgl_colorPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)fillColor {
-    return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->getFillColor() ?: self.layer->getDefaultFillColor()];
+    return [MGLStyleAttribute mgl_colorWithPropertyValueColor:self.layer->getFillColor() ?: self.layer->getDefaultFillColor()];
 }
 
 - (void)setFillOutlineColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillOutlineColor {
-    self.layer->setFillOutlineColor(fillOutlineColor.mbgl_colorPropertyValue);
+    self.layer->setFillOutlineColor(fillOutlineColor.mgl_colorPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)fillOutlineColor {
-    return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->getFillOutlineColor() ?: self.layer->getDefaultFillOutlineColor()];
+    return [MGLStyleAttribute mgl_colorWithPropertyValueColor:self.layer->getFillOutlineColor() ?: self.layer->getDefaultFillOutlineColor()];
 }
 
 - (void)setFillTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslate {
-    self.layer->setFillTranslate(fillTranslate.mbgl_offsetPropertyValue);
+    self.layer->setFillTranslate(fillTranslate.mgl_offsetPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)fillTranslate {
-    return [MGLStyleAttribute mbgl_offsetWithPropertyValueOffset:self.layer->getFillTranslate() ?: self.layer->getDefaultFillTranslate()];
+    return [MGLStyleAttribute mgl_offsetWithPropertyValueOffset:self.layer->getFillTranslate() ?: self.layer->getDefaultFillTranslate()];
 }
 
 - (void)setFillTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillTranslateAnchor {
@@ -97,11 +97,11 @@
 }
 
 - (void)setFillPattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)fillPattern {
-    self.layer->setFillPattern(fillPattern.mbgl_stringPropertyValue);
+    self.layer->setFillPattern(fillPattern.mgl_stringPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)fillPattern {
-    return [MGLStyleAttribute mbgl_stringWithPropertyValueString:self.layer->getFillPattern() ?: self.layer->getDefaultFillPattern()];
+    return [MGLStyleAttribute mgl_stringWithPropertyValueString:self.layer->getFillPattern() ?: self.layer->getDefaultFillPattern()];
 }
 
 @end

@@ -9,7 +9,7 @@
     return NO;
 }
 
-- (mbgl::style::PropertyValue<std::string>)mbgl_stringPropertyValue
+- (mbgl::style::PropertyValue<std::string>)mgl_stringPropertyValue
 {
     return mbgl::style::PropertyValue<std::string> {{ self.UTF8String }};
 }

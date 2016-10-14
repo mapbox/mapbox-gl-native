@@ -2,7 +2,7 @@
 
 @implementation NSColor (MGLAdditions)
 
-- (mbgl::Color)mbgl_color
+- (mbgl::Color)mgl_color
 {
     CGFloat r, g, b, a;
     
@@ -11,14 +11,14 @@
     return { (float)r, (float)g, (float)b, (float)a };
 }
 
-+ (NSColor *)mbgl_colorWithColor:(mbgl::Color)color
++ (NSColor *)mgl_colorWithColor:(mbgl::Color)color
 {
     return [NSColor colorWithRed:color.r green:color.g blue:color.b alpha:color.a];
 }
 
-- (mbgl::style::PropertyValue<mbgl::Color>)mbgl_colorPropertyValue
+- (mbgl::style::PropertyValue<mbgl::Color>)mgl_colorPropertyValue
 {
-    mbgl::Color color = self.mbgl_color;
+    mbgl::Color color = self.mgl_color;
     return {{ color.r, color.g, color.b, color.a }};
 }
 

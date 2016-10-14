@@ -37,7 +37,7 @@
     return NO;
 }
 
-- (mbgl::style::PropertyValue<std::array<float, 2>>)mbgl_offsetPropertyValue
+- (mbgl::style::PropertyValue<std::array<float, 2>>)mgl_offsetPropertyValue
 {
     return { self.mgl_offsetArrayValue };
 }
@@ -53,7 +53,7 @@
     };
 }
 
-- (mbgl::style::PropertyValue<std::array<float, 4>>)mbgl_paddingPropertyValue
+- (mbgl::style::PropertyValue<std::array<float, 4>>)mgl_paddingPropertyValue
 {
     return { self.mgl_paddingArrayValue };
 }

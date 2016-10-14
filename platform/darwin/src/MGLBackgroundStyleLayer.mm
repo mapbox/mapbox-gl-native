@@ -28,27 +28,27 @@
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setBackgroundColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundColor {
-    self.layer->setBackgroundColor(backgroundColor.mbgl_colorPropertyValue);
+    self.layer->setBackgroundColor(backgroundColor.mgl_colorPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)backgroundColor {
-    return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->getBackgroundColor() ?: self.layer->getDefaultBackgroundColor()];
+    return [MGLStyleAttribute mgl_colorWithPropertyValueColor:self.layer->getBackgroundColor() ?: self.layer->getDefaultBackgroundColor()];
 }
 
 - (void)setBackgroundPattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundPattern {
-    self.layer->setBackgroundPattern(backgroundPattern.mbgl_stringPropertyValue);
+    self.layer->setBackgroundPattern(backgroundPattern.mgl_stringPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)backgroundPattern {
-    return [MGLStyleAttribute mbgl_stringWithPropertyValueString:self.layer->getBackgroundPattern() ?: self.layer->getDefaultBackgroundPattern()];
+    return [MGLStyleAttribute mgl_stringWithPropertyValueString:self.layer->getBackgroundPattern() ?: self.layer->getDefaultBackgroundPattern()];
 }
 
 - (void)setBackgroundOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)backgroundOpacity {
-    self.layer->setBackgroundOpacity(backgroundOpacity.mbgl_floatPropertyValue);
+    self.layer->setBackgroundOpacity(backgroundOpacity.mgl_floatPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)backgroundOpacity {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getBackgroundOpacity() ?: self.layer->getDefaultBackgroundOpacity()];
+    return [MGLStyleAttribute mgl_numberWithPropertyValueNumber:self.layer->getBackgroundOpacity() ?: self.layer->getDefaultBackgroundOpacity()];
 }
 
 @end
