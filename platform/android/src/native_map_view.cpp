@@ -15,6 +15,7 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/gl/extension.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/util/constants.hpp>
@@ -81,7 +82,9 @@ NativeMapView::NativeMapView(JNIEnv *env_, jobject obj_, float pixelRatio_, int 
         mbgl::android::cachePath + "/mbgl-offline.db",
         mbgl::android::apkPath);
 
-    map = std::make_unique<mbgl::Map>(*this, *fileSource, MapMode::Continuous);
+    ThreadPool workerThreadPool(4);
+
+    map = std::make_unique<mbgl::Map>(*this, *fileSource, workerThreadPool, MapMode::Continuous);
 
     float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
     float cpuFactor    = availableProcessors;

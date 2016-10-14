@@ -44,6 +44,9 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/headless_display.cpp
         PRIVATE platform/default/headless_view.cpp
         PRIVATE platform/default/headless_view_glx.cpp
+
+        # Thread pool
+        PRIVATE platform/default/thread_pool.cpp
     )
 
     target_include_directories(mbgl-core

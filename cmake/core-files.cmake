@@ -8,8 +8,6 @@ set(MBGL_CORE_FILES
     src/mbgl/actor/mailbox.hpp
     src/mbgl/actor/message.hpp
     src/mbgl/actor/scheduler.hpp
-    src/mbgl/actor/thread_pool.cpp
-    src/mbgl/actor/thread_pool.hpp
 
     # algorithm
     src/mbgl/algorithm/covered_by_children.hpp
