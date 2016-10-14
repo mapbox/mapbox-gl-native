@@ -20,6 +20,7 @@
     "csscolorparser": "^1.0.2",
     "ejs": "^2.4.1",
     "express": "^4.11.1",
+    "lodash": "^4.16.4",
     "mapbox-gl-shaders": "mapbox/mapbox-gl-shaders#98a56d538b11fb331aa67a6d632d6ecd6821b007",
     "mapbox-gl-style-spec": "mapbox/mapbox-gl-style-spec#7f62a4fc9f21e619824d68abbc4b03cbc1685572",
     "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#6df3b27868cc00432197e3fc9c166fdba7067913",
