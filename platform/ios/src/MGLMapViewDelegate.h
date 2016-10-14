@@ -240,7 +240,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param annotation The annotation being rendered.
  @return An alpha value between `0` and `1.0`.
  */
-- (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation __attribute__((deprecated("Use -mapView:strokeColorForShapeAnnotation:.")));
+- (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation __attribute__((deprecated("Use -mapView:strokeColorForShapeAnnotation: or -mapView:fillColorForPolygonAnnotation:.")));
 
 /**
  Returns the color to use when rendering the outline of a shape annotation.
