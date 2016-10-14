@@ -4,9 +4,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLNetworkConfiguration : NSObject
 
-+ (void)setAPIBaseURL:(NSURL *)apiBaseURL;
++ (void)setAPIBaseURL:(nullable NSURL *)apiBaseURL;
 
-+ (NSURL *)apiBaseURL;
++ (nullable NSURL *)apiBaseURL;
 
 @end
 
