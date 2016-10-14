@@ -3,6 +3,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/filter.hpp>
+#include <mbgl/style/bucket_parameters.hpp>
 #include <mbgl/style/layer_observer.hpp>
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -20,7 +21,6 @@ namespace style {
 
 class CascadeParameters;
 class CalculationParameters;
-class BucketParameters;
 
 /**
  * `Layer::Impl` contains the internal implementation of `Layer`: the details that need to be accessible to other parts

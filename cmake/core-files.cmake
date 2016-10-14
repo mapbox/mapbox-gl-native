@@ -47,6 +47,8 @@ set(MBGL_CORE_FILES
     src/mbgl/geometry/anchor.hpp
     src/mbgl/geometry/binpack.hpp
     src/mbgl/geometry/debug_font_data.hpp
+    src/mbgl/geometry/dem_pyramid.cpp
+    src/mbgl/geometry/dem_pyramid.hpp
     src/mbgl/geometry/feature_index.cpp
     src/mbgl/geometry/feature_index.hpp
     src/mbgl/geometry/line_atlas.cpp
@@ -172,6 +174,7 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/painter_line.cpp
     src/mbgl/renderer/painter_raster.cpp
     src/mbgl/renderer/painter_symbol.cpp
+    src/mbgl/renderer/painter_terrain.cpp
     src/mbgl/renderer/raster_bucket.cpp
     src/mbgl/renderer/raster_bucket.hpp
     src/mbgl/renderer/render_item.hpp
@@ -180,6 +183,8 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/render_tile.hpp
     src/mbgl/renderer/symbol_bucket.cpp
     src/mbgl/renderer/symbol_bucket.hpp
+    src/mbgl/renderer/terrain_bucket.cpp
+    src/mbgl/renderer/terrain_bucket.hpp
 
     # shader
     src/mbgl/shader/circle_shader.cpp
@@ -228,6 +233,11 @@ set(MBGL_CORE_FILES
     src/mbgl/shader/symbol_uniforms.hpp
     src/mbgl/shader/symbol_vertex.cpp
     src/mbgl/shader/symbol_vertex.hpp
+    src/mbgl/shader/terrain_prepare_shader.cpp
+    src/mbgl/shader/terrain_prepare_shader.hpp
+    src/mbgl/shader/terrain_shader.cpp
+    src/mbgl/shader/terrain_shader.hpp
+    src/mbgl/shader/terrain_uniforms.hpp
     src/mbgl/shader/uniforms.hpp
 
     # sprite
@@ -264,12 +274,13 @@ set(MBGL_CORE_FILES
     include/mbgl/style/source.hpp
     include/mbgl/style/transition_options.hpp
     include/mbgl/style/types.hpp
-    src/mbgl/style/bucket_parameters.cpp
     src/mbgl/style/bucket_parameters.hpp
     src/mbgl/style/calculation_parameters.hpp
     src/mbgl/style/cascade_parameters.hpp
     src/mbgl/style/class_dictionary.cpp
     src/mbgl/style/class_dictionary.hpp
+    src/mbgl/style/geometry_bucket_parameters.cpp
+    src/mbgl/style/geometry_bucket_parameters.hpp
     src/mbgl/style/layer.cpp
     src/mbgl/style/layer_impl.cpp
     src/mbgl/style/layer_impl.hpp
@@ -285,6 +296,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/property_parsing.hpp
     src/mbgl/style/query_parameters.hpp
     src/mbgl/style/rapidjson_conversion.hpp
+    src/mbgl/style/raster_bucket_parameters.hpp
     src/mbgl/style/source.cpp
     src/mbgl/style/source_impl.cpp
     src/mbgl/style/source_impl.hpp
@@ -318,6 +330,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/layers/line_layer.hpp
     include/mbgl/style/layers/raster_layer.hpp
     include/mbgl/style/layers/symbol_layer.hpp
+    include/mbgl/style/layers/terrain_layer.hpp
     src/mbgl/style/layers/background_layer.cpp
     src/mbgl/style/layers/background_layer_impl.cpp
     src/mbgl/style/layers/background_layer_impl.hpp
@@ -351,6 +364,11 @@ set(MBGL_CORE_FILES
     src/mbgl/style/layers/symbol_layer_impl.hpp
     src/mbgl/style/layers/symbol_layer_properties.cpp
     src/mbgl/style/layers/symbol_layer_properties.hpp
+    src/mbgl/style/layers/terrain_layer.cpp
+    src/mbgl/style/layers/terrain_layer_impl.cpp
+    src/mbgl/style/layers/terrain_layer_impl.hpp
+    src/mbgl/style/layers/terrain_layer_properties.cpp
+    src/mbgl/style/layers/terrain_layer_properties.hpp
 
     # style/sources
     include/mbgl/style/sources/geojson_source.hpp

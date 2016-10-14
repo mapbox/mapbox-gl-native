@@ -11,6 +11,7 @@
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/style/layers/terrain_layer.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/parser.hpp>
 #include <mbgl/style/query_parameters.hpp>
@@ -542,6 +543,7 @@ struct QueueSourceReloadVisitor {
     // they don't participate in layout.
     void operator()(CustomLayer&) {}
     void operator()(RasterLayer&) {}
+    void operator()(TerrainLayer&) {}
     void operator()(BackgroundLayer&) {}
 
     template <class VectorLayer>

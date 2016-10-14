@@ -6,6 +6,7 @@
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/constant.hpp>
@@ -95,6 +96,8 @@ public:
             converted = convertVectorLayer<SymbolLayer>(*id, value);
         } else if (*type == "raster") {
             converted = convertRasterLayer(*id, value);
+        } else if (*type == "terrain") {
+            converted = convertTerrainLayer(*id, value);
         } else if (*type == "background") {
             converted = convertBackgroundLayer(*id, value);
         } else {
@@ -195,6 +198,32 @@ private:
         }
 
         return std::make_unique<RasterLayer>(id, *source);
+    }
+
+    template <class V>
+    Result<std::unique_ptr<Layer>> convertTerrainLayer(const std::string& id, const V& value) const {
+        auto sourceValue = objectMember(value, "source");
+        if (!sourceValue) {
+            return Error { "layer must have a source" };
+        }
+
+        optional<std::string> source = toString(*sourceValue);
+        if (!source) {
+            return Error { "layer source must be a string" };
+        }
+
+        auto layer = std::make_unique<TerrainLayer>(id, *source);
+
+        auto sourceLayerValue = objectMember(value, "source-layer");
+        if (sourceLayerValue) {
+            optional<std::string> sourceLayer = toString(*sourceLayerValue);
+            if (!sourceLayer) {
+                return Error { "layer source-layer must be a string" };
+            }
+            layer->setSourceLayer(*sourceLayer);
+        }
+
+        return std::move(layer);
     }
 
     template <class V>

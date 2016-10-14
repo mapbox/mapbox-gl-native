@@ -1,5 +1,5 @@
 #include <mbgl/style/layers/line_layer_impl.hpp>
-#include <mbgl/style/bucket_parameters.hpp>
+#include <mbgl/style/geometry_bucket_parameters.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
@@ -27,7 +27,8 @@ bool LineLayer::Impl::recalculate(const CalculationParameters& parameters) {
     return hasTransitions;
 }
 
-std::unique_ptr<Bucket> LineLayer::Impl::createBucket(BucketParameters& parameters) const {
+std::unique_ptr<Bucket> LineLayer::Impl::createBucket(BucketParameters& params) const {
+    auto& parameters = params.get<GeometryBucketParameters>();
     auto bucket = std::make_unique<LineBucket>(parameters.tileID.overscaleFactor());
 
     bucket->layout = layout;

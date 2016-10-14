@@ -13,6 +13,7 @@ class LineLayer;
 class CircleLayer;
 class SymbolLayer;
 class RasterLayer;
+class TerrainLayer;
 class BackgroundLayer;
 class CustomLayer;
 
@@ -40,6 +41,7 @@ protected:
         Circle,
         Symbol,
         Raster,
+        Terrain,
         Background,
         Custom,
     };
@@ -91,6 +93,8 @@ public:
             return visitor(*as<SymbolLayer>());
         case Type::Raster:
             return visitor(*as<RasterLayer>());
+        case Type::Terrain:
+            return visitor(*as<TerrainLayer>());
         case Type::Background:
             return visitor(*as<BackgroundLayer>());
         case Type::Custom:

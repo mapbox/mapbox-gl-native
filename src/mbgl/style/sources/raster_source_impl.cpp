@@ -12,7 +12,7 @@ RasterSource::Impl::Impl(std::string id_, Source& base_,
 
 std::unique_ptr<Tile> RasterSource::Impl::createTile(const OverscaledTileID& tileID,
                                                const UpdateParameters& parameters) {
-    return std::make_unique<RasterTile>(tileID, parameters, tileset);
+    return std::make_unique<RasterTile>(tileID, base.getID(), parameters, tileset);
 }
 
 } // namespace style

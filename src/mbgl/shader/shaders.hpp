@@ -9,6 +9,8 @@
 #include <mbgl/shader/line_sdf_shader.hpp>
 #include <mbgl/shader/line_pattern_shader.hpp>
 #include <mbgl/shader/raster_shader.hpp>
+#include <mbgl/shader/terrain_prepare_shader.hpp>
+#include <mbgl/shader/terrain_shader.hpp>
 #include <mbgl/shader/symbol_icon_shader.hpp>
 #include <mbgl/shader/symbol_sdf_shader.hpp>
 
@@ -28,6 +30,8 @@ public:
           lineSDF(context, defines),
           linePattern(context, defines),
           raster(context, defines),
+          terrainPrepare(context, defines),
+          terrain(context, defines),
           symbolIcon(context, defines),
           symbolIconSDF(context, defines),
           symbolGlyph(context, defines),
@@ -43,6 +47,8 @@ public:
     LineSDFShader lineSDF;
     LinePatternShader linePattern;
     RasterShader raster;
+    TerrainPrepareShader terrainPrepare;
+    TerrainShader terrain;
     SymbolIconShader symbolIcon;
     SymbolSDFShader symbolIconSDF;
     SymbolSDFShader symbolGlyph;

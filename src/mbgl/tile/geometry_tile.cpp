@@ -6,6 +6,7 @@
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>
@@ -78,6 +79,7 @@ void GeometryTile::redoLayout() {
         // Avoid cloning and including irrelevant layers.
         if (layer->is<BackgroundLayer>() ||
             layer->is<CustomLayer>() ||
+            layer->is<RasterLayer>() ||
             layer->baseImpl->source != sourceID ||
             id.overscaledZ < std::floor(layer->baseImpl->minZoom) ||
             id.overscaledZ >= std::ceil(layer->baseImpl->maxZoom) ||

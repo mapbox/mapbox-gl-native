@@ -10,6 +10,7 @@ namespace mbgl {
 class Tileset;
 
 namespace style {
+class Style;
 class Layer;
 class UpdateParameters;
 } // namespace style
@@ -17,8 +18,9 @@ class UpdateParameters;
 class RasterTile : public Tile {
 public:
     RasterTile(const OverscaledTileID&,
-                   const style::UpdateParameters&,
-                   const Tileset&);
+               std::string sourceID,
+               const style::UpdateParameters&,
+               const Tileset&);
     ~RasterTile() final;
 
     void setNecessity(Necessity) final;
@@ -29,20 +31,27 @@ public:
                  optional<Timestamp> expires_);
 
     void cancel() override;
+
+    class ParseResult {
+    public:
+        std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+    };
+
     Bucket* getBucket(const style::Layer&) override;
 
-    void onParsed(std::unique_ptr<Bucket> result);
+    void onParsed(ParseResult);
     void onError(std::exception_ptr);
 
 private:
     TileLoader<RasterTile> loader;
 
+    const std::string sourceID;
+    style::Style& style;
+
     std::shared_ptr<Mailbox> mailbox;
     Actor<RasterTileWorker> worker;
 
-    // Contains the Bucket object for the tile. Buckets are render
-    // objects and they get added by tile parsing operations.
-    std::unique_ptr<Bucket> bucket;
+    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
 };
 
 } // namespace mbgl

@@ -445,6 +445,27 @@ public abstract class Property<T> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface CIRCLE_PITCH_SCALE {}
 
+    //TERRAIN_ILLUMINATION_ALIGNMENT: Direction of light source when map is rotated.
+
+    /**
+     * The terrain illumination is relative to the north-west direction.
+     */
+    public static final String TERRAIN_ILLUMINATION_ALIGNMENT_MAP = "map";
+    /**
+     * The terrain illumination is relative to the top left of the viewport.
+     */
+    public static final String TERRAIN_ILLUMINATION_ALIGNMENT_VIEWPORT = "viewport";
+
+    /**
+     * Direction of light source when map is rotated.
+     */
+    @StringDef({
+            TERRAIN_ILLUMINATION_ALIGNMENT_MAP,
+            TERRAIN_ILLUMINATION_ALIGNMENT_VIEWPORT,
+        })
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface TERRAIN_ILLUMINATION_ALIGNMENT {}
+
 
     //Class definition
     public final String name;

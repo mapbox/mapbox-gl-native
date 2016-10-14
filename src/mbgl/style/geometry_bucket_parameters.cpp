@@ -1,11 +1,11 @@
-#include <mbgl/style/bucket_parameters.hpp>
+#include <mbgl/style/geometry_bucket_parameters.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 namespace mbgl {
 namespace style {
 
-void BucketParameters::eachFilteredFeature(const Filter& filter,
+void GeometryBucketParameters::eachFilteredFeature(const Filter& filter,
                                                 std::function<void (const GeometryTileFeature&, std::size_t index, const std::string& layerName)> function) {
     auto name = layer.getName();
     for (std::size_t i = 0; !cancelled() && i < layer.featureCount(); i++) {

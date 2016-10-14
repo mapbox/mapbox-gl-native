@@ -4,7 +4,8 @@
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
-#include <mbgl/style/bucket_parameters.hpp>
+#include <mbgl/style/geometry_bucket_parameters.hpp>
+#include <mbgl/style/raster_bucket_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
@@ -210,19 +211,15 @@ void GeometryTileWorker::redoLayout() {
             continue;
         }
 
-        BucketParameters parameters(id,
-                                    *geometryLayer,
-                                    obsolete,
-                                    reinterpret_cast<uintptr_t>(this),
-                                    glyphAtlas,
-                                    *featureIndex,
-                                    mode);
+        BucketParameters parameters = GeometryBucketParameters{id, *geometryLayer, obsolete,
+                                                               reinterpret_cast<uintptr_t>(this),
+                                                               glyphAtlas, *featureIndex, mode};
 
         if (layer->is<SymbolLayer>()) {
             symbolLayouts.push_back(layer->as<SymbolLayer>()->impl->createLayout(parameters));
         } else {
             std::unique_ptr<Bucket> bucket = layer->baseImpl->createBucket(parameters);
-            if (bucket->hasData()) {
+            if (bucket && bucket->hasData()) {
                 buckets.emplace(layer->baseImpl->bucketName(), std::move(bucket));
             }
         }

@@ -1,5 +1,5 @@
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/style/bucket_parameters.hpp>
+#include <mbgl/style/geometry_bucket_parameters.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/renderer/bucket.hpp>
 
@@ -31,7 +31,8 @@ std::unique_ptr<Bucket> SymbolLayer::Impl::createBucket(BucketParameters&) const
     return nullptr;
 }
 
-std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(BucketParameters& parameters) const {
+std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(BucketParameters& params) const {
+    auto& parameters = params.get<GeometryBucketParameters>();
     SymbolLayoutProperties layoutProperties = layout;
 
     CalculationParameters p(parameters.tileID.overscaledZ);

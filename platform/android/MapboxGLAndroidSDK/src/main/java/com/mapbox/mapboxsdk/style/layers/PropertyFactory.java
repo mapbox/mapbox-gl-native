@@ -1012,6 +1012,156 @@ public class PropertyFactory {
     }
 
     /**
+     * The color of the terrain that faces away from the light source.
+     *
+     * @param value a int color value
+     * @return property wrapper around String color
+     */
+    public static Property<String> terrainShadowColor(@ColorInt int value) {
+        return new PaintProperty<>("terrain-shadow-color", colorToRgbaString(value));
+    }
+
+    /**
+     * The color of the terrain that faces away from the light source.
+     *
+     * @param value a String value
+     * @return property wrapper around String
+     */
+    public static Property<String> terrainShadowColor(String value) {
+        return new PaintProperty<>("terrain-shadow-color", value);
+    }
+
+    /**
+     * The color of the terrain that faces away from the light source.
+     *
+     * @param function a wrapper function for String
+     * @return property wrapper around a String function
+     */
+    public static Property<Function<String>> terrainShadowColor(Function<String> function) {
+        return new PaintProperty<>("terrain-shadow-color", function);
+    }
+
+    /**
+     * The color of the terrain that faces towards the light source.
+     *
+     * @param value a int color value
+     * @return property wrapper around String color
+     */
+    public static Property<String> terrainHighlightColor(@ColorInt int value) {
+        return new PaintProperty<>("terrain-highlight-color", colorToRgbaString(value));
+    }
+
+    /**
+     * The color of the terrain that faces towards the light source.
+     *
+     * @param value a String value
+     * @return property wrapper around String
+     */
+    public static Property<String> terrainHighlightColor(String value) {
+        return new PaintProperty<>("terrain-highlight-color", value);
+    }
+
+    /**
+     * The color of the terrain that faces towards the light source.
+     *
+     * @param function a wrapper function for String
+     * @return property wrapper around a String function
+     */
+    public static Property<Function<String>> terrainHighlightColor(Function<String> function) {
+        return new PaintProperty<>("terrain-highlight-color", function);
+    }
+
+    /**
+     * The color used to accentuate rugged terrain with sharp cliffs and gorges.
+     *
+     * @param value a int color value
+     * @return property wrapper around String color
+     */
+    public static Property<String> terrainAccentColor(@ColorInt int value) {
+        return new PaintProperty<>("terrain-accent-color", colorToRgbaString(value));
+    }
+
+    /**
+     * The color used to accentuate rugged terrain with sharp cliffs and gorges.
+     *
+     * @param value a String value
+     * @return property wrapper around String
+     */
+    public static Property<String> terrainAccentColor(String value) {
+        return new PaintProperty<>("terrain-accent-color", value);
+    }
+
+    /**
+     * The color used to accentuate rugged terrain with sharp cliffs and gorges.
+     *
+     * @param function a wrapper function for String
+     * @return property wrapper around a String function
+     */
+    public static Property<Function<String>> terrainAccentColor(Function<String> function) {
+        return new PaintProperty<>("terrain-accent-color", function);
+    }
+
+    /**
+     * Direction of the lightsource. Defaults to top left.
+     *
+     * @param value a Float value
+     * @return property wrapper around Float
+     */
+    public static Property<Float> terrainIlluminationDirection(Float value) {
+        return new PaintProperty<>("terrain-illumination-direction", value);
+    }
+
+    /**
+     * Direction of the lightsource. Defaults to top left.
+     *
+     * @param function a wrapper function for Float
+     * @return property wrapper around a Float function
+     */
+    public static Property<Function<Float>> terrainIlluminationDirection(Function<Float> function) {
+        return new PaintProperty<>("terrain-illumination-direction", function);
+    }
+
+    /**
+     * Direction of light source when map is rotated.
+     *
+     * @param value a String value
+     * @return property wrapper around String
+     */
+    public static Property<String> terrainIlluminationAlignment(@Property.TERRAIN_ILLUMINATION_ALIGNMENT String value) {
+        return new PaintProperty<>("terrain-illumination-alignment", value);
+    }
+
+    /**
+     * Direction of light source when map is rotated.
+     *
+     * @param function a wrapper function for String
+     * @return property wrapper around a String function
+     */
+    public static Property<Function<String>> terrainIlluminationAlignment(Function<String> function) {
+        return new PaintProperty<>("terrain-illumination-alignment", function);
+    }
+
+    /**
+     * Intensity of the terrain
+     *
+     * @param value a Float value
+     * @return property wrapper around Float
+     */
+    public static Property<Float> terrainExaggeration(Float value) {
+        return new PaintProperty<>("terrain-exaggeration", value);
+    }
+
+    /**
+     * Intensity of the terrain
+     *
+     * @param function a wrapper function for Float
+     * @return property wrapper around a Float function
+     */
+    public static Property<Function<Float>> terrainExaggeration(Function<Float> function) {
+        return new PaintProperty<>("terrain-exaggeration", function);
+    }
+
+    /**
      * The color with which the background will be drawn.
      *
      * @param value a int color value

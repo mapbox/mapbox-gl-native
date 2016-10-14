@@ -1,6 +1,7 @@
 #include <mbgl/tile/vector_tile.hpp>
 #include <mbgl/tile/tile_loader_impl.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <protozero/pbf_reader.hpp>
 
@@ -24,6 +25,7 @@ public:
     std::unordered_map<std::string,Value> getProperties() const override;
     optional<FeatureIdentifier> getID() const override;
     GeometryCollection getGeometries() const override;
+    DEMPyramid getDEMPyramid() const override;
 
 private:
     const VectorTileLayer& layer;
@@ -239,6 +241,76 @@ GeometryCollection VectorTileFeature::getGeometries() const {
     }
 
     return fixupPolygons(lines);
+}
+
+DEMPyramid VectorTileFeature::getDEMPyramid() const {
+    DEMPyramid pyramid;
+    if (layer.extent != 256) {
+        Log::Warning(Event::ParseTile, "DEM extent must be 256");
+        return pyramid;
+    }
+
+    auto decodeSVarint = [](auto& iter) {
+        if (iter.first == iter.second) {
+            fprintf(stderr, "reading beyond end\n");
+        }
+        return iter.first != iter.second ? protozero::decode_zigzag32(*iter.first++) : 0;
+    };
+
+    auto iter = geometry_iter;
+
+    // Decode main square
+    pyramid.levels.emplace_back(256, 256, 128);
+    {
+        auto& level = pyramid.levels.front();
+        for (int32_t y = 0; y < level.height; y++) {
+            for (int32_t x = 0; x < level.width; x++) {
+                const auto value = decodeSVarint(iter);
+                const auto value_left = x ? level.get(x - 1, y) : 0;
+                const auto value_up = y ? level.get(x, y - 1) : 0;
+                const auto value_up_left = x && y ? level.get(x - 1, y - 1) : 0;
+                level.set(x, y, value + value_left + value_up - value_up_left);
+            }
+        }
+    }
+
+    pyramid.buildLevels();
+
+    // Decode bleed
+    for (auto& level : pyramid.levels) {
+        if (level.width <= 2 || level.height <= 2) {
+            break;
+        }
+
+        int32_t x = -1;
+        int32_t y = -1;
+        int32_t prev = 0;
+        // Decode left column
+        while (y < level.height) {
+            level.set(x, y, (prev = decodeSVarint(iter) + prev));
+            y++;
+        }
+
+        // Decode bottom row
+        while (x < level.width) {
+            level.set(x, y, (prev = decodeSVarint(iter) + prev));
+            x++;
+        }
+
+        // Decode right column
+        while (y > -1) {
+            level.set(x, y, (prev = decodeSVarint(iter) + prev));
+            y--;
+        }
+
+        // Decode top row
+        while (x > -1) {
+            level.set(x, y, (prev = decodeSVarint(iter) + prev));
+            x--;
+        }
+    }
+
+    return pyramid;
 }
 
 VectorTileData::VectorTileData(std::shared_ptr<const std::string> data_)

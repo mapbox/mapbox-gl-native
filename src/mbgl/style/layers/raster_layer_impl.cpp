@@ -1,5 +1,7 @@
 #include <mbgl/style/layers/raster_layer_impl.hpp>
-#include <mbgl/renderer/bucket.hpp>
+#include <mbgl/style/raster_bucket_parameters.hpp>
+#include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/util/image.hpp>
 
 namespace mbgl {
 namespace style {
@@ -16,8 +18,9 @@ bool RasterLayer::Impl::recalculate(const CalculationParameters& parameters) {
     return hasTransitions;
 }
 
-std::unique_ptr<Bucket> RasterLayer::Impl::createBucket(BucketParameters&) const {
-    return nullptr;
+std::unique_ptr<Bucket> RasterLayer::Impl::createBucket(BucketParameters& params) const {
+    auto& parameters = params.get<RasterBucketParameters>();
+    return std::make_unique<RasterBucket>(decodeImage(*parameters.data));
 }
 
 } // namespace style

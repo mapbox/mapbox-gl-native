@@ -55,6 +55,7 @@ void Source::Impl::startRender(algorithm::ClipIDGenerator& generator,
                          const mat4& projMatrix,
                          const TransformState& transform) {
     if (type == SourceType::Vector ||
+        type == SourceType::Raster ||
         type == SourceType::GeoJSON ||
         type == SourceType::Annotations) {
         generator.update(renderTiles);

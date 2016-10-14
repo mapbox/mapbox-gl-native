@@ -33,6 +33,7 @@ public:
     optional<Value> getValue(const std::string&) const override;
     optional<FeatureIdentifier> getID() const override { return { id }; }
     GeometryCollection getGeometries() const override { return geometries; }
+    DEMPyramid getDEMPyramid() const override { return {}; }
 
     const AnnotationID id;
     const FeatureType type;

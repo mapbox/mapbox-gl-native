@@ -3,6 +3,7 @@
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/geometry/dem_pyramid.hpp>
 
 #include <cstdint>
 #include <string>
@@ -38,6 +39,7 @@ public:
     virtual PropertyMap getProperties() const { return PropertyMap(); }
     virtual optional<FeatureIdentifier> getID() const { return {}; }
     virtual GeometryCollection getGeometries() const = 0;
+    virtual DEMPyramid getDEMPyramid() const = 0;
 };
 
 class GeometryTileLayer {

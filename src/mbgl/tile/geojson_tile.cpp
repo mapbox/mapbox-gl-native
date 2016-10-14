@@ -36,6 +36,10 @@ public:
         return geometry;
     }
 
+    DEMPyramid getDEMPyramid() const override {
+        return {};
+    }
+
     optional<Value> getValue(const std::string& key) const override {
         auto it = feature.properties.find(key);
         if (it != feature.properties.end()) {

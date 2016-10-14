@@ -9,6 +9,7 @@
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/style/layers/terrain_layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 
 #include <unordered_map>
@@ -63,6 +64,7 @@ auto makeLayoutPropertySetters() {
     result["text-allow-overlap"] = makePropertySetter<V>(&SymbolLayer::setTextAllowOverlap);
     result["text-ignore-placement"] = makePropertySetter<V>(&SymbolLayer::setTextIgnorePlacement);
     result["text-optional"] = makePropertySetter<V>(&SymbolLayer::setTextOptional);
+
 
 
 
@@ -123,6 +125,13 @@ auto makePaintPropertySetters() {
     result["raster-saturation"] = makePropertySetter<V>(&RasterLayer::setRasterSaturation);
     result["raster-contrast"] = makePropertySetter<V>(&RasterLayer::setRasterContrast);
     result["raster-fade-duration"] = makePropertySetter<V>(&RasterLayer::setRasterFadeDuration);
+
+    result["terrain-shadow-color"] = makePropertySetter<V>(&TerrainLayer::setTerrainShadowColor);
+    result["terrain-highlight-color"] = makePropertySetter<V>(&TerrainLayer::setTerrainHighlightColor);
+    result["terrain-accent-color"] = makePropertySetter<V>(&TerrainLayer::setTerrainAccentColor);
+    result["terrain-illumination-direction"] = makePropertySetter<V>(&TerrainLayer::setTerrainIlluminationDirection);
+    result["terrain-illumination-alignment"] = makePropertySetter<V>(&TerrainLayer::setTerrainIlluminationAlignment);
+    result["terrain-exaggeration"] = makePropertySetter<V>(&TerrainLayer::setTerrainExaggeration);
 
     result["background-color"] = makePropertySetter<V>(&BackgroundLayer::setBackgroundColor);
     result["background-pattern"] = makePropertySetter<V>(&BackgroundLayer::setBackgroundPattern);
