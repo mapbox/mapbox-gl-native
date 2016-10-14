@@ -120,7 +120,7 @@ public class MarkerViewManager {
     }
 
     public void updateMarker(MarkerView markerView) {
-        ImageView view = markerViewMap.get(markerView);
+        View view = markerViewMap.get(markerView);
         if (view != null) {
             markerView.update(view);
         }
