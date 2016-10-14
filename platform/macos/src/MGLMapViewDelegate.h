@@ -156,23 +156,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable MGLAnnotationImage *)mapView:(MGLMapView *)mapView imageForAnnotation:(id <MGLAnnotation>)annotation;
 
-/**
- Returns the alpha value to use when rendering a shape annotation.
- 
- A value of 0.0 results in a completely transparent shape. A value of 1.0, the
- default, results in a completely opaque shape.
- 
- @param mapView The map view rendering the shape annotation.
- @param annotation The annotation being rendered.
- @return An alpha value between 0 and 1.0.
- */
-- (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation;
+- (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation __attribute__((deprecated("Use -mapView:strokeColorForShapeAnnotation: or -mapView:fillColorForPolygonAnnotation:.")));
 
 /**
  Returns the color to use when rendering the outline of a shape annotation.
  
  The default stroke color is the selected menu item color. If a pattern color is
  specified, the result is undefined.
+ 
+ Opacity may be set by specifying an alpha component. The default alpha value is
+ `1.0` and results in a completely opaque stroke.
  
  @param mapView The map view rendering the shape annotation.
  @param annotation The annotation being rendered.
@@ -185,6 +178,9 @@ NS_ASSUME_NONNULL_BEGIN
  
  The default fill color is the selected menu item color. If a pattern color is
  specified, the result is undefined.
+ 
+ Opacity may be set by specifying an alpha component. The default alpha value is
+ `1.0` and results in a completely opaque shape.
  
  @param mapView The map view rendering the polygon annotation.
  @param annotation The annotation being rendered.

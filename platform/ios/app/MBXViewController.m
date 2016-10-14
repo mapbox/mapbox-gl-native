@@ -1123,11 +1123,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     return YES;
 }
 
-- (CGFloat)mapView:(__unused MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation
-{
-    return ([annotation isKindOfClass:[MGLPolygon class]] ? 0.5 : 1.0);
-}
-
 - (UIColor *)mapView:(__unused MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation
 {
     return ([annotation isKindOfClass:[MGLPolyline class]] ? [UIColor purpleColor] : [UIColor blackColor]);
@@ -1135,7 +1130,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 - (UIColor *)mapView:(__unused MGLMapView *)mapView fillColorForPolygonAnnotation:(__unused MGLPolygon *)annotation
 {
-    return (annotation.pointCount > 3 ? [UIColor greenColor] : [UIColor redColor]);
+    UIColor *color = annotation.pointCount > 3 ? [UIColor greenColor] : [UIColor redColor];
+    return [color colorWithAlphaComponent:0.5];
 }
 
 - (void)mapView:(__unused MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(__unused BOOL)animated
