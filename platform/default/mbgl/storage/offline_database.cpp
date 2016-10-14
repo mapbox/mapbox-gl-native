@@ -85,7 +85,7 @@ void OfflineDatabase::ensureSchema() {
         db->exec("PRAGMA journal_mode = DELETE");
         db->exec("PRAGMA synchronous = FULL");
         db->exec(schema);
-        db->exec("PRAGMA user_version = 5");
+        db->exec("PRAGMA user_version = 6");
     } catch (...) {
         Log::Error(Event::Database, "Unexpected error creating database schema: %s", util::toString(std::current_exception()).c_str());
         throw;
