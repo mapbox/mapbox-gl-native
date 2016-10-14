@@ -827,7 +827,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 - (NSColor *)mapView:(MGLMapView *)mapView fillColorForPolygonAnnotation:(MGLPolygon *)annotation {
-    return [NSColor colorWithWhite:0 alpha:0.8];
+    NSColor *color = [[NSColor selectedMenuItemColor] colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+    return [color colorWithAlphaComponent:0.8];
 }
 
 @end
