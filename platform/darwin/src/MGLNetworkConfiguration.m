@@ -1,5 +1,4 @@
 #import "MGLNetworkConfiguration_Private.h"
-#import "NSBundle+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 
 @interface MGLNetworkConfiguration ()
@@ -40,10 +39,6 @@
 }
 
 + (void)setAPIBaseURL:(NSURL *)apiBaseURL {
-    if (!apiBaseURL.absoluteString.length) {
-        return;
-    }
-
     [MGLNetworkConfiguration sharedManager].apiBaseURL = apiBaseURL;
 }
 

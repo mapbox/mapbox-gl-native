@@ -175,7 +175,9 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
         }
     } else if ([keyPath isEqualToString:@"apiBaseURL"] && object == [MGLNetworkConfiguration sharedManager]) {
         NSURL *apiBaseURL = change[NSKeyValueChangeNewKey];
-        if (![apiBaseURL isKindOfClass:[NSNull class]]) {
+        if ([apiBaseURL isKindOfClass:[NSNull class]]) {
+            self.mbglFileSource->setAPIBaseURL(mbgl::util::API_BASE_URL);
+        } else {
             self.mbglFileSource->setAPIBaseURL(apiBaseURL.absoluteString.UTF8String);
         }
     } else {
