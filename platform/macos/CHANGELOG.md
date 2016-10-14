@@ -30,6 +30,7 @@
 * Database errors are now logged to the console. ([#6291](https://github.com/mapbox/mapbox-gl-native/pull/6291))
 * Improved style parsing performance. ([#6170](https://github.com/mapbox/mapbox-gl-native/pull/6170))
 * Fixed a typo in the documentation for the MGLCompassDirectionFormatter class. ([#5879](https://github.com/mapbox/mapbox-gl-native/pull/5879))
+* Deprecated `-[MGLMapViewDelegate mapView:alphaForShapeAnnotation:]` in favor of specifying an alpha component via `-[MGLMapViewDelegate mapView:strokeColorForShapeAnnotation:]` or `-[MGLMapViewDelegate mapView:fillColorForPolygonAnnotation:]`. ([#6706](https://github.com/mapbox/mapbox-gl-native/pull/6706))
 
 ## 0.2.1 - July 19, 2016
 
