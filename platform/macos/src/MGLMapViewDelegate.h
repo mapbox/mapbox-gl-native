@@ -165,7 +165,7 @@ NS_ASSUME_NONNULL_BEGIN
  specified, the result is undefined.
  
  Opacity may be set by specifying an alpha component. The default alpha value is
- `1.0` and results in a completely opaque shape.
+ `1.0` and results in a completely opaque stroke.
  
  @param mapView The map view rendering the shape annotation.
  @param annotation The annotation being rendered.
