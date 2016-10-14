@@ -3,7 +3,6 @@ package com.mapbox.weartestapp.activity;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 
-import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -27,7 +26,6 @@ public class SimpleMapViewActivity extends WearableActivity {
         // Customize map with markers, polylines, etc.
       }
     });
-
   }
 
   @Override

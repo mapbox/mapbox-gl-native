@@ -20,7 +20,6 @@ public class OffsettingHelper extends DefaultOffsettingHelper {
   public void updateChild(View child, WearableRecyclerView parent) {
     super.updateChild(child, parent);
 
-
     // Figure out % progress from top to bottom
     float centerOffset = ((float) child.getHeight() / 2.0f) / (float) parent.getHeight();
     float yRelativeToCenterOffset = (child.getY() / parent.getHeight()) + centerOffset;

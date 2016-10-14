@@ -11,15 +11,15 @@ import android.widget.TextView;
 import com.mapbox.weartestapp.R;
 import com.mapbox.weartestapp.model.Feature;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class FeatureAdapter extends WearableRecyclerView.Adapter<FeatureAdapter.ViewHolder> {
 
-  private ArrayList<Feature> data;
+  private List<Feature> data;
   private Context context;
   private ItemSelectedListener itemSelectedListener;
 
-  public FeatureAdapter(Context context, ArrayList<Feature> data) {
+  public FeatureAdapter(Context context, List<Feature> data) {
     this.context = context;
     this.data = data;
   }
