@@ -1,6 +1,6 @@
-#import "MGLNetworkConfiguration.h"
+#import <Foundation/Foundation.h>
 
-@interface MGLNetworkConfiguration (Private)
+@interface MGLNetworkConfiguration : NSObject
 
 /// Returns the shared instance of the `MGLNetworkConfiguration` class.
 + (instancetype)sharedManager;

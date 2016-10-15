@@ -1,12 +1,6 @@
 #import "MGLNetworkConfiguration_Private.h"
 #import "NSProcessInfo+MGLAdditions.h"
 
-@interface MGLNetworkConfiguration ()
-
-@property (atomic) NSURL *apiBaseURL;
-
-@end
-
 @implementation MGLNetworkConfiguration
 
 + (void)load {

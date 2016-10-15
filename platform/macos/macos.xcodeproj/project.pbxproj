@@ -184,7 +184,6 @@
 		DAE6C3D61CC34C9900DB3429 /* MGLStyleTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAE6C3CC1CC34BD800DB3429 /* MGLStyleTests.mm */; };
 		DAED385F1D62CED700D7640F /* NSURL+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DAED385D1D62CED700D7640F /* NSURL+MGLAdditions.h */; };
 		DAED38601D62CED700D7640F /* NSURL+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DAED385E1D62CED700D7640F /* NSURL+MGLAdditions.m */; };
-		DD0902B11DB1AC6400C5BDCE /* MGLNetworkConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = DD0902AE1DB1AC6400C5BDCE /* MGLNetworkConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DD0902B21DB1AC6400C5BDCE /* MGLNetworkConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0902AF1DB1AC6400C5BDCE /* MGLNetworkConfiguration.m */; };
 		DD0902B31DB1AC6400C5BDCE /* MGLNetworkConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DD0902B01DB1AC6400C5BDCE /* MGLNetworkConfiguration_Private.h */; };
 		DD0902B51DB1ACE900C5BDCE /* MGLNetworkConfigurationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0902B41DB1ACE900C5BDCE /* MGLNetworkConfigurationTests.m */; };
@@ -425,7 +424,6 @@
 		DAE6C3CC1CC34BD800DB3429 /* MGLStyleTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLStyleTests.mm; path = ../../darwin/test/MGLStyleTests.mm; sourceTree = "<group>"; };
 		DAED385D1D62CED700D7640F /* NSURL+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+MGLAdditions.h"; sourceTree = "<group>"; };
 		DAED385E1D62CED700D7640F /* NSURL+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+MGLAdditions.m"; sourceTree = "<group>"; };
-		DD0902AE1DB1AC6400C5BDCE /* MGLNetworkConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration.h; sourceTree = "<group>"; };
 		DD0902AF1DB1AC6400C5BDCE /* MGLNetworkConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfiguration.m; sourceTree = "<group>"; };
 		DD0902B01DB1AC6400C5BDCE /* MGLNetworkConfiguration_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration_Private.h; sourceTree = "<group>"; };
 		DD0902B41DB1ACE900C5BDCE /* MGLNetworkConfigurationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLNetworkConfigurationTests.m; path = ../../darwin/test/MGLNetworkConfigurationTests.m; sourceTree = "<group>"; };
@@ -814,7 +812,6 @@
 				DAE6C34A1CC31E0400DB3429 /* MGLAccountManager.h */,
 				DAE6C36A1CC31E2A00DB3429 /* MGLAccountManager_Private.h */,
 				DAE6C36B1CC31E2A00DB3429 /* MGLAccountManager.m */,
-				DD0902AE1DB1AC6400C5BDCE /* MGLNetworkConfiguration.h */,
 				DD0902B01DB1AC6400C5BDCE /* MGLNetworkConfiguration_Private.h */,
 				DD0902AF1DB1AC6400C5BDCE /* MGLNetworkConfiguration.m */,
 				DAE6C34D1CC31E0400DB3429 /* MGLMapCamera.h */,
@@ -888,7 +885,6 @@
 				DAE6C3611CC31E0400DB3429 /* MGLOfflineStorage.h in Headers */,
 				352742781D4C220900A1ECE6 /* MGLStyleAttributeValue.h in Headers */,
 				DAE6C35E1CC31E0400DB3429 /* MGLMultiPoint.h in Headers */,
-				DD0902B11DB1AC6400C5BDCE /* MGLNetworkConfiguration.h in Headers */,
 				35602BFF1D3EA9B40050646F /* MGLStyleLayer_Private.h in Headers */,
 				DAE6C3971CC31E2A00DB3429 /* NSBundle+MGLAdditions.h in Headers */,
 				DAED385F1D62CED700D7640F /* NSURL+MGLAdditions.h in Headers */,
