@@ -55,6 +55,23 @@ TEST(Annotations, SymbolAnnotation) {
     EXPECT_EQ(features.size(), 1u);
 }
 
+TEST(Annotations, SymbolAnnotationAcrossTiles) {
+    AnnotationTest test;
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+
+    for (int longitude = -5; longitude <= 5; ++longitude) {
+        for (int latitude = -5; latitude <= 5; ++latitude) {
+            test.map.addAnnotation(SymbolAnnotation { { double(latitude), double(longitude) }, "default_marker" });
+        }
+    }
+
+    test.map.setZoom(3.5);
+    test.map.setPitch(60);
+    test.checkRendering("symbol_annotation_across_tiles");
+}
+
 TEST(Annotations, LineAnnotation) {
     AnnotationTest test;
 

@@ -159,7 +159,14 @@ std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const Canonic
 
     AnnotationTileLayer& pointLayer = tileData->layers.emplace(PointLayerID, PointLayerID).first->second;
 
-    symbolTree.query(bgi::intersects(LatLngBounds { tileID }),
+    // Simulate tile buffer by augmenting the bounds for each tile on a
+    // constant ratio i.e. 1/8:
+    static const double ratio = 1.0 / 8.0;
+    auto bounds = LatLngBounds { tileID };
+    auto offset = LatLng { (bounds.north() - bounds.south()) * ratio, (bounds.east() - bounds.west()) * ratio };
+    bounds.extend(LatLng { bounds.south() - offset.latitude, bounds.west() - offset.longitude });
+    bounds.extend(LatLng { bounds.north() + offset.latitude, bounds.east() + offset.longitude });
+    symbolTree.query(bgi::intersects(bounds),
         boost::make_function_output_iterator([&](const auto& val){
             val->updateLayer(tileID, pointLayer, state);
         }));
