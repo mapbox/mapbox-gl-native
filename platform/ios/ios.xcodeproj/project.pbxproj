@@ -782,7 +782,7 @@
 		DD0902A11DB18DE700C5BDCE /* MGLNetworkConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration.h; sourceTree = "<group>"; };
 		DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfiguration.m; sourceTree = "<group>"; };
 		DD0902A41DB18F1B00C5BDCE /* MGLNetworkConfiguration_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration_Private.h; sourceTree = "<group>"; };
-		DD0902AC1DB1A1AD00C5BDCE /* MGLNetworkConfigurationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfigurationTests.m; sourceTree = "<group>"; };
+		DD0902AC1DB1A1AD00C5BDCE /* MGLNetworkConfigurationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLNetworkConfigurationTests.m; path = ../../darwin/test/MGLNetworkConfigurationTests.m; sourceTree = "<group>"; };
 		DD4823721D94AE6C00EB71B7 /* fill_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = fill_filter_style.json; sourceTree = "<group>"; };
 		DD4823731D94AE6C00EB71B7 /* line_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = line_filter_style.json; sourceTree = "<group>"; };
 		DD4823741D94AE6C00EB71B7 /* numeric_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = numeric_filter_style.json; sourceTree = "<group>"; };
