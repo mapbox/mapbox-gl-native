@@ -252,41 +252,31 @@ void OfflineDownload::ensureResource(const Resource& resource,
     auto workRequestsIt = requests.insert(requests.begin(), nullptr);
     *workRequestsIt = util::RunLoop::Get()->invokeCancellable([=]() {
         requests.erase(workRequestsIt);
-
-        if (callback) {
-            optional<std::pair<Response, uint64_t>> offlineResponse =
-                offlineDatabase.getRegionResource(id, resource);
-            if (offlineResponse) {
-                if (callback) {
-                    callback(offlineResponse->first);
-                }
-
-                status.completedResourceCount++;
-                status.completedResourceSize += offlineResponse->second;
-                if (resource.kind == Resource::Kind::Tile) {
-                    status.completedTileCount += 1;
-                    status.completedTileSize += offlineResponse->second;
-                }
-
-                observer->statusChanged(status);
-                continueDownload();
-                return;
+        
+        auto getResourceSizeInDatabase = [&] () -> optional<int64_t> {
+            if (!callback) {
+                return offlineDatabase.hasRegionResource(id, resource);
             }
-        } else {
-            // without callback - only fetch if resource exist and the size of it
-            optional<int64_t> offlineResponse = offlineDatabase.hasRegionResource(id, resource);
-            if (offlineResponse) {
-                status.completedResourceCount++;
-                status.completedResourceSize += *offlineResponse;
-                if (resource.kind == Resource::Kind::Tile) {
-                    status.completedTileCount += 1;
-                    status.completedTileSize += *offlineResponse;
-                }
-
-                observer->statusChanged(status);
-                continueDownload();
-                return;
+            optional<std::pair<Response, uint64_t>> response = offlineDatabase.getRegionResource(id, resource);
+            if (!response) {
+                return {};
             }
+            callback(response->first);
+            return response->second;
+        };
+        
+        optional<int64_t> offlineResponse = getResourceSizeInDatabase();
+        if (offlineResponse) {
+            status.completedResourceCount++;
+            status.completedResourceSize += *offlineResponse;
+            if (resource.kind == Resource::Kind::Tile) {
+                status.completedTileCount += 1;
+                status.completedTileSize += *offlineResponse;
+            }
+
+            observer->statusChanged(status);
+            continueDownload();
+            return;
         }
 
         if (checkTileCountLimit(resource)) {

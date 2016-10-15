@@ -496,6 +496,59 @@ TEST(OfflineDatabase, GetRegionCompletedStatus) {
     EXPECT_EQ(tileSize, status3.completedTileSize);
 }
 
+TEST(OfflineDatabase, HasRegionResource) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
+    OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
+
+    EXPECT_FALSE(bool(db.hasRegionResource(region.getID(), Resource::style("http://example.com/1"))));
+    EXPECT_FALSE(bool(db.hasRegionResource(region.getID(), Resource::style("http://example.com/20"))));
+
+    Response response;
+    response.data = randomString(1024);
+
+    for (uint32_t i = 1; i <= 100; i++) {
+        db.putRegionResource(region.getID(), Resource::style("http://example.com/"s + util::toString(i)), response);
+    }
+
+    EXPECT_TRUE(bool(db.hasRegionResource(region.getID(), Resource::style("http://example.com/1"))));
+    EXPECT_TRUE(bool(db.hasRegionResource(region.getID(), Resource::style("http://example.com/20"))));
+    EXPECT_EQ(1024, *(db.hasRegionResource(region.getID(), Resource::style("http://example.com/20"))));
+}
+
+TEST(OfflineDatabase, HasRegionResourceTile) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
+    OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
+
+    Resource resource { Resource::Tile, "http://example.com/" };
+    resource.tileData = Resource::TileData {
+        "http://example.com/",
+        1,
+        0,
+        0,
+        0
+    };
+    Response response;
+
+    response.data = std::make_shared<std::string>("first");
+
+    EXPECT_FALSE(bool(db.hasRegionResource(region.getID(), resource)));
+    db.putRegionResource(region.getID(), resource, response);
+    EXPECT_TRUE(bool(db.hasRegionResource(region.getID(), resource)));
+    EXPECT_EQ(5, *(db.hasRegionResource(region.getID(), resource)));
+
+    OfflineRegion anotherRegion = db.createRegion(definition, OfflineRegionMetadata());
+    EXPECT_LT(region.getID(), anotherRegion.getID());
+    EXPECT_TRUE(bool(db.hasRegionResource(anotherRegion.getID(), resource)));
+    EXPECT_EQ(5, *(db.hasRegionResource(anotherRegion.getID(), resource)));
+
+}
+
 TEST(OfflineDatabase, OfflineMapboxTileCount) {
     using namespace mbgl;
 

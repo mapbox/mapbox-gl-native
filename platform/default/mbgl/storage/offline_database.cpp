@@ -255,8 +255,7 @@ optional<int64_t> OfflineDatabase::hasResource(const Resource& resource) {
         return {};
     }
 
-    optional<int64_t> size = stmt->get<optional<int64_t>>(0);
-    return size;
+    return stmt->get<optional<int64_t>>(0);
 }
 
 bool OfflineDatabase::putResource(const Resource& resource,
@@ -431,8 +430,7 @@ optional<int64_t> OfflineDatabase::hasTile(const Resource::TileData& tile) {
         return {};
     }
 
-    optional<int64_t> size = stmt->get<optional<int64_t>>(0);
-    return size;
+    return stmt->get<optional<int64_t>>(0);
 }
 
 bool OfflineDatabase::putTile(const Resource::TileData& tile,
