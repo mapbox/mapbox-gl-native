@@ -298,8 +298,7 @@ void SymbolLayout::addFeature(const GeometryCollection &lines,
             // be drawn across tile boundaries. Instead they need to be included in
             // the buffers for both tiles and clipped to tile boundaries at draw time.
             //
-            // TODO remove the `&& false` when is #1673 implemented
-            const bool addToBuffers = (mode == MapMode::Still) || inside || (mayOverlap && false);
+            const bool addToBuffers = inside || mayOverlap;
 
             symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers, symbolInstances.size(),
                     textBoxScale, textPadding, textPlacement,

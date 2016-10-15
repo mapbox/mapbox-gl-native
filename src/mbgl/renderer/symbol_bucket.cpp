@@ -63,7 +63,8 @@ bool SymbolBucket::hasCollisionBoxData() const {
 }
 
 bool SymbolBucket::needsClipping() const {
-    return mode == MapMode::Still;
+    return layout.iconAllowOverlap || layout.iconIgnorePlacement ||
+           layout.textAllowOverlap || layout.textIgnorePlacement;
 }
 
 void SymbolBucket::drawGlyphs(SymbolSDFShader& shader,
