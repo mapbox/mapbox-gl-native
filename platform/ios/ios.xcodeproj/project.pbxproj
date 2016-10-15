@@ -417,6 +417,7 @@
 		DD0902A91DB1929D00C5BDCE /* MGLNetworkConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */; };
 		DD0902AA1DB1929D00C5BDCE /* MGLNetworkConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */; };
 		DD0902AB1DB192A800C5BDCE /* MGLNetworkConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DD0902A41DB18F1B00C5BDCE /* MGLNetworkConfiguration_Private.h */; };
+		DD0902AD1DB1A1AD00C5BDCE /* MGLNetworkConfigurationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0902AC1DB1A1AD00C5BDCE /* MGLNetworkConfigurationTests.m */; };
 		DD4823751D94AE6C00EB71B7 /* fill_filter_style.json in Resources */ = {isa = PBXBuildFile; fileRef = DD4823721D94AE6C00EB71B7 /* fill_filter_style.json */; };
 		DD4823761D94AE6C00EB71B7 /* line_filter_style.json in Resources */ = {isa = PBXBuildFile; fileRef = DD4823731D94AE6C00EB71B7 /* line_filter_style.json */; };
 		DD4823771D94AE6C00EB71B7 /* numeric_filter_style.json in Resources */ = {isa = PBXBuildFile; fileRef = DD4823741D94AE6C00EB71B7 /* numeric_filter_style.json */; };
@@ -781,6 +782,7 @@
 		DD0902A11DB18DE700C5BDCE /* MGLNetworkConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration.h; sourceTree = "<group>"; };
 		DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfiguration.m; sourceTree = "<group>"; };
 		DD0902A41DB18F1B00C5BDCE /* MGLNetworkConfiguration_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration_Private.h; sourceTree = "<group>"; };
+		DD0902AC1DB1A1AD00C5BDCE /* MGLNetworkConfigurationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfigurationTests.m; sourceTree = "<group>"; };
 		DD4823721D94AE6C00EB71B7 /* fill_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = fill_filter_style.json; sourceTree = "<group>"; };
 		DD4823731D94AE6C00EB71B7 /* line_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = line_filter_style.json; sourceTree = "<group>"; };
 		DD4823741D94AE6C00EB71B7 /* numeric_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = numeric_filter_style.json; sourceTree = "<group>"; };
@@ -1083,6 +1085,7 @@
 				DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */,
 				DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */,
 				35E208A61D24210F00EC9A46 /* MGLNSDataAdditionsTests.m */,
+				DD0902AC1DB1A1AD00C5BDCE /* MGLNetworkConfigurationTests.m */,
 				DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.m */,
 				DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */,
 				DA2E885F1CC0382C00F24E7B /* MGLOfflineStorageTests.m */,
@@ -1936,6 +1939,7 @@
 				357579831D502AE6000B822E /* MGLRasterStyleLayerTests.m in Sources */,
 				353D23961D0B0DFE002BE09D /* MGLAnnotationViewTests.m in Sources */,
 				35E208A71D24210F00EC9A46 /* MGLNSDataAdditionsTests.m in Sources */,
+				DD0902AD1DB1A1AD00C5BDCE /* MGLNetworkConfigurationTests.m in Sources */,
 				DA0CD5901CF56F6A00A5F5A5 /* MGLFeatureTests.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
