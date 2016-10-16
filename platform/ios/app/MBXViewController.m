@@ -61,6 +61,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingFilteredFill,
     MBXSettingsRuntimeStylingFilteredLines,
     MBXSettingsRuntimeStylingNumericFilteredFill,
+    MBXSettingsRuntimeStylingStyleQuery,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
@@ -304,6 +305,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Style Fill With Filter",
                 @"Style Lines With Filter",
                 @"Style Fill With Numeric Filter",
+                @"Style Query For GeoJSON",
             ]];
             break;
         case MBXSettingsMiscellaneous:
@@ -428,6 +430,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingNumericFilteredFill:
                     [self styleNumericFilteredFills];
+                    break;
+                case MBXSettingsRuntimeStylingStyleQuery:
+                    [self styleQuery];
                     break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
@@ -785,6 +790,40 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     });
 }
 
+
+- (void)styleQuery
+{
+    CGRect queryRect = CGRectInset(self.mapView.bounds, 100, 200);
+    NSArray *features = [self.mapView visibleFeaturesInRect:queryRect];
+    
+    NSString *querySourceID = @"query-source-id";
+    NSString *queryLayerID = @"query-layer-id";
+    
+    // RTE if you don't remove the layer first
+    // RTE if you pass a nill layer to remove layer
+    MGLStyleLayer *layer = [self.mapView.style layerWithIdentifier:queryLayerID];
+    if (layer) {
+        [self.mapView.style removeLayer:layer];
+    }
+    
+    // RTE if you pass a nill source to remove source
+    MGLSource *source = [self.mapView.style sourceWithIdentifier:querySourceID];
+    if (source) {
+        [self.mapView.style removeSource:source];
+    }
+    
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:querySourceID features:features options:nil];
+        [self.mapView.style addSource:source];
+        
+        MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:queryLayerID source:source];
+        fillLayer.fillColor = [UIColor blueColor];
+        fillLayer.fillOpacity = @(0.5);
+        [self.mapView.style addLayer:fillLayer];
+    });
+}
+
 - (IBAction)startWorldTour
 {
     _isTouringWorld = YES;
@@ -1084,11 +1123,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     return YES;
 }
 
-- (CGFloat)mapView:(__unused MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation
-{
-    return ([annotation isKindOfClass:[MGLPolygon class]] ? 0.5 : 1.0);
-}
-
 - (UIColor *)mapView:(__unused MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation
 {
     return ([annotation isKindOfClass:[MGLPolyline class]] ? [UIColor purpleColor] : [UIColor blackColor]);
@@ -1096,7 +1130,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 - (UIColor *)mapView:(__unused MGLMapView *)mapView fillColorForPolygonAnnotation:(__unused MGLPolygon *)annotation
 {
-    return (annotation.pointCount > 3 ? [UIColor greenColor] : [UIColor redColor]);
+    UIColor *color = annotation.pointCount > 3 ? [UIColor greenColor] : [UIColor redColor];
+    return [color colorWithAlphaComponent:0.5];
 }
 
 - (void)mapView:(__unused MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(__unused BOOL)animated

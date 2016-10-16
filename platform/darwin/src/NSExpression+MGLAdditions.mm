@@ -61,4 +61,30 @@
     return { };
 }
 
+- (mbgl::FeatureIdentifier)mgl_featureIdentifier
+{
+    id value = self.constantValue;
+    mbgl::Value mbglValue = [self mgl_filterValue];
+    
+    if ([value isKindOfClass:NSString.class]) {
+        return mbglValue.get<std::string>();
+    } else if ([value isKindOfClass:NSNumber.class]) {
+        NSNumber *number = (NSNumber *)value;
+        if ((strcmp([number objCType], @encode(char)) == 0) ||
+            (strcmp([number objCType], @encode(BOOL)) == 0)) {
+            return mbglValue.get<bool>();
+        } else if ( strcmp([number objCType], @encode(double)) == 0 ||
+                    strcmp([number objCType], @encode(float)) == 0) {
+            return mbglValue.get<double>();
+        } else if ([number compare:@(0)] == NSOrderedDescending ||
+                   [number compare:@(0)] == NSOrderedSame) {
+            return mbglValue.get<uint64_t>();
+        } else if ([number compare:@(0)] == NSOrderedAscending) {
+            return mbglValue.get<int64_t>();
+        }
+    }
+    
+    return {};
+}
+
 @end

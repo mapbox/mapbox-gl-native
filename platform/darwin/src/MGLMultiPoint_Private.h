@@ -3,6 +3,7 @@
 #import "MGLGeometry.h"
 
 #import <mbgl/annotation/annotation.hpp>
+#import <mbgl/util/feature.hpp>
 #import <vector>
 
 #import <CoreGraphics/CoreGraphics.h>

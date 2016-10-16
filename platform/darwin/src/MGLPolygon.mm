@@ -3,6 +3,8 @@
 #import "MGLMultiPoint_Private.h"
 #import "MGLGeometry_Private.h"
 
+#import "MGLPolygon+MGLAdditions.h"
+
 @implementation MGLPolygon
 
 @dynamic overlayBounds;
@@ -36,6 +38,15 @@
     return result;
 }
 
+- (mbgl::Feature)featureObject {
+    mbgl::Polygon<double> geometry;
+    geometry.push_back(self.ring);
+    for (MGLPolygon *polygon in self.interiorPolygons) {
+        geometry.push_back(polygon.ring);
+    }
+    return mbgl::Feature{geometry};
+}
+
 - (mbgl::Annotation)annotationObjectWithDelegate:(id <MGLMultiPointDelegate>)delegate {
     mbgl::Polygon<double> geometry;
     geometry.push_back(self.ring);
@@ -49,6 +60,11 @@
     annotation.color = { [delegate fillColorForPolygonAnnotation:self] };
 
     return annotation;
+}
+
+- (NSDictionary *)geoJSONDictionary {
+    return @{@"type": @"Polygon",
+             @"coordinates": self.mgl_coordinates};
 }
 
 @end
@@ -85,6 +101,29 @@
 
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
     return MGLLatLngBoundsFromCoordinateBounds(_overlayBounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
+}
+
+- (mbgl::Feature)featureObject {
+    mbgl::MultiPolygon<double> multiPolygon;
+    multiPolygon.reserve(self.polygons.count);
+    for (MGLPolygon *polygon in self.polygons) {
+        mbgl::Polygon<double> geometry;
+        geometry.push_back(polygon.ring);
+        for (MGLPolygon *interiorPolygon in polygon.interiorPolygons) {
+            geometry.push_back(interiorPolygon.ring);
+        }
+        multiPolygon.push_back(geometry);
+    }
+    return mbgl::Feature {multiPolygon};
+}
+
+- (NSDictionary *)geoJSONDictionary {
+    NSMutableArray *coordinates = [[NSMutableArray alloc] initWithCapacity:self.polygons.count];
+    for (MGLPolygonFeature *feature in self.polygons) {
+        [coordinates addObject: feature.mgl_coordinates];
+    }
+    return @{@"type": @"MultiPolygon",
+             @"coordinates": coordinates};
 }
 
 @end

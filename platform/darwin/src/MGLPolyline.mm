@@ -3,6 +3,8 @@
 #import "MGLMultiPoint_Private.h"
 #import "MGLGeometry_Private.h"
 
+#import "MGLPolyline+MGLAdditions.h"
+
 @implementation MGLPolyline
 
 @dynamic overlayBounds;
@@ -13,22 +15,35 @@
     return [[self alloc] initWithCoordinates:coords count:count];
 }
 
-- (mbgl::Annotation)annotationObjectWithDelegate:(id <MGLMultiPointDelegate>)delegate {
+- (mbgl::LineString<double>)lineString {
     NSUInteger count = self.pointCount;
     CLLocationCoordinate2D *coordinates = self.coordinates;
-
+    
     mbgl::LineString<double> geometry;
     geometry.reserve(self.pointCount);
     for (NSUInteger i = 0; i < count; i++) {
         geometry.push_back(mbgl::Point<double>(coordinates[i].longitude, coordinates[i].latitude));
     }
+    
+    return geometry;
+}
 
-    mbgl::LineAnnotation annotation { geometry };
+- (mbgl::Annotation)annotationObjectWithDelegate:(id <MGLMultiPointDelegate>)delegate {
+    mbgl::LineAnnotation annotation { [self lineString] };
     annotation.opacity = { static_cast<float>([delegate alphaForShapeAnnotation:self]) };
     annotation.color = { [delegate strokeColorForShapeAnnotation:self] };
     annotation.width = { static_cast<float>([delegate lineWidthForPolylineAnnotation:self]) };
 
     return annotation;
+}
+
+- (mbgl::Feature)featureObject {
+    return mbgl::Feature {[self lineString]};    
+}
+
+- (NSDictionary *)geoJSONDictionary {
+    return @{@"type": @"LineString",
+             @"coordinates": self.mgl_coordinates};
 }
 
 @end
@@ -65,6 +80,24 @@
 
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
     return MGLLatLngBoundsFromCoordinateBounds(_overlayBounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
+}
+
+- (mbgl::Feature)featureObject {
+    mbgl::MultiLineString<double> multiLineString;
+    multiLineString.reserve(self.polylines.count);
+    for (MGLPolyline *polyline in self.polylines) {
+        multiLineString.push_back([polyline lineString]);
+    }
+    return mbgl::Feature {multiLineString};
+}
+
+- (NSDictionary *)geoJSONDictionary {
+    NSMutableArray *coordinates = [NSMutableArray array];
+    for (MGLPolylineFeature *feature in self.polylines) {
+        [coordinates addObject: feature.mgl_coordinates];
+    }    
+    return @{@"type": @"MultiLineString",
+             @"coordinates": coordinates};
 }
 
 @end
