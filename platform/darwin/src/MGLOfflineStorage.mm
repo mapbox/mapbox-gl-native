@@ -2,6 +2,7 @@
 
 #import "MGLAccountManager_Private.h"
 #import "MGLGeometry_Private.h"
+#import "MGLNetworkConfiguration.h"
 #import "MGLOfflinePack_Private.h"
 #import "MGLOfflineRegion_Private.h"
 #import "MGLTilePyramidOfflineRegion.h"
@@ -127,6 +128,13 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
 
         _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [NSBundle mainBundle].resourceURL.path.UTF8String);
 
+        // Observe for changes to the API base URL (and find out the current one).
+        [[MGLNetworkConfiguration sharedManager] addObserver:self
+                                                  forKeyPath:@"apiBaseURL"
+                                                     options:(NSKeyValueObservingOptionInitial |
+                                                              NSKeyValueObservingOptionNew)
+                                                     context:NULL];
+
         // Observe for changes to the global access token (and find out the current one).
         [[MGLAccountManager sharedManager] addObserver:self
                                             forKeyPath:@"accessToken"
@@ -147,6 +155,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
 }
 
 - (void)dealloc {
+    [[MGLNetworkConfiguration sharedManager] removeObserver:self forKeyPath:@"apiBaseURL"];
     [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
     
     for (MGLOfflinePack *pack in self.packs) {
@@ -163,6 +172,13 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
         NSString *accessToken = change[NSKeyValueChangeNewKey];
         if (![accessToken isKindOfClass:[NSNull class]]) {
             self.mbglFileSource->setAccessToken(accessToken.UTF8String);
+        }
+    } else if ([keyPath isEqualToString:@"apiBaseURL"] && object == [MGLNetworkConfiguration sharedManager]) {
+        NSURL *apiBaseURL = change[NSKeyValueChangeNewKey];
+        if ([apiBaseURL isKindOfClass:[NSNull class]]) {
+            self.mbglFileSource->setAPIBaseURL(mbgl::util::API_BASE_URL);
+        } else {
+            self.mbglFileSource->setAPIBaseURL(apiBaseURL.absoluteString.UTF8String);
         }
     } else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
