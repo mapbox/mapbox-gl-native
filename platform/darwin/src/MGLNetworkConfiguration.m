@@ -1,4 +1,4 @@
-#import "MGLNetworkConfiguration_Private.h"
+#import "MGLNetworkConfiguration.h"
 #import "NSProcessInfo+MGLAdditions.h"
 
 @implementation MGLNetworkConfiguration
