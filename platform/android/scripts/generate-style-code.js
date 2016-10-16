@@ -265,7 +265,7 @@ fs.writeFileSync(
 );
 
 //De-duplicate enum properties before processing jni property templates
-const enumPropertiesDeDup = _(enumProperties).uniq(global.propertyNativeType).value();
+const enumPropertiesDeDup = _(enumProperties).uniqBy(global.propertyNativeType).value();
 
 // JNI Enum property conversion templates
 const enumPropertyHppTypeStringValueTemplate = ejs.compile(fs.readFileSync('platform/android/src/style/conversion/types_string_values.hpp.ejs', 'utf8'), {strict: true});
