@@ -345,19 +345,23 @@ public class MarkerView extends Marker {
      * <p>
      * This method is used to instantiate the MarkerView and provide an instance of {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter}
      * </p>
+     * <p>
+     * This method is used to notify that a MarkerView is no longer active by setting a null value.
+     * </p>
      *
      * @param mapboxMap the MapboxMap instances
      */
     @Override
     public void setMapboxMap(MapboxMap mapboxMap) {
         super.setMapboxMap(mapboxMap);
+        if(mapboxMap!=null) {
+            if (isFlat()) {
+                // initial tilt value if MapboxMap is started with a tilt attribute
+                tiltValue = (float) mapboxMap.getCameraPosition().tilt;
+            }
 
-        if (isFlat()) {
-            // initial tilt value if MapboxMap is started with a tilt attribute
-            tiltValue = (float) mapboxMap.getCameraPosition().tilt;
+            markerViewManager = mapboxMap.getMarkerViewManager();
         }
-
-        markerViewManager = mapboxMap.getMarkerViewManager();
     }
 
     /**

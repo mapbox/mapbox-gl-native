@@ -146,7 +146,7 @@ public class MarkerViewActivity extends AppCompatActivity {
                     public void onMapChanged(@MapView.MapChange int change) {
                         if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
                             if (!markerViewManager.getMarkerViewAdapters().isEmpty() && viewCountView != null) {
-                                viewCountView.setText("ViewCache size " + (mapView.getChildCount() - 5));
+                                viewCountView.setText("ViewCache size " + mapView.getMarkerViewContainer().getChildCount());
                             }
                         }
                     }
@@ -194,6 +194,7 @@ public class MarkerViewActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         locationUpdateHandler.removeCallbacks(moveMarkerRunnable);
+        rotateUpdateHandler.removeCallbacks(rotateMarkerRunnable);
     }
 
     /**
