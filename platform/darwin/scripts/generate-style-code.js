@@ -227,20 +227,20 @@ global.setterImplementation = function(property, layerType) {
     let implementation = '';
     switch (property.type) {
         case 'boolean':
-            implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_boolPropertyValue);`;
+            implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mgl_boolPropertyValue);`;
             break;
         case 'number':
-            implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_floatPropertyValue);`;
+            implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mgl_floatPropertyValue);`;
             break;
         case 'string':
-            implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_stringPropertyValue);`;
+            implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mgl_stringPropertyValue);`;
             break;
         case 'enum':
             let objCType = global.objCType(layerType, property.name);
             implementation = `MGLSetEnumProperty(${objCName(property)}, ${camelize(property.name)}, ${mbglType(property)}, ${objCType});`;
             break;
         case 'color':
-            implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_colorPropertyValue);`;
+            implementation = `self.layer->set${camelize(property.name)}(${objCName(property)}.mgl_colorPropertyValue);`;
             break;
         case 'array':
             implementation = arraySetterImplementation(property);
@@ -262,23 +262,23 @@ global.mbglType = function(property) {
 }
 
 global.arraySetterImplementation = function(property) {
-    return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_${convertedType(property)}PropertyValue);`;
+    return `self.layer->set${camelize(property.name)}(${objCName(property)}.mgl_${convertedType(property)}PropertyValue);`;
 }
 
 global.styleAttributeFactory = function (property, layerType) {
     switch (property.type) {
         case 'boolean':
-            return 'mbgl_boolWithPropertyValueBool';
+            return 'mgl_boolWithPropertyValueBool';
         case 'number':
-            return 'mbgl_numberWithPropertyValueNumber';
+            return 'mgl_numberWithPropertyValueNumber';
         case 'string':
-            return 'mbgl_stringWithPropertyValueString';
+            return 'mgl_stringWithPropertyValueString';
         case 'enum':
             throw new Error('Use MGLGetEnumProperty() for enums.');
         case 'color':
-            return 'mbgl_colorWithPropertyValueColor';
+            return 'mgl_colorWithPropertyValueColor';
         case 'array':
-            return `mbgl_${convertedType(property)}WithPropertyValue${camelize(convertedType(property))}`;
+            return `mgl_${convertedType(property)}WithPropertyValue${camelize(convertedType(property))}`;
         default:
             throw new Error(`unknown type for ${property.name}`);
     }

@@ -6,8 +6,8 @@
 
 @interface NSNumber (MGLStyleAttributeAdditions_Private) <MGLStyleAttributeValue>
 
-- (mbgl::style::PropertyValue<bool>)mbgl_booleanPropertyValue;
+- (mbgl::style::PropertyValue<bool>)mgl_booleanPropertyValue;
 
-- (mbgl::style::PropertyValue<float>)mbgl_numberPropertyValue;
+- (mbgl::style::PropertyValue<float>)mgl_numberPropertyValue;
 
 @end

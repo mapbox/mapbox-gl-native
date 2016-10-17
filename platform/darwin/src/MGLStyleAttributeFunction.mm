@@ -22,17 +22,17 @@
     return YES;
 }
 
-- (mbgl::style::PropertyValue<mbgl::Color>)mbgl_colorPropertyValue
+- (mbgl::style::PropertyValue<mbgl::Color>)mgl_colorPropertyValue
 {
     __block std::vector<std::pair<float, mbgl::Color>> stops;
     [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, MGLColor * _Nonnull color, BOOL * _Nonnull stop) {
         NSAssert([color isKindOfClass:[MGLColor class]], @"Stops should be colors");
-        stops.emplace_back(zoomKey.floatValue, color.mbgl_color);
+        stops.emplace_back(zoomKey.floatValue, color.mgl_color);
     }];
     return mbgl::style::Function<mbgl::Color>({{stops}}, _base.floatValue);
 }
 
-- (mbgl::style::PropertyValue<float>)mbgl_floatPropertyValue
+- (mbgl::style::PropertyValue<float>)mgl_floatPropertyValue
 {
     __block std::vector<std::pair<float, float>> stops;
     [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSNumber * _Nonnull number, BOOL * _Nonnull stop) {
@@ -42,7 +42,7 @@
     return mbgl::style::Function<float>({{stops}}, _base.floatValue);
 }
 
-- (mbgl::style::PropertyValue<bool>)mbgl_boolPropertyValue
+- (mbgl::style::PropertyValue<bool>)mgl_boolPropertyValue
 {
     __block std::vector<std::pair<float, bool>> stops;
     [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSNumber * _Nonnull number, BOOL * _Nonnull stop) {
@@ -52,7 +52,7 @@
     return mbgl::style::Function<bool>({{stops}}, _base.floatValue);
 }
 
-- (mbgl::style::PropertyValue<std::string>)mbgl_stringPropertyValue
+- (mbgl::style::PropertyValue<std::string>)mgl_stringPropertyValue
 {
     __block std::vector<std::pair<float, std::string>> stops;
     [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSString * _Nonnull string, BOOL * _Nonnull stop) {
@@ -62,7 +62,7 @@
     return mbgl::style::Function<std::string>({{stops}}, _base.floatValue);
 }
 
-- (mbgl::style::PropertyValue<std::vector<std::string> >)mbgl_stringArrayPropertyValue
+- (mbgl::style::PropertyValue<std::vector<std::string> >)mgl_stringArrayPropertyValue
 {
     __block std::vector<std::pair<float, std::vector<std::string>>> stops;
     [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSArray *  _Nonnull strings, BOOL * _Nonnull stop) {
@@ -76,7 +76,7 @@
     return mbgl::style::Function<std::vector<std::string>>({{stops}}, _base.floatValue);
 }
 
-- (mbgl::style::PropertyValue<std::vector<float> >)mbgl_numberArrayPropertyValue
+- (mbgl::style::PropertyValue<std::vector<float> >)mgl_numberArrayPropertyValue
 {
     __block std::vector<std::pair<float, std::vector<float>>> stops;
     [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSArray *  _Nonnull numbers, BOOL * _Nonnull stop) {
@@ -90,7 +90,7 @@
     return mbgl::style::Function<std::vector<float>>({{stops}}, _base.floatValue);
 }
 
-- (mbgl::style::PropertyValue<std::array<float, 4> >)mbgl_paddingPropertyValue
+- (mbgl::style::PropertyValue<std::array<float, 4> >)mgl_paddingPropertyValue
 {
     __block std::vector<std::pair<float, std::array<float, 4>>> stops;
     [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSValue * _Nonnull padding, BOOL * _Nonnull stop) {
@@ -100,7 +100,7 @@
     return mbgl::style::Function<std::array<float, 4>>({{stops}}, _base.floatValue);
 }
 
-- (mbgl::style::PropertyValue<std::array<float, 2> >)mbgl_offsetPropertyValue
+- (mbgl::style::PropertyValue<std::array<float, 2> >)mgl_offsetPropertyValue
 {
     __block std::vector<std::pair<float, std::array<float, 2>>> stops;
     [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSValue * _Nonnull offset, BOOL * _Nonnull stop) {
@@ -116,7 +116,7 @@
     auto stops = property.getStops();
     NSMutableDictionary *convertedStops = [NSMutableDictionary dictionaryWithCapacity:stops.size()];
     for (auto stop : stops) {
-        convertedStops[@(stop.first)] = [MGLColor mbgl_colorWithColor:stop.second];
+        convertedStops[@(stop.first)] = [MGLColor mgl_colorWithColor:stop.second];
     }
     function.base = @(property.getBase());
     function.stops = convertedStops;

@@ -65,45 +65,45 @@
 }
 
 - (void)setLineMiterLimit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineMiterLimit {
-    self.layer->setLineMiterLimit(lineMiterLimit.mbgl_floatPropertyValue);
+    self.layer->setLineMiterLimit(lineMiterLimit.mgl_floatPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)lineMiterLimit {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getLineMiterLimit() ?: self.layer->getDefaultLineMiterLimit()];
+    return [MGLStyleAttribute mgl_numberWithPropertyValueNumber:self.layer->getLineMiterLimit() ?: self.layer->getDefaultLineMiterLimit()];
 }
 
 - (void)setLineRoundLimit:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineRoundLimit {
-    self.layer->setLineRoundLimit(lineRoundLimit.mbgl_floatPropertyValue);
+    self.layer->setLineRoundLimit(lineRoundLimit.mgl_floatPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)lineRoundLimit {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getLineRoundLimit() ?: self.layer->getDefaultLineRoundLimit()];
+    return [MGLStyleAttribute mgl_numberWithPropertyValueNumber:self.layer->getLineRoundLimit() ?: self.layer->getDefaultLineRoundLimit()];
 }
 
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setLineOpacity:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineOpacity {
-    self.layer->setLineOpacity(lineOpacity.mbgl_floatPropertyValue);
+    self.layer->setLineOpacity(lineOpacity.mgl_floatPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)lineOpacity {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getLineOpacity() ?: self.layer->getDefaultLineOpacity()];
+    return [MGLStyleAttribute mgl_numberWithPropertyValueNumber:self.layer->getLineOpacity() ?: self.layer->getDefaultLineOpacity()];
 }
 
 - (void)setLineColor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineColor {
-    self.layer->setLineColor(lineColor.mbgl_colorPropertyValue);
+    self.layer->setLineColor(lineColor.mgl_colorPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)lineColor {
-    return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->getLineColor() ?: self.layer->getDefaultLineColor()];
+    return [MGLStyleAttribute mgl_colorWithPropertyValueColor:self.layer->getLineColor() ?: self.layer->getDefaultLineColor()];
 }
 
 - (void)setLineTranslate:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineTranslate {
-    self.layer->setLineTranslate(lineTranslate.mbgl_offsetPropertyValue);
+    self.layer->setLineTranslate(lineTranslate.mgl_offsetPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)lineTranslate {
-    return [MGLStyleAttribute mbgl_offsetWithPropertyValueOffset:self.layer->getLineTranslate() ?: self.layer->getDefaultLineTranslate()];
+    return [MGLStyleAttribute mgl_offsetWithPropertyValueOffset:self.layer->getLineTranslate() ?: self.layer->getDefaultLineTranslate()];
 }
 
 - (void)setLineTranslateAnchor:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineTranslateAnchor {
@@ -115,51 +115,51 @@
 }
 
 - (void)setLineWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineWidth {
-    self.layer->setLineWidth(lineWidth.mbgl_floatPropertyValue);
+    self.layer->setLineWidth(lineWidth.mgl_floatPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)lineWidth {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getLineWidth() ?: self.layer->getDefaultLineWidth()];
+    return [MGLStyleAttribute mgl_numberWithPropertyValueNumber:self.layer->getLineWidth() ?: self.layer->getDefaultLineWidth()];
 }
 
 - (void)setLineGapWidth:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineGapWidth {
-    self.layer->setLineGapWidth(lineGapWidth.mbgl_floatPropertyValue);
+    self.layer->setLineGapWidth(lineGapWidth.mgl_floatPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)lineGapWidth {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getLineGapWidth() ?: self.layer->getDefaultLineGapWidth()];
+    return [MGLStyleAttribute mgl_numberWithPropertyValueNumber:self.layer->getLineGapWidth() ?: self.layer->getDefaultLineGapWidth()];
 }
 
 - (void)setLineOffset:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineOffset {
-    self.layer->setLineOffset(lineOffset.mbgl_floatPropertyValue);
+    self.layer->setLineOffset(lineOffset.mgl_floatPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)lineOffset {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getLineOffset() ?: self.layer->getDefaultLineOffset()];
+    return [MGLStyleAttribute mgl_numberWithPropertyValueNumber:self.layer->getLineOffset() ?: self.layer->getDefaultLineOffset()];
 }
 
 - (void)setLineBlur:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineBlur {
-    self.layer->setLineBlur(lineBlur.mbgl_floatPropertyValue);
+    self.layer->setLineBlur(lineBlur.mgl_floatPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)lineBlur {
-    return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->getLineBlur() ?: self.layer->getDefaultLineBlur()];
+    return [MGLStyleAttribute mgl_numberWithPropertyValueNumber:self.layer->getLineBlur() ?: self.layer->getDefaultLineBlur()];
 }
 
 - (void)setLineDasharray:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)lineDasharray {
-    self.layer->setLineDasharray(lineDasharray.mbgl_numberArrayPropertyValue);
+    self.layer->setLineDasharray(lineDasharray.mgl_numberArrayPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)lineDasharray {
-    return [MGLStyleAttribute mbgl_numberArrayWithPropertyValueNumberArray:self.layer->getLineDasharray() ?: self.layer->getDefaultLineDasharray()];
+    return [MGLStyleAttribute mgl_numberArrayWithPropertyValueNumberArray:self.layer->getLineDasharray() ?: self.layer->getDefaultLineDasharray()];
 }
 
 - (void)setLinePattern:(id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>)linePattern {
-    self.layer->setLinePattern(linePattern.mbgl_stringPropertyValue);
+    self.layer->setLinePattern(linePattern.mgl_stringPropertyValue);
 }
 
 - (id <MGLStyleAttributeValue>)linePattern {
-    return [MGLStyleAttribute mbgl_stringWithPropertyValueString:self.layer->getLinePattern() ?: self.layer->getDefaultLinePattern()];
+    return [MGLStyleAttribute mgl_stringWithPropertyValueString:self.layer->getLinePattern() ?: self.layer->getDefaultLinePattern()];
 }
 
 @end

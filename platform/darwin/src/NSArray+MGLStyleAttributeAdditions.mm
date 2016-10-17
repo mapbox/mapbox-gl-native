@@ -10,7 +10,7 @@
 
 @implementation NSArray (MGLStyleAttributeAdditions)
 
-- (mbgl::style::PropertyValue<std::vector<std::string> >)mbgl_stringArrayPropertyValue
+- (mbgl::style::PropertyValue<std::vector<std::string> >)mgl_stringArrayPropertyValue
 {
     std::vector<std::string>fonts;
     
@@ -21,7 +21,7 @@
     return {{fonts}};
 }
 
-- (mbgl::style::PropertyValue<std::vector<float> >)mbgl_numberArrayPropertyValue
+- (mbgl::style::PropertyValue<std::vector<float> >)mgl_numberArrayPropertyValue
 {
     std::vector<float>values;
     

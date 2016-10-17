@@ -2183,14 +2183,14 @@ public:
     NSColor *color = (_delegateHasStrokeColorsForShapeAnnotations
                       ? [self.delegate mapView:self strokeColorForShapeAnnotation:annotation]
                       : [NSColor selectedMenuItemColor]);
-    return color.mbgl_color;
+    return color.mgl_color;
 }
 
 - (mbgl::Color)fillColorForPolygonAnnotation:(MGLPolygon *)annotation {
     NSColor *color = (_delegateHasFillColorsForShapeAnnotations
                       ? [self.delegate mapView:self fillColorForPolygonAnnotation:annotation]
                       : [NSColor selectedMenuItemColor]);
-    return color.mbgl_color;
+    return color.mgl_color;
 }
 
 - (CGFloat)lineWidthForPolylineAnnotation:(MGLPolyline *)annotation {

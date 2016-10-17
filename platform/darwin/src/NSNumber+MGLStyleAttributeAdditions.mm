@@ -9,12 +9,12 @@
     return self;
 }
 
-- (mbgl::style::PropertyValue<bool>)mbgl_boolPropertyValue
+- (mbgl::style::PropertyValue<bool>)mgl_boolPropertyValue
 {
     return mbgl::style::PropertyValue<bool> { !!self.boolValue };
 }
 
-- (mbgl::style::PropertyValue<float>)mbgl_floatPropertyValue
+- (mbgl::style::PropertyValue<float>)mgl_floatPropertyValue
 {
     return mbgl::style::PropertyValue<float> { self.floatValue };
 }
