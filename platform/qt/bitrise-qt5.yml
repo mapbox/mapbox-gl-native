@@ -34,8 +34,9 @@ workflows:
             brew install qt5
             brew link qt5 --force
             brew linkapps qt5
-            ln -s /usr/local/Cellar/qt5/5.6.1-1/mkspecs /usr/local/mkspecs
-            ln -s /usr/local/Cellar/qt5/5.6.1-1/plugins /usr/local/plugins
+            export HOMEBREW_QT5_VERSION=$(brew list --versions qt5 | rev | cut -d' ' -f1 | rev)
+            ln -s /usr/local/Cellar/qt5/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
+            ln -s /usr/local/Cellar/qt5/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
             export BUILDTYPE=Debug
             make qt-app
             make qt-qml-app
