@@ -194,6 +194,7 @@ public class MarkerViewActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         locationUpdateHandler.removeCallbacks(moveMarkerRunnable);
+        rotateUpdateHandler.removeCallbacks(rotateMarkerRunnable);
     }
 
     /**
