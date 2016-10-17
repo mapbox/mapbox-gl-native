@@ -151,6 +151,15 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getInternal(const Resou
     }
 }
 
+optional<int64_t> OfflineDatabase::hasInternal(const Resource& resource) {
+    if (resource.kind == Resource::Kind::Tile) {
+        assert(resource.tileData);
+        return hasTile(*resource.tileData);
+    } else {
+        return hasResource(resource);
+    }
+}
+
 std::pair<bool, uint64_t> OfflineDatabase::put(const Resource& resource, const Response& response) {
     return putInternal(resource, response, true);
 }
@@ -234,6 +243,19 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resou
     }
 
     return std::make_pair(response, size);
+}
+
+optional<int64_t> OfflineDatabase::hasResource(const Resource& resource) {
+    // clang-format off
+    Statement stmt = getStatement("SELECT length(data) FROM resources WHERE url = ?");
+    // clang-format on
+
+    stmt->bind(1, resource.url);
+    if (!stmt->run()) {
+        return {};
+    }
+
+    return stmt->get<optional<int64_t>>(0);
 }
 
 bool OfflineDatabase::putResource(const Resource& resource,
@@ -384,6 +406,31 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource:
     }
 
     return std::make_pair(response, size);
+}
+
+optional<int64_t> OfflineDatabase::hasTile(const Resource::TileData& tile) {
+    // clang-format off
+    Statement stmt = getStatement(
+        "SELECT length(data) "
+        "FROM tiles "
+        "WHERE url_template = ?1 "
+        "  AND pixel_ratio  = ?2 "
+        "  AND x            = ?3 "
+        "  AND y            = ?4 "
+        "  AND z            = ?5 ");
+    // clang-format on
+
+    stmt->bind(1, tile.urlTemplate);
+    stmt->bind(2, tile.pixelRatio);
+    stmt->bind(3, tile.x);
+    stmt->bind(4, tile.y);
+    stmt->bind(5, tile.z);
+
+    if (!stmt->run()) {
+        return {};
+    }
+
+    return stmt->get<optional<int64_t>>(0);
 }
 
 bool OfflineDatabase::putTile(const Resource::TileData& tile,
@@ -554,6 +601,16 @@ void OfflineDatabase::deleteRegion(OfflineRegion&& region) {
 
 optional<std::pair<Response, uint64_t>> OfflineDatabase::getRegionResource(int64_t regionID, const Resource& resource) {
     auto response = getInternal(resource);
+
+    if (response) {
+        markUsed(regionID, resource);
+    }
+
+    return response;
+}
+
+optional<int64_t> OfflineDatabase::hasRegionResource(int64_t regionID, const Resource& resource) {
+    auto response = hasInternal(resource);
 
     if (response) {
         markUsed(regionID, resource);

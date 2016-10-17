@@ -252,19 +252,26 @@ void OfflineDownload::ensureResource(const Resource& resource,
     auto workRequestsIt = requests.insert(requests.begin(), nullptr);
     *workRequestsIt = util::RunLoop::Get()->invokeCancellable([=]() {
         requests.erase(workRequestsIt);
-
-        optional<std::pair<Response, uint64_t>> offlineResponse =
-            offlineDatabase.getRegionResource(id, resource);
-        if (offlineResponse) {
-            if (callback) {
-                callback(offlineResponse->first);
+        
+        auto getResourceSizeInDatabase = [&] () -> optional<int64_t> {
+            if (!callback) {
+                return offlineDatabase.hasRegionResource(id, resource);
             }
-
+            optional<std::pair<Response, uint64_t>> response = offlineDatabase.getRegionResource(id, resource);
+            if (!response) {
+                return {};
+            }
+            callback(response->first);
+            return response->second;
+        };
+        
+        optional<int64_t> offlineResponse = getResourceSizeInDatabase();
+        if (offlineResponse) {
             status.completedResourceCount++;
-            status.completedResourceSize += offlineResponse->second;
+            status.completedResourceSize += *offlineResponse;
             if (resource.kind == Resource::Kind::Tile) {
                 status.completedTileCount += 1;
-                status.completedTileSize += offlineResponse->second;
+                status.completedTileSize += *offlineResponse;
             }
 
             observer->statusChanged(status);
