@@ -23,7 +23,7 @@ TEST(Color, InvalidColor) {
 
 TEST(Color, ColorLAB) {
     optional<Color> result = Color::parse("#00ff00");
-    optional<ColorLAB> labColor = result->to_lab();
+    optional<ColorLAB> labColor = result->toLAB();
 
     ASSERT_DOUBLE_EQ( labColor->l, 100);
     ASSERT_DOUBLE_EQ( labColor->a, 0);
@@ -32,7 +32,7 @@ TEST(Color, ColorLAB) {
 
 TEST(Color, ColorHCL) {
     optional<Color> result = Color::parse("#00ff00");
-    optional<ColorHCL> hclColor = result->to_hcl();
+    optional<ColorHCL> hclColor = result->toHCL();
 
     ASSERT_DOUBLE_EQ( hclColor->h, 0);
     ASSERT_DOUBLE_EQ( hclColor->c, 0);

@@ -34,7 +34,7 @@ float rgb2xyz(float x) {
 
 namespace mbgl {
 
-Color Color::from_lab(const ColorLAB labColor) {
+Color Color::fromLAB(const ColorLAB& labColor) {
     float y = (labColor.l + 16) / 116;
     float x = y + labColor.a / 500;
     float z = y - labColor.b / 200;
@@ -49,8 +49,8 @@ Color Color::from_lab(const ColorLAB labColor) {
     };
 }
 
-Color Color::from_hcl(const ColorHCL hclColor) {
-    return Color::from_lab(ColorLAB{
+Color Color::fromHCL(const ColorHCL& hclColor) {
+    return Color::fromLAB(ColorLAB{
         hclColor.l,
         std::cos(hclColor.h * deg2rad) * hclColor.c,
         std::sin(hclColor.h * deg2rad) * hclColor.c,
@@ -71,7 +71,7 @@ optional<Color> Color::parse(const std::string& s) {
     }};
 }
 
-ColorLAB Color::to_lab() {
+ColorLAB Color::toLAB() {
 
     const float rawB = rgb2xyz(r);
     const float rawA = rgb2xyz(g);
@@ -88,9 +88,9 @@ ColorLAB Color::to_lab() {
     };
 }
 
-ColorHCL Color::to_hcl() {
+ColorHCL Color::toHCL() {
 
-    const optional<ColorLAB> labColor = to_lab();
+    const optional<ColorLAB> labColor = toLAB();
     const float h = std::atan2(labColor->b, labColor->a) * rad2deg;
 
     return ColorHCL{

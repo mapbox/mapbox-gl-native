@@ -3,9 +3,7 @@
 #include <vector>
 #include <utility>
 
-using EnumType = uint32_t;
-
-enum class ColorSpace : EnumType {
+enum class ColorSpace {
     RGB,
     LAB,
     HCL
@@ -20,10 +18,7 @@ public:
     using Stop = std::pair<float, T>;
     using Stops = std::vector<Stop>;
 
-    explicit Function(Stops stops_, float base_)
-        : base(base_), stops(std::move(stops_)) {}
-
-    explicit Function(Stops stops_, float base_, ColorSpace colorSpace_)
+    explicit Function(Stops stops_, float base_, ColorSpace colorSpace_ = ColorSpace::RGB)
         : base(base_), stops(std::move(stops_)), colorSpace(colorSpace_) {}
 
     float getBase() const { return base; }
