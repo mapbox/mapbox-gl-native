@@ -153,6 +153,7 @@ public class MarkerViewManager {
         View convertView = markerViewMap.get(markerView);
         if (convertView != null && convertView instanceof ImageView) {
             ((ImageView) convertView).setImageBitmap(markerView.getIcon().getBitmap());
+            convertView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         }
     }
 
