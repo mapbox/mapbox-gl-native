@@ -317,6 +317,7 @@ public class MarkerViewManager {
                 }
             }
         }
+        marker.setMapboxMap(null);
         markerViewMap.remove(marker);
     }
 
@@ -390,14 +391,15 @@ public class MarkerViewManager {
         // remove old markers
         Iterator<MarkerView> iterator = markerViewMap.keySet().iterator();
         while (iterator.hasNext()) {
-            MarkerView m = iterator.next();
-            if (!markers.contains(m)) {
+            MarkerView marker = iterator.next();
+            if (!markers.contains(marker)) {
                 // remove marker
-                convertView = markerViewMap.get(m);
+                convertView = markerViewMap.get(marker);
                 for (MapboxMap.MarkerViewAdapter adapter : markerViewAdapters) {
-                    if (adapter.getMarkerClass().equals(m.getClass())) {
-                        adapter.prepareViewForReuse(m, convertView);
+                    if (adapter.getMarkerClass().equals(marker.getClass())) {
+                        adapter.prepareViewForReuse(marker, convertView);
                         adapter.releaseView(convertView);
+                        marker.setMapboxMap(null);
                         iterator.remove();
                     }
                 }
@@ -409,20 +411,14 @@ public class MarkerViewManager {
             if (!markerViewMap.containsKey(marker)) {
                 for (final MapboxMap.MarkerViewAdapter adapter : markerViewAdapters) {
                     if (adapter.getMarkerClass().equals(marker.getClass())) {
+
+                        // Inflate View
                         convertView = (View) adapter.getViewReusePool().acquire();
                         final View adaptedView = adapter.getView(marker, convertView, mapView);
                         if (adaptedView != null) {
-
-                            // tilt
                             adaptedView.setRotationX(marker.getTilt());
-
-                            // rotation
                             adaptedView.setRotation(marker.getRotation());
-
-                            // alpha
                             adaptedView.setAlpha(marker.getAlpha());
-
-                            // visible
                             adaptedView.setVisibility(View.GONE);
 
                             if (mapboxMap.getSelectedMarkers().contains(marker)) {
@@ -448,6 +444,7 @@ public class MarkerViewManager {
                                 }
                             });
 
+                            marker.setMapboxMap(mapboxMap);
                             markerViewMap.put(marker, adaptedView);
                             if (convertView == null) {
                                 adaptedView.setVisibility(View.GONE);
