@@ -1539,7 +1539,7 @@ public class MapView extends FrameLayout {
             return;
         }
 
-        if (!MapboxEventManager.ENABLE_METRICS_ON_MAPPY) {
+        if (MapboxEventManager.ENABLE_METRICS_ON_MAPPY) {
             Hashtable<String, Object> evt = new Hashtable<>();
             evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_CLICK);
             evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
