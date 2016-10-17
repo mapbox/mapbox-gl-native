@@ -39,8 +39,8 @@ typedef NS_ENUM(NSUInteger, MGLTileSetScheme) {
 @property (nonatomic, nullable) NSNumber *maximumZoomLevel;
 
 /**
- An `NSString` object that contains an attribution to be displayed when the map is
- shown to a user. The default value is nil.
+ An `NSString` object that contains an attribution to be displayed when the map
+ is shown to a user. The default value is `nil`.
  */
 @property (nonatomic, copy, nullable) NSString *attribution;
 
@@ -55,7 +55,7 @@ typedef NS_ENUM(NSUInteger, MGLTileSetScheme) {
  Initializes and returns a new tile set object.
  
  @param tileURLTemplates An `NSArray` of `NSString` objects that represent the 
- tile templates.
+    tile templates.
  @return The initialized tile set object.
  */
 - (instancetype)initWithTileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates;
@@ -64,11 +64,11 @@ typedef NS_ENUM(NSUInteger, MGLTileSetScheme) {
  Initializes and returns a new tile set object.
  
  @param tileURLTemplates An `NSArray` of `NSString` objects that represent the 
- tile templates.
+    tile templates.
  @param minimumZoomLevel An `NSUInteger`; specifies the minimum zoom level at 
- which to display tiles.
+    which to display tiles.
  @param maximumZoomLevel An `NSUInteger`; specifies the maximum zoom level at 
- which to display tiles.
+    which to display tiles.
  @return The initialized tile set object.
  */
 - (instancetype)initWithTileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates minimumZoomLevel:(NSUInteger)minimumZoomLevel maximumZoomLevel:(NSUInteger)maximumZoomLevel;
