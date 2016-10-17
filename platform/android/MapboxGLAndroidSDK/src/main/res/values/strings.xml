@@ -5,6 +5,9 @@
     <string name="attributionsDialogTitle">Mapbox Android SDK</string>
     <string name="attributionTelemetryTitle">Make Mapbox Maps Better</string>
     <string name="attributionTelemetryMessage">You are helping to make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.</string>
+    <string name="attributionTelemetryPositive">Agree</string>
+    <string name="attributionTelemetryNegative">Disagree</string>
+    <string name="attributionTelemetryNeutral">More info</string>
     <string name="mapboxIconContentDescription">The Mapbox logo.</string>
     <string name="infoWindowTitle">Title</string>
     <string name="infoWindowDescription">Description</string>
