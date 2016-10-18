@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -15,6 +17,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -75,10 +79,13 @@ public class CustomSpriteActivity extends AppCompatActivity {
                 fab.setColorFilter(ContextCompat.getColor(CustomSpriteActivity.this, R.color.primary));
                 fab.setOnClickListener(new View.OnClickListener() {
                     private Point point;
+                    private int click;
 
                     @Override
                     public void onClick(View view) {
-                        if (point == null) {
+                        click++;
+
+                        if (click == 1) {
                             Log.i(TAG, "First click -> Car");
                             // Add an icon to reference later
                             mapboxMap.addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_car_top));
@@ -99,13 +106,17 @@ public class CustomSpriteActivity extends AppCompatActivity {
 
                             fab.setImageResource(R.drawable.ic_directions_car_black_24dp);
                         } else {
-                            //Update point
-                            point = Point.fromCoordinates(Position.fromCoordinates(point.getCoordinates().getLongitude() + 0.001, point.getCoordinates().getLatitude() + 0.001));
-                            GeoJsonSource source = mapboxMap.getSourceAs("point");
-                            source.setGeoJson(FeatureCollection.fromFeatures(new Feature[]{Feature.fromGeometry(point)}));
-
-                            //Move the camera as well
-                            mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(point.getCoordinates().getLatitude(), point.getCoordinates().getLongitude())));
+                            //Update icon
+                            mapboxMap.removeImage(CUSTOM_ICON);
+                            mapboxMap.addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), click % 2 == 0 ? R.drawable.ic_taxi_top : R.drawable.ic_car_top));
+//
+//                            //Update point
+//                            point = Point.fromCoordinates(Position.fromCoordinates(point.getCoordinates().getLongitude() + 0.001, point.getCoordinates().getLatitude() + 0.001));
+//                            GeoJsonSource source = mapboxMap.getSourceAs("point");
+//                            source.setGeoJson(FeatureCollection.fromFeatures(new Feature[]{Feature.fromGeometry(point)}));
+//
+//                            //Move the camera as well
+////                            mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(point.getCoordinates().getLatitude(), point.getCoordinates().getLongitude())));
                         }
                     }
                 });
