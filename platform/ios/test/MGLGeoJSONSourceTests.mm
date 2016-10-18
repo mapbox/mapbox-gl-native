@@ -139,26 +139,6 @@
     XCTAssertTrue([source.features.firstObject isMemberOfClass:[MGLPolygonFeature class]]);
 }
 
-
-- (void)testMGLGeoJSONSourceWithMultiPointFeaturesUsingPolylines {
-    CLLocationCoordinate2D coordinates[] = {
-        CLLocationCoordinate2DMake(100.0, 0.0),
-        CLLocationCoordinate2DMake(101.0, 0.0),
-        CLLocationCoordinate2DMake(101.0, 1.0),
-        CLLocationCoordinate2DMake(100.0, 1.0),
-        CLLocationCoordinate2DMake(100.0, 0.0)};
-    
-    MGLMultiPointFeature *multiPointFeature = [MGLMultiPointFeature multiPointWithCoordinates:coordinates count:5];
-    
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" features:@[multiPointFeature] options:nil];
-    
-    std::unique_ptr<mbgl::style::Source> mbglSource = [source mbglSource];
-    
-    XCTAssertNotNil(source.features);
-    XCTAssertEqual(source.features.count, 1);
-    XCTAssertTrue([source.features.firstObject isMemberOfClass:[MGLMultiPointFeature class]]);
-}
-
 - (void)testMGLGeoJSONSourceWithMultiPointFeaturesUsingPolygons {
     CLLocationCoordinate2D coordinates[] = {
         CLLocationCoordinate2DMake(100.0, 0.0),

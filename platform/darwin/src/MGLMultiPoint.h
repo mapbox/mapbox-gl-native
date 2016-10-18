@@ -14,17 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGLMultiPoint : MGLShape
 
 /**
- Creates and returns an `MGLMultiPoint` object from the specified set of
- coordinates.
- 
- @param coords The array of coordinates defining the shape. The data in this
- array is copied to the new object.
- @param count The number of items in the `coords` array.
- @return A new multipoint object.
- */
-+ (instancetype)multiPointWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count NS_SWIFT_NAME(multiPoint(coordinates:count:));
-
-/**
  The array of coordinates associated with the shape.
  
  This C array is a pointer to a structure inside the multipoint object, 
