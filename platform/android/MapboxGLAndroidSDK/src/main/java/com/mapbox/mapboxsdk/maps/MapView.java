@@ -2977,162 +2977,180 @@ public class MapView extends FrameLayout {
     }
 
     /**
-     * <p>
-     * This {@link MapChange} is triggered whenever the currently displayed map region is about to changing
+     * This event is triggered whenever the currently displayed map region is about to changing
      * without an animation.
-     * </p>
      * <p>
-     * This event is followed by a series of {@link MapView#REGION_IS_CHANGING} and ends
-     * with {@link MapView#REGION_DID_CHANGE}.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int REGION_WILL_CHANGE = 0;
 
     /**
-     * <p>
-     * This {@link MapChange} is triggered whenever the currently displayed map region is about to changing
+     * This event is triggered whenever the currently displayed map region is about to changing
      * with an animation.
-     * </p>
-     * <p>
-     * This event is followed by a series of {@link MapView#REGION_IS_CHANGING} and ends
-     * with {@link MapView#REGION_DID_CHANGE_ANIMATED}.
+     * <p
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int REGION_WILL_CHANGE_ANIMATED = 1;
 
     /**
+     * This event is triggered whenever the currently displayed map region is changing.
      * <p>
-     * This {@link MapChange} is triggered whenever the currently displayed map region is changing.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int REGION_IS_CHANGING = 2;
 
     /**
-     * <p>
-     * This {@link MapChange} is triggered whenever the currently displayed map region finished changing
+     * This event is triggered whenever the currently displayed map region finished changing
      * without an animation.
+     * <p>
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int REGION_DID_CHANGE = 3;
 
     /**
-     * <p>
-     * This {@link MapChange} is triggered whenever the currently displayed map region finished changing
+     * This event is triggered whenever the currently displayed map region finished changing
      * with an animation.
+     * <p>
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int REGION_DID_CHANGE_ANIMATED = 4;
 
     /**
+     * This event is triggered when the map is about to start loading a new map style.
      * <p>
-     * This {@link MapChange} is triggered when the map is about to start loading a new map style.
-     * </p>
-     * <p>
-     * This event is followed by {@link MapView#DID_FINISH_LOADING_MAP} or
-     * {@link MapView#DID_FAIL_LOADING_MAP}.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int WILL_START_LOADING_MAP = 5;
 
     /**
+     * This  is triggered when the map has successfully loaded a new map style.
      * <p>
-     * This {@link MapChange} is triggered when the map has successfully loaded a new map style.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_LOADING_MAP = 6;
 
     /**
-     * <p>
-     * This {@link MapChange} is currently not implemented.
-     * </p>
-     * <p>
      * This event is triggered when the map has failed to load a new map style.
+     * <p>
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FAIL_LOADING_MAP = 7;
 
     /**
+     * This event is triggered when the map will start rendering a frame.
      * <p>
-     * This {@link MapChange} is currently not implemented.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int WILL_START_RENDERING_FRAME = 8;
 
     /**
+     * This event is triggered when the map finished rendering a frame.
      * <p>
-     * This {@link MapChange} is currently not implemented.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_RENDERING_FRAME = 9;
 
     /**
+     * This event is triggered when the map finished rendeirng the frame fully.
      * <p>
-     * This {@link MapChange} is currently not implemented.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_RENDERING_FRAME_FULLY_RENDERED = 10;
 
     /**
+     * This event is triggered when the map will start rendering the map.
      * <p>
-     * This {@link MapChange} is currently not implemented.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int WILL_START_RENDERING_MAP = 11;
 
     /**
+     * This event is triggered when the map finished rendering the map.
      * <p>
-     * This {@link MapChange} is currently not implemented.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_RENDERING_MAP = 12;
 
     /**
+     * This event is triggered when the map is fully rendered.
      * <p>
-     * This {@link MapChange} is currently not implemented.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_RENDERING_MAP_FULLY_RENDERED = 13;
 
 
     /**
+     * This {@link MapChange} is triggered when a style has finished loading.
      * <p>
-     * This {@link MapChange} is triggered when a style is loaded
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_LOADING_STYLE = 14;
 
     /**
      * Interface definition for a callback to be invoked when the displayed map view changes.
+     * <p>
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
+     * </p>
      *
      * @see MapView#addOnMapChangedListener(OnMapChangedListener)
      * @see MapView.MapChange
