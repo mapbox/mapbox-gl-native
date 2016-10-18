@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
  <a href="https://www.mapbox.com/vector-tiles/mapbox-streets/">Mapbox Streets</a>
  layer reference.
  */
-@property (nonatomic, copy, nullable, readonly) id identifier;
+@property (nonatomic, copy, nullable) id identifier;
 
 /**
  A dictionary of attributes for this feature specified by the
@@ -81,7 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
  <a href="https://www.mapbox.com/vector-tiles/mapbox-terrain/">Mapbox Terrain</a>
  layer references.
  */
-@property (nonatomic, copy, readonly) NS_DICTIONARY_OF(NSString *, id) *attributes;
+@property (nonatomic, copy) NS_DICTIONARY_OF(NSString *, id) *attributes;
 
 /**
  Returns the feature attribute for the given attribute name.
