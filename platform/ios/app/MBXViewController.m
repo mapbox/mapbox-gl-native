@@ -694,7 +694,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MGLLineStyleLayer *insertLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"testLayer" source:source];
     insertLayer.lineColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor greenColor]];
     insertLayer.lineWidth = topMostLayer.lineWidth;
-    insertLayer.lineWidth = topMostLayer.lineWidth;
     
     [self.mapView.style insertLayer:insertLayer aboveLayer:topMostLayer];
 }
