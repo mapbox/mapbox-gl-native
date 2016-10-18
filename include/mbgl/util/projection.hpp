@@ -8,14 +8,20 @@
 
 namespace mbgl {
 
+// Spherical Mercator projection
+// http://docs.openlayers.org/library/spherical_mercator.html
 class Projection {
-
 public:
+    // Map pixel width at given scale.
+    static double worldSize(double scale) {
+        return scale * util::tileSize;
+    }
+
     static double getMetersPerPixelAtLatitude(double lat, double zoom) {
         const double constrainedZoom = util::clamp(zoom, util::MIN_ZOOM, util::MAX_ZOOM);
-        const double mapPixelWidthAtZoom = std::pow(2.0, constrainedZoom) * util::tileSize;
+        const double constrainedScale = std::pow(2.0, constrainedZoom);
         const double constrainedLatitude = util::clamp(lat, -util::LATITUDE_MAX, util::LATITUDE_MAX);
-        return std::cos(constrainedLatitude * util::DEG2RAD) * util::M2PI * util::EARTH_RADIUS_M / mapPixelWidthAtZoom;
+        return std::cos(constrainedLatitude * util::DEG2RAD) * util::M2PI * util::EARTH_RADIUS_M / worldSize(constrainedScale);
     }
 
     static ProjectedMeters projectedMetersForLatLng(const LatLng& latLng) {
@@ -32,7 +38,7 @@ public:
     }
 
     static LatLng latLngForProjectedMeters(const ProjectedMeters& projectedMeters) {
-        double latitude = (2 * std::atan(std::exp(projectedMeters.northing / util::EARTH_RADIUS_M)) - (M_PI / 2)) * util::RAD2DEG;
+        double latitude = (2 * std::atan(std::exp(projectedMeters.northing / util::EARTH_RADIUS_M)) - (M_PI / 2.0)) * util::RAD2DEG;
         double longitude = projectedMeters.easting * util::RAD2DEG / util::EARTH_RADIUS_M;
 
         latitude = util::clamp(latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
