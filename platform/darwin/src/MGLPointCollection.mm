@@ -1,4 +1,4 @@
-#import "MGLPointCollection.h"
+#import "MGLPointCollection_Private.h"
 
 #import <mbgl/util/geometry.hpp>
 #import <mbgl/util/feature.hpp>

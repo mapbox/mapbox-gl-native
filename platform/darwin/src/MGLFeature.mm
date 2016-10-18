@@ -6,7 +6,7 @@
 #import "MGLValueEvaluator.h"
 
 #import "MGLShape_Private.h"
-#import "MGLMultiPoint_Private.h"
+#import "MGLPointCollection_Private.h"
 #import "MGLPolyline+MGLAdditions.h"
 #import "MGLPolygon+MGLAdditions.h"
 #import "NSDictionary+MGLAdditions.h"
@@ -82,10 +82,10 @@
 
 @end
 
-@interface MGLMultiPointFeature () <MGLFeaturePrivate>
+@interface MGLPointCollectionFeature () <MGLFeaturePrivate>
 @end
 
-@implementation MGLMultiPointFeature
+@implementation MGLPointCollectionFeature
 
 @synthesize identifier;
 @synthesize attributes;
@@ -202,7 +202,7 @@ public:
     
     MGLShape <MGLFeaturePrivate> * operator()(const mbgl::MultiPoint<T> &geometry) const {
         std::vector<CLLocationCoordinate2D> coordinates = toLocationCoordinates2D(geometry);
-        return [[MGLMultiPointFeature alloc] initWithCoordinates:&coordinates[0] count:coordinates.size()];
+        return [[MGLPointCollectionFeature alloc] initWithCoordinates:&coordinates[0] count:coordinates.size()];
     }
     
     MGLShape <MGLFeaturePrivate> * operator()(const mbgl::MultiLineString<T> &geometry) const {

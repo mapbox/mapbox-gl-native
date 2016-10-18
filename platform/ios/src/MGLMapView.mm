@@ -2855,13 +2855,6 @@ public:
 
         if ([annotation isKindOfClass:[MGLMultiPoint class]])
         {
-            // Actual multipoints aren’t supported as annotations.
-            if ([annotation isMemberOfClass:[MGLMultiPoint class]]
-                || [annotation isMemberOfClass:[MGLMultiPointFeature class]])
-            {
-                continue;
-            }
-
             // The polyline or polygon knows how to style itself (with the map view’s help).
             MGLMultiPoint *multiPoint = (MGLMultiPoint *)annotation;
             if (!multiPoint.pointCount) {
