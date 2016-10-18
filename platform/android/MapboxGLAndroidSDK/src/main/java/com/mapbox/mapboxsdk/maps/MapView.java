@@ -1729,20 +1729,29 @@ public class MapView extends FrameLayout {
             float toleranceSides = 4 * mScreenDensity;
             float toleranceTopBottom = 10 * mScreenDensity;
 
-            RectF tapRect = new RectF((tapPoint.x - mAverageIconWidth / 2 - toleranceSides) / mScreenDensity,
-                    (tapPoint.y - mAverageIconHeight / 2 - toleranceTopBottom) / mScreenDensity,
-                    (tapPoint.x + mAverageIconWidth / 2 + toleranceSides) / mScreenDensity,
-                    (tapPoint.y + mAverageIconHeight / 2 + toleranceTopBottom) / mScreenDensity);
+            RectF tapRect = new RectF((tapPoint.x - mAverageIconWidth / 2 - toleranceSides),
+                    (tapPoint.y - mAverageIconHeight / 2 - toleranceTopBottom),
+                    (tapPoint.x + mAverageIconWidth / 2 + toleranceSides),
+                    (tapPoint.y + mAverageIconHeight / 2 + toleranceTopBottom));
 
             if (mMapboxMap.myLocationViewClickListener != null) {
                 final Location myLocation = getMyLocation();
-                PointF myLocationPointF = toScreenLocation(new LatLng(myLocation));
-                if (tapRect.contains(myLocationPointF.x, myLocationPointF.y)) {
-                    mMapboxMap.myLocationViewClickListener.onMyLocationViewClicked(myLocation);
-                    return true;
+                if (myLocation != null) {
+                    PointF myLocationPointF = toScreenLocation(new LatLng(myLocation));
+                    if (tapRect.contains(myLocationPointF.x, myLocationPointF.y)) {
+                        mMapboxMap.myLocationViewClickListener.onMyLocationViewClicked(myLocation);
+                        return true;
+                    }
                 }
             }
 
+
+            tapRect.set(
+                    tapRect.left / mScreenDensity,
+                    tapRect.top / mScreenDensity,
+                    tapRect.right / mScreenDensity,
+                    tapRect.bottom / mScreenDensity
+            );
 
             List<Marker> nearbyMarkers = getMarkersInRect(tapRect);
             long newSelectedMarkerId = -1;
