@@ -46,6 +46,22 @@ public:
 
         return LatLng(latitude, longitude);
     }
+
+    static Point<double> project(const LatLng& latLng, double scale) {
+        return Point<double> {
+            util::LONGITUDE_MAX + latLng.longitude,
+            util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + latLng.latitude * M_PI / util::DEGREES_MAX))
+        } * worldSize(scale) / util::DEGREES_MAX;
+    }
+
+    static LatLng unproject(const Point<double>& p, double scale, LatLng::WrapMode wrapMode = LatLng::Unwrapped) {
+        auto p2 = p * util::DEGREES_MAX / worldSize(scale);
+        return LatLng {
+            util::DEGREES_MAX / M_PI * std::atan(std::exp((util::LONGITUDE_MAX - p2.y) * util::DEG2RAD)) - 90.0,
+            p2.x - util::LONGITUDE_MAX,
+            wrapMode
+        };
+    }
 };
 
 } // namespace mbgl

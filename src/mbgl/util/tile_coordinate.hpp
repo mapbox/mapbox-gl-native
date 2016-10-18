@@ -5,6 +5,7 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/geometry.hpp>
+#include <mbgl/util/projection.hpp>
 
 namespace mbgl {
 
@@ -19,7 +20,7 @@ public:
 
     static TileCoordinate fromLatLng(const TransformState& state, double zoom, const LatLng& latLng) {
         const double scale = std::pow(2, zoom - state.getZoom());
-        return { state.project(latLng) * scale / double(util::tileSize), zoom };
+        return { Projection::project(latLng, state.getScale()) * scale / double(util::tileSize), zoom };
     }
 
     static TileCoordinate fromScreenCoordinate(const TransformState& state, double zoom, const ScreenCoordinate& screenCoordinate) {
