@@ -18,7 +18,6 @@ import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -51,11 +50,9 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
@@ -2869,14 +2866,15 @@ public class MapView extends FrameLayout {
 
         // Called when someone presses the attribution icon
         @Override
-        public void onClick(View v) {
-            Context context = v.getContext();
-            String[] items = context.getResources().getStringArray(R.array.attribution_names);
-            AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AttributionAlertDialogStyle);
+        public void onClick(View view) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mapView.getContext(), R.style.TelemAlertDialogStyle);
             builder.setTitle(R.string.attributionsDialogTitle);
-            builder.setAdapter(new ArrayAdapter<>(context, R.layout.attribution_list_item, items), this);
-            AlertDialog dialog = builder.show();
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(mapView.getAttributionTintColor()));
+            String[] items = mapView.getContext().getResources().getStringArray(R.array.attribution_names);
+            builder.setAdapter(new ArrayAdapter<>(mapView.getContext(), R.layout.attribution_list_item, items), this);
+            AlertDialog attributionDialog = builder.show();
+
+            // TODO Change listview text color to mapView.getAttributionTintColor()
         }
 
         // Called when someone selects an attribution, 'Improve this map' adds location data to the url
