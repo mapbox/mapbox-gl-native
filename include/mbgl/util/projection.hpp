@@ -2,9 +2,9 @@
 
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/geometry.hpp>
 #include <mbgl/math/clamp.hpp>
 
-#include <cmath>
 
 namespace mbgl {
 
