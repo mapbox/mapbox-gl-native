@@ -25,7 +25,12 @@
             <com.mapbox.mapboxsdk.maps.MapView
                 android:id="@id/mapView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                app:center_latitude="51.506675"
+                app:center_longitude="-0.128699"
+                app:direction="90"
+                app:tilt="40"
+                app:zoom="10" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"

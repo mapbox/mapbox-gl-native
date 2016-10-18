@@ -512,7 +512,7 @@ jdoubleArray nativeGetCameraValues(JNIEnv *env, jni::jobject* obj, jlong nativeM
     jdouble buf[5];
     buf[0] = latLng.latitude;
     buf[1] = latLng.longitude;
-    buf[2] = nativeMapView->getMap().getBearing();
+    buf[2] = -(nativeMapView->getMap().getBearing()-360);
     buf[3] = nativeMapView->getMap().getPitch();
     buf[4] = nativeMapView->getMap().getZoom();
     env->SetDoubleArrayRegion(output, start, leng, buf);
@@ -1057,12 +1057,12 @@ void nativeJumpTo(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdoubl
 
     mbgl::CameraOptions options;
     if (angle != -1) {
-        options.angle = angle;
+        options.angle = angle * M_PI / 180;
     }
     options.center = mbgl::LatLng(latitude, longitude);
     options.padding = nativeMapView->getInsets();
     if (pitch != -1) {
-        options.pitch = pitch;
+        options.pitch = pitch * M_PI / 180;
     }
     if (zoom != -1) {
         options.zoom = zoom;
@@ -1077,12 +1077,12 @@ void nativeEaseTo(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdoubl
 
     mbgl::CameraOptions cameraOptions;
     if (angle != -1) {
-        cameraOptions.angle = angle;
+        cameraOptions.angle = angle * M_PI / 180;
     }
     cameraOptions.center = mbgl::LatLng(latitude, longitude);
     cameraOptions.padding = nativeMapView->getInsets();
     if (pitch != -1) {
-        cameraOptions.pitch = pitch;
+        cameraOptions.pitch = pitch * M_PI / 180;
     }
     if (zoom != -1) {
         cameraOptions.zoom = zoom;
@@ -1110,12 +1110,12 @@ void nativeFlyTo(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdouble
 
     mbgl::CameraOptions cameraOptions;
     if (angle != -1) {
-        cameraOptions.angle = angle;
+        cameraOptions.angle = angle * M_PI / 180 ;
     }
     cameraOptions.center = mbgl::LatLng(latitude, longitude);
     cameraOptions.padding = nativeMapView->getInsets();
     if (pitch != -1) {
-        cameraOptions.pitch = pitch;
+        cameraOptions.pitch = pitch * M_PI / 180;
     }
     if (zoom != -1) {
         cameraOptions.zoom = zoom;
