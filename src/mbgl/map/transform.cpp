@@ -7,6 +7,7 @@
 #include <mbgl/util/unitbezier.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/projection.hpp>
 #include <mbgl/math/clamp.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -131,8 +132,8 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
 
     Duration duration = animation.duration ? *animation.duration : Duration::zero();
 
-    const double startWorldSize = state.worldSize();
     const double startScale = state.scale;
+    const double startWorldSize = Projection::worldSize(startScale);
     const double startAngle = state.angle;
     const double startPitch = state.pitch;
     state.panning = latLng != startLatLng;
@@ -288,8 +289,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         return;
     }
 
-    const double startWorldSize = state.worldSize();
-
+    const double startWorldSize = Projection::worldSize(state.scale);
     state.panning = true;
     state.scaling = true;
     state.rotating = angle != startAngle;
