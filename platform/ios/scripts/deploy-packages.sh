@@ -43,7 +43,7 @@ buildPackageStyle() {
         github-release upload \
             --tag "ios-v${PUBLISH_VERSION}" \
             --name ${file_name} \
-            --file "${BINARY_DIRECTORY}/${file_name}"
+            --file "${BINARY_DIRECTORY}/${file_name}" > /dev/null
     fi        
 }
 
@@ -57,9 +57,6 @@ PUBLISH_VERSION=
 BINARY_DIRECTORY=${BINARY_DIRECTORY:-build/ios/deploy}
 GITHUB_RELEASE=${GITHUB_RELEASE:-true}
 PUBLISH_PRE_FLAG=''
-
-rm -rf ${BINARY_DIRECTORY}
-mkdir -p ${BINARY_DIRECTORY}
 
 if [[ ${GITHUB_RELEASE} = "true" ]]; then
     GITHUB_RELEASE=true # Assign bool, not just a string
@@ -98,6 +95,7 @@ git checkout ${VERSION_TAG}
 step "Deploying version ${PUBLISH_VERSION}…"
 
 make clean && make distclean
+mkdir -p ${BINARY_DIRECTORY}
 
 if [[ "${GITHUB_RELEASE}" == true ]]; then
     step "Create GitHub release…"
@@ -116,4 +114,4 @@ buildPackageStyle "iframework" "symbols-dynamic"
 buildPackageStyle "iframework SYMBOLS=NO" "dynamic"
 buildPackageStyle "ifabric" "fabric"
 
-step "Finished deploying ${PUBLISH_VERSION}"
+step "Finished deploying ${PUBLISH_VERSION} in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds"
