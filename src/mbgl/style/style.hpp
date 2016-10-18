@@ -128,6 +128,7 @@ private:
 
     // SpriteStoreObserver implementation.
     void onSpriteLoaded() override;
+    void onSpriteAdded() override;
     void onSpriteError(std::exception_ptr) override;
 
     // SourceObserver implementation.
