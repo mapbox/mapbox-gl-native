@@ -8,6 +8,7 @@
 #include <mbgl/util/mapbox.hpp>
 
 #include <unordered_map>
+#include <list>
 #include <memory>
 #include <string>
 
@@ -89,6 +90,8 @@ private:
     optional<int64_t> hasResource(const Resource&);
     bool putResource(const Resource&, const Response&,
                      const std::string&, bool compressed);
+    std::unordered_map<std::string, Response> resourceCache;
+    std::list<std::string> resourceCacheKeys;
 
     optional<std::pair<Response, uint64_t>> getInternal(const Resource&);
     optional<int64_t> hasInternal(const Resource&);

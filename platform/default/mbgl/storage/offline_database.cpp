@@ -201,6 +201,16 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
 }
 
 optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resource& resource) {
+    
+    // looking for cached resource.
+    auto it = resourceCache.find(resource.url);
+    if (it != resourceCache.end()) {
+        // will not update 'accessed' - it has been updated lately anyway.
+        Response response = it->second;
+        uint64_t size = response.data->length();
+        return std::make_pair(response, size);
+    }
+    
     // clang-format off
     Statement accessedStmt = getStatement(
         "UPDATE resources SET accessed = ?1 WHERE url = ?2");
@@ -242,6 +252,17 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resou
         size = data->length();
     }
 
+    // insert into resource cache, but make sure it is not too large
+    if (size < (1024 * 128)) {
+        while (resourceCacheKeys.size() > 512) {
+            auto key = resourceCacheKeys.front();
+            resourceCacheKeys.pop_front();
+            resourceCache.erase(key);
+        }
+        resourceCache[resource.url] = response;
+        resourceCacheKeys.push_back(resource.url);
+    }
+
     return std::make_pair(response, size);
 }
 
@@ -262,6 +283,9 @@ bool OfflineDatabase::putResource(const Resource& resource,
                                   const Response& response,
                                   const std::string& data,
                                   bool compressed) {
+    
+    resourceCache.erase(resource.url);
+    
     if (response.notModified) {
         // clang-format off
         Statement update = getStatement(
@@ -806,6 +830,11 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
         stmt1->bind(1, 50);
         stmt1->run();
         uint64_t changes1 = db->changes();
+        
+        if (changes1 > 0) {
+            resourceCache.clear();
+            resourceCacheKeys.clear();
+        }
 
         // clang-format off
         Statement stmt2 = getStatement(
