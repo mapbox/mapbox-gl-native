@@ -66,12 +66,9 @@ public:
     bool isPanning() const;
     bool isGestureInProgress() const;
 
-    // Conversion and projection
+    // Conversion
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Unwrapped) const;
-
-    Point<double> project(const LatLng&) const;
-    LatLng unproject(const Point<double>&, double worldSize, LatLng::WrapMode = LatLng::Unwrapped) const;
 
     double zoomScale(double zoom) const;
     double scaleZoom(double scale) const;

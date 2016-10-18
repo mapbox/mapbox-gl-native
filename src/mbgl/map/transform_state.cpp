@@ -201,22 +201,6 @@ bool TransformState::isGestureInProgress() const {
 
 #pragma mark - Projection
 
-Point<double> TransformState::project(const LatLng& ll) const {
-    return Point<double>(
-        (util::LONGITUDE_MAX + ll.longitude),
-        (util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + ll.latitude * M_PI / util::DEGREES_MAX)))
-    ) * Projection::worldSize(scale) / util::DEGREES_MAX;
-}
-
-LatLng TransformState::unproject(const Point<double>& p, double worldSize, LatLng::WrapMode wrapMode) const {
-    Point<double> p2 = p * util::DEGREES_MAX / worldSize;
-    return LatLng(
-        util::DEGREES_MAX / M_PI * std::atan(std::exp((util::LONGITUDE_MAX - p2.y) * util::DEG2RAD)) - 90.0f,
-        p2.x - util::LONGITUDE_MAX,
-        wrapMode
-    );
-}
-
 double TransformState::zoomScale(double zoom) const {
     return std::pow(2.0f, zoom);
 }
@@ -232,7 +216,7 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
 
     mat4 mat = coordinatePointMatrix(getZoom());
     vec4 p;
-    Point<double> pt = project(latLng) / double(util::tileSize);
+    Point<double> pt = Projection::project(latLng, scale) / double(util::tileSize);
     vec4 c = {{ pt.x, pt.y, 0, 1 }};
     matrix::transformMat4(p, c, mat);
     return { p[0] / p[3], height - p[1] / p[3] };
@@ -274,7 +258,7 @@ LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, L
     double z1 = coord1[2] / w1;
     double t = z0 == z1 ? 0 : (targetZ - z0) / (z1 - z0);
 
-    return unproject(util::interpolate(p0, p1, t), scale, wrapMode);
+    return Projection::unproject(util::interpolate(p0, p1, t), scale / util::tileSize, wrapMode);
 }
 
 mat4 TransformState::coordinatePointMatrix(double z) const {
@@ -321,10 +305,10 @@ void TransformState::constrain(double& scale_, double& x_, double& y_) const {
 }
 
 void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& anchor) {
-    auto centerCoord = project(getLatLng(LatLng::Unwrapped));
-    auto latLngCoord = project(latLng);
-    auto anchorCoord = project(screenCoordinateToLatLng(anchor));
-    setLatLngZoom(unproject(centerCoord + latLngCoord - anchorCoord, Projection::worldSize(scale)), getZoom());
+    auto centerCoord = Projection::project(getLatLng(LatLng::Unwrapped), scale);
+    auto latLngCoord = Projection::project(latLng, scale);
+    auto anchorCoord = Projection::project(screenCoordinateToLatLng(anchor), scale);
+    setLatLngZoom(Projection::unproject(centerCoord + latLngCoord - anchorCoord, scale), getZoom());
 }
 
 void TransformState::setLatLngZoom(const LatLng &latLng, double zoom) {
