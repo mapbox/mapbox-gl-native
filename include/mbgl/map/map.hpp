@@ -159,6 +159,7 @@ public:
     // Layers
     style::Layer* getLayer(const std::string& layerID);
     void addLayer(std::unique_ptr<style::Layer>, const optional<std::string>& beforeLayerID = {});
+    void insertLayer(std::unique_ptr<style::Layer>, const std::string& afterLayerID);
     void removeLayer(const std::string& layerID);
 
     // Add image, bound to the style

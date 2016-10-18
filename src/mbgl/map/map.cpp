@@ -807,6 +807,20 @@ void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& be
 
     impl->view.deactivate();
 }
+    
+void Map::insertLayer(std::unique_ptr<Layer> layer, const std::string &after) {
+    if (!impl->style) {
+        return;
+    }
+    
+    impl->styleMutated = true;
+    impl->view.activate();
+    
+    impl->style->insertLayer(std::move(layer), after);
+    update(Update::Classes);
+    
+    impl->view.deactivate();
+}
 
 void Map::removeLayer(const std::string& id) {
     if (!impl->style) {
