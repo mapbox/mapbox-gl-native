@@ -41,7 +41,7 @@ TEST(TileCoordinate, FromLatLng) {
     for (const auto& pair : edges) {
         const auto& latLng = pair.first;
         const auto& screenCoordinate = pair.second;
-        const auto base = TileCoordinate::fromLatLng(transform.getState(), 0, latLng);
+        const auto base = TileCoordinate::fromLatLng(0, latLng);
 
         // 16 is the maximum zoom level where we actually compute placements.
         for (uint8_t integerZoom = 0; integerZoom <= 16; ++integerZoom) {
@@ -52,7 +52,7 @@ TEST(TileCoordinate, FromLatLng) {
                 latLng.latitude  == 0 ? 0.5 : latLng.latitude  == -util::LATITUDE_MAX  ? 1.0 : 0,
             };
 
-            const auto fromLatLng = TileCoordinate::fromLatLng(transform.getState(), zoom, latLng);
+            const auto fromLatLng = TileCoordinate::fromLatLng(zoom, latLng);
             ASSERT_DOUBLE_EQ(fromLatLng.z, zoom);
             ASSERT_DOUBLE_EQ(fromLatLng.p.x, tilePoint.x * maxTilesPerAxis);
             ASSERT_NEAR(fromLatLng.p.y, tilePoint.y * maxTilesPerAxis, 1.0e-7);
