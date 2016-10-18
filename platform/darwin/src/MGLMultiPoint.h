@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param count The number of items in the `coords` array.
  @return A new multipoint object.
  */
-+ (instancetype)multiPointWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
++ (instancetype)multiPointWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count NS_SWIFT_NAME(multiPoint(coordinates:count:));
 
 /**
  The array of coordinates associated with the shape.
