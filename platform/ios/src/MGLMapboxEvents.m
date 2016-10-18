@@ -129,6 +129,7 @@ const NSTimeInterval MGLFlushInterval = 180;
 
 @implementation MGLMapboxEvents {
     NSString *_instanceID;
+    UIBackgroundTaskIdentifier _backgroundTaskIdentifier;
 }
 
 + (void)initialize {
@@ -257,9 +258,20 @@ const NSTimeInterval MGLFlushInterval = 180;
 }
 
 - (void)pauseOrResumeMetricsCollectionIfRequired {
+    UIApplication *application = [UIApplication sharedApplication];
+    
     // Prevent blue status bar when host app has `when in use` permission only and it is not in foreground
     if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse &&
-        [UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+        application.applicationState == UIApplicationStateBackground) {
+        
+        if (_backgroundTaskIdentifier == UIBackgroundTaskInvalid) {
+            _backgroundTaskIdentifier = [application beginBackgroundTaskWithExpirationHandler:^{
+                [application endBackgroundTask:_backgroundTaskIdentifier];
+                _backgroundTaskIdentifier = UIBackgroundTaskInvalid;
+            }];
+            [self flush];
+        }
+        
         [self pauseMetricsCollection];
         return;
     }
@@ -307,7 +319,10 @@ const NSTimeInterval MGLFlushInterval = 180;
         return;
     }
     
-    if ([self.eventQueue count] == 0) {
+    if ([self.eventQueue count] <= 1) {
+        [self.eventQueue removeAllObjects];
+        [[UIApplication sharedApplication] endBackgroundTask:_backgroundTaskIdentifier];
+        _backgroundTaskIdentifier = UIBackgroundTaskInvalid;
         return;
     }
     
@@ -485,10 +500,12 @@ const NSTimeInterval MGLFlushInterval = 180;
             if (error) {
                 [strongSelf pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"Network error",
                                                                                         @"error": error}];
-                return;
+            } else {
+                [strongSelf pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"post",
+                                                                                   @"debug.eventsCount": @(events.count)}];
             }
-            [strongSelf pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"post",
-                                                                                    @"debug.eventsCount": @(events.count)}];
+            [[UIApplication sharedApplication] endBackgroundTask:_backgroundTaskIdentifier];
+            _backgroundTaskIdentifier = UIBackgroundTaskInvalid;
         }];
     });
 }
