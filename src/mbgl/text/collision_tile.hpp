@@ -52,7 +52,6 @@ public:
 
     std::array<float, 4> rotationMatrix;
     std::array<float, 4> reverseRotationMatrix;
-    std::array<CollisionBox, 4> edges;
 
 private:
     float findPlacementScale(float minPlacementScale,
