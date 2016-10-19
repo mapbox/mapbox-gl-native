@@ -27,9 +27,8 @@ CollisionTile::CollisionTile(PlacementConfig config_) : config(std::move(config_
 }
 
 
-float CollisionTile::findPlacementScale(float minPlacementScale, const Point<float>& anchor,
-        const CollisionBox& box, const Point<float>& blockingAnchor, const CollisionBox& blocking) {
-
+float CollisionTile::findPlacementScale(const Point<float>& anchor, const CollisionBox& box, const Point<float>& blockingAnchor, const CollisionBox& blocking) {
+    float minPlacementScale = minScale;
 
     // Find the lowest scale at which the two boxes can fit side by side without overlapping.
     // Original algorithm:
@@ -90,7 +89,7 @@ float CollisionTile::placeFeature(const CollisionFeature& feature, bool allowOve
                 const CollisionBox& blocking = std::get<1>(*it);
                 Point<float> blockingAnchor = util::matrixMultiply(rotationMatrix, blocking.anchor);
 
-                minPlacementScale = findPlacementScale(minPlacementScale, anchor, box, blockingAnchor, blocking);
+                minPlacementScale = util::max(minPlacementScale, findPlacementScale(anchor, box, blockingAnchor, blocking));
                 if (minPlacementScale >= maxScale) return minPlacementScale;
             }
         }
@@ -108,8 +107,7 @@ float CollisionTile::placeFeature(const CollisionFeature& feature, bool allowOve
                     box.maxScale);
 
             for (auto& blocking : edges) {
-                minPlacementScale = findPlacementScale(minPlacementScale, box.anchor, rotatedBox, blocking.anchor, blocking);
-
+                minPlacementScale = util::max(minPlacementScale, findPlacementScale(box.anchor, rotatedBox, blocking.anchor, blocking));
                 if (minPlacementScale >= maxScale) return minPlacementScale;
             }
         }
@@ -179,7 +177,7 @@ std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const Geometr
                     result.push_back(indexedFeature);
                 } else {
                     auto blockingAnchor = util::matrixMultiply(rotationMatrix, blocking.anchor);
-                    float minPlacementScale = findPlacementScale(minScale, anchor, queryBox, blockingAnchor, blocking);
+                    float minPlacementScale = findPlacementScale(anchor, queryBox, blockingAnchor, blocking);
                     if (minPlacementScale >= scale) {
                         seenFeatures.insert(indexedFeature.index);
                         result.push_back(indexedFeature);
