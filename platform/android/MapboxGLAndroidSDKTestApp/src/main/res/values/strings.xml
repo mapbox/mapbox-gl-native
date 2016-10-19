@@ -69,6 +69,7 @@
     <string name="activity_add_sprite">Add Custom Sprite</string>
     <string name="activity_navigation_drawer">Android SDK View integration</string>
     <string name="activity_video_view">Video View</string>
+    <string name="activity_map_in_dialog">Dialog with map</string>
 
     <!-- Description -->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
@@ -122,6 +123,7 @@
     <string name="description_video_view">Android video view on top of the map view</string>
     <string name="description_add_remove_markers">Based on zoom level</string>
     <string name="description_style_file">Use a local file as the style</string>
+    <string name="description_map_in_dialog">Display a map inside a dialog fragment</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
     <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>
@@ -161,6 +163,7 @@
     <string name="button_user_dot_default">Default</string>
     <string name="button_user_dot_tint">Tint dot</string>
     <string name="button_user_accuracy_ring_tint">Tint ring</string>
+    <string name="button_open_dialog">Open dialog</string>
 
     <string name="label_fps">FPS:</string>
 
