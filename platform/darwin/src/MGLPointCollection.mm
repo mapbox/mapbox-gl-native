@@ -43,6 +43,24 @@ NS_ASSUME_NONNULL_BEGIN
     return _count;
 }
 
+- (void)getCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range
+{
+    if (range.location + range.length > _count)
+    {
+        [NSException raise:NSRangeException
+                    format:@"Invalid coordinate range %@ extends beyond current coordinate count of %zu",
+         NSStringFromRange(range), _count];
+    }
+    
+    NSUInteger index = 0;
+    
+    for (NSUInteger i = range.location; i < range.location + range.length; i++)
+    {
+        coords[index] = _coordinates[i];
+        index++;
+    }
+}
+
 - (MGLCoordinateBounds)overlayBounds
 {
     return _bounds;
