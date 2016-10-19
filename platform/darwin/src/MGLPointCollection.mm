@@ -43,6 +43,13 @@ NS_ASSUME_NONNULL_BEGIN
     return _count;
 }
 
+- (CLLocationCoordinate2D)coordinate
+{
+    assert(_count > 0);
+    
+    return CLLocationCoordinate2DMake(_coordinates[0].latitude, _coordinates[0].longitude);
+}
+
 - (void)getCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range
 {
     if (range.location + range.length > _count)
