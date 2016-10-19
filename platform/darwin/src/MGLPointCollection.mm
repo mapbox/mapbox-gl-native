@@ -6,6 +6,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation MGLPointCollection
+{
+    size_t _count;
+}
 
 + (instancetype)pointCollectionWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
@@ -22,9 +25,14 @@ NS_ASSUME_NONNULL_BEGIN
         {
             _coordinates[i] = coords[i];
         }        
-        _pointCount = count;
+        _count = count;
     }
     return self;
+}
+
+- (NSUInteger)pointCount
+{
+    return _count;
 }
 
 - (mbgl::Feature)featureObject
@@ -53,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p; count = %lu>",
-            NSStringFromClass([self class]), (void *)self, (unsigned long)_pointCount];
+            NSStringFromClass([self class]), (void *)self, (unsigned long)_count];
 }
 
 @end
