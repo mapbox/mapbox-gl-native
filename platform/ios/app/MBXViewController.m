@@ -62,6 +62,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingFilteredLines,
     MBXSettingsRuntimeStylingNumericFilteredFill,
     MBXSettingsRuntimeStylingStyleQuery,
+    MBXSettingsRuntimeStylingFeatureSource,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
@@ -306,6 +307,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Style Lines With Filter",
                 @"Style Fill With Numeric Filter",
                 @"Style Query For GeoJSON",
+                @"Style Feature",
             ]];
             break;
         case MBXSettingsMiscellaneous:
@@ -433,6 +435,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingStyleQuery:
                     [self styleQuery];
+                    break;
+                case MBXSettingsRuntimeStylingFeatureSource:
+                    [self styleFeature];
                     break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
@@ -826,6 +831,59 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         fillLayer.fillOpacity = [MGLStyleConstantValue<NSNumber *> valueWithRawValue:@0.5];
         [self.mapView.style addLayer:fillLayer];
     });
+}
+
+- (void)styleFeature
+{
+    self.mapView.zoomLevel = 10;
+    self.mapView.centerCoordinate = CLLocationCoordinate2DMake(51.068585180672635, -114.06074523925781);
+    
+    CLLocationCoordinate2D leafCoords[] = {
+        CLLocationCoordinate2DMake(50.9683733218221,-114.07035827636719),
+        CLLocationCoordinate2DMake(51.02325750523972,-114.06967163085938),
+        CLLocationCoordinate2DMake(51.009434536947786,-114.14245605468749),
+        CLLocationCoordinate2DMake(51.030599281184124,-114.12597656249999),
+        CLLocationCoordinate2DMake(51.060386316691016,-114.21043395996094),
+        CLLocationCoordinate2DMake(51.063838646941576,-114.17816162109375),
+        CLLocationCoordinate2DMake(51.08152779888779,-114.19876098632812),
+        CLLocationCoordinate2DMake(51.08066507029602,-114.16854858398438),
+        CLLocationCoordinate2DMake(51.09662294502995,-114.17472839355469),
+        CLLocationCoordinate2DMake(51.07764539352731,-114.114990234375),
+        CLLocationCoordinate2DMake(51.13670896949613,-114.12391662597656),
+        CLLocationCoordinate2DMake(51.13369295212583,-114.09576416015624),
+        CLLocationCoordinate2DMake(51.17546878815025,-114.07585144042969),
+        CLLocationCoordinate2DMake(51.140155605265896,-114.04632568359375),
+        CLLocationCoordinate2DMake(51.15049396880196,-114.01542663574219),
+        CLLocationCoordinate2DMake(51.088860342359965,-114.00924682617186),
+        CLLocationCoordinate2DMake(51.12205789681453,-113.94813537597656),
+        CLLocationCoordinate2DMake(51.106539930027225,-113.94882202148438),
+        CLLocationCoordinate2DMake(51.117747873223344,-113.92616271972656),
+        CLLocationCoordinate2DMake(51.10093493903458,-113.92616271972656),
+        CLLocationCoordinate2DMake(51.10697105503078,-113.90625),
+        CLLocationCoordinate2DMake(51.09144802136697,-113.9117431640625),
+        CLLocationCoordinate2DMake(51.04916446529361,-113.97010803222655),
+        CLLocationCoordinate2DMake(51.045279344649146,-113.9398956298828),
+        CLLocationCoordinate2DMake(51.022825599852496,-114.06211853027344),
+        CLLocationCoordinate2DMake(51.045279344649146,-113.9398956298828),
+        CLLocationCoordinate2DMake(51.022825599852496,-114.06211853027344),
+        CLLocationCoordinate2DMake(51.022825599852496,-114.06280517578125),
+        CLLocationCoordinate2DMake(50.968805734317804,-114.06280517578125),
+        CLLocationCoordinate2DMake(50.9683733218221,-114.07035827636719),
+    };
+    NSUInteger coordsCount = sizeof(leafCoords) / sizeof(leafCoords[0]);
+    
+    MGLPolygonFeature *feature = [MGLPolygonFeature polygonWithCoordinates:leafCoords count:coordsCount];
+    feature.identifier = @"leaf-feature";
+    feature.attributes = @{@"color": @"red"};
+    
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"leaf-source" features:@[feature] options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"leaf-fill-layer" source:source];
+    layer.predicate = [NSPredicate predicateWithFormat:@"color = %@", @"red"];
+    MGLStyleValue *fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
+    layer.fillColor = fillColor;
+    [self.mapView.style addLayer:layer];
 }
 
 - (IBAction)startWorldTour

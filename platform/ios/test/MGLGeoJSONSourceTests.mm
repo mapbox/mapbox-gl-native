@@ -10,12 +10,6 @@
 @interface MGLGeoJSONSourceTests : XCTestCase
 @end
 
-@interface MGLPolygonFeature (Test)
-
-@property (nonatomic, copy, readwrite) NS_DICTIONARY_OF(NSString *, id) *attributes;
-
-@end
-
 @implementation MGLGeoJSONSourceTests
 
 - (void)testMGLGeoJSONSourceWithOptions {

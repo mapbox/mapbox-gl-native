@@ -31,6 +31,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * A source’s tiles are no longer rendered when the map is outside the source’s supported zoom levels. ([#6345](https://github.com/mapbox/mapbox-gl-native/pull/6345))
 * Improved style parsing performance. ([#6170](https://github.com/mapbox/mapbox-gl-native/pull/6170))
 * Improved feature querying performance. ([#6514](https://github.com/mapbox/mapbox-gl-native/pull/6514))
+* A feature's `identifier` and `attributes` properties can now be mutated. ([#6728](https://github.com/mapbox/mapbox-gl-native/pull/6728))
 
 ### User location
 

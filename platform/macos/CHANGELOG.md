@@ -23,6 +23,7 @@
 * Fixed crashes that could occur when loading a malformed stylesheet. ([#5736](https://github.com/mapbox/mapbox-gl-native/pull/5736))
 * Improved style parsing performance. ([#6170](https://github.com/mapbox/mapbox-gl-native/pull/6170))
 * Improved feature querying performance. ([#6514](https://github.com/mapbox/mapbox-gl-native/pull/6514))
+* A feature's `identifier` and `attributes` properties can now be mutated. ([#6728](https://github.com/mapbox/mapbox-gl-native/pull/6728))
 
 ### Annotations
 
