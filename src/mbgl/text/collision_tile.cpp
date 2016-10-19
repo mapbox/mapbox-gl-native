@@ -11,20 +11,7 @@
 
 namespace mbgl {
 
-auto infinity = std::numeric_limits<float>::infinity();
-
-CollisionTile::CollisionTile(PlacementConfig config_) : config(std::move(config_)),
-    edges({{
-        // left
-        CollisionBox(Point<float>(0, 0), 0, -infinity, 0, infinity, infinity),
-        // right
-        CollisionBox(Point<float>(util::EXTENT, 0), 0, -infinity, 0, infinity, infinity),
-        // top
-        CollisionBox(Point<float>(0, 0), -infinity, 0, infinity, 0, infinity),
-        // bottom
-        CollisionBox(Point<float>(0, util::EXTENT), -infinity, 0, infinity, 0, infinity),
-    }}) {
-
+CollisionTile::CollisionTile(PlacementConfig config_) : config(std::move(config_)) {
     // Compute the transformation matrix.
     const float angle_sin = std::sin(config.angle);
     const float angle_cos = std::cos(config.angle);
@@ -81,6 +68,17 @@ float CollisionTile::findPlacementScale(float minPlacementScale, const Point<flo
 }
 
 float CollisionTile::placeFeature(const CollisionFeature& feature, bool allowOverlap, bool avoidEdges) {
+    static const float infinity = std::numeric_limits<float>::infinity();
+    static const std::array<CollisionBox, 4> edges {{
+        // left
+        CollisionBox(Point<float>(0, 0), 0, -infinity, 0, infinity, infinity),
+        // right
+        CollisionBox(Point<float>(util::EXTENT, 0), 0, -infinity, 0, infinity, infinity),
+        // top
+        CollisionBox(Point<float>(0, 0), -infinity, 0, infinity, 0, infinity),
+        // bottom
+        CollisionBox(Point<float>(0, util::EXTENT), -infinity, 0, infinity, 0, infinity)
+    }};
 
     float minPlacementScale = minScale;
 
@@ -98,14 +96,10 @@ float CollisionTile::placeFeature(const CollisionFeature& feature, bool allowOve
         }
 
         if (avoidEdges) {
-            const Point<float> tl = { box.x1, box.y1 };
-            const Point<float> tr = { box.x2, box.y1 };
-            const Point<float> bl = { box.x1, box.y2 };
-            const Point<float> br = { box.x2, box.y2 };
-            const Point<float> rtl = util::matrixMultiply(reverseRotationMatrix, tl);
-            const Point<float> rtr = util::matrixMultiply(reverseRotationMatrix, tr);
-            const Point<float> rbl = util::matrixMultiply(reverseRotationMatrix, bl);
-            const Point<float> rbr = util::matrixMultiply(reverseRotationMatrix, br);
+            const Point<float> rtl = util::matrixMultiply(reverseRotationMatrix, { box.x1, box.y1 });
+            const Point<float> rtr = util::matrixMultiply(reverseRotationMatrix, { box.x2, box.y1 });
+            const Point<float> rbl = util::matrixMultiply(reverseRotationMatrix, { box.x1, box.y2 });
+            const Point<float> rbr = util::matrixMultiply(reverseRotationMatrix, { box.x2, box.y2 });
             CollisionBox rotatedBox(box.anchor,
                     util::min(rtl.x, rtr.x, rbl.x, rbr.x),
                     util::min(rtl.y, rtr.y, rbl.y, rbr.y),
