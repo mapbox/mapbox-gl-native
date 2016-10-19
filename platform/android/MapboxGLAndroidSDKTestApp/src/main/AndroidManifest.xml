@@ -348,6 +348,13 @@
                 android:name="@string/category"
                 android:value="@string/category_style" />
         </activity>
+        <activity android:name=".activity.style.RealTimeGeoJsonActivity"
+            android:description="@string/description_geojson_realtime"
+            android:label="@string/activity_geojson_realtime">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style" />
+        </activity>
         <activity
             android:name=".activity.style.StyleFileActivity"
             android:description="@string/description_style_file"
