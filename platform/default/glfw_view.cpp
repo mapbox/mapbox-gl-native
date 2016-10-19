@@ -508,6 +508,16 @@ void GLFWView::setWindowTitle(const std::string& title) {
     glfwSetWindowTitle(window, (std::string { "Mapbox GL: " } + title).c_str());
 }
 
+void GLFWView::setMapChangeCallback(std::function<void(mbgl::MapChange)> callback) {
+    this->mapChangeCallback = callback;
+}
+
+void GLFWView::notifyMapChange(mbgl::MapChange change) {
+    if (mapChangeCallback) {
+        mapChangeCallback(change);
+    }
+}
+
 namespace mbgl {
 namespace platform {
 
