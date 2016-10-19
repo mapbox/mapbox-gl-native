@@ -30,7 +30,7 @@ custom_categories:
       - MGLAnnotationView
       - MGLCalloutView
       - MGLCalloutViewDelegate
-      - MGLMultiPoint      
+      - MGLMultiPoint
       - MGLMultiPolygon
       - MGLMultiPolyline
       - MGLPointAnnotation
