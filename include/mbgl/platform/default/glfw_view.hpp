@@ -42,6 +42,9 @@ public:
 
     void run();
     void report(float duration);
+    
+    void setMapChangeCallback(std::function<void(mbgl::MapChange)> callback);
+    void notifyMapChange(mbgl::MapChange change) override;
 
 private:
     mbgl::Color makeRandomColor() const;
@@ -61,6 +64,8 @@ private:
 
     mbgl::AnnotationIDs annotationIDs;
     std::vector<std::string> spriteIDs;
+
+    std::function<void(mbgl::MapChange)> mapChangeCallback;
 
 private:
     bool fullscreen = false;
