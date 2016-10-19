@@ -1,13 +1,14 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLOverlay.h"
 #import "MGLShape.h"
 
 /**
  The `MGLPointCollection` class is used to define shapes composed of multiple 
  points.
  */
-@interface MGLPointCollection : MGLShape
+@interface MGLPointCollection : MGLShape <MGLOverlay>
 
 /**
  Creates and returns a `MGLPointCollection` object from the specified set of

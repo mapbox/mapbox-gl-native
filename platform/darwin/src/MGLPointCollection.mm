@@ -1,4 +1,5 @@
 #import "MGLPointCollection_Private.h"
+#import "MGLGeometry_Private.h"
 
 #import <mbgl/util/geometry.hpp>
 #import <mbgl/util/feature.hpp>
@@ -8,6 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation MGLPointCollection
 {
     size_t _count;
+    MGLCoordinateBounds _bounds;
 }
 
 + (instancetype)pointCollectionWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
@@ -20,12 +22,18 @@ NS_ASSUME_NONNULL_BEGIN
     self = [super init];
     if (self)
     {
-        _coordinates = (CLLocationCoordinate2D *)malloc(count * sizeof(CLLocationCoordinate2D));
+        _count = count;
+        _coordinates = (CLLocationCoordinate2D *)malloc(_count * sizeof(CLLocationCoordinate2D));
+        
+        mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
+        
         for (NSUInteger i = 0; i < count; i++)
         {
             _coordinates[i] = coords[i];
-        }        
-        _count = count;
+            bounds.extend(mbgl::LatLng(coords[i].latitude, coords[i].longitude));
+        }
+        
+        _bounds = MGLCoordinateBoundsFromLatLngBounds(bounds);
     }
     return self;
 }
@@ -33,6 +41,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSUInteger)pointCount
 {
     return _count;
+}
+
+- (MGLCoordinateBounds)overlayBounds
+{
+    return _bounds;
+}
+
+- (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds
+{
+    return MGLLatLngBoundsFromCoordinateBounds(_bounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
 }
 
 - (mbgl::Feature)featureObject
