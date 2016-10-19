@@ -3,6 +3,10 @@
 
 #import "MGLShape.h"
 
+/**
+ The `MGLPointCollection` class is used to define shapes composed of multiple 
+ points.
+ */
 @interface MGLPointCollection : MGLShape
 
 /**

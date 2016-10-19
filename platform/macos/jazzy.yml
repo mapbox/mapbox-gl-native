@@ -38,11 +38,11 @@ custom_categories:
       - MGLShapeCollection
   - name: Map Data
     children:
-      - MGLFeature
-      - MGLMultiPointFeature
+      - MGLFeature      
       - MGLMultiPolygonFeature
       - MGLMultiPolylineFeature
-      - MGLPointFeature
+      - MGLPointCollectionFeature
+      - MGLPointFeature      
       - MGLPolygonFeature
       - MGLPolylineFeature
       - MGLShapeCollectionFeature

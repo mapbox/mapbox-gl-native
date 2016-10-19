@@ -6,9 +6,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- The `MGLMultiPoint` class is used to define shapes composed of multiple points. 
- This class is also the superclass of `MGLPolyline` and `MGLPolygon`. The
- methods and properties of this class can be used to access information about 
+ The `MGLMultiPoint` class is the superclass of `MGLPolyline` and `MGLPolygon`. 
+ The methods and properties of this class can be used to access information about
  the specific points associated with a line or polygon.
  */
 @interface MGLMultiPoint : MGLShape

@@ -135,7 +135,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- The `MGLMultiPointFeature` class represents a multipoint in a
+ The `MGLPointCollectionFeature` class represents a multipoint in a
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
 @interface MGLPointCollectionFeature : MGLPointCollection <MGLFeature>

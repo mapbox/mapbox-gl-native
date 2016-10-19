@@ -50,6 +50,12 @@ NS_ASSUME_NONNULL_BEGIN
              @"coordinates": coordinates};
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; count = %lu>",
+            NSStringFromClass([self class]), (void *)self, (unsigned long)_pointCount];
+}
+
 @end
 
 NS_ASSUME_NONNULL_END
