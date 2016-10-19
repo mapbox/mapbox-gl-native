@@ -57,21 +57,12 @@ typedef NS_ENUM(NSUInteger, MGLCirclePitchScale) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleRadius;
 
-#if TARGET_OS_IPHONE
 /**
  The fill color of the circle.
  
- The default value of this property is an `MGLStyleValue` object containing `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing the color black. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *circleColor;
-#else
-/**
- The fill color of the circle.
- 
- The default value of this property is an `MGLStyleValue` object containing `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *circleColor;
-#endif
 
 /**
  Amount to blur the circle. 1 blurs the circle such that only the centerpoint is full opacity.
