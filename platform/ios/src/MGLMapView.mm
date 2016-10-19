@@ -1423,18 +1423,6 @@ public:
         }
     }
 
-    // Handle the case of an offset annotation view by converting the tap point to be the geo location
-    // of the annotation itself that the view represents
-    for (MGLAnnotationView *view in self.annotationContainerView.annotationViews)
-    {
-        if (view.centerOffset.dx != 0 || view.centerOffset.dy != 0) {
-            if (CGRectContainsPoint(view.frame, tapPoint)) {
-                CGPoint annotationPoint = [self convertCoordinate:view.annotation.coordinate toPointToView:self];
-                tapPoint = annotationPoint;
-            }
-        }
-    }
-
     MGLAnnotationTag hitAnnotationTag = [self annotationTagAtPoint:tapPoint persistingResults:YES];
     if (hitAnnotationTag != MGLAnnotationTagNotFound)
     {
@@ -3241,21 +3229,20 @@ public:
     // distance between its center and the tap is less than the maximum height
     // or width of an installed annotation image or annotation view.
     CGRect queryRect = CGRectInset({ point, CGSizeZero },
-                                   -_unionedAnnotationRepresentationSize.width,
-                                   -_unionedAnnotationRepresentationSize.height);
-    queryRect = CGRectInset(queryRect, -MGLAnnotationImagePaddingForHitTest,
-                            -MGLAnnotationImagePaddingForHitTest);
+                                   -_unionedAnnotationRepresentationSize.width / 2.0,
+                                   -_unionedAnnotationRepresentationSize.height / 2.0);
+    queryRect = CGRectInset(queryRect, -MGLAnnotationImagePaddingForHitTest / 2.0,
+                            -MGLAnnotationImagePaddingForHitTest / 2.0);
     std::vector<MGLAnnotationTag> nearbyAnnotations = [self annotationTagsInRect:queryRect];
 
+    // Assume that the user is fat-fingering an annotation.
+    CGRect hitRect = CGRectInset({ point, CGSizeZero },
+                                 -MGLAnnotationImagePaddingForHitTest,
+                                 -MGLAnnotationImagePaddingForHitTest);
     if (nearbyAnnotations.size())
     {
-        // Assume that the user is fat-fingering an annotation.
-        CGRect hitRect = CGRectInset({ point, CGSizeZero },
-                                     -MGLAnnotationImagePaddingForHitTest,
-                                     -MGLAnnotationImagePaddingForHitTest);
-
-        // Filter out any annotation whose image or view is unselectable or for which
-        // hit testing fails.
+        // Filter out any annotation view or annotation whose image is unselectable or
+        // for which hit testing fails.
         auto end = std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(),
                                   [&](const MGLAnnotationTag annotationTag)
         {
@@ -3268,14 +3255,8 @@ public:
             MGLAnnotationView *annotationView = annotationContext.annotationView;
             if (annotationView)
             {
-                if ( ! annotationView.enabled)
-                {
-                    return true;
-                }
-
-                CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
-                CGRect frame = CGRectInset({ calloutAnchorPoint, CGSizeZero }, -CGRectGetWidth(annotationView.frame) / 2, -CGRectGetHeight(annotationView.frame) / 2);
-                annotationRect = UIEdgeInsetsInsetRect(frame, annotationView.alignmentRectInsets);
+                // remove annotation views as they will be tested later
+                return true;
             }
             else
             {
@@ -3297,6 +3278,20 @@ public:
         });
 
         nearbyAnnotations.resize(std::distance(nearbyAnnotations.begin(), end));
+    }
+    
+    // test annotation views for real touch
+    for (MGLAnnotationView *annotationView in self.annotationContainerView.annotationViews)
+    {
+        if (annotationView.enabled
+            && CGRectIntersectsRect(annotationView.frame, hitRect))
+        {
+            MGLAnnotationTag tag = [self annotationTagForAnnotation:annotationView.annotation];
+            if (tag != MGLAnnotationTagNotFound)
+            {
+                nearbyAnnotations.push_back(tag);
+            }
+        }
     }
 
     MGLAnnotationTag hitAnnotationTag = MGLAnnotationTagNotFound;
