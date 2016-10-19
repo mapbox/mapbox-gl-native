@@ -30,7 +30,7 @@ private:
     std::array<uint8_t, 256> changeOpacities;
     std::array<uint8_t, 256> opacities;
 
-    int16_t previousZoomIndex = 0;
+    int16_t previousZoomIndex = -1;
     TimePoint previousTime = TimePoint::min();
     TimePoint time = TimePoint::min();
     bool firstFrame = true;
