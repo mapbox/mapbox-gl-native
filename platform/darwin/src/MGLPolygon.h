@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param count The number of items in the `coords` array.
  @return A new polygon object.
  */
-+ (instancetype)polygonWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count NS_SWIFT_NAME(polygon(coordinates:count:));
++ (instancetype)polygonWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
 
 /**
  Creates and returns an `MGLPolygon` object from the specified set of
