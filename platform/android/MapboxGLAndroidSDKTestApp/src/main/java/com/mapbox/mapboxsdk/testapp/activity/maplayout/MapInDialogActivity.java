@@ -81,13 +81,6 @@ public class MapInDialogActivity extends AppCompatActivity {
 
             mapView = (MapView) view.findViewById(R.id.mapView);
             mapView.onCreate(savedInstanceState);
-            mapView.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(MapboxMap mapboxMap) {
-
-                }
-            });
-
         }
 
         @Override
