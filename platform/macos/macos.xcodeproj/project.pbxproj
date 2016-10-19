@@ -41,7 +41,7 @@
 		35D65C5A1D65AD5500722C23 /* NSDate+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 35D65C581D65AD5500722C23 /* NSDate+MGLAdditions.h */; };
 		35D65C5B1D65AD5500722C23 /* NSDate+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35D65C591D65AD5500722C23 /* NSDate+MGLAdditions.mm */; };
 		4049C2A51DB6CE7F00B3F799 /* MGLPointCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 4049C2A11DB6CE7800B3F799 /* MGLPointCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4049C2A81DB6D09B00B3F799 /* MGLPointCollection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4049C2A71DB6D09B00B3F799 /* MGLPointCollection.mm */; };
+		4049C2AD1DB8020600B3F799 /* MGLPointCollection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4049C2A71DB6D09B00B3F799 /* MGLPointCollection.mm */; };
 		408AA85B1DAEECFE00022900 /* MGLShape_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 408AA85A1DAEECF100022900 /* MGLShape_Private.h */; };
 		408AA8651DAEEE3400022900 /* MGLPolygon+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 408AA8601DAEED3300022900 /* MGLPolygon+MGLAdditions.h */; };
 		408AA8661DAEEE3600022900 /* MGLPolyline+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 408AA8611DAEED3300022900 /* MGLPolyline+MGLAdditions.h */; };
@@ -1111,7 +1111,6 @@
 				DA839E9D1CC2E3400062CAFB /* MapDocument.m in Sources */,
 				DAE6C2ED1CC3050F00DB3429 /* DroppedPinAnnotation.m in Sources */,
 				DAE6C2EE1CC3050F00DB3429 /* LocationCoordinate2DTransformer.m in Sources */,
-				4049C2A81DB6D09B00B3F799 /* MGLPointCollection.mm in Sources */,
 				DAE6C2F11CC3050F00DB3429 /* TimeIntervalTransformer.m in Sources */,
 				DA839E9A1CC2E3400062CAFB /* main.m in Sources */,
 				DA839E971CC2E3400062CAFB /* AppDelegate.m in Sources */,
@@ -1154,6 +1153,7 @@
 				DAE6C3BA1CC31EF300DB3429 /* MGLOpenGLLayer.mm in Sources */,
 				DAE6C38A1CC31E2A00DB3429 /* MGLMultiPoint.mm in Sources */,
 				DAE6C3961CC31E2A00DB3429 /* MGLTypes.m in Sources */,
+				4049C2AD1DB8020600B3F799 /* MGLPointCollection.mm in Sources */,
 				DA35A2A61CC9EB2700E826B2 /* MGLCoordinateFormatter.m in Sources */,
 				352742821D4C243B00A1ECE6 /* MGLSource.mm in Sources */,
 				DAE6C3881CC31E2A00DB3429 /* MGLMapCamera.mm in Sources */,

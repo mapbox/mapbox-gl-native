@@ -2869,8 +2869,9 @@ public:
             [(NSObject *)annotation addObserver:self forKeyPath:@"coordinates" options:0 context:(void *)(NSUInteger)annotationTag];
         }
         else if ( ! [annotation isKindOfClass:[MGLMultiPolyline class]]
-                 || ![annotation isKindOfClass:[MGLMultiPolygon class]]
-                 || ![annotation isKindOfClass:[MGLShapeCollection class]])
+                 && ![annotation isKindOfClass:[MGLMultiPolygon class]]
+                 && ![annotation isKindOfClass:[MGLShapeCollection class]]
+                 && ![annotation isKindOfClass:[MGLPointCollection class]])
         {
             MGLAnnotationView *annotationView;
             NSString *symbolName;
