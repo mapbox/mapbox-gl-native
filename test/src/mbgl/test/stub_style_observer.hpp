@@ -38,6 +38,10 @@ public:
         if (sourceError) sourceError(source, error);
     }
 
+    void onSourceDescriptionChanged(Source& source) override {
+        if (sourceDescriptionChanged) sourceDescriptionChanged(source);
+    }
+
     void onTileChanged(Source& source, const OverscaledTileID& tileID) override {
         if (tileChanged) tileChanged(source, tileID);
     };
@@ -58,6 +62,7 @@ public:
     std::function<void (Source&)> sourceLoaded;
     std::function<void (Source&, std::string)> sourceAttributionChanged;
     std::function<void (Source&, std::exception_ptr)> sourceError;
+    std::function<void (Source&)> sourceDescriptionChanged;
     std::function<void (Source&, const OverscaledTileID&)> tileChanged;
     std::function<void (Source&, const OverscaledTileID&, std::exception_ptr)> tileError;
     std::function<void (std::exception_ptr)> resourceError;

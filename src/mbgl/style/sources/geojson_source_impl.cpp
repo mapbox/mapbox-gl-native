@@ -38,6 +38,12 @@ GeoJSONSource::Impl::~Impl() = default;
 
 void GeoJSONSource::Impl::setURL(std::string url_) {
     url = std::move(url_);
+
+    //Signal that the source description needs a reload
+    if (loaded) {
+        loaded = false;
+        observer->onSourceDescriptionChanged(base);
+    }
 }
 
 optional<std::string> GeoJSONSource::Impl::getURL() {
@@ -132,6 +138,7 @@ void GeoJSONSource::Impl::loadDescription(FileSource& fileSource) {
 
             loaded = true;
             observer->onSourceLoaded(base);
+            req.reset();
         }
     });
 }

@@ -7,6 +7,7 @@
 
 #include <mbgl/style/sources/geojson_source.hpp>
 
+
 NSString * const MGLGeoJSONClusterOption = @"MGLGeoJSONCluster";
 NSString * const MGLGeoJSONClusterRadiusOption = @"MGLGeoJSONClusterRadius";
 NSString * const MGLGeoJSONClusterMaximumZoomLevelOption = @"MGLGeoJSONClusterMaximumZoomLevel";
@@ -100,6 +101,42 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     {
         [NSException raise:@"Value not handled" format:@"%@ is not an NSNumber", value];
     }
+}
+
+- (void)setGeoJSONData:(NSData *)geoJSONData
+{
+    _geoJSONData = geoJSONData;
+    
+    NSString *string = [[NSString alloc] initWithData:_geoJSONData encoding:NSUTF8StringEncoding];
+    const auto geojson = mapbox::geojson::parse(string.UTF8String).get<mapbox::geojson::feature_collection>();
+    
+    const auto geoJSONSource = reinterpret_cast<mbgl::style::GeoJSONSource *>(self.source);
+    geoJSONSource->setGeoJSON(geojson);
+    
+    _features = MGLFeaturesFromMBGLFeatures(geojson);
+}
+
+- (void)setURL:(NSURL *)URL
+{
+    _URL = URL;
+    
+    NSURL *url = self.URL.mgl_URLByStandardizingScheme;
+    const auto geoJSONSource = reinterpret_cast<mbgl::style::GeoJSONSource *>(self.source);
+    geoJSONSource->setURL(url.absoluteString.UTF8String);
+}
+
+- (void)setFeatures:(NSArray *)features
+{
+    mbgl::FeatureCollection featureCollection;
+    featureCollection.reserve(features.count);
+    for (id <MGLFeaturePrivate> feature in features) {
+        featureCollection.push_back([feature mbglFeature]);
+    }
+    const auto geojson = mbgl::GeoJSON{featureCollection};
+    const auto geoJSONSource = reinterpret_cast<mbgl::style::GeoJSONSource *>(self.source);
+    geoJSONSource->setGeoJSON(geojson);
+    
+    _features = MGLFeaturesFromMBGLFeatures(featureCollection);
 }
 
 - (std::unique_ptr<mbgl::style::Source>)mbglSource
