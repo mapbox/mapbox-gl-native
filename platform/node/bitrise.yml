@@ -1,9 +1,12 @@
-format_version: 1.1.0
+format_version: 1.3.0
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
 trigger_map:
-- pattern: "*"
-  is_pull_request_allowed: true
+- tag: "node-v*"
+  workflow: primary
+- push_branch: "*"
+  workflow: primary
+- pull_request_target_branch: "*"
   workflow: primary
 
 workflows:
@@ -23,6 +26,16 @@ workflows:
                 envman add --key SKIPCI --value false
             fi
     - script:
+        title: Check for publishing
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - content: |-
+            #!/bin/bash
+            PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
+            if [[ "${BITRISE_GIT_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]]; then
+                envman add --key PUBLISH --value true
+            fi
+    - script:
         title: Run build script
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
@@ -35,9 +48,23 @@ workflows:
             brew link homebrew/versions/node4-lts
             gem install xcpretty --no-rdoc --no-ri
             make node
-            make test-node || result=$?
-            ./platform/node/scripts/after_script.sh ${BITRISE_BUILD_NUMBER} ${BITRISE_GIT_TAG:-}
-            exit ${result:-0}
+    - script:
+        title: Run test script
+        run_if: '{{and (enveq "SKIPCI" "false") (enveq "PUBLISH" "")}}'
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -eu -o pipefail
+            make test-node || envman add --key RESULT --value $?
+    - script:
+        title: Run publish script
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -eu -o pipefail
+            ./platform/node/scripts/after_script.sh ${BITRISE_BUILD_NUMBER}
+            exit ${RESULT:-0}
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
