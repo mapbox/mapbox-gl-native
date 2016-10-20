@@ -49,8 +49,8 @@ public:
     void cascade(const CascadeParameters&) override;
     bool evaluate(const PropertyEvaluationParameters&) override;
 
-    std::unique_ptr<Bucket> createBucket(BucketParameters&) const override;
-    std::unique_ptr<SymbolLayout> createLayout(BucketParameters&) const;
+    std::unique_ptr<Bucket> createBucket(BucketParameters&, const GeometryTileLayer&) const override;
+    std::unique_ptr<SymbolLayout> createLayout(BucketParameters&, const GeometryTileLayer&) const;
 
     SymbolPropertyValues iconPropertyValues(const SymbolLayoutProperties::Evaluated&) const;
     SymbolPropertyValues textPropertyValues(const SymbolLayoutProperties::Evaluated&) const;

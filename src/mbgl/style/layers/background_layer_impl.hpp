@@ -15,7 +15,7 @@ public:
     void cascade(const CascadeParameters&) override;
     bool evaluate(const PropertyEvaluationParameters&) override;
 
-    std::unique_ptr<Bucket> createBucket(BucketParameters&) const override;
+    std::unique_ptr<Bucket> createBucket(BucketParameters&, const GeometryTileLayer&) const override;
 
     BackgroundPaintProperties paint;
 };
