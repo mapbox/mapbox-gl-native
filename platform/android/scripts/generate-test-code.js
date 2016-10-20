@@ -16,9 +16,9 @@ global.camelize = function (str) {
 
 const excludeActivities = ["UpdateMetadataActivity","CarDrivingActivity","MyLocationTrackingModeActivity","MyLocationToggleActivity","MyLocationTintActivity","MyLocationDrawableActivity","DoubleMapActivity", "LocationPickerActivity","GeoJsonClusteringActivity","RuntimeStyleTestActivity", "AnimatedMarkerActivity", "ViewPagerActivity","MapFragmentActivity","SupportMapFragmentActivity","SnapshotActivity","NavigationDrawerActivity", "QueryRenderedFeaturesBoxHighlightActivity", "MultiMapActivity", "MapInDialogActivity"];
 const appBasePath = 'platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity';
-const testBasePath = 'platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/activity/gen';
+const testBasePath = 'platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/activity/gen';
 const subPackages = fs.readdirSync(appBasePath);
-const ejsConversionTask = ejs.compile(fs.readFileSync('platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/activity/activity.junit.ejs', 'utf8'), {strict: true});
+const ejsConversionTask = ejs.compile(fs.readFileSync('platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/activity/activity.junit.ejs', 'utf8'), {strict: true});
 
 if (!fs.existsSync(testBasePath)){
   fs.mkdirSync(testBasePath);
