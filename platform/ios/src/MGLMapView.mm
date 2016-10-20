@@ -776,7 +776,7 @@ public:
     [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeTop
-                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                  relatedBy:NSLayoutRelationEqual
                                      toItem:self
                                   attribute:NSLayoutAttributeTop
                                  multiplier:1
@@ -819,7 +819,7 @@ public:
     [self.logoViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeBottom
-                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                  relatedBy:NSLayoutRelationEqual
                                      toItem:self.logoView
                                   attribute:NSLayoutAttributeBaseline
                                  multiplier:1
@@ -843,7 +843,7 @@ public:
     [self.attributionButtonConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeBottom
-                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                  relatedBy:NSLayoutRelationEqual
                                      toItem:self.attributionButton
                                   attribute:NSLayoutAttributeBaseline
                                  multiplier:1
