@@ -773,14 +773,18 @@ public:
     [constraintParentView removeConstraints:self.compassViewConstraints];
     [self.compassViewConstraints removeAllObjects];
 
+    // Work around an apparent iOS 10 bug where the top layout guide isn't always updated
+    // unless there's an active constraint against it. This means we cannot constrain
+    // directly to the top of self — instead, we must constrain to the top layout guide's
+    // bottom offset, then subtract that value from contentInset.
     [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeTop
                                   relatedBy:NSLayoutRelationEqual
-                                     toItem:self
-                                  attribute:NSLayoutAttributeTop
+                                     toItem:viewController.topLayoutGuide
+                                  attribute:NSLayoutAttributeBottom
                                  multiplier:1
-                                   constant:5 + self.contentInset.top]];
+                                   constant:5 + self.contentInset.top - viewController.topLayoutGuide.length]];
 
     [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
