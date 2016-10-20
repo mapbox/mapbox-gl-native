@@ -2,7 +2,7 @@ format_version: 1.1.0
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
 trigger_map:
-- tag: node-v*.*.*
+- tag: "node-v*.*.*"
   workflow: primary
 - pattern: "*"
   is_pull_request_allowed: true
@@ -28,7 +28,7 @@ workflows:
         - content: |-
             #!/bin/bash
             PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
-            if [[ ${BITRISE_GIT_TAG:-} == "node-v${PACKAGE_JSON_VERSION}" ]]; then
+            if [[ ${BITRISE_GIT_TAG} == "node-v${PACKAGE_JSON_VERSION}" ]]; then
                 envman add --key PUBLISH --value true
                 envman add --key BUILDTYPE --value "Release"
             else
@@ -63,7 +63,6 @@ workflows:
             exit ${RESULT:-0}
     - slack:
         title: Post to Slack
-        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - webhook_url: "$SLACK_HOOK_URL"
         - channel: "#gl-bots"
