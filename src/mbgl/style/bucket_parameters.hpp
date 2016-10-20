@@ -21,14 +21,12 @@ namespace style {
 class BucketParameters {
 public:
     BucketParameters(const OverscaledTileID& tileID_,
-                          const GeometryTileLayer& layer_,
                           const std::atomic<bool>& obsolete_,
                           uintptr_t tileUID_,
                           GlyphAtlas& glyphAtlas_,
                           FeatureIndex& featureIndex_,
                           const MapMode mode_)
         : tileID(tileID_),
-          layer(layer_),
           obsolete(obsolete_),
           tileUID(tileUID_),
           glyphAtlas(glyphAtlas_),
@@ -39,10 +37,9 @@ public:
         return obsolete;
     }
 
-    void eachFilteredFeature(const Filter&, std::function<void (const GeometryTileFeature&, std::size_t index, const std::string& layerName)>);
+    void eachFilteredFeature(const Filter&, const GeometryTileLayer&, std::function<void (const GeometryTileFeature&, std::size_t index, const std::string& layerName)>);
 
     const OverscaledTileID& tileID;
-    const GeometryTileLayer& layer;
     const std::atomic<bool>& obsolete;
     uintptr_t tileUID;
     GlyphAtlas& glyphAtlas;

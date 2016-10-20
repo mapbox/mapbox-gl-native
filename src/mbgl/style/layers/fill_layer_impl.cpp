@@ -30,11 +30,11 @@ bool FillLayer::Impl::evaluate(const PropertyEvaluationParameters& parameters) {
     return paint.hasTransition();
 }
 
-std::unique_ptr<Bucket> FillLayer::Impl::createBucket(BucketParameters& parameters) const {
+std::unique_ptr<Bucket> FillLayer::Impl::createBucket(BucketParameters& parameters, const GeometryTileLayer& layer) const {
     auto bucket = std::make_unique<FillBucket>();
 
     auto& name = bucketName();
-    parameters.eachFilteredFeature(filter, [&] (const auto& feature, std::size_t index, const std::string& layerName) {
+    parameters.eachFilteredFeature(filter, layer, [&] (const auto& feature, std::size_t index, const std::string& layerName) {
         auto geometries = feature.getGeometries();
         bucket->addGeometry(geometries);
         parameters.featureIndex.insert(geometries, index, layerName, name);

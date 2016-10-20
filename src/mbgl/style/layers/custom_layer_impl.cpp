@@ -67,7 +67,7 @@ bool CustomLayer::Impl::evaluate(const PropertyEvaluationParameters&) {
     return false;
 }
 
-std::unique_ptr<Bucket> CustomLayer::Impl::createBucket(BucketParameters&) const {
+std::unique_ptr<Bucket> CustomLayer::Impl::createBucket(BucketParameters&, const GeometryTileLayer&) const {
     return nullptr;
 }
 

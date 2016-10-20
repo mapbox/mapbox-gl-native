@@ -210,6 +210,13 @@ void GeometryTileWorker::redoLayout() {
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
     auto featureIndex = std::make_unique<FeatureIndex>();
 
+    BucketParameters parameters(id,
+                                obsolete,
+                                reinterpret_cast<uintptr_t>(this),
+                                glyphAtlas,
+                                *featureIndex,
+                                mode);
+
     for (auto i = layers->rbegin(); i != layers->rend(); i++) {
         if (obsolete) {
             return;
@@ -235,18 +242,10 @@ void GeometryTileWorker::redoLayout() {
             continue;
         }
 
-        BucketParameters parameters(id,
-                                    *geometryLayer,
-                                    obsolete,
-                                    reinterpret_cast<uintptr_t>(this),
-                                    glyphAtlas,
-                                    *featureIndex,
-                                    mode);
-
         if (layer->is<SymbolLayer>()) {
-            symbolLayouts.push_back(layer->as<SymbolLayer>()->impl->createLayout(parameters));
+            symbolLayouts.push_back(layer->as<SymbolLayer>()->impl->createLayout(parameters, *geometryLayer));
         } else {
-            std::unique_ptr<Bucket> bucket = layer->baseImpl->createBucket(parameters);
+            std::unique_ptr<Bucket> bucket = layer->baseImpl->createBucket(parameters, *geometryLayer);
             if (bucket->hasData()) {
                 buckets.emplace(layer->baseImpl->bucketName(), std::move(bucket));
             }
