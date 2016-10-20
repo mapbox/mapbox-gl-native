@@ -113,11 +113,21 @@ checkstyle {
 }
 
 def getAccessKeyDeviceFarm() {
-    return hasProperty('AWS_ACCESS_KEY_ID_DEVICE_FARM') ? AWS_ACCESS_KEY_ID_DEVICE_FARM : ""
+    if (project.hasProperty('AWS_ACCESS_KEY_ID_DEVICE_FARM')) {
+        return AWS_ACCESS_KEY_ID_DEVICE_FARM
+    } else {
+        println("Could not locate AWS_ACCESS_KEY_ID_DEVICE_FARM in gradle.properties")
+        return ""
+    }
 }
 
 def getSecretAccessKeyDeviceFarm() {
-    return hasProperty('AWS_SECRET_ACCESS_KEY_DEVICE_FARM') ? AWS_SECRET_ACCESS_KEY_DEVICE_FARM : ""
+    if (project.hasProperty('AWS_SECRET_ACCESS_KEY_DEVICE_FARM')) {
+        return AWS_SECRET_ACCESS_KEY_DEVICE_FARM
+    } else {
+        println("Could not locate AWS_SECRET_ACCESS_KEY_DEVICE_FARM in gradle.properties")
+        return ""
+    }
 }
 
 devicefarm {
@@ -130,10 +140,7 @@ devicefarm {
         secretKey getSecretAccessKeyDeviceFarm()
     }
 
-    // optional block, radios default to 'on' state, all parameters optional
     devicestate {
-        ///extraDataZipFile file("path/to/zip") // or ‘null’ if you have no extra data. Default is null.
-        //auxiliaryApps files(file("path/to/app"), file("path/to/app2")) // or ‘files()’ if you have no auxiliary apps. Default is an empty list.
         wifi "on"
         bluetooth "off"
         gps "on"
@@ -142,9 +149,6 @@ devicefarm {
         longitude - 122.3491 // default
     }
 
-    // Instrumentation
-    // optional filter "my-filter"
-    // See AWS Developer docs
     instrumentation {
 
     }
