@@ -209,13 +209,7 @@ void GeometryTileWorker::redoLayout() {
     std::unordered_set<std::string> parsed;
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
     auto featureIndex = std::make_unique<FeatureIndex>();
-
-    BucketParameters parameters(id,
-                                obsolete,
-                                reinterpret_cast<uintptr_t>(this),
-                                glyphAtlas,
-                                *featureIndex,
-                                mode);
+    BucketParameters parameters { id, obsolete, *featureIndex, mode };
 
     for (auto i = layers->rbegin(); i != layers->rend(); i++) {
         if (obsolete) {
