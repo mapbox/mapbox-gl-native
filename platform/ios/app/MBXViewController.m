@@ -66,6 +66,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingUpdateGeoJSONSourceData,
     MBXSettingsRuntimeStylingUpdateGeoJSONSourceData,
     MBXSettingsRuntimeStylingUpdateGeoJSONSourceURL,
+    MBXSettingsRuntimeStylingUpdateGeoJSONSourceFeatures,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
@@ -314,6 +315,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Style Dynamic Point Collection",
                 @"Update GeoJSON Source: Data",
                 @"Update GeoJSON Source: URL",
+                @"Update GeoJSON Source: Features",
             ]];
             break;
         case MBXSettingsMiscellaneous:
@@ -453,6 +455,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingUpdateGeoJSONSourceURL:
                     [self updateGeoJSONSourceURL];
+                    break;
+                case MBXSettingsRuntimeStylingUpdateGeoJSONSourceFeatures:
+                    [self updateGeoJSONSourceFeatures];
                     break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
@@ -945,29 +950,81 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     });
 }
 
+- (void)updateGeoJSONSourceFeatures
+{
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(-41.1520, 288.6592) zoomLevel:10 animated:NO];
+    
+    CLLocationCoordinate2D smallBox[] = {
+        {-41.14763798539186, 288.68019104003906},
+        {-41.140915920129665, 288.68019104003906},
+        {-41.140915920129665, 288.6887741088867},
+        {-41.14763798539186, 288.6887741088867},
+        {-41.14763798539186, 288.68019104003906}
+    };
+    
+    CLLocationCoordinate2D largeBox[] = {
+        {-41.17710352162799, 288.67298126220703},
+        {-41.13962313627545, 288.67298126220703},
+        {-41.13962313627545, 288.7261962890625},
+        {-41.17710352162799, 288.7261962890625},
+        {-41.17710352162799, 288.67298126220703}
+    };
+    
+    MGLPolygonFeature *smallBoxFeature = [MGLPolygonFeature polygonWithCoordinates:smallBox count:sizeof(smallBox)/sizeof(smallBox[0])];
+    MGLPolygonFeature *largeBoxFeature = [MGLPolygonFeature polygonWithCoordinates:largeBox count:sizeof(largeBox)/sizeof(largeBox[0])];
+
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"mutable-data-source-features-id" features:@[smallBoxFeature] options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"mutable-data-layer-features-id" source:source];
+    MGLStyleValue *fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
+    layer.fillColor = fillColor;
+    [self.mapView.style addLayer:layer];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        MGLGeoJSONSource *source = (MGLGeoJSONSource *)[self.mapView.style sourceWithIdentifier:@"mutable-data-source-features-id"];
+        source.features = @[largeBoxFeature];
+    });
+}
+
 - (void)styleDynamicPointCollection
 {
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(36.9979, -109.0441) zoomLevel:14 animated:NO];
+    
     CLLocationCoordinate2D coordinates[] = {
         {37.00145594210082, -109.04960632324219},
+        {-41.140915920129665, 288.68019104003906},
         {37.00173012609867, -109.0404224395752},
+        {-41.14763798539186, 288.6887741088867},
         {36.99453246847359, -109.04960632324219},
-        {36.99508088541243, -109.04007911682129},
     };
+    
+    CLLocationCoordinate2D largeBox[] = {
+        {-41.17710352162799, 288.67298126220703},
+        {-41.13962313627545, 288.67298126220703},
+        {36.99508088541243, -109.04007911682129},
+        {-41.17710352162799, 288.7261962890625},
+        {-41.17710352162799, 288.67298126220703}
+    };
+    
+    MGLPolygonFeature *smallBoxFeature = [MGLPolygonFeature polygonWithCoordinates:smallBox count:sizeof(smallBox)/sizeof(smallBox[0])];
     MGLPointCollectionFeature *feature = [MGLPointCollectionFeature pointCollectionWithCoordinates:coordinates count:4];
+
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"wiggle-source" features:@[feature] options:nil];
     [self.mapView.style addSource:source];
     
     MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"wiggle-layer" source:source];
+    MGLStyleValue *fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
+    layer.fillColor = fillColor;
     [self.mapView.style addLayer:layer];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(41.563986787078704, -75.04843935793578) zoomLevel:8 animated:NO];
         
         NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"threestates" ofType:@"geojson"];
         NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
-        MGLGeoJSONSource *source = (MGLGeoJSONSource *)[self.mapView.style sourceWithIdentifier:@"mutable-data-source-url-id"];
-        source.URL = geoJSONURL;
+        MGLGeoJSONSource *source = (MGLGeoJSONSource *)[self.mapView.style sourceWithIdentifier:@"mutable-data-source-features-id"];
+        source.features = @[largeBoxFeature];
     });
 }
 

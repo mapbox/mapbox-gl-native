@@ -109,7 +109,7 @@ extern NSString * const MGLGeoJSONToleranceOption;
  is set to `nil`. This property is unavailable until the receiver is passed into
  `-[MGLStyle addSource]`.
  */
-@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLFeature>) *features;
+@property (nonatomic, nullable) NS_ARRAY_OF(id <MGLFeature>) *features;
 
 /**
  A GeoJSON representation of the contents of the source.
