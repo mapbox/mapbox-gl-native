@@ -125,6 +125,20 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     geoJSONSource->setURL(url.absoluteString.UTF8String);
 }
 
+- (void)setFeatures:(NSArray *)features
+{
+    mbgl::FeatureCollection featureCollection;
+    featureCollection.reserve(features.count);
+    for (id <MGLFeaturePrivate> feature in features) {
+        featureCollection.push_back([feature mbglFeature]);
+    }
+    const auto geojson = mbgl::GeoJSON{featureCollection};
+    const auto geoJSONSource = reinterpret_cast<mbgl::style::GeoJSONSource *>(self.source);
+    geoJSONSource->setGeoJSON(geojson);
+    
+    _features = MGLFeaturesFromMBGLFeatures(featureCollection);
+}
+
 - (std::unique_ptr<mbgl::style::Source>)mbglSource
 {
     auto source = std::make_unique<mbgl::style::GeoJSONSource>(self.identifier.UTF8String, self.geoJSONOptions);
