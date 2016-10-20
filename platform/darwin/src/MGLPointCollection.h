@@ -5,7 +5,9 @@
 #import "MGLShape.h"
 
 /**
- The `MGLPointCollection` class is used to define an array of coordinates.
+ The `MGLPointCollection` class is used to define an array of disconnected 
+ coordinates. The points in the collection may be related but are not 
+ connected visually in any way.
  
  @note `MGLPointCollection` objects cannot be added to a map view using
  `-[MGLMapView addAnnotations:]` and related methods. However, when used in a
@@ -22,7 +24,7 @@
  @param coords The array of coordinates defining the shape. The data in this
  array is copied to the new object.
  @param count The number of items in the `coords` array.
- @return A new multipoint object.
+ @return A new point collection object.
  */
 + (instancetype)pointCollectionWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
 
