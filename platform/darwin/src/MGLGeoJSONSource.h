@@ -123,7 +123,7 @@ extern NSString * const MGLGeoJSONToleranceOption;
  This property is unavailable until the receiver is passed 
  into `-[MGLStyle addSource]`.
  */
-@property (nonatomic, readonly, nullable, copy) NSData *geoJSONData;
+@property (nonatomic, nullable, copy) NSData *geoJSONData;
 
 /**
  The URL to the GeoJSON document that specifies the contents of the source.
@@ -131,7 +131,7 @@ extern NSString * const MGLGeoJSONToleranceOption;
  If the receiver was initialized using `-initWithIdentifier:geoJSONData:options`, this
  property is set to `nil`.
  */
-@property (nonatomic, readonly, nullable) NSURL *URL;
+@property (nonatomic, nullable) NSURL *URL;
 
 
 @end
