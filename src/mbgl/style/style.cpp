@@ -491,6 +491,13 @@ void Style::onSourceError(Source& source, std::exception_ptr error) {
     observer->onResourceError(error);
 }
 
+void Style::onSourceDescriptionChanged(Source& source) {
+    observer->onSourceDescriptionChanged(source);
+    if (!source.baseImpl->loaded) {
+	   source.baseImpl->loadDescription(fileSource);
+   } 
+}
+
 void Style::onTileChanged(Source& source, const OverscaledTileID& tileID) {
     observer->onTileChanged(source, tileID);
     observer->onUpdate(Update::Repaint);
