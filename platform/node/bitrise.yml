@@ -1,9 +1,12 @@
-format_version: 1.1.0
+format_version: 1.3.0
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
 trigger_map:
-- pattern: "*"
-  is_pull_request_allowed: true
+- tag: "node-v*"
+  workflow: primary
+- push_branch: "*"
+  workflow: primary
+- pull_request_target_branch: "*"
   workflow: primary
 
 workflows:
