@@ -36,7 +36,7 @@ CollisionTile::CollisionTile(PlacementConfig config_) : config(std::move(config_
 
     // The amount the map is squished depends on the y position.
     // Sort of account for this by making all boxes a bit bigger.
-    yStretch = std::pow(_yStretch, 1.3);
+    yStretch = std::pow(_yStretch, 1.3f);
 }
 
 
@@ -80,7 +80,7 @@ float CollisionTile::findPlacementScale(float minPlacementScale, const Point<flo
     return minPlacementScale;
 }
 
-float CollisionTile::placeFeature(const CollisionFeature& feature, const bool allowOverlap, const bool avoidEdges) {
+float CollisionTile::placeFeature(const CollisionFeature& feature, bool allowOverlap, bool avoidEdges) {
 
     float minPlacementScale = minScale;
 
@@ -124,7 +124,7 @@ float CollisionTile::placeFeature(const CollisionFeature& feature, const bool al
     return minPlacementScale;
 }
 
-void CollisionTile::insertFeature(CollisionFeature& feature, const float minPlacementScale, const bool ignorePlacement) {
+void CollisionTile::insertFeature(CollisionFeature& feature, float minPlacementScale, bool ignorePlacement) {
     for (auto& box : feature.boxes) {
         box.placementScale = minPlacementScale;
     }
@@ -156,7 +156,7 @@ Box CollisionTile::getTreeBox(const Point<float>& anchor, const CollisionBox& bo
     };
 }
 
-std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const float scale) {
+std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, float scale) {
 
     std::vector<IndexedSubfeature> result;
     if (queryGeometry.empty()) return result;
