@@ -63,6 +63,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingNumericFilteredFill,
     MBXSettingsRuntimeStylingStyleQuery,
     MBXSettingsRuntimeStylingFeatureSource,
+    MBXSettingsRuntimeStylingUpdateGeoJSONSourceData,
+    MBXSettingsRuntimeStylingUpdateGeoJSONSourceURL,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
@@ -308,6 +310,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Style Fill With Numeric Filter",
                 @"Style Query For GeoJSON",
                 @"Style Feature",
+                @"Update GeoJSON Source: Data",
+                @"Update GeoJSON Source: URL",
             ]];
             break;
         case MBXSettingsMiscellaneous:
@@ -438,6 +442,12 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingFeatureSource:
                     [self styleFeature];
+                    break;
+                case MBXSettingsRuntimeStylingUpdateGeoJSONSourceData:
+                    [self updateGeoJSONSourceData];
+                    break;
+                case MBXSettingsRuntimeStylingUpdateGeoJSONSourceURL:
+                    [self updateGeoJSONSourceURL];
                     break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
@@ -884,6 +894,50 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MGLStyleValue *fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
     layer.fillColor = fillColor;
     [self.mapView.style addLayer:layer];
+}
+
+- (void)updateGeoJSONSourceData
+{
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(40.329795743702064, -107.75390625) zoomLevel:11 animated:NO];
+    
+    NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-104.34814453125,37.64903402157866]]}}]}";
+    
+    NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"mutable-data-source-id" geoJSONData:data options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"mutable-data-layer-id" source:source];
+    [self.mapView.style addLayer:layer];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-109.34814453125,37.64903402157866]]}}]}";
+        NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
+        
+        MGLGeoJSONSource *source = (MGLGeoJSONSource *)[self.mapView.style sourceWithIdentifier:@"mutable-data-source-id"];
+        source.geoJSONData = data;
+    });
+}
+
+- (void)updateGeoJSONSourceURL
+{
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(48.668731, -122.857151) zoomLevel:11 animated:NO];
+    
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"polyline" ofType:@"geojson"];
+    NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"mutable-data-source-url-id" URL:geoJSONURL options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"mutable-data-layer-url-id" source:source];
+    [self.mapView.style addLayer:layer];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(41.563986787078704, -75.04843935793578) zoomLevel:8 animated:NO];
+        
+        NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"threestates" ofType:@"geojson"];
+        NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
+        MGLGeoJSONSource *source = (MGLGeoJSONSource *)[self.mapView.style sourceWithIdentifier:@"mutable-data-source-url-id"];
+        source.URL = geoJSONURL;
+    });
 }
 
 - (IBAction)startWorldTour
