@@ -1156,6 +1156,9 @@ public class MapView extends FrameLayout {
         }
 
         long[] ids = mNativeMapView.queryPointAnnotations(rect);
+        if (ids.length == 0) {
+            return new ArrayList<>();
+        }
 
         List<Long> idsList = new ArrayList<>(ids.length);
         for (int i = 0; i < ids.length; i++) {

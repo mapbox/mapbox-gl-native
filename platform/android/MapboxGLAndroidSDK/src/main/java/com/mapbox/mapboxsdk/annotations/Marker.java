@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.R;
@@ -21,6 +22,7 @@ public class Marker extends Annotation {
     private String snippet;
     private Icon icon;
     private String title;
+    private int zOrder;
 
     private InfoWindow infoWindow;
     private boolean infoWindowShown;
@@ -47,6 +49,7 @@ public class Marker extends Annotation {
         snippet = baseMarkerViewOptions.snippet;
         icon = baseMarkerViewOptions.icon;
         title = baseMarkerViewOptions.title;
+        zOrder = baseMarkerViewOptions.zOrder;
     }
 
     public LatLng getPosition() {
@@ -59,6 +62,10 @@ public class Marker extends Annotation {
 
     public String getTitle() {
         return title;
+    }
+
+    public int getZOrder() {
+        return zOrder;
     }
 
     /**
@@ -108,6 +115,17 @@ public class Marker extends Annotation {
         MapboxMap map = getMapboxMap();
         if (map != null) {
             map.updateMarker(this);
+        }
+    }
+
+    public void setZOrder(int zOrder) {
+        if (this.zOrder == zOrder) {
+            return;
+        }
+        this.zOrder = zOrder;
+        MapboxMap map = getMapboxMap();
+        if (map != null) {
+            map.forceUpdateMarkers();
         }
     }
 

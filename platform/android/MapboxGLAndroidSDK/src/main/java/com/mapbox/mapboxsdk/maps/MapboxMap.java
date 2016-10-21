@@ -918,7 +918,7 @@ public class MapboxMap {
      * Adds multiple polylines to this map.
      *
      * @param polylineOptionsList A list of polyline options objects that defines how to render the polylines.
-     * @param withWhiteStroke add the polylines with the white stroke or not
+     * @param withWhiteStroke     add the polylines with the white stroke or not
      * @return A list of the {@code Polyline}s that were added to the map.
      */
     @UiThread
@@ -1242,14 +1242,14 @@ public class MapboxMap {
      * @param marker The marker to select.
      */
     @UiThread
-    public void selectMarker(@NonNull Marker marker) {
+    public boolean selectMarker(@NonNull Marker marker) {
         if (marker == null) {
             Log.w(MapboxConstants.TAG, "marker was null, so just returning");
-            return;
+            return false;
         }
 
         if (mSelectedMarkers.contains(marker)) {
-            return;
+            return true;
         }
 
         // Need to deselect any currently selected annotation first
@@ -1272,9 +1272,10 @@ public class MapboxMap {
             if (isInfoWindowValidForMarker(marker) || getInfoWindowAdapter() != null) {
                 mInfoWindows.add(marker.showInfoWindow(this, mMapView));
             }
-        }
 
-        mSelectedMarkers.add(marker);
+            mSelectedMarkers.add(marker);
+        }
+        return handledDefaultClick;
     }
 
     /**
@@ -1789,6 +1790,10 @@ public class MapboxMap {
     @NonNull
     public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates, @Nullable String... layerIds) {
         return mMapView.getNativeMapView().queryRenderedFeatures(coordinates, layerIds);
+    }
+
+    public void forceUpdateMarkers() {
+        mMarkerViewManager.invalidateViewMarkersInVisibleRegion();
     }
 
 

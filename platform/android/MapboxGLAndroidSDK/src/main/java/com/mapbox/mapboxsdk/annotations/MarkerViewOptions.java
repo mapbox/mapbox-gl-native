@@ -26,6 +26,7 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         position((LatLng) in.readParcelable(LatLng.class.getClassLoader()));
         snippet(in.readString());
         title(in.readString());
+        zOrder(in.readInt());
         flat(in.readByte() != 0);
         anchor(in.readFloat(), in.readFloat());
         infoWindowAnchor(in.readFloat(), in.readFloat());
@@ -56,6 +57,7 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         out.writeParcelable(getPosition(), flags);
         out.writeString(getSnippet());
         out.writeString(getTitle());
+        out.writeInt(getZOrder());
         out.writeByte((byte) (isFlat() ? 1 : 0));
         out.writeFloat(getAnchorU());
         out.writeFloat(getAnchorV());
@@ -82,6 +84,7 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         marker.setSnippet(snippet);
         marker.setTitle(title);
         marker.setIcon(icon);
+        marker.setZOrder(zOrder);
         marker.setFlat(flat);
         marker.setAnchor(anchorU, anchorV);
         marker.setInfoWindowAnchor(infoWindowAnchorU, infoWindowAnchorV);

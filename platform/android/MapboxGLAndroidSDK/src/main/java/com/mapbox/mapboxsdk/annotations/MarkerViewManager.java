@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.content.Context;
-import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -12,12 +11,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +32,28 @@ import java.util.Map;
  */
 public class MarkerViewManager {
 
+    private static final Comparator<View> MARKER_SORTER = new Comparator<View>() {
+        @Override
+        public int compare(View lhs, View rhs) {
+            ImageMarkerViewAdapter.ViewHolder leftViewHolder = (ImageMarkerViewAdapter.ViewHolder) lhs.getTag();
+            ImageMarkerViewAdapter.ViewHolder rightViewHolder = (ImageMarkerViewAdapter.ViewHolder) rhs.getTag();
+
+            final MarkerView leftMarker = leftViewHolder.marker;
+            final MarkerView rightMarker = rightViewHolder.marker;
+
+            int zOrderComparison = Double.compare(leftMarker.getZOrder(), rightMarker.getZOrder());
+            if (zOrderComparison != 0) {
+                return zOrderComparison;
+            }
+
+            LatLng left = leftMarker.getPosition();
+            LatLng right = rightMarker.getPosition();
+
+            //logic is reverse, right before left, because the last added is displayed on the top
+            final int latComparison = Double.compare(right.getLatitude(), left.getLatitude());
+            return latComparison == 0 ? Double.compare(right.getLongitude(), left.getLongitude()) : latComparison;
+        }
+    };
     private Map<MarkerView, View> markerViewMap;
     private MapboxMap mapboxMap;
     private MapView mapView;
@@ -245,13 +268,16 @@ public class MarkerViewManager {
      */
     public void select(@NonNull MarkerView marker, View convertView, MapboxMap.MarkerViewAdapter adapter, boolean callbackToMap) {
         if (convertView != null) {
+            boolean handledDefaultClick = false;
             if (adapter.onSelect(marker, convertView, false)) {
                 if (callbackToMap) {
-                    mapboxMap.selectMarker(marker);
+                    handledDefaultClick = mapboxMap.selectMarker(marker);
                 }
             }
             marker.setSelected(true);
-            convertView.bringToFront();
+            if (!handledDefaultClick) {
+                convertView.bringToFront();
+            }
         }
     }
 
@@ -434,9 +460,29 @@ public class MarkerViewManager {
                 }
             }
         }
+
+
+        sortMarkers();
+
         // trigger update to make newly added ViewMarker visible,
         // these would only be updated when the map is moved.
         update();
+    }
+
+    private void sortMarkers() {
+        ViewGroup markerViewContainer = mapView.getMarkerViewContainer();
+
+        List<View> markerViews = new ArrayList<>();
+        for (int viewIndex = 0; viewIndex < markerViewContainer.getChildCount(); viewIndex++) {
+            markerViews.add(markerViewContainer.getChildAt(viewIndex));
+        }
+
+        Collections.sort(markerViews, MARKER_SORTER);
+
+        markerViewContainer.removeAllViews();
+        for (View markerView : markerViews) {
+            markerViewContainer.addView(markerView);
+        }
     }
 
     //TODO: This whole method is a stopgap for: https://github.com/mapbox/mapbox-gl-native/issues/5384
@@ -499,6 +545,7 @@ public class MarkerViewManager {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+            viewHolder.marker = marker;
             viewHolder.imageView.setImageBitmap(marker.getIcon().getBitmap());
             convertView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
             return convertView;
@@ -506,6 +553,7 @@ public class MarkerViewManager {
 
         private static class ViewHolder {
             ImageView imageView;
+            public MarkerView marker;
         }
     }
 }

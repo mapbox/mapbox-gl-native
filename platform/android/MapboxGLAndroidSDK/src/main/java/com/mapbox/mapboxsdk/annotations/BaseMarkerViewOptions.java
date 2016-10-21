@@ -21,6 +21,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     protected String snippet;
     protected String title;
     protected Icon icon;
+    protected int zOrder;
     protected boolean flat;
     protected float anchorU = 0.5f;
     protected float anchorV = 1f;
@@ -78,6 +79,17 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
      */
     public T icon(Icon icon) {
         this.icon = icon;
+        return getThis();
+    }
+
+    /**
+     * Set the zOrder of the MarkerView
+     *
+     * @param zOrder the zOrder of the MarkerView
+     * @return the object for which the method was called
+     */
+    public T zOrder(int zOrder) {
+        this.zOrder = zOrder;
         return getThis();
     }
 
@@ -185,6 +197,16 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
      */
     public Icon getIcon() {
         return icon;
+    }
+
+
+    /**
+     * Get the zOrder of the MarkerView.
+     *
+     * @return the zOrder
+     */
+    public int getZOrder() {
+        return zOrder;
     }
 
     /**
