@@ -142,6 +142,7 @@ static NSURL *MGLStyleURL_emerald;
 - (MGLSource *)sourceWithIdentifier:(NSString *)identifier
 {
     auto mbglSource = self.mapView.mbglMap->getSource(identifier.UTF8String);
+    
     if (!mbglSource) {
         return nil;
     }
@@ -159,8 +160,8 @@ static NSURL *MGLStyleURL_emerald;
         NSAssert(NO, @"Unrecognized source type");
         return nil;
     }
-
-    source.source = mbglSource;
+    
+    source.rawSource = mbglSource;
 
     return source;
 }
@@ -205,7 +206,7 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)addSource:(MGLSource *)source
 {
-    self.mapView.mbglMap->addSource(source.mbglSource);
+    self.mapView.mbglMap->addSource(source.source);
 }
 
 - (void)removeSource:(MGLSource *)source

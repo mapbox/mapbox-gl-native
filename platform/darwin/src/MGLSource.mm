@@ -4,25 +4,43 @@
 
 @interface MGLSource ()
 
-@property (nonatomic) mbgl::style::Source *source;
-
 @end
 
 @implementation MGLSource
+{
+    mbgl::style::Source *_rawSource;
+    std::unique_ptr<mbgl::style::Source> _source;
+}
 
-- (instancetype)initWithIdentifier:(NSString *)identifier {
+- (instancetype)initWithIdentifier:(NSString *)identifier
+{
     if (self = [super init]) {
         _identifier = identifier;
     }
     return self;
 }
 
-- (std::unique_ptr<mbgl::style::Source>)mbglSource {
-    [NSException raise:@"MGLAbstractClassException" format:
-     @"The source %@ cannot be added to the style. "
-     @"Make sure the source was created as a member of a concrete subclass of MGLSource.",
-     NSStringFromClass(self)];
-    return nil;
+- (mbgl::style::Source *)getRawSource
+{
+    return _rawSource;
+}
+
+- (void)setRawSource:(mbgl::style::Source *)rawSource
+{
+    _rawSource = rawSource;
+}
+
+- (std::unique_ptr<mbgl::style::Source>)source
+{
+    return std::move(_source);
+}
+
+- (void)setSource:(std::unique_ptr<mbgl::style::Source>)source
+{
+    if (source != nullptr) {
+        _rawSource = source.get();
+    }
+    _source = std::move(source);
 }
 
 @end

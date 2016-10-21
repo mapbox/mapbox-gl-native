@@ -28,6 +28,7 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     {
         _geoJSONData = data;
         _options = options;
+        [self commonInit];
     }
     return self;
 }
@@ -38,6 +39,7 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     {
         _URL = url;
         _options = options;
+        [self commonInit];
     }
     return self;
 }
@@ -46,9 +48,36 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     if (self = [super initWithIdentifier:identifier]) {
         _features = features;
         _options = options;
+        [self commonInit];
     }
     
     return self;
+}
+
+- (void)commonInit
+{
+    auto source = std::make_unique<mbgl::style::GeoJSONSource>(self.identifier.UTF8String, self.geoJSONOptions);
+    
+    if (self.URL) {
+        NSURL *url = self.URL.mgl_URLByStandardizingScheme;
+        source->setURL(url.absoluteString.UTF8String);
+    } else if (self.geoJSONData) {
+        NSString *string = [[NSString alloc] initWithData:self.geoJSONData encoding:NSUTF8StringEncoding];
+        const auto geojson = mapbox::geojson::parse(string.UTF8String).get<mapbox::geojson::feature_collection>();
+        source->setGeoJSON(geojson);
+        _features = MGLFeaturesFromMBGLFeatures(geojson);
+    } else {
+        mbgl::FeatureCollection featureCollection;
+        featureCollection.reserve(self.features.count);
+        for (id <MGLFeaturePrivate> feature in self.features) {
+            featureCollection.push_back([feature mbglFeature]);
+        }
+        const auto geojson = mbgl::GeoJSON{featureCollection};
+        source->setGeoJSON(geojson);
+        _features = MGLFeaturesFromMBGLFeatures(featureCollection);
+    }
+    
+    self.source = std::move(source);
 }
 
 - (mbgl::style::GeoJSONOptions)geoJSONOptions
@@ -100,32 +129,6 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     {
         [NSException raise:@"Value not handled" format:@"%@ is not an NSNumber", value];
     }
-}
-
-- (std::unique_ptr<mbgl::style::Source>)mbglSource
-{
-    auto source = std::make_unique<mbgl::style::GeoJSONSource>(self.identifier.UTF8String, self.geoJSONOptions);
-    
-    if (self.URL) {
-        NSURL *url = self.URL.mgl_URLByStandardizingScheme;
-        source->setURL(url.absoluteString.UTF8String);
-    } else if (self.geoJSONData) {
-        NSString *string = [[NSString alloc] initWithData:self.geoJSONData encoding:NSUTF8StringEncoding];
-        const auto geojson = mapbox::geojson::parse(string.UTF8String).get<mapbox::geojson::feature_collection>();
-        source->setGeoJSON(geojson);
-        _features = MGLFeaturesFromMBGLFeatures(geojson);
-    } else {
-        mbgl::FeatureCollection featureCollection;
-        featureCollection.reserve(self.features.count);
-        for (id <MGLFeaturePrivate> feature in self.features) {
-            featureCollection.push_back([feature mbglFeature]);
-        }
-        const auto geojson = mbgl::GeoJSON{featureCollection};
-        source->setGeoJSON(geojson);        
-        _features = MGLFeaturesFromMBGLFeatures(featureCollection);
-    }
-    
-    return std::move(source);
 }
 
 @end
