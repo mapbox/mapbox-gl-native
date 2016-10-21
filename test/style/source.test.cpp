@@ -384,7 +384,7 @@ TEST(Source, RasterTileAttribution) {
 
 TEST(Source, GeoJSonSourceUrlUpdate) {
     SourceTest test;
-    
+
     test.fileSource.sourceResponse = [&] (const Resource& resource) {
         EXPECT_EQ("url", resource.url);
         Response response;
@@ -394,7 +394,7 @@ TEST(Source, GeoJSonSourceUrlUpdate) {
 
     test.observer.sourceDescriptionChanged = [&] (Source&) {
         //Should be called (test will hang if it doesn't)
-		test.end();
+        test.end();
     };
 
     test.observer.tileError = [&] (Source&, const OverscaledTileID&, std::exception_ptr) {
@@ -403,15 +403,15 @@ TEST(Source, GeoJSonSourceUrlUpdate) {
 
     GeoJSONSource source("source");
     source.baseImpl->setObserver(&test.observer);
-    
-	//Load initial, so the source state will be loaded=true
-	source.baseImpl->loadDescription(test.fileSource);
-	
-	//Schedule an update
-	test.loop.invoke([&] () {
-		//Update the url
-		source.setURL(std::string("http://source-url.ext"));	
-	});	
+
+    //Load initial, so the source state will be loaded=true
+    source.baseImpl->loadDescription(test.fileSource);
+
+    //Schedule an update
+    test.loop.invoke([&] () {
+        //Update the url
+        source.setURL(std::string("http://source-url.ext"));
+    });
 
     test.run();
 }
