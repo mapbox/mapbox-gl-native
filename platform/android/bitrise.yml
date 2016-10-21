@@ -12,7 +12,22 @@ workflows:
   primary:
     steps:
     - script:
+        title: Check for skipping CI
+        inputs:
+        - content: |-
+            #!/bin/bash
+
+            if [[ -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_SUBJECT | sed -n '/\[skip ci\]/p')"  ||
+                  -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_SUBJECT | sed -n '/\[ci skip\]/p')"  ||
+                  -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_BODY    | sed -n 's/\[skip ci\]/p')" ||
+                  -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_BODY    | sed -n 's/\[ci skip\]/p')" ]]; then
+                envman add --key SKIPCI --value true
+            else
+                envman add --key SKIPCI --value false
+            fi
+    - script:
         title: Configure GL-native build environement
+        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
@@ -21,6 +36,7 @@ workflows:
             sudo apt-get install -y pkg-config nodejs cmake
     - script:
         title: Configure Google Cloud SDK
+        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
@@ -41,6 +57,7 @@ workflows:
             wget -O secret.json "$BITRISEIO_GCLOUD_SERVICE_ACCOUNT_JSON_URL"
     - script:
         title: Build libmapbox-gl.so for armeabi-v7a
+        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
@@ -49,6 +66,7 @@ workflows:
             make android-lib-arm-v7
     - script:
         title: Run local JVM Unit tests
+        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
@@ -56,6 +74,7 @@ workflows:
             make android-test
     - script:
         title: Generate Espresso sanity tests
+        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
@@ -63,6 +82,7 @@ workflows:
             make android-generate-test
     - script:
         title: Run Firebase instrumentation tests
+        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
@@ -79,6 +99,7 @@ workflows:
             echo "The details are made available as a zipped build artefact on top of this page."
     - script:
         title: Download Firebase results
+        run_if: '{{enveq "SKIPCI" "false"}}'
         is_always_run: true
         inputs:
         - content: |-
@@ -92,11 +113,13 @@ workflows:
             find platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk -type f -name "logcat" -print0 | xargs -0 -Imylogcat mv -i mylogcat ./
             cat logcat | ndk-stack -sym build/android-arm-v7/Debug
     - deploy-to-bitrise-io:
+        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - deploy_path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
         - is_compress: 'true'
         - notify_user_groups: none
     - slack:
+        run_if: '{{enveq "SKIPCI" "false"}}'
         title: Post to Slack
         inputs:
         - webhook_url: "$SLACK_HOOK_URL"
