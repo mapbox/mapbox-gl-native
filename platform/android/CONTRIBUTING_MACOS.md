@@ -2,11 +2,7 @@
 
 Install Oracle JDK 7+ and Android Studio:
 
-    brew tap caskroom/cask
-    brew install brew-cask
-    brew cask install java
-
-You can download the [latest version of Android Studio here](https://developer.android.com/sdk/index.html). Note that you'll still need to `brew install java` for it to work.
+Head over to [Oracles download page](http://www.oracle.com/technetwork/java/javase/downloads/index.html) to get the Java Development Kit (JDK). Once JDK is installed and setup, you can grab the [latest version of Android Studio here](https://developer.android.com/sdk/index.html) and install it following the on screen instructions.  
 
 Once Android Studio is installed, the [first time it's run it'll ask to install the Android SDK](http://developer.android.com/sdk/installing/index.html?pkg=studio) which you should do.  While doing so in the Android SDK Manager make sure to also select and install the latest versions of "Android Support Repository" and "Android Support Library" from "Extras":
 
