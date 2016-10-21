@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -54,6 +55,13 @@ public class UiSettingsTest {
         assertTrue("Compass margin top should be same", uiSettings.getCompassMarginTop() == 2);
         assertTrue("Compass margin right should be same", uiSettings.getCompassMarginRight() == 3);
         assertTrue("Compass margin bottom should be same", uiSettings.getCompassMarginBottom() == 4);
+    }
+
+    @Test
+    public void testCompassFadeWhenFacingNorth(){
+        assertTrue("Compass should fade when facing north by default.", uiSettings.isCompassFadeWhenFacingNorth());
+        uiSettings.setCompassFadeFacingNorth(false);
+        assertFalse("Compass fading should be disabled", uiSettings.isCompassFadeWhenFacingNorth());
     }
 
     @Test

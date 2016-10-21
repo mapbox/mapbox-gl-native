@@ -64,6 +64,7 @@
         <attr name="compass_margin_top" format="dimension" />
         <attr name="compass_margin_right" format="dimension" />
         <attr name="compass_margin_bottom" format="dimension" />
+        <attr name="compass_fade_facing_north" format="boolean" />
 
         <!--Logo-->
         <attr name="logo_gravity">
