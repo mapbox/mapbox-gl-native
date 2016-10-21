@@ -27,6 +27,7 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLOfflineStorage.h"
 #import "MGLOverlay.h"
 #import "MGLPointAnnotation.h"
+#import "MGLPointCollection.h"
 #import "MGLPolygon.h"
 #import "MGLPolyline.h"
 #import "MGLShape.h"

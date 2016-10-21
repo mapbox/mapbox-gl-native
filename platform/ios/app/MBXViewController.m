@@ -63,6 +63,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingNumericFilteredFill,
     MBXSettingsRuntimeStylingStyleQuery,
     MBXSettingsRuntimeStylingFeatureSource,
+    MBXSettingsRuntimeStylingPointCollection,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
@@ -308,6 +309,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Style Fill With Numeric Filter",
                 @"Style Query For GeoJSON",
                 @"Style Feature",
+                @"Style Dynamic Point Collection",
             ]];
             break;
         case MBXSettingsMiscellaneous:
@@ -438,6 +440,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingFeatureSource:
                     [self styleFeature];
+                    break;
+                case MBXSettingsRuntimeStylingPointCollection:
+                    [self styleDynamicPointCollection];
                     break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
@@ -883,6 +888,23 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     layer.predicate = [NSPredicate predicateWithFormat:@"color = %@", @"red"];
     MGLStyleValue *fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
     layer.fillColor = fillColor;
+    [self.mapView.style addLayer:layer];
+}
+
+- (void)styleDynamicPointCollection
+{
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(36.9979, -109.0441) zoomLevel:14 animated:NO];
+    CLLocationCoordinate2D coordinates[] = {
+        {37.00145594210082, -109.04960632324219},
+        {37.00173012609867, -109.0404224395752},
+        {36.99453246847359, -109.04960632324219},
+        {36.99508088541243, -109.04007911682129},
+    };
+    MGLPointCollectionFeature *feature = [MGLPointCollectionFeature pointCollectionWithCoordinates:coordinates count:4];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"wiggle-source" features:@[feature] options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"wiggle-layer" source:source];
     [self.mapView.style addLayer:layer];
 }
 

@@ -3,6 +3,7 @@
 #import "MGLPolyline.h"
 #import "MGLPolygon.h"
 #import "MGLPointAnnotation.h"
+#import "MGLPointCollection.h"
 #import "MGLShapeCollection.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -134,10 +135,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- The `MGLMultiPointFeature` class represents a multipoint in a
+ The `MGLPointCollectionFeature` class represents a multipoint in a
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
-@interface MGLMultiPointFeature : MGLMultiPoint <MGLFeature>
+@interface MGLPointCollectionFeature : MGLPointCollection <MGLFeature>
 @end
 
 /**

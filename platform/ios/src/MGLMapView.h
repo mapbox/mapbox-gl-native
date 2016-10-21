@@ -895,11 +895,10 @@ IB_DESIGNABLE
 /**
  Adds an annotation to the map view.
  
- @note `MGLMultiPolyline`, `MGLMultiPolygon`, and `MGLShapeCollection` objects
-    cannot be added to the map view at this time. Nor can `MGLMultiPoint`
-    objects that are not instances of `MGLPolyline` or `MGLPolygon`. Any
-    multipoint, multipolyline, multipolygon, or shape collection object that is
-    specified is silently ignored.
+ @note `MGLMultiPolyline`, `MGLMultiPolygon`, `MGLShapeCollection`, and 
+    `MGLPointCollection` objects cannot be added to the map view at this time. 
+    Any multipoint, multipolyline, multipolygon, shape or point collection 
+    object that is specified is silently ignored.
  
  @param annotation The annotation object to add to the receiver. This object
     must conform to the `MGLAnnotation` protocol. The map view retains the

@@ -18,11 +18,6 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
     MGLCoordinateBounds _bounds;
 }
 
-+ (instancetype)multiPointWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
-{
-    return [[self alloc] initWithCoordinates:coords count:count];
-}
-
 - (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
     self = [super init];
@@ -144,29 +139,6 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 {
     NSAssert(NO, @"Cannot add an annotation from an instance of %@", NSStringFromClass([self class]));
     return mbgl::SymbolAnnotation({mbgl::Point<double>()});
-}
-
-- (mbgl::Feature)featureObject
-{
-    mbgl::MultiPoint<double> multiPoint;
-    multiPoint.reserve(self.pointCount);
-    for (NSInteger i = 0; i< self.pointCount; i++)
-    {
-        multiPoint.push_back(mbgl::Point<double>(self.coordinates[i].longitude, self.coordinates[i].latitude));
-    }
-    return mbgl::Feature {multiPoint};
-}
-
-- (NSDictionary *)geoJSONDictionary
-{
-    NSMutableArray *coordinates = [[NSMutableArray alloc] initWithCapacity:self.pointCount];
-    for (NSUInteger index = 0; index < self.pointCount; index++) {
-        CLLocationCoordinate2D coordinate = self.coordinates[index];
-        [coordinates addObject:@[@(coordinate.longitude), @(coordinate.latitude)]];
-    }
-    
-    return @{@"type": @"MultiPoint",
-             @"coordinates": coordinates};
 }
 
 - (NSString *)description

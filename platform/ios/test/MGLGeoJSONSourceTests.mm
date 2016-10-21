@@ -139,54 +139,6 @@
     XCTAssertTrue([source.features.firstObject isMemberOfClass:[MGLPolygonFeature class]]);
 }
 
-
-- (void)testMGLGeoJSONSourceWithMultiPointFeaturesUsingPolylines {
-    CLLocationCoordinate2D coordinates[] = {
-        CLLocationCoordinate2DMake(100.0, 0.0),
-        CLLocationCoordinate2DMake(101.0, 0.0),
-        CLLocationCoordinate2DMake(101.0, 1.0),
-        CLLocationCoordinate2DMake(100.0, 1.0),
-        CLLocationCoordinate2DMake(100.0, 0.0)};
-    
-    MGLMultiPointFeature *multiPointFeature = [MGLMultiPointFeature multiPointWithCoordinates:coordinates count:5];
-    
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" features:@[multiPointFeature] options:nil];
-    
-    std::unique_ptr<mbgl::style::Source> mbglSource = [source mbglSource];
-    
-    XCTAssertNotNil(source.features);
-    XCTAssertEqual(source.features.count, 1);
-    XCTAssertTrue([source.features.firstObject isMemberOfClass:[MGLMultiPointFeature class]]);
-}
-
-- (void)testMGLGeoJSONSourceWithMultiPointFeaturesUsingPolygons {
-    CLLocationCoordinate2D coordinates[] = {
-        CLLocationCoordinate2DMake(100.0, 0.0),
-        CLLocationCoordinate2DMake(101.0, 0.0),
-        CLLocationCoordinate2DMake(101.0, 1.0),
-        CLLocationCoordinate2DMake(100.0, 1.0),
-        CLLocationCoordinate2DMake(100.0, 0.0)};
-    
-    CLLocationCoordinate2D interiorCoordinates[] = {
-        CLLocationCoordinate2DMake(100.2, 0.2),
-        CLLocationCoordinate2DMake(100.8, 0.2),
-        CLLocationCoordinate2DMake(100.8, 0.8),
-        CLLocationCoordinate2DMake(100.2, 0.8),
-        CLLocationCoordinate2DMake(100.2, 0.2)};
-    
-    MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:interiorCoordinates count:5];
-    
-    MGLMultiPointFeature *multiPointFeature = (MGLMultiPointFeature *)[MGLPolygonFeature polygonWithCoordinates:coordinates count:5 interiorPolygons:@[polygon]];
-    
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" features:@[multiPointFeature] options:nil];
-    
-    std::unique_ptr<mbgl::style::Source> mbglSource = [source mbglSource];
-    
-    XCTAssertNotNil(source.features);
-    XCTAssertEqual(source.features.count, 1);
-    XCTAssertTrue([source.features.firstObject isMemberOfClass:[MGLPolygonFeature class]]);
-}
-
 - (void)testMGLGeoJSONSourceWithMultiPolylineFeatures {
     CLLocationCoordinate2D firstCoordinates[] = { CLLocationCoordinate2DMake(0, 0), CLLocationCoordinate2DMake(10, 10)};
     MGLPolylineFeature *firstPolylineFeature = [MGLPolylineFeature polylineWithCoordinates:firstCoordinates count:2];
@@ -248,6 +200,24 @@
     XCTAssertTrue([source.features.firstObject isMemberOfClass:[MGLPointFeature class]]);
 }
 
+- (void)testMGLGeoJSONSourceWithPointCollectionFeature {
+    CLLocationCoordinate2D coordinates[] = {
+        CLLocationCoordinate2DMake(100.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 1.0),
+        CLLocationCoordinate2DMake(100.0, 1.0),
+        CLLocationCoordinate2DMake(100.0, 0.0)};
+    MGLPointCollectionFeature *pointCollectionFeature = [MGLPointCollectionFeature pointCollectionWithCoordinates:coordinates count:5];
+;
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"souce-id" features:@[pointCollectionFeature] options:nil];
+    
+    std::unique_ptr<mbgl::style::Source> mbglSource = [source mbglSource];
+    
+    XCTAssertNotNil(source.features);
+    XCTAssertEqual(source.features.count, 1);
+    XCTAssertTrue([source.features.firstObject isMemberOfClass:[MGLPointCollectionFeature class]]);
+}
+
 - (void)testMGLGeoJSONSourceWithShapeCollectionFeatures {
     CLLocationCoordinate2D coordinates[] = {
         CLLocationCoordinate2DMake(100.0, 0.0),
@@ -274,14 +244,14 @@
     
     MGLMultiPolylineFeature *multiPolylineFeature = [MGLMultiPolylineFeature multiPolylineWithPolylines:@[polylineFeature, polylineFeature]];
     
-    MGLMultiPointFeature *multiPointFeature = (MGLMultiPointFeature *)[MGLPolygonFeature polygonWithCoordinates:coordinates count:5 interiorPolygons:@[polygon]];
+    MGLPointCollectionFeature *pointCollectionFeature = [MGLPointCollectionFeature pointCollectionWithCoordinates:coordinates count:5];
     
     MGLPointFeature *pointFeature = [MGLPointFeature new];
     pointFeature.coordinate = CLLocationCoordinate2DMake(100.2, 0.2);
     
-    MGLShapeCollectionFeature *shapeCollectionFeature = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[polygonFeature, polylineFeature, multiPolygonFeature, multiPolylineFeature, multiPointFeature, pointFeature]];
+    MGLShapeCollectionFeature *shapeCollectionFeature = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[polygonFeature, polylineFeature, multiPolygonFeature, multiPolylineFeature, pointCollectionFeature, pointFeature]];
 
-    MGLShapeCollectionFeature *shapeCollectionFeature_1 = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[polygonFeature, polylineFeature, multiPolygonFeature, multiPolylineFeature, multiPointFeature, pointFeature, shapeCollectionFeature]];
+    MGLShapeCollectionFeature *shapeCollectionFeature_1 = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[polygonFeature, polylineFeature, multiPolygonFeature, multiPolylineFeature, pointCollectionFeature, pointFeature, shapeCollectionFeature]];
 
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"" features:@[shapeCollectionFeature_1] options:nil];
     
