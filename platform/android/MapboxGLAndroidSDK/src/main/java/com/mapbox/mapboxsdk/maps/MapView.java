@@ -18,7 +18,6 @@ import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -51,11 +50,9 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
@@ -2869,14 +2866,15 @@ public class MapView extends FrameLayout {
 
         // Called when someone presses the attribution icon
         @Override
-        public void onClick(View v) {
-            Context context = v.getContext();
-            String[] items = context.getResources().getStringArray(R.array.attribution_names);
-            AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AttributionAlertDialogStyle);
+        public void onClick(View view) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mapView.getContext(), R.style.TelemAlertDialogStyle);
             builder.setTitle(R.string.attributionsDialogTitle);
-            builder.setAdapter(new ArrayAdapter<>(context, R.layout.attribution_list_item, items), this);
-            AlertDialog dialog = builder.show();
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(mapView.getAttributionTintColor()));
+            String[] items = mapView.getContext().getResources().getStringArray(R.array.attribution_names);
+            builder.setAdapter(new ArrayAdapter<>(mapView.getContext(), R.layout.attribution_list_item, items), this);
+            AlertDialog attributionDialog = builder.show();
+
+            // TODO Change listview text color to mapView.getAttributionTintColor()
         }
 
         // Called when someone selects an attribution, 'Improve this map' adds location data to the url
@@ -2884,45 +2882,38 @@ public class MapView extends FrameLayout {
         public void onClick(DialogInterface dialog, int which) {
             final Context context = ((Dialog) dialog).getContext();
             if (which == ATTRIBUTION_INDEX_TELEMETRY_SETTINGS) {
-
-                int array = R.array.attribution_telemetry_options;
-                if (MapboxEventManager.getMapboxEventManager().isTelemetryEnabled()) {
-                    array = R.array.attribution_telemetry_options_already_participating;
-                }
-                String[] items = context.getResources().getStringArray(array);
-                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AttributionAlertDialogStyle);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.TelemAlertDialogStyle);
                 builder.setTitle(R.string.attributionTelemetryTitle);
-                LayoutInflater factory = LayoutInflater.from(context);
-                View content = factory.inflate(R.layout.attribution_telemetry_view, null);
-
-                ListView lv = (ListView) content.findViewById(R.id.telemetryOptionsList);
-                lv.setAdapter(new ArrayAdapter<String>(context, R.layout.attribution_list_item, items));
-                lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-
-                builder.setView(content);
-                final AlertDialog telemDialog = builder.show();
-                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                builder.setMessage(R.string.attributionTelemetryMessage);
+                builder.setPositiveButton(R.string.attributionTelemetryPositive, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        switch (position) {
-                            case 0:
-                                String url = context.getResources().getStringArray(R.array.attribution_links)[3];
-                                Intent intent = new Intent(Intent.ACTION_VIEW);
-                                intent.setData(Uri.parse(url));
-                                context.startActivity(intent);
-                                telemDialog.cancel();
-                                return;
-                            case 1:
-                                MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(false);
-                                telemDialog.cancel();
-                                return;
-                            case 2:
-                                MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(true);
-                                telemDialog.cancel();
-                                return;
-                        }
+                    public void onClick(DialogInterface dialog, int which) {
+                        MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(true);
+                        dialog.cancel();
                     }
                 });
+                builder.setNeutralButton(R.string.attributionTelemetryNeutral, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String url = context.getResources().getStringArray(R.array.attribution_links)[3];
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(url));
+                        context.startActivity(intent);
+                        dialog.cancel();
+                    }
+                });
+                builder.setNegativeButton(R.string.attributionTelemetryNegative, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(false);
+                        dialog.cancel();
+                    }
+                });
+
+                AlertDialog telemDialog = builder.show();
+                telemDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(mapView.getAttributionTintColor());
+                telemDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(mapView.getAttributionTintColor());
+                telemDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(mapView.getAttributionTintColor());
                 return;
             }
             String url = context.getResources().getStringArray(R.array.attribution_links)[which];
