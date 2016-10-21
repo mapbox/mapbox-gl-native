@@ -64,13 +64,13 @@ matrix:
       addons: *clang35
       before_script:
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
-        - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo "true" || echo "false")
-        - export BUILDTYPE=$([[ ${PUBLISH} == "true" ]] && echo "Release" || echo "Debug")
+        - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+        - export BUILDTYPE=$([[ -n ${PUBLISH:-} ]] && echo "Release" || echo "Debug")
       script:
         - nvm install 4
         - nvm use 4
         - make node
-        - if [[ ${PUBLISH} == "false" ]]; then make test-node; fi
+        - if [[ -z ${PUBLISH} ]]; then make test-node; fi
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
