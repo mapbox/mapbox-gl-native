@@ -50,7 +50,7 @@ workflows:
             make node
     - script:
         title: Run test script
-        run_if: '{{enveq "SKIPCI" "false"}} && {{enveq "PUBLISH" ""}}'
+        run_if: '{{and (enveq "SKIPCI" "false") (enveq "PUBLISH" "")}}'
         inputs:
         - content: |-
             #!/bin/bash
