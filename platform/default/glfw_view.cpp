@@ -178,7 +178,11 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_Z:
             view->nextOrientation();
             break;
-        case GLFW_KEY_Q:
+        case GLFW_KEY_Q: {
+            auto result = view->map->queryPointAnnotations({ {}, { double(view->getSize()[0]), double(view->getSize()[1]) } });
+            printf("visible point annotations: %lu\n", result.size());
+        } break;
+        case GLFW_KEY_C:
             view->clearAnnotations();
             break;
         case GLFW_KEY_P:
