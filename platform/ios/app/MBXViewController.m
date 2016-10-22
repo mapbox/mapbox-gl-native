@@ -676,10 +676,26 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     roadLayer.lineColor = roadLineColor;
     roadLayer.lineWidth = lineWidthFunction;
     roadLayer.lineGapWidth = lineWidthFunction;
+    
+    MGLLineCap lineCap = MGLLineCapRound;
+    NSValue *lineCapValue = [NSValue value:&lineCap withObjCType:@encode(MGLLineCap)];
+    roadLayer.lineCap = [MGLStyleValue<NSValue *> valueWithRawValue:lineCapValue];
 
     roadLayer.visible = YES;
     roadLayer.maximumZoomLevel = 15;
     roadLayer.minimumZoomLevel = 13;
+    
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"polyline" ofType:@"geojson"];
+    NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"ams" URL:geoJSONURL options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLLineStyleLayer *topMostLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"road-trunk"];
+    MGLLineStyleLayer *insertLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"testLayer" source:source];
+    insertLayer.lineColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor greenColor]];
+    insertLayer.lineWidth = topMostLayer.lineWidth;
+    
+    [self.mapView.style insertLayer:insertLayer aboveLayer:topMostLayer];
 }
 
 - (void)styleRasterLayer

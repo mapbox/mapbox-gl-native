@@ -185,6 +185,31 @@ Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> befor
     return layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer))->get();
 }
 
+Layer* Style::insertLayer(std::unique_ptr<Layer> layer, const std::string &after) {
+    
+    if (SymbolLayer* symbolLayer = layer->as<SymbolLayer>()) {
+        if (!symbolLayer->impl->spriteAtlas) {
+            symbolLayer->impl->spriteAtlas = spriteAtlas.get();
+        }
+    }
+    
+    if (CustomLayer* customLayer = layer->as<CustomLayer>()) {
+        customLayer->impl->initialize();
+    }
+    
+    layer->baseImpl->setObserver(this);
+    
+    auto it = std::find_if(layers.begin(), layers.end(), [&](const auto& fl) {
+        return fl->baseImpl->id == after;
+    });
+    
+    if (it != layers.end()) {
+        it++;
+    }
+    
+    return layers.insert(it, std::move(layer))->get();
+}
+
 void Style::removeLayer(const std::string& id) {
     auto it = findLayer(id);
     if (it == layers.end())

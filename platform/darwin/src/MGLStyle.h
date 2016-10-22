@@ -209,6 +209,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 - (void)insertLayer:(MGLStyleLayer *)layer belowLayer:(MGLStyleLayer *)otherLayer;
 
 /**
+ Inserts a new layer above another layer.
+ 
+ @param layer Layer to be inserted.
+ @param aboveLayer A layer that's already on the map view.
+ */
+- (void)insertLayer:(MGLStyleLayer *)layer aboveLayer:(MGLStyleLayer *)otherLayer;
+
+/**
  Removes a layer from the map view.
 
  @param layer The layer object to remove from the map view. This object

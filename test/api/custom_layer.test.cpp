@@ -113,9 +113,16 @@ TEST(CustomLayer, Basic) {
         }, new TestLayer()));
 
     auto layer = std::make_unique<FillLayer>("landcover", "mapbox");
+    std::string layerID = layer->getID();
     layer->setSourceLayer("landcover");
     layer->setFillColor(Color{ 1.0, 1.0, 0.0, 1.0 });
     map.addLayer(std::move(layer));
+
+    auto insertLayer = std::make_unique<FillLayer>("landcover", "mapbox");
+    insertLayer->setSourceLayer("landcover");
+    insertLayer->setFillColor(Color{ 0.0, 0.0, 0.0, 0.0 });
+    insertLayer->setFillOutlineColor(Color{ 0.0, 0.0, 1, 1.0 });
+    map.insertLayer(std::move(insertLayer), layerID);
 
     test::checkImage("test/fixtures/custom_layer/basic", test::render(map), 0.0006, 0.1);
 }
