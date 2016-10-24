@@ -701,6 +701,17 @@ public class MapView extends FrameLayout {
         nativeMapView.setPitch(pitch, 0);
     }
 
+    //
+    // Center coordinate
+    //
+
+    LatLng getCenterCoordinate(){
+        return nativeMapView.getLatLng();
+    }
+
+    void setCenterCoordinate(LatLng centerCoordinate){
+        nativeMapView.setLatLng(centerCoordinate);
+    }
 
     //
     // Direction
