@@ -194,11 +194,8 @@
         CLLocationCoordinate2DMake(100.0, 1.0),
         CLLocationCoordinate2DMake(100.0, 0.0)};
     MGLPointCollectionFeature *pointCollectionFeature = [MGLPointCollectionFeature pointCollectionWithCoordinates:coordinates count:5];
-;
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"souce-id" features:@[pointCollectionFeature] options:nil];
-    
-    std::unique_ptr<mbgl::style::Source> mbglSource = [source mbglSource];
-    
+
     XCTAssertNotNil(source.features);
     XCTAssertEqual(source.features.count, 1);
     XCTAssertTrue([source.features.firstObject isMemberOfClass:[MGLPointCollectionFeature class]]);
