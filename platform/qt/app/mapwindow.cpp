@@ -297,5 +297,15 @@ void MapWindow::resizeGL(int w, int h)
 void MapWindow::paintGL()
 {
     m_frameDraws++;
+
+#if QT_VERSION < 0x050400 && defined(__APPLE__)
+    // XXX GL framebuffer is valid only after first attempt of painting on
+    // older versions of Qt on macOS.
+    // See https://bugreports.qt.io/browse/QTBUG-36802 for details.
+    static bool first = true;
+    if (!first) m_map.render();
+    first = false;
+#else
     m_map.render();
+#endif
 }
