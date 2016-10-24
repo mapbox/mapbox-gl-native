@@ -139,7 +139,7 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     NSString *string = [[NSString alloc] initWithData:_geoJSONData encoding:NSUTF8StringEncoding];
     const auto geojson = mapbox::geojson::parse(string.UTF8String).get<mapbox::geojson::feature_collection>();
     
-    const auto geoJSONSource = reinterpret_cast<mbgl::style::GeoJSONSource *>(self.source);
+    const auto geoJSONSource = reinterpret_cast<mbgl::style::GeoJSONSource *>(self.rawSource);
     geoJSONSource->setGeoJSON(geojson);
     
     _features = MGLFeaturesFromMBGLFeatures(geojson);
@@ -150,7 +150,7 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     _URL = URL;
     
     NSURL *url = self.URL.mgl_URLByStandardizingScheme;
-    const auto geoJSONSource = reinterpret_cast<mbgl::style::GeoJSONSource *>(self.source);
+    const auto geoJSONSource = reinterpret_cast<mbgl::style::GeoJSONSource *>(self.rawSource);
     geoJSONSource->setURL(url.absoluteString.UTF8String);
 }
 
