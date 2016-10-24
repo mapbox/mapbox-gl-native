@@ -923,7 +923,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-109.34814453125,37.64903402157866]]}}]}";
         NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
         
-        MGLGeoJSONSource *source = (MGLGeoJSONSource *)[self.mapView.style sourceWithIdentifier:@"mutable-data-source-id"];
         source.geoJSONData = data;
     });
 }
@@ -945,7 +944,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         
         NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"threestates" ofType:@"geojson"];
         NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
-        MGLGeoJSONSource *source = (MGLGeoJSONSource *)[self.mapView.style sourceWithIdentifier:@"mutable-data-source-url-id"];
+        
         source.URL = geoJSONURL;
     });
 }
