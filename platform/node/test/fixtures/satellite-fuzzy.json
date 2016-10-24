@@ -1,0 +1,19 @@
+{
+  "version": 8,
+  "name": "Satellite",
+  "sources": {
+    "mapbox": {
+      "type": "raster",
+      "tiles": [
+          "./fixtures/tiles/{z}-{x}-{y}.jpg"
+      ]
+    }
+  },
+  "layers": [
+    {
+      "id": "satellite",
+      "type": "raster",
+      "source": "mapbox"
+    }
+  ]
+}
