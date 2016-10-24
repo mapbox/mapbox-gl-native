@@ -20,7 +20,7 @@
     return self;
 }
 
-- (mbgl::style::Source *)getRawSource
+- (mbgl::style::Source *)rawSource
 {
     return _rawSource;
 }
