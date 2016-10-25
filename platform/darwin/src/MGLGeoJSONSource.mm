@@ -1,4 +1,4 @@
-#import "MGLGeoJSONSource.h"
+#import "MGLGeoJSONSource_Private.h"
 
 #import "MGLSource_Private.h"
 #import "MGLFeature_Private.h"
@@ -18,6 +18,7 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
 @interface MGLGeoJSONSource ()
 
 @property (nonatomic, readwrite) NSDictionary *options;
+@property (nonatomic) mbgl::style::GeoJSONSource *rawSource;
 
 @end
 
@@ -138,10 +139,7 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     
     NSString *string = [[NSString alloc] initWithData:_geoJSONData encoding:NSUTF8StringEncoding];
     const auto geojson = mapbox::geojson::parse(string.UTF8String).get<mapbox::geojson::feature_collection>();
-    
-    const auto geoJSONSource = reinterpret_cast<mbgl::style::GeoJSONSource *>(self.rawSource);
-    geoJSONSource->setGeoJSON(geojson);
-    
+    self.rawSource->setGeoJSON(geojson);
     _features = MGLFeaturesFromMBGLFeatures(geojson);
 }
 
@@ -150,8 +148,7 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     _URL = URL;
     
     NSURL *url = self.URL.mgl_URLByStandardizingScheme;
-    const auto geoJSONSource = reinterpret_cast<mbgl::style::GeoJSONSource *>(self.rawSource);
-    geoJSONSource->setURL(url.absoluteString.UTF8String);
+    self.rawSource->setURL(url.absoluteString.UTF8String);
 }
 
 - (void)setFeatures:(NSArray *)features
@@ -162,8 +159,7 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
         featureCollection.push_back([feature mbglFeature]);
     }
     const auto geojson = mbgl::GeoJSON{featureCollection};
-    const auto geoJSONSource = reinterpret_cast<mbgl::style::GeoJSONSource *>(self.rawSource);
-    geoJSONSource->setGeoJSON(geojson);
+    self.rawSource->setGeoJSON(geojson);
     
     _features = MGLFeaturesFromMBGLFeatures(featureCollection);
 }
