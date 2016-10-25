@@ -29,6 +29,8 @@ public:
     }
 
 private:
+    void _setGeoJSON(const GeoJSON&);
+
     Range<uint8_t> getZoomRange() final;
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
 
