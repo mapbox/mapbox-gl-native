@@ -1014,17 +1014,38 @@ public class MapView extends FrameLayout {
             icon = IconFactory.getInstance(getContext()).defaultMarker();
             Bitmap bitmap = icon.getBitmap();
             averageIconHeight = averageIconHeight + (bitmap.getHeight() / 2 - averageIconHeight) / iconSize;
-            averageIconWidth = averageIconHeight + (bitmap.getWidth() - averageIconHeight) / iconSize;
+            averageIconWidth = averageIconWidth + (bitmap.getWidth() - averageIconWidth) / iconSize;
             marker.setIcon(icon);
         } else {
             Bitmap bitmap = icon.getBitmap();
             averageIconHeight = averageIconHeight + (bitmap.getHeight() - averageIconHeight) / iconSize;
-            averageIconWidth = averageIconHeight + (bitmap.getWidth() - averageIconHeight) / iconSize;
+            averageIconWidth = averageIconWidth + (bitmap.getWidth() - averageIconWidth) / iconSize;
         }
 
         if (!icons.contains(icon)) {
             icons.add(icon);
             loadIcon(icon);
+        } else {
+            Icon oldIcon = icons.get(icons.indexOf(icon));
+            if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
+                throw new IconBitmapChangedException();
+            }
+        }
+        return icon;
+    }
+
+    Icon loadIconForMarkerView(MarkerView marker) {
+        Icon icon = marker.getIcon();
+        int iconSize = icons.size() + 1;
+        if (icon == null) {
+            icon = IconFactory.getInstance(getContext()).defaultMarkerView();
+            marker.setIcon(icon);
+        }
+        Bitmap bitmap = icon.getBitmap();
+        averageIconHeight = averageIconHeight + (bitmap.getHeight() - averageIconHeight) / iconSize;
+        averageIconWidth = averageIconWidth + (bitmap.getWidth() - averageIconWidth) / iconSize;
+        if (!icons.contains(icon)) {
+            icons.add(icon);
         } else {
             Icon oldIcon = icons.get(icons.indexOf(icon));
             if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
@@ -1875,9 +1896,10 @@ public class MapView extends FrameLayout {
                     if (annotation instanceof Marker) {
                         if (annotation.getId() == newSelectedMarkerId) {
                             if (selectedMarkers.isEmpty() || !selectedMarkers.contains(annotation)) {
-                                // only handle click if no marker view is available
                                 if (!(annotation instanceof MarkerView)) {
                                     mapboxMap.selectMarker((Marker) annotation);
+                                } else {
+                                    mapboxMap.getMarkerViewManager().onClickMarkerView((MarkerView) annotation);
                                 }
                             }
                             break;
