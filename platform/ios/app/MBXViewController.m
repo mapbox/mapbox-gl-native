@@ -68,6 +68,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingUpdateGeoJSONSourceURL,
     MBXSettingsRuntimeStylingUpdateGeoJSONSourceFeatures,
     MBXSettingsRuntimeStylingVectorSource,
+    MBXSettingsRuntimeStylingRasterSource,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
@@ -318,6 +319,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Update GeoJSON Source: URL",
                 @"Update GeoJSON Source: Features",
                 @"Style Vector Source",
+                @"Style Raster Source",
             ]];
             break;
         case MBXSettingsMiscellaneous:
@@ -463,6 +465,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingVectorSource:
                     [self styleVectorSource];
+                    break;
+                case MBXSettingsRuntimeStylingRasterSource:
+                    [self styleRasterSource];
                     break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
@@ -1017,7 +1022,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     backgroundLayer.backgroundColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor blackColor]];
     [self.mapView.style addLayer:backgroundLayer];
     
-    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"terrain-data" source:vectorSource];
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"style-vector-line-layer-id" source:vectorSource];
     lineLayer.sourceLayerIdentifier = @"contour";
     NSUInteger lineJoinValue = MGLLineJoinRound;
     lineLayer.lineJoin = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue value:&lineJoinValue withObjCType:@encode(MGLLineJoin)]];
@@ -1026,6 +1031,17 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     lineLayer.lineColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor greenColor]];
 
     [self.mapView.style addLayer:lineLayer];
+}
+
+- (void)styleRasterSource
+{
+    // 3rd party raster source requires NSAppTransportSecurity exception for stamen.com
+    MGLTileSet *rasterTileSet = [[MGLTileSet alloc] initWithTileURLTemplates:@[@"http://a.tile.stamen.com/terrain-background/{z}/{x}/{y}.jpg"]];
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"style-raster-source-id" tileSet:rasterTileSet tileSize:256];
+    [self.mapView.style addSource:rasterSource];
+    
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"style-raster-layer-id" source:rasterSource];
+    [self.mapView.style addLayer:rasterLayer];
 }
 
 - (IBAction)startWorldTour

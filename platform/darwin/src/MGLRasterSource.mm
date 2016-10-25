@@ -6,6 +6,12 @@
 
 #include <mbgl/style/sources/raster_source.hpp>
 
+@interface MGLRasterSource ()
+
+@property (nonatomic) mbgl::style::RasterSource *rawSource;
+
+@end
+
 @implementation MGLRasterSource
 
 - (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url tileSize:(CGFloat)tileSize
@@ -13,6 +19,7 @@
     if (self = [super initWithIdentifier:identifier]) {
         _URL = url;
         _tileSize = tileSize;
+        [self commonInit];
     }
     return self;
 }
@@ -23,11 +30,12 @@
     {
         _tileSet = tileSet;
         _tileSize = tileSize;
+        [self commonInit];
     }
     return self;
 }
 
-- (std::unique_ptr<mbgl::style::Source>)mbglSource
+- (void)commonInit
 {
     std::unique_ptr<mbgl::style::RasterSource> source;
     
@@ -42,10 +50,9 @@
         source = std::make_unique<mbgl::style::RasterSource>(self.identifier.UTF8String,
                                                              self.tileSet.mbglTileset,
                                                              uint16_t(self.tileSize));
-        
     }
     
-    return std::move(source);
+    self.pendingSource = std::move(source);
 }
 
 @end
