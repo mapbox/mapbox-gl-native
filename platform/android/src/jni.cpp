@@ -1151,7 +1151,7 @@ void nativeRemoveSource(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, 
     try {
         nativeMapView->getMap().removeSource(std_string_from_jstring(env, id));
     } catch (const std::runtime_error& error) {
-        jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/layers/NoSuchSourceException"), error.what());
+        jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/sources/NoSuchSourceException"), error.what());
     }
 }
 
