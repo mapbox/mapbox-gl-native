@@ -8,8 +8,6 @@ set(MBGL_CORE_FILES
     src/mbgl/actor/mailbox.hpp
     src/mbgl/actor/message.hpp
     src/mbgl/actor/scheduler.hpp
-    src/mbgl/actor/thread_pool.cpp
-    src/mbgl/actor/thread_pool.hpp
 
     # algorithm
     src/mbgl/algorithm/covered_by_children.hpp
@@ -56,6 +54,7 @@ set(MBGL_CORE_FILES
 
     # gl
     include/mbgl/gl/gl.hpp
+    include/mbgl/gl/implementation.hpp
     src/mbgl/gl/attribute.hpp
     src/mbgl/gl/context.cpp
     src/mbgl/gl/context.hpp
@@ -63,10 +62,12 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/debugging.hpp
     src/mbgl/gl/extension.cpp
     src/mbgl/gl/extension.hpp
+    src/mbgl/gl/framebuffer.hpp
     src/mbgl/gl/gl.cpp
     src/mbgl/gl/index_buffer.hpp
     src/mbgl/gl/object.cpp
     src/mbgl/gl/object.hpp
+    src/mbgl/gl/renderbuffer.hpp
     src/mbgl/gl/shader.cpp
     src/mbgl/gl/shader.hpp
     src/mbgl/gl/state.hpp
@@ -94,18 +95,19 @@ set(MBGL_CORE_FILES
     src/mbgl/layout/symbol_layout.hpp
 
     # map
+    include/mbgl/map/backend.hpp
     include/mbgl/map/camera.hpp
     include/mbgl/map/map.hpp
     include/mbgl/map/mode.hpp
-    include/mbgl/map/update.hpp
     include/mbgl/map/view.hpp
+    src/mbgl/map/backend.cpp
     src/mbgl/map/change.hpp
     src/mbgl/map/map.cpp
     src/mbgl/map/transform.cpp
     src/mbgl/map/transform.hpp
     src/mbgl/map/transform_state.cpp
     src/mbgl/map/transform_state.hpp
-    src/mbgl/map/view.cpp
+    src/mbgl/map/update.hpp
     src/mbgl/map/zoom_history.hpp
 
     # math
@@ -132,9 +134,11 @@ set(MBGL_CORE_FILES
 
     # platform/default
     include/mbgl/platform/default/glfw_view.hpp
+    include/mbgl/platform/default/headless_backend.hpp
     include/mbgl/platform/default/headless_display.hpp
-    include/mbgl/platform/default/headless_view.hpp
+    include/mbgl/platform/default/offscreen_view.hpp
     include/mbgl/platform/default/settings_json.hpp
+    include/mbgl/platform/default/thread_pool.hpp
 
     # renderer
     src/mbgl/renderer/bucket.hpp

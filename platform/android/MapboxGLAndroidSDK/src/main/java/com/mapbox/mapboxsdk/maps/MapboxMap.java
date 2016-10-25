@@ -22,7 +22,6 @@ import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -389,15 +388,16 @@ public class MapboxMap {
      */
     @UiThread
     public final void moveCamera(CameraUpdate update, MapboxMap.CancelableCallback callback) {
-        // dismiss tracking, moving camera is equal to a gesture
-
         cameraPosition = update.getCameraPosition(this);
         mapView.resetTrackingModesIfRequired(cameraPosition);
         mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
         if (callback != null) {
             callback.onFinish();
         }
-        invalidateCameraPosition();
+
+        if (onCameraChangeListener != null) {
+            onCameraChangeListener.onCameraChange(this.cameraPosition);
+        }
     }
 
     /**
@@ -560,8 +560,6 @@ public class MapboxMap {
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
-        // dismiss tracking, moving camera is equal to a gesture
-
         cameraPosition = update.getCameraPosition(this);
         mapView.resetTrackingModesIfRequired(cameraPosition);
         mapView.flyTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
@@ -602,15 +600,17 @@ public class MapboxMap {
      * Invalidates the current camera position by reconstructing it from mbgl
      */
     private void invalidateCameraPosition() {
-        invalidCameraPosition = false;
+        if(invalidCameraPosition) {
+            invalidCameraPosition = false;
 
-        CameraPosition cameraPosition = mapView.invalidateCameraPosition();
-        if (cameraPosition != null) {
-            this.cameraPosition = cameraPosition;
-        }
+            CameraPosition cameraPosition = mapView.invalidateCameraPosition();
+            if (cameraPosition != null) {
+                this.cameraPosition = cameraPosition;
+            }
 
-        if (onCameraChangeListener != null) {
-            onCameraChangeListener.onCameraChange(this.cameraPosition);
+            if (onCameraChangeListener != null) {
+                onCameraChangeListener.onCameraChange(this.cameraPosition);
+            }
         }
     }
 
@@ -1404,12 +1404,7 @@ public class MapboxMap {
 
     private MarkerView prepareViewMarker(BaseMarkerViewOptions markerViewOptions) {
         MarkerView marker = markerViewOptions.getMarker();
-
-        Icon icon = markerViewOptions.getIcon();
-        if (icon == null) {
-            icon = IconFactory.getInstance(mapView.getContext()).defaultMarkerView();
-        }
-        marker.setIcon(icon);
+        mapView.loadIconForMarkerView(marker);
         return marker;
     }
 

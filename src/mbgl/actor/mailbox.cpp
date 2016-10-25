@@ -52,4 +52,10 @@ void Mailbox::receive() {
     }
 }
 
+void Mailbox::maybeReceive(std::weak_ptr<Mailbox> mailbox) {
+    if (auto locked = mailbox.lock()) {
+        locked->receive();
+    }
+}
+
 } // namespace mbgl

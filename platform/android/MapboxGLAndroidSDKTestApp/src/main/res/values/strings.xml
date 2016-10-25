@@ -60,6 +60,7 @@
     <string name="activity_runtime_style">Runtime Style</string>
     <string name="activity_style_file">Local Style file</string>
     <string name="activity_geojson_clustering">GeoJson Clustering</string>
+    <string name="activity_geojson_realtime">Add live realtime data</string>
     <string name="activity_print">Print a map</string>
     <string name="activity_surfaceview_overlay">SurfaceView MediaOverlay</string>
     <string name="activity_query_rendered_feature_properties">Query feature properties</string>
@@ -69,6 +70,7 @@
     <string name="activity_add_sprite">Add Custom Sprite</string>
     <string name="activity_navigation_drawer">Android SDK View integration</string>
     <string name="activity_video_view">Video View</string>
+    <string name="activity_map_in_dialog">Dialog with map</string>
 
     <!-- Description -->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
@@ -112,6 +114,7 @@
     <string name="description_circle">Use GeoJson source to show a circle</string>
     <string name="description_custom_sprite">Use a custom sprite in a Symbol Layer</string>
     <string name="description_geojson_clustering">Use GeoJson sources and dynamic layers to cluster information</string>
+    <string name="description_geojson_realtime">Use realtime GeoJSON data streams to move a symbol on your map</string>
     <string name="description_print">Shows how to print a map</string>
     <string name="description_navigation_drawer">Test animation of Android SDK View components</string>
     <string name="description_surfaceview_mediacontrols">Test overlaying SurfaceView</string>
@@ -122,6 +125,7 @@
     <string name="description_video_view">Android video view on top of the map view</string>
     <string name="description_add_remove_markers">Based on zoom level</string>
     <string name="description_style_file">Use a local file as the style</string>
+    <string name="description_map_in_dialog">Display a map inside a dialog fragment</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
     <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>
@@ -161,6 +165,7 @@
     <string name="button_user_dot_default">Default</string>
     <string name="button_user_dot_tint">Tint dot</string>
     <string name="button_user_accuracy_ring_tint">Tint ring</string>
+    <string name="button_open_dialog">Open dialog</string>
 
     <string name="label_fps">FPS:</string>
 

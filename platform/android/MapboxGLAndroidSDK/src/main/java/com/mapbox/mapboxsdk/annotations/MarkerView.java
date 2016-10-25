@@ -21,11 +21,14 @@ public class MarkerView extends Marker {
 
     private MarkerViewManager markerViewManager;
 
+    private float width;
+    private float height;
+
     private float anchorU;
     private float anchorV;
 
-    private float offsetX = -1;
-    private float offsetY = -1;
+    private float offsetX = MapboxConstants.UNMEASURED;
+    private float offsetY = MapboxConstants.UNMEASURED;
 
     private float infoWindowAnchorU;
     private float infoWindowAnchorV;
@@ -40,6 +43,7 @@ public class MarkerView extends Marker {
     private Icon markerViewIcon;
 
     private boolean selected;
+
 
     /**
      * Publicly hidden default constructor
@@ -62,6 +66,22 @@ public class MarkerView extends Marker {
         this.flat = baseMarkerViewOptions.isFlat();
         this.rotation = baseMarkerViewOptions.getRotation();
         this.selected = baseMarkerViewOptions.selected;
+    }
+
+    float getWidth() {
+        return width;
+    }
+
+    void setWidth(float width) {
+        this.width = width;
+    }
+
+    float getHeight() {
+        return height;
+    }
+
+    void setHeight(float height) {
+        this.height = height;
     }
 
     /**

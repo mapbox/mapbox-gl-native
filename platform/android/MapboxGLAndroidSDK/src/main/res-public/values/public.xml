@@ -29,6 +29,7 @@
     <public name="compass_margin_top" type="attr" />
     <public name="compass_margin_right" type="attr" />
     <public name="compass_margin_bottom" type="attr" />
+    <public name="compass_fade_facing_north" type="attr" />
     <public name="logo_gravity" type="attr" />
     <public name="logo_margin_left" type="attr" />
     <public name="logo_margin_top" type="attr" />

@@ -1,5 +1,5 @@
 #include <mbgl/actor/actor.hpp>
-#include <mbgl/actor/thread_pool.hpp>
+#include <mbgl/platform/default/thread_pool.hpp>
 
 #include <mbgl/test/util.hpp>
 

@@ -36,17 +36,11 @@ namespace android {
 
         //Update the core source
         source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setGeoJSON(*converted);
-
-        //Repaint
-        updateStyle(false);
     }
 
     void GeoJSONSource::setURL(jni::JNIEnv& env, jni::String url) {
         //Update the core source
         source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setURL(jni::Make<std::string>(env, url));
-
-        //Repaint
-        updateStyle(false);
     }
 
     jni::Class<GeoJSONSource> GeoJSONSource::javaClass;

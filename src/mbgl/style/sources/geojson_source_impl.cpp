@@ -38,14 +38,30 @@ GeoJSONSource::Impl::~Impl() = default;
 
 void GeoJSONSource::Impl::setURL(std::string url_) {
     url = std::move(url_);
+
+    //Signal that the source description needs a reload
+    if (loaded || req) {
+        loaded = false;
+        req.reset();
+        observer->onSourceDescriptionChanged(base);
+    }
 }
 
 optional<std::string> GeoJSONSource::Impl::getURL() {
     return url;
 }
 
+
 void GeoJSONSource::Impl::setGeoJSON(const GeoJSON& geoJSON) {
+    req.reset();
+    _setGeoJSON(geoJSON);
+}
+
+//Private implementation
+void GeoJSONSource::Impl::_setGeoJSON(const GeoJSON& geoJSON) {
     double scale = util::EXTENT / util::tileSize;
+
+    cache.clear();
 
     if (!options.cluster) {
         mapbox::geojsonvt::Options vtOptions;
@@ -65,7 +81,7 @@ void GeoJSONSource::Impl::setGeoJSON(const GeoJSON& geoJSON) {
         geoJSONOrSupercluster =
             std::make_unique<mapbox::supercluster::Supercluster>(features, clusterOptions);
     }
-    
+
     for (auto const &item : tiles) {
         GeoJSONTile* geoJSONTile = static_cast<GeoJSONTile*>(item.second.get());
         setTileData(*geoJSONTile, geoJSONTile->id);
@@ -125,9 +141,9 @@ void GeoJSONSource::Impl::loadDescription(FileSource& fileSource) {
                            geoJSON.error().message.c_str());
                 // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
                 // tiles to load.
-                setGeoJSON(GeoJSON{ FeatureCollection{} });
+                _setGeoJSON(GeoJSON{ FeatureCollection{} });
             } else {
-                setGeoJSON(*geoJSON);
+                _setGeoJSON(*geoJSON);
             }
 
             loaded = true;

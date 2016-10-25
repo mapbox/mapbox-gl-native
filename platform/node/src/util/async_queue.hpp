@@ -28,6 +28,7 @@ public:
             q->process();
         });
     }
+    ~AsyncQueue() {}
 
     void send(T &&data) {
         {
@@ -60,9 +61,6 @@ public:
     }
 
 private:
-    ~AsyncQueue() {
-    }
-
     void process() {
         std::unique_ptr<T> item;
         while (true) {

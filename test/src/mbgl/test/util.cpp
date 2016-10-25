@@ -1,6 +1,7 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/map/map.hpp>
+#include <mbgl/platform/default/offscreen_view.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
@@ -97,10 +98,10 @@ Server::~Server() {
     }
 }
 
-PremultipliedImage render(Map& map) {
+PremultipliedImage render(Map& map, OffscreenView& view) {
     PremultipliedImage result;
-    map.renderStill([&result](std::exception_ptr, PremultipliedImage&& image) {
-        result = std::move(image);
+    map.renderStill(view, [&](std::exception_ptr) {
+        result = view.readStillImage();
     });
 
     while (!result.size()) {

@@ -27,7 +27,7 @@ public:
 
     static Nan::Persistent<v8::Function> constructor;
 
-    static NAN_MODULE_INIT(Init);
+    static void Init();
 
     static void New(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>&);

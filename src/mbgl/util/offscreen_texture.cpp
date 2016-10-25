@@ -1,70 +1,48 @@
+#include <mbgl/util/offscreen_texture.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/util/offscreen_texture.hpp>
 
+#include <cstring>
 #include <cassert>
 
 namespace mbgl {
 
-void OffscreenTexture::bind(gl::Context& context,
-                            std::array<uint16_t, 2> size) {
+OffscreenTexture::OffscreenTexture(gl::Context& context_, std::array<uint16_t, 2> size_)
+    : context(context_), size(std::move(size_)) {
     assert(size[0] > 0 && size[1] > 0);
+}
 
-    if (!texture || texture->size != size) {
-        texture = context.createTexture(size);
-    }
-
+void OffscreenTexture::bind() {
     if (!framebuffer) {
-        framebuffer = context.createFramebuffer();
-        context.bindFramebuffer = *framebuffer;
-        MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                                                texture->texture, 0));
-
-        GLenum status = MBGL_CHECK_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
-        if (status != GL_FRAMEBUFFER_COMPLETE) {
-            switch (status) {
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                throw std::runtime_error("Couldn't create framebuffer: incomplete attachment");
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                throw std::runtime_error(
-                    "Couldn't create framebuffer: incomplete missing attachment");
-#ifdef GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER
-            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-                throw std::runtime_error("Couldn't create framebuffer: incomplete draw buffer");
-#endif
-#ifdef GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER
-            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-                throw std::runtime_error("Couldn't create framebuffer: incomplete read buffer");
-#endif
-#ifdef GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS
-            case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-                throw std::runtime_error("Couldn't create framebuffer: incomplete dimensions");
-#endif
-
-            case GL_FRAMEBUFFER_UNSUPPORTED:
-                throw std::runtime_error("Couldn't create framebuffer: unsupported");
-            default:
-                throw std::runtime_error("Couldn't create framebuffer: other");
-            }
-        }
+        texture = context.createTexture(size);
+        framebuffer = context.createFramebuffer(*texture);
     } else {
-        context.bindFramebuffer = *framebuffer;
+        context.bindFramebuffer = framebuffer->framebuffer;
     }
 
     context.viewport = { 0, 0, size[0], size[1] };
 }
 
 gl::Texture& OffscreenTexture::getTexture() {
+    assert(texture);
     return *texture;
 }
 
-std::array<uint16_t, 2> OffscreenTexture::getSize() const {
-    if (texture) {
-        // Use explicit dereference instead of -> due to clang 3.5 bug
-        return (*texture).size;
-    } else {
-        return {{ 0, 0 }};
+PremultipliedImage OffscreenTexture::readStillImage() {
+    PremultipliedImage image { size[0], size[1] };
+    MBGL_CHECK_ERROR(glReadPixels(0, 0, size[0], size[1], GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
+
+    const auto stride = image.stride();
+    auto tmp = std::make_unique<uint8_t[]>(stride);
+    uint8_t* rgba = image.data.get();
+    for (int i = 0, j = size[1] - 1; i < j; i++, j--) {
+        std::memcpy(tmp.get(), rgba + i * stride, stride);
+        std::memcpy(rgba + i * stride, rgba + j * stride, stride);
+        std::memcpy(rgba + j * stride, tmp.get(), stride);
     }
+
+    return image;
 }
+
 
 } // namespace mbgl

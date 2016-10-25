@@ -4,6 +4,7 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/extension.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/string.hpp>
@@ -124,9 +125,21 @@ GLFWView::~GLFWView() {
     glfwTerminate();
 }
 
-void GLFWView::initialize(mbgl::Map *map_) {
-    View::initialize(map_);
+void GLFWView::setMap(mbgl::Map *map_) {
+    map = map_;
     map->addAnnotationIcon("default_marker", makeSpriteImage(22, 22, 1));
+}
+
+void GLFWView::updateViewBinding() {
+    getContext().bindFramebuffer.setCurrentValue(0);
+    getContext().viewport.setCurrentValue(
+        { 0, 0, static_cast<uint16_t>(fbWidth), static_cast<uint16_t>(fbHeight) });
+}
+
+void GLFWView::bind() {
+    getContext().bindFramebuffer = 0;
+    getContext().viewport = { 0, 0, static_cast<uint16_t>(fbWidth),
+                              static_cast<uint16_t>(fbHeight) };
 }
 
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
@@ -178,7 +191,11 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_Z:
             view->nextOrientation();
             break;
-        case GLFW_KEY_Q:
+        case GLFW_KEY_Q: {
+            auto result = view->map->queryPointAnnotations({ {}, { double(view->getSize()[0]), double(view->getSize()[1]) } });
+            printf("visible point annotations: %lu\n", result.size());
+        } break;
+        case GLFW_KEY_C:
             view->clearAnnotations();
             break;
         case GLFW_KEY_P:
@@ -357,8 +374,8 @@ void GLFWView::onWindowResize(GLFWwindow *window, int width, int height) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     view->width = width;
     view->height = height;
-
-    view->map->update(mbgl::Update::Dimensions);
+    view->map->setSize({{ static_cast<uint16_t>(view->width),
+                          static_cast<uint16_t>(view->height) }});
 }
 
 void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
@@ -366,7 +383,11 @@ void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
     view->fbWidth = width;
     view->fbHeight = height;
 
-    view->map->update(mbgl::Update::Repaint);
+    // This is only triggered when the framebuffer is resized, but not the window. It can
+    // happen when you move the window between screens with a different pixel ratio.
+    // We are forcing a repaint my invalidating the view, which triggers a rerender with the
+    // new framebuffer dimensions.
+    view->invalidate();
 }
 
 void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modifiers) {
@@ -432,15 +453,15 @@ void GLFWView::run() {
             const double started = glfwGetTime();
 
             glfwMakeContextCurrent(window);
-            glViewport(0, 0, fbWidth, fbHeight);
 
-            map->render();
+            updateViewBinding();
+            map->render(*this);
 
             glfwSwapBuffers(window);
 
             report(1000 * (glfwGetTime() - started));
             if (benchmark) {
-                map->update(mbgl::Update::Repaint);
+                invalidate();
             }
 
             dirty = false;
@@ -506,6 +527,16 @@ void GLFWView::setShouldClose() {
 
 void GLFWView::setWindowTitle(const std::string& title) {
     glfwSetWindowTitle(window, (std::string { "Mapbox GL: " } + title).c_str());
+}
+
+void GLFWView::setMapChangeCallback(std::function<void(mbgl::MapChange)> callback) {
+    this->mapChangeCallback = callback;
+}
+
+void GLFWView::notifyMapChange(mbgl::MapChange change) {
+    if (mapChangeCallback) {
+        mapChangeCallback(change);
+    }
 }
 
 namespace mbgl {

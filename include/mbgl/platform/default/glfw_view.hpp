@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/mbgl.hpp>
+#include <mbgl/map/backend.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
 #include <mbgl/util/geometry.hpp>
@@ -11,26 +12,14 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
 
-class GLFWView : public mbgl::View {
+class GLFWView : public mbgl::View, public mbgl::Backend {
 public:
     GLFWView(bool fullscreen = false, bool benchmark = false);
     ~GLFWView() override;
 
-    float getPixelRatio() const override;
-    std::array<uint16_t, 2> getSize() const override;
-    std::array<uint16_t, 2> getFramebufferSize() const override;
+    float getPixelRatio() const;
 
-    void initialize(mbgl::Map*) override;
-    void activate() override;
-    void deactivate() override;
-    void invalidate() override;
-
-    static void onKey(GLFWwindow *window, int key, int scancode, int action, int mods);
-    static void onScroll(GLFWwindow *window, double xoffset, double yoffset);
-    static void onWindowResize(GLFWwindow *window, int width, int height);
-    static void onFramebufferResize(GLFWwindow *window, int width, int height);
-    static void onMouseClick(GLFWwindow *window, int button, int action, int modifiers);
-    static void onMouseMove(GLFWwindow *window, double x, double y);
+    void setMap(mbgl::Map*);
 
     // Callback called when the user presses the key mapped to style change.
     // The expected action is to set a new style, different to the current one.
@@ -41,9 +30,33 @@ public:
     void setWindowTitle(const std::string&);
 
     void run();
-    void report(float duration);
+
+    // mbgl::View implementation
+    void updateViewBinding();
+    void bind() override;
+    std::array<uint16_t, 2> getSize() const;
+    std::array<uint16_t, 2> getFramebufferSize() const;
+
+    // mbgl::Backend implementation
+    void activate() override;
+    void deactivate() override;
+    void invalidate() override;
 
 private:
+    // Window callbacks
+    static void onKey(GLFWwindow *window, int key, int scancode, int action, int mods);
+    static void onScroll(GLFWwindow *window, double xoffset, double yoffset);
+    static void onWindowResize(GLFWwindow *window, int width, int height);
+    static void onFramebufferResize(GLFWwindow *window, int width, int height);
+    static void onMouseClick(GLFWwindow *window, int button, int action, int modifiers);
+    static void onMouseMove(GLFWwindow *window, double x, double y);
+
+    // Internal
+    void report(float duration);
+    
+    void setMapChangeCallback(std::function<void(mbgl::MapChange)> callback);
+    void notifyMapChange(mbgl::MapChange change) override;
+
     mbgl::Color makeRandomColor() const;
     mbgl::Point<double> makeRandomPoint() const;
     static std::shared_ptr<const mbgl::SpriteImage>
@@ -62,7 +75,11 @@ private:
     mbgl::AnnotationIDs annotationIDs;
     std::vector<std::string> spriteIDs;
 
+    std::function<void(mbgl::MapChange)> mapChangeCallback;
+
 private:
+    mbgl::Map* map = nullptr;
+
     bool fullscreen = false;
     const bool benchmark = false;
     bool tracking = false;

@@ -48,6 +48,11 @@ enum class BufferType : uint32_t {
     Element = 0x8893
 };
 
+enum class RenderbufferType : uint32_t {
+    RGBA = 0x8058,
+    DepthStencil = 0x88F0,
+};
+
 enum class TextureMipMap : bool { No = false, Yes = true };
 enum class TextureFilter : bool { Nearest = false, Linear = true };
 

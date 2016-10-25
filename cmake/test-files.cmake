@@ -89,9 +89,9 @@ set(MBGL_TEST_FILES
     # tile
     test/tile/geometry_tile_data.test.cpp
     test/tile/raster_tile.test.cpp
+    test/tile/tile_coordinate.test.cpp
     test/tile/tile_id.test.cpp
     test/tile/vector_tile.test.cpp
-    test/tile/tile_coordinate.test.cpp
 
     # util
     test/util/async_task.test.cpp

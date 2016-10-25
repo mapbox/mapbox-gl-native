@@ -39,10 +39,10 @@ class CollisionTile {
 public:
     explicit CollisionTile(PlacementConfig);
 
-    float placeFeature(const CollisionFeature&, const bool allowOverlap, const bool avoidEdges);
-    void insertFeature(CollisionFeature&, const float minPlacementScale, const bool ignorePlacement);
+    float placeFeature(const CollisionFeature&, bool allowOverlap, bool avoidEdges);
+    void insertFeature(CollisionFeature&, float minPlacementScale, bool ignorePlacement);
 
-    std::vector<IndexedSubfeature> queryRenderedSymbols(const GeometryCoordinates&, const float scale);
+    std::vector<IndexedSubfeature> queryRenderedSymbols(const GeometryCoordinates&, float scale);
 
     const PlacementConfig config;
 
@@ -52,10 +52,9 @@ public:
 
     std::array<float, 4> rotationMatrix;
     std::array<float, 4> reverseRotationMatrix;
-    std::array<CollisionBox, 4> edges;
 
 private:
-    float findPlacementScale(float minPlacementScale,
+    float findPlacementScale(
             const Point<float>& anchor, const CollisionBox& box,
             const Point<float>& blockingAnchor, const CollisionBox& blocking);
     Box getTreeBox(const Point<float>& anchor, const CollisionBox& box, const float scale = 1.0);

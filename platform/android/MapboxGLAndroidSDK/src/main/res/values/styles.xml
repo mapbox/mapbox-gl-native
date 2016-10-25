@@ -6,4 +6,6 @@
         <item name="android:textColorPrimary">@android:color/white</item>
     </style>
 
+    <style name="TelemAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert"/>
+
 </resources>

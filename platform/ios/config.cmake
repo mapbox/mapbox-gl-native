@@ -37,9 +37,13 @@ macro(mbgl_platform_core)
         PRIVATE platform/darwin/src/image.mm
 
         # Headless view
-        PRIVATE platform/darwin/src/headless_view_eagl.mm
+        PRIVATE platform/darwin/src/headless_backend_eagl.mm
+        PRIVATE platform/default/headless_backend.cpp
         PRIVATE platform/default/headless_display.cpp
-        PRIVATE platform/default/headless_view.cpp
+        PRIVATE platform/default/offscreen_view.cpp
+
+        # Thread pool
+        PRIVATE platform/default/thread_pool.cpp
     )
 
     target_add_mason_package(mbgl-core PUBLIC geojson)
@@ -50,7 +54,7 @@ macro(mbgl_platform_core)
 
     # TODO: Remove this by converting to ARC
     set_source_files_properties(
-        platform/darwin/src/headless_view_eagl.mm
+        platform/darwin/src/headless_backend_eagl.mm
             PROPERTIES
         COMPILE_FLAGS -fno-objc-arc
     )

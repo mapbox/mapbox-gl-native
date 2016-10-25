@@ -5,6 +5,8 @@
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/source_impl.hpp>
 
+#include <mbgl/map/view.hpp>
+
 #include <mbgl/platform/log.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/debugging.hpp>
@@ -29,6 +31,8 @@
 #include <mbgl/util/mat3.hpp>
 #include <mbgl/util/string.hpp>
 
+#include <mbgl/util/offscreen_texture.hpp>
+
 #include <cassert>
 #include <algorithm>
 #include <iostream>
@@ -38,8 +42,9 @@ namespace mbgl {
 
 using namespace style;
 
-Painter::Painter(const TransformState& state_)
-    : state(state_),
+Painter::Painter(gl::Context& context_, const TransformState& state_)
+    : context(context_),
+      state(state_),
       tileTriangleVertexBuffer(context.createVertexBuffer(std::vector<FillVertex> {{
             { 0,            0 },
             { util::EXTENT, 0 },
@@ -69,9 +74,6 @@ Painter::Painter(const TransformState& state_)
 #ifndef NDEBUG
     overdrawShaders = std::make_unique<Shaders>(context, gl::Shader::Overdraw);
 #endif
-
-    // Reset GL values
-    context.setDirtyState();
 }
 
 Painter::~Painter() = default;
@@ -90,19 +92,19 @@ void Painter::cleanup() {
     context.performCleanup();
 }
 
-void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& annotationSpriteAtlas) {
-    if (frame.framebufferSize != frame_.framebufferSize) {
-        context.viewport.setDefaultValue(
-            { 0, 0, frame_.framebufferSize[0], frame_.framebufferSize[1] });
-    }
+void Painter::render(const Style& style, const FrameData& frame_, View& view, SpriteAtlas& annotationSpriteAtlas) {
     frame = frame_;
+    if (frame.contextMode == GLContextMode::Shared) {
+        context.setDirtyState();
+    }
 
     PaintParameters parameters {
 #ifndef NDEBUG
-        paintMode() == PaintMode::Overdraw ? *overdrawShaders : *shaders
+        paintMode() == PaintMode::Overdraw ? *overdrawShaders : *shaders,
 #else
-        *shaders
+        *shaders,
 #endif
+        view
     };
 
     glyphAtlas = style.glyphAtlas.get();
@@ -125,12 +127,14 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     frameHistory.record(frame.timePoint, state.getZoom(),
         frame.mapMode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Milliseconds(0));
 
+
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
     {
         MBGL_DEBUG_GROUP("upload");
 
         spriteAtlas->upload(context, 0);
+
         lineAtlas->upload(context, 0);
         glyphAtlas->upload(context, 0);
         frameHistory.upload(context, 0);
@@ -148,9 +152,8 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     // tiles whatsoever.
     {
         MBGL_DEBUG_GROUP("clear");
-        context.bindFramebuffer.reset();
-        context.viewport.reset();
-        context.stencilFunc.reset();
+        view.bind();
+        context.stencilFunc = { gl::StencilTestFunction::Always, 0, ~0u };
         context.stencilTest = true;
         context.stencilMask = 0xFF;
         context.depthTest = false;
@@ -188,7 +191,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
 
 #if not MBGL_USE_GLES2 and not defined(NDEBUG)
     if (frame.debugOptions & MapDebugOptions::StencilClip) {
-        renderClipMasks();
+        renderClipMasks(parameters);
         return;
     }
 #endif
@@ -231,7 +234,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
 
 #if not MBGL_USE_GLES2 and not defined(NDEBUG)
     if (frame.debugOptions & MapDebugOptions::DepthBuffer) {
-        renderDepthBuffer();
+        renderDepthBuffer(parameters);
     }
 #endif
 
@@ -246,10 +249,6 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         context.texture[0] = 0;
 
         context.vertexArrayObject = 0;
-    }
-
-    if (frame.contextMode == GLContextMode::Shared) {
-        context.setDirtyState();
     }
 }
 
@@ -294,16 +293,21 @@ void Painter::renderPass(PaintParameters& parameters,
             renderBackground(parameters, *layer.as<BackgroundLayer>());
         } else if (layer.is<CustomLayer>()) {
             MBGL_DEBUG_GROUP(layer.baseImpl->id + " - custom");
+
+            // Reset GL state to a known state so the CustomLayer always has a clean slate.
             context.vertexArrayObject = 0;
             context.depthFunc = gl::DepthTestFunction::LessEqual;
             context.depthTest = true;
             context.depthMask = false;
             context.stencilTest = false;
             setDepthSublayer(0);
+
             layer.as<CustomLayer>()->impl->render(state);
+
+            // Reset the view back to our original one, just in case the CustomLayer changed
+            // the viewport or Framebuffer.
+            parameters.view.bind();
             context.setDirtyState();
-            context.bindFramebuffer.reset();
-            context.viewport.reset();
         } else {
             MBGL_DEBUG_GROUP(layer.baseImpl->id + " - " + util::toString(item.tile->id));
             if (item.bucket->needsClipping()) {

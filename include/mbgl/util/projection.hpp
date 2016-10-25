@@ -2,20 +2,26 @@
 
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/geometry.hpp>
 #include <mbgl/math/clamp.hpp>
 
-#include <cmath>
 
 namespace mbgl {
 
+// Spherical Mercator projection
+// http://docs.openlayers.org/library/spherical_mercator.html
 class Projection {
-
 public:
+    // Map pixel width at given scale.
+    static double worldSize(double scale) {
+        return scale * util::tileSize;
+    }
+
     static double getMetersPerPixelAtLatitude(double lat, double zoom) {
         const double constrainedZoom = util::clamp(zoom, util::MIN_ZOOM, util::MAX_ZOOM);
-        const double mapPixelWidthAtZoom = std::pow(2.0, constrainedZoom) * util::tileSize;
+        const double constrainedScale = std::pow(2.0, constrainedZoom);
         const double constrainedLatitude = util::clamp(lat, -util::LATITUDE_MAX, util::LATITUDE_MAX);
-        return std::cos(constrainedLatitude * util::DEG2RAD) * util::M2PI * util::EARTH_RADIUS_M / mapPixelWidthAtZoom;
+        return std::cos(constrainedLatitude * util::DEG2RAD) * util::M2PI * util::EARTH_RADIUS_M / worldSize(constrainedScale);
     }
 
     static ProjectedMeters projectedMetersForLatLng(const LatLng& latLng) {
@@ -32,13 +38,29 @@ public:
     }
 
     static LatLng latLngForProjectedMeters(const ProjectedMeters& projectedMeters) {
-        double latitude = (2 * std::atan(std::exp(projectedMeters.northing / util::EARTH_RADIUS_M)) - (M_PI / 2)) * util::RAD2DEG;
+        double latitude = (2 * std::atan(std::exp(projectedMeters.northing / util::EARTH_RADIUS_M)) - (M_PI / 2.0)) * util::RAD2DEG;
         double longitude = projectedMeters.easting * util::RAD2DEG / util::EARTH_RADIUS_M;
 
         latitude = util::clamp(latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
         longitude = util::clamp(longitude, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
 
         return LatLng(latitude, longitude);
+    }
+
+    static Point<double> project(const LatLng& latLng, double scale) {
+        return Point<double> {
+            util::LONGITUDE_MAX + latLng.longitude,
+            util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + latLng.latitude * M_PI / util::DEGREES_MAX))
+        } * worldSize(scale) / util::DEGREES_MAX;
+    }
+
+    static LatLng unproject(const Point<double>& p, double scale, LatLng::WrapMode wrapMode = LatLng::Unwrapped) {
+        auto p2 = p * util::DEGREES_MAX / worldSize(scale);
+        return LatLng {
+            util::DEGREES_MAX / M_PI * std::atan(std::exp((util::LONGITUDE_MAX - p2.y) * util::DEG2RAD)) - 90.0,
+            p2.x - util::LONGITUDE_MAX,
+            wrapMode
+        };
     }
 };
 

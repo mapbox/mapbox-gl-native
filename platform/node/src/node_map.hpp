@@ -1,8 +1,11 @@
 #pragma once
 
+#include "node_thread_pool.hpp"
+
 #include <mbgl/map/map.hpp>
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/headless_backend.hpp>
+#include <mbgl/platform/default/offscreen_view.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -23,7 +26,7 @@ public:
 
     static Nan::Persistent<v8::Function> constructor;
 
-    static void Init(v8::Local<v8::Object> exports);
+    static void Init(v8::Local<v8::Object>);
 
     static void New(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void Load(const Nan::FunctionCallbackInfo<v8::Value>&);
@@ -51,7 +54,10 @@ public:
 
     std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback);
 
-    mbgl::HeadlessView view;
+    const float pixelRatio;
+    mbgl::HeadlessBackend backend;
+    std::unique_ptr<mbgl::OffscreenView> view;
+    NodeThreadPool threadpool;
     std::unique_ptr<mbgl::Map> map;
 
     std::exception_ptr error;

@@ -1,15 +1,18 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/gl/context.hpp>
-#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/headless_backend.hpp>
+#include <mbgl/platform/default/offscreen_view.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #include <mbgl/util/offscreen_texture.hpp>
 
 using namespace mbgl;
 
 TEST(OffscreenTexture, EmptyRed) {
-    HeadlessView view(1.0f, 512, 256);
-    view.activate();
+    HeadlessBackend backend;
+    OffscreenView view(backend.getContext(), {{ 512, 256 }});
+    view.bind();
 
     MBGL_CHECK_ERROR(glClearColor(1.0f, 0.0f, 0.0f, 1.0f));
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
@@ -64,11 +67,8 @@ struct Buffer {
 
 
 TEST(OffscreenTexture, RenderToTexture) {
-    HeadlessView view(1.0f, 512, 256);
-    view.activate();
-    gl::Context context;
-    context.viewport.setDefaultValue(gl::value::Viewport::Get());
-    context.bindFramebuffer.setDefaultValue(gl::value::BindFramebuffer::Get());
+    HeadlessBackend backend;
+    auto& context = backend.getContext();
 
     MBGL_CHECK_ERROR(glEnable(GL_BLEND));
     MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -106,14 +106,17 @@ void main() {
 
     // Make sure the texture gets destructed before we call context.reset();
     {
+        OffscreenView view(context, {{ 512, 256 }});
+
         // First, draw red to the bound FBO.
         context.clearColor = { 1, 0, 0, 1 };
+        view.bind();
         MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
 
         // Then, create a texture, bind it, and render yellow to that texture. This should not
         // affect the originally bound FBO.
-        OffscreenTexture texture;
-        texture.bind(context, {{ 128, 128 }});
+        OffscreenTexture texture(context, {{ 128, 128 }});
+        texture.bind();
 
         context.clearColor = { 0, 0, 0, 0 };
         MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
@@ -125,11 +128,11 @@ void main() {
             glVertexAttribPointer(paintShader.a_pos, 2, GL_FLOAT, GL_FALSE, 0, nullptr));
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 3));
 
-        auto image = view.readStillImage(texture.getSize());
+        auto image = texture.readStillImage();
         test::checkImage("test/fixtures/offscreen_texture/render-to-texture", image, 0, 0);
 
         // Now reset the FBO back to normal and retrieve the original (restored) framebuffer.
-        context.resetState();
+        view.bind();
 
         image = view.readStillImage();
         test::checkImage("test/fixtures/offscreen_texture/render-to-fbo", image, 0, 0);

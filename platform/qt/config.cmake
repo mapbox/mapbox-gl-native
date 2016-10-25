@@ -43,10 +43,11 @@ endmacro()
 macro(mbgl_platform_test)
     target_sources(mbgl-test
         PRIVATE test/src/main.cpp
-        PRIVATE platform/qt/test/headless_view_qt.cpp
+        PRIVATE platform/qt/test/headless_backend_qt.cpp
         PRIVATE platform/qt/test/qmapboxgl.cpp
+        PRIVATE platform/default/headless_backend.cpp
         PRIVATE platform/default/headless_display.cpp
-        PRIVATE platform/default/headless_view.cpp
+        PRIVATE platform/default/offscreen_view.cpp
     )
 
     set_source_files_properties(

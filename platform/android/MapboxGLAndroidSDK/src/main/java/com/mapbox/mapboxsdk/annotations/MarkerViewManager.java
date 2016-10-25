@@ -130,14 +130,18 @@ public class MarkerViewManager {
                 PointF point = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
                 if (marker.getOffsetX() == MapboxConstants.UNMEASURED) {
                     // ensure view is measured first
-                    if (convertView.getWidth() == 0) {
+                    if (marker.getWidth() == 0) {
                         convertView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                        if (convertView.getMeasuredWidth() != 0) {
+                            marker.setWidth(convertView.getMeasuredWidth());
+                            marker.setHeight(convertView.getMeasuredHeight());
+                        }
                     }
-                    if (convertView.getMeasuredWidth() != 0) {
-                        int x = (int) (marker.getAnchorU() * convertView.getMeasuredWidth());
-                        int y = (int) (marker.getAnchorV() * convertView.getMeasuredHeight());
-                        marker.setOffset(x, y);
-                    }
+                }
+                if (marker.getWidth() != 0) {
+                    int x = (int) (marker.getAnchorU() * marker.getWidth());
+                    int y = (int) (marker.getAnchorV() * marker.getHeight());
+                    marker.setOffset(x, y);
                 }
 
                 convertView.setX(point.x - marker.getOffsetX());
@@ -293,6 +297,17 @@ public class MarkerViewManager {
         return markerViewMap.get(marker);
     }
 
+    @Nullable
+    public MapboxMap.MarkerViewAdapter getViewAdapter(MarkerView markerView) {
+        MapboxMap.MarkerViewAdapter adapter = null;
+        for (MapboxMap.MarkerViewAdapter a : markerViewAdapters) {
+            if (a.getMarkerClass().equals(markerView.getClass())) {
+                adapter = a;
+            }
+        }
+        return adapter;
+    }
+
     /**
      * Remove a MarkerView from a map.
      * <p>
@@ -311,7 +326,7 @@ public class MarkerViewManager {
                 if (adapter.getMarkerClass().equals(marker.getClass())) {
                     if (adapter.prepareViewForReuse(marker, viewHolder)) {
                         // reset offset for reuse
-                        marker.setOffset(-1, -1);
+                        marker.setOffset(MapboxConstants.UNMEASURED, MapboxConstants.UNMEASURED);
                         adapter.releaseView(viewHolder);
                     }
                 }
@@ -429,21 +444,6 @@ public class MarkerViewManager {
                                 }
                             }
 
-                            adaptedView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(final View v) {
-                                    boolean clickHandled = false;
-                                    if (onMarkerViewClickListener != null) {
-                                        clickHandled = onMarkerViewClickListener.onMarkerClick(marker, v, adapter);
-                                    }
-
-                                    if (!clickHandled) {
-                                        ensureInfoWindowOffset(marker);
-                                        select(marker, v, adapter);
-                                    }
-                                }
-                            });
-
                             marker.setMapboxMap(mapboxMap);
                             markerViewMap.put(marker, adaptedView);
                             if (convertView == null) {
@@ -458,6 +458,26 @@ public class MarkerViewManager {
         // trigger update to make newly added ViewMarker visible,
         // these would only be updated when the map is moved.
         update();
+    }
+
+    public void onClickMarkerView(MarkerView markerView) {
+        boolean clickHandled = false;
+
+        MapboxMap.MarkerViewAdapter adapter = getViewAdapter(markerView);
+        View view = getView(markerView);
+        if (adapter == null || view == null) {
+            // not a valid state
+            return;
+        }
+
+        if (onMarkerViewClickListener != null) {
+            clickHandled = onMarkerViewClickListener.onMarkerClick(markerView, view, adapter);
+        }
+
+        if (!clickHandled) {
+            ensureInfoWindowOffset(markerView);
+            select(markerView, view, adapter);
+        }
     }
 
     //TODO: This whole method is a stopgap for: https://github.com/mapbox/mapbox-gl-native/issues/5384
@@ -476,15 +496,19 @@ public class MarkerViewManager {
         }
 
         if (view != null) {
-            //Ensure the marker's view is measured first
-            if (view.getMeasuredWidth() == 0) {
-                view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            if (marker.getWidth() == 0) {
+                if(view.getMeasuredWidth()==0) {
+                    //Ensure the marker's view is measured first
+                    view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                }
+                marker.setWidth(view.getMeasuredWidth());
+                marker.setHeight(view.getMeasuredHeight());
             }
 
             // update position on map
-            if (marker.getOffsetX() == -1) {
-                int x = (int) (marker.getAnchorU() * view.getMeasuredWidth());
-                int y = (int) (marker.getAnchorV() * view.getMeasuredHeight());
+            if (marker.getOffsetX() == MapboxConstants.UNMEASURED) {
+                int x = (int) (marker.getAnchorU() * marker.getWidth());
+                int y = (int) (marker.getAnchorV() * marker.getHeight());
                 marker.setOffset(x, y);
             }
 

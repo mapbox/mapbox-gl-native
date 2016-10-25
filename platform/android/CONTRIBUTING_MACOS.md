@@ -1,15 +1,8 @@
 # Contributing to the Android SDK on macOS
 
-Install Oracle JDK 7+ and Android Studio:
+## Install JDK 7+ and Android Studio:
 
-    brew tap caskroom/cask
-    brew install brew-cask
-    brew cask install java
-
-    brew cask install android-studio
-
-You can [download Android Studio instead of installing it with Homebrew, but you'll still need to `brew install java`](https://developer.android.com/sdk/index.html)
-for it to work.
+ Android Studio requires the Java Development Kit (JDK) which you can [download here](http://www.oracle.com/technetwork/java/javase/downloads/index.html). Once the JDK is installed, you can grab the [latest version of Android Studio here](https://developer.android.com/sdk/index.html) and install it following the on screen instructions.  
 
 Once Android Studio is installed, the [first time it's run it'll ask to install the Android SDK](http://developer.android.com/sdk/installing/index.html?pkg=studio) which you should do.  While doing so in the Android SDK Manager make sure to also select and install the latest versions of "Android Support Repository" and "Android Support Library" from "Extras":
 
@@ -45,6 +38,15 @@ export ANDROID_HOME=/<installation location>/android-sdk-macosx
 
 This environment variable configuration should go into a file that's read on
 your shell's startup, like `~/.profile`.
+
+## Speeding up gradle builds
+
+To optimise you development machine for faster gradle builds create the following `/Users/name/.gradle/gradle.properties`  file:
+
+```
+org.gradle.daemon=true
+org.gradle.jvmargs=-Xmx3072M
+```
 
 ## Running The TestApp
 
