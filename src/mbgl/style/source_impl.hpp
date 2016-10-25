@@ -86,6 +86,7 @@ protected:
     Source& base;
     SourceObserver* observer = nullptr;
     std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
+    TileCache cache;
 
 private:
     // TileObserver implementation.
@@ -97,7 +98,6 @@ private:
     virtual std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) = 0;
 
     std::map<UnwrappedTileID, RenderTile> renderTiles;
-    TileCache cache;
 };
 
 } // namespace style

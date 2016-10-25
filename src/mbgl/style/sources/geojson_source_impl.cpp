@@ -54,6 +54,8 @@ optional<std::string> GeoJSONSource::Impl::getURL() {
 void GeoJSONSource::Impl::setGeoJSON(const GeoJSON& geoJSON) {
     double scale = util::EXTENT / util::tileSize;
 
+    cache.clear();
+
     if (!options.cluster) {
         mapbox::geojsonvt::Options vtOptions;
         vtOptions.maxZoom = options.maxzoom;
