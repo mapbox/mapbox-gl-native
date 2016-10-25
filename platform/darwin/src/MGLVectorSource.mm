@@ -6,6 +6,12 @@
 
 #include <mbgl/style/sources/vector_source.hpp>
 
+@interface MGLVectorSource ()
+
+@property (nonatomic) mbgl::style::VectorSource *rawSource;
+
+@end
+
 @implementation MGLVectorSource
 
 static NSString *MGLVectorSourceType   = @"vector";
@@ -15,6 +21,7 @@ static NSString *MGLVectorSourceType   = @"vector";
     if (self = [super initWithIdentifier:identifier])
     {
         _URL = url;
+        [self commonInit];
     }
     return self;
 }
@@ -24,11 +31,12 @@ static NSString *MGLVectorSourceType   = @"vector";
     if (self = [super initWithIdentifier:identifier])
     {
         _tileSet = tileSet;
+        [self commonInit];
     }
     return self;
 }
 
-- (std::unique_ptr<mbgl::style::Source>)mbglSource
+- (void)commonInit
 {
     std::unique_ptr<mbgl::style::VectorSource> source;
     
@@ -43,7 +51,7 @@ static NSString *MGLVectorSourceType   = @"vector";
                                                              self.tileSet.mbglTileset);
     }
     
-    return std::move(source);
+    self.pendingSource = std::move(source);
 }
 
 @end

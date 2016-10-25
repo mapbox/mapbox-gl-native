@@ -67,6 +67,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingUpdateGeoJSONSourceData,
     MBXSettingsRuntimeStylingUpdateGeoJSONSourceURL,
     MBXSettingsRuntimeStylingUpdateGeoJSONSourceFeatures,
+    MBXSettingsRuntimeStylingVectorSource,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
@@ -316,6 +317,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Update GeoJSON Source: Data",
                 @"Update GeoJSON Source: URL",
                 @"Update GeoJSON Source: Features",
+                @"Style Vector Source",
             ]];
             break;
         case MBXSettingsMiscellaneous:
@@ -458,6 +460,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingUpdateGeoJSONSourceFeatures:
                     [self updateGeoJSONSourceFeatures];
+                    break;
+                case MBXSettingsRuntimeStylingVectorSource:
+                    [self styleVectorSource];
                     break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
@@ -1000,6 +1005,27 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     
     MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"wiggle-layer" source:source];
     [self.mapView.style addLayer:layer];
+}
+
+- (void)styleVectorSource
+{
+    NSURL *url = [[NSURL alloc] initWithString:@"mapbox://mapbox.mapbox-terrain-v2"];
+    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"style-vector-source-id" URL:url];
+    [self.mapView.style addSource:vectorSource];
+    
+    MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"style-vector-background-layer-id"];
+    backgroundLayer.backgroundColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor blackColor]];
+    [self.mapView.style addLayer:backgroundLayer];
+    
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"terrain-data" source:vectorSource];
+    lineLayer.sourceLayerIdentifier = @"contour";
+    NSUInteger lineJoinValue = MGLLineJoinRound;
+    lineLayer.lineJoin = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue value:&lineJoinValue withObjCType:@encode(MGLLineJoin)]];
+    NSUInteger lineCapValue = MGLLineCapRound;
+    lineLayer.lineCap = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue value:&lineCapValue withObjCType:@encode(MGLLineCap)]];
+    lineLayer.lineColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor greenColor]];
+
+    [self.mapView.style addLayer:lineLayer];
 }
 
 - (IBAction)startWorldTour
