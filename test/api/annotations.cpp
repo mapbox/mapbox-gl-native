@@ -201,6 +201,74 @@ TEST(Annotations, UpdateSymbolAnnotationIcon) {
     test.checkRendering("update_icon");
 }
 
+TEST(Annotations, UpdateLineAnnotationGeometry) {
+    AnnotationTest test;
+
+    LineAnnotation annotation { LineString<double> {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }} };
+    annotation.color = { { 255, 0, 0, 1 } };
+    annotation.width = { 5 };
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    AnnotationID line = test.map.addAnnotation(annotation);
+
+    test::render(test.map);
+
+    annotation.geometry = LineString<double> {{ { 0, 0 }, { -45, -45 } }};
+    test.map.updateAnnotation(line, annotation);
+    test.checkRendering("update_line_geometry");
+}
+
+TEST(Annotations, UpdateLineAnnotationStyle) {
+    AnnotationTest test;
+
+    LineAnnotation annotation { LineString<double> {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }} };
+    annotation.color = { { 255, 0, 0, 1 } };
+    annotation.width = { 5 };
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    AnnotationID line = test.map.addAnnotation(annotation);
+
+    test::render(test.map);
+
+    annotation.color = { { 0, 255, 0, 1 } };
+    annotation.width = { 2 };
+    test.map.updateAnnotation(line, annotation);
+    test.checkRendering("update_line_style");
+}
+
+TEST(Annotations, UpdateFillAnnotationGeometry) {
+    AnnotationTest test;
+
+    FillAnnotation annotation { Polygon<double> {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }} };
+    annotation.color = { { 255, 0, 0, 1 } };
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    AnnotationID fill = test.map.addAnnotation(annotation);
+
+    test::render(test.map);
+
+    annotation.geometry = Polygon<double> {{ {{ { 0, 0 }, { 0, 45 }, { 45, 0 } }} }};
+    test.map.updateAnnotation(fill, annotation);
+    test.checkRendering("update_fill_geometry");
+}
+
+TEST(Annotations, UpdateFillAnnotationStyle) {
+    AnnotationTest test;
+
+    Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
+    FillAnnotation annotation { polygon };
+    annotation.color = { { 255, 0, 0, 1 } };
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    AnnotationID fill = test.map.addAnnotation(annotation);
+
+    test::render(test.map);
+
+    annotation.color = { { 0, 255, 0, 1 } };
+    test.map.updateAnnotation(fill, annotation);
+    test.checkRendering("update_fill_style");
+}
+
 TEST(Annotations, RemovePoint) {
     AnnotationTest test;
 

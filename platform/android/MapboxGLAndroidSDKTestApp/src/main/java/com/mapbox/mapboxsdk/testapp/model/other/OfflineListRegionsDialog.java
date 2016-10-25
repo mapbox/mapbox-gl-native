@@ -12,14 +12,11 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.ArrayList;
 
-/**
- * Created by antonio on 2/17/16.
- */
 public class OfflineListRegionsDialog extends DialogFragment {
 
-    private final static String LOG_TAG = "OfflineListRegionsDialog";
+    private static final String LOG_TAG = "OfflineListRegionsDialog";
 
-    public final static String ITEMS = "ITEMS";
+    public static final String ITEMS = "ITEMS";
 
     @NonNull
     @Override

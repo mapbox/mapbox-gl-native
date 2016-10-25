@@ -144,11 +144,6 @@ typedef struct MGLOfflinePackProgress {
 /**
  Resumes downloading if the pack is inactive.
  
- A pack resumes asynchronously. To get notified when this pack resumes, observe
- KVO change notifications on this pack’s `state` key path. Alternatively, you
- can add an observer for `MGLOfflinePackProgressChangedNotification`s about this
- pack that come from the default notification center.
- 
  When a pack resumes after being suspended, it may begin by iterating over the
  already downloaded resources. As a result, the `progress` structure’s
  `countOfResourcesCompleted` field may revert to 0 before rapidly returning to
@@ -161,10 +156,9 @@ typedef struct MGLOfflinePackProgress {
 /**
  Temporarily stops downloading if the pack is active.
  
- A pack suspends asynchronously. To get notified when this pack resumes, observe
- KVO change notifications on this pack’s `state` key path. Alternatively, you
- can add an observer for `MGLOfflinePackProgressChangedNotification` about this
- pack that come from the default notification center.
+ A pack suspends asynchronously, so some network requests may be sent after this
+ method is called. Regardless, the `progress` property will not be updated until
+ `-resume` is called.
  
  If the pack previously reached a higher level of progress before being
  suspended, it may wait to suspend until it returns to that level.

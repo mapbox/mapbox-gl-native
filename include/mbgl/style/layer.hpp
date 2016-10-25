@@ -8,6 +8,14 @@
 namespace mbgl {
 namespace style {
 
+class FillLayer;
+class LineLayer;
+class CircleLayer;
+class SymbolLayer;
+class RasterLayer;
+class BackgroundLayer;
+class CustomLayer;
+
 /**
  * The runtime representation of a [layer](https://www.mapbox.com/mapbox-gl-style-spec/#layers) from the Mapbox Style
  * Specification.
@@ -25,6 +33,21 @@ namespace style {
  *     auto circleLayer = std::make_unique<CircleLayer>("my-circle-layer");
  */
 class Layer : public mbgl::util::noncopyable {
+protected:
+    enum class Type {
+        Fill,
+        Line,
+        Circle,
+        Symbol,
+        Raster,
+        Background,
+        Custom,
+    };
+
+    class Impl;
+    const Type type;
+    Layer(Type, std::unique_ptr<Impl>);
+
 public:
     virtual ~Layer();
 
@@ -43,6 +66,38 @@ public:
         return is<T>() ? reinterpret_cast<const T*>(this) : nullptr;
     }
 
+    // Convenience method for dynamic dispatch on the concrete layer type. Using
+    // method overloading, this allows consolidation of logic common to vector-based
+    // layers (Fill, Line, Circle, or Symbol). For example:
+    //
+    //     struct Visitor {
+    //         void operator()(CustomLayer&) { ... }
+    //         void operator()(RasterLayer&) { ... }
+    //         void operator()(BackgroundLayer&) { ... }
+    //         template <class VectorLayer>
+    //         void operator()(VectorLayer&) { ... }
+    //     };
+    //
+    template <class V>
+    auto accept(V&& visitor) {
+        switch (type) {
+        case Type::Fill:
+            return visitor(*as<FillLayer>());
+        case Type::Line:
+            return visitor(*as<LineLayer>());
+        case Type::Circle:
+            return visitor(*as<CircleLayer>());
+        case Type::Symbol:
+            return visitor(*as<SymbolLayer>());
+        case Type::Raster:
+            return visitor(*as<RasterLayer>());
+        case Type::Background:
+            return visitor(*as<BackgroundLayer>());
+        case Type::Custom:
+            return visitor(*as<CustomLayer>());
+        }
+    }
+
     const std::string& getID() const;
 
     // Visibility
@@ -56,22 +111,7 @@ public:
     void setMaxZoom(float) const;
 
     // Private implementation
-    class Impl;
     const std::unique_ptr<Impl> baseImpl;
-
-protected:
-    enum class Type {
-        Fill,
-        Line,
-        Circle,
-        Symbol,
-        Raster,
-        Background,
-        Custom,
-    };
-
-    const Type type;
-    Layer(Type, std::unique_ptr<Impl>);
 };
 
 } // namespace style

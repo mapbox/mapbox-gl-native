@@ -83,10 +83,10 @@ TEST(Thread, invoke) {
             EXPECT_EQ(*result, 1);
         }));
 
-        requests.push_back(thread.invokeWithCallback(&TestObject::transferInOut, [&] (std::unique_ptr<int> result) {
+        requests.push_back(thread.invokeWithCallback(&TestObject::transferInOut, std::make_unique<int>(1), [&] (std::unique_ptr<int> result) {
             EXPECT_EQ(tid, std::this_thread::get_id());
             EXPECT_EQ(*result, 1);
-        }, std::make_unique<int>(1)));
+        }));
 
         thread.invoke(&TestObject::transferInShared, std::make_shared<int>(1));
         requests.push_back(thread.invokeWithCallback(&TestObject::transferOutShared, [&] (std::shared_ptr<int> result) {
@@ -100,11 +100,11 @@ TEST(Thread, invoke) {
         });
 
         std::string test("test");
-        requests.push_back(thread.invokeWithCallback(&TestObject::transferString, [&] (std::string result){
+        requests.push_back(thread.invokeWithCallback(&TestObject::transferString, test, [&] (std::string result){
             EXPECT_EQ(tid, std::this_thread::get_id());
             EXPECT_EQ(result, "test");
             loop.stop();
-        }, test));
+        }));
         test.clear();
     });
 
@@ -147,10 +147,10 @@ TEST(Thread, ExecutesAfter) {
     bool didAfter = false;
 
     auto request = thread.invokeWithCallback(&TestWorker::send, [&] {
+        didWork = true;
+    }, [&] {
         didAfter = true;
         loop.stop();
-    }, [&] {
-        didWork = true;
     });
 
     loop.run();
@@ -167,11 +167,11 @@ TEST(Thread, WorkRequestDeletionWaitsForWorkToComplete) {
     std::promise<void> started;
     bool didWork = false;
 
-    auto request = thread.invokeWithCallback(&TestWorker::send, [&] {}, [&] {
+    auto request = thread.invokeWithCallback(&TestWorker::send, [&] {
         started.set_value();
         usleep(10000);
         didWork = true;
-    });
+    }, [&] {});
 
     started.get_future().get();
     request.reset();
@@ -186,9 +186,9 @@ TEST(Thread, WorkRequestDeletionCancelsAfter) {
     bool didAfter = false;
 
     auto request = thread.invokeWithCallback(&TestWorker::send, [&] {
-        didAfter = true;
-    }, [&] {
         started.set_value();
+    }, [&] {
+        didAfter = true;
     });
 
     started.get_future().get();
@@ -203,14 +203,14 @@ TEST(Thread, WorkRequestDeletionCancelsImmediately) {
 
     std::promise<void> started;
 
-    auto request1 = thread.invokeWithCallback(&TestWorker::send, [&] {}, [&] {
+    auto request1 = thread.invokeWithCallback(&TestWorker::send, [&] {
         usleep(10000);
         started.set_value();
-    });
+    }, [&] {});
 
-    auto request2 = thread.invokeWithCallback(&TestWorker::send, [&] {}, [&] {
+    auto request2 = thread.invokeWithCallback(&TestWorker::send, [&] {
         ADD_FAILURE() << "Second work item should not be invoked";
-    });
+    }, [&] {});
     request2.reset();
 
     started.get_future().get();

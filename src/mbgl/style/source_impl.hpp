@@ -40,14 +40,17 @@ public:
     Impl(SourceType, std::string id, Source&);
     ~Impl() override;
 
-    virtual void load(FileSource&) = 0;
+    virtual void loadDescription(FileSource&) = 0;
     bool isLoaded() const;
 
-    // Request or parse all the tiles relevant for the "TransformState". This method
-    // will return true if all the tiles were scheduled for updating of false if
-    // they were not. shouldReparsePartialTiles must be set to "true" if there is
-    // new data available that a tile in the "partial" state might be interested at.
-    bool update(const UpdateParameters&);
+    // Called when the camera has changed or icons or glyphs are loaded. May load new
+    // tiles, unload obsolete tiles, and trigger further parsing of incomplete tiles or
+    // re-placement of existing complete tiles.
+    void updateTiles(const UpdateParameters&);
+
+    // Request that all loaded tiles re-run the layout operation on the existing source
+    // data with fresh style information.
+    void reloadTiles();
 
     void startRender(algorithm::ClipIDGenerator&,
                      const mat4& projMatrix,
@@ -55,8 +58,6 @@ public:
     void finishRender(Painter&);
 
     const std::map<UnwrappedTileID, RenderTile>& getRenderTiles() const;
-
-    Tile* getTile(const OverscaledTileID&) const;
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const QueryParameters&) const;
@@ -71,28 +72,28 @@ public:
     const std::string id;
 
     bool loaded = false;
-    bool enabled = false;
+
+    // Tracks whether the source is used by any layers visible at the current zoom level. Must
+    // be initialized to true so that Style::isLoaded() does not produce false positives if
+    // called before Style::recalculate().
+    bool enabled = true;
 
 protected:
     void invalidateTiles();
 
     Source& base;
     SourceObserver* observer = nullptr;
+    std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
 
 private:
     // TileObserver implementation.
-    void onTileLoaded(Tile&, bool isNewTile) override;
+    void onTileChanged(Tile&) override;
     void onTileError(Tile&, std::exception_ptr) override;
-    void onNeedsRepaint() override;
 
     virtual uint16_t getTileSize() const = 0;
     virtual Range<uint8_t> getZoomRange() = 0;
     virtual std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) = 0;
 
-    // Stores the time when this source was most recently updated.
-    TimePoint updated = TimePoint::min();
-
-    std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
     std::map<UnwrappedTileID, RenderTile> renderTiles;
     TileCache cache;
 };

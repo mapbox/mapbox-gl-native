@@ -50,6 +50,7 @@ const std::string& FillLayer::getSourceLayer() const {
 
 void FillLayer::setFilter(const Filter& filter) {
     impl->filter = filter;
+    impl->observer->onLayerFilterChanged(*this);
 }
 
 const Filter& FillLayer::getFilter() const {
@@ -65,84 +66,105 @@ PropertyValue<bool> FillLayer::getDefaultFillAntialias() {
     return { true };
 }
 
-PropertyValue<bool> FillLayer::getFillAntialias() const {
-    return impl->paint.fillAntialias.get();
+PropertyValue<bool> FillLayer::getFillAntialias(const optional<std::string>& klass) const {
+    return impl->paint.fillAntialias.get(klass);
 }
 
 void FillLayer::setFillAntialias(PropertyValue<bool> value, const optional<std::string>& klass) {
+    if (value == getFillAntialias(klass))
+        return;
     impl->paint.fillAntialias.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<float> FillLayer::getDefaultFillOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> FillLayer::getFillOpacity() const {
-    return impl->paint.fillOpacity.get();
+PropertyValue<float> FillLayer::getFillOpacity(const optional<std::string>& klass) const {
+    return impl->paint.fillOpacity.get(klass);
 }
 
 void FillLayer::setFillOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getFillOpacity(klass))
+        return;
     impl->paint.fillOpacity.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<Color> FillLayer::getDefaultFillColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> FillLayer::getFillColor() const {
-    return impl->paint.fillColor.get();
+PropertyValue<Color> FillLayer::getFillColor(const optional<std::string>& klass) const {
+    return impl->paint.fillColor.get(klass);
 }
 
 void FillLayer::setFillColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+    if (value == getFillColor(klass))
+        return;
     impl->paint.fillColor.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<Color> FillLayer::getDefaultFillOutlineColor() {
     return { {} };
 }
 
-PropertyValue<Color> FillLayer::getFillOutlineColor() const {
-    return impl->paint.fillOutlineColor.get();
+PropertyValue<Color> FillLayer::getFillOutlineColor(const optional<std::string>& klass) const {
+    return impl->paint.fillOutlineColor.get(klass);
 }
 
 void FillLayer::setFillOutlineColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+    if (value == getFillOutlineColor(klass))
+        return;
     impl->paint.fillOutlineColor.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<std::array<float, 2>> FillLayer::getDefaultFillTranslate() {
     return { {{ 0, 0 }} };
 }
 
-PropertyValue<std::array<float, 2>> FillLayer::getFillTranslate() const {
-    return impl->paint.fillTranslate.get();
+PropertyValue<std::array<float, 2>> FillLayer::getFillTranslate(const optional<std::string>& klass) const {
+    return impl->paint.fillTranslate.get(klass);
 }
 
 void FillLayer::setFillTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
+    if (value == getFillTranslate(klass))
+        return;
     impl->paint.fillTranslate.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<TranslateAnchorType> FillLayer::getDefaultFillTranslateAnchor() {
     return { TranslateAnchorType::Map };
 }
 
-PropertyValue<TranslateAnchorType> FillLayer::getFillTranslateAnchor() const {
-    return impl->paint.fillTranslateAnchor.get();
+PropertyValue<TranslateAnchorType> FillLayer::getFillTranslateAnchor(const optional<std::string>& klass) const {
+    return impl->paint.fillTranslateAnchor.get(klass);
 }
 
 void FillLayer::setFillTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
+    if (value == getFillTranslateAnchor(klass))
+        return;
     impl->paint.fillTranslateAnchor.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<std::string> FillLayer::getDefaultFillPattern() {
     return { "" };
 }
 
-PropertyValue<std::string> FillLayer::getFillPattern() const {
-    return impl->paint.fillPattern.get();
+PropertyValue<std::string> FillLayer::getFillPattern(const optional<std::string>& klass) const {
+    return impl->paint.fillPattern.get(klass);
 }
 
 void FillLayer::setFillPattern(PropertyValue<std::string> value, const optional<std::string>& klass) {
+    if (value == getFillPattern(klass))
+        return;
     impl->paint.fillPattern.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 } // namespace style

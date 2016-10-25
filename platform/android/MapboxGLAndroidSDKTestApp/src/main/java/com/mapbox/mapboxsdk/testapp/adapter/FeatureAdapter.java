@@ -22,12 +22,12 @@ public class FeatureAdapter extends RecyclerView.Adapter<FeatureAdapter.ViewHold
         public TextView labelView;
         public TextView descriptionView;
 
-        public ViewHolder(View v) {
-            super(v);
-            Typeface typeface = FontCache.get("Roboto-Regular.ttf",v.getContext());
-            labelView = (TextView) v.findViewById(R.id.nameView);
+        public ViewHolder(View view) {
+            super(view);
+            Typeface typeface = FontCache.get("Roboto-Regular.ttf",view.getContext());
+            labelView = (TextView) view.findViewById(R.id.nameView);
             labelView.setTypeface(typeface);
-            descriptionView = (TextView) v.findViewById(R.id.descriptionView);
+            descriptionView = (TextView) view.findViewById(R.id.descriptionView);
             descriptionView.setTypeface(typeface);
         }
     }
@@ -38,8 +38,8 @@ public class FeatureAdapter extends RecyclerView.Adapter<FeatureAdapter.ViewHold
 
     @Override
     public FeatureAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_main_feature, parent, false);
-        return new ViewHolder(v);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_main_feature, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override

@@ -3,19 +3,21 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/source_observer.hpp>
-#include <mbgl/text/glyph_store_observer.hpp>
-#include <mbgl/sprite/sprite_store_observer.hpp>
+#include <mbgl/style/layer_observer.hpp>
+#include <mbgl/style/update_batch.hpp>
+#include <mbgl/text/glyph_atlas_observer.hpp>
+#include <mbgl/sprite/sprite_atlas_observer.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/zoom_history.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/worker.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geo.hpp>
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -29,12 +31,14 @@ class RenderData;
 
 namespace style {
 
+class Layer;
 class UpdateParameters;
 class QueryParameters;
 
-class Style : public GlyphStoreObserver,
-              public SpriteStoreObserver,
+class Style : public GlyphAtlasObserver,
+              public SpriteAtlasObserver,
               public SourceObserver,
+              public LayerObserver,
               public util::noncopyable {
 public:
     Style(FileSource&, float pixelRatio);
@@ -48,8 +52,9 @@ public:
 
     // Fetch the tiles needed by the current viewport and emit a signal when
     // a tile is ready so observers can render the tile.
-    void update(const UpdateParameters&);
+    void updateTiles(const UpdateParameters&);
 
+    void relayout();
     void cascade(const TimePoint&, MapMode);
     void recalculate(float z, const TimePoint&, MapMode);
 
@@ -65,8 +70,8 @@ public:
 
     std::vector<const Layer*> getLayers() const;
     Layer* getLayer(const std::string& id) const;
-    void addLayer(std::unique_ptr<Layer>,
-                  optional<std::string> beforeLayerID = {});
+    Layer* addLayer(std::unique_ptr<Layer>,
+                    optional<std::string> beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 
     std::string getName() const;
@@ -75,10 +80,14 @@ public:
     double getDefaultBearing() const;
     double getDefaultPitch() const;
 
-    bool addClass(const std::string&, const TransitionOptions& = {});
-    bool removeClass(const std::string&, const TransitionOptions& = {});
+    bool addClass(const std::string&);
+    bool removeClass(const std::string&);
+    void setClasses(const std::vector<std::string>&);
+
+    TransitionOptions getTransitionOptions() const;
+    void setTransitionOptions(const TransitionOptions&);
+
     bool hasClass(const std::string&) const;
-    void setClasses(const std::vector<std::string>&, const TransitionOptions& = {});
     std::vector<std::string> getClasses() const;
 
     RenderData getRenderData(MapDebugOptions) const;
@@ -93,9 +102,7 @@ public:
     void dumpDebugLogs() const;
 
     FileSource& fileSource;
-    std::unique_ptr<GlyphStore> glyphStore;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
-    std::unique_ptr<SpriteStore> spriteStore;
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
 
@@ -103,7 +110,7 @@ private:
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<std::unique_ptr<Layer>> layers;
     std::vector<std::string> classes;
-    optional<TransitionOptions> transitionProperties;
+    TransitionOptions transitionOptions;
 
     // Defaults
     std::string name;
@@ -113,6 +120,7 @@ private:
     double defaultPitch;
 
     std::vector<std::unique_ptr<Layer>>::const_iterator findLayer(const std::string& layerID) const;
+    void reloadLayerSource(Layer&);
 
     // GlyphStoreObserver implementation.
     void onGlyphsLoaded(const FontStack&, const GlyphRange&) override;
@@ -125,22 +133,26 @@ private:
     // SourceObserver implementation.
     void onSourceLoaded(Source&) override;
     void onSourceError(Source&, std::exception_ptr) override;
-    void onTileLoaded(Source&, const OverscaledTileID&, bool isNewTile) override;
+    void onTileChanged(Source&, const OverscaledTileID&) override;
     void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) override;
-    void onNeedsRepaint() override;
+
+    // LayerObserver implementation.
+    void onLayerFilterChanged(Layer&) override;
+    void onLayerVisibilityChanged(Layer&) override;
+    void onLayerPaintPropertyChanged(Layer&) override;
+    void onLayerLayoutPropertyChanged(Layer&) override;
 
     Observer nullObserver;
     Observer* observer = &nullObserver;
 
     std::exception_ptr lastError;
 
+    UpdateBatch updateBatch;
     ZoomHistory zoomHistory;
     bool hasPendingTransitions = false;
 
 public:
-    bool shouldReparsePartialTiles = false;
     bool loaded = false;
-    Worker workers;
 };
 
 } // namespace style

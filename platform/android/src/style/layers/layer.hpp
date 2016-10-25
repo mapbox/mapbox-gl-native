@@ -43,8 +43,6 @@ public:
 
     void setPaintProperty(jni::JNIEnv&, jni::String, jni::Object<> value);
 
-    void updateStyle(jni::JNIEnv&, jni::jboolean updateClasses);
-
     //Zoom
 
     jni::jfloat getMinZoom(jni::JNIEnv&);

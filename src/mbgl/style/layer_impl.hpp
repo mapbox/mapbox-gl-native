@@ -3,6 +3,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/filter.hpp>
+#include <mbgl/style/layer_observer.hpp>
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
@@ -73,6 +74,8 @@ public:
             const float,
             const float) const { return false; };
 
+    void setObserver(LayerObserver*);
+
 public:
     std::string id;
     std::string ref;
@@ -82,6 +85,9 @@ public:
     float minZoom = -std::numeric_limits<float>::infinity();
     float maxZoom = std::numeric_limits<float>::infinity();
     VisibilityType visibility = VisibilityType::Visible;
+
+    LayerObserver nullObserver;
+    LayerObserver* observer = &nullObserver;
 
 protected:
     Impl() = default;

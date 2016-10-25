@@ -115,8 +115,7 @@ public class MapboxEventManager {
      * @param accessToken The accessToken to load MapView
      */
     public void initialize(@NonNull Context context, @NonNull String accessToken) {
-
-        Log.i(TAG, "Telemetry initialize() called... ENABLE_METRICS_ON_MAPPY="+MapboxEventManager.ENABLE_METRICS_ON_MAPPY);
+        Log.d(TAG, "Telemetry initialize() called... ENABLE_METRICS_ON_MAPPY=" + MapboxEventManager.ENABLE_METRICS_ON_MAPPY);
 
         if (!MapboxEventManager.ENABLE_METRICS_ON_MAPPY) {
             return;
@@ -258,7 +257,7 @@ public class MapboxEventManager {
             return;
         }
 
-        if (!MapboxEventManager.ENABLE_METRICS_ON_MAPPY || telemetryEnabled) {
+        if (MapboxEventManager.ENABLE_METRICS_ON_MAPPY && telemetryEnabled) {
             Log.d(TAG, "Starting Telemetry Up!");
             // Start It Up
             context.startService(new Intent(context, TelemetryService.class));

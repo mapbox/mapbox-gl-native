@@ -27,10 +27,10 @@ public:
 
     void addGeometry(const GeometryCollection&);
 
-    void drawElements(PlainShader&, gl::ObjectStore&, bool overdraw);
-    void drawElements(PatternShader&, gl::ObjectStore&, bool overdraw);
-    void drawVertices(OutlineShader&, gl::ObjectStore&, bool overdraw);
-    void drawVertices(OutlinePatternShader&, gl::ObjectStore&, bool overdraw);
+    void drawElements(PlainShader&, gl::ObjectStore&, PaintMode);
+    void drawElements(PatternShader&, gl::ObjectStore&, PaintMode);
+    void drawVertices(OutlineShader&, gl::ObjectStore&, PaintMode);
+    void drawVertices(OutlinePatternShader&, gl::ObjectStore&, PaintMode);
 
 private:
     FillVertexBuffer vertexBuffer;

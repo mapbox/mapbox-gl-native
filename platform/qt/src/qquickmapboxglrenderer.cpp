@@ -85,7 +85,7 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
     }
 
     if (syncStatus & QQuickMapboxGL::StyleNeedsSync && quickMap->style()) {
-        m_map->setStyleURL(quickMap->style()->url());
+        m_map->setStyleUrl(quickMap->style()->url());
         m_styleLoaded = false;
     }
 

@@ -39,17 +39,18 @@ TEST_P(StyleParserTest, ParseStyle) {
         Log::Error(Event::ParseStyle, "Failed to parse style: %s", util::toString(error).c_str());
     }
 
-    for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
-        const std::string name { it->name.GetString(), it->name.GetStringLength() };
-        const JSValue &value = it->value;
+    ASSERT_TRUE(infoDoc.IsObject());
+    for (const auto& property : infoDoc.GetObject()) {
+        const std::string name { property.name.GetString(), property.name.GetStringLength() };
+        const JSValue &value = property.value;
         ASSERT_EQ(true, value.IsObject());
 
         if (value.HasMember("log")) {
             const JSValue &js_log = value["log"];
             ASSERT_EQ(true, js_log.IsArray());
-            for (rapidjson::SizeType i = 0; i < js_log.Size(); i++) {
-                const JSValue &js_entry = js_log[i];
+            for (auto& js_entry : js_log.GetArray()) {
                 ASSERT_EQ(true, js_entry.IsArray());
+                ASSERT_GE(4u, js_entry.Size());
 
                 const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
                 const FixtureLogObserver::LogMessage message {

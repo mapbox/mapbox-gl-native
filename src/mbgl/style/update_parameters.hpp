@@ -5,7 +5,7 @@
 namespace mbgl {
 
 class TransformState;
-class Worker;
+class Scheduler;
 class FileSource;
 class AnnotationManager;
 
@@ -17,32 +17,26 @@ class UpdateParameters {
 public:
     UpdateParameters(float pixelRatio_,
                           MapDebugOptions debugOptions_,
-                          TimePoint animationTime_,
                           const TransformState& transformState_,
-                          Worker& worker_,
+                          Scheduler& workerScheduler_,
                           FileSource& fileSource_,
-                          bool shouldReparsePartialTiles_,
                           const MapMode mode_,
                           AnnotationManager& annotationManager_,
                           Style& style_)
         : pixelRatio(pixelRatio_),
           debugOptions(debugOptions_),
-          animationTime(std::move(animationTime_)),
           transformState(transformState_),
-          worker(worker_),
+          workerScheduler(workerScheduler_),
           fileSource(fileSource_),
-          shouldReparsePartialTiles(shouldReparsePartialTiles_),
           mode(mode_),
           annotationManager(annotationManager_),
           style(style_) {}
 
     float pixelRatio;
     MapDebugOptions debugOptions;
-    TimePoint animationTime;
     const TransformState& transformState;
-    Worker& worker;
+    Scheduler& workerScheduler;
     FileSource& fileSource;
-    bool shouldReparsePartialTiles;
     const MapMode mode;
     AnnotationManager& annotationManager;
 

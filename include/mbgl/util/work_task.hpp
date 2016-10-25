@@ -2,6 +2,8 @@
 
 #include <mbgl/util/noncopyable.hpp>
 
+#include <memory>
+
 namespace mbgl {
 
 // A movable type-erasing function wrapper. This allows to store arbitrary invokable
@@ -13,6 +15,12 @@ public:
 
     virtual void operator()() = 0;
     virtual void cancel() = 0;
+
+    template <class Fn, class... Args>
+    static std::shared_ptr<WorkTask> make(Fn&&, Args&&...);
+
+    template <class Fn, class... Args>
+    static std::shared_ptr<WorkTask> makeWithCallback(Fn&&, Args&&...);
 };
 
 } // namespace mbgl

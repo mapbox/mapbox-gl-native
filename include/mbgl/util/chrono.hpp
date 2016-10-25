@@ -29,6 +29,8 @@ std::string rfc1123(Timestamp);
 std::string iso8601(Timestamp);
 
 Timestamp parseTimestamp(const char *);
+    
+Timestamp parseTimestamp(const int32_t timestamp);
 
 // C++17 polyfill
 template <class Rep, class Period, class = std::enable_if_t<

@@ -7,6 +7,7 @@
 namespace mbgl {
 
 class SpriteAtlas;
+class SymbolLayout;
 
 namespace style {
 
@@ -19,6 +20,7 @@ public:
     bool recalculate(const CalculationParameters&) override;
 
     std::unique_ptr<Bucket> createBucket(BucketParameters&) const override;
+    std::unique_ptr<SymbolLayout> createLayout(BucketParameters&) const;
 
     SymbolLayoutProperties layout;
     SymbolPaintProperties paint;

@@ -49,7 +49,7 @@ TileSourceImpl::TileSourceImpl(SourceType type_, std::string id_, Source& base_,
 
 TileSourceImpl::~TileSourceImpl() = default;
 
-void TileSourceImpl::load(FileSource& fileSource) {
+void TileSourceImpl::loadDescription(FileSource& fileSource) {
     if (urlOrTileset.is<Tileset>()) {
         tileset = urlOrTileset.get<Tileset>();
         loaded = true;

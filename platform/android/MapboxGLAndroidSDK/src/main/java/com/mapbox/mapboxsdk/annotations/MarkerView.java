@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.annotations;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.support.annotation.FloatRange;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
@@ -58,15 +59,13 @@ public class MarkerView extends Marker {
      */
     public MarkerView(BaseMarkerViewOptions baseMarkerViewOptions) {
         super(baseMarkerViewOptions);
+        this.alpha = baseMarkerViewOptions.getAlpha();
         this.anchorU = baseMarkerViewOptions.getAnchorU();
         this.anchorV = baseMarkerViewOptions.getAnchorV();
         this.infoWindowAnchorU = baseMarkerViewOptions.getInfoWindowAnchorU();
         this.infoWindowAnchorV = baseMarkerViewOptions.getInfoWindowAnchorV();
         this.flat = baseMarkerViewOptions.isFlat();
-        this.infoWindowAnchorU = baseMarkerViewOptions.infoWindowAnchorU;
-        this.infoWindowAnchorV = baseMarkerViewOptions.infoWindowAnchorV;
-        this.anchorU = baseMarkerViewOptions.anchorU;
-        this.anchorV = baseMarkerViewOptions.anchorV;
+        this.rotation = baseMarkerViewOptions.getRotation();
         this.selected = baseMarkerViewOptions.selected;
     }
 
@@ -349,10 +348,10 @@ public class MarkerView extends Marker {
         markerViewManager = mapboxMap.getMarkerViewManager();
     }
 
-    public void update(View view) {
+    public void update(@NonNull View view) {
         if (view != null) {
             PointF point = mapboxMap.getProjection().toScreenLocation(getPosition());
-            if (offsetX == -1) {
+            if (offsetX == MapboxConstants.UNMEASURED) {
                 // ensure view is measured first
                 if (view.getMeasuredWidth() == 0) {
                     view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
@@ -367,10 +366,29 @@ public class MarkerView extends Marker {
 
             // animate visibility
             if (visible && view.getVisibility() == View.GONE) {
-                view.animate().cancel();
-                view.setAlpha(0);
-                AnimatorUtils.alpha(view, 1);
+                view.setVisibility(visible ? View.VISIBLE : View.GONE);
             }
+        }
+
+        PointF point = mapboxMap.getProjection().toScreenLocation(getPosition());
+        if (getOffsetX() == MapboxConstants.UNMEASURED) {
+            // ensure view is measured first
+            if (view.getWidth() == 0) {
+                view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            }
+            if (view.getMeasuredWidth() != 0) {
+                int x = (int) (getAnchorU() * view.getMeasuredWidth());
+                int y = (int) (getAnchorV() * view.getMeasuredHeight());
+                setOffset(x, y);
+            }
+        }
+
+        view.setX(point.x - getOffsetX());
+        view.setY(point.y - getOffsetY());
+
+        // animate visibility
+        if (isVisible() && view.getVisibility() == View.GONE) {
+            setVisible(true);
         }
     }
 

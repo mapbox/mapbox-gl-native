@@ -30,20 +30,23 @@ public:
     Thread(const ThreadContext&, Args&&... args);
     ~Thread();
 
-    // Invoke object->fn(args...) in the runloop thread.
+    // Invoke object->fn(args...) asynchronously.
     template <typename Fn, class... Args>
     void invoke(Fn fn, Args&&... args) {
         loop->invoke(bind(fn), std::forward<Args>(args)...);
     }
 
-    // Invoke object->fn(args...) in the runloop thread, then invoke callback(result) in the current thread.
-    template <typename Fn, class Cb, class... Args>
+    // Invoke object->fn(args...) asynchronously. The final argument to fn must be a callback.
+    // The provided callback is wrapped such that it is invoked, in the current thread (which
+    // must have a RunLoop), once for each time the invocation of fn invokes the wrapper, each
+    // time forwarding the passed arguments, until such time as the AsyncRequest is cancelled.
+    template <typename Fn, class... Args>
     std::unique_ptr<AsyncRequest>
-    invokeWithCallback(Fn fn, Cb&& callback, Args&&... args) {
-        return loop->invokeWithCallback(bind(fn), callback, std::forward<Args>(args)...);
+    invokeWithCallback(Fn fn, Args&&... args) {
+        return loop->invokeWithCallback(bind(fn), std::forward<Args>(args)...);
     }
 
-    // Invoke object->fn(args...) in the runloop thread, and wait for the result.
+    // Invoke object->fn(args...) asynchronously, but wait for the result.
     template <typename Fn, class... Args>
     auto invokeSync(Fn fn, Args&&... args) {
         using R = std::result_of_t<Fn(Object, Args&&...)>;

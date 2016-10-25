@@ -11,7 +11,7 @@ namespace mbgl {
 
 std::atomic<bool> NetworkStatus::online(true);
 std::mutex NetworkStatus::mtx;
-std::set<util::AsyncTask *> NetworkStatus::observers;
+std::unordered_set<util::AsyncTask *> NetworkStatus::observers;
 
 NetworkStatus::Status NetworkStatus::Get() {
     if (online) {

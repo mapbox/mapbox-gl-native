@@ -59,9 +59,8 @@ namespace gl {
     void mbx_trapExtension(const char *name, GLuint array);
 #endif
 
-struct Error : ::std::runtime_error {
-    Error(GLenum err, const std::string &msg) : ::std::runtime_error(msg), code(err) {};
-    const GLenum code;
+struct Error : std::runtime_error {
+    using std::runtime_error::runtime_error;
 };
 
 void checkError(const char *cmd, const char *file, int line);

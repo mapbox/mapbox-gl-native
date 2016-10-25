@@ -187,7 +187,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  
  @return source An instance of an `MGLSource` subclass.
  */
-- (MGLSource *)sourceWithIdentifier:(NSString *)identifier;
+- (nullable MGLSource *)sourceWithIdentifier:(NSString *)identifier;
 
 /**
  Adds a new layer on top of existing layers.

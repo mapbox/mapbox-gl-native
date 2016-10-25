@@ -52,6 +52,13 @@ public class Marker extends Annotation {
         zOrder = baseMarkerViewOptions.zOrder;
     }
 
+    Marker(LatLng position, Icon icon, String title, String snippet) {
+        this.position = position;
+        this.icon = icon;
+        this.title = title;
+        this.snippet = snippet;
+    }
+
     public LatLng getPosition() {
         return position;
     }

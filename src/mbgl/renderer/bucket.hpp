@@ -13,7 +13,6 @@ namespace mbgl {
 
 class Painter;
 class PaintParameters;
-class CollisionTile;
 class RenderTile;
 
 namespace gl {
@@ -46,9 +45,6 @@ public:
     bool needsUpload() const {
         return !uploaded;
     }
-
-    virtual void placeFeatures(CollisionTile&) {}
-    virtual void swapRenderData() {}
 
 protected:
     std::atomic<bool> uploaded { false };

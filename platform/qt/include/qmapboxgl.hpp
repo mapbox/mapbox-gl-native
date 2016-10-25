@@ -119,11 +119,11 @@ public:
 
     void cycleDebugOptions();
 
-    QString styleJSON() const;
-    QString styleURL() const;
+    QString styleJson() const;
+    QString styleUrl() const;
 
-    void setStyleJSON(const QString &);
-    void setStyleURL(const QString &);
+    void setStyleJson(const QString &);
+    void setStyleUrl(const QString &);
 
     double latitude() const;
     void setLatitude(double latitude);
@@ -159,13 +159,13 @@ public:
     void setGestureInProgress(bool inProgress);
 
     void addClass(const QString &);
-    void addClass(const QString &, const QMapbox::TransitionOptions &);
     void removeClass(const QString &);
-    void removeClass(const QString &, const QMapbox::TransitionOptions &);
     bool hasClass(const QString &) const;
     void setClasses(const QStringList &);
-    void setClasses(const QStringList &, const QMapbox::TransitionOptions &);
     QStringList getClasses() const;
+
+    QMapbox::TransitionOptions getTransitionOptions() const;
+    void setTransitionOptions(const QMapbox::TransitionOptions&);
 
     QMapbox::AnnotationID addPointAnnotation(const QMapbox::PointAnnotation &);
     QMapbox::AnnotationID addShapeAnnotation(const QMapbox::ShapeAnnotation &);

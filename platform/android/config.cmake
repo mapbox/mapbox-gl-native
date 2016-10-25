@@ -2,11 +2,11 @@
 include(${CMAKE_CURRENT_BINARY_DIR}/toolchain.cmake)
 
 mason_use(jni.hpp VERSION 2.0.0 HEADER_ONLY)
-mason_use(libjpeg-turbo VERSION 1.4.2)
-mason_use(libpng VERSION 1.6.20)
-mason_use(libzip VERSION 0.11.2)
-mason_use(nunicode VERSION 1.6)
-mason_use(sqlite VERSION 3.9.1)
+mason_use(libjpeg-turbo VERSION 1.5.0)
+mason_use(libpng VERSION 1.6.25)
+mason_use(libzip VERSION 1.1.3)
+mason_use(nunicode VERSION 1.7.1)
+mason_use(sqlite VERSION 3.14.2)
 
 macro(mbgl_platform_core)
 
@@ -86,9 +86,10 @@ add_library(mapbox-gl SHARED
 
     # Style conversion Java -> C++
     platform/android/src/style/android_conversion.hpp
-    platform/android/src/style/android_geojson.hpp
+    platform/android/src/style/conversion/geojson.hpp
     platform/android/src/style/value.cpp
     platform/android/src/style/value.hpp
+    platform/android/src/style/conversion/url_or_tileset.hpp
 
     # Style
     platform/android/src/style/layers/background_layer.cpp
@@ -109,8 +110,16 @@ add_library(mapbox-gl SHARED
     platform/android/src/style/layers/raster_layer.hpp
     platform/android/src/style/layers/symbol_layer.cpp
     platform/android/src/style/layers/symbol_layer.hpp
+    platform/android/src/style/sources/geojson_source.cpp
+    platform/android/src/style/sources/geojson_source.hpp
+    platform/android/src/style/sources/source.cpp
+    platform/android/src/style/sources/source.hpp
     platform/android/src/style/sources/sources.cpp
     platform/android/src/style/sources/sources.hpp
+    platform/android/src/style/sources/raster_source.cpp
+    platform/android/src/style/sources/raster_source.hpp
+    platform/android/src/style/sources/vector_source.cpp
+    platform/android/src/style/sources/vector_source.hpp
 
     # Native map
     platform/android/src/native_map_view.cpp
@@ -158,14 +167,14 @@ add_custom_target(copy-files
     DEPENDS mapbox-gl
     DEPENDS example-custom-layer
     COMMAND ${CMAKE_COMMAND} -E make_directory ${ANDROID_JNI_TARGET_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:mapbox-gl> ${ANDROID_JNI_TARGET_DIR}
+    COMMAND ${STRIP_COMMAND} $<TARGET_FILE:mapbox-gl> -o ${ANDROID_JNI_TARGET_DIR}$<TARGET_FILE_NAME:mapbox-gl>
     COMMAND ${CMAKE_COMMAND} -E make_directory ${ANDROID_ASSETS_TARGET_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/common/ca-bundle.crt ${ANDROID_ASSETS_TARGET_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/platform/default/resources/api_mapbox_com-digicert.der ${ANDROID_ASSETS_TARGET_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/platform/default/resources/api_mapbox_com-geotrust.der ${ANDROID_ASSETS_TARGET_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/platform/default/resources/star_tilestream_net.der ${ANDROID_ASSETS_TARGET_DIR}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${ANDROID_TEST_APP_JNI_TARGET_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:example-custom-layer> ${ANDROID_TEST_APP_JNI_TARGET_DIR}
+    COMMAND ${STRIP_COMMAND} $<TARGET_FILE:example-custom-layer> -o ${ANDROID_TEST_APP_JNI_TARGET_DIR}$<TARGET_FILE_NAME:example-custom-layer>
 )
 
 add_custom_target(_all ALL

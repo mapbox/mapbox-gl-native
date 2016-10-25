@@ -15,7 +15,7 @@ const float globalMinScale = 0.5f; // underscale by 1 zoom level
 
 SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
         const GeometryCoordinates& line, const SymbolLayoutProperties& layout,
-        const bool alongLine, const Shaping& shapedText) {
+        const style::SymbolPlacementType placement, const Shaping& shapedText) {
 
     auto image = *(shapedIcon.image);
 
@@ -63,7 +63,7 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
     }
 
     float angle = layout.iconRotate * util::DEG2RAD;
-    if (alongLine) {
+    if (placement == style::SymbolPlacementType::Line) {
         assert(static_cast<unsigned int>(anchor.segment) < line.size());
         const GeometryCoordinate &prev= line[anchor.segment];
         if (anchor.point.y == prev.y && anchor.point.x == prev.x &&
@@ -166,7 +166,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
 
 SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
         const float boxScale, const GeometryCoordinates& line, const SymbolLayoutProperties& layout,
-        const bool alongLine, const GlyphPositions& face) {
+        const style::SymbolPlacementType placement, const GlyphPositions& face) {
 
     const float textRotate = layout.textRotate * util::DEG2RAD;
     const bool keepUpright = layout.textKeepUpright;
@@ -189,7 +189,7 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
         const float centerX = (positionedGlyph.x + glyph.metrics.advance / 2.0f) * boxScale;
 
         GlyphInstances glyphInstances;
-        if (alongLine) {
+        if (placement == style::SymbolPlacementType::Line) {
             getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, true);
             if (keepUpright)
                 getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, false);

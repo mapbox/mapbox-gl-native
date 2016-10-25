@@ -4,7 +4,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/geometry/glyph_atlas.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/shader/shaders.hpp>
 #include <mbgl/util/math.hpp>
@@ -20,7 +20,7 @@ void Painter::renderSDF(SymbolBucket& bucket,
                         float sdfFontSize,
                         std::array<float, 2> texsize,
                         SDFShader& sdfShader,
-                        void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, bool),
+                        void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, PaintMode),
 
                         // Layout
                         AlignmentType rotationAlignment,
@@ -96,7 +96,7 @@ void Painter::renderSDF(SymbolBucket& bucket,
         sdfShader.u_buffer = (haloOffset - haloWidth / fontScale) / sdfPx;
 
         setDepthSublayer(0);
-        (bucket.*drawSDF)(sdfShader, store, isOverdraw());
+        (bucket.*drawSDF)(sdfShader, store, paintMode());
     }
 
     // Then, we draw the text/icon over the halo
@@ -107,7 +107,7 @@ void Painter::renderSDF(SymbolBucket& bucket,
         sdfShader.u_buffer = (256.0f - 64.0f) / 256.0f;
 
         setDepthSublayer(1);
-        (bucket.*drawSDF)(sdfShader, store, isOverdraw());
+        (bucket.*drawSDF)(sdfShader, store, paintMode());
     }
 }
 
@@ -219,7 +219,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
             iconShader.u_fadetexture = 1;
 
             setDepthSublayer(0);
-            bucket.drawIcons(iconShader, store, isOverdraw());
+            bucket.drawIcons(iconShader, store, paintMode());
         }
     }
 

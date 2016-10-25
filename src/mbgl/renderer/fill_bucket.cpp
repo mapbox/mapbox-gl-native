@@ -119,49 +119,57 @@ bool FillBucket::needsClipping() const {
     return true;
 }
 
-void FillBucket::drawElements(PlainShader& shader, gl::ObjectStore& store, bool overdraw) {
+void FillBucket::drawElements(PlainShader& shader, gl::ObjectStore& store, PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
-        group->array[overdraw ? 1 : 0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index, store);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
+        group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
+            shader, vertexBuffer, triangleElementsBuffer, vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
-void FillBucket::drawElements(PatternShader& shader, gl::ObjectStore& store, bool overdraw) {
+void FillBucket::drawElements(PatternShader& shader, gl::ObjectStore& store, PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
-        group->array[overdraw ? 3 : 2].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index, store);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
+        group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
+            shader, vertexBuffer, triangleElementsBuffer, vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
-void FillBucket::drawVertices(OutlineShader& shader, gl::ObjectStore& store, bool overdraw) {
+void FillBucket::drawVertices(OutlineShader& shader, gl::ObjectStore& store, PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : lineGroups) {
         assert(group);
-        group->array[overdraw ? 1 : 0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index, store);
-        MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT, elements_index));
+        group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
+            shader, vertexBuffer, lineElementsBuffer, vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT,
+                                        elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * lineElementsBuffer.itemSize;
     }
 }
 
-void FillBucket::drawVertices(OutlinePatternShader& shader, gl::ObjectStore& store, bool overdraw) {
+void FillBucket::drawVertices(OutlinePatternShader& shader, gl::ObjectStore& store, PaintMode paintMode) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : lineGroups) {
         assert(group);
-        group->array[overdraw? 3 : 2].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index, store);
-        MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT, elements_index));
+        group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
+            shader, vertexBuffer, lineElementsBuffer, vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT,
+                                        elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * lineElementsBuffer.itemSize;
     }

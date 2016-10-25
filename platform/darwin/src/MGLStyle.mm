@@ -92,19 +92,11 @@ static NSURL *MGLStyleURL_emerald;
     return @(self.mapView.mbglMap->getStyleName().c_str());
 }
 
-- (mbgl::style::Layer *)mbglLayerWithIdentifier:(NSString *)identifier
-{
-    return self.mapView.mbglMap->getLayer(identifier.UTF8String);
-}
-
-- (mbgl::style::Source *)mbglSourceWithIdentifier:(NSString *)identifier
-{
-    return self.mapView.mbglMap->getSource(identifier.UTF8String);
-}
-
 - (id <MGLStyleLayer>)layerWithIdentifier:(NSString *)identifier
 {
     auto layer = self.mapView.mbglMap->getLayer(identifier.UTF8String);
+
+    if (!layer) return nil;
     
     Class clazz = [self classFromLayer:layer];
     
@@ -119,6 +111,8 @@ static NSURL *MGLStyleURL_emerald;
 - (MGLSource *)sourceWithIdentifier:(NSString *)identifier
 {
     auto s = self.mapView.mbglMap->getSource(identifier.UTF8String);
+
+    if (!s) return nil;
     
     Class clazz = [self classFromSource:s];
     
@@ -181,7 +175,7 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)addSource:(MGLSource *)source
 {
-    self.mapView.mbglMap->addSource([source mbgl_source]);
+    self.mapView.mbglMap->addSource([source mbglSource]);
 }
 
 - (void)removeSource:(MGLSource *)source
@@ -217,7 +211,8 @@ static NSURL *MGLStyleURL_emerald;
     }
     
     mbgl::style::TransitionOptions transition { { MGLDurationInSeconds(transitionDuration) } };
-    self.mapView.mbglMap->setClasses(newAppliedClasses, transition);
+    self.mapView.mbglMap->setTransitionOptions(transition);
+    self.mapView.mbglMap->setClasses(newAppliedClasses);
 }
 
 - (BOOL)hasStyleClass:(NSString *)styleClass

@@ -59,7 +59,7 @@ void MapWindow::changeStyle()
 
     auto& styles = QMapbox::defaultStyles();
 
-    m_map.setStyleURL(styles[currentStyleIndex].first);
+    m_map.setStyleUrl(styles[currentStyleIndex].first);
     setWindowTitle(QString("Mapbox GL: ") + styles[currentStyleIndex].second);
 
     if (++currentStyleIndex == styles.size()) {
@@ -105,13 +105,14 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
     case Qt::Key_Tab:
         m_map.cycleDebugOptions();
         break;
-    case Qt::Key_R:
+    case Qt::Key_R: {
+        m_map.setTransitionOptions(transition);
         if (m_map.hasClass("night")) {
-            m_map.removeClass("night", transition);
+            m_map.removeClass("night");
         } else {
-            m_map.addClass("night", transition);
+            m_map.addClass("night");
         }
-        break;
+    } break;
     default:
         break;
     }

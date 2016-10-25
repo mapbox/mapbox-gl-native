@@ -1,10 +1,10 @@
 #include <mbgl/text/glyph_pbf.hpp>
-
+#include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/text/glyph_atlas_observer.hpp>
+#include <mbgl/text/glyph_set.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/text/glyph_store_observer.hpp>
-#include <mbgl/text/glyph_set.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/token.hpp>
@@ -62,14 +62,14 @@ void parseGlyphPBF(mbgl::GlyphSet& glyphSet, const std::string& data) {
 
 namespace mbgl {
 
-GlyphPBF::GlyphPBF(GlyphStore* store,
+GlyphPBF::GlyphPBF(GlyphAtlas* atlas,
                    const FontStack& fontStack,
                    const GlyphRange& glyphRange,
-                   GlyphStoreObserver* observer_,
+                   GlyphAtlasObserver* observer_,
                    FileSource& fileSource)
     : parsed(false),
       observer(observer_) {
-    req = fileSource.request(Resource::glyphs(store->getURL(), fontStack, glyphRange), [this, store, fontStack, glyphRange](Response res) {
+    req = fileSource.request(Resource::glyphs(atlas->getURL(), fontStack, glyphRange), [this, atlas, fontStack, glyphRange](Response res) {
         if (res.error) {
             observer->onGlyphsError(fontStack, glyphRange, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
@@ -79,7 +79,7 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
             observer->onGlyphsLoaded(fontStack, glyphRange);
         } else {
             try {
-                parseGlyphPBF(**store->getGlyphSet(fontStack), *res.data);
+                parseGlyphPBF(**atlas->getGlyphSet(fontStack), *res.data);
             } catch (...) {
                 observer->onGlyphsError(fontStack, glyphRange, std::current_exception());
                 return;

@@ -1,6 +1,16 @@
 # Do not edit. Regenerate this with ./scripts/generate-core-files.sh
 
 set(MBGL_CORE_FILES
+    # actor
+    src/mbgl/actor/actor.hpp
+    src/mbgl/actor/actor_ref.hpp
+    src/mbgl/actor/mailbox.cpp
+    src/mbgl/actor/mailbox.hpp
+    src/mbgl/actor/message.hpp
+    src/mbgl/actor/scheduler.hpp
+    src/mbgl/actor/thread_pool.cpp
+    src/mbgl/actor/thread_pool.hpp
+
     # algorithm
     src/mbgl/algorithm/covered_by_children.hpp
     src/mbgl/algorithm/generate_clip_ids.cpp
@@ -52,8 +62,6 @@ set(MBGL_CORE_FILES
     src/mbgl/geometry/feature_index.hpp
     src/mbgl/geometry/fill_buffer.cpp
     src/mbgl/geometry/fill_buffer.hpp
-    src/mbgl/geometry/glyph_atlas.cpp
-    src/mbgl/geometry/glyph_atlas.hpp
     src/mbgl/geometry/icon_buffer.cpp
     src/mbgl/geometry/icon_buffer.hpp
     src/mbgl/geometry/line_atlas.cpp
@@ -78,6 +86,17 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/gl_config.hpp
     src/mbgl/gl/object_store.cpp
     src/mbgl/gl/object_store.hpp
+
+    # layout
+    src/mbgl/layout/clip_lines.cpp
+    src/mbgl/layout/clip_lines.hpp
+    src/mbgl/layout/merge_lines.cpp
+    src/mbgl/layout/merge_lines.hpp
+    src/mbgl/layout/symbol_feature.hpp
+    src/mbgl/layout/symbol_instance.cpp
+    src/mbgl/layout/symbol_instance.hpp
+    src/mbgl/layout/symbol_layout.cpp
+    src/mbgl/layout/symbol_layout.hpp
 
     # map
     include/mbgl/map/camera.hpp
@@ -189,12 +208,10 @@ set(MBGL_CORE_FILES
     include/mbgl/sprite/sprite_image.hpp
     src/mbgl/sprite/sprite_atlas.cpp
     src/mbgl/sprite/sprite_atlas.hpp
+    src/mbgl/sprite/sprite_atlas_observer.hpp
     src/mbgl/sprite/sprite_image.cpp
     src/mbgl/sprite/sprite_parser.cpp
     src/mbgl/sprite/sprite_parser.hpp
-    src/mbgl/sprite/sprite_store.cpp
-    src/mbgl/sprite/sprite_store.hpp
-    src/mbgl/sprite/sprite_store_observer.hpp
 
     # storage
     include/mbgl/storage/default_file_source.hpp
@@ -229,6 +246,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/layer.cpp
     src/mbgl/style/layer_impl.cpp
     src/mbgl/style/layer_impl.hpp
+    src/mbgl/style/layer_observer.hpp
     src/mbgl/style/layout_property.hpp
     src/mbgl/style/observer.hpp
     src/mbgl/style/paint_property.hpp
@@ -249,6 +267,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/tile_source_impl.cpp
     src/mbgl/style/tile_source_impl.hpp
     src/mbgl/style/types.cpp
+    src/mbgl/style/update_batch.hpp
     src/mbgl/style/update_parameters.hpp
 
     # style/conversion
@@ -331,14 +350,14 @@ set(MBGL_CORE_FILES
     src/mbgl/text/get_anchors.hpp
     src/mbgl/text/glyph.cpp
     src/mbgl/text/glyph.hpp
+    src/mbgl/text/glyph_atlas.cpp
+    src/mbgl/text/glyph_atlas.hpp
+    src/mbgl/text/glyph_atlas_observer.hpp
     src/mbgl/text/glyph_pbf.cpp
     src/mbgl/text/glyph_pbf.hpp
     src/mbgl/text/glyph_range.hpp
     src/mbgl/text/glyph_set.cpp
     src/mbgl/text/glyph_set.hpp
-    src/mbgl/text/glyph_store.cpp
-    src/mbgl/text/glyph_store.hpp
-    src/mbgl/text/glyph_store_observer.hpp
     src/mbgl/text/placement_config.hpp
     src/mbgl/text/quads.cpp
     src/mbgl/text/quads.hpp
@@ -352,8 +371,12 @@ set(MBGL_CORE_FILES
     src/mbgl/tile/geometry_tile.hpp
     src/mbgl/tile/geometry_tile_data.cpp
     src/mbgl/tile/geometry_tile_data.hpp
+    src/mbgl/tile/geometry_tile_worker.cpp
+    src/mbgl/tile/geometry_tile_worker.hpp
     src/mbgl/tile/raster_tile.cpp
     src/mbgl/tile/raster_tile.hpp
+    src/mbgl/tile/raster_tile_worker.cpp
+    src/mbgl/tile/raster_tile_worker.hpp
     src/mbgl/tile/tile.cpp
     src/mbgl/tile/tile.hpp
     src/mbgl/tile/tile_cache.cpp
@@ -363,8 +386,6 @@ set(MBGL_CORE_FILES
     src/mbgl/tile/tile_loader.hpp
     src/mbgl/tile/tile_loader_impl.hpp
     src/mbgl/tile/tile_observer.hpp
-    src/mbgl/tile/tile_worker.cpp
-    src/mbgl/tile/tile_worker.hpp
     src/mbgl/tile/vector_tile.cpp
     src/mbgl/tile/vector_tile.hpp
 
@@ -399,12 +420,11 @@ set(MBGL_CORE_FILES
     include/mbgl/util/variant.hpp
     include/mbgl/util/work_request.hpp
     include/mbgl/util/work_task.hpp
+    include/mbgl/util/work_task_impl.hpp
     src/mbgl/util/async_task.hpp
     src/mbgl/util/chrono.cpp
     src/mbgl/util/clip_id.cpp
     src/mbgl/util/clip_id.hpp
-    src/mbgl/util/clip_lines.cpp
-    src/mbgl/util/clip_lines.hpp
     src/mbgl/util/color.cpp
     src/mbgl/util/compression.cpp
     src/mbgl/util/constants.cpp
@@ -419,6 +439,8 @@ set(MBGL_CORE_FILES
     src/mbgl/util/grid_index.hpp
     src/mbgl/util/http_header.cpp
     src/mbgl/util/http_header.hpp
+    src/mbgl/util/http_timeout.cpp
+    src/mbgl/util/http_timeout.hpp
     src/mbgl/util/interpolate.hpp
     src/mbgl/util/intersection_tests.cpp
     src/mbgl/util/intersection_tests.hpp
@@ -434,11 +456,8 @@ set(MBGL_CORE_FILES
     src/mbgl/util/mat4.hpp
     src/mbgl/util/math.cpp
     src/mbgl/util/math.hpp
-    src/mbgl/util/merge_lines.cpp
-    src/mbgl/util/merge_lines.hpp
     src/mbgl/util/premultiply.cpp
     src/mbgl/util/premultiply.hpp
-    src/mbgl/util/ptr.hpp
     src/mbgl/util/rapidjson.hpp
     src/mbgl/util/raster.cpp
     src/mbgl/util/raster.hpp
@@ -461,6 +480,4 @@ set(MBGL_CORE_FILES
     src/mbgl/util/work_queue.cpp
     src/mbgl/util/work_queue.hpp
     src/mbgl/util/work_request.cpp
-    src/mbgl/util/worker.cpp
-    src/mbgl/util/worker.hpp
 )

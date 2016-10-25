@@ -62,7 +62,7 @@ public:
      */
     jni::jobject* operator()(const bool& value) const {
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/google/gson/JsonPrimitive")).release();
-        static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "(Z)V");
+        static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "(Ljava/lang/Boolean;)V");
 
         //Create JsonPrimitive
         jni::LocalObject<jni::jobject> converted = jni::NewLocalObject(env, *convert<jni::jobject*, bool>(env, value));

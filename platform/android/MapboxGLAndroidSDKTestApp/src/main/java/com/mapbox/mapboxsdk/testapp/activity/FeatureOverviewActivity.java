@@ -63,7 +63,7 @@ public class FeatureOverviewActivity extends AppCompatActivity {
 
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
-            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+            public void onItemClicked(RecyclerView recyclerView, int position, View view) {
                 if (!sectionAdapter.isSectionHeaderPosition(position)) {
                     int itemPosition = sectionAdapter.getConvertedPosition(position);
                     Feature feature = features.get(itemPosition);
@@ -87,9 +87,11 @@ public class FeatureOverviewActivity extends AppCompatActivity {
 
     private void loadFeatures() {
         try {
-            new LoadFeatureTask().execute(getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA));
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(MapboxConstants.TAG, "Could not resolve package info", e);
+            new LoadFeatureTask().execute(
+                getPackageManager().getPackageInfo(getPackageName(),
+                    PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA));
+        } catch (PackageManager.NameNotFoundException exception) {
+            Log.e(MapboxConstants.TAG, "Could not resolve package info", exception);
         }
     }
 
@@ -107,7 +109,8 @@ public class FeatureOverviewActivity extends AppCompatActivity {
         }
 
         FeatureSectionAdapter.Section[] dummy = new FeatureSectionAdapter.Section[sections.size()];
-        sectionAdapter = new FeatureSectionAdapter(this, R.layout.section_main_layout, R.id.section_text, new FeatureAdapter(features));
+        sectionAdapter = new FeatureSectionAdapter(
+            this, R.layout.section_main_layout, R.id.section_text, new FeatureAdapter(features));
         sectionAdapter.setSections(sections.toArray(dummy));
         recyclerView.setAdapter(sectionAdapter);
     }
@@ -119,9 +122,12 @@ public class FeatureOverviewActivity extends AppCompatActivity {
     }
 
     private boolean requestLocationPermission(final int positionInList) {
-        if ((ContextCompat.checkSelfPermission(FeatureOverviewActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(FeatureOverviewActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-            ActivityCompat.requestPermissions(FeatureOverviewActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, positionInList);
+        if ((ContextCompat.checkSelfPermission(FeatureOverviewActivity.this,
+            Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            || (ContextCompat.checkSelfPermission(FeatureOverviewActivity.this,
+            Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(FeatureOverviewActivity.this, new String[]{
+                Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, positionInList);
             return true;
         } else {
             return false;
@@ -129,11 +135,14 @@ public class FeatureOverviewActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startFeature(features.get(requestCode));
         } else {
-            Snackbar.make(findViewById(android.R.id.content), "Can't open without accepting the location permission.", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(
+                findViewById(android.R.id.content),
+                "Can't open without accepting the location permission.",
+                Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -153,7 +162,8 @@ public class FeatureOverviewActivity extends AppCompatActivity {
             String packageName = getApplicationContext().getPackageName();
             String metaDataKey = getString(R.string.category);
             for (ActivityInfo info : app.activities) {
-                if (info.labelRes != 0 && info.name.startsWith(packageName) && !info.name.equals(FeatureOverviewActivity.class.getName())) {
+                if (info.labelRes != 0 && info.name.startsWith(packageName)
+                    && !info.name.equals(FeatureOverviewActivity.class.getName())) {
                     String label = getString(info.labelRes);
                     String description = resolveString(info.descriptionRes);
                     String category = resolveMetaData(info.metaData, metaDataKey);
@@ -190,7 +200,7 @@ public class FeatureOverviewActivity extends AppCompatActivity {
         private String resolveString(@StringRes int stringRes) {
             try {
                 return getString(stringRes);
-            } catch (Resources.NotFoundException e) {
+            } catch (Resources.NotFoundException exception) {
                 return "-";
             }
         }

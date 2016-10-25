@@ -21,8 +21,10 @@ LineAtlas::LineAtlas(GLsizei w, GLsizei h)
 
 LineAtlas::~LineAtlas() = default;
 
-LinePatternPos LineAtlas::getDashPosition(const std::vector<float>& dasharray, bool round) {
-    size_t key = round ? std::numeric_limits<size_t>::min() : std::numeric_limits<size_t>::max();
+LinePatternPos LineAtlas::getDashPosition(const std::vector<float>& dasharray,
+                                          LinePatternCap patternCap) {
+    size_t key = patternCap == LinePatternCap::Round ? std::numeric_limits<size_t>::min()
+                                                     : std::numeric_limits<size_t>::max();
     for (const float part : dasharray) {
         boost::hash_combine<float>(key, part);
     }
@@ -30,7 +32,7 @@ LinePatternPos LineAtlas::getDashPosition(const std::vector<float>& dasharray, b
     // Note: We're not handling hash collisions here.
     const auto it = positions.find(key);
     if (it == positions.end()) {
-        auto inserted = positions.emplace(key, addDash(dasharray, round));
+        auto inserted = positions.emplace(key, addDash(dasharray, patternCap));
         assert(inserted.second);
         return inserted.first->second;
     } else {
@@ -38,8 +40,8 @@ LinePatternPos LineAtlas::getDashPosition(const std::vector<float>& dasharray, b
     }
 }
 
-LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, bool round) {
-    int n = round ? 7 : 0;
+LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatternCap patternCap) {
+    int n = patternCap == LinePatternCap::Round ? 7 : 0;
     int dashheight = 2 * n + 1;
     const uint8_t offset = 128;
 
@@ -90,7 +92,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, bool roun
             bool inside = (partIndex % 2) == 1;
             int signedDistance;
 
-            if (round) {
+            if (patternCap == LinePatternCap::Round) {
                 float distMiddle = n ? (float)y / n * (halfWidth + 1) : 0;
                 if (inside) {
                     float distEdge = halfWidth - fabs(distMiddle);

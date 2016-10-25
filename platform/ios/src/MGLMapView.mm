@@ -3200,25 +3200,6 @@ public:
     return reusableView;
 }
 
-- (MGLAnnotationView *)annotationViewAtPoint:(CGPoint)point
-{
-    std::vector<MGLAnnotationTag> annotationTags = [self annotationTagsInRect:self.bounds];
-    
-    for(auto const& annotationTag: annotationTags)
-    {
-        auto &annotationContext = _annotationContextsByAnnotationTag[annotationTag];
-        MGLAnnotationView *annotationView = annotationContext.annotationView;
-        CGPoint convertedPoint = [self convertPoint:point toView:annotationView];
-        
-        if ([annotationView pointInside:convertedPoint withEvent:nil])
-        {
-            return annotationView;
-        }
-    }
-    
-    return nil;
-}
-
 /**
     Returns the tag of the annotation at the given point in the view.
 
@@ -3835,10 +3816,14 @@ public:
         if ([self.delegate respondsToSelector:@selector(mapView:viewForAnnotation:)])
         {
             userLocationAnnotationView = (MGLUserLocationAnnotationView *)[self.delegate mapView:self viewForAnnotation:self.userLocation];
-            if (userLocationAnnotationView)
+            if (userLocationAnnotationView && ! [userLocationAnnotationView isKindOfClass:MGLUserLocationAnnotationView.class])
             {
-                NSAssert([userLocationAnnotationView.class isSubclassOfClass:MGLUserLocationAnnotationView.class],
-                         @"User location annotation view must be a subclass of MGLUserLocationAnnotationView");
+                static dispatch_once_t onceToken;
+                dispatch_once(&onceToken, ^{
+                    NSLog(@"Ignoring user location annotation view with type %@. User location annotation view must be a kind of MGLUserLocationAnnotationView. This warning is only shown once and will become an error in a future version.", NSStringFromClass(userLocationAnnotationView.class));
+                });
+
+                userLocationAnnotationView = nil;
             }
         }
         
@@ -4199,8 +4184,10 @@ public:
     CGRect boundsAroundCorrectPoint = CGRectOffset(bounds,
                                                    correctPoint.x - CGRectGetMidX(bounds),
                                                    correctPoint.y - CGRectGetMidY(bounds));
-    return UIEdgeInsetsMake(CGRectGetMinY(boundsAroundCorrectPoint) - CGRectGetMinY(bounds), 0,
-                            CGRectGetMaxY(bounds) - CGRectGetMaxY(boundsAroundCorrectPoint), 0);
+    return UIEdgeInsetsMake(CGRectGetMinY(boundsAroundCorrectPoint) - CGRectGetMinY(bounds) + self.contentInset.top,
+                            self.contentInset.left,
+                            CGRectGetMaxY(bounds) - CGRectGetMaxY(boundsAroundCorrectPoint) + self.contentInset.bottom,
+                            self.contentInset.right);
 }
 
 /// Returns the edge padding to apply during bifocal course tracking.
@@ -4593,15 +4580,14 @@ public:
             MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotationContext.annotation];
             if (annotationView)
             {
-                // If the annotation view has no superview it means it was never used before so add it
-                if (!annotationView.superview)
-                {
-                    [self.glView addSubview:annotationView];
-                }
-                
                 annotationView.mapView = self;
                 annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
                 annotationContext.annotationView = annotationView;
+            }
+            else
+            {
+                // if there is no annotationView at this point then we are dealing with a sprite backed annotation
+                continue;
             }
         }
         

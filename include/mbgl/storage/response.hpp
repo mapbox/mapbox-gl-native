@@ -2,6 +2,7 @@
 
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/variant.hpp>
 
 #include <string>
 #include <memory>
@@ -45,15 +46,18 @@ public:
         NotFound = 2,
         Server = 3,
         Connection = 4,
+        RateLimit = 5,
         Other = 6,
     } reason = Reason::Other;
 
     // An error message from the request handler, e.g. a server message or a system message
     // informing the user about the reason for the failure.
     std::string message;
+    
+    optional<Timestamp> retryAfter;
 
 public:
-    Error(Reason, std::string = "");
+    Error(Reason, std::string = "", optional<Timestamp> = {});
 };
 
 std::ostream& operator<<(std::ostream&, Response::Error::Reason);

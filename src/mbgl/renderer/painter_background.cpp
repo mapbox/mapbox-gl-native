@@ -27,8 +27,10 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
     auto& arrayBackground = parameters.shaders.backgroundArray;
 
     if (isPatterned) {
-        imagePosA = spriteAtlas->getPosition(properties.backgroundPattern.value.from, true);
-        imagePosB = spriteAtlas->getPosition(properties.backgroundPattern.value.to, true);
+        imagePosA = spriteAtlas->getPosition(properties.backgroundPattern.value.from,
+                                             SpritePatternMode::Repeating);
+        imagePosB = spriteAtlas->getPosition(properties.backgroundPattern.value.to,
+                                             SpritePatternMode::Repeating);
 
         if (!imagePosA || !imagePosB)
             return;

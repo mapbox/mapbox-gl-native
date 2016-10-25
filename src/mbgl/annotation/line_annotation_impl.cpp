@@ -13,18 +13,20 @@ LineAnnotationImpl::LineAnnotationImpl(AnnotationID id_, LineAnnotation annotati
 }
 
 void LineAnnotationImpl::updateStyle(Style& style) const {
-    if (style.getLayer(layerID))
-        return;
+    Layer* layer = style.getLayer(layerID);
 
-    std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>(layerID, AnnotationManager::SourceID);
-    layer->setSourceLayer(layerID);
-    layer->setLineJoin(LineJoinType::Round);
-    layer->setLineOpacity(annotation.opacity);
-    layer->setLineWidth(annotation.width);
-    layer->setLineColor(annotation.color);
-	layer->setLineIsMappyPath(annotation.isMappyPath);
+    if (!layer) {
+        auto newLayer = std::make_unique<LineLayer>(layerID, AnnotationManager::SourceID);
+        newLayer->setSourceLayer(layerID);
+        newLayer->setLineJoin(LineJoinType::Round);
+        layer = style.addLayer(std::move(newLayer), AnnotationManager::PointLayerID);
+    }
 
-    style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
+    LineLayer* lineLayer = layer->as<LineLayer>();
+    lineLayer->setLineOpacity(annotation.opacity);
+    lineLayer->setLineWidth(annotation.width);
+    lineLayer->setLineColor(annotation.color);
+    lineLayer->setLineIsMappyPath(annotation.isMappyPath);
 }
 
 const ShapeAnnotationGeometry& LineAnnotationImpl::geometry() const {

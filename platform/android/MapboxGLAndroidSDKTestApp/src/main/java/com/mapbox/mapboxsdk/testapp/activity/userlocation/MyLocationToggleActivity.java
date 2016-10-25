@@ -16,7 +16,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -27,7 +26,7 @@ public class MyLocationToggleActivity extends AppCompatActivity {
 
     private MapView mapView;
     private MapboxMap mapboxMap;
-    private FloatingActionButton locationToggleFAB;
+    private FloatingActionButton locationToggleFab;
 
     private static final int PERMISSIONS_LOCATION = 0;
 
@@ -55,10 +54,10 @@ public class MyLocationToggleActivity extends AppCompatActivity {
             }
         });
 
-        locationToggleFAB = (FloatingActionButton) findViewById(R.id.fabLocationToggle);
-        locationToggleFAB.setOnClickListener(new View.OnClickListener() {
+        locationToggleFab = (FloatingActionButton) findViewById(R.id.fabLocationToggle);
+        locationToggleFab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 if (mapboxMap != null) {
                     toggleGps(!mapboxMap.isMyLocationEnabled());
                 }
@@ -111,9 +110,13 @@ public class MyLocationToggleActivity extends AppCompatActivity {
     @UiThread
     public void toggleGps(boolean enableGps) {
         if (enableGps) {
-            if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
-                    (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
+            if ((ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                || (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED)) {
+                ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
             } else {
                 enableLocation(true);
             }
@@ -138,21 +141,19 @@ public class MyLocationToggleActivity extends AppCompatActivity {
                     }
                 }
             });
-            locationToggleFAB.setImageResource(R.drawable.ic_location_disabled_24dp);
+            locationToggleFab.setImageResource(R.drawable.ic_location_disabled_24dp);
         } else {
-            locationToggleFAB.setImageResource(R.drawable.ic_my_location_24dp);
+            locationToggleFab.setImageResource(R.drawable.ic_my_location_24dp);
         }
 
         mapboxMap.setMyLocationEnabled(enabled);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSIONS_LOCATION: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    enableLocation(true);
-                 }
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSIONS_LOCATION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                enableLocation(true);
             }
         }
     }

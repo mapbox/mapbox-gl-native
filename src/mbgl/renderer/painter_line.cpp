@@ -72,8 +72,10 @@ void Painter::renderLine(PaintParameters& parameters,
         linesdfShader.u_color = color;
         linesdfShader.u_opacity = opacity;
 
-        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round);
-        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round);
+        const LinePatternCap cap =
+            layout.lineCap == LineCapType::Round ? LinePatternCap::Round : LinePatternCap::Square;
+        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, cap);
+        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, cap);
 
         const float widthA = posA.width * properties.lineDasharray.value.fromScale * layer.impl->dashLineWidth;
         const float widthB = posB.width * properties.lineDasharray.value.toScale * layer.impl->dashLineWidth;
@@ -96,11 +98,13 @@ void Painter::renderLine(PaintParameters& parameters,
         linesdfShader.u_image = 0;
         lineAtlas->bind(store, config, 0);
 
-        bucket.drawLineSDF(linesdfShader, store, isOverdraw());
+        bucket.drawLineSDF(linesdfShader, store, paintMode());
 
     } else if (!properties.linePattern.value.from.empty()) {
-        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.linePattern.value.from, true);
-        optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.linePattern.value.to, true);
+        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(
+            properties.linePattern.value.from, SpritePatternMode::Repeating);
+        optional<SpriteAtlasPosition> imagePosB =
+            spriteAtlas->getPosition(properties.linePattern.value.to, SpritePatternMode::Repeating);
 
         if (!imagePosA || !imagePosB)
             return;
@@ -137,7 +141,7 @@ void Painter::renderLine(PaintParameters& parameters,
         linepatternShader.u_image = 0;
         spriteAtlas->bind(true, store, config, 0);
 
-        bucket.drawLinePatterns(linepatternShader, store, isOverdraw());
+        bucket.drawLinePatterns(linepatternShader, store, paintMode());
 
     } else {
 		// Mappy specific drawing on paths
@@ -161,7 +165,7 @@ void Painter::renderLine(PaintParameters& parameters,
 			lineShader.u_opacity = opacity;
 			
 			setDepthSublayer(0);
-			bucket.drawLines(lineShader, store, isOverdraw());
+			bucket.drawLines(lineShader, store, paintMode());
 		}
 
 		config.program = lineShader.getID();
@@ -179,7 +183,7 @@ void Painter::renderLine(PaintParameters& parameters,
         lineShader.u_color = color;
         lineShader.u_opacity = opacity;
 
-        bucket.drawLines(lineShader, store, isOverdraw());
+        bucket.drawLines(lineShader, store, paintMode());
     }
 }
 

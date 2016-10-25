@@ -43,11 +43,11 @@ static const char* releasedMessage() {
     return "Map resources have already been released";
 }
 
-NAN_MODULE_INIT(NodeMap::Init) {
+void NodeMap::Init(v8::Local<v8::Object> target) {
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
 
-    tpl->InstanceTemplate()->SetInternalFieldCount(2);
     tpl->SetClassName(Nan::New("Map").ToLocalChecked());
+    tpl->InstanceTemplate()->SetInternalFieldCount(2);
 
     Nan::SetPrototypeMethod(tpl, "load", Load);
     Nan::SetPrototypeMethod(tpl, "loaded", Loaded);
@@ -579,7 +579,6 @@ void NodeMap::SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>& info
         return Nan::ThrowTypeError(error->message.c_str());
     }
 
-    nodeMap->map->update(mbgl::Update::RecalculateStyle);
     info.GetReturnValue().SetUndefined();
 }
 
@@ -617,9 +616,29 @@ void NodeMap::SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>& info)
         return Nan::ThrowTypeError(error->message.c_str());
     }
 
-    nodeMap->map->update(mbgl::Update::RecalculateStyle | mbgl::Update::Classes);
     info.GetReturnValue().SetUndefined();
 }
+
+struct SetFilterVisitor {
+    mbgl::style::Filter& filter;
+
+    void operator()(mbgl::style::CustomLayer&) {
+        Nan::ThrowTypeError("layer doesn't support filters");
+    }
+
+    void operator()(mbgl::style::RasterLayer&) {
+        Nan::ThrowTypeError("layer doesn't support filters");
+    }
+
+    void operator()(mbgl::style::BackgroundLayer&) {
+        Nan::ThrowTypeError("layer doesn't support filters");
+    }
+
+    template <class VectorLayer>
+    void operator()(VectorLayer& layer) {
+        layer.setFilter(filter);
+    }
+};
 
 void NodeMap::SetFilter(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style;
@@ -652,28 +671,7 @@ void NodeMap::SetFilter(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         filter = std::move(*converted);
     }
 
-    if (layer->is<FillLayer>()) {
-        layer->as<FillLayer>()->setFilter(filter);
-        info.GetReturnValue().SetUndefined();
-        return;
-    }
-    if (layer->is<LineLayer>()) {
-        layer->as<LineLayer>()->setFilter(filter);
-        info.GetReturnValue().SetUndefined();
-        return;
-    }
-    if (layer->is<SymbolLayer>()) {
-        layer->as<SymbolLayer>()->setFilter(filter);
-        info.GetReturnValue().SetUndefined();
-        return;
-    }
-    if (layer->is<CircleLayer>()) {
-        layer->as<CircleLayer>()->setFilter(filter);
-        info.GetReturnValue().SetUndefined();
-        return;
-    }
-
-    Nan::ThrowTypeError("layer doesn't support filters");
+    layer->accept(SetFilterVisitor { filter });
 }
 
 void NodeMap::DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -739,6 +737,12 @@ NodeMap::NodeMap(v8::Local<v8::Object> options) :
     }()),
     map(std::make_unique<mbgl::Map>(view, *this, mbgl::MapMode::Still)),
     async(new uv_async_t) {
+
+    view.setMapChangeCallback([&](mbgl::MapChange change) {
+        if (change == mbgl::MapChangeDidFailLoadingMap) {
+            throw std::runtime_error("Requires a map style to be a valid style JSON");
+        }
+    });
 
     async->data = this;
     uv_async_init(uv_default_loop(), async, [](UV_ASYNC_PARAMS(h)) {

@@ -1,13 +1,15 @@
 'use strict';
 
 var test = require('tape');
-var mbgl = require('../../../../lib/mapbox-gl-native');
+var mbgl = require('../../index');
 var fs = require('fs');
 var path = require('path');
 var style = require('../fixtures/style.json');
 
 test('Map', function(t) {
-    t.test('must be constructed with new', function(t) {
+    // This test is skipped because of the req.respond shim in index.js
+    // which will always call new mbgl.Map()
+    t.skip('must be constructed with new', function(t) {
         t.throws(function() {
             mbgl.Map();
         }, /Use the new operator to create new Map objects/);
@@ -87,6 +89,42 @@ test('Map', function(t) {
         t.end();
     });
 
+    t.test('instanceof mbgl.Map', function(t) {
+        var options = {
+            request: function() {},
+            ratio: 1
+        };
+
+        var map = new mbgl.Map(options);
+
+        t.ok(map instanceof mbgl.Map);
+        t.equal(map.__proto__, mbgl.Map.prototype);
+
+        var keys = Object.keys(mbgl.Map.prototype);
+
+        t.deepEqual(keys, [
+            'load',
+            'loaded',
+            'render',
+            'release',
+            'addClass',
+            'addSource',
+            'addLayer',
+            'removeLayer',
+            'setLayoutProperty',
+            'setPaintProperty',
+            'setFilter',
+            'dumpDebugLogs',
+            'queryRenderedFeatures'
+        ]);
+
+        for (var key in keys) {
+            t.equal(map[key], mbgl.Map.prototype[key]);
+        }
+
+        t.end();
+    });
+
     t.test('.load', function(t) {
         var options = {
             request: function() {},
@@ -104,6 +142,21 @@ test('Map', function(t) {
             t.end();
         });
 
+        t.test('requires a map style to be a valid style JSON', function(t) {
+            var map = new mbgl.Map(options);
+
+            t.throws(function() {
+                map.load('foo bar');
+            }, /Requires a map style to be a valid style JSON/);
+
+            t.throws(function() {
+                map.load('""');
+            }, /Requires a map style to be a valid style JSON/);
+
+            map.release();
+            t.end();
+        });
+
         t.test('expect either an object or array at root', { timeout: 1000 }, function(t) {
             var map = new mbgl.Map(options);
 
@@ -116,7 +169,9 @@ test('Map', function(t) {
                 t.end();
             });
 
-            map.load('invalid');
+            t.throws(function() {
+                map.load('invalid');
+            }, /Requires a map style to be a valid style JSON/);
         });
 
         t.test('accepts an empty stylesheet string', function(t) {

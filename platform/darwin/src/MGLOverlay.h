@@ -29,11 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLOverlay <MGLAnnotation>
 
 /**
- The approximate center point of the overlay area. (required) (read-only)
- 
- This point is typically set to the center point of the map’s bounding
- rectangle. It is used as the anchor point for any callouts displayed for the
- annotation.
+ A coordinate representing the overlay. (required) (read-only)
  */
 @property (nonatomic, readonly) CLLocationCoordinate2D coordinate;
 

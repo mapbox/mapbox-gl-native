@@ -67,7 +67,8 @@ public class GeocoderActivity extends AppCompatActivity implements OnMapReadyCal
 
         dropPinView = new ImageView(this);
         dropPinView.setImageResource(R.drawable.ic_droppin_24dp);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
         dropPinView.setLayoutParams(params);
         mapView.addView(dropPinView);
         mapView.getMapAsync(this);
@@ -149,14 +150,14 @@ public class GeocoderActivity extends AppCompatActivity implements OnMapReadyCal
                 }
 
                 @Override
-                public void onFailure(Call<GeocodingResponse> call, Throwable t) {
-                    setError(t.getMessage());
+                public void onFailure(Call<GeocodingResponse> call, Throwable throwable) {
+                    setError(throwable.getMessage());
                 }
             });
-        } catch (ServicesException e) {
-            Log.e(LOG_TAG, "Error geocoding: " + e.toString());
-            e.printStackTrace();
-            setError(e.getMessage());
+        } catch (ServicesException servicesException) {
+            Log.e(LOG_TAG, "Error geocoding: " + servicesException.toString());
+            servicesException.printStackTrace();
+            setError(servicesException.getMessage());
         }
     }
 

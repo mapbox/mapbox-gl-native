@@ -15,7 +15,7 @@ static NSString *MGLVectorSourceType   = @"vector";
     return self;
 }
 
-- (std::unique_ptr<mbgl::style::Source>)mbgl_source
+- (std::unique_ptr<mbgl::style::Source>)mbglSource
 {
     auto source = std::make_unique<mbgl::style::VectorSource>(self.sourceIdentifier.UTF8String, self.URL.absoluteString.UTF8String);
     return std::move(source);

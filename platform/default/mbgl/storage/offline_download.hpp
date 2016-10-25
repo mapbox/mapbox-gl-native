@@ -3,7 +3,7 @@
 #include <mbgl/storage/offline.hpp>
 
 #include <list>
-#include <set>
+#include <unordered_set>
 #include <memory>
 
 namespace mbgl {
@@ -58,7 +58,7 @@ private:
     OfflineRegionStatus status;
     std::unique_ptr<OfflineRegionObserver> observer;
     std::list<std::unique_ptr<AsyncRequest>> requests;
-    std::set<std::string> requiredSourceURLs;
+    std::unordered_set<std::string> requiredSourceURLs;
 };
 
 } // namespace mbgl

@@ -3,6 +3,7 @@
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/util/variant.hpp>
+#include <mbgl/tile/geojson_tile.hpp>
 
 namespace mbgl {
 
@@ -16,11 +17,12 @@ public:
     ~Impl() final;
 
     void setURL(std::string);
+    optional<std::string> getURL();
+
     void setGeoJSON(const GeoJSON&);
+    void setTileData(GeoJSONTile&, const OverscaledTileID& tileID);
 
-    std::string getURL();
-
-    void load(FileSource&) final;
+    void loadDescription(FileSource&) final;
 
     uint16_t getTileSize() const final {
         return util::tileSize;
@@ -30,10 +32,10 @@ private:
     Range<uint8_t> getZoomRange() final;
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
 
-    variant<std::string, GeoJSONVTPointer, SuperclusterPointer> urlOrGeoJSON;
-    std::unique_ptr<AsyncRequest> req;
-
     GeoJSONOptions options;
+    optional<std::string> url;
+    std::unique_ptr<AsyncRequest> req;
+    variant<GeoJSONVTPointer, SuperclusterPointer> geoJSONOrSupercluster;
 };
 
 } // namespace style

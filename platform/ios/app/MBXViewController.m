@@ -484,7 +484,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
     [self.mapView.style addSource:source];
     
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" sourceIdentifier:@"ams"];
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" source:source];
     fillLayer.fillColor = [UIColor purpleColor];
     [self.mapView.style addLayer:fillLayer];
 }
@@ -495,7 +495,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithSourceIdentifier:@"my-raster-source" URL:rasterURL tileSize:512];
     [self.mapView.style addSource:rasterSource];
     
-    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerIdentifier:@"my-raster-layer" sourceIdentifier:@"my-raster-source"];
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerIdentifier:@"my-raster-layer" source:rasterSource];
     MGLStyleAttributeFunction *opacityFunction = [[MGLStyleAttributeFunction alloc] init];
     opacityFunction.stops = @{@20.0f: @1.0f,
                               @5.0f: @0.0f};
@@ -732,15 +732,17 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         annotationView = [[MBXAnnotationView alloc] initWithReuseIdentifier:MBXViewControllerAnnotationViewReuseIdentifer];
         annotationView.frame = CGRectMake(0, 0, 10, 10);
         annotationView.backgroundColor = [UIColor whiteColor];
-        
-        // uncomment to make the annotation view draggable
-        // also note that having two long press gesture recognizers on overlapping views (`self.view` & `annotationView`) will cause weird behaviour
-        // comment out the pin dropping functionality in the handleLongPress: method in this class to make draggable annotation views play nice
+
+        // Note that having two long press gesture recognizers on overlapping
+        // views (`self.view` & `annotationView`) will cause weird behaviour.
+        // Comment out the pin dropping functionality in the handleLongPress:
+        // method in this class to make draggable annotation views play nice.
         annotationView.draggable = YES;
         
-        // uncomment to force annotation view to maintain a constant size when the map is tilted
-        // by default, annotation views will shrink and grow as the move towards and away from the
-        // horizon. Relatedly, annotations backed by GL sprites ONLY scale with viewing distance currently.
+        // Uncomment to force annotation view to maintain a constant size when
+        // the map is tilted. By default, annotation views will shrink and grow
+        // as they move towards and away from the horizon. Relatedly, annotations
+        // backed by GL sprites currently ONLY scale with viewing distance.
         // annotationView.scalesWithViewingDistance = NO;
     } else {
         // orange indicates that the annotation view was reused

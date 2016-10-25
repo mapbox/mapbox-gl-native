@@ -1,6 +1,5 @@
 #import "MGLBaseStyleLayer.h"
 
-#import "MGLBaseStyleLayer_Private.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLMapView_Private.h"
 
@@ -14,13 +13,31 @@
 @synthesize layerIdentifier;
 @synthesize mapView;
 @synthesize layer;
+@synthesize sourceIdentifier;
+@synthesize sourceLayerIdentifier;
 
-- (void)update
+- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier
 {
-    // A style layer's map view can be nil when first created at runtime
-    // before being added to a map style. In these cases, just no-op since
-    // the addition of the layer will trigger a visual refresh. 
-    if (self.mapView) self.mapView.mbglMap->update(mbgl::Update::RecalculateStyle | mbgl::Update::Classes);
+    [[NSException exceptionWithName:@"MGLAbstractClassException"
+                             reason:@"MGLBaseStyleLayer is an abstract class"
+                           userInfo:nil] raise];
+    return nil;
+}
+
+- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier sourceIdentifier:(NSString *)sourceIdentifier
+{
+    [[NSException exceptionWithName:@"MGLAbstractClassException"
+                             reason:@"MGLBaseStyleLayer is an abstract class"
+                           userInfo:nil] raise];
+    return nil;
+}
+
+- (instancetype)initWithLayerIdentifier:(NSString *)layerIdentifier sourceIdentifier:(NSString *)sourceIdentifier sourceLayer:(NSString *)sourceLayer
+{
+    [[NSException exceptionWithName:@"MGLAbstractClassException"
+                             reason:@"MGLBaseStyleLayer is an abstract class"
+                           userInfo:nil] raise];
+    return nil;
 }
 
 - (void)setVisible:(BOOL)visible

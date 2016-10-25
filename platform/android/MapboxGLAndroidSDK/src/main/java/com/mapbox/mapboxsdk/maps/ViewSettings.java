@@ -7,7 +7,7 @@ class ViewSettings {
 
     private boolean enabled;
     private int gravity;
-    private int[]margins;
+    private int[] margins;
     private int tintColor;
 
     public ViewSettings() {

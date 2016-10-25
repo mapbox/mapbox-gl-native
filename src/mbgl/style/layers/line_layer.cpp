@@ -50,6 +50,7 @@ const std::string& LineLayer::getSourceLayer() const {
 
 void LineLayer::setFilter(const Filter& filter) {
     impl->filter = filter;
+    impl->observer->onLayerFilterChanged(*this);
 }
 
 const Filter& LineLayer::getFilter() const {
@@ -67,7 +68,10 @@ PropertyValue<LineCapType> LineLayer::getLineCap() const {
 }
 
 void LineLayer::setLineCap(PropertyValue<LineCapType> value) {
+    if (value == getLineCap())
+        return;
     impl->layout.lineCap.set(value);
+    impl->observer->onLayerLayoutPropertyChanged(*this);
 }
 PropertyValue<LineJoinType> LineLayer::getDefaultLineJoin() {
     return { LineJoinType::Miter };
@@ -78,7 +82,10 @@ PropertyValue<LineJoinType> LineLayer::getLineJoin() const {
 }
 
 void LineLayer::setLineJoin(PropertyValue<LineJoinType> value) {
+    if (value == getLineJoin())
+        return;
     impl->layout.lineJoin.set(value);
+    impl->observer->onLayerLayoutPropertyChanged(*this);
 }
 PropertyValue<float> LineLayer::getDefaultLineMiterLimit() {
     return { 2 };
@@ -89,7 +96,10 @@ PropertyValue<float> LineLayer::getLineMiterLimit() const {
 }
 
 void LineLayer::setLineMiterLimit(PropertyValue<float> value) {
+    if (value == getLineMiterLimit())
+        return;
     impl->layout.lineMiterLimit.set(value);
+    impl->observer->onLayerLayoutPropertyChanged(*this);
 }
 PropertyValue<float> LineLayer::getDefaultLineRoundLimit() {
     return { 1 };
@@ -100,7 +110,10 @@ PropertyValue<float> LineLayer::getLineRoundLimit() const {
 }
 
 void LineLayer::setLineRoundLimit(PropertyValue<float> value) {
+    if (value == getLineRoundLimit())
+        return;
     impl->layout.lineRoundLimit.set(value);
+    impl->observer->onLayerLayoutPropertyChanged(*this);
 }
 
 // Paint properties
@@ -109,28 +122,34 @@ PropertyValue<float> LineLayer::getDefaultLineOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> LineLayer::getLineOpacity() const {
-    return impl->paint.lineOpacity.get();
+PropertyValue<float> LineLayer::getLineOpacity(const optional<std::string>& klass) const {
+    return impl->paint.lineOpacity.get(klass);
 }
 
 void LineLayer::setLineOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getLineOpacity(klass))
+        return;
     impl->paint.lineOpacity.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<Color> LineLayer::getDefaultLineColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> LineLayer::getLineColor() const {
-    return impl->paint.lineColor.get();
+PropertyValue<Color> LineLayer::getLineColor(const optional<std::string>& klass) const {
+    return impl->paint.lineColor.get(klass);
 }
 
 void LineLayer::setLineColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+    if (value == getLineColor(klass))
+        return;
     impl->paint.lineColor.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
-PropertyValue<bool> LineLayer::getLineIsMappyPath() const {
-	return impl->paint.lineIsMappyPath.get();
+PropertyValue<bool> LineLayer::getLineIsMappyPath(const optional<std::string>& klass) const {
+	return impl->paint.lineIsMappyPath.get(klass);
 }
 	
 void LineLayer::setLineIsMappyPath(PropertyValue<bool> value, const optional<std::string>& klass) {
@@ -141,96 +160,120 @@ PropertyValue<std::array<float, 2>> LineLayer::getDefaultLineTranslate() {
     return { {{ 0, 0 }} };
 }
 
-PropertyValue<std::array<float, 2>> LineLayer::getLineTranslate() const {
-    return impl->paint.lineTranslate.get();
+PropertyValue<std::array<float, 2>> LineLayer::getLineTranslate(const optional<std::string>& klass) const {
+    return impl->paint.lineTranslate.get(klass);
 }
 
 void LineLayer::setLineTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
+    if (value == getLineTranslate(klass))
+        return;
     impl->paint.lineTranslate.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<TranslateAnchorType> LineLayer::getDefaultLineTranslateAnchor() {
     return { TranslateAnchorType::Map };
 }
 
-PropertyValue<TranslateAnchorType> LineLayer::getLineTranslateAnchor() const {
-    return impl->paint.lineTranslateAnchor.get();
+PropertyValue<TranslateAnchorType> LineLayer::getLineTranslateAnchor(const optional<std::string>& klass) const {
+    return impl->paint.lineTranslateAnchor.get(klass);
 }
 
 void LineLayer::setLineTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
+    if (value == getLineTranslateAnchor(klass))
+        return;
     impl->paint.lineTranslateAnchor.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<float> LineLayer::getDefaultLineWidth() {
     return { 1 };
 }
 
-PropertyValue<float> LineLayer::getLineWidth() const {
-    return impl->paint.lineWidth.get();
+PropertyValue<float> LineLayer::getLineWidth(const optional<std::string>& klass) const {
+    return impl->paint.lineWidth.get(klass);
 }
 
 void LineLayer::setLineWidth(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getLineWidth(klass))
+        return;
     impl->paint.lineWidth.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<float> LineLayer::getDefaultLineGapWidth() {
     return { 0 };
 }
 
-PropertyValue<float> LineLayer::getLineGapWidth() const {
-    return impl->paint.lineGapWidth.get();
+PropertyValue<float> LineLayer::getLineGapWidth(const optional<std::string>& klass) const {
+    return impl->paint.lineGapWidth.get(klass);
 }
 
 void LineLayer::setLineGapWidth(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getLineGapWidth(klass))
+        return;
     impl->paint.lineGapWidth.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<float> LineLayer::getDefaultLineOffset() {
     return { 0 };
 }
 
-PropertyValue<float> LineLayer::getLineOffset() const {
-    return impl->paint.lineOffset.get();
+PropertyValue<float> LineLayer::getLineOffset(const optional<std::string>& klass) const {
+    return impl->paint.lineOffset.get(klass);
 }
 
 void LineLayer::setLineOffset(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getLineOffset(klass))
+        return;
     impl->paint.lineOffset.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<float> LineLayer::getDefaultLineBlur() {
     return { 0 };
 }
 
-PropertyValue<float> LineLayer::getLineBlur() const {
-    return impl->paint.lineBlur.get();
+PropertyValue<float> LineLayer::getLineBlur(const optional<std::string>& klass) const {
+    return impl->paint.lineBlur.get(klass);
 }
 
 void LineLayer::setLineBlur(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getLineBlur(klass))
+        return;
     impl->paint.lineBlur.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<std::vector<float>> LineLayer::getDefaultLineDasharray() {
     return { {  } };
 }
 
-PropertyValue<std::vector<float>> LineLayer::getLineDasharray() const {
-    return impl->paint.lineDasharray.get();
+PropertyValue<std::vector<float>> LineLayer::getLineDasharray(const optional<std::string>& klass) const {
+    return impl->paint.lineDasharray.get(klass);
 }
 
 void LineLayer::setLineDasharray(PropertyValue<std::vector<float>> value, const optional<std::string>& klass) {
+    if (value == getLineDasharray(klass))
+        return;
     impl->paint.lineDasharray.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<std::string> LineLayer::getDefaultLinePattern() {
     return { "" };
 }
 
-PropertyValue<std::string> LineLayer::getLinePattern() const {
-    return impl->paint.linePattern.get();
+PropertyValue<std::string> LineLayer::getLinePattern(const optional<std::string>& klass) const {
+    return impl->paint.linePattern.get(klass);
 }
 
 void LineLayer::setLinePattern(PropertyValue<std::string> value, const optional<std::string>& klass) {
+    if (value == getLinePattern(klass))
+        return;
     impl->paint.linePattern.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 } // namespace style

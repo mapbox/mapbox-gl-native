@@ -212,7 +212,7 @@ TEST(Sprite, SpriteParsingInvalidJSON) {
     const auto error = parseSprite(image_1x, json_1x).get<std::exception_ptr>();
 
     EXPECT_EQ(util::toString(error),
-              std::string("Failed to parse JSON: Missing a closing quotation mark in string. at offset 13"));
+              std::string("Failed to parse JSON: Missing a closing quotation mark in string. at offset 14"));
 }
 
 TEST(Sprite, SpriteParsingEmptyImage) {

@@ -116,6 +116,17 @@ app.get('/temporary-error', function(req, res) {
     temporaryErrorCounter++;
 });
 
+app.get('/rate-limit', function(req, res) {
+    
+    if (req.query.std) {
+        res.setHeader('Retry-After', 1);
+    } else if (req.query.mbx) {
+        res.setHeader('x-rate-limit-reset', Math.round(Date.now() / 1000) + 1);
+    }
+    
+    res.status(429).end();
+});
+
 app.get('/delayed', function(req, res) {
     setTimeout(function() {
         res.status(200).send('Response');

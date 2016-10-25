@@ -7,7 +7,6 @@ import android.os.Parcelable;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarkerView, CountryMarkerViewOptions> {

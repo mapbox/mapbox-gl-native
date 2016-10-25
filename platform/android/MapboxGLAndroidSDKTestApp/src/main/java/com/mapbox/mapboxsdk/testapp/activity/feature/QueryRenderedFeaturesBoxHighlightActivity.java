@@ -35,7 +35,6 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
 
     public MapView mapView;
     private MapboxMap mapboxMap;
-    private Marker marker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +57,7 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
 
                 selectionBox.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(View view) {
                         //Query
                         int top = selectionBox.getTop() - mapView.getTop();
                         int left = selectionBox.getLeft() - mapView.getLeft();
@@ -67,19 +66,23 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
                         List<Feature> features = mapboxMap.queryRenderedFeatures(box, "building");
 
                         //Show count
-                        Toast.makeText(QueryRenderedFeaturesBoxHighlightActivity.this, String.format("%s features in box", features.size()), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(
+                            QueryRenderedFeaturesBoxHighlightActivity.this,
+                            String.format("%s features in box", features.size()),
+                            Toast.LENGTH_SHORT).show();
 
                         //remove layer / source if already added
                         try {
                             mapboxMap.removeSource("highlighted-shapes-source");
                             mapboxMap.removeLayer("highlighted-shapes-layer");
-                        } catch (Exception e) {
+                        } catch (Exception exception) {
                             //that's ok
                         }
 
                         //Add layer / source
                         mapboxMap.addSource(new GeoJsonSource("highlighted-shapes-source", FeatureCollection.fromFeatures(features)));
-                        mapboxMap.addLayer(new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source").withProperties(fillColor(Color.RED)));
+                        mapboxMap.addLayer(new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source")
+                            .withProperties(fillColor(Color.RED)));
                     }
                 });
 

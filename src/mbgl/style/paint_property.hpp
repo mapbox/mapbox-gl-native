@@ -10,7 +10,7 @@
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
-#include <map>
+#include <unordered_map>
 #include <utility>
 
 namespace mbgl {
@@ -43,9 +43,9 @@ public:
         return values.find(ClassID::Default) == values.end();
     }
 
-    const PropertyValue<T>& get() const {
+    const PropertyValue<T>& get(const optional<std::string>& klass) const {
         static const PropertyValue<T> staticValue;
-        const auto it = values.find(ClassID::Default);
+        const auto it = values.find(klass ? ClassDictionary::Get().lookup(*klass) : ClassID::Default);
         return it == values.end() ? staticValue : it->second;
     }
 
@@ -96,8 +96,8 @@ public:
 
 private:
     T defaultValue;
-    std::map<ClassID, PropertyValue<T>> values;
-    std::map<ClassID, TransitionOptions> transitions;
+    std::unordered_map<ClassID, PropertyValue<T>> values;
+    std::unordered_map<ClassID, TransitionOptions> transitions;
 
     struct CascadedValue {
         CascadedValue(std::unique_ptr<CascadedValue> prior_,

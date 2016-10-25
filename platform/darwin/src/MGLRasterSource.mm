@@ -14,7 +14,7 @@
     return self;
 }
 
-- (std::unique_ptr<mbgl::style::Source>)mbgl_source {
+- (std::unique_ptr<mbgl::style::Source>)mbglSource {
     auto source = std::make_unique<mbgl::style::RasterSource>(self.sourceIdentifier.UTF8String,
                                                               self.URL.absoluteString.UTF8String,
                                                               uint16_t(self.tileSize));

@@ -108,9 +108,9 @@ SpriteParseResult parseSprite(const std::string& image, const std::string& json)
     } else if (!doc.IsObject()) {
         return std::make_exception_ptr(std::runtime_error("Sprite JSON root must be an object"));
     } else {
-        for (JSValue::ConstMemberIterator itr = doc.MemberBegin(); itr != doc.MemberEnd(); ++itr) {
-            const std::string name = { itr->name.GetString(), itr->name.GetStringLength() };
-            const JSValue& value = itr->value;
+        for (const auto& property : doc.GetObject()) {
+            const std::string name = { property.name.GetString(), property.name.GetStringLength() };
+            const JSValue& value = property.value;
 
             if (value.IsObject()) {
                 const uint16_t x = getUInt16(value, "x", 0);

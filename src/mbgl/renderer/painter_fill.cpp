@@ -69,12 +69,14 @@ void Painter::renderFill(PaintParameters& parameters,
             // the (non-antialiased) fill.
             setDepthSublayer(0); // OK
         }
-        bucket.drawVertices(outlineShader, store, isOverdraw());
+        bucket.drawVertices(outlineShader, store, paintMode());
     }
 
     if (pattern) {
-        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.fillPattern.value.from, true);
-        optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.fillPattern.value.to, true);
+        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(
+            properties.fillPattern.value.from, SpritePatternMode::Repeating);
+        optional<SpriteAtlasPosition> imagePosB =
+            spriteAtlas->getPosition(properties.fillPattern.value.to, SpritePatternMode::Repeating);
 
         // Image fill.
         if (pass == RenderPass::Translucent && imagePosA && imagePosB) {
@@ -103,7 +105,7 @@ void Painter::renderFill(PaintParameters& parameters,
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(0);
-            bucket.drawElements(patternShader, store, isOverdraw());
+            bucket.drawElements(patternShader, store, paintMode());
 
             if (properties.fillAntialias && !isOutlineColorDefined) {
                 config.program = outlinePatternShader.getID();
@@ -130,7 +132,7 @@ void Painter::renderFill(PaintParameters& parameters,
                 spriteAtlas->bind(true, store, config, 0);
 
                 setDepthSublayer(2);
-                bucket.drawVertices(outlinePatternShader, store, isOverdraw());
+                bucket.drawVertices(outlinePatternShader, store, paintMode());
             }
         }
     } else {
@@ -147,7 +149,7 @@ void Painter::renderFill(PaintParameters& parameters,
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(1);
-            bucket.drawElements(plainShader, store, isOverdraw());
+            bucket.drawElements(plainShader, store, paintMode());
         }
     }
 
@@ -164,7 +166,7 @@ void Painter::renderFill(PaintParameters& parameters,
         outlineShader.u_world = worldSize;
 
         setDepthSublayer(2);
-        bucket.drawVertices(outlineShader, store, isOverdraw());
+        bucket.drawVertices(outlineShader, store, paintMode());
     }
 }
 

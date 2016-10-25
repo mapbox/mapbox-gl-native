@@ -13,16 +13,18 @@ FillAnnotationImpl::FillAnnotationImpl(AnnotationID id_, FillAnnotation annotati
 }
 
 void FillAnnotationImpl::updateStyle(Style& style) const {
-    if (style.getLayer(layerID))
-        return;
+    Layer* layer = style.getLayer(layerID);
 
-    std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>(layerID, AnnotationManager::SourceID);
-    layer->setSourceLayer(layerID);
-    layer->setFillOpacity(annotation.opacity);
-    layer->setFillColor(annotation.color);
-    layer->setFillOutlineColor(annotation.outlineColor);
+    if (!layer) {
+        auto newLayer = std::make_unique<FillLayer>(layerID, AnnotationManager::SourceID);
+        newLayer->setSourceLayer(layerID);
+        layer = style.addLayer(std::move(newLayer), AnnotationManager::PointLayerID);
+    }
 
-    style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
+    FillLayer* fillLayer = layer->as<FillLayer>();
+    fillLayer->setFillOpacity(annotation.opacity);
+    fillLayer->setFillColor(annotation.color);
+    fillLayer->setFillOutlineColor(annotation.outlineColor);
 }
 
 const ShapeAnnotationGeometry& FillAnnotationImpl::geometry() const {

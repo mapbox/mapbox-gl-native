@@ -38,8 +38,7 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
     if (shapeTile.features.empty())
         return;
 
-    AnnotationTileLayer& layer = *data.layers.emplace(layerID,
-        std::make_unique<AnnotationTileLayer>(layerID)).first->second;
+    AnnotationTileLayer& layer = data.layers.emplace(layerID, layerID).first->second;
 
     ToGeometryCollection toGeometryCollection;
     ToFeatureType toFeatureType;
@@ -54,8 +53,7 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
             renderGeometry = fixupPolygons(renderGeometry);
         }
 
-        layer.features.emplace_back(
-            std::make_shared<AnnotationTileFeature>(id, featureType, renderGeometry));
+        layer.features.emplace_back(id, featureType, renderGeometry);
     }
 }
 

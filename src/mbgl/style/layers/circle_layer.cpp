@@ -50,6 +50,7 @@ const std::string& CircleLayer::getSourceLayer() const {
 
 void CircleLayer::setFilter(const Filter& filter) {
     impl->filter = filter;
+    impl->observer->onLayerFilterChanged(*this);
 }
 
 const Filter& CircleLayer::getFilter() const {
@@ -65,84 +66,105 @@ PropertyValue<float> CircleLayer::getDefaultCircleRadius() {
     return { 5 };
 }
 
-PropertyValue<float> CircleLayer::getCircleRadius() const {
-    return impl->paint.circleRadius.get();
+PropertyValue<float> CircleLayer::getCircleRadius(const optional<std::string>& klass) const {
+    return impl->paint.circleRadius.get(klass);
 }
 
 void CircleLayer::setCircleRadius(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getCircleRadius(klass))
+        return;
     impl->paint.circleRadius.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<Color> CircleLayer::getDefaultCircleColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> CircleLayer::getCircleColor() const {
-    return impl->paint.circleColor.get();
+PropertyValue<Color> CircleLayer::getCircleColor(const optional<std::string>& klass) const {
+    return impl->paint.circleColor.get(klass);
 }
 
 void CircleLayer::setCircleColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+    if (value == getCircleColor(klass))
+        return;
     impl->paint.circleColor.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<float> CircleLayer::getDefaultCircleBlur() {
     return { 0 };
 }
 
-PropertyValue<float> CircleLayer::getCircleBlur() const {
-    return impl->paint.circleBlur.get();
+PropertyValue<float> CircleLayer::getCircleBlur(const optional<std::string>& klass) const {
+    return impl->paint.circleBlur.get(klass);
 }
 
 void CircleLayer::setCircleBlur(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getCircleBlur(klass))
+        return;
     impl->paint.circleBlur.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<float> CircleLayer::getDefaultCircleOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> CircleLayer::getCircleOpacity() const {
-    return impl->paint.circleOpacity.get();
+PropertyValue<float> CircleLayer::getCircleOpacity(const optional<std::string>& klass) const {
+    return impl->paint.circleOpacity.get(klass);
 }
 
 void CircleLayer::setCircleOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getCircleOpacity(klass))
+        return;
     impl->paint.circleOpacity.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<std::array<float, 2>> CircleLayer::getDefaultCircleTranslate() {
     return { {{ 0, 0 }} };
 }
 
-PropertyValue<std::array<float, 2>> CircleLayer::getCircleTranslate() const {
-    return impl->paint.circleTranslate.get();
+PropertyValue<std::array<float, 2>> CircleLayer::getCircleTranslate(const optional<std::string>& klass) const {
+    return impl->paint.circleTranslate.get(klass);
 }
 
 void CircleLayer::setCircleTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
+    if (value == getCircleTranslate(klass))
+        return;
     impl->paint.circleTranslate.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<TranslateAnchorType> CircleLayer::getDefaultCircleTranslateAnchor() {
     return { TranslateAnchorType::Map };
 }
 
-PropertyValue<TranslateAnchorType> CircleLayer::getCircleTranslateAnchor() const {
-    return impl->paint.circleTranslateAnchor.get();
+PropertyValue<TranslateAnchorType> CircleLayer::getCircleTranslateAnchor(const optional<std::string>& klass) const {
+    return impl->paint.circleTranslateAnchor.get(klass);
 }
 
 void CircleLayer::setCircleTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
+    if (value == getCircleTranslateAnchor(klass))
+        return;
     impl->paint.circleTranslateAnchor.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 PropertyValue<CirclePitchScaleType> CircleLayer::getDefaultCirclePitchScale() {
     return { CirclePitchScaleType::Map };
 }
 
-PropertyValue<CirclePitchScaleType> CircleLayer::getCirclePitchScale() const {
-    return impl->paint.circlePitchScale.get();
+PropertyValue<CirclePitchScaleType> CircleLayer::getCirclePitchScale(const optional<std::string>& klass) const {
+    return impl->paint.circlePitchScale.get(klass);
 }
 
 void CircleLayer::setCirclePitchScale(PropertyValue<CirclePitchScaleType> value, const optional<std::string>& klass) {
+    if (value == getCirclePitchScale(klass))
+        return;
     impl->paint.circlePitchScale.set(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 } // namespace style

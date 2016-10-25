@@ -25,75 +25,54 @@ global.arrayType = function (property) {
     return property.type === 'array' ? property.name.split('-').pop() : false;
 };
 
-global.testImplementation = function (property, layerType) {
+global.testImplementation = function (property, layerType, isFunction) {
+    let helperMsg = testHelperMessage(property, layerType, isFunction);
+    return `layer.${objCName(property)} = [MGLRuntimeStylingHelper ${helperMsg}];`;
+}
+
+global.testGetterImplementation = function (property, layerType, isFunction) {
+    let helperMsg = testHelperMessage(property, layerType, isFunction);
+    let value = `[MGLRuntimeStylingHelper ${helperMsg}]`;
+    if (property.type === 'enum') {
+        if (isFunction) {
+            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, ${value});`;
+        }
+        return `XCTAssert([(NSValue *)gLayer.${objCName(property)} isEqualToValue:${value}], @"%@ is not equal to %@", gLayer.${objCName(property)}, ${value});`;
+    }
+    return `XCTAssertEqualObjects(gLayer.${objCName(property)}, ${value});`;
+}
+
+global.testHelperMessage = function (property, layerType, isFunction) {
+    let fnSuffix = isFunction ? 'Function' : '';
     switch (property.type) {
         case 'boolean':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testBool;`;
+            return 'testBool' + fnSuffix;
         case 'number':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testNumber;`;
+            return 'testNumber' + fnSuffix;
         case 'string':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testString;`;
+            return 'testString' + fnSuffix;
         case 'enum':
             let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
             let objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
-            return `layer.${objCName(property)} = [MGLRuntimeStylingHelper testEnum:${objCEnum} type:@encode(${objCType})];`;    
+            return `testEnum${fnSuffix}:${objCEnum} type:@encode(${objCType})`;
         case 'color':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testColor;`;
+            return 'testColor' + fnSuffix;
         case 'array':
-            return testArrayImplementation(property);
-        default: throw new Error(`unknown type for ${property.name}`);
-    }
-}
-
-global.testGetterImplementation = function (property, layerType) {
-    switch (property.type) {
-        case 'boolean':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testBool);`;
-        case 'number':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testNumber);`;
-        case 'string':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testString);`;
-        case 'enum':
-            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            let objCEnum = `${objCType}${camelize(property.values[property.values.length-1])}`;
-            return `XCTAssert([(NSValue *)gLayer.${objCName(property)} objCType] == [[MGLRuntimeStylingHelper testEnum:${objCEnum} type:@encode(${objCType})] objCType]);`;
-        case 'color':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testColor);`;
-        case 'array':
-            return testGetterArrayImplementation(property);
-        default: throw new Error(`unknown type for ${property.name}`);
-    }
-}
-
-global.testGetterArrayImplementation = function (property) {
-    switch (arrayType(property)) {
-        case 'dasharray':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testDashArray);`;
-        case 'font':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testFont);`;
-        case 'padding':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testPadding);`;
-        case 'offset':
-        case 'translate':
-            return `XCTAssertEqualObjects(gLayer.${objCName(property)}, MGLRuntimeStylingHelper.testOffset);`; // Default offset (dx, dy)
+            switch (arrayType(property)) {
+                case 'dasharray':
+                    return 'testDashArray' + fnSuffix;
+                case 'font':
+                    return 'testFont' + fnSuffix;
+                case 'padding':
+                    return 'testPadding' + fnSuffix;
+                case 'offset':
+                case 'translate':
+                    return 'testOffset' + fnSuffix;
+                default:
+                    throw new Error(`unknown array type for ${property.name}`);
+            }
         default:
-            throw new Error(`unknown array type for ${property.name}`);
-    }
-};
-
-global.testArrayImplementation = function (property) {
-    switch (arrayType(property)) {
-        case 'dasharray':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testDashArray;`;
-        case 'font':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testFont;`;
-        case 'padding':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testPadding;`;
-        case 'offset':
-        case 'translate':
-            return `layer.${objCName(property)} = MGLRuntimeStylingHelper.testOffset;`; // Default offset (dx, dy)
-        default:
-            throw new Error(`unknown array type for ${property.name}`);
+            throw new Error(`unknown type for ${property.name}`);
     }
 };
 
@@ -157,28 +136,29 @@ global.parseColor = function (str) {
 global.describeValue = function (value, property, layerType) {
     switch (property.type) {
         case 'boolean':
-            return value ? '`YES`' : '`NO`';
+            return 'an `NSNumber` object containing ' + (value ? '`YES`' : '`NO`');
         case 'number':
+            return 'an `NSNumber` object containing the float `' + value + '`';
         case 'string':
-            return '`' + value + '`';
+            return 'the string `' + value + '`';
         case 'enum':
             let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            return '`' + `${objCType}${camelize(value)}` + '`';
+            return 'an `NSValue` object containing `' + `${objCType}${camelize(value)}` + '`';
         case 'color':
             let color = parseColor(value);
             if (!color) {
                 throw new Error(`unrecognized color format in default value of ${property.name}`);
             }
             if (color.r === 0 && color.g === 0 && color.b === 0 && color.a === 0) {
-                return '`clearColor`';
+                return '`MGLColor.clearColor`';
             }
             if (color.r === 0 && color.g === 0 && color.b === 0 && color.a === 1) {
-                return '`blackColor`';
+                return '`MGLColor.blackColor`';
             }
             if (color.r === 1 && color.g === 1 && color.b === 1 && color.a === 1) {
-                return '`whiteColor`';
+                return '`MGLColor.whiteColor`';
             }
-            return 'an `NSColor` or `UIColor`' + ` object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
+            return 'an `MGLColor`' + ` object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
         case 'array':
             let units = property.units || '';
             if (units) {
@@ -186,14 +166,14 @@ global.describeValue = function (value, property, layerType) {
             }
             if (property.name.indexOf('padding') !== -1) {
                 if (value[0] === 0 && value[1] === 0 && value[2] === 0 && value[3] === 0) {
-                    return '`NSEdgeInsetsZero` or `UIEdgeInsetsZero`';
+                    return 'an `NSValue` object containing `NSEdgeInsetsZero` or `UIEdgeInsetsZero`';
                 }
-                return `${value[0]}${units} on the top, ${value[3]}${units} on the left, ${value[2]}${units} on the bottom, and ${value[1]}${units} on the right`;
+                return 'an `NSValue` object containing an `NSEdgeInsets` or `UIEdgeInsets` struct set to' + ` ${value[0]}${units} on the top, ${value[3]}${units} on the left, ${value[2]}${units} on the bottom, and ${value[1]}${units} on the right`;
             }
             if (property.name.indexOf('offset') !== -1 || property.name.indexOf('translate') !== -1) {
-                return `${value[0]}${units} from the left and ${value[1]}${units} from the top`;
+                return 'an `NSValue` object containing a `CGVector` struct set to' + ` ${value[0]}${units} from the left and ${value[1]}${units} from the top`;
             }
-            return '`' + value.join('`, `') + '`';
+            return 'the array `' + value.join('`, `') + '`';
         default:
             throw new Error(`unknown type for ${property.name}`);
     }
@@ -207,12 +187,24 @@ global.propertyType = function (property, _private) {
     return _private ? `id <MGLStyleAttributeValue, MGLStyleAttributeValue_Private>` : `id <MGLStyleAttributeValue>`;
 };
 
+global.initLayerIdentifierOnly = function (layerType) {
+    return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String);`
+}
+
 global.initLayer = function (layerType) {
     if (layerType == "background") {
-        return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String);`
+       return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String);` 
     } else {
-        return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String, sourceIdentifier.UTF8String);`
+        return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String, source.sourceIdentifier.UTF8String);`
     }
+}
+
+global.initLayerWithSourceLayer = function(layerType) {
+    return `_layer = new mbgl::style::${camelize(layerType)}Layer(layerIdentifier.UTF8String, source.sourceIdentifier.UTF8String);`  
+}
+
+global.setSourceLayer = function() {
+   return `_layer->setSourceLayer(sourceLayer.UTF8String);`
 }
 
 global.setterImplementation = function(property, layerType) {
@@ -239,7 +231,6 @@ global.setterImplementation = function(property, layerType) {
             break;
         default: throw new Error(`unknown type for ${property.name}`)
     }
-    implementation += "\n    [self update];"
     return implementation;
 }
 
@@ -258,28 +249,32 @@ global.arraySetterImplementation = function(property) {
     return `self.layer->set${camelize(property.name)}(${objCName(property)}.mbgl_${convertedType(property)}PropertyValue);`;
 }
 
-global.getterImplementation = function(property, layerType) {
+global.styleAttributeFactory = function (property, layerType) {
     switch (property.type) {
         case 'boolean':
-            return `return [MGLStyleAttribute mbgl_boolWithPropertyValueBool:self.layer->get${camelize(property.name)}()];`
+            return 'mbgl_boolWithPropertyValueBool';
         case 'number':
-            return `return [MGLStyleAttribute mbgl_numberWithPropertyValueNumber:self.layer->get${camelize(property.name)}()];`
+            return 'mbgl_numberWithPropertyValueNumber';
         case 'string':
-            return `return [MGLStyleAttribute mbgl_stringWithPropertyValueString:self.layer->get${camelize(property.name)}()];`
+            return 'mbgl_stringWithPropertyValueString';
         case 'enum':
-            let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
-            return `MGLGetEnumProperty(${camelize(property.name)}, ${mbglType(property)}, ${objCType});`;
+            throw new Error('Use MGLGetEnumProperty() for enums.');
         case 'color':
-            return `return [MGLStyleAttribute mbgl_colorWithPropertyValueColor:self.layer->get${camelize(property.name)}()];`
+            return 'mbgl_colorWithPropertyValueColor';
         case 'array':
-            return arrayGetterImplementation(property);
+            return `mbgl_${convertedType(property)}WithPropertyValue${camelize(convertedType(property))}`;
         default:
-            throw new Error(`unknown type for ${property.name}`)
+            throw new Error(`unknown type for ${property.name}`);
     }
-}
+};
 
-global.arrayGetterImplementation = function(property) {
-    return `return [MGLStyleAttribute mbgl_${convertedType(property)}WithPropertyValue${camelize(convertedType(property))}:self.layer->get${camelize(property.name)}()];`
+global.getterImplementation = function(property, layerType) {
+    if (property.type === 'enum') {
+        let objCType = `${prefix}${camelize(layerType)}${suffix}${camelize(property.name)}`;
+        return `MGLGetEnumProperty(${camelize(property.name)}, ${mbglType(property)}, ${objCType});`;
+    }
+    let rawValue = `self.layer->get${camelize(property.name)}() ?: self.layer->getDefault${camelize(property.name)}()`;
+    return `return [MGLStyleAttribute ${styleAttributeFactory(property, layerType)}:${rawValue}];`;
 }
 
 global.convertedType = function(property) {
@@ -326,8 +321,27 @@ const layers = spec.layer.type.values.map((type) => {
     };
 });
 
-for (const layer of layers) {
-    fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, layerH(layer));
+function duplicatePlatformDecls(src) {
+    // Look for a documentation comment that contains “MGLColor” and the
+    // subsequent function, method, or property declaration. Try not to match
+    // greedily.
+    return src.replace(/(\/\*\*(?:\*[^\/]|[^*])*?\bMGLColor\b[\s\S]*?\*\/)(\s*.+?;)/g,
+                       (match, comment, decl) => {
+        let iosComment = comment.replace(/\bMGLColor\b/g, 'UIColor')
+            // Use the correct indefinite article.
+            .replace(/\b(a)n(\s+`?UIColor)\b/gi, '$1$2');
+        let macosComment = comment.replace(/\bMGLColor\b/g, 'NSColor');
+        return `\
+#if TARGET_OS_IPHONE
+${iosComment}${decl}
+#else
+${macosComment}${decl}
+#endif`;
+    });
+}
+
+for (var layer of layers) {
+    fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, duplicatePlatformDecls(layerH(layer)));
     fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
     fs.writeFileSync(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.m`, testLayers(layer));
 }

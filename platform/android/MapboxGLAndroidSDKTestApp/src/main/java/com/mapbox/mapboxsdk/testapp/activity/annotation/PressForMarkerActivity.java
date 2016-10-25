@@ -24,7 +24,7 @@ public class PressForMarkerActivity extends AppCompatActivity {
 
     private MapView mapView;
     private MapboxMap mapboxMap;
-    private ArrayList<MarkerOptions> mMarkerList = new ArrayList<>();
+    private ArrayList<MarkerOptions> markerList = new ArrayList<>();
 
     private static final DecimalFormat LAT_LON_FORMATTER = new DecimalFormat("#.#####");
 
@@ -65,14 +65,14 @@ public class PressForMarkerActivity extends AppCompatActivity {
                                 .title(title)
                                 .snippet(snippet);
 
-                        mMarkerList.add(marker);
+                        markerList.add(marker);
                         mapboxMap.addMarker(marker);
                     }
                 });
 
                 if (savedInstanceState != null) {
-                    mMarkerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);
-                    mapboxMap.addMarkers(mMarkerList);
+                    markerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);
+                    mapboxMap.addMarkers(markerList);
                 }
             }
         });
@@ -96,7 +96,7 @@ public class PressForMarkerActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
 
         mapView.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(STATE_MARKER_LIST, mMarkerList);
+        outState.putParcelableArrayList(STATE_MARKER_LIST, markerList);
     }
 
     @Override

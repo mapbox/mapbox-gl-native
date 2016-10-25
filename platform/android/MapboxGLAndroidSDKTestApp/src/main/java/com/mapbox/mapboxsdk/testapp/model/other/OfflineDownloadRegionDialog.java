@@ -12,23 +12,20 @@ import android.widget.EditText;
 
 import com.mapbox.mapboxsdk.testapp.R;
 
-/**
- * Created by antonio on 2/17/16.
- */
 public class OfflineDownloadRegionDialog extends DialogFragment {
 
-    private final static String LOG_TAG = "OfflineDownloadRegionDialog";
+    private static final String LOG_TAG = "OfflineDownloadRegionDialog";
 
     public interface DownloadRegionDialogListener {
         void onDownloadRegionDialogPositiveClick(String regionName);
     }
 
-    DownloadRegionDialogListener mListener;
+    DownloadRegionDialogListener listener;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mListener = (DownloadRegionDialogListener) activity;
+        listener = (DownloadRegionDialogListener) activity;
     }
 
     @NonNull
@@ -46,7 +43,7 @@ public class OfflineDownloadRegionDialog extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String regionName = regionNameEdit.getText().toString();
-                        mListener.onDownloadRegionDialogPositiveClick(regionName);
+                        listener.onDownloadRegionDialogPositiveClick(regionName);
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override

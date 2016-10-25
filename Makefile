@@ -339,6 +339,10 @@ else
 QT_ROOT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
 endif
 
+ifneq (,$(shell which qmake))
+export QT_INSTALL_DOCS = $(shell qmake -query QT_INSTALL_DOCS)
+endif
+
 export QT_OUTPUT_PATH = $(QT_ROOT_PATH)/$(BUILDTYPE)
 QT_BUILD = $(QT_OUTPUT_PATH)/build.ninja
 
@@ -409,6 +413,10 @@ run-qt-test-%: qt-test
 .PHONY: run-qt-test
 run-qt-test: run-qt-test-*
 
+.PHONY: qt-docs
+qt-docs:
+	qdoc $(shell pwd)/platform/qt/config.qdocconf --outputdir $(shell pwd)/$(QT_OUTPUT_PATH)/docs
+
 #### Node targets ##############################################################
 
 .PHONY: test-node
@@ -454,7 +462,7 @@ android: android-arm-v7
 
 .PHONY: android-test
 android-test:
-	cd platform/android && ./gradlew testReleaseUnitTest --continue
+	cd platform/android && ./gradlew testDebugUnitTest --continue
 
 .PHONY: android-test-apk
 android-test-apk:

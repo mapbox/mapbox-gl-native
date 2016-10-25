@@ -22,6 +22,7 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/actor/thread_pool.hpp>
 
 namespace mbgl {
 
@@ -37,7 +38,8 @@ class Map::Impl : public style::Observer {
 public:
     Impl(View&, FileSource&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
 
-    void onNeedsRepaint() override;
+    void onUpdate(Update) override;
+    void onStyleLoaded() override;
     void onStyleError() override;
     void onResourceError(std::exception_ptr) override;
 
@@ -61,6 +63,7 @@ public:
     gl::ObjectStore store;
     Update updateFlags = Update::Nothing;
     util::AsyncTask asyncUpdate;
+    ThreadPool workerThreadPool;
 
     std::unique_ptr<AnnotationManager> annotationManager;
     std::unique_ptr<Painter> painter;
@@ -99,6 +102,7 @@ Map::Impl::Impl(View& view_,
       contextMode(contextMode_),
       pixelRatio(view.getPixelRatio()),
       asyncUpdate([this] { update(); }),
+      workerThreadPool(4),
       annotationManager(std::make_unique<AnnotationManager>(pixelRatio)) {
 }
 
@@ -149,12 +153,7 @@ void Map::renderStill(StillImageCallback callback) {
 }
 
 void Map::update(Update flags) {
-    if (flags & Update::Dimensions) {
-        impl->transform.resize(impl->view.getSize());
-    }
-
-    impl->updateFlags |= flags;
-    impl->asyncUpdate.send();
+    impl->onUpdate(flags);
 }
 
 void Map::render() {
@@ -217,6 +216,10 @@ void Map::Impl::update() {
         annotationManager->updateData();
     }
 
+    if (updateFlags & Update::Layout) {
+        style->relayout();
+    }
+
     if (updateFlags & Update::Classes) {
         style->cascade(timePoint, mode);
     }
@@ -227,16 +230,14 @@ void Map::Impl::update() {
 
     style::UpdateParameters parameters(pixelRatio,
                                        debugOptions,
-                                       timePoint,
                                        transform.getState(),
-                                       style->workers,
+                                       workerThreadPool,
                                        fileSource,
-                                       style->shouldReparsePartialTiles,
                                        mode,
                                        *annotationManager,
                                        *style);
 
-    style->update(parameters);
+    style->updateTiles(parameters);
 
     if (mode == MapMode::Continuous) {
         view.invalidate();
@@ -763,26 +764,40 @@ AnnotationIDs Map::queryPointAnnotations(const ScreenBox& box) {
 #pragma mark - Style API
 
 style::Source* Map::getSource(const std::string& sourceID) {
-    impl->styleMutated = true;
-    return impl->style ? impl->style->getSource(sourceID) : nullptr;
+    if (impl->style) {
+        impl->styleMutated = true;
+        return impl->style->getSource(sourceID);
+    }
+    return nullptr;
 }
 
 void Map::addSource(std::unique_ptr<style::Source> source) {
-    impl->styleMutated = true;
-    impl->style->addSource(std::move(source));
+    if (impl->style) {
+        impl->styleMutated = true;
+        impl->style->addSource(std::move(source));
+    }
 }
 
 void Map::removeSource(const std::string& sourceID) {
-    impl->styleMutated = true;
-    impl->style->removeSource(sourceID);
+    if (impl->style) {
+        impl->styleMutated = true;
+        impl->style->removeSource(sourceID);
+    }
 }
 
 style::Layer* Map::getLayer(const std::string& layerID) {
-    impl->styleMutated = true;
-    return impl->style ? impl->style->getLayer(layerID) : nullptr;
+    if (impl->style) {
+        impl->styleMutated = true;
+        return impl->style->getLayer(layerID);
+    }
+    return nullptr;
 }
 
 void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& before) {
+    if (!impl->style) {
+        return;
+    }
+
     impl->styleMutated = true;
     impl->view.activate();
 
@@ -794,6 +809,10 @@ void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& be
 }
 
 void Map::removeLayer(const std::string& id) {
+    if (!impl->style) {
+        return;
+    }
+
     impl->styleMutated = true;
     impl->view.activate();
 
@@ -807,23 +826,38 @@ void Map::removeLayer(const std::string& id) {
 #pragma mark - Defaults
 
 std::string Map::getStyleName() const {
-    return impl->style->getName();
+    if (impl->style) {
+        return impl->style->getName();
+    }
+    return {};
 }
 
 LatLng Map::getDefaultLatLng() const {
-    return impl->style->getDefaultLatLng();
+    if (impl->style) {
+        return impl->style->getDefaultLatLng();
+    }
+    return {};
 }
 
 double Map::getDefaultZoom() const {
-    return impl->style->getDefaultZoom();
+    if (impl->style) {
+        return impl->style->getDefaultZoom();
+    }
+    return {};
 }
 
 double Map::getDefaultBearing() const {
-    return impl->style->getDefaultBearing();
+    if (impl->style) {
+        return impl->style->getDefaultBearing();
+    }
+    return {};
 }
 
 double Map::getDefaultPitch() const {
-    return impl->style->getDefaultPitch();
+    if (impl->style) {
+        return impl->style->getDefaultPitch();
+    }
+    return {};
 }
 
 #pragma mark - Toggles
@@ -862,32 +896,50 @@ MapDebugOptions Map::getDebug() const {
 }
 
 bool Map::isFullyLoaded() const {
-    return impl->style->isLoaded();
+    return impl->style ? impl->style->isLoaded() : false;
 }
 
-void Map::addClass(const std::string& className, const TransitionOptions& properties) {
-    if (impl->style->addClass(className, properties)) {
+void Map::addClass(const std::string& className) {
+    if (impl->style && impl->style->addClass(className)) {
         update(Update::Classes);
     }
 }
 
-void Map::removeClass(const std::string& className, const TransitionOptions& properties) {
-    if (impl->style->removeClass(className, properties)) {
+void Map::removeClass(const std::string& className) {
+    if (impl->style && impl->style->removeClass(className)) {
         update(Update::Classes);
     }
 }
 
-void Map::setClasses(const std::vector<std::string>& classNames, const TransitionOptions& properties) {
-    impl->style->setClasses(classNames, properties);
-    update(Update::Classes);
+void Map::setClasses(const std::vector<std::string>& classNames) {
+    if (impl->style) {
+        impl->style->setClasses(classNames);
+        update(Update::Classes);
+    }
+}
+
+style::TransitionOptions Map::getTransitionOptions() const {
+    if (impl->style) {
+        return impl->style->getTransitionOptions();
+    }
+    return {};
+}
+
+void Map::setTransitionOptions(const style::TransitionOptions& options) {
+    if (impl->style) {
+        impl->style->setTransitionOptions(options);
+    }
 }
 
 bool Map::hasClass(const std::string& className) const {
-    return impl->style->hasClass(className);
+    return impl->style ? impl->style->hasClass(className) : false;
 }
 
 std::vector<std::string> Map::getClasses() const {
-    return impl->style->getClasses();
+    if (impl->style) {
+        return impl->style->getClasses();
+    }
+    return {};
 }
 
 void Map::setSourceTileCacheSize(size_t size) {
@@ -906,9 +958,17 @@ void Map::onLowMemory() {
     impl->view.invalidate();
 }
 
-void Map::Impl::onNeedsRepaint() {
-    updateFlags |= Update::Repaint;
+void Map::Impl::onUpdate(Update flags) {
+    if (flags & Update::Dimensions) {
+        transform.resize(view.getSize());
+    }
+
+    updateFlags |= flags;
     asyncUpdate.send();
+}
+    
+void Map::Impl::onStyleLoaded() {
+    view.notifyMapChange(MapChangeDidFinishLoadingStyle);
 }
 
 void Map::Impl::onStyleError() {

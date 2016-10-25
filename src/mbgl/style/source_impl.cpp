@@ -5,6 +5,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/style/query_parameters.hpp>
+#include <mbgl/text/placement_config.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/math/clamp.hpp>
 #include <mbgl/util/tile_cover.hpp>
@@ -77,20 +78,9 @@ const std::map<UnwrappedTileID, RenderTile>& Source::Impl::getRenderTiles() cons
     return renderTiles;
 }
 
-Tile* Source::Impl::getTile(const OverscaledTileID& overscaledTileID) const {
-    auto it = tiles.find(overscaledTileID);
-    if (it != tiles.end()) {
-        return it->second.get();
-    } else {
-        return nullptr;
-    }
-}
-
-bool Source::Impl::update(const UpdateParameters& parameters) {
-    bool allTilesUpdated = true;
-
-    if (!loaded || parameters.animationTime <= updated) {
-        return allTilesUpdated;
+void Source::Impl::updateTiles(const UpdateParameters& parameters) {
+    if (!loaded) {
+        return;
     }
 
     const uint16_t tileSize = getTileSize();
@@ -98,7 +88,7 @@ bool Source::Impl::update(const UpdateParameters& parameters) {
 
     // Determine the overzooming/underzooming amounts and required tiles.
     int32_t overscaledZoom = util::coveringZoomLevel(parameters.transformState.getZoom(), type, tileSize);
-    int32_t dataTileZoom = overscaledZoom;
+    int32_t tileZoom = overscaledZoom;
 
     std::vector<UnwrappedTileID> idealTiles;
     if (overscaledZoom >= zoomRange.min) {
@@ -106,47 +96,46 @@ bool Source::Impl::update(const UpdateParameters& parameters) {
 
         // Make sure we're not reparsing overzoomed raster tiles.
         if (type == SourceType::Raster) {
-            dataTileZoom = idealZoom;
+            tileZoom = idealZoom;
         }
 
         idealTiles = util::tileCover(parameters.transformState, idealZoom);
     }
 
-    // Stores a list of all the data tiles that we're definitely going to retain. There are two
+    // Stores a list of all the tiles that we're definitely going to retain. There are two
     // kinds of tiles we need: the ideal tiles determined by the tile cover. They may not yet be in
     // use because they're still loading. In addition to that, we also need to retain all tiles that
     // we're actively using, e.g. as a replacement for tile that aren't loaded yet.
     std::set<OverscaledTileID> retain;
 
-    auto retainTileFn = [&retain](Tile& tile, bool required) -> void {
+    auto retainTileFn = [&retain](Tile& tile, Resource::Necessity necessity) -> void {
         retain.emplace(tile.id);
-        tile.setNecessity(required ? Tile::Necessity::Required
-                                   : Tile::Necessity::Optional);
+        tile.setNecessity(necessity);
     };
-    auto getTileFn = [this](const OverscaledTileID& dataTileID) -> Tile* {
-        return getTile(dataTileID);
+    auto getTileFn = [this](const OverscaledTileID& tileID) -> Tile* {
+        auto it = tiles.find(tileID);
+        return it == tiles.end() ? nullptr : it->second.get();
     };
-    auto createTileFn = [this, &parameters](const OverscaledTileID& dataTileID) -> Tile* {
-        std::unique_ptr<Tile> data = cache.get(dataTileID);
-        if (!data) {
-            data = createTile(dataTileID, parameters);
-            if (data) {
-                data->setObserver(this);
+    auto createTileFn = [this, &parameters](const OverscaledTileID& tileID) -> Tile* {
+        std::unique_ptr<Tile> tile = cache.get(tileID);
+        if (!tile) {
+            tile = createTile(tileID, parameters);
+            if (tile) {
+                tile->setObserver(this);
             }
         }
-        if (data) {
-            return tiles.emplace(dataTileID, std::move(data)).first->second.get();
-        } else {
+        if (!tile) {
             return nullptr;
         }
+        return tiles.emplace(tileID, std::move(tile)).first->second.get();
     };
-    auto renderTileFn = [this](const UnwrappedTileID& renderTileID, Tile& tile) {
-        renderTiles.emplace(renderTileID, RenderTile{ renderTileID, tile });
+    auto renderTileFn = [this](const UnwrappedTileID& tileID, Tile& tile) {
+        renderTiles.emplace(tileID, RenderTile{ tileID, tile });
     };
 
     renderTiles.clear();
     algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn,
-                                 idealTiles, zoomRange, dataTileZoom);
+                                 idealTiles, zoomRange, tileZoom);
 
     if (type != SourceType::Raster && type != SourceType::Annotations && cache.getSize() == 0) {
         size_t conservativeCacheSize =
@@ -157,41 +146,39 @@ bool Source::Impl::update(const UpdateParameters& parameters) {
         cache.setSize(conservativeCacheSize);
     }
 
-    // Remove stale data tiles from the active set of tiles.
-    // This goes through the (sorted!) tiles and retain set in lockstep and removes items from
-    // tiles that don't have the corresponding key in the retain set.
-    auto dataIt = tiles.begin();
+    // Remove stale tiles. This goes through the (sorted!) tiles map and retain set in lockstep
+    // and removes items from tiles that don't have the corresponding key in the retain set.
+    auto tilesIt = tiles.begin();
     auto retainIt = retain.begin();
-    while (dataIt != tiles.end()) {
-        if (retainIt == retain.end() || dataIt->first < *retainIt) {
-            dataIt->second->setNecessity(Tile::Necessity::Optional);
-            cache.add(dataIt->first, std::move(dataIt->second));
-            tiles.erase(dataIt++);
+    while (tilesIt != tiles.end()) {
+        if (retainIt == retain.end() || tilesIt->first < *retainIt) {
+            tilesIt->second->setNecessity(Tile::Necessity::Optional);
+            cache.add(tilesIt->first, std::move(tilesIt->second));
+            tiles.erase(tilesIt++);
         } else {
-            if (!(*retainIt < dataIt->first)) {
-                ++dataIt;
+            if (!(*retainIt < tilesIt->first)) {
+                ++tilesIt;
             }
             ++retainIt;
         }
     }
 
-    const PlacementConfig newConfig{ parameters.transformState.getAngle(),
-                                     parameters.transformState.getPitch(),
-                                     parameters.debugOptions & MapDebugOptions::Collision };
+    const PlacementConfig config { parameters.transformState.getAngle(),
+                                   parameters.transformState.getPitch(),
+                                   parameters.debugOptions & MapDebugOptions::Collision };
+
+    for (auto& pair : tiles) {
+        pair.second->setPlacementConfig(config);
+    }
+}
+
+void Source::Impl::reloadTiles() {
+    cache.clear();
+
     for (auto& pair : tiles) {
         auto tile = pair.second.get();
-        if (parameters.shouldReparsePartialTiles && tile->isIncomplete()) {
-            if (!tile->parsePending()) {
-                allTilesUpdated = false;
-            }
-        } else {
-            tile->redoPlacement(newConfig);
-        }
+        tile->redoLayout();
     }
-
-    updated = parameters.animationTime;
-
-    return allTilesUpdated;
 }
 
 static Point<int16_t> coordinateToTilePoint(const UnwrappedTileID& tileID, const Point<double>& p) {
@@ -261,16 +248,12 @@ void Source::Impl::setObserver(SourceObserver* observer_) {
     observer = observer_;
 }
 
-void Source::Impl::onTileLoaded(Tile& tile, bool isNewTile) {
-    observer->onTileLoaded(base, tile.id, isNewTile);
+void Source::Impl::onTileChanged(Tile& tile) {
+    observer->onTileChanged(base, tile.id);
 }
 
 void Source::Impl::onTileError(Tile& tile, std::exception_ptr error) {
     observer->onTileError(base, tile.id, error);
-}
-
-void Source::Impl::onNeedsRepaint() {
-    observer->onNeedsRepaint();
 }
 
 void Source::Impl::dumpDebugLogs() const {
