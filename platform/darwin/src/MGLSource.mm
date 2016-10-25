@@ -4,7 +4,7 @@
 
 @implementation MGLSource
 {
-    std::unique_ptr<mbgl::style::Source> _source;
+    std::unique_ptr<mbgl::style::Source> _pendingSource;
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier
@@ -15,17 +15,17 @@
     return self;
 }
 
-- (std::unique_ptr<mbgl::style::Source>)source
+- (std::unique_ptr<mbgl::style::Source>)pendingSource
 {
-    return std::move(_source);
+    return std::move(_pendingSource);
 }
 
-- (void)setSource:(std::unique_ptr<mbgl::style::Source>)source
+- (void)setPendingSource:(std::unique_ptr<mbgl::style::Source>)pendingSource
 {
-    if (source != nullptr) {
-        self.rawSource = source.get();
+    if (pendingSource != nullptr) {
+        self.rawSource = pendingSource.get();
     }
-    _source = std::move(source);
+    _pendingSource = std::move(pendingSource);
 }
 
 @end

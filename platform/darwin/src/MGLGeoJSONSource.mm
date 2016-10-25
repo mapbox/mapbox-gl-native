@@ -79,7 +79,7 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
         _features = MGLFeaturesFromMBGLFeatures(featureCollection);
     }
     
-    self.source = std::move(source);
+    self.pendingSource = std::move(source);
 }
 
 - (mbgl::style::GeoJSONOptions)geoJSONOptions
