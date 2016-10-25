@@ -212,6 +212,7 @@ static NSURL *MGLStyleURL_emerald;
 - (void)removeSource:(MGLSource *)source
 {
     self.mapView.mbglMap->removeSource(source.identifier.UTF8String);
+    source.rawSource = NULL;
 }
 
 - (NS_ARRAY_OF(NSString *) *)styleClasses

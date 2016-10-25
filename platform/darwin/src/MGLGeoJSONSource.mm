@@ -137,9 +137,15 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
 {
     _geoJSONData = geoJSONData;
     
+    if (self.rawSource == NULL)
+    {
+        [self commonInit];
+    }
+    
     NSString *string = [[NSString alloc] initWithData:_geoJSONData encoding:NSUTF8StringEncoding];
     const auto geojson = mapbox::geojson::parse(string.UTF8String).get<mapbox::geojson::feature_collection>();
     self.rawSource->setGeoJSON(geojson);
+    
     _features = MGLFeaturesFromMBGLFeatures(geojson);
 }
 
@@ -147,12 +153,22 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
 {
     _URL = URL;
     
+    if (self.rawSource == NULL)
+    {
+        [self commonInit];
+    }
+    
     NSURL *url = self.URL.mgl_URLByStandardizingScheme;
     self.rawSource->setURL(url.absoluteString.UTF8String);
 }
 
 - (void)setFeatures:(NSArray *)features
 {
+    if (self.rawSource == NULL)
+    {
+        [self commonInit];
+    }
+    
     mbgl::FeatureCollection featureCollection;
     featureCollection.reserve(features.count);
     for (id <MGLFeaturePrivate> feature in features) {
