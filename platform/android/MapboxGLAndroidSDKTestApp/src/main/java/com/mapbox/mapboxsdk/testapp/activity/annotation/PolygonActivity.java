@@ -58,6 +58,7 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
                 .attributionTintColor(RED_COLOR)
                 // deprecated feature!
                 .textureMode(true)
+                .compassFadesWhenFacingNorth(false)
                 .styleUrl(Style.MAPBOX_STREETS)
                 .camera(new CameraPosition.Builder()
                         .target(new LatLng(45.520486, -122.673541))

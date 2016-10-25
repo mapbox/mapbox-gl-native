@@ -44,6 +44,7 @@ public class MapboxMapOptions implements Parcelable {
     private boolean debugActive;
 
     private boolean compassEnabled = true;
+    private boolean fadeCompassFacingNorth = true;
     private int compassGravity = Gravity.TOP | Gravity.END;
     private int[] compassMargins;
 
@@ -98,6 +99,7 @@ public class MapboxMapOptions implements Parcelable {
         compassEnabled = in.readByte() != 0;
         compassGravity = in.readInt();
         compassMargins = in.createIntArray();
+        fadeCompassFacingNorth = in.readByte() != 0;
 
         logoEnabled = in.readByte() != 0;
         logoGravity = in.readInt();
@@ -193,6 +195,7 @@ public class MapboxMapOptions implements Parcelable {
                     , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_top, DIMENSION_TEN_DP * screenDensity))
                     , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_right, DIMENSION_TEN_DP * screenDensity))
                     , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_bottom, DIMENSION_TEN_DP * screenDensity))});
+            mapboxMapOptions.compassFadesWhenFacingNorth(typedArray.getBoolean(R.styleable.MapView_compass_fade_facing_north, true));
 
             mapboxMapOptions.logoEnabled(typedArray.getBoolean(R.styleable.MapView_logo_enabled, true));
             mapboxMapOptions.logoGravity(typedArray.getInt(R.styleable.MapView_logo_gravity, Gravity.BOTTOM | Gravity.START));
@@ -355,6 +358,20 @@ public class MapboxMapOptions implements Parcelable {
      */
     public MapboxMapOptions compassMargins(int[] margins) {
         compassMargins = margins;
+        return this;
+    }
+
+    /**
+     * Specifies if the compass fades to invisible when facing north.
+     * <p>
+     * By default this value is true.
+     * </p>
+     *
+     * @param compassFadeWhenFacingNorth true is compass fades to invisble
+     * @return This
+     */
+    public MapboxMapOptions compassFadesWhenFacingNorth(boolean compassFadeWhenFacingNorth) {
+        this.fadeCompassFacingNorth = compassFadeWhenFacingNorth;
         return this;
     }
 
@@ -680,6 +697,15 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
+     * Get the current configured state for fading the compass when facing north.
+     *
+     * @return True if compass fades to invisible when facing north
+     */
+    public boolean getCompassFadeFacingNorth() {
+        return fadeCompassFacingNorth;
+    }
+
+    /**
      * Get the current configured visibility state for compass for a map view.
      *
      * @return Visibility state of the compass
@@ -934,6 +960,7 @@ public class MapboxMapOptions implements Parcelable {
         dest.writeByte((byte) (compassEnabled ? 1 : 0));
         dest.writeInt(compassGravity);
         dest.writeIntArray(compassMargins);
+        dest.writeByte((byte) (fadeCompassFacingNorth ? 1 : 0));
 
         dest.writeByte((byte) (logoEnabled ? 1 : 0));
         dest.writeInt(logoGravity);
@@ -979,6 +1006,7 @@ public class MapboxMapOptions implements Parcelable {
 
         if (debugActive != options.debugActive) return false;
         if (compassEnabled != options.compassEnabled) return false;
+        if (fadeCompassFacingNorth != options.fadeCompassFacingNorth) return false;
         if (compassGravity != options.compassGravity) return false;
         if (logoEnabled != options.logoEnabled) return false;
         if (logoGravity != options.logoGravity) return false;
@@ -1022,6 +1050,7 @@ public class MapboxMapOptions implements Parcelable {
         int result = cameraPosition != null ? cameraPosition.hashCode() : 0;
         result = 31 * result + (debugActive ? 1 : 0);
         result = 31 * result + (compassEnabled ? 1 : 0);
+        result = 31 * result + (fadeCompassFacingNorth ? 1 : 0);
         result = 31 * result + compassGravity;
         result = 31 * result + Arrays.hashCode(compassMargins);
         result = 31 * result + (logoEnabled ? 1 : 0);

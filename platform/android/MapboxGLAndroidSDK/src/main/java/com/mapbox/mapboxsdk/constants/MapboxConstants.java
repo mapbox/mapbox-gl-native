@@ -115,6 +115,7 @@ public class MapboxConstants {
     public static final String STATE_COMPASS_MARGIN_TOP = "compassMarginTop";
     public static final String STATE_COMPASS_MARGIN_RIGHT = "compassMarginRight";
     public static final String STATE_COMPASS_MARGIN_BOTTOM = "compassMarginBottom";
+    public static final String STATE_COMPASS_FADE_WHEN_FACING_NORTH = "compassFade";
     public static final String STATE_LOGO_GRAVITY = "logoGravity";
     public static final String STATE_LOGO_MARGIN_LEFT = "logoMarginLeft";
     public static final String STATE_LOGO_MARGIN_TOP = "logoMarginTop";
