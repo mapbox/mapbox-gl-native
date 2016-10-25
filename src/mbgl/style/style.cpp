@@ -516,13 +516,6 @@ void Style::onSpriteLoaded() {
     observer->onUpdate(Update::Repaint);
 }
 
-void Style::onSpriteError(std::exception_ptr error) {
-    lastError = error;
-    Log::Error(Event::Style, "Failed to load sprite: %s", util::toString(error).c_str());
-    observer->onSpriteError(error);
-    observer->onResourceError(error);
-}
-
 struct QueueSourceReloadVisitor {
     UpdateBatch& updateBatch;
 
@@ -532,11 +525,33 @@ struct QueueSourceReloadVisitor {
     void operator()(RasterLayer&) {}
     void operator()(BackgroundLayer&) {}
 
+    void operator()(SymbolLayer& layer) {
+        updateBatch.sourceIDs.insert(layer.getSourceID());
+    }
+
     template <class VectorLayer>
     void operator()(VectorLayer& layer) {
         updateBatch.sourceIDs.insert(layer.getSourceID());
     }
 };
+
+void Style::onSpriteAdded() {
+    observer->onSpriteAdded();
+    
+    //Add all sources that might be affected
+    for (const auto& layer : layers) {
+        layer->accept(QueueSourceReloadVisitor { updateBatch });
+    }
+    
+    observer->onUpdate(Update::Layout | Update::Repaint);
+}
+
+void Style::onSpriteError(std::exception_ptr error) {
+    lastError = error;
+    Log::Error(Event::Style, "Failed to load sprite: %s", util::toString(error).c_str());
+    observer->onSpriteError(error);
+    observer->onResourceError(error);
+}
 
 void Style::onLayerFilterChanged(Layer& layer) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });

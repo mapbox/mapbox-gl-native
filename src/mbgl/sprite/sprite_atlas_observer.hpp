@@ -9,6 +9,7 @@ public:
     virtual ~SpriteAtlasObserver() = default;
 
     virtual void onSpriteLoaded() {}
+    virtual void onSpriteAdded() {}
     virtual void onSpriteError(std::exception_ptr) {}
 };
 

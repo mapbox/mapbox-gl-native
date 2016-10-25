@@ -115,6 +115,7 @@ void SpriteAtlas::setSprites(const Sprites& newSprites) {
 void SpriteAtlas::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
     std::lock_guard<std::mutex> lock(mutex);
     _setSprite(name, sprite);
+    observer->onSpriteAdded();
 }
 
 void SpriteAtlas::removeSprite(const std::string& name) {
