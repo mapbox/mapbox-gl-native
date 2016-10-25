@@ -51,7 +51,17 @@ public class MarkerViewManager {
 
             //logic is reverse, right before left, because the last added is displayed on the top
             final int latComparison = Double.compare(right.getLatitude(), left.getLatitude());
-            return latComparison == 0 ? Double.compare(right.getLongitude(), left.getLongitude()) : latComparison;
+            if (latComparison != 0) {
+                return latComparison;
+            }
+
+
+            final int lonComparison = Double.compare(right.getLongitude(), left.getLongitude());
+            if (lonComparison != 0) {
+                return lonComparison;
+            }
+
+            return (int) (leftMarker.getId() - rightMarker.getId());
         }
     };
     private Map<MarkerView, View> markerViewMap;
