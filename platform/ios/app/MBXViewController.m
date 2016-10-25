@@ -70,6 +70,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingUpdateGeoJSONSourceFeatures,
     MBXSettingsRuntimeStylingVectorSource,
     MBXSettingsRuntimeStylingRasterSource,
+    MBXSettingsRuntimeStylingCountryLabels,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
@@ -105,6 +106,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 @property (nonatomic) NSInteger styleIndex;
 @property (nonatomic) BOOL debugLoggingEnabled;
 @property (nonatomic) BOOL customUserLocationAnnnotationEnabled;
+@property (nonatomic) BOOL usingLocaleBasedCountryLabels;
 
 @end
 
@@ -322,6 +324,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Update GeoJSON Source: Features",
                 @"Style Vector Source",
                 @"Style Raster Source",
+                [NSString stringWithFormat:@"Label Countries in %@", (_usingLocaleBasedCountryLabels ? @"Local Language" : [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:[self bestLanguageForUser]])],
             ]];
             break;
         case MBXSettingsMiscellaneous:
@@ -473,6 +476,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingRasterSource:
                     [self styleRasterSource];
+                    break;
+                case MBXSettingsRuntimeStylingCountryLabels:
+                    [self styleCountryLabelsLanguage];
                     break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
@@ -834,7 +840,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     });
 }
 
-
 - (void)styleQuery
 {
     CGRect queryRect = CGRectInset(self.mapView.bounds, 100, 200);
@@ -1047,6 +1052,66 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     
     MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"style-raster-layer-id" source:rasterSource];
     [self.mapView.style addLayer:rasterLayer];
+}
+
+-(void)styleCountryLabelsLanguage
+{
+    NSArray<NSString *> *labelLayers = @[
+        @"country-label-lg",
+        @"country-label-md",
+        @"country-label-sm",
+    ];
+    [self styleLabelLanguageForLayersNamed:labelLayers];
+}
+
+- (void)styleLabelLanguageForLayersNamed:(NSArray<NSString *> *)layers
+{
+    _usingLocaleBasedCountryLabels = !_usingLocaleBasedCountryLabels;
+    NSString *bestLanguageForUser = [NSString stringWithFormat:@"{name_%@}", [self bestLanguageForUser]];
+    NSString *language = _usingLocaleBasedCountryLabels ? bestLanguageForUser : @"{name}";
+
+    for (NSString *layerName in layers) {
+        MGLSymbolStyleLayer *layer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:layerName];
+
+        if ([layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
+            if ([layer.textField isKindOfClass:[MGLStyleConstantValue class]]) {
+                MGLStyleConstantValue *label = (MGLStyleConstantValue<NSString *> *)layer.textField;
+                if ([label.rawValue hasPrefix:@"{name"]) {
+                    layer.textField = [MGLStyleValue valueWithRawValue:language];
+                }
+            } else if ([layer.textField isKindOfClass:[MGLStyleFunction class]]) {
+                MGLStyleFunction *function = (MGLStyleFunction<NSString *> *)layer.textField;
+                [function.stops enumerateKeysAndObjectsUsingBlock:^(id zoomLevel, id stop, BOOL *done) {
+                    if ([stop isKindOfClass:[MGLStyleConstantValue class]]) {
+                        MGLStyleConstantValue *label = (MGLStyleConstantValue<NSString *> *)stop;
+                        if ([label.rawValue hasPrefix:@"{name"]) {
+                            [function.stops setValue:[MGLStyleValue valueWithRawValue:language] forKey:zoomLevel];
+                        }
+                    }
+                }];
+                layer.textField = function;
+            }
+        } else {
+            NSLog(@"%@ is not a symbol style layer", layerName);
+        }
+    }
+}
+
+- (NSString *)bestLanguageForUser
+{
+    NSArray *supportedLanguages = @[ @"en", @"es", @"fr", @"de", @"ru", @"zh" ];
+    NSArray<NSString *> *preferredLanguages = [NSLocale preferredLanguages];
+    NSString *bestLanguage;
+
+    for (NSString *language in preferredLanguages) {
+        NSString *thisLanguage = [NSLocale localeWithLocaleIdentifier:language].languageCode;
+        if ([supportedLanguages containsObject:thisLanguage]) {
+            bestLanguage = thisLanguage;
+            break;
+        }
+    }
+
+    return bestLanguage ?: @"en";
 }
 
 - (IBAction)startWorldTour
@@ -1441,6 +1506,14 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     
     MGLPointAnnotation *point = annotation;
     point.coordinate = [self.mapView convertPoint:self.mapView.center toCoordinateFromView:self.mapView];
+}
+
+- (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style
+{
+    // Default Mapbox styles use {name_en} as their label language, which means
+    // that a device with an English-language locale is already effectively
+    // using locale-based country labels.
+    _usingLocaleBasedCountryLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
 }
 
 @end
