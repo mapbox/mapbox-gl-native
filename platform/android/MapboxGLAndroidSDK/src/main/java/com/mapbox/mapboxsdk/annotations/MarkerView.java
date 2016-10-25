@@ -366,29 +366,11 @@ public class MarkerView extends Marker {
 
             // animate visibility
             if (visible && view.getVisibility() == View.GONE) {
-                view.setVisibility(visible ? View.VISIBLE : View.GONE);
-            }
-        }
+                view.animate().cancel();
+                view.setAlpha(0F);
+                setAlpha(1F);
 
-        PointF point = mapboxMap.getProjection().toScreenLocation(getPosition());
-        if (getOffsetX() == MapboxConstants.UNMEASURED) {
-            // ensure view is measured first
-            if (view.getWidth() == 0) {
-                view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
             }
-            if (view.getMeasuredWidth() != 0) {
-                int x = (int) (getAnchorU() * view.getMeasuredWidth());
-                int y = (int) (getAnchorV() * view.getMeasuredHeight());
-                setOffset(x, y);
-            }
-        }
-
-        view.setX(point.x - getOffsetX());
-        view.setY(point.y - getOffsetY());
-
-        // animate visibility
-        if (isVisible() && view.getVisibility() == View.GONE) {
-            setVisible(true);
         }
     }
 
