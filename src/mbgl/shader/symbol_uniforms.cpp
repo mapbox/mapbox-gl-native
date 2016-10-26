@@ -9,7 +9,7 @@ using namespace style;
 
 template <class Values, class...Args>
 Values makeValues(const style::SymbolPropertyValues& values,
-                  const std::array<uint16_t, 2>& texsize,
+                  const Size& texsize,
                   const std::array<float, 2>& pixelsToGLUnits,
                   const RenderTile& tile,
                   const TransformState& state,
@@ -35,7 +35,7 @@ Values makeValues(const style::SymbolPropertyValues& values,
                               state),
         values.opacity,
         extrudeScale,
-        std::array<float, 2> {{ texsize[0] / 4.0f, texsize[1] / 4.0f }},
+        std::array<float, 2> {{ float(texsize.width) / 4, float(texsize.height) / 4 }},
         (state.getZoom() - zoomAdjust) * 10.0f,
         values.rotationAlignment == AlignmentType::Map,
         0,
@@ -46,7 +46,7 @@ Values makeValues(const style::SymbolPropertyValues& values,
 
 SymbolIconUniforms::Values
 SymbolIconUniforms::values(const style::SymbolPropertyValues& values,
-                           const std::array<uint16_t, 2>& texsize,
+                           const Size& texsize,
                            const std::array<float, 2>& pixelsToGLUnits,
                            const RenderTile& tile,
                            const TransformState& state)
@@ -61,7 +61,7 @@ SymbolIconUniforms::values(const style::SymbolPropertyValues& values,
 }
 
 static SymbolSDFUniforms::Values makeSDFValues(const style::SymbolPropertyValues& values,
-                                               const std::array<uint16_t, 2>& texsize,
+                                               const Size& texsize,
                                                const std::array<float, 2>& pixelsToGLUnits,
                                                const RenderTile& tile,
                                                const TransformState& state,
@@ -95,7 +95,7 @@ static SymbolSDFUniforms::Values makeSDFValues(const style::SymbolPropertyValues
 
 SymbolSDFUniforms::Values
 SymbolSDFUniforms::haloValues(const style::SymbolPropertyValues& values,
-                              const std::array<uint16_t, 2>& texsize,
+                              const Size& texsize,
                               const std::array<float, 2>& pixelsToGLUnits,
                               const RenderTile& tile,
                               const TransformState& state,
@@ -121,7 +121,7 @@ SymbolSDFUniforms::haloValues(const style::SymbolPropertyValues& values,
 
 SymbolSDFUniforms::Values
 SymbolSDFUniforms::foregroundValues(const style::SymbolPropertyValues& values,
-                                    const std::array<uint16_t, 2>& texsize,
+                                    const Size& texsize,
                                     const std::array<float, 2>& pixelsToGLUnits,
                                     const RenderTile& tile,
                                     const TransformState& state,

@@ -72,7 +72,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
         const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || state.getPitch() != 0;
         atlas.bind(bucket.sdfIcons || state.isChanging() || iconScaled || iconTransformed, context, 0);
 
-        std::array<uint16_t, 2> texsize {{ atlas.getWidth(), atlas.getHeight() }};
+        const Size texsize = atlas.getSize();
 
         if (bucket.sdfIcons) {
             if (values.hasHalo()) {
@@ -101,7 +101,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         auto values = layer.impl->textPropertyValues(layout);
 
-        std::array<uint16_t, 2> texsize {{ glyphAtlas->width, glyphAtlas->height }};
+        const Size texsize { glyphAtlas->width, glyphAtlas->height };
 
         if (values.hasHalo()) {
             draw(parameters.shaders.symbolGlyph,

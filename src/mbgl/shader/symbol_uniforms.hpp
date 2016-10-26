@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/shader/uniforms.hpp>
+#include <mbgl/util/size.hpp>
 
 #include <array>
 
@@ -35,7 +36,7 @@ struct SymbolIconUniforms : gl::Uniforms<
     uniforms::u_fadetexture>
 {
     static Values values(const style::SymbolPropertyValues&,
-                         const std::array<uint16_t, 2>& texsize,
+                         const Size& texsize,
                          const std::array<float, 2>& pixelsToGLUnits,
                          const RenderTile&,
                          const TransformState&);
@@ -59,14 +60,14 @@ struct SymbolSDFUniforms : gl::Uniforms<
     uniforms::u_pitch_with_map>
 {
     static Values haloValues(const style::SymbolPropertyValues&,
-                              const std::array<uint16_t, 2>& texsize,
+                              const Size& texsize,
                               const std::array<float, 2>& pixelsToGLUnits,
                               const RenderTile&,
                               const TransformState&,
                               float pixelRatio);
 
     static Values foregroundValues(const style::SymbolPropertyValues&,
-                              const std::array<uint16_t, 2>& texsize,
+                              const Size& texsize,
                               const std::array<float, 2>& pixelsToGLUnits,
                               const RenderTile&,
                               const TransformState&,
