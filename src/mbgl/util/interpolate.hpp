@@ -55,6 +55,32 @@ public:
     }
 };
 
+template <>
+struct Interpolator<ColorLAB> {
+public:
+    ColorLAB operator()(const ColorLAB& a, const ColorLAB& b, const double t) {
+        return {
+            interpolate(a.l, b.l, t),
+            interpolate(a.a, b.a, t),
+            interpolate(a.b, b.b, t),
+            interpolate(a.A, b.A, t)
+        };
+    }
+};
+
+template <>
+struct Interpolator<ColorHCL> {
+public:
+    ColorHCL operator()(const ColorHCL& a, const ColorHCL& b, const double t) {
+        return {
+            interpolate(a.h, b.h, t),
+            interpolate(a.c, b.c, t),
+            interpolate(a.l, b.l, t),
+            interpolate(a.A, b.A, t)
+        };
+    }
+};
+
 struct Uninterpolated {
     template <class T>
     T operator()(const T& a, const T&, const double) const {

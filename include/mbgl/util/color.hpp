@@ -1,6 +1,8 @@
 #pragma once
 
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/color_lab.hpp>
+#include <mbgl/util/color_hcl.hpp>
 
 #include <string>
 
@@ -14,9 +16,14 @@ public:
     float b = 0.0f;
     float a = 0.0f;
 
+    ColorLAB toLAB();
+    ColorHCL toHCL();
+
     static constexpr Color black() { return { 0.0f, 0.0f, 0.0f, 1.0f }; };
     static constexpr Color white() { return { 1.0f, 1.0f, 1.0f, 1.0f }; };
 
+    static Color fromLAB(const ColorLAB&);
+    static Color fromHCL(const ColorHCL&);
     static optional<Color> parse(const std::string&);
 };
 

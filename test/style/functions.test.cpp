@@ -3,6 +3,7 @@
 
 #include <mbgl/style/property_evaluator.hpp>
 #include <mbgl/style/calculation_parameters.hpp>
+#include <mbgl/util/color.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -12,6 +13,10 @@ float evaluate(PropertyValue<float> value, float zoom) {
 }
 std::string evaluate(PropertyValue<std::string> value, float zoom) {
     return PropertyValue<std::string>::visit(value, PropertyEvaluator<std::string>(CalculationParameters(zoom), ""));
+}
+Color evaluate(PropertyValue<Color> value, float zoom) {
+    return PropertyValue<Color>::visit(value,
+        PropertyEvaluator<Color>(CalculationParameters(zoom), Color()));
 }
 
 TEST(Function, Constant) {
@@ -72,4 +77,19 @@ TEST(Function, Stops) {
     EXPECT_EQ("string1", evaluate(discrete_0, 7));
     EXPECT_EQ("string2", evaluate(discrete_0, 9));
     EXPECT_EQ("string2", evaluate(discrete_0, 10));
+}
+
+TEST(Function, Colors) {
+    // Explicit constant slope in fringe regions.
+    Function<Color> slope_1({
+            { 0, Color{ 0.0, 1.0, 0.0, 1.0 } },
+            { 10, Color{ 0.0, 1.0, 0.0, 1.0 } } }, 1.75);
+    Color expectation = Color{ 0.0, 1.0, 0.0, 1.0 };
+    EXPECT_EQ(expectation, evaluate(slope_1, 0));
+
+    Function<Color> slope_2({
+            { 0, Color{ 0.0, 1.0, 0.0, 1.0 } },
+            { 10, Color{ 0.0, 1.0, 0.0, 1.0 } } }, 1.75, ColorSpace::HCL);
+    Color expectation2 = Color{ 0.0, 1.0, 0.0, 1.0 };
+    EXPECT_EQ(expectation2, evaluate(slope_2, 0));
 }
