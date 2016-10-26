@@ -119,7 +119,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     // Update the default matrices to the current viewport dimensions.
     state.getProjMatrix(projMatrix);
 
-    pixelsToGLUnits = {{ 2.0f  / state.getWidth(), -2.0f / state.getHeight() }};
+    pixelsToGLUnits = {{ 2.0f  / state.getSize().width, -2.0f / state.getSize().height }};
     if (state.getViewportMode() == ViewportMode::FlippedY) {
         pixelsToGLUnits[1] *= -1;
     }

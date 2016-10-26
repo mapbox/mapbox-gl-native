@@ -83,15 +83,14 @@ NativeMapView::NativeMapView(JNIEnv *env_, jobject obj_, float pixelRatio, int a
         mbgl::android::apkPath);
 
     map = std::make_unique<mbgl::Map>(
-        *this,
-        std::array<uint16_t, 2>{{ static_cast<uint16_t>(width), static_cast<uint16_t>(height) }},
+        *this, mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) },
         pixelRatio, *fileSource, threadPool, MapMode::Continuous);
 
     float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
     float cpuFactor    = availableProcessors;
     float memoryFactor = static_cast<float>(totalMemory) / 1000.0f / 1000.0f / 1000.0f;
-    float sizeFactor   = (static_cast<float>(map->getWidth())  / mbgl::util::tileSize) *
-                         (static_cast<float>(map->getHeight()) / mbgl::util::tileSize);
+    float sizeFactor   = (static_cast<float>(map->getSize().width)  / mbgl::util::tileSize) *
+                         (static_cast<float>(map->getSize().height) / mbgl::util::tileSize);
 
     size_t cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5f;
 
@@ -119,12 +118,15 @@ NativeMapView::~NativeMapView() {
 
 void NativeMapView::updateViewBinding() {
     getContext().bindFramebuffer.setCurrentValue(0);
-    getContext().viewport.setCurrentValue({ 0, 0, static_cast<uint16_t>(fbWidth), static_cast<uint16_t>(fbHeight) });
+    getContext().viewport.setCurrentValue(
+        { 0, 0, { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) } });
 }
 
 void NativeMapView::bind() {
     getContext().bindFramebuffer = 0;
-    getContext().viewport = { 0, 0, static_cast<uint16_t>(fbWidth), static_cast<uint16_t>(fbHeight) };
+    getContext().viewport = { 0,
+                              0,
+                              { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) } };
 }
 
 void NativeMapView::activate() {
@@ -201,7 +203,7 @@ void NativeMapView::render() {
          // take snapshot
          const unsigned int w = fbWidth;
          const unsigned int h = fbHeight;
-         mbgl::PremultipliedImage image { static_cast<uint16_t>(w), static_cast<uint16_t>(h) };
+         mbgl::PremultipliedImage image({ w, h });
          MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
          const size_t stride = image.stride();
          auto tmp = std::make_unique<uint8_t[]>(stride);
@@ -718,7 +720,7 @@ void NativeMapView::updateFps() {
 void NativeMapView::resizeView(int w, int h) {
     width = w;
     height = h;
-    map->setSize({{ static_cast<uint16_t>(width), static_cast<uint16_t>(height) }});
+    map->setSize({ static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
 }
 
 void NativeMapView::resizeFramebuffer(int w, int h) {

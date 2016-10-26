@@ -48,8 +48,8 @@ void CustomLayer::Impl::render(const TransformState& state) const {
 
     CustomLayerRenderParameters parameters;
 
-    parameters.width = state.getWidth();
-    parameters.height = state.getHeight();
+    parameters.width = state.getSize().width;
+    parameters.height = state.getSize().height;
     parameters.latitude = state.getLatLng().latitude;
     parameters.longitude = state.getLatLng().longitude;
     parameters.zoom = state.getZoom();

@@ -20,7 +20,7 @@ TEST(API, RepeatedRender) {
     const auto style = util::read_file("test/fixtures/api/water.json");
 
     HeadlessBackend backend;
-    OffscreenView view(backend.getContext(), {{ 256, 512 }});
+    OffscreenView view(backend.getContext(), { 256, 512 });
 #ifdef MBGL_ASSET_ZIP
     // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
@@ -32,7 +32,7 @@ TEST(API, RepeatedRender) {
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    Map map(backend, view.size, 1, fileSource, threadPool, MapMode::Still);
 
     {
         map.setStyleJSON(style);
@@ -41,12 +41,12 @@ TEST(API, RepeatedRender) {
             result = view.readStillImage();
         });
 
-        while (!result.size()) {
+        while (!result.valid()) {
             loop.runOnce();
         }
 
-        ASSERT_EQ(256u, result.width);
-        ASSERT_EQ(512u, result.height);
+        ASSERT_EQ(256u, result.size.width);
+        ASSERT_EQ(512u, result.size.height);
 #if !TEST_READ_ONLY
         util::write_file("test/fixtures/api/1.png", encodePNG(result));
 #endif
@@ -59,12 +59,12 @@ TEST(API, RepeatedRender) {
             result = view.readStillImage();
         });
 
-        while (!result.size()) {
+        while (!result.valid()) {
             loop.runOnce();
         }
 
-        ASSERT_EQ(256u, result.width);
-        ASSERT_EQ(512u, result.height);
+        ASSERT_EQ(256u, result.size.width);
+        ASSERT_EQ(512u, result.size.height);
 #if !TEST_READ_ONLY
         util::write_file("test/fixtures/api/2.png", encodePNG(result));
 #endif

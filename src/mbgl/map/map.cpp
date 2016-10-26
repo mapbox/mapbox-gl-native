@@ -99,7 +99,7 @@ public:
 };
 
 Map::Map(Backend& backend,
-         const std::array<uint16_t, 2> size,
+         const Size size,
          const float pixelRatio,
          FileSource& fileSource,
          Scheduler& scheduler,
@@ -541,7 +541,7 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.
     ScreenCoordinate nePixel = {-INFINITY, -INFINITY};
     ScreenCoordinate swPixel = {INFINITY, INFINITY};
-    double viewportHeight = getHeight();
+    double viewportHeight = getSize().height;
     for (LatLng latLng : latLngs) {
         ScreenCoordinate pixel = pixelForLatLng(latLng);
         swPixel.x = std::min(swPixel.x, pixel.x);
@@ -555,8 +555,8 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional
     // Calculate the zoom level.
     double minScale = INFINITY;
     if (width > 0 || height > 0) {
-        double scaleX = getWidth() / width;
-        double scaleY = getHeight() / height;
+        double scaleX = double(getSize().width) / width;
+        double scaleY = double(getSize().height) / height;
         if (padding && *padding) {
             scaleX -= (padding->left + padding->right) / width;
             scaleY -= (padding->top + padding->bottom) / height;
@@ -617,17 +617,13 @@ double Map::getMaxZoom() const {
 
 #pragma mark - Size
 
-void Map::setSize(const std::array<uint16_t, 2>& size) {
+void Map::setSize(const Size size) {
     impl->transform.resize(size);
     impl->onUpdate(Update::Repaint);
 }
 
-uint16_t Map::getWidth() const {
-    return impl->transform.getState().getWidth();
-}
-
-uint16_t Map::getHeight() const {
-    return impl->transform.getState().getHeight();
+Size Map::getSize() const {
+    return impl->transform.getState().getSize();
 }
 
 #pragma mark - Rotation

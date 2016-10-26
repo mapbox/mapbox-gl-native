@@ -11,7 +11,7 @@ using namespace mbgl;
 
 TEST(OffscreenTexture, EmptyRed) {
     HeadlessBackend backend;
-    OffscreenView view(backend.getContext(), {{ 512, 256 }});
+    OffscreenView view(backend.getContext(), { 512, 256 });
     view.bind();
 
     MBGL_CHECK_ERROR(glClearColor(1.0f, 0.0f, 0.0f, 1.0f));
@@ -106,7 +106,7 @@ void main() {
 
     // Make sure the texture gets destructed before we call context.reset();
     {
-        OffscreenView view(context, {{ 512, 256 }});
+        OffscreenView view(context, { 512, 256 });
 
         // First, draw red to the bound FBO.
         context.clearColor = { 1, 0, 0, 1 };
@@ -115,7 +115,7 @@ void main() {
 
         // Then, create a texture, bind it, and render yellow to that texture. This should not
         // affect the originally bound FBO.
-        OffscreenTexture texture(context, {{ 128, 128 }});
+        OffscreenTexture texture(context, { 128, 128 });
         texture.bind();
 
         context.clearColor = { 0, 0, 0, 0 };

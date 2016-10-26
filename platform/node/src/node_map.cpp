@@ -356,12 +356,11 @@ void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 }
 
 void NodeMap::startRender(NodeMap::RenderOptions options) {
-    map->setSize(std::array<uint16_t, 2>{{ static_cast<uint16_t>(options.width),
-                                           static_cast<uint16_t>(options.height) }});
+    map->setSize({ options.width, options.height });
 
-    const std::array<uint16_t, 2> fbSize{{ static_cast<uint16_t>(options.width * pixelRatio),
-                                           static_cast<uint16_t>(options.height * pixelRatio) }};
-    if (!view || view->getSize() != fbSize) {
+    const mbgl::Size fbSize{ static_cast<uint32_t>(options.width * pixelRatio),
+                             static_cast<uint32_t>(options.height * pixelRatio) };
+    if (!view || view->size != fbSize) {
         view.reset();
         view = std::make_unique<mbgl::OffscreenView>(backend.getContext(), fbSize);
     }
@@ -430,7 +429,7 @@ void NodeMap::renderFinished() {
         cb->Call(1, argv);
     } else if (img.data) {
         v8::Local<v8::Object> pixels = Nan::NewBuffer(
-            reinterpret_cast<char *>(img.data.get()), img.size(),
+            reinterpret_cast<char *>(img.data.get()), img.bytes(),
             // Retain the data until the buffer is deleted.
             [](char *, void * hint) {
                 delete [] reinterpret_cast<uint8_t*>(hint);
@@ -790,7 +789,7 @@ NodeMap::NodeMap(v8::Local<v8::Object> options)
       }()),
       backend(sharedDisplay()),
       map(std::make_unique<mbgl::Map>(backend,
-                                      std::array<uint16_t, 2>{{ 256, 256 }},
+                                      mbgl::Size{ 256, 256 },
                                       pixelRatio,
                                       *this,
                                       threadpool,
