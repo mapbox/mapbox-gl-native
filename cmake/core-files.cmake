@@ -439,6 +439,8 @@ set(MBGL_CORE_FILES
     src/mbgl/util/http_header.hpp
     src/mbgl/util/http_timeout.cpp
     src/mbgl/util/http_timeout.hpp
+    src/mbgl/util/i18n.cpp
+    src/mbgl/util/i18n.hpp
     src/mbgl/util/interpolate.hpp
     src/mbgl/util/intersection_tests.cpp
     src/mbgl/util/intersection_tests.hpp

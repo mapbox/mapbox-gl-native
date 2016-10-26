@@ -1,6 +1,7 @@
 #include <mbgl/text/glyph_set.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/math/minmax.hpp>
+#include <mbgl/util/i18n.hpp>
 
 #include <cassert>
 
@@ -54,7 +55,8 @@ const Shaping GlyphSet::getShaping(const std::u32string &string, const float max
     if (shaping.positionedGlyphs.empty())
         return shaping;
 
-    lineWrap(shaping, lineHeight, maxWidth, horizontalAlign, verticalAlign, justify, translate);
+    lineWrap(shaping, lineHeight, maxWidth, horizontalAlign, verticalAlign, justify, translate,
+             util::i18n::allowsIdeographicBreaking(string));
 
     return shaping;
 }
@@ -85,9 +87,10 @@ void justifyLine(std::vector<PositionedGlyph> &positionedGlyphs, const std::map<
     }
 }
 
-void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, const float maxWidth,
-                         const float horizontalAlign, const float verticalAlign,
-                         const float justify, const Point<float> &translate) const {
+void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, float maxWidth,
+                        const float horizontalAlign, const float verticalAlign,
+                        const float justify, const Point<float> &translate,
+                        bool useBalancedIdeographicBreaking) const {
     uint32_t lastSafeBreak = 0;
 
     uint32_t lengthBeforeCurrentLine = 0;
@@ -99,6 +102,12 @@ void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, const float ma
     std::vector<PositionedGlyph> &positionedGlyphs = shaping.positionedGlyphs;
 
     if (maxWidth) {
+        if (useBalancedIdeographicBreaking) {
+            auto lastPositionedGlyph = positionedGlyphs[positionedGlyphs.size() - 1];
+            uint32_t estimatedLineCount = std::fmax(1, std::ceil(lastPositionedGlyph.x / maxWidth));
+            maxWidth = lastPositionedGlyph.x / estimatedLineCount;
+        }
+
         for (uint32_t i = 0; i < positionedGlyphs.size(); i++) {
             PositionedGlyph &shape = positionedGlyphs[i];
 
@@ -133,8 +142,9 @@ void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, const float ma
                 line++;
             }
 
-            // Spaces, plus word-breaking punctuation that often appears without surrounding spaces.
-            if (shape.glyph == 0x20 /* space */
+            // Ideographic characters, spaces, and word-breaking punctuation that often appear without surrounding spaces.
+            if (useBalancedIdeographicBreaking
+                || shape.glyph == 0x20 /* space */
                 || shape.glyph == 0x26 /* ampersand */
                 || shape.glyph == 0x2b /* plus sign */
                 || shape.glyph == 0x2d /* hyphen-minus */
@@ -143,7 +153,8 @@ void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, const float ma
                 || shape.glyph == 0xb7 /* middle dot */
                 || shape.glyph == 0x200b /* zero-width space */
                 || shape.glyph == 0x2010 /* hyphen */
-                || shape.glyph == 0x2013 /* en dash */) {
+                || shape.glyph == 0x2013 /* en dash */
+                || util::i18n::allowsIdeographicBreaking(shape.glyph)) {
                 lastSafeBreak = i;
             }
         }

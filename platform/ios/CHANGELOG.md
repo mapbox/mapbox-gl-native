@@ -21,6 +21,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * TileJSON manifests can now specify `"scheme": "tms"` to indicate the use of [TMS](https://en.wikipedia.org/wiki/Tile_Map_Service) coordinates. ([#2270](https://github.com/mapbox/mapbox-gl-native/pull/2270))
 * Fixed an issue causing abstract MGLMultiPointFeature objects to be returned in feature query results. Now concrete MGLPointCollectionFeature objects are returned. ([#6742](https://github.com/mapbox/mapbox-gl-native/pull/6742))
 * Fixed rendering artifacts and missing glyphs that occurred after viewing a large number of CJK characters on the map. ([#5908](https://github.com/mapbox/mapbox-gl-native/pull/5908))
+* Improved the line wrapping behavior of point-placed labels written in Chinese, Japanese, and Yi. ([#6828](https://github.com/mapbox/mapbox-gl-native/pull/6828))
 * `-[MGLMapView resetPosition]` now resets to the current style’s default center coordinates, zoom level, direction, and pitch, if specified. ([#6127](https://github.com/mapbox/mapbox-gl-native/pull/6127))
 * Fixed an issue where feature querying sometimes failed to return the expected features when the map was tilted. ([#6773](https://github.com/mapbox/mapbox-gl-native/pull/6773))
 * MGLFeature’s `attributes` and `identifier` properties are now writable. ([#6728](https://github.com/mapbox/mapbox-gl-native/pull/6728))

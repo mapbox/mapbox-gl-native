@@ -13,7 +13,8 @@ public:
                              float horizontalAlign, float verticalAlign, float justify,
                              float spacing, const Point<float> &translate) const;
     void lineWrap(Shaping &shaping, float lineHeight, float maxWidth, float horizontalAlign,
-                  float verticalAlign, float justify, const Point<float> &translate) const;
+                  float verticalAlign, float justify, const Point<float> &translate,
+                  bool useBalancedIdeographicBreaking) const;
 
 private:
     std::map<uint32_t, SDFGlyph> sdfs;
