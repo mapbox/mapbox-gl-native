@@ -388,7 +388,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 /**
  Value to use for a text label. Feature properties are specified using tokens like {field_name}.
  
- The default value of this property is an `MGLStyleValue` object containing the string ``. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing the empty string. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *textField;
 
