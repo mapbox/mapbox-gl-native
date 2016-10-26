@@ -26,7 +26,7 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
     const auto style = util::read_file("test/fixtures/api/water_missing_tiles.json");
 
     HeadlessBackend backend;
-    OffscreenView view(backend.getContext(), {{ 256, 512 }});
+    OffscreenView view(backend.getContext(), { 256, 512 });
 #ifdef MBGL_ASSET_ZIP
     // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
@@ -38,7 +38,7 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    Map map(backend, view.size, 1, fileSource, threadPool, MapMode::Still);
 
     std::string message;
 

@@ -6,6 +6,7 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/size.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/transition_options.hpp>
 
@@ -33,7 +34,7 @@ class Layer;
 class Map : private util::noncopyable {
 public:
     explicit Map(Backend&,
-                 std::array<uint16_t, 2> size,
+                 Size size,
                  float pixelRatio,
                  FileSource&,
                  Scheduler&,
@@ -136,9 +137,8 @@ public:
     ViewportMode getViewportMode() const;
 
     // Size
-    void setSize(const std::array<uint16_t, 2>&);
-    uint16_t getWidth() const;
-    uint16_t getHeight() const;
+    void setSize(Size);
+    Size getSize() const;
 
     // Projection
     double getMetersPerPixelAtLatitude(double lat, double zoom) const;

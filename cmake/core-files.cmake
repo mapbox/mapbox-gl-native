@@ -420,6 +420,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/projection.hpp
     include/mbgl/util/range.hpp
     include/mbgl/util/run_loop.hpp
+    include/mbgl/util/size.hpp
     include/mbgl/util/string.hpp
     include/mbgl/util/tileset.hpp
     include/mbgl/util/timer.hpp

@@ -33,15 +33,16 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
     // Calculate z value of the farthest fragment that should be rendered.
     double farZ = std::cos(M_PI / 2.0f - getPitch()) * topHalfSurfaceDistance + getAltitude();
 
-    matrix::perspective(projMatrix, 2.0f * std::atan((getHeight() / 2.0f) / getAltitude()),
-            double(getWidth()) / getHeight(), 0.1, farZ);
+    matrix::perspective(projMatrix, 2.0f * std::atan((size.height / 2.0f) / getAltitude()),
+                        double(size.width) / size.height, 0.1, farZ);
 
     matrix::translate(projMatrix, projMatrix, 0, 0, -getAltitude());
 
     // After the rotateX, z values are in pixel units. Convert them to
     // altitude unites. 1 altitude unit = the screen height.
     const bool flippedY = viewportMode == ViewportMode::FlippedY;
-    matrix::scale(projMatrix, projMatrix, 1, flippedY ? 1 : -1, 1.0f / (rotatedNorth() ? getWidth() : getHeight()));
+    matrix::scale(projMatrix, projMatrix, 1, flippedY ? 1 : -1,
+                  1.0f / (rotatedNorth() ? size.width : size.height));
 
     using NO = NorthOrientation;
     switch (getNorthOrientation()) {
@@ -53,18 +54,14 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
 
     matrix::rotate_z(projMatrix, projMatrix, getAngle() + getNorthOrientationAngle());
 
-    matrix::translate(projMatrix, projMatrix, pixel_x() - getWidth() / 2.0f,
-            pixel_y() - getHeight() / 2.0f, 0);
+    matrix::translate(projMatrix, projMatrix, pixel_x() - size.width / 2.0f,
+                      pixel_y() - size.height / 2.0f, 0);
 }
 
 #pragma mark - Dimensions
 
-uint16_t TransformState::getWidth() const {
-    return width;
-}
-
-uint16_t TransformState::getHeight() const {
-    return height;
+Size TransformState::getSize() const {
+    return size;
 }
 
 #pragma mark - North Orientation
@@ -108,12 +105,12 @@ LatLng TransformState::getLatLng(LatLng::WrapMode wrapMode) const {
 }
 
 double TransformState::pixel_x() const {
-    const double center = (width - Projection::worldSize(scale)) / 2;
+    const double center = (size.width - Projection::worldSize(scale)) / 2;
     return center + x;
 }
 
 double TransformState::pixel_y() const {
-    const double center = (height - Projection::worldSize(scale)) / 2;
+    const double center = (size.height - Projection::worldSize(scale)) / 2;
     return center + y;
 }
 
@@ -210,7 +207,7 @@ double TransformState::scaleZoom(double s) const {
 }
 
 ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) const {
-    if (width == 0 || height == 0) {
+    if (!size) {
         return {};
     }
 
@@ -219,11 +216,11 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
     Point<double> pt = Projection::project(latLng, scale) / double(util::tileSize);
     vec4 c = {{ pt.x, pt.y, 0, 1 }};
     matrix::transformMat4(p, c, mat);
-    return { p[0] / p[3], height - p[1] / p[3] };
+    return { p[0] / p[3], size.height - p[1] / p[3] };
 }
 
 LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng::WrapMode wrapMode) const {
-    if (width == 0 || height == 0) {
+    if (!size) {
         return {};
     }
 
@@ -235,7 +232,7 @@ LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, L
 
     if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
 
-    double flippedY = height - point.y;
+    double flippedY = size.height - point.y;
 
     // since we don't know the correct projected z value for the point,
     // unproject two points to get a line and then find the point on that
@@ -273,7 +270,8 @@ mat4 TransformState::coordinatePointMatrix(double z) const {
 mat4 TransformState::getPixelMatrix() const {
     mat4 m;
     matrix::identity(m);
-    matrix::scale(m, m, width / 2.0f, -height / 2.0f, 1);
+    matrix::scale(m, m,
+                  static_cast<double>(size.width) / 2, -static_cast<double>(size.height) / 2, 1);
     matrix::translate(m, m, 1, -1, 0);
     return m;
 }
@@ -289,17 +287,17 @@ bool TransformState::rotatedNorth() const {
 void TransformState::constrain(double& scale_, double& x_, double& y_) const {
     // Constrain minimum scale to avoid zooming out far enough to show off-world areas.
     scale_ = util::max(scale_,
-                       static_cast<double>((rotatedNorth() ? height : width) / util::tileSize),
-                       static_cast<double>((rotatedNorth() ? width : height) / util::tileSize));
+                       static_cast<double>(rotatedNorth() ? size.height : size.width) / util::tileSize,
+                       static_cast<double>(rotatedNorth() ? size.width : size.height) / util::tileSize);
 
     // Constrain min/max pan to avoid showing off-world areas.
     if (constrainMode == ConstrainMode::WidthAndHeight) {
-        double max_x = (scale_ * util::tileSize - (rotatedNorth() ? height : width)) / 2;
+        double max_x = (scale_ * util::tileSize - (rotatedNorth() ? size.height : size.width)) / 2;
         x_ = std::max(-max_x, std::min(x_, max_x));
     }
 
     if (constrainMode != ConstrainMode::None) {
-        double max_y = (scale_ * util::tileSize - (rotatedNorth() ? width : height)) / 2;
+        double max_y = (scale_ * util::tileSize - (rotatedNorth() ? size.width : size.height)) / 2;
         y_ = std::max(-max_y, std::min(y_, max_y));
     }
 }

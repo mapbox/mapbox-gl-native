@@ -34,8 +34,8 @@ public:
     // mbgl::View implementation
     void updateViewBinding();
     void bind() override;
-    std::array<uint16_t, 2> getSize() const;
-    std::array<uint16_t, 2> getFramebufferSize() const;
+    mbgl::Size getSize() const;
+    mbgl::Size getFramebufferSize() const;
 
     // mbgl::Backend implementation
     void activate() override;
