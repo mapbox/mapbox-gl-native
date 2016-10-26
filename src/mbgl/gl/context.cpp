@@ -143,16 +143,14 @@ UniqueFramebuffer Context::createFramebuffer() {
     return UniqueFramebuffer{ std::move(id), { this } };
 }
 
-UniqueRenderbuffer Context::createRenderbuffer(const RenderbufferType type,
-                                               const uint16_t width,
-                                               const uint16_t height) {
+UniqueRenderbuffer Context::createRenderbuffer(const RenderbufferType type, const Size size) {
     RenderbufferID id = 0;
     MBGL_CHECK_ERROR(glGenRenderbuffers(1, &id));
     UniqueRenderbuffer renderbuffer{ std::move(id), { this } };
 
     bindRenderbuffer = renderbuffer;
     MBGL_CHECK_ERROR(
-        glRenderbufferStorage(GL_RENDERBUFFER, static_cast<GLenum>(type), width, height));
+        glRenderbufferStorage(GL_RENDERBUFFER, static_cast<GLenum>(type), size.width, size.height));
     return renderbuffer;
 }
 
@@ -251,7 +249,7 @@ Framebuffer Context::createFramebuffer(const Texture& color) {
 }
 
 UniqueTexture
-Context::createTexture(uint16_t width, uint16_t height, const void* data, TextureUnit unit) {
+Context::createTexture(const Size size, const void* data, TextureUnit unit) {
     auto obj = createTexture();
     activeTexture = unit;
     texture[unit] = obj;
@@ -259,8 +257,8 @@ Context::createTexture(uint16_t width, uint16_t height, const void* data, Textur
     MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
     MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    MBGL_CHECK_ERROR(
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data));
+    MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.width, size.height, 0, GL_RGBA,
+                                  GL_UNSIGNED_BYTE, data));
     return obj;
 }
 

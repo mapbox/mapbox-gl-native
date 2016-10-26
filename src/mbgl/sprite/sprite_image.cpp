@@ -13,7 +13,7 @@ SpriteImage::SpriteImage(PremultipliedImage&& image_,
       pixelRatio(pixelRatio_),
       sdf(sdf_) {
 
-    if (image.size() == 0) {
+    if (!image.valid()) {
         throw util::SpriteImageException("Sprite image dimensions may not be zero");
     } else if (pixelRatio <= 0) {
         throw util::SpriteImageException("Sprite pixelRatio may not be <= 0");

@@ -122,8 +122,9 @@ std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
     memcpy(img.get(), swapped.constBits(), swapped.byteCount());
 
     return std::make_unique<mbgl::SpriteImage>(
-        mbgl::PremultipliedImage{ static_cast<uint16_t>(swapped.width()),
-                                  static_cast<uint16_t>(swapped.height()), std::move(img) },
+        mbgl::PremultipliedImage(
+            { static_cast<uint32_t>(swapped.width()), static_cast<uint32_t>(swapped.height()) },
+            std::move(img)),
         1.0);
 }
 
@@ -611,7 +612,8 @@ void QMapboxGL::resize(const QSize& size, const QSize& framebufferSize)
     d_ptr->size = size;
     d_ptr->fbSize = framebufferSize;
 
-    d_ptr->mapObj->setSize({{ static_cast<uint16_t>(size.width()), static_cast<uint16_t>(size.height()) }});
+    d_ptr->mapObj->setSize(
+        { static_cast<uint32_t>(size.width()), static_cast<uint32_t>(size.height()) });
 }
 
 void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &sprite)
@@ -824,7 +826,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
         settings.cacheDatabaseMaximumSize()))
     , threadPool(4)
     , mapObj(std::make_unique<mbgl::Map>(
-        *this, std::array<uint16_t, 2>{{ static_cast<uint16_t>(size.width()), static_cast<uint16_t>(size.height()) }},
+        *this, mbgl::Size{ static_cast<uint32_t>(size.width()), static_cast<uint32_t>(size.height()) },
         pixelRatio, *fileSourceObj, threadPool,
         static_cast<mbgl::MapMode>(settings.mapMode()),
         static_cast<mbgl::GLContextMode>(settings.contextMode()),
@@ -849,33 +851,38 @@ void QMapboxGLPrivate::updateFramebufferBinding(QOpenGLFramebufferObject *fbo_)
     if (fbo) {
         getContext().bindFramebuffer.setDirty();
         getContext().viewport.setCurrentValue(
-            { 0, 0, static_cast<uint16_t>(fbo->width()), static_cast<uint16_t>(fbo->height()) });
+            { 0,
+              0,
+              { static_cast<uint32_t>(fbo->width()), static_cast<uint32_t>(fbo->height()) } });
     } else {
         getContext().bindFramebuffer.setCurrentValue(0);
-        getContext().viewport.setCurrentValue({ 0, 0, static_cast<uint16_t>(fbSize.width()),
-                                                static_cast<uint16_t>(fbSize.height()) });
+        getContext().viewport.setCurrentValue(
+            { 0,
+              0,
+              { static_cast<uint32_t>(fbSize.width()), static_cast<uint32_t>(fbSize.height()) } });
     }
 }
 
-void QMapboxGLPrivate::bind()
-{
+void QMapboxGLPrivate::bind() {
     if (fbo) {
         fbo->bind();
         getContext().bindFramebuffer.setDirty();
-        getContext().viewport = { 0, 0, static_cast<uint16_t>(fbo->width()),
-                                  static_cast<uint16_t>(fbo->height()) };
+        getContext().viewport = {
+            0, 0, { static_cast<uint32_t>(fbo->width()), static_cast<uint32_t>(fbo->height()) }
+        };
     } else {
         getContext().bindFramebuffer = 0;
-        getContext().viewport = { 0, 0, static_cast<uint16_t>(fbSize.width()),
-                                  static_cast<uint16_t>(fbSize.height()) };
+        getContext().viewport = {
+            0, 0, { static_cast<uint32_t>(fbSize.width()), static_cast<uint32_t>(fbSize.height()) }
+        };
     }
 }
 #else
-void QMapboxGLPrivate::bind()
-{
+void QMapboxGLPrivate::bind() {
     getContext().bindFramebuffer = 0;
-    getContext().viewport = { 0, 0, static_cast<uint16_t>(fbSize.width()),
-                              static_cast<uint16_t>(fbSize.height()) };
+    getContext().viewport = {
+        0, 0, { static_cast<uint32_t>(fbSize.width()), static_cast<uint32_t>(fbSize.height()) }
+    };
 }
 #endif
 

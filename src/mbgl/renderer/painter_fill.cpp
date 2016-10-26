@@ -31,8 +31,8 @@ void Painter::renderFill(PaintParameters& parameters,
     Color strokeColor = isOutlineColorDefined? properties.fillOutlineColor : fillColor;
 
     const auto viewport = context.viewport.getCurrentValue();
-    const std::array<GLfloat, 2> worldSize{ { static_cast<GLfloat>(viewport.width),
-                                              static_cast<GLfloat>(viewport.height) } };
+    const std::array<GLfloat, 2> worldSize{{ static_cast<GLfloat>(viewport.size.width),
+                                             static_cast<GLfloat>(viewport.size.height) }};
 
     bool pattern = !properties.fillPattern.value.from.empty();
     bool outline = properties.fillAntialias && !pattern && isOutlineColorDefined;

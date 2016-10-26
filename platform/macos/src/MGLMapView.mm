@@ -266,10 +266,8 @@ public:
 
     mbgl::DefaultFileSource* mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
 
-    const std::array<uint16_t, 2> size = {{ static_cast<uint16_t>(self.bounds.size.width),
-                                            static_cast<uint16_t>(self.bounds.size.height) }};
     _mbglThreadPool = new mbgl::ThreadPool(4);
-    _mbglMap = new mbgl::Map(*_mbglView, size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
+    _mbglMap = new mbgl::Map(*_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
     [self validateTileCacheSize];
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
@@ -306,6 +304,11 @@ public:
     _mbglMap->jumpTo(options);
     _pendingLatitude = NAN;
     _pendingLongitude = NAN;
+}
+
+- (mbgl::Size)size {
+    return { static_cast<uint32_t>(self.bounds.size.width),
+             static_cast<uint32_t>(self.bounds.size.height) };
 }
 
 /// Adds zoom controls to the lower-right corner.
@@ -639,8 +642,7 @@ public:
         [self validateTileCacheSize];
     }
     if (!_isTargetingInterfaceBuilder) {
-        _mbglMap->setSize({{ static_cast<uint16_t>(self.bounds.size.width),
-                             static_cast<uint16_t>(self.bounds.size.height) }});
+        _mbglMap->setSize(self.size);
     }
 }
 
@@ -2561,8 +2563,7 @@ public:
     }
 
     mbgl::gl::value::Viewport::Type getViewport() const {
-        return { 0, 0, static_cast<uint16_t>(nativeView.bounds.size.width),
-                 static_cast<uint16_t>(nativeView.bounds.size.height) };
+        return { 0, 0, nativeView.size };
     }
 
     void updateViewBinding() {
@@ -2578,9 +2579,9 @@ public:
 
     mbgl::PremultipliedImage readStillImage() {
         NSRect bounds = [nativeView convertRectToBacking:nativeView.bounds];
-        const uint16_t width = bounds.size.width;
-        const uint16_t height = bounds.size.height;
-        mbgl::PremultipliedImage image{ width, height };
+        const uint32_t width = bounds.size.width;
+        const uint32_t height = bounds.size.height;
+        mbgl::PremultipliedImage image({ width, height });
         MBGL_CHECK_ERROR(
             glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
 
