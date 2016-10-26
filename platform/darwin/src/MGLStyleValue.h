@@ -68,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLStyleConstantValue` class takes a generic parameter `T` that indicates
  the Foundation class being wrapped by this class.
  */
-@interface MGLStyleConstantValue<T> : MGLStyleValue
+@interface MGLStyleConstantValue<T> : MGLStyleValue<T>
 
 #pragma mark Creating a Style Constant Value
 
@@ -111,7 +111,7 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLStyleFunction` class takes a generic parameter `T` that indicates the
  Foundation class being wrapped by this class.
  */
-@interface MGLStyleFunction<T> : MGLStyleValue
+@interface MGLStyleFunction<T> : MGLStyleValue<T>
 
 #pragma mark Creating a Style Function
 
