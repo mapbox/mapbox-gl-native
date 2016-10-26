@@ -569,6 +569,16 @@ IB_DESIGNABLE
 - (void)addAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations;
 
 /**
+ The complete list of annotations associated with the receiver that are
+ currently visible.
+ 
+ The objects in this array must adopt the `MGLAnnotation` protocol. If no
+ annotations are associated with the map view or if no annotations associated
+ with the map view are currently visible, the value of this property is `nil`.
+ */
+@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *visibleAnnotations;
+
+/**
  Removes an annotation from the map view, deselecting it if it is selected.
  
  Removing an annotation object dissociates it from the map view entirely,

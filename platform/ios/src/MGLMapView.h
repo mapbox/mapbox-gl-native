@@ -894,7 +894,7 @@ IB_DESIGNABLE
 
 /**
  The complete list of annotations associated with the receiver that are 
- currently visible. (read-only)
+ currently visible.
  
  The objects in this array must adopt the `MGLAnnotation` protocol. If no
  annotations are associated with the map view or if no annotations associated
