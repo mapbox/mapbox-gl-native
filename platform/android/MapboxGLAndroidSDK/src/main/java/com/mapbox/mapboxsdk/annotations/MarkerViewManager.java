@@ -74,12 +74,20 @@ public class MarkerViewManager {
      * Animate a MarkerView with a given rotation.
      *
      * @param marker   the MarkerView to rotate by
-     * @param rotation the rotation by value
+     * @param rotation the rotation by value, limited to 0 - 360 degrees
      */
     public void animateRotationBy(@NonNull MarkerView marker, float rotation) {
         View convertView = markerViewMap.get(marker);
         if (convertView != null) {
-            AnimatorUtils.rotateBy(convertView, rotation);
+            convertView.animate().cancel();
+            // calculate new direction
+            float diff = rotation - convertView.getRotation();
+            if (diff > 180.0f) {
+                diff -= 360.0f;
+            } else if (diff < -180.0f) {
+                diff += 360.f;
+            }
+            AnimatorUtils.rotateBy(convertView, diff);
         }
     }
 
