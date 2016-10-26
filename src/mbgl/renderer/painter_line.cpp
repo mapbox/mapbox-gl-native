@@ -150,7 +150,7 @@ void Painter::renderLine(PaintParameters& parameters,
 		{
 			Color stroke_color = {1.0, 1.0, 1.0, opacity};
 			
-			config.program = lineShader.getID();
+			context.program = lineShader.getID();
 			
 			lineShader.u_matrix = vtxMatrix;
 			lineShader.u_linewidth = (properties.lineWidth * 3.0f) / 4.0f;
@@ -166,7 +166,7 @@ void Painter::renderLine(PaintParameters& parameters,
 			lineShader.u_opacity = opacity;
 			
 			setDepthSublayer(0);
-			bucket.drawLines(lineShader, store, paintMode());
+			bucket.drawLines(lineShader, context, paintMode());
 		}
 
         context.program = lineShader.getID();
