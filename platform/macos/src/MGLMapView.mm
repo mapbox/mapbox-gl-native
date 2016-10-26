@@ -1618,12 +1618,17 @@ public:
 
 - (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)visibleAnnotations
 {
+    return [self visibleFeaturesInRect:self.bounds];
+}
+
+- (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)visibleAnnotationsInRect:(CGRect)rect
+{
     if (_annotationContextsByAnnotationTag.empty())
     {
         return nil;
     }
     
-    std::vector<MGLAnnotationTag> annotationTags = [self annotationTagsInRect:self.bounds];
+    std::vector<MGLAnnotationTag> annotationTags = [self annotationTagsInRect:rect];
     if (annotationTags.size())
     {
         NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:annotationTags.size()];
