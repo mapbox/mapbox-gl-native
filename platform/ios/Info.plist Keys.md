@@ -14,6 +14,8 @@ As an alternative, you can use `+[MGLAccountManager setAccessToken:]` to set a t
 
 Use this key if you need to customize the API base URL used throughout the SDK. If unset, the default Mapbox API is used. 
 
+The default value is `https://api.mapbox.com`. 
+
 ## MGLMapboxMetricsEnabledSettingShownInApp
 
 If you have implemented custom opt-out of Mapbox Telemetry within the user interface of your app, use this key to disable the built-in check for opt-out support. See [this guide](https://www.mapbox.com/ios-sdk/#telemetry_opt_out) for more details.
