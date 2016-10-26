@@ -1,5 +1,6 @@
 #import "MGLRasterSource.h"
 
+#import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLTileSet_Private.h"
 #import "NSURL+MGLAdditions.h"
@@ -13,6 +14,9 @@
 @end
 
 @implementation MGLRasterSource
+{
+    std::unique_ptr<mbgl::style::RasterSource> _pendingSource;
+}
 
 - (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url tileSize:(CGFloat)tileSize
 {
@@ -52,7 +56,13 @@
                                                              uint16_t(self.tileSize));
     }
     
-    self.pendingSource = std::move(source);
+    _pendingSource = std::move(source);
+    self.rawSource = _pendingSource.get();
+}
+
+- (void)addToMapView:(MGLMapView *)mapView
+{
+    mapView.mbglMap->addSource(std::move(_pendingSource));
 }
 
 @end

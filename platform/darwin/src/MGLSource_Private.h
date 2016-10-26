@@ -3,6 +3,8 @@
 #include <mbgl/mbgl.hpp>
 #include <mbgl/style/source.hpp>
 
+@class MGLMapView;
+
 @interface MGLSource (Private)
 
 /**
@@ -15,14 +17,15 @@
 @property (nonatomic) mbgl::style::Source *rawSource;
 
 /**
- A std::unique_ptr<>, which is present only for objects that were created 
- independently (not obtained by `mbgl::Map getSource`) and have not yet
- been added via `mbgl::Map addSource`. Once a source is added, ownership of the 
- object is transferred to the `mbgl::Map` and `pendingSource` is NULL. If the
- `MGLSource` object's mbgl source is in that state, the mbgl source can still be
- changed but the changes will not be visible until the `MGLSource` is added back
- via `-[MGLStyle addSource:]` and styled with an `MGLLayer`.
+ Adds the mbgl source that this object represents to the mbgl map.
+ 
+ Once a mbgl source is added, ownership of the object is transferred to the
+ `mbgl::Map` and this object no longer has an active unique_ptr reference to the
+ `mbgl::Source`. If this object's mbgl source is in that state, the mbgl source 
+ can still be changed but the changes will not be visible until the `MGLSource` 
+ is added back to the map via `-[MGLStyle addSource:]` and styled with a 
+ `MGLLayer`.
  */
-@property (nonatomic) std::unique_ptr<mbgl::style::Source> pendingSource;
+- (void)addToMapView:(MGLMapView *)mapView;
 
 @end

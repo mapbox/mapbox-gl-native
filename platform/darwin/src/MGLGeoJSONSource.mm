@@ -1,5 +1,6 @@
 #import "MGLGeoJSONSource_Private.h"
 
+#import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLFeature_Private.h"
 
@@ -23,6 +24,9 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
 @end
 
 @implementation MGLGeoJSONSource
+{
+    std::unique_ptr<mbgl::style::GeoJSONSource> _pendingSource;
+}
 
 - (instancetype)initWithIdentifier:(NSString *)identifier geoJSONData:(NSData *)data options:(NS_DICTIONARY_OF(NSString *, id) *)options
 {
@@ -56,6 +60,11 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     return self;
 }
 
+- (void)addToMapView:(MGLMapView *)mapView
+{
+    mapView.mbglMap->addSource(std::move(_pendingSource));
+}
+
 - (void)commonInit
 {
     auto source = std::make_unique<mbgl::style::GeoJSONSource>(self.identifier.UTF8String, self.geoJSONOptions);
@@ -80,7 +89,8 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
         _features = MGLFeaturesFromMBGLFeatures(featureCollection);
     }
     
-    self.pendingSource = std::move(source);
+    _pendingSource = std::move(source);
+    self.rawSource = _pendingSource.get();
 }
 
 - (mbgl::style::GeoJSONOptions)geoJSONOptions

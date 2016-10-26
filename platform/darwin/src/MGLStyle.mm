@@ -206,11 +206,7 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)addSource:(MGLSource *)source
 {
-    // After it is added, the pending source is moved to the mbgl map and is
-    // no longer "pending". The move operation sets it to NULL. However, the
-    // MGLSource's rawSource will still point to the mbgl source and clients
-    // can mutate it via that reference.
-    self.mapView.mbglMap->addSource(source.pendingSource);
+    [source addToMapView:self.mapView];
 }
 
 - (void)removeSource:(MGLSource *)source
