@@ -13,8 +13,6 @@ import android.view.View;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -85,21 +83,33 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
         marker.setPosition(first ? LAT_LNG_CHELSEA : LAT_LNG_ARSENAL);
         marker.setIcon(iconFactory.fromResource(first ? R.drawable.ic_chelsea : R.drawable.ic_arsenal));
         marker.setTitle(first
-            ? getString(R.string.dynamic_marker_chelsea_title) : getString(R.string.dynamic_marker_arsenal_title));
+                ? getString(R.string.dynamic_marker_chelsea_title) : getString(R.string.dynamic_marker_arsenal_title));
         marker.setSnippet(first
-            ? getString(R.string.dynamic_marker_chelsea_snippet) : getString(R.string.dynamic_marker_arsenal_snippet));
+                ? getString(R.string.dynamic_marker_chelsea_snippet) : getString(R.string.dynamic_marker_arsenal_snippet));
     }
 
     @Override
-    public void onResume() {
+    protected void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+
+    @Override
+    protected void onResume() {
         super.onResume();
         mapView.onResume();
     }
 
     @Override
-    public void onPause() {
+    protected void onPause() {
         super.onPause();
         mapView.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mapView.onStop();
     }
 
     @Override

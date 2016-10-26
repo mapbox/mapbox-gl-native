@@ -123,20 +123,32 @@ public class InfoWindowActivity extends AppCompatActivity
         customMarker = mapboxMap.addMarker(new MarkerOptions()
                 .title("Custom Marker")
                 .snippet(new DecimalFormat("#.#####").format(point.getLatitude()) + ", "
-                    + new DecimalFormat("#.#####").format(point.getLongitude()))
+                        + new DecimalFormat("#.#####").format(point.getLongitude()))
                 .position(point));
     }
 
     @Override
-    public void onResume() {
+    protected void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+
+    @Override
+    protected void onResume() {
         super.onResume();
         mapView.onResume();
     }
 
     @Override
-    public void onPause() {
+    protected void onPause() {
         super.onPause();
         mapView.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mapView.onStop();
     }
 
     @Override
