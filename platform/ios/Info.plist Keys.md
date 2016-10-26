@@ -1,6 +1,6 @@
 # Info.plist Keys
 
-The SDK supports several custom `Info.plist` keys in your application in order to configure various settings. 
+The Mapbox iOS SDK supports custom `Info.plist` keys in your application in order to configure various settings. 
 
 ## MGLMapboxAccessToken
 
