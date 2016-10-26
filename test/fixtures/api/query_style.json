@@ -1,0 +1,61 @@
+{
+  "version": 8,
+  "sources": {
+    "source1": {
+      "type": "geojson",
+      "data": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      }
+    },
+    "source2": {
+      "type": "geojson",
+      "data": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      }
+    },
+    "source3": {
+      "type": "geojson",
+      "data": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "layers": [
+    {
+      "id": "layer1",
+      "type": "symbol",
+      "source": "source1",
+      "layout": {
+        "icon-image": "test-icon"
+      }
+    },
+    {
+      "id": "layer2",
+      "type": "symbol",
+      "source": "source2",
+      "layout": {
+        "icon-image": "test-icon"
+      }
+    },
+    {
+      "id": "layer3",
+      "type": "symbol",
+      "source": "source3",
+      "layout": {
+        "icon-image": "test-icon"
+      }
+    }
+  ]
+}

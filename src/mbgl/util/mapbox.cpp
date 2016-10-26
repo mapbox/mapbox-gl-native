@@ -5,16 +5,21 @@
 #include <stdexcept>
 #include <vector>
 #include <iostream>
+#include <regex>
+
+namespace {
+
+const char* protocol = "mapbox://";
+const std::size_t protocolLength = 9;
+
+} // namespace
 
 namespace mbgl {
 namespace util {
 namespace mapbox {
 
-const std::string protocol = "mapbox://";
-const std::size_t protocolLength = protocol.length();
-
 bool isMapboxURL(const std::string& url) {
-    return std::equal(protocol.begin(), protocol.end(), url.begin());
+    return url.compare(0, protocolLength, protocol) == 0;
 }
 
 static std::vector<std::string> getMapboxURLPathname(const std::string& url) {
@@ -187,6 +192,16 @@ std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_
     }
 
     result += "." + extension;
+    
+    // get the query and remove access_token, if more parameters exist, add them to the final result
+    if (queryIdx != url.length()) {
+        const auto query = url.substr(queryIdx + 1);
+        std::regex re ("&?access_token=([^&]*)");
+        std::string replace = std::regex_replace(query, re, "");
+        std::string subQuery = (replace.find("&") == 0) ? replace.substr(1, replace.length()) : replace;
+        if (subQuery.length() > 0) result += "?" + subQuery;
+    }
+
     return result;
 }
 

@@ -3,11 +3,9 @@ package com.mapbox.mapboxsdk.camera;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.FloatRange;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.constants.MathConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
@@ -125,22 +123,12 @@ public final class CameraPosition implements Parcelable {
         private LatLng target = null;
         private double tilt = -1;
         private double zoom = -1;
-        private boolean isRadian;
 
         /**
          * Creates an empty builder.
          */
         public Builder() {
             super();
-        }
-
-        /**
-         * Creates a builder for building CameraPosition objects using radians.
-         *
-         * @param isRadian true if heading is in radians
-         */
-        public Builder(boolean isRadian) {
-            this.isRadian = isRadian;
         }
 
         /**
@@ -183,10 +171,10 @@ public final class CameraPosition implements Parcelable {
         public Builder(CameraUpdateFactory.CameraPositionUpdate update) {
             super();
             if (update != null) {
-                this.bearing = update.getBearing();
-                this.target = update.getTarget();
-                this.tilt = update.getTilt();
-                this.zoom = update.getZoom();
+                bearing = update.getBearing();
+                target = update.getTarget();
+                tilt = update.getTilt();
+                zoom = update.getZoom();
             }
         }
 
@@ -203,17 +191,20 @@ public final class CameraPosition implements Parcelable {
         }
 
         /**
-         * Create Builder from an exisiting array of doubles.
+         * Create Builder from an existing array of doubles.
+         * <p>
+         * These values conform to map.ccp representation of a camera position.
+         * </p>
          *
-         * @param values Values containing target, bearing, tilt and zoom
+         * @param nativeCameraValues Values containing target, bearing, tilt and zoom
          */
-        public Builder(double[] values) {
+        public Builder(double[] nativeCameraValues) {
             super();
-            if (values != null && values.length == 5) {
-                this.target = new LatLng(values[0], values[1]);
-                this.bearing = (float) values[2];
-                this.tilt = (float) values[3];
-                this.zoom = (float) values[4];
+            if (nativeCameraValues != null && nativeCameraValues.length == 5) {
+                target(new LatLng(nativeCameraValues[0], nativeCameraValues[1]));
+                bearing(nativeCameraValues[2]);
+                tilt(nativeCameraValues[3]);
+                zoom((float) nativeCameraValues[4]);
             }
         }
 
@@ -224,12 +215,16 @@ public final class CameraPosition implements Parcelable {
          * @return Builder
          */
         public Builder bearing(double bearing) {
-            if (isRadian) {
-                this.bearing = bearing;
-            } else {
-                // converting degrees to radians
-                this.bearing = (float) (-bearing * MathConstants.DEG2RAD);
+            double direction = bearing;
+
+            while (direction >= 360) {
+                direction -= 360;
             }
+            while (direction < 0) {
+                direction += 360;
+            }
+
+            this.bearing = direction;
             return this;
         }
 
@@ -254,19 +249,16 @@ public final class CameraPosition implements Parcelable {
         }
 
         /**
-         * Set the tilt
+         * Set the tilt in degrees
+         * <p>
+         * value is clamped to 0 and 60.
+         * <p/>
          *
          * @param tilt Tilt value
          * @return Builder
          */
-        @FloatRange(from = 0.0, to = 60.0)
         public Builder tilt(double tilt) {
-            if (isRadian) {
-                this.tilt = tilt;
-            } else {
-                // converting degrees to radians
-                this.tilt = (float) (MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT) * MathConstants.DEG2RAD);
-            }
+            this.tilt = (float) MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT);
             return this;
         }
 

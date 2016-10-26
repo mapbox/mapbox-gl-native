@@ -87,7 +87,7 @@ float LineLayer::Impl::getQueryRadius() const {
 }
 
 bool LineLayer::Impl::queryIntersectsGeometry(
-        const GeometryCollection& queryGeometry,
+        const GeometryCoordinates& queryGeometry,
         const GeometryCollection& geometry,
         const float bearing,
         const float pixelsToTileUnits) const {
@@ -98,7 +98,7 @@ bool LineLayer::Impl::queryIntersectsGeometry(
             queryGeometry, paint.lineTranslate, paint.lineTranslateAnchor, bearing, pixelsToTileUnits);
     auto offsetGeometry = offsetLine(geometry, paint.lineOffset * pixelsToTileUnits);
 
-    return util::multiPolygonIntersectsBufferedMultiLine(
+    return util::polygonIntersectsBufferedMultiLine(
             translatedQueryGeometry.value_or(queryGeometry),
             offsetGeometry.value_or(geometry),
             halfWidth);

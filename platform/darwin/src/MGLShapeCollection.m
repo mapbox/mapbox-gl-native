@@ -18,4 +18,18 @@
     return _shapes.firstObject.coordinate;
 }
 
+- (NSDictionary *)geoJSONDictionary {
+    return @{@"type": @"GeometryCollection",
+             @"geometries": [self geometryCollection]};
+}
+
+- (NSArray *)geometryCollection {
+    NSMutableArray *geometries = [[NSMutableArray alloc] initWithCapacity:self.shapes.count];
+    for (id shape in self.shapes) {
+        NSDictionary *geometry = [shape geoJSONDictionary];
+        [geometries addObject:geometry];
+    }
+    return [geometries copy];
+}
+
 @end

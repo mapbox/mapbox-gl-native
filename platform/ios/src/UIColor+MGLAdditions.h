@@ -5,10 +5,10 @@
 
 @interface UIColor (MGLAdditions)
 
-- (mbgl::Color)mbgl_color;
+- (mbgl::Color)mgl_color;
 
-- (mbgl::style::PropertyValue<mbgl::Color>)mbgl_colorPropertyValue;
+- (mbgl::style::PropertyValue<mbgl::Color>)mgl_colorPropertyValue;
 
-+ (UIColor *)mbgl_colorWithColor:(mbgl::Color)color;
++ (UIColor *)mgl_colorWithColor:(mbgl::Color)color;
 
 @end

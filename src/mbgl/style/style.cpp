@@ -13,6 +13,7 @@
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/parser.hpp>
+#include <mbgl/style/query_parameters.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/class_dictionary.hpp>
 #include <mbgl/style/update_parameters.hpp>
@@ -393,10 +394,23 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
 }
 
 std::vector<Feature> Style::queryRenderedFeatures(const QueryParameters& parameters) const {
+    std::unordered_set<std::string> sourceFilter;
+
+    if (parameters.layerIDs) {
+        for (const auto& layerID : *parameters.layerIDs) {
+            auto layer = getLayer(layerID);
+            if (layer) sourceFilter.emplace(layer->baseImpl->source);
+        }
+    }
+
     std::vector<Feature> result;
     std::unordered_map<std::string, std::vector<Feature>> resultsByLayer;
 
     for (const auto& source : sources) {
+        if (!sourceFilter.empty() && sourceFilter.find(source->getID()) == sourceFilter.end()) {
+            continue;
+        }
+
         auto sourceResults = source->baseImpl->queryRenderedFeatures(parameters);
         std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
     }
@@ -465,12 +479,23 @@ void Style::onSourceLoaded(Source& source) {
     observer->onUpdate(Update::Repaint);
 }
 
+void Style::onSourceAttributionChanged(Source& source, const std::string& attribution) {
+    observer->onSourceAttributionChanged(source, attribution);
+}
+
 void Style::onSourceError(Source& source, std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load source %s: %s",
                source.getID().c_str(), util::toString(error).c_str());
     observer->onSourceError(source, error);
     observer->onResourceError(error);
+}
+
+void Style::onSourceDescriptionChanged(Source& source) {
+    observer->onSourceDescriptionChanged(source);
+    if (!source.baseImpl->loaded) {
+        source.baseImpl->loadDescription(fileSource);
+    }
 }
 
 void Style::onTileChanged(Source& source, const OverscaledTileID& tileID) {
@@ -520,7 +545,7 @@ void Style::onLayerFilterChanged(Layer& layer) {
 
 void Style::onLayerVisibilityChanged(Layer& layer) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
-    observer->onUpdate(Update::Layout);
+    observer->onUpdate(Update::RecalculateStyle | Update::Layout);
 }
 
 void Style::onLayerPaintPropertyChanged(Layer&) {

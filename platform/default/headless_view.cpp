@@ -40,19 +40,21 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height) {
     needsResize = true;
 }
 
-PremultipliedImage HeadlessView::readStillImage() {
+PremultipliedImage HeadlessView::readStillImage(std::array<uint16_t, 2> size) {
     assert(active);
 
-    const unsigned int w = dimensions[0] * pixelRatio;
-    const unsigned int h = dimensions[1] * pixelRatio;
+    if (!size[0] || !size[1]) {
+        size[0] = dimensions[0] * pixelRatio;
+        size[1] = dimensions[1] * pixelRatio;
+    }
 
-    PremultipliedImage image { w, h };
-    MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
+    PremultipliedImage image { size[0], size[1] };
+    MBGL_CHECK_ERROR(glReadPixels(0, 0, size[0], size[1], GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
 
     const auto stride = image.stride();
     auto tmp = std::make_unique<uint8_t[]>(stride);
     uint8_t* rgba = image.data.get();
-    for (int i = 0, j = h - 1; i < j; i++, j--) {
+    for (int i = 0, j = size[1] - 1; i < j; i++, j--) {
         std::memcpy(tmp.get(), rgba + i * stride, stride);
         std::memcpy(rgba + i * stride, rgba + j * stride, stride);
         std::memcpy(rgba + j * stride, tmp.get(), stride);

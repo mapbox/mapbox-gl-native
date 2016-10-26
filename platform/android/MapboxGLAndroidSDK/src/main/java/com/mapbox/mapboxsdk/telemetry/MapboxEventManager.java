@@ -65,6 +65,7 @@ public class MapboxEventManager {
     private static MapboxEventManager mapboxEventManager = null;
 
     private boolean initialized = false;
+    private boolean stagingEnv;
     private boolean telemetryEnabled;
 
     private final Vector<Hashtable<String, Object>> events = new Vector<>();
@@ -176,24 +177,16 @@ public class MapboxEventManager {
                 stagingAccessToken = prefs.getString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_ACCESS_TOKEN, null);
             }
 
-            if (!TextUtils.isEmpty(stagingURL)) {
+            if (!TextUtils.isEmpty(stagingURL) && !TextUtils.isEmpty(stagingAccessToken)) {
                 eventsURL = stagingURL;
+                this.accessToken = accessToken;
+                stagingEnv = true;
             }
-
-            if (!TextUtils.isEmpty(stagingAccessToken)) {
-                this.accessToken = stagingAccessToken;
-            }
-
-            String appName = context.getPackageManager().getApplicationLabel(appInfo).toString();
-            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            String versionName = packageInfo.versionName;
-            int versionCode = packageInfo.versionCode;
 
             // Build User Agent
-            if (TextUtils.equals(userAgent, BuildConfig.MAPBOX_EVENTS_USER_AGENT_BASE) && !TextUtils.isEmpty(appName) && !TextUtils.isEmpty(versionName)) {
-                userAgent = appName + "/" + versionName + "/" + versionCode + " " + userAgent;
-                // Ensure that only ASCII characters are sent
-                userAgent = Util.toHumanReadableAscii(userAgent);
+            String appIdentifier = getApplicationIdentifier();
+            if (TextUtils.equals(userAgent, BuildConfig.MAPBOX_EVENTS_USER_AGENT_BASE) && !TextUtils.isEmpty(appIdentifier)) {
+                userAgent = Util.toHumanReadableAscii(String.format(MapboxConstants.MAPBOX_LOCALE, "%s %s", appIdentifier, userAgent));
             }
 
         } catch (Exception e) {
@@ -655,6 +648,8 @@ public class MapboxEventManager {
                 return null;
             }
 
+            Response response = null;
+
             try {
                 // Send data
                 // =========
@@ -734,42 +729,48 @@ public class MapboxEventManager {
                 }
 
                 // Based on http://square.github.io/okhttp/3.x/okhttp/okhttp3/CertificatePinner.html
-                CertificatePinner certificatePinner = new CertificatePinner.Builder()
-                        // Staging - Geotrust
-                        .add("cloudfront-staging.tilestream.net", "sha256/kR9ysyN/lzBl/ecearDERV7qO7xqSN4jt6XuQjIVL0I=")
-                        .add("cloudfront-staging.tilestream.net", "sha256/sPbNCVpVasMJxps3IqFfLTRKkVnRCLrTlZVc5kspqlkw=")
-                        .add("cloudfront-staging.tilestream.net", "sha256/h6801m+z8v3zbgkRHpq6L29Esgfzhj89C1SyUCOQmqU=")
-                        // Prod - Geotrust
-                        .add("events.mapbox.com", "sha256/BhynraKizavqoC5U26qgYuxLZst6pCu9J5stfL6RSYY=")
-                        .add("events.mapbox.com", "sha256/owrR9U9FWDWtrFF+myoRIu75JwU4sJwzvhCNLZoY37g=")
-                        .add("events.mapbox.com", "sha256/SQVGZiOrQXi+kqxcvWWE96HhfydlLVqFr4lQTqI5qqo=")
-                        // Prod - DigiCert
-                        .add("events.mapbox.com", "sha256/Tb0uHZ/KQjWh8N9+CZFLc4zx36LONQ55l6laDi1qtT4=")
-                        .add("events.mapbox.com", "sha256/RRM1dGqnDFsCJXBTHky16vi1obOlCgFFn/yOhI/y+ho=")
-                        .add("events.mapbox.com", "sha256/WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=")
-                        .build();
+                CertificatePinner.Builder certificatePinnerBuilder = new CertificatePinner.Builder();
+                if(stagingEnv){
+                    // Staging - Geotrust
+                    certificatePinnerBuilder
+                            .add("cloudfront-staging.tilestream.net", "sha256/3euxrJOrEZI15R4104UsiAkDqe007EPyZ6eTL/XxdAY=")
+                            .add("cloudfront-staging.tilestream.net", "sha256/5kJvNEMw0KjrCAu7eXY5HZdvyCS13BbA0VJG1RSP91w=")
+                            .add("cloudfront-staging.tilestream.net", "sha256/r/mIkG3eEpVdm+u/ko/cwxzOMo1bk4TyHIlByibiA5E=");
+                }else{
+                    certificatePinnerBuilder
+                            // Prod - Geotrust
+                            .add("events.mapbox.com", "sha256/BhynraKizavqoC5U26qgYuxLZst6pCu9J5stfL6RSYY=")
+                            .add("events.mapbox.com", "sha256/owrR9U9FWDWtrFF+myoRIu75JwU4sJwzvhCNLZoY37g=")
+                            .add("events.mapbox.com", "sha256/SQVGZiOrQXi+kqxcvWWE96HhfydlLVqFr4lQTqI5qqo=")
+                            // Prod - DigiCert
+                            .add("events.mapbox.com", "sha256/Tb0uHZ/KQjWh8N9+CZFLc4zx36LONQ55l6laDi1qtT4=")
+                            .add("events.mapbox.com", "sha256/RRM1dGqnDFsCJXBTHky16vi1obOlCgFFn/yOhI/y+ho=")
+                            .add("events.mapbox.com", "sha256/WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=");
+                }
 
                 OkHttpClient client = new OkHttpClient.Builder()
-                        .certificatePinner(certificatePinner)
+                        .certificatePinner(certificatePinnerBuilder.build())
                         .addInterceptor(new GzipRequestInterceptor())
                         .build();
                 RequestBody body = RequestBody.create(JSON, jsonArray.toString());
 
                 String url = eventsURL + "/events/v2?access_token=" + accessToken;
-//                Log.d(TAG, "Events URL = " + url);
 
                 Request request = new Request.Builder()
                         .url(url)
                         .header("User-Agent", userAgent)
                         .post(body)
                         .build();
-                Response response = client.newCall(request).execute();
+                response = client.newCall(request).execute();
                 Log.d(TAG, "response code = " + response.code() + " for events " + events.size());
 
             } catch (Exception e) {
                 Log.e(TAG, "FlushTheEventsTask borked: " + e);
                 e.printStackTrace();
             } finally {
+                if (response != null && response.body() != null) {
+                    response.body().close();
+                }
                 // Reset Events
                 // ============
                 events.removeAllElements();
@@ -792,6 +793,15 @@ public class MapboxEventManager {
         @Override
         public void run() {
             new FlushTheEventsTask().execute();
+        }
+    }
+
+    private String getApplicationIdentifier() {
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return String.format(MapboxConstants.MAPBOX_LOCALE, "%s/%s/%s", context.getPackageName(), packageInfo.versionName, packageInfo.versionCode);
+        } catch (Exception e) {
+            return "";
         }
     }
 }

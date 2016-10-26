@@ -9,12 +9,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Representation of <a href="https://www.mapbox.com/mapbox-gl-style-spec/#types-function">Function</a> in the Mapbox style specification
+ * Functions are used to change properties in relation to the state of the map.
+ * <p>
+ * Currently, only zoom functions are supported.
+ * </p>
  *
  * @param <T> the target property's value type. Make sure it matches.
+ * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#types-function">The online documentation</a>
  */
 public class Function<T> {
 
+    /**
+     * A stop represents a certain point in the range of this function
+     *
+     * @param <I> input
+     * @param <O> output
+     */
     public static class Stop<I, O> {
         public final I in;
         public final O out;
@@ -24,6 +34,9 @@ public class Function<T> {
             this.out = out;
         }
 
+        /**
+         * @return an array representation of the Stop
+         */
         Object[] toValueObject() {
             return new Object[]{in, out};
         }
@@ -34,11 +47,31 @@ public class Function<T> {
         }
     }
 
+    /**
+     * Zoom functions allow the appearance of a map feature to change with map’s zoom.
+     * Zoom functions can be used to create the illusion of depth and control data density.
+     * Each stop is an array with two elements, the first is a zoom and the second is a function output value.
+     *
+     * @param stops the stops that define the function
+     * @param <T>   the property type
+     * @return the {@link Function}
+     */
     @SafeVarargs
     public static <T> Function<T> zoom(@NonNull @Size(min = 1) Stop<Float, T>... stops) {
         return new Function<T>(stops);
     }
 
+
+    /**
+     * Zoom functions allow the appearance of a map feature to change with map’s zoom.
+     * Zoom functions can be used to create the illusion of depth and control data density.
+     * Each stop is an array with two elements, the first is a zoom and the second is a function output value.
+     *
+     * @param stops the stops that define the function
+     * @param base  the exponential base of the interpolation curve - Default 1
+     * @param <T>   the property type
+     * @return the {@link Function}
+     */
     @SafeVarargs
     public static <T> Function<T> zoom(
             @FloatRange(from = 0, to = 1, fromInclusive = false, toInclusive = false) float base,
@@ -47,6 +80,14 @@ public class Function<T> {
                 .withBase(base);
     }
 
+    /**
+     * Creates a stop to use in a {@link Function}
+     *
+     * @param in     the input for the stop
+     * @param output the output for the stop
+     * @param <T>    the output property type
+     * @return the {@link Stop}
+     */
     public static <T> Stop<Float, T> stop(float in, Property<T> output) {
         return new Stop<>(in, output.value);
     }
@@ -63,11 +104,17 @@ public class Function<T> {
         return this;
     }
 
+    /**
+     * @return the base
+     */
     @Nullable
     public Float getBase() {
         return base;
     }
 
+    /**
+     * @return the stops in this function
+     */
     public Stop<Float, T>[] getStops() {
         return stops;
     }

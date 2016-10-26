@@ -45,7 +45,6 @@ public class TrackingSettings {
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
         this.myLocationTrackingMode = myLocationTrackingMode;
         mapView.setMyLocationTrackingMode(myLocationTrackingMode);
-        validateGesturesForLocationTrackingMode();
     }
 
     /**
@@ -80,7 +79,6 @@ public class TrackingSettings {
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
         this.myBearingTrackingMode = myBearingTrackingMode;
         mapView.setMyBearingTrackingMode(myBearingTrackingMode);
-        validateGesturesForBearingTrackingMode();
     }
 
     /**
@@ -135,7 +133,6 @@ public class TrackingSettings {
     public void setDismissAllTrackingOnGesture(boolean dismissTrackingOnGesture) {
         dismissLocationTrackingOnGesture = dismissTrackingOnGesture;
         dismissBearingTrackingOnGesture = dismissTrackingOnGesture;
-        validateAllGesturesForTrackingModes();
     }
 
     /**
@@ -145,7 +142,6 @@ public class TrackingSettings {
      */
     public void setDismissLocationTrackingOnGesture(boolean dismissLocationTrackingOnGesture) {
         this.dismissLocationTrackingOnGesture = dismissLocationTrackingOnGesture;
-        validateGesturesForLocationTrackingMode();
     }
 
     /**
@@ -164,7 +160,6 @@ public class TrackingSettings {
      */
     public void setDismissBearingTrackingOnGesture(boolean dismissBearingTrackingOnGesture) {
         this.dismissBearingTrackingOnGesture = dismissBearingTrackingOnGesture;
-        validateGesturesForBearingTrackingMode();
     }
 
     /**
@@ -186,42 +181,34 @@ public class TrackingSettings {
     }
 
     /**
-     * Retyrns uf bearing tracking is disabled
+     * Returns if bearing tracking disabled
      *
-     * @return True if bearing tracking will be disabled.
+     * @return True if bearing tracking is disabled.
      */
     public boolean isBearingTrackingDisabled() {
         return myBearingTrackingMode == MyBearingTracking.NONE;
     }
 
-    private void validateAllGesturesForTrackingModes() {
-        validateGesturesForBearingTrackingMode();
-        validateGesturesForLocationTrackingMode();
+    /**
+     * Returns if rotate gesture are currently enabled.
+     *
+     * @return True if rotate gestures are currently enabled.
+     */
+    public boolean isRotateGestureCurrentlyEnabled() {
+        // rotate gestures are recognised if:
+        //    The user settings are enabled AND;
+        //    EITHER bearing tracking is dismissed on gesture OR there is no bearing tracking
+        return uiSettings.isRotateGesturesEnabled() &&
+                (dismissBearingTrackingOnGesture || myBearingTrackingMode == MyBearingTracking.NONE);
     }
 
-    private void validateGesturesForLocationTrackingMode() {
-        int myLocationTrackingMode = getMyLocationTrackingMode();
-        if (!dismissLocationTrackingOnGesture) {
-            if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-                uiSettings.setScrollGesturesEnabled(true);
-            } else {
-                uiSettings.setScrollGesturesEnabled(false);
-            }
-        } else {
-            uiSettings.setScrollGesturesEnabled(true);
-        }
-    }
-
-    private void validateGesturesForBearingTrackingMode() {
-        int myBearingTrackingMode = getMyBearingTrackingMode();
-        if (!dismissBearingTrackingOnGesture) {
-            if (myBearingTrackingMode == MyBearingTracking.NONE || myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-                uiSettings.setRotateGesturesEnabled(true);
-            } else {
-                uiSettings.setRotateGesturesEnabled(false);
-            }
-        } else {
-            uiSettings.setRotateGesturesEnabled(true);
-        }
+    /**
+     * Returns if scroll gesture are currently enabled.
+     *
+     * @return True if scroll gestures are currently enabled.
+     */
+    public boolean isScrollGestureCurrentlyEnabled() {
+        return uiSettings.isScrollGesturesEnabled() &&
+                (dismissLocationTrackingOnGesture || myLocationTrackingMode == MyLocationTracking.TRACKING_NONE);
     }
 }

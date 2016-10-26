@@ -7,10 +7,6 @@
 
 @implementation MGLNSDataAdditionsTests
 
-- (void)setUp {
-    [super setUp];
-}
-
 - (void)testCompressDecompress
 {
     NSArray *originalArray = [self mockDataWithCount:180];

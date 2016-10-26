@@ -40,7 +40,7 @@ float CircleLayer::Impl::getQueryRadius() const {
 }
 
 bool CircleLayer::Impl::queryIntersectsGeometry(
-        const GeometryCollection& queryGeometry,
+        const GeometryCoordinates& queryGeometry,
         const GeometryCollection& geometry,
         const float bearing,
         const float pixelsToTileUnits) const {
@@ -50,7 +50,7 @@ bool CircleLayer::Impl::queryIntersectsGeometry(
 
     auto circleRadius = paint.circleRadius * pixelsToTileUnits;
 
-    return util::multiPolygonIntersectsBufferedMultiPoint(
+    return util::polygonIntersectsBufferedMultiPoint(
             translatedQueryGeometry.value_or(queryGeometry), geometry, circleRadius);
 }
 

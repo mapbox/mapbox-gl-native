@@ -69,7 +69,7 @@ inline optional<bool> toBool(const QVariant& value) {
 }
 
 inline optional<float> toNumber(const QVariant& value) {
-    if (value.type() == QVariant::Double) {
+    if (value.type() == QVariant::Int || value.type() == QVariant::Double) {
         return value.toFloat();
     } else {
         return {};

@@ -1,5 +1,7 @@
+#ifndef NDEBUG
 #include <mbgl/gl/debugging.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/extension.hpp>
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
 
@@ -188,3 +190,5 @@ group::~group() {
 } // namespace debugging
 } // namespace gl
 } // namespace mbgl
+
+#endif

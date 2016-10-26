@@ -13,8 +13,10 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -29,8 +31,7 @@ import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.other.OfflineDownloadRegionDialog;
 import com.mapbox.mapboxsdk.testapp.model.other.OfflineListRegionsDialog;
-
-import org.json.JSONObject;
+import com.mapbox.mapboxsdk.testapp.utils.OfflineUtils;
 
 import java.util.ArrayList;
 
@@ -73,6 +74,13 @@ public class OfflineActivity extends AppCompatActivity
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
+
+        // You can use MapboxAccountManager.setConnected(Boolean) to manually set the connectivity
+        // state of your app. This will override any checks performed via the ConnectivityManager.
+        //MapboxAccountManager.getInstance().setConnected(false);
+        Boolean connected = MapboxAccountManager.getInstance().isConnected();
+        Log.d(LOG_TAG, String.format(MapboxConstants.MAPBOX_LOCALE,
+                "MapboxAccountManager is connected: %b", connected));
 
         // Set up map
         mapView = (MapView) findViewById(R.id.mapView);
@@ -188,7 +196,7 @@ public class OfflineActivity extends AppCompatActivity
                 // Get regions info
                 ArrayList<String> offlineRegionsNames = new ArrayList<>();
                 for (OfflineRegion offlineRegion : offlineRegions) {
-                    offlineRegionsNames.add(getRegionName(offlineRegion));
+                    offlineRegionsNames.add(OfflineUtils.convertRegionName(offlineRegion.getMetadata()));
                 }
 
                 // Create args
@@ -204,22 +212,6 @@ public class OfflineActivity extends AppCompatActivity
             @Override
             public void onError(String error) {
                 Log.e(LOG_TAG, "Error: " + error);
-            }
-
-            private String getRegionName(OfflineRegion offlineRegion) {
-                String regionName;
-
-                try {
-                    byte[] metadata = offlineRegion.getMetadata();
-                    String json = new String(metadata, JSON_CHARSET);
-                    JSONObject jsonObject = new JSONObject(json);
-                    regionName = jsonObject.getString(JSON_FIELD_REGION_NAME);
-                } catch (Exception exception) {
-                    Log.e(LOG_TAG, "Failed to decode metadata: " + exception.getMessage());
-                    regionName = "Region " + offlineRegion.getID();
-                }
-
-                return regionName;
             }
         });
     }
@@ -249,16 +241,7 @@ public class OfflineActivity extends AppCompatActivity
                 styleUrl, bounds, minZoom, maxZoom, pixelRatio);
 
         // Sample way of encoding metadata from a JSONObject
-        byte[] metadata;
-        try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put(JSON_FIELD_REGION_NAME, regionName);
-            String json = jsonObject.toString();
-            metadata = json.getBytes(JSON_CHARSET);
-        } catch (Exception exception) {
-            Log.e(LOG_TAG, "Failed to encode metadata: " + exception.getMessage());
-            metadata = null;
-        }
+        byte[] metadata =  OfflineUtils.convertRegionName(regionName);
 
         // Create region
         offlineManager.createOfflineRegion(definition, metadata, new OfflineManager.CreateOfflineRegionCallback() {

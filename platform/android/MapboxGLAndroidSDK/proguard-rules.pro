@@ -1,7 +1,7 @@
 # By default, the flags in this file are appended to flags specified
 # in ../sdk/tools/proguard/proguard-android.txt,
 # contents of this file will be appended into proguard-android.txt
--keepattributes Signature, *Annotation*
+-keepattributes Signature, *Annotation*, EnclosingMethod
 
 # Square okio, ignoring warnings,
 # see https://github.com/square/okio/issues/60
@@ -10,7 +10,7 @@
 # Gesture package
 -keep class almeros.android.multitouch.gesturedetectors.** { *; }
 
-# Package: annotations
+# Package annotations
 -keep class com.mapbox.mapboxsdk.annotations.** { *; }
 
 # Package camera
@@ -24,6 +24,9 @@
 
 # Package maps
 -keep class com.mapbox.mapboxsdk.maps.** { *; }
+
+# Package net
+-keep class com.mapbox.mapboxsdk.net.** { *; }
 
 # Package offline
 -keep class com.mapbox.mapboxsdk.offline.** { *; }

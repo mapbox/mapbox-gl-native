@@ -494,21 +494,20 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 - (IBAction)manipulateStyle:(id)sender {
     MGLFillStyleLayer *fillStyleLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
     
-    MGLStyleAttributeFunction *colorFunction = [[MGLStyleAttributeFunction alloc] init];
-    colorFunction.stops = @{
-        @0.0: [NSColor redColor],
-        @10.0: [NSColor yellowColor],
-        @20.0: [NSColor blackColor],
-    };
+    MGLStyleValue *colorFunction = [MGLStyleValue<NSColor *> valueWithStops:@{
+        @0.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor redColor]],
+        @10.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor yellowColor]],
+        @20.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor blackColor]],
+    }];
     fillStyleLayer.fillColor = colorFunction;
     
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"ams" URL:geoJSONURL options:nil];
     [self.mapView.style addSource:source];
     
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" source:source];
-    fillLayer.fillColor = [NSColor greenColor];
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"test" source:source];
+    fillLayer.fillColor = [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor greenColor]];
     fillLayer.predicate = [NSPredicate predicateWithFormat:@"%K == %@", @"type", @"park"];
     [self.mapView.style addLayer:fillLayer];
 }
@@ -826,8 +825,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
 }
 
-- (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation {
-    return 0.8;
+- (NSColor *)mapView:(MGLMapView *)mapView fillColorForPolygonAnnotation:(MGLPolygon *)annotation {
+    NSColor *color = [[NSColor selectedMenuItemColor] colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+    return [color colorWithAlphaComponent:0.8];
 }
 
 @end

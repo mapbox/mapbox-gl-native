@@ -9,7 +9,9 @@ import android.support.annotation.NonNull;
 import static com.mapbox.mapboxsdk.utils.ColorUtils.*;
 
 /**
- * Line Layer
+ * A stroked line.
+ *
+ * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layers-line">The online documentation</a>
  */
 public class LineLayer extends Layer {
 
@@ -34,7 +36,7 @@ public class LineLayer extends Layer {
 
     protected native void initialize(String layerId, String sourceId);
 
-   /**
+    /**
      * Set the source layer.
      *
      * @param sourceLayer the source layer to set

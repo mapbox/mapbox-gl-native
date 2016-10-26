@@ -9,7 +9,9 @@ import android.support.annotation.NonNull;
 import static com.mapbox.mapboxsdk.utils.ColorUtils.*;
 
 /**
- * Circle Layer
+ * A filled circle.
+ *
+ * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layers-circle">The online documentation</a>
  */
 public class CircleLayer extends Layer {
 
@@ -34,7 +36,7 @@ public class CircleLayer extends Layer {
 
     protected native void initialize(String layerId, String sourceId);
 
-   /**
+    /**
      * Set the source layer.
      *
      * @param sourceLayer the source layer to set
@@ -132,7 +134,7 @@ public class CircleLayer extends Layer {
         return (PropertyValue<String>) new PropertyValue(nativeGetCircleColor());
     }
      /**
-     * The color of the circle.
+     * The fill color of the circle.
      *
      * @return int representation of a rgba string color
      * @throws RuntimeException thrown if property isn't a value

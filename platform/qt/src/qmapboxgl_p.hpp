@@ -1,11 +1,13 @@
 #pragma once
 
+#include "qmapboxgl.hpp"
+
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
+#include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/geo.hpp>
 
-#include <QMapboxGL>
 #include <QObject>
 #include <QSize>
 
@@ -33,6 +35,7 @@ public:
     QMapboxGL *q_ptr { nullptr };
 
     std::unique_ptr<mbgl::DefaultFileSource> fileSourceObj;
+    mbgl::ThreadPool threadPool;
     std::unique_ptr<mbgl::Map> mapObj;
 
     bool dirty { false };
@@ -42,5 +45,5 @@ public slots:
 
 signals:
     void needsRendering();
-    void mapChanged(QMapboxGL::MapChange);
+    void mapChanged(QMapbox::MapChange);
 };

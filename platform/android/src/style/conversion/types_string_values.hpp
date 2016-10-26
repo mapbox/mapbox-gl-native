@@ -81,6 +81,9 @@ namespace conversion {
           case mbgl::style::AlignmentType::Viewport:
             return "viewport";
             break;
+          case mbgl::style::AlignmentType::Auto:
+            return "auto";
+            break;
           default:
             throw std::runtime_error("Not implemented");
         }
@@ -92,14 +95,14 @@ namespace conversion {
           case mbgl::style::IconTextFitType::None:
             return "none";
             break;
-          case mbgl::style::IconTextFitType::Both:
-            return "both";
-            break;
           case mbgl::style::IconTextFitType::Width:
             return "width";
             break;
           case mbgl::style::IconTextFitType::Height:
             return "height";
+            break;
+          case mbgl::style::IconTextFitType::Both:
+            return "both";
             break;
           default:
             throw std::runtime_error("Not implemented");

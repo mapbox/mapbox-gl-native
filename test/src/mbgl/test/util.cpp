@@ -121,8 +121,22 @@ void checkImage(const std::string& base,
     }
 #endif
 
-    PremultipliedImage expected = decodeImage(util::read_file(base + "/expected.png"));
+    std::string expected_image;
+    try {
+        expected_image = util::read_file(base + "/expected.png");
+    } catch (std::exception& ex) {
+        Log::Error(Event::Setup, "Failed to load expected image %s: %s",
+                   (base + "/expected.png").c_str(), ex.what());
+        throw;
+    }
+
+    PremultipliedImage expected = decodeImage(expected_image);
     PremultipliedImage diff { expected.width, expected.height };
+
+
+#if !TEST_READ_ONLY
+    util::write_file(base + "/actual.png", encodePNG(actual));
+#endif
 
     ASSERT_EQ(expected.width, actual.width);
     ASSERT_EQ(expected.height, actual.height);
@@ -137,7 +151,6 @@ void checkImage(const std::string& base,
     EXPECT_LE(pixels / (expected.width * expected.height), imageThreshold);
 
 #if !TEST_READ_ONLY
-    util::write_file(base + "/actual.png", encodePNG(actual));
     util::write_file(base + "/diff.png", encodePNG(diff));
 #endif
 }

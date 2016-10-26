@@ -3,6 +3,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
 #include <string>
@@ -95,6 +96,7 @@ private:
 
     // Ensure these are initialised last
     std::unique_ptr<mbgl::DefaultFileSource> fileSource;
+    mbgl::ThreadPool threadPool;
     std::unique_ptr<mbgl::Map> map;
     mbgl::EdgeInsets insets;
 

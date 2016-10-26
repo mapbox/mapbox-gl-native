@@ -1,8 +1,7 @@
 #pragma once
 
 #include <mbgl/geometry/binpack.hpp>
-#include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/object_store.hpp>
+#include <mbgl/gl/object.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
@@ -21,7 +20,7 @@ class FileSource;
 class SpriteAtlasObserver;
 
 namespace gl {
-class Config;
+class Context;
 } // namespace gl
 
 class SpriteImage;
@@ -83,14 +82,14 @@ public:
                                               SpritePatternMode mode = SpritePatternMode::Single);
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
-    void bind(bool linear, gl::ObjectStore&, gl::Config&, uint32_t unit);
+    void bind(bool linear, gl::Context&, gl::TextureUnit unit);
 
     // Updates sprites in the atlas texture that may have changed.
     void updateDirty();
 
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
-    void upload(gl::ObjectStore&, gl::Config&, uint32_t unit);
+    void upload(gl::Context&, gl::TextureUnit unit);
 
     dimension getWidth() const { return width; }
     dimension getHeight() const { return height; }
@@ -105,7 +104,7 @@ private:
     void _setSprite(const std::string&, const std::shared_ptr<const SpriteImage>& = nullptr);
     void emitSpriteLoadedIfComplete();
 
-    const GLsizei width, height;
+    const uint16_t width, height;
     const dimension pixelWidth, pixelHeight;
     const float pixelRatio;
 

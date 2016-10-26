@@ -6,8 +6,6 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/gl/debugging.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_values.hpp>
-#include <mbgl/gl/gl_helper.hpp>
 #include <mbgl/util/color.hpp>
 
 namespace mbgl {
@@ -28,7 +26,7 @@ void Painter::renderTileDebug(const RenderTile& tile) {
 void Painter::renderDebugText(Tile& tile, const mat4 &matrix) {
     MBGL_DEBUG_GROUP("debug text");
 
-    config.depthTest = GL_FALSE;
+    context.depthTest = false;
 
     if (!tile.debugBucket || tile.debugBucket->renderable != tile.isRenderable() ||
         tile.debugBucket->complete != tile.isComplete() ||
@@ -37,32 +35,32 @@ void Painter::renderDebugText(Tile& tile, const mat4 &matrix) {
         tile.debugBucket->debugMode != frame.debugOptions) {
         tile.debugBucket = std::make_unique<DebugBucket>(
             tile.id, tile.isRenderable(), tile.isComplete(), tile.modified,
-            tile.expires, frame.debugOptions);
+            tile.expires, frame.debugOptions, context);
     }
 
-    auto& plainShader = shaders->plain;
-    config.program = plainShader.getID();
+    auto& plainShader = shaders->fill;
+    context.program = plainShader.getID();
     plainShader.u_matrix = matrix;
     plainShader.u_opacity = 1.0f;
 
     // Draw white outline
     plainShader.u_color = Color::white();
-    config.lineWidth = 4.0f * frame.pixelRatio;
-    tile.debugBucket->drawLines(plainShader, store);
+    context.lineWidth = 4.0f * frame.pixelRatio;
+    tile.debugBucket->drawLines(plainShader, context);
 
-#ifndef GL_ES_VERSION_2_0
+#if not MBGL_USE_GLES2
     // Draw line "end caps"
     MBGL_CHECK_ERROR(glPointSize(2));
-    tile.debugBucket->drawPoints(plainShader, store);
-#endif
+    tile.debugBucket->drawPoints(plainShader, context);
+#endif // MBGL_USE_GLES2
 
     // Draw black text.
     plainShader.u_color = Color::black();
-    config.lineWidth = 2.0f * frame.pixelRatio;
-    tile.debugBucket->drawLines(plainShader, store);
+    context.lineWidth = 2.0f * frame.pixelRatio;
+    tile.debugBucket->drawLines(plainShader, context);
 
-    config.depthFunc.reset();
-    config.depthTest = GL_TRUE;
+    context.depthFunc = gl::DepthTestFunction::LessEqual;
+    context.depthTest = true;
 }
 
 void Painter::renderDebugFrame(const mat4 &matrix) {
@@ -71,32 +69,33 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     // Disable depth test and don't count this towards the depth buffer,
     // but *don't* disable stencil test, as we want to clip the red tile border
     // to the tile viewport.
-    config.depthTest = GL_FALSE;
-    config.stencilOp.reset();
-    config.stencilTest = GL_TRUE;
+    context.depthTest = false;
+    context.stencilOp = { gl::StencilTestOperation::Keep, gl::StencilTestOperation::Keep,
+                          gl::StencilTestOperation::Replace };
+    context.stencilTest = true;
 
-    auto& plainShader = shaders->plain;
-    config.program = plainShader.getID();
+    auto& plainShader = shaders->fill;
+    context.program = plainShader.getID();
     plainShader.u_matrix = matrix;
     plainShader.u_opacity = 1.0f;
 
     // draw tile outline
-    tileBorderArray.bind(plainShader, tileBorderBuffer, BUFFER_OFFSET_0, store);
+    tileBorderArray.bind(plainShader, tileLineStripVertexBuffer, BUFFER_OFFSET_0, context);
     plainShader.u_color = { 1.0f, 0.0f, 0.0f, 1.0f };
-    config.lineWidth = 4.0f * frame.pixelRatio;
-    MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index()));
+    context.lineWidth = 4.0f * frame.pixelRatio;
+    MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 0, static_cast<GLsizei>(tileLineStripVertexBuffer.vertexCount)));
 }
 
 #ifndef NDEBUG
 void Painter::renderClipMasks() {
-    config.stencilTest = GL_FALSE;
-    config.depthTest = GL_FALSE;
-    config.program = 0;
-    config.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
+    context.stencilTest = false;
+    context.depthTest = false;
+    context.program = 0;
+    context.colorMask = { true, true, true, true };
 
-#ifndef GL_ES_VERSION_2_0
-    config.pixelZoom = { 1, 1 };
-    config.rasterPos = {{ -1, -1, 0, 0 }};
+#if not MBGL_USE_GLES2
+    context.pixelZoom = { 1, 1 };
+    context.rasterPos = { -1, -1, 0, 0 };
 
     // Read the stencil buffer
     const auto& fbSize = frame.framebufferSize;
@@ -121,20 +120,20 @@ void Painter::renderClipMasks() {
 
     MBGL_CHECK_ERROR(glWindowPos2i(0, 0));
     MBGL_CHECK_ERROR(glDrawPixels(fbSize[0], fbSize[1], GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels.get()));
-#endif // GL_ES_VERSION_2_0
+#endif // MBGL_USE_GLES2
 }
 #endif // NDEBUG
 
 #ifndef NDEBUG
 void Painter::renderDepthBuffer() {
-    config.stencilTest = GL_FALSE;
-    config.depthTest = GL_FALSE;
-    config.program = 0;
-    config.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
+    context.stencilTest = false;
+    context.depthTest = false;
+    context.program = 0;
+    context.colorMask = { true, true, true, true };
 
-#ifndef GL_ES_VERSION_2_0
-    config.pixelZoom = { 1, 1 };
-    config.rasterPos = {{ -1, -1, 0, 0 }};
+#if not MBGL_USE_GLES2
+    context.pixelZoom = { 1, 1 };
+    context.rasterPos = { -1, -1, 0, 0 };
 
     // Read the stencil buffer
     const auto& fbSize = frame.framebufferSize;
@@ -156,7 +155,7 @@ void Painter::renderDepthBuffer() {
 
     MBGL_CHECK_ERROR(glWindowPos2i(0, 0));
     MBGL_CHECK_ERROR(glDrawPixels(fbSize[0], fbSize[1], GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels.get()));
-#endif // GL_ES_VERSION_2_0
+#endif // MBGL_USE_GLES2
 }
 #endif // NDEBUG
 

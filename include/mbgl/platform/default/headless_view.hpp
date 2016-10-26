@@ -22,6 +22,8 @@ typedef XID GLXPbuffer;
 
 #include <mbgl/mbgl.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/types.hpp>
+#include <mbgl/gl/extension.hpp>
 
 #include <memory>
 #include <thread>
@@ -45,7 +47,7 @@ public:
     void deactivate() override;
     void notifyMapChange(MapChange) override;
 
-    PremultipliedImage readStillImage() override;
+    PremultipliedImage readStillImage(std::array<uint16_t, 2> size = {{ 0, 0 }}) override;
 
     void resize(uint16_t width, uint16_t height);
     void setMapChangeCallback(std::function<void(MapChange)>&& cb) { mapChangeCallback = std::move(cb); }
@@ -89,9 +91,9 @@ private:
 
     std::function<void(MapChange)> mapChangeCallback;
 
-    GLuint fbo = 0;
-    GLuint fboDepthStencil = 0;
-    GLuint fboColor = 0;
+    gl::FramebufferID fbo = 0;
+    gl::RenderbufferID fboDepthStencil = 0;
+    gl::RenderbufferID fboColor = 0;
 };
 
 } // namespace mbgl

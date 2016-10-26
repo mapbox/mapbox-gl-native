@@ -1,9 +1,5 @@
 #import "NSValue+MGLStyleAttributeAdditions.h"
 
-#import "NSValue+MGLStyleAttributeAdditions_Private.h"
-
-#include <array>
-
 #if TARGET_OS_IPHONE
     #import <UIKit/UIKit.h>
     #define MGLEdgeInsets UIEdgeInsets
@@ -32,16 +28,6 @@
     return [NSValue value:&insets withObjCType:@encode(MGLEdgeInsets)];
 }
 
-- (BOOL)isFunction
-{
-    return NO;
-}
-
-- (mbgl::style::PropertyValue<std::array<float, 2>>)mbgl_offsetPropertyValue
-{
-    return { self.mgl_offsetArrayValue };
-}
-
 - (std::array<float, 2>)mgl_offsetArrayValue
 {
     NSAssert(strcmp(self.objCType, @encode(CGVector)) == 0, @"Value does not represent a CGVector");
@@ -51,11 +37,6 @@
         static_cast<float>(vector.dx),
         static_cast<float>(vector.dy),
     };
-}
-
-- (mbgl::style::PropertyValue<std::array<float, 4>>)mbgl_paddingPropertyValue
-{
-    return { self.mgl_paddingArrayValue };
 }
 
 - (std::array<float, 4>)mgl_paddingArrayValue

@@ -4,11 +4,11 @@
 #include <mbgl/style/conversion/geojson.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
-#include <sstream>
-#include <string>
-
 #include <QByteArray>
 #include <QVariant>
+
+#include <sstream>
+#include <string>
 
 namespace mbgl {
 namespace style {

@@ -5,7 +5,7 @@
 #include <mbgl/util/timer.hpp>
 #include <mbgl/util/geometry.hpp>
 
-#ifdef MBGL_USE_GLES2
+#if MBGL_USE_GLES2
 #define GLFW_INCLUDE_ES2
 #endif
 #define GL_GLEXT_PROTOTYPES
@@ -42,6 +42,9 @@ public:
 
     void run();
     void report(float duration);
+    
+    void setMapChangeCallback(std::function<void(mbgl::MapChange)> callback);
+    void notifyMapChange(mbgl::MapChange change) override;
 
 private:
     mbgl::Color makeRandomColor() const;
@@ -61,6 +64,8 @@ private:
 
     mbgl::AnnotationIDs annotationIDs;
     std::vector<std::string> spriteIDs;
+
+    std::function<void(mbgl::MapChange)> mapChangeCallback;
 
 private:
     bool fullscreen = false;

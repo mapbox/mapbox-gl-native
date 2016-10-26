@@ -1,3 +1,5 @@
+add_definitions(-DMBGL_USE_GLES2=1)
+
 #Include to use build specific variables
 include(${CMAKE_CURRENT_BINARY_DIR}/toolchain.cmake)
 
@@ -19,9 +21,10 @@ macro(mbgl_platform_core)
         PRIVATE platform/android/src/timer.cpp
 
         # File source
-        PRIVATE platform/android/src/http_file_source.cpp
         PRIVATE platform/android/src/asset_file_source.cpp
+        PRIVATE platform/android/src/http_file_source.cpp
         PRIVATE platform/default/default_file_source.cpp
+        PRIVATE platform/default/local_file_source.cpp
         PRIVATE platform/default/online_file_source.cpp
 
         # Offline
@@ -45,6 +48,9 @@ macro(mbgl_platform_core)
 
         # Headless view
         # TODO
+
+        # Thread pool
+        PRIVATE platform/default/thread_pool.cpp
     )
 
     target_include_directories(mbgl-core
@@ -124,6 +130,10 @@ add_library(mapbox-gl SHARED
     # Native map
     platform/android/src/native_map_view.cpp
     platform/android/src/native_map_view.hpp
+
+    # Connectivity
+    platform/android/src/connectivity_listener.cpp
+    platform/android/src/connectivity_listener.hpp
 
     # Main jni bindings
     platform/android/src/jni.cpp

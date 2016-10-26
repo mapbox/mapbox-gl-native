@@ -28,8 +28,6 @@ void RasterTile::cancel() {
 }
 
 void RasterTile::setError(std::exception_ptr err) {
-    bucket.reset();
-    availableData = DataAvailability::All;
     observer->onTileError(*this, err);
 }
 
@@ -45,6 +43,12 @@ void RasterTile::onParsed(std::unique_ptr<Bucket> result) {
     bucket = std::move(result);
     availableData = DataAvailability::All;
     observer->onTileChanged(*this);
+}
+
+void RasterTile::onError(std::exception_ptr err) {
+    bucket.reset();
+    availableData = DataAvailability::All;
+    observer->onTileError(*this, err);
 }
 
 Bucket* RasterTile::getBucket(const style::Layer&) {

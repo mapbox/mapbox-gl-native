@@ -3,6 +3,14 @@
 #pragma once
 
 #if TARGET_OS_IPHONE
+@class UIImage;
+#define MGLImage UIImage
+#else
+@class NSImage;
+#define MGLImage NSImage
+#endif
+
+#if TARGET_OS_IPHONE
 @class UIColor;
 #define MGLColor UIColor
 #else

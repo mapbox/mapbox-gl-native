@@ -38,7 +38,7 @@ public class PropertyFactory {
 <% for (const property of paintProperties) { -%>
 <% if (property.type == 'color') { -%>
     /**
-     * <%- property.doc %>
+     * <%- propertyFactoryMethodDoc(property) %>
      *
      * @param value a int color value
      * @return property wrapper around String color
@@ -49,7 +49,7 @@ public class PropertyFactory {
 
 <% } -%>
     /**
-     * <%- property.doc %>
+     * <%- propertyFactoryMethodDoc(property) %>
      *
      * @param value a <%- propertyType(property) %> value
      * @return property wrapper around <%- propertyType(property) %>
@@ -59,7 +59,7 @@ public class PropertyFactory {
     }
 
     /**
-     * <%- property.doc %>
+     * <%- propertyFactoryMethodDoc(property) %>
      *
      * @param function a wrapper function for <%- propertyType(property) %>
      * @return property wrapper around a <%- propertyType(property) %> function
@@ -71,7 +71,7 @@ public class PropertyFactory {
 <% } -%>
 <% for (const property of layoutProperties) { -%>
     /**
-     * <%- property.doc %>
+     * <%- propertyFactoryMethodDoc(property) %>
      *
      * @param value a <%- propertyType(property) %> value
      * @return property wrapper around <%- propertyType(property) %>
@@ -81,7 +81,7 @@ public class PropertyFactory {
     }
 
     /**
-     * <%- property.doc %>
+     * <%- propertyFactoryMethodDoc(property) %>
      *
      * @param function a wrapper function for <%- propertyType(property) %>
      * @return property wrapper around a <%- propertyType(property) %> function

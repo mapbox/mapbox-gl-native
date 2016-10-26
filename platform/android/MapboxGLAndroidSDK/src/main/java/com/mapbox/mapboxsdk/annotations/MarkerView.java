@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
@@ -10,7 +9,6 @@ import android.view.View;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
 /**
  * MarkerView is an annotation that shows an View at a geographical location.
@@ -26,11 +24,14 @@ public class MarkerView extends Marker {
 
     private MarkerViewManager markerViewManager;
 
+    private float width;
+    private float height;
+
     private float anchorU;
     private float anchorV;
 
-    private float offsetX = -1;
-    private float offsetY = -1;
+    private float offsetX = MapboxConstants.UNMEASURED;
+    private float offsetY = MapboxConstants.UNMEASURED;
 
     private float infoWindowAnchorU;
     private float infoWindowAnchorV;
@@ -45,6 +46,7 @@ public class MarkerView extends Marker {
     private Icon markerViewIcon;
 
     private boolean selected;
+
 
     /**
      * Publicly hidden default constructor
@@ -67,6 +69,22 @@ public class MarkerView extends Marker {
         this.flat = baseMarkerViewOptions.isFlat();
         this.rotation = baseMarkerViewOptions.getRotation();
         this.selected = baseMarkerViewOptions.selected;
+    }
+
+    float getWidth() {
+        return width;
+    }
+
+    void setWidth(float width) {
+        this.width = width;
+    }
+
+    float getHeight() {
+        return height;
+    }
+
+    void setHeight(float height) {
+        this.height = height;
     }
 
     /**
@@ -232,7 +250,10 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Set the rotation value of the MarkerView.
+     * Set the rotation value of the MarkerView in degrees.
+     * <p>
+     * Input will be limited to 0 - 360 degrees
+     * </p>
      * <p>
      * This will result in animating the rotation of the MarkerView using an rotation animator
      * from current value to the provided parameter value.
@@ -241,9 +262,26 @@ public class MarkerView extends Marker {
      * @param rotation the rotation value to animate to
      */
     public void setRotation(float rotation) {
-        this.rotation = rotation;
+        // limit to 0 - 360 degrees
+        float newRotation = rotation;
+        while (newRotation > 360) {
+            newRotation -= 360;
+        }
+        while (newRotation < 0) {
+            newRotation += 360;
+        }
+
+        // calculate new direction
+        float diff = newRotation - this.rotation;
+        if (diff > 180.0f) {
+            diff -= 360.0f;
+        } else if (diff < -180.0f) {
+            diff += 360.f;
+        }
+
+        this.rotation = newRotation;
         if (markerViewManager != null) {
-            markerViewManager.animateRotation(this, rotation);
+            markerViewManager.animateRotationBy(this, diff);
         }
     }
 
@@ -289,10 +327,10 @@ public class MarkerView extends Marker {
     @Override
     public void setIcon(@Nullable Icon icon) {
         if (icon != null) {
-            markerViewIcon = IconFactory.recreate("icon", icon.getBitmap());
+            markerViewIcon = IconFactory.recreate(IconFactory.ICON_MARKERVIEW_ID, icon.getBitmap());
         }
-        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
-        Icon transparentIcon = IconFactory.recreate("markerViewSettings", bitmap);
+        Icon transparentIcon = IconFactory.recreate(IconFactory.ICON_MARKERVIEW_ID,
+                IconFactory.ICON_MARKERVIEW_BITMAP);
         if (markerViewManager != null) {
             markerViewManager.updateIcon(this);
         }
@@ -333,44 +371,51 @@ public class MarkerView extends Marker {
      * <p>
      * This method is used to instantiate the MarkerView and provide an instance of {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter}
      * </p>
+     * <p>
+     * This method is used to notify that a MarkerView is no longer active by setting a null value.
+     * </p>
      *
      * @param mapboxMap the MapboxMap instances
      */
     @Override
     public void setMapboxMap(MapboxMap mapboxMap) {
         super.setMapboxMap(mapboxMap);
+        if (mapboxMap != null) {
+            if (isFlat()) {
+                // initial tilt value if MapboxMap is started with a tilt attribute
+                tiltValue = (float) mapboxMap.getCameraPosition().tilt;
+            }
 
-        if (isFlat()) {
-            // initial tilt value if MapboxMap is started with a tilt attribute
-            tiltValue = (float) mapboxMap.getCameraPosition().tilt;
+            markerViewManager = mapboxMap.getMarkerViewManager();
         }
-
-        markerViewManager = mapboxMap.getMarkerViewManager();
     }
 
     public void update(@NonNull View view) {
-        if (view != null) {
-            PointF point = mapboxMap.getProjection().toScreenLocation(getPosition());
-            if (offsetX == MapboxConstants.UNMEASURED) {
-                // ensure view is measured first
-                if (view.getMeasuredWidth() == 0) {
-                    view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        PointF point = mapboxMap.getProjection().toScreenLocation(getPosition());
+        if (offsetX == MapboxConstants.UNMEASURED) {
+            // ensure view is measured first
+            if (width == 0) {
+                view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                if (view.getMeasuredWidth() != 0) {
+                    setWidth(view.getMeasuredWidth());
+                    setHeight(view.getMeasuredHeight());
                 }
-                int x = (int) (getAnchorU() * view.getMeasuredWidth());
-                int y = (int) (getAnchorV() * view.getMeasuredHeight());
-                setOffset(x, y);
             }
+        }
+        if (width != 0) {
+            int x = (int) (anchorU * width);
+            int y = (int) (anchorV * height);
+            setOffset(x, y);
+        }
 
-            view.setX(point.x - offsetX);
-            view.setY(point.y - offsetY);
+        view.setX(point.x - offsetX);
+        view.setY(point.y - offsetY);
 
-            // animate visibility
-            if (visible && view.getVisibility() == View.GONE) {
-                view.animate().cancel();
-                view.setAlpha(0F);
-                setAlpha(1F);
-
-            }
+        // animate visibility
+        if (visible && view.getVisibility() == View.GONE) {
+            view.animate().cancel();
+            view.setAlpha(0F);
+            setAlpha(1F);
         }
     }
 

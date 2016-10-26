@@ -1,5 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
@@ -21,8 +22,8 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
     optional<SpriteAtlasPosition> imagePosA;
     optional<SpriteAtlasPosition> imagePosB;
 
-    auto& patternShader = parameters.shaders.pattern;
-    auto& plainShader = parameters.shaders.plain;
+    auto& patternShader = parameters.shaders.fillPattern;
+    auto& plainShader = parameters.shaders.fill;
     auto& arrayBackgroundPattern = parameters.shaders.backgroundPatternArray;
     auto& arrayBackground = parameters.shaders.backgroundArray;
 
@@ -35,7 +36,7 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
         if (!imagePosA || !imagePosB)
             return;
 
-        config.program = patternShader.getID();
+        context.program = patternShader.getID();
         patternShader.u_matrix = identityMatrix;
         patternShader.u_pattern_tl_a = imagePosA->tl;
         patternShader.u_pattern_br_a = imagePosA->br;
@@ -44,21 +45,21 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
         patternShader.u_mix = properties.backgroundPattern.value.t;
         patternShader.u_opacity = properties.backgroundOpacity;
 
-        spriteAtlas->bind(true, store, config, 0);
-        arrayBackgroundPattern.bind(patternShader, tileStencilBuffer, BUFFER_OFFSET(0), store);
+        spriteAtlas->bind(true, context, 0);
+        arrayBackgroundPattern.bind(patternShader, tileTriangleVertexBuffer, BUFFER_OFFSET(0), context);
 
     } else {
-        config.program = plainShader.getID();
+        context.program = plainShader.getID();
         plainShader.u_color = properties.backgroundColor;
         plainShader.u_opacity = properties.backgroundOpacity;
 
-        arrayBackground.bind(plainShader, tileStencilBuffer, BUFFER_OFFSET(0), store);
+        arrayBackground.bind(plainShader, tileTriangleVertexBuffer, BUFFER_OFFSET(0), context);
     }
 
-    config.stencilTest = GL_FALSE;
-    config.depthFunc.reset();
-    config.depthTest = GL_TRUE;
-    config.depthMask = GL_FALSE;
+    context.stencilTest = false;
+    context.depthFunc = gl::DepthTestFunction::LessEqual;
+    context.depthTest = true;
+    context.depthMask = false;
     setDepthSublayer(0);
 
     for (const auto& tileID : util::tileCover(state, state.getIntegerZoom())) {
@@ -83,7 +84,7 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
             plainShader.u_matrix = vertexMatrix;
         }
 
-        MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)tileStencilBuffer.index()));
+        MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, static_cast<GLsizei>(tileTriangleVertexBuffer.vertexCount)));
     }
 }
 

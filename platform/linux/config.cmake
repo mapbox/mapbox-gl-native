@@ -7,6 +7,7 @@ mason_use(libpng VERSION 1.6.25)
 mason_use(libjpeg-turbo VERSION 1.5.0)
 mason_use(webp VERSION 0.5.1)
 mason_use(gtest VERSION 1.7.0${MASON_CXXABI_SUFFIX})
+mason_use(benchmark VERSION 1.0.0)
 
 include(cmake/loop-uv.cmake)
 
@@ -15,6 +16,7 @@ macro(mbgl_platform_core)
         # File source
         PRIVATE platform/default/asset_file_source.cpp
         PRIVATE platform/default/default_file_source.cpp
+        PRIVATE platform/default/local_file_source.cpp
         PRIVATE platform/default/http_file_source.cpp
         PRIVATE platform/default/online_file_source.cpp
 
@@ -42,6 +44,9 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/headless_display.cpp
         PRIVATE platform/default/headless_view.cpp
         PRIVATE platform/default/headless_view_glx.cpp
+
+        # Thread pool
+        PRIVATE platform/default/thread_pool.cpp
     )
 
     target_include_directories(mbgl-core
@@ -96,6 +101,23 @@ macro(mbgl_platform_test)
     )
 
     target_link_libraries(mbgl-test
+        PRIVATE mbgl-loop
+    )
+endmacro()
+
+
+macro(mbgl_platform_benchmark)
+    target_sources(mbgl-benchmark
+        PRIVATE benchmark/src/main.cpp
+    )
+
+    set_source_files_properties(
+        benchmark/src/main.cpp
+            PROPERTIES
+        COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
+    )
+
+    target_link_libraries(mbgl-benchmark
         PRIVATE mbgl-loop
     )
 endmacro()

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "node_thread_pool.hpp"
+
 #include <mbgl/map/map.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
@@ -23,7 +25,7 @@ public:
 
     static Nan::Persistent<v8::Function> constructor;
 
-    static void Init(v8::Local<v8::Object> exports);
+    static void Init(v8::Local<v8::Object>);
 
     static void New(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void Load(const Nan::FunctionCallbackInfo<v8::Value>&);
@@ -37,6 +39,8 @@ public:
     static void SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetFilter(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void SetCenter(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void SetBearing(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>&);
 
@@ -50,6 +54,7 @@ public:
     std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback);
 
     mbgl::HeadlessView view;
+    NodeThreadPool threadpool;
     std::unique_ptr<mbgl::Map> map;
 
     std::exception_ptr error;

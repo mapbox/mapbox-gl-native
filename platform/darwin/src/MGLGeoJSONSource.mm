@@ -22,18 +22,9 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
 
 @implementation MGLGeoJSONSource
 
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier geoJSONData:(NSData *)data
+- (instancetype)initWithIdentifier:(NSString *)identifier geoJSONData:(NSData *)data options:(NS_DICTIONARY_OF(NSString *, id) *)options
 {
-    if (self = [super initWithSourceIdentifier:sourceIdentifier])
-    {
-        _geoJSONData = data;
-    }
-    return self;
-}
-
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier geoJSONData:(NSData *)data options:(NS_DICTIONARY_OF(NSString *, id) *)options
-{
-    if (self = [super initWithSourceIdentifier:sourceIdentifier])
+    if (self = [super initWithIdentifier:identifier])
     {
         _geoJSONData = data;
         _options = options;
@@ -41,22 +32,22 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
     return self;
 }
 
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url
+- (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url options:(NS_DICTIONARY_OF(NSString *, id) *)options
 {
-    if (self = [super initWithSourceIdentifier:sourceIdentifier])
-    {
-        _URL = url;
-    }
-    return self;
-}
-
-- (instancetype)initWithSourceIdentifier:(NSString *)sourceIdentifier URL:(NSURL *)url options:(NS_DICTIONARY_OF(NSString *, id) *)options
-{
-    if (self = [super initWithSourceIdentifier:sourceIdentifier])
+    if (self = [super initWithIdentifier:identifier])
     {
         _URL = url;
         _options = options;
     }
+    return self;
+}
+
+- (instancetype)initWithIdentifier:(NSString *)identifier features:(NSArray<id<MGLFeature>> *)features options:(NS_DICTIONARY_OF(NSString *,id) *)options {
+    if (self = [super initWithIdentifier:identifier]) {
+        _features = features;
+        _options = options;
+    }
+    
     return self;
 }
 
@@ -113,16 +104,25 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
 
 - (std::unique_ptr<mbgl::style::Source>)mbglSource
 {
-    auto source = std::make_unique<mbgl::style::GeoJSONSource>(self.sourceIdentifier.UTF8String, [self geoJSONOptions]);
+    auto source = std::make_unique<mbgl::style::GeoJSONSource>(self.identifier.UTF8String, self.geoJSONOptions);
     
     if (self.URL) {
         NSURL *url = self.URL.mgl_URLByStandardizingScheme;
         source->setURL(url.absoluteString.UTF8String);
-    } else {
+    } else if (self.geoJSONData) {
         NSString *string = [[NSString alloc] initWithData:self.geoJSONData encoding:NSUTF8StringEncoding];
         const auto geojson = mapbox::geojson::parse(string.UTF8String).get<mapbox::geojson::feature_collection>();
         source->setGeoJSON(geojson);
         _features = MGLFeaturesFromMBGLFeatures(geojson);
+    } else {
+        mbgl::FeatureCollection featureCollection;
+        featureCollection.reserve(self.features.count);
+        for (id <MGLFeaturePrivate> feature in self.features) {
+            featureCollection.push_back([feature mbglFeature]);
+        }
+        const auto geojson = mbgl::GeoJSON{featureCollection};
+        source->setGeoJSON(geojson);        
+        _features = MGLFeaturesFromMBGLFeatures(featureCollection);
     }
     
     return std::move(source);

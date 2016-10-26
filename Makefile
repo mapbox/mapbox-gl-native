@@ -88,6 +88,7 @@ $(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcse
 	@# Create Xcode schemes so that we can use xcodebuild from the command line. CMake doesn't
 	@# create these automatically.
 	SCHEME_NAME=mbgl-test SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
+	SCHEME_NAME=mbgl-benchmark SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
 	SCHEME_NAME=mbgl-render SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
 	SCHEME_NAME=mbgl-offline SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
 	SCHEME_NAME=mbgl-glfw SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
@@ -116,6 +117,10 @@ xproj: $(MACOS_PROJ_PATH)
 test: $(MACOS_PROJ_PATH)
 	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-test' build $(XCPRETTY)
 
+.PHONY: benchmark
+benchmark: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-benchmark' build $(XCPRETTY)
+
 .PHONY: run-test
 run-test: run-test-*
 
@@ -123,6 +128,12 @@ run-test-%: test
 	ulimit -c unlimited && ($(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-test --gtest_catch_exceptions=0 --gtest_filter=$* & pid=$$! && wait $$pid \
 	  || (lldb -c /cores/core.$$pid --batch --one-line 'thread backtrace all' --one-line 'quit' && exit 1))
 	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'CI' test $(XCPRETTY)
+
+.PHONY: run-benchmark
+run-benchmark: run-benchmark-.
+
+run-benchmark-%: benchmark
+	$(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-benchmark --benchmark_filter=$*
 
 .PHONY: glfw-app
 glfw-app: $(MACOS_PROJ_PATH)
@@ -143,6 +154,10 @@ offline: $(MACOS_PROJ_PATH)
 .PHONY: node
 node: $(MACOS_PROJ_PATH)
 	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-node' build $(XCPRETTY)
+
+.PHONY: macos-test
+macos-test: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'CI' test $(XCPRETTY)
 
 .PHONY: xpackage
 xpackage: $(MACOS_PROJ_PATH)
@@ -250,6 +265,10 @@ ifabric: $(IOS_PROJ_PATH)
 	FORMAT=static BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO SELF_CONTAINED=YES \
 	./platform/ios/scripts/package.sh
 
+.PHONY: ideploy
+ideploy:
+	caffeinate -i ./platform/ios/scripts/deploy-packages.sh
+
 .PHONY: idocument
 idocument:
 	OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
@@ -281,6 +300,10 @@ linux: glfw-app render offline
 test: $(LINUX_BUILD)
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-test
 
+.PHONY: benchmark
+benchmark: $(LINUX_BUILD)
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-benchmark
+
 ifneq (,$(shell which gdb))
   GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
 endif
@@ -290,6 +313,12 @@ run-test: run-test-*
 
 run-test-%: test
 	$(GDB) $(LINUX_OUTPUT_PATH)/mbgl-test --gtest_catch_exceptions=0 --gtest_filter=$*
+
+.PHONY: run-benchmark
+run-benchmark: run-benchmark-.
+
+run-benchmark-%: benchmark
+	$(LINUX_OUTPUT_PATH)/mbgl-benchmark --benchmark_filter=$*
 
 .PHONY: render
 render: $(LINUX_BUILD)
@@ -378,6 +407,7 @@ $(MACOS_QT_PROJ_PATH): $(BUILD_DEPS)
 	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-qt SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
 	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-qt-qml SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
 	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-test SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
+	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-benchmark SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
 	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-core SCHEME_TYPE=library BUILDABLE_NAME=libmbgl-core.a BLUEPRINT_NAME=mbgl-core platform/macos/scripts/create_scheme.sh
 	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=qmapboxgl SCHEME_TYPE=library BUILDABLE_NAME=libqmapboxgl.dylib BLUEPRINT_NAME=qmapboxgl platform/macos/scripts/create_scheme.sh
 
@@ -386,6 +416,10 @@ qtproj: $(MACOS_QT_PROJ_PATH)
 	open $(MACOS_QT_PROJ_PATH)
 
 endif
+
+.PHONY: qt-lib
+qt-lib: $(QT_BUILD)
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QT_OUTPUT_PATH) qmapboxgl
 
 .PHONY: qt-app
 qt-app: $(QT_BUILD)
@@ -429,9 +463,13 @@ test-node: node
 ANDROID_ENV = platform/android/scripts/toolchain.sh
 ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
 
+.PHONY: style-code-android
+style-code-android: $(BUILD_DEPS)
+	node platform/android/scripts/generate-style-code.js
+
 define ANDROID_RULES
 
-build/android-$1/$(BUILDTYPE): $(BUILD_DEPS)
+build/android-$1/$(BUILDTYPE): style-code-android
 	mkdir -p build/android-$1/$(BUILDTYPE)
 
 build/android-$1/$(BUILDTYPE)/toolchain.cmake: platform/android/scripts/toolchain.sh build/android-$1/$(BUILDTYPE)
@@ -471,10 +509,6 @@ android-test-apk:
 .PHONY: apackage
 apackage:
 	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
-
-.PHONY: style-code-android
-style-code-android:
-	node platform/android/scripts/generate-style-code.js
 
 .PHONY: android-generate-test
 android-generate-test:

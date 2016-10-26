@@ -21,6 +21,7 @@ local.properties
 
 # Token file
 MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
+MapboxGLAndroidSDKWearTestApp/src/main/res/values/developer-config.xml
 
 # Twitter Fabric / Crashlytics
 fabric.properties

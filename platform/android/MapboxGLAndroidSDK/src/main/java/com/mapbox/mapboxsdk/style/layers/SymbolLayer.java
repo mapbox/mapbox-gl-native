@@ -9,7 +9,9 @@ import android.support.annotation.NonNull;
 import static com.mapbox.mapboxsdk.utils.ColorUtils.*;
 
 /**
- * Symbol Layer
+ * An icon or a text label.
+ *
+ * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layers-symbol">The online documentation</a>
  */
 public class SymbolLayer extends Layer {
 
@@ -34,7 +36,7 @@ public class SymbolLayer extends Layer {
 
     protected native void initialize(String layerId, String sourceId);
 
-   /**
+    /**
      * Set the source layer.
      *
      * @param sourceLayer the source layer to set
@@ -534,7 +536,7 @@ public class SymbolLayer extends Layer {
         return (PropertyValue<String>) new PropertyValue(nativeGetIconHaloColor());
     }
      /**
-     * The color of the icon's halo. Icon halos can only be used with sdf icons.
+     * The color of the icon's halo. Icon halos can only be used with SDF icons.
      *
      * @return int representation of a rgba string color
      * @throws RuntimeException thrown if property isn't a value

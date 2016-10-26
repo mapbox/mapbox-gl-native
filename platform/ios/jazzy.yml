@@ -51,6 +51,24 @@ custom_categories:
       - MGLPolygonFeature
       - MGLPolylineFeature
       - MGLShapeCollectionFeature
+  - name: Style Layers
+    children:
+      - MGLBackgroundStyleLayer
+      - MGLCircleStyleLayer
+      - MGLFillStyleLayer
+      - MGLForegroundStyleLayer
+      - MGLLineStyleLayer
+      - MGLRasterStyleLayer
+      - MGLStyleLayer
+      - MGLSymbolStyleLayer
+      - MGLVectorStyleLayer
+  - name: Data Sources
+    children:
+      - MGLSource
+      - MGLGeoJSONSource
+      - MGLRasterSource
+      - MGLTileSet
+      - MGLVectorSource
   - name: Offline Maps
     children:
       - MGLOfflineRegion

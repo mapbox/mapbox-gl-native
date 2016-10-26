@@ -28,7 +28,7 @@ public:
     void cancel(HTTPRequest *);
 
 public slots:
-    void replyFinish(QNetworkReply *);
+    void onReplyFinished();
 
 private:
     QMap<QUrl, QPair<QNetworkReply *, QVector<HTTPRequest *>>> m_pending;

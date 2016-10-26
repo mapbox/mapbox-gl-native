@@ -48,6 +48,34 @@
                ReferencedContainer = "container:macos.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8E8A234D3E364CDFA2918983"
+               BuildableName = "mbgl-test"
+               BlueprintName = "mbgl-test"
+               ReferencedContainer = "container:../../build/macos/mbgl.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "NO"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "11FCEF1E29744645907C1E4B"
+               BuildableName = "mbgl-benchmark"
+               BlueprintName = "mbgl-benchmark"
+               ReferencedContainer = "container:../../build/macos/mbgl.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

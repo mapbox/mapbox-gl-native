@@ -44,8 +44,11 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.os.Looper.getMainLooper;
 import static com.mapbox.mapboxsdk.style.layers.Filter.all;
 import static com.mapbox.mapboxsdk.style.layers.Filter.eq;
+import static com.mapbox.mapboxsdk.style.layers.Filter.gte;
+import static com.mapbox.mapboxsdk.style.layers.Filter.lt;
 import static com.mapbox.mapboxsdk.style.layers.Function.Stop;
 import static com.mapbox.mapboxsdk.style.layers.Function.stop;
 import static com.mapbox.mapboxsdk.style.layers.Function.zoom;
@@ -62,6 +65,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillTranslateAnc
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineCap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineJoin;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineOpacity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.symbolPlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
@@ -173,6 +177,15 @@ public class RuntimeStyleActivity extends AppCompatActivity {
                 return true;
             case R.id.action_add_custom_tiles:
                 addCustomTileSource();
+                return true;
+            case R.id.action_fill_filter:
+                styleFillFilterLayer();
+                return true;
+            case R.id.action_line_filter:
+                styleLineFilterLayer();
+                return true;
+            case R.id.action_numeric_filter:
+                styleNumericFillLayer();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -450,6 +463,97 @@ public class RuntimeStyleActivity extends AppCompatActivity {
                 new FillLayer("custom-tile-layers", "custom-tile-source")
                         .withSourceLayer("water")
         );
+    }
+
+    private void styleFillFilterLayer() {
+        mapboxMap.setStyleUrl("asset://fill_filter_style.json");
+        mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(31, -100), 3));
+
+        Handler handler = new Handler(getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mapboxMap == null) {
+                    return;
+                }
+
+                Log.d(TAG, "Styling filtered fill layer");
+
+                FillLayer states = (FillLayer) mapboxMap.getLayer("states");
+
+                if (states != null) {
+                    states.setFilter(eq("name", "Texas"));
+
+                    states.setProperties(
+                            fillColor(Color.RED),
+                            fillOpacity(0.25f)
+                    );
+                } else {
+                    Toast.makeText(RuntimeStyleActivity.this, "No states layer in this style", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, 2000);
+    }
+
+    private void styleLineFilterLayer() {
+        mapboxMap.setStyleUrl("asset://line_filter_style.json");
+        mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(40, -97), 5));
+
+        Handler handler = new Handler(getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mapboxMap == null) {
+                    return;
+                }
+
+                Log.d(TAG, "Styling filtered line layer");
+
+                LineLayer counties = (LineLayer) mapboxMap.getLayer("counties");
+
+                if (counties != null) {
+                    counties.setFilter(eq("NAME10", "Washington"));
+
+                    counties.setProperties(
+                            lineColor(Color.RED),
+                            lineOpacity(0.75f),
+                            lineWidth(5f)
+                    );
+                } else {
+                    Toast.makeText(RuntimeStyleActivity.this, "No counties layer in this style", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, 2000);
+    }
+
+    private void styleNumericFillLayer() {
+        mapboxMap.setStyleUrl("asset://numeric_filter_style.json");
+        mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(40, -97), 5));
+
+        Handler handler = new Handler(getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mapboxMap == null) {
+                    return;
+                }
+
+                Log.d(TAG, "Styling numeric fill layer");
+
+                FillLayer regions = (FillLayer) mapboxMap.getLayer("regions");
+
+                if (regions != null) {
+                    regions.setFilter(all(gte("HRRNUM", 200), lt("HRRNUM", 300)));
+
+                    regions.setProperties(
+                            fillColor(Color.BLUE),
+                            fillOpacity(0.5f)
+                    );
+                } else {
+                    Toast.makeText(RuntimeStyleActivity.this, "No regions layer in this style", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, 2000);
     }
 
     private static class DefaultCallback implements MapboxMap.CancelableCallback {

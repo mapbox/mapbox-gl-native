@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
 import com.mapbox.mapboxsdk.exceptions.MapboxAccountManagerNotStartedException;
+import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 
 public class MapboxAccountManager {
@@ -16,6 +17,8 @@ public class MapboxAccountManager {
 
     private final String accessToken;
     private final Context applicationContext;
+
+    private Boolean connected = null;
 
     /**
      * MapboxAccountManager should NOT be instantiated directly.
@@ -40,11 +43,16 @@ public class MapboxAccountManager {
      */
     public static MapboxAccountManager start(Context context, String accessToken) {
         if (mapboxAccountManager == null) {
+            //Create a new account manager
             mapboxAccountManager = new MapboxAccountManager(context, accessToken);
+
+            //Initialize the event manager
+            MapboxEventManager.getMapboxEventManager().initialize(context, accessToken);
+
+            //Register a receiver to listen for connectivity updates
+            ConnectivityReceiver.instance(context);
         }
 
-        MapboxEventManager eventManager = MapboxEventManager.getMapboxEventManager();
-        eventManager.initialize(mapboxAccountManager.applicationContext, mapboxAccountManager.accessToken);
         return mapboxAccountManager;
     }
 
@@ -84,16 +92,40 @@ public class MapboxAccountManager {
     }
 
     /**
+     * Manually sets the connectivity state of the app. This is useful for apps that control their
+     * own connectivity state and want to bypass any checks to the ConnectivityManager.
+     *
+     * @param connected flag to determine the connectivity state, true for connected, false for
+     *                  disconnected, null for ConnectivityManager to determine.
+     */
+    public void setConnected(Boolean connected) {
+        // Connectivity state overridden by app
+        this.connected = connected;
+    }
+
+    /**
      * Determines whether we have an Internet connection available. Please do not rely on this
      * method in your apps, this method is used internally by the SDK.
      *
      * @return true if there is an Internet connection, false otherwise
      */
-    public boolean isConnected() {
+    public Boolean isConnected() {
+        if (connected != null) {
+            // Connectivity state overridden by app
+            return connected;
+        }
+
         ConnectivityManager cm = (ConnectivityManager) applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean result = (activeNetwork != null && activeNetwork.isConnected());
-        return result;
+        return (activeNetwork != null && activeNetwork.isConnected());
+    }
+
+    /**
+     * Not public API
+     * @return the Application Context
+     */
+    public Context getApplicationContext() {
+        return applicationContext;
     }
 
 }

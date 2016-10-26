@@ -7,7 +7,7 @@
 namespace mbgl {
 namespace android {
 
-class Value  {
+class Value {
 public:
 
     Value(jni::JNIEnv&, jni::jobject*);
@@ -27,8 +27,10 @@ public:
     int getLength() const;
     Value get(const int index ) const;
 
+private:
+
     jni::JNIEnv& jenv;
-    jni::jobject* value;
+    std::shared_ptr<jni::jobject> value;
 };
 
 }

@@ -15,7 +15,7 @@ public class UiSettings {
 
     private MapView mapView;
 
-    private ViewSettings compassSettings;
+    private CompassViewSettings compassSettings;
     private ViewSettings logoSettings;
     private ViewSettings attributionSettings;
 
@@ -39,7 +39,7 @@ public class UiSettings {
 
     UiSettings(@NonNull MapView mapView) {
         this.mapView = mapView;
-        this.compassSettings = new ViewSettings();
+        this.compassSettings = new CompassViewSettings();
         this.logoSettings = new ViewSettings();
         this.attributionSettings = new ViewSettings();
     }
@@ -83,6 +83,28 @@ public class UiSettings {
     public void setCompassGravity(int gravity) {
         compassSettings.setGravity(gravity);
         mapView.setCompassGravity(gravity);
+    }
+
+    /**
+     * Enables or disables fading of the compass when facing north.
+     * <p>
+     * By default this feature is enabled
+     * </p>
+     *
+     * @param compassFadeFacingNorth True to enable the fading animation; false to disable it
+     */
+    public void setCompassFadeFacingNorth(boolean compassFadeFacingNorth) {
+        compassSettings.setFadeFacingNorth(compassFadeFacingNorth);
+        mapView.setCompassFadeFacingNorth(compassFadeFacingNorth);
+    }
+
+    /**
+     * Returns whether the compass performs a fading animation out when facing north.
+     *
+     * @return True if the compass will fade, false if it remains visible
+     */
+    public boolean isCompassFadeWhenFacingNorth(){
+        return compassSettings.isFadeFacingNorth();
     }
 
     /**

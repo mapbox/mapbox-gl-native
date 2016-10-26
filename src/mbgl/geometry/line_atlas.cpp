@@ -1,7 +1,6 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/object_store.hpp>
-#include <mbgl/gl/gl_config.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
@@ -12,10 +11,10 @@
 
 namespace mbgl {
 
-LineAtlas::LineAtlas(GLsizei w, GLsizei h)
+LineAtlas::LineAtlas(uint16_t w, uint16_t h)
     : width(w),
       height(h),
-      data(std::make_unique<GLbyte[]>(w * h)),
+      data(std::make_unique<char[]>(w * h)),
       dirty(true) {
 }
 
@@ -121,30 +120,30 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
     return position;
 }
 
-void LineAtlas::upload(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
+void LineAtlas::upload(gl::Context& context, gl::TextureUnit unit) {
     if (dirty) {
-        bind(store, config, unit);
+        bind(context, unit);
     }
 }
 
-void LineAtlas::bind(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
+void LineAtlas::bind(gl::Context& context, gl::TextureUnit unit) {
     bool first = false;
     if (!texture) {
-        texture = store.createTexture();
-        config.activeTexture = unit;
-        config.texture[unit] = *texture;
+        texture = context.createTexture();
+        context.activeTexture = unit;
+        context.texture[unit] = *texture;
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         first = true;
-    } else if (config.texture[unit] != *texture) {
-        config.activeTexture = unit;
-        config.texture[unit] = *texture;
+    } else if (context.texture[unit] != *texture) {
+        context.activeTexture = unit;
+        context.texture[unit] = *texture;
     }
 
     if (dirty) {
-        config.activeTexture = unit;
+        context.activeTexture = unit;
         if (first) {
             MBGL_CHECK_ERROR(glTexImage2D(
                 GL_TEXTURE_2D, // GLenum target

@@ -64,6 +64,7 @@
         <attr name="compass_margin_top" format="dimension" />
         <attr name="compass_margin_right" format="dimension" />
         <attr name="compass_margin_bottom" format="dimension" />
+        <attr name="compass_fade_facing_north" format="boolean" />
 
         <!--Logo-->
         <attr name="logo_gravity">
@@ -111,5 +112,8 @@
         <attr name="attribution_margin_bottom" format="dimension" />
         <attr name="attribution_enabled" format="boolean" />
         <attr name="attribution_tint" format="color" />
+
+        <!-- Deprecated to use TextureView-->
+        <attr name="texture_mode" format="boolean" />
     </declare-styleable>
 </resources>

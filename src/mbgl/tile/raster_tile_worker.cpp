@@ -16,11 +16,10 @@ void RasterTileWorker::parse(std::shared_ptr<const std::string> data) {
     }
 
     try {
-        auto bucket = std::make_unique<RasterBucket>();
-        bucket->setImage(decodeImage(*data));
+        auto bucket = std::make_unique<RasterBucket>(decodeImage(*data));
         parent.invoke(&RasterTile::onParsed, std::move(bucket));
     } catch (...) {
-        parent.invoke(&RasterTile::setError, std::current_exception());
+        parent.invoke(&RasterTile::onError, std::current_exception());
     }
 }
 

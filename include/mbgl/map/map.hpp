@@ -19,8 +19,9 @@
 
 namespace mbgl {
 
-class FileSource;
 class View;
+class FileSource;
+class Scheduler;
 class SpriteImage;
 struct CameraOptions;
 struct AnimationOptions;
@@ -32,7 +33,7 @@ class Layer;
 
 class Map : private util::noncopyable {
 public:
-    explicit Map(View&, FileSource&,
+    explicit Map(View&, FileSource&, Scheduler&,
                  MapMode mapMode = MapMode::Continuous,
                  GLContextMode contextMode = GLContextMode::Unique,
                  ConstrainMode constrainMode = ConstrainMode::HeightOnly,
@@ -160,6 +161,10 @@ public:
     style::Layer* getLayer(const std::string& layerID);
     void addLayer(std::unique_ptr<style::Layer>, const optional<std::string>& beforeLayerID = {});
     void removeLayer(const std::string& layerID);
+
+    // Add image, bound to the style
+    void addImage(const std::string&, std::unique_ptr<const SpriteImage>);
+    void removeImage(const std::string&);
 
     // Defaults
     std::string getStyleName() const;

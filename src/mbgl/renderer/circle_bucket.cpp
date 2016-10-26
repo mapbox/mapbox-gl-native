@@ -1,5 +1,6 @@
 #include <mbgl/renderer/circle_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #include <mbgl/shader/circle_shader.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
@@ -16,9 +17,9 @@ CircleBucket::~CircleBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-void CircleBucket::upload(gl::ObjectStore& store, gl::Config&) {
-    vertexBuffer_.upload(store);
-    elementsBuffer_.upload(store);
+void CircleBucket::upload(gl::Context& context) {
+    vertexBuffer = context.createVertexBuffer(std::move(vertices));
+    indexBuffer = context.createIndexBuffer(std::move(triangles));
     uploaded = true;
 }
 
@@ -30,7 +31,7 @@ void CircleBucket::render(Painter& painter,
 }
 
 bool CircleBucket::hasData() const {
-    return !triangleGroups_.empty();
+    return !groups.empty();
 }
 
 bool CircleBucket::needsClipping() const {
@@ -58,45 +59,47 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
             // │ 1     2 │
             // └─────────┘
             //
-            vertexBuffer_.add(x, y, -1, -1); // 1
-            vertexBuffer_.add(x, y, 1, -1); // 2
-            vertexBuffer_.add(x, y, 1, 1); // 3
-            vertexBuffer_.add(x, y, -1, 1); // 4
+            vertices.emplace_back(x, y, -1, -1); // 1
+            vertices.emplace_back(x, y, 1, -1); // 2
+            vertices.emplace_back(x, y, 1, 1); // 3
+            vertices.emplace_back(x, y, -1, 1); // 4
 
-            if (!triangleGroups_.size() || (triangleGroups_.back()->vertex_length + 4 > 65535)) {
+            if (!groups.size() || groups.back().vertexLength + 4 > 65535) {
                 // Move to a new group because the old one can't hold the geometry.
-                triangleGroups_.emplace_back(std::make_unique<TriangleGroup>());
+                groups.emplace_back();
             }
 
-            TriangleGroup& group = *triangleGroups_.back();
-            auto index = group.vertex_length;
+            auto& group = groups.back();
+            uint16_t index = group.vertexLength;
 
             // 1, 2, 3
             // 1, 4, 3
-            elementsBuffer_.add(index, index + 1, index + 2);
-            elementsBuffer_.add(index, index + 3, index + 2);
+            triangles.emplace_back(index,
+                                   static_cast<uint16_t>(index + 1),
+                                   static_cast<uint16_t>(index + 2));
+            triangles.emplace_back(index,
+                                   static_cast<uint16_t>(index + 3),
+                                   static_cast<uint16_t>(index + 2));
 
-            group.vertex_length += 4;
-            group.elements_length += 2;
+            group.vertexLength += 4;
+            group.indexLength += 2;
         }
     }
 }
 
-void CircleBucket::drawCircles(CircleShader& shader, gl::ObjectStore& store) {
+void CircleBucket::drawCircles(CircleShader& shader, gl::Context& context, PaintMode paintMode) {
     GLbyte* vertexIndex = BUFFER_OFFSET(0);
     GLbyte* elementsIndex = BUFFER_OFFSET(0);
 
-    for (auto& group : triangleGroups_) {
-        assert(group);
+    for (auto& group : groups) {
+        if (!group.indexLength) continue;
 
-        if (!group->elements_length) continue;
+        group.getVAO(shader, paintMode).bind(shader, *vertexBuffer, *indexBuffer, vertexIndex, context);
 
-        group->array[0].bind(shader, vertexBuffer_, elementsBuffer_, vertexIndex, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT, elementsIndex));
 
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elementsIndex));
-
-        vertexIndex += group->vertex_length * vertexBuffer_.itemSize;
-        elementsIndex += group->elements_length * elementsBuffer_.itemSize;
+        vertexIndex += group.vertexLength * vertexBuffer->vertexSize;
+        elementsIndex += group.indexLength * indexBuffer->primitiveSize;
     }
 }
 

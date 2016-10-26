@@ -71,6 +71,8 @@ public:
     const SourceType type;
     const std::string id;
 
+    virtual optional<std::string> getAttribution() const { return {}; };
+
     bool loaded = false;
 
     // Tracks whether the source is used by any layers visible at the current zoom level. Must
@@ -84,6 +86,7 @@ protected:
     Source& base;
     SourceObserver* observer = nullptr;
     std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
+    TileCache cache;
 
 private:
     // TileObserver implementation.
@@ -95,7 +98,6 @@ private:
     virtual std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) = 0;
 
     std::map<UnwrappedTileID, RenderTile> renderTiles;
-    TileCache cache;
 };
 
 } // namespace style

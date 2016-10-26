@@ -15,10 +15,15 @@ import com.mapbox.mapboxsdk.geometry.VisibleRegion;
  */
 public class Projection {
 
-    private MapView mapView;
+    private final MapView mapView;
+    private final float screenDensity;
+    private final PointF screenLocationPoint;
 
     Projection(@NonNull MapView mapView) {
         this.mapView = mapView;
+        this.screenLocationPoint = new PointF();
+        this.screenDensity = mapView.getContext() != null ? /* return default if unit test */
+                mapView.getContext().getResources().getDisplayMetrics().density : 1.0f;
     }
 
     /**
@@ -45,7 +50,8 @@ public class Projection {
      * the given screen point does not intersect the ground plane.
      */
     public LatLng fromScreenLocation(PointF point) {
-        return mapView.fromScreenLocation(point);
+        screenLocationPoint.set(point.x / screenDensity, point.y / screenDensity);
+        return mapView.fromNativeScreenLocation(screenLocationPoint);
     }
 
     /**
@@ -84,7 +90,9 @@ public class Projection {
      * @return A Point representing the screen location in screen pixels.
      */
     public PointF toScreenLocation(LatLng location) {
-        return mapView.toScreenLocation(location);
+        PointF pointF = mapView.toNativeScreenLocation(location);
+        pointF.set(pointF.x * screenDensity, pointF.y * screenDensity);
+        return pointF;
     }
 
     /**

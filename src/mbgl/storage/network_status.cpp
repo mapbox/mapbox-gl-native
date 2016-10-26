@@ -22,11 +22,11 @@ NetworkStatus::Status NetworkStatus::Get() {
 }
 
 void NetworkStatus::Set(Status status) {
-    if (status == Status::Online) {
+    if (status == Status::Offline) {
+        online = false;
+    } else if(!online) {
         online = true;
         Reachable();
-    } else {
-        online = false;
     }
 }
 

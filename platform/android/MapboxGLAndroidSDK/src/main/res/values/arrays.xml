@@ -6,16 +6,6 @@
         <item>Improve this map</item>
         <item>Telemetry Settings</item>
     </array>
-    <array name="attribution_telemetry_options">
-        <item>Tell Me More</item>
-        <item>Don\'t Participate</item>
-        <item>Participate</item>
-    </array>
-    <array name="attribution_telemetry_options_already_participating">
-        <item>Tell Me More</item>
-        <item>Stop Participating</item>
-        <item>Keep Participating</item>
-    </array>
     <!-- If editing this array update MapView.ATTRIBUTION_INDEX_IMPROVE_THIS_MAP -->
     <array name="attribution_links" formatted="false" translatable="false">
         <item>https://www.mapbox.com/about/maps/</item>

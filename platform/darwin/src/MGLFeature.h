@@ -91,6 +91,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable id)attributeForKey:(NSString *)key;
 
+/**
+ Returns a dictionary that can be serialized as a GeoJSON Feature representation
+ of an instance of an `MGLFeature` subclass.
+ 
+ The dictionary includes a `geometry` key corresponding to the receiver’s 
+ underlying geometry data, a `properties` key corresponding to the receiver’s 
+ `attributes` property, and an `id` key corresponding to the receiver’s 
+ `identifier` property.
+ */
+- (NS_DICTIONARY_OF(NSString *, id) *)geoJSONDictionary;
+
 @end
 
 /**
@@ -140,6 +151,11 @@ NS_ASSUME_NONNULL_BEGIN
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
 @interface MGLShapeCollectionFeature : MGLShapeCollection <MGLFeature>
+
+@property (nonatomic, copy, readonly) NS_ARRAY_OF(MGLShape<MGLFeature> *) *shapes;
+
++ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)shapes;
+
 @end
 
 NS_ASSUME_NONNULL_END

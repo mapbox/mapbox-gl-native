@@ -46,6 +46,15 @@ export ANDROID_HOME=/<installation location>/android-sdk-macosx
 This environment variable configuration should go into a file that's read on
 your shell's startup, like `~/.profile`.
 
+## Speeding up gradle builds
+
+To optimise you development machine for faster gradle builds create the following `/Users/name/.gradle/gradle.properties`  file:
+
+```
+org.gradle.daemon=true
+org.gradle.jvmargs=-Xmx3072M
+```
+
 ## Running The TestApp
 
 In order to run the TestApp on an emulator or device the Core GL portion needs to built first.  Core GL is the common C++ based OpenGL engine that powers the maps for iOS, Android, and Qt in the project.  To build it, open Terminal and run the following commands from the root of the `mapbox-gl-native` source code

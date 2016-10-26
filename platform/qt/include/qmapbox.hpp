@@ -23,9 +23,30 @@ typedef QPair<Coordinate, QString> PointAnnotation;
 // FIXME: We need to add support for custom style properties
 typedef QPair<LineString, QString> ShapeAnnotation;
 
+// Reflects mbgl::NetworkStatus::Status.
 enum NetworkMode {
     Online, // Default
     Offline,
+};
+
+// Reflects mbgl::MapChange.
+enum MapChange {
+    MapChangeRegionWillChange = 0,
+    MapChangeRegionWillChangeAnimated,
+    MapChangeRegionIsChanging,
+    MapChangeRegionDidChange,
+    MapChangeRegionDidChangeAnimated,
+    MapChangeWillStartLoadingMap,
+    MapChangeDidFinishLoadingMap,
+    MapChangeDidFailLoadingMap,
+    MapChangeWillStartRenderingFrame,
+    MapChangeDidFinishRenderingFrame,
+    MapChangeDidFinishRenderingFrameFullyRendered,
+    MapChangeWillStartRenderingMap,
+    MapChangeDidFinishRenderingMap,
+    MapChangeDidFinishRenderingMapFullyRendered,
+    MapChangeDidFinishLoadingStyle,
+    MapChangeSourceDidChange
 };
 
 struct Q_DECL_EXPORT CameraOptions {
@@ -63,9 +84,11 @@ typedef void (*CustomLayerRenderFunction)(void* context, const CustomLayerRender
 typedef void (*CustomLayerDeinitializeFunction)(void* context);
 
 Q_DECL_EXPORT void initializeGLExtensions();
+Q_DECL_EXPORT void registerTypes();
 
-}
+} // namespace QMapbox
 
 Q_DECLARE_METATYPE(QMapbox::Coordinate);
+Q_DECLARE_METATYPE(QMapbox::MapChange);
 
 #endif // QMAPBOX_H

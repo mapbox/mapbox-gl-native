@@ -7,6 +7,7 @@
 #include <mbgl/util/unitbezier.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/projection.hpp>
 #include <mbgl/math/clamp.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
@@ -112,8 +113,8 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     // Find the shortest path otherwise.
     else startLatLng.unwrapForShortestPath(latLng);
 
-    const Point<double> startPoint = state.project(startLatLng);
-    const Point<double> endPoint = state.project(latLng);
+    const Point<double> startPoint = Projection::project(startLatLng, state.scale);
+    const Point<double> endPoint = Projection::project(latLng, state.scale);
 
     ScreenCoordinate center = getScreenCoordinate(padding);
     center.y = state.height - center.y;
@@ -131,10 +132,6 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
 
     Duration duration = animation.duration ? *animation.duration : Duration::zero();
 
-    const double startWorldSize = state.worldSize();
-    state.Bc = startWorldSize / util::DEGREES_MAX;
-    state.Cc = startWorldSize / util::M2PI;
-
     const double startScale = state.scale;
     const double startAngle = state.angle;
     const double startPitch = state.pitch;
@@ -144,7 +141,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
 
     startTransition(camera, animation, [=](double t) {
         Point<double> framePoint = util::interpolate(startPoint, endPoint, t);
-        LatLng frameLatLng = state.unproject(framePoint, startWorldSize);
+        LatLng frameLatLng = Projection::unproject(framePoint, startScale);
         double frameScale = util::interpolate(startScale, scale, t);
         state.setLatLngZoom(frameLatLng, state.scaleZoom(frameScale));
 
@@ -186,8 +183,8 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     LatLng startLatLng = getLatLng(padding).wrapped();
     startLatLng.unwrapForShortestPath(latLng);
 
-    const Point<double> startPoint = state.project(startLatLng);
-    const Point<double> endPoint = state.project(latLng);
+    const Point<double> startPoint = Projection::project(startLatLng, state.scale);
+    const Point<double> endPoint = Projection::project(latLng, state.scale);
 
     ScreenCoordinate center = getScreenCoordinate(padding);
     center.y = state.height - center.y;
@@ -291,10 +288,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         return;
     }
 
-    const double startWorldSize = state.worldSize();
-    state.Bc = startWorldSize / util::DEGREES_MAX;
-    state.Cc = startWorldSize / util::M2PI;
-
+    const double startScale = state.scale;
     state.panning = true;
     state.scaling = true;
     state.rotating = angle != startAngle;
@@ -310,7 +304,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         double frameZoom = startZoom + state.scaleZoom(1 / w(s));
 
         // Convert to geographic coordinates and set the new viewpoint.
-        LatLng frameLatLng = state.unproject(framePoint, startWorldSize);
+        LatLng frameLatLng = Projection::unproject(framePoint, startScale);
         state.setLatLngZoom(frameLatLng, frameZoom);
 
         if (angle != startAngle) {

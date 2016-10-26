@@ -22,7 +22,7 @@ public:
     LayoutProperty<bool> iconAllowOverlap { false };
     LayoutProperty<bool> iconIgnorePlacement { false };
     LayoutProperty<bool> iconOptional { false };
-    LayoutProperty<AlignmentType> iconRotationAlignment { AlignmentType::Viewport };
+    LayoutProperty<AlignmentType> iconRotationAlignment { AlignmentType::Auto };
     LayoutProperty<float> iconSize { 1 };
     LayoutProperty<IconTextFitType> iconTextFit { IconTextFitType::None };
     LayoutProperty<std::array<float, 4>> iconTextFitPadding { {{ 0, 0, 0, 0 }} };
@@ -31,8 +31,8 @@ public:
     LayoutProperty<float> iconPadding { 2 };
     LayoutProperty<bool> iconKeepUpright { false };
     LayoutProperty<std::array<float, 2>> iconOffset { {{ 0, 0 }} };
-    LayoutProperty<AlignmentType> textPitchAlignment { AlignmentType::Undefined };
-    LayoutProperty<AlignmentType> textRotationAlignment { AlignmentType::Viewport };
+    LayoutProperty<AlignmentType> textPitchAlignment { AlignmentType::Auto };
+    LayoutProperty<AlignmentType> textRotationAlignment { AlignmentType::Auto };
     LayoutProperty<std::string> textField { "" };
     LayoutProperty<std::vector<std::string>> textFont { { "Open Sans Regular", "Arial Unicode MS Regular" } };
     LayoutProperty<float> textSize { 16 };

@@ -22,7 +22,6 @@ import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -187,6 +186,27 @@ public class MapboxMap {
     @UiThread
     public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
         getMapView().getNativeMapView().removeSource(sourceId);
+    }
+
+    /**
+     * Add an image to be used int hte map's style
+     *
+     * @param name  the name of the image
+     * @param image the pre-multiplied Bitmap
+     */
+    @UiThread
+    public void addImage(@NonNull String name, @NonNull Bitmap image) {
+        getMapView().getNativeMapView().addImage(name, image);
+    }
+
+    /**
+     * Removes an image from the map's style
+     *
+     * @param name the name of the image to remove
+     */
+    @UiThread
+    public void removeImage(String name) {
+        getMapView().getNativeMapView().removeImage(name);
     }
 
     //
@@ -371,11 +391,15 @@ public class MapboxMap {
     @UiThread
     public final void moveCamera(CameraUpdate update, MapboxMap.CancelableCallback callback) {
         cameraPosition = update.getCameraPosition(this);
+        mapView.resetTrackingModesIfRequired(cameraPosition);
         mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
         if (callback != null) {
             callback.onFinish();
         }
-        invalidateCameraPosition();
+
+        if (onCameraChangeListener != null) {
+            onCameraChangeListener.onCameraChange(this.cameraPosition);
+        }
     }
 
     /**
@@ -411,6 +435,9 @@ public class MapboxMap {
      * unless specified within {@link CameraUpdate}. A callback can be used to be notified when
      * easing the camera stops. If {@link #getCameraPosition()} is called during the animation, it
      * will return the current location of the camera in flight.
+     * <p>
+     * Note that this will cancel location tracking mode if enabled.
+     * </p>
      *
      * @param update     The change that should be applied to the camera.
      * @param durationMs The duration of the animation in milliseconds. This must be strictly
@@ -434,26 +461,38 @@ public class MapboxMap {
 
     @UiThread
     public final void easeCamera(
-      CameraUpdate update, int durationMs, boolean easingInterpolator, final MapboxMap.CancelableCallback callback) {
-        cameraPosition = update.getCameraPosition(this);
-        mapView.easeTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
-          cameraPosition.zoom, easingInterpolator, new CancelableCallback() {
-            @Override
-            public void onCancel() {
-                if (callback != null) {
-                    callback.onCancel();
-                }
-                invalidateCameraPosition();
-            }
+            CameraUpdate update, int durationMs, boolean easingInterpolator, final MapboxMap.CancelableCallback callback) {
+        // dismiss tracking, moving camera is equal to a gesture
+        easeCamera(update, durationMs, easingInterpolator, true, callback);
+    }
 
-            @Override
-            public void onFinish() {
-                if (callback != null) {
-                    callback.onFinish();
-                }
-                invalidateCameraPosition();
-            }
-        });
+    @UiThread
+    public final void easeCamera(
+            CameraUpdate update, int durationMs, boolean easingInterpolator, boolean resetTrackingMode, final MapboxMap.CancelableCallback callback) {
+        // dismiss tracking, moving camera is equal to a gesture
+        cameraPosition = update.getCameraPosition(this);
+        if (resetTrackingMode) {
+            mapView.resetTrackingModesIfRequired(cameraPosition);
+        }
+
+        mapView.easeTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
+                cameraPosition.zoom, easingInterpolator, new CancelableCallback() {
+                    @Override
+                    public void onCancel() {
+                        if (callback != null) {
+                            callback.onCancel();
+                        }
+                        invalidateCameraPosition();
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        if (callback != null) {
+                            callback.onFinish();
+                        }
+                        invalidateCameraPosition();
+                    }
+                });
     }
 
     /**
@@ -524,28 +563,29 @@ public class MapboxMap {
     @UiThread
     public final void animateCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
         cameraPosition = update.getCameraPosition(this);
+        mapView.resetTrackingModesIfRequired(cameraPosition);
         mapView.flyTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
-          cameraPosition.zoom, new CancelableCallback() {
-            @Override
-            public void onCancel() {
-                if (callback != null) {
-                    callback.onCancel();
-                }
-                invalidateCameraPosition();
-            }
+                cameraPosition.zoom, new CancelableCallback() {
+                    @Override
+                    public void onCancel() {
+                        if (callback != null) {
+                            callback.onCancel();
+                        }
+                        invalidateCameraPosition();
+                    }
 
-            @Override
-            public void onFinish() {
-                if (onCameraChangeListener != null) {
-                    onCameraChangeListener.onCameraChange(cameraPosition);
-                }
+                    @Override
+                    public void onFinish() {
+                        if (onCameraChangeListener != null) {
+                            onCameraChangeListener.onCameraChange(cameraPosition);
+                        }
 
-                if (callback != null) {
-                    callback.onFinish();
-                }
-                invalidateCameraPosition();
-            }
-        });
+                        if (callback != null) {
+                            callback.onFinish();
+                        }
+                        invalidateCameraPosition();
+                    }
+                });
     }
 
     /**
@@ -562,15 +602,17 @@ public class MapboxMap {
      * Invalidates the current camera position by reconstructing it from mbgl
      */
     private void invalidateCameraPosition() {
-        invalidCameraPosition = false;
+        if(invalidCameraPosition) {
+            invalidCameraPosition = false;
 
-        CameraPosition cameraPosition = mapView.invalidateCameraPosition();
-        if (cameraPosition != null) {
-            this.cameraPosition = cameraPosition;
-        }
+            CameraPosition cameraPosition = mapView.invalidateCameraPosition();
+            if (cameraPosition != null) {
+                this.cameraPosition = cameraPosition;
+            }
 
-        if (onCameraChangeListener != null) {
-            onCameraChangeListener.onCameraChange(this.cameraPosition);
+            if (onCameraChangeListener != null) {
+                onCameraChangeListener.onCameraChange(this.cameraPosition);
+            }
         }
     }
 
@@ -745,7 +787,6 @@ public class MapboxMap {
     //
 
     void setTilt(double tilt) {
-        markerViewManager.setTilt((float) tilt);
         mapView.setTilt(tilt);
     }
 
@@ -1392,12 +1433,7 @@ public class MapboxMap {
 
     private MarkerView prepareViewMarker(BaseMarkerViewOptions markerViewOptions) {
         MarkerView marker = markerViewOptions.getMarker();
-
-        Icon icon = markerViewOptions.getIcon();
-        if (icon == null) {
-            icon = IconFactory.getInstance(mapView.getContext()).defaultMarkerView();
-        }
-        marker.setIcon(icon);
+        mapView.loadIconForMarkerView(marker);
         return marker;
     }
 
@@ -1699,7 +1735,7 @@ public class MapboxMap {
     public void setMyLocationEnabled(boolean enabled) {
         if (!mapView.isPermissionsAccepted()) {
             Log.e(MapboxConstants.TAG, "Could not activate user location tracking: "
-              + "user did not accept the permission or permissions were not requested.");
+                    + "user did not accept the permission or permissions were not requested.");
             return;
         }
         myLocationEnabled = enabled;
@@ -1846,7 +1882,6 @@ public class MapboxMap {
     public void forceUpdateMarkers() {
         markerViewManager.invalidateViewMarkersInVisibleRegion();
     }
-
 
     //
     // Interfaces
@@ -2041,7 +2076,7 @@ public class MapboxMap {
          * @return the View that is adapted to the contents of MarkerView
          */
         @Nullable
-        public abstract View getView(@NonNull U marker, @NonNull View convertView, @NonNull ViewGroup parent);
+        public abstract View getView(@NonNull U marker, @Nullable View convertView, @NonNull ViewGroup parent);
 
         /**
          * Called when an MarkerView is removed from the MapView or the View object is going to be reused.

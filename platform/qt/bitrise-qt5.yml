@@ -34,13 +34,21 @@ workflows:
             brew install qt5
             brew link qt5 --force
             brew linkapps qt5
-            ln -s /usr/local/Cellar/qt5/5.6.1-1/mkspecs /usr/local/mkspecs
-            ln -s /usr/local/Cellar/qt5/5.6.1-1/plugins /usr/local/plugins
+            export HOMEBREW_QT5_VERSION=$(brew list --versions qt5 | rev | cut -d' ' -f1 | rev)
+            ln -s /usr/local/Cellar/qt5/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
+            ln -s /usr/local/Cellar/qt5/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
             export BUILDTYPE=Debug
             make qt-app
             make qt-qml-app
             make run-qt-test
         - is_debug: 'yes'
+    - deploy-to-bitrise-io:
+        title: Deploy to Bitrise.io
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - deploy_path: "test/fixtures"
+        - notify_user_groups: none
+        - is_compress: 'true'
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'

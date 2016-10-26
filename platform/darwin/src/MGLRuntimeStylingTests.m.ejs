@@ -14,11 +14,15 @@
 @implementation MGL<%- camelize(type) %>LayerTests
 
 - (void)test<%- camelize(type) %>Layer {
+<% if (type === 'background') { -%>
+    MGL<%- camelize(type) %>StyleLayer *layer = [[MGL<%- camelize(type) %>StyleLayer alloc] initWithIdentifier:@"layerID"];
+<% } else { -%>
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"sourceID" URL:url];
-MGL<%- camelize(type) %>StyleLayer *layer = [[MGL<%- camelize(type) %>StyleLayer alloc] initWithLayerIdentifier:@"layerID" source:source];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
     [self.mapView.style addSource:source];
+    MGL<%- camelize(type) %>StyleLayer *layer = [[MGL<%- camelize(type) %>StyleLayer alloc] initWithIdentifier:@"layerID" source:source];
+<% } -%>
     [self.mapView.style addLayer:layer];
 
 <% for (const property of layoutProperties) { -%>
@@ -28,7 +32,8 @@ MGL<%- camelize(type) %>StyleLayer *layer = [[MGL<%- camelize(type) %>StyleLayer
     <%- testImplementation(property, type) %>
 <% } -%>
 
-    MGL<%- camelize(type) %>StyleLayer *gLayer = [self.mapView.style layerWithIdentifier:@"layerID"];
+    MGL<%- camelize(type) %>StyleLayer *gLayer = (MGL<%- camelize(type) %>StyleLayer *)[self.mapView.style layerWithIdentifier:@"layerID"];
+    XCTAssertTrue([gLayer isKindOfClass:[MGL<%- camelize(type) %>StyleLayer class]]);
 <% for (const property of layoutProperties) { -%>
     <%- testGetterImplementation(property, type) %>
 <% } -%>

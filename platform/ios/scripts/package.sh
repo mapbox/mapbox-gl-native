@@ -11,7 +11,7 @@ PRODUCTS=${DERIVED_DATA}
 
 BUILDTYPE=${BUILDTYPE:-Debug}
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
-GCC_GENERATE_DEBUGGING_SYMBOLS=${SYMBOLS:-YES}
+SYMBOLS=${SYMBOLS:-YES}
 
 BUILD_DYNAMIC=true
 BUILD_STATIC=true
@@ -42,7 +42,7 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
 fi
 IOS_SDK_VERSION=`xcrun --sdk ${SDK} --show-sdk-version`
 
-echo "Configuring ${FORMAT:-dynamic and static} ${BUILDTYPE} framework for ${SDK}; symbols: ${GCC_GENERATE_DEBUGGING_SYMBOLS}; self-contained static framework: ${SELF_CONTAINED:-NO}"
+echo "Configuring ${FORMAT:-dynamic and static} ${BUILDTYPE} framework for ${SDK}; symbols: ${SYMBOLS}; self-contained static framework: ${SELF_CONTAINED:-NO}"
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
@@ -79,7 +79,6 @@ elif [[ ${BUILD_STATIC} == true ]]; then
 fi
 
 xcodebuild \
-    GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
     CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
     CURRENT_SHORT_VERSION=${SHORT_VERSION} \
     CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
@@ -94,7 +93,6 @@ xcodebuild \
 
 if [[ ${BUILD_FOR_DEVICE} == true ]]; then
     xcodebuild \
-        GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
         CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
         CURRENT_SHORT_VERSION=${SHORT_VERSION} \
         CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
@@ -111,7 +109,7 @@ fi
 LIBS=(Mapbox.a)
 
 # https://medium.com/@syshen/create-an-ios-universal-framework-148eb130a46c
-if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
+if [[ ${BUILD_FOR_DEVICE} == true ]]; then
     if [[ ${BUILD_STATIC} == true ]]; then
         step "Assembling static framework for iOS Simulator and devices…"
         mkdir -p ${OUTPUT}/static/${NAME}.framework
@@ -179,14 +177,35 @@ else
     cp -rv ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/Settings.bundle ${STATIC_SETTINGS_DIR}
 fi
 
-if [[ "${GCC_GENERATE_DEBUGGING_SYMBOLS}" == false ]]; then
-    step "Stripping binaries…"
+if [[ ${SYMBOLS} = NO ]]; then
+    step "Stripping symbols from binaries"
     if [[ ${BUILD_STATIC} == true ]]; then
         strip -Sx "${OUTPUT}/static/${NAME}.framework/${NAME}"
     fi
     if [[ ${BUILD_DYNAMIC} == true ]]; then
         strip -Sx "${OUTPUT}/dynamic/${NAME}.framework/${NAME}"
     fi
+fi
+
+function get_comparable_uuid {
+    echo $(dwarfdump --uuid ${1} | sed -n 's/.*UUID:\([^\"]*\) .*/\1/p' | sort)
+}
+
+function validate_dsym {
+    step "Validating dSYM and framework UUIDs…"
+    DSYM_UUID=$(get_comparable_uuid "${1}")
+    FRAMEWORK_UUID=$(get_comparable_uuid "${2}")
+    echo -e "${1}\n  ${DSYM_UUID}\n${2}\n  ${FRAMEWORK_UUID}"
+    if [[ ${DSYM_UUID} != ${FRAMEWORK_UUID} ]]; then
+        echo "Error: dSYM and framework UUIDs do not match."
+        exit 1
+    fi
+}
+
+if [[ ${BUILD_DYNAMIC} == true && ${BUILDTYPE} == Release ]]; then
+    validate_dsym \
+        "${OUTPUT}/dynamic/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}" \
+        "${OUTPUT}/dynamic/${NAME}.framework/${NAME}"
 fi
 
 function create_podspec {

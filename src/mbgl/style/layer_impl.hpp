@@ -69,7 +69,7 @@ public:
 
     virtual float getQueryRadius() const { return 0; }
     virtual bool queryIntersectsGeometry(
-            const GeometryCollection&,
+            const GeometryCoordinates&,
             const GeometryCollection&,
             const float,
             const float) const { return false; };

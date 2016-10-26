@@ -17,7 +17,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.SurfaceTexture;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -46,14 +46,13 @@ import android.view.ScaleGestureDetector;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
@@ -130,6 +129,8 @@ public class MapView extends FrameLayout {
     private MyLocationView myLocationView;
     private LocationListener myLocationListener;
 
+    private Projection projection;
+
     private CopyOnWriteArrayList<OnMapChangedListener> onMapChangedListener;
     private ZoomButtonsController zoomButtonsController;
     private ConnectivityReceiver connectivityReceiver;
@@ -153,8 +154,8 @@ public class MapView extends FrameLayout {
 
     private PointF focalPoint;
 
-    private String styleUrl;
-    private String initalStyle;
+    private String styleUrl = Style.MAPBOX_STREETS;
+    private boolean styleWasSet = false;
 
     private List<OnMapReadyCallback> onMapReadyCallbackList;
     private SnapshotRequest snapshotRequest;
@@ -194,14 +195,26 @@ public class MapView extends FrameLayout {
         onMapReadyCallbackList = new ArrayList<>();
         onMapChangedListener = new CopyOnWriteArrayList<>();
         mapboxMap = new MapboxMap(this);
+        projection = mapboxMap.getProjection();
+
         icons = new ArrayList<>();
         View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
         setWillNotDraw(false);
 
-        // Reference the TextureView
-        SurfaceView surfaceView = (SurfaceView) view.findViewById(R.id.surfaceView);
+        if (options.getTextureMode()) {
+            TextureView textureView = new TextureView(context);
+            textureView.setSurfaceTextureListener(new SurfaceTextureListener());
+            addView(textureView, 0);
+        } else {
+            SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+            surfaceView.getHolder().addCallback(new SurfaceCallback());
+            surfaceView.setVisibility(View.VISIBLE);
+        }
 
         nativeMapView = new NativeMapView(this);
+
+        // load transparent icon for MarkerView to trace actual markers, see #6352
+        loadIcon(IconFactory.recreate(IconFactory.ICON_MARKERVIEW_ID, IconFactory.ICON_MARKERVIEW_BITMAP));
 
         // Ensure this view is interactable
         setClickable(true);
@@ -209,8 +222,6 @@ public class MapView extends FrameLayout {
         setFocusable(true);
         setFocusableInTouchMode(true);
         requestFocus();
-
-        surfaceView.getHolder().addCallback(new SurfaceCallback());
 
         // Touch gesture detectors
         gestureDetector = new GestureDetectorCompat(context, new GestureListener());
@@ -275,13 +286,13 @@ public class MapView extends FrameLayout {
         // style url
         String style = options.getStyle();
         if (!TextUtils.isEmpty(style)) {
-            initalStyle = style;
+            styleUrl = style;
         }
 
         // MyLocationView
         MyLocationViewSettings myLocationViewSettings = mapboxMap.getMyLocationViewSettings();
         myLocationViewSettings.setForegroundDrawable(
-            options.getMyLocationForegroundDrawable(), options.getMyLocationForegroundBearingDrawable());
+                options.getMyLocationForegroundDrawable(), options.getMyLocationForegroundBearingDrawable());
         myLocationViewSettings.setForegroundTintColor(options.getMyLocationForegroundTintColor());
         myLocationViewSettings.setBackgroundDrawable(options.getMyLocationBackgroundDrawable(), options.getMyLocationBackgroundBearingDrawable(), options.getMyLocationBackgroundPadding());
         myLocationViewSettings.setBackgroundTintColor(options.getMyLocationBackgroundTintColor());
@@ -317,6 +328,7 @@ public class MapView extends FrameLayout {
             int tenDp = (int) getResources().getDimension(R.dimen.ten_dp);
             uiSettings.setCompassMargins(tenDp, tenDp, tenDp, tenDp);
         }
+        uiSettings.setCompassFadeFacingNorth(options.getCompassFadeFacingNorth());
 
         // Logo
         uiSettings.setLogoEnabled(options.getLogoEnabled());
@@ -344,7 +356,7 @@ public class MapView extends FrameLayout {
 
         int attributionTintColor = options.getAttributionTintColor();
         uiSettings.setAttributionTintColor(attributionTintColor != -1
-            ? attributionTintColor : ColorUtils.getPrimaryColor(getContext()));
+                ? attributionTintColor : ColorUtils.getPrimaryColor(getContext()));
     }
 
     //
@@ -381,7 +393,7 @@ public class MapView extends FrameLayout {
             // Get previous camera position
             CameraPosition cameraPosition = savedInstanceState.getParcelable(MapboxConstants.STATE_CAMERA_POSITION);
             if (cameraPosition != null) {
-                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder(cameraPosition).build()));
             }
 
             UiSettings uiSettings = mapboxMap.getUiSettings();
@@ -399,9 +411,10 @@ public class MapView extends FrameLayout {
             uiSettings.setCompassEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_COMPASS_ENABLED));
             uiSettings.setCompassGravity(savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_GRAVITY));
             uiSettings.setCompassMargins(savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_LEFT),
-                      savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_TOP),
-                      savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_RIGHT),
-                      savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_BOTTOM));
+                    savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_TOP),
+                    savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_RIGHT),
+                    savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_BOTTOM));
+            uiSettings.setCompassFadeFacingNorth(savedInstanceState.getBoolean(MapboxConstants.STATE_COMPASS_FADE_WHEN_FACING_NORTH));
 
             // Logo
             uiSettings.setLogoEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_LOGO_ENABLED));
@@ -420,7 +433,7 @@ public class MapView extends FrameLayout {
                     , savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_BOTTOM));
 
             mapboxMap.setDebugActive(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
-            mapboxMap.setStyleUrl(savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL));
+            styleUrl = savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL);
 
             // User location
             try {
@@ -432,10 +445,14 @@ public class MapView extends FrameLayout {
             TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
             //noinspection ResourceType
             trackingSettings.setMyLocationTrackingMode(
-              savedInstanceState.getInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
+                    savedInstanceState.getInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
             //noinspection ResourceType
             trackingSettings.setMyBearingTrackingMode(
-              savedInstanceState.getInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
+                    savedInstanceState.getInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
+            trackingSettings.setDismissLocationTrackingOnGesture(
+                    savedInstanceState.getBoolean(MapboxConstants.STATE_MY_LOCATION_TRACKING_DISMISS, true));
+            trackingSettings.setDismissBearingTrackingOnGesture(
+                    savedInstanceState.getBoolean(MapboxConstants.STATE_MY_BEARING_TRACKING_DISMISS, true));
         } else if (savedInstanceState == null) {
             // Start Telemetry (authorization determined in initial MapboxEventManager constructor)
             Log.i(MapView.class.getCanonicalName(), "MapView start Telemetry...");
@@ -456,6 +473,8 @@ public class MapView extends FrameLayout {
                     reloadIcons();
                     reloadMarkers();
                     adjustTopOffsetPixels();
+
+                    // Notify listeners the map is ready
                     if (onMapReadyCallbackList.size() > 0) {
                         Iterator<OnMapReadyCallback> iterator = onMapReadyCallbackList.iterator();
                         while (iterator.hasNext()) {
@@ -463,8 +482,11 @@ public class MapView extends FrameLayout {
                             callback.onMapReady(mapboxMap);
                             iterator.remove();
                         }
-                        mapboxMap.getMarkerViewManager().scheduleViewMarkerInvalidation();
                     }
+
+                    // invalidate camera to update overlain views with correct tilt value
+                    invalidateCameraPosition();
+
                 } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {
                     mapboxMap.getMarkerViewManager().scheduleViewMarkerInvalidation();
 
@@ -508,6 +530,8 @@ public class MapView extends FrameLayout {
         TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
         outState.putInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, trackingSettings.getMyLocationTrackingMode());
         outState.putInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, trackingSettings.getMyBearingTrackingMode());
+        outState.putBoolean(MapboxConstants.STATE_MY_LOCATION_TRACKING_DISMISS, trackingSettings.isDismissLocationTrackingOnGesture());
+        outState.putBoolean(MapboxConstants.STATE_MY_BEARING_TRACKING_DISMISS, trackingSettings.isDismissBearingTrackingOnGesture());
 
         // UiSettings
         UiSettings uiSettings = mapboxMap.getUiSettings();
@@ -528,6 +552,7 @@ public class MapView extends FrameLayout {
         outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_TOP, uiSettings.getCompassMarginTop());
         outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_BOTTOM, uiSettings.getCompassMarginBottom());
         outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_RIGHT, uiSettings.getCompassMarginRight());
+        outState.putBoolean(MapboxConstants.STATE_COMPASS_FADE_WHEN_FACING_NORTH, uiSettings.isCompassFadeWhenFacingNorth());
 
         // UiSettings - Logo
         outState.putInt(MapboxConstants.STATE_LOGO_GRAVITY, uiSettings.getLogoGravity());
@@ -564,7 +589,7 @@ public class MapView extends FrameLayout {
      */
     @UiThread
     public void onPause() {
-        // Register for connectivity changes
+        // Unregister for connectivity changes
         if (connectivityReceiver != null) {
             getContext().unregisterReceiver(connectivityReceiver);
             connectivityReceiver = null;
@@ -585,10 +610,9 @@ public class MapView extends FrameLayout {
         nativeMapView.update();
         myLocationView.onResume();
 
-        if (styleUrl == null) {
-            // user supplied style through xml
-            // user has failed to supply a style url
-            setStyleUrl(initalStyle == null ? Style.MAPBOX_STREETS : initalStyle);
+        // In case that no style was set or was loaded through MapboxMapOptions
+        if (!styleWasSet) {
+            setStyleUrl(styleUrl);
         }
     }
 
@@ -644,6 +668,7 @@ public class MapView extends FrameLayout {
     }
 
     void setTilt(Double pitch) {
+        mapboxMap.getMarkerViewManager().setTilt(pitch.floatValue());
         myLocationView.setTilt(pitch);
         nativeMapView.setPitch(pitch, 0);
     }
@@ -851,6 +876,7 @@ public class MapView extends FrameLayout {
 
         styleUrl = url;
         nativeMapView.setStyleUrl(url);
+        styleWasSet = true;
     }
 
     /**
@@ -954,21 +980,24 @@ public class MapView extends FrameLayout {
     // Projection
     //
 
-    LatLng fromScreenLocation(@NonNull PointF point) {
+    /*
+     * Internal use only, use Projection#fromScreenLocation instead
+     */
+    LatLng fromNativeScreenLocation(@NonNull PointF point) {
         if (destroyed) {
             return new LatLng();
         }
-        point.set(point.x / screenDensity, point.y / screenDensity);
         return nativeMapView.latLngForPixel(point);
     }
 
-    PointF toScreenLocation(@NonNull LatLng location) {
+    /*
+     * Internal use only, use Projection#toScreenLocation instead.
+     */
+    PointF toNativeScreenLocation(@NonNull LatLng location) {
         if (destroyed || location == null) {
             return new PointF();
         }
-        PointF pointF = nativeMapView.pixelForLatLng(location);
-        pointF.set(pointF.x * screenDensity, pointF.y * screenDensity);
-        return pointF;
+        return nativeMapView.pixelForLatLng(location);
     }
 
     //
@@ -987,17 +1016,38 @@ public class MapView extends FrameLayout {
             icon = IconFactory.getInstance(getContext()).defaultMarker();
             Bitmap bitmap = icon.getBitmap();
             averageIconHeight = averageIconHeight + (bitmap.getHeight() / 2 - averageIconHeight) / iconSize;
-            averageIconWidth = averageIconHeight + (bitmap.getWidth() - averageIconHeight) / iconSize;
+            averageIconWidth = averageIconWidth + (bitmap.getWidth() - averageIconWidth) / iconSize;
             marker.setIcon(icon);
         } else {
             Bitmap bitmap = icon.getBitmap();
             averageIconHeight = averageIconHeight + (bitmap.getHeight() - averageIconHeight) / iconSize;
-            averageIconWidth = averageIconHeight + (bitmap.getWidth() - averageIconHeight) / iconSize;
+            averageIconWidth = averageIconWidth + (bitmap.getWidth() - averageIconWidth) / iconSize;
         }
 
         if (!icons.contains(icon)) {
             icons.add(icon);
             loadIcon(icon);
+        } else {
+            Icon oldIcon = icons.get(icons.indexOf(icon));
+            if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
+                throw new IconBitmapChangedException();
+            }
+        }
+        return icon;
+    }
+
+    Icon loadIconForMarkerView(MarkerView marker) {
+        Icon icon = marker.getIcon();
+        int iconSize = icons.size() + 1;
+        if (icon == null) {
+            icon = IconFactory.getInstance(getContext()).defaultMarkerView();
+            marker.setIcon(icon);
+        }
+        Bitmap bitmap = icon.getBitmap();
+        averageIconHeight = averageIconHeight + (bitmap.getHeight() - averageIconHeight) / iconSize;
+        averageIconWidth = averageIconWidth + (bitmap.getWidth() - averageIconWidth) / iconSize;
+        if (!icons.contains(icon)) {
+            icons.add(icon);
         } else {
             Icon oldIcon = icons.get(icons.indexOf(icon));
             if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
@@ -1271,6 +1321,12 @@ public class MapView extends FrameLayout {
 
     public void invalidateContentPadding() {
         setContentPadding(contentPaddingLeft, contentPaddingTop, contentPaddingRight, contentPaddingBottom);
+
+        if (!mapboxMap.getTrackingSettings().isLocationTrackingDisabled()) {
+            setFocalPoint(new PointF(myLocationView.getCenterX(), myLocationView.getCenterY()));
+        } else {
+            setFocalPoint(null);
+        }
     }
 
     double getMetersPerPixelAtLatitude(@FloatRange(from = -180, to = 180) double latitude) {
@@ -1454,12 +1510,68 @@ public class MapView extends FrameLayout {
         }
     }
 
+    // This class handles TextureView callbacks
+    private class SurfaceTextureListener implements TextureView.SurfaceTextureListener {
+
+        private Surface surface;
+
+        // Called when the native surface texture has been created
+        // Must do all EGL/GL ES initialization here
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+            nativeMapView.createSurface(this.surface = new Surface(surface));
+            nativeMapView.resizeFramebuffer(width, height);
+            hasSurface = true;
+        }
+
+        // Called when the native surface texture has been destroyed
+        // Must do all EGL/GL ES destruction here
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+            hasSurface = false;
+
+            if (nativeMapView != null) {
+                nativeMapView.destroySurface();
+            }
+            this.surface.release();
+            return true;
+        }
+
+        // Called when the format or size of the native surface texture has been changed
+        // Must handle window resizing here.
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+            if (destroyed) {
+                return;
+            }
+
+            nativeMapView.resizeFramebuffer(width, height);
+        }
+
+        // Called when the SurfaceTexure frame is drawn to screen
+        // Must sync with UI here
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+            if (destroyed) {
+                return;
+            }
+            compassView.update(getDirection());
+            myLocationView.update();
+            mapboxMap.getMarkerViewManager().update();
+
+            for (InfoWindow infoWindow : mapboxMap.getInfoWindows()) {
+                infoWindow.update();
+            }
+        }
+    }
+
     CameraPosition invalidateCameraPosition() {
         if (destroyed) {
             return new CameraPosition.Builder().build();
         }
         CameraPosition position = new CameraPosition.Builder(nativeMapView.getCameraValues()).build();
         myLocationView.setCameraPosition(position);
+        mapboxMap.getMarkerViewManager().setTilt((float) position.tilt);
         return position;
     }
 
@@ -1558,7 +1670,7 @@ public class MapView extends FrameLayout {
      * @param yCoordinate Original y screen cooridnate at start of gesture
      */
     private void trackGestureEvent(@NonNull String gestureId, @NonNull float xCoordinate, @NonNull float yCoordinate) {
-        LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
+        LatLng tapLatLng = projection.fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
         // NaN and Infinite checks to prevent JSON errors at send to server time
         if (Double.isNaN(tapLatLng.getLatitude()) || Double.isNaN(tapLatLng.getLongitude())) {
@@ -1592,7 +1704,7 @@ public class MapView extends FrameLayout {
      * @param yCoordinate Orginal y screen coordinate at end of drag
      */
     private void trackGestureDragEndEvent(@NonNull float xCoordinate, @NonNull float yCoordinate) {
-        LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
+        LatLng tapLatLng = projection.fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
         // NaN and Infinite checks to prevent JSON errors at send to server time
         if (Double.isNaN(tapLatLng.getLatitude()) || Double.isNaN(tapLatLng.getLongitude())) {
@@ -1665,7 +1777,7 @@ public class MapView extends FrameLayout {
 
                 if (twoTap && isTap && !inProgress) {
                     if (focalPoint != null) {
-                        zoom(false, focalPoint.x / screenDensity, focalPoint.y / screenDensity);
+                        zoom(false, focalPoint.x, focalPoint.y);
                     } else {
                         PointF focalPoint = TwoFingerGestureDetector.determineFocalPoint(event);
                         zoom(false, focalPoint.x, focalPoint.y);
@@ -1769,7 +1881,7 @@ public class MapView extends FrameLayout {
             if (mapboxMap.myLocationViewClickListener != null) {
                 final Location myLocation = getMyLocation();
                 if (myLocation != null) {
-                    PointF myLocationPointF = toScreenLocation(new LatLng(myLocation));
+                    PointF myLocationPointF = toNativeScreenLocation(new LatLng(myLocation));
                     if (tapRect.contains(myLocationPointF.x, myLocationPointF.y)) {
                         mapboxMap.myLocationViewClickListener.onMyLocationViewClicked(myLocation);
                         return true;
@@ -1812,9 +1924,10 @@ public class MapView extends FrameLayout {
                     if (annotation instanceof Marker) {
                         if (annotation.getId() == newSelectedMarkerId) {
                             if (selectedMarkers.isEmpty() || !selectedMarkers.contains(annotation)) {
-                                // only handle click if no marker view is available
                                 if (!(annotation instanceof MarkerView)) {
                                     mapboxMap.selectMarker((Marker) annotation);
+                                } else {
+                                    mapboxMap.getMarkerViewManager().onClickMarkerView((MarkerView) annotation);
                                 }
                             }
                             break;
@@ -1830,7 +1943,7 @@ public class MapView extends FrameLayout {
                 // notify app of map click
                 MapboxMap.OnMapClickListener listener = mapboxMap.getOnMapClickListener();
                 if (listener != null) {
-                    LatLng point = fromScreenLocation(tapPoint);
+                    LatLng point = projection.fromScreenLocation(tapPoint);
                     listener.onMapClick(point);
                 }
             }
@@ -1844,7 +1957,7 @@ public class MapView extends FrameLayout {
         public void onLongPress(MotionEvent motionEvent) {
             MapboxMap.OnMapLongClickListener listener = mapboxMap.getOnMapLongClickListener();
             if (listener != null && !quickZoom) {
-                LatLng point = fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
+                LatLng point = projection.fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
                 listener.onMapLongClick(point);
             }
         }
@@ -1852,12 +1965,11 @@ public class MapView extends FrameLayout {
         // Called for flings
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            if (destroyed || !mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+            if (destroyed || !mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                 return false;
             }
 
-            // reset tracking modes if gesture occurs
-            resetTrackingModesIfRequired();
+            resetTrackingModesIfRequired(true, false);
 
             // Fling the map
             float ease = 0.25f;
@@ -1889,7 +2001,7 @@ public class MapView extends FrameLayout {
             if (!scrollInProgress) {
                 scrollInProgress = true;
             }
-            if (destroyed || !mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+            if (destroyed || !mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                 return false;
             }
 
@@ -1899,9 +2011,8 @@ public class MapView extends FrameLayout {
 
             requestDisallowInterceptTouchEvent(true);
 
-            // reset tracking modes if gesture occurs
-            resetTrackingModesIfRequired();
-
+            // reset tracking if needed
+            resetTrackingModesIfRequired(true, false);
             // Cancel any animation
             nativeMapView.cancelTransitions();
 
@@ -1928,9 +2039,6 @@ public class MapView extends FrameLayout {
             if (destroyed || !mapboxMap.getUiSettings().isZoomGesturesEnabled()) {
                 return false;
             }
-
-            // reset tracking modes if gesture occurs
-            resetTrackingModesIfRequired();
 
             beginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_PINCH_START, detector.getFocusX(), detector.getFocusY());
@@ -1982,6 +2090,11 @@ public class MapView extends FrameLayout {
             // Gesture is a quickzoom if there aren't two fingers
             quickZoom = !twoTap;
 
+            // make an assumption here; if the zoom center is specified by the gesture, it's NOT going
+            // to be in the center of the map. Therefore the zoom will translate the map center, so tracking
+            // should be disabled.
+
+            resetTrackingModesIfRequired(!quickZoom, false);
             // Scale the map
             if (focalPoint != null) {
                 // arround user provided focal point
@@ -2008,12 +2121,9 @@ public class MapView extends FrameLayout {
         // Called when two fingers first touch the screen
         @Override
         public boolean onRotateBegin(RotateGestureDetector detector) {
-            if (destroyed || !mapboxMap.getUiSettings().isRotateGesturesEnabled()) {
+            if (destroyed || !mapboxMap.getTrackingSettings().isRotateGestureCurrentlyEnabled()) {
                 return false;
             }
-
-            // reset tracking modes if gesture occurs
-            resetTrackingModesIfRequired();
 
             beginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_ROTATION_START, detector.getFocusX(), detector.getFocusY());
@@ -2032,11 +2142,7 @@ public class MapView extends FrameLayout {
         // Called for rotation
         @Override
         public boolean onRotate(RotateGestureDetector detector) {
-            if (destroyed || !mapboxMap.getUiSettings().isRotateGesturesEnabled()) {
-                return false;
-            }
-
-            if (dragStarted) {
+            if (destroyed || !mapboxMap.getTrackingSettings().isRotateGestureCurrentlyEnabled() || dragStarted) {
                 return false;
             }
 
@@ -2061,6 +2167,11 @@ public class MapView extends FrameLayout {
 
             // Cancel any animation
             nativeMapView.cancelTransitions();
+
+            // rotation constitutes translation of anything except the center of
+            // rotation, so cancel both location and bearing tracking if required
+
+            resetTrackingModesIfRequired(true, true);
 
             // Get rotate value
             double bearing = nativeMapView.getBearing();
@@ -2091,9 +2202,6 @@ public class MapView extends FrameLayout {
             if (!mapboxMap.getUiSettings().isTiltGesturesEnabled()) {
                 return false;
             }
-
-            // reset tracking modes if gesture occurs
-            resetTrackingModesIfRequired();
 
             beginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_PITCH_START, detector.getFocusX(), detector.getFocusY());
@@ -2196,7 +2304,7 @@ public class MapView extends FrameLayout {
                 return true;
 
             case KeyEvent.KEYCODE_DPAD_LEFT:
-                if (!mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+                if (!mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                     return false;
                 }
 
@@ -2208,7 +2316,7 @@ public class MapView extends FrameLayout {
                 return true;
 
             case KeyEvent.KEYCODE_DPAD_RIGHT:
-                if (!mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+                if (!mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                     return false;
                 }
 
@@ -2220,7 +2328,7 @@ public class MapView extends FrameLayout {
                 return true;
 
             case KeyEvent.KEYCODE_DPAD_UP:
-                if (!mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+                if (!mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                     return false;
                 }
 
@@ -2232,7 +2340,7 @@ public class MapView extends FrameLayout {
                 return true;
 
             case KeyEvent.KEYCODE_DPAD_DOWN:
-                if (!mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+                if (!mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                     return false;
                 }
 
@@ -2312,7 +2420,7 @@ public class MapView extends FrameLayout {
         switch (event.getActionMasked()) {
             // The trackball was rotated
             case MotionEvent.ACTION_MOVE:
-                if (!mapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+                if (!mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
                     return false;
                 }
 
@@ -2451,6 +2559,7 @@ public class MapView extends FrameLayout {
                 if (mapboxMap.getUiSettings().isZoomControlsEnabled()) {
                     zoomButtonsController.setVisible(false);
                 }
+                return true;
 
             default:
                 // We are not interested in this event
@@ -2596,9 +2705,18 @@ public class MapView extends FrameLayout {
                 ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void resetTrackingModesIfRequired() {
+    /**
+     * Reset the tracking modes as necessary. Location tracking is reset if the map center is changed,
+     * bearing tracking if there is a rotation.
+     *
+     * @param translate
+     * @param rotate
+     */
+    void resetTrackingModesIfRequired(boolean translate, boolean rotate) {
         TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
-        if (trackingSettings.isDismissLocationTrackingOnGesture()) {
+
+        // if tracking is on, and we should dismiss tracking with gestures, and this is a scroll action, turn tracking off
+        if (translate && !trackingSettings.isLocationTrackingDisabled() && trackingSettings.isDismissLocationTrackingOnGesture()) {
             resetLocationTrackingMode();
         }
 
@@ -2608,6 +2726,10 @@ public class MapView extends FrameLayout {
             resetBearingTrackingMode();
         }
         */
+    }
+
+    void resetTrackingModesIfRequired(CameraPosition cameraPosition) {
+        resetTrackingModesIfRequired(cameraPosition.target != null, cameraPosition.bearing != -1);
     }
 
     private void resetLocationTrackingMode() {
@@ -2621,7 +2743,8 @@ public class MapView extends FrameLayout {
 
     private void resetBearingTrackingMode() {
         try {
-            setMyBearingTrackingMode(MyBearingTracking.NONE);
+            TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
+            trackingSettings.setMyBearingTrackingMode(MyBearingTracking.NONE);
         } catch (SecurityException ignore) {
             // User did not accept location permissions
         }
@@ -2641,6 +2764,10 @@ public class MapView extends FrameLayout {
 
     void setCompassMargins(int left, int top, int right, int bottom) {
         setWidgetMargins(compassView, left, top, right, bottom);
+    }
+
+    void setCompassFadeFacingNorth(boolean compassFadeFacingNorth) {
+        compassView.fadeCompassViewFacingNorth(compassFadeFacingNorth);
     }
 
     //
@@ -2795,14 +2922,15 @@ public class MapView extends FrameLayout {
 
         // Called when someone presses the attribution icon
         @Override
-        public void onClick(View v) {
-            Context context = v.getContext();
-            String[] items = context.getResources().getStringArray(R.array.attribution_names);
-            AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AttributionAlertDialogStyle);
+        public void onClick(View view) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mapView.getContext(), R.style.TelemAlertDialogStyle);
             builder.setTitle(R.string.attributionsDialogTitle);
-            builder.setAdapter(new ArrayAdapter<>(context, R.layout.attribution_list_item, items), this);
-            AlertDialog dialog = builder.show();
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(mapView.getAttributionTintColor()));
+            String[] items = mapView.getContext().getResources().getStringArray(R.array.attribution_names);
+            builder.setAdapter(new ArrayAdapter<>(mapView.getContext(), R.layout.attribution_list_item, items), this);
+            AlertDialog attributionDialog = builder.show();
+
+            // TODO Change listview text color to mapView.getAttributionTintColor()
         }
 
         // Called when someone selects an attribution, 'Improve this map' adds location data to the url
@@ -2810,45 +2938,38 @@ public class MapView extends FrameLayout {
         public void onClick(DialogInterface dialog, int which) {
             final Context context = ((Dialog) dialog).getContext();
             if (which == ATTRIBUTION_INDEX_TELEMETRY_SETTINGS) {
-
-                int array = R.array.attribution_telemetry_options;
-                if (MapboxEventManager.getMapboxEventManager().isTelemetryEnabled()) {
-                    array = R.array.attribution_telemetry_options_already_participating;
-                }
-                String[] items = context.getResources().getStringArray(array);
-                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AttributionAlertDialogStyle);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.TelemAlertDialogStyle);
                 builder.setTitle(R.string.attributionTelemetryTitle);
-                LayoutInflater factory = LayoutInflater.from(context);
-                View content = factory.inflate(R.layout.attribution_telemetry_view, null);
-
-                ListView lv = (ListView) content.findViewById(R.id.telemetryOptionsList);
-                lv.setAdapter(new ArrayAdapter<String>(context, R.layout.attribution_list_item, items));
-                lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-
-                builder.setView(content);
-                final AlertDialog telemDialog = builder.show();
-                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                builder.setMessage(R.string.attributionTelemetryMessage);
+                builder.setPositiveButton(R.string.attributionTelemetryPositive, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        switch (position) {
-                            case 0:
-                                String url = context.getResources().getStringArray(R.array.attribution_links)[3];
-                                Intent intent = new Intent(Intent.ACTION_VIEW);
-                                intent.setData(Uri.parse(url));
-                                context.startActivity(intent);
-                                telemDialog.cancel();
-                                return;
-                            case 1:
-                                MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(false);
-                                telemDialog.cancel();
-                                return;
-                            case 2:
-                                MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(true);
-                                telemDialog.cancel();
-                                return;
-                        }
+                    public void onClick(DialogInterface dialog, int which) {
+                        MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(true);
+                        dialog.cancel();
                     }
                 });
+                builder.setNeutralButton(R.string.attributionTelemetryNeutral, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String url = context.getResources().getStringArray(R.array.attribution_links)[3];
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(url));
+                        context.startActivity(intent);
+                        dialog.cancel();
+                    }
+                });
+                builder.setNegativeButton(R.string.attributionTelemetryNegative, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(false);
+                        dialog.cancel();
+                    }
+                });
+
+                AlertDialog telemDialog = builder.show();
+                telemDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(mapView.getAttributionTintColor());
+                telemDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(mapView.getAttributionTintColor());
+                telemDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(mapView.getAttributionTintColor());
                 return;
             }
             String url = context.getResources().getStringArray(R.array.attribution_links)[which];
@@ -2903,162 +3024,180 @@ public class MapView extends FrameLayout {
     }
 
     /**
-     * <p>
-     * This {@link MapChange} is triggered whenever the currently displayed map region is about to changing
+     * This event is triggered whenever the currently displayed map region is about to changing
      * without an animation.
-     * </p>
      * <p>
-     * This event is followed by a series of {@link MapView#REGION_IS_CHANGING} and ends
-     * with {@link MapView#REGION_DID_CHANGE}.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int REGION_WILL_CHANGE = 0;
 
     /**
-     * <p>
-     * This {@link MapChange} is triggered whenever the currently displayed map region is about to changing
+     * This event is triggered whenever the currently displayed map region is about to changing
      * with an animation.
-     * </p>
-     * <p>
-     * This event is followed by a series of {@link MapView#REGION_IS_CHANGING} and ends
-     * with {@link MapView#REGION_DID_CHANGE_ANIMATED}.
+     * <p
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int REGION_WILL_CHANGE_ANIMATED = 1;
 
     /**
+     * This event is triggered whenever the currently displayed map region is changing.
      * <p>
-     * This {@link MapChange} is triggered whenever the currently displayed map region is changing.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int REGION_IS_CHANGING = 2;
 
     /**
-     * <p>
-     * This {@link MapChange} is triggered whenever the currently displayed map region finished changing
+     * This event is triggered whenever the currently displayed map region finished changing
      * without an animation.
+     * <p>
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int REGION_DID_CHANGE = 3;
 
     /**
-     * <p>
-     * This {@link MapChange} is triggered whenever the currently displayed map region finished changing
+     * This event is triggered whenever the currently displayed map region finished changing
      * with an animation.
+     * <p>
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int REGION_DID_CHANGE_ANIMATED = 4;
 
     /**
+     * This event is triggered when the map is about to start loading a new map style.
      * <p>
-     * This {@link MapChange} is triggered when the map is about to start loading a new map style.
-     * </p>
-     * <p>
-     * This event is followed by {@link MapView#DID_FINISH_LOADING_MAP} or
-     * {@link MapView#DID_FAIL_LOADING_MAP}.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int WILL_START_LOADING_MAP = 5;
 
     /**
+     * This  is triggered when the map has successfully loaded a new map style.
      * <p>
-     * This {@link MapChange} is triggered when the map has successfully loaded a new map style.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_LOADING_MAP = 6;
 
     /**
-     * <p>
-     * This {@link MapChange} is currently not implemented.
-     * </p>
-     * <p>
      * This event is triggered when the map has failed to load a new map style.
+     * <p>
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FAIL_LOADING_MAP = 7;
 
     /**
+     * This event is triggered when the map will start rendering a frame.
      * <p>
-     * This {@link MapChange} is currently not implemented.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int WILL_START_RENDERING_FRAME = 8;
 
     /**
+     * This event is triggered when the map finished rendering a frame.
      * <p>
-     * This {@link MapChange} is currently not implemented.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_RENDERING_FRAME = 9;
 
     /**
+     * This event is triggered when the map finished rendeirng the frame fully.
      * <p>
-     * This {@link MapChange} is currently not implemented.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_RENDERING_FRAME_FULLY_RENDERED = 10;
 
     /**
+     * This event is triggered when the map will start rendering the map.
      * <p>
-     * This {@link MapChange} is currently not implemented.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int WILL_START_RENDERING_MAP = 11;
 
     /**
+     * This event is triggered when the map finished rendering the map.
      * <p>
-     * This {@link MapChange} is currently not implemented.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_RENDERING_MAP = 12;
 
     /**
+     * This event is triggered when the map is fully rendered.
      * <p>
-     * This {@link MapChange} is currently not implemented.
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_RENDERING_MAP_FULLY_RENDERED = 13;
 
 
     /**
+     * This {@link MapChange} is triggered when a style has finished loading.
      * <p>
-     * This {@link MapChange} is triggered when a style is loaded
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
      * </p>
      *
+     * @see MapChange
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_LOADING_STYLE = 14;
 
     /**
      * Interface definition for a callback to be invoked when the displayed map view changes.
+     * <p>
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
+     * </p>
      *
      * @see MapView#addOnMapChangedListener(OnMapChangedListener)
      * @see MapView.MapChange

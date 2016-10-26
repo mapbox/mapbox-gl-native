@@ -4,6 +4,7 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/projection.hpp>
 #include <mbgl/util/mat4.hpp>
 
 #include <cstdint>
@@ -65,12 +66,9 @@ public:
     bool isPanning() const;
     bool isGestureInProgress() const;
 
-    // Conversion and projection
+    // Conversion
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Unwrapped) const;
-
-    Point<double> project(const LatLng&) const;
-    LatLng unproject(const Point<double>&, double worldSize, LatLng::WrapMode = LatLng::Unwrapped) const;
 
     double zoomScale(double zoom) const;
     double scaleZoom(double scale) const;
@@ -87,8 +85,6 @@ private:
 
     // logical dimensions
     uint16_t width = 0, height = 0;
-
-    double worldSize() const;
 
     mat4 coordinatePointMatrix(double z) const;
     mat4 getPixelMatrix() const;
@@ -117,8 +113,8 @@ private:
     double pitch = 0.0;
 
     // cache values for spherical mercator math
-    double Bc = worldSize() / util::DEGREES_MAX;
-    double Cc = worldSize() / util::M2PI;
+    double Bc = Projection::worldSize(scale) / util::DEGREES_MAX;
+    double Cc = Projection::worldSize(scale) / util::M2PI;
 };
 
 } // namespace mbgl

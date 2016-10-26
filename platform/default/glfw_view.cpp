@@ -3,13 +3,15 @@
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_values.hpp>
-#include <mbgl/gl/gl_helper.hpp>
+#include <mbgl/gl/extension.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/map/camera.hpp>
+
+#include <mbgl/gl/state.hpp>
+#include <mbgl/gl/value.hpp>
 
 #include <cassert>
 #include <cstdlib>
@@ -176,7 +178,11 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_Z:
             view->nextOrientation();
             break;
-        case GLFW_KEY_Q:
+        case GLFW_KEY_Q: {
+            auto result = view->map->queryPointAnnotations({ {}, { double(view->getSize()[0]), double(view->getSize()[1]) } });
+            printf("visible point annotations: %lu\n", result.size());
+        } break;
+        case GLFW_KEY_C:
             view->clearAnnotations();
             break;
         case GLFW_KEY_P:
@@ -506,6 +512,16 @@ void GLFWView::setWindowTitle(const std::string& title) {
     glfwSetWindowTitle(window, (std::string { "Mapbox GL: " } + title).c_str());
 }
 
+void GLFWView::setMapChangeCallback(std::function<void(mbgl::MapChange)> callback) {
+    this->mapChangeCallback = callback;
+}
+
+void GLFWView::notifyMapChange(mbgl::MapChange change) {
+    if (mapChangeCallback) {
+        mapChangeCallback(change);
+    }
+}
+
 namespace mbgl {
 namespace platform {
 
@@ -533,8 +549,8 @@ void showDebugImage(std::string name, const char *data, size_t width, size_t hei
     float scale = static_cast<float>(fbWidth) / static_cast<float>(width);
 
     {
-        gl::Preserve<gl::PixelZoom> pixelZoom;
-        gl::Preserve<gl::RasterPos> rasterPos;
+        gl::PreserveState<gl::value::PixelZoom> pixelZoom;
+        gl::PreserveState<gl::value::RasterPos> rasterPos;
 
         MBGL_CHECK_ERROR(glPixelZoom(scale, -scale));
         MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
@@ -570,11 +586,11 @@ void showColorDebugImage(std::string name, const char *data, size_t logicalWidth
     float yScale = static_cast<float>(fbHeight) / static_cast<float>(height);
 
     {
-        gl::Preserve<gl::ClearColor> clearColor;
-        gl::Preserve<gl::Blend> blend;
-        gl::Preserve<gl::BlendFunc> blendFunc;
-        gl::Preserve<gl::PixelZoom> pixelZoom;
-        gl::Preserve<gl::RasterPos> rasterPos;
+        gl::PreserveState<gl::value::ClearColor> clearColor;
+        gl::PreserveState<gl::value::Blend> blend;
+        gl::PreserveState<gl::value::BlendFunc> blendFunc;
+        gl::PreserveState<gl::value::PixelZoom> pixelZoom;
+        gl::PreserveState<gl::value::RasterPos> rasterPos;
 
         MBGL_CHECK_ERROR(glClearColor(0.8, 0.8, 0.8, 1));
         MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));

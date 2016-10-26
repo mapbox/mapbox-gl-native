@@ -2,6 +2,7 @@
 
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/text/placement_config.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
@@ -38,10 +39,10 @@ class CollisionTile {
 public:
     explicit CollisionTile(PlacementConfig);
 
-    float placeFeature(const CollisionFeature&, const bool allowOverlap, const bool avoidEdges);
-    void insertFeature(CollisionFeature&, const float minPlacementScale, const bool ignorePlacement);
+    float placeFeature(const CollisionFeature&, bool allowOverlap, bool avoidEdges);
+    void insertFeature(CollisionFeature&, float minPlacementScale, bool ignorePlacement);
 
-    std::vector<IndexedSubfeature> queryRenderedSymbols(const mapbox::geometry::box<int16_t>&, const float scale);
+    std::vector<IndexedSubfeature> queryRenderedSymbols(const GeometryCoordinates&, float scale);
 
     const PlacementConfig config;
 
@@ -49,17 +50,17 @@ public:
     const float maxScale = 2.0f;
     float yStretch;
 
+    std::array<float, 4> rotationMatrix;
+    std::array<float, 4> reverseRotationMatrix;
+
 private:
-    float findPlacementScale(float minPlacementScale,
+    float findPlacementScale(
             const Point<float>& anchor, const CollisionBox& box,
             const Point<float>& blockingAnchor, const CollisionBox& blocking);
     Box getTreeBox(const Point<float>& anchor, const CollisionBox& box, const float scale = 1.0);
 
     Tree tree;
     Tree ignoredTree;
-    std::array<float, 4> rotationMatrix;
-    std::array<float, 4> reverseRotationMatrix;
-    std::array<CollisionBox, 4> edges;
 };
 
 } // namespace mbgl

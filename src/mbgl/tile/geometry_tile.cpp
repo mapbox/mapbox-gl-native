@@ -41,7 +41,6 @@ void GeometryTile::cancel() {
 }
 
 void GeometryTile::setError(std::exception_ptr err) {
-    availableData = DataAvailability::All;
     observer->onTileError(*this, err);
 }
 
@@ -113,6 +112,11 @@ void GeometryTile::onPlacement(PlacementResult result) {
     observer->onTileChanged(*this);
 }
 
+void GeometryTile::onError(std::exception_ptr err) {
+    availableData = DataAvailability::All;
+    observer->onTileError(*this, err);
+}
+
 Bucket* GeometryTile::getBucket(const Layer& layer) {
     const auto it = buckets.find(layer.baseImpl->bucketName());
     if (it == buckets.end()) {
@@ -132,7 +136,7 @@ void GeometryTile::queryRenderedFeatures(
     if (!featureIndex || !data) return;
 
     featureIndex->query(result,
-                        { queryGeometry },
+                        queryGeometry,
                         transformState.getAngle(),
                         util::tileSize * id.overscaleFactor(),
                         std::pow(2, transformState.getZoom() - id.overscaledZ),

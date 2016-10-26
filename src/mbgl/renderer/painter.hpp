@@ -8,11 +8,10 @@
 #include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/bucket.hpp>
 
-#include <mbgl/geometry/vao.hpp>
-#include <mbgl/geometry/static_vertex_buffer.hpp>
-
-#include <mbgl/gl/gl_config.hpp>
-#include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/vao.hpp>
+#include <mbgl/gl/context.hpp>
+#include <mbgl/shader/fill_vertex.hpp>
+#include <mbgl/shader/raster_vertex.hpp>
 
 #include <mbgl/style/style.hpp>
 
@@ -42,14 +41,10 @@ class SymbolBucket;
 class RasterBucket;
 
 class Shaders;
-class SDFShader;
+class SymbolSDFShader;
 class PaintParameters;
 
 struct ClipID;
-
-namespace util {
-class ObjectStore;
-} // namespace util
 
 namespace style {
 class Style;
@@ -63,7 +58,7 @@ class BackgroundLayer;
 } // namespace style
 
 struct FrameData {
-    std::array<uint16_t, 2> framebufferSize;
+    std::array<uint16_t, 2> framebufferSize = {{ 0, 0 }};
     TimePoint timePoint;
     float pixelRatio;
     MapMode mapMode;
@@ -73,12 +68,14 @@ struct FrameData {
 
 class Painter : private util::noncopyable {
 public:
-    Painter(const TransformState&, gl::ObjectStore&);
+    Painter(const TransformState&);
     ~Painter();
 
     void render(const style::Style&,
                 const FrameData&,
                 SpriteAtlas& annotationSpriteAtlas);
+
+    void cleanup();
 
     // Renders debug information for a tile.
     void renderTileDebug(const RenderTile&);
@@ -116,7 +113,7 @@ private:
     void renderPass(PaintParameters&,
                     RenderPass,
                     Iterator it, Iterator end,
-                    GLsizei i, int8_t increment);
+                    uint32_t i, int8_t increment);
 
     void setClipping(const ClipID&);
 
@@ -124,8 +121,8 @@ private:
                    const RenderTile&,
                    float scaleDivisor,
                    std::array<float, 2> texsize,
-                   SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, PaintMode),
+                   SymbolSDFShader& sdfShader,
+                   void (SymbolBucket::*drawSDF)(SymbolSDFShader&, gl::Context&, PaintMode),
 
                    // Layout
                    style::AlignmentType rotationAlignment,
@@ -166,18 +163,17 @@ private:
     }();
 
     const TransformState& state;
-    gl::ObjectStore& store;
 
     FrameData frame;
 
     int indent = 0;
 
-    gl::Config config;
+    gl::Context context;
 
     RenderPass pass = RenderPass::Opaque;
 
     int numSublayers = 3;
-    GLsizei currentLayer;
+    uint32_t currentLayer;
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
 
@@ -192,36 +188,11 @@ private:
     std::unique_ptr<Shaders> overdrawShaders;
 #endif
 
-    // Set up the stencil quad we're using to generate the stencil mask.
-    StaticVertexBuffer tileStencilBuffer {
-        // top left triangle
-        {{ 0, 0 }},
-        {{ util::EXTENT, 0 }},
-        {{ 0, util::EXTENT }},
+    gl::VertexBuffer<FillVertex> tileTriangleVertexBuffer;
+    gl::VertexBuffer<FillVertex> tileLineStripVertexBuffer;
+    gl::VertexBuffer<RasterVertex> rasterVertexBuffer;
 
-        // bottom right triangle
-        {{ util::EXTENT, 0 }},
-        {{ 0, util::EXTENT }},
-        {{ util::EXTENT, util::EXTENT }},
-    };
-
-    StaticRasterVertexBuffer rasterBoundsBuffer {
-        {{ 0, 0, 0, 0 }},
-        {{ util::EXTENT, 0, 32767, 0 }},
-        {{ 0, util::EXTENT, 0, 32767 }},
-        {{ util::EXTENT, util::EXTENT, 32767, 32767 }},
-    };
-
-    // Set up the tile boundary lines we're using to draw the tile outlines.
-    StaticVertexBuffer tileBorderBuffer {
-        {{ 0, 0 }},
-        {{ util::EXTENT, 0 }},
-        {{ util::EXTENT, util::EXTENT }},
-        {{ 0, util::EXTENT }},
-        {{ 0, 0 }},
-    };
-
-    VertexArrayObject tileBorderArray;
+    gl::VertexArrayObject tileBorderArray;
 };
 
 } // namespace mbgl

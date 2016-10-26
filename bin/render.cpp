@@ -3,8 +3,9 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-#include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
 #pragma GCC diagnostic push
@@ -84,7 +85,8 @@ int main(int argc, char *argv[]) {
     }
 
     HeadlessView view(pixelRatio, width, height);
-    Map map(view, fileSource, MapMode::Still);
+    ThreadPool threadPool(4);
+    Map map(view, fileSource, threadPool, MapMode::Still);
 
     map.setStyleJSON(style);
     map.setClasses(classes);

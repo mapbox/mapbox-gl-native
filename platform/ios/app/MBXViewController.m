@@ -5,6 +5,7 @@
 #import "MBXOfflinePacksTableViewController.h"
 #import "MBXAnnotationView.h"
 #import "MBXUserLocationAnnotationView.h"
+
 #import "MGLFillStyleLayer.h"
 
 #import <Mapbox/Mapbox.h>
@@ -19,6 +20,56 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 };
 
 static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXViewControllerAnnotationViewReuseIdentifer";
+
+typedef NS_ENUM(NSInteger, MBXSettingsSections) {
+    MBXSettingsCoreRendering = 0,
+    MBXSettingsAnnotations,
+    MBXSettingsRuntimeStyling,
+    MBXSettingsMiscellaneous,
+};
+
+typedef NS_ENUM(NSInteger, MBXSettingsCoreRenderingRows) {
+    MBXSettingsCoreRenderingResetPosition = 0,
+    MBXSettingsCoreRenderingTileBoundaries,
+    MBXSettingsCoreRenderingTileInfo,
+    MBXSettingsCoreRenderingTimestamps,
+    MBXSettingsCoreRenderingCollisionBoxes,
+    MBXSettingsCoreRenderingOverdrawVisualization,
+};
+
+typedef NS_ENUM(NSInteger, MBXSettingsAnnotationsRows) {
+    MBXSettingsAnnotations100Views = 0,
+    MBXSettingsAnnotations1000Views,
+    MBXSettingsAnnotations10000Views,
+    MBXSettingsAnnotations100Sprites,
+    MBXSettingsAnnotations1000Sprites,
+    MBXSettingsAnnotations10000Sprites,
+    MBXSettingsAnnotationsTestShapes,
+    MBXSettingsAnnotationsCustomCallout,
+    MBXSettingsAnnotationsRemoveAnnotations,
+};
+
+typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
+    MBXSettingsRuntimeStylingWater = 0,
+    MBXSettingsRuntimeStylingRoads,
+    MBXSettingsRuntimeStylingRaster,
+    MBXSettingsRuntimeStylingGeoJSON,
+    MBXSettingsRuntimeStylingSymbols,
+    MBXSettingsRuntimeStylingBuildings,
+    MBXSettingsRuntimeStylingFerry,
+    MBXSettingsRuntimeStylingParks,
+    MBXSettingsRuntimeStylingFilteredFill,
+    MBXSettingsRuntimeStylingFilteredLines,
+    MBXSettingsRuntimeStylingNumericFilteredFill,
+    MBXSettingsRuntimeStylingStyleQuery,
+};
+
+typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
+    MBXSettingsMiscellaneousWorldTour = 0,
+    MBXSettingsMiscellaneousCustomUserDot,
+    MBXSettingsMiscellaneousPrintLogFile,
+    MBXSettingsMiscellaneousDeleteLogFile,
+};
 
 @interface MBXDroppedPinAnnotation : MGLPointAnnotation
 @end
@@ -38,7 +89,9 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 @implementation MBXSpriteBackedAnnotation
 @end
 
-@interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
+@interface MBXViewController () <UITableViewDelegate,
+                                 UITableViewDataSource,
+                                 MGLMapViewDelegate>
 
 @property (nonatomic) IBOutlet MGLMapView *mapView;
 @property (nonatomic) NSInteger styleIndex;
@@ -52,7 +105,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     BOOL _isTouringWorld;
 }
 
-#pragma mark - Setup
+#pragma mark - Setup & Teardown
 
 + (void)initialize
 {
@@ -167,152 +220,286 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     }
 }
 
-#pragma mark - Actions
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+    [self saveState:nil];
+}
+
+#pragma mark - Debugging Interface
 
 - (IBAction)showSettings:(__unused id)sender
 {
-    MGLMapDebugMaskOptions debugMask = self.mapView.debugMask;
-    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Map Settings"
-                                                       delegate:self
-                                              cancelButtonTitle:@"Cancel"
-                                         destructiveButtonTitle:nil
-                                              otherButtonTitles:
-        @"Reset Position",
-        ((debugMask & MGLMapDebugTileBoundariesMask)
-         ? @"Hide Tile Boundaries"
-         : @"Show Tile Boundaries"),
-        ((debugMask & MGLMapDebugTileInfoMask)
-         ? @"Hide Tile Info"
-         : @"Show Tile Info"),
-        ((debugMask & MGLMapDebugTimestampsMask)
-         ? @"Hide Tile Timestamps"
-         : @"Show Tile Timestamps"),
-        ((debugMask & MGLMapDebugCollisionBoxesMask)
-         ? @"Hide Collision Boxes"
-         : @"Show Collision Boxes"),
-        ((debugMask & MGLMapDebugOverdrawVisualizationMask)
-         ? @"Hide Overdraw Visualization"
-         : @"Show Overdraw Visualization"),
-        @"Add 100 Views",
-        @"Add 1,000 Views",
-        @"Add 10,000 Views",
-        @"Add 100 Sprites",
-        @"Add 1,000 Sprites",
-        @"Add 10,000 Sprites",
-        @"Add Test Shapes",
-        @"Start World Tour",
-        @"Add Custom Callout Point",
-        @"Remove Annotations",
-        @"Manipulate Style",
-        ((_customUserLocationAnnnotationEnabled)
-         ? @"Disable Custom User Dot"
-         : @"Enable Custom User Dot"),
-        nil];
-
-    if (self.debugLoggingEnabled)
-    {
-        [sheet addButtonWithTitle:@"Print Telemetry Logfile"];
-        [sheet addButtonWithTitle:@"Delete Telemetry Logfile"];
-    }
-
-    [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
+    UITableViewController *settingsViewController = [[UITableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+    settingsViewController.tableView.delegate = self;
+    settingsViewController.tableView.dataSource = self;
+    settingsViewController.title = @"Debugging";
+    settingsViewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissSettings:)];
+    UINavigationController *wrapper = [[UINavigationController alloc] initWithRootViewController:settingsViewController];
+    wrapper.navigationBar.tintColor = self.navigationController.navigationBar.tintColor;
+    [self.navigationController presentViewController:wrapper animated:YES completion:nil];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+- (void)dismissSettings:(__unused id)sender
 {
-    if (buttonIndex == actionSheet.firstOtherButtonIndex)
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (NSArray <NSString *> *)settingsSectionTitles
+{
+    return @[
+        @"Core Rendering",
+        @"Annotations",
+        @"Runtime Styling",
+        @"Miscellaneous"
+    ];
+}
+
+- (NSArray <NSString *> *)settingsTitlesForSection:(NSInteger)section
+{
+    NSMutableArray *settingsTitles = [NSMutableArray array];
+
+    MGLMapDebugMaskOptions debugMask = self.mapView.debugMask;
+
+    switch (section)
     {
-        [self.mapView resetPosition];
+        case MBXSettingsCoreRendering:
+            [settingsTitles addObjectsFromArray:@[
+                @"Reset Position",
+                [NSString stringWithFormat:@"%@ Tile Boundaries",
+                    (debugMask & MGLMapDebugTileBoundariesMask ? @"Hide" :@"Show")],
+                [NSString stringWithFormat:@"%@ Tile Info",
+                    (debugMask & MGLMapDebugTileInfoMask ? @"Hide" :@"Show")],
+                [NSString stringWithFormat:@"%@ Tile Timestamps",
+                    (debugMask & MGLMapDebugTimestampsMask ? @"Hide" :@"Show")],
+                [NSString stringWithFormat:@"%@ Collision Boxes",
+                    (debugMask & MGLMapDebugCollisionBoxesMask ? @"Hide" :@"Show")],
+                [NSString stringWithFormat:@"%@ Overdraw Visualization",
+                    (debugMask & MGLMapDebugOverdrawVisualizationMask ? @"Hide" :@"Show")],
+            ]];
+            break;
+        case MBXSettingsAnnotations:
+            [settingsTitles addObjectsFromArray:@[
+                @"Add 100 Views",
+                @"Add 1,000 Views",
+                @"Add 10,000 Views",
+                @"Add 100 Sprites",
+                @"Add 1,000 Sprites",
+                @"Add 10,000 Sprites",
+                @"Add Test Shapes",
+                @"Add Point With Custom Callout",
+                @"Remove Annotations",
+            ]];
+            break;
+        case MBXSettingsRuntimeStyling:
+            [settingsTitles addObjectsFromArray:@[
+                @"Style Water With Function",
+                @"Style Roads With Function",
+                @"Add Raster & Apply Function",
+                @"Add GeoJSON & Apply Fill",
+                @"Style Symbol Color",
+                @"Style Building Fill Color",
+                @"Style Ferry Line Color",
+                @"Remove Parks",
+                @"Style Fill With Filter",
+                @"Style Lines With Filter",
+                @"Style Fill With Numeric Filter",
+                @"Style Query For GeoJSON",
+            ]];
+            break;
+        case MBXSettingsMiscellaneous:
+            [settingsTitles addObjectsFromArray:@[
+                @"Start World Tour",
+                [NSString stringWithFormat:@"%@ Custom User Dot", (_customUserLocationAnnnotationEnabled ? @"Disable" : @"Enable")],
+            ]];
+
+            if (self.debugLoggingEnabled)
+            {
+                [settingsTitles addObjectsFromArray:@[
+                    @"Print Telemetry Logfile",
+                    @"Delete Telemetry Logfile",
+                ]];
+            };
+            break;
+        default:
+            NSAssert(NO, @"All settings sections should be implemented");
+            break;
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1)
+
+    return settingsTitles;
+}
+
+- (void)performActionForSettingAtIndexPath:(NSIndexPath *)indexPath
+{
+    switch (indexPath.section)
     {
-        self.mapView.debugMask ^= MGLMapDebugTileBoundariesMask;
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2)
-    {
-        self.mapView.debugMask ^= MGLMapDebugTileInfoMask;
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 3)
-    {
-        self.mapView.debugMask ^= MGLMapDebugTimestampsMask;
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 4)
-    {
-        self.mapView.debugMask ^= MGLMapDebugCollisionBoxesMask;
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 5)
-    {
-        self.mapView.debugMask ^= MGLMapDebugOverdrawVisualizationMask;
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 6)
-    {
-        [self parseFeaturesAddingCount:100 usingViews:YES];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 7)
-    {
-        [self parseFeaturesAddingCount:1000 usingViews:YES];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
-    {
-        [self parseFeaturesAddingCount:10000 usingViews:YES];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 9)
-    {
-        [self parseFeaturesAddingCount:100 usingViews:NO];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 10)
-    {
-        [self parseFeaturesAddingCount:1000 usingViews:NO];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 11)
-    {
-        [self parseFeaturesAddingCount:10000 usingViews:NO];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 12)
-    {
-        [self addTestShapes];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 13)
-    {
-        [self startWorldTour:actionSheet];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 14)
-    {
-        [self presentAnnotationWithCustomCallout];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 15)
-    {
-        [self.mapView removeAnnotations:self.mapView.annotations];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 16)
-    {
-        [self testRuntimeStyling];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 17)
-    {
-        _customUserLocationAnnnotationEnabled = !_customUserLocationAnnnotationEnabled;
-        self.mapView.showsUserLocation = NO;
-        self.mapView.userTrackingMode = MGLUserTrackingModeFollow;
-    }
-    else if (buttonIndex == actionSheet.numberOfButtons - 2 && self.debugLoggingEnabled)
-    {
-        NSString *fileContents = [NSString stringWithContentsOfFile:[self telemetryDebugLogfilePath] encoding:NSUTF8StringEncoding error:nil];
-        NSLog(@"%@", fileContents);
-    }
-    else if (buttonIndex == actionSheet.numberOfButtons - 1 && self.debugLoggingEnabled)
-    {
-        NSString *filePath = [self telemetryDebugLogfilePath];
-        if ([[NSFileManager defaultManager] isDeletableFileAtPath:filePath]) {
-            NSError *error;
-            BOOL success = [[NSFileManager defaultManager] removeItemAtPath:filePath error:&error];
-            if (success) {
-                NSLog(@"Deleted telemetry log.");
-            } else {
-                NSLog(@"Error deleting telemetry log: %@", error.localizedDescription);
+        case MBXSettingsCoreRendering:
+            switch (indexPath.row)
+            {
+                case MBXSettingsCoreRenderingResetPosition:
+                    [self.mapView resetPosition];
+                    break;
+                case MBXSettingsCoreRenderingTileBoundaries:
+                    self.mapView.debugMask ^= MGLMapDebugTileBoundariesMask;
+                    break;
+                case MBXSettingsCoreRenderingTileInfo:
+                    self.mapView.debugMask ^= MGLMapDebugTileInfoMask;
+                    break;
+                case MBXSettingsCoreRenderingTimestamps:
+                    self.mapView.debugMask ^= MGLMapDebugTimestampsMask;
+                    break;
+                case MBXSettingsCoreRenderingCollisionBoxes:
+                    self.mapView.debugMask ^= MGLMapDebugCollisionBoxesMask;
+                    break;
+                case MBXSettingsCoreRenderingOverdrawVisualization:
+                    self.mapView.debugMask ^= MGLMapDebugOverdrawVisualizationMask;
+                    break;
+                default:
+                    NSAssert(NO, @"All core rendering setting rows should be implemented");
+                    break;
             }
-        }
+            break;
+        case MBXSettingsAnnotations:
+            switch (indexPath.row)
+            {
+                case MBXSettingsAnnotations100Views:
+                    [self parseFeaturesAddingCount:100 usingViews:YES];
+                    break;
+                case MBXSettingsAnnotations1000Views:
+                    [self parseFeaturesAddingCount:1000 usingViews:YES];
+                    break;
+                case MBXSettingsAnnotations10000Views:
+                    [self parseFeaturesAddingCount:10000 usingViews:YES];
+                    break;
+                case MBXSettingsAnnotations100Sprites:
+                    [self parseFeaturesAddingCount:100 usingViews:NO];
+                    break;
+                case MBXSettingsAnnotations1000Sprites:
+                    [self parseFeaturesAddingCount:1000 usingViews:NO];
+                    break;
+                case MBXSettingsAnnotations10000Sprites:
+                    [self parseFeaturesAddingCount:10000 usingViews:NO];
+                    break;
+                case MBXSettingsAnnotationsTestShapes:
+                    [self addTestShapes];
+                    break;
+                case MBXSettingsAnnotationsCustomCallout:
+                    [self addAnnotationWithCustomCallout];
+                    break;
+                case MBXSettingsAnnotationsRemoveAnnotations:
+                    [self.mapView removeAnnotations:self.mapView.annotations];
+                    break;
+                default:
+                    NSAssert(NO, @"All annotations setting rows should be implemented");
+                    break;
+            }
+            break;
+        case MBXSettingsRuntimeStyling:
+            switch (indexPath.row)
+            {
+                case MBXSettingsRuntimeStylingWater:
+                    [self styleWaterLayer];
+                    break;
+                case MBXSettingsRuntimeStylingRoads:
+                    [self styleRoadLayer];
+                    break;
+                case MBXSettingsRuntimeStylingRaster:
+                    [self styleRasterLayer];
+                    break;
+                case MBXSettingsRuntimeStylingGeoJSON:
+                    [self styleGeoJSONSource];
+                    break;
+                case MBXSettingsRuntimeStylingSymbols:
+                    [self styleSymbolLayer];
+                    break;
+                case MBXSettingsRuntimeStylingBuildings:
+                    [self styleBuildingLayer];
+                    break;
+                case MBXSettingsRuntimeStylingFerry:
+                    [self styleFerryLayer];
+                    break;
+                case MBXSettingsRuntimeStylingParks:
+                    [self removeParkLayer];
+                    break;
+                case MBXSettingsRuntimeStylingFilteredFill:
+                    [self styleFilteredFill];
+                    break;
+                case MBXSettingsRuntimeStylingFilteredLines:
+                    [self styleFilteredLines];
+                    break;
+                case MBXSettingsRuntimeStylingNumericFilteredFill:
+                    [self styleNumericFilteredFills];
+                    break;
+                case MBXSettingsRuntimeStylingStyleQuery:
+                    [self styleQuery];
+                    break;
+                default:
+                    NSAssert(NO, @"All runtime styling setting rows should be implemented");
+                    break;
+            }
+            break;
+        case MBXSettingsMiscellaneous:
+            switch (indexPath.row)
+            {
+                case MBXSettingsMiscellaneousWorldTour:
+                    [self startWorldTour];
+                    break;
+                case MBXSettingsMiscellaneousCustomUserDot:
+                    [self toggleCustomUserDot];
+                    break;
+                case MBXSettingsMiscellaneousPrintLogFile:
+                    [self printTelemetryLogFile];
+                    break;
+                case MBXSettingsMiscellaneousDeleteLogFile:
+                    [self deleteTelemetryLogFile];
+                    break;
+                default:
+                    NSAssert(NO, @"All miscellaneous setting rows should be implemented");
+                    break;
+            }
+            break;
+        default:
+            NSAssert(NO, @"All settings sections should be implemented");
+            break;
     }
 }
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return [[self settingsSectionTitles] count];
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [[self settingsTitlesForSection:section] count];
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section;
+{
+    return [[self settingsSectionTitles] objectAtIndex:section];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+
+    cell.textLabel.text = [[self settingsTitlesForSection:indexPath.section] objectAtIndex:indexPath.row];
+
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+
+    [self dismissViewControllerAnimated:YES completion:^
+    {
+        [self performActionForSettingAtIndexPath:indexPath];
+    }];
+}
+
+#pragma mark - Debugging Actions
 
 - (void)parseFeaturesAddingCount:(NSUInteger)featuresCount usingViews:(BOOL)useViews
 {
@@ -441,106 +628,285 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     [self.mapView addAnnotation:outerPolygon];
 }
 
-- (void)presentAnnotationWithCustomCallout
+- (void)addAnnotationWithCustomCallout
 {
     [self.mapView removeAnnotations:self.mapView.annotations];
-    
+
     MBXCustomCalloutAnnotation *annotation = [[MBXCustomCalloutAnnotation alloc] init];
     annotation.coordinate = CLLocationCoordinate2DMake(48.8533940, 2.3775439);
     annotation.title = @"Custom Callout";
-    
+
     [self.mapView addAnnotation:annotation];
     [self.mapView showAnnotations:@[annotation] animated:YES];
-}
-
-- (void)testRuntimeStyling
-{
-    [self styleWaterLayer];
-    [self styleRoadLayer];
-    [self styleRasterLayer];
-    [self styleGeoJSONSource];
-    [self styleSymbolLayer];
-    
-    MGLFillStyleLayer *buildingLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"building"];
-    buildingLayer.fillColor = [UIColor blackColor];
-    
-    MGLLineStyleLayer *ferryLineLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"ferry"];
-    ferryLineLayer.lineColor = [UIColor redColor];
-    
-    MGLFillStyleLayer *parkLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"park"];
-    [self.mapView.style removeLayer:parkLayer];
-}
-
-- (void)styleSymbolLayer
-{
-    MGLSymbolStyleLayer *stateLayer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:@"state-label-lg"];
-    stateLayer.textColor = [UIColor redColor];
-}
-
-- (void)styleGeoJSONSource
-{
-    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
-    NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithSourceIdentifier:@"ams" URL:geoJSONURL];
-    [self.mapView.style addSource:source];
-    
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithLayerIdentifier:@"test" source:source];
-    fillLayer.fillColor = [UIColor purpleColor];
-    [self.mapView.style addLayer:fillLayer];
-}
-
-- (void)styleRasterLayer
-{
-    NSURL *rasterURL = [NSURL URLWithString:@"mapbox://mapbox.satellite"];
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithSourceIdentifier:@"my-raster-source" URL:rasterURL tileSize:512];
-    [self.mapView.style addSource:rasterSource];
-    
-    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithLayerIdentifier:@"my-raster-layer" source:rasterSource];
-    MGLStyleAttributeFunction *opacityFunction = [[MGLStyleAttributeFunction alloc] init];
-    opacityFunction.stops = @{@20.0f: @1.0f,
-                              @5.0f: @0.0f};
-    rasterLayer.rasterOpacity = opacityFunction;
-    [self.mapView.style addLayer:rasterLayer];
 }
 
 - (void)styleWaterLayer
 {
     MGLFillStyleLayer *waterLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
-    MGLStyleAttributeFunction *waterColorFunction = [[MGLStyleAttributeFunction alloc] init];
-    waterColorFunction.stops = @{@6.0f: [UIColor yellowColor],
-                                 @8.0f: [UIColor blueColor],
-                                 @10.0f: [UIColor redColor],
-                                 @12.0f: [UIColor greenColor],
-                                 @14.0f: [UIColor blueColor]};
+    MGLStyleValue *waterColorFunction = [MGLStyleValue<UIColor *> valueWithStops:@{
+        @6.0f: [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor yellowColor]],
+        @8.0f: [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor blueColor]],
+        @10.0f: [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]],
+        @12.0f: [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor greenColor]],
+        @14.0f: [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor blueColor]],
+    }];
     waterLayer.fillColor = waterColorFunction;
-    
-    MGLStyleAttributeFunction *fillAntialias = [[MGLStyleAttributeFunction alloc] init];
-    fillAntialias.stops = @{@11: @YES,
-                            @12: @NO,
-                            @13: @YES,
-                            @14: @NO,
-                            @15: @YES};
+
+    MGLStyleValue *fillAntialias = [MGLStyleValue<NSNumber *> valueWithStops:@{
+        @11: [MGLStyleValue<NSNumber *> valueWithRawValue:@YES],
+        @12: [MGLStyleValue<NSNumber *> valueWithRawValue:@NO],
+        @13: [MGLStyleValue<NSNumber *> valueWithRawValue:@YES],
+        @14: [MGLStyleValue<NSNumber *> valueWithRawValue:@NO],
+        @15: [MGLStyleValue<NSNumber *> valueWithRawValue:@YES],
+    }];
     waterLayer.fillAntialias = fillAntialias;
 }
 
 - (void)styleRoadLayer
 {
     MGLLineStyleLayer *roadLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"road-primary"];
-    roadLayer.lineColor = [UIColor blackColor];
-    MGLStyleAttributeFunction *lineWidthFunction = [[MGLStyleAttributeFunction alloc] init];
-    
-    MGLStyleAttributeFunction *roadLineColor = [[MGLStyleAttributeFunction alloc] init];
-    roadLineColor.stops = @{@10: [UIColor purpleColor],
-                            @13: [UIColor yellowColor],
-                            @16: [UIColor cyanColor]};
+    roadLayer.lineColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor blackColor]];
+    MGLStyleValue *lineWidthFunction = [MGLStyleValue<NSNumber *> valueWithStops:@{}];
+
+    MGLStyleValue *roadLineColor = [MGLStyleValue<UIColor *> valueWithStops:@{
+        @10: [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor purpleColor]],
+        @13: [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor yellowColor]],
+        @16: [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor cyanColor]],
+    }];
     roadLayer.lineColor = roadLineColor;
     roadLayer.lineWidth = lineWidthFunction;
     roadLayer.lineGapWidth = lineWidthFunction;
-    
+
     roadLayer.visible = YES;
     roadLayer.maximumZoomLevel = 15;
     roadLayer.minimumZoomLevel = 13;
 }
+
+- (void)styleRasterLayer
+{
+    NSURL *rasterURL = [NSURL URLWithString:@"mapbox://mapbox.satellite"];
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"my-raster-source" URL:rasterURL tileSize:512];
+    [self.mapView.style addSource:rasterSource];
+
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"my-raster-layer" source:rasterSource];
+    MGLStyleValue *opacityFunction = [MGLStyleValue<NSNumber *> valueWithStops:@{
+        @20.0f: [MGLStyleValue<NSNumber *> valueWithRawValue:@1.0f],
+        @5.0f: [MGLStyleValue<NSNumber *> valueWithRawValue:@0.0f],
+    }];
+    rasterLayer.rasterOpacity = opacityFunction;
+    [self.mapView.style addLayer:rasterLayer];
+}
+
+- (void)styleGeoJSONSource
+{
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
+    NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"ams" URL:geoJSONURL options:nil];
+    [self.mapView.style addSource:source];
+
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"test" source:source];
+    fillLayer.fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor purpleColor]];
+    [self.mapView.style addLayer:fillLayer];
+}
+
+- (void)styleSymbolLayer
+{
+    MGLSymbolStyleLayer *stateLayer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:@"state-label-lg"];
+    stateLayer.textColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
+}
+
+- (void)styleBuildingLayer
+{
+    MGLFillStyleLayer *buildingLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"building"];
+    buildingLayer.fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor blackColor]];
+}
+
+- (void)styleFerryLayer
+{
+    MGLLineStyleLayer *ferryLineLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"ferry"];
+    ferryLineLayer.lineColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
+}
+
+- (void)removeParkLayer
+{
+    MGLFillStyleLayer *parkLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"park"];
+    [self.mapView.style removeLayer:parkLayer];
+}
+
+- (void)styleFilteredFill
+{
+    // set style and focus on Texas
+    [self.mapView setStyleURL:[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"fill_filter_style" ofType:@"json"]]];
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(31, -100) zoomLevel:3 animated:NO];
+
+    // after slight delay, fill in Texas (atypical use; we want to clearly see the change for test purposes)
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^
+    {
+        MGLFillStyleLayer *statesLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"states"];
+
+        // filter
+        statesLayer.predicate = [NSPredicate predicateWithFormat:@"name == 'Texas'"];
+
+        // paint properties
+        statesLayer.fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
+        statesLayer.fillOpacity = [MGLStyleValue<NSNumber *> valueWithRawValue:@0.25];
+    });
+}
+
+- (void)styleFilteredLines
+{
+    // set style and focus on lower 48
+    [self.mapView setStyleURL:[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"line_filter_style" ofType:@"json"]]];
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(40, -97) zoomLevel:5 animated:NO];
+
+    // after slight delay, change styling for all Washington-named counties  (atypical use; we want to clearly see the change for test purposes)
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^
+    {
+        MGLLineStyleLayer *countiesLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"counties"];
+
+        // filter
+        countiesLayer.predicate = [NSPredicate predicateWithFormat:@"NAME10 == 'Washington'"];
+
+        // paint properties
+        countiesLayer.lineColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
+        countiesLayer.lineOpacity = [MGLStyleValue<NSNumber *> valueWithRawValue:@0.75];
+        countiesLayer.lineWidth = [MGLStyleValue<NSNumber *> valueWithRawValue:@5];
+    });
+}
+
+- (void)styleNumericFilteredFills
+{
+    // set style and focus on lower 48
+    [self.mapView setStyleURL:[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"numeric_filter_style" ofType:@"json"]]];
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(40, -97) zoomLevel:5 animated:NO];
+
+    // after slight delay, change styling for regions 200-299 (atypical use; we want to clearly see the change for test purposes)
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^
+    {
+        MGLFillStyleLayer *regionsLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"regions"];
+
+        // filter (testing both inline and format strings)
+        regionsLayer.predicate = [NSPredicate predicateWithFormat:@"HRRNUM >= %@ AND HRRNUM < 300", @(200)];
+
+        // paint properties
+        regionsLayer.fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor blueColor]];
+        regionsLayer.fillOpacity = [MGLStyleValue<NSNumber *> valueWithRawValue:@0.5];
+    });
+}
+
+
+- (void)styleQuery
+{
+    CGRect queryRect = CGRectInset(self.mapView.bounds, 100, 200);
+    NSArray *features = [self.mapView visibleFeaturesInRect:queryRect];
+    
+    NSString *querySourceID = @"query-source-id";
+    NSString *queryLayerID = @"query-layer-id";
+    
+    // RTE if you don't remove the layer first
+    // RTE if you pass a nill layer to remove layer
+    MGLStyleLayer *layer = [self.mapView.style layerWithIdentifier:queryLayerID];
+    if (layer) {
+        [self.mapView.style removeLayer:layer];
+    }
+    
+    // RTE if you pass a nill source to remove source
+    MGLSource *source = [self.mapView.style sourceWithIdentifier:querySourceID];
+    if (source) {
+        [self.mapView.style removeSource:source];
+    }
+    
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:querySourceID features:features options:nil];
+        [self.mapView.style addSource:source];
+        
+        MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:queryLayerID source:source];
+        fillLayer.fillColor = [MGLStyleConstantValue<UIColor *> valueWithRawValue:[UIColor blueColor]];
+        fillLayer.fillOpacity = [MGLStyleConstantValue<NSNumber *> valueWithRawValue:@0.5];
+        [self.mapView.style addLayer:fillLayer];
+    });
+}
+
+- (IBAction)startWorldTour
+{
+    _isTouringWorld = YES;
+
+    [self.mapView removeAnnotations:self.mapView.annotations];
+    NSUInteger numberOfAnnotations = sizeof(WorldTourDestinations) / sizeof(WorldTourDestinations[0]);
+    NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:numberOfAnnotations];
+    for (NSUInteger i = 0; i < numberOfAnnotations; i++)
+    {
+        MBXDroppedPinAnnotation *annotation = [[MBXDroppedPinAnnotation alloc] init];
+        annotation.coordinate = WorldTourDestinations[i];
+        [annotations addObject:annotation];
+    }
+    [self.mapView addAnnotations:annotations];
+    [self continueWorldTourWithRemainingAnnotations:annotations];
+}
+
+- (void)continueWorldTourWithRemainingAnnotations:(NS_MUTABLE_ARRAY_OF(MGLPointAnnotation *) *)annotations
+{
+    MGLPointAnnotation *nextAnnotation = annotations.firstObject;
+    if (!nextAnnotation || !_isTouringWorld)
+    {
+        _isTouringWorld = NO;
+        return;
+    }
+
+    [annotations removeObjectAtIndex:0];
+    MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:nextAnnotation.coordinate
+                                                            fromDistance:10
+                                                                   pitch:arc4random_uniform(60)
+                                                                 heading:arc4random_uniform(360)];
+    __weak MBXViewController *weakSelf = self;
+    [self.mapView flyToCamera:camera completionHandler:^{
+        MBXViewController *strongSelf = weakSelf;
+        [strongSelf performSelector:@selector(continueWorldTourWithRemainingAnnotations:)
+                         withObject:annotations
+                         afterDelay:2];
+    }];
+}
+
+- (void)toggleCustomUserDot
+{
+    _customUserLocationAnnnotationEnabled = !_customUserLocationAnnnotationEnabled;
+    self.mapView.showsUserLocation = NO;
+    self.mapView.userTrackingMode = MGLUserTrackingModeFollow;
+}
+
+- (void)printTelemetryLogFile
+{
+    NSString *fileContents = [NSString stringWithContentsOfFile:[self telemetryDebugLogFilePath] encoding:NSUTF8StringEncoding error:nil];
+    NSLog(@"%@", fileContents);
+}
+
+- (void)deleteTelemetryLogFile
+{
+    NSString *filePath = [self telemetryDebugLogFilePath];
+    if ([[NSFileManager defaultManager] isDeletableFileAtPath:filePath])
+    {
+        NSError *error;
+        BOOL success = [[NSFileManager defaultManager] removeItemAtPath:filePath error:&error];
+        if (success) {
+            NSLog(@"Deleted telemetry log.");
+        } else {
+            NSLog(@"Error deleting telemetry log: %@", error.localizedDescription);
+        }
+    }
+}
+
+- (NSString *)telemetryDebugLogFilePath
+{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy'-'MM'-'dd"];
+    [dateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
+    NSString *filePath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:[NSString stringWithFormat:@"telemetry_log-%@.json", [dateFormatter stringFromDate:[NSDate date]]]];
+
+    return filePath;
+}
+
+#pragma mark - User Actions
 
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer *)longPress
 {
@@ -643,69 +1009,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     [sender setAccessibilityValue:nextAccessibilityValue];
 }
 
-- (IBAction)startWorldTour:(__unused id)sender
-{
-    _isTouringWorld = YES;
-    
-    [self.mapView removeAnnotations:self.mapView.annotations];
-    NSUInteger numberOfAnnotations = sizeof(WorldTourDestinations) / sizeof(WorldTourDestinations[0]);
-    NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:numberOfAnnotations];
-    for (NSUInteger i = 0; i < numberOfAnnotations; i++)
-    {
-        MBXDroppedPinAnnotation *annotation = [[MBXDroppedPinAnnotation alloc] init];
-        annotation.coordinate = WorldTourDestinations[i];
-        [annotations addObject:annotation];
-    }
-    [self.mapView addAnnotations:annotations];
-    [self continueWorldTourWithRemainingAnnotations:annotations];
-}
-
-- (void)continueWorldTourWithRemainingAnnotations:(NS_MUTABLE_ARRAY_OF(MGLPointAnnotation *) *)annotations
-{
-    MGLPointAnnotation *nextAnnotation = annotations.firstObject;
-    if (!nextAnnotation || !_isTouringWorld)
-    {
-        _isTouringWorld = NO;
-        return;
-    }
-    
-    [annotations removeObjectAtIndex:0];
-    MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:nextAnnotation.coordinate
-                                                            fromDistance:10
-                                                                   pitch:arc4random_uniform(60)
-                                                                 heading:arc4random_uniform(360)];
-    __weak MBXViewController *weakSelf = self;
-    [self.mapView flyToCamera:camera completionHandler:^{
-        MBXViewController *strongSelf = weakSelf;
-        [strongSelf performSelector:@selector(continueWorldTourWithRemainingAnnotations:)
-                         withObject:annotations
-                         afterDelay:2];
-    }];
-}
-
-- (NSString *)telemetryDebugLogfilePath
-{
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy'-'MM'-'dd"];
-    [dateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
-    NSString *filePath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:[NSString stringWithFormat:@"telemetry_log-%@.json", [dateFormatter stringFromDate:[NSDate date]]]];
-
-    return filePath;
-}
-
-- (IBAction)unwindToMapViewController:(__unused UIStoryboardSegue *)sender {
-}
-
-#pragma mark - Destruction
-
-- (void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-
-    [self saveState:nil];
-}
-
-#pragma mark - MGLMapViewDelegate
+#pragma mark - Map Delegate
 
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
 {
@@ -823,11 +1127,6 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     return YES;
 }
 
-- (CGFloat)mapView:(__unused MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation
-{
-    return ([annotation isKindOfClass:[MGLPolygon class]] ? 0.5 : 1.0);
-}
-
 - (UIColor *)mapView:(__unused MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation
 {
     return ([annotation isKindOfClass:[MGLPolyline class]] ? [UIColor purpleColor] : [UIColor blackColor]);
@@ -835,7 +1134,8 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 - (UIColor *)mapView:(__unused MGLMapView *)mapView fillColorForPolygonAnnotation:(__unused MGLPolygon *)annotation
 {
-    return (annotation.pointCount > 3 ? [UIColor greenColor] : [UIColor redColor]);
+    UIColor *color = annotation.pointCount > 3 ? [UIColor greenColor] : [UIColor redColor];
+    return [color colorWithAlphaComponent:0.5];
 }
 
 - (void)mapView:(__unused MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(__unused BOOL)animated

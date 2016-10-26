@@ -1,10 +1,9 @@
-#include <mbgl/util/timer.hpp>
+#include "timer_impl.hpp"
 
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <memory>
-
-#include "timer_impl.hpp"
 
 namespace mbgl {
 namespace util {

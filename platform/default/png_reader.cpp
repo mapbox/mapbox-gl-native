@@ -80,7 +80,7 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
     int color_type = 0;
     png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, nullptr, nullptr, nullptr);
 
-    UnassociatedImage image { width, height };
+    UnassociatedImage image { static_cast<uint16_t>(width), static_cast<uint16_t>(height) };
 
     if (color_type == PNG_COLOR_TYPE_PALETTE)
         png_set_expand(png_ptr);

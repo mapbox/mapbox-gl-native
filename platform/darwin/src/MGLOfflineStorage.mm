@@ -2,6 +2,7 @@
 
 #import "MGLAccountManager_Private.h"
 #import "MGLGeometry_Private.h"
+#import "MGLNetworkConfiguration.h"
 #import "MGLOfflinePack_Private.h"
 #import "MGLOfflineRegion_Private.h"
 #import "MGLTilePyramidOfflineRegion.h"
@@ -59,7 +60,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
                                                              appropriateForURL:nil
                                                                         create:YES
                                                                          error:nil];
-    NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
+    NSString *bundleIdentifier = [self bundleIdentifier];
     if (!bundleIdentifier) {
         // There’s no main bundle identifier when running in a unit test bundle.
         bundleIdentifier = [NSBundle bundleForClass:self].bundleIdentifier;
@@ -93,7 +94,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
     NSString *legacyCachePath = [legacyPaths.firstObject stringByAppendingPathComponent:MGLOfflineStorageFileName3_2_0_beta_1];
 #elif TARGET_OS_MAC
     // ~/Library/Caches/tld.app.bundle.id/offline.db
-    NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
+    NSString *bundleIdentifier = [self bundleIdentifier];
     NSURL *legacyCacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory
                                                                             inDomain:NSUserDomainMask
                                                                    appropriateForURL:nil
@@ -127,6 +128,13 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
 
         _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [NSBundle mainBundle].resourceURL.path.UTF8String);
 
+        // Observe for changes to the API base URL (and find out the current one).
+        [[MGLNetworkConfiguration sharedManager] addObserver:self
+                                                  forKeyPath:@"apiBaseURL"
+                                                     options:(NSKeyValueObservingOptionInitial |
+                                                              NSKeyValueObservingOptionNew)
+                                                     context:NULL];
+
         // Observe for changes to the global access token (and find out the current one).
         [[MGLAccountManager sharedManager] addObserver:self
                                             forKeyPath:@"accessToken"
@@ -137,7 +145,17 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
     return self;
 }
 
++ (NSString *)bundleIdentifier {
+    NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
+    if (!bundleIdentifier) {
+        // There’s no main bundle identifier when running in a unit test bundle.
+        bundleIdentifier = [NSBundle bundleForClass:self].bundleIdentifier;
+    }
+    return bundleIdentifier;
+}
+
 - (void)dealloc {
+    [[MGLNetworkConfiguration sharedManager] removeObserver:self forKeyPath:@"apiBaseURL"];
     [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
     
     for (MGLOfflinePack *pack in self.packs) {
@@ -154,6 +172,13 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
         NSString *accessToken = change[NSKeyValueChangeNewKey];
         if (![accessToken isKindOfClass:[NSNull class]]) {
             self.mbglFileSource->setAccessToken(accessToken.UTF8String);
+        }
+    } else if ([keyPath isEqualToString:@"apiBaseURL"] && object == [MGLNetworkConfiguration sharedManager]) {
+        NSURL *apiBaseURL = change[NSKeyValueChangeNewKey];
+        if ([apiBaseURL isKindOfClass:[NSNull class]]) {
+            self.mbglFileSource->setAPIBaseURL(mbgl::util::API_BASE_URL);
+        } else {
+            self.mbglFileSource->setAPIBaseURL(apiBaseURL.absoluteString.UTF8String);
         }
     } else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];

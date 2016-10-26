@@ -18,12 +18,14 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
@@ -55,9 +57,18 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
             @Override
             public void onMapReady(MapboxMap map) {
                 mapboxMap = map;
+
+                // enable location updates
                 toggleGps(!mapboxMap.isMyLocationEnabled());
 
+                // add some padding
                 final MyLocationViewSettings myLocationViewSettings = mapboxMap.getMyLocationViewSettings();
+                myLocationViewSettings.setPadding(0, 500, 0, 0);
+
+                // enable tracking
+                TrackingSettings settings = mapboxMap.getTrackingSettings();
+                settings.setDismissLocationTrackingOnGesture(false);
+                settings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
 
                 // handle default button clicks
                 ViewUtils.attachClickListener(

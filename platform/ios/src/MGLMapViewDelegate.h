@@ -126,6 +126,23 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapViewDidFinishRenderingFrame:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
 
+/**
+ Tells the delegate that the map has just finished loading a style.
+ 
+ This method is called during the initialization of the map view and after any
+ subsequent loading of a new style. This method is called between the
+ `-mapViewWillStartRenderingMap:` and `-mapViewDidFinishRenderingMap:` delegate
+ methods. Changes to sources or layers of the current style do not cause this
+ method to be called.
+ 
+ This method is the earliest opportunity to modify the layout or appearance of
+ the current style before the map view is displayed to the user.
+
+ @param mapView The map view that has just loaded a style.
+ @param style The style that was loaded.
+ */
+- (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style;
+
 #pragma mark Tracking User Location
 
 /**
@@ -211,23 +228,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable MGLAnnotationImage *)mapView:(MGLMapView *)mapView imageForAnnotation:(id <MGLAnnotation>)annotation;
 
-/**
- Returns the alpha value to use when rendering a shape annotation.
- 
- A value of `0.0` results in a completely transparent shape. A value of `1.0`,
- the default, results in a completely opaque shape.
- 
- @param mapView The map view rendering the shape annotation.
- @param annotation The annotation being rendered.
- @return An alpha value between `0` and `1.0`.
- */
-- (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation;
+- (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation __attribute__((deprecated("Use -mapView:strokeColorForShapeAnnotation: or -mapView:fillColorForPolygonAnnotation:.")));
 
 /**
  Returns the color to use when rendering the outline of a shape annotation.
  
  The default stroke color is the map view’s tint color. If a pattern color is
  specified, the result is undefined.
+ 
+ Opacity may be set by specifying an alpha component. The default alpha value is
+ `1.0` and results in a completely opaque stroke.
  
  @param mapView The map view rendering the shape annotation.
  @param annotation The annotation being rendered.
@@ -240,6 +250,9 @@ NS_ASSUME_NONNULL_BEGIN
  
  The default fill color is the map view’s tint color. If a pattern color is
  specified, the result is undefined.
+ 
+ Opacity may be set by specifying an alpha component. The default alpha value is
+ `1.0` and results in a completely opaque shape.
  
  @param mapView The map view rendering the polygon annotation.
  @param annotation The annotation being rendered.

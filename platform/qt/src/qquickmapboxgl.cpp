@@ -1,16 +1,27 @@
+#include "qquickmapboxgl.hpp"
+
+#include "qmapbox.hpp"
+#include "qquickmapboxglmapparameter.hpp"
 #include "qquickmapboxglrenderer.hpp"
 
 #include <mbgl/util/constants.hpp>
 
-#include <QQuickMapboxGL>
-#include <QQuickMapboxGLStyleProperty>
-
 #include <QDebug>
 #include <QQuickItem>
+#include <QRegularExpression>
 #include <QString>
 #include <QtGlobal>
+#include <QQmlListProperty>
+#include <QJSValue>
 
-#include <cmath>
+namespace {
+
+static const QRegularExpression s_camelCase {"([a-z0-9])([A-Z])"};
+static const QStringList s_parameterTypes = QStringList()
+    << "style" << "paint" << "layout" << "layer" << "source" << "filter" << "image"
+    << "bearing" << "pitch";
+
+} // namespace
 
 QQuickMapboxGL::QQuickMapboxGL(QQuickItem *parent_)
     : QQuickFramebufferObject(parent_)
@@ -23,20 +34,28 @@ QQuickMapboxGL::~QQuickMapboxGL()
 
 QQuickFramebufferObject::Renderer *QQuickMapboxGL::createRenderer() const
 {
-    QQuickMapboxGLRenderer *renderer = new QQuickMapboxGLRenderer();
-    connect(renderer, SIGNAL(styleChanged()), this, SIGNAL(styleChanged()));
-    return renderer;
+    return new QQuickMapboxGLRenderer;
 }
 
 void QQuickMapboxGL::setPlugin(QDeclarativeGeoServiceProvider *)
 {
-    qWarning() << __PRETTY_FUNCTION__
-        << "Not implemented.";
+    m_error = QGeoServiceProvider::NotSupportedError;
+    m_errorString = "QQuickMapboxGL does not support plugins.";
+    emit errorChanged();
 }
 
 QDeclarativeGeoServiceProvider *QQuickMapboxGL::plugin() const
 {
     return nullptr;
+}
+
+void QQuickMapboxGL::componentComplete()
+{
+    QQuickFramebufferObject::componentComplete();
+
+    for (const auto& param : m_parameters) {
+        processMapParameter(param);
+    }
 }
 
 void QQuickMapboxGL::setMinimumZoomLevel(qreal zoom)
@@ -122,12 +141,12 @@ QGeoCoordinate QQuickMapboxGL::center() const
 
 QGeoServiceProvider::Error QQuickMapboxGL::error() const
 {
-    return QGeoServiceProvider::NoError;
+    return m_error;
 }
 
 QString QQuickMapboxGL::errorString() const
 {
-    return QString();
+    return m_errorString;
 }
 
 void QQuickMapboxGL::setVisibleRegion(const QGeoShape &shape)
@@ -142,8 +161,7 @@ QGeoShape QQuickMapboxGL::visibleRegion() const
 
 void QQuickMapboxGL::setCopyrightsVisible(bool)
 {
-    qWarning() << __PRETTY_FUNCTION__
-        << "Not implemented.";
+    qWarning() << Q_FUNC_INFO << "Not implemented.";
 }
 
 bool QQuickMapboxGL::copyrightsVisible() const
@@ -159,12 +177,14 @@ void QQuickMapboxGL::setColor(const QColor &color)
 
     m_color = color;
 
-    QVariantMap paintProperty;
-    paintProperty["type"] = QQuickMapboxGLLayoutStyleProperty::PaintType;
-    paintProperty["layer"] = "background";
-    paintProperty["property"] = "background-color";
-    paintProperty["value"] = color;
-    onStylePropertyUpdated(paintProperty);
+    StyleProperty change;
+    change.type = StyleProperty::Paint;
+    change.layer = "background";
+    change.property = "background-color";
+    change.value = color;
+    m_stylePropertyChanges << change;
+
+    update();
 
     emit colorChanged(m_color);
 }
@@ -182,132 +202,264 @@ void QQuickMapboxGL::pan(int dx, int dy)
     update();
 }
 
-void QQuickMapboxGL::setStyle(QQuickMapboxGLStyle *style)
+void QQuickMapboxGL::onMapChanged(QMapbox::MapChange change)
 {
-    if (style == m_style) {
-        return;
+    if (change == QMapbox::MapChangeDidFinishLoadingStyle) {
+        m_styleLoaded = true;
+        update();
+    }
+}
+
+bool QQuickMapboxGL::parseImage(QQuickMapboxGLMapParameter *param)
+{
+    m_imageChanges << Image {
+        param->property("name").toString(),
+        QImage(param->property("sprite").toString())
+    };
+    return true;
+}
+
+bool QQuickMapboxGL::parseStyle(QQuickMapboxGLMapParameter *param)
+{
+    QString url = param->property("url").toString();
+    if (m_styleUrl == url) {
+        return false;
     }
 
-    disconnect(style, SIGNAL(urlChanged(QString)), this, SLOT(onStyleChanged()));
-    disconnect(style, SIGNAL(propertyUpdated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
-    delete m_style;
-    m_style = style;
-    if (style) {
-        style->setParentItem(this);
-        connect(style, SIGNAL(urlChanged(QString)), this, SLOT(onStyleChanged()));
-        connect(style, SIGNAL(propertyUpdated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
+    // Reload parameters if switching style URLs.
+    if (!m_styleUrl.isEmpty()) {
+        for (const auto& param_ : m_parameters) {
+            if (param_->property("type").toString() == "style") continue;
+            processMapParameter(param_);
+        }
     }
 
+    m_styleUrl = url;
+    m_styleLoaded = false;
     m_syncState |= StyleNeedsSync;
-    update();
 
-    emit styleChanged();
+    return true;
 }
 
-QQuickMapboxGLStyle *QQuickMapboxGL::style() const
+bool QQuickMapboxGL::parseStyleProperty(QQuickMapboxGLMapParameter *param, const QString &name)
 {
-    return m_style;
-}
-
-void QQuickMapboxGL::setBearing(qreal angle)
-{
-    angle = std::fmod(angle, 360.);
-
-    if (m_bearing == angle) {
-        return;
+    // Ignore meta-properties "type", "layer" and "class".
+    if (name == "type" || name == "layer" || name == "class") {
+        return false;
     }
 
-    m_bearing = angle;
+    QString formattedName(name);
+    formattedName = formattedName.replace(s_camelCase, "\\1-\\2").toLower();
 
+    QVariant value = param->property(name.toLatin1());
+    if (value.canConvert<QJSValue>()) {
+        value = value.value<QJSValue>().toVariant();
+    }
+
+    m_stylePropertyChanges << QQuickMapboxGL::StyleProperty {
+        param->property("type").toString().at(0) == 'p' ? StyleProperty::Paint : StyleProperty::Layout,
+        param->property("layer").toString(),
+        formattedName,
+        value,
+        param->property("class").toString()
+    };
+    return true;
+}
+
+bool QQuickMapboxGL::parseStyleLayer(QQuickMapboxGLMapParameter *param)
+{
+    QVariantMap layer;
+    layer["id"] = param->property("name");
+    layer["source"] = param->property("source");
+    layer["type"] = param->property("layerType");
+    if (param->property("sourceLayer").isValid()) {
+        layer["source-layer"] = param->property("sourceLayer");
+    }
+    m_layerChanges << layer;
+    return true;
+}
+
+bool QQuickMapboxGL::parseStyleSource(QQuickMapboxGLMapParameter *param)
+{
+    QString sourceType = param->property("sourceType").toString();
+
+    QVariantMap source;
+    source["id"] = param->property("name");
+    source["type"] = sourceType;
+    if (sourceType == "vector" || sourceType == "raster") {
+        source["url"] = param->property("url");
+        m_sourceChanges << source;
+    } else if (sourceType == "geojson") {
+        QFile geojson(param->property("data").toString());
+        geojson.open(QIODevice::ReadOnly);
+        source["data"] = geojson.readAll();
+        m_sourceChanges << source;
+    } else {
+        m_error = QGeoServiceProvider::UnknownParameterError;
+        m_errorString = "Invalid source type: " + sourceType;
+        emit errorChanged();
+        return false;
+    }
+    return true;
+}
+
+bool QQuickMapboxGL::parseStyleFilter(QQuickMapboxGLMapParameter *param)
+{
+    QVariantMap filter;
+    filter["layer"] = param->property("layer");
+    filter["filter"] = param->property("filter");
+    m_filterChanges << filter;
+    return true;
+}
+
+bool QQuickMapboxGL::parseBearing(QQuickMapboxGLMapParameter *param)
+{
+    qreal angle = param->property("angle").toReal();
+    if (m_bearing == angle) return false;
+    m_bearing = angle;
     m_syncState |= BearingNeedsSync;
     update();
-
-    emit bearingChanged(m_bearing);
+    return true;
 }
 
-qreal QQuickMapboxGL::bearing() const
+bool QQuickMapboxGL::parsePitch(QQuickMapboxGLMapParameter *param)
 {
-    return m_bearing;
-}
-
-void QQuickMapboxGL::setPitch(qreal angle)
-{
+    qreal angle = param->property("angle").toReal();
     angle = qMin(qMax(0., angle), mbgl::util::PITCH_MAX * mbgl::util::RAD2DEG);
+    if (m_pitch == angle) return false;
+    m_pitch = angle;
+    m_syncState |= PitchNeedsSync;
+    update();
+    return true;
+}
 
-    if (m_pitch == angle) {
+void QQuickMapboxGL::processMapParameter(QQuickMapboxGLMapParameter *param)
+{
+    bool needsUpdate = false;
+    switch (s_parameterTypes.indexOf(param->property("type").toString())) {
+    case -1:
+        m_error = QGeoServiceProvider::UnknownParameterError;
+        m_errorString = "Invalid value for property 'type': " + param->property("type").toString();
+        emit errorChanged();
+        break;
+    case 0: // style
+        needsUpdate |= parseStyle(param);
+        break;
+    case 1: // paint
+    case 2: // layout
+        for (int i = param->propertyOffset(); i < param->metaObject()->propertyCount(); ++i) {
+            needsUpdate |= parseStyleProperty(param, QString(param->metaObject()->property(i).name()));
+        }
+        break;
+    case 3: // layer
+        needsUpdate |= parseStyleLayer(param);
+        break;
+    case 4: // source
+        needsUpdate |= parseStyleSource(param);
+        break;
+    case 5: // filter
+        needsUpdate |= parseStyleFilter(param);
+        break;
+    case 6: // image
+        needsUpdate |= parseImage(param);
+        break;
+    case 7: // bearing
+        needsUpdate |= parseBearing(param);
+        break;
+    case 8: // pitch
+        needsUpdate |= parsePitch(param);
+        break;
+    }
+    if (needsUpdate) update();
+}
+
+void QQuickMapboxGL::onParameterPropertyUpdated(const QString &propertyName)
+{
+    QQuickMapboxGLMapParameter *param = qobject_cast<QQuickMapboxGLMapParameter *>(sender());
+    if (!param) {
+        m_error = QGeoServiceProvider::NotSupportedError;
+        m_errorString = "QQuickMapboxGL::onParameterPropertyUpdated should be called from a QQuickMapboxGLMapParameter.";
+        emit errorChanged();
         return;
     }
 
-    m_pitch = angle;
-
-    m_syncState |= PitchNeedsSync;
-    update();
-
-    emit pitchChanged(m_pitch);
-}
-
-qreal QQuickMapboxGL::pitch() const
-{
-    return m_pitch;
-}
-
-QPointF QQuickMapboxGL::swapPan()
-{
-    QPointF oldPan = m_pan;
-
-    m_pan = QPointF(0, 0);
-
-    return oldPan;
-}
-
-int QQuickMapboxGL::swapSyncState()
-{
-    int oldState = m_syncState;
-
-    m_syncState = NothingNeedsSync;
-
-    return oldState;
-}
-
-void QQuickMapboxGL::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
-{
-    QQuickFramebufferObject::itemChange(change, value);
-
-    switch (change) {
-    case QQuickItem::ItemChildAddedChange:
-        if (QQuickMapboxGLStyleProperty *property = qobject_cast<QQuickMapboxGLStyleProperty *>(value.item)) {
-            connect(property, SIGNAL(updated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
-            connect(this, SIGNAL(styleChanged()), property, SLOT(checkUpdated()));
-        }
-        break;
-    case QQuickItem::ItemChildRemovedChange:
-        if (QQuickMapboxGLStyleProperty *property = qobject_cast<QQuickMapboxGLStyleProperty *>(value.item)) {
-            disconnect(property, SIGNAL(updated(QVariantMap)), this, SLOT(onStylePropertyUpdated(QVariantMap)));
-            disconnect(this, SIGNAL(styleChanged()), property, SLOT(checkUpdated()));
-        }
-    default:
-        break;
-    }
-}
-
-void QQuickMapboxGL::onStylePropertyUpdated(const QVariantMap &params)
-{
-    switch (params.value("type").toInt()) {
-    case QQuickMapboxGLStyleProperty::LayoutType:
-        m_layoutChanges << params;
-        break;
-    case QQuickMapboxGLStyleProperty::PaintType:
-        m_paintChanges << params;
-        break;
+    if (propertyName == "type") {
+        m_error = QGeoServiceProvider::NotSupportedError;
+        m_errorString = "Property 'type' is a write-once.";
+        emit errorChanged();
+        return;
     }
 
-    update();
+    bool needsUpdate = false;
+    switch (s_parameterTypes.indexOf(param->property("type").toString())) {
+    case -1:
+        m_error = QGeoServiceProvider::UnknownParameterError;
+        m_errorString = "Invalid value for property 'type': " + param->property("type").toString();
+        emit errorChanged();
+        break;
+    case 0: // style
+        needsUpdate |= parseStyle(param);
+        break;
+    case 1: // paint
+    case 2: // layout
+        needsUpdate |= parseStyleProperty(param, propertyName);
+        break;
+    case 3: // layer
+        needsUpdate |= parseStyleLayer(param);
+        break;
+    case 4: // source
+        needsUpdate |= parseStyleSource(param);
+        break;
+    case 5: // filter
+        needsUpdate |= parseStyleFilter(param);
+        break;
+    case 6: // image
+        needsUpdate |= parseImage(param);
+        break;
+    case 7: // bearing
+        needsUpdate |= parseBearing(param);
+        break;
+    case 8: // pitch
+        needsUpdate |= parsePitch(param);
+        break;
+    }
+    if (needsUpdate) update();
 }
 
-void QQuickMapboxGL::onStyleChanged()
+void QQuickMapboxGL::appendParameter(QQmlListProperty<QQuickMapboxGLMapParameter> *prop, QQuickMapboxGLMapParameter *param)
 {
-    m_syncState |= StyleNeedsSync;
-    update();
+    QQuickMapboxGL *map = static_cast<QQuickMapboxGL *>(prop->object);
+    map->m_parameters.append(param);
+    QObject::connect(param, SIGNAL(propertyUpdated(QString)), map, SLOT(onParameterPropertyUpdated(QString)));
+}
 
-    emit styleChanged();
+int QQuickMapboxGL::countParameters(QQmlListProperty<QQuickMapboxGLMapParameter> *prop)
+{
+    QQuickMapboxGL *map = static_cast<QQuickMapboxGL *>(prop->object);
+    return map->m_parameters.count();
+}
+
+QQuickMapboxGLMapParameter *QQuickMapboxGL::parameterAt(QQmlListProperty<QQuickMapboxGLMapParameter> *prop, int index)
+{
+    QQuickMapboxGL *map = static_cast<QQuickMapboxGL *>(prop->object);
+    return map->m_parameters[index];
+}
+
+void QQuickMapboxGL::clearParameter(QQmlListProperty<QQuickMapboxGLMapParameter> *prop)
+{
+    QQuickMapboxGL *map = static_cast<QQuickMapboxGL *>(prop->object);
+    for (auto param : map->m_parameters) {
+        QObject::disconnect(param, SIGNAL(propertyUpdated(QString)), map, SLOT(onParameterPropertyUpdated(QString)));
+    }
+    map->m_parameters.clear();
+}
+
+QQmlListProperty<QQuickMapboxGLMapParameter> QQuickMapboxGL::parameters()
+{
+    return QQmlListProperty<QQuickMapboxGLMapParameter>(this,
+            nullptr,
+            appendParameter,
+            countParameters,
+            parameterAt,
+            clearParameter);
 }

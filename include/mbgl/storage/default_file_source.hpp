@@ -121,6 +121,7 @@ public:
 private:
     const std::unique_ptr<util::Thread<Impl>> thread;
     const std::unique_ptr<FileSource> assetFileSource;
+    const std::unique_ptr<FileSource> localFileSource;
 };
 
 } // namespace mbgl

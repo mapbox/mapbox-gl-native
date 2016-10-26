@@ -1,5 +1,4 @@
 #include "node_log.hpp"
-#include "util/async_queue.hpp"
 
 #include <mbgl/util/enum.hpp>
 
@@ -19,7 +18,7 @@ struct NodeLogObserver::LogMessage {
 };
 
 NodeLogObserver::NodeLogObserver(v8::Local<v8::Object> target)
-    : queue(new Queue(uv_default_loop(), [this](LogMessage &message) {
+    : queue(new util::AsyncQueue<LogMessage>(uv_default_loop(), [this](LogMessage &message) {
           Nan::HandleScope scope;
 
           auto msg = Nan::New<v8::Object>();

@@ -107,12 +107,15 @@ public class MapboxConstants {
     public static final String STATE_MY_LOCATION_ENABLED = "myLocationEnabled";
     public static final String STATE_MY_LOCATION_TRACKING_MODE = "myLocationTracking";
     public static final String STATE_MY_BEARING_TRACKING_MODE = "myBearingTracking";
+    public static final String STATE_MY_LOCATION_TRACKING_DISMISS = "myLocationTrackingDismiss";
+    public static final String STATE_MY_BEARING_TRACKING_DISMISS = "myBearingTrackingDismiss";
     public static final String STATE_COMPASS_ENABLED = "compassEnabled";
     public static final String STATE_COMPASS_GRAVITY = "compassGravity";
     public static final String STATE_COMPASS_MARGIN_LEFT = "compassMarginLeft";
     public static final String STATE_COMPASS_MARGIN_TOP = "compassMarginTop";
     public static final String STATE_COMPASS_MARGIN_RIGHT = "compassMarginRight";
     public static final String STATE_COMPASS_MARGIN_BOTTOM = "compassMarginBottom";
+    public static final String STATE_COMPASS_FADE_WHEN_FACING_NORTH = "compassFade";
     public static final String STATE_LOGO_GRAVITY = "logoGravity";
     public static final String STATE_LOGO_MARGIN_LEFT = "logoMarginLeft";
     public static final String STATE_LOGO_MARGIN_TOP = "logoMarginTop";
