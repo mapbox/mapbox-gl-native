@@ -262,8 +262,6 @@ void SymbolLayout::addFeature(const GeometryCollection &lines,
     const SymbolPlacementType iconPlacement = layout.get<IconRotationAlignment>() != AlignmentType::Map
                                                   ? SymbolPlacementType::Point
                                                   : layout.get<SymbolPlacement>();
-    const bool mayOverlap = layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
-        layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>();
     const bool isLine = layout.get<SymbolPlacement>() == SymbolPlacementType::Line;
     const float textRepeatDistance = symbolSpacing / 2;
 
@@ -289,22 +287,25 @@ void SymbolLayout::addFeature(const GeometryCollection &lines,
                 }
             }
 
-            const bool inside = !(anchor.point.x < 0 || anchor.point.x > util::EXTENT || anchor.point.y < 0 || anchor.point.y > util::EXTENT);
+            // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers
+            // +-------------------+ Symbols with anchors located on tile edges
+            // |(0,0)             || are duplicated on neighbor tiles.
+            // |                  ||
+            // |                  || In continuous mode, to avoid overdraw we
+            // |                  || skip symbols located on the extent edges.
+            // |       Tile       || In still mode, we include the features in
+            // |                  || the buffers for both tiles and clip them
+            // |                  || at draw time.
+            // |                  ||
+            // +-------------------| In this scenario, the inner bounding box
+            // +-------------------+ is called 'withinPlus0', and the outer
+            //       (extent,extent) is called 'inside'.
+            const bool withinPlus0 = anchor.point.x >= 0 && anchor.point.x < util::EXTENT && anchor.point.y >= 0 && anchor.point.y < util::EXTENT;
+            const bool inside = withinPlus0 || anchor.point.x == util::EXTENT || anchor.point.y == util::EXTENT;
 
             if (avoidEdges && !inside) continue;
 
-            // Normally symbol layers are drawn across tile boundaries. Only symbols
-            // with their anchors within the tile boundaries are added to the buffers
-            // to prevent symbols from being drawn twice.
-            //
-            // Symbols in layers with overlap are sorted in the y direction so that
-            // symbols lower on the canvas are drawn on top of symbols near the top.
-            // To preserve this order across tile boundaries these symbols can't
-            // be drawn across tile boundaries. Instead they need to be included in
-            // the buffers for both tiles and clipped to tile boundaries at draw time.
-            //
-            // TODO remove the `&& false` when is #1673 implemented
-            const bool addToBuffers = (mode == MapMode::Still) || inside || (mayOverlap && false);
+            const bool addToBuffers = mode == MapMode::Still || withinPlus0;
 
             symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers, symbolInstances.size(),
                     textBoxScale, textPadding, textPlacement,

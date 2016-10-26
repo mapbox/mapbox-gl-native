@@ -35,16 +35,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
                      const auto& buffers,
                      const SymbolPropertyValues& values_)
     {
-        // In some cases, we disable the stencil test so that labels aren't clipped
-        // to tile boundaries.
-        //
-        // Layers with features that may be drawn overlapping aren't clipped. These
-        // layers are sorted in the y direction, and to draw the correct ordering near
-        // tile edges the icons are included in both tiles and clipped when drawing.
-        //
-        // TODO remove the `true ||` when #1673 is implemented
-        const bool drawAcrossEdges = (frame.mapMode == MapMode::Continuous) && (true || !(layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
-              layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>()));
+        // We clip symbols to their tile extent in still mode.
+        const bool needsClipping = frame.mapMode == MapMode::Still;
 
         program.draw(
             context,
@@ -52,9 +44,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
             values_.pitchAlignment == AlignmentType::Map
                 ? depthModeForSublayer(0, gl::DepthMode::ReadOnly)
                 : gl::DepthMode::disabled(),
-            drawAcrossEdges
-                ? gl::StencilMode::disabled()
-                : stencilModeForClipping(tile.clip),
+            needsClipping
+                ? stencilModeForClipping(tile.clip)
+                : gl::StencilMode::disabled(),
             colorModeForRenderPass(),
             std::move(uniformValues),
             *buffers.vertexBuffer,
