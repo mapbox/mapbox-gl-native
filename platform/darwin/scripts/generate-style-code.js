@@ -152,6 +152,9 @@ global.describeValue = function (value, property, layerType) {
         case 'number':
             return 'an `NSNumber` object containing the float `' + value + '`';
         case 'string':
+            if (value === '') {
+                return 'the empty string';
+            }
             return 'the string `' + value + '`';
         case 'enum':
             let displayValue;
