@@ -20,7 +20,7 @@ const std::string AnnotationManager::SourceID = "com.mapbox.annotations";
 const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.points";
 
 AnnotationManager::AnnotationManager(float pixelRatio)
-    : spriteAtlas(1024, 1024, pixelRatio) {
+    : spriteAtlas({ 1024, 1024 }, pixelRatio) {
 
     struct NullFileSource : public FileSource {
         std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override {
