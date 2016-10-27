@@ -331,6 +331,7 @@ public class MarkerView extends Marker {
         }
         Icon transparentIcon = IconFactory.recreate(IconFactory.ICON_MARKERVIEW_ID,
                 IconFactory.ICON_MARKERVIEW_BITMAP);
+        invalidateMarker();
         if (markerViewManager != null) {
             markerViewManager.updateIcon(this);
         }
@@ -388,6 +389,13 @@ public class MarkerView extends Marker {
 
             markerViewManager = mapboxMap.getMarkerViewManager();
         }
+    }
+
+    private void invalidateMarker() {
+        offsetX = MapboxConstants.UNMEASURED;
+        offsetY = MapboxConstants.UNMEASURED;
+        width = 0;
+        height = 0;
     }
 
     public void update(@NonNull View view) {
