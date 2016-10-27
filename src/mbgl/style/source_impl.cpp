@@ -207,8 +207,19 @@ std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRendere
 
     mapbox::geometry::box<double> box = mapbox::geometry::envelope(queryGeometry);
 
-    for (const auto& tilePtr : renderTiles) {
-        const RenderTile& renderTile = tilePtr.second;
+
+    auto sortRenderTiles = [](const RenderTile& a, const RenderTile& b) {
+        return a.id.canonical.z != b.id.canonical.z ? a.id.canonical.z < b.id.canonical.z :
+               a.id.canonical.y != b.id.canonical.y ? a.id.canonical.y < b.id.canonical.y :
+               a.id.wrap != b.id.wrap ? a.id.wrap < b.id.wrap : a.id.canonical.x < b.id.canonical.x;
+    };
+    std::vector<std::reference_wrapper<const RenderTile>> sortedTiles;
+    std::transform(renderTiles.cbegin(), renderTiles.cend(), std::back_inserter(sortedTiles),
+                   [](const auto& pair) { return std::ref(pair.second); });
+    std::sort(sortedTiles.begin(), sortedTiles.end(), sortRenderTiles);
+
+    for (const auto& renderTileRef : sortedTiles) {
+        const RenderTile& renderTile = renderTileRef.get();
         GeometryCoordinate tileSpaceBoundsMin = TileCoordinate::toGeometryCoordinate(renderTile.id, box.min);
         if (tileSpaceBoundsMin.x >= util::EXTENT || tileSpaceBoundsMin.y >= util::EXTENT) {
             continue;
