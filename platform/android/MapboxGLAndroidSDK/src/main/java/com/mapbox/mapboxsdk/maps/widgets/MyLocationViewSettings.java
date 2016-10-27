@@ -198,12 +198,12 @@ public class MyLocationViewSettings {
     }
 
     /**
-     * Set the MyLocationView padding.
+     * Set the MyLocationView padding in pixels divided by 2.
      *
      * @param left   the padding left of MyLocationView
      * @param top    the padding top of MyLocationView
      * @param right  the padding right of MyLocationView
-     * @param bottom the padding bottom of MyLocaionView
+     * @param bottom the padding bottom of MyLocationView
      */
     public void setPadding(int left, int top, int right, int bottom) {
         padding = new int[]{left, top, right, bottom};
@@ -212,7 +212,7 @@ public class MyLocationViewSettings {
     }
 
     /**
-     * Get the MyLocationView padding.
+     * Get the MyLocationView padding in pixels.
      *
      * @return an array describing the padding in a LTRB manner
      */
