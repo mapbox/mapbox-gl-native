@@ -86,7 +86,9 @@ public:
     void bindTexture(Texture&,
                      TextureUnit = 0,
                      TextureFilter = TextureFilter::Nearest,
-                     TextureMipMap = TextureMipMap::No);
+                     TextureMipMap = TextureMipMap::No,
+                     TextureWrap wrapX = TextureWrap::Clamp,
+                     TextureWrap wrapY = TextureWrap::Clamp);
 
     void clear(optional<mbgl::Color> color,
                optional<float> depth,

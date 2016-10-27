@@ -211,19 +211,38 @@ void Context::updateTexture(
 void Context::bindTexture(Texture& obj,
                           TextureUnit unit,
                           TextureFilter filter,
-                          TextureMipMap mipmap) {
-    if (filter != obj.filter || mipmap != obj.mipmap) {
+                          TextureMipMap mipmap,
+                          TextureWrap wrapX,
+                          TextureWrap wrapY) {
+    if (filter != obj.filter || mipmap != obj.mipmap || wrapX != obj.wrapX || wrapY != obj.wrapY) {
         activeTexture = unit;
         texture[unit] = obj.texture;
-        MBGL_CHECK_ERROR(glTexParameteri(
-            GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-            filter == TextureFilter::Linear
-                ? (mipmap == TextureMipMap::Yes ? GL_LINEAR_MIPMAP_NEAREST : GL_LINEAR)
-                : (mipmap == TextureMipMap::Yes ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST)));
-        MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                                         filter == TextureFilter::Linear ? GL_LINEAR : GL_NEAREST));
-        obj.filter = filter;
-        obj.mipmap = mipmap;
+
+        if (filter != obj.filter || mipmap != obj.mipmap) {
+            MBGL_CHECK_ERROR(glTexParameteri(
+                GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                filter == TextureFilter::Linear
+                    ? (mipmap == TextureMipMap::Yes ? GL_LINEAR_MIPMAP_NEAREST : GL_LINEAR)
+                    : (mipmap == TextureMipMap::Yes ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST)));
+            MBGL_CHECK_ERROR(
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                                filter == TextureFilter::Linear ? GL_LINEAR : GL_NEAREST));
+            obj.filter = filter;
+            obj.mipmap = mipmap;
+        }
+        if (wrapX != obj.wrapX) {
+
+            MBGL_CHECK_ERROR(
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                                wrapX == TextureWrap::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT));
+            obj.wrapX = wrapX;
+        }
+        if (wrapY != obj.wrapY) {
+            MBGL_CHECK_ERROR(
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                                wrapY == TextureWrap::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT));
+            obj.wrapY = wrapY;
+        }
     } else if (texture[unit] != obj.texture) {
         // We are checking first to avoid setting the active texture without a subsequent
         // texture bind.
