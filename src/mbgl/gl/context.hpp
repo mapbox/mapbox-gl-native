@@ -65,18 +65,22 @@ public:
     // Create a texture from an image with data.
     template <typename Image>
     Texture createTexture(const Image& image, TextureUnit unit = 0) {
-        return { image.size, createTexture(image.size, image.data.get(), unit) };
+        auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
+        return { image.size, createTexture(image.size, image.data.get(), format, unit) };
     }
 
     template <typename Image>
     void updateTexture(Texture& obj, const Image& image, TextureUnit unit = 0) {
-        updateTexture(obj.texture.get(), image.size, image.data.get(), unit);
+        auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
+        updateTexture(obj.texture.get(), image.size, image.data.get(), format, unit);
         obj.size = image.size;
     }
 
     // Creates an empty texture with the specified dimensions.
-    Texture createTexture(const Size size, TextureUnit unit = 0) {
-        return { size, createTexture(size, nullptr, unit) };
+    Texture createTexture(const Size size,
+                          TextureFormat format = TextureFormat::RGBA,
+                          TextureUnit unit = 0) {
+        return { size, createTexture(size, nullptr, format, unit) };
     }
 
     void bindTexture(Texture&,
@@ -153,8 +157,8 @@ private:
 
     UniqueBuffer createVertexBuffer(const void* data, std::size_t size);
     UniqueBuffer createIndexBuffer(const void* data, std::size_t size);
-    UniqueTexture createTexture(Size size, const void* data, TextureUnit);
-    void updateTexture(TextureID, Size size, const void* data, TextureUnit);
+    UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit);
+    void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit);
     UniqueFramebuffer createFramebuffer();
     UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);
 

@@ -9,9 +9,10 @@
 
 namespace mbgl {
 
-enum ImageAlphaMode {
+enum class ImageAlphaMode {
     Unassociated,
-    Premultiplied
+    Premultiplied,
+    Exclusive, // Alpha-channel only
 };
 
 template <ImageAlphaMode Mode>
@@ -47,15 +48,17 @@ public:
         return size && data.get() != nullptr;
     }
 
-    size_t stride() const { return static_cast<size_t>(size.width) * 4; }
+    size_t stride() const { return channels * size.width; }
     size_t bytes() const { return stride() * size.height; }
 
     Size size;
+    static constexpr size_t channels = Mode == ImageAlphaMode::Exclusive ? 1 : 4;
     std::unique_ptr<uint8_t[]> data;
 };
 
 using UnassociatedImage = Image<ImageAlphaMode::Unassociated>;
 using PremultipliedImage = Image<ImageAlphaMode::Premultiplied>;
+using AlphaImage = Image<ImageAlphaMode::Exclusive>;
 
 // TODO: don't use std::string for binary data.
 PremultipliedImage decodeImage(const std::string&);
