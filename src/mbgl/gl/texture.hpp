@@ -12,6 +12,8 @@ public:
     UniqueTexture texture;
     TextureFilter filter = TextureFilter::Nearest;
     TextureMipMap mipmap = TextureMipMap::No;
+    TextureWrap wrapX = TextureWrap::Clamp;
+    TextureWrap wrapY = TextureWrap::Clamp;
 };
 
 } // namespace gl

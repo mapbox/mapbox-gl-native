@@ -55,7 +55,7 @@ void Painter::renderLine(PaintParameters& parameters,
                  posA,
                  posB,
                  layer.impl->dashLineWidth,
-                 lineAtlas->width));
+                 lineAtlas->getSize().width));
 
     } else if (!properties.linePattern.value.from.empty()) {
         optional<SpriteAtlasPosition> posA = spriteAtlas->getPosition(
