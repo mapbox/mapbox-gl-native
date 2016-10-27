@@ -46,6 +46,10 @@ enum class RenderbufferType : uint32_t {
 
 enum class TextureMipMap : bool { No = false, Yes = true };
 enum class TextureFilter : bool { Nearest = false, Linear = true };
+enum class TextureFormat : uint32_t {
+    RGBA = 0x1908,
+    Alpha = 0x1906,
+};
 
 enum class PrimitiveType {
     Points = 0x0000,
