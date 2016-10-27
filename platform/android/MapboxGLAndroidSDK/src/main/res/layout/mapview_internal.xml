@@ -7,7 +7,7 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
-    <FrameLayout
+    <com.mapbox.mapboxsdk.view.TouchDispachableFrameLayout
         android:id="@+id/markerViewContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
