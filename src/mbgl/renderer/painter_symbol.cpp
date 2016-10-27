@@ -101,7 +101,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         auto values = layer.impl->textPropertyValues(layout);
 
-        const Size texsize { glyphAtlas->width, glyphAtlas->height };
+        const Size texsize = glyphAtlas->getSize()x§;
 
         if (values.hasHalo()) {
             draw(parameters.shaders.symbolGlyph,
