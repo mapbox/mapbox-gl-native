@@ -32,8 +32,7 @@
     XCTAssertEqual(mbglOptions.tolerance, 0.42);
   
     options = @{MGLGeoJSONClusterOption: @"number 1"};
-    source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" URL:url options:options];
-    XCTAssertThrows([source geoJSONOptions]);
+    XCTAssertThrows([[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" URL:url options:options]);
 }
 
 - (void)testMGLGeoJSONSourceWithData {
@@ -42,8 +41,6 @@
     
     NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" geoJSONData:data options:nil];
-    
-    [source mbglSource];
     
     XCTAssertNotNil(source.features);
     XCTAssertEqual(source.features.count, 1);
@@ -55,8 +52,6 @@
     MGLPolylineFeature *polylineFeature = [MGLPolylineFeature polylineWithCoordinates:coordinates count:2];
     
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" features:@[polylineFeature] options:nil];
-    
-    std::unique_ptr<mbgl::style::Source> mbglSource = [source mbglSource];
     
     XCTAssertNotNil(source.features);
     XCTAssertEqual(source.features.count, 1);
@@ -95,8 +90,6 @@
     
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" features:@[polygonFeature] options:nil];
     
-    std::unique_ptr<mbgl::style::Source> mbglSource = [source mbglSource];
-    
     XCTAssertNotNil(source.features);
     XCTAssertEqual(source.features.count, 1);
     MGLPolygonFeature *expectedPolygonFeature = (MGLPolygonFeature *)source.features.firstObject;
@@ -131,8 +124,7 @@
     MGLPolygonFeature *polygonFeature = [MGLPolygonFeature polygonWithCoordinates:coordinates count:5 interiorPolygons:@[polygon]];
     
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" features:@[polygonFeature] options:nil];
-    
-    std::unique_ptr<mbgl::style::Source> mbglSource = [source mbglSource];
+   
     
     XCTAssertNotNil(source.features);
     XCTAssertEqual(source.features.count, 1);
@@ -147,8 +139,6 @@
     MGLMultiPolylineFeature *multiPolylineFeature = [MGLMultiPolylineFeature multiPolylineWithPolylines:@[firstPolylineFeature, secondPolylineFeature]];
     
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" features:@[multiPolylineFeature] options:nil];
-    
-    std::unique_ptr<mbgl::style::Source> mbglSource = [source mbglSource];
     
     XCTAssertNotNil(source.features);
     XCTAssertEqual(source.features.count, 1);
@@ -179,8 +169,6 @@
     
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" features:@[multiPolygonFeature] options:nil];
     
-    std::unique_ptr<mbgl::style::Source> mbglSource = [source mbglSource];
-    
     XCTAssertNotNil(source.features);
     XCTAssertEqual(source.features.count, 1);
     XCTAssertTrue([source.features.firstObject isMemberOfClass:[MGLMultiPolygonFeature class]]);
@@ -192,8 +180,6 @@
     pointFeature.coordinate = CLLocationCoordinate2DMake(100.2, 0.2);
     
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"souce-id" features:@[pointFeature] options:nil];
-    
-    std::unique_ptr<mbgl::style::Source> mbglSource = [source mbglSource];
     
     XCTAssertNotNil(source.features);
     XCTAssertEqual(source.features.count, 1);
@@ -208,11 +194,8 @@
         CLLocationCoordinate2DMake(100.0, 1.0),
         CLLocationCoordinate2DMake(100.0, 0.0)};
     MGLPointCollectionFeature *pointCollectionFeature = [MGLPointCollectionFeature pointCollectionWithCoordinates:coordinates count:5];
-;
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"souce-id" features:@[pointCollectionFeature] options:nil];
-    
-    std::unique_ptr<mbgl::style::Source> mbglSource = [source mbglSource];
-    
+
     XCTAssertNotNil(source.features);
     XCTAssertEqual(source.features.count, 1);
     XCTAssertTrue([source.features.firstObject isMemberOfClass:[MGLPointCollectionFeature class]]);
@@ -253,9 +236,7 @@
 
     MGLShapeCollectionFeature *shapeCollectionFeature_1 = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[polygonFeature, polylineFeature, multiPolygonFeature, multiPolylineFeature, pointCollectionFeature, pointFeature, shapeCollectionFeature]];
 
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"" features:@[shapeCollectionFeature_1] options:nil];
-    
-    XCTAssertThrowsSpecificNamed([source mbglSource], NSException, @"Method unavailable");
+    XCTAssertThrowsSpecificNamed([[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" features:@[shapeCollectionFeature_1] options:nil], NSException, @"Method unavailable");
 }
 
 @end

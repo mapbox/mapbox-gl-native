@@ -1,18 +1,29 @@
 #import "MGLRasterSource.h"
 
+#import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLTileSet_Private.h"
 #import "NSURL+MGLAdditions.h"
 
 #include <mbgl/style/sources/raster_source.hpp>
 
+@interface MGLRasterSource ()
+
+@property (nonatomic) mbgl::style::RasterSource *rawSource;
+
+@end
+
 @implementation MGLRasterSource
+{
+    std::unique_ptr<mbgl::style::RasterSource> _pendingSource;
+}
 
 - (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url tileSize:(CGFloat)tileSize
 {
     if (self = [super initWithIdentifier:identifier]) {
         _URL = url;
         _tileSize = tileSize;
+        [self commonInit];
     }
     return self;
 }
@@ -23,11 +34,12 @@
     {
         _tileSet = tileSet;
         _tileSize = tileSize;
+        [self commonInit];
     }
     return self;
 }
 
-- (std::unique_ptr<mbgl::style::Source>)mbglSource
+- (void)commonInit
 {
     std::unique_ptr<mbgl::style::RasterSource> source;
     
@@ -42,10 +54,15 @@
         source = std::make_unique<mbgl::style::RasterSource>(self.identifier.UTF8String,
                                                              self.tileSet.mbglTileset,
                                                              uint16_t(self.tileSize));
-        
     }
     
-    return std::move(source);
+    _pendingSource = std::move(source);
+    self.rawSource = _pendingSource.get();
+}
+
+- (void)addToMapView:(MGLMapView *)mapView
+{
+    mapView.mbglMap->addSource(std::move(_pendingSource));
 }
 
 @end

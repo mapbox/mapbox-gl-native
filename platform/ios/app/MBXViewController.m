@@ -64,6 +64,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingStyleQuery,
     MBXSettingsRuntimeStylingFeatureSource,
     MBXSettingsRuntimeStylingPointCollection,
+    MBXSettingsRuntimeStylingUpdateGeoJSONSourceData,
+    MBXSettingsRuntimeStylingUpdateGeoJSONSourceURL,
+    MBXSettingsRuntimeStylingUpdateGeoJSONSourceFeatures,
+    MBXSettingsRuntimeStylingVectorSource,
+    MBXSettingsRuntimeStylingRasterSource,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
@@ -310,6 +315,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Style Query For GeoJSON",
                 @"Style Feature",
                 @"Style Dynamic Point Collection",
+                @"Update GeoJSON Source: Data",
+                @"Update GeoJSON Source: URL",
+                @"Update GeoJSON Source: Features",
+                @"Style Vector Source",
+                @"Style Raster Source",
             ]];
             break;
         case MBXSettingsMiscellaneous:
@@ -443,6 +453,21 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingPointCollection:
                     [self styleDynamicPointCollection];
+                    break;
+                case MBXSettingsRuntimeStylingUpdateGeoJSONSourceURL:
+                    [self updateGeoJSONSourceURL];
+                    break;
+                case MBXSettingsRuntimeStylingUpdateGeoJSONSourceData:
+                    [self updateGeoJSONSourceData];
+                    break;
+                case MBXSettingsRuntimeStylingUpdateGeoJSONSourceFeatures:
+                    [self updateGeoJSONSourceFeatures];
+                    break;
+                case MBXSettingsRuntimeStylingVectorSource:
+                    [self styleVectorSource];
+                    break;
+                case MBXSettingsRuntimeStylingRasterSource:
+                    [self styleRasterSource];
                     break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
@@ -891,6 +916,85 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.mapView.style addLayer:layer];
 }
 
+- (void)updateGeoJSONSourceData
+{
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(40.329795743702064, -107.75390625) zoomLevel:11 animated:NO];
+    
+    NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-104.34814453125,37.64903402157866]]}}]}";
+    
+    NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"mutable-data-source-id" geoJSONData:data options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"mutable-data-layer-id" source:source];
+    [self.mapView.style addLayer:layer];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-109.34814453125,37.64903402157866]]}}]}";
+        NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
+        
+        source.geoJSONData = data;
+    });
+}
+
+- (void)updateGeoJSONSourceURL
+{
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(48.668731, -122.857151) zoomLevel:11 animated:NO];
+    
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"polyline" ofType:@"geojson"];
+    NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"mutable-data-source-url-id" URL:geoJSONURL options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"mutable-data-layer-url-id" source:source];
+    [self.mapView.style addLayer:layer];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(41.563986787078704, -75.04843935793578) zoomLevel:8 animated:NO];
+        
+        NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"threestates" ofType:@"geojson"];
+        NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
+        
+        source.URL = geoJSONURL;
+    });
+}
+
+- (void)updateGeoJSONSourceFeatures
+{
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(-41.1520, 288.6592) zoomLevel:10 animated:NO];
+    
+    CLLocationCoordinate2D smallBox[] = {
+        {-41.14763798539186, 288.68019104003906},
+        {-41.140915920129665, 288.68019104003906},
+        {-41.140915920129665, 288.6887741088867},
+        {-41.14763798539186, 288.6887741088867},
+        {-41.14763798539186, 288.68019104003906}
+    };
+    
+    CLLocationCoordinate2D largeBox[] = {
+        {-41.17710352162799, 288.67298126220703},
+        {-41.13962313627545, 288.67298126220703},
+        {-41.13962313627545, 288.7261962890625},
+        {-41.17710352162799, 288.7261962890625},
+        {-41.17710352162799, 288.67298126220703}
+    };
+    
+    MGLPolygonFeature *smallBoxFeature = [MGLPolygonFeature polygonWithCoordinates:smallBox count:sizeof(smallBox)/sizeof(smallBox[0])];
+    MGLPolygonFeature *largeBoxFeature = [MGLPolygonFeature polygonWithCoordinates:largeBox count:sizeof(largeBox)/sizeof(largeBox[0])];
+
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"mutable-data-source-features-id" features:@[smallBoxFeature] options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"mutable-data-layer-features-id" source:source];
+    MGLStyleValue *fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
+    layer.fillColor = fillColor;
+    [self.mapView.style addLayer:layer];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        source.features = @[largeBoxFeature];
+    });
+}
+
 - (void)styleDynamicPointCollection
 {
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(36.9979, -109.0441) zoomLevel:14 animated:NO];
@@ -906,6 +1010,38 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     
     MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"wiggle-layer" source:source];
     [self.mapView.style addLayer:layer];
+}
+
+- (void)styleVectorSource
+{
+    NSURL *url = [[NSURL alloc] initWithString:@"mapbox://mapbox.mapbox-terrain-v2"];
+    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"style-vector-source-id" URL:url];
+    [self.mapView.style addSource:vectorSource];
+    
+    MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"style-vector-background-layer-id"];
+    backgroundLayer.backgroundColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor blackColor]];
+    [self.mapView.style addLayer:backgroundLayer];
+    
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"style-vector-line-layer-id" source:vectorSource];
+    lineLayer.sourceLayerIdentifier = @"contour";
+    NSUInteger lineJoinValue = MGLLineJoinRound;
+    lineLayer.lineJoin = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue value:&lineJoinValue withObjCType:@encode(MGLLineJoin)]];
+    NSUInteger lineCapValue = MGLLineCapRound;
+    lineLayer.lineCap = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue value:&lineCapValue withObjCType:@encode(MGLLineCap)]];
+    lineLayer.lineColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor greenColor]];
+
+    [self.mapView.style addLayer:lineLayer];
+}
+
+- (void)styleRasterSource
+{
+    // 3rd party raster source requires NSAppTransportSecurity exception for stamen.com
+    MGLTileSet *rasterTileSet = [[MGLTileSet alloc] initWithTileURLTemplates:@[@"http://a.tile.stamen.com/terrain-background/{z}/{x}/{y}.jpg"]];
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"style-raster-source-id" tileSet:rasterTileSet tileSize:256];
+    [self.mapView.style addSource:rasterSource];
+    
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"style-raster-layer-id" source:rasterSource];
+    [self.mapView.style addLayer:rasterLayer];
 }
 
 - (IBAction)startWorldTour

@@ -142,6 +142,7 @@ static NSURL *MGLStyleURL_emerald;
 - (MGLSource *)sourceWithIdentifier:(NSString *)identifier
 {
     auto mbglSource = self.mapView.mbglMap->getSource(identifier.UTF8String);
+    
     if (!mbglSource) {
         return nil;
     }
@@ -159,8 +160,8 @@ static NSURL *MGLStyleURL_emerald;
         NSAssert(NO, @"Unrecognized source type");
         return nil;
     }
-
-    source.source = mbglSource;
+    
+    source.rawSource = mbglSource;
 
     return source;
 }
@@ -205,12 +206,17 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)addSource:(MGLSource *)source
 {
-    self.mapView.mbglMap->addSource(source.mbglSource);
+    [source addToMapView:self.mapView];
 }
 
 - (void)removeSource:(MGLSource *)source
 {
     self.mapView.mbglMap->removeSource(source.identifier.UTF8String);
+    
+    // Once a mbgl source is removed from the map, ownership does not return
+    // to the MGL source. Therefore, the rawSource pointer is set to NULL
+    // so that the implementation of MGL source can avoid using it again.
+    source.rawSource = NULL;
 }
 
 - (NS_ARRAY_OF(NSString *) *)styleClasses

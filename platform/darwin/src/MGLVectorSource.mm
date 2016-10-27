@@ -1,12 +1,22 @@
 #import "MGLVectorSource.h"
 
+#import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLTileSet_Private.h"
 #import "NSURL+MGLAdditions.h"
 
 #include <mbgl/style/sources/vector_source.hpp>
 
+@interface MGLVectorSource ()
+
+@property (nonatomic) mbgl::style::VectorSource *rawSource;
+
+@end
+
 @implementation MGLVectorSource
+{
+    std::unique_ptr<mbgl::style::VectorSource> _pendingSource;
+}
 
 static NSString *MGLVectorSourceType   = @"vector";
 
@@ -15,6 +25,7 @@ static NSString *MGLVectorSourceType   = @"vector";
     if (self = [super initWithIdentifier:identifier])
     {
         _URL = url;
+        [self commonInit];
     }
     return self;
 }
@@ -24,11 +35,12 @@ static NSString *MGLVectorSourceType   = @"vector";
     if (self = [super initWithIdentifier:identifier])
     {
         _tileSet = tileSet;
+        [self commonInit];
     }
     return self;
 }
 
-- (std::unique_ptr<mbgl::style::Source>)mbglSource
+- (void)commonInit
 {
     std::unique_ptr<mbgl::style::VectorSource> source;
     
@@ -43,7 +55,13 @@ static NSString *MGLVectorSourceType   = @"vector";
                                                              self.tileSet.mbglTileset);
     }
     
-    return std::move(source);
+    _pendingSource = std::move(source);
+    self.rawSource = _pendingSource.get();
+}
+
+- (void)addToMapView:(MGLMapView *)mapView
+{
+    mapView.mbglMap->addSource(std::move(_pendingSource));
 }
 
 @end
