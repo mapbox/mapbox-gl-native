@@ -31,8 +31,8 @@
     for (MGLAnnotationView *view in subviews)
     {
         [self addSubview:view];
-        [self.annotationViews addObject:view];
     }
+    [self.annotationViews addObjectsFromArray:subviews];
 }
 
 #pragma mark UIAccessibility methods
