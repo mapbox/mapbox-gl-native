@@ -16,7 +16,7 @@ public:
     util::RunLoop loop;
     StubFileSource fileSource;
     StubStyleObserver observer;
-    GlyphAtlas glyphAtlas { 32, 32, fileSource };
+    GlyphAtlas glyphAtlas{ { 32, 32 }, fileSource };
 
     void run(const std::string& url, const FontStack& fontStack, const GlyphRangeSet& glyphRanges) {
         // Squelch logging.
