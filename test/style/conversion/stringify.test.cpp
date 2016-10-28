@@ -79,13 +79,40 @@ TEST(Stringify, Filter) {
     ASSERT_EQ(stringify(EqualsFilter { "a", 1.0 }), "[\"==\",\"a\",1.0]");
 }
 
-TEST(Stringify, Function) {
-    ASSERT_EQ(stringify(Function<float>({{0, 1}}, 2)), "{\"base\":2.0,\"stops\":[[0.0,1.0]]}");
+TEST(Stringify, CameraFunction) {
+    ASSERT_EQ(stringify(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 2 })),
+        "{\"type\":\"exponential\",\"base\":2.0,\"stops\":[[0.0,1.0]]}");
+    ASSERT_EQ(stringify(CameraFunction<float>(IntervalStops<float> { {{0, 1}} })),
+        "{\"type\":\"interval\",\"stops\":[[0.0,1.0]]}");
+}
+
+TEST(Stringify, SourceFunction) {
+    ASSERT_EQ(stringify(SourceFunction<float>("property", ExponentialStops<float> { {{0, 1}}, 2 })),
+        "{\"property\":\"property\",\"type\":\"exponential\",\"base\":2.0,\"stops\":[[0.0,1.0]]}");
+    ASSERT_EQ(stringify(SourceFunction<float>("property", IntervalStops<float> { {{0, 1}} })),
+        "{\"property\":\"property\",\"type\":\"interval\",\"stops\":[[0.0,1.0]]}");
+    ASSERT_EQ(stringify(SourceFunction<float>("property", CategoricalStops<float> { {{CategoricalValue(true), 1}} })),
+        "{\"property\":\"property\",\"type\":\"categorical\",\"stops\":[[true,1.0]]}");
+    ASSERT_EQ(stringify(SourceFunction<float>("property", IdentityStops<float> {})),
+        "{\"property\":\"property\",\"type\":\"identity\"}");
+}
+
+TEST(Stringify, CompositeFunction) {
+    ASSERT_EQ(stringify(CompositeFunction<float>("property",
+        std::map<float, ExponentialStops<float>> {
+            { 0, ExponentialStops<float> { {{0, 1}}, 2 } },
+            { 1, ExponentialStops<float> { {{0, 1}}, 2 } }
+        })),
+        "{\"property\":\"property\",\"type\":\"exponential\",\"base\":2.0,"
+        "\"stops\":["
+            "[{\"zoom\":0.0,\"value\":0.0},1.0],"
+            "[{\"zoom\":1.0,\"value\":0.0},1.0]]}");
 }
 
 TEST(Stringify, PropertyValue) {
     ASSERT_EQ(stringify(PropertyValue<float>(1)), "1.0");
-    ASSERT_EQ(stringify(PropertyValue<float>(Function<float>({{0, 1}}, 2))), "{\"base\":2.0,\"stops\":[[0.0,1.0]]}");
+    ASSERT_EQ(stringify(PropertyValue<float>(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 2 }))),
+        "{\"type\":\"exponential\",\"base\":2.0,\"stops\":[[0.0,1.0]]}");
 }
 
 TEST(Stringify, Layout) {

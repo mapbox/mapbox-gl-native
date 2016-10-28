@@ -20,16 +20,14 @@ public:
     using Attributes = As;
     using Uniforms = Us;
 
-    using Vertex = typename Attributes::Vertex;
     using UniformValues = typename Uniforms::Values;
-
-    static_assert(std::is_standard_layout<Vertex>::value, "vertex type must use standard layout");
+    using AttributeBindings = typename Attributes::Bindings;
 
     Program(Context& context, const std::string& vertexSource, const std::string& fragmentSource)
         : vertexShader(context.createShader(ShaderType::Vertex, vertexSource)),
           fragmentShader(context.createShader(ShaderType::Fragment, fragmentSource)),
           program(context.createProgram(vertexShader, fragmentShader)),
-          attributesState(Attributes::state(program)),
+          attributeLocations(Attributes::locations(program)),
           uniformsState((context.linkProgram(program), Uniforms::state(program))) {}
 
     template <class DrawMode>
@@ -39,22 +37,30 @@ public:
               StencilMode stencilMode,
               ColorMode colorMode,
               UniformValues&& uniformValues,
-              const VertexBuffer<Vertex>& vertexBuffer,
+              AttributeBindings&& attributeBindings,
               const IndexBuffer<DrawMode>& indexBuffer,
               const SegmentVector<Attributes>& segments) {
         static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
-        context.draw({
-            std::move(drawMode),
-            std::move(depthMode),
-            std::move(stencilMode),
-            std::move(colorMode),
-            program,
-            vertexBuffer.buffer,
-            indexBuffer.buffer,
-            segments,
-            Uniforms::binder(uniformsState, std::move(uniformValues)),
-            Attributes::binder(attributesState)
-        });
+
+        context.setDrawMode(drawMode);
+        context.setDepthMode(depthMode);
+        context.setStencilMode(stencilMode);
+        context.setColorMode(colorMode);
+
+        context.program = program;
+
+        Uniforms::bind(uniformsState, std::move(uniformValues));
+
+        for (const auto& segment : segments) {
+            segment.bind(context,
+                         indexBuffer.buffer,
+                         attributeLocations,
+                         attributeBindings);
+
+            context.draw(drawMode.primitiveType,
+                         segment.indexOffset,
+                         segment.indexLength);
+        }
     }
 
 private:
@@ -62,7 +68,7 @@ private:
     UniqueShader fragmentShader;
     UniqueProgram program;
 
-    typename Attributes::State attributesState;
+    typename Attributes::Locations attributeLocations;
     typename Uniforms::State uniformsState;
 };
 

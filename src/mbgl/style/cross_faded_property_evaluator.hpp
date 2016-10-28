@@ -28,7 +28,7 @@ public:
 
     Faded<T> operator()(const Undefined&) const;
     Faded<T> operator()(const T& constant) const;
-    Faded<T> operator()(const Function<T>&) const;
+    Faded<T> operator()(const CameraFunction<T>&) const;
 
 private:
     Faded<T> calculate(const T& min, const T& mid, const T& max) const;

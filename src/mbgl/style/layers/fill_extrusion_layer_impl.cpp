@@ -11,7 +11,7 @@ bool FillExtrusionLayer::Impl::evaluate(const PropertyEvaluationParameters&) {
     return false;
 }
 
-std::unique_ptr<Bucket> FillExtrusionLayer::Impl::createBucket(BucketParameters&, const GeometryTileLayer&) const {
+std::unique_ptr<Bucket> FillExtrusionLayer::Impl::createBucket(const BucketParameters&, const std::vector<const Layer*>&) const {
     return nullptr;
 }
 

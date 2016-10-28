@@ -5,6 +5,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
 
 #include <mbgl/util/color.hpp>
 
@@ -30,17 +31,17 @@ public:
     PropertyValue<bool> getFillAntialias(const optional<std::string>& klass = {}) const;
     void setFillAntialias(PropertyValue<bool>, const optional<std::string>& klass = {});
 
-    static PropertyValue<float> getDefaultFillOpacity();
-    PropertyValue<float> getFillOpacity(const optional<std::string>& klass = {}) const;
-    void setFillOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
+    static DataDrivenPropertyValue<float> getDefaultFillOpacity();
+    DataDrivenPropertyValue<float> getFillOpacity(const optional<std::string>& klass = {}) const;
+    void setFillOpacity(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
 
-    static PropertyValue<Color> getDefaultFillColor();
-    PropertyValue<Color> getFillColor(const optional<std::string>& klass = {}) const;
-    void setFillColor(PropertyValue<Color>, const optional<std::string>& klass = {});
+    static DataDrivenPropertyValue<Color> getDefaultFillColor();
+    DataDrivenPropertyValue<Color> getFillColor(const optional<std::string>& klass = {}) const;
+    void setFillColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
 
-    static PropertyValue<Color> getDefaultFillOutlineColor();
-    PropertyValue<Color> getFillOutlineColor(const optional<std::string>& klass = {}) const;
-    void setFillOutlineColor(PropertyValue<Color>, const optional<std::string>& klass = {});
+    static DataDrivenPropertyValue<Color> getDefaultFillOutlineColor();
+    DataDrivenPropertyValue<Color> getFillOutlineColor(const optional<std::string>& klass = {}) const;
+    void setFillOutlineColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
 
     static PropertyValue<std::array<float, 2>> getDefaultFillTranslate();
     PropertyValue<std::array<float, 2>> getFillTranslate(const optional<std::string>& klass = {}) const;

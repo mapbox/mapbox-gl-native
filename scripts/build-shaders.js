@@ -14,28 +14,43 @@ if (!shaderName || !inputPath || !outputPath) {
     process.exit(1);
 }
 
-var pragmaMapboxRe = /(\s*)#pragma\s+mapbox\s*:\s+(define|initialize)\s+(low|medium|high)p\s+(float|vec(?:2|3|4))\s+(.*)/;
-
-
-function applyPragmas(source) {
-    return '\n' + source.split('\n').map(function(line) {
-        var params = line.match(pragmaMapboxRe);
-        if (params) {
-            if (params[2] === 'define') {
-                return params[1] + 'uniform ' + params[3] + 'p ' + params[4] + ' u_' + params[5] + ';';
-            } else {
-                return params[1] + params[3] + 'p ' + params[4] + ' ' + params[5] + ' = u_' + params[5] + ';';
-            }
-        } else {
-            return line;
-        }
-    }).join('\n');
+function applyPragmas(source, pragmas) {
+    return source.replace(/#pragma mapbox: ([\w]+) ([\w]+) ([\w]+) ([\w]+)/g, (match, operation, precision, type, name) => {
+        return pragmas[operation]
+            .join("\n")
+            .replace(/\{type\}/g, type)
+            .replace(/\{precision\}/g, precision)
+            .replace(/\{name\}/g, name);
+    });
 }
 
-var vertexPrelude = fs.readFileSync(path.join(inputPath, '_prelude.vertex.glsl'));
-var fragmentPrelude = fs.readFileSync(path.join(inputPath, '_prelude.fragment.glsl'));
-var vertexSource = vertexPrelude + fs.readFileSync(path.join(inputPath, shaderName + '.vertex.glsl'), 'utf8');
-var fragmentSource = fragmentPrelude + fs.readFileSync(path.join(inputPath, shaderName + '.fragment.glsl'), 'utf8');
+function vertexSource() {
+    var prelude = fs.readFileSync(path.join(inputPath, '_prelude.vertex.glsl'));
+    var source = fs.readFileSync(path.join(inputPath, shaderName + '.vertex.glsl'), 'utf8');
+    return prelude + applyPragmas(source, {
+        define: [
+            "uniform lowp float a_{name}_t;",
+            "attribute {precision} {type} a_{name}_min;",
+            "attribute {precision} {type} a_{name}_max;",
+            "varying {precision} {type} {name};"
+        ],
+        initialize: [
+            "{name} = mix(a_{name}_min, a_{name}_max, a_{name}_t);"
+        ]
+    });
+}
+
+function fragmentSource() {
+    var prelude = fs.readFileSync(path.join(inputPath, '_prelude.fragment.glsl'));
+    var source = fs.readFileSync(path.join(inputPath, shaderName + '.fragment.glsl'), 'utf8');
+    return prelude + applyPragmas(source, {
+        define: [
+            "varying {precision} {type} {name};"
+        ],
+        initialize: [
+        ]
+    });
+}
 
 var content = "#pragma once\n" +
 "\n" +
@@ -49,8 +64,8 @@ var content = "#pragma once\n" +
 "class " + shaderName + " {\n" +
 "public:\n" +
 "    static constexpr const char* name = \"" + shaderName + "\";\n" +
-"    static constexpr const char* vertexSource = R\"MBGL_SHADER(" + applyPragmas(vertexSource) + ")MBGL_SHADER\";\n" +
-"    static constexpr const char* fragmentSource = R\"MBGL_SHADER(" + applyPragmas(fragmentSource) + ")MBGL_SHADER\";\n" +
+"    static constexpr const char* vertexSource = R\"MBGL_SHADER(\n" + vertexSource() + ")MBGL_SHADER\";\n" +
+"    static constexpr const char* fragmentSource = R\"MBGL_SHADER(\n" + fragmentSource() + ")MBGL_SHADER\";\n" +
 "};\n" +
 "\n" +
 "} // namespace shaders\n" +

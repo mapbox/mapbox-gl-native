@@ -20,6 +20,7 @@ class GlyphAtlas;
 class SymbolBucket;
 
 namespace style {
+class BucketParameters;
 class Filter;
 class Layer;
 } // namespace style
@@ -28,15 +29,9 @@ struct Anchor;
 
 class SymbolLayout {
 public:
-    SymbolLayout(std::vector<std::string> layerIDs_,
-                 std::string sourceLayerName_,
-                 uint32_t overscaling,
-                 float zoom,
-                 const MapMode,
+    SymbolLayout(const style::BucketParameters&,
+                 const std::vector<const style::Layer*>&,
                  const GeometryTileLayer&,
-                 const style::Filter&,
-                 style::SymbolLayoutProperties::Evaluated,
-                 float textMaxSize,
                  SpriteAtlas&);
 
     bool canPrepare(GlyphAtlas&);
@@ -56,8 +51,7 @@ public:
 
     State state = Pending;
 
-    const std::vector<std::string> layerIDs;
-    const std::string sourceLayerName;
+    std::unordered_map<std::string, style::SymbolPaintProperties::Evaluated> layerPaintProperties;
 
 private:
     void addFeature(const SymbolFeature&,
@@ -75,11 +69,14 @@ private:
     void addSymbols(Buffer&, const SymbolQuads&, float scale,
                     const bool keepUpright, const style::SymbolPlacementType, const float placementAngle);
 
+    const std::string sourceLayerName;
+    const std::string bucketName;
     const float overscaling;
     const float zoom;
     const MapMode mode;
-    const style::SymbolLayoutProperties::Evaluated layout;
-    const float textMaxSize;
+
+    style::SymbolLayoutProperties::Evaluated layout;
+    float textMaxSize;
 
     SpriteAtlas& spriteAtlas;
 

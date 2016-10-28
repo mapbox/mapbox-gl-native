@@ -4,6 +4,7 @@
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion/data_driven_property_value.hpp>
 
 #include <functional>
 #include <string>
@@ -18,15 +19,15 @@ using LayoutPropertySetter = std::function<optional<Error> (Layer&, const V&)>;
 template <class V>
 using PaintPropertySetter = std::function<optional<Error> (Layer&, const V&, const optional<std::string>&)>;
 
-template <class V, class L, class T, class...Args>
-auto makePropertySetter(void (L::*setter)(PropertyValue<T>, const Args&...args)) {
+template <class V, class L, class PropertyValue, class...Args>
+auto makePropertySetter(void (L::*setter)(PropertyValue, const Args&...args)) {
     return [setter] (Layer& layer, const V& value, const Args&...args) -> optional<Error> {
         L* typedLayer = layer.as<L>();
         if (!typedLayer) {
             return Error { "layer doesn't support this property" };
         }
 
-        Result<PropertyValue<T>> typedValue = convert<PropertyValue<T>>(value);
+        Result<PropertyValue> typedValue = convert<PropertyValue>(value);
         if (!typedValue) {
             return typedValue.error();
         }

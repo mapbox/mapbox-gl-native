@@ -241,10 +241,14 @@ std::vector<FontStack> Parser::fontStacks() const {
                 result.insert({"Open Sans Regular", "Arial Unicode MS Regular"});
             } else if (textFont.isConstant()) {
                 result.insert(textFont.asConstant());
-            } else if (textFont.isFunction()) {
-                for (const auto& stop : textFont.asFunction().getStops()) {
-                    result.insert(stop.second);
-                }
+            } else if (textFont.isCameraFunction()) {
+                textFont.asCameraFunction().stops.match(
+                    [&] (const auto& stops) {
+                        for (const auto& stop : stops.stops) {
+                            result.insert(stop.second);
+                        }
+                    }
+                );
             }
         }
     }

@@ -1,5 +1,5 @@
 #include <mbgl/style/layers/line_layer_impl.hpp>
-#include <mbgl/style/bucket_parameters.hpp>
+#include <mbgl/style/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
@@ -20,31 +20,25 @@ bool LineLayer::Impl::evaluate(const PropertyEvaluationParameters& parameters) {
 
     paint.evaluate(parameters);
 
-    passes = (paint.evaluated.get<LineOpacity>() > 0 && paint.evaluated.get<LineColor>().a > 0 && paint.evaluated.get<LineWidth>() > 0)
+    passes = (paint.evaluated.get<LineOpacity>().constantOr(1.0) > 0
+           && paint.evaluated.get<LineColor>().constantOr(Color::black()).a > 0
+           && paint.evaluated.get<LineWidth>() > 0)
         ? RenderPass::Translucent : RenderPass::None;
 
     return paint.hasTransition();
 }
 
-std::unique_ptr<Bucket> LineLayer::Impl::createBucket(BucketParameters& parameters, const GeometryTileLayer& layer) const {
-    auto bucket = std::make_unique<LineBucket>(parameters.tileID.overscaleFactor());
-
-    bucket->layout = layout.evaluate(PropertyEvaluationParameters(parameters.tileID.overscaledZ));
-
-    parameters.eachFilteredFeature(filter, layer, [&] (const auto& feature, std::size_t index, const std::string& layerName) {
-        auto geometries = feature.getGeometries();
-        bucket->addGeometry(geometries);
-        parameters.featureIndex.insert(geometries, index, layerName, id);
-    });
-
-    return std::move(bucket);
+std::unique_ptr<Bucket> LineLayer::Impl::createBucket(const BucketParameters& parameters, const std::vector<const Layer*>& layers) const {
+    return std::make_unique<LineBucket>(parameters, layers, layout);
 }
 
 float LineLayer::Impl::getLineWidth() const {
-    if (paint.evaluated.get<LineGapWidth>() > 0) {
-        return paint.evaluated.get<LineGapWidth>() + 2 * paint.evaluated.get<LineWidth>();
+    float lineWidth = paint.evaluated.get<LineWidth>();
+    float gapWidth = paint.evaluated.get<LineGapWidth>().constantOr(0);
+    if (gapWidth) {
+        return gapWidth + 2 * lineWidth;
     } else {
-        return paint.evaluated.get<LineWidth>();
+        return lineWidth;
     }
 }
 
@@ -80,7 +74,8 @@ optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const d
 
 float LineLayer::Impl::getQueryRadius() const {
     const std::array<float, 2>& translate = paint.evaluated.get<LineTranslate>();
-    return getLineWidth() / 2.0 + std::abs(paint.evaluated.get<LineOffset>()) + util::length(translate[0], translate[1]);
+    auto offset = paint.evaluated.get<LineOffset>().constantOr(LineOffset::defaultValue());
+    return getLineWidth() / 2.0 + std::abs(offset) + util::length(translate[0], translate[1]);
 }
 
 bool LineLayer::Impl::queryIntersectsGeometry(
@@ -93,7 +88,9 @@ bool LineLayer::Impl::queryIntersectsGeometry(
 
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry, paint.evaluated.get<LineTranslate>(), paint.evaluated.get<LineTranslateAnchor>(), bearing, pixelsToTileUnits);
-    auto offsetGeometry = offsetLine(geometry, paint.evaluated.get<LineOffset>() * pixelsToTileUnits);
+
+    auto offset = paint.evaluated.get<LineOffset>().constantOr(LineOffset::defaultValue());
+    auto offsetGeometry = offsetLine(geometry, offset * pixelsToTileUnits);
 
     return util::polygonIntersectsBufferedMultiLine(
             translatedQueryGeometry.value_or(queryGeometry),

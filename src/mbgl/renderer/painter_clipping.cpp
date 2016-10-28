@@ -6,6 +6,8 @@
 namespace mbgl {
 
 void Painter::renderClippingMask(const UnwrappedTileID& tileID, const ClipID& clip) {
+    static const style::FillPaintProperties::Evaluated properties {};
+    static const FillProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
     programs->fill.draw(
         context,
         gl::Triangles(),
@@ -21,14 +23,14 @@ void Painter::renderClippingMask(const UnwrappedTileID& tileID, const ClipID& cl
         gl::ColorMode::disabled(),
         FillProgram::UniformValues {
             uniforms::u_matrix::Value{ matrixForTile(tileID) },
-            uniforms::u_opacity::Value{ 0.0f },
-            uniforms::u_color::Value{ Color {} },
-            uniforms::u_outline_color::Value{ Color {} },
             uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
         },
         tileVertexBuffer,
         tileTriangleIndexBuffer,
-        tileTriangleSegments
+        tileTriangleSegments,
+        paintAttibuteData,
+        properties,
+        state.getZoom()
     );
 }
 

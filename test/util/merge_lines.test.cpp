@@ -11,21 +11,21 @@ using namespace mbgl;
 TEST(MergeLines, SameText) {
     // merges lines with the same text
     std::vector<mbgl::SymbolFeature> input1 = {
-        { FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{{4, 0}, {5, 0}, {6, 0}}}, bbb, {}, 0 },
-        { FeatureType::LineString, {{{8, 0}, {9, 0}}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{{2, 0}, {3, 0}, {4, 0}}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{{6, 0}, {7, 0}, {8, 0}}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{{5, 0}, {6, 0}}}, aaa, {}, 0 }
+        { FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{{4, 0}, {5, 0}, {6, 0}}}, bbb, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{{8, 0}, {9, 0}}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{{2, 0}, {3, 0}, {4, 0}}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{{6, 0}, {7, 0}, {8, 0}}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{{5, 0}, {6, 0}}}, aaa, {}, {{0, 0}}, 0, 0 }
     };
 
     const std::vector<mbgl::SymbolFeature> expected1 = {
-        { FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{{4, 0}, {5, 0}, {6, 0}}}, bbb, {}, 0 },
-        { FeatureType::LineString, {{{5, 0}, {6, 0}, {7, 0}, {8, 0}, {9, 0}}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{}}, aaa, {}, 0 }
+        { FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{{4, 0}, {5, 0}, {6, 0}}}, bbb, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{{5, 0}, {6, 0}, {7, 0}, {8, 0}, {9, 0}}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{}}, aaa, {}, {{0, 0}}, 0, 0 }
     };
 
     mbgl::util::mergeLines(input1);
@@ -38,15 +38,15 @@ TEST(MergeLines, SameText) {
 TEST(MergeLines, BothEnds) {
     // mergeLines handles merge from both ends
     std::vector<mbgl::SymbolFeature> input2 = {
-        { FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{{4, 0}, {5, 0}, {6, 0}}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{{2, 0}, {3, 0}, {4, 0}}}, aaa, {}, 0 }
+        { FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{{4, 0}, {5, 0}, {6, 0}}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{{2, 0}, {3, 0}, {4, 0}}}, aaa, {}, {{0, 0}}, 0, 0 }
     };
 
     const std::vector<mbgl::SymbolFeature> expected2 = {
-        { FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{}}, aaa, {}, 0 }
+        { FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{}}, aaa, {}, {{0, 0}}, 0, 0 }
     };
 
     mbgl::util::mergeLines(input2);
@@ -59,15 +59,15 @@ TEST(MergeLines, BothEnds) {
 TEST(MergeLines, CircularLines) {
     // mergeLines handles circular lines
     std::vector<mbgl::SymbolFeature> input3 = {
-        { FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{{2, 0}, {3, 0}, {4, 0}}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{{4, 0}, {0, 0}}}, aaa, {}, 0 }
+        { FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{{2, 0}, {3, 0}, {4, 0}}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{{4, 0}, {0, 0}}}, aaa, {}, {{0, 0}}, 0, 0 }
     };
 
     const std::vector<mbgl::SymbolFeature> expected3 = {
-        { FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {0, 0}}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{}}, aaa, {}, 0 },
-        { FeatureType::LineString, {{}}, aaa, {}, 0 }
+        { FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {0, 0}}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{}}, aaa, {}, {{0, 0}}, 0, 0 },
+        { FeatureType::LineString, {{}}, aaa, {}, {{0, 0}}, 0, 0 }
     };
 
     mbgl::util::mergeLines(input3);
@@ -79,7 +79,7 @@ TEST(MergeLines, CircularLines) {
 
 TEST(MergeLines, EmptyOuterGeometry) {
     std::vector<mbgl::SymbolFeature> input = {
-        { FeatureType::LineString, {}, aaa, {}, 0 },
+        { FeatureType::LineString, {}, aaa, {}, {{0, 0}}, 0, 0 },
     };
 
     const std::vector<mbgl::SymbolFeature> expected = input;
@@ -91,7 +91,7 @@ TEST(MergeLines, EmptyOuterGeometry) {
 
 TEST(MergeLines, EmptyInnerGeometry) {
     std::vector<mbgl::SymbolFeature> input = {
-        { FeatureType::LineString, {{}}, aaa, {}, 0 },
+        { FeatureType::LineString, {{}}, aaa, {}, {{0, 0}}, 0, 0 },
     };
 
     const std::vector<mbgl::SymbolFeature> expected = input;

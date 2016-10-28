@@ -19,5 +19,8 @@ template <class... Ts> void ignore(Ts&&...) {}
 //
 template <class T> void ignore(const std::initializer_list<T>&) {}
 
+// Handle the zero-argument case.
+inline void ignore(const std::initializer_list<int>&) {}
+
 } // namespace util
 } // namespace mbgl

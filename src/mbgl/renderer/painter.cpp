@@ -42,12 +42,12 @@ namespace mbgl {
 
 using namespace style;
 
-static gl::VertexVector<FillVertex> tileVertices() {
-    gl::VertexVector<FillVertex> result;
-    result.emplace_back(FillAttributes::vertex({ 0,            0 }));
-    result.emplace_back(FillAttributes::vertex({ util::EXTENT, 0 }));
-    result.emplace_back(FillAttributes::vertex({ 0, util::EXTENT }));
-    result.emplace_back(FillAttributes::vertex({ util::EXTENT, util::EXTENT }));
+static gl::VertexVector<FillLayoutVertex> tileVertices() {
+    gl::VertexVector<FillLayoutVertex> result;
+    result.emplace_back(FillProgram::layoutVertex({ 0,            0 }));
+    result.emplace_back(FillProgram::layoutVertex({ util::EXTENT, 0 }));
+    result.emplace_back(FillProgram::layoutVertex({ 0, util::EXTENT }));
+    result.emplace_back(FillProgram::layoutVertex({ util::EXTENT, util::EXTENT }));
     return result;
 }
 
@@ -68,12 +68,12 @@ static gl::IndexVector<gl::LineStrip> tileLineStripIndices() {
     return result;
 }
 
-static gl::VertexVector<RasterVertex> rasterVertices() {
-    gl::VertexVector<RasterVertex> result;
-    result.emplace_back(RasterProgram::vertex({ 0, 0 }, { 0, 0 }));
-    result.emplace_back(RasterProgram::vertex({ util::EXTENT, 0 }, { 32767, 0 }));
-    result.emplace_back(RasterProgram::vertex({ 0, util::EXTENT }, { 0, 32767 }));
-    result.emplace_back(RasterProgram::vertex({ util::EXTENT, util::EXTENT }, { 32767, 32767 }));
+static gl::VertexVector<RasterLayoutVertex> rasterVertices() {
+    gl::VertexVector<RasterLayoutVertex> result;
+    result.emplace_back(RasterProgram::layoutVertex({ 0, 0 }, { 0, 0 }));
+    result.emplace_back(RasterProgram::layoutVertex({ util::EXTENT, 0 }, { 32767, 0 }));
+    result.emplace_back(RasterProgram::layoutVertex({ 0, util::EXTENT }, { 0, 32767 }));
+    result.emplace_back(RasterProgram::layoutVertex({ util::EXTENT, util::EXTENT }, { 32767, 32767 }));
     return result;
 }
 
