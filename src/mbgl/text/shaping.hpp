@@ -26,7 +26,7 @@ class PositionedIcon {
         float left = 0;
         float right = 0;
 
-        operator bool() const { return image && (*image).pos.hasArea(); }
+        explicit operator bool() const { return image && (*image).pos.hasArea(); }
 };
 
 PositionedIcon shapeIcon(const SpriteAtlasElement& image, const style::SymbolLayoutProperties&);

@@ -13,7 +13,7 @@ public:
     constexpr Size(const uint32_t width_, const uint32_t height_) : width(width_), height(height_) {
     }
 
-    constexpr operator bool() const {
+    constexpr explicit operator bool() const {
         return width > 0 && height > 0;
     }
 
