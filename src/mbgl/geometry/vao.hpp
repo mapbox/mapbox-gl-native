@@ -44,6 +44,9 @@ public:
                 storeBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
             }
         } else {
+            // Band-aid for https://github.com/mapbox/mapbox-gl-native/issues/5731
+            elementsBuffer.bind(store);
+
             verifyBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
         }
     }
