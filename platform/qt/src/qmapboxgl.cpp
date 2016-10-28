@@ -850,16 +850,12 @@ void QMapboxGLPrivate::updateFramebufferBinding(QOpenGLFramebufferObject *fbo_)
     fbo = fbo_;
     if (fbo) {
         getContext().bindFramebuffer.setDirty();
-        getContext().viewport.setCurrentValue(
-            { 0,
-              0,
-              { static_cast<uint32_t>(fbo->width()), static_cast<uint32_t>(fbo->height()) } });
+        getContext().viewport = {
+            0, 0, { static_cast<uint32_t>(fbo->width()), static_cast<uint32_t>(fbo->height()) } };
     } else {
         getContext().bindFramebuffer.setCurrentValue(0);
-        getContext().viewport.setCurrentValue(
-            { 0,
-              0,
-              { static_cast<uint32_t>(fbSize.width()), static_cast<uint32_t>(fbSize.height()) } });
+        getContext().viewport = {
+            0, 0, { static_cast<uint32_t>(fbSize.width()), static_cast<uint32_t>(fbSize.height()) } };
     }
 }
 
