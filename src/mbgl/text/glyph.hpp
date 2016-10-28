@@ -14,7 +14,7 @@ namespace mbgl {
 GlyphRange getGlyphRange(char32_t glyph);
 
 struct GlyphMetrics {
-    operator bool() const {
+    explicit operator bool() const {
         return !(width == 0 && height == 0 && advance == 0);
     }
 
@@ -27,12 +27,20 @@ struct GlyphMetrics {
 
 };
 
+inline bool operator==(const GlyphMetrics& lhs, const GlyphMetrics& rhs) {
+    return lhs.width == rhs.width &&
+        lhs.height == rhs.height &&
+        lhs.left == rhs.left &&
+        lhs.top == rhs.top &&
+        lhs.advance == rhs.advance;
+}
+
 struct Glyph {
     explicit Glyph() : rect(0, 0, 0, 0), metrics() {}
     explicit Glyph(Rect<uint16_t> rect_, GlyphMetrics metrics_)
         : rect(std::move(rect_)), metrics(std::move(metrics_)) {}
 
-    operator bool() const {
+    explicit operator bool() const {
         return metrics || rect.hasArea();
     }
 
@@ -64,7 +72,7 @@ class Shaping {
     int32_t left;
     int32_t right;
 
-    operator bool() const { return !positionedGlyphs.empty(); }
+    explicit operator bool() const { return !positionedGlyphs.empty(); }
 };
 
 class SDFGlyph {
