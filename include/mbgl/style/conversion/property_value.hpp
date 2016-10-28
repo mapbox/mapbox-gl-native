@@ -16,7 +16,7 @@ struct Converter<PropertyValue<T>> {
         if (isUndefined(value)) {
             return {};
         } else if (isObject(value)) {
-            Result<Function<T>> function = convert<Function<T>>(value);
+            Result<CameraFunction<T>> function = convert<CameraFunction<T>>(value);
             if (!function) {
                 return function.error();
             }

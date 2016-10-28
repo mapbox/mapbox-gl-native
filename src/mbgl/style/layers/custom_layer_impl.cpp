@@ -70,7 +70,8 @@ bool CustomLayer::Impl::evaluate(const PropertyEvaluationParameters&) {
     return false;
 }
 
-std::unique_ptr<Bucket> CustomLayer::Impl::createBucket(BucketParameters&, const GeometryTileLayer&) const {
+std::unique_ptr<Bucket> CustomLayer::Impl::createBucket(const BucketParameters&, const std::vector<const Layer*>&) const {
+    assert(false);
     return nullptr;
 }
 

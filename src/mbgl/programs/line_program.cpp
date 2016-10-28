@@ -10,7 +10,7 @@ namespace mbgl {
 
 using namespace style;
 
-static_assert(sizeof(LineAttributes::Vertex) == 8, "expected LineVertex size");
+static_assert(sizeof(LineLayoutVertex) == 8, "expected LineLayoutVertex size");
 
 template <class Values, class...Args>
 Values makeValues(const LinePaintProperties::Evaluated& properties,
@@ -25,11 +25,7 @@ Values makeValues(const LinePaintProperties::Evaluated& properties,
                                   properties.get<LineTranslateAnchor>(),
                                   state)
         },
-        uniforms::u_opacity::Value{ properties.get<LineOpacity>() },
         uniforms::u_width::Value{ properties.get<LineWidth>() },
-        uniforms::u_gapwidth::Value{ properties.get<LineGapWidth>() },
-        uniforms::u_blur::Value{ properties.get<LineBlur>() },
-        uniforms::u_offset::Value{ properties.get<LineOffset>() },
         uniforms::u_ratio::Value{ 1.0f / tile.id.pixelsToTileUnits(1.0, state.getZoom()) },
         uniforms::u_gl_units_to_pixels::Value{{{ 1.0f / pixelsToGLUnits[0], 1.0f / pixelsToGLUnits[1] }}},
         std::forward<Args>(args)...
@@ -45,8 +41,7 @@ LineProgram::uniformValues(const LinePaintProperties::Evaluated& properties,
         properties,
         tile,
         state,
-        pixelsToGLUnits,
-        uniforms::u_color::Value{ properties.get<LineColor>() }
+        pixelsToGLUnits
     );
 }
 
@@ -78,7 +73,6 @@ LineSDFProgram::uniformValues(const LinePaintProperties::Evaluated& properties,
         tile,
         state,
         pixelsToGLUnits,
-        uniforms::u_color::Value{ properties.get<LineColor>() },
         uniforms::u_patternscale_a::Value{ scaleA },
         uniforms::u_patternscale_b::Value{ scaleB },
         uniforms::u_tex_y_a::Value{ posA.y },

@@ -51,7 +51,10 @@ void Painter::renderSymbol(PaintParameters& parameters,
             std::move(uniformValues),
             *buffers.vertexBuffer,
             *buffers.indexBuffer,
-            buffers.segments
+            buffers.segments,
+            bucket.paintPropertyBinders.at(layer.getID()),
+            layer.impl->paint.evaluated,
+            state.getZoom()
         );
     };
 
@@ -110,6 +113,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
     }
 
     if (bucket.hasCollisionBoxData()) {
+        static const style::PaintProperties<>::Evaluated properties {};
+        static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+
         programs->collisionBox.draw(
             context,
             gl::Lines { 1.0f },
@@ -124,7 +130,10 @@ void Painter::renderSymbol(PaintParameters& parameters,
             },
             *bucket.collisionBox.vertexBuffer,
             *bucket.collisionBox.indexBuffer,
-            bucket.collisionBox.segments
+            bucket.collisionBox.segments,
+            paintAttributeData,
+            properties,
+            state.getZoom()
         );
     }
 }

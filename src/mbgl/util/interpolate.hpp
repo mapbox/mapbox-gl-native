@@ -1,14 +1,18 @@
 #pragma once
 
+#include <mbgl/util/color.hpp>
+#include <mbgl/util/range.hpp>
+
 #include <array>
 #include <vector>
 #include <string>
 #include <type_traits>
 #include <utility>
-#include <mbgl/util/color.hpp>
 
 namespace mbgl {
 namespace util {
+
+float interpolationFactor(float base, Range<float> range, float z);
 
 template <class T, class Enabled = void>
 struct Interpolator;
@@ -77,6 +81,9 @@ struct Interpolator<std::string>
 template <class T>
 struct Interpolator<std::vector<T>>
     : Uninterpolated {};
+
+template <class T>
+constexpr bool Interpolatable = !std::is_base_of<Uninterpolated, Interpolator<T>>::value;
 
 } // namespace util
 } // namespace mbgl

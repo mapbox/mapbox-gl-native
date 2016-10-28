@@ -7,6 +7,7 @@
 #include <mbgl/shader/symbol_sdf.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/size.hpp>
+#include <mbgl/style/layers/symbol_layer_properties.hpp>
 
 #include <cmath>
 #include <array>
@@ -31,9 +32,9 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_gamma);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_aspect_ratio);
 } // namespace uniforms
 
-struct SymbolAttributes : gl::Attributes<
+struct SymbolLayoutAttributes : gl::Attributes<
     attributes::a_pos,
-    attributes::a_offset,
+    attributes::a_offset<2>,
     attributes::a_texture_pos,
     attributes::a_data<4>>
 {
@@ -46,34 +47,32 @@ struct SymbolAttributes : gl::Attributes<
                          float labelminzoom,
                          uint8_t labelangle) {
         return Vertex {
-            {
+            {{
                 static_cast<int16_t>(a.x),
                 static_cast<int16_t>(a.y)
-            },
-            {
+            }},
+            {{
                 static_cast<int16_t>(::round(o.x * 64)),  // use 1/64 pixels for placement
                 static_cast<int16_t>(::round(o.y * 64))
-            },
-            {
+            }},
+            {{
                 static_cast<uint16_t>(tx / 4),
                 static_cast<uint16_t>(ty / 4)
-            },
-            {
+            }},
+            {{
                 static_cast<uint8_t>(labelminzoom * 10), // 1/10 zoom levels: z16 == 160
                 static_cast<uint8_t>(labelangle),
                 static_cast<uint8_t>(minzoom * 10),
                 static_cast<uint8_t>(::fmin(maxzoom, 25) * 10)
-            }
+            }}
         };
     }
 };
 
-using SymbolVertex = SymbolAttributes::Vertex;
-
 class SymbolIconProgram : public Program<
     shaders::symbol_icon,
     gl::Triangle,
-    SymbolAttributes,
+    SymbolLayoutAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
         uniforms::u_opacity,
@@ -82,7 +81,8 @@ class SymbolIconProgram : public Program<
         uniforms::u_zoom,
         uniforms::u_rotate_with_map,
         uniforms::u_texture,
-        uniforms::u_fadetexture>>
+        uniforms::u_fadetexture>,
+    style::SymbolPaintProperties>
 {
 public:
     using Program::Program;
@@ -97,7 +97,7 @@ public:
 class SymbolSDFProgram : public Program<
     shaders::symbol_sdf,
     gl::Triangle,
-    SymbolAttributes,
+    SymbolLayoutAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
         uniforms::u_opacity,
@@ -113,7 +113,8 @@ class SymbolSDFProgram : public Program<
         uniforms::u_pitch,
         uniforms::u_bearing,
         uniforms::u_aspect_ratio,
-        uniforms::u_pitch_with_map>>
+        uniforms::u_pitch_with_map>,
+    style::SymbolPaintProperties>
 {
 public:
     using Program::Program;
@@ -132,5 +133,8 @@ public:
                                                  const TransformState&,
                                                  float pixelRatio);
 };
+
+using SymbolLayoutVertex = SymbolLayoutAttributes::Vertex;
+using SymbolAttributes = SymbolIconProgram::Attributes;
 
 } // namespace mbgl

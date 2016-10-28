@@ -662,6 +662,11 @@ void Style::onLayerPaintPropertyChanged(Layer&) {
     observer->onUpdate(Update::RecalculateStyle | Update::Classes);
 }
 
+void Style::onLayerDataDrivenPaintPropertyChanged(Layer& layer) {
+    layer.accept(QueueSourceReloadVisitor { updateBatch });
+    observer->onUpdate(Update::RecalculateStyle | Update::Classes | Update::Layout);
+}
+
 void Style::onLayerLayoutPropertyChanged(Layer& layer, const char * property) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
 

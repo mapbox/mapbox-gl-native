@@ -49,6 +49,7 @@ void Painter::renderRaster(PaintParameters& parameters,
         return;
 
     const RasterPaintProperties::Evaluated& properties = layer.impl->paint.evaluated;
+    const RasterProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
     assert(bucket.texture);
     context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
@@ -77,7 +78,10 @@ void Painter::renderRaster(PaintParameters& parameters,
         },
         rasterVertexBuffer,
         tileTriangleIndexBuffer,
-        rasterSegments
+        rasterSegments,
+        paintAttributeData,
+        properties,
+        state.getZoom()
     );
 }
 

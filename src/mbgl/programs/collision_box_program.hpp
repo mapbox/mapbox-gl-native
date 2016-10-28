@@ -28,29 +28,30 @@ class CollisionBoxProgram : public Program<
         uniforms::u_matrix,
         uniforms::u_scale,
         uniforms::u_zoom,
-        uniforms::u_maxzoom>>
+        uniforms::u_maxzoom>,
+    style::PaintProperties<>>
 {
 public:
     using Program::Program;
 
-    static Vertex vertex(Point<float> a, Point<float> o, float maxzoom, float placementZoom) {
-        return Vertex {
-            {
+    static LayoutVertex vertex(Point<float> a, Point<float> o, float maxzoom, float placementZoom) {
+        return LayoutVertex {
+            {{
                 static_cast<int16_t>(a.x),
                 static_cast<int16_t>(a.y)
-            },
-            {
+            }},
+            {{
                 static_cast<int16_t>(::round(o.x)),
                 static_cast<int16_t>(::round(o.y))
-            },
-            {
+            }},
+            {{
                 static_cast<uint8_t>(maxzoom * 10),
                 static_cast<uint8_t>(placementZoom * 10)
-            }
+            }}
         };
     }
 };
 
-using CollisionBoxVertex = CollisionBoxProgram::Vertex;
+using CollisionBoxVertex = CollisionBoxProgram::LayoutVertex;
 
 } // namespace mbgl

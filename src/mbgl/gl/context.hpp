@@ -13,7 +13,6 @@
 #include <mbgl/gl/depth_mode.hpp>
 #include <mbgl/gl/stencil_mode.hpp>
 #include <mbgl/gl/color_mode.hpp>
-#include <mbgl/gl/segment.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 
@@ -40,6 +39,7 @@ public:
     UniqueProgram createProgram(ShaderID vertexShader, ShaderID fragmentShader);
     void linkProgram(ProgramID);
     UniqueTexture createTexture();
+    UniqueVertexArray createVertexArray();
 
     template <class Vertex, class DrawMode>
     VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v) {
@@ -119,24 +119,19 @@ public:
                optional<float> depth,
                optional<int32_t> stencil);
 
-    struct Drawable {
-        DrawMode drawMode;
-        DepthMode depthMode;
-        StencilMode stencilMode;
-        ColorMode colorMode;
-        gl::ProgramID program;
-        gl::BufferID vertexBuffer;
-        gl::BufferID indexBuffer;
-        const std::vector<Segment>& segments;
-        std::function<void ()> bindUniforms;
-        std::function<void (std::size_t)> bindAttributes;
-    };
-
-    void draw(const Drawable&);
+    void setDrawMode(const Points&);
+    void setDrawMode(const Lines&);
+    void setDrawMode(const LineStrip&);
+    void setDrawMode(const Triangles&);
+    void setDrawMode(const TriangleStrip&);
 
     void setDepthMode(const DepthMode&);
     void setStencilMode(const StencilMode&);
     void setColorMode(const ColorMode&);
+
+    void draw(PrimitiveType,
+              std::size_t indexOffset,
+              std::size_t indexLength);
 
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
@@ -164,6 +159,8 @@ public:
     std::array<State<value::BindTexture>, 2> texture;
     State<value::BindVertexArray> vertexArrayObject;
     State<value::Program> program;
+    State<value::BindVertexBuffer> vertexBuffer;
+    State<value::BindElementBuffer> elementBuffer;
 
 #if not MBGL_USE_GLES2
     State<value::PixelZoom> pixelZoom;
@@ -196,8 +193,6 @@ private:
 #if not MBGL_USE_GLES2
     State<value::PointSize> pointSize;
 #endif // MBGL_USE_GLES2
-    State<value::BindVertexBuffer> vertexBuffer;
-    State<value::BindElementBuffer> elementBuffer;
 
     UniqueBuffer createVertexBuffer(const void* data, std::size_t size);
     UniqueBuffer createIndexBuffer(const void* data, std::size_t size);
@@ -209,12 +204,6 @@ private:
 #if not MBGL_USE_GLES2
     void drawPixels(Size size, const void* data, TextureFormat);
 #endif // MBGL_USE_GLES2
-
-    PrimitiveType operator()(const Points&);
-    PrimitiveType operator()(const Lines&);
-    PrimitiveType operator()(const LineStrip&);
-    PrimitiveType operator()(const Triangles&);
-    PrimitiveType operator()(const TriangleStrip&);
 
     friend detail::ProgramDeleter;
     friend detail::ShaderDeleter;

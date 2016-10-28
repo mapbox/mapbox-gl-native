@@ -7,7 +7,7 @@ namespace mbgl {
 
 using namespace style;
 
-static_assert(sizeof(SymbolAttributes::Vertex) == 16, "expected SymbolVertex size");
+static_assert(sizeof(SymbolLayoutVertex) == 16, "expected SymbolLayoutVertex size");
 
 template <class Values, class...Args>
 Values makeValues(const style::SymbolPropertyValues& values,

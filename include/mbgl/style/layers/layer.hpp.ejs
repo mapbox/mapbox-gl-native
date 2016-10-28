@@ -10,6 +10,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
 
 #include <mbgl/util/color.hpp>
 
@@ -45,18 +46,18 @@ public:
     // Layout properties
 
 <% for (const property of layoutProperties) { -%>
-    static PropertyValue<<%- propertyType(property) %>> getDefault<%- camelize(property.name) %>();
-    PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() const;
-    void set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>>);
+    static <%- propertyValueType(property) %> getDefault<%- camelize(property.name) %>();
+    <%- propertyValueType(property) %> get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>);
 
 <% } -%>
 <% } -%>
     // Paint properties
 
 <% for (const property of paintProperties) { -%>
-    static PropertyValue<<%- propertyType(property) %>> getDefault<%- camelize(property.name) %>();
-    PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>(const optional<std::string>& klass = {}) const;
-    void set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>>, const optional<std::string>& klass = {});
+    static <%- propertyValueType(property) %> getDefault<%- camelize(property.name) %>();
+    <%- propertyValueType(property) %> get<%- camelize(property.name) %>(const optional<std::string>& klass = {}) const;
+    void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>, const optional<std::string>& klass = {});
 
 <% } -%>
     // Private implementation

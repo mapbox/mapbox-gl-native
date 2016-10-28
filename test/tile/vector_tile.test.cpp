@@ -60,7 +60,9 @@ TEST(VectorTile, Issue7615) {
 
     style::SymbolLayer symbolLayer("symbol", "source");
     auto symbolBucket = std::make_shared<SymbolBucket>(
-        MapMode::Continuous, style::SymbolLayoutProperties::Evaluated(), false, false);
+        style::SymbolLayoutProperties::Evaluated(),
+        std::unordered_map<std::string, style::SymbolPaintProperties::Evaluated>(),
+        0.0f, false, false);
 
     // Simulate placement of a symbol layer.
     tile.onPlacement(GeometryTile::PlacementResult {

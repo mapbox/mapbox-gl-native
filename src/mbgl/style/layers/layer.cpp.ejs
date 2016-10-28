@@ -86,15 +86,15 @@ const Filter& <%- camelize(type) %>Layer::getFilter() const {
 // Layout properties
 
 <% for (const property of layoutProperties) { -%>
-PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::getDefault<%- camelize(property.name) %>() {
+<%- propertyValueType(property) %> <%- camelize(type) %>Layer::getDefault<%- camelize(property.name) %>() {
     return <%- camelize(property.name) %>::defaultValue();
 }
 
-PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
+<%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
     return impl->layout.unevaluated.get<<%- camelize(property.name) %>>();
 }
 
-void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>> value) {
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> value) {
     if (value == get<%- camelize(property.name) %>())
         return;
     impl->layout.unevaluated.get<<%- camelize(property.name) %>>() = value;
@@ -104,19 +104,27 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue
 
 // Paint properties
 <% for (const property of paintProperties) { %>
-PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::getDefault<%- camelize(property.name) %>() {
+<%- propertyValueType(property) %> <%- camelize(type) %>Layer::getDefault<%- camelize(property.name) %>() {
     return { <%- defaultValue(property) %> };
 }
 
-PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>(const optional<std::string>& klass) const {
+<%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>(const optional<std::string>& klass) const {
     return impl->paint.get<<%- camelize(property.name) %>>(klass);
 }
 
-void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>> value, const optional<std::string>& klass) {
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> value, const optional<std::string>& klass) {
     if (value == get<%- camelize(property.name) %>(klass))
         return;
     impl->paint.set<<%- camelize(property.name) %>>(value, klass);
+<% if (isDataDriven(property)) { -%>
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
+<% } else { -%>
     impl->observer->onLayerPaintPropertyChanged(*this);
+<% } -%>
 }
 <% } -%>
 

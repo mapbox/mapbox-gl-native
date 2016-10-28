@@ -217,15 +217,15 @@ void SymbolLayer::setIconImage(PropertyValue<std::string> value) {
     impl->layout.unevaluated.get<IconImage>() = value;
     impl->observer->onLayerLayoutPropertyChanged(*this, "icon-image");
 }
-PropertyValue<float> SymbolLayer::getDefaultIconRotate() {
+DataDrivenPropertyValue<float> SymbolLayer::getDefaultIconRotate() {
     return IconRotate::defaultValue();
 }
 
-PropertyValue<float> SymbolLayer::getIconRotate() const {
+DataDrivenPropertyValue<float> SymbolLayer::getIconRotate() const {
     return impl->layout.unevaluated.get<IconRotate>();
 }
 
-void SymbolLayer::setIconRotate(PropertyValue<float> value) {
+void SymbolLayer::setIconRotate(DataDrivenPropertyValue<float> value) {
     if (value == getIconRotate())
         return;
     impl->layout.unevaluated.get<IconRotate>() = value;
@@ -259,15 +259,15 @@ void SymbolLayer::setIconKeepUpright(PropertyValue<bool> value) {
     impl->layout.unevaluated.get<IconKeepUpright>() = value;
     impl->observer->onLayerLayoutPropertyChanged(*this, "icon-keep-upright");
 }
-PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultIconOffset() {
+DataDrivenPropertyValue<std::array<float, 2>> SymbolLayer::getDefaultIconOffset() {
     return IconOffset::defaultValue();
 }
 
-PropertyValue<std::array<float, 2>> SymbolLayer::getIconOffset() const {
+DataDrivenPropertyValue<std::array<float, 2>> SymbolLayer::getIconOffset() const {
     return impl->layout.unevaluated.get<IconOffset>();
 }
 
-void SymbolLayer::setIconOffset(PropertyValue<std::array<float, 2>> value) {
+void SymbolLayer::setIconOffset(DataDrivenPropertyValue<std::array<float, 2>> value) {
     if (value == getIconOffset())
         return;
     impl->layout.unevaluated.get<IconOffset>() = value;

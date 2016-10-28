@@ -34,7 +34,7 @@ public:
     const MapDebugOptions debugMode;
 
     gl::SegmentVector<DebugAttributes> segments;
-    optional<gl::VertexBuffer<DebugVertex>> vertexBuffer;
+    optional<gl::VertexBuffer<DebugLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Lines>> indexBuffer;
 };
 

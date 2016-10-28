@@ -3,7 +3,9 @@
 #include <mbgl/layout/clip_lines.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
-#include <mbgl/style/layer.hpp>
+#include <mbgl/style/bucket_parameters.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/get_anchors.hpp>
@@ -27,26 +29,48 @@ namespace mbgl {
 
 using namespace style;
 
-SymbolLayout::SymbolLayout(std::vector<std::string> layerIDs_,
-                           std::string sourceLayerName_,
-                           uint32_t overscaling_,
-                           float zoom_,
-                           const MapMode mode_,
-                           const GeometryTileLayer& layer,
-                           const style::Filter& filter,
-                           style::SymbolLayoutProperties::Evaluated layout_,
-                           float textMaxSize_,
+SymbolLayout::SymbolLayout(const BucketParameters& parameters,
+                           const std::vector<const Layer*>& layers,
+                           const GeometryTileLayer& sourceLayer,
                            SpriteAtlas& spriteAtlas_)
-    : layerIDs(std::move(layerIDs_)),
-      sourceLayerName(std::move(sourceLayerName_)),
-      overscaling(overscaling_),
-      zoom(zoom_),
-      mode(mode_),
-      layout(std::move(layout_)),
-      textMaxSize(textMaxSize_),
+    : sourceLayerName(sourceLayer.getName()),
+      bucketName(layers.at(0)->getID()),
+      overscaling(parameters.tileID.overscaleFactor()),
+      zoom(parameters.tileID.overscaledZ),
+      mode(parameters.mode),
       spriteAtlas(spriteAtlas_),
-      tileSize(util::tileSize * overscaling_),
+      tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize) {
+
+    const SymbolLayer::Impl& leader = *layers.at(0)->as<SymbolLayer>()->impl;
+
+    layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
+
+    if (layout.get<IconRotationAlignment>() == AlignmentType::Auto) {
+        if (layout.get<SymbolPlacement>() == SymbolPlacementType::Line) {
+            layout.get<IconRotationAlignment>() = AlignmentType::Map;
+        } else {
+            layout.get<IconRotationAlignment>() = AlignmentType::Viewport;
+        }
+    }
+
+    if (layout.get<TextRotationAlignment>() == AlignmentType::Auto) {
+        if (layout.get<SymbolPlacement>() == SymbolPlacementType::Line) {
+            layout.get<TextRotationAlignment>() = AlignmentType::Map;
+        } else {
+            layout.get<TextRotationAlignment>() = AlignmentType::Viewport;
+        }
+    }
+
+    // If unspecified `text-pitch-alignment` inherits `text-rotation-alignment`
+    if (layout.get<TextPitchAlignment>() == AlignmentType::Auto) {
+        layout.get<TextPitchAlignment>() = layout.get<TextRotationAlignment>();
+    }
+
+    textMaxSize = leader.layout.evaluate<TextSize>(PropertyEvaluationParameters(18));
+
+    layout.get<IconSize>() = leader.layout.evaluate<IconSize>(PropertyEvaluationParameters(zoom + 1));
+    layout.get<TextSize>() = leader.layout.evaluate<TextSize>(PropertyEvaluationParameters(zoom + 1));
 
     const bool hasText = !layout.get<TextField>().empty() && !layout.get<TextFont>().empty();
     const bool hasIcon = !layout.get<IconImage>().empty();
@@ -55,13 +79,15 @@ SymbolLayout::SymbolLayout(std::vector<std::string> layerIDs_,
         return;
     }
 
-    auto layerName = layer.getName();
+    for (const auto& layer : layers) {
+        layerPaintProperties.emplace(layer->getID(), layer->as<SymbolLayer>()->impl->paint.evaluated);
+    }
 
     // Determine and load glyph ranges
-    const size_t featureCount = layer.featureCount();
+    const size_t featureCount = sourceLayer.featureCount();
     for (size_t i = 0; i < featureCount; ++i) {
-        auto feature = layer.getFeature(i);
-        if (!filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
+        auto feature = sourceLayer.getFeature(i);
+        if (!leader.filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
             continue;
 
         SymbolFeature ft;
@@ -103,6 +129,8 @@ SymbolLayout::SymbolLayout(std::vector<std::string> layerIDs_,
 
         if (hasIcon) {
             ft.icon = util::replaceTokens(layout.get<IconImage>(), getValue);
+            ft.iconOffset = layout.get<IconOffset>().evaluate(zoom, *feature);
+            ft.iconRotation = layout.get<IconRotate>().evaluate(zoom, *feature) * util::DEG2RAD;
         }
 
         if (ft.text || ft.icon) {
@@ -209,14 +237,14 @@ void SymbolLayout::prepare(uintptr_t tileUID,
         if (feature.icon) {
             auto image = spriteAtlas.getImage(*feature.icon, SpritePatternMode::Single);
             if (image) {
-                shapedIcon = shapeIcon(*image, layout);
+                shapedIcon = shapeIcon(*image, feature);
                 assert((*image).spriteImage);
                 if ((*image).spriteImage->sdf) {
                     sdfIcons = true;
                 }
                 if ((*image).relativePixelRatio != 1.0f) {
                     iconsNeedLinear = true;
-                } else if (layout.get<IconRotate>() != 0) {
+                } else if (layout.get<IconRotate>().constantOr(1) != 0) {
                     iconsNeedLinear = true;
                 }
             }
@@ -254,7 +282,7 @@ void SymbolLayout::addFeature(const SymbolFeature& feature,
                                                   ? SymbolPlacementType::Point
                                                   : layout.get<SymbolPlacement>();
     const float textRepeatDistance = symbolSpacing / 2;
-    IndexedSubfeature indexedFeature = {feature.index, sourceLayerName, layerIDs.at(0), symbolInstances.size()};
+    IndexedSubfeature indexedFeature = {feature.index, sourceLayerName, bucketName, symbolInstances.size()};
 
     auto addSymbolInstance = [&] (const GeometryCoordinates& line, Anchor& anchor) {
         // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers
@@ -350,7 +378,7 @@ bool SymbolLayout::anchorIsTooClose(const std::u16string& text, const float repe
 }
 
 std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) {
-    auto bucket = std::make_unique<SymbolBucket>(mode, layout, sdfIcons, iconsNeedLinear);
+    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, zoom, sdfIcons, iconsNeedLinear);
 
     // Calculate which labels can be shown and when they can be shown and
     // create the bufers used for rendering.
@@ -487,13 +515,13 @@ void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);
 
         // coordinates (2 triangles)
-        buffer.vertices.emplace_back(SymbolAttributes::vertex(anchorPoint, tl, tex.x, tex.y,
+        buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tl, tex.x, tex.y,
                             minZoom, maxZoom, placementZoom, glyphAngle));
-        buffer.vertices.emplace_back(SymbolAttributes::vertex(anchorPoint, tr, tex.x + tex.w, tex.y,
+        buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tr, tex.x + tex.w, tex.y,
                             minZoom, maxZoom, placementZoom, glyphAngle));
-        buffer.vertices.emplace_back(SymbolAttributes::vertex(anchorPoint, bl, tex.x, tex.y + tex.h,
+        buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, bl, tex.x, tex.y + tex.h,
                             minZoom, maxZoom, placementZoom, glyphAngle));
-        buffer.vertices.emplace_back(SymbolAttributes::vertex(anchorPoint, br, tex.x + tex.w, tex.y + tex.h,
+        buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, tex.x + tex.w, tex.y + tex.h,
                             minZoom, maxZoom, placementZoom, glyphAngle));
 
         // add the two triangles, referencing the four coordinates we just inserted.

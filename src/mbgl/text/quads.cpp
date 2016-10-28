@@ -62,7 +62,7 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
         bl = {left, bottom};
     }
 
-    float angle = layout.get<IconRotate>() * util::DEG2RAD;
+    float angle = shapedIcon.angle;
     if (placement == style::SymbolPlacementType::Line) {
         assert(static_cast<unsigned int>(anchor.segment) < line.size());
         const GeometryCoordinate &prev= line[anchor.segment];

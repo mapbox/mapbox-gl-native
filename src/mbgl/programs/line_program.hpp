@@ -6,8 +6,8 @@
 #include <mbgl/shader/line.hpp>
 #include <mbgl/shader/line_pattern.hpp>
 #include <mbgl/shader/line_sdf.hpp>
-#include <mbgl/style/layers/line_layer_properties.hpp>
 #include <mbgl/util/geometry.hpp>
+#include <mbgl/style/layers/line_layer_properties.hpp>
 
 #include <cmath>
 
@@ -21,8 +21,6 @@ class SpriteAtlasPosition;
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_ratio);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_width);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_gapwidth);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_offset);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_tex_y_a);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_tex_y_b);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_sdfgamma);
@@ -32,23 +30,38 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_patternscale_b);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_gl_units_to_pixels);
 } // namespace uniforms
 
-struct LineAttributes : gl::Attributes<
+struct LineLayoutAttributes : gl::Attributes<
     attributes::a_pos,
     attributes::a_data<4>>
+{};
+
+class LineProgram : public Program<
+    shaders::line,
+    gl::Triangle,
+    LineLayoutAttributes,
+    gl::Uniforms<
+        uniforms::u_matrix,
+        uniforms::u_width,
+        uniforms::u_ratio,
+        uniforms::u_gl_units_to_pixels>,
+    style::LinePaintProperties>
 {
+public:
+    using Program::Program;
+
     /*
      * @param p vertex position
      * @param e extrude normal
      * @param t texture normal
      * @param dir direction of the line cap (-1/0/1)
      */
-    static Vertex vertex(Point<int16_t> p, Point<double> e, Point<bool> t, int8_t dir, int32_t linesofar = 0) {
-        return Vertex {
-            {
+    static LayoutVertex layoutVertex(Point<int16_t> p, Point<double> e, Point<bool> t, int8_t dir, int32_t linesofar = 0) {
+        return LayoutVertex {
+            {{
                 static_cast<int16_t>((p.x * 2) | t.x),
                 static_cast<int16_t>((p.y * 2) | t.y)
-            },
-            {
+            }},
+            {{
                 // add 128 to store a byte in an unsigned byte
                 static_cast<uint8_t>(::round(extrudeScale * e.x) + 128),
                 static_cast<uint8_t>(::round(extrudeScale * e.y) + 128),
@@ -65,7 +78,7 @@ struct LineAttributes : gl::Attributes<
                 // so we need to shift the linesofar.
                 static_cast<uint8_t>(((dir == 0 ? 0 : (dir < 0 ? -1 : 1 )) + 1) | ((linesofar & 0x3F) << 2)),
                 static_cast<uint8_t>(linesofar >> 6)
-            }
+            }}
         };
     }
 
@@ -77,27 +90,6 @@ struct LineAttributes : gl::Attributes<
      * the acute/bevelled line join.
      */
     static const int8_t extrudeScale = 63;
-};
-
-using LineVertex = LineAttributes::Vertex;
-
-class LineProgram : public Program<
-    shaders::line,
-    gl::Triangle,
-    LineAttributes,
-    gl::Uniforms<
-        uniforms::u_matrix,
-        uniforms::u_opacity,
-        uniforms::u_width,
-        uniforms::u_gapwidth,
-        uniforms::u_blur,
-        uniforms::u_offset,
-        uniforms::u_ratio,
-        uniforms::u_gl_units_to_pixels,
-        uniforms::u_color>>
-{
-public:
-    using Program::Program;
 
     static UniformValues uniformValues(const style::LinePaintProperties::Evaluated&,
                                        const RenderTile&,
@@ -108,14 +100,10 @@ public:
 class LinePatternProgram : public Program<
     shaders::line_pattern,
     gl::Triangle,
-    LineAttributes,
+    LineLayoutAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
-        uniforms::u_opacity,
         uniforms::u_width,
-        uniforms::u_gapwidth,
-        uniforms::u_blur,
-        uniforms::u_offset,
         uniforms::u_ratio,
         uniforms::u_gl_units_to_pixels,
         uniforms::u_pattern_tl_a,
@@ -125,7 +113,8 @@ class LinePatternProgram : public Program<
         uniforms::u_pattern_size_a,
         uniforms::u_pattern_size_b,
         uniforms::u_fade,
-        uniforms::u_image>>
+        uniforms::u_image>,
+    style::LinePaintProperties>
 {
 public:
     using Program::Program;
@@ -141,24 +130,20 @@ public:
 class LineSDFProgram : public Program<
     shaders::line_sdf,
     gl::Triangle,
-    LineAttributes,
+    LineLayoutAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
-        uniforms::u_opacity,
         uniforms::u_width,
-        uniforms::u_gapwidth,
-        uniforms::u_blur,
-        uniforms::u_offset,
         uniforms::u_ratio,
         uniforms::u_gl_units_to_pixels,
-        uniforms::u_color,
         uniforms::u_patternscale_a,
         uniforms::u_patternscale_b,
         uniforms::u_tex_y_a,
         uniforms::u_tex_y_b,
         uniforms::u_mix,
         uniforms::u_sdfgamma,
-        uniforms::u_image>>
+        uniforms::u_image>,
+    style::LinePaintProperties>
 {
 public:
     using Program::Program;
@@ -173,5 +158,8 @@ public:
                                        float dashLineWidth,
                                        float atlasWidth);
 };
+
+using LineLayoutVertex = LineProgram::LayoutVertex;
+using LineAttributes = LineProgram::Attributes;
 
 } // namespace mbgl
