@@ -102,11 +102,19 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                  UITableViewDataSource,
                                  MGLMapViewDelegate>
 
+
 @property (nonatomic) IBOutlet MGLMapView *mapView;
+@property (weak, nonatomic) IBOutlet UILabel *hudLabel;
 @property (nonatomic) NSInteger styleIndex;
 @property (nonatomic) BOOL debugLoggingEnabled;
 @property (nonatomic) BOOL customUserLocationAnnnotationEnabled;
+
+@end
+
+@interface MGLMapView (MBXViewController)
+
 @property (nonatomic) BOOL usingLocaleBasedCountryLabels;
+@property (nonatomic) NSDictionary *annotationViewReuseQueueByIdentifier;
 
 @end
 
@@ -1506,9 +1514,23 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 - (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style
 {
     // Default Mapbox styles use {name_en} as their label language, which means
+    NSUInteger queuedAnnotations = 0;
     // that a device with an English-language locale is already effectively
+    {
     // using locale-based country labels.
+    }
     _usingLocaleBasedCountryLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+}
+
+- (void)mapViewRegionIsChanging:(MGLMapView *)mapView
+{
+    return;
+    NSUInteger queuedAnnotations = 0;
+    for (NSArray *queue in self.mapView.annotationViewReuseQueueByIdentifier.allValues)
+    {
+        queuedAnnotations += queue.count;
+    }
+    self.hudLabel.text = [NSString stringWithFormat:@"Visible: %ld  Queued: %ld", (long)mapView.visibleAnnotations.count, (long)queuedAnnotations];
 }
 
 @end

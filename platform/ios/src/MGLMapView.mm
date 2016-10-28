@@ -254,6 +254,7 @@ public:
 @property (nonatomic) MGLMapViewProxyAccessibilityElement *mapViewProxyAccessibilityElement;
 @property (nonatomic) MGLAnnotationContainerView *annotationContainerView;
 @property (nonatomic) MGLUserLocation *userLocation;
+@property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, NS_MUTABLE_ARRAY_OF(MGLAnnotationView *) *) *annotationViewReuseQueueByIdentifier;
 
 @end
 
@@ -270,7 +271,6 @@ public:
     MGLAnnotationContextMap _annotationContextsByAnnotationTag;
     /// Tag of the selected annotation. If the user location annotation is selected, this ivar is set to `MGLAnnotationTagNotFound`.
     MGLAnnotationTag _selectedAnnotationTag;
-    NS_MUTABLE_DICTIONARY_OF(NSString *, NS_MUTABLE_ARRAY_OF(MGLAnnotationView *) *) *_annotationViewReuseQueueByIdentifier;
 
     BOOL _userLocationAnnotationIsSelected;
     /// Size of the rectangle formed by unioning the maximum slop area around every annotation image and annotation image view.
@@ -4629,49 +4629,79 @@ public:
     [CATransaction begin];
     [CATransaction setDisableActions:YES];
 
-    for (auto &pair : _annotationContextsByAnnotationTag)
+    // If the map is pitched consider the viewport to be exactly the same as the bounds.
+    // Otherwise, add a small buffer.
+    CGFloat widthAdjustment = self.camera.pitch > 0.0 ? 0.0 : -_largestAnnotationViewSize.width / 2.0;
+    CGFloat heightAdjustment = self.camera.pitch > 0.0 ? 0.0 : -_largestAnnotationViewSize.height / 2.0;
+    CGRect viewPort = CGRectInset(self.bounds, widthAdjustment, heightAdjustment);
+    
+    NSArray *visibleAnnotations = [self visibleAnnotationsInRect:viewPort];
+    NSMutableArray *offscreenAnnotations = [self.annotations mutableCopy];
+    [offscreenAnnotations removeObjectsInArray:visibleAnnotations];
+    
+    // Update visible annotations
+    for (id<MGLAnnotation> annotation in visibleAnnotations)
     {
-        CGRect viewPort = CGRectInset(self.bounds,
-                                      -_largestAnnotationViewSize.width / 2.0 - MGLAnnotationUpdateViewportOutset.width / 2.0,
-                                      -_largestAnnotationViewSize.height / 2.0 - MGLAnnotationUpdateViewportOutset.width);
-
-        MGLAnnotationContext &annotationContext = pair.second;
-        MGLAnnotationView *annotationView = annotationContext.annotationView;
-
         // Defer to the shape/polygon styling delegate methods
-        if ([annotationContext.annotation isKindOfClass:[MGLMultiPoint class]])
+        if ([annotation isKindOfClass:[MGLMultiPoint class]])
         {
             continue;
         }
-
-        if (!annotationView)
+        
+        MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
+        if (annotationTag != MGLAnnotationTagNotFound)
         {
-            MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotationContext.annotation];
-            if (annotationView)
+            MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
+            MGLAnnotationView *annotationView = annotationContext.annotationView;
+            if (!annotationView)
             {
-                annotationView.mapView = self;
-                annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
-                annotationContext.annotationView = annotationView;
-
-                if (!annotationView.superview) {
-                    [self.annotationContainerView insertSubview:annotationView atIndex:0];
+                // This will dequeue views if the delegate implements the dequeue call
+                MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotationContext.annotation];
+                
+                if (annotationView)
+                {
+                    annotationView.mapView = self;
+                    annotationContext.annotationView = annotationView;
+                    
+                    // New annotation (created because there is nothing to dequeue) may not have been added to the
+                    // container view yet. Add them here.
+                    if (!annotationView.superview) {
+                        [self.annotationContainerView insertSubview:annotationView atIndex:0];
+                    }
                 }
             }
-            else
+            if (annotationView)
             {
-                // if there is no annotationView at this point then we are dealing with a sprite backed annotation
-                continue;
+                annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
             }
         }
-
-        bool annotationViewIsVisible = CGRectContainsRect(viewPort, annotationView.frame);
-        if (!annotationViewIsVisible && annotationContext.viewReuseIdentifier)
+    }
+    
+    // Enqueue (and hide if required) offscreen annotations
+    for (id<MGLAnnotation> annotation in offscreenAnnotations)
+    {
+        MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
+        if (annotationTag != MGLAnnotationTagNotFound)
         {
+            MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
+            
+            // If the map changes quickly it is possible that some views may be processed after their
+            // annotation has already moved offscreen. This cleans those stranded view up.
+            UIView *annotationView = annotationContext.annotationView;
+            if (annotationView)
+            {
+                if (CGRectIntersectsRect(annotationView.frame, self.bounds))
+                {
+                    CGRect adjustedFrame = annotationView.frame;
+                    adjustedFrame.origin.x = -CGRectGetWidth(adjustedFrame) * 2.0;
+                    annotationView.frame = adjustedFrame;
+                }
+            }
+            
+            // This is a noop if the annotation view has already been queued or if it has no
+            // reuse identifier
             [self enqueueAnnotationViewForAnnotationContext:annotationContext];
-        }
-        else
-        {
-            annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
+            
         }
     }
 
@@ -4684,10 +4714,9 @@ public:
 
     if (!annotationView) return;
 
-    annotationView.annotation = nil;
-
     if (annotationContext.viewReuseIdentifier)
     {
+        annotationView.annotation = nil;
         NSMutableArray *annotationViewReuseQueue = [self annotationViewReuseQueueForIdentifier:annotationContext.viewReuseIdentifier];
         if (![annotationViewReuseQueue containsObject:annotationView])
         {
