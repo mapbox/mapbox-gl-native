@@ -4,37 +4,34 @@
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
-
+#include <mbgl/style/bucket_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 
 #include <mbgl/map/mode.hpp>
 
-TEST(Buckets, CircleBucket) {
-    mbgl::MapMode mapMode = mbgl::MapMode::Still;
+using namespace mbgl;
 
-    mbgl::CircleBucket bucket { mapMode };
+TEST(Buckets, CircleBucket) {
+    CircleBucket bucket { { {0, 0, 0}, MapMode::Still }, {} };
     ASSERT_FALSE(bucket.hasData());
 }
 
 TEST(Buckets, FillBucket) {
-    mbgl::FillBucket bucket;
+    FillBucket bucket { { {0, 0, 0}, MapMode::Still }, {} };
     ASSERT_FALSE(bucket.hasData());
 }
 
 TEST(Buckets, LineBucket) {
-    uint32_t overscaling = 0;
-
-    mbgl::LineBucket bucket { overscaling };
+    LineBucket bucket { { {0, 0, 0}, MapMode::Still }, {}, {} };
     ASSERT_FALSE(bucket.hasData());
 }
 
 TEST(Buckets, SymbolBucket) {
-    mbgl::MapMode mapMode = mbgl::MapMode::Still;
-    mbgl::style::SymbolLayoutProperties::Evaluated properties;
+    style::SymbolLayoutProperties::Evaluated layout;
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
 
-    mbgl::SymbolBucket bucket { mapMode, properties, sdfIcons, iconsNeedLinear };
+    SymbolBucket bucket { layout, {}, 0, sdfIcons, iconsNeedLinear };
     ASSERT_FALSE(bucket.hasIconData());
     ASSERT_FALSE(bucket.hasTextData());
     ASSERT_FALSE(bucket.hasCollisionBoxData());

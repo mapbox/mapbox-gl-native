@@ -214,20 +214,131 @@ void stringify(Writer& writer, const Undefined&) {
     writer.Null();
 }
 
-template <class Writer, class T>
-void stringify(Writer& writer, const Function<T>& f) {
-    writer.StartObject();
-    writer.Key("base");
-    writer.Double(f.getBase());
-    writer.Key("stops");
-    writer.StartArray();
-    for (const auto& stop : f.getStops()) {
+template <class Writer>
+void stringify(Writer& writer, const CategoricalValue& v) {
+    CategoricalValue::visit(v, [&] (const auto& v_) { stringify(writer, v_); });
+}
+
+template <class Writer>
+class StringifyStops {
+public:
+    Writer& writer;
+
+    template <class T>
+    void operator()(const ExponentialStops<T>& f) {
+        writer.Key("type");
+        writer.String("exponential");
+        writer.Key("base");
+        writer.Double(f.base);
+        writer.Key("stops");
+        stringifyStops(f.stops);
+    }
+
+    template <class T>
+    void operator()(const IntervalStops<T>& f) {
+        writer.Key("type");
+        writer.String("interval");
+        writer.Key("stops");
+        stringifyStops(f.stops);
+    }
+
+    template <class T>
+    void operator()(const CategoricalStops<T>& f) {
+        writer.Key("type");
+        writer.String("categorical");
+        writer.Key("stops");
+        stringifyStops(f.stops);
+    }
+
+    template <class T>
+    void operator()(const IdentityStops<T>&) {
+        writer.Key("type");
+        writer.String("identity");
+    }
+
+    template <class T>
+    void operator()(const std::map<float, ExponentialStops<T>>& f) {
+        writer.Key("type");
+        writer.String("exponential");
+        if (!f.empty()) {
+            writer.Key("base");
+            writer.Double(f.begin()->second.base);
+        }
+        writer.Key("stops");
+        stringifyCompositeStops(f);
+    }
+
+    template <class T>
+    void operator()(const std::map<float, IntervalStops<T>>& f) {
+        writer.Key("type");
+        writer.String("interval");
+        writer.Key("stops");
+        stringifyCompositeStops(f);
+    }
+
+    template <class T>
+    void operator()(const std::map<float, CategoricalStops<T>>& f) {
+        writer.Key("type");
+        writer.String("categorical");
+        writer.Key("stops");
+        stringifyCompositeStops(f);
+    }
+
+private:
+    template <class K, class V>
+    void stringifyStops(const std::map<K, V>& stops) {
         writer.StartArray();
-        writer.Double(stop.first);
-        stringify(writer, stop.second);
+        for (const auto& stop : stops) {
+            writer.StartArray();
+            stringify(writer, stop.first);
+            stringify(writer, stop.second);
+            writer.EndArray();
+        }
         writer.EndArray();
     }
-    writer.EndArray();
+
+    template <class InnerStops>
+    void stringifyCompositeStops(const std::map<float, InnerStops>& stops) {
+        writer.StartArray();
+        for (const auto& outer : stops) {
+            for (const auto& inner : outer.second.stops) {
+                writer.StartArray();
+                writer.StartObject();
+                writer.Key("zoom");
+                writer.Double(outer.first);
+                writer.Key("value");
+                stringify(writer, inner.first);
+                writer.EndObject();
+                stringify(writer, inner.second);
+                writer.EndArray();
+            }
+        }
+        writer.EndArray();
+    }
+};
+
+template <class Writer, class T>
+void stringify(Writer& writer, const CameraFunction<T>& f) {
+    writer.StartObject();
+    CameraFunction<T>::Stops::visit(f.stops, StringifyStops<Writer> { writer });
+    writer.EndObject();
+}
+
+template <class Writer, class T>
+void stringify(Writer& writer, const SourceFunction<T>& f) {
+    writer.StartObject();
+    writer.Key("property");
+    writer.String(f.property);
+    SourceFunction<T>::Stops::visit(f.stops, StringifyStops<Writer> { writer });
+    writer.EndObject();
+}
+
+template <class Writer, class T>
+void stringify(Writer& writer, const CompositeFunction<T>& f) {
+    writer.StartObject();
+    writer.Key("property");
+    writer.String(f.property);
+    CompositeFunction<T>::Stops::visit(f.stops, StringifyStops<Writer> { writer });
     writer.EndObject();
 }
 
@@ -238,7 +349,20 @@ void stringify(Writer& writer, const PropertyValue<T>& v) {
 
 template <class Property, class Writer, class T>
 void stringify(Writer& writer, const PropertyValue<T>& value) {
-    if (value) {
+    if (!value.isUndefined()) {
+        writer.Key(Property::key);
+        stringify(writer, value);
+    }
+}
+
+template <class Writer, class T>
+void stringify(Writer& writer, const DataDrivenPropertyValue<T>& v) {
+    v.evaluate([&] (const auto& v_) { stringify(writer, v_); });
+}
+
+template <class Property, class Writer, class T>
+void stringify(Writer& writer, const DataDrivenPropertyValue<T>& value) {
+    if (!value.isUndefined()) {
         writer.Key(Property::key);
         stringify(writer, value);
     }

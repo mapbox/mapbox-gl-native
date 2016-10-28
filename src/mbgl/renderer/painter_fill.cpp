@@ -38,7 +38,6 @@ void Painter::renderFill(PaintParameters& parameters,
         auto draw = [&] (uint8_t sublayer,
                          auto& program,
                          const auto& drawMode,
-                         const auto& vertexBuffer,
                          const auto& indexBuffer,
                          const auto& segments) {
             program.draw(
@@ -51,7 +50,6 @@ void Painter::renderFill(PaintParameters& parameters,
                     tile.translatedMatrix(properties.get<FillTranslate>(),
                                           properties.get<FillTranslateAnchor>(),
                                           state),
-                    properties.get<FillOpacity>(),
                     context.viewport.getCurrentValue().size,
                     *imagePosA,
                     *imagePosB,
@@ -59,16 +57,18 @@ void Painter::renderFill(PaintParameters& parameters,
                     tile.id,
                     state
                 ),
-                vertexBuffer,
+                *bucket.vertexBuffer,
                 indexBuffer,
-                segments
+                segments,
+                bucket.paintPropertyBinders.at(layer.getID()),
+                properties,
+                state.getZoom()
             );
         };
 
         draw(0,
              parameters.programs.fillPattern,
              gl::Triangles(),
-             *bucket.vertexBuffer,
              *bucket.triangleIndexBuffer,
              bucket.triangleSegments);
 
@@ -79,14 +79,12 @@ void Painter::renderFill(PaintParameters& parameters,
         draw(2,
              parameters.programs.fillOutlinePattern,
              gl::Lines { 2.0f },
-             *bucket.vertexBuffer,
              *bucket.lineIndexBuffer,
              bucket.lineSegments);
     } else {
         auto draw = [&] (uint8_t sublayer,
                          auto& program,
                          const auto& drawMode,
-                         const auto& vertexBuffer,
                          const auto& indexBuffer,
                          const auto& segments) {
             program.draw(
@@ -96,17 +94,19 @@ void Painter::renderFill(PaintParameters& parameters,
                 stencilModeForClipping(tile.clip),
                 colorModeForRenderPass(),
                 FillProgram::UniformValues {
-                    uniforms::u_matrix::Value{ tile.translatedMatrix(properties.get<FillTranslate>(),
-                                               properties.get<FillTranslateAnchor>(),
-                                               state) },
-                    uniforms::u_opacity::Value{ properties.get<FillOpacity>() },
-                    uniforms::u_color::Value{ properties.get<FillColor>() },
-                    uniforms::u_outline_color::Value{ properties.get<FillOutlineColor>() },
+                    uniforms::u_matrix::Value{
+                        tile.translatedMatrix(properties.get<FillTranslate>(),
+                                              properties.get<FillTranslateAnchor>(),
+                                              state)
+                    },
                     uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
                 },
-                vertexBuffer,
+                *bucket.vertexBuffer,
                 indexBuffer,
-                segments
+                segments,
+                bucket.paintPropertyBinders.at(layer.getID()),
+                properties,
+                state.getZoom()
             );
         };
 
@@ -114,18 +114,17 @@ void Painter::renderFill(PaintParameters& parameters,
             draw(2,
                  parameters.programs.fillOutline,
                  gl::Lines { 2.0f },
-                 *bucket.vertexBuffer,
                  *bucket.lineIndexBuffer,
                  bucket.lineSegments);
         }
 
         // Only draw the fill when it's opaque and we're drawing opaque fragments,
         // or when it's translucent and we're drawing translucent fragments.
-        if ((properties.get<FillColor>().a >= 1.0f && properties.get<FillOpacity>() >= 1.0f) == (pass == RenderPass::Opaque)) {
+        if ((properties.get<FillColor>().constantOr(Color()).a >= 1.0f
+          && properties.get<FillOpacity>().constantOr(0) >= 1.0f) == (pass == RenderPass::Opaque)) {
             draw(1,
                  parameters.programs.fill,
                  gl::Triangles(),
-                 *bucket.vertexBuffer,
                  *bucket.triangleIndexBuffer,
                  bucket.triangleSegments);
         }
@@ -134,7 +133,6 @@ void Painter::renderFill(PaintParameters& parameters,
             draw(2,
                  parameters.programs.fillOutline,
                  gl::Lines { 2.0f },
-                 *bucket.vertexBuffer,
                  *bucket.lineIndexBuffer,
                  bucket.lineSegments);
         }

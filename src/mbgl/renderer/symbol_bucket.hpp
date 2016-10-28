@@ -16,8 +16,9 @@ namespace mbgl {
 
 class SymbolBucket : public Bucket {
 public:
-    SymbolBucket(const MapMode,
-                 style::SymbolLayoutProperties::Evaluated,
+    SymbolBucket(style::SymbolLayoutProperties::Evaluated,
+                 const std::unordered_map<std::string, style::SymbolPaintProperties::Evaluated>&,
+                 float zoom,
                  bool sdfIcons,
                  bool iconsNeedLinear);
 
@@ -28,26 +29,27 @@ public:
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
 
-    const MapMode mode;
     const style::SymbolLayoutProperties::Evaluated layout;
     const bool sdfIcons;
     const bool iconsNeedLinear;
 
+    std::unordered_map<std::string, SymbolIconProgram::PaintPropertyBinders> paintPropertyBinders;
+
     struct TextBuffer {
-        gl::VertexVector<SymbolVertex> vertices;
+        gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::IndexVector<gl::Triangles> triangles;
         gl::SegmentVector<SymbolAttributes> segments;
 
-        optional<gl::VertexBuffer<SymbolVertex>> vertexBuffer;
+        optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } text;
 
     struct IconBuffer {
-        gl::VertexVector<SymbolVertex> vertices;
+        gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::IndexVector<gl::Triangles> triangles;
         gl::SegmentVector<SymbolAttributes> segments;
 
-        optional<gl::VertexBuffer<SymbolVertex>> vertexBuffer;
+        optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } icon;
 

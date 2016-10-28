@@ -3,29 +3,40 @@
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
-#include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/util/optional.hpp>
 
 namespace mbgl {
 
 class SpriteAtlasElement;
+class SymbolFeature;
 
 class PositionedIcon {
-    public:
-        explicit PositionedIcon() {}
-        explicit PositionedIcon(const SpriteAtlasElement& _image,
-                float _top, float _bottom, float _left, float _right) :
-            image(_image), top(_top), bottom(_bottom), left(_left), right(_right) {}
+public:
+    PositionedIcon() = default;
+    PositionedIcon(const SpriteAtlasElement& image_,
+                   float top_,
+                   float bottom_,
+                   float left_,
+                   float right_,
+                   float angle_)
+        : image(image_),
+          top(top_),
+          bottom(bottom_),
+          left(left_),
+          right(right_),
+          angle(angle_) {}
 
-        optional<SpriteAtlasElement> image;
-        float top = 0;
-        float bottom = 0;
-        float left = 0;
-        float right = 0;
+    optional<SpriteAtlasElement> image;
+    float top = 0;
+    float bottom = 0;
+    float left = 0;
+    float right = 0;
+    float angle = 0;
 
-        explicit operator bool() const { return image && (*image).pos.hasArea(); }
+    explicit operator bool() const { return image && (*image).pos.hasArea(); }
 };
 
-PositionedIcon shapeIcon(const SpriteAtlasElement& image, const style::SymbolLayoutProperties::Evaluated&);
+PositionedIcon shapeIcon(const SpriteAtlasElement&,
+                         const SymbolFeature&);
 
 } // namespace mbgl

@@ -23,7 +23,7 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
       expires(std::move(expires_)),
       debugMode(debugMode_) {
 
-    gl::VertexVector<FillVertex> vertices;
+    gl::VertexVector<FillLayoutVertex> vertices;
     gl::IndexVector<gl::Lines> indices;
 
     auto addText = [&] (const std::string& text, double left, double baseline, double scale) {
@@ -43,7 +43,7 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
                         int16_t(::round(baseline - glyph.data[j + 1] * scale))
                     };
 
-                    vertices.emplace_back(FillAttributes::vertex(p));
+                    vertices.emplace_back(FillProgram::layoutVertex(p));
 
                     if (prev) {
                         indices.emplace_back(vertices.vertexSize() - 2,

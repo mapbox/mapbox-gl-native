@@ -17,7 +17,7 @@ TEST(getIconQuads, normal) {
         std::shared_ptr<const SpriteImage>(),
         1.0f
     };
-    PositionedIcon shapedIcon(image, -5.0, 6.0, -7.0, 8.0);
+    PositionedIcon shapedIcon(image, -5.0, 6.0, -7.0, 8.0, 0);
     GeometryCoordinates line;
     Shaping shapedText;
 
@@ -47,7 +47,7 @@ TEST(getIconQuads, style) {
         std::shared_ptr<const SpriteImage>(),
         1.0f
     };
-    PositionedIcon shapedIcon(image, -10.0, 10.0, -10.0, 10.0);
+    PositionedIcon shapedIcon(image, -10.0, 10.0, -10.0, 10.0, 0);
     GeometryCoordinates line;
     Shaping shapedText;
     shapedText.top = -10.0f;

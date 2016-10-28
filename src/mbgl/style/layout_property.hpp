@@ -1,6 +1,9 @@
 #pragma once
 
+#include <mbgl/style/property_value.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
 #include <mbgl/style/property_evaluator.hpp>
+#include <mbgl/style/data_driven_property_evaluator.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
 
 namespace mbgl {
@@ -11,9 +14,17 @@ class PropertyEvaluationParameters;
 template <class T>
 class LayoutProperty {
 public:
-    using EvaluatorType = PropertyEvaluator<T>;
     using UnevaluatedType = PropertyValue<T>;
+    using EvaluatorType = PropertyEvaluator<T>;
     using EvaluatedType = T;
+};
+
+template <class T>
+class DataDrivenLayoutProperty {
+public:
+    using UnevaluatedType = DataDrivenPropertyValue<T>;
+    using EvaluatorType = DataDrivenPropertyEvaluator<T>;
+    using EvaluatedType = PossiblyEvaluatedPropertyValue<T>;
 };
 
 template <class... Ps>

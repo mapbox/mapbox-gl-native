@@ -2,19 +2,38 @@
 
 #include <mbgl/gl/program.hpp>
 #include <mbgl/programs/program_parameters.hpp>
+#include <mbgl/programs/attributes.hpp>
+#include <mbgl/style/paint_property.hpp>
 
 #include <sstream>
 #include <cassert>
 
 namespace mbgl {
 
-template <class Shaders, class Primitive, class Attributes, class Uniforms>
-class Program : public gl::Program<Primitive, Attributes, Uniforms> {
+template <class Shaders,
+          class Primitive,
+          class LayoutAttrs,
+          class Uniforms,
+          class PaintProperties>
+class Program {
 public:
-    using ParentType = gl::Program<Primitive, Attributes, Uniforms>;
+    using LayoutAttributes = LayoutAttrs;
+    using LayoutVertex = typename LayoutAttributes::Vertex;
+
+    using PaintPropertyBinders = typename PaintProperties::Binders;
+    using PaintAttributes = typename PaintPropertyBinders::Attributes;
+    using Attributes = gl::ConcatenateAttributes<LayoutAttributes, PaintAttributes>;
+
+    using UniformValues = typename Uniforms::Values;
+    using PaintUniforms = typename PaintPropertyBinders::Uniforms;
+    using AllUniforms = gl::ConcatenateUniforms<Uniforms, PaintUniforms>;
+
+    using ProgramType = gl::Program<Primitive, Attributes, AllUniforms>;
+
+    ProgramType program;
 
     Program(gl::Context& context, const ProgramParameters& programParameters)
-        : ParentType(context, vertexSource(programParameters), fragmentSource(programParameters))
+        : program(context, vertexSource(programParameters), fragmentSource(programParameters))
         {}
 
     static std::string pixelRatioDefine(const ProgramParameters& parameters) {
@@ -38,6 +57,33 @@ public:
         return pixelRatioDefine(parameters) + Shaders::vertexSource;
     }
 
+    template <class DrawMode>
+    void draw(gl::Context& context,
+              DrawMode drawMode,
+              gl::DepthMode depthMode,
+              gl::StencilMode stencilMode,
+              gl::ColorMode colorMode,
+              UniformValues&& uniformValues,
+              const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
+              const gl::IndexBuffer<DrawMode>& indexBuffer,
+              const gl::SegmentVector<Attributes>& segments,
+              const PaintPropertyBinders& paintPropertyBinders,
+              const typename PaintProperties::Evaluated& currentProperties,
+              float currentZoom) {
+        program.draw(
+            context,
+            std::move(drawMode),
+            std::move(depthMode),
+            std::move(stencilMode),
+            std::move(colorMode),
+            uniformValues
+                .concat(paintPropertyBinders.uniformValues(currentZoom)),
+            LayoutAttributes::allVariableBindings(layoutVertexBuffer)
+                .concat(paintPropertyBinders.attributeBindings(currentProperties)),
+            indexBuffer,
+            segments
+        );
+    }
 };
 
 } // namespace mbgl

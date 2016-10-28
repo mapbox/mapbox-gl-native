@@ -5,6 +5,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
 
 #include <mbgl/util/color.hpp>
 
@@ -30,9 +31,9 @@ public:
     PropertyValue<float> getFillExtrusionOpacity(const optional<std::string>& klass = {}) const;
     void setFillExtrusionOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
 
-    static PropertyValue<Color> getDefaultFillExtrusionColor();
-    PropertyValue<Color> getFillExtrusionColor(const optional<std::string>& klass = {}) const;
-    void setFillExtrusionColor(PropertyValue<Color>, const optional<std::string>& klass = {});
+    static DataDrivenPropertyValue<Color> getDefaultFillExtrusionColor();
+    DataDrivenPropertyValue<Color> getFillExtrusionColor(const optional<std::string>& klass = {}) const;
+    void setFillExtrusionColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
 
     static PropertyValue<std::array<float, 2>> getDefaultFillExtrusionTranslate();
     PropertyValue<std::array<float, 2>> getFillExtrusionTranslate(const optional<std::string>& klass = {}) const;
@@ -46,13 +47,13 @@ public:
     PropertyValue<std::string> getFillExtrusionPattern(const optional<std::string>& klass = {}) const;
     void setFillExtrusionPattern(PropertyValue<std::string>, const optional<std::string>& klass = {});
 
-    static PropertyValue<float> getDefaultFillExtrusionHeight();
-    PropertyValue<float> getFillExtrusionHeight(const optional<std::string>& klass = {}) const;
-    void setFillExtrusionHeight(PropertyValue<float>, const optional<std::string>& klass = {});
+    static DataDrivenPropertyValue<float> getDefaultFillExtrusionHeight();
+    DataDrivenPropertyValue<float> getFillExtrusionHeight(const optional<std::string>& klass = {}) const;
+    void setFillExtrusionHeight(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
 
-    static PropertyValue<float> getDefaultFillExtrusionBase();
-    PropertyValue<float> getFillExtrusionBase(const optional<std::string>& klass = {}) const;
-    void setFillExtrusionBase(PropertyValue<float>, const optional<std::string>& klass = {});
+    static DataDrivenPropertyValue<float> getDefaultFillExtrusionBase();
+    DataDrivenPropertyValue<float> getFillExtrusionBase(const optional<std::string>& klass = {}) const;
+    void setFillExtrusionBase(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
 
     // Private implementation
 

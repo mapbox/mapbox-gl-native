@@ -32,7 +32,7 @@ private:
     void cascade(const CascadeParameters&) final {}
     bool evaluate(const PropertyEvaluationParameters&) final;
 
-    std::unique_ptr<Bucket> createBucket(BucketParameters&, const GeometryTileLayer&) const final;
+    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const Layer*>&) const final;
 
     CustomLayerInitializeFunction initializeFn = nullptr;
     CustomLayerRenderFunction renderFn = nullptr;

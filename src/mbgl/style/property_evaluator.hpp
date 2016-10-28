@@ -17,7 +17,7 @@ public:
 
     T operator()(const Undefined&) const { return defaultValue; }
     T operator()(const T& constant) const { return constant; }
-    T operator()(const Function<T>& fn) const { return fn.evaluate(parameters.z); }
+    T operator()(const CameraFunction<T>& fn) const { return fn.evaluate(parameters.z); }
 
 private:
     const PropertyEvaluationParameters& parameters;

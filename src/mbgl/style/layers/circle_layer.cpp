@@ -65,64 +65,80 @@ const Filter& CircleLayer::getFilter() const {
 
 // Paint properties
 
-PropertyValue<float> CircleLayer::getDefaultCircleRadius() {
+DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleRadius() {
     return { 5 };
 }
 
-PropertyValue<float> CircleLayer::getCircleRadius(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<float> CircleLayer::getCircleRadius(const optional<std::string>& klass) const {
     return impl->paint.get<CircleRadius>(klass);
 }
 
-void CircleLayer::setCircleRadius(PropertyValue<float> value, const optional<std::string>& klass) {
+void CircleLayer::setCircleRadius(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getCircleRadius(klass))
         return;
     impl->paint.set<CircleRadius>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
-PropertyValue<Color> CircleLayer::getDefaultCircleColor() {
+DataDrivenPropertyValue<Color> CircleLayer::getDefaultCircleColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> CircleLayer::getCircleColor(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<Color> CircleLayer::getCircleColor(const optional<std::string>& klass) const {
     return impl->paint.get<CircleColor>(klass);
 }
 
-void CircleLayer::setCircleColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+void CircleLayer::setCircleColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
     if (value == getCircleColor(klass))
         return;
     impl->paint.set<CircleColor>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
-PropertyValue<float> CircleLayer::getDefaultCircleBlur() {
+DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleBlur() {
     return { 0 };
 }
 
-PropertyValue<float> CircleLayer::getCircleBlur(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<float> CircleLayer::getCircleBlur(const optional<std::string>& klass) const {
     return impl->paint.get<CircleBlur>(klass);
 }
 
-void CircleLayer::setCircleBlur(PropertyValue<float> value, const optional<std::string>& klass) {
+void CircleLayer::setCircleBlur(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getCircleBlur(klass))
         return;
     impl->paint.set<CircleBlur>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
-PropertyValue<float> CircleLayer::getDefaultCircleOpacity() {
+DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> CircleLayer::getCircleOpacity(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<float> CircleLayer::getCircleOpacity(const optional<std::string>& klass) const {
     return impl->paint.get<CircleOpacity>(klass);
 }
 
-void CircleLayer::setCircleOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
+void CircleLayer::setCircleOpacity(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getCircleOpacity(klass))
         return;
     impl->paint.set<CircleOpacity>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
 PropertyValue<std::array<float, 2>> CircleLayer::getDefaultCircleTranslate() {
@@ -170,49 +186,61 @@ void CircleLayer::setCirclePitchScale(PropertyValue<CirclePitchScaleType> value,
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
-PropertyValue<float> CircleLayer::getDefaultCircleStrokeWidth() {
+DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleStrokeWidth() {
     return { 0 };
 }
 
-PropertyValue<float> CircleLayer::getCircleStrokeWidth(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<float> CircleLayer::getCircleStrokeWidth(const optional<std::string>& klass) const {
     return impl->paint.get<CircleStrokeWidth>(klass);
 }
 
-void CircleLayer::setCircleStrokeWidth(PropertyValue<float> value, const optional<std::string>& klass) {
+void CircleLayer::setCircleStrokeWidth(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getCircleStrokeWidth(klass))
         return;
     impl->paint.set<CircleStrokeWidth>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
-PropertyValue<Color> CircleLayer::getDefaultCircleStrokeColor() {
+DataDrivenPropertyValue<Color> CircleLayer::getDefaultCircleStrokeColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> CircleLayer::getCircleStrokeColor(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<Color> CircleLayer::getCircleStrokeColor(const optional<std::string>& klass) const {
     return impl->paint.get<CircleStrokeColor>(klass);
 }
 
-void CircleLayer::setCircleStrokeColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+void CircleLayer::setCircleStrokeColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
     if (value == getCircleStrokeColor(klass))
         return;
     impl->paint.set<CircleStrokeColor>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
-PropertyValue<float> CircleLayer::getDefaultCircleStrokeOpacity() {
+DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleStrokeOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> CircleLayer::getCircleStrokeOpacity(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<float> CircleLayer::getCircleStrokeOpacity(const optional<std::string>& klass) const {
     return impl->paint.get<CircleStrokeOpacity>(klass);
 }
 
-void CircleLayer::setCircleStrokeOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
+void CircleLayer::setCircleStrokeOpacity(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getCircleStrokeOpacity(klass))
         return;
     impl->paint.set<CircleStrokeOpacity>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
 } // namespace style

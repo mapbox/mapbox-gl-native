@@ -36,27 +36,27 @@ template <class T, class... Params> void testClone(Params... params) {
     EXPECT_EQ("test", layer->baseImpl->clone()->getID());
 }
 
-const auto color = PropertyValue<Color> {{ 1, 0, 0, 1 }};
-const auto opacity = PropertyValue<float> { 1.0f };
-const auto radius = PropertyValue<float> { 1.0f };
-const auto blur = PropertyValue<float> { 1.0f };
-const auto pattern = PropertyValue<std::string> { "foo" };
-const auto antialias = PropertyValue<bool> { false };
-const auto translate = PropertyValue<std::array<float, 2>> {{{ 0, 0 }}};
-const auto translateAnchor = PropertyValue<TranslateAnchorType> { TranslateAnchorType::Map };
-const auto lineCap = PropertyValue<LineCapType> { LineCapType::Round };
-const auto lineJoin = PropertyValue<LineJoinType> { LineJoinType::Miter };
-const auto miterLimit = PropertyValue<float> { 1.0f };
-const auto roundLimit = PropertyValue<float> { 1.0f };
-const auto width = PropertyValue<float> { 1.0f };
-const auto gapWidth = PropertyValue<float> { 1.0f };
-const auto offset = PropertyValue<float> { 1.0f };
-const auto dashArray = PropertyValue<std::vector<float>> {{}};
-const auto hueRotate = PropertyValue<float> { 1.0f };
-const auto brightness = PropertyValue<float> { 1.0f };
-const auto saturation = PropertyValue<float> { 1.0f };
-const auto contrast = PropertyValue<float> { 1.0f };
-const auto duration = PropertyValue<float> { 1.0f };
+const auto color = Color { 1, 0, 0, 1 };
+const auto opacity = 1.0f;
+const auto radius = 1.0f;
+const auto blur = 1.0f;
+const auto pattern = std::string { "foo" };
+const auto antialias = false;
+const auto translate = std::array<float, 2> {{ 0, 0 }};
+const auto translateAnchor = TranslateAnchorType::Map;
+const auto lineCap = LineCapType::Round;
+const auto lineJoin = LineJoinType::Miter;
+const auto miterLimit = 1.0f;
+const auto roundLimit = 1.0f;
+const auto width = 1.0f;
+const auto gapWidth = 1.0f;
+const auto offset = 1.0f;
+const auto dashArray = std::vector<float> {};
+const auto hueRotate = 1.0f;
+const auto brightness = 1.0f;
+const auto saturation = 1.0f;
+const auto contrast = 1.0f;
+const auto duration = 1.0f;
 
 } // namespace
 
@@ -77,13 +77,13 @@ TEST(Layer, BackgroundProperties) {
     // Paint properties
 
     layer->setBackgroundColor(color);
-    EXPECT_EQ(layer->getBackgroundColor().asConstant(), color.asConstant());
+    EXPECT_EQ(layer->getBackgroundColor(), color);
 
     layer->setBackgroundOpacity(opacity);
-    EXPECT_EQ(layer->getBackgroundOpacity().asConstant(), opacity.asConstant());
+    EXPECT_EQ(layer->getBackgroundOpacity(), opacity);
 
     layer->setBackgroundPattern(pattern);
-    EXPECT_EQ(layer->getBackgroundPattern().asConstant(), pattern.asConstant());
+    EXPECT_EQ(layer->getBackgroundPattern(), pattern);
 }
 
 TEST(Layer, CircleProperties) {
@@ -93,22 +93,22 @@ TEST(Layer, CircleProperties) {
     // Paint properties
 
     layer->setCircleColor(color);
-    EXPECT_EQ(layer->getCircleColor().asConstant(), color.asConstant());
+    EXPECT_EQ(layer->getCircleColor(), color);
 
     layer->setCircleOpacity(opacity);
-    EXPECT_EQ(layer->getCircleOpacity().asConstant(), opacity.asConstant());
+    EXPECT_EQ(layer->getCircleOpacity(), opacity);
 
     layer->setCircleRadius(radius);
-    EXPECT_EQ(layer->getCircleRadius().asConstant(), radius.asConstant());
+    EXPECT_EQ(layer->getCircleRadius(), radius);
 
     layer->setCircleBlur(blur);
-    EXPECT_EQ(layer->getCircleBlur().asConstant(), blur.asConstant());
+    EXPECT_EQ(layer->getCircleBlur(), blur);
 
     layer->setCircleTranslate(translate);
-    EXPECT_EQ(layer->getCircleTranslate().asConstant(), translate.asConstant());
+    EXPECT_EQ(layer->getCircleTranslate(), translate);
 
     layer->setCircleTranslateAnchor(translateAnchor);
-    EXPECT_EQ(layer->getCircleTranslateAnchor().asConstant(), translateAnchor.asConstant());
+    EXPECT_EQ(layer->getCircleTranslateAnchor(), translateAnchor);
 }
 
 TEST(Layer, FillProperties) {
@@ -118,25 +118,25 @@ TEST(Layer, FillProperties) {
     // Paint properties
 
     layer->setFillColor(color);
-    EXPECT_EQ(layer->getFillColor().asConstant(), color.asConstant());
+    EXPECT_EQ(layer->getFillColor(), color);
 
     layer->setFillOutlineColor(color);
-    EXPECT_EQ(layer->getFillOutlineColor().asConstant(), color.asConstant());
+    EXPECT_EQ(layer->getFillOutlineColor(), color);
 
     layer->setFillOpacity(opacity);
-    EXPECT_EQ(layer->getFillOpacity().asConstant(), opacity.asConstant());
+    EXPECT_EQ(layer->getFillOpacity(), opacity);
 
     layer->setFillPattern(pattern);
-    EXPECT_EQ(layer->getFillPattern().asConstant(), pattern.asConstant());
+    EXPECT_EQ(layer->getFillPattern(), pattern);
 
     layer->setFillAntialias(antialias);
-    EXPECT_EQ(layer->getFillAntialias().asConstant(), antialias.asConstant());
+    EXPECT_EQ(layer->getFillAntialias(), antialias);
 
     layer->setFillTranslate(translate);
-    EXPECT_EQ(layer->getFillTranslate().asConstant(), translate.asConstant());
+    EXPECT_EQ(layer->getFillTranslate(), translate);
 
     layer->setFillTranslateAnchor(translateAnchor);
-    EXPECT_EQ(layer->getFillTranslateAnchor().asConstant(), translateAnchor.asConstant());
+    EXPECT_EQ(layer->getFillTranslateAnchor(), translateAnchor);
 }
 
 TEST(Layer, LineProperties) {
@@ -146,48 +146,48 @@ TEST(Layer, LineProperties) {
     // Layout properties
 
     layer->setLineCap(lineCap);
-    EXPECT_EQ(layer->getLineCap().asConstant(), lineCap.asConstant());
+    EXPECT_EQ(layer->getLineCap(), lineCap);
 
     layer->setLineJoin(lineJoin);
-    EXPECT_EQ(layer->getLineJoin().asConstant(), lineJoin.asConstant());
+    EXPECT_EQ(layer->getLineJoin(), lineJoin);
 
     layer->setLineMiterLimit(miterLimit);
-    EXPECT_EQ(layer->getLineMiterLimit().asConstant(), miterLimit.asConstant());
+    EXPECT_EQ(layer->getLineMiterLimit(), miterLimit);
 
     layer->setLineRoundLimit(roundLimit);
-    EXPECT_EQ(layer->getLineRoundLimit().asConstant(), roundLimit.asConstant());
+    EXPECT_EQ(layer->getLineRoundLimit(), roundLimit);
 
     // Paint properties
 
     layer->setLineColor(color);
-    EXPECT_EQ(layer->getLineColor().asConstant(), color.asConstant());
+    EXPECT_EQ(layer->getLineColor(), color);
 
     layer->setLineOpacity(opacity);
-    EXPECT_EQ(layer->getLineOpacity().asConstant(), opacity.asConstant());
+    EXPECT_EQ(layer->getLineOpacity(), opacity);
 
     layer->setLineTranslate(translate);
-    EXPECT_EQ(layer->getLineTranslate().asConstant(), translate.asConstant());
+    EXPECT_EQ(layer->getLineTranslate(), translate);
 
     layer->setLineTranslateAnchor(translateAnchor);
-    EXPECT_EQ(layer->getLineTranslateAnchor().asConstant(), translateAnchor.asConstant());
+    EXPECT_EQ(layer->getLineTranslateAnchor(), translateAnchor);
 
     layer->setLineWidth(width);
-    EXPECT_EQ(layer->getLineWidth().asConstant(), width.asConstant());
+    EXPECT_EQ(layer->getLineWidth(), width);
 
     layer->setLineGapWidth(gapWidth);
-    EXPECT_EQ(layer->getLineGapWidth().asConstant(), gapWidth.asConstant());
+    EXPECT_EQ(layer->getLineGapWidth(), gapWidth);
 
     layer->setLineOffset(offset);
-    EXPECT_EQ(layer->getLineOffset().asConstant(), offset.asConstant());
+    EXPECT_EQ(layer->getLineOffset(), offset);
 
     layer->setLineBlur(blur);
-    EXPECT_EQ(layer->getLineBlur().asConstant(), blur.asConstant());
+    EXPECT_EQ(layer->getLineBlur(), blur);
 
     layer->setLineDasharray(dashArray);
-    EXPECT_EQ(layer->getLineDasharray().asConstant(), dashArray.asConstant());
+    EXPECT_EQ(layer->getLineDasharray(), dashArray);
 
     layer->setLinePattern(pattern);
-    EXPECT_EQ(layer->getLinePattern().asConstant(), pattern.asConstant());
+    EXPECT_EQ(layer->getLinePattern(), pattern);
 }
 
 TEST(Layer, RasterProperties) {
@@ -197,25 +197,25 @@ TEST(Layer, RasterProperties) {
     // Paint properties
 
     layer->setRasterOpacity(opacity);
-    EXPECT_EQ(layer->getRasterOpacity().asConstant(), opacity.asConstant());
+    EXPECT_EQ(layer->getRasterOpacity(), opacity);
 
     layer->setRasterHueRotate(hueRotate);
-    EXPECT_EQ(layer->getRasterHueRotate().asConstant(), hueRotate.asConstant());
+    EXPECT_EQ(layer->getRasterHueRotate(), hueRotate);
 
     layer->setRasterBrightnessMin(brightness);
-    EXPECT_EQ(layer->getRasterBrightnessMin().asConstant(), brightness.asConstant());
+    EXPECT_EQ(layer->getRasterBrightnessMin(), brightness);
 
     layer->setRasterBrightnessMax(brightness);
-    EXPECT_EQ(layer->getRasterBrightnessMax().asConstant(), brightness.asConstant());
+    EXPECT_EQ(layer->getRasterBrightnessMax(), brightness);
 
     layer->setRasterSaturation(saturation);
-    EXPECT_EQ(layer->getRasterSaturation().asConstant(), saturation.asConstant());
+    EXPECT_EQ(layer->getRasterSaturation(), saturation);
 
     layer->setRasterContrast(contrast);
-    EXPECT_EQ(layer->getRasterContrast().asConstant(), contrast.asConstant());
+    EXPECT_EQ(layer->getRasterContrast(), contrast);
 
     layer->setRasterFadeDuration(duration);
-    EXPECT_EQ(layer->getRasterFadeDuration().asConstant(), duration.asConstant());
+    EXPECT_EQ(layer->getRasterFadeDuration(), duration);
 }
 
 TEST(Layer, Observer) {

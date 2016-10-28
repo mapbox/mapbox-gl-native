@@ -80,49 +80,61 @@ void FillLayer::setFillAntialias(PropertyValue<bool> value, const optional<std::
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
-PropertyValue<float> FillLayer::getDefaultFillOpacity() {
+DataDrivenPropertyValue<float> FillLayer::getDefaultFillOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> FillLayer::getFillOpacity(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<float> FillLayer::getFillOpacity(const optional<std::string>& klass) const {
     return impl->paint.get<FillOpacity>(klass);
 }
 
-void FillLayer::setFillOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
+void FillLayer::setFillOpacity(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getFillOpacity(klass))
         return;
     impl->paint.set<FillOpacity>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
-PropertyValue<Color> FillLayer::getDefaultFillColor() {
+DataDrivenPropertyValue<Color> FillLayer::getDefaultFillColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> FillLayer::getFillColor(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<Color> FillLayer::getFillColor(const optional<std::string>& klass) const {
     return impl->paint.get<FillColor>(klass);
 }
 
-void FillLayer::setFillColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+void FillLayer::setFillColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
     if (value == getFillColor(klass))
         return;
     impl->paint.set<FillColor>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
-PropertyValue<Color> FillLayer::getDefaultFillOutlineColor() {
+DataDrivenPropertyValue<Color> FillLayer::getDefaultFillOutlineColor() {
     return { {} };
 }
 
-PropertyValue<Color> FillLayer::getFillOutlineColor(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<Color> FillLayer::getFillOutlineColor(const optional<std::string>& klass) const {
     return impl->paint.get<FillOutlineColor>(klass);
 }
 
-void FillLayer::setFillOutlineColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+void FillLayer::setFillOutlineColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
     if (value == getFillOutlineColor(klass))
         return;
     impl->paint.set<FillOutlineColor>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
 PropertyValue<std::array<float, 2>> FillLayer::getDefaultFillTranslate() {

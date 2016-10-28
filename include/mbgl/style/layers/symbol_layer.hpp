@@ -5,6 +5,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
 
 #include <mbgl/util/color.hpp>
 
@@ -72,9 +73,9 @@ public:
     PropertyValue<std::string> getIconImage() const;
     void setIconImage(PropertyValue<std::string>);
 
-    static PropertyValue<float> getDefaultIconRotate();
-    PropertyValue<float> getIconRotate() const;
-    void setIconRotate(PropertyValue<float>);
+    static DataDrivenPropertyValue<float> getDefaultIconRotate();
+    DataDrivenPropertyValue<float> getIconRotate() const;
+    void setIconRotate(DataDrivenPropertyValue<float>);
 
     static PropertyValue<float> getDefaultIconPadding();
     PropertyValue<float> getIconPadding() const;
@@ -84,9 +85,9 @@ public:
     PropertyValue<bool> getIconKeepUpright() const;
     void setIconKeepUpright(PropertyValue<bool>);
 
-    static PropertyValue<std::array<float, 2>> getDefaultIconOffset();
-    PropertyValue<std::array<float, 2>> getIconOffset() const;
-    void setIconOffset(PropertyValue<std::array<float, 2>>);
+    static DataDrivenPropertyValue<std::array<float, 2>> getDefaultIconOffset();
+    DataDrivenPropertyValue<std::array<float, 2>> getIconOffset() const;
+    void setIconOffset(DataDrivenPropertyValue<std::array<float, 2>>);
 
     static PropertyValue<AlignmentType> getDefaultTextPitchAlignment();
     PropertyValue<AlignmentType> getTextPitchAlignment() const;

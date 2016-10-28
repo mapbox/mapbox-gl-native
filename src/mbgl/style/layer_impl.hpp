@@ -61,7 +61,7 @@ public:
     // Returns true if any paint properties have active transitions.
     virtual bool evaluate(const PropertyEvaluationParameters&) = 0;
 
-    virtual std::unique_ptr<Bucket> createBucket(BucketParameters&, const GeometryTileLayer&) const = 0;
+    virtual std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const Layer*>&) const = 0;
 
     // Checks whether this layer needs to be rendered in the given render pass.
     bool hasRenderPass(RenderPass) const;

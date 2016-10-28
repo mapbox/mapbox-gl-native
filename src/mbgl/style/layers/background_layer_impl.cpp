@@ -16,7 +16,8 @@ bool BackgroundLayer::Impl::evaluate(const PropertyEvaluationParameters& paramet
     return paint.hasTransition();
 }
 
-std::unique_ptr<Bucket> BackgroundLayer::Impl::createBucket(BucketParameters&, const GeometryTileLayer&) const {
+std::unique_ptr<Bucket> BackgroundLayer::Impl::createBucket(const BucketParameters&, const std::vector<const Layer*>&) const {
+    assert(false);
     return nullptr;
 }
 

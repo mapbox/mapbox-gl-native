@@ -1,5 +1,5 @@
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/style/bucket_parameters.hpp>
+#include <mbgl/style/property_evaluation_parameters.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/renderer/bucket.hpp>
 
@@ -24,52 +24,17 @@ bool SymbolLayer::Impl::evaluate(const PropertyEvaluationParameters& parameters)
     return paint.hasTransition();
 }
 
-std::unique_ptr<Bucket> SymbolLayer::Impl::createBucket(BucketParameters&, const GeometryTileLayer&) const {
+std::unique_ptr<Bucket> SymbolLayer::Impl::createBucket(const BucketParameters&, const std::vector<const Layer*>&) const {
     assert(false); // Should be calling createLayout() instead.
     return nullptr;
 }
 
-std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(BucketParameters& parameters,
-                                                              const GeometryTileLayer& layer,
-                                                              std::vector<std::string> group) const {
-    PropertyEvaluationParameters p(parameters.tileID.overscaledZ);
-    SymbolLayoutProperties::Evaluated evaluated = layout.evaluate(p);
-
-    if (evaluated.get<IconRotationAlignment>() == AlignmentType::Auto) {
-        if (evaluated.get<SymbolPlacement>() == SymbolPlacementType::Line) {
-            evaluated.get<IconRotationAlignment>() = AlignmentType::Map;
-        } else {
-            evaluated.get<IconRotationAlignment>() = AlignmentType::Viewport;
-        }
-    }
-
-    if (evaluated.get<TextRotationAlignment>() == AlignmentType::Auto) {
-        if (evaluated.get<SymbolPlacement>() == SymbolPlacementType::Line) {
-            evaluated.get<TextRotationAlignment>() = AlignmentType::Map;
-        } else {
-            evaluated.get<TextRotationAlignment>() = AlignmentType::Viewport;
-        }
-    }
-
-    // If unspecified `text-pitch-alignment` inherits `text-rotation-alignment`
-    if (evaluated.get<TextPitchAlignment>() == AlignmentType::Auto) {
-        evaluated.get<TextPitchAlignment>() = evaluated.get<TextRotationAlignment>();
-    }
-
-    float textMaxSize = layout.evaluate<TextSize>(PropertyEvaluationParameters(18));
-
-    evaluated.get<IconSize>() = layout.evaluate<IconSize>(PropertyEvaluationParameters(p.z + 1));
-    evaluated.get<TextSize>() = layout.evaluate<TextSize>(PropertyEvaluationParameters(p.z + 1));
-
-    return std::make_unique<SymbolLayout>(std::move(group),
-                                          layer.getName(),
-                                          parameters.tileID.overscaleFactor(),
-                                          parameters.tileID.overscaledZ,
-                                          parameters.mode,
+std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(const BucketParameters& parameters,
+                                                              const std::vector<const Layer*>& group,
+                                                              const GeometryTileLayer& layer) const {
+    return std::make_unique<SymbolLayout>(parameters,
+                                          group,
                                           layer,
-                                          filter,
-                                          evaluated,
-                                          textMaxSize,
                                           *spriteAtlas);
 }
 
