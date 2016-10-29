@@ -22,7 +22,7 @@ public:
 
     std::vector<CircleVertex> vertices;
     std::vector<gl::Triangle> triangles;
-    std::vector<gl::Segment> segments;
+    std::vector<gl::Segment> segments { { 0, 0 } };
 
     optional<gl::VertexBuffer<CircleVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;

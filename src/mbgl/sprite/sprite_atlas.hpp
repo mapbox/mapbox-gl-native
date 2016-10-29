@@ -106,7 +106,7 @@ private:
     void _setSprite(const std::string&, const std::shared_ptr<const SpriteImage>& = nullptr);
     void emitSpriteLoadedIfComplete();
 
-    const uint16_t width, height;
+    const dimension width, height;
     const dimension pixelWidth, pixelHeight;
     const float pixelRatio;
 
