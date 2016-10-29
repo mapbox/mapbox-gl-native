@@ -2,12 +2,12 @@
 
 namespace mbgl {
 
-class Shaders;
+class Programs;
 class View;
 
 class PaintParameters {
 public:
-    Shaders& shaders;
+    Programs& programs;
     View& view;
 };
 

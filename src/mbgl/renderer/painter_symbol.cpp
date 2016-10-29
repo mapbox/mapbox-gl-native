@@ -6,9 +6,9 @@
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/shader/shaders.hpp>
-#include <mbgl/shader/symbol_uniforms.hpp>
-#include <mbgl/shader/collision_box_uniforms.hpp>
+#include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/symbol_program.hpp>
+#include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/tile/tile.hpp>
 
@@ -30,7 +30,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
     frameHistory.bind(context, 1);
 
-    auto draw = [&] (auto& shader,
+    auto draw = [&] (auto& program,
                      auto&& uniformValues,
                      const auto& buffers,
                      const SymbolPropertyValues& values_)
@@ -54,7 +54,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
                 ? gl::StencilMode::disabled()
                 : stencilModeForClipping(tile.clip),
             colorModeForRenderPass(),
-            shader,
+            program,
             std::move(uniformValues),
             gl::Segmented<gl::Triangles>(
                 *buffers.vertexBuffer,
@@ -76,21 +76,21 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         if (bucket.sdfIcons) {
             if (values.hasHalo()) {
-                draw(parameters.shaders.symbolIconSDF,
-                     SymbolSDFUniforms::haloValues(values, texsize, pixelsToGLUnits, tile, state, frame.pixelRatio),
+                draw(parameters.programs.symbolIconSDF,
+                     SymbolSDFProgram::haloUniformValues(values, texsize, pixelsToGLUnits, tile, state, frame.pixelRatio),
                      bucket.icon,
                      values);
             }
 
             if (values.hasForeground()) {
-                draw(parameters.shaders.symbolIconSDF,
-                     SymbolSDFUniforms::foregroundValues(values, texsize, pixelsToGLUnits, tile, state, frame.pixelRatio),
+                draw(parameters.programs.symbolIconSDF,
+                     SymbolSDFProgram::foregroundUniformValues(values, texsize, pixelsToGLUnits, tile, state, frame.pixelRatio),
                      bucket.icon,
                      values);
             }
         } else {
-            draw(parameters.shaders.symbolIcon,
-                 SymbolIconUniforms::values(values, texsize, pixelsToGLUnits, tile, state),
+            draw(parameters.programs.symbolIcon,
+                 SymbolIconProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state),
                  bucket.icon,
                  values);
         }
@@ -104,15 +104,15 @@ void Painter::renderSymbol(PaintParameters& parameters,
         const Size texsize = glyphAtlas->getSize();
 
         if (values.hasHalo()) {
-            draw(parameters.shaders.symbolGlyph,
-                 SymbolSDFUniforms::haloValues(values, texsize, pixelsToGLUnits, tile, state, frame.pixelRatio),
+            draw(parameters.programs.symbolGlyph,
+                 SymbolSDFProgram::haloUniformValues(values, texsize, pixelsToGLUnits, tile, state, frame.pixelRatio),
                  bucket.text,
                  values);
         }
 
         if (values.hasForeground()) {
-            draw(parameters.shaders.symbolGlyph,
-                 SymbolSDFUniforms::foregroundValues(values, texsize, pixelsToGLUnits, tile, state, frame.pixelRatio),
+            draw(parameters.programs.symbolGlyph,
+                 SymbolSDFProgram::foregroundUniformValues(values, texsize, pixelsToGLUnits, tile, state, frame.pixelRatio),
                  bucket.text,
                  values);
         }
@@ -123,8 +123,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
             gl::DepthMode::disabled(),
             gl::StencilMode::disabled(),
             colorModeForRenderPass(),
-            shaders->collisionBox,
-            CollisionBoxUniforms::Values {
+            programs->collisionBox,
+            CollisionBoxProgram::UniformValues {
                 uniforms::u_matrix::Value{ tile.matrix },
                 uniforms::u_scale::Value{ std::pow(2.0f, float(state.getZoom() - tile.tile.id.overscaledZ)) },
                 uniforms::u_zoom::Value{ float(state.getZoom() * 10) },

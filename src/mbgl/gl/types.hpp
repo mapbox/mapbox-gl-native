@@ -19,6 +19,11 @@ using AttributeLocation = int32_t;
 using UniformLocation = int32_t;
 using TextureUnit = uint8_t;
 
+enum class ShaderType : uint32_t {
+    Vertex = 0x8B31,
+    Fragment = 0x8B30
+};
+
 enum class DataType : uint32_t {
     Byte = 0x1400,
     UnsignedByte = 0x1401,

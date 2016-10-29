@@ -1,10 +1,7 @@
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/shader/fill_shader.hpp>
-#include <mbgl/shader/fill_pattern_shader.hpp>
-#include <mbgl/shader/fill_outline_shader.hpp>
-#include <mbgl/shader/fill_outline_pattern_shader.hpp>
+#include <mbgl/programs/fill_program.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <mapbox/earcut.hpp>

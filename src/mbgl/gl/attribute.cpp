@@ -4,6 +4,10 @@
 namespace mbgl {
 namespace gl {
 
+AttributeLocation attributeLocation(ProgramID id, const char* name) {
+    return MBGL_CHECK_ERROR(glGetAttribLocation(id, name));
+}
+
 void bindAttribute(AttributeLocation location,
                    std::size_t count,
                    DataType type,

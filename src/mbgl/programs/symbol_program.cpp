@@ -1,4 +1,4 @@
-#include <mbgl/shader/symbol_uniforms.hpp>
+#include <mbgl/programs/symbol_program.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
@@ -6,6 +6,8 @@
 namespace mbgl {
 
 using namespace style;
+
+static_assert(sizeof(SymbolAttributes::Vertex) == 16, "expected SymbolVertex size");
 
 template <class Values, class...Args>
 Values makeValues(const style::SymbolPropertyValues& values,
@@ -44,14 +46,14 @@ Values makeValues(const style::SymbolPropertyValues& values,
     };
 }
 
-SymbolIconUniforms::Values
-SymbolIconUniforms::values(const style::SymbolPropertyValues& values,
-                           const Size& texsize,
-                           const std::array<float, 2>& pixelsToGLUnits,
-                           const RenderTile& tile,
-                           const TransformState& state)
+SymbolIconProgram::UniformValues
+SymbolIconProgram::uniformValues(const style::SymbolPropertyValues& values,
+                                 const Size& texsize,
+                                 const std::array<float, 2>& pixelsToGLUnits,
+                                 const RenderTile& tile,
+                                 const TransformState& state)
 {
-    return makeValues<SymbolIconUniforms::Values>(
+    return makeValues<SymbolIconProgram::UniformValues>(
         values,
         texsize,
         pixelsToGLUnits,
@@ -60,7 +62,7 @@ SymbolIconUniforms::values(const style::SymbolPropertyValues& values,
     );
 }
 
-static SymbolSDFUniforms::Values makeSDFValues(const style::SymbolPropertyValues& values,
+static SymbolSDFProgram::UniformValues makeSDFValues(const style::SymbolPropertyValues& values,
                                                const Size& texsize,
                                                const std::array<float, 2>& pixelsToGLUnits,
                                                const RenderTile& tile,
@@ -77,7 +79,7 @@ static SymbolSDFUniforms::Values makeSDFValues(const style::SymbolPropertyValues
         ? 1.0 / std::cos(state.getPitch())
         : 1.0;
 
-    return makeValues<SymbolSDFUniforms::Values>(
+    return makeValues<SymbolSDFProgram::UniformValues>(
         values,
         texsize,
         pixelsToGLUnits,
@@ -93,8 +95,8 @@ static SymbolSDFUniforms::Values makeSDFValues(const style::SymbolPropertyValues
     );
 }
 
-SymbolSDFUniforms::Values
-SymbolSDFUniforms::haloValues(const style::SymbolPropertyValues& values,
+SymbolSDFProgram::UniformValues
+SymbolSDFProgram::haloUniformValues(const style::SymbolPropertyValues& values,
                               const Size& texsize,
                               const std::array<float, 2>& pixelsToGLUnits,
                               const RenderTile& tile,
@@ -119,8 +121,8 @@ SymbolSDFUniforms::haloValues(const style::SymbolPropertyValues& values,
     );
 }
 
-SymbolSDFUniforms::Values
-SymbolSDFUniforms::foregroundValues(const style::SymbolPropertyValues& values,
+SymbolSDFProgram::UniformValues
+SymbolSDFProgram::foregroundUniformValues(const style::SymbolPropertyValues& values,
                                     const Size& texsize,
                                     const std::array<float, 2>& pixelsToGLUnits,
                                     const RenderTile& tile,

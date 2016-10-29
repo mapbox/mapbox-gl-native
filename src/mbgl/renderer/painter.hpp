@@ -9,8 +9,8 @@
 #include <mbgl/renderer/bucket.hpp>
 
 #include <mbgl/gl/context.hpp>
-#include <mbgl/shader/fill_attributes.hpp>
-#include <mbgl/shader/raster_attributes.hpp>
+#include <mbgl/programs/fill_program.hpp>
+#include <mbgl/programs/raster_program.hpp>
 
 #include <mbgl/style/style.hpp>
 
@@ -40,8 +40,7 @@ class CircleBucket;
 class SymbolBucket;
 class RasterBucket;
 
-class Shaders;
-class SymbolSDFShader;
+class Programs;
 class PaintParameters;
 
 struct ClipID;
@@ -152,9 +151,9 @@ private:
 
     FrameHistory frameHistory;
 
-    std::unique_ptr<Shaders> shaders;
+    std::unique_ptr<Programs> programs;
 #ifndef NDEBUG
-    std::unique_ptr<Shaders> overdrawShaders;
+    std::unique_ptr<Programs> overdrawPrograms;
 #endif
 
     gl::VertexBuffer<FillVertex> tileTriangleVertexBuffer;

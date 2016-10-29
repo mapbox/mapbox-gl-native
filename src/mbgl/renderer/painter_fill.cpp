@@ -5,8 +5,8 @@
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/shader/shaders.hpp>
-#include <mbgl/shader/fill_uniforms.hpp>
+#include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/fill_program.hpp>
 #include <mbgl/util/convert.hpp>
 
 namespace mbgl {
@@ -35,12 +35,12 @@ void Painter::renderFill(PaintParameters& parameters,
 
         spriteAtlas->bind(true, context, 0);
 
-        auto draw = [&] (uint8_t sublayer, auto& shader, const auto& subject) {
+        auto draw = [&] (uint8_t sublayer, auto& program, const auto& subject) {
             context.draw({
                 depthModeForSublayer(sublayer, gl::DepthMode::ReadWrite),
                 stencilModeForClipping(tile.clip),
                 colorModeForRenderPass(),
-                shader,
+                program,
                 FillPatternUniforms::values(
                     tile.translatedMatrix(properties.fillTranslate.value,
                                           properties.fillTranslateAnchor.value,
@@ -58,7 +58,7 @@ void Painter::renderFill(PaintParameters& parameters,
         };
 
         draw(0,
-             parameters.shaders.fillPattern,
+             parameters.programs.fillPattern,
              gl::Segmented<gl::Triangles>(
                  *bucket.vertexBuffer,
                  *bucket.triangleIndexBuffer,
@@ -69,20 +69,20 @@ void Painter::renderFill(PaintParameters& parameters,
         }
 
         draw(2,
-             parameters.shaders.fillOutlinePattern,
+             parameters.programs.fillOutlinePattern,
              gl::Segmented<gl::Lines>(
                  *bucket.vertexBuffer,
                  *bucket.lineIndexBuffer,
                  bucket.lineSegments,
                  2.0f));
     } else {
-        auto draw = [&] (uint8_t sublayer, auto& shader, Color outlineColor, const auto& subject) {
+        auto draw = [&] (uint8_t sublayer, auto& program, Color outlineColor, const auto& subject) {
             context.draw({
                 depthModeForSublayer(sublayer, gl::DepthMode::ReadWrite),
                 stencilModeForClipping(tile.clip),
                 colorModeForRenderPass(),
-                shader,
-                FillColorUniforms::Values {
+                program,
+                FillProgram::UniformValues {
                     uniforms::u_matrix::Value{ tile.translatedMatrix(properties.fillTranslate.value,
                                                properties.fillTranslateAnchor.value,
                                                state) },
@@ -97,7 +97,7 @@ void Painter::renderFill(PaintParameters& parameters,
 
         if (properties.fillAntialias.value && !properties.fillOutlineColor.isUndefined() && pass == RenderPass::Translucent) {
             draw(2,
-                 parameters.shaders.fillOutline,
+                 parameters.programs.fillOutline,
                  properties.fillOutlineColor.value,
                  gl::Segmented<gl::Lines>(
                      *bucket.vertexBuffer,
@@ -110,7 +110,7 @@ void Painter::renderFill(PaintParameters& parameters,
         // or when it's translucent and we're drawing translucent fragments.
         if ((properties.fillColor.value.a >= 1.0f && properties.fillOpacity.value >= 1.0f) == (pass == RenderPass::Opaque)) {
             draw(1,
-                 parameters.shaders.fill,
+                 parameters.programs.fill,
                  properties.fillOutlineColor.value,
                  gl::Segmented<gl::Triangles>(
                      *bucket.vertexBuffer,
@@ -120,7 +120,7 @@ void Painter::renderFill(PaintParameters& parameters,
 
         if (properties.fillAntialias.value && properties.fillOutlineColor.isUndefined() && pass == RenderPass::Translucent) {
             draw(2,
-                 parameters.shaders.fillOutline,
+                 parameters.programs.fillOutline,
                  properties.fillColor.value,
                  gl::Segmented<gl::Lines>(
                      *bucket.vertexBuffer,

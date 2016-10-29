@@ -5,8 +5,8 @@
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/gl/segment.hpp>
-#include <mbgl/shader/symbol_attributes.hpp>
-#include <mbgl/shader/collision_box_attributes.hpp>
+#include <mbgl/programs/symbol_program.hpp>
+#include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/text/glyph_range.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 

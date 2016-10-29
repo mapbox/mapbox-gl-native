@@ -21,7 +21,7 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 
-#include <mbgl/shader/shaders.hpp>
+#include <mbgl/programs/programs.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 #include <mbgl/algorithm/generate_clip_ids_impl.hpp>
@@ -60,18 +60,18 @@ Painter::Painter(gl::Context& context_, const TransformState& state_)
             FillAttributes::vertex({ 0, 0 })
       }})),
       rasterVertexBuffer(context.createVertexBuffer(std::vector<RasterVertex> {{
-            RasterAttributes::vertex({ 0, 0 }, { 0, 0 }),
-            RasterAttributes::vertex({ util::EXTENT, 0 }, { 32767, 0 }),
-            RasterAttributes::vertex({ 0, util::EXTENT }, { 0, 32767 }),
-            RasterAttributes::vertex({ util::EXTENT, util::EXTENT }, { 32767, 32767 })
+            RasterProgram::vertex({ 0, 0 }, { 0, 0 }),
+            RasterProgram::vertex({ util::EXTENT, 0 }, { 32767, 0 }),
+            RasterProgram::vertex({ 0, util::EXTENT }, { 0, 32767 }),
+            RasterProgram::vertex({ util::EXTENT, util::EXTENT }, { 32767, 32767 })
       }})) {
 #ifndef NDEBUG
     gl::debugging::enable();
 #endif
 
-    shaders = std::make_unique<Shaders>(context);
+    programs = std::make_unique<Programs>(context);
 #ifndef NDEBUG
-    overdrawShaders = std::make_unique<Shaders>(context, gl::Shader::Overdraw);
+    overdrawPrograms = std::make_unique<Programs>(context, ProgramDefines::Overdraw);
 #endif
 }
 
@@ -93,9 +93,9 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
 
     PaintParameters parameters {
 #ifndef NDEBUG
-        paintMode() == PaintMode::Overdraw ? *overdrawShaders : *shaders,
+        paintMode() == PaintMode::Overdraw ? *overdrawPrograms : *programs,
 #else
-        *shaders,
+        *programs,
 #endif
         view
     };

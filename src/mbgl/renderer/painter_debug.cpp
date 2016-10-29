@@ -4,8 +4,8 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/tile/tile.hpp>
-#include <mbgl/shader/shaders.hpp>
-#include <mbgl/shader/fill_uniforms.hpp>
+#include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/fill_program.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/gl/debugging.hpp>
 #include <mbgl/util/color.hpp>
@@ -23,8 +23,8 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
             gl::DepthMode::disabled(),
             stencilModeForClipping(renderTile.clip),
             gl::ColorMode::unblended(),
-            shaders->fill,
-            FillColorUniforms::Values {
+            programs->fill,
+            FillProgram::UniformValues {
                 uniforms::u_matrix::Value{ renderTile.matrix },
                 uniforms::u_opacity::Value{ 1.0f },
                 uniforms::u_color::Value{ color },

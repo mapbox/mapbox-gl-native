@@ -82,28 +82,28 @@ auto Segmented(const VertexBuffer<Vertex>& vertexBuffer,
 
 class Drawable {
 public:
-    template <class Shader, class Subject>
+    template <class Program, class Subject>
     Drawable(DepthMode depthMode_,
              StencilMode stencilMode_,
              ColorMode colorMode_,
-             Shader& shader,
-             typename Shader::UniformsType::Values&& uniformValues,
+             Program& program_,
+             typename Program::UniformValues&& uniformValues,
              const Subject& subject)
         : drawMode(subject.drawMode),
           depthMode(std::move(depthMode_)),
           stencilMode(std::move(stencilMode_)),
           colorMode(std::move(colorMode_)),
-          program(shader.getID()),
+          program(program_.program),
           vertexBuffer(subject.vertexBuffer),
           vertexSize(subject.vertexSize),
           indexBuffer(subject.indexBuffer),
           primitiveSize(subject.primitiveSize),
           segments(subject.segments),
-          bindUniforms(Shader::UniformsType::binder(shader.uniformsState, std::move(uniformValues))),
-          bindAttributes(Shader::AttributesType::binder(shader.attributesState))
+          bindUniforms(Program::Uniforms::binder(program_.uniformsState, std::move(uniformValues))),
+          bindAttributes(Program::Attributes::binder(program_.attributesState))
     {
-        static_assert(std::is_standard_layout<typename Subject::VertexType>::value, "vertex type must use standard layout");
-        static_assert(std::is_same<typename Shader::AttributesType::Vertex, typename Subject::VertexType>::value, "vertex type mismatch");
+        static_assert(std::is_standard_layout<typename Program::Vertex>::value, "vertex type must use standard layout");
+        static_assert(std::is_same<typename Program::Vertex, typename Subject::VertexType>::value, "vertex type mismatch");
     }
 
     DrawMode drawMode;

@@ -20,10 +20,5 @@ struct MisuseException : Exception {
     MisuseException(const std::string &msg) : Exception(msg) {}
 };
 
-struct ShaderException : Exception {
-    ShaderException(const char *msg) : Exception(msg) {}
-    ShaderException(const std::string &msg) : Exception(msg) {}
-};
-
 } // namespace util
 } // namespace mbgl

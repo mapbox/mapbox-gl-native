@@ -1,4 +1,4 @@
-#include <mbgl/shader/line_uniforms.hpp>
+#include <mbgl/programs/line_program.hpp>
 #include <mbgl/style/layers/line_layer_properties.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
@@ -7,6 +7,8 @@
 #include <mbgl/geometry/line_atlas.hpp>
 
 namespace mbgl {
+
+static_assert(sizeof(LineAttributes::Vertex) == 8, "expected LineVertex size");
 
 template <class Values, class...Args>
 Values makeValues(const style::LinePaintProperties& properties,
@@ -45,12 +47,12 @@ Values makeValues(const style::LinePaintProperties& properties,
     };
 }
 
-LineColorUniforms::Values
-LineColorUniforms::values(const style::LinePaintProperties& properties,
-                          float pixelRatio,
-                          const RenderTile& tile,
-                          const TransformState& state) {
-    return makeValues<LineColorUniforms::Values>(
+LineProgram::UniformValues
+LineProgram::uniformValues(const style::LinePaintProperties& properties,
+                           float pixelRatio,
+                           const RenderTile& tile,
+                           const TransformState& state) {
+    return makeValues<LineProgram::UniformValues>(
         properties,
         pixelRatio,
         tile,
@@ -59,15 +61,15 @@ LineColorUniforms::values(const style::LinePaintProperties& properties,
     );
 }
 
-LineSDFUniforms::Values
-LineSDFUniforms::values(const style::LinePaintProperties& properties,
-                        float pixelRatio,
-                        const RenderTile& tile,
-                        const TransformState& state,
-                        const LinePatternPos& posA,
-                        const LinePatternPos& posB,
-                        float dashLineWidth,
-                        float atlasWidth) {
+LineSDFProgram::UniformValues
+LineSDFProgram::uniformValues(const style::LinePaintProperties& properties,
+                              float pixelRatio,
+                              const RenderTile& tile,
+                              const TransformState& state,
+                              const LinePatternPos& posA,
+                              const LinePatternPos& posB,
+                              float dashLineWidth,
+                              float atlasWidth) {
     const float widthA = posA.width * properties.lineDasharray.value.fromScale * dashLineWidth;
     const float widthB = posB.width * properties.lineDasharray.value.toScale * dashLineWidth;
 
@@ -81,7 +83,7 @@ LineSDFUniforms::values(const style::LinePaintProperties& properties,
         -posB.height / 2.0f
     }};
 
-    return makeValues<LineSDFUniforms::Values>(
+    return makeValues<LineSDFProgram::UniformValues>(
         properties,
         pixelRatio,
         tile,
@@ -97,13 +99,13 @@ LineSDFUniforms::values(const style::LinePaintProperties& properties,
     );
 }
 
-LinePatternUniforms::Values
-LinePatternUniforms::values(const style::LinePaintProperties& properties,
-                            float pixelRatio,
-                            const RenderTile& tile,
-                            const TransformState& state,
-                            const SpriteAtlasPosition& posA,
-                            const SpriteAtlasPosition& posB) {
+LinePatternProgram::UniformValues
+LinePatternProgram::uniformValues(const style::LinePaintProperties& properties,
+                                  float pixelRatio,
+                                  const RenderTile& tile,
+                                  const TransformState& state,
+                                  const SpriteAtlasPosition& posA,
+                                  const SpriteAtlasPosition& posB) {
      std::array<float, 2> sizeA {{
          tile.id.pixelsToTileUnits(posA.size[0] * properties.linePattern.value.fromScale, state.getIntegerZoom()),
          posA.size[1]
@@ -114,7 +116,7 @@ LinePatternUniforms::values(const style::LinePaintProperties& properties,
          posB.size[1]
      }};
 
-    return makeValues<LinePatternUniforms::Values>(
+    return makeValues<LinePatternProgram::UniformValues>(
         properties,
         pixelRatio,
         tile,

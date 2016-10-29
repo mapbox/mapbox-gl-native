@@ -1,6 +1,6 @@
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
-#include <mbgl/shader/raster_shader.hpp>
+#include <mbgl/programs/raster_program.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/gl/context.hpp>
 

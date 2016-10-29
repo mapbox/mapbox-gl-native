@@ -4,11 +4,15 @@
 #include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/util/traits.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/platform/log.hpp>
 
 #include <boost/functional/hash.hpp>
 
 namespace mbgl {
 namespace gl {
+
+static_assert(underlying_type(ShaderType::Vertex) == GL_VERTEX_SHADER, "OpenGL type mismatch");
+static_assert(underlying_type(ShaderType::Fragment) == GL_FRAGMENT_SHADER, "OpenGL type mismatch");
 
 static_assert(underlying_type(PrimitiveType::Points) == GL_POINTS, "OpenGL type mismatch");
 static_assert(underlying_type(PrimitiveType::Lines) == GL_LINES, "OpenGL type mismatch");
@@ -34,16 +38,53 @@ Context::~Context() {
     reset();
 }
 
-UniqueProgram Context::createProgram() {
-    return UniqueProgram{ MBGL_CHECK_ERROR(glCreateProgram()), { this } };
+UniqueShader Context::createShader(ShaderType type, const std::string& source) {
+    UniqueShader result { MBGL_CHECK_ERROR(glCreateShader(static_cast<GLenum>(type))), { this } };
+
+    const GLchar* sources = source.data();
+    const GLsizei lengths = static_cast<GLsizei>(source.length());
+    MBGL_CHECK_ERROR(glShaderSource(result, 1, &sources, &lengths));
+    MBGL_CHECK_ERROR(glCompileShader(result));
+
+    GLint status = 0;
+    MBGL_CHECK_ERROR(glGetShaderiv(result, GL_COMPILE_STATUS, &status));
+    if (status != 0) {
+        return result;
+    }
+
+    GLint logLength;
+    MBGL_CHECK_ERROR(glGetShaderiv(result, GL_INFO_LOG_LENGTH, &logLength));
+    if (logLength > 0) {
+        const auto log = std::make_unique<GLchar[]>(logLength);
+        MBGL_CHECK_ERROR(glGetShaderInfoLog(result, logLength, &logLength, log.get()));
+        Log::Error(Event::Shader, "Shader failed to compile: %s", log.get());
+    }
+
+    throw std::runtime_error("shader failed to compile");
 }
 
-UniqueShader Context::createVertexShader() {
-    return UniqueShader{ MBGL_CHECK_ERROR(glCreateShader(GL_VERTEX_SHADER)), { this } };
-}
+UniqueProgram Context::createProgram(ShaderID vertexShader, ShaderID fragmentShader) {
+    UniqueProgram result { MBGL_CHECK_ERROR(glCreateProgram()), { this } };
 
-UniqueShader Context::createFragmentShader() {
-    return UniqueShader{ MBGL_CHECK_ERROR(glCreateShader(GL_FRAGMENT_SHADER)), { this } };
+    MBGL_CHECK_ERROR(glAttachShader(result, vertexShader));
+    MBGL_CHECK_ERROR(glAttachShader(result, fragmentShader));
+    MBGL_CHECK_ERROR(glLinkProgram(result));
+
+    GLint status;
+    MBGL_CHECK_ERROR(glGetProgramiv(result, GL_LINK_STATUS, &status));
+    if (status != 0) {
+        return result;
+    }
+
+    GLint logLength;
+    MBGL_CHECK_ERROR(glGetProgramiv(result, GL_INFO_LOG_LENGTH, &logLength));
+    const auto log = std::make_unique<GLchar[]>(logLength);
+    if (logLength > 0) {
+        MBGL_CHECK_ERROR(glGetProgramInfoLog(result, logLength, &logLength, log.get()));
+        Log::Error(Event::Shader, "Program failed to link: %s", log.get());
+    }
+
+    throw std::runtime_error("program failed to link");
 }
 
 UniqueBuffer Context::createVertexBuffer(const void* data, std::size_t size) {

@@ -2,7 +2,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/gl/context.hpp>
 
-#include <mbgl/shader/circle_shader.hpp>
+#include <mbgl/programs/circle_program.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/util/constants.hpp>
 
@@ -58,10 +58,10 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
             // │ 1     2 │
             // └─────────┘
             //
-            vertices.emplace_back(CircleAttributes::vertex(point, -1, -1)); // 1
-            vertices.emplace_back(CircleAttributes::vertex(point,  1, -1)); // 2
-            vertices.emplace_back(CircleAttributes::vertex(point,  1,  1)); // 3
-            vertices.emplace_back(CircleAttributes::vertex(point, -1,  1)); // 4
+            vertices.emplace_back(CircleProgram::vertex(point, -1, -1)); // 1
+            vertices.emplace_back(CircleProgram::vertex(point,  1, -1)); // 2
+            vertices.emplace_back(CircleProgram::vertex(point,  1,  1)); // 3
+            vertices.emplace_back(CircleProgram::vertex(point, -1,  1)); // 4
 
             auto& segment = segments.back();
             assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());

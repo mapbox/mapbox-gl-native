@@ -5,7 +5,7 @@
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/gl/segment.hpp>
-#include <mbgl/shader/fill_attributes.hpp>
+#include <mbgl/programs/fill_program.hpp>
 
 #include <vector>
 

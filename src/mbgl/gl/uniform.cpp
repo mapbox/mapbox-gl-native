@@ -7,6 +7,10 @@
 namespace mbgl {
 namespace gl {
 
+UniformLocation uniformLocation(ProgramID id, const char* name) {
+    return MBGL_CHECK_ERROR(glGetUniformLocation(id, name));
+}
+
 template <>
 void bindUniform<float>(UniformLocation location, const float& t) {
     MBGL_CHECK_ERROR(glUniform1f(location, t));

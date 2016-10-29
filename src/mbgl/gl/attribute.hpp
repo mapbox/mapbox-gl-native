@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/gl/types.hpp>
-#include <mbgl/gl/shader.hpp>
 
 #include <cstddef>
 #include <functional>
@@ -18,9 +17,6 @@ public:
 
     class State {
     public:
-        State(const char* name, const Shader& shader)
-            : location(shader.getAttributeLocation(name)) {}
-
         AttributeLocation location;
         static constexpr std::size_t count = N;
         static constexpr DataType type = DataTypeOf<T>::value;
@@ -134,6 +130,8 @@ const std::size_t Vertex<A1, A2, A3, A4, A5>::attributeOffsets[5] = {
 
 } // namespace detail
 
+AttributeLocation attributeLocation(ProgramID, const char * name);
+
 void bindAttribute(AttributeLocation location,
                    std::size_t count,
                    DataType type,
@@ -147,8 +145,8 @@ public:
     using State = std::tuple<typename As::State...>;
     using Vertex = detail::Vertex<As...>;
 
-    static State state(const Shader& shader) {
-        return State { { As::name, shader }... };
+    static State state(const ProgramID& id) {
+        return State { { attributeLocation(id, As::name) }... };
     }
 
     static std::function<void (std::size_t)> binder(const State& state) {

@@ -4,14 +4,13 @@ function(add_shader VAR name)
     set(shader_source_prefix ${MBGL_GENERATED}/include/mbgl/shader)
 
     add_custom_command(
-       OUTPUT ${shader_source_prefix}/${name}.vertex.hpp ${shader_source_prefix}/${name}.fragment.hpp
-       COMMAND ${shader_build_cmd} ${shader_file_prefix}/${name}.vertex.glsl ${shader_source_prefix}/${name}.vertex.hpp
-       COMMAND ${shader_build_cmd} ${shader_file_prefix}/${name}.fragment.glsl ${shader_source_prefix}/${name}.fragment.hpp
+       OUTPUT ${shader_source_prefix}/${name}.hpp
+       COMMAND ${shader_build_cmd} ${shader_file_prefix}/${name}.vertex.glsl ${shader_file_prefix}/${name}.fragment.glsl ${shader_source_prefix}/${name}.hpp
        DEPENDS ${shader_file_prefix}/${name}.vertex.glsl
        DEPENDS ${shader_file_prefix}/${name}.fragment.glsl
        VERBATIM
     )
-    set(${VAR} ${${VAR}} ${shader_source_prefix}/${name}.vertex.hpp ${shader_source_prefix}/${name}.fragment.hpp PARENT_SCOPE)
+    set(${VAR} ${${VAR}} ${shader_source_prefix}/${name}.hpp PARENT_SCOPE)
 endfunction()
 
 add_shader(MBGL_SHADER_FILES circle)

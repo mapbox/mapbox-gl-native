@@ -1,6 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/shader/shaders.hpp>
-#include <mbgl/shader/fill_uniforms.hpp>
+#include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/fill_program.hpp>
 #include <mbgl/util/clip_id.hpp>
 
 namespace mbgl {
@@ -17,8 +17,8 @@ void Painter::renderClippingMask(const UnwrappedTileID& tileID, const ClipID& cl
             gl::StencilMode::Replace
         },
         gl::ColorMode::disabled(),
-        shaders->fill,
-        FillColorUniforms::Values {
+        programs->fill,
+        FillProgram::UniformValues {
             uniforms::u_matrix::Value{ matrixForTile(tileID) },
             uniforms::u_opacity::Value{ 0.0f },
             uniforms::u_color::Value{ Color {} },

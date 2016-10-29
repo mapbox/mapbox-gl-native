@@ -1,4 +1,4 @@
-#include <mbgl/shader/fill_uniforms.hpp>
+#include <mbgl/programs/fill_program.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/style/property_evaluator.hpp>
 #include <mbgl/tile/tile_id.hpp>
@@ -7,6 +7,8 @@
 namespace mbgl {
 
 using namespace style;
+
+static_assert(sizeof(FillAttributes::Vertex) == 4, "expected FillVertex size");
 
 FillPatternUniforms::Values
 FillPatternUniforms::values(mat4 matrix,

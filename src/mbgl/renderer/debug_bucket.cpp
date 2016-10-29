@@ -1,7 +1,6 @@
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/shader/fill_shader.hpp>
-#include <mbgl/shader/fill_attributes.hpp>
+#include <mbgl/programs/fill_program.hpp>
 #include <mbgl/geometry/debug_font_data.hpp>
 #include <mbgl/util/string.hpp>
 

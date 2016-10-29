@@ -4,8 +4,8 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
-#include <mbgl/shader/shaders.hpp>
-#include <mbgl/shader/line_uniforms.hpp>
+#include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/line_program.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 
@@ -23,12 +23,12 @@ void Painter::renderLine(PaintParameters& parameters,
 
     const auto& properties = layer.impl->paint;
 
-    auto draw = [&] (auto& shader, auto&& uniformValues) {
+    auto draw = [&] (auto& program, auto&& uniformValues) {
         context.draw({
             depthModeForSublayer(0, gl::DepthMode::ReadOnly),
             stencilModeForClipping(tile.clip),
             colorModeForRenderPass(),
-            shader,
+            program,
             std::move(uniformValues),
             gl::Segmented<gl::Triangles>(
                 *bucket.vertexBuffer,
@@ -46,8 +46,8 @@ void Painter::renderLine(PaintParameters& parameters,
 
         lineAtlas->bind(context, 0);
 
-        draw(parameters.shaders.lineSDF,
-             LineSDFUniforms::values(
+        draw(parameters.programs.lineSDF,
+             LineSDFProgram::uniformValues(
                  properties,
                  frame.pixelRatio,
                  tile,
@@ -68,8 +68,8 @@ void Painter::renderLine(PaintParameters& parameters,
 
         spriteAtlas->bind(true, context, 0);
 
-        draw(parameters.shaders.linePattern,
-             LinePatternUniforms::values(
+        draw(parameters.programs.linePattern,
+             LinePatternProgram::uniformValues(
                  properties,
                  frame.pixelRatio,
                  tile,
@@ -78,8 +78,8 @@ void Painter::renderLine(PaintParameters& parameters,
                  *posB));
 
     } else {
-        draw(parameters.shaders.line,
-             LineColorUniforms::values(
+        draw(parameters.programs.line,
+             LineProgram::uniformValues(
                  properties,
                  frame.pixelRatio,
                  tile,

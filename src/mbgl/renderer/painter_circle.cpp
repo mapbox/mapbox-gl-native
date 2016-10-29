@@ -4,8 +4,8 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
-#include <mbgl/shader/shaders.hpp>
-#include <mbgl/shader/circle_uniforms.hpp>
+#include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/circle_program.hpp>
 #include <mbgl/gl/context.hpp>
 
 namespace mbgl {
@@ -29,8 +29,8 @@ void Painter::renderCircle(PaintParameters& parameters,
             ? stencilModeForClipping(tile.clip)
             : gl::StencilMode::disabled(),
         colorModeForRenderPass(),
-        parameters.shaders.circle,
-        CircleUniforms::Values {
+        parameters.programs.circle,
+        CircleProgram::UniformValues {
             uniforms::u_matrix::Value{ tile.translatedMatrix(properties.circleTranslate.value,
                                        properties.circleTranslateAnchor.value,
                                        state) },

@@ -2,8 +2,8 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
-#include <mbgl/shader/shaders.hpp>
-#include <mbgl/shader/fill_uniforms.hpp>
+#include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/fill_program.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/util/tile_cover.hpp>
 
@@ -32,7 +32,7 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
                 depthModeForSublayer(0, gl::DepthMode::ReadOnly),
                 gl::StencilMode::disabled(),
                 colorModeForRenderPass(),
-                parameters.shaders.fillPattern,
+                parameters.programs.fillPattern,
                 FillPatternUniforms::values(
                     matrixForTile(tileID),
                     properties.backgroundOpacity.value,
@@ -52,8 +52,8 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
                 depthModeForSublayer(0, gl::DepthMode::ReadOnly),
                 gl::StencilMode::disabled(),
                 colorModeForRenderPass(),
-                parameters.shaders.fill,
-                FillColorUniforms::Values {
+                parameters.programs.fill,
+                FillProgram::UniformValues {
                     uniforms::u_matrix::Value{ matrixForTile(tileID) },
                     uniforms::u_opacity::Value{ properties.backgroundOpacity.value },
                     uniforms::u_color::Value{ properties.backgroundColor.value },

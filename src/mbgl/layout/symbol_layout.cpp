@@ -507,14 +507,14 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 const float maxZoom = util::clamp(zoom + util::log2(box.maxScale), util::MIN_ZOOM_F, util::MAX_ZOOM_F);
                 const float placementZoom = util::clamp(zoom + util::log2(box.placementScale), util::MIN_ZOOM_F, util::MAX_ZOOM_F);
 
-                collisionBox.vertices.emplace_back(CollisionBoxAttributes::vertex(anchor, tl, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxAttributes::vertex(anchor, tr, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxAttributes::vertex(anchor, tr, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxAttributes::vertex(anchor, br, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxAttributes::vertex(anchor, br, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxAttributes::vertex(anchor, bl, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxAttributes::vertex(anchor, bl, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxAttributes::vertex(anchor, tl, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tl, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tr, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tr, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, br, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, br, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, bl, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, bl, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tl, maxZoom, placementZoom));
             }
         };
         populateCollisionBox(symbolInstance.textCollisionFeature);
