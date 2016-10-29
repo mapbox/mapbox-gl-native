@@ -11,12 +11,12 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/utf.hpp>
 #include <mbgl/util/token.hpp>
-#include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/math/clamp.hpp>
 #include <mbgl/math/minmax.hpp>
+#include <mbgl/math/log2.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/log.hpp>
 
@@ -418,8 +418,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
 
 template <typename Buffer>
 void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float scale, const bool keepUpright, const style::SymbolPlacementType placement, const float placementAngle) {
-
-    const float placementZoom = ::fmax(std::log(scale) / std::log(2) + zoom, 0);
+    const float placementZoom = util::max(util::log2(scale) + zoom, 0.0f);
 
     for (const auto& symbol : symbols) {
         const auto &tl = symbol.tl;
@@ -428,9 +427,8 @@ void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         const auto &br = symbol.br;
         const auto &tex = symbol.tex;
 
-        float minZoom =
-            util::max(static_cast<float>(zoom + log(symbol.minScale) / log(2)), placementZoom);
-        float maxZoom = util::min(static_cast<float>(zoom + log(symbol.maxScale) / log(2)), 25.0f);
+        float minZoom = util::max(zoom + util::log2(symbol.minScale), placementZoom);
+        float maxZoom = util::min(zoom + util::log2(symbol.maxScale), util::MAX_ZOOM_F);
         const auto &anchorPoint = symbol.anchorPoint;
 
         // drop upside down versions of glyphs
@@ -510,8 +508,8 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 bl = util::matrixMultiply(collisionTile.reverseRotationMatrix, bl);
                 br = util::matrixMultiply(collisionTile.reverseRotationMatrix, br);
 
-                const float maxZoom = util::clamp(zoom + log(box.maxScale) / log(2), util::MIN_ZOOM, util::MAX_ZOOM);
-                const float placementZoom = util::clamp(zoom + log(box.placementScale) / log(2), util::MIN_ZOOM, util::MAX_ZOOM);
+                const float maxZoom = util::clamp(zoom + util::log2(box.maxScale), util::MIN_ZOOM_F, util::MAX_ZOOM_F);
+                const float placementZoom = util::clamp(zoom + util::log2(box.placementScale), util::MIN_ZOOM_F, util::MAX_ZOOM_F);
 
                 collisionBox.vertices.emplace_back(anchor.x, anchor.y, tl.x, tl.y, maxZoom, placementZoom);
                 collisionBox.vertices.emplace_back(anchor.x, anchor.y, tr.x, tr.y, maxZoom, placementZoom);

@@ -24,6 +24,7 @@
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/math/log2.hpp>
 
 namespace mbgl {
 
