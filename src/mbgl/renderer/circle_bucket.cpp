@@ -31,6 +31,8 @@ bool CircleBucket::hasData() const {
 }
 
 void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
+    constexpr const uint16_t vertexLength = 4;
+
     for (auto& circle : geometryCollection) {
         for(auto & geometry : circle) {
             auto x = geometry.x;
@@ -42,7 +44,7 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
             if ((mode != MapMode::Still) &&
                 (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT)) continue;
 
-            if (!segments.size() || segments.back().vertexLength + 4 > 65535) {
+            if (segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
                 // Move to a new segments because the old one can't hold the geometry.
                 segments.emplace_back(vertices.size(), triangles.size());
             }
@@ -62,18 +64,15 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
             vertices.emplace_back(x, y, -1, 1); // 4
 
             auto& segment = segments.back();
+            assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());
             uint16_t index = segment.vertexLength;
 
             // 1, 2, 3
             // 1, 4, 3
-            triangles.emplace_back(index,
-                                   static_cast<uint16_t>(index + 1),
-                                   static_cast<uint16_t>(index + 2));
-            triangles.emplace_back(index,
-                                   static_cast<uint16_t>(index + 3),
-                                   static_cast<uint16_t>(index + 2));
+            triangles.emplace_back(index, index + 1, index + 2);
+            triangles.emplace_back(index, index + 3, index + 2);
 
-            segment.vertexLength += 4;
+            segment.vertexLength += vertexLength;
             segment.primitiveLength += 2;
         }
     }
