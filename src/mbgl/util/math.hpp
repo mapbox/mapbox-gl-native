@@ -106,11 +106,5 @@ T smoothstep(T edge0, T edge1, T x) {
     return t * t * (T(3) - T(2) * t);
 }
 
-// Computes the log2(x) rounded up to the next integer.
-// (== number of bits required to store x)
-uint32_t ceil_log2(uint64_t x);
-
-double log2(double x);
-
 } // namespace util
 } // namespace mbgl

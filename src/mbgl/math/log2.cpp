@@ -1,4 +1,4 @@
-#include <mbgl/util/math.hpp>
+#include <mbgl/math/log2.hpp>
 
 namespace mbgl {
 namespace util {
@@ -19,16 +19,6 @@ uint32_t ceil_log2(uint64_t x) {
     }
 
     return y;
-}
-
-double log2(double x) {
-// log2() is producing wrong results on ARMv5 binaries
-// running on ARMv7+ CPUs.
-#if defined(__ANDROID__)
-    return std::log(x) / 0.6931471805599453; // log(x) / log(2)
-#else
-    return ::log2(x);
-#endif
 }
 
 } // namespace util

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
-#include <mbgl/util/math.hpp>
+#include <mbgl/math/log2.hpp>
 #include <mbgl/platform/log.hpp>
 
 namespace mbgl {

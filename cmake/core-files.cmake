@@ -119,8 +119,10 @@ set(MBGL_CORE_FILES
 
     # math
     include/mbgl/math/clamp.hpp
+    include/mbgl/math/log2.hpp
     include/mbgl/math/minmax.hpp
     include/mbgl/math/wrap.hpp
+    src/mbgl/math/log2.cpp
 
     # mbgl
     include/mbgl/mbgl.hpp
@@ -481,7 +483,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/mat3.hpp
     src/mbgl/util/mat4.cpp
     src/mbgl/util/mat4.hpp
-    src/mbgl/util/math.cpp
     src/mbgl/util/math.hpp
     src/mbgl/util/offscreen_texture.cpp
     src/mbgl/util/offscreen_texture.hpp

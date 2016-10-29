@@ -2,7 +2,7 @@
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
-#include <mbgl/util/math.hpp>
+#include <mbgl/math/log2.hpp>
 #include <mbgl/math/clamp.hpp>
 
 namespace mbgl {
@@ -117,7 +117,7 @@ double TransformState::pixel_y() const {
 #pragma mark - Zoom
 
 double TransformState::getZoom() const {
-    return std::log(scale) / M_LN2;
+    return scaleZoom(scale);
 }
 
 int32_t TransformState::getIntegerZoom() const {
