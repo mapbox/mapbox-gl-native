@@ -5,7 +5,7 @@
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/gl/segment.hpp>
-#include <mbgl/shader/line_vertex.hpp>
+#include <mbgl/shader/line_attributes.hpp>
 #include <mbgl/style/layers/line_layer_properties.hpp>
 
 #include <vector>

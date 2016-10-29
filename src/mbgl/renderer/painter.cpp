@@ -45,25 +45,25 @@ Painter::Painter(gl::Context& context_, const TransformState& state_)
     : context(context_),
       state(state_),
       tileTriangleVertexBuffer(context.createVertexBuffer(std::vector<FillVertex> {{
-            { 0,            0 },
-            { util::EXTENT, 0 },
-            { 0, util::EXTENT },
-            { util::EXTENT, 0 },
-            { 0, util::EXTENT },
-            { util::EXTENT, util::EXTENT }
+            FillAttributes::vertex({ 0,            0 }),
+            FillAttributes::vertex({ util::EXTENT, 0 }),
+            FillAttributes::vertex({ 0, util::EXTENT }),
+            FillAttributes::vertex({ util::EXTENT, 0 }),
+            FillAttributes::vertex({ 0, util::EXTENT }),
+            FillAttributes::vertex({ util::EXTENT, util::EXTENT })
       }})),
       tileLineStripVertexBuffer(context.createVertexBuffer(std::vector<FillVertex> {{
-            { 0, 0 },
-            { util::EXTENT, 0 },
-            { util::EXTENT, util::EXTENT },
-            { 0, util::EXTENT },
-            { 0, 0 }
+            FillAttributes::vertex({ 0, 0 }),
+            FillAttributes::vertex({ util::EXTENT, 0 }),
+            FillAttributes::vertex({ util::EXTENT, util::EXTENT }),
+            FillAttributes::vertex({ 0, util::EXTENT }),
+            FillAttributes::vertex({ 0, 0 })
       }})),
       rasterVertexBuffer(context.createVertexBuffer(std::vector<RasterVertex> {{
-            { 0, 0, 0, 0 },
-            { util::EXTENT, 0, 32767, 0 },
-            { 0, util::EXTENT, 0, 32767 },
-            { util::EXTENT, util::EXTENT, 32767, 32767 }
+            RasterAttributes::vertex({ 0, 0 }, { 0, 0 }),
+            RasterAttributes::vertex({ util::EXTENT, 0 }, { 32767, 0 }),
+            RasterAttributes::vertex({ 0, util::EXTENT }, { 0, 32767 }),
+            RasterAttributes::vertex({ util::EXTENT, util::EXTENT }, { 32767, 32767 })
       }})) {
 #ifndef NDEBUG
     gl::debugging::enable();

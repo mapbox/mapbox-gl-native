@@ -486,17 +486,7 @@ void Context::draw(const Drawable& drawable) {
         if (needAttributeBindings()) {
             vertexBuffer = drawable.vertexBuffer;
             elementBuffer = drawable.indexBuffer;
-
-            for (const auto& binding : drawable.attributeBindings) {
-                MBGL_CHECK_ERROR(glEnableVertexAttribArray(binding.location));
-                MBGL_CHECK_ERROR(glVertexAttribPointer(
-                    binding.location,
-                    binding.count,
-                    static_cast<GLenum>(binding.type),
-                    GL_FALSE,
-                    static_cast<GLsizei>(drawable.vertexSize),
-                    reinterpret_cast<GLvoid*>(binding.offset + (drawable.vertexSize * segment.vertexOffset))));
-            }
+            drawable.bindAttributes(segment.vertexOffset);
         }
 
         if (drawable.indexBuffer) {

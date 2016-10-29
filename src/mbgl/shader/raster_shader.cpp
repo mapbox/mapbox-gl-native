@@ -1,7 +1,6 @@
 #include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/shader/raster.vertex.hpp>
 #include <mbgl/shader/raster.fragment.hpp>
-#include <mbgl/shader/raster_vertex.hpp>
 
 namespace mbgl {
 
@@ -10,6 +9,7 @@ RasterShader::RasterShader(gl::Context& context, Defines defines)
              shaders::raster::vertex,
              shaders::raster::fragment,
              context, defines),
+      attributesState(RasterAttributes::state(*this)),
       uniformsState(RasterUniforms::state(*this)) {
 }
 

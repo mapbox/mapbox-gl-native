@@ -1,7 +1,6 @@
 #include <mbgl/shader/fill_pattern_shader.hpp>
 #include <mbgl/shader/fill_pattern.vertex.hpp>
 #include <mbgl/shader/fill_pattern.fragment.hpp>
-#include <mbgl/shader/fill_vertex.hpp>
 
 namespace mbgl {
 
@@ -10,6 +9,7 @@ FillPatternShader::FillPatternShader(gl::Context& context, Defines defines)
              shaders::fill_pattern::vertex,
              shaders::fill_pattern::fragment,
              context, defines),
+      attributesState(FillAttributes::state(*this)),
       uniformsState(FillPatternUniforms::state(*this)) {
 }
 

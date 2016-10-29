@@ -1,7 +1,7 @@
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/shader/fill_shader.hpp>
-#include <mbgl/shader/fill_vertex.hpp>
+#include <mbgl/shader/fill_attributes.hpp>
 #include <mbgl/geometry/debug_font_data.hpp>
 #include <mbgl/util/string.hpp>
 
@@ -37,8 +37,8 @@ std::vector<FillVertex> buildTextVertices(const OverscaledTileID& id,
                     };
 
                     if (prev) {
-                        textPoints.emplace_back(prev->x, prev->y);
-                        textPoints.emplace_back(p.x, p.y);
+                        textPoints.emplace_back(FillAttributes::vertex(*prev));
+                        textPoints.emplace_back(FillAttributes::vertex(p));
                     }
 
                     prev = p;

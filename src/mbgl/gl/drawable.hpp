@@ -100,10 +100,10 @@ public:
           primitiveSize(subject.primitiveSize),
           segments(subject.segments),
           bindUniforms(Shader::UniformsType::binder(shader.uniformsState, std::move(uniformValues))),
-          attributeBindings(AttributeBindings<Shader, typename Subject::VertexType>()(shader))
+          bindAttributes(Shader::AttributesType::binder(shader.attributesState))
     {
         static_assert(std::is_standard_layout<typename Subject::VertexType>::value, "vertex type must use standard layout");
-        static_assert(std::is_same<typename Shader::VertexType, typename Subject::VertexType>::value, "vertex type mismatch");
+        static_assert(std::is_same<typename Shader::AttributesType::Vertex, typename Subject::VertexType>::value, "vertex type mismatch");
     }
 
     DrawMode drawMode;
@@ -117,7 +117,7 @@ public:
     std::size_t primitiveSize;
     const std::vector<Segment>& segments;
     std::function<void ()> bindUniforms;
-    std::vector<AttributeBinding> attributeBindings;
+    std::function<void (std::size_t)> bindAttributes;
 };
 
 } // namespace gl

@@ -6,7 +6,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/shader/fill_vertex.hpp>
+#include <mbgl/shader/fill_attributes.hpp>
 
 namespace mbgl {
 

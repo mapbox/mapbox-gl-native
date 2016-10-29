@@ -58,11 +58,11 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
             assert(lineSegment.vertexLength <= std::numeric_limits<uint16_t>::max());
             uint16_t lineIndex = lineSegment.vertexLength;
 
-            vertices.emplace_back(ring[0].x, ring[0].y);
+            vertices.emplace_back(FillAttributes::vertex(ring[0]));
             lines.emplace_back(lineIndex + nVertices - 1, lineIndex);
 
             for (uint32_t i = 1; i < nVertices; i++) {
-                vertices.emplace_back(ring[i].x, ring[i].y);
+                vertices.emplace_back(FillAttributes::vertex(ring[i]));
                 lines.emplace_back(lineIndex + i - 1, lineIndex + i);
             }
 

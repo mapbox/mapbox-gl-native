@@ -9,8 +9,8 @@
 #include <mbgl/renderer/bucket.hpp>
 
 #include <mbgl/gl/context.hpp>
-#include <mbgl/shader/fill_vertex.hpp>
-#include <mbgl/shader/raster_vertex.hpp>
+#include <mbgl/shader/fill_attributes.hpp>
+#include <mbgl/shader/raster_attributes.hpp>
 
 #include <mbgl/style/style.hpp>
 

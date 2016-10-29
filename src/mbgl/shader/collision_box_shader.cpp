@@ -1,7 +1,6 @@
 #include <mbgl/shader/collision_box_shader.hpp>
 #include <mbgl/shader/collision_box.vertex.hpp>
 #include <mbgl/shader/collision_box.fragment.hpp>
-#include <mbgl/shader/collision_box_vertex.hpp>
 
 namespace mbgl {
 
@@ -10,6 +9,7 @@ CollisionBoxShader::CollisionBoxShader(gl::Context& context)
              shaders::collision_box::vertex,
              shaders::collision_box::fragment,
              context),
+      attributesState(CollisionBoxAttributes::state(*this)),
       uniformsState(CollisionBoxUniforms::state(*this))
 {
 }

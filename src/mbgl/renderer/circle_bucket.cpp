@@ -34,9 +34,9 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
     constexpr const uint16_t vertexLength = 4;
 
     for (auto& circle : geometryCollection) {
-        for(auto & geometry : circle) {
-            auto x = geometry.x;
-            auto y = geometry.y;
+        for(auto& point : circle) {
+            auto x = point.x;
+            auto y = point.y;
 
             // Do not include points that are outside the tile boundaries.
             // Include all points in Still mode. You need to include points from
@@ -58,10 +58,10 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
             // │ 1     2 │
             // └─────────┘
             //
-            vertices.emplace_back(x, y, -1, -1); // 1
-            vertices.emplace_back(x, y, 1, -1); // 2
-            vertices.emplace_back(x, y, 1, 1); // 3
-            vertices.emplace_back(x, y, -1, 1); // 4
+            vertices.emplace_back(CircleAttributes::vertex(point, -1, -1)); // 1
+            vertices.emplace_back(CircleAttributes::vertex(point,  1, -1)); // 2
+            vertices.emplace_back(CircleAttributes::vertex(point,  1,  1)); // 3
+            vertices.emplace_back(CircleAttributes::vertex(point, -1,  1)); // 4
 
             auto& segment = segments.back();
             assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());

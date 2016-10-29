@@ -372,12 +372,10 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
                                   bool round,
                                   std::size_t startVertex,
                                   std::vector<TriangleElement>& triangleStore) {
-    int8_t tx = round ? 1 : 0;
-
     Point<double> extrude = normal;
     if (endLeft)
         extrude = extrude - (util::perp(normal) * endLeft);
-    vertices.emplace_back(currentCoordinate.x, currentCoordinate.y, extrude.x, extrude.y, tx, 0, endLeft, distance * LINE_DISTANCE_SCALE);
+    vertices.emplace_back(LineAttributes::vertex(currentCoordinate, extrude, { round, false }, endLeft, distance * LINE_DISTANCE_SCALE));
     e3 = vertices.size() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
@@ -388,7 +386,7 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
     extrude = normal * -1.0;
     if (endRight)
         extrude = extrude - (util::perp(normal) * endRight);
-    vertices.emplace_back(currentCoordinate.x, currentCoordinate.y, extrude.x, extrude.y, tx, 1, -endRight, distance * LINE_DISTANCE_SCALE);
+    vertices.emplace_back(LineAttributes::vertex(currentCoordinate, extrude, { round, true }, -endRight, distance * LINE_DISTANCE_SCALE));
     e3 = vertices.size() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
@@ -412,10 +410,8 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
                                    bool lineTurnsLeft,
                                    std::size_t startVertex,
                                    std::vector<TriangleElement>& triangleStore) {
-    int8_t ty = lineTurnsLeft;
-
     Point<double> flippedExtrude = extrude * (lineTurnsLeft ? -1.0 : 1.0);
-    vertices.emplace_back(currentVertex.x, currentVertex.y, flippedExtrude.x, flippedExtrude.y, 0, ty, 0, distance * LINE_DISTANCE_SCALE);
+    vertices.emplace_back(LineAttributes::vertex(currentVertex, flippedExtrude, { false, lineTurnsLeft }, 0, distance * LINE_DISTANCE_SCALE));
     e3 = vertices.size() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
