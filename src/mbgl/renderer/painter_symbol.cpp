@@ -10,6 +10,7 @@
 #include <mbgl/shader/symbol_uniforms.hpp>
 #include <mbgl/shader/collision_box_uniforms.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/tile/tile.hpp>
 
 #include <cmath>
 
@@ -125,7 +126,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
             shaders->collisionBox,
             CollisionBoxUniforms::values(
                 tile.matrix,
-                std::pow(2, state.getZoom() - tile.id.canonical.z),
+                std::pow(2.0f, state.getZoom() - tile.tile.id.overscaledZ),
                 state.getZoom() * 10,
                 (tile.id.canonical.z + 1) * 10
             ),
