@@ -129,7 +129,9 @@ enum { MGLAnnotationTagNotFound = UINT32_MAX };
 
 /// Mapping from an annotation tag to metadata about that annotation, including
 /// the annotation itself.
-typedef std::map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationContextMap;
+typedef std::map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationTagContextMap;
+
+typedef std::map<id<MGLAnnotation>, MGLAnnotationContext> MGLAnnotationObjectContextMap;
 
 /// Initializes the run loop shim that lives on the main thread.
 void MGLinitializeRunLoop() {
@@ -268,7 +270,9 @@ public:
 
     NS_MUTABLE_ARRAY_OF(NSURL *) *_bundledStyleURLs;
 
-    MGLAnnotationContextMap _annotationContextsByAnnotationTag;
+    MGLAnnotationTagContextMap _annotationContextsByAnnotationTag;
+    MGLAnnotationObjectContextMap _annotationContextsByAnnotation;
+    
     /// Tag of the selected annotation. If the user location annotation is selected, this ivar is set to `MGLAnnotationTagNotFound`.
     MGLAnnotationTag _selectedAnnotationTag;
 
@@ -428,6 +432,7 @@ public:
     // Set up annotation management and selection state.
     _annotationImagesByIdentifier = [NSMutableDictionary dictionary];
     _annotationContextsByAnnotationTag = {};
+    _annotationContextsByAnnotation = {};
     _annotationViewReuseQueueByIdentifier = [NSMutableDictionary dictionary];
     _selectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastTap = {};
@@ -2987,6 +2992,7 @@ public:
                 context.viewReuseIdentifier = annotationView.reuseIdentifier;
             }
 
+            _annotationContextsByAnnotation[annotation] = context;
             _annotationContextsByAnnotationTag[annotationTag] = context;
 
             if ([annotation isKindOfClass:[NSObject class]]) {
@@ -3079,15 +3085,6 @@ public:
     }
 
     return annotationView;
-}
-
-- (nullable MGLAnnotationView *)viewForAnnotation:(id<MGLAnnotation>)annotation
-{
-    MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
-    if (annotationTag == MGLAnnotationTagNotFound) return nil;
-
-    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
-    return annotationContext.annotationView;
 }
 
 - (double)alphaForShapeAnnotation:(MGLShape *)annotation
@@ -3186,6 +3183,16 @@ public:
 
         MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
         MGLAnnotationView *annotationView = annotationContext.annotationView;
+
+        if (annotationContext.viewReuseIdentifier)
+        {
+            NSMutableArray *annotationViewReuseQueue = [self annotationViewReuseQueueForIdentifier:annotationContext.viewReuseIdentifier];
+            if (![annotationViewReuseQueue containsObject:annotationView])
+            {
+                [annotationViewReuseQueue removeObject:annotationView];
+            }
+        }
+
         annotationView.annotation = nil;
         [annotationView removeFromSuperview];
 
@@ -3195,6 +3202,7 @@ public:
         }
 
         _annotationContextsByAnnotationTag.erase(annotationTag);
+        _annotationContextsByAnnotation.erase(annotation);
 
         if ([annotation isKindOfClass:[NSObject class]] && ![annotation isKindOfClass:[MGLMultiPoint class]])
         {
@@ -4631,15 +4639,15 @@ public:
 
     // If the map is pitched consider the viewport to be exactly the same as the bounds.
     // Otherwise, add a small buffer.
-    CGFloat widthAdjustment = self.camera.pitch > 0.0 ? 0.0 : -_largestAnnotationViewSize.width / 2.0;
-    CGFloat heightAdjustment = self.camera.pitch > 0.0 ? 0.0 : -_largestAnnotationViewSize.height / 2.0;
+    CGFloat widthAdjustment = self.camera.pitch > 0.0 ? 0.0 : -_largestAnnotationViewSize.width * 2.0;
+    CGFloat heightAdjustment = self.camera.pitch > 0.0 ? 0.0 : -_largestAnnotationViewSize.height * 2.0;
     CGRect viewPort = CGRectInset(self.bounds, widthAdjustment, heightAdjustment);
     
     NSArray *visibleAnnotations = [self visibleAnnotationsInRect:viewPort];
     NSMutableArray *offscreenAnnotations = [self.annotations mutableCopy];
     [offscreenAnnotations removeObjectsInArray:visibleAnnotations];
     
-    // Update visible annotations
+    // Update the center of visible annotation views
     for (id<MGLAnnotation> annotation in visibleAnnotations)
     {
         // Defer to the shape/polygon styling delegate methods
@@ -4648,60 +4656,64 @@ public:
             continue;
         }
         
-        MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
-        if (annotationTag != MGLAnnotationTagNotFound)
+        MGLAnnotationContext &annotationContext = _annotationContextsByAnnotation.at(annotation);
+        MGLAnnotationView *annotationView = annotationContext.annotationView;
+        if (!annotationView)
         {
-            MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
-            MGLAnnotationView *annotationView = annotationContext.annotationView;
-            if (!annotationView)
-            {
-                // This will dequeue views if the delegate implements the dequeue call
-                MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotationContext.annotation];
-                
-                if (annotationView)
-                {
-                    annotationView.mapView = self;
-                    annotationContext.annotationView = annotationView;
-                    
-                    // New annotation (created because there is nothing to dequeue) may not have been added to the
-                    // container view yet. Add them here.
-                    if (!annotationView.superview) {
-                        [self.annotationContainerView insertSubview:annotationView atIndex:0];
-                    }
-                }
-            }
+            // This will dequeue views if the delegate implements the dequeue call
+            MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotationContext.annotation];
+            
             if (annotationView)
             {
-                annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
+                annotationView.mapView = self;
+                annotationContext.annotationView = annotationView;
+                
+                // New annotation (created because there is nothing to dequeue) may not have been added to the
+                // container view yet. Add them here.
+                if (!annotationView.superview) {
+                    [self.annotationContainerView insertSubview:annotationView atIndex:0];
+                }
             }
+        }
+        if (annotationView)
+        {
+            annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
         }
     }
     
-    // Enqueue (and hide if required) offscreen annotations
+    CGPoint upperLeft = {_largestAnnotationViewSize.width,_largestAnnotationViewSize.height};
+    CGPoint lowerRight = {CGRectGetWidth(self.bounds) + _largestAnnotationViewSize.width,
+                          CGRectGetHeight(self.bounds) + _largestAnnotationViewSize.height};
+    
+    CLLocationCoordinate2D upperLeftCoordinate = [self convertPoint:upperLeft toCoordinateFromView:self];
+    CLLocationCoordinate2D lowerRightCoordinate = [self convertPoint:lowerRight toCoordinateFromView:self];
+    
+    // Enqueue (and move if required) offscreen annotation views
     for (id<MGLAnnotation> annotation in offscreenAnnotations)
     {
-        MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
-        if (annotationTag != MGLAnnotationTagNotFound)
+        CLLocationCoordinate2D coordinate = annotation.coordinate;
+        MGLAnnotationContext &annotationContext = _annotationContextsByAnnotation.at(annotation);
+        UIView *annotationView = annotationContext.annotationView;
+        
+        if (annotationView)
         {
-            MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
-            
-            // If the map changes quickly it is possible that some views may be processed after their
-            // annotation has already moved offscreen. This cleans those stranded view up.
-            UIView *annotationView = annotationContext.annotationView;
-            if (annotationView)
+            // Every so often (1 out of 1000 frames?) the mbgl query mechanism fails. This logic spot checks the
+            // offscreenAnnotations values -- if they are actually still on screen then the view center is
+            // moved and the enqueue operation is avoided. This allows us to keep the performance benefit of
+            // using the mbgl query result. It also forces views that have just gone offscreen to be cleared
+            // fully from view.
+            if ((coordinate.latitude > upperLeftCoordinate.latitude || coordinate.latitude < lowerRightCoordinate.latitude) ||
+                (coordinate.longitude < upperLeftCoordinate.longitude || coordinate.longitude > lowerRightCoordinate.longitude))
             {
-                if (CGRectIntersectsRect(annotationView.frame, self.bounds))
-                {
-                    CGRect adjustedFrame = annotationView.frame;
-                    adjustedFrame.origin.x = -CGRectGetWidth(adjustedFrame) * 2.0;
-                    annotationView.frame = adjustedFrame;
-                }
+                CGRect adjustedFrame = annotationView.frame;
+                adjustedFrame.origin.x = -CGRectGetWidth(adjustedFrame) * 2.0;
+                annotationView.frame = adjustedFrame;
+                [self enqueueAnnotationViewForAnnotationContext:annotationContext];
             }
-            
-            // This is a noop if the annotation view has already been queued or if it has no
-            // reuse identifier
-            [self enqueueAnnotationViewForAnnotationContext:annotationContext];
-            
+            else
+            {
+                annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
+            }
         }
     }
 
