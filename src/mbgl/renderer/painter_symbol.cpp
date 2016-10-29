@@ -70,7 +70,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
         SpriteAtlas& atlas = *layer.impl->spriteAtlas;
         const bool iconScaled = values.paintSize != 1.0f || frame.pixelRatio != atlas.getPixelRatio() || bucket.iconsNeedLinear;
         const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || state.getPitch() != 0;
-        atlas.bind(bucket.sdfIcons || state.isChanging() || iconScaled || iconTransformed, context, 0);
+        atlas.bind(bucket.sdfIcons || state.isScaling() || state.isRotating() || iconScaled || iconTransformed, context, 0);
 
         std::array<uint16_t, 2> texsize {{ atlas.getWidth(), atlas.getHeight() }};
 

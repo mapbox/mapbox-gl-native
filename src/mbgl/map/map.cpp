@@ -408,7 +408,6 @@ void Map::cancelTransitions() {
 
 void Map::setGestureInProgress(bool inProgress) {
     impl->transform.setGestureInProgress(inProgress);
-    impl->onUpdate(Update::Repaint);
 }
 
 bool Map::isGestureInProgress() const {

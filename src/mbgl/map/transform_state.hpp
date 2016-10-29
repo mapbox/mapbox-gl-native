@@ -60,7 +60,6 @@ public:
     float getPitch() const;
 
     // State
-    bool isChanging() const;
     bool isRotating() const;
     bool isScaling() const;
     bool isPanning() const;

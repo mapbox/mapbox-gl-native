@@ -49,12 +49,28 @@ TEST(Annotations, SymbolAnnotation) {
     auto screenBox = ScreenBox { {}, { double(size.width), double(size.height) } };
     auto features = test.map.queryPointAnnotations(screenBox);
     EXPECT_EQ(features.size(), 1u);
+    test.checkRendering("point_annotation");
 
     test.map.setZoom(test.map.getMaxZoom());
     test.checkRendering("point_annotation");
 
     features = test.map.queryPointAnnotations(screenBox);
     EXPECT_EQ(features.size(), 1u);
+}
+
+TEST(Annotations, SymbolLinearInterpolation)
+{
+    AnnotationTest test;
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    test.map.addAnnotation(SymbolAnnotation { Point<double>(0.15, 0.15), "default_marker" });
+    test.checkRendering("point_annotation");
+
+    // Should not trigger GL_LINEAR when binding the symbol shader.
+    test.map.setGestureInProgress(true);
+    test.map.moveBy({});
+    test.checkRendering("point_annotation");
 }
 
 TEST(Annotations, LineAnnotation) {
