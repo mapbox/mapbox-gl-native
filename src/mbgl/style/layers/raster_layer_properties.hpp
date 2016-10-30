@@ -9,22 +9,43 @@
 namespace mbgl {
 namespace style {
 
-class CascadeParameters;
-class CalculationParameters;
-
-class RasterPaintProperties {
-public:
-    void cascade(const CascadeParameters&);
-    bool recalculate(const CalculationParameters&);
-
-    PaintProperty<float> rasterOpacity { 1 };
-    PaintProperty<float> rasterHueRotate { 0 };
-    PaintProperty<float> rasterBrightnessMin { 0 };
-    PaintProperty<float> rasterBrightnessMax { 1 };
-    PaintProperty<float> rasterSaturation { 0 };
-    PaintProperty<float> rasterContrast { 0 };
-    PaintProperty<float> rasterFadeDuration { 300 };
+struct RasterOpacity : PaintProperty<float> {
+    static float defaultValue() { return 1; }
 };
+
+struct RasterHueRotate : PaintProperty<float> {
+    static float defaultValue() { return 0; }
+};
+
+struct RasterBrightnessMin : PaintProperty<float> {
+    static float defaultValue() { return 0; }
+};
+
+struct RasterBrightnessMax : PaintProperty<float> {
+    static float defaultValue() { return 1; }
+};
+
+struct RasterSaturation : PaintProperty<float> {
+    static float defaultValue() { return 0; }
+};
+
+struct RasterContrast : PaintProperty<float> {
+    static float defaultValue() { return 0; }
+};
+
+struct RasterFadeDuration : PaintProperty<float> {
+    static float defaultValue() { return 300; }
+};
+
+class RasterPaintProperties : public PaintProperties<
+    RasterOpacity,
+    RasterHueRotate,
+    RasterBrightnessMin,
+    RasterBrightnessMax,
+    RasterSaturation,
+    RasterContrast,
+    RasterFadeDuration
+> {};
 
 } // namespace style
 } // namespace mbgl

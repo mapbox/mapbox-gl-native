@@ -19,7 +19,7 @@ class Bucket;
 namespace style {
 
 class CascadeParameters;
-class CalculationParameters;
+class PropertyEvaluationParameters;
 class BucketParameters;
 
 /**
@@ -57,7 +57,7 @@ public:
 
     // Fully evaluate cascaded paint properties based on a zoom level.
     // Returns true if any paint properties have active transitions.
-    virtual bool recalculate(const CalculationParameters&) = 0;
+    virtual bool evaluate(const PropertyEvaluationParameters&) = 0;
 
     virtual std::unique_ptr<Bucket> createBucket(BucketParameters&) const = 0;
 

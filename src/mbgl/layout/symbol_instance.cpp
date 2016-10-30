@@ -7,7 +7,7 @@ using namespace style;
 
 SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
         const Shaping& shapedText, const PositionedIcon& shapedIcon,
-        const SymbolLayoutProperties& layout, const bool addToBuffers, const uint32_t index_,
+        const SymbolLayoutProperties::Evaluated& layout, const bool addToBuffers, const uint32_t index_,
         const float textBoxScale, const float textPadding, const SymbolPlacementType textPlacement,
         const float iconBoxScale, const float iconPadding, const SymbolPlacementType iconPlacement,
         const GlyphPositions& face, const IndexedSubfeature& indexedFeature) :

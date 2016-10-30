@@ -62,7 +62,7 @@ void CustomLayer::Impl::render(const TransformState& state) const {
     renderFn(context, parameters);
 }
 
-bool CustomLayer::Impl::recalculate(const CalculationParameters&) {
+bool CustomLayer::Impl::evaluate(const PropertyEvaluationParameters&) {
     passes = RenderPass::Translucent;
     return false;
 }

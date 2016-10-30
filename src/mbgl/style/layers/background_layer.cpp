@@ -42,13 +42,13 @@ PropertyValue<Color> BackgroundLayer::getDefaultBackgroundColor() {
 }
 
 PropertyValue<Color> BackgroundLayer::getBackgroundColor(const optional<std::string>& klass) const {
-    return impl->paint.backgroundColor.get(klass);
+    return impl->paint.get<BackgroundColor>(klass);
 }
 
 void BackgroundLayer::setBackgroundColor(PropertyValue<Color> value, const optional<std::string>& klass) {
     if (value == getBackgroundColor(klass))
         return;
-    impl->paint.backgroundColor.set(value, klass);
+    impl->paint.set<BackgroundColor>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
@@ -57,13 +57,13 @@ PropertyValue<std::string> BackgroundLayer::getDefaultBackgroundPattern() {
 }
 
 PropertyValue<std::string> BackgroundLayer::getBackgroundPattern(const optional<std::string>& klass) const {
-    return impl->paint.backgroundPattern.get(klass);
+    return impl->paint.get<BackgroundPattern>(klass);
 }
 
 void BackgroundLayer::setBackgroundPattern(PropertyValue<std::string> value, const optional<std::string>& klass) {
     if (value == getBackgroundPattern(klass))
         return;
-    impl->paint.backgroundPattern.set(value, klass);
+    impl->paint.set<BackgroundPattern>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
@@ -72,13 +72,13 @@ PropertyValue<float> BackgroundLayer::getDefaultBackgroundOpacity() {
 }
 
 PropertyValue<float> BackgroundLayer::getBackgroundOpacity(const optional<std::string>& klass) const {
-    return impl->paint.backgroundOpacity.get(klass);
+    return impl->paint.get<BackgroundOpacity>(klass);
 }
 
 void BackgroundLayer::setBackgroundOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getBackgroundOpacity(klass))
         return;
-    impl->paint.backgroundOpacity.set(value, klass);
+    impl->paint.set<BackgroundOpacity>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 

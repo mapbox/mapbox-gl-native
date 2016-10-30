@@ -18,7 +18,7 @@
 #include <mbgl/style/class_dictionary.hpp>
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/style/cascade_parameters.hpp>
-#include <mbgl/style/calculation_parameters.hpp>
+#include <mbgl/style/property_evaluation_parameters.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -266,7 +266,6 @@ void Style::cascade(const TimePoint& timePoint, MapMode mode) {
         classIDs.push_back(ClassDictionary::Get().lookup(className));
     }
     classIDs.push_back(ClassID::Default);
-    classIDs.push_back(ClassID::Fallback);
 
     const CascadeParameters parameters {
         classIDs,
@@ -288,7 +287,7 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
 
     zoomHistory.update(z, timePoint);
 
-    const CalculationParameters parameters {
+    const PropertyEvaluationParameters parameters {
         z,
         mode == MapMode::Continuous ? timePoint : Clock::time_point::max(),
         zoomHistory,
@@ -297,7 +296,7 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
 
     hasPendingTransitions = false;
     for (const auto& layer : layers) {
-        const bool hasTransitions = layer->baseImpl->recalculate(parameters);
+        const bool hasTransitions = layer->baseImpl->evaluate(parameters);
 
         // Disable this layer if it doesn't need to be rendered.
         const bool needsRendering = layer->baseImpl->needsRendering(zoomHistory.lastZoom);
@@ -374,10 +373,10 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
                 result.order.emplace_back(*layer);
                 continue;
             }
-            const BackgroundPaintProperties& paint = background->impl->paint;
-            if (layer.get() == layers[0].get() && paint.backgroundPattern.value.from.empty()) {
+            const BackgroundPaintProperties::Evaluated& paint = background->impl->paint.evaluated;
+            if (layer.get() == layers[0].get() && paint.get<BackgroundPattern>().from.empty()) {
                 // This is a solid background. We can use glClear().
-                result.backgroundColor = paint.backgroundColor * paint.backgroundOpacity;
+                result.backgroundColor = paint.get<BackgroundColor>() * paint.get<BackgroundOpacity>();
             } else {
                 // This is a textured background, or not the bottommost layer. We need to render it with a quad.
                 result.order.emplace_back(*layer);

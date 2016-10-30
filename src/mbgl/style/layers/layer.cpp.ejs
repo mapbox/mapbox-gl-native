@@ -78,17 +78,17 @@ const Filter& <%- camelize(type) %>Layer::getFilter() const {
 
 <% for (const property of layoutProperties) { -%>
 PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::getDefault<%- camelize(property.name) %>() {
-    return { <%- defaultValue(property) %> };
+    return <%- camelize(property.name) %>::defaultValue();
 }
 
 PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
-    return impl->layout.<%- camelizeWithLeadingLowercase(property.name) %>.get();
+    return impl->layout.unevaluated.get<<%- camelize(property.name) %>>();
 }
 
 void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>> value) {
     if (value == get<%- camelize(property.name) %>())
         return;
-    impl->layout.<%- camelizeWithLeadingLowercase(property.name) %>.set(value);
+    impl->layout.unevaluated.get<<%- camelize(property.name) %>>() = value;
     impl->observer->onLayerLayoutPropertyChanged(*this, "<%- property.name %>");
 }
 <% } -%>
@@ -100,13 +100,13 @@ PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::getDefa
 }
 
 PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>(const optional<std::string>& klass) const {
-    return impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.get(klass);
+    return impl->paint.get<<%- camelize(property.name) %>>(klass);
 }
 
 void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>> value, const optional<std::string>& klass) {
     if (value == get<%- camelize(property.name) %>(klass))
         return;
-    impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.set(value, klass);
+    impl->paint.set<<%- camelize(property.name) %>>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 <% } -%>

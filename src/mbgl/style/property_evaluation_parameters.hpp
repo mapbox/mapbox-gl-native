@@ -6,12 +6,12 @@
 namespace mbgl {
 namespace style {
 
-class CalculationParameters {
+class PropertyEvaluationParameters {
 public:
-    explicit CalculationParameters(float z_)
+    explicit PropertyEvaluationParameters(float z_)
         : z(z_) {}
 
-    CalculationParameters(float z_,
+    PropertyEvaluationParameters(float z_,
                           TimePoint now_,
                           ZoomHistory zoomHistory_,
                           Duration defaultFadeDuration_)

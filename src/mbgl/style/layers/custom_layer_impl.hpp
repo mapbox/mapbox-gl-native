@@ -29,7 +29,7 @@ private:
     std::unique_ptr<Layer> cloneRef(const std::string& id) const override;
 
     void cascade(const CascadeParameters&) final {}
-    bool recalculate(const CalculationParameters&) final;
+    bool evaluate(const PropertyEvaluationParameters&) final;
 
     std::unique_ptr<Bucket> createBucket(BucketParameters&) const final;
 

@@ -9,18 +9,23 @@
 namespace mbgl {
 namespace style {
 
-class CascadeParameters;
-class CalculationParameters;
-
-class BackgroundPaintProperties {
-public:
-    void cascade(const CascadeParameters&);
-    bool recalculate(const CalculationParameters&);
-
-    PaintProperty<Color> backgroundColor { Color::black() };
-    PaintProperty<std::string, CrossFadedPropertyEvaluator> backgroundPattern { "" };
-    PaintProperty<float> backgroundOpacity { 1 };
+struct BackgroundColor : PaintProperty<Color> {
+    static Color defaultValue() { return Color::black(); }
 };
+
+struct BackgroundPattern : CrossFadedPaintProperty<std::string> {
+    static std::string defaultValue() { return ""; }
+};
+
+struct BackgroundOpacity : PaintProperty<float> {
+    static float defaultValue() { return 1; }
+};
+
+class BackgroundPaintProperties : public PaintProperties<
+    BackgroundColor,
+    BackgroundPattern,
+    BackgroundOpacity
+> {};
 
 } // namespace style
 } // namespace mbgl

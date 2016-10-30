@@ -17,7 +17,7 @@ namespace mbgl {
 class SymbolBucket : public Bucket {
 public:
     SymbolBucket(const MapMode,
-                 style::SymbolLayoutProperties,
+                 style::SymbolLayoutProperties::Evaluated,
                  bool sdfIcons,
                  bool iconsNeedLinear);
 
@@ -29,7 +29,7 @@ public:
     bool hasCollisionBoxData() const;
 
     const MapMode mode;
-    const style::SymbolLayoutProperties layout;
+    const style::SymbolLayoutProperties::Evaluated layout;
     const bool sdfIcons;
     const bool iconsNeedLinear;
 

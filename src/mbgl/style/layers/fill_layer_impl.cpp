@@ -12,22 +12,22 @@ void FillLayer::Impl::cascade(const CascadeParameters& parameters) {
     paint.cascade(parameters);
 }
 
-bool FillLayer::Impl::recalculate(const CalculationParameters& parameters) {
-    bool hasTransitions = paint.recalculate(parameters);
+bool FillLayer::Impl::evaluate(const PropertyEvaluationParameters& parameters) {
+    paint.evaluate(parameters);
 
     passes = RenderPass::None;
 
-    if (paint.fillAntialias) {
+    if (paint.evaluated.get<FillAntialias>()) {
         passes |= RenderPass::Translucent;
     }
 
-    if (!paint.fillPattern.value.from.empty() || (paint.fillColor.value.a * paint.fillOpacity) < 1.0f) {
+    if (!paint.evaluated.get<FillPattern>().from.empty() || (paint.evaluated.get<FillColor>().a * paint.evaluated.get<FillOpacity>()) < 1.0f) {
         passes |= RenderPass::Translucent;
     } else {
         passes |= RenderPass::Opaque;
     }
 
-    return hasTransitions;
+    return paint.hasTransition();
 }
 
 std::unique_ptr<Bucket> FillLayer::Impl::createBucket(BucketParameters& parameters) const {
@@ -44,7 +44,7 @@ std::unique_ptr<Bucket> FillLayer::Impl::createBucket(BucketParameters& paramete
 }
 
 float FillLayer::Impl::getQueryRadius() const {
-    const std::array<float, 2>& translate = paint.fillTranslate;
+    const std::array<float, 2>& translate = paint.evaluated.get<FillTranslate>();
     return util::length(translate[0], translate[1]);
 }
 
@@ -55,7 +55,7 @@ bool FillLayer::Impl::queryIntersectsGeometry(
         const float pixelsToTileUnits) const {
 
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
-            queryGeometry, paint.fillTranslate, paint.fillTranslateAnchor, bearing, pixelsToTileUnits);
+            queryGeometry, paint.evaluated.get<FillTranslate>(), paint.evaluated.get<FillTranslateAnchor>(), bearing, pixelsToTileUnits);
 
     return util::polygonIntersectsMultiPolygon(translatedQueryGeometry.value_or(queryGeometry), geometry);
 }

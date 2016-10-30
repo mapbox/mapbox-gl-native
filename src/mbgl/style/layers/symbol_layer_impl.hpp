@@ -47,13 +47,13 @@ public:
     std::unique_ptr<Layer> cloneRef(const std::string& id) const override;
 
     void cascade(const CascadeParameters&) override;
-    bool recalculate(const CalculationParameters&) override;
+    bool evaluate(const PropertyEvaluationParameters&) override;
 
     std::unique_ptr<Bucket> createBucket(BucketParameters&) const override;
     std::unique_ptr<SymbolLayout> createLayout(BucketParameters&) const;
 
-    SymbolPropertyValues iconPropertyValues(const SymbolLayoutProperties&) const;
-    SymbolPropertyValues textPropertyValues(const SymbolLayoutProperties&) const;
+    SymbolPropertyValues iconPropertyValues(const SymbolLayoutProperties::Evaluated&) const;
+    SymbolPropertyValues textPropertyValues(const SymbolLayoutProperties::Evaluated&) const;
 
     SymbolLayoutProperties layout;
     SymbolPaintProperties paint;

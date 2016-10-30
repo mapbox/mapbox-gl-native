@@ -1,14 +1,14 @@
 #pragma once
 
 #include <mbgl/style/class_dictionary.hpp>
-#include <mbgl/style/property_parsing.hpp>
 #include <mbgl/style/property_evaluator.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/cascade_parameters.hpp>
-#include <mbgl/style/calculation_parameters.hpp>
+#include <mbgl/style/property_evaluation_parameters.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
-#include <mbgl/util/rapidjson.hpp>
+#include <mbgl/util/indexed_tuple.hpp>
+#include <mbgl/util/ignore.hpp>
 
 #include <unordered_map>
 #include <utility>
@@ -16,29 +16,59 @@
 namespace mbgl {
 namespace style {
 
-template <class T, template <class S> class Evaluator = PropertyEvaluator>
-class PaintProperty {
+template <class T, class Evaluator>
+class UnevaluatedPaintProperty {
 public:
-    using Result = typename Evaluator<T>::ResultType;
+    using Result = typename Evaluator::ResultType;
 
-    explicit PaintProperty(T defaultValue_)
-        : defaultValue(defaultValue_) {
-        values.emplace(ClassID::Fallback, defaultValue_);
+    UnevaluatedPaintProperty() = default;
+
+    UnevaluatedPaintProperty(PropertyValue<T> value_,
+                             UnevaluatedPaintProperty<T, Evaluator> prior_,
+                             TransitionOptions transition,
+                             TimePoint now)
+        : begin(now + transition.delay.value_or(Duration::zero())),
+          end(begin + transition.duration.value_or(Duration::zero())),
+          value(std::move(value_)) {
+        if (transition) {
+            prior = { std::move(prior_) };
+        }
     }
 
-    PaintProperty(const PaintProperty& other)
-        : defaultValue(other.defaultValue),
-          values(other.values),
-          transitions(other.transitions) {
+    Result evaluate(const PropertyEvaluationParameters& parameters, T defaultValue) {
+        Result finalValue = value.evaluate(Evaluator(parameters, defaultValue));
+        if (!prior) {
+            // No prior value.
+            return finalValue;
+        } else if (parameters.now >= end) {
+            // Transition from prior value is now complete.
+            prior = {};
+            return finalValue;
+        } else {
+            // Interpolate between recursively-calculated prior value and final.
+            float t = std::chrono::duration<float>(parameters.now - begin) / (end - begin);
+            return util::interpolate(prior->get().evaluate(parameters, defaultValue), finalValue, util::DEFAULT_TRANSITION_EASE.solve(t, 0.001));
+        }
     }
 
-    PaintProperty& operator=(const PaintProperty& other) {
-        defaultValue = other.defaultValue;
-        values = other.values;
-        transitions = other.transitions;
-        return *this;
+    bool hasTransition() const {
+        return bool(prior);
     }
 
+    bool isUndefined() const {
+        return value.isUndefined();
+    }
+
+private:
+    optional<mapbox::util::recursive_wrapper<UnevaluatedPaintProperty<T, Evaluator>>> prior;
+    TimePoint begin;
+    TimePoint end;
+    PropertyValue<T> value;
+};
+
+template <class T>
+class CascadingPaintProperty {
+public:
     bool isUndefined() const {
         return values.find(ClassID::Default) == values.end();
     }
@@ -57,82 +87,119 @@ public:
         transitions[klass ? ClassDictionary::Get().lookup(*klass) : ClassID::Default] = transition;
     }
 
-    void cascade(const CascadeParameters& params) {
-        const bool overrideTransition = !params.transition.delay && !params.transition.duration;
-        Duration delay = params.transition.delay.value_or(Duration::zero());
-        Duration duration = params.transition.duration.value_or(Duration::zero());
+    template <class UnevaluatedPaintProperty>
+    UnevaluatedPaintProperty cascade(const CascadeParameters& params, UnevaluatedPaintProperty prior) const {
+        TransitionOptions transition;
+        PropertyValue<T> value;
 
         for (const auto classID : params.classes) {
-            if (values.find(classID) == values.end())
-                continue;
-
-            if (overrideTransition && transitions.find(classID) != transitions.end()) {
-                const TransitionOptions& transition = transitions[classID];
-                if (transition.delay) delay = *transition.delay;
-                if (transition.duration) duration = *transition.duration;
+            if (values.find(classID) != values.end()) {
+                value = values.at(classID);
+                break;
             }
-
-            cascaded = std::make_unique<CascadedValue>(std::move(cascaded),
-                                                       params.now + delay,
-                                                       params.now + delay + duration,
-                                                       values.at(classID));
-
-            break;
         }
 
-        assert(cascaded);
-    }
+        for (const auto classID : params.classes) {
+            if (transitions.find(classID) != transitions.end()) {
+                transition = transitions.at(classID).reverseMerge(transition);
+                break;
+            }
+        }
 
-    bool calculate(const CalculationParameters& parameters) {
-        assert(cascaded);
-        Evaluator<T> evaluator(parameters, defaultValue);
-        value = cascaded->calculate(evaluator, parameters.now);
-        return cascaded->prior.operator bool();
+        return UnevaluatedPaintProperty(std::move(value),
+                                        std::move(prior),
+                                        transition.reverseMerge(params.transition),
+                                        params.now);
     }
-
-    // TODO: remove / privatize
-    operator T() const { return value; }
-    Result value;
 
 private:
-    T defaultValue;
     std::unordered_map<ClassID, PropertyValue<T>> values;
     std::unordered_map<ClassID, TransitionOptions> transitions;
+};
 
-    struct CascadedValue {
-        CascadedValue(std::unique_ptr<CascadedValue> prior_,
-                      TimePoint begin_,
-                      TimePoint end_,
-                      PropertyValue<T> value_)
-            : prior(std::move(prior_)),
-              begin(std::move(begin_)),
-              end(std::move(end_)),
-              value(std::move(value_)) {
-        }
+template <class T>
+class PaintProperty {
+public:
+    using ValueType = PropertyValue<T>;
+    using CascadingType = CascadingPaintProperty<T>;
+    using EvaluatorType = PropertyEvaluator<T>;
+    using UnevaluatedType = UnevaluatedPaintProperty<T, EvaluatorType>;
+    using EvaluatedType = T;
+};
 
-        Result calculate(const Evaluator<T>& evaluator, const TimePoint& now) {
-            Result finalValue = PropertyValue<T>::visit(value, evaluator);
-            if (!prior) {
-                // No prior value.
-                return finalValue;
-            } else if (now >= end) {
-                // Transition from prior value is now complete.
-                prior.reset();
-                return finalValue;
-            } else {
-                // Interpolate between recursively-calculated prior value and final.
-                float t = std::chrono::duration<float>(now - begin) / (end - begin);
-                return util::interpolate(prior->calculate(evaluator, now), finalValue, util::DEFAULT_TRANSITION_EASE.solve(t, 0.001));
-            }
-        }
+template <class T>
+class CrossFadedPaintProperty {
+public:
+    using ValueType = PropertyValue<T>;
+    using CascadingType = CascadingPaintProperty<T>;
+    using EvaluatorType = CrossFadedPropertyEvaluator<T>;
+    using UnevaluatedType = UnevaluatedPaintProperty<T, EvaluatorType>;
+    using EvaluatedType = Faded<T>;
+};
 
-        std::unique_ptr<CascadedValue> prior;
-        TimePoint begin;
-        TimePoint end;
-        PropertyValue<T> value;
+template <class... Ps>
+class PaintProperties {
+public:
+    using Properties = TypeList<Ps...>;
+    using EvaluatedTypes = TypeList<typename Ps::EvaluatedType...>;
+    using UnevaluatedTypes = TypeList<typename Ps::UnevaluatedType...>;
+    using CascadingTypes = TypeList<typename Ps::CascadingType...>;
+
+    template <class TypeList>
+    using Tuple = IndexedTuple<Properties, TypeList>;
+
+    class Evaluated : public Tuple<EvaluatedTypes> {
+    public:
+        using Tuple<EvaluatedTypes>::Tuple;
     };
 
-    std::unique_ptr<CascadedValue> cascaded;
+    class Unevaluated : public Tuple<UnevaluatedTypes> {
+    public:
+        using Tuple<UnevaluatedTypes>::Tuple;
+    };
+
+    class Cascading : public Tuple<CascadingTypes> {
+    public:
+        using Tuple<CascadingTypes>::Tuple;
+    };
+
+    template <class P>
+    auto get(const optional<std::string>& klass) const {
+        return cascading.template get<P>().get(klass);
+    }
+
+    template <class P>
+    void set(const typename P::ValueType& value, const optional<std::string>& klass) {
+        cascading.template get<P>().set(value, klass);
+    }
+
+    void cascade(const CascadeParameters& parameters) {
+        unevaluated = Unevaluated {
+            cascading.template get<Ps>().cascade(parameters,
+                std::move(unevaluated.template get<Ps>()))...
+        };
+    }
+
+    template <class P>
+    auto evaluate(const PropertyEvaluationParameters& parameters) {
+        return unevaluated.template get<P>().evaluate(parameters, P::defaultValue());
+    }
+
+    void evaluate(const PropertyEvaluationParameters& parameters) {
+        evaluated = Evaluated {
+            evaluate<Ps>(parameters)...
+        };
+    }
+
+    bool hasTransition() const {
+        bool result = false;
+        util::ignore({ result |= unevaluated.template get<Ps>().hasTransition()... });
+        return result;
+    }
+
+    Cascading cascading;
+    Unevaluated unevaluated;
+    Evaluated evaluated;
 };
 
 } // namespace style

@@ -33,9 +33,9 @@ public:
 
     explicit operator bool() const { return !isUndefined(); };
 
-    template <typename Visitor>
-    static auto visit(const PropertyValue<T>& value, Visitor&& visitor) {
-        return Value::visit(value.value, visitor);
+    template <typename Evaluator>
+    auto evaluate(const Evaluator& evaluator) const {
+        return Value::visit(value, evaluator);
     }
 };
 

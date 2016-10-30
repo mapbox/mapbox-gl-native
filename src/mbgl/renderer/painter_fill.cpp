@@ -17,17 +17,17 @@ void Painter::renderFill(PaintParameters& parameters,
                          FillBucket& bucket,
                          const FillLayer& layer,
                          const RenderTile& tile) {
-    const FillPaintProperties& properties = layer.impl->paint;
+    const FillPaintProperties::Evaluated& properties = layer.impl->paint.evaluated;
 
-    if (!properties.fillPattern.value.from.empty()) {
+    if (!properties.get<FillPattern>().from.empty()) {
         if (pass != RenderPass::Translucent) {
             return;
         }
 
         optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(
-            properties.fillPattern.value.from, SpritePatternMode::Repeating);
+            properties.get<FillPattern>().from, SpritePatternMode::Repeating);
         optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(
-            properties.fillPattern.value.to, SpritePatternMode::Repeating);
+            properties.get<FillPattern>().to, SpritePatternMode::Repeating);
 
         if (!imagePosA || !imagePosB) {
             return;
@@ -48,14 +48,14 @@ void Painter::renderFill(PaintParameters& parameters,
                 stencilModeForClipping(tile.clip),
                 colorModeForRenderPass(),
                 FillPatternUniforms::values(
-                    tile.translatedMatrix(properties.fillTranslate.value,
-                                          properties.fillTranslateAnchor.value,
+                    tile.translatedMatrix(properties.get<FillTranslate>(),
+                                          properties.get<FillTranslateAnchor>(),
                                           state),
-                    properties.fillOpacity.value,
+                    properties.get<FillOpacity>(),
                     context.viewport.getCurrentValue().size,
                     *imagePosA,
                     *imagePosB,
-                    properties.fillPattern.value,
+                    properties.get<FillPattern>(),
                     tile.id,
                     state
                 ),
@@ -72,7 +72,7 @@ void Painter::renderFill(PaintParameters& parameters,
              *bucket.triangleIndexBuffer,
              bucket.triangleSegments);
 
-        if (!properties.fillAntialias.value || !properties.fillOutlineColor.isUndefined()) {
+        if (!properties.get<FillAntialias>() || !layer.impl->paint.unevaluated.get<FillOutlineColor>().isUndefined()) {
             return;
         }
 
@@ -97,11 +97,11 @@ void Painter::renderFill(PaintParameters& parameters,
                 stencilModeForClipping(tile.clip),
                 colorModeForRenderPass(),
                 FillProgram::UniformValues {
-                    uniforms::u_matrix::Value{ tile.translatedMatrix(properties.fillTranslate.value,
-                                               properties.fillTranslateAnchor.value,
+                    uniforms::u_matrix::Value{ tile.translatedMatrix(properties.get<FillTranslate>(),
+                                               properties.get<FillTranslateAnchor>(),
                                                state) },
-                    uniforms::u_opacity::Value{ properties.fillOpacity.value },
-                    uniforms::u_color::Value{ properties.fillColor.value },
+                    uniforms::u_opacity::Value{ properties.get<FillOpacity>() },
+                    uniforms::u_color::Value{ properties.get<FillColor>() },
                     uniforms::u_outline_color::Value{ outlineColor },
                     uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
                 },
@@ -111,10 +111,10 @@ void Painter::renderFill(PaintParameters& parameters,
             );
         };
 
-        if (properties.fillAntialias.value && !properties.fillOutlineColor.isUndefined() && pass == RenderPass::Translucent) {
+        if (properties.get<FillAntialias>() && !layer.impl->paint.unevaluated.get<FillOutlineColor>().isUndefined() && pass == RenderPass::Translucent) {
             draw(2,
                  parameters.programs.fillOutline,
-                 properties.fillOutlineColor.value,
+                 properties.get<FillOutlineColor>(),
                  gl::Lines { 2.0f },
                  *bucket.vertexBuffer,
                  *bucket.lineIndexBuffer,
@@ -123,20 +123,20 @@ void Painter::renderFill(PaintParameters& parameters,
 
         // Only draw the fill when it's opaque and we're drawing opaque fragments,
         // or when it's translucent and we're drawing translucent fragments.
-        if ((properties.fillColor.value.a >= 1.0f && properties.fillOpacity.value >= 1.0f) == (pass == RenderPass::Opaque)) {
+        if ((properties.get<FillColor>().a >= 1.0f && properties.get<FillOpacity>() >= 1.0f) == (pass == RenderPass::Opaque)) {
             draw(1,
                  parameters.programs.fill,
-                 properties.fillOutlineColor.value,
+                 properties.get<FillOutlineColor>(),
                  gl::Triangles(),
                  *bucket.vertexBuffer,
                  *bucket.triangleIndexBuffer,
                  bucket.triangleSegments);
         }
 
-        if (properties.fillAntialias.value && properties.fillOutlineColor.isUndefined() && pass == RenderPass::Translucent) {
+        if (properties.get<FillAntialias>() && layer.impl->paint.unevaluated.get<FillOutlineColor>().isUndefined() && pass == RenderPass::Translucent) {
             draw(2,
                  parameters.programs.fillOutline,
-                 properties.fillColor.value,
+                 properties.get<FillColor>(),
                  gl::Lines { 2.0f },
                  *bucket.vertexBuffer,
                  *bucket.lineIndexBuffer,

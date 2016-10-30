@@ -30,7 +30,7 @@ TEST(Buckets, LineBucket) {
 
 TEST(Buckets, SymbolBucket) {
     mbgl::MapMode mapMode = mbgl::MapMode::Still;
-    mbgl::style::SymbolLayoutProperties properties;
+    mbgl::style::SymbolLayoutProperties::Evaluated properties;
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
 

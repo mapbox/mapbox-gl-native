@@ -5,21 +5,5 @@
 namespace mbgl {
 namespace style {
 
-void BackgroundPaintProperties::cascade(const CascadeParameters& parameters) {
-    backgroundColor.cascade(parameters);
-    backgroundPattern.cascade(parameters);
-    backgroundOpacity.cascade(parameters);
-}
-
-bool BackgroundPaintProperties::recalculate(const CalculationParameters& parameters) {
-    bool hasTransitions = false;
-
-    hasTransitions |= backgroundColor.calculate(parameters);
-    hasTransitions |= backgroundPattern.calculate(parameters);
-    hasTransitions |= backgroundOpacity.calculate(parameters);
-
-    return hasTransitions;
-}
-
 } // namespace style
 } // namespace mbgl

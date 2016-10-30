@@ -9,22 +9,43 @@
 namespace mbgl {
 namespace style {
 
-class CascadeParameters;
-class CalculationParameters;
-
-class CirclePaintProperties {
-public:
-    void cascade(const CascadeParameters&);
-    bool recalculate(const CalculationParameters&);
-
-    PaintProperty<float> circleRadius { 5 };
-    PaintProperty<Color> circleColor { Color::black() };
-    PaintProperty<float> circleBlur { 0 };
-    PaintProperty<float> circleOpacity { 1 };
-    PaintProperty<std::array<float, 2>> circleTranslate { {{ 0, 0 }} };
-    PaintProperty<TranslateAnchorType> circleTranslateAnchor { TranslateAnchorType::Map };
-    PaintProperty<CirclePitchScaleType> circlePitchScale { CirclePitchScaleType::Map };
+struct CircleRadius : PaintProperty<float> {
+    static float defaultValue() { return 5; }
 };
+
+struct CircleColor : PaintProperty<Color> {
+    static Color defaultValue() { return Color::black(); }
+};
+
+struct CircleBlur : PaintProperty<float> {
+    static float defaultValue() { return 0; }
+};
+
+struct CircleOpacity : PaintProperty<float> {
+    static float defaultValue() { return 1; }
+};
+
+struct CircleTranslate : PaintProperty<std::array<float, 2>> {
+    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+};
+
+struct CircleTranslateAnchor : PaintProperty<TranslateAnchorType> {
+    static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
+};
+
+struct CirclePitchScale : PaintProperty<CirclePitchScaleType> {
+    static CirclePitchScaleType defaultValue() { return CirclePitchScaleType::Map; }
+};
+
+class CirclePaintProperties : public PaintProperties<
+    CircleRadius,
+    CircleColor,
+    CircleBlur,
+    CircleOpacity,
+    CircleTranslate,
+    CircleTranslateAnchor,
+    CirclePitchScale
+> {};
 
 } // namespace style
 } // namespace mbgl

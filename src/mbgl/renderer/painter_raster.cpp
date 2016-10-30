@@ -48,7 +48,7 @@ void Painter::renderRaster(PaintParameters& parameters,
     if (!bucket.hasData())
         return;
 
-    const RasterPaintProperties& properties = layer.impl->paint;
+    const RasterPaintProperties::Evaluated& properties = layer.impl->paint.evaluated;
 
     assert(bucket.texture);
     context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
@@ -64,13 +64,13 @@ void Painter::renderRaster(PaintParameters& parameters,
             uniforms::u_matrix::Value{ tile.matrix },
             uniforms::u_image0::Value{ 0 },
             uniforms::u_image1::Value{ 1 },
-            uniforms::u_opacity0::Value{ properties.rasterOpacity.value },
+            uniforms::u_opacity0::Value{ properties.get<RasterOpacity>() },
             uniforms::u_opacity1::Value{ 0 },
-            uniforms::u_brightness_low::Value{ properties.rasterBrightnessMin.value },
-            uniforms::u_brightness_high::Value{ properties.rasterBrightnessMax.value },
-            uniforms::u_saturation_factor::Value{ saturationFactor(properties.rasterSaturation.value) },
-            uniforms::u_contrast_factor::Value{ contrastFactor(properties.rasterContrast.value) },
-            uniforms::u_spin_weights::Value{ spinWeights(properties.rasterHueRotate.value) },
+            uniforms::u_brightness_low::Value{ properties.get<RasterBrightnessMin>() },
+            uniforms::u_brightness_high::Value{ properties.get<RasterBrightnessMax>() },
+            uniforms::u_saturation_factor::Value{ saturationFactor(properties.get<RasterSaturation>()) },
+            uniforms::u_contrast_factor::Value{ contrastFactor(properties.get<RasterContrast>()) },
+            uniforms::u_spin_weights::Value{ spinWeights(properties.get<RasterHueRotate>()) },
             uniforms::u_buffer_scale::Value{ 1.0f },
             uniforms::u_scale_parent::Value{ 1.0f },
             uniforms::u_tl_parent::Value{ std::array<float, 2> {{ 0.0f, 0.0f }} },

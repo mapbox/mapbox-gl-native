@@ -10,29 +10,5 @@
 namespace mbgl {
 namespace style {
 
-<% if (layoutProperties.length) { -%>
-void <%- camelize(type) %>LayoutProperties::recalculate(const CalculationParameters& parameters) {
-<% for (const property of layoutProperties) { -%>
-    <%- camelizeWithLeadingLowercase(property.name) %>.calculate(parameters);
-<% } -%>
-}
-
-<% } -%>
-void <%- camelize(type) %>PaintProperties::cascade(const CascadeParameters& parameters) {
-<% for (const property of paintProperties) { -%>
-    <%- camelizeWithLeadingLowercase(property.name) %>.cascade(parameters);
-<% } -%>
-}
-
-bool <%- camelize(type) %>PaintProperties::recalculate(const CalculationParameters& parameters) {
-    bool hasTransitions = false;
-
-<% for (const property of paintProperties) { -%>
-    hasTransitions |= <%- camelizeWithLeadingLowercase(property.name) %>.calculate(parameters);
-<% } -%>
-
-    return hasTransitions;
-}
-
 } // namespace style
 } // namespace mbgl

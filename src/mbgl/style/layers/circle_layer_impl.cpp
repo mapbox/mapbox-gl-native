@@ -12,13 +12,13 @@ void CircleLayer::Impl::cascade(const CascadeParameters& parameters) {
     paint.cascade(parameters);
 }
 
-bool CircleLayer::Impl::recalculate(const CalculationParameters& parameters) {
-    bool hasTransitions = paint.recalculate(parameters);
+bool CircleLayer::Impl::evaluate(const PropertyEvaluationParameters& parameters) {
+    paint.evaluate(parameters);
 
-    passes = (paint.circleRadius > 0 && paint.circleColor.value.a > 0 && paint.circleOpacity > 0)
+    passes = (paint.evaluated.get<CircleRadius>() > 0 && paint.evaluated.get<CircleColor>().a > 0 && paint.evaluated.get<CircleOpacity>() > 0)
         ? RenderPass::Translucent : RenderPass::None;
 
-    return hasTransitions;
+    return paint.hasTransition();
 }
 
 std::unique_ptr<Bucket> CircleLayer::Impl::createBucket(BucketParameters& parameters) const {
@@ -35,8 +35,8 @@ std::unique_ptr<Bucket> CircleLayer::Impl::createBucket(BucketParameters& parame
 }
 
 float CircleLayer::Impl::getQueryRadius() const {
-    const std::array<float, 2>& translate = paint.circleTranslate;
-    return paint.circleRadius + util::length(translate[0], translate[1]);
+    const std::array<float, 2>& translate = paint.evaluated.get<CircleTranslate>();
+    return paint.evaluated.get<CircleRadius>() + util::length(translate[0], translate[1]);
 }
 
 bool CircleLayer::Impl::queryIntersectsGeometry(
@@ -46,9 +46,9 @@ bool CircleLayer::Impl::queryIntersectsGeometry(
         const float pixelsToTileUnits) const {
 
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
-            queryGeometry, paint.circleTranslate, paint.circleTranslateAnchor, bearing, pixelsToTileUnits);
+            queryGeometry, paint.evaluated.get<CircleTranslate>(), paint.evaluated.get<CircleTranslateAnchor>(), bearing, pixelsToTileUnits);
 
-    auto circleRadius = paint.circleRadius * pixelsToTileUnits;
+    auto circleRadius = paint.evaluated.get<CircleRadius>() * pixelsToTileUnits;
 
     return util::polygonIntersectsBufferedMultiPoint(
             translatedQueryGeometry.value_or(queryGeometry), geometry, circleRadius);

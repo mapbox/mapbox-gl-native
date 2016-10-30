@@ -14,33 +14,35 @@
 namespace mbgl {
 namespace style {
 
-class CascadeParameters;
-class CalculationParameters;
-
-<% if (layoutProperties.length) { -%>
-class <%- camelize(type) %>LayoutProperties {
-public:
-    void recalculate(const CalculationParameters&);
-
 <% for (const property of layoutProperties) { -%>
-    LayoutProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { <%- defaultValue(property) %> };
-<% } -%>
+struct <%- camelize(property.name) %> : LayoutProperty<<%- propertyType(property) %>> {
+    static <%- propertyType(property) %> defaultValue() { return <%- defaultValue(property) %>; }
 };
 
 <% } -%>
-class <%- camelize(type) %>PaintProperties {
-public:
-    void cascade(const CascadeParameters&);
-    bool recalculate(const CalculationParameters&);
-
 <% for (const property of paintProperties) { -%>
-<% if (/-pattern$/.test(property.name) || property.name === 'line-dasharray') { -%>
-    PaintProperty<<%- propertyType(property) %>, CrossFadedPropertyEvaluator> <%- camelizeWithLeadingLowercase(property.name) %> { <%- defaultValue(property) %> };
-<% } else { -%>
-    PaintProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { <%- defaultValue(property) %> };
-<% } -%>
-<% } -%>
+struct <%- camelize(property.name) %> : <%
+if (/-pattern$/.test(property.name) || property.name === 'line-dasharray') {
+%>CrossFaded<% } -%>PaintProperty<<%- propertyType(property) %>> {
+    static <%- propertyType(property) %> defaultValue() { return <%- defaultValue(property) %>; }
 };
+
+<% } -%>
+<% if (layoutProperties.length) { -%>
+class <%- camelize(type) %>LayoutProperties : public LayoutProperties<
+<% for (const property of layoutProperties.slice(0, -1)) { -%>
+    <%- camelize(property.name) %>,
+<% } -%>
+    <%- camelize(layoutProperties.slice(-1)[0].name) %>
+> {};
+
+<% } -%>
+class <%- camelize(type) %>PaintProperties : public PaintProperties<
+<% for (const property of paintProperties.slice(0, -1)) { -%>
+    <%- camelize(property.name) %>,
+<% } -%>
+    <%- camelize(paintProperties.slice(-1)[0].name) %>
+> {};
 
 } // namespace style
 } // namespace mbgl

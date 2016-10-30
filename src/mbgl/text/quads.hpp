@@ -2,6 +2,7 @@
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <vector>
@@ -10,10 +11,6 @@ namespace mbgl {
 
 struct Anchor;
 class PositionedIcon;
-
-namespace style {
-class SymbolLayoutProperties;
-} // namespace style
 
 struct SymbolQuad {
     explicit SymbolQuad(Point<float> tl_, Point<float> tr_, Point<float> bl_, Point<float> br_,
@@ -40,11 +37,11 @@ struct SymbolQuad {
 typedef std::vector<SymbolQuad> SymbolQuads;
 
 SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
-        const GeometryCoordinates& line, const style::SymbolLayoutProperties&,
+        const GeometryCoordinates& line, const style::SymbolLayoutProperties::Evaluated&,
         style::SymbolPlacementType placement, const Shaping& shapedText);
 
 SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
-        const float boxScale, const GeometryCoordinates& line, const style::SymbolLayoutProperties&,
+        const float boxScale, const GeometryCoordinates& line, const style::SymbolLayoutProperties::Evaluated&,
         style::SymbolPlacementType placement, const GlyphPositions& face);
 
 } // namespace mbgl

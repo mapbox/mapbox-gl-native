@@ -6,9 +6,21 @@
 namespace mbgl {
 namespace style {
 
-struct TransitionOptions {
+class TransitionOptions {
+public:
     optional<Duration> duration = {};
     optional<Duration> delay = {};
+
+    TransitionOptions reverseMerge(const TransitionOptions& defaults) const {
+        return {
+            duration ? duration : defaults.duration,
+            delay ? delay : defaults.delay
+        };
+    }
+
+    explicit operator bool() const {
+        return duration || delay;
+    }
 };
 
 } // namespace style

@@ -43,8 +43,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
         // tile edges the icons are included in both tiles and clipped when drawing.
         //
         // TODO remove the `true ||` when #1673 is implemented
-        const bool drawAcrossEdges = (frame.mapMode == MapMode::Continuous) && (true || !(layout.textAllowOverlap || layout.iconAllowOverlap ||
-              layout.textIgnorePlacement || layout.iconIgnorePlacement));
+        const bool drawAcrossEdges = (frame.mapMode == MapMode::Continuous) && (true || !(layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
+              layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>()));
 
         program.draw(
             context,

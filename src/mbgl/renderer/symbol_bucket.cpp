@@ -7,7 +7,7 @@ namespace mbgl {
 using namespace style;
 
 SymbolBucket::SymbolBucket(const MapMode mode_,
-                           style::SymbolLayoutProperties layout_,
+                           style::SymbolLayoutProperties::Evaluated layout_,
                            bool sdfIcons_,
                            bool iconsNeedLinear_)
     : mode(mode_),

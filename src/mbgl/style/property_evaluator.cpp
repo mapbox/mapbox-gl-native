@@ -1,5 +1,5 @@
 #include <mbgl/style/property_evaluator.hpp>
-#include <mbgl/style/calculation_parameters.hpp>
+#include <mbgl/style/property_evaluation_parameters.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/chrono.hpp>

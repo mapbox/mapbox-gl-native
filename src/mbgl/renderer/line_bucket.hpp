@@ -24,7 +24,7 @@ public:
     void addGeometry(const GeometryCollection&);
     void addGeometry(const GeometryCoordinates& line);
 
-    style::LineLayoutProperties layout;
+    style::LineLayoutProperties::Evaluated layout;
 
     gl::VertexVector<LineVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;
