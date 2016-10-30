@@ -103,6 +103,29 @@ TEST(Transform, InvalidBearing) {
     ASSERT_DOUBLE_EQ(2, transform.getAngle());
 }
 
+TEST(Transform, IntegerZoom) {
+    Transform transform;
+
+    auto checkIntegerZoom = [&transform](uint8_t zoomInt, double zoom) {
+        double scale = transform.getState().zoomScale(zoom);
+        transform.setScale(scale);
+        ASSERT_DOUBLE_EQ(transform.getScale(), scale);
+        ASSERT_NEAR(transform.getZoom(), zoom, 0.0001);
+        ASSERT_EQ(transform.getState().getIntegerZoom(), zoomInt);
+        ASSERT_NEAR(transform.getState().getZoomFraction(), zoom - zoomInt, 0.0001);
+    };
+
+    for (uint8_t zoomInt = 0; zoomInt < 20; ++zoomInt) {
+        for (uint32_t percent = 0; percent < 100; ++percent) {
+            double zoom = zoomInt + (0.01 * percent);
+            checkIntegerZoom(zoomInt, zoom);
+        }
+    }
+
+    // Special case zoom 20.
+    checkIntegerZoom(20, 20.0);
+}
+
 TEST(Transform, PerspectiveProjection) {
     LatLng loc;
 
