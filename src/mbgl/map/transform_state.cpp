@@ -121,7 +121,7 @@ double TransformState::getZoom() const {
 }
 
 int32_t TransformState::getIntegerZoom() const {
-    return std::floor(getZoom());
+    return getZoom();
 }
 
 double TransformState::getZoomFraction() const {
