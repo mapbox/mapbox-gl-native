@@ -2,6 +2,14 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 4.2.0-beta.4 - October 25, 2016
+
+Mapbox Android 4.2.0-beta.4 contains all 4.2.0-beta.3 changes and adds:
+
+* Query rendered features by source [#6516](https://github.com/mapbox/mapbox-gl-native/issues/6516)
+* Decreased logging for release builds [#6787](https://github.com/mapbox/mapbox-gl-native/pull/6787)
+* setConnected method to manually set a connected flag [#6618](https://github.com/mapbox/mapbox-gl-native/pull/6618)
+
 ## 4.2.0-beta.3 - September 21, 2016
 
 Mapbox Android 4.2.0-beta.3 contains all 4.2.0-beta.2 changes and adds:
