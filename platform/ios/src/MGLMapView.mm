@@ -3087,6 +3087,12 @@ public:
     return annotationView;
 }
 
+- (nullable MGLAnnotationView *)viewForAnnotation:(id<MGLAnnotation>)annotation
+{
+    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotation.at(annotation);
+    return annotationContext.annotationView;
+}
+
 - (double)alphaForShapeAnnotation:(MGLShape *)annotation
 {
     // The explicit -mapView:alphaForShapeAnnotation: delegate method is deprecated
