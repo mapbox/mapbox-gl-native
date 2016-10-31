@@ -192,7 +192,6 @@ public:
     MGLAnnotationAccessibilityElement *accessibilityElement;
     MGLAnnotationView *annotationView;
     NSString *viewReuseIdentifier;
-    MGLAnnotationTag annotationTag;
 };
 
 /** An accessibility element representing the MGLMapView at large. */
@@ -2915,7 +2914,6 @@ public:
             MGLAnnotationTag annotationTag = _mbglMap->addAnnotation([multiPoint annotationObjectWithDelegate:self]);
             MGLAnnotationContext context;
             context.annotation = annotation;
-            context.annotationTag = annotationTag;
             _annotationContextsByAnnotationTag[annotationTag] = context;
 
             [(NSObject *)annotation addObserver:self forKeyPath:@"coordinates" options:0 context:(void *)(NSUInteger)annotationTag];
@@ -2989,7 +2987,6 @@ public:
             context.annotation = annotation;
             MGLAnnotationImage *annotationImage = annotationImagesForAnnotation[annotationValue];
             context.imageReuseIdentifier = annotationImage.reuseIdentifier;
-            context.annotationTag = annotationTag;
 
             if (annotationView) {
                 context.annotationView = annotationView;
