@@ -311,6 +311,11 @@ public:
              static_cast<uint32_t>(self.bounds.size.height) };
 }
 
+- (mbgl::Size)framebufferSize {
+    NSRect bounds = [self convertRectToBacking:self.bounds];
+    return { static_cast<uint32_t>(bounds.size.width), static_cast<uint32_t>(bounds.size.height) };
+}
+
 /// Adds zoom controls to the lower-right corner.
 - (void)installZoomControls {
     _zoomControls = [[NSSegmentedControl alloc] initWithFrame:NSZeroRect];
@@ -2563,13 +2568,14 @@ public:
     }
 
     mbgl::gl::value::Viewport::Type getViewport() const {
-        return { 0, 0, nativeView.size };
+        return { 0, 0, nativeView.framebufferSize };
     }
 
     void updateViewBinding() {
         fbo = mbgl::gl::value::BindFramebuffer::Get();
         getContext().bindFramebuffer.setCurrentValue(fbo);
         getContext().viewport.setCurrentValue(getViewport());
+        assert(mbgl::gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
     }
 
     void bind() override {
@@ -2578,17 +2584,14 @@ public:
     }
 
     mbgl::PremultipliedImage readStillImage() {
-        NSRect bounds = [nativeView convertRectToBacking:nativeView.bounds];
-        const uint32_t width = bounds.size.width;
-        const uint32_t height = bounds.size.height;
-        mbgl::PremultipliedImage image({ width, height });
-        MBGL_CHECK_ERROR(
-            glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
+        mbgl::PremultipliedImage image(nativeView.framebufferSize);
+        MBGL_CHECK_ERROR(glReadPixels(0, 0, image.size.width, image.size.height, GL_RGBA,
+                                      GL_UNSIGNED_BYTE, image.data.get()));
 
         const size_t stride = image.stride();
         auto tmp = std::make_unique<uint8_t[]>(stride);
         uint8_t *rgba = image.data.get();
-        for (int i = 0, j = height - 1; i < j; i++, j--) {
+        for (int i = 0, j = image.size.height - 1; i < j; i++, j--) {
             std::memcpy(tmp.get(), rgba + i * stride, stride);
             std::memcpy(rgba + i * stride, rgba + j * stride, stride);
             std::memcpy(rgba + j * stride, tmp.get(), stride);

@@ -183,6 +183,10 @@ constexpr bool operator!=(const Viewport::Type& a, const Viewport::Type& b) {
     return a.x != b.x || a.y != b.y || a.size != b.size;
 }
 
+constexpr bool operator==(const Viewport::Type& a, const Viewport::Type& b) {
+    return !(a != b);
+}
+
 struct BindFramebuffer {
     using Type = FramebufferID;
     static const constexpr Type Default = 0;

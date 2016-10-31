@@ -132,7 +132,9 @@ void GLFWView::setMap(mbgl::Map *map_) {
 
 void GLFWView::updateViewBinding() {
     getContext().bindFramebuffer.setCurrentValue(0);
+    assert(mbgl::gl::value::BindFramebuffer::Get() == getContext().bindFramebuffer.getCurrentValue());
     getContext().viewport.setCurrentValue({ 0, 0, getFramebufferSize() });
+    assert(mbgl::gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
 }
 
 void GLFWView::bind() {
