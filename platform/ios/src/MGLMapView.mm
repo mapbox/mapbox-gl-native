@@ -191,6 +191,7 @@ public:
     MGLAnnotationAccessibilityElement *accessibilityElement;
     MGLAnnotationView *annotationView;
     NSString *viewReuseIdentifier;
+    MGLAnnotationTag annotationTag;
 };
 
 /** An accessibility element representing the MGLMapView at large. */
@@ -2913,6 +2914,7 @@ public:
             MGLAnnotationTag annotationTag = _mbglMap->addAnnotation([multiPoint annotationObjectWithDelegate:self]);
             MGLAnnotationContext context;
             context.annotation = annotation;
+            context.annotationTag = annotationTag;
             _annotationContextsByAnnotationTag[annotationTag] = context;
 
             [(NSObject *)annotation addObserver:self forKeyPath:@"coordinates" options:0 context:(void *)(NSUInteger)annotationTag];
@@ -2986,6 +2988,7 @@ public:
             context.annotation = annotation;
             MGLAnnotationImage *annotationImage = annotationImagesForAnnotation[annotationValue];
             context.imageReuseIdentifier = annotationImage.reuseIdentifier;
+            context.annotationTag = annotationTag;
 
             if (annotationView) {
                 context.annotationView = annotationView;
@@ -4661,8 +4664,11 @@ public:
         {
             continue;
         }
-        
+
+        // Get the context using the "by annotation" map. This avoids the expensive lookup
+        // by tag.
         MGLAnnotationContext &annotationContext = _annotationContextsByAnnotation.at(annotation);
+
         MGLAnnotationView *annotationView = annotationContext.annotationView;
         if (!annotationView)
         {
@@ -4673,7 +4679,12 @@ public:
             {
                 annotationView.mapView = self;
                 annotationContext.annotationView = annotationView;
-                
+
+                // In other methods, the context is looked up by tag. This updates the pointer in the
+                // "by tag" map so that it has the latest information regarding which annotation view
+                // is associated with the context
+                _annotationContextsByAnnotationTag[annotationContext.annotationTag] = annotationContext;
+
                 // New annotation (created because there is nothing to dequeue) may not have been added to the
                 // container view yet. Add them here.
                 if (!annotationView.superview) {
@@ -4681,6 +4692,7 @@ public:
                 }
             }
         }
+
         if (annotationView)
         {
             annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
