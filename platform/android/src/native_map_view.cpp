@@ -116,17 +116,20 @@ NativeMapView::~NativeMapView() {
     vm = nullptr;
 }
 
+mbgl::Size NativeMapView::getFramebufferSize() const {
+    return { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) };
+}
+
 void NativeMapView::updateViewBinding() {
     getContext().bindFramebuffer.setCurrentValue(0);
-    getContext().viewport.setCurrentValue(
-        { 0, 0, { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) } });
+    assert(mbgl::gl::value::BindFramebuffer::Get() == getContext().bindFramebuffer.getCurrentValue());
+    getContext().viewport.setCurrentValue({ 0, 0, getFramebufferSize() });
+    assert(mbgl::gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
 }
 
 void NativeMapView::bind() {
     getContext().bindFramebuffer = 0;
-    getContext().viewport = { 0,
-                              0,
-                              { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) } };
+    getContext().viewport = { 0, 0, getFramebufferSize() };
 }
 
 void NativeMapView::activate() {
