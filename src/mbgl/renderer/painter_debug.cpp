@@ -71,6 +71,10 @@ void Painter::renderClipMasks(PaintParameters&) {
     context.pixelZoom = { 1, 1 };
     context.rasterPos = { -1, -1, 0, 0 };
 
+    // When reading data from the framebuffer, make sure that we are storing the depth values
+    // tightly packed into the buffer to avoid buffer overruns. Also see unpacking adjustment below.
+    MBGL_CHECK_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
+
     // Read the stencil buffer
     const auto viewport = context.viewport.getCurrentValue();
     auto pixels = std::make_unique<uint8_t[]>(viewport.size.width * viewport.size.height);
@@ -92,6 +96,7 @@ void Painter::renderClipMasks(PaintParameters&) {
         *it *= factor;
     }
 
+    MBGL_CHECK_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
     MBGL_CHECK_ERROR(glWindowPos2i(viewport.x, viewport.y));
     MBGL_CHECK_ERROR(glDrawPixels(viewport.size.width, viewport.size.height, GL_LUMINANCE,
                                   GL_UNSIGNED_BYTE, pixels.get()));
@@ -108,13 +113,19 @@ void Painter::renderDepthBuffer(PaintParameters&) {
     context.pixelZoom = { 1, 1 };
     context.rasterPos = { -1, -1, 0, 0 };
 
-    // Read the stencil buffer
-    const auto viewport = context.viewport.getCurrentValue();
-    auto pixels = std::make_unique<uint8_t[]>(viewport.size.width * viewport.size.height);
+    // When reading data from the framebuffer, make sure that we are storing the depth values
+    // tightly packed into the buffer to avoid buffer overruns. Also see unpacking adjustment below.
+    MBGL_CHECK_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
 
+    // Scales the values in the depth buffer so that they cover the entire grayscale range. This
+    // makes it easier to spot tiny differences.
     const double base = 1.0 / (1.0 - depthRangeSize);
-    glPixelTransferf(GL_DEPTH_SCALE, base);
-    glPixelTransferf(GL_DEPTH_BIAS, 1.0 - base);
+    MBGL_CHECK_ERROR(glPixelTransferf(GL_DEPTH_SCALE, base));
+    MBGL_CHECK_ERROR(glPixelTransferf(GL_DEPTH_BIAS, 1.0 - base));
+
+    // Read the stencil buffer
+    auto viewport = context.viewport.getCurrentValue();
+    auto pixels = std::make_unique<uint8_t[]>(viewport.size.width * viewport.size.height);
 
     MBGL_CHECK_ERROR(glReadPixels(
                 viewport.x,           // GLint x
@@ -126,6 +137,7 @@ void Painter::renderDepthBuffer(PaintParameters&) {
                 pixels.get()          // GLvoid * data
                 ));
 
+    MBGL_CHECK_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
     MBGL_CHECK_ERROR(glWindowPos2i(viewport.x, viewport.y));
     MBGL_CHECK_ERROR(glDrawPixels(viewport.size.width, viewport.size.height, GL_LUMINANCE,
                                   GL_UNSIGNED_BYTE, pixels.get()));
