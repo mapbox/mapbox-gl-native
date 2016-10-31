@@ -108,7 +108,7 @@ enum { MGLAnnotationTagNotFound = UINT32_MAX };
 
 /// Mapping from an annotation tag to metadata about that annotation, including
 /// the annotation itself.
-typedef std::unordered_map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationContextMap;
+typedef std::unordered_map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationTagContextMap;
 
 /// Returns an NSImage for the default marker image.
 NSImage *MGLDefaultMarkerImage() {
@@ -171,7 +171,7 @@ public:
     CGFloat _pitchAtBeginningOfGesture;
     BOOL _didHideCursorDuringGesture;
 
-    MGLAnnotationContextMap _annotationContextsByAnnotationTag;
+    MGLAnnotationTagContextMap _annotationContextsByAnnotationTag;
     MGLAnnotationTag _selectedAnnotationTag;
     MGLAnnotationTag _lastSelectedAnnotationTag;
     /// Size of the rectangle formed by unioning the maximum slop area around every annotation image.

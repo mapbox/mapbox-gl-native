@@ -129,9 +129,10 @@ enum { MGLAnnotationTagNotFound = UINT32_MAX };
 
 /// Mapping from an annotation tag to metadata about that annotation, including
 /// the annotation itself.
-typedef std::map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationTagContextMap;
+typedef std::unordered_map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationTagContextMap;
 
-typedef std::map<id<MGLAnnotation>, MGLAnnotationContext> MGLAnnotationObjectContextMap;
+/// Mapping from an annotation object to an annotation tag.
+typedef std::map<id<MGLAnnotation>, MGLAnnotationTag> MGLAnnotationObjectTagMap;
 
 /// Initializes the run loop shim that lives on the main thread.
 void MGLinitializeRunLoop() {
@@ -272,7 +273,7 @@ public:
     NS_MUTABLE_ARRAY_OF(NSURL *) *_bundledStyleURLs;
 
     MGLAnnotationTagContextMap _annotationContextsByAnnotationTag;
-    MGLAnnotationObjectContextMap _annotationContextsByAnnotation;
+    MGLAnnotationObjectTagMap _annotationTagsByAnnotation;
     
     /// Tag of the selected annotation. If the user location annotation is selected, this ivar is set to `MGLAnnotationTagNotFound`.
     MGLAnnotationTag _selectedAnnotationTag;
@@ -433,7 +434,7 @@ public:
     // Set up annotation management and selection state.
     _annotationImagesByIdentifier = [NSMutableDictionary dictionary];
     _annotationContextsByAnnotationTag = {};
-    _annotationContextsByAnnotation = {};
+    _annotationTagsByAnnotation = {};
     _annotationViewReuseQueueByIdentifier = [NSMutableDictionary dictionary];
     _selectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastTap = {};
@@ -2995,7 +2996,7 @@ public:
                 context.viewReuseIdentifier = annotationView.reuseIdentifier;
             }
 
-            _annotationContextsByAnnotation[annotation] = context;
+            _annotationTagsByAnnotation[annotation] = annotationTag;
             _annotationContextsByAnnotationTag[annotationTag] = context;
 
             if ([annotation isKindOfClass:[NSObject class]]) {
@@ -3092,7 +3093,8 @@ public:
 
 - (nullable MGLAnnotationView *)viewForAnnotation:(id<MGLAnnotation>)annotation
 {
-    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotation.at(annotation);
+    MGLAnnotationTag annotationTag = _annotationTagsByAnnotation.at(annotation);
+    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
     return annotationContext.annotationView;
 }
 
@@ -3211,7 +3213,7 @@ public:
         }
 
         _annotationContextsByAnnotationTag.erase(annotationTag);
-        _annotationContextsByAnnotation.erase(annotation);
+        _annotationTagsByAnnotation.erase(annotation);
 
         if ([annotation isKindOfClass:[NSObject class]] && ![annotation isKindOfClass:[MGLMultiPoint class]])
         {
@@ -4665,9 +4667,10 @@ public:
             continue;
         }
 
-        // Get the context using the "by annotation" map. This avoids the expensive lookup
-        // by tag.
-        MGLAnnotationContext &annotationContext = _annotationContextsByAnnotation.at(annotation);
+        // Get the annotation tag then use it to get the context. This avoids the expensive lookup
+        // by tag in `annotationTagForAnnotation:`
+        MGLAnnotationTag annotationTag = _annotationTagsByAnnotation.at(annotation);
+        MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
 
         MGLAnnotationView *annotationView = annotationContext.annotationView;
         if (!annotationView)
@@ -4679,11 +4682,6 @@ public:
             {
                 annotationView.mapView = self;
                 annotationContext.annotationView = annotationView;
-
-                // In other methods, the context is looked up by tag. This updates the pointer in the
-                // "by tag" map so that it has the latest information regarding which annotation view
-                // is associated with the context
-                _annotationContextsByAnnotationTag[annotationContext.annotationTag] = annotationContext;
 
                 // New annotation (created because there is nothing to dequeue) may not have been added to the
                 // container view yet. Add them here.
@@ -4710,7 +4708,8 @@ public:
     for (id<MGLAnnotation> annotation in offscreenAnnotations)
     {
         CLLocationCoordinate2D coordinate = annotation.coordinate;
-        MGLAnnotationContext &annotationContext = _annotationContextsByAnnotation.at(annotation);
+        MGLAnnotationTag annotationTag = _annotationTagsByAnnotation.at(annotation);
+        MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
         UIView *annotationView = annotationContext.annotationView;
         
         if (annotationView)
