@@ -109,6 +109,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 @property (nonatomic) NSInteger styleIndex;
 @property (nonatomic) BOOL debugLoggingEnabled;
 @property (nonatomic) BOOL customUserLocationAnnnotationEnabled;
+@property (nonatomic) BOOL usingLocaleBasedCountryLabels;
 @property (nonatomic) BOOL reuseQueueStatsEnabled;
 
 @end
