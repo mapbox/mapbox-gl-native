@@ -167,6 +167,7 @@ public class SupportMapFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        map.onStart();
         map.getMapAsync(onMapReadyCallback);
     }
 
@@ -205,6 +206,7 @@ public class SupportMapFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+        map.onStop();
     }
 
     /**

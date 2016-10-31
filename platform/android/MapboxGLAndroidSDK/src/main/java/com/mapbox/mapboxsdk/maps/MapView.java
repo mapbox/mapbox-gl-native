@@ -160,6 +160,9 @@ public class MapView extends FrameLayout {
     private List<OnMapReadyCallback> onMapReadyCallbackList;
     private SnapshotRequest snapshotRequest;
 
+    private boolean onStartCalled;
+    private boolean onStopCalled;
+
     @UiThread
     public MapView(@NonNull Context context) {
         super(context);
@@ -573,43 +576,18 @@ public class MapView extends FrameLayout {
     }
 
     /**
-     * You must call this method from the parent's {@link Activity#onDestroy()} or {@link Fragment#onDestroy()}.
+     * You must call this method from the parent's {@link Activity#onStart()} or {@link Fragment#onStart()}
      */
     @UiThread
-    public void onDestroy() {
-        destroyed = true;
-        nativeMapView.terminateContext();
-        nativeMapView.terminateDisplay();
-        nativeMapView.destroySurface();
-        nativeMapView.destroy();
-        nativeMapView = null;
-    }
+    public void onStart() {
+        onStartCalled = true;
 
-    /**
-     * You must call this method from the parent's {@link Activity#onPause()} or {@link Fragment#onPause()}.
-     */
-    @UiThread
-    public void onPause() {
-        // Unregister for connectivity changes
-        if (connectivityReceiver != null) {
-            getContext().unregisterReceiver(connectivityReceiver);
-            connectivityReceiver = null;
-        }
-
-        myLocationView.onPause();
-    }
-
-    /**
-     * You must call this method from the parent's {@link Activity#onResume()} or {@link Fragment#onResume()}.
-     */
-    @UiThread
-    public void onResume() {
         // Register for connectivity changes
         connectivityReceiver = new ConnectivityReceiver();
         getContext().registerReceiver(connectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         nativeMapView.update();
-        myLocationView.onResume();
+        myLocationView.onStart();
 
         // In case that no style was set or was loaded through MapboxMapOptions
         if (!styleWasSet) {
@@ -617,6 +595,61 @@ public class MapView extends FrameLayout {
         }
     }
 
+    /**
+     * You must call this method from the parent's {@link Activity#onResume()} or {@link Fragment#onResume()}.
+     */
+    @UiThread
+    public void onResume() {
+        if (!onStartCalled) {
+            // TODO: 26/10/16, can be removed after 5.0.0 release
+            throw new IllegalStateException("MapView#onStart() was not called. " +
+                    "You must call this method from the parent's {@link Activity#onStart()} or {@link Fragment#onStart()}.");
+        }
+    }
+
+    /**
+     * You must call this method from the parent's {@link Activity#onPause()} or {@link Fragment#onPause()}.
+     */
+    @UiThread
+    public void onPause() {
+        // replaced by onStop in v5.0.0, keep around for future development
+    }
+
+    /**
+     * You must call this method from the parent's {@link Activity#onStop()} or {@link Fragment#onStop()}.
+     */
+    @UiThread
+    public void onStop() {
+        onStopCalled = true;
+
+        // Unregister for connectivity changes
+        if (connectivityReceiver != null) {
+            getContext().unregisterReceiver(connectivityReceiver);
+            connectivityReceiver = null;
+        }
+
+        myLocationView.onStop();
+    }
+
+    /**
+     * You must call this method from the parent's {@link Activity#onDestroy()} or {@link Fragment#onDestroy()}.
+     */
+    @UiThread
+    public void onDestroy() {
+        if (!onStopCalled) {
+            // TODO: 26/10/16, can be removed after 5.0.0 release
+            throw new IllegalStateException("MapView#onStop() was not called. " +
+                    "You must call this method from the parent's {@link Activity#onStop()} or {@link Fragment#onStop()}.");
+        }
+
+        destroyed = true;
+        nativeMapView.terminateContext();
+        nativeMapView.terminateDisplay();
+        nativeMapView.destroySurface();
+        nativeMapView.destroy();
+        nativeMapView = null;
+    }
+    
     void setFocalPoint(PointF focalPoint) {
         if (focalPoint == null) {
             // resetting focal point,

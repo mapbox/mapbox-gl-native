@@ -127,6 +127,7 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
     @Override
     protected void onStart() {
         super.onStart();
+        mapView.onStart();
         LocationServices.getLocationServices(this).addLocationListener(this);
     }
 
@@ -146,6 +147,7 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
     protected void onStop() {
         super.onStop();
         LocationServices.getLocationServices(this).removeLocationListener(this);
+        mapView.onStop();
     }
 
     @Override

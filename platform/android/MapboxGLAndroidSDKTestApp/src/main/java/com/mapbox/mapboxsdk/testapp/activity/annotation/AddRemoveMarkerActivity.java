@@ -128,6 +128,11 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
         Log.d(MapboxConstants.TAG, "showHighThresholdMarker() " + activeMarker.getId());
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
 
     @Override
     protected void onResume() {
@@ -137,8 +142,14 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        mapView.onPause();
         super.onPause();
+        mapView.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mapView.onStop();
     }
 
     @Override

@@ -124,22 +124,35 @@ public class PolylineActivity extends AppCompatActivity {
     public List<PolylineOptions> getRandomLine() {
         final List<PolylineOptions> randomLines = getAllPolylines();
         Collections.shuffle(randomLines);
-        return new ArrayList<PolylineOptions>() {{
-            add(randomLines.get(0));
-        }
+        return new ArrayList<PolylineOptions>() {
+            {
+                add(randomLines.get(0));
+            }
         };
     }
 
     @Override
-    public void onResume() {
+    protected void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+
+    @Override
+    protected void onResume() {
         super.onResume();
         mapView.onResume();
     }
 
     @Override
-    public void onPause() {
+    protected void onPause() {
         super.onPause();
         mapView.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mapView.onStop();
     }
 
     @Override
