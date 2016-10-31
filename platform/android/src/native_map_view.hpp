@@ -20,6 +20,7 @@ public:
     NativeMapView(JNIEnv *env, jobject obj, float pixelRatio, int availableProcessors, size_t totalMemory);
     virtual ~NativeMapView();
 
+    mbgl::Size getFramebufferSize() const;
     void updateViewBinding();
     void bind() override;
 

@@ -549,6 +549,12 @@ public:
              static_cast<uint32_t>(self.bounds.size.height) };
 }
 
+- (mbgl::Size)framebufferSize
+{
+    return { static_cast<uint32_t>(self.glView.drawableWidth),
+             static_cast<uint32_t>(self.glView.drawableHeight) };
+}
+
 - (void)createGLView
 {
     if (_context) return;
@@ -4953,7 +4959,7 @@ public:
     }
 
     mbgl::gl::value::Viewport::Type getViewport() const {
-        return { 0, 0, nativeView.size };
+        return { 0, 0, nativeView.framebufferSize };
     }
 
     /// This function is called before we start rendering, when iOS invokes our rendering method.
@@ -4963,6 +4969,7 @@ public:
         // We are using 0 as the placeholder value for the GLKView's framebuffer.
         getContext().bindFramebuffer.setCurrentValue(0);
         getContext().viewport.setCurrentValue(getViewport());
+        assert(mbgl::gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
     }
 
     void bind() override {
