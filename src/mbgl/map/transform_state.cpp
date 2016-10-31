@@ -175,6 +175,10 @@ float TransformState::getPitch() const {
 
 #pragma mark - State
 
+bool TransformState::isChanging() const {
+    return rotating || scaling || panning || gestureInProgress;
+}
+
 bool TransformState::isRotating() const {
     return rotating;
 }
