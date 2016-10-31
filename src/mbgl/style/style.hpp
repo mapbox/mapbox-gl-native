@@ -90,7 +90,7 @@ public:
     bool hasClass(const std::string&) const;
     std::vector<std::string> getClasses() const;
 
-    RenderData getRenderData(MapDebugOptions) const;
+    RenderData getRenderData(MapDebugOptions, float angle) const;
 
     std::vector<Feature> queryRenderedFeatures(const QueryParameters&) const;
 
