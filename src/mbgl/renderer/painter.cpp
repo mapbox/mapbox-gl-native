@@ -125,7 +125,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     spriteAtlas = style.spriteAtlas.get();
     lineAtlas = style.lineAtlas.get();
 
-    RenderData renderData = style.getRenderData(frame.debugOptions);
+    RenderData renderData = style.getRenderData(frame.debugOptions, state.getAngle());
     const std::vector<RenderItem>& order = renderData.order;
     const std::unordered_set<Source*>& sources = renderData.sources;
 

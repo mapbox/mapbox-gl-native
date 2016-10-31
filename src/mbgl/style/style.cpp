@@ -353,7 +353,7 @@ bool Style::isLoaded() const {
     return true;
 }
 
-RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
+RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const {
     RenderData result;
 
     for (const auto& source : sources) {
@@ -361,6 +361,9 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
             result.sources.insert(source.get());
         }
     }
+
+    const bool isLeft = std::abs(angle) > M_PI_2;
+    const bool isBottom = angle < 0;
 
     for (const auto& layer : layers) {
         if (!layer->baseImpl->needsRendering(zoomHistory.lastZoom)) {
@@ -395,8 +398,29 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
             continue;
         }
 
-        for (auto& pair : source->baseImpl->getRenderTiles()) {
-            auto& tile = pair.second;
+        auto& renderTiles = source->baseImpl->getRenderTiles();
+        const bool symbolLayer = layer->is<SymbolLayer>();
+
+        // Sort symbol tiles in opposite y position, so tiles with overlapping
+        // symbols are drawn on top of each other, with lower symbols being
+        // drawn on top of higher symbols.
+        std::vector<std::reference_wrapper<RenderTile>> sortedTiles;
+        std::transform(renderTiles.begin(), renderTiles.end(), std::back_inserter(sortedTiles),
+                [](auto& pair) { return std::ref(pair.second); });
+        if (symbolLayer) {
+            std::sort(sortedTiles.begin(), sortedTiles.end(),
+                      [isLeft, isBottom](const RenderTile& a, const RenderTile& b) {
+                bool sortX = a.id.canonical.x > b.id.canonical.x;
+                bool sortW = a.id.wrap > b.id.wrap;
+                bool sortY = a.id.canonical.y > b.id.canonical.y;
+                return
+                    a.id.canonical.y != b.id.canonical.y ? (isLeft ? sortY : !sortY) :
+                    a.id.wrap != b.id.wrap ? (isBottom ? sortW : !sortW) : (isBottom ? sortX : !sortX);
+            });
+        }
+
+        for (auto& tileRef : sortedTiles) {
+            auto& tile = tileRef.get();
             if (!tile.tile.isRenderable()) {
                 continue;
             }
@@ -404,7 +428,7 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
             // We're not clipping symbol layers, so when we have both parents and children of symbol
             // layers, we drop all children in favor of their parent to avoid duplicate labels.
             // See https://github.com/mapbox/mapbox-gl-native/issues/2482
-            if (layer->is<SymbolLayer>()) {
+            if (symbolLayer) {
                 bool skip = false;
                 // Look back through the buckets we decided to render to find out whether there is
                 // already a bucket from this layer that is a parent of this tile. Tiles are ordered
