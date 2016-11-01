@@ -1,3 +1,8 @@
+# 3.4.0 - Novmeber 2, 2016
+
+- Fixes Bitrise configuration to automatically publish macOS binaries ([#6789](https://github.com/mapbox/mapbox-gl-native/pull/6789))
+- Switches from using individual thread pools for each `mbgl::Map` object to sharing the built-in Node.js thread pool for NodeMap implementations ([#6687](https://github.com/mapbox/mapbox-gl-native/pull/6687))
+
 # 3.3.3 - September 6, 2016
 
 - Switches to using a NodeRequest member function (with a JavaScript shim in front to preserve the API) instead of a new `v8::Context` to avoid a memory leak ([#5704](https://github.com/mapbox/mapbox-gl-native/pull/5704))
