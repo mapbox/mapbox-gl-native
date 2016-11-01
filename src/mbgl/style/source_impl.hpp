@@ -48,6 +48,9 @@ public:
     // re-placement of existing complete tiles.
     void updateTiles(const UpdateParameters&);
 
+    // Removes all tiles (by putting them into the cache).
+    void removeTiles();
+
     // Request that all loaded tiles re-run the layout operation on the existing source
     // data with fresh style information.
     void reloadTiles();
@@ -82,6 +85,7 @@ public:
 
 protected:
     void invalidateTiles();
+    void removeStaleTiles(const std::set<OverscaledTileID>&);
 
     Source& base;
     SourceObserver* observer = nullptr;

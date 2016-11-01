@@ -82,6 +82,12 @@ public class RealTimeGeoJsonActivity extends AppCompatActivity implements OnMapR
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         mapView.onResume();
@@ -96,6 +102,7 @@ public class RealTimeGeoJsonActivity extends AppCompatActivity implements OnMapR
     @Override
     protected void onStop() {
         super.onStop();
+        mapView.onStop();
         handler.removeCallbacks(runnable);
     }
 

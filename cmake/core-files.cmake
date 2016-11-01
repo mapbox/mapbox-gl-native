@@ -56,10 +56,16 @@ set(MBGL_CORE_FILES
     include/mbgl/gl/gl.hpp
     include/mbgl/gl/implementation.hpp
     src/mbgl/gl/attribute.hpp
+    src/mbgl/gl/color_mode.cpp
+    src/mbgl/gl/color_mode.hpp
     src/mbgl/gl/context.cpp
     src/mbgl/gl/context.hpp
     src/mbgl/gl/debugging.cpp
     src/mbgl/gl/debugging.hpp
+    src/mbgl/gl/depth_mode.cpp
+    src/mbgl/gl/depth_mode.hpp
+    src/mbgl/gl/draw_mode.hpp
+    src/mbgl/gl/drawable.hpp
     src/mbgl/gl/extension.cpp
     src/mbgl/gl/extension.hpp
     src/mbgl/gl/framebuffer.hpp
@@ -68,17 +74,18 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/object.cpp
     src/mbgl/gl/object.hpp
     src/mbgl/gl/renderbuffer.hpp
+    src/mbgl/gl/segment.hpp
     src/mbgl/gl/shader.cpp
     src/mbgl/gl/shader.hpp
     src/mbgl/gl/state.hpp
+    src/mbgl/gl/stencil_mode.cpp
+    src/mbgl/gl/stencil_mode.hpp
     src/mbgl/gl/texture.hpp
     src/mbgl/gl/types.hpp
     src/mbgl/gl/uniform.cpp
     src/mbgl/gl/uniform.hpp
     src/mbgl/gl/value.cpp
     src/mbgl/gl/value.hpp
-    src/mbgl/gl/vao.cpp
-    src/mbgl/gl/vao.hpp
     src/mbgl/gl/vertex_array.cpp
     src/mbgl/gl/vertex_array.hpp
     src/mbgl/gl/vertex_buffer.hpp
@@ -112,8 +119,10 @@ set(MBGL_CORE_FILES
 
     # math
     include/mbgl/math/clamp.hpp
+    include/mbgl/math/log2.hpp
     include/mbgl/math/minmax.hpp
     include/mbgl/math/wrap.hpp
+    src/mbgl/math/log2.cpp
 
     # mbgl
     include/mbgl/mbgl.hpp
@@ -146,7 +155,6 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/circle_bucket.hpp
     src/mbgl/renderer/debug_bucket.cpp
     src/mbgl/renderer/debug_bucket.hpp
-    src/mbgl/renderer/element_group.hpp
     src/mbgl/renderer/fill_bucket.cpp
     src/mbgl/renderer/fill_bucket.hpp
     src/mbgl/renderer/frame_history.cpp
@@ -176,10 +184,12 @@ set(MBGL_CORE_FILES
     # shader
     src/mbgl/shader/circle_shader.cpp
     src/mbgl/shader/circle_shader.hpp
+    src/mbgl/shader/circle_uniforms.hpp
     src/mbgl/shader/circle_vertex.cpp
     src/mbgl/shader/circle_vertex.hpp
     src/mbgl/shader/collision_box_shader.cpp
     src/mbgl/shader/collision_box_shader.hpp
+    src/mbgl/shader/collision_box_uniforms.hpp
     src/mbgl/shader/collision_box_vertex.cpp
     src/mbgl/shader/collision_box_vertex.hpp
     src/mbgl/shader/fill_outline_pattern_shader.cpp
@@ -190,6 +200,8 @@ set(MBGL_CORE_FILES
     src/mbgl/shader/fill_pattern_shader.hpp
     src/mbgl/shader/fill_shader.cpp
     src/mbgl/shader/fill_shader.hpp
+    src/mbgl/shader/fill_uniforms.cpp
+    src/mbgl/shader/fill_uniforms.hpp
     src/mbgl/shader/fill_vertex.cpp
     src/mbgl/shader/fill_vertex.hpp
     src/mbgl/shader/line_pattern_shader.cpp
@@ -198,10 +210,13 @@ set(MBGL_CORE_FILES
     src/mbgl/shader/line_sdf_shader.hpp
     src/mbgl/shader/line_shader.cpp
     src/mbgl/shader/line_shader.hpp
+    src/mbgl/shader/line_uniforms.cpp
+    src/mbgl/shader/line_uniforms.hpp
     src/mbgl/shader/line_vertex.cpp
     src/mbgl/shader/line_vertex.hpp
     src/mbgl/shader/raster_shader.cpp
     src/mbgl/shader/raster_shader.hpp
+    src/mbgl/shader/raster_uniforms.hpp
     src/mbgl/shader/raster_vertex.cpp
     src/mbgl/shader/raster_vertex.hpp
     src/mbgl/shader/shaders.hpp
@@ -209,8 +224,11 @@ set(MBGL_CORE_FILES
     src/mbgl/shader/symbol_icon_shader.hpp
     src/mbgl/shader/symbol_sdf_shader.cpp
     src/mbgl/shader/symbol_sdf_shader.hpp
+    src/mbgl/shader/symbol_uniforms.cpp
+    src/mbgl/shader/symbol_uniforms.hpp
     src/mbgl/shader/symbol_vertex.cpp
     src/mbgl/shader/symbol_vertex.hpp
+    src/mbgl/shader/uniforms.hpp
 
     # sprite
     include/mbgl/sprite/sprite_image.hpp
@@ -420,6 +438,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/projection.hpp
     include/mbgl/util/range.hpp
     include/mbgl/util/run_loop.hpp
+    include/mbgl/util/size.hpp
     include/mbgl/util/string.hpp
     include/mbgl/util/tileset.hpp
     include/mbgl/util/timer.hpp
@@ -464,7 +483,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/mat3.hpp
     src/mbgl/util/mat4.cpp
     src/mbgl/util/mat4.hpp
-    src/mbgl/util/math.cpp
     src/mbgl/util/math.hpp
     src/mbgl/util/offscreen_texture.cpp
     src/mbgl/util/offscreen_texture.hpp

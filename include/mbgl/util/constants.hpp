@@ -35,6 +35,8 @@ constexpr double DEGREES_MAX = 360;
 constexpr double PITCH_MAX = M_PI / 3;
 constexpr double MIN_ZOOM = 0.0;
 constexpr double MAX_ZOOM = 25.5;
+constexpr float  MIN_ZOOM_F = MIN_ZOOM;
+constexpr float  MAX_ZOOM_F = MAX_ZOOM;
 
 constexpr uint64_t DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
 

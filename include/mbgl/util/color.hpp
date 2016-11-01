@@ -17,6 +17,10 @@ public:
     static constexpr Color black() { return { 0.0f, 0.0f, 0.0f, 1.0f }; };
     static constexpr Color white() { return { 1.0f, 1.0f, 1.0f, 1.0f }; };
 
+    static constexpr Color red()   { return { 1.0f, 0.0f, 0.0f, 1.0f }; };
+    static constexpr Color green() { return { 0.0f, 1.0f, 0.0f, 1.0f }; };
+    static constexpr Color blue()  { return { 0.0f, 0.0f, 1.0f, 1.0f }; };
+
     static optional<Color> parse(const std::string&);
 };
 

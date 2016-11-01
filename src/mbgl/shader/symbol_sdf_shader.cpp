@@ -9,7 +9,8 @@ SymbolSDFShader::SymbolSDFShader(gl::Context& context, Defines defines)
     : Shader(shaders::symbol_sdf::name,
              shaders::symbol_sdf::vertex,
              shaders::symbol_sdf::fragment,
-             context, defines) {
+             context, defines),
+      uniformsState(SymbolSDFUniforms::state(*this)) {
 }
 
 } // namespace mbgl

@@ -94,59 +94,18 @@ public class LocationPickerActivity extends AppCompatActivity {
 
                 //Add user marker
                 mapboxMap.getMarkerViewManager().addMarkerViewAdapter(
-                    new PulseMarkerViewAdapter(LocationPickerActivity.this));
+                        new PulseMarkerViewAdapter(LocationPickerActivity.this));
                 userMarker = createCustomUserMarker(new LatLng(0, 0));
 
                 //Fix the focal point to the center of the map
                 PointF focalPoint = new PointF(
-                    (mapView.getX() + mapView.getWidth() / 2), (mapView.getY() + mapView.getHeight() / 2));
+                        (mapView.getX() + mapView.getWidth() / 2), (mapView.getY() + mapView.getHeight() / 2));
                 mapboxMap.getUiSettings().setFocalPoint(focalPoint);
 
                 //Track camera updates to animate the user location views
                 trackUserLocationView(userMarker);
             }
         });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mapView.onResume();
-
-        //Check permissions
-        if (arePermissionsGranted()) {
-            mapView.getMapAsync(new OnMapReadyCallback() {
-
-                @Override
-                public void onMapReady(final MapboxMap mapboxMap) {
-                    //Get the user's location
-                    final LocationServices locationServices = LocationServices.getLocationServices(getApplicationContext());
-
-                    Location location = locationServices.getLastLocation();
-                    if (location != null) {
-                        zoomInOn(location);
-                        userMarker.setPosition(new LatLng(location));
-                    } else {
-                        final ProgressDialog loadingDialog = ProgressDialog.show(
-                            LocationPickerActivity.this, "Loading", "Getting user location", false);
-                        locationServices.addLocationListener(new LocationListener() {
-                            @Override
-                            public void onLocationChanged(@Nullable Location location) {
-                                //Move the camera to the user
-                                if (location != null) {
-                                    zoomInOn(location);
-                                    userMarker.setPosition(new LatLng(location));
-                                    locationServices.removeLocationListener(this);
-                                    loadingDialog.hide();
-                                }
-                            }
-                        });
-                    }
-
-                    locationServices.toggleGPS(true);
-                }
-            });
-        }
     }
 
     private void zoomInOn(Location location) {
@@ -276,7 +235,7 @@ public class LocationPickerActivity extends AppCompatActivity {
         dropPinView = new ImageView(this);
         dropPinView.setImageResource(R.drawable.ic_droppin_24dp);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
         params.bottomMargin = (int) (12 * density);
         dropPinView.setLayoutParams(params);
 
@@ -384,11 +343,11 @@ public class LocationPickerActivity extends AppCompatActivity {
 
     private boolean arePermissionsGranted() {
         if (Build.VERSION.SDK_INT >= 23
-            && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-            && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.i(TAG, "Requesting permissions");
             ActivityCompat.requestPermissions(this, new String[]{
-                Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSIONS);
+                    Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSIONS);
             return false;
         }
         Log.i(TAG, "Permissions already granted");
@@ -396,9 +355,56 @@ public class LocationPickerActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause() {
+    protected void onStart() {
+        super.onStart();
+        mapView.onStart();
+
+        //Check permissions
+        if (arePermissionsGranted()) {
+            mapView.getMapAsync(new OnMapReadyCallback() {
+
+                @Override
+                public void onMapReady(final MapboxMap mapboxMap) {
+                    //Get the user's location
+                    final LocationServices locationServices = LocationServices.getLocationServices(getApplicationContext());
+
+                    Location location = locationServices.getLastLocation();
+                    if (location != null) {
+                        zoomInOn(location);
+                        userMarker.setPosition(new LatLng(location));
+                    } else {
+                        final ProgressDialog loadingDialog = ProgressDialog.show(
+                                LocationPickerActivity.this, "Loading", "Getting user location", false);
+                        locationServices.addLocationListener(new LocationListener() {
+                            @Override
+                            public void onLocationChanged(@Nullable Location location) {
+                                //Move the camera to the user
+                                if (location != null) {
+                                    zoomInOn(location);
+                                    userMarker.setPosition(new LatLng(location));
+                                    locationServices.removeLocationListener(this);
+                                    loadingDialog.hide();
+                                }
+                            }
+                        });
+                    }
+
+                    locationServices.toggleGPS(true);
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onPause() {
         super.onPause();
         mapView.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mapView.onStop();
     }
 
     @Override

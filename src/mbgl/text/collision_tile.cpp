@@ -1,5 +1,6 @@
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/geometry/feature_index.hpp>
+#include <mbgl/math/log2.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/math/minmax.hpp>

@@ -9,7 +9,8 @@ FillPatternShader::FillPatternShader(gl::Context& context, Defines defines)
     : Shader(shaders::fill_pattern::name,
              shaders::fill_pattern::vertex,
              shaders::fill_pattern::fragment,
-             context, defines) {
+             context, defines),
+      uniformsState(FillPatternUniforms::state(*this)) {
 }
 
 } // namespace mbgl

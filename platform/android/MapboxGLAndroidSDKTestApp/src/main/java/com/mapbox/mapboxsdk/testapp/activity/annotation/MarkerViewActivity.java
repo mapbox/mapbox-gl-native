@@ -183,6 +183,7 @@ public class MarkerViewActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        mapView.onStart();
         loopMarkerMove();
     }
 
@@ -193,6 +194,7 @@ public class MarkerViewActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        mapView.onStop();
         locationUpdateHandler.removeCallbacks(moveMarkerRunnable);
         rotateUpdateHandler.removeCallbacks(rotateMarkerRunnable);
     }

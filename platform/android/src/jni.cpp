@@ -833,9 +833,10 @@ void nativeAddAnnotationIcon(JNIEnv *env, jni::jobject* obj, jlong nativeMapView
 
     NullCheck(*env, jpixels);
     std::size_t size = jni::GetArrayLength(*env, *jpixels);
-    mbgl::PremultipliedImage premultipliedImage(width, height);
+    mbgl::PremultipliedImage premultipliedImage(
+        { static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
 
-    if (premultipliedImage.size() != uint32_t(size)) {
+    if (premultipliedImage.bytes() != uint32_t(size)) {
         throw mbgl::util::SpriteImageException("Sprite image pixel count mismatch");
     }
 
@@ -1162,9 +1163,10 @@ void nativeAddImage(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni:
     // Create Pre-multiplied image from byte[]
     NullCheck(*env, data);
     std::size_t size = jni::GetArrayLength(*env, *data);
-    mbgl::PremultipliedImage premultipliedImage(width, height);
+    mbgl::PremultipliedImage premultipliedImage(
+        { static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
 
-    if (premultipliedImage.size() != uint32_t(size)) {
+    if (premultipliedImage.bytes() != uint32_t(size)) {
         throw mbgl::util::SpriteImageException("Sprite image pixel count mismatch");
     }
 

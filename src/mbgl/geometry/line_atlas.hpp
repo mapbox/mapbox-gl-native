@@ -13,11 +13,12 @@ namespace gl {
 class Context;
 } // namespace gl
 
-typedef struct {
+class LinePatternPos {
+public:
     float width;
     float height;
     float y;
-} LinePatternPos;
+};
 
 enum class LinePatternCap : bool {
     Square = false,

@@ -84,6 +84,12 @@ public class MapInDialogActivity extends AppCompatActivity {
         }
 
         @Override
+        public void onStart() {
+            super.onStart();
+            mapView.onStart();
+        }
+
+        @Override
         public void onResume() {
             super.onResume();
             mapView.onResume();
@@ -93,6 +99,12 @@ public class MapInDialogActivity extends AppCompatActivity {
         public void onPause() {
             super.onPause();
             mapView.onPause();
+        }
+
+        @Override
+        public void onStop() {
+            super.onStop();
+            mapView.onStop();
         }
 
         @Override

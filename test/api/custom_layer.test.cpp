@@ -97,7 +97,7 @@ TEST(CustomLayer, Basic) {
 
     ThreadPool threadPool(4);
 
-    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    Map map(backend, view.size, 1, fileSource, threadPool, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));
     map.setLatLngZoom({ 37.8, -122.5 }, 10);
     map.addLayer(std::make_unique<CustomLayer>(

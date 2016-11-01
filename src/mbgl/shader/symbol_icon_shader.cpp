@@ -9,7 +9,8 @@ SymbolIconShader::SymbolIconShader(gl::Context& context, Defines defines)
     : Shader(shaders::symbol_icon::name,
              shaders::symbol_icon::vertex,
              shaders::symbol_icon::fragment,
-             context, defines) {
+             context, defines),
+      uniformsState(SymbolIconUniforms::state(*this)) {
 }
 
 } // namespace mbgl

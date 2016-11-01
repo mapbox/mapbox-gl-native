@@ -9,7 +9,8 @@ CircleShader::CircleShader(gl::Context& context, Defines defines)
     : Shader(shaders::circle::name,
              shaders::circle::vertex,
              shaders::circle::fragment,
-             context, defines) {
+             context, defines),
+      uniformsState(CircleUniforms::state(*this)) {
 }
 
 } // namespace mbgl

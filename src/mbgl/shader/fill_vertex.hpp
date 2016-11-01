@@ -2,7 +2,7 @@
 
 #include <mbgl/gl/attribute.hpp>
 
-#include <array>
+#include <vector>
 #include <cstdint>
 
 namespace mbgl {
@@ -19,7 +19,7 @@ namespace gl {
 
 template <class Shader>
 struct AttributeBindings<Shader, FillVertex> {
-    std::array<AttributeBinding, 1> operator()(const Shader& shader) {
+    std::vector<AttributeBinding> operator()(const Shader& shader) {
         return {{
             MBGL_MAKE_ATTRIBUTE_BINDING(FillVertex, shader, a_pos)
         }};

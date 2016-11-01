@@ -27,8 +27,8 @@ int main(int argc, char *argv[]) {
     double bearing = 0;
     double pitch = 0;
 
-    int width = 512;
-    int height = 512;
+    uint32_t width = 512;
+    uint32_t height = 512;
     static std::string output = "out.png";
     std::string cache_file = "cache.sqlite";
     std::string asset_root = ".";
@@ -84,9 +84,9 @@ int main(int argc, char *argv[]) {
     }
 
     HeadlessBackend backend;
-    OffscreenView view(backend.getContext(), {{ static_cast<uint16_t>(width), static_cast<uint16_t>(height) }});
+    OffscreenView view(backend.getContext(), { width, height });
     ThreadPool threadPool(4);
-    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    Map map(backend, view.size, 1, fileSource, threadPool, MapMode::Still);
 
     map.setStyleJSON(style);
     map.setClasses(classes);

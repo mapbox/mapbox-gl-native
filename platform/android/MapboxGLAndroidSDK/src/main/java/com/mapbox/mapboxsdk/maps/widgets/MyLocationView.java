@@ -321,7 +321,7 @@ public class MyLocationView extends View {
         setBearing(position.bearing);
     }
 
-    public void onResume() {
+    public void onStart() {
         if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
             compassListener.onResume();
         }
@@ -330,7 +330,7 @@ public class MyLocationView extends View {
         }
     }
 
-    public void onPause() {
+    public void onStop() {
         compassListener.onPause();
         toggleGps(false);
     }

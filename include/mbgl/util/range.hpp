@@ -5,7 +5,7 @@ namespace mbgl {
 template <class T>
 class Range {
 public:
-    Range(const T& min_, const T& max_)
+    constexpr Range(const T& min_, const T& max_)
         : min(min_), max(max_) {}
 
     T min;

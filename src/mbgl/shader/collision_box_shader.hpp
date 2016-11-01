@@ -2,7 +2,7 @@
 
 #include <mbgl/gl/shader.hpp>
 #include <mbgl/gl/attribute.hpp>
-#include <mbgl/gl/uniform.hpp>
+#include <mbgl/shader/collision_box_uniforms.hpp>
 
 namespace mbgl {
 
@@ -13,15 +13,13 @@ public:
     CollisionBoxShader(gl::Context&);
 
     using VertexType = CollisionBoxVertex;
+    using UniformsType = CollisionBoxUniforms;
 
     gl::Attribute<int16_t, 2> a_pos     = {"a_pos",     *this};
     gl::Attribute<int16_t, 2> a_extrude = {"a_extrude", *this};
     gl::Attribute<uint8_t, 2> a_data    = {"a_data",    *this};
 
-    gl::UniformMatrix<4> u_matrix  = {"u_matrix",  *this};
-    gl::Uniform<float>   u_scale   = {"u_scale",   *this};
-    gl::Uniform<float>   u_zoom    = {"u_zoom",    *this};
-    gl::Uniform<float>   u_maxzoom = {"u_maxzoom", *this};
+    typename CollisionBoxUniforms::State uniformsState;
 };
 
 } // namespace mbgl

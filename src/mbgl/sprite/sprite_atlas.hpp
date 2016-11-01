@@ -26,13 +26,15 @@ class Context;
 class SpriteImage;
 class SpritePosition;
 
-struct SpriteAtlasPosition {
+class SpriteAtlasPosition {
+public:
     std::array<float, 2> size = {{ 0, 0 }};
     std::array<float, 2> tl = {{ 0, 0 }};
     std::array<float, 2> br = {{ 0, 0 }};
 };
 
-struct SpriteAtlasElement {
+class SpriteAtlasElement {
+public:
     Rect<uint16_t> pos;
     std::shared_ptr<const SpriteImage> spriteImage;
     float relativePixelRatio;
@@ -104,7 +106,7 @@ private:
     void _setSprite(const std::string&, const std::shared_ptr<const SpriteImage>& = nullptr);
     void emitSpriteLoadedIfComplete();
 
-    const uint16_t width, height;
+    const dimension width, height;
     const dimension pixelWidth, pixelHeight;
     const float pixelRatio;
 

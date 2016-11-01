@@ -132,14 +132,12 @@ void GLFWView::setMap(mbgl::Map *map_) {
 
 void GLFWView::updateViewBinding() {
     getContext().bindFramebuffer.setCurrentValue(0);
-    getContext().viewport.setCurrentValue(
-        { 0, 0, static_cast<uint16_t>(fbWidth), static_cast<uint16_t>(fbHeight) });
+    getContext().viewport.setCurrentValue({ 0, 0, getFramebufferSize() });
 }
 
 void GLFWView::bind() {
     getContext().bindFramebuffer = 0;
-    getContext().viewport = { 0, 0, static_cast<uint16_t>(fbWidth),
-                              static_cast<uint16_t>(fbHeight) };
+    getContext().viewport = { 0, 0, getFramebufferSize() };
 }
 
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
@@ -192,7 +190,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             view->nextOrientation();
             break;
         case GLFW_KEY_Q: {
-            auto result = view->map->queryPointAnnotations({ {}, { double(view->getSize()[0]), double(view->getSize()[1]) } });
+            auto result = view->map->queryPointAnnotations({ {}, { double(view->getSize().width), double(view->getSize().height) } });
             printf("visible point annotations: %lu\n", result.size());
         } break;
         case GLFW_KEY_C:
@@ -267,7 +265,7 @@ GLFWView::makeSpriteImage(int width, int height, float pixelRatio) {
     const int w = std::ceil(pixelRatio * width);
     const int h = std::ceil(pixelRatio * height);
 
-    mbgl::PremultipliedImage image(w, h);
+    mbgl::PremultipliedImage image({ static_cast<uint32_t>(w), static_cast<uint32_t>(h) });
     auto data = reinterpret_cast<uint32_t*>(image.data.get());
     const int dist = (w / 2) * (w / 2);
     for (int y = 0; y < h; y++) {
@@ -374,8 +372,7 @@ void GLFWView::onWindowResize(GLFWwindow *window, int width, int height) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     view->width = width;
     view->height = height;
-    view->map->setSize({{ static_cast<uint16_t>(view->width),
-                          static_cast<uint16_t>(view->height) }});
+    view->map->setSize({ static_cast<uint32_t>(view->width), static_cast<uint32_t>(view->height) });
 }
 
 void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
@@ -480,12 +477,12 @@ float GLFWView::getPixelRatio() const {
     return pixelRatio;
 }
 
-std::array<uint16_t, 2> GLFWView::getSize() const {
-    return {{ static_cast<uint16_t>(width), static_cast<uint16_t>(height) }};
+mbgl::Size GLFWView::getSize() const {
+    return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 }
 
-std::array<uint16_t, 2> GLFWView::getFramebufferSize() const {
-    return {{ static_cast<uint16_t>(fbWidth), static_cast<uint16_t>(fbHeight) }};
+mbgl::Size GLFWView::getFramebufferSize() const {
+    return { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) };
 }
 
 void GLFWView::activate() {

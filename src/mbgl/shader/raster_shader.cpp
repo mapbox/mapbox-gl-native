@@ -9,7 +9,8 @@ RasterShader::RasterShader(gl::Context& context, Defines defines)
     : Shader(shaders::raster::name,
              shaders::raster::vertex,
              shaders::raster::fragment,
-             context, defines) {
+             context, defines),
+      uniformsState(RasterUniforms::state(*this)) {
 }
 
 } // namespace mbgl

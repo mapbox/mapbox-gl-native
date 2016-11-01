@@ -4,8 +4,6 @@
 #include <mbgl/gl/shader.hpp>
 
 #include <cstddef>
-#include <limits>
-#include <vector>
 
 namespace mbgl {
 namespace gl {
@@ -27,10 +25,8 @@ public:
           type(DataTypeOf<T>::value),
           count(N),
           offset(O) {
-        static_assert(std::is_standard_layout<Vertex>::value, "vertex type must use standard layout");
         static_assert(O % 4 == 0, "vertex attribute must be optimally aligned");
         static_assert(1 <= N && N <= 4, "count must be 1, 2, 3, or 4");
-        static_assert(sizeof(Vertex) <= std::numeric_limits<int32_t>::max(), "vertex type is too big");
     }
 
     AttributeLocation location;
