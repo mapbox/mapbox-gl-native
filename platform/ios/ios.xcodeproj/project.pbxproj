@@ -171,6 +171,10 @@
 		7E016D851D9E890300A29A21 /* MGLPolygon+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E016D821D9E890300A29A21 /* MGLPolygon+MGLAdditions.h */; };
 		7E016D861D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */; };
 		7E016D871D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */; };
+		88F0C0831DC8FD8C002DB7AE /* MGLCustomVectorSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 88F0C0811DC8FD8C002DB7AE /* MGLCustomVectorSource.h */; };
+		88F0C0841DC8FD8C002DB7AE /* MGLCustomVectorSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 88F0C0811DC8FD8C002DB7AE /* MGLCustomVectorSource.h */; };
+		88F0C0851DC8FD8C002DB7AE /* MGLCustomVectorSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88F0C0821DC8FD8C002DB7AE /* MGLCustomVectorSource.mm */; };
+		88F0C0861DC8FD8C002DB7AE /* MGLCustomVectorSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88F0C0821DC8FD8C002DB7AE /* MGLCustomVectorSource.mm */; };
 		DA0CD5901CF56F6A00A5F5A5 /* MGLFeatureTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */; };
 		DA17BE301CC4BAC300402C41 /* MGLMapView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA17BE2F1CC4BAC300402C41 /* MGLMapView_Private.h */; };
 		DA17BE311CC4BDAA00402C41 /* MGLMapView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA17BE2F1CC4BAC300402C41 /* MGLMapView_Private.h */; };
@@ -413,13 +417,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		DA25D5C71CCDA0C100607828 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DA25D5B81CCD9EDE00607828;
-			remoteInfo = settings;
-		};
 		DA25D5C91CCDA0CC00607828 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
@@ -595,6 +592,8 @@
 		7E016D7D1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLPolyline+MGLAdditions.m"; sourceTree = "<group>"; };
 		7E016D821D9E890300A29A21 /* MGLPolygon+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLPolygon+MGLAdditions.h"; sourceTree = "<group>"; };
 		7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLPolygon+MGLAdditions.m"; sourceTree = "<group>"; };
+		88F0C0811DC8FD8C002DB7AE /* MGLCustomVectorSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCustomVectorSource.h; sourceTree = "<group>"; };
+		88F0C0821DC8FD8C002DB7AE /* MGLCustomVectorSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLCustomVectorSource.mm; sourceTree = "<group>"; tabWidth = 4; };
 		DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
 		DA17BE2F1CC4BAC300402C41 /* MGLMapView_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapView_Private.h; sourceTree = "<group>"; };
 		DA1DC94A1CB6C1C2006E619F /* Mapbox GL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -841,6 +840,8 @@
 				404C26E01D89B877000AA13D /* MGLTileSet.h */,
 				404C26E61D89C515000AA13D /* MGLTileSet_Private.h */,
 				404C26E11D89B877000AA13D /* MGLTileSet.mm */,
+				88F0C0811DC8FD8C002DB7AE /* MGLCustomVectorSource.h */,
+				88F0C0821DC8FD8C002DB7AE /* MGLCustomVectorSource.mm */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -1282,8 +1283,8 @@
 				DA8847E11CBAFA5100AB86E3 /* MGLGeometry.h */,
 				DA8848011CBAFA6200AB86E3 /* MGLGeometry_Private.h */,
 				DA8848021CBAFA6200AB86E3 /* MGLGeometry.mm */,
-				DA8848041CBAFA6200AB86E3 /* MGLMultiPoint_Private.h */,
 				DA8847E31CBAFA5100AB86E3 /* MGLMultiPoint.h */,
+				DA8848041CBAFA6200AB86E3 /* MGLMultiPoint_Private.h */,
 				DA8848051CBAFA6200AB86E3 /* MGLMultiPoint.mm */,
 				DA8847E71CBAFA5100AB86E3 /* MGLOverlay.h */,
 				DA8847E81CBAFA5100AB86E3 /* MGLPointAnnotation.h */,
@@ -1421,6 +1422,7 @@
 				35D13AB71D3D15E300AFB4E0 /* MGLStyleLayer.h in Headers */,
 				DA88488E1CBB047F00AB86E3 /* reachability.h in Headers */,
 				40F887701D7A1E58008ECB67 /* MGLGeoJSONSource_Private.h in Headers */,
+				88F0C0831DC8FD8C002DB7AE /* MGLCustomVectorSource.h in Headers */,
 				350098DC1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h in Headers */,
 				DA8848231CBAFA6200AB86E3 /* MGLOfflineStorage_Private.h in Headers */,
 				404326891D5B9B27007111BD /* MGLAnnotationContainerView_Private.h in Headers */,
@@ -1544,6 +1546,7 @@
 				DA17BE311CC4BDAA00402C41 /* MGLMapView_Private.h in Headers */,
 				DABFB86C1CBE99E500D62B32 /* MGLTypes.h in Headers */,
 				DABFB8691CBE99E500D62B32 /* MGLShape.h in Headers */,
+				88F0C0841DC8FD8C002DB7AE /* MGLCustomVectorSource.h in Headers */,
 				3510FFEB1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.h in Headers */,
 				35E1A4D91D74336F007AA97F /* MGLValueEvaluator.h in Headers */,
 				7E016D7F1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h in Headers */,
@@ -1653,7 +1656,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				DA25D5C81CCDA0C100607828 /* PBXTargetDependency */,
 			);
 			name = dynamic;
 			productName = framework;
@@ -1726,25 +1728,31 @@
 				TargetAttributes = {
 					DA1DC9491CB6C1C2006E619F = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = PEWGB469RG;
 					};
 					DA25D5B81CCD9EDE00607828 = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = PEWGB469RG;
 					};
 					DA2E88501CC036F400F24E7B = {
 						CreatedOnToolsVersion = 7.3;
-						LastSwiftMigration = 0800;
+						DevelopmentTeam = PEWGB469RG;
 					};
 					DA8847D11CBAF91600AB86E3 = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = PEWGB469RG;
 					};
 					DA8933D41CCD306400E68420 = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = PEWGB469RG;
 					};
 					DAA4E4121CBB71D400178DFB = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = PEWGB469RG;
 					};
 					DABCABA71CB80692000A7C39 = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = PEWGB469RG;
 					};
 				};
 			};
@@ -1931,6 +1939,7 @@
 				30E578191DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */,
 				40EDA1C11CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */,
 				DA8848541CBAFB9800AB86E3 /* MGLCompactCalloutView.m in Sources */,
+				88F0C0851DC8FD8C002DB7AE /* MGLCustomVectorSource.mm in Sources */,
 				DA8848251CBAFA6200AB86E3 /* MGLPointAnnotation.mm in Sources */,
 				35136D3C1D42272500C20EFD /* MGLCircleStyleLayer.mm in Sources */,
 				350098DE1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.mm in Sources */,
@@ -2004,6 +2013,7 @@
 				30E5781A1DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */,
 				40EDA1C21CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */,
 				DAA4E4291CBB730400178DFB /* NSBundle+MGLAdditions.m in Sources */,
+				88F0C0861DC8FD8C002DB7AE /* MGLCustomVectorSource.mm in Sources */,
 				DAA4E42E1CBB730400178DFB /* MGLAPIClient.m in Sources */,
 				35136D3D1D42272500C20EFD /* MGLCircleStyleLayer.mm in Sources */,
 				350098DF1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.mm in Sources */,
@@ -2077,11 +2087,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		DA25D5C81CCDA0C100607828 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DA25D5B81CCD9EDE00607828 /* settings */;
-			targetProxy = DA25D5C71CCDA0C100607828 /* PBXContainerItemProxy */;
-		};
 		DA25D5CA1CCDA0CC00607828 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DA8933D41CCD306400E68420 /* bundle */;
@@ -2187,6 +2192,7 @@
 				CURRENT_SEMANTIC_VERSION = 1.0.0;
 				CURRENT_SHORT_VERSION = 1.0;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = PEWGB469RG;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -2238,6 +2244,7 @@
 				CURRENT_SEMANTIC_VERSION = 1.0.0;
 				CURRENT_SHORT_VERSION = 1.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = PEWGB469RG;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -2261,6 +2268,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = PEWGB469RG;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -2273,6 +2281,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = PEWGB469RG;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
