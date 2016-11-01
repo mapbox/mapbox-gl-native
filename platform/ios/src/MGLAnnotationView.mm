@@ -38,6 +38,9 @@
     // Intentionally left blank. The default implementation of this method does nothing.
 }
 
+-(void)willBeEnqueued {
+    
+}
 - (void)setCenterOffset:(CGVector)centerOffset
 {
     _centerOffset = centerOffset;

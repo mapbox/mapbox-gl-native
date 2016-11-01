@@ -83,6 +83,9 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
 - (void)prepareForReuse;
 
 /**
+ Called when the view go into the reuse queue.
+ */
+- (void)willBeEnqueued;
  The annotation object currently associated with the view.
  
  You should not change the value of this property directly. This property

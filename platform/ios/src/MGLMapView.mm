@@ -270,7 +270,7 @@ public:
     MGLAnnotationContextMap _annotationContextsByAnnotationTag;
     /// Tag of the selected annotation. If the user location annotation is selected, this ivar is set to `MGLAnnotationTagNotFound`.
     MGLAnnotationTag _selectedAnnotationTag;
-    NS_MUTABLE_DICTIONARY_OF(NSString *, NS_MUTABLE_ARRAY_OF(MGLAnnotationView *) *) *_annotationViewReuseQueueByIdentifier;
+    NS_MUTABLE_DICTIONARY_OF(NSString *, NS_MUTABLE_SET_OF(MGLAnnotationView *) *) *_annotationViewReuseQueueByIdentifier;
 
     BOOL _userLocationAnnotationIsSelected;
     /// Size of the rectangle formed by unioning the maximum slop area around every annotation image and annotation image view.
@@ -3238,11 +3238,13 @@ public:
 
 - (nullable MGLAnnotationView *)dequeueReusableAnnotationViewWithIdentifier:(NSString *)identifier
 {
-    NSMutableArray *annotationViewReuseQueue = [self annotationViewReuseQueueForIdentifier:identifier];
-    MGLAnnotationView *reusableView = annotationViewReuseQueue.firstObject;
-    [reusableView prepareForReuse];
-    [annotationViewReuseQueue removeObject:reusableView];
-
+    NSMutableSet *annotationViewReuseQueue = [self annotationViewReuseQueueForIdentifier:identifier];
+    MGLAnnotationView *reusableView = annotationViewReuseQueue.anyObject;
+    if (reusableView) {
+        reusableView.hidden = NO;
+        [reusableView prepareForReuse];
+        [annotationViewReuseQueue removeObject:reusableView];
+    }
     return reusableView;
 }
 
@@ -4610,16 +4612,17 @@ public:
     {
         return;
     }
-
+    
     [CATransaction begin];
     [CATransaction setDisableActions:YES];
 
+    CGRect viewPort = CGRectInset(self.bounds,
+                                  -_largestAnnotationViewSize.width / 2.0 - MGLAnnotationUpdateViewportOutset.width / 2.0,
+                                  -_largestAnnotationViewSize.height / 2.0 - MGLAnnotationUpdateViewportOutset.width);
+    MGLCoordinateBounds bounds = [self convertRect:viewPort toCoordinateBoundsFromView:self];
+
     for (auto &pair : _annotationContextsByAnnotationTag)
     {
-        CGRect viewPort = CGRectInset(self.bounds,
-                                      -_largestAnnotationViewSize.width / 2.0 - MGLAnnotationUpdateViewportOutset.width / 2.0,
-                                      -_largestAnnotationViewSize.height / 2.0 - MGLAnnotationUpdateViewportOutset.width);
-
         MGLAnnotationContext &annotationContext = pair.second;
         MGLAnnotationView *annotationView = annotationContext.annotationView;
 
@@ -4629,37 +4632,26 @@ public:
             continue;
         }
 
-        if (!annotationView)
-        {
-            MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotationContext.annotation];
-            if (annotationView)
-            {
+        bool annotationViewIsVisible = MGLCoordinateInCoordinateBounds([annotationContext.annotation coordinate], bounds);
+
+        if (annotationViewIsVisible) {
+            if (!annotationView) {
+                MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotationContext.annotation];
                 annotationView.mapView = self;
-                annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
                 annotationContext.annotationView = annotationView;
 
                 if (!annotationView.superview) {
                     [self.annotationContainerView insertSubview:annotationView atIndex:0];
                 }
             }
-            else
-            {
-                // if there is no annotationView at this point then we are dealing with a sprite backed annotation
-                continue;
+            annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
+
+        } else {
+            if (annotationContext.viewReuseIdentifier) {
+                [self enqueueAnnotationViewForAnnotationContext:annotationContext];
             }
         }
-
-        bool annotationViewIsVisible = CGRectContainsRect(viewPort, annotationView.frame);
-        if (!annotationViewIsVisible && annotationContext.viewReuseIdentifier)
-        {
-            [self enqueueAnnotationViewForAnnotationContext:annotationContext];
-        }
-        else
-        {
-            annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
-        }
     }
-
     [CATransaction commit];
 }
 
@@ -4668,12 +4660,12 @@ public:
     MGLAnnotationView *annotationView = annotationContext.annotationView;
 
     if (!annotationView) return;
-
+    [annotationView willBeEnqueued];
     annotationView.annotation = nil;
-
+    annotationView.hidden = YES;
     if (annotationContext.viewReuseIdentifier)
     {
-        NSMutableArray *annotationViewReuseQueue = [self annotationViewReuseQueueForIdentifier:annotationContext.viewReuseIdentifier];
+        NSMutableSet *annotationViewReuseQueue = [self annotationViewReuseQueueForIdentifier:annotationContext.viewReuseIdentifier];
         if (![annotationViewReuseQueue containsObject:annotationView])
         {
             [annotationViewReuseQueue addObject:annotationView];
@@ -4730,7 +4722,6 @@ public:
         } completion:NULL];
         _userLocationAnimationCompletionDate = [NSDate dateWithTimeIntervalSinceNow:duration];
 
-        annotationView.hidden = NO;
         [annotationView update];
 
         if (_userLocationAnnotationIsSelected)
@@ -4943,10 +4934,10 @@ public:
                                                views:views]];
 }
 
-- (NS_MUTABLE_ARRAY_OF(MGLAnnotationView *) *)annotationViewReuseQueueForIdentifier:(NSString *)identifier {
+- (NS_MUTABLE_SET_OF(MGLAnnotationView *) *)annotationViewReuseQueueForIdentifier:(NSString *)identifier {
     if (!_annotationViewReuseQueueByIdentifier[identifier])
     {
-        _annotationViewReuseQueueByIdentifier[identifier] = [NSMutableArray array];
+        _annotationViewReuseQueueByIdentifier[identifier] = [NSMutableSet set];
     }
 
     return _annotationViewReuseQueueByIdentifier[identifier];
