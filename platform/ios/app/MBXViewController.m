@@ -74,7 +74,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
-    MBXSettingsMiscellaneousWorldTour = 0,
+    MBXSettingsMiscellaneousShowReuseQueueStats = 0,
+    MBXSettingsMiscellaneousWorldTour,
     MBXSettingsMiscellaneousCustomUserDot,
     MBXSettingsMiscellaneousPrintLogFile,
     MBXSettingsMiscellaneousDeleteLogFile,
@@ -102,11 +103,21 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                  UITableViewDataSource,
                                  MGLMapViewDelegate>
 
+
 @property (nonatomic) IBOutlet MGLMapView *mapView;
+@property (weak, nonatomic) IBOutlet UILabel *hudLabel;
 @property (nonatomic) NSInteger styleIndex;
 @property (nonatomic) BOOL debugLoggingEnabled;
 @property (nonatomic) BOOL customUserLocationAnnnotationEnabled;
 @property (nonatomic) BOOL usingLocaleBasedCountryLabels;
+@property (nonatomic) BOOL reuseQueueStatsEnabled;
+
+@end
+
+@interface MGLMapView (MBXViewController)
+
+@property (nonatomic) BOOL usingLocaleBasedCountryLabels;
+@property (nonatomic) NSDictionary *annotationViewReuseQueueByIdentifier;
 
 @end
 
@@ -140,6 +151,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self restoreState:nil];
 
     self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
+    self.hudLabel.hidden = YES;
 
     if ([MGLAccountManager accessToken].length)
     {
@@ -323,6 +335,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             ]];
             break;
         case MBXSettingsMiscellaneous:
+            [settingsTitles addObject:@"Show Reuse Queue Stats"];
+
             [settingsTitles addObjectsFromArray:@[
                 @"Start World Tour",
                 [NSString stringWithFormat:@"%@ Custom User Dot", (_customUserLocationAnnnotationEnabled ? @"Disable" : @"Enable")],
@@ -335,6 +349,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     @"Delete Telemetry Logfile",
                 ]];
             };
+
             break;
         default:
             NSAssert(NO, @"All settings sections should be implemented");
@@ -495,6 +510,12 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 case MBXSettingsMiscellaneousDeleteLogFile:
                     [self deleteTelemetryLogFile];
                     break;
+                case MBXSettingsMiscellaneousShowReuseQueueStats:
+                {
+                    self.reuseQueueStatsEnabled = YES;
+                    self.hudLabel.hidden = NO;
+                    break;
+                }
                 default:
                     NSAssert(NO, @"All miscellaneous setting rows should be implemented");
                     break;
@@ -1506,9 +1527,24 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 - (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style
 {
     // Default Mapbox styles use {name_en} as their label language, which means
+    NSUInteger queuedAnnotations = 0;
     // that a device with an English-language locale is already effectively
+    {
     // using locale-based country labels.
+    }
     _usingLocaleBasedCountryLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+}
+
+- (void)mapViewRegionIsChanging:(MGLMapView *)mapView
+{
+    if (self.reuseQueueStatsEnabled) {
+        NSUInteger queuedAnnotations = 0;
+        for (NSArray *queue in self.mapView.annotationViewReuseQueueByIdentifier.allValues)
+        {
+            queuedAnnotations += queue.count;
+        }
+        self.hudLabel.text = [NSString stringWithFormat:@"Visible: %ld  Queued: %ld", (long)mapView.visibleAnnotations.count, (long)queuedAnnotations];
+    }
 }
 
 @end
