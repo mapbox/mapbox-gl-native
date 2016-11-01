@@ -63,7 +63,7 @@ public:
                      const TransformState&);
     void finishRender(Painter&);
 
-    const std::map<UnwrappedTileID, RenderTile>& getRenderTiles() const;
+    std::map<UnwrappedTileID, RenderTile>& getRenderTiles();
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const QueryParameters&) const;

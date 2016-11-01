@@ -24,6 +24,7 @@ public:
     Tile& tile;
     ClipID clip;
     mat4 matrix;
+    bool used = false;
 
     mat4 translatedMatrix(const std::array<float, 2>& translate,
                           style::TranslateAnchorType anchor,
