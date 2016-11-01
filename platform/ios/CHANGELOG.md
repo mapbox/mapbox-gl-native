@@ -46,6 +46,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Annotations
 
 * MGLPolyline annotations and the exterior coordinates of MGLPolygon annotations are now able to be mutated, part or all, and changes are displayed immediately. ([#6565](https://github.com/mapbox/mapbox-gl-native/pull/6565))
+* Added new APIs to MGLMapView to query for visible annotations. Combined with `-[MGLMapView viewForAnnotation:]`, these APIs can be used to access all visible annotation views. ([6061](https://github.com/mapbox/mapbox-gl-native/pull/6061)) 
 * Fixed an issue causing offscreen annotation views to be updated even when they were in the reuse queue. ([#5987](https://github.com/mapbox/mapbox-gl-native/pull/5987))
 * Fixed an issue preventing MGLAnnotationView from animating when its coordinate changes. ([#6215](https://github.com/mapbox/mapbox-gl-native/pull/6215))
 * Fixed an issue causing the wrong annotation view to be selected when tapping an annotation view with a center offset applied. ([#5931](https://github.com/mapbox/mapbox-gl-native/pull/5931))
