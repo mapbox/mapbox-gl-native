@@ -70,11 +70,13 @@ void Source::Impl::startRender(algorithm::ClipIDGenerator& generator,
 void Source::Impl::finishRender(Painter& painter) {
     for (auto& pair : renderTiles) {
         auto& tile = pair.second;
-        painter.renderTileDebug(tile);
+        if (tile.used) {
+            painter.renderTileDebug(tile);
+        }
     }
 }
 
-const std::map<UnwrappedTileID, RenderTile>& Source::Impl::getRenderTiles() const {
+std::map<UnwrappedTileID, RenderTile>& Source::Impl::getRenderTiles() {
     return renderTiles;
 }
 

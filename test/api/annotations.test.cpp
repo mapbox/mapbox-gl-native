@@ -419,3 +419,32 @@ TEST(Annotations, VisibleFeatures) {
     features.erase(std::unique(features.begin(), features.end(), sameID), features.end());
     EXPECT_EQ(features.size(), ids.size());
 }
+
+
+TEST(Annotations, DebugEmpty) {
+    // This test should render nothing, not even the tile borders. Tile borders are only rendered
+    // when there is an actual tile we're trying to render, but since there is no annotation, we
+    // should not render them.
+    AnnotationTest test;
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.setDebug(MapDebugOptions::TileBorders);
+    test.map.setZoom(1);
+
+    test.checkRendering("debug_empty");
+}
+
+
+TEST(Annotations, DebugSparse) {
+    // This test should only render the top right tile with the associated tile border, but no other
+    // tiles because they're all empty.
+    AnnotationTest test;
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.setDebug(MapDebugOptions::TileBorders);
+    test.map.setZoom(1);
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    test.map.addAnnotation(SymbolAnnotation { Point<double>(10, 10), "default_marker" });
+
+    test.checkRendering("debug_sparse");
+}
