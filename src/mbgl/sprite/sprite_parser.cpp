@@ -20,11 +20,35 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
                                  const double ratio,
                                  const bool sdf) {
     // Disallow invalid parameter configurations.
-    if (width <= 0 || height <= 0 || width > 1024 || height > 1024 ||
-        ratio <= 0 || ratio > 10 ||
-        srcX >= image.size.width || srcY >= image.size.height ||
-        srcX + width > image.size.width || srcY + height > image.size.height) {
-        Log::Error(Event::Sprite, "Can't create sprite with invalid metrics");
+    bool invalidParam = false;
+    std::stringstream invalidParamMessage;
+    invalidParamMessage << "Can't create sprite with invalid metrics: ";
+
+    if (width <= 0 || width > 1024) {
+        invalidParam = true;
+        invalidParamMessage << "invalid width: " << width;
+    } else if (height <= 0 || height > 1024) {
+        invalidParam = true;
+        invalidParamMessage << "invalid height: " << height;
+    } else if (ratio <= 0 || ratio > 10) {
+        invalidParam = true;
+        invalidParamMessage << "invalid ratio: " << ratio;
+    } else if (srcX >= image.size.width || srcX + width > image.size.width) {
+        invalidParam = true;
+        invalidParamMessage << "mismatched width: " <<
+            "image.size.height: " << image.size.width <<
+            ", srcX: " << srcX <<
+            ", width: " << width;
+    } else if (srcY >= image.size.height || srcY + height > image.size.height) {
+        invalidParam = true;
+        invalidParamMessage << "mismatched height: " <<
+            "image.size.height: " << image.size.height <<
+            ", srcY: " << srcY <<
+            ", height: " << height;
+    }
+
+    if (invalidParam) {
+        Log::Error(Event::Sprite, invalidParamMessage.str());
         return nullptr;
     }
 

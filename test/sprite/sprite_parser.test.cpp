@@ -41,12 +41,97 @@ TEST(Sprite, SpriteImageCreationInvalid) {
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, image_1x.size.width + 1, 16, 1, false));   // right edge out of bounds
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 16, image_1x.size.height + 1, 1, false));  // bottom edge out of bounds
 
-    EXPECT_EQ(13u, log.count({
+    EXPECT_EQ(1u, log.count({
                       EventSeverity::Error,
                       Event::Sprite,
                       int64_t(-1),
-                      "Can't create sprite with invalid metrics",
+                      "Can't create sprite with invalid metrics: invalid width: 0",
                   }));
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Error,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't create sprite with invalid metrics: invalid height: 0",
+                  }));
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Error,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't create sprite with invalid metrics: invalid width: 4294967295",
+                  }));
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Error,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't create sprite with invalid metrics: invalid height: 4294967295",
+                  }));
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Error,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't create sprite with invalid metrics: invalid ratio: 0",
+                  }));
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Error,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't create sprite with invalid metrics: invalid ratio: -1",
+                  }));
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Error,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't create sprite with invalid metrics: invalid ratio: 23",
+                  }));
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Error,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't create sprite with invalid metrics: invalid width: 2048",
+                  }));
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Error,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't create sprite with invalid metrics: invalid height: 1025",
+                  }));
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Error,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't create sprite with invalid metrics: mismatched width: image.size.height: 200, srcX: 4294967295, width: 16",
+                  }));
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Error,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't create sprite with invalid metrics: mismatched height: image.size.height: 299, srcY: 4294967295, height: 16",
+                  }));
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Error,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't create sprite with invalid metrics: mismatched width: image.size.height: 200, srcX: 0, width: 201",
+                  }));
+
+    EXPECT_EQ(1u, log.count({
+                      EventSeverity::Error,
+                      Event::Sprite,
+                      int64_t(-1),
+                      "Can't create sprite with invalid metrics: mismatched height: image.size.height: 299, srcY: 0, height: 300",
+                  }));
+
 }
 
 TEST(Sprite, SpriteImageCreation1x) {
@@ -228,7 +313,7 @@ TEST(Sprite, SpriteParsingEmptyImage) {
                       EventSeverity::Error,
                       Event::Sprite,
                       int64_t(-1),
-                      "Can't create sprite with invalid metrics",
+                      "Can't create sprite with invalid metrics: invalid width: 0",
                   }));
 }
 
@@ -261,7 +346,7 @@ TEST(Sprite, SpriteParsingWidthTooBig) {
                       EventSeverity::Error,
                       Event::Sprite,
                       int64_t(-1),
-                      "Can't create sprite with invalid metrics",
+                      "Can't create sprite with invalid metrics: invalid width: 0",
                   }));
 }
 
@@ -284,7 +369,7 @@ TEST(Sprite, SpriteParsingNegativeWidth) {
                       EventSeverity::Error,
                       Event::Sprite,
                       int64_t(-1),
-                      "Can't create sprite with invalid metrics",
+                      "Can't create sprite with invalid metrics: invalid width: 0",
                   }));
 }
 
@@ -301,6 +386,6 @@ TEST(Sprite, SpriteParsingNullRatio) {
                       EventSeverity::Error,
                       Event::Sprite,
                       int64_t(-1),
-                      "Can't create sprite with invalid metrics",
+                      "Can't create sprite with invalid metrics: invalid ratio: 0",
                   }));
 }
