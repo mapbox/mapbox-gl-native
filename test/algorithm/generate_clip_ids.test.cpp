@@ -6,6 +6,7 @@ using namespace mbgl;
 
 struct Renderable {
     ClipID clip;
+    bool used = true;
 
     bool operator==(const Renderable& rhs) const {
         return clip == rhs.clip;

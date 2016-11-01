@@ -404,6 +404,7 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
             auto bucket = tile.tile.getBucket(*layer);
             if (bucket) {
                 result.order.emplace_back(*layer, &tile, bucket);
+                tile.used = true;
             }
         }
     }
