@@ -38,6 +38,7 @@ jazzy \
     --github-file-prefix https://github.com/mapbox/mapbox-gl-native/tree/${BRANCH} \
     --module-version ${SHORT_VERSION} \
     --readme ${README} \
+    --documentation="platform/macos/docs/Info.plist Keys.md" \
     --theme platform/darwin/docs/theme \
     --output ${OUTPUT}
 # https://github.com/realm/jazzy/issues/411

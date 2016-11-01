@@ -38,6 +38,7 @@ jazzy \
     --github-file-prefix https://github.com/mapbox/mapbox-gl-native/tree/${BRANCH} \
     --module-version ${SHORT_VERSION} \
     --readme ${README} \
+    --documentation="platform/ios/docs/Info.plist Keys.md" \
     --root-url https://www.mapbox.com/ios-sdk/api/${RELEASE_VERSION}/ \
     --theme platform/darwin/docs/theme \
     --output ${OUTPUT}
