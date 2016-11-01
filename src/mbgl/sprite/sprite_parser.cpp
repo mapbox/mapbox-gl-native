@@ -5,6 +5,7 @@
 
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/rapidjson.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <cmath>
 #include <limits>
@@ -24,7 +25,10 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
         ratio <= 0 || ratio > 10 ||
         srcX >= image.size.width || srcY >= image.size.height ||
         srcX + width > image.size.width || srcY + height > image.size.height) {
-        Log::Error(Event::Sprite, "Can't create sprite with invalid metrics");
+        Log::Error(Event::Sprite, "Can't create sprite with invalid metrics: %ux%u@%u,%u in %ux%u@%sx sprite",
+            width, height, srcX, srcY,
+            image.size.width, image.size.height,
+            util::toString(ratio).c_str());
         return nullptr;
     }
 
