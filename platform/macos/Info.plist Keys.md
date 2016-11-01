@@ -4,9 +4,9 @@ The Mapbox macOS SDK supports custom `Info.plist` keys in your application in or
 
 ## MGLMapboxAccessToken
 
-Set the <a href="https://www.mapbox.com/help/define-access-token/">Mapbox access token</a> to be used by all instances of `MGLMapView` in the current application.
+Set the [Mapbox access token](https://www.mapbox.com/help/define-access-token/) to be used by all instances of `MGLMapView` in the current application.
 
-Mapbox-hosted vector tiles and styles require an API access token, which you can obtain from the <a href="https://www.mapbox.com/studio/account/tokens/">Mapbox account page</a>. Access tokens associate requests to Mapbox’s vector tile and style APIs with your Mapbox account. They also deter other developers from using your styles without your permission.
+Mapbox-hosted vector tiles and styles require an API access token, which you can obtain from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/). Access tokens associate requests to Mapbox’s vector tile and style APIs with your Mapbox account. They also deter other developers from using your styles without your permission.
 
 As an alternative, you can use `+[MGLAccountManager setAccessToken:]` to set a token in code. See [our guide](https://www.mapbox.com/help/ios-private-access-token/) for some tips on keeping access tokens in open source code private. 
 
