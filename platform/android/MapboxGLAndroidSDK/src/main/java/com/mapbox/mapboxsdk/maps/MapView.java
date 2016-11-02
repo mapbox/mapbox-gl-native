@@ -190,7 +190,7 @@ public class MapView extends FrameLayout {
     private void initialize(@NonNull Context context, @NonNull MapboxMapOptions options) {
         if (isInEditMode()) {
             // if we are in an editor mode we show an image of a map
-            LayoutInflater.from(context).inflate(R.layout.mapview_preview, this);
+            LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_preview, this);
             return;
         }
 
@@ -201,7 +201,7 @@ public class MapView extends FrameLayout {
         projection = mapboxMap.getProjection();
 
         icons = new ArrayList<>();
-        View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
+        View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
         setWillNotDraw(false);
 
         if (options.getTextureMode()) {
@@ -329,7 +329,7 @@ public class MapView extends FrameLayout {
         if (compassMargins != null) {
             uiSettings.setCompassMargins(compassMargins[0], compassMargins[1], compassMargins[2], compassMargins[3]);
         } else {
-            int tenDp = (int) getResources().getDimension(R.dimen.ten_dp);
+            int tenDp = (int) getResources().getDimension(R.dimen.mapbox_ten_dp);
             uiSettings.setCompassMargins(tenDp, tenDp, tenDp, tenDp);
         }
         uiSettings.setCompassFadeFacingNorth(options.getCompassFadeFacingNorth());
@@ -341,7 +341,7 @@ public class MapView extends FrameLayout {
         if (logoMargins != null) {
             uiSettings.setLogoMargins(logoMargins[0], logoMargins[1], logoMargins[2], logoMargins[3]);
         } else {
-            int sixteenDp = (int) getResources().getDimension(R.dimen.sixteen_dp);
+            int sixteenDp = (int) getResources().getDimension(R.dimen.mapbox_sixteen_dp);
             uiSettings.setLogoMargins(sixteenDp, sixteenDp, sixteenDp, sixteenDp);
         }
 
@@ -353,8 +353,8 @@ public class MapView extends FrameLayout {
             uiSettings.setAttributionMargins(attributionMargins[0], attributionMargins[1], attributionMargins[2], attributionMargins[3]);
         } else {
             Resources resources = getResources();
-            int sevenDp = (int) resources.getDimension(R.dimen.seven_dp);
-            int seventySixDp = (int) resources.getDimension(R.dimen.seventy_six_dp);
+            int sevenDp = (int) resources.getDimension(R.dimen.mapbox_seven_dp);
+            int seventySixDp = (int) resources.getDimension(R.dimen.mapbox_seventy_six_dp);
             uiSettings.setAttributionMargins(seventySixDp, sevenDp, sevenDp, sevenDp);
         }
 
@@ -2930,10 +2930,10 @@ public class MapView extends FrameLayout {
         @Override
         public void onClick(View view) {
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(mapView.getContext(), R.style.TelemAlertDialogStyle);
-            builder.setTitle(R.string.attributionsDialogTitle);
-            String[] items = mapView.getContext().getResources().getStringArray(R.array.attribution_names);
-            builder.setAdapter(new ArrayAdapter<>(mapView.getContext(), R.layout.attribution_list_item, items), this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(mapView.getContext(), R.style.mapbox_AlertDialogStyle);
+            builder.setTitle(R.string.mapbox_attributionsDialogTitle);
+            String[] items = mapView.getContext().getResources().getStringArray(R.array.mapbox_attribution_names);
+            builder.setAdapter(new ArrayAdapter<>(mapView.getContext(), R.layout.mapbox_attribution_list_item, items), this);
             AlertDialog attributionDialog = builder.show();
 
             // TODO Change listview text color to mapView.getAttributionTintColor()
@@ -2944,27 +2944,27 @@ public class MapView extends FrameLayout {
         public void onClick(DialogInterface dialog, int which) {
             final Context context = ((Dialog) dialog).getContext();
             if (which == ATTRIBUTION_INDEX_TELEMETRY_SETTINGS) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.TelemAlertDialogStyle);
-                builder.setTitle(R.string.attributionTelemetryTitle);
-                builder.setMessage(R.string.attributionTelemetryMessage);
-                builder.setPositiveButton(R.string.attributionTelemetryPositive, new DialogInterface.OnClickListener() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.mapbox_AlertDialogStyle);
+                builder.setTitle(R.string.mapbox_attributionTelemetryTitle);
+                builder.setMessage(R.string.mapbox_attributionTelemetryMessage);
+                builder.setPositiveButton(R.string.mapbox_attributionTelemetryPositive, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(true);
                         dialog.cancel();
                     }
                 });
-                builder.setNeutralButton(R.string.attributionTelemetryNeutral, new DialogInterface.OnClickListener() {
+                builder.setNeutralButton(R.string.mapbox_attributionTelemetryNeutral, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String url = context.getResources().getStringArray(R.array.attribution_links)[3];
+                        String url = context.getResources().getStringArray(R.array.mapbox_attribution_links)[3];
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setData(Uri.parse(url));
                         context.startActivity(intent);
                         dialog.cancel();
                     }
                 });
-                builder.setNegativeButton(R.string.attributionTelemetryNegative, new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(R.string.mapbox_attributionTelemetryNegative, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(false);
@@ -2978,7 +2978,7 @@ public class MapView extends FrameLayout {
                 telemDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(mapView.getAttributionTintColor());
                 return;
             }
-            String url = context.getResources().getStringArray(R.array.attribution_links)[which];
+            String url = context.getResources().getStringArray(R.array.mapbox_attribution_links)[which];
             if (which == ATTRIBUTION_INDEX_IMPROVE_THIS_MAP) {
                 LatLng latLng = mapView.getMapboxMap().getCameraPosition().target;
                 url = String.format(url, latLng.getLongitude(), latLng.getLatitude(), (int) mapView.getZoom());

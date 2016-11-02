@@ -26,12 +26,12 @@
                 android:id="@id/mapView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:center_latitude="51.506675"
-                app:center_longitude="-0.128699"
-                app:compass_fade_facing_north="false"
-                app:direction="90"
-                app:tilt="40"
-                app:zoom="10" />
+                app:mapbox_center_latitude="51.506675"
+                app:mapbox_center_longitude="-0.128699"
+                app:mapbox_compass_fade_facing_north="false"
+                app:mapbox_direction="90"
+                app:mapbox_tilt="40"
+                app:mapbox_zoom="10" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"

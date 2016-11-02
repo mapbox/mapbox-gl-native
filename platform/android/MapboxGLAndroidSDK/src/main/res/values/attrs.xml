@@ -1,50 +1,50 @@
 <resources>
     <!-- these are public -->
-    <declare-styleable name="MapView">
+    <declare-styleable name="mapbox_MapView">
 
         <!--Configuration-->
-        <attr name="access_token" format="string" />
-        <attr name="style_url" format="string" />
-        <attr name="api_base_url" format="string" />
+        <attr name="mapbox_access_token" format="string" />
+        <attr name="mapbox_style_url" format="string" />
+        <attr name="mapbox_api_base_url" format="string" />
 
         <!--Camera-->
-        <attr name="center_longitude" format="float" />
-        <attr name="center_latitude" format="float" />
-        <attr name="zoom" format="float" />
-        <attr name="direction" format="float" />
-        <attr name="tilt" format="float" />
+        <attr name="mapbox_center_longitude" format="float" />
+        <attr name="mapbox_center_latitude" format="float" />
+        <attr name="mapbox_zoom" format="float" />
+        <attr name="mapbox_direction" format="float" />
+        <attr name="mapbox_tilt" format="float" />
 
         <!--Zoom-->
-        <attr name="zoom_max" format="float" />
-        <attr name="zoom_min" format="float" />
+        <attr name="mapbox_zoom_max" format="float" />
+        <attr name="mapbox_zoom_min" format="float" />
 
         <!--Gestures-->
-        <attr name="zoom_enabled" format="boolean" />
-        <attr name="scroll_enabled" format="boolean" />
-        <attr name="rotate_enabled" format="boolean" />
-        <attr name="tilt_enabled" format="boolean" />
-        <attr name="debug_active" format="boolean" />
+        <attr name="mapbox_zoom_enabled" format="boolean" />
+        <attr name="mapbox_scroll_enabled" format="boolean" />
+        <attr name="mapbox_rotate_enabled" format="boolean" />
+        <attr name="mapbox_tilt_enabled" format="boolean" />
+        <attr name="mapbox_debug_active" format="boolean" />
 
         <!--UI-Controls-->
-        <attr name="zoom_controls_enabled" format="boolean" />
+        <attr name="mapbox_zoom_controls_enabled" format="boolean" />
 
         <!--MyLocation-->
-        <attr name="my_location_enabled" format="boolean" />
-        <attr name="my_location_foreground" format="reference" />
-        <attr name="my_location_foreground_bearing" format="reference" />
-        <attr name="my_location_foreground_tint" format="color" />
-        <attr name="my_location_background" format="reference" />
-        <attr name="my_location_background_tint" format="color" />
-        <attr name="my_location_background_left" format="dimension" />
-        <attr name="my_location_background_top" format="dimension" />
-        <attr name="my_location_background_right" format="dimension" />
-        <attr name="my_location_background_bottom" format="dimension" />
-        <attr name="my_location_accuracy_tint" format="color" />
-        <attr name="my_location_accuracy_alpha" format="integer" />
+        <attr name="mapbox_my_location_enabled" format="boolean" />
+        <attr name="mapbox_my_location_foreground" format="reference" />
+        <attr name="mapbox_my_location_foreground_bearing" format="reference" />
+        <attr name="mapbox_my_location_foreground_tint" format="color" />
+        <attr name="mapbox_my_location_background" format="reference" />
+        <attr name="mapbox_my_location_background_tint" format="color" />
+        <attr name="mapbox_my_location_background_left" format="dimension" />
+        <attr name="mapbox_my_location_background_top" format="dimension" />
+        <attr name="mapbox_my_location_background_right" format="dimension" />
+        <attr name="mapbox_my_location_background_bottom" format="dimension" />
+        <attr name="mapbox_my_location_accuracy_tint" format="color" />
+        <attr name="mapbox_my_location_accuracy_alpha" format="integer" />
 
         <!--Compass-->
-        <attr name="compass_enabled" format="boolean" />
-        <attr name="compass_gravity">
+        <attr name="mapbox_compass_enabled" format="boolean" />
+        <attr name="mapbox_compass_gravity">
             <flag name="top" value="0x30" />
             <flag name="bottom" value="0x50" />
             <flag name="left" value="0x03" />
@@ -60,14 +60,14 @@
             <flag name="start" value="0x00800003" />
             <flag name="end" value="0x00800005" />
         </attr>
-        <attr name="compass_margin_left" format="dimension" />
-        <attr name="compass_margin_top" format="dimension" />
-        <attr name="compass_margin_right" format="dimension" />
-        <attr name="compass_margin_bottom" format="dimension" />
-        <attr name="compass_fade_facing_north" format="boolean" />
+        <attr name="mapbox_compass_margin_left" format="dimension" />
+        <attr name="mapbox_compass_margin_top" format="dimension" />
+        <attr name="mapbox_compass_margin_right" format="dimension" />
+        <attr name="mapbox_compass_margin_bottom" format="dimension" />
+        <attr name="mapbox_compass_fade_facing_north" format="boolean" />
 
         <!--Logo-->
-        <attr name="logo_gravity">
+        <attr name="mapbox_logo_gravity">
             <flag name="top" value="0x30" />
             <flag name="bottom" value="0x50" />
             <flag name="left" value="0x03" />
@@ -83,14 +83,14 @@
             <flag name="start" value="0x00800003" />
             <flag name="end" value="0x00800005" />
         </attr>
-        <attr name="logo_margin_left" format="dimension" />
-        <attr name="logo_margin_top" format="dimension" />
-        <attr name="logo_margin_right" format="dimension" />
-        <attr name="logo_margin_bottom" format="dimension" />
-        <attr name="logo_enabled" format="boolean" />
+        <attr name="mapbox_logo_margin_left" format="dimension" />
+        <attr name="mapbox_logo_margin_top" format="dimension" />
+        <attr name="mapbox_logo_margin_right" format="dimension" />
+        <attr name="mapbox_logo_margin_bottom" format="dimension" />
+        <attr name="mapbox_logo_enabled" format="boolean" />
 
         <!--Attribution-->
-        <attr name="attribution_gravity">
+        <attr name="mapbox_attribution_gravity">
             <flag name="top" value="0x30" />
             <flag name="bottom" value="0x50" />
             <flag name="left" value="0x03" />
@@ -106,14 +106,14 @@
             <flag name="start" value="0x00800003" />
             <flag name="end" value="0x00800005" />
         </attr>
-        <attr name="attribution_margin_left" format="dimension" />
-        <attr name="attribution_margin_top" format="dimension" />
-        <attr name="attribution_margin_right" format="dimension" />
-        <attr name="attribution_margin_bottom" format="dimension" />
-        <attr name="attribution_enabled" format="boolean" />
-        <attr name="attribution_tint" format="color" />
+        <attr name="mapbox_attribution_margin_left" format="dimension" />
+        <attr name="mapbox_attribution_margin_top" format="dimension" />
+        <attr name="mapbox_attribution_margin_right" format="dimension" />
+        <attr name="mapbox_attribution_margin_bottom" format="dimension" />
+        <attr name="mapbox_attribution_enabled" format="boolean" />
+        <attr name="mapbox_attribution_tint" format="color" />
 
         <!-- Deprecated to use TextureView-->
-        <attr name="texture_mode" format="boolean" />
+        <attr name="mapbox_texture_mode" format="boolean" />
     </declare-styleable>
 </resources>

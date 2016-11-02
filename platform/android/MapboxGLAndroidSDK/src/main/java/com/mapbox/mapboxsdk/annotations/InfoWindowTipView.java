@@ -20,7 +20,7 @@ final class InfoWindowTipView extends View {
         super(context, attrs);
 
         mPath = new Path();
-        mLineWidth = (int) context.getResources().getDimension(R.dimen.infowindow_line_width);
+        mLineWidth = (int) context.getResources().getDimension(R.dimen.mapbox_infowindow_line_width);
         mPaint = new Paint();
         mPaint.setColor(Color.WHITE);
         mPaint.setAntiAlias(true);

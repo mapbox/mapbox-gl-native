@@ -16,10 +16,10 @@
         android:id="@id/mapView"
         android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
-        app:center_latitude="52.519003"
-        app:center_longitude="13.400972"
-        app:style_url="@string/style_mapbox_streets"
-        app:zoom="16"
+        app:mapbox_center_latitude="52.519003"
+        app:mapbox_center_longitude="13.400972"
+        app:mapbox_style_url="@string/mapbox_style_mapbox_streets"
+        app:mapbox_zoom="16"
         android:layout_height="match_parent"/>
 
     <android.support.design.widget.FloatingActionButton

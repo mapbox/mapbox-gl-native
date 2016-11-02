@@ -14,10 +14,10 @@
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@id/mapView"
-        app:center_latitude="50.871062"
-        app:center_longitude="1.583210"
-        app:direction="220"
-        app:zoom="10"
+        app:mapbox_center_latitude="50.871062"
+        app:mapbox_center_longitude="1.583210"
+        app:mapbox_direction="220"
+        app:mapbox_zoom="10"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar" />

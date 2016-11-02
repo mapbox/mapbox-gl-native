@@ -8,34 +8,34 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/mapview_preview" />
+        android:src="@drawable/mapbox_mapview_preview" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginBottom="@dimen/eight_dp"
-        android:layout_marginLeft="@dimen/eight_dp"
-        android:contentDescription="@string/mapboxIconContentDescription"
-        android:src="@drawable/attribution_logo" />
+        android:layout_marginBottom="@dimen/mapbox_eight_dp"
+        android:layout_marginLeft="@dimen/mapbox_eight_dp"
+        android:contentDescription="@string/mapbox_iconContentDescription"
+        android:src="@drawable/mapbox_logo_icon" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="@dimen/seven_dp"
-        android:layout_marginLeft="@dimen/seventy_six_dp"
-        android:background="@drawable/bg_default_selector"
+        android:layout_marginBottom="@dimen/mapbox_seven_dp"
+        android:layout_marginLeft="@dimen/mapbox_seventy_six_dp"
+        android:background="@drawable/mapbox_default_bg_selector"
         android:clickable="true"
-        android:contentDescription="@string/attributionsIconContentDescription"
-        android:src="@drawable/ic_info_outline_24dp_selector" />
+        android:contentDescription="@string/mapbox_attributionsIconContentDescription"
+        android:src="@drawable/mapbox_info_bg_selector" />
 
     <ImageView
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_alignParentRight="true"
         android:layout_margin="10dp"
-        android:src="@drawable/compass" />
+        android:src="@drawable/mapbox_compass_icon" />
 
 </RelativeLayout>

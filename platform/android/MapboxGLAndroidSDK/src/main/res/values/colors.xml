@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="white">#F9F9F9</color>
-    <color name="black">#000000</color>
-    <color name="gray">#7D7F80</color>
-    <color name="gray_light">#EEEEEE</color>
+    <color name="mapbox_gray">#7D7F80</color>
+    <color name="mapbox_gray_light">#EEEEEE</color>
     <color name="mapbox_blue">#1E8CAB</color>
-    <color name="my_location_ring">@color/mapbox_blue</color>
+    <color name="mapbox_my_location_ring">@color/mapbox_blue</color>
 </resources>

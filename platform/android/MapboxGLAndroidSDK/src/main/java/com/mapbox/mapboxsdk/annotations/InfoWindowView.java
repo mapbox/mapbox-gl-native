@@ -25,7 +25,7 @@ class InfoWindowView extends RelativeLayout {
     }
 
     private void initialize(Context context) {
-        LayoutInflater.from(context).inflate(R.layout.infowindow_content, this);
+        LayoutInflater.from(context).inflate(R.layout.mapbox_infowindow_content, this);
         mTipView = (InfoWindowTipView) findViewById(R.id.infowindow_tipview);
     }
 
@@ -33,6 +33,6 @@ class InfoWindowView extends RelativeLayout {
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mTipView.getLayoutParams();
         layoutParams.leftMargin = marginLeft;
         // This is a bit of a hack but prevents an occasional gap between the InfoWindow
-        layoutParams.topMargin = (int) getResources().getDimension(R.dimen.infowindow_offset);
+        layoutParams.topMargin = (int) getResources().getDimension(R.dimen.mapbox_infowindow_offset);
     }
 }

@@ -120,14 +120,14 @@ public final class IconFactory {
 
     public Icon defaultMarker() {
         if (mDefaultMarker == null) {
-            mDefaultMarker = fromResource(R.drawable.default_marker);
+            mDefaultMarker = fromResource(R.drawable.mapbox_marker_icon_default);
         }
         return mDefaultMarker;
     }
 
     public Icon defaultMarkerView() {
         if (mDefaultMarkerView == null) {
-            mDefaultMarkerView = fromResource(R.drawable.default_markerview);
+            mDefaultMarkerView = fromResource(R.drawable.mapbox_markerview_icon_default);
         }
         return mDefaultMarkerView;
     }

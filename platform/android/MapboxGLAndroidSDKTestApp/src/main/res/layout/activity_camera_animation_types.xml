@@ -17,9 +17,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/toolbar"
-        app:center_latitude="51.50325"
-        app:center_longitude="-0.11968"
-        app:zoom="15" />
+        app:mapbox_center_latitude="51.50325"
+        app:mapbox_center_longitude="-0.11968"
+        app:mapbox_zoom="15" />
 
     <LinearLayout
         android:layout_width="match_parent"

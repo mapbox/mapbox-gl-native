@@ -129,8 +129,8 @@ public class InfoWindow {
                 final float mapRight = mapView.getRight();
                 final float mapLeft = mapView.getLeft();
 
-                float marginHorizontal = resources.getDimension(R.dimen.infowindow_margin);
-                float tipViewOffset = resources.getDimension(R.dimen.infowindow_tipview_width) / 2;
+                float marginHorizontal = resources.getDimension(R.dimen.mapbox_infowindow_margin);
+                float tipViewOffset = resources.getDimension(R.dimen.mapbox_infowindow_tipview_width) / 2;
                 float tipViewMarginLeft = view.getMeasuredWidth() / 2 - tipViewOffset;
 
                 boolean outOfBoundsLeft = false;

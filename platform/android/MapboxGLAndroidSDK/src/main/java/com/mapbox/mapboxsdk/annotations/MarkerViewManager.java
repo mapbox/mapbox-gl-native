@@ -538,7 +538,7 @@ public class MarkerViewManager {
             ViewHolder viewHolder;
             if (convertView == null) {
                 viewHolder = new ViewHolder();
-                convertView = inflater.inflate(R.layout.view_image_marker, parent, false);
+                convertView = inflater.inflate(R.layout.mapbox_view_image_marker, parent, false);
                 viewHolder.imageView = (ImageView) convertView.findViewById(R.id.image);
                 convertView.setTag(viewHolder);
             } else {
