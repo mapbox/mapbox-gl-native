@@ -348,8 +348,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
     const std::size_t endVertex = vertices.size();
     const std::size_t vertexCount = endVertex - startVertex;
 
-    if (segments.back().vertexLength + vertexCount > std::numeric_limits<uint16_t>::max()) {
-        // Move to a new group because the old one can't hold the geometry.
+    if (segments.empty() || segments.back().vertexLength + vertexCount > std::numeric_limits<uint16_t>::max()) {
         segments.emplace_back(startVertex, triangles.size());
     }
 

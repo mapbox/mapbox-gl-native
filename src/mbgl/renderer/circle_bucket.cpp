@@ -44,7 +44,7 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
             if ((mode != MapMode::Still) &&
                 (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT)) continue;
 
-            if (segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
+            if (segments.empty() || segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
                 // Move to a new segments because the old one can't hold the geometry.
                 segments.emplace_back(vertices.size(), triangles.size());
             }

@@ -23,6 +23,7 @@ set(MBGL_TEST_FILES
     test/geometry/binpack.test.cpp
 
     # gl
+    test/gl/bucket.test.cpp
     test/gl/object.test.cpp
 
     # include/mbgl
