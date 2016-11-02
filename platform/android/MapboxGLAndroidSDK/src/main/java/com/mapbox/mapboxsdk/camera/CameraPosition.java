@@ -154,12 +154,12 @@ public final class CameraPosition implements Parcelable {
         public Builder(TypedArray typedArray) {
             super();
             if (typedArray != null) {
-                this.bearing = typedArray.getFloat(R.styleable.MapView_direction, 0.0f);
-                double lat = typedArray.getFloat(R.styleable.MapView_center_latitude, 0.0f);
-                double lng = typedArray.getFloat(R.styleable.MapView_center_longitude, 0.0f);
+                this.bearing = typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_direction, 0.0f);
+                double lat = typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_center_latitude, 0.0f);
+                double lng = typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_center_longitude, 0.0f);
                 this.target = new LatLng(lat, lng);
-                this.tilt = typedArray.getFloat(R.styleable.MapView_tilt, 0.0f);
-                this.zoom = typedArray.getFloat(R.styleable.MapView_zoom, 0.0f);
+                this.tilt = typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_tilt, 0.0f);
+                this.zoom = typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_zoom, 0.0f);
             }
         }
 

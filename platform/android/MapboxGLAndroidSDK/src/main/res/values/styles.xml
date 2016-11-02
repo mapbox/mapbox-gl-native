@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- these are public -->
-    <style name="AttributionAlertDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="android:textColorPrimary">@android:color/white</item>
-    </style>
-
-    <style name="TelemAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert"/>
+    <style name="mapbox_AlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert"/>
 
 </resources>

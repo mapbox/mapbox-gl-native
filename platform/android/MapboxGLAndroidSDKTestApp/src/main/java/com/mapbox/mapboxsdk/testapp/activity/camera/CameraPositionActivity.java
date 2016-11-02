@@ -63,7 +63,7 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
                 Context context = v.getContext();
                 final View dialogContent = LayoutInflater.from(context).inflate(R.layout.dialog_camera_position, null);
                 AlertDialog.Builder builder = new AlertDialog.Builder(
-                    context, com.mapbox.mapboxsdk.R.style.AttributionAlertDialogStyle);
+                    context, com.mapbox.mapboxsdk.R.style.mapbox_AlertDialogStyle);
                 builder.setTitle(R.string.dialog_camera_position);
                 builder.setView(onInflateDialogContent(dialogContent));
                 builder.setPositiveButton("Animate", new DialogInterface.OnClickListener() {

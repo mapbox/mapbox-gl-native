@@ -1,57 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--Add references to exposed resources-->
-    <public name="AttributionAlertDialogStyle" type="style" />
 
-    <public name="style_mapbox_streets" type="string" />
-    <public name="style_emerald" type="string" />
-    <public name="style_light" type="string" />
-    <public name="style_dark" type="string" />
-    <public name="style_satellite" type="string" />
-    <public name="style_satellite_streets" type="string" />
+    <!-- This file contains attributes and styles that are part of the public API-->
+    <!-- Users can find these with code completion while other ones from this module will remain-->
+    <!-- hidden, though the user can reference them but won't show up during code completion-->
 
-    <public name="center_longitude" type="attr" />
-    <public name="center_latitude" type="attr" />
-    <public name="zoom_level" type="attr" />
-    <public name="direction" type="attr" />
-    <public name="zoom_enabled" type="attr" />
-    <public name="scroll_enabled" type="attr" />
-    <public name="rotate_enabled" type="attr" />
-    <public name="zoom_controls_enabled" type="attr" />
-    <public name="debug_active" type="attr" />
-    <public name="style_url" type="attr" />
-    <public name="access_token" type="attr" />
-    <public name="style_classes" type="attr" />
-    <public name="my_location_enabled" type="attr" />
-    <public name="compass_enabled" type="attr" />
-    <public name="compass_gravity" type="attr" />
-    <public name="compass_margin_left" type="attr" />
-    <public name="compass_margin_top" type="attr" />
-    <public name="compass_margin_right" type="attr" />
-    <public name="compass_margin_bottom" type="attr" />
-    <public name="compass_fade_facing_north" type="attr" />
-    <public name="logo_gravity" type="attr" />
-    <public name="logo_margin_left" type="attr" />
-    <public name="logo_margin_top" type="attr" />
-    <public name="logo_margin_right" type="attr" />
-    <public name="logo_margin_bottom" type="attr" />
-    <public name="logo_visibility" type="attr" />
-    <public name="attribution_gravity" type="attr" />
-    <public name="attribution_margin_left" type="attr" />
-    <public name="attribution_margin_top" type="attr" />
-    <public name="attribution_margin_right" type="attr" />
-    <public name="attribution_margin_bottom" type="attr" />
-    <public name="attribution_visibility" type="attr" />
+    <public name="mapbox_AlertDialogStyle" type="style" />
 
-    <public name="attribution_logo" type="drawable" />
-    <public name="compass" type="drawable" />
-    <public name="default_marker" type="drawable" />
-    <public name="attribution_button_pressed_selector" type="drawable" />
-    <public name="attribution_button_pressed_normal" type="drawable" />
-    <public name="attribution_button_pressed_pressed" type="drawable" />
-    <public name="my_location" type="drawable" />
-    <public name="my_location_bearing" type="drawable" />
-    <public name="my_location_stale" type="drawable" />
-    <public name="my_location_ring" type="color" />
+    <public name="mapbox_style_mapbox_streets" type="string" />
+    <public name="mapbox_style_emerald" type="string" />
+    <public name="mapbox_style_light" type="string" />
+    <public name="mapbox_style_dark" type="string" />
+    <public name="mapbox_style_satellite" type="string" />
+    <public name="mapbox_style_satellite_streets" type="string" />
+
+    <public name="mapbox_center_longitude" type="attr" />
+    <public name="mapbox_center_latitude" type="attr" />
+    <public name="mapbox_zoom_level" type="attr" />
+    <public name="mapbox_direction" type="attr" />
+    <public name="mapbox_zoom_enabled" type="attr" />
+    <public name="mapbox_scroll_enabled" type="attr" />
+    <public name="mapbox_rotate_enabled" type="attr" />
+    <public name="mapbox_zoom_controls_enabled" type="attr" />
+    <public name="mapbox_debug_active" type="attr" />
+    <public name="mapbox_style_url" type="attr" />
+    <public name="mapbox_access_token" type="attr" />
+    <public name="mapbox_style_classes" type="attr" />
+    <public name="mapbox_my_location_enabled" type="attr" />
+    <public name="mapbox_compass_enabled" type="attr" />
+    <public name="mapbox_compass_gravity" type="attr" />
+    <public name="mapbox_compass_margin_left" type="attr" />
+    <public name="mapbox_compass_margin_top" type="attr" />
+    <public name="mapbox_compass_margin_right" type="attr" />
+    <public name="mapbox_compass_margin_bottom" type="attr" />
+    <public name="mapbox_compass_fade_facing_north" type="attr" />
+    <public name="mapbox_logo_gravity" type="attr" />
+    <public name="mapbox_logo_margin_left" type="attr" />
+    <public name="mapbox_logo_margin_top" type="attr" />
+    <public name="mapbox_logo_margin_right" type="attr" />
+    <public name="mapbox_logo_margin_bottom" type="attr" />
+    <public name="mapbox_logo_visibility" type="attr" />
+    <public name="mapbox_attribution_gravity" type="attr" />
+    <public name="mapbox_attribution_margin_left" type="attr" />
+    <public name="mapbox_attribution_margin_top" type="attr" />
+    <public name="mapbox_attribution_margin_right" type="attr" />
+    <public name="mapbox_attribution_margin_bottom" type="attr" />
+    <public name="mapbox_attribution_visibility" type="attr" />
+
+    <public name="mapbox_attribution_logo" type="drawable" />
+    <public name="mapbox_compass" type="drawable" />
+    <public name="mapbox_default_marker" type="drawable" />
+    <public name="mapbox_attribution_button_pressed_selector" type="drawable" />
+    <public name="mapbox_attribution_button_pressed_normal" type="drawable" />
+    <public name="mapbox_attribution_button_pressed_pressed" type="drawable" />
+    <public name="mapbox_my_location" type="drawable" />
+    <public name="mapbox_my_location_bearing" type="drawable" />
+    <public name="mapbox_my_location_stale" type="drawable" />
+    <public name="mapbox_my_location_ring" type="color" />
     <public name="mapbox_blue" type="color" />
 </resources>
