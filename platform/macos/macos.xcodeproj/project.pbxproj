@@ -82,6 +82,9 @@
 		DA839EA01CC2E3400062CAFB /* MapDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA839E9E1CC2E3400062CAFB /* MapDocument.xib */; };
 		DA839EA21CC2E3400062CAFB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA839EA11CC2E3400062CAFB /* Assets.xcassets */; };
 		DA839EA51CC2E3400062CAFB /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA839EA31CC2E3400062CAFB /* MainMenu.xib */; };
+		DA87A9981DC9D88400810D09 /* MGLGeoJSONSourceTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA87A9961DC9D88400810D09 /* MGLGeoJSONSourceTests.mm */; };
+		DA87A9991DC9D88400810D09 /* MGLTileSetTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA87A9971DC9D88400810D09 /* MGLTileSetTests.mm */; };
+		DA87A99C1DC9D8DD00810D09 /* MGLGeoJSONSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA87A99B1DC9D8DD00810D09 /* MGLGeoJSONSource_Private.h */; };
 		DA8933A51CCD287300E68420 /* MGLAnnotationCallout.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA8933A71CCD287300E68420 /* MGLAnnotationCallout.xib */; };
 		DA8933AE1CCD290700E68420 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA8933AB1CCD290700E68420 /* Localizable.strings */; };
 		DA8933B51CCD2C2500E68420 /* Foundation.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA8933B31CCD2C2500E68420 /* Foundation.strings */; };
@@ -304,6 +307,9 @@
 		DA839EA11CC2E3400062CAFB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DA839EA41CC2E3400062CAFB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		DA839EA61CC2E3400062CAFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DA87A9961DC9D88400810D09 /* MGLGeoJSONSourceTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLGeoJSONSourceTests.mm; sourceTree = "<group>"; };
+		DA87A9971DC9D88400810D09 /* MGLTileSetTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLTileSetTests.mm; sourceTree = "<group>"; };
+		DA87A99B1DC9D8DD00810D09 /* MGLGeoJSONSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLGeoJSONSource_Private.h; sourceTree = "<group>"; };
 		DA8933A61CCD287300E68420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MGLAnnotationCallout.xib; sourceTree = "<group>"; };
 		DA8933AC1CCD290700E68420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA8933B41CCD2C2500E68420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Foundation.strings; sourceTree = "<group>"; };
@@ -503,6 +509,7 @@
 				DA8F25951D51CAC70010E6B5 /* MGLVectorSource.h */,
 				DA8F25961D51CAC70010E6B5 /* MGLVectorSource.mm */,
 				352742871D4C245800A1ECE6 /* MGLGeoJSONSource.h */,
+				DA87A99B1DC9D8DD00810D09 /* MGLGeoJSONSource_Private.h */,
 				352742881D4C245800A1ECE6 /* MGLGeoJSONSource.mm */,
 				352742831D4C244700A1ECE6 /* MGLRasterSource.h */,
 				352742841D4C244700A1ECE6 /* MGLRasterSource.mm */,
@@ -584,6 +591,15 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		DA87A99A1DC9D88800810D09 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				DA87A9961DC9D88400810D09 /* MGLGeoJSONSourceTests.mm */,
+				DA87A9971DC9D88400810D09 /* MGLTileSetTests.mm */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
 		DA8933A81CCD28D100E68420 /* Kit Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -620,7 +636,6 @@
 				DA8F257A1D51C5F40010E6B5 /* MGLRuntimeStylingHelper.h */,
 				DA8F257B1D51C5F40010E6B5 /* MGLRuntimeStylingHelper.m */,
 				DA2DBBCA1D51E30A00D38FF9 /* MGLStyleLayerTests.xib */,
-				DA2207BB1DC076940002F84D /* MGLStyleValueTests.swift */,
 			);
 			name = Layers;
 			sourceTree = "<group>";
@@ -629,7 +644,9 @@
 			isa = PBXGroup;
 			children = (
 				DA8F257C1D51C5F40010E6B5 /* Layers */,
+				DA87A99A1DC9D88800810D09 /* Sources */,
 				35C5D84B1D6DD75B00E95907 /* MGLFilterTests.mm */,
+				DA2207BB1DC076940002F84D /* MGLStyleValueTests.swift */,
 			);
 			name = Styling;
 			path = ../../darwin/test;
@@ -932,6 +949,7 @@
 				35602C001D3EA9B40050646F /* MGLForegroundStyleLayer.h in Headers */,
 				DAE6C35D1CC31E0400DB3429 /* MGLMapCamera.h in Headers */,
 				DAE6C3B41CC31EF300DB3429 /* MGLCompassCell.h in Headers */,
+				DA87A99C1DC9D8DD00810D09 /* MGLGeoJSONSource_Private.h in Headers */,
 				3537CA741D3F93A600380318 /* MGLStyle_Private.h in Headers */,
 				DA8F259A1D51CAD00010E6B5 /* MGLSource_Private.h in Headers */,
 				DA8F25931D51CA750010E6B5 /* MGLSymbolStyleLayer.h in Headers */,
@@ -1201,7 +1219,9 @@
 				DAE6C3D51CC34C9900DB3429 /* MGLOfflineStorageTests.m in Sources */,
 				DD58A4C91D822C6700E1F038 /* MGLExpressionTests.mm in Sources */,
 				DAE6C3D31CC34C9900DB3429 /* MGLOfflinePackTests.m in Sources */,
+				DA87A9991DC9D88400810D09 /* MGLTileSetTests.mm in Sources */,
 				DA35A2A81CC9F41600E826B2 /* MGLCoordinateFormatterTests.m in Sources */,
+				DA87A9981DC9D88400810D09 /* MGLGeoJSONSourceTests.mm in Sources */,
 				DA0CD58E1CF56F5800A5F5A5 /* MGLFeatureTests.mm in Sources */,
 				DA2207BC1DC076940002F84D /* MGLStyleValueTests.swift in Sources */,
 			);
