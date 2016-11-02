@@ -70,7 +70,7 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
                     Log.e(TAG, "Could not load geojson: " + e.getMessage());
                     return;
                 }
-                mapboxMap.addImage("test-icon", BitmapFactory.decodeResource(getResources(), R.drawable.default_marker));
+                mapboxMap.addImage("test-icon", BitmapFactory.decodeResource(getResources(), R.drawable.mapbox_marker_icon_default));
                 mapboxMap.addLayer(new SymbolLayer("symbols-layer", "symbols-source").withProperties(iconImage("test-icon")));
 
 

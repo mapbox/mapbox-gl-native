@@ -218,17 +218,17 @@ public class MapboxMapOptions implements Parcelable {
 
             Drawable foregroundDrawable = typedArray.getDrawable(R.styleable.mapbox_MapView_mapbox_my_location_foreground);
             if (foregroundDrawable == null) {
-                foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocationview_icon_default);
+                foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_icon_default);
             }
 
             Drawable foregroundBearingDrawable = typedArray.getDrawable(R.styleable.mapbox_MapView_mapbox_my_location_foreground_bearing);
             if (foregroundBearingDrawable == null) {
-                foregroundBearingDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocationview_icon_bearing);
+                foregroundBearingDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_icon_bearing);
             }
 
             Drawable backgroundDrawable = typedArray.getDrawable(R.styleable.mapbox_MapView_mapbox_my_location_background);
             if (backgroundDrawable == null) {
-                backgroundDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocationview_bg_shape);
+                backgroundDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_bg_shape);
             }
 
             mapboxMapOptions.myLocationForegroundDrawables(foregroundDrawable, foregroundBearingDrawable);

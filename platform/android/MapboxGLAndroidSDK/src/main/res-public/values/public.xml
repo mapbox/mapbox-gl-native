@@ -47,15 +47,15 @@
     <public name="mapbox_attribution_margin_bottom" type="attr" />
     <public name="mapbox_attribution_visibility" type="attr" />
 
-    <public name="mapbox_attribution_logo" type="drawable" />
-    <public name="mapbox_compass" type="drawable" />
-    <public name="mapbox_default_marker" type="drawable" />
-    <public name="mapbox_attribution_button_pressed_selector" type="drawable" />
-    <public name="mapbox_attribution_button_pressed_normal" type="drawable" />
-    <public name="mapbox_attribution_button_pressed_pressed" type="drawable" />
-    <public name="mapbox_my_location" type="drawable" />
-    <public name="mapbox_my_location_bearing" type="drawable" />
-    <public name="mapbox_my_location_stale" type="drawable" />
-    <public name="mapbox_my_location_ring" type="color" />
+    <public name="mapbox_logo_icon" type="drawable" />
+    <public name="mapbox_compass_icon" type="drawable" />
+    <public name="mapbox_marker_icon_default" type="drawable" />
+    <public name="mapbox_info_bg_selector" type="drawable" />
+    <public name="mapbox_info_icon_default" type="drawable" />
+    <public name="mapbox_info_icon_selected" type="drawable" />
+    <public name="mapbox_mylocation_icon_default" type="drawable" />
+    <public name="mapbox_mylocation_icon_bearing" type="drawable" />
+
+    <public name="mapbox_mylocation_ring" type="color" />
     <public name="mapbox_blue" type="color" />
 </resources>

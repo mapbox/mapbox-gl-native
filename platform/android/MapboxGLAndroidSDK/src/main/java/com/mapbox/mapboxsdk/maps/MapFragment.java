@@ -94,16 +94,16 @@ public final class MapFragment extends Fragment {
         Drawable foregroundBearingDrawable = options.getMyLocationForegroundBearingDrawable();
         if (foregroundDrawable == null || foregroundBearingDrawable == null) {
             if (foregroundDrawable == null) {
-                foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocationview_icon_default);
+                foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_icon_default);
             }
             if (foregroundBearingDrawable == null) {
-                foregroundBearingDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocationview_icon_bearing);
+                foregroundBearingDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_icon_bearing);
             }
             options.myLocationForegroundDrawables(foregroundDrawable, foregroundBearingDrawable);
         }
 
         if (options.getMyLocationBackgroundDrawable() == null) {
-            options.myLocationBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.mapbox_mylocationview_bg_shape));
+            options.myLocationBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_bg_shape));
         }
 
         return map = new MapView(inflater.getContext(), options);
