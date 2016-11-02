@@ -16,29 +16,29 @@ typedef NSString *MGLGeoJSONSourceOption NS_STRING_ENUM;
  If the `features` property contains point features, setting this option to
  `YES` clusters the points by radius into groups. The default value is `NO`.
  */
-extern MGLGeoJSONSourceOption const MGLGeoJSONClusterOption;
+extern const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionClustered;
 
 /**
  An `NSNumber` object containing an integer; specifies the radius of each
  cluster if clustering is enabled. A value of 512 produces a radius equal to
  the width of a tile. The default value is 50.
  */
-extern MGLGeoJSONSourceOption const MGLGeoJSONClusterRadiusOption;
+extern const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionClusterRadius;
 
 /**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
  which to cluster points if clustering is enabled. Defaults to one zoom level 
- less than the value of `MGLGeoJSONMaximumZoomLevelOption` so that, at the 
+ less than the value of `MGLGeoJSONSourceOptionMaximumZoomLevel` so that, at the
  maximum zoom level, the features are not clustered.
  */
-extern MGLGeoJSONSourceOption const MGLGeoJSONClusterMaximumZoomLevelOption;
+extern const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionMaximumZoomLevelForClustering;
 
 /**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
  which to create vector tiles. A greater value produces greater detail at high
  zoom levels. The default value is 18.
  */
-extern MGLGeoJSONSourceOption const MGLGeoJSONMaximumZoomLevelOption;
+extern const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionMaximumZoomLevel;
 
 /**
  An `NSNumber` object containing an integer; specifies the size of the tile
@@ -46,14 +46,14 @@ extern MGLGeoJSONSourceOption const MGLGeoJSONMaximumZoomLevelOption;
  buffer as wide as the tile itself. Larger values produce fewer rendering 
  artifacts near tile edges and slower performance. The default value is 128.
  */
-extern MGLGeoJSONSourceOption const MGLGeoJSONBufferOption;
+extern const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionBuffer;
 
 /**
  An `NSNumber` object containing a double; specifies the Douglas-Peucker
  simplification tolerance. A greater value produces simpler geometries and
  improves performance. The default value is 0.375.
  */
-extern MGLGeoJSONSourceOption const MGLGeoJSONToleranceOption;
+extern const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance;
 
 /**
  A GeoJSON source.
@@ -103,7 +103,7 @@ extern MGLGeoJSONSourceOption const MGLGeoJSONToleranceOption;
  @param options An `NSDictionary` of options for this source.
  @return An initialized GeoJSON source.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier features:(NSArray<id<MGLFeature>> *)features options:(nullable NS_DICTIONARY_OF(MGLGeoJSONSourceOption,id) *)options NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier features:(NSArray<id<MGLFeature>> *)features options:(nullable NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
 
 #pragma mark Accessing a Source’s Content
 
@@ -120,7 +120,7 @@ extern MGLGeoJSONSourceOption const MGLGeoJSONToleranceOption;
  A GeoJSON representation of the contents of the source.
  
  Use the `features` property instead to get an object representation of the
- contents. Alternatively, use NSJSONSerialization with the value of this
+ contents. Alternatively, use `NSJSONSerialization` with the value of this
  property to transform it into Foundation types.
 
  If the receiver was initialized using `-initWithIdentifier:URL:options` or 

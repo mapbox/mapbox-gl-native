@@ -90,11 +90,11 @@
         NSDictionary *userInfo = notification.userInfo;
         XCTAssertNotNil(userInfo, @"Progress change notification should have a userInfo dictionary.");
         
-        NSNumber *stateNumber = userInfo[MGLOfflinePackStateUserInfoKey];
+        NSNumber *stateNumber = userInfo[MGLOfflinePackUserInfoKeyState];
         XCTAssert([stateNumber isKindOfClass:[NSNumber class]], @"Progress change notification’s state should be an NSNumber.");
         XCTAssertEqual(stateNumber.integerValue, pack.state, @"State in a progress change notification should match the pack’s state.");
         
-        NSValue *progressValue = userInfo[MGLOfflinePackProgressUserInfoKey];
+        NSValue *progressValue = userInfo[MGLOfflinePackUserInfoKeyProgress];
         XCTAssert([progressValue isKindOfClass:[NSValue class]], @"Progress change notification’s progress should be an NSValue.");
         XCTAssertEqualObjects(progressValue, [NSValue valueWithMGLOfflinePackProgress:pack.progress], @"Progress change notification’s progress should match pack’s progress.");
         
