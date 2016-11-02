@@ -46,11 +46,11 @@ public class CameraPositionTest {
         float tilt = 44;
 
         TypedArray typedArray = mock(TypedArray.class);
-        when(typedArray.getFloat(R.styleable.MapView_direction, 0.0f)).thenReturn(bearing);
-        when(typedArray.getFloat(R.styleable.MapView_center_latitude, 0.0f)).thenReturn(latitude);
-        when(typedArray.getFloat(R.styleable.MapView_center_longitude, 0.0f)).thenReturn(longitude);
-        when(typedArray.getFloat(R.styleable.MapView_zoom, 0.0f)).thenReturn(zoom);
-        when(typedArray.getFloat(R.styleable.MapView_tilt, 0.0f)).thenReturn(tilt);
+        when(typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_direction, 0.0f)).thenReturn(bearing);
+        when(typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_center_latitude, 0.0f)).thenReturn(latitude);
+        when(typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_center_longitude, 0.0f)).thenReturn(longitude);
+        when(typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_zoom, 0.0f)).thenReturn(zoom);
+        when(typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_tilt, 0.0f)).thenReturn(tilt);
         doNothing().when(typedArray).recycle();
 
         CameraPosition cameraPosition = new CameraPosition.Builder(typedArray).build();
