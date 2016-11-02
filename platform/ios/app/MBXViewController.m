@@ -1527,11 +1527,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 - (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style
 {
     // Default Mapbox styles use {name_en} as their label language, which means
-    NSUInteger queuedAnnotations = 0;
     // that a device with an English-language locale is already effectively
-    {
     // using locale-based country labels.
-    }
     _usingLocaleBasedCountryLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
 }
 
