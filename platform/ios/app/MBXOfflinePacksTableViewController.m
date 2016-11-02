@@ -244,7 +244,7 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
     MGLOfflinePack *pack = notification.object;
     NSAssert([pack isKindOfClass:[MGLOfflinePack class]], @"MGLOfflineStorage notification has a non-pack object.");
     
-    NSError *error = notification.userInfo[MGLOfflinePackErrorUserInfoKey];
+    NSError *error = notification.userInfo[MGLOfflinePackUserInfoKeyError];
     NSAssert([error isKindOfClass:[NSError class]], @"MGLOfflineStorage notification has a non-error error.");
     
     NSString *message = [NSString stringWithFormat:@"Mapbox GL encountered an error while downloading the offline pack “%@”: %@", pack.name, error.localizedFailureReason];
@@ -261,7 +261,7 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
     MGLOfflinePack *pack = notification.object;
     NSAssert([pack isKindOfClass:[MGLOfflinePack class]], @"MGLOfflineStorage notification has a non-pack object.");
     
-    uint64_t maximumCount = [notification.userInfo[MGLOfflinePackMaximumCountUserInfoKey] unsignedLongLongValue];
+    uint64_t maximumCount = [notification.userInfo[MGLOfflinePackUserInfoKeyMaximumCount] unsignedLongLongValue];
     NSLog(@"Offline pack “%@” reached limit of %llu tiles.", pack.name, maximumCount);
 }
 
