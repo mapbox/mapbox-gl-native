@@ -15,12 +15,12 @@
 - (void)testMGLGeoJSONSourceWithOptions {
     NSURL *url = [NSURL URLWithString:@"http://www.mapbox.com/source"];
     
-    NSDictionary *options = @{MGLGeoJSONClusterOption: @(YES),
-                              MGLGeoJSONClusterRadiusOption: @42,
-                              MGLGeoJSONClusterMaximumZoomLevelOption: @98,
-                              MGLGeoJSONMaximumZoomLevelOption: @99,
-                              MGLGeoJSONBufferOption: @1976,
-                              MGLGeoJSONToleranceOption: @0.42};
+    NSDictionary *options = @{MGLGeoJSONSourceOptionClustered: @YES,
+                              MGLGeoJSONSourceOptionClusterRadius: @42,
+                              MGLGeoJSONSourceOptionMaximumZoomLevelForClustering: @98,
+                              MGLGeoJSONSourceOptionMaximumZoomLevel: @99,
+                              MGLGeoJSONSourceOptionBuffer: @1976,
+                              MGLGeoJSONSourceOptionSimplificationTolerance: @0.42};
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" URL:url options:options];
     
     auto mbglOptions = [source geoJSONOptions];
@@ -31,7 +31,7 @@
     XCTAssertEqual(mbglOptions.buffer, 1976);
     XCTAssertEqual(mbglOptions.tolerance, 0.42);
   
-    options = @{MGLGeoJSONClusterOption: @"number 1"};
+    options = @{MGLGeoJSONSourceOptionClustered: @"number 1"};
     XCTAssertThrows([[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" URL:url options:options]);
 }
 

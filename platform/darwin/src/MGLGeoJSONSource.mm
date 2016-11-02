@@ -8,13 +8,12 @@
 
 #include <mbgl/style/sources/geojson_source.hpp>
 
-
-NSString * const MGLGeoJSONClusterOption = @"MGLGeoJSONCluster";
-NSString * const MGLGeoJSONClusterRadiusOption = @"MGLGeoJSONClusterRadius";
-NSString * const MGLGeoJSONClusterMaximumZoomLevelOption = @"MGLGeoJSONClusterMaximumZoomLevel";
-NSString * const MGLGeoJSONMaximumZoomLevelOption = @"MGLGeoJSONMaximumZoomLevel";
-NSString * const MGLGeoJSONBufferOption = @"MGLGeoJSONBuffer";
-NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance";
+const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionClustered = @"MGLGeoJSONSourceOptionClustered";
+const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionClusterRadius = @"MGLGeoJSONSourceOptionClusterRadius";
+const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionMaximumZoomLevelForClustering = @"MGLGeoJSONSourceOptionMaximumZoomLevelForClustering";
+const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionMaximumZoomLevel = @"MGLGeoJSONSourceOptionMaximumZoomLevel";
+const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionBuffer = @"MGLGeoJSONSourceOptionBuffer";
+const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"MGLGeoJSONSourceOptionSimplificationTolerance";
 
 @interface MGLGeoJSONSource ()
 
@@ -97,38 +96,32 @@ NSString * const MGLGeoJSONToleranceOption = @"MGLGeoJSONOptionsClusterTolerance
 {
     auto mbglOptions = mbgl::style::GeoJSONOptions();
     
-    if (self.options[MGLGeoJSONMaximumZoomLevelOption]) {
-        id value = self.options[MGLGeoJSONMaximumZoomLevelOption];
+    if (id value = self.options[MGLGeoJSONSourceOptionMaximumZoomLevel]) {
         [self validateValue:value];
         mbglOptions.maxzoom = [value integerValue];
     }
     
-    if (self.options[MGLGeoJSONBufferOption]) {
-        id value = self.options[MGLGeoJSONBufferOption];
+    if (id value = self.options[MGLGeoJSONSourceOptionBuffer]) {
         [self validateValue:value];
         mbglOptions.buffer = [value integerValue];
     }
     
-    if (self.options[MGLGeoJSONToleranceOption]) {
-        id value = self.options[MGLGeoJSONToleranceOption];
+    if (id value = self.options[MGLGeoJSONSourceOptionSimplificationTolerance]) {
         [self validateValue:value];
         mbglOptions.tolerance = [value doubleValue];
     }
     
-    if (self.options[MGLGeoJSONClusterRadiusOption]) {
-        id value = self.options[MGLGeoJSONClusterRadiusOption];
+    if (id value = self.options[MGLGeoJSONSourceOptionClusterRadius]) {
         [self validateValue:value];
         mbglOptions.clusterRadius = [value integerValue];
     }
     
-    if (self.options[MGLGeoJSONClusterMaximumZoomLevelOption]) {
-        id value = self.options[MGLGeoJSONClusterMaximumZoomLevelOption];
+    if (id value = self.options[MGLGeoJSONSourceOptionMaximumZoomLevelForClustering]) {
         [self validateValue:value];
         mbglOptions.clusterMaxZoom = [value integerValue];
     }
     
-    if (self.options[MGLGeoJSONClusterOption]) {
-        id value = self.options[MGLGeoJSONClusterOption];
+    if (id value = self.options[MGLGeoJSONSourceOptionClustered]) {
         [self validateValue:value];
         mbglOptions.cluster = [value boolValue];
     }
