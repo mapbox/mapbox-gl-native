@@ -448,7 +448,7 @@ void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
             minZoom = 0;
         }
 
-        if (buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
+        if (buffer.segments.empty() || buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
             buffer.segments.emplace_back(buffer.vertices.size(), buffer.triangles.size());
         }
 

@@ -36,7 +36,7 @@ public:
     struct TextBuffer {
         std::vector<SymbolVertex> vertices;
         std::vector<gl::Triangle> triangles;
-        std::vector<gl::Segment> segments { { 0, 0 } };
+        std::vector<gl::Segment> segments;
 
         optional<gl::VertexBuffer<SymbolVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
@@ -45,7 +45,7 @@ public:
     struct IconBuffer {
         std::vector<SymbolVertex> vertices;
         std::vector<gl::Triangle> triangles;
-        std::vector<gl::Segment> segments { { 0, 0 } };
+        std::vector<gl::Segment> segments;
 
         optional<gl::VertexBuffer<SymbolVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;

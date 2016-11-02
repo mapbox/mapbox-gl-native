@@ -51,7 +51,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
             if (nVertices == 0)
                 continue;
 
-            if (lineSegments.back().vertexLength + nVertices > std::numeric_limits<uint16_t>::max()) {
+            if (lineSegments.empty() || lineSegments.back().vertexLength + nVertices > std::numeric_limits<uint16_t>::max()) {
                 lineSegments.emplace_back(vertices.size(), lines.size());
             }
 
@@ -76,7 +76,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
         std::size_t nIndicies = indices.size();
         assert(nIndicies % 3 == 0);
 
-        if (triangleSegments.back().vertexLength + totalVertices > std::numeric_limits<uint16_t>::max()) {
+        if (triangleSegments.empty() || triangleSegments.back().vertexLength + totalVertices > std::numeric_limits<uint16_t>::max()) {
             triangleSegments.emplace_back(startVertices, triangles.size());
         }
 

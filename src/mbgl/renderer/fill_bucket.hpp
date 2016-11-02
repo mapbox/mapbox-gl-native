@@ -22,8 +22,8 @@ public:
     std::vector<FillVertex> vertices;
     std::vector<gl::Line> lines;
     std::vector<gl::Triangle> triangles;
-    std::vector<gl::Segment> lineSegments { { 0, 0 } };
-    std::vector<gl::Segment> triangleSegments { { 0, 0 } };
+    std::vector<gl::Segment> lineSegments;
+    std::vector<gl::Segment> triangleSegments;
 
     optional<gl::VertexBuffer<FillVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Line>> lineIndexBuffer;

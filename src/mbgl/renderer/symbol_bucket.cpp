@@ -42,7 +42,7 @@ void SymbolBucket::render(Painter& painter,
 }
 
 bool SymbolBucket::hasData() const {
-    assert(false); // Should be calling SymbolLayout::hasSymbolInstances() instead.
+    assert(false); // Should be calling SymbolLayout::has{Text,Icon,CollisonBox}Data() instead.
     return false;
 }
 
