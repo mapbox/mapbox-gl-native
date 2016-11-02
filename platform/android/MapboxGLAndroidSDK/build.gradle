@@ -45,6 +45,10 @@ android {
         buildConfigField "String", "GIT_REVISION_SHORT", String.format("\"%s\"", getGitRevision())
     }
 
+    android {
+        resourcePrefix 'mapbox_'
+    }
+
     sourceSets {
         main.res.srcDirs += 'src/main/res-public'
     }
