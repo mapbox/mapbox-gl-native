@@ -12,6 +12,8 @@ typedef struct __GLXcontextRec* GLXContext;
 typedef struct __GLXFBConfigRec* GLXFBConfig;
 typedef long unsigned int XID;
 typedef XID GLXPbuffer;
+#elif MBGL_USE_OSMESA
+#include <GL/osmesa.h>
 #endif
 
 #include <mbgl/map/backend.hpp>
@@ -69,6 +71,11 @@ private:
     GLXFBConfig *fbConfigs = nullptr;
     GLXContext glContext = nullptr;
     GLXPbuffer glxPbuffer = 0;
+#endif
+
+#if MBGL_USE_OSMESA
+    OSMesaContext glContext = nullptr;
+    GLubyte fakeBuffer = 0;
 #endif
 
     std::function<void(MapChange)> mapChangeCallback;
