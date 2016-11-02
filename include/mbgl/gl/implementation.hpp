@@ -9,6 +9,8 @@
     #else
         #define MBGL_USE_CGL 1
     #endif
+#elif defined(__OSMESA__)
+    #define MBGL_USE_OSMESA 1
 #else
     #define MBGL_USE_GLX 1
 #endif
