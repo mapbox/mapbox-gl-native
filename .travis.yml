@@ -65,7 +65,7 @@ matrix:
       before_script:
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
         - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
-        - export BUILDTYPE=$([[ -n ${PUBLISH:-} ]] && echo "Release" || echo "Debug")
+        - export BUILDTYPE=Debug
       script:
         - nvm install 4
         - nvm use 4

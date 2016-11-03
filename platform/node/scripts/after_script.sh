@@ -6,12 +6,7 @@ set -o pipefail
 JOB=$1
 
 if [[ -n ${PUBLISH:-} ]]; then
-    if [[ "${BUILDTYPE}" == "Debug" ]]; then
-        echo "Please run this script in release mode (BUILDTYPE=Release)."
-        exit 1
-    else
-        ./node_modules/.bin/node-pre-gyp package publish info
-    fi
+    ./node_modules/.bin/node-pre-gyp package publish info
 else
     if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
         gzip --stdout node_modules/mapbox-gl-test-suite/render-tests/index.html | \
