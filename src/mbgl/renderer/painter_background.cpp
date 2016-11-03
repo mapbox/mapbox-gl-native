@@ -53,13 +53,13 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
                 gl::StencilMode::disabled(),
                 colorModeForRenderPass(),
                 parameters.shaders.fill,
-                FillColorUniforms::values(
+                FillColorUniforms::Values {
                     matrixForTile(tileID),
                     properties.backgroundOpacity.value,
                     properties.backgroundColor.value,
                     properties.backgroundColor.value,
                     context.viewport.getCurrentValue().size
-                ),
+                },
                 gl::Unindexed<gl::TriangleStrip>(tileTriangleVertexBuffer)
             });
         }

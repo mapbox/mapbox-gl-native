@@ -68,11 +68,6 @@ public:
         return State { { Us::name, shader }... };
     }
 
-    template <class... Args>
-    static Values values(Args&&... args) {
-        return Values { std::forward<Args>(args)... };
-    }
-
     static std::function<void ()> binder(State& state, Values&& values_) {
         return [&state, values = std::move(values_)] () mutable {
             noop((std::get<typename Us::State>(state) = std::get<typename Us::Value>(values), 0)...);

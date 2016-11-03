@@ -82,7 +82,7 @@ void Painter::renderFill(PaintParameters& parameters,
                 stencilModeForClipping(tile.clip),
                 colorModeForRenderPass(),
                 shader,
-                FillColorUniforms::values(
+                FillColorUniforms::Values {
                     tile.translatedMatrix(properties.fillTranslate.value,
                                           properties.fillTranslateAnchor.value,
                                           state),
@@ -90,7 +90,7 @@ void Painter::renderFill(PaintParameters& parameters,
                     properties.fillColor.value,
                     outlineColor,
                     context.viewport.getCurrentValue().size
-                ),
+                },
                 subject
             });
         };

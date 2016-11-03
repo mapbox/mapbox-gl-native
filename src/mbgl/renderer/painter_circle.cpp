@@ -29,7 +29,7 @@ void Painter::renderCircle(PaintParameters& parameters,
             : gl::StencilMode::disabled(),
         colorModeForRenderPass(),
         parameters.shaders.circle,
-        CircleUniforms::values(
+        CircleUniforms::Values {
             tile.translatedMatrix(properties.circleTranslate.value,
                                   properties.circleTranslateAnchor.value,
                                   state),
@@ -45,7 +45,7 @@ void Painter::renderCircle(PaintParameters& parameters,
                   }}
                 : pixelsToGLUnits,
             frame.pixelRatio
-        ),
+        },
         gl::Segmented<gl::Triangles>(
             *bucket.vertexBuffer,
             *bucket.indexBuffer,

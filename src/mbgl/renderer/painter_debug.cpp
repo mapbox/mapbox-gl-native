@@ -25,13 +25,13 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
             stencilModeForClipping(renderTile.clip),
             gl::ColorMode::unblended(),
             shaders->fill,
-            FillColorUniforms::values(
+            FillColorUniforms::Values {
                 renderTile.matrix,
                 1.0f,
                 color,
                 color,
                 context.viewport.getCurrentValue().size
-            ),
+            },
             subject
         });
     };
