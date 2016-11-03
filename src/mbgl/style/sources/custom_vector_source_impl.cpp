@@ -13,6 +13,10 @@ namespace mbgl {
       return { options.minzoom, options.maxzoom };
     }
     
+    uint16_t CustomVectorSource::Impl::getTileSize() const {
+      return options.tileSize;
+    }
+    
     std::unique_ptr<Tile> CustomVectorSource::Impl::createTile(const OverscaledTileID& tileID,
                                                           const UpdateParameters& parameters) {
       auto tilePointer = std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters);

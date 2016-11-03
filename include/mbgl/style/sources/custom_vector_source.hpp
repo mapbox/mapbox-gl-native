@@ -10,6 +10,7 @@ namespace style {
     struct CustomVectorSourceOptions {
         uint8_t minzoom = 0;
         uint8_t maxzoom = 18;
+        uint16_t tileSize = 512;
     };
 
     
