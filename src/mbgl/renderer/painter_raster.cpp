@@ -59,7 +59,7 @@ void Painter::renderRaster(PaintParameters& parameters,
         gl::StencilMode::disabled(),
         colorModeForRenderPass(),
         parameters.shaders.raster,
-        RasterUniforms::values(
+        RasterUniforms::Values {
             tile.matrix,
             0,
             1,
@@ -73,7 +73,7 @@ void Painter::renderRaster(PaintParameters& parameters,
             1.0f,
             1.0f,
             std::array<float, 2> {{ 0.0f, 0.0f }}
-        ),
+        },
         gl::Unindexed<gl::TriangleStrip>(rasterVertexBuffer)
     });
 }

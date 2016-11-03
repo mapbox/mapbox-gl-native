@@ -124,12 +124,12 @@ void Painter::renderSymbol(PaintParameters& parameters,
             gl::StencilMode::disabled(),
             colorModeForRenderPass(),
             shaders->collisionBox,
-            CollisionBoxUniforms::values(
+            CollisionBoxUniforms::Values {
                 tile.matrix,
                 std::pow(2.0f, state.getZoom() - tile.tile.id.overscaledZ),
                 state.getZoom() * 10,
                 (tile.id.canonical.z + 1) * 10
-            ),
+            },
             gl::Unindexed<gl::Lines>(
                 *bucket.collisionBox.vertexBuffer,
                 1.0f
