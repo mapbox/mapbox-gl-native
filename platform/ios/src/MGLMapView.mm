@@ -2915,6 +2915,7 @@ public:
             MGLAnnotationContext context;
             context.annotation = annotation;
             _annotationContextsByAnnotationTag[annotationTag] = context;
+            _annotationTagsByAnnotation[annotation] = annotationTag;
 
             [(NSObject *)annotation addObserver:self forKeyPath:@"coordinates" options:0 context:(void *)(NSUInteger)annotationTag];
         }
