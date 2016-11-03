@@ -2,6 +2,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol MGLFeature;
+
+
 @protocol MGLCustomVectorSourceDataSource <NSObject>
 
 /** 
@@ -12,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param callback A block to call with the data that has been fetched for the tile. The data can be in the form of a
  GeoJSON Feature, FeatureCollection, or Geometry.
  */
-- (void)getTileForZoom:(NSInteger)zoom x:(NSInteger)x y:(NSInteger)y callback:(void (^)(NSDictionary* __nullable))callback;
+- (void)getTileForZoom:(NSInteger)zoom x:(NSInteger)x y:(NSInteger)y callback:( void (^)(NSArray<id <MGLFeature>>*) )callback;
 
 @end
 
@@ -52,6 +55,9 @@ NS_ASSUME_NONNULL_BEGIN
  is shown to a user. The default value is `nil`.
  */
 @property (nonatomic, copy, nullable) NSString *attribution;
+
+
+- (void)setSourceLoaded;
 
 @end
 

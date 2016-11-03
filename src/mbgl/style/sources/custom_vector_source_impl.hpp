@@ -11,7 +11,8 @@ namespace mbgl {
       Impl(std::string id, Source&, CustomVectorSourceOptions options, std::function<void(uint8_t, uint32_t, uint32_t)> fetchTile);
       
       void loadDescription(FileSource&) final {}
-
+      void setSourceLoaded();
+      
     private:
       CustomVectorSourceOptions options;
       std::function<void(uint8_t, uint32_t, uint32_t)> fetchTile;

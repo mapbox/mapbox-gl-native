@@ -18,9 +18,12 @@ class CustomVectorSource : public Source {
 public:
   CustomVectorSource(std::string id, CustomVectorSourceOptions options, std::function<void(uint8_t, uint32_t, uint32_t)> fetchTile);
 
+    void setSourceLoaded();
+  
     // Private implementation
 
     class Impl;
+    Impl* const impl;
 };
 
 template <>

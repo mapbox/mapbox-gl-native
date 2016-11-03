@@ -1,6 +1,7 @@
 #include <mbgl/style/sources/custom_vector_source_impl.hpp>
 #include <mbgl/tile/vector_tile.hpp>
 #include <mbgl/tile/geojson_tile.hpp>
+#include <mbgl/style/source_observer.hpp>
 
 namespace mbgl {
   namespace style {
@@ -20,8 +21,13 @@ namespace mbgl {
     std::unique_ptr<Tile> CustomVectorSource::Impl::createTile(const OverscaledTileID& tileID,
                                                           const UpdateParameters& parameters) {
       auto tilePointer = std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters);
-//      setTileData(*tilePointer.get(), tileID);
+      fetchTile(tileID.canonical.z, tileID.canonical.x, tileID.canonical.y);
       return std::move(tilePointer);
+    }
+
+    void CustomVectorSource::Impl::setSourceLoaded() {
+      loaded = true;
+      observer->onSourceLoaded(base);
     }
     
   } // namespace style
