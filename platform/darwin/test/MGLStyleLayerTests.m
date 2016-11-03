@@ -13,6 +13,7 @@
     [vc.view addSubview:_mapView];
     _mapView.delegate = self;
 #else
+    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
     NSWindowController *windowController = [[NSWindowController alloc] initWithWindowNibName:@"MGLStyleLayerTests" owner:self];
     [windowController showWindow:nil];
 #endif

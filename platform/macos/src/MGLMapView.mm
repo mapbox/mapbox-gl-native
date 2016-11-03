@@ -108,7 +108,7 @@ enum { MGLAnnotationTagNotFound = UINT32_MAX };
 
 /// Mapping from an annotation tag to metadata about that annotation, including
 /// the annotation itself.
-typedef std::unordered_map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationContextMap;
+typedef std::unordered_map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationTagContextMap;
 
 /// Returns an NSImage for the default marker image.
 NSImage *MGLDefaultMarkerImage() {
@@ -171,7 +171,7 @@ public:
     CGFloat _pitchAtBeginningOfGesture;
     BOOL _didHideCursorDuringGesture;
 
-    MGLAnnotationContextMap _annotationContextsByAnnotationTag;
+    MGLAnnotationTagContextMap _annotationContextsByAnnotationTag;
     MGLAnnotationTag _selectedAnnotationTag;
     MGLAnnotationTag _lastSelectedAnnotationTag;
     /// Size of the rectangle formed by unioning the maximum slop area around every annotation image.
@@ -1623,6 +1623,35 @@ public:
     return [NSArray arrayWithObjects:&annotations[0] count:annotations.size()];
 }
 
+- (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)visibleAnnotations
+{
+    return [self visibleFeaturesInRect:self.bounds];
+}
+
+- (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)visibleAnnotationsInRect:(CGRect)rect
+{
+    if (_annotationContextsByAnnotationTag.empty())
+    {
+        return nil;
+    }
+    
+    std::vector<MGLAnnotationTag> annotationTags = [self annotationTagsInRect:rect];
+    if (annotationTags.size())
+    {
+        NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:annotationTags.size()];
+        
+        for (auto const& annotationTag: annotationTags)
+        {
+            MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag[annotationTag];
+            [annotations addObject:annotationContext.annotation];
+        }
+        
+        return [annotations copy];
+    }
+    
+    return nil;
+}
+
 /// Returns the annotation assigned the given tag. Cheap.
 - (id <MGLAnnotation>)annotationWithTag:(MGLAnnotationTag)tag {
     if (!_annotationContextsByAnnotationTag.count(tag)) {
@@ -1666,12 +1695,6 @@ public:
         NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"Annotation does not conform to MGLAnnotation");
 
         if ([annotation isKindOfClass:[MGLMultiPoint class]]) {
-            // Actual multipoints aren’t supported as annotations.
-            if ([annotation isMemberOfClass:[MGLMultiPoint class]]
-                || [annotation isMemberOfClass:[MGLMultiPointFeature class]]) {
-                continue;
-            }
-
             // The multipoint knows how to style itself (with the map view’s help).
             MGLMultiPoint *multiPoint = (MGLMultiPoint *)annotation;
             if (!multiPoint.pointCount) {
@@ -1685,8 +1708,9 @@ public:
 
             [(NSObject *)annotation addObserver:self forKeyPath:@"coordinates" options:0 context:(void *)(NSUInteger)annotationTag];
         } else if (![annotation isKindOfClass:[MGLMultiPolyline class]]
-                   || ![annotation isKindOfClass:[MGLMultiPolygon class]]
-                   || ![annotation isKindOfClass:[MGLShapeCollection class]]) {
+                   && ![annotation isKindOfClass:[MGLMultiPolygon class]]
+                   && ![annotation isKindOfClass:[MGLShapeCollection class]]
+                   && ![annotation isKindOfClass:[MGLPointCollection class]]) {
             MGLAnnotationImage *annotationImage = nil;
             if (delegateHasImagesForAnnotations) {
                 annotationImage = [self.delegate mapView:self imageForAnnotation:annotation];

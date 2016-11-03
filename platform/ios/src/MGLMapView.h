@@ -893,13 +893,22 @@ IB_DESIGNABLE
 @property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *annotations;
 
 /**
+ The complete list of annotations associated with the receiver that are 
+ currently visible.
+ 
+ The objects in this array must adopt the `MGLAnnotation` protocol. If no
+ annotations are associated with the map view or if no annotations associated
+ with the map view are currently visible, the value of this property is `nil`.
+ */
+@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *visibleAnnotations;
+
+/**
  Adds an annotation to the map view.
  
- @note `MGLMultiPolyline`, `MGLMultiPolygon`, and `MGLShapeCollection` objects
-    cannot be added to the map view at this time. Nor can `MGLMultiPoint`
-    objects that are not instances of `MGLPolyline` or `MGLPolygon`. Any
-    multipoint, multipolyline, multipolygon, or shape collection object that is
-    specified is silently ignored.
+ @note `MGLMultiPolyline`, `MGLMultiPolygon`, `MGLShapeCollection`, and 
+    `MGLPointCollection` objects cannot be added to the map view at this time. 
+    Any multipoint, multipolyline, multipolygon, shape or point collection 
+    object that is specified is silently ignored.
  
  @param annotation The annotation object to add to the receiver. This object
     must conform to the `MGLAnnotation` protocol. The map view retains the
@@ -986,6 +995,17 @@ IB_DESIGNABLE
     such object exists in the reuse queue.
  */
 - (nullable __kindof MGLAnnotationView *)dequeueReusableAnnotationViewWithIdentifier:(NSString *)identifier;
+
+/**
+ Returns the list of annotations associated with the receiver that intersect with 
+ the given rectangle.
+ 
+ @param rect A rectangle expressed in the map view’s coordinate system.
+ @return An array of objects that adopt the `MGLAnnotation` protocol or `nil` if
+    no annotations associated with the map view are currently visible in the 
+    rectangle.
+ */
+- (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)visibleAnnotationsInRect:(CGRect)rect;
 
 #pragma mark Managing Annotation Selections
 

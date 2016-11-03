@@ -34,6 +34,7 @@ custom_categories:
       - MGLMultiPolygon
       - MGLMultiPolyline
       - MGLPointAnnotation
+      - MGLPointCollection
       - MGLPolygon
       - MGLPolyline
       - MGLOverlay
@@ -44,9 +45,9 @@ custom_categories:
   - name: Map Data
     children:
       - MGLFeature
-      - MGLMultiPointFeature
       - MGLMultiPolygonFeature
       - MGLMultiPolylineFeature
+      - MGLPointCollectionFeature      
       - MGLPointFeature
       - MGLPolygonFeature
       - MGLPolylineFeature

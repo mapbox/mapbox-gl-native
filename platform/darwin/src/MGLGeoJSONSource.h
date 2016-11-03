@@ -7,33 +7,38 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLFeature;
 
 /**
+ Options for `MGLGeoJSONSource` objects.
+ */
+typedef NSString *MGLGeoJSONSourceOption NS_STRING_ENUM;
+
+/**
  An `NSNumber` object containing a Boolean enabling or disabling clustering.
  If the `features` property contains point features, setting this option to
  `YES` clusters the points by radius into groups. The default value is `NO`.
  */
-extern NSString * const MGLGeoJSONClusterOption;
+extern const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionClustered;
 
 /**
  An `NSNumber` object containing an integer; specifies the radius of each
  cluster if clustering is enabled. A value of 512 produces a radius equal to
  the width of a tile. The default value is 50.
  */
-extern NSString * const MGLGeoJSONClusterRadiusOption;
+extern const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionClusterRadius;
 
 /**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
  which to cluster points if clustering is enabled. Defaults to one zoom level 
- less than the value of `MGLGeoJSONMaximumZoomLevelOption` so that, at the 
+ less than the value of `MGLGeoJSONSourceOptionMaximumZoomLevel` so that, at the
  maximum zoom level, the features are not clustered.
  */
-extern NSString * const MGLGeoJSONClusterMaximumZoomLevelOption;
+extern const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionMaximumZoomLevelForClustering;
 
 /**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
  which to create vector tiles. A greater value produces greater detail at high
  zoom levels. The default value is 18.
  */
-extern NSString * const MGLGeoJSONMaximumZoomLevelOption;
+extern const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionMaximumZoomLevel;
 
 /**
  An `NSNumber` object containing an integer; specifies the size of the tile
@@ -41,14 +46,14 @@ extern NSString * const MGLGeoJSONMaximumZoomLevelOption;
  buffer as wide as the tile itself. Larger values produce fewer rendering 
  artifacts near tile edges and slower performance. The default value is 128.
  */
-extern NSString * const MGLGeoJSONBufferOption;
+extern const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionBuffer;
 
 /**
  An `NSNumber` object containing a double; specifies the Douglas-Peucker
  simplification tolerance. A greater value produces simpler geometries and
  improves performance. The default value is 0.375.
  */
-extern NSString * const MGLGeoJSONToleranceOption;
+extern const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance;
 
 /**
  A GeoJSON source.
@@ -71,7 +76,7 @@ extern NSString * const MGLGeoJSONToleranceOption;
  @param options An `NSDictionary` of options for this source.
  @return An initialized GeoJSON source.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier geoJSONData:(NSData *)data options:(nullable NS_DICTIONARY_OF(NSString *, id) *)options NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier geoJSONData:(NSData *)data options:(nullable NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
 
 /**
  Returns a GeoJSON source with an identifier, URL, and dictionary of options for
@@ -85,7 +90,7 @@ extern NSString * const MGLGeoJSONToleranceOption;
  @param options An `NSDictionary` of options for this source.
  @return An initialized GeoJSON source.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url options:(nullable NS_DICTIONARY_OF(NSString *, id) *)options NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url options:(nullable NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
 
 /**
  Returns a GeoJSON source with an identifier, features dictionary, and dictionary 
@@ -98,7 +103,7 @@ extern NSString * const MGLGeoJSONToleranceOption;
  @param options An `NSDictionary` of options for this source.
  @return An initialized GeoJSON source.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier features:(NSArray<id<MGLFeature>> *)features options:(nullable NS_DICTIONARY_OF(NSString *,id) *)options  NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier features:(NSArray<id<MGLFeature>> *)features options:(nullable NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
 
 #pragma mark Accessing a Source’s Content
 
@@ -109,13 +114,13 @@ extern NSString * const MGLGeoJSONToleranceOption;
  is set to `nil`. This property is unavailable until the receiver is passed into
  `-[MGLStyle addSource]`.
  */
-@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLFeature>) *features;
+@property (nonatomic, nullable) NS_ARRAY_OF(id <MGLFeature>) *features;
 
 /**
  A GeoJSON representation of the contents of the source.
  
  Use the `features` property instead to get an object representation of the
- contents. Alternatively, use NSJSONSerialization with the value of this
+ contents. Alternatively, use `NSJSONSerialization` with the value of this
  property to transform it into Foundation types.
 
  If the receiver was initialized using `-initWithIdentifier:URL:options` or 
@@ -123,7 +128,7 @@ extern NSString * const MGLGeoJSONToleranceOption;
  This property is unavailable until the receiver is passed 
  into `-[MGLStyle addSource]`.
  */
-@property (nonatomic, readonly, nullable, copy) NSData *geoJSONData;
+@property (nonatomic, nullable, copy) NSData *geoJSONData;
 
 /**
  The URL to the GeoJSON document that specifies the contents of the source.
@@ -131,7 +136,7 @@ extern NSString * const MGLGeoJSONToleranceOption;
  If the receiver was initialized using `-initWithIdentifier:geoJSONData:options`, this
  property is set to `nil`.
  */
-@property (nonatomic, readonly, nullable) NSURL *URL;
+@property (nonatomic, nullable) NSURL *URL;
 
 
 @end

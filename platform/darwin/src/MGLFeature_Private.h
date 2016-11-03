@@ -26,9 +26,6 @@ NS_DICTIONARY_OF(NSString *, id) *NSDictionaryFeatureForGeometry(NSDictionary *g
 
 @protocol MGLFeaturePrivate <MGLFeature>
 
-@property (nonatomic, copy, nullable, readwrite) id identifier;
-@property (nonatomic, copy, readwrite) NS_DICTIONARY_OF(NSString *, id) *attributes;
-
 - (mbgl::Feature)mbglFeature;
 
 @end

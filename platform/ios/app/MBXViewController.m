@@ -46,6 +46,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsAnnotationsRows) {
     MBXSettingsAnnotations10000Sprites,
     MBXSettingsAnnotationsTestShapes,
     MBXSettingsAnnotationsCustomCallout,
+    MBXSettingsAnnotationsQueryAnnotations,
     MBXSettingsAnnotationsRemoveAnnotations,
 };
 
@@ -62,10 +63,19 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingFilteredLines,
     MBXSettingsRuntimeStylingNumericFilteredFill,
     MBXSettingsRuntimeStylingStyleQuery,
+    MBXSettingsRuntimeStylingFeatureSource,
+    MBXSettingsRuntimeStylingPointCollection,
+    MBXSettingsRuntimeStylingUpdateGeoJSONSourceData,
+    MBXSettingsRuntimeStylingUpdateGeoJSONSourceURL,
+    MBXSettingsRuntimeStylingUpdateGeoJSONSourceFeatures,
+    MBXSettingsRuntimeStylingVectorSource,
+    MBXSettingsRuntimeStylingRasterSource,
+    MBXSettingsRuntimeStylingCountryLabels,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
-    MBXSettingsMiscellaneousWorldTour = 0,
+    MBXSettingsMiscellaneousShowReuseQueueStats = 0,
+    MBXSettingsMiscellaneousWorldTour,
     MBXSettingsMiscellaneousCustomUserDot,
     MBXSettingsMiscellaneousPrintLogFile,
     MBXSettingsMiscellaneousDeleteLogFile,
@@ -93,10 +103,21 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                  UITableViewDataSource,
                                  MGLMapViewDelegate>
 
+
 @property (nonatomic) IBOutlet MGLMapView *mapView;
+@property (weak, nonatomic) IBOutlet UILabel *hudLabel;
 @property (nonatomic) NSInteger styleIndex;
 @property (nonatomic) BOOL debugLoggingEnabled;
 @property (nonatomic) BOOL customUserLocationAnnnotationEnabled;
+@property (nonatomic) BOOL usingLocaleBasedCountryLabels;
+@property (nonatomic) BOOL reuseQueueStatsEnabled;
+
+@end
+
+@interface MGLMapView (MBXViewController)
+
+@property (nonatomic) BOOL usingLocaleBasedCountryLabels;
+@property (nonatomic) NSDictionary *annotationViewReuseQueueByIdentifier;
 
 @end
 
@@ -130,12 +151,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self restoreState:nil];
 
     self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
-}
+    self.hudLabel.hidden = YES;
 
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    
     if ([MGLAccountManager accessToken].length)
     {
         self.styleIndex = -1;
@@ -289,6 +306,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Add 10,000 Sprites",
                 @"Add Test Shapes",
                 @"Add Point With Custom Callout",
+                @"Query Annotations",
                 @"Remove Annotations",
             ]];
             break;
@@ -306,9 +324,19 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Style Lines With Filter",
                 @"Style Fill With Numeric Filter",
                 @"Style Query For GeoJSON",
+                @"Style Feature",
+                @"Style Dynamic Point Collection",
+                @"Update GeoJSON Source: Data",
+                @"Update GeoJSON Source: URL",
+                @"Update GeoJSON Source: Features",
+                @"Style Vector Source",
+                @"Style Raster Source",
+                [NSString stringWithFormat:@"Label Countries in %@", (_usingLocaleBasedCountryLabels ? @"Local Language" : [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:[self bestLanguageForUser]])],
             ]];
             break;
         case MBXSettingsMiscellaneous:
+            [settingsTitles addObject:@"Show Reuse Queue Stats"];
+
             [settingsTitles addObjectsFromArray:@[
                 @"Start World Tour",
                 [NSString stringWithFormat:@"%@ Custom User Dot", (_customUserLocationAnnnotationEnabled ? @"Disable" : @"Enable")],
@@ -321,6 +349,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     @"Delete Telemetry Logfile",
                 ]];
             };
+
             break;
         default:
             NSAssert(NO, @"All settings sections should be implemented");
@@ -387,6 +416,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 case MBXSettingsAnnotationsCustomCallout:
                     [self addAnnotationWithCustomCallout];
                     break;
+                case MBXSettingsAnnotationsQueryAnnotations:
+                    [self testQueryPointAnnotations];
+                    break;
                 case MBXSettingsAnnotationsRemoveAnnotations:
                     [self.mapView removeAnnotations:self.mapView.annotations];
                     break;
@@ -434,6 +466,30 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 case MBXSettingsRuntimeStylingStyleQuery:
                     [self styleQuery];
                     break;
+                case MBXSettingsRuntimeStylingFeatureSource:
+                    [self styleFeature];
+                    break;
+                case MBXSettingsRuntimeStylingPointCollection:
+                    [self styleDynamicPointCollection];
+                    break;
+                case MBXSettingsRuntimeStylingUpdateGeoJSONSourceURL:
+                    [self updateGeoJSONSourceURL];
+                    break;
+                case MBXSettingsRuntimeStylingUpdateGeoJSONSourceData:
+                    [self updateGeoJSONSourceData];
+                    break;
+                case MBXSettingsRuntimeStylingUpdateGeoJSONSourceFeatures:
+                    [self updateGeoJSONSourceFeatures];
+                    break;
+                case MBXSettingsRuntimeStylingVectorSource:
+                    [self styleVectorSource];
+                    break;
+                case MBXSettingsRuntimeStylingRasterSource:
+                    [self styleRasterSource];
+                    break;
+                case MBXSettingsRuntimeStylingCountryLabels:
+                    [self styleCountryLabelsLanguage];
+                    break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
                     break;
@@ -454,6 +510,12 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 case MBXSettingsMiscellaneousDeleteLogFile:
                     [self deleteTelemetryLogFile];
                     break;
+                case MBXSettingsMiscellaneousShowReuseQueueStats:
+                {
+                    self.reuseQueueStatsEnabled = YES;
+                    self.hudLabel.hidden = NO;
+                    break;
+                }
                 default:
                     NSAssert(NO, @"All miscellaneous setting rows should be implemented");
                     break;
@@ -794,7 +856,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     });
 }
 
-
 - (void)styleQuery
 {
     CGRect queryRect = CGRectInset(self.mapView.bounds, 100, 200);
@@ -826,6 +887,247 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         fillLayer.fillOpacity = [MGLStyleConstantValue<NSNumber *> valueWithRawValue:@0.5];
         [self.mapView.style addLayer:fillLayer];
     });
+}
+
+- (void)styleFeature
+{
+    self.mapView.zoomLevel = 10;
+    self.mapView.centerCoordinate = CLLocationCoordinate2DMake(51.068585180672635, -114.06074523925781);
+    
+    CLLocationCoordinate2D leafCoords[] = {
+        CLLocationCoordinate2DMake(50.9683733218221,-114.07035827636719),
+        CLLocationCoordinate2DMake(51.02325750523972,-114.06967163085938),
+        CLLocationCoordinate2DMake(51.009434536947786,-114.14245605468749),
+        CLLocationCoordinate2DMake(51.030599281184124,-114.12597656249999),
+        CLLocationCoordinate2DMake(51.060386316691016,-114.21043395996094),
+        CLLocationCoordinate2DMake(51.063838646941576,-114.17816162109375),
+        CLLocationCoordinate2DMake(51.08152779888779,-114.19876098632812),
+        CLLocationCoordinate2DMake(51.08066507029602,-114.16854858398438),
+        CLLocationCoordinate2DMake(51.09662294502995,-114.17472839355469),
+        CLLocationCoordinate2DMake(51.07764539352731,-114.114990234375),
+        CLLocationCoordinate2DMake(51.13670896949613,-114.12391662597656),
+        CLLocationCoordinate2DMake(51.13369295212583,-114.09576416015624),
+        CLLocationCoordinate2DMake(51.17546878815025,-114.07585144042969),
+        CLLocationCoordinate2DMake(51.140155605265896,-114.04632568359375),
+        CLLocationCoordinate2DMake(51.15049396880196,-114.01542663574219),
+        CLLocationCoordinate2DMake(51.088860342359965,-114.00924682617186),
+        CLLocationCoordinate2DMake(51.12205789681453,-113.94813537597656),
+        CLLocationCoordinate2DMake(51.106539930027225,-113.94882202148438),
+        CLLocationCoordinate2DMake(51.117747873223344,-113.92616271972656),
+        CLLocationCoordinate2DMake(51.10093493903458,-113.92616271972656),
+        CLLocationCoordinate2DMake(51.10697105503078,-113.90625),
+        CLLocationCoordinate2DMake(51.09144802136697,-113.9117431640625),
+        CLLocationCoordinate2DMake(51.04916446529361,-113.97010803222655),
+        CLLocationCoordinate2DMake(51.045279344649146,-113.9398956298828),
+        CLLocationCoordinate2DMake(51.022825599852496,-114.06211853027344),
+        CLLocationCoordinate2DMake(51.045279344649146,-113.9398956298828),
+        CLLocationCoordinate2DMake(51.022825599852496,-114.06211853027344),
+        CLLocationCoordinate2DMake(51.022825599852496,-114.06280517578125),
+        CLLocationCoordinate2DMake(50.968805734317804,-114.06280517578125),
+        CLLocationCoordinate2DMake(50.9683733218221,-114.07035827636719),
+    };
+    NSUInteger coordsCount = sizeof(leafCoords) / sizeof(leafCoords[0]);
+    
+    MGLPolygonFeature *feature = [MGLPolygonFeature polygonWithCoordinates:leafCoords count:coordsCount];
+    feature.identifier = @"leaf-feature";
+    feature.attributes = @{@"color": @"red"};
+    
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"leaf-source" features:@[feature] options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"leaf-fill-layer" source:source];
+    layer.predicate = [NSPredicate predicateWithFormat:@"color = %@", @"red"];
+    MGLStyleValue *fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
+    layer.fillColor = fillColor;
+    [self.mapView.style addLayer:layer];
+}
+
+- (void)updateGeoJSONSourceData
+{
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(40.329795743702064, -107.75390625) zoomLevel:11 animated:NO];
+    
+    NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-104.34814453125,37.64903402157866]]}}]}";
+    
+    NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"mutable-data-source-id" geoJSONData:data options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"mutable-data-layer-id" source:source];
+    [self.mapView.style addLayer:layer];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-109.34814453125,37.64903402157866]]}}]}";
+        NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
+        
+        source.geoJSONData = data;
+    });
+}
+
+- (void)updateGeoJSONSourceURL
+{
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(48.668731, -122.857151) zoomLevel:11 animated:NO];
+    
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"polyline" ofType:@"geojson"];
+    NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"mutable-data-source-url-id" URL:geoJSONURL options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"mutable-data-layer-url-id" source:source];
+    [self.mapView.style addLayer:layer];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(41.563986787078704, -75.04843935793578) zoomLevel:8 animated:NO];
+        
+        NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"threestates" ofType:@"geojson"];
+        NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
+        
+        source.URL = geoJSONURL;
+    });
+}
+
+- (void)updateGeoJSONSourceFeatures
+{
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(-41.1520, 288.6592) zoomLevel:10 animated:NO];
+    
+    CLLocationCoordinate2D smallBox[] = {
+        {-41.14763798539186, 288.68019104003906},
+        {-41.140915920129665, 288.68019104003906},
+        {-41.140915920129665, 288.6887741088867},
+        {-41.14763798539186, 288.6887741088867},
+        {-41.14763798539186, 288.68019104003906}
+    };
+    
+    CLLocationCoordinate2D largeBox[] = {
+        {-41.17710352162799, 288.67298126220703},
+        {-41.13962313627545, 288.67298126220703},
+        {-41.13962313627545, 288.7261962890625},
+        {-41.17710352162799, 288.7261962890625},
+        {-41.17710352162799, 288.67298126220703}
+    };
+    
+    MGLPolygonFeature *smallBoxFeature = [MGLPolygonFeature polygonWithCoordinates:smallBox count:sizeof(smallBox)/sizeof(smallBox[0])];
+    MGLPolygonFeature *largeBoxFeature = [MGLPolygonFeature polygonWithCoordinates:largeBox count:sizeof(largeBox)/sizeof(largeBox[0])];
+
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"mutable-data-source-features-id" features:@[smallBoxFeature] options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"mutable-data-layer-features-id" source:source];
+    MGLStyleValue *fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
+    layer.fillColor = fillColor;
+    [self.mapView.style addLayer:layer];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        source.features = @[largeBoxFeature];
+    });
+}
+
+- (void)styleDynamicPointCollection
+{
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(36.9979, -109.0441) zoomLevel:14 animated:NO];
+    CLLocationCoordinate2D coordinates[] = {
+        {37.00145594210082, -109.04960632324219},
+        {37.00173012609867, -109.0404224395752},
+        {36.99453246847359, -109.04960632324219},
+        {36.99508088541243, -109.04007911682129},
+    };
+    MGLPointCollectionFeature *feature = [MGLPointCollectionFeature pointCollectionWithCoordinates:coordinates count:4];
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"wiggle-source" features:@[feature] options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"wiggle-layer" source:source];
+    [self.mapView.style addLayer:layer];
+}
+
+- (void)styleVectorSource
+{
+    NSURL *url = [[NSURL alloc] initWithString:@"mapbox://mapbox.mapbox-terrain-v2"];
+    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"style-vector-source-id" URL:url];
+    [self.mapView.style addSource:vectorSource];
+    
+    MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"style-vector-background-layer-id"];
+    backgroundLayer.backgroundColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor blackColor]];
+    [self.mapView.style addLayer:backgroundLayer];
+    
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"style-vector-line-layer-id" source:vectorSource];
+    lineLayer.sourceLayerIdentifier = @"contour";
+    NSUInteger lineJoinValue = MGLLineJoinRound;
+    lineLayer.lineJoin = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue value:&lineJoinValue withObjCType:@encode(MGLLineJoin)]];
+    NSUInteger lineCapValue = MGLLineCapRound;
+    lineLayer.lineCap = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue value:&lineCapValue withObjCType:@encode(MGLLineCap)]];
+    lineLayer.lineColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor greenColor]];
+
+    [self.mapView.style addLayer:lineLayer];
+}
+
+- (void)styleRasterSource
+{
+    // 3rd party raster source requires NSAppTransportSecurity exception for stamen.com
+    MGLTileSet *rasterTileSet = [[MGLTileSet alloc] initWithTileURLTemplates:@[@"http://a.tile.stamen.com/terrain-background/{z}/{x}/{y}.jpg"]];
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"style-raster-source-id" tileSet:rasterTileSet tileSize:256];
+    [self.mapView.style addSource:rasterSource];
+    
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"style-raster-layer-id" source:rasterSource];
+    [self.mapView.style addLayer:rasterLayer];
+}
+
+-(void)styleCountryLabelsLanguage
+{
+    NSArray<NSString *> *labelLayers = @[
+        @"country-label-lg",
+        @"country-label-md",
+        @"country-label-sm",
+    ];
+    [self styleLabelLanguageForLayersNamed:labelLayers];
+}
+
+- (void)styleLabelLanguageForLayersNamed:(NSArray<NSString *> *)layers
+{
+    _usingLocaleBasedCountryLabels = !_usingLocaleBasedCountryLabels;
+    NSString *bestLanguageForUser = [NSString stringWithFormat:@"{name_%@}", [self bestLanguageForUser]];
+    NSString *language = _usingLocaleBasedCountryLabels ? bestLanguageForUser : @"{name}";
+
+    for (NSString *layerName in layers) {
+        MGLSymbolStyleLayer *layer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:layerName];
+
+        if ([layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
+            if ([layer.textField isKindOfClass:[MGLStyleConstantValue class]]) {
+                MGLStyleConstantValue *label = (MGLStyleConstantValue<NSString *> *)layer.textField;
+                if ([label.rawValue hasPrefix:@"{name"]) {
+                    layer.textField = [MGLStyleValue valueWithRawValue:language];
+                }
+            } else if ([layer.textField isKindOfClass:[MGLStyleFunction class]]) {
+                MGLStyleFunction *function = (MGLStyleFunction<NSString *> *)layer.textField;
+                [function.stops enumerateKeysAndObjectsUsingBlock:^(id zoomLevel, id stop, BOOL *done) {
+                    if ([stop isKindOfClass:[MGLStyleConstantValue class]]) {
+                        MGLStyleConstantValue *label = (MGLStyleConstantValue<NSString *> *)stop;
+                        if ([label.rawValue hasPrefix:@"{name"]) {
+                            [function.stops setValue:[MGLStyleValue valueWithRawValue:language] forKey:zoomLevel];
+                        }
+                    }
+                }];
+                layer.textField = function;
+            }
+        } else {
+            NSLog(@"%@ is not a symbol style layer", layerName);
+        }
+    }
+}
+
+- (NSString *)bestLanguageForUser
+{
+    NSArray *supportedLanguages = @[ @"en", @"es", @"fr", @"de", @"ru", @"zh" ];
+    NSArray<NSString *> *preferredLanguages = [NSLocale preferredLanguages];
+    NSString *bestLanguage;
+
+    for (NSString *language in preferredLanguages) {
+        NSString *thisLanguage = [NSLocale localeWithLocaleIdentifier:language].languageCode;
+        if ([supportedLanguages containsObject:thisLanguage]) {
+            bestLanguage = thisLanguage;
+            break;
+        }
+    }
+
+    return bestLanguage ?: @"en";
 }
 
 - (IBAction)startWorldTour
@@ -873,6 +1175,20 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     _customUserLocationAnnnotationEnabled = !_customUserLocationAnnnotationEnabled;
     self.mapView.showsUserLocation = NO;
     self.mapView.userTrackingMode = MGLUserTrackingModeFollow;
+}
+
+- (void)testQueryPointAnnotations {
+    NSNumber *visibleAnnotationCount = @(self.mapView.visibleAnnotations.count);
+    NSString *message;
+    if ([visibleAnnotationCount integerValue] == 1) {
+        message = [NSString stringWithFormat:@"There is %@ visible annotation.", visibleAnnotationCount];
+    } else {
+        message = [NSString stringWithFormat:@"There are %@ visible annotations.", visibleAnnotationCount];
+    }
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Visible Annotations" message:message preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)printTelemetryLogFile
@@ -1206,6 +1522,26 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     
     MGLPointAnnotation *point = annotation;
     point.coordinate = [self.mapView convertPoint:self.mapView.center toCoordinateFromView:self.mapView];
+}
+
+- (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style
+{
+    // Default Mapbox styles use {name_en} as their label language, which means
+    // that a device with an English-language locale is already effectively
+    // using locale-based country labels.
+    _usingLocaleBasedCountryLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+}
+
+- (void)mapViewRegionIsChanging:(MGLMapView *)mapView
+{
+    if (self.reuseQueueStatsEnabled) {
+        NSUInteger queuedAnnotations = 0;
+        for (NSArray *queue in self.mapView.annotationViewReuseQueueByIdentifier.allValues)
+        {
+            queuedAnnotations += queue.count;
+        }
+        self.hudLabel.text = [NSString stringWithFormat:@"Visible: %ld  Queued: %ld", (long)mapView.visibleAnnotations.count, (long)queuedAnnotations];
+    }
 }
 
 @end

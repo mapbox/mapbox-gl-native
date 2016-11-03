@@ -3,6 +3,7 @@
 #import "MGLPolyline.h"
 #import "MGLPolygon.h"
 #import "MGLPointAnnotation.h"
+#import "MGLPointCollection.h"
 #import "MGLShapeCollection.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -18,8 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
  using `-[MGLMapView visibleFeaturesAtPoint:]` and related methods. Each feature
  object associates a shape with an identifier and attributes as specified by the
  source. Like ordinary `MGLAnnotation` objects, some kinds of `MGLFeature`
- objects can also be added to a map view using `-[MGLMapView addAnnotations:]`
- and related methods.
+ objects can also be added to a map view using an `MGLGeoJSONSource` or
+ `-[MGLMapView addAnnotations:]` and related methods.
  */
 @protocol MGLFeature <MGLAnnotation>
 
@@ -48,9 +49,13 @@ NS_ASSUME_NONNULL_BEGIN
  For details about the identifiers used in most Mapbox-provided styles, consult
  the
  <a href="https://www.mapbox.com/vector-tiles/mapbox-streets/">Mapbox Streets</a>
- layer reference.
+ layer reference. Note that while it is possible to change this value on feature 
+ instances obtained from `-[MGLMapView visibleFeaturesAtPoint:]` and related 
+ methods, there will be no effect on the map. Setting this value can be useful
+ when the feature instance is used to initialize an `MGLGeoJSONSource` and that 
+ source is added to the map and styled.
  */
-@property (nonatomic, copy, nullable, readonly) id identifier;
+@property (nonatomic, copy, nullable) id identifier;
 
 /**
  A dictionary of attributes for this feature specified by the
@@ -79,9 +84,13 @@ NS_ASSUME_NONNULL_BEGIN
  <a href="https://www.mapbox.com/vector-tiles/mapbox-streets/">Mapbox Streets</a>
  and
  <a href="https://www.mapbox.com/vector-tiles/mapbox-terrain/">Mapbox Terrain</a>
- layer references.
+ layer references. Note that while it is possible to change this value on feature
+ instances obtained from `-[MGLMapView visibleFeaturesAtPoint:]` and related
+ methods, there will be no effect on the map. Setting this value can be useful
+ when the feature instance is used to initialize an `MGLGeoJSONSource` and that
+ source is added to the map and styled.
  */
-@property (nonatomic, copy, readonly) NS_DICTIONARY_OF(NSString *, id) *attributes;
+@property (nonatomic, copy) NS_DICTIONARY_OF(NSString *, id) *attributes;
 
 /**
  Returns the feature attribute for the given attribute name.
@@ -126,10 +135,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- The `MGLMultiPointFeature` class represents a multipoint in a
+ The `MGLPointCollectionFeature` class represents a multipoint in a
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
-@interface MGLMultiPointFeature : MGLMultiPoint <MGLFeature>
+@interface MGLPointCollectionFeature : MGLPointCollection <MGLFeature>
 @end
 
 /**

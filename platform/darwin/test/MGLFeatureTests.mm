@@ -227,24 +227,6 @@
     XCTAssertEqualObjects(geoJSONFeature[@"geometry"], expectedGeometry);
 }
 
-- (void)testMultiPointFeatureGeoJSONDictionary {
-    CLLocationCoordinate2D coord1 = { 0, 0 };
-    CLLocationCoordinate2D coord2 = { 10, 10 };
-    CLLocationCoordinate2D coord3 = { 0, 0 };
-    CLLocationCoordinate2D coords[] = { coord1, coord2, coord3 };
-    MGLMultiPointFeature *multiPointFeature = [MGLMultiPointFeature multiPointWithCoordinates:coords count:3];
-    
-    // A GeoJSON feature
-    NSDictionary *geoJSONFeature = [multiPointFeature geoJSONDictionary];
-    
-    // it has the correct geometry
-    NSDictionary *expectedGeometry = @{@"type": @"MultiPoint",
-                                       @"coordinates": @[@[@(coord1.longitude), @(coord1.latitude)],
-                                                         @[@(coord2.longitude), @(coord2.latitude)],
-                                                         @[@(coord3.longitude), @(coord3.latitude)]]};
-    XCTAssertEqualObjects(geoJSONFeature[@"geometry"], expectedGeometry);
-}
-
 - (void)testMultiPolylineFeatureGeoJSONDictionary {
     CLLocationCoordinate2D coord1 = { 0, 0 };
     CLLocationCoordinate2D coord2 = { 10, 10 };
@@ -294,6 +276,25 @@
                                                    @[@(coord2.longitude), @(coord2.latitude)],
                                                    @[@(coord3.longitude), @(coord3.latitude)]]]]};
     XCTAssertEqualObjects(geoJSONFeature[@"geometry"], expectedGeometry);
+}
+
+- (void)testPointCollectionFeatureGeoJSONDictionary {
+    CLLocationCoordinate2D coord1 = { 0, 0 };
+    CLLocationCoordinate2D coord2 = { 10, 10 };
+    CLLocationCoordinate2D coord3 = { 0, 0 };
+    CLLocationCoordinate2D coords[] = { coord1, coord2, coord3 };
+    MGLPointCollectionFeature *pointCollectionFeature = [MGLPointCollectionFeature pointCollectionWithCoordinates:coords count:3];
+    
+    // A GeoJSON feature
+    NSDictionary *geoJSONFeature = [pointCollectionFeature geoJSONDictionary];
+    
+    // it has the correct geometry
+    NSDictionary *expectedGeometry = @{@"type": @"MultiPoint",
+                                       @"coordinates": @[@[@(coord1.longitude), @(coord1.latitude)],
+                                                         @[@(coord2.longitude), @(coord2.latitude)],
+                                                         @[@(coord3.longitude), @(coord3.latitude)]]};
+    XCTAssertEqualObjects(geoJSONFeature[@"geometry"], expectedGeometry);
+
 }
 
 - (void)testShapeCollectionFeatureGeoJSONDictionary {

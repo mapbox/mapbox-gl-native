@@ -569,6 +569,16 @@ IB_DESIGNABLE
 - (void)addAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations;
 
 /**
+ The complete list of annotations associated with the receiver that are
+ currently visible.
+ 
+ The objects in this array must adopt the `MGLAnnotation` protocol. If no
+ annotations are associated with the map view or if no annotations associated
+ with the map view are currently visible, the value of this property is `nil`.
+ */
+@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *visibleAnnotations;
+
+/**
  Removes an annotation from the map view, deselecting it if it is selected.
  
  Removing an annotation object dissociates it from the map view entirely,
@@ -607,6 +617,17 @@ IB_DESIGNABLE
     such object exists in the reuse queue.
  */
 - (nullable MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier;
+
+/**
+ Returns the list of annotations associated with the receiver that intersect with
+ the given rectangle.
+ 
+ @param rect A rectangle expressed in the map view’s coordinate system.
+ @return An array of objects that adopt the `MGLAnnotation` protocol or `nil` if
+ no annotations associated with the map view are currently visible in the
+ rectangle.
+ */
+- (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)visibleAnnotationsInRect:(CGRect)rect;
 
 #pragma mark Managing Annotation Selections
 
