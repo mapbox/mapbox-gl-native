@@ -6,7 +6,7 @@ addons_shortcuts:
   addons_clang35: &clang35
     apt:
       sources:  [ 'ubuntu-toolchain-r-test', 'george-edison55-precise-backports' ]
-      packages: [ 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'cmake', 'cmake-data',
+      packages: [ 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.8v4', 'cmake', 'cmake-data',
                   'mesa-utils', 'libxi-dev', 'libglu1-mesa-dev', 'x11proto-randr-dev', 'x11proto-xext-dev', 'libxrandr-dev',
                   'x11proto-xf86vidmode-dev', 'libxxf86vm-dev', 'libxcursor-dev', 'libxinerama-dev' ]
   addons_gcc5: &gcc5
@@ -46,7 +46,6 @@ before_script:
 script:
   - make linux
   - make benchmark
-  - make test
   - make run-test
 after_script:
   - ccache --show-stats
@@ -60,7 +59,7 @@ matrix:
       dist: trusty
       language: node
       compiler: "node4-clang35-debug"
-      env: _CXX=clang++-3.5 _CC=clang-3.5
+      env: _CXX=clang++-3.5 _CC=clang-3.5 WITH_OSMESA=1
       addons: *clang35
       before_script:
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
