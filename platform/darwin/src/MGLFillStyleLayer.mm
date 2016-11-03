@@ -2,6 +2,7 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLSource.h"
+#import "MGLMapView_Private.h"
 #import "NSPredicate+MGLAdditions.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLStyleValue_Private.h"
@@ -16,13 +17,23 @@
 @end
 
 @implementation MGLFillStyleLayer
+{
+    std::unique_ptr<mbgl::style::FillLayer> _pendingLayer;
+}
 
 - (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source
 {
     if (self = [super initWithIdentifier:identifier source:source]) {
-        _layer = new mbgl::style::FillLayer(identifier.UTF8String, source.identifier.UTF8String);
+        [self commonInit:identifier source:source];
     }
     return self;
+}
+
+- (void)commonInit:(NSString *)identifier source:(MGLSource *)source
+{
+    auto layer = std::make_unique<mbgl::style::FillLayer>(identifier.UTF8String, source.identifier.UTF8String);
+    _pendingLayer = std::move(layer);
+    self.layer = _pendingLayer.get();
 }
 
 - (NSString *)sourceLayerIdentifier
@@ -116,6 +127,13 @@
 - (MGLStyleValue<NSString *> *)fillPattern {
     auto propertyValue = self.layer->getFillPattern() ?: self.layer->getDefaultFillPattern();
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
+}
+
+#pragma mark -
+
+- (void)addToMapView:(MGLMapView *)mapView
+{
+    mapView.mbglMap->addLayer(std::move(_pendingLayer));
 }
 
 @end
