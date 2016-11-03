@@ -3,8 +3,10 @@
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLFeature_Private.h"
+#import "MGLShape_Private.h"
 
 #include <mbgl/style/sources/custom_vector_source.hpp>
+#include <mbgl/util/geojson.hpp>
 
 @interface MGLCustomVectorSource () {
     std::unique_ptr<mbgl::style::CustomVectorSource> _pendingSource;
@@ -34,7 +36,6 @@
                                                                               ^(NS_ARRAY_OF(id <MGLFeature>) *features)
                                                                               {
                                                                                   [self processData:features forTile:z x:x y:y];
-//                                                                                  NSLog(@"Got tile data into callback%@", tiledata);
                                                                               }];
                                                                          });
         
@@ -58,10 +59,18 @@
     mapView.mbglMap->addSource(std::move(_pendingSource));
 }
 
-
 - (void)processData:(NS_ARRAY_OF(id <MGLFeature>)*)features forTile:(uint8_t)z x:(uint32_t)x y:(uint32_t)y
 {
     NSLog(@"processData %li/%li/%li", (long)z, (long)x, (long)y);
+    
+    mbgl::FeatureCollection featureCollection;
+    featureCollection.reserve(features.count);
+    for (id <MGLFeaturePrivate> feature in features)
+    {
+        featureCollection.push_back([feature mbglFeature]);
+    }
+    const auto geojson = mbgl::GeoJSON{featureCollection};
+    self.rawSource->setTileData(z, x, y, geojson);
 }
 
 

@@ -57,8 +57,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *attribution;
 
 
-- (void)setSourceLoaded;
-
 @end
 
 NS_ASSUME_NONNULL_END
