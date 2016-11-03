@@ -1,6 +1,4 @@
 #import "MGLSource.h"
-#import <mapbox/variant.hpp>
-#import <mapbox/geometry.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param callback A block to call with the data that has been fetched for the tile. The data can be in the form of a
  GeoJSON Feature, FeatureCollection, or Geometry.
  */
-- (void)getTileForZoom:(NSInteger)zoom x:(NSInteger)x y:(NSInteger)x callback:(void (^)(NSDictionary* __nullable))callback;
+- (void)getTileForZoom:(NSInteger)zoom x:(NSInteger)x y:(NSInteger)y callback:(void (^)(NSDictionary* __nullable))callback;
 
 @end
 
