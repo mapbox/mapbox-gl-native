@@ -158,6 +158,7 @@ public class MapView extends FrameLayout {
     private boolean styleWasSet = false;
 
     private List<OnMapReadyCallback> onMapReadyCallbackList;
+    private MapboxMap.CancelableCallback cameraCancelableCallback;
     private SnapshotRequest snapshotRequest;
 
     private boolean onStartCalled;
@@ -741,7 +742,7 @@ public class MapView extends FrameLayout {
             return;
         }
         long duration = animated ? MapboxConstants.ANIMATION_DURATION : 0;
-        nativeMapView.cancelTransitions();
+        cancelTransitions();
         // Out of range directions are normalised in setBearing
         nativeMapView.setBearing(-direction, duration);
     }
@@ -751,7 +752,7 @@ public class MapView extends FrameLayout {
             return;
         }
         myLocationView.setBearing(0);
-        nativeMapView.cancelTransitions();
+        cancelTransitions();
         nativeMapView.resetNorth();
     }
 
@@ -829,7 +830,7 @@ public class MapView extends FrameLayout {
 
     private void zoom(boolean zoomIn, float x, float y) {
         // Cancel any animation
-        nativeMapView.cancelTransitions();
+        cancelTransitions();
 
         if (zoomIn) {
             nativeMapView.scaleBy(2.0, x / screenDensity, y / screenDensity, MapboxConstants.ANIMATION_DURATION);
@@ -1372,11 +1373,19 @@ public class MapView extends FrameLayout {
     // Mapbox Core GL Camera
     //
 
+    private void cancelTransitions(){
+        if (cameraCancelableCallback != null) {
+            cameraCancelableCallback.onCancel();
+            cameraCancelableCallback = null;
+        }
+        nativeMapView.cancelTransitions();
+    }
+
     void jumpTo(double bearing, LatLng center, double pitch, double zoom) {
         if (destroyed) {
             return;
         }
-        nativeMapView.cancelTransitions();
+        cancelTransitions();
         nativeMapView.jumpTo(bearing, center, pitch, zoom);
     }
 
@@ -1384,16 +1393,17 @@ public class MapView extends FrameLayout {
         if (destroyed) {
             return;
         }
-        nativeMapView.cancelTransitions();
+        cancelTransitions();
 
         // Register callbacks early enough
         if (cancelableCallback != null) {
+            cameraCancelableCallback = cancelableCallback;
             addOnMapChangedListener(new OnMapChangedListener() {
                 @Override
                 public void onMapChanged(@MapChange int change) {
-                    if (change == REGION_DID_CHANGE_ANIMATED) {
-                        cancelableCallback.onFinish();
-
+                    if (change == REGION_DID_CHANGE_ANIMATED && cameraCancelableCallback != null) {
+                        cameraCancelableCallback.onFinish();
+                        cameraCancelableCallback = null;
                         // Clean up after self
                         removeOnMapChangedListener(this);
                     }
@@ -1408,16 +1418,17 @@ public class MapView extends FrameLayout {
         if (destroyed) {
             return;
         }
-        nativeMapView.cancelTransitions();
+        cancelTransitions();
 
         // Register callbacks early enough
         if (cancelableCallback != null) {
+            cameraCancelableCallback = cancelableCallback;
             addOnMapChangedListener(new OnMapChangedListener() {
                 @Override
                 public void onMapChanged(@MapChange int change) {
-                    if (change == REGION_DID_CHANGE_ANIMATED) {
+                    if (change == REGION_DID_CHANGE_ANIMATED && cameraCancelableCallback != null) {
                         cancelableCallback.onFinish();
-
+                        cameraCancelableCallback = null;
                         // Clean up after self
                         removeOnMapChangedListener(this);
                     }
@@ -1888,7 +1899,7 @@ public class MapView extends FrameLayout {
                 return false;
             }
             // Cancel any animation
-            nativeMapView.cancelTransitions();
+            cancelTransitions();
             return true;
         }
 
@@ -1990,7 +2001,7 @@ public class MapView extends FrameLayout {
             double duration = speed / (deceleration * ease);
 
             // Cancel any animation
-            nativeMapView.cancelTransitions();
+            cancelTransitions();
 
             nativeMapView.moveBy(velocityX * duration / 2.0 / screenDensity, velocityY * duration / 2.0 / screenDensity, (long) (duration * 1000.0f));
 
@@ -2022,7 +2033,7 @@ public class MapView extends FrameLayout {
             // reset tracking if needed
             resetTrackingModesIfRequired(true, false);
             // Cancel any animation
-            nativeMapView.cancelTransitions();
+            cancelTransitions();
 
             // Scroll the map
             nativeMapView.moveBy(-distanceX / screenDensity, -distanceY / screenDensity);
@@ -2093,7 +2104,7 @@ public class MapView extends FrameLayout {
             }
 
             // Cancel any animation
-            nativeMapView.cancelTransitions();
+            cancelTransitions();
 
             // Gesture is a quickzoom if there aren't two fingers
             quickZoom = !twoTap;
@@ -2174,7 +2185,7 @@ public class MapView extends FrameLayout {
             }
 
             // Cancel any animation
-            nativeMapView.cancelTransitions();
+            cancelTransitions();
 
             // rotation constitutes translation of anything except the center of
             // rotation, so cancel both location and bearing tracking if required
@@ -2250,7 +2261,7 @@ public class MapView extends FrameLayout {
             }
 
             // Cancel any animation
-            nativeMapView.cancelTransitions();
+            cancelTransitions();
 
             // Get tilt value (scale and clamp)
             double pitch = getTilt();
@@ -2317,7 +2328,7 @@ public class MapView extends FrameLayout {
                 }
 
                 // Cancel any animation
-                nativeMapView.cancelTransitions();
+                cancelTransitions();
 
                 // Move left
                 nativeMapView.moveBy(scrollDist / screenDensity, 0.0 / screenDensity);
@@ -2329,7 +2340,7 @@ public class MapView extends FrameLayout {
                 }
 
                 // Cancel any animation
-                nativeMapView.cancelTransitions();
+                cancelTransitions();
 
                 // Move right
                 nativeMapView.moveBy(-scrollDist / screenDensity, 0.0 / screenDensity);
@@ -2341,7 +2352,7 @@ public class MapView extends FrameLayout {
                 }
 
                 // Cancel any animation
-                nativeMapView.cancelTransitions();
+                cancelTransitions();
 
                 // Move up
                 nativeMapView.moveBy(0.0 / screenDensity, scrollDist / screenDensity);
@@ -2353,7 +2364,7 @@ public class MapView extends FrameLayout {
                 }
 
                 // Cancel any animation
-                nativeMapView.cancelTransitions();
+                cancelTransitions();
 
                 // Move down
                 nativeMapView.moveBy(0.0 / screenDensity, -scrollDist / screenDensity);
@@ -2433,7 +2444,7 @@ public class MapView extends FrameLayout {
                 }
 
                 // Cancel any animation
-                nativeMapView.cancelTransitions();
+                cancelTransitions();
 
                 // Scroll the map
                 nativeMapView.moveBy(-10.0 * event.getX() / screenDensity, -10.0 * event.getY() / screenDensity);
@@ -2529,7 +2540,7 @@ public class MapView extends FrameLayout {
                     }
 
                     // Cancel any animation
-                    nativeMapView.cancelTransitions();
+                    cancelTransitions();
 
                     // Get the vertical scroll amount, one click = 1
                     float scrollDist = event.getAxisValue(MotionEvent.AXIS_VSCROLL);
