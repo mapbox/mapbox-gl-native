@@ -8,9 +8,5 @@ namespace mbgl {
     : Source(SourceType::Vector, std::make_unique<CustomVectorSource::Impl>(std::move(id), *this,  options, fetchTile)),
     impl(static_cast<Impl*>(baseImpl.get())) { }
     
-    void CustomVectorSource::setSourceLoaded() {
-      impl->setSourceLoaded();
-    }
-    
   } // namespace style
 } // namespace mbgl

@@ -58,10 +58,6 @@
     mapView.mbglMap->addSource(std::move(_pendingSource));
 }
 
-- (void)setSourceLoaded
-{
-    _rawSource->setSourceLoaded();
-}
 
 - (void)processData:(NS_ARRAY_OF(id <MGLFeature>)*)features forTile:(uint8_t)z x:(uint32_t)x y:(uint32_t)y
 {
