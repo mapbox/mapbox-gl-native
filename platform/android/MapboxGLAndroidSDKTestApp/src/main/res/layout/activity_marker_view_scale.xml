@@ -52,9 +52,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
-        app:mapbox_center_latitude="38.907192"
-        app:mapbox_center_longitude="-77.036871"
-        app:mapbox_style_url="@string/mapbox_style_mapbox_streets"
-        app:mapbox_zoom="12" />
+        app:mapbox_cameraTargetLat="38.907192"
+        app:mapbox_cameraTargetLng="-77.036871"
+        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"
+        app:mapbox_cameraZoom="12" />
 
 </RelativeLayout>

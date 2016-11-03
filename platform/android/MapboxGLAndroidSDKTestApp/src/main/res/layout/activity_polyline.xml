@@ -17,11 +17,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/toolbar"
-        app:mapbox_attribution_tint="@android:color/holo_green_dark"
-        app:mapbox_center_latitude="47.798202"
-        app:mapbox_center_longitude="7.573781"
-        app:mapbox_style_url="@string/mapbox_style_mapbox_streets"
-        app:mapbox_zoom="4" />
+        app:mapbox_uiAttributionTintColor="@android:color/holo_green_dark"
+        app:mapbox_cameraTargetLat="47.798202"
+        app:mapbox_cameraTargetLng="7.573781"
+        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"
+        app:mapbox_cameraZoom="4" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

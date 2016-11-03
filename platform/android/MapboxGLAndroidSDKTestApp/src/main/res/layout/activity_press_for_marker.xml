@@ -17,12 +17,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
-        app:mapbox_attribution_gravity="top|end"
-        app:mapbox_center_latitude="45.1855569"
-        app:mapbox_center_longitude="5.7215506"
-        app:mapbox_logo_gravity="top|end"
-        app:mapbox_logo_margin_right="10dp"
-        app:mapbox_style_url="@string/mapbox_style_mapbox_streets"
-        app:mapbox_zoom="11" />
+        app:mapbox_uiAttributionGravity="top|end"
+        app:mapbox_cameraTargetLat="45.1855569"
+        app:mapbox_cameraTargetLng="5.7215506"
+        app:mapbox_uiLogoGravity="top|end"
+        app:mapbox_uiLogoMarginRight="10dp"
+        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"
+        app:mapbox_cameraZoom="11" />
 
 </RelativeLayout>

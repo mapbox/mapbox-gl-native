@@ -16,9 +16,9 @@
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:mapbox_my_location_foreground_tint="@color/primary"
-        app:mapbox_my_location_accuracy_tint="@color/primary"
-        app:mapbox_style_url="@string/mapbox_style_mapbox_streets"
-        app:mapbox_zoom="15" />
+        app:mapbox_myLocationTintColor="@color/primary"
+        app:mapbox_myLocationAccuracyTintColor="@color/primary"
+        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"
+        app:mapbox_cameraZoom="15" />
 
 </LinearLayout>

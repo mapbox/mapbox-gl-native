@@ -80,10 +80,10 @@
                 android:id="@id/mapView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:mapbox_center_latitude="37.176546"
-                app:mapbox_center_longitude="-3.599007"
-                app:mapbox_style_url="@string/mapbox_style_emerald"
-                app:mapbox_zoom="15" />
+                app:mapbox_cameraTargetLat="37.176546"
+                app:mapbox_cameraTargetLng="-3.599007"
+                app:mapbox_styleUrl="@string/mapbox_style_emerald"
+                app:mapbox_cameraZoom="15" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"
