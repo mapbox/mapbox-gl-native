@@ -310,6 +310,7 @@
 		DA87A9961DC9D88400810D09 /* MGLGeoJSONSourceTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLGeoJSONSourceTests.mm; sourceTree = "<group>"; };
 		DA87A9971DC9D88400810D09 /* MGLTileSetTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLTileSetTests.mm; sourceTree = "<group>"; };
 		DA87A99B1DC9D8DD00810D09 /* MGLGeoJSONSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLGeoJSONSource_Private.h; sourceTree = "<group>"; };
+		DA87A99F1DC9DC6200810D09 /* MGLValueEvaluator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLValueEvaluator.h; sourceTree = "<group>"; };
 		DA8933A61CCD287300E68420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MGLAnnotationCallout.xib; sourceTree = "<group>"; };
 		DA8933AC1CCD290700E68420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA8933B41CCD2C2500E68420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Foundation.strings; sourceTree = "<group>"; };
@@ -841,6 +842,7 @@
 				DAE6C37A1CC31E2A00DB3429 /* MGLStyle.mm */,
 				DAE6C3591CC31E0400DB3429 /* MGLTypes.h */,
 				DAE6C37C1CC31E2A00DB3429 /* MGLTypes.m */,
+				DA87A99F1DC9DC6200810D09 /* MGLValueEvaluator.h */,
 			);
 			name = Foundation;
 			path = ../darwin/src;
@@ -936,6 +938,7 @@
 				DA8F25B21D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.h in Headers */,
 				DAE6C38E1CC31E2A00DB3429 /* MGLOfflineStorage_Private.h in Headers */,
 				408AA8661DAEEE3600022900 /* MGLPolyline+MGLAdditions.h in Headers */,
+				DA87A9A01DC9DC6200810D09 /* MGLValueEvaluator.h in Headers */,
 				DAE6C3601CC31E0400DB3429 /* MGLOfflineRegion.h in Headers */,
 				DAE6C3681CC31E0400DB3429 /* MGLTilePyramidOfflineRegion.h in Headers */,
 				DA35A2CF1CCAAED300E826B2 /* NSValue+MGLAdditions.h in Headers */,
