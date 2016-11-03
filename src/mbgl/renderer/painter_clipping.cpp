@@ -19,11 +19,11 @@ void Painter::renderClippingMask(const UnwrappedTileID& tileID, const ClipID& cl
         gl::ColorMode::disabled(),
         shaders->fill,
         FillColorUniforms::Values {
-           matrixForTile(tileID),
-           0.0f,
-           Color {},
-           Color {},
-           context.viewport.getCurrentValue().size
+            uniforms::u_matrix::Value{ matrixForTile(tileID) },
+            uniforms::u_opacity::Value{ 0.0f },
+            uniforms::u_color::Value{ Color {} },
+            uniforms::u_outline_color::Value{ Color {} },
+            uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
         },
         gl::Unindexed<gl::Triangles>(tileTriangleVertexBuffer)
     });

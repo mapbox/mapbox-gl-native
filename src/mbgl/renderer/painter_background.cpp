@@ -54,11 +54,11 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
                 colorModeForRenderPass(),
                 parameters.shaders.fill,
                 FillColorUniforms::Values {
-                    matrixForTile(tileID),
-                    properties.backgroundOpacity.value,
-                    properties.backgroundColor.value,
-                    properties.backgroundColor.value,
-                    context.viewport.getCurrentValue().size
+                    uniforms::u_matrix::Value{ matrixForTile(tileID) },
+                    uniforms::u_opacity::Value{ properties.backgroundOpacity.value },
+                    uniforms::u_color::Value{ properties.backgroundColor.value },
+                    uniforms::u_outline_color::Value{ properties.backgroundColor.value },
+                    uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
                 },
                 gl::Unindexed<gl::TriangleStrip>(tileTriangleVertexBuffer)
             });

@@ -29,18 +29,18 @@ Values makeValues(const style::LinePaintProperties& properties,
     float x = state.getSize().height / 2.0f * std::tan(state.getPitch());
 
     return Values {
-        tile.translatedMatrix(properties.lineTranslate.value,
-                              properties.lineTranslateAnchor.value,
-                              state),
-        properties.lineOpacity.value,
-        properties.lineWidth.value / 2,
-        properties.lineGapWidth.value / 2,
-        properties.lineBlur.value + antialiasing,
-        -properties.lineOffset.value,
-        antialiasing / 2,
-        antialiasingMatrix,
-        1.0f / tile.id.pixelsToTileUnits(1.0, state.getZoom()),
-        (topedgelength + x) / topedgelength - 1.0f,
+        uniforms::u_matrix::Value{ tile.translatedMatrix(properties.lineTranslate.value,
+                                   properties.lineTranslateAnchor.value,
+                                   state) },
+        uniforms::u_opacity::Value{ properties.lineOpacity.value },
+        uniforms::u_linewidth::Value{ properties.lineWidth.value / 2 },
+        uniforms::u_gapwidth::Value{ properties.lineGapWidth.value / 2 },
+        uniforms::u_blur::Value{ properties.lineBlur.value + antialiasing },
+        uniforms::u_offset::Value{ -properties.lineOffset.value },
+        uniforms::u_antialiasing::Value{ antialiasing / 2 },
+        uniforms::u_antialiasingmatrix::Value{ antialiasingMatrix },
+        uniforms::u_ratio::Value{ 1.0f / tile.id.pixelsToTileUnits(1.0, state.getZoom()) },
+        uniforms::u_extra::Value{ (topedgelength + x) / topedgelength - 1.0f },
         std::forward<Args>(args)...
     };
 }
@@ -55,7 +55,7 @@ LineColorUniforms::values(const style::LinePaintProperties& properties,
         pixelRatio,
         tile,
         state,
-        properties.lineColor.value
+        uniforms::u_color::Value{ properties.lineColor.value }
     );
 }
 
@@ -86,14 +86,14 @@ LineSDFUniforms::values(const style::LinePaintProperties& properties,
         pixelRatio,
         tile,
         state,
-        properties.lineColor.value,
-        scaleA,
-        scaleB,
-        posA.y,
-        posB.y,
-        properties.lineDasharray.value.t,
-        atlasWidth / (std::min(widthA, widthB) * 256.0f * pixelRatio) / 2.0f,
-        0
+        uniforms::u_color::Value{ properties.lineColor.value },
+        uniforms::u_patternscale_a::Value{ scaleA },
+        uniforms::u_patternscale_b::Value{ scaleB },
+        uniforms::u_tex_y_a::Value{ posA.y },
+        uniforms::u_tex_y_b::Value{ posB.y },
+        uniforms::u_mix::Value{ properties.lineDasharray.value.t },
+        uniforms::u_sdfgamma::Value{ atlasWidth / (std::min(widthA, widthB) * 256.0f * pixelRatio) / 2.0f },
+        uniforms::u_image::Value{ 0 }
     );
 }
 
@@ -119,14 +119,14 @@ LinePatternUniforms::values(const style::LinePaintProperties& properties,
         pixelRatio,
         tile,
         state,
-        posA.tl,
-        posA.br,
-        posB.tl,
-        posB.br,
-        sizeA,
-        sizeB,
-        properties.linePattern.value.t,
-        0
+        uniforms::u_pattern_tl_a::Value{ posA.tl },
+        uniforms::u_pattern_br_a::Value{ posA.br },
+        uniforms::u_pattern_tl_b::Value{ posB.tl },
+        uniforms::u_pattern_br_b::Value{ posB.br },
+        uniforms::u_pattern_size_a::Value{ sizeA },
+        uniforms::u_pattern_size_b::Value{ sizeB },
+        uniforms::u_fade::Value{ properties.linePattern.value.t },
+        uniforms::u_image::Value{ 0 }
     );
 }
 

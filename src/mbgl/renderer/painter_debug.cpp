@@ -25,11 +25,11 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
             gl::ColorMode::unblended(),
             shaders->fill,
             FillColorUniforms::Values {
-                renderTile.matrix,
-                1.0f,
-                color,
-                color,
-                context.viewport.getCurrentValue().size
+                uniforms::u_matrix::Value{ renderTile.matrix },
+                uniforms::u_opacity::Value{ 1.0f },
+                uniforms::u_color::Value{ color },
+                uniforms::u_outline_color::Value{ color },
+                uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
             },
             subject
         });

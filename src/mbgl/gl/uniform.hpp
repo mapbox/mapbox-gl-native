@@ -18,7 +18,6 @@ class Uniform {
 public:
     class Value {
     public:
-        Value(T t_) : t(std::move(t_)) {}
         T t;
     };
 

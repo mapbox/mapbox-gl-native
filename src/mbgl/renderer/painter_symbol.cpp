@@ -125,10 +125,10 @@ void Painter::renderSymbol(PaintParameters& parameters,
             colorModeForRenderPass(),
             shaders->collisionBox,
             CollisionBoxUniforms::Values {
-                tile.matrix,
-                std::pow(2.0f, state.getZoom() - tile.tile.id.overscaledZ),
-                state.getZoom() * 10,
-                (tile.id.canonical.z + 1) * 10
+                uniforms::u_matrix::Value{ tile.matrix },
+                uniforms::u_scale::Value{ std::pow(2.0f, float(state.getZoom() - tile.tile.id.overscaledZ)) },
+                uniforms::u_zoom::Value{ float(state.getZoom() * 10) },
+                uniforms::u_maxzoom::Value{ float((tile.id.canonical.z + 1) * 10) },
             },
             gl::Unindexed<gl::Lines>(
                 *bucket.collisionBox.vertexBuffer,
