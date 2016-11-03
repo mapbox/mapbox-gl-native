@@ -6,6 +6,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol MGLFeature;
 
+/**
+ Data source for `MGLCustomVectorSource`.
+ */
 @protocol MGLCustomVectorSourceDataSource <NSObject>
 
 /** 
@@ -19,15 +22,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/**
+ A source for vector data that is fetched 1 tile at a time. Usefull for sources that are
+ too large to fit in memory, or are already divided into tiles, but not in Mapbox Vector Tile format.
+ */
 @interface MGLCustomVectorSource : MGLGeoJSONSourceBase
 
 /**
- Returns a custom vector datasource initialized with an identifier, datasource, and zoom levels.
+ Returns a custom vector datasource initialized with an identifier, datasource,  and a
+ dictionary of options for the source according to the
+ <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson">style
+ specification</a>.
 
  @param identifier A string that uniquely identifies the source.
- @param minimumZoomLevel The minimum zoom level at which the source will display tiles.
- @param maximumZoomLevel The maximum zoom level at which the source will display tiles.
  @param dataSource An object that implements the `MGLCustomVectorSourceDataSource` protocol that will be queried for tile data.
+ @param options An `NSDictionary` of options for this source.
  */
 - (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(NSObject<MGLCustomVectorSourceDataSource>*)dataSource options:(NS_DICTIONARY_OF(NSString *, id) *)options NS_DESIGNATED_INITIALIZER;
 
