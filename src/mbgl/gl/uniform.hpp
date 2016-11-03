@@ -3,10 +3,10 @@
 #include <mbgl/gl/types.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/ignore.hpp>
+#include <mbgl/util/indexed_tuple.hpp>
 
 #include <array>
 #include <functional>
-#include <tuple>
 
 namespace mbgl {
 namespace gl {
@@ -63,8 +63,8 @@ UniformLocation uniformLocation(ProgramID, const char * name);
 template <class... Us>
 class Uniforms {
 public:
-    using State = std::tuple<typename Us::State...>;
-    using Values = std::tuple<typename Us::Value...>;
+    using State = IndexedTuple<TypeList<Us...>, TypeList<typename Us::State...>>;
+    using Values = IndexedTuple<TypeList<Us...>, TypeList<typename Us::Value...>>;
 
     static State state(const ProgramID& id) {
         return State { { uniformLocation(id, Us::name) }... };
@@ -72,7 +72,7 @@ public:
 
     static std::function<void ()> binder(State& state, Values&& values_) {
         return [&state, values = std::move(values_)] () mutable {
-            ignore((std::get<typename Us::State>(state) = std::get<typename Us::Value>(values), 0)...);
+            ignore({ (state.template get<Us>() = values.template get<Us>(), 0)... });
         };
     }
 };

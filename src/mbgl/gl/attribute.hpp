@@ -2,11 +2,10 @@
 
 #include <mbgl/gl/types.hpp>
 #include <mbgl/util/ignore.hpp>
+#include <mbgl/util/indexed_tuple.hpp>
 
 #include <cstddef>
 #include <functional>
-#include <tuple>
-#include <utility>
 
 namespace mbgl {
 namespace gl {
@@ -143,27 +142,24 @@ void bindAttribute(AttributeLocation location,
 template <class... As>
 class Attributes {
 public:
-    using State = std::tuple<typename As::State...>;
+    using State = IndexedTuple<TypeList<As...>, TypeList<typename As::State...>>;
     using Vertex = detail::Vertex<As...>;
+
+    template <class A>
+    static constexpr std::size_t Index = TypeIndex<A, As...>::value;
 
     static State state(const ProgramID& id) {
         return State { { attributeLocation(id, As::name) }... };
     }
 
     static std::function<void (std::size_t)> binder(const State& state) {
-        return binder(state, std::index_sequence_for<As...>());
-    }
-
-private:
-    template <std::size_t... Is>
-    static std::function<void (std::size_t)> binder(const State& state, std::index_sequence<Is...>) {
         return [&state] (std::size_t vertexOffset) {
-            ignore((bindAttribute(std::get<Is>(state).location,
-                                  std::get<Is>(state).count,
-                                  std::get<Is>(state).type,
-                                  sizeof(Vertex),
-                                  vertexOffset,
-                                  Vertex::attributeOffsets[Is]), 0)...);
+            ignore({ (bindAttribute(state.template get<As>().location,
+                                    state.template get<As>().count,
+                                    state.template get<As>().type,
+                                    sizeof(Vertex),
+                                    vertexOffset,
+                                    Vertex::attributeOffsets[Index<As>]), 0)... });
         };
     }
 };
