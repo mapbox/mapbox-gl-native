@@ -4,6 +4,7 @@
 #import "MGLSource_Private.h"
 #import "MGLFeature_Private.h"
 #import "MGLShape_Private.h"
+#import "MGLGeoJSONSourceBase_Private.h"
 
 #include <mbgl/style/sources/custom_vector_source.hpp>
 #include <mbgl/util/geojson.hpp>
@@ -12,21 +13,20 @@
     std::unique_ptr<mbgl::style::CustomVectorSource> _pendingSource;
 }
 
+@property (nonatomic, readwrite) NSDictionary *options;
 @property (nonnull) mbgl::style::CustomVectorSource *rawSource;
 
 @end
 
 @implementation MGLCustomVectorSource
 
-- (instancetype)initWithIdentifier:(NSString *)identifier minimumZoomLevel:(NSUInteger)minimumZoomLevel maximumZoomLevel:(NSUInteger)maximumZoomLevel dataSource:(NSObject<MGLCustomVectorSourceDataSource>*)dataSource
+- (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(NSObject<MGLCustomVectorSourceDataSource>*)dataSource options:(NS_DICTIONARY_OF(NSString *, id) *)options
 {
     if (self = [super initWithIdentifier:identifier])
     {
-        _maximumZoomLevel = @(maximumZoomLevel);
-        _minimumZoomLevel = @(minimumZoomLevel);
         _dataSource = dataSource;
     
-        auto source = std::make_unique<mbgl::style::CustomVectorSource>(self.identifier.UTF8String, self.customSourceOptions,
+        auto source = std::make_unique<mbgl::style::CustomVectorSource>(self.identifier.UTF8String, self.geoJSONOptions,
                                                                          ^void(uint8_t z, uint32_t x, uint32_t y)
                                                                          {
                                                                              [self.dataSource getTileForZoom:z
@@ -46,14 +46,6 @@
     return self;
 }
 
-- (mbgl::style::CustomVectorSourceOptions)customSourceOptions
-{
-    auto options = mbgl::style::CustomVectorSourceOptions();
-    options.minzoom = self.minimumZoomLevel.integerValue;
-    options.maxzoom = self.maximumZoomLevel.integerValue;
-    return options;
-}
-
 - (void)addToMapView:(MGLMapView *)mapView
 {
     mapView.mbglMap->addSource(std::move(_pendingSource));
@@ -61,8 +53,6 @@
 
 - (void)processData:(NS_ARRAY_OF(id <MGLFeature>)*)features forTile:(uint8_t)z x:(uint32_t)x y:(uint32_t)y
 {
-    NSLog(@"processData %li/%li/%li", (long)z, (long)x, (long)y);
-    
     mbgl::FeatureCollection featureCollection;
     featureCollection.reserve(features.count);
     for (id <MGLFeaturePrivate> feature in features)

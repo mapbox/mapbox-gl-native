@@ -173,6 +173,10 @@
 		7E016D871D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */; };
 		88DDFB291DCB7A9200B53BDD /* MGLCustomVectorSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 88F0C0811DC8FD8C002DB7AE /* MGLCustomVectorSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		88DDFB2A1DCB7AFC00B53BDD /* MGLCustomVectorSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 88F0C0811DC8FD8C002DB7AE /* MGLCustomVectorSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		88DDFB2D1DCBC21700B53BDD /* MGLGeoJSONSourceBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 88DDFB2B1DCBC21700B53BDD /* MGLGeoJSONSourceBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		88DDFB2E1DCBC21700B53BDD /* MGLGeoJSONSourceBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 88DDFB2B1DCBC21700B53BDD /* MGLGeoJSONSourceBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		88DDFB2F1DCBC21700B53BDD /* MGLGeoJSONSourceBase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88DDFB2C1DCBC21700B53BDD /* MGLGeoJSONSourceBase.mm */; };
+		88DDFB301DCBC21700B53BDD /* MGLGeoJSONSourceBase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88DDFB2C1DCBC21700B53BDD /* MGLGeoJSONSourceBase.mm */; };
 		88F0C0851DC8FD8C002DB7AE /* MGLCustomVectorSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88F0C0821DC8FD8C002DB7AE /* MGLCustomVectorSource.mm */; };
 		88F0C0861DC8FD8C002DB7AE /* MGLCustomVectorSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88F0C0821DC8FD8C002DB7AE /* MGLCustomVectorSource.mm */; };
 		DA0CD5901CF56F6A00A5F5A5 /* MGLFeatureTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */; };
@@ -592,6 +596,9 @@
 		7E016D7D1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLPolyline+MGLAdditions.m"; sourceTree = "<group>"; };
 		7E016D821D9E890300A29A21 /* MGLPolygon+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLPolygon+MGLAdditions.h"; sourceTree = "<group>"; };
 		7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLPolygon+MGLAdditions.m"; sourceTree = "<group>"; };
+		88DDFB2B1DCBC21700B53BDD /* MGLGeoJSONSourceBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLGeoJSONSourceBase.h; sourceTree = "<group>"; };
+		88DDFB2C1DCBC21700B53BDD /* MGLGeoJSONSourceBase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLGeoJSONSourceBase.mm; sourceTree = "<group>"; };
+		88DDFB311DCBC36E00B53BDD /* MGLGeoJSONSourceBase_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLGeoJSONSourceBase_Private.h; sourceTree = "<group>"; };
 		88F0C0811DC8FD8C002DB7AE /* MGLCustomVectorSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCustomVectorSource.h; sourceTree = "<group>"; };
 		88F0C0821DC8FD8C002DB7AE /* MGLCustomVectorSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLCustomVectorSource.mm; sourceTree = "<group>"; tabWidth = 4; };
 		DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
@@ -842,6 +849,9 @@
 				404C26E11D89B877000AA13D /* MGLTileSet.mm */,
 				88F0C0811DC8FD8C002DB7AE /* MGLCustomVectorSource.h */,
 				88F0C0821DC8FD8C002DB7AE /* MGLCustomVectorSource.mm */,
+				88DDFB2B1DCBC21700B53BDD /* MGLGeoJSONSourceBase.h */,
+				88DDFB311DCBC36E00B53BDD /* MGLGeoJSONSourceBase_Private.h */,
+				88DDFB2C1DCBC21700B53BDD /* MGLGeoJSONSourceBase.mm */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -1434,6 +1444,7 @@
 				353933F51D3FB785003F57D7 /* MGLBackgroundStyleLayer.h in Headers */,
 				DA88485A1CBAFB9800AB86E3 /* MGLUserLocation_Private.h in Headers */,
 				DA27C24F1CBB4C11000B0ECD /* MGLAccountManager_Private.h in Headers */,
+				88DDFB2D1DCBC21700B53BDD /* MGLGeoJSONSourceBase.h in Headers */,
 				DA8847FC1CBAFA5100AB86E3 /* MGLStyle.h in Headers */,
 				354B83961D2E873E005D9406 /* MGLUserLocationAnnotationView.h in Headers */,
 				DA8847F01CBAFA5100AB86E3 /* MGLAnnotation.h in Headers */,
@@ -1535,6 +1546,7 @@
 				404C26E31D89B877000AA13D /* MGLTileSet.h in Headers */,
 				DABFB8611CBE99E500D62B32 /* MGLMultiPoint.h in Headers */,
 				3510FFF11D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */,
+				88DDFB2E1DCBC21700B53BDD /* MGLGeoJSONSourceBase.h in Headers */,
 				35E0CFE71D3E501500188327 /* MGLStyle_Private.h in Headers */,
 				DABFB86D1CBE9A0F00D62B32 /* MGLAnnotationImage.h in Headers */,
 				DABFB8721CBE9A0F00D62B32 /* MGLUserLocation.h in Headers */,
@@ -1969,6 +1981,7 @@
 				DA8848321CBAFA6200AB86E3 /* NSString+MGLAdditions.m in Sources */,
 				408AA8581DAEDA1E00022900 /* NSDictionary+MGLAdditions.mm in Sources */,
 				DA35A2A11CC9E95F00E826B2 /* MGLCoordinateFormatter.m in Sources */,
+				88DDFB2F1DCBC21700B53BDD /* MGLGeoJSONSourceBase.mm in Sources */,
 				35305D481D22AA680007D005 /* NSData+MGLAdditions.mm in Sources */,
 				DA8848291CBAFA6200AB86E3 /* MGLStyle.mm in Sources */,
 				DA88481C1CBAFA6200AB86E3 /* MGLGeometry.mm in Sources */,
@@ -2043,6 +2056,7 @@
 				DA35A2CC1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */,
 				408AA8591DAEDA1E00022900 /* NSDictionary+MGLAdditions.mm in Sources */,
 				DAA4E4281CBB730400178DFB /* MGLTypes.m in Sources */,
+				88DDFB301DCBC21700B53BDD /* MGLGeoJSONSourceBase.mm in Sources */,
 				DA35A2A21CC9E95F00E826B2 /* MGLCoordinateFormatter.m in Sources */,
 				35305D491D22AA680007D005 /* NSData+MGLAdditions.mm in Sources */,
 				DAA4E42D1CBB730400178DFB /* MGLAnnotationImage.m in Sources */,

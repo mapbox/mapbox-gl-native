@@ -8,13 +8,13 @@ namespace mbgl {
     
     class CustomVectorSource::Impl : public Source::Impl {
     public:
-      Impl(std::string id, Source&, CustomVectorSourceOptions options, std::function<void(uint8_t, uint32_t, uint32_t)> fetchTile);
+      Impl(std::string id, Source&, GeoJSONOptions options, std::function<void(uint8_t, uint32_t, uint32_t)> fetchTile);
       
       void loadDescription(FileSource&) final {}
       void setTileData(uint8_t, uint32_t, uint32_t, const mapbox::geojson::geojson&);
 
     private:
-      CustomVectorSourceOptions options;
+      GeoJSONOptions options;
       std::function<void(uint8_t, uint32_t, uint32_t)> fetchTile;
       
       uint16_t getTileSize() const;

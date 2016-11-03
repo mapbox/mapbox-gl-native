@@ -1,4 +1,5 @@
 #import "MGLGeoJSONSource_Private.h"
+#import "MGLGeoJSONSourceBase_Private.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
@@ -8,12 +9,6 @@
 
 #include <mbgl/style/sources/geojson_source.hpp>
 
-const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionClustered = @"MGLGeoJSONSourceOptionClustered";
-const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionClusterRadius = @"MGLGeoJSONSourceOptionClusterRadius";
-const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionMaximumZoomLevelForClustering = @"MGLGeoJSONSourceOptionMaximumZoomLevelForClustering";
-const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionMaximumZoomLevel = @"MGLGeoJSONSourceOptionMaximumZoomLevel";
-const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionBuffer = @"MGLGeoJSONSourceOptionBuffer";
-const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"MGLGeoJSONSourceOptionSimplificationTolerance";
 
 @interface MGLGeoJSONSource ()
 
@@ -106,50 +101,7 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
     self.rawSource = _pendingSource.get();
 }
 
-- (mbgl::style::GeoJSONOptions)geoJSONOptions
-{
-    auto mbglOptions = mbgl::style::GeoJSONOptions();
-    
-    if (id value = self.options[MGLGeoJSONSourceOptionMaximumZoomLevel]) {
-        [self validateValue:value];
-        mbglOptions.maxzoom = [value integerValue];
-    }
-    
-    if (id value = self.options[MGLGeoJSONSourceOptionBuffer]) {
-        [self validateValue:value];
-        mbglOptions.buffer = [value integerValue];
-    }
-    
-    if (id value = self.options[MGLGeoJSONSourceOptionSimplificationTolerance]) {
-        [self validateValue:value];
-        mbglOptions.tolerance = [value doubleValue];
-    }
-    
-    if (id value = self.options[MGLGeoJSONSourceOptionClusterRadius]) {
-        [self validateValue:value];
-        mbglOptions.clusterRadius = [value integerValue];
-    }
-    
-    if (id value = self.options[MGLGeoJSONSourceOptionMaximumZoomLevelForClustering]) {
-        [self validateValue:value];
-        mbglOptions.clusterMaxZoom = [value integerValue];
-    }
-    
-    if (id value = self.options[MGLGeoJSONSourceOptionClustered]) {
-        [self validateValue:value];
-        mbglOptions.cluster = [value boolValue];
-    }
-    
-    return mbglOptions;
-}
 
-- (void)validateValue:(id)value
-{
-    if (! [value isKindOfClass:[NSNumber class]])
-    {
-        [NSException raise:@"Value not handled" format:@"%@ is not an NSNumber", value];
-    }
-}
 
 - (void)setGeoJSONData:(NSData *)geoJSONData
 {

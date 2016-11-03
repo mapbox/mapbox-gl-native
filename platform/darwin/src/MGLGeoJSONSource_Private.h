@@ -5,6 +5,4 @@
 
 @interface MGLGeoJSONSource (Private)
 
-- (mbgl::style::GeoJSONOptions)geoJSONOptions;
-
 @end

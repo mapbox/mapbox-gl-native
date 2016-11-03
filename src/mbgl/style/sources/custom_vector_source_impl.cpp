@@ -8,7 +8,7 @@
 namespace mbgl {
   namespace style {
     
-    CustomVectorSource::Impl::Impl(std::string id, Source& base_, CustomVectorSourceOptions options_, std::function<void(uint8_t, uint32_t, uint32_t)> fetchTile_)
+    CustomVectorSource::Impl::Impl(std::string id, Source& base_, GeoJSONOptions options_, std::function<void(uint8_t, uint32_t, uint32_t)> fetchTile_)
     : Source::Impl(SourceType::Vector, std::move(id), base_), options(options_), fetchTile(fetchTile_) {
       loaded = true;
     }

@@ -6,15 +6,9 @@
 namespace mbgl {
 namespace style {
     
-  struct CustomVectorSourceOptions : GeoJSONOptions {
-        uint8_t minzoom = 0;
-        uint16_t tileSize = 512;
-    };
-
-    
 class CustomVectorSource : public Source {
 public:
-  CustomVectorSource(std::string id, CustomVectorSourceOptions options, std::function<void(uint8_t, uint32_t, uint32_t)> fetchTile);
+  CustomVectorSource(std::string id, GeoJSONOptions options, std::function<void(uint8_t, uint32_t, uint32_t)> fetchTile);
   
     void setTileData(uint8_t, uint32_t, uint32_t, const mapbox::geojson::geojson&);
     // Private implementation
