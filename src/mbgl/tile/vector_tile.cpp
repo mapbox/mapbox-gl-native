@@ -234,11 +234,7 @@ GeometryCollection VectorTileFeature::getGeometries() const {
         }
     }
 
-    if (layer.version >= 2 || type != FeatureType::Polygon) {
-        return lines;
-    }
-
-    return fixupPolygons(lines);
+    return lines;
 }
 
 VectorTileData::VectorTileData(std::shared_ptr<const std::string> data_)
