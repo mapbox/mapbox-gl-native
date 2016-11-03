@@ -1,24 +1,5 @@
 apply plugin: 'com.android.application'
 
-task accessToken {
-    def tokenFile = new File("MapboxGLAndroidSDKWearTestApp/src/main/res/values/developer-config.xml")
-    if (!tokenFile.exists()) {
-        String tokenFileContents = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<resources>\n" +
-                "    <string name=\"mapbox_access_token\">" + "$System.env.MAPBOX_ACCESS_TOKEN" + "</string>\n" +
-                "</resources>"
-
-        if (tokenFileContents == null) {
-            throw new InvalidUserDataException("You must set the MAPBOX_ACCESS_TOKEN environment variable.")
-        }
-        tokenFile.write(tokenFileContents)
-    }
-}
-
-gradle.projectsEvaluated {
-    preBuild.dependsOn('accessToken')
-}
-
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
@@ -44,14 +25,15 @@ dependencies {
         transitive = true
     }
 
+    // Wear
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.google.android.support:wearable:2.0.0-alpha3'
+    provided 'com.google.android.wearable:wearable:2.0.0-alpha3'
+
     // Leak Canary
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
-
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.google.android.support:wearable:2.0.0-alpha3'
-    provided 'com.google.android.wearable:wearable:2.0.0-alpha3'
 }
 
-apply from: '../checkstyle.gradle'
+apply from: 'gradle-config.gradle'
