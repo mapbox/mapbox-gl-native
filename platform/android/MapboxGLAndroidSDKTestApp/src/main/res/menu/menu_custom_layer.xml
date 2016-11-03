@@ -5,4 +5,13 @@
     <item
         android:id="@+id/action_update_layer"
         android:title="Update layer (invalidate)" />
+    <item
+        android:id="@+id/action_set_color_red"
+        android:title="Red" />
+    <item
+        android:id="@+id/action_set_color_green"
+        android:title="Green" />
+    <item
+        android:id="@+id/action_set_color_blue"
+        android:title="Blue" />
 </menu>

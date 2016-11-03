@@ -6,6 +6,9 @@ public class ExampleCustomLayer {
     }
 
     public native static long createContext();
+
+    public native static void setColor(float red, float green, float blue, float alpha);
+
     public static long InitializeFunction;
     public static long RenderFunction;
     public static long DeinitializeFunction;

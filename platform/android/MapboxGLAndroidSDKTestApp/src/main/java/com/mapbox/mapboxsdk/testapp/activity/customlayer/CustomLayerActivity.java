@@ -146,6 +146,15 @@ public class CustomLayerActivity extends AppCompatActivity {
             case R.id.action_update_layer:
                 updateLayer();
                 return true;
+            case R.id.action_set_color_red:
+                ExampleCustomLayer.setColor(1, 0, 0, 1);
+                return true;
+            case R.id.action_set_color_green:
+                ExampleCustomLayer.setColor(0, 1, 0, 1);
+                return true;
+            case R.id.action_set_color_blue:
+                ExampleCustomLayer.setColor(0, 0, 1, 1);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
