@@ -2,13 +2,12 @@
 
 #include <mbgl/style/source.hpp>
 #include <mbgl/util/geojson.hpp>
-
+#include <mbgl/style/sources/geojson_source.hpp>
 namespace mbgl {
 namespace style {
     
-    struct CustomVectorSourceOptions {
+  struct CustomVectorSourceOptions : GeoJSONOptions {
         uint8_t minzoom = 0;
-        uint8_t maxzoom = 18;
         uint16_t tileSize = 512;
     };
 

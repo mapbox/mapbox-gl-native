@@ -3,6 +3,7 @@
 #include <mbgl/tile/geojson_tile.hpp>
 #include <mbgl/style/source_observer.hpp>
 #include <mapbox/geojsonvt.hpp>
+#include <supercluster.hpp>
 
 namespace mbgl {
   namespace style {
@@ -31,17 +32,34 @@ namespace mbgl {
     {
       double scale = util::EXTENT / util::tileSize;
       
-      mapbox::geojsonvt::Options vtOptions;
-      vtOptions.maxZoom = options.maxzoom;
-      vtOptions.extent = util::EXTENT;
-      vtOptions.buffer = std::round(scale * 0);//options.buffer
-      vtOptions.tolerance = scale * 1;//options.tolerance
-      mapbox::geojsonvt::GeoJSONVT geojSONVT = mapbox::geojsonvt::GeoJSONVT(geoJSON, vtOptions);
+      variant<GeoJSONVTPointer, SuperclusterPointer> geoJSONOrSupercluster;
+      if (!options.cluster) {
+        mapbox::geojsonvt::Options vtOptions;
+        vtOptions.maxZoom = options.maxzoom;
+        vtOptions.extent = util::EXTENT;
+        vtOptions.buffer = std::round(scale * options.buffer);
+        vtOptions.tolerance = scale * options.tolerance;
+        geoJSONOrSupercluster = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(geoJSON, vtOptions);
+      } else {
+        mapbox::supercluster::Options clusterOptions;
+        clusterOptions.maxZoom = options.clusterMaxZoom;
+        clusterOptions.extent = util::EXTENT;
+        clusterOptions.radius = std::round(scale * options.clusterRadius);
+        
+        const auto& features = geoJSON.get<mapbox::geometry::feature_collection<double>>();
+        geoJSONOrSupercluster =
+        std::make_unique<mapbox::supercluster::Supercluster>(features, clusterOptions);
+      }
       
       for (auto const &item : tiles) {
-        GeoJSONTile* geoJSONTile = static_cast<GeoJSONTile*>(item.second.get());
-        if(geoJSONTile->id.canonical.z == z && geoJSONTile->id.canonical.x == x && geoJSONTile->id.canonical.y == y) {
-          geoJSONTile->updateData(geojSONVT.getTile(z, x, y).features);
+        GeoJSONTile* tile = static_cast<GeoJSONTile*>(item.second.get());
+        if(tile->id.canonical.z == z && tile->id.canonical.x == x && tile->id.canonical.y == y) {
+          if (geoJSONOrSupercluster.is<GeoJSONVTPointer>()) {
+            tile->updateData(geoJSONOrSupercluster.get<GeoJSONVTPointer>()->getTile(z, x, y).features);
+          } else {
+            assert(geoJSONOrSupercluster.is<SuperclusterPointer>());
+            tile->updateData(geoJSONOrSupercluster.get<SuperclusterPointer>()->getTile(z, x, y));
+          }
         }
       }
     }
