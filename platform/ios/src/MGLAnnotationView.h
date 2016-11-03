@@ -37,6 +37,31 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
 };
 
 /**
+   Options for locking the orientation of an `MGLAnnotationView` along one or more
+   axes for a billboard effect.
+ 
+   By default the billboard will always facing the view flat
+ */
+typedef NS_OPTIONS(NSUInteger, MGLAnnotationViewBillboardLocking) {
+   
+    /**
+      Locking the tilting angle so it tilts with the map
+     */
+    MGLAnnotationViewBillboardLockingTilt = 0x01 << 0,
+    
+    /**
+      Locking the heading angle so it rotates with the map
+     */
+    MGLAnnotationViewBillboardLockingHeading = 0x01 << 1,
+    
+    /**
+      Billboard tilts and rotates with the map
+     */
+    MGLAnnotationViewBillboardLockingAll = MGLAnnotationViewBillboardLockingTilt |
+        MGLAnnotationViewBillboardLockingHeading
+};
+
+/**
  The `MGLAnnotationView` class is responsible for marking a point annotation
  with a view. Annotation views represent an annotation object, which is an
  object that corresponds to the `MGLAnnotation` protocol. When an annotation’s
@@ -220,6 +245,12 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
  calls this method to update the drag state.
  */
 - (void)setDragState:(MGLAnnotationViewDragState)dragState animated:(BOOL)animated NS_REQUIRES_SUPER;
+
+/**
+ The current locking of the axis of the annotation view
+ By default the view is unlocked along both degree of freedom
+ */
+@property (nonatomic, assign) MGLAnnotationViewBillboardLocking lockAxis;
 
 @end
 

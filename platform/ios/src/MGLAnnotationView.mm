@@ -11,7 +11,13 @@
 
 @property (nonatomic, readwrite, nullable) NSString *reuseIdentifier;
 @property (nonatomic, readwrite, nullable) id <MGLAnnotation> annotation;
+
 @property (nonatomic, readwrite) CATransform3D lastAppliedScaleTransform;
+
+@property (nonatomic, readwrite) CATransform3D lastAppliedTiltTransform;
+
+@property (nonatomic, readwrite) CATransform3D lastAppliedHeadingTransform;
+
 @property (nonatomic, weak) UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, weak) UILongPressGestureRecognizer *longPressRecognizer;
 @property (nonatomic, weak) MGLMapView *mapView;
@@ -26,9 +32,12 @@
     if (self)
     {
         _lastAppliedScaleTransform = CATransform3DIdentity;
+        _lastAppliedTiltTransform = CATransform3DIdentity;
+        _lastAppliedHeadingTransform = CATransform3DIdentity;
         _reuseIdentifier = [reuseIdentifier copy];
         _scalesWithViewingDistance = YES;
         _enabled = YES;
+        _lockAxis = MGLAnnotationViewBillboardLockingAll;
     }
     return self;
 }
@@ -70,7 +79,8 @@
     center.y += _centerOffset.dy;
     
     super.center = center;
-    [self updateScaleTransformForViewingDistance];
+    
+    [self updateTransform];
 }
 
 - (void)setScalesWithViewingDistance:(BOOL)scalesWithViewingDistance
@@ -78,7 +88,38 @@
     if (_scalesWithViewingDistance != scalesWithViewingDistance)
     {
         _scalesWithViewingDistance = scalesWithViewingDistance;
-        [self updateScaleTransformForViewingDistance];
+        [self updateTransform];
+    }
+}
+
+- (void)updateTransform
+{
+    [self updateTiltTransform];
+    [self updateHeadingTransform];
+//    [self updateScaleTransformForViewingDistance];
+}
+
+- (void)updateHeadingTransform
+{
+    if( _lockAxis & MGLAnnotationViewBillboardLockingHeading ) {
+        const mbgl::TransformState mapTransform = self.mapView.mbglMap->getTransform();
+        CATransform3D undoOfLastHeadingTransform = CATransform3DInvert(_lastAppliedHeadingTransform);
+        CATransform3D newHeadingTransform = CATransform3DMakeRotation(mapTransform.getAngle(), 0, 0, 1);
+        CATransform3D effectiveTransform = CATransform3DConcat(undoOfLastHeadingTransform, newHeadingTransform);
+        self.layer.transform = CATransform3DConcat(self.layer.transform, effectiveTransform);
+        _lastAppliedHeadingTransform = newHeadingTransform;
+    }
+}
+
+- (void)updateTiltTransform
+{
+    if( _lockAxis & MGLAnnotationViewBillboardLockingTilt ) {
+        const mbgl::TransformState mapTransform = self.mapView.mbglMap->getTransform();
+        CATransform3D undoOfLastTiltTransform = CATransform3DInvert(_lastAppliedTiltTransform);
+        CATransform3D newTiltTransform = CATransform3DMakeRotation(mapTransform.getPitch(), 1, 0, 0);
+        CATransform3D effectiveTransform = CATransform3DConcat(undoOfLastTiltTransform, newTiltTransform);
+        self.layer.transform = CATransform3DConcat(self.layer.transform, effectiveTransform);
+        _lastAppliedTiltTransform = newTiltTransform;
     }
 }
 

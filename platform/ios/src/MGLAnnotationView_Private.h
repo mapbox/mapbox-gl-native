@@ -11,6 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readwrite, nullable) id <MGLAnnotation> annotation;
 @property (nonatomic, weak) MGLMapView *mapView;
 
+-(void)updateTransform;
+
 @end
 
 NS_ASSUME_NONNULL_END

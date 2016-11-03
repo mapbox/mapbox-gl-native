@@ -3013,6 +3013,10 @@ public:
     [newAnnotationContainerView addSubviews:annotationViews];
     [_glView insertSubview:newAnnotationContainerView atIndex:0];
     self.annotationContainerView = newAnnotationContainerView;
+    
+    CATransform3D perspectiveTransform = CATransform3DIdentity;
+    perspectiveTransform.m34 = -1.0 / 500;
+    self.annotationContainerView.layer.sublayerTransform = perspectiveTransform;
 }
 
 /// Initialize and return a default annotation image that depicts a round pin
@@ -4658,6 +4662,8 @@ public:
         {
             annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
         }
+        
+//        [annotationView updateTransform];
     }
 
     [CATransaction commit];
