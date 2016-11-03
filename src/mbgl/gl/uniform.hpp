@@ -14,12 +14,16 @@ template <class T>
 void bindUniform(UniformLocation, const T&);
 
 template <class Tag, class T>
+class UniformValue {
+public:
+    explicit UniformValue(T t_) : t(std::move(t_)) {}
+    T t;
+};
+
+template <class Tag, class T>
 class Uniform {
 public:
-    class Value {
-    public:
-        T t;
-    };
+    using Value = UniformValue<Tag, T>;
 
     class State {
     public:
