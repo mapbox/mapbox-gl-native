@@ -4705,13 +4705,19 @@ public:
     // Enqueue (and move if required) offscreen annotation views
     for (id<MGLAnnotation> annotation in offscreenAnnotations)
     {
-        CLLocationCoordinate2D coordinate = annotation.coordinate;
+        // Defer to the shape/polygon styling delegate methods
+        if ([annotation isKindOfClass:[MGLMultiPoint class]])
+        {
+            continue;
+        }
+
         MGLAnnotationTag annotationTag = _annotationTagsByAnnotation.at(annotation);
         MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
         UIView *annotationView = annotationContext.annotationView;
         
         if (annotationView)
         {
+            CLLocationCoordinate2D coordinate = annotation.coordinate;
             // Every so often (1 out of 1000 frames?) the mbgl query mechanism fails. This logic spot checks the
             // offscreenAnnotations values -- if they are actually still on screen then the view center is
             // moved and the enqueue operation is avoided. This allows us to keep the performance benefit of
