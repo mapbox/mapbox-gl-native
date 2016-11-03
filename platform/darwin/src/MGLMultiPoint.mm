@@ -16,6 +16,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 {
     size_t _count;
     MGLCoordinateBounds _bounds;
+    std::vector<CLLocationCoordinate2D> _coordinates;
 }
 
 - (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
@@ -24,40 +25,24 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 
     if (self)
     {
-        [self setupWithCoordinates:coords count:count];
+        _count = count;
+        _coordinates.reserve(_count);
+        for (NSUInteger i = 0; i < _count; i++)
+        {
+            _coordinates.push_back(coords[i]);
+        }
+        [self computeBounds];
     }
 
     return self;
-}
-
-- (void)setupWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
-{
-    if (_coordinates) free(_coordinates);
-
-    _count = count;
-    _coordinates = (CLLocationCoordinate2D *)malloc(_count * sizeof(CLLocationCoordinate2D));
-
-    mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
-
-    for (NSUInteger i = 0; i < _count; i++)
-    {
-        _coordinates[i] = coords[i];
-        bounds.extend(mbgl::LatLng(coords[i].latitude, coords[i].longitude));
-    }
-
-    _bounds = MGLCoordinateBoundsFromLatLngBounds(bounds);
-}
-
-- (void)dealloc
-{
-    free(_coordinates);
 }
 
 - (CLLocationCoordinate2D)coordinate
 {
     assert(_count > 0);
 
-    return CLLocationCoordinate2DMake(_coordinates[0].latitude, _coordinates[0].longitude);
+    CLLocationCoordinate2D coordinate = _coordinates.at(0);
+    return CLLocationCoordinate2DMake(coordinate.latitude, coordinate.longitude);
 }
 
 - (NSUInteger)pointCount
@@ -68,6 +53,11 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingPointCount
 {
     return [NSSet setWithObjects:@"coordinates", nil];
+}
+
+- (CLLocationCoordinate2D *)coordinates
+{
+    return _coordinates.data();
 }
 
 - (void)getCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range
@@ -83,19 +73,14 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 
     for (NSUInteger i = range.location; i < range.location + range.length; i++)
     {
-        coords[index] = _coordinates[i];
+        coords[index] = _coordinates.at(i);
         index++;
     }
 }
 
 - (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(CLLocationCoordinate2D *)coords
 {
-    if ((coords >= _coordinates && coords < _coordinates + _count) ||
-        (coords + range.length >= _coordinates && coords + range.length < _coordinates + _count))
-    {
-        [NSException raise:NSRangeException format:@"Reuse of existing coordinates array %p not supported", coords];
-    }
-    else if (range.length == 0)
+    if (range.length == 0)
     {
         [NSException raise:NSRangeException format:@"Empty coordinate range %@", NSStringFromRange(range)];
     }
@@ -107,22 +92,29 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
     }
 
     [self willChangeValueForKey:@"coordinates"];
-    if (NSMaxRange(range) <= _count)
+    NSUInteger newCount = NSMaxRange(range);
+    std::vector<CLLocationCoordinate2D> newCoordinates;
+    newCoordinates.reserve(range.length);
+    for (NSUInteger i = 0; i < range.length; i++)
     {
-        // replacing existing coordinate(s)
-        memcpy(_coordinates + range.location, coords, range.length * sizeof(CLLocationCoordinate2D));
+        newCoordinates.push_back(coords[i]);
     }
-    else
-    {
-        // appending new coordinate(s)
-        NSUInteger newCount = NSMaxRange(range);
-        CLLocationCoordinate2D *newCoordinates = (CLLocationCoordinate2D *)malloc(newCount * sizeof(CLLocationCoordinate2D));
-        memcpy(newCoordinates, _coordinates, fmin(_count, range.location) * sizeof(CLLocationCoordinate2D));
-        memcpy(newCoordinates + range.location, coords, range.length * sizeof(CLLocationCoordinate2D));
-        [self setupWithCoordinates:newCoordinates count:newCount];
-        free(newCoordinates);
-    }
+    _coordinates.resize(newCount);
+    std::copy_backward(newCoordinates.begin(), newCoordinates.end(), _coordinates.begin() + range.location + 1);
+    _count = newCount;
+    [self computeBounds];
     [self didChangeValueForKey:@"coordinates"];
+}
+
+- (void)computeBounds
+{
+    CLLocationCoordinate2D *coords = self.coordinates;
+    mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
+    for (NSUInteger i = 0; i < _count; i++)
+    {
+        bounds.extend(mbgl::LatLng(coords[i].latitude, coords[i].longitude));
+    }
+    _bounds = MGLCoordinateBoundsFromLatLngBounds(bounds);
 }
 
 - (MGLCoordinateBounds)overlayBounds
