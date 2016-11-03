@@ -13,7 +13,7 @@
 
 + (NSColor *)mgl_colorWithColor:(mbgl::Color)color
 {
-    return [NSColor colorWithRed:color.r green:color.g blue:color.b alpha:color.a];
+    return [NSColor colorWithCalibratedRed:color.r green:color.g blue:color.b alpha:color.a];
 }
 
 - (mbgl::style::PropertyValue<mbgl::Color>)mgl_colorPropertyValue
