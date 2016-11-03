@@ -83,13 +83,13 @@ void Painter::renderFill(PaintParameters& parameters,
                 colorModeForRenderPass(),
                 shader,
                 FillColorUniforms::Values {
-                    tile.translatedMatrix(properties.fillTranslate.value,
-                                          properties.fillTranslateAnchor.value,
-                                          state),
-                    properties.fillOpacity.value,
-                    properties.fillColor.value,
-                    outlineColor,
-                    context.viewport.getCurrentValue().size
+                    uniforms::u_matrix::Value{ tile.translatedMatrix(properties.fillTranslate.value,
+                                               properties.fillTranslateAnchor.value,
+                                               state) },
+                    uniforms::u_opacity::Value{ properties.fillOpacity.value },
+                    uniforms::u_color::Value{ properties.fillColor.value },
+                    uniforms::u_outline_color::Value{ outlineColor },
+                    uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
                 },
                 subject
             });

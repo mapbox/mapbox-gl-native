@@ -30,16 +30,16 @@ Values makeValues(const style::SymbolPropertyValues& values,
     float zoomAdjust = std::log(values.paintSize / values.layoutSize) / std::log(2);
 
     return Values {
-        tile.translatedMatrix(values.translate,
-                              values.translateAnchor,
-                              state),
-        values.opacity,
-        extrudeScale,
-        std::array<float, 2> {{ float(texsize.width) / 4, float(texsize.height) / 4 }},
-        (state.getZoom() - zoomAdjust) * 10.0f,
-        values.rotationAlignment == AlignmentType::Map,
-        0,
-        1,
+        uniforms::u_matrix::Value{ tile.translatedMatrix(values.translate,
+                                   values.translateAnchor,
+                                   state) },
+        uniforms::u_opacity::Value{ values.opacity },
+        uniforms::u_extrude_scale::Value{ extrudeScale },
+        uniforms::u_texsize::Value{ std::array<float, 2> {{ float(texsize.width) / 4, float(texsize.height) / 4 }} },
+        uniforms::u_zoom::Value{ float((state.getZoom() - zoomAdjust) * 10) },
+        uniforms::u_rotate_with_map::Value{ values.rotationAlignment == AlignmentType::Map },
+        uniforms::u_texture::Value{ 0 },
+        uniforms::u_fadetexture::Value{ 1 },
         std::forward<Args>(args)...
     };
 }
@@ -83,13 +83,13 @@ static SymbolSDFUniforms::Values makeSDFValues(const style::SymbolPropertyValues
         pixelsToGLUnits,
         tile,
         state,
-        color,
-        buffer,
-        (gammaBase + gammaAdjust) * gammaScale,
-        state.getPitch(),
-        -1.0f * state.getAngle(),
-        (state.getSize().width * 1.0f) / (state.getSize().height * 1.0f),
-        values.pitchAlignment == AlignmentType::Map
+        uniforms::u_color::Value{ color },
+        uniforms::u_buffer::Value{ buffer },
+        uniforms::u_gamma::Value{ (gammaBase + gammaAdjust) * gammaScale },
+        uniforms::u_pitch::Value{ state.getPitch() },
+        uniforms::u_bearing::Value{ -1.0f * state.getAngle() },
+        uniforms::u_aspect_ratio::Value{ (state.getSize().width * 1.0f) / (state.getSize().height * 1.0f) },
+        uniforms::u_pitch_with_map::Value{ values.pitchAlignment == AlignmentType::Map }
     );
 }
 

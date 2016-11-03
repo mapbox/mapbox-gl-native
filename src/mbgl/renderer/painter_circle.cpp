@@ -21,6 +21,7 @@ void Painter::renderCircle(PaintParameters& parameters,
     }
 
     const CirclePaintProperties& properties = layer.impl->paint;
+    const bool scaleWithMap = properties.circlePitchScale.value == CirclePitchScaleType::Map;
 
     context.draw({
         depthModeForSublayer(0, gl::DepthMode::ReadOnly),
@@ -30,21 +31,21 @@ void Painter::renderCircle(PaintParameters& parameters,
         colorModeForRenderPass(),
         parameters.shaders.circle,
         CircleUniforms::Values {
-            tile.translatedMatrix(properties.circleTranslate.value,
-                                  properties.circleTranslateAnchor.value,
-                                  state),
-            properties.circleOpacity.value,
-            properties.circleColor.value,
-            properties.circleRadius.value,
-            properties.circleBlur.value,
-            properties.circlePitchScale.value == CirclePitchScaleType::Map,
-            properties.circlePitchScale.value == CirclePitchScaleType::Map
+            uniforms::u_matrix::Value{ tile.translatedMatrix(properties.circleTranslate.value,
+                                       properties.circleTranslateAnchor.value,
+                                       state) },
+            uniforms::u_opacity::Value{ properties.circleOpacity.value },
+            uniforms::u_color::Value{ properties.circleColor.value },
+            uniforms::u_radius::Value{ properties.circleRadius.value },
+            uniforms::u_blur::Value{ properties.circleBlur.value },
+            uniforms::u_scale_with_map::Value{ scaleWithMap },
+            uniforms::u_extrude_scale::Value{ scaleWithMap
                 ? std::array<float, 2> {{
                     pixelsToGLUnits[0] * state.getAltitude(),
                     pixelsToGLUnits[1] * state.getAltitude()
                   }}
-                : pixelsToGLUnits,
-            frame.pixelRatio
+                : pixelsToGLUnits },
+            uniforms::u_devicepixelratio::Value{ frame.pixelRatio },
         },
         gl::Segmented<gl::Triangles>(
             *bucket.vertexBuffer,
