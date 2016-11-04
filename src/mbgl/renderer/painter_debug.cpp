@@ -68,12 +68,10 @@ void Painter::renderClipMasks(PaintParameters&) {
     context.program = 0;
 
 #if not MBGL_USE_GLES2
-    context.pixelZoom = { 1, 1 };
-    context.rasterPos = { -1, -1, 0, 0 };
 
     // When reading data from the framebuffer, make sure that we are storing the depth values
     // tightly packed into the buffer to avoid buffer overruns. Also see unpacking adjustment below.
-    MBGL_CHECK_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
+    context.pixelStorePack = { 1 };
 
     // Read the stencil buffer
     const auto viewport = context.viewport.getCurrentValue();
@@ -96,8 +94,9 @@ void Painter::renderClipMasks(PaintParameters&) {
         *it *= factor;
     }
 
-    MBGL_CHECK_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-    MBGL_CHECK_ERROR(glWindowPos2i(viewport.x, viewport.y));
+    context.pixelZoom = { 1, 1 };
+    context.rasterPos = { -1, -1, 0, 1 };
+    context.pixelStoreUnpack = { 1 };
     MBGL_CHECK_ERROR(glDrawPixels(viewport.size.width, viewport.size.height, GL_LUMINANCE,
                                   GL_UNSIGNED_BYTE, pixels.get()));
 #endif // MBGL_USE_GLES2
@@ -110,12 +109,10 @@ void Painter::renderDepthBuffer(PaintParameters&) {
     context.program = 0;
 
 #if not MBGL_USE_GLES2
-    context.pixelZoom = { 1, 1 };
-    context.rasterPos = { -1, -1, 0, 0 };
 
     // When reading data from the framebuffer, make sure that we are storing the depth values
     // tightly packed into the buffer to avoid buffer overruns. Also see unpacking adjustment below.
-    MBGL_CHECK_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
+    context.pixelStorePack = { 1 };
 
     // Scales the values in the depth buffer so that they cover the entire grayscale range. This
     // makes it easier to spot tiny differences.
@@ -137,8 +134,9 @@ void Painter::renderDepthBuffer(PaintParameters&) {
                 pixels.get()          // GLvoid * data
                 ));
 
-    MBGL_CHECK_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-    MBGL_CHECK_ERROR(glWindowPos2i(viewport.x, viewport.y));
+    context.pixelZoom = { 1, 1 };
+    context.rasterPos = { -1, -1, 0, 1 };
+    context.pixelStoreUnpack = { 1 };
     MBGL_CHECK_ERROR(glDrawPixels(viewport.size.width, viewport.size.height, GL_LUMINANCE,
                                   GL_UNSIGNED_BYTE, pixels.get()));
 #endif // MBGL_USE_GLES2

@@ -283,6 +283,8 @@ void Context::setDirtyState() {
     pointSize.setDirty();
     pixelZoom.setDirty();
     rasterPos.setDirty();
+    pixelStorePack.setDirty();
+    pixelStoreUnpack.setDirty();
 #endif // MBGL_USE_GLES2
     for (auto& tex : texture) {
        tex.setDirty();
