@@ -45,17 +45,12 @@ export -f check_tidy check_format
 echo "Running clang checks... (this might take a while)"
 
 if [[ -n $2 ]] && [[ $2 == "--diff" ]]; then
-    git diff-index --quiet HEAD || {
-        echo "Your repository contains unstaged and/or uncommitted changes."
-        echo "Please commit all changes before proceeding."
-        exit 1
-    }
-    DIFF_FILES=$(for file in `git diff origin/master..HEAD --name-only | grep "pp$"`; do echo $file; done)
+    DIFF_FILES=$(for file in `git diff origin/master --name-only | grep "pp$"`; do echo $file; done)
     if [[ -n $DIFF_FILES ]]; then
         echo "${DIFF_FILES}" | xargs -I{} -P ${JOBS} bash -c 'check_tidy --fix' {}
         # XXX disabled until we run clang-format over the entire codebase.
         #echo "${DIFF_FILES}" | xargs -I{} -P ${JOBS} bash -c 'check_format' {}
-        git diff-index --quiet HEAD || {
+        git diff --quiet || {
             echo "Changes were made to source files - please review them before committing."
             exit 1
         }
