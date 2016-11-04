@@ -42,13 +42,13 @@ GeometryTileWorker::~GeometryTileWorker() {
    States are indicated by [state], lines are transitions triggered by
    messages, (parentheses) are actions taken on transition.
 
-                              [idle] <------------------.
-                                 |                      |
-                      set{Data,Layers,Placement}        |
-                                 |                      |
-           (do layout/placement; self-send "coalesced") |
-                                 v                      |
-                           [coalescing] --- coalesced --.
+                              [idle] <----------------------------.
+                                 |                                |
+      set{Data,Layers,Placement}, symbolDependenciesChanged       |
+                                 |                                |
+           (do layout/placement; self-send "coalesced")           |
+                                 v                                |
+                           [coalescing] --- coalesced ------------.
                                |   |
              .-----------------.   .---------------.
              |                                     |
@@ -129,6 +129,31 @@ void GeometryTileWorker::setPlacementConfig(PlacementConfig placementConfig_, ui
 
         case Coalescing:
             state = NeedPlacement;
+            break;
+
+        case NeedPlacement:
+        case NeedLayout:
+            break;
+        }
+    } catch (...) {
+        parent.invoke(&GeometryTile::onError, std::current_exception());
+    }
+}
+
+void GeometryTileWorker::symbolDependenciesChanged() {
+    try {
+        switch (state) {
+        case Idle:
+            if (hasPendingSymbolDependencies()) {
+                attemptPlacement();
+                coalesce();
+            }
+            break;
+
+        case Coalescing:
+            if (hasPendingSymbolDependencies()) {
+                state = NeedPlacement;
+            }
             break;
 
         case NeedPlacement:
@@ -236,6 +261,18 @@ void GeometryTileWorker::redoLayout() {
     });
 
     attemptPlacement();
+}
+
+bool GeometryTileWorker::hasPendingSymbolDependencies() const {
+    bool result = false;
+
+    for (const auto& symbolLayout : symbolLayouts) {
+        if (symbolLayout->state == SymbolLayout::Pending) {
+            result = true;
+        }
+    }
+
+    return result;
 }
 
 void GeometryTileWorker::attemptPlacement() {
