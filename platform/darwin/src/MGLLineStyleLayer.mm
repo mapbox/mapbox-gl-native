@@ -17,13 +17,23 @@
 @end
 
 @implementation MGLLineStyleLayer
+{
+    std::unique_ptr<mbgl::style::LineLayer> _pendingLayer;
+}
 
 - (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source
 {
     if (self = [super initWithIdentifier:identifier source:source]) {
-        _layer = new mbgl::style::LineLayer(identifier.UTF8String, source.identifier.UTF8String);
+        [self commonInit:identifier source:source];
     }
     return self;
+}
+
+- (void)commonInit:(NSString *)identifier source:(MGLSource *)source
+{
+    auto layer = std::make_unique<mbgl::style::LineLayer>(identifier.UTF8String, source.identifier.UTF8String);
+    _pendingLayer = std::move(layer);
+    self.layer = _pendingLayer.get();
 }
 
 - (NSString *)sourceLayerIdentifier
@@ -189,6 +199,14 @@
 - (MGLStyleValue<NSString *> *)linePattern {
     auto propertyValue = self.layer->getLinePattern() ?: self.layer->getDefaultLinePattern();
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
+}
+
+
+#pragma mark - Add style layer to map
+
+- (void)addToMapView:(MGLMapView *)mapView
+{
+    mapView.mbglMap->addLayer(std::move(_pendingLayer));
 }
 
 @end
