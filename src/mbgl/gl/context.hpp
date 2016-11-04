@@ -132,6 +132,8 @@ public:
     State<value::RasterPos> rasterPos;
     State<value::PixelStorePack> pixelStorePack;
     State<value::PixelStoreUnpack> pixelStoreUnpack;
+    State<value::PixelTransferDepth> pixelTransferDepth;
+    State<value::PixelTransferStencil> pixelTransferStencil;
 #endif // MBGL_USE_GLES2
 
 private:

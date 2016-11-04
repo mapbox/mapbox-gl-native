@@ -417,6 +417,34 @@ PixelStoreUnpack::Type PixelStoreUnpack::Get() {
     return value;
 }
 
+const constexpr PixelTransferDepth::Type PixelTransferDepth::Default;
+
+void PixelTransferDepth::Set(const Type& value) {
+    MBGL_CHECK_ERROR(glPixelTransferf(GL_DEPTH_SCALE, value.scale));
+    MBGL_CHECK_ERROR(glPixelTransferf(GL_DEPTH_BIAS, value.bias));
+}
+
+PixelTransferDepth::Type PixelTransferDepth::Get() {
+    Type value;
+    MBGL_CHECK_ERROR(glGetFloatv(GL_DEPTH_SCALE, &value.scale));
+    MBGL_CHECK_ERROR(glGetFloatv(GL_DEPTH_BIAS, &value.bias));
+    return value;
+}
+
+const constexpr PixelTransferStencil::Type PixelTransferStencil::Default;
+
+void PixelTransferStencil::Set(const Type& value) {
+    MBGL_CHECK_ERROR(glPixelTransferf(GL_INDEX_SHIFT, value.shift));
+    MBGL_CHECK_ERROR(glPixelTransferf(GL_INDEX_OFFSET, value.offset));
+}
+
+PixelTransferStencil::Type PixelTransferStencil::Get() {
+    Type value;
+    MBGL_CHECK_ERROR(glGetIntegerv(GL_INDEX_SHIFT, &value.shift));
+    MBGL_CHECK_ERROR(glGetIntegerv(GL_INDEX_OFFSET, &value.offset));
+    return value;
+}
+
 #endif // MBGL_USE_GLES2
 
 } // namespace value
