@@ -50,6 +50,10 @@ enum class TextureWrap : bool { Clamp, Repeat };
 enum class TextureFormat : uint32_t {
     RGBA = 0x1908,
     Alpha = 0x1906,
+#if not MBGL_USE_GLES2
+    Stencil = 0x1901,
+    Depth = 0x1902,
+#endif // MBGL_USE_GLES2
 };
 
 enum class PrimitiveType {

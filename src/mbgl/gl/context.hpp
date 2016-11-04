@@ -62,6 +62,15 @@ public:
                                   const Renderbuffer<RenderbufferType::DepthStencil>&);
     Framebuffer createFramebuffer(const Texture&);
 
+    template <typename Image,
+              TextureFormat format = Image::channels == 4 ? TextureFormat::RGBA
+                                                          : TextureFormat::Alpha>
+    Image readFramebuffer(const Size size, bool flip = true) {
+        static_assert(Image::channels == (format == TextureFormat::RGBA ? 4 : 1),
+                      "image format mismatch");
+        return { size, readFramebuffer(size, format, flip) };
+    }
+
     // Create a texture from an image with data.
     template <typename Image>
     Texture createTexture(const Image& image, TextureUnit unit = 0) {
@@ -167,6 +176,7 @@ private:
     void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit);
     UniqueFramebuffer createFramebuffer();
     UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);
+    std::unique_ptr<uint8_t[]> readFramebuffer(Size, TextureFormat, bool flip);
 
     PrimitiveType operator()(const Points&);
     PrimitiveType operator()(const Lines&);
