@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.maps;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
@@ -210,5 +211,28 @@ public class TrackingSettings {
     public boolean isScrollGestureCurrentlyEnabled() {
         return uiSettings.isScrollGesturesEnabled() &&
                 (dismissLocationTrackingOnGesture || myLocationTrackingMode == MyLocationTracking.TRACKING_NONE);
+    }
+
+    /**
+     * Reset the tracking modes as necessary. Location tracking is reset if the map center is changed,
+     * bearing tracking if there is a rotation.
+     *
+     * @param translate
+     * @param rotate
+     */
+    public void resetTrackingModesIfRequired(boolean translate, boolean rotate) {
+        // if tracking is on, and we should dismiss tracking with gestures, and this is a scroll action, turn tracking off
+        if (translate && !isLocationTrackingDisabled() && isDismissLocationTrackingOnGesture()) {
+            setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
+        }
+
+        // reset bearing tracking only on rotate
+        if (rotate && !isBearingTrackingDisabled() && isDismissBearingTrackingOnGesture()) {
+            setMyBearingTrackingMode(MyBearingTracking.NONE);
+        }
+    }
+
+    public void resetTrackingModesIfRequired(CameraPosition cameraPosition) {
+        resetTrackingModesIfRequired(cameraPosition.target != null, cameraPosition.bearing != -1);
     }
 }

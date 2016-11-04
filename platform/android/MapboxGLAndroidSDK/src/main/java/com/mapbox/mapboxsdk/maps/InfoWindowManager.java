@@ -80,4 +80,8 @@ class InfoWindowManager {
     MapboxMap.OnInfoWindowCloseListener getOnInfoWindowCloseListener() {
         return onInfoWindowCloseListener;
     }
+
+    public void add(InfoWindow infoWindow) {
+        infoWindows.add(infoWindow);
+    }
 }

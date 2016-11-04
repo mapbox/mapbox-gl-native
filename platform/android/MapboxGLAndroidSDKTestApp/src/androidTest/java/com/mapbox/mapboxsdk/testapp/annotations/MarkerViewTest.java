@@ -107,6 +107,7 @@ public class MarkerViewTest {
         public void perform(UiController uiController, View view) {
             mapboxMap.getMarkerViewManager().addMarkerViewAdapter(new MarkerViewActivity.TextAdapter(view.getContext(), mapboxMap));
             marker = mapboxMap.addMarker(options);
+            uiController.loopMainThreadForAtLeast(100);
         }
     }
 
@@ -131,7 +132,6 @@ public class MarkerViewTest {
         @Override
         public void perform(UiController uiController, View view) {
             mapboxMap.selectMarker(marker);
-
         }
     }
 
