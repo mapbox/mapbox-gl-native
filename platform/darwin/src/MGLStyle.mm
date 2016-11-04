@@ -179,8 +179,7 @@ static NSURL *MGLStyleURL_emerald;
          @"Make sure the style layer was created as a member of a concrete subclass of MGLStyleLayer.",
          layer];
     }
-
-    self.mapView.mbglMap->addLayer(std::unique_ptr<mbgl::style::Layer>(layer.layer));
+    [layer addToMapView:self.mapView];
 }
 
 - (void)insertLayer:(MGLStyleLayer *)layer belowLayer:(MGLStyleLayer *)otherLayer

@@ -736,8 +736,6 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslateAnchor;
 
-- (void)addToMapView:(MGLMapView *)mapView;
-
 @end
 
 NS_ASSUME_NONNULL_END

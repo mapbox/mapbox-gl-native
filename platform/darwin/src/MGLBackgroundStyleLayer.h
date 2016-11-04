@@ -50,8 +50,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *backgroundOpacity;
 
-- (void)addToMapView:(MGLMapView *)mapView;
-
 @end
 
 NS_ASSUME_NONNULL_END

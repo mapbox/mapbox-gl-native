@@ -201,8 +201,6 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *linePattern;
 
-- (void)addToMapView:(MGLMapView *)mapView;
-
 @end
 
 NS_ASSUME_NONNULL_END

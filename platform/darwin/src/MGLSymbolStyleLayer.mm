@@ -17,23 +17,13 @@
 @end
 
 @implementation MGLSymbolStyleLayer
-{
-    std::unique_ptr<mbgl::style::SymbolLayer> _pendingLayer;
-}
 
 - (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source
 {
     if (self = [super initWithIdentifier:identifier source:source]) {
-        [self commonInit:identifier source:source];
+        _layer = new mbgl::style::SymbolLayer(identifier.UTF8String, source.identifier.UTF8String);
     }
     return self;
-}
-
-- (void)commonInit:(NSString *)identifier source:(MGLSource *)source
-{
-    auto layer = std::make_unique<mbgl::style::SymbolLayer>(identifier.UTF8String, source.identifier.UTF8String);
-    _pendingLayer = std::move(layer);
-    self.layer = _pendingLayer.get();
 }
 
 - (NSString *)sourceLayerIdentifier
@@ -540,13 +530,5 @@
     auto propertyValue = self.layer->getTextTranslateAnchor() ?: self.layer->getDefaultTextTranslateAnchor();
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *>().toStyleValue(propertyValue);
 }
-
-#pragma mark - Add style layer to map
-
-- (void)addToMapView:(MGLMapView *)mapView
-{
-    mapView.mbglMap->addLayer(std::move(_pendingLayer));
-}
-
 
 @end

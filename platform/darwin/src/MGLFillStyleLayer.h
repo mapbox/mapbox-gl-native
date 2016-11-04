@@ -96,9 +96,6 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *fillPattern;
 
-
-- (void)addToMapView:(MGLMapView *)mapView;
-
 @end
 
 NS_ASSUME_NONNULL_END
