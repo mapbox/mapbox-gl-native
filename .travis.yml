@@ -7,14 +7,12 @@ addons_shortcuts:
     apt:
       sources:  [ 'ubuntu-toolchain-r-test', 'george-edison55-precise-backports' ]
       packages: [ 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.8v4', 'cmake', 'cmake-data',
-                  'mesa-utils', 'libxi-dev', 'libglu1-mesa-dev', 'x11proto-randr-dev', 'x11proto-xext-dev', 'libxrandr-dev',
-                  'x11proto-xf86vidmode-dev', 'libxxf86vm-dev', 'libxcursor-dev', 'libxinerama-dev' ]
+                  'libxrandr-dev', 'libxcursor-dev', 'libxinerama-dev' ]
   addons_gcc5: &gcc5
     apt:
       sources:  [ 'ubuntu-toolchain-r-test', 'george-edison55-precise-backports' ]
-      packages: [ 'gdb', 'g++-5', 'gcc-5', 'cmake', 'cmake-data',
-                  'mesa-utils', 'libxi-dev', 'libglu1-mesa-dev', 'x11proto-randr-dev', 'x11proto-xext-dev', 'libxrandr-dev',
-                  'x11proto-xf86vidmode-dev', 'libxxf86vm-dev', 'libxcursor-dev', 'libxinerama-dev' ]
+      packages: [ 'g++-5', 'gcc-5', 'libllvm3.8v4', 'cmake', 'cmake-data',
+                  'libxrandr-dev', 'libxcursor-dev', 'libxinerama-dev' ]
   addons_qt4: &qt4
     apt:
       sources:  [ 'ubuntu-toolchain-r-test', 'george-edison55-precise-backports' ]
@@ -46,6 +44,7 @@ before_script:
 script:
   - make linux
   - make benchmark
+  - make test
   - make run-test
 after_script:
   - ccache --show-stats
@@ -75,11 +74,13 @@ matrix:
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
 
     # GCC 5 - Debug - Coverage
+    # FIXME: https://github.com/mapbox/mapbox-gl-native/issues/6918
     - os: linux
-      sudo: false
+      sudo: required
+      dist: trusty
       language: cpp
       compiler: "glfw-gcc5-debug"
-      env: BUILDTYPE=Debug _CXX=g++-5 _CC=gcc-5 WITH_COVERAGE=1
+      env: BUILDTYPE=Debug _CXX=g++-5 _CC=gcc-5 WITH_COVERAGE=1 WITH_OSMESA=1
       addons: *gcc5
       after_script:
         - ccache --show-stats
@@ -87,10 +88,11 @@ matrix:
 
     # GCC 5 - Release
     - os: linux
-      sudo: false
+      sudo: required
+      dist: trusty
       language: cpp
       compiler: "glfw-gcc5-release"
-      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
+      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5 WITH_OSMESA=1
       addons: *gcc5
 
     # Clang 3.5 - Debug
@@ -99,7 +101,7 @@ matrix:
       dist: trusty
       language: cpp
       compiler: "glfw-clang35-debug"
-      env: BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5
+      env: BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5 WITH_OSMESA=1
       addons: *clang35
 
     # Clang 3.5 - Release
@@ -108,7 +110,7 @@ matrix:
       dist: trusty
       language: cpp
       compiler: "glfw-clang35-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
+      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5 WITH_OSMESA=1
       addons: *clang35
 
     # Clang 3.5 - tidy
@@ -116,11 +118,11 @@ matrix:
       sudo: required
       dist: trusty
       language: cpp
-      compiler: "tidy-clang35-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
+      compiler: "check-clang35-release"
+      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5 WITH_OSMESA=1
       addons: *clang35
       script:
-        - make tidy
+        - git fetch origin master:refs/remotes/origin/master
 
     # Qt 4 - Release
     - os: linux
@@ -128,7 +130,7 @@ matrix:
       dist: trusty
       language: cpp
       compiler: "qt4-gcc5-release"
-      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5 WITH_QT_4=1
+      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5 RUN_XVFB=1 WITH_QT_4=1
       addons: *qt4
       script:
         - make qt-app
@@ -140,9 +142,7 @@ matrix:
       dist: trusty
       language: cpp
       compiler: "qt5-gcc5-release"
-      # Qt 5 gets confused with fglrx that is installed by default on Travis
-      # trusty bots. This way we force both Qt and Xvfb to load on mesa drivers.
-      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5 LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/mesa
+      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5 RUN_XVFB=1
       addons: *qt5
       script:
         - make qt-app

@@ -38,7 +38,7 @@ mapbox_time "touch_package_json" \
 touch package.json
 
 # Start the mock X server
-if [ -f /etc/init.d/xvfb ] && [ -z "${WITH_OSMESA}" ]; then
+if [ -f /etc/init.d/xvfb ] && [ ! -z "${RUN_XVFB}" ]; then
     mapbox_time "start_xvfb" \
     sh -e /etc/init.d/xvfb start
     sleep 2 # sometimes, xvfb takes some time to start up
