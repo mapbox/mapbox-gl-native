@@ -220,6 +220,12 @@ void Style::updateTiles(const UpdateParameters& parameters) {
     }
 }
 
+void Style::updateSymbolDependentTiles() {
+    for (const auto& source : sources) {
+        source->baseImpl->updateSymbolDependentTiles();
+    }
+}
+
 void Style::relayout() {
     for (const auto& sourceID : updateBatch.sourceIDs) {
         Source* source = getSource(sourceID);
@@ -475,7 +481,7 @@ void Style::setObserver(style::Observer* observer_) {
 
 void Style::onGlyphsLoaded(const FontStack& fontStack, const GlyphRange& glyphRange) {
     observer->onGlyphsLoaded(fontStack, glyphRange);
-    observer->onUpdate(Update::Repaint);
+    updateSymbolDependentTiles();
 }
 
 void Style::onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
@@ -525,7 +531,8 @@ void Style::onTileError(Source& source, const OverscaledTileID& tileID, std::exc
 
 void Style::onSpriteLoaded() {
     observer->onSpriteLoaded();
-    observer->onUpdate(Update::Repaint);
+    observer->onUpdate(Update::Repaint); // For *-pattern properties.
+    updateSymbolDependentTiles();
 }
 
 void Style::onSpriteError(std::exception_ptr error) {
