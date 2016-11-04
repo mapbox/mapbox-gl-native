@@ -3,7 +3,6 @@
 #include <mbgl/platform/default/headless_backend.hpp>
 #include <mbgl/platform/default/offscreen_view.hpp>
 
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/context.hpp>
 
 #include <memory>

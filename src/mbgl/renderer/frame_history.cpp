@@ -1,7 +1,6 @@
 #include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/gl/context.hpp>
-#include <mbgl/gl/gl.hpp>
 
 #include <cassert>
 

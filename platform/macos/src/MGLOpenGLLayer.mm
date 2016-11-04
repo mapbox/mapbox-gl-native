@@ -2,8 +2,6 @@
 
 #import "MGLMapView_Private.h"
 
-#import <mbgl/gl/gl.hpp>
-
 @implementation MGLOpenGLLayer
 
 - (MGLMapView *)mapView {

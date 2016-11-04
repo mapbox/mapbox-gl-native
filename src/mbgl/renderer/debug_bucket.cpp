@@ -5,8 +5,6 @@
 #include <mbgl/geometry/debug_font_data.hpp>
 #include <mbgl/util/string.hpp>
 
-#include <mbgl/gl/gl.hpp>
-
 #include <cmath>
 #include <string>
 #include <vector>

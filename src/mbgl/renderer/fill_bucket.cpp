@@ -5,7 +5,6 @@
 #include <mbgl/shader/fill_pattern_shader.hpp>
 #include <mbgl/shader/fill_outline_shader.hpp>
 #include <mbgl/shader/fill_outline_pattern_shader.hpp>
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <mapbox/earcut.hpp>
