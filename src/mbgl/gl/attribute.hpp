@@ -154,12 +154,12 @@ public:
 
     static std::function<void (std::size_t)> binder(const State& state) {
         return [&state] (std::size_t vertexOffset) {
-            ignore({ (bindAttribute(state.template get<As>().location,
-                                    state.template get<As>().count,
-                                    state.template get<As>().type,
-                                    sizeof(Vertex),
-                                    vertexOffset,
-                                    Vertex::attributeOffsets[Index<As>]), 0)... });
+            util::ignore({ (bindAttribute(state.template get<As>().location,
+                                          state.template get<As>().count,
+                                          state.template get<As>().type,
+                                          sizeof(Vertex),
+                                          vertexOffset,
+                                          Vertex::attributeOffsets[Index<As>]), 0)... });
         };
     }
 };

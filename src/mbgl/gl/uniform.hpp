@@ -72,7 +72,7 @@ public:
 
     static std::function<void ()> binder(State& state, Values&& values_) {
         return [&state, values = std::move(values_)] () mutable {
-            ignore({ (state.template get<Us>() = values.template get<Us>(), 0)... });
+            util::ignore({ (state.template get<Us>() = values.template get<Us>(), 0)... });
         };
     }
 };

@@ -3,6 +3,7 @@
 #include <initializer_list>
 
 namespace mbgl {
+namespace util {
 
 // Accept any number of parameters of any types, and do nothing with them.
 // Useful for providing a context for parameter pack expansion where a legal
@@ -18,4 +19,5 @@ template <class... Ts> void ignore(Ts&&...) {}
 //
 template <class T> void ignore(const std::initializer_list<T>&) {}
 
+} // namespace util
 } // namespace mbgl
