@@ -14,7 +14,6 @@
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/gl/extension.hpp>
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/image.hpp>
@@ -34,23 +33,6 @@ void log_egl_string(EGLDisplay display, EGLint name, const char *label) {
             strncpy(buf, str + pos, 512);
             buf[512] = 0;
             mbgl::Log::Info(mbgl::Event::OpenGL, "EGL %s: %s", label, buf);
-        }
-    }
-}
-
-void log_gl_string(GLenum name, const char *label) {
-    const GLubyte *str = glGetString(name);
-    if (str == nullptr) {
-        mbgl::Log::Error(mbgl::Event::OpenGL, "glGetString(%d) returned error %d", name,
-                         glGetError());
-        throw std::runtime_error("glGetString() failed");
-    } else {
-        char buf[513];
-        for (int len = std::strlen(reinterpret_cast<const char *>(str)), pos = 0; len > 0;
-             len -= 512, pos += 512) {
-            strncpy(buf, reinterpret_cast<const char *>(str) + pos, 512);
-            buf[512] = 0;
-            mbgl::Log::Info(mbgl::Event::OpenGL, "GL %s: %s", label, buf);
         }
     }
 }
@@ -421,16 +403,6 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
             throw std::runtime_error("eglMakeCurrent() failed");
         }
 
-        log_gl_string(GL_VENDOR, "Vendor");
-        log_gl_string(GL_RENDERER, "Renderer");
-        log_gl_string(GL_VERSION, "Version");
-        if (!inEmulator()) {
-            log_gl_string(GL_SHADING_LANGUAGE_VERSION,
-                        "SL Version"); // In the emulator this returns NULL with error code 0?
-                                        // https://code.google.com/p/android/issues/detail?id=78977
-        }
-
-        log_gl_string(GL_EXTENSIONS, "Extensions");
         mbgl::gl::InitializeExtensions([] (const char * name) {
              return reinterpret_cast<mbgl::gl::glProc>(eglGetProcAddress(name));
         });
