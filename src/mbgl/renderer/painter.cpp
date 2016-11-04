@@ -8,7 +8,6 @@
 #include <mbgl/map/view.hpp>
 
 #include <mbgl/platform/log.hpp>
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/debugging.hpp>
 
 #include <mbgl/style/style.hpp>
@@ -197,7 +196,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     renderPass(parameters,
                RenderPass::Translucent,
                order.begin(), order.end(),
-               static_cast<GLsizei>(order.size()) - 1, -1);
+               static_cast<uint32_t>(order.size()) - 1, -1);
 
     if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
 

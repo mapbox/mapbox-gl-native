@@ -1,6 +1,5 @@
 #include <mbgl/shader/symbol_vertex.hpp>
 #include <mbgl/gl/shader.hpp>
-#include <mbgl/gl/gl.hpp>
 
 namespace mbgl {
 
