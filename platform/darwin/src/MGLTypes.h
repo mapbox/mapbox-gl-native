@@ -20,6 +20,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#ifndef NS_STRING_ENUM
+    #define NS_STRING_ENUM
+    #define NS_EXTENSIBLE_STRING_ENUM
+    typedef NSString *NSErrorDomain;
+    typedef NSString *NSNotificationName;
+#endif
+
 /** Indicates an error occurred in the Mapbox SDK. */
 extern NSErrorDomain const MGLErrorDomain;
 
@@ -96,10 +103,4 @@ NS_ASSUME_NONNULL_END
         #define NS_DICTIONARY_OF(ObjectClass...)            NSDictionary
         #define NS_MUTABLE_DICTIONARY_OF(ObjectClass...)    NSMutableDictionary
     #endif
-#endif
-
-#if !defined(FOUNDATION_SWIFT_SDK_EPOCH_LESS_THAN) || FOUNDATION_SWIFT_SDK_EPOCH_LESS_THAN(8)
-    #define NS_STRING_ENUM
-    #define NS_EXTENSIBLE_STRING_ENUM
-    #define NSNotificationName NSString *
 #endif
