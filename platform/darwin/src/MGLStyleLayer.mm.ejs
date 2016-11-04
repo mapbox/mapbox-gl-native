@@ -7,6 +7,7 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLSource.h"
+#import "MGLMapView_Private.h"
 #import "NSPredicate+MGLAdditions.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLStyleValue_Private.h"
@@ -16,50 +17,59 @@
 
 @interface MGL<%- camelize(type) %>StyleLayer ()
 
-@property (nonatomic) mbgl::style::<%- camelize(type) %>Layer *layer;
+@property (nonatomic) mbgl::style::<%- camelize(type) %>Layer *rawLayer;
 
 @end
 
 @implementation MGL<%- camelize(type) %>StyleLayer
+{
+    std::unique_ptr<mbgl::style::<%- camelize(type) %>Layer> _pendingLayer;
+}
 
 <% if (type == 'background') { -%>
 - (instancetype)initWithIdentifier:(NSString *)identifier
 {
     if (self = [super initWithIdentifier:identifier]) {
-        _layer = new mbgl::style::<%- camelize(type) %>Layer(identifier.UTF8String);
+        auto layer = std::make_unique<mbgl::style::<%- camelize(type) %>Layer>(identifier.UTF8String);
+        _pendingLayer = std::move(layer);
+        self.rawLayer = _pendingLayer.get();
     }
     return self;
 }
+
 <% } else { -%>
 - (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source
 {
     if (self = [super initWithIdentifier:identifier source:source]) {
-        _layer = new mbgl::style::<%- camelize(type) %>Layer(identifier.UTF8String, source.identifier.UTF8String);
+        auto layer = std::make_unique<mbgl::style::<%- camelize(type) %>Layer>(identifier.UTF8String, source.identifier.UTF8String);
+        _pendingLayer = std::move(layer);
+        self.rawLayer = _pendingLayer.get();
     }
     return self;
 }
+
 <% } -%>
 
 <% if (type !== 'background' && type !== 'raster') { -%>
 - (NSString *)sourceLayerIdentifier
 {
-    auto layerID = self.layer->getSourceLayer();
+    auto layerID = self.rawLayer->getSourceLayer();
     return layerID.empty() ? nil : @(layerID.c_str());
 }
 
 - (void)setSourceLayerIdentifier:(NSString *)sourceLayerIdentifier
 {
-    self.layer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
+    self.rawLayer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
 }
 
 - (void)setPredicate:(NSPredicate *)predicate
 {
-    self.layer->setFilter(predicate.mgl_filter);
+    self.rawLayer->setFilter(predicate.mgl_filter);
 }
 
 - (NSPredicate *)predicate
 {
-    return [NSPredicate mgl_predicateWithFilter:self.layer->getFilter()];
+    return [NSPredicate mgl_predicateWithFilter:self.rawLayer->getFilter()];
 }
 
 <% } -%>
@@ -69,11 +79,11 @@
 <% for (const property of layoutProperties) { -%>
 - (void)set<%- camelize(property.name) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue(<%- objCName(property) %>);
-    self.layer->set<%- camelize(property.name) %>(mbglValue);
+    self.rawLayer->set<%- camelize(property.name) %>(mbglValue);
 }
 
 - (MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
-    auto propertyValue = self.layer->get<%- camelize(property.name) %>() ?: self.layer->getDefault<%- camelize(property.name) %>();
+    auto propertyValue = self.rawLayer->get<%- camelize(property.name) %>() ?: self.rawLayer->getDefault<%- camelize(property.name) %>();
     return MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toStyleValue(propertyValue);
 }
 
@@ -85,14 +95,32 @@
 <% for (const property of paintProperties) { -%>
 - (void)set<%- camelize(property.name) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue(<%- objCName(property) %>);
-    self.layer->set<%- camelize(property.name) %>(mbglValue);
+    self.rawLayer->set<%- camelize(property.name) %>(mbglValue);
 }
 
 - (MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
-    auto propertyValue = self.layer->get<%- camelize(property.name) %>() ?: self.layer->getDefault<%- camelize(property.name) %>();
+    auto propertyValue = self.rawLayer->get<%- camelize(property.name) %>() ?: self.rawLayer->getDefault<%- camelize(property.name) %>();
     return MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toStyleValue(propertyValue);
 }
 
 <% } -%>
 <% } -%>
+
+#pragma mark - Add style layer to map
+
+- (void)addToMapView:(MGLMapView *)mapView
+{
+    [self addToMapView:mapView belowLayer:nil];
+}
+
+- (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
+{
+    if (otherLayer) {
+        const mbgl::optional<std::string> belowLayerId{otherLayer.identifier.UTF8String};
+        mapView.mbglMap->addLayer(std::move(_pendingLayer), belowLayerId);
+    } else {
+        mapView.mbglMap->addLayer(std::move(_pendingLayer));
+    }
+}
+
 @end

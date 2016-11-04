@@ -769,6 +769,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"test" source:source];
     fillLayer.fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor purpleColor]];
     [self.mapView.style addLayer:fillLayer];
+    
 }
 
 - (void)styleSymbolLayer
