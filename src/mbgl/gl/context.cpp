@@ -285,6 +285,8 @@ void Context::setDirtyState() {
     rasterPos.setDirty();
     pixelStorePack.setDirty();
     pixelStoreUnpack.setDirty();
+    pixelTransferDepth.setDirty();
+    pixelTransferStencil.setDirty();
 #endif // MBGL_USE_GLES2
     for (auto& tex : texture) {
        tex.setDirty();

@@ -73,6 +73,9 @@ void Painter::renderClipMasks(PaintParameters&) {
     // tightly packed into the buffer to avoid buffer overruns. Also see unpacking adjustment below.
     context.pixelStorePack = { 1 };
 
+    // Reset the value in case someone else changed it, or it's dirty.
+    context.pixelTransferStencil = gl::value::PixelTransferStencil::Default;
+
     // Read the stencil buffer
     const auto viewport = context.viewport.getCurrentValue();
     auto pixels = std::make_unique<uint8_t[]>(viewport.size.width * viewport.size.height);
@@ -116,9 +119,8 @@ void Painter::renderDepthBuffer(PaintParameters&) {
 
     // Scales the values in the depth buffer so that they cover the entire grayscale range. This
     // makes it easier to spot tiny differences.
-    const double base = 1.0 / (1.0 - depthRangeSize);
-    MBGL_CHECK_ERROR(glPixelTransferf(GL_DEPTH_SCALE, base));
-    MBGL_CHECK_ERROR(glPixelTransferf(GL_DEPTH_BIAS, 1.0 - base));
+    const float base = 1.0f / (1.0f - depthRangeSize);
+    context.pixelTransferDepth = { base, 1.0f - base };
 
     // Read the stencil buffer
     auto viewport = context.viewport.getCurrentValue();

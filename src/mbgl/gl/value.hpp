@@ -282,6 +282,34 @@ struct PixelStoreUnpack {
     static Type Get();
 };
 
+struct PixelTransferDepth {
+    struct Type {
+        float scale;
+        float bias;
+    };
+    static const constexpr Type Default = { 1, 0 };
+    static void Set(const Type&);
+    static Type Get();
+};
+
+constexpr bool operator!=(const PixelTransferDepth::Type& a, const PixelTransferDepth::Type& b) {
+    return a.scale != b.scale || a.bias != b.bias;
+}
+
+struct PixelTransferStencil {
+    struct Type {
+        int32_t shift;
+        int32_t offset;
+    };
+    static const constexpr Type Default = { 0, 0 };
+    static void Set(const Type&);
+    static Type Get();
+};
+
+constexpr bool operator!=(const PixelTransferStencil::Type& a, const PixelTransferStencil::Type& b) {
+    return a.shift != b.shift || a.offset != b.offset;
+}
+
 #endif // MBGL_USE_GLES2
 
 } // namespace value
