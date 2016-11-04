@@ -35,6 +35,7 @@ public:
     void setData(std::unique_ptr<const GeometryTileData>);
 
     void setPlacementConfig(const PlacementConfig&) override;
+    void symbolDependenciesChanged() override;
     void redoLayout() override;
 
     Bucket* getBucket(const style::Layer&) override;

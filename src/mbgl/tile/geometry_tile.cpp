@@ -65,6 +65,10 @@ void GeometryTile::setPlacementConfig(const PlacementConfig& desiredConfig) {
     worker.invoke(&GeometryTileWorker::setPlacementConfig, desiredConfig, correlationID);
 }
 
+void GeometryTile::symbolDependenciesChanged() {
+    worker.invoke(&GeometryTileWorker::symbolDependenciesChanged);
+}
+
 void GeometryTile::redoLayout() {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
     // state despite pending parse operations.
