@@ -92,6 +92,32 @@ UniqueRenderbuffer Context::createRenderbuffer(const RenderbufferType type, cons
     return renderbuffer;
 }
 
+std::unique_ptr<uint8_t[]> Context::readFramebuffer(const Size size, const TextureFormat format, const bool flip) {
+    const size_t stride = size.width * (format == TextureFormat::RGBA ? 4 : 1);
+    auto data = std::make_unique<uint8_t[]>(stride * size.height);
+
+#if not MBGL_USE_GLES2
+    // When reading data from the framebuffer, make sure that we are storing the values
+    // tightly packed into the buffer to avoid buffer overruns.
+    pixelStorePack = { 1 };
+#endif // MBGL_USE_GLES2
+
+    MBGL_CHECK_ERROR(glReadPixels(0, 0, size.width, size.height, static_cast<GLenum>(format),
+                                  GL_UNSIGNED_BYTE, data.get()));
+
+    if (flip) {
+        auto tmp = std::make_unique<uint8_t[]>(stride);
+        uint8_t* rgba = data.get();
+        for (int i = 0, j = size.height - 1; i < j; i++, j--) {
+            std::memcpy(tmp.get(), rgba + i * stride, stride);
+            std::memcpy(rgba + i * stride, rgba + j * stride, stride);
+            std::memcpy(rgba + j * stride, tmp.get(), stride);
+        }
+    }
+
+    return data;
+}
+
 namespace {
 
 void checkFramebuffer() {

@@ -10,8 +10,6 @@
 
 #include <sys/system_properties.h>
 
-#include <GLES2/gl2.h>
-
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
@@ -204,18 +202,7 @@ void NativeMapView::render() {
          snapshot = false;
 
          // take snapshot
-         const unsigned int w = fbWidth;
-         const unsigned int h = fbHeight;
-         mbgl::PremultipliedImage image({ w, h });
-         MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
-         const size_t stride = image.stride();
-         auto tmp = std::make_unique<uint8_t[]>(stride);
-         uint8_t *rgba = image.data.get();
-         for (int i = 0, j = h - 1; i < j; i++, j--) {
-            std::memcpy(tmp.get(), rgba + i * stride, stride);
-            std::memcpy(rgba + i * stride, rgba + j * stride, stride);
-            std::memcpy(rgba + j * stride, tmp.get(), stride);
-         }
+         auto image = getContext().readFramebuffer<mbgl::PremultipliedImage>(getFramebufferSize());
 
          // encode and convert to jbytes
          std::string string = encodePNG(image);

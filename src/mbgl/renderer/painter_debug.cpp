@@ -68,29 +68,16 @@ void Painter::renderClipMasks(PaintParameters&) {
     context.program = 0;
 
 #if not MBGL_USE_GLES2
-
-    // When reading data from the framebuffer, make sure that we are storing the depth values
-    // tightly packed into the buffer to avoid buffer overruns. Also see unpacking adjustment below.
-    context.pixelStorePack = { 1 };
-
     // Reset the value in case someone else changed it, or it's dirty.
     context.pixelTransferStencil = gl::value::PixelTransferStencil::Default;
 
     // Read the stencil buffer
     const auto viewport = context.viewport.getCurrentValue();
-    auto pixels = std::make_unique<uint8_t[]>(viewport.size.width * viewport.size.height);
-    MBGL_CHECK_ERROR(glReadPixels(
-                viewport.x,           // GLint x
-                viewport.y,           // GLint y
-                viewport.size.width,  // GLsizei width
-                viewport.size.height, // GLsizei height
-                GL_STENCIL_INDEX,     // GLenum format
-                GL_UNSIGNED_BYTE,     // GLenum type
-                pixels.get()          // GLvoid * data
-                ));
+    auto image =
+        context.readFramebuffer<AlphaImage, gl::TextureFormat::Stencil>(viewport.size, false);
 
     // Scale the Stencil buffer to cover the entire color space.
-    auto it = pixels.get();
+    auto it = image.data.get();
     auto end = it + viewport.size.width * viewport.size.height;
     const auto factor = 255.0f / *std::max_element(it, end);
     for (; it != end; ++it) {
@@ -101,7 +88,7 @@ void Painter::renderClipMasks(PaintParameters&) {
     context.rasterPos = { -1, -1, 0, 1 };
     context.pixelStoreUnpack = { 1 };
     MBGL_CHECK_ERROR(glDrawPixels(viewport.size.width, viewport.size.height, GL_LUMINANCE,
-                                  GL_UNSIGNED_BYTE, pixels.get()));
+                                  GL_UNSIGNED_BYTE, image.data.get()));
 #endif // MBGL_USE_GLES2
 }
 
@@ -112,11 +99,6 @@ void Painter::renderDepthBuffer(PaintParameters&) {
     context.program = 0;
 
 #if not MBGL_USE_GLES2
-
-    // When reading data from the framebuffer, make sure that we are storing the depth values
-    // tightly packed into the buffer to avoid buffer overruns. Also see unpacking adjustment below.
-    context.pixelStorePack = { 1 };
-
     // Scales the values in the depth buffer so that they cover the entire grayscale range. This
     // makes it easier to spot tiny differences.
     const float base = 1.0f / (1.0f - depthRangeSize);
@@ -124,23 +106,14 @@ void Painter::renderDepthBuffer(PaintParameters&) {
 
     // Read the stencil buffer
     auto viewport = context.viewport.getCurrentValue();
-    auto pixels = std::make_unique<uint8_t[]>(viewport.size.width * viewport.size.height);
-
-    MBGL_CHECK_ERROR(glReadPixels(
-                viewport.x,           // GLint x
-                viewport.y,           // GLint y
-                viewport.size.width,  // GLsizei width
-                viewport.size.height, // GLsizei height
-                GL_DEPTH_COMPONENT,   // GLenum format
-                GL_UNSIGNED_BYTE,     // GLenum type
-                pixels.get()          // GLvoid * data
-                ));
+    auto image =
+        context.readFramebuffer<AlphaImage, gl::TextureFormat::Depth>(viewport.size, false);
 
     context.pixelZoom = { 1, 1 };
     context.rasterPos = { -1, -1, 0, 1 };
     context.pixelStoreUnpack = { 1 };
     MBGL_CHECK_ERROR(glDrawPixels(viewport.size.width, viewport.size.height, GL_LUMINANCE,
-                                  GL_UNSIGNED_BYTE, pixels.get()));
+                                  GL_UNSIGNED_BYTE, image.data.get()));
 #endif // MBGL_USE_GLES2
 }
 #endif // NDEBUG

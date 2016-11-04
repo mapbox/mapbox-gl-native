@@ -24,7 +24,6 @@
 #import <mbgl/platform/darwin/reachability.h>
 #import <mbgl/platform/default/thread_pool.hpp>
 #import <mbgl/gl/extension.hpp>
-#import <mbgl/gl/gl.hpp>
 #import <mbgl/gl/context.hpp>
 #import <mbgl/map/backend.hpp>
 #import <mbgl/sprite/sprite_image.hpp>
@@ -2608,20 +2607,7 @@ public:
     }
 
     mbgl::PremultipliedImage readStillImage() {
-        mbgl::PremultipliedImage image(nativeView.framebufferSize);
-        MBGL_CHECK_ERROR(glReadPixels(0, 0, image.size.width, image.size.height, GL_RGBA,
-                                      GL_UNSIGNED_BYTE, image.data.get()));
-
-        const size_t stride = image.stride();
-        auto tmp = std::make_unique<uint8_t[]>(stride);
-        uint8_t *rgba = image.data.get();
-        for (int i = 0, j = image.size.height - 1; i < j; i++, j--) {
-            std::memcpy(tmp.get(), rgba + i * stride, stride);
-            std::memcpy(rgba + i * stride, rgba + j * stride, stride);
-            std::memcpy(rgba + j * stride, tmp.get(), stride);
-        }
-
-        return image;
+        return getContext().readFramebuffer<mbgl::PremultipliedImage>(nativeView.framebufferSize);
     }
 
 private:
