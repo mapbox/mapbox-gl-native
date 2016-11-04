@@ -65,12 +65,16 @@ class AnnotationManager {
             }
         }
         long id = annotation.getId();
-        nativeMapView.removeAnnotation(id);
+        if (nativeMapView != null) {
+            nativeMapView.removeAnnotation(id);
+        }
         annotations.remove(id);
     }
 
     void removeAnnotation(long id) {
-        nativeMapView.removeAnnotation(id);
+        if (nativeMapView != null) {
+            nativeMapView.removeAnnotation(id);
+        }
         annotations.remove(id);
     }
 
@@ -88,7 +92,11 @@ class AnnotationManager {
             }
             ids[i] = annotationList.get(i).getId();
         }
-        nativeMapView.removeAnnotations(ids);
+
+        if (nativeMapView != null) {
+            nativeMapView.removeAnnotations(ids);
+        }
+
         for (long id : ids) {
             annotations.remove(id);
         }
@@ -109,7 +117,11 @@ class AnnotationManager {
                 }
             }
         }
-        nativeMapView.removeAnnotations(ids);
+
+        if (nativeMapView != null) {
+            nativeMapView.removeAnnotations(ids);
+        }
+
         annotations.clear();
     }
 
@@ -119,7 +131,7 @@ class AnnotationManager {
 
     Marker addMarker(@NonNull BaseMarkerOptions markerOptions, @NonNull MapboxMap mapboxMap) {
         Marker marker = prepareMarker(markerOptions);
-        long id = nativeMapView.addMarker(marker);
+        long id = nativeMapView != null ? nativeMapView.addMarker(marker) : 0;
         marker.setMapboxMap(mapboxMap);
         marker.setId(id);
         annotations.put(id, marker);
@@ -139,25 +151,26 @@ class AnnotationManager {
             }
 
             if (markers.size() > 0) {
-                long[] ids = nativeMapView.addMarkers(markers);
-
-                // if unittests or markers are correctly added to map
-                if (ids == null || ids.length == markers.size()) {
-                    long id = 0;
-                    Marker m;
-                    for (int i = 0; i < markers.size(); i++) {
-                        m = markers.get(i);
-                        m.setMapboxMap(mapboxMap);
-                        if (ids != null) {
-                            id = ids[i];
-                        } else {
-                            //unit test
-                            id++;
-                        }
-                        m.setId(id);
-                        annotations.put(id, m);
-                    }
+                long[] ids = null;
+                if (nativeMapView != null) {
+                    ids = nativeMapView.addMarkers(markers);
                 }
+
+                long id = 0;
+                Marker m;
+                for (int i = 0; i < markers.size(); i++) {
+                    m = markers.get(i);
+                    m.setMapboxMap(mapboxMap);
+                    if (ids != null) {
+                        id = ids[i];
+                    } else {
+                        //unit test
+                        id++;
+                    }
+                    m.setId(id);
+                    annotations.put(id, m);
+                }
+
             }
         }
         return markers;
@@ -355,7 +368,7 @@ class AnnotationManager {
     Polygon addPolygon(@NonNull PolygonOptions polygonOptions, @NonNull MapboxMap mapboxMap) {
         Polygon polygon = polygonOptions.getPolygon();
         if (!polygon.getPoints().isEmpty()) {
-            long id = nativeMapView.addPolygon(polygon);
+            long id = nativeMapView != null ? nativeMapView.addPolygon(polygon) : 0;
             polygon.setId(id);
             polygon.setMapboxMap(mapboxMap);
             annotations.put(id, polygon);
@@ -376,23 +389,23 @@ class AnnotationManager {
                 }
             }
 
-            long[] ids = nativeMapView.addPolygons(polygons);
+            long[] ids = null;
+            if (nativeMapView != null) {
+                ids = nativeMapView.addPolygons(polygons);
+            }
 
-            // if unit tests or polygons correctly added to map
-            if (ids == null || ids.length == polygons.size()) {
-                long id = 0;
-                for (int i = 0; i < polygons.size(); i++) {
-                    polygon = polygons.get(i);
-                    polygon.setMapboxMap(mapboxMap);
-                    if (ids != null) {
-                        id = ids[i];
-                    } else {
-                        // unit test
-                        id++;
-                    }
-                    polygon.setId(id);
-                    annotations.put(id, polygon);
+            long id = 0;
+            for (int i = 0; i < polygons.size(); i++) {
+                polygon = polygons.get(i);
+                polygon.setMapboxMap(mapboxMap);
+                if (ids != null) {
+                    id = ids[i];
+                } else {
+                    // unit test
+                    id++;
                 }
+                polygon.setId(id);
+                annotations.put(id, polygon);
             }
         }
         return polygons;
@@ -434,7 +447,7 @@ class AnnotationManager {
     Polyline addPolyline(@NonNull PolylineOptions polylineOptions, @NonNull MapboxMap mapboxMap) {
         Polyline polyline = polylineOptions.getPolyline();
         if (!polyline.getPoints().isEmpty()) {
-            long id = nativeMapView.addPolyline(polyline);
+            long id = nativeMapView != null ? nativeMapView.addPolyline(polyline) : 0;
             polyline.setMapboxMap(mapboxMap);
             polyline.setId(id);
             annotations.put(id, polyline);
@@ -455,25 +468,25 @@ class AnnotationManager {
                 }
             }
 
-            long[] ids = nativeMapView.addPolylines(polylines);
+            long[] ids = null;
+            if (nativeMapView != null) {
+                ids = nativeMapView.addPolylines(polylines);
+            }
 
-            // if unit tests or polylines are correctly added to map
-            if (ids == null || ids.length == polylines.size()) {
-                long id = 0;
-                Polyline p;
+            long id = 0;
+            Polyline p;
 
-                for (int i = 0; i < polylines.size(); i++) {
-                    p = polylines.get(i);
-                    p.setMapboxMap(mapboxMap);
-                    if (ids != null) {
-                        id = ids[i];
-                    } else {
-                        // unit test
-                        id++;
-                    }
-                    p.setId(id);
-                    annotations.put(id, p);
+            for (int i = 0; i < polylines.size(); i++) {
+                p = polylines.get(i);
+                p.setMapboxMap(mapboxMap);
+                if (ids != null) {
+                    id = ids[i];
+                } else {
+                    // unit test
+                    id++;
                 }
+                p.setId(id);
+                annotations.put(id, p);
             }
         }
         return polylines;

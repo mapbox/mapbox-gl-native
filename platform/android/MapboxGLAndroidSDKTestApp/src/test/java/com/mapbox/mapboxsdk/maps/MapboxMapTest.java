@@ -79,10 +79,13 @@ public class MapboxMapTest {
     @Mock
     MapboxMap.OnMyBearingTrackingModeChangeListener mMyBearingTrackingModeChangeListener;
 
+    @Mock
+    IconManager iconManager;
+
     @Before
     public void beforeTest() {
         MockitoAnnotations.initMocks(this);
-        mMapboxMap = new MapboxMap(mMapView);
+        mMapboxMap = new MapboxMap(mMapView, iconManager);
     }
 
     @Test
