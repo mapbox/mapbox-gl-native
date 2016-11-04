@@ -1635,7 +1635,11 @@ public:
         
         for (auto const& annotationTag: annotationTags)
         {
-            MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag[annotationTag];
+            if (!_annotationContextsByAnnotationTag.count(annotationTag))
+            {
+                continue;
+            }
+            MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
             [annotations addObject:annotationContext.annotation];
         }
         
