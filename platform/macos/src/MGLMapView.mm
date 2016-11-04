@@ -1635,7 +1635,11 @@ public:
         
         for (auto const& annotationTag: annotationTags)
         {
-            MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag[annotationTag];
+            if (!_annotationContextsByAnnotationTag.count(annotationTag))
+            {
+                continue;
+            }
+            MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
             [annotations addObject:annotationContext.annotation];
         }
         
@@ -1686,6 +1690,12 @@ public:
 
     for (id <MGLAnnotation> annotation in annotations) {
         NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"Annotation does not conform to MGLAnnotation");
+
+        // adding the same annotation object twice is a no-op
+        if ([self.annotations containsObject:annotation])
+        {
+            continue;
+        }
 
         if ([annotation isKindOfClass:[MGLMultiPoint class]]) {
             // The multipoint knows how to style itself (with the map view’s help).
