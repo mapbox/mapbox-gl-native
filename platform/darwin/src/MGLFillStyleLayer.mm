@@ -129,7 +129,7 @@
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 
-#pragma mark -
+#pragma mark - Add style layer to map
 
 - (void)addToMapView:(MGLMapView *)mapView
 {

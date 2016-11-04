@@ -2,6 +2,7 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLSource.h"
+#import "MGLMapView_Private.h"
 #import "NSPredicate+MGLAdditions.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLStyleValue_Private.h"
@@ -16,13 +17,23 @@
 @end
 
 @implementation MGLBackgroundStyleLayer
+{
+    std::unique_ptr<mbgl::style::BackgroundLayer> _pendingLayer;
+}
 
 - (instancetype)initWithIdentifier:(NSString *)identifier
 {
     if (self = [super initWithIdentifier:identifier]) {
-        _layer = new mbgl::style::BackgroundLayer(identifier.UTF8String);
+        [self commonInit:identifier];
     }
     return self;
+}
+
+- (void)commonInit:(NSString *)identifier
+{
+    auto layer = std::make_unique<mbgl::style::BackgroundLayer>(identifier.UTF8String);
+    _pendingLayer = std::move(layer);
+    self.layer = _pendingLayer.get();
 }
 
 #pragma mark - Accessing the Paint Attributes
@@ -55,6 +66,13 @@
 - (MGLStyleValue<NSNumber *> *)backgroundOpacity {
     auto propertyValue = self.layer->getBackgroundOpacity() ?: self.layer->getDefaultBackgroundOpacity();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+}
+
+#pragma mark - Add style layer to map
+
+- (void)addToMapView:(MGLMapView *)mapView
+{
+    mapView.mbglMap->addLayer(std::move(_pendingLayer));
 }
 
 @end

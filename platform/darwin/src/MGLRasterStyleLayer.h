@@ -69,6 +69,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterFadeDuration;
 
+- (void)addToMapView:(MGLMapView *)mapView;
+
 @end
 
 NS_ASSUME_NONNULL_END

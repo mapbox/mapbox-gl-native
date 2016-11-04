@@ -112,6 +112,8 @@ typedef NS_ENUM(NSUInteger, MGLCirclePitchScale) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circlePitchScale;
 
+- (void)addToMapView:(MGLMapView *)mapView;
+
 @end
 
 NS_ASSUME_NONNULL_END
