@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
@@ -21,23 +22,22 @@ import java.util.List;
 
 class AnnotationManager {
 
-    private MapboxMap mapboxMap;
-    private MapView mapView;
+    private NativeMapView nativeMapView;
+    private IconManager iconManager;
     private InfoWindowManager infoWindowManager;
+    private MarkerViewManager markerViewManager;
 
     private LongSparseArray<Annotation> annotations;
     private List<Marker> selectedMarkers;
-    private MarkerViewManager markerViewManager;
 
     private MapboxMap.OnMarkerClickListener onMarkerClickListener;
 
-    AnnotationManager(MapboxMap map, MapView view, InfoWindowManager manager) {
-        mapView = view;
-        mapboxMap = map;
-        infoWindowManager = manager;
-        markerViewManager = new MarkerViewManager(map, view);
-        selectedMarkers = new ArrayList<>();
-        annotations = new LongSparseArray<>();
+    AnnotationManager(NativeMapView view, IconManager iconManager, InfoWindowManager manager) {
+        this.nativeMapView = view;
+        this.iconManager = iconManager;
+        this.infoWindowManager = manager;
+        this.selectedMarkers = new ArrayList<>();
+        this.annotations = new LongSparseArray<>();
     }
 
     //
@@ -65,12 +65,12 @@ class AnnotationManager {
             }
         }
         long id = annotation.getId();
-        mapView.removeAnnotation(id);
+        nativeMapView.removeAnnotation(id);
         annotations.remove(id);
     }
 
     void removeAnnotation(long id) {
-        mapView.removeAnnotation(id);
+        nativeMapView.removeAnnotation(id);
         annotations.remove(id);
     }
 
@@ -88,7 +88,7 @@ class AnnotationManager {
             }
             ids[i] = annotationList.get(i).getId();
         }
-        mapView.removeAnnotations(ids);
+        nativeMapView.removeAnnotations(ids);
         for (long id : ids) {
             annotations.remove(id);
         }
@@ -109,7 +109,7 @@ class AnnotationManager {
                 }
             }
         }
-        mapView.removeAnnotations(ids);
+        nativeMapView.removeAnnotations(ids);
         annotations.clear();
     }
 
@@ -117,16 +117,16 @@ class AnnotationManager {
     // Markers
     //
 
-    Marker addMarker(@NonNull BaseMarkerOptions markerOptions) {
+    Marker addMarker(@NonNull BaseMarkerOptions markerOptions, @NonNull MapboxMap mapboxMap) {
         Marker marker = prepareMarker(markerOptions);
-        long id = mapView.addMarker(marker);
+        long id = nativeMapView.addMarker(marker);
         marker.setMapboxMap(mapboxMap);
         marker.setId(id);
         annotations.put(id, marker);
         return marker;
     }
 
-    List<Marker> addMarkers(@NonNull List<? extends BaseMarkerOptions> markerOptionsList) {
+    List<Marker> addMarkers(@NonNull List<? extends BaseMarkerOptions> markerOptionsList, @NonNull MapboxMap mapboxMap) {
         int count = markerOptionsList.size();
         List<Marker> markers = new ArrayList<>(count);
         if (count > 0) {
@@ -139,7 +139,7 @@ class AnnotationManager {
             }
 
             if (markers.size() > 0) {
-                long[] ids = mapView.addMarkers(markers);
+                long[] ids = nativeMapView.addMarkers(markers);
 
                 // if unittests or markers are correctly added to map
                 if (ids == null || ids.length == markers.size()) {
@@ -165,27 +165,27 @@ class AnnotationManager {
 
     private Marker prepareMarker(BaseMarkerOptions markerOptions) {
         Marker marker = markerOptions.getMarker();
-        Icon icon = mapView.loadIconForMarker(marker);
-        marker.setTopOffsetPixels(mapView.getTopOffsetPixelsForIcon(icon));
+        Icon icon = iconManager.loadIconForMarker(marker);
+        marker.setTopOffsetPixels(iconManager.getTopOffsetPixelsForIcon(icon));
         return marker;
     }
 
-    MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions) {
+    MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions, @NonNull MapboxMap mapboxMap) {
         MarkerView marker = prepareViewMarker(markerOptions);
         marker.setMapboxMap(mapboxMap);
-        long id = mapView.addMarker(marker);
+        long id = nativeMapView.addMarker(marker);
         marker.setId(id);
         annotations.put(id, marker);
         markerViewManager.invalidateViewMarkersInVisibleRegion();
         return marker;
     }
 
-    List<MarkerView> addMarkerViews(@NonNull List<? extends BaseMarkerViewOptions> markerViewOptions) {
+    List<MarkerView> addMarkerViews(@NonNull List<? extends BaseMarkerViewOptions> markerViewOptions, @NonNull MapboxMap mapboxMap) {
         List<MarkerView> markers = new ArrayList<>();
         for (BaseMarkerViewOptions markerViewOption : markerViewOptions) {
             MarkerView marker = prepareViewMarker(markerViewOption);
             marker.setMapboxMap(mapboxMap);
-            long id = mapView.addMarker(marker);
+            long id = nativeMapView.addMarker(marker);
             marker.setId(id);
             annotations.put(id, marker);
             markers.add(marker);
@@ -196,12 +196,24 @@ class AnnotationManager {
 
     private MarkerView prepareViewMarker(BaseMarkerViewOptions markerViewOptions) {
         MarkerView marker = markerViewOptions.getMarker();
-        mapView.loadIconForMarkerView(marker);
+        iconManager.loadIconForMarkerView(marker);
         return marker;
     }
 
-    void updateMarker(@NonNull Marker updatedMarker) {
-        mapView.updateMarker(updatedMarker);
+    void updateMarker(@NonNull Marker updatedMarker, @NonNull MapboxMap mapboxMap) {
+        if (updatedMarker == null) {
+            return;
+        }
+
+        if (updatedMarker.getId() == -1) {
+            return;
+        }
+
+        if (!(updatedMarker instanceof MarkerView)) {
+            iconManager.ensureIconLoaded(updatedMarker, mapboxMap);
+        }
+
+        nativeMapView.updateMarker(updatedMarker);
 
         int index = annotations.indexOfKey(updatedMarker.getId());
         if (index > -1) {
@@ -225,7 +237,7 @@ class AnnotationManager {
         onMarkerClickListener = listener;
     }
 
-    void selectMarker(@NonNull Marker marker) {
+    void selectMarker(@NonNull Marker marker, @NonNull MapboxMap mapboxMap) {
         if (selectedMarkers.contains(marker)) {
             return;
         }
@@ -248,7 +260,7 @@ class AnnotationManager {
             }
 
             if (infoWindowManager.isInfoWindowValidForMarker(marker) || infoWindowManager.getInfoWindowAdapter() != null) {
-                infoWindowManager.getInfoWindows().add(marker.showInfoWindow(mapboxMap, mapView));
+                infoWindowManager.getInfoWindows().add(marker.showInfoWindow(mapboxMap, mapboxMap.getMapView()));
             }
         }
 
@@ -294,14 +306,56 @@ class AnnotationManager {
         return selectedMarkers;
     }
 
+    public List<Marker> getMarkersInRect(@NonNull RectF rect) {
+        long[] ids = nativeMapView.queryPointAnnotations(rect);
+
+        List<Long> idsList = new ArrayList<>(ids.length);
+        for (long id : ids) {
+            idsList.add(id);
+        }
+
+        List<Marker> annotations = new ArrayList<>(ids.length);
+        List<Annotation> annotationList = getAnnotations();
+        int count = annotationList.size();
+        for (int i = 0; i < count; i++) {
+            Annotation annotation = annotationList.get(i);
+            if (annotation instanceof com.mapbox.mapboxsdk.annotations.Marker && idsList.contains(annotation.getId())) {
+                annotations.add((com.mapbox.mapboxsdk.annotations.Marker) annotation);
+            }
+        }
+
+        return new ArrayList<>(annotations);
+    }
+
+    public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rect) {
+        long[] ids = nativeMapView.queryPointAnnotations(rect);
+
+        List<Long> idsList = new ArrayList<>(ids.length);
+        for (long id : ids) {
+            idsList.add(id);
+        }
+
+        List<MarkerView> annotations = new ArrayList<>(ids.length);
+        List<Annotation> annotationList = getAnnotations();
+        int count = annotationList.size();
+        for (int i = 0; i < count; i++) {
+            Annotation annotation = annotationList.get(i);
+            if (annotation instanceof MarkerView) {
+                annotations.add((MarkerView) annotation);
+            }
+        }
+
+        return new ArrayList<>(annotations);
+    }
+
     //
     // Polygons
     //
 
-    Polygon addPolygon(@NonNull PolygonOptions polygonOptions) {
+    Polygon addPolygon(@NonNull PolygonOptions polygonOptions, @NonNull MapboxMap mapboxMap) {
         Polygon polygon = polygonOptions.getPolygon();
         if (!polygon.getPoints().isEmpty()) {
-            long id = mapView.addPolygon(polygon);
+            long id = nativeMapView.addPolygon(polygon);
             polygon.setId(id);
             polygon.setMapboxMap(mapboxMap);
             annotations.put(id, polygon);
@@ -309,7 +363,7 @@ class AnnotationManager {
         return polygon;
     }
 
-    List<Polygon> addPolygons(@NonNull List<PolygonOptions> polygonOptionsList) {
+    List<Polygon> addPolygons(@NonNull List<PolygonOptions> polygonOptionsList, @NonNull MapboxMap mapboxMap) {
         int count = polygonOptionsList.size();
 
         Polygon polygon;
@@ -322,7 +376,7 @@ class AnnotationManager {
                 }
             }
 
-            long[] ids = mapView.addPolygons(polygons);
+            long[] ids = nativeMapView.addPolygons(polygons);
 
             // if unit tests or polygons correctly added to map
             if (ids == null || ids.length == polygons.size()) {
@@ -345,7 +399,15 @@ class AnnotationManager {
     }
 
     void updatePolygon(Polygon polygon) {
-        mapView.updatePolygon(polygon);
+        if (polygon == null) {
+            return;
+        }
+
+        if (polygon.getId() == -1) {
+            return;
+        }
+
+        nativeMapView.updatePolygon(polygon);
 
         int index = annotations.indexOfKey(polygon.getId());
         if (index > -1) {
@@ -369,10 +431,10 @@ class AnnotationManager {
     // Polylines
     //
 
-    Polyline addPolyline(@NonNull PolylineOptions polylineOptions) {
+    Polyline addPolyline(@NonNull PolylineOptions polylineOptions, @NonNull MapboxMap mapboxMap) {
         Polyline polyline = polylineOptions.getPolyline();
         if (!polyline.getPoints().isEmpty()) {
-            long id = mapView.addPolyline(polyline);
+            long id = nativeMapView.addPolyline(polyline);
             polyline.setMapboxMap(mapboxMap);
             polyline.setId(id);
             annotations.put(id, polyline);
@@ -380,7 +442,7 @@ class AnnotationManager {
         return polyline;
     }
 
-    List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList) {
+    List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList, @NonNull MapboxMap mapboxMap) {
         int count = polylineOptionsList.size();
         Polyline polyline;
         List<Polyline> polylines = new ArrayList<>(count);
@@ -393,7 +455,7 @@ class AnnotationManager {
                 }
             }
 
-            long[] ids = mapView.addPolylines(polylines);
+            long[] ids = nativeMapView.addPolylines(polylines);
 
             // if unit tests or polylines are correctly added to map
             if (ids == null || ids.length == polylines.size()) {
@@ -418,7 +480,15 @@ class AnnotationManager {
     }
 
     void updatePolyline(Polyline polyline) {
-        mapView.updatePolyline(polyline);
+        if (polyline == null) {
+            return;
+        }
+
+        if (polyline.getId() == -1) {
+            return;
+        }
+
+        nativeMapView.updatePolyline(polyline);
 
         int index = annotations.indexOfKey(polyline.getId());
         if (index > -1) {
@@ -442,8 +512,42 @@ class AnnotationManager {
     // MarkerViewManager
     //
 
-    MarkerViewManager getMarkerViewManager() {
+    MarkerViewManager getMarkerViewManager(MapboxMap mapboxMap) {
+        if (markerViewManager == null) {
+            this.markerViewManager = new MarkerViewManager(mapboxMap, mapboxMap.getMapView());
+        }
         return markerViewManager;
     }
 
+    void adjustTopOffsetPixels(MapboxMap mapboxMap) {
+        int count = annotations.size();
+        for (int i = 0; i < count; i++) {
+            Annotation annotation = annotations.get(i);
+            if (annotation instanceof Marker) {
+                Marker marker = (Marker) annotation;
+                marker.setTopOffsetPixels(
+                        iconManager.getTopOffsetPixelsForIcon(marker.getIcon()));
+            }
+        }
+
+        for (Marker marker : selectedMarkers) {
+            if (marker.isInfoWindowShown()) {
+                marker.hideInfoWindow();
+                marker.showInfoWindow(mapboxMap, mapboxMap.getMapView());
+            }
+        }
+    }
+
+    void reloadMarkers() {
+        int count = annotations.size();
+        for (int i = 0; i < count; i++) {
+            Annotation annotation = annotations.get(i);
+            if (annotation instanceof Marker) {
+                Marker marker = (Marker) annotation;
+                nativeMapView.removeAnnotation(annotation.getId());
+                long newId = nativeMapView.addMarker(marker);
+                marker.setId(newId);
+            }
+        }
+    }
 }

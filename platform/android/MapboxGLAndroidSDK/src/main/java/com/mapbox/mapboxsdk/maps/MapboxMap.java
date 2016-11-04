@@ -86,14 +86,14 @@ public class MapboxMap {
     private double maxZoomLevel = -1;
     private double minZoomLevel = -1;
 
-    MapboxMap(@NonNull MapView mapView) {
+    MapboxMap(@NonNull MapView mapView, IconManager iconManager) {
         this.mapView = mapView;
         this.mapView.addOnMapChangedListener(new MapChangeCameraPositionListener());
         uiSettings = new UiSettings(mapView);
         trackingSettings = new TrackingSettings(this.mapView, uiSettings);
         projection = new Projection(mapView);
         infoWindowManager = new InfoWindowManager();
-        annotationManager = new AnnotationManager(this, mapView, infoWindowManager);
+        annotationManager = new AnnotationManager(mapView.getNativeMapView(), iconManager, infoWindowManager);
     }
 
     // Style
@@ -788,7 +788,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public Marker addMarker(@NonNull MarkerOptions markerOptions) {
-        return annotationManager.addMarker(markerOptions);
+        return annotationManager.addMarker(markerOptions, this);
     }
 
     /**
@@ -804,7 +804,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public Marker addMarker(@NonNull BaseMarkerOptions markerOptions) {
-        return annotationManager.addMarker(markerOptions);
+        return annotationManager.addMarker(markerOptions, this);
     }
 
     /**
@@ -820,13 +820,19 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions) {
-        return annotationManager.addMarker(markerOptions);
+        return annotationManager.addMarker(markerOptions, this);
     }
 
     @UiThread
     @NonNull
     public List<MarkerView> addMarkerViews(@NonNull List<? extends BaseMarkerViewOptions> markerViewOptions) {
-        return annotationManager.addMarkerViews(markerViewOptions);
+        return annotationManager.addMarkerViews(markerViewOptions, this);
+    }
+
+    @UiThread
+    @NonNull
+    public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rect) {
+        return annotationManager.getMarkerViewsInRect(rect);
     }
 
     /**
@@ -842,7 +848,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public List<Marker> addMarkers(@NonNull List<? extends BaseMarkerOptions> markerOptionsList) {
-        return annotationManager.addMarkers(markerOptionsList);
+        return annotationManager.addMarkers(markerOptionsList, this);
     }
 
     /**
@@ -854,7 +860,7 @@ public class MapboxMap {
      */
     @UiThread
     public void updateMarker(@NonNull Marker updatedMarker) {
-        annotationManager.updateMarker(updatedMarker);
+        annotationManager.updateMarker(updatedMarker, this);
     }
 
     /**
@@ -866,7 +872,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public Polyline addPolyline(@NonNull PolylineOptions polylineOptions) {
-        return annotationManager.addPolyline(polylineOptions);
+        return annotationManager.addPolyline(polylineOptions, this);
     }
 
     /**
@@ -878,7 +884,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList) {
-        return annotationManager.addPolylines(polylineOptionsList);
+        return annotationManager.addPolylines(polylineOptionsList, this);
     }
 
     /**
@@ -900,7 +906,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public Polygon addPolygon(@NonNull PolygonOptions polygonOptions) {
-        return annotationManager.addPolygon(polygonOptions);
+        return annotationManager.addPolygon(polygonOptions, this);
     }
 
     /**
@@ -912,7 +918,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public List<Polygon> addPolygons(@NonNull List<PolygonOptions> polygonOptionsList) {
-        return annotationManager.addPolygons(polygonOptionsList);
+        return annotationManager.addPolygons(polygonOptionsList, this);
     }
 
 
@@ -1093,7 +1099,7 @@ public class MapboxMap {
             Log.w(MapboxConstants.TAG, "marker was null, so just returning");
             return;
         }
-        annotationManager.selectMarker(marker);
+        annotationManager.selectMarker(marker, this);
     }
 
     /**
@@ -1130,7 +1136,7 @@ public class MapboxMap {
      * @return the associated MarkerViewManager
      */
     public MarkerViewManager getMarkerViewManager() {
-        return annotationManager.getMarkerViewManager();
+        return annotationManager.getMarkerViewManager(this);
     }
 
     //
@@ -1186,6 +1192,10 @@ public class MapboxMap {
     // used by MapView
     List<InfoWindow> getInfoWindows() {
         return infoWindowManager.getInfoWindows();
+    }
+
+    AnnotationManager getAnnotationManager() {
+        return annotationManager;
     }
 
     //

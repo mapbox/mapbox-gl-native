@@ -400,7 +400,7 @@ public class MarkerViewManager {
      */
     public void invalidateViewMarkersInVisibleRegion() {
         RectF mapViewRect = new RectF(0, 0, mapView.getWidth(), mapView.getHeight());
-        List<MarkerView> markers = mapView.getMarkerViewsInRect(mapViewRect);
+        List<MarkerView> markers = mapboxMap.getMarkerViewsInRect(mapViewRect);
         View convertView;
 
         // remove old markers
