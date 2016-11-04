@@ -17,7 +17,7 @@
 
 @interface MGL<%- camelize(type) %>StyleLayer ()
 
-@property (nonatomic) mbgl::style::<%- camelize(type) %>Layer *layer;
+@property (nonatomic) mbgl::style::<%- camelize(type) %>Layer *rawLayer;
 
 @end
 
@@ -30,53 +30,46 @@
 - (instancetype)initWithIdentifier:(NSString *)identifier
 {
     if (self = [super initWithIdentifier:identifier]) {
-        [self commonInit:identifier];
-    }
-    return self;
-}
-- (void)commonInit:(NSString *)identifier
-{
-    auto layer = std::make_unique<mbgl::style::<%- camelize(type) %>Layer>(identifier.UTF8String);
-    _pendingLayer = std::move(layer);
-    self.layer = _pendingLayer.get();
-}
-<% } else { -%>
-- (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source
-{
-    if (self = [super initWithIdentifier:identifier source:source]) {
-        [self commonInit:identifier source:source];
+        auto layer = std::make_unique<mbgl::style::<%- camelize(type) %>Layer>(identifier.UTF8String);
+        _pendingLayer = std::move(layer);
+        self.rawLayer = _pendingLayer.get();
     }
     return self;
 }
 
-- (void)commonInit:(NSString *)identifier source:(MGLSource *)source
+<% } else { -%>
+- (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source
 {
-    auto layer = std::make_unique<mbgl::style::<%- camelize(type) %>Layer>(identifier.UTF8String, source.identifier.UTF8String);
-    _pendingLayer = std::move(layer);
-    self.layer = _pendingLayer.get();
+    if (self = [super initWithIdentifier:identifier source:source]) {
+        auto layer = std::make_unique<mbgl::style::<%- camelize(type) %>Layer>(identifier.UTF8String, source.identifier.UTF8String);
+        _pendingLayer = std::move(layer);
+        self.rawLayer = _pendingLayer.get();
+    }
+    return self;
 }
+
 <% } -%>
 
 <% if (type !== 'background' && type !== 'raster') { -%>
 - (NSString *)sourceLayerIdentifier
 {
-    auto layerID = self.layer->getSourceLayer();
+    auto layerID = self.rawLayer->getSourceLayer();
     return layerID.empty() ? nil : @(layerID.c_str());
 }
 
 - (void)setSourceLayerIdentifier:(NSString *)sourceLayerIdentifier
 {
-    self.layer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
+    self.rawLayer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
 }
 
 - (void)setPredicate:(NSPredicate *)predicate
 {
-    self.layer->setFilter(predicate.mgl_filter);
+    self.rawLayer->setFilter(predicate.mgl_filter);
 }
 
 - (NSPredicate *)predicate
 {
-    return [NSPredicate mgl_predicateWithFilter:self.layer->getFilter()];
+    return [NSPredicate mgl_predicateWithFilter:self.rawLayer->getFilter()];
 }
 
 <% } -%>
@@ -86,11 +79,11 @@
 <% for (const property of layoutProperties) { -%>
 - (void)set<%- camelize(property.name) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue(<%- objCName(property) %>);
-    self.layer->set<%- camelize(property.name) %>(mbglValue);
+    self.rawLayer->set<%- camelize(property.name) %>(mbglValue);
 }
 
 - (MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
-    auto propertyValue = self.layer->get<%- camelize(property.name) %>() ?: self.layer->getDefault<%- camelize(property.name) %>();
+    auto propertyValue = self.rawLayer->get<%- camelize(property.name) %>() ?: self.rawLayer->getDefault<%- camelize(property.name) %>();
     return MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toStyleValue(propertyValue);
 }
 
@@ -102,11 +95,11 @@
 <% for (const property of paintProperties) { -%>
 - (void)set<%- camelize(property.name) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue(<%- objCName(property) %>);
-    self.layer->set<%- camelize(property.name) %>(mbglValue);
+    self.rawLayer->set<%- camelize(property.name) %>(mbglValue);
 }
 
 - (MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
-    auto propertyValue = self.layer->get<%- camelize(property.name) %>() ?: self.layer->getDefault<%- camelize(property.name) %>();
+    auto propertyValue = self.rawLayer->get<%- camelize(property.name) %>() ?: self.rawLayer->getDefault<%- camelize(property.name) %>();
     return MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toStyleValue(propertyValue);
 }
 
@@ -117,7 +110,17 @@
 
 - (void)addToMapView:(MGLMapView *)mapView
 {
-    mapView.mbglMap->addLayer(std::move(_pendingLayer));
+    [self addToMapView:mapView belowLayer:nil];
+}
+
+- (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
+{
+    if (otherLayer) {
+        const mbgl::optional<std::string> belowLayerId{otherLayer.identifier.UTF8String};
+        mapView.mbglMap->addLayer(std::move(_pendingLayer), belowLayerId);
+    } else {
+        mapView.mbglMap->addLayer(std::move(_pendingLayer));
+    }
 }
 
 @end

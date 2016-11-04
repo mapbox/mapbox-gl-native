@@ -134,7 +134,7 @@ static NSURL *MGLStyleURL_emerald;
         return nil;
     }
 
-    styleLayer.layer = mbglLayer;
+    styleLayer.rawLayer = mbglLayer;
 
     return styleLayer;
 }
@@ -173,7 +173,7 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)addLayer:(MGLStyleLayer *)layer
 {
-    if (!layer.layer) {
+    if (!layer.rawLayer) {
         [NSException raise:NSInvalidArgumentException format:
          @"The style layer %@ cannot be added to the style. "
          @"Make sure the style layer was created as a member of a concrete subclass of MGLStyleLayer.",
@@ -184,14 +184,14 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)insertLayer:(MGLStyleLayer *)layer belowLayer:(MGLStyleLayer *)otherLayer
 {
-    if (!layer.layer) {
+    if (!layer.rawLayer) {
         [NSException raise:NSInvalidArgumentException
                     format:
          @"The style layer %@ cannot be added to the style. "
          @"Make sure the style layer was created as a member of a concrete subclass of MGLStyleLayer.",
          layer];
     }
-    if (!otherLayer.layer) {
+    if (!otherLayer.rawLayer) {
         [NSException raise:NSInvalidArgumentException
                     format:
          @"A style layer cannot be placed before %@ in the style. "
@@ -199,8 +199,7 @@ static NSURL *MGLStyleURL_emerald;
          otherLayer];
     }
 
-    const mbgl::optional<std::string> belowLayerId{otherLayer.identifier.UTF8String};
-    self.mapView.mbglMap->addLayer(std::unique_ptr<mbgl::style::Layer>(layer.layer), belowLayerId);
+    [layer addToMapView:self.mapView belowLayer:otherLayer];
 }
 
 - (void)addSource:(MGLSource *)source
