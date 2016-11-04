@@ -259,7 +259,7 @@ struct RasterPos {
         double z;
         double w;
     };
-    static const constexpr Type Default = { 0, 0, 0, 0 };
+    static const constexpr Type Default = { 0, 0, 0, 1 };
     static void Set(const Type&);
     static Type Get();
 };
@@ -267,6 +267,20 @@ struct RasterPos {
 constexpr bool operator!=(const RasterPos::Type& a, const RasterPos::Type& b) {
     return a.x != b.x || a.y != b.y || a.z != b.z || a.w != b.w;
 }
+
+struct PixelStorePack {
+    using Type = PixelStorageType;
+    static const constexpr Type Default = { 4 };
+    static void Set(const Type&);
+    static Type Get();
+};
+
+struct PixelStoreUnpack {
+    using Type = PixelStorageType;
+    static const constexpr Type Default = { 4 };
+    static void Set(const Type&);
+    static Type Get();
+};
 
 #endif // MBGL_USE_GLES2
 

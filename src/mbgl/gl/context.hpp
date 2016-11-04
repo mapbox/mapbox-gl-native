@@ -130,6 +130,8 @@ public:
 #if not MBGL_USE_GLES2
     State<value::PixelZoom> pixelZoom;
     State<value::RasterPos> rasterPos;
+    State<value::PixelStorePack> pixelStorePack;
+    State<value::PixelStoreUnpack> pixelStoreUnpack;
 #endif // MBGL_USE_GLES2
 
 private:
