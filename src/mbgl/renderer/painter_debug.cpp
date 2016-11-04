@@ -8,7 +8,6 @@
 #include <mbgl/shader/fill_uniforms.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/gl/debugging.hpp>
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/util/color.hpp>
 
 namespace mbgl {
@@ -86,9 +85,7 @@ void Painter::renderClipMasks(PaintParameters&) {
 
     context.pixelZoom = { 1, 1 };
     context.rasterPos = { -1, -1, 0, 1 };
-    context.pixelStoreUnpack = { 1 };
-    MBGL_CHECK_ERROR(glDrawPixels(viewport.size.width, viewport.size.height, GL_LUMINANCE,
-                                  GL_UNSIGNED_BYTE, image.data.get()));
+    context.drawPixels(image);
 #endif // MBGL_USE_GLES2
 }
 
@@ -111,9 +108,7 @@ void Painter::renderDepthBuffer(PaintParameters&) {
 
     context.pixelZoom = { 1, 1 };
     context.rasterPos = { -1, -1, 0, 1 };
-    context.pixelStoreUnpack = { 1 };
-    MBGL_CHECK_ERROR(glDrawPixels(viewport.size.width, viewport.size.height, GL_LUMINANCE,
-                                  GL_UNSIGNED_BYTE, image.data.get()));
+    context.drawPixels(image);
 #endif // MBGL_USE_GLES2
 }
 #endif // NDEBUG

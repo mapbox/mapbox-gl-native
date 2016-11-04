@@ -71,6 +71,14 @@ public:
         return { size, readFramebuffer(size, format, flip) };
     }
 
+#if not MBGL_USE_GLES2
+    template <typename Image>
+    void drawPixels(const Image& image) {
+        auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
+        drawPixels(image.size, image.data.get(), format);
+    }
+#endif // MBGL_USE_GLES2
+
     // Create a texture from an image with data.
     template <typename Image>
     Texture createTexture(const Image& image, TextureUnit unit = 0) {
@@ -177,6 +185,9 @@ private:
     UniqueFramebuffer createFramebuffer();
     UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);
     std::unique_ptr<uint8_t[]> readFramebuffer(Size, TextureFormat, bool flip);
+#if not MBGL_USE_GLES2
+    void drawPixels(Size size, const void* data, TextureFormat);
+#endif // MBGL_USE_GLES2
 
     PrimitiveType operator()(const Points&);
     PrimitiveType operator()(const Lines&);
