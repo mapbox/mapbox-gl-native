@@ -118,6 +118,17 @@ std::unique_ptr<uint8_t[]> Context::readFramebuffer(const Size size, const Textu
     return data;
 }
 
+#if not MBGL_USE_GLES2
+void Context::drawPixels(const Size size, const void* data, TextureFormat format) {
+    pixelStoreUnpack = { 1 };
+    if (format != TextureFormat::RGBA) {
+        format = static_cast<TextureFormat>(GL_LUMINANCE);
+    }
+    MBGL_CHECK_ERROR(glDrawPixels(size.width, size.height, static_cast<GLenum>(GL_LUMINANCE),
+                                  GL_UNSIGNED_BYTE, data));
+}
+#endif // MBGL_USE_GLES2
+
 namespace {
 
 void checkFramebuffer() {
