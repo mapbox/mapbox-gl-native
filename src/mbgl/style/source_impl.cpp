@@ -172,6 +172,12 @@ void Source::Impl::updateTiles(const UpdateParameters& parameters) {
     }
 }
 
+void Source::Impl::updateSymbolDependentTiles() {
+    for (auto& pair : tiles) {
+        pair.second->symbolDependenciesChanged();
+    }
+}
+
 void Source::Impl::reloadTiles() {
     cache.clear();
 
