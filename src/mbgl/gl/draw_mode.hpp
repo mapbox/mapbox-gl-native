@@ -3,6 +3,8 @@
 #include <mbgl/gl/primitives.hpp>
 #include <mbgl/util/variant.hpp>
 
+#include <cassert>
+
 namespace mbgl {
 namespace gl {
 
@@ -11,6 +13,8 @@ public:
     using Primitive = Point;
     static constexpr std::size_t bufferGroupSize = 1;
 
+    explicit Points(float pointSize_) : pointSize(pointSize_) {}
+
     float pointSize;
 };
 
@@ -18,6 +22,10 @@ class Lines {
 public:
     using Primitive = Line;
     static constexpr std::size_t bufferGroupSize = 2;
+
+    explicit Lines(float lineWidth_) : lineWidth(lineWidth_) {
+        assert(lineWidth > 0);
+    }
 
     float lineWidth;
 };
@@ -28,6 +36,10 @@ public:
     // cannot be grouped into logical elements beyond a single Point.
     using Primitive = Line;
     static constexpr std::size_t bufferGroupSize = 1;
+
+    explicit LineStrip(float lineWidth_) : lineWidth(lineWidth_) {
+        assert(lineWidth > 0);
+    }
 
     float lineWidth;
 };
