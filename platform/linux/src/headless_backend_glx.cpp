@@ -14,8 +14,8 @@ gl::glProc HeadlessBackend::initializeExtension(const char* name) {
 }
 
 void HeadlessBackend::createContext() {
-    xDisplay = display->xDisplay;
-    fbConfigs = display->fbConfigs;
+    xDisplay = display->attribute<Display*>();
+    fbConfigs = display->attribute<GLXFBConfig*>();
 
     if (!glContext) {
         // Try to create a legacy context

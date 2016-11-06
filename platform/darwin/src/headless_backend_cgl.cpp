@@ -22,7 +22,7 @@ gl::glProc HeadlessBackend::initializeExtension(const char* name) {
 }
 
 void HeadlessBackend::createContext() {
-    CGLError error = CGLCreateContext(display->pixelFormat, nullptr, &glContext);
+    CGLError error = CGLCreateContext(display->attribute<CGLPixelFormatObj>(), nullptr, &glContext);
     if (error != kCGLNoError) {
         throw std::runtime_error(std::string("Error creating GL context object:") +
                                  CGLErrorString(error) + "\n");
