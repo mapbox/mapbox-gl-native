@@ -14,7 +14,8 @@ include(cmake/loop-uv.cmake)
 
 macro(use_glx_backend _TARGET)
     target_sources(${_TARGET}
-        PRIVATE platform/default/headless_backend_glx.cpp
+        PRIVATE platform/linux/src/headless_backend_glx.cpp
+        PRIVATE platform/linux/src/headless_display_glx.cpp
     )
 
     target_link_libraries(${_TARGET}
@@ -26,6 +27,7 @@ endmacro()
 macro(use_osmesa_backend _TARGET)
     target_sources(${_TARGET}
         PRIVATE platform/default/headless_backend_osmesa.cpp
+        PRIVATE platform/default/headless_display.cpp
     )
 
     target_add_mason_package(${_TARGET}
@@ -70,7 +72,6 @@ macro(mbgl_platform_core)
 
         # Headless view
         PRIVATE platform/default/headless_backend.cpp
-        PRIVATE platform/default/headless_display.cpp
         PRIVATE platform/default/offscreen_view.cpp
 
         # Thread pool
