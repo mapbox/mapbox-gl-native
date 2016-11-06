@@ -8,6 +8,27 @@
 
 namespace mbgl {
 
+struct EAGLImpl : public HeadlessBackend::Impl {
+    EAGLImpl(EAGLContext* glContext_) : glContext(glContext_) {
+        [reinterpret_cast<EAGLContext*>(glContext) retain];
+        reinterpret_cast<EAGLContext*>(glContext).multiThreaded = YES;
+    }
+
+    ~EAGLImpl() {
+        [glContext release];
+    }
+
+    void activateContext() {
+        [EAGLContext setCurrentContext:glContext];
+    }
+
+    void deactivateContext() {
+        [EAGLContext setCurrentContext:nil];
+    }
+
+    EAGLContext* glContext = nullptr;
+};
+
 gl::glProc HeadlessBackend::initializeExtension(const char* name) {
     static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengles"));
     if (!framework) {
@@ -21,26 +42,17 @@ gl::glProc HeadlessBackend::initializeExtension(const char* name) {
     return reinterpret_cast<gl::glProc>(symbol);
 }
 
+bool HeadlessBackend::hasDisplay() {
+    return true;
+}
+
 void HeadlessBackend::createContext() {
-    glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    EAGLContext* glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     if (glContext == nil) {
         throw std::runtime_error("Error creating GL context object");
     }
-    [reinterpret_cast<EAGLContext*>(glContext) retain];
-    reinterpret_cast<EAGLContext*>(glContext).multiThreaded = YES;
-}
 
-void HeadlessBackend::destroyContext() {
-    [reinterpret_cast<EAGLContext*>(glContext) release];
-    glContext = nil;
-}
-
-void HeadlessBackend::activateContext() {
-    [EAGLContext setCurrentContext:reinterpret_cast<EAGLContext*>(glContext)];
-}
-
-void HeadlessBackend::deactivateContext() {
-    [EAGLContext setCurrentContext:nil];
+    impl.reset(new EAGLImpl(glContext));
 }
 
 } // namespace mbgl

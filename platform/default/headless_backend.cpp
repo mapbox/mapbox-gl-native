@@ -3,15 +3,16 @@
 
 #include <cassert>
 #include <stdexcept>
+#include <type_traits>
 
 namespace mbgl {
 
-HeadlessBackend::HeadlessBackend() : display(std::make_shared<HeadlessDisplay>()) {
+HeadlessBackend::HeadlessBackend() {
     activate();
 }
 
 HeadlessBackend::HeadlessBackend(std::shared_ptr<HeadlessDisplay> display_)
-    : display(std::move(display_)) {
+        : display(std::move(display_)) {
     activate();
 }
 
@@ -23,8 +24,8 @@ HeadlessBackend::~HeadlessBackend() {
 void HeadlessBackend::activate() {
     active = true;
 
-    if (!glContext) {
-        if (!display) {
+    if (!hasContext()) {
+        if (!hasDisplay()) {
             throw std::runtime_error("Display is not set");
         }
         createContext();
@@ -45,6 +46,21 @@ void HeadlessBackend::deactivate() {
 
 void HeadlessBackend::invalidate() {
     assert(false);
+}
+
+void HeadlessBackend::destroyContext() {
+    assert(hasContext());
+    impl.reset();
+}
+
+void HeadlessBackend::activateContext() {
+    assert(hasContext());
+    impl->activateContext();
+}
+
+void HeadlessBackend::deactivateContext() {
+    assert(hasContext());
+    impl->deactivateContext();
 }
 
 void HeadlessBackend::notifyMapChange(MapChange change) {
