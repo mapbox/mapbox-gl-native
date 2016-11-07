@@ -92,8 +92,8 @@ public class MyLocationView extends View {
     private PointF screenLocation;
 
     // camera vars
-    private float bearing;
-    private float tilt;
+    private double bearing;
+    private double tilt;
 
     // Controls the compass update rate in milliseconds
     private static final int COMPASS_UPDATE_RATE_MS = 500;
@@ -266,7 +266,7 @@ public class MyLocationView extends View {
 
         // put camera in position
         camera.save();
-        camera.rotate(tilt, 0, 0);
+        camera.rotate((float) tilt, 0, 0);
         camera.getMatrix(matrix);
 
         if (myBearingTrackingMode != MyBearingTracking.NONE && directionAnimator != null) {
@@ -306,14 +306,14 @@ public class MyLocationView extends View {
     }
 
     public void setTilt(@FloatRange(from = 0, to = 60.0f) double tilt) {
-        this.tilt = (float) tilt;
+        this.tilt = tilt;
         if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
             mapboxMap.getUiSettings().setFocalPoint(new PointF(getCenterX(), getCenterY()));
         }
     }
 
     public void setBearing(double bearing) {
-        this.bearing = (float) bearing;
+        this.bearing = bearing;
     }
 
     public void setCameraPosition(CameraPosition position) {
@@ -385,7 +385,7 @@ public class MyLocationView extends View {
     protected Parcelable onSaveInstanceState() {
         Bundle bundle = new Bundle();
         bundle.putParcelable("superState", super.onSaveInstanceState());
-        bundle.putFloat("tilt", tilt);
+        bundle.putDouble("tilt", tilt);
         return bundle;
     }
 
@@ -475,7 +475,7 @@ public class MyLocationView extends View {
         invalidate();
     }
 
-    private void setCompass(float bearing) {
+    private void setCompass(double bearing) {
         float oldDir = previousDirection;
         if (directionAnimator != null) {
             oldDir = (Float) directionAnimator.getAnimatedValue();
@@ -483,7 +483,7 @@ public class MyLocationView extends View {
             directionAnimator = null;
         }
 
-        float newDir = bearing;
+        float newDir = (float) bearing;
         float diff = oldDir - newDir;
         if (diff > 180.0f) {
             newDir += 360.0f;
