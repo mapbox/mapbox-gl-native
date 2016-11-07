@@ -113,25 +113,14 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineOpacity;
 
-#if TARGET_OS_IPHONE
 /**
  The color with which the line will be drawn.
  
- The default value of this property is an `MGLStyleValue` object containing `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing the color black. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `linePattern` is set to `nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *lineColor;
-#else
-/**
- The color with which the line will be drawn.
- 
- The default value of this property is an `MGLStyleValue` object containing `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
-
- This property is only applied to the style if `linePattern` is set to `nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *lineColor;
-#endif
 
 /**
  The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.

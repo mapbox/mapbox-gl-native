@@ -563,45 +563,23 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconOpacity;
 
-#if TARGET_OS_IPHONE
 /**
  The color of the icon. This can only be used with sdf icons.
  
- The default value of this property is an `MGLStyleValue` object containing `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing the color black. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconColor;
-#else
-/**
- The color of the icon. This can only be used with sdf icons.
- 
- The default value of this property is an `MGLStyleValue` object containing `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconColor;
-#endif
-
-#if TARGET_OS_IPHONE
 /**
  The color of the icon's halo. Icon halos can only be used with SDF icons.
  
- The default value of this property is an `MGLStyleValue` object containing `UIColor.clearColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing the clear color. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconHaloColor;
-#else
-/**
- The color of the icon's halo. Icon halos can only be used with SDF icons.
- 
- The default value of this property is an `MGLStyleValue` object containing `NSColor.clearColor`. Set this property to `nil` to reset it to the default value.
-
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconHaloColor;
-#endif
 
 /**
  Distance of halo to the icon outline.
@@ -654,45 +632,23 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textOpacity;
 
-#if TARGET_OS_IPHONE
 /**
  The color with which the text will be drawn.
  
- The default value of this property is an `MGLStyleValue` object containing `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing the color black. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *textColor;
-#else
-/**
- The color with which the text will be drawn.
- 
- The default value of this property is an `MGLStyleValue` object containing `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
- This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *textColor;
-#endif
-
-#if TARGET_OS_IPHONE
 /**
  The color of the text's halo, which helps it stand out from backgrounds.
  
- The default value of this property is an `MGLStyleValue` object containing `UIColor.clearColor`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing the clear color. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *textHaloColor;
-#else
-/**
- The color of the text's halo, which helps it stand out from backgrounds.
- 
- The default value of this property is an `MGLStyleValue` object containing `NSColor.clearColor`. Set this property to `nil` to reset it to the default value.
-
- This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *textHaloColor;
-#endif
 
 /**
  Distance of halo to the font outline. Max text halo width is 1/4 of the font-size.
