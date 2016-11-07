@@ -10,9 +10,7 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import android.support.v4.util.LongSparseArray;
 import android.support.v4.util.Pools;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +19,6 @@ import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
-import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -47,7 +44,6 @@ import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.commons.geojson.Feature;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -70,23 +66,13 @@ public class MapboxMap {
     private Projection projection;
     private CameraPosition cameraPosition;
     private boolean invalidCameraPosition;
-    private LongSparseArray<Annotation> annotations;
-
-    private List<Marker> selectedMarkers;
-    private MarkerViewManager markerViewManager;
-
-    private List<InfoWindow> infoWindows;
-    private MapboxMap.InfoWindowAdapter infoWindowAdapter;
 
     private boolean myLocationEnabled;
-    private boolean allowConcurrentMultipleInfoWindows;
 
     private MapboxMap.OnMapClickListener onMapClickListener;
     private MapboxMap.OnMapLongClickListener onMapLongClickListener;
-    private MapboxMap.OnMarkerClickListener onMarkerClickListener;
-    private MapboxMap.OnInfoWindowClickListener onInfoWindowClickListener;
-    private MapboxMap.OnInfoWindowLongClickListener onInfoWindowLongClickListener;
-    private MapboxMap.OnInfoWindowCloseListener onInfoWindowCloseListener;
+
+
     private MapboxMap.OnFlingListener onFlingListener;
     private MapboxMap.OnScrollListener onScrollListener;
     private MapboxMap.OnMyLocationTrackingModeChangeListener onMyLocationTrackingModeChangeListener;
@@ -94,19 +80,20 @@ public class MapboxMap {
     private MapboxMap.OnFpsChangedListener onFpsChangedListener;
     private MapboxMap.OnCameraChangeListener onCameraChangeListener;
 
+    private AnnotationManager annotationManager;
+    private InfoWindowManager infoWindowManager;
+
     private double maxZoomLevel = -1;
     private double minZoomLevel = -1;
 
-    MapboxMap(@NonNull MapView mapView) {
+    MapboxMap(@NonNull MapView mapView, IconManager iconManager) {
         this.mapView = mapView;
         this.mapView.addOnMapChangedListener(new MapChangeCameraPositionListener());
         uiSettings = new UiSettings(mapView);
         trackingSettings = new TrackingSettings(this.mapView, uiSettings);
         projection = new Projection(mapView);
-        annotations = new LongSparseArray<>();
-        selectedMarkers = new ArrayList<>();
-        infoWindows = new ArrayList<>();
-        markerViewManager = new MarkerViewManager(this, mapView);
+        infoWindowManager = new InfoWindowManager();
+        annotationManager = new AnnotationManager(mapView.getNativeMapView(), iconManager, infoWindowManager);
     }
 
     // Style
@@ -220,7 +207,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setMinZoom(
-      @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
+            @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
         if ((minZoom < MapboxConstants.MINIMUM_ZOOM) || (minZoom > MapboxConstants.MAXIMUM_ZOOM)) {
             Log.e(MapboxConstants.TAG, "Not setting minZoom, value is in unsupported range: " + minZoom);
             return;
@@ -257,7 +244,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setMaxZoom(
-      @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
+            @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
         if ((maxZoom < MapboxConstants.MINIMUM_ZOOM) || (maxZoom > MapboxConstants.MAXIMUM_ZOOM)) {
             Log.e(MapboxConstants.TAG, "Not setting maxZoom, value is in unsupported range: " + maxZoom);
             return;
@@ -600,7 +587,7 @@ public class MapboxMap {
      * Invalidates the current camera position by reconstructing it from mbgl
      */
     private void invalidateCameraPosition() {
-        if(invalidCameraPosition) {
+        if (invalidCameraPosition) {
             invalidCameraPosition = false;
 
             CameraPosition cameraPosition = mapView.invalidateCameraPosition();
@@ -801,7 +788,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public Marker addMarker(@NonNull MarkerOptions markerOptions) {
-        return addMarker((BaseMarkerOptions) markerOptions);
+        return annotationManager.addMarker(markerOptions, this);
     }
 
     /**
@@ -817,12 +804,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public Marker addMarker(@NonNull BaseMarkerOptions markerOptions) {
-        Marker marker = prepareMarker(markerOptions);
-        long id = mapView.addMarker(marker);
-        marker.setMapboxMap(this);
-        marker.setId(id);
-        annotations.put(id, marker);
-        return marker;
+        return annotationManager.addMarker(markerOptions, this);
     }
 
     /**
@@ -838,29 +820,19 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions) {
-        MarkerView marker = prepareViewMarker(markerOptions);
-        marker.setMapboxMap(this);
-        long id = mapView.addMarker(marker);
-        marker.setId(id);
-        annotations.put(id, marker);
-        markerViewManager.invalidateViewMarkersInVisibleRegion();
-        return marker;
+        return annotationManager.addMarker(markerOptions, this);
     }
 
     @UiThread
     @NonNull
     public List<MarkerView> addMarkerViews(@NonNull List<? extends BaseMarkerViewOptions> markerViewOptions) {
-        List<MarkerView> markers = new ArrayList<>();
-        for (BaseMarkerViewOptions markerViewOption : markerViewOptions) {
-            MarkerView marker = prepareViewMarker(markerViewOption);
-            marker.setMapboxMap(this);
-            long id = mapView.addMarker(marker);
-            marker.setId(id);
-            annotations.put(id, marker);
-            markers.add(marker);
-        }
-        markerViewManager.invalidateViewMarkersInVisibleRegion();
-        return markers;
+        return annotationManager.addMarkerViews(markerViewOptions, this);
+    }
+
+    @UiThread
+    @NonNull
+    public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rect) {
+        return annotationManager.getMarkerViewsInRect(rect);
     }
 
     /**
@@ -876,40 +848,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public List<Marker> addMarkers(@NonNull List<? extends BaseMarkerOptions> markerOptionsList) {
-        int count = markerOptionsList.size();
-        List<Marker> markers = new ArrayList<>(count);
-        if (count > 0) {
-            BaseMarkerOptions markerOptions;
-            Marker marker;
-            for (int i = 0; i < count; i++) {
-                markerOptions = markerOptionsList.get(i);
-                marker = prepareMarker(markerOptions);
-                markers.add(marker);
-            }
-
-            if (markers.size() > 0) {
-                long[] ids = mapView.addMarkers(markers);
-
-                // if unittests or markers are correctly added to map
-                if (ids == null || ids.length == markers.size()) {
-                    long id = 0;
-                    Marker m;
-                    for (int i = 0; i < markers.size(); i++) {
-                        m = markers.get(i);
-                        m.setMapboxMap(this);
-                        if (ids != null) {
-                            id = ids[i];
-                        } else {
-                            //unit test
-                            id++;
-                        }
-                        m.setId(id);
-                        annotations.put(id, m);
-                    }
-                }
-            }
-        }
-        return markers;
+        return annotationManager.addMarkers(markerOptionsList, this);
     }
 
     /**
@@ -921,42 +860,7 @@ public class MapboxMap {
      */
     @UiThread
     public void updateMarker(@NonNull Marker updatedMarker) {
-        mapView.updateMarker(updatedMarker);
-
-        int index = annotations.indexOfKey(updatedMarker.getId());
-        if (index > -1) {
-            annotations.setValueAt(index, updatedMarker);
-        }
-    }
-
-    /**
-     * Update a polygon on this map.
-     *
-     * @param polygon An updated polygon object.
-     */
-    @UiThread
-    public void updatePolygon(Polygon polygon) {
-        mapView.updatePolygon(polygon);
-
-        int index = annotations.indexOfKey(polygon.getId());
-        if (index > -1) {
-            annotations.setValueAt(index, polygon);
-        }
-    }
-
-    /**
-     * Update a polyline on this map.
-     *
-     * @param polyline An updated polyline object.
-     */
-    @UiThread
-    public void updatePolyline(Polyline polyline) {
-        mapView.updatePolyline(polyline);
-
-        int index = annotations.indexOfKey(polyline.getId());
-        if (index > -1) {
-            annotations.setValueAt(index, polyline);
-        }
+        annotationManager.updateMarker(updatedMarker, this);
     }
 
     /**
@@ -968,14 +872,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public Polyline addPolyline(@NonNull PolylineOptions polylineOptions) {
-        Polyline polyline = polylineOptions.getPolyline();
-        if (!polyline.getPoints().isEmpty()) {
-            long id = mapView.addPolyline(polyline);
-            polyline.setMapboxMap(this);
-            polyline.setId(id);
-            annotations.put(id, polyline);
-        }
-        return polyline;
+        return annotationManager.addPolyline(polylineOptions, this);
     }
 
     /**
@@ -987,40 +884,17 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList) {
-        int count = polylineOptionsList.size();
-        Polyline polyline;
-        List<Polyline> polylines = new ArrayList<>(count);
+        return annotationManager.addPolylines(polylineOptionsList, this);
+    }
 
-        if (count > 0) {
-            for (PolylineOptions options : polylineOptionsList) {
-                polyline = options.getPolyline();
-                if (!polyline.getPoints().isEmpty()) {
-                    polylines.add(polyline);
-                }
-            }
-
-            long[] ids = mapView.addPolylines(polylines);
-
-            // if unit tests or polylines are correctly added to map
-            if (ids == null || ids.length == polylines.size()) {
-                long id = 0;
-                Polyline p;
-
-                for (int i = 0; i < polylines.size(); i++) {
-                    p = polylines.get(i);
-                    p.setMapboxMap(this);
-                    if (ids != null) {
-                        id = ids[i];
-                    } else {
-                        // unit test
-                        id++;
-                    }
-                    p.setId(id);
-                    annotations.put(id, p);
-                }
-            }
-        }
-        return polylines;
+    /**
+     * Update a polyline on this map.
+     *
+     * @param polyline An updated polyline object.
+     */
+    @UiThread
+    public void updatePolyline(Polyline polyline) {
+        annotationManager.updatePolyline(polyline);
     }
 
     /**
@@ -1032,14 +906,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public Polygon addPolygon(@NonNull PolygonOptions polygonOptions) {
-        Polygon polygon = polygonOptions.getPolygon();
-        if (!polygon.getPoints().isEmpty()) {
-            long id = mapView.addPolygon(polygon);
-            polygon.setId(id);
-            polygon.setMapboxMap(this);
-            annotations.put(id, polygon);
-        }
-        return polygon;
+        return annotationManager.addPolygon(polygonOptions, this);
     }
 
     /**
@@ -1051,38 +918,18 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public List<Polygon> addPolygons(@NonNull List<PolygonOptions> polygonOptionsList) {
-        int count = polygonOptionsList.size();
+        return annotationManager.addPolygons(polygonOptionsList, this);
+    }
 
-        Polygon polygon;
-        List<Polygon> polygons = new ArrayList<>(count);
-        if (count > 0) {
-            for (PolygonOptions polygonOptions : polygonOptionsList) {
-                polygon = polygonOptions.getPolygon();
-                if (!polygon.getPoints().isEmpty()) {
-                    polygons.add(polygon);
-                }
-            }
 
-            long[] ids = mapView.addPolygons(polygons);
-
-            // if unit tests or polygons correctly added to map
-            if (ids == null || ids.length == polygons.size()) {
-                long id = 0;
-                for (int i = 0; i < polygons.size(); i++) {
-                    polygon = polygons.get(i);
-                    polygon.setMapboxMap(this);
-                    if (ids != null) {
-                        id = ids[i];
-                    } else {
-                        // unit test
-                        id++;
-                    }
-                    polygon.setId(id);
-                    annotations.put(id, polygon);
-                }
-            }
-        }
-        return polygons;
+    /**
+     * Update a polygon on this map.
+     *
+     * @param polygon An updated polygon object.
+     */
+    @UiThread
+    public void updatePolygon(Polygon polygon) {
+        annotationManager.updatePolygon(polygon);
     }
 
     /**
@@ -1095,7 +942,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removeMarker(@NonNull Marker marker) {
-        removeAnnotation(marker);
+        annotationManager.removeAnnotation(marker);
     }
 
     /**
@@ -1108,7 +955,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removePolyline(@NonNull Polyline polyline) {
-        removeAnnotation(polyline);
+        annotationManager.removeAnnotation(polyline);
     }
 
     /**
@@ -1121,7 +968,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removePolygon(@NonNull Polygon polygon) {
-        removeAnnotation(polygon);
+        annotationManager.removeAnnotation(polygon);
     }
 
     /**
@@ -1131,16 +978,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removeAnnotation(@NonNull Annotation annotation) {
-        if (annotation instanceof Marker) {
-            Marker marker = (Marker) annotation;
-            marker.hideInfoWindow();
-            if (marker instanceof MarkerView) {
-                markerViewManager.removeMarkerView((MarkerView) marker);
-            }
-        }
-        long id = annotation.getId();
-        mapView.removeAnnotation(id);
-        annotations.remove(id);
+        annotationManager.removeAnnotation(annotation);
     }
 
     /**
@@ -1150,8 +988,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removeAnnotation(long id) {
-        mapView.removeAnnotation(id);
-        annotations.remove(id);
+        annotationManager.removeAnnotation(id);
     }
 
     /**
@@ -1161,23 +998,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removeAnnotations(@NonNull List<? extends Annotation> annotationList) {
-        int count = annotationList.size();
-        long[] ids = new long[count];
-        for (int i = 0; i < count; i++) {
-            Annotation annotation = annotationList.get(i);
-            if (annotation instanceof Marker) {
-                Marker marker = (Marker) annotation;
-                marker.hideInfoWindow();
-                if (marker instanceof MarkerView) {
-                    markerViewManager.removeMarkerView((MarkerView) marker);
-                }
-            }
-            ids[i] = annotationList.get(i).getId();
-        }
-        mapView.removeAnnotations(ids);
-        for (long id : ids) {
-            annotations.remove(id);
-        }
+        annotationManager.removeAnnotations(annotationList);
     }
 
     /**
@@ -1185,22 +1006,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removeAnnotations() {
-        Annotation annotation;
-        int count = annotations.size();
-        long[] ids = new long[count];
-        for (int i = 0; i < count; i++) {
-            ids[i] = annotations.keyAt(i);
-            annotation = annotations.get(ids[i]);
-            if (annotation instanceof Marker) {
-                Marker marker = (Marker) annotation;
-                marker.hideInfoWindow();
-                if (marker instanceof MarkerView) {
-                    markerViewManager.removeMarkerView((MarkerView) marker);
-                }
-            }
-        }
-        mapView.removeAnnotations(ids);
-        annotations.clear();
+        annotationManager.removeAnnotations();
     }
 
     /**
@@ -1208,7 +1014,7 @@ public class MapboxMap {
      */
     @UiThread
     public void clear() {
-        removeAnnotations();
+        annotationManager.removeAnnotations();
     }
 
     /**
@@ -1219,7 +1025,7 @@ public class MapboxMap {
      */
     @Nullable
     public Annotation getAnnotation(long id) {
-        return annotations.get(id);
+        return annotationManager.getAnnotation(id);
     }
 
     /**
@@ -1230,11 +1036,7 @@ public class MapboxMap {
      */
     @NonNull
     public List<Annotation> getAnnotations() {
-        List<Annotation> annotations = new ArrayList<>();
-        for (int i = 0; i < this.annotations.size(); i++) {
-            annotations.add(this.annotations.get(this.annotations.keyAt(i)));
-        }
-        return annotations;
+        return annotationManager.getAnnotations();
     }
 
     /**
@@ -1245,15 +1047,7 @@ public class MapboxMap {
      */
     @NonNull
     public List<Marker> getMarkers() {
-        List<Marker> markers = new ArrayList<>();
-        Annotation annotation;
-        for (int i = 0; i < annotations.size(); i++) {
-            annotation = annotations.get(annotations.keyAt(i));
-            if (annotation instanceof Marker) {
-                markers.add((Marker) annotation);
-            }
-        }
-        return markers;
+        return annotationManager.getMarkers();
     }
 
     /**
@@ -1264,15 +1058,7 @@ public class MapboxMap {
      */
     @NonNull
     public List<Polygon> getPolygons() {
-        List<Polygon> polygons = new ArrayList<>();
-        Annotation annotation;
-        for (int i = 0; i < annotations.size(); i++) {
-            annotation = annotations.get(annotations.keyAt(i));
-            if (annotation instanceof Polygon) {
-                polygons.add((Polygon) annotation);
-            }
-        }
-        return polygons;
+        return annotationManager.getPolygons();
     }
 
     /**
@@ -1283,15 +1069,18 @@ public class MapboxMap {
      */
     @NonNull
     public List<Polyline> getPolylines() {
-        List<Polyline> polylines = new ArrayList<>();
-        Annotation annotation;
-        for (int i = 0; i < annotations.size(); i++) {
-            annotation = annotations.get(annotations.keyAt(i));
-            if (annotation instanceof Polyline) {
-                polylines.add((Polyline) annotation);
-            }
-        }
-        return polylines;
+        return annotationManager.getPolylines();
+    }
+
+    /**
+     * Sets a callback that's invoked when the user clicks on a marker.
+     *
+     * @param listener The callback that's invoked when the user clicks on a marker.
+     *                 To unset the callback, use null.
+     */
+    @UiThread
+    public void setOnMarkerClickListener(@Nullable OnMarkerClickListener listener) {
+        annotationManager.setOnMarkerClickListener(listener);
     }
 
     /**
@@ -1310,34 +1099,7 @@ public class MapboxMap {
             Log.w(MapboxConstants.TAG, "marker was null, so just returning");
             return;
         }
-
-        if (selectedMarkers.contains(marker)) {
-            return;
-        }
-
-        // Need to deselect any currently selected annotation first
-        if (!isAllowConcurrentMultipleOpenInfoWindows()) {
-            deselectMarkers();
-        }
-
-        boolean handledDefaultClick = false;
-        if (onMarkerClickListener != null) {
-            // end developer has provided a custom click listener
-            handledDefaultClick = onMarkerClickListener.onMarkerClick(marker);
-        }
-
-        if (!handledDefaultClick) {
-            if (marker instanceof MarkerView) {
-                markerViewManager.select((MarkerView) marker, false);
-                markerViewManager.ensureInfoWindowOffset((MarkerView) marker);
-            }
-
-            if (isInfoWindowValidForMarker(marker) || getInfoWindowAdapter() != null) {
-                infoWindows.add(marker.showInfoWindow(this, mapView));
-            }
-        }
-
-        selectedMarkers.add(marker);
+        annotationManager.selectMarker(marker, this);
     }
 
     /**
@@ -1345,22 +1107,7 @@ public class MapboxMap {
      */
     @UiThread
     public void deselectMarkers() {
-        if (selectedMarkers.isEmpty()) {
-            return;
-        }
-
-        for (Marker marker : selectedMarkers) {
-            if (marker.isInfoWindowShown()) {
-                marker.hideInfoWindow();
-            }
-
-            if (marker instanceof MarkerView) {
-                markerViewManager.deselect((MarkerView) marker, false);
-            }
-        }
-
-        // Removes all selected markers from the list
-        selectedMarkers.clear();
+        annotationManager.deselectMarkers();
     }
 
     /**
@@ -1370,19 +1117,7 @@ public class MapboxMap {
      */
     @UiThread
     public void deselectMarker(@NonNull Marker marker) {
-        if (!selectedMarkers.contains(marker)) {
-            return;
-        }
-
-        if (marker.isInfoWindowShown()) {
-            marker.hideInfoWindow();
-        }
-
-        if (marker instanceof MarkerView) {
-            markerViewManager.deselect((MarkerView) marker, false);
-        }
-
-        selectedMarkers.remove(marker);
+        annotationManager.deselectMarker(marker);
     }
 
     /**
@@ -1392,20 +1127,7 @@ public class MapboxMap {
      */
     @UiThread
     public List<Marker> getSelectedMarkers() {
-        return selectedMarkers;
-    }
-
-    private Marker prepareMarker(BaseMarkerOptions markerOptions) {
-        Marker marker = markerOptions.getMarker();
-        Icon icon = mapView.loadIconForMarker(marker);
-        marker.setTopOffsetPixels(mapView.getTopOffsetPixelsForIcon(icon));
-        return marker;
-    }
-
-    private MarkerView prepareViewMarker(BaseMarkerViewOptions markerViewOptions) {
-        MarkerView marker = markerViewOptions.getMarker();
-        mapView.loadIconForMarkerView(marker);
-        return marker;
+        return annotationManager.getSelectedMarkers();
     }
 
     /**
@@ -1414,7 +1136,7 @@ public class MapboxMap {
      * @return the associated MarkerViewManager
      */
     public MarkerViewManager getMarkerViewManager() {
-        return markerViewManager;
+        return annotationManager.getMarkerViewManager(this);
     }
 
     //
@@ -1433,7 +1155,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setInfoWindowAdapter(@Nullable InfoWindowAdapter infoWindowAdapter) {
-        this.infoWindowAdapter = infoWindowAdapter;
+        infoWindowManager.setInfoWindowAdapter(infoWindowAdapter);
     }
 
     /**
@@ -1444,7 +1166,7 @@ public class MapboxMap {
     @UiThread
     @Nullable
     public InfoWindowAdapter getInfoWindowAdapter() {
-        return infoWindowAdapter;
+        return infoWindowManager.getInfoWindowAdapter();
     }
 
     /**
@@ -1454,7 +1176,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setAllowConcurrentMultipleOpenInfoWindows(boolean allow) {
-        allowConcurrentMultipleInfoWindows = allow;
+        infoWindowManager.setAllowConcurrentMultipleOpenInfoWindows(allow);
     }
 
     /**
@@ -1464,16 +1186,16 @@ public class MapboxMap {
      */
     @UiThread
     public boolean isAllowConcurrentMultipleOpenInfoWindows() {
-        return allowConcurrentMultipleInfoWindows;
+        return infoWindowManager.isAllowConcurrentMultipleOpenInfoWindows();
     }
 
     // used by MapView
     List<InfoWindow> getInfoWindows() {
-        return infoWindows;
+        return infoWindowManager.getInfoWindows();
     }
 
-    private boolean isInfoWindowValidForMarker(@NonNull Marker marker) {
-        return !TextUtils.isEmpty(marker.getTitle()) || !TextUtils.isEmpty(marker.getSnippet());
+    AnnotationManager getAnnotationManager() {
+        return annotationManager;
     }
 
     //
@@ -1611,17 +1333,6 @@ public class MapboxMap {
     }
 
     /**
-     * Sets a callback that's invoked when the user clicks on a marker.
-     *
-     * @param listener The callback that's invoked when the user clicks on a marker.
-     *                 To unset the callback, use null.
-     */
-    @UiThread
-    public void setOnMarkerClickListener(@Nullable OnMarkerClickListener listener) {
-        onMarkerClickListener = listener;
-    }
-
-    /**
      * Sets a callback that's invoked when the user clicks on an info window.
      *
      * @param listener The callback that's invoked when the user clicks on an info window.
@@ -1629,7 +1340,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setOnInfoWindowClickListener(@Nullable OnInfoWindowClickListener listener) {
-        onInfoWindowClickListener = listener;
+        infoWindowManager.setOnInfoWindowClickListener(listener);
     }
 
     /**
@@ -1639,7 +1350,7 @@ public class MapboxMap {
      */
     @UiThread
     public OnInfoWindowClickListener getOnInfoWindowClickListener() {
-        return onInfoWindowClickListener;
+        return infoWindowManager.getOnInfoWindowClickListener();
     }
 
     /**
@@ -1650,7 +1361,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setOnInfoWindowLongClickListener(@Nullable OnInfoWindowLongClickListener listener) {
-        onInfoWindowLongClickListener = listener;
+        infoWindowManager.setOnInfoWindowLongClickListener(listener);
     }
 
     /**
@@ -1659,11 +1370,11 @@ public class MapboxMap {
      * @return Current active InfoWindow long Click Listener
      */
     public OnInfoWindowLongClickListener getOnInfoWindowLongClickListener() {
-        return onInfoWindowLongClickListener;
+        return infoWindowManager.getOnInfoWindowLongClickListener();
     }
 
     public void setOnInfoWindowCloseListener(@Nullable OnInfoWindowCloseListener listener) {
-        onInfoWindowCloseListener = listener;
+        infoWindowManager.setOnInfoWindowCloseListener(listener);
     }
 
     /**
@@ -1673,7 +1384,7 @@ public class MapboxMap {
      */
     @UiThread
     public OnInfoWindowCloseListener getOnInfoWindowCloseListener() {
-        return onInfoWindowCloseListener;
+        return infoWindowManager.getOnInfoWindowCloseListener();
     }
 
     //

@@ -35,7 +35,6 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.InputDevice;
@@ -61,20 +60,15 @@ import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
-import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
-import com.mapbox.mapboxsdk.annotations.Polygon;
-import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
-import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
@@ -87,7 +81,6 @@ import com.mapbox.mapboxsdk.utils.ColorUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -112,12 +105,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MapView extends FrameLayout {
 
     private MapboxMap mapboxMap;
+    private IconManager iconManager;
+    private AnnotationManager annotationManager;
+
     private boolean initialLoad;
     private boolean destroyed;
-
-    private List<Icon> icons;
-    private int averageIconHeight;
-    private int averageIconWidth;
 
     private NativeMapView nativeMapView;
     private boolean hasSurface = false;
@@ -197,10 +189,7 @@ public class MapView extends FrameLayout {
         initialLoad = true;
         onMapReadyCallbackList = new ArrayList<>();
         onMapChangedListener = new CopyOnWriteArrayList<>();
-        mapboxMap = new MapboxMap(this);
-        projection = mapboxMap.getProjection();
 
-        icons = new ArrayList<>();
         View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
         setWillNotDraw(false);
 
@@ -215,9 +204,10 @@ public class MapView extends FrameLayout {
         }
 
         nativeMapView = new NativeMapView(this);
-
-        // load transparent icon for MarkerView to trace actual markers, see #6352
-        loadIcon(IconFactory.recreate(IconFactory.ICON_MARKERVIEW_ID, IconFactory.ICON_MARKERVIEW_BITMAP));
+        iconManager = new IconManager(nativeMapView);
+        mapboxMap = new MapboxMap(this, iconManager);
+        annotationManager = mapboxMap.getAnnotationManager();
+        projection = mapboxMap.getProjection();
 
         // Ensure this view is interactable
         setClickable(true);
@@ -474,9 +464,9 @@ public class MapView extends FrameLayout {
             public void onMapChanged(@MapChange int change) {
                 if (change == DID_FINISH_LOADING_STYLE && initialLoad) {
                     initialLoad = false;
-                    reloadIcons();
-                    reloadMarkers();
-                    adjustTopOffsetPixels();
+                    iconManager.reloadIcons();
+                    annotationManager.reloadMarkers();
+                    annotationManager.adjustTopOffsetPixels(mapboxMap);
 
                     // Notify listeners the map is ready
                     if (onMapReadyCallbackList.size() > 0) {
@@ -649,7 +639,7 @@ public class MapView extends FrameLayout {
         nativeMapView.destroy();
         nativeMapView = null;
     }
-    
+
     void setFocalPoint(PointF focalPoint) {
         if (focalPoint == null) {
             // resetting focal point,
@@ -775,14 +765,6 @@ public class MapView extends FrameLayout {
         return contentPaddingBottom;
     }
 
-    int getContentWidth() {
-        return getWidth() - contentPaddingLeft - contentPaddingRight;
-    }
-
-    int getContentHeight() {
-        return getHeight() - contentPaddingBottom - contentPaddingTop;
-    }
-
     //
     // Zoom
     //
@@ -846,10 +828,7 @@ public class MapView extends FrameLayout {
     //
 
     boolean isDebugActive() {
-        if (destroyed) {
-            return false;
-        }
-        return nativeMapView.getDebug();
+        return !destroyed && nativeMapView.getDebug();
     }
 
     void setDebugActive(boolean debugActive) {
@@ -1034,297 +1013,11 @@ public class MapView extends FrameLayout {
         return nativeMapView.pixelForLatLng(location);
     }
 
-    //
-    // Annotations
-    //
-
-    Icon loadIconForMarker(Marker marker) {
-        Icon icon = marker.getIcon();
-
-        // calculating average before adding
-        int iconSize = icons.size() + 1;
-
-        // TODO replace former if case with anchor implementation,
-        // current workaround for having extra pixels is diving height by 2
-        if (icon == null) {
-            icon = IconFactory.getInstance(getContext()).defaultMarker();
-            Bitmap bitmap = icon.getBitmap();
-            averageIconHeight = averageIconHeight + (bitmap.getHeight() / 2 - averageIconHeight) / iconSize;
-            averageIconWidth = averageIconWidth + (bitmap.getWidth() - averageIconWidth) / iconSize;
-            marker.setIcon(icon);
-        } else {
-            Bitmap bitmap = icon.getBitmap();
-            averageIconHeight = averageIconHeight + (bitmap.getHeight() - averageIconHeight) / iconSize;
-            averageIconWidth = averageIconWidth + (bitmap.getWidth() - averageIconWidth) / iconSize;
-        }
-
-        if (!icons.contains(icon)) {
-            icons.add(icon);
-            loadIcon(icon);
-        } else {
-            Icon oldIcon = icons.get(icons.indexOf(icon));
-            if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
-                throw new IconBitmapChangedException();
-            }
-        }
-        return icon;
-    }
-
-    Icon loadIconForMarkerView(MarkerView marker) {
-        Icon icon = marker.getIcon();
-        int iconSize = icons.size() + 1;
-        if (icon == null) {
-            icon = IconFactory.getInstance(getContext()).defaultMarkerView();
-            marker.setIcon(icon);
-        }
-        Bitmap bitmap = icon.getBitmap();
-        averageIconHeight = averageIconHeight + (bitmap.getHeight() - averageIconHeight) / iconSize;
-        averageIconWidth = averageIconWidth + (bitmap.getWidth() - averageIconWidth) / iconSize;
-        if (!icons.contains(icon)) {
-            icons.add(icon);
-        } else {
-            Icon oldIcon = icons.get(icons.indexOf(icon));
-            if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
-                throw new IconBitmapChangedException();
-            }
-        }
-        return icon;
-    }
-
-    void loadIcon(Icon icon) {
-        if (destroyed) {
-            return;
-        }
-        Bitmap bitmap = icon.getBitmap();
-        String id = icon.getId();
-        if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
-            bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
-        }
-        ByteBuffer buffer = ByteBuffer.allocate(bitmap.getRowBytes() * bitmap.getHeight());
-        bitmap.copyPixelsToBuffer(buffer);
-
-        float density = bitmap.getDensity();
-        if (density == Bitmap.DENSITY_NONE) {
-            density = DisplayMetrics.DENSITY_DEFAULT;
-        }
-        float scale = density / DisplayMetrics.DENSITY_DEFAULT;
-        nativeMapView.addAnnotationIcon(
-                id,
-                bitmap.getWidth(),
-                bitmap.getHeight(),
-                scale, buffer.array());
-    }
-
-    void reloadIcons() {
-        int count = icons.size();
-        for (int i = 0; i < count; i++) {
-            Icon icon = icons.get(i);
-            loadIcon(icon);
-        }
-    }
-
-    void updateMarker(@NonNull Marker updatedMarker) {
-        if (destroyed) {
-            return;
-        }
-        if (updatedMarker == null) {
-            Log.w(MapboxConstants.TAG, "marker was null, doing nothing");
-            return;
-        }
-
-        if (updatedMarker.getId() == -1) {
-            Log.w(MapboxConstants.TAG, "marker has an id of -1, possibly was not added yet, doing nothing");
-            return;
-        }
-
-        if (!(updatedMarker instanceof MarkerView)) {
-            ensureIconLoaded(updatedMarker);
-        }
-
-        nativeMapView.updateMarker(updatedMarker);
-    }
-
-
-    void updatePolygon(Polygon polygon) {
-        if (destroyed) {
-            return;
-        }
-
-        if (polygon == null) {
-            Log.w(MapboxConstants.TAG, "polygon was null, doing nothing");
-            return;
-        }
-
-        if (polygon.getId() == -1) {
-            Log.w(MapboxConstants.TAG, "polygon has an id of -1, indicating the polygon was not added to the map yet.");
-            return;
-        }
-
-        nativeMapView.updatePolygon(polygon);
-    }
-
-    void updatePolyline(Polyline polyline) {
-        if (destroyed) {
-            return;
-        }
-
-        if (polyline == null) {
-            Log.w(MapboxConstants.TAG, "polygon was null, doing nothing");
-            return;
-        }
-
-        if (polyline.getId() == -1) {
-            Log.w(MapboxConstants.TAG, "polygon has an id of -1, indicating the polygon was not added to the map yet.");
-            return;
-        }
-
-        nativeMapView.updatePolyline(polyline);
-    }
-
-    private void ensureIconLoaded(Marker marker) {
-        Icon icon = marker.getIcon();
-        if (icon == null) {
-            icon = IconFactory.getInstance(getContext()).defaultMarker();
-            marker.setIcon(icon);
-        }
-        if (!icons.contains(icon)) {
-            icons.add(icon);
-            loadIcon(icon);
-        } else {
-            Icon oldIcon = icons.get(icons.indexOf(icon));
-            if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
-                throw new IconBitmapChangedException();
-            }
-        }
-
-        // this seems to be a costly operation according to the profiler so I'm trying to save some calls
-        Marker previousMarker = marker.getId() != -1 ? (Marker) mapboxMap.getAnnotation(marker.getId()) : null;
-        if (previousMarker == null || previousMarker.getIcon() == null || previousMarker.getIcon() != marker.getIcon()) {
-            marker.setTopOffsetPixels(getTopOffsetPixelsForIcon(icon));
-        }
-    }
-
-    long addMarker(@NonNull Marker marker) {
-        if (destroyed) {
-            return 0L;
-        }
-        return nativeMapView.addMarker(marker);
-    }
-
-    long[] addMarkers(@NonNull List<Marker> markerList) {
-        if (destroyed) {
-            return new long[]{};
-        }
-        return nativeMapView.addMarkers(markerList);
-    }
-
-    long addPolyline(@NonNull Polyline polyline) {
-        if (destroyed) {
-            return 0L;
-        }
-        return nativeMapView.addPolyline(polyline);
-    }
-
-    long[] addPolylines(@NonNull List<Polyline> polylines) {
-        if (destroyed) {
-            return new long[]{};
-        }
-        return nativeMapView.addPolylines(polylines);
-    }
-
-    long addPolygon(@NonNull Polygon polygon) {
-        if (destroyed) {
-            return 0L;
-        }
-        return nativeMapView.addPolygon(polygon);
-    }
-
-    long[] addPolygons(@NonNull List<Polygon> polygons) {
-        if (destroyed) {
-            return new long[]{};
-        }
-        return nativeMapView.addPolygons(polygons);
-    }
-
-    void removeAnnotation(long id) {
-        if (destroyed) {
-            return;
-        }
-        nativeMapView.removeAnnotation(id);
-    }
-
-    void removeAnnotations(@NonNull long[] ids) {
-        if (destroyed) {
-            return;
-        }
-        nativeMapView.removeAnnotations(ids);
-    }
-
-    List<Marker> getMarkersInRect(@NonNull RectF rect) {
-        if (destroyed || rect == null) {
-            return new ArrayList<>();
-        }
-
-        long[] ids = nativeMapView.queryPointAnnotations(rect);
-
-        List<Long> idsList = new ArrayList<>(ids.length);
-        for (int i = 0; i < ids.length; i++) {
-            idsList.add(ids[i]);
-        }
-
-        List<Marker> annotations = new ArrayList<>(ids.length);
-        List<Annotation> annotationList = mapboxMap.getAnnotations();
-        int count = annotationList.size();
-        for (int i = 0; i < count; i++) {
-            Annotation annotation = annotationList.get(i);
-            if (annotation instanceof Marker && idsList.contains(annotation.getId())) {
-                annotations.add((Marker) annotation);
-            }
-        }
-
-        return new ArrayList<>(annotations);
-    }
-
-    public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rect) {
-        if (destroyed || rect == null) {
-            return new ArrayList<>();
-        }
-
-        long[] ids = nativeMapView.queryPointAnnotations(rect);
-
-        List<Long> idsList = new ArrayList<>(ids.length);
-        for (int i = 0; i < ids.length; i++) {
-            idsList.add(ids[i]);
-        }
-
-        List<MarkerView> annotations = new ArrayList<>(ids.length);
-        List<Annotation> annotationList = mapboxMap.getAnnotations();
-        int count = annotationList.size();
-        for (int i = 0; i < count; i++) {
-            Annotation annotation = annotationList.get(i);
-            if (annotation instanceof MarkerView) {
-                annotations.add((MarkerView) annotation);
-            }
-        }
-
-        return new ArrayList<>(annotations);
-    }
-
     /**
      * @return the ViewGroup containing the marker views
      */
     public ViewGroup getMarkerViewContainer() {
         return markerViewContainer;
-    }
-
-
-    int getTopOffsetPixelsForIcon(Icon icon) {
-        if (destroyed) {
-            return 0;
-        }
-
-        return (int) (nativeMapView.getTopOffsetPixelsForAnnotationSymbol(icon.getId())
-                * screenDensity);
     }
 
     void setContentPadding(int left, int top, int right, int bottom) {
@@ -1426,43 +1119,6 @@ public class MapView extends FrameLayout {
         }
 
         nativeMapView.flyTo(bearing, center, duration, pitch, zoom);
-    }
-
-    private void adjustTopOffsetPixels() {
-        List<Annotation> annotations = mapboxMap.getAnnotations();
-        int count = annotations.size();
-        for (int i = 0; i < count; i++) {
-            Annotation annotation = annotations.get(i);
-            if (annotation instanceof Marker) {
-                Marker marker = (Marker) annotation;
-                marker.setTopOffsetPixels(
-                        getTopOffsetPixelsForIcon(marker.getIcon()));
-            }
-        }
-
-        for (Marker marker : mapboxMap.getSelectedMarkers()) {
-            if (marker.isInfoWindowShown()) {
-                marker.hideInfoWindow();
-                marker.showInfoWindow(mapboxMap, this);
-            }
-        }
-    }
-
-    private void reloadMarkers() {
-        if (destroyed) {
-            return;
-        }
-        List<Annotation> annotations = mapboxMap.getAnnotations();
-        int count = annotations.size();
-        for (int i = 0; i < count; i++) {
-            Annotation annotation = annotations.get(i);
-            if (annotation instanceof Marker) {
-                Marker marker = (Marker) annotation;
-                nativeMapView.removeAnnotation(annotation.getId());
-                long newId = nativeMapView.addMarker(marker);
-                marker.setId(newId);
-            }
-        }
     }
 
     //
@@ -1700,7 +1356,7 @@ public class MapView extends FrameLayout {
      * @param xCoordinate Original x screen coordinate at start of gesture
      * @param yCoordinate Original y screen cooridnate at start of gesture
      */
-    private void trackGestureEvent(@NonNull String gestureId, @NonNull float xCoordinate, @NonNull float yCoordinate) {
+    private void trackGestureEvent(@NonNull String gestureId, float xCoordinate, float yCoordinate) {
         LatLng tapLatLng = projection.fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
         // NaN and Infinite checks to prevent JSON errors at send to server time
@@ -1732,7 +1388,7 @@ public class MapView extends FrameLayout {
      * @param xCoordinate Original x screen coordinate at end of drag
      * @param yCoordinate Orginal y screen coordinate at end of drag
      */
-    private void trackGestureDragEndEvent(@NonNull float xCoordinate, @NonNull float yCoordinate) {
+    private void trackGestureDragEndEvent(float xCoordinate, float yCoordinate) {
         LatLng tapLatLng = projection.fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
         // NaN and Infinite checks to prevent JSON errors at send to server time
@@ -1900,12 +1556,12 @@ public class MapView extends FrameLayout {
             float toleranceSides = 4 * screenDensity;
             float toleranceTopBottom = 10 * screenDensity;
 
-            RectF tapRect = new RectF((tapPoint.x - averageIconWidth / 2 - toleranceSides) / screenDensity,
-                    (tapPoint.y - averageIconHeight / 2 - toleranceTopBottom) / screenDensity,
-                    (tapPoint.x + averageIconWidth / 2 + toleranceSides) / screenDensity,
-                    (tapPoint.y + averageIconHeight / 2 + toleranceTopBottom) / screenDensity);
+            RectF tapRect = new RectF((tapPoint.x - iconManager.getAverageIconWidth() / 2 - toleranceSides) / screenDensity,
+                    (tapPoint.y - iconManager.getAverageIconHeight() / 2 - toleranceTopBottom) / screenDensity,
+                    (tapPoint.x + iconManager.getAverageIconWidth() / 2 + toleranceSides) / screenDensity,
+                    (tapPoint.y + iconManager.getAverageIconHeight() / 2 + toleranceTopBottom) / screenDensity);
 
-            List<Marker> nearbyMarkers = getMarkersInRect(tapRect);
+            List<Marker> nearbyMarkers = annotationManager.getMarkersInRect(tapRect);
             long newSelectedMarkerId = -1;
 
             if (nearbyMarkers != null && nearbyMarkers.size() > 0) {
@@ -2487,7 +2143,7 @@ public class MapView extends FrameLayout {
         // Track if we have been cancelled
         private boolean cancelled;
 
-        public TrackballLongPressTimeOut() {
+        TrackballLongPressTimeOut() {
             cancelled = false;
         }
 
@@ -2713,13 +2369,6 @@ public class MapView extends FrameLayout {
                 ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    /**
-     * Reset the tracking modes as necessary. Location tracking is reset if the map center is changed,
-     * bearing tracking if there is a rotation.
-     *
-     * @param translate
-     * @param rotate
-     */
     void resetTrackingModesIfRequired(boolean translate, boolean rotate) {
         TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
 
@@ -2881,7 +2530,7 @@ public class MapView extends FrameLayout {
         private Bitmap bitmap;
         private MapboxMap.SnapshotReadyCallback callback;
 
-        public SnapshotRequest(Bitmap bitmap, MapboxMap.SnapshotReadyCallback callback) {
+        SnapshotRequest(Bitmap bitmap, MapboxMap.SnapshotReadyCallback callback) {
             this.bitmap = bitmap;
             this.callback = callback;
         }
@@ -2921,7 +2570,7 @@ public class MapView extends FrameLayout {
         private static final int ATTRIBUTION_INDEX_TELEMETRY_SETTINGS = 3;
         private MapView mapView;
 
-        public AttributionOnClickListener(MapView mapView) {
+        AttributionOnClickListener(MapView mapView) {
             super();
             this.mapView = mapView;
         }
@@ -2929,14 +2578,11 @@ public class MapView extends FrameLayout {
         // Called when someone presses the attribution icon
         @Override
         public void onClick(View view) {
-
             AlertDialog.Builder builder = new AlertDialog.Builder(mapView.getContext(), R.style.mapbox_AlertDialogStyle);
             builder.setTitle(R.string.mapbox_attributionsDialogTitle);
             String[] items = mapView.getContext().getResources().getStringArray(R.array.mapbox_attribution_names);
             builder.setAdapter(new ArrayAdapter<>(mapView.getContext(), R.layout.mapbox_attribution_list_item, items), this);
-            AlertDialog attributionDialog = builder.show();
-
-            // TODO Change listview text color to mapView.getAttributionTintColor()
+            builder.show();
         }
 
         // Called when someone selects an attribution, 'Improve this map' adds location data to the url
@@ -2993,7 +2639,7 @@ public class MapView extends FrameLayout {
 
         private MapboxMap mapboxMap;
 
-        public ZoomInvalidator(MapboxMap mapboxMap) {
+        ZoomInvalidator(MapboxMap mapboxMap) {
             this.mapboxMap = mapboxMap;
         }
 
