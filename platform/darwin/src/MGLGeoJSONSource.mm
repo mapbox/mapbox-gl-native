@@ -12,7 +12,6 @@
 
 @interface MGLGeoJSONSource ()
 
-@property (nonatomic, readwrite) NSDictionary *options;
 @property (nonatomic) mbgl::style::GeoJSONSource *rawSource;
 
 @end
@@ -24,10 +23,9 @@
 
 - (instancetype)initWithIdentifier:(NSString *)identifier geoJSONData:(NSData *)data options:(NS_DICTIONARY_OF(NSString *, id) *)options
 {
-    if (self = [super initWithIdentifier:identifier])
+    if (self = [super initWithIdentifier:identifier options:options])
     {
         _geoJSONData = data;
-        _options = options;
         [self commonInit];
     }
     return self;
@@ -35,19 +33,17 @@
 
 - (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url options:(NS_DICTIONARY_OF(NSString *, id) *)options
 {
-    if (self = [super initWithIdentifier:identifier])
+    if (self = [super initWithIdentifier:identifier options:options])
     {
         _URL = url;
-        _options = options;
         [self commonInit];
     }
     return self;
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier features:(NSArray<id<MGLFeature>> *)features options:(NS_DICTIONARY_OF(NSString *,id) *)options {
-    if (self = [super initWithIdentifier:identifier]) {
+    if (self = [super initWithIdentifier:identifier options:options]) {
         _features = features;
-        _options = options;
         [self commonInit];
     }
     
