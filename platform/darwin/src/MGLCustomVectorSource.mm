@@ -25,19 +25,24 @@
     if (self = [super initWithIdentifier:identifier])
     {
         _dataSource = dataSource;
-    
+        
+        _requestQueue = [[NSOperationQueue alloc] init];
+        self.requestQueue.name = [NSString stringWithFormat:@"mgl.CustomVectorSource.%@", identifier];
         auto source = std::make_unique<mbgl::style::CustomVectorSource>(self.identifier.UTF8String, self.geoJSONOptions,
-                                                                         ^void(uint8_t z, uint32_t x, uint32_t y)
-                                                                         {
-                                                                             [self.dataSource getTileForZoom:z
-                                                                                                           x:x
-                                                                                                           y:y
-                                                                                                    callback:
-                                                                              ^(NS_ARRAY_OF(id <MGLFeature>) *features)
-                                                                              {
-                                                                                  [self processData:features forTile:z x:x y:y];
-                                                                              }];
-                                                                         });
+                                                                        ^void(uint8_t z, uint32_t x, uint32_t y)
+                                                                        {
+                                                                            [self.requestQueue addOperationWithBlock:
+                                                                             ^{
+                                                                                 [self.dataSource getTileForZoom:z
+                                                                                                               x:x
+                                                                                                               y:y
+                                                                                                        callback:
+                                                                                  ^(NS_ARRAY_OF(id <MGLFeature>) *features)
+                                                                                  {
+                                                                                      [self processData:features forTile:z x:x y:y];
+                                                                                  }];
+                                                                             }];
+                                                                        });
         
         _pendingSource = std::move(source);
         self.rawSource = _pendingSource.get();
@@ -60,7 +65,9 @@
         featureCollection.push_back([feature mbglFeature]);
     }
     const auto geojson = mbgl::GeoJSON{featureCollection};
-    self.rawSource->setTileData(z, x, y, geojson);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.rawSource->setTileData(z, x, y, geojson);
+    });
 }
 
 

@@ -45,6 +45,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, copy) NSObject<MGLCustomVectorSourceDataSource> *dataSource;
 
+/**
+ A queue that calls to the datasource will be made on.
+ */
+@property (nonatomic, readonly) NSOperationQueue *requestQueue;
 
 @end
 
