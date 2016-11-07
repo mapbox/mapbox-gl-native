@@ -928,7 +928,11 @@ IB_DESIGNABLE
 
 #pragma mark Runtime styling API
 
-- (MGLStyle *)style;
+/**
+ Returns an `MGLStyle` instance that lets you manipulate layers and sources
+ in real-time.
+ */
+@property (nonatomic, readonly) MGLStyle *style;
 
 @end
 

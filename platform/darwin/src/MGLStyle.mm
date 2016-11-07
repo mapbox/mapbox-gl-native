@@ -104,6 +104,14 @@ static NSURL *MGLStyleURL_emerald;
     return [NSURL URLWithString:@(self.mapView.mbglMap->getStyleURL().c_str())];
 }
 
+- (instancetype)initWithMapView:(MGLMapView *)mapView
+{
+    if (self = [super init]) {
+        _mapView = mapView;
+    }
+    return self;
+}
+
 - (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier
 {
     auto mbglLayer = self.mapView.mbglMap->getLayer(identifier.UTF8String);

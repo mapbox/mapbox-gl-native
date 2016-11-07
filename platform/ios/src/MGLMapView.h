@@ -1077,9 +1077,13 @@ IB_DESIGNABLE
  */
 - (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
 
-#pragma mark - Runtime styling API
+#pragma mark Runtime styling API
 
-- (MGLStyle *)style;
+/**
+ Returns an `MGLStyle` instance that lets you manipulate layers and sources
+ in real-time.
+ */
+@property (nonatomic, readonly) MGLStyle *style;
 
 #pragma mark Accessing the Underlying Map Data
 
