@@ -33,10 +33,10 @@
                                                                         {
                                                                             [self.requestQueue addOperationWithBlock:
                                                                              ^{
-                                                                                 [self.dataSource getTileForZoom:z
-                                                                                                               x:x
-                                                                                                               y:y
-                                                                                                        callback:
+                                                                                 [self.dataSource getTileForZoomLevel:z
+                                                                                                                    x:x
+                                                                                                                    y:y
+                                                                                                    completionHandler:
                                                                                   ^(NS_ARRAY_OF(id <MGLFeature>) *features)
                                                                                   {
                                                                                       [self processData:features forTile:z x:x y:y];
@@ -46,7 +46,7 @@
         
         _pendingSource = std::move(source);
         self.rawSource = _pendingSource.get();
-
+        
     }
     return self;
 }
@@ -70,7 +70,7 @@
     });
 }
 
-- (void)updateTile:(NSInteger)z x:(NSInteger)x y:(NSInteger)y
+- (void)setNeedsUpdateAtZoomLevel:(NSUInteger)z x:(NSUInteger)x y:(NSUInteger)y
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self.rawSource->updateTile((uint8_t)z, (uint32_t)x, (uint32_t)y);

@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param x
  @param callback A block to call with the data that has been fetched for the tile.
  */
-- (void)getTileForZoom:(NSInteger)zoom x:(NSInteger)x y:(NSInteger)y callback:( void (^)(NSArray<id <MGLFeature>>*) )callback;
+- (void)getTileForZoomLevel:(NSUInteger)zoomLevel x:(NSUInteger)x y:(NSUInteger)y completionHandler:( void (^)(NSArray<id <MGLFeature>>*) )completionHandler;
 
 @end
 
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Request that the source reloads a tile. Tile will only be reloaded if it is currently on screen.
  */
-- (void)updateTile:(NSInteger)z x:(NSInteger)x y:(NSInteger)y;
+- (void)setNeedsUpdateAtZoomLevel:(NSUInteger)z x:(NSUInteger)x y:(NSUInteger)y;
 
 /**
  An object that implements the `MGLCustomVectorSourceDataSource` protocol that will be queried for tile data.
