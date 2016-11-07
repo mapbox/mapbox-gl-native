@@ -16,12 +16,12 @@ addons_shortcuts:
   addons_qt4: &qt4
     apt:
       sources:  [ 'ubuntu-toolchain-r-test', 'george-edison55-precise-backports' ]
-      packages: [ 'g++-5', 'gcc-5', 'libjemalloc-dev', 'cmake', 'cmake-data',
+      packages: [ 'g++-5', 'gcc-5', 'libllvm3.8v4', 'libjemalloc-dev', 'cmake', 'cmake-data',
                   'mesa-utils', 'qt4-default' ]
   addons_qt5: &qt5
     apt:
       sources:  [ 'ubuntu-toolchain-r-test', 'george-edison55-precise-backports' ]
-      packages: [ 'g++-5', 'gcc-5', 'cmake', 'cmake-data',
+      packages: [ 'g++-5', 'gcc-5', 'libllvm3.8v4', 'cmake', 'cmake-data',
                   'mesa-utils', 'libc6-dbg', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev', 'qtpositioning5-dev', 'qtlocation5-dev' ]
 
 env:

@@ -46,10 +46,14 @@ if [ -f /etc/init.d/xvfb ] && [ ! -z "${RUN_XVFB}" ]; then
     # Make sure we're connecting to xvfb
     export DISPLAY=:99.0
 
+    CXX11ABI=""
+    if [ `scripts/check-cxx11abi.sh` = 'ON' ]; then
+        CXX11ABI="-cxx11abi"
+    fi
     # Install and set up to load a more recent version of mesa
     mapbox_time "install_mesa" \
-    mason install mesa 11.2.2
-    export LD_LIBRARY_PATH="`mason prefix mesa 11.2.2`/lib:${LD_LIBRARY_PATH:-}"
+    mason install mesa 13.0.0-glx${CXX11ABI}
+    export LD_LIBRARY_PATH="`mason prefix mesa 13.0.0-glx${CXX11ABI}`/lib:${LD_LIBRARY_PATH:-}"
 fi
 
 # Install and set up to load awscli

@@ -292,6 +292,7 @@ $(LINUX_BUILD): $(BUILD_DEPS)
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
 		-DWITH_COVERAGE=${WITH_COVERAGE} \
+		-DIS_CI_BUILD=${CI} \
 		-DWITH_OSMESA=${WITH_OSMESA})
 
 .PHONY: linux
@@ -387,7 +388,8 @@ $(QT_BUILD): $(BUILD_DEPS)
 		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
 		-DWITH_QT_4=${WITH_QT_4} \
 		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
-		-DWITH_COVERAGE=${WITH_COVERAGE})
+		-DWITH_COVERAGE=${WITH_COVERAGE} \
+		-DIS_CI_BUILD=${CI})
 
 ifeq ($(HOST_PLATFORM), macos)
 
@@ -401,7 +403,8 @@ $(MACOS_QT_PROJ_PATH): $(BUILD_DEPS)
 		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
 		-DWITH_QT_4=${WITH_QT_4} \
 		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
-		-DWITH_COVERAGE=${WITH_COVERAGE})
+		-DWITH_COVERAGE=${WITH_COVERAGE} \
+		-DIS_CI_BUILD=${CI})
 
 	@# Create Xcode schemes so that we can use xcodebuild from the command line. CMake doesn't
 	@# create these automatically.
