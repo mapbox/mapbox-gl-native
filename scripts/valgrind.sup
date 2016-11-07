@@ -180,3 +180,89 @@
    fun:draw_wide_line
    ...
 }
+{
+   Ubuntu 14.04 - Travis + Qt5
+   Memcheck:Leak
+   ...
+   obj:*/libQt5Core.*
+   ...
+}
+{
+   Ubuntu 14.04 - Travis + Qt5
+   Memcheck:Cond
+   ...
+   obj:*/libQt5Core.*
+   ...
+}
+{
+   Ubuntu 14.04 - Travis + Qt5
+   Memcheck:Value8
+   ...
+   obj:*/libQt5Core.*
+   ...
+}
+{
+   Ubuntu 14.04 - Travis + Qt5
+   Memcheck:Leak
+   ...
+   obj:*/libQt5Gui.*
+   ...
+}
+{
+   Ubuntu 14.04 - Travis + Qt5
+   Memcheck:Cond
+   ...
+   obj:*/libQt5Gui.*
+   ...
+}
+{
+   Ubuntu 14.04 - Travis + Qt5
+   Memcheck:Value8
+   ...
+   obj:*/libQt5Gui.*
+   ...
+}
+{
+   Ubuntu 14.04 - Travis + mesa 13.0.0-glx
+   Memcheck:Cond
+   ...
+   obj:*/mesa/libGL.so.*
+   ...
+}
+{
+   Ubuntu 14.04 - Travis + mesa 13.0.0-glx
+   Memcheck:Value8
+   ...
+   obj:*/mesa/libGL.so.*
+   ...
+}
+{
+   Ubuntu 14.04 - Travis + mesa 13.0.0-glx
+   Memcheck:Cond
+   ...
+   fun:do_rasterize_bin
+   ...
+}
+{
+   Ubuntu 14.04 - Travis + mesa 13.0.0-glx
+   Memcheck:Value8
+   ...
+   fun:do_rasterize_bin
+   ...
+}
+{
+   Ubuntu 14.04 - Travis + mesa 13.0.0-glx
+   Memcheck:Cond
+   ...
+   fun:_ZN6mapbox10pixelmatchEPKhS1_mmPhdb
+   ...
+}
+{
+   Ubuntu 14.04 - Travis + mesa 13.0.0-glx
+   Memcheck:Param
+   write(buf)
+   ...
+   obj:*/libc-*
+   fun:_ZN4mbgl4util10write_fileERKSsS2_
+   ...
+}
