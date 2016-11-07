@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/gl/types.hpp>
+#include <mbgl/util/ignore.hpp>
 
 #include <cstddef>
 #include <functional>
@@ -157,17 +158,14 @@ private:
     template <std::size_t... Is>
     static std::function<void (std::size_t)> binder(const State& state, std::index_sequence<Is...>) {
         return [&state] (std::size_t vertexOffset) {
-            noop((bindAttribute(std::get<Is>(state).location,
-                                std::get<Is>(state).count,
-                                std::get<Is>(state).type,
-                                sizeof(Vertex),
-                                vertexOffset,
-                                Vertex::attributeOffsets[Is]), 0)...);
+            ignore((bindAttribute(std::get<Is>(state).location,
+                                  std::get<Is>(state).count,
+                                  std::get<Is>(state).type,
+                                  sizeof(Vertex),
+                                  vertexOffset,
+                                  Vertex::attributeOffsets[Is]), 0)...);
         };
     }
-
-    // This exists only to provide a varags context for unpacking the assignments in `binder`.
-    template <int...> static void noop(int...) {}
 };
 
 } // namespace gl

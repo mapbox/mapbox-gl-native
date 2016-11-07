@@ -8,19 +8,19 @@ namespace gl {
 class Segment {
 public:
     Segment(std::size_t vertexOffset_,
-            std::size_t primitiveOffset_,
+            std::size_t indexOffset_,
             std::size_t vertexLength_ = 0,
-            std::size_t primitiveLength_ = 0)
+            std::size_t indexLength_ = 0)
         : vertexOffset(vertexOffset_),
-          primitiveOffset(primitiveOffset_),
+          indexOffset(indexOffset_),
           vertexLength(vertexLength_),
-          primitiveLength(primitiveLength_) {}
+          indexLength(indexLength_) {}
 
     const std::size_t vertexOffset;
-    const std::size_t primitiveOffset;
+    const std::size_t indexOffset;
 
     std::size_t vertexLength;
-    std::size_t primitiveLength;
+    std::size_t indexLength;
 };
 
 } // namespace gl

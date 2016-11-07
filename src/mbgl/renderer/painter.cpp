@@ -41,30 +41,44 @@ namespace mbgl {
 
 using namespace style;
 
+static gl::VertexVector<FillVertex, gl::Triangles> tileTriangles() {
+    gl::VertexVector<FillVertex, gl::Triangles> result;
+    result.emplace_back(
+            FillAttributes::vertex({ 0,            0 }),
+            FillAttributes::vertex({ util::EXTENT, 0 }),
+            FillAttributes::vertex({ 0, util::EXTENT }));
+    result.emplace_back(
+            FillAttributes::vertex({ util::EXTENT, 0 }),
+            FillAttributes::vertex({ 0, util::EXTENT }),
+            FillAttributes::vertex({ util::EXTENT, util::EXTENT }));
+    return result;
+}
+
+static gl::VertexVector<FillVertex, gl::LineStrip> tileLineStrip() {
+    gl::VertexVector<FillVertex, gl::LineStrip> result;
+    result.emplace_back(FillAttributes::vertex({ 0, 0 }));
+    result.emplace_back(FillAttributes::vertex({ util::EXTENT, 0 }));
+    result.emplace_back(FillAttributes::vertex({ util::EXTENT, util::EXTENT }));
+    result.emplace_back(FillAttributes::vertex({ 0, util::EXTENT }));
+    result.emplace_back(FillAttributes::vertex({ 0, 0 }));
+    return result;
+}
+
+static gl::VertexVector<RasterVertex, gl::TriangleStrip> rasterTriangleStrip() {
+    gl::VertexVector<RasterVertex, gl::TriangleStrip> result;
+    result.emplace_back(RasterProgram::vertex({ 0, 0 }, { 0, 0 }));
+    result.emplace_back(RasterProgram::vertex({ util::EXTENT, 0 }, { 32767, 0 }));
+    result.emplace_back(RasterProgram::vertex({ 0, util::EXTENT }, { 0, 32767 }));
+    result.emplace_back(RasterProgram::vertex({ util::EXTENT, util::EXTENT }, { 32767, 32767 }));
+    return result;
+}
+
 Painter::Painter(gl::Context& context_, const TransformState& state_)
     : context(context_),
       state(state_),
-      tileTriangleVertexBuffer(context.createVertexBuffer(std::vector<FillVertex> {{
-            FillAttributes::vertex({ 0,            0 }),
-            FillAttributes::vertex({ util::EXTENT, 0 }),
-            FillAttributes::vertex({ 0, util::EXTENT }),
-            FillAttributes::vertex({ util::EXTENT, 0 }),
-            FillAttributes::vertex({ 0, util::EXTENT }),
-            FillAttributes::vertex({ util::EXTENT, util::EXTENT })
-      }})),
-      tileLineStripVertexBuffer(context.createVertexBuffer(std::vector<FillVertex> {{
-            FillAttributes::vertex({ 0, 0 }),
-            FillAttributes::vertex({ util::EXTENT, 0 }),
-            FillAttributes::vertex({ util::EXTENT, util::EXTENT }),
-            FillAttributes::vertex({ 0, util::EXTENT }),
-            FillAttributes::vertex({ 0, 0 })
-      }})),
-      rasterVertexBuffer(context.createVertexBuffer(std::vector<RasterVertex> {{
-            RasterProgram::vertex({ 0, 0 }, { 0, 0 }),
-            RasterProgram::vertex({ util::EXTENT, 0 }, { 32767, 0 }),
-            RasterProgram::vertex({ 0, util::EXTENT }, { 0, 32767 }),
-            RasterProgram::vertex({ util::EXTENT, util::EXTENT }, { 32767, 32767 })
-      }})) {
+      tileTriangleVertexBuffer(context.createVertexBuffer(tileTriangles())),
+      tileLineStripVertexBuffer(context.createVertexBuffer(tileLineStrip())),
+      rasterVertexBuffer(context.createVertexBuffer(rasterTriangleStrip())) {
 #ifndef NDEBUG
     gl::debugging::enable();
 #endif

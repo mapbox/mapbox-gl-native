@@ -24,18 +24,17 @@ void Painter::renderLine(PaintParameters& parameters,
     const auto& properties = layer.impl->paint;
 
     auto draw = [&] (auto& program, auto&& uniformValues) {
-        context.draw({
+        program.draw(
+            context,
+            gl::Triangles(),
             depthModeForSublayer(0, gl::DepthMode::ReadOnly),
             stencilModeForClipping(tile.clip),
             colorModeForRenderPass(),
-            program,
             std::move(uniformValues),
-            gl::Segmented<gl::Triangles>(
-                *bucket.vertexBuffer,
-                *bucket.indexBuffer,
-                bucket.segments
-            )
-        });
+            *bucket.vertexBuffer,
+            *bucket.indexBuffer,
+            bucket.segments
+        );
     };
 
     if (!properties.lineDasharray.value.from.empty()) {

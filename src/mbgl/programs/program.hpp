@@ -11,11 +11,13 @@ enum class ProgramDefines : bool {
     Overdraw = true,
 };
 
-template <class Shaders, class As, class Us>
-class Program : public gl::Program<As, Us> {
+template <class Shaders, class Primitive, class Attributes, class Uniforms>
+class Program : public gl::Program<Primitive, Attributes, Uniforms> {
 public:
+    using ParentType = gl::Program<Primitive, Attributes, Uniforms>;
+
     Program(gl::Context& context, ProgramDefines defines)
-        : gl::Program<As, Us>(context, Shaders::vertexSource, fragmentSource(defines))
+        : ParentType(context, Shaders::vertexSource, fragmentSource(defines))
         {}
 
     static std::string fragmentSource(ProgramDefines defines) {

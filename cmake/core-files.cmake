@@ -65,7 +65,6 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/depth_mode.cpp
     src/mbgl/gl/depth_mode.hpp
     src/mbgl/gl/draw_mode.hpp
-    src/mbgl/gl/drawable.hpp
     src/mbgl/gl/extension.cpp
     src/mbgl/gl/extension.hpp
     src/mbgl/gl/framebuffer.hpp
@@ -73,6 +72,7 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/index_buffer.hpp
     src/mbgl/gl/object.cpp
     src/mbgl/gl/object.hpp
+    src/mbgl/gl/primitives.hpp
     src/mbgl/gl/program.hpp
     src/mbgl/gl/renderbuffer.hpp
     src/mbgl/gl/segment.hpp
@@ -154,6 +154,7 @@ set(MBGL_CORE_FILES
     src/mbgl/programs/circle_program.hpp
     src/mbgl/programs/collision_box_program.cpp
     src/mbgl/programs/collision_box_program.hpp
+    src/mbgl/programs/debug_program.hpp
     src/mbgl/programs/fill_program.cpp
     src/mbgl/programs/fill_program.hpp
     src/mbgl/programs/line_program.cpp

@@ -6,7 +6,9 @@
 namespace mbgl {
 
 void Painter::renderClippingMask(const UnwrappedTileID& tileID, const ClipID& clip) {
-    context.draw({
+    programs->fill.draw(
+        context,
+        gl::Triangles(),
         gl::DepthMode::disabled(),
         gl::StencilMode {
             gl::StencilMode::Always(),
@@ -17,7 +19,6 @@ void Painter::renderClippingMask(const UnwrappedTileID& tileID, const ClipID& cl
             gl::StencilMode::Replace
         },
         gl::ColorMode::disabled(),
-        programs->fill,
         FillProgram::UniformValues {
             uniforms::u_matrix::Value{ matrixForTile(tileID) },
             uniforms::u_opacity::Value{ 0.0f },
@@ -25,8 +26,8 @@ void Painter::renderClippingMask(const UnwrappedTileID& tileID, const ClipID& cl
             uniforms::u_outline_color::Value{ Color {} },
             uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
         },
-        gl::Unindexed<gl::Triangles>(tileTriangleVertexBuffer)
-    });
+        tileTriangleVertexBuffer
+    );
 }
 
 } // namespace mbgl

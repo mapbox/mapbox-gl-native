@@ -5,6 +5,7 @@
 #include <mbgl/programs/line_program.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/programs/symbol_program.hpp>
+#include <mbgl/programs/debug_program.hpp>
 #include <mbgl/programs/collision_box_program.hpp>
 
 namespace mbgl {
@@ -24,6 +25,7 @@ public:
           symbolIcon(context, defines),
           symbolIconSDF(context, defines),
           symbolGlyph(context, defines),
+          debug(context, ProgramDefines::None),
           collisionBox(context, ProgramDefines::None) {
     }
 
@@ -40,6 +42,7 @@ public:
     SymbolSDFProgram symbolIconSDF;
     SymbolSDFProgram symbolGlyph;
 
+    DebugProgram debug;
     CollisionBoxProgram collisionBox;
 };
 

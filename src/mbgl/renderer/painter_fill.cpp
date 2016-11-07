@@ -35,12 +35,18 @@ void Painter::renderFill(PaintParameters& parameters,
 
         spriteAtlas->bind(true, context, 0);
 
-        auto draw = [&] (uint8_t sublayer, auto& program, const auto& subject) {
-            context.draw({
+        auto draw = [&] (uint8_t sublayer,
+                         auto& program,
+                         const auto& drawMode,
+                         const auto& vertexBuffer,
+                         const auto& indexBuffer,
+                         const auto& segments) {
+            program.draw(
+                context,
+                drawMode,
                 depthModeForSublayer(sublayer, gl::DepthMode::ReadWrite),
                 stencilModeForClipping(tile.clip),
                 colorModeForRenderPass(),
-                program,
                 FillPatternUniforms::values(
                     tile.translatedMatrix(properties.fillTranslate.value,
                                           properties.fillTranslateAnchor.value,
@@ -53,16 +59,18 @@ void Painter::renderFill(PaintParameters& parameters,
                     tile.id,
                     state
                 ),
-                subject
-            });
+                vertexBuffer,
+                indexBuffer,
+                segments
+            );
         };
 
         draw(0,
              parameters.programs.fillPattern,
-             gl::Segmented<gl::Triangles>(
-                 *bucket.vertexBuffer,
-                 *bucket.triangleIndexBuffer,
-                 bucket.triangleSegments));
+             gl::Triangles(),
+             *bucket.vertexBuffer,
+             *bucket.triangleIndexBuffer,
+             bucket.triangleSegments);
 
         if (!properties.fillAntialias.value || !properties.fillOutlineColor.isUndefined()) {
             return;
@@ -70,18 +78,24 @@ void Painter::renderFill(PaintParameters& parameters,
 
         draw(2,
              parameters.programs.fillOutlinePattern,
-             gl::Segmented<gl::Lines>(
-                 *bucket.vertexBuffer,
-                 *bucket.lineIndexBuffer,
-                 bucket.lineSegments,
-                 2.0f));
+             gl::Lines { 2.0f },
+             *bucket.vertexBuffer,
+             *bucket.lineIndexBuffer,
+             bucket.lineSegments);
     } else {
-        auto draw = [&] (uint8_t sublayer, auto& program, Color outlineColor, const auto& subject) {
-            context.draw({
+        auto draw = [&] (uint8_t sublayer,
+                         auto& program,
+                         Color outlineColor,
+                         const auto& drawMode,
+                         const auto& vertexBuffer,
+                         const auto& indexBuffer,
+                         const auto& segments) {
+            program.draw(
+                context,
+                drawMode,
                 depthModeForSublayer(sublayer, gl::DepthMode::ReadWrite),
                 stencilModeForClipping(tile.clip),
                 colorModeForRenderPass(),
-                program,
                 FillProgram::UniformValues {
                     uniforms::u_matrix::Value{ tile.translatedMatrix(properties.fillTranslate.value,
                                                properties.fillTranslateAnchor.value,
@@ -91,19 +105,20 @@ void Painter::renderFill(PaintParameters& parameters,
                     uniforms::u_outline_color::Value{ outlineColor },
                     uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
                 },
-                subject
-            });
+                vertexBuffer,
+                indexBuffer,
+                segments
+            );
         };
 
         if (properties.fillAntialias.value && !properties.fillOutlineColor.isUndefined() && pass == RenderPass::Translucent) {
             draw(2,
                  parameters.programs.fillOutline,
                  properties.fillOutlineColor.value,
-                 gl::Segmented<gl::Lines>(
-                     *bucket.vertexBuffer,
-                     *bucket.lineIndexBuffer,
-                     bucket.lineSegments,
-                     2.0f));
+                 gl::Lines { 2.0f },
+                 *bucket.vertexBuffer,
+                 *bucket.lineIndexBuffer,
+                 bucket.lineSegments);
         }
 
         // Only draw the fill when it's opaque and we're drawing opaque fragments,
@@ -112,21 +127,20 @@ void Painter::renderFill(PaintParameters& parameters,
             draw(1,
                  parameters.programs.fill,
                  properties.fillOutlineColor.value,
-                 gl::Segmented<gl::Triangles>(
-                     *bucket.vertexBuffer,
-                     *bucket.triangleIndexBuffer,
-                     bucket.triangleSegments));
+                 gl::Triangles(),
+                 *bucket.vertexBuffer,
+                 *bucket.triangleIndexBuffer,
+                 bucket.triangleSegments);
         }
 
         if (properties.fillAntialias.value && properties.fillOutlineColor.isUndefined() && pass == RenderPass::Translucent) {
             draw(2,
                  parameters.programs.fillOutline,
                  properties.fillColor.value,
-                 gl::Segmented<gl::Lines>(
-                     *bucket.vertexBuffer,
-                     *bucket.lineIndexBuffer,
-                     bucket.lineSegments,
-                     2.0f));
+                 gl::Lines { 2.0f },
+                 *bucket.vertexBuffer,
+                 *bucket.lineIndexBuffer,
+                 bucket.lineSegments);
         }
     }
 }

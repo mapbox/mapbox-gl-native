@@ -54,11 +54,12 @@ void Painter::renderRaster(PaintParameters& parameters,
     context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
     context.bindTexture(*bucket.texture, 1, gl::TextureFilter::Linear);
 
-    context.draw({
+    parameters.programs.raster.draw(
+        context,
+        gl::TriangleStrip(),
         depthModeForSublayer(0, gl::DepthMode::ReadOnly),
         gl::StencilMode::disabled(),
         colorModeForRenderPass(),
-        parameters.programs.raster,
         RasterProgram::UniformValues {
             uniforms::u_matrix::Value{ tile.matrix },
             uniforms::u_image0::Value{ 0 },
@@ -74,8 +75,8 @@ void Painter::renderRaster(PaintParameters& parameters,
             uniforms::u_scale_parent::Value{ 1.0f },
             uniforms::u_tl_parent::Value{ std::array<float, 2> {{ 0.0f, 0.0f }} },
         },
-        gl::Unindexed<gl::TriangleStrip>(rasterVertexBuffer)
-    });
+        rasterVertexBuffer
+    );
 }
 
 } // namespace mbgl

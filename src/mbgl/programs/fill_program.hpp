@@ -86,6 +86,7 @@ struct FillPatternUniforms : gl::Uniforms<
 
 class FillProgram : public Program<
     shaders::fill,
+    gl::Triangle,
     FillAttributes,
     FillUniforms>
 {
@@ -94,6 +95,7 @@ class FillProgram : public Program<
 
 class FillPatternProgram : public Program<
     shaders::fill_pattern,
+    gl::Triangle,
     FillAttributes,
     FillPatternUniforms>
 {
@@ -102,6 +104,7 @@ class FillPatternProgram : public Program<
 
 class FillOutlineProgram : public Program<
     shaders::fill_outline,
+    gl::Line,
     FillAttributes,
     FillUniforms>
 {
@@ -110,6 +113,7 @@ class FillOutlineProgram : public Program<
 
 class FillOutlinePatternProgram : public Program<
     shaders::fill_outline_pattern,
+    gl::Line,
     FillAttributes,
     FillPatternUniforms>
 {

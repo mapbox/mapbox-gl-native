@@ -18,21 +18,19 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
 
     MBGL_DEBUG_GROUP(std::string { "debug " } + util::toString(renderTile.id));
 
-    auto draw = [&] (Color color, auto subject) {
-        context.draw({
+    auto draw = [&] (Color color, const auto& vertexBuffer, auto drawMode) {
+        programs->debug.draw(
+            context,
+            drawMode,
             gl::DepthMode::disabled(),
             stencilModeForClipping(renderTile.clip),
             gl::ColorMode::unblended(),
-            programs->fill,
-            FillProgram::UniformValues {
+            DebugProgram::UniformValues {
                 uniforms::u_matrix::Value{ renderTile.matrix },
-                uniforms::u_opacity::Value{ 1.0f },
-                uniforms::u_color::Value{ color },
-                uniforms::u_outline_color::Value{ color },
-                uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
+                uniforms::u_color::Value{ color }
             },
-            subject
-        });
+            vertexBuffer
+        );
     };
 
     if (frame.debugOptions & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
@@ -47,15 +45,12 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
                 tile.expires, frame.debugOptions, context);
         }
 
-        const auto& vertexBuffer = tile.debugBucket->vertexBuffer;
-
-        draw(Color::white(), gl::Unindexed<gl::Lines>(vertexBuffer, 4.0f * frame.pixelRatio));
-        draw(Color::black(), gl::Unindexed<gl::Points>(vertexBuffer, 2.0f));
-        draw(Color::black(), gl::Unindexed<gl::Lines>(vertexBuffer, 2.0f * frame.pixelRatio));
+        draw(Color::white(), tile.debugBucket->vertexBuffer, gl::Lines { 4.0f * frame.pixelRatio });
+        draw(Color::black(), tile.debugBucket->vertexBuffer, gl::Lines { 2.0f * frame.pixelRatio });
     }
 
     if (frame.debugOptions & MapDebugOptions::TileBorders) {
-        draw(Color::red(), gl::Unindexed<gl::LineStrip>(tileLineStripVertexBuffer, 4.0f * frame.pixelRatio));
+        draw(Color::red(), tileLineStripVertexBuffer, gl::LineStrip { 4.0f * frame.pixelRatio });
     }
 }
 

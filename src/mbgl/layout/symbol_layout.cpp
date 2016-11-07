@@ -449,7 +449,7 @@ void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         }
 
         if (buffer.segments.empty() || buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
-            buffer.segments.emplace_back(buffer.vertices.size(), buffer.triangles.size());
+            buffer.segments.emplace_back(buffer.vertices.vertexSize(), buffer.triangles.indexSize());
         }
 
         // We're generating triangle fans, so we always start with the first
@@ -476,7 +476,7 @@ void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         buffer.triangles.emplace_back(index + 1, index + 2, index + 3);
 
         segment.vertexLength += vertexLength;
-        segment.primitiveLength += 2;
+        segment.indexLength += 6;
     }
 }
 
@@ -507,14 +507,14 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 const float maxZoom = util::clamp(zoom + util::log2(box.maxScale), util::MIN_ZOOM_F, util::MAX_ZOOM_F);
                 const float placementZoom = util::clamp(zoom + util::log2(box.placementScale), util::MIN_ZOOM_F, util::MAX_ZOOM_F);
 
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tl, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tr, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tr, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, br, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, br, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, bl, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, bl, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tl, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tl, maxZoom, placementZoom),
+                                                   CollisionBoxProgram::vertex(anchor, tr, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tr, maxZoom, placementZoom),
+                                                   CollisionBoxProgram::vertex(anchor, br, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, br, maxZoom, placementZoom),
+                                                   CollisionBoxProgram::vertex(anchor, bl, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, bl, maxZoom, placementZoom),
+                                                   CollisionBoxProgram::vertex(anchor, tl, maxZoom, placementZoom));
             }
         };
         populateCollisionBox(symbolInstance.textCollisionFeature);

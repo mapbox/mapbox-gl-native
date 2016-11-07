@@ -17,6 +17,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_maxzoom);
 
 class CollisionBoxProgram : public Program<
     shaders::collision_box,
+    gl::Line,
     gl::Attributes<
         attributes::a_pos,
         attributes::a_extrude,

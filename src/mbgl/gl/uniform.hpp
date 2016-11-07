@@ -2,6 +2,7 @@
 
 #include <mbgl/gl/types.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/ignore.hpp>
 
 #include <array>
 #include <functional>
@@ -71,13 +72,9 @@ public:
 
     static std::function<void ()> binder(State& state, Values&& values_) {
         return [&state, values = std::move(values_)] () mutable {
-            noop((std::get<typename Us::State>(state) = std::get<typename Us::Value>(values), 0)...);
+            ignore((std::get<typename Us::State>(state) = std::get<typename Us::Value>(values), 0)...);
         };
     }
-
-private:
-    // This exists only to provide a varags context for unpacking the assignments in `binder`.
-    template <int...> static void noop(int...) {}
 };
 
 } // namespace gl

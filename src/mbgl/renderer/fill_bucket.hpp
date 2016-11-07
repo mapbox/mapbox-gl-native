@@ -19,15 +19,15 @@ public:
 
     void addGeometry(const GeometryCollection&);
 
-    std::vector<FillVertex> vertices;
-    std::vector<gl::Line> lines;
-    std::vector<gl::Triangle> triangles;
+    gl::VertexVector<FillVertex> vertices;
+    gl::IndexVector<gl::Lines> lines;
+    gl::IndexVector<gl::Triangles> triangles;
     std::vector<gl::Segment> lineSegments;
     std::vector<gl::Segment> triangleSegments;
 
     optional<gl::VertexBuffer<FillVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gl::Line>> lineIndexBuffer;
-    optional<gl::IndexBuffer<gl::Triangle>> triangleIndexBuffer;
+    optional<gl::IndexBuffer<gl::Lines>> lineIndexBuffer;
+    optional<gl::IndexBuffer<gl::Triangles>> triangleIndexBuffer;
 };
 
 } // namespace mbgl

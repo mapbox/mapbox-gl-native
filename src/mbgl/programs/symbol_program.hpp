@@ -72,6 +72,7 @@ using SymbolVertex = SymbolAttributes::Vertex;
 
 class SymbolIconProgram : public Program<
     shaders::symbol_icon,
+    gl::Triangle,
     SymbolAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
@@ -95,6 +96,7 @@ public:
 
 class SymbolSDFProgram : public Program<
     shaders::symbol_sdf,
+    gl::Triangle,
     SymbolAttributes,
     gl::Uniforms<
         uniforms::u_matrix,

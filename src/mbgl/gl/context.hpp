@@ -8,9 +8,16 @@
 #include <mbgl/gl/framebuffer.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/gl/drawable.hpp>
+#include <mbgl/gl/types.hpp>
+#include <mbgl/gl/draw_mode.hpp>
+#include <mbgl/gl/depth_mode.hpp>
+#include <mbgl/gl/stencil_mode.hpp>
+#include <mbgl/gl/color_mode.hpp>
+#include <mbgl/gl/segment.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
+
+#include <functional>
 #include <memory>
 #include <vector>
 #include <array>
@@ -33,18 +40,18 @@ public:
     UniqueProgram createProgram(ShaderID vertexShader, ShaderID fragmentShader);
     UniqueTexture createTexture();
 
-    template <class V>
-    VertexBuffer<V> createVertexBuffer(std::vector<V>&& v) {
-        return VertexBuffer<V> {
-            v.size(),
-            createVertexBuffer(v.data(), v.size() * sizeof(V))
+    template <class Vertex, class DrawMode>
+    VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v) {
+        return VertexBuffer<Vertex, DrawMode> {
+            v.vertexSize(),
+            createVertexBuffer(v.data(), v.byteSize())
         };
     }
 
-    template <class P>
-    IndexBuffer<P> createIndexBuffer(std::vector<P>&& v) {
-        return IndexBuffer<P> {
-            createIndexBuffer(v.data(), v.size() * sizeof(P))
+    template <class DrawMode>
+    IndexBuffer<DrawMode> createIndexBuffer(IndexVector<DrawMode>&& v) {
+        return IndexBuffer<DrawMode> {
+            createIndexBuffer(v.data(), v.byteSize())
         };
     }
 
@@ -110,6 +117,19 @@ public:
     void clear(optional<mbgl::Color> color,
                optional<float> depth,
                optional<int32_t> stencil);
+
+    struct Drawable {
+        DrawMode drawMode;
+        DepthMode depthMode;
+        StencilMode stencilMode;
+        ColorMode colorMode;
+        gl::ProgramID program;
+        gl::BufferID vertexBuffer;
+        gl::BufferID indexBuffer;
+        const std::vector<Segment>& segments;
+        std::function<void ()> bindUniforms;
+        std::function<void (std::size_t)> bindAttributes;
+    };
 
     void draw(const Drawable&);
 

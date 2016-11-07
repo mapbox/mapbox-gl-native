@@ -25,6 +25,7 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_tl_parent);
 
 class RasterProgram : public Program<
     shaders::raster,
+    gl::Triangle,
     gl::Attributes<
         attributes::a_pos,
         attributes::a_texture_pos>,

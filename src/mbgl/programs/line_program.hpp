@@ -88,6 +88,7 @@ using LineVertex = LineAttributes::Vertex;
 
 class LineProgram : public Program<
     shaders::line,
+    gl::Triangle,
     LineAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
@@ -113,6 +114,7 @@ public:
 
 class LinePatternProgram : public Program<
     shaders::line_pattern,
+    gl::Triangle,
     LineAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
@@ -147,6 +149,7 @@ public:
 
 class LineSDFProgram : public Program<
     shaders::line_sdf,
+    gl::Triangle,
     LineAttributes,
     gl::Uniforms<
         uniforms::u_matrix,

@@ -34,26 +34,26 @@ public:
     const bool iconsNeedLinear;
 
     struct TextBuffer {
-        std::vector<SymbolVertex> vertices;
-        std::vector<gl::Triangle> triangles;
+        gl::VertexVector<SymbolVertex> vertices;
+        gl::IndexVector<gl::Triangles> triangles;
         std::vector<gl::Segment> segments;
 
         optional<gl::VertexBuffer<SymbolVertex>> vertexBuffer;
-        optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
+        optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } text;
 
     struct IconBuffer {
-        std::vector<SymbolVertex> vertices;
-        std::vector<gl::Triangle> triangles;
+        gl::VertexVector<SymbolVertex> vertices;
+        gl::IndexVector<gl::Triangles> triangles;
         std::vector<gl::Segment> segments;
 
         optional<gl::VertexBuffer<SymbolVertex>> vertexBuffer;
-        optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
+        optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } icon;
 
     struct CollisionBoxBuffer {
-        std::vector<CollisionBoxVertex> vertices;
-        optional<gl::VertexBuffer<CollisionBoxVertex>> vertexBuffer;
+        gl::VertexVector<CollisionBoxVertex, gl::Lines> vertices;
+        optional<gl::VertexBuffer<CollisionBoxVertex, gl::Lines>> vertexBuffer;
     } collisionBox;
 };
 

@@ -16,6 +16,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_devicepixelratio);
 
 class CircleProgram : public Program<
     shaders::circle,
+    gl::Triangle,
     gl::Attributes<
         attributes::a_pos>,
     gl::Uniforms<

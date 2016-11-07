@@ -39,7 +39,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
                 throw GeometryTooLongException();
         }
 
-        std::size_t startVertices = vertices.size();
+        std::size_t startVertices = vertices.vertexSize();
 
         for (const auto& ring : polygon) {
             std::size_t nVertices = ring.size();
@@ -48,7 +48,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
                 continue;
 
             if (lineSegments.empty() || lineSegments.back().vertexLength + nVertices > std::numeric_limits<uint16_t>::max()) {
-                lineSegments.emplace_back(vertices.size(), lines.size());
+                lineSegments.emplace_back(vertices.vertexSize(), lines.indexSize());
             }
 
             auto& lineSegment = lineSegments.back();
@@ -64,7 +64,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
             }
 
             lineSegment.vertexLength += nVertices;
-            lineSegment.primitiveLength += nVertices;
+            lineSegment.indexLength += nVertices * 2;
         }
 
         std::vector<uint32_t> indices = mapbox::earcut(polygon);
@@ -73,7 +73,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
         assert(nIndicies % 3 == 0);
 
         if (triangleSegments.empty() || triangleSegments.back().vertexLength + totalVertices > std::numeric_limits<uint16_t>::max()) {
-            triangleSegments.emplace_back(startVertices, triangles.size());
+            triangleSegments.emplace_back(startVertices, triangles.indexSize());
         }
 
         auto& triangleSegment = triangleSegments.back();
@@ -87,7 +87,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
         }
 
         triangleSegment.vertexLength += totalVertices;
-        triangleSegment.primitiveLength += nIndicies / 3;
+        triangleSegment.indexLength += nIndicies;
     }
 }
 

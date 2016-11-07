@@ -32,7 +32,7 @@ public:
     const optional<Timestamp> expires;
     const MapDebugOptions debugMode;
 
-    gl::VertexBuffer<FillVertex> vertexBuffer;
+    gl::VertexBuffer<FillVertex, gl::Lines> vertexBuffer;
 };
 
 } // namespace mbgl

@@ -26,12 +26,12 @@ public:
 
     style::LineLayoutProperties layout;
 
-    std::vector<LineVertex> vertices;
-    std::vector<gl::Triangle> triangles;
+    gl::VertexVector<LineVertex> vertices;
+    gl::IndexVector<gl::Triangles> triangles;
     std::vector<gl::Segment> segments;
 
     optional<gl::VertexBuffer<LineVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gl::Triangle>> indexBuffer;
+    optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 
 private:
     struct TriangleElement {

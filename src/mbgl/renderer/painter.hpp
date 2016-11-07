@@ -156,9 +156,9 @@ private:
     std::unique_ptr<Programs> overdrawPrograms;
 #endif
 
-    gl::VertexBuffer<FillVertex> tileTriangleVertexBuffer;
-    gl::VertexBuffer<FillVertex> tileLineStripVertexBuffer;
-    gl::VertexBuffer<RasterVertex> rasterVertexBuffer;
+    gl::VertexBuffer<FillVertex, gl::Triangles> tileTriangleVertexBuffer;
+    gl::VertexBuffer<FillVertex, gl::LineStrip> tileLineStripVertexBuffer;
+    gl::VertexBuffer<RasterVertex, gl::TriangleStrip> rasterVertexBuffer;
 };
 
 } // namespace mbgl

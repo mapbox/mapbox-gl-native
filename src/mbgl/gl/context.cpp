@@ -533,9 +533,9 @@ void Context::draw(const Drawable& drawable) {
         if (drawable.indexBuffer) {
             MBGL_CHECK_ERROR(glDrawElements(
                 static_cast<GLenum>(primitiveType),
-                static_cast<GLsizei>(drawable.primitiveSize / sizeof(uint16_t) * segment.primitiveLength),
+                static_cast<GLsizei>(segment.indexLength),
                 GL_UNSIGNED_SHORT,
-                reinterpret_cast<GLvoid*>(drawable.primitiveSize * segment.primitiveOffset)));
+                reinterpret_cast<GLvoid*>(sizeof(uint16_t) * segment.indexOffset)));
         } else {
             MBGL_CHECK_ERROR(glDrawArrays(
                 static_cast<GLenum>(primitiveType),

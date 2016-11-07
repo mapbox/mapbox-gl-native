@@ -46,7 +46,7 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
 
             if (segments.empty() || segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
                 // Move to a new segments because the old one can't hold the geometry.
-                segments.emplace_back(vertices.size(), triangles.size());
+                segments.emplace_back(vertices.vertexSize(), triangles.indexSize());
             }
 
             // this geometry will be of the Point type, and we'll derive
@@ -73,7 +73,7 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
             triangles.emplace_back(index, index + 3, index + 2);
 
             segment.vertexLength += vertexLength;
-            segment.primitiveLength += 2;
+            segment.indexLength += 6;
         }
     }
 }

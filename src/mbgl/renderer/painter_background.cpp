@@ -28,11 +28,12 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
         spriteAtlas->bind(true, context, 0);
 
         for (const auto& tileID : util::tileCover(state, state.getIntegerZoom())) {
-            context.draw({
+            parameters.programs.fillPattern.draw(
+                context,
+                gl::Triangles(),
                 depthModeForSublayer(0, gl::DepthMode::ReadOnly),
                 gl::StencilMode::disabled(),
                 colorModeForRenderPass(),
-                parameters.programs.fillPattern,
                 FillPatternUniforms::values(
                     matrixForTile(tileID),
                     properties.backgroundOpacity.value,
@@ -43,16 +44,17 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
                     tileID,
                     state
                 ),
-                gl::Unindexed<gl::TriangleStrip>(tileTriangleVertexBuffer)
-            });
+                tileTriangleVertexBuffer
+            );
         }
     } else {
         for (const auto& tileID : util::tileCover(state, state.getIntegerZoom())) {
-            context.draw({
+            parameters.programs.fill.draw(
+                context,
+                gl::Triangles(),
                 depthModeForSublayer(0, gl::DepthMode::ReadOnly),
                 gl::StencilMode::disabled(),
                 colorModeForRenderPass(),
-                parameters.programs.fill,
                 FillProgram::UniformValues {
                     uniforms::u_matrix::Value{ matrixForTile(tileID) },
                     uniforms::u_opacity::Value{ properties.backgroundOpacity.value },
@@ -60,8 +62,8 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
                     uniforms::u_outline_color::Value{ properties.backgroundColor.value },
                     uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
                 },
-                gl::Unindexed<gl::TriangleStrip>(tileTriangleVertexBuffer)
-            });
+                tileTriangleVertexBuffer
+            );
         }
     }
 }
