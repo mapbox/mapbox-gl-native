@@ -13,6 +13,17 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Responsible for managing icons added to the Map.
+ * <p>
+ * Maintains a {@link List} of {@link Icon} and  is responsible for initialising default markers and
+ * setting up {@link MarkerView} annotation ghosting.
+ * </p>
+ * <p>
+ * Keep track of icons added and the resulting average icon size. This is used internally by our
+ * gestures detection to calculate the size of a touch target.
+ * </p>
+ */
 class IconManager {
 
     private NativeMapView nativeMapView;
@@ -137,11 +148,11 @@ class IconManager {
         }
     }
 
-    public int getAverageIconHeight() {
+    int getAverageIconHeight() {
         return averageIconHeight;
     }
 
-    public int getAverageIconWidth() {
+    int getAverageIconWidth() {
         return averageIconWidth;
     }
 }

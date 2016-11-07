@@ -10,6 +10,15 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Responsible for managing InfoWindows shown on the Map.
+ * <p>
+ * Maintains a {@link List} of opened {@link InfoWindow} and tracks configurations as
+ * allowConcurrentMultipleInfoWindows which allows to have multiple {@link InfoWindow} open at the
+ * same time. Responsible for managing listeners as {@link com.mapbox.mapboxsdk.maps.MapboxMap.OnInfoWindowClickListener}
+ * and {@link com.mapbox.mapboxsdk.maps.MapboxMap.OnInfoWindowLongClickListener}.
+ * </p>
+ */
 class InfoWindowManager {
 
     private List<InfoWindow> infoWindows;

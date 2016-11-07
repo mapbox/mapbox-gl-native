@@ -20,6 +20,16 @@ import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Responsible for managing and tracking state of Annotations linked to Map. All events related to
+ * annotations that occur on {@link MapboxMap} are forwarded to this class.
+ * <p>
+ * Responsible for referencing {@link InfoWindowManager} and {@link MarkerViewManager}.
+ * </p>
+ * <p>
+ * Exposes convenience methods to add/remove/update all subtypes of annotations found in com.mapbox.mapboxsdk.annotations.
+ * </p>
+ */
 class AnnotationManager {
 
     private NativeMapView nativeMapView;
