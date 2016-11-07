@@ -338,7 +338,15 @@
             android:label="@string/activity_circle">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_style" />
+                android:value="@string/category_style"/>
+        </activity>
+        <activity
+            android:name=".activity.style.SymbolLayerActivity"
+            android:description="@string/description_symbol_layer"
+            android:label="@string/activity_symbol_layer">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style"/>
         </activity>
         <activity
             android:name=".activity.style.GeoJsonClusteringActivity"
