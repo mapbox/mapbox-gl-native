@@ -64,5 +64,14 @@ namespace mbgl {
       }
     }
     
+    void CustomVectorSource::Impl::updateTile(uint8_t z, uint32_t x, uint32_t y) {
+        for (auto const &item : tiles) {
+            GeoJSONTile* tile = static_cast<GeoJSONTile*>(item.second.get());
+            if(tile->id.canonical.z == z && tile->id.canonical.x == x && tile->id.canonical.y == y) {
+                fetchTile(z, x, y);
+            }
+        }
+    }
+    
   } // namespace style
 } // namespace mbgl

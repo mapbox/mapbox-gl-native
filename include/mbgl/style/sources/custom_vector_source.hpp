@@ -11,8 +11,9 @@ public:
     CustomVectorSource(std::string id, GeoJSONOptions options, std::function<void(uint8_t, uint32_t, uint32_t)> fetchTile);
   
     void setTileData(uint8_t, uint32_t, uint32_t, const mapbox::geojson::geojson&);
-    // Private implementation
+    void updateTile(uint8_t, uint32_t, uint32_t);
 
+    // Private implementation
     class Impl;
     Impl* const impl;
 };

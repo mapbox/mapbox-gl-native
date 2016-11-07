@@ -12,5 +12,8 @@ namespace mbgl {
       impl->setTileData(z, x, y, geoJSON);
     }
     
+    void CustomVectorSource::updateTile(uint8_t z, uint32_t x, uint32_t y) {
+        impl->updateTile(z, x, y);
+    }
   } // namespace style
 } // namespace mbgl

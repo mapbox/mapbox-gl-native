@@ -70,5 +70,11 @@
     });
 }
 
+- (void)updateTile:(NSInteger)z x:(NSInteger)x y:(NSInteger)y
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.rawSource->updateTile((uint8_t)z, (uint32_t)x, (uint32_t)y);
+    });
+}
 
 @end

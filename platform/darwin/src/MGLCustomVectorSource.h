@@ -41,6 +41,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(NSObject<MGLCustomVectorSourceDataSource>*)dataSource options:(NS_DICTIONARY_OF(NSString *, id) *)options NS_DESIGNATED_INITIALIZER;
 
 /**
+ Request that the source reloads a tile. Tile will only be reloaded if it is currently on screen.
+ */
+- (void)updateTile:(NSInteger)z x:(NSInteger)x y:(NSInteger)y;
+
+/**
  An object that implements the `MGLCustomVectorSourceDataSource` protocol that will be queried for tile data.
  */
 @property (nonatomic, readonly, copy) NSObject<MGLCustomVectorSourceDataSource> *dataSource;
