@@ -1,20 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'checkstyle'
-apply plugin: 'maven'
-apply plugin: 'signing'
-
-allprojects {
-    group project.GROUP
-    version project.VERSION_NAME
-
-    repositories {
-        mavenCentral()
-    }
-}
-
-repositories {
-    mavenCentral()
-}
 
 ext {
     supportLibVersion = '25.0.0'
@@ -46,10 +30,12 @@ android {
     }
 
     android {
+        // avoid naming conflicts, force usage of prefix
         resourcePrefix 'mapbox_'
     }
 
     sourceSets {
+        // limit amount of exposed library resources
         main.res.srcDirs += 'src/main/res-public'
     }
 
@@ -73,92 +59,11 @@ android {
         }
 
         release {
-            jniDebuggable false
+            // aar proguard configuration
             consumerProguardFiles 'proguard-rules.pro'
+            jniDebuggable false
         }
     }
-}
-
-configurations {
-    all*.exclude group: 'commons-logging', module: 'commons-logging'
-    all*.exclude group: 'commons-collections', module: 'commons-collections'
-}
-
-android.libraryVariants.all { variant ->
-    def name = variant.name
-    //noinspection GroovyAssignabilityCheck
-    task "javadoc$name"(type: Javadoc) {
-        description = "Generates javadoc for build $name"
-        failOnError = false
-        destinationDir = new File(destinationDir, variant.baseName)
-        source = files(variant.javaCompile.source)
-        classpath = files(variant.javaCompile.classpath.files) + files(android.bootClasspath)
-        options.windowTitle("Mapbox Android SDK $VERSION_NAME Reference")
-        options.docTitle("Mapbox Android SDK $VERSION_NAME")
-        options.header("Mapbox Android SDK $VERSION_NAME Reference")
-        options.bottom("&copy; 2015&ndash;2016 Mapbox. All rights reserved.")
-        options.links("http://docs.oracle.com/javase/7/docs/api/")
-        options.linksOffline("http://d.android.com/reference/", "$System.env.ANDROID_HOME/docs/reference")
-        options.overview("src/main/java/overview.html")
-        options.group("Mapbox Android SDK", "com.mapbox.*")
-        options.group("Third Party Libraries", "com.almeros.*")
-        exclude '**/R.java', '**/BuildConfig.java', 'com/almeros/**'
-    }
-}
-
-/*
-task cleanJNIBuilds {
-    def jniLibsDir = new File("MapboxGLAndroidSDK/src/main/jniLibs")
-    delete jniLibsDir.absolutePath
-}
-*/
-
-android.libraryVariants.all { variant ->
-    def name = variant.buildType.name
-    def checkstyle = project.tasks.create "checkstyle${name.capitalize()}", Checkstyle
-    checkstyle.dependsOn variant.javaCompile
-    checkstyle.source variant.javaCompile.source
-    checkstyle.classpath = project.fileTree(variant.javaCompile.destinationDir)
-    checkstyle.exclude('**/BuildConfig.java')
-    checkstyle.exclude('**/R.java')
-    checkstyle.exclude('**/com/almeros/android/multitouch/**')
-    project.tasks.getByName("check").dependsOn checkstyle
-}
-
-// From https://raw.github.com/mcxiaoke/gradle-mvn-push/master/jar.gradle
-android.libraryVariants.all { variant ->
-    def jarTask = project.tasks.create(name: "jar${variant.name.capitalize()}", type: Jar) {
-        from variant.javaCompile.destinationDir
-        exclude "**/R.class"
-        exclude "**/BuildConfig.class"
-    }
-    jarTask.dependsOn variant.javaCompile
-    artifacts.add('archives', jarTask);
-}
-
-// From https://raw.github.com/mcxiaoke/gradle-mvn-push/master/gradle-mvn-push.gradle
-def isReleaseBuild() {
-    return VERSION_NAME.contains("SNAPSHOT") == false
-}
-
-def getReleaseRepositoryUrl() {
-    return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL :
-            "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-}
-
-def getSnapshotRepositoryUrl() {
-    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL :
-            "https://oss.sonatype.org/content/repositories/snapshots/"
-}
-
-def getRepositoryUsername() {
-    return hasProperty('USERNAME') ? USERNAME :
-            (hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : "")
-}
-
-def getRepositoryPassword() {
-    return hasProperty('PASSWORD') ? PASSWORD :
-            (hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : "")
 }
 
 def getGitRevision() {
@@ -168,121 +73,10 @@ def getGitRevision() {
     return ref
 }
 
-task apklib(type: Zip) {
-    appendix = extension = 'apklib'
-
-    from 'AndroidManifest.xml'
-    into('res') {
-        from 'res'
-    }
-    into('src') {
-        from 'src'
-    }
+configurations {
+    all*.exclude group: 'commons-logging', module: 'commons-logging'
+    all*.exclude group: 'commons-collections', module: 'commons-collections'
 }
 
-artifacts {
-    archives apklib
-}
-
-afterEvaluate { project ->
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                pom.groupId = GROUP
-                pom.artifactId = POM_ARTIFACT_ID
-                pom.version = VERSION_NAME
-
-                repository(url: getReleaseRepositoryUrl()) {
-                    authentication(userName: getRepositoryUsername(),
-                            password: getRepositoryPassword())
-                }
-                snapshotRepository(url: getSnapshotRepositoryUrl()) {
-                    authentication(userName: getRepositoryUsername(),
-                            password: getRepositoryPassword())
-                }
-
-/*
-                // Leaving out as artifact was incorrectly named when found
-                addFilter('aar') { artifact, file ->
-                    artifact.name == archivesBaseName
-                }
-                addFilter('apklib') { artifact, file ->
-                    artifact.name == archivesBaseName + '-apklib'
-                }
-*/
-
-                pom.project {
-                    name POM_NAME
-                    packaging POM_PACKAGING
-                    description POM_DESCRIPTION
-                    url POM_URL
-
-                    scm {
-                        url POM_SCM_URL
-                        connection POM_SCM_CONNECTION
-                        developerConnection POM_SCM_DEV_CONNECTION
-                    }
-
-                    licenses {
-                        license {
-                            name POM_LICENCE_NAME
-                            url POM_LICENCE_URL
-                            distribution POM_LICENCE_DIST
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id POM_DEVELOPER_ID
-                            name POM_DEVELOPER_NAME
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    signing {
-        required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
-        sign configurations.archives
-    }
-
-    task androidJavadocs(type: Javadoc) {
-        source = android.sourceSets.main.java.sourceFiles
-        classpath = files(android.bootClasspath)
-    }
-
-    task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-        classifier = 'javadoc'
-        from androidJavadocs.destinationDir
-    }
-
-    task androidSourcesJar(type: Jar) {
-        classifier = 'sources'
-        from android.sourceSets.main.java.sourceFiles
-    }
-
-    artifacts {
-        archives androidSourcesJar
-        archives androidJavadocsJar
-    }
-}
-
-
-task makeClean(type: Exec) {
-    workingDir '../../'
-    commandLine 'make', 'clean'
-}
-
-task makeAndroid(type: Exec) {
-    workingDir '../../'
-    commandLine 'make', 'android'
-}
-
-task makeAndroidAll(type: Exec) {
-    workingDir '../../'
-    commandLine 'make', 'apackage'
-}
-
+apply from: 'gradle-javadoc.gradle'
+apply from: 'gradle-publish.gradle'

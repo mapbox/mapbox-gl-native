@@ -1,25 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'checkstyle'
-apply plugin: 'devicefarm'
-
-task accessToken {
-    def tokenFile = new File("MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml")
-    if (!tokenFile.exists()) {
-        String tokenFileContents = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<resources>\n" +
-                "    <string name=\"mapbox_access_token\">" + "$System.env.MAPBOX_ACCESS_TOKEN" + "</string>\n" +
-                "</resources>"
-
-        if (tokenFileContents == null) {
-            throw new InvalidUserDataException("You must set the MAPBOX_ACCESS_TOKEN environment variable.")
-        }
-        tokenFile.write(tokenFileContents)
-    }
-}
-
-gradle.projectsEvaluated {
-    preBuild.dependsOn('accessToken')
-}
 
 ext {
     supportLibVersion = '25.0.0'
@@ -36,7 +15,6 @@ android {
         versionCode 11
         versionName "5.0.0"
 
-        // Specify AndroidJUnitRunner as the default test instrumentation runner
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -64,7 +42,6 @@ android {
 
     buildTypes {
         debug {
-            // run code coverage reports
             testCoverageEnabled = true
         }
         release {
@@ -106,63 +83,9 @@ dependencies {
     androidTestCompile 'com.squareup.spoon:spoon-client:1.6.2'
 }
 
-checkstyle {
-    configFile project.file('../checks.xml')
-    showViolations true
-}
-
-def getAccessKeyDeviceFarm() {
-    if (project.hasProperty('AWS_ACCESS_KEY_ID_DEVICE_FARM')) {
-        return AWS_ACCESS_KEY_ID_DEVICE_FARM
-    } else {
-        println("Could not locate AWS_ACCESS_KEY_ID_DEVICE_FARM in gradle.properties")
-        return ""
-    }
-}
-
-def getSecretAccessKeyDeviceFarm() {
-    if (project.hasProperty('AWS_SECRET_ACCESS_KEY_DEVICE_FARM')) {
-        return AWS_SECRET_ACCESS_KEY_DEVICE_FARM
-    } else {
-        println("Could not locate AWS_SECRET_ACCESS_KEY_DEVICE_FARM in gradle.properties")
-        return ""
-    }
-}
-
-devicefarm {
-
-    projectName "Mapbox GL Android" // required: Must already exists.
-    devicePool "sanity" // optional: Defaults to "Top Devices"
-
-    authentication {
-        accessKey getAccessKeyDeviceFarm()
-        secretKey getSecretAccessKeyDeviceFarm()
-    }
-
-    devicestate {
-        wifi "on"
-        bluetooth "off"
-        gps "on"
-        nfc "on"
-        latitude 47.6204 // default
-        longitude - 122.3491 // default
-    }
-
-    instrumentation {
-
-    }
-}
-
-android.applicationVariants.all { variant ->
-    def name = variant.buildType.name
-    def checkstyle = project.tasks.create "checkstyle${name.capitalize()}", Checkstyle
-    checkstyle.dependsOn variant.javaCompile
-    checkstyle.source variant.javaCompile.source
-    checkstyle.classpath = project.fileTree(variant.javaCompile.destinationDir)
-    checkstyle.exclude('**/BuildConfig.java')
-    checkstyle.exclude('**/R.java')
-    project.tasks.getByName("check").dependsOn checkstyle
-}
-
+apply from: 'gradle-make.gradle'
+apply from: 'gradle-config.gradle'
+apply from: 'gradle-device-farm.gradle'
 apply from: 'gradle-spoon.gradle'
+
 
