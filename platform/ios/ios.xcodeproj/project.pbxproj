@@ -2268,6 +2268,7 @@
 		DA25D5BC1CCD9EDE00607828 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				INFOPLIST_FILE = framework/Settings.bundle/Root.plist;
 				PRODUCT_NAME = Settings;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = bundle;
@@ -2277,6 +2278,7 @@
 		DA25D5BD1CCD9EDE00607828 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				INFOPLIST_FILE = framework/Settings.bundle/Root.plist;
 				PRODUCT_NAME = Settings;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = bundle;
