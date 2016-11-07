@@ -15,6 +15,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -2458,7 +2459,12 @@ public class MapView extends FrameLayout {
     }
 
     void setAtttibutionTintColor(int tintColor) {
-        ColorUtils.setTintList(attributionsView, tintColor);
+        // Check that the tint color being passed in isn't transparent.
+        if (Color.alpha(tintColor) == 0) {
+            ColorUtils.setTintList(attributionsView, ContextCompat.getColor(getContext(), R.color.mapbox_blue));
+        } else {
+            ColorUtils.setTintList(attributionsView, tintColor);
+        }
     }
 
     int getAttributionTintColor() {
