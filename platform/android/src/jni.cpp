@@ -498,7 +498,7 @@ jdoubleArray nativeGetCameraValues(JNIEnv *env, jni::jobject* obj, jlong nativeM
     jdouble buf[5];
     buf[0] = latLng.latitude;
     buf[1] = latLng.longitude;
-    buf[2] = -(nativeMapView->getMap().getBearing());
+    buf[2] = -nativeMapView->getMap().getBearing();
     buf[3] = nativeMapView->getMap().getPitch();
     buf[4] = nativeMapView->getMap().getZoom();
     env->SetDoubleArrayRegion(output, start, leng, buf);
