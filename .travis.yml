@@ -49,6 +49,8 @@ script:
 after_script:
   - ccache --show-stats
   - ./platform/linux/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
+after_success:
+  - ./platform/linux/scripts/after_success.sh
 
 matrix:
   include:
