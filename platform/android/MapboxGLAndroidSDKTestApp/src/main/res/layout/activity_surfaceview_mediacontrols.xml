@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
-        app:mapbox_style_url="@string/mapbox_style_light" />
+        app:mapbox_styleUrl="@string/mapbox_style_light" />
 
     <FrameLayout
         android:id="@+id/container"

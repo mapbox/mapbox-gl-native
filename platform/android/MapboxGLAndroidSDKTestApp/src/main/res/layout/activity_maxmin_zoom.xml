@@ -17,9 +17,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
-        app:mapbox_center_latitude="-1.063510"
-        app:mapbox_center_longitude=" 32.895425"
-        app:mapbox_style_url="@string/mapbox_style_satellite_streets"
-        app:mapbox_zoom="4" />
+        app:mapbox_cameraTargetLat="-1.063510"
+        app:mapbox_cameraTargetLng=" 32.895425"
+        app:mapbox_styleUrl="@string/mapbox_style_satellite_streets"
+        app:mapbox_cameraZoom="4" />
 
 </RelativeLayout>

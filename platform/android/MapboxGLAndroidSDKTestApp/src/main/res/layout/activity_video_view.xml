@@ -27,11 +27,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
-        mapbox:mapbox_attribution_gravity="top"
-        mapbox:mapbox_center_latitude="34.4021"
-        mapbox:mapbox_center_longitude="-119.7081"
-        mapbox:mapbox_logo_gravity="top"
-        mapbox:mapbox_style_url="mapbox://styles/mapbox/streets-v9"
-        mapbox:mapbox_zoom="13" />
+        mapbox:mapbox_uiAttributionGravity="top"
+        mapbox:mapbox_cameraTargetLat="34.4021"
+        mapbox:mapbox_cameraTargetLng="-119.7081"
+        mapbox:mapbox_uiLogoGravity="top"
+        mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v9"
+        mapbox:mapbox_cameraZoom="13" />
 
 </RelativeLayout>

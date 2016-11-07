@@ -7,6 +7,59 @@
 
     <public name="mapbox_AlertDialogStyle" type="style" />
 
+    <!-- Exposed attrs.xml -->
+    <public name="mapbox_accessToken" type="attr" />
+    <public name="mapbox_styleUrl" type="attr" />
+    <public name="mapbox_apiBaseUrl" type="attr" />
+
+    <public name="mapbox_cameraTargetLng" type="attr" />
+    <public name="mapbox_cameraTargetLat" type="attr" />
+    <public name="mapbox_cameraZoom_level" type="attr" />
+    <public name="mapbox_cameraBearing" type="attr" />
+
+    <public name="mapbox_uiZoomGestures" type="attr" />
+    <public name="mapbox_uiScrollGestures" type="attr" />
+    <public name="mapbox_uiRotateGestures" type="attr" />
+    <public name="mapbox_uiZoomControls" type="attr" />
+
+    <public name="mapbox_myLocation" type="attr" />
+    <public name="mapbox_myLocationTintColor" type="attr" />
+    <public name="mapbox_myLocationDrawable" type="attr" />
+    <public name="mapbox_myLocationBearingDrawable" type="attr" />
+    <public name="mapbox_myLocationBackgroundDrawable" type="attr" />
+    <public name="mapbox_myLocationBackgroundTintColor" type="attr" />
+    <public name="mapbox_myLocationBackgroundMarginLeft" type="attr" />
+    <public name="mapbox_myLocationBackgroundMarginTop" type="attr" />
+    <public name="mapbox_myLocationBackgroundMarginRight" type="attr" />
+    <public name="mapbox_myLocationBackgroundMarginBottom" type="attr" />
+    <public name="mapbox_myLocationAccuracyTintColor" type="attr" />
+    <public name="mapbox_myLocationAccuracyAlpha" type="attr" />
+
+    <public name="mapbox_uiCompass" type="attr" />
+    <public name="mapbox_uiCompassGravity" type="attr" />
+    <public name="mapbox_uiCompassMarginLeft" type="attr" />
+    <public name="mapbox_uiCompassMarginTop" type="attr" />
+    <public name="mapbox_uiCompassMarginRight" type="attr" />
+    <public name="mapbox_uiCompassMarginBottom" type="attr" />
+    <public name="mapbox_uiCompassFadeFacingNorth" type="attr" />
+
+    <public name="mapbox_uiLogo" type="attr" />
+    <public name="mapbox_uiLogoGravity" type="attr" />
+    <public name="mapbox_uiLogoMarginLeft" type="attr" />
+    <public name="mapbox_uiLogoMarginTop" type="attr" />
+    <public name="mapbox_uiLogoMarginRight" type="attr" />
+    <public name="mapbox_uiLogoMarginBottom" type="attr" />
+
+    <public name="mapbox_uiAttribution" type="attr" />
+    <public name="mapbox_uiAttributionGravity" type="attr" />
+    <public name="mapbox_uiAttributionMarginLeft" type="attr" />
+    <public name="mapbox_uiAttributionMarginTop" type="attr" />
+    <public name="mapbox_uiAttributionMarginRight" type="attr" />
+    <public name="mapbox_uiAttributionMarginBottom" type="attr" />
+
+    <public name="mapbox_renderTextureMode" type="attr" />
+
+    <!-- Exposed styles -->
     <public name="mapbox_style_mapbox_streets" type="string" />
     <public name="mapbox_style_emerald" type="string" />
     <public name="mapbox_style_light" type="string" />
@@ -14,39 +67,7 @@
     <public name="mapbox_style_satellite" type="string" />
     <public name="mapbox_style_satellite_streets" type="string" />
 
-    <public name="mapbox_center_longitude" type="attr" />
-    <public name="mapbox_center_latitude" type="attr" />
-    <public name="mapbox_zoom_level" type="attr" />
-    <public name="mapbox_direction" type="attr" />
-    <public name="mapbox_zoom_enabled" type="attr" />
-    <public name="mapbox_scroll_enabled" type="attr" />
-    <public name="mapbox_rotate_enabled" type="attr" />
-    <public name="mapbox_zoom_controls_enabled" type="attr" />
-    <public name="mapbox_debug_active" type="attr" />
-    <public name="mapbox_style_url" type="attr" />
-    <public name="mapbox_access_token" type="attr" />
-    <public name="mapbox_style_classes" type="attr" />
-    <public name="mapbox_my_location_enabled" type="attr" />
-    <public name="mapbox_compass_enabled" type="attr" />
-    <public name="mapbox_compass_gravity" type="attr" />
-    <public name="mapbox_compass_margin_left" type="attr" />
-    <public name="mapbox_compass_margin_top" type="attr" />
-    <public name="mapbox_compass_margin_right" type="attr" />
-    <public name="mapbox_compass_margin_bottom" type="attr" />
-    <public name="mapbox_compass_fade_facing_north" type="attr" />
-    <public name="mapbox_logo_gravity" type="attr" />
-    <public name="mapbox_logo_margin_left" type="attr" />
-    <public name="mapbox_logo_margin_top" type="attr" />
-    <public name="mapbox_logo_margin_right" type="attr" />
-    <public name="mapbox_logo_margin_bottom" type="attr" />
-    <public name="mapbox_logo_visibility" type="attr" />
-    <public name="mapbox_attribution_gravity" type="attr" />
-    <public name="mapbox_attribution_margin_left" type="attr" />
-    <public name="mapbox_attribution_margin_top" type="attr" />
-    <public name="mapbox_attribution_margin_right" type="attr" />
-    <public name="mapbox_attribution_margin_bottom" type="attr" />
-    <public name="mapbox_attribution_visibility" type="attr" />
-
+    <!-- Exposed drawables -->
     <public name="mapbox_logo_icon" type="drawable" />
     <public name="mapbox_compass_icon" type="drawable" />
     <public name="mapbox_marker_icon_default" type="drawable" />
@@ -56,6 +77,7 @@
     <public name="mapbox_mylocation_icon_default" type="drawable" />
     <public name="mapbox_mylocation_icon_bearing" type="drawable" />
 
+    <!-- Exposed colors -->
     <public name="mapbox_mylocation_ring" type="color" />
     <public name="mapbox_blue" type="color" />
 </resources>

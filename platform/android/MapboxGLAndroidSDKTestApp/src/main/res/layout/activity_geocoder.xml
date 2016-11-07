@@ -17,9 +17,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="5"
-        app:mapbox_center_latitude="38.90962"
-        app:mapbox_center_longitude="-77.04341"
-        app:mapbox_zoom="15" />
+        app:mapbox_cameraTargetLat="38.90962"
+        app:mapbox_cameraTargetLng="-77.04341"
+        app:mapbox_cameraZoom="15" />
 
     <TextView
         android:id="@+id/message"
