@@ -588,7 +588,7 @@ public class MyLocationView extends View {
 
         private void rotateCamera(float rotation) {
             CameraPosition.Builder builder = new CameraPosition.Builder();
-            builder.bearing(-rotation);
+            builder.bearing(rotation);
             mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), COMPASS_UPDATE_RATE_MS, false /*linear interpolator*/, false /*do not disable tracking*/, null);
         }
 
@@ -694,7 +694,7 @@ public class MyLocationView extends View {
             // add direction
             if (myBearingTrackingMode == MyBearingTracking.GPS) {
                 if (location.hasBearing()) {
-                    builder.bearing(-location.getBearing());
+                    builder.bearing(location.getBearing());
                 }
                 setCompass(0);
             }
