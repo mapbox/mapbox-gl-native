@@ -3022,7 +3022,7 @@ public class MapView extends FrameLayout {
     /**
      * This event is triggered whenever the currently displayed map region is about to changing
      * with an animation.
-     * <p
+     * <p>
      * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}
      * </p>
      *

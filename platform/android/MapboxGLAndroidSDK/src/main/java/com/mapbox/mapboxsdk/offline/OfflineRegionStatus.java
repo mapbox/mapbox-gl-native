@@ -7,6 +7,7 @@ package com.mapbox.mapboxsdk.offline;
  * <p>
  * Note that the total required size in bytes is not currently available. A
  * future API release may provide an estimate of this number.
+ * </p>
  */
 public class OfflineRegionStatus {
 
