@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,6 +27,8 @@ public class MarkerView extends Marker {
 
     private float width;
     private float height;
+
+    private final RectF drawRect = new RectF();
 
     private float anchorU;
     private float anchorV;
@@ -418,6 +421,8 @@ public class MarkerView extends Marker {
 
         view.setX(point.x - offsetX);
         view.setY(point.y - offsetY);
+        drawRect.set(0, 0, width, height);
+        drawRect.offset(view.getX(), view.getY());
 
         // animate visibility
         if (visible && view.getVisibility() == View.GONE) {
@@ -425,6 +430,10 @@ public class MarkerView extends Marker {
             view.setAlpha(0F);
             setAlpha(1F);
         }
+    }
+
+    public RectF getDrawRect() {
+        return drawRect;
     }
 
     /**

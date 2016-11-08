@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -116,6 +117,8 @@ public class MyLocationView extends View {
     private GpsLocationListener userLocationListener;
     private CompassListener compassListener;
     private WindowManager mWindowManager;
+
+    private final RectF drawRect = new RectF();
 
     public MyLocationView(Context context) {
         super(context);
@@ -305,6 +308,16 @@ public class MyLocationView extends View {
         } else {
             draw(canvas, foregroundBearingDrawable, backgroundBearingDrawable);
         }
+    }
+
+    public RectF getDrawRect() {
+        if (myBearingTrackingMode == MyBearingTracking.NONE) {
+            drawRect.set(foregroundDrawable.getBounds());
+        } else {
+            drawRect.set(foregroundBearingDrawable.getBounds());
+        }
+        drawRect.offset(screenLocation.x, screenLocation.y); //TODO manage orientation when map rotation will be activated
+        return drawRect;
     }
 
     private void draw(Canvas canvas, Drawable foreground, Drawable background) {

@@ -66,6 +66,7 @@ import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
+import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -1867,73 +1868,36 @@ public class MapView extends FrameLayout {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
-            List<Marker> selectedMarkers = mapboxMap.getSelectedMarkers();
-
             PointF tapPoint = new PointF(motionEvent.getX(), motionEvent.getY());
-            float toleranceSides = 4 * screenDensity;
-            float toleranceTopBottom = 10 * screenDensity;
 
-            RectF tapRect = new RectF((tapPoint.x - averageIconWidth / 2 - toleranceSides),
-                    (tapPoint.y - averageIconHeight / 2 - toleranceTopBottom),
-                    (tapPoint.x + averageIconWidth / 2 + toleranceSides),
-                    (tapPoint.y + averageIconHeight / 2 + toleranceTopBottom));
+            Location myLocation = getMyLocation();
+            if (myLocation != null && mapboxMap.myLocationViewClickListener != null) {
+                RectF myLocationViewDrawRect = myLocationView.getDrawRect();
+                if (myLocationViewDrawRect.contains(tapPoint.x, tapPoint.y)) {
+                    mapboxMap.myLocationViewClickListener.onMyLocationViewClicked(myLocation);
+                    trackGestureEvent(MapboxEvent.GESTURE_SINGLETAP, motionEvent.getX(), motionEvent.getY());
+                    return true;
+                }
+            }
 
-            if (mapboxMap.myLocationViewClickListener != null) {
-                final Location myLocation = getMyLocation();
-                if (myLocation != null) {
-                    PointF myLocationPointF = toNativeScreenLocation(new LatLng(myLocation));
-                    if (tapRect.contains(myLocationPointF.x, myLocationPointF.y)) {
-                        mapboxMap.myLocationViewClickListener.onMyLocationViewClicked(myLocation);
-                        return true;
+            List<MarkerView> markerViews = new ArrayList<>();
+            final List<Marker> markers = mapboxMap.getMarkers();
+            for (Marker marker : markers) {
+                if (marker.getClass().equals(MarkerView.class)) {
+                    final MarkerView markerView = (MarkerView) marker;
+                    if (markerView.isVisible()) {
+                        RectF drawRect = markerView.getDrawRect();
+                        if (drawRect.contains(tapPoint.x, tapPoint.y)) {
+                            markerViews.add(markerView);
+                        }
                     }
                 }
             }
 
-
-            tapRect.set(
-                    tapRect.left / screenDensity,
-                    tapRect.top / screenDensity,
-                    tapRect.right / screenDensity,
-                    tapRect.bottom / screenDensity
-            );
-
-            List<Marker> nearbyMarkers = getMarkersInRect(tapRect);
-            long newSelectedMarkerId = -1;
-
-            if (nearbyMarkers != null && nearbyMarkers.size() > 0) {
-                Collections.sort(nearbyMarkers);
-                for (Marker nearbyMarker : nearbyMarkers) {
-                    boolean found = false;
-                    for (Marker selectedMarker : selectedMarkers) {
-                        if (selectedMarker.equals(nearbyMarker)) {
-                            found = true;
-                        }
-                    }
-                    if (!found) {
-                        newSelectedMarkerId = nearbyMarker.getId();
-                        break;
-                    }
-                }
-            }
-
-            if (newSelectedMarkerId >= 0) {
-                List<Annotation> annotations = mapboxMap.getAnnotations();
-                int count = annotations.size();
-                for (int i = 0; i < count; i++) {
-                    Annotation annotation = annotations.get(i);
-                    if (annotation instanceof Marker) {
-                        if (annotation.getId() == newSelectedMarkerId) {
-                            if (selectedMarkers.isEmpty() || !selectedMarkers.contains(annotation)) {
-                                if (!(annotation instanceof MarkerView)) {
-                                    mapboxMap.selectMarker((Marker) annotation);
-                                } else {
-                                    mapboxMap.getMarkerViewManager().onClickMarkerView((MarkerView) annotation);
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
+            if (!markerViews.isEmpty()) {
+                Collections.sort(markerViews, MarkerViewManager.MARKER_SORTER);
+                final MarkerView selectedMarker = markerViews.get(markerViews.size() - 1);
+                mapboxMap.getMarkerViewManager().onClickMarkerView(selectedMarker);
             } else {
                 if (mapboxMap.getUiSettings().isDeselectMarkersOnTap()) {
                     // deselect any selected marker
@@ -1950,6 +1914,71 @@ public class MapView extends FrameLayout {
 
             trackGestureEvent(MapboxEvent.GESTURE_SINGLETAP, motionEvent.getX(), motionEvent.getY());
             return true;
+            //dead code since we do not use MarkerGL
+
+
+//
+//            float toleranceSides = 4 * screenDensity;
+//            float toleranceTopBottom = 10 * screenDensity;
+//
+//            RectF tapRect = new RectF((tapPoint.x - averageIconWidth / 2 - toleranceSides) / screenDensity,
+//                    (tapPoint.y - averageIconHeight / 2 - toleranceTopBottom) / screenDensity,
+//                    (tapPoint.x + averageIconWidth / 2 + toleranceSides) / screenDensity,
+//                    (tapPoint.y + averageIconHeight / 2 + toleranceTopBottom) / screenDensity);
+//
+//            List<Marker> nearbyMarkers = getMarkersInRect(tapRect);
+//            long newSelectedMarkerId = -1;
+//
+//            if (nearbyMarkers != null && nearbyMarkers.size() > 0) {
+//                Collections.sort(nearbyMarkers);
+//                for (Marker nearbyMarker : nearbyMarkers) {
+//                    boolean found = false;
+//                    for (Marker selectedMarker : selectedMarkers) {
+//                        if (selectedMarker.equals(nearbyMarker)) {
+//                            found = true;
+//                        }
+//                    }
+//                    if (!found) {
+//                        newSelectedMarkerId = nearbyMarker.getId();
+//                        break;
+//                    }
+//                }
+//            }
+//
+//            if (newSelectedMarkerId >= 0) {
+//                List<Annotation> annotations = mapboxMap.getAnnotations();
+//                int count = annotations.size();
+//                for (int i = 0; i < count; i++) {
+//                    Annotation annotation = annotations.get(i);
+//                    if (annotation instanceof Marker) {
+//                        if (annotation.getId() == newSelectedMarkerId) {
+//                            if (selectedMarkers.isEmpty() || !selectedMarkers.contains(annotation)) {
+//                                if (!(annotation instanceof MarkerView)) {
+//                                    mapboxMap.selectMarker((Marker) annotation);
+//                                } else {
+//                                    mapboxMap.getMarkerViewManager().onClickMarkerView((MarkerView) annotation);
+//                                }
+//                            }
+//                            break;
+//                        }
+//                    }
+//                }
+//            } else {
+//                if (mapboxMap.getUiSettings().isDeselectMarkersOnTap()) {
+//                    // deselect any selected marker
+//                    mapboxMap.deselectMarkers();
+//                }
+//
+//                // notify app of map click
+//                MapboxMap.OnMapClickListener listener = mapboxMap.getOnMapClickListener();
+//                if (listener != null) {
+//                    LatLng point = projection.fromScreenLocation(tapPoint);
+//                    listener.onMapClick(point);
+//                }
+//            }
+//
+//            trackGestureEvent(MapboxEvent.GESTURE_SINGLETAP, motionEvent.getX(), motionEvent.getY());
+//            return true;
         }
 
         // Called for a long press

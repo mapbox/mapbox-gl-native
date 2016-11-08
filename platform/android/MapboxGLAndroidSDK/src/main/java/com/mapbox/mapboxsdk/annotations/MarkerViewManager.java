@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class MarkerViewManager {
 
-    private static final Comparator<View> MARKER_SORTER = new Comparator<View>() {
+    private static final Comparator<View> MARKER_VIEW_SORTER = new Comparator<View>() {
         @Override
         public int compare(View lhs, View rhs) {
             ImageMarkerViewAdapter.ViewHolder leftViewHolder = (ImageMarkerViewAdapter.ViewHolder) lhs.getTag();
@@ -42,6 +42,13 @@ public class MarkerViewManager {
             final MarkerView leftMarker = leftViewHolder.marker;
             final MarkerView rightMarker = rightViewHolder.marker;
 
+            return MARKER_SORTER.compare(leftMarker, rightMarker);
+        }
+    };
+
+    public static final Comparator<MarkerView> MARKER_SORTER = new Comparator<MarkerView>() {
+        @Override
+        public int compare(MarkerView leftMarker, MarkerView rightMarker) {
             int zOrderComparison = Double.compare(leftMarker.getZOrder(), rightMarker.getZOrder());
             if (zOrderComparison != 0) {
                 return zOrderComparison;
@@ -65,6 +72,7 @@ public class MarkerViewManager {
             return (int) (leftMarker.getId() - rightMarker.getId());
         }
     };
+
     private Map<MarkerView, View> markerViewMap;
     private MapboxMap mapboxMap;
     private MapView mapView;
@@ -494,7 +502,7 @@ public class MarkerViewManager {
             markerViews.add(markerViewContainer.getChildAt(viewIndex));
         }
 
-        Collections.sort(markerViews, MARKER_SORTER);
+        Collections.sort(markerViews, MARKER_VIEW_SORTER);
 
         markerViewContainer.removeAllViews();
         for (View markerView : markerViews) {
