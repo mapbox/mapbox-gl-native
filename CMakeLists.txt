@@ -22,9 +22,10 @@ if(WITH_CXX11ABI)
 endif()
 
 if(WITH_OSMESA)
-    add_compile_options(-D__OSMESA__)
+    # Default mesa mason binary is OSMesa.
+    set(MASON_MESA_SUFFIX "")
 else()
-    set(MASON_MESA_SUFFIX -glx)
+    set(MASON_MESA_SUFFIX "-glx")
 endif()
 
 if(IS_CI_BUILD)

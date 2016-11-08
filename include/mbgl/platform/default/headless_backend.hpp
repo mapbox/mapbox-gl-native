@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/gl/implementation.hpp>
 #include <mbgl/gl/extension.hpp>
 
 #include <mbgl/map/backend.hpp>
