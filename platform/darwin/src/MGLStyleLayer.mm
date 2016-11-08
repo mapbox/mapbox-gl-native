@@ -5,8 +5,6 @@
 
 @interface MGLStyleLayer ()
 
-@property (nonatomic) mbgl::style::Layer *layer;
-
 @end
 
 @implementation MGLStyleLayer
@@ -24,33 +22,33 @@
     mbgl::style::VisibilityType v = visible
     ? mbgl::style::VisibilityType::Visible
     : mbgl::style::VisibilityType::None;
-    self.layer->setVisibility(v);
+    self.rawLayer->setVisibility(v);
 }
 
 - (BOOL)isVisible
 {
-    mbgl::style::VisibilityType v = self.layer->getVisibility();
+    mbgl::style::VisibilityType v = self.rawLayer->getVisibility();
     return (v == mbgl::style::VisibilityType::Visible);
 }
 
 - (void)setMaximumZoomLevel:(float)maximumZoomLevel
 {
-    self.layer->setMaxZoom(maximumZoomLevel);
+    self.rawLayer->setMaxZoom(maximumZoomLevel);
 }
 
 - (float)maximumZoomLevel
 {
-    return self.layer->getMaxZoom();
+    return self.rawLayer->getMaxZoom();
 }
 
 - (void)setMinimumZoomLevel:(float)minimumZoomLevel
 {
-    self.layer->setMinZoom(minimumZoomLevel);
+    self.rawLayer->setMinZoom(minimumZoomLevel);
 }
 
 - (float)minimumZoomLevel
 {
-    return self.layer->getMinZoom();
+    return self.rawLayer->getMinZoom();
 }
 
 @end
