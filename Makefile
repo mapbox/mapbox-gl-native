@@ -273,8 +273,10 @@ ideploy:
 idocument:
 	OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
 
-style-code-darwin:
+.PHONY: darwin-style-code
+darwin-style-code:
 	node platform/darwin/scripts/generate-style-code.js
+style-code: darwin-style-code
 endif
 
 #### Linux targets #####################################################
@@ -467,13 +469,14 @@ test-node: node
 ANDROID_ENV = platform/android/scripts/toolchain.sh
 ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
 
-.PHONY: style-code-android
-style-code-android: $(BUILD_DEPS)
+.PHONY: android-style-code
+android-style-code:
 	node platform/android/scripts/generate-style-code.js
+style-code: android-style-code
 
 define ANDROID_RULES
 
-build/android-$1/$(BUILDTYPE): style-code-android
+build/android-$1/$(BUILDTYPE): $(BUILD_DEPS)
 	mkdir -p build/android-$1/$(BUILDTYPE)
 
 build/android-$1/$(BUILDTYPE)/toolchain.cmake: platform/android/scripts/toolchain.sh build/android-$1/$(BUILDTYPE)
