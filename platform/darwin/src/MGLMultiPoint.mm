@@ -14,7 +14,6 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 
 @implementation MGLMultiPoint
 {
-    size_t _count;
     MGLCoordinateBounds _bounds;
     std::vector<CLLocationCoordinate2D> _coordinates;
 }
@@ -25,12 +24,8 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 
     if (self)
     {
-        _count = count;
-        _coordinates.reserve(_count);
-        for (NSUInteger i = 0; i < _count; i++)
-        {
-            _coordinates.push_back(coords[i]);
-        }
+        NSAssert(count > 0, @"A multipoint must have coordinates");
+        _coordinates = { coords, coords + count };
         [self computeBounds];
     }
 
@@ -39,15 +34,13 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 
 - (CLLocationCoordinate2D)coordinate
 {
-    assert(_count > 0);
-
-    CLLocationCoordinate2D coordinate = _coordinates.at(0);
-    return CLLocationCoordinate2DMake(coordinate.latitude, coordinate.longitude);
+    NSAssert([self pointCount] > 0, @"A multipoint must have coordinates");
+    return _coordinates.at(0);
 }
 
 - (NSUInteger)pointCount
 {
-    return _count;
+    return _coordinates.size();
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingPointCount
@@ -62,46 +55,40 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 
 - (void)getCoordinates:(CLLocationCoordinate2D *)coords range:(NSRange)range
 {
-    if (range.location + range.length > _count)
+    if (range.location + range.length > [self pointCount])
     {
         [NSException raise:NSRangeException
                     format:@"Invalid coordinate range %@ extends beyond current coordinate count of %zu",
-                        NSStringFromRange(range), _count];
+                        NSStringFromRange(range), [self pointCount]];
     }
 
-    NSUInteger index = 0;
+    std::copy(_coordinates.begin() + range.location, _coordinates.begin() + NSMaxRange(range), coords);
+}
 
-    for (NSUInteger i = range.location; i < range.location + range.length; i++)
-    {
-        coords[index] = _coordinates.at(i);
-        index++;
-    }
+- (void)appendCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
+{
+    [self willChangeValueForKey:@"coordinates"];
+    _coordinates.insert(_coordinates.end(), *coords);
+    [self computeBounds];
+    [self didChangeValueForKey:@"coordinates"];
 }
 
 - (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(CLLocationCoordinate2D *)coords
 {
     if (range.length == 0)
     {
-        [NSException raise:NSRangeException format:@"Empty coordinate range %@", NSStringFromRange(range)];
+        return;
     }
-    else if (range.location > _count)
+    
+    if (NSMaxRange(range) > _coordinates.size())
     {
         [NSException raise:NSRangeException
                     format:@"Invalid range %@ for existing coordinate count %zu",
-                        NSStringFromRange(range), _count];
+         NSStringFromRange(range), [self pointCount]];
     }
 
     [self willChangeValueForKey:@"coordinates"];
-    NSUInteger newCount = NSMaxRange(range);
-    std::vector<CLLocationCoordinate2D> newCoordinates;
-    newCoordinates.reserve(range.length);
-    for (NSUInteger i = 0; i < range.length; i++)
-    {
-        newCoordinates.push_back(coords[i]);
-    }
-    _coordinates.resize(newCount);
-    std::copy_backward(newCoordinates.begin(), newCoordinates.end(), _coordinates.begin() + range.location + 1);
-    _count = newCount;
+    std::copy(coords, coords + range.length, _coordinates.begin() + range.location);
     [self computeBounds];
     [self didChangeValueForKey:@"coordinates"];
 }
@@ -110,7 +97,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 {
     CLLocationCoordinate2D *coords = self.coordinates;
     mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
-    for (NSUInteger i = 0; i < _count; i++)
+    for (NSUInteger i = 0; i < [self pointCount]; i++)
     {
         bounds.extend(mbgl::LatLng(coords[i].latitude, coords[i].longitude));
     }
@@ -136,7 +123,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p; count = %lu; bounds = %@>",
-               NSStringFromClass([self class]), (void *)self, (unsigned long)_count, MGLStringFromCoordinateBounds(_bounds)];
+               NSStringFromClass([self class]), (void *)self, (unsigned long)[self pointCount], MGLStringFromCoordinateBounds(_bounds)];
 }
 
 @end

@@ -59,6 +59,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(CLLocationCoordinate2D *)coords;
 
+// TODO: Document this
+- (void)appendCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
+
 @end
 
 NS_ASSUME_NONNULL_END
