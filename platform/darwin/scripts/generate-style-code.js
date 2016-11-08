@@ -6,20 +6,10 @@ const _ = require('lodash');
 const colorParser = require('csscolorparser');
 const spec = _.merge(require('mapbox-gl-style-spec').latest, require('./style-spec-overrides-v8.json'));
 
+require('../../../scripts/style-code');
+
 const prefix = 'MGL';
 const suffix = 'StyleLayer';
-
-global.camelize = function (str) {
-    return str.replace(/(?:^|-)(.)/g, function (_, x) {
-        return x.toUpperCase();
-    });
-};
-
-global.camelizeWithLeadingLowercase = function (str) {
-    return str.replace(/-(.)/g, function (_, x) {
-        return x.toUpperCase();
-    });
-};
 
 global.objCName = function (property) {
     return camelizeWithLeadingLowercase(property.name);
@@ -346,7 +336,7 @@ ${macosComment}${decl}
 }
 
 for (var layer of layers) {
-    fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, duplicatePlatformDecls(layerH(layer)));
-    fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
-    fs.writeFileSync(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.m`, testLayers(layer));
+    writeIfModified(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, duplicatePlatformDecls(layerH(layer)));
+    writeIfModified(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
+    writeIfModified(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.m`, testLayers(layer));
 }

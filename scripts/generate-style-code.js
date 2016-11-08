@@ -5,23 +5,13 @@ const ejs = require('ejs');
 const spec = require('mapbox-gl-style-spec').latest;
 var colorParser = require('csscolorparser');
 
+require('./style-code');
+
 function parseCSSColor(str) {
   var color = colorParser.parseCSSColor(str);
   return [
       color[0] / 255 * color[3], color[1] / 255 * color[3], color[2] / 255 * color[3], color[3]
   ];
-}
-
-global.camelize = function (str) {
-  return str.replace(/(?:^|-)(.)/g, function (_, x) {
-    return x.toUpperCase();
-  });
-}
-
-global.camelizeWithLeadingLowercase = function (str) {
-  return str.replace(/-(.)/g, function (_, x) {
-    return x.toUpperCase();
-  });
 }
 
 global.propertyType = function (property) {
@@ -121,16 +111,19 @@ const layers = Object.keys(spec.layer.type.values).map((type) => {
     type: type,
     layoutProperties: layoutProperties,
     paintProperties: paintProperties,
+    doc: spec.layer.type.values[type].doc,
+    layoutPropertiesByName: spec[`layout_${type}`],
+    paintPropertiesByName: spec[`paint_${type}`],
   };
 });
 
 for (const layer of layers) {
-  fs.writeFileSync(`include/mbgl/style/layers/${layer.type}_layer.hpp`, layerHpp(layer));
-  fs.writeFileSync(`src/mbgl/style/layers/${layer.type}_layer.cpp`, layerCpp(layer));
+  writeIfModified(`include/mbgl/style/layers/${layer.type}_layer.hpp`, layerHpp(layer));
+  writeIfModified(`src/mbgl/style/layers/${layer.type}_layer.cpp`, layerCpp(layer));
 
-  fs.writeFileSync(`src/mbgl/style/layers/${layer.type}_layer_properties.hpp`, propertiesHpp(layer));
-  fs.writeFileSync(`src/mbgl/style/layers/${layer.type}_layer_properties.cpp`, propertiesCpp(layer));
+  writeIfModified(`src/mbgl/style/layers/${layer.type}_layer_properties.hpp`, propertiesHpp(layer));
+  writeIfModified(`src/mbgl/style/layers/${layer.type}_layer_properties.cpp`, propertiesCpp(layer));
 }
 
 const propertySettersHpp = ejs.compile(fs.readFileSync('include/mbgl/style/conversion/make_property_setters.hpp.ejs', 'utf8'), {strict: true});
-fs.writeFileSync('include/mbgl/style/conversion/make_property_setters.hpp', propertySettersHpp({layers: layers}));
+writeIfModified('include/mbgl/style/conversion/make_property_setters.hpp', propertySettersHpp({layers: layers}));

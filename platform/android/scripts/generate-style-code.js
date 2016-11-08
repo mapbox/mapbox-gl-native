@@ -5,6 +5,8 @@ const ejs = require('ejs');
 const spec = require('mapbox-gl-style-spec').latest;
 const _ = require('lodash');
 
+require('../../../scripts/style-code');
+
 // Specification parsing //
 
 //Collect layer types from spec
@@ -37,29 +39,6 @@ const layoutProperties = _(layers).map('layoutProperties').flatten().value();
 const paintProperties = _(layers).map('paintProperties').flatten().value();
 const allProperties = _(layoutProperties).union(paintProperties).value();
 const enumProperties = _(allProperties).filter({'type': 'enum'}).value();
-
-// Global functions //
-
-global.iff = function (condition, val) {
-  return condition() ? val : "";
-}
-
-
-global.camelize = function (str) {
-  return str.replace(/(?:^|-)(.)/g, function (_, x) {
-    return x.toUpperCase();
-  });
-}
-
-global.camelizeWithLeadingLowercase = function (str) {
-  return str.replace(/-(.)/g, function (_, x) {
-    return x.toUpperCase();
-  });
-}
-
-global.snakeCaseUpper = function snakeCaseUpper(str) {
-  return str.replace(/-/g, "_").toUpperCase();
-}
 
 global.propertyType = function propertyType(property) {
   switch (property.type) {
@@ -235,7 +214,6 @@ global.propertyValueDoc = function (property, value) {
 
 // Template processing //
 
-
 // Java + JNI Layers (Peer model)
 const layerHpp = ejs.compile(fs.readFileSync('platform/android/src/style/layers/layer.hpp.ejs', 'utf8'), {strict: true});
 const layerCpp = ejs.compile(fs.readFileSync('platform/android/src/style/layers/layer.cpp.ejs', 'utf8'), {strict: true});
@@ -243,23 +221,23 @@ const layerJava = ejs.compile(fs.readFileSync('platform/android/MapboxGLAndroidS
 const layerJavaUnitTests = ejs.compile(fs.readFileSync('platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/style/layer.junit.ejs', 'utf8'), {strict: true});
 
 for (const layer of layers) {
-  fs.writeFileSync(`platform/android/src/style/layers/${layer.type}_layer.hpp`, layerHpp(layer));
-  fs.writeFileSync(`platform/android/src/style/layers/${layer.type}_layer.cpp`, layerCpp(layer));
-  fs.writeFileSync(`platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/${camelize(layer.type)}Layer.java`, layerJava(layer));
-  fs.writeFileSync(`platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/style/${camelize(layer.type)}LayerTest.java`, layerJavaUnitTests(layer));
+  writeIfModified(`platform/android/src/style/layers/${layer.type}_layer.hpp`, layerHpp(layer));
+  writeIfModified(`platform/android/src/style/layers/${layer.type}_layer.cpp`, layerCpp(layer));
+  writeIfModified(`platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/${camelize(layer.type)}Layer.java`, layerJava(layer));
+  writeIfModified(`platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/style/${camelize(layer.type)}LayerTest.java`, layerJavaUnitTests(layer));
 }
 
 
 // Java PropertyFactory
 const propertiesTemplate = ejs.compile(fs.readFileSync('platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/property_factory.java.ejs', 'utf8'), {strict: true});
-fs.writeFileSync(
+writeIfModified(
     `platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/PropertyFactory.java`,
     propertiesTemplate({layoutProperties: layoutProperties, paintProperties: paintProperties})
 );
 
 // Java Property
 const enumPropertyJavaTemplate = ejs.compile(fs.readFileSync('platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/property.java.ejs', 'utf8'), {strict: true});
-fs.writeFileSync(
+writeIfModified(
     `platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/Property.java`,
     enumPropertyJavaTemplate({properties: enumProperties})
 );
@@ -269,14 +247,14 @@ const enumPropertiesDeDup = _(enumProperties).uniqBy(global.propertyNativeType).
 
 // JNI Enum property conversion templates
 const enumPropertyHppTypeStringValueTemplate = ejs.compile(fs.readFileSync('platform/android/src/style/conversion/types_string_values.hpp.ejs', 'utf8'), {strict: true});
-fs.writeFileSync(
+writeIfModified(
     `platform/android/src/style/conversion/types_string_values.hpp`,
     enumPropertyHppTypeStringValueTemplate({properties: enumPropertiesDeDup})
 );
 
 // JNI property value types conversion templates
 const enumPropertyHppTypeTemplate = ejs.compile(fs.readFileSync('platform/android/src/style/conversion/types.hpp.ejs', 'utf8'), {strict: true});
-fs.writeFileSync(
+writeIfModified(
     `platform/android/src/style/conversion/types.hpp`,
     enumPropertyHppTypeTemplate({properties: enumPropertiesDeDup})
 );
