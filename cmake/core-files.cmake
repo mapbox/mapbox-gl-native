@@ -54,7 +54,6 @@ set(MBGL_CORE_FILES
 
     # gl
     include/mbgl/gl/gl.hpp
-    include/mbgl/gl/implementation.hpp
     src/mbgl/gl/attribute.hpp
     src/mbgl/gl/color_mode.cpp
     src/mbgl/gl/color_mode.hpp

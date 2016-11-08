@@ -1,7 +1,5 @@
 #pragma once
 
-#include <mbgl/gl/implementation.hpp>
-
 #include <memory>
 
 namespace mbgl {
