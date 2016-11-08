@@ -95,6 +95,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.mapbox.mapboxsdk.utils.MathUtils.convertNativeBearing;
+
 /**
  * <p>
  * A {@code MapView} provides an embeddable map interface.
@@ -718,16 +720,7 @@ public class MapView extends FrameLayout {
             return 0;
         }
 
-        double direction = -nativeMapView.getBearing();
-
-        while (direction > 360) {
-            direction -= 360;
-        }
-        while (direction < 0) {
-            direction += 360;
-        }
-
-        return direction;
+        return convertNativeBearing(nativeMapView.getBearing());
     }
 
     void setDirection(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION) double direction) {
