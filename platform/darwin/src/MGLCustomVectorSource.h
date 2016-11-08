@@ -46,6 +46,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setNeedsUpdateAtZoomLevel:(NSUInteger)z x:(NSUInteger)x y:(NSUInteger)y;
 
 /**
+ Reload all tiles.
+ */
+- (void)reload;
+
+/**
  An object that implements the `MGLCustomVectorSourceDataSource` protocol that will be queried for tile data.
  */
 @property (nonatomic, readonly, copy) NSObject<MGLCustomVectorSourceDataSource> *dataSource;

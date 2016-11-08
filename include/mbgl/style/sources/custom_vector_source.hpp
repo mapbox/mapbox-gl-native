@@ -12,7 +12,8 @@ public:
   
     void setTileData(uint8_t, uint32_t, uint32_t, const mapbox::geojson::geojson&);
     void updateTile(uint8_t, uint32_t, uint32_t);
-
+    void reload();
+  
     // Private implementation
     class Impl;
     Impl* const impl;

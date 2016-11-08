@@ -16,6 +16,10 @@ void CustomVectorSource::setTileData(uint8_t z, uint32_t x, uint32_t y, const ma
 void CustomVectorSource::updateTile(uint8_t z, uint32_t x, uint32_t y) {
     impl->updateTile(z, x, y);
 }
-    
+  
+void CustomVectorSource::reload() {
+    impl->reload();
+}
+
 } // namespace style
 } // namespace mbgl

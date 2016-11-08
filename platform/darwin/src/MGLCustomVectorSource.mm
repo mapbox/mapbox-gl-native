@@ -77,4 +77,11 @@
     });
 }
 
+- (void)reload
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.rawSource->reload();
+    });
+}
+
 @end

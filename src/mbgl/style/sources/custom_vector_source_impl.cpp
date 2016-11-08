@@ -71,6 +71,13 @@ void CustomVectorSource::Impl::updateTile(uint8_t z, uint32_t x, uint32_t y) {
         }
     }
 }
+ 
+void CustomVectorSource::Impl::reload() {
+    for (auto const &item : tiles) {
+        GeoJSONTile* tile = static_cast<GeoJSONTile*>(item.second.get());
+        fetchTile(tile->id.canonical.z, tile->id.canonical.x, tile->id.canonical.y);
+    }
+}
     
 } // namespace style
 } // namespace mbgl
