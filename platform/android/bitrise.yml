@@ -175,6 +175,13 @@ workflows:
             export BUILDTYPE=Release
             make apackage
     - script:
+        title: Log metrics
+        inputs:
+        - content: |-
+            #!/bin/bash
+            echo "Log binary size metrics to AWS CloudWatch:"
+            CLOUDWATCH=true platform/android/scripts/metrics.sh
+    - script:
         title: Publish to maven
         inputs:
         - content: |-
