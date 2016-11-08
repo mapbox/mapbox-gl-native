@@ -9,6 +9,8 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
+import static com.mapbox.mapboxsdk.utils.MathUtils.convertNativeBearing;
+
 /**
  * Resembles the position, angle, zoom and tilt of the user's viewpoint.
  */
@@ -202,7 +204,7 @@ public final class CameraPosition implements Parcelable {
             super();
             if (nativeCameraValues != null && nativeCameraValues.length == 5) {
                 target(new LatLng(nativeCameraValues[0], nativeCameraValues[1]));
-                bearing(nativeCameraValues[2]);
+                bearing(convertNativeBearing(nativeCameraValues[2]));
                 tilt(nativeCameraValues[3]);
                 zoom((float) nativeCameraValues[4]);
             }
