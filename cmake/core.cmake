@@ -34,6 +34,13 @@ target_include_directories(mbgl-core
     PRIVATE ${MBGL_GENERATED}/include
 )
 
+if(WITH_CLIPPER)
+    target_sources(mbgl-core
+        PRIVATE platform/default/clipper/clipper.cpp
+        PRIVATE platform/default/clipper/clipper.hpp
+    )
+endif()
+
 target_add_mason_package(mbgl-core PUBLIC geometry)
 target_add_mason_package(mbgl-core PUBLIC variant)
 target_add_mason_package(mbgl-core PUBLIC unique_resource)

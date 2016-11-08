@@ -66,7 +66,9 @@ Feature convertFeature(const GeometryTileFeature&, const CanonicalTileID&);
 
 // Fix up possibly-non-V2-compliant polygon geometry using angus clipper.
 // The result is guaranteed to have correctly wound, strictly simple rings.
+#if MBGL_USE_CLIPPER
 GeometryCollection fixupPolygons(const GeometryCollection&);
+#endif
 
 struct ToGeometryCollection {
     GeometryCollection operator()(const mapbox::geometry::point<int16_t>& geom) const {

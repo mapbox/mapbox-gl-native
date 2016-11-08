@@ -48,10 +48,12 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
 
         assert(featureType != FeatureType::Unknown);
 
+#if MBGL_USE_CLIPPER
         // https://github.com/mapbox/geojson-vt-cpp/issues/44
         if (featureType == FeatureType::Polygon) {
             renderGeometry = fixupPolygons(renderGeometry);
         }
+#endif
 
         layer.features.emplace_back(id, featureType, renderGeometry);
     }

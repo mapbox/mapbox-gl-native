@@ -35,10 +35,6 @@ set(MBGL_CORE_FILES
     src/mbgl/annotation/symbol_annotation_impl.cpp
     src/mbgl/annotation/symbol_annotation_impl.hpp
 
-    # clipper
-    src/clipper/clipper.cpp
-    src/clipper/clipper.hpp
-
     # csscolorparser
     src/csscolorparser/csscolorparser.cpp
     src/csscolorparser/csscolorparser.hpp

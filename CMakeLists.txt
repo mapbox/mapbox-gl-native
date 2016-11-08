@@ -16,6 +16,7 @@ option(WITH_CXX11ABI "Use cxx11abi mason packages" OFF)
 option(WITH_COVERAGE "Enable coverage reports" OFF)
 option(WITH_OSMESA   "Use OSMesa headless backend" OFF)
 option(IS_CI_BUILD   "Continuous integration build" OFF)
+option(WITH_CLIPPER  "Use Angus ClipperLib simplification" ON)
 
 if(WITH_CXX11ABI)
     set(MASON_CXXABI_SUFFIX -cxx11abi)
@@ -30,6 +31,10 @@ endif()
 
 if(IS_CI_BUILD)
     add_compile_options(-DCI_BUILD=1)
+endif()
+
+if(WITH_CLIPPER)
+    add_compile_options(-DMBGL_USE_CLIPPER=1)
 endif()
 
 mason_use(geometry VERSION 0.8.0 HEADER_ONLY)

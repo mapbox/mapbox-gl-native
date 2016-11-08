@@ -58,7 +58,7 @@ matrix:
       dist: trusty
       language: node
       compiler: "node4-clang35-debug"
-      env: _CXX=clang++-3.5 _CC=clang-3.5 WITH_OSMESA=1
+      env: _CXX=clang++-3.5 _CC=clang-3.5 WITH_OSMESA=1 WITH_CLIPPER=0
       addons: *clang35
       before_script:
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")

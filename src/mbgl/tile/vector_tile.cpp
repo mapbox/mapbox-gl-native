@@ -234,11 +234,13 @@ GeometryCollection VectorTileFeature::getGeometries() const {
         }
     }
 
-    if (layer.version >= 2 || type != FeatureType::Polygon) {
-        return lines;
+#if MBGL_USE_CLIPPER
+    if (layer.version < 2 && type == FeatureType::Polygon) {
+        return fixupPolygons(lines);
     }
+#endif
 
-    return fixupPolygons(lines);
+    return lines;
 }
 
 VectorTileData::VectorTileData(std::shared_ptr<const std::string> data_)

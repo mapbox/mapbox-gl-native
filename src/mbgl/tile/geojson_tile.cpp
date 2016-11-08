@@ -28,10 +28,12 @@ public:
     GeometryCollection getGeometries() const override {
         GeometryCollection geometry = apply_visitor(ToGeometryCollection(), feature.geometry);
 
+#if MBGL_USE_CLIPPER
         // https://github.com/mapbox/geojson-vt-cpp/issues/44
         if (getType() == FeatureType::Polygon) {
             geometry = fixupPolygons(geometry);
         }
+#endif
 
         return geometry;
     }
