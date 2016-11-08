@@ -30,5 +30,5 @@ fabric.properties
 captures/
 
 # Generated test cases
-MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/activity/gen/
+MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/activity/gen/
 
