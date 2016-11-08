@@ -2865,19 +2865,13 @@ public:
 /// Returns the annotation tag assigned to the given annotation. Relatively expensive.
 - (MGLAnnotationTag)annotationTagForAnnotation:(id <MGLAnnotation>)annotation
 {
-    if ( ! annotation || annotation == self.userLocation)
+    if ( ! annotation || annotation == self.userLocation
+        || _annotationTagsByAnnotation.count(annotation) == 0)
     {
         return MGLAnnotationTagNotFound;
     }
-
-    for (auto &pair : _annotationContextsByAnnotationTag)
-    {
-        if (pair.second.annotation == annotation)
-        {
-            return pair.first;
-        }
-    }
-    return MGLAnnotationTagNotFound;
+    
+    return  _annotationTagsByAnnotation.at(annotation);
 }
 
 - (void)addAnnotation:(id <MGLAnnotation>)annotation
@@ -3101,7 +3095,14 @@ public:
 
 - (nullable MGLAnnotationView *)viewForAnnotation:(id<MGLAnnotation>)annotation
 {
-    MGLAnnotationTag annotationTag = _annotationTagsByAnnotation.at(annotation);
+    if (annotation == self.userLocation)
+    {
+        return self.userLocationAnnotationView;
+    }
+    MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
+    if (annotationTag == MGLAnnotationTagNotFound) {
+        return nil;
+    }
     MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
     return annotationContext.annotationView;
 }
@@ -4675,9 +4676,9 @@ public:
             continue;
         }
 
-        // Get the annotation tag then use it to get the context. This avoids the expensive lookup
-        // by tag in `annotationTagForAnnotation:`
-        MGLAnnotationTag annotationTag = _annotationTagsByAnnotation.at(annotation);
+        // Get the annotation tag then use it to get the context.
+        MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
+        NSAssert(annotationTag != MGLAnnotationTagNotFound, @"-visibleAnnotationsInRect: returned unrecognized annotation");
         MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
 
         MGLAnnotationView *annotationView = annotationContext.annotationView;
@@ -4721,7 +4722,8 @@ public:
             continue;
         }
 
-        MGLAnnotationTag annotationTag = _annotationTagsByAnnotation.at(annotation);
+        MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
+        NSAssert(annotationTag != MGLAnnotationTagNotFound, @"-visibleAnnotationsInRect: returned unrecognized annotation");
         MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
         UIView *annotationView = annotationContext.annotationView;
         

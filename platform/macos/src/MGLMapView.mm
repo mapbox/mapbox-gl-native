@@ -1667,16 +1667,11 @@ public:
 
 /// Returns the annotation tag assigned to the given annotation. Relatively expensive.
 - (MGLAnnotationTag)annotationTagForAnnotation:(id <MGLAnnotation>)annotation {
-    if (!annotation) {
+    if (!annotation || _annotationTagsByAnnotation.count(annotation) == 0) {
         return MGLAnnotationTagNotFound;
     }
 
-    for (auto &pair : _annotationContextsByAnnotationTag) {
-        if (pair.second.annotation == annotation) {
-            return pair.first;
-        }
-    }
-    return MGLAnnotationTagNotFound;
+    return  _annotationTagsByAnnotation.at(annotation);
 }
 
 - (void)addAnnotation:(id <MGLAnnotation>)annotation {
