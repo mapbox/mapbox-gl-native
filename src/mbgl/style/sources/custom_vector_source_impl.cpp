@@ -31,33 +31,42 @@ std::unique_ptr<Tile> CustomVectorSource::Impl::createTile(const OverscaledTileI
 void CustomVectorSource::Impl::setTileData(uint8_t z, uint32_t x, uint32_t y, const mapbox::geojson::geojson& geoJSON) {
     double scale = util::EXTENT / util::tileSize;
     
-    variant<GeoJSONVTPointer, SuperclusterPointer> geoJSONOrSupercluster;
-    if (!options.cluster) {
-        mapbox::geojsonvt::Options vtOptions;
-        vtOptions.maxZoom = options.maxzoom;
-        vtOptions.extent = util::EXTENT;
-        vtOptions.buffer = std::round(scale * options.buffer);
-        vtOptions.tolerance = scale * options.tolerance;
-        geoJSONOrSupercluster = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(geoJSON, vtOptions);
+    if(geoJSON.is<FeatureCollection>() && geoJSON.get<FeatureCollection>().size() == 0) {
+        for (auto const &item : tiles) {
+            GeoJSONTile* tile = static_cast<GeoJSONTile*>(item.second.get());
+            if(tile->id.canonical.z == z && tile->id.canonical.x == x && tile->id.canonical.y == y) {
+                tile->updateData(mapbox::geometry::feature_collection<int16_t>());
+            }
+        }
     } else {
-        mapbox::supercluster::Options clusterOptions;
-        clusterOptions.maxZoom = options.clusterMaxZoom;
-        clusterOptions.extent = util::EXTENT;
-        clusterOptions.radius = std::round(scale * options.clusterRadius);
+        variant<GeoJSONVTPointer, SuperclusterPointer> geoJSONOrSupercluster;
+        if (!options.cluster) {
+            mapbox::geojsonvt::Options vtOptions;
+            vtOptions.maxZoom = options.maxzoom;
+            vtOptions.extent = util::EXTENT;
+            vtOptions.buffer = std::round(scale * options.buffer);
+            vtOptions.tolerance = scale * options.tolerance;
+            geoJSONOrSupercluster = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(geoJSON, vtOptions);
+        } else {
+            mapbox::supercluster::Options clusterOptions;
+            clusterOptions.maxZoom = options.clusterMaxZoom;
+            clusterOptions.extent = util::EXTENT;
+            clusterOptions.radius = std::round(scale * options.clusterRadius);
+            
+            const auto& features = geoJSON.get<mapbox::geometry::feature_collection<double>>();
+            geoJSONOrSupercluster =
+            std::make_unique<mapbox::supercluster::Supercluster>(features, clusterOptions);
+        }
         
-        const auto& features = geoJSON.get<mapbox::geometry::feature_collection<double>>();
-        geoJSONOrSupercluster =
-        std::make_unique<mapbox::supercluster::Supercluster>(features, clusterOptions);
-    }
-    
-    for (auto const &item : tiles) {
-        GeoJSONTile* tile = static_cast<GeoJSONTile*>(item.second.get());
-        if(tile->id.canonical.z == z && tile->id.canonical.x == x && tile->id.canonical.y == y) {
-            if (geoJSONOrSupercluster.is<GeoJSONVTPointer>()) {
-                tile->updateData(geoJSONOrSupercluster.get<GeoJSONVTPointer>()->getTile(z, x, y).features);
-            } else {
-                assert(geoJSONOrSupercluster.is<SuperclusterPointer>());
-                tile->updateData(geoJSONOrSupercluster.get<SuperclusterPointer>()->getTile(z, x, y));
+        for (auto const &item : tiles) {
+            GeoJSONTile* tile = static_cast<GeoJSONTile*>(item.second.get());
+            if(tile->id.canonical.z == z && tile->id.canonical.x == x && tile->id.canonical.y == y) {
+                if (geoJSONOrSupercluster.is<GeoJSONVTPointer>()) {
+                    tile->updateData(geoJSONOrSupercluster.get<GeoJSONVTPointer>()->getTile(z, x, y).features);
+                } else {
+                    assert(geoJSONOrSupercluster.is<SuperclusterPointer>());
+                    tile->updateData(geoJSONOrSupercluster.get<SuperclusterPointer>()->getTile(z, x, y));
+                }
             }
         }
     }
