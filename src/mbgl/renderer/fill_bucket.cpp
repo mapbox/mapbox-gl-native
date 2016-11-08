@@ -108,9 +108,10 @@ void FillBucket::upload(gl::Context& context) {
 
 void FillBucket::render(Painter& painter,
                         PaintParameters& parameters,
-                        const Layer& layer,
+                        const Layer& layer_,
                         const RenderTile& tile) {
-    painter.renderFill(parameters, *this, *layer.as<FillLayer>(), tile);
+    layer = &layer_;
+    painter.renderFill(parameters, *this, *layer_.as<FillLayer>(), tile);
 }
 
 bool FillBucket::hasData() const {
@@ -129,6 +130,14 @@ void FillBucket::drawElements(FillShader& shader,
     for (auto& group : triangleGroups) {
         group.getVAO(shader, paintMode).bind(
             shader, *vertexBuffer, *triangleIndexBuffer, vertex_index, context);
+        if (context.elementBuffer.getCurrentValue() == 0) {
+            Log::Error(Event::OpenGL, "Unbound element buffer! Expected %u", (*triangleIndexBuffer).buffer.get());
+            Log::Error(Event::OpenGL, "Current vertex buffer: %u", context.vertexBuffer.getCurrentValue());
+            Log::Error(Event::OpenGL, "Expected vertex buffer: %u", (*vertexBuffer).buffer.get());
+            Log::Error(Event::OpenGL, "Vertex length: %zu", group.vertexLength);
+            Log::Error(Event::OpenGL, "Index length: %zu", group.indexLength);
+            Log::Error(Event::OpenGL, "Layer: %s", layer->getID().c_str());
+        }
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(group.indexLength * 3), GL_UNSIGNED_SHORT,
                                         elements_index));
         vertex_index += group.vertexLength * vertexBuffer->vertexSize;
