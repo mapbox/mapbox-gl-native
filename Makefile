@@ -494,6 +494,10 @@ android-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile
 android-$1: android-lib-$1
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
+.PHONY: run-android-$1
+run-android-$1: android-$1
+	cd platform/android  && ./gradlew :MapboxGLAndroidSDKTestApp:installDebug && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity	
+
 apackage: android-lib-$1
 endef
 
@@ -502,21 +506,32 @@ $(foreach abi,$(ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
 .PHONY: android
 android: android-arm-v7
 
-.PHONY: android-test
-android-test:
-	cd platform/android && ./gradlew testDebugUnitTest --continue
+.PHONY: run-android
+run-android: run-android-arm-v7
+	 
+.PHONY: run-android-unit-test
+run-android-unit-test:
+	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:testDebugUnitTest --continue
 
-.PHONY: android-test-apk
-android-test-apk:
-	cd platform/android && ./gradlew assembleDebug --continue && ./gradlew assembleAndroidTest --continue
+.PHONY: android-ui-test
+android-ui-test:
+	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:assembleDebug --continue && ./gradlew :MapboxGLAndroidSDKTestApp:assembleAndroidTest --continue
+
+.PHONY: run-android-ui-test
+run-android-ui-test:
+	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:connectedAndroidTest -i	
 
 .PHONY: apackage
 apackage:
 	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
 
-.PHONY: android-generate-test
-android-generate-test:
+.PHONY: test-code-android
+test-code-android:
 	node platform/android/scripts/generate-test-code.js
+
+.PHONY: android-ndk-stack
+android-ndk-stack:
+	adb logcat | ndk-stack -sym build/android-arm-v7/Debug	
 
 #### Miscellaneous targets #####################################################
 
@@ -529,6 +544,7 @@ clean:
 	-rm -rf ./build \
 	        ./platform/android/MapboxGLAndroidSDK/build \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/build \
+	        ./platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/activity/gen \
 	        ./platform/android/MapboxGLAndroidSDK/src/main/jniLibs \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/src/main/jniLibs \
 	        ./platform/android/MapboxGLAndroidSDK/src/main/assets

@@ -71,7 +71,7 @@ workflows:
         - content: |-
             #!/bin/bash
             echo "Running unit tests from testapp/src/test:"
-            make android-test
+            make run-android-unit-test
     - script:
         title: Generate Espresso sanity tests
         run_if: '{{enveq "SKIPCI" "false"}}'
@@ -79,7 +79,7 @@ workflows:
         - content: |-
             #!/bin/bash
             echo "Generate these test locally by executing:"
-            make android-generate-test
+            make test-code-android
     - script:
         title: Run Firebase instrumentation tests
         run_if: '{{enveq "SKIPCI" "false"}}'
@@ -90,7 +90,7 @@ workflows:
             wget -O platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml "$BITRISEIO_TEST_ACCESS_TOKEN_UI_TEST_URL"
 
             echo "Build seperate test apk:"
-            make android-test-apk
+            make android-ui-test
 
             echo "Run tests on firebase:"
             gcloud auth activate-service-account --key-file secret.json --project android-gl-native
@@ -223,7 +223,7 @@ workflows:
         - content: |-
             #!/bin/bash
             echo "Generate these test locally by executing:"
-            make android-generate-test
+            make test-code-android
     - script:
         title: Run AWS Device Farm instrumentation tests
         inputs:
