@@ -111,6 +111,22 @@ public class MapboxMap {
 
     // Style
 
+    /**
+     * Returns a layer that conforms to {@link Layer} if any layer with the given identifier was
+     * found.
+     * <p>
+     * Layer identifiers are not guaranteed to exist across styles or different versions of the
+     * same style. Applications that use this API must set the style URL to an explicitly versioned
+     * style either by passing in the URL String using {@link MapboxMapOptions#styleUrl(String)} or
+     * setting through XML using {@link com.mapbox.mapboxsdk.R.attr#style_url}. This approach
+     * also avoids layer identifier name changes that will occur in the default style’s layers over
+     * time. These default styles can be found in the {@link Style} class.
+     * </p>
+     *
+     * @param layerId a String matching the layer ID found within the current map style. This String
+     *                is case sensitive.
+     * @return a {@link Layer}, null if the layer doesn't exist.
+     */
     @Nullable
     @UiThread
     public Layer getLayer(@NonNull String layerId) {
@@ -119,10 +135,19 @@ public class MapboxMap {
 
     /**
      * Tries to cast the Layer to T, returns null if it's another type.
+     * <p>
+     * Layer identifiers are not guaranteed to exist across styles or different versions of the
+     * same style. Applications that use this API must set the style URL to an explicitly versioned
+     * style either by passing in the URL String using {@link MapboxMapOptions#styleUrl(String)} or
+     * setting through XML using {@link com.mapbox.mapboxsdk.R.attr#style_url}. This approach
+     * also avoids layer identifier name changes that will occur in the default style’s layers over
+     * time. These default styles can be found in the {@link Style} class.
+     * </p>
      *
-     * @param layerId the layer id used to look up a layer
-     * @param <T>     the generic attribute of a Layer
-     * @return the casted Layer, null if another type
+     * @param layerId a String matching the layer ID found within the current map style. This String
+     *                is case sensitive.
+     * @param <T>     the generic attribute of a {@link Layer}.
+     * @return the casted {@link Layer}, null if another type.
      */
     @Nullable
     @UiThread
@@ -136,21 +161,71 @@ public class MapboxMap {
         }
     }
 
+    /**
+     * Adds a new layer on top of existing layers.
+     *
+     * @param layer a {@link Layer}.
+     */
     @UiThread
     public void addLayer(@NonNull Layer layer) {
         addLayer(layer, null);
     }
 
+    /**
+     * Inserts a new layer below another layer.
+     * <p>
+     * Layer identifiers are not guaranteed to exist across styles or different versions of the
+     * same style. Applications that use this API must set the style URL to an explicitly versioned
+     * style either by passing in the URL String using {@link MapboxMapOptions#styleUrl(String)} or
+     * setting through XML using {@link com.mapbox.mapboxsdk.R.attr#style_url}. This approach
+     * also avoids layer identifier name changes that will occur in the default style’s layers over
+     * time. These default styles can be found in the {@link Style} class.
+     * </p>
+     *
+     * @param layer a {@link Layer} to be added to map style.
+     * @param before a String layer identifier that's already found in the map view style. If the
+     *               layer is not found in the current map style the layer will be added to the top
+     *               of the map.
+     */
     @UiThread
     public void addLayer(@NonNull Layer layer, String before) {
         getMapView().getNativeMapView().addLayer(layer, before);
     }
 
+    /**
+     * Removes a layer from the map style.
+     *
+     * <p>
+     * Layer identifiers are not guaranteed to exist across styles or different versions of the
+     * same style. Applications that use this API must set the style URL to an explicitly versioned
+     * style either by passing in the URL String using {@link MapboxMapOptions#styleUrl(String)} or
+     * setting through XML using {@link com.mapbox.mapboxsdk.R.attr#style_url}. This approach
+     * also avoids layer identifier name changes that will occur in the default style’s layers over
+     * time. These default styles can be found in the {@link Style} class.
+     * </p>
+     * @param layerId
+     * @throws NoSuchLayerException
+     */
     @UiThread
     public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
         getMapView().getNativeMapView().removeLayer(layerId);
     }
 
+    /**
+     * Returns a {@link Source} if any source with the given identifier was found.
+     * <p>
+     * Source identifiers are not guaranteed to exist across styles or different versions of the
+     * same style. Applications that use this API must set the style URL to an explicitly versioned
+     * style either by passing in the URL String using {@link MapboxMapOptions#styleUrl(String)} or
+     * setting through XML using {@link com.mapbox.mapboxsdk.R.attr#style_url}. This approach
+     * also avoids source identifier name changes that will occur in the default style’s source over
+     * time. These default styles can be found in the {@link Style} class.
+     * </p>
+     *
+     * @param sourceId a String matching the source ID found within the current map style. This
+     *                 String is case sensitive.
+     * @return a {@link Source} object, null if the layer doesn't exist.
+     */
     @Nullable
     @UiThread
     public Source getSource(@NonNull String sourceId) {
@@ -159,10 +234,18 @@ public class MapboxMap {
 
     /**
      * Tries to cast the Source to T, returns null if it's another type.
+     * <p>
+     * Source identifiers are not guaranteed to exist across styles or different versions of the
+     * same style. Applications that use this API must set the style URL to an explicitly versioned
+     * style either by passing in the URL String using {@link MapboxMapOptions#styleUrl(String)} or
+     * setting through XML using {@link com.mapbox.mapboxsdk.R.attr#style_url}. This approach
+     * also avoids source identifier name changes that will occur in the default style’s source over
+     * time. These default styles can be found in the {@link Style} class.
+     * </p>
      *
-     * @param sourceId the id used to look up a layer
-     * @param <T>      the generic type of a Source
-     * @return the casted Source, null if another type
+     * @param sourceId the id used to look up a layer.
+     * @param <T>      the generic type of a Source.
+     * @return the casted Source, null if another type.
      */
     @Nullable
     @UiThread
@@ -176,21 +259,40 @@ public class MapboxMap {
         }
     }
 
+    /**
+     * Adds a new source to the map style.
+     *
+     * @param source the {@link Source} to add to the map view.
+     */
     @UiThread
     public void addSource(@NonNull Source source) {
         getMapView().getNativeMapView().addSource(source);
     }
 
+    /**
+     * Removes a source from the map style.
+     * <p>
+     * Source identifiers are not guaranteed to exist across styles or different versions of the
+     * same style. Applications that use this API must set the style URL to an explicitly versioned
+     * style either by passing in the URL String using {@link MapboxMapOptions#styleUrl(String)} or
+     * setting through XML using {@link com.mapbox.mapboxsdk.R.attr#style_url}. This approach
+     * also avoids source identifier name changes that will occur in the default style’s source over
+     * time. These default styles can be found in the {@link Style} class.
+     * </p>
+     *
+     * @param sourceId a String identifier representing the source to remove.
+     * @throws NoSuchSourceException the source trying to be removed doesn't exist in the map.
+     */
     @UiThread
     public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
         getMapView().getNativeMapView().removeSource(sourceId);
     }
 
     /**
-     * Add an image to be used int hte map's style
+     * Add an image to be used in the map style
      *
-     * @param name  the name of the image
-     * @param image the pre-multiplied Bitmap
+     * @param name  the name of the image.
+     * @param image the pre-multiplied Bitmap.
      */
     @UiThread
     public void addImage(@NonNull String name, @NonNull Bitmap image) {
@@ -198,9 +300,9 @@ public class MapboxMap {
     }
 
     /**
-     * Removes an image from the map's style
+     * Removes an image from the map style
      *
-     * @param name the name of the image to remove
+     * @param name the name of the image to remove.
      */
     @UiThread
     public void removeImage(String name) {
@@ -212,9 +314,7 @@ public class MapboxMap {
     //
 
     /**
-     * <p>
      * Sets the minimum zoom level the map can be displayed at.
-     * </p>
      *
      * @param minZoom The new minimum zoom level.
      */
@@ -230,9 +330,7 @@ public class MapboxMap {
     }
 
     /**
-     * <p>
      * Gets the maximum zoom level the map can be displayed at.
-     * </p>
      *
      * @return The minimum zoom level.
      */
@@ -249,9 +347,7 @@ public class MapboxMap {
     //
 
     /**
-     * <p>
      * Sets the maximum zoom level the map can be displayed at.
-     * </p>
      *
      * @param maxZoom The new maximum zoom level.
      */
@@ -267,9 +363,7 @@ public class MapboxMap {
     }
 
     /**
-     * <p>
      * Gets the maximum zoom level the map can be displayed at.
-     * </p>
      *
      * @return The maximum zoom level.
      */
