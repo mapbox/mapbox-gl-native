@@ -4,24 +4,22 @@ var path = require('path');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
 
-var vertex_file = process.argv[2];
-var fragment_file = process.argv[3];
-var output_file = process.argv[4];
+var shaderName = process.argv[2];
+var inputPath = process.argv[3];
+var outputPath = process.argv[4];
 
-if (!vertex_file || !fragment_file || !output_file) {
-    console.warn('No input or output file given.');
-    console.warn('Usage: %s input.vertex.glsl input.fragment.glsl output.hpp', path.basename(process.argv[1]));
+if (!shaderName || !inputPath || !outputPath) {
+    console.warn('Not enough arguments.');
+    console.warn('Usage: %s shaderName /path-to-shader-sources /output-path', path.basename(process.argv[1]));
     process.exit(1);
 }
 
-var components = path.basename(vertex_file).split('.');
-var shader_name = components[0];
+var pragmaMapboxRe = /(\s*)#pragma\s+mapbox\s*:\s+(define|initialize)\s+(low|medium|high)p\s+(float|vec(?:2|3|4))\s+(.*)/;
 
-var pragma_mapbox_regex = /(\s*)#pragma\s+mapbox\s*:\s+(define|initialize)\s+(low|medium|high)p\s+(float|vec(?:2|3|4))\s+(.*)/;
 
-function source(file) {
-    return '\n' + fs.readFileSync(file, 'utf8').split('\n').map(function(line) {
-        var params = line.match(pragma_mapbox_regex);
+function applyPragmas(source) {
+    return '\n' + source.split('\n').map(function(line) {
+        var params = line.match(pragmaMapboxRe);
         if (params) {
             if (params[2] === 'define') {
                 return params[1] + 'uniform ' + params[3] + 'p ' + params[4] + ' u_' + params[5] + ';';
@@ -34,6 +32,11 @@ function source(file) {
     }).join('\n');
 }
 
+var vertexPrelude = fs.readFileSync(path.join(inputPath, '_prelude.vertex.glsl'));
+var fragmentPrelude = fs.readFileSync(path.join(inputPath, '_prelude.fragment.glsl'));
+var vertexSource = vertexPrelude + fs.readFileSync(path.join(inputPath, shaderName + '.vertex.glsl'), 'utf8');
+var fragmentSource = fragmentPrelude + fs.readFileSync(path.join(inputPath, shaderName + '.fragment.glsl'), 'utf8');
+
 var content = "#pragma once\n" +
 "\n" +
 "// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.\n" +
@@ -43,15 +46,15 @@ var content = "#pragma once\n" +
 "namespace mbgl {\n" +
 "namespace shaders {\n" +
 "\n" +
-"class " + shader_name + " {\n" +
+"class " + shaderName + " {\n" +
 "public:\n" +
-"    static constexpr const char* name = \"" + shader_name + "\";" +
-"    static constexpr const char* vertexSource = R\"MBGL_SHADER(" + source(vertex_file) + ")MBGL_SHADER\";\n" +
-"    static constexpr const char* fragmentSource = R\"MBGL_SHADER(" + source(fragment_file) + ")MBGL_SHADER\";\n" +
+"    static constexpr const char* name = \"" + shaderName + "\";\n" +
+"    static constexpr const char* vertexSource = R\"MBGL_SHADER(" + applyPragmas(vertexSource) + ")MBGL_SHADER\";\n" +
+"    static constexpr const char* fragmentSource = R\"MBGL_SHADER(" + applyPragmas(fragmentSource) + ")MBGL_SHADER\";\n" +
 "};\n" +
 "\n" +
 "} // namespace shaders\n" +
 "} // namespace mbgl\n";
 
-mkdirp.sync(path.dirname(output_file));
-fs.writeFileSync(output_file, content);
+mkdirp.sync(outputPath);
+fs.writeFileSync(path.join(outputPath, shaderName + '.hpp'), content);

@@ -5,9 +5,11 @@ function(add_shader VAR name)
 
     add_custom_command(
        OUTPUT ${shader_source_prefix}/${name}.hpp
-       COMMAND ${shader_build_cmd} ${shader_file_prefix}/${name}.vertex.glsl ${shader_file_prefix}/${name}.fragment.glsl ${shader_source_prefix}/${name}.hpp
+       COMMAND ${shader_build_cmd} ${name} ${shader_file_prefix} ${shader_source_prefix}
        DEPENDS ${shader_file_prefix}/${name}.vertex.glsl
        DEPENDS ${shader_file_prefix}/${name}.fragment.glsl
+       DEPENDS ${shader_file_prefix}/_prelude.vertex.glsl
+       DEPENDS ${shader_file_prefix}/_prelude.fragment.glsl
        VERBATIM
     )
     set(${VAR} ${${VAR}} ${shader_source_prefix}/${name}.hpp PARENT_SCOPE)
