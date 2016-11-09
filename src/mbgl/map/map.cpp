@@ -1015,7 +1015,9 @@ void Map::setSourceTileCacheSize(size_t size) {
 
 void Map::onLowMemory() {
     if (impl->painter) {
+        impl->backend.activate();
         impl->painter->cleanup();
+        impl->backend.deactivate();
     }
     if (impl->style) {
         impl->style->onLowMemory();
