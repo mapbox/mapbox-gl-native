@@ -25,7 +25,6 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
@@ -616,13 +615,12 @@ public class MyLocationView extends View {
 
                 currentDegree = (int) (magneticHeading);
 
-                /**
-                 * Mappy, the bearing of the sensor doesn't allow to rotate the map
-                 // Change the user location view orientation to reflect the device orientation
-                 setBearing(currentDegree);
+                /* Mappy, the bearing of the sensor doesn't allow to rotate the map
+                // Change the user location view orientation to reflect the device orientation
+                setBearing(currentDegree);
 
                  if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-                    rotateCamera();
+                 rotateCamera();
                  }
                  */
 
@@ -714,9 +712,16 @@ public class MyLocationView extends View {
         }
 
         void updateAccuracy(@NonNull Location location) {
-            if (accuracyAnimator != null && accuracyAnimator.isRunning()) {
-                // use current accuracy as a starting point
-                accuracy = (Float) accuracyAnimator.getAnimatedValue();
+            if (location.getAccuracy() == accuracy) {
+                // nothing change for accuracy
+                return;
+            }
+
+            if (accuracyAnimator != null) {
+                if (accuracyAnimator.isRunning()) {
+                    // use current accuracy as a starting point
+                    accuracy = (Float) accuracyAnimator.getAnimatedValue();
+                }
                 accuracyAnimator.end();
             }
 
@@ -749,7 +754,7 @@ public class MyLocationView extends View {
             if (previousUpdateTimeStamp == 0) {
                 animationDuration = 0;
             } else {
-                animationDuration = (locationUpdateTimestamp - previousUpdateTimeStamp) * 1.1f /*make animation slightly longer*/;
+                animationDuration = 750L;// (locationUpdateTimestamp - previousUpdateTimeStamp) * 1.1f /*make animation slightly longer*/;
             }
 
             // calculate interpolated location
@@ -806,7 +811,7 @@ public class MyLocationView extends View {
             // calculate updateLatLng time + add some extra offset to improve animation
             long previousUpdateTimeStamp = locationUpdateTimestamp;
             locationUpdateTimestamp = SystemClock.elapsedRealtime();
-            long locationUpdateDuration = (long) ((locationUpdateTimestamp - previousUpdateTimeStamp) * 1.2f);
+            long locationUpdateDuration = 750L; //(long) ((locationUpdateTimestamp - previousUpdateTimeStamp) * 1.2f);
 
             // animate changes
             if (locationChangeAnimator != null) {
