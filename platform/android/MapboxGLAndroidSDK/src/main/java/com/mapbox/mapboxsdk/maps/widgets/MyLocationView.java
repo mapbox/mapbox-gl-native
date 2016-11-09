@@ -541,8 +541,6 @@ public class MyLocationView extends View {
         float[] matrix = new float[9];
         float[] orientation = new float[3];
 
-        private int currentDegree = 0;
-
         // Compass data
         private long compassUpdateNextTimestamp = 0;
 
@@ -575,22 +573,22 @@ public class MyLocationView extends View {
                 SensorManager.getOrientation(matrix, orientation);
 
                 float magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation)[0]);
-                currentDegree = (int) (magneticHeading);
-
-                // Change the user location view orientation to reflect the device orientation
-                setCompass(currentDegree);
-
                 if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-                    rotateCamera();
+                    // Change the user location view orientation to reflect the device orientation
+                    rotateCamera(magneticHeading);
+                    setCompass(0);
+                } else {
+                    // Change compass direction
+                    setCompass(magneticHeading);
                 }
 
                 compassUpdateNextTimestamp = currentTime + COMPASS_UPDATE_RATE_MS;
             }
         }
 
-        private void rotateCamera() {
+        private void rotateCamera(float rotation) {
             CameraPosition.Builder builder = new CameraPosition.Builder();
-            builder.bearing(currentDegree);
+            builder.bearing(rotation);
             mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), COMPASS_UPDATE_RATE_MS, false /*linear interpolator*/, false /*do not disable tracking*/, null);
         }
 
