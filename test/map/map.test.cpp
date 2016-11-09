@@ -13,6 +13,7 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/util/color.hpp>
 
@@ -441,4 +442,62 @@ TEST(Map, DontLoadUnneededTiles) {
         test::render(map, test.view);
         EXPECT_EQ(referenceTiles[z], tiles) << "zoom level " << z;
     }
+}
+
+
+class MockBackend : public HeadlessBackend {
+public:
+    std::function<void()> callback;
+    void invalidate() override {
+        if (callback) {
+            callback();
+        }
+    }
+};
+
+TEST(Map, ContinuousRendering) {
+    util::RunLoop runLoop;
+    MockBackend backend;
+    OffscreenView view { backend.getContext() };
+    ThreadPool threadPool { 4 };
+
+#ifdef MBGL_ASSET_ZIP
+    // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
+    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
+#else
+    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
+#endif
+
+    Map map(backend, view.size, 1, fileSource, threadPool, MapMode::Continuous);
+
+    using namespace std::chrono_literals;
+
+    util::Timer emergencyShutoff;
+    emergencyShutoff.start(10s, 0s, [&] {
+        util::RunLoop::Get()->stop();
+        FAIL() << "Did not stop rendering";
+    });
+
+    util::Timer timer;
+    util::AsyncTask render{[&] {
+        if (map.isFullyLoaded()) {
+            // Abort the test after 1 second after the map loading fully. Note that a "fully loaded
+            // map" doesn't mean that we won't render anymore: we could still render fade in/fade
+            // out or other animations.
+            // If we are continuing to render indefinitely, the emergency shutoff above will trigger
+            // and the test will fail since the regular time will be constantly reset.
+            timer.start(1s, 0s, [&] {
+                util::RunLoop::Get()->stop();
+            });
+        }
+
+        map.render(view);
+    }};
+
+    backend.callback = [&] {
+        render.send();
+    };
+
+    map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));
+    util::RunLoop::Get()->run();
 }
