@@ -197,6 +197,11 @@ void NativeMapView::invalidate() {
 void NativeMapView::render() {
     activate();
 
+    if (framebufferSizeChanged) {
+        getContext().viewport = { 0, 0, getFramebufferSize() };
+        framebufferSizeChanged = false;
+    }
+
     updateViewBinding();
     map->render(*this);
 
@@ -729,6 +734,7 @@ void NativeMapView::resizeView(int w, int h) {
 void NativeMapView::resizeFramebuffer(int w, int h) {
     fbWidth = w;
     fbHeight = h;
+    framebufferSizeChanged = true;
     invalidate();
 }
 
