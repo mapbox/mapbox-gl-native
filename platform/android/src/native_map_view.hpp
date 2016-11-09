@@ -90,6 +90,7 @@ private:
     int height = 0;
     int fbWidth = 0;
     int fbHeight = 0;
+    bool framebufferSizeChanged = true;
 
     int availableProcessors = 0;
     size_t totalMemory = 0;
