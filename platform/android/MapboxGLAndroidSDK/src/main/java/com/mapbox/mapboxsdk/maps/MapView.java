@@ -1284,7 +1284,7 @@ public class MapView extends FrameLayout {
         return direction;
     }
 
-    void setBearing(float bearing) {
+    void setBearing(double bearing) {
         if (destroyed) {
             return;
         }
@@ -1292,7 +1292,7 @@ public class MapView extends FrameLayout {
         nativeMapView.setBearing(bearing);
     }
 
-    void setBearing(float bearing, long duration) {
+    void setBearing(double bearing, long duration) {
         if (destroyed) {
             return;
         }
