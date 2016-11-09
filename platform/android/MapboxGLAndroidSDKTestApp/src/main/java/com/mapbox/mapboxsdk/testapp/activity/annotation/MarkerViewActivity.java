@@ -327,12 +327,12 @@ public class MarkerViewActivity extends AppCompatActivity {
     /**
      * Adapts a MarkerView to display text  in a TextView.
      */
-    private static class TextAdapter extends MapboxMap.MarkerViewAdapter<TextMarkerView> {
+    public static class TextAdapter extends MapboxMap.MarkerViewAdapter<TextMarkerView> {
 
         private LayoutInflater inflater;
         private MapboxMap mapboxMap;
 
-        TextAdapter(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
+        public TextAdapter(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
             super(context);
             this.inflater = LayoutInflater.from(context);
             this.mapboxMap = mapboxMap;

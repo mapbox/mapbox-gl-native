@@ -81,6 +81,7 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.squareup.spoon:spoon-client:1.6.2'
+    androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
 }
 
 apply from: 'gradle-make.gradle'

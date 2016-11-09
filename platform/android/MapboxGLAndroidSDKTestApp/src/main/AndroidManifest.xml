@@ -446,9 +446,10 @@
                 android:value="@string/category_maplayout" />
         </activity>
 
-        <!-- For Unit tests -->
+        <!-- For Instrumentation tests -->
         <activity android:name=".activity.style.RuntimeStyleTestActivity" />
         <activity android:name=".activity.style.RuntimeStyleTimingTestActivity" />
+        <activity android:name=".activity.espresso.EspressoTestActivity" />
 
         <!-- Configuration Settings -->
         <meta-data
