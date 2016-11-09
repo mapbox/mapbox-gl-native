@@ -115,9 +115,9 @@ private:
     // Defaults
     std::string name;
     LatLng defaultLatLng;
-    double defaultZoom;
-    double defaultBearing;
-    double defaultPitch;
+    double defaultZoom = 0;
+    double defaultBearing = 0;
+    double defaultPitch = 0;
 
     std::vector<std::unique_ptr<Layer>>::const_iterator findLayer(const std::string& layerID) const;
     void reloadLayerSource(Layer&);
