@@ -1,5 +1,5 @@
 mason_use(glfw VERSION 3.2.1)
-if(IS_CI_BUILD)
+if(IS_CI_BUILD AND NOT WITH_EGL)
     mason_use(mesa VERSION 13.0.0${MASON_MESA_SUFFIX}${MASON_CXXABI_SUFFIX})
 endif()
 mason_use(boost_libprogram_options VERSION 1.60.0)
@@ -40,6 +40,7 @@ macro(mbgl_platform_core)
         )
         if (IS_CI_BUILD)
             target_add_mason_package(mbgl-core PUBLIC mesa)
+            target_link_libraries(mbgl-core PUBLIC -lX11)
         else()
             target_link_libraries(mbgl-core
                 PUBLIC -lGL

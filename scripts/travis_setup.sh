@@ -25,7 +25,9 @@ fi
 
 echo "export CXX=\"${CXX}\""
 echo "export CC=\"${CC}\""
-${CXX} --version
+if [ -x $(which ${CXX}) ]; then
+    ${CXX} --version
+fi
 
 # Ensure mason is on the PATH
 export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
@@ -37,15 +39,23 @@ git submodule update --init .mason
 mapbox_time "touch_package_json" \
 touch package.json
 
-# Start the mock X server
-if [ -f /etc/init.d/xvfb ] && [ ! -z "${RUN_XVFB}" ]; then
+function mapbox_start_xvfb {
+    if [ ! -f /etc/init.d/xvfb ]; then
+        echo "Error: Could not start Xvfb mock server."
+        exit 1
+    fi
+
     mapbox_time "start_xvfb" \
     sh -e /etc/init.d/xvfb start
     sleep 2 # sometimes, xvfb takes some time to start up
 
     # Make sure we're connecting to xvfb
     export DISPLAY=:99.0
+}
 
+export -f mapbox_start_xvfb
+
+function mapbox_export_mesa_library_path {
     CXX11ABI=""
     if [ `scripts/check-cxx11abi.sh` = 'ON' ]; then
         CXX11ABI="-cxx11abi"
@@ -54,7 +64,9 @@ if [ -f /etc/init.d/xvfb ] && [ ! -z "${RUN_XVFB}" ]; then
     mapbox_time "install_mesa" \
     mason install mesa 13.0.0-glx${CXX11ABI}
     export LD_LIBRARY_PATH="`mason prefix mesa 13.0.0-glx${CXX11ABI}`/lib:${LD_LIBRARY_PATH:-}"
-fi
+}
+
+export -f mapbox_export_mesa_library_path
 
 # Install and set up to load awscli
 pip install --user awscli
