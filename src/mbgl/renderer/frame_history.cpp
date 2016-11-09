@@ -21,6 +21,7 @@ void FrameHistory::record(const TimePoint& now, float zoom, const Duration& dura
         for (int16_t z = 0; z <= zoomIndex; z++) {
             opacities.data[z] = 255u;
         }
+        previousTime = now;
         firstFrame = false;
     }
 
