@@ -29,8 +29,8 @@ private:
     const AlphaImage opacities{ { 256, 1 } };
 
     int16_t previousZoomIndex = 0;
-    TimePoint previousTime = TimePoint::min();
-    TimePoint time = TimePoint::min();
+    TimePoint previousTime;
+    TimePoint time;
     bool firstFrame = true;
     bool dirty = true;
 
