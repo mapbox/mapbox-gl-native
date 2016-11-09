@@ -3,10 +3,10 @@ git:
 
 # Save common build configurations as shortcuts, so we can reference them later.
 addons_shortcuts:
-  addons_clang35: &clang35
+  addons_clang38: &clang38
     apt:
       sources:  [ 'ubuntu-toolchain-r-test', 'george-edison55-precise-backports' ]
-      packages: [ 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.8v4', 'cmake', 'cmake-data',
+      packages: [ 'clang-3.8', 'libstdc++-5-dev', 'libstdc++6', 'libllvm3.8v4', 'cmake', 'cmake-data',
                   'libxrandr-dev', 'libxcursor-dev', 'libxinerama-dev' ]
   addons_gcc5: &gcc5
     apt:
@@ -52,14 +52,14 @@ after_script:
 
 matrix:
   include:
-    # Clang 3.5 - Debug - Node
+    # Clang 3.8 - Debug - Node
     - os: linux
       sudo: required
       dist: trusty
       language: node
-      compiler: "node4-clang35-debug"
-      env: _CXX=clang++-3.5 _CC=clang-3.5 WITH_OSMESA=1
-      addons: *clang35
+      compiler: "node4-clang38-debug"
+      env: _CXX=clang++-3.8 _CC=clang-3.8 WITH_OSMESA=1
+      addons: *clang38
       before_script:
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
         - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
@@ -95,32 +95,32 @@ matrix:
       env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5 WITH_OSMESA=1
       addons: *gcc5
 
-    # Clang 3.5 - Debug
+    # Clang 3.8 - Debug
     - os: linux
       sudo: required
       dist: trusty
       language: cpp
-      compiler: "glfw-clang35-debug"
-      env: BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5 WITH_OSMESA=1
-      addons: *clang35
+      compiler: "glfw-clang38-debug"
+      env: BUILDTYPE=Debug _CXX=clang++-3.8 _CC=clang-3.8 WITH_OSMESA=1
+      addons: *clang38
 
-    # Clang 3.5 - Release
+    # Clang 3.8 - Release
     - os: linux
       sudo: required
       dist: trusty
       language: cpp
-      compiler: "glfw-clang35-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5 WITH_OSMESA=1
-      addons: *clang35
+      compiler: "glfw-clang38-release"
+      env: BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 WITH_OSMESA=1
+      addons: *clang38
 
-    # Clang 3.5 - check
+    # Clang 3.8 - check
     - os: linux
       sudo: required
       dist: trusty
       language: cpp
-      compiler: "check-clang35-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5 WITH_OSMESA=1
-      addons: *clang35
+      compiler: "check-clang38-release"
+      env: BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 WITH_OSMESA=1
+      addons: *clang38
       script:
         - git fetch origin master:refs/remotes/origin/master
         - make check
