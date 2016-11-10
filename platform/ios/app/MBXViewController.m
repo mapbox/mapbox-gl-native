@@ -1146,7 +1146,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 {
     MGLCustomVectorSource *source = [[MGLCustomVectorSource alloc] initWithIdentifier:@"latlon"
                                                                            dataSource:self
-                                                                              options:@{MGLGeoJSONSourceOptionMinimumZoomLevel:@14}];
+                                                                              options:@{MGLGeoJSONSourceOptionMaximumZoomLevel:@14}];
     [self.mapView.style addSource:source];
     MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"latlonlines"
                                                                           source:source];
