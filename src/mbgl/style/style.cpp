@@ -572,9 +572,17 @@ void Style::onLayerPaintPropertyChanged(Layer&) {
     observer->onUpdate(Update::RecalculateStyle | Update::Classes);
 }
 
-void Style::onLayerLayoutPropertyChanged(Layer& layer) {
+void Style::onLayerLayoutPropertyChanged(Layer& layer, const char * property) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
-    observer->onUpdate(Update::Layout);
+
+    auto update = Update::Layout;
+
+    //Recalculate the style for certain properties
+    bool needsRecalculation = strcmp(property, "icon-size") == 0 || strcmp(property, "text-size") == 0;
+    if (needsRecalculation) {
+        update |= Update::RecalculateStyle;
+    }
+    observer->onUpdate(update);
 }
 
 void Style::dumpDebugLogs() const {
