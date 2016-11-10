@@ -1,8 +1,11 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
 import android.support.test.espresso.Espresso;
+import android.support.test.espresso.UiController;
+import android.support.test.espresso.ViewAction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.view.View;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
@@ -15,6 +18,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
 
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;

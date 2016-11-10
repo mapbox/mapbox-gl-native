@@ -1100,12 +1100,13 @@ void nativeAddLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlon
     assert(nativeLayerPtr != 0);
 
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
 
-    nativeMapView->getMap().addLayer(
-        layer->releaseCoreLayer(),
-        before ? mbgl::optional<std::string>(std_string_from_jstring(env, before)) : mbgl::optional<std::string>()
-    );
+    Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
+    try {
+        layer->addToMap(nativeMapView->getMap(), before ? mbgl::optional<std::string>(std_string_from_jstring(env, before)) : mbgl::optional<std::string>());
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
+    }
 }
 
 void nativeRemoveLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* id) {
