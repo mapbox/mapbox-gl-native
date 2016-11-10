@@ -60,7 +60,7 @@ TEST(GLObject, Value) {
 }
 
 TEST(GLObject, Store) {
-    HeadlessBackend backend;
+    HeadlessBackend backend { test::sharedDisplay() };
     OffscreenView view(backend.getContext());
 
     gl::Context context;

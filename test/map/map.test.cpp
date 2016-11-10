@@ -23,7 +23,7 @@ using namespace std::literals::string_literals;
 
 struct MapTest {
     util::RunLoop runLoop;
-    HeadlessBackend backend;
+    HeadlessBackend backend { test::sharedDisplay() };
     OffscreenView view { backend.getContext() };
     StubFileSource fileSource;
     ThreadPool threadPool { 4 };
@@ -447,6 +447,10 @@ TEST(Map, DontLoadUnneededTiles) {
 
 class MockBackend : public HeadlessBackend {
 public:
+    MockBackend(std::shared_ptr<HeadlessDisplay> display_)
+            : HeadlessBackend(display_) {
+    }
+
     std::function<void()> callback;
     void invalidate() override {
         if (callback) {
@@ -457,7 +461,7 @@ public:
 
 TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     util::RunLoop runLoop;
-    MockBackend backend;
+    MockBackend backend { test::sharedDisplay() };
     OffscreenView view { backend.getContext() };
     ThreadPool threadPool { 4 };
 
