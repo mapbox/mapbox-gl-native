@@ -1,3 +1,8 @@
+# 3.4.1 - Novmeber 10, 2016
+
+- Skips assigning clip IDs to tiles that won't be rendered, mitigating a `stencil mask overflow` error ([#6871](https://github.com/mapbox/mapbox-gl-native/pull/6871))
+- Fixes camera logic to avoid unnecessary or redundant setting of camera options ([#6990](https://github.com/mapbox/mapbox-gl-native/pull/6990))
+
 # 3.4.0 - Novmeber 2, 2016
 
 - Fixes Bitrise configuration to automatically publish macOS binaries ([#6789](https://github.com/mapbox/mapbox-gl-native/pull/6789))
