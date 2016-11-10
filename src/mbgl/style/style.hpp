@@ -142,7 +142,7 @@ private:
     void onLayerFilterChanged(Layer&) override;
     void onLayerVisibilityChanged(Layer&) override;
     void onLayerPaintPropertyChanged(Layer&) override;
-    void onLayerLayoutPropertyChanged(Layer&) override;
+    void onLayerLayoutPropertyChanged(Layer&, const char *) override;
 
     Observer nullObserver;
     Observer* observer = &nullObserver;
