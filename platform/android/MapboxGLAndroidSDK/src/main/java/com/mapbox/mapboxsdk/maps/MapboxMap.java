@@ -162,9 +162,10 @@ public class MapboxMap {
     }
 
     /**
-     * Adds a new layer on top of existing layers.
+     * Adds a new layer on top of existing layers. The layer must be newly created and not added to the map before
      *
      * @param layer a {@link Layer}.
+     *
      */
     @UiThread
     public void addLayer(@NonNull Layer layer) {
@@ -172,7 +173,7 @@ public class MapboxMap {
     }
 
     /**
-     * Inserts a new layer below another layer.
+     * Inserts a new layer below another layer. The layer must be newly created and not added to the map before
      * <p>
      * Layer identifiers are not guaranteed to exist across styles or different versions of the
      * same style. Applications that use this API must set the style URL to an explicitly versioned
@@ -186,6 +187,7 @@ public class MapboxMap {
      * @param before a String layer identifier that's already found in the map view style. If the
      *               layer is not found in the current map style the layer will be added to the top
      *               of the map.
+     *
      */
     @UiThread
     public void addLayer(@NonNull Layer layer, String before) {
@@ -193,7 +195,7 @@ public class MapboxMap {
     }
 
     /**
-     * Removes a layer from the map style.
+     * Removes a layer from the map style. Any references to the layer become invalid and should not be used anymore
      *
      * <p>
      * Layer identifiers are not guaranteed to exist across styles or different versions of the
@@ -204,7 +206,11 @@ public class MapboxMap {
      * time. These default styles can be found in the {@link Style} class.
      * </p>
      * @param layerId
+     * Removes the layer. Any references to the layer become invalid and should not be used anymore
+     *
+     * @param layerId the layer to remove
      * @throws NoSuchLayerException
+     * 
      */
     @UiThread
     public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
@@ -260,7 +266,7 @@ public class MapboxMap {
     }
 
     /**
-     * Adds a new source to the map style.
+     * Adds the source to the map. The source must be newly created and not added to the map before
      *
      * @param source the {@link Source} to add to the map view.
      */
@@ -270,7 +276,7 @@ public class MapboxMap {
     }
 
     /**
-     * Removes a source from the map style.
+     * Removes a source from the map style. Any references to the source become invalid and should not be used anymore
      * <p>
      * Source identifiers are not guaranteed to exist across styles or different versions of the
      * same style. Applications that use this API must set the style URL to an explicitly versioned
@@ -282,6 +288,7 @@ public class MapboxMap {
      *
      * @param sourceId a String identifier representing the source to remove.
      * @throws NoSuchSourceException the source trying to be removed doesn't exist in the map.
+     *
      */
     @UiThread
     public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
