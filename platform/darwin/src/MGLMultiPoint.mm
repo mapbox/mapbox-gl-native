@@ -68,7 +68,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 - (void)appendCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
     [self willChangeValueForKey:@"coordinates"];
-    _coordinates.insert(_coordinates.end(), *coords);
+    _coordinates.insert(_coordinates.end(), count, *coords);
     [self computeBounds];
     [self didChangeValueForKey:@"coordinates"];
 }
@@ -95,11 +95,10 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 
 - (void)computeBounds
 {
-    CLLocationCoordinate2D *coords = self.coordinates;
     mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
-    for (NSUInteger i = 0; i < [self pointCount]; i++)
+    for (auto coordinate : _coordinates)
     {
-        bounds.extend(mbgl::LatLng(coords[i].latitude, coords[i].longitude));
+        bounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
     }
     _bounds = MGLCoordinateBoundsFromLatLngBounds(bounds);
 }
