@@ -421,13 +421,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		DA25D5C71CCDA0C100607828 /* PBXContainerItemProxy */ = {		
- 			isa = PBXContainerItemProxy;		
- 			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;		
- 			proxyType = 1;		
- 			remoteGlobalIDString = DA25D5B81CCD9EDE00607828;		
- 			remoteInfo = settings;		
- 		};
+		DA25D5C71CCDA0C100607828 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DA25D5B81CCD9EDE00607828;
+			remoteInfo = settings;
+		};
 		DA25D5C91CCDA0CC00607828 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
@@ -2104,10 +2104,10 @@
 
 /* Begin PBXTargetDependency section */
 		DA25D5C81CCDA0C100607828 /* PBXTargetDependency */ = {
- 			isa = PBXTargetDependency;
- 			target = DA25D5B81CCD9EDE00607828 /* settings */;
- 			targetProxy = DA25D5C71CCDA0C100607828 /* PBXContainerItemProxy */;
- 		};
+			isa = PBXTargetDependency;
+			target = DA25D5B81CCD9EDE00607828 /* settings */;
+			targetProxy = DA25D5C71CCDA0C100607828 /* PBXContainerItemProxy */;
+		};
 		DA25D5CA1CCDA0CC00607828 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DA8933D41CCD306400E68420 /* bundle */;
