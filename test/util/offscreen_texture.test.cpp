@@ -10,7 +10,7 @@
 using namespace mbgl;
 
 TEST(OffscreenTexture, EmptyRed) {
-    HeadlessBackend backend;
+    HeadlessBackend backend { test::sharedDisplay() };
     OffscreenView view(backend.getContext(), { 512, 256 });
     view.bind();
 
@@ -67,7 +67,7 @@ struct Buffer {
 
 
 TEST(OffscreenTexture, RenderToTexture) {
-    HeadlessBackend backend;
+    HeadlessBackend backend { test::sharedDisplay() };
     auto& context = backend.getContext();
 
     MBGL_CHECK_ERROR(glEnable(GL_BLEND));

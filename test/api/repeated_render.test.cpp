@@ -12,15 +12,17 @@
 
 #include <future>
 
+using namespace mbgl;
+
+
 TEST(API, RepeatedRender) {
-    using namespace mbgl;
 
     util::RunLoop loop;
 
     const auto style = util::read_file("test/fixtures/api/water.json");
 
-    HeadlessBackend backend;
-    OffscreenView view(backend.getContext(), { 256, 512 });
+    HeadlessBackend backend { test::sharedDisplay() };
+    OffscreenView view { backend.getContext(), { 256, 512 } };
 #ifdef MBGL_ASSET_ZIP
     // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");

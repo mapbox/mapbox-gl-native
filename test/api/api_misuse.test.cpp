@@ -14,14 +14,15 @@
 
 using namespace mbgl;
 
+
 TEST(API, RenderWithoutCallback) {
     auto log = new FixtureLogObserver();
     Log::setObserver(std::unique_ptr<Log::Observer>(log));
 
     util::RunLoop loop;
 
-    HeadlessBackend backend;
-    OffscreenView view(backend.getContext(), { 128, 512 });
+    HeadlessBackend backend { test::sharedDisplay() };
+    OffscreenView view { backend.getContext(), { 128, 512 } };
     StubFileSource fileSource;
     ThreadPool threadPool(4);
 
@@ -45,8 +46,8 @@ TEST(API, RenderWithoutCallback) {
 TEST(API, RenderWithoutStyle) {
     util::RunLoop loop;
 
-    HeadlessBackend backend;
-    OffscreenView view(backend.getContext(), { 128, 512 });
+    HeadlessBackend backend { test::sharedDisplay() };
+    OffscreenView view { backend.getContext(), { 128, 512 } };
     StubFileSource fileSource;
     ThreadPool threadPool(4);
 

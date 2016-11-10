@@ -23,8 +23,8 @@ std::shared_ptr<SpriteImage> namedMarker(const std::string &name) {
 class AnnotationTest {
 public:
     util::RunLoop loop;
-    HeadlessBackend backend;
-    OffscreenView view{ backend.getContext() };
+    HeadlessBackend backend { test::sharedDisplay() };
+    OffscreenView view { backend.getContext() };
     StubFileSource fileSource;
     ThreadPool threadPool { 4 };
     Map map { backend, view.size, 1, fileSource, threadPool, MapMode::Still };

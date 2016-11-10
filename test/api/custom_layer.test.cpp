@@ -85,8 +85,8 @@ public:
 TEST(CustomLayer, Basic) {
     util::RunLoop loop;
 
-    HeadlessBackend backend;
-    OffscreenView view(backend.getContext());
+    HeadlessBackend backend { test::sharedDisplay() };
+    OffscreenView view { backend.getContext() };
 
 #ifdef MBGL_ASSET_ZIP
     // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`

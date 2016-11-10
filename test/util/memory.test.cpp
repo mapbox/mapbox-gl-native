@@ -56,7 +56,7 @@ public:
     }
 
     util::RunLoop runLoop;
-    HeadlessBackend backend;
+    HeadlessBackend backend { test::sharedDisplay() };
     OffscreenView view{ backend.getContext(), { 512, 512 } };
     StubFileSource fileSource;
     ThreadPool threadPool { 4 };
