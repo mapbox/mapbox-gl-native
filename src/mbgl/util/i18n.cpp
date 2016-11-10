@@ -8,7 +8,7 @@ namespace {
     @param last The last codepoint in the block, inclusive.
  */
 #define DEFINE_IS_IN_UNICODE_BLOCK(name, first, last)                                              \
-    inline bool isIn##name(uint32_t codepoint) {                                                   \
+    inline bool isIn##name(uint16_t codepoint) {                                                   \
         return codepoint >= first && codepoint <= last;                                            \
     }
 
@@ -294,13 +294,13 @@ namespace mbgl {
 namespace util {
 namespace i18n {
 
-bool isVisible(uint32_t chr) {
+bool isVisible(uint16_t chr) {
     return (chr == 0x0a    /* newline */
             || chr == 0x20 /* space */
             || chr == 0x200b /* zero-width space */);
 }
 
-bool allowsWordBreaking(uint32_t chr) {
+bool allowsWordBreaking(uint16_t chr) {
     return (chr == 0x0a      /* newline */
             || chr == 0x20   /* space */
             || chr == 0x26   /* ampersand */
@@ -314,8 +314,8 @@ bool allowsWordBreaking(uint32_t chr) {
             || chr == 0x2013 /* en dash */);
 }
 
-bool allowsIdeographicBreaking(const std::u32string& string) {
-    for (uint32_t chr : string) {
+bool allowsIdeographicBreaking(const std::u16string& string) {
+    for (uint16_t chr : string) {
         if (!allowsIdeographicBreaking(chr)) {
             return false;
         }
@@ -323,7 +323,7 @@ bool allowsIdeographicBreaking(const std::u32string& string) {
     return true;
 }
 
-bool allowsIdeographicBreaking(uint32_t chr) {
+bool allowsIdeographicBreaking(uint16_t chr) {
     // Return early for characters outside all ideographic ranges.
     if (chr < 0x2E80)
         return false;

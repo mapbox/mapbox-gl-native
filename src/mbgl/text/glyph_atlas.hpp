@@ -55,7 +55,7 @@ public:
     void setObserver(GlyphAtlasObserver* observer);
 
     void addGlyphs(uintptr_t tileUID,
-                   const std::u32string& text,
+                   const std::u16string& text,
                    const FontStack&,
                    const GlyphSet&,
                    GlyphPositions&);

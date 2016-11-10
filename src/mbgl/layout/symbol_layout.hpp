@@ -64,8 +64,8 @@ private:
                     const GlyphPositions& face,
                     const size_t index);
 
-    bool anchorIsTooClose(const std::u32string& text, const float repeatDistance, Anchor&);
-    std::map<std::u32string, std::vector<Anchor>> compareText;
+    bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, Anchor&);
+    std::map<std::u16string, std::vector<Anchor>> compareText;
 
     void addToDebugBuffers(CollisionTile&, SymbolBucket&);
 

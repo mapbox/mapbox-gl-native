@@ -11,7 +11,7 @@
 namespace mbgl {
 
 // Note: this only works for the BMP
-GlyphRange getGlyphRange(char32_t glyph);
+GlyphRange getGlyphRange(char16_t glyph);
 
 struct GlyphMetrics {
     explicit operator bool() const {
@@ -63,10 +63,10 @@ public:
 class Shaping {
     public:
     explicit Shaping() : top(0), bottom(0), left(0), right(0) {}
-    explicit Shaping(float x, float y, std::u32string text_)
+    explicit Shaping(float x, float y, std::u16string text_)
         : text(std::move(text_)), top(y), bottom(y), left(x), right(x) {}
     std::vector<PositionedGlyph> positionedGlyphs;
-    std::u32string text;
+    std::u16string text;
     int32_t top;
     int32_t bottom;
     int32_t left;

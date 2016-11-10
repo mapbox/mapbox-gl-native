@@ -3,8 +3,8 @@
 #include <mbgl/layout/merge_lines.hpp>
 #include <mbgl/layout/symbol_feature.hpp>
 
-const std::u32string aaa = U"a";
-const std::u32string bbb = U"b";
+const std::u16string aaa = u"a";
+const std::u16string bbb = u"b";
 
 TEST(MergeLines, SameText) {
     // merges lines with the same text
