@@ -2,6 +2,8 @@ format_version: 1.1.0
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
 trigger_map:
+- pattern: nightly-release
+  workflow: nightly-release
 - pattern: "*"
   is_pull_request_allowed: true
   workflow: primary
@@ -78,3 +80,31 @@ workflows:
             failed'
         - icon_url: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-icon-128.png
         - icon_url_on_error: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-error-icon-128.png
+  nightly-release:
+    steps:
+    - script:
+        title: Install Dependencies
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -eu -o pipefail
+            brew install cmake
+        - is_debug: 'yes'
+    - script:
+        title: Configure AWS-CLI
+        inputs:
+        - content: |-
+            #!/bin/bash
+            apt-get install -y python-pip python-dev build-essential
+            pip install awscli
+    - script:
+        title: Build package
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -eu -o pipefail
+            export BUILDTYPE=Release
+            export SYMBOLS=NO
+            make xpackage
+            CLOUDWATCH=true platform/macos/scripts/metrics.sh
+        - is_debug: 'yes'
