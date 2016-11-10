@@ -16,14 +16,14 @@ NS_ASSUME_NONNULL_BEGIN
  @param zoom
  @param y
  @param x
- @param callback A block to call with the data that has been fetched for the tile.
+ @param completionHandler A block to call with the data that has been fetched for the tile.
  */
 - (void)getTileForZoomLevel:(NSUInteger)zoomLevel x:(NSUInteger)x y:(NSUInteger)y completionHandler:( void (^)(NSArray<id <MGLFeature>>*) )completionHandler;
 
 @end
 
 /**
- A source for vector data that is fetched 1 tile at a time. Usefull for sources that are
+ A source for vector data that is fetched 1 tile at a time. Useful for sources that are
  too large to fit in memory, or are already divided into tiles, but not in Mapbox Vector Tile format.
  */
 @interface MGLCustomVectorSource : MGLGeoJSONSourceBase
@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Reload all tiles.
  */
-- (void)reload;
+- (void)reloadData;
 
 /**
  An object that implements the `MGLCustomVectorSourceDataSource` protocol that will be queried for tile data.
