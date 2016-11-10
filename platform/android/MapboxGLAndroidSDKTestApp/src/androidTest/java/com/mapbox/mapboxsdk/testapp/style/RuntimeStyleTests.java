@@ -104,12 +104,8 @@ public class RuntimeStyleTests {
             mapboxMap.addLayer(layer);
             assertNotNull(mapboxMap.getLayer("building"));
 
-            try {
-                layer.setProperties(PropertyFactory.visibility(Property.VISIBLE));
-                assertTrue("Never reached as the reference is invalid after adding", false);
-            } catch (Exception e) {
-                //Expected, reference is no longer valid
-            }
+            //Assure the reference still works
+            layer.setProperties(PropertyFactory.visibility(Property.VISIBLE));
         }
     }
 

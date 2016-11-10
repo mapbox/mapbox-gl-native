@@ -59,7 +59,6 @@ public class <%- camelize(type) %>Layer extends Layer {
      * @param sourceLayer the source layer to set
      */
     public void setSourceLayer(String sourceLayer) {
-        checkValidity();
         nativeSetSourceLayer(sourceLayer);
     }
 
@@ -81,7 +80,6 @@ public class <%- camelize(type) %>Layer extends Layer {
      * @param filter the filter to set
      */
     public void setFilter(Filter.Statement filter) {
-        checkValidity();
         this.setFilter(filter.toArray());
     }
 
@@ -91,7 +89,6 @@ public class <%- camelize(type) %>Layer extends Layer {
      * @param filter the filter array to set
      */
     public void setFilter(Object[] filter) {
-        checkValidity();
         nativeSetFilter(filter);
     }
 
@@ -140,7 +137,6 @@ public class <%- camelize(type) %>Layer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() {
-        checkValidity();
         return (PropertyValue<<%- propertyType(property) %>>) new PropertyValue(nativeGet<%- camelize(property.name) %>());
     }
  <% if (property.type == 'color') { -%>
@@ -152,7 +148,6 @@ public class <%- camelize(type) %>Layer extends Layer {
      */
     @ColorInt
     public int get<%- camelize(property.name) %>AsInt() {
-        checkValidity();
         PropertyValue<<%- propertyType(property) %>> value = get<%- camelize(property.name) %>();
         if (value.isValue()) {
             return rgbaToColor(value.getValue());
