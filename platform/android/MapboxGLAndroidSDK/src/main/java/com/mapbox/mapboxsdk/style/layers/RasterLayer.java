@@ -42,7 +42,6 @@ public class RasterLayer extends Layer {
      * @param sourceLayer the source layer to set
      */
     public void setSourceLayer(String sourceLayer) {
-        checkValidity();
         nativeSetSourceLayer(sourceLayer);
     }
 
@@ -77,7 +76,6 @@ public class RasterLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getRasterOpacity() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetRasterOpacity());
     }
  
@@ -88,7 +86,6 @@ public class RasterLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getRasterHueRotate() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetRasterHueRotate());
     }
  
@@ -99,7 +96,6 @@ public class RasterLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getRasterBrightnessMin() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetRasterBrightnessMin());
     }
  
@@ -110,7 +106,6 @@ public class RasterLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getRasterBrightnessMax() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetRasterBrightnessMax());
     }
  
@@ -121,7 +116,6 @@ public class RasterLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getRasterSaturation() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetRasterSaturation());
     }
  
@@ -132,7 +126,6 @@ public class RasterLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getRasterContrast() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetRasterContrast());
     }
  
@@ -143,7 +136,6 @@ public class RasterLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getRasterFadeDuration() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetRasterFadeDuration());
     }
  

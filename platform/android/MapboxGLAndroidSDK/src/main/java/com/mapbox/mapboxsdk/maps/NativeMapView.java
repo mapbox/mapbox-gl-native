@@ -488,7 +488,6 @@ final class NativeMapView {
 
     public void addLayer(@NonNull Layer layer, @Nullable String before) {
         nativeAddLayer(nativeMapViewPtr, layer.getNativePtr(), before);
-        layer.invalidate();
     }
 
     public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
