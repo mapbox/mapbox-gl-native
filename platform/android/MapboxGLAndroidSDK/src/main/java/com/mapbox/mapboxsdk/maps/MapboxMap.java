@@ -165,7 +165,6 @@ public class MapboxMap {
      * Adds a new layer on top of existing layers. The layer must be newly created and not added to the map before
      *
      * @param layer a {@link Layer}.
-     *
      */
     @UiThread
     public void addLayer(@NonNull Layer layer) {
@@ -183,11 +182,10 @@ public class MapboxMap {
      * time. These default styles can be found in the {@link Style} class.
      * </p>
      *
-     * @param layer a {@link Layer} to be added to map style.
+     * @param layer  a {@link Layer} to be added to map style.
      * @param before a String layer identifier that's already found in the map view style. If the
      *               layer is not found in the current map style the layer will be added to the top
      *               of the map.
-     *
      */
     @UiThread
     public void addLayer(@NonNull Layer layer, String before) {
@@ -196,7 +194,6 @@ public class MapboxMap {
 
     /**
      * Removes a layer from the map style. Any references to the layer become invalid and should not be used anymore
-     *
      * <p>
      * Layer identifiers are not guaranteed to exist across styles or different versions of the
      * same style. Applications that use this API must set the style URL to an explicitly versioned
@@ -205,12 +202,10 @@ public class MapboxMap {
      * also avoids layer identifier name changes that will occur in the default style’s layers over
      * time. These default styles can be found in the {@link Style} class.
      * </p>
-     * @param layerId
-     * Removes the layer. Any references to the layer become invalid and should not be used anymore
-     *
-     * @param layerId the layer to remove
-     * @throws NoSuchLayerException
-     * 
+     * @param layerId a String matching the layer ID found within the current map style. This
+     *                String is case sensitive.
+     * @throws NoSuchLayerException If the layer doesn't exist in the current style, this exception
+     *                              will be thrown.
      */
     @UiThread
     public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
@@ -288,7 +283,6 @@ public class MapboxMap {
      *
      * @param sourceId a String identifier representing the source to remove.
      * @throws NoSuchSourceException the source trying to be removed doesn't exist in the map.
-     *
      */
     @UiThread
     public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
@@ -327,7 +321,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setMinZoom(
-      @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
+            @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
         if ((minZoom < MapboxConstants.MINIMUM_ZOOM) || (minZoom > MapboxConstants.MAXIMUM_ZOOM)) {
             Log.e(MapboxConstants.TAG, "Not setting minZoom, value is in unsupported range: " + minZoom);
             return;
@@ -360,7 +354,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setMaxZoom(
-      @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
+            @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
         if ((maxZoom < MapboxConstants.MINIMUM_ZOOM) || (maxZoom > MapboxConstants.MAXIMUM_ZOOM)) {
             Log.e(MapboxConstants.TAG, "Not setting maxZoom, value is in unsupported range: " + maxZoom);
             return;
@@ -553,11 +547,49 @@ public class MapboxMap {
         easeCamera(update, durationMs, true, callback);
     }
 
+    /**
+     * Gradually move the camera by a specified duration in milliseconds, zoom will not be affected
+     * unless specified within {@link CameraUpdate}. A callback can be used to be notified when
+     * easing the camera stops. If {@link #getCameraPosition()} is called during the animation, it
+     * will return the current location of the camera in flight.
+     * <p>
+     * Note that this will cancel location tracking mode if enabled.
+     * </p>
+     *
+     * @param update             The change that should be applied to the camera.
+     * @param durationMs         The duration of the animation in milliseconds. This must be strictly
+     *                           positive, otherwise an IllegalArgumentException will be thrown.
+     * @param easingInterpolator The rate of change of the camera animation. If false, the easing
+     *                           animation will be linear.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
+     */
     @UiThread
     public final void easeCamera(CameraUpdate update, int durationMs, boolean easingInterpolator) {
         easeCamera(update, durationMs, easingInterpolator, null);
     }
 
+    /**
+     * Gradually move the camera by a specified duration in milliseconds, zoom will not be affected
+     * unless specified within {@link CameraUpdate}. A callback can be used to be notified when
+     * easing the camera stops. If {@link #getCameraPosition()} is called during the animation, it
+     * will return the current location of the camera in flight.
+     * <p>
+     * Note that this will cancel location tracking mode if enabled.
+     * </p>
+     *
+     * @param update             The change that should be applied to the camera.
+     * @param durationMs         The duration of the animation in milliseconds. This must be strictly
+     *                           positive, otherwise an IllegalArgumentException will be thrown.
+     * @param easingInterpolator The rate of change of the camera animation. If false, the easing
+     *                           animation will be linear.
+     * @param callback           An optional callback to be notified from the main thread when the
+     *                           animation stops. If the animation stops due to its natural
+     *                           completion, the callback will be notified with onFinish(). If the
+     *                           animation stops due to interruption by a later camera movement or a
+     *                           user gesture, onCancel() will be called. Do not update or ease the
+     *                           camera from within onCancel().
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
+     */
     @UiThread
     public final void easeCamera(
             CameraUpdate update, int durationMs, boolean easingInterpolator, final MapboxMap.CancelableCallback callback) {
@@ -565,6 +597,29 @@ public class MapboxMap {
         easeCamera(update, durationMs, easingInterpolator, true, callback);
     }
 
+    /**
+     * Gradually move the camera by a specified duration in milliseconds, zoom will not be affected
+     * unless specified within {@link CameraUpdate}. A callback can be used to be notified when
+     * easing the camera stops. If {@link #getCameraPosition()} is called during the animation, it
+     * will return the current location of the camera in flight.
+     * <p>
+     * Note that this will cancel location tracking mode if enabled.
+     * </p>
+     *
+     * @param update             The change that should be applied to the camera.
+     * @param durationMs         The duration of the animation in milliseconds. This must be strictly
+     *                           positive, otherwise an IllegalArgumentException will be thrown.
+     * @param easingInterpolator The rate of change of the camera animation. If false, the easing
+     *                           animation will be linear.
+     * @param resetTrackingMode  Dismiss tracking, moving camera is equal to a gesture.
+     * @param callback           An optional callback to be notified from the main thread when the
+     *                           animation stops. If the animation stops due to its natural
+     *                           completion, the callback will be notified with onFinish(). If the
+     *                           animation stops due to interruption by a later camera movement or a
+     *                           user gesture, onCancel() will be called. Do not update or ease the
+     *                           camera from within onCancel().
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
+     */
     @UiThread
     public final void easeCamera(
             CameraUpdate update, int durationMs, boolean easingInterpolator, boolean resetTrackingMode, final MapboxMap.CancelableCallback callback) {
@@ -701,7 +756,7 @@ public class MapboxMap {
      * Invalidates the current camera position by reconstructing it from mbgl
      */
     private void invalidateCameraPosition() {
-        if(invalidCameraPosition) {
+        if (invalidCameraPosition) {
             invalidCameraPosition = false;
 
             CameraPosition cameraPosition = mapView.invalidateCameraPosition();
@@ -948,6 +1003,17 @@ public class MapboxMap {
         return marker;
     }
 
+    /**
+     * <p>
+     * Adds multiple {@link MarkerView}s to this map.
+     * </p>
+     * The marker's icon is rendered on the map at the location {@code Marker.position}.
+     * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
+     *
+     * @param markerViewOptions A list of {@link com.mapbox.mapboxsdk.annotations.MarkerViewOptions}
+     *                          objects that defines how to render the markers.
+     * @return A list made up of {@link MarkerView} that were added to the map.
+     */
     @UiThread
     @NonNull
     public List<MarkerView> addMarkerViews(@NonNull List<? extends BaseMarkerViewOptions> markerViewOptions) {
@@ -1283,9 +1349,25 @@ public class MapboxMap {
 
     /**
      * Removes all annotations from the map.
+     *
+     * @deprecated use {@link MapboxMap#clear()} instead.
      */
+    @Deprecated
     @UiThread
     public void removeAnnotations() {
+        clear();
+    }
+
+    /**
+     * Removes all markers, polylines, polygons, etc from the map.
+     * <p>
+     * This does not affect {@link com.mapbox.mapboxsdk.maps.widgets.MyLocationView}, if
+     * enabled/visible on the map it will remain visible to the user. This also doesn't remove any
+     * runtime styling layers or sources you might have added to the map.
+     * </p>
+     */
+    @UiThread
+    public void clear() {
         Annotation annotation;
         int count = annotations.size();
         long[] ids = new long[count];
@@ -1305,15 +1387,7 @@ public class MapboxMap {
     }
 
     /**
-     * Removes all markers, polylines, polygons, overlays, etc from the map.
-     */
-    @UiThread
-    public void clear() {
-        removeAnnotations();
-    }
-
-    /**
-     * Return a annotation based on its id.
+     * Return an annotation based on its id.
      *
      * @param id the id used to look up an annotation
      * @return An annotation with a matched id, null is returned if no match was found
@@ -1763,6 +1837,12 @@ public class MapboxMap {
         return onInfoWindowLongClickListener;
     }
 
+    /**
+     * Sets a callback that's invoked when a marker's info window is closed.
+     *
+     * @param listener The callback that's invoked when a marker's info window is closed. To unset
+     *                 the callback, use null.
+     */
     public void setOnInfoWindowCloseListener(@Nullable OnInfoWindowCloseListener listener) {
         onInfoWindowCloseListener = listener;
     }
