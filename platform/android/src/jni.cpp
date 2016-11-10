@@ -1142,9 +1142,13 @@ void nativeAddSource(JNIEnv *env, jni::jobject* obj, jni::jlong nativeMapViewPtr
     assert(nativeSourcePtr != 0);
 
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    Source *source = reinterpret_cast<Source *>(nativeSourcePtr);
 
-    nativeMapView->getMap().addSource(source->releaseCoreSource());
+    Source *source = reinterpret_cast<Source *>(nativeSourcePtr);
+    try {
+        source->addToMap(nativeMapView->getMap());
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/sources/CannotAddSourceException"), error.what());
+    }
 }
 
 void nativeRemoveSource(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* id) {

@@ -35,6 +35,19 @@ namespace android {
         return jni::Make<jni::String>(env, source.getID());
     }
 
+    void Source::addToMap(mbgl::Map& _map) {
+        //Check to see if we own the source first
+        if (!ownedSource) {
+            throw std::runtime_error("Cannot add source twice");
+        }
+
+        //Add source to map
+        _map.addSource(releaseCoreSource());
+
+        //Save pointer to the map
+        this->map = &_map;
+    }
+
     std::unique_ptr<mbgl::style::Source> Source::releaseCoreSource() {
         assert(ownedSource != nullptr);
         return std::move(ownedSource);
