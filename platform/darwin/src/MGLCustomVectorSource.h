@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param dataSource An object that implements the `MGLCustomVectorSourceDataSource` protocol that will be queried for tile data.
  @param options An `NSDictionary` of options for this source.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(NSObject<MGLCustomVectorSourceDataSource>*)dataSource options:(NS_DICTIONARY_OF(NSString *, id) *)options NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(NSObject<MGLCustomVectorSourceDataSource>*)dataSource options:(NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
 
 /**
  Request that the source reloads a tile. Tile will only be reloaded if it is currently on screen.

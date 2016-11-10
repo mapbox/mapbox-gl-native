@@ -20,7 +20,7 @@
 
 @implementation MGLCustomVectorSource
 
-- (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(NSObject<MGLCustomVectorSourceDataSource>*)dataSource options:(NS_DICTIONARY_OF(NSString *, id) *)options
+- (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(NSObject<MGLCustomVectorSourceDataSource>*)dataSource options:(NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *)options
 {
     if (self = [super initWithIdentifier:identifier options:options])
     {

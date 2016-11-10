@@ -12,7 +12,7 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
 @implementation MGLGeoJSONSourceBase
 
 
-- (instancetype)initWithIdentifier:(NSString *)identifier options:(NS_DICTIONARY_OF(NSString *, id) *)options
+- (instancetype)initWithIdentifier:(NSString *)identifier options:(NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *)options
 {
     if (self = [super initWithIdentifier:identifier]) {
         self.options = options;

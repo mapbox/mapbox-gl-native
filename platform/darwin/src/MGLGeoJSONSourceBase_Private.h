@@ -4,9 +4,9 @@
 
 @interface MGLGeoJSONSourceBase (Private)
 
-@property (nonatomic, readwrite) NSDictionary *options;
+@property (nonatomic, readwrite) NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *options;
 
-- (instancetype)initWithIdentifier:(NSString *)identifier options:(NS_DICTIONARY_OF(NSString *, id) *)options;
+- (instancetype)initWithIdentifier:(NSString *)identifier options:(NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *)options;
 
 - (mbgl::style::GeoJSONOptions)geoJSONOptions;
 
