@@ -123,16 +123,33 @@ public class MapboxMap {
         }
     }
 
+    /**
+     * Adds the layer to the map. The layer must be newly created and not added to the map before
+     *
+     * @param layer the layer to add
+     */
     @UiThread
     public void addLayer(@NonNull Layer layer) {
         addLayer(layer, null);
     }
 
+    /**
+     * Adds the layer to the map. The layer must be newly created and not added to the map before
+     *
+     * @param layer  the layer to add
+     * @param before the layer id to add this layer before
+     */
     @UiThread
     public void addLayer(@NonNull Layer layer, String before) {
         getMapView().getNativeMapView().addLayer(layer, before);
     }
 
+    /**
+     * Removes the layer. Any references to the layer become invalid and should not be used anymore
+     *
+     * @param layerId the layer to remove
+     * @throws NoSuchLayerException
+     */
     @UiThread
     public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
         getMapView().getNativeMapView().removeLayer(layerId);
@@ -163,11 +180,22 @@ public class MapboxMap {
         }
     }
 
+    /**
+     * Adds the source to the map. The source must be newly created and not added to the map before
+     *
+     * @param source the source to add
+     */
     @UiThread
     public void addSource(@NonNull Source source) {
         getMapView().getNativeMapView().addSource(source);
     }
 
+    /**
+     * Removes the source. Any references to the source become invalid and should not be used anymore
+     *
+     * @param sourceId the source to remove
+     * @throws NoSuchSourceException
+     */
     @UiThread
     public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
         getMapView().getNativeMapView().removeSource(sourceId);
