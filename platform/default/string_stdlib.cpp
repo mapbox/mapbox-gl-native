@@ -1,10 +1,10 @@
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/util/utf.hpp>
 #define NU_WITH_TOUPPER
 #define NU_WITH_TOLOWER
 #define NU_WITH_UTF8_WRITER
 #include <libnu/libnu.h>
 #include <cstring>
+#include <sstream>
 
 namespace mbgl { namespace platform {
 

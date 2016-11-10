@@ -31,7 +31,7 @@ const std::map<uint32_t, SDFGlyph> &GlyphSet::getSDFs() const {
     return sdfs;
 }
 
-const Shaping GlyphSet::getShaping(const std::u32string &string, const float maxWidth,
+const Shaping GlyphSet::getShaping(const std::u16string &string, const float maxWidth,
                                     const float lineHeight, const float horizontalAlign,
                                     const float verticalAlign, const float justify,
                                     const float spacing, const Point<float> &translate) const {
@@ -44,7 +44,7 @@ const Shaping GlyphSet::getShaping(const std::u32string &string, const float max
     const float y = yOffset;
 
     // Loop through all characters of this label and shape.
-    for (uint32_t chr : string) {
+    for (char16_t chr : string) {
         auto it = sdfs.find(chr);
         if (it != sdfs.end()) {
             shaping.positionedGlyphs.emplace_back(chr, x, y);
