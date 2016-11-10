@@ -2,7 +2,9 @@
 
 #include <mbgl/style/source.hpp>
 #include <mbgl/util/geojson.hpp>
+#include <mbgl/util/geo.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
+
 namespace mbgl {
 namespace style {
     
@@ -12,6 +14,7 @@ public:
   
     void setTileData(uint8_t, uint32_t, uint32_t, const mapbox::geojson::geojson&);
     void updateTile(uint8_t, uint32_t, uint32_t);
+    void reloadRegion(mbgl::LatLngBounds bounds, uint8_t z);
     void reload();
   
     // Private implementation

@@ -1,6 +1,7 @@
 #import "MGLSource.h"
 #import "MGLGeoJSONSource.h"
 #import "MGLGeoJSONSourceBase.h"
+#import "MGLGeometry.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -40,9 +41,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(NSObject<MGLCustomVectorSourceDataSource>*)dataSource options:(NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
 
 /**
- Request that the source reloads a tile. Tile will only be reloaded if it is currently on screen.
+ Request that the source reloads a region.
  */
-- (void)setNeedsUpdateAtZoomLevel:(NSUInteger)z x:(NSUInteger)x y:(NSUInteger)y;
+- (void)reloadTileInCoordinateBounds:(MGLCoordinateBounds)bounds zoomLevel:(NSUInteger)zoomLevel;
 
 /**
  Reload all tiles.

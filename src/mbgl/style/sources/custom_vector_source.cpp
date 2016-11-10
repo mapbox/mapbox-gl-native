@@ -12,7 +12,11 @@ CustomVectorSource::CustomVectorSource(std::string id, GeoJSONOptions options, s
 void CustomVectorSource::setTileData(uint8_t z, uint32_t x, uint32_t y, const mapbox::geojson::geojson& geoJSON) {
     impl->setTileData(z, x, y, geoJSON);
 }
-      
+
+void CustomVectorSource::reloadRegion(mbgl::LatLngBounds bounds, uint8_t z) {
+    impl->reloadRegion(bounds, z);
+}
+  
 void CustomVectorSource::updateTile(uint8_t z, uint32_t x, uint32_t y) {
     impl->updateTile(z, x, y);
 }

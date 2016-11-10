@@ -5,6 +5,7 @@
 #import "MGLFeature_Private.h"
 #import "MGLShape_Private.h"
 #import "MGLGeoJSONSourceBase_Private.h"
+#import "MGLGeometry_Private.h"
 
 #include <mbgl/style/sources/custom_vector_source.hpp>
 #include <mbgl/util/geojson.hpp>
@@ -67,18 +68,19 @@
     });
 }
 
+- (void)reloadTileInCoordinateBounds:(MGLCoordinateBounds)bounds zoomLevel:(NSUInteger)zoomLevel
+{
+    self.rawSource->reloadRegion(MGLLatLngBoundsFromCoordinateBounds(bounds), (uint8_t)zoomLevel);
+}
+
 - (void)setNeedsUpdateAtZoomLevel:(NSUInteger)z x:(NSUInteger)x y:(NSUInteger)y
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.rawSource->updateTile((uint8_t)z, (uint32_t)x, (uint32_t)y);
-    });
+    self.rawSource->updateTile((uint8_t)z, (uint32_t)x, (uint32_t)y);
 }
 
 - (void)reloadData
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.rawSource->reload();
-    });
+    self.rawSource->reload();
 }
 
 @end

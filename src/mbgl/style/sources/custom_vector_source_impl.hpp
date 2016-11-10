@@ -13,6 +13,7 @@ public:
     void loadDescription(FileSource&) final {}
     void setTileData(uint8_t, uint32_t, uint32_t, const mapbox::geojson::geojson&);
     void updateTile(uint8_t, uint32_t, uint32_t);
+    void reloadRegion(mbgl::LatLngBounds bounds, uint8_t z);
     void reload();
 
 private:

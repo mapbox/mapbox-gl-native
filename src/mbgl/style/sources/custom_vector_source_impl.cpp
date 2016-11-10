@@ -2,6 +2,7 @@
 #include <mbgl/tile/vector_tile.hpp>
 #include <mbgl/tile/geojson_tile.hpp>
 #include <mbgl/style/source_observer.hpp>
+#include <mbgl/util/tile_cover.hpp>
 #include <mapbox/geojsonvt.hpp>
 #include <supercluster.hpp>
 
@@ -81,6 +82,12 @@ void CustomVectorSource::Impl::updateTile(uint8_t z, uint32_t x, uint32_t y) {
     }
 }
  
+void CustomVectorSource::Impl::reloadRegion(mbgl::LatLngBounds bounds, uint8_t z) {
+    for (const auto& tile : mbgl::util::tileCover(bounds, z)) {
+        updateTile(tile.canonical.z, tile.canonical.x, tile.canonical.z);
+    }
+}
+
 void CustomVectorSource::Impl::reload() {
     for (auto const &item : tiles) {
         GeoJSONTile* tile = static_cast<GeoJSONTile*>(item.second.get());
