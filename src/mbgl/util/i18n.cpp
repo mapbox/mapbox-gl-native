@@ -4,6 +4,26 @@ namespace mbgl {
 namespace util {
 namespace i18n {
 
+bool isVisible(uint32_t chr) {
+    return (chr == 0x0a /* newline */
+            || chr == 0x20 /* space */
+            || chr == 0x200b /* zero-width space */);
+}
+
+bool allowsWordBreaking(uint32_t chr) {
+    return (chr == 0x0a /* newline */
+            || chr == 0x20 /* space */
+            || chr == 0x26 /* ampersand */
+            || chr == 0x2b /* plus sign */
+            || chr == 0x2d /* hyphen-minus */
+            || chr == 0x2f /* solidus */
+            || chr == 0xad /* soft hyphen */
+            || chr == 0xb7 /* middle dot */
+            || chr == 0x200b /* zero-width space */
+            || chr == 0x2010 /* hyphen */
+            || chr == 0x2013 /* en dash */);
+}
+
 bool allowsIdeographicBreaking(const std::u32string& string) {
     for (uint32_t chr : string) {
         if (!allowsIdeographicBreaking(chr)) {

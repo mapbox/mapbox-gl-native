@@ -128,8 +128,7 @@ void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, float maxWidth
                     // Collapse invisible characters.
                     uint32_t breakGlyph = positionedGlyphs[lastSafeBreak].glyph;
                     uint32_t lineEnd = lastSafeBreak;
-                    if (breakGlyph == 0x20 /* space */
-                        || breakGlyph == 0x200b /* zero-width space */) {
+                    if (util::i18n::isVisible(breakGlyph)) {
                         lineEnd--;
                     }
 
@@ -144,16 +143,7 @@ void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, float maxWidth
 
             // Ideographic characters, spaces, and word-breaking punctuation that often appear without surrounding spaces.
             if (useBalancedIdeographicBreaking
-                || shape.glyph == 0x20 /* space */
-                || shape.glyph == 0x26 /* ampersand */
-                || shape.glyph == 0x2b /* plus sign */
-                || shape.glyph == 0x2d /* hyphen-minus */
-                || shape.glyph == 0x2f /* solidus */
-                || shape.glyph == 0xad /* soft hyphen */
-                || shape.glyph == 0xb7 /* middle dot */
-                || shape.glyph == 0x200b /* zero-width space */
-                || shape.glyph == 0x2010 /* hyphen */
-                || shape.glyph == 0x2013 /* en dash */
+                || util::i18n::allowsWordBreaking(shape.glyph)
                 || util::i18n::allowsIdeographicBreaking(shape.glyph)) {
                 lastSafeBreak = i;
             }
