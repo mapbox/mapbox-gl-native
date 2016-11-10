@@ -80,6 +80,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * MGLMapDebugOverdrawVisualizationMask no longer has any effect in Release builds of the SDK. This debug mask has been disabled for performance reasons. ([#5555](https://github.com/mapbox/mapbox-gl-native/pull/5555))
 * Fixed a typo in the documentation for the MGLCompassDirectionFormatter class. ([#5879](https://github.com/mapbox/mapbox-gl-native/pull/5879))
 
+## 3.3.6 - November 9, 2016
+
+* Fixed a crash that occurred during low-memory situations when multiple instances of MGLMapView were in the view hierarchy. The speculative fix in v3.3.5 has been reverted. ([#6972](https://github.com/mapbox/mapbox-gl-native/pull/6972))
+
 ## 3.3.5 - November 2, 2016
 
 * Speculatively fixed an OpenGL rendering crash. ([#6844](https://github.com/mapbox/mapbox-gl-native/pull/6844))
