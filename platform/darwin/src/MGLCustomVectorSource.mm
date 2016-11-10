@@ -33,14 +33,11 @@
                                                                         {
                                                                             [self.requestQueue addOperationWithBlock:
                                                                              ^{
-                                                                                 [self.dataSource getTileForZoomLevel:z
-                                                                                                                    x:x
-                                                                                                                    y:y
-                                                                                                    completionHandler:
-                                                                                  ^(NS_ARRAY_OF(id <MGLFeature>) *features)
-                                                                                  {
-                                                                                      [self processData:features forTile:z x:x y:y];
-                                                                                  }];
+                                                                                 [self processData:
+                                                                                  [self.dataSource getTileForZoomLevel:z
+                                                                                                                     x:x
+                                                                                                                     y:y]
+                                                                                           forTile:z x:x y:y];
                                                                              }];
                                                                         });
         

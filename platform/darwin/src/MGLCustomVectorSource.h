@@ -16,9 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
  @param zoom
  @param y
  @param x
- @param completionHandler A block to call with the data that has been fetched for the tile.
  */
-- (void)getTileForZoomLevel:(NSUInteger)zoomLevel x:(NSUInteger)x y:(NSUInteger)y completionHandler:( void (^)(NSArray<id <MGLFeature>>*) )completionHandler;
+- (NSArray<id <MGLFeature>>*)getTileForZoomLevel:(NSUInteger)zoomLevel x:(NSUInteger)x y:(NSUInteger)y;
 
 @end
 
@@ -53,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  An object that implements the `MGLCustomVectorSourceDataSource` protocol that will be queried for tile data.
  */
-@property (nonatomic, readonly, copy) NSObject<MGLCustomVectorSourceDataSource> *dataSource;
+@property (nonatomic, weak) id<MGLCustomVectorSourceDataSource> dataSource;
 
 /**
  A queue that calls to the datasource will be made on.

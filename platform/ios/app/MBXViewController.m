@@ -1622,7 +1622,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 }
 
 #pragma mark - MGLCustomVectorSourceDataSource
-- (void)getTileForZoomLevel:(NSUInteger)zoom x:(NSUInteger)x y:(NSUInteger)y completionHandler:(void (^)(NSArray<id<MGLFeature>> * _Nonnull))completionHandler {
+- (NSArray<id <MGLFeature>>*)getTileForZoomLevel:(NSUInteger)zoom x:(NSUInteger)x y:(NSUInteger)y {
     int tilesAtThisZoom = 1 << zoom;
     double lngWidth = 360.0 / tilesAtThisZoom;
     CLLocationCoordinate2D southwest;
@@ -1679,7 +1679,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         [features addObject:feature];
     }
     
-    completionHandler(features);
+    return features;
 }
 
 @end
