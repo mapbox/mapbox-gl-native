@@ -30,10 +30,6 @@ module.exports = function (style, options, callback) {
         callback(new Error('timed out after 20 seconds'));
     }, 20000);
 
-    options.center = style.center;
-    options.zoom = style.zoom;
-    options.bearing = style.bearing;
-    options.pitch = style.pitch;
     options.debug = {
         tileBorders: options.debug,
         collision: options.collisionDebug,
