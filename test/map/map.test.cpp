@@ -394,3 +394,15 @@ TEST(Map, RemoveImage) {
     map.removeImage("test-icon");
     test::checkImage("test/fixtures/map/remove_icon", test::render(map, test.view));
 }
+
+TEST(Map, GetImage) {
+    MapTest test;
+
+    Map map(test.backend, test.view.size, 1, test.fileSource, test.threadPool, MapMode::Still);
+    auto decoded = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
+    auto image = std::make_unique<SpriteImage>(std::move(decoded), 1.0);
+
+    map.setStyleJSON(util::read_file("test/fixtures/api/icon_style.json"));
+    map.addImage("test-icon", std::move(image));
+    test::checkImage("test/fixtures/map/get_icon", map.getImage("test-icon")->image);
+}
