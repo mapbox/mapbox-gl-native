@@ -51,6 +51,12 @@ Style::~Style() {
         source->baseImpl->setObserver(nullptr);
     }
 
+    for (const auto& layer : layers) {
+        if (CustomLayer* customLayer = layer->as<CustomLayer>()) {
+            customLayer->impl->deinitialize();
+        }
+    }
+
     glyphAtlas->setObserver(nullptr);
     spriteAtlas->setObserver(nullptr);
 }
