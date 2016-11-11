@@ -61,7 +61,6 @@ public:
     public:
         std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
         std::unique_ptr<CollisionTile> collisionTile;
-        PlacementConfig placedConfig;
         uint64_t correlationID;
     };
     void onPlacement(PlacementResult);
@@ -79,7 +78,7 @@ private:
     Actor<GeometryTileWorker> worker;
 
     uint64_t correlationID = 0;
-    optional<PlacementConfig> placedConfig;
+    optional<PlacementConfig> requestedConfig;
 
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
     std::unique_ptr<FeatureIndex> featureIndex;
