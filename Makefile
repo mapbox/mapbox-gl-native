@@ -1,4 +1,5 @@
 export BUILDTYPE ?= Debug
+export WITH_CLIPPER ?= ON
 
 ifeq ($(BUILDTYPE), Release)
 else ifeq ($(BUILDTYPE), Debug)
@@ -83,7 +84,8 @@ MACOS_XCSCHEMES += platform/macos/scripts/node.xcscheme
 
 $(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(MACOS_XCSCHEMES)
 	mkdir -p $(MACOS_OUTPUT_PATH)
-	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode ../..)
+	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode ../.. \
+		-DWITH_CLIPPER=${WITH_CLIPPER})
 
 	@# Create Xcode schemes so that we can use xcodebuild from the command line. CMake doesn't
 	@# create these automatically.
@@ -222,7 +224,8 @@ $(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEP
 	mkdir -p $(IOS_OUTPUT_PATH)
 	(cd $(IOS_OUTPUT_PATH) && cmake -G Xcode ../.. \
 		-DCMAKE_TOOLCHAIN_FILE=../../platform/ios/toolchain.cmake \
-		-DMBGL_PLATFORM=ios)
+		-DMBGL_PLATFORM=ios \
+		-DWITH_CLIPPER=${WITH_CLIPPER})
 
 $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/ios/WorkspaceSettings.xcsettings
 	mkdir -p "$(IOS_USER_DATA_PATH)"
@@ -295,7 +298,8 @@ $(LINUX_BUILD): $(BUILD_DEPS)
 		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
 		-DWITH_COVERAGE=${WITH_COVERAGE} \
 		-DIS_CI_BUILD=${CI} \
-		-DWITH_OSMESA=${WITH_OSMESA})
+		-DWITH_OSMESA=${WITH_OSMESA} \
+		-DWITH_CLIPPER=${WITH_CLIPPER})
 
 .PHONY: linux
 linux: glfw-app render offline
@@ -391,7 +395,8 @@ $(QT_BUILD): $(BUILD_DEPS)
 		-DWITH_QT_4=${WITH_QT_4} \
 		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
 		-DWITH_COVERAGE=${WITH_COVERAGE} \
-		-DIS_CI_BUILD=${CI})
+		-DIS_CI_BUILD=${CI} \
+		-DWITH_CLIPPER=${WITH_CLIPPER})
 
 ifeq ($(HOST_PLATFORM), macos)
 
@@ -406,7 +411,8 @@ $(MACOS_QT_PROJ_PATH): $(BUILD_DEPS)
 		-DWITH_QT_4=${WITH_QT_4} \
 		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
 		-DWITH_COVERAGE=${WITH_COVERAGE} \
-		-DIS_CI_BUILD=${CI})
+		-DIS_CI_BUILD=${CI} \
+		-DWITH_CLIPPER=${WITH_CLIPPER})
 
 	@# Create Xcode schemes so that we can use xcodebuild from the command line. CMake doesn't
 	@# create these automatically.

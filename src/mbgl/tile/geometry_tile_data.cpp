@@ -1,7 +1,9 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/tile_id.hpp>
 
+#if MBGL_USE_CLIPPER
 #include <clipper/clipper.hpp>
+#endif
 
 namespace mbgl {
 
@@ -17,6 +19,7 @@ static double signedArea(const GeometryCoordinates& ring) {
     return sum;
 }
 
+#if MBGL_USE_CLIPPER
 static ClipperLib::Path toClipperPath(const GeometryCoordinates& ring) {
     ClipperLib::Path result;
     result.reserve(ring.size());
@@ -84,6 +87,7 @@ GeometryCollection fixupPolygons(const GeometryCollection& rings) {
     }
     return result;
 }
+#endif
 
 std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
     std::vector<GeometryCollection> polygons;

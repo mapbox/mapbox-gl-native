@@ -34,6 +34,9 @@ workflows:
             PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
             if [[ "${BITRISE_GIT_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]]; then
                 envman add --key PUBLISH --value true
+                envman add --key BUILDTYPE --value "Release"
+            else
+                envman add --key BUILDTYPE --value "Debug"
             fi
     - script:
         title: Run build script
@@ -47,6 +50,7 @@ workflows:
             brew install awscli homebrew/versions/node4-lts
             brew link homebrew/versions/node4-lts
             gem install xcpretty --no-rdoc --no-ri
+            envman add --key WITH_CLIPPER --value 0
             make node
     - script:
         title: Run test script

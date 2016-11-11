@@ -11,7 +11,6 @@ mason_use(nunicode VERSION 1.7.1)
 mason_use(sqlite VERSION 3.14.2)
 
 macro(mbgl_platform_core)
-
     target_sources(mbgl-core
         # Loop
         PRIVATE platform/android/src/thread.cpp
