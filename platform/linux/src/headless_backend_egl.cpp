@@ -58,11 +58,16 @@ void HeadlessBackend::createContext() {
     EGLDisplay display_ = display->attribute<EGLDisplay>();
     EGLConfig& config = display->attribute<EGLConfig&>();
 
-    if (!eglBindAPI(EGL_OPENGL_API)) {
-        throw std::runtime_error("Error setting the EGL rendering API.\n");
-    }
+    // EGL initializes the context client version to 1 by default. We want to
+    // use OpenGL ES 2.0 which has the ability to create shader and program
+    // objects and also to write vertex and fragment shaders in the OpenGL ES
+    // Shading Language.
+    const EGLint attribs[] = {
+        EGL_CONTEXT_CLIENT_VERSION, 2,
+        EGL_NONE
+    };
 
-    EGLContext glContext = eglCreateContext(display_, config, EGL_NO_CONTEXT, NULL);
+    EGLContext glContext = eglCreateContext(display_, config, EGL_NO_CONTEXT, attribs);
     if (glContext == EGL_NO_CONTEXT) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateContext() returned error 0x%04x",
                          eglGetError());
