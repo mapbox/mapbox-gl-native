@@ -492,7 +492,6 @@ void Map::setLatLng(const LatLng& latLng, optional<ScreenCoordinate> anchor, con
 }
 
 LatLng Map::getLatLng(optional<EdgeInsets> padding) const {
-    impl->cameraMutated = true;
     return impl->transform.getLatLng(padding);
 }
 
