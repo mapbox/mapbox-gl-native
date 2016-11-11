@@ -363,7 +363,7 @@ class AnnotationManager {
         int count = annotationList.size();
         for (int i = 0; i < count; i++) {
             Annotation annotation = annotationList.get(i);
-            if (annotation instanceof MarkerView) {
+            if (annotation instanceof MarkerView && idsList.contains(annotation.getId())) {
                 annotations.add((MarkerView) annotation);
             }
         }
