@@ -74,17 +74,26 @@ TEST(OffscreenTexture, RenderToTexture) {
     MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
     Shader paintShader(R"MBGL_SHADER(
+#ifdef GL_ES
+precision mediump float;
+#endif
 attribute vec2 a_pos;
 void main() {
     gl_Position = vec4(a_pos, 0, 1);
 }
 )MBGL_SHADER", R"MBGL_SHADER(
+#ifdef GL_ES
+precision mediump float;
+#endif
 void main() {
     gl_FragColor = vec4(0, 0.8, 0, 0.8);
 }
 )MBGL_SHADER");
 
         Shader compositeShader(R"MBGL_SHADER(
+#ifdef GL_ES
+precision mediump float;
+#endif
 attribute vec2 a_pos;
 varying vec2 v_texcoord;
 void main() {
@@ -92,6 +101,9 @@ void main() {
     v_texcoord = (a_pos + 1.0) / 2.0;
 }
 )MBGL_SHADER", R"MBGL_SHADER(
+#ifdef GL_ES
+precision mediump float;
+#endif
 uniform sampler2D u_texture;
 varying vec2 v_texcoord;
 void main() {

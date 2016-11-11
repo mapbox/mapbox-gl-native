@@ -1,4 +1,5 @@
 #include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <EGL/egl.h>
@@ -23,6 +24,11 @@ HeadlessDisplay::Impl::Impl() {
     EGLint major, minor, numConfigs;
     if (!eglInitialize(display, &major, &minor)) {
         throw std::runtime_error("eglInitialize() failed.\n");
+    }
+
+    if (!eglBindAPI(EGL_OPENGL_ES_API)) {
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglBindAPI(EGL_OPENGL_ES_API) returned error %d", eglGetError());
+        throw std::runtime_error("eglBindAPI() failed");
     }
 
     // This shouldn't matter as we're rendering to a framebuffer.
