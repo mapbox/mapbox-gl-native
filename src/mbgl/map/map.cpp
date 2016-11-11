@@ -855,7 +855,7 @@ void Map::addSource(std::unique_ptr<style::Source> source) {
 std::unique_ptr<Source> Map::removeSource(const std::string& sourceID) {
     if (impl->style) {
         impl->styleMutated = true;
-        return impl->style->removeSource(sourceID);        
+        return impl->style->removeSource(sourceID);
     }
     return nullptr;
 }
