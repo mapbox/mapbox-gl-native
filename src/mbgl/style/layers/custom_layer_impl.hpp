@@ -21,6 +21,7 @@ public:
     ~Impl() final;
 
     void initialize();
+    void deinitialize();
     void render(const TransformState&) const;
 
 private:

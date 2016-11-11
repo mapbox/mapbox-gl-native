@@ -23,11 +23,7 @@ CustomLayer::Impl::Impl(const CustomLayer::Impl& other)
     // Don't copy anything else.
 }
 
-CustomLayer::Impl::~Impl() {
-    if (deinitializeFn) {
-        deinitializeFn(context);
-    }
-}
+CustomLayer::Impl::~Impl() = default;
 
 std::unique_ptr<Layer> CustomLayer::Impl::clone() const {
     return std::make_unique<CustomLayer>(*this);
@@ -41,6 +37,12 @@ std::unique_ptr<Layer> CustomLayer::Impl::cloneRef(const std::string&) const {
 void CustomLayer::Impl::initialize() {
     assert(initializeFn);
     initializeFn(context);
+}
+
+void CustomLayer::Impl::deinitialize() {
+    if (deinitializeFn) {
+        deinitializeFn(context);
+    }
 }
 
 void CustomLayer::Impl::render(const TransformState& state) const {

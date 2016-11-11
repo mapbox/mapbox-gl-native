@@ -159,12 +159,12 @@ public:
     // Sources
     style::Source* getSource(const std::string& sourceID);
     void addSource(std::unique_ptr<style::Source>);
-    void removeSource(const std::string& sourceID);
+    std::unique_ptr<style::Source> removeSource(const std::string& sourceID);
 
     // Layers
     style::Layer* getLayer(const std::string& layerID);
     void addLayer(std::unique_ptr<style::Layer>, const optional<std::string>& beforeLayerID = {});
-    void removeLayer(const std::string& layerID);
+    std::unique_ptr<style::Layer> removeLayer(const std::string& layerID);
 
     // Add image, bound to the style
     void addImage(const std::string&, std::unique_ptr<const SpriteImage>);
