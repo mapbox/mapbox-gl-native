@@ -51,6 +51,12 @@ Style::~Style() {
         source->baseImpl->setObserver(nullptr);
     }
 
+    for (const auto& layer : layers) {
+        if (CustomLayer* customLayer = layer->as<CustomLayer>()) {
+            customLayer->impl->deinitialize();
+        }
+    }
+
     glyphAtlas->setObserver(nullptr);
     spriteAtlas->setObserver(nullptr);
 }
@@ -134,7 +140,7 @@ void Style::addSource(std::unique_ptr<Source> source) {
     sources.emplace_back(std::move(source));
 }
 
-void Style::removeSource(const std::string& id) {
+std::unique_ptr<Source> Style::removeSource(const std::string& id) {
     auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& source) {
         return source->getID() == id;
     });
@@ -143,8 +149,11 @@ void Style::removeSource(const std::string& id) {
         throw std::runtime_error("no such source");
     }
 
+    auto source = std::move(*it);
     sources.erase(it);
     updateBatch.sourceIDs.erase(id);
+
+    return source;
 }
 
 std::vector<const Layer*> Style::getLayers() const {
@@ -185,11 +194,22 @@ Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> befor
     return layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer))->get();
 }
 
-void Style::removeLayer(const std::string& id) {
-    auto it = findLayer(id);
+std::unique_ptr<Layer> Style::removeLayer(const std::string& id) {
+    auto it = std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
+        return layer->baseImpl->id == id;
+    });
+
     if (it == layers.end())
         throw std::runtime_error("no such layer");
+
+    auto layer = std::move(*it);
+
+    if (CustomLayer* customLayer = layer->as<CustomLayer>()) {
+        customLayer->impl->deinitialize();
+    }
+
     layers.erase(it);
+    return layer;
 }
 
 std::string Style::getName() const {

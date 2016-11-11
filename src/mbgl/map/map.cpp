@@ -851,11 +851,12 @@ void Map::addSource(std::unique_ptr<style::Source> source) {
     }
 }
 
-void Map::removeSource(const std::string& sourceID) {
+std::unique_ptr<Source> Map::removeSource(const std::string& sourceID) {
     if (impl->style) {
         impl->styleMutated = true;
-        impl->style->removeSource(sourceID);
+        return impl->style->removeSource(sourceID);
     }
+    return nullptr;
 }
 
 style::Layer* Map::getLayer(const std::string& layerID) {
@@ -880,18 +881,20 @@ void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& be
     impl->backend.deactivate();
 }
 
-void Map::removeLayer(const std::string& id) {
+std::unique_ptr<Layer> Map::removeLayer(const std::string& id) {
     if (!impl->style) {
-        return;
+        return nullptr;
     }
 
     impl->styleMutated = true;
     impl->backend.activate();
 
-    impl->style->removeLayer(id);
+    auto removedLayer = impl->style->removeLayer(id);
     impl->onUpdate(Update::Classes);
 
     impl->backend.deactivate();
+
+    return removedLayer;
 }
 
 void Map::addImage(const std::string& name, std::unique_ptr<const SpriteImage> image) {
