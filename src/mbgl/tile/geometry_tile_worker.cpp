@@ -321,7 +321,6 @@ void GeometryTileWorker::attemptPlacement() {
     parent.invoke(&GeometryTile::onPlacement, GeometryTile::PlacementResult {
         std::move(buckets),
         std::move(collisionTile),
-        *placementConfig,
         correlationID
     });
 }
