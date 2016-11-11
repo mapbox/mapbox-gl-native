@@ -197,6 +197,11 @@ std::unique_ptr<Layer> Style::removeLayer(const std::string& id) {
         throw std::runtime_error("no such layer");
 
     auto layer = std::move(*it);
+
+    if (CustomLayer* customLayer = layer->as<CustomLayer>()) {
+        customLayer->impl->deinitialize();
+    }
+
     layers.erase(it);
     return layer;
 }

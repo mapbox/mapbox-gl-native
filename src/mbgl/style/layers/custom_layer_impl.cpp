@@ -43,6 +43,11 @@ void CustomLayer::Impl::initialize() {
     initializeFn(context);
 }
 
+void CustomLayer::Impl::deinitialize() {
+    assert(deinitializeFn);
+    deinitializeFn(context);
+}
+
 void CustomLayer::Impl::render(const TransformState& state) const {
     assert(renderFn);
 
