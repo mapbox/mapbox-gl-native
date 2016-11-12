@@ -92,3 +92,11 @@ else()
         PRIVATE -lGL
     )
 endif()
+
+add_custom_command(
+    TARGET qmapboxgl
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/platform/qt/include
+            ${CMAKE_CURRENT_BINARY_DIR}/platform/qt/include
+)
