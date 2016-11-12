@@ -1,6 +1,6 @@
 # Changelog for Mapbox macOS SDK
 
-## master
+## 0.3.0
 
 ### Packaging
 
