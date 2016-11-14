@@ -56,6 +56,7 @@ workflows:
             #!/bin/bash
             set -eu -o pipefail
             make test-node || envman add --key RESULT --value $?
+            ./platform/node/scripts/after_script.sh ${BITRISE_BUILD_NUMBER}
     - script:
         title: Run publish script
         run_if: '{{enveq "SKIPCI" "false"}}'
@@ -63,7 +64,7 @@ workflows:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
-            ./platform/node/scripts/after_script.sh ${BITRISE_BUILD_NUMBER}
+            ./platform/node/scripts/after_success.sh
             exit ${RESULT:-0}
     - slack:
         title: Post to Slack
