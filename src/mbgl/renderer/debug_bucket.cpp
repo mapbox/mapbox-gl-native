@@ -80,7 +80,8 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
       modified(std::move(modified_)),
       expires(std::move(expires_)),
       debugMode(debugMode_),
-      vertexBuffer(context.createVertexBuffer(buildTextVertices(id, renderable_, complete_, modified_, expires_, debugMode_))) {
+      vertexBuffer(context.createVertexBuffer(buildTextVertices(id, renderable_, complete_, modified_, expires_, debugMode_))),
+      segments(vertexBuffer) {
 }
 
 } // namespace mbgl

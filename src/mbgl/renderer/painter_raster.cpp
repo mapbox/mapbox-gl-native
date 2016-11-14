@@ -75,7 +75,8 @@ void Painter::renderRaster(PaintParameters& parameters,
             uniforms::u_scale_parent::Value{ 1.0f },
             uniforms::u_tl_parent::Value{ std::array<float, 2> {{ 0.0f, 0.0f }} },
         },
-        rasterVertexBuffer
+        rasterVertexBuffer,
+        rasterSegments
     );
 }
 

@@ -26,7 +26,8 @@ void Painter::renderClippingMask(const UnwrappedTileID& tileID, const ClipID& cl
             uniforms::u_outline_color::Value{ Color {} },
             uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
         },
-        tileTriangleVertexBuffer
+        tileTriangleVertexBuffer,
+        tileTriangleSegments
     );
 }
 

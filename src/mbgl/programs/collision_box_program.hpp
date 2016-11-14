@@ -15,13 +15,15 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_scale);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_maxzoom);
 } // namespace uniforms
 
+using CollisionBoxAttributes = gl::Attributes<
+    attributes::a_pos,
+    attributes::a_extrude,
+    attributes::a_data<2>>;
+
 class CollisionBoxProgram : public Program<
     shaders::collision_box,
     gl::Line,
-    gl::Attributes<
-        attributes::a_pos,
-        attributes::a_extrude,
-        attributes::a_data<2>>,
+    CollisionBoxAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
         uniforms::u_scale,
