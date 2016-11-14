@@ -68,19 +68,24 @@ UniqueProgram Context::createProgram(ShaderID vertexShader, ShaderID fragmentSha
 
     MBGL_CHECK_ERROR(glAttachShader(result, vertexShader));
     MBGL_CHECK_ERROR(glAttachShader(result, fragmentShader));
-    MBGL_CHECK_ERROR(glLinkProgram(result));
+
+    return result;
+}
+
+void Context::linkProgram(ProgramID program_) {
+    MBGL_CHECK_ERROR(glLinkProgram(program_));
 
     GLint status;
-    MBGL_CHECK_ERROR(glGetProgramiv(result, GL_LINK_STATUS, &status));
-    if (status != 0) {
-        return result;
+    MBGL_CHECK_ERROR(glGetProgramiv(program_, GL_LINK_STATUS, &status));
+    if (status == GL_TRUE) {
+        return;
     }
 
     GLint logLength;
-    MBGL_CHECK_ERROR(glGetProgramiv(result, GL_INFO_LOG_LENGTH, &logLength));
+    MBGL_CHECK_ERROR(glGetProgramiv(program_, GL_INFO_LOG_LENGTH, &logLength));
     const auto log = std::make_unique<GLchar[]>(logLength);
     if (logLength > 0) {
-        MBGL_CHECK_ERROR(glGetProgramInfoLog(result, logLength, &logLength, log.get()));
+        MBGL_CHECK_ERROR(glGetProgramInfoLog(program_, logLength, &logLength, log.get()));
         Log::Error(Event::Shader, "Program failed to link: %s", log.get());
     }
 

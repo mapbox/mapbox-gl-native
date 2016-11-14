@@ -17,6 +17,9 @@ public:
 
     class State {
     public:
+        explicit State(AttributeLocation location_)
+            : location(location_) {}
+
         AttributeLocation location;
         static constexpr std::size_t count = N;
         static constexpr DataType type = DataTypeOf<T>::value;
@@ -130,7 +133,7 @@ const std::size_t Vertex<A1, A2, A3, A4, A5>::attributeOffsets[5] = {
 
 } // namespace detail
 
-AttributeLocation attributeLocation(ProgramID, const char * name);
+AttributeLocation bindAttributeLocation(ProgramID, AttributeLocation, const char * name);
 
 void bindAttribute(AttributeLocation location,
                    std::size_t count,
@@ -149,7 +152,7 @@ public:
     static constexpr std::size_t Index = TypeIndex<A, As...>::value;
 
     static State state(const ProgramID& id) {
-        return State { { attributeLocation(id, As::name) }... };
+        return State { typename As::State(bindAttributeLocation(id, Index<As>, As::name))... };
     }
 
     static std::function<void (std::size_t)> binder(const State& state) {
