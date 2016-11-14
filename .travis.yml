@@ -54,26 +54,42 @@ after_success:
 
 matrix:
   include:
-    # Clang 3.8 - Debug - Node
+    # OSMesa - Node - Clang 3.8 - Debug
     - os: linux
       sudo: required
       dist: trusty
       language: node
-      compiler: "node4-clang38-debug"
-      env: _CXX=clang++-3.8 _CC=clang-3.8 WITH_OSMESA=1
+      compiler: "osmesa-node4-clang38-debug"
+      env: BUILDTYPE=Debug _CXX=clang++-3.8 _CC=clang-3.8 WITH_OSMESA=1
       addons: *clang38
-      before_script:
-        - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
-        - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
-        - export BUILDTYPE=$([[ -n ${PUBLISH:-} ]] && echo "Release" || echo "Debug")
       script:
         - nvm install 4
         - nvm use 4
         - make node
-        - if [[ -z ${PUBLISH} ]]; then make test-node; fi
+        - make test-node
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
+
+    # GLX - Node - Clang 3.8 - Release
+    - os: linux
+      sudo: required
+      dist: trusty
+      language: node
+      compiler: "glx-node4-clang38-release"
+      env: BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 RUN_XVFB=1
+      addons: *clang38
+      before_script:
+        - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
+        - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+      script:
+        - nvm install 4
+        - nvm use 4
+        - make node
+      after_script:
+        - ccache --show-stats
+      after_success:
+        - ./platform/node/scripts/after_success.sh
 
     # GCC 5 - Debug - Coverage
     # FIXME: https://github.com/mapbox/mapbox-gl-native/issues/6918
