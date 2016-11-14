@@ -1145,8 +1145,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 - (void)addLatLonGrid
 {
     MGLCustomVectorSource *source = [[MGLCustomVectorSource alloc] initWithIdentifier:@"latlon"
-                                                                           dataSource:self
                                                                               options:@{MGLGeoJSONSourceOptionMaximumZoomLevel:@14}];
+    source.dataSource = self;
     [self.mapView.style addSource:source];
     MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"latlonlines"
                                                                           source:source];
@@ -1622,7 +1622,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 }
 
 #pragma mark - MGLCustomVectorSourceDataSource
-- (NSArray<id <MGLFeature>>*)getTileForZoomLevel:(NSUInteger)zoom x:(NSUInteger)x y:(NSUInteger)y {
+- (NSArray<id <MGLFeature>>*)featuresInTileAtX:(NSUInteger)x y:(NSUInteger)y zoomLevel:(NSUInteger)zoom {
     int tilesAtThisZoom = 1 << zoom;
     double lngWidth = 360.0 / tilesAtThisZoom;
     CLLocationCoordinate2D southwest;

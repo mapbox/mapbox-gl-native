@@ -9,6 +9,7 @@
 
 #include <mbgl/style/sources/custom_vector_source.hpp>
 #include <mbgl/util/geojson.hpp>
+#include <mbgl/util/geo.hpp>
 
 @interface MGLCustomVectorSource () {
     std::unique_ptr<mbgl::style::CustomVectorSource> _pendingSource;
@@ -16,37 +17,63 @@
 
 @property (nonatomic, readwrite) NSDictionary *options;
 @property (nonnull) mbgl::style::CustomVectorSource *rawSource;
+@property (nonatomic, assign) BOOL dataSourceImplementsFeaturesForTile;
+@property (nonatomic, assign) BOOL dataSourceImplementsFeaturesForBounds;
 
 @end
 
 @implementation MGLCustomVectorSource
 
-- (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(NSObject<MGLCustomVectorSourceDataSource>*)dataSource options:(NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *)options
+- (instancetype)initWithIdentifier:(NSString *)identifier options:(NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *)options
 {
     if (self = [super initWithIdentifier:identifier options:options])
     {
-        _dataSource = dataSource;
-        
         _requestQueue = [[NSOperationQueue alloc] init];
         self.requestQueue.name = [NSString stringWithFormat:@"mgl.CustomVectorSource.%@", identifier];
-        auto source = std::make_unique<mbgl::style::CustomVectorSource>(self.identifier.UTF8String, self.geoJSONOptions,
-                                                                        ^void(uint8_t z, uint32_t x, uint32_t y)
-                                                                        {
-                                                                            [self.requestQueue addOperationWithBlock:
-                                                                             ^{
-                                                                                 [self processData:
-                                                                                  [self.dataSource getTileForZoomLevel:z
-                                                                                                                     x:x
-                                                                                                                     y:y]
-                                                                                           forTile:z x:x y:y];
-                                                                             }];
-                                                                        });
+        auto source = std::make_unique<mbgl::style::CustomVectorSource>
+        (self.identifier.UTF8String, self.geoJSONOptions,
+         ^void(uint8_t z, uint32_t x, uint32_t y)
+         {
+             [self.requestQueue addOperationWithBlock:
+              ^{
+                  NSArray<id <MGLFeature>> *data;
+                  if(!self.dataSource) {
+                      data = nil;
+                  } else if(self.dataSourceImplementsFeaturesForTile) {
+                      data = [self.dataSource featuresInTileAtX:x
+                                                              y:y
+                                                      zoomLevel:z];
+                  } else {
+//                      mbgl::CanonicalTileID tileID = mbgl::CanonicalTileID(z, x, y);
+//                      mbgl::LatLngBounds tileBounds = mbgl::LatLngBounds(tileID);
+//                      data = [self.dataSource featuresInCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(tileBounds)
+//                                                               zoomLevel:z];
+                  }
+                  [self processData:data
+                            forTile:z x:x y:y];
+              }];
+         });
         
         _pendingSource = std::move(source);
         self.rawSource = _pendingSource.get();
         
     }
     return self;
+}
+
+- (void)setDataSource:(id<MGLCustomVectorSourceDataSource>)dataSource
+{
+    //Check which method the datasource implements, to avoid having to check for each tile
+    self.dataSourceImplementsFeaturesForTile = [dataSource respondsToSelector:@selector(featuresInTileAtX:y:zoomLevel:)];
+    self.dataSourceImplementsFeaturesForBounds = [dataSource respondsToSelector:@selector(featuresInCoordinateBounds:zoomLevel:)];
+    
+    if(!self.dataSourceImplementsFeaturesForBounds && !self.dataSourceImplementsFeaturesForTile) {
+        [NSException raise:@"Invalid Datasource" format:@"Datasource does not implement any MGLCustomVectorSourceDataSource methods"];
+    } else if(self.dataSourceImplementsFeaturesForBounds && self.dataSourceImplementsFeaturesForTile) {
+        [NSException raise:@"Invalid Datasource" format:@"Datasource implements multiple MGLCustomVectorSourceDataSource methods"];
+    }
+
+    _dataSource = dataSource;
 }
 
 - (void)addToMapView:(MGLMapView *)mapView
