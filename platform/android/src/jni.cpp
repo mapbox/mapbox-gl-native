@@ -1109,7 +1109,10 @@ void nativeAddLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlon
     }
 }
 
-void nativeRemoveLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* id) {
+/**
+ * Remove by layer id. Ownership is not transferred back
+ */
+void nativeRemoveLayerById(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* id) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     try {
@@ -1118,6 +1121,22 @@ void nativeRemoveLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, j
         jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/layers/NoSuchLayerException"), error.what());
     }
 }
+
+/**
+ * Remove with wrapper object id. Ownership is transferred back to the wrapper
+ */
+void nativeRemoveLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlong layerPtr) {
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    mbgl::android::Layer *layer = reinterpret_cast<mbgl::android::Layer *>(layerPtr);
+    try {
+        std::unique_ptr<mbgl::style::Layer> coreLayer = nativeMapView->getMap().removeLayer(layer->get().getID());
+        layer->setLayer(std::move(coreLayer));
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/layers/NoSuchLayerException"), error.what());
+    }
+}
+
 
 jni::jobject* nativeGetSource(JNIEnv *env, jni::jobject* obj, jni::jlong nativeMapViewPtr, jni::jstring* sourceId) {
     assert(env);
@@ -1838,7 +1857,8 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeFlyTo, "(JDDDJDD)V"),
         MAKE_NATIVE_METHOD(nativeGetLayer, "(JLjava/lang/String;)Lcom/mapbox/mapboxsdk/style/layers/Layer;"),
         MAKE_NATIVE_METHOD(nativeAddLayer, "(JJLjava/lang/String;)V"),
-        MAKE_NATIVE_METHOD(nativeRemoveLayer, "(JLjava/lang/String;)V"),
+        MAKE_NATIVE_METHOD(nativeRemoveLayerById, "(JLjava/lang/String;)V"),
+        MAKE_NATIVE_METHOD(nativeRemoveLayer, "(JJ)V"),
         MAKE_NATIVE_METHOD(nativeGetSource, "(JLjava/lang/String;)Lcom/mapbox/mapboxsdk/style/sources/Source;"),
         MAKE_NATIVE_METHOD(nativeAddSource, "(JJ)V"),
         MAKE_NATIVE_METHOD(nativeRemoveSource, "(JLjava/lang/String;)V"),

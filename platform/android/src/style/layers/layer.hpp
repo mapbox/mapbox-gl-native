@@ -34,9 +34,16 @@ public:
 
     virtual jni::jobject* createJavaPeer(jni::JNIEnv&) = 0;
 
+    /**
+     * Set core layer (ie return ownership after remove)
+     */
+    void setLayer(std::unique_ptr<mbgl::style::Layer>);
+
     void addToMap(mbgl::Map&, mbgl::optional<std::string>);
 
     jni::String getId(jni::JNIEnv&);
+
+    style::Layer& get();
 
     void setLayoutProperty(jni::JNIEnv&, jni::String, jni::Object<> value);
 
