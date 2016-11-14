@@ -31,6 +31,14 @@ namespace android {
     Source::~Source() {
     }
 
+    style::Source& Source::get() {
+        return source;
+    }
+
+    void Source::setSource(std::unique_ptr<style::Source> coreSource) {
+        this->ownedSource = std::move(coreSource);
+    }
+
     jni::String Source::getId(jni::JNIEnv& env) {
         return jni::Make<jni::String>(env, source.getID());
     }

@@ -14,6 +14,7 @@ import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
+import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
@@ -73,6 +74,8 @@ public class RuntimeStyleTests {
         } catch (NoSuchSourceException e) {
             // it's ok..
         }
+
+        onView(withId(R.id.mapView)).perform(new AddRemoveSourceAction());
     }
 
     private class AddRemoveLayerAction implements ViewAction {
@@ -126,6 +129,52 @@ public class RuntimeStyleTests {
 
             //Ensure it's there
             Assert.assertNotNull(mapboxMap.getLayer(layer.getId()));
+        }
+    }
+
+    private class AddRemoveSourceAction implements ViewAction {
+
+        @Override
+        public Matcher<View> getConstraints() {
+            return isDisplayed();
+        }
+
+        @Override
+        public String getDescription() {
+            return getClass().getSimpleName();
+        }
+
+        @Override
+        public void perform(UiController uiController, View view) {
+            MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+
+            //Add initial source
+            mapboxMap.addSource(new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2"));
+
+            //Remove
+            try {
+                mapboxMap.removeSource("my-source");
+            } catch (NoSuchSourceException e) {
+                fail("Definitively exists: " + e.getMessage());
+            }
+            assertNull(mapboxMap.getLayer("my-source"));
+
+            //Add
+            Source source = new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
+            mapboxMap.addSource(source);
+
+            //Remove, preserving the reference
+            try {
+                mapboxMap.removeSource(source);
+            } catch (NoSuchSourceException e) {
+                fail("Definitively exists: " + e.getMessage());
+            }
+
+            //Re-add the reference...
+            mapboxMap.addSource(source);
+
+            //Ensure it's there
+            Assert.assertNotNull(mapboxMap.getSource(source.getId()));
         }
     }
 
