@@ -210,11 +210,22 @@ public class MapboxMap {
      *
      * @param layerId the layer to remove
      * @throws NoSuchLayerException
-     * 
+     *
      */
     @UiThread
     public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
         getMapView().getNativeMapView().removeLayer(layerId);
+    }
+
+    /**
+     * Removes the layer. The reference is re-usable after this and can be re-added
+     *
+     * @param layer the layer to remove
+     * @throws NoSuchLayerException
+     */
+    @UiThread
+    public void removeLayer(@NonNull Layer layer) throws NoSuchLayerException {
+        getMapView().getNativeMapView().removeLayer(layer);
     }
 
     /**
