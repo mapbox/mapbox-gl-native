@@ -507,7 +507,11 @@ final class NativeMapView {
     }
 
     public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
-        nativeRemoveSource(nativeMapViewPtr, sourceId);
+        nativeRemoveSourceById(nativeMapViewPtr, sourceId);
+    }
+
+    public void removeSource(@NonNull Source source) throws NoSuchSourceException {
+        nativeRemoveSource(nativeMapViewPtr, source.getNativePtr());
     }
 
     public void addImage(@NonNull String name, @NonNull Bitmap image) {
@@ -755,7 +759,9 @@ final class NativeMapView {
 
     private native void nativeAddSource(long nativeMapViewPtr, long nativeSourcePtr);
 
-    private native void nativeRemoveSource(long nativeMapViewPtr, String sourceId) throws NoSuchSourceException;
+    private native void nativeRemoveSourceById(long nativeMapViewPtr, String sourceId) throws NoSuchSourceException;
+
+    private native void nativeRemoveSource(long nativeMapViewPtr, long sourcePtr) throws NoSuchSourceException;
 
     private native void nativeAddImage(long nativeMapViewPtr, String name, int width, int height, float pixelRatio, byte[] array);
 

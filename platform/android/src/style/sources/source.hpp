@@ -32,6 +32,13 @@ public:
 
     virtual ~Source();
 
+    /**
+     * Set core source (ie return ownership after remove)
+     */
+    void setSource(std::unique_ptr<style::Source>);
+
+    style::Source& get();
+
     void addToMap(mbgl::Map&);
 
     virtual jni::jobject* createJavaPeer(jni::JNIEnv&) = 0;

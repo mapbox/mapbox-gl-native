@@ -213,6 +213,17 @@ public class MapboxMap {
     }
 
     /**
+     * Removes the source, preserving the reverence for re-use
+     *
+     * @param source the source to remove
+     * @throws NoSuchSourceException
+     */
+    @UiThread
+    public void removeSource(@NonNull Source source) throws NoSuchSourceException {
+        getMapView().getNativeMapView().removeSource(source);
+    }
+
+    /**
      * Add an image to be used int hte map's style
      *
      * @param name  the name of the image
