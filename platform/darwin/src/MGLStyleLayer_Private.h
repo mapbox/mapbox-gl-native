@@ -29,11 +29,18 @@
  */
 - (void)addToMapView:(MGLMapView *)mapView;
 
-
+/**
+ Removes the mbgl style layer that this object represents from the mbgl map.
+ 
+ When a mbgl style layer is removed, ownership of the object is transferred back
+ to the `MGLStyleLayer` instance and the unique_ptr reference is valid again. It 
+ is safe to add the layer back to the style after it is removed.
+ */
+- (void)removeFromMapView:(MGLMapView *)mapView;
 
 /**
  Adds the mbgl style layer that this object represents to the mbgl map below the specified `otherLayer`.
- 
+
  Once a mbgl style layer is added, ownership of the object is transferred to the
  `mbgl::Map` and this object no longer has an active unique_ptr reference to the
  `mbgl::style::Layer`.

@@ -168,7 +168,7 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)removeLayer:(MGLStyleLayer *)layer
 {
-    self.mapView.mbglMap->removeLayer(layer.identifier.UTF8String);
+    [layer removeFromMapView:self.mapView];    
 }
 
 - (void)addLayer:(MGLStyleLayer *)layer
@@ -209,12 +209,7 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)removeSource:(MGLSource *)source
 {
-    self.mapView.mbglMap->removeSource(source.identifier.UTF8String);
-    
-    // Once a mbgl source is removed from the map, ownership does not return
-    // to the MGL source. Therefore, the rawSource pointer is set to NULL
-    // so that the implementation of MGL source can avoid using it again.
-    source.rawSource = NULL;
+    [source removeFromMapView:self.mapView];
 }
 
 - (NS_ARRAY_OF(NSString *) *)styleClasses

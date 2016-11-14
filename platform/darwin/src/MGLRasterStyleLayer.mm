@@ -32,6 +32,31 @@
 }
 
 
+
+#pragma mark -  Adding to and removing from a map view
+
+- (void)addToMapView:(MGLMapView *)mapView
+{
+    [self addToMapView:mapView belowLayer:nil];
+}
+
+- (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
+{
+    if (otherLayer) {
+        const mbgl::optional<std::string> belowLayerId{otherLayer.identifier.UTF8String};
+        mapView.mbglMap->addLayer(std::move(_pendingLayer), belowLayerId);
+    } else {
+        mapView.mbglMap->addLayer(std::move(_pendingLayer));
+    }
+}
+
+- (void)removeFromMapView:(MGLMapView *)mapView
+{
+    auto removedLayer = mapView.mbglMap->removeLayer(self.identifier.UTF8String);
+    _pendingLayer = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::RasterLayer> &>(removedLayer));
+    self.rawLayer = _pendingLayer.get();
+}
+
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setRasterOpacity:(MGLStyleValue<NSNumber *> *)rasterOpacity {
@@ -104,22 +129,5 @@
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
-#pragma mark - Add style layer to map
-
-- (void)addToMapView:(MGLMapView *)mapView
-{
-    [self addToMapView:mapView belowLayer:nil];
-}
-
-- (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
-{
-    if (otherLayer) {
-        const mbgl::optional<std::string> belowLayerId{otherLayer.identifier.UTF8String};
-        mapView.mbglMap->addLayer(std::move(_pendingLayer), belowLayerId);
-    } else {
-        mapView.mbglMap->addLayer(std::move(_pendingLayer));
-    }
-}
 
 @end
