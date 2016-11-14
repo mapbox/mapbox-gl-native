@@ -4,8 +4,9 @@
 namespace mbgl {
 namespace gl {
 
-AttributeLocation attributeLocation(ProgramID id, const char* name) {
-    return MBGL_CHECK_ERROR(glGetAttribLocation(id, name));
+AttributeLocation bindAttributeLocation(ProgramID id, AttributeLocation location, const char* name) {
+    MBGL_CHECK_ERROR(glBindAttribLocation(id, location, name));
+    return location;
 }
 
 void bindAttribute(AttributeLocation location,

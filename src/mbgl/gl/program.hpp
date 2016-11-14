@@ -30,7 +30,7 @@ public:
           fragmentShader(context.createShader(ShaderType::Fragment, fragmentSource)),
           program(context.createProgram(vertexShader, fragmentShader)),
           attributesState(Attributes::state(program)),
-          uniformsState(Uniforms::state(program)) {}
+          uniformsState((context.linkProgram(program), Uniforms::state(program))) {}
 
     // Indexed drawing.
     template <class DrawMode>

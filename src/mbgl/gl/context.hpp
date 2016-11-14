@@ -38,6 +38,7 @@ public:
 
     UniqueShader createShader(ShaderType type, const std::string& source);
     UniqueProgram createProgram(ShaderID vertexShader, ShaderID fragmentShader);
+    void linkProgram(ProgramID);
     UniqueTexture createTexture();
 
     template <class Vertex, class DrawMode>
