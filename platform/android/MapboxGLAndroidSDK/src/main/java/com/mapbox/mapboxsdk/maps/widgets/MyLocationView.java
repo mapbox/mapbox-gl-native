@@ -92,8 +92,9 @@ public class MyLocationView extends View {
     private PointF screenLocation;
 
     // camera vars
-    private float bearing;
-    private float tilt;
+    private double tilt;
+    private double bearing;
+    private float magneticHeading;
 
     // Controls the compass update rate in milliseconds
     private static final int COMPASS_UPDATE_RATE_MS = 500;
@@ -266,7 +267,7 @@ public class MyLocationView extends View {
 
         // put camera in position
         camera.save();
-        camera.rotate(tilt, 0, 0);
+        camera.rotate((float) tilt, 0, 0);
         camera.getMatrix(matrix);
 
         if (myBearingTrackingMode != MyBearingTracking.NONE && directionAnimator != null) {
@@ -313,7 +314,14 @@ public class MyLocationView extends View {
     }
 
     public void setBearing(double bearing) {
-        this.bearing = (float) bearing;
+        this.bearing = bearing;
+        if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+            if (myBearingTrackingMode == MyBearingTracking.GPS) {
+                setCompass(location.getBearing() - bearing);
+            } else if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+                setCompass(magneticHeading - bearing);
+            }
+        }
     }
 
     public void setCameraPosition(CameraPosition position) {
@@ -385,7 +393,7 @@ public class MyLocationView extends View {
     protected Parcelable onSaveInstanceState() {
         Bundle bundle = new Bundle();
         bundle.putParcelable("superState", super.onSaveInstanceState());
-        bundle.putFloat("tilt", tilt);
+        bundle.putDouble("tilt", tilt);
         return bundle;
     }
 
@@ -451,6 +459,8 @@ public class MyLocationView extends View {
             if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
                 // always face north
                 setCompass(0);
+            } else {
+                myLocationBehavior.invalidate();
             }
         }
         invalidate();
@@ -475,7 +485,7 @@ public class MyLocationView extends View {
         invalidate();
     }
 
-    private void setCompass(float bearing) {
+    private void setCompass(double bearing) {
         float oldDir = previousDirection;
         if (directionAnimator != null) {
             oldDir = (Float) directionAnimator.getAnimatedValue();
@@ -483,7 +493,7 @@ public class MyLocationView extends View {
             directionAnimator = null;
         }
 
-        float newDir = bearing;
+        float newDir = (float) bearing;
         float diff = oldDir - newDir;
         if (diff > 180.0f) {
             newDir += 360.0f;
@@ -572,14 +582,14 @@ public class MyLocationView extends View {
                 SensorManager.getRotationMatrixFromVector(matrix, event.values);
                 SensorManager.getOrientation(matrix, orientation);
 
-                float magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation)[0]);
+                magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation)[0]);
                 if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
                     // Change the user location view orientation to reflect the device orientation
                     rotateCamera(magneticHeading);
                     setCompass(0);
                 } else {
                     // Change compass direction
-                    setCompass(magneticHeading);
+                    setCompass(magneticHeading - bearing);
                 }
 
                 compassUpdateNextTimestamp = currentTime + COMPASS_UPDATE_RATE_MS;
@@ -729,11 +739,6 @@ public class MyLocationView extends View {
 
             // update LatLng location
             LatLng newLocation = new LatLng(location);
-
-            // update LatLng direction
-            if (myBearingTrackingMode == MyBearingTracking.GPS && location.hasBearing()) {
-                setCompass(location.getBearing() + bearing);
-            }
 
             // update LatLng accuracy
             updateAccuracy(location);
