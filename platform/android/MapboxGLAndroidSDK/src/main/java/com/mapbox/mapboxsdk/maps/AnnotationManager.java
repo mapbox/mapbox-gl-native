@@ -329,7 +329,14 @@ class AnnotationManager {
         return selectedMarkers;
     }
 
-    public List<Marker> getMarkersInRect(@NonNull RectF rect) {
+    public List<Marker> getMarkersInRect(@NonNull RectF rectangle) {
+        // convert Rectangle to be density depedent
+        float pixelRatio = nativeMapView.getPixelRatio();
+        RectF rect = new RectF(rectangle.left / pixelRatio,
+                rectangle.top / pixelRatio,
+                rectangle.right / pixelRatio,
+                rectangle.bottom / pixelRatio);
+
         long[] ids = nativeMapView.queryPointAnnotations(rect);
 
         List<Long> idsList = new ArrayList<>(ids.length);
@@ -350,7 +357,13 @@ class AnnotationManager {
         return new ArrayList<>(annotations);
     }
 
-    public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rect) {
+    public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rectangle) {
+        float pixelRatio = nativeMapView.getPixelRatio();
+        RectF rect = new RectF(rectangle.left / pixelRatio,
+                rectangle.top / pixelRatio,
+                rectangle.right / pixelRatio,
+                rectangle.bottom / pixelRatio);
+
         long[] ids = nativeMapView.queryPointAnnotations(rect);
 
         List<Long> idsList = new ArrayList<>(ids.length);
@@ -363,7 +376,7 @@ class AnnotationManager {
         int count = annotationList.size();
         for (int i = 0; i < count; i++) {
             Annotation annotation = annotationList.get(i);
-            if (annotation instanceof MarkerView) {
+            if (annotation instanceof MarkerView && idsList.contains(annotation.getId())) {
                 annotations.add((MarkerView) annotation);
             }
         }
