@@ -52,8 +52,12 @@ public:
     } icon;
 
     struct CollisionBoxBuffer {
-        gl::VertexVector<CollisionBoxVertex, gl::Lines> vertices;
-        optional<gl::VertexBuffer<CollisionBoxVertex, gl::Lines>> vertexBuffer;
+        gl::VertexVector<CollisionBoxVertex> vertices;
+        gl::IndexVector<gl::Lines> lines;
+        std::vector<gl::Segment> segments;
+
+        optional<gl::VertexBuffer<CollisionBoxVertex>> vertexBuffer;
+        optional<gl::IndexBuffer<gl::Lines>> indexBuffer;
     } collisionBox;
 };
 

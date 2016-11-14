@@ -130,7 +130,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
                 uniforms::u_zoom::Value{ float(state.getZoom() * 10) },
                 uniforms::u_maxzoom::Value{ float((tile.id.canonical.z + 1) * 10) },
             },
-            *bucket.collisionBox.vertexBuffer
+            *bucket.collisionBox.vertexBuffer,
+            *bucket.collisionBox.indexBuffer,
+            bucket.collisionBox.segments
         );
     }
 }
