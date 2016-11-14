@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/util/optional.hpp>
+
 #include <cstddef>
 
 namespace mbgl {
@@ -21,6 +23,10 @@ public:
 
     std::size_t vertexLength;
     std::size_t indexLength;
+
+private:
+    friend class Context;
+    mutable optional<UniqueVertexArray> vao;
 };
 
 template <class Attributes>
