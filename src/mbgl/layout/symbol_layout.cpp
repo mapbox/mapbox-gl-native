@@ -507,14 +507,28 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 const float maxZoom = util::clamp(zoom + util::log2(box.maxScale), util::MIN_ZOOM_F, util::MAX_ZOOM_F);
                 const float placementZoom = util::clamp(zoom + util::log2(box.placementScale), util::MIN_ZOOM_F, util::MAX_ZOOM_F);
 
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tl, maxZoom, placementZoom),
-                                                   CollisionBoxProgram::vertex(anchor, tr, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tr, maxZoom, placementZoom),
-                                                   CollisionBoxProgram::vertex(anchor, br, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, br, maxZoom, placementZoom),
-                                                   CollisionBoxProgram::vertex(anchor, bl, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, bl, maxZoom, placementZoom),
-                                                   CollisionBoxProgram::vertex(anchor, tl, maxZoom, placementZoom));
+                static constexpr std::size_t vertexLength = 4;
+                static constexpr std::size_t indexLength = 8;
+
+                if (collisionBox.segments.empty() || collisionBox.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
+                    collisionBox.segments.emplace_back(collisionBox.vertices.vertexSize(), collisionBox.lines.indexSize());
+                }
+
+                auto& segment = collisionBox.segments.back();
+                uint16_t index = segment.vertexLength;
+
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tl, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tr, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, br, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, bl, maxZoom, placementZoom));
+
+                collisionBox.lines.emplace_back(index + 0, index + 1);
+                collisionBox.lines.emplace_back(index + 1, index + 2);
+                collisionBox.lines.emplace_back(index + 2, index + 3);
+                collisionBox.lines.emplace_back(index + 3, index + 0);
+
+                segment.vertexLength += vertexLength;
+                segment.indexLength += indexLength;
             }
         };
         populateCollisionBox(symbolInstance.textCollisionFeature);

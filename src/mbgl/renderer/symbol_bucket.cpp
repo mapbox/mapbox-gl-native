@@ -29,6 +29,7 @@ void SymbolBucket::upload(gl::Context& context) {
 
     if (!collisionBox.vertices.empty()) {
         collisionBox.vertexBuffer = context.createVertexBuffer(std::move(collisionBox.vertices));
+        collisionBox.indexBuffer = context.createIndexBuffer(std::move(collisionBox.lines));
     }
 
     uploaded = true;
@@ -55,7 +56,7 @@ bool SymbolBucket::hasIconData() const {
 }
 
 bool SymbolBucket::hasCollisionBoxData() const {
-    return bool(collisionBox.vertexBuffer);
+    return !collisionBox.segments.empty();
 }
 
 } // namespace mbgl
