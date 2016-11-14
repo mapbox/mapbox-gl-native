@@ -222,13 +222,6 @@ mbgl::Map &NativeMapView::getMap() { return *map; }
 
 mbgl::DefaultFileSource &NativeMapView::getFileSource() { return *fileSource; }
 
-bool NativeMapView::inEmulator() {
-    // Detect if we are in emulator
-    char prop[PROP_VALUE_MAX];
-    __system_property_get("ro.kernel.qemu", prop);
-    return strtol(prop, nullptr, 0) == 1;
-}
-
 void NativeMapView::initializeDisplay() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::initializeDisplay");
 
@@ -258,22 +251,39 @@ void NativeMapView::initializeDisplay() {
     log_egl_string(display, EGL_CLIENT_APIS, "Client APIs");
     log_egl_string(display, EGL_EXTENSIONS, "Client Extensions");
 
-    // Detect if we are in emulator
-    if (inEmulator()) {
+    // Detect if we are in emulator.
+    const bool inEmulator = []() {
+        char prop[PROP_VALUE_MAX];
+        __system_property_get("ro.kernel.qemu", prop);
+        return strtol(prop, nullptr, 0) == 1;
+    }();
+
+    if (inEmulator) {
+        // XXX https://code.google.com/p/android/issues/detail?id=78977
         mbgl::Log::Warning(mbgl::Event::Android, "In emulator! Enabling hacks :-(");
+    }
+
+    if (!eglBindAPI(EGL_OPENGL_ES_API)) {
+        mbgl::Log::Error(mbgl::Event::OpenGL, "eglBindAPI(EGL_OPENGL_ES_API) returned error %d", eglGetError());
+        throw std::runtime_error("eglBindAPI() failed");
     }
 
     // Get all configs at least RGB 565 with 16 depth and 8 stencil
     EGLint configAttribs[] = {
-        EGL_CONFIG_CAVEAT,                               EGL_NONE,           EGL_RENDERABLE_TYPE,
-        EGL_OPENGL_ES2_BIT,                              EGL_SURFACE_TYPE,   EGL_WINDOW_BIT,
-        EGL_BUFFER_SIZE,                                 16,                 EGL_RED_SIZE,
-        5,                                               EGL_GREEN_SIZE,     6,
-        EGL_BLUE_SIZE,                                   5,                  EGL_DEPTH_SIZE,
-        16,                                              EGL_STENCIL_SIZE,   8,
-        (inEmulator() ? EGL_NONE : EGL_CONFORMANT),        EGL_OPENGL_ES2_BIT, // Ugly hack
-        (inEmulator() ? EGL_NONE : EGL_COLOR_BUFFER_TYPE), EGL_RGB_BUFFER,     // Ugly hack
-        EGL_NONE};
+        EGL_CONFIG_CAVEAT,                               EGL_NONE,
+        EGL_RENDERABLE_TYPE,                             EGL_OPENGL_ES2_BIT,
+        EGL_SURFACE_TYPE,                                EGL_WINDOW_BIT,
+        EGL_BUFFER_SIZE,                                 16,
+        EGL_RED_SIZE,                                    5,
+        EGL_GREEN_SIZE,                                  6,
+        EGL_BLUE_SIZE,                                   5,
+        EGL_DEPTH_SIZE,                                  16,
+        EGL_STENCIL_SIZE,                                8,
+        (inEmulator ? EGL_NONE : EGL_CONFORMANT),        EGL_OPENGL_ES2_BIT,
+        (inEmulator ? EGL_NONE : EGL_COLOR_BUFFER_TYPE), EGL_RGB_BUFFER,
+        EGL_NONE
+    };
+
     EGLint numConfigs;
     if (!eglChooseConfig(display, configAttribs, nullptr, 0, &numConfigs)) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglChooseConfig(NULL) returned error %d",
