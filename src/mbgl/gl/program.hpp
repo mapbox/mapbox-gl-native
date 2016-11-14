@@ -42,7 +42,7 @@ public:
               UniformValues&& uniformValues,
               const VertexBuffer<Vertex>& vertexBuffer,
               const IndexBuffer<DrawMode>& indexBuffer,
-              const std::vector<Segment>& segments) {
+              const SegmentVector<Attributes>& segments) {
         static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
         context.draw({
             std::move(drawMode),
@@ -66,7 +66,8 @@ public:
               StencilMode stencilMode,
               ColorMode colorMode,
               UniformValues&& uniformValues,
-              const VertexBuffer<Vertex, DrawMode>& vertexBuffer) {
+              const VertexBuffer<Vertex, DrawMode>& vertexBuffer,
+              const SegmentVector<Attributes>& segments) {
         static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
         context.draw({
             std::move(drawMode),
@@ -76,7 +77,7 @@ public:
             program,
             vertexBuffer.buffer,
             0,
-            {{ 0, 0, vertexBuffer.vertexCount, 0 }},
+            segments,
             Uniforms::binder(uniformsState, std::move(uniformValues)),
             Attributes::binder(attributesState)
         });

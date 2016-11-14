@@ -77,8 +77,11 @@ Painter::Painter(gl::Context& context_, const TransformState& state_)
     : context(context_),
       state(state_),
       tileTriangleVertexBuffer(context.createVertexBuffer(tileTriangles())),
-      tileLineStripVertexBuffer(context.createVertexBuffer(tileLineStrip())),
-      rasterVertexBuffer(context.createVertexBuffer(rasterTriangleStrip())) {
+      tileTriangleSegments(tileTriangleVertexBuffer),
+      tileBorderVertexBuffer(context.createVertexBuffer(tileLineStrip())),
+      tileBorderSegments(tileBorderVertexBuffer),
+      rasterVertexBuffer(context.createVertexBuffer(rasterTriangleStrip())),
+      rasterSegments(rasterVertexBuffer) {
 #ifndef NDEBUG
     gl::debugging::enable();
 #endif

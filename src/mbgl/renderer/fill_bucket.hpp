@@ -22,8 +22,8 @@ public:
     gl::VertexVector<FillVertex> vertices;
     gl::IndexVector<gl::Lines> lines;
     gl::IndexVector<gl::Triangles> triangles;
-    std::vector<gl::Segment> lineSegments;
-    std::vector<gl::Segment> triangleSegments;
+    gl::SegmentVector<FillAttributes> lineSegments;
+    gl::SegmentVector<FillAttributes> triangleSegments;
 
     optional<gl::VertexBuffer<FillVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Lines>> lineIndexBuffer;

@@ -7,11 +7,13 @@
 
 namespace mbgl {
 
+using DebugAttributes = gl::Attributes<
+    attributes::a_pos>;
+
 class DebugProgram : public Program<
     shaders::debug,
     gl::Line,
-    gl::Attributes<
-        attributes::a_pos>,
+    DebugAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
         uniforms::u_color>>
@@ -19,5 +21,7 @@ class DebugProgram : public Program<
 public:
     using Program::Program;
 };
+
+using DebugVertex = DebugProgram::Vertex;
 
 } // namespace mbgl
