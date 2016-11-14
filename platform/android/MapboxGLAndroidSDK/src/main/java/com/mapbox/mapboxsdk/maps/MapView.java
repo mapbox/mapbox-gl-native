@@ -1572,10 +1572,10 @@ public class MapView extends FrameLayout {
             float toleranceSides = 4 * screenDensity;
             float toleranceTopBottom = 10 * screenDensity;
 
-            RectF tapRect = new RectF((tapPoint.x - iconManager.getAverageIconWidth() / 2 - toleranceSides) / screenDensity,
-                    (tapPoint.y - iconManager.getAverageIconHeight() / 2 - toleranceTopBottom) / screenDensity,
-                    (tapPoint.x + iconManager.getAverageIconWidth() / 2 + toleranceSides) / screenDensity,
-                    (tapPoint.y + iconManager.getAverageIconHeight() / 2 + toleranceTopBottom) / screenDensity);
+            RectF tapRect = new RectF(tapPoint.x - iconManager.getAverageIconWidth() / 2 - toleranceSides,
+                    tapPoint.y - iconManager.getAverageIconHeight() / 2 - toleranceTopBottom,
+                    tapPoint.x + iconManager.getAverageIconWidth() / 2 + toleranceSides,
+                    tapPoint.y + iconManager.getAverageIconHeight() / 2 + toleranceTopBottom);
 
             List<Marker> nearbyMarkers = annotationManager.getMarkersInRect(tapRect);
             long newSelectedMarkerId = -1;
