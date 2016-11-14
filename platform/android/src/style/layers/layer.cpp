@@ -45,6 +45,10 @@ namespace android {
         this->map = &_map;
     }
 
+    void Layer::setLayer(std::unique_ptr<mbgl::style::Layer> sourceLayer) {
+        this->ownedLayer = std::move(sourceLayer);
+    }
+
     std::unique_ptr<mbgl::style::Layer> Layer::releaseCoreLayer() {
         assert(ownedLayer != nullptr);
         return std::move(ownedLayer);
@@ -52,6 +56,10 @@ namespace android {
 
     jni::String Layer::getId(jni::JNIEnv& env) {
         return jni::Make<jni::String>(env, layer.getID());
+    }
+
+    style::Layer& Layer::get() {
+        return layer;
     }
 
     void Layer::setLayoutProperty(jni::JNIEnv& env, jni::String jname, jni::Object<> jvalue) {

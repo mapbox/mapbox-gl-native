@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
+import android.graphics.Color;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
@@ -19,6 +20,8 @@ import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
 import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
 
+import junit.framework.Assert;
+
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
@@ -30,6 +33,7 @@ import org.junit.runner.RunWith;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -94,7 +98,7 @@ public class RuntimeStyleTests {
             try {
                 mapboxMap.removeLayer("building");
             } catch (NoSuchLayerException e) {
-                assertFalse(true);
+                fail("Definitively exists: " + e.getMessage());
             }
             assertNull(mapboxMap.getLayer("building"));
 
@@ -106,6 +110,22 @@ public class RuntimeStyleTests {
 
             //Assure the reference still works
             layer.setProperties(PropertyFactory.visibility(Property.VISIBLE));
+
+            //Remove, preserving the reference
+            try {
+                mapboxMap.removeLayer(layer);
+            } catch (NoSuchLayerException e) {
+                fail("Definitively exists: " + e.getMessage());
+            }
+
+            //Property setters should still work
+            layer.setProperties(PropertyFactory.fillColor(Color.RED));
+
+            //Re-add the reference...
+            mapboxMap.addLayer(layer);
+
+            //Ensure it's there
+            Assert.assertNotNull(mapboxMap.getLayer(layer.getId()));
         }
     }
 
