@@ -1170,11 +1170,23 @@ void nativeAddSource(JNIEnv *env, jni::jobject* obj, jni::jlong nativeMapViewPtr
     }
 }
 
-void nativeRemoveSource(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* id) {
+void nativeRemoveSourceById(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* id) {
+     assert(nativeMapViewPtr != 0);
+     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+     try {
+         nativeMapView->getMap().removeSource(std_string_from_jstring(env, id));
+     } catch (const std::runtime_error& error) {
+         jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/sources/NoSuchSourceException"), error.what());
+     }
+}
+
+void nativeRemoveSource(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlong sourcePtr) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    mbgl::android::Source *source = reinterpret_cast<mbgl::android::Source *>(sourcePtr);
     try {
-        nativeMapView->getMap().removeSource(std_string_from_jstring(env, id));
+        std::unique_ptr<mbgl::style::Source> coreSource = nativeMapView->getMap().removeSource(source->get().getID());
+        source->setSource(std::move(coreSource));
     } catch (const std::runtime_error& error) {
         jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/sources/NoSuchSourceException"), error.what());
     }
@@ -1861,7 +1873,8 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeRemoveLayer, "(JJ)V"),
         MAKE_NATIVE_METHOD(nativeGetSource, "(JLjava/lang/String;)Lcom/mapbox/mapboxsdk/style/sources/Source;"),
         MAKE_NATIVE_METHOD(nativeAddSource, "(JJ)V"),
-        MAKE_NATIVE_METHOD(nativeRemoveSource, "(JLjava/lang/String;)V"),
+        MAKE_NATIVE_METHOD(nativeRemoveSourceById, "(JLjava/lang/String;)V"),
+        MAKE_NATIVE_METHOD(nativeRemoveSource, "(JJ)V"),
         MAKE_NATIVE_METHOD(nativeAddImage, "(JLjava/lang/String;IIF[B)V"),
         MAKE_NATIVE_METHOD(nativeRemoveImage, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeSetContentPadding, "(JDDDD)V"),
