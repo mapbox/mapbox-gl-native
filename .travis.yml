@@ -58,7 +58,7 @@ matrix:
       dist: trusty
       language: node
       compiler: "node4-clang38-debug"
-      env: _CXX=clang++-3.8 _CC=clang-3.8 WITH_OSMESA=1
+      env: _CXX=clang++-3.8 _CC=clang-3.8 RUN_XVFB=1
       addons: *clang38
       before_script:
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
