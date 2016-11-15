@@ -168,6 +168,12 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)removeLayer:(MGLStyleLayer *)layer
 {
+    if (!layer.rawLayer) {
+        [NSException raise:NSInvalidArgumentException format:
+         @"The style layer %@ cannot be removed from the style. "
+         @"Make sure the style layer was created as a member of a concrete subclass of MGLStyleLayer.",
+         layer];
+    }
     [layer removeFromMapView:self.mapView];    
 }
 
@@ -198,7 +204,6 @@ static NSURL *MGLStyleURL_emerald;
          @"Make sure otherLayer was obtained using -[MGLStyle layerWithIdentifier:].",
          otherLayer];
     }
-
     [layer addToMapView:self.mapView belowLayer:otherLayer];
 }
 
@@ -210,12 +215,17 @@ static NSURL *MGLStyleURL_emerald;
          @"Make sure the source was created as a member of a concrete subclass of MGLSource.",
          source];
     }
-
     [source addToMapView:self.mapView];
 }
 
 - (void)removeSource:(MGLSource *)source
 {
+    if (!source.rawSource) {
+        [NSException raise:NSInvalidArgumentException format:
+         @"The source %@ cannot be removed from the style. "
+         @"Make sure the source was created as a member of a concrete subclass of MGLSource.",
+         source];
+    }
     [source removeFromMapView:self.mapView];
 }
 
