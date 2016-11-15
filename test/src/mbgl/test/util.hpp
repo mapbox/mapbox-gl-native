@@ -51,15 +51,6 @@ class Map;
 
 namespace test {
 
-class Server {
-public:
-    Server(const char* script);
-    ~Server();
-
-private:
-    int fd = -1;
-};
-
 PremultipliedImage render(Map&);
 
 void checkImage(const std::string& base,
