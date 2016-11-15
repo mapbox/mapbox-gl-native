@@ -469,6 +469,7 @@ test-node: node
 
 ANDROID_ENV = platform/android/scripts/toolchain.sh
 ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
+ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
 
 .PHONY: android-style-code
 android-style-code:
@@ -489,6 +490,10 @@ build/android-$1/$(BUILDTYPE)/Makefile: build/android-$1/$(BUILDTYPE)/toolchain.
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DMBGL_PLATFORM=android
+
+.PHONY: android-test-lib-$1
+android-test-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C build/android-$1/$(BUILDTYPE) mbgl-test
 
 .PHONY: android-lib-$1
 android-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile

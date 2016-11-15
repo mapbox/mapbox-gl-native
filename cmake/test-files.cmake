@@ -68,7 +68,7 @@ set(MBGL_TEST_FILES
     test/storage/offline.test.cpp
     test/storage/offline_database.test.cpp
     test/storage/offline_download.test.cpp
-    test/storage/online_file_source.test.cpp
+    #test/storage/online_file_source.test.cpp
     test/storage/resource.test.cpp
 
     # style/conversion

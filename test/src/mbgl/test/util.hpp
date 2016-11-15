@@ -54,14 +54,6 @@ class HeadlessDisplay;
 
 namespace test {
 
-class Server {
-public:
-    Server(const char* script);
-    ~Server();
-
-private:
-    int fd = -1;
-};
 
 std::shared_ptr<HeadlessDisplay> sharedDisplay();
 

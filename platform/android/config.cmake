@@ -9,6 +9,7 @@ mason_use(libpng VERSION 1.6.25)
 mason_use(libzip VERSION 1.1.3)
 mason_use(nunicode VERSION 1.7.1)
 mason_use(sqlite VERSION 3.14.2)
+mason_use(gtest VERSION 1.7.0)
 
 macro(mbgl_platform_core)
 
@@ -46,11 +47,20 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/png_reader.cpp
         PRIVATE platform/default/jpeg_reader.cpp
 
-        # Headless view
-        # TODO
-
         # Thread pool
         PRIVATE platform/default/thread_pool.cpp
+
+        # Native map
+        platform/android/src/native_map_view.cpp
+        platform/android/src/native_map_view.hpp
+
+        # Main jni bindings
+        platform/android/src/jni.cpp
+        platform/android/src/jni.hpp
+        platform/android/src/attach_env.cpp
+        platform/android/src/attach_env.hpp
+        platform/android/src/java_types.cpp
+        platform/android/src/java_types.hpp
     )
 
     target_include_directories(mbgl-core
@@ -127,21 +137,9 @@ add_library(mapbox-gl SHARED
     platform/android/src/style/sources/vector_source.cpp
     platform/android/src/style/sources/vector_source.hpp
 
-    # Native map
-    platform/android/src/native_map_view.cpp
-    platform/android/src/native_map_view.hpp
-
     # Connectivity
     platform/android/src/connectivity_listener.cpp
     platform/android/src/connectivity_listener.hpp
-
-    # Main jni bindings
-    platform/android/src/jni.cpp
-    platform/android/src/jni.hpp
-    platform/android/src/attach_env.cpp
-    platform/android/src/attach_env.hpp
-    platform/android/src/java_types.cpp
-    platform/android/src/java_types.hpp
 )
 
 target_add_mason_package(mapbox-gl PUBLIC rapidjson)
@@ -192,3 +190,28 @@ add_custom_target(_all ALL
     DEPENDS example-custom-layer
     DEPENDS copy-files
 )
+
+macro(mbgl_platform_test)
+
+    # Get rid of pthread (from gtest)
+    #get_target_property(TEST_LINK_FLAGS mbgl-test LINK_FLAGS)
+    #STRING(REPLACE "-pthread" "" TEST_LINK_FLAGS ${TEST_LINK_FLAGS})
+    #set_target_properties(mbgl-test PROPERTIES LINK_FLAGS ${TEST_LINK_FLAGS})
+    #set_property(TARGET mbgl-test PROPERTY LINK_LIRARIES "")
+
+    target_sources(mbgl-test
+        # Main test files
+        PRIVATE platform/android/src/test/main.jni.cpp
+
+        # Headless view
+        PRIVATE platform/default/headless_backend.cpp
+        PRIVATE platform/default/headless_display.cpp
+        PRIVATE platform/linux/src/headless_backend_egl.cpp
+        PRIVATE platform/linux/src/headless_display_egl.cpp
+    )
+
+    target_link_libraries(mbgl-test
+        PRIVATE mapbox-gl
+    )
+endmacro()
+
