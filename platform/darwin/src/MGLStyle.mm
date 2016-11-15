@@ -168,6 +168,13 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)removeLayer:(MGLStyleLayer *)layer
 {
+    if (!layer.layer) {
+        [NSException raise:NSInvalidArgumentException format:
+         @"The style layer %@ cannot be removed from the style. "
+         @"Make sure the style layer was created as a member of a concrete subclass of MGLStyleLayer.",
+         layer];
+    }
+
     self.mapView.mbglMap->removeLayer(layer.identifier.UTF8String);
 }
 
@@ -218,6 +225,13 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)removeSource:(MGLSource *)source
 {
+    if (!source.rawSource) {
+        [NSException raise:NSInvalidArgumentException format:
+         @"The source %@ cannot be removed from the style. "
+         @"Make sure the source was created as a member of a concrete subclass of MGLSource.",
+         source];
+    }
+
     self.mapView.mbglMap->removeSource(source.identifier.UTF8String);
     
     // Once a mbgl source is removed from the map, ownership does not return
