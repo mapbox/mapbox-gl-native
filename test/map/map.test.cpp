@@ -455,7 +455,7 @@ public:
     }
 };
 
-TEST(Map, ContinuousRendering) {
+TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     util::RunLoop runLoop;
     MockBackend backend;
     OffscreenView view { backend.getContext() };
