@@ -57,8 +57,6 @@ public:
 private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
 
-    bool inEmulator();
-
 private:
     JavaVM *vm = nullptr;
     JNIEnv *env = nullptr;
