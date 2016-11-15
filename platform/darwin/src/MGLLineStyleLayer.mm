@@ -10,6 +10,27 @@
 
 #include <mbgl/style/layers/line_layer.hpp>
 
+namespace mbgl {
+
+    MBGL_DEFINE_ENUM(MGLLineCap, {
+        { MGLLineCapButt, "butt" },
+        { MGLLineCapRound, "round" },
+        { MGLLineCapSquare, "square" },
+    });
+
+    MBGL_DEFINE_ENUM(MGLLineJoin, {
+        { MGLLineJoinBevel, "bevel" },
+        { MGLLineJoinRound, "round" },
+        { MGLLineJoinMiter, "miter" },
+    });
+
+    MBGL_DEFINE_ENUM(MGLLineTranslateAnchor, {
+        { MGLLineTranslateAnchorMap, "map" },
+        { MGLLineTranslateAnchorViewport, "viewport" },
+    });
+
+}
+
 @interface MGLLineStyleLayer ()
 
 @property (nonatomic) mbgl::style::LineLayer *rawLayer;
@@ -26,34 +47,30 @@
     if (self = [super initWithIdentifier:identifier source:source]) {
         auto layer = std::make_unique<mbgl::style::LineLayer>(identifier.UTF8String, source.identifier.UTF8String);
         _pendingLayer = std::move(layer);
-        self.rawLayer = _pendingLayer.get();
+        _rawLayer = _pendingLayer.get();
     }
     return self;
 }
-
-
 - (NSString *)sourceLayerIdentifier
 {
-    auto layerID = self.rawLayer->getSourceLayer();
+    auto layerID = _rawLayer->getSourceLayer();
     return layerID.empty() ? nil : @(layerID.c_str());
 }
 
 - (void)setSourceLayerIdentifier:(NSString *)sourceLayerIdentifier
 {
-    self.rawLayer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
+    _rawLayer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
 }
 
 - (void)setPredicate:(NSPredicate *)predicate
 {
-    self.rawLayer->setFilter(predicate.mgl_filter);
+    _rawLayer->setFilter(predicate.mgl_filter);
 }
 
 - (NSPredicate *)predicate
 {
-    return [NSPredicate mgl_predicateWithFilter:self.rawLayer->getFilter()];
+    return [NSPredicate mgl_predicateWithFilter:_rawLayer->getFilter()];
 }
-
-
 #pragma mark -  Adding to and removing from a map view
 
 - (void)addToMapView:(MGLMapView *)mapView
@@ -75,48 +92,54 @@
 {
     auto removedLayer = mapView.mbglMap->removeLayer(self.identifier.UTF8String);
     _pendingLayer = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::LineLayer> &>(removedLayer));
-    self.rawLayer = _pendingLayer.get();
+    _rawLayer = _pendingLayer.get();
 }
 
 #pragma mark - Accessing the Layout Attributes
 
 - (void)setLineCap:(MGLStyleValue<NSValue *> *)lineCap {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineCapType, NSValue *>().toPropertyValue(lineCap);
-    self.rawLayer->setLineCap(mbglValue);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineCapType,
+    NSValue *,
+    mbgl::style::LineCapType,
+    MGLLineCap>().toEnumPropertyValue(lineCap);
+    _rawLayer->setLineCap(mbglValue);
 }
 
 - (MGLStyleValue<NSValue *> *)lineCap {
-    auto propertyValue = self.rawLayer->getLineCap() ?: self.rawLayer->getDefaultLineCap();
-    return MGLStyleValueTransformer<mbgl::style::LineCapType, NSValue *>().toStyleValue(propertyValue);
+    auto propertyValue = _rawLayer->getLineCap() ?: _rawLayer->getDefaultLineCap();
+    return MGLStyleValueTransformer<mbgl::style::LineCapType, NSValue *, mbgl::style::LineCapType, MGLLineCap>().toEnumStyleValue(propertyValue);
 }
 
 - (void)setLineJoin:(MGLStyleValue<NSValue *> *)lineJoin {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *>().toPropertyValue(lineJoin);
-    self.rawLayer->setLineJoin(mbglValue);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineJoinType,
+    NSValue *,
+    mbgl::style::LineJoinType,
+    MGLLineJoin>().toEnumPropertyValue(lineJoin);
+    _rawLayer->setLineJoin(mbglValue);
 }
 
 - (MGLStyleValue<NSValue *> *)lineJoin {
-    auto propertyValue = self.rawLayer->getLineJoin() ?: self.rawLayer->getDefaultLineJoin();
-    return MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *>().toStyleValue(propertyValue);
+    auto propertyValue = _rawLayer->getLineJoin() ?: _rawLayer->getDefaultLineJoin();
+    return MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toEnumStyleValue(propertyValue);
 }
 
 - (void)setLineMiterLimit:(MGLStyleValue<NSNumber *> *)lineMiterLimit {
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineMiterLimit);
-    self.rawLayer->setLineMiterLimit(mbglValue);
+    _rawLayer->setLineMiterLimit(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineMiterLimit {
-    auto propertyValue = self.rawLayer->getLineMiterLimit() ?: self.rawLayer->getDefaultLineMiterLimit();
+    auto propertyValue = _rawLayer->getLineMiterLimit() ?: _rawLayer->getDefaultLineMiterLimit();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
 - (void)setLineRoundLimit:(MGLStyleValue<NSNumber *> *)lineRoundLimit {
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineRoundLimit);
-    self.rawLayer->setLineRoundLimit(mbglValue);
+    _rawLayer->setLineRoundLimit(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineRoundLimit {
-    auto propertyValue = self.rawLayer->getLineRoundLimit() ?: self.rawLayer->getDefaultLineRoundLimit();
+    auto propertyValue = _rawLayer->getLineRoundLimit() ?: _rawLayer->getDefaultLineRoundLimit();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -124,101 +147,104 @@
 
 - (void)setLineOpacity:(MGLStyleValue<NSNumber *> *)lineOpacity {
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineOpacity);
-    self.rawLayer->setLineOpacity(mbglValue);
+    _rawLayer->setLineOpacity(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineOpacity {
-    auto propertyValue = self.rawLayer->getLineOpacity() ?: self.rawLayer->getDefaultLineOpacity();
+    auto propertyValue = _rawLayer->getLineOpacity() ?: _rawLayer->getDefaultLineOpacity();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
 - (void)setLineColor:(MGLStyleValue<MGLColor *> *)lineColor {
     auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue(lineColor);
-    self.rawLayer->setLineColor(mbglValue);
+    _rawLayer->setLineColor(mbglValue);
 }
 
 - (MGLStyleValue<MGLColor *> *)lineColor {
-    auto propertyValue = self.rawLayer->getLineColor() ?: self.rawLayer->getDefaultLineColor();
+    auto propertyValue = _rawLayer->getLineColor() ?: _rawLayer->getDefaultLineColor();
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
 }
 
 - (void)setLineTranslate:(MGLStyleValue<NSValue *> *)lineTranslate {
     auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue(lineTranslate);
-    self.rawLayer->setLineTranslate(mbglValue);
+    _rawLayer->setLineTranslate(mbglValue);
 }
 
 - (MGLStyleValue<NSValue *> *)lineTranslate {
-    auto propertyValue = self.rawLayer->getLineTranslate() ?: self.rawLayer->getDefaultLineTranslate();
+    auto propertyValue = _rawLayer->getLineTranslate() ?: _rawLayer->getDefaultLineTranslate();
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
 - (void)setLineTranslateAnchor:(MGLStyleValue<NSValue *> *)lineTranslateAnchor {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *>().toPropertyValue(lineTranslateAnchor);
-    self.rawLayer->setLineTranslateAnchor(mbglValue);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType,
+    NSValue *,
+    mbgl::style::TranslateAnchorType,
+    MGLLineTranslateAnchor>().toEnumPropertyValue(lineTranslateAnchor);
+    _rawLayer->setLineTranslateAnchor(mbglValue);
 }
 
 - (MGLStyleValue<NSValue *> *)lineTranslateAnchor {
-    auto propertyValue = self.rawLayer->getLineTranslateAnchor() ?: self.rawLayer->getDefaultLineTranslateAnchor();
-    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *>().toStyleValue(propertyValue);
+    auto propertyValue = _rawLayer->getLineTranslateAnchor() ?: _rawLayer->getDefaultLineTranslateAnchor();
+    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLLineTranslateAnchor>().toEnumStyleValue(propertyValue);
 }
 
 - (void)setLineWidth:(MGLStyleValue<NSNumber *> *)lineWidth {
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineWidth);
-    self.rawLayer->setLineWidth(mbglValue);
+    _rawLayer->setLineWidth(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineWidth {
-    auto propertyValue = self.rawLayer->getLineWidth() ?: self.rawLayer->getDefaultLineWidth();
+    auto propertyValue = _rawLayer->getLineWidth() ?: _rawLayer->getDefaultLineWidth();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
 - (void)setLineGapWidth:(MGLStyleValue<NSNumber *> *)lineGapWidth {
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineGapWidth);
-    self.rawLayer->setLineGapWidth(mbglValue);
+    _rawLayer->setLineGapWidth(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineGapWidth {
-    auto propertyValue = self.rawLayer->getLineGapWidth() ?: self.rawLayer->getDefaultLineGapWidth();
+    auto propertyValue = _rawLayer->getLineGapWidth() ?: _rawLayer->getDefaultLineGapWidth();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
 - (void)setLineOffset:(MGLStyleValue<NSNumber *> *)lineOffset {
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineOffset);
-    self.rawLayer->setLineOffset(mbglValue);
+    _rawLayer->setLineOffset(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineOffset {
-    auto propertyValue = self.rawLayer->getLineOffset() ?: self.rawLayer->getDefaultLineOffset();
+    auto propertyValue = _rawLayer->getLineOffset() ?: _rawLayer->getDefaultLineOffset();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
 - (void)setLineBlur:(MGLStyleValue<NSNumber *> *)lineBlur {
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineBlur);
-    self.rawLayer->setLineBlur(mbglValue);
+    _rawLayer->setLineBlur(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineBlur {
-    auto propertyValue = self.rawLayer->getLineBlur() ?: self.rawLayer->getDefaultLineBlur();
+    auto propertyValue = _rawLayer->getLineBlur() ?: _rawLayer->getDefaultLineBlur();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
 - (void)setLineDasharray:(MGLStyleValue<NSArray<NSNumber *> *> *)lineDasharray {
     auto mbglValue = MGLStyleValueTransformer<std::vector<float>, NSArray<NSNumber *> *, float>().toPropertyValue(lineDasharray);
-    self.rawLayer->setLineDasharray(mbglValue);
+    _rawLayer->setLineDasharray(mbglValue);
 }
 
 - (MGLStyleValue<NSArray<NSNumber *> *> *)lineDasharray {
-    auto propertyValue = self.rawLayer->getLineDasharray() ?: self.rawLayer->getDefaultLineDasharray();
+    auto propertyValue = _rawLayer->getLineDasharray() ?: _rawLayer->getDefaultLineDasharray();
     return MGLStyleValueTransformer<std::vector<float>, NSArray<NSNumber *> *, float>().toStyleValue(propertyValue);
 }
 
 - (void)setLinePattern:(MGLStyleValue<NSString *> *)linePattern {
     auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(linePattern);
-    self.rawLayer->setLinePattern(mbglValue);
+    _rawLayer->setLinePattern(mbglValue);
 }
 
 - (MGLStyleValue<NSString *> *)linePattern {
-    auto propertyValue = self.rawLayer->getLinePattern() ?: self.rawLayer->getDefaultLinePattern();
+    auto propertyValue = _rawLayer->getLinePattern() ?: _rawLayer->getDefaultLinePattern();
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 
