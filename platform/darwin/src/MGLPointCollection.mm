@@ -54,8 +54,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (range.location + range.length > [self pointCount])
     {
         [NSException raise:NSRangeException
-                    format:@"Invalid coordinate range %@ extends beyond current coordinate count of %zu",
-         NSStringFromRange(range), [self pointCount]];
+                    format:@"Invalid coordinate range %@ extends beyond current coordinate count of %@",
+         NSStringFromRange(range), @([self pointCount])];
     }
 
     std::copy(_coordinates.begin() + range.location, _coordinates.begin() + NSMaxRange(range), coords);
