@@ -52,7 +52,7 @@ endif
 
 .NOTPARALLEL: node_modules
 node_modules: package.json
-	npm update # Install dependencies but don't run our own install script.
+	npm install --ignore-scripts # Install dependencies but don't run our own install script.
 
 BUILD_DEPS += .mason/mason
 BUILD_DEPS += Makefile
