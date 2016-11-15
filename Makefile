@@ -503,6 +503,29 @@ android-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile
 android-$1: android-lib-$1
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
+run-android-core-test-$1: android-lib-$1 android-test-lib-$1
+	# Compile main sources and extract the classes (using the test app to get all transitive dependencies in one place)
+	cd platform/android && ./gradlew assembleDebug
+	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk classes.dex -d build/android-$1/$(BUILDTYPE)
+	
+	#Compile Test runner
+	javac -sourcepath platform/android/src/test -d build/android-$1/$(BUILDTYPE) -source 1.7 -target 1.7 platform/android/src/test/Main.java
+	#Combine and dex
+	cd build/android-$1/$(BUILDTYPE) && dx --dex --output=test.jar *.class classes.dex
+
+	#Ensure clean state on the device
+	adb shell "rm -Rf $(ANDROID_LOCAL_WORK_DIR)"
+	adb shell "mkdir -p $(ANDROID_LOCAL_WORK_DIR)/test"
+
+	#Push all needed files to the device
+	adb push build/android-$1/$(BUILDTYPE)/test.jar $(ANDROID_LOCAL_WORK_DIR)
+	adb push test/fixtures $(ANDROID_LOCAL_WORK_DIR)/test
+	adb push build/android-$1/$(BUILDTYPE)/libmapbox-gl.so $(ANDROID_LOCAL_WORK_DIR)
+	adb push build/android-$1/$(BUILDTYPE)/libmbgl-test.so $(ANDROID_LOCAL_WORK_DIR)
+
+	#Kick off the tests
+	adb shell "export LD_LIBRARY_PATH=/system/lib:$(ANDROID_LOCAL_WORK_DIR) && cd $(ANDROID_LOCAL_WORK_DIR) && dalvikvm32 -cp $(ANDROID_LOCAL_WORK_DIR)/test.jar Main"
+
 .PHONY: run-android-$1
 run-android-$1: android-$1
 	cd platform/android  && ./gradlew :MapboxGLAndroidSDKTestApp:installDebug && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity	

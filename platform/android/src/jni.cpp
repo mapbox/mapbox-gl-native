@@ -1264,6 +1264,7 @@ void listOfflineRegions(JNIEnv *env, jni::jobject* obj, jlong defaultFileSourceP
     defaultFileSource->listOfflineRegions([obj, defaultFileSourcePtr, listCallback](std::exception_ptr error, mbgl::optional<std::vector<mbgl::OfflineRegion>> regions) mutable {
 
         // Reattach, the callback comes from a different thread
+        assert(theJVM != nullptr);
         JNIEnv *env2;
         jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
         if (renderDetach) {
@@ -1355,6 +1356,7 @@ void createOfflineRegion(JNIEnv *env, jni::jobject* obj, jlong defaultFileSource
 
         // Reattach, the callback comes from a different thread
         JNIEnv *env2;
+        assert(theJVM != nullptr);
         jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
         if (renderDetach) {
             mbgl::Log::Debug(mbgl::Event::JNI, "Attached.");
@@ -1446,6 +1448,7 @@ void setOfflineRegionObserver(JNIEnv *env, jni::jobject* offlineRegion_, jni::jo
             mbgl::Log::Debug(mbgl::Event::JNI, "~Observer()");
             // Env
             JNIEnv* env2;
+            assert(theJVM != nullptr);
             jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
             jni::DeleteGlobalRef(*env2, std::move(observerCallback));
             detach_jni_thread(theJVM, &env2, renderDetach);
@@ -1454,6 +1457,7 @@ void setOfflineRegionObserver(JNIEnv *env, jni::jobject* offlineRegion_, jni::jo
         void statusChanged(mbgl::OfflineRegionStatus status) override {
             // Env
             JNIEnv* env2;
+            assert(theJVM != nullptr);
             jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
 
             // Conver to jint
@@ -1489,6 +1493,7 @@ void setOfflineRegionObserver(JNIEnv *env, jni::jobject* offlineRegion_, jni::jo
         void responseError(mbgl::Response::Error error) override {
             // Env
             JNIEnv* env2;
+            assert(theJVM != nullptr);
             jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
 
             // Handle the value of reason independently of the underlying int value
@@ -1528,6 +1533,7 @@ void setOfflineRegionObserver(JNIEnv *env, jni::jobject* offlineRegion_, jni::jo
         void mapboxTileCountLimitExceeded(uint64_t limit) override {
             // Env
             JNIEnv* env2;
+            assert(theJVM != nullptr);
             jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
 
             // Send limit
@@ -1586,6 +1592,7 @@ void getOfflineRegionStatus(JNIEnv *env, jni::jobject* offlineRegion_, jni::jobj
 
         // Reattach, the callback comes from a different thread
         JNIEnv *env2;
+        assert(theJVM != nullptr);
         jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
         if (renderDetach) {
             mbgl::Log::Debug(mbgl::Event::JNI, "Attached.");
@@ -1640,6 +1647,7 @@ void deleteOfflineRegion(JNIEnv *env, jni::jobject* offlineRegion_, jni::jobject
 
         // Reattach, the callback comes from a different thread
         JNIEnv *env2;
+        assert(theJVM != nullptr);
         jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
         if (renderDetach) {
             mbgl::Log::Debug(mbgl::Event::JNI, "Attached.");
@@ -1683,6 +1691,7 @@ void updateOfflineRegionMetadata(JNIEnv *env, jni::jobject* offlineRegion_, jni:
     defaultFileSource->updateOfflineMetadata(id, metadata, [updateCallback] (std::exception_ptr error, mbgl::optional<mbgl::OfflineRegionMetadata> data) mutable {
         // Reattach, the callback comes from a different thread
         JNIEnv *env2;
+        assert(theJVM != nullptr);
         jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
         if (renderDetach) {
             mbgl::Log::Debug(mbgl::Event::JNI, "Attached.");
@@ -1704,9 +1713,13 @@ void updateOfflineRegionMetadata(JNIEnv *env, jni::jobject* offlineRegion_, jni:
 
 // Offline calls end
 
-}
+} //anonymous
 
-extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+namespace mbgl {
+namespace android {
+
+void registerNatives(JavaVM *vm) {
+    assert(vm != nullptr);
     theJVM = vm;
 
     jni::JNIEnv& env = jni::GetEnv(*vm, jni::jni_version_1_6);
@@ -1989,6 +2002,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     char release[PROP_VALUE_MAX] = "";
     __system_property_get("ro.build.version.release", release);
     androidRelease = std::string(release);
-
-    return JNI_VERSION_1_6;
 }
+    
+} //android
+} //mbgl

@@ -1,5 +1,7 @@
 add_definitions(-DMBGL_USE_GLES2=1)
 
+include(cmake/test-files.cmake)
+
 #Include to use build specific variables
 include(${CMAKE_CURRENT_BINARY_DIR}/toolchain.cmake)
 
@@ -10,6 +12,8 @@ mason_use(libzip VERSION 1.1.3)
 mason_use(nunicode VERSION 1.7.1)
 mason_use(sqlite VERSION 3.14.2)
 mason_use(gtest VERSION 1.7.0)
+
+## mbgl core ##
 
 macro(mbgl_platform_core)
 
@@ -145,7 +149,9 @@ endmacro()
 
 ## Main library ##
 
-add_library(mapbox-gl SHARED)
+add_library(mapbox-gl SHARED
+    platform/android/src/main.cpp
+)
 
 target_compile_options(mapbox-gl
     PRIVATE -fvisibility=hidden
@@ -157,7 +163,24 @@ target_link_libraries(mapbox-gl
 )
 
 ## Test library ##
-add_library(mbgl-test SHARED)
+
+add_library(mbgl-test SHARED
+    # Actual tests
+    ${MBGL_TEST_FILES}
+
+    # Utilities
+    test/include/mbgl/test.hpp
+    test/src/mbgl/test/test.cpp
+
+    # Main test entry point
+    platform/android/src/test/main.jni.cpp
+
+    # Headless view
+    platform/default/offscreen_view.cpp
+    platform/default/headless_backend.cpp
+    platform/linux/src/headless_backend_egl.cpp
+    platform/linux/src/headless_display_egl.cpp
+)
 
 target_compile_options(mbgl-test
     PRIVATE -fvisibility=hidden
@@ -170,26 +193,22 @@ target_include_directories(mbgl-test
     PRIVATE test/include
     PRIVATE test/src
     PRIVATE platform/default
+    PRIVATE ${MBGL_GENERATED}/include
 )
-
-target_sources(mbgl-test
-    # Actual tests
-    ${MBGL_TEST_FILES}
-
-    # Main test entry point
-    PRIVATE platform/android/src/test/main.jni.cpp
-
-    # Headless view
-    PRIVATE platform/linux/src/headless_backend_egl.cpp
-    PRIVATE platform/linux/src/headless_display_egl.cpp
-
-)
-
-target_add_mason_package(mbgl-test PUBLIC rapidjson)
 
 target_link_libraries(mbgl-test
     PRIVATE mbgl-core
 )
+
+target_add_mason_package(mbgl-test PRIVATE geometry)
+target_add_mason_package(mbgl-test PRIVATE variant)
+target_add_mason_package(mbgl-test PRIVATE unique_resource)
+target_add_mason_package(mbgl-test PRIVATE rapidjson)
+target_add_mason_package(mbgl-test PRIVATE gtest)
+target_add_mason_package(mbgl-test PRIVATE pixelmatch)
+target_add_mason_package(mbgl-test PRIVATE boost)
+target_add_mason_package(mbgl-test PRIVATE geojson)
+target_add_mason_package(mbgl-test PRIVATE geojsonvt)
 
 ## Custom layer example ##
 
@@ -205,6 +224,8 @@ target_compile_options(example-custom-layer
 target_link_libraries(example-custom-layer
     PRIVATE mbgl-core
 )
+
+## Strip and copy ##
 
 set(ANDROID_SDK_PROJECT_DIR ${CMAKE_SOURCE_DIR}/platform/android/MapboxGLAndroidSDK)
 set(ANDROID_JNI_TARGET_DIR ${ANDROID_SDK_PROJECT_DIR}/src/main/jniLibs/${ANDROID_JNIDIR}/)

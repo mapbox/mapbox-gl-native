@@ -1,3 +1,4 @@
+#include "../jni.hpp"
 #include <jni/jni.hpp>
 #include <mbgl/test.hpp>
 
@@ -10,6 +11,8 @@ void runAllTests(JNIEnv *env, jni::jobject* obj) {
 
 extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 	std::cout << "Loading tests";
+
+    mbgl::android::theJVM = vm;
 
 	struct Main { static constexpr auto Name() { return "Main"; } };
 	

@@ -5,7 +5,7 @@ public class Main {
 		//Need to load the mapbox-gl library explicitly first
 		System.loadLibrary("mapbox-gl");
 		//Load the tests
-		System.loadLibrary("test-jni-lib");
+		System.loadLibrary("mbgl-test");
 		System.out.println("Libraries loaded");
 		//Run the tests
 		new Main().runAllTests();
