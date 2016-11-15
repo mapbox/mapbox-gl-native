@@ -28,7 +28,7 @@ targets.
    - g++-5 or later
  - [CMake](https://cmake.org/) 3.1 or later (for build only)
  - [cURL](https://curl.haxx.se) (for build only)
- - [Node.js](https://nodejs.org/) (for build only)
+ - [Node.js](https://nodejs.org/) 4.2.1 or later (for build only)
  - [`pkg-config`](https://wiki.freedesktop.org/www/Software/pkg-config/) (for build only)
 
 Depending on your operating system and target, you'll need additional
