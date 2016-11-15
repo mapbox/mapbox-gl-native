@@ -533,6 +533,8 @@ public:
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationDidBecomeActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
 
     // set initial position
     //
@@ -639,6 +641,7 @@ public:
 
 - (void)dealloc
 {
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_attributionButton removeObserver:self forKeyPath:@"hidden"];
 
@@ -760,31 +763,29 @@ public:
 
 - (void)updateConstraints
 {
-    // If we have a view controller reference, use its layout guides for our various top & bottom
-    // views so they don't underlap navigation or tool bars. If we don't have a reference, apply
-    // constraints against ourself to maintain (albeit less ideal) placement of the subviews.
+    // If we have a view controller reference and its automaticallyAdjustsScrollViewInsets
+    // is set to YES, use its view as the parent for constraints. -[MGLMapView adjustContentInset]
+    // already take top and bottom layout guides into account. If we don't have a reference, apply
+    // constraints against ourself to maintain placement of the subviews.
     //
     UIViewController *viewController = self.viewControllerForLayoutGuides;
-    UIView *constraintParentView = (viewController.view ? viewController.view : self);
-
+    BOOL useLayoutGuides = viewController.view && viewController.automaticallyAdjustsScrollViewInsets;
+    UIView *view = useLayoutGuides ? viewController.view : self;
+    
     // compass
     //
     UIView *compassContainer = self.compassView.superview;
-    [constraintParentView removeConstraints:self.compassViewConstraints];
+    [view removeConstraints:self.compassViewConstraints];
     [self.compassViewConstraints removeAllObjects];
 
-    // Work around an apparent iOS 10 bug where the top layout guide isn't always updated
-    // unless there's an active constraint against it. This means we cannot constrain
-    // directly to the top of self — instead, we must constrain to the top layout guide's
-    // bottom offset, then subtract that value from contentInset.
     [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
                                   attribute:NSLayoutAttributeTop
                                   relatedBy:NSLayoutRelationEqual
-                                     toItem:viewController.topLayoutGuide
-                                  attribute:NSLayoutAttributeBottom
+                                     toItem:view
+                                  attribute:NSLayoutAttributeTop
                                  multiplier:1
-                                   constant:5 + self.contentInset.top - viewController.topLayoutGuide.length]];
+                                   constant:5 + self.contentInset.top]];
 
     [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
@@ -813,11 +814,11 @@ public:
                                   attribute:NSLayoutAttributeNotAnAttribute
                                  multiplier:1
                                    constant:compassImage.size.height]];
-    [constraintParentView addConstraints:self.compassViewConstraints];
+    [view addConstraints:self.compassViewConstraints];
 
     // logo bug
     //
-    [constraintParentView removeConstraints:self.logoViewConstraints];
+    [view removeConstraints:self.logoViewConstraints];
     [self.logoViewConstraints removeAllObjects];
 
     [self.logoViewConstraints addObject:
@@ -837,11 +838,11 @@ public:
                                   attribute:NSLayoutAttributeLeading
                                  multiplier:1
                                    constant:8 + self.contentInset.left]];
-    [constraintParentView addConstraints:self.logoViewConstraints];
+    [view addConstraints:self.logoViewConstraints];
 
     // attribution button
     //
-    [constraintParentView removeConstraints:self.attributionButtonConstraints];
+    [view removeConstraints:self.attributionButtonConstraints];
     [self.attributionButtonConstraints removeAllObjects];
 
     [self.attributionButtonConstraints addObject:
@@ -861,7 +862,7 @@ public:
                                   attribute:NSLayoutAttributeTrailing
                                  multiplier:1
                                    constant:8 + self.contentInset.right]];
-    [constraintParentView addConstraints:self.attributionButtonConstraints];
+    [view addConstraints:self.attributionButtonConstraints];
 
     [super updateConstraints];
 }
@@ -1066,6 +1067,11 @@ public:
 {
     [self validateDisplayLink];
     [super didMoveToSuperview];
+}
+
+- (void)deviceOrientationDidChange:(__unused NSNotification *)notification
+{
+    [self setNeedsLayout];
 }
 
 - (void)sleepGL:(__unused NSNotification *)notification
