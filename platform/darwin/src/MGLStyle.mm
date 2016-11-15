@@ -170,7 +170,7 @@ static NSURL *MGLStyleURL_emerald;
 {
     if (!layer.layer) {
         [NSException raise:NSInvalidArgumentException format:
-         @"The style layer %@ cannot be added to the style. "
+         @"The style layer %@ cannot be removed from the style. "
          @"Make sure the style layer was created as a member of a concrete subclass of MGLStyleLayer.",
          layer];
     }
