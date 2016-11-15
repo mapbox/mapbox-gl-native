@@ -763,26 +763,16 @@ public:
 
 - (void)updateConstraints
 {
-    // If we have a view controller reference and its automaticallyAdjustsScrollViewInsets
-    // is set to YES, use its view as the parent for constraints. -[MGLMapView adjustContentInset]
-    // already take top and bottom layout guides into account. If we don't have a reference, apply
-    // constraints against ourself to maintain placement of the subviews.
-    //
-    UIViewController *viewController = self.viewControllerForLayoutGuides;
-    BOOL useLayoutGuides = viewController.view && viewController.automaticallyAdjustsScrollViewInsets;
-    UIView *view = useLayoutGuides ? viewController.view : self;
-    
     // compass
     //
-    UIView *compassContainer = self.compassView.superview;
-    [view removeConstraints:self.compassViewConstraints];
+    [self removeConstraints:self.compassViewConstraints];
     [self.compassViewConstraints removeAllObjects];
 
     [self.compassViewConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:compassContainer
+     [NSLayoutConstraint constraintWithItem:self.compassView
                                   attribute:NSLayoutAttributeTop
                                   relatedBy:NSLayoutRelationEqual
-                                     toItem:view
+                                     toItem:self
                                   attribute:NSLayoutAttributeTop
                                  multiplier:1
                                    constant:5 + self.contentInset.top]];
@@ -791,14 +781,14 @@ public:
      [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeTrailing
                                   relatedBy:NSLayoutRelationEqual
-                                     toItem:compassContainer
+                                     toItem:self.compassView
                                   attribute:NSLayoutAttributeTrailing
                                  multiplier:1
                                    constant:5 + self.contentInset.right]];
 
     UIImage *compassImage = self.compassView.image;
     [self.compassViewConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:compassContainer
+     [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeWidth
                                   relatedBy:NSLayoutRelationEqual
                                      toItem:nil
@@ -807,18 +797,18 @@ public:
                                    constant:compassImage.size.width]];
 
     [self.compassViewConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:compassContainer
+     [NSLayoutConstraint constraintWithItem:self.compassView
                                   attribute:NSLayoutAttributeHeight
                                   relatedBy:NSLayoutRelationEqual
                                      toItem:nil
                                   attribute:NSLayoutAttributeNotAnAttribute
                                  multiplier:1
                                    constant:compassImage.size.height]];
-    [view addConstraints:self.compassViewConstraints];
+    [self addConstraints:self.compassViewConstraints];
 
     // logo bug
     //
-    [view removeConstraints:self.logoViewConstraints];
+    [self removeConstraints:self.logoViewConstraints];
     [self.logoViewConstraints removeAllObjects];
 
     [self.logoViewConstraints addObject:
@@ -838,11 +828,11 @@ public:
                                   attribute:NSLayoutAttributeLeading
                                  multiplier:1
                                    constant:8 + self.contentInset.left]];
-    [view addConstraints:self.logoViewConstraints];
+    [self addConstraints:self.logoViewConstraints];
 
     // attribution button
     //
-    [view removeConstraints:self.attributionButtonConstraints];
+    [self removeConstraints:self.attributionButtonConstraints];
     [self.attributionButtonConstraints removeAllObjects];
 
     [self.attributionButtonConstraints addObject:
@@ -862,7 +852,7 @@ public:
                                   attribute:NSLayoutAttributeTrailing
                                  multiplier:1
                                    constant:8 + self.contentInset.right]];
-    [view addConstraints:self.attributionButtonConstraints];
+    [self addConstraints:self.attributionButtonConstraints];
 
     [super updateConstraints];
 }
