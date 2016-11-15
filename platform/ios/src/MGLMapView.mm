@@ -533,6 +533,11 @@ public:
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationDidBecomeActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
+    
+#if !TARGET_OS_TVOS
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+#endif
 
     // set initial position
     //
@@ -639,6 +644,9 @@ public:
 
 - (void)dealloc
 {
+#if !TARGET_OS_TVOS
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+#endif
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_attributionButton removeObserver:self forKeyPath:@"hidden"];
 
@@ -1062,6 +1070,11 @@ public:
 {
     [self validateDisplayLink];
     [super didMoveToSuperview];
+}
+
+- (void)deviceOrientationDidChange:(__unused NSNotification *)notification
+{
+    [self setNeedsLayout];
 }
 
 - (void)sleepGL:(__unused NSNotification *)notification
