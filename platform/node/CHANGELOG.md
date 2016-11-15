@@ -1,3 +1,7 @@
+# 3.4.2 - Novmeber 15, 2016
+
+- Switches back to publishing Linux binaries with GLX, to eliminate a runtime dependency on `libOSMesa.so.8` and enable dynamically linking against `libGL.so` provided by an alternate implementation, such as the NVIDIA proproetary drivers ([#7503](https://github.com/mapbox/mapbox-gl-native/pull/7053))
+
 # 3.4.1 - Novmeber 10, 2016
 
 - Skips assigning clip IDs to tiles that won't be rendered, mitigating a `stencil mask overflow` error ([#6871](https://github.com/mapbox/mapbox-gl-native/pull/6871))
