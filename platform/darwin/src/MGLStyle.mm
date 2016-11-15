@@ -206,6 +206,13 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)addSource:(MGLSource *)source
 {
+    if (!source.rawSource) {
+        [NSException raise:NSInvalidArgumentException format:
+         @"The source %@ cannot be added to the style. "
+         @"Make sure the source was created as a member of a concrete subclass of MGLSource.",
+         source];
+    }
+
     [source addToMapView:self.mapView];
 }
 
