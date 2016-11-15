@@ -50,17 +50,68 @@ macro(mbgl_platform_core)
         # Thread pool
         PRIVATE platform/default/thread_pool.cpp
 
+        # Conversion C++ -> Java
+        platform/android/src/conversion/constant.hpp
+        platform/android/src/conversion/conversion.hpp
+        platform/android/src/style/conversion/function.hpp
+        platform/android/src/style/conversion/property_value.hpp
+        platform/android/src/style/conversion/types.hpp
+        platform/android/src/style/conversion/types_string_values.hpp
+
+        # Style conversion Java -> C++
+        platform/android/src/style/android_conversion.hpp
+        platform/android/src/style/conversion/geojson.hpp
+        platform/android/src/style/value.cpp
+        platform/android/src/style/value.hpp
+        platform/android/src/style/conversion/url_or_tileset.hpp
+
+        # Style
+        platform/android/src/style/layers/background_layer.cpp
+        platform/android/src/style/layers/background_layer.hpp
+        platform/android/src/style/layers/circle_layer.cpp
+        platform/android/src/style/layers/circle_layer.hpp
+        platform/android/src/style/layers/custom_layer.cpp
+        platform/android/src/style/layers/custom_layer.hpp
+        platform/android/src/style/layers/fill_layer.cpp
+        platform/android/src/style/layers/fill_layer.hpp
+        platform/android/src/style/layers/layer.cpp
+        platform/android/src/style/layers/layer.hpp
+        platform/android/src/style/layers/layers.cpp
+        platform/android/src/style/layers/layers.hpp
+        platform/android/src/style/layers/line_layer.cpp
+        platform/android/src/style/layers/line_layer.hpp
+        platform/android/src/style/layers/raster_layer.cpp
+        platform/android/src/style/layers/raster_layer.hpp
+        platform/android/src/style/layers/symbol_layer.cpp
+        platform/android/src/style/layers/symbol_layer.hpp
+        platform/android/src/style/sources/geojson_source.cpp
+        platform/android/src/style/sources/geojson_source.hpp
+        platform/android/src/style/sources/source.cpp
+        platform/android/src/style/sources/source.hpp
+        platform/android/src/style/sources/sources.cpp
+        platform/android/src/style/sources/sources.hpp
+        platform/android/src/style/sources/raster_source.cpp
+        platform/android/src/style/sources/raster_source.hpp
+        platform/android/src/style/sources/vector_source.cpp
+        platform/android/src/style/sources/vector_source.hpp
+
+        # Connectivity
+        platform/android/src/connectivity_listener.cpp
+        platform/android/src/connectivity_listener.hpp
+
         # Native map
         platform/android/src/native_map_view.cpp
         platform/android/src/native_map_view.hpp
 
         # Main jni bindings
-        platform/android/src/jni.cpp
-        platform/android/src/jni.hpp
         platform/android/src/attach_env.cpp
         platform/android/src/attach_env.hpp
         platform/android/src/java_types.cpp
         platform/android/src/java_types.hpp
+
+        # Main entry point
+        platform/android/src/jni.hpp
+        platform/android/src/jni.cpp
     )
 
     target_include_directories(mbgl-core
@@ -74,6 +125,7 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC libzip)
     target_add_mason_package(mbgl-core PUBLIC geojson)
     target_add_mason_package(mbgl-core PUBLIC jni.hpp)
+    target_add_mason_package(mbgl-core PUBLIC rapidjson)
 
     target_compile_options(mbgl-core
         PRIVATE -fvisibility=hidden
@@ -91,58 +143,9 @@ macro(mbgl_platform_core)
     )
 endmacro()
 
-add_library(mapbox-gl SHARED
-    # Conversion C++ -> Java
-    platform/android/src/conversion/constant.hpp
-    platform/android/src/conversion/conversion.hpp
-    platform/android/src/style/conversion/function.hpp
-    platform/android/src/style/conversion/property_value.hpp
-    platform/android/src/style/conversion/types.hpp
-    platform/android/src/style/conversion/types_string_values.hpp
+## Main library ##
 
-    # Style conversion Java -> C++
-    platform/android/src/style/android_conversion.hpp
-    platform/android/src/style/conversion/geojson.hpp
-    platform/android/src/style/value.cpp
-    platform/android/src/style/value.hpp
-    platform/android/src/style/conversion/url_or_tileset.hpp
-
-    # Style
-    platform/android/src/style/layers/background_layer.cpp
-    platform/android/src/style/layers/background_layer.hpp
-    platform/android/src/style/layers/circle_layer.cpp
-    platform/android/src/style/layers/circle_layer.hpp
-    platform/android/src/style/layers/custom_layer.cpp
-    platform/android/src/style/layers/custom_layer.hpp
-    platform/android/src/style/layers/fill_layer.cpp
-    platform/android/src/style/layers/fill_layer.hpp
-    platform/android/src/style/layers/layer.cpp
-    platform/android/src/style/layers/layer.hpp
-    platform/android/src/style/layers/layers.cpp
-    platform/android/src/style/layers/layers.hpp
-    platform/android/src/style/layers/line_layer.cpp
-    platform/android/src/style/layers/line_layer.hpp
-    platform/android/src/style/layers/raster_layer.cpp
-    platform/android/src/style/layers/raster_layer.hpp
-    platform/android/src/style/layers/symbol_layer.cpp
-    platform/android/src/style/layers/symbol_layer.hpp
-    platform/android/src/style/sources/geojson_source.cpp
-    platform/android/src/style/sources/geojson_source.hpp
-    platform/android/src/style/sources/source.cpp
-    platform/android/src/style/sources/source.hpp
-    platform/android/src/style/sources/sources.cpp
-    platform/android/src/style/sources/sources.hpp
-    platform/android/src/style/sources/raster_source.cpp
-    platform/android/src/style/sources/raster_source.hpp
-    platform/android/src/style/sources/vector_source.cpp
-    platform/android/src/style/sources/vector_source.hpp
-
-    # Connectivity
-    platform/android/src/connectivity_listener.cpp
-    platform/android/src/connectivity_listener.hpp
-)
-
-target_add_mason_package(mapbox-gl PUBLIC rapidjson)
+add_library(mapbox-gl SHARED)
 
 target_compile_options(mapbox-gl
     PRIVATE -fvisibility=hidden
@@ -152,6 +155,43 @@ target_compile_options(mapbox-gl
 target_link_libraries(mapbox-gl
     PUBLIC mbgl-core
 )
+
+## Test library ##
+add_library(mbgl-test SHARED)
+
+target_compile_options(mbgl-test
+    PRIVATE -fvisibility=hidden
+    PRIVATE -Os
+)
+
+target_include_directories(mbgl-test
+    PRIVATE include
+    PRIVATE src # TODO: eliminate
+    PRIVATE test/include
+    PRIVATE test/src
+    PRIVATE platform/default
+)
+
+target_sources(mbgl-test
+    # Actual tests
+    ${MBGL_TEST_FILES}
+
+    # Main test entry point
+    PRIVATE platform/android/src/test/main.jni.cpp
+
+    # Headless view
+    PRIVATE platform/linux/src/headless_backend_egl.cpp
+    PRIVATE platform/linux/src/headless_display_egl.cpp
+
+)
+
+target_add_mason_package(mbgl-test PUBLIC rapidjson)
+
+target_link_libraries(mbgl-test
+    PRIVATE mbgl-core
+)
+
+## Custom layer example ##
 
 add_library(example-custom-layer SHARED
     platform/android/src/example_custom_layer.cpp
@@ -190,28 +230,3 @@ add_custom_target(_all ALL
     DEPENDS example-custom-layer
     DEPENDS copy-files
 )
-
-macro(mbgl_platform_test)
-
-    # Get rid of pthread (from gtest)
-    #get_target_property(TEST_LINK_FLAGS mbgl-test LINK_FLAGS)
-    #STRING(REPLACE "-pthread" "" TEST_LINK_FLAGS ${TEST_LINK_FLAGS})
-    #set_target_properties(mbgl-test PROPERTIES LINK_FLAGS ${TEST_LINK_FLAGS})
-    #set_property(TARGET mbgl-test PROPERTY LINK_LIRARIES "")
-
-    target_sources(mbgl-test
-        # Main test files
-        PRIVATE platform/android/src/test/main.jni.cpp
-
-        # Headless view
-        PRIVATE platform/default/headless_backend.cpp
-        PRIVATE platform/default/headless_display.cpp
-        PRIVATE platform/linux/src/headless_backend_egl.cpp
-        PRIVATE platform/linux/src/headless_display_egl.cpp
-    )
-
-    target_link_libraries(mbgl-test
-        PRIVATE mapbox-gl
-    )
-endmacro()
-
