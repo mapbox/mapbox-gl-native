@@ -63,6 +63,8 @@ public:
     void onStyleError() override;
     void onResourceError(std::exception_ptr) override;
 
+    void updateState();
+
     void update();
     void render(View&);
 
@@ -202,8 +204,6 @@ void Map::render(View& view) {
 
     impl->backend.notifyMapChange(MapChangeWillStartRenderingFrame);
 
-    const Update flags = impl->transform.updateTransitions(Clock::now());
-
     impl->render(view);
 
     impl->backend.notifyMapChange(isFullyLoaded() ?
@@ -220,19 +220,13 @@ void Map::render(View& view) {
             impl->backend.notifyMapChange(MapChangeDidFinishLoadingMap);
         }
     }
-
-    // Triggers an asynchronous update, that eventually triggers a view
-    // invalidation, causing renderSync to be called again if in transition.
-    if (flags != Update::Nothing) {
-        impl->onUpdate(flags);
-    }
 }
 
 void Map::triggerRepaint() {
     impl->backend.invalidate();
 }
 
-void Map::Impl::update() {
+void Map::Impl::updateState() {
     if (!style) {
         updateFlags = Update::Nothing;
     }
@@ -240,11 +234,6 @@ void Map::Impl::update() {
     if (updateFlags == Update::Nothing || (mode == MapMode::Still && !stillImageRequest)) {
         return;
     }
-
-    // This time point is used to:
-    // - Calculate style property transitions;
-    // - Hint style sources to notify when all its tiles are loaded;
-    timePoint = Clock::now();
 
     if (style->loaded && updateFlags & Update::AnnotationStyle) {
         annotationManager->updateStyle(*style);
@@ -278,6 +267,13 @@ void Map::Impl::update() {
 
     style->updateTiles(parameters);
 
+    updateFlags = Update::Nothing;
+}
+
+void Map::Impl::update() {
+    timePoint = Clock::now();
+    updateState();
+
     if (mode == MapMode::Continuous) {
         backend.invalidate();
     } else if (stillImageRequest && style->isLoaded()) {
@@ -286,14 +282,17 @@ void Map::Impl::update() {
         render(stillImageRequest->view);
         backend.deactivate();
     }
-
-    updateFlags = Update::Nothing;
 }
 
 void Map::Impl::render(View& view) {
     if (!painter) {
         painter = std::make_unique<Painter>(backend.getContext(), transform.getState(), pixelRatio);
     }
+
+    timePoint = Clock::now();
+    const Update flags = transform.updateTransitions(timePoint);
+    updateFlags |= flags;
+    updateState();
 
     FrameData frameData { timePoint,
                           pixelRatio,
@@ -319,6 +318,12 @@ void Map::Impl::render(View& view) {
     } else if (painter->needsAnimation()) {
         updateFlags |= Update::Repaint;
         asyncUpdate.send();
+    }
+
+    // Triggers an asynchronous update, that eventually triggers a view
+    // invalidation, causing renderSync to be called again if in transition.
+    if (flags != Update::Nothing) {
+        onUpdate(flags);
     }
 }
 
