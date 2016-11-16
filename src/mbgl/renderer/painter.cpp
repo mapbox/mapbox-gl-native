@@ -87,11 +87,11 @@ Painter::Painter(gl::Context& context_, const TransformState& state_, float pixe
     gl::debugging::enable();
 #endif
 
-    ProgramParameters programParameters = ProgramParameters{ pixelRatio, false };
+    ProgramParameters programParameters{ pixelRatio, false };
     programs = std::make_unique<Programs>(context, programParameters);
 #ifndef NDEBUG
     
-    ProgramParameters programParametersOverdraw = ProgramParameters{ pixelRatio, true };
+    ProgramParameters programParametersOverdraw{ pixelRatio, true };
     overdrawPrograms = std::make_unique<Programs>(context, programParametersOverdraw);
 #endif
 }
