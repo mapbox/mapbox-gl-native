@@ -171,11 +171,15 @@ add_library(mbgl-test SHARED
     # Main test entry point
     platform/android/src/test/main.jni.cpp
 
+)
+
+target_sources(mbgl-test
     # Headless view
-    platform/default/offscreen_view.cpp
-    platform/default/headless_backend.cpp
-    platform/linux/src/headless_backend_egl.cpp
-    platform/linux/src/headless_display_egl.cpp
+    PRIVATE platform/default/headless_backend.cpp
+    PRIVATE platform/default/offscreen_view.cpp
+
+    PRIVATE platform/linux/src/headless_backend_egl.cpp
+    PRIVATE platform/linux/src/headless_display_egl.cpp
 )
 
 target_compile_options(mbgl-test
