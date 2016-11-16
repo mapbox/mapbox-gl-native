@@ -31,8 +31,23 @@ HeadlessDisplay::Impl::Impl() {
         throw std::runtime_error("eglBindAPI() failed");
     }
 
+#if !defined(__ANDROID__)
     // This shouldn't matter as we're rendering to a framebuffer.
     const EGLint attribs[] = { EGL_NONE };
+#else
+    const EGLint attribs[] = {
+        EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+        EGL_RED_SIZE, 8,
+        EGL_GREEN_SIZE, 8,
+        EGL_BLUE_SIZE, 8,
+        EGL_ALPHA_SIZE, 8,
+        EGL_DEPTH_SIZE, 0,
+        EGL_STENCIL_SIZE, 0,
+        EGL_NONE
+    };
+#endif // __ANDROID__
+
     if (!eglChooseConfig(display, attribs, &config, 1, &numConfigs) || numConfigs != 1) {
         throw std::runtime_error("Failed to choose ARGB config.\n");
     }

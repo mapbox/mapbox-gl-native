@@ -10,9 +10,24 @@
 namespace mbgl {
 
 struct EGLImpl : public HeadlessBackend::Impl {
-    EGLImpl(EGLContext glContext_, EGLDisplay display_)
+    EGLImpl(EGLContext glContext_, EGLDisplay display_, EGLConfig config_)
             : glContext(glContext_),
-              display(display_) {
+              display(display_),
+              config(config_) {
+#if defined(__ANDROID__)
+        //Create a PBuffer surface (in conjunction with EGL_SURFACE_TYPE, EGL_PBUFFER_BIT)
+        const EGLint surfAttribs[] = {
+            EGL_WIDTH, 512,
+            EGL_HEIGHT, 512,
+            EGL_LARGEST_PBUFFER, EGL_TRUE,
+            EGL_NONE
+        };
+
+        glSurface = eglCreatePbufferSurface(display, config, surfAttribs);
+        if(glSurface == EGL_NO_SURFACE) {
+            throw std::runtime_error("Could not create surface: " + std::to_string(eglGetError()));
+        }
+#endif // __ANDROID__
     }
 
     ~EGLImpl() {
@@ -22,10 +37,16 @@ struct EGLImpl : public HeadlessBackend::Impl {
         if (!eglDestroyContext(display, glContext)) {
             throw std::runtime_error("Failed to destroy EGL context.\n");
         }
+        if (glSurface != EGL_NO_SURFACE) {
+            if (!eglDestroySurface(display, glSurface)) {
+                throw std::runtime_error("Failed to destroy EGL context.\n");
+            }
+            glSurface = EGL_NO_SURFACE;
+        }
     }
 
     void activateContext() final {
-        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, glContext)) {
+        if (!eglMakeCurrent(display, glSurface, glSurface, glContext)) {
             throw std::runtime_error("Switching OpenGL context failed.\n");
         }
     }
@@ -38,6 +59,8 @@ struct EGLImpl : public HeadlessBackend::Impl {
 
     EGLContext glContext = EGL_NO_CONTEXT;
     EGLDisplay display = EGL_NO_DISPLAY;
+    EGLConfig config = 0;
+    EGLSurface glSurface = EGL_NO_SURFACE;
 };
 
 gl::glProc HeadlessBackend::initializeExtension(const char* name) {
@@ -74,7 +97,7 @@ void HeadlessBackend::createContext() {
         throw std::runtime_error("Error creating the EGL context object.\n");
     }
 
-    impl.reset(new EGLImpl(glContext, display_));
+    impl.reset(new EGLImpl(glContext, display_, config));
 }
 
 } // namespace mbgl
