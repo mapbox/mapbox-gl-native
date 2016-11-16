@@ -468,10 +468,8 @@ public:
     _compassView.accessibilityTraits = UIAccessibilityTraitButton;
     _compassView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_LABEL", nil, nil, @"Compass", @"Accessibility label");
     _compassView.accessibilityHint = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_HINT", nil, nil, @"Rotates the map to face due north", @"Accessibility hint");
-    UIView *container = [[UIView alloc] initWithFrame:CGRectZero];
-    [container addSubview:_compassView];
-    container.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:container];
+    _compassView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:_compassView];
     _compassViewConstraints = [NSMutableArray array];
 
     // setup interaction
