@@ -397,6 +397,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  */
 - (void)removeImageForName:(NSString *)name;
 
+
+/**
+ Returns an image from the style for the specified name.
+
+ @param name The name of the image to get.
+ */
+- (MGLImage *)imageForName:(NSString *)name;
+
 @end
 
 NS_ASSUME_NONNULL_END

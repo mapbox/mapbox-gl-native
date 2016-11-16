@@ -495,6 +495,22 @@ static NSURL *MGLStyleURL_emerald;
     self.mapView.mbglMap->removeImage([name UTF8String]);
 }
 
+- (MGLImage *)imageForName:(NSString *)name
+{
+    NSAssert(name, @"name is null");
+
+    auto spriteImage = self.mapView.mbglMap->getImage([name UTF8String]);
+
+    NSAssert(spriteImage, @"spriteImage is null");
+    if (!spriteImage)
+    {
+        return nil;
+    }
+
+    auto imageData = [NSData dataWithBytes:spriteImage->image.data.get() length:spriteImage->image.size()];
+    return [[MGLImage alloc] initWithData:imageData];
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p; name = %@, URL = %@>",
