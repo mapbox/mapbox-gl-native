@@ -31,8 +31,15 @@ HeadlessDisplay::Impl::Impl() {
         throw std::runtime_error("eglBindAPI() failed");
     }
 
-    // This shouldn't matter as we're rendering to a framebuffer.
-    const EGLint attribs[] = { EGL_NONE };
+    const EGLint attribs[] = {
+#if __ANDROID__
+        // Android emulator requires a pixel buffer to generate renderable unit
+        // test results.
+        EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
+#endif // __ANDROID__
+        EGL_NONE
+    };
+
     if (!eglChooseConfig(display, attribs, &config, 1, &numConfigs) || numConfigs != 1) {
         throw std::runtime_error("Failed to choose ARGB config.\n");
     }
