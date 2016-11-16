@@ -1,24 +1,25 @@
 #include <mbgl/test.hpp>
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/server.hpp>
+
 #include <mbgl/util/thread.hpp>
+#include <mbgl/platform/log.hpp>
+
 #include <gtest/gtest.h>
 
 namespace mbgl {
 
     int runTests(int argc, char *argv[]) {
 #if TEST_HAS_SERVER
-        std::cout << "Starting server\n";
+        Log::Info(Event::General, "Starting server");
         util::Thread<test::Server> server({"Webserver"}, true);
         server.invokeSync(&test::Server::start);
 
         //Make sure the server is up before continueing
-        httplib::Client cli("127.0.0.1", 3000);
-        int resCode = cli.get("/test")->status;
-        while(resCode !=200) {
-            std::cout << "No response yet\n";
-            usleep(1000*1000);
-            resCode = cli.get("/test")->status;
+        httplib::Client client("127.0.0.1", 3000);
+        while (client.get("/test")->status != 200) {
+            Log::Info(Event::General, "No response yet, waiting for mock webserver");
+            usleep(1000 * 1000);
         }
 #endif
 

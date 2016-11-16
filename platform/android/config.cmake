@@ -168,10 +168,6 @@ add_library(mbgl-test SHARED
     # Actual tests
     ${MBGL_TEST_FILES}
 
-    # Utilities
-    test/include/mbgl/test.hpp
-    test/src/mbgl/test/test.cpp
-
     # Main test entry point
     platform/android/src/test/main.jni.cpp
 
@@ -248,6 +244,7 @@ add_custom_target(copy-files
 
 add_custom_target(_all ALL
     DEPENDS mapbox-gl
+    DEPENDS mbgl-test
     DEPENDS example-custom-layer
     DEPENDS copy-files
 )

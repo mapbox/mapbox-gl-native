@@ -58,6 +58,8 @@ set(MBGL_TEST_FILES
     test/src/mbgl/test/test.cpp
     test/src/mbgl/test/util.cpp
     test/src/mbgl/test/util.hpp
+    test/src/mbgl/test/server.cpp
+    test/src/mbgl/test/server.hpp
 
     # storage
     test/storage/asset_file_source.test.cpp
