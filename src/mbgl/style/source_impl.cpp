@@ -137,7 +137,7 @@ void Source::Impl::updateTiles(const UpdateParameters& parameters) {
     algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn,
                                  idealTiles, zoomRange, tileZoom);
 
-    if (type != SourceType::Raster && type != SourceType::Annotations && cache.getSize() == 0) {
+    if (type != SourceType::Annotations && cache.getSize() == 0) {
         size_t conservativeCacheSize =
             ((float)parameters.transformState.getWidth() / util::tileSize) *
             ((float)parameters.transformState.getHeight() / util::tileSize) *
