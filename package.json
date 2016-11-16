@@ -22,7 +22,7 @@
     "ejs": "^2.4.1",
     "express": "^4.11.1",
     "lodash": "^4.16.4",
-    "mapbox-gl-shaders": "mapbox/mapbox-gl-shaders#4d4ab3813274b0d2e9113f06d819e66a471df457",
+    "mapbox-gl-shaders": "mapbox/mapbox-gl-shaders#5ef35e4be4694dfa33aba7696806be06669c5701",
     "mapbox-gl-style-spec": "mapbox/mapbox-gl-style-spec#7f62a4fc9f21e619824d68abbc4b03cbc1685572",
     "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#424897066b9f18bcfcf47a7ace9f35eff45d4073",
     "mkdirp": "^0.5.1",
