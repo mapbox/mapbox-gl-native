@@ -193,7 +193,8 @@ public class MapboxMap {
     }
 
     /**
-     * Removes a layer from the map style. Any references to the layer become invalid and should not be used anymore
+     * Removes a layer from the map style. Any references to the layer become invalid and should not
+     * be used anymore
      * <p>
      * Layer identifiers are not guaranteed to exist across styles or different versions of the
      * same style. Applications that use this API must set the style URL to an explicitly versioned
@@ -203,13 +204,25 @@ public class MapboxMap {
      * time. These default styles can be found in the {@link Style} class.
      * </p>
      * @param layerId a String matching the layer ID found within the current map style. This
-     *                String is case sensitive.
+     *                String is case sensitive. Any references to the layer become invalid and should
+     *                not be used anymore
      * @throws NoSuchLayerException If the layer doesn't exist in the current style, this exception
      *                              will be thrown.
      */
     @UiThread
     public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
         getMapView().getNativeMapView().removeLayer(layerId);
+    }
+
+    /**
+     * Removes the layer. The reference is re-usable after this and can be re-added
+     *
+     * @param layer the layer to remove
+     * @throws NoSuchLayerException
+     */
+    @UiThread
+    public void removeLayer(@NonNull Layer layer) throws NoSuchLayerException {
+        getMapView().getNativeMapView().removeLayer(layer);
     }
 
     /**
@@ -290,7 +303,18 @@ public class MapboxMap {
     }
 
     /**
-     * Add an image to be used in the map style
+     * Removes the source, preserving the reverence for re-use
+     *
+     * @param source the source to remove
+     * @throws NoSuchSourceException
+     */
+    @UiThread
+    public void removeSource(@NonNull Source source) throws NoSuchSourceException {
+        getMapView().getNativeMapView().removeSource(source);
+    }
+
+    /**
+     * Add an image to be used int hte map's style
      *
      * @param name  the name of the image.
      * @param image the pre-multiplied Bitmap.
@@ -444,6 +468,7 @@ public class MapboxMap {
      * @return The current position of the Camera.
      */
     public final CameraPosition getCameraPosition() {
+        invalidCameraPosition = invalidCameraPosition || cameraPosition == null;
         if (invalidCameraPosition) {
             invalidateCameraPosition();
         }
@@ -482,17 +507,22 @@ public class MapboxMap {
      * @param callback the callback to be invoked when an animation finishes or is canceled
      */
     @UiThread
-    public final void moveCamera(CameraUpdate update, MapboxMap.CancelableCallback callback) {
-        cameraPosition = update.getCameraPosition(this);
-        mapView.resetTrackingModesIfRequired(cameraPosition);
-        mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
-        if (callback != null) {
-            callback.onFinish();
-        }
+    public final void moveCamera(final CameraUpdate update, final MapboxMap.CancelableCallback callback) {
+        mapView.post(new Runnable() {
+            @Override
+            public void run() {
+                cameraPosition = update.getCameraPosition(MapboxMap.this);
+                mapView.resetTrackingModesIfRequired(cameraPosition);
+                mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
+                if (callback != null) {
+                    callback.onFinish();
+                }
 
-        if (onCameraChangeListener != null) {
-            onCameraChangeListener.onCameraChange(this.cameraPosition);
-        }
+                if (onCameraChangeListener != null) {
+                    onCameraChangeListener.onCameraChange(cameraPosition);
+                }
+            }
+        });
     }
 
     /**
@@ -621,32 +651,36 @@ public class MapboxMap {
      * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
-    public final void easeCamera(
-            CameraUpdate update, int durationMs, boolean easingInterpolator, boolean resetTrackingMode, final MapboxMap.CancelableCallback callback) {
-        // dismiss tracking, moving camera is equal to a gesture
-        cameraPosition = update.getCameraPosition(this);
-        if (resetTrackingMode) {
-            mapView.resetTrackingModesIfRequired(cameraPosition);
-        }
+    public final void easeCamera(final CameraUpdate update, final int durationMs, final boolean easingInterpolator, final boolean resetTrackingMode, final MapboxMap.CancelableCallback callback) {
+        mapView.post(new Runnable() {
+            @Override
+            public void run() {
+                // dismiss tracking, moving camera is equal to a gesture
+                cameraPosition = update.getCameraPosition(MapboxMap.this);
+                if (resetTrackingMode) {
+                    mapView.resetTrackingModesIfRequired(cameraPosition);
+                }
 
-        mapView.easeTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
-                cameraPosition.zoom, easingInterpolator, new CancelableCallback() {
-                    @Override
-                    public void onCancel() {
-                        if (callback != null) {
-                            callback.onCancel();
-                        }
-                        invalidateCameraPosition();
-                    }
+                mapView.easeTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
+                        cameraPosition.zoom, easingInterpolator, new CancelableCallback() {
+                            @Override
+                            public void onCancel() {
+                                if (callback != null) {
+                                    callback.onCancel();
+                                }
+                                invalidateCameraPosition();
+                            }
 
-                    @Override
-                    public void onFinish() {
-                        if (callback != null) {
-                            callback.onFinish();
-                        }
-                        invalidateCameraPosition();
-                    }
-                });
+                            @Override
+                            public void onFinish() {
+                                if (callback != null) {
+                                    callback.onFinish();
+                                }
+                                invalidateCameraPosition();
+                            }
+                        });
+            }
+        });
     }
 
     /**
@@ -715,31 +749,36 @@ public class MapboxMap {
      * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
-    public final void animateCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
-        cameraPosition = update.getCameraPosition(this);
-        mapView.resetTrackingModesIfRequired(cameraPosition);
-        mapView.flyTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
-                cameraPosition.zoom, new CancelableCallback() {
-                    @Override
-                    public void onCancel() {
-                        if (callback != null) {
-                            callback.onCancel();
-                        }
-                        invalidateCameraPosition();
-                    }
+    public final void animateCamera(final CameraUpdate update, final int durationMs, final MapboxMap.CancelableCallback callback) {
+        mapView.post(new Runnable() {
+            @Override
+            public void run() {
+                cameraPosition = update.getCameraPosition(MapboxMap.this);
+                mapView.resetTrackingModesIfRequired(cameraPosition);
+                mapView.flyTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
+                        cameraPosition.zoom, new CancelableCallback() {
+                            @Override
+                            public void onCancel() {
+                                if (callback != null) {
+                                    callback.onCancel();
+                                }
+                                invalidateCameraPosition();
+                            }
 
-                    @Override
-                    public void onFinish() {
-                        if (onCameraChangeListener != null) {
-                            onCameraChangeListener.onCameraChange(cameraPosition);
-                        }
+                            @Override
+                            public void onFinish() {
+                                if (onCameraChangeListener != null) {
+                                    onCameraChangeListener.onCameraChange(cameraPosition);
+                                }
 
-                        if (callback != null) {
-                            callback.onFinish();
-                        }
-                        invalidateCameraPosition();
-                    }
-                });
+                                if (callback != null) {
+                                    callback.onFinish();
+                                }
+                                invalidateCameraPosition();
+                            }
+                        });
+            }
+        });
     }
 
     /**

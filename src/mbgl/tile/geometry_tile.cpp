@@ -57,11 +57,12 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
 }
 
 void GeometryTile::setPlacementConfig(const PlacementConfig& desiredConfig) {
-    if (placedConfig == desiredConfig) {
+    if (requestedConfig == desiredConfig) {
         return;
     }
 
     ++correlationID;
+    requestedConfig = desiredConfig;
     worker.invoke(&GeometryTileWorker::setPlacementConfig, desiredConfig, correlationID);
 }
 
@@ -112,7 +113,6 @@ void GeometryTile::onPlacement(PlacementResult result) {
         buckets[bucket.first] = std::move(bucket.second);
     }
     featureIndex->setCollisionTile(std::move(result.collisionTile));
-    placedConfig = result.placedConfig;
     observer->onTileChanged(*this);
 }
 

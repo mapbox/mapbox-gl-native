@@ -66,13 +66,13 @@ public:
 
     Source* getSource(const std::string& id) const;
     void addSource(std::unique_ptr<Source>);
-    void removeSource(const std::string& sourceID);
+    std::unique_ptr<Source> removeSource(const std::string& sourceID);
 
     std::vector<const Layer*> getLayers() const;
     Layer* getLayer(const std::string& id) const;
     Layer* addLayer(std::unique_ptr<Layer>,
                     optional<std::string> beforeLayerID = {});
-    void removeLayer(const std::string& layerID);
+    std::unique_ptr<Layer> removeLayer(const std::string& layerID);
 
     std::string getName() const;
     LatLng getDefaultLatLng() const;
@@ -143,7 +143,7 @@ private:
     void onLayerFilterChanged(Layer&) override;
     void onLayerVisibilityChanged(Layer&) override;
     void onLayerPaintPropertyChanged(Layer&) override;
-    void onLayerLayoutPropertyChanged(Layer&) override;
+    void onLayerLayoutPropertyChanged(Layer&, const char *) override;
 
     Observer nullObserver;
     Observer* observer = &nullObserver;

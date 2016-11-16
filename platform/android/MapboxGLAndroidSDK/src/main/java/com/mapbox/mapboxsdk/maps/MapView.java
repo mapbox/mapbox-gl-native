@@ -1220,10 +1220,15 @@ public class MapView extends FrameLayout {
         nativeMapView.removeAnnotations(ids);
     }
 
-    List<Marker> getMarkersInRect(@NonNull RectF rect) {
-        if (destroyed || rect == null) {
+    List<Marker> getMarkersInRect(@NonNull RectF rectangle) {
+        if (destroyed || rectangle == null) {
             return new ArrayList<>();
         }
+
+        RectF rect = new RectF(rectangle.left / screenDensity,
+                rectangle.top / screenDensity,
+                rectangle.right / screenDensity,
+                rectangle.bottom / screenDensity);
 
         long[] ids = nativeMapView.queryPointAnnotations(rect);
 
@@ -1248,13 +1253,18 @@ public class MapView extends FrameLayout {
     /**
      * Use to determine which {@link MarkerView}s are found within a given {@link RectF}
      *
-     * @param rect Holds four float coordinates for a rectangle.
+     * @param rectangle Holds four float coordinates for a rectangle.
      * @return The list of {@link MarkerView}s found within the provided {@link RectF}.
      */
-    public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rect) {
-        if (destroyed || rect == null) {
+    public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rectangle) {
+        if (destroyed || rectangle == null) {
             return new ArrayList<>();
         }
+
+        RectF rect = new RectF(rectangle.left / screenDensity,
+                rectangle.top / screenDensity,
+                rectangle.right / screenDensity,
+                rectangle.bottom / screenDensity);
 
         long[] ids = nativeMapView.queryPointAnnotations(rect);
 
@@ -1268,7 +1278,7 @@ public class MapView extends FrameLayout {
         int count = annotationList.size();
         for (int i = 0; i < count; i++) {
             Annotation annotation = annotationList.get(i);
-            if (annotation instanceof MarkerView) {
+            if (annotation instanceof MarkerView && idsList.contains(annotation.getId())) {
                 annotations.add((MarkerView) annotation);
             }
         }
@@ -1893,10 +1903,10 @@ public class MapView extends FrameLayout {
             float toleranceSides = 4 * screenDensity;
             float toleranceTopBottom = 10 * screenDensity;
 
-            RectF tapRect = new RectF((tapPoint.x - averageIconWidth / 2 - toleranceSides) / screenDensity,
-                    (tapPoint.y - averageIconHeight / 2 - toleranceTopBottom) / screenDensity,
-                    (tapPoint.x + averageIconWidth / 2 + toleranceSides) / screenDensity,
-                    (tapPoint.y + averageIconHeight / 2 + toleranceTopBottom) / screenDensity);
+            RectF tapRect = new RectF(tapPoint.x - averageIconWidth / 2 - toleranceSides,
+                    tapPoint.y - averageIconHeight / 2 - toleranceTopBottom,
+                    tapPoint.x + averageIconWidth / 2 + toleranceSides,
+                    tapPoint.y + averageIconHeight / 2 + toleranceTopBottom);
 
             List<Marker> nearbyMarkers = getMarkersInRect(tapRect);
             long newSelectedMarkerId = -1;
