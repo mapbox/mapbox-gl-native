@@ -2,6 +2,7 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/util/i18n.hpp>
+#include <mbgl/text/bidi.hpp>
 
 #include <cassert>
 
@@ -31,7 +32,7 @@ const std::map<uint32_t, SDFGlyph> &GlyphSet::getSDFs() const {
     return sdfs;
 }
 
-const Shaping GlyphSet::getShaping(const std::u16string &string, const float maxWidth,
+const Shaping GlyphSet::getShaping(const std::u16string &string, const WritingDirection writingDirection, const float maxWidth,
                                     const float lineHeight, const float horizontalAlign,
                                     const float verticalAlign, const float justify,
                                     const float spacing, const Point<float> &translate) const {
@@ -56,7 +57,7 @@ const Shaping GlyphSet::getShaping(const std::u16string &string, const float max
         return shaping;
 
     lineWrap(shaping, lineHeight, maxWidth, horizontalAlign, verticalAlign, justify, translate,
-             util::i18n::allowsIdeographicBreaking(string));
+             util::i18n::allowsIdeographicBreaking(string), writingDirection);
 
     return shaping;
 }
@@ -90,7 +91,9 @@ void justifyLine(std::vector<PositionedGlyph> &positionedGlyphs, const std::map<
 void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, float maxWidth,
                         const float horizontalAlign, const float verticalAlign,
                         const float justify, const Point<float> &translate,
-                        bool useBalancedIdeographicBreaking) const {
+                        bool useBalancedIdeographicBreaking, const WritingDirection writingDirection) const {
+    float lineFeedOffset = writingDirection == WritingDirection::RightToLeft ? -lineHeight : lineHeight;
+    
     uint32_t lastSafeBreak = 0;
 
     uint32_t lengthBeforeCurrentLine = 0;
@@ -112,7 +115,7 @@ void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, float maxWidth
             PositionedGlyph &shape = positionedGlyphs[i];
 
             shape.x -= lengthBeforeCurrentLine;
-            shape.y += lineHeight * line;
+            shape.y += lineFeedOffset * line;
 
             if (shape.x > maxWidth && lastSafeBreak > 0) {
 
@@ -120,7 +123,7 @@ void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, float maxWidth
                 maxLineLength = util::max(lineLength, maxLineLength);
 
                 for (uint32_t k = lastSafeBreak + 1; k <= i; k++) {
-                    positionedGlyphs[k].y += lineHeight;
+                    positionedGlyphs[k].y += lineFeedOffset;
                     positionedGlyphs[k].x -= lineLength;
                 }
 

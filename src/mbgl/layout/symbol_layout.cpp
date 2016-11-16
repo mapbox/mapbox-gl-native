@@ -92,7 +92,9 @@ SymbolLayout::SymbolLayout(std::string bucketName_,
                 u8string = platform::lowercase(u8string);
             }
 
-            ft.text = bidi.bidiTransform(util::utf8_to_utf16::convert(u8string));
+            std::u16string u16string = util::utf8_to_utf16::convert(u8string);
+            ft.text = bidi.bidiTransform(u16string);
+            ft.writingDirection = bidi.baseWritingDirection(u16string);
 
             // Loop through all characters of this text and collect unique codepoints.
             for (char16_t chr : *ft.text) {
@@ -196,6 +198,7 @@ void SymbolLayout::prepare(uintptr_t tileUID,
         if (feature.text) {
             shapedText = glyphSet->getShaping(
                 /* string */ *feature.text,
+                /* base direction of text */ *feature.writingDirection,
                 /* maxWidth: ems */ layout.symbolPlacement != SymbolPlacementType::Line ?
                     layout.textMaxWidth * 24 : 0,
                 /* lineHeight: ems */ layout.textLineHeight * 24,
