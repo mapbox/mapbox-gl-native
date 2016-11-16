@@ -33,5 +33,4 @@ if [ -f "${FILE}" ]; then
     fi
 else
     echo "* File '${FILE}' does not exist"
-    exit 1
 fi
