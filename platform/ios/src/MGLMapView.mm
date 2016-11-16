@@ -786,24 +786,6 @@ public:
                                  multiplier:1
                                    constant:5 + self.contentInset.right]];
 
-    UIImage *compassImage = self.compassView.image;
-    [self.compassViewConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:self
-                                  attribute:NSLayoutAttributeWidth
-                                  relatedBy:NSLayoutRelationEqual
-                                     toItem:nil
-                                  attribute:NSLayoutAttributeNotAnAttribute
-                                 multiplier:1
-                                   constant:compassImage.size.width]];
-
-    [self.compassViewConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:self.compassView
-                                  attribute:NSLayoutAttributeHeight
-                                  relatedBy:NSLayoutRelationEqual
-                                     toItem:nil
-                                  attribute:NSLayoutAttributeNotAnAttribute
-                                 multiplier:1
-                                   constant:compassImage.size.height]];
     [self addConstraints:self.compassViewConstraints];
 
     // logo bug
