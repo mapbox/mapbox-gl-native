@@ -292,7 +292,7 @@ void Map::Impl::update() {
 
 void Map::Impl::render(View& view) {
     if (!painter) {
-        painter = std::make_unique<Painter>(backend.getContext(), transform.getState());
+        painter = std::make_unique<Painter>(backend.getContext(), transform.getState(), pixelRatio);
     }
 
     FrameData frameData { timePoint,

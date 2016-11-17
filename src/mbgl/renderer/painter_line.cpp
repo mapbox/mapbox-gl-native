@@ -70,7 +70,6 @@ void Painter::renderLine(PaintParameters& parameters,
         draw(parameters.programs.linePattern,
              LinePatternProgram::uniformValues(
                  properties,
-                 frame.pixelRatio,
                  tile,
                  state,
                  *posA,
@@ -80,7 +79,6 @@ void Painter::renderLine(PaintParameters& parameters,
         draw(parameters.programs.line,
              LineProgram::uniformValues(
                  properties,
-                 frame.pixelRatio,
                  tile,
                  state));
     }

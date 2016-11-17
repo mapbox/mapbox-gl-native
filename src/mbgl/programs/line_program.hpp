@@ -23,9 +23,8 @@ class SpriteAtlasPosition;
 
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_ratio);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_linewidth);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_width);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_gapwidth);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_antialiasing);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_extra);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_offset);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_tex_y_a);
@@ -93,11 +92,10 @@ class LineProgram : public Program<
     gl::Uniforms<
         uniforms::u_matrix,
         uniforms::u_opacity,
-        uniforms::u_linewidth,
+        uniforms::u_width,
         uniforms::u_gapwidth,
         uniforms::u_blur,
         uniforms::u_offset,
-        uniforms::u_antialiasing,
         uniforms::u_antialiasingmatrix,
         uniforms::u_ratio,
         uniforms::u_extra,
@@ -107,7 +105,6 @@ public:
     using Program::Program;
 
     static UniformValues uniformValues(const style::LinePaintProperties&,
-                                       float pixelRatio,
                                        const RenderTile&,
                                        const TransformState&);
 };
@@ -119,11 +116,10 @@ class LinePatternProgram : public Program<
     gl::Uniforms<
         uniforms::u_matrix,
         uniforms::u_opacity,
-        uniforms::u_linewidth,
+        uniforms::u_width,
         uniforms::u_gapwidth,
         uniforms::u_blur,
         uniforms::u_offset,
-        uniforms::u_antialiasing,
         uniforms::u_antialiasingmatrix,
         uniforms::u_ratio,
         uniforms::u_extra,
@@ -140,7 +136,6 @@ public:
     using Program::Program;
 
     static UniformValues uniformValues(const style::LinePaintProperties&,
-                                       float pixelRatio,
                                        const RenderTile&,
                                        const TransformState&,
                                        const SpriteAtlasPosition& posA,
@@ -154,11 +149,10 @@ class LineSDFProgram : public Program<
     gl::Uniforms<
         uniforms::u_matrix,
         uniforms::u_opacity,
-        uniforms::u_linewidth,
+        uniforms::u_width,
         uniforms::u_gapwidth,
         uniforms::u_blur,
         uniforms::u_offset,
-        uniforms::u_antialiasing,
         uniforms::u_antialiasingmatrix,
         uniforms::u_ratio,
         uniforms::u_extra,

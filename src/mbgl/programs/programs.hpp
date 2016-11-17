@@ -7,26 +7,27 @@
 #include <mbgl/programs/symbol_program.hpp>
 #include <mbgl/programs/debug_program.hpp>
 #include <mbgl/programs/collision_box_program.hpp>
+#include <mbgl/programs/program_parameters.hpp>
 
 namespace mbgl {
 
 class Programs {
 public:
-    Programs(gl::Context& context, ProgramDefines defines = ProgramDefines::None)
-        : circle(context, defines),
-          fill(context, defines),
-          fillPattern(context, defines),
-          fillOutline(context, defines),
-          fillOutlinePattern(context, defines),
-          line(context, defines),
-          lineSDF(context, defines),
-          linePattern(context, defines),
-          raster(context, defines),
-          symbolIcon(context, defines),
-          symbolIconSDF(context, defines),
-          symbolGlyph(context, defines),
-          debug(context, ProgramDefines::None),
-          collisionBox(context, ProgramDefines::None) {
+    Programs(gl::Context& context, const ProgramParameters& programParameters)
+        : circle(context, programParameters),
+          fill(context, programParameters),
+          fillPattern(context, programParameters),
+          fillOutline(context, programParameters),
+          fillOutlinePattern(context, programParameters),
+          line(context, programParameters),
+          lineSDF(context, programParameters),
+          linePattern(context, programParameters),
+          raster(context, programParameters),
+          symbolIcon(context, programParameters),
+          symbolIconSDF(context, programParameters),
+          symbolGlyph(context, programParameters),
+          debug(context, ProgramParameters(programParameters.pixelRatio, false)),
+          collisionBox(context, ProgramParameters(programParameters.pixelRatio, false)) {
     }
 
     CircleProgram circle;
