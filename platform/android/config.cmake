@@ -67,6 +67,8 @@ macro(mbgl_platform_core)
 
     target_compile_options(mbgl-core
         PRIVATE -fvisibility=hidden
+        PRIVATE -ffunction-sections
+        PRIVATE -fdata-sections
         PRIVATE -Os
     )
 
@@ -78,6 +80,7 @@ macro(mbgl_platform_core)
         PUBLIC -lstdc++
         PUBLIC -latomic
         PUBLIC -lz
+        PUBLIC -Wl,--gc-sections
     )
 endmacro()
 
@@ -148,11 +151,14 @@ target_add_mason_package(mapbox-gl PUBLIC rapidjson)
 
 target_compile_options(mapbox-gl
     PRIVATE -fvisibility=hidden
+    PRIVATE -ffunction-sections
+    PRIVATE -fdata-sections
     PRIVATE -Os
 )
 
 target_link_libraries(mapbox-gl
     PUBLIC mbgl-core
+    PUBLIC -Wl,--gc-sections
 )
 
 add_library(example-custom-layer SHARED
@@ -161,11 +167,14 @@ add_library(example-custom-layer SHARED
 
 target_compile_options(example-custom-layer
     PRIVATE -fvisibility=hidden
+    PRIVATE -ffunction-sections
+    PRIVATE -fdata-sections
     PRIVATE -Os
 )
 
 target_link_libraries(example-custom-layer
     PRIVATE mbgl-core
+    PUBLIC -Wl,--gc-sections
 )
 
 set(ANDROID_SDK_PROJECT_DIR ${CMAKE_SOURCE_DIR}/platform/android/MapboxGLAndroidSDK)
