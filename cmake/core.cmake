@@ -45,6 +45,7 @@ target_add_mason_package(mbgl-core PRIVATE supercluster)
 target_add_mason_package(mbgl-core PRIVATE kdbush)
 target_add_mason_package(mbgl-core PRIVATE earcut)
 target_add_mason_package(mbgl-core PRIVATE protozero)
+target_add_mason_package(mbgl-core PRIVATE icu)
 
 mbgl_platform_core()
 

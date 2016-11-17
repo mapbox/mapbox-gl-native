@@ -360,6 +360,8 @@ set(MBGL_CORE_FILES
     src/mbgl/text/quads.hpp
     src/mbgl/text/shaping.cpp
     src/mbgl/text/shaping.hpp
+    src/mbgl/text/bidi.cpp
+    src/mbgl/text/bidi.hpp
 
     # tile
     src/mbgl/tile/geojson_tile.cpp
