@@ -47,14 +47,11 @@ TEST(Annotations, SymbolAnnotation) {
 
     auto size = test.view.size;
     auto screenBox = ScreenBox { {}, { double(size.width), double(size.height) } };
-    auto features = test.map.queryPointAnnotations(screenBox);
-    EXPECT_EQ(features.size(), 1u);
-
-    test.map.setZoom(test.map.getMaxZoom());
-    test.checkRendering("point_annotation");
-
-    features = test.map.queryPointAnnotations(screenBox);
-    EXPECT_EQ(features.size(), 1u);
+    for (uint8_t zoom = test.map.getMinZoom(); zoom <= test.map.getMaxZoom(); ++zoom) {
+        test.map.setZoom(zoom);
+        test.checkRendering("point_annotation");
+        EXPECT_EQ(test.map.queryPointAnnotations(screenBox).size(), 1u);
+    }
 }
 
 TEST(Annotations, LineAnnotation) {
