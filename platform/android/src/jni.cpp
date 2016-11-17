@@ -471,8 +471,7 @@ void nativeMoveBy(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdoubl
                           jlong duration) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    mbgl::ScreenCoordinate center(dx, dy);
-    nativeMapView->getMap().moveBy(center, mbgl::Milliseconds(duration));
+    nativeMapView->getMap().moveBy({dx, dy}, mbgl::Milliseconds(duration));
 }
 
 void nativeSetLatLng(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdouble latitude, jdouble longitude, jlong duration) {
