@@ -20,6 +20,8 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/log.hpp>
 
+#include <mbgl/text/bidi.hpp>
+
 namespace mbgl {
 
 using namespace style;
@@ -90,7 +92,7 @@ SymbolLayout::SymbolLayout(std::string bucketName_,
                 u8string = platform::lowercase(u8string);
             }
 
-            ft.text = util::utf8_to_utf16::convert( u8string );
+            ft.text = bidi.bidiTransform(util::utf8_to_utf16::convert(u8string));
 
             // Loop through all characters of this text and collect unique codepoints.
             for (char16_t chr : *ft.text) {

@@ -4,6 +4,7 @@
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/layout/symbol_feature.hpp>
 #include <mbgl/layout/symbol_instance.hpp>
+#include <mbgl/text/bidi.hpp>
 
 #include <memory>
 #include <map>
@@ -91,6 +92,8 @@ private:
     GlyphRangeSet ranges;
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
+    
+    BiDi bidi; // Consider moving this up to geometry tile worker to reduce reinstantiation costs; use of BiDi/ubiditransform object must be constrained to one thread
 };
 
 } // namespace mbgl
