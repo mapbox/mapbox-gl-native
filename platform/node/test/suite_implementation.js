@@ -74,8 +74,12 @@ module.exports = function (style, options, callback) {
             // Ensure that the next `map.render(options)` does not overwrite this change.
             if (operation[0] === 'setCenter') {
                 options.center = operations[1];
+            } else if (operation[0] === 'setZoom') {
+                options.zoom = operations[1];
             } else if (operation[0] === 'setBearing') {
                 options.bearing = operations[1];
+            } else if (operation[0] === 'setPitch') {
+                options.pitch = operations[1];
             }
 
             map[operation[0]].apply(map, operation.slice(1));

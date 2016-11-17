@@ -62,7 +62,9 @@ void NodeMap::Init(v8::Local<v8::Object> target) {
     Nan::SetPrototypeMethod(tpl, "setPaintProperty", SetPaintProperty);
     Nan::SetPrototypeMethod(tpl, "setFilter", SetFilter);
     Nan::SetPrototypeMethod(tpl, "setCenter", SetCenter);
+    Nan::SetPrototypeMethod(tpl, "setZoom", SetZoom);
     Nan::SetPrototypeMethod(tpl, "setBearing", SetBearing);
+    Nan::SetPrototypeMethod(tpl, "setPitch", SetPitch);
 
     Nan::SetPrototypeMethod(tpl, "dumpDebugLogs", DumpDebugLogs);
     Nan::SetPrototypeMethod(tpl, "queryRenderedFeatures", QueryRenderedFeatures);
@@ -725,6 +727,23 @@ void NodeMap::SetCenter(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     info.GetReturnValue().SetUndefined();
 }
 
+void NodeMap::SetZoom(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+
+    if (info.Length() <= 0 || !info[0]->IsNumber()) {
+        return Nan::ThrowTypeError("First argument must be a number");
+    }
+
+    try {
+        nodeMap->map->setZoom(info[0]->NumberValue());
+    } catch (const std::exception &ex) {
+        return Nan::ThrowError(ex.what());
+    }
+
+    info.GetReturnValue().SetUndefined();
+}
+
 void NodeMap::SetBearing(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
@@ -735,6 +754,23 @@ void NodeMap::SetBearing(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     try {
         nodeMap->map->setBearing(info[0]->NumberValue());
+    } catch (const std::exception &ex) {
+        return Nan::ThrowError(ex.what());
+    }
+
+    info.GetReturnValue().SetUndefined();
+}
+
+void NodeMap::SetPitch(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+
+    if (info.Length() <= 0 || !info[0]->IsNumber()) {
+        return Nan::ThrowTypeError("First argument must be a number");
+    }
+
+    try {
+        nodeMap->map->setPitch(info[0]->NumberValue());
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }
