@@ -67,6 +67,14 @@ workflows:
             export BUILDTYPE=Debug
             make android-lib-arm-v7
     - script:
+        title: Compile Core tests
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - content: |-
+            #!/bin/bash
+            echo "Compiling core tests:"
+            BUILDTYPE=Debug make android-test-lib-arm-v7
+    - script:
         title: Run local JVM Unit tests
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
