@@ -55,7 +55,7 @@ public:
 
 private:
     void addFeature(const SymbolFeature&,
-                    const Shaping& shapedText,
+                    const std::pair<Shaping, Shaping>& shapedTextOrientations,
                     const PositionedIcon& shapedIcon,
                     const GlyphPositions& face);
 
@@ -67,7 +67,8 @@ private:
     // Adds placed items to the buffer.
     template <typename Buffer>
     void addSymbols(Buffer&, const SymbolQuads&, float scale,
-                    const bool keepUpright, const style::SymbolPlacementType, const float placementAngle);
+                    const bool keepUpright, const style::SymbolPlacementType, const float placementAngle,
+                    WritingModeType writingModes);
 
     const std::string sourceLayerName;
     const std::string bucketName;
