@@ -1,0 +1,96 @@
+<html>
+<head>
+<title>Mapbox GL Binary Size</title>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+var data;
+google.charts.load('current', {'packages': ['corechart']});
+google.charts.setOnLoadCallback(function() {
+    var platforms = [
+        { 'platform': 'iOS', 'arch': 'armv7' },
+        { 'platform': 'iOS', 'arch': 'arm64' },
+        { 'platform': 'macOS', 'arch': 'x86_64' },
+        { 'platform': 'Android', 'arch': 'arm-v5' },
+        { 'platform': 'Android', 'arch': 'arm-v7' },
+        { 'platform': 'Android', 'arch': 'arm-v8' },
+        { 'platform': 'Android', 'arch': 'x86' },
+        { 'platform': 'Android', 'arch': 'x86-64' },
+        { 'platform': 'Android', 'arch': 'mips' },
+    ];
+
+    data = new google.visualization.DataTable();
+    data.addColumn('datetime', 'Date');
+    platforms.forEach(function(item) {
+        data.addColumn('number', item.platform + '/' + item.arch);
+    });
+
+    var dateFormatter = new google.visualization.DateFormat({formatType: 'long'});
+    var byteFormatter = new google.visualization.NumberFormat({pattern:'###,### bytes'});
+
+    function addDataset(platform, arch, index) {
+        getLogs(platform, arch, function(err, json) {
+            if (err) throw err;
+            for (var i = 0; i < json.Datapoints.length; i++) {
+                var item = json.Datapoints[i];
+                var row = [new Date(item.Timestamp)];
+                for (var j = 0; j < platforms.length; j++) {
+                    if (j == index) {
+                        row.push(item.Maximum);
+                    } else {
+                        row.push(null);
+                    }
+                }
+                data.addRow(row);
+            }
+
+            data.sort([{column: 0}]);
+
+            drawChart();
+        });
+    }
+
+    platforms.forEach(function(item, index) {
+        addDataset(item.platform, item.arch, index);
+    });
+});
+
+function drawChart() {
+    var options = {
+        title: 'Mapbox GL Binary size',
+        chartArea: {height: '90%'},
+        interpolateNulls: true
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('chart'));
+    chart.draw(data, options);
+}
+
+function getLogs(platform, arch, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'https://mapbox.s3.amazonaws.com/mapbox-gl-native/metrics/binary-size/Platform=' + platform + ',Arch=' + arch + '.json', true);
+    xhr.onload = function() {
+        if (xhr.status == 200) {
+            try {
+                var logs = JSON.parse(xhr.responseText);
+            } catch(err) {
+                callback(err);
+                return;
+            }
+            callback(null, logs);
+        } else {
+            callback(new Error(xhr.responseText));
+        }
+    };
+    xhr.onerror = function() {
+        callback(new Error(xhr.responseText));
+    };
+    xhr.send();
+}
+</script>
+</head>
+
+<body>
+<div id="chart" style="height:100%"></div>
+</body>
+</html>
+
