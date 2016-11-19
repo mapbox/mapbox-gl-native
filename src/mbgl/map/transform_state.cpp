@@ -199,7 +199,7 @@ bool TransformState::isGestureInProgress() const {
 #pragma mark - Projection
 
 double TransformState::zoomScale(double zoom) const {
-    return std::pow(2.0f, zoom);
+    return std::pow(2.0, zoom);
 }
 
 double TransformState::scaleZoom(double s) const {
