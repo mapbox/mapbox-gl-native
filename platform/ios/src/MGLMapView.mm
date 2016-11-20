@@ -2269,8 +2269,6 @@ public:
 
 - (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate edgePadding:(UIEdgeInsets)insets zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
-    _mbglMap->cancelTransitions();
-
     mbgl::CameraOptions cameraOptions;
     cameraOptions.center = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
     cameraOptions.padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
@@ -2297,6 +2295,20 @@ public:
             });
         };
     }
+    
+    MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
+    if ([self.camera isEqualToMapCamera:camera])
+    {
+        if (completion)
+        {
+            [self animateWithDelay:duration animations:^{
+                completion();
+            }];
+        }
+        return;
+    }
+    
+    _mbglMap->cancelTransitions();
     _mbglMap->easeTo(cameraOptions, animationOptions);
 }
 
@@ -2415,9 +2427,6 @@ public:
 
 - (void)_setVisibleCoordinates:(const CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
-    _mbglMap->cancelTransitions();
-
-    [self willChangeValueForKey:@"visibleCoordinateBounds"];
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     std::vector<mbgl::LatLng> latLngs;
@@ -2447,6 +2456,21 @@ public:
             });
         };
     }
+    
+    MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
+    if ([self.camera isEqualToMapCamera:camera])
+    {
+        if (completion)
+        {
+            [self animateWithDelay:duration animations:^{
+                completion();
+            }];
+        }
+        return;
+    }
+    
+    [self willChangeValueForKey:@"visibleCoordinateBounds"];
+    _mbglMap->cancelTransitions();
     _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"visibleCoordinateBounds"];
 }
@@ -2532,13 +2556,6 @@ public:
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
-    _mbglMap->cancelTransitions();
-    if ([self.camera isEqual:camera])
-    {
-        return;
-    }
-
-    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:self.contentInset];
     mbgl::AnimationOptions animationOptions;
     if (duration > 0)
     {
@@ -2553,8 +2570,21 @@ public:
             });
         };
     }
+    
+    if ([self.camera isEqualToMapCamera:camera])
+    {
+        if (completion)
+        {
+            [self animateWithDelay:duration animations:^{
+                completion();
+            }];
+        }
+        return;
+    }
 
     [self willChangeValueForKey:@"camera"];
+    _mbglMap->cancelTransitions();
+    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:self.contentInset];
     _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"camera"];
 }
@@ -2576,13 +2606,6 @@ public:
 
 - (void)_flyToCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)insets withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion
 {
-    _mbglMap->cancelTransitions();
-    if ([self.camera isEqual:camera])
-    {
-        return;
-    }
-
-    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:insets];
     mbgl::AnimationOptions animationOptions;
     if (duration >= 0)
     {
@@ -2603,8 +2626,21 @@ public:
             });
         };
     }
+    
+    if ([self.camera isEqualToMapCamera:camera])
+    {
+        if (completion)
+        {
+            [self animateWithDelay:duration animations:^{
+                completion();
+            }];
+        }
+        return;
+    }
 
     [self willChangeValueForKey:@"camera"];
+    _mbglMap->cancelTransitions();
+    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:insets];
     _mbglMap->flyTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"camera"];
 }
