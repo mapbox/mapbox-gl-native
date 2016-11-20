@@ -20,8 +20,6 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/logging.hpp>
 
-#include <mbgl/text/bidi.hpp>
-
 namespace mbgl {
 
 using namespace style;
@@ -92,9 +90,7 @@ SymbolLayout::SymbolLayout(std::string bucketName_,
                 u8string = platform::lowercase(u8string);
             }
 
-            std::u16string u16string = util::utf8_to_utf16::convert(u8string);
-            ft.text = bidi.bidiTransform(u16string);
-            ft.writingDirection = bidi.baseWritingDirection(u16string);
+            ft.text = applyArabicShaping(util::utf8_to_utf16::convert(u8string));
 
             // Loop through all characters of this text and collect unique codepoints.
             for (char16_t chr : *ft.text) {
@@ -198,7 +194,6 @@ void SymbolLayout::prepare(uintptr_t tileUID,
         if (feature.text) {
             shapedText = glyphSet->getShaping(
                 /* string */ *feature.text,
-                /* base direction of text */ *feature.writingDirection,
                 /* maxWidth: ems */ layout.get<SymbolPlacement>() != SymbolPlacementType::Line ?
                     layout.get<TextMaxWidth>() * 24 : 0,
                 /* lineHeight: ems */ layout.get<TextLineHeight>() * 24,
@@ -206,7 +201,8 @@ void SymbolLayout::prepare(uintptr_t tileUID,
                 /* verticalAlign */ verticalAlign,
                 /* justify */ justify,
                 /* spacing: ems */ layout.get<TextLetterSpacing>() * 24,
-                /* translate */ Point<float>(layout.get<TextOffset>()[0], layout.get<TextOffset>()[1]));
+                /* translate */ Point<float>(layout.get<TextOffset>()[0], layout.get<TextOffset>()[1]),
+                /* bidirectional algorithm object */ bidi);
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shapedText) {

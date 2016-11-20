@@ -1,25 +1,47 @@
 #pragma once
 
+#include <set>
 #include <string>
+#include <vector>
 
 #include <mbgl/util/noncopyable.hpp>
 
-struct UBiDiTransform;
+struct UBiDi;
 
 namespace mbgl {
-    
-enum class WritingDirection : bool { LeftToRight, RightToLeft };    
-    
+
+class BiDi;
+
+std::u16string applyArabicShaping(const std::u16string&);
+
+class ProcessedBiDiText {
+public:
+    ProcessedBiDiText(BiDi&);
+
+    std::vector<std::u16string> applyLineBreaking(std::set<int32_t>);
+
+private:
+    void mergeParagraphLineBreaks(std::set<int32_t>&);
+
+    BiDi& bidi;
+};
+
 class BiDi : private util::noncopyable {
 public:
     BiDi();
     ~BiDi();
 
-    std::u16string bidiTransform(const std::u16string&);
-    WritingDirection baseWritingDirection(const std::u16string&);
+    // Calling processText resets internal state, invalidating any existing ProcessedBiDiText
+    // objects
+    ProcessedBiDiText processText(const std::u16string&);
+
+    friend class ProcessedBiDiText;
 
 private:
-    UBiDiTransform* transform;
+    std::u16string getLine(int32_t start, int32_t end);
+
+    UBiDi* bidiText;
+    UBiDi* bidiLine;
 };
 
 } // end namespace mbgl

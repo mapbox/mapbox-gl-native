@@ -6,9 +6,6 @@ namespace mbgl {
 namespace util {
 namespace i18n {
 
-/** Returns whether a character is a visible character. */
-bool isVisible(uint16_t chr);
-
 /** Returns whether a line break can be inserted after the character indicated
     by the given Unicode codepoint due to word breaking. */
 bool allowsWordBreaking(uint16_t chr);
