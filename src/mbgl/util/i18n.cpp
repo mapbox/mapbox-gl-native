@@ -294,12 +294,6 @@ namespace mbgl {
 namespace util {
 namespace i18n {
 
-bool isVisible(uint16_t chr) {
-    return (chr == 0x0a    /* newline */
-            || chr == 0x20 /* space */
-            || chr == 0x200b /* zero-width space */);
-}
-
 bool allowsWordBreaking(uint16_t chr) {
     return (chr == 0x0a      /* newline */
             || chr == 0x20   /* space */
@@ -324,6 +318,10 @@ bool allowsIdeographicBreaking(const std::u16string& string) {
 }
 
 bool allowsIdeographicBreaking(uint16_t chr) {
+    // Allow U+2027 "Interpunct" for hyphenation of Chinese words
+    if (chr == 0x2027)
+        return true;
+
     // Return early for characters outside all ideographic ranges.
     if (chr < 0x2E80)
         return false;
