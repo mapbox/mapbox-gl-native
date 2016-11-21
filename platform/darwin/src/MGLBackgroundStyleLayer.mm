@@ -70,16 +70,6 @@
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
 }
 
-- (void)setBackgroundPattern:(MGLStyleValue<NSString *> *)backgroundPattern {
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(backgroundPattern);
-    _rawLayer->setBackgroundPattern(mbglValue);
-}
-
-- (MGLStyleValue<NSString *> *)backgroundPattern {
-    auto propertyValue = _rawLayer->getBackgroundPattern() ?: _rawLayer->getDefaultBackgroundPattern();
-    return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
-}
-
 - (void)setBackgroundOpacity:(MGLStyleValue<NSNumber *> *)backgroundOpacity {
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(backgroundOpacity);
     _rawLayer->setBackgroundOpacity(mbglValue);
@@ -88,6 +78,16 @@
 - (MGLStyleValue<NSNumber *> *)backgroundOpacity {
     auto propertyValue = _rawLayer->getBackgroundOpacity() ?: _rawLayer->getDefaultBackgroundOpacity();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+}
+
+- (void)setBackgroundPattern:(MGLStyleValue<NSString *> *)backgroundPattern {
+    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(backgroundPattern);
+    _rawLayer->setBackgroundPattern(mbglValue);
+}
+
+- (MGLStyleValue<NSString *> *)backgroundPattern {
+    auto propertyValue = _rawLayer->getBackgroundPattern() ?: _rawLayer->getDefaultBackgroundPattern();
+    return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 
 

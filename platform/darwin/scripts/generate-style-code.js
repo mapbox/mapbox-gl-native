@@ -4,10 +4,19 @@ const fs = require('fs');
 const ejs = require('ejs');
 const _ = require('lodash');
 const colorParser = require('csscolorparser');
-const spec = _.merge(require('mapbox-gl-style-spec').latest, require('./style-spec-overrides-v8.json'));
-
+const cocoaConventions = require('./style-spec-cocoa-conventions-v8.json');
+let spec = _.merge(require('mapbox-gl-style-spec').latest, require('./style-spec-overrides-v8.json'));
 const prefix = 'MGL';
 const suffix = 'StyleLayer';
+
+// Rename properties and keep `original` for use with setters and getters
+_.forOwn(cocoaConventions, function (properties, kind) {
+    _.forOwn(properties, function (newName, oldName) {
+        spec[kind][newName] = spec[kind][oldName];
+        spec[kind][newName].original = oldName;
+        delete spec[kind][oldName];
+    })
+});
 
 global.camelize = function (str) {
     return str.replace(/(?:^|-)(.)/g, function (_, x) {
@@ -212,6 +221,10 @@ global.propertyDefault = function (property, layerType) {
     return 'an `MGLStyleValue` object containing ' + describeValue(property.default, property, layerType);
 };
 
+global.originalPropertyName = function (property) {
+    return property.original || property.name;
+}
+
 global.propertyType = function (property) {
     switch (property.type) {
         case 'boolean':
@@ -321,8 +334,8 @@ const layers = Object.keys(spec.layer.type.values).map((type) => {
 
     return {
         type: type,
-        layoutProperties: layoutProperties,
-        paintProperties: paintProperties,
+        layoutProperties: _.sortBy(layoutProperties, ['name']),
+        paintProperties: _.sortBy(paintProperties, ['name']),
         layoutPropertiesByName: spec[`layout_${type}`],
         paintPropertiesByName: spec[`paint_${type}`],
     };

@@ -39,16 +39,16 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 
 /**
- Name of image in style images to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *backgroundPattern;
-
-/**
  The opacity at which the background will be drawn.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *backgroundOpacity;
+
+/**
+ Name of image in style images to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *backgroundPattern;
 
 @end
 

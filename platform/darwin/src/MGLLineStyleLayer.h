@@ -107,11 +107,13 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
 #pragma mark - Accessing the Paint Attributes
 
 /**
- The opacity at which the line will be drawn.
+ Blur applied to the line, in points.
+
+ This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineOpacity;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineBlur;
 
 #if TARGET_OS_IPHONE
 /**
@@ -132,6 +134,45 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *lineColor;
 #endif
+
+/**
+ Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to points, multiply the length by the current line width.
+
+ This property is measured in line widths.
+
+ This property is only applied to the style if `linePattern` is set to `nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDasharray;
+
+/**
+ Draws a line casing outside of a line's actual path. Value indicates the width of the inner gap.
+
+ This property is measured in points.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineGapWidth;
+
+/**
+ The line's offset. For linear features, a positive value offsets the line to the right, relative to the direction of the line, and a negative value to the left. For polygon features, a positive value results in an inset, and a negative value results in an outset.
+
+ This property is measured in points.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineOffset;
+
+/**
+ The opacity at which the line will be drawn.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineOpacity;
+
+/**
+ Name of image in style images to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512).
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *linePattern;
 
 /**
  The geometry's offset.
@@ -159,47 +200,6 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineWidth;
-
-/**
- Draws a line casing outside of a line's actual path. Value indicates the width of the inner gap.
-
- This property is measured in points.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineGapWidth;
-
-/**
- The line's offset. For linear features, a positive value offsets the line to the right, relative to the direction of the line, and a negative value to the left. For polygon features, a positive value results in an inset, and a negative value results in an outset.
-
- This property is measured in points.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineOffset;
-
-/**
- Blur applied to the line, in points.
-
- This property is measured in points.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineBlur;
-
-/**
- Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to points, multiply the length by the current line width.
-
- This property is measured in line widths.
-
- This property is only applied to the style if `linePattern` is set to `nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDasharray;
-
-/**
- Name of image in style images to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512).
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *linePattern;
 
 @end
 
