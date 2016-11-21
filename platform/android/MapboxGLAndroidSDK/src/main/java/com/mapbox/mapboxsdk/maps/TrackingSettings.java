@@ -199,7 +199,7 @@ public class TrackingSettings {
         //    The user settings are enabled AND;
         //    EITHER bearing tracking is dismissed on gesture OR there is no bearing tracking
         return uiSettings.isRotateGesturesEnabled() &&
-                (dismissBearingTrackingOnGesture || myBearingTrackingMode == MyBearingTracking.NONE);
+                (dismissBearingTrackingOnGesture || myBearingTrackingMode == MyBearingTracking.NONE || (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE));
     }
 
     /**

@@ -50,7 +50,7 @@ public:
         // Squelch logging.
         Log::setObserver(std::make_unique<Log::NullObserver>());
 
-        transform.resize({{ 512, 512 }});
+        transform.resize({ 512, 512 });
         transform.setLatLngZoom({0, 0}, 0);
 
         transformState = transform.getState();

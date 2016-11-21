@@ -6,6 +6,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/mat4.hpp>
+#include <mbgl/util/size.hpp>
 
 #include <cstdint>
 #include <array>
@@ -26,8 +27,7 @@ public:
     void getProjMatrix(mat4& matrix) const;
 
     // Dimensions
-    uint16_t getWidth() const;
-    uint16_t getHeight() const;
+    Size getSize() const;
 
     // North Orientation
     NorthOrientation getNorthOrientation() const;
@@ -84,7 +84,7 @@ private:
     NorthOrientation orientation = NorthOrientation::Upwards;
 
     // logical dimensions
-    uint16_t width = 0, height = 0;
+    Size size;
 
     mat4 coordinatePointMatrix(double z) const;
     mat4 getPixelMatrix() const;

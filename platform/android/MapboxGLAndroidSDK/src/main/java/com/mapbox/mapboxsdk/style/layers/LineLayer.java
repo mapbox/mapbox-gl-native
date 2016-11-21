@@ -42,7 +42,6 @@ public class LineLayer extends Layer {
      * @param sourceLayer the source layer to set
      */
     public void setSourceLayer(String sourceLayer) {
-        checkValidity();
         nativeSetSourceLayer(sourceLayer);
     }
 
@@ -62,7 +61,6 @@ public class LineLayer extends Layer {
      * @param filter the filter to set
      */
     public void setFilter(Filter.Statement filter) {
-        checkValidity();
         this.setFilter(filter.toArray());
     }
 
@@ -72,7 +70,6 @@ public class LineLayer extends Layer {
      * @param filter the filter array to set
      */
     public void setFilter(Object[] filter) {
-        checkValidity();
         nativeSetFilter(filter);
     }
 
@@ -119,7 +116,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getLineCap() {
-        checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetLineCap());
     }
  
@@ -130,7 +126,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getLineJoin() {
-        checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetLineJoin());
     }
  
@@ -141,7 +136,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getLineMiterLimit() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetLineMiterLimit());
     }
  
@@ -152,7 +146,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getLineRoundLimit() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetLineRoundLimit());
     }
  
@@ -163,7 +156,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getLineOpacity() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetLineOpacity());
     }
  
@@ -174,7 +166,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getLineColor() {
-        checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetLineColor());
     }
      /**
@@ -185,7 +176,6 @@ public class LineLayer extends Layer {
      */
     @ColorInt
     public int getLineColorAsInt() {
-        checkValidity();
         PropertyValue<String> value = getLineColor();
         if (value.isValue()) {
             return rgbaToColor(value.getValue());
@@ -202,7 +192,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float[]> getLineTranslate() {
-        checkValidity();
         return (PropertyValue<Float[]>) new PropertyValue(nativeGetLineTranslate());
     }
  
@@ -213,7 +202,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getLineTranslateAnchor() {
-        checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetLineTranslateAnchor());
     }
  
@@ -224,7 +212,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getLineWidth() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetLineWidth());
     }
  
@@ -235,7 +222,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getLineGapWidth() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetLineGapWidth());
     }
  
@@ -246,7 +232,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getLineOffset() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetLineOffset());
     }
  
@@ -257,7 +242,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getLineBlur() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetLineBlur());
     }
  
@@ -268,7 +252,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float[]> getLineDasharray() {
-        checkValidity();
         return (PropertyValue<Float[]>) new PropertyValue(nativeGetLineDasharray());
     }
  
@@ -279,7 +262,6 @@ public class LineLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getLinePattern() {
-        checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetLinePattern());
     }
  

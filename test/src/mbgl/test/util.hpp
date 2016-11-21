@@ -52,6 +52,7 @@
 namespace mbgl {
 
 class Map;
+class OffscreenView;
 
 namespace test {
 
@@ -64,7 +65,7 @@ private:
     int fd = -1;
 };
 
-PremultipliedImage render(Map&);
+PremultipliedImage render(Map&, OffscreenView&);
 
 void checkImage(const std::string& base,
                 const PremultipliedImage& actual,
