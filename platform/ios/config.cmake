@@ -6,6 +6,7 @@ macro(mbgl_platform_core)
     set_xcode_property(mbgl-core BITCODE_GENERATION_MODE bitcode)
     set_xcode_property(mbgl-core ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
     set_xcode_property(mbgl-core GCC_SYMBOLS_PRIVATE_EXTERN YES)
+    set_xcode_property(mbgl-core LLVM_LTO $<$<CONFIG:Release>:YES>)
 
     target_sources(mbgl-core
         # Loop
