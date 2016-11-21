@@ -6,6 +6,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/programs/debug_program.hpp>
 
 namespace mbgl {
@@ -32,8 +33,9 @@ public:
     const optional<Timestamp> expires;
     const MapDebugOptions debugMode;
 
-    gl::VertexBuffer<DebugVertex, gl::Lines> vertexBuffer;
     gl::SegmentVector<DebugAttributes> segments;
+    optional<gl::VertexBuffer<DebugVertex>> vertexBuffer;
+    optional<gl::IndexBuffer<gl::Lines>> indexBuffer;
 };
 
 } // namespace mbgl

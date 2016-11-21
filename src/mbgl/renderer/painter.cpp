@@ -42,31 +42,34 @@ namespace mbgl {
 
 using namespace style;
 
-static gl::VertexVector<FillVertex, gl::Triangles> tileTriangles() {
-    gl::VertexVector<FillVertex, gl::Triangles> result;
-    result.emplace_back(
-            FillAttributes::vertex({ 0,            0 }),
-            FillAttributes::vertex({ util::EXTENT, 0 }),
-            FillAttributes::vertex({ 0, util::EXTENT }));
-    result.emplace_back(
-            FillAttributes::vertex({ util::EXTENT, 0 }),
-            FillAttributes::vertex({ 0, util::EXTENT }),
-            FillAttributes::vertex({ util::EXTENT, util::EXTENT }));
-    return result;
-}
-
-static gl::VertexVector<FillVertex, gl::LineStrip> tileLineStrip() {
-    gl::VertexVector<FillVertex, gl::LineStrip> result;
-    result.emplace_back(FillAttributes::vertex({ 0, 0 }));
+static gl::VertexVector<FillVertex> tileVertices() {
+    gl::VertexVector<FillVertex> result;
+    result.emplace_back(FillAttributes::vertex({ 0,            0 }));
     result.emplace_back(FillAttributes::vertex({ util::EXTENT, 0 }));
-    result.emplace_back(FillAttributes::vertex({ util::EXTENT, util::EXTENT }));
     result.emplace_back(FillAttributes::vertex({ 0, util::EXTENT }));
-    result.emplace_back(FillAttributes::vertex({ 0, 0 }));
+    result.emplace_back(FillAttributes::vertex({ util::EXTENT, util::EXTENT }));
     return result;
 }
 
-static gl::VertexVector<RasterVertex, gl::TriangleStrip> rasterTriangleStrip() {
-    gl::VertexVector<RasterVertex, gl::TriangleStrip> result;
+static gl::IndexVector<gl::Triangles> tileTriangleIndices() {
+    gl::IndexVector<gl::Triangles> result;
+    result.emplace_back(0, 1, 2);
+    result.emplace_back(1, 2, 3);
+    return result;
+}
+
+static gl::IndexVector<gl::LineStrip> tileLineStripIndices() {
+    gl::IndexVector<gl::LineStrip> result;
+    result.emplace_back(0);
+    result.emplace_back(1);
+    result.emplace_back(3);
+    result.emplace_back(2);
+    result.emplace_back(0);
+    return result;
+}
+
+static gl::VertexVector<RasterVertex> rasterVertices() {
+    gl::VertexVector<RasterVertex> result;
     result.emplace_back(RasterProgram::vertex({ 0, 0 }, { 0, 0 }));
     result.emplace_back(RasterProgram::vertex({ util::EXTENT, 0 }, { 32767, 0 }));
     result.emplace_back(RasterProgram::vertex({ 0, util::EXTENT }, { 0, 32767 }));
@@ -77,12 +80,15 @@ static gl::VertexVector<RasterVertex, gl::TriangleStrip> rasterTriangleStrip() {
 Painter::Painter(gl::Context& context_, const TransformState& state_, float pixelRatio)
     : context(context_),
       state(state_),
-      tileTriangleVertexBuffer(context.createVertexBuffer(tileTriangles())),
-      tileTriangleSegments(tileTriangleVertexBuffer),
-      tileBorderVertexBuffer(context.createVertexBuffer(tileLineStrip())),
-      tileBorderSegments(tileBorderVertexBuffer),
-      rasterVertexBuffer(context.createVertexBuffer(rasterTriangleStrip())),
-      rasterSegments(rasterVertexBuffer) {
+      tileVertexBuffer(context.createVertexBuffer(tileVertices())),
+      rasterVertexBuffer(context.createVertexBuffer(rasterVertices())),
+      tileTriangleIndexBuffer(context.createIndexBuffer(tileTriangleIndices())),
+      tileBorderIndexBuffer(context.createIndexBuffer(tileLineStripIndices())) {
+
+    tileTriangleSegments.emplace_back(0, 0, 4, 6);
+    tileBorderSegments.emplace_back(0, 0, 4, 5);
+    rasterSegments.emplace_back(0, 0, 4, 6);
+
 #ifndef NDEBUG
     gl::debugging::enable();
 #endif

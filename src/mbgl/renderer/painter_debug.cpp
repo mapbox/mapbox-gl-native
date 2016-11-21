@@ -18,7 +18,7 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
 
     MBGL_DEBUG_GROUP(std::string { "debug " } + util::toString(renderTile.id));
 
-    auto draw = [&] (Color color, const auto& vertexBuffer, const auto& segments, auto drawMode) {
+    auto draw = [&] (Color color, const auto& vertexBuffer, const auto& indexBuffer, const auto& segments, auto drawMode) {
         programs->debug.draw(
             context,
             drawMode,
@@ -30,6 +30,7 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
                 uniforms::u_color::Value{ color }
             },
             vertexBuffer,
+            indexBuffer,
             segments
         );
     };
@@ -47,19 +48,22 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
         }
 
         draw(Color::white(),
-             tile.debugBucket->vertexBuffer,
+             *tile.debugBucket->vertexBuffer,
+             *tile.debugBucket->indexBuffer,
              tile.debugBucket->segments,
              gl::Lines { 4.0f * frame.pixelRatio });
 
         draw(Color::black(),
-             tile.debugBucket->vertexBuffer,
+             *tile.debugBucket->vertexBuffer,
+             *tile.debugBucket->indexBuffer,
              tile.debugBucket->segments,
              gl::Lines { 2.0f * frame.pixelRatio });
     }
 
     if (frame.debugOptions & MapDebugOptions::TileBorders) {
         draw(Color::red(),
-             tileBorderVertexBuffer,
+             tileVertexBuffer,
+             tileBorderIndexBuffer,
              tileBorderSegments,
              gl::LineStrip { 4.0f * frame.pixelRatio });
     }
