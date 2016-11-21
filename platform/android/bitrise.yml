@@ -52,7 +52,7 @@ workflows:
             export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
             echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
             curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-            sudo apt-get update && sudo apt-get install google-cloud-sdk
+            sudo apt-get update && sudo apt-get install -y google-cloud-sdk
 
             # Get authentication secret
             echo "Downloading Google Cloud authnetication:"
@@ -97,7 +97,7 @@ workflows:
             echo "Run tests on firebase:"
             gcloud auth activate-service-account --key-file secret.json --project android-gl-native
             gcloud beta test android devices list
-            gcloud beta test android run --type instrumentation --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest-unaligned.apk --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 15m --test-targets "class com.mapbox.mapboxsdk.testapp.camera.CameraMoveTest"
+            gcloud beta test android run --type instrumentation --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest.apk --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 15m
             echo "The details are made available as a zipped build artefact on top of this page."
     - script:
         title: Download Firebase results
