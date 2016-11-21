@@ -9,6 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class MGLUserLocation;
 
 /** View representing an `MGLUserLocation` on screen. */
+MGL_EXTERN
 @interface MGLUserLocationAnnotationView : MGLAnnotationView
 
 /**

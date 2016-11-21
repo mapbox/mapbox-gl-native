@@ -1,6 +1,9 @@
 #import <Cocoa/Cocoa.h>
 
+#import "MGLTypes.h"
+
 /// Button that looks like a hyperlink and opens a URL.
+MGL_EXTERN
 @interface MGLAttributionButton : NSButton
 
 /// Returns an `MGLAttributionButton` instance with the given title and URL.

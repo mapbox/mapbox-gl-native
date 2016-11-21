@@ -77,6 +77,7 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
  ensuring that your use adheres to the relevant terms of use.
  */
 IB_DESIGNABLE
+MGL_EXTERN
 @interface MGLMapView : UIView
 
 #pragma mark Creating Instances

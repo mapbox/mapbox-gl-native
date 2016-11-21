@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
  `style` and obtain the background layer using the `-[MGLStyle layerWithIdentifier:]` 
  method and passing `background` for the identifier. 
  */
+MGL_EXTERN
 @interface MGLBackgroundStyleLayer : MGLStyleLayer
 
 - (instancetype)initWithIdentifier:(NSString *)identifier NS_DESIGNATED_INITIALIZER;

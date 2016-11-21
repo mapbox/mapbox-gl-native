@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
  @note `MGLShapeCollection` objects cannot be added to a map view using
     `-[MGLMapView addAnnotations:]` and related methods.
  */
+MGL_EXTERN
 @interface MGLShapeCollection : MGLShape
 
 /**

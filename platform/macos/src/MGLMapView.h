@@ -48,6 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
     ensuring that your use adheres to the relevant terms of use.
  */
 IB_DESIGNABLE
+MGL_EXTERN
 @interface MGLMapView : NSView
 
 #pragma mark Creating Instances

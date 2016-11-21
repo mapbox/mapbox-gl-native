@@ -1,6 +1,6 @@
-#import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLTypes.h"
 #import "MGLAnnotation.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
  directly. Instead, you retrieve an existing MGLUserLocation object from the
  `userLocation` property of the map view displayed in your application.
  */
+MGL_EXTERN
 @interface MGLUserLocation : NSObject <MGLAnnotation>
 
 #pragma mark Determining the User’s Position

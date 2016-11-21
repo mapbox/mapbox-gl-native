@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
  subclasses of this class. Instead, create instances of `MGLRasterStyleLayer`
  and the concrete subclasses of `MGLVectorStyleLayer`.
  */
+MGL_EXTERN
 @interface MGLForegroundStyleLayer : MGLStyleLayer
 
 #pragma mark Initializing a Style Layer

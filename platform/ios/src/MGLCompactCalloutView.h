@@ -1,5 +1,6 @@
 #import "SMCalloutView.h"
 #import "MGLCalloutView.h"
+#import "MGLTypes.h"
 
 /**
  A concrete implementation of `MGLCalloutView` based on
@@ -7,6 +8,7 @@
  callout view displays the represented annotation’s title, subtitle, and
  accessory views in a compact, two-line layout.
  */
+MGL_EXTERN
 @interface MGLCompactCalloutView : SMCalloutView <MGLCalloutView>
 
 + (instancetype)platformCalloutView;

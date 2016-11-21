@@ -1,4 +1,4 @@
-#import <Foundation/Foundation.h>
+#import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -6,6 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
  The MGLAccountManager object provides a global way to set a Mapbox API access
  token.
  */
+MGL_EXTERN
 @interface MGLAccountManager : NSObject
 
 #pragma mark Authorizing Access

@@ -5,6 +5,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+MGL_EXTERN
 @interface MGLAPIClient : NSObject <NSURLSessionDelegate>
 
 - (void)postEvents:(NS_ARRAY_OF(MGLMapboxEventAttributes *) *)events completionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler;

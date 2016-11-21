@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
  situations where all you want to do is associate a point on the map with a
  title.
  */
+MGL_EXTERN
 @interface MGLPointAnnotation : MGLShape
 
 /**

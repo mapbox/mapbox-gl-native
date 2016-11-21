@@ -1,5 +1,4 @@
-#import <Foundation/Foundation.h>
-
+#import "MGLTypes.h"
 #import "MGLAnnotation.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -11,6 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
  and providing an appropriate value for the coordinate property inherited from
  the `MGLAnnotation` protocol.
  */
+MGL_EXTERN
 @interface MGLShape : NSObject <MGLAnnotation>
 
 /**

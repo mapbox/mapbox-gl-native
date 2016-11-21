@@ -1,4 +1,4 @@
-#import <Foundation/Foundation.h>
+#import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -10,6 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
  by any applications via the `MGLMapboxAPIBaseURL` dictionary key in the 
  application's `Info.plist`.
  */
+MGL_EXTERN
 @interface MGLNetworkConfiguration : NSObject
 
 /// Returns the shared instance of the `MGLNetworkConfiguration` class.

@@ -8,6 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
  `NSImage` objects with annotation-related metadata. They may be recycled later
  and put into a reuse queue that is maintained by the map view.
  */
+MGL_EXTERN
 @interface MGLAnnotationImage : NSObject
 
 #pragma mark Initializing and Preparing the Image Object

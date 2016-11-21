@@ -228,6 +228,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `MGLMapView` for its `style` and obtain existing layers using the 
  `-[MGLStyle layerWithIdentifier:]` method. 
  */
+MGL_EXTERN
 @interface MGLSymbolStyleLayer : MGLVectorStyleLayer
 
 #pragma mark - Accessing the Layout Attributes

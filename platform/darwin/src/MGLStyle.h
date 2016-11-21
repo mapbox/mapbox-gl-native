@@ -35,6 +35,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  by Mapbox.
  <a href="https://www.mapbox.com/maps/">Learn more about Mapbox default styles</a>.
  */
+MGL_EXTERN
 @interface MGLStyle : NSObject
 
 #pragma mark Default Style URLs

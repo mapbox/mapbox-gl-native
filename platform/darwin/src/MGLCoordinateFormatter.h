@@ -1,5 +1,6 @@
-#import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
+
+#import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -8,6 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
  geographic coordinate pairs. Use this class to create localized coordinate
  strings when displaying location information to users.
  */
+MGL_EXTERN
 @interface MGLCoordinateFormatter : NSFormatter
 
 /**

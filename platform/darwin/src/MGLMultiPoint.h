@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  class to access information about the specific points associated with the line
  or polygon.
  */
+MGL_EXTERN
 @interface MGLMultiPoint : MGLShape
 
 /**

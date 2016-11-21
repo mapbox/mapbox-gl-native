@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
  the order they are provided. The first and last points are not connected to
  each other.
  */
+MGL_EXTERN
 @interface MGLPolyline : MGLMultiPoint <MGLOverlay>
 
 /**
@@ -39,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
  @note `MGLMultiPolyline` objects cannot be added to a map view using
     `-[MGLMapView addAnnotations:]` and related methods.
  */
+MGL_EXTERN
 @interface MGLMultiPolyline : MGLShape <MGLOverlay>
 
 /**

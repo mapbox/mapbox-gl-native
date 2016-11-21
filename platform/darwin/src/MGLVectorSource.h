@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
  @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-vector">The
     style specification.</a>
  */
+MGL_EXTERN
 @interface MGLVectorSource : MGLSource
 
 #pragma mark Initializing a Source

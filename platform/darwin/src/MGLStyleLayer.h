@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLBackgroundStyleLayer` and the concrete subclasses of
  `MGLForegroundStyleLayer`.
  */
+MGL_EXTERN
 @interface MGLStyleLayer : NSObject
 
 #pragma mark Initializing a Style Layer
