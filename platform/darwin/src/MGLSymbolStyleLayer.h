@@ -7,22 +7,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- Label placement relative to its geometry.
- 
- Values of this type are used in the `symbolPlacement` property of `MGLSymbolStyleLayer`.
- */
-typedef NS_ENUM(NSUInteger, MGLSymbolPlacement) {
-    /**
-     The label is placed at the point where the geometry is located.
-     */
-    MGLSymbolPlacementPoint,
-    /**
-     The label is placed along the line of the geometry. Can only be used on `LineString` and `Polygon` geometries.
-     */
-    MGLSymbolPlacementLine,
-};
-
-/**
  In combination with `symbolPlacement`, determines the rotation behavior of icons.
  
  Values of this type are used in the `iconRotationAlignment` property of `MGLSymbolStyleLayer`.
@@ -67,63 +51,19 @@ typedef NS_ENUM(NSUInteger, MGLIconTextFit) {
 };
 
 /**
- Orientation of text when map is pitched.
+ Label placement relative to its geometry.
  
- Values of this type are used in the `textPitchAlignment` property of `MGLSymbolStyleLayer`.
+ Values of this type are used in the `symbolPlacement` property of `MGLSymbolStyleLayer`.
  */
-typedef NS_ENUM(NSUInteger, MGLTextPitchAlignment) {
+typedef NS_ENUM(NSUInteger, MGLSymbolPlacement) {
     /**
-     The text is aligned to the plane of the map.
+     The label is placed at the point where the geometry is located.
      */
-    MGLTextPitchAlignmentMap,
+    MGLSymbolPlacementPoint,
     /**
-     The text is aligned to the plane of the viewport.
+     The label is placed along the line of the geometry. Can only be used on `LineString` and `Polygon` geometries.
      */
-    MGLTextPitchAlignmentViewport,
-    /**
-     Automatically matches the value of `textRotationAlignment`.
-     */
-    MGLTextPitchAlignmentAuto,
-};
-
-/**
- In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text.
- 
- Values of this type are used in the `textRotationAlignment` property of `MGLSymbolStyleLayer`.
- */
-typedef NS_ENUM(NSUInteger, MGLTextRotationAlignment) {
-    /**
-     When `symbolPlacement` is set to `MGLSymbolPlacementPoint`, aligns text east-west. When `symbolPlacement` is set to `MGLSymbolPlacementLine`, aligns text x-axes with the line.
-     */
-    MGLTextRotationAlignmentMap,
-    /**
-     Produces glyphs whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbolPlacement`.
-     */
-    MGLTextRotationAlignmentViewport,
-    /**
-     When `symbolPlacement` is set to `MGLSymbolPlacementPoint`, this is equivalent to `MGLTextRotationAlignmentViewport`. When `symbolPlacement` is set to `MGLSymbolPlacementLine`, this is equivalent to `MGLTextRotationAlignmentMap`.
-     */
-    MGLTextRotationAlignmentAuto,
-};
-
-/**
- Text justification options.
- 
- Values of this type are used in the `textJustify` property of `MGLSymbolStyleLayer`.
- */
-typedef NS_ENUM(NSUInteger, MGLTextJustify) {
-    /**
-     The text is aligned to the left.
-     */
-    MGLTextJustifyLeft,
-    /**
-     The text is centered.
-     */
-    MGLTextJustifyCenter,
-    /**
-     The text is aligned to the right.
-     */
-    MGLTextJustifyRight,
+    MGLSymbolPlacementLine,
 };
 
 /**
@@ -168,6 +108,66 @@ typedef NS_ENUM(NSUInteger, MGLTextAnchor) {
      The bottom right corner of the text is placed closest to the anchor.
      */
     MGLTextAnchorBottomRight,
+};
+
+/**
+ Text justification options.
+ 
+ Values of this type are used in the `textJustify` property of `MGLSymbolStyleLayer`.
+ */
+typedef NS_ENUM(NSUInteger, MGLTextJustify) {
+    /**
+     The text is aligned to the left.
+     */
+    MGLTextJustifyLeft,
+    /**
+     The text is centered.
+     */
+    MGLTextJustifyCenter,
+    /**
+     The text is aligned to the right.
+     */
+    MGLTextJustifyRight,
+};
+
+/**
+ Orientation of text when map is pitched.
+ 
+ Values of this type are used in the `textPitchAlignment` property of `MGLSymbolStyleLayer`.
+ */
+typedef NS_ENUM(NSUInteger, MGLTextPitchAlignment) {
+    /**
+     The text is aligned to the plane of the map.
+     */
+    MGLTextPitchAlignmentMap,
+    /**
+     The text is aligned to the plane of the viewport.
+     */
+    MGLTextPitchAlignmentViewport,
+    /**
+     Automatically matches the value of `textRotationAlignment`.
+     */
+    MGLTextPitchAlignmentAuto,
+};
+
+/**
+ In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text.
+ 
+ Values of this type are used in the `textRotationAlignment` property of `MGLSymbolStyleLayer`.
+ */
+typedef NS_ENUM(NSUInteger, MGLTextRotationAlignment) {
+    /**
+     When `symbolPlacement` is set to `MGLSymbolPlacementPoint`, aligns text east-west. When `symbolPlacement` is set to `MGLSymbolPlacementLine`, aligns text x-axes with the line.
+     */
+    MGLTextRotationAlignmentMap,
+    /**
+     Produces glyphs whose x-axes are aligned with the x-axis of the viewport, regardless of the value of `symbolPlacement`.
+     */
+    MGLTextRotationAlignmentViewport,
+    /**
+     When `symbolPlacement` is set to `MGLSymbolPlacementPoint`, this is equivalent to `MGLTextRotationAlignmentViewport`. When `symbolPlacement` is set to `MGLSymbolPlacementLine`, this is equivalent to `MGLTextRotationAlignmentMap`.
+     */
+    MGLTextRotationAlignmentAuto,
 };
 
 /**
@@ -233,31 +233,6 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 #pragma mark - Accessing the Layout Attributes
 
 /**
- Label placement relative to its geometry.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementPoint`. Set this property to `nil` to reset it to the default value.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *symbolPlacement;
-
-/**
- Distance between two symbol anchors.
-
- This property is measured in points.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `250`. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolSpacing;
-
-/**
- If true, the symbols will not cross tile edges to avoid mutual collisions. Recommended in layers that don't have enough padding in the vector tile to prevent collisions, or if it is a point symbol layer placed after a line symbol layer.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolAvoidEdges;
-
-/**
  If true, the icon will be visible even if it collides with other previously drawn symbols.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
@@ -276,6 +251,29 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconIgnorePlacement;
 
 /**
+ A string with {tokens} replaced, referencing the data property to pull from.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *iconImageName;
+
+/**
+ If true, the icon may be flipped to prevent it from being rendered upside-down.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `iconImage` is non-`nil`, and `iconRotationAlignment` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLIconRotationAlignmentMap`, and `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconKeepUpright;
+
+/**
+ Offset distance of icon from its anchor.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing a `CGVector` struct set to 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconOffset;
+
+/**
  If true, text will display without their corresponding icons when the icon collides with other symbols and the text does not.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
@@ -283,6 +281,28 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  This property is only applied to the style if `iconImage` is non-`nil`, and `textField` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconOptional;
+
+/**
+ Size of the additional area around the icon bounding box used for detecting symbol collisions.
+
+ This property is measured in points.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `2`. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconPadding;
+
+/**
+ Rotates the icon clockwise.
+
+ This property is measured in degrees.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconRotate;
 
 /**
  In combination with `symbolPlacement`, determines the rotation behavior of icons.
@@ -323,67 +343,47 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFitPadding;
 
 /**
- A string with {tokens} replaced, referencing the data property to pull from.
+ If true, the symbols will not cross tile edges to avoid mutual collisions. Recommended in layers that don't have enough padding in the vector tile to prevent collisions, or if it is a point symbol layer placed after a line symbol layer.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *iconImage;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolAvoidEdges;
 
 /**
- Rotates the icon clockwise.
-
- This property is measured in degrees.
+ Label placement relative to its geometry.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementPoint`. Set this property to `nil` to reset it to the default value.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconRotate;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *symbolPlacement;
 
 /**
- Size of the additional area around the icon bounding box used for detecting symbol collisions.
+ Distance between two symbol anchors.
 
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `2`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `250`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconPadding;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolSpacing;
 
 /**
- If true, the icon may be flipped to prevent it from being rendered upside-down.
+ If true, the text will be visible even if it collides with other previously drawn symbols.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`, and `iconRotationAlignment` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLIconRotationAlignmentMap`, and `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
+ This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconKeepUpright;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textAllowOverlap;
 
 /**
- Offset distance of icon from its anchor.
+ Part of the text placed closest to the anchor.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing a `CGVector` struct set to 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconOffset;
-
-/**
- Orientation of text when map is pitched.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextPitchAlignmentAuto`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextAnchorCenter`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textPitchAlignment;
-
-/**
- In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextRotationAlignmentAuto`. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textRotationAlignment;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textAnchor;
 
 /**
  Value to use for a text label. Feature properties are specified using tokens like {field_name}.
@@ -402,37 +402,31 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSString *> *> *textFont;
 
 /**
- Font size.
-
- This property is measured in points.
+ If true, other symbols can be visible even if they collide with the text.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `16`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textSize;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textIgnorePlacement;
 
 /**
- The maximum line width for text wrapping.
-
- This property is measured in ems.
+ Text justification options.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `10`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextJustifyCenter`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textMaxWidth;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textJustify;
 
 /**
- Text leading value for multi-line text.
-
- This property is measured in ems.
+ If true, the text may be flipped vertically to prevent it from being rendered upside-down.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1.2`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `YES`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `textField` is non-`nil`, and `textRotationAlignment` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextRotationAlignmentMap`, and `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textLineHeight;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textKeepUpright;
 
 /**
  Text tracking amount.
@@ -446,22 +440,15 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textLetterSpacing;
 
 /**
- Text justification options.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextJustifyCenter`. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textJustify;
+ Text leading value for multi-line text.
 
-/**
- Part of the text placed closest to the anchor.
+ This property is measured in ems.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextAnchorCenter`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1.2`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textAnchor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textLineHeight;
 
 /**
  Maximum angle change between adjacent characters.
@@ -475,44 +462,15 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textMaxAngle;
 
 /**
- Rotates the text clockwise.
+ The maximum line width for text wrapping.
 
- This property is measured in degrees.
+ This property is measured in ems.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `10`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textRotate;
-
-/**
- Size of the additional area around the text bounding box used for detecting symbol collisions.
-
- This property is measured in points.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `2`. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textPadding;
-
-/**
- If true, the text may be flipped vertically to prevent it from being rendered upside-down.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `YES`. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `textField` is non-`nil`, and `textRotationAlignment` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextRotationAlignmentMap`, and `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textKeepUpright;
-
-/**
- Specifies how to capitalize text.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextTransformNone`. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTransform;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textMaxWidth;
 
 /**
  Offset distance of text from its anchor.
@@ -526,24 +484,6 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textOffset;
 
 /**
- If true, the text will be visible even if it collides with other previously drawn symbols.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textAllowOverlap;
-
-/**
- If true, other symbols can be visible even if they collide with the text.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textIgnorePlacement;
-
-/**
  If true, icons will display without their corresponding text when the text collides with other symbols and the icon does not.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
@@ -552,16 +492,67 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textOptional;
 
-#pragma mark - Accessing the Paint Attributes
+/**
+ Size of the additional area around the text bounding box used for detecting symbol collisions.
+
+ This property is measured in points.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `2`. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textPadding;
 
 /**
- The opacity at which the icon will be drawn.
+ Orientation of text when map is pitched.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
-
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextPitchAlignmentAuto`. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconOpacity;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textPitchAlignment;
+
+/**
+ Rotates the text clockwise.
+
+ This property is measured in degrees.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textRotate;
+
+/**
+ In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextRotationAlignmentAuto`. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textRotationAlignment;
+
+/**
+ Font size.
+
+ This property is measured in points.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `16`. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textSize;
+
+/**
+ Specifies how to capitalize text.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextTransformNone`. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTransform;
+
+#pragma mark - Accessing the Paint Attributes
 
 #if TARGET_OS_IPHONE
 /**
@@ -582,6 +573,17 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconColor;
 #endif
+
+/**
+ Fade out the halo towards the outside.
+
+ This property is measured in points.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+
+ This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloBlur;
 
 #if TARGET_OS_IPHONE
 /**
@@ -615,15 +617,13 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloWidth;
 
 /**
- Fade out the halo towards the outside.
-
- This property is measured in points.
+ The opacity at which the icon will be drawn.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloBlur;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconOpacity;
 
 /**
  Distance that the icon's anchor is moved from its original placement.
@@ -645,15 +645,6 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslateAnchor;
 
-/**
- The opacity at which the text will be drawn.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
-
- This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textOpacity;
-
 #if TARGET_OS_IPHONE
 /**
  The color with which the text will be drawn.
@@ -673,6 +664,17 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *textColor;
 #endif
+
+/**
+ The halo's fadeout distance towards the outside.
+
+ This property is measured in points.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+
+ This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloBlur;
 
 #if TARGET_OS_IPHONE
 /**
@@ -706,15 +708,13 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloWidth;
 
 /**
- The halo's fadeout distance towards the outside.
-
- This property is measured in points.
+ The opacity at which the text will be drawn.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
 
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloBlur;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textOpacity;
 
 /**
  Distance that the text's anchor is moved from its original placement.

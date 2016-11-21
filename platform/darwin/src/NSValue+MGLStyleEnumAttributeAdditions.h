@@ -46,19 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) MGLLineJoin MGLLineJoinValue;
 
 /**
- Creates a new value object containing the given `MGLSymbolPlacement` enumeration.
-
- @param type The value for the new object.
- @return A new value object that contains the style enumeration type.
-*/
-+ (instancetype)valueWithMGLSymbolPlacement:(MGLSymbolPlacement)symbolPlacement;
-
-/**
- The `MGLSymbolPlacement` enumeration representation of the value.
-*/
-@property (readonly) MGLSymbolPlacement MGLSymbolPlacementValue;
-
-/**
  Creates a new value object containing the given `MGLIconRotationAlignment` enumeration.
 
  @param type The value for the new object.
@@ -85,6 +72,45 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) MGLIconTextFit MGLIconTextFitValue;
 
 /**
+ Creates a new value object containing the given `MGLSymbolPlacement` enumeration.
+
+ @param type The value for the new object.
+ @return A new value object that contains the style enumeration type.
+*/
++ (instancetype)valueWithMGLSymbolPlacement:(MGLSymbolPlacement)symbolPlacement;
+
+/**
+ The `MGLSymbolPlacement` enumeration representation of the value.
+*/
+@property (readonly) MGLSymbolPlacement MGLSymbolPlacementValue;
+
+/**
+ Creates a new value object containing the given `MGLTextAnchor` enumeration.
+
+ @param type The value for the new object.
+ @return A new value object that contains the style enumeration type.
+*/
++ (instancetype)valueWithMGLTextAnchor:(MGLTextAnchor)textAnchor;
+
+/**
+ The `MGLTextAnchor` enumeration representation of the value.
+*/
+@property (readonly) MGLTextAnchor MGLTextAnchorValue;
+
+/**
+ Creates a new value object containing the given `MGLTextJustify` enumeration.
+
+ @param type The value for the new object.
+ @return A new value object that contains the style enumeration type.
+*/
++ (instancetype)valueWithMGLTextJustify:(MGLTextJustify)textJustify;
+
+/**
+ The `MGLTextJustify` enumeration representation of the value.
+*/
+@property (readonly) MGLTextJustify MGLTextJustifyValue;
+
+/**
  Creates a new value object containing the given `MGLTextPitchAlignment` enumeration.
 
  @param type The value for the new object.
@@ -109,32 +135,6 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLTextRotationAlignment` enumeration representation of the value.
 */
 @property (readonly) MGLTextRotationAlignment MGLTextRotationAlignmentValue;
-
-/**
- Creates a new value object containing the given `MGLTextJustify` enumeration.
-
- @param type The value for the new object.
- @return A new value object that contains the style enumeration type.
-*/
-+ (instancetype)valueWithMGLTextJustify:(MGLTextJustify)textJustify;
-
-/**
- The `MGLTextJustify` enumeration representation of the value.
-*/
-@property (readonly) MGLTextJustify MGLTextJustifyValue;
-
-/**
- Creates a new value object containing the given `MGLTextAnchor` enumeration.
-
- @param type The value for the new object.
- @return A new value object that contains the style enumeration type.
-*/
-+ (instancetype)valueWithMGLTextAnchor:(MGLTextAnchor)textAnchor;
-
-/**
- The `MGLTextAnchor` enumeration representation of the value.
-*/
-@property (readonly) MGLTextAnchor MGLTextAnchorValue;
 
 /**
  Creates a new value object containing the given `MGLTextTransform` enumeration.
@@ -202,19 +202,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) MGLTextTranslateAnchor MGLTextTranslateAnchorValue;
 
 /**
- Creates a new value object containing the given `MGLCircleTranslateAnchor` structure.
-
- @param type The value for the new object.
- @return A new value object that contains the style enumeration type.
-*/
-+ (instancetype)valueWithMGLCircleTranslateAnchor:(MGLCircleTranslateAnchor)circleTranslateAnchor;
-
-/**
- The `MGLCircleTranslateAnchor` enumeration representation of the value.
-*/
-@property (readonly) MGLCircleTranslateAnchor MGLCircleTranslateAnchorValue;
-
-/**
  Creates a new value object containing the given `MGLCirclePitchScale` structure.
 
  @param type The value for the new object.
@@ -226,6 +213,19 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLCirclePitchScale` enumeration representation of the value.
 */
 @property (readonly) MGLCirclePitchScale MGLCirclePitchScaleValue;
+
+/**
+ Creates a new value object containing the given `MGLCircleTranslateAnchor` structure.
+
+ @param type The value for the new object.
+ @return A new value object that contains the style enumeration type.
+*/
++ (instancetype)valueWithMGLCircleTranslateAnchor:(MGLCircleTranslateAnchor)circleTranslateAnchor;
+
+/**
+ The `MGLCircleTranslateAnchor` enumeration representation of the value.
+*/
+@property (readonly) MGLCircleTranslateAnchor MGLCircleTranslateAnchorValue;
 
 @end
 

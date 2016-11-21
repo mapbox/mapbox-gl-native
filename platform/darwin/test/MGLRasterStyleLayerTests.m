@@ -16,39 +16,39 @@
     MGLRasterStyleLayer *layer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     [self.mapView.style addLayer:layer];
 
-    layer.rasterOpacity = [MGLRuntimeStylingHelper testNumber];
-    layer.rasterHueRotate = [MGLRuntimeStylingHelper testNumber];
-    layer.rasterBrightnessMin = [MGLRuntimeStylingHelper testNumber];
-    layer.rasterBrightnessMax = [MGLRuntimeStylingHelper testNumber];
-    layer.rasterSaturation = [MGLRuntimeStylingHelper testNumber];
+    layer.maximumRasterBrightness = [MGLRuntimeStylingHelper testNumber];
+    layer.minimumRasterBrightness = [MGLRuntimeStylingHelper testNumber];
     layer.rasterContrast = [MGLRuntimeStylingHelper testNumber];
     layer.rasterFadeDuration = [MGLRuntimeStylingHelper testNumber];
+    layer.rasterHueRotate = [MGLRuntimeStylingHelper testNumber];
+    layer.rasterOpacity = [MGLRuntimeStylingHelper testNumber];
+    layer.rasterSaturation = [MGLRuntimeStylingHelper testNumber];
 
     MGLRasterStyleLayer *gLayer = (MGLRasterStyleLayer *)[self.mapView.style layerWithIdentifier:@"layerID"];
     XCTAssertTrue([gLayer isKindOfClass:[MGLRasterStyleLayer class]]);
-    XCTAssertEqualObjects(gLayer.rasterOpacity, [MGLRuntimeStylingHelper testNumber]);
-    XCTAssertEqualObjects(gLayer.rasterHueRotate, [MGLRuntimeStylingHelper testNumber]);
-    XCTAssertEqualObjects(gLayer.rasterBrightnessMin, [MGLRuntimeStylingHelper testNumber]);
-    XCTAssertEqualObjects(gLayer.rasterBrightnessMax, [MGLRuntimeStylingHelper testNumber]);
-    XCTAssertEqualObjects(gLayer.rasterSaturation, [MGLRuntimeStylingHelper testNumber]);
+    XCTAssertEqualObjects(gLayer.maximumRasterBrightness, [MGLRuntimeStylingHelper testNumber]);
+    XCTAssertEqualObjects(gLayer.minimumRasterBrightness, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.rasterContrast, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.rasterFadeDuration, [MGLRuntimeStylingHelper testNumber]);
+    XCTAssertEqualObjects(gLayer.rasterHueRotate, [MGLRuntimeStylingHelper testNumber]);
+    XCTAssertEqualObjects(gLayer.rasterOpacity, [MGLRuntimeStylingHelper testNumber]);
+    XCTAssertEqualObjects(gLayer.rasterSaturation, [MGLRuntimeStylingHelper testNumber]);
 
-    layer.rasterOpacity = [MGLRuntimeStylingHelper testNumberFunction];
-    layer.rasterHueRotate = [MGLRuntimeStylingHelper testNumberFunction];
-    layer.rasterBrightnessMin = [MGLRuntimeStylingHelper testNumberFunction];
-    layer.rasterBrightnessMax = [MGLRuntimeStylingHelper testNumberFunction];
-    layer.rasterSaturation = [MGLRuntimeStylingHelper testNumberFunction];
+    layer.maximumRasterBrightness = [MGLRuntimeStylingHelper testNumberFunction];
+    layer.minimumRasterBrightness = [MGLRuntimeStylingHelper testNumberFunction];
     layer.rasterContrast = [MGLRuntimeStylingHelper testNumberFunction];
     layer.rasterFadeDuration = [MGLRuntimeStylingHelper testNumberFunction];
+    layer.rasterHueRotate = [MGLRuntimeStylingHelper testNumberFunction];
+    layer.rasterOpacity = [MGLRuntimeStylingHelper testNumberFunction];
+    layer.rasterSaturation = [MGLRuntimeStylingHelper testNumberFunction];
 
-    XCTAssertEqualObjects(gLayer.rasterOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
-    XCTAssertEqualObjects(gLayer.rasterHueRotate, [MGLRuntimeStylingHelper testNumberFunction]);
-    XCTAssertEqualObjects(gLayer.rasterBrightnessMin, [MGLRuntimeStylingHelper testNumberFunction]);
-    XCTAssertEqualObjects(gLayer.rasterBrightnessMax, [MGLRuntimeStylingHelper testNumberFunction]);
-    XCTAssertEqualObjects(gLayer.rasterSaturation, [MGLRuntimeStylingHelper testNumberFunction]);
+    XCTAssertEqualObjects(gLayer.maximumRasterBrightness, [MGLRuntimeStylingHelper testNumberFunction]);
+    XCTAssertEqualObjects(gLayer.minimumRasterBrightness, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.rasterContrast, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.rasterFadeDuration, [MGLRuntimeStylingHelper testNumberFunction]);
+    XCTAssertEqualObjects(gLayer.rasterHueRotate, [MGLRuntimeStylingHelper testNumberFunction]);
+    XCTAssertEqualObjects(gLayer.rasterOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
+    XCTAssertEqualObjects(gLayer.rasterSaturation, [MGLRuntimeStylingHelper testNumberFunction]);
 }
 
 @end

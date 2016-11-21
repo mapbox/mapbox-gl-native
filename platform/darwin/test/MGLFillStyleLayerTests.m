@@ -17,39 +17,39 @@
     [self.mapView.style addLayer:layer];
 
     layer.fillAntialias = [MGLRuntimeStylingHelper testBool];
-    layer.fillOpacity = [MGLRuntimeStylingHelper testNumber];
     layer.fillColor = [MGLRuntimeStylingHelper testColor];
+    layer.fillOpacity = [MGLRuntimeStylingHelper testNumber];
     layer.fillOutlineColor = [MGLRuntimeStylingHelper testColor];
+    layer.fillPattern = [MGLRuntimeStylingHelper testString];
     layer.fillTranslate = [MGLRuntimeStylingHelper testOffset];
     layer.fillTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLFillTranslateAnchorViewport type:@encode(MGLFillTranslateAnchor)];
-    layer.fillPattern = [MGLRuntimeStylingHelper testString];
 
     MGLFillStyleLayer *gLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"layerID"];
     XCTAssertTrue([gLayer isKindOfClass:[MGLFillStyleLayer class]]);
     XCTAssertEqualObjects(gLayer.fillAntialias, [MGLRuntimeStylingHelper testBool]);
-    XCTAssertEqualObjects(gLayer.fillOpacity, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.fillColor, [MGLRuntimeStylingHelper testColor]);
+    XCTAssertEqualObjects(gLayer.fillOpacity, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.fillOutlineColor, [MGLRuntimeStylingHelper testColor]);
+    XCTAssertEqualObjects(gLayer.fillPattern, [MGLRuntimeStylingHelper testString]);
     XCTAssertEqualObjects(gLayer.fillTranslate, [MGLRuntimeStylingHelper testOffset]);
     XCTAssert([gLayer.fillTranslateAnchor isKindOfClass:[MGLStyleConstantValue class]]);
     XCTAssertEqualObjects(gLayer.fillTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLFillTranslateAnchorViewport type:@encode(MGLFillTranslateAnchor)]);
-    XCTAssertEqualObjects(gLayer.fillPattern, [MGLRuntimeStylingHelper testString]);
 
     layer.fillAntialias = [MGLRuntimeStylingHelper testBoolFunction];
-    layer.fillOpacity = [MGLRuntimeStylingHelper testNumberFunction];
     layer.fillColor = [MGLRuntimeStylingHelper testColorFunction];
+    layer.fillOpacity = [MGLRuntimeStylingHelper testNumberFunction];
     layer.fillOutlineColor = [MGLRuntimeStylingHelper testColorFunction];
+    layer.fillPattern = [MGLRuntimeStylingHelper testStringFunction];
     layer.fillTranslate = [MGLRuntimeStylingHelper testOffsetFunction];
     layer.fillTranslateAnchor = [MGLRuntimeStylingHelper testEnumFunction:MGLFillTranslateAnchorViewport type:@encode(MGLFillTranslateAnchor)];
-    layer.fillPattern = [MGLRuntimeStylingHelper testStringFunction];
 
     XCTAssertEqualObjects(gLayer.fillAntialias, [MGLRuntimeStylingHelper testBoolFunction]);
-    XCTAssertEqualObjects(gLayer.fillOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.fillColor, [MGLRuntimeStylingHelper testColorFunction]);
+    XCTAssertEqualObjects(gLayer.fillOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.fillOutlineColor, [MGLRuntimeStylingHelper testColorFunction]);
+    XCTAssertEqualObjects(gLayer.fillPattern, [MGLRuntimeStylingHelper testStringFunction]);
     XCTAssertEqualObjects(gLayer.fillTranslate, [MGLRuntimeStylingHelper testOffsetFunction]);
     XCTAssertEqualObjects(gLayer.fillTranslateAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLFillTranslateAnchorViewport type:@encode(MGLFillTranslateAnchor)]);
-    XCTAssertEqualObjects(gLayer.fillPattern, [MGLRuntimeStylingHelper testStringFunction]);
 }
 
 @end
