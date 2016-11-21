@@ -1379,8 +1379,8 @@ public class MapView extends FrameLayout {
             addOnMapChangedListener(new OnMapChangedListener() {
                 @Override
                 public void onMapChanged(@MapChange int change) {
-                    if (change == REGION_DID_CHANGE_ANIMATED && cameraCancelableCallback != null) {
-                        cameraCancelableCallback.onFinish();
+                    if (change == REGION_DID_CHANGE_ANIMATED && cancelableCallback != null) {
+                        cancelableCallback.onFinish();
                         cameraCancelableCallback = null;
                         // Clean up after self
                         removeOnMapChangedListener(this);
@@ -1404,7 +1404,7 @@ public class MapView extends FrameLayout {
             addOnMapChangedListener(new OnMapChangedListener() {
                 @Override
                 public void onMapChanged(@MapChange int change) {
-                    if (change == REGION_DID_CHANGE_ANIMATED && cameraCancelableCallback != null) {
+                    if (change == REGION_DID_CHANGE_ANIMATED && cancelableCallback != null) {
                         cancelableCallback.onFinish();
                         cameraCancelableCallback = null;
                         // Clean up after self
