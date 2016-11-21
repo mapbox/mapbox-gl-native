@@ -35,6 +35,11 @@ function(create_source_groups target)
     endforeach()
 endfunction()
 
+# This little macro lets you set any XCode specific property
+macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE)
+    set_property(TARGET ${TARGET} PROPERTY XCODE_ATTRIBUTE_${XCODE_PROPERTY} ${XCODE_VALUE})
+endmacro (set_xcode_property)
+
 function(_write_xcconfig_var target var)
     get_property(result TARGET ${target} PROPERTY INTERFACE_${var} SET)
     if (result)

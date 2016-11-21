@@ -8,6 +8,8 @@ mason_use(benchmark VERSION 1.0.0)
 include(cmake/loop-darwin.cmake)
 
 macro(mbgl_platform_core)
+    set_xcode_property(mbgl-core GCC_SYMBOLS_PRIVATE_EXTERN YES)
+
     target_sources(mbgl-core
         # File source
         PRIVATE platform/darwin/src/http_file_source.mm

@@ -4,6 +4,8 @@ add_library(mbgl-loop STATIC
     platform/darwin/src/timer.cpp
 )
 
+set_xcode_property(mbgl-loop GCC_SYMBOLS_PRIVATE_EXTERN YES)
+
 target_compile_options(mbgl-loop
     PRIVATE -fPIC
     PRIVATE -fvisibility-inlines-hidden
