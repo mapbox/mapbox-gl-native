@@ -4,6 +4,7 @@ macro(mbgl_platform_core)
     set_xcode_property(mbgl-core IPHONEOS_DEPLOYMENT_TARGET "8.0")
     set_xcode_property(mbgl-core ENABLE_BITCODE "YES")
     set_xcode_property(mbgl-core BITCODE_GENERATION_MODE bitcode)
+    set_xcode_property(mbgl-core ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
 
     target_sources(mbgl-core
         # Loop
