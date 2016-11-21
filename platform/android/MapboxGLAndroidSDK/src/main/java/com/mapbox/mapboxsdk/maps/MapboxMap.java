@@ -203,6 +203,7 @@ public class MapboxMap {
      * also avoids layer identifier name changes that will occur in the default style’s layers over
      * time. These default styles can be found in the {@link Style} class.
      * </p>
+     *
      * @param layerId a String matching the layer ID found within the current map style. This
      *                String is case sensitive. Any references to the layer become invalid and should
      *                not be used anymore
@@ -1033,12 +1034,23 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions) {
+        // listen for a render event, so we can invalidate MarkerViews
+        mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+            @Override
+            public void onMapChanged(@MapView.MapChange int change) {
+                if (change == MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
+                    markerViewManager.invalidateViewMarkersInVisibleRegion();
+                    mapView.removeOnMapChangedListener(this);
+                }
+            }
+        });
+
+        // add marker to map
         MarkerView marker = prepareViewMarker(markerOptions);
         marker.setMapboxMap(this);
         long id = mapView.addMarker(marker);
         marker.setId(id);
         annotations.put(id, marker);
-        markerViewManager.invalidateViewMarkersInVisibleRegion();
         return marker;
     }
 
@@ -1058,6 +1070,20 @@ public class MapboxMap {
     public List<MarkerView> addMarkerViews(@NonNull List<? extends BaseMarkerViewOptions> markerViewOptions) {
         List<MarkerView> markers = new ArrayList<>();
         for (BaseMarkerViewOptions markerViewOption : markerViewOptions) {
+            if (markerViewOptions.indexOf(markerViewOption) == markerViewOptions.size() - 1) {
+                // only invalidate marker views with last item in list
+                // listen for a render event, so we can invalidate MarkerViews
+                mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+                    @Override
+                    public void onMapChanged(@MapView.MapChange int change) {
+                        if (change == MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
+                            markerViewManager.invalidateViewMarkersInVisibleRegion();
+                            mapView.removeOnMapChangedListener(this);
+                        }
+                    }
+                });
+            }
+            // add marker to map
             MarkerView marker = prepareViewMarker(markerViewOption);
             marker.setMapboxMap(this);
             long id = mapView.addMarker(marker);
@@ -1065,7 +1091,6 @@ public class MapboxMap {
             annotations.put(id, marker);
             markers.add(marker);
         }
-        markerViewManager.invalidateViewMarkersInVisibleRegion();
         return markers;
     }
 
