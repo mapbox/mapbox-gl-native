@@ -10,14 +10,21 @@
 
 namespace mbgl {
 
-gl::VertexVector<FillVertex, gl::Lines>
-buildTextVertices(const OverscaledTileID& id,
-                  const bool renderable,
-                  const bool complete,
-                  optional<Timestamp> modified,
-                  optional<Timestamp> expires,
-                  MapDebugOptions debugMode) {
-    gl::VertexVector<FillVertex, gl::Lines> textLines;
+DebugBucket::DebugBucket(const OverscaledTileID& id,
+                         const bool renderable_,
+                         const bool complete_,
+                         optional<Timestamp> modified_,
+                         optional<Timestamp> expires_,
+                         MapDebugOptions debugMode_,
+                         gl::Context& context)
+    : renderable(renderable_),
+      complete(complete_),
+      modified(std::move(modified_)),
+      expires(std::move(expires_)),
+      debugMode(debugMode_) {
+
+    gl::VertexVector<FillVertex> vertices;
+    gl::IndexVector<gl::Lines> indices;
 
     auto addText = [&] (const std::string& text, double left, double baseline, double scale) {
         for (uint8_t c : text) {
@@ -36,9 +43,11 @@ buildTextVertices(const OverscaledTileID& id,
                         int16_t(::round(baseline - glyph.data[j + 1] * scale))
                     };
 
+                    vertices.emplace_back(FillAttributes::vertex(p));
+
                     if (prev) {
-                        textLines.emplace_back(FillAttributes::vertex(*prev),
-                                               FillAttributes::vertex(p));
+                        indices.emplace_back(vertices.vertexSize() - 1,
+                                             vertices.vertexSize());
                     }
 
                     prev = p;
@@ -65,23 +74,10 @@ buildTextVertices(const OverscaledTileID& id,
         addText(expiresText, 50, baseline + 200, 5);
     }
 
-    return textLines;
-}
+    segments.emplace_back(0, 0, vertices.vertexSize(), indices.indexSize());
 
-DebugBucket::DebugBucket(const OverscaledTileID& id,
-                         const bool renderable_,
-                         const bool complete_,
-                         optional<Timestamp> modified_,
-                         optional<Timestamp> expires_,
-                         MapDebugOptions debugMode_,
-                         gl::Context& context)
-    : renderable(renderable_),
-      complete(complete_),
-      modified(std::move(modified_)),
-      expires(std::move(expires_)),
-      debugMode(debugMode_),
-      vertexBuffer(context.createVertexBuffer(buildTextVertices(id, renderable_, complete_, modified_, expires_, debugMode_))),
-      segments(vertexBuffer) {
+    vertexBuffer = context.createVertexBuffer(std::move(vertices));
+    indexBuffer = context.createIndexBuffer(std::move(indices));
 }
 
 } // namespace mbgl

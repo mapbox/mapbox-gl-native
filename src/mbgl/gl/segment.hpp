@@ -33,13 +33,6 @@ template <class Attributes>
 class SegmentVector : public std::vector<Segment> {
 public:
     SegmentVector() = default;
-
-    // This constructor is for unindexed rendering. It creates a SegmentVector with a
-    // single segment having 0 indexes.
-    template <class DrawMode>
-    SegmentVector(const VertexBuffer<typename Attributes::Vertex, DrawMode>& buffer) {
-        emplace_back(0, 0, buffer.vertexCount, 0);
-    }
 };
 
 } // namespace gl

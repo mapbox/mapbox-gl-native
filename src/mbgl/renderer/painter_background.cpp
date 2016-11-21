@@ -44,7 +44,8 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
                     tileID,
                     state
                 ),
-                tileTriangleVertexBuffer,
+                tileVertexBuffer,
+                tileTriangleIndexBuffer,
                 tileTriangleSegments
             );
         }
@@ -63,7 +64,8 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
                     uniforms::u_outline_color::Value{ properties.get<BackgroundColor>() },
                     uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
                 },
-                tileTriangleVertexBuffer,
+                tileVertexBuffer,
+                tileTriangleIndexBuffer,
                 tileTriangleSegments
             );
         }

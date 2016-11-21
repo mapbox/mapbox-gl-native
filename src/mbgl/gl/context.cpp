@@ -518,18 +518,11 @@ void Context::draw(const Drawable& drawable) {
             drawable.bindAttributes(segment.vertexOffset);
         }
 
-        if (drawable.indexBuffer) {
-            MBGL_CHECK_ERROR(glDrawElements(
-                static_cast<GLenum>(primitiveType),
-                static_cast<GLsizei>(segment.indexLength),
-                GL_UNSIGNED_SHORT,
-                reinterpret_cast<GLvoid*>(sizeof(uint16_t) * segment.indexOffset)));
-        } else {
-            MBGL_CHECK_ERROR(glDrawArrays(
-                static_cast<GLenum>(primitiveType),
-                static_cast<GLint>(segment.vertexOffset),
-                static_cast<GLsizei>(segment.vertexLength)));
-        }
+        MBGL_CHECK_ERROR(glDrawElements(
+            static_cast<GLenum>(primitiveType),
+            static_cast<GLsizei>(segment.indexLength),
+            GL_UNSIGNED_SHORT,
+            reinterpret_cast<GLvoid*>(sizeof(uint16_t) * segment.indexOffset)));
     }
 }
 

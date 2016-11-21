@@ -158,13 +158,14 @@ private:
     std::unique_ptr<Programs> overdrawPrograms;
 #endif
 
-    gl::VertexBuffer<FillVertex, gl::Triangles> tileTriangleVertexBuffer;
+    gl::VertexBuffer<FillVertex> tileVertexBuffer;
+    gl::VertexBuffer<RasterVertex> rasterVertexBuffer;
+
+    gl::IndexBuffer<gl::Triangles> tileTriangleIndexBuffer;
+    gl::IndexBuffer<gl::LineStrip> tileBorderIndexBuffer;
+
     gl::SegmentVector<FillAttributes> tileTriangleSegments;
-
-    gl::VertexBuffer<DebugVertex, gl::LineStrip> tileBorderVertexBuffer;
     gl::SegmentVector<DebugAttributes> tileBorderSegments;
-
-    gl::VertexBuffer<RasterVertex, gl::TriangleStrip> rasterVertexBuffer;
     gl::SegmentVector<RasterAttributes> rasterSegments;
 };
 

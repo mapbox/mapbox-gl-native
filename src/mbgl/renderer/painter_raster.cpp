@@ -56,7 +56,7 @@ void Painter::renderRaster(PaintParameters& parameters,
 
     parameters.programs.raster.draw(
         context,
-        gl::TriangleStrip(),
+        gl::Triangles(),
         depthModeForSublayer(0, gl::DepthMode::ReadOnly),
         gl::StencilMode::disabled(),
         colorModeForRenderPass(),
@@ -76,6 +76,7 @@ void Painter::renderRaster(PaintParameters& parameters,
             uniforms::u_tl_parent::Value{ std::array<float, 2> {{ 0.0f, 0.0f }} },
         },
         rasterVertexBuffer,
+        tileTriangleIndexBuffer,
         rasterSegments
     );
 }

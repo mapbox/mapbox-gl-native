@@ -32,7 +32,6 @@ public:
           attributesState(Attributes::state(program)),
           uniformsState((context.linkProgram(program), Uniforms::state(program))) {}
 
-    // Indexed drawing.
     template <class DrawMode>
     void draw(Context& context,
               DrawMode drawMode,
@@ -52,31 +51,6 @@ public:
             program,
             vertexBuffer.buffer,
             indexBuffer.buffer,
-            segments,
-            Uniforms::binder(uniformsState, std::move(uniformValues)),
-            Attributes::binder(attributesState)
-        });
-    }
-
-    // Unindexed drawing.
-    template <class DrawMode>
-    void draw(Context& context,
-              DrawMode drawMode,
-              DepthMode depthMode,
-              StencilMode stencilMode,
-              ColorMode colorMode,
-              UniformValues&& uniformValues,
-              const VertexBuffer<Vertex, DrawMode>& vertexBuffer,
-              const SegmentVector<Attributes>& segments) {
-        static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
-        context.draw({
-            std::move(drawMode),
-            std::move(depthMode),
-            std::move(stencilMode),
-            std::move(colorMode),
-            program,
-            vertexBuffer.buffer,
-            0,
             segments,
             Uniforms::binder(uniformsState, std::move(uniformValues)),
             Attributes::binder(attributesState)
