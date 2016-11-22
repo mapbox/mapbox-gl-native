@@ -28,9 +28,10 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/sqlite3.hpp
 
         # Misc
+        PRIVATE platform/darwin/mbgl/storage/reachability.h
+        PRIVATE platform/darwin/mbgl/storage/reachability.m
         PRIVATE platform/darwin/src/log_nslog.mm
         PRIVATE platform/darwin/src/nsthread.mm
-        PRIVATE platform/darwin/src/reachability.m
         PRIVATE platform/darwin/src/string_nsstring.mm
 
         # Image handling
@@ -60,6 +61,7 @@ macro(mbgl_platform_core)
     )
 
     target_include_directories(mbgl-core
+        PUBLIC platform/darwin
         PRIVATE platform/default
     )
 

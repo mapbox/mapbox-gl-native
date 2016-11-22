@@ -25,7 +25,7 @@
  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <mbgl/platform/darwin/reachability.h>
+#import <mbgl/storage/reachability.h>
 
 #import <sys/socket.h>
 #import <netinet/in.h>
