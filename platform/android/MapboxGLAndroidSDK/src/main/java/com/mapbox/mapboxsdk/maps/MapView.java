@@ -1689,7 +1689,7 @@ public class MapView extends FrameLayout {
             requestDisallowInterceptTouchEvent(true);
 
             // reset tracking if needed
-            resetTrackingModesIfRequired(true, false);
+            resetTrackingModesIfRequired(true, true);
             // Cancel any animation
             cancelTransitions();
 
