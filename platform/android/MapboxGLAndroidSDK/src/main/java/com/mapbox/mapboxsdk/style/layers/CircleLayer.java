@@ -1,7 +1,7 @@
-// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
+// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make android-style-code`.
 package com.mapbox.mapboxsdk.style.layers;
 
-import com.mapbox.mapboxsdk.exceptions.ConversionException;
+import android.support.annotation.UiThread;
 
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -13,6 +13,7 @@ import static com.mapbox.mapboxsdk.utils.ColorUtils.*;
  *
  * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layers-circle">The online documentation</a>
  */
+@UiThread
 public class CircleLayer extends Layer {
 
     /**
