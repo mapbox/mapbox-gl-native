@@ -137,9 +137,6 @@ set(MBGL_CORE_FILES
     src/mbgl/platform/event.cpp
     src/mbgl/platform/log.cpp
 
-    # platform/darwin
-    include/mbgl/platform/darwin/reachability.h
-
     # platform/default
     include/mbgl/platform/default/glfw_view.hpp
     include/mbgl/platform/default/headless_backend.hpp

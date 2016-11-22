@@ -21,7 +21,7 @@
 #import <mbgl/mbgl.hpp>
 #import <mbgl/annotation/annotation.hpp>
 #import <mbgl/map/camera.hpp>
-#import <mbgl/platform/darwin/reachability.h>
+#import <mbgl/storage/reachability.h>
 #import <mbgl/platform/default/thread_pool.hpp>
 #import <mbgl/gl/extension.hpp>
 #import <mbgl/gl/context.hpp>

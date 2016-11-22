@@ -7,7 +7,7 @@
 #import "MGLAPIClient.h"
 #import "MGLLocationManager.h"
 
-#include <mbgl/platform/darwin/reachability.h>
+#include <mbgl/storage/reachability.h>
 #include <sys/sysctl.h>
 
 // Event types

@@ -13,7 +13,7 @@
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/platform/darwin/reachability.h>
+#include <mbgl/storage/reachability.h>
 #include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
