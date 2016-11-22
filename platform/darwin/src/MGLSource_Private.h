@@ -1,6 +1,5 @@
 #import "MGLSource.h"
 
-#include <mbgl/mbgl.hpp>
 #include <mbgl/style/source.hpp>
 
 @class MGLMapView;

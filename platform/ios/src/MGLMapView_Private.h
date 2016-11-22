@@ -1,6 +1,6 @@
 #import <Mapbox/Mapbox.h>
 
-#include <mbgl/mbgl.hpp>
+#import <mbgl/map/map.hpp>
 
 /// Minimum size of an annotation’s accessibility element.
 extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;

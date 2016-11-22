@@ -1,6 +1,7 @@
 #pragma once
 
-#include <mbgl/mbgl.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/map/view.hpp>
 #include <mbgl/map/backend.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
