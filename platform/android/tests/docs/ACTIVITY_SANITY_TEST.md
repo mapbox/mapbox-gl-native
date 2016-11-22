@@ -6,7 +6,7 @@ This type of test checks if an Activity doesn't crash at start up. For this proj
 
 The generation is done by executing:
 
-> make android-generate-test
+> make test-code-android
 
 This command underneath executes the following js file found in:
 
