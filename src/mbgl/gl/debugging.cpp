@@ -2,8 +2,8 @@
 #include <mbgl/gl/debugging.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/extension.hpp>
-#include <mbgl/platform/event.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/event.hpp>
+#include <mbgl/util/logging.hpp>
 
 #define GL_DEBUG_OUTPUT_SYNCHRONOUS       0x8242
 #define GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH 0x8243

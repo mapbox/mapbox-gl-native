@@ -5,7 +5,7 @@
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/offline_download.hpp>
 
-#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/platform.hpp>
 #include <mbgl/util/url.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/work_request.hpp>

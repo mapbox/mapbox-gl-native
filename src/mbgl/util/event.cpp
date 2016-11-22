@@ -1,4 +1,4 @@
-#include <mbgl/platform/event.hpp>
+#include <mbgl/util/event.hpp>
 #include <mbgl/util/enum.hpp>
 
 namespace mbgl {

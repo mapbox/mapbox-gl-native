@@ -3,7 +3,7 @@
 #include <mbgl/storage/network_status.hpp>
 
 #include <mbgl/storage/response.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/thread.hpp>

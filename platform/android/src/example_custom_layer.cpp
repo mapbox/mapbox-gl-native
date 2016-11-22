@@ -1,7 +1,7 @@
 #include <jni.h>
 #include <GLES2/gl2.h>
 
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <mbgl/style/layers/custom_layer.hpp>
 

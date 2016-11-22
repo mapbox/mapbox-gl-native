@@ -8,7 +8,7 @@
 #include <mbgl/util/run_loop.hpp>
 
 #include "node_map.hpp"
-#include "node_log.hpp"
+#include "node_logging.hpp"
 #include "node_request.hpp"
 
 void RegisterModule(v8::Local<v8::Object> target, v8::Local<v8::Object> module) {

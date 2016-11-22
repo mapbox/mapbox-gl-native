@@ -10,9 +10,9 @@
 
 #include <sys/system_properties.h>
 
-#include <mbgl/platform/platform.hpp>
-#include <mbgl/platform/event.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/platform.hpp>
+#include <mbgl/util/event.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/gl/extension.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/util/constants.hpp>

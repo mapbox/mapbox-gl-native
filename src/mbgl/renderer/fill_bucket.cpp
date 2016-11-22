@@ -2,7 +2,7 @@
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/programs/fill_program.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <mapbox/earcut.hpp>
 

@@ -7,7 +7,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/io.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 using namespace mbgl;
 

@@ -23,7 +23,7 @@
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/actor/scheduler.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/math/log2.hpp>
 
 namespace mbgl {

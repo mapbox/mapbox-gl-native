@@ -8,7 +8,7 @@
 
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread_context.hpp>
-#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/platform.hpp>
 
 #include <pthread.h>
 

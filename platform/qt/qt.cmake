@@ -28,7 +28,7 @@ set(MBGL_QT_FILES
     PRIVATE platform/default/sqlite3.hpp
 
     # Misc
-    PRIVATE platform/default/log_stderr.cpp
+    PRIVATE platform/default/logging_stderr.cpp
 
     # Thread pool
     PRIVATE platform/default/mbgl/util/default_thread_pool.cpp

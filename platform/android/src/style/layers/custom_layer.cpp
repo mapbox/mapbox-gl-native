@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 namespace android {

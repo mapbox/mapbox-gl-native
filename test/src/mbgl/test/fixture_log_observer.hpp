@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <vector>
 #include <cstdarg>

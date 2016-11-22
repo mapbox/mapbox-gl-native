@@ -2,7 +2,7 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/util/utf.hpp>
-#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/platform.hpp>
 
 using namespace mbgl;
 

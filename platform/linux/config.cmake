@@ -67,7 +67,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/sqlite3.hpp
 
         # Misc
-        PRIVATE platform/default/log_stderr.cpp
+        PRIVATE platform/default/logging_stderr.cpp
         PRIVATE platform/default/string_stdlib.cpp
         PRIVATE platform/default/thread.cpp
 

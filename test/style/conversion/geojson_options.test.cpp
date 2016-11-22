@@ -4,7 +4,7 @@
 #include <mbgl/style/conversion/geojson_options.hpp>
 #include <mbgl/test/conversion_stubs.hpp>
 
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 using namespace mbgl::style;
 using namespace mbgl::style::conversion;

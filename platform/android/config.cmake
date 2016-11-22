@@ -44,7 +44,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/sqlite3.hpp
 
         # Misc
-        PRIVATE platform/android/src/log_android.cpp
+        PRIVATE platform/android/src/logging_android.cpp
         PRIVATE platform/default/string_stdlib.cpp
 
         # Image handling

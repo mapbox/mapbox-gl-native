@@ -1,5 +1,5 @@
 #include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <GL/osmesa.h>
 

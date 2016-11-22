@@ -1,7 +1,7 @@
 #include <mbgl/storage/http_file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/optional.hpp>

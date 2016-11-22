@@ -1,6 +1,6 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/constants.hpp>
 #include <regex>

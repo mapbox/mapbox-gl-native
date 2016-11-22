@@ -2,8 +2,8 @@
 #include <mbgl/sprite/sprite_atlas_observer.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/gl/context.hpp>
-#include <mbgl/platform/log.hpp>
-#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/logging.hpp>
+#include <mbgl/util/platform.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>

@@ -1,4 +1,4 @@
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/util/thread.hpp>
 

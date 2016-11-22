@@ -1,5 +1,5 @@
 #include <mbgl/storage/local_file_source.hpp>
-#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/platform.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 #include <unistd.h>

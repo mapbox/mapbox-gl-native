@@ -26,7 +26,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/math/minmax.hpp>
 
 #include <algorithm>

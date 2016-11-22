@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/platform.hpp>
 
 namespace mbgl {
 namespace platform {

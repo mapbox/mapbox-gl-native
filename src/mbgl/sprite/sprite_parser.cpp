@@ -1,7 +1,7 @@
 #include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/rapidjson.hpp>
