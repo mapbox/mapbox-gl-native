@@ -6,7 +6,7 @@
 #include <mbgl/platform/default/headless_backend.hpp>
 #include <mbgl/platform/default/offscreen_view.hpp>
 #include <mbgl/storage/online_file_source.hpp>
-#include <mbgl/platform/default/thread_pool.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/run_loop.hpp>
 

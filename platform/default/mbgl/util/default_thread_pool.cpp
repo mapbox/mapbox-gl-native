@@ -1,4 +1,4 @@
-#include <mbgl/platform/default/thread_pool.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/actor/mailbox.hpp>
 
 namespace mbgl {

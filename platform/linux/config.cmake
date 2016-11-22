@@ -82,7 +82,8 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/offscreen_view.cpp
 
         # Thread pool
-        PRIVATE platform/default/thread_pool.cpp
+        PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
+        PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
     )
 
     target_include_directories(mbgl-core

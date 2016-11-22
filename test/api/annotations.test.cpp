@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 
-#include <mbgl/platform/default/thread_pool.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/map/map.hpp>

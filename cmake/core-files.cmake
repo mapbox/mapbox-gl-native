@@ -141,7 +141,6 @@ set(MBGL_CORE_FILES
     include/mbgl/platform/default/headless_backend.hpp
     include/mbgl/platform/default/headless_display.hpp
     include/mbgl/platform/default/offscreen_view.hpp
-    include/mbgl/platform/default/thread_pool.hpp
 
     # programs
     src/mbgl/programs/attributes.hpp
