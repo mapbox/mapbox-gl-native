@@ -29,6 +29,7 @@ target_compile_options(mbgl-node
 
 target_include_directories(mbgl-node
     PRIVATE src # TODO: eliminate
+    PRIVATE platform/default
 )
 
 target_link_libraries(mbgl-node

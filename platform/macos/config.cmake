@@ -42,10 +42,13 @@ macro(mbgl_platform_core)
         PRIVATE platform/darwin/src/image.mm
 
         # Headless view
+        PRIVATE platform/default/mbgl/gl/headless_backend.cpp
+        PRIVATE platform/default/mbgl/gl/headless_backend.hpp
         PRIVATE platform/darwin/src/headless_backend_cgl.cpp
+        PRIVATE platform/default/mbgl/gl/headless_display.hpp
         PRIVATE platform/darwin/src/headless_display_cgl.cpp
-        PRIVATE platform/default/headless_backend.cpp
-        PRIVATE platform/default/offscreen_view.cpp
+        PRIVATE platform/default/mbgl/gl/offscreen_view.cpp
+        PRIVATE platform/default/mbgl/gl/offscreen_view.hpp
 
         # Thread pool
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp

@@ -5,8 +5,8 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/platform/default/headless_backend.hpp>
-#include <mbgl/platform/default/offscreen_view.hpp>
+#include <mbgl/gl/headless_backend.hpp>
+#include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/color.hpp>

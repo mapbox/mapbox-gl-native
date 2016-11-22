@@ -1,4 +1,4 @@
-#include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/gl/headless_display.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/string.hpp>
 

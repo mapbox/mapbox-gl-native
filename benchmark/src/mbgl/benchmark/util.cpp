@@ -1,5 +1,5 @@
 #include <mbgl/benchmark/util.hpp>
-#include <mbgl/platform/default/offscreen_view.hpp>
+#include <mbgl/gl/offscreen_view.hpp>
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>

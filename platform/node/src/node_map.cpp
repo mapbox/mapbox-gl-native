@@ -4,7 +4,7 @@
 #include "node_conversion.hpp"
 #include "node_geojson.hpp"
 
-#include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/gl/headless_display.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
