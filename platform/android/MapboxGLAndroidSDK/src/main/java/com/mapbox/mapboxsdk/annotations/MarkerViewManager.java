@@ -222,11 +222,11 @@ public class MarkerViewManager {
                     adapter.onDeselect(marker, convertView);
                 }
             }
-            if (callbackToMap) {
-                mapboxMap.deselectMarker(marker);
-            }
-            marker.setSelected(false);
         }
+        if (callbackToMap) {
+            mapboxMap.deselectMarker(marker);
+        }
+        marker.setSelected(false);
     }
 
     /**
