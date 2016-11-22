@@ -1,7 +1,7 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/premultiply.hpp>
 #include <mbgl/util/char_array_buffer.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <istream>
 #include <sstream>

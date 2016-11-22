@@ -1,6 +1,6 @@
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <stdexcept>
 #include <vector>

@@ -1,4 +1,4 @@
-#include "node_log.hpp"
+#include "node_logging.hpp"
 
 #include <mbgl/util/enum.hpp>
 

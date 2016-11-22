@@ -1,5 +1,5 @@
 #include <mbgl/text/glyph_set.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/util/i18n.hpp>
 #include <mbgl/text/bidi.hpp>

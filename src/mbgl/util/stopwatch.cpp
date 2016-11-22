@@ -2,7 +2,7 @@
 #include <mbgl/util/stopwatch.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <iostream>
 #include <atomic>

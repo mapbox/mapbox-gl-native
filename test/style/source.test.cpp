@@ -12,7 +12,7 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/tileset.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <mbgl/map/transform.hpp>
 #include <mbgl/style/style.hpp>

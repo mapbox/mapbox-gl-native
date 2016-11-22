@@ -2,7 +2,7 @@
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 #include <mbgl/math/log2.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 namespace algorithm {

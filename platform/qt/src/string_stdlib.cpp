@@ -1,4 +1,4 @@
-#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/platform.hpp>
 
 #include <QByteArray>
 #include <QString>

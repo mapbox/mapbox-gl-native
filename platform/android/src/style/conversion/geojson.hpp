@@ -6,7 +6,7 @@
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
 #include <mbgl/util/rapidjson.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 #include <jni/jni.hpp>
 
 #include <sstream>

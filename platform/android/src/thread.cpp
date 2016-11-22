@@ -1,5 +1,5 @@
-#include <mbgl/platform/log.hpp>
-#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/logging.hpp>
+#include <mbgl/util/platform.hpp>
 
 #include <sys/prctl.h>
 #include <sys/resource.h>

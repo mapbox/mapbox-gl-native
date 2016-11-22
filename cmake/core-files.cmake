@@ -130,13 +130,6 @@ set(MBGL_CORE_FILES
     src/parsedate/parsedate.c
     src/parsedate/parsedate.h
 
-    # platform
-    include/mbgl/platform/event.hpp
-    include/mbgl/platform/log.hpp
-    include/mbgl/platform/platform.hpp
-    src/mbgl/platform/event.cpp
-    src/mbgl/platform/log.cpp
-
     # programs
     src/mbgl/programs/attributes.hpp
     src/mbgl/programs/circle_program.cpp
@@ -386,6 +379,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/constants.hpp
     include/mbgl/util/convert.hpp
     include/mbgl/util/enum.hpp
+    include/mbgl/util/event.hpp
     include/mbgl/util/exception.hpp
     include/mbgl/util/feature.hpp
     include/mbgl/util/font_stack.hpp
@@ -393,8 +387,10 @@ set(MBGL_CORE_FILES
     include/mbgl/util/geojson.hpp
     include/mbgl/util/geometry.hpp
     include/mbgl/util/image.hpp
+    include/mbgl/util/logging.hpp
     include/mbgl/util/noncopyable.hpp
     include/mbgl/util/optional.hpp
+    include/mbgl/util/platform.hpp
     include/mbgl/util/projection.hpp
     include/mbgl/util/range.hpp
     include/mbgl/util/run_loop.hpp
@@ -419,6 +415,7 @@ set(MBGL_CORE_FILES
     src/mbgl/util/convert.cpp
     src/mbgl/util/dtoa.cpp
     src/mbgl/util/dtoa.hpp
+    src/mbgl/util/event.cpp
     src/mbgl/util/exclusive.hpp
     src/mbgl/util/font_stack.cpp
     src/mbgl/util/geo.cpp
@@ -438,6 +435,7 @@ set(MBGL_CORE_FILES
     src/mbgl/util/intersection_tests.hpp
     src/mbgl/util/io.cpp
     src/mbgl/util/io.hpp
+    src/mbgl/util/logging.cpp
     src/mbgl/util/mapbox.cpp
     src/mbgl/util/mapbox.hpp
     src/mbgl/util/mat2.cpp

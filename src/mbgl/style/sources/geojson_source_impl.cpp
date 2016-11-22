@@ -1,4 +1,4 @@
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
 #include <mbgl/style/source_observer.hpp>

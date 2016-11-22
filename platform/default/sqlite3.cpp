@@ -7,7 +7,7 @@
 #include <chrono>
 #include <experimental/optional>
 
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 namespace mapbox {
 namespace sqlite {

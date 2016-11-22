@@ -1,7 +1,7 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/gl/context.hpp>
-#include <mbgl/platform/log.hpp>
-#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/logging.hpp>
+#include <mbgl/util/platform.hpp>
 
 #include <boost/functional/hash.hpp>
 

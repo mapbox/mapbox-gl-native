@@ -4,7 +4,7 @@
 #include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/util/traits.hpp>
 #include <mbgl/util/std.hpp>
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <cstring>
 

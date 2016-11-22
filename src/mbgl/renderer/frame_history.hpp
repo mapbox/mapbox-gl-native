@@ -2,7 +2,7 @@
 
 #include <array>
 
-#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/platform.hpp>
 #include <mbgl/gl/texture.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/image.hpp>

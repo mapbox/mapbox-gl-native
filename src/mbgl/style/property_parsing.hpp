@@ -5,7 +5,7 @@
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
 
-#include <mbgl/platform/log.hpp>
+#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 namespace style {

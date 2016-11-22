@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/platform/event.hpp>
+#include <mbgl/util/event.hpp>
 #include <mbgl/util/chrono.hpp>
 
 #include <string>
