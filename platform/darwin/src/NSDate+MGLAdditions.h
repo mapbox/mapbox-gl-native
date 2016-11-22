@@ -1,6 +1,5 @@
 #import <Foundation/Foundation.h>
 
-#include <mbgl/mbgl.hpp>
 #include <mbgl/util/chrono.hpp>
 
 @interface NSDate (MGLAdditions)

@@ -7,7 +7,7 @@
 #import <GLKit/GLKit.h>
 #import <OpenGLES/EAGL.h>
 
-#include <mbgl/mbgl.hpp>
+#include <mbgl/map/view.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/map/camera.hpp>

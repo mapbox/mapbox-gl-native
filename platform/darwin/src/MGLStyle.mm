@@ -31,7 +31,6 @@
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
-#include <mbgl/mbgl.hpp>
 
 #if TARGET_OS_IPHONE
     #import "UIImage+MGLAdditions.h"

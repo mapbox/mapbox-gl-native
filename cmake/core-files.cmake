@@ -123,9 +123,6 @@ set(MBGL_CORE_FILES
     include/mbgl/math/wrap.hpp
     src/mbgl/math/log2.cpp
 
-    # mbgl
-    include/mbgl/mbgl.hpp
-
     # parsedate
     src/parsedate/parsedate.c
     src/parsedate/parsedate.h

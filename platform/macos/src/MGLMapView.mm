@@ -18,7 +18,7 @@
 #import "MGLAnnotationImage.h"
 #import "MGLMapViewDelegate.h"
 
-#import <mbgl/mbgl.hpp>
+#import <mbgl/map/view.hpp>
 #import <mbgl/annotation/annotation.hpp>
 #import <mbgl/map/camera.hpp>
 #import <mbgl/storage/reachability.h>
