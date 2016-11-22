@@ -10,7 +10,6 @@
 
 #include <mbgl/style/layers/background_layer.hpp>
 
-
 @interface MGLBackgroundStyleLayer ()
 
 @property (nonatomic) mbgl::style::BackgroundLayer *rawLayer;

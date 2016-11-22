@@ -10,7 +10,6 @@
 
 #include <mbgl/style/layers/raster_layer.hpp>
 
-
 @interface MGLRasterStyleLayer ()
 
 @property (nonatomic) mbgl::style::RasterLayer *rawLayer;

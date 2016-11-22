@@ -9,7 +9,6 @@
 #import "MGLSymbolStyleLayer.h"
 
 #include <mbgl/style/layers/symbol_layer.hpp>
-
 namespace mbgl {
 
     MBGL_DEFINE_ENUM(MGLSymbolPlacement, {
@@ -145,10 +144,7 @@ namespace mbgl {
 #pragma mark - Accessing the Layout Attributes
 
 - (void)setSymbolPlacement:(MGLStyleValue<NSValue *> *)symbolPlacement {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::SymbolPlacementType,
-    NSValue *,
-    mbgl::style::SymbolPlacementType,
-    MGLSymbolPlacement>().toEnumPropertyValue(symbolPlacement);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::SymbolPlacementType, NSValue *, mbgl::style::SymbolPlacementType, MGLSymbolPlacement>().toEnumPropertyValue(symbolPlacement);
     _rawLayer->setSymbolPlacement(mbglValue);
 }
 
@@ -208,10 +204,7 @@ namespace mbgl {
 }
 
 - (void)setIconRotationAlignment:(MGLStyleValue<NSValue *> *)iconRotationAlignment {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::AlignmentType,
-    NSValue *,
-    mbgl::style::AlignmentType,
-    MGLIconRotationAlignment>().toEnumPropertyValue(iconRotationAlignment);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::AlignmentType, NSValue *, mbgl::style::AlignmentType, MGLIconRotationAlignment>().toEnumPropertyValue(iconRotationAlignment);
     _rawLayer->setIconRotationAlignment(mbglValue);
 }
 
@@ -231,10 +224,7 @@ namespace mbgl {
 }
 
 - (void)setIconTextFit:(MGLStyleValue<NSValue *> *)iconTextFit {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::IconTextFitType,
-    NSValue *,
-    mbgl::style::IconTextFitType,
-    MGLIconTextFit>().toEnumPropertyValue(iconTextFit);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::IconTextFitType, NSValue *, mbgl::style::IconTextFitType, MGLIconTextFit>().toEnumPropertyValue(iconTextFit);
     _rawLayer->setIconTextFit(mbglValue);
 }
 
@@ -304,10 +294,7 @@ namespace mbgl {
 }
 
 - (void)setTextPitchAlignment:(MGLStyleValue<NSValue *> *)textPitchAlignment {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::AlignmentType,
-    NSValue *,
-    mbgl::style::AlignmentType,
-    MGLTextPitchAlignment>().toEnumPropertyValue(textPitchAlignment);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::AlignmentType, NSValue *, mbgl::style::AlignmentType, MGLTextPitchAlignment>().toEnumPropertyValue(textPitchAlignment);
     _rawLayer->setTextPitchAlignment(mbglValue);
 }
 
@@ -317,10 +304,7 @@ namespace mbgl {
 }
 
 - (void)setTextRotationAlignment:(MGLStyleValue<NSValue *> *)textRotationAlignment {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::AlignmentType,
-    NSValue *,
-    mbgl::style::AlignmentType,
-    MGLTextRotationAlignment>().toEnumPropertyValue(textRotationAlignment);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::AlignmentType, NSValue *, mbgl::style::AlignmentType, MGLTextRotationAlignment>().toEnumPropertyValue(textRotationAlignment);
     _rawLayer->setTextRotationAlignment(mbglValue);
 }
 
@@ -390,10 +374,7 @@ namespace mbgl {
 }
 
 - (void)setTextJustify:(MGLStyleValue<NSValue *> *)textJustify {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextJustifyType,
-    NSValue *,
-    mbgl::style::TextJustifyType,
-    MGLTextJustify>().toEnumPropertyValue(textJustify);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextJustifyType, NSValue *, mbgl::style::TextJustifyType, MGLTextJustify>().toEnumPropertyValue(textJustify);
     _rawLayer->setTextJustify(mbglValue);
 }
 
@@ -403,10 +384,7 @@ namespace mbgl {
 }
 
 - (void)setTextAnchor:(MGLStyleValue<NSValue *> *)textAnchor {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextAnchorType,
-    NSValue *,
-    mbgl::style::TextAnchorType,
-    MGLTextAnchor>().toEnumPropertyValue(textAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextAnchorType, NSValue *, mbgl::style::TextAnchorType, MGLTextAnchor>().toEnumPropertyValue(textAnchor);
     _rawLayer->setTextAnchor(mbglValue);
 }
 
@@ -456,10 +434,7 @@ namespace mbgl {
 }
 
 - (void)setTextTransform:(MGLStyleValue<NSValue *> *)textTransform {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextTransformType,
-    NSValue *,
-    mbgl::style::TextTransformType,
-    MGLTextTransform>().toEnumPropertyValue(textTransform);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextTransformType, NSValue *, mbgl::style::TextTransformType, MGLTextTransform>().toEnumPropertyValue(textTransform);
     _rawLayer->setTextTransform(mbglValue);
 }
 
@@ -571,10 +546,7 @@ namespace mbgl {
 }
 
 - (void)setIconTranslateAnchor:(MGLStyleValue<NSValue *> *)iconTranslateAnchor {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType,
-    NSValue *,
-    mbgl::style::TranslateAnchorType,
-    MGLIconTranslateAnchor>().toEnumPropertyValue(iconTranslateAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLIconTranslateAnchor>().toEnumPropertyValue(iconTranslateAnchor);
     _rawLayer->setIconTranslateAnchor(mbglValue);
 }
 
@@ -644,10 +616,7 @@ namespace mbgl {
 }
 
 - (void)setTextTranslateAnchor:(MGLStyleValue<NSValue *> *)textTranslateAnchor {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType,
-    NSValue *,
-    mbgl::style::TranslateAnchorType,
-    MGLTextTranslateAnchor>().toEnumPropertyValue(textTranslateAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLTextTranslateAnchor>().toEnumPropertyValue(textTranslateAnchor);
     _rawLayer->setTextTranslateAnchor(mbglValue);
 }
 

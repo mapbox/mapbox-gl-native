@@ -9,7 +9,6 @@
 #import "MGLLineStyleLayer.h"
 
 #include <mbgl/style/layers/line_layer.hpp>
-
 namespace mbgl {
 
     MBGL_DEFINE_ENUM(MGLLineCap, {
@@ -98,10 +97,7 @@ namespace mbgl {
 #pragma mark - Accessing the Layout Attributes
 
 - (void)setLineCap:(MGLStyleValue<NSValue *> *)lineCap {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineCapType,
-    NSValue *,
-    mbgl::style::LineCapType,
-    MGLLineCap>().toEnumPropertyValue(lineCap);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineCapType, NSValue *, mbgl::style::LineCapType, MGLLineCap>().toEnumPropertyValue(lineCap);
     _rawLayer->setLineCap(mbglValue);
 }
 
@@ -111,10 +107,7 @@ namespace mbgl {
 }
 
 - (void)setLineJoin:(MGLStyleValue<NSValue *> *)lineJoin {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineJoinType,
-    NSValue *,
-    mbgl::style::LineJoinType,
-    MGLLineJoin>().toEnumPropertyValue(lineJoin);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toEnumPropertyValue(lineJoin);
     _rawLayer->setLineJoin(mbglValue);
 }
 
@@ -176,10 +169,7 @@ namespace mbgl {
 }
 
 - (void)setLineTranslateAnchor:(MGLStyleValue<NSValue *> *)lineTranslateAnchor {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType,
-    NSValue *,
-    mbgl::style::TranslateAnchorType,
-    MGLLineTranslateAnchor>().toEnumPropertyValue(lineTranslateAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLLineTranslateAnchor>().toEnumPropertyValue(lineTranslateAnchor);
     _rawLayer->setLineTranslateAnchor(mbglValue);
 }
 
