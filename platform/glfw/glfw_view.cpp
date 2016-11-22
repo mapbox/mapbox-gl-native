@@ -1,4 +1,5 @@
-#include <mbgl/platform/default/glfw_view.hpp>
+#include "glfw_view.hpp"
+
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/style/transition_options.hpp>

@@ -1,9 +1,9 @@
-#include <mbgl/mbgl.hpp>
+#include "glfw_view.hpp"
+#include "settings_json.hpp"
+
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/platform/default/settings_json.hpp>
-#include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
