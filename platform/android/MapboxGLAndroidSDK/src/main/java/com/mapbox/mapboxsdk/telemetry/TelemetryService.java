@@ -8,14 +8,12 @@ import android.content.pm.ServiceInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
+import timber.log.Timber;
 
 /**
  * Manages Startup and Shutdown of Telemetry resources
  */
 public class TelemetryService extends Service {
-
-    private static final String TAG = "TelemetryService";
 
     private TelemetryLocationReceiver telemetryLocationReceiver = null;
 
@@ -53,7 +51,7 @@ public class TelemetryService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        Log.i(TAG, "onCreate() called");
+        Timber.i("onCreate() called");
 
         // Enable Location Listening for lifecycle of app
         IntentFilter filter = new IntentFilter(TelemetryLocationReceiver.INTENT_STRING);
@@ -128,7 +126,7 @@ public class TelemetryService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Log.i(TAG, "onStartCommand() called");
+        Timber.i("onStartCommand() called");
 
         return START_NOT_STICKY;
     }
@@ -142,13 +140,13 @@ public class TelemetryService extends Service {
         try {
             Thread.sleep(1000);
         } catch (Exception e) {
-            Log.e(TAG, "Error while trying to sleep for 1 second: " + e);
+            Timber.e("Error while trying to sleep for 1 second: " + e);
         }
 
         try {
             unregisterReceiver(telemetryLocationReceiver);
         } catch (IllegalArgumentException e) {
-            Log.e(TAG, "Error when unregisterReceiver: " + e);
+            Timber.e("Error when unregisterReceiver: " + e);
         }
 
     }

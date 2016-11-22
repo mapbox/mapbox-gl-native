@@ -6,7 +6,7 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -37,7 +37,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
  * Sample Activity to show off geojson source clustering and filter usage
  */
 public class GeoJsonClusteringActivity extends AppCompatActivity {
-    private static final String TAG = GeoJsonClusteringActivity.class.getSimpleName();
 
     private MapView mapView;
     private MapboxMap mapboxMap;
@@ -132,7 +131,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
                     )
             );
         } catch (MalformedURLException malformedUrlException) {
-            Log.e(TAG, "That's not an url... " + malformedUrlException.getMessage());
+            Timber.e("That's not an url... " + malformedUrlException.getMessage());
         }
 
         //Add unclustered layer

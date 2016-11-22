@@ -3,7 +3,7 @@ package com.mapbox.mapboxsdk.testapp.style;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
-import android.util.Log;
+import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -23,7 +23,6 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class RuntimeStyleBackgroundLayerTest
         extends ActivityInstrumentationTestCase2<RuntimeStyleTestActivity> {
-    private static final String TAG = RuntimeStyleBackgroundLayerTest.class.getSimpleName();
 
     public RuntimeStyleBackgroundLayerTest() {
         super(RuntimeStyleTestActivity.class);
@@ -40,7 +39,7 @@ public class RuntimeStyleBackgroundLayerTest
         getActivity().mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
-                Log.i(TAG, "visibility");
+                Timber.i("visibility");
                 BackgroundLayer layer = mapboxMap.getLayerAs("background");
                 assertNotNull(layer);
 

@@ -6,7 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -37,8 +37,6 @@ import java.util.ArrayList;
 
 public class OfflineActivity extends AppCompatActivity
         implements OfflineDownloadRegionDialog.DownloadRegionDialogListener {
-
-    private static final String LOG_TAG = "OfflineActivity";
 
     // JSON encoding/decoding
     public static final String JSON_CHARSET = "UTF-8";
@@ -79,7 +77,7 @@ public class OfflineActivity extends AppCompatActivity
         // state of your app. This will override any checks performed via the ConnectivityManager.
         //MapboxAccountManager.getInstance().setConnected(false);
         Boolean connected = MapboxAccountManager.getInstance().isConnected();
-        Log.d(LOG_TAG, String.format(MapboxConstants.MAPBOX_LOCALE,
+        Timber.d(String.format(MapboxConstants.MAPBOX_LOCALE,
                 "MapboxAccountManager is connected: %b", connected));
 
         // Set up map
@@ -89,7 +87,7 @@ public class OfflineActivity extends AppCompatActivity
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                Log.d(LOG_TAG, "Map is ready");
+                Timber.d("Map is ready");
                 OfflineActivity.this.mapboxMap = mapboxMap;
 
                 // Set initial position to UNHQ in NYC
@@ -185,7 +183,7 @@ public class OfflineActivity extends AppCompatActivity
      */
 
     private void handleDownloadRegion() {
-        Log.d(LOG_TAG, "handleDownloadRegion");
+        Timber.d("handleDownloadRegion");
 
         // Show dialog
         OfflineDownloadRegionDialog offlineDownloadRegionDialog = new OfflineDownloadRegionDialog();
@@ -193,7 +191,7 @@ public class OfflineActivity extends AppCompatActivity
     }
 
     private void handleListRegions() {
-        Log.d(LOG_TAG, "handleListRegions");
+        Timber.d("handleListRegions");
 
         // Query the DB asynchronously
         offlineManager.listOfflineRegions(new OfflineManager.ListOfflineRegionsCallback() {
@@ -223,7 +221,7 @@ public class OfflineActivity extends AppCompatActivity
 
             @Override
             public void onError(String error) {
-                Log.e(LOG_TAG, "Error: " + error);
+                Timber.e("Error: " + error);
             }
         });
     }
@@ -240,7 +238,7 @@ public class OfflineActivity extends AppCompatActivity
         }
 
         // Start progress bar
-        Log.d(LOG_TAG, "Download started: " + regionName);
+        Timber.d("Download started: " + regionName);
         startProgress();
 
         // Definition
@@ -259,14 +257,14 @@ public class OfflineActivity extends AppCompatActivity
         offlineManager.createOfflineRegion(definition, metadata, new OfflineManager.CreateOfflineRegionCallback() {
             @Override
             public void onCreate(OfflineRegion offlineRegion) {
-                Log.d(LOG_TAG, "Offline region created: " + regionName);
+                Timber.d("Offline region created: " + regionName);
                 OfflineActivity.this.offlineRegion = offlineRegion;
                 launchDownload();
             }
 
             @Override
             public void onError(String error) {
-                Log.e(LOG_TAG, "Error: " + error);
+                Timber.e("Error: " + error);
             }
         });
     }
@@ -291,7 +289,7 @@ public class OfflineActivity extends AppCompatActivity
                 }
 
                 // Debug
-                Log.d(LOG_TAG, String.format("%s/%s resources; %s bytes downloaded.",
+                Timber.d(String.format("%s/%s resources; %s bytes downloaded.",
                         String.valueOf(status.getCompletedResourceCount()),
                         String.valueOf(status.getRequiredResourceCount()),
                         String.valueOf(status.getCompletedResourceSize())));
@@ -299,13 +297,13 @@ public class OfflineActivity extends AppCompatActivity
 
             @Override
             public void onError(OfflineRegionError error) {
-                Log.e(LOG_TAG, "onError reason: " + error.getReason());
-                Log.e(LOG_TAG, "onError message: " + error.getMessage());
+                Timber.e("onError reason: " + error.getReason());
+                Timber.e("onError message: " + error.getMessage());
             }
 
             @Override
             public void mapboxTileCountLimitExceeded(long limit) {
-                Log.e(LOG_TAG, "Mapbox tile count limit exceeded: " + limit);
+                Timber.e("Mapbox tile count limit exceeded: " + limit);
             }
         });
 

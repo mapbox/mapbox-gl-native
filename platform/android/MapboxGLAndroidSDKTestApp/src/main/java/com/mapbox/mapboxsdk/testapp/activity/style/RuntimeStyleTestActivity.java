@@ -12,7 +12,6 @@ import com.mapbox.mapboxsdk.testapp.R;
  * Test activity for unit test execution
  */
 public class RuntimeStyleTestActivity extends AppCompatActivity {
-    private static final String TAG = RuntimeStyleTestActivity.class.getSimpleName();
 
     public MapView mapView;
     private MapboxMap mapboxMap;

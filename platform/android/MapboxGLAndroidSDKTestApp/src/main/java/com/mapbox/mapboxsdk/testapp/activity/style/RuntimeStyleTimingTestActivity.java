@@ -20,7 +20,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
  * Test activity for unit test execution
  */
 public class RuntimeStyleTimingTestActivity extends AppCompatActivity {
-    private static final String TAG = RuntimeStyleTimingTestActivity.class.getSimpleName();
 
     public MapView mapView;
     private MapboxMap mapboxMap;

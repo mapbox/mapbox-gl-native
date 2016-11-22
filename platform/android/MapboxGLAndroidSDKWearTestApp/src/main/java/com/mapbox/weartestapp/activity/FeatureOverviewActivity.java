@@ -15,7 +15,6 @@ import java.util.List;
 
 public class FeatureOverviewActivity extends WearableActivity implements FeatureAdapter.ItemSelectedListener {
 
-  private static final String TAG = "MainActivity";
   private WearableRecyclerView wearableRecyclerView;
   private List<Feature> exampleItemModels;
 

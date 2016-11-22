@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
+import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.BackgroundLayer;
@@ -28,7 +28,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
  */
 @RunWith(AndroidJUnit4.class)
 public class BackgroundLayerStyleTest extends BaseStyleTest {
-    private static final String TAG = BackgroundLayerStyleTest.class.getSimpleName();
 
     @Rule
     public final ActivityTestRule<RuntimeStyleTestActivity> rule = new ActivityTestRule<>(RuntimeStyleTestActivity.class);
@@ -51,9 +50,9 @@ public class BackgroundLayerStyleTest extends BaseStyleTest {
 
         mapboxMap = rule.getActivity().getMapboxMap();
 
-        Log.i(TAG, "Retrieving layer");
+        Timber.i("Retrieving layer");
         layer = mapboxMap.getLayerAs("background");
-        Log.i(TAG, "visibility");
+        Timber.i("visibility");
         assertNotNull(layer);
 
         //Get initial
@@ -70,9 +69,9 @@ public class BackgroundLayerStyleTest extends BaseStyleTest {
 
         mapboxMap = rule.getActivity().getMapboxMap();
 
-        Log.i(TAG, "Retrieving layer");
+        Timber.i("Retrieving layer");
         layer = mapboxMap.getLayerAs("background");
-        Log.i(TAG, "background-color");
+        Timber.i("background-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -86,9 +85,9 @@ public class BackgroundLayerStyleTest extends BaseStyleTest {
 
         mapboxMap = rule.getActivity().getMapboxMap();
 
-        Log.i(TAG, "Retrieving layer");
+        Timber.i("Retrieving layer");
         layer = mapboxMap.getLayerAs("background");
-        Log.i(TAG, "background-color");
+        Timber.i("background-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -102,9 +101,9 @@ public class BackgroundLayerStyleTest extends BaseStyleTest {
 
         mapboxMap = rule.getActivity().getMapboxMap();
 
-        Log.i(TAG, "Retrieving layer");
+        Timber.i("Retrieving layer");
         layer = mapboxMap.getLayerAs("background");
-        Log.i(TAG, "background-pattern");
+        Timber.i("background-pattern");
         assertNotNull(layer);
 
         //Set and Get
@@ -118,9 +117,9 @@ public class BackgroundLayerStyleTest extends BaseStyleTest {
 
         mapboxMap = rule.getActivity().getMapboxMap();
 
-        Log.i(TAG, "Retrieving layer");
+        Timber.i("Retrieving layer");
         layer = mapboxMap.getLayerAs("background");
-        Log.i(TAG, "background-opacity");
+        Timber.i("background-opacity");
         assertNotNull(layer);
 
         //Set and Get

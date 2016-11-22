@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.telemetry;
 
-import android.util.Log;
+import timber.log.Timber;
 import java.io.IOException;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -17,16 +17,14 @@ import okio.Okio;
  */
 public final class GzipRequestInterceptor implements Interceptor {
 
-    private static final String TAG = "GzipRequestInterceptor";
-
     @Override public Response intercept(Interceptor.Chain chain) throws IOException {
         Request originalRequest = chain.request();
         if (originalRequest.body() == null || originalRequest.header("Content-Encoding") != null) {
-            Log.d(TAG, "Not compressing");
+            Timber.d("Not compressing");
             return chain.proceed(originalRequest);
         }
 
-        Log.d(TAG, "Compressing");
+        Timber.d("Compressing");
         Request compressedRequest = originalRequest.newBuilder()
                 .header("Content-Encoding", "gzip")
                 .method(originalRequest.method(), gzip(originalRequest.body()))

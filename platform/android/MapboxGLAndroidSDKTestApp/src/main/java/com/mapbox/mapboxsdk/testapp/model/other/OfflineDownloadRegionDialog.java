@@ -7,14 +7,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
+import timber.log.Timber;
 import android.widget.EditText;
 
 import com.mapbox.mapboxsdk.testapp.R;
 
 public class OfflineDownloadRegionDialog extends DialogFragment {
-
-    private static final String LOG_TAG = "OfflineDownloadRegionDialog";
 
     public interface DownloadRegionDialogListener {
         void onDownloadRegionDialogPositiveClick(String regionName);
@@ -48,7 +46,7 @@ public class OfflineDownloadRegionDialog extends DialogFragment {
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Log.d(LOG_TAG, "Download cancelled.");
+                Timber.d("Download cancelled.");
             }
         });
 

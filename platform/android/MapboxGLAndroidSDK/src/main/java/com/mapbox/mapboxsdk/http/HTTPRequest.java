@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.text.TextUtils;
-import android.util.Log;
+import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
@@ -32,7 +32,6 @@ import okhttp3.internal.Util;
 class HTTPRequest implements Callback {
 
     private static OkHttpClient mClient = new OkHttpClient();
-    private static final String LOG_TAG = HTTPRequest.class.getName();
     private String USER_AGENT_STRING = null;
 
     private static final int CONNECTION_ERROR = 0;
@@ -108,11 +107,11 @@ class HTTPRequest implements Callback {
     @Override
     public void onResponse(Call call, Response response) throws IOException {
         if (response.isSuccessful()) {
-            Log.v(LOG_TAG, String.format("[HTTP] Request was successful (code = %d).", response.code()));
+            Timber.v(String.format("[HTTP] Request was successful (code = %d).", response.code()));
         } else {
             // We don't want to call this unsuccessful because a 304 isn't really an error
             String message = !TextUtils.isEmpty(response.message()) ? response.message() : "No additional information";
-            Log.d(LOG_TAG, String.format(
+            Timber.d(String.format(
                     "[HTTP] Request with response code = %d: %s",
                     response.code(), message));
         }
@@ -158,14 +157,14 @@ class HTTPRequest implements Callback {
         String errorMessage = e.getMessage() != null ? e.getMessage() : "Error processing the request";
 
         if (type == TEMPORARY_ERROR) {
-            Log.d(LOG_TAG, String.format(MapboxConstants.MAPBOX_LOCALE,
+            Timber.d(String.format(MapboxConstants.MAPBOX_LOCALE,
                 "Request failed due to a temporary error: %s", errorMessage));
         } else if (type == CONNECTION_ERROR) {
-            Log.i(LOG_TAG, String.format(MapboxConstants.MAPBOX_LOCALE,
+            Timber.i(String.format(MapboxConstants.MAPBOX_LOCALE,
                 "Request failed due to a connection error: %s", errorMessage));
         } else {
             // PERMANENT_ERROR
-            Log.w(LOG_TAG, String.format(MapboxConstants.MAPBOX_LOCALE,
+            Timber.w(String.format(MapboxConstants.MAPBOX_LOCALE,
                 "Request failed due to a permanent error: %s", errorMessage));
         }
 

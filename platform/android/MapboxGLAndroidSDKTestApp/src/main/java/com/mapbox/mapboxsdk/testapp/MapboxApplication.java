@@ -5,6 +5,9 @@ import android.os.StrictMode;
 
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.squareup.leakcanary.LeakCanary;
+import timber.log.Timber;
+
+import static timber.log.Timber.DebugTree;
 
 public class MapboxApplication extends Application {
 
@@ -19,6 +22,8 @@ public class MapboxApplication extends Application {
         }
         LeakCanary.install(this);
 
+        initializeLogger();
+
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectDiskReads()
                 .detectDiskWrites()
@@ -32,5 +37,11 @@ public class MapboxApplication extends Application {
                 .build());
 
         MapboxAccountManager.start(getApplicationContext(), getString(R.string.mapbox_access_token));
+    }
+
+    private void initializeLogger() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new DebugTree());
+        }
     }
 }

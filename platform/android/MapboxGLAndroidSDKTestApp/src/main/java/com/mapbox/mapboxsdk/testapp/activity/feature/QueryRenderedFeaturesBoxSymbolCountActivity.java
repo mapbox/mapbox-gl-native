@@ -7,7 +7,7 @@ import android.support.annotation.RawRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -37,7 +37,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
  * Demo's query rendered features on Symbols
  */
 public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivity {
-    private static final String TAG = QueryRenderedFeaturesBoxSymbolCountActivity.class.getSimpleName();
 
     public MapView mapView;
     private MapboxMap mapboxMap;
@@ -67,7 +66,7 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
                 try {
                     mapboxMap.addSource(new GeoJsonSource("symbols-source", readRawResource(R.raw.test_points_utrecht)));
                 } catch (IOException e) {
-                    Log.e(TAG, "Could not load geojson: " + e.getMessage());
+                    Timber.e("Could not load geojson: " + e.getMessage());
                     return;
                 }
                 mapboxMap.addImage("test-icon", BitmapFactory.decodeResource(getResources(), R.drawable.mapbox_marker_icon_default));
@@ -81,7 +80,7 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
                         int top = selectionBox.getTop() - mapView.getTop();
                         int left = selectionBox.getLeft() - mapView.getLeft();
                         RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
-                        Log.i(TAG, String.format("Querying box %s", box));
+                        Timber.i(String.format("Querying box %s", box));
                         List<Feature> features = mapboxMap.queryRenderedFeatures(box, "symbols-layer");
 
                         //Show count

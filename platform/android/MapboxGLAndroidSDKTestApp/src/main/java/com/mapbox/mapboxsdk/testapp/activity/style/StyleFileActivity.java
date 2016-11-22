@@ -9,7 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -37,7 +37,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
  * Example on how to use a file:// resource for the style.json
  */
 public class StyleFileActivity extends AppCompatActivity {
-  private static final String TAG = StyleFileActivity.class.getSimpleName();
 
   private MapboxMap mapboxMap;
   private MapView mapView;
@@ -68,7 +67,7 @@ public class StyleFileActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
-            Log.i(TAG, "Loading style file");
+            Timber.i("Loading style file");
             new CreateStyleFileTask().execute();
           }
         });
@@ -87,7 +86,7 @@ public class StyleFileActivity extends AppCompatActivity {
       try {
         cacheStyleFile = File.createTempFile("my-", ".style.json");
         cacheStyleFile.createNewFile();
-        Log.i(TAG, "Writing style file to: " + cacheStyleFile.getAbsolutePath());
+        Timber.i("Writing style file to: " + cacheStyleFile.getAbsolutePath());
         writeToFile(cacheStyleFile, readRawResource(R.raw.local_style));
       } catch (Exception e) {
         Toast.makeText(StyleFileActivity.this, "Could not create style file in cache dir", Toast.LENGTH_SHORT).show();

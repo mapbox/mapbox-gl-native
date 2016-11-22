@@ -8,7 +8,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.telemetry.TelemetryLocationReceiver;
 import com.mapzen.android.lost.api.LocationRequest;
@@ -29,8 +29,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * </p>
  */
 public class LocationServices implements com.mapzen.android.lost.api.LocationListener {
-
-    private static final String TAG = "LocationServices";
 
     private static LocationServices instance;
 
@@ -73,7 +71,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
      */
     public void toggleGPS(boolean enableGPS) {
         if (!areLocationPermissionsGranted()) {
-            Log.w(TAG, "Location Permissions Not Granted Yet.  Try again after requesting.");
+            Timber.w("Location Permissions Not Granted Yet.  Try again after requesting.");
             return;
         }
 
@@ -130,7 +128,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
      */
     @Override
     public void onLocationChanged(Location location) {
-//        Log.d(TAG, "onLocationChanged()..." + location);
+//        Timber.d("onLocationChanged()..." + location);
         this.lastLocation = location;
 
         // Update Listeners
@@ -181,7 +179,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
     public boolean areLocationPermissionsGranted() {
         if ((ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
                 (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-            Log.w(TAG, "Location Permissions Not Granted Yet.  Try again after requesting.");
+            Timber.w("Location Permissions Not Granted Yet.  Try again after requesting.");
             return false;
         }
         return true;

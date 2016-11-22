@@ -6,10 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -67,7 +66,7 @@ public class RealTimeGeoJsonActivity extends AppCompatActivity implements OnMapR
         try {
             mapboxMap.addSource(new GeoJsonSource(ID_GEOJSON_SOURCE, new URL(URL_GEOJSON_SOURCE)));
         }catch (MalformedURLException e){
-            Log.e(MapboxConstants.TAG, "Invalid URL", e);
+            Timber.e("Invalid URL", e);
         }
 
         // add layer

@@ -19,10 +19,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.adapter.FeatureAdapter;
 import com.mapbox.mapboxsdk.testapp.adapter.FeatureSectionAdapter;
@@ -91,7 +90,7 @@ public class FeatureOverviewActivity extends AppCompatActivity {
                 getPackageManager().getPackageInfo(getPackageName(),
                     PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA));
         } catch (PackageManager.NameNotFoundException exception) {
-            Log.e(MapboxConstants.TAG, "Could not resolve package info", exception);
+            Timber.e("Could not resolve package info", exception);
         }
     }
 

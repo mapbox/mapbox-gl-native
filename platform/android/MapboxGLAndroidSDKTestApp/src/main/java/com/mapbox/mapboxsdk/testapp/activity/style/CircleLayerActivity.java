@@ -8,11 +8,10 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -68,8 +67,7 @@ public class CircleLayerActivity extends AppCompatActivity {
                             try {
                                 mapboxMap.addSource(new GeoJsonSource("point", new URL("https://gist.githubusercontent.com/anonymous/87eca90e80a72b1b42be9d0201ec3c8e/raw/acbb46384fd56044a504f122950d0637d98b4e7a/map.geojson")));
                             } catch (MalformedURLException malformedUrlException) {
-                                Log.e(
-                                    MapboxConstants.TAG,
+                                Timber.e(
                                     "That's not an url... " + malformedUrlException.getMessage()
                                 );
                             }

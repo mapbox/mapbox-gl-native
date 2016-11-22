@@ -7,7 +7,7 @@ import android.support.annotation.RawRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -74,7 +74,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
  * Sample Activity to show off the runtime style api
  */
 public class RuntimeStyleActivity extends AppCompatActivity {
-    private static final String TAG = RuntimeStyleActivity.class.getSimpleName();
 
     private MapView mapView;
     private MapboxMap mapboxMap;
@@ -294,12 +293,12 @@ public class RuntimeStyleActivity extends AppCompatActivity {
         layer = mapboxMap.getLayerAs("parksLayer");
         //And get some properties
         PropertyValue<Boolean> fillAntialias = layer.getFillAntialias();
-        Log.d(TAG, "Fill anti alias: " + fillAntialias.getValue());
+        Timber.d("Fill anti alias: " + fillAntialias.getValue());
         layer.setProperties(fillTranslateAnchor(FILL_TRANSLATE_ANCHOR_MAP));
         PropertyValue<String> fillTranslateAnchor = layer.getFillTranslateAnchor();
-        Log.d(TAG, "Fill translate anchor: " + fillTranslateAnchor.getValue());
+        Timber.d("Fill translate anchor: " + fillTranslateAnchor.getValue());
         PropertyValue<String> visibility = layer.getVisibility();
-        Log.d(TAG, "Visibility: " + visibility.getValue());
+        Timber.d("Visibility: " + visibility.getValue());
 
         //Get a good look at it all
         mapboxMap.animateCamera(CameraUpdateFactory.zoomTo(12));
@@ -348,14 +347,14 @@ public class RuntimeStyleActivity extends AppCompatActivity {
                     return;
                 }
                 
-                Log.d(TAG, "Updating parks source");
+                Timber.d("Updating parks source");
                 //change the source
                 int park = counter < parks.getFeatures().size() - 1 ? counter : 0;
 
                 GeoJsonSource source = mapboxMap.getSourceAs("dynamic-park-source");
 
                 if (source == null) {
-                    Log.e(TAG, "Source not found");
+                    Timber.e("Source not found");
                     Toast.makeText(RuntimeStyleActivity.this, "Source not found", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -427,11 +426,11 @@ public class RuntimeStyleActivity extends AppCompatActivity {
         PropertyValue<String> fillColor = layer.getFillColor();
         Function<String> function = fillColor.getFunction();
         if (function != null) {
-            Log.d(TAG, "Fill color base: " + function.getBase());
-            Log.d(TAG, "Fill color #stops: " + function.getStops().length);
+            Timber.d("Fill color base: " + function.getBase());
+            Timber.d("Fill color #stops: " + function.getStops().length);
             if (function.getStops() != null) {
                 for (Stop stop : function.getStops()) {
-                    Log.d(TAG, "Fill color #stops: " + stop);
+                    Timber.d("Fill color #stops: " + stop);
                 }
             }
         }
@@ -489,7 +488,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
                     return;
                 }
 
-                Log.d(TAG, "Styling filtered fill layer");
+                Timber.d("Styling filtered fill layer");
 
                 FillLayer states = (FillLayer) mapboxMap.getLayer("states");
 
@@ -519,7 +518,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
                     return;
                 }
 
-                Log.d(TAG, "Styling filtered line layer");
+                Timber.d("Styling filtered line layer");
 
                 LineLayer counties = (LineLayer) mapboxMap.getLayer("counties");
 
@@ -550,7 +549,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
                     return;
                 }
 
-                Log.d(TAG, "Styling numeric fill layer");
+                Timber.d("Styling numeric fill layer");
 
                 FillLayer regions = (FillLayer) mapboxMap.getLayer("regions");
 

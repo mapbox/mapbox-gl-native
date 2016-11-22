@@ -8,7 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -32,7 +32,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
  * Example to add a sprite image and use it in a Symbol Layer
  */
 public class CustomSpriteActivity extends AppCompatActivity {
-    private static final String TAG = CustomSpriteActivity.class.getSimpleName();
     private static final String CUSTOM_ICON = "custom-icon";
 
     private MapboxMap mapboxMap;
@@ -69,7 +68,7 @@ public class CustomSpriteActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         if (point == null) {
-                            Log.i(TAG, "First click -> Car");
+                            Timber.i("First click -> Car");
                             // Add an icon to reference later
                             mapboxMap.addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_car_top));
 

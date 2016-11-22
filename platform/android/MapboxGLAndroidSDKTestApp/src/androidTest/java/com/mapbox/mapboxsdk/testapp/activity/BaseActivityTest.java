@@ -4,9 +4,8 @@ import android.app.Activity;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingResourceTimeoutException;
 import android.support.test.rule.ActivityTestRule;
-import android.util.Log;
+import timber.log.Timber;
 
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
@@ -31,13 +30,13 @@ public abstract class BaseActivityTest {
     @Before
     public void beforeTest() {
         try {
-            Log.e(MapboxConstants.TAG, "@Before test: register idle resource");
+            Timber.e("@Before test: register idle resource");
             idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
             Espresso.registerIdlingResources(idlingResource);
             checkViewIsDisplayed(R.id.mapView);
             mapboxMap = idlingResource.getMapboxMap();
         } catch (IdlingResourceTimeoutException e) {
-            Log.e(MapboxConstants.TAG, "Idling resource timed out. Couldn't not validate if map is ready.");
+            Timber.e("Idling resource timed out. Couldn't not validate if map is ready.");
             throw new RuntimeException("Could not start test for " + getActivityClass().getSimpleName() + ".\n" +
                     "The ViewHierarchy doesn't contain a view with resource id = R.id.mapView or \n" +
                     "the Activity doesn't contain an instance variable with a name equal to mapboxMap.\n" +
@@ -64,7 +63,7 @@ public abstract class BaseActivityTest {
 
     @After
     public void afterTest() {
-        Log.e(MapboxConstants.TAG, "@After test: unregister idle resource");
+        Timber.e("@After test: unregister idle resource");
         Espresso.unregisterIdlingResources(idlingResource);
     }
 }
