@@ -42,6 +42,7 @@ public class FillLayer extends Layer {
      * @param sourceLayer the source layer to set
      */
     public void setSourceLayer(String sourceLayer) {
+        checkValidity();
         nativeSetSourceLayer(sourceLayer);
     }
 
@@ -61,6 +62,7 @@ public class FillLayer extends Layer {
      * @param filter the filter to set
      */
     public void setFilter(Filter.Statement filter) {
+        checkValidity();
         this.setFilter(filter.toArray());
     }
 
@@ -70,6 +72,7 @@ public class FillLayer extends Layer {
      * @param filter the filter array to set
      */
     public void setFilter(Object[] filter) {
+        checkValidity();
         nativeSetFilter(filter);
     }
 
@@ -116,6 +119,7 @@ public class FillLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Boolean> getFillAntialias() {
+        checkValidity();
         return (PropertyValue<Boolean>) new PropertyValue(nativeGetFillAntialias());
     }
  
@@ -126,6 +130,7 @@ public class FillLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getFillOpacity() {
+        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetFillOpacity());
     }
  
@@ -136,6 +141,7 @@ public class FillLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getFillColor() {
+        checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetFillColor());
     }
      /**
@@ -146,6 +152,7 @@ public class FillLayer extends Layer {
      */
     @ColorInt
     public int getFillColorAsInt() {
+        checkValidity();
         PropertyValue<String> value = getFillColor();
         if (value.isValue()) {
             return rgbaToColor(value.getValue());
@@ -162,6 +169,7 @@ public class FillLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getFillOutlineColor() {
+        checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetFillOutlineColor());
     }
      /**
@@ -172,6 +180,7 @@ public class FillLayer extends Layer {
      */
     @ColorInt
     public int getFillOutlineColorAsInt() {
+        checkValidity();
         PropertyValue<String> value = getFillOutlineColor();
         if (value.isValue()) {
             return rgbaToColor(value.getValue());
@@ -188,6 +197,7 @@ public class FillLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float[]> getFillTranslate() {
+        checkValidity();
         return (PropertyValue<Float[]>) new PropertyValue(nativeGetFillTranslate());
     }
  
@@ -198,6 +208,7 @@ public class FillLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getFillTranslateAnchor() {
+        checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetFillTranslateAnchor());
     }
  
@@ -208,6 +219,7 @@ public class FillLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getFillPattern() {
+        checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetFillPattern());
     }
  

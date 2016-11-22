@@ -4,8 +4,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/platform/default/headless_backend.hpp>
-#include <mbgl/platform/default/offscreen_view.hpp>
+#include <mbgl/platform/default/headless_view.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -54,9 +53,7 @@ public:
 
     std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback);
 
-    const float pixelRatio;
-    mbgl::HeadlessBackend backend;
-    std::unique_ptr<mbgl::OffscreenView> view;
+    mbgl::HeadlessView view;
     NodeThreadPool threadpool;
     std::unique_ptr<mbgl::Map> map;
 

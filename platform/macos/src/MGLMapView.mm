@@ -25,8 +25,6 @@
 #import <mbgl/platform/default/thread_pool.hpp>
 #import <mbgl/gl/extension.hpp>
 #import <mbgl/gl/gl.hpp>
-#import <mbgl/gl/context.hpp>
-#import <mbgl/map/backend.hpp>
 #import <mbgl/sprite/sprite_image.hpp>
 #import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/storage/network_status.hpp>
@@ -250,7 +248,7 @@ public:
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
 
     // Set up cross-platform controllers and resources.
-    _mbglView = new MGLMapViewImpl(self);
+    _mbglView = new MGLMapViewImpl(self, [NSScreen mainScreen].backingScaleFactor);
 
     // Delete the pre-offline ambient cache at
     // ~/Library/Caches/com.mapbox.sdk.ios/cache.db.
@@ -264,10 +262,9 @@ public:
     NSURL *legacyCacheURL = [cachesDirectoryURL URLByAppendingPathComponent:@"cache.db"];
     [[NSFileManager defaultManager] removeItemAtURL:legacyCacheURL error:NULL];
 
-    mbgl::DefaultFileSource* mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
-
+    mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
     _mbglThreadPool = new mbgl::ThreadPool(4);
-    _mbglMap = new mbgl::Map(*_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
+    _mbglMap = new mbgl::Map(*_mbglView, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
     [self validateTileCacheSize];
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
@@ -304,16 +301,6 @@ public:
     _mbglMap->jumpTo(options);
     _pendingLatitude = NAN;
     _pendingLongitude = NAN;
-}
-
-- (mbgl::Size)size {
-    return { static_cast<uint32_t>(self.bounds.size.width),
-             static_cast<uint32_t>(self.bounds.size.height) };
-}
-
-- (mbgl::Size)framebufferSize {
-    NSRect bounds = [self convertRectToBacking:self.bounds];
-    return { static_cast<uint32_t>(bounds.size.width), static_cast<uint32_t>(bounds.size.height) };
 }
 
 /// Adds zoom controls to the lower-right corner.
@@ -647,7 +634,7 @@ public:
         [self validateTileCacheSize];
     }
     if (!_isTargetingInterfaceBuilder) {
-        _mbglMap->setSize(self.size);
+        _mbglMap->update(mbgl::Update::Dimensions);
     }
 }
 
@@ -758,8 +745,7 @@ public:
             return reinterpret_cast<mbgl::gl::glProc>(symbol);
         });
 
-        _mbglView->updateViewBinding();
-        _mbglMap->render(*_mbglView);
+        _mbglMap->render();
 
         if (_isPrinting) {
             _isPrinting = NO;
@@ -2545,10 +2531,25 @@ public:
 }
 
 /// Adapter responsible for bridging calls from mbgl to MGLMapView and Cocoa.
-class MGLMapViewImpl : public mbgl::View, public mbgl::Backend {
+class MGLMapViewImpl : public mbgl::View {
 public:
-    MGLMapViewImpl(MGLMapView *nativeView_)
-        : nativeView(nativeView_) {}
+    MGLMapViewImpl(MGLMapView *nativeView_, const float scaleFactor_)
+        : nativeView(nativeView_), scaleFactor(scaleFactor_) {}
+
+    float getPixelRatio() const override {
+        return scaleFactor;
+    }
+
+    std::array<uint16_t, 2> getSize() const override {
+        return {{ static_cast<uint16_t>(nativeView.bounds.size.width),
+                  static_cast<uint16_t>(nativeView.bounds.size.height) }};
+    }
+
+    std::array<uint16_t, 2> getFramebufferSize() const override {
+        NSRect bounds = [nativeView convertRectToBacking:nativeView.bounds];
+        return {{ static_cast<uint16_t>(bounds.size.width),
+                  static_cast<uint16_t>(bounds.size.height) }};
+    }
 
     void notifyMapChange(mbgl::MapChange change) override {
         [nativeView notifyMapChange:change];
@@ -2567,31 +2568,18 @@ public:
         [NSOpenGLContext clearCurrentContext];
     }
 
-    mbgl::gl::value::Viewport::Type getViewport() const {
-        return { 0, 0, nativeView.framebufferSize };
-    }
+    mbgl::PremultipliedImage readStillImage(std::array<uint16_t, 2> size = {{ 0, 0 }}) override {
+        if (!size[0] || !size[1]) {
+            size = getFramebufferSize();
+        }
 
-    void updateViewBinding() {
-        fbo = mbgl::gl::value::BindFramebuffer::Get();
-        getContext().bindFramebuffer.setCurrentValue(fbo);
-        getContext().viewport.setCurrentValue(getViewport());
-        assert(mbgl::gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
-    }
-
-    void bind() override {
-        getContext().bindFramebuffer = fbo;
-        getContext().viewport = getViewport();
-    }
-
-    mbgl::PremultipliedImage readStillImage() {
-        mbgl::PremultipliedImage image(nativeView.framebufferSize);
-        MBGL_CHECK_ERROR(glReadPixels(0, 0, image.size.width, image.size.height, GL_RGBA,
-                                      GL_UNSIGNED_BYTE, image.data.get()));
+        mbgl::PremultipliedImage image { size[0], size[1] };
+        MBGL_CHECK_ERROR(glReadPixels(0, 0, size[0], size[1], GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
 
         const size_t stride = image.stride();
         auto tmp = std::make_unique<uint8_t[]>(stride);
         uint8_t *rgba = image.data.get();
-        for (int i = 0, j = image.size.height - 1; i < j; i++, j--) {
+        for (int i = 0, j = size[1] - 1; i < j; i++, j--) {
             std::memcpy(tmp.get(), rgba + i * stride, stride);
             std::memcpy(rgba + i * stride, rgba + j * stride, stride);
             std::memcpy(rgba + j * stride, tmp.get(), stride);
@@ -2604,8 +2592,8 @@ private:
     /// Cocoa map view that this adapter bridges to.
     __weak MGLMapView *nativeView = nullptr;
 
-    /// The current framebuffer of the NSOpenGLLayer we are painting to.
-    GLint fbo = 0;
+    /// Backing scale factor of the view.
+    const float scaleFactor;
 };
 
 @end

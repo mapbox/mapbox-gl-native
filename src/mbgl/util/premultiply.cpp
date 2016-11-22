@@ -8,11 +8,12 @@ namespace util {
 PremultipliedImage premultiply(UnassociatedImage&& src) {
     PremultipliedImage dst;
 
-    dst.size = src.size;
+    dst.width = src.width;
+    dst.height = src.height;
     dst.data = std::move(src.data);
 
     uint8_t* data = dst.data.get();
-    for (size_t i = 0; i < dst.bytes(); i += 4) {
+    for (size_t i = 0; i < dst.size(); i += 4) {
         uint8_t& r = data[i + 0];
         uint8_t& g = data[i + 1];
         uint8_t& b = data[i + 2];
@@ -28,11 +29,12 @@ PremultipliedImage premultiply(UnassociatedImage&& src) {
 UnassociatedImage unpremultiply(PremultipliedImage&& src) {
     UnassociatedImage dst;
 
-    dst.size = src.size;
+    dst.width = src.width;
+    dst.height = src.height;
     dst.data = std::move(src.data);
 
     uint8_t* data = dst.data.get();
-    for (size_t i = 0; i < dst.bytes(); i += 4) {
+    for (size_t i = 0; i < dst.size(); i += 4) {
         uint8_t& r = data[i + 0];
         uint8_t& g = data[i + 1];
         uint8_t& b = data[i + 2];

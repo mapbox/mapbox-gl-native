@@ -23,7 +23,7 @@ public:
               ViewportMode = ViewportMode::Default);
 
     // Map view
-    bool resize(Size size);
+    bool resize(std::array<uint16_t, 2> size);
 
     // Camera
     /** Returns the current camera options. */

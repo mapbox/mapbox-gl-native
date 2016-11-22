@@ -2,7 +2,6 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
-#include <mbgl/map/backend.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
@@ -15,15 +14,14 @@
 namespace mbgl {
 namespace android {
 
-class NativeMapView : public mbgl::View, public mbgl::Backend {
+class NativeMapView : public mbgl::View, private mbgl::util::noncopyable {
 public:
     NativeMapView(JNIEnv *env, jobject obj, float pixelRatio, int availableProcessors, size_t totalMemory);
     virtual ~NativeMapView();
 
-    mbgl::Size getFramebufferSize() const;
-    void updateViewBinding();
-    void bind() override;
-
+    float getPixelRatio() const override;
+    std::array<uint16_t, 2> getSize() const override;
+    std::array<uint16_t, 2> getFramebufferSize() const override;
     void activate() override;
     void deactivate() override;
     void invalidate() override;
@@ -57,6 +55,8 @@ public:
 private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
 
+    bool inEmulator();
+
 private:
     JavaVM *vm = nullptr;
     JNIEnv *env = nullptr;
@@ -81,6 +81,7 @@ private:
 
     bool firstTime = false;
     bool fpsEnabled = false;
+    bool sizeChanged = false;
     bool snapshot = false;
     double fps = 0.0;
 
@@ -88,7 +89,7 @@ private:
     int height = 0;
     int fbWidth = 0;
     int fbHeight = 0;
-    bool framebufferSizeChanged = true;
+    const float pixelRatio;
 
     int availableProcessors = 0;
     size_t totalMemory = 0;

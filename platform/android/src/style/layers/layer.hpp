@@ -34,16 +34,10 @@ public:
 
     virtual jni::jobject* createJavaPeer(jni::JNIEnv&) = 0;
 
-    /**
-     * Set core layer (ie return ownership after remove)
-     */
-    void setLayer(std::unique_ptr<mbgl::style::Layer>);
-
-    void addToMap(mbgl::Map&, mbgl::optional<std::string>);
-
     jni::String getId(jni::JNIEnv&);
 
-    style::Layer& get();
+    //Release the owned view and return it
+    std::unique_ptr<mbgl::style::Layer> releaseCoreLayer();
 
     void setLayoutProperty(jni::JNIEnv&, jni::String, jni::Object<> value);
 
@@ -70,16 +64,8 @@ public:
     jni::Object<jni::ObjectTag> getVisibility(jni::JNIEnv&);
 
 protected:
-    //Release the owned view and return it
-    std::unique_ptr<mbgl::style::Layer> releaseCoreLayer();
-
-    //Owned layer is set when creating a new layer, before adding it to the map
     std::unique_ptr<mbgl::style::Layer> ownedLayer;
-
-    //Raw reference to the layer
     mbgl::style::Layer& layer;
-
-    //Map is set when the layer is retrieved or after adding to the map
     mbgl::Map* map;
 
 };

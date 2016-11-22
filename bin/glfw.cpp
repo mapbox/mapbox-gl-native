@@ -13,11 +13,10 @@
 #include <sstream>
 #include <cstdlib>
 #include <cstdio>
-#include <array>
 
 namespace {
 
-GLFWView* view = nullptr;
+std::unique_ptr<GLFWView> view;
 
 }
 
@@ -105,8 +104,7 @@ int main(int argc, char *argv[]) {
         mbgl::Log::Info(mbgl::Event::General, "BENCHMARK MODE: Some optimizations are disabled.");
     }
 
-    GLFWView backend(fullscreen, benchmark);
-    view = &backend;
+    view = std::make_unique<GLFWView>(fullscreen, benchmark);
 
     mbgl::DefaultFileSource fileSource("/tmp/mbgl-cache.db", ".");
 
@@ -120,9 +118,7 @@ int main(int argc, char *argv[]) {
 
     mbgl::ThreadPool threadPool(4);
 
-    mbgl::Map map(backend, view->getSize(), view->getPixelRatio(), fileSource, threadPool);
-
-    backend.setMap(&map);
+    mbgl::Map map(*view, fileSource, threadPool);
 
     // Load settings
     mbgl::Settings_JSON settings;
@@ -185,6 +181,5 @@ int main(int argc, char *argv[]) {
                     "Exit location: --lat=\"%f\" --lon=\"%f\" --zoom=\"%f\" --bearing \"%f\"",
                     settings.latitude, settings.longitude, settings.zoom, settings.bearing);
 
-    view = nullptr;
     return 0;
 }

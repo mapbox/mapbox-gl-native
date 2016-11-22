@@ -241,20 +241,16 @@ ActiveTexture::Type ActiveTexture::Get() {
     return static_cast<Type>(activeTexture - GL_TEXTURE0);
 }
 
-const constexpr Viewport::Type Viewport::Default;
-
 void Viewport::Set(const Type& value) {
-    MBGL_CHECK_ERROR(glViewport(value.x, value.y, value.size.width, value.size.height));
+    MBGL_CHECK_ERROR(glViewport(value.x, value.y, value.width, value.height));
 }
 
 Viewport::Type Viewport::Get() {
     GLint viewport[4];
     MBGL_CHECK_ERROR(glGetIntegerv(GL_VIEWPORT, viewport));
     return { static_cast<int32_t>(viewport[0]), static_cast<int32_t>(viewport[1]),
-             { static_cast<uint32_t>(viewport[2]), static_cast<uint32_t>(viewport[3]) } };
+             static_cast<uint16_t>(viewport[2]), static_cast<uint16_t>(viewport[3]) };
 }
-
-const constexpr BindFramebuffer::Type BindFramebuffer::Default;
 
 void BindFramebuffer::Set(const Type& value) {
     MBGL_CHECK_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, value));
@@ -263,18 +259,6 @@ void BindFramebuffer::Set(const Type& value) {
 BindFramebuffer::Type BindFramebuffer::Get() {
     GLint binding;
     MBGL_CHECK_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &binding));
-    return binding;
-}
-
-const constexpr BindRenderbuffer::Type BindRenderbuffer::Default;
-
-void BindRenderbuffer::Set(const Type& value) {
-    MBGL_CHECK_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, value));
-}
-
-BindRenderbuffer::Type BindRenderbuffer::Get() {
-    GLint binding;
-    MBGL_CHECK_ERROR(glGetIntegerv(GL_RENDERBUFFER_BINDING, &binding));
     return binding;
 }
 

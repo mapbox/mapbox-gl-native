@@ -1,7 +1,6 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/platform/default/offscreen_view.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
@@ -98,13 +97,13 @@ Server::~Server() {
     }
 }
 
-PremultipliedImage render(Map& map, OffscreenView& view) {
+PremultipliedImage render(Map& map) {
     PremultipliedImage result;
-    map.renderStill(view, [&](std::exception_ptr) {
-        result = view.readStillImage();
+    map.renderStill([&result](std::exception_ptr, PremultipliedImage&& image) {
+        result = std::move(image);
     });
 
-    while (!result.valid()) {
+    while (!result.size()) {
         util::RunLoop::Get()->runOnce();
     }
 
@@ -132,23 +131,24 @@ void checkImage(const std::string& base,
     }
 
     PremultipliedImage expected = decodeImage(expected_image);
-    PremultipliedImage diff { expected.size };
+    PremultipliedImage diff { expected.width, expected.height };
 
 
 #if !TEST_READ_ONLY
     util::write_file(base + "/actual.png", encodePNG(actual));
 #endif
 
-    ASSERT_EQ(expected.size, actual.size);
+    ASSERT_EQ(expected.width, actual.width);
+    ASSERT_EQ(expected.height, actual.height);
 
     double pixels = mapbox::pixelmatch(actual.data.get(),
                                        expected.data.get(),
-                                       expected.size.width,
-                                       expected.size.height,
+                                       expected.width,
+                                       expected.height,
                                        diff.data.get(),
                                        pixelThreshold);
 
-    EXPECT_LE(pixels / (expected.size.width * expected.size.height), imageThreshold);
+    EXPECT_LE(pixels / (expected.width * expected.height), imageThreshold);
 
 #if !TEST_READ_ONLY
     util::write_file(base + "/diff.png", encodePNG(diff));

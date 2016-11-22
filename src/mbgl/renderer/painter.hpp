@@ -28,7 +28,6 @@ namespace mbgl {
 
 class RenderTile;
 class SpriteAtlas;
-class View;
 class GlyphAtlas;
 class LineAtlas;
 struct FrameData;
@@ -59,6 +58,7 @@ class BackgroundLayer;
 } // namespace style
 
 struct FrameData {
+    std::array<uint16_t, 2> framebufferSize = {{ 0, 0 }};
     TimePoint timePoint;
     float pixelRatio;
     MapMode mapMode;
@@ -68,12 +68,11 @@ struct FrameData {
 
 class Painter : private util::noncopyable {
 public:
-    Painter(gl::Context&, const TransformState&);
+    Painter(const TransformState&);
     ~Painter();
 
     void render(const style::Style&,
                 const FrameData&,
-                View&,
                 SpriteAtlas& annotationSpriteAtlas);
 
     void cleanup();
@@ -86,9 +85,9 @@ public:
 
 #ifndef NDEBUG
     // Renders tile clip boundaries, using stencil buffer to calculate fill color.
-    void renderClipMasks(PaintParameters&);
+    void renderClipMasks();
     // Renders the depth buffer.
-    void renderDepthBuffer(PaintParameters&);
+    void renderDepthBuffer();
 #endif
 
     void renderDebugText(Tile&, const mat4&);
@@ -153,9 +152,6 @@ private:
     }
 #endif
 
-private:
-    gl::Context& context;
-
     mat4 projMatrix;
 
     std::array<float, 2> pixelsToGLUnits;
@@ -171,6 +167,8 @@ private:
     FrameData frame;
 
     int indent = 0;
+
+    gl::Context context;
 
     RenderPass pass = RenderPass::Opaque;
 

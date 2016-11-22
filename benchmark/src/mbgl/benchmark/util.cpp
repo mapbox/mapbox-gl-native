@@ -1,21 +1,19 @@
 #include <mbgl/benchmark/util.hpp>
-#include <mbgl/platform/default/offscreen_view.hpp>
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/view.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 namespace mbgl {
 namespace benchmark {
 
-void render(Map& map, OffscreenView& view) {
+void render(Map& map) {
     PremultipliedImage result;
-    map.renderStill(view, [&](std::exception_ptr) {
-        result = view.readStillImage();
+    map.renderStill([&result](std::exception_ptr, PremultipliedImage&& image) {
+        result = std::move(image);
     });
 
-    while (!result.valid()) {
+    while (!result.size()) {
         util::RunLoop::Get()->runOnce();
     }
 }

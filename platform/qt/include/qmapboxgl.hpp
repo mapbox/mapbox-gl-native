@@ -3,7 +3,6 @@
 
 #include <QMapbox>
 #include <QObject>
-#include <QSize>
 #include <QPointF>
 
 class QImage;
@@ -11,7 +10,6 @@ class QMargins;
 class QSize;
 class QString;
 class QStringList;
-class QOpenGLFramebufferObject;
 
 class QMapboxGLPrivate;
 
@@ -97,10 +95,7 @@ public:
         NorthLeftwards,
     };
 
-    QMapboxGL(QObject* parent = 0,
-              const QMapboxGLSettings& = QMapboxGLSettings(),
-              const QSize& size = QSize(),
-              qreal pixelRatio = 1);
+    QMapboxGL(QObject *parent = 0, const QMapboxGLSettings& = QMapboxGLSettings());
     virtual ~QMapboxGL();
 
     void cycleDebugOptions();
@@ -172,7 +167,7 @@ public:
     void scaleBy(double scale, const QPointF &center = QPointF());
     void rotateBy(const QPointF &first, const QPointF &second);
 
-    void resize(const QSize &size, const QSize &framebufferSize);
+    void resize(const QSize &size);
 
     void addAnnotationIcon(const QString &name, const QImage &sprite);
 
@@ -203,11 +198,7 @@ public:
     void setFilter(const QString &layer, const QVariant &filter);
 
 public slots:
-#if QT_VERSION >= 0x050000
-    void render(QOpenGLFramebufferObject *fbo = NULL);
-#else
     void render();
-#endif
     void connectionEstablished();
 
 signals:

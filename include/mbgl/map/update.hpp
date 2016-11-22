@@ -6,6 +6,7 @@ namespace mbgl {
 
 enum class Update {
     Nothing                   = 0,
+    Dimensions                = 1 << 1,
     Classes                   = 1 << 2,
     RecalculateStyle          = 1 << 3,
     RenderStill               = 1 << 4,

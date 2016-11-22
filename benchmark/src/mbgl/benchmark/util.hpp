@@ -3,11 +3,10 @@
 namespace mbgl {
 
 class Map;
-class OffscreenView;
 
 namespace benchmark {
 
-void render(Map&, OffscreenView&);
+void render(Map&);
 
 } // namespace benchmark
 } // namespace mbgl

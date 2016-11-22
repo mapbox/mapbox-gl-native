@@ -2,10 +2,6 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## 4.2.0-beta.5 - October 25, 2016
-
-Mapbox Android 4.2.0-beta.5 adds no new features, only bug fixes.
-
 ## 4.2.0-beta.4 - October 25, 2016
 
 Mapbox Android 4.2.0-beta.4 contains all 4.2.0-beta.3 changes and adds:

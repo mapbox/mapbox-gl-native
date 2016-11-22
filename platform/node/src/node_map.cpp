@@ -356,27 +356,21 @@ void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 }
 
 void NodeMap::startRender(NodeMap::RenderOptions options) {
-    map->setSize({ options.width, options.height });
-
-    const mbgl::Size fbSize{ static_cast<uint32_t>(options.width * pixelRatio),
-                             static_cast<uint32_t>(options.height * pixelRatio) };
-    if (!view || view->size != fbSize) {
-        view.reset();
-        view = std::make_unique<mbgl::OffscreenView>(backend.getContext(), fbSize);
-    }
+    view.resize(options.width, options.height);
+    map->update(mbgl::Update::Dimensions);
     map->setClasses(options.classes);
     map->setLatLngZoom(mbgl::LatLng(options.latitude, options.longitude), options.zoom);
     map->setBearing(options.bearing);
     map->setPitch(options.pitch);
     map->setDebug(options.debugOptions);
 
-    map->renderStill(*view, [this](const std::exception_ptr eptr) {
+    map->renderStill([this](const std::exception_ptr eptr, mbgl::PremultipliedImage&& result) {
         if (eptr) {
             error = std::move(eptr);
             uv_async_send(async);
         } else {
             assert(!image.data);
-            image = view->readStillImage();
+            image = std::move(result);
             uv_async_send(async);
         }
     });
@@ -429,7 +423,7 @@ void NodeMap::renderFinished() {
         cb->Call(1, argv);
     } else if (img.data) {
         v8::Local<v8::Object> pixels = Nan::NewBuffer(
-            reinterpret_cast<char *>(img.data.get()), img.bytes(),
+            reinterpret_cast<char *>(img.data.get()), img.size(),
             // Retain the data until the buffer is deleted.
             [](char *, void * hint) {
                 delete [] reinterpret_cast<uint8_t*>(hint);
@@ -778,25 +772,16 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
     }
 }
 
-NodeMap::NodeMap(v8::Local<v8::Object> options)
-    : pixelRatio([&] {
-          Nan::HandleScope scope;
-          return Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust()
-                     ? Nan::Get(options, Nan::New("ratio").ToLocalChecked())
-                           .ToLocalChecked()
-                           ->NumberValue()
-                     : 1.0;
-      }()),
-      backend(sharedDisplay()),
-      map(std::make_unique<mbgl::Map>(backend,
-                                      mbgl::Size{ 256, 256 },
-                                      pixelRatio,
-                                      *this,
-                                      threadpool,
-                                      mbgl::MapMode::Still)),
-      async(new uv_async_t) {
+NodeMap::NodeMap(v8::Local<v8::Object> options) :
+    view(sharedDisplay(), [&] {
+        Nan::HandleScope scope;
+        return Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust() ? Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue() : 1.0;
+    }()),
+    threadpool(),
+    map(std::make_unique<mbgl::Map>(view, *this, threadpool, mbgl::MapMode::Still)),
+    async(new uv_async_t) {
 
-    backend.setMapChangeCallback([&](mbgl::MapChange change) {
+    view.setMapChangeCallback([&](mbgl::MapChange change) {
         if (change == mbgl::MapChangeDidFailLoadingMap) {
             throw std::runtime_error("Requires a map style to be a valid style JSON");
         }

@@ -87,17 +87,7 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
                                 .tilt(tilt)
                                 .build();
 
-                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, new MapboxMap.CancelableCallback() {
-                            @Override
-                            public void onCancel() {
-                                Log.v(MapboxConstants.TAG, "OnCancel called");
-                            }
-
-                            @Override
-                            public void onFinish() {
-                                Log.v(MapboxConstants.TAG, "OnFinish called");
-                            }
-                        });
+                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
                         Log.v(MapboxConstants.TAG, cameraPosition.toString());
                     }
                 });

@@ -31,29 +31,8 @@ namespace android {
     Source::~Source() {
     }
 
-    style::Source& Source::get() {
-        return source;
-    }
-
-    void Source::setSource(std::unique_ptr<style::Source> coreSource) {
-        this->ownedSource = std::move(coreSource);
-    }
-
     jni::String Source::getId(jni::JNIEnv& env) {
         return jni::Make<jni::String>(env, source.getID());
-    }
-
-    void Source::addToMap(mbgl::Map& _map) {
-        //Check to see if we own the source first
-        if (!ownedSource) {
-            throw std::runtime_error("Cannot add source twice");
-        }
-
-        //Add source to map
-        _map.addSource(releaseCoreSource());
-
-        //Save pointer to the map
-        this->map = &_map;
     }
 
     std::unique_ptr<mbgl::style::Source> Source::releaseCoreSource() {

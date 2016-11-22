@@ -157,8 +157,8 @@ std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
 }
 
 std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
-    const double w = state.getSize().width;
-    const double h = state.getSize().height;
+    const double w = state.getWidth();
+    const double h = state.getHeight();
     return tileCover(
         TileCoordinate::fromScreenCoordinate(state, z, { 0,   0   }).p,
         TileCoordinate::fromScreenCoordinate(state, z, { w,   0   }).p,

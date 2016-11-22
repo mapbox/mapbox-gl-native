@@ -2,7 +2,6 @@
 
 #include <mbgl/platform/log.hpp>
 #include <mbgl/gl/extension.hpp>
-#include <mbgl/gl/context.hpp>
 
 #import <GLKit/GLKit.h>
 #import <OpenGLES/EAGL.h>
@@ -19,7 +18,6 @@
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
-#include <mbgl/map/backend.hpp>
 #include <mbgl/math/wrap.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/constants.hpp>
@@ -27,7 +25,7 @@
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/run_loop.hpp>
+#import <mbgl/util/run_loop.hpp>
 
 #import "Mapbox.h"
 #import "MGLFeature_Private.h"
@@ -392,7 +390,8 @@ public:
     self.clipsToBounds = YES;
 
     // setup mbgl view
-    _mbglView = new MBGLView(self);
+    const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
+    _mbglView = new MBGLView(self, scaleFactor);
 
     // Delete the pre-offline ambient cache at ~/Library/Caches/cache.db.
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -401,9 +400,8 @@ public:
 
     // setup mbgl map
     mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
-    const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _mbglThreadPool = new mbgl::ThreadPool(4);
-    _mbglMap = new mbgl::Map(*_mbglView, self.size, scaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
+    _mbglMap = new mbgl::Map(*_mbglView, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
     [self validateTileCacheSize];
 
     // start paused if in IB
@@ -542,18 +540,6 @@ public:
     if ([UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
         [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{}];
     }
-}
-
-- (mbgl::Size)size
-{
-    return { static_cast<uint32_t>(self.bounds.size.width),
-             static_cast<uint32_t>(self.bounds.size.height) };
-}
-
-- (mbgl::Size)framebufferSize
-{
-    return { static_cast<uint32_t>(self.glView.drawableWidth),
-             static_cast<uint32_t>(self.glView.drawableHeight) };
 }
 
 - (void)createGLView
@@ -883,8 +869,7 @@ public:
 {
     if ( ! self.dormant)
     {
-        _mbglView->updateViewBinding();
-        _mbglMap->render(*_mbglView);
+        _mbglMap->render();
 
         [self updateUserLocationAnnotationView];
     }
@@ -897,8 +882,9 @@ public:
 
     [self adjustContentInset];
 
-    if (!_isTargetingInterfaceBuilder) {
-        _mbglMap->setSize([self size]);
+    if ( ! _isTargetingInterfaceBuilder)
+    {
+        _mbglMap->update(mbgl::Update::Dimensions);
     }
 
     if (self.attributionSheet.visible)
@@ -4963,38 +4949,25 @@ public:
     return _annotationViewReuseQueueByIdentifier[identifier];
 }
 
-class MBGLView : public mbgl::View, public mbgl::Backend
+class MBGLView : public mbgl::View
 {
 public:
-    MBGLView(MGLMapView* nativeView_) : nativeView(nativeView_) {
+    MBGLView(MGLMapView* nativeView_, const float scaleFactor_)
+        : nativeView(nativeView_), scaleFactor(scaleFactor_) {
     }
 
-    mbgl::gl::value::Viewport::Type getViewport() const {
-        return { 0, 0, nativeView.framebufferSize };
+    float getPixelRatio() const override {
+        return scaleFactor;
     }
 
-    /// This function is called before we start rendering, when iOS invokes our rendering method.
-    /// iOS already sets the correct framebuffer and viewport for us, so we need to update the
-    /// context state with the anticipated values.
-    void updateViewBinding() {
-        // We are using 0 as the placeholder value for the GLKView's framebuffer.
-        getContext().bindFramebuffer.setCurrentValue(0);
-        getContext().viewport.setCurrentValue(getViewport());
-        assert(mbgl::gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
+    std::array<uint16_t, 2> getSize() const override {
+        return {{ static_cast<uint16_t>([nativeView bounds].size.width),
+                  static_cast<uint16_t>([nativeView bounds].size.height) }};
     }
 
-    void bind() override {
-        if (getContext().bindFramebuffer != 0) {
-            // Something modified our state, and we need to bind the original drawable again.
-            // Doing this also sets the viewport to the full framebuffer.
-            // Note that in reality, iOS does not use the Framebuffer 0 (it's typically 1), and we
-            // only use this is a placeholder value.
-            [nativeView.glView bindDrawable];
-            updateViewBinding();
-        } else {
-            // Our framebuffer is still bound, but the viewport might have changed.
-            getContext().viewport = getViewport();
-        }
+    std::array<uint16_t, 2> getFramebufferSize() const override {
+        return {{ static_cast<uint16_t>([[nativeView glView] drawableWidth]),
+                  static_cast<uint16_t>([[nativeView glView] drawableHeight]) }};
     }
 
     void notifyMapChange(mbgl::MapChange change) override
@@ -5019,6 +4992,7 @@ public:
 
 private:
     __weak MGLMapView *nativeView = nullptr;
+    const float scaleFactor;
 };
 
 @end
@@ -5232,7 +5206,7 @@ void MGLFinishCustomStyleLayer(void *context)
 
 - (void)setCustomStyleLayersNeedDisplay
 {
-    [self setNeedsGLDisplay];
+    _mbglMap->update(mbgl::Update::Repaint);
 }
 
 - (mbgl::Map *)mbglMap {

@@ -49,7 +49,6 @@ public class CustomSpriteActivity extends AppCompatActivity {
     private MapboxMap mapboxMap;
     private MapView mapView;
     private Layer layer;
-    private GeoJsonSource source;
 
 
     @Override
@@ -86,8 +85,7 @@ public class CustomSpriteActivity extends AppCompatActivity {
 
                             //Add a source with a geojson point
                             point = Point.fromCoordinates(Position.fromCoordinates(13.400972d, 52.519003d));
-                            source = new GeoJsonSource("point", FeatureCollection.fromFeatures(new Feature[]{Feature.fromGeometry(point)}));
-                            mapboxMap.addSource(source);
+                            mapboxMap.addSource(new GeoJsonSource("point", FeatureCollection.fromFeatures(new Feature[]{Feature.fromGeometry(point)})));
 
                             //Add a symbol layer that references that point source
                             layer = new SymbolLayer("layer", "point");
@@ -103,6 +101,7 @@ public class CustomSpriteActivity extends AppCompatActivity {
                         } else {
                             //Update point
                             point = Point.fromCoordinates(Position.fromCoordinates(point.getCoordinates().getLongitude() + 0.001, point.getCoordinates().getLatitude() + 0.001));
+                            GeoJsonSource source = mapboxMap.getSourceAs("point");
                             source.setGeoJson(FeatureCollection.fromFeatures(new Feature[]{Feature.fromGeometry(point)}));
 
                             //Move the camera as well

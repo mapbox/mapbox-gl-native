@@ -108,7 +108,12 @@ inline bool CanonicalTileID::operator!=(const CanonicalTileID& rhs) const {
 }
 
 inline bool CanonicalTileID::operator<(const CanonicalTileID& rhs) const {
-    return z != rhs.z ? z < rhs.z : x != rhs.x ? x < rhs.x : y < rhs.y;
+    if (z != rhs.z) {
+        return z < rhs.z;
+    } else if (x != rhs.x) {
+        return x < rhs.x;
+    }
+    return y < rhs.y;
 }
 
 inline bool CanonicalTileID::isChildOf(const CanonicalTileID& parent) const {
@@ -170,7 +175,10 @@ inline bool OverscaledTileID::operator!=(const OverscaledTileID& rhs) const {
 }
 
 inline bool OverscaledTileID::operator<(const OverscaledTileID& rhs) const {
-    return overscaledZ != rhs.overscaledZ ? overscaledZ < rhs.overscaledZ : canonical < rhs.canonical;
+    if (overscaledZ != rhs.overscaledZ) {
+        return overscaledZ < rhs.overscaledZ;
+    }
+    return canonical < rhs.canonical;
 }
 
 inline uint32_t OverscaledTileID::overscaleFactor() const {
@@ -183,7 +191,11 @@ inline bool OverscaledTileID::isChildOf(const OverscaledTileID& rhs) const {
 }
 
 inline OverscaledTileID OverscaledTileID::scaledTo(uint8_t z) const {
-    return { z, z >= canonical.z ? canonical : canonical.scaledTo(z) };
+    if (z >= canonical.z) {
+        return { z, canonical };
+    } else {
+        return { z, canonical.scaledTo(z) };
+    }
 }
 
 inline UnwrappedTileID OverscaledTileID::unwrapTo(int16_t wrap) const {
@@ -211,7 +223,10 @@ inline bool UnwrappedTileID::operator!=(const UnwrappedTileID& rhs) const {
 }
 
 inline bool UnwrappedTileID::operator<(const UnwrappedTileID& rhs) const {
-    return wrap != rhs.wrap ? wrap < rhs.wrap : canonical < rhs.canonical;
+    if (wrap != rhs.wrap) {
+        return wrap < rhs.wrap;
+    }
+    return canonical < rhs.canonical;
 }
 
 inline bool UnwrappedTileID::isChildOf(const UnwrappedTileID& parent) const {

@@ -1,5 +1,4 @@
 mason_use(glfw VERSION 3.2.1)
-mason_use(mesa VERSION 13.0.0${MASON_CXXABI_SUFFIX})
 mason_use(boost_libprogram_options VERSION 1.60.0)
 mason_use(sqlite VERSION 3.14.2)
 mason_use(libuv VERSION 1.9.1)
@@ -12,34 +11,7 @@ mason_use(benchmark VERSION 1.0.0)
 
 include(cmake/loop-uv.cmake)
 
-macro(use_glx_backend _TARGET)
-    target_sources(${_TARGET}
-        PRIVATE platform/default/headless_backend_glx.cpp
-    )
-
-    target_link_libraries(${_TARGET}
-        PUBLIC -lGL
-        PUBLIC -lX11
-    )
-endmacro()
-
-macro(use_osmesa_backend _TARGET)
-    target_sources(${_TARGET}
-        PRIVATE platform/default/headless_backend_osmesa.cpp
-    )
-
-    target_add_mason_package(${_TARGET}
-        PUBLIC mesa
-    )
-endmacro()
-
 macro(mbgl_platform_core)
-    if (WITH_OSMESA)
-        use_osmesa_backend(mbgl-core)
-    else()
-        use_glx_backend(mbgl-core)
-    endif()
-
     target_sources(mbgl-core
         # File source
         PRIVATE platform/default/asset_file_source.cpp
@@ -69,9 +41,9 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/webp_reader.cpp
 
         # Headless view
-        PRIVATE platform/default/headless_backend.cpp
         PRIVATE platform/default/headless_display.cpp
-        PRIVATE platform/default/offscreen_view.cpp
+        PRIVATE platform/default/headless_view.cpp
+        PRIVATE platform/default/headless_view_glx.cpp
 
         # Thread pool
         PRIVATE platform/default/thread_pool.cpp
@@ -90,6 +62,8 @@ macro(mbgl_platform_core)
     target_link_libraries(mbgl-core
         PUBLIC -lz
         PUBLIC -lcurl
+        PUBLIC -lGL
+        PUBLIC -lX11
     )
 endmacro()
 

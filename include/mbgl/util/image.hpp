@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/size.hpp>
 
 #include <string>
 #include <memory>
@@ -19,38 +18,39 @@ class Image : private util::noncopyable {
 public:
     Image() = default;
 
-    Image(Size size_)
-        : size(std::move(size_)),
-          data(std::make_unique<uint8_t[]>(bytes())) {}
+    Image(uint16_t w, uint16_t h)
+        : width(w),
+          height(h),
+          data(std::make_unique<uint8_t[]>(size())) {}
 
-    Image(Size size_, std::unique_ptr<uint8_t[]> data_)
-        : size(std::move(size_)),
+    Image(uint16_t w, uint16_t h, std::unique_ptr<uint8_t[]> data_)
+        : width(w),
+          height(h),
           data(std::move(data_)) {}
 
     Image(Image&& o)
-        : size(o.size),
+        : width(o.width),
+          height(o.height),
           data(std::move(o.data)) {}
 
     Image& operator=(Image&& o) {
-        size = o.size;
+        width = o.width;
+        height = o.height;
         data = std::move(o.data);
         return *this;
     }
 
     bool operator==(const Image& rhs) const {
-        return size == rhs.size &&
-               std::equal(data.get(), data.get() + bytes(), rhs.data.get(),
-                          rhs.data.get() + rhs.bytes());
+        return width == rhs.width && height == rhs.height &&
+               std::equal(data.get(), data.get() + size(), rhs.data.get(),
+                          rhs.data.get() + rhs.size());
     }
 
-    bool valid() const {
-        return size && data.get() != nullptr;
-    }
+    size_t stride() const { return static_cast<size_t>(width) * 4; }
+    size_t size() const { return static_cast<size_t>(width) * height * 4; }
 
-    size_t stride() const { return static_cast<size_t>(size.width) * 4; }
-    size_t bytes() const { return stride() * size.height; }
-
-    Size size;
+    uint16_t width = 0;
+    uint16_t height = 0;
     std::unique_ptr<uint8_t[]> data;
 };
 

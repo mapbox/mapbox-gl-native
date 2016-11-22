@@ -66,13 +66,13 @@ public:
 
     Source* getSource(const std::string& id) const;
     void addSource(std::unique_ptr<Source>);
-    std::unique_ptr<Source> removeSource(const std::string& sourceID);
+    void removeSource(const std::string& sourceID);
 
     std::vector<const Layer*> getLayers() const;
     Layer* getLayer(const std::string& id) const;
     Layer* addLayer(std::unique_ptr<Layer>,
                     optional<std::string> beforeLayerID = {});
-    std::unique_ptr<Layer> removeLayer(const std::string& layerID);
+    void removeLayer(const std::string& layerID);
 
     std::string getName() const;
     LatLng getDefaultLatLng() const;
@@ -121,7 +121,6 @@ private:
 
     std::vector<std::unique_ptr<Layer>>::const_iterator findLayer(const std::string& layerID) const;
     void reloadLayerSource(Layer&);
-    void updateSymbolDependentTiles();
 
     // GlyphStoreObserver implementation.
     void onGlyphsLoaded(const FontStack&, const GlyphRange&) override;
@@ -143,7 +142,7 @@ private:
     void onLayerFilterChanged(Layer&) override;
     void onLayerVisibilityChanged(Layer&) override;
     void onLayerPaintPropertyChanged(Layer&) override;
-    void onLayerLayoutPropertyChanged(Layer&, const char *) override;
+    void onLayerLayoutPropertyChanged(Layer&) override;
 
     Observer nullObserver;
     Observer* observer = &nullObserver;

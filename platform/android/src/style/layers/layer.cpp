@@ -32,34 +32,13 @@ namespace android {
     Layer::~Layer() {
     }
 
-    void Layer::addToMap(mbgl::Map& _map, mbgl::optional<std::string> before) {
-        //Check to see if we own the layer first
-        if (!ownedLayer) {
-            throw std::runtime_error("Cannot add layer twice");
-        }
-
-        //Add layer to map
-        _map.addLayer(releaseCoreLayer(), before);
-
-        //Save pointer to the map
-        this->map = &_map;
-    }
-
-    void Layer::setLayer(std::unique_ptr<mbgl::style::Layer> sourceLayer) {
-        this->ownedLayer = std::move(sourceLayer);
+    jni::String Layer::getId(jni::JNIEnv& env) {
+        return jni::Make<jni::String>(env, layer.getID());
     }
 
     std::unique_ptr<mbgl::style::Layer> Layer::releaseCoreLayer() {
         assert(ownedLayer != nullptr);
         return std::move(ownedLayer);
-    }
-
-    jni::String Layer::getId(jni::JNIEnv& env) {
-        return jni::Make<jni::String>(env, layer.getID());
-    }
-
-    style::Layer& Layer::get() {
-        return layer;
     }
 
     void Layer::setLayoutProperty(jni::JNIEnv& env, jni::String jname, jni::Object<> jvalue) {

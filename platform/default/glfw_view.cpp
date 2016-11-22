@@ -4,7 +4,6 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/extension.hpp>
-#include <mbgl/gl/context.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/string.hpp>
@@ -125,21 +124,9 @@ GLFWView::~GLFWView() {
     glfwTerminate();
 }
 
-void GLFWView::setMap(mbgl::Map *map_) {
-    map = map_;
+void GLFWView::initialize(mbgl::Map *map_) {
+    View::initialize(map_);
     map->addAnnotationIcon("default_marker", makeSpriteImage(22, 22, 1));
-}
-
-void GLFWView::updateViewBinding() {
-    getContext().bindFramebuffer.setCurrentValue(0);
-    assert(mbgl::gl::value::BindFramebuffer::Get() == getContext().bindFramebuffer.getCurrentValue());
-    getContext().viewport.setCurrentValue({ 0, 0, getFramebufferSize() });
-    assert(mbgl::gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
-}
-
-void GLFWView::bind() {
-    getContext().bindFramebuffer = 0;
-    getContext().viewport = { 0, 0, getFramebufferSize() };
 }
 
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
@@ -192,7 +179,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             view->nextOrientation();
             break;
         case GLFW_KEY_Q: {
-            auto result = view->map->queryPointAnnotations({ {}, { double(view->getSize().width), double(view->getSize().height) } });
+            auto result = view->map->queryPointAnnotations({ {}, { double(view->getSize()[0]), double(view->getSize()[1]) } });
             printf("visible point annotations: %lu\n", result.size());
         } break;
         case GLFW_KEY_C:
@@ -267,7 +254,7 @@ GLFWView::makeSpriteImage(int width, int height, float pixelRatio) {
     const int w = std::ceil(pixelRatio * width);
     const int h = std::ceil(pixelRatio * height);
 
-    mbgl::PremultipliedImage image({ static_cast<uint32_t>(w), static_cast<uint32_t>(h) });
+    mbgl::PremultipliedImage image(w, h);
     auto data = reinterpret_cast<uint32_t*>(image.data.get());
     const int dist = (w / 2) * (w / 2);
     for (int y = 0; y < h; y++) {
@@ -374,7 +361,8 @@ void GLFWView::onWindowResize(GLFWwindow *window, int width, int height) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     view->width = width;
     view->height = height;
-    view->map->setSize({ static_cast<uint32_t>(view->width), static_cast<uint32_t>(view->height) });
+
+    view->map->update(mbgl::Update::Dimensions);
 }
 
 void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
@@ -382,11 +370,7 @@ void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
     view->fbWidth = width;
     view->fbHeight = height;
 
-    // This is only triggered when the framebuffer is resized, but not the window. It can
-    // happen when you move the window between screens with a different pixel ratio.
-    // We are forcing a repaint my invalidating the view, which triggers a rerender with the
-    // new framebuffer dimensions.
-    view->invalidate();
+    view->map->update(mbgl::Update::Repaint);
 }
 
 void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modifiers) {
@@ -452,15 +436,15 @@ void GLFWView::run() {
             const double started = glfwGetTime();
 
             glfwMakeContextCurrent(window);
+            glViewport(0, 0, fbWidth, fbHeight);
 
-            updateViewBinding();
-            map->render(*this);
+            map->render();
 
             glfwSwapBuffers(window);
 
             report(1000 * (glfwGetTime() - started));
             if (benchmark) {
-                invalidate();
+                map->update(mbgl::Update::Repaint);
             }
 
             dirty = false;
@@ -479,12 +463,12 @@ float GLFWView::getPixelRatio() const {
     return pixelRatio;
 }
 
-mbgl::Size GLFWView::getSize() const {
-    return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
+std::array<uint16_t, 2> GLFWView::getSize() const {
+    return {{ static_cast<uint16_t>(width), static_cast<uint16_t>(height) }};
 }
 
-mbgl::Size GLFWView::getFramebufferSize() const {
-    return { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) };
+std::array<uint16_t, 2> GLFWView::getFramebufferSize() const {
+    return {{ static_cast<uint16_t>(fbWidth), static_cast<uint16_t>(fbHeight) }};
 }
 
 void GLFWView::activate() {

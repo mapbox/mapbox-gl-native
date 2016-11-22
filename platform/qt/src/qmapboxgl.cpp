@@ -6,7 +6,6 @@
 
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/context.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/conversion.hpp>
@@ -24,7 +23,6 @@
 #if QT_VERSION >= 0x050000
 #include <QGuiApplication>
 #include <QWindow>
-#include <QOpenGLFramebufferObject>
 #else
 #include <QCoreApplication>
 #endif
@@ -122,9 +120,8 @@ std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
     memcpy(img.get(), swapped.constBits(), swapped.byteCount());
 
     return std::make_unique<mbgl::SpriteImage>(
-        mbgl::PremultipliedImage(
-            { static_cast<uint32_t>(swapped.width()), static_cast<uint32_t>(swapped.height()) },
-            std::move(img)),
+        mbgl::PremultipliedImage{ static_cast<uint16_t>(swapped.width()),
+                                  static_cast<uint16_t>(swapped.height()), std::move(img) },
         1.0);
 }
 
@@ -274,7 +271,7 @@ void QMapboxGLSettings::setAccessToken(const QString &token)
     Constructs a QMapboxGL object with \a settings and sets \a parent as the parent
     object. The \a settings cannot be changed after the object is constructed.
 */
-QMapboxGL::QMapboxGL(QObject *parent, const QMapboxGLSettings &settings, const QSize& size, qreal pixelRatio)
+QMapboxGL::QMapboxGL(QObject *parent, const QMapboxGLSettings &settings)
     : QObject(parent)
 {
     // Multiple QMapboxGL running on the same thread
@@ -283,7 +280,7 @@ QMapboxGL::QMapboxGL(QObject *parent, const QMapboxGLSettings &settings, const Q
         loop.setLocalData(std::make_shared<mbgl::util::RunLoop>());
     }
 
-    d_ptr = new QMapboxGLPrivate(this, settings, size, pixelRatio);
+    d_ptr = new QMapboxGLPrivate(this, settings);
 }
 
 QMapboxGL::~QMapboxGL()
@@ -605,15 +602,15 @@ void QMapboxGL::rotateBy(const QPointF &first, const QPointF &second)
             mbgl::ScreenCoordinate { second.x(), second.y() });
 }
 
-void QMapboxGL::resize(const QSize& size, const QSize& framebufferSize)
+void QMapboxGL::resize(const QSize& size)
 {
-    if (d_ptr->size == size && d_ptr->fbSize == framebufferSize) return;
+    QSize converted = size / d_ptr->getPixelRatio();
+    if (d_ptr->size == converted) return;
 
-    d_ptr->size = size;
-    d_ptr->fbSize = framebufferSize;
+    glViewport(0, 0, converted.width(), converted.height());
 
-    d_ptr->mapObj->setSize(
-        { static_cast<uint32_t>(size.width()), static_cast<uint32_t>(size.height()) });
+    d_ptr->size = converted;
+    d_ptr->mapObj->update(mbgl::Update::Dimensions);
 }
 
 void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &sprite)
@@ -796,29 +793,19 @@ void QMapboxGL::setFilter(const QString& layer_, const QVariant& filter_)
     qWarning() << "Layer doesn't support filters";
 }
 
-#if QT_VERSION >= 0x050000
-void QMapboxGL::render(QOpenGLFramebufferObject *fbo)
-{
-    d_ptr->dirty = false;
-    d_ptr->updateFramebufferBinding(fbo);
-    d_ptr->mapObj->render(*d_ptr);
-}
-#else
 void QMapboxGL::render()
 {
     d_ptr->dirty = false;
-    d_ptr->mapObj->render(*d_ptr);
+    d_ptr->mapObj->render();
 }
-#endif
 
 void QMapboxGL::connectionEstablished()
 {
     d_ptr->connectionEstablished();
 }
 
-QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size_, qreal pixelRatio)
+QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings)
     : QObject(q)
-    , size(size_)
     , q_ptr(q)
     , fileSourceObj(std::make_unique<mbgl::DefaultFileSource>(
         settings.cacheDatabasePath().toStdString(),
@@ -826,8 +813,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
         settings.cacheDatabaseMaximumSize()))
     , threadPool(4)
     , mapObj(std::make_unique<mbgl::Map>(
-        *this, mbgl::Size{ static_cast<uint32_t>(size.width()), static_cast<uint32_t>(size.height()) },
-        pixelRatio, *fileSourceObj, threadPool,
+        *this, *fileSourceObj, threadPool,
         static_cast<mbgl::MapMode>(settings.mapMode()),
         static_cast<mbgl::GLContextMode>(settings.contextMode()),
         static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
@@ -844,44 +830,31 @@ QMapboxGLPrivate::~QMapboxGLPrivate()
 {
 }
 
-#if QT_VERSION >= 0x050000
-void QMapboxGLPrivate::updateFramebufferBinding(QOpenGLFramebufferObject *fbo_)
+float QMapboxGLPrivate::getPixelRatio() const
 {
-    fbo = fbo_;
-    if (fbo) {
-        getContext().bindFramebuffer.setDirty();
-        getContext().viewport = {
-            0, 0, { static_cast<uint32_t>(fbo->width()), static_cast<uint32_t>(fbo->height()) } };
-    } else {
-        getContext().bindFramebuffer.setCurrentValue(0);
-        assert(mbgl::gl::value::BindFramebuffer::Get() == getContext().bindFramebuffer.getCurrentValue());
-        getContext().viewport = {
-            0, 0, { static_cast<uint32_t>(fbSize.width()), static_cast<uint32_t>(fbSize.height()) } };
-    }
+#if QT_VERSION >= 0x050000
+    // QWindow is the most reliable pixel ratio because QGuiApplication returns
+    // the maximum pixel ratio of all available QScreen objects - this is not
+    // valid for cases e.g. where two or more QScreen objects with different
+    // pixel ratios are present and the window shows on the screen with lower
+    // pixel ratio.
+    static const float pixelRatio = QGuiApplication::allWindows().first()->devicePixelRatio();
+#else
+    static const float pixelRatio = 1.0;
+#endif
+    return pixelRatio;
 }
 
-void QMapboxGLPrivate::bind() {
-    if (fbo) {
-        fbo->bind();
-        getContext().bindFramebuffer.setDirty();
-        getContext().viewport = {
-            0, 0, { static_cast<uint32_t>(fbo->width()), static_cast<uint32_t>(fbo->height()) }
-        };
-    } else {
-        getContext().bindFramebuffer = 0;
-        getContext().viewport = {
-            0, 0, { static_cast<uint32_t>(fbSize.width()), static_cast<uint32_t>(fbSize.height()) }
-        };
-    }
+std::array<uint16_t, 2> QMapboxGLPrivate::getSize() const
+{
+    return {{ static_cast<uint16_t>(size.width()), static_cast<uint16_t>(size.height()) }};
 }
-#else
-void QMapboxGLPrivate::bind() {
-    getContext().bindFramebuffer = 0;
-    getContext().viewport = {
-        0, 0, { static_cast<uint32_t>(fbSize.width()), static_cast<uint32_t>(fbSize.height()) }
-    };
+
+std::array<uint16_t, 2> QMapboxGLPrivate::getFramebufferSize() const
+{
+    return {{ static_cast<uint16_t>(size.width() * getPixelRatio()),
+              static_cast<uint16_t>(size.height() * getPixelRatio()) }};
 }
-#endif
 
 void QMapboxGLPrivate::invalidate()
 {

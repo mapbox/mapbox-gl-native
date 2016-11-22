@@ -32,31 +32,19 @@ public:
 
     virtual ~Source();
 
-    /**
-     * Set core source (ie return ownership after remove)
-     */
-    void setSource(std::unique_ptr<style::Source>);
-
-    style::Source& get();
-
-    void addToMap(mbgl::Map&);
-
     virtual jni::jobject* createJavaPeer(jni::JNIEnv&) = 0;
 
     jni::String getId(jni::JNIEnv&);
 
-protected:
     //Release the owned view and return it
     std::unique_ptr<mbgl::style::Source> releaseCoreSource();
 
-    //Set on newly created sources until added to the map
+protected:
+
     std::unique_ptr<mbgl::style::Source> ownedSource;
-
-    //Raw pointer that is valid until the source is removed from the map
     mbgl::style::Source& source;
-
-    //Map pointer is valid for newly created sources only after adding to the map
     mbgl::Map* map;
+
 };
 
 } //android
