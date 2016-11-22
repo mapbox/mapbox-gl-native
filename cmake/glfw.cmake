@@ -1,12 +1,12 @@
 add_executable(mbgl-glfw
-    bin/glfw.cpp
+    platform/glfw/main.cpp
 )
 
 target_sources(mbgl-glfw
-    PRIVATE include/mbgl/platform/default/glfw_view.hpp
-    PRIVATE platform/default/glfw_view.cpp
-    PRIVATE include/mbgl/platform/default/settings_json.hpp
-    PRIVATE platform/default/settings_json.cpp
+    PRIVATE platform/glfw/glfw_view.hpp
+    PRIVATE platform/glfw/glfw_view.cpp
+    PRIVATE platform/glfw/settings_json.hpp
+    PRIVATE platform/glfw/settings_json.cpp
     PRIVATE platform/default/mbgl/util/default_styles.hpp
     PRIVATE platform/default/mbgl/util/default_styles.cpp
 )

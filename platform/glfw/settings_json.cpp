@@ -1,4 +1,4 @@
-#include <mbgl/platform/default/settings_json.hpp>
+#include "settings_json.hpp"
 #include <fstream>
 
 namespace mbgl {
