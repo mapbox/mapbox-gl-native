@@ -7,6 +7,8 @@ target_sources(mbgl-glfw
     PRIVATE platform/default/glfw_view.cpp
     PRIVATE include/mbgl/platform/default/settings_json.hpp
     PRIVATE platform/default/settings_json.cpp
+    PRIVATE platform/default/mbgl/util/default_styles.hpp
+    PRIVATE platform/default/mbgl/util/default_styles.cpp
 )
 
 target_compile_options(mbgl-glfw
@@ -16,6 +18,7 @@ target_compile_options(mbgl-glfw
 target_include_directories(mbgl-glfw
     PRIVATE include
     PRIVATE src # TODO: eliminate
+    PRIVATE platform/default
 )
 
 target_link_libraries(mbgl-glfw

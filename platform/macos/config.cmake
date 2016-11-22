@@ -18,6 +18,10 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/local_file_source.cpp
         PRIVATE platform/default/online_file_source.cpp
 
+        # Default styles
+        PRIVATE platform/default/mbgl/util/default_styles.hpp
+        PRIVATE platform/default/mbgl/util/default_styles.cpp
+
         # Offline
         PRIVATE platform/default/mbgl/storage/offline.cpp
         PRIVATE platform/default/mbgl/storage/offline_database.cpp
@@ -55,7 +59,7 @@ macro(mbgl_platform_core)
 
     target_include_directories(mbgl-core
         PUBLIC platform/darwin
-        PRIVATE platform/default
+        PUBLIC platform/default
     )
 
     target_link_libraries(mbgl-core
