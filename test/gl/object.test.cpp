@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/platform/default/headless_backend.hpp>
-#include <mbgl/platform/default/offscreen_view.hpp>
+#include <mbgl/gl/headless_backend.hpp>
+#include <mbgl/gl/offscreen_view.hpp>
 
 #include <mbgl/gl/context.hpp>
 

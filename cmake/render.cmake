@@ -9,6 +9,7 @@ target_compile_options(mbgl-render
 target_include_directories(mbgl-render
     PRIVATE include
     PRIVATE src # TODO: eliminate
+    PRIVATE platform/default
 )
 
 target_link_libraries(mbgl-render

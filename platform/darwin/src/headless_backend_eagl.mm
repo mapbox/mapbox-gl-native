@@ -1,4 +1,4 @@
-#include <mbgl/platform/default/headless_backend.hpp>
+#include <mbgl/gl/headless_backend.hpp>
 
 #include <mbgl/gl/extension.hpp>
 

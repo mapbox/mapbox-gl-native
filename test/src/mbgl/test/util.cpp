@@ -1,8 +1,8 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/platform/default/offscreen_view.hpp>
-#include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/gl/offscreen_view.hpp>
+#include <mbgl/gl/headless_display.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>

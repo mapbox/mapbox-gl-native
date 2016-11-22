@@ -137,11 +137,6 @@ set(MBGL_CORE_FILES
     src/mbgl/platform/event.cpp
     src/mbgl/platform/log.cpp
 
-    # platform/default
-    include/mbgl/platform/default/headless_backend.hpp
-    include/mbgl/platform/default/headless_display.hpp
-    include/mbgl/platform/default/offscreen_view.hpp
-
     # programs
     src/mbgl/programs/attributes.hpp
     src/mbgl/programs/circle_program.cpp
