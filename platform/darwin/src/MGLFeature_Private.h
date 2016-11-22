@@ -3,6 +3,7 @@
 
 #import <mbgl/util/geo.hpp>
 #import <mbgl/util/feature.hpp>
+#import <mbgl/style/conversion/geojson.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -11,6 +12,17 @@ NS_ASSUME_NONNULL_BEGIN
  vector tile features.
  */
 NS_ARRAY_OF(MGLShape <MGLFeature> *) *MGLFeaturesFromMBGLFeatures(const std::vector<mbgl::Feature> &features);
+
+/**
+ Returns an `MGLFeature` object converted from the given mbgl::Feature
+ */
+id <MGLFeature> MGLFeatureFromMBGLFeature(const mbgl::Feature &feature);
+
+/**
+ Returns an `MGLShape` representing the given geojson. The shape can be
+ a feature, a collection of features, or a geometry.
+ */
+MGLShape* MGLShapeFromGeoJSON(const mapbox::geojson::geojson &geojson);
 
 /**
  Takes an `mbgl::Feature` object, an identifer, and attributes dictionary and

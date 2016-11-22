@@ -37,8 +37,8 @@
     return annotation;
 }
 
-- (mbgl::Feature)featureObject {
-    return mbgl::Feature {[self lineString]};    
+- (mbgl::Geometry<double>)geometryObject {
+    return [self lineString];
 }
 
 - (NSDictionary *)geoJSONDictionary {
@@ -82,13 +82,13 @@
     return MGLLatLngBoundsFromCoordinateBounds(_overlayBounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
 }
 
-- (mbgl::Feature)featureObject {
+- (mbgl::Geometry<double>)geometryObject {
     mbgl::MultiLineString<double> multiLineString;
     multiLineString.reserve(self.polylines.count);
     for (MGLPolyline *polyline in self.polylines) {
         multiLineString.push_back([polyline lineString]);
     }
-    return mbgl::Feature {multiLineString};
+    return multiLineString;
 }
 
 - (NSDictionary *)geoJSONDictionary {

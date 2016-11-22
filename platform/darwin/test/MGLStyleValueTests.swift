@@ -3,7 +3,7 @@ import Mapbox
 
 class MGLStyleValueTests: XCTestCase {
     func testConstantValues() {
-        let geoJSONSource = MGLGeoJSONSource(identifier: "test", features: [], options: nil)
+        let geoJSONSource = MGLGeoJSONSource(identifier: "test", shape: nil, options: nil)
         let symbolStyleLayer = MGLSymbolStyleLayer(identifier: "test", source: geoJSONSource)
         
         // Boolean
@@ -20,7 +20,7 @@ class MGLStyleValueTests: XCTestCase {
     }
     
     func testFunctions() {
-        let geoJSONSource = MGLGeoJSONSource(identifier: "test", features: [], options: nil)
+        let geoJSONSource = MGLGeoJSONSource(identifier: "test", shape: nil, options: nil)
         let symbolStyleLayer = MGLSymbolStyleLayer(identifier: "test", source: geoJSONSource)
         
         // Boolean

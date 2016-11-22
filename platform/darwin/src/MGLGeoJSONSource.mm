@@ -3,6 +3,7 @@
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLFeature_Private.h"
+#import "MGLShape_Private.h"
 
 #import "NSURL+MGLAdditions.h"
 
@@ -49,13 +50,13 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
     return self;
 }
 
-- (instancetype)initWithIdentifier:(NSString *)identifier features:(NSArray<id<MGLFeature>> *)features options:(NS_DICTIONARY_OF(NSString *,id) *)options {
+- (instancetype)initWithIdentifier:(NSString *)identifier shape:(nullable MGLShape *)shape options:(NSDictionary<MGLGeoJSONSourceOption,id> *)options
+{
     if (self = [super initWithIdentifier:identifier]) {
-        _features = features;
+        _shape = shape;
         _options = options;
         [self commonInit];
     }
-    
     return self;
 }
 
@@ -85,21 +86,15 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
     if (self.URL) {
         NSURL *url = self.URL.mgl_URLByStandardizingScheme;
         source->setURL(url.absoluteString.UTF8String);
-        _features = nil;
+        _shape = nil;
     } else if (self.geoJSONData) {
         NSString *string = [[NSString alloc] initWithData:self.geoJSONData encoding:NSUTF8StringEncoding];
-        const auto geojson = mapbox::geojson::parse(string.UTF8String).get<mapbox::geojson::feature_collection>();
+        const auto geojson = mapbox::geojson::parse(string.UTF8String);
         source->setGeoJSON(geojson);
-        _features = MGLFeaturesFromMBGLFeatures(geojson);
+        _shape = MGLShapeFromGeoJSON(geojson);
     } else {
-        mbgl::FeatureCollection featureCollection;
-        featureCollection.reserve(self.features.count);
-        for (id <MGLFeaturePrivate> feature in self.features) {
-            featureCollection.push_back([feature mbglFeature]);
-        }
-        const auto geojson = mbgl::GeoJSON{featureCollection};
+        const auto geojson = mbgl::GeoJSON{self.shape.geometryObject};
         source->setGeoJSON(geojson);
-        _features = MGLFeaturesFromMBGLFeatures(featureCollection);
     }
     
     _pendingSource = std::move(source);
@@ -161,10 +156,10 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
     }
     
     NSString *string = [[NSString alloc] initWithData:_geoJSONData encoding:NSUTF8StringEncoding];
-    const auto geojson = mapbox::geojson::parse(string.UTF8String).get<mapbox::geojson::feature_collection>();
+    const auto geojson = mapbox::geojson::parse(string.UTF8String);
     self.rawSource->setGeoJSON(geojson);
     
-    _features = MGLFeaturesFromMBGLFeatures(geojson);
+    _shape = MGLShapeFromGeoJSON(geojson);
 }
 
 - (void)setURL:(NSURL *)URL
@@ -180,28 +175,24 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
     self.rawSource->setURL(url.absoluteString.UTF8String);
 }
 
-- (void)setFeatures:(NSArray *)features
+
+- (void)setShape:(MGLShape *)shape
 {
     if (self.rawSource == NULL)
     {
         [self commonInit];
     }
-    
-    mbgl::FeatureCollection featureCollection;
-    featureCollection.reserve(features.count);
-    for (id <MGLFeaturePrivate> feature in features) {
-        featureCollection.push_back([feature mbglFeature]);
-    }
-    const auto geojson = mbgl::GeoJSON{featureCollection};
+
+    const auto geojson = mbgl::GeoJSON{shape.geometryObject};
     self.rawSource->setGeoJSON(geojson);
     
-    _features = MGLFeaturesFromMBGLFeatures(featureCollection);
+    _shape = shape;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; geoJSONData = %@; features = %@>",
-            NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.geoJSONData, self.features];
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; geoJSONData = %@; shape = %@>",
+            NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.geoJSONData, self.shape];
 }
 
 @end

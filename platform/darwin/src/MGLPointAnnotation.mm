@@ -24,10 +24,10 @@
              @"coordinates": @[@(self.coordinate.longitude), @(self.coordinate.latitude)]};
 }
 
-- (mbgl::Feature)featureObject
+- (mbgl::Geometry<double>)geometryObject
 {
     mbgl::Point<double> point = { self.coordinate.longitude, self.coordinate.latitude };
-    return mbgl::Feature {point};
+    return point;
 }
 
 @end

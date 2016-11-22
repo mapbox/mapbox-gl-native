@@ -14,6 +14,7 @@
 #import "NSExpression+MGLAdditions.h"
 
 #import <mbgl/util/geometry.hpp>
+#import <mbgl/style/conversion/geojson.hpp>
 #import <mapbox/geometry/feature.hpp>
 
 @interface MGLPointFeature () <MGLFeaturePrivate>
@@ -33,7 +34,7 @@
 }
 
 - (mbgl::Feature)mbglFeature {
-    return mbglFeature([self featureObject], identifier, self.attributes);
+    return mbglFeature({[self geometryObject]}, identifier, self.attributes);
 }
 
 @end
@@ -55,7 +56,7 @@
 }
 
 - (mbgl::Feature)mbglFeature {
-    return mbglFeature([self featureObject], identifier, self.attributes);
+    return mbglFeature({[self geometryObject]}, identifier, self.attributes);
 }
 
 @end
@@ -77,7 +78,7 @@
 }
 
 - (mbgl::Feature)mbglFeature {
-    return mbglFeature([self featureObject], identifier, self.attributes);
+    return mbglFeature({[self geometryObject]}, identifier, self.attributes);
 }
 
 @end
@@ -99,7 +100,7 @@
 }
 
 - (mbgl::Feature)mbglFeature {
-    return mbglFeature([self featureObject], identifier, self.attributes);
+    return mbglFeature({[self geometryObject]}, identifier, self.attributes);
 }
 
 @end
@@ -121,7 +122,7 @@
 }
 
 - (mbgl::Feature)mbglFeature {
-    return mbglFeature([self featureObject], identifier, self.attributes);
+    return mbglFeature({[self geometryObject]}, identifier, self.attributes);
 }
 
 @end
@@ -143,7 +144,7 @@
 }
 
 - (mbgl::Feature)mbglFeature {
-    return mbglFeature([self featureObject], identifier, self.attributes);
+    return mbglFeature({[self geometryObject]}, identifier, self.attributes);
 }
 
 @end
@@ -266,25 +267,59 @@ private:
     }
 };
 
+template <typename T>
+class GeoJSONEvaluator {
+public:
+    MGLShape <MGLFeaturePrivate> * operator()(const mbgl::Geometry<T> &geometry) const {
+        GeometryEvaluator<T> evaluator;
+        MGLShape <MGLFeaturePrivate> *shape = mapbox::geometry::geometry<T>::visit(geometry, evaluator);
+        return shape;
+    }
+    
+    MGLShape <MGLFeaturePrivate> * operator()(const mbgl::Feature &feature) const {
+        GeometryEvaluator<T> evaluator;
+        MGLShape <MGLFeaturePrivate> *shape = mapbox::geometry::geometry<T>::visit(feature.geometry, evaluator);
+        return shape;
+    }
+    
+    MGLShape <MGLFeaturePrivate> * operator()(const mbgl::FeatureCollection &collection) const {
+        NSMutableArray *shapes = [NSMutableArray arrayWithCapacity:collection.size()];
+        for (const auto &feature : collection) {
+            [shapes addObject:MGLFeatureFromMBGLFeature(feature)];
+        }
+        return [MGLShapeCollection<MGLFeaturePrivate> shapeCollectionWithShapes:shapes];
+    }
+};
+
 NS_ARRAY_OF(MGLShape <MGLFeature> *) *MGLFeaturesFromMBGLFeatures(const std::vector<mbgl::Feature> &features) {
     NSMutableArray *shapes = [NSMutableArray arrayWithCapacity:features.size()];
     for (const auto &feature : features) {
-        NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithCapacity:feature.properties.size()];
-        for (auto &pair : feature.properties) {
-            auto &value = pair.second;
-            ValueEvaluator evaluator;
-            attributes[@(pair.first.c_str())] = mbgl::Value::visit(value, evaluator);
-        }
-        
-        GeometryEvaluator<double> evaluator;
-        MGLShape <MGLFeaturePrivate> *shape = mapbox::geometry::geometry<double>::visit(feature.geometry, evaluator);
-        if (feature.id) {
-            shape.identifier = mbgl::FeatureIdentifier::visit(*feature.id, ValueEvaluator());
-        }
-        shape.attributes = attributes;
-        [shapes addObject:shape];
+        [shapes addObject:MGLFeatureFromMBGLFeature(feature)];
     }
     return shapes;
+}
+
+id <MGLFeature> MGLFeatureFromMBGLFeature(const mbgl::Feature &feature) {
+    NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithCapacity:feature.properties.size()];
+    for (auto &pair : feature.properties) {
+        auto &value = pair.second;
+        ValueEvaluator evaluator;
+        attributes[@(pair.first.c_str())] = mbgl::Value::visit(value, evaluator);
+    }
+    GeometryEvaluator<double> evaluator;
+    MGLShape <MGLFeaturePrivate> *shape = mapbox::geometry::geometry<double>::visit(feature.geometry, evaluator);
+    if (feature.id) {
+        shape.identifier = mbgl::FeatureIdentifier::visit(*feature.id, ValueEvaluator());
+    }
+    shape.attributes = attributes;
+    
+    return shape;
+}
+
+MGLShape* MGLShapeFromGeoJSON(const mapbox::geojson::geojson &geojson) {
+    GeoJSONEvaluator<double> evaluator;
+    MGLShape *shape = mapbox::geojson::geojson::visit(geojson, evaluator);
+    return shape;
 }
 
 mbgl::Feature mbglFeature(mbgl::Feature feature, id identifier, NSDictionary *attributes)

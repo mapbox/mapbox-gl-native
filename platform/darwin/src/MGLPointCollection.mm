@@ -71,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
     return MGLLatLngBoundsFromCoordinateBounds(_bounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
 }
 
-- (mbgl::Feature)featureObject
+- (mbgl::Geometry<double>)geometryObject
 {
     mbgl::MultiPoint<double> multiPoint;
     multiPoint.reserve(self.pointCount);
@@ -79,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         multiPoint.push_back(mbgl::Point<double>(self.coordinates[i].longitude, self.coordinates[i].latitude));
     }
-    return mbgl::Feature {multiPoint};
+    return multiPoint;
 }
 
 - (NSDictionary *)geoJSONDictionary
