@@ -401,7 +401,7 @@ public class MyLocationView extends View {
     public void onRestoreInstanceState(Parcelable state) {
         if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
-            tilt = bundle.getFloat("tilt");
+            tilt = bundle.getDouble("tilt");
             state = bundle.getParcelable("superState");
         }
         super.onRestoreInstanceState(state);
