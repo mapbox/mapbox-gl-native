@@ -1405,7 +1405,7 @@ public class MapView extends FrameLayout {
                 @Override
                 public void onMapChanged(@MapChange int change) {
                     if (change == REGION_DID_CHANGE_ANIMATED && cameraCancelableCallback != null) {
-                        cancelableCallback.onFinish();
+                        cameraCancelableCallback.onFinish();
                         cameraCancelableCallback = null;
                         // Clean up after self
                         removeOnMapChangedListener(this);
