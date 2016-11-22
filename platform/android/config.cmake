@@ -56,11 +56,12 @@ macro(mbgl_platform_core)
         # TODO
 
         # Thread pool
-        PRIVATE platform/default/thread_pool.cpp
+        PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
+        PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
     )
 
     target_include_directories(mbgl-core
-        PRIVATE platform/default
+        PUBLIC platform/default
     )
 
     target_add_mason_package(mbgl-core PUBLIC sqlite)

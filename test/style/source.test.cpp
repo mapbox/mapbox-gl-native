@@ -11,7 +11,7 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/tileset.hpp>
-#include <mbgl/platform/default/thread_pool.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/map/transform.hpp>

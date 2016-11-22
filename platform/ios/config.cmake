@@ -48,7 +48,8 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/offscreen_view.cpp
 
         # Thread pool
-        PRIVATE platform/default/thread_pool.cpp
+        PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
+        PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
     )
 
     target_add_mason_package(mbgl-core PUBLIC geojson)

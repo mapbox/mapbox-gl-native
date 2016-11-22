@@ -4,7 +4,7 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/backend.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/platform/default/thread_pool.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
 #include <string>
