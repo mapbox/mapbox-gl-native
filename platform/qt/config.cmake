@@ -15,7 +15,7 @@ macro(mbgl_platform_core)
     )
 
     target_include_directories(mbgl-core
-        PRIVATE platform/default
+        PUBLIC platform/default
         PRIVATE platform/qt/include
     )
 

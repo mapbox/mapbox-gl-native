@@ -393,7 +393,6 @@ set(MBGL_CORE_FILES
     include/mbgl/util/compression.hpp
     include/mbgl/util/constants.hpp
     include/mbgl/util/convert.hpp
-    include/mbgl/util/default_styles.hpp
     include/mbgl/util/enum.hpp
     include/mbgl/util/exception.hpp
     include/mbgl/util/feature.hpp
@@ -426,7 +425,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/compression.cpp
     src/mbgl/util/constants.cpp
     src/mbgl/util/convert.cpp
-    src/mbgl/util/default_styles.cpp
     src/mbgl/util/dtoa.cpp
     src/mbgl/util/dtoa.hpp
     src/mbgl/util/exclusive.hpp

@@ -61,7 +61,11 @@ static_assert(mbgl::util::default_styles::currentVersion == MGLStyleDefaultVersi
     } \
     \
     + (NSURL *)name##StyleURL##WithVersion:(NSInteger)version { \
-        return [NSURL URLWithString:[@"mapbox://styles/mapbox/" #fileName "-v" stringByAppendingFormat:@"%li", (long)version]]; \
+        if (mbgl::util::default_styles::currentVersion == version) { \
+            return [NSURL URLWithString:@(mbgl::util::default_styles::name.url)]; \
+        } else { \
+            return [NSURL URLWithString:[@"mapbox://styles/mapbox/" #fileName "-v" stringByAppendingFormat:@"%li", (long)version]]; \
+        } \
     }
 
 MGL_DEFINE_STYLE(streets, streets)
