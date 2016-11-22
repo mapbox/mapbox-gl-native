@@ -9,7 +9,6 @@
 #import "MGLCircleStyleLayer.h"
 
 #include <mbgl/style/layers/circle_layer.hpp>
-
 namespace mbgl {
 
     MBGL_DEFINE_ENUM(MGLCircleTranslateAnchor, {
@@ -141,10 +140,7 @@ namespace mbgl {
 }
 
 - (void)setCircleTranslateAnchor:(MGLStyleValue<NSValue *> *)circleTranslateAnchor {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType,
-    NSValue *,
-    mbgl::style::TranslateAnchorType,
-    MGLCircleTranslateAnchor>().toEnumPropertyValue(circleTranslateAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLCircleTranslateAnchor>().toEnumPropertyValue(circleTranslateAnchor);
     _rawLayer->setCircleTranslateAnchor(mbglValue);
 }
 
@@ -154,10 +150,7 @@ namespace mbgl {
 }
 
 - (void)setCirclePitchScale:(MGLStyleValue<NSValue *> *)circlePitchScale {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::CirclePitchScaleType,
-    NSValue *,
-    mbgl::style::CirclePitchScaleType,
-    MGLCirclePitchScale>().toEnumPropertyValue(circlePitchScale);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::CirclePitchScaleType, NSValue *, mbgl::style::CirclePitchScaleType, MGLCirclePitchScale>().toEnumPropertyValue(circlePitchScale);
     _rawLayer->setCirclePitchScale(mbglValue);
 }
 

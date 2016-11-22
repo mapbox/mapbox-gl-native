@@ -117,11 +117,4 @@ NS_INLINE CLLocationDegrees MGLDegreesFromRadians(CGFloat radians) {
     return radians * 180 / M_PI;
 }
 
-/**
- Methods for round-tripping Mapbox geometry structure values.
- */
-@interface NSValue (MGLGeometryAdditions)
-
-@end
-
 NS_ASSUME_NONNULL_END

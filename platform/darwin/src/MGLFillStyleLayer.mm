@@ -9,7 +9,6 @@
 #import "MGLFillStyleLayer.h"
 
 #include <mbgl/style/layers/fill_layer.hpp>
-
 namespace mbgl {
 
     MBGL_DEFINE_ENUM(MGLFillTranslateAnchor, {
@@ -136,10 +135,7 @@ namespace mbgl {
 }
 
 - (void)setFillTranslateAnchor:(MGLStyleValue<NSValue *> *)fillTranslateAnchor {
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType,
-    NSValue *,
-    mbgl::style::TranslateAnchorType,
-    MGLFillTranslateAnchor>().toEnumPropertyValue(fillTranslateAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslateAnchor>().toEnumPropertyValue(fillTranslateAnchor);
     _rawLayer->setFillTranslateAnchor(mbglValue);
 }
 

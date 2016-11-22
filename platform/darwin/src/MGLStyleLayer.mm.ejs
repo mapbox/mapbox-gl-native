@@ -15,7 +15,6 @@
 #import "MGL<%- camelize(type) %>StyleLayer.h"
 
 #include <mbgl/style/layers/<%- type %>_layer.hpp>
-
 <% if (containsEnumerationProperties)  { -%>
 namespace mbgl {
 
@@ -131,10 +130,7 @@ namespace mbgl {
 <% for (const property of layoutProperties) { -%>
 - (void)set<%- camelize(property.name) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
 <% if (property.type == "enum") { -%>
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::<%- mbglType(property) %>,
-    NSValue *,
-    mbgl::style::<%- mbglType(property) %>,
-    MGL<%- camelize(property.name) %>>().toEnumPropertyValue(<%- objCName(property) %>);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::<%- mbglType(property) %>, NSValue *, mbgl::style::<%- mbglType(property) %>, MGL<%- camelize(property.name) %>>().toEnumPropertyValue(<%- objCName(property) %>);
     _rawLayer->set<%- camelize(property.name) %>(mbglValue);
 <% } else { -%>
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue(<%- objCName(property) %>);
@@ -159,10 +155,7 @@ namespace mbgl {
 <% for (const property of paintProperties) { -%>
 - (void)set<%- camelize(property.name) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
 <% if (property.type == "enum") { -%>
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::<%- mbglType(property) %>,
-    NSValue *,
-    mbgl::style::<%- mbglType(property) %>,
-    MGL<%- camelize(property.name) %>>().toEnumPropertyValue(<%- objCName(property) %>);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::<%- mbglType(property) %>, NSValue *, mbgl::style::<%- mbglType(property) %>, MGL<%- camelize(property.name) %>>().toEnumPropertyValue(<%- objCName(property) %>);
     _rawLayer->set<%- camelize(property.name) %>(mbglValue);
 <% } else { -%>
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue(<%- objCName(property) %>);
