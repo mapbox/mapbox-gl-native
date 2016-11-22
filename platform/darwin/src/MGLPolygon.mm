@@ -38,23 +38,22 @@
     return result;
 }
 
-- (mbgl::Feature)featureObject {
+- (mbgl::Polygon<double>)polygon {
     mbgl::Polygon<double> geometry;
     geometry.push_back(self.ring);
     for (MGLPolygon *polygon in self.interiorPolygons) {
         geometry.push_back(polygon.ring);
     }
-    return mbgl::Feature{geometry};
+    return geometry;
+}
+
+- (mbgl::Geometry<double>)geometryObject {
+    return [self polygon];
 }
 
 - (mbgl::Annotation)annotationObjectWithDelegate:(id <MGLMultiPointDelegate>)delegate {
-    mbgl::Polygon<double> geometry;
-    geometry.push_back(self.ring);
-    for (MGLPolygon *polygon in self.interiorPolygons) {
-        geometry.push_back(polygon.ring);
-    }
-
-    mbgl::FillAnnotation annotation { geometry };
+    
+    mbgl::FillAnnotation annotation { [self polygon] };
     annotation.opacity = { static_cast<float>([delegate alphaForShapeAnnotation:self]) };
     annotation.outlineColor = { [delegate strokeColorForShapeAnnotation:self] };
     annotation.color = { [delegate fillColorForPolygonAnnotation:self] };
@@ -103,7 +102,7 @@
     return MGLLatLngBoundsFromCoordinateBounds(_overlayBounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
 }
 
-- (mbgl::Feature)featureObject {
+- (mbgl::Geometry<double>)geometryObject {
     mbgl::MultiPolygon<double> multiPolygon;
     multiPolygon.reserve(self.polygons.count);
     for (MGLPolygon *polygon in self.polygons) {
@@ -114,7 +113,7 @@
         }
         multiPolygon.push_back(geometry);
     }
-    return mbgl::Feature {multiPolygon};
+    return multiPolygon;
 }
 
 - (NSDictionary *)geoJSONDictionary {

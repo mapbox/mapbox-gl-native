@@ -1,5 +1,9 @@
 #import "MGLShapeCollection.h"
 
+#import "MGLShape_Private.h"
+
+#import <mbgl/style/conversion/geojson.hpp>
+
 @implementation MGLShapeCollection
 
 + (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape *) *)shapes {
@@ -30,6 +34,15 @@
         [geometries addObject:geometry];
     }
     return [geometries copy];
+}
+
+- (mbgl::Geometry<double>)geometryObject {
+    mapbox::geojson::geometry_collection collection;
+    collection.reserve(self.shapes.count);
+    for (MGLShape *shape in self.shapes) {
+        collection.push_back([shape geometryObject]);
+    }
+    return collection;
 }
 
 @end

@@ -398,8 +398,8 @@
 		DAD165711CF41981001FF4B9 /* MGLFeature.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAD1656B1CF41981001FF4B9 /* MGLFeature.mm */; };
 		DAD165781CF4CDFF001FF4B9 /* MGLShapeCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = DAD165761CF4CDFF001FF4B9 /* MGLShapeCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DAD165791CF4CDFF001FF4B9 /* MGLShapeCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = DAD165761CF4CDFF001FF4B9 /* MGLShapeCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DAD1657A1CF4CDFF001FF4B9 /* MGLShapeCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = DAD165771CF4CDFF001FF4B9 /* MGLShapeCollection.m */; };
-		DAD1657B1CF4CDFF001FF4B9 /* MGLShapeCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = DAD165771CF4CDFF001FF4B9 /* MGLShapeCollection.m */; };
+		DAD1657A1CF4CDFF001FF4B9 /* MGLShapeCollection.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAD165771CF4CDFF001FF4B9 /* MGLShapeCollection.mm */; };
+		DAD1657B1CF4CDFF001FF4B9 /* MGLShapeCollection.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAD165771CF4CDFF001FF4B9 /* MGLShapeCollection.mm */; };
 		DAED38631D62D0FC00D7640F /* NSURL+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DAED38611D62D0FC00D7640F /* NSURL+MGLAdditions.h */; };
 		DAED38641D62D0FC00D7640F /* NSURL+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DAED38611D62D0FC00D7640F /* NSURL+MGLAdditions.h */; };
 		DAED38651D62D0FC00D7640F /* NSURL+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DAED38621D62D0FC00D7640F /* NSURL+MGLAdditions.m */; };
@@ -767,7 +767,7 @@
 		DAD1656A1CF41981001FF4B9 /* MGLFeature_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFeature_Private.h; sourceTree = "<group>"; };
 		DAD1656B1CF41981001FF4B9 /* MGLFeature.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFeature.mm; sourceTree = "<group>"; };
 		DAD165761CF4CDFF001FF4B9 /* MGLShapeCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShapeCollection.h; sourceTree = "<group>"; };
-		DAD165771CF4CDFF001FF4B9 /* MGLShapeCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLShapeCollection.m; sourceTree = "<group>"; };
+		DAD165771CF4CDFF001FF4B9 /* MGLShapeCollection.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLShapeCollection.mm; sourceTree = "<group>"; };
 		DAED38611D62D0FC00D7640F /* NSURL+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+MGLAdditions.h"; sourceTree = "<group>"; };
 		DAED38621D62D0FC00D7640F /* NSURL+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+MGLAdditions.m"; sourceTree = "<group>"; };
 		DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfiguration.m; sourceTree = "<group>"; };
@@ -1302,7 +1302,7 @@
 				40CF6DBA1DAC3C1800A4D18B /* MGLShape_Private.h */,
 				DA88480E1CBAFA6200AB86E3 /* MGLShape.mm */,
 				DAD165761CF4CDFF001FF4B9 /* MGLShapeCollection.h */,
-				DAD165771CF4CDFF001FF4B9 /* MGLShapeCollection.m */,
+				DAD165771CF4CDFF001FF4B9 /* MGLShapeCollection.mm */,
 			);
 			name = Geometry;
 			sourceTree = "<group>";
@@ -1950,7 +1950,7 @@
 				DA88488C1CBB037E00AB86E3 /* SMCalloutView.m in Sources */,
 				35136D4E1D4277FC00C20EFD /* MGLSource.mm in Sources */,
 				DA35A2B81CCA9A5D00E826B2 /* MGLClockDirectionFormatter.m in Sources */,
-				DAD1657A1CF4CDFF001FF4B9 /* MGLShapeCollection.m in Sources */,
+				DAD1657A1CF4CDFF001FF4B9 /* MGLShapeCollection.mm in Sources */,
 				35136D451D42275100C20EFD /* MGLSymbolStyleLayer.mm in Sources */,
 				35599DED1D46F14E0048254D /* MGLStyleValue.mm in Sources */,
 				DA8848211CBAFA6200AB86E3 /* MGLOfflinePack.mm in Sources */,
@@ -2023,7 +2023,7 @@
 				DAA4E4351CBB730400178DFB /* SMCalloutView.m in Sources */,
 				35136D4F1D4277FC00C20EFD /* MGLSource.mm in Sources */,
 				DA35A2B91CCA9A5D00E826B2 /* MGLClockDirectionFormatter.m in Sources */,
-				DAD1657B1CF4CDFF001FF4B9 /* MGLShapeCollection.m in Sources */,
+				DAD1657B1CF4CDFF001FF4B9 /* MGLShapeCollection.mm in Sources */,
 				DAA4E4251CBB730400178DFB /* MGLShape.mm in Sources */,
 				35136D461D42275100C20EFD /* MGLSymbolStyleLayer.mm in Sources */,
 				35599DEE1D46F14E0048254D /* MGLStyleValue.mm in Sources */,
