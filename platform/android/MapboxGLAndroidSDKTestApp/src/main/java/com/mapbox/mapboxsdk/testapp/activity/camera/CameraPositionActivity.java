@@ -54,6 +54,14 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
     @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
+
+        mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition position) {
+                Log.e(MapboxConstants.TAG, "OnCameraChange: " + position);
+            }
+        });
+
         // add a listener to FAB
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setColorFilter(ContextCompat.getColor(CameraPositionActivity.this, R.color.primary));

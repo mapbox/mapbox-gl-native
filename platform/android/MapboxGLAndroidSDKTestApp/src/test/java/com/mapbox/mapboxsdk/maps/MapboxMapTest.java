@@ -1,8 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.PointF;
 
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -11,11 +9,8 @@ import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +25,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -196,19 +190,6 @@ public class MapboxMapTest {
     }
 
     //
-    // padding
-    //
-
-    @Test
-    public void testPadding() {
-        mMapboxMap.setOnCameraChangeListener(mOnCameraChangeListener);
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
-        mMapboxMap.setPadding(0, 0, 0, 0);
-        verify(mOnCameraChangeListener, times(1)).onCameraChange(position);
-    }
-
-    //
     // setters/getters interfaces
     //
 
@@ -261,316 +242,6 @@ public class MapboxMapTest {
     }
 
     //
-    // CameraPosition
-    //
-
-    @Test
-    public void testCameraPosition() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        assertEquals("CameraPosition should be same", position, mMapboxMap.getCameraPosition());
-    }
-
-    //
-    // Camera - moveCamera
-    //
-
-    @Test
-    public void testNewCameraPositionMoveCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
-        assertEquals("CameraPosition should be same", position, mMapboxMap.getCameraPosition());
-    }
-
-    //
-    // Camera - animateCamera
-    //
-
-    @Test
-    public void testNewCameraPositionAnimateCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
-        assertEquals("CameraPosition should be same", position, mMapboxMap.getCameraPosition());
-    }
-
-    @Test
-    public void testNewCameraPositionAnimateCameraWithCallbackParameter() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), null);
-        assertEquals("CameraPosition should be same", position, mMapboxMap.getCameraPosition());
-    }
-
-    @Test
-    public void testNewCameraPositionAnimateCameraWithDurationParameter() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 0);
-        assertEquals("CameraPosition should be same", position, mMapboxMap.getCameraPosition());
-    }
-
-    @Test
-    public void testNewCameraPositionAnimateCameraWithDurationAndCallbackParameter() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 0, null);
-        assertEquals("CameraPosition should be same", position, mMapboxMap.getCameraPosition());
-    }
-
-    //
-    // Camera - easeCamera
-    //
-
-    @Test
-    public void testNewCameraPositionEaseCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position));
-        assertEquals("CameraPosition should be same", position, mMapboxMap.getCameraPosition());
-    }
-
-    @Test
-    public void testNewCameraPositionEaseCameraWithCallbackParameter() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position), 1000, null);
-        assertEquals("CameraPosition should be same", position, mMapboxMap.getCameraPosition());
-    }
-
-    //
-    // Camera - LatLng
-    //
-
-    @Test
-    public void testLatLngMoveCamera() {
-        mMapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(4, 5)));
-        assertEquals("LatLng should be same", new LatLng(4, 5), mMapboxMap.getCameraPosition().target);
-    }
-
-    @Test
-    public void testLatLngAnimateCamera() {
-        mMapboxMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(4, 5)));
-        assertEquals("LatLng should be same", new LatLng(4, 5), mMapboxMap.getCameraPosition().target);
-    }
-
-    @Test
-    public void testLatLngEaseCamera() {
-        mMapboxMap.easeCamera(CameraUpdateFactory.newLatLng(new LatLng(4, 5)), 1000);
-        assertEquals("LatLng should be same", new LatLng(4, 5), mMapboxMap.getCameraPosition().target);
-    }
-
-    //
-    // Camera - LatLngZoom
-    //
-
-    @Test
-    public void testLatLngZoomMoveCamera() {
-        mMapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(4, 5), 10));
-        assertEquals("LatLng should be same", new LatLng(4, 5), mMapboxMap.getCameraPosition().target);
-        assertTrue("Zoomlevel should be same", 10 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    @Test
-    public void testLatLngZoomAnimateCamera() {
-        mMapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(4, 5), 10));
-        assertEquals("LatLng should be same", new LatLng(4, 5), mMapboxMap.getCameraPosition().target);
-        assertTrue("Zoomlevel should be same", 10 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    @Test
-    public void testLatLngZoomEaseCamera() {
-        mMapboxMap.easeCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(4, 5), 10), 1000);
-        assertEquals("LatLng should be same", new LatLng(4, 5), mMapboxMap.getCameraPosition().target);
-        assertTrue("Zoomlevel should be same", 10 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    //
-    // Camera - LatLngBounds
-    //
-    @Test
-    public void testLatLngBounds() {
-        LatLng la = new LatLng(34.053940, -118.242622);
-        LatLng ny = new LatLng(40.712730, -74.005953);
-        LatLng centroid = new LatLng(
-                (la.getLatitude() + ny.getLatitude()) / 2,
-                (la.getLongitude() + ny.getLongitude()) / 2);
-
-        Projection projection = mock(Projection.class);
-        when(projection.toScreenLocation(la)).thenReturn(new PointF(20, 20));
-        when(projection.toScreenLocation(ny)).thenReturn(new PointF(100, 100));
-        when(projection.fromScreenLocation(any(PointF.class))).thenReturn(centroid);
-
-        UiSettings uiSettings = mock(UiSettings.class);
-        when(uiSettings.getHeight()).thenReturn(1000f);
-
-        mMapboxMap.setProjection(projection);
-        mMapboxMap.setUiSettings(uiSettings);
-
-        LatLngBounds bounds = new LatLngBounds.Builder().include(la).include(ny).build();
-        mMapboxMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 1));
-
-        assertEquals("LatLng should be same", centroid, mMapboxMap.getCameraPosition().target);
-    }
-
-
-    //
-    // CameraPositionUpdate - NPX target
-    //
-    @Test
-    public void testCamerePositionUpdateNullTarget() {
-        LatLng latLng = new LatLng(1, 1);
-        mMapboxMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMapboxMap.moveCamera(CameraUpdateFactory.newLatLng(null));
-        assertEquals("LatLng should be same", latLng, mMapboxMap.getCameraPosition().target);
-    }
-
-    //
-    // Camera - ScrollBy
-    //
-    @Test
-    public void testScrollBy() {
-        LatLng latLng = new LatLng(1, 1);
-        mMapboxMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMapboxMap.moveCamera(CameraUpdateFactory.scrollBy(0, 0));
-        assertEquals("LatLng should be same", latLng, mMapboxMap.getCameraPosition().target);
-        mMapboxMap.moveCamera(CameraUpdateFactory.scrollBy(12, 12));
-    }
-
-    //
-    // Camera - Zoom
-    //
-
-    @Test
-    public void testZoomInMoveCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.moveCamera(CameraUpdateFactory.zoomIn());
-        assertTrue("Zoomlevel should be same", 4 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    @Test
-    public void testZoomOutMoveCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.moveCamera(CameraUpdateFactory.zoomOut());
-        assertTrue("Zoomlevel should be same", 2 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    @Test
-    public void testZoomByMoveCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.moveCamera(CameraUpdateFactory.zoomBy(3));
-        assertTrue("Zoomlevel should be same", 6 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    @Test
-    public void testZoomByPointMoveCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.moveCamera(CameraUpdateFactory.zoomBy(3, new Point(0, 0)));
-        assertTrue("Zoomlevel should be same", 6 == mMapboxMap.getCameraPosition().zoom);
-        // todo calculate and check LatLng
-    }
-
-    @Test
-    public void testZoomToMoveCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.moveCamera(CameraUpdateFactory.zoomTo(12));
-        assertTrue("Zoomlevel should be same", 12 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    @Test
-    public void testZoomInAnimateCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.animateCamera(CameraUpdateFactory.zoomIn());
-        assertTrue("Zoomlevel should be same", 4 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    @Test
-    public void testZoomOutAnimateCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.animateCamera(CameraUpdateFactory.zoomOut());
-        assertTrue("Zoomlevel should be same", 2 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    @Test
-    public void testZoomByAnimateCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.animateCamera(CameraUpdateFactory.zoomBy(3));
-        assertTrue("Zoomlevel should be same", 6 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    @Test
-    public void testZoomToAnimateCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-        assertTrue("Zoomlevel should be same", 12 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    @Test
-    public void testZoomByPointAnimateCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.animateCamera(CameraUpdateFactory.zoomBy(1, new Point(0, 0)));
-        assertTrue("Zoomlevel should be same", 4 == mMapboxMap.getCameraPosition().zoom);
-        // todo calculate and check LatLng
-    }
-
-    @Test
-    public void testZoomInEaseCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.easeCamera(CameraUpdateFactory.zoomIn(), 1000);
-        assertTrue("Zoomlevel should be same", 4 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    @Test
-    public void testZoomOutEaseCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.easeCamera(CameraUpdateFactory.zoomOut(), 1000);
-        assertTrue("Zoomlevel should be same", 2 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    @Test
-    public void testZoomByEaseCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.easeCamera(CameraUpdateFactory.zoomBy(3), 1000);
-        assertTrue("Zoomlevel should be same", 6 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    @Test
-    public void testZoomByPointCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.easeCamera(CameraUpdateFactory.zoomBy(3, new Point(0, 0)), 1000);
-        assertTrue("Zoomlevel should be same", 6 == mMapboxMap.getCameraPosition().zoom);
-        // todo calculate and check LatLng
-    }
-
-    @Test
-    public void testZoomToEaseCamera() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setCameraPosition(position);
-        mMapboxMap.easeCamera(CameraUpdateFactory.zoomTo(12), 1000);
-        assertTrue("Zoomlevel should be same", 12 == mMapboxMap.getCameraPosition().zoom);
-    }
-
-    //
-    // OnCameraChangeListener
-    //
-
-    @Test
-    public void testOnCameraChangeListener() {
-        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.setOnCameraChangeListener(mOnCameraChangeListener);
-        mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
-        verify(mOnCameraChangeListener, times(1)).onCameraChange(position);
-    }
-
-    //
     // Annotations
     //
 
@@ -582,7 +253,7 @@ public class MapboxMapTest {
     }
 
     @Test(expected = InvalidMarkerPositionException.class)
-    public void testAddMarkerInvalidPosition(){
+    public void testAddMarkerInvalidPosition() {
         new MarkerOptions().getMarker();
     }
 

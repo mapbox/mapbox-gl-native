@@ -45,7 +45,7 @@ public class MarkerViewTest {
     }
 
     @Test
-    public void addMarkerTest() {
+    public void addMarkerViewTest() {
         ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
         assertEquals("Markers should be empty", 0, mapboxMap.getMarkers().size());
@@ -107,6 +107,8 @@ public class MarkerViewTest {
         public void perform(UiController uiController, View view) {
             mapboxMap.getMarkerViewManager().addMarkerViewAdapter(new MarkerViewActivity.TextAdapter(view.getContext(), mapboxMap));
             marker = mapboxMap.addMarker(options);
+            mapboxMap.invalidate();
+            uiController.loopMainThreadForAtLeast(250);
         }
     }
 
@@ -131,10 +133,10 @@ public class MarkerViewTest {
         @Override
         public void perform(UiController uiController, View view) {
             mapboxMap.selectMarker(marker);
-
+            mapboxMap.invalidate();
+            uiController.loopMainThreadForAtLeast(250);
         }
     }
-
 
     @After
     public void unregisterIdlingResource() {

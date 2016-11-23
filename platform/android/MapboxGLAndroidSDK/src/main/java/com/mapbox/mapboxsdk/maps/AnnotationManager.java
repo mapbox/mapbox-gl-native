@@ -30,7 +30,7 @@ import java.util.List;
  * Exposes convenience methods to add/remove/update all subtypes of annotations found in com.mapbox.mapboxsdk.annotations.
  * </p>
  */
-class AnnotationManager {
+class AnnotationManager implements MapView.OnMapChangedListener {
 
     private NativeMapView nativeMapView;
     private IconManager iconManager;
@@ -41,6 +41,7 @@ class AnnotationManager {
     private List<Marker> selectedMarkers;
 
     private MapboxMap.OnMarkerClickListener onMarkerClickListener;
+    private boolean isWaitingForRenderInvoke;
 
     AnnotationManager(NativeMapView view, IconManager iconManager, InfoWindowManager manager) {
         this.nativeMapView = view;
@@ -48,6 +49,19 @@ class AnnotationManager {
         this.infoWindowManager = manager;
         this.selectedMarkers = new ArrayList<>();
         this.annotations = new LongSparseArray<>();
+
+        if (view != null) {
+            // null checking needed for unit tests
+            view.addOnMapChangedListener(this);
+        }
+    }
+
+    @Override
+    public void onMapChanged(@MapView.MapChange int change) {
+        if (isWaitingForRenderInvoke && change == MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
+            isWaitingForRenderInvoke = false;
+            markerViewManager.invalidateViewMarkersInVisibleRegion();
+        }
     }
 
     //
@@ -194,18 +208,24 @@ class AnnotationManager {
     }
 
     MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions, @NonNull MapboxMap mapboxMap) {
+        isWaitingForRenderInvoke = true;
         MarkerView marker = prepareViewMarker(markerOptions);
         marker.setMapboxMap(mapboxMap);
         long id = nativeMapView.addMarker(marker);
         marker.setId(id);
         annotations.put(id, marker);
-        markerViewManager.invalidateViewMarkersInVisibleRegion();
         return marker;
     }
 
     List<MarkerView> addMarkerViews(@NonNull List<? extends BaseMarkerViewOptions> markerViewOptions, @NonNull MapboxMap mapboxMap) {
         List<MarkerView> markers = new ArrayList<>();
         for (BaseMarkerViewOptions markerViewOption : markerViewOptions) {
+            // if last marker
+            if (markerViewOptions.indexOf(markerViewOption) == markerViewOptions.size() - 1) {
+                // get notified when render occurs to invalidate and draw MarkerViews
+                isWaitingForRenderInvoke = true;
+            }
+            // add marker to map
             MarkerView marker = prepareViewMarker(markerViewOption);
             marker.setMapboxMap(mapboxMap);
             long id = nativeMapView.addMarker(marker);
@@ -283,7 +303,7 @@ class AnnotationManager {
             }
 
             if (infoWindowManager.isInfoWindowValidForMarker(marker) || infoWindowManager.getInfoWindowAdapter() != null) {
-                infoWindowManager.getInfoWindows().add(marker.showInfoWindow(mapboxMap, mapboxMap.getMapView()));
+                infoWindowManager.add(marker.showInfoWindow(mapboxMap, mapboxMap.getMapView()));
             }
         }
 

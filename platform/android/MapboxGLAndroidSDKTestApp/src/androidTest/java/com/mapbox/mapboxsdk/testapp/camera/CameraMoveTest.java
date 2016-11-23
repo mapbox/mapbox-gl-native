@@ -231,6 +231,7 @@ public class CameraMoveTest {
         @Override
         public void perform(UiController uiController, View view) {
             mapboxMap.moveCamera(cameraUpdate);
+            uiController.loopMainThreadForAtLeast(100);
         }
     }
 }

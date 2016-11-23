@@ -61,6 +61,13 @@ public class CameraAnimationTypeActivity extends AppCompatActivity implements On
             }
         });
 
+        mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition position) {
+                Log.e(MapboxConstants.TAG, "OnCameraChange: " + position);
+            }
+        });
+
         // handle move button clicks
         View moveButton = findViewById(R.id.cameraMoveButton);
         if (moveButton != null) {
