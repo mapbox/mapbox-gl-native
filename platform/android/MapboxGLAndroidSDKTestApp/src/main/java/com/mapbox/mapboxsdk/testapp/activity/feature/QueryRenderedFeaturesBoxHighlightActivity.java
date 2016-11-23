@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -31,7 +31,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
  * Demo's query rendered features
  */
 public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity {
-    private static final String TAG = QueryRenderedFeaturesBoxHighlightActivity.class.getSimpleName();
 
     public MapView mapView;
     private MapboxMap mapboxMap;
@@ -62,7 +61,7 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
                         int top = selectionBox.getTop() - mapView.getTop();
                         int left = selectionBox.getLeft() - mapView.getLeft();
                         RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
-                        Log.i(TAG, String.format("Querying box %s for buildings", box));
+                        Timber.i(String.format("Querying box %s for buildings", box));
                         List<Feature> features = mapboxMap.queryRenderedFeatures(box, "building");
 
                         //Show count

@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.WindowManager;
 
 import com.mapbox.mapboxsdk.BuildConfig;
@@ -59,8 +59,6 @@ import okhttp3.internal.Util;
  * Primary access is via MapboxEventManager.getMapboxEventManager()
  */
 public class MapboxEventManager {
-
-    private static final String TAG = "MapboxEventManager";
 
     private static MapboxEventManager mapboxEventManager = null;
 
@@ -117,10 +115,10 @@ public class MapboxEventManager {
      */
     public void initialize(@NonNull Context context, @NonNull String accessToken) {
 
-        Log.i(TAG, "Telemetry initialize() called...");
+        Timber.i("Telemetry initialize() called...");
 
         if (initialized) {
-            Log.i(TAG, "Mapbox Telemetry has already been initialized.");
+            Timber.i("Mapbox Telemetry has already been initialized.");
             return;
         }
 
@@ -133,7 +131,7 @@ public class MapboxEventManager {
         try {
             messageDigest = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
-            Log.w(TAG, "Error getting Encryption Algorithm: " + e);
+            Timber.w("Error getting Encryption Algorithm: " + e);
         }
 
         // Create Initial Session Id
@@ -142,7 +140,7 @@ public class MapboxEventManager {
         SharedPreferences prefs = context.getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
         // Determine if Telemetry Should Be Enabled
-        Log.i(TAG, "Right before Telemetry set enabled in initialized()");
+        Timber.i("Right before Telemetry set enabled in initialized()");
         setTelemetryEnabled(prefs.getBoolean(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_ENABLED, true));
 
         // Load / Create Vendor Id
@@ -169,7 +167,7 @@ public class MapboxEventManager {
             String stagingAccessToken = appInfo.metaData.getString(MapboxConstants.KEY_META_DATA_STAGING_ACCESS_TOKEN);
 
             if (TextUtils.isEmpty(stagingURL) || TextUtils.isEmpty(stagingAccessToken)) {
-                Log.d(TAG, "Looking in SharedPreferences for Staging Credentials");
+                Timber.d("Looking in SharedPreferences for Staging Credentials");
                 stagingURL = prefs.getString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_URL, null);
                 stagingAccessToken = prefs.getString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_ACCESS_TOKEN, null);
             }
@@ -187,7 +185,7 @@ public class MapboxEventManager {
             }
 
         } catch (Exception e) {
-            Log.e(TAG, "Error Trying to load Staging Credentials: " + e.toString());
+            Timber.e("Error Trying to load Staging Credentials: " + e.toString());
         }
 
         // Register for battery updates
@@ -222,7 +220,7 @@ public class MapboxEventManager {
                 }
             }
         } catch (Exception e) {
-            Log.w(MapboxConstants.TAG, "Error checking for Telemetry Service Config: " + e);
+            Timber.w("Error checking for Telemetry Service Config: " + e);
         }
         throw new TelemetryServiceNotConfiguredException();
     }
@@ -240,40 +238,40 @@ public class MapboxEventManager {
      * @param telemetryEnabled True to start telemetry, false to stop it
      */
     public void setTelemetryEnabled(boolean telemetryEnabled) {
-        Log.i(TAG, "setTelemetryEnabled(); this.telemetryEnabled = " + this.telemetryEnabled + "; telemetryEnabled = " + telemetryEnabled);
+        Timber.i("setTelemetryEnabled(); this.telemetryEnabled = " + this.telemetryEnabled + "; telemetryEnabled = " + telemetryEnabled);
         if (this.telemetryEnabled == telemetryEnabled) {
-            Log.d(TAG, "No need to start / stop telemetry as it's already in that state.");
+            Timber.d("No need to start / stop telemetry as it's already in that state.");
             return;
         }
 
         if (telemetryEnabled) {
-            Log.d(TAG, "Starting Telemetry Up!");
+            Timber.d("Starting Telemetry Up!");
             // Start It Up
             context.startService(new Intent(context, TelemetryService.class));
 
             // Make sure Ambient Mode is started at a minimum
             if (LocationServices.getLocationServices(context).areLocationPermissionsGranted()) {
-                Log.i(TAG, "Permissions are good, see if GPS is enabled and if not then setup Ambient.");
+                Timber.i("Permissions are good, see if GPS is enabled and if not then setup Ambient.");
                 if (LocationServices.getLocationServices(context).isGPSEnabled()) {
                     LocationServices.getLocationServices(context).toggleGPS(false);
                 }
             } else {
                 // Start timer that checks for Permissions
-                Log.i(TAG, "Permissions are not good.  Need to do some looping to check on stuff.");
+                Timber.i("Permissions are not good.  Need to do some looping to check on stuff.");
 
                 final Handler permsHandler = new Handler();
                 Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
                         if (LocationServices.getLocationServices(context).areLocationPermissionsGranted()) {
-                            Log.i(TAG, "Permissions finally granted, so starting Ambient if GPS isn't already enabled");
+                            Timber.i("Permissions finally granted, so starting Ambient if GPS isn't already enabled");
                             // Start Ambient
                             if (LocationServices.getLocationServices(context).isGPSEnabled()) {
                                 LocationServices.getLocationServices(context).toggleGPS(false);
                             }
                         } else {
                             // Restart Handler
-                            Log.i(TAG, "Permissions not granted yet... let's try again in 30 seconds");
+                            Timber.i("Permissions not granted yet... let's try again in 30 seconds");
                             permsHandler.postDelayed(this, 1000 * 30);
                         }
                     }
@@ -285,7 +283,7 @@ public class MapboxEventManager {
             timer = new Timer();
             timer.schedule(new FlushEventsTimerTask(), flushDelayInitialInMillis, flushDelayInMillis);
         } else {
-            Log.d(TAG, "Shutting Telemetry Down");
+            Timber.d("Shutting Telemetry Down");
             // Shut It Down
             events.removeAllElements();
             context.stopService(new Intent(context, TelemetryService.class));
@@ -311,7 +309,7 @@ public class MapboxEventManager {
      * NOTE: Permission set to package private to enable only telemetry code to use this.
      */
     void flushEventsQueueImmediately() {
-        Log.i(TAG, "flushEventsQueueImmediately() called...");
+        Timber.i("flushEventsQueueImmediately() called...");
         new FlushTheEventsTask().execute();
     }
 
@@ -325,7 +323,7 @@ public class MapboxEventManager {
         }
         events.add(event);
         if (events.size() == FLUSH_EVENTS_CAP) {
-            Log.d(TAG, "eventsSize == flushCap so send data.");
+            Timber.d("eventsSize == flushCap so send data.");
             flushEventsQueueImmediately();
         }
     }
@@ -419,7 +417,7 @@ public class MapboxEventManager {
             eventWithAttributes.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, getCellularNetworkType());
             eventWithAttributes.put(MapboxEvent.ATTRIBUTE_WIFI, getConnectedToWifi());
         } else {
-            Log.w(TAG, "This is not an event type in the Events Data Model.");
+            Timber.w("This is not an event type in the Events Data Model.");
             return;
         }
 
@@ -441,7 +439,7 @@ public class MapboxEventManager {
 
         // Send to Server Immediately
         flushEventsQueueImmediately();
-        Log.d(TAG, "turnstile event pushed.");
+        Timber.d("turnstile event pushed.");
     }
 
     /**
@@ -466,7 +464,7 @@ public class MapboxEventManager {
                 return hex;
             }
         } catch (Exception e) {
-            Log.w(TAG, "Error encoding string, will return in original form." + e);
+            Timber.w("Error encoding string, will return in original form." + e);
         }
         return string;
     }
@@ -602,7 +600,7 @@ public class MapboxEventManager {
                     status = true;
                 }
             } catch (Exception e) {
-                Log.w(TAG, "Error getting Wifi Connection Status: " + e);
+                Timber.w("Error getting Wifi Connection Status: " + e);
                 status = false;
             }
         }
@@ -620,13 +618,13 @@ public class MapboxEventManager {
         protected Void doInBackground(Void... voids) {
 
              if (events.isEmpty()) {
-                Log.d(TAG, "No events in the queue to send so returning.");
+                Timber.d("No events in the queue to send so returning.");
                 return null;
             }
 
             // Check for NetworkConnectivity
             if (!MapboxAccountManager.getInstance().isConnected()) {
-                Log.w(TAG, "Not connected to network, so empty events cache and return without attempting to send events");
+                Timber.w("Not connected to network, so empty events cache and return without attempting to send events");
                 // Make sure that events don't pile up when Offline
                 // and thus impact available memory over time.
                 events.removeAllElements();
@@ -747,10 +745,10 @@ public class MapboxEventManager {
                         .post(body)
                         .build();
                 response = client.newCall(request).execute();
-                Log.d(TAG, "response code = " + response.code() + " for events " + events.size());
+                Timber.d("response code = " + response.code() + " for events " + events.size());
 
             } catch (Exception e) {
-                Log.e(TAG, "FlushTheEventsTask borked: " + e);
+                Timber.e("FlushTheEventsTask borked: " + e);
                 e.printStackTrace();
             } finally {
                 if (response != null && response.body() != null) {

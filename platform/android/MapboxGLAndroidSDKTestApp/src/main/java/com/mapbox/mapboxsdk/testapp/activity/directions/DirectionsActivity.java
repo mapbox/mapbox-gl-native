@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
@@ -34,8 +34,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class DirectionsActivity extends AppCompatActivity {
-
-    private static final String LOG_TAG = "DirectionsActivity";
 
     private MapView mapView;
     private MapboxMap mapboxMap;
@@ -110,17 +108,17 @@ public class DirectionsActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<DirectionsResponse> call, Throwable throwable) {
-                    Log.e(LOG_TAG, "Error: " + throwable.getMessage());
+                    Timber.e("Error: " + throwable.getMessage());
                 }
 
                 @Override
                 public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
                     // You can get generic HTTP info about the response
-                    Log.d(LOG_TAG, "Response code: " + response.code());
+                    Timber.d("Response code: " + response.code());
 
                     // Print some info about the route
                     DirectionsRoute currentRoute = response.body().getRoutes().get(0);
-                    Log.d(LOG_TAG, "Distance: " + currentRoute.getDistance());
+                    Timber.d("Distance: " + currentRoute.getDistance());
 
                     // Draw the route on the map
                     drawRoute(currentRoute);
@@ -128,7 +126,7 @@ public class DirectionsActivity extends AppCompatActivity {
 
             });
         } catch (ServicesException servicesException) {
-            Log.e(LOG_TAG, "Error displaying route: " + servicesException.toString());
+            Timber.e("Error displaying route: " + servicesException.toString());
             servicesException.printStackTrace();
         }
     }

@@ -1,13 +1,12 @@
 package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.Nullable;
-import android.util.Log;
+import timber.log.Timber;
 
 /**
  * Properties for Layer
  */
 public class PropertyValue<T> {
-    private static final String TAG = PropertyValue.class.getSimpleName();
 
     private final Object value;
 
@@ -33,7 +32,7 @@ public class PropertyValue<T> {
             //noinspection unchecked
             return (Function<T>) value;
         } else {
-            Log.w(TAG, "not a function, try value");
+            Timber.w("not a function, try value");
             return null;
         }
     }
@@ -44,7 +43,7 @@ public class PropertyValue<T> {
             //noinspection unchecked
             return (T) value;
         } else {
-            Log.w(TAG, "not a value, try function");
+            Timber.w("not a value, try function");
             return null;
         }
     }

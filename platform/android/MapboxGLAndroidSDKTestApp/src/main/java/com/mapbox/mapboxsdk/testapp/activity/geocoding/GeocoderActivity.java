@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -36,8 +36,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class GeocoderActivity extends AppCompatActivity implements OnMapReadyCallback {
-
-    private static final String LOG_TAG = "GeocoderActivity";
 
     private MapboxMap mapboxMap;
     private MapView mapView;
@@ -167,7 +165,7 @@ public class GeocoderActivity extends AppCompatActivity implements OnMapReadyCal
                 }
             });
         } catch (ServicesException servicesException) {
-            Log.e(LOG_TAG, "Error geocoding: " + servicesException.toString());
+            Timber.e("Error geocoding: " + servicesException.toString());
             servicesException.printStackTrace();
             setError(servicesException.getMessage());
         }
@@ -178,17 +176,17 @@ public class GeocoderActivity extends AppCompatActivity implements OnMapReadyCal
      */
 
     private void setMessage(String message) {
-        Log.d(LOG_TAG, "Message: " + message);
+        Timber.d("Message: " + message);
         textView.setText(message);
     }
 
     private void setSuccess(String placeName) {
-        Log.d(LOG_TAG, "Place name: " + placeName);
+        Timber.d("Place name: " + placeName);
         textView.setText(placeName);
     }
 
     private void setError(String message) {
-        Log.e(LOG_TAG, "Error: " + message);
+        Timber.e("Error: " + message);
         textView.setText("Error: " + message);
     }
 

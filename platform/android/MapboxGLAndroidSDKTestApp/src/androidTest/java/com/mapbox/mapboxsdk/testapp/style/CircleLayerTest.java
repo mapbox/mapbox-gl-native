@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
+import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
@@ -28,7 +28,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
  */
 @RunWith(AndroidJUnit4.class)
 public class CircleLayerTest extends BaseStyleTest {
-    private static final String TAG = CircleLayerTest.class.getSimpleName();
 
     @Rule
     public final ActivityTestRule<RuntimeStyleTestActivity> rule = new ActivityTestRule<>(RuntimeStyleTestActivity.class);
@@ -52,14 +51,14 @@ public class CircleLayerTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new CircleLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "visibility");
+        Timber.i("visibility");
         assertNotNull(layer);
 
         //Get initial
@@ -77,14 +76,14 @@ public class CircleLayerTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new CircleLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "circle-radius");
+        Timber.i("circle-radius");
         assertNotNull(layer);
 
         //Set and Get
@@ -99,14 +98,14 @@ public class CircleLayerTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new CircleLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "circle-color");
+        Timber.i("circle-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -121,14 +120,14 @@ public class CircleLayerTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new CircleLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "circle-color");
+        Timber.i("circle-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -143,14 +142,14 @@ public class CircleLayerTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new CircleLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "circle-blur");
+        Timber.i("circle-blur");
         assertNotNull(layer);
 
         //Set and Get
@@ -165,14 +164,14 @@ public class CircleLayerTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new CircleLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "circle-opacity");
+        Timber.i("circle-opacity");
         assertNotNull(layer);
 
         //Set and Get
@@ -187,14 +186,14 @@ public class CircleLayerTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new CircleLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "circle-translate");
+        Timber.i("circle-translate");
         assertNotNull(layer);
 
         //Set and Get
@@ -209,14 +208,14 @@ public class CircleLayerTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new CircleLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "circle-translate-anchor");
+        Timber.i("circle-translate-anchor");
         assertNotNull(layer);
 
         //Set and Get
@@ -231,14 +230,14 @@ public class CircleLayerTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new CircleLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "circle-pitch-scale");
+        Timber.i("circle-pitch-scale");
         assertNotNull(layer);
 
         //Set and Get

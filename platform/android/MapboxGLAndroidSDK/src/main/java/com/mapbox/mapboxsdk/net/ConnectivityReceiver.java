@@ -7,7 +7,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
-import android.util.Log;
+import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 
@@ -19,7 +19,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Not public api.
  */
 public class ConnectivityReceiver extends BroadcastReceiver {
-    private static final String TAG = ConnectivityReceiver.class.getSimpleName();
     private static ConnectivityReceiver INSTANCE;
 
     /**
@@ -49,7 +48,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         boolean connected = isConnected(context);
-        Log.v(TAG, "Connected: " + connected);
+        Timber.v("Connected: " + connected);
 
         //Loop over listeners
         for (ConnectivityListener listener : listeners) {

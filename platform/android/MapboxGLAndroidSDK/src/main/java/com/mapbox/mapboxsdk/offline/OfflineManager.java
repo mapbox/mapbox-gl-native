@@ -7,7 +7,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.util.Log;
+import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -19,8 +19,6 @@ import java.io.File;
  * It'll help you list and create offline regions.
  */
 public class OfflineManager {
-
-    private final static String LOG_TAG = "OfflineManager";
 
     //
     // Static methods
@@ -119,9 +117,9 @@ public class OfflineManager {
                     MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
                     MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL);
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(LOG_TAG, "Failed to read the package metadata: " + e.getMessage());
+            Timber.e("Failed to read the package metadata: " + e.getMessage());
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Failed to read the storage key: " + e.getMessage());
+            Timber.e("Failed to read the storage key: " + e.getMessage());
         }
 
         String databasePath = null;
@@ -130,7 +128,7 @@ public class OfflineManager {
                 // Try getting the external storage path
                 databasePath = context.getExternalFilesDir(null).getAbsolutePath();
             } catch (NullPointerException e) {
-                Log.e(LOG_TAG, "Failed to obtain the external storage path: " + e.getMessage());
+                Timber.e("Failed to obtain the external storage path: " + e.getMessage());
             }
         }
 
@@ -158,7 +156,7 @@ public class OfflineManager {
             return true;
         }
 
-        Log.w(LOG_TAG, "External storage was requested but it isn't readable. For API level < 18"
+        Timber.w("External storage was requested but it isn't readable. For API level < 18"
                 + " make sure you've requested READ_EXTERNAL_STORAGE or WRITE_EXTERNAL_STORAGE"
                 + " permissions in your app Manifest (defaulting to internal storage).");
 
@@ -175,10 +173,10 @@ public class OfflineManager {
                     File file = new File(path);
                     if (file.exists()) {
                         file.delete();
-                        Log.d(LOG_TAG, "Old ambient cache database deleted to save space: " + path);
+                        Timber.d("Old ambient cache database deleted to save space: " + path);
                     }
                 } catch (Exception e) {
-                    Log.e(LOG_TAG, "Failed to delete old ambient cache database: " + e.getMessage());
+                    Timber.e("Failed to delete old ambient cache database: " + e.getMessage());
                 }
             }
         }).start();

@@ -12,7 +12,7 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -269,7 +269,6 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
 
     private static class LoadLocationTask extends AsyncTask<Void, Integer, List<LatLng>> {
 
-        private static final String TAG = "LoadLocationTask";
         private BulkMarkerActivity activity;
         private ProgressDialog progressDialog;
         private int amount;
@@ -286,7 +285,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                 String json = GeoParseUtil.loadStringFromAssets(activity.getApplicationContext(), "points.geojson");
                 return GeoParseUtil.parseGeoJSONCoordinates(json);
             } catch (IOException | JSONException exception) {
-                Log.e(TAG, "Could not add markers,", exception);
+                Timber.e("Could not add markers,", exception);
                 return null;
             }
         }

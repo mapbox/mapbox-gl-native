@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
+import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
@@ -28,7 +28,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
  */
 @RunWith(AndroidJUnit4.class)
 public class LineLayerStyleTest extends BaseStyleTest {
-    private static final String TAG = LineLayerStyleTest.class.getSimpleName();
 
     @Rule
     public final ActivityTestRule<RuntimeStyleTestActivity> rule = new ActivityTestRule<>(RuntimeStyleTestActivity.class);
@@ -52,14 +51,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "visibility");
+        Timber.i("visibility");
         assertNotNull(layer);
 
         //Get initial
@@ -77,14 +76,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-cap");
+        Timber.i("line-cap");
         assertNotNull(layer);
 
         //Set and Get
@@ -99,14 +98,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-join");
+        Timber.i("line-join");
         assertNotNull(layer);
 
         //Set and Get
@@ -121,14 +120,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-miter-limit");
+        Timber.i("line-miter-limit");
         assertNotNull(layer);
 
         //Set and Get
@@ -143,14 +142,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-round-limit");
+        Timber.i("line-round-limit");
         assertNotNull(layer);
 
         //Set and Get
@@ -165,14 +164,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-opacity");
+        Timber.i("line-opacity");
         assertNotNull(layer);
 
         //Set and Get
@@ -187,14 +186,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-color");
+        Timber.i("line-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -209,14 +208,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-color");
+        Timber.i("line-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -231,14 +230,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-translate");
+        Timber.i("line-translate");
         assertNotNull(layer);
 
         //Set and Get
@@ -253,14 +252,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-translate-anchor");
+        Timber.i("line-translate-anchor");
         assertNotNull(layer);
 
         //Set and Get
@@ -275,14 +274,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-width");
+        Timber.i("line-width");
         assertNotNull(layer);
 
         //Set and Get
@@ -297,14 +296,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-gap-width");
+        Timber.i("line-gap-width");
         assertNotNull(layer);
 
         //Set and Get
@@ -319,14 +318,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-offset");
+        Timber.i("line-offset");
         assertNotNull(layer);
 
         //Set and Get
@@ -341,14 +340,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-blur");
+        Timber.i("line-blur");
         assertNotNull(layer);
 
         //Set and Get
@@ -363,14 +362,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-dasharray");
+        Timber.i("line-dasharray");
         assertNotNull(layer);
 
         //Set and Get
@@ -385,14 +384,14 @@ public class LineLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new LineLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "line-pattern");
+        Timber.i("line-pattern");
         assertNotNull(layer);
 
         //Set and Get

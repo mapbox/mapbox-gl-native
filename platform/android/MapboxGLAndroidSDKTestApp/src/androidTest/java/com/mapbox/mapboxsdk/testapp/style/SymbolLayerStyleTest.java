@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
+import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
@@ -28,7 +28,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
  */
 @RunWith(AndroidJUnit4.class)
 public class SymbolLayerStyleTest extends BaseStyleTest {
-    private static final String TAG = SymbolLayerStyleTest.class.getSimpleName();
 
     @Rule
     public final ActivityTestRule<RuntimeStyleTestActivity> rule = new ActivityTestRule<>(RuntimeStyleTestActivity.class);
@@ -52,14 +51,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "visibility");
+        Timber.i("visibility");
         assertNotNull(layer);
 
         //Get initial
@@ -77,14 +76,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "symbol-placement");
+        Timber.i("symbol-placement");
         assertNotNull(layer);
 
         //Set and Get
@@ -99,14 +98,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "symbol-spacing");
+        Timber.i("symbol-spacing");
         assertNotNull(layer);
 
         //Set and Get
@@ -121,14 +120,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "symbol-avoid-edges");
+        Timber.i("symbol-avoid-edges");
         assertNotNull(layer);
 
         //Set and Get
@@ -143,14 +142,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-allow-overlap");
+        Timber.i("icon-allow-overlap");
         assertNotNull(layer);
 
         //Set and Get
@@ -165,14 +164,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-ignore-placement");
+        Timber.i("icon-ignore-placement");
         assertNotNull(layer);
 
         //Set and Get
@@ -187,14 +186,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-optional");
+        Timber.i("icon-optional");
         assertNotNull(layer);
 
         //Set and Get
@@ -209,14 +208,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-rotation-alignment");
+        Timber.i("icon-rotation-alignment");
         assertNotNull(layer);
 
         //Set and Get
@@ -231,14 +230,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-size");
+        Timber.i("icon-size");
         assertNotNull(layer);
 
         //Set and Get
@@ -253,14 +252,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-text-fit");
+        Timber.i("icon-text-fit");
         assertNotNull(layer);
 
         //Set and Get
@@ -275,14 +274,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-text-fit-padding");
+        Timber.i("icon-text-fit-padding");
         assertNotNull(layer);
 
         //Set and Get
@@ -297,14 +296,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-image");
+        Timber.i("icon-image");
         assertNotNull(layer);
 
         //Set and Get
@@ -319,14 +318,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-rotate");
+        Timber.i("icon-rotate");
         assertNotNull(layer);
 
         //Set and Get
@@ -341,14 +340,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-padding");
+        Timber.i("icon-padding");
         assertNotNull(layer);
 
         //Set and Get
@@ -363,14 +362,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-keep-upright");
+        Timber.i("icon-keep-upright");
         assertNotNull(layer);
 
         //Set and Get
@@ -385,14 +384,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-offset");
+        Timber.i("icon-offset");
         assertNotNull(layer);
 
         //Set and Get
@@ -407,14 +406,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-pitch-alignment");
+        Timber.i("text-pitch-alignment");
         assertNotNull(layer);
 
         //Set and Get
@@ -429,14 +428,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-rotation-alignment");
+        Timber.i("text-rotation-alignment");
         assertNotNull(layer);
 
         //Set and Get
@@ -451,14 +450,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-field");
+        Timber.i("text-field");
         assertNotNull(layer);
 
         //Set and Get
@@ -473,14 +472,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-font");
+        Timber.i("text-font");
         assertNotNull(layer);
 
         //Set and Get
@@ -495,14 +494,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-size");
+        Timber.i("text-size");
         assertNotNull(layer);
 
         //Set and Get
@@ -517,14 +516,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-max-width");
+        Timber.i("text-max-width");
         assertNotNull(layer);
 
         //Set and Get
@@ -539,14 +538,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-line-height");
+        Timber.i("text-line-height");
         assertNotNull(layer);
 
         //Set and Get
@@ -561,14 +560,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-letter-spacing");
+        Timber.i("text-letter-spacing");
         assertNotNull(layer);
 
         //Set and Get
@@ -583,14 +582,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-justify");
+        Timber.i("text-justify");
         assertNotNull(layer);
 
         //Set and Get
@@ -605,14 +604,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-anchor");
+        Timber.i("text-anchor");
         assertNotNull(layer);
 
         //Set and Get
@@ -627,14 +626,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-max-angle");
+        Timber.i("text-max-angle");
         assertNotNull(layer);
 
         //Set and Get
@@ -649,14 +648,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-rotate");
+        Timber.i("text-rotate");
         assertNotNull(layer);
 
         //Set and Get
@@ -671,14 +670,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-padding");
+        Timber.i("text-padding");
         assertNotNull(layer);
 
         //Set and Get
@@ -693,14 +692,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-keep-upright");
+        Timber.i("text-keep-upright");
         assertNotNull(layer);
 
         //Set and Get
@@ -715,14 +714,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-transform");
+        Timber.i("text-transform");
         assertNotNull(layer);
 
         //Set and Get
@@ -737,14 +736,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-offset");
+        Timber.i("text-offset");
         assertNotNull(layer);
 
         //Set and Get
@@ -759,14 +758,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-allow-overlap");
+        Timber.i("text-allow-overlap");
         assertNotNull(layer);
 
         //Set and Get
@@ -781,14 +780,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-ignore-placement");
+        Timber.i("text-ignore-placement");
         assertNotNull(layer);
 
         //Set and Get
@@ -803,14 +802,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-optional");
+        Timber.i("text-optional");
         assertNotNull(layer);
 
         //Set and Get
@@ -825,14 +824,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-opacity");
+        Timber.i("icon-opacity");
         assertNotNull(layer);
 
         //Set and Get
@@ -847,14 +846,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-color");
+        Timber.i("icon-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -869,14 +868,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-color");
+        Timber.i("icon-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -891,14 +890,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-halo-color");
+        Timber.i("icon-halo-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -913,14 +912,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-halo-color");
+        Timber.i("icon-halo-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -935,14 +934,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-halo-width");
+        Timber.i("icon-halo-width");
         assertNotNull(layer);
 
         //Set and Get
@@ -957,14 +956,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-halo-blur");
+        Timber.i("icon-halo-blur");
         assertNotNull(layer);
 
         //Set and Get
@@ -979,14 +978,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-translate");
+        Timber.i("icon-translate");
         assertNotNull(layer);
 
         //Set and Get
@@ -1001,14 +1000,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "icon-translate-anchor");
+        Timber.i("icon-translate-anchor");
         assertNotNull(layer);
 
         //Set and Get
@@ -1023,14 +1022,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-opacity");
+        Timber.i("text-opacity");
         assertNotNull(layer);
 
         //Set and Get
@@ -1045,14 +1044,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-color");
+        Timber.i("text-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -1067,14 +1066,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-color");
+        Timber.i("text-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -1089,14 +1088,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-halo-color");
+        Timber.i("text-halo-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -1111,14 +1110,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-halo-color");
+        Timber.i("text-halo-color");
         assertNotNull(layer);
 
         //Set and Get
@@ -1133,14 +1132,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-halo-width");
+        Timber.i("text-halo-width");
         assertNotNull(layer);
 
         //Set and Get
@@ -1155,14 +1154,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-halo-blur");
+        Timber.i("text-halo-blur");
         assertNotNull(layer);
 
         //Set and Get
@@ -1177,14 +1176,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-translate");
+        Timber.i("text-translate");
         assertNotNull(layer);
 
         //Set and Get
@@ -1199,14 +1198,14 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
         mapboxMap = rule.getActivity().getMapboxMap();
 
         if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-            Log.i(TAG, "Adding layer");
+            Timber.i("Adding layer");
             layer = new SymbolLayer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
             //Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
-        Log.i(TAG, "text-translate-anchor");
+        Timber.i("text-translate-anchor");
         assertNotNull(layer);
 
         //Set and Get

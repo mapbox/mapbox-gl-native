@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
+import timber.log.Timber;
 
 import org.json.JSONObject;
 
@@ -28,7 +28,7 @@ public class OfflineUtils {
             String json = jsonObject.toString();
             metadata = json.getBytes(JSON_CHARSET);
         } catch (Exception exception) {
-            Log.e("OfflineUtils", "Failed to encode metadata: " + exception.getMessage());
+            Timber.e("Failed to encode metadata: " + exception.getMessage());
         }
         return metadata;
     }

@@ -2,9 +2,7 @@ package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.util.Log;
-
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import timber.log.Timber;
 
 import java.util.Hashtable;
 
@@ -19,7 +17,7 @@ public class FontCache {
                 tf = Typeface.createFromAsset(context.getAssets(), name);
                 fontCache.put(name, tf);
             } catch (Exception exception) {
-                Log.e(MapboxConstants.TAG, "Font not found");
+                Timber.e("Font not found");
             }
         }
         return tf;

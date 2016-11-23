@@ -11,7 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +20,6 @@ import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -98,15 +97,15 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
                         mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, new MapboxMap.CancelableCallback() {
                             @Override
                             public void onCancel() {
-                                Log.v(MapboxConstants.TAG, "OnCancel called");
+                                Timber.v("OnCancel called");
                             }
 
                             @Override
                             public void onFinish() {
-                                Log.v(MapboxConstants.TAG, "OnFinish called");
+                                Timber.v("OnFinish called");
                             }
                         });
-                        Log.v(MapboxConstants.TAG, cameraPosition.toString());
+                        Timber.v(cameraPosition.toString());
                     }
                 });
                 builder.setNegativeButton("Cancel", null);

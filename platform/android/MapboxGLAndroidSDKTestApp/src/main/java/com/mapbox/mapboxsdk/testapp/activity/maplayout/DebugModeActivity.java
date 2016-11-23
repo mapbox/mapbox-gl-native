@@ -6,7 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -17,8 +17,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 public class DebugModeActivity extends AppCompatActivity {
-
-    private static final String TAG = "DebugModeActivity";
 
     private MapView mapView;
     private MapboxMap mapboxMap;
@@ -65,7 +63,7 @@ public class DebugModeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (mapboxMap != null) {
-                    Log.d(TAG, "Debug FAB: isDebug Active? " + mapboxMap.isDebugActive());
+                    Timber.d("Debug FAB: isDebug Active? " + mapboxMap.isDebugActive());
                     mapboxMap.cycleDebugOptions();
                 }
             }

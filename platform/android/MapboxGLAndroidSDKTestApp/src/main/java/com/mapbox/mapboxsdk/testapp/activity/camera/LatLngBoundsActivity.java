@@ -4,12 +4,11 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -84,8 +83,8 @@ public class LatLngBoundsActivity extends AppCompatActivity implements OnMapRead
         mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
 
         // Log data
-        Log.e(MapboxConstants.TAG, "Move to bounds: " + bounds.toString());
-        Log.e(MapboxConstants.TAG, "Resulting bounds:" + mapboxMap.getProjection().getVisibleRegion().latLngBounds.toString());
+        Timber.e("Move to bounds: " + bounds.toString());
+        Timber.e("Resulting bounds:" + mapboxMap.getProjection().getVisibleRegion().latLngBounds.toString());
     }
 
     @Override

@@ -6,7 +6,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +22,6 @@ import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.customlayer.ExampleCustomLayer;
 
 public class CustomLayerActivity extends AppCompatActivity {
-    private static final String TAG = CustomLayerActivity.class.getSimpleName();
 
     private MapboxMap mapboxMap;
     private MapView mapView;
@@ -66,7 +65,7 @@ public class CustomLayerActivity extends AppCompatActivity {
                 mapboxMap.removeLayer(customLayer.getId());
                 customLayer = null;
             } catch (NoSuchLayerException noSuchLayerException) {
-                Log.e(TAG, "No custom layer to remove");
+                Timber.e("No custom layer to remove");
             }
             fab.setImageResource(R.drawable.ic_layers_24dp);
         } else {

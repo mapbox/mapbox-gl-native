@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -33,7 +33,6 @@ import java.util.Map;
  * Demo's query rendered features
  */
 public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
-    private static final String TAG = QueryRenderedFeaturesPropertiesActivity.class.getSimpleName();
 
     public MapView mapView;
     private MapboxMap mapboxMap;
@@ -64,7 +63,7 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
                     public void onMapClick(@NonNull LatLng point) {
                         //Query
                         final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
-                        Log.i(TAG, String.format(
+                        Timber.i(String.format(
                             "Requesting features for %sx%s (%sx%s adjusted for density)",
                             pixel.x, pixel.y, pixel.x / density, pixel.y / density)
                         );
@@ -92,21 +91,22 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
     }
 
     private void debugOutput(List<Feature> features) {
-        Log.i(TAG, String.format("Got %s features", features.size()));
+        Timber.i(String.format("Got %s features", features.size()));
         for (Feature feature : features) {
             if (feature != null) {
-                Log.i(TAG, String.format("Got feature %s with %s properties and Geometry %s",
+                Timber.i(String.format("Got feature %s with %s properties and Geometry %s",
                         feature.getId(),
                         feature.getProperties() != null ? feature.getProperties().entrySet().size() : "<null>",
                         feature.getGeometry() != null ? feature.getGeometry().getClass().getSimpleName() : "<null>")
                 );
                 if (feature.getProperties() != null) {
                     for (Map.Entry<String, JsonElement> entry : feature.getProperties().entrySet()) {
-                        Log.i(TAG, String.format("Prop %s - %s", entry.getKey(), entry.getValue()));
+                        Timber.i(String.format("Prop %s - %s", entry.getKey(), entry.getValue()));
                     }
                 }
             } else {
-                Log.i(TAG, "Got NULL feature %s");
+                // TODO Question: Why not formatting here??
+                Timber.i("Got NULL feature %s");
             }
         }
     }

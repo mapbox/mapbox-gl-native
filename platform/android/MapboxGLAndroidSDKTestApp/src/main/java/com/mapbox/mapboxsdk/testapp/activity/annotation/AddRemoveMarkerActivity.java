@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -13,7 +13,6 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -99,14 +98,14 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
         isShowingHighThresholdMarker = false;
 
         if (activeMarker != null) {
-            Log.d(MapboxConstants.TAG, "Remove marker with " + activeMarker.getId());
+            Timber.d("Remove marker with " + activeMarker.getId());
             mapboxMap.removeMarker(activeMarker);
         } else {
-            Log.e(MapboxConstants.TAG, "active marker is null");
+            Timber.e("active marker is null");
         }
 
         activeMarker = mapboxMap.addMarker(lowThresholdMarker);
-        Log.d(MapboxConstants.TAG, "showLowThresholdMarker() " + activeMarker.getId());
+        Timber.d("showLowThresholdMarker() " + activeMarker.getId());
     }
 
     private void showHighThresholdMarker() {
@@ -118,14 +117,14 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
         isShowingHighThresholdMarker = true;
 
         if (activeMarker != null) {
-            Log.d(MapboxConstants.TAG, "Remove marker with " + activeMarker.getId());
+            Timber.d("Remove marker with " + activeMarker.getId());
             mapboxMap.removeMarker(activeMarker);
         } else {
-            Log.e(MapboxConstants.TAG, "active marker is null");
+            Timber.e("active marker is null");
         }
 
         activeMarker = mapboxMap.addMarker(highThresholdMarker);
-        Log.d(MapboxConstants.TAG, "showHighThresholdMarker() " + activeMarker.getId());
+        Timber.d("showHighThresholdMarker() " + activeMarker.getId());
     }
 
     @Override

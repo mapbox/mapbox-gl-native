@@ -14,7 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -59,7 +59,6 @@ import retrofit2.Response;
  * Sample Activity to show a typical location picker use case
  */
 public class LocationPickerActivity extends AppCompatActivity {
-    private static final String TAG = "LocationPickerActivity";
     private static final int REQUEST_PERMISSIONS = 101;
 
     private MapView mapView;
@@ -199,7 +198,7 @@ public class LocationPickerActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Log.i(TAG, "Location Selected!");
+                        Timber.i("Location Selected!");
                         if (mapboxMap != null) {
                             //Control button's state
                             clearDisplayViewButton.setVisibility(View.VISIBLE);
@@ -287,7 +286,7 @@ public class LocationPickerActivity extends AppCompatActivity {
                     if (results.size() > 0) {
                         CarmenFeature feature = results.get(0);
                         address = feature.getAddress() + " " + feature.getText();
-                        Log.i(TAG, "address " + address);
+                        Timber.i("address " + address);
                     } else {
                         showFeedbackMessage("No results for search.");
                     }
@@ -297,12 +296,12 @@ public class LocationPickerActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<GeocodingResponse> call, Throwable throwable) {
-                    Log.e(TAG, "Geocoding Failure: " + throwable.getMessage());
+                    Timber.e("Geocoding Failure: " + throwable.getMessage());
                     callbacks.onFailure(throwable);
                 }
             });
         } catch (ServicesException servicesException) {
-            Log.e(TAG, "Error geocoding: " + servicesException.toString());
+            Timber.e("Error geocoding: " + servicesException.toString());
             callbacks.onFailure(servicesException);
         }
     }
@@ -345,12 +344,12 @@ public class LocationPickerActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= 23
                 && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "Requesting permissions");
+            Timber.i("Requesting permissions");
             ActivityCompat.requestPermissions(this, new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSIONS);
             return false;
         }
-        Log.i(TAG, "Permissions already granted");
+        Timber.i("Permissions already granted");
         return true;
     }
 

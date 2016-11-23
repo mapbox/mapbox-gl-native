@@ -2,9 +2,8 @@ package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.app.Activity;
 import android.support.test.espresso.IdlingResource;
-import android.util.Log;
+import timber.log.Timber;
 
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import java.lang.reflect.Field;
@@ -43,10 +42,10 @@ public class OnMapReadyIdlingResource implements IdlingResource {
             Field field = activity.getClass().getDeclaredField("mapboxMap");
             field.setAccessible(true);
             mapboxMap = (MapboxMap) field.get(activity);
-            Log.e(MapboxConstants.TAG, "isMapboxReady called with value " + (mapboxMap != null));
+            Timber.e("isMapboxReady called with value " + (mapboxMap != null));
             return mapboxMap != null;
         } catch (Exception e) {
-            Log.e(MapboxConstants.TAG, "could not reflect", e);
+            Timber.e("could not reflect", e);
             return false;
         }
     }

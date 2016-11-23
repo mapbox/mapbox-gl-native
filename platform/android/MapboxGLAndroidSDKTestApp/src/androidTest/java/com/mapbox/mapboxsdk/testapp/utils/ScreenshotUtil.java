@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Environment;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +23,6 @@ import java.util.UUID;
  */
 public class ScreenshotUtil {
 
-    private static final String LOG_TAG = ScreenshotUtil.class.getName();
-
     // Where to store the files. This path is required by AWS Device Farm:
     // http://docs.aws.amazon.com/devicefarm/latest/developerguide/test-types-android-instrumentation.html#test-types-android-instrumentation-screenshots
     private static final String SCREENSHOT_FOLDER = "test-screenshots";
@@ -38,7 +36,7 @@ public class ScreenshotUtil {
 
         // Check if storage is available
         if (!isExternalStorageWritable()) {
-            Log.d(LOG_TAG, "External storage is not available.");
+            Timber.d("External storage is not available.");
             return;
         }
 
@@ -129,7 +127,7 @@ public class ScreenshotUtil {
         File dir = new File(path);
         dir.mkdirs();
         path += File.separator + filename;
-        Log.d(LOG_TAG, "Screenshot path: " + path);
+        Timber.d("Screenshot path: " + path);
         return path;
     }
 

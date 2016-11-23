@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.util.Log;
+import timber.log.Timber;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -15,8 +15,6 @@ import java.lang.annotation.RetentionPolicy;
  * to create a new offline region.
  */
 public class OfflineRegion {
-
-    private final static String LOG_TAG = "OfflineRegion";
 
     //
     // Static methods
@@ -404,7 +402,7 @@ public class OfflineRegion {
             super.finalize();
             destroyOfflineRegion();
         } catch (Throwable throwable) {
-            Log.e(LOG_TAG, "Failed to finalize OfflineRegion: " + throwable.getMessage());
+            Timber.e("Failed to finalize OfflineRegion: " + throwable.getMessage());
         }
     }
 

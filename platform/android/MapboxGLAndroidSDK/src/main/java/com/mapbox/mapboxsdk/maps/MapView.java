@@ -36,7 +36,7 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.GestureDetector;
 import android.view.InputDevice;
 import android.view.KeyEvent;
@@ -449,7 +449,7 @@ public class MapView extends FrameLayout {
                     savedInstanceState.getBoolean(MapboxConstants.STATE_MY_BEARING_TRACKING_DISMISS, true));
         } else if (savedInstanceState == null) {
             // Start Telemetry (authorization determined in initial MapboxEventManager constructor)
-            Log.i(MapView.class.getCanonicalName(), "MapView start Telemetry...");
+            Timber.i("MapView start Telemetry...");
             MapboxEventManager eventManager = MapboxEventManager.getMapboxEventManager();
             eventManager.initialize(getContext(), getAccessToken());
         }
@@ -1295,12 +1295,12 @@ public class MapView extends FrameLayout {
 
         // NaN and Infinite checks to prevent JSON errors at send to server time
         if (Double.isNaN(tapLatLng.getLatitude()) || Double.isNaN(tapLatLng.getLongitude())) {
-            Log.d(MapView.class.getSimpleName(), "trackGestureEvent() has a NaN lat or lon.  Returning.");
+            Timber.d("trackGestureEvent() has a NaN lat or lon.  Returning.");
             return;
         }
 
         if (Double.isInfinite(tapLatLng.getLatitude()) || Double.isInfinite(tapLatLng.getLongitude())) {
-            Log.d(MapView.class.getSimpleName(), "trackGestureEvent() has an Infinite lat or lon.  Returning.");
+            Timber.d("trackGestureEvent() has an Infinite lat or lon.  Returning.");
             return;
         }
 
@@ -1327,12 +1327,12 @@ public class MapView extends FrameLayout {
 
         // NaN and Infinite checks to prevent JSON errors at send to server time
         if (Double.isNaN(tapLatLng.getLatitude()) || Double.isNaN(tapLatLng.getLongitude())) {
-            Log.d(MapView.class.getSimpleName(), "trackGestureDragEndEvent() has a NaN lat or lon.  Returning.");
+            Timber.d("trackGestureDragEndEvent() has a NaN lat or lon.  Returning.");
             return;
         }
 
         if (Double.isInfinite(tapLatLng.getLatitude()) || Double.isInfinite(tapLatLng.getLongitude())) {
-            Log.d(MapView.class.getSimpleName(), "trackGestureDragEndEvent() has an Infinite lat or lon.  Returning.");
+            Timber.d("trackGestureDragEndEvent() has an Infinite lat or lon.  Returning.");
             return;
         }
 

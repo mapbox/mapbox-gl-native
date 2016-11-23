@@ -18,7 +18,7 @@ package com.mapbox.mapboxsdk.testapp.utils;
 import java.util.ArrayList;
 
 import android.os.SystemClock;
-import android.util.Log;
+import timber.log.Timber;
 
 /**
  * A utility class to help log timings splits throughout a method call.
@@ -133,21 +133,21 @@ public class TimingLogger {
     }
 
     /**
-     * Dumps the timings to the log using Log.d(). If Log.isLoggable was
+     * Dumps the timings to the log using Timber.d(). If Log.isLoggable was
      * not enabled to at least the Log.VERBOSE for the specified tag at
      * construction or reset() time then this call does nothing.
      */
     public void dumpToLog() {
         if (mDisabled) return;
-        Log.d(mTag, mLabel + ": begin");
+        Timber.d(mLabel + ": begin");
         final long first = mSplits.get(0);
         long now = first;
         for (int i = 1; i < mSplits.size(); i++) {
             now = mSplits.get(i);
             final String splitLabel = mSplitLabels.get(i);
             final long prev = mSplits.get(i - 1);
-            Log.d(mTag, mLabel + ":      " + (now - prev) + " ms, " + splitLabel);
+            Timber.d(mLabel + ":      " + (now - prev) + " ms, " + splitLabel);
         }
-        Log.d(mTag, mLabel + ": end, " + (now - first) + " ms");
+        Timber.d(mLabel + ": end, " + (now - first) + " ms");
     }
 }

@@ -10,7 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.util.Pools;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -55,7 +55,6 @@ import java.util.List;
  * </p>
  */
 public class MapboxMap {
-    private static final String TAG = MapboxMap.class.getSimpleName();
 
     private MapView mapView;
     private UiSettings uiSettings;
@@ -119,7 +118,7 @@ public class MapboxMap {
             //noinspection unchecked
             return (T) getMapView().getNativeMapView().getLayer(layerId);
         } catch (ClassCastException e) {
-            Log.e(TAG, String.format("Layer: %s is a different type: %s", layerId, e.getMessage()));
+            Timber.e(String.format("Layer: %s is a different type: %s", layerId, e.getMessage()));
             return null;
         }
     }
@@ -187,7 +186,7 @@ public class MapboxMap {
             //noinspection unchecked
             return (T) getMapView().getNativeMapView().getSource(sourceId);
         } catch (ClassCastException e) {
-            Log.e(TAG, String.format("Source: %s is a different type: %s", sourceId, e.getMessage()));
+            Timber.e(String.format("Source: %s is a different type: %s", sourceId, e.getMessage()));
             return null;
         }
     }
@@ -260,7 +259,7 @@ public class MapboxMap {
     public void setMinZoom(
             @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
         if ((minZoom < MapboxConstants.MINIMUM_ZOOM) || (minZoom > MapboxConstants.MAXIMUM_ZOOM)) {
-            Log.e(MapboxConstants.TAG, "Not setting minZoom, value is in unsupported range: " + minZoom);
+            Timber.e("Not setting minZoom, value is in unsupported range: " + minZoom);
             return;
         }
         minZoomLevel = minZoom;
@@ -297,7 +296,7 @@ public class MapboxMap {
     public void setMaxZoom(
             @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
         if ((maxZoom < MapboxConstants.MINIMUM_ZOOM) || (maxZoom > MapboxConstants.MAXIMUM_ZOOM)) {
-            Log.e(MapboxConstants.TAG, "Not setting maxZoom, value is in unsupported range: " + maxZoom);
+            Timber.e("Not setting maxZoom, value is in unsupported range: " + maxZoom);
             return;
         }
         maxZoomLevel = maxZoom;
@@ -1150,7 +1149,7 @@ public class MapboxMap {
     @UiThread
     public void selectMarker(@NonNull Marker marker) {
         if (marker == null) {
-            Log.w(MapboxConstants.TAG, "marker was null, so just returning");
+            Timber.w("marker was null, so just returning");
             return;
         }
         annotationManager.selectMarker(marker, this);
@@ -1476,7 +1475,7 @@ public class MapboxMap {
     @UiThread
     public void setMyLocationEnabled(boolean enabled) {
         if (!mapView.isPermissionsAccepted()) {
-            Log.e(MapboxConstants.TAG, "Could not activate user location tracking: "
+            Timber.e("Could not activate user location tracking: "
                     + "user did not accept the permission or permissions were not requested.");
             return;
         }

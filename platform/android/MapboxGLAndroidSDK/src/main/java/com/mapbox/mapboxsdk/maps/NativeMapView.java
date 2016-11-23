@@ -9,7 +9,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
-import android.util.Log;
+import timber.log.Timber;
 import android.view.Surface;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -149,14 +149,14 @@ final class NativeMapView {
 
         if (width > 65535) {
             // we have seen edge cases where devices return incorrect values #6111
-            Log.e(MapboxConstants.TAG, "Device returned an out of range width size, " +
+            Timber.e("Device returned an out of range width size, " +
                     "capping value at 65535 instead of " + width);
             width = 65535;
         }
 
         if (height > 65535) {
             // we have seen edge cases where devices return incorrect values #6111
-            Log.e(MapboxConstants.TAG, "Device returned an out of range height size, " +
+            Timber.e("Device returned an out of range height size, " +
                     "capping value at 65535 instead of " + height);
             height = 65535;
         }
