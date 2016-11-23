@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingResourceTimeoutException;
 import android.support.test.rule.ActivityTestRule;
-import timber.log.Timber;
 
+import com.mapbox.mapboxsdk.PermissionGranter;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
@@ -13,7 +13,10 @@ import com.mapbox.mapboxsdk.testapp.utils.ScreenshotUtil;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
+
+import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -26,6 +29,11 @@ public abstract class BaseActivityTest {
     public ActivityTestRule<Activity> rule = new ActivityTestRule<>(getActivityClass());
     protected MapboxMap mapboxMap;
     protected OnMapReadyIdlingResource idlingResource;
+
+    @BeforeClass
+    public static void beforeClass() {
+        PermissionGranter.grantLocation();
+    }
 
     @Before
     public void beforeTest() {

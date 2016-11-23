@@ -11,12 +11,9 @@ import android.support.test.espresso.ViewAction;
 import android.support.test.rule.ActivityTestRule;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.PermissionGranter;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -29,7 +26,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -56,6 +53,11 @@ public class MyLocationViewTest {
 
     private OnMapReadyIdlingResource idlingResource;
 
+    @BeforeClass
+    public static void beforeClass() {
+        PermissionGranter.grantLocation();
+    }
+
     @Before
     public void beforeTest() {
         idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
@@ -63,7 +65,6 @@ public class MyLocationViewTest {
     }
 
     @Test
-    @Ignore // requires runtime permissions, disabled for CI
     public void testEnabled() {
         ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -75,7 +76,6 @@ public class MyLocationViewTest {
     }
 
     @Test
-    @Ignore // requires runtime permissions, disabled for CI + issue with android.support.test.espresso.AppNotIdleException: Looped for 5049 iterations over 60 SECONDS.
     public void testTracking() {
         ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -114,18 +114,6 @@ public class MyLocationViewTest {
 
         @Override
         public void perform(UiController uiController, View view) {
-            if (isEnabled) {
-                // move camera above user location
-                mapboxMap.moveCamera(
-                        CameraUpdateFactory.newCameraPosition(
-                                new CameraPosition.Builder()
-                                        .target(new LatLng(LocationServices.getLocationServices(view.getContext()).getLastLocation()))
-                                        .build()
-                        )
-                );
-            }
-
-            // show loction on screen
             mapboxMap.setMyLocationEnabled(isEnabled);
         }
     }
