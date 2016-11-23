@@ -86,7 +86,7 @@
                             </popUpButtonCell>
                         </popUpButton>
                         <connections>
-                            <action selector="setStyle:" target="-1" id="2Kw-9i-a3G"/>
+                            <action selector="showStyle:" target="-1" id="pBn-SO-HIX"/>
                         </connections>
                     </toolbarItem>
                 </allowedToolbarItems>

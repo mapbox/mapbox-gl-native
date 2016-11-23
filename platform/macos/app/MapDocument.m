@@ -143,7 +143,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 #pragma mark View methods
 
-- (IBAction)setStyle:(id)sender {
+- (IBAction)showStyle:(id)sender {
     NSInteger tag;
     if ([sender isKindOfClass:[NSMenuItem class]]) {
         tag = [sender tag];
@@ -563,7 +563,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 #pragma mark User interface validation
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
-    if (menuItem.action == @selector(setStyle:)) {
+    if (menuItem.action == @selector(showStyle:)) {
         NSURL *styleURL = self.mapView.styleURL;
         NSCellStateValue state;
         switch (menuItem.tag) {
@@ -731,7 +731,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return ([styleURL.scheme isEqualToString:@"mapbox"]
                 && [styleURL.pathComponents.firstObject isEqualToString:@"styles"]);
     }
-    if (toolbarItem.action == @selector(setStyle:)) {
+    if (toolbarItem.action == @selector(showStyle:)) {
         NSPopUpButton *popUpButton = (NSPopUpButton *)toolbarItem.view;
         NSUInteger index = self.indexOfStyleInToolbarItem;
         if (index == NSNotFound) {
