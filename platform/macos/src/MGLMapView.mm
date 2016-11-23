@@ -590,6 +590,7 @@ public:
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
     _mbglMap->setStyleURL(styleURL.absoluteString.UTF8String);
+    _style = [[MGLStyle alloc] initWithMapView:self];
 }
 
 - (IBAction)reloadStyle:(__unused id)sender {
@@ -2191,13 +2192,6 @@ public:
 }
 
 #pragma mark - Runtime styling
-
-- (MGLStyle *)style
-{
-    MGLStyle *style = [[MGLStyle alloc] init];
-    style.mapView = self;
-    return style;
-}
 
 - (mbgl::Map *)mbglMap
 {

@@ -363,6 +363,7 @@ public:
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
     _mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
+    _style = [[MGLStyle alloc] initWithMapView:self];
 }
 
 - (IBAction)reloadStyle:(__unused id)sender {
@@ -628,13 +629,6 @@ public:
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
-}
-
-- (MGLStyle *)style
-{
-    MGLStyle *style = [[MGLStyle alloc] init];
-    style.mapView = self;
-    return style;
 }
 
 - (void)reachabilityChanged:(NSNotification *)notification
