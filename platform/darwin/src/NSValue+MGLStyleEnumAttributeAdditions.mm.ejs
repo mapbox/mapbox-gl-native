@@ -17,7 +17,7 @@ const paintProperties = locals.paintProperties;
     return [NSValue value:&<%- objCName(property) %> withObjCType:@encode(MGL<%- camelize(property.name) %>)];
 }
 
-- (MGL<%- camelize(property.name) %>)<%- objCName(property) %> {
+- (MGL<%- camelize(property.name) %>)MGL<%- camelize(property.name) %>Value {
     MGL<%- camelize(property.name) %> value;
     [self getValue:&value];
     return value;
@@ -33,7 +33,7 @@ const paintProperties = locals.paintProperties;
 return [NSValue value:&<%- objCName(property) %> withObjCType:@encode(MGL<%- camelize(property.name) %>)];
 }
 
-- (MGL<%- camelize(property.name) %>)<%- objCName(property) %> {
+- (MGL<%- camelize(property.name) %>)MGL<%- camelize(property.name) %>Value {
     MGL<%- camelize(property.name) %> value;
     [self getValue:&value];
     return value;
