@@ -9,7 +9,7 @@
     return [NSValue value:&lineCap withObjCType:@encode(MGLLineCap)];
 }
 
-- (MGLLineCap)lineCap {
+- (MGLLineCap)MGLLineCapValue {
     MGLLineCap value;
     [self getValue:&value];
     return value;
@@ -19,7 +19,7 @@
     return [NSValue value:&lineJoin withObjCType:@encode(MGLLineJoin)];
 }
 
-- (MGLLineJoin)lineJoin {
+- (MGLLineJoin)MGLLineJoinValue {
     MGLLineJoin value;
     [self getValue:&value];
     return value;
@@ -29,7 +29,7 @@
     return [NSValue value:&symbolPlacement withObjCType:@encode(MGLSymbolPlacement)];
 }
 
-- (MGLSymbolPlacement)symbolPlacement {
+- (MGLSymbolPlacement)MGLSymbolPlacementValue {
     MGLSymbolPlacement value;
     [self getValue:&value];
     return value;
@@ -39,7 +39,7 @@
     return [NSValue value:&iconRotationAlignment withObjCType:@encode(MGLIconRotationAlignment)];
 }
 
-- (MGLIconRotationAlignment)iconRotationAlignment {
+- (MGLIconRotationAlignment)MGLIconRotationAlignmentValue {
     MGLIconRotationAlignment value;
     [self getValue:&value];
     return value;
@@ -49,7 +49,7 @@
     return [NSValue value:&iconTextFit withObjCType:@encode(MGLIconTextFit)];
 }
 
-- (MGLIconTextFit)iconTextFit {
+- (MGLIconTextFit)MGLIconTextFitValue {
     MGLIconTextFit value;
     [self getValue:&value];
     return value;
@@ -59,7 +59,7 @@
     return [NSValue value:&textPitchAlignment withObjCType:@encode(MGLTextPitchAlignment)];
 }
 
-- (MGLTextPitchAlignment)textPitchAlignment {
+- (MGLTextPitchAlignment)MGLTextPitchAlignmentValue {
     MGLTextPitchAlignment value;
     [self getValue:&value];
     return value;
@@ -69,7 +69,7 @@
     return [NSValue value:&textRotationAlignment withObjCType:@encode(MGLTextRotationAlignment)];
 }
 
-- (MGLTextRotationAlignment)textRotationAlignment {
+- (MGLTextRotationAlignment)MGLTextRotationAlignmentValue {
     MGLTextRotationAlignment value;
     [self getValue:&value];
     return value;
@@ -79,7 +79,7 @@
     return [NSValue value:&textJustify withObjCType:@encode(MGLTextJustify)];
 }
 
-- (MGLTextJustify)textJustify {
+- (MGLTextJustify)MGLTextJustifyValue {
     MGLTextJustify value;
     [self getValue:&value];
     return value;
@@ -89,7 +89,7 @@
     return [NSValue value:&textAnchor withObjCType:@encode(MGLTextAnchor)];
 }
 
-- (MGLTextAnchor)textAnchor {
+- (MGLTextAnchor)MGLTextAnchorValue {
     MGLTextAnchor value;
     [self getValue:&value];
     return value;
@@ -99,7 +99,7 @@
     return [NSValue value:&textTransform withObjCType:@encode(MGLTextTransform)];
 }
 
-- (MGLTextTransform)textTransform {
+- (MGLTextTransform)MGLTextTransformValue {
     MGLTextTransform value;
     [self getValue:&value];
     return value;
@@ -109,7 +109,7 @@
 return [NSValue value:&fillTranslateAnchor withObjCType:@encode(MGLFillTranslateAnchor)];
 }
 
-- (MGLFillTranslateAnchor)fillTranslateAnchor {
+- (MGLFillTranslateAnchor)MGLFillTranslateAnchorValue {
     MGLFillTranslateAnchor value;
     [self getValue:&value];
     return value;
@@ -119,7 +119,7 @@ return [NSValue value:&fillTranslateAnchor withObjCType:@encode(MGLFillTranslate
 return [NSValue value:&lineTranslateAnchor withObjCType:@encode(MGLLineTranslateAnchor)];
 }
 
-- (MGLLineTranslateAnchor)lineTranslateAnchor {
+- (MGLLineTranslateAnchor)MGLLineTranslateAnchorValue {
     MGLLineTranslateAnchor value;
     [self getValue:&value];
     return value;
@@ -129,7 +129,7 @@ return [NSValue value:&lineTranslateAnchor withObjCType:@encode(MGLLineTranslate
 return [NSValue value:&iconTranslateAnchor withObjCType:@encode(MGLIconTranslateAnchor)];
 }
 
-- (MGLIconTranslateAnchor)iconTranslateAnchor {
+- (MGLIconTranslateAnchor)MGLIconTranslateAnchorValue {
     MGLIconTranslateAnchor value;
     [self getValue:&value];
     return value;
@@ -139,7 +139,7 @@ return [NSValue value:&iconTranslateAnchor withObjCType:@encode(MGLIconTranslate
 return [NSValue value:&textTranslateAnchor withObjCType:@encode(MGLTextTranslateAnchor)];
 }
 
-- (MGLTextTranslateAnchor)textTranslateAnchor {
+- (MGLTextTranslateAnchor)MGLTextTranslateAnchorValue {
     MGLTextTranslateAnchor value;
     [self getValue:&value];
     return value;
@@ -149,7 +149,7 @@ return [NSValue value:&textTranslateAnchor withObjCType:@encode(MGLTextTranslate
 return [NSValue value:&circleTranslateAnchor withObjCType:@encode(MGLCircleTranslateAnchor)];
 }
 
-- (MGLCircleTranslateAnchor)circleTranslateAnchor {
+- (MGLCircleTranslateAnchor)MGLCircleTranslateAnchorValue {
     MGLCircleTranslateAnchor value;
     [self getValue:&value];
     return value;
@@ -159,7 +159,7 @@ return [NSValue value:&circleTranslateAnchor withObjCType:@encode(MGLCircleTrans
 return [NSValue value:&circlePitchScale withObjCType:@encode(MGLCirclePitchScale)];
 }
 
-- (MGLCirclePitchScale)circlePitchScale {
+- (MGLCirclePitchScale)MGLCirclePitchScaleValue {
     MGLCirclePitchScale value;
     [self getValue:&value];
     return value;

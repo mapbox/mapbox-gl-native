@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLLineCap` enumeration representation of the value.
 */
-@property (readonly) MGLLineCap lineCap;
+@property (readonly) MGLLineCap MGLLineCapValue;
 
 /**
  Creates a new value object containing the given `MGLLineJoin` enumeration.
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLLineJoin` enumeration representation of the value.
 */
-@property (readonly) MGLLineJoin lineJoin;
+@property (readonly) MGLLineJoin MGLLineJoinValue;
 
 /**
  Creates a new value object containing the given `MGLSymbolPlacement` enumeration.
@@ -56,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLSymbolPlacement` enumeration representation of the value.
 */
-@property (readonly) MGLSymbolPlacement symbolPlacement;
+@property (readonly) MGLSymbolPlacement MGLSymbolPlacementValue;
 
 /**
  Creates a new value object containing the given `MGLIconRotationAlignment` enumeration.
@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLIconRotationAlignment` enumeration representation of the value.
 */
-@property (readonly) MGLIconRotationAlignment iconRotationAlignment;
+@property (readonly) MGLIconRotationAlignment MGLIconRotationAlignmentValue;
 
 /**
  Creates a new value object containing the given `MGLIconTextFit` enumeration.
@@ -82,7 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLIconTextFit` enumeration representation of the value.
 */
-@property (readonly) MGLIconTextFit iconTextFit;
+@property (readonly) MGLIconTextFit MGLIconTextFitValue;
 
 /**
  Creates a new value object containing the given `MGLTextPitchAlignment` enumeration.
@@ -95,7 +95,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLTextPitchAlignment` enumeration representation of the value.
 */
-@property (readonly) MGLTextPitchAlignment textPitchAlignment;
+@property (readonly) MGLTextPitchAlignment MGLTextPitchAlignmentValue;
 
 /**
  Creates a new value object containing the given `MGLTextRotationAlignment` enumeration.
@@ -108,7 +108,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLTextRotationAlignment` enumeration representation of the value.
 */
-@property (readonly) MGLTextRotationAlignment textRotationAlignment;
+@property (readonly) MGLTextRotationAlignment MGLTextRotationAlignmentValue;
 
 /**
  Creates a new value object containing the given `MGLTextJustify` enumeration.
@@ -121,7 +121,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLTextJustify` enumeration representation of the value.
 */
-@property (readonly) MGLTextJustify textJustify;
+@property (readonly) MGLTextJustify MGLTextJustifyValue;
 
 /**
  Creates a new value object containing the given `MGLTextAnchor` enumeration.
@@ -134,7 +134,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLTextAnchor` enumeration representation of the value.
 */
-@property (readonly) MGLTextAnchor textAnchor;
+@property (readonly) MGLTextAnchor MGLTextAnchorValue;
 
 /**
  Creates a new value object containing the given `MGLTextTransform` enumeration.
@@ -147,7 +147,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLTextTransform` enumeration representation of the value.
 */
-@property (readonly) MGLTextTransform textTransform;
+@property (readonly) MGLTextTransform MGLTextTransformValue;
 
 /**
  Creates a new value object containing the given `MGLFillTranslateAnchor` structure.
@@ -160,7 +160,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLFillTranslateAnchor` enumeration representation of the value.
 */
-@property (readonly) MGLFillTranslateAnchor fillTranslateAnchor;
+@property (readonly) MGLFillTranslateAnchor MGLFillTranslateAnchorValue;
 
 /**
  Creates a new value object containing the given `MGLLineTranslateAnchor` structure.
@@ -173,7 +173,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLLineTranslateAnchor` enumeration representation of the value.
 */
-@property (readonly) MGLLineTranslateAnchor lineTranslateAnchor;
+@property (readonly) MGLLineTranslateAnchor MGLLineTranslateAnchorValue;
 
 /**
  Creates a new value object containing the given `MGLIconTranslateAnchor` structure.
@@ -186,7 +186,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLIconTranslateAnchor` enumeration representation of the value.
 */
-@property (readonly) MGLIconTranslateAnchor iconTranslateAnchor;
+@property (readonly) MGLIconTranslateAnchor MGLIconTranslateAnchorValue;
 
 /**
  Creates a new value object containing the given `MGLTextTranslateAnchor` structure.
@@ -199,7 +199,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLTextTranslateAnchor` enumeration representation of the value.
 */
-@property (readonly) MGLTextTranslateAnchor textTranslateAnchor;
+@property (readonly) MGLTextTranslateAnchor MGLTextTranslateAnchorValue;
 
 /**
  Creates a new value object containing the given `MGLCircleTranslateAnchor` structure.
@@ -212,7 +212,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLCircleTranslateAnchor` enumeration representation of the value.
 */
-@property (readonly) MGLCircleTranslateAnchor circleTranslateAnchor;
+@property (readonly) MGLCircleTranslateAnchor MGLCircleTranslateAnchorValue;
 
 /**
  Creates a new value object containing the given `MGLCirclePitchScale` structure.
@@ -225,7 +225,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLCirclePitchScale` enumeration representation of the value.
 */
-@property (readonly) MGLCirclePitchScale circlePitchScale;
+@property (readonly) MGLCirclePitchScale MGLCirclePitchScaleValue;
 
 @end
 
