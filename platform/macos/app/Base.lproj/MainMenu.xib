@@ -434,6 +434,27 @@
                                     <action selector="toggleLayers:" target="-1" id="YdA-Mr-MHi"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="8aO-Nm-fxF"/>
+                            <menuItem title="Labels In" id="M7v-B1-vo3">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Labels In" id="gOc-5u-4v5">
+                                    <items>
+                                        <menuItem title="Local Language" id="hTL-wF-DEs">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="setLabelLanguage:" target="-1" id="Zc4-TL-Cxe"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Preferred Language" tag="1" id="PkP-Ne-ISX">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="setLabelLanguage:" target="-1" id="7Io-iF-xf8"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="qTh-Hu-dGV"/>
                         </items>
                     </menu>
                 </menuItem>

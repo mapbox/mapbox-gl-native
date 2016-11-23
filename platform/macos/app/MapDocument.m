@@ -64,6 +64,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     NSUInteger _droppedPinCounter;
     NSNumberFormatter *_spellOutNumberFormatter;
     
+    BOOL _isLocalizingLabels;
     BOOL _showsToolTipsOnDroppedPins;
     BOOL _randomizesCursorsOnDroppedPins;
     BOOL _isTouringWorld;
@@ -123,10 +124,12 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 - (void)window:(NSWindow *)window willEncodeRestorableState:(NSCoder *)state {
     [state encodeObject:self.mapView.styleURL forKey:@"MBXMapViewStyleURL"];
+    [state encodeBool:_isLocalizingLabels forKey:@"MBXLocalizeLabels"];
 }
 
 - (void)window:(NSWindow *)window didDecodeRestorableState:(NSCoder *)state {
     self.mapView.styleURL = [state decodeObjectForKey:@"MBXMapViewStyleURL"];
+    _isLocalizingLabels = [state decodeBoolForKey:@"MBXLocalizeLabels"];
 }
 
 #pragma mark Services
@@ -323,6 +326,60 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     
     [self.styleLayersArrayController removeObjectsAtArrangedObjectIndexes:indices];
+}
+
+- (IBAction)setLabelLanguage:(NSMenuItem *)sender {
+    _isLocalizingLabels = sender.tag;
+    [self updateLabels];
+}
+
+- (void)updateLabels {
+    NSString *preferredLanguageCode = self.preferredLanguageCode;
+    NSString *preferredNameToken = _isLocalizingLabels ? [NSString stringWithFormat:@"{name_%@}", preferredLanguageCode] : @"{name}";
+    NSRegularExpression *nameTokenExpression = [NSRegularExpression regularExpressionWithPattern:@"\\{name(?:_\\w{2})?\\}" options:0 error:NULL];
+    
+    for (MGLSymbolStyleLayer *layer in self.mapView.style.layers) {
+        if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
+            continue;
+        }
+        
+        if ([layer.textField isKindOfClass:[MGLStyleConstantValue class]]) {
+            NSString *textField = [(MGLStyleConstantValue<NSString *> *)layer.textField rawValue];
+            textField = [nameTokenExpression stringByReplacingMatchesInString:textField
+                                                                      options:0
+                                                                        range:NSMakeRange(0, textField.length)
+                                                                 withTemplate:preferredNameToken];
+            layer.textField = [MGLStyleValue<NSString *> valueWithRawValue:textField];
+        } else if ([layer.textField isKindOfClass:[MGLStyleFunction class]]) {
+            MGLStyleFunction *function = (MGLStyleFunction<NSString *> *)layer.textField;
+            NSMutableDictionary *stops = function.stops.mutableCopy;
+            [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLStyleConstantValue<NSString *> *stop, BOOL *done) {
+                NSString *textField = stop.rawValue;
+                textField = [nameTokenExpression stringByReplacingMatchesInString:textField
+                                                                          options:0
+                                                                            range:NSMakeRange(0, textField.length)
+                                                                     withTemplate:preferredNameToken];
+                stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:textField];
+            }];
+            function.stops = stops;
+            layer.textField = function;
+        }
+    }
+}
+
+- (NSString *)preferredLanguageCode {
+    // Languages supported by Mapbox Streets v10.
+    NSSet *supportedLanguages = [NSSet setWithObjects:@"en", @"es", @"fr", @"de", @"ru", @"zh", nil];
+    NSArray *preferredLanguages = [NSLocale preferredLanguages];
+    
+    for (NSString *language in preferredLanguages) {
+        NSString *languageCode = [[NSLocale localeWithLocaleIdentifier:language] objectForKey:NSLocaleLanguageCode];
+        if ([supportedLanguages containsObject:languageCode]) {
+            return languageCode;
+        }
+    }
+    
+    return @"en";
 }
 
 - (void)applyPendingState {
@@ -736,6 +793,14 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     if (menuItem.action == @selector(deleteStyleLayers:)) {
         return self.styleLayersTableView.clickedRow >= 0 || self.styleLayersTableView.selectedRow >= 0;
     }
+    if (menuItem.action == @selector(setLabelLanguage:)) {
+        menuItem.state = menuItem.tag == _isLocalizingLabels ? NSOnState: NSOffState;
+        if (menuItem.tag) {
+            NSLocale *locale = [NSLocale localeWithLocaleIdentifier:[NSBundle mainBundle].developmentLocalization];
+            menuItem.title = [locale displayNameForKey:NSLocaleIdentifier value:self.preferredLanguageCode];
+        }
+        return YES;
+    }
     if (menuItem.action == @selector(manipulateStyle:)) {
         return YES;
     }
@@ -921,6 +986,10 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 #pragma mark MGLMapViewDelegate methods
+
+- (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
+    [self updateLabels];
+}
 
 - (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation {
     return YES;
