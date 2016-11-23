@@ -1596,7 +1596,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         {
             queuedAnnotations += queue.count;
         }
-        self.hudLabel.text = [NSString stringWithFormat:@"Visible: %ld  Queued: %ld", (long)mapView.visibleAnnotations.count, (long)queuedAnnotations];
+        self.hudLabel.text = [NSString stringWithFormat:@"Visible: %ld  Queued: %ld", (unsigned long)mapView.visibleAnnotations.count, (unsigned long)queuedAnnotations];
     }
 }
 

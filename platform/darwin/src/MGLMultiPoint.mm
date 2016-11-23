@@ -58,8 +58,8 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
     if (range.location + range.length > [self pointCount])
     {
         [NSException raise:NSRangeException
-                    format:@"Invalid coordinate range %@ extends beyond current coordinate count of %@",
-                        NSStringFromRange(range), @([self pointCount])];
+                    format:@"Invalid coordinate range %@ extends beyond current coordinate count of %ld",
+                        NSStringFromRange(range), (unsigned long)[self pointCount]];
     }
 
     std::copy(_coordinates.begin() + range.location, _coordinates.begin() + NSMaxRange(range), coords);
@@ -83,8 +83,8 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
     if (NSMaxRange(range) > _coordinates.size())
     {
         [NSException raise:NSRangeException
-                    format:@"Invalid range %@ for existing coordinate count %@",
-         NSStringFromRange(range), @([self pointCount])];
+                    format:@"Invalid range %@ for existing coordinate count %ld",
+         NSStringFromRange(range), (unsigned long)[self pointCount]];
     }
 
     [self willChangeValueForKey:@"coordinates"];
