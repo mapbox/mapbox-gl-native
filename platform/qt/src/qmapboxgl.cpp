@@ -25,6 +25,7 @@
 #include <QGuiApplication>
 #include <QWindow>
 #include <QOpenGLFramebufferObject>
+#include <QOpenGLContext>
 #else
 #include <QCoreApplication>
 #endif
