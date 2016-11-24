@@ -26,21 +26,23 @@ private:
     void changeStyle();
     qreal pixelRatio();
 
-    // QGLWidget implementation.
+    // QWidget implementation.
     void keyPressEvent(QKeyEvent *ev) final;
     void mousePressEvent(QMouseEvent *ev) final;
     void mouseMoveEvent(QMouseEvent *ev) final;
     void wheelEvent(QWheelEvent *ev) final;
 
+    // Q{,Open}GLWidget implementation.
     void initializeGL() final;
     void paintGL() final;
 
     QPointF m_lastPos;
 
-    QMapboxGL m_map;
+    QMapboxGLSettings m_settings;
+    QScopedPointer<QMapboxGL> m_map;
 
-    QPropertyAnimation m_bearingAnimation;
-    QPropertyAnimation m_zoomAnimation;
+    QPropertyAnimation *m_bearingAnimation;
+    QPropertyAnimation *m_zoomAnimation;
 
     unsigned m_animationTicks = 0;
     unsigned m_frameDraws = 0;
