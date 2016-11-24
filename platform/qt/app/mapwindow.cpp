@@ -38,9 +38,9 @@ void MapWindow::selfTest()
 }
 
 qreal MapWindow::pixelRatio() {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+#if QT_VERSION >= 0x050600
     return devicePixelRatioF();
-#elif (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#elif QT_VERSION >= 0x050000
     return devicePixelRatio();
 #else
     return 1;
