@@ -112,6 +112,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class MapView extends FrameLayout {
 
+
     private MapboxMap mapboxMap;
     private boolean initialLoad;
     private boolean destroyed;
@@ -123,7 +124,6 @@ public class MapView extends FrameLayout {
     private NativeMapView nativeMapView;
     private boolean hasSurface = false;
 
-    private ViewGroup markerViewContainer;
     private CompassView compassView;
     private ImageView logoView;
     private ImageView attributionsView;
@@ -161,6 +161,7 @@ public class MapView extends FrameLayout {
     private List<OnMapReadyCallback> onMapReadyCallbackList;
     private SnapshotRequest snapshotRequest;
 
+
     @UiThread
     public MapView(@NonNull Context context) {
         super(context);
@@ -192,15 +193,20 @@ public class MapView extends FrameLayout {
             return;
         }
 
+
         initialLoad = true;
         onMapReadyCallbackList = new ArrayList<>();
         onMapChangedListener = new CopyOnWriteArrayList<>();
-        mapboxMap = new MapboxMap(this);
-        projection = mapboxMap.getProjection();
+
+
 
         icons = new ArrayList<>();
         View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
         setWillNotDraw(false);
+
+        mapboxMap = new MapboxMap(this);
+
+        projection = mapboxMap.getProjection();
 
         if (options.getTextureMode()) {
             TextureView textureView = new TextureView(context);
@@ -213,6 +219,7 @@ public class MapView extends FrameLayout {
         }
 
         nativeMapView = new NativeMapView(this);
+
 
         // load transparent icon for MarkerView to trace actual markers, see #6352
         loadIcon(IconFactory.recreate(IconFactory.ICON_MARKERVIEW_ID, IconFactory.ICON_MARKERVIEW_BITMAP));
@@ -239,10 +246,9 @@ public class MapView extends FrameLayout {
         // Connectivity
         onConnectivityChanged(isConnected());
 
-        markerViewContainer = (ViewGroup) view.findViewById(R.id.markerViewContainer);
-
         myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
         myLocationView.setMapboxMap(mapboxMap);
+
 
         compassView = (CompassView) view.findViewById(R.id.compassView);
         compassView.setMapboxMap(mapboxMap);
@@ -1280,13 +1286,6 @@ public class MapView extends FrameLayout {
         return new ArrayList<>(annotations);
     }
 
-    /**
-     * @return the ViewGroup containing the marker views
-     */
-    public ViewGroup getMarkerViewContainer() {
-        return markerViewContainer;
-    }
-
 
     int getTopOffsetPixelsForIcon(Icon icon) {
         if (destroyed) {
@@ -1895,7 +1894,7 @@ public class MapView extends FrameLayout {
             }
 
             if (!markerViews.isEmpty()) {
-                Collections.sort(markerViews, MarkerViewManager.MARKER_SORTER);
+                Collections.sort(markerViews);
                 final MarkerView selectedMarker = markerViews.get(markerViews.size() - 1);
                 mapboxMap.getMarkerViewManager().onClickMarkerView(selectedMarker);
             } else {
