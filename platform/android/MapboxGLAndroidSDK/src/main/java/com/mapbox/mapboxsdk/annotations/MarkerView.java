@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.annotations;
 
+
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.FloatRange;
@@ -12,14 +13,10 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**
- * MarkerView is an annotation that shows an View at a geographical location.
- * <p>
- * This class uses {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter} to adapt a
- * MarkerView model to an Android SDK {@link android.view.View} object.
- * </p>
- * <p>
- * An {@link InfoWindow} can be shown when a MarkerView is pressed
- * </p>
+ * MarkerView is an annotation that shows an View at a geographical location. <p> This class uses
+ * {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter} to adapt a MarkerView model to an
+ * Android SDK {@link android.view.View} object. </p> <p> An {@link InfoWindow} can be shown when a
+ * MarkerView is pressed </p>
  */
 public class MarkerView extends Marker {
 
@@ -41,6 +38,7 @@ public class MarkerView extends Marker {
 
     private boolean flat;
     private boolean visible = true;
+    private float zIndex;
 
     private float tiltValue;
     private float rotation;
@@ -72,6 +70,7 @@ public class MarkerView extends Marker {
         this.flat = baseMarkerViewOptions.isFlat();
         this.rotation = baseMarkerViewOptions.getRotation();
         this.selected = baseMarkerViewOptions.selected;
+        this.zIndex = baseMarkerViewOptions.zIndex;
     }
 
     float getWidth() {
@@ -91,11 +90,9 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Specifies the anchor being set on a particular point point of the MarkerView.
-     * <p>
-     * The anchor point is specified in the continuous space [0.0, 1.0] x [0.0, 1.0], where (0, 0)
-     * is the top-left corner of the image, and (1, 1) is the bottom-right corner.
-     * </p>
+     * Specifies the anchor being set on a particular point point of the MarkerView. <p> The anchor
+     * point is specified in the continuous space [0.0, 1.0] x [0.0, 1.0], where (0, 0) is the
+     * top-left corner of the image, and (1, 1) is the bottom-right corner. </p>
      *
      * @param u u-coordinate of the anchor, as a ratio of the image width (in the range [0, 1])
      * @param v v-coordinate of the anchor, as a ratio of the image height (in the range [0, 1])
@@ -128,10 +125,8 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Internal method to set the calculated offset.
-     * <p>
-     * These are calculated based on the View bounds and the provided anchor.
-     * </p>
+     * Internal method to set the calculated offset. <p> These are calculated based on the View
+     * bounds and the provided anchor. </p>
      *
      * @param x the x-value of the offset
      * @param y the y-value of the offset
@@ -160,16 +155,14 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Specifies the anchor point of the info window on the View of the MarkerView.
-     * <p>
-     * This is specified in the same coordinate system as the anchor.
-     * </p>
-     * <p>
-     * The default is the top middle of the View.
-     * </p>
+     * Specifies the anchor point of the info window on the View of the MarkerView. <p> This is
+     * specified in the same coordinate system as the anchor. </p> <p> The default is the top middle
+     * of the View. </p>
      *
-     * @param u u-coordinate of the info window anchor, as a ratio of the image width (in the range [0, 1])
-     * @param v v-coordinate of the info window anchor, as a ratio of the image height (in the range [0, 1])
+     * @param u u-coordinate of the info window anchor, as a ratio of the image width (in the range
+     *          [0, 1])
+     * @param v v-coordinate of the info window anchor, as a ratio of the image height (in the range
+     *          [0, 1])
      * @see #setAnchor(float, float) for more details.
      */
     public void setInfoWindowAnchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
@@ -178,7 +171,8 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Get the horizontal distance, normalized to [0, 1], of the info window anchor from the left edge.
+     * Get the horizontal distance, normalized to [0, 1], of the info window anchor from the left
+     * edge.
      *
      * @return the u value of the InfoWindow anchor.
      */
@@ -187,7 +181,8 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Get the vertical distance, normalized to [0, 1], of the info window anchor from the top edge.
+     * Get the vertical distance, normalized to [0, 1], of the info window anchor from the top
+     * edge.
      *
      * @return the v value of the InfoWindow anchor.
      */
@@ -205,7 +200,8 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Sets whether this marker should be flat against the map true or a billboard facing the camera false.
+     * Sets whether this marker should be flat against the map true or a billboard facing the camera
+     * false.
      *
      * @param flat the flat state of the MarkerView
      */
@@ -253,14 +249,9 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Set the rotation value of the MarkerView in degrees.
-     * <p>
-     * Input will be limited to 0 - 360 degrees
-     * </p>
-     * <p>
-     * This will result in animating the rotation of the MarkerView using an rotation animator
-     * from current value to the provided parameter value.
-     * </p>
+     * Set the rotation value of the MarkerView in degrees. <p> Input will be limited to 0 - 360
+     * degrees </p> <p> This will result in animating the rotation of the MarkerView using an
+     * rotation animator from current value to the provided parameter value. </p>
      *
      * @param rotation the rotation value to animate to
      */
@@ -307,11 +298,8 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Set the alpha value of the MarkerView.
-     * <p>
-     * This will result in animating the alpha of the MarkerView using an alpha animator
-     * from current value to the provided parameter value.
-     * </p>
+     * Set the alpha value of the MarkerView. <p> This will result in animating the alpha of the
+     * MarkerView using an alpha animator from current value to the provided parameter value. </p>
      *
      * @param alpha the alpha value to animate to
      */
@@ -353,6 +341,14 @@ public class MarkerView extends Marker {
         return selected;
     }
 
+    public float getzIndex() {
+        return zIndex;
+    }
+
+    public void setzIndex(float zIndex) {
+        this.zIndex = zIndex;
+    }
+
     /**
      * For internal use only, use {@link MapboxMap#selectMarker(Marker)} instead.
      */
@@ -371,13 +367,10 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Set the MapboxMap associated tot the MapView containing the MarkerView.
-     * <p>
-     * This method is used to instantiate the MarkerView and provide an instance of {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter}
-     * </p>
-     * <p>
-     * This method is used to notify that a MarkerView is no longer active by setting a null value.
-     * </p>
+     * Set the MapboxMap associated tot the MapView containing the MarkerView. <p> This method is
+     * used to instantiate the MarkerView and provide an instance of {@link
+     * com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter} </p> <p> This method is used to notify
+     * that a MarkerView is no longer active by setting a null value. </p>
      *
      * @param mapboxMap the MapboxMap instances
      */
@@ -419,6 +412,7 @@ public class MarkerView extends Marker {
             setOffset(x, y);
         }
 
+
         view.setX(point.x - offsetX);
         view.setY(point.y - offsetY);
         drawRect.set(0, 0, width, height);
@@ -429,6 +423,12 @@ public class MarkerView extends Marker {
             view.animate().cancel();
             view.setAlpha(0F);
             setAlpha(1F);
+
+            if (isFlat()) {
+                // initial tilt value if MapboxMap is started with a tilt attribute
+                tiltValue = (float) mapboxMap.getCameraPosition().tilt;
+
+            }
         }
     }
 
@@ -445,4 +445,34 @@ public class MarkerView extends Marker {
     public String toString() {
         return "MarkerView [position[" + getPosition() + "]]";
     }
+
+    @Override
+    public int compareTo(@NonNull Annotation annotation) {
+        if (annotation instanceof MarkerView) {
+            MarkerView other = (MarkerView) annotation;
+            int zOrderComparison = Double.compare(getZOrder(), other.getZOrder());
+            if (zOrderComparison != 0) {
+                return zOrderComparison;
+            }
+
+            LatLng left = getPosition();
+            LatLng right = other.getPosition();
+
+            //logic is reverse, right before left, because the last added is displayed on the top
+            final int latComparison = Double.compare(right.getLatitude(), left.getLatitude());
+            if (latComparison != 0) {
+                return latComparison;
+            }
+
+
+            final int lonComparison = Double.compare(right.getLongitude(), left.getLongitude());
+            if (lonComparison != 0) {
+                return lonComparison;
+            }
+
+            return (int) (getId() - other.getId());
+        }
+        return super.compareTo(annotation);
+    }
+
 }

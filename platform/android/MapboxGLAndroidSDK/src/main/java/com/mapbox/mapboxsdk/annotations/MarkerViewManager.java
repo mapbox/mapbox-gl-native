@@ -5,6 +5,7 @@ import android.graphics.RectF;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +16,25 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+
 import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+
+import com.mapbox.mapboxsdk.maps.Projection;
+import com.mapbox.mapboxsdk.maps.widgets.MarkerViewLayout;
+import com.mapbox.mapboxsdk.utils.AnimatorUtils;
+
+import java.util.ArrayList;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Interface for interacting with ViewMarkers objects inside of a MapView.
@@ -32,6 +43,7 @@ import java.util.Map;
  * </p>
  */
 public class MarkerViewManager {
+
 
     private static final Comparator<View> MARKER_VIEW_SORTER = new Comparator<View>() {
         @Override
@@ -73,7 +85,9 @@ public class MarkerViewManager {
         }
     };
 
-    private Map<MarkerView, View> markerViewMap;
+
+    public MarkerViewLayout layout;
+    private HashMap<MarkerView, View> markerViewMap;
     private MapboxMap mapboxMap;
     private MapView mapView;
     private List<MapboxMap.MarkerViewAdapter> markerViewAdapters;
@@ -89,8 +103,10 @@ public class MarkerViewManager {
      */
     public MarkerViewManager(@NonNull MapboxMap mapboxMap, @NonNull MapView mapView) {
         this.mapboxMap = mapboxMap;
-        this.markerViewAdapters = new ArrayList<>();
         this.mapView = mapView;
+        this.layout = (MarkerViewLayout) mapView.findViewById(R.id.markerViewLayout);
+        this.layout.setMarkerViewManager(this);
+        this.markerViewAdapters = new ArrayList<>();
         this.markerViewMap = new HashMap<>();
         this.defaultMarkerViewAdapter = new ImageMarkerViewAdapter(mapView.getContext());
         this.markerViewAdapters.add(defaultMarkerViewAdapter);
@@ -451,6 +467,8 @@ public class MarkerViewManager {
             }
         }
 
+
+
         // introduce new markers
         for (final MarkerView marker : markers) {
             if (!markerViewMap.containsKey(marker)) {
@@ -478,7 +496,7 @@ public class MarkerViewManager {
                             markerViewMap.put(marker, adaptedView);
                             if (convertView == null) {
                                 adaptedView.setVisibility(View.GONE);
-                                mapView.getMarkerViewContainer().addView(adaptedView);
+                                layout.addView(adaptedView);
                             }
                         }
                     }
@@ -486,8 +504,11 @@ public class MarkerViewManager {
             }
         }
 
+       /* Log.i("invalidate", "layout invalidate");
+        layout.invalidate();*/
 
-        sortMarkers();
+
+        //sortMarkers();
 
         // trigger update to make newly added ViewMarker visible,
         // these would only be updated when the map is moved.
@@ -495,7 +516,9 @@ public class MarkerViewManager {
     }
 
     private void sortMarkers() {
-        ViewGroup markerViewContainer = mapView.getMarkerViewContainer();
+       /* ViewGroup markerViewContainer = mapView.getMarkerViewContainer();
+
+        markerViewContainer.removeAllViews();
 
         List<View> markerViews = new ArrayList<>();
         for (int viewIndex = 0; viewIndex < markerViewContainer.getChildCount(); viewIndex++) {
@@ -504,10 +527,10 @@ public class MarkerViewManager {
 
         Collections.sort(markerViews, MARKER_VIEW_SORTER);
 
-        markerViewContainer.removeAllViews();
+
         for (View markerView : markerViews) {
             markerViewContainer.addView(markerView);
-        }
+        }*/
     }
 
     public void onClickMarkerView(MarkerView markerView) {
@@ -568,6 +591,10 @@ public class MarkerViewManager {
             marker.setTopOffsetPixels(infoWindowOffsetY);
             marker.setRightOffsetPixels(infoWindowOffsetX);
         }
+    }
+
+    public HashMap<MarkerView,View> getMarkers() {
+        return markerViewMap;
     }
 
     /**
