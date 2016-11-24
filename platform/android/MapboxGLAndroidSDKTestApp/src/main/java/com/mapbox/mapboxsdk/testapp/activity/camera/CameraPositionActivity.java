@@ -57,7 +57,7 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
         mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition position) {
-                Log.e(MapboxConstants.TAG, "OnCameraChange: " + position);
+                Timber.w("OnCameraChange: " + position);
             }
         });
 
