@@ -31,10 +31,6 @@ public:
     void invalidate() final;
     void notifyMapChange(mbgl::MapChange) final;
 
-#if QT_VERSION >= 0x050000
-    void updateFramebufferBinding(QOpenGLFramebufferObject *);
-#endif
-
     mbgl::EdgeInsets margins;
     QSize size { 0, 0 };
     QSize fbSize { 0, 0 };
