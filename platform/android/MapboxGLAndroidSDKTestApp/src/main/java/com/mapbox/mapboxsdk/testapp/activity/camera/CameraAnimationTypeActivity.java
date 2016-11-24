@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import timber.log.Timber;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -16,6 +15,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+
+import timber.log.Timber;
 
 public class CameraAnimationTypeActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -55,14 +56,7 @@ public class CameraAnimationTypeActivity extends AppCompatActivity implements On
         mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition position) {
-                Timber.v(position.toString());
-            }
-        });
-
-        mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
-            @Override
-            public void onCameraChange(CameraPosition position) {
-                Log.e(MapboxConstants.TAG, "OnCameraChange: " + position);
+                Timber.w(position.toString());
             }
         });
 
@@ -101,18 +95,18 @@ public class CameraAnimationTypeActivity extends AppCompatActivity implements On
                         public void onCancel() {
                             Timber.i("Duration onCancel Callback called.");
                             Toast.makeText(
-                                CameraAnimationTypeActivity.this,
-                                "Ease onCancel Callback called.",
-                                Toast.LENGTH_LONG).show();
+                                    CameraAnimationTypeActivity.this,
+                                    "Ease onCancel Callback called.",
+                                    Toast.LENGTH_LONG).show();
                         }
 
                         @Override
                         public void onFinish() {
                             Timber.i("Duration onFinish Callback called.");
                             Toast.makeText(
-                                CameraAnimationTypeActivity.this,
-                                "Ease onFinish Callback called.",
-                                Toast.LENGTH_LONG).show();
+                                    CameraAnimationTypeActivity.this,
+                                    "Ease onFinish Callback called.",
+                                    Toast.LENGTH_LONG).show();
                         }
                     };
 
@@ -138,18 +132,18 @@ public class CameraAnimationTypeActivity extends AppCompatActivity implements On
                         public void onCancel() {
                             Timber.i("Duration onCancel Callback called.");
                             Toast.makeText(
-                                CameraAnimationTypeActivity.this,
-                                "Duration onCancel Callback called.",
-                                Toast.LENGTH_LONG).show();
+                                    CameraAnimationTypeActivity.this,
+                                    "Duration onCancel Callback called.",
+                                    Toast.LENGTH_LONG).show();
                         }
 
                         @Override
                         public void onFinish() {
                             Timber.i("Duration onFinish Callback called.");
                             Toast.makeText(
-                                CameraAnimationTypeActivity.this,
-                                "Duration onFinish Callback called.",
-                                Toast.LENGTH_LONG).show();
+                                    CameraAnimationTypeActivity.this,
+                                    "Duration onFinish Callback called.",
+                                    Toast.LENGTH_LONG).show();
                         }
                     };
 
