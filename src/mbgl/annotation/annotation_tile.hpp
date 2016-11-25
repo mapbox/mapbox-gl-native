@@ -31,7 +31,7 @@ public:
 
     FeatureType getType() const override { return type; }
     optional<Value> getValue(const std::string&) const override;
-    optional<FeatureIdentifier> getID() const override { return { id }; }
+    optional<FeatureIdentifier> getID() const override { return { static_cast<uint64_t>(id) }; }
     GeometryCollection getGeometries() const override { return geometries; }
 
     const AnnotationID id;

@@ -94,9 +94,9 @@ inline optional<Value> toValue(const QVariant& value) {
     } else if (value.type() == QVariant::Color) {
         return { value.value<QColor>().name().toStdString() };
     } else if (value.type() == QVariant::Int) {
-        return { value.toInt() };
+        return { int64_t(value.toInt()) };
     } else if (value.canConvert(QVariant::Double)) {
-        return { value.toFloat() };
+        return { value.toDouble() };
     } else {
         return {};
     }

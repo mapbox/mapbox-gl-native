@@ -72,7 +72,7 @@
         NSNumber *number = (NSNumber *)value;
         if ((strcmp([number objCType], @encode(char)) == 0) ||
             (strcmp([number objCType], @encode(BOOL)) == 0)) {
-            return mbglValue.get<bool>();
+            return uint64_t(mbglValue.get<bool>());
         } else if ( strcmp([number objCType], @encode(double)) == 0 ||
                     strcmp([number objCType], @encode(float)) == 0) {
             return mbglValue.get<double>();

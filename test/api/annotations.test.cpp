@@ -340,12 +340,12 @@ TEST(Annotations, QueryRenderedFeatures) {
     auto features = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 0, 0 }));
     EXPECT_EQ(features.size(), 1u);
     EXPECT_TRUE(!!features[0].id);
-    EXPECT_EQ(*features[0].id, 0);
+    EXPECT_EQ(*features[0].id, uint64_t(0));
 
     auto features2 = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 50, 0 }));
     EXPECT_EQ(features2.size(), 1u);
     EXPECT_TRUE(!!features2[0].id);
-    EXPECT_EQ(*features2[0].id, 1);
+    EXPECT_EQ(*features2[0].id, uint64_t(1));
 }
 
 TEST(Annotations, QueryFractionalZoomLevels) {

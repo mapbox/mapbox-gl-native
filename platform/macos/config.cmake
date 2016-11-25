@@ -82,6 +82,8 @@ endmacro()
 
 
 macro(mbgl_platform_render)
+    set_xcode_property(mbgl-render GCC_SYMBOLS_PRIVATE_EXTERN YES)
+
     target_link_libraries(mbgl-render
         PRIVATE mbgl-loop
         PRIVATE "-framework Foundation"
@@ -95,6 +97,8 @@ endmacro()
 
 
 macro(mbgl_platform_offline)
+    set_xcode_property(mbgl-offline GCC_SYMBOLS_PRIVATE_EXTERN YES)
+
     target_link_libraries(mbgl-offline
         PRIVATE mbgl-loop
         PRIVATE "-framework Foundation"
@@ -108,6 +112,8 @@ endmacro()
 
 
 macro(mbgl_platform_test)
+    set_xcode_property(mbgl-test GCC_SYMBOLS_PRIVATE_EXTERN YES)
+
     target_sources(mbgl-test
         PRIVATE test/src/main.cpp
     )
@@ -130,6 +136,8 @@ macro(mbgl_platform_test)
 endmacro()
 
 macro(mbgl_platform_benchmark)
+    set_xcode_property(mbgl-benchmark GCC_SYMBOLS_PRIVATE_EXTERN YES)
+
     target_sources(mbgl-benchmark
         PRIVATE benchmark/src/main.cpp
     )
@@ -152,6 +160,8 @@ macro(mbgl_platform_benchmark)
 endmacro()
 
 macro(mbgl_platform_node)
+    set_xcode_property(mbgl-node GCC_SYMBOLS_PRIVATE_EXTERN YES)
+
     target_link_libraries(mbgl-node
         PRIVATE "-framework Foundation"
         PRIVATE "-framework OpenGL"
