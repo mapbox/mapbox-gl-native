@@ -15,8 +15,11 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
  * An {@link InfoWindow} can be shown when a Marker is pressed
  * </p>
  */
-public class Marker extends Annotation {
+public class Marker implements Comparable<Marker> {
 
+    private long id = -1; // -1 unless added to a MapView
+    private MapboxMap mapboxMap;
+    private MapView mapView;
     private LatLng position;
     private String snippet;
     private Icon icon;
@@ -212,4 +215,93 @@ public class Marker extends Annotation {
     public String toString() {
         return "Marker [position[" + getPosition() + "]]";
     }
+
+    /**
+     * <p>
+     * Gets the annotation's unique ID.
+     * </p>
+     * This ID is unique for a MapView instance and is suitable for associating your own extra
+     * data with.
+     *
+     * @return the assigned id
+     */
+    public long getId() {
+        return id;
+    }
+
+    public void remove() {
+        if (mapboxMap == null) {
+            return;
+        }
+        mapboxMap.removeMarker(this);
+    }
+
+    /**
+     * Do not use this method. Used internally by the SDK.
+     *
+     * @param id the assigned id
+     */
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    /**
+     * Do not use this method. Used internally by the SDK.
+     *
+     * @param mapboxMap the hosting mapbox map
+     */
+    public void setMapboxMap(MapboxMap mapboxMap) {
+        this.mapboxMap = mapboxMap;
+    }
+
+    /**
+     * Gets the hosting mapbox map.
+     *
+     * @return the MapboxMap
+     */
+    protected MapboxMap getMapboxMap() {
+        return mapboxMap;
+    }
+
+    /**
+     * Don not use this method.  Used internally by the SDK.
+     *
+     * @param mapView the hosting map view
+     */
+    public void setMapView(MapView mapView) {
+        this.mapView = mapView;
+    }
+
+    /**
+     * Gets the hosting map view.
+     *
+     * @return The MapView
+     */
+    protected MapView getMapView() {
+        return mapView;
+    }
+
+    @Override
+    public int compareTo(@NonNull Marker marker) {
+        if (id < marker.getId()) {
+            return 1;
+        } else if (id > marker.getId()) {
+            return -1;
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || !(o instanceof Marker)) return false;
+        Marker that = (Marker) o;
+        return id == that.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (getId() ^ (getId() >>> 32));
+    }
+
 }

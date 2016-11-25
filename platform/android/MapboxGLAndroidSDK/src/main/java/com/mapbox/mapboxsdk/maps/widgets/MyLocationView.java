@@ -324,7 +324,7 @@ public class MyLocationView extends View {
         }
     }
 
-    public void setCameraPosition(CameraPosition position) {\
+    public void setCameraPosition(CameraPosition position) {
         if (position != null) {
             setTilt(position.tilt);
             setBearing(position.bearing);

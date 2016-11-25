@@ -60,7 +60,6 @@ import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.R;
-import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
@@ -1513,23 +1512,17 @@ public class MapView extends FrameLayout {
                     }
                 }
             }
-
             if (newSelectedMarkerId >= 0) {
-                List<Annotation> annotations = mapboxMap.getAnnotations();
-                int count = annotations.size();
-                for (int i = 0; i < count; i++) {
-                    Annotation annotation = annotations.get(i);
-                    if (annotation instanceof Marker) {
-                        if (annotation.getId() == newSelectedMarkerId) {
-                            if (selectedMarkers.isEmpty() || !selectedMarkers.contains(annotation)) {
-                                if (!(annotation instanceof MarkerView)) {
-                                    mapboxMap.selectMarker((Marker) annotation);
-                                } else {
-                                    mapboxMap.getMarkerViewManager().onClickMarkerView((MarkerView) annotation);
-                                }
+                for (Marker marker : annotationManager.getMarkers()) {
+                    if (marker.getId() == newSelectedMarkerId) {
+                        if (selectedMarkers.isEmpty() || !selectedMarkers.contains(marker)) {
+                            if (!(marker instanceof MarkerView)) {
+                                mapboxMap.selectMarker(marker);
+                            } else {
+                                mapboxMap.getMarkerViewManager().onClickMarkerView((MarkerView) marker);
                             }
-                            break;
                         }
+                        break;
                     }
                 }
             } else {
