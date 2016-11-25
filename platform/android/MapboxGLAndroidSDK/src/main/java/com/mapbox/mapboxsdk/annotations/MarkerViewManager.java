@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
@@ -31,27 +32,31 @@ import java.util.Map;
  */
 public class MarkerViewManager {
 
-    private Map<MarkerView, View> markerViewMap;
+    private final ViewGroup markerViewContainer;
+    private final Map<MarkerView, View> markerViewMap = new HashMap<>();
+    private final List<MapboxMap.MarkerViewAdapter> markerViewAdapters  = new ArrayList<>();
+
+    // TODO refactor MapboxMap out for Projection and Transform
+    // Requires removing MapboxMap from Annotations by using Peer model from #6912
     private MapboxMap mapboxMap;
-    private MapView mapView;
-    private List<MapboxMap.MarkerViewAdapter> markerViewAdapters;
+
     private long viewMarkerBoundsUpdateTime;
     private MapboxMap.OnMarkerViewClickListener onMarkerViewClickListener;
-    private ImageMarkerViewAdapter defaultMarkerViewAdapter;
 
     /**
      * Creates an instance of MarkerViewManager.
      *
-     * @param mapboxMap the MapboxMap associated with the MarkerViewManager
-     * @param mapView   the MapView associated with the MarkerViewManager
+     * @param container the ViewGroup associated with the MarkerViewManager
      */
-    public MarkerViewManager(@NonNull MapboxMap mapboxMap, @NonNull MapView mapView) {
+    public MarkerViewManager(@NonNull ViewGroup container) {
+        this.markerViewContainer = container;
+        this.markerViewAdapters.add(new ImageMarkerViewAdapter(container.getContext()));
+    }
+
+    // TODO refactor MapboxMap out for Projection and Transform
+    // Requires removing MapboxMap from Annotations by using Peer model from #6912
+    public void bind(MapboxMap mapboxMap){
         this.mapboxMap = mapboxMap;
-        this.markerViewAdapters = new ArrayList<>();
-        this.mapView = mapView;
-        this.markerViewMap = new HashMap<>();
-        this.defaultMarkerViewAdapter = new ImageMarkerViewAdapter(mapView.getContext());
-        this.markerViewAdapters.add(defaultMarkerViewAdapter);
     }
 
     /**
@@ -415,7 +420,7 @@ public class MarkerViewManager {
      * </p>
      */
     public void invalidateViewMarkersInVisibleRegion() {
-        RectF mapViewRect = new RectF(0, 0, mapView.getWidth(), mapView.getHeight());
+        RectF mapViewRect = new RectF(0, 0, markerViewContainer.getWidth(), markerViewContainer.getHeight());
         List<MarkerView> markers = mapboxMap.getMarkerViewsInRect(mapViewRect);
         View convertView;
 
@@ -445,7 +450,7 @@ public class MarkerViewManager {
 
                         // Inflate View
                         convertView = (View) adapter.getViewReusePool().acquire();
-                        final View adaptedView = adapter.getView(marker, convertView, mapView);
+                        final View adaptedView = adapter.getView(marker, convertView, markerViewContainer);
                         if (adaptedView != null) {
                             adaptedView.setRotationX(marker.getTilt());
                             adaptedView.setRotation(marker.getRotation());
@@ -464,7 +469,7 @@ public class MarkerViewManager {
                             markerViewMap.put(marker, adaptedView);
                             if (convertView == null) {
                                 adaptedView.setVisibility(View.GONE);
-                                mapView.getMarkerViewContainer().addView(adaptedView);
+                                markerViewContainer.addView(adaptedView);
                             }
                         }
                     }
@@ -515,7 +520,7 @@ public class MarkerViewManager {
             for (final MapboxMap.MarkerViewAdapter adapter : markerViewAdapters) {
                 if (adapter.getMarkerClass().equals(marker.getClass())) {
                     View convertView = (View) adapter.getViewReusePool().acquire();
-                    view = adapter.getView(marker, convertView, mapView);
+                    view = adapter.getView(marker, convertView, markerViewContainer);
                     break;
                 }
             }
@@ -523,7 +528,7 @@ public class MarkerViewManager {
 
         if (view != null) {
             if (marker.getWidth() == 0) {
-                if(view.getMeasuredWidth()==0) {
+                if (view.getMeasuredWidth() == 0) {
                     //Ensure the marker's view is measured first
                     view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
                 }
@@ -544,6 +549,10 @@ public class MarkerViewManager {
             marker.setTopOffsetPixels(infoWindowOffsetY);
             marker.setRightOffsetPixels(infoWindowOffsetX);
         }
+    }
+
+    public ViewGroup getMarkerViewContainer() {
+        return markerViewContainer;
     }
 
     /**

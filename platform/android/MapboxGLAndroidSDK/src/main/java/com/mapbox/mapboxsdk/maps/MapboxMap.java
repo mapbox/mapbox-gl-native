@@ -1,20 +1,27 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.location.Location;
+import android.os.Handler;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.util.Pools;
+
 import timber.log.Timber;
+
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ZoomButtonsController;
 
 import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
@@ -40,6 +47,7 @@ import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
+import com.mapbox.mapboxsdk.utils.ColorUtils;
 import com.mapbox.services.commons.geojson.Feature;
 
 import java.lang.reflect.ParameterizedType;
@@ -54,46 +62,134 @@ import java.util.List;
  * Note: Similar to a View object, a MapboxMap should only be read and modified from the main thread.
  * </p>
  */
-public class MapboxMap {
+public final class MapboxMap {
 
-    private MapView mapView;
-    private UiSettings uiSettings;
-    private TrackingSettings trackingSettings;
-    private MyLocationViewSettings myLocationViewSettings;
-    private Projection projection;
-    private Transform transform;
-    private boolean myLocationEnabled;
+    private final NativeMapView nativeMapView;
+    private final UiSettings uiSettings;
+    private final TrackingSettings trackingSettings;
+    private final Projection projection;
+    private final Transform transform;
+    private final AnnotationManager annotationManager;
+    private final MyLocationViewSettings myLocationViewSettings;
+    private final OnRegisterTouchListener onRegisterTouchListener;
 
-    private MapboxMap.OnMapClickListener onMapClickListener;
-    private MapboxMap.OnMapLongClickListener onMapLongClickListener;
-
-
-    private MapboxMap.OnFlingListener onFlingListener;
-    private MapboxMap.OnScrollListener onScrollListener;
-    private MapboxMap.OnMyLocationTrackingModeChangeListener onMyLocationTrackingModeChangeListener;
-    private MapboxMap.OnMyBearingTrackingModeChangeListener onMyBearingTrackingModeChangeListener;
     private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
-    private AnnotationManager annotationManager;
-    private InfoWindowManager infoWindowManager;
+    private boolean myLocationEnabled;
 
     private double maxZoomLevel = -1;
     private double minZoomLevel = -1;
 
-    MapboxMap(@NonNull MapView mapView, IconManager iconManager) {
-        this.mapView = mapView;
-        uiSettings = new UiSettings(mapView);
-        trackingSettings = new TrackingSettings(this.mapView, uiSettings);
-        projection = new Projection(mapView);
-        infoWindowManager = new InfoWindowManager();
-        annotationManager = new AnnotationManager(mapView.getNativeMapView(), iconManager, infoWindowManager);
+    MapboxMap(NativeMapView map, Transform transform, UiSettings ui, TrackingSettings tracking, MyLocationViewSettings myLocationView,
+              Projection projection, OnRegisterTouchListener listener, AnnotationManager annotations) {
+        this.nativeMapView = map;
+        this.uiSettings = ui;
+        this.trackingSettings = tracking;
+        this.projection = projection;
+        this.myLocationViewSettings = myLocationView;
+        this.annotationManager = annotations.bind(this);
+        this.transform = transform;
+        this.onRegisterTouchListener = listener;
+    }
 
-        // TODO inject NativeMapView https://github.com/mapbox/mapbox-gl-native/issues/4100
-        NativeMapView nativeMapView = mapView.getNativeMapView();
-        if (nativeMapView != null) {
-            transform = new Transform(nativeMapView, this);
-            nativeMapView.addOnMapChangedListener(new CameraInvalidator());
+    void initialise(Context context, MapboxMapOptions options) {
+        // TODO migrate code from this method to the classes they impact themselves
+        setDebugActive(options.getDebugActive());
+
+        CameraPosition position = options.getCamera();
+        if (position != null && !position.equals(CameraPosition.DEFAULT)) {
+            transform.moveCamera(this, CameraUpdateFactory.newCameraPosition(position), null);
+            myLocationViewSettings.setTilt(position.tilt);
         }
+
+        // api base url
+        String apiBaseUrl = options.getApiBaseUrl();
+        if (!TextUtils.isEmpty(apiBaseUrl)) {
+            nativeMapView.setApiBaseUrl(apiBaseUrl);
+        }
+
+        // access token
+        String accessToken = options.getAccessToken();
+        if (!TextUtils.isEmpty(accessToken)) {
+            nativeMapView.setAccessToken(accessToken);
+        }else{
+            nativeMapView.setAccessToken(MapboxAccountManager.getInstance().getAccessToken());
+        }
+
+        // style url
+        String style = options.getStyle();
+        if (!TextUtils.isEmpty(style)) {
+            nativeMapView.setStyleUrl(style);
+        }
+
+        // MyLocationView
+        myLocationViewSettings.setForegroundDrawable(
+                options.getMyLocationForegroundDrawable(), options.getMyLocationForegroundBearingDrawable());
+        myLocationViewSettings.setForegroundTintColor(options.getMyLocationForegroundTintColor());
+        myLocationViewSettings.setBackgroundDrawable(
+                options.getMyLocationBackgroundDrawable(), options.getMyLocationBackgroundPadding());
+        myLocationViewSettings.setBackgroundTintColor(options.getMyLocationBackgroundTintColor());
+        myLocationViewSettings.setAccuracyAlpha(options.getMyLocationAccuracyAlpha());
+        myLocationViewSettings.setAccuracyTintColor(options.getMyLocationAccuracyTintColor());
+        setMyLocationEnabled(options.getLocationEnabled());
+
+        // Enable gestures
+        uiSettings.setZoomGesturesEnabled(options.getZoomGesturesEnabled());
+        uiSettings.setZoomGestureChangeAllowed(options.getZoomGesturesEnabled());
+        uiSettings.setScrollGesturesEnabled(options.getScrollGesturesEnabled());
+        uiSettings.setScrollGestureChangeAllowed(options.getScrollGesturesEnabled());
+        uiSettings.setRotateGesturesEnabled(options.getRotateGesturesEnabled());
+        uiSettings.setRotateGestureChangeAllowed(options.getRotateGesturesEnabled());
+        uiSettings.setTiltGesturesEnabled(options.getTiltGesturesEnabled());
+        uiSettings.setTiltGestureChangeAllowed(options.getTiltGesturesEnabled());
+
+        // Ui Controls
+        uiSettings.setZoomControlsEnabled(options.getZoomControlsEnabled());
+
+        // Zoom
+        setMaxZoom(options.getMaxZoom());
+        setMinZoom(options.getMinZoom());
+
+        Resources resources = context.getResources();
+
+        // Compass
+        uiSettings.setCompassEnabled(options.getCompassEnabled());
+        uiSettings.setCompassGravity(options.getCompassGravity());
+        int[] compassMargins = options.getCompassMargins();
+        if (compassMargins != null) {
+            uiSettings.setCompassMargins(compassMargins[0], compassMargins[1], compassMargins[2], compassMargins[3]);
+        } else {
+            int tenDp = (int) resources.getDimension(R.dimen.mapbox_ten_dp);
+            uiSettings.setCompassMargins(tenDp, tenDp, tenDp, tenDp);
+        }
+        uiSettings.setCompassFadeFacingNorth(options.getCompassFadeFacingNorth());
+
+        // Logo
+        uiSettings.setLogoEnabled(options.getLogoEnabled());
+        uiSettings.setLogoGravity(options.getLogoGravity());
+        int[] logoMargins = options.getLogoMargins();
+        if (logoMargins != null) {
+            uiSettings.setLogoMargins(logoMargins[0], logoMargins[1], logoMargins[2], logoMargins[3]);
+        } else {
+            int sixteenDp = (int) resources.getDimension(R.dimen.mapbox_sixteen_dp);
+            uiSettings.setLogoMargins(sixteenDp, sixteenDp, sixteenDp, sixteenDp);
+        }
+
+        // Attribution
+        uiSettings.setAttributionEnabled(options.getAttributionEnabled());
+        uiSettings.setAttributionGravity(options.getAttributionGravity());
+        int[] attributionMargins = options.getAttributionMargins();
+        if (attributionMargins != null) {
+            uiSettings.setAttributionMargins(attributionMargins[0], attributionMargins[1], attributionMargins[2], attributionMargins[3]);
+        } else {
+            int sevenDp = (int) resources.getDimension(R.dimen.mapbox_seven_dp);
+            int seventySixDp = (int) resources.getDimension(R.dimen.mapbox_seventy_six_dp);
+            uiSettings.setAttributionMargins(seventySixDp, sevenDp, sevenDp, sevenDp);
+        }
+
+        int attributionTintColor = options.getAttributionTintColor();
+        uiSettings.setAttributionTintColor(attributionTintColor != -1
+                ? attributionTintColor : ColorUtils.getPrimaryColor(context));
     }
 
     // Style
@@ -101,7 +197,7 @@ public class MapboxMap {
     @Nullable
     @UiThread
     public Layer getLayer(@NonNull String layerId) {
-        return getMapView().getNativeMapView().getLayer(layerId);
+        return nativeMapView.getLayer(layerId);
     }
 
     /**
@@ -116,7 +212,7 @@ public class MapboxMap {
     public <T extends Layer> T getLayerAs(@NonNull String layerId) {
         try {
             //noinspection unchecked
-            return (T) getMapView().getNativeMapView().getLayer(layerId);
+            return (T) nativeMapView.getLayer(layerId);
         } catch (ClassCastException e) {
             Timber.e(String.format("Layer: %s is a different type: %s", layerId, e.getMessage()));
             return null;
@@ -141,7 +237,7 @@ public class MapboxMap {
      */
     @UiThread
     public void addLayer(@NonNull Layer layer, String before) {
-        getMapView().getNativeMapView().addLayer(layer, before);
+        nativeMapView.addLayer(layer, before);
     }
 
     /**
@@ -152,7 +248,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
-        getMapView().getNativeMapView().removeLayer(layerId);
+        nativeMapView.removeLayer(layerId);
     }
 
     /**
@@ -163,13 +259,13 @@ public class MapboxMap {
      */
     @UiThread
     public void removeLayer(@NonNull Layer layer) throws NoSuchLayerException {
-        getMapView().getNativeMapView().removeLayer(layer);
+        nativeMapView.removeLayer(layer);
     }
 
     @Nullable
     @UiThread
     public Source getSource(@NonNull String sourceId) {
-        return getMapView().getNativeMapView().getSource(sourceId);
+        return nativeMapView.getSource(sourceId);
     }
 
     /**
@@ -184,7 +280,7 @@ public class MapboxMap {
     public <T extends Source> T getSourceAs(@NonNull String sourceId) {
         try {
             //noinspection unchecked
-            return (T) getMapView().getNativeMapView().getSource(sourceId);
+            return (T) nativeMapView.getSource(sourceId);
         } catch (ClassCastException e) {
             Timber.e(String.format("Source: %s is a different type: %s", sourceId, e.getMessage()));
             return null;
@@ -198,7 +294,7 @@ public class MapboxMap {
      */
     @UiThread
     public void addSource(@NonNull Source source) {
-        getMapView().getNativeMapView().addSource(source);
+        nativeMapView.addSource(source);
     }
 
     /**
@@ -209,7 +305,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
-        getMapView().getNativeMapView().removeSource(sourceId);
+        nativeMapView.removeSource(sourceId);
     }
 
     /**
@@ -220,7 +316,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removeSource(@NonNull Source source) throws NoSuchSourceException {
-        getMapView().getNativeMapView().removeSource(source);
+        nativeMapView.removeSource(source);
     }
 
     /**
@@ -231,7 +327,7 @@ public class MapboxMap {
      */
     @UiThread
     public void addImage(@NonNull String name, @NonNull Bitmap image) {
-        getMapView().getNativeMapView().addImage(name, image);
+        nativeMapView.addImage(name, image);
     }
 
     /**
@@ -241,7 +337,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removeImage(String name) {
-        getMapView().getNativeMapView().removeImage(name);
+        nativeMapView.removeImage(name);
     }
 
     //
@@ -263,7 +359,7 @@ public class MapboxMap {
             return;
         }
         minZoomLevel = minZoom;
-        mapView.setMinZoom(minZoom);
+        nativeMapView.setMinZoom(minZoom);
     }
 
     /**
@@ -276,7 +372,7 @@ public class MapboxMap {
     @UiThread
     public double getMinZoom() {
         if (minZoomLevel == -1) {
-            return minZoomLevel = mapView.getMinZoom();
+            return minZoomLevel = nativeMapView.getMinZoom();
         }
         return minZoomLevel;
     }
@@ -300,7 +396,7 @@ public class MapboxMap {
             return;
         }
         maxZoomLevel = maxZoom;
-        mapView.setMaxZoom(maxZoom);
+        nativeMapView.setMaxZoom(maxZoom);
     }
 
     /**
@@ -313,7 +409,7 @@ public class MapboxMap {
     @UiThread
     public double getMaxZoom() {
         if (maxZoomLevel == -1) {
-            return maxZoomLevel = mapView.getMaxZoom();
+            return maxZoomLevel = nativeMapView.getMaxZoom();
         }
         return maxZoomLevel;
     }
@@ -354,9 +450,6 @@ public class MapboxMap {
      * @return the MyLocationViewSettings associated with this map
      */
     public MyLocationViewSettings getMyLocationViewSettings() {
-        if (myLocationViewSettings == null) {
-            myLocationViewSettings = new MyLocationViewSettings(mapView, mapView.getUserLocationView());
-        }
         return myLocationViewSettings;
     }
 
@@ -420,6 +513,9 @@ public class MapboxMap {
     @UiThread
     public final void moveCamera(CameraUpdate update) {
         moveCamera(update, null);
+        // MapChange.REGION_DID_CHANGE_ANIMATED is not called for `jumpTo`
+        // invalidate camera position to provide OnCameraChange event.
+        invalidateCameraPosition();
     }
 
     /**
@@ -432,10 +528,10 @@ public class MapboxMap {
      */
     @UiThread
     public final void moveCamera(final CameraUpdate update, final MapboxMap.CancelableCallback callback) {
-        mapView.post(new Runnable() {
+        new Handler().post(new Runnable() {
             @Override
             public void run() {
-                transform.moveCamera(update, callback);
+                transform.moveCamera(MapboxMap.this, update, callback);
             }
         });
     }
@@ -559,10 +655,10 @@ public class MapboxMap {
      */
     @UiThread
     public final void easeCamera(final CameraUpdate update, final int durationMs, final boolean easingInterpolator, final boolean resetTrackingMode, final MapboxMap.CancelableCallback callback) {
-        mapView.post(new Runnable() {
+        new Handler().post(new Runnable() {
             @Override
             public void run() {
-                transform.easeCamera(update, durationMs, easingInterpolator, resetTrackingMode, callback);
+                transform.easeCamera(MapboxMap.this, update, durationMs, easingInterpolator, resetTrackingMode, callback);
             }
         });
     }
@@ -634,10 +730,10 @@ public class MapboxMap {
      */
     @UiThread
     public final void animateCamera(final CameraUpdate update, final int durationMs, final MapboxMap.CancelableCallback callback) {
-        mapView.post(new Runnable() {
+        new Handler().post(new Runnable() {
             @Override
             public void run() {
-                transform.animateCamera(update, durationMs, callback);
+                transform.animateCamera(MapboxMap.this, update, durationMs, callback);
             }
         });
     }
@@ -648,7 +744,7 @@ public class MapboxMap {
     void invalidateCameraPosition() {
         CameraPosition cameraPosition = transform.invalidateCameraPosition();
         if (cameraPosition != null) {
-            mapView.updateCameraPosition(cameraPosition);
+            transform.updateCameraPosition(cameraPosition);
         }
     }
 
@@ -674,7 +770,7 @@ public class MapboxMap {
      */
     @UiThread
     public boolean isDebugActive() {
-        return mapView.isDebugActive();
+        return nativeMapView.getDebug();
     }
 
     /**
@@ -687,21 +783,21 @@ public class MapboxMap {
      */
     @UiThread
     public void setDebugActive(boolean debugActive) {
-        mapView.setDebugActive(debugActive);
+        nativeMapView.setDebug(debugActive);
     }
 
     /**
      * <p>
      * Cycles through the map debug options.
      * </p>
-     * The value of {@link MapView#isDebugActive()} reflects whether there are
+     * The value of isDebugActive reflects whether there are
      * any map debug options enabled or disabled.
      *
-     * @see MapView#isDebugActive()
+     * @see #isDebugActive()
      */
     @UiThread
     public void cycleDebugOptions() {
-        mapView.cycleDebugOptions();
+        nativeMapView.cycleDebugOptions();
     }
 
     //
@@ -739,7 +835,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setStyleUrl(@NonNull String url) {
-        mapView.setStyleUrl(url);
+        nativeMapView.setStyleUrl(url);
     }
 
     /**
@@ -775,7 +871,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public String getStyleUrl() {
-        return mapView.getStyleUrl();
+        return nativeMapView.getStyleUrl();
     }
 
     //
@@ -797,7 +893,7 @@ public class MapboxMap {
     @Deprecated
     @UiThread
     public void setAccessToken(@NonNull String accessToken) {
-        mapView.setAccessToken(accessToken);
+        nativeMapView.setAccessToken(accessToken);
     }
 
     /**
@@ -815,16 +911,12 @@ public class MapboxMap {
     @UiThread
     @Nullable
     public String getAccessToken() {
-        return mapView.getAccessToken();
+        return nativeMapView.getAccessToken();
     }
 
     //
     // Annotations
     //
-
-    void setTilt(double tilt) {
-        mapView.setTilt(tilt);
-    }
 
     /**
      * <p>
@@ -1152,7 +1244,7 @@ public class MapboxMap {
             Timber.w("marker was null, so just returning");
             return;
         }
-        annotationManager.selectMarker(marker, this);
+        annotationManager.selectMarker(marker);
     }
 
     /**
@@ -1189,7 +1281,7 @@ public class MapboxMap {
      * @return the associated MarkerViewManager
      */
     public MarkerViewManager getMarkerViewManager() {
-        return annotationManager.getMarkerViewManager(this);
+        return annotationManager.getMarkerViewManager();
     }
 
     //
@@ -1208,7 +1300,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setInfoWindowAdapter(@Nullable InfoWindowAdapter infoWindowAdapter) {
-        infoWindowManager.setInfoWindowAdapter(infoWindowAdapter);
+        annotationManager.getInfoWindowManager().setInfoWindowAdapter(infoWindowAdapter);
     }
 
     /**
@@ -1219,7 +1311,7 @@ public class MapboxMap {
     @UiThread
     @Nullable
     public InfoWindowAdapter getInfoWindowAdapter() {
-        return infoWindowManager.getInfoWindowAdapter();
+        return annotationManager.getInfoWindowManager().getInfoWindowAdapter();
     }
 
     /**
@@ -1229,7 +1321,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setAllowConcurrentMultipleOpenInfoWindows(boolean allow) {
-        infoWindowManager.setAllowConcurrentMultipleOpenInfoWindows(allow);
+        annotationManager.getInfoWindowManager().setAllowConcurrentMultipleOpenInfoWindows(allow);
     }
 
     /**
@@ -1239,12 +1331,12 @@ public class MapboxMap {
      */
     @UiThread
     public boolean isAllowConcurrentMultipleOpenInfoWindows() {
-        return infoWindowManager.isAllowConcurrentMultipleOpenInfoWindows();
+        return annotationManager.getInfoWindowManager().isAllowConcurrentMultipleOpenInfoWindows();
     }
 
     // Internal API
     List<InfoWindow> getInfoWindows() {
-        return infoWindowManager.getInfoWindows();
+        return annotationManager.getInfoWindowManager().getInfoWindows();
     }
 
     AnnotationManager getAnnotationManager() {
@@ -1279,7 +1371,7 @@ public class MapboxMap {
      * @param bottom The bottom margin in pixels.
      */
     public void setPadding(int left, int top, int right, int bottom) {
-        mapView.setContentPadding(left, top, right, bottom);
+        projection.setContentPadding(new int[]{left, top, right, bottom}, myLocationViewSettings.getPadding());
         uiSettings.invalidate();
     }
 
@@ -1289,10 +1381,7 @@ public class MapboxMap {
      * @return An array with length 4 in the LTRB order.
      */
     public int[] getPadding() {
-        return new int[]{mapView.getContentPaddingLeft(),
-                mapView.getContentPaddingTop(),
-                mapView.getContentPaddingRight(),
-                mapView.getContentPaddingBottom()};
+        return projection.getContentPadding();
     }
 
     //
@@ -1334,12 +1423,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setOnScrollListener(@Nullable OnScrollListener listener) {
-        onScrollListener = listener;
-    }
-
-    // used by MapView
-    OnScrollListener getOnScrollListener() {
-        return onScrollListener;
+        onRegisterTouchListener.onRegisterScrollListener(listener);
     }
 
     /**
@@ -1350,12 +1434,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setOnFlingListener(@Nullable OnFlingListener listener) {
-        onFlingListener = listener;
-    }
-
-    // used by MapView
-    OnFlingListener getOnFlingListener() {
-        return onFlingListener;
+        onRegisterTouchListener.onRegisterFlingListener(listener);
     }
 
     /**
@@ -1366,12 +1445,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setOnMapClickListener(@Nullable OnMapClickListener listener) {
-        onMapClickListener = listener;
-    }
-
-    // used  by MapView
-    OnMapClickListener getOnMapClickListener() {
-        return onMapClickListener;
+        onRegisterTouchListener.onRegisterMapClickListener(listener);
     }
 
     /**
@@ -1382,12 +1456,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setOnMapLongClickListener(@Nullable OnMapLongClickListener listener) {
-        onMapLongClickListener = listener;
-    }
-
-    // used by MapView
-    OnMapLongClickListener getOnMapLongClickListener() {
-        return onMapLongClickListener;
+        onRegisterTouchListener.onRegisterMapLongClickListener(listener);
     }
 
     /**
@@ -1398,7 +1467,7 @@ public class MapboxMap {
      */
     @UiThread
     public void setOnInfoWindowClickListener(@Nullable OnInfoWindowClickListener listener) {
-        infoWindowManager.setOnInfoWindowClickListener(listener);
+        getAnnotationManager().getInfoWindowManager().setOnInfoWindowClickListener(listener);
     }
 
     /**
@@ -1408,7 +1477,7 @@ public class MapboxMap {
      */
     @UiThread
     public OnInfoWindowClickListener getOnInfoWindowClickListener() {
-        return infoWindowManager.getOnInfoWindowClickListener();
+        return getAnnotationManager().getInfoWindowManager().getOnInfoWindowClickListener();
     }
 
     /**
@@ -1420,7 +1489,7 @@ public class MapboxMap {
     @UiThread
     public void setOnInfoWindowLongClickListener(@Nullable OnInfoWindowLongClickListener
                                                          listener) {
-        infoWindowManager.setOnInfoWindowLongClickListener(listener);
+        getAnnotationManager().getInfoWindowManager().setOnInfoWindowLongClickListener(listener);
     }
 
     /**
@@ -1429,11 +1498,11 @@ public class MapboxMap {
      * @return Current active InfoWindow long Click Listener
      */
     public OnInfoWindowLongClickListener getOnInfoWindowLongClickListener() {
-        return infoWindowManager.getOnInfoWindowLongClickListener();
+        return getAnnotationManager().getInfoWindowManager().getOnInfoWindowLongClickListener();
     }
 
     public void setOnInfoWindowCloseListener(@Nullable OnInfoWindowCloseListener listener) {
-        infoWindowManager.setOnInfoWindowCloseListener(listener);
+        getAnnotationManager().getInfoWindowManager().setOnInfoWindowCloseListener(listener);
     }
 
     /**
@@ -1443,7 +1512,7 @@ public class MapboxMap {
      */
     @UiThread
     public OnInfoWindowCloseListener getOnInfoWindowCloseListener() {
-        return infoWindowManager.getOnInfoWindowCloseListener();
+        return getAnnotationManager().getInfoWindowManager().getOnInfoWindowCloseListener();
     }
 
     //
@@ -1474,13 +1543,13 @@ public class MapboxMap {
      */
     @UiThread
     public void setMyLocationEnabled(boolean enabled) {
-        if (!mapView.isPermissionsAccepted()) {
+        if (!trackingSettings.isPermissionsAccepted()) {
             Timber.e("Could not activate user location tracking: "
                     + "user did not accept the permission or permissions were not requested.");
             return;
         }
         myLocationEnabled = enabled;
-        mapView.setMyLocationEnabled(enabled);
+        trackingSettings.setMyLocationEnabled(enabled);
     }
 
     /**
@@ -1491,7 +1560,7 @@ public class MapboxMap {
     @UiThread
     @Nullable
     public Location getMyLocation() {
-        return mapView.getMyLocation();
+        return trackingSettings.getMyLocation();
     }
 
     /**
@@ -1504,7 +1573,7 @@ public class MapboxMap {
     @UiThread
     public void setOnMyLocationChangeListener(@Nullable MapboxMap.OnMyLocationChangeListener
                                                       listener) {
-        mapView.setOnMyLocationChangeListener(listener);
+        trackingSettings.setOnMyLocationChangeListener(listener);
     }
 
     /**
@@ -1514,15 +1583,8 @@ public class MapboxMap {
      *                 To unset the callback, use null.
      */
     @UiThread
-    public void setOnMyLocationTrackingModeChangeListener
-    (@Nullable MapboxMap.OnMyLocationTrackingModeChangeListener listener) {
-        onMyLocationTrackingModeChangeListener = listener;
-    }
-
-    // used by MapView
-    MapboxMap.OnMyLocationTrackingModeChangeListener getOnMyLocationTrackingModeChangeListener
-    () {
-        return onMyLocationTrackingModeChangeListener;
+    public void setOnMyLocationTrackingModeChangeListener(@Nullable MapboxMap.OnMyLocationTrackingModeChangeListener listener) {
+        trackingSettings.setOnMyLocationTrackingModeChangeListener(listener);
     }
 
     /**
@@ -1532,38 +1594,13 @@ public class MapboxMap {
      *                 To unset the callback, use null.
      */
     @UiThread
-    public void setOnMyBearingTrackingModeChangeListener
-    (@Nullable OnMyBearingTrackingModeChangeListener listener) {
-        onMyBearingTrackingModeChangeListener = listener;
-    }
-
-    // used by MapView
-    OnMyBearingTrackingModeChangeListener getOnMyBearingTrackingModeChangeListener() {
-        return onMyBearingTrackingModeChangeListener;
-    }
-
-    MapView getMapView() {
-        return mapView;
-    }
-
-    void setUiSettings(UiSettings uiSettings) {
-        this.uiSettings = uiSettings;
-    }
-
-    void setProjection(Projection projection) {
-        this.projection = projection;
+    public void setOnMyBearingTrackingModeChangeListener(@Nullable OnMyBearingTrackingModeChangeListener listener) {
+        trackingSettings.setOnMyBearingTrackingModeChangeListener(listener);
     }
 
     //
     // Invalidate
     //
-
-    /**
-     * Triggers an invalidation of the map view.
-     */
-    public void invalidate() {
-        mapView.invalidate();
-    }
 
     /**
      * Takes a snapshot of the map.
@@ -1573,7 +1610,8 @@ public class MapboxMap {
      */
     @UiThread
     public void snapshot(@NonNull SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
-        mapView.snapshot(callback, bitmap);
+        // FIXME 12/02/2016
+        //mapView.snapshot(callback, bitmap);
     }
 
     /**
@@ -1583,7 +1621,8 @@ public class MapboxMap {
      */
     @UiThread
     public void snapshot(@NonNull SnapshotReadyCallback callback) {
-        mapView.snapshot(callback, null);
+        // FIXME 12/02/2016
+        //mapView.snapshot(callback, null);
     }
 
     /**
@@ -1597,7 +1636,7 @@ public class MapboxMap {
     @NonNull
     public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates, @Nullable String...
             layerIds) {
-        return mapView.getNativeMapView().queryRenderedFeatures(coordinates, layerIds);
+        return nativeMapView.queryRenderedFeatures(coordinates, layerIds);
     }
 
     /**
@@ -1611,21 +1650,7 @@ public class MapboxMap {
     @NonNull
     public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates, @Nullable String...
             layerIds) {
-        return mapView.getNativeMapView().queryRenderedFeatures(coordinates, layerIds);
-    }
-
-    //
-    // Innner classes
-    //
-
-    private class CameraInvalidator implements MapView.OnMapChangedListener {
-
-        @Override
-        public void onMapChanged(@MapView.MapChange int change) {
-            if (change == MapView.REGION_DID_CHANGE_ANIMATED) {
-                invalidateCameraPosition();
-            }
-        }
+        return nativeMapView.queryRenderedFeatures(coordinates, layerIds);
     }
 
     //
@@ -1682,6 +1707,20 @@ public class MapboxMap {
          * @param fps The average number of frames rendered over the last second.
          */
         void onFpsChanged(double fps);
+    }
+
+    /**
+     * Interface definition for a callback to be invoked when a user registers an listener that is
+     * related to touch and click events.
+     */
+    interface OnRegisterTouchListener {
+        void onRegisterMapClickListener(OnMapClickListener listener);
+
+        void onRegisterMapLongClickListener(OnMapLongClickListener listener);
+
+        void onRegisterScrollListener(OnScrollListener listener);
+
+        void onRegisterFlingListener(OnFlingListener listener);
     }
 
     /**
@@ -1939,7 +1978,7 @@ public class MapboxMap {
     /**
      * Interface definition for a callback to be invoked when the the My Location tracking mode changes.
      *
-     * @see MapView#setMyLocationTrackingMode(int)
+     * @see TrackingSettings#setMyLocationTrackingMode(int)
      */
     public interface OnMyLocationTrackingModeChangeListener {
 
@@ -1954,7 +1993,7 @@ public class MapboxMap {
     /**
      * Interface definition for a callback to be invoked when the the My Location tracking mode changes.
      *
-     * @see MapView#setMyLocationTrackingMode(int)
+     * @see TrackingSettings#setMyLocationTrackingMode(int)
      */
     public interface OnMyBearingTrackingModeChangeListener {
 

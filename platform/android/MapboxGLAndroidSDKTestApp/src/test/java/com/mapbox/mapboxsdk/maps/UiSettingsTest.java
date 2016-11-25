@@ -1,6 +1,11 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.view.Gravity;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+
+import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,13 +21,28 @@ import static org.mockito.Mockito.when;
 public class UiSettingsTest {
 
     @InjectMocks
-    MapView mMapView = mock(MapView.class);
+    Projection projection = mock(Projection.class);
 
-    UiSettings uiSettings;
+    @InjectMocks
+    FocalPointChangeListener focalPointChangeListener = mock(FocalPointChangeListener.class);
+
+    @InjectMocks
+    CompassView compassView = mock(CompassView.class);
+
+    @InjectMocks
+    ImageView imageView = mock(ImageView.class);
+
+    @InjectMocks
+    ImageView logoView = mock(ImageView.class);
+
+    @InjectMocks
+    FrameLayout.LayoutParams layoutParams = mock(FrameLayout.LayoutParams.class);
+
+    private UiSettings uiSettings;
 
     @Before
     public void beforeTest() {
-        uiSettings = new UiSettings(mMapView);
+        uiSettings = new UiSettings(projection, focalPointChangeListener, compassView, imageView, logoView);
     }
 
     @Test
@@ -32,6 +52,7 @@ public class UiSettingsTest {
 
     @Test
     public void testCompassEnabled() {
+        when(compassView.isEnabled()).thenReturn(true);
         uiSettings.setCompassEnabled(true);
         assertEquals("Compass should be enabled", true, uiSettings.isCompassEnabled());
     }
@@ -44,12 +65,20 @@ public class UiSettingsTest {
 
     @Test
     public void testCompassGravity() {
-        uiSettings.setCompassGravity(Gravity.LEFT);
-        assertEquals("Compass gravity should be same", Gravity.LEFT, uiSettings.getCompassGravity());
+        when(compassView.getLayoutParams()).thenReturn(layoutParams);
+        layoutParams.gravity = Gravity.START;
+        uiSettings.setCompassGravity(Gravity.START);
+        assertEquals("Compass gravity should be same", Gravity.START, uiSettings.getCompassGravity());
     }
 
     @Test
     public void testCompassMargins() {
+        when(projection.getContentPadding()).thenReturn(new int[]{0, 0, 0, 0});
+        when(compassView.getLayoutParams()).thenReturn(layoutParams);
+        layoutParams.leftMargin = 1;
+        layoutParams.topMargin = 2;
+        layoutParams.rightMargin = 3;
+        layoutParams.bottomMargin = 4;
         uiSettings.setCompassMargins(1, 2, 3, 4);
         assertTrue("Compass margin left should be same", uiSettings.getCompassMarginLeft() == 1);
         assertTrue("Compass margin top should be same", uiSettings.getCompassMarginTop() == 2);
@@ -58,9 +87,11 @@ public class UiSettingsTest {
     }
 
     @Test
-    public void testCompassFadeWhenFacingNorth(){
+    public void testCompassFadeWhenFacingNorth() {
+        when(compassView.isFadeCompassViewFacingNorth()).thenReturn(true);
         assertTrue("Compass should fade when facing north by default.", uiSettings.isCompassFadeWhenFacingNorth());
         uiSettings.setCompassFadeFacingNorth(false);
+        when(compassView.isFadeCompassViewFacingNorth()).thenReturn(false);
         assertFalse("Compass fading should be disabled", uiSettings.isCompassFadeWhenFacingNorth());
     }
 
@@ -72,18 +103,27 @@ public class UiSettingsTest {
 
     @Test
     public void testLogoDisabled() {
+        when(logoView.getVisibility()).thenReturn(View.GONE);
         uiSettings.setLogoEnabled(false);
         assertEquals("Logo should be disabled", false, uiSettings.isLogoEnabled());
     }
 
     @Test
     public void testLogoGravity() {
-        uiSettings.setLogoGravity(Gravity.RIGHT);
-        assertEquals("Logo gravity should be same", Gravity.RIGHT, uiSettings.getLogoGravity());
+        layoutParams.gravity = Gravity.END;
+        when(logoView.getLayoutParams()).thenReturn(layoutParams);
+        uiSettings.setLogoGravity(Gravity.END);
+        assertEquals("Logo gravity should be same", Gravity.END, uiSettings.getLogoGravity());
     }
 
     @Test
     public void testLogoMargins() {
+        when(projection.getContentPadding()).thenReturn(new int[]{0, 0, 0, 0});
+        when(logoView.getLayoutParams()).thenReturn(layoutParams);
+        layoutParams.leftMargin = 1;
+        layoutParams.topMargin = 2;
+        layoutParams.rightMargin = 3;
+        layoutParams.bottomMargin = 4;
         uiSettings.setLogoMargins(1, 2, 3, 4);
         assertTrue("Compass margin left should be same", uiSettings.getLogoMarginLeft() == 1);
         assertTrue("Compass margin top should be same", uiSettings.getLogoMarginTop() == 2);
@@ -93,24 +133,34 @@ public class UiSettingsTest {
 
     @Test
     public void testAttributionEnabled() {
+        when(imageView.getVisibility()).thenReturn(View.VISIBLE);
         uiSettings.setAttributionEnabled(true);
         assertEquals("Attribution should be enabled", true, uiSettings.isAttributionEnabled());
     }
 
     @Test
     public void testAttributionDisabled() {
+        when(imageView.getVisibility()).thenReturn(View.GONE);
         uiSettings.setAttributionEnabled(false);
-        assertEquals("Attribution should be disabled", false, uiSettings.isLogoEnabled());
+        assertEquals("Attribution should be disabled", false, uiSettings.isAttributionEnabled());
     }
 
     @Test
     public void testAttributionGravity() {
-        uiSettings.setAttributionGravity(Gravity.RIGHT);
-        assertEquals("Attribution gravity should be same", Gravity.RIGHT, uiSettings.getAttributionGravity());
+        when(imageView.getLayoutParams()).thenReturn(layoutParams);
+        layoutParams.gravity = Gravity.END;
+        uiSettings.setAttributionGravity(Gravity.END);
+        assertEquals("Attribution gravity should be same", Gravity.END, uiSettings.getAttributionGravity());
     }
 
     @Test
     public void testAttributionMargins() {
+        when(imageView.getLayoutParams()).thenReturn(layoutParams);
+        when(projection.getContentPadding()).thenReturn(new int[]{0, 0, 0, 0});
+        layoutParams.leftMargin = 1;
+        layoutParams.topMargin = 2;
+        layoutParams.rightMargin = 3;
+        layoutParams.bottomMargin = 4;
         uiSettings.setAttributionMargins(1, 2, 3, 4);
         assertTrue("Attribution margin left should be same", uiSettings.getAttributionMarginLeft() == 1);
         assertTrue("Attribution margin top should be same", uiSettings.getAttributionMarginTop() == 2);
@@ -286,22 +336,5 @@ public class UiSettingsTest {
         assertEquals("Tilt gesture should be disabled", false, uiSettings.isTiltGesturesEnabled());
         assertEquals("Zoom gesture should be disabled", false, uiSettings.isZoomGesturesEnabled());
         assertEquals("Scroll gesture should be disabled", false, uiSettings.isScrollGesturesEnabled());
-    }
-
-    @Test
-    public void testInvalidate() {
-        uiSettings.invalidate();
-    }
-
-    @Test
-    public void testHeight() {
-        when(mMapView.getMeasuredHeight()).thenReturn(1);
-        assertEquals("height should be same as mocked instance", 1, uiSettings.getHeight(), 0);
-    }
-
-    @Test
-    public void testWidth() {
-        when(mMapView.getMeasuredWidth()).thenReturn(1);
-        assertEquals("width should be same as mocked instance", 1, uiSettings.getWidth(), 0);
     }
 }

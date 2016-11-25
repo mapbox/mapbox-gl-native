@@ -231,7 +231,7 @@ public class CameraAnimateTest {
         @Override
         public void perform(UiController uiController, View view) {
             mapboxMap.animateCamera(cameraUpdate);
-            uiController.loopMainThreadForAtLeast(MapboxConstants.ANIMATION_DURATION);
+            uiController.loopMainThreadForAtLeast(TestConstants.ANIMATION_TEST_TIME);
         }
     }
 }

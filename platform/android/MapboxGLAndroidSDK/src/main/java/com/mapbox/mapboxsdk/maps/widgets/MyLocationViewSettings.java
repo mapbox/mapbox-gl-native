@@ -4,14 +4,16 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
 
-import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.Projection;
+import com.mapbox.mapboxsdk.maps.TrackingSettings;
 
 /**
  * Settings to configure the visual appearance of the MyLocationView.
  */
 public class MyLocationViewSettings {
 
-    private MapView mapView;
+    private Projection projection;
+    private TrackingSettings trackingSettings;
     private MyLocationView myLocationView;
 
     //
@@ -58,13 +60,14 @@ public class MyLocationViewSettings {
     /**
      * Creates an instance of MyLocationViewSettings
      *
-     * @param mapView        the MapView that hosts the MyLocationView
+     * @param projection     the MapView projection
      * @param myLocationView the MyLocationView to apply the settings to
      * @see MyLocationView
      */
-    public MyLocationViewSettings(MapView mapView, MyLocationView myLocationView) {
-        this.mapView = mapView;
+    public MyLocationViewSettings(Projection projection, MyLocationView myLocationView, TrackingSettings trackingSettings) {
+        this.projection = projection;
         this.myLocationView = myLocationView;
+        this.trackingSettings = trackingSettings;
     }
 
     /**
@@ -208,7 +211,8 @@ public class MyLocationViewSettings {
     public void setPadding(int left, int top, int right, int bottom) {
         padding = new int[]{left, top, right, bottom};
         myLocationView.setContentPadding(padding);
-        mapView.invalidateContentPadding();
+        projection.invalidateContentPadding(padding);
+        trackingSettings.invalidateFocalPointForTracking(myLocationView);
     }
 
     /**
@@ -256,5 +260,9 @@ public class MyLocationViewSettings {
     public void setAccuracyTintColor(@ColorInt int accuracyTintColor) {
         this.accuracyTintColor = accuracyTintColor;
         myLocationView.setAccuracyTint(accuracyTintColor);
+    }
+
+    public void setTilt(double tilt) {
+        myLocationView.setTilt(tilt);
     }
 }

@@ -179,13 +179,6 @@ public class MapboxMapOptionsTest {
     }
 
     @Test
-    public void testParceable() {
-        MapboxMapOptions options = new MapboxMapOptions().camera(new CameraPosition.Builder().build()).styleUrl("s").accessToken("a").debugActive(true).compassMargins(new int[]{0, 1, 2, 3});
-        MapboxMapOptions parceled = (MapboxMapOptions) MockParcel.obtain(options);
-        assertEquals(options, parceled);
-    }
-
-    @Test
     public void testAccessToken() {
         assertNull(new MapboxMapOptions().getAccessToken());
         assertEquals("test", new MapboxMapOptions().accessToken("test").getAccessToken());

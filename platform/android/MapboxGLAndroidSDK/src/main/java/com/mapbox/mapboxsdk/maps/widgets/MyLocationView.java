@@ -379,6 +379,7 @@ public class MyLocationView extends View {
         }
     }
 
+    // TODO refactor MapboxMap out
     public void setMapboxMap(MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
         this.projection = mapboxMap.getProjection();
