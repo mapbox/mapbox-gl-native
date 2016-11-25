@@ -163,9 +163,9 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
                                   gl::BlendDestinationFactor::One };
             const float overdraw = 1.0f / 8.0f;
             context.blendColor = { overdraw, overdraw, overdraw, 0.0f };
-            context.clearColor =  {253.0f, 247.0f, 235.0f, 1.0f};//fix mappy
+            context.clearColor =  {0.9921f, 0.9686f, 0.9215f, 1.0f};//fix mappy
         } else {
-            context.clearColor = {253.0f, 247.0f, 235.0f, 1.0f};//background;
+            context.clearColor = {0.9921f, 0.9686f, 0.9215f, 1.0f};//background;
         }
         context.clearStencil = 0;
         context.clearDepth = 1;
