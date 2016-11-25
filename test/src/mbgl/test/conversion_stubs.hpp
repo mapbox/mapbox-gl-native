@@ -104,7 +104,7 @@ inline optional<mbgl::Value> toValue(const Value& value) {
     } else if (value.is<std::string>()) {
         return { value.get<std::string>() };
     } else if (value.is<float>()) {
-        return { value.get<float>() };
+        return { double(value.get<float>()) };
     } else {
         return {};
     }

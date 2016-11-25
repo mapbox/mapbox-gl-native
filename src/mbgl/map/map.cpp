@@ -825,7 +825,8 @@ AnnotationIDs Map::queryPointAnnotations(const ScreenBox& box) {
     std::set<AnnotationID> set;
     for (auto &feature : features) {
         assert(feature.id);
-        assert(*feature.id <= std::numeric_limits<AnnotationID>::max());
+        assert(feature.id->is<uint64_t>());
+        assert(feature.id->get<uint64_t>() <= std::numeric_limits<AnnotationID>::max());
         set.insert(static_cast<AnnotationID>(feature.id->get<uint64_t>()));
     }
     AnnotationIDs ids;
