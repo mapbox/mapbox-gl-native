@@ -865,10 +865,13 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         NSPopUpButton *popUpButton = (NSPopUpButton *)toolbarItem.view;
         NSUInteger index = self.indexOfStyleInToolbarItem;
         if (index == NSNotFound) {
-            [popUpButton addItemWithTitle:@"Custom"];
-            index = [popUpButton numberOfItems] - 1;
+            index = -1;
         }
         [popUpButton selectItemAtIndex:index];
+        if (index == -1) {
+            NSString *name = self.mapView.style.name;
+            popUpButton.title = name ?: @"Custom";
+        }
     }
     if (action == @selector(toggleLayers:)) {
         BOOL isShown = ![self.splitView isSubviewCollapsed:self.splitView.arrangedSubviews.firstObject];

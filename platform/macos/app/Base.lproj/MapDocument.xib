@@ -26,6 +26,7 @@
         <objectController objectClassName="MGLStyle" id="Xji-k6-iQ4" userLabel="Style Object Controller">
             <declaredKeys>
                 <string>layers</string>
+                <string>name</string>
             </declaredKeys>
             <connections>
                 <binding destination="jxx-uM-ZTC" name="contentObject" keyPath="selection.style" id="60N-aU-tgJ"/>
