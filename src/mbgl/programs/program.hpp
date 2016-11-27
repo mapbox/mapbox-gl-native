@@ -3,6 +3,7 @@
 #include <mbgl/gl/program.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 
+#include <sstream>
 #include <cassert>
 
 namespace mbgl {
@@ -17,7 +18,11 @@ public:
         {}
     
     static std::string pixelRatioDefine(const ProgramParameters& parameters) {
-        return std::string("#define DEVICE_PIXEL_RATIO ") + std::to_string(parameters.pixelRatio) + "\n";
+        std::ostringstream pixelRatioSS;
+        pixelRatioSS.imbue(std::locale("C"));
+        pixelRatioSS.setf(std::ios_base::showpoint);
+        pixelRatioSS << parameters.pixelRatio;
+        return std::string("#define DEVICE_PIXEL_RATIO ") + pixelRatioSS.str() + "\n";
     }
 
     static std::string fragmentSource(const ProgramParameters& parameters) {
