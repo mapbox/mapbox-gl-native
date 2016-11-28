@@ -183,7 +183,12 @@ static NSURL *MGLStyleURL_emerald;
          @"Make sure the source was created as a member of a concrete subclass of MGLSource.",
          source];
     }
-    [source addToMapView:self.mapView];
+
+    try {
+        [source addToMapView:self.mapView];
+    } catch (std::runtime_error & err) {
+        [NSException raise:@"Could not add source" format:@"%s", err.what()];
+    }
 }
 
 - (void)removeSource:(MGLSource *)source
