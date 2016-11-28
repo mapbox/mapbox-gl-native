@@ -136,6 +136,16 @@ void Style::setJSON(const std::string& json) {
 }
 
 void Style::addSource(std::unique_ptr<Source> source) {
+    //Guard against duplicate source ids
+    auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& existing) {
+        return existing->getID() == source->getID();
+    });
+
+    if (it != sources.end()) {
+        std::string msg = "Source " + source->getID() + " already exists";
+        throw std::runtime_error(msg.c_str());
+    }
+
     source->baseImpl->setObserver(this);
     sources.emplace_back(std::move(source));
 }
