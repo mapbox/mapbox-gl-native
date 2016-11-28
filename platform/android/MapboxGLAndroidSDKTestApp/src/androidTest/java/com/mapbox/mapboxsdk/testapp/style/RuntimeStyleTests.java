@@ -13,6 +13,7 @@ import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
 import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
@@ -26,7 +27,6 @@ import junit.framework.Assert;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,10 +35,8 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Basic smoke tests for Layer and Source
@@ -175,6 +173,15 @@ public class RuntimeStyleTests {
 
             //Ensure it's there
             Assert.assertNotNull(mapboxMap.getSource(source.getId()));
+
+            //Test adding a duplicate source
+            try {
+                Source source2 = new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
+                mapboxMap.addSource(source2);
+                fail("Should not have been allowed to add a source with a duplicate id");
+            } catch (CannotAddSourceException e) {
+                //OK
+            }
         }
     }
 
