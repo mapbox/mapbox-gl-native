@@ -12,8 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -72,7 +70,6 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
                 mapboxMap.addImage("test-icon", BitmapFactory.decodeResource(getResources(), R.drawable.mapbox_marker_icon_default));
                 mapboxMap.addLayer(new SymbolLayer("symbols-layer", "symbols-source").withProperties(iconImage("test-icon")));
 
-
                 selectionBox.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -92,15 +89,10 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
                                 String.format("%s features in box", features.size()),
                                 Toast.LENGTH_SHORT);
                         toast.show();
-
                     }
                 });
-
-                //Little taste of home
-                mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.0907, 5.1214), 16));
             }
         });
-
     }
 
     private String readRawResource(@RawRes int rawResource) throws IOException {

@@ -49,8 +49,6 @@ public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
             @Override
             public void onMapReady(final MapboxMap mapboxMap) {
                 QueryRenderedFeaturesBoxCountActivity.this.mapboxMap = mapboxMap;
-
-
                 selectionBox.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -71,12 +69,8 @@ public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
                         debugOutput(features);
                     }
                 });
-
-                //Little taste of home
-                mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.0907, 5.1214), 16));
             }
         });
-
     }
 
     private void debugOutput(List<Feature> features) {

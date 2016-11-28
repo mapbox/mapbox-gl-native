@@ -51,9 +51,6 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
             @Override
             public void onMapReady(final MapboxMap mapboxMap) {
                 QueryRenderedFeaturesBoxHighlightActivity.this.mapboxMap = mapboxMap;
-
-                //Add a fill layer to display stuff on
-
                 selectionBox.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -84,9 +81,6 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
                             .withProperties(fillColor(Color.RED)));
                     }
                 });
-
-                //Little taste of home
-                mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.0907, 5.1214), 16));
             }
         });
 

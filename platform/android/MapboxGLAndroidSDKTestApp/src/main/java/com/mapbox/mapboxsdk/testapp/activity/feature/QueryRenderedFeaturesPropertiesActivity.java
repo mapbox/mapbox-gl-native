@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -82,9 +81,6 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
                         mapboxMap.selectMarker(marker);
                     }
                 });
-
-                //Little taste of home
-                mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.0907, 5.1214), 16));
             }
         });
 
