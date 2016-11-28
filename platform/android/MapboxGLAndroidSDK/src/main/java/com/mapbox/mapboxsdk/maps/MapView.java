@@ -2547,7 +2547,8 @@ public class MapView extends FrameLayout {
             WILL_START_RENDERING_MAP,
             DID_FINISH_RENDERING_MAP,
             DID_FINISH_RENDERING_MAP_FULLY_RENDERED,
-            DID_FINISH_LOADING_STYLE
+            DID_FINISH_LOADING_STYLE,
+            SOURCE_DID_CHANGE
     })
     @Retention(RetentionPolicy.SOURCE)
     public @interface MapChange {
@@ -2722,6 +2723,18 @@ public class MapView extends FrameLayout {
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_LOADING_STYLE = 14;
+
+
+    /**
+     * This {@link MapChange} is triggered when a source attribution changes.
+     * <p>
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
+     * </p>
+     *
+     * @see MapChange
+     * @see MapView.OnMapChangedListener
+     */
+    public static final int SOURCE_DID_CHANGE = 15;
 
     /**
      * Interface definition for a callback to be invoked when the displayed map view changes.
