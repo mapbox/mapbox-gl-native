@@ -2590,11 +2590,19 @@ public:
     }
 
     void activate() override {
+        if (activationCount++) {
+            return;
+        }
+
         MGLOpenGLLayer *layer = (MGLOpenGLLayer *)nativeView.layer;
         [layer.openGLContext makeCurrentContext];
     }
 
     void deactivate() override {
+        if (--activationCount) {
+            return;
+        }
+
         [NSOpenGLContext clearCurrentContext];
     }
 
@@ -2640,6 +2648,9 @@ private:
 
     /// The current framebuffer of the NSOpenGLLayer we are painting to.
     GLint fbo = 0;
+
+    /// The reference counted count of activation calls
+    NSUInteger activationCount = 0;
 };
 
 @end
