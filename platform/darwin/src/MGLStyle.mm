@@ -223,7 +223,11 @@ static NSURL *MGLStyleURL_emerald;
          source];
     }
 
-    [source addToMapView:self.mapView];
+    try {
+        [source addToMapView:self.mapView];
+    } catch (std::runtime_error & err) {
+        [NSException raise:@"Could not add source" format:@"%s", err.what()];
+    }
 }
 
 - (void)removeSource:(MGLSource *)source
