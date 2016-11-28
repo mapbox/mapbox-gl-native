@@ -125,10 +125,12 @@ public final class CompassView extends ImageView implements Runnable {
     public void run() {
         if (isFacingNorth() && fadeCompassViewFacingNorth) {
             resetAnimation();
-            fadeAnimator = ViewCompat.animate(CompassView.this).alpha(0.0f).setDuration(TIME_FADE_ANIMATION).withLayer();
+            setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            fadeAnimator = ViewCompat.animate(CompassView.this).alpha(0.0f).setDuration(TIME_FADE_ANIMATION);
             fadeAnimator.setListener(new ViewPropertyAnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(View view) {
+                    setLayerType(LAYER_TYPE_NONE, null);
                     setVisibility(View.INVISIBLE);
                     resetAnimation();
                 }
