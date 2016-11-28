@@ -259,7 +259,7 @@ public class MapView extends FrameLayout {
         mapboxMap.setDebugActive(options.getDebugActive());
 
         CameraPosition position = options.getCamera();
-        if (!position.equals(CameraPosition.DEFAULT)) {
+        if (position != null && !position.equals(CameraPosition.DEFAULT)) {
             mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
             myLocationView.setTilt(position.tilt);
         }
