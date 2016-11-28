@@ -3,9 +3,12 @@
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/source_impl.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
+
+#include <memory>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -112,4 +115,22 @@ TEST(Style, Properties) {
     ASSERT_EQ(0, style.getDefaultBearing());
     ASSERT_EQ(0, style.getDefaultZoom());
     ASSERT_EQ(0, style.getDefaultPitch());
+}
+
+TEST(Style, DuplicateSource) {
+    util::RunLoop loop;
+
+    StubFileSource fileSource;
+    Style style { fileSource, 1.0 };
+
+    style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
+
+    style.addSource(std::make_unique<VectorSource>("sourceId", "mapbox://mapbox.mapbox-terrain-v2"));
+
+    try {
+        style.addSource(std::make_unique<VectorSource>("sourceId", "mapbox://mapbox.mapbox-terrain-v2"));
+        FAIL() << "Should not have been allowed to add a duplicate source id";
+    } catch (std::runtime_error) {
+        //Expected
+    }
 }
