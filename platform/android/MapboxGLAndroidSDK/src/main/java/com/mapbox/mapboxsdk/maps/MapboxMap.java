@@ -906,7 +906,7 @@ public class MapboxMap {
 
     /**
      * <p>
-     * Updates a marker on this map. Does nothing if the marker is already added.
+     * Updates a marker on this map. Does nothing if the marker isn't already added.
      * </p>
      *
      * @param updatedMarker An updated marker object.
