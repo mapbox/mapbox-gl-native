@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLMultiPoint (Private)
 
-- (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
+- (instancetype)initWithCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count;
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds;
 
 /** Constructs a shape annotation object, asking the delegate for style values. */

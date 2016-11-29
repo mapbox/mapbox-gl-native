@@ -18,7 +18,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
     std::vector<CLLocationCoordinate2D> _coordinates;
 }
 
-- (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
+- (instancetype)initWithCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
     self = [super init];
 
@@ -65,7 +65,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
     std::copy(_coordinates.begin() + range.location, _coordinates.begin() + NSMaxRange(range), coords);
 }
 
-- (void)appendCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
+- (void)appendCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
     [self willChangeValueForKey:@"coordinates"];
     _coordinates.insert(_coordinates.end(), count, *coords);
@@ -73,7 +73,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
     [self didChangeValueForKey:@"coordinates"];
 }
 
-- (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(CLLocationCoordinate2D *)coords
+- (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(const CLLocationCoordinate2D *)coords
 {
     if (range.length == 0)
     {

@@ -12,12 +12,12 @@ NS_ASSUME_NONNULL_BEGIN
     std::vector<CLLocationCoordinate2D> _coordinates;
 }
 
-+ (instancetype)pointCollectionWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
++ (instancetype)pointCollectionWithCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
     return [[self alloc] initWithCoordinates:coords count:count];
 }
 
-- (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count
+- (instancetype)initWithCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
     self = [super init];
     if (self)
