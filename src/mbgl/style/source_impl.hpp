@@ -3,6 +3,7 @@
 #include <mbgl/style/source.hpp>
 
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/tile/tile_id_hash.hpp>
 #include <mbgl/tile/tile_observer.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/tile_cache.hpp>
