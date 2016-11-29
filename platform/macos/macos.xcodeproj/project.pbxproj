@@ -58,7 +58,7 @@
 		55D9B4B11D005D3900C1CCE2 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D9B4B01D005D3900C1CCE2 /* libz.tbd */; };
 		DA0CD58E1CF56F5800A5F5A5 /* MGLFeatureTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */; };
 		DA2207BC1DC076940002F84D /* MGLStyleValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2207BB1DC076940002F84D /* MGLStyleValueTests.swift */; };
-		DA2DBBCB1D51E30A00D38FF9 /* MGLStyleLayerTests.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA2DBBCA1D51E30A00D38FF9 /* MGLStyleLayerTests.xib */; };
+		DA2DBBCB1D51E30A00D38FF9 /* MGLMapViewTests.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA2DBBCA1D51E30A00D38FF9 /* MGLMapViewTests.xib */; };
 		DA35A2A41CC9EB1A00E826B2 /* MGLCoordinateFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA35A2A61CC9EB2700E826B2 /* MGLCoordinateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */; };
 		DA35A2A81CC9F41600E826B2 /* MGLCoordinateFormatterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2A71CC9F41600E826B2 /* MGLCoordinateFormatterTests.m */; };
@@ -85,7 +85,7 @@
 		DA87A9981DC9D88400810D09 /* MGLGeoJSONSourceTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA87A9961DC9D88400810D09 /* MGLGeoJSONSourceTests.mm */; };
 		DA87A9991DC9D88400810D09 /* MGLTileSetTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA87A9971DC9D88400810D09 /* MGLTileSetTests.mm */; };
 		DA87A99C1DC9D8DD00810D09 /* MGLGeoJSONSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA87A99B1DC9D8DD00810D09 /* MGLGeoJSONSource_Private.h */; };
-		DA87A99D1DC9DB2E00810D09 /* MGLStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2DBBC81D51E26600D38FF9 /* MGLStyleLayerTests.m */; };
+		DA87A99D1DC9DB2E00810D09 /* MGLMapViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2DBBC81D51E26600D38FF9 /* MGLMapViewTests.m */; };
 		DA87A99E1DC9DC2100810D09 /* MGLFilterTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35C5D84B1D6DD75B00E95907 /* MGLFilterTests.mm */; };
 		DA87A9A01DC9DC6200810D09 /* MGLValueEvaluator.h in Headers */ = {isa = PBXBuildFile; fileRef = DA87A99F1DC9DC6200810D09 /* MGLValueEvaluator.h */; };
 		DA87A9A11DC9DCB400810D09 /* MGLRuntimeStylingHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8F257B1D51C5F40010E6B5 /* MGLRuntimeStylingHelper.m */; };
@@ -287,9 +287,9 @@
 		DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
 		DA2207BA1DC076930002F84D /* test-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "test-Bridging-Header.h"; sourceTree = "<group>"; };
 		DA2207BB1DC076940002F84D /* MGLStyleValueTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MGLStyleValueTests.swift; sourceTree = "<group>"; };
-		DA2DBBC71D51E26600D38FF9 /* MGLStyleLayerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLStyleLayerTests.h; path = ../darwin/test/MGLStyleLayerTests.h; sourceTree = SOURCE_ROOT; };
-		DA2DBBC81D51E26600D38FF9 /* MGLStyleLayerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLStyleLayerTests.m; path = ../darwin/test/MGLStyleLayerTests.m; sourceTree = SOURCE_ROOT; };
-		DA2DBBCA1D51E30A00D38FF9 /* MGLStyleLayerTests.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MGLStyleLayerTests.xib; sourceTree = "<group>"; };
+		DA2DBBC71D51E26600D38FF9 /* MGLMapViewTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLMapViewTests.h; path = ../darwin/test/MGLMapViewTests.h; sourceTree = SOURCE_ROOT; };
+		DA2DBBC81D51E26600D38FF9 /* MGLMapViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLMapViewTests.m; path = ../darwin/test/MGLMapViewTests.m; sourceTree = SOURCE_ROOT; };
+		DA2DBBCA1D51E30A00D38FF9 /* MGLMapViewTests.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MGLMapViewTests.xib; sourceTree = "<group>"; };
 		DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCoordinateFormatter.h; sourceTree = "<group>"; };
 		DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLCoordinateFormatter.m; sourceTree = "<group>"; };
 		DA35A2A71CC9F41600E826B2 /* MGLCoordinateFormatterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLCoordinateFormatterTests.m; path = ../../darwin/test/MGLCoordinateFormatterTests.m; sourceTree = "<group>"; };
@@ -636,8 +636,8 @@
 			isa = PBXGroup;
 			children = (
 				DA2207BA1DC076930002F84D /* test-Bridging-Header.h */,
-				DA2DBBC71D51E26600D38FF9 /* MGLStyleLayerTests.h */,
-				DA2DBBC81D51E26600D38FF9 /* MGLStyleLayerTests.m */,
+				DA2DBBC71D51E26600D38FF9 /* MGLMapViewTests.h */,
+				DA2DBBC81D51E26600D38FF9 /* MGLMapViewTests.m */,
 				DA8F25741D51C5F40010E6B5 /* MGLFillStyleLayerTests.m */,
 				DA8F25751D51C5F40010E6B5 /* MGLRasterStyleLayerTests.m */,
 				DA8F25761D51C5F40010E6B5 /* MGLSymbolStyleLayerTests.m */,
@@ -646,7 +646,7 @@
 				DA8F25791D51C5F40010E6B5 /* MGLBackgroundStyleLayerTests.m */,
 				DA8F257A1D51C5F40010E6B5 /* MGLRuntimeStylingHelper.h */,
 				DA8F257B1D51C5F40010E6B5 /* MGLRuntimeStylingHelper.m */,
-				DA2DBBCA1D51E30A00D38FF9 /* MGLStyleLayerTests.xib */,
+				DA2DBBCA1D51E30A00D38FF9 /* MGLMapViewTests.xib */,
 			);
 			name = Layers;
 			sourceTree = "<group>";
@@ -1134,7 +1134,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				35724FC41D630502002A4AB4 /* amsterdam.geojson in Resources */,
-				DA2DBBCB1D51E30A00D38FF9 /* MGLStyleLayerTests.xib in Resources */,
+				DA2DBBCB1D51E30A00D38FF9 /* MGLMapViewTests.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1233,7 +1233,7 @@
 				DA87A9A41DCACC5000810D09 /* MGLSymbolStyleLayerTests.m in Sources */,
 				DAE6C3D51CC34C9900DB3429 /* MGLOfflineStorageTests.m in Sources */,
 				DA87A9A61DCACC5000810D09 /* MGLCircleStyleLayerTests.m in Sources */,
-				DA87A99D1DC9DB2E00810D09 /* MGLStyleLayerTests.m in Sources */,
+				DA87A99D1DC9DB2E00810D09 /* MGLMapViewTests.m in Sources */,
 				DA87A99E1DC9DC2100810D09 /* MGLFilterTests.mm in Sources */,
 				DD58A4C91D822C6700E1F038 /* MGLExpressionTests.mm in Sources */,
 				DA87A9A71DCACC5000810D09 /* MGLBackgroundStyleLayerTests.m in Sources */,
