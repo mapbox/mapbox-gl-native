@@ -148,6 +148,13 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
 /**
  Returns a tile source initialized an identifier, tile URL templates, and
  options.
+ 
+ Tile URL template strings are a loose open standard for referring to custom
+ locations from which to download tiles, whether vector or raster. An example
+ template string is `http://myserver.com/tiles/{z}/{x}/{y}.pbf`.
+ 
+ In the current implementation, only the first tile URL template string
+ specified is used.
 
  After initializing and configuring the source, add it to a map view’s style
  using the `-[MGLStyle addSource:]` method.
@@ -159,6 +166,9 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
     `MGLTileSourceOption` for available keys and values. Pass in `nil` to use
     the default values.
  @return An initialized tile source.
+ 
+ @see <a href="https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames">OpenStreetMap's 
+    wiki page</a> for more information on tile URL template strings.
  */
 - (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options;
 
