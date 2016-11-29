@@ -1,9 +1,9 @@
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
-#import "MGLStyleLayerTests.h"
+#import "MGLMapViewTests.h"
 
-@interface MGLFillLayerTests : MGLStyleLayerTests
+@interface MGLFillLayerTests : MGLMapViewTests
 @end
 
 @implementation MGLFillLayerTests
