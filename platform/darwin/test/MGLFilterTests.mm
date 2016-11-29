@@ -1,10 +1,10 @@
-#import "MGLStyleLayerTests.h"
+#import "MGLMapViewTests.h"
 
 #import "NSPredicate+MGLAdditions.h"
 #import "MGLValueEvaluator.h"
 
 
-@interface MGLFilterTests : MGLStyleLayerTests {
+@interface MGLFilterTests : MGLMapViewTests {
     MGLGeoJSONSource *source;
     MGLLineStyleLayer *layer;
 }
