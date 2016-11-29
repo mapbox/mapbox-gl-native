@@ -10,6 +10,7 @@
 #include <mbgl/style/sources/custom_vector_source.hpp>
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/tile/tile_id.hpp>
 
 @interface MGLCustomVectorSource () {
     std::unique_ptr<mbgl::style::CustomVectorSource> _pendingSource;
@@ -44,10 +45,10 @@
                                                               y:y
                                                       zoomLevel:z];
                   } else {
-//                      mbgl::CanonicalTileID tileID = mbgl::CanonicalTileID(z, x, y);
-//                      mbgl::LatLngBounds tileBounds = mbgl::LatLngBounds(tileID);
-//                      data = [self.dataSource featuresInCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(tileBounds)
-//                                                               zoomLevel:z];
+                      mbgl::CanonicalTileID tileID = mbgl::CanonicalTileID(z, x, y);
+                      mbgl::LatLngBounds tileBounds = mbgl::LatLngBounds(tileID);
+                      data = [self.dataSource featuresInCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(tileBounds)
+                                                               zoomLevel:z];
                   }
                   [self processData:data
                             forTile:z x:x y:y];

@@ -1622,21 +1622,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 }
 
 #pragma mark - MGLCustomVectorSourceDataSource
-- (NSArray<id <MGLFeature>>*)featuresInTileAtX:(NSUInteger)x y:(NSUInteger)y zoomLevel:(NSUInteger)zoom {
-    int tilesAtThisZoom = 1 << zoom;
-    double lngWidth = 360.0 / tilesAtThisZoom;
-    CLLocationCoordinate2D southwest;
-    CLLocationCoordinate2D northeast;
-    southwest.longitude = -180 + (x * lngWidth);
-    northeast.longitude = southwest.longitude + lngWidth;
-    
-    double latHeightMerc = 1.0 / tilesAtThisZoom;
-    double topLatMerc = y * latHeightMerc;
-    double bottomLatMerc = topLatMerc + latHeightMerc;
-    
-    southwest.latitude = (180 / M_PI) * ((2 * atan(exp(M_PI * (1 - (2 * bottomLatMerc))))) - (M_PI / 2.0));
-    northeast.latitude = (180 / M_PI) * ((2 * atan(exp(M_PI * (1 - (2 * topLatMerc))))) - (M_PI / 2.0));
-    
+- (NSArray<id <MGLFeature>>*)featuresInCoordinateBounds:(MGLCoordinateBounds)bounds zoomLevel:(NSUInteger)zoom {
     double gridSpacing;
     if(zoom >= 13) {
         gridSpacing = 0.01;
@@ -1663,17 +1649,17 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     NSMutableArray <id <MGLFeature>> * features = [NSMutableArray array];
     CLLocationCoordinate2D coords[2];
     
-    for (double y = ceil(northeast.latitude / gridSpacing) * gridSpacing; y >= floor(southwest.latitude / gridSpacing) * gridSpacing; y -= gridSpacing) {
-        coords[0] = CLLocationCoordinate2DMake(y, southwest.longitude);
-        coords[1] = CLLocationCoordinate2DMake(y, northeast.longitude);
+    for (double y = ceil(bounds.ne.latitude / gridSpacing) * gridSpacing; y >= floor(bounds.sw.latitude / gridSpacing) * gridSpacing; y -= gridSpacing) {
+        coords[0] = CLLocationCoordinate2DMake(y, bounds.sw.longitude);
+        coords[1] = CLLocationCoordinate2DMake(y, bounds.ne.longitude);
         MGLPolylineFeature *feature = [MGLPolylineFeature polylineWithCoordinates:coords count:2];
         feature.attributes = @{@"value": @(y)};
         [features addObject:feature];
     }
     
-    for (double x = floor(southwest.longitude / gridSpacing) * gridSpacing; x <= ceil(northeast.longitude / gridSpacing) * gridSpacing; x += gridSpacing) {
-        coords[0] = CLLocationCoordinate2DMake(southwest.latitude, x);
-        coords[1] = CLLocationCoordinate2DMake(northeast.latitude, x);
+    for (double x = floor(bounds.sw.longitude / gridSpacing) * gridSpacing; x <= ceil(bounds.ne.longitude / gridSpacing) * gridSpacing; x += gridSpacing) {
+        coords[0] = CLLocationCoordinate2DMake(bounds.sw.latitude, x);
+        coords[1] = CLLocationCoordinate2DMake(bounds.ne.latitude, x);
         MGLPolylineFeature *feature = [MGLPolylineFeature polylineWithCoordinates:coords count:2];
         feature.attributes = @{@"value": @(x)};
         [features addObject:feature];
