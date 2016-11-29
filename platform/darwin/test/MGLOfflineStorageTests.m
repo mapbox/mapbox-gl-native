@@ -19,6 +19,7 @@
         }];
         if ([MGLOfflineStorage sharedOfflineStorage].packs) {
             [expectation fulfill];
+            [self waitForExpectationsWithTimeout:0 handler:nil];
         } else {
             [self waitForExpectationsWithTimeout:2 handler:nil];
         }
