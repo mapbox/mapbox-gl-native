@@ -152,6 +152,7 @@
 		40EDA1C01CFE0E0200D9EA68 /* MGLAnnotationContainerView.h in Headers */ = {isa = PBXBuildFile; fileRef = 40EDA1BD1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.h */; };
 		40EDA1C11CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 40EDA1BE1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.m */; };
 		40EDA1C21CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 40EDA1BE1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.m */; };
+		40F2631B1DECE003009B635C /* api_mapbox_staging.der in Resources */ = {isa = PBXBuildFile; fileRef = 40F2631A1DECE003009B635C /* api_mapbox_staging.der */; };
 		40F887701D7A1E58008ECB67 /* MGLGeoJSONSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 40F8876F1D7A1DB8008ECB67 /* MGLGeoJSONSource_Private.h */; };
 		40F887711D7A1E59008ECB67 /* MGLGeoJSONSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 40F8876F1D7A1DB8008ECB67 /* MGLGeoJSONSource_Private.h */; };
 		40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 40FDA76A1CCAAA6800442548 /* MBXAnnotationView.m */; };
@@ -294,7 +295,6 @@
 		DA8848751CBAFCC100AB86E3 /* mapbox@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA88486B1CBAFCC100AB86E3 /* mapbox@3x.png */; };
 		DA88487A1CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der in Resources */ = {isa = PBXBuildFile; fileRef = DA8848771CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der */; };
 		DA88487B1CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der in Resources */ = {isa = PBXBuildFile; fileRef = DA8848781CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der */; };
-		DA88487C1CBAFD5C00AB86E3 /* star_tilestream_net.der in Resources */ = {isa = PBXBuildFile; fileRef = DA8848791CBAFD5C00AB86E3 /* star_tilestream_net.der */; };
 		DA8848841CBB033F00AB86E3 /* FABAttributes.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848801CBB033F00AB86E3 /* FABAttributes.h */; };
 		DA8848851CBB033F00AB86E3 /* FABKitProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848811CBB033F00AB86E3 /* FABKitProtocol.h */; };
 		DA8848861CBB033F00AB86E3 /* Fabric+FABKits.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848821CBB033F00AB86E3 /* Fabric+FABKits.h */; };
@@ -309,7 +309,6 @@
 		DA8933DC1CCD31D400E68420 /* Foundation.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DA8933BD1CCD2CAD00E68420 /* Foundation.stringsdict */; };
 		DA8933DD1CCD31D400E68420 /* api_mapbox_com-digicert.der in Resources */ = {isa = PBXBuildFile; fileRef = DA8848771CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der */; };
 		DA8933DE1CCD31D400E68420 /* api_mapbox_com-geotrust.der in Resources */ = {isa = PBXBuildFile; fileRef = DA8848781CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der */; };
-		DA8933DF1CCD31D400E68420 /* star_tilestream_net.der in Resources */ = {isa = PBXBuildFile; fileRef = DA8848791CBAFD5C00AB86E3 /* star_tilestream_net.der */; };
 		DA8933E01CCD31DF00E68420 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA89339F1CCC951200E68420 /* Localizable.strings */; };
 		DA8933E11CCD31DF00E68420 /* Compass.png in Resources */ = {isa = PBXBuildFile; fileRef = DA8848631CBAFCC100AB86E3 /* Compass.png */; };
 		DA8933E21CCD31DF00E68420 /* Compass@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA8848641CBAFCC100AB86E3 /* Compass@2x.png */; };
@@ -582,6 +581,7 @@
 		40CFA6501D787579008103BD /* MGLGeoJSONSourceTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLGeoJSONSourceTests.mm; path = ../../darwin/test/MGLGeoJSONSourceTests.mm; sourceTree = "<group>"; };
 		40EDA1BD1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationContainerView.h; sourceTree = "<group>"; };
 		40EDA1BE1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLAnnotationContainerView.m; sourceTree = "<group>"; };
+		40F2631A1DECE003009B635C /* api_mapbox_staging.der */ = {isa = PBXFileReference; lastKnownFileType = file; name = api_mapbox_staging.der; path = ../../default/resources/api_mapbox_staging.der; sourceTree = "<group>"; };
 		40F8876F1D7A1DB8008ECB67 /* MGLGeoJSONSource_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLGeoJSONSource_Private.h; sourceTree = "<group>"; };
 		40FDA7691CCAAA6800442548 /* MBXAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXAnnotationView.h; sourceTree = "<group>"; };
 		40FDA76A1CCAAA6800442548 /* MBXAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXAnnotationView.m; sourceTree = "<group>"; };
@@ -720,7 +720,6 @@
 		DA88486B1CBAFCC100AB86E3 /* mapbox@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mapbox@3x.png"; sourceTree = "<group>"; };
 		DA8848771CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der */ = {isa = PBXFileReference; lastKnownFileType = file; name = "api_mapbox_com-digicert.der"; path = "../../default/resources/api_mapbox_com-digicert.der"; sourceTree = "<group>"; };
 		DA8848781CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der */ = {isa = PBXFileReference; lastKnownFileType = file; name = "api_mapbox_com-geotrust.der"; path = "../../default/resources/api_mapbox_com-geotrust.der"; sourceTree = "<group>"; };
-		DA8848791CBAFD5C00AB86E3 /* star_tilestream_net.der */ = {isa = PBXFileReference; lastKnownFileType = file; name = star_tilestream_net.der; path = ../../default/resources/star_tilestream_net.der; sourceTree = "<group>"; };
 		DA8848801CBB033F00AB86E3 /* FABAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FABAttributes.h; sourceTree = "<group>"; };
 		DA8848811CBB033F00AB86E3 /* FABKitProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FABKitProtocol.h; sourceTree = "<group>"; };
 		DA8848821CBB033F00AB86E3 /* Fabric+FABKits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Fabric+FABKits.h"; sourceTree = "<group>"; };
@@ -1138,9 +1137,9 @@
 			children = (
 				DA89339F1CCC951200E68420 /* Localizable.strings */,
 				DAC49C5F1CD02BC9009E1AA3 /* Localizable.stringsdict */,
+				40F2631A1DECE003009B635C /* api_mapbox_staging.der */,
 				DA8848771CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der */,
 				DA8848781CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der */,
-				DA8848791CBAFD5C00AB86E3 /* star_tilestream_net.der */,
 				DA8848631CBAFCC100AB86E3 /* Compass.png */,
 				DA8848641CBAFCC100AB86E3 /* Compass@2x.png */,
 				DA8848651CBAFCC100AB86E3 /* Compass@3x.png */,
@@ -1816,18 +1815,18 @@
 				DA8848731CBAFCC100AB86E3 /* mapbox.png in Resources */,
 				DA8933BC1CCD2CA100E68420 /* Foundation.strings in Resources */,
 				DA8848741CBAFCC100AB86E3 /* mapbox@2x.png in Resources */,
+				DA88487B1CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der in Resources */,
 				DA88487A1CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der in Resources */,
+				40F2631B1DECE003009B635C /* api_mapbox_staging.der in Resources */,
 				DA8933A31CCC95B000E68420 /* Localizable.strings in Resources */,
 				DA88486D1CBAFCC100AB86E3 /* Compass.png in Resources */,
 				DA8848721CBAFCC100AB86E3 /* default_marker@3x.png in Resources */,
-				DA88487C1CBAFD5C00AB86E3 /* star_tilestream_net.der in Resources */,
 				DA88486F1CBAFCC100AB86E3 /* Compass@3x.png in Resources */,
 				DA88486E1CBAFCC100AB86E3 /* Compass@2x.png in Resources */,
 				DA8848701CBAFCC100AB86E3 /* default_marker.png in Resources */,
 				DA8848711CBAFCC100AB86E3 /* default_marker@2x.png in Resources */,
 				DA8933F01CCD387900E68420 /* strip-frameworks.sh in Resources */,
 				DA8848751CBAFCC100AB86E3 /* mapbox@3x.png in Resources */,
-				DA88487B1CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der in Resources */,
 				DAC49C5C1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */,
 				DA8933BF1CCD2CAD00E68420 /* Foundation.stringsdict in Resources */,
 			);
@@ -1852,7 +1851,6 @@
 				DA8933DD1CCD31D400E68420 /* api_mapbox_com-digicert.der in Resources */,
 				DAC49C5D1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */,
 				DA8933DE1CCD31D400E68420 /* api_mapbox_com-geotrust.der in Resources */,
-				DA8933DF1CCD31D400E68420 /* star_tilestream_net.der in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
