@@ -5093,16 +5093,28 @@ public:
 
     void activate() override
     {
+        if (activationCount++)
+        {
+            return;
+        }
+
         [EAGLContext setCurrentContext:nativeView.context];
     }
 
     void deactivate() override
     {
+        if (--activationCount)
+        {
+            return;
+        }
+
         [EAGLContext setCurrentContext:nil];
     }
 
 private:
     __weak MGLMapView *nativeView = nullptr;
+
+    NSUInteger activationCount = 0;
 };
 
 @end
