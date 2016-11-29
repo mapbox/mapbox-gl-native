@@ -656,13 +656,12 @@ const NSTimeInterval MGLFlushInterval = 180;
         double accuracy = 10000000;
         double lat = floor(loc.coordinate.latitude * accuracy) / accuracy;
         double lng = floor(loc.coordinate.longitude * accuracy) / accuracy;
-        double horizontalAccuracy = loc.horizontalAccuracy;
         NSString *formattedDate = [self.rfc3339DateFormatter stringFromDate:loc.timestamp];
         [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{MGLEventKeyCreated: formattedDate,
                                                                          MGLEventKeyLatitude: @(lat),
                                                                          MGLEventKeyLongitude: @(lng),
                                                                          MGLEventKeyAltitude: @(round(loc.altitude)),
-                                                                         MGLEventHorizontalAccuracy: @(horizontalAccuracy)}];
+                                                                         MGLEventHorizontalAccuracy: @(loc.horizontalAccuracy)}];
     }
 }
 
