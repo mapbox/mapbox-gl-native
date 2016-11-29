@@ -514,6 +514,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapView:(MGLMapView *)mapView tapOnCalloutForAnnotation:(id <MGLAnnotation>)annotation;
 
+/**
+ Tells the delegate that the user tapped on the map, but not on an annotation.
+ 
+ This method is called when then user taps on the map, but the tap does not select an annotation.
+ It is called if an annotation was previously selected, and this tap causes it to be deselected.
+ 
+ @param mapView The map view containing the specified annotation.
+ @param coordinate The coordinate of the point on the map that was tapped.
+ */
+- (void)mapView:(MGLMapView *)mapView tapAtCoordinate:(CLLocationCoordinate2D)coordinate;
+
 @end
 
 NS_ASSUME_NONNULL_END

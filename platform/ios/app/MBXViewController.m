@@ -1544,4 +1544,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     }
 }
 
+
+- (void)mapView:(MGLMapView *)mapView tapAtCoordinate:(CLLocationCoordinate2D)coordinate
+{
+  NSLog(@"Did tap: %f,%f", coordinate.latitude, coordinate.longitude);
+}
+
 @end
