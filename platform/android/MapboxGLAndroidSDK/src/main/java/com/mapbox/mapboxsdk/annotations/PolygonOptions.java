@@ -35,11 +35,24 @@ public final class PolygonOptions implements Parcelable {
         strokeColor(in.readInt());
     }
 
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     *
+     * @return integer 0.
+     */
     @Override
     public int describeContents() {
         return 0;
     }
 
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param out   The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written. May be 0 or
+     *              {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
     @Override
     public void writeToParcel(Parcel out, int flags) {
         out.writeList(getPoints());
@@ -50,15 +63,30 @@ public final class PolygonOptions implements Parcelable {
 
     private Polygon polygon;
 
+    /**
+     * Defines options for a polygon.
+     */
     public PolygonOptions() {
         polygon = new Polygon();
     }
 
+    /**
+     * Adds a vertex to the outline of the polygon being built.
+     *
+     * @param point {@link LatLng} point to be added to polygon geometry.
+     * @return This {@link PolygonOptions} object with the given point added to the outline.
+     */
     public PolygonOptions add(LatLng point) {
         polygon.addPoint(point);
         return this;
     }
 
+    /**
+     * Adds vertices to the outline of the polygon being built.
+     *
+     * @param points {@link LatLng} points to be added to polygon geometry.
+     * @return This {@link PolygonOptions} object with the given points added to the outline.
+     */
     public PolygonOptions add(LatLng... points) {
         for (LatLng point : points) {
             add(point);
@@ -66,6 +94,13 @@ public final class PolygonOptions implements Parcelable {
         return this;
     }
 
+    /**
+     * Adds vertices to the outline of the polygon being built.
+     *
+     * @param points {@link Iterable} list made up of {@link LatLng} points defining the polygon
+     *               geometry
+     * @return This {@link PolygonOptions} object with the given points added to the outline.
+     */
     public PolygonOptions addAll(Iterable<LatLng> points) {
         for (LatLng point : points) {
             add(point);
@@ -73,26 +108,42 @@ public final class PolygonOptions implements Parcelable {
         return this;
     }
 
+    /**
+     * Set the alpha value of the polyline.
+     *
+     * @param alpha float value between 0 (not visible) and 1.
+     * @return This {@link PolygonOptions} object with the given polygon alpha value.
+     */
     public PolygonOptions alpha(float alpha) {
         polygon.setAlpha(alpha);
         return this;
     }
 
+    /**
+     * Gets the alpha set for this {@link PolygonOptions} object.
+     *
+     * @return float value between 0 and 1 defining the alpha.
+     */
     public float getAlpha() {
         return polygon.getAlpha();
     }
 
     /**
-     * Sets the color of the polygon.
+     * Specifies the polygon's fill color, as 32-bit ARGB. The default color is black.
      *
-     * @param color - the color in ARGB format
-     * @return PolygonOptions - the options object
+     * @param color 32-bit ARGB color.
+     * @return This {@link PolylineOptions} object with a new color set.
      */
     public PolygonOptions fillColor(int color) {
         polygon.setFillColor(color);
         return this;
     }
 
+    /**
+     * Gets the fill color set for this {@link PolygonOptions} object.
+     *
+     * @return The fill color of the polygon in ARGB format.
+     */
     public int getFillColor() {
         return polygon.getFillColor();
     }
@@ -107,16 +158,21 @@ public final class PolygonOptions implements Parcelable {
     }
 
     /**
-     * Sets the color of the stroke of the polygon.
+     * Specifies the polygon's stroke color, as 32-bit ARGB. The default color is black.
      *
-     * @param color - the color in ARGB format
-     * @return PolygonOptions - the options object
+     * @param color 32-bit ARGB color.
+     * @return This {@link PolygonOptions} object with a new stroke color set.
      */
     public PolygonOptions strokeColor(int color) {
         polygon.setStrokeColor(color);
         return this;
     }
 
+    /**
+     * Gets the stroke color set for this {@link PolygonOptions} object.
+     *
+     * @return The stroke color of the polygon in ARGB format.
+     */
     public int getStrokeColor() {
         return polygon.getStrokeColor();
     }
@@ -126,6 +182,14 @@ public final class PolygonOptions implements Parcelable {
         return polygon.getPoints();
     }
 
+    /**
+     * Compares this {@link PolygonOptions} object with another {@link PolygonOptions} and
+     * determines if their color, alpha, stroke color, and vertices match.
+     *
+     * @param o Another {@link PolygonOptions} to compare with this object.
+     * @return True if color, alpha, stroke color, and vertices match this {@link PolygonOptions}
+     * object. Else, false.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -139,6 +203,14 @@ public final class PolygonOptions implements Parcelable {
         return !(getPoints() != null ? !getPoints().equals(polygon.getPoints()) : polygon.getPoints() != null);
     }
 
+    /**
+     * Gives an integer which can be used as the bucket number for storing elements of the set/map.
+     * This bucket number is the address of the element inside the set/map. There's no guarantee
+     * that this hash value will be consistent between different Java implementations, or even
+     * between different execution runs of the same program.
+     *
+     * @return integer value you can use for storing element.
+     */
     @Override
     public int hashCode() {
         int result = 1;

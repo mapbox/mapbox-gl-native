@@ -10,9 +10,19 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**
- * Marker is an annotation that shows an icon image at a geographical location.
+ * Marker is an annotation that shows an icon image at a geographical location. The default marker
+ * uses a provided icon. This icon can be customized using {@link IconFactory} to generate an
+ * {@link Icon} using a provided image. Markers are added to the map by first giving a
+ * {@link LatLng} and using {@link MapboxMap#addMarker(MarkerOptions)}. The marker icon will be
+ * centered at this position so it is common to add padding to the icon image before usage.
  * <p>
- * An {@link InfoWindow} can be shown when a Marker is pressed
+ * If more customization is needed, we offer {@link MarkerView} which places a {@link View} on top
+ * of the map at a geographical location.
+ * </p>
+ * <p>
+ * Markers are designed to be interactive. They receive click events by default, and are often used
+ * with event listeners to bring up info windows. An {@link InfoWindow} is displayed by default when
+ * either a title or snippet is provided.
  * </p>
  */
 public class Marker extends Annotation {
@@ -35,6 +45,11 @@ public class Marker extends Annotation {
         super();
     }
 
+    /**
+     * Creates a instance of {@link Marker} using the builder of Marker.
+     *
+     * @param baseMarkerOptions The builder used to construct the Marker.
+     */
     public Marker(BaseMarkerOptions baseMarkerOptions) {
         position = baseMarkerOptions.position;
         snippet = baseMarkerOptions.snippet;
@@ -56,20 +71,35 @@ public class Marker extends Annotation {
         this.snippet = snippet;
     }
 
+    /**
+     * Returns the position of the marker.
+     *
+     * @return A {@link LatLng} object specifying the marker's current position.
+     */
     public LatLng getPosition() {
         return position;
     }
 
+    /**
+     * Gets the snippet of the marker.
+     *
+     * @return A string containing the marker's snippet.
+     */
     public String getSnippet() {
         return snippet;
     }
 
+    /**
+     * Gets the snippet of the marker.
+     *
+     * @return A string containing the marker's snippet.
+     */
     public String getTitle() {
         return title;
     }
 
     /**
-     * Do not use this method. Used internally by the SDK.
+     * Do not use this method, used internally by the SDK.
      */
     public void hideInfoWindow() {
         if (infoWindow != null) {
@@ -79,7 +109,7 @@ public class Marker extends Annotation {
     }
 
     /**
-     * Do not use this method. Used internally by the SDK.
+     * Do not use this method, used internally by the SDK.
      *
      * @return true if the infoWindow is shown
      */
@@ -88,9 +118,9 @@ public class Marker extends Annotation {
     }
 
     /**
-     * Sets the position.
+     * Sets the location of the marker.
      *
-     * @param position new position
+     * @param position A {@link LatLng} defining the marker position.
      */
     public void setPosition(LatLng position) {
         this.position = position;
@@ -100,15 +130,21 @@ public class Marker extends Annotation {
         }
     }
 
+    /**
+     * Sets the snippet of the marker.
+     *
+     * @param snippet A String used in the marker info window. If {@code null}, the snippet is
+     *                cleared.
+     */
     public void setSnippet(String snippet) {
         this.snippet = snippet;
         refreshInfoWindowContent();
     }
 
     /**
-     * Sets the icon.
+     * Sets the icon of the marker.
      *
-     * @param icon The icon to be used as Marker image
+     * @param icon The {@link Icon} to be used as Marker image
      */
     public void setIcon(@Nullable Icon icon) {
         this.icon = icon;
@@ -118,15 +154,33 @@ public class Marker extends Annotation {
         }
     }
 
+    /**
+     * Gets the {@link Icon} currently used for the marker. If no Icon was set for the marker, the
+     * default icon will be returned.
+     *
+     * @return The {@link Icon} the marker is using.
+     */
     public Icon getIcon() {
         return icon;
     }
 
+    /**
+     * Sets the title of the marker.
+     *
+     * @param title A String used in the marker info window. If {@code null}, the title is
+     *              cleared.
+     */
     public void setTitle(String title) {
         this.title = title;
         refreshInfoWindowContent();
     }
 
+    /**
+     * Gets the {@link InfoWindow} the marker is using. If the marker hasn't had an info window
+     * defined, this will return {@code null}.
+     *
+     * @return
+     */
     @Nullable
     public InfoWindow getInfoWindow() {
         return infoWindow;
@@ -150,11 +204,12 @@ public class Marker extends Annotation {
     }
 
     /**
-     * Do not use this method. Used internally by the SDK.
+     * Do not use this method, used internally by the SDK. Use {@link MapboxMap#selectMarker(Marker)}
+     * if you want to programmatically display the markers info window.
      *
-     * @param mapboxMap the hosting mapbox map
-     * @param mapView   the hosting map view
-     * @return the info window that was shown
+     * @param mapboxMap The hosting mapbox map.
+     * @param mapView   The hosting map view.
+     * @return The info window that was shown.
      */
     public InfoWindow showInfoWindow(@NonNull MapboxMap mapboxMap, @NonNull MapView mapView) {
         setMapboxMap(mapboxMap);
@@ -191,7 +246,7 @@ public class Marker extends Annotation {
     }
 
     /**
-     * Do not use this method. Used internally by the SDK.
+     * Do not use this method, used internally by the SDK.
      *
      * @param topOffsetPixels the top offset pixels.
      */
@@ -200,7 +255,7 @@ public class Marker extends Annotation {
     }
 
     /**
-     * Do not use this method. Used internally by the SDK.
+     * Do not use this method, used internally by the SDK.
      *
      * @param rightOffsetPixels the right offset pixels.
      */
@@ -208,6 +263,11 @@ public class Marker extends Annotation {
         this.rightOffsetPixels = rightOffsetPixels;
     }
 
+    /**
+     * Returns a String with the marker position.
+     *
+     * @return A String with the marker position.
+     */
     @Override
     public String toString() {
         return "Marker [position[" + getPosition() + "]]";

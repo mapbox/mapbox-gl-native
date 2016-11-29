@@ -10,13 +10,17 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 /**
  * builder class for composing MarkerView objects.
  * <p>
- * Do not extend this class directly but extend BaseMarkerViewOptions instead.
+ * Do not extend this class directly but extend {@link BaseMarkerViewOptions} instead.
  * </p>
  */
 public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerViewOptions> {
 
     private MarkerView marker;
 
+    /**
+     * Defines default options for a MarkerView. Extend {@link BaseMarkerViewOptions} if you need
+     * more customization.
+     */
     public MarkerViewOptions() {
         marker = new MarkerView();
     }
@@ -41,16 +45,34 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         }
     }
 
+    /**
+     * Get the instance of the object for which this method was called.
+     *
+     * @return the object for which this method was called.
+     */
     @Override
     public MarkerViewOptions getThis() {
         return this;
     }
 
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     *
+     * @return integer 0.
+     */
     @Override
     public int describeContents() {
         return 0;
     }
 
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param out   The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written. May be 0 or
+     *              {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
     @Override
     public void writeToParcel(Parcel out, int flags) {
         out.writeParcelable(getPosition(), flags);
@@ -72,12 +94,17 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         }
     }
 
+    /**
+     * Get the {@link MarkerView}.
+     *
+     * @return {@link MarkerView}.
+     */
     @Override
     public MarkerView getMarker() {
         if (position == null) {
             throw new InvalidMarkerPositionException();
         }
-        
+
         marker.setPosition(position);
         marker.setSnippet(snippet);
         marker.setTitle(title);
@@ -102,6 +129,14 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         }
     };
 
+    /**
+     * Compares this {@link MarkerViewOptions} object with another {@link MarkerViewOptions} and
+     * determines if they match.
+     *
+     * @param o Another {@link MarkerViewOptions} to compare with this object.
+     * @return True if the {@link MarkerViewOptions} being passed in matches this
+     * {@link PolylineOptions} object. Else, false.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -110,6 +145,14 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         return marker != null ? marker.equals(that.marker) : that.marker == null;
     }
 
+    /**
+     * Gives an integer which can be used as the bucket number for storing elements of the set/map.
+     * This bucket number is the address of the element inside the set/map. There's no guarantee
+     * that this hash value will be consistent between different Java implementations, or even
+     * between different execution runs of the same program.
+     *
+     * @return integer value you can use for storing element.
+     */
     @Override
     public int hashCode() {
         return marker != null ? marker.hashCode() : 0;
