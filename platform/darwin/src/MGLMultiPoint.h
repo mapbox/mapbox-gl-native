@@ -56,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param coords The array of coordinates defining the shape. The data in this
     array is copied to the object.
  */
-- (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(CLLocationCoordinate2D *)coords;
+- (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(const CLLocationCoordinate2D *)coords;
 
 /**
  Appends one or more coordinates for the shape, which will instantaneously
@@ -66,7 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
     array is copied to the new object.
  @param count The number of items in the `coords` array.
  */
-- (void)appendCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
+- (void)appendCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count;
 
 @end
 

@@ -9,7 +9,7 @@
 
 @dynamic overlayBounds;
 
-+ (instancetype)polylineWithCoordinates:(CLLocationCoordinate2D *)coords
++ (instancetype)polylineWithCoordinates:(const CLLocationCoordinate2D *)coords
                                   count:(NSUInteger)count
 {
     return [[self alloc] initWithCoordinates:coords count:count];
