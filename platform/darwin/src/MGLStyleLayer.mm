@@ -3,10 +3,6 @@
 
 #include <mbgl/style/layer.hpp>
 
-@interface MGLStyleLayer ()
-
-@end
-
 @implementation MGLStyleLayer
 
 - (instancetype)initWithIdentifier:(NSString *)identifier
@@ -19,6 +15,8 @@
 
 - (void)setVisible:(BOOL)visible
 {
+    MGLAssertStyleLayerIsValid();
+
     mbgl::style::VisibilityType v = visible
     ? mbgl::style::VisibilityType::Visible
     : mbgl::style::VisibilityType::None;
@@ -27,27 +25,37 @@
 
 - (BOOL)isVisible
 {
+    MGLAssertStyleLayerIsValid();
+
     mbgl::style::VisibilityType v = self.rawLayer->getVisibility();
     return (v == mbgl::style::VisibilityType::Visible);
 }
 
 - (void)setMaximumZoomLevel:(float)maximumZoomLevel
 {
+    MGLAssertStyleLayerIsValid();
+
     self.rawLayer->setMaxZoom(maximumZoomLevel);
 }
 
 - (float)maximumZoomLevel
 {
+    MGLAssertStyleLayerIsValid();
+
     return self.rawLayer->getMaxZoom();
 }
 
 - (void)setMinimumZoomLevel:(float)minimumZoomLevel
 {
+    MGLAssertStyleLayerIsValid();
+
     self.rawLayer->setMinZoom(minimumZoomLevel);
 }
 
 - (float)minimumZoomLevel
 {
+    MGLAssertStyleLayerIsValid();
+    
     return self.rawLayer->getMinZoom();
 }
 

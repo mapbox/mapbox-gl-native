@@ -5,6 +5,25 @@
 
 #include <mbgl/style/layer.hpp>
 
+/**
+ Assert that the style layer is valid.
+
+ This macro should be used at the beginning of any public-facing instance method
+ of `MGLStyleLayer` and its subclasses. For private methods, an assertion is more appropriate.
+ */
+#define MGLAssertStyleLayerIsValid() \
+    do { \
+        if (!self.rawLayer) { \
+            [NSException raise:@"Invalid style layer" \
+                        format: \
+            @"-[MGLStyle removeLayer:] has been called " \
+            @"with this instance but another style layer instance was added with the same identifer. It is an " \
+            @"error to send any message to this layer since it cannot be recovered after removal due to the " \
+            @"identifer collision. Use unique identifiers for all layer instances including layers of " \
+            @"different types."]; \
+        } \
+    } while (NO);
+
 @class MGLMapView;
 
 @interface MGLStyleLayer (Private)

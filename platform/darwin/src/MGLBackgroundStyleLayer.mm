@@ -50,42 +50,65 @@
 
 - (void)removeFromMapView:(MGLMapView *)mapView
 {
+    _pendingLayer = nullptr;
+    _rawLayer = nullptr;
+
     auto removedLayer = mapView.mbglMap->removeLayer(self.identifier.UTF8String);
     if (!removedLayer) {
         return;
     }
-    _pendingLayer = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::BackgroundLayer> &>(removedLayer));
+
+    mbgl::style::BackgroundLayer *layer = dynamic_cast<mbgl::style::BackgroundLayer *>(removedLayer.get());
+    if (!layer) {
+        return;
+    }
+
+    removedLayer.release();
+
+    _pendingLayer = std::unique_ptr<mbgl::style::BackgroundLayer>(layer);
     _rawLayer = _pendingLayer.get();
 }
 
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setBackgroundColor:(MGLStyleValue<MGLColor *> *)backgroundColor {
+    MGLAssertStyleLayerIsValid();
+
     auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue(backgroundColor);
     _rawLayer->setBackgroundColor(mbglValue);
 }
 
 - (MGLStyleValue<MGLColor *> *)backgroundColor {
+    MGLAssertStyleLayerIsValid();
+
     auto propertyValue = _rawLayer->getBackgroundColor() ?: _rawLayer->getDefaultBackgroundColor();
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
 }
 
 - (void)setBackgroundOpacity:(MGLStyleValue<NSNumber *> *)backgroundOpacity {
+    MGLAssertStyleLayerIsValid();
+
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(backgroundOpacity);
     _rawLayer->setBackgroundOpacity(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)backgroundOpacity {
+    MGLAssertStyleLayerIsValid();
+
     auto propertyValue = _rawLayer->getBackgroundOpacity() ?: _rawLayer->getDefaultBackgroundOpacity();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
 - (void)setBackgroundPattern:(MGLStyleValue<NSString *> *)backgroundPattern {
+    MGLAssertStyleLayerIsValid();
+
     auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(backgroundPattern);
     _rawLayer->setBackgroundPattern(mbglValue);
 }
 
 - (MGLStyleValue<NSString *> *)backgroundPattern {
+    MGLAssertStyleLayerIsValid();
+
     auto propertyValue = _rawLayer->getBackgroundPattern() ?: _rawLayer->getDefaultBackgroundPattern();
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
