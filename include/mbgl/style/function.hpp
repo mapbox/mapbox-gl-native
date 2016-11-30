@@ -20,22 +20,18 @@ public:
     float getBase() const { return base; }
     const std::vector<std::pair<float, T>>& getStops() const { return stops; }
 
+    friend bool operator==(const Function& lhs, const Function& rhs) {
+        return lhs.base == rhs.base && lhs.stops == rhs.stops;
+    }
+
+    friend bool operator!=(const Function& lhs, const Function& rhs) {
+        return !(lhs == rhs);
+    }
+
 private:
     float base = 1;
     std::vector<std::pair<float, T>> stops;
-
-    template <class S> friend bool operator==(const Function<S>&, const Function<S>&);
 };
-
-template <class T>
-bool operator==(const Function<T>& lhs, const Function<T>& rhs) {
-    return lhs.base == rhs.base && lhs.stops == rhs.stops;
-}
-
-template <class T>
-bool operator!=(const Function<T>& lhs, const Function<T>& rhs) {
-    return !(lhs == rhs);
-}
 
 } // namespace style
 } // namespace mbgl
