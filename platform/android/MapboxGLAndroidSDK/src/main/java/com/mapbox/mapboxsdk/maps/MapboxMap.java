@@ -1034,19 +1034,41 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions) {
+       return addMarker(markerOptions, null);
+    }
+
+    /**
+     * <p>
+     * Adds a marker to this map.
+     * </p>
+     * The marker's icon is rendered on the map at the location {@code Marker.position}.
+     * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
+     *
+     * @param markerOptions A marker options object that defines how to render the marker.
+     * @param onMarkerViewAddedListener Callback invoked when the View has been added to the map.
+     * @return The {@code Marker} that was added to the map.
+     */
+    @UiThread
+    @NonNull
+    public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions, final MarkerViewManager.OnMarkerViewAddedListener onMarkerViewAddedListener) {
+        final MarkerView marker = prepareViewMarker(markerOptions);
+
         // listen for a render event, so we can invalidate MarkerViews
         mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
             @Override
             public void onMapChanged(@MapView.MapChange int change) {
                 if (change == MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
                     markerViewManager.invalidateViewMarkersInVisibleRegion();
+                    if(onMarkerViewAddedListener !=null && markerViewManager.getView(marker)!=null){
+                        // checking if view is also found in current viewport.
+                        onMarkerViewAddedListener.onViewAdded(marker);
+                    }
                     mapView.removeOnMapChangedListener(this);
                 }
             }
         });
 
         // add marker to map
-        MarkerView marker = prepareViewMarker(markerOptions);
         marker.setMapboxMap(this);
         long id = mapView.addMarker(marker);
         marker.setId(id);

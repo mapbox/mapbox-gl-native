@@ -270,7 +270,6 @@ public class MarkerViewManager {
         select(marker, convertView, adapter, true);
     }
 
-
     /**
      * Animate a MarkerView to a selected state.
      * <p>
@@ -296,11 +295,22 @@ public class MarkerViewManager {
     }
 
     /**
-     * Get view representation from a MarkerView. If marker is not found in current viewport,
-     * {@code null} is returned.
+     * Get the View representation for a MarkerView.
+     * <p>
+     * Note that this method returns null in following situations:
+     * </p>
+     * <p><ul>
+     * <li>The MarkerView isn't rendered yet, adding a marker is an asynchronous operation</li>
+     * <li>The MarkerView isn't found in the Map viewport, related View has been recycled</li>
+     * </ul><p>
+     * <p>
+     * To handle the asynchronous addition, you can register to Map change events with
+     * {@link MapView#addOnMapChangedListener(MapView.OnMapChangedListener)} and validate if
+     * the View has been added.
+     * </p>
      *
-     * @param marker the marker to get the view.
-     * @return the Android SDK View object.
+     * @param marker the marker to get the view representation for
+     * @return the android SDK View representing the MarkerView
      */
     @Nullable
     public View getView(MarkerView marker) {
@@ -308,10 +318,10 @@ public class MarkerViewManager {
     }
 
     /**
-     * Get the view adapter for a marker.
+     * Get the MarkerViewAdapter for a MarkerView.
      *
-     * @param markerView the marker to get the view adapter.
-     * @return the MarkerView adapter.
+     * @param markerView the MarkerView to get the adapter for
+     * @return the MarkerViewAdapter is there is one available for the provided MarkerView
      */
     @Nullable
     public MapboxMap.MarkerViewAdapter getViewAdapter(MarkerView markerView) {
@@ -578,5 +588,22 @@ public class MarkerViewManager {
         private static class ViewHolder {
             ImageView imageView;
         }
+    }
+
+    /**
+     * Interface definition invoked when the View of a MarkerView has been added to the map.
+     * <p>
+     * This callback will be invoked as a result of {@link MapboxMap#addMarker(BaseMarkerOptions)}
+     * and only when the related MarkerView is found in the viewport of the map.
+     * </p>
+     */
+    public interface OnMarkerViewAddedListener {
+
+        /**
+         * Invoked when the View of a MarkerView has been added to the Map.
+         *
+         * @param markerView The MarkerView the View was added for
+         */
+        void onViewAdded(@NonNull  MarkerView markerView);
     }
 }
