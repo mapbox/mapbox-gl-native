@@ -5,6 +5,9 @@
 
 #import <Mapbox/Mapbox.h>
 
+#include <OpenGL/gl.h>
+#include <OpenGL/glext.h>
+
 static NSString * const MGLDroppedPinAnnotationImageIdentifier = @"dropped";
 
 static const CLLocationCoordinate2D WorldTourDestinations[] = {
@@ -604,6 +607,80 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         cos(angle) * 20);
 }
 
+- (IBAction)insertCustomStyleLayer:(id)sender {
+    [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
+        [self removeCustomStyleLayer:sender];
+    }];
+    
+    if (!self.undoManager.isUndoing) {
+        [self.undoManager setActionName:@"Add Lime Green Layer"];
+    }
+    
+    static const GLchar *vertexShaderSource = "attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0, 1); }";
+    static const GLchar *fragmentShaderSource = "void main() { gl_FragColor = vec4(0, 1, 0, 1); }";
+    
+    __block GLuint program = 0;
+    __block GLuint vertexShader = 0;
+    __block GLuint fragmentShader = 0;
+    __block GLuint buffer = 0;
+    __block GLuint a_pos = 0;
+    MGLOpenGLStyleLayer *layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"mbx-custom" preparationHandler:^{
+        program = glCreateProgram();
+        vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        
+        glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+        glCompileShader(vertexShader);
+        glAttachShader(program, vertexShader);
+        glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+        glCompileShader(fragmentShader);
+        glAttachShader(program, fragmentShader);
+        glLinkProgram(program);
+        a_pos = glGetAttribLocation(program, "a_pos");
+        
+        GLfloat background[] = { -1,-1, 1,-1, -1,1, 1,1 };
+        glGenBuffers(1, &buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), background, GL_STATIC_DRAW);
+    } drawingHandler:^(MGLOpenGLStyleLayerDrawingState state) {
+        glUseProgram(program);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        glEnableVertexAttribArray(a_pos);
+        glVertexAttribPointer(a_pos, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+        glDisable(GL_STENCIL_TEST);
+        glDisable(GL_DEPTH_TEST);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    } completionHandler:^{
+        if (program) {
+            glDeleteBuffers(1, &buffer);
+            glDetachShader(program, vertexShader);
+            glDetachShader(program, fragmentShader);
+            glDeleteShader(vertexShader);
+            glDeleteShader(fragmentShader);
+            glDeleteProgram(program);
+        }
+    }];
+    MGLStyleLayer *houseNumberLayer = [self.mapView.style layerWithIdentifier:@"housenum-label"];
+    if (houseNumberLayer) {
+        [self.mapView.style insertLayer:layer belowLayer:houseNumberLayer];
+    } else {
+        [self.mapView.style addLayer:layer];
+    }
+}
+
+- (IBAction)removeCustomStyleLayer:(id)sender {
+    [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
+        [self insertCustomStyleLayer:sender];
+    }];
+    
+    if (!self.undoManager.isUndoing) {
+        [self.undoManager setActionName:@"Delete Lime Green Layer"];
+    }
+    
+    MGLStyleLayer *layer = [self.mapView.style layerWithIdentifier:@"mbx-custom"];
+    [self.mapView.style removeLayer:layer];
+}
+
 #pragma mark Offline packs
 
 - (IBAction)addOfflinePack:(id)sender {
@@ -891,6 +968,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     if (menuItem.action == @selector(drawAnimatedAnnotation:)) {
         return !_isShowingAnimatedAnnotation;
+    }
+    if (menuItem.action == @selector(insertCustomStyleLayer:)) {
+        return ![self.mapView.style layerWithIdentifier:@"mbx-custom"];
     }
     if (menuItem.action == @selector(showAllAnnotations:) || menuItem.action == @selector(removeAllAnnotations:)) {
         return self.mapView.annotations.count > 0;
