@@ -120,6 +120,10 @@ public class MarkerViewManager {
         View convertView = markerViewMap.get(marker);
         if (convertView != null) {
             convertView.setVisibility(visible ? View.VISIBLE : View.GONE);
+            if(visible && marker.isFlat()){
+                // apply tilting after visible change
+                convertView.setRotationX(marker.getTilt());
+            }
         }
     }
 
@@ -173,8 +177,8 @@ public class MarkerViewManager {
         for (MarkerView markerView : markerViewMap.keySet()) {
             if (markerView.isFlat()) {
                 convertView = markerViewMap.get(markerView);
+                markerView.setTilt(tilt);
                 if (convertView != null) {
-                    markerView.setTilt(tilt);
                     convertView.setRotationX(tilt);
                 }
             }

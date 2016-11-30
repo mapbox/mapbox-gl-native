@@ -54,6 +54,7 @@
         android:layout_below="@id/toolbar"
         app:center_latitude="38.907192"
         app:center_longitude="-77.036871"
+        app:tilt="60"
         app:style_url="@string/style_mapbox_streets"
         app:zoom="12" />
 
