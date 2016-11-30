@@ -407,30 +407,10 @@ public class MapboxMapTest {
     public void testRemoveAnnotation() {
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng());
         Marker marker = mMapboxMap.addMarker(markerOptions);
-        mMapboxMap.removeAnnotation(marker);
-        assertTrue("Annotations should be empty", mMapboxMap.getAnnotations().isEmpty());
+        mMapboxMap.removeMarker(marker);
+        assertTrue("Annotations should be empty", mMapboxMap.getMarkers().isEmpty());
     }
 
-    @Test
-    public void testRemoveAnnotationById() {
-        MarkerOptions markerOptions = new MarkerOptions().position(new LatLng());
-        mMapboxMap.addMarker(markerOptions);
-        // id will always be 0 in unit tests
-        mMapboxMap.removeAnnotation(0);
-        assertTrue("Annotations should be empty", mMapboxMap.getAnnotations().isEmpty());
-    }
-
-    @Test
-    public void testRemoveAnnotations() {
-        List<BaseMarkerOptions> markerList = new ArrayList<>();
-        MarkerOptions markerOptions1 = new MarkerOptions().title("a").position(new LatLng());
-        MarkerOptions markerOptions2 = new MarkerOptions().title("b").position(new LatLng());
-        markerList.add(markerOptions1);
-        markerList.add(markerOptions2);
-        mMapboxMap.addMarkers(markerList);
-        mMapboxMap.removeAnnotations();
-        assertTrue("Annotations should be empty", mMapboxMap.getAnnotations().isEmpty());
-    }
 
     @Test
     public void testClear() {
@@ -441,34 +421,9 @@ public class MapboxMapTest {
         markerList.add(markerOptions2);
         mMapboxMap.addMarkers(markerList);
         mMapboxMap.clear();
-        assertTrue("Annotations should be empty", mMapboxMap.getAnnotations().isEmpty());
-    }
-
-    @Test
-    public void testRemoveAnnotationsByList() {
-        List<BaseMarkerOptions> markerList = new ArrayList<>();
-        MarkerOptions markerOptions1 = new MarkerOptions().title("a").position(new LatLng());
-        MarkerOptions markerOptions2 = new MarkerOptions().title("b").position(new LatLng());
-        markerList.add(markerOptions1);
-        markerList.add(markerOptions2);
-        List<Marker> markers = mMapboxMap.addMarkers(markerList);
-        Marker marker = mMapboxMap.addMarker(new MarkerOptions().position(new LatLng()).title("c"));
-        mMapboxMap.removeAnnotations(markers);
-        assertTrue("Annotations should not be empty", mMapboxMap.getAnnotations().size() == 1);
-        assertTrue("Marker should be contained", mMapboxMap.getAnnotations().contains(marker));
-    }
-
-    @Test
-    public void testGetAnnotationById() {
-        MarkerOptions markerOptions = new MarkerOptions().position(new LatLng());
-        Marker initialMarker = mMapboxMap.addMarker(markerOptions);
-        Marker retrievedMarker = (Marker) mMapboxMap.getAnnotation(0);
-        assertEquals("Markers should match", initialMarker, retrievedMarker);
-    }
-
-    @Test
-    public void testGetAnnotations() {
-        assertNotNull("Annotations should be non null", mMapboxMap.getAnnotations());
+        assertTrue("Annotations should be empty", mMapboxMap.getMarkers().isEmpty());
+        assertTrue("Annotations should be empty", mMapboxMap.getPolygons().isEmpty());
+        assertTrue("Annotations should be empty", mMapboxMap.getPolygons().isEmpty());
     }
 
     @Test

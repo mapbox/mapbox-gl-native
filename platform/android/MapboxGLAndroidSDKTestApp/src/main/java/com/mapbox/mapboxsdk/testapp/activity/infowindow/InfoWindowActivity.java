@@ -115,7 +115,7 @@ public class InfoWindowActivity extends AppCompatActivity
     public void onMapLongClick(@NonNull LatLng point) {
         if (customMarker != null) {
             // Remove previous added marker
-            mapboxMap.removeAnnotation(customMarker);
+            customMarker.remove();
             customMarker = null;
         }
 

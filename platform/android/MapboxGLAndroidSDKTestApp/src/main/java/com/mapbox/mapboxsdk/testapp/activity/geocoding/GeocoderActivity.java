@@ -88,7 +88,7 @@ public class GeocoderActivity extends AppCompatActivity implements OnMapReadyCal
 
                 setMessage("Geocoding...");
 
-                mapboxMap.removeAnnotations();
+                mapboxMap.clear();
                 mapboxMap.addMarker(new MarkerOptions().position(centerLatLng));
 
                 geocode(centerLatLng);

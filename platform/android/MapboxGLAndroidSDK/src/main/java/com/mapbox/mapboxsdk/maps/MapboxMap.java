@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.MapboxAccountManager;
-import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
@@ -995,7 +994,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removeMarker(@NonNull Marker marker) {
-        annotationManager.removeAnnotation(marker);
+        annotationManager.removeMarker(marker);
     }
 
     /**
@@ -1008,7 +1007,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removePolyline(@NonNull Polyline polyline) {
-        annotationManager.removeAnnotation(polyline);
+        annotationManager.removePolyline(polyline);
     }
 
     /**
@@ -1021,45 +1020,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removePolygon(@NonNull Polygon polygon) {
-        annotationManager.removeAnnotation(polygon);
-    }
-
-    /**
-     * Removes an annotation from the map.
-     *
-     * @param annotation The annotation object to remove.
-     */
-    @UiThread
-    public void removeAnnotation(@NonNull Annotation annotation) {
-        annotationManager.removeAnnotation(annotation);
-    }
-
-    /**
-     * Removes an annotation from the map
-     *
-     * @param id The identifier associated to the annotation to be removed
-     */
-    @UiThread
-    public void removeAnnotation(long id) {
-        annotationManager.removeAnnotation(id);
-    }
-
-    /**
-     * Removes multiple annotations from the map.
-     *
-     * @param annotationList A list of annotation objects to remove.
-     */
-    @UiThread
-    public void removeAnnotations(@NonNull List<? extends Annotation> annotationList) {
-        annotationManager.removeAnnotations(annotationList);
-    }
-
-    /**
-     * Removes all annotations from the map.
-     */
-    @UiThread
-    public void removeAnnotations() {
-        annotationManager.removeAnnotations();
+        annotationManager.removePolygon(polygon);
     }
 
     /**
@@ -1067,29 +1028,7 @@ public class MapboxMap {
      */
     @UiThread
     public void clear() {
-        annotationManager.removeAnnotations();
-    }
-
-    /**
-     * Return a annotation based on its id.
-     *
-     * @param id the id used to look up an annotation
-     * @return An annotation with a matched id, null is returned if no match was found
-     */
-    @Nullable
-    public Annotation getAnnotation(long id) {
-        return annotationManager.getAnnotation(id);
-    }
-
-    /**
-     * Returns a list of all the annotations on the map.
-     *
-     * @return A list of all the annotation objects. The returned object is a copy so modifying this
-     * list will not update the map
-     */
-    @NonNull
-    public List<Annotation> getAnnotations() {
-        return annotationManager.getAnnotations();
+        annotationManager.clear();
     }
 
     /**

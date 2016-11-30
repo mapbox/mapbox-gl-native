@@ -86,10 +86,12 @@ public class PolylineActivity extends AppCompatActivity {
                         if (polylines != null && polylines.size() > 0) {
                             if (polylines.size() == 1) {
                                 // test for removing annotation
-                                mapboxMap.removeAnnotation(polylines.get(0));
+                                polylines.get(0).remove();
                             } else {
                                 // test for removing annotations
-                                mapboxMap.removeAnnotations(polylines);
+                                for (Polyline polyline : polylines) {
+                                    polyline.remove();
+                                }
                             }
                         }
                         polylineOptions.clear();
