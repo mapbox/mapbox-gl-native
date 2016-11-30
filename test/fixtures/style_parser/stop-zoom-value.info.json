@@ -1,6 +1,7 @@
 {
     "default": {
         "log": [
+            [1, "WARNING", "ParseStyle", "function must have at least one stop"],
             [1, "WARNING", "ParseStyle", "function stop must have two elements"]
         ]
     }

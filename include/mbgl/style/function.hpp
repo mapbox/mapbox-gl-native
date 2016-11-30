@@ -12,8 +12,10 @@ public:
     using Stop = std::pair<float, T>;
     using Stops = std::vector<Stop>;
 
-    explicit Function(Stops stops_, float base_)
-        : base(base_), stops(std::move(stops_)) {}
+    Function(Stops stops_, float base_)
+        : base(base_), stops(std::move(stops_)) {
+        assert(stops.size() > 0);
+    }
 
     float getBase() const { return base; }
     const std::vector<std::pair<float, T>>& getStops() const { return stops; }

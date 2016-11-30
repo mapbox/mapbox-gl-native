@@ -50,12 +50,6 @@ TEST(Function, Stops) {
     EXPECT_EQ(3.0, evaluate(slope_2, 15));
     EXPECT_EQ(3.0, evaluate(slope_2, 22));
 
-    // Test no values.
-    Function<float> slope_3({}, 1.75);
-    EXPECT_EQ(1, evaluate(slope_3, 2));
-    EXPECT_EQ(1, evaluate(slope_3, 6));
-    EXPECT_EQ(1, evaluate(slope_3, 12));
-
 
     // Explicit constant slope in fringe regions.
     Function<float> slope_4({ { 0, 2 }, { 8, 10 } }, 1);

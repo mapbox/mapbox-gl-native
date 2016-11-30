@@ -25,6 +25,10 @@ struct Converter<Function<T>> {
             return Error { "function stops must be an array" };
         }
 
+        if (arrayLength(*stopsValue) == 0) {
+            return Error { "function must have at least one stop" };
+        }
+
         std::vector<std::pair<float, T>> stops;
         for (std::size_t i = 0; i < arrayLength(*stopsValue); ++i) {
             const auto& stopValue = arrayMember(*stopsValue, i);
