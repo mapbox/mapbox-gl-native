@@ -8,6 +8,7 @@
 #import "MGLSymbolStyleLayer.h"
 #import "MGLRasterStyleLayer.h"
 #import "MGLBackgroundStyleLayer.h"
+#import "MGLOpenGLStyleLayer.h"
 
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
@@ -28,6 +29,7 @@
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
@@ -309,6 +311,8 @@ static NSURL *MGLStyleURL_emerald;
         styleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:identifier source:source];
     } else if (mbglLayer->as<mbgl::style::BackgroundLayer>()) {
         styleLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:identifier];
+    } else if (mbglLayer->as<mbgl::style::CustomLayer>()) {
+        styleLayer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:identifier];
     } else {
         NSAssert(NO, @"Unrecognized layer type");
         return nil;
