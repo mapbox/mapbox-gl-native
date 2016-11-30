@@ -184,6 +184,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 /**
  Returns a source with the given identifier in the current style.
 
+ @note Source identifiers are not guaranteed to exist across styles or different
+    versions of the same style. Applications that use this API must first set the
+    style URL to an explicitly versioned style using a convenience method like
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    inspectable in Interface Builder, or a manually constructed `NSURL`. This
+    approach also avoids source identifer name changes that will occur in the default
+    style’s sources over time.
+
  @return An instance of a concrete subclass of `MGLSource` associated with the
     given identifier, or `nil` if the current style contains no such source.
  */
@@ -199,6 +207,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 /**
  Removes a source from the current style.
  
+ @note Source identifiers are not guaranteed to exist across styles or different
+    versions of the same style. Applications that use this API must first set the
+    style URL to an explicitly versioned style using a convenience method like
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    inspectable in Interface Builder, or a manually constructed `NSURL`. This
+    approach also avoids source identifer name changes that will occur in the default
+    style’s sources over time.
+
  @param source The source to remove from the current style.
  */
 - (void)removeSource:(MGLSource *)source;
@@ -213,6 +229,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Returns a style layer with the given identifier in the current style.
+ 
+ @note Layer identifiers are not guaranteed to exist across styles or different
+    versions of the same style. Applications that use this API must first set
+    the style URL to an explicitly versioned style using a convenience method like
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    inspectable in Interface Builder, or a manually constructed `NSURL`. This
+    approach also avoids layer identifer name changes that will occur in the default
+    style’s layers over time.
  
  @return An instance of a concrete subclass of `MGLStyleLayer` associated with
     the given identifier, or `nil` if the current style contains no such style
@@ -240,6 +264,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Inserts a new layer below another layer.
+ 
+ @note Layer identifiers are not guaranteed to exist across styles or different
+    versions of the same style. Applications that use this API must first set
+    the style URL to an explicitly versioned style using a convenience method like
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    inspectable in Interface Builder, or a manually constructed `NSURL`. This
+    approach also avoids layer identifer name changes that will occur in the default
+    style’s layers over time.
 
  @param layer The layer to insert.
  @param sibling An existing layer in the style.
@@ -248,6 +280,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Inserts a new layer above another layer.
+ 
+ @note Layer identifiers are not guaranteed to exist across styles or different
+    versions of the same style. Applications that use this API must first set
+    the style URL to an explicitly versioned style using a convenience method like
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    inspectable in Interface Builder, or a manually constructed `NSURL`. This
+    approach also avoids layer identifer name changes that will occur in the default
+    style’s layers over time.
 
  @param layer The layer to insert.
  @param sibling An existing layer in the style.
@@ -256,6 +296,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Removes a layer from the map view.
+ 
+ @note Layer identifiers are not guaranteed to exist across styles or different
+    versions of the same style. Applications that use this API must first set
+    the style URL to an explicitly versioned style using a convenience method like
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    inspectable in Interface Builder, or a manually constructed `NSURL`. This
+    approach also avoids layer identifer name changes that will occur in the default
+    style’s layers over time.
 
  @param layer The layer object to remove from the map view. This object
  must conform to the `MGLStyleLayer` protocol.
@@ -287,6 +335,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Deactivates the style class with the given identifier.
+ 
+ @note Style class names are not guaranteed to exist across styles or different
+    versions of the same style. Applications that use this API must first set the
+    style URL to an explicitly versioned style using a convenience method like
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    inspectable in Interface Builder, or a manually constructed `NSURL`. This
+    approach also avoids style class name changes that will occur in the default
+    style over time.
 
  @param styleClass The style class to deactivate.
  */
@@ -307,6 +363,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Removes a name and its associated image from the style.
+ 
+ @note Names and their associated images are not guaranteed to exist across
+    styles or different versions of the same style. Applications that use this
+    API must first set the style URL to an explicitly versioned style using a
+    convenience method like `+[MGLStyle outdoorsStyleURLWithVersion:]`,
+    `MGLMapView`'s “Style URL” inspectable in Interface Builder, or a manually
+    constructed `NSURL`. This approach also avoids image name changes that will 
+    occur in the default style over time.
 
  @param name The name of the image to remove.
  */
