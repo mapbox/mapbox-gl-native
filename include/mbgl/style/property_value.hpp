@@ -17,7 +17,13 @@ private:
     using Value = variant<Undefined, T, Function<T>>;
     Value value;
 
-    template <class S> friend bool operator==(const PropertyValue<S>&, const PropertyValue<S>&);
+    friend bool operator==(const PropertyValue& lhs, const PropertyValue& rhs) {
+        return lhs.value == rhs.value;
+    }
+
+    friend bool operator!=(const PropertyValue& lhs, const PropertyValue& rhs) {
+        return !(lhs == rhs);
+    }
 
 public:
     PropertyValue()                     : value()         {}
@@ -38,16 +44,6 @@ public:
         return Value::visit(value, evaluator);
     }
 };
-
-template <class T>
-bool operator==(const PropertyValue<T>& lhs, const PropertyValue<T>& rhs) {
-    return lhs.value == rhs.value;
-}
-
-template <class T>
-bool operator!=(const PropertyValue<T>& lhs, const PropertyValue<T>& rhs) {
-    return !(lhs == rhs);
-}
 
 } // namespace style
 } // namespace mbgl
