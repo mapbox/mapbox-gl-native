@@ -253,16 +253,16 @@ void Map::Impl::update() {
         annotationManager->updateData();
     }
 
-    if (updateFlags & Update::Layout) {
-        style->relayout();
-    }
-
     if (updateFlags & Update::Classes) {
         style->cascade(timePoint, mode);
     }
 
     if (updateFlags & Update::Classes || updateFlags & Update::RecalculateStyle) {
         style->recalculate(transform.getZoom(), timePoint, mode);
+    }
+
+    if (updateFlags & Update::Layout) {
+        style->relayout();
     }
 
     style::UpdateParameters parameters(pixelRatio,
