@@ -159,8 +159,10 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
  Examples:
  
  <ul>
- <li><code>http://abc.com/tiles/{z}/{x}/{y}.pbf</code> might become <code>http://abc.com/tiles/14/6/9.pbf</code></li>
- <li><code>http://abc.com/tiles/{z}/{x}/{y}{ratio}.png</code> might become <code>http://abc.com/tiles/14/6/9@2x.png</code></li>
+ <li><code>http://abc.com/tiles/{z}/{x}/{y}.pbf</code> might become
+    <code>http://abc.com/tiles/14/6/9.pbf</code></li>
+ <li><code>http://abc.com/tiles/{z}/{x}/{y}{ratio}.png</code> might become
+    <code>http://abc.com/tiles/14/6/9@2x.png</code></li>
  </ul>
  
  Only the first tile URL template string specified is used.
