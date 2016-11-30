@@ -24,7 +24,10 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
 
     if (self)
     {
-        NSAssert(count > 0, @"A multipoint must have coordinates");
+        if (!count) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"A multipoint must have at least one vertex."];
+        }
         _coordinates = { coords, coords + count };
         [self computeBounds];
     }
@@ -65,32 +68,70 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor)
     std::copy(_coordinates.begin() + range.location, _coordinates.begin() + NSMaxRange(range), coords);
 }
 
-- (void)appendCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count
-{
+- (void)setCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count {
+    if (!count) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"A multipoint must have at least one vertex."];
+    }
+    
     [self willChangeValueForKey:@"coordinates"];
-    _coordinates.insert(_coordinates.end(), count, *coords);
+    _coordinates = { coords, coords + count };
     [self computeBounds];
     [self didChangeValueForKey:@"coordinates"];
 }
 
-- (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(const CLLocationCoordinate2D *)coords
-{
-    if (range.length == 0)
-    {
+- (void)insertCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count atIndex:(NSUInteger)index {
+    if (!count) {
         return;
     }
     
-    if (NSMaxRange(range) > _coordinates.size())
-    {
+    if (index > _coordinates.size()) {
+        [NSException raise:NSRangeException
+                    format:@"Invalid index %lu for existing coordinate count %ld",
+         (unsigned long)index, (unsigned long)[self pointCount]];
+    }
+    
+    [self willChangeValueForKey:@"coordinates"];
+    _coordinates.insert(_coordinates.begin() + index, count, *coords);
+    [self computeBounds];
+    [self didChangeValueForKey:@"coordinates"];
+}
+
+- (void)appendCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count
+{
+    [self insertCoordinates:coords count:count atIndex:_coordinates.size()];
+}
+
+- (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(const CLLocationCoordinate2D *)coords
+{
+    [self replaceCoordinatesInRange:range withCoordinates:coords count:range.length];
+}
+
+- (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count {
+    if (!count && !range.length) {
+        return;
+    }
+    
+    if (NSMaxRange(range) > _coordinates.size()) {
         [NSException raise:NSRangeException
                     format:@"Invalid range %@ for existing coordinate count %ld",
          NSStringFromRange(range), (unsigned long)[self pointCount]];
     }
 
     [self willChangeValueForKey:@"coordinates"];
-    std::copy(coords, coords + range.length, _coordinates.begin() + range.location);
+    std::copy(coords, coords + MIN(count, range.length), _coordinates.begin() + range.location);
+    if (count >= range.length) {
+        _coordinates.insert(_coordinates.begin() + NSMaxRange(range), coords, coords + count - range.length);
+    } else {
+        _coordinates.erase(_coordinates.begin() + range.location + count, _coordinates.begin() + NSMaxRange(range));
+    }
     [self computeBounds];
     [self didChangeValueForKey:@"coordinates"];
+}
+
+- (void)removeCoordinatesInRange:(NSRange)range {
+    CLLocationCoordinate2D coords;
+    [self replaceCoordinatesInRange:range withCoordinates:&coords count:0];
 }
 
 - (void)computeBounds
