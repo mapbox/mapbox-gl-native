@@ -218,6 +218,8 @@ set(MBGL_CORE_FILES
     src/mbgl/style/cascade_parameters.hpp
     src/mbgl/style/class_dictionary.cpp
     src/mbgl/style/class_dictionary.hpp
+    src/mbgl/style/cross_faded_property_evaluator.cpp
+    src/mbgl/style/cross_faded_property_evaluator.hpp
     src/mbgl/style/function.cpp
     src/mbgl/style/layer.cpp
     src/mbgl/style/layer_impl.cpp
@@ -229,7 +231,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/parser.cpp
     src/mbgl/style/parser.hpp
     src/mbgl/style/property_evaluation_parameters.hpp
-    src/mbgl/style/property_evaluator.cpp
     src/mbgl/style/property_evaluator.hpp
     src/mbgl/style/property_parsing.cpp
     src/mbgl/style/property_parsing.hpp
