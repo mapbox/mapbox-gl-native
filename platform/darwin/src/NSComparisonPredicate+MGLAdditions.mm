@@ -68,6 +68,12 @@
             filter.values = self.rightExpression.mgl_filterValues;
             return filter;
         }
+        case NSContainsPredicateOperatorType: {
+            auto filter = mbgl::style::InFilter();
+            filter.key = [self.rightExpression.constantValue UTF8String];
+            filter.values = self.leftExpression.mgl_filterValues;
+            return filter;
+        }
         case NSBetweenPredicateOperatorType: {
             auto filter = mbgl::style::AllFilter();
             auto gteFilter = mbgl::style::GreaterThanEqualsFilter();
@@ -85,7 +91,6 @@
         case NSBeginsWithPredicateOperatorType:
         case NSEndsWithPredicateOperatorType:
         case NSCustomSelectorPredicateOperatorType:
-        case NSContainsPredicateOperatorType:
             [NSException raise:@"Unsupported operator type"
                         format:@"NSPredicateOperatorType:%lu is not supported.", (unsigned long)self.predicateOperatorType];
     }

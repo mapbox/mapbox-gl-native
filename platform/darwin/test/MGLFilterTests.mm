@@ -74,6 +74,18 @@
     [self.mapView.style addLayer:layer];
 }
 
+- (void)testContainsPredicate
+{
+    // core does not have a "contains" filter but we can achieve the equivalent by creating an `mbgl::style::InFilter`
+    // and searching the value for the key
+    NSPredicate *expectedPredicate = [NSPredicate predicateWithFormat:@"park IN %@", @[@"park", @"neighbourhood"]];
+    NSPredicate *containsPredicate = [NSPredicate predicateWithFormat:@"%@ CONTAINS %@", @[@"park", @"neighbourhood"], @"park"];
+    
+    layer.predicate = containsPredicate;
+    XCTAssertEqualObjects(layer.predicate, expectedPredicate);
+    [self.mapView.style addLayer:layer];
+}
+
 - (void)testBetweenPredicate
 {
     // core does not have a "between" filter but we can achieve the equivalent by creating a set of greater than or equal / less than or equal
