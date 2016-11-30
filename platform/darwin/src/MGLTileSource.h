@@ -150,11 +150,20 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
  options.
  
  Tile URL template strings are a loose open standard for referring to custom
- locations from which to download tiles, whether vector or raster. An example
- template string is `http://myserver.com/tiles/{z}/{x}/{y}.pbf`.
+ locations from which to download tiles, whether vector or raster.
  
- In the current implementation, only the first tile URL template string
- specified is used.
+ Currently the tokens `x`, `y`, and `z` are supported for tile locations in the
+ world grid, as well as `ratio` for use in raster tiles, which allows
+ pre-rendered imagery to adapt to the current `UIScreen.scale`.
+ 
+ Examples:
+ 
+ <ul>
+ <li><code>http://abc.com/tiles/{z}/{x}/{y}.pbf</code> might become <code>http://abc.com/tiles/14/6/9.pbf</code></li>
+ <li><code>http://abc.com/tiles/{z}/{x}/{y}{ratio}.png</code> might become <code>http://abc.com/tiles/14/6/9@2x.png</code></li>
+ </ul>
+ 
+ Only the first tile URL template string specified is used.
 
  After initializing and configuring the source, add it to a map view’s style
  using the `-[MGLStyle addSource:]` method.
