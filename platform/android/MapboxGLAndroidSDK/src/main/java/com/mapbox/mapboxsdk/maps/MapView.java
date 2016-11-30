@@ -1252,6 +1252,10 @@ public class MapView extends FrameLayout {
 
     /**
      * Use to determine which {@link MarkerView}s are found within a given {@link RectF}
+     * <p>
+     * Note that adding a Marker is an asynchronous operation and requires the map to render first
+     * before querying the map for them.
+     * </p>
      *
      * @param rectangle Holds four float coordinates for a rectangle.
      * @return The list of {@link MarkerView}s found within the provided {@link RectF}.
