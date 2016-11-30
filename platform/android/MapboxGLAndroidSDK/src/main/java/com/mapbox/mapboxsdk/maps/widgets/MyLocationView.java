@@ -607,13 +607,25 @@ public class MyLocationView extends View {
 
             if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
 
-                // calculate the rotation matrix
-                SensorManager.getRotationMatrixFromVector(matrix, event.values);
-                SensorManager.getOrientation(matrix, orientation);
+                /**
+                 * Mappy Fix
+                 * On some Samsung devices (e.g. Galaxy Note 3 and Galaxy S4) the
+                 * SensorManager.getRotationMatrixFromVector() appears to throw an
+                 * exception when the passed rotation vector has length > 4.
+                 * In this case
+                 */
+                try {
+                    // calculate the rotation matrix
+                    SensorManager.getRotationMatrixFromVector(matrix, event.values);
+                    SensorManager.getOrientation(matrix, orientation);
 
-                float magneticHeading = (float) Math.toDegrees(orientation[0]);
+                    float magneticHeading = (float) Math.toDegrees(orientation[0]);
 
-                currentDegree = (int) (magneticHeading);
+                    currentDegree = (int) (magneticHeading);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    currentDegree = 0;
+                }
 
                 /* Mappy, the bearing of the sensor doesn't allow to rotate the map
                 // Change the user location view orientation to reflect the device orientation
