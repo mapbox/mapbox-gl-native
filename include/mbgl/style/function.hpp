@@ -1,7 +1,8 @@
 #pragma once
 
-#include <vector>
+#include <cassert>
 #include <utility>
+#include <vector>
 
 namespace mbgl {
 namespace style {
@@ -19,6 +20,8 @@ public:
 
     float getBase() const { return base; }
     const std::vector<std::pair<float, T>>& getStops() const { return stops; }
+
+    T evaluate(float z) const;
 
     friend bool operator==(const Function& lhs, const Function& rhs) {
         return lhs.base == rhs.base && lhs.stops == rhs.stops;
