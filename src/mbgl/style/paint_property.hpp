@@ -2,6 +2,7 @@
 
 #include <mbgl/style/class_dictionary.hpp>
 #include <mbgl/style/property_evaluator.hpp>
+#include <mbgl/style/cross_faded_property_evaluator.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/cascade_parameters.hpp>
 #include <mbgl/style/property_evaluation_parameters.hpp>

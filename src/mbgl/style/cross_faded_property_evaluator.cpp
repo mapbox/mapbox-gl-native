@@ -1,4 +1,4 @@
-#include <mbgl/style/property_evaluator.hpp>
+#include <mbgl/style/cross_faded_property_evaluator.hpp>
 #include <mbgl/util/chrono.hpp>
 
 #include <cmath>
