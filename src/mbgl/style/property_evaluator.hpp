@@ -1,12 +1,11 @@
 #pragma once
 
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/property_evaluation_parameters.hpp>
 #include <mbgl/util/interpolate.hpp>
 
 namespace mbgl {
 namespace style {
-
-class PropertyEvaluationParameters;
 
 template <typename T>
 class PropertyEvaluator {
@@ -19,7 +18,7 @@ public:
 
     T operator()(const Undefined&) const { return defaultValue; }
     T operator()(const T& constant) const { return constant; }
-    T operator()(const Function<T>&) const;
+    T operator()(const Function<T>& fn) const { return fn.evaluate(parameters.z); }
 
 private:
     const PropertyEvaluationParameters& parameters;
