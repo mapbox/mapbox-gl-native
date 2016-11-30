@@ -11,30 +11,6 @@ namespace mbgl {
 namespace style {
 
 template <typename T>
-T defaultStopsValue();
-
-template <> bool defaultStopsValue() { return true; }
-template <> float defaultStopsValue() { return 1.0f; }
-template <> Color defaultStopsValue() { return { 0, 0, 0, 1 }; }
-template <> std::vector<float> defaultStopsValue() { return {{ 1, 0 }}; }
-template <> std::vector<std::string> defaultStopsValue() { return {{}}; }
-template <> std::array<float, 2> defaultStopsValue() { return {{ 0, 0 }}; }
-template <> std::array<float, 4> defaultStopsValue() { return {{ 0, 0, 0, 0 }}; }
-
-template <> std::string defaultStopsValue() { return {}; }
-template <> TranslateAnchorType defaultStopsValue() { return {}; }
-template <> RotateAnchorType defaultStopsValue() { return {}; }
-template <> CirclePitchScaleType defaultStopsValue() { return {}; }
-template <> LineCapType defaultStopsValue() { return {}; }
-template <> LineJoinType defaultStopsValue() { return {}; }
-template <> SymbolPlacementType defaultStopsValue() { return {}; }
-template <> TextAnchorType defaultStopsValue() { return {}; }
-template <> TextJustifyType defaultStopsValue() { return {}; }
-template <> TextTransformType defaultStopsValue() { return {}; }
-template <> AlignmentType defaultStopsValue() { return {}; }
-template <> IconTextFitType defaultStopsValue() { return {}; };
-
-template <typename T>
 T PropertyEvaluator<T>::operator()(const Function<T>& fn) const {
     float base = fn.getBase();
     const std::vector<std::pair<float, T>>& stops = fn.getStops();
@@ -80,7 +56,8 @@ T PropertyEvaluator<T>::operator()(const Function<T>& fn) const {
         return smaller_val;
     } else {
         // No stop defined.
-        return defaultStopsValue<T>();
+        assert(false);
+        return T();
     }
 }
 
