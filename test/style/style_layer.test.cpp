@@ -1,5 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_layer_observer.hpp>
+#include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
@@ -15,6 +17,10 @@
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/util/color.hpp>
+#include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/io.hpp>
+
+#include <memory>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -268,3 +274,25 @@ TEST(Layer, Observer) {
     layer->setLineCap(lineCap);
     EXPECT_FALSE(layoutPropertyChanged);
 }
+
+TEST(Layer, DuplicateLayer) {
+    util::RunLoop loop;
+
+    //Setup style
+    StubFileSource fileSource;
+    Style style { fileSource, 1.0 };
+    style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
+
+    //Add initial layer
+    style.addLayer(std::make_unique<LineLayer>("line", "unusedsource"));
+
+    //Try to add duplicate
+    try {
+        style.addLayer(std::make_unique<LineLayer>("line", "unusedsource"));
+        FAIL() << "Should not have been allowed to add a duplicate layer id";
+    } catch (const std::runtime_error e) {
+        //Expected
+        ASSERT_STREQ("Layer line already exists", e.what());
+    }
+}
+
