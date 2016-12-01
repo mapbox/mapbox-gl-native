@@ -1418,7 +1418,7 @@ public:
  @param singleTap An in progress tap gesture recognizer.
  @param persist True to remember the cycleable set of annotations. @see annotationTagAtPoint:persistingResults
  */
-- (id <MGLAnnotation> _Nullable)annotationForGestureRecognizer:(UITapGestureRecognizer*)singleTap persistingResults:(BOOL)persist
+- (nullable id <MGLAnnotation>)annotationForGestureRecognizer:(UITapGestureRecognizer*)singleTap persistingResults:(BOOL)persist
 {
     CGPoint tapPoint = [singleTap locationInView:self];
 
