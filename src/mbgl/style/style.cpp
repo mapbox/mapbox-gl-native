@@ -199,6 +199,15 @@ Layer* Style::getLayer(const std::string& id) const {
 Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> before) {
     // TODO: verify source
 
+    // Guard against duplicate layer ids
+    auto it = std::find_if(layers.begin(), layers.end(), [&](const auto& existing) {
+        return existing->getID() == layer->getID();
+    });
+
+    if (it != layers.end()) {
+        throw std::runtime_error(std::string{"Layer "} + layer->getID() + " already exists");
+    }
+
     if (SymbolLayer* symbolLayer = layer->as<SymbolLayer>()) {
         if (!symbolLayer->impl->spriteAtlas) {
             symbolLayer->impl->spriteAtlas = spriteAtlas.get();
