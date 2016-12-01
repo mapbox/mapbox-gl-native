@@ -9,6 +9,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.layers.Property;
@@ -127,6 +128,14 @@ public class RuntimeStyleTests {
 
             //Ensure it's there
             Assert.assertNotNull(mapboxMap.getLayer(layer.getId()));
+
+            //Test adding a duplicate layer
+            try {
+                mapboxMap.addLayer(new FillLayer("building", "composite"));
+                fail("Should not have been allowed to add a layer with a duplicate id");
+            } catch (CannotAddLayerException e) {
+                //OK
+            }
         }
     }
 
