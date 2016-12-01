@@ -9,6 +9,7 @@ import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -40,6 +41,7 @@ public class QueryRenderedSymbolBoxCountTest {
     }
 
     @Test
+    @Ignore
     public void testCountSymbols() {
         // click on box to query map
         onView(withId(R.id.selection_box)).perform(click());

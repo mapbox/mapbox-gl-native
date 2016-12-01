@@ -41,6 +41,7 @@ public class QueryRenderedFeaturesBoxCountTest {
     }
 
     @Test
+    @Ignore
     public void testCountFeatures() {
         // click on box to query map
         onView(withId(R.id.selection_box)).perform(click());

@@ -15,6 +15,7 @@ import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -45,6 +46,7 @@ public class QueryRenderedFeaturesHighlightTest {
     }
 
     @Test
+    @Ignore
     public void testCountFeatures() {
         // click on box to query map
         onView(withId(R.id.selection_box)).perform(click());
