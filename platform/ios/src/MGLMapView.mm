@@ -236,9 +236,8 @@ public:
 @property (nonatomic, readwrite) UIButton *attributionButton;
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *attributionButtonConstraints;
 @property (nonatomic) UIActionSheet *attributionSheet;
-
 @property (nonatomic, readwrite) MGLStyle *style;
-
+@property (nonatomic) UITapGestureRecognizer *singleTapGestureRecognizer;
 @property (nonatomic) UIPanGestureRecognizer *pan;
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
@@ -502,9 +501,10 @@ public:
     doubleTap.numberOfTapsRequired = 2;
     [self addGestureRecognizer:doubleTap];
 
-    UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTapGesture:)];
-    [singleTap requireGestureRecognizerToFail:doubleTap];
-    [self addGestureRecognizer:singleTap];
+    _singleTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTapGesture:)];
+    [_singleTapGestureRecognizer requireGestureRecognizerToFail:doubleTap];
+    _singleTapGestureRecognizer.delegate = self;
+    [self addGestureRecognizer:_singleTapGestureRecognizer];
 
     UITapGestureRecognizer *twoFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerTapGesture:)];
     twoFingerTap.numberOfTouchesRequired = 2;
@@ -1398,6 +1398,27 @@ public:
         return;
     }
 
+    id<MGLAnnotation>annotation = [self annotationForGestureRecognizer:singleTap persistingResults:YES];
+    if(annotation)
+    {
+        [self selectAnnotation:annotation animated:YES];
+    }
+    else
+    {
+        [self deselectAnnotation:self.selectedAnnotation animated:YES];
+    }
+}
+
+/**
+ Returns the annotation that would be selected by a tap gesture recognizer.
+ 
+ This is used when a gesture is recognized, and to check if the gesture should be recognized.
+ 
+ @param singleTap An in progress tap gesture recognizer.
+ @param persist True to remember the cycleable set of annotations. @see annotationTagAtPoint:persistingResults
+ */
+- (nullable id <MGLAnnotation>)annotationForGestureRecognizer:(UITapGestureRecognizer*)singleTap persistingResults:(BOOL)persist
+{
     CGPoint tapPoint = [singleTap locationInView:self];
 
     if (self.userLocationVisible)
@@ -1412,19 +1433,19 @@ public:
             // Get the tap point within the custom hit test layer.
             tapPointForUserLocation = [singleTap locationInView:self.userLocationAnnotationView];
         }
-
+        
         CALayer *hitLayer = [self.userLocationAnnotationView.hitTestLayer hitTest:tapPointForUserLocation];
-
+        
         if (hitLayer)
         {
             if ( ! _userLocationAnnotationIsSelected)
             {
-                [self selectAnnotation:self.userLocation animated:YES];
+                return self.userLocation;
             }
-            return;
+            return nil;
         }
     }
-
+    
     // Handle the case of an offset annotation view by converting the tap point to be the geo location
     // of the annotation itself that the view represents
     for (MGLAnnotationView *view in self.annotationContainerView.annotationViews)
@@ -1436,21 +1457,19 @@ public:
             }
         }
     }
-
-    MGLAnnotationTag hitAnnotationTag = [self annotationTagAtPoint:tapPoint persistingResults:YES];
+    
+    MGLAnnotationTag hitAnnotationTag = [self annotationTagAtPoint:tapPoint persistingResults:persist];
     if (hitAnnotationTag != MGLAnnotationTagNotFound)
     {
         if (hitAnnotationTag != _selectedAnnotationTag)
         {
             id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
             NSAssert(annotation, @"Cannot select nonexistent annotation with tag %u", hitAnnotationTag);
-            [self selectAnnotation:annotation animated:YES];
+            return annotation;
         }
     }
-    else
-    {
-        [self deselectAnnotation:self.selectedAnnotation animated:YES];
-    }
+    
+    return nil;
 }
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
@@ -1607,6 +1626,17 @@ public:
                 return NO;
             }
         }
+    }
+    else if (gestureRecognizer == _singleTapGestureRecognizer)
+    {
+      //Gesture will be recognized if it could deselect an annotation
+      if(!self.selectedAnnotation)
+      {
+          id<MGLAnnotation>annotation = [self annotationForGestureRecognizer:(UITapGestureRecognizer*)gestureRecognizer persistingResults:NO];
+          if(!annotation) {
+              return NO;
+          }
+      }
     }
     return YES;
 }
