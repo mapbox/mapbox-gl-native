@@ -20,6 +20,7 @@ import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -45,6 +46,7 @@ public class MarkerViewTest {
     }
 
     @Test
+    @Ignore
     public void addMarkerViewTest() {
         ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -66,6 +68,7 @@ public class MarkerViewTest {
     }
 
     @Test
+    @Ignore
     public void showInfoWindowTest() {
         ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
