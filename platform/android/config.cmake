@@ -19,6 +19,31 @@ mason_use(nunicode VERSION 1.7.1)
 mason_use(sqlite VERSION 3.14.2)
 mason_use(gtest VERSION 1.7.0)
 
+set(ANDROID_SDK_PROJECT_DIR ${CMAKE_SOURCE_DIR}/platform/android/MapboxGLAndroidSDK)
+set(ANDROID_JNI_TARGET_DIR ${ANDROID_SDK_PROJECT_DIR}/src/main/jniLibs/${ANDROID_JNIDIR})
+set(ANDROID_ASSETS_TARGET_DIR ${ANDROID_SDK_PROJECT_DIR}/src/main/assets)
+set(ANDROID_TEST_APP_JNI_TARGET_DIR ${CMAKE_SOURCE_DIR}/platform/android/MapboxGLAndroidSDKTestApp/src/main/jniLibs/${ANDROID_JNIDIR})
+
+macro(mbgl_android_copy_asset source target)
+    add_custom_command(
+        OUTPUT ${ANDROID_ASSETS_TARGET_DIR}/${target}
+        COMMAND  ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/${source} ${ANDROID_ASSETS_TARGET_DIR}/${target}
+        DEPENDS ${CMAKE_SOURCE_DIR}/${source}
+    )
+endmacro()
+
+mbgl_android_copy_asset(common/ca-bundle.crt ca-bundle.crt)
+mbgl_android_copy_asset(platform/default/resources/api_mapbox_com-digicert.der api_mapbox_com-digicert.der)
+mbgl_android_copy_asset(platform/default/resources/api_mapbox_com-geotrust.der api_mapbox_com-geotrust.der)
+mbgl_android_copy_asset(platform/default/resources/star_tilestream_net.der star_tilestream_net.der)
+
+add_custom_target(mbgl-copy-android-assets
+    DEPENDS ${ANDROID_ASSETS_TARGET_DIR}/ca-bundle.crt
+    DEPENDS ${ANDROID_ASSETS_TARGET_DIR}/api_mapbox_com-digicert.der
+    DEPENDS ${ANDROID_ASSETS_TARGET_DIR}/api_mapbox_com-geotrust.der
+    DEPENDS ${ANDROID_ASSETS_TARGET_DIR}/star_tilestream_net.der
+)
+
 ## mbgl core ##
 
 macro(mbgl_platform_core)
@@ -163,6 +188,10 @@ add_library(mapbox-gl SHARED
     platform/android/src/main.cpp
 )
 
+add_dependencies(mapbox-gl
+    mbgl-copy-android-assets
+)
+
 target_compile_options(mapbox-gl
     PRIVATE -fvisibility=hidden
     PRIVATE -ffunction-sections
@@ -175,6 +204,11 @@ target_link_libraries(mapbox-gl
     PUBLIC -Wl,--gc-sections
 )
 
+# Create a stripped version of the library and copy it to the JNIDIR.
+add_custom_command(TARGET mapbox-gl POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E make_directory ${ANDROID_JNI_TARGET_DIR}
+                   COMMAND ${STRIP_COMMAND} $<TARGET_FILE:mapbox-gl> -o ${ANDROID_JNI_TARGET_DIR}/$<TARGET_FILE_NAME:mapbox-gl>)
+
 ## Test library ##
 
 add_library(mbgl-test SHARED
@@ -184,6 +218,10 @@ add_library(mbgl-test SHARED
     # Main test entry point
     platform/android/src/test/main.jni.cpp
 
+)
+
+add_dependencies(mbgl-test
+    mapbox-gl
 )
 
 target_sources(mbgl-test
@@ -229,6 +267,11 @@ target_add_mason_package(mbgl-test PRIVATE boost)
 target_add_mason_package(mbgl-test PRIVATE geojson)
 target_add_mason_package(mbgl-test PRIVATE geojsonvt)
 
+add_custom_command(TARGET mbgl-test POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/stripped
+                   COMMAND ${STRIP_COMMAND} $<TARGET_FILE:mapbox-gl> -o ${CMAKE_CURRENT_BINARY_DIR}/stripped/$<TARGET_FILE_NAME:mapbox-gl>
+                   COMMAND ${STRIP_COMMAND} $<TARGET_FILE:mbgl-test> -o ${CMAKE_CURRENT_BINARY_DIR}/stripped/$<TARGET_FILE_NAME:mbgl-test>)
+
 ## Custom layer example ##
 
 add_library(example-custom-layer SHARED
@@ -243,42 +286,10 @@ target_compile_options(example-custom-layer
 )
 
 target_link_libraries(example-custom-layer
-    PRIVATE mbgl-core
+    PRIVATE mapbox-gl
     PUBLIC -Wl,--gc-sections
 )
 
-## Strip and copy ##
-
-set(ANDROID_SDK_PROJECT_DIR ${CMAKE_SOURCE_DIR}/platform/android/MapboxGLAndroidSDK)
-set(ANDROID_JNI_TARGET_DIR ${ANDROID_SDK_PROJECT_DIR}/src/main/jniLibs/${ANDROID_JNIDIR}/)
-set(ANDROID_ASSETS_TARGET_DIR ${ANDROID_SDK_PROJECT_DIR}/src/main/assets/)
-set(ANDROID_TEST_APP_JNI_TARGET_DIR ${CMAKE_SOURCE_DIR}/platform/android/MapboxGLAndroidSDKTestApp/src/main/jniLibs/${ANDROID_JNIDIR}/)
-
-add_custom_target(copy-files
-    DEPENDS mapbox-gl
-    DEPENDS example-custom-layer
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${ANDROID_JNI_TARGET_DIR}
-    COMMAND ${STRIP_COMMAND} $<TARGET_FILE:mapbox-gl> -o ${ANDROID_JNI_TARGET_DIR}$<TARGET_FILE_NAME:mapbox-gl>
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${ANDROID_ASSETS_TARGET_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/common/ca-bundle.crt ${ANDROID_ASSETS_TARGET_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/platform/default/resources/api_mapbox_com-digicert.der ${ANDROID_ASSETS_TARGET_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/platform/default/resources/api_mapbox_com-geotrust.der ${ANDROID_ASSETS_TARGET_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/platform/default/resources/star_tilestream_net.der ${ANDROID_ASSETS_TARGET_DIR}
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${ANDROID_TEST_APP_JNI_TARGET_DIR}
-    COMMAND ${STRIP_COMMAND} $<TARGET_FILE:example-custom-layer> -o ${ANDROID_TEST_APP_JNI_TARGET_DIR}$<TARGET_FILE_NAME:example-custom-layer>
-)
-
-add_custom_target(mbgl-test-stripped
-    DEPENDS mapbox-gl
-    DEPENDS mbgl-test
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/stripped
-    COMMAND ${STRIP_COMMAND} $<TARGET_FILE:mapbox-gl> -o ${CMAKE_CURRENT_BINARY_DIR}/stripped/$<TARGET_FILE_NAME:mapbox-gl>
-    COMMAND ${STRIP_COMMAND} $<TARGET_FILE:mbgl-test> -o ${CMAKE_CURRENT_BINARY_DIR}/stripped/$<TARGET_FILE_NAME:mbgl-test>
-)
-
-add_custom_target(_all ALL
-    DEPENDS mapbox-gl
-    DEPENDS mbgl-test
-    DEPENDS example-custom-layer
-    DEPENDS copy-files
-)
+add_custom_command(TARGET example-custom-layer POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E make_directory ${ANDROID_TEST_APP_JNI_TARGET_DIR}
+                   COMMAND ${STRIP_COMMAND} $<TARGET_FILE:example-custom-layer> -o ${ANDROID_TEST_APP_JNI_TARGET_DIR}/$<TARGET_FILE_NAME:example-custom-layer>)
