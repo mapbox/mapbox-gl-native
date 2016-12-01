@@ -44,12 +44,14 @@ public final class CameraPosition implements Parcelable {
     public final LatLng target;
 
     /**
-     * The angle, in degrees, of the camera angle from the nadir (directly facing the Earth). See tilt(double) for details of restrictions on the range of values.
+     * The angle, in degrees, of the camera angle from the nadir (directly facing the Earth).
+     * See tilt(float) for details of restrictions on the range of values.
      */
     public final double tilt;
 
     /**
-     * Zoom level near the center of the screen. See zoom(double) for the definition of the camera's zoom level.
+     * Zoom level near the center of the screen. See zoom(float) for the definition of the camera's
+     * zoom level.
      */
     public final double zoom;
 
@@ -57,9 +59,12 @@ public final class CameraPosition implements Parcelable {
      * Constructs a CameraPosition.
      *
      * @param target  The target location to align with the center of the screen.
-     * @param zoom    Zoom level at target. See zoom(double) for details of restrictions.
-     * @param tilt    The camera angle, in degrees, from the nadir (directly down). See tilt(double) for details of restrictions.
-     * @param bearing Direction that the camera is pointing in, in degrees clockwise from north. This value will be normalized to be within 0 degrees inclusive and 360 degrees exclusive.
+     * @param zoom    Zoom level at target. See zoom(float) for details of restrictions.
+     * @param tilt    The camera angle, in degrees, from the nadir (directly down). See tilt(float)
+     *                for details of restrictions.
+     * @param bearing Direction that the camera is pointing in, in degrees clockwise from north.
+     *                This value will be normalized to be within 0 degrees inclusive and 360 degrees
+     *                exclusive.
      * @throws NullPointerException     if target is null
      * @throws IllegalArgumentException if tilt is outside the range of 0 to 90 degrees inclusive.
      */
@@ -70,11 +75,24 @@ public final class CameraPosition implements Parcelable {
         this.zoom = zoom;
     }
 
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     *
+     * @return integer 0.
+     */
     @Override
     public int describeContents() {
         return 0;
     }
 
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param out   The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written. May be 0 or
+     *              {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
     @Override
     public void writeToParcel(Parcel out, int flags) {
         out.writeDouble(bearing);
@@ -83,11 +101,24 @@ public final class CameraPosition implements Parcelable {
         out.writeDouble(zoom);
     }
 
+    /**
+     * Returns a String with the camera target, zoom, bearing and tilt.
+     *
+     * @return A String with CameraPosition information.
+     */
     @Override
     public String toString() {
         return "Target: " + target + ", Zoom:" + zoom + ", Bearing:" + bearing + ", Tilt:" + tilt;
     }
 
+    /**
+     * Compares this {@link CameraPosition} object with another {@link CameraPosition} and
+     * determines if their target, zoom, tilt, and bearing match.
+     *
+     * @param o Another {@link CameraPosition} to compare with this object.
+     * @return True if target, zoom, tilt, and bearing match this {@link CameraPosition} object.
+     * Else, false.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -111,6 +142,14 @@ public final class CameraPosition implements Parcelable {
         return true;
     }
 
+    /**
+     * Gives an integer which can be used as the bucket number for storing elements of the set/map.
+     * This bucket number is the address of the element inside the set/map. There's no guarantee
+     * that this hash value will be consistent between different Java implementations, or even
+     * between different execution runs of the same program.
+     *
+     * @return integer value you can use for storing element.
+     */
     @Override
     public int hashCode() {
         int result = 1;

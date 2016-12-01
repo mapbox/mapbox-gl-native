@@ -67,8 +67,8 @@ public class TrackingSettings {
      * </p>
      * Shows the direction the user is heading.
      * <p>
-     * When location tracking is disabled the direction of {@link MyLocationView}  is rotated
-     * When location tracking is enabled the {@link MapView} is rotated based on bearing value.
+     * When location tracking is disabled the direction of {@link MyLocationView} is rotated. When
+     * location tracking is enabled the {@link MapView} is rotated based on the bearing value.
      * </p>
      * See {@link MyBearingTracking} for different values.
      *

@@ -17,18 +17,18 @@ public final class Polyline extends MultiPoint {
     }
 
     /**
-     * Returns the Polyline tint color.
+     * Gets the color of this polyline.
      *
-     * @return the tint color
+     * @return The color in ARGB format.
      */
     public int getColor() {
         return color;
     }
 
     /**
-     * Returns the Polyline width.
+     * Gets the width of this polyline.
      *
-     * @return the width
+     * @return The width in screen pixels.
      */
     public float getWidth() {
         return width;
