@@ -408,13 +408,6 @@ IB_DESIGNABLE
  */
 @property(nonatomic) CGFloat decelerationRate;
 
-/**
- The gesture recognizer used to detect single taps on the map.
- 
- Your application can use this to modify the behavior of your own gesture recognizers.
- */
-@property (nonatomic, readonly) UITapGestureRecognizer *singleTapGestureRecognizer;
-
 #pragma mark Manipulating the Viewpoint
 
 /**
