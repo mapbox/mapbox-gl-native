@@ -932,6 +932,23 @@ public class MapView extends FrameLayout {
     void setApiBaseUrl(@NonNull String baseUrl) {
         nativeMapView.setApiBaseUrl(baseUrl);
     }
+    
+        /**
+     * <p>
+     * Loads a new map style from the specified bundled style.
+     * </p>
+     *
+     * @param newStyleJson The bundled style json code.
+     * @param base one of 'mapbox://', 'http://', 'https://', 'assets/'.     
+     * @see Style
+     */
+    @UiThread
+    public void setStyleJson(@NonNull String newStyleJson, @NonNull String base) {
+        if (mDestroyed) {
+            return;
+        }
+        mNativeMapView.setStyleJson(newStyleJson, base);
+    }
 
     //
     // Access token

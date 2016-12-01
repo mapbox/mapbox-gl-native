@@ -742,6 +742,12 @@ public class MapboxMap {
         mapView.setStyleUrl(url);
     }
 
+    @UiThread
+    public void setStyleJson(@NonNull String newStyleJson, @NonNull String base) {
+        mMapView.setStyleJson(newStyleJson, base);
+    }
+
+
     /**
      * <p>
      * Loads a new map style from the specified bundled style.
