@@ -145,7 +145,7 @@ public:
     NSString *imageReuseIdentifier;
 };
 
-@interface MGLMapView () <NSPopoverDelegate, MGLMultiPointDelegate>
+@interface MGLMapView () <NSPopoverDelegate, MGLMultiPointDelegate, NSGestureRecognizerDelegate>
 
 @property (nonatomic, readwrite) NSSegmentedControl *zoomControls;
 @property (nonatomic, readwrite) NSSlider *compass;
@@ -172,6 +172,7 @@ public:
     NSPanGestureRecognizer *_panGestureRecognizer;
     NSMagnificationGestureRecognizer *_magnificationGestureRecognizer;
     NSRotationGestureRecognizer *_rotationGestureRecognizer;
+    NSClickGestureRecognizer *_singleClickRecognizer;
     double _scaleAtBeginningOfGesture;
     CLLocationDirection _directionAtBeginningOfGesture;
     CGFloat _pitchAtBeginningOfGesture;
@@ -408,9 +409,10 @@ public:
     _panGestureRecognizer.delaysKeyEvents = YES;
     [self addGestureRecognizer:_panGestureRecognizer];
 
-    NSClickGestureRecognizer *clickGestureRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleClickGesture:)];
-    clickGestureRecognizer.delaysPrimaryMouseButtonEvents = NO;
-    [self addGestureRecognizer:clickGestureRecognizer];
+    _singleClickRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleClickGesture:)];
+    _singleClickRecognizer.delaysPrimaryMouseButtonEvents = NO;
+    _singleClickRecognizer.delegate = self;
+    [self addGestureRecognizer:_singleClickRecognizer];
 
     NSClickGestureRecognizer *rightClickGestureRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleRightClickGesture:)];
     rightClickGestureRecognizer.buttonMask = 0x2;
@@ -1538,6 +1540,20 @@ public:
         return self.attributionView;
     }
     return nil;
+}
+
+#pragma mark NSGestureRecognizerDelegate methods
+- (BOOL)gestureRecognizer:(NSGestureRecognizer *)gestureRecognizer shouldAttemptToRecognizeWithEvent:(NSEvent *)event {
+    if (gestureRecognizer == _singleClickRecognizer) {
+        if (!self.selectedAnnotation) {
+            NSPoint gesturePoint = [self convertPoint:[event locationInWindow] fromView:nil];
+            MGLAnnotationTag hitAnnotationTag = [self annotationTagAtPoint:gesturePoint persistingResults:NO];
+            if (hitAnnotationTag == MGLAnnotationTagNotFound) {
+                return NO;
+            }
+        }
+    }
+    return YES;
 }
 
 #pragma mark Keyboard events
