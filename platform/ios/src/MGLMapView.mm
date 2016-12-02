@@ -1477,6 +1477,10 @@ public:
     else
     {
         [self deselectAnnotation:self.selectedAnnotation animated:YES];
+        if ([self.delegate respondsToSelector:@selector(mapView:tapAtCoordinate:)])
+        {
+            [self.delegate mapView:self tapAtCoordinate:[self convertPoint:tapPoint toCoordinateFromView:self]];
+        }
     }
 }
 
