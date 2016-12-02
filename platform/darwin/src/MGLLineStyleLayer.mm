@@ -82,6 +82,12 @@ namespace mbgl {
 
 - (void)addToMapView:(MGLMapView *)mapView
 {
+    if (_pendingLayer == nullptr) {
+        [NSException raise:@"MGLRedundantLayerException"
+            format:@"This instance %@ was already added to %@. Adding the same layer instance " \
+                    "to the style more than once is invalid.", self, mapView.style];
+    }
+
     [self addToMapView:mapView belowLayer:nil];
 }
 

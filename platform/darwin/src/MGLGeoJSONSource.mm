@@ -61,6 +61,12 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
 
 - (void)addToMapView:(MGLMapView *)mapView
 {
+    if (_pendingSource == nullptr) {
+        [NSException raise:@"MGLRedundantSourceException"
+                    format:@"This instance %@ was already added to %@. Adding the same source instance " \
+                            "to the style more than once is invalid.", self, mapView.style];
+    }
+
     mapView.mbglMap->addSource(std::move(_pendingSource));
 }
 
