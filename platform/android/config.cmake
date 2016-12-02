@@ -173,6 +173,7 @@ macro(mbgl_platform_core)
         PUBLIC -latomic
         PUBLIC -lz
         PUBLIC -Wl,--gc-sections
+        PUBLIC -Wl,--icf=safe
     )
 endmacro()
 
@@ -196,6 +197,7 @@ target_compile_options(mapbox-gl
 target_link_libraries(mapbox-gl
     PUBLIC mbgl-core
     PUBLIC -Wl,--gc-sections
+    PUBLIC -Wl,--icf=safe
 )
 
 # Create a stripped version of the library and copy it to the JNIDIR.
@@ -282,6 +284,7 @@ target_compile_options(example-custom-layer
 target_link_libraries(example-custom-layer
     PRIVATE mapbox-gl
     PUBLIC -Wl,--gc-sections
+    PUBLIC -Wl,--icf=safe
 )
 
 add_custom_command(TARGET example-custom-layer POST_BUILD
