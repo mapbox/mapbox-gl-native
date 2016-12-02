@@ -1,6 +1,6 @@
-#import "MGLMapViewTests.h"
+#import "MGLStyleLayerTests.h"
 
-@implementation MGLMapViewTests
+@implementation MGLStyleLayerTests
 
 - (void)setUp {
     [super setUp];
@@ -14,7 +14,7 @@
     _mapView.delegate = self;
 #else
     [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
-    NSWindowController *windowController = [[NSWindowController alloc] initWithWindowNibName:@"MGLMapViewTests" owner:self];
+    NSWindowController *windowController = [[NSWindowController alloc] initWithWindowNibName:@"MGLStyleLayerTests" owner:self];
     [windowController showWindow:nil];
 #endif
 }

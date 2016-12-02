@@ -1,6 +1,6 @@
-#import "MGLMapViewTests.h"
+#import "MGLStyleLayerTests.h"
 
-@interface MGLSourceTests : MGLMapViewTests
+@interface MGLSourceTests : MGLStyleLayerTests
 
 @end
 

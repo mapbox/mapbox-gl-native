@@ -191,7 +191,7 @@
 		DA25D5CD1CCDA11500607828 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA25D5B91CCD9EDE00607828 /* Settings.bundle */; };
 		DA27C24E1CBB3811000B0ECD /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA27C24D1CBB3811000B0ECD /* GLKit.framework */; };
 		DA27C24F1CBB4C11000B0ECD /* MGLAccountManager_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8847FF1CBAFA6200AB86E3 /* MGLAccountManager_Private.h */; };
-		DA2DBBCE1D51E80400D38FF9 /* MGLMapViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2DBBCD1D51E80400D38FF9 /* MGLMapViewTests.m */; };
+		DA2DBBCE1D51E80400D38FF9 /* MGLStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2DBBCD1D51E80400D38FF9 /* MGLStyleLayerTests.m */; };
 		DA2E88561CC036F400F24E7B /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
 		DA2E88611CC0382C00F24E7B /* MGLGeometryTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */; };
 		DA2E88621CC0382C00F24E7B /* MGLOfflinePackTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.m */; };
@@ -621,8 +621,8 @@
 		DA25D5BF1CCD9F8400607828 /* Root.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Root.plist; sourceTree = "<group>"; };
 		DA25D5C51CCDA06800607828 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Root.strings; sourceTree = "<group>"; };
 		DA27C24D1CBB3811000B0ECD /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
-		DA2DBBCC1D51E80400D38FF9 /* MGLMapViewTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLMapViewTests.h; path = ../../darwin/test/MGLMapViewTests.h; sourceTree = "<group>"; };
-		DA2DBBCD1D51E80400D38FF9 /* MGLMapViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLMapViewTests.m; path = ../../darwin/test/MGLMapViewTests.m; sourceTree = "<group>"; };
+		DA2DBBCC1D51E80400D38FF9 /* MGLStyleLayerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLStyleLayerTests.h; path = ../../darwin/test/MGLStyleLayerTests.h; sourceTree = "<group>"; };
+		DA2DBBCD1D51E80400D38FF9 /* MGLStyleLayerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLStyleLayerTests.m; path = ../../darwin/test/MGLStyleLayerTests.m; sourceTree = "<group>"; };
 		DA2E88511CC036F400F24E7B /* test.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = test.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA2E88551CC036F400F24E7B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLGeometryTests.mm; path = ../../darwin/test/MGLGeometryTests.mm; sourceTree = "<group>"; };
@@ -1059,8 +1059,8 @@
 				DA35A2A91CCA058D00E826B2 /* MGLCoordinateFormatterTests.m */,
 				DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */,
 				DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */,
-				DA2DBBCC1D51E80400D38FF9 /* MGLMapViewTests.h */,
-				DA2DBBCD1D51E80400D38FF9 /* MGLMapViewTests.m */,
+				DA2DBBCC1D51E80400D38FF9 /* MGLStyleLayerTests.h */,
+				DA2DBBCD1D51E80400D38FF9 /* MGLStyleLayerTests.m */,
 				35E208A61D24210F00EC9A46 /* MGLNSDataAdditionsTests.m */,
 				DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.m */,
 				DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */,
@@ -1898,7 +1898,7 @@
 				DA2E88611CC0382C00F24E7B /* MGLGeometryTests.mm in Sources */,
 				357579801D501E09000B822E /* MGLFillStyleLayerTests.m in Sources */,
 				DA2E88641CC0382C00F24E7B /* MGLOfflineStorageTests.m in Sources */,
-				DA2DBBCE1D51E80400D38FF9 /* MGLMapViewTests.m in Sources */,
+				DA2DBBCE1D51E80400D38FF9 /* MGLStyleLayerTests.m in Sources */,
 				DA35A2C61CCA9F8300E826B2 /* MGLCompassDirectionFormatterTests.m in Sources */,
 				3575798E1D502EC7000B822E /* MGLRuntimeStylingHelper.m in Sources */,
 				4085AF091D933DEA00F11B22 /* MGLTileSetTests.mm in Sources */,

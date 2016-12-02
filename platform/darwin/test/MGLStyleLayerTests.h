@@ -2,7 +2,7 @@
 #import "MGLRuntimeStylingHelper.h"
 #import <XCTest/XCTest.h>
 
-@interface MGLMapViewTests : XCTestCase <MGLMapViewDelegate>
+@interface MGLStyleLayerTests : XCTestCase <MGLMapViewDelegate>
 
 @property (nonatomic) IBOutlet MGLMapView *mapView;
 @property (nonatomic) XCTestExpectation *expectation;
