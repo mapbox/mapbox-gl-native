@@ -113,7 +113,7 @@ const GeometryTileLayer* VectorTileData::getLayer(const std::string& name) const
         parsed = true;
         mapbox::vector_tile::buffer tile_buffer(*data);
         for (auto const& tile_layer : tile_buffer.getLayers()) {
-            layers.emplace(tile_layer.first, std::make_unique<VectorTileLayer>(tile_layer.second));
+            layers.emplace(tile_layer.first, tile_layer.second);
         }
     }
 
