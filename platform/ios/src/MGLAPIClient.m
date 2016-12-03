@@ -122,7 +122,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
     self.geoTrustCert = certificate;
     [self loadCertificate:&certificate withResource:@"api_mapbox_com-digicert"];
     self.digicertCert = certificate;
-    [self loadCertificate:&certificate withResource:@"star_tilestream_net"];
+    [self loadCertificate:&certificate withResource:@"api_mapbox_staging"];
     self.testServerCert = certificate;
 }
 

@@ -61,7 +61,21 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
 
 - (void)addToMapView:(MGLMapView *)mapView
 {
+    if (_pendingSource == nullptr) {
+        [NSException raise:@"MGLRedundantSourceException"
+                    format:@"This instance %@ was already added to %@. Adding the same source instance " \
+                            "to the style more than once is invalid.", self, mapView.style];
+    }
+
     mapView.mbglMap->addSource(std::move(_pendingSource));
+}
+
+- (void)removeFromMapView:(MGLMapView *)mapView
+{
+    auto removedSource = mapView.mbglMap->removeSource(self.identifier.UTF8String);
+
+    _pendingSource = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::GeoJSONSource> &>(removedSource));
+    self.rawSource = _pendingSource.get();
 }
 
 - (void)commonInit
@@ -182,6 +196,12 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
     self.rawSource->setGeoJSON(geojson);
     
     _features = MGLFeaturesFromMBGLFeatures(featureCollection);
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; geoJSONData = %@; features = %@>",
+            NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.geoJSONData, self.features];
 }
 
 @end

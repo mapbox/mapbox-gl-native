@@ -34,6 +34,7 @@
 #import <mbgl/util/chrono.hpp>
 #import <mbgl/util/run_loop.hpp>
 
+#import <map>
 #import <unordered_map>
 #import <unordered_set>
 
@@ -109,6 +110,9 @@ enum { MGLAnnotationTagNotFound = UINT32_MAX };
 /// the annotation itself.
 typedef std::unordered_map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationTagContextMap;
 
+/// Mapping from an annotation object to an annotation tag.
+typedef std::map<id<MGLAnnotation>, MGLAnnotationTag> MGLAnnotationObjectTagMap;
+
 /// Returns an NSImage for the default marker image.
 NSImage *MGLDefaultMarkerImage() {
     NSString *path = [[NSBundle mgl_frameworkBundle] pathForResource:MGLDefaultStyleMarkerSymbolName
@@ -140,12 +144,14 @@ public:
     NSString *imageReuseIdentifier;
 };
 
-@interface MGLMapView () <NSPopoverDelegate, MGLMultiPointDelegate>
+@interface MGLMapView () <NSPopoverDelegate, MGLMultiPointDelegate, NSGestureRecognizerDelegate>
 
 @property (nonatomic, readwrite) NSSegmentedControl *zoomControls;
 @property (nonatomic, readwrite) NSSlider *compass;
 @property (nonatomic, readwrite) NSImageView *logoView;
 @property (nonatomic, readwrite) NSView *attributionView;
+
+@property (nonatomic, readwrite) MGLStyle *style;
 
 /// Mapping from reusable identifiers to annotation images.
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImagesByIdentifier;
@@ -165,12 +171,14 @@ public:
     NSPanGestureRecognizer *_panGestureRecognizer;
     NSMagnificationGestureRecognizer *_magnificationGestureRecognizer;
     NSRotationGestureRecognizer *_rotationGestureRecognizer;
+    NSClickGestureRecognizer *_singleClickRecognizer;
     double _scaleAtBeginningOfGesture;
     CLLocationDirection _directionAtBeginningOfGesture;
     CGFloat _pitchAtBeginningOfGesture;
     BOOL _didHideCursorDuringGesture;
 
     MGLAnnotationTagContextMap _annotationContextsByAnnotationTag;
+    MGLAnnotationObjectTagMap _annotationTagsByAnnotation;
     MGLAnnotationTag _selectedAnnotationTag;
     MGLAnnotationTag _lastSelectedAnnotationTag;
     /// Size of the rectangle formed by unioning the maximum slop area around every annotation image.
@@ -180,6 +188,8 @@ public:
     BOOL _wantsToolTipRects;
     /// True if any annotation images that have custom cursors have been installed.
     BOOL _wantsCursorRects;
+    /// True if a willChange notification has been issued for shape annotation layers and a didChange notification is pending.
+    BOOL _isChangingAnnotationLayers;
 
     // Cached checks for delegate method implementations that may be called from
     // MGLMultiPointDelegate methods.
@@ -290,6 +300,7 @@ public:
     // Set up annotation management and selection state.
     _annotationImagesByIdentifier = [NSMutableDictionary dictionary];
     _annotationContextsByAnnotationTag = {};
+    _annotationTagsByAnnotation = {};
     _selectedAnnotationTag = MGLAnnotationTagNotFound;
     _lastSelectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastClick = {};
@@ -405,9 +416,10 @@ public:
     _panGestureRecognizer.delaysKeyEvents = YES;
     [self addGestureRecognizer:_panGestureRecognizer];
 
-    NSClickGestureRecognizer *clickGestureRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleClickGesture:)];
-    clickGestureRecognizer.delaysPrimaryMouseButtonEvents = NO;
-    [self addGestureRecognizer:clickGestureRecognizer];
+    _singleClickRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleClickGesture:)];
+    _singleClickRecognizer.delaysPrimaryMouseButtonEvents = NO;
+    _singleClickRecognizer.delegate = self;
+    [self addGestureRecognizer:_singleClickRecognizer];
 
     NSClickGestureRecognizer *rightClickGestureRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleRightClickGesture:)];
     rightClickGestureRecognizer.buttonMask = 0x2;
@@ -577,7 +589,7 @@ public:
     if (_isTargetingInterfaceBuilder) {
         return;
     }
-
+    
     // Default to Streets.
     if (!styleURL) {
         // An access token is required to load any default style, including
@@ -589,7 +601,10 @@ public:
     }
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
+    [self willChangeValueForKey:@"style"];
+    _style = [[MGLStyle alloc] initWithMapView:self];
     _mbglMap->setStyleURL(styleURL.absoluteString.UTF8String);
+    [self didChangeValueForKey:@"style"];
 }
 
 - (IBAction)reloadStyle:(__unused id)sender {
@@ -849,6 +864,10 @@ public:
         }
         case mbgl::MapChangeDidFinishLoadingMap:
         {
+            [self.style willChangeValueForKey:@"sources"];
+            [self.style didChangeValueForKey:@"sources"];
+            [self.style willChangeValueForKey:@"layers"];
+            [self.style didChangeValueForKey:@"layers"];
             if ([self.delegate respondsToSelector:@selector(mapViewDidFinishLoadingMap:)]) {
                 [self.delegate mapViewDidFinishLoadingMap:self];
             }
@@ -888,6 +907,10 @@ public:
         case mbgl::MapChangeDidFinishRenderingFrame:
         case mbgl::MapChangeDidFinishRenderingFrameFullyRendered:
         {
+            if (_isChangingAnnotationLayers) {
+                _isChangingAnnotationLayers = NO;
+                [self.style didChangeValueForKey:@"layers"];
+            }
             if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingFrame:fullyRendered:)]) {
                 BOOL fullyRendered = change == mbgl::MapChangeDidFinishRenderingFrameFullyRendered;
                 [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:fullyRendered];
@@ -896,6 +919,11 @@ public:
         }
         case mbgl::MapChangeDidFinishLoadingStyle:
         {
+            [self.style willChangeValueForKey:@"name"];
+            [self.style willChangeValueForKey:@"sources"];
+            [self.style didChangeValueForKey:@"sources"];
+            [self.style willChangeValueForKey:@"layers"];
+            [self.style didChangeValueForKey:@"layers"];
             if ([self.delegate respondsToSelector:@selector(mapView:didFinishLoadingStyle:)])
             {
                 [self.delegate mapView:self didFinishLoadingStyle:self.style];
@@ -1520,6 +1548,20 @@ public:
     return nil;
 }
 
+#pragma mark NSGestureRecognizerDelegate methods
+- (BOOL)gestureRecognizer:(NSGestureRecognizer *)gestureRecognizer shouldAttemptToRecognizeWithEvent:(NSEvent *)event {
+    if (gestureRecognizer == _singleClickRecognizer) {
+        if (!self.selectedAnnotation) {
+            NSPoint gesturePoint = [self convertPoint:[event locationInWindow] fromView:nil];
+            MGLAnnotationTag hitAnnotationTag = [self annotationTagAtPoint:gesturePoint persistingResults:NO];
+            if (hitAnnotationTag == MGLAnnotationTagNotFound) {
+                return NO;
+            }
+        }
+    }
+    return YES;
+}
+
 #pragma mark Keyboard events
 
 - (void)keyDown:(NSEvent *)event {
@@ -1641,7 +1683,11 @@ public:
         
         for (auto const& annotationTag: annotationTags)
         {
-            MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag[annotationTag];
+            if (!_annotationContextsByAnnotationTag.count(annotationTag))
+            {
+                continue;
+            }
+            MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
             [annotations addObject:annotationContext.annotation];
         }
         
@@ -1663,16 +1709,11 @@ public:
 
 /// Returns the annotation tag assigned to the given annotation. Relatively expensive.
 - (MGLAnnotationTag)annotationTagForAnnotation:(id <MGLAnnotation>)annotation {
-    if (!annotation) {
+    if (!annotation || _annotationTagsByAnnotation.count(annotation) == 0) {
         return MGLAnnotationTagNotFound;
     }
 
-    for (auto &pair : _annotationContextsByAnnotationTag) {
-        if (pair.second.annotation == annotation) {
-            return pair.first;
-        }
-    }
-    return MGLAnnotationTagNotFound;
+    return  _annotationTagsByAnnotation.at(annotation);
 }
 
 - (void)addAnnotation:(id <MGLAnnotation>)annotation {
@@ -1693,6 +1734,12 @@ public:
     for (id <MGLAnnotation> annotation in annotations) {
         NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"Annotation does not conform to MGLAnnotation");
 
+        // adding the same annotation object twice is a no-op
+        if ([self.annotations containsObject:annotation])
+        {
+            continue;
+        }
+
         if ([annotation isKindOfClass:[MGLMultiPoint class]]) {
             // The multipoint knows how to style itself (with the map view’s help).
             MGLMultiPoint *multiPoint = (MGLMultiPoint *)annotation;
@@ -1700,10 +1747,12 @@ public:
                 continue;
             }
 
+            _isChangingAnnotationLayers = YES;
             MGLAnnotationTag annotationTag = _mbglMap->addAnnotation([multiPoint annotationObjectWithDelegate:self]);
             MGLAnnotationContext context;
             context.annotation = annotation;
             _annotationContextsByAnnotationTag[annotationTag] = context;
+            _annotationTagsByAnnotation[annotation] = annotationTag;
 
             [(NSObject *)annotation addObserver:self forKeyPath:@"coordinates" options:0 context:(void *)(NSUInteger)annotationTag];
         } else if (![annotation isKindOfClass:[MGLMultiPolyline class]]
@@ -1741,6 +1790,7 @@ public:
             context.annotation = annotation;
             context.imageReuseIdentifier = annotationImage.reuseIdentifier;
             _annotationContextsByAnnotationTag[annotationTag] = context;
+            _annotationTagsByAnnotation[annotation] = annotationTag;
 
             if ([annotation isKindOfClass:[NSObject class]]) {
                 NSAssert(![annotation isKindOfClass:[MGLMultiPoint class]], @"Point annotation should not be MGLMultiPoint.");
@@ -1755,6 +1805,9 @@ public:
     }
 
     [self didChangeValueForKey:@"annotations"];
+    if (_isChangingAnnotationLayers) {
+        [self.style willChangeValueForKey:@"layers"];
+    }
 
     [self updateAnnotationTrackingAreas];
 }
@@ -1827,6 +1880,7 @@ public:
         }
 
         _annotationContextsByAnnotationTag.erase(annotationTag);
+        _annotationTagsByAnnotation.erase(annotation);
 
         if ([annotation isKindOfClass:[NSObject class]] &&
             ![annotation isKindOfClass:[MGLMultiPoint class]]) {
@@ -1835,10 +1889,14 @@ public:
             [(NSObject *)annotation removeObserver:self forKeyPath:@"coordinates" context:(void *)(NSUInteger)annotationTag];
         }
 
+        _isChangingAnnotationLayers = YES;
         _mbglMap->removeAnnotation(annotationTag);
     }
 
     [self didChangeValueForKey:@"annotations"];
+    if (_isChangingAnnotationLayers) {
+        [self.style willChangeValueForKey:@"layers"];
+    }
 
     [self updateAnnotationTrackingAreas];
 }
@@ -2191,13 +2249,6 @@ public:
 }
 
 #pragma mark - Runtime styling
-
-- (MGLStyle *)style
-{
-    MGLStyle *style = [[MGLStyle alloc] init];
-    style.mapView = self;
-    return style;
-}
 
 - (mbgl::Map *)mbglMap
 {
@@ -2582,11 +2633,19 @@ public:
     }
 
     void activate() override {
+        if (activationCount++) {
+            return;
+        }
+
         MGLOpenGLLayer *layer = (MGLOpenGLLayer *)nativeView.layer;
         [layer.openGLContext makeCurrentContext];
     }
 
     void deactivate() override {
+        if (--activationCount) {
+            return;
+        }
+
         [NSOpenGLContext clearCurrentContext];
     }
 
@@ -2616,6 +2675,9 @@ private:
 
     /// The current framebuffer of the NSOpenGLLayer we are painting to.
     GLint fbo = 0;
+
+    /// The reference counted count of activation calls
+    NSUInteger activationCount = 0;
 };
 
 @end

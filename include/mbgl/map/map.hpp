@@ -157,11 +157,13 @@ public:
     void removeAnnotation(AnnotationID);
 
     // Sources
+    std::vector<style::Source*> getSources();
     style::Source* getSource(const std::string& sourceID);
     void addSource(std::unique_ptr<style::Source>);
     std::unique_ptr<style::Source> removeSource(const std::string& sourceID);
 
     // Layers
+    std::vector<style::Layer*> getLayers();
     style::Layer* getLayer(const std::string& layerID);
     void addLayer(std::unique_ptr<style::Layer>, const optional<std::string>& beforeLayerID = {});
     std::unique_ptr<style::Layer> removeLayer(const std::string& layerID);

@@ -175,6 +175,15 @@ std::vector<const Layer*> Style::getLayers() const {
     return result;
 }
 
+std::vector<Layer*> Style::getLayers() {
+    std::vector<Layer*> result;
+    result.reserve(layers.size());
+    for (auto& layer : layers) {
+        result.push_back(layer.get());
+    }
+    return result;
+}
+
 std::vector<std::unique_ptr<Layer>>::const_iterator Style::findLayer(const std::string& id) const {
     return std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
         return layer->baseImpl->id == id;
@@ -331,6 +340,24 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
             source->baseImpl->removeTiles();
         }
     }
+}
+
+std::vector<const Source*> Style::getSources() const {
+    std::vector<const Source*> result;
+    result.reserve(sources.size());
+    for (const auto& source : sources) {
+        result.push_back(source.get());
+    }
+    return result;
+}
+
+std::vector<Source*> Style::getSources() {
+    std::vector<Source*> result;
+    result.reserve(sources.size());
+    for (auto& source : sources) {
+        result.push_back(source.get());
+    }
+    return result;
 }
 
 Source* Style::getSource(const std::string& id) const {

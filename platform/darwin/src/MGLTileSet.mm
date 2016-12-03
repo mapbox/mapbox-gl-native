@@ -84,4 +84,10 @@
     return tileset;
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; tileURLTemplates = %@>",
+            NSStringFromClass([self class]), (void *)self, self.tileURLTemplates];
+}
+
 @end

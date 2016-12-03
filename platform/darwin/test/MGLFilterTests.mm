@@ -1,10 +1,10 @@
-#import "MGLMapViewTests.h"
+#import "MGLStyleLayerTests.h"
 
 #import "NSPredicate+MGLAdditions.h"
 #import "MGLValueEvaluator.h"
 
 
-@interface MGLFilterTests : MGLMapViewTests {
+@interface MGLFilterTests : MGLStyleLayerTests {
     MGLGeoJSONSource *source;
     MGLLineStyleLayer *layer;
 }
@@ -71,6 +71,18 @@
         layer.predicate = predicate;
         XCTAssertEqualObjects(layer.predicate, predicate);
     }
+    [self.mapView.style addLayer:layer];
+}
+
+- (void)testContainsPredicate
+{
+    // core does not have a "contains" filter but we can achieve the equivalent by creating an `mbgl::style::InFilter`
+    // and searching the value for the key
+    NSPredicate *expectedPredicate = [NSPredicate predicateWithFormat:@"park IN %@", @[@"park", @"neighbourhood"]];
+    NSPredicate *containsPredicate = [NSPredicate predicateWithFormat:@"%@ CONTAINS %@", @[@"park", @"neighbourhood"], @"park"];
+    
+    layer.predicate = containsPredicate;
+    XCTAssertEqualObjects(layer.predicate, expectedPredicate);
     [self.mapView.style addLayer:layer];
 }
 

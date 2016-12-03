@@ -46,9 +46,12 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     return flattenedShapes;
 }
 
-@interface MapDocument () <NSWindowDelegate, NSSharingServicePickerDelegate, NSMenuDelegate, MGLMapViewDelegate>
+@interface MapDocument () <NSWindowDelegate, NSSharingServicePickerDelegate, NSMenuDelegate, NSSplitViewDelegate, MGLMapViewDelegate>
 
+@property (weak) IBOutlet NSArrayController *styleLayersArrayController;
+@property (weak) IBOutlet NSTableView *styleLayersTableView;
 @property (weak) IBOutlet NSMenu *mapViewContextMenu;
+@property (weak) IBOutlet NSSplitView *splitView;
 
 @end
 
@@ -61,6 +64,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     NSUInteger _droppedPinCounter;
     NSNumberFormatter *_spellOutNumberFormatter;
     
+    BOOL _isLocalizingLabels;
     BOOL _showsToolTipsOnDroppedPins;
     BOOL _randomizesCursorsOnDroppedPins;
     BOOL _isTouringWorld;
@@ -98,6 +102,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     NSPressGestureRecognizer *pressGestureRecognizer = [[NSPressGestureRecognizer alloc] initWithTarget:self action:@selector(handlePressGesture:)];
     [self.mapView addGestureRecognizer:pressGestureRecognizer];
     
+    [self.splitView setPosition:0 ofDividerAtIndex:0];
+    
     [self applyPendingState];
 }
 
@@ -118,10 +124,12 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 - (void)window:(NSWindow *)window willEncodeRestorableState:(NSCoder *)state {
     [state encodeObject:self.mapView.styleURL forKey:@"MBXMapViewStyleURL"];
+    [state encodeBool:_isLocalizingLabels forKey:@"MBXLocalizeLabels"];
 }
 
 - (void)window:(NSWindow *)window didDecodeRestorableState:(NSCoder *)state {
     self.mapView.styleURL = [state decodeObjectForKey:@"MBXMapViewStyleURL"];
+    _isLocalizingLabels = [state decodeBoolForKey:@"MBXLocalizeLabels"];
 }
 
 #pragma mark Services
@@ -143,7 +151,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 #pragma mark View methods
 
-- (IBAction)setStyle:(id)sender {
+- (IBAction)showStyle:(id)sender {
     NSInteger tag;
     if ([sender isKindOfClass:[NSMenuItem class]]) {
         tag = [sender tag];
@@ -174,6 +182,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
             NSAssert(NO, @"Cannot set style from control with tag %li", (long)tag);
             break;
     }
+    [self.undoManager removeAllActionsWithTarget:self];
     self.mapView.styleURL = styleURL;
     [self.window.toolbar validateVisibleItems];
 }
@@ -195,6 +204,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     [alert addButtonWithTitle:@"Apply"];
     [alert addButtonWithTitle:@"Cancel"];
     if ([alert runModal] == NSAlertFirstButtonReturn) {
+        [self.undoManager removeAllActionsWithTarget:self];
         self.mapView.styleURL = [NSURL URLWithString:textField.stringValue];
         [[NSUserDefaults standardUserDefaults] setURL:self.mapView.styleURL forKey:@"MBXCustomStyleURL"];
         [self.window.toolbar validateVisibleItems];
@@ -214,7 +224,162 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 - (IBAction)reload:(id)sender {
+    [self.undoManager removeAllActionsWithTarget:self];
     [self.mapView reloadStyle:sender];
+}
+
+/**
+ Show or hide the Layers sidebar.
+ */
+- (IBAction)toggleLayers:(id)sender {
+    BOOL isShown = ![self.splitView isSubviewCollapsed:self.splitView.arrangedSubviews.firstObject];
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
+        context.allowsImplicitAnimation = YES;
+        [self.splitView setPosition:isShown ? 0 : 100 ofDividerAtIndex:0];
+        [self.window.toolbar validateVisibleItems];
+    } completionHandler:nil];
+}
+
+/**
+ Show or hide the selected layers.
+ */
+- (IBAction)toggleStyleLayers:(id)sender {
+    NSInteger clickedRow = self.styleLayersTableView.clickedRow;
+    NSIndexSet *indices = self.styleLayersTableView.selectedRowIndexes;
+    if (clickedRow >= 0 && ![indices containsIndex:clickedRow]) {
+        indices = [NSIndexSet indexSetWithIndex:clickedRow];
+    }
+    [self toggleStyleLayersAtArrangedObjectIndexes:indices];
+}
+
+- (void)toggleStyleLayersAtArrangedObjectIndexes:(NSIndexSet *)indices {
+    NS_ARRAY_OF(MGLStyleLayer *) *layers = [self.mapView.style.layers objectsAtIndexes:indices];
+    BOOL isVisible = layers.firstObject.visible;
+    [self.undoManager registerUndoWithTarget:self handler:^(MapDocument * _Nonnull target) {
+        [target toggleStyleLayersAtArrangedObjectIndexes:indices];
+    }];
+    
+    if (!self.undoManager.undoing) {
+        NSString *actionName;
+        if (indices.count == 1) {
+            actionName = [NSString stringWithFormat:@"%@ Layer “%@”", isVisible ? @"Hide" : @"Show", layers.firstObject.identifier];
+        } else {
+            actionName = [NSString stringWithFormat:@"%@ %@ Layers", isVisible ? @"Hide" : @"Show",
+                          [NSNumberFormatter localizedStringFromNumber:@(indices.count)
+                                                           numberStyle:NSNumberFormatterDecimalStyle]];
+        }
+        [self.undoManager setActionIsDiscardable:YES];
+        [self.undoManager setActionName:actionName];
+    }
+    
+    for (MGLStyleLayer *layer in layers) {
+        layer.visible = !isVisible;
+    }
+    
+    NSIndexSet *columnIndices = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)];
+    [self.styleLayersTableView reloadDataForRowIndexes:indices columnIndexes:columnIndices];
+}
+
+- (IBAction)deleteStyleLayers:(id)sender {
+    NSInteger clickedRow = self.styleLayersTableView.clickedRow;
+    NSIndexSet *indices = self.styleLayersTableView.selectedRowIndexes;
+    if (clickedRow >= 0 && ![indices containsIndex:clickedRow]) {
+        indices = [NSIndexSet indexSetWithIndex:clickedRow];
+    }
+    [self deleteStyleLayersAtArrangedObjectIndexes:indices];
+}
+
+- (void)insertStyleLayers:(NS_ARRAY_OF(MGLStyleLayer *) *)layers atArrangedObjectIndexes:(NSIndexSet *)indices {
+    [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
+        [self deleteStyleLayersAtArrangedObjectIndexes:indices];
+    }];
+    
+    if (!self.undoManager.undoing) {
+        NSString *actionName;
+        if (indices.count == 1) {
+            actionName = [NSString stringWithFormat:@"Add Layer “%@”", layers.firstObject.identifier];
+        } else {
+            actionName = [NSString stringWithFormat:@"Add %@ Layers",
+                          [NSNumberFormatter localizedStringFromNumber:@(indices.count) numberStyle:NSNumberFormatterDecimalStyle]];
+        }
+        [self.undoManager setActionName:actionName];
+    }
+    
+    [self.styleLayersArrayController insertObjects:layers atArrangedObjectIndexes:indices];
+}
+
+- (void)deleteStyleLayersAtArrangedObjectIndexes:(NSIndexSet *)indices {
+    NS_ARRAY_OF(MGLStyleLayer *) *layers = [self.mapView.style.layers objectsAtIndexes:indices];
+    [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
+        [self insertStyleLayers:layers atArrangedObjectIndexes:indices];
+    }];
+    
+    if (!self.undoManager.undoing) {
+        NSString *actionName;
+        if (indices.count == 1) {
+            actionName = [NSString stringWithFormat:@"Delete Layer “%@”", layers.firstObject.identifier];
+        } else {
+            actionName = [NSString stringWithFormat:@"Delete %@ Layers",
+                          [NSNumberFormatter localizedStringFromNumber:@(indices.count) numberStyle:NSNumberFormatterDecimalStyle]];
+        }
+        [self.undoManager setActionName:actionName];
+    }
+    
+    [self.styleLayersArrayController removeObjectsAtArrangedObjectIndexes:indices];
+}
+
+- (IBAction)setLabelLanguage:(NSMenuItem *)sender {
+    _isLocalizingLabels = sender.tag;
+    [self updateLabels];
+}
+
+- (void)updateLabels {
+    NSString *preferredLanguageCode = self.preferredLanguageCode;
+    NSString *preferredNameToken = _isLocalizingLabels ? [NSString stringWithFormat:@"{name_%@}", preferredLanguageCode] : @"{name}";
+    NSRegularExpression *nameTokenExpression = [NSRegularExpression regularExpressionWithPattern:@"\\{name(?:_\\w{2})?\\}" options:0 error:NULL];
+    
+    for (MGLSymbolStyleLayer *layer in self.mapView.style.layers) {
+        if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
+            continue;
+        }
+        
+        if ([layer.textField isKindOfClass:[MGLStyleConstantValue class]]) {
+            NSString *textField = [(MGLStyleConstantValue<NSString *> *)layer.textField rawValue];
+            textField = [nameTokenExpression stringByReplacingMatchesInString:textField
+                                                                      options:0
+                                                                        range:NSMakeRange(0, textField.length)
+                                                                 withTemplate:preferredNameToken];
+            layer.textField = [MGLStyleValue<NSString *> valueWithRawValue:textField];
+        } else if ([layer.textField isKindOfClass:[MGLStyleFunction class]]) {
+            MGLStyleFunction *function = (MGLStyleFunction<NSString *> *)layer.textField;
+            NSMutableDictionary *stops = function.stops.mutableCopy;
+            [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLStyleConstantValue<NSString *> *stop, BOOL *done) {
+                NSString *textField = stop.rawValue;
+                textField = [nameTokenExpression stringByReplacingMatchesInString:textField
+                                                                          options:0
+                                                                            range:NSMakeRange(0, textField.length)
+                                                                     withTemplate:preferredNameToken];
+                stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:textField];
+            }];
+            function.stops = stops;
+            layer.textField = function;
+        }
+    }
+}
+
+- (NSString *)preferredLanguageCode {
+    // Languages supported by Mapbox Streets v10.
+    NSSet *supportedLanguages = [NSSet setWithObjects:@"en", @"es", @"fr", @"de", @"ru", @"zh", nil];
+    NSArray *preferredLanguages = [NSLocale preferredLanguages];
+    
+    for (NSString *language in preferredLanguages) {
+        NSString *languageCode = [[NSLocale localeWithLocaleIdentifier:language] objectForKey:NSLocaleLanguageCode];
+        if ([supportedLanguages containsObject:languageCode]) {
+            return languageCode;
+        }
+    }
+    
+    return @"en";
 }
 
 - (void)applyPendingState {
@@ -563,7 +728,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 #pragma mark User interface validation
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
-    if (menuItem.action == @selector(setStyle:)) {
+    if (menuItem.action == @selector(showStyle:)) {
         NSURL *styleURL = self.mapView.styleURL;
         NSCellStateValue state;
         switch (menuItem.tag) {
@@ -605,6 +770,35 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return self.mapView.direction != 0;
     }
     if (menuItem.action == @selector(reload:)) {
+        return YES;
+    }
+    if (menuItem.action == @selector(toggleLayers:)) {
+        BOOL isShown = ![self.splitView isSubviewCollapsed:self.splitView.arrangedSubviews.firstObject];
+        menuItem.title = isShown ? @"Hide Layers" : @"Show Layers";
+        return YES;
+    }
+    if (menuItem.action == @selector(toggleStyleLayers:)) {
+        NSInteger row = self.styleLayersTableView.clickedRow;
+        if (row == -1) {
+            row = self.styleLayersTableView.selectedRow;
+        }
+        if (row == -1) {
+            menuItem.title = @"Show";
+        } else {
+            BOOL isVisible = self.mapView.style.layers[row].visible;
+            menuItem.title = isVisible ? @"Hide" : @"Show";
+        }
+        return row != -1;
+    }
+    if (menuItem.action == @selector(deleteStyleLayers:)) {
+        return self.styleLayersTableView.clickedRow >= 0 || self.styleLayersTableView.selectedRow >= 0;
+    }
+    if (menuItem.action == @selector(setLabelLanguage:)) {
+        menuItem.state = menuItem.tag == _isLocalizingLabels ? NSOnState: NSOffState;
+        if (menuItem.tag) {
+            NSLocale *locale = [NSLocale localeWithLocaleIdentifier:[NSBundle mainBundle].developmentLocalization];
+            menuItem.title = [locale displayNameForKey:NSLocaleIdentifier value:self.preferredLanguageCode];
+        }
         return YES;
     }
     if (menuItem.action == @selector(manipulateStyle:)) {
@@ -722,7 +916,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return NO;
     }
     
-    if (toolbarItem.action == @selector(showShareMenu:)) {
+    SEL action = toolbarItem.action;
+    if (action == @selector(showShareMenu:)) {
         [(NSButton *)toolbarItem.view sendActionOn:NSLeftMouseDownMask];
         if (![MGLAccountManager accessToken]) {
             return NO;
@@ -731,14 +926,21 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return ([styleURL.scheme isEqualToString:@"mapbox"]
                 && [styleURL.pathComponents.firstObject isEqualToString:@"styles"]);
     }
-    if (toolbarItem.action == @selector(setStyle:)) {
+    if (action == @selector(showStyle:)) {
         NSPopUpButton *popUpButton = (NSPopUpButton *)toolbarItem.view;
         NSUInteger index = self.indexOfStyleInToolbarItem;
         if (index == NSNotFound) {
-            [popUpButton addItemWithTitle:@"Custom"];
-            index = [popUpButton numberOfItems] - 1;
+            index = -1;
         }
         [popUpButton selectItemAtIndex:index];
+        if (index == -1) {
+            NSString *name = self.mapView.style.name;
+            popUpButton.title = name ?: @"Custom";
+        }
+    }
+    if (action == @selector(toggleLayers:)) {
+        BOOL isShown = ![self.splitView isSubviewCollapsed:self.splitView.arrangedSubviews.firstObject];
+        [(NSButton *)toolbarItem.view setState:isShown ? NSOnState : NSOffState];
     }
     return NO;
 }
@@ -773,7 +975,21 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
 }
 
+#pragma mark NSSplitViewDelegate methods
+
+- (BOOL)splitView:(NSSplitView *)splitView canCollapseSubview:(NSView *)subview {
+    return subview != self.mapView;
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex {
+    return YES;
+}
+
 #pragma mark MGLMapViewDelegate methods
+
+- (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
+    [self updateLabels];
+}
 
 - (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation {
     return YES;

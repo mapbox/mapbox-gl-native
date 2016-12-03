@@ -33,15 +33,9 @@ macro(mbgl_android_copy_asset source target)
 endmacro()
 
 mbgl_android_copy_asset(common/ca-bundle.crt ca-bundle.crt)
-mbgl_android_copy_asset(platform/default/resources/api_mapbox_com-digicert.der api_mapbox_com-digicert.der)
-mbgl_android_copy_asset(platform/default/resources/api_mapbox_com-geotrust.der api_mapbox_com-geotrust.der)
-mbgl_android_copy_asset(platform/default/resources/star_tilestream_net.der star_tilestream_net.der)
 
 add_custom_target(mbgl-copy-android-assets
     DEPENDS ${ANDROID_ASSETS_TARGET_DIR}/ca-bundle.crt
-    DEPENDS ${ANDROID_ASSETS_TARGET_DIR}/api_mapbox_com-digicert.der
-    DEPENDS ${ANDROID_ASSETS_TARGET_DIR}/api_mapbox_com-geotrust.der
-    DEPENDS ${ANDROID_ASSETS_TARGET_DIR}/star_tilestream_net.der
 )
 
 ## mbgl core ##

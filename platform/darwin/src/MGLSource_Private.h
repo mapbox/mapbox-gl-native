@@ -27,4 +27,13 @@
  */
 - (void)addToMapView:(MGLMapView *)mapView;
 
+/**
+ Removes the mbgl source that this object represents from the mbgl map.
+ 
+ When a mbgl source is removed, ownership of the object is transferred back
+ to the `MGLSource` instance and the unique_ptr reference is valid again. It is
+ safe to add the source back to the style after it is removed.
+ */
+- (void)removeFromMapView:(MGLMapView *)mapView;
+
 @end

@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param count The number of items in the `coords` array.
  @return A new polygon object.
  */
-+ (instancetype)polygonWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
++ (instancetype)polygonWithCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count;
 
 /**
  Creates and returns an `MGLPolygon` object from the specified set of
@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
     is considered to have no interior polygons.
  @return A new polygon object.
  */
-+ (instancetype)polygonWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count interiorPolygons:(nullable NS_ARRAY_OF(MGLPolygon *) *)interiorPolygons;
++ (instancetype)polygonWithCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count interiorPolygons:(nullable NS_ARRAY_OF(MGLPolygon *) *)interiorPolygons;
 
 @end
 

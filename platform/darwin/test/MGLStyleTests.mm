@@ -1,4 +1,16 @@
-#import "MGLStyle.h"
+#import "MGLMapView.h"
+#import "MGLStyle_Private.h"
+
+#import "MGLGeoJSONSource.h"
+#import "MGLRasterSource.h"
+#import "MGLVectorSource.h"
+
+#import "MGLBackgroundStyleLayer.h"
+#import "MGLCircleStyleLayer.h"
+#import "MGLFillStyleLayer.h"
+#import "MGLLineStyleLayer.h"
+#import "MGLRasterStyleLayer.h"
+#import "MGLSymbolStyleLayer.h"
 
 #import "NSBundle+MGLAdditions.h"
 
@@ -8,9 +20,20 @@
 #import <objc/runtime.h>
 
 @interface MGLStyleTests : XCTestCase
+
+@property (nonatomic) MGLMapView *mapView;
+@property (nonatomic) MGLStyle *style;
+
 @end
 
 @implementation MGLStyleTests
+
+- (void)setUp {
+    [super setUp];
+
+    self.mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+    self.style = [[MGLStyle alloc] initWithMapView:self.mapView];
+}
 
 - (void)testUnversionedStyleURLs {
 #pragma clang diagnostic push
@@ -90,6 +113,56 @@
         NSString *version = [styleHeader substringWithRange:[result rangeAtIndex:1]];
         XCTAssertEqual([version integerValue], MGLStyleDefaultVersion, @"Versioned style URL method should document current version as %ld, not %ld.", MGLStyleDefaultVersion, version.integerValue);
     }];
+}
+
+- (void)testAddingSourcesTwice {
+    MGLGeoJSONSource *geoJSONSource = [[MGLGeoJSONSource alloc] initWithIdentifier:@"geoJSONSource" features:@[] options:nil];
+    [self.style addSource:geoJSONSource];
+    XCTAssertThrowsSpecificNamed([self.style addSource:geoJSONSource], NSException, @"MGLRedundantSourceException");
+
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"rasterSource" URL:[NSURL new] tileSize:42];
+    [self.style addSource:rasterSource];
+    XCTAssertThrowsSpecificNamed([self.style addSource:rasterSource], NSException, @"MGLRedundantSourceException");
+
+    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"vectorSource" URL:[NSURL new]];
+    [self.style addSource:vectorSource];
+    XCTAssertThrowsSpecificNamed([self.style addSource:vectorSource], NSException, @"MGLRedundantSourceException");
+}
+
+- (void)testAddingSourcesWithDuplicateIdentifiers {
+    MGLVectorSource *source1 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" URL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorSource *source2 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" URL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+
+    [self.style addSource: source1];
+    XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, @"MGLRedundantSourceIdentiferException");
+}
+
+- (void)testAddingLayersTwice {
+    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"geoJSONSource" features:@[] options:nil];
+
+    MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"backgroundLayer"];
+    [self.style addLayer:backgroundLayer];
+    XCTAssertThrowsSpecificNamed([self.style addLayer:backgroundLayer], NSException, @"MGLRedundantLayerException");
+
+    MGLCircleStyleLayer *circleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"circleLayer" source:source];
+    [self.style addLayer:circleLayer];
+    XCTAssertThrowsSpecificNamed([self.style addLayer:circleLayer], NSException, @"MGLRedundantLayerException");
+
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:source];
+    [self.style addLayer:fillLayer];
+    XCTAssertThrowsSpecificNamed([self.style addLayer:fillLayer], NSException, @"MGLRedundantLayerException");
+
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"lineLayer" source:source];
+    [self.style addLayer:lineLayer];
+    XCTAssertThrowsSpecificNamed([self.style addLayer:lineLayer], NSException, @"MGLRedundantLayerException");
+
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"rasterLayer" source:source];
+    [self.style addLayer:rasterLayer];
+    XCTAssertThrowsSpecificNamed([self.style addLayer:rasterLayer], NSException, @"MGLRedundantLayerException");
+
+    MGLSymbolStyleLayer *symbolLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"symbolLayer" source:source];
+    [self.style addLayer:symbolLayer];
+    XCTAssertThrowsSpecificNamed([self.style addLayer:symbolLayer], NSException, @"MGLRedundantLayerException");
 }
 
 - (NSString *)stringWithContentsOfStyleHeader {

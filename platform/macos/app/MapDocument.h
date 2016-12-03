@@ -6,7 +6,7 @@
 
 @property (weak) IBOutlet MGLMapView *mapView;
 
-- (IBAction)setStyle:(id)sender;
+- (IBAction)showStyle:(id)sender;
 - (IBAction)chooseCustomStyle:(id)sender;
 
 - (IBAction)reload:(id)sender;

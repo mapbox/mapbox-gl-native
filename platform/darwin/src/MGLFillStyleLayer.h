@@ -39,13 +39,6 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillAntialias;
 
-/**
- The opacity of the entire fill layer. In contrast to the `fillColor`, this value will also affect the 1pt stroke around the fill, if the stroke is used.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillOpacity;
-
 #if TARGET_OS_IPHONE
 /**
  The color of the filled part of this layer.
@@ -67,11 +60,23 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
 #endif
 
 /**
+ The opacity of the entire fill layer. In contrast to the `fillColor`, this value will also affect the 1pt stroke around the fill, if the stroke is used.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillOpacity;
+
+/**
  The outline color of the fill. Matches the value of `fillColor` if unspecified.
 
  This property is only applied to the style if `fillPattern` is set to `nil`, and `fillAntialias` is set to an `MGLStyleValue` object containing an `NSNumber` object containing `YES`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *fillOutlineColor;
+
+/**
+ Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *fillPattern;
 
 /**
  The geometry's offset.
@@ -90,11 +95,6 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
  This property is only applied to the style if `fillTranslate` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslateAnchor;
-
-/**
- Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *fillPattern;
 
 @end
 

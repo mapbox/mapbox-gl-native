@@ -26,7 +26,7 @@
  @param count The number of items in the `coords` array.
  @return A new point collection object.
  */
-+ (instancetype)pointCollectionWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
++ (instancetype)pointCollectionWithCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count;
 
 /** The array of coordinates associated with the shape. */
 @property (nonatomic, readonly) CLLocationCoordinate2D *coordinates NS_RETURNS_INNER_POINTER;

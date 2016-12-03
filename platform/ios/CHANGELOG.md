@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## master
 
+* Improved the line wrapping behavior of point-placed labels written in Chinese, Japanese, and Yi. ([#6828](https://github.com/mapbox/mapbox-gl-native/pull/6828))
+
+## 3.4.0
+
 ### Packaging
 
 * Xcode 7.3 or above is required for using this SDK. ([#6059](https://github.com/mapbox/mapbox-gl-native/issues/6059))
@@ -21,7 +25,6 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * TileJSON manifests can now specify `"scheme": "tms"` to indicate the use of [TMS](https://en.wikipedia.org/wiki/Tile_Map_Service) coordinates. ([#2270](https://github.com/mapbox/mapbox-gl-native/pull/2270))
 * Fixed an issue causing abstract MGLMultiPointFeature objects to be returned in feature query results. Now concrete MGLPointCollectionFeature objects are returned. ([#6742](https://github.com/mapbox/mapbox-gl-native/pull/6742))
 * Fixed rendering artifacts and missing glyphs that occurred after viewing a large number of CJK characters on the map. ([#5908](https://github.com/mapbox/mapbox-gl-native/pull/5908))
-* Improved the line wrapping behavior of point-placed labels written in Chinese, Japanese, and Yi. ([#6828](https://github.com/mapbox/mapbox-gl-native/pull/6828))
 * `-[MGLMapView resetPosition]` now resets to the current style’s default center coordinates, zoom level, direction, and pitch, if specified. ([#6127](https://github.com/mapbox/mapbox-gl-native/pull/6127))
 * Fixed an issue where feature querying sometimes failed to return the expected features when the map was tilted. ([#6773](https://github.com/mapbox/mapbox-gl-native/pull/6773))
 * MGLFeature’s `attributes` and `identifier` properties are now writable. ([#6728](https://github.com/mapbox/mapbox-gl-native/pull/6728))
@@ -42,14 +45,15 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * The user dot now animates between user locations when user tracking is disabled. ([#6215](https://github.com/mapbox/mapbox-gl-native/pull/6215))
 * To customize the appearance of the user location annotation, subclass the newly added MGLUserLocationAnnotationView class and implement `-[MGLMapViewDelegate mapView:viewForAnnotation:]`. ([#5882](https://github.com/mapbox/mapbox-gl-native/pull/5882))
+* `-[MGLMapView viewForAnnotation:]` now returns the user location annotation view when given the user location annotation. ([#6957](https://github.com/mapbox/mapbox-gl-native/pull/6957))
 * Fixed an issue causing the user dot’s accuracy ring to wobble while zooming in and out. ([#6019](https://github.com/mapbox/mapbox-gl-native/pull/6019))
 * Heading accuracy indicator sizing has been changed to appear more precise. ([#6120](https://github.com/mapbox/mapbox-gl-native/pull/6120))
 * Fixed an issue that caused the map to not update to reflect the centerOffset when the user location was tracked. ([#6216](https://github.com/mapbox/mapbox-gl-native/pull/6216))
 
 ### Annotations
 
-* MGLPolyline annotations and the exterior coordinates of MGLPolygon annotations are now able to be mutated, part or all, and changes are displayed immediately. ([#6565](https://github.com/mapbox/mapbox-gl-native/pull/6565))
-* Added new APIs to MGLMapView to query for visible annotations. Combined with `-[MGLMapView viewForAnnotation:]`, these APIs can be used to access all visible annotation views. ([6061](https://github.com/mapbox/mapbox-gl-native/pull/6061)) 
+* Added new methods to MGLMultiPoint for changing or appending vertices along polyline annotations and the exteriors of polygon annotations. ([#6565](https://github.com/mapbox/mapbox-gl-native/pull/6565))
+* Added new APIs to MGLMapView to query for visible annotations. Combined with `-[MGLMapView viewForAnnotation:]`, these APIs can be used to access all visible annotation views. ([6061](https://github.com/mapbox/mapbox-gl-native/pull/6061))
 * Fixed an issue causing offscreen annotation views to be updated even when they were in the reuse queue. ([#5987](https://github.com/mapbox/mapbox-gl-native/pull/5987))
 * Fixed an issue preventing MGLAnnotationView from animating when its coordinate changes. ([#6215](https://github.com/mapbox/mapbox-gl-native/pull/6215))
 * Fixed an issue causing the wrong annotation view to be selected when tapping an annotation view with a center offset applied. ([#5931](https://github.com/mapbox/mapbox-gl-native/pull/5931))
@@ -57,6 +61,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Per documentation, the first and last coordinates in an MGLPolygon must be identical in order for the polygon to draw correctly. The same is true for an MGLPolygon’s interior polygon. ([#5514](https://github.com/mapbox/mapbox-gl-native/pull/5514))
 * To make an MGLPolyline or MGLPolygon span the antimeridian, specify coordinates with longitudes greater than 180° or less than −180°. ([#6088](https://github.com/mapbox/mapbox-gl-native/pull/6088))
 * Deprecated `-[MGLMapViewDelegate mapView:alphaForShapeAnnotation:]` in favor of specifying an alpha component via `-[MGLMapViewDelegate mapView:strokeColorForShapeAnnotation:]` or `-[MGLMapViewDelegate mapView:fillColorForPolygonAnnotation:]`. ([#6706](https://github.com/mapbox/mapbox-gl-native/pull/6706))
+* Various method arguments that are represented as C arrays of `CLLocationCoordinate2D` instances have been marked `const` to streamline bridging to Swift. ([#7215](https://github.com/mapbox/mapbox-gl-native/pull/7215))
 * Fixed an issue that caused an annotation view to disappear if it isn’t created using the annotation view reuse queue. ([#6485](https://github.com/mapbox/mapbox-gl-native/pull/6485))
 * Fixed an issue that could reset user-added transformations on annotation views. ([#6166](https://github.com/mapbox/mapbox-gl-native/pull/6166))
 * Improved the performance of relocating a non-view-backed point annotation by changing its `coordinate` property. ([#5385](https://github.com/mapbox/mapbox-gl-native/pull/5385))
@@ -77,10 +82,27 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Other changes
 
 * Raster tiles such as those from Mapbox Satellite are now cached, eliminating flashing while panning back and forth. ([#7091](https://github.com/mapbox/mapbox-gl-native/pull/7091))
+* Improved the performance of symbol style layers. ([#7025](https://github.com/mapbox/mapbox-gl-native/pull/7025))
 * As the user zooms in, tiles from lower zoom levels are scaled up until tiles for higher zoom levels are loaded. ([#5143](https://github.com/mapbox/mapbox-gl-native/pull/5143))
 * Notification names and user info keys are now string enumeration values for ease of use in Swift. ([#6794](https://github.com/mapbox/mapbox-gl-native/pull/6794))
 * MGLMapDebugOverdrawVisualizationMask no longer has any effect in Release builds of the SDK. This debug mask has been disabled for performance reasons. ([#5555](https://github.com/mapbox/mapbox-gl-native/pull/5555))
 * Fixed a typo in the documentation for the MGLCompassDirectionFormatter class. ([#5879](https://github.com/mapbox/mapbox-gl-native/pull/5879))
+* The UITapGestureRecognizer on MGLMapView that is used for selecting annotations now fails if a tap does not select an annotation. ([#7246](https://github.com/mapbox/mapbox-gl-native/pull/7246))
+
+## 3.3.7 - November 17, 2016
+
+* This version is the same as 3.3.6 but it is built with Xcode 8 that produces a smaller binary. Developers using this version in Swift applications built with Xcode 7.3.1 should use the  unstripped, `*-symbols` framework.
+
+## 3.3.6 - November 9, 2016
+
+* Fixed a crash that occurred during low-memory situations when multiple instances of MGLMapView were in the view hierarchy. The speculative fix in v3.3.5 has been reverted. ([#6972](https://github.com/mapbox/mapbox-gl-native/pull/6972))
+
+## 3.3.5 - November 2, 2016
+
+* Speculatively fixed an OpenGL rendering crash. ([#6844](https://github.com/mapbox/mapbox-gl-native/pull/6844))
+* Fixed an issue with symbols not being properly stripped from the dynamic framework. The dSYM file included with the standard dynamic framework in previous releases (e.g., `mapbox-ios-sdk-3.3.4-dynamic.zip` or the `Mapbox-iOS-SDK` pod) could not be used to symbolicate crashes. ([#6531](https://github.com/mapbox/mapbox-gl-native/pull/6531))
+* Include simulator architecture slices in the dSYM file that is generated for release builds. ([#5740](https://github.com/mapbox/mapbox-gl-native/pull/5740))
+* Fixed a rare networking-related crash. ([#5932](https://github.com/mapbox/mapbox-gl-native/pull/5932))
 
 ## 3.3.7 - November 17, 2016
 

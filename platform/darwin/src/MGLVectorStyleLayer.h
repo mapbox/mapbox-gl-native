@@ -52,10 +52,11 @@ NS_ASSUME_NONNULL_BEGIN
  <li><code>NSNotPredicateType</code> (<code>NOT</code>, <code>!</code>)</li>
  </ul>
  
- The following aggregate operator is supported:
+ The following aggregate operators are supported:
  
  <ul>
  <li><code>NSInPredicateOperatorType</code> (<code>IN</code>)</li>
+ <li><code>NSContainsPredicateOperatorType</code> (<code>CONTAINS</code>)</li>
  </ul>
  
  To test whether a feature has or lacks a specific attribute, compare the attribute to `NULL` or `NIL`. Predicates created using the `+[NSPredicate predicateWithValue:]` method are also supported. String operators and custom operators are not supported.
@@ -118,7 +119,9 @@ NS_ASSUME_NONNULL_BEGIN
  
  Automatic type casting is not performed. Therefore, a feature only matches this
  predicate if its value for the attribute in question is of the same type as the
- value specified in the predicate.
+ value specified in the predicate. Also, operator modifiers `c`, `d`, and the
+ combined `cd` for case and diacritic insensitivity are unsupported for 
+ comparison and aggregate operators that are used in the predicate.
  */
 @property (nonatomic, nullable) NSPredicate *predicate;
 

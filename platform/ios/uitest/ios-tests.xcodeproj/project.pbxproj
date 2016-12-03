@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		96567A231B0E84CD00D78776 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96567A221B0E84CD00D78776 /* LaunchScreen.xib */; };
 		96567A311B0E8BB900D78776 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96567A301B0E8BB900D78776 /* Images.xcassets */; };
+		DA180EF21DD1A4DF000A211D /* OHHTTPStubs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA180EF11DD1A4DF000A211D /* OHHTTPStubs.framework */; };
 		DA482C801C12582600772FE3 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA482C7F1C12582600772FE3 /* Mapbox.framework */; };
 		DA482C811C12582600772FE3 /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA482C7F1C12582600772FE3 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DA9C551D1CD9DFCD000A15C6 /* libKIF.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DA9C551B1CD9DFA7000A15C6 /* libKIF.a */; };
@@ -17,12 +18,6 @@
 		DD043366196DBBE000E6F39D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DD043365196DBBE000E6F39D /* main.m */; };
 		DD0580E81ACB628200B112C9 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD0580E71ACB628200B112C9 /* IOKit.framework */; };
 		DD0E6F841B0190E200DC035A /* libOCMock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DD0E6F701B0190E200DC035A /* libOCMock.a */; };
-		DD0E6F981B01B68E00DC035A /* OHHTTPStubs.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F8E1B01B68E00DC035A /* OHHTTPStubs.m */; };
-		DD0E6F991B01B68E00DC035A /* OHHTTPStubs+NSURLSessionConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F8F1B01B68E00DC035A /* OHHTTPStubs+NSURLSessionConfiguration.m */; };
-		DD0E6F9A1B01B68E00DC035A /* OHHTTPStubsResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F911B01B68E00DC035A /* OHHTTPStubsResponse.m */; };
-		DD0E6F9B1B01B68E00DC035A /* OHHTTPStubsResponse+HTTPMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F931B01B68E00DC035A /* OHHTTPStubsResponse+HTTPMessage.m */; };
-		DD0E6F9C1B01B68E00DC035A /* OHHTTPStubsResponse+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F951B01B68E00DC035A /* OHHTTPStubsResponse+JSON.m */; };
-		DD0E6F9D1B01B68E00DC035A /* OHPathHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F971B01B68E00DC035A /* OHPathHelpers.m */; };
 		DDBD016C196DC4740033959E /* MapViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DDBD0168196DC4740033959E /* MapViewTests.m */; };
 		DDBD016D196DC4740033959E /* KIFTestActor+MapboxGL.m in Sources */ = {isa = PBXBuildFile; fileRef = DDBD016A196DC4740033959E /* KIFTestActor+MapboxGL.m */; };
 /* End PBXBuildFile section */
@@ -54,9 +49,9 @@
 /* Begin PBXFileReference section */
 		96567A221B0E84CD00D78776 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = SOURCE_ROOT; };
 		96567A301B0E8BB900D78776 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = SOURCE_ROOT; };
+		DA180EF11DD1A4DF000A211D /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OHHTTPStubs.framework; path = "OHHTTPStubs/OHHTTPStubs/build/Debug-iphoneos/OHHTTPStubs.framework"; sourceTree = "<group>"; };
 		DA482C7F1C12582600772FE3 /* Mapbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Mapbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA9C551B1CD9DFA7000A15C6 /* libKIF.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libKIF.a; path = "../../../build/ios/Build/Products/Debug-iphonesimulator/libKIF.a"; sourceTree = "<group>"; };
-		DADD9EB51BD16D8B00DA9161 /* Compatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Compatibility.h; path = OHHTTPStubs/OHHTTPStubs/Sources/Compatibility.h; sourceTree = SOURCE_ROOT; };
 		DD043323196DB9BC00E6F39D /* Mapbox GL Tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL Tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLTAppDelegate.m; sourceTree = SOURCE_ROOT; };
 		DD043360196DBBD500E6F39D /* MGLTViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLTViewController.m; sourceTree = SOURCE_ROOT; };
@@ -75,17 +70,6 @@
 		DD0E6F781B0190E200DC035A /* OCMockObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMockObject.h; sourceTree = "<group>"; };
 		DD0E6F791B0190E200DC035A /* OCMRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMRecorder.h; sourceTree = "<group>"; };
 		DD0E6F7A1B0190E200DC035A /* OCMStubRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMStubRecorder.h; sourceTree = "<group>"; };
-		DD0E6F8D1B01B68E00DC035A /* OHHTTPStubs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OHHTTPStubs.h; path = OHHTTPStubs/OHHTTPStubs/Sources/OHHTTPStubs.h; sourceTree = SOURCE_ROOT; };
-		DD0E6F8E1B01B68E00DC035A /* OHHTTPStubs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OHHTTPStubs.m; path = OHHTTPStubs/OHHTTPStubs/Sources/OHHTTPStubs.m; sourceTree = SOURCE_ROOT; };
-		DD0E6F8F1B01B68E00DC035A /* OHHTTPStubs+NSURLSessionConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "OHHTTPStubs+NSURLSessionConfiguration.m"; path = "OHHTTPStubs/OHHTTPStubs/Sources/OHHTTPStubs+NSURLSessionConfiguration.m"; sourceTree = SOURCE_ROOT; };
-		DD0E6F901B01B68E00DC035A /* OHHTTPStubsResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OHHTTPStubsResponse.h; path = OHHTTPStubs/OHHTTPStubs/Sources/OHHTTPStubsResponse.h; sourceTree = SOURCE_ROOT; };
-		DD0E6F911B01B68E00DC035A /* OHHTTPStubsResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OHHTTPStubsResponse.m; path = OHHTTPStubs/OHHTTPStubs/Sources/OHHTTPStubsResponse.m; sourceTree = SOURCE_ROOT; };
-		DD0E6F921B01B68E00DC035A /* OHHTTPStubsResponse+HTTPMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OHHTTPStubsResponse+HTTPMessage.h"; path = "OHHTTPStubs/OHHTTPStubs/Sources/OHHTTPStubsResponse+HTTPMessage.h"; sourceTree = SOURCE_ROOT; };
-		DD0E6F931B01B68E00DC035A /* OHHTTPStubsResponse+HTTPMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "OHHTTPStubsResponse+HTTPMessage.m"; path = "OHHTTPStubs/OHHTTPStubs/Sources/OHHTTPStubsResponse+HTTPMessage.m"; sourceTree = SOURCE_ROOT; };
-		DD0E6F941B01B68E00DC035A /* OHHTTPStubsResponse+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OHHTTPStubsResponse+JSON.h"; path = "OHHTTPStubs/OHHTTPStubs/Sources/OHHTTPStubsResponse+JSON.h"; sourceTree = SOURCE_ROOT; };
-		DD0E6F951B01B68E00DC035A /* OHHTTPStubsResponse+JSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "OHHTTPStubsResponse+JSON.m"; path = "OHHTTPStubs/OHHTTPStubs/Sources/OHHTTPStubsResponse+JSON.m"; sourceTree = SOURCE_ROOT; };
-		DD0E6F961B01B68E00DC035A /* OHPathHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OHPathHelpers.h; path = OHHTTPStubs/OHHTTPStubs/Sources/OHPathHelpers.h; sourceTree = SOURCE_ROOT; };
-		DD0E6F971B01B68E00DC035A /* OHPathHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OHPathHelpers.m; path = OHHTTPStubs/OHHTTPStubs/Sources/OHPathHelpers.m; sourceTree = SOURCE_ROOT; };
 		DDBD0152196DC3D70033959E /* Test Bundle.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Test Bundle.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DDBD0165196DC4560033959E /* Bundle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Bundle-Info.plist"; sourceTree = SOURCE_ROOT; };
 		DDBD0168196DC4740033959E /* MapViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapViewTests.m; sourceTree = SOURCE_ROOT; };
@@ -106,6 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA180EF21DD1A4DF000A211D /* OHHTTPStubs.framework in Frameworks */,
 				DD0580E81ACB628200B112C9 /* IOKit.framework in Frameworks */,
 				DA9C551D1CD9DFCD000A15C6 /* libKIF.a in Frameworks */,
 				DD0E6F841B0190E200DC035A /* libOCMock.a in Frameworks */,
@@ -137,6 +122,7 @@
 		DD043325196DB9BC00E6F39D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DA180EF11DD1A4DF000A211D /* OHHTTPStubs.framework */,
 				DA9C551B1CD9DFA7000A15C6 /* libKIF.a */,
 				DA482C7F1C12582600772FE3 /* Mapbox.framework */,
 				DD0580E71ACB628200B112C9 /* IOKit.framework */,
@@ -194,25 +180,6 @@
 			path = OCMock/OCMock;
 			sourceTree = SOURCE_ROOT;
 		};
-		DD0E6F861B01B67100DC035A /* OHHTTPStubs */ = {
-			isa = PBXGroup;
-			children = (
-				DADD9EB51BD16D8B00DA9161 /* Compatibility.h */,
-				DD0E6F8D1B01B68E00DC035A /* OHHTTPStubs.h */,
-				DD0E6F8E1B01B68E00DC035A /* OHHTTPStubs.m */,
-				DD0E6F8F1B01B68E00DC035A /* OHHTTPStubs+NSURLSessionConfiguration.m */,
-				DD0E6F901B01B68E00DC035A /* OHHTTPStubsResponse.h */,
-				DD0E6F911B01B68E00DC035A /* OHHTTPStubsResponse.m */,
-				DD0E6F921B01B68E00DC035A /* OHHTTPStubsResponse+HTTPMessage.h */,
-				DD0E6F931B01B68E00DC035A /* OHHTTPStubsResponse+HTTPMessage.m */,
-				DD0E6F941B01B68E00DC035A /* OHHTTPStubsResponse+JSON.h */,
-				DD0E6F951B01B68E00DC035A /* OHHTTPStubsResponse+JSON.m */,
-				DD0E6F961B01B68E00DC035A /* OHPathHelpers.h */,
-				DD0E6F971B01B68E00DC035A /* OHPathHelpers.m */,
-			);
-			name = OHHTTPStubs;
-			sourceTree = "<group>";
-		};
 		DDBD0139196DC38D0033959E /* Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -221,7 +188,6 @@
 				DDBD0168196DC4740033959E /* MapViewTests.m */,
 				DDBD0167196DC46B0033959E /* Supporting Files */,
 				DD0E6F6B1B01906600DC035A /* OCMock */,
-				DD0E6F861B01B67100DC035A /* OHHTTPStubs */,
 			);
 			name = Tests;
 			path = "Mapbox GL Tests";
@@ -342,14 +308,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DD0E6F981B01B68E00DC035A /* OHHTTPStubs.m in Sources */,
-				DD0E6F9C1B01B68E00DC035A /* OHHTTPStubsResponse+JSON.m in Sources */,
-				DD0E6F9B1B01B68E00DC035A /* OHHTTPStubsResponse+HTTPMessage.m in Sources */,
 				DDBD016D196DC4740033959E /* KIFTestActor+MapboxGL.m in Sources */,
-				DD0E6F991B01B68E00DC035A /* OHHTTPStubs+NSURLSessionConfiguration.m in Sources */,
-				DD0E6F9A1B01B68E00DC035A /* OHHTTPStubsResponse.m in Sources */,
 				DDBD016C196DC4740033959E /* MapViewTests.m in Sources */,
-				DD0E6F9D1B01B68E00DC035A /* OHPathHelpers.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -480,6 +440,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Mapbox GL Tests.app/Mapbox GL Tests";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/OHHTTPStubs/OHHTTPStubs/build/Debug-iphoneos",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -513,6 +477,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Mapbox GL Tests.app/Mapbox GL Tests";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/OHHTTPStubs/OHHTTPStubs/build/Debug-iphoneos",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = "KIF_XCTEST=1";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",

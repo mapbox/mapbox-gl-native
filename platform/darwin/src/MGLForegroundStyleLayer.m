@@ -10,4 +10,11 @@
     return self;
 }
 
+- (NSString *)description {
+    return [NSString stringWithFormat:
+            @"<%@: %p; identifier = %@; sourceIdentifier = %@; visible = %@>",
+            NSStringFromClass([self class]), (void *)self, self.identifier,
+            self.sourceIdentifier, self.visible ? @"YES" : @"NO"];
+}
+
 @end

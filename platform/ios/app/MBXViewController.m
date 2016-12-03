@@ -71,6 +71,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingVectorSource,
     MBXSettingsRuntimeStylingRasterSource,
     MBXSettingsRuntimeStylingCountryLabels,
+    MBXSettingsRuntimeStylingRouteLine,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
@@ -332,6 +333,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Style Vector Source",
                 @"Style Raster Source",
                 [NSString stringWithFormat:@"Label Countries in %@", (_usingLocaleBasedCountryLabels ? @"Local Language" : [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:[self bestLanguageForUser]])],
+                @"Add Route Line",
             ]];
             break;
         case MBXSettingsMiscellaneous:
@@ -489,6 +491,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingCountryLabels:
                     [self styleCountryLabelsLanguage];
+                    break;
+                case MBXSettingsRuntimeStylingRouteLine:
+                    [self styleRouteLine];
                     break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
@@ -769,6 +774,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"test" source:source];
     fillLayer.fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor purpleColor]];
     [self.mapView.style addLayer:fillLayer];
+    
 }
 
 - (void)styleSymbolLayer
@@ -813,6 +819,18 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         statesLayer.fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
         statesLayer.fillOpacity = [MGLStyleValue<NSNumber *> valueWithRawValue:@0.25];
     });
+}
+
++ (MGLStyleConstantValue<NSValue *> *)testEnum:(NSUInteger)value type:(const char *)type
+{
+    return [MGLStyleConstantValue<NSValue *> valueWithRawValue:[NSValue value:&value withObjCType:type]];
+}
+
++ (MGLStyleFunction<NSValue *> *)testEnumFunction:(NSUInteger)value type:(const char *)type
+{
+    return [MGLStyleFunction<NSValue *> valueWithStops:@{
+                                                         @18: [self testEnum:value type:type],
+                                                         }];
 }
 
 - (void)styleFilteredLines
@@ -1078,6 +1096,44 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         @"country-label-sm",
     ];
     [self styleLabelLanguageForLayersNamed:labelLayers];
+}
+
+- (void)styleRouteLine
+{
+    CLLocationCoordinate2D coords[] = {
+        { 43.84455590478528, 10.504238605499268 },
+        { 43.84385562343126, 10.504125952720642 },
+        { 43.84388657526694, 10.503299832344055 },
+        { 43.84332557075269, 10.503235459327698 },
+        { 43.843441641085036, 10.502264499664307 },
+        { 43.84396395478592, 10.50242006778717 },
+        { 43.84406067904351, 10.501744151115416 },
+        { 43.84422317544319, 10.501792430877686 }
+    };
+    NSInteger count = sizeof(coords) / sizeof(coords[0]);
+
+    [self.mapView setCenterCoordinate:coords[0] zoomLevel:16 animated:YES];
+
+    MGLPolylineFeature *routeLine = [MGLPolylineFeature polylineWithCoordinates:coords count:count];
+
+    MGLGeoJSONSource *routeSource = [[MGLGeoJSONSource alloc] initWithIdentifier:@"style-route-source" features:@[routeLine] options:nil];
+    [self.mapView.style addSource:routeSource];
+
+    MGLLineStyleLayer *baseRouteLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"style-base-route-layer" source:routeSource];
+    baseRouteLayer.lineColor = [MGLStyleConstantValue valueWithRawValue:[UIColor orangeColor]];
+    baseRouteLayer.lineWidth = [MGLStyleConstantValue valueWithRawValue:@20];
+    baseRouteLayer.lineOpacity = [MGLStyleConstantValue valueWithRawValue:@0.5];
+    baseRouteLayer.lineCap = [MGLStyleConstantValue valueWithRawValue:[NSValue valueWithMGLLineCap:MGLLineCapRound]];
+    baseRouteLayer.lineJoin = [MGLStyleConstantValue valueWithRawValue:[NSValue valueWithMGLLineJoin:MGLLineJoinRound]];
+    [self.mapView.style addLayer:baseRouteLayer];
+
+    MGLLineStyleLayer *routeLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"style-base-route-layer" source:routeSource];
+    routeLayer.lineColor = [MGLStyleConstantValue valueWithRawValue:[UIColor whiteColor]];
+    routeLayer.lineWidth = [MGLStyleConstantValue valueWithRawValue:@15];
+    routeLayer.lineOpacity = [MGLStyleConstantValue valueWithRawValue:@0.8];
+    routeLayer.lineCap = [MGLStyleConstantValue valueWithRawValue:[NSValue valueWithMGLLineCap:MGLLineCapRound]];
+    routeLayer.lineJoin = [MGLStyleConstantValue valueWithRawValue:[NSValue valueWithMGLLineJoin:MGLLineJoinRound]];
+    [self.mapView.style addLayer:routeLayer];
 }
 
 - (void)styleLabelLanguageForLayersNamed:(NSArray<NSString *> *)layers
@@ -1540,7 +1596,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         {
             queuedAnnotations += queue.count;
         }
-        self.hudLabel.text = [NSString stringWithFormat:@"Visible: %ld  Queued: %ld", (long)mapView.visibleAnnotations.count, (long)queuedAnnotations];
+        self.hudLabel.text = [NSString stringWithFormat:@"Visible: %ld  Queued: %ld", (unsigned long)mapView.visibleAnnotations.count, (unsigned long)queuedAnnotations];
     }
 }
 

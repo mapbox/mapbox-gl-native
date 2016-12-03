@@ -366,32 +366,32 @@
                         <items>
                             <menuItem title="Streets" state="on" tag="1" keyEquivalent="1" id="17N-yz-NNo">
                                 <connections>
-                                    <action selector="setStyle:" target="-1" id="I4L-Wx-UXA"/>
+                                    <action selector="showStyle:" target="-1" id="BGu-va-ftr"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Outdoors" tag="2" keyEquivalent="2" id="BBa-Qa-SQr">
                                 <connections>
-                                    <action selector="setStyle:" target="-1" id="rM1-yG-t5u"/>
+                                    <action selector="showStyle:" target="-1" id="sQ3-b6-G1A"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Light" tag="3" keyEquivalent="3" id="HWe-7u-UVJ">
                                 <connections>
-                                    <action selector="setStyle:" target="-1" id="Q9V-O1-oRz"/>
+                                    <action selector="showStyle:" target="-1" id="jMN-oR-sbZ"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Dark" tag="4" keyEquivalent="4" id="6HI-q6-AeV">
                                 <connections>
-                                    <action selector="setStyle:" target="-1" id="YfH-1I-G50"/>
+                                    <action selector="showStyle:" target="-1" id="xgf-Sq-eJw"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Satellite" tag="5" keyEquivalent="5" id="h0J-5X-kgF">
                                 <connections>
-                                    <action selector="setStyle:" target="-1" id="GXt-oK-Hy1"/>
+                                    <action selector="showStyle:" target="-1" id="YyE-2C-Vhj"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Satellite Streets" tag="6" keyEquivalent="6" id="9BL-00-HFt">
                                 <connections>
-                                    <action selector="setStyle:" target="-1" id="oL4-AC-waq"/>
+                                    <action selector="showStyle:" target="-1" id="NTT-Y1-EqU"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Custom Style…" id="L0h-86-2cU">
@@ -429,6 +429,32 @@
                                     <action selector="toggleToolbarShown:" target="-1" id="BXY-wc-z0C"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Show Layers" keyEquivalent="L" id="qtg-l9-BH3">
+                                <connections>
+                                    <action selector="toggleLayers:" target="-1" id="YdA-Mr-MHi"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="8aO-Nm-fxF"/>
+                            <menuItem title="Labels In" id="M7v-B1-vo3">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Labels In" id="gOc-5u-4v5">
+                                    <items>
+                                        <menuItem title="Local Language" id="hTL-wF-DEs">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="setLabelLanguage:" target="-1" id="Zc4-TL-Cxe"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Preferred Language" tag="1" id="PkP-Ne-ISX">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="setLabelLanguage:" target="-1" id="7Io-iF-xf8"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="qTh-Hu-dGV"/>
                         </items>
                     </menu>
                 </menuItem>

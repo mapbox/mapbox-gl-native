@@ -35,6 +35,7 @@ NSString *const MGLEventKeyZoomLevel = @"zoom";
 NSString *const MGLEventKeySpeed = @"speed";
 NSString *const MGLEventKeyCourse = @"course";
 NSString *const MGLEventKeyGestureID = @"gesture";
+NSString *const MGLEventHorizontalAccuracy = @"horizontalAccuracy";
 NSString *const MGLEventKeyLocalDebugDescription = @"debug.description";
 
 static NSString *const MGLEventKeyEvent = @"event";
@@ -46,7 +47,6 @@ static NSString *const MGLEventKeyOperatingSystem = @"operatingSystem";
 static NSString *const MGLEventKeyResolution = @"resolution";
 static NSString *const MGLEventKeyAccessibilityFontScale = @"accessibilityFontScale";
 static NSString *const MGLEventKeyOrientation = @"orientation";
-static NSString *const MGLEventKeyBatteryLevel = @"batteryLevel";
 static NSString *const MGLEventKeyPluggedIn = @"pluggedIn";
 static NSString *const MGLEventKeyWifi = @"wifi";
 static NSString *const MGLEventKeySource = @"source";
@@ -190,9 +190,6 @@ const NSTimeInterval MGLFlushInterval = 180;
         // Clear Any System TimeZone Cache
         [NSTimeZone resetSystemTimeZone];
         [_rfc3339DateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
-        
-        // Enable Battery Monitoring
-        [UIDevice currentDevice].batteryMonitoringEnabled = YES;
 
         // Configure logging
         if ([self isProbablyAppStoreBuild]) {
@@ -454,7 +451,6 @@ const NSTimeInterval MGLFlushInterval = 180;
                                                      MGLEventKeyResolution: @(self.data.scale),
                                                      MGLEventKeyAccessibilityFontScale: @([self contentSizeScale]),
                                                      MGLEventKeyOrientation: [self deviceOrientation],
-                                                     MGLEventKeyBatteryLevel: @([self batteryLevel]),
                                                      MGLEventKeyWifi: @([[MGLReachability reachabilityForLocalWiFi] isReachableViaWiFi])} mutableCopy];
     [self addBatteryStateToAttributes:attributes];
     return [self eventForAttributes:attributes attributeDictionary:attributeDictionary];
@@ -475,7 +471,6 @@ const NSTimeInterval MGLFlushInterval = 180;
 - (MGLMutableMapboxEventAttributes *)interactionEvent {
     MGLMutableMapboxEventAttributes *attributes = [@{MGLEventKeyCreated: [self.rfc3339DateFormatter stringFromDate:[NSDate date]],
                                                      MGLEventKeyOrientation: [self deviceOrientation],
-                                                     MGLEventKeyBatteryLevel: @([self batteryLevel]),
                                                      MGLEventKeyWifi: @([[MGLReachability reachabilityForLocalWiFi] isReachableViaWiFi])} mutableCopy];
     [self addBatteryStateToAttributes:attributes];
     return attributes;
@@ -517,10 +512,6 @@ const NSTimeInterval MGLFlushInterval = 180;
                                                 selector:@selector(flush)
                                                 userInfo:nil
                                                  repeats:YES];
-}
-
-- (NSInteger)batteryLevel {
-    return [[NSNumber numberWithFloat:roundf(100 * [UIDevice currentDevice].batteryLevel)] integerValue];
 }
 
 - (NSString *)deviceOrientation {
@@ -669,7 +660,8 @@ const NSTimeInterval MGLFlushInterval = 180;
         [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{MGLEventKeyCreated: formattedDate,
                                                                          MGLEventKeyLatitude: @(lat),
                                                                          MGLEventKeyLongitude: @(lng),
-                                                                         MGLEventKeyAltitude: @(round(loc.altitude))}];
+                                                                         MGLEventKeyAltitude: @(round(loc.altitude)),
+                                                                         MGLEventHorizontalAccuracy: @(loc.horizontalAccuracy)}];
     }
 }
 

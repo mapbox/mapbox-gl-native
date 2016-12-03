@@ -1,6 +1,7 @@
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make android-style-code`.
 package com.mapbox.mapboxsdk.testapp.style;
 
+import android.graphics.Color;
 import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;

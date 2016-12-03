@@ -86,6 +86,15 @@ To add or update text that the user may see in the macOS SDK:
 1. _(Optional.)_ When dealing with a number followed by a pluralized word, do not split the string. Instead, use a format string and make `val` ambiguous, like `%d file(s)`. Then pluralize for English in the appropriate [.stringsdict file](https://developer.apple.com/library/mac/documentation/MacOSX/Conceptual/BPInternational/StringsdictFileFormat/StringsdictFileFormat.html). See [platform/darwin/resources/en.lproj/Foundation.stringsdict](../darwin/resources/en.lproj/Foundation.stringsdict) for an example. Localizers should do likewise for their languages.
 1. Run `make genstrings` and commit any changes it makes to .strings files. The make rule also updates the iOS SDK’s strings tables.
 
+### Adding a localization
+
+To add a localization to the macOS SDK:
+
+1. In macos.xcworkspace, open the project editor for macos.xcodeproj. Using the project editor’s sidebar or tab bar dropdown, go to the “macos” project; under the Localizations section of the Info tab, click the + button to add your language to the project.
+1. In the sheet that appears, select all the .strings and .stringsdict files but no .xib file. (Most of the XIBs are part of the macosapp example application, which is not localized, while MGLAnnotationCallout.xib contains no localizable strings.)
+1. In the Project navigator, expand each .strings and .stringsdict file in the project. An additional version for your localization should be listed; translate it. Translate everything on the right side of the equals sign. Leave the left side and any comments unmodified. See Apple’s documentation on the [.strings](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/LoadingResources/Strings/Strings.html) and [.stringsdict](https://developer.apple.com/library/content/documentation/MacOSX/Conceptual/BPInternational/StringsdictFileFormat/StringsdictFileFormat.html) formats.
+1. You’re already most of the way towards localizing the iOS SDK too – consider [completing that localization](../ios/DEVELOPING.md#adding-a-localization).
+
 ## Access tokens
 
 The demo applications use Mapbox vector tiles, which require a Mapbox account and API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/). You will be prompted for this access token the first time you launch the demo application.
