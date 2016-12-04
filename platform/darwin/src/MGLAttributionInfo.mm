@@ -1,5 +1,4 @@
 #import "MGLAttributionInfo.h"
-#import "NSString+MGLAdditions.h"
 
 #if TARGET_OS_IPHONE
     #import <UIKit/UIKit.h>
@@ -7,12 +6,10 @@
     #import <Cocoa/Cocoa.h>
 #endif
 
-#include <string>
+#import "MGLMapCamera.h"
+#import "NSString+MGLAdditions.h"
 
-/**
- Absolute string of the URL to the Map Feedback tool.
- */
-static NSString * const MGLAttributionFeedbackURLString = @"https://www.mapbox.com/map-feedback/";
+#include <string>
 
 @implementation MGLAttributionInfo
 
@@ -21,7 +18,10 @@ static NSString * const MGLAttributionFeedbackURLString = @"https://www.mapbox.c
         NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType,
         NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding),
     };
-    NSMutableString *css = [NSMutableString string];
+    // Apply a bogus, easily detectable style rule to any feedback link, since
+    // NSAttributedString doesn’t preserve the class attribute.
+    NSMutableString *css = [NSMutableString stringWithString:
+                            @".mapbox-improve-map { -webkit-text-stroke-width: 1000px; }"];
     if (fontSize) {
         [css appendFormat:@"html { font-size: %.1fpx; }", fontSize];
     }
@@ -34,33 +34,40 @@ static NSString * const MGLAttributionFeedbackURLString = @"https://www.mapbox.c
         linkColor = [linkColor colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
 #endif
         [linkColor getRed:&red green:&green blue:&blue alpha:&alpha];
-        [css appendFormat:@"a:link { color: rgba(%f%%, %f%%, %f%%, %f); }",
+        [css appendFormat:
+         @"a:link { color: rgba(%f%%, %f%%, %f%%, %f); }",
          red * 100, green * 100, blue * 100, alpha];
     }
     NSString *styledHTML = [NSString stringWithFormat:@"<style type='text/css'>%@</style>%@", css, htmlString];
     NSData *htmlData = [styledHTML dataUsingEncoding:NSUTF8StringEncoding];
     
 #if TARGET_OS_IPHONE
-    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithData:htmlData
-                                                                            options:options
-                                                                 documentAttributes:nil
-                                                                              error:NULL];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithData:htmlData
+                                                                                          options:options
+                                                                               documentAttributes:nil
+                                                                                            error:NULL];
 #else
-    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:htmlData
-                                                                            options:options
-                                                                 documentAttributes:nil];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithHTML:htmlData
+                                                                                          options:options
+                                                                               documentAttributes:nil];
 #endif
     
     NSMutableArray *infos = [NSMutableArray array];
     [attributedString enumerateAttribute:NSLinkAttributeName
                                  inRange:attributedString.mgl_wholeRange
                                  options:0
-                              usingBlock:^(id _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-        // Omit the Map Feedback link because the SDK already provides the appropriate UI for giving feedback.
-        // Ideally we’d look for class="mapbox-improve-map", but NSAttributedString loses that information.
+                              usingBlock:
+    ^(id _Nullable value, NSRange range, BOOL * _Nonnull stop) {
         NSCAssert(!value || [value isKindOfClass:[NSURL class]], @"If present, URL attribute must be an NSURL.");
-        if ([value isEqual:[NSURL URLWithString:MGLAttributionFeedbackURLString]]) {
-            return;
+        
+        // Detect feedback links by the bogus style rule applied above.
+        NSNumber *strokeWidth = [attributedString attribute:NSStrokeWidthAttributeName
+                                                    atIndex:range.location
+                                             effectiveRange:NULL];
+        BOOL isFeedbackLink = NO;
+        if ([strokeWidth floatValue] > 100) {
+            isFeedbackLink = YES;
+            [attributedString removeAttribute:NSStrokeWidthAttributeName range:range];
         }
         
         // Omit whitespace-only strings.
@@ -71,6 +78,7 @@ static NSString * const MGLAttributionFeedbackURLString = @"https://www.mapbox.c
         }
         
         MGLAttributionInfo *info = [[MGLAttributionInfo alloc] initWithTitle:title URL:value];
+        info.feedbackLink = isFeedbackLink;
         [infos addObject:info];
     }];
     return infos;
@@ -82,6 +90,17 @@ static NSString * const MGLAttributionFeedbackURLString = @"https://www.mapbox.c
         _URL = URL;
     }
     return self;
+}
+
+- (nullable NSURL *)feedbackURLAtCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel {
+    if (!self.feedbackLink) {
+        return nil;
+    }
+    
+    NSURLComponents *components = [NSURLComponents componentsWithURL:self.URL resolvingAgainstBaseURL:NO];
+    components.fragment = [NSString stringWithFormat:@"/%.5f/%.5f/%i",
+                           centerCoordinate.longitude, centerCoordinate.latitude, (int)round(zoomLevel + 1)];
+    return components.URL;
 }
 
 - (BOOL)isEqual:(id)object {

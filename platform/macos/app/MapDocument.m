@@ -666,15 +666,6 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }];
 }
 
-#pragma mark Help methods
-
-- (IBAction)giveFeedback:(id)sender {
-    CLLocationCoordinate2D centerCoordinate = self.mapView.centerCoordinate;
-    NSURL *feedbackURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.mapbox.com/map-feedback/#/%.5f/%.5f/%.0f",
-                                               centerCoordinate.longitude, centerCoordinate.latitude, round(self.mapView.zoomLevel + 1)]];
-    [[NSWorkspace sharedWorkspace] openURL:feedbackURL];
-}
-
 #pragma mark Mouse events
 
 - (void)handlePressGesture:(NSPressGestureRecognizer *)gestureRecognizer {

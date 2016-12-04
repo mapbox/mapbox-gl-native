@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
+#import <CoreLocation/CoreLocation.h>
 
 #import "MGLTypes.h"
 
@@ -25,6 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) NSAttributedString *title;
 @property (nonatomic, nullable) NSURL *URL;
+@property (nonatomic, getter=isFeedbackLink) BOOL feedbackLink;
+
+- (nullable NSURL *)feedbackURLAtCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel;
 
 @end
 

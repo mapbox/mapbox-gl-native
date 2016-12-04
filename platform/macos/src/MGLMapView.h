@@ -950,6 +950,25 @@ IB_DESIGNABLE
  */
 - (CLLocationDistance)metersPerPointAtLatitude:(CLLocationDegrees)latitude;
 
+#pragma mark Giving Feedback to Improve the Map
+
+/**
+ Opens one or more webpages in the default Web browser in which the user can
+ provide feedback about the map data.
+ 
+ You should add a menu item to the Help menu of your application that invokes
+ this method. Title it “Improve This Map” or similar. Set its target to the
+ first responder and its action to `giveFeedback:`.
+ 
+ This map view searches the current style’s sources for webpages to open.
+ Specifically, each source’s tile set has an `attribution` property containing
+ HTML code; if an <code>&lt;a></code> tag (link) within that code has an
+ <code>class</code> attribute set to <code>mapbox-improve-map</code>, its
+ <code>href</code> attribute defines the URL to open. Such links are omitted
+ from the attribution view.
+ */
+- (IBAction)giveFeedback:(id)sender;
+
 #pragma mark Debugging the Map
 
 /**

@@ -25,16 +25,29 @@
         [infos growArrayByAddingAttributionInfosFromArray:subinfos];
     }
     
-    XCTAssertEqual(infos.count, 3);
+    XCTAssertEqual(infos.count, 4);
     
+    CLLocationCoordinate2D mapbox = CLLocationCoordinate2DMake(12.9810816, 77.6368034);
     XCTAssertEqualObjects(infos[0].title.string, @"© Mapbox");
     XCTAssertEqualObjects(infos[0].URL, [NSURL URLWithString:@"https://www.mapbox.com/about/maps/"]);
+    XCTAssertFalse(infos[0].feedbackLink);
+    XCTAssertNil([infos[0] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14]);
     
     XCTAssertEqualObjects(infos[1].title.string, @"©️ OpenStreetMap");
     XCTAssertEqualObjects(infos[1].URL, [NSURL URLWithString:@"http://www.openstreetmap.org/about/"]);
+    XCTAssertFalse(infos[1].feedbackLink);
+    XCTAssertNil([infos[1] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14]);
     
     XCTAssertEqualObjects(infos[2].title.string, @"CC\u00a0BY-SA");
     XCTAssertNil(infos[2].URL);
+    XCTAssertFalse(infos[2].feedbackLink);
+    XCTAssertNil([infos[2] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14]);
+    
+    XCTAssertEqualObjects(infos[3].title.string, @"Improve this map");
+    XCTAssertEqualObjects(infos[3].URL, [NSURL URLWithString:@"https://www.mapbox.com/map-feedback/"]);
+    XCTAssertTrue(infos[3].feedbackLink);
+    XCTAssertEqualObjects([infos[3] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14],
+                          [NSURL URLWithString:@"https://www.mapbox.com/map-feedback/#/77.63680/12.98108/15"]);
 }
 
 - (void)testStyle {

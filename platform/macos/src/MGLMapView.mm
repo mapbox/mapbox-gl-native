@@ -430,6 +430,11 @@ public:
     CGFloat miniSize = [NSFont systemFontSizeForControlSize:NSMiniControlSize];
     NSArray *attributionInfos = [self.style attributionInfosWithFontSize:miniSize linkColor:[NSColor blackColor]];
     for (MGLAttributionInfo *info in attributionInfos) {
+        // Feedback links are added to the Help menu.
+        if (info.feedbackLink) {
+            continue;
+        }
+        
         // For each attribution, add a borderless button that responds to clicks
         // and feels like a hyperlink.
         NSButton *button = [[MGLAttributionButton alloc] initWithAttributionInfo:info];
@@ -1644,6 +1649,23 @@ public:
     [self setDirection:-sender.doubleValue animated:YES];
 }
 
+- (IBAction)giveFeedback:(id)sender {
+    CLLocationCoordinate2D centerCoordinate = self.centerCoordinate;
+    double zoomLevel = self.zoomLevel;
+    NSMutableArray *urls = [NSMutableArray array];
+    for (MGLAttributionInfo *info in [self.style attributionInfosWithFontSize:0 linkColor:nil]) {
+        NSURL *url = [info feedbackURLAtCenterCoordinate:centerCoordinate zoomLevel:zoomLevel];
+        if (url) {
+            [urls addObject:url];
+        }
+    }
+    [[NSWorkspace sharedWorkspace] openURLs:urls
+                    withAppBundleIdentifier:nil
+                                    options:0
+             additionalEventParamDescriptor:nil
+                          launchIdentifiers:nil];
+}
+
 #pragma mark Annotations
 
 - (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)annotations {
@@ -2456,6 +2478,15 @@ public:
 
     std::vector<mbgl::Feature> features = _mbglMap->queryRenderedFeatures(screenBox, optionalLayerIDs);
     return MGLFeaturesFromMBGLFeatures(features);
+}
+
+#pragma mark User interface validation
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
+    if (menuItem.action == @selector(giveFeedback:)) {
+        return YES;
+    }
+    return [super validateMenuItem:menuItem];
 }
 
 #pragma mark Interface Builder methods
