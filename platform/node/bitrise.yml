@@ -42,10 +42,11 @@ workflows:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
+            brew update
             brew install cmake
             brew unlink node
-            brew install awscli homebrew/versions/node4-lts
-            brew link homebrew/versions/node4-lts
+            brew install awscli node@4
+            brew link node@4
             gem install xcpretty --no-rdoc --no-ri
             make node
     - script:
