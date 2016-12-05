@@ -61,6 +61,7 @@
 		55D9B4B11D005D3900C1CCE2 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D9B4B01D005D3900C1CCE2 /* libz.tbd */; };
 		DA0CD58E1CF56F5800A5F5A5 /* MGLFeatureTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */; };
 		DA2207BC1DC076940002F84D /* MGLStyleValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2207BB1DC076940002F84D /* MGLStyleValueTests.swift */; };
+		DA2784FE1DF03060001D5B8D /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA2784FD1DF03060001D5B8D /* Media.xcassets */; };
 		DA2DBBCB1D51E30A00D38FF9 /* MGLStyleLayerTests.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA2DBBCA1D51E30A00D38FF9 /* MGLStyleLayerTests.xib */; };
 		DA35A2A41CC9EB1A00E826B2 /* MGLCoordinateFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA35A2A61CC9EB2700E826B2 /* MGLCoordinateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */; };
@@ -296,6 +297,7 @@
 		DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
 		DA2207BA1DC076930002F84D /* test-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "test-Bridging-Header.h"; sourceTree = "<group>"; };
 		DA2207BB1DC076940002F84D /* MGLStyleValueTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MGLStyleValueTests.swift; sourceTree = "<group>"; };
+		DA2784FD1DF03060001D5B8D /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Media.xcassets; path = ../../darwin/test/Media.xcassets; sourceTree = "<group>"; };
 		DA2DBBCA1D51E30A00D38FF9 /* MGLStyleLayerTests.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MGLStyleLayerTests.xib; sourceTree = "<group>"; };
 		DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCoordinateFormatter.h; sourceTree = "<group>"; };
 		DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLCoordinateFormatter.m; sourceTree = "<group>"; };
@@ -842,6 +844,7 @@
 				DAE6C3CC1CC34BD800DB3429 /* MGLStyleTests.mm */,
 				DD58A4C71D822C6200E1F038 /* MGLExpressionTests.mm */,
 				DAE6C33A1CC30DB200DB3429 /* Info.plist */,
+				DA2784FD1DF03060001D5B8D /* Media.xcassets */,
 			);
 			name = "SDK Tests";
 			path = test;
@@ -1150,6 +1153,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				35724FC41D630502002A4AB4 /* amsterdam.geojson in Resources */,
+				DA2784FE1DF03060001D5B8D /* Media.xcassets in Resources */,
 				DA2DBBCB1D51E30A00D38FF9 /* MGLStyleLayerTests.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

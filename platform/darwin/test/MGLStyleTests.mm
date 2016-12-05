@@ -17,6 +17,11 @@
 #import <mbgl/util/default_styles.hpp>
 
 #import <XCTest/XCTest.h>
+#if TARGET_OS_IPHONE
+    #import <UIKit/UIKit.h>
+#else
+    #import <Cocoa/Cocoa.h>
+#endif
 #import <objc/runtime.h>
 
 @interface MGLStyleTests : XCTestCase
@@ -173,6 +178,25 @@
     NSString *styleHeader = [NSString stringWithContentsOfURL:styleHeaderURL usedEncoding:nil error:&styleHeaderError];
     XCTAssertNil(styleHeaderError, @"Error getting contents of MGLStyle.h.");
     return styleHeader;
+}
+
+- (void)testImages {
+    NSString *imageName = @"TrackingLocationMask";
+#if TARGET_OS_IPHONE
+    MGLImage *image = [MGLImage imageNamed:imageName
+                                  inBundle:[NSBundle bundleForClass:[self class]]
+             compatibleWithTraitCollection:nil];
+#else
+    MGLImage *image = [[NSBundle bundleForClass:[self class]] imageForResource:imageName];
+#endif
+    XCTAssertNotNil(image);
+    
+    [self.mapView.style setImage:image forName:imageName];
+    MGLImage *styleImage = [self.mapView.style imageForName:imageName];
+    
+    XCTAssertNotNil(styleImage);
+    XCTAssertEqual(image.size.width, styleImage.size.width);
+    XCTAssertEqual(image.size.height, styleImage.size.height);
 }
 
 @end

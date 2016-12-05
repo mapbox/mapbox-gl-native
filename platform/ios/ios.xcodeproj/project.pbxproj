@@ -188,6 +188,7 @@
 		DA25D5C01CCD9F8400607828 /* Root.plist in Resources */ = {isa = PBXBuildFile; fileRef = DA25D5BF1CCD9F8400607828 /* Root.plist */; };
 		DA25D5C61CCDA06800607828 /* Root.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA25D5C41CCDA06800607828 /* Root.strings */; };
 		DA25D5CD1CCDA11500607828 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA25D5B91CCD9EDE00607828 /* Settings.bundle */; };
+		DA2784FC1DF02FF4001D5B8D /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA2784FB1DF02FF4001D5B8D /* Media.xcassets */; };
 		DA27C24E1CBB3811000B0ECD /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA27C24D1CBB3811000B0ECD /* GLKit.framework */; };
 		DA27C24F1CBB4C11000B0ECD /* MGLAccountManager_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8847FF1CBAFA6200AB86E3 /* MGLAccountManager_Private.h */; };
 		DA2DBBCE1D51E80400D38FF9 /* MGLStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2DBBCD1D51E80400D38FF9 /* MGLStyleLayerTests.m */; };
@@ -618,6 +619,7 @@
 		DA25D5B91CCD9EDE00607828 /* Settings.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Settings.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA25D5BF1CCD9F8400607828 /* Root.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Root.plist; sourceTree = "<group>"; };
 		DA25D5C51CCDA06800607828 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Root.strings; sourceTree = "<group>"; };
+		DA2784FB1DF02FF4001D5B8D /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Media.xcassets; path = ../../darwin/test/Media.xcassets; sourceTree = "<group>"; };
 		DA27C24D1CBB3811000B0ECD /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		DA2DBBCC1D51E80400D38FF9 /* MGLStyleLayerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLStyleLayerTests.h; path = ../../darwin/test/MGLStyleLayerTests.h; sourceTree = "<group>"; };
 		DA2DBBCD1D51E80400D38FF9 /* MGLStyleLayerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLStyleLayerTests.m; path = ../../darwin/test/MGLStyleLayerTests.m; sourceTree = "<group>"; };
@@ -1065,6 +1067,7 @@
 				DA2E88601CC0382C00F24E7B /* MGLStyleTests.mm */,
 				DD58A4C51D822BD000E1F038 /* MGLExpressionTests.mm */,
 				DA2E88551CC036F400F24E7B /* Info.plist */,
+				DA2784FB1DF02FF4001D5B8D /* Media.xcassets */,
 			);
 			name = "SDK Tests";
 			path = test;
@@ -1805,6 +1808,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA2784FC1DF02FF4001D5B8D /* Media.xcassets in Resources */,
 				353BAEF71D646370009A8DA9 /* amsterdam.geojson in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

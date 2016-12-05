@@ -2,6 +2,13 @@
 
 @implementation UIImage (MGLAdditions)
 
+- (nullable instancetype)initWithMGLSpriteImage:(const mbgl::SpriteImage *)spriteImage
+{
+    std::string png = encodePNG(spriteImage->image);
+    NSData *data = [[NSData alloc] initWithBytes:png.data() length:png.size()];
+    return [self initWithData:data scale:spriteImage->pixelRatio];
+}
+
 - (std::unique_ptr<mbgl::SpriteImage>)mgl_spriteImage
 {
     CGImageRef cgImage = self.CGImage;
