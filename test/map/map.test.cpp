@@ -398,7 +398,7 @@ TEST(Map, RemoveImage) {
 TEST(Map, GetImage) {
     MapTest test;
 
-    Map map(test.backend, test.view.size, 1, test.fileSource, test.threadPool, MapMode::Still);
+    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
     auto decoded = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
     auto image = std::make_unique<SpriteImage>(std::move(decoded), 1.0);
 
