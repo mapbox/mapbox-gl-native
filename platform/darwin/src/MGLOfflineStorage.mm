@@ -334,4 +334,10 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
     }];
 }
 
+#pragma mark - ambient cache
+
+- (void)cleanAmbientCache {
+    _mbglFileSource->cleanAmbientCache();
+}
+
 @end
