@@ -32,3 +32,15 @@ xcuserdata
 /documentation
 test/fixtures/api/assets.zip
 test/fixtures/storage/assets.zip
+platform/qt/.moc/
+platform/qt/.obj/
+platform/qt/.pch/
+platform/qt/.rcc/
+/shared/
+/static/
+Makefile
+Makefile.Shared
+Makefile.Static
+libqmapboxgl.*
+uic_wrapper.sh
+
