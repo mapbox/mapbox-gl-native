@@ -2,6 +2,7 @@
 
 #include <mbgl/gl/uniform.hpp>
 #include <mbgl/util/color.hpp>
+#include <mbgl/util/size.hpp>
 
 namespace mbgl {
 namespace uniforms {
@@ -26,6 +27,7 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pattern_br_b);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pattern_size_a);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pattern_size_b);
 
+MBGL_DEFINE_UNIFORM_SCALAR(Size, u_world);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_mix);
 MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_image);
 

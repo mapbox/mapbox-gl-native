@@ -9,7 +9,6 @@
 #include <mbgl/shader/fill_outline_pattern.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/util/size.hpp>
 
 #include <string>
 
@@ -24,7 +23,6 @@ template <class> class Faded;
 } // namespace style
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_SCALAR(Size,     u_world);
 MBGL_DEFINE_UNIFORM_SCALAR(Color,    u_outline_color);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_scale_a);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_scale_b);

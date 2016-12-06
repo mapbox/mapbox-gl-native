@@ -51,14 +51,18 @@ SymbolIconProgram::uniformValues(const style::SymbolPropertyValues& values,
                                  const Size& texsize,
                                  const std::array<float, 2>& pixelsToGLUnits,
                                  const RenderTile& tile,
-                                 const TransformState& state)
+                                 const TransformState& state,
+                                 const bool interpolate,
+                                 const Size framebufferSize)
 {
     return makeValues<SymbolIconProgram::UniformValues>(
         values,
         texsize,
         pixelsToGLUnits,
         tile,
-        state
+        state,
+        uniforms::u_interpolate::Value{ interpolate },
+        uniforms::u_world::Value{ framebufferSize }
     );
 }
 
