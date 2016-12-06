@@ -1,9 +1,13 @@
 {
   "layout_symbol": {
-    "icon-image": "icon-image-name"
+    "icon-image": "icon-image-name",
+    "icon-size": "icon-scale"
   },
   "paint_raster": {
     "raster-brightness-min": "minimum-raster-brightness",
     "raster-brightness-max": "maximum-raster-brightness"
+  },
+  "paint_line": {
+    "line-dasharray": "line-dash-pattern"
   }
 }

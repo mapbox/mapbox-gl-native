@@ -25,7 +25,7 @@
     layer.iconPadding = [MGLRuntimeStylingHelper testNumber];
     layer.iconRotate = [MGLRuntimeStylingHelper testNumber];
     layer.iconRotationAlignment = [MGLRuntimeStylingHelper testEnum:MGLIconRotationAlignmentAuto type:@encode(MGLIconRotationAlignment)];
-    layer.iconSize = [MGLRuntimeStylingHelper testNumber];
+    layer.iconScale = [MGLRuntimeStylingHelper testNumber];
     layer.iconTextFit = [MGLRuntimeStylingHelper testEnum:MGLIconTextFitBoth type:@encode(MGLIconTextFit)];
     layer.iconTextFitPadding = [MGLRuntimeStylingHelper testPadding];
     layer.symbolAvoidEdges = [MGLRuntimeStylingHelper testBool];
@@ -77,7 +77,7 @@
     XCTAssertEqualObjects(gLayer.iconRotate, [MGLRuntimeStylingHelper testNumber]);
     XCTAssert([gLayer.iconRotationAlignment isKindOfClass:[MGLStyleConstantValue class]]);
     XCTAssertEqualObjects(gLayer.iconRotationAlignment, [MGLRuntimeStylingHelper testEnum:MGLIconRotationAlignmentAuto type:@encode(MGLIconRotationAlignment)]);
-    XCTAssertEqualObjects(gLayer.iconSize, [MGLRuntimeStylingHelper testNumber]);
+    XCTAssertEqualObjects(gLayer.iconScale, [MGLRuntimeStylingHelper testNumber]);
     XCTAssert([gLayer.iconTextFit isKindOfClass:[MGLStyleConstantValue class]]);
     XCTAssertEqualObjects(gLayer.iconTextFit, [MGLRuntimeStylingHelper testEnum:MGLIconTextFitBoth type:@encode(MGLIconTextFit)]);
     XCTAssertEqualObjects(gLayer.iconTextFitPadding, [MGLRuntimeStylingHelper testPadding]);
@@ -135,7 +135,7 @@
     layer.iconPadding = [MGLRuntimeStylingHelper testNumberFunction];
     layer.iconRotate = [MGLRuntimeStylingHelper testNumberFunction];
     layer.iconRotationAlignment = [MGLRuntimeStylingHelper testEnumFunction:MGLIconRotationAlignmentAuto type:@encode(MGLIconRotationAlignment)];
-    layer.iconSize = [MGLRuntimeStylingHelper testNumberFunction];
+    layer.iconScale = [MGLRuntimeStylingHelper testNumberFunction];
     layer.iconTextFit = [MGLRuntimeStylingHelper testEnumFunction:MGLIconTextFitBoth type:@encode(MGLIconTextFit)];
     layer.iconTextFitPadding = [MGLRuntimeStylingHelper testPaddingFunction];
     layer.symbolAvoidEdges = [MGLRuntimeStylingHelper testBoolFunction];
@@ -184,7 +184,7 @@
     XCTAssertEqualObjects(gLayer.iconPadding, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.iconRotate, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.iconRotationAlignment, [MGLRuntimeStylingHelper testEnumFunction:MGLIconRotationAlignmentAuto type:@encode(MGLIconRotationAlignment)]);
-    XCTAssertEqualObjects(gLayer.iconSize, [MGLRuntimeStylingHelper testNumberFunction]);
+    XCTAssertEqualObjects(gLayer.iconScale, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.iconTextFit, [MGLRuntimeStylingHelper testEnumFunction:MGLIconTextFitBoth type:@encode(MGLIconTextFit)]);
     XCTAssertEqualObjects(gLayer.iconTextFitPadding, [MGLRuntimeStylingHelper testPaddingFunction]);
     XCTAssertEqualObjects(gLayer.symbolAvoidEdges, [MGLRuntimeStylingHelper testBoolFunction]);

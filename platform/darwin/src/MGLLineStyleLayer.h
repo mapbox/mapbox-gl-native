@@ -142,7 +142,7 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
 
  This property is only applied to the style if `linePattern` is set to `nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDasharray;
+@property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDashPattern;
 
 /**
  Draws a line casing outside of a line's actual path. Value indicates the width of the inner gap.

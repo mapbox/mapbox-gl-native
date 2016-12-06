@@ -297,14 +297,14 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::style::AlignmentType, NSValue *, mbgl::style::AlignmentType, MGLIconRotationAlignment>().toEnumStyleValue(propertyValue);
 }
 
-- (void)setIconSize:(MGLStyleValue<NSNumber *> *)iconSize {
+- (void)setIconScale:(MGLStyleValue<NSNumber *> *)iconScale {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(iconSize);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(iconScale);
     _rawLayer->setIconSize(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)iconSize {
+- (MGLStyleValue<NSNumber *> *)iconScale {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = _rawLayer->getIconSize() ?: _rawLayer->getDefaultIconSize();

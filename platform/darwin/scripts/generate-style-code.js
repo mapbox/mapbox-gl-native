@@ -39,7 +39,7 @@ global.objCType = function (layerType, propertyName) {
 }
 
 global.arrayType = function (property) {
-    return property.type === 'array' ? property.name.split('-').pop() : false;
+    return property.type === 'array' ? originalPropertyName(property).split('-').pop() : false;
 };
 
 global.testImplementation = function (property, layerType, isFunction) {

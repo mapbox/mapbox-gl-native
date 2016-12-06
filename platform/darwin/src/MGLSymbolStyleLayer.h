@@ -320,7 +320,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconSize;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconScale;
 
 /**
  Scales the icon to fit around the associated text.
