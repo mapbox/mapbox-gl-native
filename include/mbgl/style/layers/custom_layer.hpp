@@ -7,8 +7,8 @@ namespace style {
 
 /**
  * Initialize any GL state needed by the custom layer. This method is called once, from the
- * rendering thread, at a point when the GL context is active but before rendering for the
- * first time.
+ * main thread, at a point when the GL context is active but before rendering for the first
+ * time.
  *
  * Resources that are acquired in this method must be released in the UninitializeFunction.
  */
@@ -40,7 +40,7 @@ using CustomLayerRenderFunction = void (*)(void* context, const CustomLayerRende
 
 /**
  * Destroy any GL state needed by the custom layer, and deallocate context, if necessary. This
- * method is called once, from the rendering thread, at a point when the GL context is active.
+ * method is called once, from the main thread, at a point when the GL context is active.
  *
  * Note that it may be called even when the InitializeFunction has not been called.
  */
