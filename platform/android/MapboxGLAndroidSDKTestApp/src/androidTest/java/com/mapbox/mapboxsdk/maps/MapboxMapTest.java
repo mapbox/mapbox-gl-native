@@ -9,7 +9,6 @@ import android.support.test.espresso.ViewAction;
 import android.support.test.rule.ActivityTestRule;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -23,6 +22,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
+import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
 import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
 
 import org.hamcrest.Matcher;
@@ -39,7 +39,6 @@ import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withChild;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
@@ -87,8 +86,8 @@ public class MapboxMapTest {
         onView(withId(R.id.mapView)).perform(new MapboxMapAction(new InvokeViewAction() {
             @Override
             public void onViewAction(UiController uiController, View view) {
-                mapboxMap.setMinZoom(10);
-                assertEquals("MinZoom should match", 10, mapboxMap.getMinZoom(), 10);
+                mapboxMap.setMinZoomPreference(10);
+                assertEquals("MinZoom should match", 10, mapboxMap.getMinZoomLevel(), 10);
             }
         }));
     }
@@ -101,8 +100,8 @@ public class MapboxMapTest {
         onView(withId(R.id.mapView)).perform(new MapboxMapAction(new InvokeViewAction() {
             @Override
             public void onViewAction(UiController uiController, View view) {
-                mapboxMap.setMaxZoom(zoom);
-                assertEquals("MaxZoom should match", zoom, mapboxMap.getMaxZoom(), 10);
+                mapboxMap.setMaxZoomPreference(zoom);
+                assertEquals("MaxZoom should match", zoom, mapboxMap.getMaxZoomLevel(), 10);
             }
         }));
     }
@@ -110,9 +109,14 @@ public class MapboxMapTest {
     @Test
     public void testInitialZoomLevels() {
         ViewUtils.checkViewIsDisplayed(R.id.mapView);
-        MapboxMap mapboxMap = activity.getMapboxMap();
-        assertEquals("MaxZoom should match", MapboxConstants.MAXIMUM_ZOOM, mapboxMap.getMaxZoom(), 0);
-        assertEquals("MinZoom should match", MapboxConstants.MINIMUM_ZOOM, mapboxMap.getMinZoom(), 0);
+        final MapboxMap mapboxMap = activity.getMapboxMap();
+        onView(withId(R.id.mapView)).perform(new MapboxMapAction(new InvokeViewAction() {
+            @Override
+            public void onViewAction(UiController uiController, View view) {
+                assertEquals("MaxZoom should match", MapboxConstants.MAXIMUM_ZOOM, mapboxMap.getMaxZoomLevel(), TestConstants.ZOOM_DELTA);
+                assertEquals("MinZoom should match", MapboxConstants.MINIMUM_ZOOM, mapboxMap.getMinZoomLevel(), TestConstants.ZOOM_DELTA);
+            }
+        }));
     }
 
     //

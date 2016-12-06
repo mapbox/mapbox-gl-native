@@ -54,8 +54,8 @@ public class SupportMapFragmentActivity extends AppCompatActivity implements OnM
 
             LatLng dc = new LatLng(38.90252, -77.02291);
 
-            options.minZoom(9);
-            options.maxZoom(11);
+            options.minZoomPreference(9);
+            options.maxZoomPreference(11);
             options.camera(new CameraPosition.Builder()
                     .target(dc)
                     .zoom(11)

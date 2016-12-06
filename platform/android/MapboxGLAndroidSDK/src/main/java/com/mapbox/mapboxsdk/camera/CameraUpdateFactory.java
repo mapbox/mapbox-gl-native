@@ -258,7 +258,7 @@ public final class CameraUpdateFactory {
                 float scaleY = (uiSettings.getHeight() - padding.top - padding.bottom) / height;
                 minScale = scaleX < scaleY ? scaleX : scaleY;
                 zoom = calculateZoom(mapboxMap, minScale);
-                zoom = MathUtils.clamp(zoom, mapboxMap.getMinZoom(), mapboxMap.getMaxZoom());
+                zoom = MathUtils.clamp(zoom, mapboxMap.getMinZoomLevel(), mapboxMap.getMaxZoomLevel());
             }
 
             // Calculate the center point

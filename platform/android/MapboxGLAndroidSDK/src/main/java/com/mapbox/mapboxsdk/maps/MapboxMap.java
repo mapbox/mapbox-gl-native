@@ -70,9 +70,6 @@ public final class MapboxMap {
 
     private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
-    private double maxZoomLevel = -1;
-    private double minZoomLevel = -1;
-
     MapboxMap(NativeMapView map, Transform transform, UiSettings ui, TrackingSettings tracking, MyLocationViewSettings myLocationView,
               Projection projection, OnRegisterTouchListener listener, AnnotationManager annotations) {
         this.nativeMapView = map;
@@ -89,17 +86,13 @@ public final class MapboxMap {
         transform.initialise(this, options);
         uiSettings.initialise(context, options);
         myLocationViewSettings.initialise(options);
+        setMyLocationEnabled(options.getLocationEnabled());
 
         // api base url
         setDebugActive(options.getDebugActive());
         setApiBaseUrl(options);
         setAccessToken(options);
         setStyleUrl(options);
-
-        // todo migrate with other PR
-        setMyLocationEnabled(options.getLocationEnabled());
-        setMaxZoom(options.getMaxZoom());
-        setMinZoom(options.getMinZoom());
     }
 
     // Style
@@ -262,14 +255,9 @@ public final class MapboxMap {
      * @param minZoom The new minimum zoom level.
      */
     @UiThread
-    public void setMinZoom(
+    public void setMinZoomPreference(
             @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
-        if ((minZoom < MapboxConstants.MINIMUM_ZOOM) || (minZoom > MapboxConstants.MAXIMUM_ZOOM)) {
-            Timber.e("Not setting minZoom, value is in unsupported range: " + minZoom);
-            return;
-        }
-        minZoomLevel = minZoom;
-        nativeMapView.setMinZoom(minZoom);
+        transform.setMinZoom(minZoom);
     }
 
     /**
@@ -280,11 +268,8 @@ public final class MapboxMap {
      * @return The minimum zoom level.
      */
     @UiThread
-    public double getMinZoom() {
-        if (minZoomLevel == -1) {
-            return minZoomLevel = nativeMapView.getMinZoom();
-        }
-        return minZoomLevel;
+    public double getMinZoomLevel() {
+        return transform.getMinZoom();
     }
 
     //
@@ -299,14 +284,8 @@ public final class MapboxMap {
      * @param maxZoom The new maximum zoom level.
      */
     @UiThread
-    public void setMaxZoom(
-            @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
-        if ((maxZoom < MapboxConstants.MINIMUM_ZOOM) || (maxZoom > MapboxConstants.MAXIMUM_ZOOM)) {
-            Timber.e("Not setting maxZoom, value is in unsupported range: " + maxZoom);
-            return;
-        }
-        maxZoomLevel = maxZoom;
-        nativeMapView.setMaxZoom(maxZoom);
+    public void setMaxZoomPreference(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
+        transform.setMaxZoom(maxZoom);
     }
 
     /**
@@ -317,11 +296,8 @@ public final class MapboxMap {
      * @return The maximum zoom level.
      */
     @UiThread
-    public double getMaxZoom() {
-        if (maxZoomLevel == -1) {
-            return maxZoomLevel = nativeMapView.getMaxZoom();
-        }
-        return maxZoomLevel;
+    public double getMaxZoomLevel() {
+        return transform.getMaxZoom();
     }
 
     //

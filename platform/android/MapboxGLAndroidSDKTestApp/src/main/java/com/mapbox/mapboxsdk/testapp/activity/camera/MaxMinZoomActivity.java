@@ -39,8 +39,8 @@ public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     public void onMapReady(MapboxMap map) {
         mapboxMap = map;
-        mapboxMap.setMinZoom(3);
-        mapboxMap.setMaxZoom(5);
+        mapboxMap.setMinZoomPreference(3);
+        mapboxMap.setMaxZoomPreference(5);
     }
 
     @Override
