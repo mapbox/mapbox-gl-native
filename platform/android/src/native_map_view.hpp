@@ -23,8 +23,6 @@ public:
     void updateViewBinding();
     void bind() override;
 
-    void activate() override;
-    void deactivate() override;
     void invalidate() override;
 
     void notifyMapChange(mbgl::MapChange) override;
@@ -52,6 +50,10 @@ public:
     void setInsets(mbgl::EdgeInsets insets_);
 
     void scheduleTakeSnapshot();
+
+protected:
+    void activate() override;
+    void deactivate() override;
 
 private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);

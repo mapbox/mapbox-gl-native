@@ -190,7 +190,7 @@ void NativeMapView::invalidate() {
 }
 
 void NativeMapView::render() {
-    activate();
+    BackendScope guard(*this);
 
     updateViewBinding();
     map->render(*this);
@@ -235,8 +235,6 @@ void NativeMapView::render() {
     } else {
         mbgl::Log::Info(mbgl::Event::Android, "Not swapping as we are not ready");
     }
-
-    deactivate();
 }
 
 mbgl::Map &NativeMapView::getMap() { return *map; }
@@ -421,7 +419,7 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
     if (!firstTime) {
         firstTime = true;
 
-        activate();
+        BackendScope guard(*this);
 
         if (!eglMakeCurrent(display, surface, surface, context)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
@@ -442,8 +440,6 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
         mbgl::gl::InitializeExtensions([] (const char * name) {
              return reinterpret_cast<mbgl::gl::glProc>(eglGetProcAddress(name));
         });
-
-        deactivate();
     }
 }
 
