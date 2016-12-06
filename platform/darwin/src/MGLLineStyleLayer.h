@@ -141,6 +141,8 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
  This property is measured in line widths.
 
  This property is only applied to the style if `linePattern` is set to `nil`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-line-dasharray"><code>line-dasharray</code></a> paint property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDashPattern;
 
