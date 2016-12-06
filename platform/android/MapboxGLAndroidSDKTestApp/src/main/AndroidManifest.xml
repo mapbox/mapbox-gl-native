@@ -318,14 +318,6 @@
                 android:value="@string/category_fragment" />
         </activity>
         <activity
-            android:name=".activity.maplayout.VideoViewActivity"
-            android:description="@string/description_video_view"
-            android:label="@string/activity_video_view">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_maplayout" />
-        </activity>
-        <activity
             android:name=".activity.maplayout.SimpleMapActivity"
             android:description="@string/description_simple_map"
             android:label="@string/activity_simple_map">
@@ -395,14 +387,6 @@
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_imagegenerator" />
-        </activity>
-        <activity
-            android:name=".activity.maplayout.SurfaceViewMediaControlActivity"
-            android:description="@string/description_surfaceview_mediacontrols"
-            android:label="@string/activity_surfaceview_overlay">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_maplayout" />
         </activity>
 
         <!-- Features -->

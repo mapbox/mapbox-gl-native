@@ -62,7 +62,6 @@
     <string name="activity_geojson_clustering">GeoJson Clustering</string>
     <string name="activity_geojson_realtime">Add live realtime data</string>
     <string name="activity_print">Print a map</string>
-    <string name="activity_surfaceview_overlay">SurfaceView MediaOverlay</string>
     <string name="activity_query_rendered_feature_properties">Query feature properties</string>
     <string name="activity_query_rendered_features_box_count">Count features in box</string>
     <string name="activity_query_rendered_features_box_symbol_count">Count symbols in box</string>
@@ -71,7 +70,6 @@
     <string name="activity_symbol_layer">Symbols</string>
     <string name="activity_add_sprite">Add Custom Sprite</string>
     <string name="activity_navigation_drawer">Android SDK View integration</string>
-    <string name="activity_video_view">Video View</string>
     <string name="activity_simple_map">Simple Map</string>
     <string name="activity_map_in_dialog">Dialog with map</string>
     <string name="activity_marker_view_rectangle">Marker views in rectangle</string>
@@ -122,13 +120,11 @@
     <string name="description_geojson_realtime">Use realtime GeoJSON data streams to move a symbol on your map</string>
     <string name="description_print">Shows how to print a map</string>
     <string name="description_navigation_drawer">Test animation of Android SDK View components</string>
-    <string name="description_surfaceview_mediacontrols">Test overlaying SurfaceView</string>
     <string name="description_query_rendered_feature_properties_point">Query rendered feature properties on click</string>
     <string name="description_query_rendered_features_box_count">Count all rendered features in box</string>
     <string name="description_query_rendered_features_box_symbol_count">Count all rendered symbols in box</string>
     <string name="description_query_rendered_features_box_highlight">Hightligh buildings in box</string>
     <string name="description_car_driving">MyLocationView follow map update example</string>
-    <string name="description_video_view">Android video view on top of the map view</string>
     <string name="description_simple_map">Shows a simple map</string>
     <string name="description_add_remove_markers">Based on zoom level</string>
     <string name="description_style_file">Use a local file as the style</string>
