@@ -7,6 +7,7 @@
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/util/url.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
@@ -65,8 +66,6 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    std::string style = mbgl::util::read_file(style_path);
-
     using namespace mbgl;
 
     util::RunLoop loop;
@@ -90,7 +89,12 @@ int main(int argc, char *argv[]) {
     ThreadPool threadPool(4);
     Map map(backend, mbgl::Size { width, height }, pixelRatio, fileSource, threadPool, MapMode::Still);
 
-    map.setStyleJSON(style);
+    if (util::isURL(style_path)) {
+        map.setStyleURL(style_path);
+    } else {
+        map.setStyleJSON(mbgl::util::read_file(style_path));
+    }
+
     map.setClasses(classes);
 
     map.setLatLngZoom({ lat, lon }, zoom);
