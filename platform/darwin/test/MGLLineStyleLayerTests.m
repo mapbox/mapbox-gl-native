@@ -22,7 +22,7 @@
     layer.lineRoundLimit = [MGLRuntimeStylingHelper testNumber];
     layer.lineBlur = [MGLRuntimeStylingHelper testNumber];
     layer.lineColor = [MGLRuntimeStylingHelper testColor];
-    layer.lineDasharray = [MGLRuntimeStylingHelper testDashArray];
+    layer.lineDashPattern = [MGLRuntimeStylingHelper testDashArray];
     layer.lineGapWidth = [MGLRuntimeStylingHelper testNumber];
     layer.lineOffset = [MGLRuntimeStylingHelper testNumber];
     layer.lineOpacity = [MGLRuntimeStylingHelper testNumber];
@@ -41,7 +41,7 @@
     XCTAssertEqualObjects(gLayer.lineRoundLimit, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineBlur, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineColor, [MGLRuntimeStylingHelper testColor]);
-    XCTAssertEqualObjects(gLayer.lineDasharray, [MGLRuntimeStylingHelper testDashArray]);
+    XCTAssertEqualObjects(gLayer.lineDashPattern, [MGLRuntimeStylingHelper testDashArray]);
     XCTAssertEqualObjects(gLayer.lineGapWidth, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineOffset, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.lineOpacity, [MGLRuntimeStylingHelper testNumber]);
@@ -57,7 +57,7 @@
     layer.lineRoundLimit = [MGLRuntimeStylingHelper testNumberFunction];
     layer.lineBlur = [MGLRuntimeStylingHelper testNumberFunction];
     layer.lineColor = [MGLRuntimeStylingHelper testColorFunction];
-    layer.lineDasharray = [MGLRuntimeStylingHelper testDashArrayFunction];
+    layer.lineDashPattern = [MGLRuntimeStylingHelper testDashArrayFunction];
     layer.lineGapWidth = [MGLRuntimeStylingHelper testNumberFunction];
     layer.lineOffset = [MGLRuntimeStylingHelper testNumberFunction];
     layer.lineOpacity = [MGLRuntimeStylingHelper testNumberFunction];
@@ -72,7 +72,7 @@
     XCTAssertEqualObjects(gLayer.lineRoundLimit, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.lineBlur, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.lineColor, [MGLRuntimeStylingHelper testColorFunction]);
-    XCTAssertEqualObjects(gLayer.lineDasharray, [MGLRuntimeStylingHelper testDashArrayFunction]);
+    XCTAssertEqualObjects(gLayer.lineDashPattern, [MGLRuntimeStylingHelper testDashArrayFunction]);
     XCTAssertEqualObjects(gLayer.lineGapWidth, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.lineOffset, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.lineOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
