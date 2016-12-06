@@ -5,6 +5,8 @@
 
 #include <mbgl/style/layer.hpp>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  Assert that the style layer is valid.
 
@@ -40,13 +42,14 @@
 @property (nonatomic) mbgl::style::Layer *rawLayer;
 
 /**
- Adds the mbgl style layer that this object represents to the mbgl map.
- 
+ Adds the mbgl style layer that this object represents to the mbgl map below the
+ specified `otherLayer`.
+
  Once a mbgl style layer is added, ownership of the object is transferred to the
  `mbgl::Map` and this object no longer has an active unique_ptr reference to the
  `mbgl::style::Layer`.
  */
-- (void)addToMapView:(MGLMapView *)mapView;
+- (void)addToMapView:(MGLMapView *)mapView belowLayer:(nullable MGLStyleLayer *)otherLayer;
 
 /**
  Removes the mbgl style layer that this object represents from the mbgl map.
@@ -57,13 +60,6 @@
  */
 - (void)removeFromMapView:(MGLMapView *)mapView;
 
-/**
- Adds the mbgl style layer that this object represents to the mbgl map below the specified `otherLayer`.
-
- Once a mbgl style layer is added, ownership of the object is transferred to the
- `mbgl::Map` and this object no longer has an active unique_ptr reference to the
- `mbgl::style::Layer`.
- */
-- (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer;
-
 @end
+
+NS_ASSUME_NONNULL_END

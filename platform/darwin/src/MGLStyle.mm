@@ -1,4 +1,4 @@
-#import "MGLStyle.h"
+#import "MGLStyle_Private.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLStyleLayer.h"
@@ -45,6 +45,7 @@
 
 @property (nonatomic, readwrite, weak) MGLMapView *mapView;
 @property (readonly, copy, nullable) NSURL *URL;
+@property (nonatomic, readwrite, strong) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLOpenGLStyleLayer *) *openGLLayers;
 
 @end
 
@@ -107,6 +108,7 @@ static NSURL *MGLStyleURL_emerald;
 - (instancetype)initWithMapView:(MGLMapView *)mapView {
     if (self = [super init]) {
         _mapView = mapView;
+        _openGLLayers = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -270,7 +272,7 @@ static NSURL *MGLStyleURL_emerald;
         [NSException raise:NSRangeException
                     format:@"Cannot insert style layer at out-of-bounds index %lu.", (unsigned long)index];
     } else if (index == 0) {
-        [styleLayer addToMapView:self.mapView];
+        [styleLayer addToMapView:self.mapView belowLayer:nil];
     } else {
         MGLStyleLayer *sibling = [self layerFromMBGLLayer:layers.at(layers.size() - index)];
         [styleLayer addToMapView:self.mapView belowLayer:sibling];
@@ -351,7 +353,7 @@ static NSURL *MGLStyleURL_emerald;
          layer];
     }
     [self willChangeValueForKey:@"layers"];
-    [layer addToMapView:self.mapView];
+    [layer addToMapView:self.mapView belowLayer:nil];
     [self didChangeValueForKey:@"layers"];
 }
 
@@ -414,7 +416,7 @@ static NSURL *MGLStyleURL_emerald;
          @"Make sure sibling was obtained using -[MGLStyle layerWithIdentifier:].",
          sibling];
     } else if (index + 1 == layers.size()) {
-        [layer addToMapView:self.mapView];
+        [layer addToMapView:self.mapView belowLayer:nil];
     } else {
         MGLStyleLayer *sibling = [self layerFromMBGLLayer:layers.at(index + 1)];
         [layer addToMapView:self.mapView belowLayer:sibling];
