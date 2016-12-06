@@ -13,6 +13,11 @@ public:
     constexpr Color() = default;
     constexpr Color(float r_, float g_, float b_, float a_)
         : r(r_), g(g_), b(b_), a(a_) {
+// Some g++ versions can't deal with assertions within a constexpr constructor: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65973
+#if !defined(__GNUC__) || \
+    (__GNUC__ == 5 && __GNUC_MINOR__ >= 4) || \
+    (__GNUC__ == 6 && __GNUC_MINOR__ >= 1) || \
+     __GNUC__ >= 7
         assert(r_ >= 0.0f);
         assert(r_ <= 1.0f);
         assert(g_ >= 0.0f);
@@ -21,6 +26,7 @@ public:
         assert(b_ <= 1.0f);
         assert(a_ >= 0.0f);
         assert(a_ <= 1.0f);
+#endif
     }
 
     float r = 0.0f;
