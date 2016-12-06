@@ -1,5 +1,6 @@
 #import "MGLMapView.h"
 #import "MGLStyle_Private.h"
+#import "MGLOpenGLStyleLayer.h"
 
 #import "MGLShapeSource.h"
 #import "MGLRasterSource.h"
@@ -168,6 +169,23 @@
     MGLSymbolStyleLayer *symbolLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"symbolLayer" source:source];
     [self.style addLayer:symbolLayer];
     XCTAssertThrowsSpecificNamed([self.style addLayer:symbolLayer], NSException, @"MGLRedundantLayerException");
+}
+
+- (void)testAddingLayersWithDuplicateIdentifiers {
+    //Just some source
+    MGLVectorSource *source = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" URL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    [self.mapView.style addSource: source];
+    
+    //Add initial layer
+    MGLFillStyleLayer *initial = [[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source];
+    [self.mapView.style addLayer:initial];
+    
+    //Try to add the duplicate
+    XCTAssertThrowsSpecificNamed([self.mapView.style addLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source]], NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] belowLayer:initial],NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] aboveLayer:initial], NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] atIndex:0], NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"my-layer"] atIndex:0], NSException, @"MGLRedundantLayerIdentifierException");
 }
 
 - (NSString *)stringWithContentsOfStyleHeader {
