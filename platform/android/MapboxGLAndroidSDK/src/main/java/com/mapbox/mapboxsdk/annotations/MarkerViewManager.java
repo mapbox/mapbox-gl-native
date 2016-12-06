@@ -9,12 +9,10 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
@@ -34,7 +32,7 @@ public class MarkerViewManager {
 
     private final ViewGroup markerViewContainer;
     private final Map<MarkerView, View> markerViewMap = new HashMap<>();
-    private final List<MapboxMap.MarkerViewAdapter> markerViewAdapters  = new ArrayList<>();
+    private final List<MapboxMap.MarkerViewAdapter> markerViewAdapters = new ArrayList<>();
 
     // TODO refactor MapboxMap out for Projection and Transform
     // Requires removing MapboxMap from Annotations by using Peer model from #6912
@@ -55,7 +53,7 @@ public class MarkerViewManager {
 
     // TODO refactor MapboxMap out for Projection and Transform
     // Requires removing MapboxMap from Annotations by using Peer model from #6912
-    public void bind(MapboxMap mapboxMap){
+    public void bind(MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
     }
 
@@ -487,14 +485,14 @@ public class MarkerViewManager {
      *
      * @param markerView that the click event occurred.
      */
-    public void onClickMarkerView(MarkerView markerView) {
+    public boolean onClickMarkerView(MarkerView markerView) {
         boolean clickHandled = false;
 
         MapboxMap.MarkerViewAdapter adapter = getViewAdapter(markerView);
         View view = getView(markerView);
         if (adapter == null || view == null) {
             // not a valid state
-            return;
+            return true;
         }
 
         if (onMarkerViewClickListener != null) {
@@ -505,6 +503,8 @@ public class MarkerViewManager {
             ensureInfoWindowOffset(markerView);
             select(markerView, view, adapter);
         }
+
+        return clickHandled;
     }
 
     /**

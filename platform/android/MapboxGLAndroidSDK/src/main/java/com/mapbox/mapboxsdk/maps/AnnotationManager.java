@@ -5,7 +5,6 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
-import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
@@ -301,23 +300,16 @@ class AnnotationManager implements MapView.OnMapChangedListener {
             deselectMarkers();
         }
 
-        boolean handledDefaultClick = false;
-        if (onMarkerClickListener != null) {
-            // end developer has provided a custom click listener
-            handledDefaultClick = onMarkerClickListener.onMarkerClick(marker);
+        if (marker instanceof MarkerView) {
+            markerViewManager.select((MarkerView) marker, false);
+            markerViewManager.ensureInfoWindowOffset((MarkerView) marker);
         }
 
-        if (!handledDefaultClick) {
-            if (marker instanceof MarkerView) {
-                markerViewManager.select((MarkerView) marker, false);
-                markerViewManager.ensureInfoWindowOffset((MarkerView) marker);
-            }
-
-            if (infoWindowManager.isInfoWindowValidForMarker(marker) || infoWindowManager.getInfoWindowAdapter() != null) {
-                infoWindowManager.add(marker.showInfoWindow(mapboxMap, mapView));
-            }
+        if (infoWindowManager.isInfoWindowValidForMarker(marker) || infoWindowManager.getInfoWindowAdapter() != null) {
+            infoWindowManager.add(marker.showInfoWindow(mapboxMap, mapView));
         }
 
+        // only add to selected markers if user didn't handle the click event themselves #3176
         selectedMarkers.add(marker);
     }
 
@@ -655,13 +647,27 @@ class AnnotationManager implements MapView.OnMapChangedListener {
                 Annotation annotation = annotations.get(i);
                 if (annotation instanceof Marker) {
                     if (annotation.getId() == newSelectedMarkerId) {
-                        if (selectedMarkers.isEmpty() || !selectedMarkers.contains(annotation)) {
-                            if (!(annotation instanceof MarkerView)) {
-                                selectMarker((Marker) annotation);
-                            } else {
-                                markerViewManager.onClickMarkerView((MarkerView) annotation);
+                        Marker marker = (Marker) annotation;
+                        boolean handledDefaultClick = false;
+
+                        if (marker instanceof MarkerView) {
+                            handledDefaultClick = markerViewManager.onClickMarkerView((MarkerView) marker);
+                        } else {
+                            if (onMarkerClickListener != null) {
+                                // end developer has provided a custom click listener
+                                handledDefaultClick = onMarkerClickListener.onMarkerClick(marker);
                             }
                         }
+
+                        if (annotation instanceof MarkerView) {
+                            markerViewManager.onClickMarkerView((MarkerView) annotation);
+                        } else {
+                            if (!handledDefaultClick) {
+                                // only select marker if user didn't handle the click event themselves
+                                selectMarker(marker);
+                            }
+                        }
+
                         return true;
                     }
                 }
