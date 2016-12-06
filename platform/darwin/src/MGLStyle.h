@@ -203,7 +203,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  @note Adding the same source instance more than once will result in a 
     `MGLRedundantSourceException`. Reusing the same source identifier, even with
     different source instances, will result in a 
-    `MGLRedundantSourceIdentiferException`.
+    `MGLRedundantSourceIdentifierException`.
  
  @param source The source to add to the current style.
  */
