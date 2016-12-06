@@ -75,8 +75,6 @@ public final class MapboxMap {
 
     private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
-    private boolean myLocationEnabled;
-
     private double maxZoomLevel = -1;
     private double minZoomLevel = -1;
 
@@ -1526,7 +1524,7 @@ public final class MapboxMap {
      */
     @UiThread
     public boolean isMyLocationEnabled() {
-        return myLocationEnabled;
+        return trackingSettings.isMyLocationEnabled();
     }
 
     /**
@@ -1543,12 +1541,6 @@ public final class MapboxMap {
      */
     @UiThread
     public void setMyLocationEnabled(boolean enabled) {
-        if (!trackingSettings.isPermissionsAccepted()) {
-            Timber.e("Could not activate user location tracking: "
-                    + "user did not accept the permission or permissions were not requested.");
-            return;
-        }
-        myLocationEnabled = enabled;
         trackingSettings.setMyLocationEnabled(enabled);
     }
 
