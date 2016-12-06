@@ -675,6 +675,22 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     fillLayer.fillColor = [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor greenColor]];
     fillLayer.predicate = [NSPredicate predicateWithFormat:@"%K == %@", @"type", @"park"];
     [self.mapView.style addLayer:fillLayer];
+    
+    NSImage *image = [NSImage imageNamed:NSImageNameIChatTheaterTemplate];
+    [self.mapView.style setImage:image forName:NSImageNameIChatTheaterTemplate];
+    
+    MGLSource *streetsSource = [self.mapView.style sourceWithIdentifier:@"composite"];
+    MGLSymbolStyleLayer *theaterLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"theaters" source:streetsSource];
+    theaterLayer.sourceLayerIdentifier = @"poi_label";
+    theaterLayer.predicate = [NSPredicate predicateWithFormat:@"maki == 'theatre'"];
+    theaterLayer.iconImageName = [MGLStyleValue valueWithRawValue:NSImageNameIChatTheaterTemplate];
+    theaterLayer.iconSize = [MGLStyleValue valueWithRawValue:@2];
+    theaterLayer.iconColor = [MGLStyleValue valueWithStops:@{
+        @16.0: [MGLStyleValue valueWithRawValue:[NSColor redColor]],
+        @18.0: [MGLStyleValue valueWithRawValue:[NSColor yellowColor]],
+        @20.0: [MGLStyleValue valueWithRawValue:[NSColor blackColor]],
+    }];
+    [self.mapView.style addLayer:theaterLayer];
 }
 
 - (IBAction)dropPin:(NSMenuItem *)sender {

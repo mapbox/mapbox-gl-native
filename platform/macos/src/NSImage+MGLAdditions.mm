@@ -8,6 +8,7 @@
     NSBitmapImageRep *rep = [NSBitmapImageRep imageRepWithData:data];
     if ([self initWithSize:NSMakeSize(spriteImage->getWidth(), spriteImage->getHeight())]) {
         [self addRepresentation:rep];
+        [self setTemplate:spriteImage->sdf];
     }
     return self;
 }
@@ -23,7 +24,8 @@
     mbgl::PremultipliedImage cPremultipliedImage(rep.pixelsWide, rep.pixelsHigh);
     std::copy(rep.bitmapData, rep.bitmapData + cPremultipliedImage.size(), cPremultipliedImage.data.get());
     return std::make_unique<mbgl::SpriteImage>(std::move(cPremultipliedImage),
-                                               (float)(rep.pixelsWide / self.size.width));
+                                               (float)(rep.pixelsWide / self.size.width),
+                                               [self isTemplate]);
 }
 
 @end

@@ -6,7 +6,14 @@
 {
     std::string png = encodePNG(spriteImage->image);
     NSData *data = [[NSData alloc] initWithBytes:png.data() length:png.size()];
-    return [self initWithData:data scale:spriteImage->pixelRatio];
+    if (self = [self initWithData:data scale:spriteImage->pixelRatio])
+    {
+        if (spriteImage->sdf)
+        {
+            self = [self imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        }
+    }
+    return self;
 }
 
 - (std::unique_ptr<mbgl::SpriteImage>)mgl_spriteImage
@@ -28,7 +35,8 @@
     CGContextRelease(context);
     CGColorSpaceRelease(colorSpace);
 
-    return std::make_unique<mbgl::SpriteImage>(std::move(cPremultipliedImage), float(self.scale));
+    BOOL isTemplate = self.renderingMode == UIImageRenderingModeAlwaysTemplate;
+    return std::make_unique<mbgl::SpriteImage>(std::move(cPremultipliedImage), float(self.scale), isTemplate);
 }
 
 @end
