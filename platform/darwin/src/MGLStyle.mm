@@ -482,17 +482,37 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)setImage:(MGLImage *)image forName:(NSString *)name
 {
-    NSAssert(image, @"image is null");
-    NSAssert(name, @"name is null");
+    if (!image) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"Cannot assign nil image to “%@”.", name];
+    }
+    if (!name) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"Cannot assign image %@ to a nil name.", image];
+    }
 
     self.mapView.mbglMap->addImage([name UTF8String], image.mgl_spriteImage);
 }
 
 - (void)removeImageForName:(NSString *)name
 {
-    NSAssert(name, @"name is null");
+    if (!name) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"Cannot remove image with nil name."];
+    }
 
     self.mapView.mbglMap->removeImage([name UTF8String]);
+}
+
+- (MGLImage *)imageForName:(NSString *)name
+{
+    if (!name) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"Cannot get image with nil name."];
+    }
+
+    auto spriteImage = self.mapView.mbglMap->getImage([name UTF8String]);
+    return spriteImage ? [[MGLImage alloc] initWithMGLSpriteImage:spriteImage] : nil;
 }
 
 - (NSString *)description

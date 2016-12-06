@@ -372,6 +372,23 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 #pragma mark Managing a Style’s Images
 
 /**
+ Returns the image associated with the given name in the style.
+ 
+ @note Names and their associated images are not guaranteed to exist across
+    styles or different versions of the same style. Applications that use this
+    API must first set the style URL to an explicitly versioned style using a
+    convenience method like `+[MGLStyle outdoorsStyleURLWithVersion:]`,
+    `MGLMapView`'s “Style URL” inspectable in Interface Builder, or a manually
+    constructed `NSURL`. This approach also avoids image name changes that will 
+    occur in the default style over time.
+ 
+ @param name The name associated with the image you want to obtain.
+ @return The image associated with the given name, or `nil` if no image is
+    associated with that name.
+ */
+- (nullable MGLImage *)imageForName:(NSString *)name;
+
+/**
  Adds or overrides an image used by the style’s layers.
  
  To use an image in a style layer, give it a unique name using this method, then

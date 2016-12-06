@@ -2,6 +2,16 @@
 
 @implementation NSImage (MGLAdditions)
 
+- (nullable instancetype)initWithMGLSpriteImage:(const mbgl::SpriteImage *)spriteImage {
+    std::string png = encodePNG(spriteImage->image);
+    NSData *data = [[NSData alloc] initWithBytes:png.data() length:png.size()];
+    NSBitmapImageRep *rep = [NSBitmapImageRep imageRepWithData:data];
+    if ([self initWithSize:NSMakeSize(spriteImage->getWidth(), spriteImage->getHeight())]) {
+        [self addRepresentation:rep];
+    }
+    return self;
+}
+
 - (std::unique_ptr<mbgl::SpriteImage>)mgl_spriteImage {
     // Create a bitmap image representation from the image, respecting backing
     // scale factor and any resizing done on the image at runtime.
@@ -9,9 +19,6 @@
     [self lockFocus];
     NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:{ NSZeroPoint, self.size }];
     [self unlockFocus];
-
-    // Get the image’s raw pixel data as an RGBA buffer.
-    std::string pixelString((const char *)rep.bitmapData, rep.pixelsWide * rep.pixelsHigh * 4 /* RGBA */);
 
     mbgl::PremultipliedImage cPremultipliedImage(rep.pixelsWide, rep.pixelsHigh);
     std::copy(rep.bitmapData, rep.bitmapData + cPremultipliedImage.size(), cPremultipliedImage.data.get());
