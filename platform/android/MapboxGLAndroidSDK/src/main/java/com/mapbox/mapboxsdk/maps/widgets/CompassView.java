@@ -61,6 +61,7 @@ public final class CompassView extends ImageView implements Runnable {
         setLayoutParams(lp);
     }
 
+    // TODO refactor MapboxMap and replace with interface
     public void setMapboxMap(@NonNull MapboxMap mapboxMap) {
         setOnClickListener(new CompassClickListener(mapboxMap, this));
     }
@@ -119,6 +120,10 @@ public final class CompassView extends ImageView implements Runnable {
 
     public void fadeCompassViewFacingNorth(boolean compassFadeFacingNorth) {
         fadeCompassViewFacingNorth = compassFadeFacingNorth;
+    }
+
+    public boolean isFadeCompassViewFacingNorth(){
+        return fadeCompassViewFacingNorth;
     }
 
     @Override

@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.VisibleRegion;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 
 /**
  * A projection is used to translate between on screen location and geographic coordinates on
@@ -15,15 +16,33 @@ import com.mapbox.mapboxsdk.geometry.VisibleRegion;
  */
 public class Projection {
 
-    private final MapView mapView;
-    private final float screenDensity;
-    private final PointF screenLocationPoint;
+    private final NativeMapView nativeMapView;
+    private int[] contentPadding;
 
-    Projection(@NonNull MapView mapView) {
-        this.mapView = mapView;
-        this.screenLocationPoint = new PointF();
-        this.screenDensity = mapView.getContext() != null ? /* return default if unit test */
-                mapView.getContext().getResources().getDisplayMetrics().density : 1.0f;
+    Projection(@NonNull NativeMapView nativeMapView) {
+        this.nativeMapView = nativeMapView;
+        this.contentPadding = new int[]{0, 0, 0, 0};
+    }
+
+    void setContentPadding(int[] contentPadding, int[] userLocationViewPadding) {
+        this.contentPadding = contentPadding;
+
+        int[] padding = new int[]{
+                contentPadding[0] + userLocationViewPadding[0],
+                contentPadding[1] + userLocationViewPadding[1],
+                contentPadding[2] + userLocationViewPadding[2],
+                contentPadding[3] + userLocationViewPadding[3]
+        };
+
+        nativeMapView.setContentPadding(padding);
+    }
+
+    int[] getContentPadding() {
+        return contentPadding;
+    }
+
+    public void invalidateContentPadding(int[] userLocationViewPadding) {
+        setContentPadding(contentPadding, userLocationViewPadding);
     }
 
     /**
@@ -37,7 +56,7 @@ public class Projection {
      * @return The distance measured in meters.
      */
     public double getMetersPerPixelAtLatitude(@FloatRange(from = -90, to = 90) double latitude) {
-        return mapView.getMetersPerPixelAtLatitude(latitude);
+        return nativeMapView.getMetersPerPixelAtLatitude(latitude);
     }
 
     /**
@@ -50,8 +69,7 @@ public class Projection {
      * the given screen point does not intersect the ground plane.
      */
     public LatLng fromScreenLocation(PointF point) {
-        screenLocationPoint.set(point.x / screenDensity, point.y / screenDensity);
-        return mapView.fromNativeScreenLocation(screenLocationPoint);
+        return nativeMapView.latLngForPixel(point);
     }
 
     /**
@@ -63,10 +81,10 @@ public class Projection {
     public VisibleRegion getVisibleRegion() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-        float left = mapView.getContentPaddingLeft();
-        float right = mapView.getWidth() - mapView.getContentPaddingRight();
-        float top = mapView.getContentPaddingTop();
-        float bottom = mapView.getHeight() - mapView.getContentPaddingBottom();
+        float left = contentPadding[0];
+        float right = nativeMapView.getWidth() - contentPadding[2];
+        float top = contentPadding[1];
+        float bottom = nativeMapView.getHeight() - contentPadding[3];
 
         LatLng topLeft = fromScreenLocation(new PointF(left, top));
         LatLng topRight = fromScreenLocation(new PointF(right, top));
@@ -90,18 +108,14 @@ public class Projection {
      * @return A Point representing the screen location in screen pixels.
      */
     public PointF toScreenLocation(LatLng location) {
-        PointF pointF = mapView.toNativeScreenLocation(location);
-        pointF.set(pointF.x * screenDensity, pointF.y * screenDensity);
-        return pointF;
+        return nativeMapView.pixelForLatLng(location);
     }
 
-    /**
-     * Calculates a zoom level based on minimum scale and current scale from MapView
-     *
-     * @param minScale The minimum scale to calculate the zoom level.
-     * @return zoom level that fits the MapView.
-     */
-    public double calculateZoom(float minScale) {
-        return Math.log(mapView.getScale() * minScale) / Math.log(2);
+    float getHeight() {
+        return nativeMapView.getHeight();
+    }
+
+    float getWidth() {
+        return nativeMapView.getWidth();
     }
 }

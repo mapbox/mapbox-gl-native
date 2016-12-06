@@ -140,13 +140,15 @@ public class MarkerViewActivity extends AppCompatActivity {
                 markerViewManager.addMarkerViewAdapter(new CountryAdapter(MarkerViewActivity.this, mapboxMap));
                 markerViewManager.addMarkerViewAdapter(new TextAdapter(MarkerViewActivity.this, mapboxMap));
 
+                final ViewGroup markerViewContainer = markerViewManager.getMarkerViewContainer();
+
                 // add a change listener to validate the size of amount of child views
                 mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
                     @Override
                     public void onMapChanged(@MapView.MapChange int change) {
                         if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
                             if (!markerViewManager.getMarkerViewAdapters().isEmpty() && viewCountView != null) {
-                                viewCountView.setText("ViewCache size " + mapView.getMarkerViewContainer().getChildCount());
+                                viewCountView.setText("ViewCache size " + markerViewContainer.getChildCount());
                             }
                         }
                     }

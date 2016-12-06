@@ -42,6 +42,9 @@ public class OfflineActivity extends AppCompatActivity
     public static final String JSON_CHARSET = "UTF-8";
     public static final String JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME";
 
+    // Style URL
+    public static final String STYLE_URL = Style.MAPBOX_STREETS;
+
     /*
      * UI elements
      */
@@ -82,7 +85,7 @@ public class OfflineActivity extends AppCompatActivity
 
         // Set up map
         mapView = (MapView) findViewById(R.id.mapView);
-        mapView.setStyleUrl(Style.MAPBOX_STREETS);
+        mapView.setStyleUrl(STYLE_URL);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -242,13 +245,12 @@ public class OfflineActivity extends AppCompatActivity
         startProgress();
 
         // Definition
-        String styleUrl = mapboxMap.getStyleUrl();
         LatLngBounds bounds = mapboxMap.getProjection().getVisibleRegion().latLngBounds;
         double minZoom = mapboxMap.getCameraPosition().zoom;
         double maxZoom = mapboxMap.getMaxZoom();
         float pixelRatio = this.getResources().getDisplayMetrics().density;
         OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
-                styleUrl, bounds, minZoom, maxZoom, pixelRatio);
+                STYLE_URL, bounds, minZoom, maxZoom, pixelRatio);
 
         // Sample way of encoding metadata from a JSONObject
         byte[] metadata =  OfflineUtils.convertRegionName(regionName);

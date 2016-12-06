@@ -54,9 +54,8 @@ public class CameraInternalAPITest {
         CameraPosition cameraPosition = mapboxMap.getCameraPosition();
         assertEquals("Default camera position should match default", cameraPosition, initialPosition);
 
-        MapView mapView = (MapView) activity.findViewById(R.id.mapView);
-        onView(withId(R.id.mapView)).perform(new BearingAction(mapView));
-        assertEquals("Bearing should match", 45.1f, MapViewUtils.getDirection(mapView), TestConstants.BEARING_DELTA);
+        onView(withId(R.id.mapView)).perform(new BearingAction(mapboxMap));
+        assertEquals("Bearing should match", 45.1f, MapViewUtils.getDirection(mapboxMap), TestConstants.BEARING_DELTA);
     }
 
     @Test
@@ -69,9 +68,8 @@ public class CameraInternalAPITest {
         CameraPosition cameraPosition = mapboxMap.getCameraPosition();
         assertEquals("Default camera position should match default", cameraPosition, initialPosition);
 
-        MapView mapView = (MapView) activity.findViewById(R.id.mapView);
-        onView(withId(R.id.mapView)).perform(new TiltAction(mapView));
-        assertEquals("Tilt should match", 40.0f, MapViewUtils.getTilt(mapView), TestConstants.TILT_DELTA);
+        onView(withId(R.id.mapView)).perform(new TiltAction(mapboxMap));
+        assertEquals("Tilt should match", 40.0f, MapViewUtils.getTilt(mapboxMap), TestConstants.TILT_DELTA);
     }
 
     @Test
@@ -84,10 +82,8 @@ public class CameraInternalAPITest {
         CameraPosition cameraPosition = mapboxMap.getCameraPosition();
         assertEquals("Default camera position should match default", cameraPosition, initialPosition);
 
-        MapView mapView = (MapView) activity.findViewById(R.id.mapView);
-        onView(withId(R.id.mapView)).perform(new LatLngAction(mapView));
-
-        LatLng centerCoordinate = MapViewUtils.getLatLng(mapView);
+        onView(withId(R.id.mapView)).perform(new LatLngAction(mapboxMap));
+        LatLng centerCoordinate = MapViewUtils.getLatLng(mapboxMap);
         assertEquals("Latitude should match", 1.1f, centerCoordinate.getLatitude(), TestConstants.LAT_LNG_DELTA);
         assertEquals("Longitude should match", 2.2f, centerCoordinate.getLongitude(), TestConstants.LAT_LNG_DELTA);
     }
@@ -99,10 +95,10 @@ public class CameraInternalAPITest {
 
     private class BearingAction implements ViewAction {
 
-        private MapView mapView;
+        private MapboxMap mapboxMap;
 
-        BearingAction(MapView mapView) {
-            this.mapView = mapView;
+        BearingAction(MapboxMap mapboxMap) {
+            this.mapboxMap = mapboxMap;
         }
 
         @Override
@@ -117,16 +113,16 @@ public class CameraInternalAPITest {
 
         @Override
         public void perform(UiController uiController, View view) {
-            MapViewUtils.setDirection(mapView, -45.1f);
+            MapViewUtils.setDirection(mapboxMap, -45.1f);
         }
     }
 
     private class TiltAction implements ViewAction {
 
-        private MapView mapView;
+        private MapboxMap mapboxMap;
 
-        TiltAction(MapView mapView) {
-            this.mapView = mapView;
+        TiltAction(MapboxMap mapboxMap) {
+            this.mapboxMap = mapboxMap;
         }
 
         @Override
@@ -141,16 +137,16 @@ public class CameraInternalAPITest {
 
         @Override
         public void perform(UiController uiController, View view) {
-            MapViewUtils.setTilt(mapView, 40.0f);
+            MapViewUtils.setTilt(mapboxMap, 40.0f);
         }
     }
 
     private class LatLngAction implements ViewAction {
 
-        private MapView mapView;
+        private MapboxMap mapboxMap;
 
-        LatLngAction(MapView mapView) {
-            this.mapView = mapView;
+        LatLngAction(MapboxMap mapboxMap) {
+            this.mapboxMap = mapboxMap;
         }
 
         @Override
@@ -165,7 +161,7 @@ public class CameraInternalAPITest {
 
         @Override
         public void perform(UiController uiController, View view) {
-            MapViewUtils.setLatLng(mapView, new LatLng(1.1, 2.2));
+            MapViewUtils.setLatLng(mapboxMap, new LatLng(1.1, 2.2));
         }
     }
 }

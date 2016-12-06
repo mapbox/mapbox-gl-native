@@ -257,7 +257,7 @@ public final class CameraUpdateFactory {
                 float scaleX = (uiSettings.getWidth() - padding.left - padding.right) / width;
                 float scaleY = (uiSettings.getHeight() - padding.top - padding.bottom) / height;
                 minScale = scaleX < scaleY ? scaleX : scaleY;
-                zoom = projection.calculateZoom(minScale);
+                zoom = calculateZoom(mapboxMap, minScale);
                 zoom = MathUtils.clamp(zoom, mapboxMap.getMinZoom(), mapboxMap.getMaxZoom());
             }
 
@@ -274,6 +274,16 @@ public final class CameraUpdateFactory {
                     .tilt(0)
                     .bearing(0)
                     .build();
+        }
+
+        /**
+         * Calculates a zoom level based on minimum scale and current scale from MapView
+         *
+         * @param minScale The minimum scale to calculate the zoom level.
+         * @return zoom level that fits the MapView.
+         */
+        public double calculateZoom(MapboxMap mapboxMap, float minScale) {
+            return Math.log(mapboxMap.getCameraPosition().zoom * minScale) / Math.log(2);
         }
     }
 

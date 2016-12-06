@@ -231,7 +231,7 @@ public class CameraEaseTest {
         @Override
         public void perform(UiController uiController, View view) {
             mapboxMap.easeCamera(cameraUpdate);
-            uiController.loopMainThreadForAtLeast(MapboxConstants.ANIMATION_DURATION);
+            uiController.loopMainThreadForAtLeast(TestConstants.ANIMATION_TEST_TIME);
         }
     }
 }
