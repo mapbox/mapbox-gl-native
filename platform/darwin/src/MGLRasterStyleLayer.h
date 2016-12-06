@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
  Increase or reduce the brightness of the image. The value is the maximum brightness.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-brightness-max"><code>raster-brightness-max</code></a> paint property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumRasterBrightness;
 
@@ -27,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
  Increase or reduce the brightness of the image. The value is the minimum brightness.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-brightness-min"><code>raster-brightness-min</code></a> paint property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *minimumRasterBrightness;
 

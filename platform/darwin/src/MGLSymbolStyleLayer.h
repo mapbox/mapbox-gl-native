@@ -252,6 +252,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 
 /**
  A string with {tokens} replaced, referencing the data property to pull from.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-image"><code>icon-image</code></a> layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *iconImageName;
 
@@ -319,6 +321,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-size"><code>icon-size</code></a> layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconScale;
 

@@ -91,6 +91,10 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
  
  <%- propertyReqs(property, layoutPropertiesByName, type) %>
 <% } -%>
+<% if (property.original) { -%>
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-<%- type -%>-<%- property.original -%>"><code><%- property.original -%></code></a> layout property in the Mapbox Style Specification.
+<% } -%>
  */
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
 
@@ -108,6 +112,10 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 <% } if (property.requires) { -%>
 
  <%- propertyReqs(property, paintPropertiesByName, type) %>
+<% } -%>
+<% if (property.original) { -%>
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-<%- property.original -%>"><code><%- property.original -%></code></a> paint property in the Mapbox Style Specification.
 <% } -%>
  */
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
