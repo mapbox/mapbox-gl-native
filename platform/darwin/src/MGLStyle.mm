@@ -271,10 +271,18 @@ static NSURL *MGLStyleURL_emerald;
         [NSException raise:NSRangeException
                     format:@"Cannot insert style layer at out-of-bounds index %lu.", (unsigned long)index];
     } else if (index == 0) {
-        [styleLayer addToMapView:self.mapView];
+        try {
+            [styleLayer addToMapView:self.mapView];
+        } catch (const std::runtime_error & err) {
+            [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
+        }
     } else {
-        MGLStyleLayer *sibling = [self layerFromMBGLLayer:layers.at(layers.size() - index)];
-        [styleLayer addToMapView:self.mapView belowLayer:sibling];
+        try {
+            MGLStyleLayer *sibling = [self layerFromMBGLLayer:layers.at(layers.size() - index)];
+            [styleLayer addToMapView:self.mapView belowLayer:sibling];
+        } catch (std::runtime_error & err) {
+            [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
+        }
     }
 }
 
@@ -350,7 +358,11 @@ static NSURL *MGLStyleURL_emerald;
          layer];
     }
     [self willChangeValueForKey:@"layers"];
-    [layer addToMapView:self.mapView];
+    try {
+        [layer addToMapView:self.mapView];
+    } catch (std::runtime_error & err) {
+        [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
+    }
     [self didChangeValueForKey:@"layers"];
 }
 
@@ -375,7 +387,11 @@ static NSURL *MGLStyleURL_emerald;
          sibling];
     }
     [self willChangeValueForKey:@"layers"];
-    [layer addToMapView:self.mapView belowLayer:sibling];
+    try {
+        [layer addToMapView:self.mapView belowLayer:sibling];
+    } catch (std::runtime_error & err) {
+        [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
+    }
     [self didChangeValueForKey:@"layers"];
 }
 
@@ -413,10 +429,18 @@ static NSURL *MGLStyleURL_emerald;
          @"Make sure sibling was obtained using -[MGLStyle layerWithIdentifier:].",
          sibling];
     } else if (index + 1 == layers.size()) {
-        [layer addToMapView:self.mapView];
+        try {
+            [layer addToMapView:self.mapView];
+        } catch (std::runtime_error & err) {
+            [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
+        }
     } else {
         MGLStyleLayer *sibling = [self layerFromMBGLLayer:layers.at(index + 1)];
-        [layer addToMapView:self.mapView belowLayer:sibling];
+        try {
+            [layer addToMapView:self.mapView belowLayer:sibling];
+        } catch (std::runtime_error & err) {
+            [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
+        }
     }
     [self didChangeValueForKey:@"layers"];
 }

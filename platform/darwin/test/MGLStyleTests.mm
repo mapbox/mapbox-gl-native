@@ -1,5 +1,8 @@
 #import "MGLMapView.h"
 #import "MGLStyle_Private.h"
+#if TARGET_OS_IPHONE
+#import "MGLMapView+MGLCustomStyleLayerAdditions.h"
+#endif
 
 #import "MGLGeoJSONSource.h"
 #import "MGLRasterSource.h"
@@ -163,6 +166,30 @@
     MGLSymbolStyleLayer *symbolLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"symbolLayer" source:source];
     [self.style addLayer:symbolLayer];
     XCTAssertThrowsSpecificNamed([self.style addLayer:symbolLayer], NSException, @"MGLRedundantLayerException");
+}
+
+- (void)testAddingLayersWithDuplicateIdentifiers {
+    //Just some source
+    MGLVectorSource *source = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" URL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    [self.mapView.style addSource: source];
+    
+    //Add initial layer
+    MGLFillStyleLayer *initial = [[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source];
+    [self.mapView.style addLayer:initial];
+    
+    //Try to add the duplicate
+    XCTAssertThrowsSpecificNamed([self.mapView.style addLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source]], NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] belowLayer:initial],NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] aboveLayer:initial], NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] atIndex:0], NSException, @"MGLRedundantLayerIdentifierException");
+
+#if TARGET_OS_IPHONE
+    //Try to insert a duplicate custom layer
+    MGLCustomStyleLayerDrawingHandler drawingHandler = ^(CGSize size, CLLocationCoordinate2D centerCoordinate, double zoomLevel, CLLocationDirection direction, CGFloat pitch, CGFloat perspectiveSkew) {
+    };
+    
+    XCTAssertThrowsSpecific([self.mapView insertCustomStyleLayerWithIdentifier:@"my-layer" preparationHandler:^{} drawingHandler:drawingHandler completionHandler: ^{} belowStyleLayerWithIdentifier:nil], NSException);
+#endif
 }
 
 - (NSString *)stringWithContentsOfStyleHeader {
