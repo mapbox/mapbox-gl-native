@@ -9,7 +9,7 @@ using namespace style;
 
 LineAnnotationImpl::LineAnnotationImpl(AnnotationID id_, LineAnnotation annotation_, uint8_t maxZoom_)
     : ShapeAnnotationImpl(id_, maxZoom_),
-      annotation({ ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.width, annotation_.color }) {
+      annotation({ ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.width, annotation_.color, annotation_.dasharray }) {
 }
 
 void LineAnnotationImpl::updateStyle(Style& style) const {
@@ -26,6 +26,7 @@ void LineAnnotationImpl::updateStyle(Style& style) const {
     lineLayer->setLineOpacity(annotation.opacity);
     lineLayer->setLineWidth(annotation.width);
     lineLayer->setLineColor(annotation.color);
+    lineLayer->setLineDasharray(annotation.dasharray);
 }
 
 const ShapeAnnotationGeometry& LineAnnotationImpl::geometry() const {

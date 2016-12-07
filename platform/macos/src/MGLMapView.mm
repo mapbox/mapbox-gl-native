@@ -198,6 +198,7 @@ public:
     BOOL _delegateHasStrokeColorsForShapeAnnotations;
     BOOL _delegateHasFillColorsForShapeAnnotations;
     BOOL _delegateHasLineWidthsForShapeAnnotations;
+    BOOL _delegateHasDasharrayForShapeAnnotations;
 
     /// True if the current process is the Interface Builder designable
     /// renderer. When drawing the designable, the map is paused, so any call to
@@ -557,6 +558,7 @@ public:
     _delegateHasStrokeColorsForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:strokeColorForShapeAnnotation:)];
     _delegateHasFillColorsForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:fillColorForPolygonAnnotation:)];
     _delegateHasLineWidthsForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:lineWidthForPolylineAnnotation:)];
+    _delegateHasDasharrayForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:lineDasharrayForPolylineAnnotation:)];
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
@@ -2293,6 +2295,13 @@ public:
         return [self.delegate mapView:self lineWidthForPolylineAnnotation:(MGLPolyline *)annotation];
     }
     return 3.0;
+}
+
+- (NSArray<NSNumber *> *)lineDasharrayForPolylineAnnotation:(MGLPolyline *)annotation {
+    if(_delegateHasDasharrayForShapeAnnotations) {
+        return [self.delegate mapView:self lineDasharrayForPolylineAnnotation:annotation];
+    }
+    return nil;
 }
 
 #pragma mark MGLPopoverDelegate methods

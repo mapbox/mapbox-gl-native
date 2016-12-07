@@ -2,6 +2,7 @@
 
 #import "MGLMultiPoint_Private.h"
 #import "MGLGeometry_Private.h"
+#import "MGLStyleValue_Private.h"
 
 #import "MGLPolyline+MGLAdditions.h"
 
@@ -33,7 +34,11 @@
     annotation.opacity = { static_cast<float>([delegate alphaForShapeAnnotation:self]) };
     annotation.color = { [delegate strokeColorForShapeAnnotation:self] };
     annotation.width = { static_cast<float>([delegate lineWidthForPolylineAnnotation:self]) };
-
+    NSArray<NSNumber*> *dashArray = [delegate lineDasharrayForPolylineAnnotation:self];
+    if(!dashArray) {
+        dashArray = @[@1];
+    }
+    annotation.dasharray = MGLStyleValueTransformer<std::vector<float>, NSArray<NSNumber *> *, float>().toPropertyValue([MGLStyleValue valueWithRawValue:dashArray]);
     return annotation;
 }
 
