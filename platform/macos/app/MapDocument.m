@@ -1,6 +1,7 @@
 #import "MapDocument.h"
 
 #import "AppDelegate.h"
+#import "LimeGreenStyleLayer.h"
 #import "DroppedPinAnnotation.h"
 
 #import <Mapbox/Mapbox.h>
@@ -604,6 +605,37 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         cos(angle) * 20);
 }
 
+- (IBAction)insertCustomStyleLayer:(id)sender {
+    [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
+        [self removeCustomStyleLayer:sender];
+    }];
+    
+    if (!self.undoManager.isUndoing) {
+        [self.undoManager setActionName:@"Add Lime Green Layer"];
+    }
+    
+    LimeGreenStyleLayer *layer = [[LimeGreenStyleLayer alloc] initWithIdentifier:@"mbx-custom"];
+    MGLStyleLayer *houseNumberLayer = [self.mapView.style layerWithIdentifier:@"housenum-label"];
+    if (houseNumberLayer) {
+        [self.mapView.style insertLayer:layer belowLayer:houseNumberLayer];
+    } else {
+        [self.mapView.style addLayer:layer];
+    }
+}
+
+- (IBAction)removeCustomStyleLayer:(id)sender {
+    [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
+        [self insertCustomStyleLayer:sender];
+    }];
+    
+    if (!self.undoManager.isUndoing) {
+        [self.undoManager setActionName:@"Delete Lime Green Layer"];
+    }
+    
+    MGLStyleLayer *layer = [self.mapView.style layerWithIdentifier:@"mbx-custom"];
+    [self.mapView.style removeLayer:layer];
+}
+
 #pragma mark Offline packs
 
 - (IBAction)addOfflinePack:(id)sender {
@@ -891,6 +923,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     if (menuItem.action == @selector(drawAnimatedAnnotation:)) {
         return !_isShowingAnimatedAnnotation;
+    }
+    if (menuItem.action == @selector(insertCustomStyleLayer:)) {
+        return ![self.mapView.style layerWithIdentifier:@"mbx-custom"];
     }
     if (menuItem.action == @selector(showAllAnnotations:) || menuItem.action == @selector(removeAllAnnotations:)) {
         return self.mapView.annotations.count > 0;

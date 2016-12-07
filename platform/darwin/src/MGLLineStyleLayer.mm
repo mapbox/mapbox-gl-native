@@ -80,7 +80,7 @@ namespace mbgl {
 }
 #pragma mark -  Adding to and removing from a map view
 
-- (void)addToMapView:(MGLMapView *)mapView
+- (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
 {
     if (_pendingLayer == nullptr) {
         [NSException raise:@"MGLRedundantLayerException"
@@ -88,11 +88,6 @@ namespace mbgl {
                     "to the style more than once is invalid.", self, mapView.style];
     }
 
-    [self addToMapView:mapView belowLayer:nil];
-}
-
-- (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
-{
     if (otherLayer) {
         const mbgl::optional<std::string> belowLayerId{otherLayer.identifier.UTF8String};
         mapView.mbglMap->addLayer(std::move(_pendingLayer), belowLayerId);

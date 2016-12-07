@@ -378,6 +378,11 @@ public:
     self.styleURL = styleURL;
 }
 
+- (mbgl::Map *)mbglMap
+{
+    return _mbglMap;
+}
+
 - (void)commonInit
 {
     MGLinitializeRunLoop();
@@ -5333,83 +5338,6 @@ private:
 - (void)setAllowsTilting:(BOOL)allowsTilting
 {
     self.pitchEnabled = allowsTilting;
-}
-
-@end
-
-#pragma mark - MGLCustomStyleLayerAdditions methods
-
-class MGLCustomStyleLayerHandlers
-{
-public:
-    MGLCustomStyleLayerHandlers(MGLCustomStyleLayerPreparationHandler p,
-                                MGLCustomStyleLayerDrawingHandler d,
-                                MGLCustomStyleLayerCompletionHandler f)
-    : prepare(p), draw(d), finish(f) {}
-
-    MGLCustomStyleLayerPreparationHandler prepare;
-    MGLCustomStyleLayerDrawingHandler draw;
-    MGLCustomStyleLayerCompletionHandler finish;
-};
-
-void MGLPrepareCustomStyleLayer(void *context)
-{
-    MGLCustomStyleLayerPreparationHandler prepare = reinterpret_cast<MGLCustomStyleLayerHandlers *>(context)->prepare;
-    if (prepare)
-    {
-        prepare();
-    }
-}
-
-void MGLDrawCustomStyleLayer(void *context, const mbgl::style::CustomLayerRenderParameters &params)
-{
-    CGSize size = CGSizeMake(params.width, params.height);
-    CLLocationCoordinate2D centerCoordinate = CLLocationCoordinate2DMake(params.latitude, params.longitude);
-    double zoomLevel = params.zoom;
-    CLLocationDirection direction = mbgl::util::wrap(params.bearing, 0., 360.);
-    CGFloat pitch = params.pitch;
-    CGFloat perspectiveSkew = params.altitude;
-    MGLCustomStyleLayerDrawingHandler draw = reinterpret_cast<MGLCustomStyleLayerHandlers *>(context)->draw;
-    if (draw)
-    {
-        draw(size, centerCoordinate, zoomLevel, direction, pitch, perspectiveSkew);
-    }
-}
-
-void MGLFinishCustomStyleLayer(void *context)
-{
-    MGLCustomStyleLayerHandlers *handlers = reinterpret_cast<MGLCustomStyleLayerHandlers *>(context);
-    MGLCustomStyleLayerCompletionHandler finish = handlers->finish;
-    if (finish)
-    {
-        finish();
-    }
-    delete handlers;
-}
-
-@implementation MGLMapView (MGLCustomStyleLayerAdditions)
-
-- (void)insertCustomStyleLayerWithIdentifier:(NSString *)identifier preparationHandler:(void (^)())preparation drawingHandler:(MGLCustomStyleLayerDrawingHandler)drawing completionHandler:(void (^)())completion belowStyleLayerWithIdentifier:(nullable NSString *)otherIdentifier
-{
-    NSAssert(identifier, @"Style layer needs an identifier");
-    MGLCustomStyleLayerHandlers *context = new MGLCustomStyleLayerHandlers(preparation, drawing, completion);
-    _mbglMap->addLayer(std::make_unique<mbgl::style::CustomLayer>(identifier.UTF8String, MGLPrepareCustomStyleLayer,
-                                                                  MGLDrawCustomStyleLayer, MGLFinishCustomStyleLayer, context),
-                       otherIdentifier ? mbgl::optional<std::string>(otherIdentifier.UTF8String) : mbgl::optional<std::string>());
-}
-
-- (void)removeCustomStyleLayerWithIdentifier:(NSString *)identifier
-{
-    _mbglMap->removeLayer(identifier.UTF8String);
-}
-
-- (void)setCustomStyleLayersNeedDisplay
-{
-    [self setNeedsGLDisplay];
-}
-
-- (mbgl::Map *)mbglMap {
-    return _mbglMap;
 }
 
 @end

@@ -1,4 +1,4 @@
-#import "MGLStyle.h"
+#import "MGLStyle_Private.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLStyleLayer.h"
@@ -8,6 +8,7 @@
 #import "MGLSymbolStyleLayer.h"
 #import "MGLRasterStyleLayer.h"
 #import "MGLBackgroundStyleLayer.h"
+#import "MGLOpenGLStyleLayer.h"
 
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
@@ -28,6 +29,7 @@
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
@@ -43,6 +45,7 @@
 
 @property (nonatomic, readwrite, weak) MGLMapView *mapView;
 @property (readonly, copy, nullable) NSURL *URL;
+@property (nonatomic, readwrite, strong) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLOpenGLStyleLayer *) *openGLLayers;
 
 @end
 
@@ -105,6 +108,7 @@ static NSURL *MGLStyleURL_emerald;
 - (instancetype)initWithMapView:(MGLMapView *)mapView {
     if (self = [super init]) {
         _mapView = mapView;
+        _openGLLayers = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -268,7 +272,7 @@ static NSURL *MGLStyleURL_emerald;
         [NSException raise:NSRangeException
                     format:@"Cannot insert style layer at out-of-bounds index %lu.", (unsigned long)index];
     } else if (index == 0) {
-        [styleLayer addToMapView:self.mapView];
+        [styleLayer addToMapView:self.mapView belowLayer:nil];
     } else {
         MGLStyleLayer *sibling = [self layerFromMBGLLayer:layers.at(layers.size() - index)];
         [styleLayer addToMapView:self.mapView belowLayer:sibling];
@@ -283,7 +287,8 @@ static NSURL *MGLStyleURL_emerald;
                     format:@"Cannot remove style layer at out-of-bounds index %lu.", (unsigned long)index];
     }
     auto layer = layers.at(layers.size() - 1 - index);
-    self.mapView.mbglMap->removeLayer(layer->getID());
+    MGLStyleLayer *styleLayer = [self layerFromMBGLLayer:layer];
+    [styleLayer removeFromMapView:self.mapView];
 }
 
 - (MGLStyleLayer *)layerFromMBGLLayer:(mbgl::style::Layer *)mbglLayer
@@ -307,8 +312,15 @@ static NSURL *MGLStyleURL_emerald;
     } else if (auto circleLayer = mbglLayer->as<mbgl::style::CircleLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(circleLayer->getSourceID().c_str())];
         styleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:identifier source:source];
-    } else if (mbglLayer->as<mbgl::style::BackgroundLayer>()) {
+    } else if (mbglLayer->is<mbgl::style::BackgroundLayer>()) {
         styleLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:identifier];
+    } else if (auto customLayer = mbglLayer->as<mbgl::style::CustomLayer>()) {
+        styleLayer = self.openGLLayers[identifier];
+        if (styleLayer) {
+            NSAssert(styleLayer.rawLayer == customLayer, @"%@ wraps a CustomLayer that differs from the one associated with the underlying style.", styleLayer);
+            return styleLayer;
+        }
+        styleLayer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:identifier];
     } else {
         NSAssert(NO, @"Unrecognized layer type");
         return nil;
@@ -347,7 +359,7 @@ static NSURL *MGLStyleURL_emerald;
          layer];
     }
     [self willChangeValueForKey:@"layers"];
-    [layer addToMapView:self.mapView];
+    [layer addToMapView:self.mapView belowLayer:nil];
     [self didChangeValueForKey:@"layers"];
 }
 
@@ -410,7 +422,7 @@ static NSURL *MGLStyleURL_emerald;
          @"Make sure sibling was obtained using -[MGLStyle layerWithIdentifier:].",
          sibling];
     } else if (index + 1 == layers.size()) {
-        [layer addToMapView:self.mapView];
+        [layer addToMapView:self.mapView belowLayer:nil];
     } else {
         MGLStyleLayer *sibling = [self layerFromMBGLLayer:layers.at(index + 1)];
         [layer addToMapView:self.mapView belowLayer:sibling];
