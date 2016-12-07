@@ -4,9 +4,12 @@ import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.maps.FocalPointChangeListener;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.Projection;
 
 /**
@@ -72,6 +75,19 @@ public class MyLocationViewSettings {
         this.myLocationView = myLocationView;
         this.projection = projection;
         this.focalPointChangeListener = focalPointChangedListener;
+    }
+
+    public void initialise(@NonNull MapboxMapOptions options) {
+        CameraPosition position = options.getCamera();
+        if (position != null && !position.equals(CameraPosition.DEFAULT)) {
+            setTilt(position.tilt);
+        }
+        setForegroundDrawable(options.getMyLocationForegroundDrawable(), options.getMyLocationForegroundBearingDrawable());
+        setForegroundTintColor(options.getMyLocationForegroundTintColor());
+        setBackgroundDrawable(options.getMyLocationBackgroundDrawable(), options.getMyLocationBackgroundPadding());
+        setBackgroundTintColor(options.getMyLocationBackgroundTintColor());
+        setAccuracyAlpha(options.getMyLocationAccuracyAlpha());
+        setAccuracyTintColor(options.getMyLocationAccuracyTintColor());
     }
 
     /**
@@ -277,5 +293,4 @@ public class MyLocationViewSettings {
             focalPointChangeListener.onFocalPointChanged(null);
         }
     }
-
 }
