@@ -104,12 +104,13 @@ void MGLFinishCustomStyleLayer(void *context) {
 #pragma mark - Adding to and removing from a map view
 
 - (void)setMapView:(MGLMapView *)mapView {
-    if (_mapView) {
+    if (_mapView && mapView) {
         [NSException raise:@"MGLLayerReuseException"
                     format:@"%@ cannot be added to more than one MGLStyle at a time.", self];
     }
+    _mapView.style.openGLLayers[self.identifier] = nil;
     _mapView = mapView;
-    mapView.style.openGLLayers[self.identifier] = self;
+    _mapView.style.openGLLayers[self.identifier] = self;
 }
 
 - (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer {

@@ -287,7 +287,8 @@ static NSURL *MGLStyleURL_emerald;
                     format:@"Cannot remove style layer at out-of-bounds index %lu.", (unsigned long)index];
     }
     auto layer = layers.at(layers.size() - 1 - index);
-    self.mapView.mbglMap->removeLayer(layer->getID());
+    MGLStyleLayer *styleLayer = [self layerFromMBGLLayer:layer];
+    [styleLayer removeFromMapView:self.mapView];
 }
 
 - (MGLStyleLayer *)layerFromMBGLLayer:(mbgl::style::Layer *)mbglLayer
@@ -311,9 +312,14 @@ static NSURL *MGLStyleURL_emerald;
     } else if (auto circleLayer = mbglLayer->as<mbgl::style::CircleLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(circleLayer->getSourceID().c_str())];
         styleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:identifier source:source];
-    } else if (mbglLayer->as<mbgl::style::BackgroundLayer>()) {
+    } else if (mbglLayer->is<mbgl::style::BackgroundLayer>()) {
         styleLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:identifier];
-    } else if (mbglLayer->as<mbgl::style::CustomLayer>()) {
+    } else if (auto customLayer = mbglLayer->as<mbgl::style::CustomLayer>()) {
+        styleLayer = self.openGLLayers[identifier];
+        if (styleLayer) {
+            NSAssert(styleLayer.rawLayer == customLayer, @"%@ wraps a CustomLayer that differs from the one associated with the underlying style.", styleLayer);
+            return styleLayer;
+        }
         styleLayer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:identifier];
     } else {
         NSAssert(NO, @"Unrecognized layer type");
