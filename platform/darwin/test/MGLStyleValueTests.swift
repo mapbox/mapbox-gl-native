@@ -1,7 +1,9 @@
 import XCTest
 import Mapbox
 
-class MGLStyleValueTests: XCTestCase {
+
+extension MGLStyleValueTests {
+    
     func testConstantValues() {
         let geoJSONSource = MGLGeoJSONSource(identifier: "test", shape: nil, options: nil)
         let symbolStyleLayer = MGLSymbolStyleLayer(identifier: "test", source: geoJSONSource)
@@ -29,7 +31,7 @@ class MGLStyleValueTests: XCTestCase {
             2: MGLStyleValue(rawValue: false),
             3: MGLStyleValue(rawValue: true),
             4: MGLStyleValue(rawValue: false),
-        ]
+            ]
         symbolStyleLayer.iconAllowOverlap = MGLStyleFunction<NSNumber>(base: 1, stops: stops)
         XCTAssertEqual((symbolStyleLayer.iconAllowOverlap as! MGLStyleFunction<NSNumber>), MGLStyleFunction(base: 1, stops: stops))
     }

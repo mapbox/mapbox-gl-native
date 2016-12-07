@@ -63,6 +63,10 @@
 
 - (instancetype)initWithBase:(CGFloat)base stops:(NSDictionary *)stops {
     if (self = [super init]) {
+        if (!stops.count)
+        {
+            [NSException raise:NSInvalidArgumentException format:@"%@ requires at least one stop.", self];
+        }
         _base = base;
         _stops = stops;
     }
