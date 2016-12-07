@@ -43,19 +43,7 @@ public class TrackingSettingsTest {
     public void testSanity() {
         assertNotNull("trackingsettings should not be null", trackingSettings);
     }
-
-    @Test
-    public void testMyLocationTrackingMode() {
-        trackingSettings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
-        assertEquals("MyLocationTrackingMode should match", MyLocationTracking.TRACKING_FOLLOW, trackingSettings.getMyLocationTrackingMode());
-    }
-
-    @Test
-    public void testMyBearingTrackingMode() {
-        trackingSettings.setMyBearingTrackingMode(MyBearingTracking.COMPASS);
-        assertEquals("MyLocationTrackingMode should match", MyBearingTracking.COMPASS, trackingSettings.getMyBearingTrackingMode());
-    }
-
+    
     @Test
     public void testDismissTrackingModesOnGesture() {
         trackingSettings.setDismissTrackingOnGesture(false);
