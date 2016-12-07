@@ -189,7 +189,8 @@ void GlyphSet::shapeLines(Shaping& shaping,
         // Collapse whitespace so it doesn't throw off justification
         boost::algorithm::trim_if(line, boost::algorithm::is_any_of(u" \t\n\v\f\r"));
 
-        if (line.empty()) { 
+        if (line.empty()) {
+            y += lineHeight; // Still need a line feed after empty line
             continue;
         }
 
@@ -205,18 +206,17 @@ void GlyphSet::shapeLines(Shaping& shaping,
             x += glyph.metrics.advance + spacing;
         }
 
-        if (static_cast<uint32_t>(shaping.positionedGlyphs.size()) == lineStartIndex) {
-            continue;
+        // Only justify if we placed at least one glyph
+        if (static_cast<uint32_t>(shaping.positionedGlyphs.size()) != lineStartIndex) {
+            float lineLength = x - spacing; // Don't count trailing spacing
+            maxLineLength = util::max(lineLength, maxLineLength);
+            
+            justifyLine(shaping.positionedGlyphs, sdfs, lineStartIndex,
+                        static_cast<uint32_t>(shaping.positionedGlyphs.size()) - 1, justify);
         }
 
-        float lineLength = x - spacing; // Don't count trailing spacing
-        maxLineLength = util::max(lineLength, maxLineLength);
-
-        justifyLine(shaping.positionedGlyphs, sdfs, lineStartIndex,
-                    static_cast<uint32_t>(shaping.positionedGlyphs.size()) - 1, justify);
-
         x = 0;
-        y += lineHeight; // Move to next line
+        y += lineHeight;
     }
 
     align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight,
