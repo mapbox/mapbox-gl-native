@@ -200,7 +200,11 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 /**
  Adds a new source to the current style.
 
- @note Adding the same source instance more than once will result in a 
+ @note Wait until the map style has finished loading before adding a new source.
+    Implement `MGLMapViewDelegate` methods `-mapViewDidFinishLoadingMap:`
+    or `-mapView:didFinishLoadingStyle:`
+ 
+ @note Adding the same source instance more than once will result in a
     `MGLRedundantSourceException`. Reusing the same source identifier, even with
     different source instances, will result in a 
     `MGLRedundantSourceIdentifierException`.
@@ -252,6 +256,10 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 /**
  Adds a new layer on top of existing layers.
 
+ @note Wait until the map style has finished loading before adding a new layer. 
+    Implement `MGLMapViewDelegate` methods `-mapViewDidFinishLoadingMap:`
+    or `-mapView:didFinishLoadingStyle:`
+ 
  @note Adding the same layer instance more than once will result in a
     `MGLRedundantLayerException`. Reusing the same layer identifer, even with
     different layer instances, will also result in an exception.
@@ -263,6 +271,10 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Inserts a new layer into the style at the given index.
+ 
+ @note Wait until the map style has finished loading before inserting a new layer.
+    Implement `MGLMapViewDelegate` methods `-mapViewDidFinishLoadingMap:`
+    or `-mapView:didFinishLoadingStyle:`
  
  @note Adding the same layer instance more than once will result in a
     `MGLRedundantLayerException`. Reusing the same layer identifer, even with
@@ -277,6 +289,10 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Inserts a new layer below another layer.
+ 
+ @note Wait until the map style has finished loading before inserting a new layer.
+    Implement `MGLMapViewDelegate` methods `-mapViewDidFinishLoadingMap:`
+    or `-mapView:didFinishLoadingStyle:`
  
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set
@@ -297,6 +313,10 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Inserts a new layer above another layer.
+ 
+ @note Wait until the map style has finished loading before inserting a new layer.
+    Implement `MGLMapViewDelegate` methods `-mapViewDidFinishLoadingMap:`
+    or `-mapView:didFinishLoadingStyle:`
  
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set
