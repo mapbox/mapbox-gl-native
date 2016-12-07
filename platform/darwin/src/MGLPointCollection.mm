@@ -8,9 +8,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MGLPointCollection
 {
-    MGLCoordinateBounds _bounds;
+    MGLCoordinateBounds _overlayBounds;
     std::vector<CLLocationCoordinate2D> _coordinates;
 }
+
+@synthesize overlayBounds = _overlayBounds;
 
 + (instancetype)pointCollectionWithCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
@@ -28,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
         {
             bounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
         }
-        _bounds = MGLCoordinateBoundsFromLatLngBounds(bounds);
+        _overlayBounds = MGLCoordinateBoundsFromLatLngBounds(bounds);
     }
     return self;
 }
@@ -61,14 +63,9 @@ NS_ASSUME_NONNULL_BEGIN
     std::copy(_coordinates.begin() + range.location, _coordinates.begin() + NSMaxRange(range), coords);
 }
 
-- (MGLCoordinateBounds)overlayBounds
-{
-    return _bounds;
-}
-
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds
 {
-    return MGLLatLngBoundsFromCoordinateBounds(_bounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
+    return MGLCoordinateBoundsIntersectsCoordinateBounds(_overlayBounds, overlayBounds);
 }
 
 - (mbgl::Geometry<double>)geometryObject

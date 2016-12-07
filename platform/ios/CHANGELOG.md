@@ -46,7 +46,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Annotations
 
-* Added new methods to MGLMultiPoint for changing or appending vertices along polyline annotations and the exteriors of polygon annotations. ([#6565](https://github.com/mapbox/mapbox-gl-native/pull/6565))
+* Added new methods to MGLMultiPoint for changing the vertices along a polyline annotation or the exterior of a polygon annotation. ([#6565](https://github.com/mapbox/mapbox-gl-native/pull/6565))
 * Added new APIs to MGLMapView to query for visible annotations. Combined with `-[MGLMapView viewForAnnotation:]`, these APIs can be used to access all visible annotation views. ([6061](https://github.com/mapbox/mapbox-gl-native/pull/6061))
 * Fixed an issue causing offscreen annotation views to be updated even when they were in the reuse queue. ([#5987](https://github.com/mapbox/mapbox-gl-native/pull/5987))
 * Fixed an issue preventing MGLAnnotationView from animating when its coordinate changes. ([#6215](https://github.com/mapbox/mapbox-gl-native/pull/6215))
