@@ -17,6 +17,19 @@ NS_ASSUME_NONNULL_BEGIN
  
  This option is only applicable to `MGLRasterSource` objects; it is ignored when
  initializing `MGLVectorSource` objects.
+
+ ### Example ###
+
+ ```swift
+ // Define tileset
+ let tileset = MGLTileSet(tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"])
+ tileset.minimumZoomLevel = 9
+ tileset.maximumZoomLevel = 16
+ tileset.attribution = "© Mapbox"
+ // Add source to map
+ let source = MGLRasterSource(identifier: "clouds", tileSet: tileset, tileSize: 512)
+ mapView.style().add(source)
+ ```
  */
 extern const MGLTileSourceOption MGLTileSourceOptionTileSize;
 

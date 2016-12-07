@@ -260,6 +260,21 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  otherwise, find it using the `MGLStyle.layers` property. You can also create a
  new symbol style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
+
+ ### Example ###
+
+ ```swift
+ let layer = MGLSymbolStyleLayer(identifier: "coffeeshops", source: pois)
+ layer.sourceLayerIdentifier = "pois"
+ layer.iconImage = MGLStyleValue(rawValue: "coffee")
+ layer.iconSize = MGLStyleValue(rawValue: 0.5)
+ layer.textField = MGLStyleValue(rawValue: "{name}")
+ layer.textTranslate = MGLStyleValue(rawValue: NSValue(cgVector: CGVector(dx: 10, dy: 0)))
+ layer.textJustify = MGLStyleValue(rawValue: NSValue(mglTextJustify: .left))
+ layer.textAnchor = MGLStyleValue(rawValue: NSValue(mglTextAnchor: .left))
+ layer.predicate = NSPredicate(format: "%K == %@", "venue-type" "coffee")
+ mapView.style().add(layer)
+ ```
  */
 @interface MGLSymbolStyleLayer : MGLVectorStyleLayer
 

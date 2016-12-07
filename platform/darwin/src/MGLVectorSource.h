@@ -24,6 +24,19 @@ NS_ASSUME_NONNULL_BEGIN
  (<var>extent</var>&nbsp;×&nbsp;2)&nbsp;−&nbsp;1, inclusive. Any vector style
  layer initialized with a vector source must have a non-`nil` value in its
  `sourceLayerIdentifier` property.
+
+ ### Example ###
+
+ ```swift
+ // Define tileset
+ let tileset = MGLTileSet(tileURLTemplates: ["https://example.com/vector-tiles/{z}/{x}/{y}.mvt"])
+ tileset.minimumZoomLevel = 9
+ tileset.maximumZoomLevel = 16
+ tileset.attribution = "© Mapbox"
+ // Add source to map
+ let source = MGLVectorSource(identifier: "pois", tileSet: tileset)
+ mapView.style().add(source)
+ ```
  */
 @interface MGLVectorSource : MGLTileSource
 

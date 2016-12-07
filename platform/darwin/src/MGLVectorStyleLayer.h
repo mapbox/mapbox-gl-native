@@ -128,6 +128,22 @@ NS_ASSUME_NONNULL_BEGIN
  style attributes and also `hyphen-minus` and `tag:subtag`. However, you must use
  `%K` in the format string to represent these variables:
  `@"%K == 'LineString'", @"$type"`.
+
+ ### Example ###
+ To create a filter with the logic `(index == 10 || index == 5) && ele >= 200`,
+ you could create a predicate using `NSCompoundPredicate` along these lines:
+
+ ```swift
+ let meters = 1500.0
+ let layer = MGLLineStyleLayer(identifier: "contour", source: contours)
+ layer.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+    NSCompoundPredicate(orPredicateWithSubpredicates: [
+	NSPredicate(format: "%K == 10", "contour-index"),
+	NSPredicate(format: "%K == 5", "contour-index"),
+    ]),
+    NSPredicate(format: "ele >= \(meters)"),
+ ])
+ ```
  */
 @property (nonatomic, nullable) NSPredicate *predicate;
 

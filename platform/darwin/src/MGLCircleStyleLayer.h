@@ -59,6 +59,21 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
  otherwise, find it using the `MGLStyle.layers` property. You can also create a
  new circle style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
+
+ ### Example ###
+
+ ```swift
+ let layer = MGLCircleStyleLayer(identifier: "circles", source: population)
+ layer.sourceLayerIdentifier = "population"
+ layer.circleColor = MGLStyleValue(rawValue: UIColor.green)
+ layer.circleRadius = MGLStyleValue(base: 1.75, stops: [
+    12: MGLStyleValue(rawValue: 2),
+    22: MGLStyleValue(rawValue: 180)
+ ])
+ layer.circleOpacity = MGLStyleValue(rawValue: 0.7)
+ layer.predicate = NSPredicate(format: "%K == %@", "ethnicity", "ewok")
+ mapView.style().add(layer)
+ ```
  */
 @interface MGLCircleStyleLayer : MGLVectorStyleLayer
 
