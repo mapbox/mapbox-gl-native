@@ -191,7 +191,7 @@ void MGLFinishCustomStyleLayer(void *context) {
 
 /**
  Forces the map view associated with this style to redraw the receiving layer,
- causing its drawing handler to be run.
+ causing the `-drawInMapView:withContext:` method to be called.
  */
 - (void)setNeedsDisplay {
     [self.mapView setNeedsGLDisplay];
