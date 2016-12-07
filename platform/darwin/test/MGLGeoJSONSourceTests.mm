@@ -47,7 +47,7 @@
     NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" geoJSONData:data options:nil];
     
-    MGLShapeCollection *collection = source.shape;
+    MGLShapeCollection *collection = (MGLShapeCollection *)source.shape;
     XCTAssertNotNil(collection);
     XCTAssertEqual(collection.shapes.count, 1);
     XCTAssertTrue([collection.shapes.firstObject isMemberOfClass:[MGLPolylineFeature class]]);
@@ -245,7 +245,7 @@
     
     MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" shape:shapeCollectionFeature_1 options:nil];
     
-    MGLShapeCollectionFeature *shape = source.shape;
+    MGLShapeCollectionFeature *shape = (MGLShapeCollectionFeature *)source.shape;
     
     XCTAssertNotNil(shape);
     XCTAssert(shape.shapes.count == 7, @"Shape collection should contain 7 shapes");
