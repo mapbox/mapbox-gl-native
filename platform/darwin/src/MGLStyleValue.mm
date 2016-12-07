@@ -65,7 +65,7 @@
     if (self = [super init]) {
         if (!stops.count)
         {
-            [NSException raise:@"NSInvalidArgumentException" format:@"%@ requires at least one stop.", self];
+            [NSException raise:NSInvalidArgumentException format:@"%@ requires at least one stop.", self];
         }
         _base = base;
         _stops = stops;
