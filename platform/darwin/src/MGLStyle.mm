@@ -19,7 +19,7 @@
 #import "MGLSource.h"
 #import "MGLVectorSource_Private.h"
 #import "MGLRasterSource.h"
-#import "MGLGeoJSONSource.h"
+#import "MGLShapeSource.h"
 
 #import "MGLAttributionInfo.h"
 #import "MGLTileSet_Private.h"
@@ -167,7 +167,7 @@ static NSURL *MGLStyleURL_emerald;
     if (auto vectorSource = source->as<mbgl::style::VectorSource>()) {
         return [[MGLVectorSource alloc] initWithRawSource:vectorSource];
     } else if (auto geoJSONSource = source->as<mbgl::style::GeoJSONSource>()) {
-        return [[MGLGeoJSONSource alloc] initWithRawSource:geoJSONSource];
+        return [[MGLShapeSource alloc] initWithRawSource:geoJSONSource];
     } else if (auto rasterSource = source->as<mbgl::style::RasterSource>()) {
         return [[MGLRasterSource alloc] initWithRawSource:rasterSource];
     } else {

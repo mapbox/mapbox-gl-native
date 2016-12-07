@@ -1,4 +1,4 @@
-#import "MGLGeoJSONSource_Private.h"
+#import "MGLShapeSource_Private.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
@@ -9,14 +9,14 @@
 
 #include <mbgl/style/sources/geojson_source.hpp>
 
-const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionClustered = @"MGLGeoJSONSourceOptionClustered";
-const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionClusterRadius = @"MGLGeoJSONSourceOptionClusterRadius";
-const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionMaximumZoomLevelForClustering = @"MGLGeoJSONSourceOptionMaximumZoomLevelForClustering";
-const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionMaximumZoomLevel = @"MGLGeoJSONSourceOptionMaximumZoomLevel";
-const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionBuffer = @"MGLGeoJSONSourceOptionBuffer";
-const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"MGLGeoJSONSourceOptionSimplificationTolerance";
+const MGLShapeSourceOption MGLShapeSourceOptionClustered = @"MGLShapeSourceOptionClustered";
+const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius = @"MGLShapeSourceOptionClusterRadius";
+const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForClustering = @"MGLShapeSourceOptionMaximumZoomLevelForClustering";
+const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevel = @"MGLShapeSourceOptionMaximumZoomLevel";
+const MGLShapeSourceOption MGLShapeSourceOptionBuffer = @"MGLShapeSourceOptionBuffer";
+const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLShapeSourceOptionSimplificationTolerance";
 
-@interface MGLGeoJSONSource ()
+@interface MGLShapeSource ()
 
 - (instancetype)initWithRawSource:(mbgl::style::GeoJSONSource *)rawSource NS_DESIGNATED_INITIALIZER;
 
@@ -25,7 +25,7 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
 
 @end
 
-@implementation MGLGeoJSONSource
+@implementation MGLShapeSource
 {
     std::unique_ptr<mbgl::style::GeoJSONSource> _pendingSource;
 }
@@ -52,7 +52,7 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
     return self;
 }
 
-- (instancetype)initWithIdentifier:(NSString *)identifier shape:(nullable MGLShape *)shape options:(NSDictionary<MGLGeoJSONSourceOption,id> *)options
+- (instancetype)initWithIdentifier:(NSString *)identifier shape:(nullable MGLShape *)shape options:(NSDictionary<MGLShapeSourceOption,id> *)options
 {
     if (self = [super initWithIdentifier:identifier]) {
         _shape = shape;
@@ -111,32 +111,32 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
 {
     auto mbglOptions = mbgl::style::GeoJSONOptions();
     
-    if (id value = self.options[MGLGeoJSONSourceOptionMaximumZoomLevel]) {
+    if (id value = self.options[MGLShapeSourceOptionMaximumZoomLevel]) {
         [self validateValue:value];
         mbglOptions.maxzoom = [value integerValue];
     }
     
-    if (id value = self.options[MGLGeoJSONSourceOptionBuffer]) {
+    if (id value = self.options[MGLShapeSourceOptionBuffer]) {
         [self validateValue:value];
         mbglOptions.buffer = [value integerValue];
     }
     
-    if (id value = self.options[MGLGeoJSONSourceOptionSimplificationTolerance]) {
+    if (id value = self.options[MGLShapeSourceOptionSimplificationTolerance]) {
         [self validateValue:value];
         mbglOptions.tolerance = [value doubleValue];
     }
     
-    if (id value = self.options[MGLGeoJSONSourceOptionClusterRadius]) {
+    if (id value = self.options[MGLShapeSourceOptionClusterRadius]) {
         [self validateValue:value];
         mbglOptions.clusterRadius = [value integerValue];
     }
     
-    if (id value = self.options[MGLGeoJSONSourceOptionMaximumZoomLevelForClustering]) {
+    if (id value = self.options[MGLShapeSourceOptionMaximumZoomLevelForClustering]) {
         [self validateValue:value];
         mbglOptions.clusterMaxZoom = [value integerValue];
     }
     
-    if (id value = self.options[MGLGeoJSONSourceOptionClustered]) {
+    if (id value = self.options[MGLShapeSourceOptionClustered]) {
         [self validateValue:value];
         mbglOptions.cluster = [value boolValue];
     }

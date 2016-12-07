@@ -5,8 +5,8 @@ import Mapbox
 extension MGLStyleValueTests {
     
     func testConstantValues() {
-        let geoJSONSource = MGLGeoJSONSource(identifier: "test", shape: nil, options: nil)
-        let symbolStyleLayer = MGLSymbolStyleLayer(identifier: "test", source: geoJSONSource)
+        let shapeSource = MGLShapeSource(identifier: "test", shape: nil, options: nil)
+        let symbolStyleLayer = MGLSymbolStyleLayer(identifier: "test", source: shapeSource)
         
         // Boolean
         symbolStyleLayer.iconAllowOverlap = MGLStyleConstantValue(rawValue: true)
@@ -22,7 +22,7 @@ extension MGLStyleValueTests {
     }
     
     func testFunctions() {
-        let geoJSONSource = MGLGeoJSONSource(identifier: "test", shape: nil, options: nil)
+        let geoJSONSource = MGLShapeSource(identifier: "test", shape: nil, options: nil)
         let symbolStyleLayer = MGLSymbolStyleLayer(identifier: "test", source: geoJSONSource)
         
         // Boolean

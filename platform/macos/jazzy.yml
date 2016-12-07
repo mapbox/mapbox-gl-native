@@ -60,7 +60,7 @@ custom_categories:
   - name: Data Sources
     children:
       - MGLSource
-      - MGLGeoJSONSource
+      - MGLShapeSource
       - MGLRasterSource
       - MGLTileSet
       - MGLVectorSource
