@@ -15,6 +15,7 @@
  to the map view's style, the point collection represents as a group of distinct 
  annotations.
  */
+MGL_EXPORT
 @interface MGLPointCollection : MGLShape <MGLOverlay>
 
 /**

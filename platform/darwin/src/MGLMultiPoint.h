@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLPolygon` classes. However, you can use the method and properties of this
  class to access information about the vertices of the line or polygon.
  */
+MGL_EXPORT
 @interface MGLMultiPoint : MGLShape
 
 /**

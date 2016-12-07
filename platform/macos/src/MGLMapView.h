@@ -47,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
  @note You are responsible for getting permission to use the map data and for
     ensuring that your use adheres to the relevant terms of use.
  */
-IB_DESIGNABLE
+MGL_EXPORT IB_DESIGNABLE
 @interface MGLMapView : NSView
 
 #pragma mark Creating Instances

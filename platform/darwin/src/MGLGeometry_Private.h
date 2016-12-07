@@ -51,6 +51,7 @@ NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(NSEdgeInsets insets) {
     @param latitude The latitude of the point at the center of the viewport.
     @param size The size of the viewport.
     @return An altitude measured in meters. */
+MGL_EXPORT
 CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLocationDegrees latitude, CGSize size);
 
 /** Converts a camera altitude to a map zoom level.
@@ -60,4 +61,5 @@ CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLo
     @param latitude The latitude of the point at the center of the viewport.
     @param size The size of the viewport.
     @return A zero-based zoom level. */
+MGL_EXPORT
 double MGLZoomLevelForAltitude(CLLocationDistance altitude, CGFloat pitch, CLLocationDegrees latitude, CGSize size);

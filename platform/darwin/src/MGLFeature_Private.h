@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
  Returns an array of `MGLFeature` objects converted from the given vector of
  vector tile features.
  */
+MGL_EXPORT
 NS_ARRAY_OF(MGLShape <MGLFeature> *) *MGLFeaturesFromMBGLFeatures(const std::vector<mbgl::Feature> &features);
 
 /**
