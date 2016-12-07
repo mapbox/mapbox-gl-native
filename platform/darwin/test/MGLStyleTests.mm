@@ -139,7 +139,7 @@
     MGLVectorSource *source2 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" URL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
 
     [self.style addSource: source1];
-    XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, @"MGLRedundantSourceIdentiferException");
+    XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, @"MGLRedundantSourceIdentifierException");
 }
 
 - (void)testAddingLayersTwice {

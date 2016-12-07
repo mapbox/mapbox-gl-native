@@ -191,7 +191,7 @@ static NSURL *MGLStyleURL_emerald;
     try {
         [source addToMapView:self.mapView];
     } catch (std::runtime_error & err) {
-        [NSException raise:@"MGLRedundantSourceIdentiferException" format:@"%s", err.what()];
+        [NSException raise:@"MGLRedundantSourceIdentifierException" format:@"%s", err.what()];
     }
 }
 
