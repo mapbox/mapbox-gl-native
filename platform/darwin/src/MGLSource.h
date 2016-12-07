@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  Do not create instances of this class directly, and do not create your own
  subclasses of this class. Instead, create instances of `MGLShapeSource` and the
- concrete subclasses of `MGLTileSource`.
+ concrete subclasses of `MGLTileSource`, `MGLVectorSource` and `MGLRasterSource`.
  */
 @interface MGLSource : NSObject
 
