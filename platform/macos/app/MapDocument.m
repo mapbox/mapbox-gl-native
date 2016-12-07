@@ -684,7 +684,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     theaterLayer.sourceLayerIdentifier = @"poi_label";
     theaterLayer.predicate = [NSPredicate predicateWithFormat:@"maki == 'theatre'"];
     theaterLayer.iconImageName = [MGLStyleValue valueWithRawValue:NSImageNameIChatTheaterTemplate];
-    theaterLayer.iconSize = [MGLStyleValue valueWithRawValue:@2];
+    theaterLayer.iconScale = [MGLStyleValue valueWithRawValue:@2];
     theaterLayer.iconColor = [MGLStyleValue valueWithStops:@{
         @16.0: [MGLStyleValue valueWithRawValue:[NSColor redColor]],
         @18.0: [MGLStyleValue valueWithRawValue:[NSColor yellowColor]],
