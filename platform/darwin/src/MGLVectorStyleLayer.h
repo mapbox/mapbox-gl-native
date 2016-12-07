@@ -122,6 +122,12 @@ NS_ASSUME_NONNULL_BEGIN
  value specified in the predicate. Also, operator modifiers `c`, `d`, and the
  combined `cd` for case and diacritic insensitivity are unsupported for 
  comparison and aggregate operators that are used in the predicate.
+ 
+ It is possible to create expressions that contain special characters in the 
+ predicate format syntax. This includes the `$` in the `$id` and `$type` special 
+ style attributes and also `hyphen-minus` and `tag:subtag`. However, you must use
+ `%K` in the format string to represent these variables:
+ `@"%K == 'LineString'", @"$type"`.
  */
 @property (nonatomic, nullable) NSPredicate *predicate;
 
