@@ -800,15 +800,6 @@ void QMapboxGL::setFilter(const QString& layer_, const QVariant& filter_)
 #if QT_VERSION >= 0x050000
 void QMapboxGL::render(QOpenGLFramebufferObject *fbo)
 {
-#if defined(__APPLE__)
-    // FIXME Consume one GL_INVALID_OPERATION from Qt.
-    // See https://bugreports.qt.io/browse/QTBUG-36802 for details.
-    GLenum error = glGetError();
-    if (!(error == GL_NO_ERROR || error == GL_INVALID_OPERATION)) {
-        throw std::runtime_error(std::string("glGetError() returned ") + std::to_string(error));
-    }
-#endif
-
     d_ptr->dirty = false;
     d_ptr->fbo = fbo;
     d_ptr->mapObj->render(*d_ptr);
