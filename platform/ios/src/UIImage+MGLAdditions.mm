@@ -13,7 +13,7 @@
     size_t bytesPerRow = bytesPerPixel * width;
     size_t bitsPerComponent = 8;
 
-    CGContextRef context = CGBitmapContextCreate(cPremultipliedImage.data.get(),
+    CGContextRef context = CGBitmapContextCreate(cPremultipliedImage.data(),
       width, height, bitsPerComponent, bytesPerRow,
       colorSpace, kCGImageAlphaPremultipliedLast);
 

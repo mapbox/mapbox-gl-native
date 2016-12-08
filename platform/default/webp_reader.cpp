@@ -15,17 +15,17 @@ PremultipliedImage decodeWebP(const uint8_t* data, size_t size) {
         throw std::runtime_error("failed to retrieve WebP basic header information");
     }
 
-    int stride = width * 4;
-    size_t webpSize = stride * height;
-    auto webp = std::make_unique<uint8_t[]>(webpSize);
+    PremultipliedImage image({ static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
 
-    if (!WebPDecodeRGBAInto(data, size, webp.get(), webpSize, stride)) {
+    if (!WebPDecodeRGBAInto(data, size, image.data(), image.bytes(), image.stride())) {
         throw std::runtime_error("failed to decode WebP data");
     }
 
-    UnassociatedImage image({ static_cast<uint32_t>(width), static_cast<uint32_t>(height) },
-                            std::move(webp));
-    return util::premultiply(std::move(image));
+    // libwebp reads unassociated (= non-premultiplied) data by default, so we have to manually
+    // ensure that it gets premultiplied.
+    util::premultiply(image.data(), image.bytes());
+
+    return image;
 }
 
 } // namespace mbgl

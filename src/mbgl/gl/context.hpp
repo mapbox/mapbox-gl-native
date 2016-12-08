@@ -71,33 +71,35 @@ public:
     Framebuffer createFramebuffer(const Texture&);
 
     template <typename Image,
-              TextureFormat format = Image::channels == 4 ? TextureFormat::RGBA
-                                                          : TextureFormat::Alpha>
+              TextureFormat format = Image::channels() == 4 ? TextureFormat::RGBA
+                                                            : TextureFormat::Alpha>
     Image readFramebuffer(const Size size, bool flip = true) {
-        static_assert(Image::channels == (format == TextureFormat::RGBA ? 4 : 1),
+        static_assert(Image::channels() == (format == TextureFormat::RGBA ? 4 : 1),
                       "image format mismatch");
-        return { size, readFramebuffer(size, format, flip) };
+        Image image{ size };
+        readFramebuffer(size, format, flip, image.data());
+        return image;
     }
 
 #if not MBGL_USE_GLES2
     template <typename Image>
     void drawPixels(const Image& image) {
-        auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
-        drawPixels(image.size, image.data.get(), format);
+        auto format = image.channels() == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
+        drawPixels(image.size, image.data(), format);
     }
 #endif // MBGL_USE_GLES2
 
     // Create a texture from an image with data.
     template <typename Image>
     Texture createTexture(const Image& image, TextureUnit unit = 0) {
-        auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
-        return { image.size, createTexture(image.size, image.data.get(), format, unit) };
+        auto format = image.channels() == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
+        return { image.size, createTexture(image.size, image.data(), format, unit) };
     }
 
     template <typename Image>
     void updateTexture(Texture& obj, const Image& image, TextureUnit unit = 0) {
-        auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
-        updateTexture(obj.texture.get(), image.size, image.data.get(), format, unit);
+        auto format = image.channels() == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
+        updateTexture(obj.texture.get(), image.size, image.data(), format, unit);
         obj.size = image.size;
     }
 
@@ -205,7 +207,7 @@ private:
     void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit);
     UniqueFramebuffer createFramebuffer();
     UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);
-    std::unique_ptr<uint8_t[]> readFramebuffer(Size, TextureFormat, bool flip);
+    void readFramebuffer(Size, TextureFormat, bool flip, uint8_t* data);
 #if not MBGL_USE_GLES2
     void drawPixels(Size size, const void* data, TextureFormat);
 #endif // MBGL_USE_GLES2

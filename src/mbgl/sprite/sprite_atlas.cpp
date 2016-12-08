@@ -263,13 +263,13 @@ void SpriteAtlas::copy(const Holder& holder, const SpritePatternMode mode) {
     if (!image.valid()) {
         image = PremultipliedImage({ static_cast<uint32_t>(std::ceil(size.width * pixelRatio)),
                                      static_cast<uint32_t>(std::ceil(size.height * pixelRatio)) });
-        std::fill(image.data.get(), image.data.get() + image.bytes(), 0);
+        std::fill(image.data(), image.data() + image.bytes(), 0);
     }
 
     const uint32_t* srcData =
-        reinterpret_cast<const uint32_t*>(holder.spriteImage->image.data.get());
+        reinterpret_cast<const uint32_t*>(holder.spriteImage->image.data());
     if (!srcData) return;
-    uint32_t* const dstData = reinterpret_cast<uint32_t*>(image.data.get());
+    uint32_t* const dstData = reinterpret_cast<uint32_t*>(image.data());
 
     const int padding = 1;
 

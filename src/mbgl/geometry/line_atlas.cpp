@@ -101,7 +101,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
                 signedDistance = int((inside ? 1 : -1) * dist);
             }
 
-            image.data[index + x] = fmax(0, fmin(255, signedDistance + offset));
+            image.data()[index + x] = fmax(0, fmin(255, signedDistance + offset));
         }
     }
 

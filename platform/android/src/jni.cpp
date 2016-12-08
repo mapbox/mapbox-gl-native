@@ -845,7 +845,7 @@ void nativeAddAnnotationIcon(JNIEnv *env, jni::jobject* obj, jlong nativeMapView
         throw mbgl::util::SpriteImageException("Sprite image pixel count mismatch");
     }
 
-    jni::GetArrayRegion(*env, *jpixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
+    jni::GetArrayRegion(*env, *jpixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data()));
 
     auto iconImage = std::make_shared<mbgl::SpriteImage>(
         std::move(premultipliedImage),
@@ -1211,7 +1211,7 @@ void nativeAddImage(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni:
         throw mbgl::util::SpriteImageException("Sprite image pixel count mismatch");
     }
 
-    jni::GetArrayRegion(*env, *data, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
+    jni::GetArrayRegion(*env, *data, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data()));
 
     //Wrap in a SpriteImage with the correct pixel ratio
     auto spriteImage = std::make_unique<mbgl::SpriteImage>(std::move(premultipliedImage), float(pixelRatio));

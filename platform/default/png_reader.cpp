@@ -80,7 +80,7 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
     int color_type = 0;
     png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, nullptr, nullptr, nullptr);
 
-    UnassociatedImage image({ width, height });
+    PremultipliedImage image({ static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
 
     if (color_type == PNG_COLOR_TYPE_PALETTE)
         png_set_expand(png_ptr);
@@ -112,13 +112,17 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
     // we can read whole image at once
     // alloc row pointers
     const std::unique_ptr<png_bytep[]> rows(new png_bytep[height]);
-    for (unsigned row = 0; row < height; ++row)
-        rows[row] = image.data.get() + row * width * 4;
+    for (size_t row = 0; row < height; ++row)
+        rows[row] = image.data() + row * image.stride();
     png_read_image(png_ptr, rows.get());
 
     png_read_end(png_ptr, nullptr);
 
-    return util::premultiply(std::move(image));
+    // libpng reads unassociated (= non-premultiplied) data by default, so we have to manually
+    // ensure that it gets premultiplied.
+    util::premultiply(image.data(), image.bytes());
+
+    return image;
 }
 
 } // namespace mbgl

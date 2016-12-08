@@ -156,7 +156,7 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
         uint32_t y1 = image.size.width * (rect.y + y + padding) + rect.x + padding;
         uint32_t y2 = buffered_width * y;
         for (uint32_t x = 0; x < buffered_width; x++) {
-            image.data[y1 + x] = source[y2 + x];
+            image.data()[y1 + x] = source[y2 + x];
         }
     }
 
@@ -178,7 +178,7 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
                 const Rect<uint16_t>& rect = value.rect;
 
                 // Clear out the bitmap.
-                uint8_t *target = image.data.get();
+                uint8_t *target = image.data();
                 for (uint32_t y = 0; y < rect.h; y++) {
                     uint32_t y1 = image.size.width * (rect.y + y) + rect.x;
                     for (uint32_t x = 0; x < rect.w; x++) {

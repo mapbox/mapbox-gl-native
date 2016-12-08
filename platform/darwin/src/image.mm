@@ -11,7 +11,7 @@
 namespace mbgl {
 
 std::string encodePNG(const PremultipliedImage& src) {
-    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, src.data.get(), src.bytes(), NULL);
+    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, src.data(), src.bytes(), NULL);
     if (!provider) {
         return "";
     }
@@ -93,11 +93,12 @@ PremultipliedImage decodeImage(const std::string &source_data) {
         throw std::runtime_error("CGColorSpaceCreateDeviceRGB failed");
     }
 
+    // CoreGraphics produces premultiplied images by default.
     PremultipliedImage result({ static_cast<uint32_t>(CGImageGetWidth(image)),
                                 static_cast<uint32_t>(CGImageGetHeight(image)) });
 
     CGContextRef context =
-        CGBitmapContextCreate(result.data.get(), result.size.width, result.size.height, 8,
+        CGBitmapContextCreate(result.data(), result.size.width, result.size.height, 8,
                               result.stride(), color_space, kCGImageAlphaPremultipliedLast);
     if (!context) {
         CGColorSpaceRelease(color_space);

@@ -119,14 +119,10 @@ std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
         .rgbSwapped()
         .convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
-    auto img = std::make_unique<uint8_t[]>(swapped.byteCount());
-    memcpy(img.get(), swapped.constBits(), swapped.byteCount());
+    mbgl::PremultipliedImage img({ static_cast<uint32_t>(swapped.width()), static_cast<uint32_t>(swapped.height()) });
+    memcpy(img.data(), swapped.constBits(), swapped.byteCount());
 
-    return std::make_unique<mbgl::SpriteImage>(
-        mbgl::PremultipliedImage(
-            { static_cast<uint32_t>(swapped.width()), static_cast<uint32_t>(swapped.height()) },
-            std::move(img)),
-        1.0);
+    return std::make_unique<mbgl::SpriteImage>(std::move(img), 1.0);
 }
 
 } // namespace

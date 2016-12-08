@@ -345,7 +345,7 @@ void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto options = ParseOptions(Nan::To<v8::Object>(info[0]).ToLocalChecked());
 
     assert(!nodeMap->callback);
-    assert(!nodeMap->image.data);
+    assert(!nodeMap->image.data());
     nodeMap->callback = std::make_unique<Nan::Callback>(info[1].As<v8::Function>());
 
     try {
@@ -397,7 +397,7 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
             error = std::move(eptr);
             uv_async_send(async);
         } else {
-            assert(!image.data);
+            assert(!image.data());
             image = view->readStillImage();
             uv_async_send(async);
         }
@@ -429,7 +429,7 @@ void NodeMap::renderFinished() {
 
     // These have to be empty to be prepared for the next render call.
     assert(!callback);
-    assert(!image.data);
+    assert(!image.data());
 
     if (error) {
         std::string errorMessage;
@@ -449,16 +449,16 @@ void NodeMap::renderFinished() {
         assert(!error);
 
         cb->Call(1, argv);
-    } else if (img.data) {
+    } else if (img.data()) {
+        auto ptr = new mbgl::PremultipliedImage(std::move(img));
         v8::Local<v8::Object> pixels = Nan::NewBuffer(
-            reinterpret_cast<char *>(img.data.get()), img.bytes(),
+            reinterpret_cast<char *>(ptr->data()), ptr->bytes(),
             // Retain the data until the buffer is deleted.
             [](char *, void * hint) {
-                delete [] reinterpret_cast<uint8_t*>(hint);
+                delete[] reinterpret_cast<mbgl::PremultipliedImage*>(hint);
             },
-            img.data.get()
+            ptr
         ).ToLocalChecked();
-        img.data.release();
 
         v8::Local<v8::Value> argv[] = {
             Nan::Null(),
