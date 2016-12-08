@@ -15,6 +15,7 @@ class SymbolLayer;
 class RasterLayer;
 class BackgroundLayer;
 class CustomLayer;
+class FillExtrusionLayer;
 
 /**
  * The runtime representation of a [layer](https://www.mapbox.com/mapbox-gl-style-spec/#layers) from the Mapbox Style
@@ -42,6 +43,7 @@ protected:
         Raster,
         Background,
         Custom,
+        FillExtrusion,
     };
 
     class Impl;
@@ -95,6 +97,8 @@ public:
             return visitor(*as<BackgroundLayer>());
         case Type::Custom:
             return visitor(*as<CustomLayer>());
+        case Type::FillExtrusion:
+            return visitor(*as<FillExtrusionLayer>());
         }
     }
 

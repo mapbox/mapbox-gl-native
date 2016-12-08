@@ -5,7 +5,7 @@
 #include <mbgl/style/conversion/property_setter.hpp>
 
 <% for (const layer of locals.layers) { -%>
-#include <mbgl/style/layers/<%- layer.type %>_layer.hpp>
+#include <mbgl/style/layers/<%- layer.type.replace('-', '_') %>_layer.hpp>
 <% } -%>
 
 #include <unordered_map>

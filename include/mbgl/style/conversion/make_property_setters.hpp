@@ -8,6 +8,7 @@
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 
@@ -67,6 +68,7 @@ auto makeLayoutPropertySetters() {
 
 
 
+
     return result;
 }
 
@@ -115,6 +117,17 @@ auto makePaintPropertySetters() {
     result["circle-translate"] = makePropertySetter<V>(&CircleLayer::setCircleTranslate);
     result["circle-translate-anchor"] = makePropertySetter<V>(&CircleLayer::setCircleTranslateAnchor);
     result["circle-pitch-scale"] = makePropertySetter<V>(&CircleLayer::setCirclePitchScale);
+    result["circle-stroke-width"] = makePropertySetter<V>(&CircleLayer::setCircleStrokeWidth);
+    result["circle-stroke-color"] = makePropertySetter<V>(&CircleLayer::setCircleStrokeColor);
+    result["circle-stroke-opacity"] = makePropertySetter<V>(&CircleLayer::setCircleStrokeOpacity);
+
+    result["fill-extrusion-opacity"] = makePropertySetter<V>(&FillExtrusionLayer::setFillExtrusionOpacity);
+    result["fill-extrusion-color"] = makePropertySetter<V>(&FillExtrusionLayer::setFillExtrusionColor);
+    result["fill-extrusion-translate"] = makePropertySetter<V>(&FillExtrusionLayer::setFillExtrusionTranslate);
+    result["fill-extrusion-translate-anchor"] = makePropertySetter<V>(&FillExtrusionLayer::setFillExtrusionTranslateAnchor);
+    result["fill-extrusion-pattern"] = makePropertySetter<V>(&FillExtrusionLayer::setFillExtrusionPattern);
+    result["fill-extrusion-height"] = makePropertySetter<V>(&FillExtrusionLayer::setFillExtrusionHeight);
+    result["fill-extrusion-base"] = makePropertySetter<V>(&FillExtrusionLayer::setFillExtrusionBase);
 
     result["raster-opacity"] = makePropertySetter<V>(&RasterLayer::setRasterOpacity);
     result["raster-hue-rotate"] = makePropertySetter<V>(&RasterLayer::setRasterHueRotate);

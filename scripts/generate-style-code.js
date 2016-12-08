@@ -3,12 +3,12 @@
 const fs = require('fs');
 const ejs = require('ejs');
 const spec = require('mapbox-gl-style-spec').latest;
-var colorParser = require('csscolorparser');
+const colorParser = require('csscolorparser');
 
 require('./style-code');
 
 function parseCSSColor(str) {
-  var color = colorParser.parseCSSColor(str);
+  const color = colorParser.parseCSSColor(str);
   return [
       color[0] / 255 * color[3], color[1] / 255 * color[3], color[2] / 255 * color[3], color[3]
   ];
@@ -40,7 +40,7 @@ global.propertyType = function (property) {
     }
   default: throw new Error(`unknown type for ${property.name}`)
   }
-}
+};
 
 global.defaultValue = function (property) {
   // https://github.com/mapbox/mapbox-gl-native/issues/5258
@@ -64,7 +64,7 @@ global.defaultValue = function (property) {
       return `${propertyType(property)}::${camelize(property.default)}`;
     }
   case 'color':
-    var color = parseCSSColor(property.default).join(', ');
+    const color = parseCSSColor(property.default).join(', ');
     switch (color) {
     case '0, 0, 0, 0':
       return '{}';
@@ -85,7 +85,7 @@ global.defaultValue = function (property) {
   default:
     return property.default;
   }
-}
+};
 
 const layerHpp = ejs.compile(fs.readFileSync('include/mbgl/style/layers/layer.hpp.ejs', 'utf8'), {strict: true});
 const layerCpp = ejs.compile(fs.readFileSync('src/mbgl/style/layers/layer.cpp.ejs', 'utf8'), {strict: true});
@@ -118,11 +118,13 @@ const layers = Object.keys(spec.layer.type.values).map((type) => {
 });
 
 for (const layer of layers) {
-  writeIfModified(`include/mbgl/style/layers/${layer.type}_layer.hpp`, layerHpp(layer));
-  writeIfModified(`src/mbgl/style/layers/${layer.type}_layer.cpp`, layerCpp(layer));
+  const layerFileName = layer.type.replace('-', '_');
 
-  writeIfModified(`src/mbgl/style/layers/${layer.type}_layer_properties.hpp`, propertiesHpp(layer));
-  writeIfModified(`src/mbgl/style/layers/${layer.type}_layer_properties.cpp`, propertiesCpp(layer));
+  writeIfModified(`include/mbgl/style/layers/${layerFileName}_layer.hpp`, layerHpp(layer));
+  writeIfModified(`src/mbgl/style/layers/${layerFileName}_layer.cpp`, layerCpp(layer));
+
+  writeIfModified(`src/mbgl/style/layers/${layerFileName}_layer_properties.hpp`, propertiesHpp(layer));
+  writeIfModified(`src/mbgl/style/layers/${layerFileName}_layer_properties.cpp`, propertiesCpp(layer));
 }
 
 const propertySettersHpp = ejs.compile(fs.readFileSync('include/mbgl/style/conversion/make_property_setters.hpp.ejs', 'utf8'), {strict: true});
