@@ -63,6 +63,24 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
+    jni::Object<jni::ObjectTag> CircleLayer::getCircleStrokeWidth(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::CircleLayer>()->CircleLayer::getCircleStrokeWidth());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<jni::ObjectTag> CircleLayer::getCircleStrokeColor(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::CircleLayer>()->CircleLayer::getCircleStrokeColor());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<jni::ObjectTag> CircleLayer::getCircleStrokeOpacity(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::CircleLayer>()->CircleLayer::getCircleStrokeOpacity());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
     jni::Class<CircleLayer> CircleLayer::javaClass;
 
     jni::jobject* CircleLayer::createJavaPeer(jni::JNIEnv& env) {
@@ -88,7 +106,10 @@ namespace android {
             METHOD(&CircleLayer::getCircleOpacity, "nativeGetCircleOpacity"),
             METHOD(&CircleLayer::getCircleTranslate, "nativeGetCircleTranslate"),
             METHOD(&CircleLayer::getCircleTranslateAnchor, "nativeGetCircleTranslateAnchor"),
-            METHOD(&CircleLayer::getCirclePitchScale, "nativeGetCirclePitchScale"));
+            METHOD(&CircleLayer::getCirclePitchScale, "nativeGetCirclePitchScale"),
+            METHOD(&CircleLayer::getCircleStrokeWidth, "nativeGetCircleStrokeWidth"),
+            METHOD(&CircleLayer::getCircleStrokeColor, "nativeGetCircleStrokeColor"),
+            METHOD(&CircleLayer::getCircleStrokeOpacity, "nativeGetCircleStrokeOpacity"));
     }
 
 } // namespace android

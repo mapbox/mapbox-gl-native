@@ -187,6 +187,48 @@ namespace mbgl {
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
+- (void)setCircleStrokeColor:(MGLStyleValue<MGLColor *> *)circleStrokeColor {
+    MGLAssertStyleLayerIsValid();
+
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue(circleStrokeColor);
+    _rawLayer->setCircleStrokeColor(mbglValue);
+}
+
+- (MGLStyleValue<MGLColor *> *)circleStrokeColor {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = _rawLayer->getCircleStrokeColor() ?: _rawLayer->getDefaultCircleStrokeColor();
+    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
+}
+
+- (void)setCircleStrokeOpacity:(MGLStyleValue<NSNumber *> *)circleStrokeOpacity {
+    MGLAssertStyleLayerIsValid();
+
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(circleStrokeOpacity);
+    _rawLayer->setCircleStrokeOpacity(mbglValue);
+}
+
+- (MGLStyleValue<NSNumber *> *)circleStrokeOpacity {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = _rawLayer->getCircleStrokeOpacity() ?: _rawLayer->getDefaultCircleStrokeOpacity();
+    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+}
+
+- (void)setCircleStrokeWidth:(MGLStyleValue<NSNumber *> *)circleStrokeWidth {
+    MGLAssertStyleLayerIsValid();
+
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(circleStrokeWidth);
+    _rawLayer->setCircleStrokeWidth(mbglValue);
+}
+
+- (MGLStyleValue<NSNumber *> *)circleStrokeWidth {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = _rawLayer->getCircleStrokeWidth() ?: _rawLayer->getDefaultCircleStrokeWidth();
+    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+}
+
 - (void)setCircleTranslate:(MGLStyleValue<NSValue *> *)circleTranslate {
     MGLAssertStyleLayerIsValid();
 

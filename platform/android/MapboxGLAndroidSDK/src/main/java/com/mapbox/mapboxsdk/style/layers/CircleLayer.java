@@ -196,6 +196,52 @@ public class CircleLayer extends Layer {
         return (PropertyValue<String>) new PropertyValue(nativeGetCirclePitchScale());
     }
  
+    /**
+     * Get the CircleStrokeWidth property
+     *
+     * @return property wrapper value around Float
+     */
+    @SuppressWarnings("unchecked")
+    public PropertyValue<Float> getCircleStrokeWidth() {
+        return (PropertyValue<Float>) new PropertyValue(nativeGetCircleStrokeWidth());
+    }
+ 
+    /**
+     * Get the CircleStrokeColor property
+     *
+     * @return property wrapper value around String
+     */
+    @SuppressWarnings("unchecked")
+    public PropertyValue<String> getCircleStrokeColor() {
+        return (PropertyValue<String>) new PropertyValue(nativeGetCircleStrokeColor());
+    }
+     /**
+     * The stroke color of the circle.
+     *
+     * @return int representation of a rgba string color
+     * @throws RuntimeException thrown if property isn't a value
+     */
+    @ColorInt
+    public int getCircleStrokeColorAsInt() {
+        PropertyValue<String> value = getCircleStrokeColor();
+        if (value.isValue()) {
+            return rgbaToColor(value.getValue());
+        } else {
+            throw new RuntimeException("circle-stroke-color was set as a Function");
+        }
+    }
+
+ 
+    /**
+     * Get the CircleStrokeOpacity property
+     *
+     * @return property wrapper value around Float
+     */
+    @SuppressWarnings("unchecked")
+    public PropertyValue<Float> getCircleStrokeOpacity() {
+        return (PropertyValue<Float>) new PropertyValue(nativeGetCircleStrokeOpacity());
+    }
+ 
     private native Object nativeGetCircleRadius();
 
     private native Object nativeGetCircleColor();
@@ -209,6 +255,12 @@ public class CircleLayer extends Layer {
     private native Object nativeGetCircleTranslateAnchor();
 
     private native Object nativeGetCirclePitchScale();
+
+    private native Object nativeGetCircleStrokeWidth();
+
+    private native Object nativeGetCircleStrokeColor();
+
+    private native Object nativeGetCircleStrokeOpacity();
 
 
     @Override

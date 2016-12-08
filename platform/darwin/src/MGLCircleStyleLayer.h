@@ -94,6 +94,38 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleRadius;
 
+#if TARGET_OS_IPHONE
+/**
+ The stroke color of the circle.
+ 
+ The default value of this property is an `MGLStyleValue` object containing `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *circleStrokeColor;
+#else
+/**
+ The stroke color of the circle.
+ 
+ The default value of this property is an `MGLStyleValue` object containing `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *circleStrokeColor;
+#endif
+
+/**
+ The opacity of the circle's stroke.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleStrokeOpacity;
+
+/**
+ The width of the circle's stroke. Strokes are placed outside of the `circleRadius`.
+
+ This property is measured in points.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleStrokeWidth;
+
 /**
  The geometry's offset.
 
