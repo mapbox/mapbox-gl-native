@@ -954,10 +954,37 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.mapView.style addSource:source];
     
     MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"leaf-fill-layer" source:source];
-    layer.predicate = [NSPredicate predicateWithFormat:@"color = %@", @"red"];
+    layer.predicate = [NSPredicate predicateWithFormat:@"color = 'red'"];
     MGLStyleValue *fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor redColor]];
     layer.fillColor = fillColor;
     [self.mapView.style addLayer:layer];
+
+    NSString *geoJSON = @"{\"type\": \"Feature\", \"properties\": {\"color\": \"green\"}, \"geometry\": { \"type\": \"Point\", \"coordinates\": [ -114.06847000122069, 51.050459433092655 ] }}";
+
+    NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
+    MGLShapeSource *pointSource = [[MGLShapeSource alloc] initWithIdentifier:@"leaf-point-source" geoJSONData:data options:nil];
+    [self.mapView.style addSource:pointSource];
+
+    MGLCircleStyleLayer *circleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"leaf-circle-layer" source:pointSource];
+    circleLayer.circleColor = [MGLStyleValue valueWithRawValue:[UIColor greenColor]];
+    circleLayer.predicate = [NSPredicate predicateWithFormat:@"color = 'green'"];
+    [self.mapView.style addLayer:circleLayer];
+
+
+    CLLocationCoordinate2D squareCoords[] = {
+        {51.056070541830934, -114.0274429321289},
+        {51.07937094724242, -114.0274429321289},
+        {51.07937094724242, -113.98761749267578},
+        {51.05607054183093, -113.98761749267578},
+        {51.056070541830934, -114.0274429321289},
+    };
+    MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:squareCoords count:sizeof(squareCoords)/sizeof(squareCoords[0])];
+    MGLShapeSource *plainShapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"leaf-plain-shape-source" shape:polygon options:nil];
+    [self.mapView.style addSource:plainShapeSource];
+
+    MGLFillStyleLayer *plainFillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"leaf-plain-fill-layer" source:plainShapeSource];
+    plainFillLayer.fillColor = [MGLStyleValue valueWithRawValue:[UIColor yellowColor]];
+    [self.mapView.style addLayer:plainFillLayer];
 }
 
 - (void)updateShapeSourceData
