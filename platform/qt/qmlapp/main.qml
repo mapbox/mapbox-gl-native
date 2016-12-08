@@ -323,6 +323,16 @@ ApplicationWindow {
                         source.data = ":source2.geojson"
                     }
                 }
+                RadioButton {
+                    text: "Route 3"
+                    exclusiveGroup: sourceGroup
+                    onClicked: {
+                        source.data = '{ "type": "FeatureCollection", "features": \
+                            [{ "type": "Feature", "properties": {}, "geometry": { \
+                            "type": "LineString", "coordinates": [[ 24.934938848018646, \
+                            60.16830257086771 ], [ 24.943315386772156, 60.16227776476442 ]]}}]}'
+                    }
+                }
             }
         }
 
