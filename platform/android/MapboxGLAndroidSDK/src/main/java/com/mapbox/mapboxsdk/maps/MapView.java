@@ -173,7 +173,7 @@ public class MapView extends FrameLayout {
         Projection projection = new Projection(nativeMapView);
         UiSettings uiSettings = new UiSettings(projection, focalPointInvalidator, compassView, attributionsView, logoView);
         TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPointInvalidator);
-        MyLocationViewSettings myLocationViewSettings = new MyLocationViewSettings(projection, myLocationView, trackingSettings);
+        MyLocationViewSettings myLocationViewSettings = new MyLocationViewSettings(myLocationView, projection, focalPointInvalidator);
         MarkerViewManager markerViewManager = new MarkerViewManager(markerViewContainer);
         AnnotationManager annotationManager = new AnnotationManager(nativeMapView, this, markerViewManager);
         Transform transform = new Transform(nativeMapView, annotationManager.getMarkerViewManager(), trackingSettings);

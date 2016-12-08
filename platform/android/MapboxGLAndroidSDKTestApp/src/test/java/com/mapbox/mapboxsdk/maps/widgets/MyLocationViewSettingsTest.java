@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.maps.widgets;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 
+import com.mapbox.mapboxsdk.maps.FocalPointChangeListener;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 
@@ -30,11 +31,14 @@ public class MyLocationViewSettingsTest {
     @InjectMocks
     TrackingSettings trackingSettings = mock(TrackingSettings.class);
 
+    @InjectMocks
+    FocalPointChangeListener focalPointChangeListener = mock(FocalPointChangeListener.class);
+
     private MyLocationViewSettings locationViewSettings;
 
     @Before
     public void beforeTest() {
-        locationViewSettings = new MyLocationViewSettings(projection, myLocationView, trackingSettings);
+        locationViewSettings = new MyLocationViewSettings(myLocationView, projection, focalPointChangeListener);
     }
 
     @Test
@@ -83,6 +87,5 @@ public class MyLocationViewSettingsTest {
         locationViewSettings.setEnabled(true);
         assertTrue("state should be true", locationViewSettings.isEnabled());
     }
-
 }
 

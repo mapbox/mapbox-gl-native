@@ -1,11 +1,13 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
+import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
 
+import com.mapbox.mapboxsdk.constants.MyLocationTracking;
+import com.mapbox.mapboxsdk.maps.FocalPointChangeListener;
 import com.mapbox.mapboxsdk.maps.Projection;
-import com.mapbox.mapboxsdk.maps.TrackingSettings;
 
 /**
  * Settings to configure the visual appearance of the MyLocationView.
@@ -13,8 +15,8 @@ import com.mapbox.mapboxsdk.maps.TrackingSettings;
 public class MyLocationViewSettings {
 
     private Projection projection;
-    private TrackingSettings trackingSettings;
     private MyLocationView myLocationView;
+    private FocalPointChangeListener focalPointChangeListener;
 
     //
     // State
@@ -59,15 +61,17 @@ public class MyLocationViewSettings {
 
     /**
      * Creates an instance of MyLocationViewSettings
+     * <p>
      *
-     * @param projection     the MapView projection
-     * @param myLocationView the MyLocationView to apply the settings to
+     * @param myLocationView            the MyLocationView to apply the settings to
+     * @param projection                the MapView projection
+     * @param focalPointChangedListener the interface to be invoked when focal points changes
      * @see MyLocationView
      */
-    public MyLocationViewSettings(Projection projection, MyLocationView myLocationView, TrackingSettings trackingSettings) {
-        this.projection = projection;
+    public MyLocationViewSettings(MyLocationView myLocationView, Projection projection, FocalPointChangeListener focalPointChangedListener) {
         this.myLocationView = myLocationView;
-        this.trackingSettings = trackingSettings;
+        this.projection = projection;
+        this.focalPointChangeListener = focalPointChangedListener;
     }
 
     /**
@@ -212,7 +216,7 @@ public class MyLocationViewSettings {
         padding = new int[]{left, top, right, bottom};
         myLocationView.setContentPadding(padding);
         projection.invalidateContentPadding(padding);
-        trackingSettings.invalidateFocalPointForTracking(myLocationView);
+        invalidateFocalPointForTracking(myLocationView);
     }
 
     /**
@@ -265,4 +269,13 @@ public class MyLocationViewSettings {
     public void setTilt(double tilt) {
         myLocationView.setTilt(tilt);
     }
+
+    private void invalidateFocalPointForTracking(MyLocationView myLocationView) {
+        if (!(myLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE)) {
+            focalPointChangeListener.onFocalPointChanged(new PointF(myLocationView.getCenterX(), myLocationView.getCenterY()));
+        } else {
+            focalPointChangeListener.onFocalPointChanged(null);
+        }
+    }
+
 }

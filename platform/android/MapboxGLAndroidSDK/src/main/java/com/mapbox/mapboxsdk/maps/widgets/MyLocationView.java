@@ -488,6 +488,17 @@ public class MyLocationView extends View {
         invalidate();
     }
 
+    @MyLocationTracking.Mode
+    public int getMyLocationTrackingMode() {
+        return myLocationTrackingMode;
+    }
+
+
+    @MyBearingTracking.Mode
+    public int getMyBearingTrackingMode() {
+        return myBearingTrackingMode;
+    }
+
     private void setCompass(double bearing) {
         setCompass(bearing, 0 /* no animation */);
     }
