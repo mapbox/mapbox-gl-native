@@ -30,10 +30,11 @@ ApplicationWindow {
                 property var fillColor: waterColorDialog.color
             },
             MapParameter {
+                id: source
                 property var type: "source"
                 property var name: "routeSource"
                 property var sourceType: "geojson"
-                property var data: ":source.geojson"
+                property var data: ":source1.geojson"
             },
             MapParameter {
                 property var type: "layer"
@@ -256,11 +257,11 @@ ApplicationWindow {
             title: "Style:"
 
             ColumnLayout {
-                ExclusiveGroup { id: group }
+                ExclusiveGroup { id: styleGroup }
                 RadioButton {
                     text: "Streets"
                     checked: true
-                    exclusiveGroup: group
+                    exclusiveGroup: styleGroup
                     onClicked: {
                         style.url = "mapbox://styles/mapbox/streets-v9"
                         landColorDialog.color = "#e0ded8"
@@ -269,7 +270,7 @@ ApplicationWindow {
                 }
                 RadioButton {
                     text: "Dark"
-                    exclusiveGroup: group
+                    exclusiveGroup: styleGroup
                     onClicked: {
                         style.url = "mapbox://styles/mapbox/dark-v9"
                         landColorDialog.color = "#343332"
@@ -278,7 +279,7 @@ ApplicationWindow {
                 }
                 RadioButton {
                     text: "Satellite"
-                    exclusiveGroup: group
+                    exclusiveGroup: styleGroup
                     onClicked: {
                         style.url = "mapbox://styles/mapbox/satellite-v9"
                     }
@@ -298,6 +299,31 @@ ApplicationWindow {
             anchors.right: parent.right
             text: "Select water color"
             onClicked: waterColorDialog.open()
+        }
+
+        GroupBox {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            title: "Route:"
+
+            ColumnLayout {
+                ExclusiveGroup { id: sourceGroup }
+                RadioButton {
+                    text: "Route 1"
+                    checked: true
+                    exclusiveGroup: sourceGroup
+                    onClicked: {
+                        source.data = ":source1.geojson"
+                    }
+                }
+                RadioButton {
+                    text: "Route 2"
+                    exclusiveGroup: sourceGroup
+                    onClicked: {
+                        source.data = ":source2.geojson"
+                    }
+                }
+            }
         }
 
         CheckBox {

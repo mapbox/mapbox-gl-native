@@ -694,6 +694,8 @@ void QMapboxGL::addSource(const QString &sourceID, const QVariantMap &params)
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
+    removeSource(sourceID);
+
     Result<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(QVariant(params), sourceID.toStdString());
     if (!source) {
         qWarning() << "Unable to add source:" << source.error().message.c_str();
@@ -705,7 +707,11 @@ void QMapboxGL::addSource(const QString &sourceID, const QVariantMap &params)
 
 void QMapboxGL::removeSource(const QString& sourceID)
 {
-    d_ptr->mapObj->removeSource(sourceID.toStdString());
+    auto sourceIDStdString = sourceID.toStdString();
+
+    if (d_ptr->mapObj->getSource(sourceIDStdString)) {
+        d_ptr->mapObj->removeSource(sourceIDStdString);
+    }
 }
 
 void QMapboxGL::addCustomLayer(const QString &id,
