@@ -847,6 +847,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     fileSourceObj->setAccessToken(settings.accessToken().toStdString());
     connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()), Qt::QueuedConnection);
     connect(this, SIGNAL(mapChanged(QMapbox::MapChange)), q_ptr, SIGNAL(mapChanged(QMapbox::MapChange)), Qt::QueuedConnection);
+    connect(this, SIGNAL(copyrightsChanged(QString)), q_ptr, SIGNAL(copyrightsChanged(QString)), Qt::QueuedConnection);
 }
 
 QMapboxGLPrivate::~QMapboxGLPrivate()
@@ -882,6 +883,16 @@ void QMapboxGLPrivate::invalidate()
 
 void QMapboxGLPrivate::notifyMapChange(mbgl::MapChange change)
 {
+    if (change == mbgl::MapChangeSourceDidChange) {
+        std::string attribution;
+        for (const auto& source : mapObj->getSources()) {
+            // Avoid duplicates by using the most complete attribution HTML snippet.
+            if (source->getAttribution() && (attribution.size() < source->getAttribution()->size()))
+                attribution = *source->getAttribution();
+        }
+        emit copyrightsChanged(QString::fromStdString(attribution));
+    }
+
     emit mapChanged(static_cast<QMapbox::MapChange>(change));
 }
 

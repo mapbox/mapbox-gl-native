@@ -213,6 +213,7 @@ public slots:
 signals:
     void needsRendering();
     void mapChanged(QMapbox::MapChange);
+    void copyrightsChanged(const QString &copyrightsHtml);
 
 private:
     Q_DISABLE_COPY(QMapboxGL)
