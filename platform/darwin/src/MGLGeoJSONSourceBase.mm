@@ -9,6 +9,12 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionMinimumZoomLevel = @"MGLGeoJS
 const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionBuffer = @"MGLGeoJSONSourceOptionBuffer";
 const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"MGLGeoJSONSourceOptionSimplificationTolerance";
 
+@interface MGLGeoJSONSourceBase ()
+
+@property (nonatomic, readwrite) NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *options;
+
+@end
+
 @implementation MGLGeoJSONSourceBase
 
 
