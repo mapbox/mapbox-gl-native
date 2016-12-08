@@ -79,7 +79,21 @@
 
 - (void)addToMapView:(MGLMapView *)mapView
 {
+    if (_pendingSource == nullptr) {
+        [NSException raise:@"MGLRedundantSourceException"
+                    format:@"This instance %@ was already added to %@. Adding the same source instance " \
+         "to the style more than once is invalid.", self, mapView.style];
+    }
+
     mapView.mbglMap->addSource(std::move(_pendingSource));
+}
+
+- (void)removeFromMapView:(MGLMapView *)mapView
+{
+    auto removedSource = mapView.mbglMap->removeSource(self.identifier.UTF8String);
+    
+    _pendingSource = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::CustomVectorSource> &>(removedSource));
+    self.rawSource = _pendingSource.get();
 }
 
 - (void)processData:(NS_ARRAY_OF(id <MGLFeature>)*)features forTile:(uint8_t)z x:(uint32_t)x y:(uint32_t)y
