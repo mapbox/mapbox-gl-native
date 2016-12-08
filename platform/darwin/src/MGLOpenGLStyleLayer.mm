@@ -32,8 +32,8 @@ void MGLDrawCustomStyleLayer(void *context, const mbgl::style::CustomLayerRender
         .centerCoordinate = CLLocationCoordinate2DMake(params.latitude, params.longitude),
         .zoomLevel = params.zoom,
         .direction = mbgl::util::wrap(params.bearing, 0., 360.),
-        .pitch = params.pitch,
-        .perspectiveSkew = params.altitude,
+        .pitch = static_cast<CGFloat>(params.pitch),
+        .perspectiveSkew = static_cast<CGFloat>(params.altitude),
     };
     [layer drawInMapView:layer.mapView withContext:drawingContext];
 }
