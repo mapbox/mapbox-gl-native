@@ -245,6 +245,94 @@ public class CircleLayerTest extends BaseStyleTest {
         assertEquals((String) layer.getCirclePitchScale().getValue(), (String) CIRCLE_PITCH_SCALE_MAP);
     }
 
+    @Test
+    public void testCircleStrokeWidth() {
+        checkViewIsDisplayed(R.id.mapView);
+
+        mapboxMap = rule.getActivity().getMapboxMap();
+
+        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+            Timber.i("Adding layer");
+            layer = new CircleLayer("my-layer", "composite");
+            layer.setSourceLayer("composite");
+            mapboxMap.addLayer(layer);
+            //Layer reference is now stale, get new reference
+            layer = mapboxMap.getLayerAs("my-layer");
+        }
+        Timber.i("circle-stroke-width");
+        assertNotNull(layer);
+
+        //Set and Get
+        layer.setProperties(circleStrokeWidth(0.3f));
+        assertEquals((Float) layer.getCircleStrokeWidth().getValue(), (Float) 0.3f);
+    }
+
+    @Test
+    public void testCircleStrokeColor() {
+        checkViewIsDisplayed(R.id.mapView);
+
+        mapboxMap = rule.getActivity().getMapboxMap();
+
+        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+            Timber.i("Adding layer");
+            layer = new CircleLayer("my-layer", "composite");
+            layer.setSourceLayer("composite");
+            mapboxMap.addLayer(layer);
+            //Layer reference is now stale, get new reference
+            layer = mapboxMap.getLayerAs("my-layer");
+        }
+        Timber.i("circle-stroke-color");
+        assertNotNull(layer);
+
+        //Set and Get
+        layer.setProperties(circleStrokeColor("rgba(0, 0, 0, 1)"));
+        assertEquals((String) layer.getCircleStrokeColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    }
+
+    @Test
+    public void testCircleStrokeColorAsInt() {
+        checkViewIsDisplayed(R.id.mapView);
+
+        mapboxMap = rule.getActivity().getMapboxMap();
+
+        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+            Timber.i("Adding layer");
+            layer = new CircleLayer("my-layer", "composite");
+            layer.setSourceLayer("composite");
+            mapboxMap.addLayer(layer);
+            //Layer reference is now stale, get new reference
+            layer = mapboxMap.getLayerAs("my-layer");
+        }
+        Timber.i("circle-stroke-color");
+        assertNotNull(layer);
+
+        //Set and Get
+        layer.setProperties(circleStrokeColor(Color.RED));
+        assertEquals(layer.getCircleStrokeColorAsInt(), Color.RED);
+    }
+
+    @Test
+    public void testCircleStrokeOpacity() {
+        checkViewIsDisplayed(R.id.mapView);
+
+        mapboxMap = rule.getActivity().getMapboxMap();
+
+        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+            Timber.i("Adding layer");
+            layer = new CircleLayer("my-layer", "composite");
+            layer.setSourceLayer("composite");
+            mapboxMap.addLayer(layer);
+            //Layer reference is now stale, get new reference
+            layer = mapboxMap.getLayerAs("my-layer");
+        }
+        Timber.i("circle-stroke-opacity");
+        assertNotNull(layer);
+
+        //Set and Get
+        layer.setProperties(circleStrokeOpacity(0.3f));
+        assertEquals((Float) layer.getCircleStrokeOpacity().getValue(), (Float) 0.3f);
+    }
+
 
    @After
    public void unregisterIntentServiceIdlingResource() {

@@ -872,6 +872,76 @@ public class PropertyFactory {
     }
 
     /**
+     * The width of the circle's stroke. Strokes are placed outside of the "circle-radius".
+     *
+     * @param value a Float value
+     * @return property wrapper around Float
+     */
+    public static Property<Float> circleStrokeWidth(Float value) {
+        return new PaintProperty<>("circle-stroke-width", value);
+    }
+
+    /**
+     * The width of the circle's stroke. Strokes are placed outside of the "circle-radius".
+     *
+     * @param function a wrapper function for Float
+     * @return property wrapper around a Float function
+     */
+    public static Property<Function<Float>> circleStrokeWidth(Function<Float> function) {
+        return new PaintProperty<>("circle-stroke-width", function);
+    }
+
+    /**
+     * The stroke color of the circle.
+     *
+     * @param value a int color value
+     * @return property wrapper around String color
+     */
+    public static Property<String> circleStrokeColor(@ColorInt int value) {
+        return new PaintProperty<>("circle-stroke-color", colorToRgbaString(value));
+    }
+
+    /**
+     * The stroke color of the circle.
+     *
+     * @param value a String value
+     * @return property wrapper around String
+     */
+    public static Property<String> circleStrokeColor(String value) {
+        return new PaintProperty<>("circle-stroke-color", value);
+    }
+
+    /**
+     * The stroke color of the circle.
+     *
+     * @param function a wrapper function for String
+     * @return property wrapper around a String function
+     */
+    public static Property<Function<String>> circleStrokeColor(Function<String> function) {
+        return new PaintProperty<>("circle-stroke-color", function);
+    }
+
+    /**
+     * The opacity of the circle's stroke.
+     *
+     * @param value a Float value
+     * @return property wrapper around Float
+     */
+    public static Property<Float> circleStrokeOpacity(Float value) {
+        return new PaintProperty<>("circle-stroke-opacity", value);
+    }
+
+    /**
+     * The opacity of the circle's stroke.
+     *
+     * @param function a wrapper function for Float
+     * @return property wrapper around a Float function
+     */
+    public static Property<Function<Float>> circleStrokeOpacity(Function<Float> function) {
+        return new PaintProperty<>("circle-stroke-opacity", function);
+    }
+
+    /**
      * The opacity at which the image will be drawn.
      *
      * @param value a Float value

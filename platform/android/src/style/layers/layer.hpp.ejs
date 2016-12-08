@@ -7,7 +7,7 @@
 #pragma once
 
 #include "layer.hpp"
-#include <mbgl/style/layers/<%- type %>_layer.hpp>
+#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
 #include <jni/jni.hpp>
 
 namespace mbgl {

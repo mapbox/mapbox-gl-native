@@ -14,7 +14,7 @@
 #import "MGLStyleValue_Private.h"
 #import "MGL<%- camelize(type) %>StyleLayer.h"
 
-#include <mbgl/style/layers/<%- type %>_layer.hpp>
+#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
 <% if (containsEnumerationProperties)  { -%>
 namespace mbgl {
 
