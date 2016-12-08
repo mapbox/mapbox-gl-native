@@ -192,6 +192,10 @@ public class OfflineManager {
         return instance;
     }
 
+    public static synchronized boolean isAvailable() {
+        return instance != null || MapboxAccountManager.isStarted();
+    }
+
     /**
      * Access token getter/setter
      *

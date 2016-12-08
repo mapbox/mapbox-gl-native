@@ -56,6 +56,10 @@ public class MapboxAccountManager {
         return mapboxAccountManager;
     }
 
+    public static boolean isStarted() {
+        return mapboxAccountManager != null;
+    }
+
     /**
      * Internal Use Only
      * Get an instance of MapboxAccountManager configured with the app's Access Token
