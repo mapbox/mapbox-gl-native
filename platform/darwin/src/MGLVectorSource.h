@@ -6,10 +6,19 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A vector tile source. Tiles must be in Mapbox Vector Tile format.
+ `MGLVectorSource` is a map content source that supplies tiled vector data in
+ <a href="https://www.mapbox.com/vector-tiles/">Mapbox Vector Tile</a> format to
+ be shown on the map. The location of and metadata about the vector tiles are
+ defined by either an `MGLTileSet` object or an external TileJSON resource. A
+ vector source is added to an `MGLStyle` object along with an
+ `MGLVectorStyleLayer` object. The vector style layer defines the appearance of
+ any content supplied by the vector source.
  
- @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-vector">The
-    style specification.</a>
+ Within each vector tile, each geometric coordinate must lie between
+ −1&nbsp;×&nbsp;<var>extent</var> and
+ (<var>extent</var>&nbsp;×&nbsp;2)&nbsp;−&nbsp;1, inclusive. Any vector style
+ layer initialized with a vector source must have a non-`nil` value in its
+ `sourceLayerIdentifier` property.
  */
 @interface MGLVectorSource : MGLSource
 
@@ -20,6 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
  
  After initializing and configuring the source, add it to a map view’s style
  using the `-[MGLStyle addSource:]` method.
+ 
+ The URL may be a full HTTP or HTTPS URL or, for tile sets hosted by Mapbox, a
+ Mapbox URL indicating a map identifier (`mapbox://<mapid>`).
  
  @param identifier A string that uniquely identifies the source in the style to
     which it is added.
@@ -48,8 +60,8 @@ NS_ASSUME_NONNULL_BEGIN
  A URL to a TileJSON configuration file describing the source’s contents and
  other metadata.
  
- The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the tile
- set’s map ID (`mapbox://<mapid>`).
+ The URL may be a full HTTP or HTTPS URL or, for tile sets hosted by Mapbox, a
+ Mapbox URL indicating a map identifier (`mapbox://<mapid>`).
  
  If the receiver was initialized using `-initWithIdentifier:tileSet:`, this
  property is set to `nil`.

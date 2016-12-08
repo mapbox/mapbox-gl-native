@@ -8,7 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Information about an attribution statement, usually a copyright or trademark
- statement, associated with a map source.
+ statement, associated with a map content source.
  */
 @interface MGLAttributionInfo : NSObject
 

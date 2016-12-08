@@ -57,10 +57,15 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionBuffer;
 extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 
 /**
- A shape source.
-
- @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson">The
-    style specification.</a>
+ `MGLShapeSource` is a map content source that supplies vector shapes to be
+ shown on the map. The shapes may be instances of `MGLShape` or `MGLFeature`,
+ or they may be defined by local or external
+ <a href="http://geojson.org/">GeoJSON</a> code. A shape source is added to an
+ `MGLStyle` object along with an `MGLVectorStyleLayer` object. The vector style
+ layer defines the appearance of any content supplied by the shape source.
+ 
+ Any vector style layer initialized with a shape source should have a `nil`
+ value in its `sourceLayerIdentifier` property.
  */
 @interface MGLShapeSource : MGLSource
 
@@ -109,12 +114,12 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 #pragma mark Accessing a Source’s Content
 
 /**
- The contents of the source. A shape can represent a GeoJSON geometry, a feature, 
- or a collection of features.
+ The contents of the source. A shape can represent a GeoJSON geometry, a
+ feature, or a collection of features.
 
- If the receiver was initialized using `-initWithIdentifier:URL:options:`, this property
- is set to `nil`. This property is unavailable until the receiver is passed into
- `-[MGLStyle addSource]`.
+ If the receiver was initialized using `-initWithIdentifier:URL:options:`, this
+ property is set to `nil`. This property is unavailable until the receiver is
+ passed into `-[MGLStyle addSource]`.
  */
 @property (nonatomic, nullable) MGLShape *shape;
 
@@ -135,8 +140,8 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 /**
  The URL to the GeoJSON document that specifies the contents of the source.
 
- If the receiver was initialized using `-initWithIdentifier:geoJSONData:options`, 
- this property is set to `nil`.
+ If the receiver was initialized using
+ `-initWithIdentifier:geoJSONData:options`, this property is set to `nil`.
  */
 @property (nonatomic, nullable) NSURL *URL;
 

@@ -121,7 +121,7 @@
 }
 
 - (void)testAddingSourcesTwice {
-    MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"geoJSONSource" shape:nil options:nil];
+    MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
     [self.style addSource:shapeSource];
     XCTAssertThrowsSpecificNamed([self.style addSource:shapeSource], NSException, @"MGLRedundantSourceException");
 
@@ -143,7 +143,7 @@
 }
 
 - (void)testAddingLayersTwice {
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"geoJSONSource" shape:nil options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
 
     MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"backgroundLayer"];
     [self.style addLayer:backgroundLayer];
