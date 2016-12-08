@@ -290,9 +290,14 @@ bool QQuickMapboxGL::parseStyleSource(QQuickMapboxGLMapParameter *param)
         source["url"] = param->property("url");
         m_sourceChanges << source;
     } else if (sourceType == "geojson") {
-        QFile geojson(param->property("data").toString());
-        geojson.open(QIODevice::ReadOnly);
-        source["data"] = geojson.readAll();
+        auto data = param->property("data").toString();
+        if (data.startsWith(':')) {
+            QFile geojson(data);
+            geojson.open(QIODevice::ReadOnly);
+            source["data"] = geojson.readAll();
+        } else {
+            source["data"] = data.toUtf8();
+        }
         m_sourceChanges << source;
     } else {
         m_error = QGeoServiceProvider::UnknownParameterError;
