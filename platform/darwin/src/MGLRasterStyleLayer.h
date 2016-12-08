@@ -56,8 +56,10 @@ NS_ASSUME_NONNULL_BEGIN
  This property is measured in degrees.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-hue-rotate"><code>raster-hue-rotate</code></a> paint property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotate;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotation;
 
 /**
  The opacity at which the image will be drawn.
