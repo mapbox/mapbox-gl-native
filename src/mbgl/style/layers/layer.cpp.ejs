@@ -5,8 +5,8 @@
 -%>
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
-#include <mbgl/style/layers/<%- type %>_layer.hpp>
-#include <mbgl/style/layers/<%- type %>_layer_impl.hpp>
+#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
+#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer_impl.hpp>
 
 namespace mbgl {
 namespace style {
