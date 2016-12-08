@@ -1,12 +1,20 @@
 #import <Foundation/Foundation.h>
 
 /**
- A source supplies data to be shown on the map. Sources don't contain styling 
- details like color or width. Use subclasses of `MGLStyleLayer` to give visual
- representation to sources.
+ `MGLSource` is an abstract base class for map content sources. A map content
+ source supplies content to be shown on the map. A source is added to an
+ `MGLStyle` object along with an `MGLForegroundStyleLayer` object. The
+ foreground style layer defines the appearance of any content supplied by the
+ source.
  
- You should use the concrete subclasses of `MGLSource` to create vector, 
- raster, GeoJSON, and other source types.
+ Each source defined by the style JSON file is represented at runtime by an
+ `MGLSource` object that you can use to refine the map’s content. You can also
+ add and remove sources dynamically using methods such as
+ `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
+ 
+ Do not create instances of this class directly, and do not create your own
+ subclasses of this class. Instead, create instances of `MGLRasterSource`,
+ `MGLShapeSource`, and `MGLVectorSource`.
  */
 @interface MGLSource : NSObject
 

@@ -8,10 +8,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A raster tile source.
- 
- @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-raster">The
- style specification.</a>
+ `MGLRasterSource` is a map content source that supplies raster image tiles to
+ be shown on the map. The location of and metadata about the raster tiles are
+ defined by either an `MGLTileSet` object or an external TileJSON resource. A
+ raster source is added to an `MGLStyle` object along with an
+ `MGLRasterStyleLayer` object. Use a raster style layer to control the
+ appearance of content supplied by the raster source.
  */
 @interface MGLRasterSource : MGLSource
 
@@ -23,6 +25,9 @@ NS_ASSUME_NONNULL_BEGIN
  
  After initializing and configuring the source, add it to a map view’s style
  using the `-[MGLStyle addSource:]` method.
+ 
+ The URL may be a full HTTP or HTTPS URL or, for tile sets hosted by Mapbox, a
+ Mapbox URL indicating a map identifier (`mapbox://<mapid>`).
  
  @param identifier A string that uniquely identifies the source in the style to
     which it is added.
@@ -56,8 +61,8 @@ NS_ASSUME_NONNULL_BEGIN
  A URL to a TileJSON configuration file describing the source’s contents and
  other metadata.
  
- The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the tile
- set’s map ID (`mapbox://<mapid>`).
+ The URL may be a full HTTP or HTTPS URL or, for tile sets hosted by Mapbox, a
+ Mapbox URL indicating a map identifier (`mapbox://<mapid>`).
  
  @see <a href="https://www.mapbox.com/help/an-open-platform/#tilejson">The 
  TileJSON specification.</a>
