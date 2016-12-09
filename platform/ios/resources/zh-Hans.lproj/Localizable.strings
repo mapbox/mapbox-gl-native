@@ -1,0 +1,84 @@
+/* Accessibility hint */
+"ANNOTATION_A11Y_HINT" = "显示信息";
+
+/* No comment provided by engineer. */
+"API_CLIENT_400_DESC" = "The session data task failed. Original request was: %@";
+
+/* No comment provided by engineer. */
+"API_CLIENT_400_REASON" = "The status code was %ld";
+
+/* No comment provided by engineer. */
+"CANCEL" = "取消";
+
+/* Accessibility hint */
+"COMPASS_A11Y_HINT" = "旋转地图使正北朝上";
+
+/* Accessibility label */
+"COMPASS_A11Y_LABEL" = "指南针";
+
+/* Compass abbreviation for north */
+"COMPASS_NORTH" = "北";
+
+/* Copyright notice in attribution sheet */
+"COPY_MAPBOX" = "© Mapbox";
+
+/* Copyright notice in attribution sheet */
+"COPY_OSM" = "© OpenStreetMap";
+
+/* Instructions in Interface Builder designable; {key}, {plist file name} */
+"DESIGNABLE" = "在%2$@中将你的access token设为%1$@可在这里显示Mapbox上的地图\n\n更多说明请见";
+
+/* Setup documentation URL display string; keep as short as possible */
+"FIRST_STEPS_URL" = "mapbox.com/help/first-steps-ios-sdk";
+
+/* Accessibility hint */
+"INFO_A11Y_HINT" = "显示致谢、用户反馈及更多";
+
+/* Accessibility label */
+"INFO_A11Y_LABEL" = "关于这个地图";
+
+/* Accessibility label */
+"LOGO_A11Y_LABEL" = "Mapbox";
+
+/* Accessibility label */
+"MAP_A11Y_LABEL" = "地图";
+
+/* Map accessibility value */
+"MAP_A11Y_VALUE" = "地图缩放%1$d倍\n有%2$ld处标记可见";
+
+/* Action in attribution sheet */
+"MAP_FEEDBACK" = "改进地图";
+
+/* Action sheet title */
+"SDK_NAME" = "Mapbox iOS SDK";
+
+/* Telemetry prompt message */
+"TELEMETRY_DISABLED_MSG" = "你可以提供匿名数据来帮助OpenStreetMap和Mapbox的地图变得更好。";
+
+/* Telemetry prompt button */
+"TELEMETRY_DISABLED_OFF" = "暂不参与";
+
+/* Telemetry prompt button */
+"TELEMETRY_DISABLED_ON" = "我要参与";
+
+/* Telemetry prompt message */
+"TELEMETRY_ENABLED_MSG" = "你的匿名数据在帮助OpenStreetMap和Mapbox的地图变得更好。";
+
+/* Telemetry prompt button */
+"TELEMETRY_ENABLED_OFF" = "不再参与";
+
+/* Telemetry prompt button */
+"TELEMETRY_ENABLED_ON" = "继续参与";
+
+/* Telemetry prompt button */
+"TELEMETRY_MORE" = "详细信息";
+
+/* Action in attribution sheet */
+"TELEMETRY_NAME" = "Mapbox传感数据";
+
+/* Telemetry prompt title */
+"TELEMETRY_TITLE" = "让Mapbox地图变得更好";
+
+/* Default user location annotation title */
+"USER_DOT_TITLE" = "你在这里";
+
