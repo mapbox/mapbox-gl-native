@@ -17,7 +17,7 @@
 "COMPASS_A11Y_LABEL" = "指南针";
 
 /* Compass abbreviation for north */
-"COMPASS_NORTH" = "N";
+"COMPASS_NORTH" = "北";
 
 /* Copyright notice in attribution sheet */
 "COPY_MAPBOX" = "© Mapbox";
@@ -32,7 +32,7 @@
 "FIRST_STEPS_URL" = "mapbox.com/help/first-steps-ios-sdk";
 
 /* Accessibility hint */
-"INFO_A11Y_HINT" = "显示致谢，用户反馈及更多";
+"INFO_A11Y_HINT" = "显示致谢、用户反馈及更多";
 
 /* Accessibility label */
 "INFO_A11Y_LABEL" = "关于这个地图";
@@ -44,7 +44,7 @@
 "MAP_A11Y_LABEL" = "地图";
 
 /* Map accessibility value */
-"MAP_A11Y_VALUE" = "Zoom %1$dx\n%2$ld annotation(s) visible";
+"MAP_A11Y_VALUE" = "地图缩放%1$d倍\n有%2$ld处标记可见";
 
 /* Action in attribution sheet */
 "MAP_FEEDBACK" = "改进地图";
