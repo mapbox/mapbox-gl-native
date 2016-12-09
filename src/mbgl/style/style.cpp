@@ -148,6 +148,8 @@ void Style::addSource(std::unique_ptr<Source> source) {
 
     source->baseImpl->setObserver(this);
     sources.emplace_back(std::move(source));
+
+    observer->onUpdate(Update::RecalculateStyle);
 }
 
 std::unique_ptr<Source> Style::removeSource(const std::string& id) {
