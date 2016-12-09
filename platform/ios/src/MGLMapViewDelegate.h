@@ -272,6 +272,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (CGFloat)mapView:(MGLMapView *)mapView lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
 
+/**
+ Returns the lengths of the alternating dashes and gaps that form the dash pattern of a polyline annotation.
+ 
+ This property is measured in line widths.
+ 
+ @param mapView The map view rendering the polygon annotation.
+ @param annotation The annotation being rendered.
+ @return The pattern of dashes.
+ */
+- (nullable NSArray<NSNumber *> *)mapView:(MGLMapView *)mapView lineDasharrayForPolylineAnnotation:(MGLPolyline *)annotation;
+
 #pragma mark Managing Annotation Views
 
 /**

@@ -1504,6 +1504,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     return ([annotation isKindOfClass:[MGLPolyline class]] ? [UIColor purpleColor] : [UIColor blackColor]);
 }
 
+- (NSArray<NSNumber*>*)mapView:(MGLMapView *)mapView lineDasharrayForPolylineAnnotation:(MGLPolyline *)annotation
+{
+    return @[@0.3, @0.3];
+}
+
 - (UIColor *)mapView:(__unused MGLMapView *)mapView fillColorForPolygonAnnotation:(__unused MGLPolygon *)annotation
 {
     UIColor *color = annotation.pointCount > 3 ? [UIColor greenColor] : [UIColor redColor];

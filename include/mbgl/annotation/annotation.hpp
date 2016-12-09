@@ -32,6 +32,7 @@ public:
     style::PropertyValue<float> opacity { 1.0f };
     style::PropertyValue<float> width { 1.0f };
     style::PropertyValue<Color> color { Color::black() };
+    style::PropertyValue<std::vector<float>> dasharray { { 1 } };
 };
 
 class FillAnnotation {
