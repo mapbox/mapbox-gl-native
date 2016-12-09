@@ -116,7 +116,7 @@ workflows:
             echo "The details from Firebase will be downloaded, zipped and attached as a build artefact."
             testUri=$(gsutil ls "gs://test-lab-wrrntqk05p31w-h3y1qk44vuunw/" | tail -n1)
             echo "Downloading from : "$testUri
-            cd platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk && gsutil -m cp -R -Z $testUri .
+            gsutil -m cp -R -Z $testUri platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
 
             echo "Try running ndk-stack on downloaded logcat to symbolicate the stacktraces:"
             find platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk -type f -name "logcat" -print0 | xargs -0 -Imylogcat mv -i mylogcat ./
