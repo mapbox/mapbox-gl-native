@@ -536,6 +536,12 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
 
     return true;
 }
+    
+void OfflineDatabase::deleteAllTiles(void) {
+    db->exec("DELETE FROM tiles");
+    db->exec("VACUUM");
+}
+
 
 std::vector<OfflineRegion> OfflineDatabase::listRegions() {
     // clang-format off

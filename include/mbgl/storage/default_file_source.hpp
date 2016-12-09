@@ -112,6 +112,11 @@ public:
      * by the Mapbox Terms of Service.
      */
     void setOfflineMapboxTileCountLimit(uint64_t) const;
+    
+    /*
+     * Clean ambient cache
+     */
+    void cleanAmbientCache(void);
 
     // For testing only.
     void put(const Resource&, const Response&);

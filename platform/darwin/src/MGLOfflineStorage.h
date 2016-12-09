@@ -225,6 +225,8 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
  */
 @property (nonatomic, readonly) unsigned long long countOfBytesCompleted;
 
+- (void)cleanAmbientCache;
+
 @end
 
 NS_ASSUME_NONNULL_END

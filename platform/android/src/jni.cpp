@@ -1389,6 +1389,12 @@ void destroyOfflineRegion(JNIEnv *env, jni::jobject* offlineRegion_) {
     delete offlineRegion;
 }
 
+void cleanAmbientCache(JNIEnv *env, jni::jobject* obj, jlong defaultFileSourcePtr) {
+    assert(defaultFileSourcePtr != 0);
+    mbgl::DefaultFileSource *defaultFileSource = reinterpret_cast<mbgl::DefaultFileSource *>(defaultFileSourcePtr);
+    defaultFileSource->cleanAmbientCache();
+}
+
 void setOfflineRegionObserver(JNIEnv *env, jni::jobject* offlineRegion_, jni::jobject* observerCallback) {
     // Offline region
     mbgl::OfflineRegion* offlineRegion = getOfflineRegionPeer(env, offlineRegion_);
@@ -1872,7 +1878,8 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(getAccessToken, "(J)Ljava/lang/String;"),
         MAKE_NATIVE_METHOD(listOfflineRegions, "(JLcom/mapbox/mapboxsdk/offline/OfflineManager$ListOfflineRegionsCallback;)V"),
         MAKE_NATIVE_METHOD(createOfflineRegion, "(JLcom/mapbox/mapboxsdk/offline/OfflineRegionDefinition;[BLcom/mapbox/mapboxsdk/offline/OfflineManager$CreateOfflineRegionCallback;)V"),
-        MAKE_NATIVE_METHOD(setOfflineMapboxTileCountLimit, "(JJ)V")
+        MAKE_NATIVE_METHOD(setOfflineMapboxTileCountLimit, "(JJ)V"),
+        MAKE_NATIVE_METHOD(cleanAmbientCache, "(J)V")
     );
 
     jni::Class<OfflineManager::ListOfflineRegionsCallback> listOfflineRegionsCallbackClass = jni::Class<OfflineManager::ListOfflineRegionsCallback>::Find(env);

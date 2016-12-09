@@ -192,6 +192,10 @@ public class OfflineManager {
         return instance;
     }
 
+    public static synchronized boolean isAvailable() {
+        return instance != null || MapboxAccountManager.isStarted();
+    }
+
     /**
      * Access token getter/setter
      *
@@ -307,6 +311,10 @@ public class OfflineManager {
         setOfflineMapboxTileCountLimit(mDefaultFileSourcePtr, limit);
     }
 
+    public void cleanAmbientCache() {
+        cleanAmbientCache(mDefaultFileSourcePtr);
+    }
+
 
     /*
      * Native methods
@@ -328,5 +336,8 @@ public class OfflineManager {
 
     private native void setOfflineMapboxTileCountLimit(
             long defaultFileSourcePtr, long limit);
+
+    private native void cleanAmbientCache(
+            long defaultFileSourcePtr);
 
 }
