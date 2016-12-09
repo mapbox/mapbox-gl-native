@@ -14,8 +14,13 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/async_task.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/source_impl.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/util/color.hpp>
+#include <mapbox/geojson.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -505,3 +510,31 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));
     util::RunLoop::Get()->run();
 }
+
+TEST(Map, ReplaceSource) {
+    MapTest test;
+
+    Map map(test.backend, test.view.size, 1, test.fileSource, test.threadPool, MapMode::Still);
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+
+    mapbox::geojson::point geometry1{ -50.0, -50.0 };
+    auto source = std::make_unique<GeoJSONSource>("source");
+    source->setGeoJSON(geometry1);
+    map.addSource(std::move(source));
+
+    auto layer = std::make_unique<CircleLayer>("layer", "source");
+    layer->setCircleRadius(8.0);
+    layer->setCircleColor({{ 1, 0, 0, 1 }});
+    map.addLayer(std::move(layer));
+
+    test::checkImage("test/fixtures/map/replace_source/added", test::render(map, test.view));
+
+    mapbox::geojson::point geometry2{ 50.0, 50.0 };
+    map.removeSource("source");
+    source = std::make_unique<GeoJSONSource>("source");
+    source->setGeoJSON(geometry2);
+    map.addSource(std::move(source));
+
+    test::checkImage("test/fixtures/map/replace_source/readded", test::render(map, test.view));
+}
+
