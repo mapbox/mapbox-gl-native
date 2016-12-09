@@ -15,6 +15,7 @@ typedef NS_ENUM(NSUInteger, MGLTileSetScheme) {
  `MGLRasterSource` instead of an `NSURL` representing a TileJSON URL to create a 
  source.
  */
+MGL_EXTERN
 @interface MGLTileSet : NSObject
 
 /**

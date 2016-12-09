@@ -117,6 +117,7 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLPointFeature` class represents a point in a
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
+MGL_EXTERN
 @interface MGLPointFeature : MGLPointAnnotation <MGLFeature>
 @end
 
@@ -124,6 +125,7 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLPolylineFeature` class represents a polyline in a
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
+MGL_EXTERN
 @interface MGLPolylineFeature : MGLPolyline <MGLFeature>
 @end
 
@@ -131,6 +133,7 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLPolygonFeature` class represents a polygon in a
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
+MGL_EXTERN
 @interface MGLPolygonFeature : MGLPolygon <MGLFeature>
 @end
 
@@ -138,6 +141,7 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLPointCollectionFeature` class represents a multipoint in a
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
+MGL_EXTERN
 @interface MGLPointCollectionFeature : MGLPointCollection <MGLFeature>
 @end
 
@@ -145,6 +149,7 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLMultiPolylineFeature` class represents a multipolyline in a
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
+MGL_EXTERN
 @interface MGLMultiPolylineFeature : MGLMultiPolyline <MGLFeature>
 @end
 
@@ -152,6 +157,7 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLMultiPolygonFeature` class represents a multipolygon in a
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
+MGL_EXTERN
 @interface MGLMultiPolygonFeature : MGLMultiPolygon <MGLFeature>
 @end
 
@@ -159,6 +165,7 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLShapeCollectionFeature` class represents a shape collection in a
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
+MGL_EXTERN
 @interface MGLShapeCollectionFeature : MGLShapeCollection <MGLFeature>
 
 @property (nonatomic, copy, readonly) NS_ARRAY_OF(MGLShape<MGLFeature> *) *shapes;

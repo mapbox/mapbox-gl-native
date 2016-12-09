@@ -1,8 +1,10 @@
-#import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
+
+#import "MGLTypes.h"
 
 @protocol MGLLocationManagerDelegate;
 
+MGL_EXTERN
 @interface MGLLocationManager : NSObject <CLLocationManagerDelegate>
 
 @property (nonatomic, weak) id<MGLLocationManagerDelegate> delegate;

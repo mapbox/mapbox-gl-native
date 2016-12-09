@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  subclasses: `MGLCircleStyleLayer`, `MGLFillStyleLayer`, `MGLLineStyleLayer`,
  and `MGLSymbolStyleLayer`.
  */
+MGL_EXTERN
 @interface MGLVectorStyleLayer : MGLForegroundStyleLayer
 
 #pragma mark Refining a Style Layer’s Content

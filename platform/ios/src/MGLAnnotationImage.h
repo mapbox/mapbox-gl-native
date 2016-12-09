@@ -1,5 +1,7 @@
 #import <UIKit/UIKit.h>
 
+#import "MGLTypes.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -8,6 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
  objects and may be recycled later and put into a reuse queue that is maintained
  by the map view.
  */
+MGL_EXTERN
 @interface MGLAnnotationImage : NSObject
 
 #pragma mark Initializing and Preparing the Image Object

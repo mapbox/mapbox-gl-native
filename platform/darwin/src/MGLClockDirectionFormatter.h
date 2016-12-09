@@ -1,5 +1,6 @@
-#import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
+
+#import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
  irrespective of the user’s orientation, use `MGLCompassDirectionFormatter`
  instead.
  */
+MGL_EXTERN
 @interface MGLClockDirectionFormatter : NSFormatter
 
 /**

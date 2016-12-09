@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-raster">The
  style specification.</a>
  */
+MGL_EXTERN
 @interface MGLRasterSource : MGLSource
 
 #pragma mark Initializing a Source

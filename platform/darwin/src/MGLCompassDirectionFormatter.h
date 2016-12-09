@@ -1,5 +1,6 @@
-#import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
+
+#import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -12,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  irrespective of the user’s current location. To format a direction relative to
  the user’s current location, use `MGLClockDirectionFormatter` instead.
  */
+MGL_EXTERN
 @interface MGLCompassDirectionFormatter : NSFormatter
 
 /**

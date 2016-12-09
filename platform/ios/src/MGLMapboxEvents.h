@@ -30,6 +30,7 @@ extern NSString *const MGLEventGesturePitchStart;
 typedef NS_DICTIONARY_OF(NSString *, id) MGLMapboxEventAttributes;
 typedef NS_MUTABLE_DICTIONARY_OF(NSString *, id) MGLMutableMapboxEventAttributes;
 
+MGL_EXTERN
 @interface MGLMapboxEvents : NSObject
 
 + (nullable instancetype)sharedManager;

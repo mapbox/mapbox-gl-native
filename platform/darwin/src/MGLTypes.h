@@ -2,6 +2,12 @@
 
 #pragma once
 
+#ifdef __cplusplus
+#define MGL_EXTERN extern "C" __attribute__((visibility ("default")))
+#else
+#define MGL_EXTERN extern __attribute__((visibility ("default")))
+#endif
+
 #if TARGET_OS_IPHONE
 @class UIImage;
 #define MGLImage UIImage

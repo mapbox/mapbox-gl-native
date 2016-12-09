@@ -1,5 +1,4 @@
-#import <Foundation/Foundation.h>
-
+#import "MGLTypes.h"
 #import "MGLOfflineRegion.h"
 #import "MGLGeometry.h"
 
@@ -9,6 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
  An offline region defined by a style URL, geographic coordinate bounds, and
  range of zoom levels.
  */
+MGL_EXTERN
 @interface MGLTilePyramidOfflineRegion : NSObject <MGLOfflineRegion, NSSecureCoding, NSCopying>
 
 /**

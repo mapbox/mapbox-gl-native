@@ -44,6 +44,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
  `MGLMapView` for its `style` and obtain existing layers using the 
  `-[MGLStyle layerWithIdentifier:]` method. 
  */
+MGL_EXTERN
 @interface MGLCircleStyleLayer : MGLVectorStyleLayer
 
 #pragma mark - Accessing the Paint Attributes

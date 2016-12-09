@@ -6,6 +6,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+MGL_EXTERN
 @interface MGLAnnotationContainerView : UIView
 
 + (instancetype)annotationContainerViewWithAnnotationContainerView:(MGLAnnotationContainerView *)annotationContainerView;

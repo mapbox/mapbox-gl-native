@@ -61,6 +61,7 @@ extern const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationToleranc
  @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson">The
     style specification.</a>
  */
+MGL_EXTERN
 @interface MGLGeoJSONSource : MGLSource
 
 #pragma mark Initializing a Source

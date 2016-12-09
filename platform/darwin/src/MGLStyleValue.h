@@ -1,5 +1,6 @@
-#import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
+
+#import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -25,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  <li>`NSArray`</li>
  </ul>
  */
+MGL_EXTERN
 @interface MGLStyleValue<T> : NSObject
 
 #pragma mark Creating a Style Value
@@ -68,6 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLStyleConstantValue` class takes a generic parameter `T` that indicates
  the Foundation class being wrapped by this class.
  */
+MGL_EXTERN
 @interface MGLStyleConstantValue<T> : MGLStyleValue<T>
 
 #pragma mark Creating a Style Constant Value
@@ -111,6 +114,7 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLStyleFunction` class takes a generic parameter `T` that indicates the
  Foundation class being wrapped by this class.
  */
+MGL_EXTERN
 @interface MGLStyleFunction<T> : MGLStyleValue<T>
 
 #pragma mark Creating a Style Function
