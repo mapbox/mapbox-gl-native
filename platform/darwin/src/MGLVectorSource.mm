@@ -1,4 +1,4 @@
-#import "MGLVectorSource.h"
+#import "MGLVectorSource_Private.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
@@ -8,6 +8,8 @@
 #include <mbgl/style/sources/vector_source.hpp>
 
 @interface MGLVectorSource ()
+
+- (instancetype)initWithRawSource:(mbgl::style::VectorSource *)rawSource NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic) mbgl::style::VectorSource *rawSource;
 
@@ -34,6 +36,16 @@
     {
         _tileSet = tileSet;
         [self commonInit];
+    }
+    return self;
+}
+
+- (instancetype)initWithRawSource:(mbgl::style::VectorSource *)rawSource {
+    if (self = [super initWithRawSource:rawSource]) {
+        if (auto attribution = rawSource->getAttribution()) {
+            _tileSet = [[MGLTileSet alloc] initWithTileURLTemplates:@[]];
+            _tileSet.attribution = @(attribution->c_str());
+        }
     }
     return self;
 }

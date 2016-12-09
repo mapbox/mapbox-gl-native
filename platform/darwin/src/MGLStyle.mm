@@ -17,9 +17,12 @@
 #import "NSDate+MGLAdditions.h"
 
 #import "MGLSource.h"
-#import "MGLVectorSource.h"
+#import "MGLVectorSource_Private.h"
 #import "MGLRasterSource.h"
 #import "MGLGeoJSONSource.h"
+
+#import "MGLAttributionInfo.h"
+#import "MGLTileSet_Private.h"
 
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
@@ -158,25 +161,18 @@ static NSURL *MGLStyleURL_emerald;
     return rawSource ? [self sourceFromMBGLSource:rawSource] : nil;
 }
 
-- (MGLSource *)sourceFromMBGLSource:(mbgl::style::Source *)mbglSource {
-    NSString *identifier = @(mbglSource->getID().c_str());
-    
+- (MGLSource *)sourceFromMBGLSource:(mbgl::style::Source *)source {
     // TODO: Fill in options specific to the respective source classes
     // https://github.com/mapbox/mapbox-gl-native/issues/6584
-    MGLSource *source;
-    if (mbglSource->is<mbgl::style::VectorSource>()) {
-        source = [[MGLVectorSource alloc] initWithIdentifier:identifier];
-    } else if (mbglSource->is<mbgl::style::GeoJSONSource>()) {
-        source = [[MGLGeoJSONSource alloc] initWithIdentifier:identifier];
-    } else if (mbglSource->is<mbgl::style::RasterSource>()) {
-        source = [[MGLRasterSource alloc] initWithIdentifier:identifier];
+    if (auto vectorSource = source->as<mbgl::style::VectorSource>()) {
+        return [[MGLVectorSource alloc] initWithRawSource:vectorSource];
+    } else if (auto geoJSONSource = source->as<mbgl::style::GeoJSONSource>()) {
+        return [[MGLGeoJSONSource alloc] initWithRawSource:geoJSONSource];
+    } else if (auto rasterSource = source->as<mbgl::style::RasterSource>()) {
+        return [[MGLRasterSource alloc] initWithRawSource:rasterSource];
     } else {
-        source = [[MGLSource alloc] initWithIdentifier:identifier];
+        return [[MGLSource alloc] initWithRawSource:source];
     }
-    
-    source.rawSource = mbglSource;
-
-    return source;
 }
 
 - (void)addSource:(MGLSource *)source
@@ -204,6 +200,25 @@ static NSURL *MGLStyleURL_emerald;
          source];
     }
     [source removeFromMapView:self.mapView];
+}
+
+- (nullable NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
+    // It’d be incredibly convenient to use -sources here, but this operation
+    // depends on the sources being sorted in ascending order by creation, as
+    // with the std::vector used in mbgl.
+    auto rawSources = self.mapView.mbglMap->getSources();
+    NSMutableArray *infos = [NSMutableArray arrayWithCapacity:rawSources.size()];
+    for (auto rawSource = rawSources.begin(); rawSource != rawSources.end(); ++rawSource) {
+        MGLSource *source = [self sourceFromMBGLSource:*rawSource];
+        if (![source isKindOfClass:[MGLVectorSource class]]
+            && ![source isKindOfClass:[MGLRasterSource class]]) {
+            continue;
+        }
+        
+        NSArray *tileSetInfos = [[(id)source tileSet] attributionInfosWithFontSize:fontSize linkColor:linkColor];
+        [infos growArrayByAddingAttributionInfosFromArray:tileSetInfos];
+    }
+    return infos;
 }
 
 #pragma mark Style layers

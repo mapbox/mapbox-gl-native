@@ -18,6 +18,8 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
 
 @interface MGLGeoJSONSource ()
 
+- (instancetype)initWithRawSource:(mbgl::style::GeoJSONSource *)rawSource NS_DESIGNATED_INITIALIZER;
+
 @property (nonatomic, readwrite) NSDictionary *options;
 @property (nonatomic) mbgl::style::GeoJSONSource *rawSource;
 
@@ -58,6 +60,10 @@ const MGLGeoJSONSourceOption MGLGeoJSONSourceOptionSimplificationTolerance = @"M
         [self commonInit];
     }
     return self;
+}
+
+- (instancetype)initWithRawSource:(mbgl::style::GeoJSONSource *)rawSource {
+    return [super initWithRawSource:rawSource];
 }
 
 - (void)addToMapView:(MGLMapView *)mapView

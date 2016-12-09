@@ -1,5 +1,7 @@
 #import "MGLTileSet.h"
 
+#import "MGLAttributionInfo.h"
+
 #include <mbgl/util/tileset.hpp>
 
 @implementation MGLTileSet
@@ -55,6 +57,12 @@
     }
     
     _maximumZoomLevel = maximumZoomLevel;
+}
+
+- (nullable NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
+    return [MGLAttributionInfo attributionInfosFromHTMLString:self.attribution
+                                                     fontSize:fontSize
+                                                    linkColor:linkColor];
 }
 
 - (mbgl::Tileset)mbglTileset

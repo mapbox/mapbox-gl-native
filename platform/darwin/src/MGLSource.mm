@@ -20,6 +20,14 @@
     return self;
 }
 
+- (instancetype)initWithRawSource:(mbgl::style::Source *)rawSource {
+    NSString *identifier = @(rawSource->getID().c_str());
+    if (self = [self initWithIdentifier:identifier]) {
+        _rawSource = rawSource;
+    }
+    return self;
+}
+
 - (void)addToMapView:(MGLMapView *)mapView {
     [NSException raise:NSInvalidArgumentException format:
      @"The source %@ cannot be added to the style. "
