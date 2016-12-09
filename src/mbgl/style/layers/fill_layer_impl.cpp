@@ -15,6 +15,10 @@ void FillLayer::Impl::cascade(const CascadeParameters& parameters) {
 bool FillLayer::Impl::evaluate(const PropertyEvaluationParameters& parameters) {
     paint.evaluate(parameters);
 
+    if (paint.unevaluated.get<FillOutlineColor>().isUndefined()) {
+        paint.evaluated.get<FillOutlineColor>() = paint.evaluated.get<FillColor>();
+    }
+
     passes = RenderPass::None;
 
     if (paint.evaluated.get<FillAntialias>()) {
