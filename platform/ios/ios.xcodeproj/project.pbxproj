@@ -493,9 +493,7 @@
 
 /* Begin PBXFileReference section */
 		20DABE861DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Foundation.strings"; sourceTree = "<group>"; };
-		20DABE871DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "zh-Hans"; path = "zh-Hans.lproj/Foundation.stringsdict"; sourceTree = "<group>"; };
 		20DABE881DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		20DABE891DF78149007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
 		20DABE8A1DF78149007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Root.strings"; sourceTree = "<group>"; };
 		30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+MGLAdditions.h"; path = "src/UIImage+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
 		30E578121DAA7D690050F07E /* UIImage+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "UIImage+MGLAdditions.mm"; path = "src/UIImage+MGLAdditions.mm"; sourceTree = SOURCE_ROOT; };
@@ -2147,7 +2145,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				DA8933BE1CCD2CAD00E68420 /* en */,
-				20DABE871DF78148007AC5FF /* zh-Hans */,
 			);
 			name = Foundation.stringsdict;
 			sourceTree = "<group>";
@@ -2164,7 +2161,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				DAC49C621CD07D74009E1AA3 /* en */,
-				20DABE891DF78149007AC5FF /* zh-Hans */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
