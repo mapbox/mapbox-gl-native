@@ -7,6 +7,7 @@ import android.support.annotation.UiThread;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
@@ -38,6 +39,13 @@ final class Transform implements MapView.OnMapChangedListener {
         this.trackingSettings = trackingSettings;
         this.myLocationView = trackingSettings.getMyLocationView();
         mapView.addOnMapChangedListener(this);
+    }
+
+    void initialise(@NonNull MapboxMap mapboxMap, @NonNull MapboxMapOptions options) {
+        CameraPosition position = options.getCamera();
+        if (position != null && !position.equals(CameraPosition.DEFAULT)) {
+            moveCamera(mapboxMap, CameraUpdateFactory.newCameraPosition(position), null);
+        }
     }
 
     //

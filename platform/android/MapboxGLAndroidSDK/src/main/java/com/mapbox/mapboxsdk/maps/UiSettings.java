@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.support.annotation.ColorInt;
@@ -52,9 +54,72 @@ public final class UiSettings {
         this.compassView = compassView;
         this.attributionsView = attributionsView;
         this.logoView = logoView;
-        if(logoView.getResources()!=null) {
+        if (logoView.getResources() != null) {
             this.pixelRatio = logoView.getResources().getDisplayMetrics().density;
         }
+    }
+
+    void initialise(@NonNull Context context, @NonNull MapboxMapOptions options) {
+        Resources resources = context.getResources();
+        initialiseGestures(options);
+        initialiseCompass(options, resources);
+        initialiseLogo(options, resources);
+        initialiseAttribution(context, options);
+    }
+
+    private void initialiseGestures(MapboxMapOptions options) {
+        setZoomGesturesEnabled(options.getZoomGesturesEnabled());
+        setZoomGestureChangeAllowed(options.getZoomGesturesEnabled());
+        setScrollGesturesEnabled(options.getScrollGesturesEnabled());
+        setScrollGestureChangeAllowed(options.getScrollGesturesEnabled());
+        setRotateGesturesEnabled(options.getRotateGesturesEnabled());
+        setRotateGestureChangeAllowed(options.getRotateGesturesEnabled());
+        setTiltGesturesEnabled(options.getTiltGesturesEnabled());
+        setTiltGestureChangeAllowed(options.getTiltGesturesEnabled());
+        setZoomControlsEnabled(options.getZoomControlsEnabled());
+    }
+
+    private void initialiseCompass(MapboxMapOptions options, Resources resources) {
+        setCompassEnabled(options.getCompassEnabled());
+        setCompassGravity(options.getCompassGravity());
+        int[] compassMargins = options.getCompassMargins();
+        if (compassMargins != null) {
+            setCompassMargins(compassMargins[0], compassMargins[1], compassMargins[2], compassMargins[3]);
+        } else {
+            int tenDp = (int) resources.getDimension(R.dimen.mapbox_ten_dp);
+            setCompassMargins(tenDp, tenDp, tenDp, tenDp);
+        }
+        setCompassFadeFacingNorth(options.getCompassFadeFacingNorth());
+    }
+
+    private void initialiseLogo(MapboxMapOptions options, Resources resources) {
+        setLogoEnabled(options.getLogoEnabled());
+        setLogoGravity(options.getLogoGravity());
+        int[] logoMargins = options.getLogoMargins();
+        if (logoMargins != null) {
+            setLogoMargins(logoMargins[0], logoMargins[1], logoMargins[2], logoMargins[3]);
+        } else {
+            int sixteenDp = (int) resources.getDimension(R.dimen.mapbox_sixteen_dp);
+            setLogoMargins(sixteenDp, sixteenDp, sixteenDp, sixteenDp);
+        }
+    }
+
+    private void initialiseAttribution(Context context, MapboxMapOptions options) {
+        Resources resources = context.getResources();
+        setAttributionEnabled(options.getAttributionEnabled());
+        setAttributionGravity(options.getAttributionGravity());
+        int[] attributionMargins = options.getAttributionMargins();
+        if (attributionMargins != null) {
+            setAttributionMargins(attributionMargins[0], attributionMargins[1], attributionMargins[2], attributionMargins[3]);
+        } else {
+            int sevenDp = (int) resources.getDimension(R.dimen.mapbox_seven_dp);
+            int seventySixDp = (int) resources.getDimension(R.dimen.mapbox_seventy_six_dp);
+            setAttributionMargins(seventySixDp, sevenDp, sevenDp, sevenDp);
+        }
+
+        int attributionTintColor = options.getAttributionTintColor();
+        setAttributionTintColor(attributionTintColor != -1
+                ? attributionTintColor : ColorUtils.getPrimaryColor(context));
     }
 
     /**

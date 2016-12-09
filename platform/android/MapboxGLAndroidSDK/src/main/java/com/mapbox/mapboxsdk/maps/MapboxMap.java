@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -12,16 +11,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.util.Pools;
-
-import timber.log.Timber;
-
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ZoomButtonsController;
 
 import com.mapbox.mapboxsdk.MapboxAccountManager;
-import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
@@ -47,11 +41,12 @@ import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
-import com.mapbox.mapboxsdk.utils.ColorUtils;
 import com.mapbox.services.commons.geojson.Feature;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * The general class to interact with in the Android Mapbox SDK. It exposes the entry point for all
@@ -90,104 +85,21 @@ public final class MapboxMap {
         this.onRegisterTouchListener = listener;
     }
 
-    void initialise(Context context, MapboxMapOptions options) {
-        // TODO migrate code from this method to the classes they impact themselves
-        setDebugActive(options.getDebugActive());
-
-        CameraPosition position = options.getCamera();
-        if (position != null && !position.equals(CameraPosition.DEFAULT)) {
-            transform.moveCamera(this, CameraUpdateFactory.newCameraPosition(position), null);
-            myLocationViewSettings.setTilt(position.tilt);
-        }
+    void initialise(@NonNull Context context, @NonNull MapboxMapOptions options) {
+        transform.initialise(this, options);
+        uiSettings.initialise(context, options);
+        myLocationViewSettings.initialise(options);
 
         // api base url
-        String apiBaseUrl = options.getApiBaseUrl();
-        if (!TextUtils.isEmpty(apiBaseUrl)) {
-            nativeMapView.setApiBaseUrl(apiBaseUrl);
-        }
+        setDebugActive(options.getDebugActive());
+        setApiBaseUrl(options);
+        setAccessToken(options);
+        setStyleUrl(options);
 
-        // access token
-        String accessToken = options.getAccessToken();
-        if (!TextUtils.isEmpty(accessToken)) {
-            nativeMapView.setAccessToken(accessToken);
-        }else{
-            nativeMapView.setAccessToken(MapboxAccountManager.getInstance().getAccessToken());
-        }
-
-        // style url
-        String style = options.getStyle();
-        if (!TextUtils.isEmpty(style)) {
-            nativeMapView.setStyleUrl(style);
-        }
-
-        // MyLocationView
-        myLocationViewSettings.setForegroundDrawable(
-                options.getMyLocationForegroundDrawable(), options.getMyLocationForegroundBearingDrawable());
-        myLocationViewSettings.setForegroundTintColor(options.getMyLocationForegroundTintColor());
-        myLocationViewSettings.setBackgroundDrawable(
-                options.getMyLocationBackgroundDrawable(), options.getMyLocationBackgroundPadding());
-        myLocationViewSettings.setBackgroundTintColor(options.getMyLocationBackgroundTintColor());
-        myLocationViewSettings.setAccuracyAlpha(options.getMyLocationAccuracyAlpha());
-        myLocationViewSettings.setAccuracyTintColor(options.getMyLocationAccuracyTintColor());
+        // todo migrate with other PR
         setMyLocationEnabled(options.getLocationEnabled());
-
-        // Enable gestures
-        uiSettings.setZoomGesturesEnabled(options.getZoomGesturesEnabled());
-        uiSettings.setZoomGestureChangeAllowed(options.getZoomGesturesEnabled());
-        uiSettings.setScrollGesturesEnabled(options.getScrollGesturesEnabled());
-        uiSettings.setScrollGestureChangeAllowed(options.getScrollGesturesEnabled());
-        uiSettings.setRotateGesturesEnabled(options.getRotateGesturesEnabled());
-        uiSettings.setRotateGestureChangeAllowed(options.getRotateGesturesEnabled());
-        uiSettings.setTiltGesturesEnabled(options.getTiltGesturesEnabled());
-        uiSettings.setTiltGestureChangeAllowed(options.getTiltGesturesEnabled());
-
-        // Ui Controls
-        uiSettings.setZoomControlsEnabled(options.getZoomControlsEnabled());
-
-        // Zoom
         setMaxZoom(options.getMaxZoom());
         setMinZoom(options.getMinZoom());
-
-        Resources resources = context.getResources();
-
-        // Compass
-        uiSettings.setCompassEnabled(options.getCompassEnabled());
-        uiSettings.setCompassGravity(options.getCompassGravity());
-        int[] compassMargins = options.getCompassMargins();
-        if (compassMargins != null) {
-            uiSettings.setCompassMargins(compassMargins[0], compassMargins[1], compassMargins[2], compassMargins[3]);
-        } else {
-            int tenDp = (int) resources.getDimension(R.dimen.mapbox_ten_dp);
-            uiSettings.setCompassMargins(tenDp, tenDp, tenDp, tenDp);
-        }
-        uiSettings.setCompassFadeFacingNorth(options.getCompassFadeFacingNorth());
-
-        // Logo
-        uiSettings.setLogoEnabled(options.getLogoEnabled());
-        uiSettings.setLogoGravity(options.getLogoGravity());
-        int[] logoMargins = options.getLogoMargins();
-        if (logoMargins != null) {
-            uiSettings.setLogoMargins(logoMargins[0], logoMargins[1], logoMargins[2], logoMargins[3]);
-        } else {
-            int sixteenDp = (int) resources.getDimension(R.dimen.mapbox_sixteen_dp);
-            uiSettings.setLogoMargins(sixteenDp, sixteenDp, sixteenDp, sixteenDp);
-        }
-
-        // Attribution
-        uiSettings.setAttributionEnabled(options.getAttributionEnabled());
-        uiSettings.setAttributionGravity(options.getAttributionGravity());
-        int[] attributionMargins = options.getAttributionMargins();
-        if (attributionMargins != null) {
-            uiSettings.setAttributionMargins(attributionMargins[0], attributionMargins[1], attributionMargins[2], attributionMargins[3]);
-        } else {
-            int sevenDp = (int) resources.getDimension(R.dimen.mapbox_seven_dp);
-            int seventySixDp = (int) resources.getDimension(R.dimen.mapbox_seventy_six_dp);
-            uiSettings.setAttributionMargins(seventySixDp, sevenDp, sevenDp, sevenDp);
-        }
-
-        int attributionTintColor = options.getAttributionTintColor();
-        uiSettings.setAttributionTintColor(attributionTintColor != -1
-                ? attributionTintColor : ColorUtils.getPrimaryColor(context));
     }
 
     // Style
@@ -799,6 +711,17 @@ public final class MapboxMap {
     }
 
     //
+    // API endpoint config
+    //
+
+    private void setApiBaseUrl(@NonNull MapboxMapOptions options) {
+        String apiBaseUrl = options.getApiBaseUrl();
+        if (!TextUtils.isEmpty(apiBaseUrl)) {
+            nativeMapView.setApiBaseUrl(apiBaseUrl);
+        }
+    }
+
+    //
     // Styling
     //
 
@@ -859,6 +782,18 @@ public final class MapboxMap {
     }
 
     /**
+     * Loads a new map style from MapboxMapOptions if available.
+     *
+     * @param options the object containing the style url
+     */
+    private void setStyleUrl(@NonNull MapboxMapOptions options) {
+        String style = options.getStyle();
+        if (!TextUtils.isEmpty(style)) {
+            setStyleUrl(style);
+        }
+    }
+
+    /**
      * <p>
      * Returns the map style currently displayed in the map view.
      * </p>
@@ -910,6 +845,15 @@ public final class MapboxMap {
     @Nullable
     public String getAccessToken() {
         return nativeMapView.getAccessToken();
+    }
+
+    private void setAccessToken(@NonNull MapboxMapOptions options) {
+        String accessToken = options.getAccessToken();
+        if (!TextUtils.isEmpty(accessToken)) {
+            nativeMapView.setAccessToken(accessToken);
+        } else {
+            nativeMapView.setAccessToken(MapboxAccountManager.getInstance().getAccessToken());
+        }
     }
 
     //
