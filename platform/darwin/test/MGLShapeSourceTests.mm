@@ -2,26 +2,26 @@
 
 #import <Mapbox/Mapbox.h>
 #import "MGLFeature_Private.h"
-#import "MGLGeoJSONSource_Private.h"
+#import "MGLShapeSource_Private.h"
 #import "MGLSource_Private.h"
 
 #include <mbgl/style/sources/geojson_source.hpp>
 
-@interface MGLGeoJSONSourceTests : XCTestCase
+@interface MGLShapeSourceTests : XCTestCase
 @end
 
-@implementation MGLGeoJSONSourceTests
+@implementation MGLShapeSourceTests
 
-- (void)testMGLGeoJSONSourceWithOptions {
+- (void)testMGLShapeSourceWithOptions {
     NSURL *url = [NSURL URLWithString:@"http://www.mapbox.com/source"];
     
-    NSDictionary *options = @{MGLGeoJSONSourceOptionClustered: @YES,
-                              MGLGeoJSONSourceOptionClusterRadius: @42,
-                              MGLGeoJSONSourceOptionMaximumZoomLevelForClustering: @98,
-                              MGLGeoJSONSourceOptionMaximumZoomLevel: @99,
-                              MGLGeoJSONSourceOptionBuffer: @1976,
-                              MGLGeoJSONSourceOptionSimplificationTolerance: @0.42};
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" URL:url options:options];
+    NSDictionary *options = @{MGLShapeSourceOptionClustered: @YES,
+                              MGLShapeSourceOptionClusterRadius: @42,
+                              MGLShapeSourceOptionMaximumZoomLevelForClustering: @98,
+                              MGLShapeSourceOptionMaximumZoomLevel: @99,
+                              MGLShapeSourceOptionBuffer: @1976,
+                              MGLShapeSourceOptionSimplificationTolerance: @0.42};
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" URL:url options:options];
     
     auto mbglOptions = [source geoJSONOptions];
     XCTAssertTrue(mbglOptions.cluster);
@@ -31,21 +31,21 @@
     XCTAssertEqual(mbglOptions.buffer, 1976);
     XCTAssertEqual(mbglOptions.tolerance, 0.42);
   
-    options = @{MGLGeoJSONSourceOptionClustered: @"number 1"};
-    XCTAssertThrows([[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" URL:url options:options]);
+    options = @{MGLShapeSourceOptionClustered: @"number 1"};
+    XCTAssertThrows([[MGLShapeSource alloc] initWithIdentifier:@"source-id" URL:url options:options]);
 }
 
 - (void)testNilShape {
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"id" shape:nil options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"id" shape:nil options:nil];
     XCTAssertNil(source.shape);
 }
 
-- (void)testMGLGeoJSONSourceWithDataMultipleFeatures {
+- (void)testMGLShapeSourceWithDataMultipleFeatures {
     
     NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-104.34814453125,37.64903402157866]]}}]}";
     
     NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" geoJSONData:data options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" geoJSONData:data options:nil];
     
     MGLShapeCollection *collection = (MGLShapeCollection *)source.shape;
     XCTAssertNotNil(collection);
@@ -53,25 +53,25 @@
     XCTAssertTrue([collection.shapes.firstObject isMemberOfClass:[MGLPolylineFeature class]]);
 }
 
-- (void)testMGLGeoJSONSourceWithSingleFeature {
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"geojson"
+- (void)testMGLShapeSourceWithSingleFeature {
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"geojson"
                                                                 geoJSONData:[@"{\"type\": \"Point\", \"coordinates\": [0, 0]}" dataUsingEncoding:NSUTF8StringEncoding]
                                                                     options:nil];
     XCTAssertNotNil(source.shape);
     XCTAssert([source.shape isKindOfClass:[MGLPointFeature class]]);
 }
 
-- (void)testMGLGeoJSONSourceWithPolylineFeatures {
+- (void)testMGLShapeSourceWithPolylineFeatures {
     CLLocationCoordinate2D coordinates[] = { CLLocationCoordinate2DMake(0, 0), CLLocationCoordinate2DMake(10, 10)};
     MGLPolylineFeature *polylineFeature = [MGLPolylineFeature polylineWithCoordinates:coordinates count:2];
     
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" shape:polylineFeature options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:polylineFeature options:nil];
     
     XCTAssertNotNil(source.shape);
     XCTAssertTrue([source.shape isMemberOfClass:[MGLPolylineFeature class]]);
 }
 
-- (void)testMGLGeoJSONSourceWithPolygonFeatures {
+- (void)testMGLShapeSourceWithPolygonFeatures {
     CLLocationCoordinate2D coordinates[] = {
         CLLocationCoordinate2DMake(100.0, 0.0),
         CLLocationCoordinate2DMake(101.0, 0.0),
@@ -101,7 +101,7 @@
                                   @"array-of-array-attribute": arrayOfArrays,
                                   @"array-of-dictionary-attribute": arrayOfDictionaries};
     
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" shape:polygonFeature options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:polygonFeature options:nil];
     
     XCTAssertNotNil(source.shape);
     MGLPolygonFeature *expectedPolygonFeature = (MGLPolygonFeature *)source.shape;
@@ -117,7 +117,7 @@
     XCTAssertEqualObjects(expectedPolygonFeature.attributes[@"array-of-dictionary-attribute"], arrayOfDictionaries);
 }
 
-- (void)testMGLGeoJSONSourceWithPolygonFeaturesInculdingInteriorPolygons {
+- (void)testMGLShapeSourceWithPolygonFeaturesInculdingInteriorPolygons {
     CLLocationCoordinate2D coordinates[] = {
         CLLocationCoordinate2DMake(100.0, 0.0),
         CLLocationCoordinate2DMake(101.0, 0.0),
@@ -136,26 +136,26 @@
     
     MGLPolygonFeature *polygonFeature = [MGLPolygonFeature polygonWithCoordinates:coordinates count:5 interiorPolygons:@[polygon]];
     
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" shape:polygonFeature options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:polygonFeature options:nil];
     
     XCTAssertNotNil(source.shape);
     XCTAssertTrue([source.shape isMemberOfClass:[MGLPolygonFeature class]]);
 }
 
-- (void)testMGLGeoJSONSourceWithMultiPolylineFeatures {
+- (void)testMGLShapeSourceWithMultiPolylineFeatures {
     CLLocationCoordinate2D firstCoordinates[] = { CLLocationCoordinate2DMake(0, 0), CLLocationCoordinate2DMake(10, 10)};
     MGLPolylineFeature *firstPolylineFeature = [MGLPolylineFeature polylineWithCoordinates:firstCoordinates count:2];
     CLLocationCoordinate2D secondCoordinates[] = { CLLocationCoordinate2DMake(0, 0), CLLocationCoordinate2DMake(10, 10)};
     MGLPolylineFeature *secondPolylineFeature = [MGLPolylineFeature polylineWithCoordinates:secondCoordinates count:2];
     MGLMultiPolylineFeature *multiPolylineFeature = [MGLMultiPolylineFeature multiPolylineWithPolylines:@[firstPolylineFeature, secondPolylineFeature]];
     
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" shape:multiPolylineFeature options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:multiPolylineFeature options:nil];
     
     XCTAssertNotNil(source.shape);
     XCTAssertTrue([source.shape isMemberOfClass:[MGLMultiPolylineFeature class]]);
 }
 
-- (void)testMGLGeoJSONSourceWithMultiPolygonFeatures {
+- (void)testMGLShapeSourceWithMultiPolygonFeatures {
     CLLocationCoordinate2D coordinates[] = {
         CLLocationCoordinate2DMake(100.0, 0.0),
         CLLocationCoordinate2DMake(101.0, 0.0),
@@ -177,23 +177,23 @@
     
     MGLMultiPolygonFeature *multiPolygonFeature = [MGLMultiPolygonFeature multiPolygonWithPolygons:@[firstPolygon, secondPolygon]];
     
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" shape:multiPolygonFeature options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:multiPolygonFeature options:nil];
     
     XCTAssertNotNil(source.shape);
     XCTAssertTrue([source.shape isMemberOfClass:[MGLMultiPolygonFeature class]]);
 }
 
-- (void)testMGLGeoJSONSourceWithPointFeature {
+- (void)testMGLShapeSourceWithPointFeature {
     MGLPointFeature *pointFeature = [MGLPointFeature new];
     pointFeature.coordinate = CLLocationCoordinate2DMake(100.2, 0.2);
     
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"souce-id" shape:pointFeature options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"souce-id" shape:pointFeature options:nil];
     
     XCTAssertNotNil(source.shape);
     XCTAssertTrue([source.shape isMemberOfClass:[MGLPointFeature class]]);
 }
 
-- (void)testMGLGeoJSONSourceWithPointCollectionFeature {
+- (void)testMGLShapeSourceWithPointCollectionFeature {
     CLLocationCoordinate2D coordinates[] = {
         CLLocationCoordinate2DMake(100.0, 0.0),
         CLLocationCoordinate2DMake(101.0, 0.0),
@@ -201,13 +201,13 @@
         CLLocationCoordinate2DMake(100.0, 1.0),
         CLLocationCoordinate2DMake(100.0, 0.0)};
     MGLPointCollectionFeature *pointCollectionFeature = [MGLPointCollectionFeature pointCollectionWithCoordinates:coordinates count:5];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"souce-id" shape:pointCollectionFeature options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"souce-id" shape:pointCollectionFeature options:nil];
 
     XCTAssertNotNil(source.shape);
     XCTAssertTrue([source.shape isMemberOfClass:[MGLPointCollectionFeature class]]);
 }
 
-- (void)testMGLGeoJSONSourceWithShapeCollectionFeatures {
+- (void)testMGLShapeSourceWithShapeCollectionFeatures {
     CLLocationCoordinate2D coordinates[] = {
         CLLocationCoordinate2DMake(100.0, 0.0),
         CLLocationCoordinate2DMake(101.0, 0.0),
@@ -243,7 +243,7 @@
     MGLShapeCollectionFeature *shapeCollectionFeature_1 = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[polygonFeature, polylineFeature, multiPolygonFeature, multiPolylineFeature, pointCollectionFeature, pointFeature, shapeCollectionFeature]];
 
     
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"source-id" shape:shapeCollectionFeature_1 options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:shapeCollectionFeature_1 options:nil];
     
     MGLShapeCollectionFeature *shape = (MGLShapeCollectionFeature *)source.shape;
     

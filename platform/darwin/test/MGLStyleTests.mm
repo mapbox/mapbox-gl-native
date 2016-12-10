@@ -1,7 +1,7 @@
 #import "MGLMapView.h"
 #import "MGLStyle_Private.h"
 
-#import "MGLGeoJSONSource.h"
+#import "MGLShapeSource.h"
 #import "MGLRasterSource.h"
 #import "MGLVectorSource.h"
 
@@ -121,9 +121,9 @@
 }
 
 - (void)testAddingSourcesTwice {
-    MGLGeoJSONSource *geoJSONSource = [[MGLGeoJSONSource alloc] initWithIdentifier:@"geoJSONSource" shape:nil options:nil];
-    [self.style addSource:geoJSONSource];
-    XCTAssertThrowsSpecificNamed([self.style addSource:geoJSONSource], NSException, @"MGLRedundantSourceException");
+    MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"geoJSONSource" shape:nil options:nil];
+    [self.style addSource:shapeSource];
+    XCTAssertThrowsSpecificNamed([self.style addSource:shapeSource], NSException, @"MGLRedundantSourceException");
 
     MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"rasterSource" URL:[NSURL new] tileSize:42];
     [self.style addSource:rasterSource];
@@ -143,7 +143,7 @@
 }
 
 - (void)testAddingLayersTwice {
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"geoJSONSource" shape:nil options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"geoJSONSource" shape:nil options:nil];
 
     MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"backgroundLayer"];
     [self.style addLayer:backgroundLayer];

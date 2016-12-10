@@ -11,7 +11,7 @@
 - (void)testCircleLayer {
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
     [self.mapView.style addSource:source];
     MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     [self.mapView.style addLayer:layer];
