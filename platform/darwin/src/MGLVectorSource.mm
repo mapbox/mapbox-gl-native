@@ -70,9 +70,6 @@
 }
 
 - (NSString *)attribution {
-    if (!self.rawSource) {
-        return nil;
-    }
     auto attribution = self.rawSource->getAttribution();
     return attribution ? @(attribution->c_str()) : nil;
 }
