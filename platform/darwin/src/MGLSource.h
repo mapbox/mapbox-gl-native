@@ -1,5 +1,7 @@
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  `MGLSource` is an abstract base class for map content sources. A map content
  source supplies content to be shown on the map. A source is added to an
@@ -40,3 +42,5 @@
 @property (nonatomic, copy) NSString *identifier;
 
 @end
+
+NS_ASSUME_NONNULL_END
