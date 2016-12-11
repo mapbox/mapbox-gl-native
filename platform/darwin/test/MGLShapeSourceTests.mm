@@ -12,18 +12,15 @@
 
 @implementation MGLShapeSourceTests
 
-- (void)testMGLShapeSourceWithOptions {
-    NSURL *url = [NSURL URLWithString:@"http://www.mapbox.com/source"];
-    
+- (void)testGeoJSONOptionsFromDictionary {
     NSDictionary *options = @{MGLShapeSourceOptionClustered: @YES,
                               MGLShapeSourceOptionClusterRadius: @42,
                               MGLShapeSourceOptionMaximumZoomLevelForClustering: @98,
                               MGLShapeSourceOptionMaximumZoomLevel: @99,
                               MGLShapeSourceOptionBuffer: @1976,
                               MGLShapeSourceOptionSimplificationTolerance: @0.42};
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" URL:url options:options];
     
-    auto mbglOptions = [source geoJSONOptions];
+    auto mbglOptions = MGLGeoJSONOptionsFromDictionary(options);
     XCTAssertTrue(mbglOptions.cluster);
     XCTAssertEqual(mbglOptions.clusterRadius, 42);
     XCTAssertEqual(mbglOptions.clusterMaxZoom, 98);
@@ -32,7 +29,7 @@
     XCTAssertEqual(mbglOptions.tolerance, 0.42);
   
     options = @{MGLShapeSourceOptionClustered: @"number 1"};
-    XCTAssertThrows([[MGLShapeSource alloc] initWithIdentifier:@"source-id" URL:url options:options]);
+    XCTAssertThrows(MGLGeoJSONOptionsFromDictionary(options));
 }
 
 - (void)testNilShape {
