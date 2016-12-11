@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param fontSize The default text size in points.
  @param linkColor The default link color.
  */
-+ (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosFromHTMLString:(NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor;
++ (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosFromHTMLString:(nullable NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor;
 
 - (instancetype)initWithTitle:(NSAttributedString *)title URL:(nullable NSURL *)URL;
 

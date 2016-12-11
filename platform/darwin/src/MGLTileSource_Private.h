@@ -1,12 +1,16 @@
-#import "MGLTileSet.h"
+#import "MGLTileSource.h"
 
-#include <mbgl/util/tileset.hpp>
+#import <CoreGraphics/CoreGraphics.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+namespace mbgl {
+    class Tileset;
+}
+
 @class MGLAttributionInfo;
 
-@interface MGLTileSet (Private)
+@interface MGLTileSource (Private)
 
 /**
  A structured representation of the `attribution` property. The default value is
@@ -17,8 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor;
 
-- (mbgl::Tileset)mbglTileset;
-
 @end
+
+mbgl::Tileset MGLTileSetFromTileURLTemplates(NS_ARRAY_OF(NSString *) *tileURLTemplates, NS_DICTIONARY_OF(MGLTileSourceOption, id) * _Nullable options);
 
 NS_ASSUME_NONNULL_END

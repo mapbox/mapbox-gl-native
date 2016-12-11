@@ -115,6 +115,14 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
     self.rawSource = _pendingSource.get();
 }
 
+- (mbgl::style::GeoJSONSource *)rawSource {
+    return (mbgl::style::GeoJSONSource *)super.rawSource;
+}
+
+- (void)setRawSource:(mbgl::style::GeoJSONSource *)rawSource {
+    super.rawSource = rawSource;
+}
+
 - (mbgl::style::GeoJSONOptions)geoJSONOptions
 {
     auto mbglOptions = mbgl::style::GeoJSONOptions();

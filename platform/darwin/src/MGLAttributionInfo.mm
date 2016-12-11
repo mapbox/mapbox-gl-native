@@ -13,7 +13,11 @@
 
 @implementation MGLAttributionInfo
 
-+ (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosFromHTMLString:(NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
++ (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosFromHTMLString:(nullable NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
+    if (!htmlString) {
+        return @[];
+    }
+    
     NSDictionary *options = @{
         NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType,
         NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding),

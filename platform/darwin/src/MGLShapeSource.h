@@ -64,6 +64,14 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
  `MGLStyle` object along with an `MGLVectorStyleLayer` object. The vector style
  layer defines the appearance of any content supplied by the shape source.
  
+ Each
+ <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson"><code>geojson</code></a>
+ source defined by the style JSON file is represented at runtime by an
+ `MGLShapeSource` object that you can use to refine the map’s content and
+ initialize new style layers. You can also add and remove sources dynamically
+ using methods such as `-[MGLStyle addSource:]` and
+ `-[MGLStyle sourceWithIdentifier:]`.
+ 
  Any vector style layer initialized with a shape source should have a `nil`
  value in its `sourceLayerIdentifier` property.
  */

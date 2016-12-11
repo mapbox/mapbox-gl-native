@@ -57,12 +57,13 @@ custom_categories:
       - MGLStyleLayer
       - MGLSymbolStyleLayer
       - MGLVectorStyleLayer
-  - name: Data Sources
+  - name: Content Sources
     children:
-      - MGLSource
-      - MGLShapeSource
       - MGLRasterSource
-      - MGLTileSet
+      - MGLShapeSource
+      - MGLSource
+      - MGLTileCoordinateSystem
+      - MGLTileSource
       - MGLVectorSource
   - name: Offline Maps
     children:

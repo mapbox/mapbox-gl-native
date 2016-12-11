@@ -15,12 +15,14 @@ NS_ASSUME_NONNULL_BEGIN
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
  
  Do not create instances of this class directly, and do not create your own
- subclasses of this class. Instead, create instances of `MGLRasterSource`,
- `MGLShapeSource`, and `MGLVectorSource`.
+ subclasses of this class. Instead, create instances of `MGLShapeSource` and the
+ concrete subclasses of `MGLTileSource`.
  */
 @interface MGLSource : NSObject
 
 #pragma mark Initializing a Source
+
+- (instancetype)init __attribute__((unavailable("Use -initWithIdentifier: instead.")));
 
 /**
  Returns a source initialized with an identifier.
