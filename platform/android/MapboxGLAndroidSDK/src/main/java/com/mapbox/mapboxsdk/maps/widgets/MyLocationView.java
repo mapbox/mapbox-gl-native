@@ -173,7 +173,7 @@ public class MyLocationView extends View {
     }
 
     public final void setForegroundDrawableTint(@ColorInt int color) {
-        if (color != Color.TRANSPARENT) {
+        if (color < 1) {
             if (foregroundDrawable != null) {
                 foregroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
             }
@@ -202,7 +202,7 @@ public class MyLocationView extends View {
     }
 
     public final void setShadowDrawableTint(@ColorInt int color) {
-        if (color != Color.TRANSPARENT) {
+         if (color < 1) {
             if (backgroundDrawable == null) {
                 return;
             }
