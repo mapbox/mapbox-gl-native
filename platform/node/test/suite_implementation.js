@@ -61,14 +61,9 @@ module.exports = function (style, options, callback) {
             callback();
 
         } else if (operation[0] === 'wait') {
-            var wait = function () {
-                if (map.loaded()) {
-                    applyOperations(operations.slice(1), callback);
-                } else {
-                    map.render(options, wait);
-                }
-            };
-            wait();
+            map.render(options, function () {
+                applyOperations(operations.slice(1), callback);
+            });
 
         } else {
             // Ensure that the next `map.render(options)` does not overwrite this change.
