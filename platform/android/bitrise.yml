@@ -113,6 +113,8 @@ workflows:
         inputs:
         - content: |-
             #!/bin/bash
+            mkdir -p platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
+
             echo "The details from Firebase will be downloaded, zipped and attached as a build artefact."
             testUri=$(gsutil ls "gs://test-lab-wrrntqk05p31w-h3y1qk44vuunw/" | tail -n1)
             echo "Downloading from : "$testUri
