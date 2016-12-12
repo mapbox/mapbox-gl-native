@@ -56,6 +56,11 @@ public class MapboxConstants {
     public static final int ANIMATION_DURATION_SHORT = 150;
 
     /**
+     * Animation time of a fling gesture
+     */
+    public static final long ANIMATION_DURATION_FLING = 350;
+
+    /**
      * The currently supported minimum zoom level.
      */
     public static final float MINIMUM_ZOOM = 0.0f;

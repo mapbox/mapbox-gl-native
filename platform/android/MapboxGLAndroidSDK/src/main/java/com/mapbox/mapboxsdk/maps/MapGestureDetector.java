@@ -5,7 +5,6 @@ import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
-import android.util.Log;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -16,8 +15,6 @@ import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
-
-import timber.log.Timber;
 
 /**
  * Manages gestures events on a MapView.
@@ -298,17 +295,19 @@ final class MapGestureDetector {
 
             trackingSettings.resetTrackingModesIfRequired(true, false);
 
-            double decelerationRate = 1;
-
             // Cancel any animation
             transform.cancelTransitions();
 
             float screenDensity = uiSettings.getPixelRatio();
-            double offsetX = velocityX * decelerationRate / 4 / screenDensity;
-            double offsetY = velocityY * decelerationRate / 4 / screenDensity;
+
+            double tilt = transform.getTilt();
+            // tilt results in a bigger translation, need to limit input #5281, limitFactor ranges from 2 -> 8
+            double limitFactor = 2 + ((tilt != 0) ? (tilt / 10) : 0);
+            double offsetX = velocityX / limitFactor / screenDensity;
+            double offsetY = velocityY / limitFactor / screenDensity;
 
             transform.setGestureInProgress(true);
-            transform.moveBy(offsetX, offsetY, (long) (decelerationRate * 1000.0f));
+            transform.moveBy(offsetX, offsetY, MapboxConstants.ANIMATION_DURATION_FLING);
             transform.setGestureInProgress(false);
 
             if (onFlingListener != null) {
