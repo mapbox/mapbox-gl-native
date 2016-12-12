@@ -2,6 +2,7 @@
 # support `mason` (i.e. Yocto). Do not add any `mason` macro.
 
 option(WITH_QT_DECODERS "Use builtin Qt image decoders" OFF)
+option(WITH_QT_I18N     "Use builtin Qt i18n support"   OFF)
 option(WITH_QT_4        "Use Qt4 instead of Qt5"        OFF)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -D__QT__")
@@ -29,7 +30,6 @@ set(MBGL_QT_FILES
 
     # Misc
     PRIVATE platform/default/logging_stderr.cpp
-    PRIVATE platform/default/bidi.cpp
 
     # Thread pool
     PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
