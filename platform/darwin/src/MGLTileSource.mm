@@ -1,12 +1,20 @@
 #import "MGLTileSource_Private.h"
 
-#import "MGLAttributionInfo.h"
+#import "MGLAttributionInfo_Private.h"
+#import "NSString+MGLAdditions.h"
+
+#if TARGET_OS_IPHONE
+    #import <UIKit/UIKit.h>
+#else
+    #import <Cocoa/Cocoa.h>
+#endif
 
 #include <mbgl/util/tileset.hpp>
 
 const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel = @"MGLTileSourceOptionMinimumZoomLevel";
 const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel = @"MGLTileSourceOptionMaximumZoomLevel";
-const MGLTileSourceOption MGLTileSourceOptionAttribution = @"MGLTileSourceOptionAttribution";
+const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString = @"MGLTileSourceOptionAttributionHTMLString";
+const MGLTileSourceOption MGLTileSourceOptionAttributionInfos = @"MGLTileSourceOptionAttributionInfos";
 const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem = @"MGLTileSourceOptionTileCoordinateSystem";
 
 @implementation MGLTileSource
@@ -19,13 +27,17 @@ const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem = @"MGLTileSou
     return [super initWithIdentifier:identifier];
 }
 
-- (nullable NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
-    return [MGLAttributionInfo attributionInfosFromHTMLString:self.attribution
+- (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfos {
+    return [self attributionInfosWithFontSize:0 linkColor:nil];
+}
+
+- (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
+    return [MGLAttributionInfo attributionInfosFromHTMLString:self.attributionHTMLString
                                                      fontSize:fontSize
                                                     linkColor:linkColor];
 }
 
-- (NSString *)attribution {
+- (NSString *)attributionHTMLString {
     [NSException raise:@"MGLAbstractClassException"
                 format:@"MGLTileSource is an abstract class"];
     return nil;
@@ -61,12 +73,33 @@ mbgl::Tileset MGLTileSetFromTileURLTemplates(NS_ARRAY_OF(NSString *) *tileURLTem
                     format:@"MGLTileSourceOptionMinimumZoomLevel must be less than MGLTileSourceOptionMaximumZoomLevel."];
     }
     
-    if (NSString *attribution = options[MGLTileSourceOptionAttribution]) {
+    if (NSString *attribution = options[MGLTileSourceOptionAttributionHTMLString]) {
         if (![attribution isKindOfClass:[NSString class]]) {
             [NSException raise:NSInvalidArgumentException
-                        format:@"MGLTileSourceOptionAttribution must be set to a string."];
+                        format:@"MGLTileSourceOptionAttributionHTMLString must be set to a string."];
         }
         tileSet.attribution = attribution.UTF8String;
+    }
+    
+    if (NSArray *attributionInfos = options[MGLTileSourceOptionAttributionInfos]) {
+        if (![attributionInfos isKindOfClass:[NSArray class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLTileSourceOptionAttributionInfos must be set to a string."];
+        }
+        
+        NSAttributedString *attributedString = [MGLAttributionInfo attributedStringForAttributionInfos:attributionInfos];
+#if TARGET_OS_IPHONE
+        static NSString * const NSExcludedElementsDocumentAttribute = @"ExcludedElements";
+#endif
+        NSDictionary *documentAttributes = @{
+            NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType,
+            NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding),
+            // The attribution string is meant to be a simple, inline fragment, not a full-fledged, validating document.
+            NSExcludedElementsDocumentAttribute: @[@"XML", @"DOCTYPE", @"html", @"head", @"meta", @"title", @"style", @"body", @"p"],
+        };
+        NSData *data = [attributedString dataFromRange:attributedString.mgl_wholeRange documentAttributes:documentAttributes error:NULL];
+        NSString *html = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        tileSet.attribution = html.UTF8String;
     }
     
     if (NSNumber *tileCoordinateSystemNumber = options[MGLTileSourceOptionTileCoordinateSystem]) {

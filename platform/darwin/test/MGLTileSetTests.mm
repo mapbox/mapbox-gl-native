@@ -43,11 +43,34 @@
     // when the tile set has an attribution
     NSString *attribution = @"my tileset © ©️🎈";
     tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, @{
-        MGLTileSourceOptionAttribution: attribution,
+        MGLTileSourceOptionAttributionHTMLString: attribution,
     });
     
     // the attribution is reflected by the mbgl tileset
     XCTAssertEqual(tileSet.attribution, attribution.UTF8String);
+    
+    // when the tile set has attribution infos
+    MGLAttributionInfo *mapboxInfo = [[MGLAttributionInfo alloc] initWithTitle:[[NSAttributedString alloc] initWithString:@"Mapbox"]
+                                                                           URL:[NSURL URLWithString:@"https://www.mapbox.com/"]];
+    NSAttributedString *gl = [[NSAttributedString alloc] initWithString:@"GL" attributes:@{
+        NSBackgroundColorAttributeName: [MGLColor redColor],
+    }];
+    MGLAttributionInfo *glInfo = [[MGLAttributionInfo alloc] initWithTitle:gl URL:nil];
+    tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, @{
+        MGLTileSourceOptionAttributionInfos: @[mapboxInfo, glInfo],
+    });
+    
+    // the attribution is reflected by the mbgl tileset
+#if TARGET_OS_IPHONE
+    NSString *html = (@"<font style=\"font-family: 'Helvetica'; font-weight: normal; font-style: normal; font-size: 12.00pt\">"
+                      @"<a href=\"https://www.mapbox.com/\">Mapbox</a> </font>"
+                      @"<font style=\"font-family: 'Helvetica'; font-weight: normal; font-style: normal; font-size: 12.00pt; background-color: #ff0000\">GL</font>\n");
+#else
+    NSString *html = (@"<font face=\"Helvetica\" size=\"3\" style=\"font: 12.0px Helvetica\">"
+                      @"<a href=\"https://www.mapbox.com/\">Mapbox</a> </font>"
+                      @"<font face=\"Helvetica\" size=\"3\" style=\"font: 12.0px Helvetica; background-color: #ff2600\">GL</font>\n");
+#endif
+    XCTAssertEqualObjects(@(tileSet.attribution.c_str()), html);
     
     // when the tile coordinate system is changed using an NSNumber
     tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, @{

@@ -59,6 +59,7 @@ custom_categories:
       - MGLVectorStyleLayer
   - name: Content Sources
     children:
+      - MGLAttributionInfo
       - MGLRasterSource
       - MGLShapeSource
       - MGLSource

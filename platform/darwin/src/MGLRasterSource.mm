@@ -95,7 +95,7 @@ static const CGFloat MGLRasterSourceRetinaTileSize = 512;
     super.rawSource = rawSource;
 }
 
-- (NSString *)attribution {
+- (NSString *)attributionHTMLString {
     auto attribution = self.rawSource->getAttribution();
     return attribution ? @(attribution->c_str()) : nil;
 }

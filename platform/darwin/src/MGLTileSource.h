@@ -5,6 +5,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MGLAttributionInfo;
+
 /**
  Options for `MGLTileSource` objects.
  */
@@ -32,20 +34,43 @@ extern const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel;
 
 #if TARGET_OS_IPHONE
 /**
- A string to be displayed in an action sheet when the source is part of a map
- view’s style and the map view’s attribution button is pressed.
+ An HTML string defining the buttons to be displayed in an action sheet when the
+ source is part of a map view’s style and the map view’s attribution button is
+ pressed.
  
- The default value for this option is `nil`.
+ By default, no attribution statements are displayed. If the
+ `MGLTileSourceOptionAttributionInfos` option is specified, this option is
+ ignored.
  */
-extern const MGLTileSourceOption MGLTileSourceOptionAttribution;
+extern const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
+
+/**
+ An array of `MGLAttributionInfo` objects defining the buttons to be displayed
+ in an action sheet when the source is part of a map view’s style and the map
+ view’s attribution button is pressed.
+ 
+ By default, no attribution statements are displayed.
+ */
+extern const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
 #else
 /**
- A string to be displayed in the map view’s attribution view when the source is
- part of the map view’s style.
+ An HTML string defining the buttons to be displayed in the map view’s
+ attribution view when the source is part of the map view’s style.
  
- The default value for this option is `nil`.
+ By default, no attribution statements are displayed. If the
+ `MGLTileSourceOptionAttributionInfos` option is specified, this option is
+ ignored.
  */
-extern const MGLTileSourceOption MGLTileSourceOptionAttribution;
+extern const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
+
+/**
+ An array of `MGLAttributionInfo` objects defining the buttons to be displayed
+ in the map view’s attribution view when the source is part of the map view’s
+ style.
+ 
+ By default, no attribution statements are displayed.
+ */
+extern const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
 #endif
 
 /**
@@ -140,13 +165,14 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
 #pragma mark Accessing Attribution Strings
 
 /**
- An `NSString` object that contains an attribution to be displayed when the map
- is shown to a user.
+ An array of `MGLAttributionInfo` objects that define the attribution
+ statements to be displayed when the map is shown to the user.
  
- The default value is `nil`. If the source is initialized with a configuration
- URL, this property is also `nil` until the configuration JSON file is loaded.
+ By default, this array is empty. If the source is initialized with a
+ configuration URL, this array is also empty until the configuration JSON file
+ is loaded.
  */
-@property (nonatomic, copy, nullable, readonly) NSString *attribution;
+@property (nonatomic, copy, readonly) NS_ARRAY_OF(MGLAttributionInfo *) *attributionInfos;
 
 @end
 

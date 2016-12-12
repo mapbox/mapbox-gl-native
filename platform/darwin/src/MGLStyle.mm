@@ -22,7 +22,7 @@
 #import "MGLRasterSource.h"
 #import "MGLShapeSource.h"
 
-#import "MGLAttributionInfo.h"
+#import "MGLAttributionInfo_Private.h"
 
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
