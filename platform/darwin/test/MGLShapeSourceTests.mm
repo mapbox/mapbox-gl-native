@@ -42,7 +42,11 @@
     NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-104.34814453125,37.64903402157866]]}}]}";
     
     NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" geoJSONData:data options:nil];
+    NSError *error;
+    MGLShape *shape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(shape);
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:shape options:nil];
     
     MGLShapeCollection *collection = (MGLShapeCollection *)source.shape;
     XCTAssertNotNil(collection);
@@ -51,18 +55,24 @@
 }
 
 - (void)testMGLShapeSourceWithSingleGeometry {
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"geojson"
-                                                                geoJSONData:[@"{\"type\": \"Point\", \"coordinates\": [0, 0]}" dataUsingEncoding:NSUTF8StringEncoding]
-                                                                    options:nil];
+    NSData *data = [@"{\"type\": \"Point\", \"coordinates\": [0, 0]}" dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *error;
+    MGLShape *shape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(shape);
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"geojson" shape:shape options:nil];
     XCTAssertNotNil(source.shape);
-    XCTAssert([source.shape isKindOfClass:[MGLPointFeature class]]);
+    XCTAssert([source.shape isKindOfClass:[MGLPointAnnotation class]]);
 }
 
 - (void)testMGLGeoJSONSourceWithSingleFeature {
     NSString *geoJSON = @"{\"type\": \"Feature\", \"properties\": {\"color\": \"green\"}, \"geometry\": { \"type\": \"Point\", \"coordinates\": [ -114.06847000122069, 51.050459433092655 ] }}";
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"geojson"
-                                                                geoJSONData:[geoJSON dataUsingEncoding:NSUTF8StringEncoding]
-                                                                    options:nil];
+    NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *error;
+    MGLShape *shape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(shape);
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"geojson" shape:shape options:nil];
     XCTAssertNotNil(source.shape);
     XCTAssert([source.shape isKindOfClass:[MGLPointFeature class]]);
     MGLPointFeature *feature = (MGLPointFeature *)source.shape;

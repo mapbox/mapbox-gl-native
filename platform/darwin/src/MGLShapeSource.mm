@@ -30,19 +30,6 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
     std::unique_ptr<mbgl::style::GeoJSONSource> _pendingSource;
 }
 
-- (instancetype)initWithIdentifier:(NSString *)identifier geoJSONData:(NSData *)data options:(NS_DICTIONARY_OF(NSString *, id) *)options {
-    if (self = [super initWithIdentifier:identifier]) {
-        auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
-        auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, geoJSONOptions);
-        
-        _pendingSource = std::move(source);
-        self.rawSource = _pendingSource.get();
-        
-        self.geoJSONData = data;
-    }
-    return self;
-}
-
 - (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url options:(NS_DICTIONARY_OF(NSString *, id) *)options {
     if (self = [super initWithIdentifier:identifier]) {
         auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
@@ -98,16 +85,6 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
     super.rawSource = rawSource;
 }
 
-- (void)setGeoJSONData:(NSData *)geoJSONData {
-    _geoJSONData = geoJSONData;
-    
-    NSString *string = [[NSString alloc] initWithData:_geoJSONData encoding:NSUTF8StringEncoding];
-    const auto geojson = mapbox::geojson::parse(string.UTF8String);
-    self.rawSource->setGeoJSON(geojson);
-    
-    _shape = MGLShapeFromGeoJSON(geojson);
-}
-
 - (NSURL *)URL {
     auto url = self.rawSource->getURL();
     return url ? [NSURL URLWithString:@(url->c_str())] : nil;
@@ -137,8 +114,8 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; geoJSONData = %@; shape = %@>",
-            NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.geoJSONData, self.shape];
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; shape = %@>",
+            NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.shape];
 }
 
 @end

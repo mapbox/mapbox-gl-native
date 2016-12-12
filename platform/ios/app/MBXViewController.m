@@ -967,7 +967,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     NSString *geoJSON = @"{\"type\": \"Feature\", \"properties\": {\"color\": \"green\"}, \"geometry\": { \"type\": \"Point\", \"coordinates\": [ -114.06847000122069, 51.050459433092655 ] }}";
 
     NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
-    MGLShapeSource *pointSource = [[MGLShapeSource alloc] initWithIdentifier:@"leaf-point-source" geoJSONData:data options:nil];
+    MGLShape *shape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:NULL];
+    MGLShapeSource *pointSource = [[MGLShapeSource alloc] initWithIdentifier:@"leaf-point-source" shape:shape options:nil];
     [self.mapView.style addSource:pointSource];
 
     MGLCircleStyleLayer *circleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"leaf-circle-layer" source:pointSource];
@@ -999,7 +1000,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-104.34814453125,37.64903402157866]]}}]}";
     
     NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"mutable-data-source-id" geoJSONData:data options:nil];
+    MGLShape *shape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:NULL];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"mutable-data-source-id" shape:shape options:nil];
     [self.mapView.style addSource:source];
     
     MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"mutable-data-layer-id" source:source];
@@ -1008,8 +1010,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-109.34814453125,37.64903402157866]]}}]}";
         NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
-        
-        source.geoJSONData = data;
+        MGLShape *shape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:NULL];
+        source.shape = shape;
     });
 }
 
