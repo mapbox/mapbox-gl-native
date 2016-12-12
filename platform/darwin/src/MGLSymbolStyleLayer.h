@@ -560,7 +560,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 
 #if TARGET_OS_IPHONE
 /**
- The color of the icon. This can only be used with sdf icons.
+ The tint color to apply to the icon. The `iconImage` property must be set to a template image.
  
  The default value of this property is an `MGLStyleValue` object containing `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
@@ -569,7 +569,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconColor;
 #else
 /**
- The color of the icon. This can only be used with sdf icons.
+ The tint color to apply to the icon. The `iconImage` property must be set to a template image.
  
  The default value of this property is an `MGLStyleValue` object containing `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
@@ -591,7 +591,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 
 #if TARGET_OS_IPHONE
 /**
- The color of the icon's halo. Icon halos can only be used with SDF icons.
+ The color of the icon’s halo. The `iconImage` property must be set to a template image.
  
  The default value of this property is an `MGLStyleValue` object containing `UIColor.clearColor`. Set this property to `nil` to reset it to the default value.
 
@@ -600,7 +600,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconHaloColor;
 #else
 /**
- The color of the icon's halo. Icon halos can only be used with SDF icons.
+ The color of the icon’s halo. The `iconImage` property must be set to a template image.
  
  The default value of this property is an `MGLStyleValue` object containing `NSColor.clearColor`. Set this property to `nil` to reset it to the default value.
 
