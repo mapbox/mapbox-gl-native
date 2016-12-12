@@ -1,0 +1,22 @@
+language: generic
+sudo: false
+
+matrix:
+  include:
+    - os: linux
+      env: CXX=g++-5
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test' ]
+          packages: [ 'g++-5' ]
+    - os: linux
+      env: CXX=clang++-3.7
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.7' ]
+          packages: [ 'clang-3.7' ]
+
+cache: apt
+
+script:
+ - make run-test

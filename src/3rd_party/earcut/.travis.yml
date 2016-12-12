@@ -1,0 +1,40 @@
+language: cpp
+
+sudo: false
+
+compiler:
+ - clang
+ - gcc
+
+env:
+ - BUILDTYPE: Debug
+ - BUILDTYPE: Release
+
+addons:
+  apt:
+    sources:
+     - ubuntu-toolchain-r-test
+     - llvm-toolchain-precise-3.7
+     - george-edison55-precise-backports
+    packages:
+     - g++-4.9
+     - gcc-4.9
+     - clang-3.7
+     - cmake
+     - cmake-data
+     - xorg-dev
+     - libgl1-mesa-glx
+     - libgl1-mesa-dev
+
+cache: apt
+
+before_script:
+ - if [[ ${CXX} == "g++" ]]; then export CXX="g++-4.9" CC="gcc-4.9" ; fi
+ - if [[ ${CXX} == "clang++" ]]; then export CXX="clang++-3.7" CC="clang-3.7" ; fi
+
+script:
+ - mkdir ./build && cd ./build
+ - cmake .. -DCMAKE_BUILD_TYPE=${BUILDTYPE}
+ - make -j4
+ - ./tests
+ - ./bench

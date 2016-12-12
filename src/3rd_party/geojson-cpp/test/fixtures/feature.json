@@ -1,0 +1,16 @@
+{
+    "type": "Feature",
+    "geometry": {
+        "type": "Point",
+        "coordinates": [30.5, 50.5]
+    },
+    "properties": {
+        "bool": true,
+        "string": "foo",
+        "double": 2.5,
+        "uint": 10,
+        "int": -10,
+        "null": null,
+        "nested": [5, {"foo": "bar"}]
+    }
+}

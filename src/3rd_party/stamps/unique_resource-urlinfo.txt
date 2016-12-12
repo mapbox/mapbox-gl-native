@@ -1,0 +1,3 @@
+repository='external project URL'
+module='https://github.com/okdshin/unique_resource/archive/cba309.zip'
+tag=''

@@ -1,0 +1,3 @@
+repository='external project URL'
+module='https://github.com/mapbox/geojson-vt-cpp/archive/v6.1.3.zip'
+tag=''

@@ -1,0 +1,47 @@
+language: generic
+sudo: false
+
+matrix:
+  include:
+    - os: linux
+      env: CXX=g++-5
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test' ]
+          packages: [ 'libstdc++-5-dev', 'g++-5', 'libxi-dev','libglu1-mesa-dev','x11proto-randr-dev','x11proto-xext-dev','libxrandr-dev','x11proto-xf86vidmode-dev','libxxf86vm-dev','libxcursor-dev','libxinerama-dev' ]
+    - os: linux
+      env: CXX=clang++-3.8 BUILDTYPE=Debug ASAN_OPTIONS=detect_leaks=1 CXXFLAGS="-fsanitize=address" LDFLAGS="-fsanitize=address"
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test' ]
+          packages: [ 'libstdc++-5-dev', 'libxi-dev','libglu1-mesa-dev','x11proto-randr-dev','x11proto-xext-dev','libxrandr-dev','x11proto-xf86vidmode-dev','libxxf86vm-dev','libxcursor-dev','libxinerama-dev' ]
+    - os: linux
+      env: CXX=clang++-3.8 BUILDTYPE=Release
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test', ]
+          packages: [ 'libstdc++-5-dev', 'libxi-dev','libglu1-mesa-dev','x11proto-randr-dev','x11proto-xext-dev','libxrandr-dev','x11proto-xf86vidmode-dev','libxxf86vm-dev','libxcursor-dev','libxinerama-dev']
+    - os: osx
+      osx_image: xcode7.3
+      env: BUILDTYPE=Release
+
+cache: apt
+
+install:
+  - |
+    if [[ ${CXX} =~ "clang" ]] && [[ $(uname -s) == "Linux" ]]; then
+      ./.mason/mason install clang 3.8.0
+      CLANG_PREFIX=$(./.mason/mason prefix clang 3.8.0)
+      export PATH=${CLANG_PREFIX}/bin:${PATH}
+      which clang++
+      clang++ -v
+    fi
+
+script:
+  - make test -j2 V=1
+  - make build/bench V=1
+  - make build/debug V=1
+
+notifications:
+  slack:
+    secure: "aqkA6cy2y18F77+2holvmKEP6e5gvAOhYqjnJI5wE4UDCyxNi6EK40fb42hrYfIX5cw00TAPEdQXA9U83/lOP67JSSG9ARhlOihEDcxBo/rAnwNs2hNycYFa3orN7gKUSNIXrc5nw9lcfJIxdiVBbhj0kaCppKLQCeox29XG4R3Fdm8UW98pQXY4TACynePbNq0vPJCCvDp6Xp4HlDbKfUleyDW5NGjHPT/SSToE137LShtuQmWuBOzchmckkhDE7zCiTZu5wNbRiFOHYh8dZUatd/6RjotoDqkvP2QBEo0mRW6d7ug7zAZTNmqh0dG0tv3Wpg9V7ZdURRN5c3UDkZv1GvIuC7y3qeBh+7V+/3aYcecsJkd3BmExYHQ2YPcTr9+UvtewlxD7LkeppwbSqDNjD8WGFuO37FU3DyD7O5WBcjCcljuV5Fqil0i10WT3CtqPDm9YLz+Sfyq4HRfrcdXfrFQRe9xvyJ3Upb+Nk2qy5pZ8XFsAHKL1lfqzOUgzO/3cNOVSW1Bda4BFL1oHy+XKrKRakRc3nz8JejciKBX7pdyCKB8jueiCgFZS9mCe2JRTQxlRoA+qYrggupdvzI4rdiwzQ+tNbt7Mf58wxAdkkcngz13HBdfbUNgZ3ZOOz0v7lBWIH23agW8GxUfvJZxY6kJ3WGcw59bbquvIxvs="

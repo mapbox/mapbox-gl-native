@@ -1,0 +1,20 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [170, 10],
+            [170, -10],
+            [190, 0],
+            [170, 10]
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+machine:
+  xcode:
+    version: 7.3
+  environment:
+    XCODE_SCHEME: "no"
+    XCODE_WORKSPACE: "no"
+    NODE_VERSION: 6
+
+dependencies:
+  cache_directories:
+    - './nvm'
+  override:
+    - ./ci/dependencies.sh
+test:
+  override:
+    - ./ci/test.sh
+deployment:
+  release:
+    tag: /v[0-9]+\.[0-9]+\.[0-9]+(\-dev)?/
+    commands:
+      - ./ci/deploy.sh
+general:
+  artifacts:
+    - "node_modules/mapbox-gl-test-suite/render-tests/index.html"
+    - "node_modules/mapbox-gl-test-suite/query-tests/index.html"

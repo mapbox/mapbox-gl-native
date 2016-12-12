@@ -1,0 +1,3 @@
+repository='external project URL'
+module='https://github.com/tmpsantos/Optional/archive/5f08e2.zip'
+tag=''

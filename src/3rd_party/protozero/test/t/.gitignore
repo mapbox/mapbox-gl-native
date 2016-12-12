@@ -1,0 +1,6 @@
+testcase
+testcase.pb.cc
+testcase.pb.h
+testcase.pb.o
+test_cases.o
+writer_test_cases.o

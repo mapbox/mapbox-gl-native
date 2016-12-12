@@ -1,0 +1,14 @@
+[ignore]
+
+.*/node_modules/.*
+
+[include]
+
+[libs]
+
+./interfaces/
+
+[options]
+
+[version]
+0.36.0

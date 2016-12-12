@@ -1,0 +1,3 @@
+repository='external project URL'
+module='https://github.com/mapbox/protozero/archive/v1.4.2.zip'
+tag=''
