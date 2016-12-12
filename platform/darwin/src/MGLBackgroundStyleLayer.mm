@@ -26,9 +26,19 @@
     if (self = [super initWithIdentifier:identifier]) {
         auto layer = std::make_unique<mbgl::style::BackgroundLayer>(identifier.UTF8String);
         _pendingLayer = std::move(layer);
-        _rawLayer = _pendingLayer.get();
+        self.rawLayer = _pendingLayer.get();
     }
     return self;
+}
+
+- (mbgl::style::BackgroundLayer *)rawLayer
+{
+    return (mbgl::style::BackgroundLayer *)super.rawLayer;
+}
+
+- (void)setRawLayer:(mbgl::style::BackgroundLayer *)rawLayer
+{
+    super.rawLayer = rawLayer;
 }
 
 #pragma mark -  Adding to and removing from a map view
@@ -52,7 +62,7 @@
 - (void)removeFromMapView:(MGLMapView *)mapView
 {
     _pendingLayer = nullptr;
-    _rawLayer = nullptr;
+    self.rawLayer = nullptr;
 
     auto removedLayer = mapView.mbglMap->removeLayer(self.identifier.UTF8String);
     if (!removedLayer) {
@@ -67,7 +77,7 @@
     removedLayer.release();
 
     _pendingLayer = std::unique_ptr<mbgl::style::BackgroundLayer>(layer);
-    _rawLayer = _pendingLayer.get();
+    self.rawLayer = _pendingLayer.get();
 }
 
 #pragma mark - Accessing the Paint Attributes
@@ -76,13 +86,13 @@
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue(backgroundColor);
-    _rawLayer->setBackgroundColor(mbglValue);
+    self.rawLayer->setBackgroundColor(mbglValue);
 }
 
 - (MGLStyleValue<MGLColor *> *)backgroundColor {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getBackgroundColor() ?: _rawLayer->getDefaultBackgroundColor();
+    auto propertyValue = self.rawLayer->getBackgroundColor() ?: self.rawLayer->getDefaultBackgroundColor();
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
 }
 
@@ -90,13 +100,13 @@
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(backgroundOpacity);
-    _rawLayer->setBackgroundOpacity(mbglValue);
+    self.rawLayer->setBackgroundOpacity(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)backgroundOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getBackgroundOpacity() ?: _rawLayer->getDefaultBackgroundOpacity();
+    auto propertyValue = self.rawLayer->getBackgroundOpacity() ?: self.rawLayer->getDefaultBackgroundOpacity();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -104,13 +114,13 @@
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(backgroundPattern);
-    _rawLayer->setBackgroundPattern(mbglValue);
+    self.rawLayer->setBackgroundPattern(mbglValue);
 }
 
 - (MGLStyleValue<NSString *> *)backgroundPattern {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getBackgroundPattern() ?: _rawLayer->getDefaultBackgroundPattern();
+    auto propertyValue = self.rawLayer->getBackgroundPattern() ?: self.rawLayer->getDefaultBackgroundPattern();
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 
