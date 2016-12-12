@@ -1,0 +1,9 @@
+.DS_Store
+out
+profiling
+build
+deps
+*.gcda
+*.gcno
+.ycm_extra_conf.pyc
+mason_packages

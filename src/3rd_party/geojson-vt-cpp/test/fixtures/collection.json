@@ -1,0 +1,10 @@
+{ "type": "GeometryCollection",
+  "geometries": [
+    { "type": "MultiPoint",
+    "coordinates": [ [100, -90], [101, 90] ]
+    },
+    { "type": "LineString",
+      "coordinates": [ [101, 0], [102, 1.0] ]
+      }
+  ]
+}

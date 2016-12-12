@@ -1,0 +1,10 @@
+{
+    "name": "protozero",
+    "version": "1.4.2",
+    "description": "Minimalist protocol buffer decoder and encoder in C++",
+    "main": "include_dirs.js",
+    "repository"   :  {
+      "type" : "git",
+      "url"  : "git://github.com/mapbox/protozero.git"
+    }
+}

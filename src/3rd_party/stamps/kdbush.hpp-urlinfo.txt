@@ -1,0 +1,3 @@
+repository='external project URL'
+module='https://github.com/mourner/kdbush.hpp/archive/v0.1.1.zip'
+tag=''

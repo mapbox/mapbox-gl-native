@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mapbox GL JS debug page</title>
+    <meta charset='utf-8'>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel='stylesheet' href='/dist/mapbox-gl.css' />
+    <style>
+        body { margin: 0; padding: 0; }
+        html, body, #map { height: 100%; }
+    </style>
+</head>
+
+<body>
+<div id='map'></div>
+
+<script src='/dist/mapbox-gl-dev.js'></script>
+<script src='/debug/access_token_generated.js'></script>
+<script>
+
+var style = {
+    "version": 8,
+    "metadata": {
+        "test": {
+            "native": false,
+            "width": 512,
+            "height": 512
+        }
+    },
+    "center": [0, 0],
+    "zoom": 0,
+    "sources": {
+        "geojson": {
+            "type": "geojson",
+            "data": "/test/integration/data/places.geojson",
+            "cluster": true,
+            "clusterRadius": 25
+        }
+    },
+    "glyphs": "/test/integration/glyphs/{fontstack}/{range}.pbf",
+    "layers": [
+        {
+            "id": "cluster",
+            "type": "circle",
+            "source": "geojson",
+            "filter": ["==", "cluster", true],
+            "paint": {
+                "circle-color": "rgba(0, 200, 0, 1)",
+                "circle-radius": 20
+            }
+        },
+        {
+            "id": "cluster_label",
+            "type": "symbol",
+            "source": "geojson",
+            "filter": ["==", "cluster", true],
+            "layout": {
+                "text-field": "{point_count}",
+                "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+                "text-size": 12,
+                "text-allow-overlap": true,
+                "text-ignore-placement": true
+            }
+        },
+        {
+            "id": "unclustered_point",
+            "type": "circle",
+            "source": "geojson",
+            "filter": ["!=", "cluster", true],
+            "paint": {
+                "circle-color": "rgba(0, 0, 200, 1)",
+                "circle-radius": 10
+            }
+        }
+    ]
+};
+
+var map = window.map = new mapboxgl.Map({
+    container: 'map',
+    style: style,
+    hash: true
+});
+
+map.addControl(new mapboxgl.NavigationControl());
+map.addControl(new mapboxgl.GeolocateControl());
+
+</script>
+</body>
+</html>

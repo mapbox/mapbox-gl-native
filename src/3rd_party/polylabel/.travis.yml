@@ -1,0 +1,35 @@
+sudo: false
+dist: trusty
+cache: apt
+
+matrix:
+  include:
+    - language: generic
+      env: CXX=g++-5
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test' ]
+          packages: [ 'g++-5' ]
+      script:
+        - make test
+
+    - language: generic
+      env: CXX=clang++-3.8
+      addons:
+        apt:
+          sources: [ 'ubuntu-toolchain-r-test' ]
+          packages: [ 'clang-3.8', 'libstdc++-5-dev', 'libstdc++6' ]
+      script:
+        - make test
+
+    - language: node
+      node_js: 4
+      script:
+        - npm install
+        - npm test
+
+    - language: node
+      node_js: stable
+      script:
+        - npm install
+        - npm test

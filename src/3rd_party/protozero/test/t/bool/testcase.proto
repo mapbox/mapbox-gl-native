@@ -1,0 +1,11 @@
+
+option optimize_for = LITE_RUNTIME;
+
+package TestBoolean;
+
+message Test {
+
+    required bool b = 1;
+
+}
+

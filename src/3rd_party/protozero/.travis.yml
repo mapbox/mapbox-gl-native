@@ -1,0 +1,106 @@
+language: c
+
+sudo: false
+
+# Save common build configurations as shortcuts, so we can reference them later.
+addons_shortcuts:
+  addons_clang35: &clang35
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
+      packages: [ 'clang-3.5', 'libprotobuf-dev','protobuf-compiler' ]
+  addons_clang38: &clang38
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.8' ]
+      packages: [ 'clang-3.8', 'libprotobuf-dev','protobuf-compiler' ]
+  addons_gcc49: &gcc47
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'g++-4.7', 'gcc-4.7', 'libprotobuf-dev','protobuf-compiler' ]
+  addons_gcc49: &gcc48
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'g++-4.8', 'gcc-4.8', 'libprotobuf-dev','protobuf-compiler' ]
+  addons_gcc49: &gcc49
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'g++-4.9', 'gcc-4.9', 'libprotobuf-dev','protobuf-compiler' ]
+  addons_gcc49: &gcc5
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'g++-5', 'gcc-5', 'libprotobuf-dev','protobuf-compiler' ]
+
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode6
+      compiler: clang
+    - os: osx
+      osx_image: xcode7
+      compiler: clang
+    - os: linux
+      compiler: "clang35"
+      env: CXX=clang++-3.5
+      addons: *clang35
+    - os: linux
+      compiler: "clang38"
+      env: CXX=clang++-3.8
+      addons: *clang38
+    - os: linux
+      compiler: "clang38"
+      env: CXX=clang++-3.8 CXX_STD=c++14
+      addons: *clang38
+    - os: linux
+      compiler: "clang38"
+      env: CXX=clang++-3.8 CXXFLAGS="-DPROTOZERO_DO_NOT_USE_BARE_POINTER=1"
+      addons: *clang38
+    - os: linux
+      compiler: "gcc47"
+      env: CXX=g++-4.7
+      addons: *gcc47
+    - os: linux
+      compiler: "gcc48"
+      env: CXX=g++-4.8
+      addons: *gcc48
+    - os: linux
+      compiler: "gcc49"
+      env: CXX=g++-4.9 COVERAGE=gcov-4.9
+      addons: *gcc49
+    - os: linux
+      compiler: "gcc49"
+      env: CXX=g++-4.9 CXX_STD=c++14
+      addons: *gcc49
+    - os: linux
+      compiler: "gcc49"
+      env: CXX=g++-4.9 CXXFLAGS="-DPROTOZERO_DO_NOT_USE_BARE_POINTER=1"
+      addons: *gcc49
+    - os: linux
+      compiler: "gcc5"
+      env: CXX=g++-5 CXXFLAGS="-D_GLIBCXX_USE_CXX11_ABI=0"
+      addons: *gcc5
+    - os: linux
+      compiler: "gcc5"
+      env: CXX=g++-5 CXXFLAGS="-D_GLIBCXX_USE_CXX11_ABI=1"
+      addons: *gcc5
+
+before_install:
+ - echo ${CXX}
+ - if [[ $(uname -s) == 'Linux' ]]; then
+     export PYTHONPATH=$(pwd)/.local/lib/python2.7/site-packages;
+   else
+     brew install protobuf;
+     export PYTHONPATH=$(pwd)/.local/lib/python/site-packages;
+   fi
+ - if [ -n "${COVERAGE}" ]; then
+     PYTHONUSERBASE=$(pwd)/.local pip install --user cpp-coveralls;
+   fi
+
+install:
+ - make test
+
+script:
+ - if [ -n "${COVERAGE}" ]; then
+    make clean;
+    CXXFLAGS="--coverage ${CXXFLAGS}" LDFLAGS="--coverage ${LDFLAGS}" make test;
+    ${COVERAGE} -lp test/*tests.o test/t/*/*test_cases.o;
+    ./.local/bin/cpp-coveralls --no-gcov -i include/protozero;
+   fi
