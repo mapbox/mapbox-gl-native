@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
             @"-[MGLStyle removeLayer:] has been called " \
             @"with this instance but another style layer instance was added with the same identifer. It is an " \
             @"error to send any message to this layer since it cannot be recovered after removal due to the " \
-            @"identifer collision. Use unique identifiers for all layer instances including layers of " \
+            @"identifier collision. Use unique identifiers for all layer instances including layers of " \
             @"different types."]; \
         } \
     } while (NO);
