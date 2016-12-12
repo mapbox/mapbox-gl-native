@@ -15,6 +15,23 @@ _.forOwn(cocoaConventions, function (properties, kind) {
         spec[kind][newName] = spec[kind][oldName];
         spec[kind][newName].original = oldName;
         delete spec[kind][oldName];
+        
+        // Update requirements in other properties.
+        let updateRequirements = function (property, name) {
+            let requires = property.requires || [];
+            for (let i = 0; i < requires.length; i++) {
+                if (requires[i] in cocoaConventions[kind]) {
+                    property.requires[i] = cocoaConventions[kind][requires[i]];
+                }
+                _.forOwn(requires[i], function (values, name, require) {
+                    if (require in cocoaConventions[kind]) {
+                        require[cocoaConventions[kind][name]] = values;
+                    }
+                });
+            }
+        };
+        _.forOwn(spec[kind.replace(/^layout_/, 'paint_')], updateRequirements);
+        _.forOwn(spec[kind.replace(/^paint_/, 'layout_')], updateRequirements);
     })
 });
 
