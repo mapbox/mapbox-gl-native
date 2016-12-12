@@ -25,6 +25,7 @@ mason_use(libzip VERSION 1.1.3)
 mason_use(nunicode VERSION 1.7.1)
 mason_use(sqlite VERSION 3.14.2)
 mason_use(gtest VERSION 1.7.0)
+mason_use(icu VERSION 58.1)
 
 set(ANDROID_SDK_PROJECT_DIR ${CMAKE_SOURCE_DIR}/platform/android/MapboxGLAndroidSDK)
 set(ANDROID_JNI_TARGET_DIR ${ANDROID_SDK_PROJECT_DIR}/src/main/jniLibs/${ANDROID_JNIDIR})
@@ -77,6 +78,7 @@ macro(mbgl_platform_core)
         # Misc
         PRIVATE platform/android/src/logging_android.cpp
         PRIVATE platform/default/string_stdlib.cpp
+        PRIVATE platform/default/bidi.cpp
 
         # Image handling
         PRIVATE platform/default/image.cpp
@@ -163,6 +165,7 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC geojson)
     target_add_mason_package(mbgl-core PUBLIC jni.hpp)
     target_add_mason_package(mbgl-core PUBLIC rapidjson)
+    target_add_mason_package(mbgl-core PUBLIC icu)
 
     target_compile_options(mbgl-core
         PRIVATE -fvisibility=hidden
