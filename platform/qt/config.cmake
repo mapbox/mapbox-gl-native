@@ -2,6 +2,7 @@ include(platform/qt/qt.cmake)
 
 mason_use(sqlite VERSION 3.14.2)
 mason_use(gtest VERSION 1.7.0${MASON_CXXABI_SUFFIX})
+mason_use(icu VERSION 58.1)
 
 if(NOT WITH_QT_DECODERS)
     mason_use(libjpeg-turbo VERSION 1.5.0)
@@ -38,6 +39,9 @@ macro(mbgl_platform_core)
     else()
         add_definitions(-DQT_IMAGE_DECODERS)
     endif()
+
+    target_add_mason_package(mbgl-core PRIVATE icu)
+
 endmacro()
 
 macro(mbgl_platform_test)

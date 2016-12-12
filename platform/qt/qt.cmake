@@ -29,6 +29,7 @@ set(MBGL_QT_FILES
 
     # Misc
     PRIVATE platform/default/logging_stderr.cpp
+    PRIVATE platform/default/bidi.cpp
 
     # Thread pool
     PRIVATE platform/default/mbgl/util/default_thread_pool.cpp

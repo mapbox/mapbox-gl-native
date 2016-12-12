@@ -324,7 +324,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/sources/vector_source_impl.hpp
 
     # text
-    src/mbgl/text/bidi.cpp
     src/mbgl/text/bidi.hpp
     src/mbgl/text/check_max_angle.cpp
     src/mbgl/text/check_max_angle.hpp

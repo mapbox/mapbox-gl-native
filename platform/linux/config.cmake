@@ -11,6 +11,7 @@ mason_use(libjpeg-turbo VERSION 1.5.0)
 mason_use(webp VERSION 0.5.1)
 mason_use(gtest VERSION 1.7.0${MASON_CXXABI_SUFFIX})
 mason_use(benchmark VERSION 1.0.0)
+mason_use(icu VERSION 58.1)
 
 include(cmake/loop-uv.cmake)
 
@@ -70,6 +71,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/logging_stderr.cpp
         PRIVATE platform/default/string_stdlib.cpp
         PRIVATE platform/default/thread.cpp
+        PRIVATE platform/default/bidi.cpp
 
         # Image handling
         PRIVATE platform/default/image.cpp
@@ -98,6 +100,7 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC libpng)
     target_add_mason_package(mbgl-core PUBLIC libjpeg-turbo)
     target_add_mason_package(mbgl-core PUBLIC webp)
+    target_add_mason_package(mbgl-core PUBLIC icu)
 
     target_link_libraries(mbgl-core
         PUBLIC -lz
