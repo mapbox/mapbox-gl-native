@@ -3,6 +3,7 @@
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLFeature_Private.h"
+#import "MGLShapeCollectionFeature_Private.h"
 #import "MGLShape_Private.h"
 
 #import "NSURL+MGLAdditions.h"
@@ -99,8 +100,15 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
         source->setGeoJSON(geojson);
         _shape = MGLShapeFromGeoJSON(geojson);
     } else {
-        const auto geojson = mbgl::GeoJSON{self.shape.geometryObject};
-        source->setGeoJSON(geojson);
+        if ([self.shape isKindOfClass:[MGLShapeCollectionFeature class]]) {
+            MGLShapeCollectionFeature *feature = (MGLShapeCollectionFeature *)self.shape;
+            source->setGeoJSON(mbgl::GeoJSON{[feature mbglFeatureCollection]});
+        } else if ([self.shape conformsToProtocol:@protocol(MGLFeature)]) {
+            id<MGLFeaturePrivate> feature = (id<MGLFeaturePrivate>)self.shape;
+            source->setGeoJSON(mbgl::GeoJSON{[feature mbglFeature]});
+        } else {
+            source->setGeoJSON(mbgl::GeoJSON{self.shape.geometryObject});
+        }
     }
     
     _pendingSource = std::move(source);

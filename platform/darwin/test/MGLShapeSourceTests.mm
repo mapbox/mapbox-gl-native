@@ -53,12 +53,23 @@
     XCTAssertTrue([collection.shapes.firstObject isMemberOfClass:[MGLPolylineFeature class]]);
 }
 
-- (void)testMGLShapeSourceWithSingleFeature {
+- (void)testMGLShapeSourceWithSingleGeometry {
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"geojson"
                                                                 geoJSONData:[@"{\"type\": \"Point\", \"coordinates\": [0, 0]}" dataUsingEncoding:NSUTF8StringEncoding]
                                                                     options:nil];
     XCTAssertNotNil(source.shape);
     XCTAssert([source.shape isKindOfClass:[MGLPointFeature class]]);
+}
+
+- (void)testMGLGeoJSONSourceWithSingleFeature {
+    NSString *geoJSON = @"{\"type\": \"Feature\", \"properties\": {\"color\": \"green\"}, \"geometry\": { \"type\": \"Point\", \"coordinates\": [ -114.06847000122069, 51.050459433092655 ] }}";
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"geojson"
+                                                                geoJSONData:[geoJSON dataUsingEncoding:NSUTF8StringEncoding]
+                                                                    options:nil];
+    XCTAssertNotNil(source.shape);
+    XCTAssert([source.shape isKindOfClass:[MGLPointFeature class]]);
+    MGLPointFeature *feature = (MGLPointFeature *)source.shape;
+    XCTAssert([feature.attributes.allKeys containsObject:@"color"]);
 }
 
 - (void)testMGLShapeSourceWithPolylineFeatures {
@@ -240,15 +251,11 @@
     
     MGLShapeCollectionFeature *shapeCollectionFeature = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[polygonFeature, polylineFeature, multiPolygonFeature, multiPolylineFeature, pointCollectionFeature, pointFeature]];
 
-    MGLShapeCollectionFeature *shapeCollectionFeature_1 = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[polygonFeature, polylineFeature, multiPolygonFeature, multiPolylineFeature, pointCollectionFeature, pointFeature, shapeCollectionFeature]];
-
-    
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:shapeCollectionFeature_1 options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:shapeCollectionFeature options:nil];
     
     MGLShapeCollectionFeature *shape = (MGLShapeCollectionFeature *)source.shape;
-    
     XCTAssertNotNil(shape);
-    XCTAssert(shape.shapes.count == 7, @"Shape collection should contain 7 shapes");
+    XCTAssert(shape.shapes.count == 6, @"Shape collection should contain 6 shapes");
 }
 
 @end

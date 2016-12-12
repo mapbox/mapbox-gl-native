@@ -1,4 +1,5 @@
 #import "MGLFeature_Private.h"
+#import "MGLShapeCollectionFeature_Private.h"
 
 #import "MGLPointAnnotation.h"
 #import "MGLPolyline.h"
@@ -177,6 +178,15 @@
     return mbgl::Feature{geometry};
 }
 
+- (mbgl::FeatureCollection)mbglFeatureCollection {
+    mbgl::FeatureCollection featureCollection;
+    featureCollection.reserve(self.shapes.count);
+    for (id <MGLFeaturePrivate> feature in self.shapes) {
+        featureCollection.push_back([feature mbglFeature]);
+    }
+    return featureCollection;
+}
+
 @end
 
 /**
@@ -277,8 +287,7 @@ public:
     }
     
     MGLShape <MGLFeaturePrivate> * operator()(const mbgl::Feature &feature) const {
-        GeometryEvaluator<T> evaluator;
-        MGLShape <MGLFeaturePrivate> *shape = mapbox::geometry::geometry<T>::visit(feature.geometry, evaluator);
+        MGLShape <MGLFeaturePrivate> *shape = (MGLShape <MGLFeaturePrivate> *)MGLFeatureFromMBGLFeature(feature);
         return shape;
     }
     
