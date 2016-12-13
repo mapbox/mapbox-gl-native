@@ -733,7 +733,12 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 {
     MGLLineStyleLayer *roadLayer = (MGLLineStyleLayer *)[self.mapView.style layerWithIdentifier:@"road-primary"];
     roadLayer.lineColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor blackColor]];
-    MGLStyleValue *lineWidthFunction = [MGLStyleValue<NSNumber *> valueWithStops:@{}];
+
+    MGLStyleValue *lineWidthFunction = [MGLStyleValue<NSNumber *> valueWithStops:@{
+       @5: [MGLStyleValue<NSNumber *> valueWithRawValue:@5],
+       @10: [MGLStyleValue<NSNumber *> valueWithRawValue:@15],
+       @15: [MGLStyleValue<NSNumber *> valueWithRawValue:@30],
+    }];
 
     MGLStyleValue *roadLineColor = [MGLStyleValue<UIColor *> valueWithStops:@{
         @10: [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor purpleColor]],
@@ -1156,7 +1161,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     baseRouteLayer.lineJoin = [MGLStyleConstantValue valueWithRawValue:[NSValue valueWithMGLLineJoin:MGLLineJoinRound]];
     [self.mapView.style addLayer:baseRouteLayer];
 
-    MGLLineStyleLayer *routeLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"style-base-route-layer" source:routeSource];
+    MGLLineStyleLayer *routeLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"style-route-layer" source:routeSource];
     routeLayer.lineColor = [MGLStyleConstantValue valueWithRawValue:[UIColor whiteColor]];
     routeLayer.lineWidth = [MGLStyleConstantValue valueWithRawValue:@15];
     routeLayer.lineOpacity = [MGLStyleConstantValue valueWithRawValue:@0.8];
