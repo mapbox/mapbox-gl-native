@@ -75,9 +75,6 @@ public:
     bool isComplete() const {
         return availableData == DataAvailability::All;
     }
-    bool isIncomplete() const {
-        return availableData == DataAvailability::Some;
-    }
 
     void dumpDebugLogs() const;
 
