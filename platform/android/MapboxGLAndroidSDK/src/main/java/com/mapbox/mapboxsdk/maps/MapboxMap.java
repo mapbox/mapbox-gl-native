@@ -230,7 +230,7 @@ public final class MapboxMap {
     }
 
     /**
-     * Add an image to be used int hte map's style
+     * Adds an image to be used in the map's style
      *
      * @param name  the name of the image
      * @param image the pre-multiplied Bitmap
