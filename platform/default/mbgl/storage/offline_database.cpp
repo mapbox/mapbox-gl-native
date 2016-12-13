@@ -224,6 +224,37 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
 
     return { inserted, size };
 }
+    
+std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource, const Response& response, bool evict_, bool compressed) {
+    if (response.error) {
+        return { false, 0 };
+    }
+    
+    uint64_t size = response.data->size();
+    
+    if (response.data) {
+        size = response.data->size();
+    } else {
+        size = 0;
+    }
+    
+    if (evict_ && !evict(size)) {
+        Log::Info(Event::Database, "Unable to make space for entry");
+        return { false, 0 };
+    }
+    
+    bool inserted;
+    
+    if (resource.kind == Resource::Kind::Tile) {
+        assert(resource.tileData);
+        inserted = putTile(*resource.tileData, response, *response.data, compressed);
+    } else {
+        inserted = putResource(resource, response, *response.data, compressed);
+    }
+    
+    return { inserted, size };
+}
+
 
 optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resource& resource) {
     // Update accessed timestamp used for LRU eviction.
@@ -668,6 +699,34 @@ void OfflineDatabase::putRegionResources(int64_t regionID, const std::list<std::
     // Commit the completed batch
     transaction.commit();
 }
+    
+void OfflineDatabase::putRegionResources(int64_t regionID, const std::list<std::tuple<Resource, Response, bool>>& resources, OfflineRegionStatus& status) {
+    mapbox::sqlite::Transaction transaction(*db);
+    
+    for (const auto& elem : resources) {
+        const auto& resource = std::get<0>(elem);
+        const auto& response = std::get<1>(elem);
+        const auto compressed = std::get<2>(elem);
+        
+        try {
+            uint64_t resourceSize = putRegionResourceInternal(regionID, resource, response, compressed);
+            status.completedResourceCount++;
+            status.completedResourceSize += resourceSize;
+            if (resource.kind == Resource::Kind::Tile) {
+                status.completedTileCount += 1;
+                status.completedTileSize += resourceSize;
+            }
+        } catch (MapboxTileLimitExceededException) {
+            // Commit the rest of the batch and retrow
+            transaction.commit();
+            throw;
+        }
+    }
+    
+    // Commit the completed batch
+    transaction.commit();
+}
+
 
 uint64_t OfflineDatabase::putRegionResourceInternal(int64_t regionID, const Resource& resource, const Response& response) {
     if (exceedsOfflineMapboxTileCountLimit(resource)) {
@@ -684,6 +743,24 @@ uint64_t OfflineDatabase::putRegionResourceInternal(int64_t regionID, const Reso
         *offlineMapboxTileCount += 1;
     }
 
+    return size;
+}
+    
+uint64_t OfflineDatabase::putRegionResourceInternal(int64_t regionID, const Resource& resource, const Response& response, bool compressed) {
+    if (exceedsOfflineMapboxTileCountLimit(resource)) {
+        throw MapboxTileLimitExceededException();
+    }
+    
+    uint64_t size = putInternal(resource, response, false, compressed).second;
+    bool previouslyUnused = markUsed(regionID, resource);
+    
+    if (offlineMapboxTileCount
+        && resource.kind == Resource::Kind::Tile
+        && util::mapbox::isMapboxURL(resource.url)
+        && previouslyUnused) {
+        *offlineMapboxTileCount += 1;
+    }
+    
     return size;
 }
 

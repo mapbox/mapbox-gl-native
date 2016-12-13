@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <mutex>
+#include <list>
 
 namespace mbgl {
 
@@ -122,6 +123,8 @@ public:
      * by the Mapbox Terms of Service.
      */
     void setOfflineMapboxTileCountLimit(uint64_t) const;
+    
+    void startPutRegionResources(OfflineRegion& region, const std::list<std::tuple<Resource, Response, bool>>&, std::function<void (std::exception_ptr)> callback);
 
     /*
      * Pause file request activity.

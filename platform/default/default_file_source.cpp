@@ -174,6 +174,16 @@ public:
     void put(const Resource& resource, const Response& response) {
         offlineDatabase->put(resource, response);
     }
+    
+    void startPutRegionResources(const int64_t regionID, const std::list<std::tuple<Resource, Response, bool>>& resources, std::function<void (std::exception_ptr)> callback) {
+        try {
+            OfflineRegionStatus status;
+            offlineDatabase->putRegionResources(regionID, resources, status);
+            callback({});
+        } catch (...) {
+            callback(std::current_exception());
+        }
+    }
 
 private:
     OfflineDownload& getDownload(int64_t regionID) {
@@ -285,6 +295,10 @@ void DefaultFileSource::getOfflineRegionStatus(OfflineRegion& region, std::funct
 
 void DefaultFileSource::setOfflineMapboxTileCountLimit(uint64_t limit) const {
     impl->actor().invoke(&Impl::setOfflineMapboxTileCountLimit, limit);
+}
+    
+void DefaultFileSource::startPutRegionResources(OfflineRegion& region, const std::list<std::tuple<Resource, Response, bool>>& resources, std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::startPutRegionResources, region.getID(), resources, callback);
 }
 
 void DefaultFileSource::pause() {
