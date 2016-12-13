@@ -27,6 +27,8 @@
     "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#66397c8ee0426537d25e8d4cfcac134ca21a021b",
     "mkdirp": "^0.5.1",
     "node-cmake": "^1.2.1",
+    "pixelmatch": "^4.0.2",
+    "pngjs": "^3.0.0",
     "request": "^2.72.0",
     "tape": "^4.5.1"
   },
