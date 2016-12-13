@@ -23,6 +23,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
+import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
 
 import org.hamcrest.Matcher;
 import org.junit.After;
@@ -58,13 +59,14 @@ public class MapboxMapTest {
     @Before
     public void beforeTest() {
         activity = rule.getActivity();
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         idlingResource = new OnMapReadyIdlingResource(activity);
         Espresso.registerIdlingResources(idlingResource);
     }
 
     @Test
-    @Ignore
     public void testSanity() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         assertNotNull("mapboxMap should not be null", mapboxMap);
     }
@@ -74,16 +76,16 @@ public class MapboxMapTest {
     //
 
     @Test
-    @Ignore
     public void testMinZoom() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         onView(withId(R.id.mapView)).perform(new MinZoomAction(mapboxMap));
         assertEquals("MinZoom should match", 10, mapboxMap.getMinZoom(), 0);
     }
 
     @Test
-    @Ignore
     public void testMaxZoom() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         double zoom = 10;
         mapboxMap.setMaxZoom(zoom);
@@ -91,8 +93,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testInitialZoomLevels() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         assertEquals("MaxZoom should match", MapboxConstants.MAXIMUM_ZOOM, mapboxMap.getMaxZoom(), 0);
         assertEquals("MinZoom should match", MapboxConstants.MINIMUM_ZOOM, mapboxMap.getMinZoom(), 0);
@@ -103,8 +105,8 @@ public class MapboxMapTest {
     //
 
     @Test
-    @Ignore
     public void testTrackingSettings() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         assertNotNull("TrackingSettings should not be null", mapboxMap.getTrackingSettings());
     }
@@ -114,24 +116,24 @@ public class MapboxMapTest {
     //
 
     @Test
-    @Ignore
     public void testConcurrentInfoWindowEnabled() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         mapboxMap.setAllowConcurrentMultipleOpenInfoWindows(true);
         assertTrue("ConcurrentWindows should be true", mapboxMap.isAllowConcurrentMultipleOpenInfoWindows());
     }
 
     @Test
-    @Ignore
     public void testConcurrentInfoWindowDisabled() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         mapboxMap.setAllowConcurrentMultipleOpenInfoWindows(false);
         assertFalse("ConcurrentWindows should be false", mapboxMap.isAllowConcurrentMultipleOpenInfoWindows());
     }
 
     @Test
-    @Ignore
     public void testInfoWindowAdapter() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         MapboxMap.InfoWindowAdapter infoWindowAdapter = new MapboxMap.InfoWindowAdapter() {
             @Nullable
@@ -151,6 +153,7 @@ public class MapboxMapTest {
     @Test
     @Ignore /* disabled due to enabling permissions during test #7177 */
     public void testMyLocationEnabled() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         mapboxMap.setMyLocationEnabled(true);
         assertTrue("MyLocationEnabled should be true", mapboxMap.isMyLocationEnabled());
@@ -159,6 +162,7 @@ public class MapboxMapTest {
     @Test
     @Ignore /* can't create handler inside thread that not called Looper.prepare() */
     public void testMyLocationDisabled() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         mapboxMap.setMyLocationEnabled(false);
         assertFalse("MyLocationEnabled should be false", mapboxMap.isMyLocationEnabled());
@@ -169,8 +173,8 @@ public class MapboxMapTest {
     //
 
     @Test
-    @Ignore
     public void testFpsListener() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         MapboxMap.OnFpsChangedListener fpsChangedListener = new MapboxMap.OnFpsChangedListener() {
             @Override
@@ -183,8 +187,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testInfoWindowClickListener() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         MapboxMap.OnInfoWindowClickListener clickListener = new MapboxMap.OnInfoWindowClickListener() {
             @Override
@@ -197,8 +201,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testInfoWindowCloseListener() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         MapboxMap.OnInfoWindowCloseListener listener = new MapboxMap.OnInfoWindowCloseListener() {
             @Override
@@ -211,8 +215,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testInfoWindowLongClickListener() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         MapboxMap.OnInfoWindowLongClickListener listener = new MapboxMap.OnInfoWindowLongClickListener() {
             @Override
@@ -229,8 +233,8 @@ public class MapboxMapTest {
     //
 
     @Test
-    @Ignore
     public void testAddMarker() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng());
         Marker marker = mapboxMap.addMarker(markerOptions);
@@ -238,14 +242,13 @@ public class MapboxMapTest {
     }
 
     @Test(expected = InvalidMarkerPositionException.class)
-    @Ignore
     public void testAddMarkerInvalidPosition() {
         new MarkerOptions().getMarker();
     }
 
     @Test
-    @Ignore
     public void testAddMarkers() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         List<BaseMarkerOptions> markerList = new ArrayList<>();
         MarkerOptions markerOptions1 = new MarkerOptions().position(new LatLng()).title("a");
@@ -259,8 +262,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testAddMarkersEmpty() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         List<BaseMarkerOptions> markerList = new ArrayList<>();
         mapboxMap.addMarkers(markerList);
@@ -268,8 +271,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testAddMarkersSingleMarker() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         List<BaseMarkerOptions> markerList = new ArrayList<>();
         MarkerOptions markerOptions = new MarkerOptions().title("a").position(new LatLng());
@@ -280,8 +283,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testAddPolygon() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         PolygonOptions polygonOptions = new PolygonOptions().add(new LatLng());
         Polygon polygon = mapboxMap.addPolygon(polygonOptions);
@@ -289,8 +292,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testAddEmptyPolygon() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         PolygonOptions polygonOptions = new PolygonOptions();
         Polygon polygon = mapboxMap.addPolygon(polygonOptions);
@@ -298,8 +301,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testAddPolygons() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         List<PolygonOptions> polygonList = new ArrayList<>();
         PolygonOptions polygonOptions1 = new PolygonOptions().fillColor(Color.BLACK).add(new LatLng());
@@ -316,16 +319,16 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void addPolygonsEmpty() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         mapboxMap.addPolygons(new ArrayList<PolygonOptions>());
         assertEquals("Polygons size should be 0", 0, mapboxMap.getPolygons().size());
     }
 
     @Test
-    @Ignore
     public void addPolygonsSingle() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         List<PolygonOptions> polygonList = new ArrayList<>();
         PolygonOptions polygonOptions = new PolygonOptions().fillColor(Color.BLACK).add(new LatLng());
@@ -336,8 +339,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testAddPolyline() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         PolylineOptions polylineOptions = new PolylineOptions().add(new LatLng());
         Polyline polyline = mapboxMap.addPolyline(polylineOptions);
@@ -345,8 +348,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testAddEmptyPolyline() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         PolylineOptions polylineOptions = new PolylineOptions();
         Polyline polyline = mapboxMap.addPolyline(polylineOptions);
@@ -354,8 +357,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testAddPolylines() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         List<PolylineOptions> polylineList = new ArrayList<>();
         PolylineOptions polygonOptions1 = new PolylineOptions().color(Color.BLACK).add(new LatLng());
@@ -372,16 +375,16 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testAddPolylinesEmpty() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         mapboxMap.addPolylines(new ArrayList<PolylineOptions>());
         assertEquals("Polygons size should be 0", 0, mapboxMap.getPolylines().size());
     }
 
     @Test
-    @Ignore
     public void testAddPolylinesSingle() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         List<PolylineOptions> polylineList = new ArrayList<>();
         PolylineOptions polygonOptions = new PolylineOptions().color(Color.BLACK).add(new LatLng());
@@ -392,8 +395,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testRemoveMarker() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng());
         Marker marker = mapboxMap.addMarker(markerOptions);
@@ -402,8 +405,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testRemovePolygon() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         PolygonOptions polygonOptions = new PolygonOptions();
         Polygon polygon = mapboxMap.addPolygon(polygonOptions);
@@ -412,8 +415,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testRemovePolyline() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         PolylineOptions polylineOptions = new PolylineOptions();
         Polyline polyline = mapboxMap.addPolyline(polylineOptions);
@@ -422,8 +425,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testRemoveAnnotation() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng());
         Marker marker = mapboxMap.addMarker(markerOptions);
@@ -432,8 +435,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testRemoveAnnotationById() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng());
         mapboxMap.addMarker(markerOptions);
@@ -443,8 +446,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testRemoveAnnotations() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         List<BaseMarkerOptions> markerList = new ArrayList<>();
         MarkerOptions markerOptions1 = new MarkerOptions().title("a").position(new LatLng());
@@ -457,8 +460,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testClear() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         List<BaseMarkerOptions> markerList = new ArrayList<>();
         MarkerOptions markerOptions1 = new MarkerOptions().title("a").position(new LatLng());
@@ -471,8 +474,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testRemoveAnnotationsByList() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         List<BaseMarkerOptions> markerList = new ArrayList<>();
         MarkerOptions markerOptions1 = new MarkerOptions().title("a").position(new LatLng());
@@ -487,8 +490,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testGetAnnotationById() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng());
         Marker initialMarker = mapboxMap.addMarker(markerOptions);
@@ -497,43 +500,43 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testGetAnnotations() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         assertNotNull("Annotations should be non null", mapboxMap.getAnnotations());
     }
 
     @Test
-    @Ignore
     public void testGetMarkers() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         assertNotNull("Markers should be non null", mapboxMap.getMarkers());
     }
 
     @Test
-    @Ignore
     public void testGetPolygons() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         assertNotNull("Polygons should be non null", mapboxMap.getPolygons());
     }
 
     @Test
-    @Ignore
     public void testGetPolylines() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         assertNotNull("Polylines should be non null", mapboxMap.getPolylines());
     }
 
     @Test
-    @Ignore
     public void testGetSelectedMarkers() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         assertNotNull("Selected markers should be non null", mapboxMap.getSelectedMarkers());
     }
 
     @Test
-    @Ignore
     public void testSelectMarker() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng());
         Marker marker = mapboxMap.addMarker(markerOptions);
@@ -542,8 +545,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testDeselectMarker() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng());
         Marker marker = mapboxMap.addMarker(markerOptions);
@@ -553,8 +556,8 @@ public class MapboxMapTest {
     }
 
     @Test
-    @Ignore
     public void testDeselectMarkers() {
+        ViewUtils.checkViewIsDisplayed(R.id.mapView);
         MapboxMap mapboxMap = activity.getMapboxMap();
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng());
         Marker marker1 = mapboxMap.addMarker(markerOptions);
