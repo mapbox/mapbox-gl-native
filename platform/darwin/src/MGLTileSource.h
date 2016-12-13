@@ -162,6 +162,17 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
  */
 - (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options;
 
+#pragma mark Accessing a Source’s Content
+
+/**
+ The URL to the TileJSON configuration file that specifies the contents of the
+ source.
+
+ If the receiver was initialized using
+ `-initWithIdentifier:tileURLTemplates:options`, this property is set to `nil`.
+ */
+@property (nonatomic, copy, nullable, readonly) NSURL *configurationURL;
+
 #pragma mark Accessing Attribution Strings
 
 /**
