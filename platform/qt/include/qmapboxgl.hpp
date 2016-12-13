@@ -186,6 +186,7 @@ public:
     QMargins margins() const;
 
     void addSource(const QString &sourceID, const QVariantMap& params);
+    void updateSource(const QString &sourceID, const QVariantMap& params);
     void removeSource(const QString &sourceID);
 
     void addImage(const QString &name, const QImage &sprite);

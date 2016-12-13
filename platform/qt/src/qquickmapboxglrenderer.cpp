@@ -88,7 +88,7 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
     }
 
     for (const auto& change : quickMap->m_sourceChanges) {
-        m_map->addSource(change.value("id").toString(), change);
+        m_map->updateSource(change.value("id").toString(), change);
     }
     quickMap->m_sourceChanges.clear();
 
