@@ -1210,7 +1210,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     NSString *bestLanguage;
 
     for (NSString *language in preferredLanguages) {
-        NSString *thisLanguage = [NSLocale localeWithLocaleIdentifier:language].languageCode;
+        NSString *thisLanguage = [[NSLocale localeWithLocaleIdentifier:language] objectForKey:NSLocaleLanguageCode];
         if ([supportedLanguages containsObject:thisLanguage]) {
             bestLanguage = thisLanguage;
             break;
