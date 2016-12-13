@@ -13,6 +13,7 @@
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -694,8 +695,6 @@ void QMapboxGL::addSource(const QString &sourceID, const QVariantMap &params)
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
-    removeSource(sourceID);
-
     Result<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(QVariant(params), sourceID.toStdString());
     if (!source) {
         qWarning() << "Unable to add source:" << source.error().message.c_str();
@@ -703,6 +702,31 @@ void QMapboxGL::addSource(const QString &sourceID, const QVariantMap &params)
     }
 
     d_ptr->mapObj->addSource(std::move(*source));
+}
+
+void QMapboxGL::updateSource(const QString &sourceID, const QVariantMap &params)
+{
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    auto source = d_ptr->mapObj->getSource(sourceID.toStdString());
+    if (!source) {
+        addSource(sourceID, params);
+        return;
+    }
+
+    auto sourceGeoJSON = source->as<GeoJSONSource>();
+    if (!sourceGeoJSON) {
+        qWarning() << "Unable to update source: only GeoJSON sources are mutable.";
+        return;
+    }
+
+    if (params.contains("data")) {
+        auto result = convertGeoJSON(params["data"]);
+        if (result) {
+            sourceGeoJSON->setGeoJSON(*result);
+        }
+    }
 }
 
 void QMapboxGL::removeSource(const QString& sourceID)
