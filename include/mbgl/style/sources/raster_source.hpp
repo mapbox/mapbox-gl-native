@@ -11,9 +11,12 @@ class RasterSource : public Source {
 public:
     RasterSource(std::string id, variant<std::string, Tileset> urlOrTileset, uint16_t tileSize);
 
+    optional<std::string> getURL() const;
+
     // Private implementation
 
     class Impl;
+    Impl* const impl;
 };
 
 template <>

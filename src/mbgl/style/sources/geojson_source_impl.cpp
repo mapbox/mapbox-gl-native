@@ -47,7 +47,7 @@ void GeoJSONSource::Impl::setURL(std::string url_) {
     }
 }
 
-optional<std::string> GeoJSONSource::Impl::getURL() {
+optional<std::string> GeoJSONSource::Impl::getURL() const {
     return url;
 }
 
