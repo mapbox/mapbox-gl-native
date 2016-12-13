@@ -237,7 +237,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconAllowOverlap;
 
@@ -246,7 +246,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconIgnorePlacement;
 
@@ -262,7 +262,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`, and `iconRotationAlignment` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLIconRotationAlignmentMap`, and `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`, and `iconRotationAlignment` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLIconRotationAlignmentMap`, and `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconKeepUpright;
 
@@ -271,7 +271,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing a `CGVector` struct set to 0 from the left and 0 from the top. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconOffset;
 
@@ -280,7 +280,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`, and `textField` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`, and `textField` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconOptional;
 
@@ -291,7 +291,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `2`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconPadding;
 
@@ -302,7 +302,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconRotate;
 
@@ -311,7 +311,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLIconRotationAlignmentAuto`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconRotationAlignment;
 
@@ -320,7 +320,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  
  This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-size"><code>icon-size</code></a> layout property in the Mapbox Style Specification.
  */
@@ -331,7 +331,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLIconTextFitNone`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`, and `textField` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`, and `textField` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFit;
 
@@ -342,7 +342,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `NSEdgeInsetsZero` or `UIEdgeInsetsZero`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `iconImage` is non-`nil`, and `textField` is non-`nil`, and `iconTextFit` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLIconTextFitBoth`, `MGLIconTextFitWidth`, or `MGLIconTextFitHeight`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`, and `textField` is non-`nil`, and `iconTextFit` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLIconTextFitBoth`, `MGLIconTextFitWidth`, or `MGLIconTextFitHeight`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFitPadding;
 
@@ -492,7 +492,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`, and `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `textField` is non-`nil`, and `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textOptional;
 
@@ -560,20 +560,20 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 
 #if TARGET_OS_IPHONE
 /**
- The color of the icon. This can only be used with sdf icons.
+ The tint color to apply to the icon. The `iconImageName` property must be set to a template image.
  
  The default value of this property is an `MGLStyleValue` object containing `UIColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconColor;
 #else
 /**
- The color of the icon. This can only be used with sdf icons.
+ The tint color to apply to the icon. The `iconImageName` property must be set to a template image.
  
  The default value of this property is an `MGLStyleValue` object containing `NSColor.blackColor`. Set this property to `nil` to reset it to the default value.
 
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconColor;
 #endif
@@ -585,26 +585,26 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
 
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloBlur;
 
 #if TARGET_OS_IPHONE
 /**
- The color of the icon's halo. Icon halos can only be used with SDF icons.
+ The color of the icon’s halo. The `iconImageName` property must be set to a template image.
  
  The default value of this property is an `MGLStyleValue` object containing `UIColor.clearColor`. Set this property to `nil` to reset it to the default value.
 
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconHaloColor;
 #else
 /**
- The color of the icon's halo. Icon halos can only be used with SDF icons.
+ The color of the icon’s halo. The `iconImageName` property must be set to a template image.
  
  The default value of this property is an `MGLStyleValue` object containing `NSColor.clearColor`. Set this property to `nil` to reset it to the default value.
 
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconHaloColor;
 #endif
@@ -616,7 +616,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
 
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloWidth;
 
@@ -625,7 +625,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
 
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconOpacity;
 
@@ -636,7 +636,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing a `CGVector` struct set to 0 points from the left and 0 points from the top. Set this property to `nil` to reset it to the default value.
 
- This property is only applied to the style if `iconImage` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslate;
 
@@ -645,7 +645,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLIconTranslateAnchorMap`. Set this property to `nil` to reset it to the default value.
 
- This property is only applied to the style if `iconImage` is non-`nil`, and `iconTranslate` is non-`nil`. Otherwise, it is ignored.
+ This property is only applied to the style if `iconImageName` is non-`nil`, and `iconTranslate` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslateAnchor;
 
