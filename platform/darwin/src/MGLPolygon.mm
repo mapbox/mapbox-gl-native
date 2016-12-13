@@ -5,6 +5,8 @@
 
 #import "MGLPolygon+MGLAdditions.h"
 
+#import <mbgl/util/geojson.hpp>
+
 @implementation MGLPolygon
 
 @dynamic overlayBounds;

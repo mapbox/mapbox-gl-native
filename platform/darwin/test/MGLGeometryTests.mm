@@ -131,7 +131,7 @@
     XCTAssertTrue([serializedGeoJSON isKindOfClass:[NSDictionary class]], @"Serialized GeoJSON data should be a JSON object.");
     NSDictionary *geoJSON = @{
         @"type": @"Feature",
-        @"identifier": @504,
+        @"id": @504,
         @"geometry": @{
             @"type": @"Point",
             @"coordinates": @[

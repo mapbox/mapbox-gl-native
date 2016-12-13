@@ -5,6 +5,8 @@
 
 #import "MGLPolyline+MGLAdditions.h"
 
+#import <mbgl/util/geojson.hpp>
+
 @implementation MGLPolyline
 
 @dynamic overlayBounds;

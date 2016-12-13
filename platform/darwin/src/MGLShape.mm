@@ -26,8 +26,18 @@
     }
 }
 
+- (mbgl::GeoJSON)geoJSONObject {
+    return self.geometryObject;
+}
+
+- (mbgl::Geometry<double>)geometryObject {
+    [NSException raise:@"MGLAbstractClassException"
+                format:@"MGLShape is an abstract class"];
+    return mbgl::Point<double>();
+}
+
 - (NSData *)geoJSONDataUsingEncoding:(NSStringEncoding)encoding {
-    auto geometry = self.geometryObject;
+    auto geometry = self.geoJSONObject;
     NSString *string = @(mapbox::geojson::stringify(geometry).c_str());
     return [string dataUsingEncoding:NSUTF8StringEncoding];
 }

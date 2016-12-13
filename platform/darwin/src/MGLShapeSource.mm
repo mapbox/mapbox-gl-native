@@ -100,16 +100,7 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
 }
 
 - (void)setShape:(MGLShape *)shape {
-    if ([shape isKindOfClass:[MGLShapeCollectionFeature class]]) {
-        MGLShapeCollectionFeature *feature = (MGLShapeCollectionFeature *)shape;
-        self.rawSource->setGeoJSON({ [feature mbglFeatureCollection] });
-    } else if ([shape conformsToProtocol:@protocol(MGLFeature)]) {
-        id<MGLFeaturePrivate> feature = (id<MGLFeaturePrivate>)shape;
-        self.rawSource->setGeoJSON({ [feature mbglFeature] });
-    } else {
-        self.rawSource->setGeoJSON({ shape.geometryObject });
-    }
-    
+    self.rawSource->setGeoJSON({ shape.geoJSONObject });
     _shape = shape;
 }
 

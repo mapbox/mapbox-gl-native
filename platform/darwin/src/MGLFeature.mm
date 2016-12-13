@@ -34,6 +34,10 @@
     return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
 }
 
+- (mbgl::GeoJSON)geoJSONObject {
+    return self.mbglFeature;
+}
+
 - (mbgl::Feature)mbglFeature {
     return mbglFeature({[self geometryObject]}, identifier, self.attributes);
 }
@@ -54,6 +58,10 @@
 
 - (NSDictionary *)geoJSONDictionary {
     return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
+}
+
+- (mbgl::GeoJSON)geoJSONObject {
+    return self.mbglFeature;
 }
 
 - (mbgl::Feature)mbglFeature {
@@ -78,6 +86,10 @@
     return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
 }
 
+- (mbgl::GeoJSON)geoJSONObject {
+    return self.mbglFeature;
+}
+
 - (mbgl::Feature)mbglFeature {
     return mbglFeature({[self geometryObject]}, identifier, self.attributes);
 }
@@ -98,6 +110,10 @@
 
 - (NSDictionary *)geoJSONDictionary {
     return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
+}
+
+- (mbgl::GeoJSON)geoJSONObject {
+    return self.mbglFeature;
 }
 
 - (mbgl::Feature)mbglFeature {
@@ -122,6 +138,10 @@
     return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
 }
 
+- (mbgl::GeoJSON)geoJSONObject {
+    return self.mbglFeature;
+}
+
 - (mbgl::Feature)mbglFeature {
     return mbglFeature({[self geometryObject]}, identifier, self.attributes);
 }
@@ -142,6 +162,10 @@
 
 - (NSDictionary *)geoJSONDictionary {
     return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
+}
+
+- (mbgl::GeoJSON)geoJSONObject {
+    return self.mbglFeature;
 }
 
 - (mbgl::Feature)mbglFeature {
@@ -170,6 +194,10 @@
 
 - (NSDictionary *)geoJSONDictionary {
     return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
+}
+
+- (mbgl::GeoJSON)geoJSONObject {
+    return self.mbglFeatureCollection;
 }
 
 - (mbgl::Feature)mbglFeature {
