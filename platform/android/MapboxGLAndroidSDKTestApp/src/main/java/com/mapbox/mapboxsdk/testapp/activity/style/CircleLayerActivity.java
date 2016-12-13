@@ -1,10 +1,10 @@
 package com.mapbox.mapboxsdk.testapp.activity.style;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,35 +14,41 @@ import timber.log.Timber;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
-import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static com.mapbox.mapboxsdk.style.layers.Filter.in;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
 
-/**
- * Example to add a circle as a layer using runtime style API, contains adding
- * GeoJSON as source that contains 1 Feature with a Point geometry, adding a circle layer and
- * changing circle layer properties as size and colors.
- */
 public class CircleLayerActivity extends AppCompatActivity {
 
-  private MapboxMap mapboxMap;
+  private static final String[] STOPS_FOR_ROUTE = new String[] {"99009", "99131", "99049", "99039", "99029", "99019",
+    "98079", "98069", "97099", "97089", "97079", "97069", "97209", "97059", "97049", "97039", "97019", "96069",
+    "96059", "96049", "96099", "96089", "96079", "85079", "85089", "85069", "85059", "85099", "84069", "84059",
+    "84049", "84039", "84029", "84019", "83099", "83079", "83059", "83049", "83029", "82069", "82049", "82029",
+    "82109", "81069", "81049", "81029", "80089", "80069", "80049", "80039", "80029", "01319", "01219", "01129",
+    "01059", "01119", "01019", "04159", "04149", "04229", "04239", "05059", "05049", "05039", "05019", "10589"};
+
   private MapView mapView;
-  private Layer circleLayer;
+  private MapboxMap mapboxMap;
+  private CircleLayer layer;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_circlelayer);
+    setContentView(R.layout.activity_circle_layer);
 
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
@@ -59,40 +65,50 @@ public class CircleLayerActivity extends AppCompatActivity {
       @Override
       public void onMapReady(@NonNull final MapboxMap map) {
         mapboxMap = map;
+        try {
+          mapboxMap.addSource(new GeoJsonSource("bus_stop",
+            new URL("https://raw.githubusercontent.com/cheeaun/busrouter-sg/master/data/2/bus-stops.geojson")));
+        } catch (MalformedURLException malformedUrlException) {
+          Timber.e("That's not an url... ", malformedUrlException);
+        }
+
+        layer = new CircleLayer("stops_layer", "bus_stop");
+        layer.setProperties(
+          circleColor(Color.parseColor("#FF9800")),
+          circleRadius(1.0f)
+        );
+
+        mapboxMap.addLayer(layer);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setColorFilter(ContextCompat.getColor(CircleLayerActivity.this, R.color.primary));
         fab.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
-            if (circleLayer == null) {
-              // first time
-              try {
-                mapboxMap.addSource(new GeoJsonSource("point", new URL("https://gist.githubusercontent.com/anonymous/87eca90e80a72b1b42be9d0201ec3c8e/raw/acbb46384fd56044a504f122950d0637d98b4e7a/map.geojson")));
-              } catch (MalformedURLException malformedUrlException) {
-                Timber.e(
-                  "That's not an url... " + malformedUrlException.getMessage()
-                );
-              }
 
-              circleLayer = new CircleLayer("circleLayer", "point");
-              circleLayer.setProperties(
-                circleColor(ResourcesCompat.getColor(getResources(), R.color.primary_dark, getTheme())),
-                circleRadius(getResources().getDimension(R.dimen.circle_size))
-              );
+            // filter out stops for our route
+            layer.setFilter(in("number", STOPS_FOR_ROUTE));
 
-              // lets add a circle below labels!
-              mapboxMap.addLayer(circleLayer, "waterway-label");
-            } else {
-              // change size and color
-              circleLayer.setProperties(
-                circleRadius(mapView.getTag() == null
-                  ? getResources().getDimension(R.dimen.activity_horizontal_margin)
-                  : getResources().getDimension(R.dimen.circle_size)),
-                circleColor(mapView.getTag() == null ? ResourcesCompat.getColor(
-                  getResources(), R.color.blue_accent, getTheme()) : ResourcesCompat.getColor(
-                  getResources(), R.color.green_accent, getTheme())));
-              mapView.setTag(mapView.getTag() == null ? mapboxMap : null);
+            // add route as a line
+            try {
+              mapboxMap.addSource(new GeoJsonSource("bus_route",
+                new URL("https://gist.githubusercontent.com/tobrun/7fbc0fe7e9ffea509f7608cda2601d5d/raw/"
+                  + "a4b8cc289020f91fa2e1553524820054395e36f5/line.geojson")));
+            } catch (MalformedURLException malformedUrlException) {
+              Timber.e("That's not an url... ", malformedUrlException);
             }
+            LineLayer lineLayer = new LineLayer("route_layer", "bus_route");
+            mapboxMap.addLayer(lineLayer, "stops_layer");
+
+            // move camera to start route
+            mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+              new CameraPosition.Builder()
+                .target(new LatLng(1.3896777, 103.9874997))
+                .bearing(225)
+                .tilt(45)
+                .zoom(13)
+                .build()
+            ), 1750);
           }
         });
       }
