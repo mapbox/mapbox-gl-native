@@ -364,6 +364,13 @@
                 android:name="@string/category"
                 android:value="@string/category_style" />
         </activity>
+        <activity android:name=".activity.style.RandomFillActivity"
+            android:description="@string/description_random_polygon"
+            android:label="@string/activity_random_polygon">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style" />
+        </activity>
         <activity
             android:name=".activity.style.StyleFileActivity"
             android:description="@string/description_style_file"
