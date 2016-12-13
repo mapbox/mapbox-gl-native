@@ -9,6 +9,9 @@
 
 const MGLTileSourceOption MGLTileSourceOptionTileSize = @"MGLTileSourceOptionTileSize";
 
+static const CGFloat MGLRasterSourceClassicTileSize = 256;
+static const CGFloat MGLRasterSourceRetinaTileSize = 512;
+
 @interface MGLRasterSource ()
 
 - (instancetype)initWithRawSource:(mbgl::style::RasterSource *)rawSource NS_DESIGNATED_INITIALIZER;
@@ -22,7 +25,14 @@ const MGLTileSourceOption MGLTileSourceOptionTileSize = @"MGLTileSourceOptionTil
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL {
-    return [self initWithIdentifier:identifier configurationURL:configurationURL tileSize:0];
+    // The style specification default is 512, but 256 is the expected value for
+    // any tile set that would be accessed through a mapbox: URL and therefore
+    // any tile URL that this option currently affects.
+    BOOL isMapboxURL = ([configurationURL.scheme isEqualToString:@"mapbox"]
+                        && [configurationURL.host containsString:@"."]
+                        && (!configurationURL.path.length || [configurationURL.path isEqualToString:@"/"]));
+    CGFloat tileSize = isMapboxURL ? MGLRasterSourceClassicTileSize : MGLRasterSourceRetinaTileSize;
+    return [self initWithIdentifier:identifier configurationURL:configurationURL tileSize:tileSize];
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL tileSize:(CGFloat)tileSize {
