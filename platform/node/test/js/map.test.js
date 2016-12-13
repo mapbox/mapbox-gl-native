@@ -371,6 +371,48 @@ test('Map', function(t) {
             map.release();
             t.end();
         });
+
+        // This can't be tested with a test-suite render test because zoom and center
+        // are set via a different code path when included as style properties.
+        t.test('sets zoom before center', function(t) {
+            var map = new mbgl.Map(options);
+            map.load({
+                "version": 8,
+                "sources": {
+                    "geojson": {
+                        "type": "geojson",
+                        "data": {
+                            "type": "Point",
+                            "coordinates": [
+                                18.05489,
+                                59.32744
+                            ]
+                        }
+                    }
+                },
+                "layers": [
+                    {
+                        "id": "circle",
+                        "type": "circle",
+                        "source": "geojson",
+                        "paint": {
+                            "circle-color": "red"
+                        }
+                    }
+                ]
+            });
+            map.render({width: 400, height: 400, zoom: 5, center: [18.05489, 59.32744]}, function(err, actual) {
+                t.error(err);
+
+                var PNG = require('pngjs').PNG;
+                var pixelmatch = require('pixelmatch');
+                var expected = PNG.sync.read(
+                    fs.readFileSync(path.join(__dirname, '../fixtures/zoom-center/expected.png'))).data;
+                var numPixels = pixelmatch(actual, expected, undefined, 400, 400, { threshold: 0.13 });
+                t.equal(numPixels, 0);
+                t.end();
+            });
+        })
     });
 
     t.test('request callback', function (t) {

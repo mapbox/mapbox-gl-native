@@ -371,13 +371,13 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
         map->setClasses(options.classes);
     }
 
+    if (map->getZoom() != options.zoom) {
+        map->setZoom(options.zoom);
+    }
+
     mbgl::LatLng latLng(options.latitude, options.longitude);
     if (map->getLatLng() != latLng) {
         map->setLatLng(latLng);
-    }
-
-    if (map->getZoom() != options.zoom) {
-        map->setZoom(options.zoom);
     }
 
     if (map->getBearing() != options.bearing) {
