@@ -11,9 +11,12 @@ class VectorSource : public Source {
 public:
     VectorSource(std::string id, variant<std::string, Tileset> urlOrTileset);
 
+    optional<std::string> getURL() const;
+
     // Private implementation
 
     class Impl;
+    Impl* const impl;
 };
 
 template <>
