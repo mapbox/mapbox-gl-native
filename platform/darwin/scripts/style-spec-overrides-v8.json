@@ -45,6 +45,12 @@
     }
   },
   "paint_symbol": {
+    "icon-color": {
+      "doc": "The tint color to apply to the icon. The `icon-image-name` property must be set to a template image."
+    },
+    "icon-halo-color": {
+      "doc": "The color of the icon’s halo. The `icon-image-name` property must be set to a template image."
+    },
     "icon-translate": {
       "doc": "Distance that the icon's anchor is moved from its original placement."
     },

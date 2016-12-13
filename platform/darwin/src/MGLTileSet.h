@@ -17,6 +17,32 @@ typedef NS_ENUM(NSUInteger, MGLTileSetScheme) {
  */
 @interface MGLTileSet : NSObject
 
+#pragma mark Creating a Tile Set
+
+/**
+ Initializes and returns a new tile set object.
+ 
+ @param tileURLTemplates An `NSArray` of `NSString` objects that represent the 
+    tile templates.
+ @return The initialized tile set object.
+ */
+- (instancetype)initWithTileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates;
+
+/**
+ Initializes and returns a new tile set object.
+ 
+ @param tileURLTemplates An `NSArray` of `NSString` objects that represent the 
+    tile templates.
+ @param minimumZoomLevel An `NSUInteger`; specifies the minimum zoom level at 
+    which to display tiles.
+ @param maximumZoomLevel An `NSUInteger`; specifies the maximum zoom level at 
+    which to display tiles.
+ @return The initialized tile set object.
+ */
+- (instancetype)initWithTileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates minimumZoomLevel:(NSUInteger)minimumZoomLevel maximumZoomLevel:(NSUInteger)maximumZoomLevel;
+
+#pragma mark Accessing Tile Set Metadata
+
 /**
  An `NSArray` of `NSString` objects that represent the tile templates.
  */
@@ -50,28 +76,6 @@ typedef NS_ENUM(NSUInteger, MGLTileSetScheme) {
  of the tile coordinates. The default is `MGLTileSetSchemeXYZ`.
  */
 @property (nonatomic) MGLTileSetScheme scheme;
-
-/**
- Initializes and returns a new tile set object.
- 
- @param tileURLTemplates An `NSArray` of `NSString` objects that represent the 
-    tile templates.
- @return The initialized tile set object.
- */
-- (instancetype)initWithTileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates;
-
-/**
- Initializes and returns a new tile set object.
- 
- @param tileURLTemplates An `NSArray` of `NSString` objects that represent the 
-    tile templates.
- @param minimumZoomLevel An `NSUInteger`; specifies the minimum zoom level at 
-    which to display tiles.
- @param maximumZoomLevel An `NSUInteger`; specifies the maximum zoom level at 
-    which to display tiles.
- @return The initialized tile set object.
- */
-- (instancetype)initWithTileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates minimumZoomLevel:(NSUInteger)minimumZoomLevel maximumZoomLevel:(NSUInteger)maximumZoomLevel;
 
 @end
 

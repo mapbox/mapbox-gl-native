@@ -1,4 +1,4 @@
-#import "MGLRasterSource.h"
+#import "MGLRasterSource_Private.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
@@ -8,6 +8,8 @@
 #include <mbgl/style/sources/raster_source.hpp>
 
 @interface MGLRasterSource ()
+
+- (instancetype)initWithRawSource:(mbgl::style::RasterSource *)rawSource NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic) mbgl::style::RasterSource *rawSource;
 
@@ -35,6 +37,16 @@
         _tileSet = tileSet;
         _tileSize = tileSize;
         [self commonInit];
+    }
+    return self;
+}
+
+- (instancetype)initWithRawSource:(mbgl::style::RasterSource *)rawSource {
+    if (self = [super initWithRawSource:rawSource]) {
+        if (auto attribution = rawSource->getAttribution()) {
+            _tileSet = [[MGLTileSet alloc] initWithTileURLTemplates:@[]];
+            _tileSet.attribution = @(attribution->c_str());
+        }
     }
     return self;
 }

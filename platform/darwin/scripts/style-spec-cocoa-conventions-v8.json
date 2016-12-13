@@ -5,7 +5,8 @@
   },
   "paint_raster": {
     "raster-brightness-min": "minimum-raster-brightness",
-    "raster-brightness-max": "maximum-raster-brightness"
+    "raster-brightness-max": "maximum-raster-brightness",
+    "raster-hue-rotate": "raster-hue-rotation"
   },
   "paint_line": {
     "line-dasharray": "line-dash-pattern"

@@ -140,7 +140,7 @@ Map::Impl::Impl(Backend& backend_,
 }
 
 Map::~Map() {
-    impl->backend.activate();
+    BackendScope guard(impl->backend);
 
     impl->styleRequest = nullptr;
 
@@ -149,8 +149,6 @@ Map::~Map() {
     impl->style.reset();
     impl->annotationManager.reset();
     impl->painter.reset();
-
-    impl->backend.deactivate();
 }
 
 void Map::renderStill(View& view, StillImageCallback callback) {
@@ -275,9 +273,8 @@ void Map::Impl::update() {
         backend.invalidate();
     } else if (stillImageRequest && style->isLoaded()) {
         // TODO: determine whether we need activate/deactivate
-        backend.activate();
+        BackendScope guard(backend);
         render(stillImageRequest->view);
-        backend.deactivate();
     }
 
     updateFlags = Update::Nothing;
@@ -848,12 +845,10 @@ void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& be
     }
 
     impl->styleMutated = true;
-    impl->backend.activate();
+    BackendScope guard(impl->backend);
 
     impl->style->addLayer(std::move(layer), before);
     impl->onUpdate(Update::Classes);
-
-    impl->backend.deactivate();
 }
 
 std::unique_ptr<Layer> Map::removeLayer(const std::string& id) {
@@ -862,12 +857,10 @@ std::unique_ptr<Layer> Map::removeLayer(const std::string& id) {
     }
 
     impl->styleMutated = true;
-    impl->backend.activate();
+    BackendScope guard(impl->backend);
 
     auto removedLayer = impl->style->removeLayer(id);
     impl->onUpdate(Update::Classes);
-
-    impl->backend.deactivate();
 
     return removedLayer;
 }
@@ -1033,9 +1026,8 @@ void Map::setSourceTileCacheSize(size_t size) {
 
 void Map::onLowMemory() {
     if (impl->painter) {
-        impl->backend.activate();
+        BackendScope guard(impl->backend);
         impl->painter->cleanup();
-        impl->backend.deactivate();
     }
     if (impl->style) {
         impl->style->onLowMemory();
