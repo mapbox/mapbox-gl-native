@@ -26,10 +26,6 @@ custom_categories:
       - MGLMapViewDelegate
       - MGLStyle
       - MGLUserTrackingMode
-  - name: User Interaction
-    children:
-      - MGLCalloutView
-      - MGLCalloutViewDelegate
   - name: Protocols and Abstract Classes
     children:
       - MGLAnnotation
@@ -52,6 +48,10 @@ custom_categories:
       - MGLAnnotationView
       - MGLUserLocation
       - MGLUserLocationAnnotationView
+  - name: User Interaction
+    children:
+      - MGLCalloutView
+      - MGLCalloutViewDelegate
   - name: Style Features
     children:
       - MGLPointFeature
