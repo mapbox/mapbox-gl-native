@@ -179,7 +179,7 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
       }
     };
 
-    static final List<List<LatLng>> STAR_SHAPE_HOLES = new ArrayList<ArrayList<LatLng>>() {
+    static final List<? extends List<LatLng>> STAR_SHAPE_HOLES = new ArrayList<ArrayList<LatLng>>() {
       {
         add(new ArrayList<LatLng>() {
           {

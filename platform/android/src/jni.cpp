@@ -769,8 +769,8 @@ jni::jarray<jlong>* nativeAddPolygons(JNIEnv *env, jni::jobject* obj, jlong nati
         NullCheck(*env, jarrayHoles);
 
         std::size_t size = jni::GetArrayLength(*env, *jarrayHoles);
-        for (std::size_t i = 0; i < size; i++) {
-            jni::jobject* hole = reinterpret_cast<jni::jobject*>(jni::GetObjectArrayElement(*env, *jarrayHoles, i));
+        for (std::size_t j = 0; j < size; j++) {
+            jni::jobject* hole = jni::GetObjectArrayElement(*env, *jarrayHoles, j);
             NullCheck(*env, hole);
             geometry.push_back(toGeometry<mbgl::LinearRing<double>>(env, hole));
             jni::DeleteLocalRef(*env, hole);

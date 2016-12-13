@@ -11,13 +11,11 @@ import java.util.List;
 public abstract class MultiPoint extends Annotation {
 
   private List<LatLng> points;
-  private List<List<LatLng>> holes;
   private float alpha = 1.0f;
 
   protected MultiPoint() {
     super();
     points = new ArrayList<>();
-    holes = new ArrayList<>();
   }
 
   /**
@@ -27,15 +25,6 @@ public abstract class MultiPoint extends Annotation {
    */
   public List<LatLng> getPoints() {
     return new ArrayList<>(points);
-  }
-
-  /*
-   * Returns a copy of the holes.
-   *
-   * @return holes - as a copy
-   */
-  public List<List<LatLng>> getHoles() {
-    return new ArrayList<>(holes);
   }
 
   /**
@@ -57,10 +46,6 @@ public abstract class MultiPoint extends Annotation {
   public void addPoint(LatLng point) {
     points.add(point);
     update();
-  }
-
-  void addHole(List<LatLng> hole) {
-    holes.add(hole);
   }
 
   /**
