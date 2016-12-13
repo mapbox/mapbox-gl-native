@@ -30,14 +30,24 @@ NS_ASSUME_NONNULL_BEGIN
 static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
- The proxy object for the current map style for customization purposes and a
- set of convenience methods for creating style URLs of default styles provided
- by Mapbox.
+ The proxy object for the current map style.
+ 
+ MGLStyle provides a set of convenience methods for changing Mapbox
+ default styles using `-[MGLMapView styleURL]`.
  <a href="https://www.mapbox.com/maps/">Learn more about Mapbox default styles</a>.
+ 
+ It is also possible to directly manipulate the current map style 
+ via `-[MGLMapView style]` by updating the style's data sources or layers.
+ 
+ @note Wait until the map style has finished loading before modifying a map's
+    style via any of the MGLStyle instance methods below.
+    You can use the `MGLMapViewDelegate` methods `-mapViewDidFinishLoadingMap:`
+    or `-mapView:didFinishLoadingStyle:` as indicators that it's safe
+    to modify the map's style.
  */
 @interface MGLStyle : NSObject
 
-#pragma mark Accessing Common Styles
+#pragma mark Accessing Default Styles
 
 /**
  Returns the URL to version 8 of the
@@ -199,10 +209,6 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Adds a new source to the current style.
-
- @note Wait until the map style has finished loading before adding a new source.
-    Implement `MGLMapViewDelegate` methods `-mapViewDidFinishLoadingMap:`
-    or `-mapView:didFinishLoadingStyle:`
  
  @note Adding the same source instance more than once will result in a
     `MGLRedundantSourceException`. Reusing the same source identifier, even with
@@ -255,10 +261,6 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Adds a new layer on top of existing layers.
-
- @note Wait until the map style has finished loading before adding a new layer. 
-    Implement `MGLMapViewDelegate` methods `-mapViewDidFinishLoadingMap:`
-    or `-mapView:didFinishLoadingStyle:`
  
  @note Adding the same layer instance more than once will result in a
     `MGLRedundantLayerException`. Reusing the same layer identifer, even with
@@ -271,10 +273,6 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Inserts a new layer into the style at the given index.
- 
- @note Wait until the map style has finished loading before inserting a new layer.
-    Implement `MGLMapViewDelegate` methods `-mapViewDidFinishLoadingMap:`
-    or `-mapView:didFinishLoadingStyle:`
  
  @note Adding the same layer instance more than once will result in a
     `MGLRedundantLayerException`. Reusing the same layer identifer, even with
@@ -289,10 +287,6 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Inserts a new layer below another layer.
- 
- @note Wait until the map style has finished loading before inserting a new layer.
-    Implement `MGLMapViewDelegate` methods `-mapViewDidFinishLoadingMap:`
-    or `-mapView:didFinishLoadingStyle:`
  
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set
@@ -313,10 +307,6 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Inserts a new layer above another layer.
- 
- @note Wait until the map style has finished loading before inserting a new layer.
-    Implement `MGLMapViewDelegate` methods `-mapViewDidFinishLoadingMap:`
-    or `-mapView:didFinishLoadingStyle:`
  
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set
