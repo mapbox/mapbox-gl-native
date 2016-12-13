@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
  tileset.attribution = "© Mapbox"
  // Add source to map
  let source = MGLVectorSource(identifier: "pois", tileSet: tileset)
- mapView.style().add(source)
+ mapView.style.addSource(source)
  ```
  */
 @interface MGLVectorSource : MGLTileSource

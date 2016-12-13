@@ -71,8 +71,8 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
     22: MGLStyleValue(rawValue: 180)
  ])
  layer.circleOpacity = MGLStyleValue(rawValue: 0.7)
- layer.predicate = NSPredicate(format: "%K == %@", "ethnicity", "ewok")
- mapView.style().add(layer)
+ layer.predicate = NSPredicate(format: "%K == %@", "marital-status", "married")
+ mapView.style.addLayer(layer)
  ```
  */
 @interface MGLCircleStyleLayer : MGLVectorStyleLayer

@@ -134,15 +134,10 @@ NS_ASSUME_NONNULL_BEGIN
  you could create a predicate using `NSCompoundPredicate` along these lines:
 
  ```swift
- let meters = 1500.0
- let layer = MGLLineStyleLayer(identifier: "contour", source: contours)
- layer.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-    NSCompoundPredicate(orPredicateWithSubpredicates: [
-	NSPredicate(format: "%K == 10", "contour-index"),
-	NSPredicate(format: "%K == 5", "contour-index"),
-    ]),
-    NSPredicate(format: "ele >= \(meters)"),
- ])
+ let layer = MGLLineStyleLayer(identifier: "contour", source: terrain)
+ layer.sourceLayerIdentifier = "contours"
+ layer.predicate = NSPredicate(format: "(index == 10 || index == 5) && ele >= 1500.0")
+ mapView.style.addLayer(layer)
  ```
  */
 @property (nonatomic, nullable) NSPredicate *predicate;

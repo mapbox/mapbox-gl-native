@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  tileset.attribution = "© Mapbox"
  // Add source to map
  let source = MGLRasterSource(identifier: "clouds", tileSet: tileset, tileSize: 512)
- mapView.style().add(source)
+ mapView.style.addSource(source)
  ```
  */
 extern const MGLTileSourceOption MGLTileSourceOptionTileSize;

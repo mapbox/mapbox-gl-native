@@ -45,7 +45,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
  layer.sourceLayerIdentifier = "parks"
  layer.fillColor = MGLStyleValue(rawValue: UIColor.green)
  layer.predicate = NSPredicate(format: "type == %@", "national-park")
- mapView.style().add(layer)
+ mapView.style.addLayer(layer)
  ```
  */
 @interface MGLFillStyleLayer : MGLVectorStyleLayer
