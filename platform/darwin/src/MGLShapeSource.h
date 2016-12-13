@@ -118,17 +118,17 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 
  If the receiver was initialized using `-initWithIdentifier:URL:options:`, this
  property is set to `nil`. This property is unavailable until the receiver is
- passed into `-[MGLStyle addSource]`.
+ passed into `-[MGLStyle addSource:]`.
  */
-@property (nonatomic, nullable) MGLShape *shape;
+@property (nonatomic, copy, nullable) MGLShape *shape;
 
 /**
  The URL to the GeoJSON document that specifies the contents of the source.
 
- If the receiver was initialized using
- `-initWithIdentifier:geoJSONData:options`, this property is set to `nil`.
+ If the receiver was initialized using `-initWithIdentifier:shape:options:`,
+ this property is set to `nil`.
  */
-@property (nonatomic, nullable) NSURL *URL;
+@property (nonatomic, copy, nullable) NSURL *URL;
 
 @end
 
