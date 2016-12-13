@@ -2,7 +2,6 @@
 # in ../sdk/tools/proguard/proguard-android.txt,
 # contents of this file will be appended into proguard-android.txt
 -keepattributes Signature, *Annotation*, EnclosingMethod
--dontobfuscate
 
 # Square okio, ignoring warnings,
 # see https://github.com/square/okio/issues/60
@@ -83,5 +82,5 @@
     long consumerIndex;
 }
 
--keep class com.google.**
+-keep class com.google.** { *; }
 -dontwarn com.google.**
