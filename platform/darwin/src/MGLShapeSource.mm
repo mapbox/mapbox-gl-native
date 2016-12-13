@@ -3,7 +3,6 @@
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLFeature_Private.h"
-#import "MGLShapeCollectionFeature_Private.h"
 #import "MGLShape_Private.h"
 
 #import "NSURL+MGLAdditions.h"

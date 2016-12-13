@@ -97,7 +97,7 @@
         CLLocationCoordinate2DMake(100.0, 1.0),
         CLLocationCoordinate2DMake(100.0, 0.0)};
     
-    MGLPolygonFeature<MGLFeaturePrivate> *polygonFeature = (MGLPolygonFeature<MGLFeaturePrivate> *)[MGLPolygonFeature polygonWithCoordinates:coordinates count:5];
+    MGLPolygonFeature *polygonFeature = [MGLPolygonFeature polygonWithCoordinates:coordinates count:5];
     polygonFeature.identifier = @"feature-id";
     NSString *stringAttribute = @"string";
     NSNumber *boolAttribute = [NSNumber numberWithBool:YES];
