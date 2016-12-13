@@ -20,7 +20,7 @@ ProcessedBiDiText::ProcessedBiDiText(BiDi& p_bidi) : bidi(p_bidi) {
 }
 
 void ProcessedBiDiText::mergeParagraphLineBreaks(std::set<int32_t>& lineBreakPoints) {
-    lineBreakPoints.insert(impl->string.length());
+    lineBreakPoints.insert(bidi.impl->string.length());
 }
 
 std::vector<std::u16string>
