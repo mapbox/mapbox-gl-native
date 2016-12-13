@@ -69,6 +69,11 @@
     super.rawSource = rawSource;
 }
 
+- (NSURL *)configurationURL {
+    auto url = self.rawSource->getURL();
+    return url ? [NSURL URLWithString:@(url->c_str())] : nil;
+}
+
 - (NSString *)attributionHTMLString {
     auto attribution = self.rawSource->getAttribution();
     return attribution ? @(attribution->c_str()) : nil;

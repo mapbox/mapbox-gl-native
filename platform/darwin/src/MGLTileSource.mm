@@ -27,6 +27,12 @@ const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem = @"MGLTileSou
     return [super initWithIdentifier:identifier];
 }
 
+- (NSURL *)configurationURL {
+    [NSException raise:@"MGLAbstractClassException"
+                format:@"MGLTileSource is an abstract class"];
+    return nil;
+}
+
 - (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfos {
     return [self attributionInfosWithFontSize:0 linkColor:nil];
 }
