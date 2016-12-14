@@ -19,7 +19,7 @@
     } catch (std::runtime_error &err) {
         if (outError) {
             *outError = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeUnknown userInfo:@{
-                NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"%s", err.what()],
+                NSLocalizedFailureReasonErrorKey: @(err.what()),
             }];
         }
         return nil;
