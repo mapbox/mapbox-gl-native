@@ -311,12 +311,12 @@ void SymbolLayout::addFeature(const GeometryCollection &lines,
     }
 }
 
-bool SymbolLayout::anchorIsTooClose(const std::u16string &text, const float repeatDistance, Anchor &anchor) {
+bool SymbolLayout::anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor& anchor) {
     if (compareText.find(text) == compareText.end()) {
         compareText.emplace(text, Anchors());
     } else {
         auto otherAnchors = compareText.find(text)->second;
-        for (Anchor &otherAnchor : otherAnchors) {
+        for (const Anchor& otherAnchor : otherAnchors) {
             if (util::dist<float>(anchor.point, otherAnchor.point) < repeatDistance) {
                 return true;
             }
