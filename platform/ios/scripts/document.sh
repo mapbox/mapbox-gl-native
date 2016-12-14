@@ -32,7 +32,8 @@ mkdir -p ${OUTPUT}
 
 cp platform/ios/screenshot.png "${OUTPUT}"
 
-DEFAULT_THEME='platform/darwin/docs/theme'
+DEFAULT_THEME="platform/darwin/docs/theme"
+THEME=${JAZZY_THEME:-$DEFAULT_THEME}
 
 jazzy \
     --config platform/ios/jazzy.yml \
@@ -42,7 +43,7 @@ jazzy \
     --readme ${README} \
     --documentation="platform/ios/docs/Info.plist Keys.md" \
     --root-url https://www.mapbox.com/ios-sdk/api/${RELEASE_VERSION}/ \
-    --theme ${JAZZY_THEME:-$DEFAULT_THEME} \
+    --theme ${THEME} \
     --output ${OUTPUT}
 # https://github.com/realm/jazzy/issues/411
 find ${OUTPUT} -name *.html -exec \
