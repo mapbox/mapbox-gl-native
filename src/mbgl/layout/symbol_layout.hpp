@@ -59,11 +59,10 @@ public:
     const std::string sourceLayerName;
 
 private:
-    void addFeature(const GeometryCollection&,
+    void addFeature(const SymbolFeature&,
                     const Shaping& shapedText,
                     const PositionedIcon& shapedIcon,
-                    const GlyphPositions& face,
-                    const size_t index);
+                    const GlyphPositions& face);
 
     bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);
     std::map<std::u16string, std::vector<Anchor>> compareText;
