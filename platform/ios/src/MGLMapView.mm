@@ -4815,8 +4815,6 @@ public:
 
 - (void)updateCalloutView
 {
-    [CATransaction begin];
-    
     UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
     id <MGLAnnotation> annotation = calloutView.representedObject;
     
@@ -4839,8 +4837,6 @@ public:
             calloutView.center = point;
         }
     }
-    
-    [CATransaction commit];
 }
 
 - (void)enqueueAnnotationViewForAnnotationContext:(MGLAnnotationContext &)annotationContext
