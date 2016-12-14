@@ -103,16 +103,8 @@ SymbolLayout::SymbolLayout(std::string bucketName_,
         }
 
         if (ft.text || ft.icon) {
-            auto &multiline = ft.geometry;
-
-            GeometryCollection geometryCollection = feature->getGeometries();
-            for (auto& line : geometryCollection) {
-                multiline.emplace_back();
-                for (auto& point : line) {
-                    multiline.back().emplace_back(point.x, point.y);
-                }
-            }
-
+            ft.type = feature->getType();
+            ft.geometry = feature->getGeometries();
             features.push_back(std::move(ft));
         }
     }
@@ -229,17 +221,17 @@ void SymbolLayout::prepare(uintptr_t tileUID,
 
         // if either shapedText or icon position is present, add the feature
         if (shapedText || shapedIcon) {
-            addFeature(feature.geometry, shapedText, shapedIcon, face, feature.index);
+            addFeature(feature, shapedText, shapedIcon, face);
         }
     }
 
     features.clear();
 }
 
-
-void SymbolLayout::addFeature(const GeometryCollection &lines,
-        const Shaping &shapedText, const PositionedIcon &shapedIcon, const GlyphPositions &face, const size_t index) {
-
+void SymbolLayout::addFeature(const SymbolFeature& feature,
+                              const Shaping& shapedText,
+                              const PositionedIcon& shapedIcon,
+                              const GlyphPositions& face) {
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
 
@@ -258,55 +250,75 @@ void SymbolLayout::addFeature(const GeometryCollection &lines,
     const SymbolPlacementType iconPlacement = layout.get<IconRotationAlignment>() != AlignmentType::Map
                                                   ? SymbolPlacementType::Point
                                                   : layout.get<SymbolPlacement>();
-    const bool isLine = layout.get<SymbolPlacement>() == SymbolPlacementType::Line;
     const float textRepeatDistance = symbolSpacing / 2;
+    IndexedSubfeature indexedFeature = {feature.index, sourceLayerName, bucketName, symbolInstances.size()};
 
-    auto& clippedLines = isLine ?
-        util::clipLines(lines, 0, 0, util::EXTENT, util::EXTENT) :
-        lines;
+    auto addSymbolInstance = [&] (const GeometryCoordinates& line, Anchor& anchor) {
+        // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers
+        // +-------------------+ Symbols with anchors located on tile edges
+        // |(0,0)             || are duplicated on neighbor tiles.
+        // |                  ||
+        // |                  || In continuous mode, to avoid overdraw we
+        // |                  || skip symbols located on the extent edges.
+        // |       Tile       || In still mode, we include the features in
+        // |                  || the buffers for both tiles and clip them
+        // |                  || at draw time.
+        // |                  ||
+        // +-------------------| In this scenario, the inner bounding box
+        // +-------------------+ is called 'withinPlus0', and the outer
+        //       (extent,extent) is called 'inside'.
+        const bool withinPlus0 = anchor.point.x >= 0 && anchor.point.x < util::EXTENT && anchor.point.y >= 0 && anchor.point.y < util::EXTENT;
+        const bool inside = withinPlus0 || anchor.point.x == util::EXTENT || anchor.point.y == util::EXTENT;
 
-    IndexedSubfeature indexedFeature = {index, sourceLayerName, bucketName, symbolInstances.size()};
+        if (avoidEdges && !inside) return;
 
-    for (const auto& line : clippedLines) {
-        if (line.empty()) continue;
+        const bool addToBuffers = mode == MapMode::Still || withinPlus0;
 
-        // Calculate the anchor points around which you want to place labels
-        Anchors anchors = isLine ?
-            getAnchors(line, symbolSpacing, textMaxAngle, shapedText.left, shapedText.right, shapedIcon.left, shapedIcon.right, glyphSize, textMaxBoxScale, overscaling) :
-            Anchors({ Anchor(float(line[0].x), float(line[0].y), 0, minScale) });
+        symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers, symbolInstances.size(),
+                textBoxScale, textPadding, textPlacement,
+                iconBoxScale, iconPadding, iconPlacement,
+                face, indexedFeature);
+    };
 
-        // For each potential label, create the placement features used to check for collisions, and the quads use for rendering.
-        for (Anchor &anchor : anchors) {
-            if (shapedText && isLine) {
-                if (anchorIsTooClose(shapedText.text, textRepeatDistance, anchor)) {
-                    continue;
+    if (layout.get<SymbolPlacement>() == SymbolPlacementType::Line) {
+        auto clippedLines = util::clipLines(feature.geometry, 0, 0, util::EXTENT, util::EXTENT);
+        for (const auto& line : clippedLines) {
+            Anchors anchors = getAnchors(line,
+                                         symbolSpacing,
+                                         textMaxAngle,
+                                         shapedText.left,
+                                         shapedText.right,
+                                         shapedIcon.left,
+                                         shapedIcon.right,
+                                         glyphSize,
+                                         textMaxBoxScale,
+                                         overscaling);
+
+            for (auto& anchor : anchors) {
+                if (!shapedText || !anchorIsTooClose(shapedText.text, textRepeatDistance, anchor)) {
+                    addSymbolInstance(line, anchor);
                 }
             }
-
-            // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers
-            // +-------------------+ Symbols with anchors located on tile edges
-            // |(0,0)             || are duplicated on neighbor tiles.
-            // |                  ||
-            // |                  || In continuous mode, to avoid overdraw we
-            // |                  || skip symbols located on the extent edges.
-            // |       Tile       || In still mode, we include the features in
-            // |                  || the buffers for both tiles and clip them
-            // |                  || at draw time.
-            // |                  ||
-            // +-------------------| In this scenario, the inner bounding box
-            // +-------------------+ is called 'withinPlus0', and the outer
-            //       (extent,extent) is called 'inside'.
-            const bool withinPlus0 = anchor.point.x >= 0 && anchor.point.x < util::EXTENT && anchor.point.y >= 0 && anchor.point.y < util::EXTENT;
-            const bool inside = withinPlus0 || anchor.point.x == util::EXTENT || anchor.point.y == util::EXTENT;
-
-            if (avoidEdges && !inside) continue;
-
-            const bool addToBuffers = mode == MapMode::Still || withinPlus0;
-
-            symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers, symbolInstances.size(),
-                    textBoxScale, textPadding, textPlacement,
-                    iconBoxScale, iconPadding, iconPlacement,
-                    face, indexedFeature);
+        }
+    } else if (feature.type == FeatureType::Polygon) {
+        // TODO: pole of inaccessibility
+        for (const auto& ring : feature.geometry) {
+            for (const auto& point : ring) {
+                Anchor anchor(point.x, point.y, 0, minScale);
+                addSymbolInstance(ring, anchor);
+            }
+        }
+    } else if (feature.type == FeatureType::LineString) {
+        for (const auto& line : feature.geometry) {
+            Anchor anchor(line[0].x, line[0].y, 0, minScale);
+            addSymbolInstance(line, anchor);
+        }
+    } else if (feature.type == FeatureType::Point) {
+        for (const auto& points : feature.geometry) {
+            for (const auto& point : points) {
+                Anchor anchor(point.x, point.y, 0, minScale);
+                addSymbolInstance({point}, anchor);
+            }
         }
     }
 }
