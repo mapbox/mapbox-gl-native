@@ -168,7 +168,7 @@ a {
   text-decoration: none;
 
   &:hover, &:focus {
-    color: $link_hover_color;
+    opacity: 0.7;
   }
 
   &:focus {
@@ -468,11 +468,11 @@ pre code {
 
   .token-icon {
     background: url('../img/plus.svg');
-    width: 13px;
+    width: 15px;
     display: inline-block;
     vertical-align: middle;
     height: 13px;
-    opacity: 0.8;
+    opacity: 1;
     margin-left: 5px;
     background-repeat: no-repeat;
   }
