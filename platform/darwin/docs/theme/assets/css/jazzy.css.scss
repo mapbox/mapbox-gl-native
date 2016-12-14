@@ -27,6 +27,7 @@ $code_font: Menlo, Bitstream Vera Sans Mono, Monaco, Consolas, monospacee;
 
 $purple: #9595D1;
 $blue: #4092C5;
+
 // ----- Layout
 
 $gutter: 16px;
@@ -39,23 +40,14 @@ $navigation_max_width: 300px;
 $header_weight: normal;
 $header_color: #555;
 $header_font: 'Open Sans Bold', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-$header_bg_color: #3887be;
 $header_link_color: #fff;
 $doc_coverage_color: #999;
-
-
-// ----- Breadcrumbs
-
-$breadcrumbs_bg_color: #fbfbfb;
-$breadcrumbs_border_color: #ddd;
 
 
 // ----- Navigation
 
 $navigation_max_width: 300px;
 $navigation_bg_color: #fbfbfb;
-$navigation_border_color: #ddd;
-$navigation_title_color: #555;
 $navigation_task_color: $link_color;
 
 $section_name_color: $color_darkblue;
@@ -330,7 +322,7 @@ pre code {
 .navigation {
   order: 2;
   font-size: 13px;
-
+  padding-top: 20px;
   @media (min-width: 768px) {
     order: 1;
     width: 25%;
@@ -396,6 +388,9 @@ pre code {
 
 .section {
   padding: 0px 20px;
+  @media (max-width: 768px) {
+    padding: inherit;
+  }
 }
 
 .section-content {
@@ -562,15 +557,17 @@ pre code {
 }
 
 .graybox {
-  border-collapse: collapse;
   width: 100%;
+  border-collapse:separate;
+  border:solid $keyline_color 1px;
+  border-radius:6px;
+  -moz-border-radius:6px;
   p {
     margin: 0;
     word-break: break-word;
     min-width: 50px;
   }
   td {
-    border: $gray_border;
     padding: 5px 25px 5px 10px;
     vertical-align: middle;
   }
@@ -580,6 +577,18 @@ pre code {
     vertical-align: top;
     word-break: normal;
     width: 40px;
+    border-left: none;
+    border-top: none;
+  }
+  th, td {
+    border-right:none;
+    border-top: none;
+  }
+  td:first-child, th:first-child {
+     border-left: none;
+  }
+  tr:last-of-type td {
+    border-bottom: none;
   }
 }
 
@@ -608,7 +617,7 @@ pre code {
 // ===========================================================================
 
 .footer {
-  border-top: 1px $navigation_border_color solid;
+  border-top: 1px $keyline_color solid;
   padding: $gutter/2 $gutter;
   color: $footer_text_color;
 
