@@ -90,5 +90,6 @@ apply from: 'gradle-make.gradle'
 apply from: 'gradle-config.gradle'
 apply from: 'gradle-device-farm.gradle'
 apply from: 'gradle-spoon.gradle'
+apply from: 'gradle-checkstyle.gradle'
 
 
