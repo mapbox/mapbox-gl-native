@@ -4766,15 +4766,7 @@ public:
         }
     }
 
-    CGFloat largestHeight = _largestAnnotationViewSize.height;
-    CGFloat largestWidth = _largestAnnotationViewSize.width;
-    CGFloat viewHeight = CGRectGetHeight(self.frame);
-    CGFloat viewWidth = CGRectGetWidth(self.frame);
-    CLLocationCoordinate2D southwestCoordinate = [self convertPoint:{-largestWidth, viewHeight + largestHeight}
-                                               toCoordinateFromView:self];
-    CLLocationCoordinate2D northeastCoordinate = [self convertPoint:{viewWidth + largestWidth, -largestHeight}
-                                               toCoordinateFromView:self];
-    MGLCoordinateBounds coordinateBounds = {southwestCoordinate, northeastCoordinate};
+    MGLCoordinateBounds coordinateBounds = [self convertRect:viewPort toCoordinateBoundsFromView:self];
 
     // Enqueue (and move if required) offscreen annotation views
     for (id<MGLAnnotation> annotation in offscreenAnnotations)
@@ -4805,7 +4797,7 @@ public:
             else
             {
                 CGRect adjustedFrame = annotationView.frame;
-                adjustedFrame.origin.x = -CGRectGetWidth(adjustedFrame) * 10.0;
+                adjustedFrame.origin.x = CGRectGetWidth(annotationView.layer.presentationLayer.frame) * -2.0;
                 annotationView.frame = adjustedFrame;
                 [self enqueueAnnotationViewForAnnotationContext:annotationContext];
             }
