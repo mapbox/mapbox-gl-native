@@ -565,7 +565,7 @@ run-android-ui-test:
 
 .PHONY: apackage
 apackage:
-	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
+	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
 .PHONY: test-code-android
 test-code-android:
