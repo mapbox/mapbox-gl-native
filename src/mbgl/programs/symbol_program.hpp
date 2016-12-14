@@ -22,6 +22,7 @@ class TransformState;
 
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_texsize);
+MBGL_DEFINE_UNIFORM_SCALAR(bool, u_interpolate);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_rotate_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_pitch_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_texture);
@@ -82,7 +83,9 @@ class SymbolIconProgram : public Program<
         uniforms::u_zoom,
         uniforms::u_rotate_with_map,
         uniforms::u_texture,
-        uniforms::u_fadetexture>>
+        uniforms::u_fadetexture,
+        uniforms::u_interpolate,
+        uniforms::u_world>>
 {
 public:
     using Program::Program;
@@ -91,7 +94,9 @@ public:
                                        const Size& texsize,
                                        const std::array<float, 2>& pixelsToGLUnits,
                                        const RenderTile&,
-                                       const TransformState&);
+                                       const TransformState&,
+                                       const bool interpolate,
+                                       const Size framebufferSize);
 };
 
 class SymbolSDFProgram : public Program<
