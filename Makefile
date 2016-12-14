@@ -472,6 +472,8 @@ test-node: node
 MBGL_ANDROID_ENV = platform/android/scripts/toolchain.sh
 MBGL_ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
 MBGL_ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
+MBGL_ANDROID_LIBDIR = lib$(if $(filter arm-v8 x86-64,$1),64)
+MBGL_ANDROID_DALVIKVM = dalvikvm$(if $(filter arm-v8 x86-64,$1),64,32)
 
 .PHONY: android-style-code
 android-style-code:
@@ -530,7 +532,7 @@ run-android-core-test-$1: android-test-lib-$1
 	adb push build/android-$1/$(BUILDTYPE)/stripped/libmbgl-test.so $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
 
 	#Kick off the tests
-	adb shell "export LD_LIBRARY_PATH=/system/lib:$(MBGL_ANDROID_LOCAL_WORK_DIR) && cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && dalvikvm32 -cp $(MBGL_ANDROID_LOCAL_WORK_DIR)/test.jar Main"
+	adb shell "export LD_LIBRARY_PATH=/system/$(MBGL_ANDROID_LIBDIR):$(MBGL_ANDROID_LOCAL_WORK_DIR) && cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && $(MBGL_ANDROID_DALVIKVM) -cp $(MBGL_ANDROID_LOCAL_WORK_DIR)/test.jar Main"
 
 	#Gather the results
 	adb shell "cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && tar -cvzf results.tgz test/fixtures/*  > /dev/null 2>&1"
