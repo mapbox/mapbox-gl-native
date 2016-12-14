@@ -43,6 +43,7 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLBackgroundStyleLayer.h"
 #import "MGLOpenGLStyleLayer.h"
 #import "MGLSource.h"
+#import "MGLTileSource.h"
 #import "MGLVectorSource.h"
 #import "MGLShapeSource.h"
 #import "MGLRasterSource.h"
@@ -53,4 +54,4 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import "NSValue+MGLAdditions.h"
 #import "NSValue+MGLStyleEnumAttributeAdditions.h"
 #import "MGLStyleValue.h"
-#import "MGLTileSet.h"
+#import "MGLAttributionInfo.h"

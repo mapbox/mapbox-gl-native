@@ -1,7 +1,7 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
 
-#import "MGLAttributionInfo.h"
+#import "MGLAttributionInfo_Private.h"
 
 @interface MGLAttributionInfoTests : XCTestCase
 

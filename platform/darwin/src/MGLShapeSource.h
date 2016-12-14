@@ -64,6 +64,14 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
  `MGLStyle` object along with an `MGLVectorStyleLayer` object. The vector style
  layer defines the appearance of any content supplied by the shape source.
  
+ Each
+ <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson"><code>geojson</code></a>
+ source defined by the style JSON file is represented at runtime by an
+ `MGLShapeSource` object that you can use to refine the map’s content and
+ initialize new style layers. You can also add and remove sources dynamically
+ using methods such as `-[MGLStyle addSource:]` and
+ `-[MGLStyle sourceWithIdentifier:]`.
+ 
  Any vector style layer initialized with a shape source should have a `nil`
  value in its `sourceLayerIdentifier` property.
  */
@@ -72,23 +80,8 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 #pragma mark Initializing a Source
 
 /**
- Returns a shape source initialized with an identifier, GeoJSON data, and a 
- dictionary of options for the source according to the
- <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson">style
- specification</a>.
- 
- @param identifier A string that uniquely identifies the source.
- @param geoJSONData An `NSData` object representing GeoJSON source code.
- @param options An `NSDictionary` of options for this source.
- @return An initialized shape source.
- */
-- (instancetype)initWithIdentifier:(NSString *)identifier geoJSONData:(NSData *)data options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
-
-/**
  Returns a shape source with an identifier, URL, and dictionary of options for
- the source according to the
- <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson">style
- specification</a>.
+ the source.
  
  @param identifier A string that uniquely identifies the source.
  @param URL An HTTP(S) URL, absolute file URL, or local file URL relative to the
@@ -99,10 +92,16 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 - (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
 
 /**
- Returns a shape source with an identifier, a shape, and dictionary
- of options for the source according to the
- <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson">style
- specification</a>.
+ Returns a shape source with an identifier, a shape, and dictionary of options
+ for the source.
+ 
+ To specify attributes about the shape, use an instance of an `MGLShape`
+ subclass that conforms to the `MGLFeature` protocol, such as `MGLPointFeature`.
+ To include multiple shapes in the source, use an `MGLShapeCollection` or
+ `MGLShapeCollectionFeature` object.
+ 
+ To create a shape from GeoJSON source code, use the
+ `+[MGLShape shapeWithData:encoding:error:]` method.
  
  @param identifier A string that uniquely identifies the source.
  @param shape A concrete subclass of `MGLShape`
@@ -119,31 +118,17 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 
  If the receiver was initialized using `-initWithIdentifier:URL:options:`, this
  property is set to `nil`. This property is unavailable until the receiver is
- passed into `-[MGLStyle addSource]`.
+ passed into `-[MGLStyle addSource:]`.
  */
-@property (nonatomic, nullable) MGLShape *shape;
-
-/**
- A GeoJSON representation of the contents of the source.
- 
- Use the `shape` property instead to get an object representation of the
- contents. Alternatively, use `NSJSONSerialization` with the value of this
- property to transform it into Foundation types.
-
- If the receiver was initialized using `-initWithIdentifier:URL:options` or 
- `-initWithIdentifier:shape:options`, this property is set to `nil`.
- This property is unavailable until the receiver is passed  into 
- `-[MGLStyle addSource]`.
- */
-@property (nonatomic, nullable, copy) NSData *geoJSONData;
+@property (nonatomic, copy, nullable) MGLShape *shape;
 
 /**
  The URL to the GeoJSON document that specifies the contents of the source.
 
- If the receiver was initialized using
- `-initWithIdentifier:geoJSONData:options`, this property is set to `nil`.
+ If the receiver was initialized using `-initWithIdentifier:shape:options:`,
+ this property is set to `nil`.
  */
-@property (nonatomic, nullable) NSURL *URL;
+@property (nonatomic, copy, nullable) NSURL *URL;
 
 @end
 

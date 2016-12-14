@@ -1,5 +1,7 @@
 #import "MGLSource.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 namespace mbgl {
     namespace style {
         class Source;
@@ -46,3 +48,5 @@ namespace mbgl {
 - (void)removeFromMapView:(MGLMapView *)mapView;
 
 @end
+
+NS_ASSUME_NONNULL_END

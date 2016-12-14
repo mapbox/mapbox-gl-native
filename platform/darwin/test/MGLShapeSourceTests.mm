@@ -12,18 +12,15 @@
 
 @implementation MGLShapeSourceTests
 
-- (void)testMGLShapeSourceWithOptions {
-    NSURL *url = [NSURL URLWithString:@"http://www.mapbox.com/source"];
-    
+- (void)testGeoJSONOptionsFromDictionary {
     NSDictionary *options = @{MGLShapeSourceOptionClustered: @YES,
                               MGLShapeSourceOptionClusterRadius: @42,
                               MGLShapeSourceOptionMaximumZoomLevelForClustering: @98,
                               MGLShapeSourceOptionMaximumZoomLevel: @99,
                               MGLShapeSourceOptionBuffer: @1976,
                               MGLShapeSourceOptionSimplificationTolerance: @0.42};
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" URL:url options:options];
     
-    auto mbglOptions = [source geoJSONOptions];
+    auto mbglOptions = MGLGeoJSONOptionsFromDictionary(options);
     XCTAssertTrue(mbglOptions.cluster);
     XCTAssertEqual(mbglOptions.clusterRadius, 42);
     XCTAssertEqual(mbglOptions.clusterMaxZoom, 98);
@@ -32,7 +29,7 @@
     XCTAssertEqual(mbglOptions.tolerance, 0.42);
   
     options = @{MGLShapeSourceOptionClustered: @"number 1"};
-    XCTAssertThrows([[MGLShapeSource alloc] initWithIdentifier:@"source-id" URL:url options:options]);
+    XCTAssertThrows(MGLGeoJSONOptionsFromDictionary(options));
 }
 
 - (void)testNilShape {
@@ -45,7 +42,11 @@
     NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-104.34814453125,37.64903402157866]]}}]}";
     
     NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" geoJSONData:data options:nil];
+    NSError *error;
+    MGLShape *shape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(shape);
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:shape options:nil];
     
     MGLShapeCollection *collection = (MGLShapeCollection *)source.shape;
     XCTAssertNotNil(collection);
@@ -54,18 +55,24 @@
 }
 
 - (void)testMGLShapeSourceWithSingleGeometry {
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"geojson"
-                                                                geoJSONData:[@"{\"type\": \"Point\", \"coordinates\": [0, 0]}" dataUsingEncoding:NSUTF8StringEncoding]
-                                                                    options:nil];
+    NSData *data = [@"{\"type\": \"Point\", \"coordinates\": [0, 0]}" dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *error;
+    MGLShape *shape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(shape);
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"geojson" shape:shape options:nil];
     XCTAssertNotNil(source.shape);
-    XCTAssert([source.shape isKindOfClass:[MGLPointFeature class]]);
+    XCTAssert([source.shape isKindOfClass:[MGLPointAnnotation class]]);
 }
 
 - (void)testMGLGeoJSONSourceWithSingleFeature {
     NSString *geoJSON = @"{\"type\": \"Feature\", \"properties\": {\"color\": \"green\"}, \"geometry\": { \"type\": \"Point\", \"coordinates\": [ -114.06847000122069, 51.050459433092655 ] }}";
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"geojson"
-                                                                geoJSONData:[geoJSON dataUsingEncoding:NSUTF8StringEncoding]
-                                                                    options:nil];
+    NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *error;
+    MGLShape *shape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(shape);
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"geojson" shape:shape options:nil];
     XCTAssertNotNil(source.shape);
     XCTAssert([source.shape isKindOfClass:[MGLPointFeature class]]);
     MGLPointFeature *feature = (MGLPointFeature *)source.shape;
@@ -90,7 +97,7 @@
         CLLocationCoordinate2DMake(100.0, 1.0),
         CLLocationCoordinate2DMake(100.0, 0.0)};
     
-    MGLPolygonFeature<MGLFeaturePrivate> *polygonFeature = (MGLPolygonFeature<MGLFeaturePrivate> *)[MGLPolygonFeature polygonWithCoordinates:coordinates count:5];
+    MGLPolygonFeature *polygonFeature = [MGLPolygonFeature polygonWithCoordinates:coordinates count:5];
     polygonFeature.identifier = @"feature-id";
     NSString *stringAttribute = @"string";
     NSNumber *boolAttribute = [NSNumber numberWithBool:YES];

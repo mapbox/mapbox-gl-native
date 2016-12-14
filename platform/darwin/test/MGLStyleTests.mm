@@ -126,18 +126,18 @@
     [self.style addSource:shapeSource];
     XCTAssertThrowsSpecificNamed([self.style addSource:shapeSource], NSException, @"MGLRedundantSourceException");
 
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"rasterSource" URL:[NSURL new] tileSize:42];
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"rasterSource" configurationURL:[NSURL URLWithString:@".json"] tileSize:42];
     [self.style addSource:rasterSource];
     XCTAssertThrowsSpecificNamed([self.style addSource:rasterSource], NSException, @"MGLRedundantSourceException");
 
-    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"vectorSource" URL:[NSURL new]];
+    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"vectorSource" configurationURL:[NSURL URLWithString:@".json"]];
     [self.style addSource:vectorSource];
     XCTAssertThrowsSpecificNamed([self.style addSource:vectorSource], NSException, @"MGLRedundantSourceException");
 }
 
 - (void)testAddingSourcesWithDuplicateIdentifiers {
-    MGLVectorSource *source1 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" URL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
-    MGLVectorSource *source2 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" URL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorSource *source1 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorSource *source2 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
 
     [self.style addSource: source1];
     XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, @"MGLRedundantSourceIdentifierException");
@@ -173,7 +173,7 @@
 
 - (void)testAddingLayersWithDuplicateIdentifiers {
     //Just some source
-    MGLVectorSource *source = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" URL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorSource *source = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
     [self.mapView.style addSource: source];
     
     //Add initial layer

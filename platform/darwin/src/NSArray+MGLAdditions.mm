@@ -23,4 +23,19 @@
     return vector;
 }
 
+- (NSAttributedString *)mgl_attributedComponentsJoinedByString:(NSString *)separator {
+    NSAttributedString *attributedSeparator = [[NSAttributedString alloc] initWithString:separator];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] init];
+    BOOL isSubsequentItem = NO;
+    for (NSAttributedString *component in self) {
+        NSAssert([component isKindOfClass:[NSAttributedString class]], @"Items in array must be attributed strings.");
+        if (isSubsequentItem) {
+            [attributedString appendAttributedString:attributedSeparator];
+        }
+        isSubsequentItem = YES;
+        [attributedString appendAttributedString:component];
+    }
+    return attributedString;
+}
+
 @end

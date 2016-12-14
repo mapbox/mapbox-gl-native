@@ -1,8 +1,8 @@
 #import "MGLPointCollection_Private.h"
 #import "MGLGeometry_Private.h"
 
+#import <mbgl/util/geojson.hpp>
 #import <mbgl/util/geometry.hpp>
-#import <mbgl/util/feature.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -1,4 +1,4 @@
-#import "MGLAttributionInfo.h"
+#import "MGLAttributionInfo_Private.h"
 
 #if TARGET_OS_IPHONE
     #import <UIKit/UIKit.h>
@@ -7,13 +7,18 @@
 #endif
 
 #import "MGLMapCamera.h"
+#import "NSArray+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 
 #include <string>
 
 @implementation MGLAttributionInfo
 
-+ (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosFromHTMLString:(NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
++ (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosFromHTMLString:(nullable NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
+    if (!htmlString) {
+        return @[];
+    }
+    
     NSDictionary *options = @{
         NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType,
         NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding),
@@ -82,6 +87,18 @@
         [infos addObject:info];
     }];
     return infos;
+}
+
++ (NSAttributedString *)attributedStringForAttributionInfos:(NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfos {
+    NSMutableArray *titles = [NSMutableArray arrayWithCapacity:attributionInfos.count];
+    for (MGLAttributionInfo *info in attributionInfos) {
+        NSMutableAttributedString *title = info.title.mutableCopy;
+        if (info.URL) {
+            [title addAttribute:NSLinkAttributeName value:info.URL range:title.mgl_wholeRange];
+        }
+        [titles addObject:title];
+    }
+    return [titles mgl_attributedComponentsJoinedByString:@" "];
 }
 
 - (instancetype)initWithTitle:(NSAttributedString *)title URL:(NSURL *)URL {

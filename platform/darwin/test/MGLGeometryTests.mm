@@ -99,4 +99,49 @@
     XCTAssertFalse(MGLCoordinateInCoordinateBounds(kCLLocationCoordinate2DInvalid, wyoming));
 }
 
+- (void)testGeoJSONDeserialization {
+    NSData *data = [@"{\"type\": \"Feature\", \"geometry\": {\"type\": \"Point\", \"coordinates\": [0, 0]}, \"properties\": {}}" dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *error;
+    MGLPointFeature *feature = (MGLPointFeature *)[MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&error];
+    XCTAssertNil(error, @"Valid GeoJSON data should produce no error on deserialization.");
+    XCTAssertNotNil(feature, @"Valid GeoJSON data should produce an object on deserialization.");
+    XCTAssertTrue([feature isKindOfClass:[MGLPointFeature class]], @"Valid GeoJSON point feature data should produce an MGLPointFeature.");
+    XCTAssertEqual(feature.attributes.count, 0);
+    XCTAssertEqual(feature.coordinate.latitude, 0);
+    XCTAssertEqual(feature.coordinate.longitude, 0);
+    
+    data = [@"{\"type\": \"Feature\", \"feature\": {\"type\": \"Point\", \"coordinates\": [0, 0]}}" dataUsingEncoding:NSUTF8StringEncoding];
+    error = nil;
+    MGLShape *shape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&error];
+    XCTAssertNotNil(error, @"Invalid GeoJSON data should produce an error on deserialization.");
+    XCTAssertNil(shape, @"Invalid GeoJSON data should produce no object on deserialization.");
+}
+
+- (void)testGeoJSONSerialization {
+    MGLPointFeature *feature = [[MGLPointFeature alloc] init];
+    feature.identifier = @504;
+    feature.coordinate = CLLocationCoordinate2DMake(29.95, -90.066667);
+    
+    NSData *data = [feature geoJSONDataUsingEncoding:NSUTF8StringEncoding];
+    XCTAssertNotNil(data, @"MGLPointFeature should serialize as an UTF-8 string data object.");
+    NSError *error;
+    NSDictionary *serializedGeoJSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+    XCTAssertNil(error, @"Serialized GeoJSON data should be deserializable JSON.");
+    XCTAssertNotNil(serializedGeoJSON, @"Serialized GeoJSON data should be valid JSON.");
+    XCTAssertTrue([serializedGeoJSON isKindOfClass:[NSDictionary class]], @"Serialized GeoJSON data should be a JSON object.");
+    NSDictionary *geoJSON = @{
+        @"type": @"Feature",
+        @"id": @504,
+        @"geometry": @{
+            @"type": @"Point",
+            @"coordinates": @[
+                @(-90.066667),
+                @29.95,
+            ],
+        },
+        @"properties": @{},
+    };
+    XCTAssertEqualObjects(serializedGeoJSON, geoJSON, @"MGLPointFeature should serialize as a GeoJSON point feature.");
+}
+
 @end

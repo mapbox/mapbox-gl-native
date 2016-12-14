@@ -13,45 +13,49 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGLAttributionInfo : NSObject
 
 /**
- Parses and returns the attribution infos contained in the given HTML source
- code string.
+ Returns an initialized attribution info object with the given title and URL.
  
- @param htmlString The HTML source code to parse.
- @param fontSize The default text size in points.
- @param linkColor The default link color.
+ @param title The attribution statement’s title.
+ @param URL A URL to more information about the entity named in the attribution.
+ @return An initialized attribution info object.
  */
-+ (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosFromHTMLString:(NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor;
-
 - (instancetype)initWithTitle:(NSAttributedString *)title URL:(nullable NSURL *)URL;
 
+/**
+ The attribution statement’s attributed title text.
+ */
 @property (nonatomic) NSAttributedString *title;
+
+/**
+ The URL to more information about the entity named in the attribution.
+ 
+ If this property is set, the attribution statement should be displayed as a
+ hyperlink or action button. Otherwise, if it is `nil`, the attribution
+ statement should be displayed as plain text.
+ */
 @property (nonatomic, nullable) NSURL *URL;
+
+/**
+ A Boolean value indicating whether the attribution statement is a shortcut to a
+ feedback tool.
+ 
+ If this property is set, the statement should be treated as a way for the user
+ to provide feedback rather than an attribution statement.
+ */
 @property (nonatomic, getter=isFeedbackLink) BOOL feedbackLink;
 
+/**
+ Returns a copy of the `URL` property modified to account for the given center
+ coordinate and zoom level.
+ 
+ @param centerCoordinate The map’s center coordinate.
+ @param zoomLevel The map’s zoom level. See `MGLMapView`’s `zoomLevel` property
+    for more information.
+ @return A modified URL containing a fragment that points to the specified
+    viewport. If the `feedbackLink` property is set to `NO`, this method returns
+    `nil`.
+ */
 - (nullable NSURL *)feedbackURLAtCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel;
-
-@end
-
-@interface NSMutableArray (MGLAttributionInfoAdditions)
-
-/**
- Adds the given attribution info object to the receiver as long as it isn’t
- redundant to any object already in the receiver. Any existing object that is
- redundant to the given object is replaced by the given object.
- 
- @param info The info object to add to the receiver.
- @return True if the given info object was added to the receiver.
- */
-- (void)growArrayByAddingAttributionInfo:(MGLAttributionInfo *)info;
-
-/**
- Adds each of the given attribution info objects to the receiver as long as it
- isn’t redundant to any object already in the receiver. Any existing object that
- is redundant to the given object is replaced by the given object.
- 
- @param infos An array of info objects to add to the receiver.
- */
-- (void)growArrayByAddingAttributionInfosFromArray:(NS_ARRAY_OF(MGLAttributionInfo *) *)infos;
 
 @end
 

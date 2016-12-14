@@ -2,6 +2,7 @@
 
 #import "MGLMapView_Private.h"
 #import "MGLStyle_Private.h"
+#import "MGLStyleLayer_Private.h"
 
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/math/wrap.hpp>
@@ -96,9 +97,17 @@ void MGLFinishCustomStyleLayer(void *context) {
                                                                 MGLFinishCustomStyleLayer,
                                                                 (__bridge void *)self);
         _pendingLayer = std::move(layer);
-        _rawLayer = _pendingLayer.get();
+        self.rawLayer = _pendingLayer.get();
     }
     return self;
+}
+
+- (mbgl::style::CustomLayer *)rawLayer {
+    return (mbgl::style::CustomLayer *)super.rawLayer;
+}
+
+- (void)setRawLayer:(mbgl::style::CustomLayer *)rawLayer {
+    super.rawLayer = rawLayer;
 }
 
 #pragma mark - Adding to and removing from a map view
@@ -130,7 +139,7 @@ void MGLFinishCustomStyleLayer(void *context) {
         return;
     }
     _pendingLayer = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::CustomLayer> &>(removedLayer));
-    _rawLayer = _pendingLayer.get();
+    self.rawLayer = _pendingLayer.get();
 }
 
 /**

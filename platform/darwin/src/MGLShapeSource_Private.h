@@ -1,12 +1,21 @@
 #import "MGLShapeSource.h"
 #import "MGLShapeSource_Private.h"
 
-#include <mbgl/style/sources/geojson_source.hpp>
+NS_ASSUME_NONNULL_BEGIN
+
+namespace mbgl {
+    namespace style {
+        class GeoJSONOptions;
+        struct GeoJSONSource;
+    }
+}
 
 @interface MGLShapeSource (Private)
 
 - (instancetype)initWithRawSource:(mbgl::style::GeoJSONSource *)rawSource;
 
-- (mbgl::style::GeoJSONOptions)geoJSONOptions;
-
 @end
+
+mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *options);
+
+NS_ASSUME_NONNULL_END

@@ -17,12 +17,12 @@
 #import "NSDate+MGLAdditions.h"
 
 #import "MGLSource.h"
-#import "MGLVectorSource_Private.h"
+#import "MGLTileSource_Private.h"
+#import "MGLVectorSource.h"
 #import "MGLRasterSource.h"
 #import "MGLShapeSource.h"
 
-#import "MGLAttributionInfo.h"
-#import "MGLTileSet_Private.h"
+#import "MGLAttributionInfo_Private.h"
 
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
@@ -209,13 +209,12 @@ static NSURL *MGLStyleURL_emerald;
     auto rawSources = self.mapView.mbglMap->getSources();
     NSMutableArray *infos = [NSMutableArray arrayWithCapacity:rawSources.size()];
     for (auto rawSource = rawSources.begin(); rawSource != rawSources.end(); ++rawSource) {
-        MGLSource *source = [self sourceFromMBGLSource:*rawSource];
-        if (![source isKindOfClass:[MGLVectorSource class]]
-            && ![source isKindOfClass:[MGLRasterSource class]]) {
+        MGLTileSource *source = (MGLTileSource *)[self sourceFromMBGLSource:*rawSource];
+        if (![source isKindOfClass:[MGLTileSource class]]) {
             continue;
         }
         
-        NSArray *tileSetInfos = [[(id)source tileSet] attributionInfosWithFontSize:fontSize linkColor:linkColor];
+        NSArray *tileSetInfos = [source attributionInfosWithFontSize:fontSize linkColor:linkColor];
         [infos growArrayByAddingAttributionInfosFromArray:tileSetInfos];
     }
     return infos;

@@ -34,15 +34,26 @@ namespace mbgl {
     if (self = [super initWithIdentifier:identifier source:source]) {
         auto layer = std::make_unique<mbgl::style::FillLayer>(identifier.UTF8String, source.identifier.UTF8String);
         _pendingLayer = std::move(layer);
-        _rawLayer = _pendingLayer.get();
+        self.rawLayer = _pendingLayer.get();
     }
     return self;
 }
+
+- (mbgl::style::FillLayer *)rawLayer
+{
+    return (mbgl::style::FillLayer *)super.rawLayer;
+}
+
+- (void)setRawLayer:(mbgl::style::FillLayer *)rawLayer
+{
+    super.rawLayer = rawLayer;
+}
+
 - (NSString *)sourceLayerIdentifier
 {
     MGLAssertStyleLayerIsValid();
 
-    auto layerID = _rawLayer->getSourceLayer();
+    auto layerID = self.rawLayer->getSourceLayer();
     return layerID.empty() ? nil : @(layerID.c_str());
 }
 
@@ -50,22 +61,23 @@ namespace mbgl {
 {
     MGLAssertStyleLayerIsValid();
 
-    _rawLayer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
+    self.rawLayer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
 }
 
 - (void)setPredicate:(NSPredicate *)predicate
 {
     MGLAssertStyleLayerIsValid();
 
-    _rawLayer->setFilter(predicate.mgl_filter);
+    self.rawLayer->setFilter(predicate.mgl_filter);
 }
 
 - (NSPredicate *)predicate
 {
     MGLAssertStyleLayerIsValid();
 
-    return [NSPredicate mgl_predicateWithFilter:_rawLayer->getFilter()];
+    return [NSPredicate mgl_predicateWithFilter:self.rawLayer->getFilter()];
 }
+
 #pragma mark -  Adding to and removing from a map view
 
 - (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
@@ -87,7 +99,7 @@ namespace mbgl {
 - (void)removeFromMapView:(MGLMapView *)mapView
 {
     _pendingLayer = nullptr;
-    _rawLayer = nullptr;
+    self.rawLayer = nullptr;
 
     auto removedLayer = mapView.mbglMap->removeLayer(self.identifier.UTF8String);
     if (!removedLayer) {
@@ -102,7 +114,7 @@ namespace mbgl {
     removedLayer.release();
 
     _pendingLayer = std::unique_ptr<mbgl::style::FillLayer>(layer);
-    _rawLayer = _pendingLayer.get();
+    self.rawLayer = _pendingLayer.get();
 }
 
 #pragma mark - Accessing the Paint Attributes
@@ -111,13 +123,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<bool, NSNumber *>().toPropertyValue(fillAntialias);
-    _rawLayer->setFillAntialias(mbglValue);
+    self.rawLayer->setFillAntialias(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)fillAntialias {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getFillAntialias() ?: _rawLayer->getDefaultFillAntialias();
+    auto propertyValue = self.rawLayer->getFillAntialias() ?: self.rawLayer->getDefaultFillAntialias();
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -125,13 +137,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue(fillColor);
-    _rawLayer->setFillColor(mbglValue);
+    self.rawLayer->setFillColor(mbglValue);
 }
 
 - (MGLStyleValue<MGLColor *> *)fillColor {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getFillColor() ?: _rawLayer->getDefaultFillColor();
+    auto propertyValue = self.rawLayer->getFillColor() ?: self.rawLayer->getDefaultFillColor();
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
 }
 
@@ -139,13 +151,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(fillOpacity);
-    _rawLayer->setFillOpacity(mbglValue);
+    self.rawLayer->setFillOpacity(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)fillOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getFillOpacity() ?: _rawLayer->getDefaultFillOpacity();
+    auto propertyValue = self.rawLayer->getFillOpacity() ?: self.rawLayer->getDefaultFillOpacity();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -153,13 +165,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue(fillOutlineColor);
-    _rawLayer->setFillOutlineColor(mbglValue);
+    self.rawLayer->setFillOutlineColor(mbglValue);
 }
 
 - (MGLStyleValue<MGLColor *> *)fillOutlineColor {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getFillOutlineColor() ?: _rawLayer->getDefaultFillOutlineColor();
+    auto propertyValue = self.rawLayer->getFillOutlineColor() ?: self.rawLayer->getDefaultFillOutlineColor();
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
 }
 
@@ -167,13 +179,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(fillPattern);
-    _rawLayer->setFillPattern(mbglValue);
+    self.rawLayer->setFillPattern(mbglValue);
 }
 
 - (MGLStyleValue<NSString *> *)fillPattern {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getFillPattern() ?: _rawLayer->getDefaultFillPattern();
+    auto propertyValue = self.rawLayer->getFillPattern() ?: self.rawLayer->getDefaultFillPattern();
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 
@@ -181,13 +193,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue(fillTranslate);
-    _rawLayer->setFillTranslate(mbglValue);
+    self.rawLayer->setFillTranslate(mbglValue);
 }
 
 - (MGLStyleValue<NSValue *> *)fillTranslate {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getFillTranslate() ?: _rawLayer->getDefaultFillTranslate();
+    auto propertyValue = self.rawLayer->getFillTranslate() ?: self.rawLayer->getDefaultFillTranslate();
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
@@ -195,13 +207,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslateAnchor>().toEnumPropertyValue(fillTranslateAnchor);
-    _rawLayer->setFillTranslateAnchor(mbglValue);
+    self.rawLayer->setFillTranslateAnchor(mbglValue);
 }
 
 - (MGLStyleValue<NSValue *> *)fillTranslateAnchor {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getFillTranslateAnchor() ?: _rawLayer->getDefaultFillTranslateAnchor();
+    auto propertyValue = self.rawLayer->getFillTranslateAnchor() ?: self.rawLayer->getDefaultFillTranslateAnchor();
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslateAnchor>().toEnumStyleValue(propertyValue);
 }
 

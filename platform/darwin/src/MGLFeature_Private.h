@@ -36,10 +36,4 @@ mbgl::Feature mbglFeature(mbgl::Feature feature, id identifier, NSDictionary *at
  */
 NS_DICTIONARY_OF(NSString *, id) *NSDictionaryFeatureForGeometry(NSDictionary *geometry, NSDictionary *attributes, id identifier);
 
-@protocol MGLFeaturePrivate <MGLFeature>
-
-- (mbgl::Feature)mbglFeature;
-
-@end
-
 NS_ASSUME_NONNULL_END
