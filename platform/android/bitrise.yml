@@ -43,7 +43,7 @@ workflows:
         - content: |-
             #!/bin/bash
             # Run checkstyle gradle task on all modules
-            ./gradlew checkstyle
+            cd platform/android && ./gradlew checkstyle
     - script:
         title: Configure Google Cloud SDK
         run_if: '{{enveq "SKIPCI" "false"}}'
