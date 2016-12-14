@@ -4745,8 +4745,8 @@ public:
         if (!annotationView)
         {
             // This will dequeue views if the delegate implements the dequeue call
-            MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotationContext.annotation];
-            
+            annotationView = [self annotationViewForAnnotation:annotationContext.annotation];
+
             if (annotationView)
             {
                 annotationView.mapView = self;
@@ -4765,14 +4765,17 @@ public:
             annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
         }
     }
-    
-    CGPoint upperLeft = {_largestAnnotationViewSize.width,_largestAnnotationViewSize.height};
-    CGPoint lowerRight = {CGRectGetWidth(self.bounds) + _largestAnnotationViewSize.width,
-                          CGRectGetHeight(self.bounds) + _largestAnnotationViewSize.height};
-    
-    CLLocationCoordinate2D upperLeftCoordinate = [self convertPoint:upperLeft toCoordinateFromView:self];
-    CLLocationCoordinate2D lowerRightCoordinate = [self convertPoint:lowerRight toCoordinateFromView:self];
-    
+
+    CGFloat largestHeight = _largestAnnotationViewSize.height;
+    CGFloat largestWidth = _largestAnnotationViewSize.width;
+    CGFloat viewHeight = CGRectGetHeight(self.frame);
+    CGFloat viewWidth = CGRectGetWidth(self.frame);
+    CLLocationCoordinate2D southwestCoordinate = [self convertPoint:{-largestWidth, viewHeight + largestHeight}
+                                               toCoordinateFromView:self];
+    CLLocationCoordinate2D northeastCoordinate = [self convertPoint:{viewWidth + largestWidth, -largestHeight}
+                                               toCoordinateFromView:self];
+    MGLCoordinateBounds coordinateBounds = {southwestCoordinate, northeastCoordinate};
+
     // Enqueue (and move if required) offscreen annotation views
     for (id<MGLAnnotation> annotation in offscreenAnnotations)
     {
@@ -4795,17 +4798,16 @@ public:
             // moved and the enqueue operation is avoided. This allows us to keep the performance benefit of
             // using the mbgl query result. It also forces views that have just gone offscreen to be cleared
             // fully from view.
-            if ((coordinate.latitude > upperLeftCoordinate.latitude || coordinate.latitude < lowerRightCoordinate.latitude) ||
-                (coordinate.longitude < upperLeftCoordinate.longitude || coordinate.longitude > lowerRightCoordinate.longitude))
+            if (MGLCoordinateInCoordinateBounds(coordinate, coordinateBounds))
             {
-                CGRect adjustedFrame = annotationView.frame;
-                adjustedFrame.origin.x = -CGRectGetWidth(adjustedFrame) * 2.0;
-                annotationView.frame = adjustedFrame;
-                [self enqueueAnnotationViewForAnnotationContext:annotationContext];
+                annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
             }
             else
             {
-                annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
+                CGRect adjustedFrame = annotationView.frame;
+                adjustedFrame.origin.x = -CGRectGetWidth(adjustedFrame) * 10.0;
+                annotationView.frame = adjustedFrame;
+                [self enqueueAnnotationViewForAnnotationContext:annotationContext];
             }
         }
     }
