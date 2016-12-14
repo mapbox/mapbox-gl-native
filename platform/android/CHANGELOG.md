@@ -6,6 +6,16 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 * Support for Android Nougat [#5910](5910-move-listener-logic-for-nougat) & [#6390](https://github.com/mapbox/mapbox-gl-native/pull/6390)
 
+## 4.2.0 - December 14, 2016
+
+Mapbox Android 4.2.0 contains all 4.2.0-beta.3 changes and adds:
+
+* Adds additional documentation to APIs
+* Resolved issue with marker views occasionally not showing up until a gesture was performed on map [#7239](https://github.com/mapbox/mapbox-gl-native/pull/7239)
+* Added horizontal accuracy to location events [#7237](https://github.com/mapbox/mapbox-gl-native/pull/7237)
+* Resolved issue with changing visibility of a layer [#7242](https://github.com/mapbox/mapbox-gl-native/pull/7242)
+* Proguard improvement and fixes
+
 ## 4.2.0-beta.3 - September 21, 2016
 
 Mapbox Android 4.2.0-beta.3 contains all 4.2.0-beta.2 changes and adds:
