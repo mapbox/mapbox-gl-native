@@ -16,17 +16,8 @@ template <class Values, class...Args>
 Values makeValues(const LinePaintProperties::Evaluated& properties,
                   const RenderTile& tile,
                   const TransformState& state,
+                  const std::array<float, 2>& pixelsToGLUnits,
                   Args&&... args) {
-
-    mat2 antialiasingMatrix;
-    matrix::identity(antialiasingMatrix);
-    matrix::scale(antialiasingMatrix, antialiasingMatrix, 1.0, std::cos(state.getPitch()));
-    matrix::rotate(antialiasingMatrix, antialiasingMatrix, state.getAngle());
-
-    // calculate how much longer the real world distance is at the top of the screen
-    // than at the middle of the screen.
-    float topedgelength = std::sqrt(std::pow(state.getSize().height, 2.0f) / 4.0f  * (1.0f + std::pow(state.getCameraToCenterDistance(), 2.0f)));
-    float x = state.getSize().height / 2.0f * std::tan(state.getPitch());
 
     return Values {
         uniforms::u_matrix::Value{
@@ -39,9 +30,8 @@ Values makeValues(const LinePaintProperties::Evaluated& properties,
         uniforms::u_gapwidth::Value{ properties.get<LineGapWidth>() },
         uniforms::u_blur::Value{ properties.get<LineBlur>() },
         uniforms::u_offset::Value{ properties.get<LineOffset>() },
-        uniforms::u_antialiasingmatrix::Value{ antialiasingMatrix },
         uniforms::u_ratio::Value{ 1.0f / tile.id.pixelsToTileUnits(1.0, state.getZoom()) },
-        uniforms::u_extra::Value{ (topedgelength + x) / topedgelength - 1.0f },
+        uniforms::u_gl_units_to_pixels::Value{{{ 1.0f / pixelsToGLUnits[0], 1.0f / pixelsToGLUnits[1] }}},
         std::forward<Args>(args)...
     };
 }
@@ -49,11 +39,13 @@ Values makeValues(const LinePaintProperties::Evaluated& properties,
 LineProgram::UniformValues
 LineProgram::uniformValues(const LinePaintProperties::Evaluated& properties,
                            const RenderTile& tile,
-                           const TransformState& state) {
+                           const TransformState& state,
+                           const std::array<float, 2>& pixelsToGLUnits) {
     return makeValues<LineProgram::UniformValues>(
         properties,
         tile,
         state,
+        pixelsToGLUnits,
         uniforms::u_color::Value{ properties.get<LineColor>() }
     );
 }
@@ -63,6 +55,7 @@ LineSDFProgram::uniformValues(const LinePaintProperties::Evaluated& properties,
                               float pixelRatio,
                               const RenderTile& tile,
                               const TransformState& state,
+                              const std::array<float, 2>& pixelsToGLUnits,
                               const LinePatternPos& posA,
                               const LinePatternPos& posB,
                               float dashLineWidth,
@@ -84,6 +77,7 @@ LineSDFProgram::uniformValues(const LinePaintProperties::Evaluated& properties,
         properties,
         tile,
         state,
+        pixelsToGLUnits,
         uniforms::u_color::Value{ properties.get<LineColor>() },
         uniforms::u_patternscale_a::Value{ scaleA },
         uniforms::u_patternscale_b::Value{ scaleB },
@@ -99,6 +93,7 @@ LinePatternProgram::UniformValues
 LinePatternProgram::uniformValues(const LinePaintProperties::Evaluated& properties,
                                   const RenderTile& tile,
                                   const TransformState& state,
+                                  const std::array<float, 2>& pixelsToGLUnits,
                                   const SpriteAtlasPosition& posA,
                                   const SpriteAtlasPosition& posB) {
      std::array<float, 2> sizeA {{
@@ -115,6 +110,7 @@ LinePatternProgram::uniformValues(const LinePaintProperties::Evaluated& properti
         properties,
         tile,
         state,
+        pixelsToGLUnits,
         uniforms::u_pattern_tl_a::Value{ posA.tl },
         uniforms::u_pattern_br_a::Value{ posA.br },
         uniforms::u_pattern_tl_b::Value{ posB.tl },

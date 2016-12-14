@@ -22,7 +22,6 @@ namespace uniforms {
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_ratio);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_width);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_gapwidth);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_extra);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_offset);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_tex_y_a);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_tex_y_b);
@@ -30,7 +29,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_sdfgamma);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_fade);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_patternscale_a);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_patternscale_b);
-MBGL_DEFINE_UNIFORM_MATRIX(double, 2, u_antialiasingmatrix);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_gl_units_to_pixels);
 } // namespace uniforms
 
 struct LineAttributes : gl::Attributes<
@@ -93,9 +92,8 @@ class LineProgram : public Program<
         uniforms::u_gapwidth,
         uniforms::u_blur,
         uniforms::u_offset,
-        uniforms::u_antialiasingmatrix,
         uniforms::u_ratio,
-        uniforms::u_extra,
+        uniforms::u_gl_units_to_pixels,
         uniforms::u_color>>
 {
 public:
@@ -103,7 +101,8 @@ public:
 
     static UniformValues uniformValues(const style::LinePaintProperties::Evaluated&,
                                        const RenderTile&,
-                                       const TransformState&);
+                                       const TransformState&,
+                                       const std::array<float, 2>& pixelsToGLUnits);
 };
 
 class LinePatternProgram : public Program<
@@ -117,9 +116,8 @@ class LinePatternProgram : public Program<
         uniforms::u_gapwidth,
         uniforms::u_blur,
         uniforms::u_offset,
-        uniforms::u_antialiasingmatrix,
         uniforms::u_ratio,
-        uniforms::u_extra,
+        uniforms::u_gl_units_to_pixels,
         uniforms::u_pattern_tl_a,
         uniforms::u_pattern_br_a,
         uniforms::u_pattern_tl_b,
@@ -135,6 +133,7 @@ public:
     static UniformValues uniformValues(const style::LinePaintProperties::Evaluated&,
                                        const RenderTile&,
                                        const TransformState&,
+                                       const std::array<float, 2>& pixelsToGLUnits,
                                        const SpriteAtlasPosition& posA,
                                        const SpriteAtlasPosition& posB);
 };
@@ -150,9 +149,8 @@ class LineSDFProgram : public Program<
         uniforms::u_gapwidth,
         uniforms::u_blur,
         uniforms::u_offset,
-        uniforms::u_antialiasingmatrix,
         uniforms::u_ratio,
-        uniforms::u_extra,
+        uniforms::u_gl_units_to_pixels,
         uniforms::u_color,
         uniforms::u_patternscale_a,
         uniforms::u_patternscale_b,
@@ -169,6 +167,7 @@ public:
                                        float pixelRatio,
                                        const RenderTile&,
                                        const TransformState&,
+                                       const std::array<float, 2>& pixelsToGLUnits,
                                        const LinePatternPos& posA,
                                        const LinePatternPos& posB,
                                        float dashLineWidth,
