@@ -48,10 +48,9 @@ const Shaping GlyphSet::getShaping(const std::u16string& logicalInput,
     // different from the glyphs that get shown
     Shaping shaping(translate.x * 24, translate.y * 24, logicalInput);
 
-    ProcessedBiDiText processedText = bidi.processText(logicalInput);
-
     std::vector<std::u16string> reorderedLines =
-        processedText.applyLineBreaking(determineLineBreaks(logicalInput, spacing, maxWidth));
+        bidi.processText(logicalInput,
+                         determineLineBreaks(logicalInput, spacing, maxWidth));
 
     shapeLines(shaping, reorderedLines, spacing, lineHeight, horizontalAlign, verticalAlign,
                justify, translate);
@@ -84,8 +83,9 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
                  uint32_t start,
                  uint32_t end,
                  float justify) {
-    if (!justify)
+    if (!justify) {
         return;
+    }
 
     PositionedGlyph& glyph = positionedGlyphs[end];
     auto it = sdfs.find(glyph.glyph);
@@ -105,14 +105,13 @@ float GlyphSet::determineIdeographicLineWidth(const std::u16string& logicalInput
     float totalWidth = 0;
 
     // totalWidth doesn't include the last character for magical tuning reasons. This makes the
-    // algorithm a little
-    //  more agressive about trying to fit the text into fewer lines, taking advantage of the
-    //  tolerance for going a little
-    //  over maxWidth
+    // algorithm a little more agressive about trying to fit the text into fewer lines, taking
+    // advantage of the tolerance for going a little over maxWidth
     for (uint32_t i = 0; i < logicalInput.size() - 1; i++) {
         auto it = sdfs.find(logicalInput[i]);
-        if (it != sdfs.end())
+        if (it != sdfs.end()) {
             totalWidth += it->second.metrics.advance + spacing;
+        }
     }
 
     int32_t lineCount = std::fmax(1, std::ceil(totalWidth / maxWidth));
@@ -124,14 +123,17 @@ float GlyphSet::determineIdeographicLineWidth(const std::u16string& logicalInput
 std::set<int32_t> GlyphSet::determineLineBreaks(const std::u16string& logicalInput,
                                                 const float spacing,
                                                 float maxWidth) const {
-    if (!maxWidth)
+    if (!maxWidth) {
         return {};
+    }
 
-    if (logicalInput.empty())
+    if (logicalInput.empty()) {
         return {};
+    }
 
-    if (util::i18n::allowsIdeographicBreaking(logicalInput))
+    if (util::i18n::allowsIdeographicBreaking(logicalInput)) {
         maxWidth = determineIdeographicLineWidth(logicalInput, spacing, maxWidth);
+    }
 
     std::set<int32_t> lineBreakPoints;
     float currentX = 0;
@@ -140,8 +142,9 @@ std::set<int32_t> GlyphSet::determineLineBreaks(const std::u16string& logicalInp
 
     for (uint32_t i = 0; i < logicalInput.size(); i++) {
         auto it = sdfs.find(logicalInput[i]);
-        if (it == sdfs.end())
+        if (it == sdfs.end()) {
             continue;
+        }
 
         const SDFGlyph& glyph = it->second;
 
@@ -186,24 +189,28 @@ void GlyphSet::shapeLines(Shaping& shaping,
         // Collapse whitespace so it doesn't throw off justification
         boost::algorithm::trim_if(line, boost::algorithm::is_any_of(u" \t\n\v\f\r"));
 
-        if (line.empty())
+        if (line.empty()) { 
             continue;
+        }
 
         uint32_t lineStartIndex = static_cast<uint32_t>(shaping.positionedGlyphs.size());
         for (char16_t chr : line) {
             auto it = sdfs.find(chr);
-            if (it == sdfs.end())
+            if (it == sdfs.end()) {
                 continue;
+            }
 
             const SDFGlyph& glyph = it->second;
             shaping.positionedGlyphs.emplace_back(chr, x, y);
             x += glyph.metrics.advance + spacing;
         }
 
-        if (static_cast<uint32_t>(shaping.positionedGlyphs.size()) == lineStartIndex)
+        if (static_cast<uint32_t>(shaping.positionedGlyphs.size()) == lineStartIndex) {
             continue;
+        }
 
-        maxLineLength = util::max(x, maxLineLength);
+        float lineLength = x - spacing; // Don't count trailing spacing
+        maxLineLength = util::max(lineLength, maxLineLength);
 
         justifyLine(shaping.positionedGlyphs, sdfs, lineStartIndex,
                     static_cast<uint32_t>(shaping.positionedGlyphs.size()) - 1, justify);
