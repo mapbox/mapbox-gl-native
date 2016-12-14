@@ -15,7 +15,7 @@
         <code>
         <a name="/{{usr}}"></a>
         <a name="//apple_ref/{{language_stub}}/{{dash_type}}/{{name}}" class="dashAnchor"></a>
-        <a class="token" href="#/{{usr}}">{{name}}</a>
+        <a class="token" href="#/{{usr}}">{{name}}<span class="token-icon" /></a>
         </code>
         {{#default_impl_abstract}}
           <span class="declaration-note">
@@ -29,9 +29,7 @@
         {{/from_protocol_extension}}
       </div>
       <div class="height-container">
-        <div class="pointer-container"></div>
         <section class="section">
-          <div class="pointer"></div>
           {{#abstract}}
           <div class="abstract">
             {{{abstract}}}
@@ -49,13 +47,13 @@
           {{#declaration}}
           <div class="declaration">
             <h4>Declaration</h4>
-            <div class="language">
-              <p class="aside-title">{{language}}</p>
+            <div class="language keyline-blue">
+              <p  style="background: rgba(65, 131, 196, 0.15);" class="aside-title text-blue">{{language}}</p>
               {{{declaration}}}
             </div>
             {{#other_language_declaration}}
-            <div class="language">
-              <p class="aside-title">Swift</p>
+            <div class="language keyline-purple">
+              <p style="background: rgba(149, 149, 209, 0.21);" class="aside-title text-purple">Swift</p>
               {{{other_language_declaration}}}
             </div>
             {{/other_language_declaration}}
@@ -82,8 +80,8 @@
           {{#github_token_url}}
           <div class="slightly-smaller show-on-github">
             <a href="{{{github_token_url}}}">
-              Show on Github
-              <img class="show-on-github-icon" src="{{{path_to_root}}}img/github.svg"/>
+              <img style="margin-bottom: 1px;" class="show-on-github-icon" src="{{{path_to_root}}}img/github.svg"/>
+              View Source on Github
             </a>
           </div>
           {{/github_token_url}}
