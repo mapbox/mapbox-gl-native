@@ -37,6 +37,8 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textFont;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textHaloColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textHaloWidth;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
 /**
@@ -46,6 +48,8 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
 
     public static final String MARKER_SOURCE = "marker-source";
     public static final String MARKER_LAYER = "marker-layer";
+    public static final String TEXT_MARKER_SOURCE = "text-marker-source";
+    public static final String TEXT_MARKER_LAYER = "text-marker-layer";
     private MapboxMap mapboxMap;
     private MapView mapView;
 
@@ -92,6 +96,25 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
                                 )
                 );
 
+                // Add a text marker source and layer
+                FeatureCollection textMarker = FeatureCollection.fromFeatures(new Feature[] {
+                    Feature.fromGeometry(Point.fromCoordinates(new double[] {4.91638, 52.35273}), featureProperties("Hello"))
+                  });
+
+                mapboxMap.addSource(new GeoJsonSource(TEXT_MARKER_SOURCE, textMarker));
+
+                //Add the text-symbol-layer
+                mapboxMap.addLayer(
+                  new SymbolLayer(TEXT_MARKER_LAYER, TEXT_MARKER_SOURCE)
+                    .withProperties(
+                      iconAllowOverlap(true),
+                      textField("{title}"),
+                      textHaloColor(Color.WHITE),
+                      textHaloWidth(3.5f),
+                      textSize(20f)
+                    )
+                );
+
                 //Show
                 mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.35273, 4.91638), 14));
 
@@ -106,6 +129,7 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
         //Query which features are clicked
         PointF screenLoc = mapboxMap.getProjection().toScreenLocation(point);
         List<Feature> features = mapboxMap.queryRenderedFeatures(screenLoc, MARKER_LAYER);
+        List<Feature> textFeature = mapboxMap.queryRenderedFeatures(screenLoc, TEXT_MARKER_LAYER);
 
         SymbolLayer layer = mapboxMap.getLayerAs(MARKER_LAYER);
         if (features.size() == 0) {
@@ -113,6 +137,13 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
             layer.setProperties(iconSize(1f));
         } else {
             layer.setProperties(iconSize(3f));
+        }
+
+        SymbolLayer textLayer = mapboxMap.getLayerAs(TEXT_MARKER_LAYER);
+        if (textFeature.size() == 0){
+            textLayer.setProperties(textField("{title}"));
+        } else {
+            textLayer.setProperties(textField("Goodbye"));
         }
     }
 
