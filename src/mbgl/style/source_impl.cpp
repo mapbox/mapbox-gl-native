@@ -139,8 +139,8 @@ void Source::Impl::updateTiles(const UpdateParameters& parameters) {
 
     if (type != SourceType::Annotations && cache.getSize() == 0) {
         size_t conservativeCacheSize =
-            ((float)parameters.transformState.getWidth() / util::tileSize) *
-            ((float)parameters.transformState.getHeight() / util::tileSize) *
+            std::max((float)parameters.transformState.getWidth() / util::tileSize, 1.0f) *
+            std::max((float)parameters.transformState.getHeight() / util::tileSize, 1.0f) *
             (parameters.transformState.getMaxZoom() - parameters.transformState.getMinZoom() + 1) *
             0.5;
         cache.setSize(conservativeCacheSize);
