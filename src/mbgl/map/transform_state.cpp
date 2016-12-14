@@ -27,22 +27,24 @@ void TransformState::matrixFor(mat4& matrix, const UnwrappedTileID& tileID) cons
 }
 
 void TransformState::getProjMatrix(mat4& projMatrix) const {
-    double halfFov = std::atan(0.5 / getAltitude());
-    double topHalfSurfaceDistance = std::sin(halfFov) * getAltitude() /
-        std::sin(M_PI / 2.0f - getPitch() - halfFov);
+
+     // Find the distance from the center point [width/2, height/2] to the
+    // center top point [width/2, 0] in Z units, using the law of sines.
+    // 1 Z unit is equivalent to 1 horizontal px at the center of the map
+    // (the distance between[width/2, height/2] and [width/2 + 1, height/2])
+    const double halfFov = getFieldOfView() / 2.0;
+    const double groundAngle = M_PI / 2.0 + getPitch();
+    const double topHalfSurfaceDistance = std::sin(halfFov) * getCameraToCenterDistance() / std::sin(M_PI - groundAngle - halfFov);
+
     // Calculate z value of the farthest fragment that should be rendered.
-    double farZ = std::cos(M_PI / 2.0f - getPitch()) * topHalfSurfaceDistance + getAltitude();
+    const double farZ = std::cos(M_PI / 2.0 - getPitch()) * topHalfSurfaceDistance + getCameraToCenterDistance();
 
-    matrix::perspective(projMatrix, 2.0f * std::atan((size.height / 2.0f) / getAltitude()),
-                        double(size.width) / size.height, 0.1, farZ);
+    matrix::perspective(projMatrix, getFieldOfView(), double(size.width) / size.height, 0.1, farZ);
 
-    matrix::translate(projMatrix, projMatrix, 0, 0, -getAltitude());
-
-    // After the rotateX, z values are in pixel units. Convert them to
-    // altitude unites. 1 altitude unit = the screen height.
     const bool flippedY = viewportMode == ViewportMode::FlippedY;
-    matrix::scale(projMatrix, projMatrix, 1, flippedY ? 1 : -1,
-                  1.0f / (rotatedNorth() ? size.width : size.height));
+    matrix::scale(projMatrix, projMatrix, 1, flippedY ? 1 : -1, 1);
+
+    matrix::translate(projMatrix, projMatrix, 0, 0, -getCameraToCenterDistance());
 
     using NO = NorthOrientation;
     switch (getNorthOrientation()) {
@@ -164,8 +166,12 @@ float TransformState::getAngle() const {
     return angle;
 }
 
-float TransformState::getAltitude() const {
-    return altitude;
+float TransformState::getFieldOfView() const {
+    return fov;
+}
+
+float TransformState::getCameraToCenterDistance() const {
+    return 0.5 * size.height / std::tan(fov / 2.0);
 }
 
 float TransformState::getPitch() const {
