@@ -169,6 +169,7 @@
     <string name="button_user_dot_default">Default</string>
     <string name="button_user_dot_tint">Tint dot</string>
     <string name="button_user_accuracy_ring_tint">Tint ring</string>
+    <string name="button_user_transparent_tint">tran</string>
     <string name="button_open_dialog">Open dialog</string>
 
     <string name="label_fps">FPS:</string>

@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.testapp.activity.userlocation;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -81,6 +82,7 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
                             MyLocationTintActivity.this, R.color.mapbox_my_location_ring));
                         myLocationViewSettings.setForegroundTintColor(ContextCompat.getColor(
                             MyLocationTintActivity.this, R.color.mapbox_blue));
+                        myLocationViewSettings.setBackgroundTintColor(Color.WHITE);
                     }
                 });
 
@@ -95,6 +97,7 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
                             ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapbox_green));
                         myLocationViewSettings.setForegroundTintColor(
                             ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapbox_green));
+                        myLocationViewSettings.setBackgroundTintColor(Color.WHITE);
                     }
                 });
 
@@ -109,8 +112,21 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
                             ContextCompat.getColor(MyLocationTintActivity.this, R.color.accent));
                         myLocationViewSettings.setForegroundTintColor(
                             ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapbox_blue));
+                        myLocationViewSettings.setBackgroundTintColor(Color.WHITE);
                     }
                 });
+
+                ViewUtils.attachClickListener(
+                  MyLocationTintActivity.this,
+                  R.id.user_dot_transparent_button,
+                  new View.OnClickListener() {
+                      @Override
+                      public void onClick(View view) {
+                          myLocationViewSettings.setForegroundTintColor(Color.TRANSPARENT);
+                          myLocationViewSettings.setBackgroundTintColor(Color.TRANSPARENT);
+                      }
+                  }
+                );
             }
         });
 

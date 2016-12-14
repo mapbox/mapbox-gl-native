@@ -75,9 +75,23 @@ public class MyLocationViewSettingsTest {
     }
 
     @Test
+    public void testForegroundTransparentTint() {
+        int color = Color.TRANSPARENT;
+        locationViewSettings.setForegroundTintColor(Color.TRANSPARENT);
+        assertEquals("color should match", color, locationViewSettings.getForegroundTintColor());
+    }
+
+    @Test
     public void testBackgroundTint() {
         int color = Color.RED;
         locationViewSettings.setBackgroundTintColor(Color.RED);
+        assertEquals("color should match", color, locationViewSettings.getBackgroundTintColor());
+    }
+
+    @Test
+    public void testBackgroundTransparentTint() {
+        int color = Color.TRANSPARENT;
+        locationViewSettings.setBackgroundTintColor(Color.TRANSPARENT);
         assertEquals("color should match", color, locationViewSettings.getBackgroundTintColor());
     }
 

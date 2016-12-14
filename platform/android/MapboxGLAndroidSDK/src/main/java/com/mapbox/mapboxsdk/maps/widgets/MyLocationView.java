@@ -173,13 +173,11 @@ public class MyLocationView extends View {
     }
 
     public final void setForegroundDrawableTint(@ColorInt int color) {
-        if (color != Color.TRANSPARENT) {
-            if (foregroundDrawable != null) {
-                foregroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
-            }
-            if (foregroundBearingDrawable != null) {
-                foregroundBearingDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
-            }
+        if (foregroundDrawable != null) {
+            foregroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        }
+        if (foregroundBearingDrawable != null) {
+            foregroundBearingDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
         }
         invalidate();
     }
@@ -202,12 +200,10 @@ public class MyLocationView extends View {
     }
 
     public final void setShadowDrawableTint(@ColorInt int color) {
-        if (color != Color.TRANSPARENT) {
-            if (backgroundDrawable == null) {
-                return;
-            }
-            backgroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        if (backgroundDrawable == null) {
+            return;
         }
+        backgroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
         invalidate();
     }
 
