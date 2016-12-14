@@ -8,10 +8,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
+import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -25,7 +27,9 @@ public class MarkerViewScaleActivity extends AppCompatActivity implements OnMapR
 
     private MapboxMap mapboxMap;
     private MapView mapView;
-    private View markerView;
+
+    private MarkerView markerView;
+    private MarkerViewManager markerViewManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +45,6 @@ public class MarkerViewScaleActivity extends AppCompatActivity implements OnMapR
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        final SeekBar xBar = (SeekBar) findViewById(R.id.seekbar_factor);
-        TextView textView = (TextView) findViewById(R.id.textview_factor);
-        xBar.setOnSeekBarChangeListener(new FactorChangeListener(textView));
-
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
@@ -53,16 +53,39 @@ public class MarkerViewScaleActivity extends AppCompatActivity implements OnMapR
     @Override
     public void onMapReady(MapboxMap map) {
         mapboxMap = map;
+        markerViewManager = map.getMarkerViewManager();
+
+        final SeekBar xBar = (SeekBar) findViewById(R.id.seekbar_factor);
+        final TextView textView = (TextView) findViewById(R.id.textview_factor);
+
+        // We need to listen to a render event to be sure
+        // the View of the Marker has been added to the map
+        mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+            @Override
+            public void onMapChanged(@MapView.MapChange int change) {
+                if (isMarkerRendered()) {
+                    Toast.makeText(MarkerViewScaleActivity.this, "MarkerView is ready", Toast.LENGTH_SHORT).show();
+                    View view = markerViewManager.getView(markerView);
+                    xBar.setOnSeekBarChangeListener(new FactorChangeListener(view, textView));
+                    xBar.setClickable(true);
+                    mapView.removeOnMapChangedListener(this);
+                }
+            }
+
+            private boolean isMarkerRendered() {
+                return markerView != null && markerViewManager.getView(markerView) != null;
+            }
+        });
+
         Icon icon = IconFactory.getInstance(MarkerViewScaleActivity.this)
                 .fromResource(R.drawable.ic_circle);
 
-        MarkerView marker = mapboxMap.addMarker(new MarkerViewOptions()
+        markerView = mapboxMap.addMarker(new MarkerViewOptions()
                 .position(new LatLng(38.907192, -77.036871))
                 .icon(icon)
                 .flat(true));
-
-        markerView = mapboxMap.getMarkerViewManager().getView(marker);
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -76,27 +99,27 @@ public class MarkerViewScaleActivity extends AppCompatActivity implements OnMapR
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
-
-    @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         mapView.onResume();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
+    public void onStart() {
+        super.onResume();
+        mapView.onStart();
     }
 
     @Override
-    protected void onStop() {
+    public void onStop(){
         super.onStop();
         mapView.onStop();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
     }
 
     @Override
@@ -117,11 +140,13 @@ public class MarkerViewScaleActivity extends AppCompatActivity implements OnMapR
         mapView.onLowMemory();
     }
 
-    private class FactorChangeListener implements SeekBar.OnSeekBarChangeListener {
+    private static class FactorChangeListener implements SeekBar.OnSeekBarChangeListener {
 
         private TextView textView;
+        private View view;
 
-        public FactorChangeListener(TextView textView) {
+        FactorChangeListener(View view, TextView textView) {
+            this.view = view;
             this.textView = textView;
         }
 
@@ -129,9 +154,9 @@ public class MarkerViewScaleActivity extends AppCompatActivity implements OnMapR
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             float newScale = getScale(progress);
             textView.setText(String.format(Locale.US, "Scale: %.1f", newScale));
-            if (MarkerViewScaleActivity.this.markerView != null) {
-                markerView.setScaleX(newScale);
-                markerView.setScaleY(newScale);
+            if (view != null) {
+                view.setScaleX(newScale);
+                view.setScaleY(newScale);
             }
         }
 
