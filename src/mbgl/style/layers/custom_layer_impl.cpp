@@ -57,7 +57,7 @@ void CustomLayer::Impl::render(const TransformState& state) const {
     parameters.zoom = state.getZoom();
     parameters.bearing = -state.getAngle() * util::RAD2DEG;
     parameters.pitch = state.getPitch();
-    parameters.altitude = state.getAltitude();
+    parameters.fieldOfView = state.getFieldOfView();
 
     renderFn(context, parameters);
 }

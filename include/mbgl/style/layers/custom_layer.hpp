@@ -25,7 +25,7 @@ struct CustomLayerRenderParameters {
     double zoom;
     double bearing;
     double pitch;
-    double altitude;
+    double fieldOfView;
 };
 
 /**

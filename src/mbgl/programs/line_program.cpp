@@ -25,7 +25,7 @@ Values makeValues(const LinePaintProperties::Evaluated& properties,
 
     // calculate how much longer the real world distance is at the top of the screen
     // than at the middle of the screen.
-    float topedgelength = std::sqrt(std::pow(state.getSize().height, 2.0f) / 4.0f  * (1.0f + std::pow(state.getAltitude(), 2.0f)));
+    float topedgelength = std::sqrt(std::pow(state.getSize().height, 2.0f) / 4.0f  * (1.0f + std::pow(state.getCameraToCenterDistance(), 2.0f)));
     float x = state.getSize().height / 2.0f * std::tan(state.getPitch());
 
     return Values {

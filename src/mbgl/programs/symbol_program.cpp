@@ -23,8 +23,8 @@ Values makeValues(const style::SymbolPropertyValues& values,
         extrudeScale.fill(tile.id.pixelsToTileUnits(1, state.getZoom()) * scale);
     } else {
         extrudeScale = {{
-            pixelsToGLUnits[0] * scale * state.getAltitude(),
-            pixelsToGLUnits[1] * scale * state.getAltitude()
+            pixelsToGLUnits[0] * scale * state.getCameraToCenterDistance(),
+            pixelsToGLUnits[1] * scale * state.getCameraToCenterDistance()
         }};
     }
 
@@ -77,7 +77,7 @@ static SymbolSDFProgram::UniformValues makeSDFValues(const style::SymbolProperty
     const float gammaBase = 0.105 * values.sdfScale / values.paintSize / pixelRatio;
     const float gammaScale = (values.pitchAlignment == AlignmentType::Map
         ? 1.0 / std::cos(state.getPitch())
-        : 1.0) / state.getAltitude();
+        : 1.0) / state.getCameraToCenterDistance();
 
     return makeValues<SymbolSDFProgram::UniformValues>(
         values,
