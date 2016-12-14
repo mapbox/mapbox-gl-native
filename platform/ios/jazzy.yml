@@ -81,6 +81,10 @@ custom_categories:
       - MGLFillStyleLayer
       - MGLLineStyleLayer
       - MGLSymbolStyleLayer
+  - name: Style Values
+    children:
+      - MGLStyleValue
+      - NSValue(MGLAdditions)
   - name: Offline Maps
     children:
       - MGLOfflineRegion
