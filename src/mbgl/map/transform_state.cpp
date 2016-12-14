@@ -36,10 +36,13 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
     const double groundAngle = M_PI / 2.0 + getPitch();
     const double topHalfSurfaceDistance = std::sin(halfFov) * getCameraToCenterDistance() / std::sin(M_PI - groundAngle - halfFov);
 
-    // Calculate z value of the farthest fragment that should be rendered.
-    const double farZ = std::cos(M_PI / 2.0 - getPitch()) * topHalfSurfaceDistance + getCameraToCenterDistance();
 
-    matrix::perspective(projMatrix, getFieldOfView(), double(size.width) / size.height, 0.1, farZ);
+    // Calculate z distance of the farthest fragment that should be rendered.
+    const double furthestDistance = std::cos(M_PI / 2 - getPitch()) * topHalfSurfaceDistance + getCameraToCenterDistance();
+    // Add a bit extra to avoid precision problems when a fragment's distance is exactly `furthestDistance`
+    const double farZ = furthestDistance * 1.01;
+
+    matrix::perspective(projMatrix, getFieldOfView(), double(size.width) / size.height, 1, farZ);
 
     const bool flippedY = viewportMode == ViewportMode::FlippedY;
     matrix::scale(projMatrix, projMatrix, 1, flippedY ? 1 : -1, 1);
