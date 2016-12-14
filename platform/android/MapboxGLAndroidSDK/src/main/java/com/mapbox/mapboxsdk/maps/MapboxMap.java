@@ -905,7 +905,25 @@ public final class MapboxMap {
     @UiThread
     @NonNull
     public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions) {
-        return annotationManager.addMarker(markerOptions, this);
+        return annotationManager.addMarker(markerOptions, this, null);
+    }
+
+
+    /**
+     * <p>
+     * Adds a marker to this map.
+     * </p>
+     * The marker's icon is rendered on the map at the location {@code Marker.position}.
+     * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
+     *
+     * @param markerOptions             A marker options object that defines how to render the marker.
+     * @param onMarkerViewAddedListener Callback invoked when the View has been added to the map.
+     * @return The {@code Marker} that was added to the map.
+     */
+    @UiThread
+    @NonNull
+    public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions, final MarkerViewManager.OnMarkerViewAddedListener onMarkerViewAddedListener) {
+        return annotationManager.addMarker(markerOptions, this, onMarkerViewAddedListener);
     }
 
     @UiThread

@@ -20,6 +20,7 @@ import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ import java.util.List;
  * Exposes convenience methods to add/remove/update all subtypes of annotations found in com.mapbox.mapboxsdk.annotations.
  * </p>
  */
-class AnnotationManager implements MapView.OnMapChangedListener {
+class AnnotationManager {
 
     private final NativeMapView nativeMapView;
     private final MapView mapView;
@@ -44,8 +45,8 @@ class AnnotationManager implements MapView.OnMapChangedListener {
 
     private MapboxMap mapboxMap;
 
+    private HashMap<MarkerView, MarkerViewManager.OnMarkerViewAddedListener> markerMap = new HashMap<>();
     private MapboxMap.OnMarkerClickListener onMarkerClickListener;
-    private boolean isWaitingForRenderInvoke;
 
     AnnotationManager(NativeMapView view, MapView mapView, MarkerViewManager markerViewManager) {
         this.nativeMapView = view;
@@ -54,7 +55,7 @@ class AnnotationManager implements MapView.OnMapChangedListener {
         this.markerViewManager = markerViewManager;
         if (view != null) {
             // null checking needed for unit tests
-            view.addOnMapChangedListener(this);
+            nativeMapView.addOnMapChangedListener(markerViewManager);
         }
     }
 
@@ -64,14 +65,6 @@ class AnnotationManager implements MapView.OnMapChangedListener {
         this.mapboxMap = mapboxMap;
         this.markerViewManager.bind(mapboxMap);
         return this;
-    }
-
-    @Override
-    public void onMapChanged(@MapView.MapChange int change) {
-        if (isWaitingForRenderInvoke && change == MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
-            isWaitingForRenderInvoke = false;
-            markerViewManager.invalidateViewMarkersInVisibleRegion();
-        }
     }
 
     //
@@ -218,7 +211,6 @@ class AnnotationManager implements MapView.OnMapChangedListener {
     }
 
     MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions, @NonNull MapboxMap mapboxMap) {
-        isWaitingForRenderInvoke = true;
         MarkerView marker = prepareViewMarker(markerOptions);
         marker.setMapboxMap(mapboxMap);
         long id = nativeMapView.addMarker(marker);
@@ -227,13 +219,28 @@ class AnnotationManager implements MapView.OnMapChangedListener {
         return marker;
     }
 
+    public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions, @NonNull MapboxMap mapboxMap, final MarkerViewManager.OnMarkerViewAddedListener onMarkerViewAddedListener) {
+        final MarkerView marker = prepareViewMarker(markerOptions);
+
+        // add marker to map
+        marker.setMapboxMap(mapboxMap);
+        long id = nativeMapView.addMarker(marker);
+        marker.setId(id);
+        annotations.put(id, marker);
+
+        markerViewManager.addOnMarkerViewAddedListener(marker, onMarkerViewAddedListener);
+        markerViewManager.setWaitingForRenderInvoke(true);
+        return marker;
+    }
+
+
     List<MarkerView> addMarkerViews(@NonNull List<? extends BaseMarkerViewOptions> markerViewOptions, @NonNull MapboxMap mapboxMap) {
         List<MarkerView> markers = new ArrayList<>();
         for (BaseMarkerViewOptions markerViewOption : markerViewOptions) {
             // if last marker
             if (markerViewOptions.indexOf(markerViewOption) == markerViewOptions.size() - 1) {
                 // get notified when render occurs to invalidate and draw MarkerViews
-                isWaitingForRenderInvoke = true;
+                markerViewManager.setWaitingForRenderInvoke(true);
             }
             // add marker to map
             MarkerView marker = prepareViewMarker(markerViewOption);

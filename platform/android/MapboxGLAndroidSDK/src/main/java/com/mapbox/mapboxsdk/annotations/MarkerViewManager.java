@@ -6,6 +6,7 @@ import android.graphics.RectF;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
@@ -28,10 +30,11 @@ import java.util.Map;
  * This class is responsible for managing a {@link MarkerView} item.
  * </p>
  */
-public class MarkerViewManager {
+public class MarkerViewManager implements MapView.OnMapChangedListener {
 
     private final ViewGroup markerViewContainer;
     private final Map<MarkerView, View> markerViewMap = new HashMap<>();
+    private final LongSparseArray<OnMarkerViewAddedListener> markerViewAddedListenerMap = new LongSparseArray<>();
     private final List<MapboxMap.MarkerViewAdapter> markerViewAdapters = new ArrayList<>();
 
     // TODO refactor MapboxMap out for Projection and Transform
@@ -40,6 +43,7 @@ public class MarkerViewManager {
 
     private long viewMarkerBoundsUpdateTime;
     private MapboxMap.OnMarkerViewClickListener onMarkerViewClickListener;
+    private boolean isWaitingForRenderInvoke;
 
     /**
      * Creates an instance of MarkerViewManager.
@@ -55,6 +59,19 @@ public class MarkerViewManager {
     // Requires removing MapboxMap from Annotations by using Peer model from #6912
     public void bind(MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
+    }
+
+
+    @Override
+    public void onMapChanged(@MapView.MapChange int change) {
+        if (isWaitingForRenderInvoke && change == MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
+            isWaitingForRenderInvoke = false;
+            invalidateViewMarkersInVisibleRegion();
+        }
+    }
+
+    public void setWaitingForRenderInvoke(boolean waitingForRenderInvoke) {
+        isWaitingForRenderInvoke = waitingForRenderInvoke;
     }
 
     /**
@@ -470,10 +487,21 @@ public class MarkerViewManager {
                                 markerViewContainer.addView(adaptedView);
                             }
                         }
+
+                        // notify listener is marker view is rendered
+                        OnMarkerViewAddedListener onViewAddedListener = markerViewAddedListenerMap.get(marker.getId());
+                        if (onViewAddedListener != null) {
+                            onViewAddedListener.onViewAdded(marker);
+                            markerViewAddedListenerMap.remove(marker.getId());
+                        }
                     }
                 }
             }
         }
+
+        // clear map, don't keep references to MarkerView listeners that are not found in the bounds of the map.
+        markerViewAddedListenerMap.clear();
+
         // trigger update to make newly added ViewMarker visible,
         // these would only be updated when the map is moved.
         update();
@@ -555,6 +583,10 @@ public class MarkerViewManager {
         return markerViewContainer;
     }
 
+    public void addOnMarkerViewAddedListener(MarkerView markerView, OnMarkerViewAddedListener onMarkerViewAddedListener) {
+        markerViewAddedListenerMap.put(markerView.getId(), onMarkerViewAddedListener);
+    }
+
     /**
      * Default MarkerViewAdapter used for base class of {@link MarkerView} to adapt a MarkerView to
      * an ImageView.
@@ -587,5 +619,22 @@ public class MarkerViewManager {
         private static class ViewHolder {
             ImageView imageView;
         }
+    }
+
+    /**
+     * Interface definition invoked when the View of a MarkerView has been added to the map.
+     * <p>
+     * {@link MapboxMap#addMarker(BaseMarkerOptions)}
+     * and only when the related MarkerView is found in the viewport of the map.
+     * </p>
+     */
+    public interface OnMarkerViewAddedListener {
+
+        /**
+         * Invoked when the View of a MarkerView has been added to the Map.
+         *
+         * @param markerView The MarkerView the View was added for
+         */
+        void onViewAdded(@NonNull MarkerView markerView);
     }
 }
