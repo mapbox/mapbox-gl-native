@@ -19,6 +19,14 @@ BRANCH=$( git describe --tags --match=macos-v*.*.* --abbrev=0 )
 SHORT_VERSION=$( echo ${BRANCH} | sed 's/^macos-v//' )
 RELEASE_VERSION=$( echo ${SHORT_VERSION} | sed -e 's/^macos-v//' -e 's/-.*//' )
 
+FAVICON='<link rel="shortcut icon" href="https://www.mapbox.com/img/favicon.ico" type="image/x-icon" />'
+if [ -a ${HTMLHEAD} ]; then
+    HTMLHEAD="${FAVICON}
+$(cat ${HTMLHEAD})"
+else
+    HTMLHEAD="${FAVICON}"
+fi
+
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/README.md
@@ -40,6 +48,7 @@ jazzy \
     --readme ${README} \
     --documentation="platform/macos/docs/Info.plist Keys.md" \
     --theme platform/darwin/docs/theme \
+    --head "${HTMLHEAD}" \
     --output ${OUTPUT}
 # https://github.com/realm/jazzy/issues/411
 find ${OUTPUT} -name *.html -exec \

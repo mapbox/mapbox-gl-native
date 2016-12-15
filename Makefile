@@ -165,7 +165,7 @@ xpackage: $(MACOS_PROJ_PATH)
 
 .PHONY: xdocument
 xdocument:
-	OUTPUT=$(OUTPUT) ./platform/macos/scripts/document.sh
+	OUTPUT=$(OUTPUT) HTMLHEAD=$(HTMLHEAD) ./platform/macos/scripts/document.sh
 
 .PHONY: genstrings
 genstrings:
@@ -271,7 +271,7 @@ ideploy:
 
 .PHONY: idocument
 idocument:
-	OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
+	OUTPUT=$(OUTPUT) HTMLHEAD=$(HTMLHEAD) ./platform/ios/scripts/document.sh
 
 style-code-darwin:
 	node platform/darwin/scripts/generate-style-code.js
