@@ -186,6 +186,12 @@ namespace mbgl {
 <% } -%>
 }
 
+<% if (property.original) { %>
+- (void)set<%- camelize(originalPropertyName(property)) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> {
+    NSAssert(NO, @"Use -set<%- camelize(property.name) %>: instead.");
+}
+
+<% } -%>
 <% } -%>
 <% } -%>
 <% if (paintProperties.length) { -%>
@@ -215,6 +221,12 @@ namespace mbgl {
 <% } -%>
 }
 
+<% if (property.original) { %>
+- (void)set<%- camelize(originalPropertyName(property)) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> {
+    NSAssert(NO, @"Use -set<%- camelize(property.name) %>: instead.");
+}
+
+<% } -%>
 <% } -%>
 <% } -%>
 

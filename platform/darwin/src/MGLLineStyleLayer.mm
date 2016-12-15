@@ -231,6 +231,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::vector<float>, NSArray<NSNumber *> *, float>().toStyleValue(propertyValue);
 }
 
+
+- (void)setLineDasharray:(MGLStyleValue<NSArray<NSNumber *> *> *)lineDasharray {
+    NSAssert(NO, @"Use -setLineDashPattern: instead.");
+}
+
 - (void)setLineGapWidth:(MGLStyleValue<NSNumber *> *)lineGapWidth {
     MGLAssertStyleLayerIsValid();
 

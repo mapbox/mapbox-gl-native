@@ -133,6 +133,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
 }
 
+
+- (void)setFillAntialias:(MGLStyleValue<NSNumber *> *)fillAntialias {
+    NSAssert(NO, @"Use -setFillAntialiased: instead.");
+}
+
 - (void)setFillColor:(MGLStyleValue<MGLColor *> *)fillColor {
     MGLAssertStyleLayerIsValid();
 
