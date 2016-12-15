@@ -113,21 +113,21 @@ typedef NS_ENUM(NSUInteger, MGLTextAnchor) {
 /**
  Text justification options.
  
- Values of this type are used in the `textJustify` property of `MGLSymbolStyleLayer`.
+ Values of this type are used in the `textJustification` property of `MGLSymbolStyleLayer`.
  */
-typedef NS_ENUM(NSUInteger, MGLTextJustify) {
+typedef NS_ENUM(NSUInteger, MGLTextJustification) {
     /**
      The text is aligned to the left.
      */
-    MGLTextJustifyLeft,
+    MGLTextJustificationLeft,
     /**
      The text is centered.
      */
-    MGLTextJustifyCenter,
+    MGLTextJustificationCenter,
     /**
      The text is aligned to the right.
      */
-    MGLTextJustifyRight,
+    MGLTextJustificationRight,
 };
 
 /**
@@ -238,8 +238,10 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-allow-overlap"><code>icon-allow-overlap</code></a> layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconAllowOverlap;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconAllowsOverlap;
 
 /**
  If true, other symbols can be visible even if they collide with the icon.
@@ -247,8 +249,10 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-ignore-placement"><code>icon-ignore-placement</code></a> layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconIgnorePlacement;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconIgnoresPlacement;
 
 /**
  A string with {tokens} replaced, referencing the data property to pull from.
@@ -256,15 +260,6 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-image"><code>icon-image</code></a> layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *iconImageName;
-
-/**
- If true, the icon may be flipped to prevent it from being rendered upside-down.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `iconImageName` is non-`nil`, and `iconRotationAlignment` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLIconRotationAlignmentMap`, and `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconKeepUpright;
 
 /**
  Offset distance of icon from its anchor.
@@ -303,8 +298,10 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-rotate"><code>icon-rotate</code></a> layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconRotate;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconRotation;
 
 /**
  In combination with `symbolPlacement`, determines the rotation behavior of icons.
@@ -347,11 +344,61 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFitPadding;
 
 /**
+ If true, the icon may be flipped to prevent it from being rendered upside-down.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `iconImageName` is non-`nil`, and `iconRotationAlignment` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLIconRotationAlignmentMap`, and `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-keep-upright"><code>icon-keep-upright</code></a> layout property in the Mapbox Style Specification.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *keepsIconUpright;
+
+/**
+ If true, the text may be flipped vertically to prevent it from being rendered upside-down.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `YES`. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `textField` is non-`nil`, and `textRotationAlignment` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextRotationAlignmentMap`, and `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-keep-upright"><code>text-keep-upright</code></a> layout property in the Mapbox Style Specification.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *keepsTextUpright;
+
+/**
+ Maximum angle change between adjacent characters.
+
+ This property is measured in degrees.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `45`. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `textField` is non-`nil`, and `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-max-angle"><code>text-max-angle</code></a> layout property in the Mapbox Style Specification.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumTextAngle;
+
+/**
+ The maximum line width for text wrapping.
+
+ This property is measured in ems.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `10`. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-max-width"><code>text-max-width</code></a> layout property in the Mapbox Style Specification.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumTextWidth;
+
+/**
  If true, the symbols will not cross tile edges to avoid mutual collisions. Recommended in layers that don't have enough padding in the vector tile to prevent collisions, or if it is a point symbol layer placed after a line symbol layer.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-symbol-avoid-edges"><code>symbol-avoid-edges</code></a> layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolAvoidEdges;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolAvoidsEdges;
 
 /**
  Label placement relative to its geometry.
@@ -377,8 +424,10 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-allow-overlap"><code>text-allow-overlap</code></a> layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textAllowOverlap;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textAllowsOverlap;
 
 /**
  Part of the text placed closest to the anchor.
@@ -411,26 +460,21 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-ignore-placement"><code>text-ignore-placement</code></a> layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textIgnorePlacement;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textIgnoresPlacement;
 
 /**
  Text justification options.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextJustifyCenter`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextJustificationCenter`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textJustify;
-
-/**
- If true, the text may be flipped vertically to prevent it from being rendered upside-down.
  
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `YES`. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `textField` is non-`nil`, and `textRotationAlignment` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLTextRotationAlignmentMap`, and `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-justify"><code>text-justify</code></a> layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textKeepUpright;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textJustification;
 
 /**
  Text tracking amount.
@@ -455,28 +499,6 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textLineHeight;
 
 /**
- Maximum angle change between adjacent characters.
-
- This property is measured in degrees.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `45`. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `textField` is non-`nil`, and `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue` object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textMaxAngle;
-
-/**
- The maximum line width for text wrapping.
-
- This property is measured in ems.
- 
- The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `10`. Set this property to `nil` to reset it to the default value.
- 
- This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textMaxWidth;
-
-/**
  Offset distance of text from its anchor.
 
  This property is measured in ems.
@@ -493,8 +515,10 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`, and `iconImageName` is non-`nil`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-optional"><code>text-optional</code></a> layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textOptional;
+@property (nonatomic, null_resettable, getter=isTextOptional) MGLStyleValue<NSNumber *> *textOptional;
 
 /**
  Size of the additional area around the text bounding box used for detecting symbol collisions.
@@ -524,8 +548,10 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-rotate"><code>text-rotate</code></a> layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textRotate;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textRotation;
 
 /**
  In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text.

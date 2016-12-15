@@ -12,22 +12,32 @@ const suffix = 'StyleLayer';
 // Rename properties and keep `original` for use with setters and getters
 _.forOwn(cocoaConventions, function (properties, kind) {
     _.forOwn(properties, function (newName, oldName) {
-        spec[kind][newName] = spec[kind][oldName];
-        spec[kind][newName].original = oldName;
+        let property = spec[kind][oldName];
+        property.original = oldName
+        if (newName.startsWith('is-')) {
+            property.getter = newName;
+            newName = newName.substr(3);
+        } else {
+        }
         delete spec[kind][oldName];
+        spec[kind][newName] = property;
         
         // Update requirements in other properties.
         let updateRequirements = function (property, name) {
             let requires = property.requires || [];
             for (let i = 0; i < requires.length; i++) {
-                if (requires[i] in cocoaConventions[kind]) {
-                    property.requires[i] = cocoaConventions[kind][requires[i]];
+                if (requires[i] === oldName) {
+                    property.requires[i] = newName;
                 }
-                _.forOwn(requires[i], function (values, name, require) {
-                    if (require in cocoaConventions[kind]) {
-                        require[cocoaConventions[kind][name]] = values;
-                    }
-                });
+                if (typeof requires[i] !== 'string') {
+                    let prop = name;
+                    _.forOwn(requires[i], function (values, name, require) {
+                        if (name === oldName) {
+                            require[newName] = values;
+                            delete require[name];
+                        }
+                    });
+                }
             }
         };
         _.forOwn(spec[kind.replace(/^layout_/, 'paint_')], updateRequirements);
@@ -49,6 +59,10 @@ global.camelizeWithLeadingLowercase = function (str) {
 
 global.objCName = function (property) {
     return camelizeWithLeadingLowercase(property.name);
+}
+
+global.objCGetter = function (property) {
+    return camelizeWithLeadingLowercase(property.getter || property.name);
 }
 
 global.objCType = function (layerType, propertyName) {
@@ -149,7 +163,7 @@ global.propertyDoc = function (propertyName, property, layerType) {
     return doc.replace(/(p)ixel/gi, '$1oint').replace(/(\d)px\b/g, '$1pt');
 };
 
-global.propertyReqs = function (property, layoutPropertiesByName, type) {
+global.propertyReqs = function (property, propertiesByName, type) {
     return 'This property is only applied to the style if ' + property.requires.map(function (req) {
         if (typeof req === 'string') {
             return '`' + camelizeWithLeadingLowercase(req) + '` is non-`nil`';
@@ -157,7 +171,7 @@ global.propertyReqs = function (property, layoutPropertiesByName, type) {
             return '`' + camelizeWithLeadingLowercase(req['!']) + '` is set to `nil`';
         } else {
             let name = Object.keys(req)[0];
-            return '`' + camelizeWithLeadingLowercase(name) + '` is set to an `MGLStyleValue` object containing ' + describeValue(req[name], layoutPropertiesByName[name], type);
+            return '`' + camelizeWithLeadingLowercase(name) + '` is set to an `MGLStyleValue` object containing ' + describeValue(req[name], propertiesByName[name], type);
         }
     }).join(', and ') + '. Otherwise, it is ignored.';
 };
@@ -318,11 +332,11 @@ global.setSourceLayer = function() {
 }
 
 global.mbglType = function(property) {
-    let mbglType = camelize(property.name) + 'Type';
-    if (/-translate-anchor$/.test(property.name)) {
+    let mbglType = camelize(originalPropertyName(property)) + 'Type';
+    if (/-translate-anchor$/.test(originalPropertyName(property))) {
         mbglType = 'TranslateAnchorType';
     }
-    if (/-(rotation|pitch)-alignment$/.test(property.name)) {
+    if (/-(rotation|pitch)-alignment$/.test(originalPropertyName(property))) {
         mbglType = 'AlignmentType';
     }
     return mbglType;

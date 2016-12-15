@@ -65,12 +65,12 @@
     return value;
 }
 
-+ (NSValue *)valueWithMGLTextJustify:(MGLTextJustify)textJustify {
-    return [NSValue value:&textJustify withObjCType:@encode(MGLTextJustify)];
++ (NSValue *)valueWithMGLTextJustification:(MGLTextJustification)textJustification {
+    return [NSValue value:&textJustification withObjCType:@encode(MGLTextJustification)];
 }
 
-- (MGLTextJustify)MGLTextJustifyValue {
-    MGLTextJustify value;
+- (MGLTextJustification)MGLTextJustificationValue {
+    MGLTextJustification value;
     [self getValue:&value];
     return value;
 }

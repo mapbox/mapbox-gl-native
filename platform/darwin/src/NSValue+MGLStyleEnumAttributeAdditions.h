@@ -98,17 +98,17 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) MGLTextAnchor MGLTextAnchorValue;
 
 /**
- Creates a new value object containing the given `MGLTextJustify` enumeration.
+ Creates a new value object containing the given `MGLTextJustification` enumeration.
 
  @param type The value for the new object.
  @return A new value object that contains the style enumeration type.
 */
-+ (instancetype)valueWithMGLTextJustify:(MGLTextJustify)textJustify;
++ (instancetype)valueWithMGLTextJustification:(MGLTextJustification)textJustification;
 
 /**
- The `MGLTextJustify` enumeration representation of the value.
+ The `MGLTextJustification` enumeration representation of the value.
 */
-@property (readonly) MGLTextJustify MGLTextJustifyValue;
+@property (readonly) MGLTextJustification MGLTextJustificationValue;
 
 /**
  Creates a new value object containing the given `MGLTextPitchAlignment` enumeration.

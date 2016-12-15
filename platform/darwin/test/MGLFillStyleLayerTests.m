@@ -16,7 +16,7 @@
     MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     [self.mapView.style addLayer:layer];
 
-    layer.fillAntialias = [MGLRuntimeStylingHelper testBool];
+    layer.fillAntialiased = [MGLRuntimeStylingHelper testBool];
     layer.fillColor = [MGLRuntimeStylingHelper testColor];
     layer.fillOpacity = [MGLRuntimeStylingHelper testNumber];
     layer.fillOutlineColor = [MGLRuntimeStylingHelper testColor];
@@ -26,7 +26,7 @@
 
     MGLFillStyleLayer *gLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"layerID"];
     XCTAssertTrue([gLayer isKindOfClass:[MGLFillStyleLayer class]]);
-    XCTAssertEqualObjects(gLayer.fillAntialias, [MGLRuntimeStylingHelper testBool]);
+    XCTAssertEqualObjects(gLayer.fillAntialiased, [MGLRuntimeStylingHelper testBool]);
     XCTAssertEqualObjects(gLayer.fillColor, [MGLRuntimeStylingHelper testColor]);
     XCTAssertEqualObjects(gLayer.fillOpacity, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.fillOutlineColor, [MGLRuntimeStylingHelper testColor]);
@@ -35,7 +35,7 @@
     XCTAssert([gLayer.fillTranslateAnchor isKindOfClass:[MGLStyleConstantValue class]]);
     XCTAssertEqualObjects(gLayer.fillTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLFillTranslateAnchorViewport type:@encode(MGLFillTranslateAnchor)]);
 
-    layer.fillAntialias = [MGLRuntimeStylingHelper testBoolFunction];
+    layer.fillAntialiased = [MGLRuntimeStylingHelper testBoolFunction];
     layer.fillColor = [MGLRuntimeStylingHelper testColorFunction];
     layer.fillOpacity = [MGLRuntimeStylingHelper testNumberFunction];
     layer.fillOutlineColor = [MGLRuntimeStylingHelper testColorFunction];
@@ -43,7 +43,7 @@
     layer.fillTranslate = [MGLRuntimeStylingHelper testOffsetFunction];
     layer.fillTranslateAnchor = [MGLRuntimeStylingHelper testEnumFunction:MGLFillTranslateAnchorViewport type:@encode(MGLFillTranslateAnchor)];
 
-    XCTAssertEqualObjects(gLayer.fillAntialias, [MGLRuntimeStylingHelper testBoolFunction]);
+    XCTAssertEqualObjects(gLayer.fillAntialiased, [MGLRuntimeStylingHelper testBoolFunction]);
     XCTAssertEqualObjects(gLayer.fillColor, [MGLRuntimeStylingHelper testColorFunction]);
     XCTAssertEqualObjects(gLayer.fillOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.fillOutlineColor, [MGLRuntimeStylingHelper testColorFunction]);
