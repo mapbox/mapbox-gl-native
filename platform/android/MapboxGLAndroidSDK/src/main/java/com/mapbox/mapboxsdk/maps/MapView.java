@@ -89,7 +89,7 @@ public class MapView extends FrameLayout {
     private boolean destroyed;
 
     private NativeMapView nativeMapView;
-    private boolean hasSurface = false;
+    private boolean textureMode;
 
     private CompassView compassView;
     private MyLocationView myLocationView;
@@ -143,16 +143,7 @@ public class MapView extends FrameLayout {
         View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
         setWillNotDraw(false);
 
-        if (options.getTextureMode()) {
-            TextureView textureView = new TextureView(context);
-            textureView.setSurfaceTextureListener(new SurfaceTextureListener());
-            addView(textureView, 0);
-        } else {
-            SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
-            surfaceView.getHolder().addCallback(new SurfaceCallback());
-            surfaceView.setVisibility(View.VISIBLE);
-        }
-
+        textureMode = options.getTextureMode();
         nativeMapView = new NativeMapView(this);
 
         // inflate overlain Views
@@ -228,6 +219,17 @@ public class MapView extends FrameLayout {
      */
     @UiThread
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        // initialise rendering surface
+        if (textureMode) {
+            TextureView textureView = new TextureView(getContext());
+            textureView.setSurfaceTextureListener(new SurfaceTextureListener());
+            addView(textureView, 0);
+        } else {
+            SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+            surfaceView.getHolder().addCallback(new SurfaceCallback());
+            surfaceView.setVisibility(View.VISIBLE);
+        }
+
         // TODO distill into singular purpose methods/classes
         String accessToken = mapboxMap.getAccessToken();
         if (TextUtils.isEmpty(accessToken)) {
@@ -701,10 +703,6 @@ public class MapView extends FrameLayout {
             return;
         }
 
-        if (!hasSurface) {
-            return;
-        }
-
         nativeMapView.render();
     }
 
@@ -726,7 +724,6 @@ public class MapView extends FrameLayout {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             nativeMapView.createSurface(surface = holder.getSurface());
-            hasSurface = true;
         }
 
         @Override
@@ -739,7 +736,7 @@ public class MapView extends FrameLayout {
 
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
-            hasSurface = false;
+            destroyed = false;
 
             if (nativeMapView != null) {
                 nativeMapView.destroySurface();
@@ -759,14 +756,13 @@ public class MapView extends FrameLayout {
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             nativeMapView.createSurface(this.surface = new Surface(surface));
             nativeMapView.resizeFramebuffer(width, height);
-            hasSurface = true;
         }
 
         // Called when the native surface texture has been destroyed
         // Must do all EGL/GL ES destruction here
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-            hasSurface = false;
+            destroyed = true;
 
             if (nativeMapView != null) {
                 nativeMapView.destroySurface();
