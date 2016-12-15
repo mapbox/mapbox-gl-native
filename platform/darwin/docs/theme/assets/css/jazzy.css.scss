@@ -158,11 +158,9 @@ img {
 a {
   color: $link_color;
   text-decoration: none;
-
-  &:hover, &:focus {
+  > *:hover, &:hover, &:focus {
     opacity: 0.7;
   }
-
   &:focus {
     box-shadow:inset 0 0 0 1px rgba(0,0,0,0.05);
   }
@@ -262,6 +260,9 @@ pre code {
   padding: 12px 0px;
   font-size: 12px;
   color: $doc_coverage_color;
+  @media (max-width: 768px) {
+    display: block;
+  }
 }
 .header-tag {
   vertical-align: text-top;
@@ -369,7 +370,6 @@ pre code {
 .nav-group-task-link {
    color: $color_darkblue_lighten;
 }
-
 // ===========================================================================
 //
 //  Content
@@ -401,7 +401,6 @@ pre code {
 
 .section-content img {
   margin: 0 auto;
-  display: block;
 }
 
 .section-name {
@@ -409,6 +408,17 @@ pre code {
   display: block;
 }
 
+.anchor-icon {
+  margin-left: 4px;
+  opacity: 0.7;
+  display: inline-block;
+  background: url("../img/link.svg");
+  background-repeat: no-repeat;
+  width: 10px;
+  height: 10px;
+}
+
+h1 > .anchor-icon { margin-bottom: 2px; }
 .declaration .highlight {
   font-size: 15px;
   overflow-x: initial; // This allows the scrollbar to show up inside declarations
@@ -452,12 +462,19 @@ pre code {
   .token {
     margin-left: 0px;
     font-size: 13px;
-    word-break: break-all;
+    display: flex;
+    padding: 5px 0px;
+    line-height: 14px;
   }
-
+  .token-name {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .token-icon {
     background: url('../img/plus.svg');
-    width: 15px;
+    width: 17px;
     display: inline-block;
     vertical-align: middle;
     height: 13px;
@@ -600,10 +617,6 @@ pre code {
 }
 
 .show-on-github a {
-  padding: 0px 5px;
-  background: rgba(56, 135, 190, 0.12);
-  border-radius: 4px;
-  border: 1px solid rgba(115, 189, 242, 0.49);
   margin: 10px 0 10px;
   display: inline-block;
   font-size: 13px;

@@ -33,7 +33,7 @@
 
         <section class="section">
           <div class="section-content">
-            {{^hide_name}}<h1>{{name}}</h1>{{/hide_name}}
+            {{^hide_name}}<a href="#/{{name}}"><h1 id="{{name}}">{{name}}<span class="anchor-icon" /></h1></a>{{/hide_name}}
             {{#declaration}}
               <div class="declaration">
                 <div class="language">

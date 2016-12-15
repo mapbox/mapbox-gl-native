@@ -4,7 +4,7 @@
     <a name="/{{uid}}"></a>
     <a name="//apple_ref/{{language_stub}}/Section/{{name}}" class="dashAnchor"></a>
     <a href="#/{{uid}}">
-      <h3 class="section-name">{{name}}</h3>
+      <h3 id="{{uid}}" class="section-name">{{name}}<span class="anchor-icon" /></h3>
     </a>
   </div>
   {{/name}}
@@ -15,7 +15,7 @@
         <code>
         <a name="/{{usr}}"></a>
         <a name="//apple_ref/{{language_stub}}/{{dash_type}}/{{name}}" class="dashAnchor"></a>
-        <a class="token" href="#/{{usr}}">{{name}}<span class="token-icon" /></a>
+        <a class="token" href="#/{{usr}}"><span class="token-name">{{name}}</span><span class="token-icon" /></a>
         </code>
         {{#default_impl_abstract}}
           <span class="declaration-note">
@@ -81,7 +81,7 @@
           <div class="show-on-github">
             <a href="{{{github_token_url}}}">
               <img style="margin-bottom: 1px;" class="show-on-github-icon" src="{{{path_to_root}}}img/github.svg"/>
-              View Source on Github
+              View Source on GitHub
             </a>
           </div>
           {{/github_token_url}}
