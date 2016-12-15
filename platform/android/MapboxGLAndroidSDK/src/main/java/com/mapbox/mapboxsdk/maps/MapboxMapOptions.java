@@ -58,8 +58,8 @@ public class MapboxMapOptions implements Parcelable {
     private int attributionGravity = Gravity.BOTTOM;
     private int[] attributionMargins;
 
-    private float minZoom = MapboxConstants.MINIMUM_ZOOM;
-    private float maxZoom = MapboxConstants.MAXIMUM_ZOOM;
+    private double minZoom = MapboxConstants.MINIMUM_ZOOM;
+    private double maxZoom = MapboxConstants.MAXIMUM_ZOOM;
 
     private boolean rotateGesturesEnabled = true;
     private boolean scrollGesturesEnabled = true;
@@ -110,8 +110,8 @@ public class MapboxMapOptions implements Parcelable {
         attributionMargins = in.createIntArray();
         attributionTintColor = in.readInt();
 
-        minZoom = in.readFloat();
-        maxZoom = in.readFloat();
+        minZoom = in.readDouble();
+        maxZoom = in.readDouble();
 
         rotateGesturesEnabled = in.readByte() != 0;
         scrollGesturesEnabled = in.readByte() != 0;
@@ -184,8 +184,8 @@ public class MapboxMapOptions implements Parcelable {
             mapboxMapOptions.tiltGesturesEnabled(typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiTiltGestures, true));
             mapboxMapOptions.zoomControlsEnabled(typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiZoomControls, false));
 
-            mapboxMapOptions.maxZoom(typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_cameraZoomMax, MapboxConstants.MAXIMUM_ZOOM));
-            mapboxMapOptions.minZoom(typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_cameraZoomMin, MapboxConstants.MINIMUM_ZOOM));
+            mapboxMapOptions.maxZoomPreference(typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_cameraZoomMax, MapboxConstants.MAXIMUM_ZOOM));
+            mapboxMapOptions.minZoomPreference(typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_cameraZoomMin, MapboxConstants.MINIMUM_ZOOM));
 
             mapboxMapOptions.compassEnabled(typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiCompass, true));
             mapboxMapOptions.compassGravity(typedArray.getInt(R.styleable.mapbox_MapView_mapbox_uiCompassGravity, Gravity.TOP | Gravity.END));
@@ -310,7 +310,7 @@ public class MapboxMapOptions implements Parcelable {
      * @param minZoom Zoom level to be used
      * @return This
      */
-    public MapboxMapOptions minZoom(float minZoom) {
+    public MapboxMapOptions minZoomPreference(double minZoom) {
         this.minZoom = minZoom;
         return this;
     }
@@ -321,7 +321,7 @@ public class MapboxMapOptions implements Parcelable {
      * @param maxZoom Zoom level to be used
      * @return This
      */
-    public MapboxMapOptions maxZoom(float maxZoom) {
+    public MapboxMapOptions maxZoomPreference(double maxZoom) {
         this.maxZoom = maxZoom;
         return this;
     }
@@ -654,7 +654,7 @@ public class MapboxMapOptions implements Parcelable {
      *
      * @return Mininum zoom level to be used.
      */
-    public float getMinZoom() {
+    public double getMinZoomPreference() {
         return minZoom;
     }
 
@@ -663,7 +663,7 @@ public class MapboxMapOptions implements Parcelable {
      *
      * @return Maximum zoom to be used.
      */
-    public float getMaxZoom() {
+    public double getMaxZoomPreference() {
         return maxZoom;
     }
 
@@ -969,8 +969,8 @@ public class MapboxMapOptions implements Parcelable {
         dest.writeIntArray(attributionMargins);
         dest.writeInt(attributionTintColor);
 
-        dest.writeFloat(minZoom);
-        dest.writeFloat(maxZoom);
+        dest.writeDouble(minZoom);
+        dest.writeDouble(maxZoom);
 
         dest.writeByte((byte) (rotateGesturesEnabled ? 1 : 0));
         dest.writeByte((byte) (scrollGesturesEnabled ? 1 : 0));
@@ -1011,8 +1011,8 @@ public class MapboxMapOptions implements Parcelable {
         if (attributionTintColor != options.attributionTintColor) return false;
         if (attributionEnabled != options.attributionEnabled) return false;
         if (attributionGravity != options.attributionGravity) return false;
-        if (Float.compare(options.minZoom, minZoom) != 0) return false;
-        if (Float.compare(options.maxZoom, maxZoom) != 0) return false;
+        if (Double.compare(options.minZoom, minZoom) != 0) return false;
+        if (Double.compare(options.maxZoom, maxZoom) != 0) return false;
         if (rotateGesturesEnabled != options.rotateGesturesEnabled) return false;
         if (scrollGesturesEnabled != options.scrollGesturesEnabled) return false;
         if (tiltGesturesEnabled != options.tiltGesturesEnabled) return false;
@@ -1045,7 +1045,9 @@ public class MapboxMapOptions implements Parcelable {
 
     @Override
     public int hashCode() {
-        int result = cameraPosition != null ? cameraPosition.hashCode() : 0;
+        int result;
+        long temp;
+        result = cameraPosition != null ? cameraPosition.hashCode() : 0;
         result = 31 * result + (debugActive ? 1 : 0);
         result = 31 * result + (compassEnabled ? 1 : 0);
         result = 31 * result + (fadeCompassFacingNorth ? 1 : 0);
@@ -1058,8 +1060,10 @@ public class MapboxMapOptions implements Parcelable {
         result = 31 * result + (attributionEnabled ? 1 : 0);
         result = 31 * result + attributionGravity;
         result = 31 * result + Arrays.hashCode(attributionMargins);
-        result = 31 * result + (minZoom != +0.0f ? Float.floatToIntBits(minZoom) : 0);
-        result = 31 * result + (maxZoom != +0.0f ? Float.floatToIntBits(maxZoom) : 0);
+        temp = Double.doubleToLongBits(minZoom);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(maxZoom);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (rotateGesturesEnabled ? 1 : 0);
         result = 31 * result + (scrollGesturesEnabled ? 1 : 0);
         result = 31 * result + (tiltGesturesEnabled ? 1 : 0);
@@ -1074,9 +1078,10 @@ public class MapboxMapOptions implements Parcelable {
         result = 31 * result + Arrays.hashCode(myLocationBackgroundPadding);
         result = 31 * result + myLocationAccuracyTintColor;
         result = 31 * result + myLocationAccuracyAlpha;
+        result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
+        result = 31 * result + (textureMode ? 1 : 0);
         result = 31 * result + (style != null ? style.hashCode() : 0);
         result = 31 * result + (accessToken != null ? accessToken.hashCode() : 0);
-        result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
         return result;
     }
 }
