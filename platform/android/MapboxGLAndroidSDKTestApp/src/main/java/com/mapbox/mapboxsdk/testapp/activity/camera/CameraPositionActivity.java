@@ -31,6 +31,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 public class CameraPositionActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   private MapView mapView;
+  private MapboxMap mapboxMap;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,7 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
 
   @Override
   public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+    this.mapboxMap = mapboxMap;
 
     mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
       @Override
