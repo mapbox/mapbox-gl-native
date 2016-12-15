@@ -243,6 +243,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconAllowsOverlap;
 
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconAllowOverlap __attribute__((unavailable("Use iconAllowsOverlap instead.")));
+
 /**
  If true, other symbols can be visible even if they collide with the icon.
  
@@ -254,12 +257,18 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconIgnoresPlacement;
 
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconIgnorePlacement __attribute__((unavailable("Use iconIgnoresPlacement instead.")));
+
 /**
  A string with {tokens} replaced, referencing the data property to pull from.
  
  This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-image"><code>icon-image</code></a> layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *iconImageName;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *iconImage __attribute__((unavailable("Use iconImageName instead.")));
 
 /**
  Offset distance of icon from its anchor.
@@ -303,6 +312,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconRotation;
 
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconRotate __attribute__((unavailable("Use iconRotation instead.")));
+
 /**
  In combination with `symbolPlacement`, determines the rotation behavior of icons.
  
@@ -322,6 +334,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-size"><code>icon-size</code></a> layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconScale;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconSize __attribute__((unavailable("Use iconScale instead.")));
 
 /**
  Scales the icon to fit around the associated text.
@@ -354,6 +369,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *keepsIconUpright;
 
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconKeepUpright __attribute__((unavailable("Use keepsIconUpright instead.")));
+
 /**
  If true, the text may be flipped vertically to prevent it from being rendered upside-down.
  
@@ -364,6 +382,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-keep-upright"><code>text-keep-upright</code></a> layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *keepsTextUpright;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textKeepUpright __attribute__((unavailable("Use keepsTextUpright instead.")));
 
 /**
  Maximum angle change between adjacent characters.
@@ -378,6 +399,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumTextAngle;
 
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textMaxAngle __attribute__((unavailable("Use maximumTextAngle instead.")));
+
 /**
  The maximum line width for text wrapping.
 
@@ -391,6 +415,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumTextWidth;
 
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textMaxWidth __attribute__((unavailable("Use maximumTextWidth instead.")));
+
 /**
  If true, the symbols will not cross tile edges to avoid mutual collisions. Recommended in layers that don't have enough padding in the vector tile to prevent collisions, or if it is a point symbol layer placed after a line symbol layer.
  
@@ -399,6 +426,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-symbol-avoid-edges"><code>symbol-avoid-edges</code></a> layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolAvoidsEdges;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolAvoidEdges __attribute__((unavailable("Use symbolAvoidsEdges instead.")));
 
 /**
  Label placement relative to its geometry.
@@ -428,6 +458,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-allow-overlap"><code>text-allow-overlap</code></a> layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textAllowsOverlap;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textAllowOverlap __attribute__((unavailable("Use textAllowsOverlap instead.")));
 
 /**
  Part of the text placed closest to the anchor.
@@ -465,6 +498,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textIgnoresPlacement;
 
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textIgnorePlacement __attribute__((unavailable("Use textIgnoresPlacement instead.")));
+
 /**
  Text justification options.
  
@@ -475,6 +511,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-justify"><code>text-justify</code></a> layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textJustification;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textJustify __attribute__((unavailable("Use textJustification instead.")));
 
 /**
  Text tracking amount.
@@ -515,8 +554,6 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `NO`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textField` is non-`nil`, and `iconImageName` is non-`nil`. Otherwise, it is ignored.
- 
- This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-optional"><code>text-optional</code></a> layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable, getter=isTextOptional) MGLStyleValue<NSNumber *> *textOptional;
 
@@ -552,6 +589,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-rotate"><code>text-rotate</code></a> layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textRotation;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textRotate __attribute__((unavailable("Use textRotation instead.")));
 
 /**
  In combination with `symbolPlacement`, determines the rotation behavior of the individual glyphs forming the text.

@@ -13,11 +13,12 @@ const suffix = 'StyleLayer';
 _.forOwn(cocoaConventions, function (properties, kind) {
     _.forOwn(properties, function (newName, oldName) {
         let property = spec[kind][oldName];
-        property.original = oldName
         if (newName.startsWith('is-')) {
             property.getter = newName;
             newName = newName.substr(3);
-        } else {
+        }
+        if (newName !== oldName) {
+            property.original = oldName;
         }
         delete spec[kind][oldName];
         spec[kind][newName] = property;

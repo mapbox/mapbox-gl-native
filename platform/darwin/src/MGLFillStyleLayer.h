@@ -41,6 +41,9 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
  */
 @property (nonatomic, null_resettable, getter=isFillAntialiased) MGLStyleValue<NSNumber *> *fillAntialiased;
 
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillAntialias __attribute__((unavailable("Use fillAntialiased instead.")));
+
 #if TARGET_OS_IPHONE
 /**
  The color of the filled part of this layer.
