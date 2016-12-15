@@ -376,7 +376,7 @@
 		DA8F259B1D51CB000010E6B5 /* MGLStyleValue_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLStyleValue_Private.h; sourceTree = "<group>"; };
 		DA8F25A61D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+MGLStyleAttributeAdditions.h"; sourceTree = "<group>"; };
 		DA8F25A71D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSValue+MGLStyleAttributeAdditions.mm"; sourceTree = "<group>"; };
-		DA8F25B51D51D2240010E6B5 /* MGLRuntimeStylingTests.m.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = MGLRuntimeStylingTests.m.ejs; sourceTree = "<group>"; };
+		DA8F25B51D51D2240010E6B5 /* MGLStyleLayerTests.m.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; name = MGLStyleLayerTests.m.ejs; path = ../test/MGLStyleLayerTests.m.ejs; sourceTree = "<group>"; };
 		DA8F25B61D51D2240010E6B5 /* MGLStyleLayer.h.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = MGLStyleLayer.h.ejs; sourceTree = "<group>"; };
 		DA8F25B71D51D2240010E6B5 /* MGLStyleLayer.mm.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = MGLStyleLayer.mm.ejs; sourceTree = "<group>"; };
 		DAA48EFB1D6A4731006A7E36 /* StyleLayerIconTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StyleLayerIconTransformer.h; sourceTree = "<group>"; };
@@ -715,11 +715,11 @@
 		DA8F25B81D51D2280010E6B5 /* Foundation Templates */ = {
 			isa = PBXGroup;
 			children = (
-				4032C5BA1DE1EECB0062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.h.ejs */,
-				4032C5C71DE1FEAB0062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.mm.ejs */,
-				DA8F25B51D51D2240010E6B5 /* MGLRuntimeStylingTests.m.ejs */,
 				DA8F25B61D51D2240010E6B5 /* MGLStyleLayer.h.ejs */,
 				DA8F25B71D51D2240010E6B5 /* MGLStyleLayer.mm.ejs */,
+				DA8F25B51D51D2240010E6B5 /* MGLStyleLayerTests.m.ejs */,
+				4032C5BA1DE1EECB0062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.h.ejs */,
+				4032C5C71DE1FEAB0062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.mm.ejs */,
 			);
 			name = "Foundation Templates";
 			path = ../../darwin/src;
