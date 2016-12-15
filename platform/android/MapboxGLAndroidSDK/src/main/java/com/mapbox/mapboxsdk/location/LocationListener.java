@@ -7,10 +7,11 @@ import android.location.Location;
  */
 public interface LocationListener {
 
-    /**
-     * Callback method for receiving location updates from LocationServices.
-     * @param location The new Location data
-     */
-    void onLocationChanged(Location location);
+  /**
+   * Callback method for receiving location updates from LocationServices.
+   *
+   * @param location The new Location data
+   */
+  void onLocationChanged(Location location);
 
 }

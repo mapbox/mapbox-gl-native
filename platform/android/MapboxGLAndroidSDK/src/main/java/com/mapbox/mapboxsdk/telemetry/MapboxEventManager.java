@@ -252,7 +252,7 @@ public class MapboxEventManager {
             // Make sure Ambient Mode is started at a minimum
             if (LocationServices.getLocationServices(context).areLocationPermissionsGranted()) {
                 Timber.i("Permissions are good, see if GPS is enabled and if not then setup Ambient.");
-                if (LocationServices.getLocationServices(context).isGPSEnabled()) {
+                if (LocationServices.getLocationServices(context).isGpsEnabled()) {
                     LocationServices.getLocationServices(context).toggleGPS(false);
                 }
             } else {
@@ -266,7 +266,7 @@ public class MapboxEventManager {
                         if (LocationServices.getLocationServices(context).areLocationPermissionsGranted()) {
                             Timber.i("Permissions finally granted, so starting Ambient if GPS isn't already enabled");
                             // Start Ambient
-                            if (LocationServices.getLocationServices(context).isGPSEnabled()) {
+                            if (LocationServices.getLocationServices(context).isGpsEnabled()) {
                                 LocationServices.getLocationServices(context).toggleGPS(false);
                             }
                         } else {
