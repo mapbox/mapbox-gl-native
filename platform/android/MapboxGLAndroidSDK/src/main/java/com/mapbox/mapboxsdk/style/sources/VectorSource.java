@@ -9,47 +9,47 @@ import java.net.URL;
  */
 public class VectorSource extends Source {
 
-    /**
-     * Internal use
-     *
-     * @param nativePtr - pointer to native peer
-     */
-    public VectorSource(long nativePtr) {
-        super(nativePtr);
-    }
+  /**
+   * Internal use
+   *
+   * @param nativePtr - pointer to native peer
+   */
+  public VectorSource(long nativePtr) {
+    super(nativePtr);
+  }
 
-    /**
-     * Create a vector source from a remote url
-     *
-     * @param id  the source id
-     * @param url the url
-     */
-    public VectorSource(String id, URL url) {
-        this(id, url.toExternalForm());
-    }
+  /**
+   * Create a vector source from a remote url
+   *
+   * @param id  the source id
+   * @param url the url
+   */
+  public VectorSource(String id, URL url) {
+    this(id, url.toExternalForm());
+  }
 
-    /**
-     * Create a vector source from a remote url
-     *
-     * @param id  the source id
-     * @param url the url
-     */
-    public VectorSource(String id, String url) {
-        initialize(id, url);
-    }
+  /**
+   * Create a vector source from a remote url
+   *
+   * @param id  the source id
+   * @param url the url
+   */
+  public VectorSource(String id, String url) {
+    initialize(id, url);
+  }
 
-    /**
-     * Create a vector source from a tilset
-     *
-     * @param id      the source id
-     * @param tileSet the tileset
-     */
-    public VectorSource(String id, TileSet tileSet) {
-        initialize(id, tileSet.toValueObject());
-    }
+  /**
+   * Create a vector source from a tilset
+   *
+   * @param id      the source id
+   * @param tileSet the tileset
+   */
+  public VectorSource(String id, TileSet tileSet) {
+    initialize(id, tileSet.toValueObject());
+  }
 
-    protected native void initialize(String layerId, Object payload);
+  protected native void initialize(String layerId, Object payload);
 
-    @Override
-    protected native void finalize() throws Throwable;
+  @Override
+  protected native void finalize() throws Throwable;
 }

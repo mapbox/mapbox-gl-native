@@ -5,30 +5,30 @@ package com.mapbox.mapboxsdk.net;
  */
 class NativeConnectivityListener implements ConnectivityListener {
 
-    static {
-        System.loadLibrary("mapbox-gl");
-    }
+  static {
+    System.loadLibrary("mapbox-gl");
+  }
 
-    private long nativePtr;
-    private boolean invalidated;
+  private long nativePtr;
+  private boolean invalidated;
 
-    NativeConnectivityListener(long nativePtr) {
-        this.nativePtr = nativePtr;
-    }
+  NativeConnectivityListener(long nativePtr) {
+    this.nativePtr = nativePtr;
+  }
 
-    NativeConnectivityListener() {
-        initialize();
-    }
+  NativeConnectivityListener() {
+    initialize();
+  }
 
-    @Override
-    public void onNetworkStateChanged(boolean connected) {
-        nativeOnConnectivityStateChanged(connected);
-    }
+  @Override
+  public void onNetworkStateChanged(boolean connected) {
+    nativeOnConnectivityStateChanged(connected);
+  }
 
-    protected native void nativeOnConnectivityStateChanged(boolean connected);
+  protected native void nativeOnConnectivityStateChanged(boolean connected);
 
-    protected native void initialize();
+  protected native void initialize();
 
-    @Override
-    protected native void finalize() throws Throwable;
+  @Override
+  protected native void finalize() throws Throwable;
 }
