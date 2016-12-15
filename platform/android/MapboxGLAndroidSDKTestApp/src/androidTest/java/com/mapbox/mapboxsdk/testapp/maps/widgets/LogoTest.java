@@ -26,59 +26,59 @@ import static org.hamcrest.Matchers.not;
 
 public class LogoTest {
 
-    @Rule
-    public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
+  @Rule
+  public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
 
-    private OnMapReadyIdlingResource idlingResource;
+  private OnMapReadyIdlingResource idlingResource;
 
-    @Before
-    public void registerIdlingResource() {
-        idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-        Espresso.registerIdlingResources(idlingResource);
+  @Before
+  public void registerIdlingResource() {
+    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
+    Espresso.registerIdlingResources(idlingResource);
+  }
+
+  @Test
+  public void testDefault() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    onView(withId(R.id.logoView)).check(matches(isDisplayed()));
+  }
+
+  @Test
+  public void testDisabled() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+
+    onView(withId(R.id.logoView))
+      .perform(new DisableAction(mapboxMap))
+      .check(matches(not(isDisplayed())));
+  }
+
+  @After
+  public void unregisterIdlingResource() {
+    Espresso.unregisterIdlingResources(idlingResource);
+  }
+
+  private class DisableAction implements ViewAction {
+
+    private MapboxMap mapboxMap;
+
+    DisableAction(MapboxMap map) {
+      mapboxMap = map;
     }
 
-    @Test
-    public void testDefault() {
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-        onView(withId(R.id.logoView)).check(matches(isDisplayed()));
+    @Override
+    public Matcher<View> getConstraints() {
+      return isDisplayed();
     }
 
-    @Test
-    public void testDisabled() {
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-        MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
-
-        onView(withId(R.id.logoView))
-                .perform(new DisableAction(mapboxMap))
-                .check(matches(not(isDisplayed())));
+    @Override
+    public String getDescription() {
+      return getClass().getSimpleName();
     }
 
-    @After
-    public void unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(idlingResource);
+    @Override
+    public void perform(UiController uiController, View view) {
+      mapboxMap.getUiSettings().setLogoEnabled(false);
     }
-
-    private class DisableAction implements ViewAction {
-
-        private MapboxMap mapboxMap;
-
-        DisableAction(MapboxMap map) {
-            mapboxMap = map;
-        }
-
-        @Override
-        public Matcher<View> getConstraints() {
-            return isDisplayed();
-        }
-
-        @Override
-        public String getDescription() {
-            return getClass().getSimpleName();
-        }
-
-        @Override
-        public void perform(UiController uiController, View view) {
-            mapboxMap.getUiSettings().setLogoEnabled(false);
-        }
-    }
+  }
 }

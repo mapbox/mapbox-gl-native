@@ -29,33 +29,34 @@ import static org.hamcrest.Matchers.not;
  */
 public class QueryRenderedSymbolBoxCountTest {
 
-    @Rule
-    public final ActivityTestRule<QueryRenderedFeaturesBoxSymbolCountActivity> rule = new ActivityTestRule<>(QueryRenderedFeaturesBoxSymbolCountActivity.class);
+  @Rule
+  public final ActivityTestRule<QueryRenderedFeaturesBoxSymbolCountActivity> rule =
+    new ActivityTestRule<>(QueryRenderedFeaturesBoxSymbolCountActivity.class);
 
-    private OnMapReadyIdlingResource idlingResource;
+  private OnMapReadyIdlingResource idlingResource;
 
-    @Before
-    public void registerIdlingResource() {
-        idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-        Espresso.registerIdlingResources(idlingResource);
-    }
+  @Before
+  public void registerIdlingResource() {
+    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
+    Espresso.registerIdlingResources(idlingResource);
+  }
 
-    @Test
-    @Ignore
-    public void testCountSymbols() {
-        // click on box to query map
-        onView(withId(R.id.selection_box)).perform(click());
+  @Test
+  @Ignore
+  public void testCountSymbols() {
+    // click on box to query map
+    onView(withId(R.id.selection_box)).perform(click());
 
-        // validate if toast is shown
-        onView(withText("2 features in box"))
-                .inRoot(withDecorView(not(is(rule.getActivity().getWindow().getDecorView()))))
-                .check(matches(isDisplayed()));
-    }
+    // validate if toast is shown
+    onView(withText("2 features in box"))
+      .inRoot(withDecorView(not(is(rule.getActivity().getWindow().getDecorView()))))
+      .check(matches(isDisplayed()));
+  }
 
-    @After
-    public void unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(idlingResource);
-    }
+  @After
+  public void unregisterIdlingResource() {
+    Espresso.unregisterIdlingResources(idlingResource);
+  }
 
 }
 

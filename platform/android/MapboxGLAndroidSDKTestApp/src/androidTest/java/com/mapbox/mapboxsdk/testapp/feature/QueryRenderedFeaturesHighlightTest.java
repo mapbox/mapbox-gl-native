@@ -34,47 +34,48 @@ import static org.hamcrest.Matchers.not;
  */
 public class QueryRenderedFeaturesHighlightTest {
 
-    @Rule
-    public final ActivityTestRule<QueryRenderedFeaturesBoxHighlightActivity> rule = new ActivityTestRule<>(QueryRenderedFeaturesBoxHighlightActivity.class);
+  @Rule
+  public final ActivityTestRule<QueryRenderedFeaturesBoxHighlightActivity> rule =
+    new ActivityTestRule<>(QueryRenderedFeaturesBoxHighlightActivity.class);
 
-    private OnMapReadyIdlingResource idlingResource;
+  private OnMapReadyIdlingResource idlingResource;
 
-    @Before
-    public void registerIdlingResource() {
-        idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-        Espresso.registerIdlingResources(idlingResource);
-    }
+  @Before
+  public void registerIdlingResource() {
+    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
+    Espresso.registerIdlingResources(idlingResource);
+  }
 
-    @Test
-    @Ignore
-    public void testCountFeatures() {
-        // click on box to query map
-        onView(withId(R.id.selection_box)).perform(click());
+  @Test
+  @Ignore
+  public void testCountFeatures() {
+    // click on box to query map
+    onView(withId(R.id.selection_box)).perform(click());
 
-        // validate if toast is shown
-        onView(withText("50 features in box"))
-                .inRoot(withDecorView(not(is(rule.getActivity().getWindow().getDecorView()))))
-                .check(matches(isDisplayed()));
-    }
+    // validate if toast is shown
+    onView(withText("50 features in box"))
+      .inRoot(withDecorView(not(is(rule.getActivity().getWindow().getDecorView()))))
+      .check(matches(isDisplayed()));
+  }
 
-    @After
-    public void unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(idlingResource);
-    }
+  @After
+  public void unregisterIdlingResource() {
+    Espresso.unregisterIdlingResources(idlingResource);
+  }
 
-    private static ViewAction clickXY(final float x, final float y) {
-        return new GeneralClickAction(
-                Tap.SINGLE,
-                new CoordinatesProvider() {
-                    @Override
-                    public float[] calculateCoordinates(View view) {
-                        final int[] screenPos = new int[2];
-                        view.getLocationOnScreen(screenPos);
-                        final float screenX = screenPos[0] + x;
-                        final float screenY = screenPos[1] + y;
-                        return new float[]{screenX, screenY};
-                    }
-                },
-                Press.FINGER);
-    }
+  private static ViewAction clickXY(final float x, final float y) {
+    return new GeneralClickAction(
+      Tap.SINGLE,
+      new CoordinatesProvider() {
+        @Override
+        public float[] calculateCoordinates(View view) {
+          final int[] screenPos = new int[2];
+          view.getLocationOnScreen(screenPos);
+          final float screenX = screenPos[0] + x;
+          final float screenY = screenPos[1] + y;
+          return new float[] {screenX, screenY};
+        }
+      },
+      Press.FINGER);
+  }
 }

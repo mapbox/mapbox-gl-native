@@ -153,18 +153,18 @@ public class MoveGestureDetector extends BaseGestureDetector {
    * Determine (multi)finger focal point (a.k.a. center point between all
    * fingers)
    *
-   * @param e
+   * @param motionEvent a {@link MotionEvent} object.
    * @return PointF focal point
    */
-  private PointF determineFocalPoint(MotionEvent e) {
+  private PointF determineFocalPoint(MotionEvent motionEvent) {
     // Number of fingers on screen
-    final int pCount = e.getPointerCount();
+    final int pCount = motionEvent.getPointerCount();
     float x = 0.0f;
     float y = 0.0f;
 
     for (int i = 0; i < pCount; i++) {
-      x += e.getX(i);
-      y += e.getY(i);
+      x += motionEvent.getX(i);
+      y += motionEvent.getY(i);
     }
 
     return new PointF(x / pCount, y / pCount);

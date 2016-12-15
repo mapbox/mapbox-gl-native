@@ -33,135 +33,137 @@ import static org.junit.Assert.assertEquals;
  */
 public class CameraInternalAPITest {
 
-    @Rule
-    public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
+  @Rule
+  public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
 
-    private OnMapReadyIdlingResource idlingResource;
+  private OnMapReadyIdlingResource idlingResource;
 
-    @Before
-    public void registerIdlingResource() {
-        idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-        Espresso.registerIdlingResources(idlingResource);
+  @Before
+  public void registerIdlingResource() {
+    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
+    Espresso.registerIdlingResources(idlingResource);
+  }
+
+  @Test
+  public void testBearing() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    EspressoTestActivity activity = rule.getActivity();
+    MapboxMap mapboxMap = activity.getMapboxMap();
+
+    CameraPosition initialPosition = new
+      CameraPosition.Builder().target(new LatLng()).zoom(1).bearing(0).tilt(0).build();
+    CameraPosition cameraPosition = mapboxMap.getCameraPosition();
+    assertEquals("Default camera position should match default", cameraPosition, initialPosition);
+
+    onView(withId(R.id.mapView)).perform(new BearingAction(mapboxMap));
+    assertEquals("Bearing should match", 45.1f, MapViewUtils.getDirection(mapboxMap), TestConstants.BEARING_DELTA);
+  }
+
+  @Test
+  public void testTilt() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    EspressoTestActivity activity = rule.getActivity();
+    MapboxMap mapboxMap = activity.getMapboxMap();
+
+    CameraPosition initialPosition = new CameraPosition.Builder().target(
+      new LatLng()).zoom(1).bearing(0).tilt(0).build();
+    CameraPosition cameraPosition = mapboxMap.getCameraPosition();
+    assertEquals("Default camera position should match default", cameraPosition, initialPosition);
+
+    onView(withId(R.id.mapView)).perform(new TiltAction(mapboxMap));
+    assertEquals("Tilt should match", 40.0f, MapViewUtils.getTilt(mapboxMap), TestConstants.TILT_DELTA);
+  }
+
+  @Test
+  public void testLatLng() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    EspressoTestActivity activity = rule.getActivity();
+    MapboxMap mapboxMap = activity.getMapboxMap();
+
+    CameraPosition initialPosition = new CameraPosition.Builder().target(new LatLng()).zoom(1).bearing(0).tilt(0).build();
+    CameraPosition cameraPosition = mapboxMap.getCameraPosition();
+    assertEquals("Default camera position should match default", cameraPosition, initialPosition);
+
+    onView(withId(R.id.mapView)).perform(new LatLngAction(mapboxMap));
+    LatLng centerCoordinate = MapViewUtils.getLatLng(mapboxMap);
+    assertEquals("Latitude should match", 1.1f, centerCoordinate.getLatitude(), TestConstants.LAT_LNG_DELTA);
+    assertEquals("Longitude should match", 2.2f, centerCoordinate.getLongitude(), TestConstants.LAT_LNG_DELTA);
+  }
+
+  @After
+  public void unregisterIdlingResource() {
+    Espresso.unregisterIdlingResources(idlingResource);
+  }
+
+  private class BearingAction implements ViewAction {
+
+    private MapboxMap mapboxMap;
+
+    BearingAction(MapboxMap mapboxMap) {
+      this.mapboxMap = mapboxMap;
     }
 
-    @Test
-    public void testBearing() {
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-        EspressoTestActivity activity = rule.getActivity();
-        MapboxMap mapboxMap = activity.getMapboxMap();
-
-        CameraPosition initialPosition = new CameraPosition.Builder().target(new LatLng()).zoom(1).bearing(0).tilt(0).build();
-        CameraPosition cameraPosition = mapboxMap.getCameraPosition();
-        assertEquals("Default camera position should match default", cameraPosition, initialPosition);
-
-        onView(withId(R.id.mapView)).perform(new BearingAction(mapboxMap));
-        assertEquals("Bearing should match", 45.1f, MapViewUtils.getDirection(mapboxMap), TestConstants.BEARING_DELTA);
+    @Override
+    public Matcher<View> getConstraints() {
+      return isDisplayed();
     }
 
-    @Test
-    public void testTilt() {
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-        EspressoTestActivity activity = rule.getActivity();
-        MapboxMap mapboxMap = activity.getMapboxMap();
-
-        CameraPosition initialPosition = new CameraPosition.Builder().target(new LatLng()).zoom(1).bearing(0).tilt(0).build();
-        CameraPosition cameraPosition = mapboxMap.getCameraPosition();
-        assertEquals("Default camera position should match default", cameraPosition, initialPosition);
-
-        onView(withId(R.id.mapView)).perform(new TiltAction(mapboxMap));
-        assertEquals("Tilt should match", 40.0f, MapViewUtils.getTilt(mapboxMap), TestConstants.TILT_DELTA);
+    @Override
+    public String getDescription() {
+      return getClass().getSimpleName();
     }
 
-    @Test
-    public void testLatLng() {
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-        EspressoTestActivity activity = rule.getActivity();
-        MapboxMap mapboxMap = activity.getMapboxMap();
+    @Override
+    public void perform(UiController uiController, View view) {
+      MapViewUtils.setDirection(mapboxMap, -45.1f);
+    }
+  }
 
-        CameraPosition initialPosition = new CameraPosition.Builder().target(new LatLng()).zoom(1).bearing(0).tilt(0).build();
-        CameraPosition cameraPosition = mapboxMap.getCameraPosition();
-        assertEquals("Default camera position should match default", cameraPosition, initialPosition);
+  private class TiltAction implements ViewAction {
 
-        onView(withId(R.id.mapView)).perform(new LatLngAction(mapboxMap));
-        LatLng centerCoordinate = MapViewUtils.getLatLng(mapboxMap);
-        assertEquals("Latitude should match", 1.1f, centerCoordinate.getLatitude(), TestConstants.LAT_LNG_DELTA);
-        assertEquals("Longitude should match", 2.2f, centerCoordinate.getLongitude(), TestConstants.LAT_LNG_DELTA);
+    private MapboxMap mapboxMap;
+
+    TiltAction(MapboxMap mapboxMap) {
+      this.mapboxMap = mapboxMap;
     }
 
-    @After
-    public void unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(idlingResource);
+    @Override
+    public Matcher<View> getConstraints() {
+      return isDisplayed();
     }
 
-    private class BearingAction implements ViewAction {
-
-        private MapboxMap mapboxMap;
-
-        BearingAction(MapboxMap mapboxMap) {
-            this.mapboxMap = mapboxMap;
-        }
-
-        @Override
-        public Matcher<View> getConstraints() {
-            return isDisplayed();
-        }
-
-        @Override
-        public String getDescription() {
-            return getClass().getSimpleName();
-        }
-
-        @Override
-        public void perform(UiController uiController, View view) {
-            MapViewUtils.setDirection(mapboxMap, -45.1f);
-        }
+    @Override
+    public String getDescription() {
+      return getClass().getSimpleName();
     }
 
-    private class TiltAction implements ViewAction {
+    @Override
+    public void perform(UiController uiController, View view) {
+      MapViewUtils.setTilt(mapboxMap, 40.0f);
+    }
+  }
 
-        private MapboxMap mapboxMap;
+  private class LatLngAction implements ViewAction {
 
-        TiltAction(MapboxMap mapboxMap) {
-            this.mapboxMap = mapboxMap;
-        }
+    private MapboxMap mapboxMap;
 
-        @Override
-        public Matcher<View> getConstraints() {
-            return isDisplayed();
-        }
-
-        @Override
-        public String getDescription() {
-            return getClass().getSimpleName();
-        }
-
-        @Override
-        public void perform(UiController uiController, View view) {
-            MapViewUtils.setTilt(mapboxMap, 40.0f);
-        }
+    LatLngAction(MapboxMap mapboxMap) {
+      this.mapboxMap = mapboxMap;
     }
 
-    private class LatLngAction implements ViewAction {
-
-        private MapboxMap mapboxMap;
-
-        LatLngAction(MapboxMap mapboxMap) {
-            this.mapboxMap = mapboxMap;
-        }
-
-        @Override
-        public Matcher<View> getConstraints() {
-            return isDisplayed();
-        }
-
-        @Override
-        public String getDescription() {
-            return getClass().getSimpleName();
-        }
-
-        @Override
-        public void perform(UiController uiController, View view) {
-            MapViewUtils.setLatLng(mapboxMap, new LatLng(1.1, 2.2));
-        }
+    @Override
+    public Matcher<View> getConstraints() {
+      return isDisplayed();
     }
+
+    @Override
+    public String getDescription() {
+      return getClass().getSimpleName();
+    }
+
+    @Override
+    public void perform(UiController uiController, View view) {
+      MapViewUtils.setLatLng(mapboxMap, new LatLng(1.1, 2.2));
+    }
+  }
 }

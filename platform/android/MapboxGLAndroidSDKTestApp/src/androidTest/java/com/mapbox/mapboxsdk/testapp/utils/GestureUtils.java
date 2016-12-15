@@ -8,8 +8,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 public class GestureUtils {
 
-    public static void doubleClickGesture(@IdRes int id){
-        onView(withId(id)).perform(doubleClick());
-    }
+  public static void doubleClickGesture(@IdRes int id) {
+    onView(withId(id)).perform(doubleClick());
+  }
 
 }
