@@ -23,49 +23,49 @@ import static org.mockito.Mockito.when;
 
 public class TrackingSettingsTest {
 
-    @InjectMocks
-    MyLocationView myLocationView = mock(MyLocationView.class);
+  @InjectMocks
+  MyLocationView myLocationView = mock(MyLocationView.class);
 
-    @InjectMocks
-    UiSettings uiSettings = mock(UiSettings.class);
+  @InjectMocks
+  UiSettings uiSettings = mock(UiSettings.class);
 
-    @InjectMocks
-    FocalPointChangeListener focalPointChangeListener = mock(FocalPointChangeListener.class);
+  @InjectMocks
+  FocalPointChangeListener focalPointChangeListener = mock(FocalPointChangeListener.class);
 
-    private TrackingSettings trackingSettings;
+  private TrackingSettings trackingSettings;
 
-    @Before
-    public void beforeTest() {
-        trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPointChangeListener);
-    }
+  @Before
+  public void beforeTest() {
+    trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPointChangeListener);
+  }
 
-    @Test
-    public void testSanity() {
-        assertNotNull("trackingsettings should not be null", trackingSettings);
-    }
-    
-    @Test
-    public void testDismissTrackingModesOnGesture() {
-        trackingSettings.setDismissTrackingOnGesture(false);
-        assertFalse("DismissTrackingOnGesture should be false", trackingSettings.isDismissTrackingOnGesture());
-    }
+  @Test
+  public void testSanity() {
+    assertNotNull("trackingsettings should not be null", trackingSettings);
+  }
 
-    @Test
-    public void testValidateGesturesForTrackingModes() {
-        trackingSettings.setDismissTrackingOnGesture(false);
-        trackingSettings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
-        assertFalse("DismissTrackingOnGesture should be false", trackingSettings.isDismissTrackingOnGesture());
-    }
+  @Test
+  public void testDismissTrackingModesOnGesture() {
+    trackingSettings.setDismissTrackingOnGesture(false);
+    assertFalse("DismissTrackingOnGesture should be false", trackingSettings.isDismissTrackingOnGesture());
+  }
 
-    @Test
-    public void testMyLocationEnabled() {
-        // setup mock context to provide accepted location permission
-        Context context = mock(Context.class);
-        when(myLocationView.getContext()).thenReturn(context);
-        when(context.checkPermission(eq(Manifest.permission.ACCESS_COARSE_LOCATION), anyInt(), anyInt())).thenReturn(PackageManager.PERMISSION_GRANTED);
+  @Test
+  public void testValidateGesturesForTrackingModes() {
+    trackingSettings.setDismissTrackingOnGesture(false);
+    trackingSettings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
+    assertFalse("DismissTrackingOnGesture should be false", trackingSettings.isDismissTrackingOnGesture());
+  }
 
-        assertFalse("Location should be disabled by default.", trackingSettings.isMyLocationEnabled());
-        trackingSettings.setMyLocationEnabled(true);
-        assertTrue("Location should be enabled", trackingSettings.isMyLocationEnabled());
-    }
+  @Test
+  public void testMyLocationEnabled() {
+    // setup mock context to provide accepted location permission
+    Context context = mock(Context.class);
+    when(myLocationView.getContext()).thenReturn(context);
+    when(context.checkPermission(eq(Manifest.permission.ACCESS_COARSE_LOCATION), anyInt(), anyInt())).thenReturn(PackageManager.PERMISSION_GRANTED);
+
+    assertFalse("Location should be disabled by default.", trackingSettings.isMyLocationEnabled());
+    trackingSettings.setMyLocationEnabled(true);
+    assertTrue("Location should be enabled", trackingSettings.isMyLocationEnabled());
+  }
 }
