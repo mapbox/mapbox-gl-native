@@ -247,7 +247,7 @@ public class OfflineActivity extends AppCompatActivity
         // Definition
         LatLngBounds bounds = mapboxMap.getProjection().getVisibleRegion().latLngBounds;
         double minZoom = mapboxMap.getCameraPosition().zoom;
-        double maxZoom = mapboxMap.getMaxZoom();
+        double maxZoom = mapboxMap.getMaxZoomLevel();
         float pixelRatio = this.getResources().getDisplayMetrics().density;
         OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
                 STYLE_URL, bounds, minZoom, maxZoom, pixelRatio);

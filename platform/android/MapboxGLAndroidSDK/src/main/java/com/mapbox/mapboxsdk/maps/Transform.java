@@ -14,6 +14,8 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 
 import java.util.concurrent.TimeUnit;
 
+import timber.log.Timber;
+
 import static com.mapbox.mapboxsdk.maps.MapView.REGION_DID_CHANGE_ANIMATED;
 
 /**
@@ -261,5 +263,33 @@ final class Transform implements MapView.OnMapChangedListener {
 
     void moveBy(double offsetX, double offsetY, long duration) {
         mapView.moveBy(offsetX, offsetY, duration);
+    }
+
+    //
+    // Min & Max ZoomLevel
+    //
+
+    void setMinZoom(double minZoom) {
+        if ((minZoom < MapboxConstants.MINIMUM_ZOOM) || (minZoom > MapboxConstants.MAXIMUM_ZOOM)) {
+            Timber.e("Not setting minZoomPreference, value is in unsupported range: " + minZoom);
+            return;
+        }
+        mapView.setMinZoom(minZoom);
+    }
+
+    double getMinZoom() {
+        return mapView.getMinZoom();
+    }
+
+    void setMaxZoom(double maxZoom) {
+        if ((maxZoom < MapboxConstants.MINIMUM_ZOOM) || (maxZoom > MapboxConstants.MAXIMUM_ZOOM)) {
+            Timber.e("Not setting maxZoomPreference, value is in unsupported range: " + maxZoom);
+            return;
+        }
+        mapView.setMaxZoom(maxZoom);
+    }
+
+    double getMaxZoom() {
+        return mapView.getMaxZoom();
     }
 }
