@@ -22,139 +22,139 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 public class ScrollByActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    public static final int MULTIPLIER_PER_PIXEL = 50;
+  public static final int MULTIPLIER_PER_PIXEL = 50;
 
-    private MapView mapView;
-    private MapboxMap mapboxMap;
-    private SeekBar xBar;
-    private SeekBar yBar;
+  private MapView mapView;
+  private MapboxMap mapboxMap;
+  private SeekBar seekBarX;
+  private SeekBar seekBarY;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scroll_by);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_scroll_by);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-        }
+    ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setDisplayShowHomeEnabled(true);
+    }
 
-        xBar = (SeekBar) findViewById(R.id.seekbar_move_x);
-        TextView xText = (TextView) findViewById(R.id.textview_x);
-        xBar.setOnSeekBarChangeListener(new PixelBarChangeListener(xText, R.string.scrollby_x_value));
+    seekBarX = (SeekBar) findViewById(R.id.seekbar_move_x);
+    TextView textViewX = (TextView) findViewById(R.id.textview_x);
+    seekBarX.setOnSeekBarChangeListener(new PixelBarChangeListener(textViewX, R.string.scrollby_x_value));
 
-        yBar = (SeekBar) findViewById(R.id.seekbar_move_y);
-        TextView yText = (TextView) findViewById(R.id.textview_y);
-        yBar.setOnSeekBarChangeListener(new PixelBarChangeListener(yText, R.string.scrollby_y_value));
+    seekBarY = (SeekBar) findViewById(R.id.seekbar_move_y);
+    TextView textViewY = (TextView) findViewById(R.id.textview_y);
+    seekBarY.setOnSeekBarChangeListener(new PixelBarChangeListener(textViewY, R.string.scrollby_y_value));
 
-        mapView = (MapView) findViewById(R.id.mapView);
-        mapView.setTag(true);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(this);
+    mapView = (MapView) findViewById(R.id.mapView);
+    mapView.setTag(true);
+    mapView.onCreate(savedInstanceState);
+    mapView.getMapAsync(this);
+  }
+
+  @Override
+  public void onMapReady(MapboxMap map) {
+    mapboxMap = map;
+    UiSettings uiSettings = mapboxMap.getUiSettings();
+    uiSettings.setLogoEnabled(false);
+    uiSettings.setAttributionEnabled(false);
+
+    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+    fab.setColorFilter(ContextCompat.getColor(ScrollByActivity.this, R.color.primary));
+    fab.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        mapboxMap.easeCamera(CameraUpdateFactory.scrollBy(
+          seekBarX.getProgress() * MULTIPLIER_PER_PIXEL,
+          seekBarY.getProgress() * MULTIPLIER_PER_PIXEL)
+        );
+      }
+    });
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+    mapView.onStart();
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mapView.onResume();
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mapView.onPause();
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    mapView.onStop();
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    mapView.onDestroy();
+  }
+
+  @Override
+  public void onLowMemory() {
+    super.onLowMemory();
+    mapView.onLowMemory();
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        onBackPressed();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
+    }
+  }
+
+  private static class PixelBarChangeListener implements SeekBar.OnSeekBarChangeListener {
+
+    @StringRes
+    private int prefixTextResource;
+    private TextView valueView;
+
+    public PixelBarChangeListener(@NonNull TextView textView, @StringRes int textRes) {
+      valueView = textView;
+      prefixTextResource = textRes;
     }
 
     @Override
-    public void onMapReady(MapboxMap map) {
-        mapboxMap = map;
-        UiSettings uiSettings = mapboxMap.getUiSettings();
-        uiSettings.setLogoEnabled(false);
-        uiSettings.setAttributionEnabled(false);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setColorFilter(ContextCompat.getColor(ScrollByActivity.this, R.color.primary));
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mapboxMap.easeCamera(CameraUpdateFactory.scrollBy(
-                        xBar.getProgress() * MULTIPLIER_PER_PIXEL,
-                        yBar.getProgress() * MULTIPLIER_PER_PIXEL)
-                );
-            }
-        });
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+      int value = progress * ScrollByActivity.MULTIPLIER_PER_PIXEL;
+      valueView.setText(String.format(seekBar.getResources().getString(prefixTextResource), value));
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private static class PixelBarChangeListener implements SeekBar.OnSeekBarChangeListener {
-
-        @StringRes
-        private int prefixTextResource;
-        private TextView valueView;
-
-        public PixelBarChangeListener(@NonNull TextView textView, @StringRes int textRes) {
-            valueView = textView;
-            prefixTextResource = textRes;
-        }
-
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            int value = progress * ScrollByActivity.MULTIPLIER_PER_PIXEL;
-            valueView.setText(String.format(seekBar.getResources().getString(prefixTextResource), value));
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    }
+  }
 }
