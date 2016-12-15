@@ -8,9 +8,8 @@ import android.view.View;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapViewUtils;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
@@ -31,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Tests camera transformations that aren't part of our public API
  */
-public class CameraInternalAPITest {
+public class CameraInternalApiTest {
 
   @Rule
   public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
@@ -80,7 +79,8 @@ public class CameraInternalAPITest {
     EspressoTestActivity activity = rule.getActivity();
     MapboxMap mapboxMap = activity.getMapboxMap();
 
-    CameraPosition initialPosition = new CameraPosition.Builder().target(new LatLng()).zoom(1).bearing(0).tilt(0).build();
+    CameraPosition initialPosition = new CameraPosition.Builder().target(
+      new LatLng()).zoom(1).bearing(0).tilt(0).build();
     CameraPosition cameraPosition = mapboxMap.getCameraPosition();
     assertEquals("Default camera position should match default", cameraPosition, initialPosition);
 

@@ -10,7 +10,6 @@ import android.view.View;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -49,7 +48,7 @@ public class CameraEaseTest {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
 
-        /*TODO remove zoom #6474*/
+    /*TODO remove zoom #6474*/
     float zoom = 1.0f;
     LatLng moveTarget = new LatLng(1, 1);
 
@@ -166,7 +165,7 @@ public class CameraEaseTest {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
 
-        /*TODO fix zoom #6474*/
+    /*TODO fix zoom #6474*/
     float zoom = 1.0f;
 
     onView(withId(R.id.mapView)).perform(new EaseCameraAction(mapboxMap, CameraUpdateFactory.zoomIn()));
@@ -180,7 +179,7 @@ public class CameraEaseTest {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
 
-        /*TODO fix zoom #6474*/
+    /*TODO fix zoom #6474*/
     float zoom = 10.0f;
     onView(withId(R.id.mapView)).perform(new EaseCameraAction(mapboxMap,
       CameraUpdateFactory.newLatLngZoom(new LatLng(), zoom)));
@@ -194,7 +193,7 @@ public class CameraEaseTest {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
 
-        /*TODO fix zoom #6474*/
+    /*TODO fix zoom #6474*/
     float zoom = 1.0f;
     final float zoomBy = 2.45f;
 
@@ -209,7 +208,7 @@ public class CameraEaseTest {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
 
-        /*TODO fix zoom #6474*/
+    /*TODO fix zoom #6474*/
     final float zoomTo = 2.45f;
 
     onView(withId(R.id.mapView)).perform(new EaseCameraAction(mapboxMap, CameraUpdateFactory.zoomTo(zoomTo)));

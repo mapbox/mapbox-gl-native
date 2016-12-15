@@ -15,7 +15,8 @@ public class VisibleRegionTest {
   private static final LatLng NEAR_LEFT = new LatLng(34, -12);
   private static final LatLng FAR_RIGHT = new LatLng(52, 26);
   private static final LatLng NEAR_RIGHT = new LatLng(34, 26);
-  private static final LatLngBounds BOUNDS = new LatLngBounds.Builder().include(FAR_LEFT).include(FAR_RIGHT).include(NEAR_LEFT).include(NEAR_RIGHT).build();
+  private static final LatLngBounds BOUNDS =
+    new LatLngBounds.Builder().include(FAR_LEFT).include(FAR_RIGHT).include(NEAR_LEFT).include(NEAR_RIGHT).build();
 
   @Test
   public void testSanity() {
@@ -77,12 +78,12 @@ public class VisibleRegionTest {
   public void testToString() {
     VisibleRegion region = new VisibleRegion(FAR_LEFT, FAR_RIGHT, NEAR_LEFT, NEAR_RIGHT, BOUNDS);
     assertEquals("string should match",
-      "[farLeft [LatLng [latitude=52.0, longitude=-12.0, altitude=0.0]], " +
-        "farRight [LatLng [latitude=52.0, longitude=26.0, altitude=0.0]], " +
-        "nearLeft [LatLng [latitude=34.0, longitude=-12.0, altitude=0.0]], " +
-        "nearRight [LatLng [latitude=34.0, longitude=26.0, altitude=0.0]], " +
-        "latLngBounds [N:52.0; E:26.0; S:34.0; W:-12.0]]"
-      , region.toString());
+      "[farLeft [LatLng [latitude=52.0, longitude=-12.0, altitude=0.0]], "
+        + "farRight [LatLng [latitude=52.0, longitude=26.0, altitude=0.0]], "
+        + "nearLeft [LatLng [latitude=34.0, longitude=-12.0, altitude=0.0]], "
+        + "nearRight [LatLng [latitude=34.0, longitude=26.0, altitude=0.0]], "
+        + "latLngBounds [N:52.0; E:26.0; S:34.0; W:-12.0]]",
+      region.toString());
   }
 
   @Test

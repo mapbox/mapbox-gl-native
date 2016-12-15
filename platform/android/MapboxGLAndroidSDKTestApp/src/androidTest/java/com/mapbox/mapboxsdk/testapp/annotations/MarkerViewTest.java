@@ -108,7 +108,8 @@ public class MarkerViewTest {
 
     @Override
     public void perform(UiController uiController, View view) {
-      mapboxMap.getMarkerViewManager().addMarkerViewAdapter(new MarkerViewActivity.TextAdapter(view.getContext(), mapboxMap));
+      mapboxMap.getMarkerViewManager().addMarkerViewAdapter(
+        new MarkerViewActivity.TextAdapter(view.getContext(), mapboxMap));
       marker = mapboxMap.addMarker(options);
       uiController.loopMainThreadForAtLeast(250);
     }

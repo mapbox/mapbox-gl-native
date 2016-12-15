@@ -55,7 +55,8 @@ public class MyLocationViewSettingsTest {
     when(constantState.newDrawable()).thenReturn(foregroundDrawable);
     locationViewSettings.setForegroundDrawable(foregroundDrawable, foregroundBearingDrawable);
     assertEquals("foreground should match", foregroundDrawable, locationViewSettings.getForegroundDrawable());
-    assertEquals("foreground bearing should match", foregroundBearingDrawable, locationViewSettings.getForegroundBearingDrawable());
+    assertEquals("foreground bearing should match", foregroundBearingDrawable,
+      locationViewSettings.getForegroundBearingDrawable());
   }
 
   @Test

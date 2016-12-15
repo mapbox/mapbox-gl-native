@@ -74,9 +74,8 @@ public class OfflineRegionStatus {
    * Getters
    */
 
-  public
   @OfflineRegion.DownloadState
-  int getDownloadState() {
+  public int getDownloadState() {
     return downloadState;
   }
 

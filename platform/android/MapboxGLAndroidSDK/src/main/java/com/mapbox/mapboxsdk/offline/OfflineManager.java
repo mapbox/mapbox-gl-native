@@ -117,10 +117,10 @@ public class OfflineManager {
       setStorageExternal = appInfo.metaData.getBoolean(
         MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
         MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL);
-    } catch (PackageManager.NameNotFoundException e) {
-      Timber.e("Failed to read the package metadata: " + e.getMessage());
-    } catch (Exception e) {
-      Timber.e("Failed to read the storage key: " + e.getMessage());
+    } catch (PackageManager.NameNotFoundException nameNotFoundException) {
+      Timber.e("Failed to read the package metadata: " + nameNotFoundException.getMessage());
+    } catch (Exception exception) {
+      Timber.e("Failed to read the storage key: " + exception.getMessage());
     }
 
     String databasePath = null;
@@ -128,8 +128,8 @@ public class OfflineManager {
       try {
         // Try getting the external storage path
         databasePath = context.getExternalFilesDir(null).getAbsolutePath();
-      } catch (NullPointerException e) {
-        Timber.e("Failed to obtain the external storage path: " + e.getMessage());
+      } catch (NullPointerException nullPointerException) {
+        Timber.e("Failed to obtain the external storage path: " + nullPointerException.getMessage());
       }
     }
 

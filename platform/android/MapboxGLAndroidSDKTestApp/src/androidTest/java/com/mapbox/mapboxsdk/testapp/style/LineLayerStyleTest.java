@@ -1,12 +1,10 @@
-// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
 package com.mapbox.mapboxsdk.testapp.style;
+// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make style-code-android`.
 
 import android.graphics.Color;
 import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-
-import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
@@ -20,9 +18,30 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.*;
-import static com.mapbox.mapboxsdk.style.layers.Property.*;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
+import timber.log.Timber;
+
+import static com.mapbox.mapboxsdk.style.layers.Property.LINE_CAP_BUTT;
+import static com.mapbox.mapboxsdk.style.layers.Property.LINE_JOIN_BEVEL;
+import static com.mapbox.mapboxsdk.style.layers.Property.LINE_TRANSLATE_ANCHOR_MAP;
+import static com.mapbox.mapboxsdk.style.layers.Property.NONE;
+import static com.mapbox.mapboxsdk.style.layers.Property.VISIBLE;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineBlur;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineCap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineDasharray;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineGapWidth;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineJoin;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineMiterLimit;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineOffset;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineOpacity;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.linePattern;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineRoundLimit;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineTranslate;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineTranslateAnchor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Basic smoke tests for LineLayer

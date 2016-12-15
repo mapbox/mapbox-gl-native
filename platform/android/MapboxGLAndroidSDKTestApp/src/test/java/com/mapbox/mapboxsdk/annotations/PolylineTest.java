@@ -1,7 +1,5 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import com.mapbox.mapboxsdk.annotations.Polyline;
-import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.junit.Test;

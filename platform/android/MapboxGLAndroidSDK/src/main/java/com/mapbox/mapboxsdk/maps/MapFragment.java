@@ -135,7 +135,7 @@ public final class MapFragment extends Fragment {
         throw new IllegalArgumentException();
       }
       return token;
-    } catch (Exception e) {
+    } catch (Exception exception) {
       // use fallback on string resource, used for development
       int tokenResId = context.getResources().getIdentifier("mapbox_access_token", "string", context.getPackageName());
       return tokenResId != 0 ? context.getString(tokenResId) : null;

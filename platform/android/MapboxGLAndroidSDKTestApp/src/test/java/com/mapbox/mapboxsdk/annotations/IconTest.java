@@ -13,7 +13,7 @@ import static junit.framework.Assert.assertNotSame;
 public class IconTest {
 
   @Mock
-  Bitmap mBitmap;
+  Bitmap bitmap;
 
   @Before
   public void beforeTest() {
@@ -29,14 +29,14 @@ public class IconTest {
 
   @Test
   public void testBitmap() {
-    Icon icon = IconFactory.recreate("test", mBitmap);
-    assertEquals("bitmap should match", mBitmap, icon.getBitmap());
+    Icon icon = IconFactory.recreate("test", bitmap);
+    assertEquals("bitmap should match", bitmap, icon.getBitmap());
   }
 
   @Test
   public void testEquals() {
-    Icon icon1 = IconFactory.recreate("test", mBitmap);
-    Icon icon2 = IconFactory.recreate("test", mBitmap);
+    Icon icon1 = IconFactory.recreate("test", bitmap);
+    Icon icon2 = IconFactory.recreate("test", bitmap);
     assertEquals("icons should not match", icon1, icon2);
   }
 
@@ -48,8 +48,8 @@ public class IconTest {
 
   @Test
   public void testHashcode() {
-    Icon icon = IconFactory.recreate("test", mBitmap);
-    long expectedHashcode = 31 * mBitmap.hashCode() + "test".hashCode();
+    Icon icon = IconFactory.recreate("test", bitmap);
+    long expectedHashcode = 31 * bitmap.hashCode() + "test".hashCode();
     assertEquals("hashcode should match", expectedHashcode, icon.hashCode());
   }
 }

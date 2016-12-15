@@ -171,7 +171,8 @@ public class MarkerView extends Marker {
    * @param v v-coordinate of the info window anchor, as a ratio of the image height (in the range [0, 1]).
    * @see #setAnchor(float, float) for more details.
    */
-  public void setInfoWindowAnchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
+  public void setInfoWindowAnchor(
+    @FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
     this.infoWindowAnchorU = u;
     this.infoWindowAnchorV = v;
   }

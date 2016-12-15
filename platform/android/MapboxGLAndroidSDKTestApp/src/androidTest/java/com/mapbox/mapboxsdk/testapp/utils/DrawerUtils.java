@@ -15,7 +15,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withContentDesc
 
 public class DrawerUtils {
 
-  private final static String HOME_BUTTON_STRING = "Navigate up";
+  private static final String HOME_BUTTON_STRING = "Navigate up";
 
   public static void openDrawer() {
     onView(withContentDescription(HOME_BUTTON_STRING)).perform(click());

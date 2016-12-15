@@ -83,7 +83,8 @@ public class MarkerViewTest {
 
   @Test
   public void testFlatDefault() {
-    assertFalse("default value of flat should be false", new MarkerViewOptions().position(new LatLng()).getMarker().isFlat());
+    assertFalse("default value of flat should be false", new MarkerViewOptions().position(
+      new LatLng()).getMarker().isFlat());
   }
 
   @Test
@@ -221,7 +222,8 @@ public class MarkerViewTest {
 
   @Test
   public void testBuilder() {
-    MarkerView marker = new MarkerViewOptions().title("title").snippet("snippet").position(new LatLng(10, 12)).getMarker();
+    MarkerView marker = new MarkerViewOptions().title("title").snippet("snippet").position(
+      new LatLng(10, 12)).getMarker();
     assertEquals(marker.getSnippet(), "snippet");
     assertEquals(marker.getPosition(), new LatLng(10, 12));
   }
@@ -271,7 +273,8 @@ public class MarkerViewTest {
   @Test
   public void testToString() {
     MarkerView marker = new MarkerViewOptions().position(new LatLng(0, 0)).getMarker();
-    assertEquals(marker.toString(), "MarkerView [position[" + "LatLng [latitude=0.0, longitude=0.0, altitude=0.0]" + "]]");
+    assertEquals(marker.toString(), "MarkerView [position["
+      + "LatLng [latitude=0.0, longitude=0.0, altitude=0.0]" + "]]");
   }
 
   @Test

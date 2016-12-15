@@ -4,7 +4,6 @@ import android.graphics.PointF;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
 
 import java.io.Serializable;

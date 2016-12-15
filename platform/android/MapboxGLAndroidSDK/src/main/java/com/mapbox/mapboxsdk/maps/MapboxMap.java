@@ -148,7 +148,7 @@ public final class MapboxMap {
    * Removes the layer. Any references to the layer become invalid and should not be used anymore
    *
    * @param layerId the layer to remove
-   * @throws NoSuchLayerException
+   * @throws NoSuchLayerException Thrown when the layer doesn't exist.
    */
   @UiThread
   public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
@@ -159,7 +159,7 @@ public final class MapboxMap {
    * Removes the layer. The reference is re-usable after this and can be re-added
    *
    * @param layer the layer to remove
-   * @throws NoSuchLayerException
+   * @throws NoSuchLayerException Thrown when the layer doesn't exist.
    */
   @UiThread
   public void removeLayer(@NonNull Layer layer) throws NoSuchLayerException {
@@ -185,8 +185,8 @@ public final class MapboxMap {
     try {
       //noinspection unchecked
       return (T) nativeMapView.getSource(sourceId);
-    } catch (ClassCastException e) {
-      Timber.e(String.format("Source: %s is a different type: %s", sourceId, e.getMessage()));
+    } catch (ClassCastException classCastException) {
+      Timber.e(String.format("Source: %s is a different type: %s", sourceId, classCastException.getMessage()));
       return null;
     }
   }
@@ -205,7 +205,7 @@ public final class MapboxMap {
    * Removes the source. Any references to the source become invalid and should not be used anymore
    *
    * @param sourceId the source to remove
-   * @throws NoSuchSourceException
+   * @throws NoSuchSourceException Thrown when the source doesn't exist.
    */
   @UiThread
   public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
@@ -216,7 +216,7 @@ public final class MapboxMap {
    * Removes the source, preserving the reverence for re-use
    *
    * @param source the source to remove
-   * @throws NoSuchSourceException
+   * @throws NoSuchSourceException Thrown when the source doesn't exist.
    */
   @UiThread
   public void removeSource(@NonNull Source source) throws NoSuchSourceException {
@@ -1472,14 +1472,13 @@ public final class MapboxMap {
   }
 
   /**
-   * <p>
    * Enables or disables the my-location layer.
    * While enabled, the my-location layer continuously draws an indication of a user's current
    * location and bearing.
-   * </p>
+   * <p>
    * In order to use the my-location layer feature you need to request permission for either
-   * {@link android.Manifest.permission#ACCESS_COARSE_LOCATION} or
-   * {@link android.Manifest.permission#ACCESS_FINE_LOCATION}.
+   * {@code ACCESS_COARSE_LOCATION} or {@code ACCESS_FINE_LOCATION}.
+   * </p>
    *
    * @param enabled True to enable; false to disable.
    */

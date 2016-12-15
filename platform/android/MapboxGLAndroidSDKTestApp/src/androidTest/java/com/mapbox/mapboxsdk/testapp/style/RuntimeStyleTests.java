@@ -70,7 +70,7 @@ public class RuntimeStyleTests {
     mapboxMap.addSource(new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2"));
     try {
       mapboxMap.removeSource("my-source");
-    } catch (NoSuchSourceException e) {
+    } catch (NoSuchSourceException noSuchSourceException) {
       // it's ok..
     }
 
@@ -99,8 +99,8 @@ public class RuntimeStyleTests {
       //Remove
       try {
         mapboxMap.removeLayer("building");
-      } catch (NoSuchLayerException e) {
-        fail("Definitively exists: " + e.getMessage());
+      } catch (NoSuchLayerException noSuchSourceException) {
+        fail("Definitively exists: " + noSuchSourceException.getMessage());
       }
       assertNull(mapboxMap.getLayer("building"));
 
@@ -116,8 +116,8 @@ public class RuntimeStyleTests {
       //Remove, preserving the reference
       try {
         mapboxMap.removeLayer(layer);
-      } catch (NoSuchLayerException e) {
-        fail("Definitively exists: " + e.getMessage());
+      } catch (NoSuchLayerException noSuchSourceException) {
+        fail("Definitively exists: " + noSuchSourceException.getMessage());
       }
 
       //Property setters should still work
@@ -133,7 +133,7 @@ public class RuntimeStyleTests {
       try {
         mapboxMap.addLayer(new FillLayer("building", "composite"));
         fail("Should not have been allowed to add a layer with a duplicate id");
-      } catch (CannotAddLayerException e) {
+      } catch (CannotAddLayerException cannotAddLayerException) {
         //OK
       }
     }
@@ -161,8 +161,8 @@ public class RuntimeStyleTests {
       //Remove
       try {
         mapboxMap.removeSource("my-source");
-      } catch (NoSuchSourceException e) {
-        fail("Definitively exists: " + e.getMessage());
+      } catch (NoSuchSourceException noSuchSourceException) {
+        fail("Definitively exists: " + noSuchSourceException.getMessage());
       }
       assertNull(mapboxMap.getLayer("my-source"));
 
@@ -173,8 +173,8 @@ public class RuntimeStyleTests {
       //Remove, preserving the reference
       try {
         mapboxMap.removeSource(source);
-      } catch (NoSuchSourceException e) {
-        fail("Definitively exists: " + e.getMessage());
+      } catch (NoSuchSourceException noSuchSourceException) {
+        fail("Definitively exists: " + noSuchSourceException.getMessage());
       }
 
       //Re-add the reference...
@@ -188,7 +188,7 @@ public class RuntimeStyleTests {
         Source source2 = new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
         mapboxMap.addSource(source2);
         fail("Should not have been allowed to add a source with a duplicate id");
-      } catch (CannotAddSourceException e) {
+      } catch (CannotAddSourceException cannotAddSourceException) {
         //OK
       }
     }

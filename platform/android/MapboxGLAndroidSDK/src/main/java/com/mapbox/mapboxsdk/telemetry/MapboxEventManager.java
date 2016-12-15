@@ -163,8 +163,8 @@ public class MapboxEventManager {
     // Setup Message Digest
     try {
       messageDigest = MessageDigest.getInstance("SHA-1");
-    } catch (NoSuchAlgorithmException e) {
-      Timber.w("Error getting Encryption Algorithm: " + e);
+    } catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+      Timber.w("Error getting Encryption Algorithm: " + noSuchAlgorithmException);
     }
 
     // Create Initial Session Id
@@ -221,8 +221,8 @@ public class MapboxEventManager {
           userAgent));
       }
 
-    } catch (Exception e) {
-      Timber.e("Error Trying to load Staging Credentials: " + e.toString());
+    } catch (Exception exception) {
+      Timber.e("Error Trying to load Staging Credentials: " + exception.toString());
     }
 
     // Register for battery updates
@@ -257,8 +257,8 @@ public class MapboxEventManager {
           }
         }
       }
-    } catch (Exception e) {
-      Timber.w("Error checking for Telemetry Service Config: " + e);
+    } catch (Exception exception) {
+      Timber.w("Error checking for Telemetry Service Config: " + exception);
     }
     throw new TelemetryServiceNotConfiguredException();
   }

@@ -264,9 +264,9 @@ public final class CameraUpdateFactory {
       }
 
       // Calculate the center point
-      PointF paddedNEPixel = new PointF(nePixel.x + padding.right / minScale, nePixel.y + padding.top / minScale);
-      PointF paddedSWPixel = new PointF(swPixel.x - padding.left / minScale, swPixel.y - padding.bottom / minScale);
-      PointF centerPixel = new PointF((paddedNEPixel.x + paddedSWPixel.x) / 2, (paddedNEPixel.y + paddedSWPixel.y) / 2);
+      PointF paddedNePixel = new PointF(nePixel.x + padding.right / minScale, nePixel.y + padding.top / minScale);
+      PointF paddedSwPixel = new PointF(swPixel.x - padding.left / minScale, swPixel.y - padding.bottom / minScale);
+      PointF centerPixel = new PointF((paddedNePixel.x + paddedSwPixel.x) / 2, (paddedNePixel.y + paddedSwPixel.y) / 2);
       centerPixel.y = viewportHeight - centerPixel.y;
       LatLng center = projection.fromScreenLocation(centerPixel);
 

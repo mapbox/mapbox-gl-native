@@ -2,8 +2,20 @@ package com.mapbox.mapboxsdk.style.layers;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-import static com.mapbox.mapboxsdk.style.layers.Filter.*;
+import static com.mapbox.mapboxsdk.style.layers.Filter.all;
+import static com.mapbox.mapboxsdk.style.layers.Filter.any;
+import static com.mapbox.mapboxsdk.style.layers.Filter.eq;
+import static com.mapbox.mapboxsdk.style.layers.Filter.gt;
+import static com.mapbox.mapboxsdk.style.layers.Filter.gte;
+import static com.mapbox.mapboxsdk.style.layers.Filter.has;
+import static com.mapbox.mapboxsdk.style.layers.Filter.in;
+import static com.mapbox.mapboxsdk.style.layers.Filter.lt;
+import static com.mapbox.mapboxsdk.style.layers.Filter.lte;
+import static com.mapbox.mapboxsdk.style.layers.Filter.neq;
+import static com.mapbox.mapboxsdk.style.layers.Filter.none;
+import static com.mapbox.mapboxsdk.style.layers.Filter.notHas;
+import static com.mapbox.mapboxsdk.style.layers.Filter.notIn;
+import static org.junit.Assert.assertArrayEquals;
 
 /**
  * Tests for Filter

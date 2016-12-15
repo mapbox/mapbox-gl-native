@@ -29,7 +29,6 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class CameraMoveTest {
 
@@ -49,7 +48,7 @@ public class CameraMoveTest {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
 
-        /*TODO remove zoom #6474*/
+    /*TODO remove zoom #6474*/
     float zoom = 1.0f;
     LatLng moveTarget = new LatLng(1, 1);
 
@@ -166,7 +165,7 @@ public class CameraMoveTest {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
 
-        /*TODO fix zoom #6474*/
+    /*TODO fix zoom #6474*/
     float zoom = 1.0f;
 
     onView(withId(R.id.mapView)).perform(new MoveCameraAction(mapboxMap, CameraUpdateFactory.zoomIn()));
@@ -180,7 +179,7 @@ public class CameraMoveTest {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
 
-        /*TODO fix zoom #6474*/
+    /*TODO fix zoom #6474*/
     float zoom = 10.0f;
     onView(withId(R.id.mapView)).perform(new MoveCameraAction(mapboxMap,
       CameraUpdateFactory.newLatLngZoom(new LatLng(), zoom)));
@@ -195,7 +194,7 @@ public class CameraMoveTest {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
 
-        /*TODO fix zoom #6474*/
+    /*TODO fix zoom #6474*/
     float zoom = 1.0f;
     final float zoomBy = 2.45f;
 
@@ -210,7 +209,7 @@ public class CameraMoveTest {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
 
-        /*TODO fix zoom #6474*/
+    /*TODO fix zoom #6474*/
     final float zoomTo = 2.45f;
 
     onView(withId(R.id.mapView)).perform(new MoveCameraAction(mapboxMap, CameraUpdateFactory.zoomTo(zoomTo)));

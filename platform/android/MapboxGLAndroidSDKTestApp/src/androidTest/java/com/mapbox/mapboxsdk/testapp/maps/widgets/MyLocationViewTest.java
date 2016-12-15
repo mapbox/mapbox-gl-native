@@ -76,7 +76,8 @@ public class MyLocationViewTest {
 
   @Test
   @Ignore
-  // requires runtime permissions, disabled for CI + issue with android.support.test.espresso.AppNotIdleException: Looped for 5049 iterations over 60 SECONDS.
+  // requires runtime permissions, disabled for CI + issue with android.support.test.espresso.AppNotIdleException:
+  // Looped for 5049 iterations over 60 SECONDS.
   public void testTracking() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -198,8 +199,8 @@ public class MyLocationViewTest {
 
     @Override
     protected boolean matchesSafely(View target) {
-      Drawable currentDrawable = isBearingDrawable ?
-        mapboxMap.getMyLocationViewSettings().getForegroundBearingDrawable() :
+      Drawable currentDrawable = isBearingDrawable
+        ? mapboxMap.getMyLocationViewSettings().getForegroundBearingDrawable() :
         mapboxMap.getMyLocationViewSettings().getForegroundDrawable();
 
       Resources resources = target.getContext().getResources();

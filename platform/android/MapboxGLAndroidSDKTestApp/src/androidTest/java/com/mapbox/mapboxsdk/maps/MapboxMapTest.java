@@ -113,8 +113,10 @@ public class MapboxMapTest {
     onView(withId(R.id.mapView)).perform(new MapboxMapAction(new InvokeViewAction() {
       @Override
       public void onViewAction(UiController uiController, View view) {
-        assertEquals("MaxZoom should match", MapboxConstants.MAXIMUM_ZOOM, mapboxMap.getMaxZoomLevel(), TestConstants.ZOOM_DELTA);
-        assertEquals("MinZoom should match", MapboxConstants.MINIMUM_ZOOM, mapboxMap.getMinZoomLevel(), TestConstants.ZOOM_DELTA);
+        assertEquals("MaxZoom should match", MapboxConstants.MAXIMUM_ZOOM, mapboxMap.getMaxZoomLevel(),
+          TestConstants.ZOOM_DELTA);
+        assertEquals("MinZoom should match", MapboxConstants.MINIMUM_ZOOM, mapboxMap.getMinZoomLevel(),
+          TestConstants.ZOOM_DELTA);
       }
     }));
   }
@@ -287,7 +289,8 @@ public class MapboxMapTest {
           }
         };
         mapboxMap.setOnInfoWindowLongClickListener(listener);
-        assertEquals("InfoWindowLongClickListener should match", listener, mapboxMap.getOnInfoWindowLongClickListener());
+        assertEquals("InfoWindowLongClickListener should match", listener,
+          mapboxMap.getOnInfoWindowLongClickListener());
       }
     }));
   }

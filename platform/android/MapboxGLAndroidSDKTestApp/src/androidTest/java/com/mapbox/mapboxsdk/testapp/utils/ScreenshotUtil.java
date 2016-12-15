@@ -26,7 +26,8 @@ import java.util.UUID;
 public class ScreenshotUtil {
 
   // Where to store the files. This path is required by AWS Device Farm:
-  // http://docs.aws.amazon.com/devicefarm/latest/developerguide/test-types-android-instrumentation.html#test-types-android-instrumentation-screenshots
+  // http://docs.aws.amazon.com/devicefarm/latest/developerguide/test-types-android-instrumentation.html
+  // #test-types-android-instrumentation-screenshots
   private static final String SCREENSHOT_FOLDER = "test-screenshots";
 
   // Image type and quality
@@ -43,17 +44,18 @@ public class ScreenshotUtil {
     }
 
     // Get a bitmap from the activity root view. When the drawing cache is enabled,
-//        // the next call to getDrawingCache() will draw the view in a bitmap.
+    // the next call to getDrawingCache() will draw the view in a bitmap.
     View rootView = activity.getWindow().getDecorView().getRootView();
-//        rootView.setDrawingCacheEnabled(true);r
-//        rootView.setDrawingCacheEnabled(false);
+    // rootView.setDrawingCacheEnabled(true);r
+    // rootView.setDrawingCacheEnabled(false);
 
     Bitmap bitmap = null;
 
     // Add the SurfaceView bit (see getAllTextureViews() below)
     List<TextureView> tilingViews = getAllTextureViews(rootView);
     if (tilingViews.size() > 0) {
-      bitmap = Bitmap.createBitmap(tilingViews.get(0).getHeight(), tilingViews.get(0).getWidth(), Bitmap.Config.ARGB_8888);
+      bitmap = Bitmap.createBitmap(tilingViews.get(0).getHeight(), tilingViews.get(0).getWidth(),
+        Bitmap.Config.ARGB_8888);
       Canvas canvas = new Canvas(bitmap);
       for (TextureView TextureView : tilingViews) {
         Bitmap b = TextureView.getBitmap(TextureView.getWidth(), TextureView.getHeight());
@@ -73,24 +75,24 @@ public class ScreenshotUtil {
       outputStream = new FileOutputStream(outputFile);
       bitmap.compress(DEFAULT_IMAGE_FORMAT, DEFAULT_IMAGE_QUALITY, outputStream);
       outputStream.flush();
-    } catch (Exception e) {
+    } catch (Exception exception) {
 
-      e.printStackTrace();
+      exception.printStackTrace();
     } finally {
       if (outputStream != null) {
         try {
           outputStream.close();
-        } catch (IOException e) {
-          e.printStackTrace();
+        } catch (IOException ioException) {
+          ioException.printStackTrace();
         }
       }
     }
   }
 
-    /*
-     * The classic way of taking a screenshot (above) doesn't work with TextureView, this fixes it:
-     * http://stackoverflow.com/questions/19704060/screen-capture-textureview-is-black-using-drawingcache
-     */
+  /*
+   * The classic way of taking a screenshot (above) doesn't work with TextureView, this fixes it:
+   * http://stackoverflow.com/questions/19704060/screen-capture-textureview-is-black-using-drawingcache
+   */
 
   public static List<TextureView> getAllTextureViews(View view) {
     List<TextureView> tilingViews = new ArrayList<TextureView>();
@@ -106,9 +108,9 @@ public class ScreenshotUtil {
     return tilingViews;
   }
 
-    /*
-     * Utils
-     */
+  /*
+   * Utils
+   */
 
   public static boolean isExternalStorageWritable() {
     // Checks if external storage is available for read and write

@@ -466,7 +466,8 @@ final class NativeMapView {
   }
 
   public LatLng latLngForProjectedMeters(ProjectedMeters projectedMeters) {
-    return nativeLatLngForProjectedMeters(nativeMapViewPtr, projectedMeters.getNorthing(), projectedMeters.getEasting());
+    return nativeLatLngForProjectedMeters(nativeMapViewPtr, projectedMeters.getNorthing(),
+      projectedMeters.getEasting());
   }
 
   public PointF pixelForLatLng(LatLng latLng) {
@@ -617,7 +618,8 @@ final class NativeMapView {
   // JNI methods
   //
 
-  private native long nativeCreate(String cachePath, String dataPath, String apkPath, float pixelRatio, int availableProcessors, long totalMemory);
+  private native long nativeCreate(String cachePath, String dataPath, String apkPath, float pixelRatio,
+                                   int availableProcessors, long totalMemory);
 
   private native void nativeDestroy(long nativeMapViewPtr);
 

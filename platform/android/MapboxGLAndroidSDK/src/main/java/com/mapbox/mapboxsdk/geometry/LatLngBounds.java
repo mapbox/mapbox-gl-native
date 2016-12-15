@@ -115,10 +115,10 @@ public class LatLngBounds implements Parcelable {
    * @return LatLngBounds
    */
   static LatLngBounds fromLatLngs(final List<? extends ILatLng> latLngs) {
-    double minLat = 90,
-      minLon = 180,
-      maxLat = -90,
-      maxLon = -180;
+    double minLat = 90;
+    double minLon = 180;
+    double maxLat = -90;
+    double maxLon = -180;
 
     for (final ILatLng gp : latLngs) {
       final double latitude = gp.getLatitude();

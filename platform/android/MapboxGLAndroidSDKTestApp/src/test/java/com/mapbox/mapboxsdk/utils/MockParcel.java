@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyByte;
@@ -51,7 +50,7 @@ public class MockParcel {
       Object fieldValue = field.get(object);
       Method myMethod = creatorClass.getDeclaredMethod("createFromParcel", Parcel.class);
       return (Parcelable) myMethod.invoke(fieldValue, parcel);
-    } catch (Exception e) {
+    } catch (Exception exception) {
       return null;
     }
   }
@@ -67,8 +66,8 @@ public class MockParcel {
 
   public static void testDescribeContents(@NonNull Parcelable object, int describeContentsValue) {
     if (describeContentsValue == 0) {
-      assertEquals("\nExpecting a describeContents() value of 0 for a " + object.getClass().getSimpleName() + " instance." +
-          "\nYou can provide a different value for describeContentValue through the obtain method.",
+      assertEquals("\nExpecting a describeContents() value of 0 for a " + object.getClass().getSimpleName()
+        + " instance." + "\nYou can provide a different value for describeContentValue through the obtain method.",
         0,
         object.describeContents());
     } else {

@@ -121,8 +121,8 @@ class HTTPRequest implements Callback {
     byte[] body;
     try {
       body = response.body().bytes();
-    } catch (IOException e) {
-      onFailure(e);
+    } catch (IOException ioException) {
+      onFailure(ioException);
       //throw e;
       return;
     } finally {

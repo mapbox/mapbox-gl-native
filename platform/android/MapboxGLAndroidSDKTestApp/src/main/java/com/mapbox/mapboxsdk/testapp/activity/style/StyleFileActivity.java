@@ -9,9 +9,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
-import timber.log.Timber;
-
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -32,8 +29,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
+import timber.log.Timber;
 
 /**
  * Example on how to use a file:// resource for the style.json

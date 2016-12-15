@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
-import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 
@@ -12,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -62,7 +60,8 @@ public class TrackingSettingsTest {
     // setup mock context to provide accepted location permission
     Context context = mock(Context.class);
     when(myLocationView.getContext()).thenReturn(context);
-    when(context.checkPermission(eq(Manifest.permission.ACCESS_COARSE_LOCATION), anyInt(), anyInt())).thenReturn(PackageManager.PERMISSION_GRANTED);
+    when(context.checkPermission(eq(Manifest.permission.ACCESS_COARSE_LOCATION), anyInt(),
+      anyInt())).thenReturn(PackageManager.PERMISSION_GRANTED);
 
     assertFalse("Location should be disabled by default.", trackingSettings.isMyLocationEnabled());
     trackingSettings.setMyLocationEnabled(true);

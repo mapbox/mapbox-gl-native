@@ -36,12 +36,12 @@ public abstract class BaseActivityTest {
       Espresso.registerIdlingResources(idlingResource);
       checkViewIsDisplayed(R.id.mapView);
       mapboxMap = idlingResource.getMapboxMap();
-    } catch (IdlingResourceTimeoutException e) {
+    } catch (IdlingResourceTimeoutException idlingResourceTimeoutException) {
       Timber.e("Idling resource timed out. Couldn't not validate if map is ready.");
-      throw new RuntimeException("Could not start test for " + getActivityClass().getSimpleName() + ".\n" +
-        "The ViewHierarchy doesn't contain a view with resource id = R.id.mapView or \n" +
-        "the Activity doesn't contain an instance variable with a name equal to mapboxMap.\n" +
-        "You can resolve this issue be implementing the requirements above or\n add "
+      throw new RuntimeException("Could not start test for " + getActivityClass().getSimpleName() + ".\n"
+        + "The ViewHierarchy doesn't contain a view with resource id = R.id.mapView or \n"
+        + "the Activity doesn't contain an instance variable with a name equal to mapboxMap.\n"
+        + "You can resolve this issue be implementing the requirements above or\n add "
         + getActivityClass().getSimpleName() + " to the excludeActivities array in `generate-test-code.js`.\n");
     }
   }

@@ -50,8 +50,10 @@ public class MapboxMapOptionsTest {
 
   @Test
   public void testCompassMargins() {
-    assertTrue(Arrays.equals(new int[] {0, 1, 2, 3}, new MapboxMapOptions().compassMargins(new int[] {0, 1, 2, 3}).getCompassMargins()));
-    assertFalse(Arrays.equals(new int[] {0, 1, 2, 3}, new MapboxMapOptions().compassMargins(new int[] {0, 0, 0, 0}).getCompassMargins()));
+    assertTrue(Arrays.equals(new int[] {0, 1, 2, 3}, new MapboxMapOptions().compassMargins(
+      new int[] {0, 1, 2, 3}).getCompassMargins()));
+    assertFalse(Arrays.equals(new int[] {0, 1, 2, 3}, new MapboxMapOptions().compassMargins(
+      new int[] {0, 0, 0, 0}).getCompassMargins()));
   }
 
   @Test
@@ -69,8 +71,10 @@ public class MapboxMapOptionsTest {
 
   @Test
   public void testLogoMargins() {
-    assertTrue(Arrays.equals(new int[] {0, 1, 2, 3}, new MapboxMapOptions().logoMargins(new int[] {0, 1, 2, 3}).getLogoMargins()));
-    assertFalse(Arrays.equals(new int[] {0, 1, 2, 3}, new MapboxMapOptions().logoMargins(new int[] {0, 0, 0, 0}).getLogoMargins()));
+    assertTrue(Arrays.equals(new int[] {0, 1, 2, 3}, new MapboxMapOptions().logoMargins(
+      new int[] {0, 1, 2, 3}).getLogoMargins()));
+    assertFalse(Arrays.equals(new int[] {0, 1, 2, 3}, new MapboxMapOptions().logoMargins(
+      new int[] {0, 0, 0, 0}).getLogoMargins()));
   }
 
   @Test
@@ -94,8 +98,10 @@ public class MapboxMapOptionsTest {
 
   @Test
   public void testAttributionMargins() {
-    assertTrue(Arrays.equals(new int[] {0, 1, 2, 3}, new MapboxMapOptions().attributionMargins(new int[] {0, 1, 2, 3}).getAttributionMargins()));
-    assertFalse(Arrays.equals(new int[] {0, 1, 2, 3}, new MapboxMapOptions().attributionMargins(new int[] {0, 0, 0, 0}).getAttributionMargins()));
+    assertTrue(Arrays.equals(new int[] {0, 1, 2, 3}, new MapboxMapOptions().attributionMargins(
+      new int[] {0, 1, 2, 3}).getAttributionMargins()));
+    assertFalse(Arrays.equals(new int[] {0, 1, 2, 3}, new MapboxMapOptions().attributionMargins(
+      new int[] {0, 0, 0, 0}).getAttributionMargins()));
   }
 
   @Test
@@ -171,12 +177,14 @@ public class MapboxMapOptionsTest {
 
   @Test
   public void testMyLocationForegroundTint() {
-    assertEquals(Color.BLUE, new MapboxMapOptions().myLocationForegroundTintColor(Color.BLUE).getMyLocationForegroundTintColor());
+    assertEquals(Color.BLUE,
+      new MapboxMapOptions().myLocationForegroundTintColor(Color.BLUE).getMyLocationForegroundTintColor());
   }
 
   @Test
   public void testMyLocationBackgroundTint() {
-    assertEquals(Color.BLUE, new MapboxMapOptions().myLocationBackgroundTintColor(Color.BLUE).getMyLocationBackgroundTintColor());
+    assertEquals(Color.BLUE,
+      new MapboxMapOptions().myLocationBackgroundTintColor(Color.BLUE).getMyLocationBackgroundTintColor());
   }
 
   @Test

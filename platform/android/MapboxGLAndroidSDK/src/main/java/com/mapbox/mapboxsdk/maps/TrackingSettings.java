@@ -244,9 +244,6 @@ public final class TrackingSettings {
   /**
    * Reset the tracking modes as necessary. Location tracking is reset if the map center is changed,
    * bearing tracking if there is a rotation.
-   *
-   * @param translate
-   * @param rotate
    */
   void resetTrackingModesIfRequired(boolean translate, boolean rotate) {
     // if tracking is on, and we should dismiss tracking with gestures, and this is a scroll action, turn tracking off

@@ -1,12 +1,11 @@
 package com.mapbox.mapboxsdk.style.layers;
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make android-style-code`.
 
-import android.support.annotation.UiThread;
-
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 
-import static com.mapbox.mapboxsdk.utils.ColorUtils.*;
+import static com.mapbox.mapboxsdk.utils.ColorUtils.rgbaToColor;
 
 /**
  * A filled polygon with an optional stroked border.
