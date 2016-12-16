@@ -115,21 +115,21 @@ public final class CameraPosition implements Parcelable {
    * Compares this {@link CameraPosition} object with another {@link CameraPosition} and
    * determines if their target, zoom, tilt, and bearing match.
    *
-   * @param object Another {@link CameraPosition} to compare with this object.
+   * @param o Another {@link CameraPosition} to compare with this object.
    * @return True if target, zoom, tilt, and bearing match this {@link CameraPosition} object.
    * Else, false.
    */
   @Override
-  public boolean equals(Object object) {
-    if (this == object) {
+  public boolean equals(Object o) {
+    if (this == o) {
       return true;
     }
 
-    if (object == null || getClass() != object.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
 
-    CameraPosition cameraPosition = (CameraPosition) object;
+    CameraPosition cameraPosition = (CameraPosition) o;
     if (target != null && !target.equals(cameraPosition.target)) {
       return false;
     } else if (zoom != cameraPosition.zoom) {

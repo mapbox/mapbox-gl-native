@@ -26,10 +26,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * </ul>
  * <p>
  * Note: If registering a listener in your Activity.onStart() implementation, you should unregister it in
- * Activity.onStop().
- * (You won't receive location updates when paused, and this will cut down on unnecessary system overhead).
- * Do not unregister in Activity.onSaveInstanceState(), because this won't be called if the user moves back in the
- * history stack.
+ * Activity.onStop(). (You won't receive location updates when paused, and this will cut down on unnecessary system
+ * overhead). Do not unregister in Activity.onSaveInstanceState(), because this won't be called if the user moves back
+ * in the history stack.
  * </p>
  */
 public class LocationServices implements com.mapzen.android.lost.api.LocationListener {

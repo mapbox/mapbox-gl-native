@@ -14,8 +14,8 @@ import java.util.List;
  */
 public final class PolygonOptions implements Parcelable {
 
-  public static final Parcelable.Creator<PolygonOptions> CREATOR
-    = new Parcelable.Creator<PolygonOptions>() {
+  public static final Parcelable.Creator<PolygonOptions> CREATOR =
+    new Parcelable.Creator<PolygonOptions>() {
       public PolygonOptions createFromParcel(Parcel in) {
         return new PolygonOptions(in);
       }
@@ -186,20 +186,20 @@ public final class PolygonOptions implements Parcelable {
    * Compares this {@link PolygonOptions} object with another {@link PolygonOptions} and
    * determines if their color, alpha, stroke color, and vertices match.
    *
-   * @param object Another {@link PolygonOptions} to compare with this object.
+   * @param o Another {@link PolygonOptions} to compare with this object.
    * @return True if color, alpha, stroke color, and vertices match this {@link PolygonOptions}
    * object. Else, false.
    */
   @Override
-  public boolean equals(Object object) {
-    if (this == object) {
+  public boolean equals(Object o) {
+    if (this == o) {
       return true;
     }
-    if (object == null || getClass() != object.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
 
-    PolygonOptions polygon = (PolygonOptions) object;
+    PolygonOptions polygon = (PolygonOptions) o;
 
     if (Float.compare(polygon.getAlpha(), getAlpha()) != 0) {
       return false;

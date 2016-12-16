@@ -73,15 +73,15 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
   }
 
   @Override
-  public boolean equals(Object object) {
-    if (this == object) {
+  public boolean equals(Object o) {
+    if (this == o) {
       return true;
     }
-    if (object == null || getClass() != object.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
 
-    ProjectedMeters projectedMeters = (ProjectedMeters) object;
+    ProjectedMeters projectedMeters = (ProjectedMeters) o;
 
     return Double.compare(projectedMeters.easting, easting) == 0
       && Double.compare(projectedMeters.northing, northing) == 0;

@@ -68,19 +68,19 @@ public class VisibleRegion implements Parcelable {
    * or if all four corners and the bounds of the two objects are the same,
    * this method returns true. Otherwise, this method returns false.
    *
-   * @param object The Object to compare with.
+   * @param o The Object to compare with.
    * @return true if both objects are the same object.
    */
   @Override
-  public boolean equals(Object object) {
-    if (!(object instanceof VisibleRegion)) {
+  public boolean equals(Object o) {
+    if (!(o instanceof VisibleRegion)) {
       return false;
     }
-    if (object == this) {
+    if (o == this) {
       return true;
     }
 
-    VisibleRegion visibleRegion = (VisibleRegion) object;
+    VisibleRegion visibleRegion = (VisibleRegion) o;
     return farLeft.equals(visibleRegion.farLeft)
       && farRight.equals(visibleRegion.farRight)
       && nearLeft.equals(visibleRegion.nearLeft)

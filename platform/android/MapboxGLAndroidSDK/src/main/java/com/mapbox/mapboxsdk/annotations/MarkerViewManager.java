@@ -303,8 +303,8 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
    * @param adapter       the adapter used to adapt the marker to the convertView.
    * @param callbackToMap indicates if select marker must be called on MapboxMap.
    */
-  public void select(@NonNull MarkerView marker, View convertView,
-                     MapboxMap.MarkerViewAdapter adapter, boolean callbackToMap) {
+  public void select(@NonNull MarkerView marker, View convertView, MapboxMap.MarkerViewAdapter adapter,
+                     boolean callbackToMap) {
     if (convertView != null) {
       if (adapter.onSelect(marker, convertView, false)) {
         if (callbackToMap) {

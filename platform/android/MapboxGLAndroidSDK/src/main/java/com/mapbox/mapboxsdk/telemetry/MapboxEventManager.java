@@ -26,7 +26,6 @@ import android.view.WindowManager;
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.constants.GeoConstants;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.utils.MathUtils;
@@ -54,6 +53,14 @@ import okhttp3.Response;
 import okhttp3.internal.Util;
 import timber.log.Timber;
 
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.KEY_META_DATA_STAGING_ACCESS_TOKEN;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.KEY_META_DATA_STAGING_SERVER;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.MAPBOX_LOCALE;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.MAPBOX_SHARED_PREFERENCES_FILE;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_ENABLED;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_ACCESS_TOKEN;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_URL;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID;
 import static com.mapbox.mapboxsdk.telemetry.MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE;
 import static com.mapbox.mapboxsdk.telemetry.MapboxEvent.ATTRIBUTE_APPLICATION_STATE;
 import static com.mapbox.mapboxsdk.telemetry.MapboxEvent.ATTRIBUTE_BATTERY_LEVEL;
@@ -99,8 +106,7 @@ public class MapboxEventManager {
 
   private final Vector<Hashtable<String, Object>> events = new Vector<>();
   private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-  private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ",
-    MapboxConstants.MAPBOX_LOCALE);
+  private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", MAPBOX_LOCALE);
 
   private Context context = null;
   private String accessToken = null;
@@ -170,22 +176,22 @@ public class MapboxEventManager {
     // Create Initial Session Id
     rotateSessionId();
 
-    SharedPreferences prefs = context.getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES_FILE,
+    SharedPreferences prefs = context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES_FILE,
       Context.MODE_PRIVATE);
 
     // Determine if Telemetry Should Be Enabled
     Timber.i("Right before Telemetry set enabled in initialized()");
-    setTelemetryEnabled(prefs.getBoolean(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_ENABLED, true));
+    setTelemetryEnabled(prefs.getBoolean(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_ENABLED, true));
 
     // Load / Create Vendor Id
-    if (prefs.contains(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID)) {
-      mapboxVendorId = prefs.getString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, "");
+    if (prefs.contains(MAPBOX_SHARED_PREFERENCE_KEY_VENDORID)) {
+      mapboxVendorId = prefs.getString(MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, "");
     }
     if (TextUtils.isEmpty(mapboxVendorId)) {
       String vendorId = UUID.randomUUID().toString();
       mapboxVendorId = encodeString(vendorId);
       SharedPreferences.Editor editor = prefs.edit();
-      editor.putString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, mapboxVendorId);
+      editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, mapboxVendorId);
       editor.apply();
       editor.commit();
     }
@@ -198,18 +204,17 @@ public class MapboxEventManager {
     try {
       ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(),
         PackageManager.GET_META_DATA);
-      String stagingUrl = appInfo.metaData.getString(MapboxConstants.KEY_META_DATA_STAGING_SERVER);
-      String stagingAccessToken = appInfo.metaData.getString(MapboxConstants.KEY_META_DATA_STAGING_ACCESS_TOKEN);
+      String stagingURL = appInfo.metaData.getString(KEY_META_DATA_STAGING_SERVER);
+      String stagingAccessToken = appInfo.metaData.getString(KEY_META_DATA_STAGING_ACCESS_TOKEN);
 
-      if (TextUtils.isEmpty(stagingUrl) || TextUtils.isEmpty(stagingAccessToken)) {
+      if (TextUtils.isEmpty(stagingURL) || TextUtils.isEmpty(stagingAccessToken)) {
         Timber.d("Looking in SharedPreferences for Staging Credentials");
-        stagingUrl = prefs.getString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_URL, null);
-        stagingAccessToken = prefs.getString(
-          MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_ACCESS_TOKEN, null);
+        stagingURL = prefs.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_URL, null);
+        stagingAccessToken = prefs.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_ACCESS_TOKEN, null);
       }
 
-      if (!TextUtils.isEmpty(stagingUrl) && !TextUtils.isEmpty(stagingAccessToken)) {
-        eventsURL = stagingUrl;
+      if (!TextUtils.isEmpty(stagingURL) && !TextUtils.isEmpty(stagingAccessToken)) {
+        eventsURL = stagingURL;
         this.accessToken = accessToken;
         stagingEnv = true;
       }
@@ -217,8 +222,7 @@ public class MapboxEventManager {
       // Build User Agent
       String appIdentifier = getApplicationIdentifier();
       if (TextUtils.equals(userAgent, BuildConfig.MAPBOX_EVENTS_USER_AGENT_BASE) && !TextUtils.isEmpty(appIdentifier)) {
-        userAgent = Util.toHumanReadableAscii(String.format(MapboxConstants.MAPBOX_LOCALE, "%s %s", appIdentifier,
-          userAgent));
+        userAgent = Util.toHumanReadableAscii(String.format(MAPBOX_LOCALE, "%s %s", appIdentifier, userAgent));
       }
 
     } catch (Exception exception) {
@@ -226,8 +230,8 @@ public class MapboxEventManager {
     }
 
     // Register for battery updates
-    IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-    batteryStatus = context.registerReceiver(null, intentFilter);
+    IntentFilter iFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+    batteryStatus = context.registerReceiver(null, iFilter);
 
     initialized = true;
   }
@@ -336,10 +340,9 @@ public class MapboxEventManager {
 
     // Persist
     this.telemetryEnabled = telemetryEnabled;
-    SharedPreferences prefs = context.getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES_FILE,
-      Context.MODE_PRIVATE);
+    SharedPreferences prefs = context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
-    editor.putBoolean(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_ENABLED, telemetryEnabled);
+    editor.putBoolean(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_ENABLED, telemetryEnabled);
     editor.apply();
     editor.commit();
   }
@@ -834,7 +837,7 @@ public class MapboxEventManager {
   private String getApplicationIdentifier() {
     try {
       PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-      return String.format(MapboxConstants.MAPBOX_LOCALE, "%s/%s/%s", context.getPackageName(), packageInfo.versionName,
+      return String.format(MAPBOX_LOCALE, "%s/%s/%s", context.getPackageName(), packageInfo.versionName,
         packageInfo.versionCode);
     } catch (Exception exception) {
       return "";

@@ -61,7 +61,7 @@ public class InfoWindow {
 
     view.setOnClickListener(new View.OnClickListener() {
       @Override
-      public void onClick(View view) {
+      public void onClick(View v) {
         MapboxMap mapboxMap = InfoWindow.this.mapboxMap.get();
         if (mapboxMap != null) {
           MapboxMap.OnInfoWindowClickListener onInfoWindowClickListener = mapboxMap.getOnInfoWindowClickListener();
@@ -80,7 +80,7 @@ public class InfoWindow {
 
     view.setOnLongClickListener(new View.OnLongClickListener() {
       @Override
-      public boolean onLongClick(View view) {
+      public boolean onLongClick(View v) {
         MapboxMap mapboxMap = InfoWindow.this.mapboxMap.get();
         if (mapboxMap != null) {
           MapboxMap.OnInfoWindowLongClickListener listener = mapboxMap.getOnInfoWindowLongClickListener();
@@ -108,8 +108,8 @@ public class InfoWindow {
   InfoWindow open(MapView mapView, Marker boundMarker, LatLng position, int offsetX, int offsetY) {
     setBoundMarker(boundMarker);
 
-    MapView.LayoutParams lp = new MapView.LayoutParams(
-      MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT);
+    MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT,
+      MapView.LayoutParams.WRAP_CONTENT);
 
     MapboxMap mapboxMap = this.mapboxMap.get();
     View view = this.view.get();

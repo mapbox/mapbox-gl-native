@@ -5,10 +5,10 @@ import android.os.Looper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
+import timber.log.Timber;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-import timber.log.Timber;
 
 /**
  * An offline region is the basic building block for offline mobile maps.
@@ -29,18 +29,18 @@ public class OfflineRegion {
   private OfflineManager offlineManager;
 
   // Members
-  private long id = 0;
-  private OfflineRegionDefinition definition = null;
+  private long mId = 0;
+  private OfflineRegionDefinition mDefinition = null;
 
   /**
    * Arbitrary binary region metadata. The contents are opaque to the SDK implementation;
    * it just stores and retrieves a byte[]. Check the `OfflineActivity` in the TestApp
    * for a sample implementation that uses JSON to store an offline region name.
    */
-  private byte[] metadata = null;
+  private byte[] mMetadata = null;
 
   // Holds the pointer to JNI OfflineRegion
-  private long offlineRegionPtr = 0;
+  private long mOfflineRegionPtr = 0;
 
   // Makes sure callbacks come back to the main thread
   private Handler handler;
@@ -217,15 +217,15 @@ public class OfflineRegion {
    */
 
   public long getID() {
-    return id;
+    return mId;
   }
 
   public OfflineRegionDefinition getDefinition() {
-    return definition;
+    return mDefinition;
   }
 
   public byte[] getMetadata() {
-    return metadata;
+    return mMetadata;
   }
 
   private Handler getHandler() {
@@ -383,7 +383,7 @@ public class OfflineRegion {
         getHandler().post(new Runnable() {
           @Override
           public void run() {
-            OfflineRegion.this.metadata = metadata;
+            mMetadata = metadata;
             callback.onUpdate(metadata);
           }
         });

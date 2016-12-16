@@ -15,7 +15,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
  */
 public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefinition {
 
-  private String styleUrl;
+  private String styleURL;
   private LatLngBounds bounds;
   private double minZoom;
   private double maxZoom;
@@ -30,8 +30,8 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
   }
 
   public OfflineTilePyramidRegionDefinition(
-    String styleUrl, LatLngBounds bounds, double minZoom, double maxZoom, float pixelRatio) {
-    this.styleUrl = styleUrl;
+    String styleURL, LatLngBounds bounds, double minZoom, double maxZoom, float pixelRatio) {
+    this.styleURL = styleURL;
     this.bounds = bounds;
     this.minZoom = minZoom;
     this.maxZoom = maxZoom;
@@ -42,8 +42,8 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
    * Getters
    */
 
-  public String getStyleUrl() {
-    return styleUrl;
+  public String getStyleURL() {
+    return styleURL;
   }
 
   public LatLngBounds getBounds() {

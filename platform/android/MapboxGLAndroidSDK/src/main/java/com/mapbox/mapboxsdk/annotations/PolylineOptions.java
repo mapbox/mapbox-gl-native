@@ -14,8 +14,8 @@ import java.util.List;
 public final class PolylineOptions implements Parcelable {
 
 
-  public static final Parcelable.Creator<PolylineOptions> CREATOR
-    = new Parcelable.Creator<PolylineOptions>() {
+  public static final Parcelable.Creator<PolylineOptions> CREATOR =
+    new Parcelable.Creator<PolylineOptions>() {
       public PolylineOptions createFromParcel(Parcel in) {
         return new PolylineOptions(in);
       }
@@ -191,20 +191,20 @@ public final class PolylineOptions implements Parcelable {
    * Compares this {@link PolylineOptions} object with another {@link PolylineOptions} and
    * determines if their color, alpha, width, and vertices match.
    *
-   * @param object Another {@link PolylineOptions} to compare with this object.
+   * @param o Another {@link PolylineOptions} to compare with this object.
    * @return True if color, alpha, width, and vertices match this {@link PolylineOptions} object.
    * Else, false.
    */
   @Override
-  public boolean equals(Object object) {
-    if (this == object) {
+  public boolean equals(Object o) {
+    if (this == o) {
       return true;
     }
-    if (object == null || getClass() != object.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
 
-    PolylineOptions polyline = (PolylineOptions) object;
+    PolylineOptions polyline = (PolylineOptions) o;
 
     if (Float.compare(polyline.getAlpha(), getAlpha()) != 0) {
       return false;

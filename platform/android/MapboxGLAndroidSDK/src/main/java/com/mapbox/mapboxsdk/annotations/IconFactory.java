@@ -33,13 +33,13 @@ public final class IconFactory {
   public static final Bitmap ICON_MARKERVIEW_BITMAP = Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8);
   public static final String ICON_MARKERVIEW_ID = ICON_ID_PREFIX + "marker_view";
 
-  private Context context;
+  private Context mContext;
   private static IconFactory sInstance;
-  private Icon defaultMarker;
-  private Icon defaultMarkerView;
-  private BitmapFactory.Options options;
+  private Icon mDefaultMarker;
+  private Icon mDefaultMarkerView;
+  private BitmapFactory.Options mOptions;
 
-  private int nextId = 0;
+  private int mNextId = 0;
 
   public static synchronized IconFactory getInstance(@NonNull Context context) {
     if (sInstance == null) {
@@ -49,7 +49,7 @@ public final class IconFactory {
   }
 
   private IconFactory(@NonNull Context context) {
-    this.context = context;
+    mContext = context;
     DisplayMetrics realMetrics = null;
     DisplayMetrics metrics = new DisplayMetrics();
     WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -60,12 +60,12 @@ public final class IconFactory {
     }
     wm.getDefaultDisplay().getMetrics(metrics);
 
-    options = new BitmapFactory.Options();
-    options.inScaled = true;
-    options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
-    options.inTargetDensity = metrics.densityDpi;
+    mOptions = new BitmapFactory.Options();
+    mOptions.inScaled = true;
+    mOptions.inDensity = DisplayMetrics.DENSITY_DEFAULT;
+    mOptions.inTargetDensity = metrics.densityDpi;
     if (realMetrics != null) {
-      options.inScreenDensity = realMetrics.densityDpi;
+      mOptions.inScreenDensity = realMetrics.densityDpi;
     }
   }
 
@@ -76,10 +76,10 @@ public final class IconFactory {
    * @return The {@link Icon} using the given Bitmap image.
    */
   public Icon fromBitmap(@NonNull Bitmap bitmap) {
-    if (nextId < 0) {
+    if (mNextId < 0) {
       throw new TooManyIconsException();
     }
-    String id = ICON_ID_PREFIX + ++nextId;
+    String id = ICON_ID_PREFIX + ++mNextId;
     return new Icon(id, bitmap);
   }
 
@@ -125,7 +125,7 @@ public final class IconFactory {
    * @return The {@link Icon} that was loaded from the asset or {@code null} if failed to load.
    */
   public Icon fromResource(@DrawableRes int resourceId) {
-    Drawable drawable = ContextCompat.getDrawable(context, resourceId);
+    Drawable drawable = ContextCompat.getDrawable(mContext, resourceId);
     Bitmap bitmap;
     if (drawable instanceof BitmapDrawable) {
       BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
@@ -134,11 +134,8 @@ public final class IconFactory {
       if (drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
         bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
       } else {
-        bitmap = Bitmap.createBitmap(
-          drawable.getIntrinsicWidth(),
-          drawable.getIntrinsicHeight(),
-          Bitmap.Config.ARGB_8888
-        );
+        bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
+          Bitmap.Config.ARGB_8888);
       }
 
       Canvas canvas = new Canvas(bitmap);
@@ -154,10 +151,10 @@ public final class IconFactory {
    * @return An {@link Icon} with the default {@link Marker} icon.
    */
   public Icon defaultMarker() {
-    if (defaultMarker == null) {
-      defaultMarker = fromResource(R.drawable.mapbox_marker_icon_default);
+    if (mDefaultMarker == null) {
+      mDefaultMarker = fromResource(R.drawable.mapbox_marker_icon_default);
     }
-    return defaultMarker;
+    return mDefaultMarker;
   }
 
   /**
@@ -166,14 +163,14 @@ public final class IconFactory {
    * @return An {@link Icon} with the default {@link MarkerView} icon.
    */
   public Icon defaultMarkerView() {
-    if (defaultMarkerView == null) {
-      defaultMarkerView = fromResource(R.drawable.mapbox_markerview_icon_default);
+    if (mDefaultMarkerView == null) {
+      mDefaultMarkerView = fromResource(R.drawable.mapbox_markerview_icon_default);
     }
-    return defaultMarkerView;
+    return mDefaultMarkerView;
   }
 
   private Icon fromInputStream(@NonNull InputStream is) {
-    Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
+    Bitmap bitmap = BitmapFactory.decodeStream(is, null, mOptions);
     return fromBitmap(bitmap);
   }
 
@@ -186,7 +183,7 @@ public final class IconFactory {
   public Icon fromAsset(@NonNull String assetName) {
     InputStream is;
     try {
-      is = context.getAssets().open(assetName);
+      is = mContext.getAssets().open(assetName);
     } catch (IOException ioException) {
       return null;
     }
@@ -201,7 +198,7 @@ public final class IconFactory {
    * load.
    */
   public Icon fromPath(@NonNull String absolutePath) {
-    Bitmap bitmap = BitmapFactory.decodeFile(absolutePath, options);
+    Bitmap bitmap = BitmapFactory.decodeFile(absolutePath, mOptions);
     return fromBitmap(bitmap);
   }
 
@@ -211,12 +208,13 @@ public final class IconFactory {
    *
    * @param fileName The name of the Bitmap image file.
    * @return The {@link Icon} that was loaded from the asset or {@code null} if failed to load.
-   * @see <a href="https://developer.android.com/guide/topics/data/data-storage.html#filesInternal">Using the Internal Storage</a>
+   * @see <a href="https://developer.android.com/guide/topics/data/data-storage.html#filesInternal">
+   *   Using the Internal Storage</a>
    */
   public Icon fromFile(@NonNull String fileName) {
     FileInputStream is;
     try {
-      is = context.openFileInput(fileName);
+      is = mContext.openFileInput(fileName);
     } catch (FileNotFoundException fileNotFoundException) {
       return null;
     }

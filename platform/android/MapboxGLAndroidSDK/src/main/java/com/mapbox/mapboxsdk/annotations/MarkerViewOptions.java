@@ -118,8 +118,8 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
     return marker;
   }
 
-  public static final Parcelable.Creator<MarkerViewOptions> CREATOR
-    = new Parcelable.Creator<MarkerViewOptions>() {
+  public static final Parcelable.Creator<MarkerViewOptions> CREATOR =
+    new Parcelable.Creator<MarkerViewOptions>() {
       public MarkerViewOptions createFromParcel(Parcel in) {
         return new MarkerViewOptions(in);
       }

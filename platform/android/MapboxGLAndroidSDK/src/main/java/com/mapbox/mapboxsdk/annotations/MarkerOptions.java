@@ -126,8 +126,8 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
     return icon;
   }
 
-  public static final Parcelable.Creator<MarkerOptions> CREATOR
-    = new Parcelable.Creator<MarkerOptions>() {
+  public static final Parcelable.Creator<MarkerOptions> CREATOR =
+    new Parcelable.Creator<MarkerOptions>() {
       public MarkerOptions createFromParcel(Parcel in) {
         return new MarkerOptions(in);
       }
@@ -141,20 +141,20 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
    * Compares this {@link MarkerOptions} object with another {@link MarkerOptions} and
    * determines if their properties match.
    *
-   * @param object Another {@link MarkerOptions} to compare with this object.
+   * @param o Another {@link MarkerOptions} to compare with this object.
    * @return True if marker properties match this {@link MarkerOptions} object.
    * Else, false.
    */
   @Override
-  public boolean equals(Object object) {
-    if (this == object) {
+  public boolean equals(Object o) {
+    if (this == o) {
       return true;
     }
-    if (object == null || getClass() != object.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
 
-    MarkerOptions marker = (MarkerOptions) object;
+    MarkerOptions marker = (MarkerOptions) o;
 
     if (getPosition() != null ? !getPosition().equals(marker.getPosition()) : marker.getPosition() != null) {
       return false;

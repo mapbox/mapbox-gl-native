@@ -176,6 +176,17 @@ public class Marker extends Annotation {
   }
 
   /**
+   * Gets the {@link InfoWindow} the marker is using. If the marker hasn't had an info window
+   * defined, this will return {@code null}.
+   *
+   * @return The info window the marker is using.
+   */
+  @Nullable
+  public InfoWindow getInfoWindow() {
+    return infoWindow;
+  }
+
+  /**
    * Update only for default Marker's InfoWindow content for Title and Snippet
    */
   private void refreshInfoWindowContent() {
@@ -225,17 +236,6 @@ public class Marker extends Annotation {
     iw.open(mapView, this, getPosition(), rightOffsetPixels, topOffsetPixels);
     infoWindowShown = true;
     return iw;
-  }
-
-  /**
-   * Gets the {@link InfoWindow} the marker is using. If the marker hasn't had an info window
-   * defined, this will return {@code null}.
-   *
-   * @return The {@link InfoWindow} the marker is using.
-   */
-  @Nullable
-  public InfoWindow getInfoWindow() {
-    return infoWindow;
   }
 
   private InfoWindow getInfoWindow(@NonNull MapView mapView) {

@@ -6,6 +6,8 @@ import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.text.TextUtils;
 
+import timber.log.Timber;
+
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -27,11 +29,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.internal.Util;
-import timber.log.Timber;
 
 class HTTPRequest implements Callback {
 
-  private static OkHttpClient CLIENT = new OkHttpClient();
+  private static OkHttpClient mClient = new OkHttpClient();
   private String USER_AGENT_STRING = null;
 
   private static final int CONNECTION_ERROR = 0;
@@ -40,12 +41,12 @@ class HTTPRequest implements Callback {
 
   // Reentrancy is not needed, but "Lock" is an
   // abstract class.
-  private ReentrantLock lock = new ReentrantLock();
+  private ReentrantLock mLock = new ReentrantLock();
 
-  private long nativePtr = 0;
+  private long mNativePtr = 0;
 
-  private Call call;
-  private Request request;
+  private Call mCall;
+  private Request mRequest;
 
   private native void nativeOnFailure(int type, String message);
 
@@ -53,7 +54,7 @@ class HTTPRequest implements Callback {
                                        String retryAfter, String xRateLimitReset, byte[] body);
 
   private HTTPRequest(long nativePtr, String resourceUrl, String etag, String modified) {
-    this.nativePtr = nativePtr;
+    mNativePtr = nativePtr;
 
     try {
       // Don't try a request if we aren't connected
@@ -82,18 +83,18 @@ class HTTPRequest implements Callback {
       } else if (modified.length() > 0) {
         builder = builder.addHeader("If-Modified-Since", modified);
       }
-      request = builder.build();
-      call = CLIENT.newCall(request);
-      call.enqueue(this);
+      mRequest = builder.build();
+      mCall = mClient.newCall(mRequest);
+      mCall.enqueue(this);
     } catch (Exception exception) {
       onFailure(exception);
     }
   }
 
   public void cancel() {
-    // call can be null if the constructor gets aborted (e.g, under a NoRouteToHostException).
-    if (call != null) {
-      call.cancel();
+    // mCall can be null if the constructor gets aborted (e.g, under a NoRouteToHostException).
+    if (mCall != null) {
+      mCall.cancel();
     }
 
     // TODO: We need a lock here because we can try
@@ -101,9 +102,9 @@ class HTTPRequest implements Callback {
     // answered on the OkHTTP thread. We could get rid of
     // this lock by using Runnable when we move Android
     // implementation of mbgl::RunLoop to Looper.
-    lock.lock();
-    nativePtr = 0;
-    lock.unlock();
+    mLock.lock();
+    mNativePtr = 0;
+    mLock.unlock();
   }
 
   @Override
@@ -123,14 +124,14 @@ class HTTPRequest implements Callback {
       body = response.body().bytes();
     } catch (IOException ioException) {
       onFailure(ioException);
-      //throw e;
+      //throw ioException;
       return;
     } finally {
       response.body().close();
     }
 
-    lock.lock();
-    if (nativePtr != 0) {
+    mLock.lock();
+    if (mNativePtr != 0) {
       nativeOnResponse(response.code(),
         response.header("ETag"),
         response.header("Last-Modified"),
@@ -140,25 +141,24 @@ class HTTPRequest implements Callback {
         response.header("x-rate-limit-reset"),
         body);
     }
-    lock.unlock();
+    mLock.unlock();
   }
 
   @Override
-  public void onFailure(Call call, IOException ioException) {
-    onFailure(ioException);
+  public void onFailure(Call call, IOException e) {
+    onFailure(e);
   }
 
-  private void onFailure(Exception exception) {
+  private void onFailure(Exception e) {
     int type = PERMANENT_ERROR;
-    if ((exception instanceof NoRouteToHostException) || (exception instanceof UnknownHostException)
-      || (exception instanceof SocketException) || (exception instanceof ProtocolException)
-      || (exception instanceof SSLException)) {
+    if ((e instanceof NoRouteToHostException) || (e instanceof UnknownHostException) || (e instanceof SocketException)
+      || (e instanceof ProtocolException) || (e instanceof SSLException)) {
       type = CONNECTION_ERROR;
-    } else if ((exception instanceof InterruptedIOException)) {
+    } else if ((e instanceof InterruptedIOException)) {
       type = TEMPORARY_ERROR;
     }
 
-    String errorMessage = exception.getMessage() != null ? exception.getMessage() : "Error processing the request";
+    String errorMessage = e.getMessage() != null ? e.getMessage() : "Error processing the request";
 
     if (type == TEMPORARY_ERROR) {
       Timber.d(String.format(MapboxConstants.MAPBOX_LOCALE,
@@ -172,11 +172,11 @@ class HTTPRequest implements Callback {
         "Request failed due to a permanent error: %s", errorMessage));
     }
 
-    lock.lock();
-    if (nativePtr != 0) {
+    mLock.lock();
+    if (mNativePtr != 0) {
       nativeOnFailure(type, errorMessage);
     }
-    lock.unlock();
+    mLock.unlock();
   }
 
   private String getUserAgent() {

@@ -10,12 +10,12 @@ import com.mapbox.mapboxsdk.maps.MapView;
  * @see Marker
  */
 public class Icon {
-  private Bitmap bitmap;
-  private String id;
+  private Bitmap mBitmap;
+  private String mId;
 
   Icon(String id, Bitmap bitmap) {
-    this.id = id;
-    this.bitmap = bitmap;
+    mId = id;
+    mBitmap = bitmap;
   }
 
   /**
@@ -24,7 +24,7 @@ public class Icon {
    * @return {@link String} identifier for this {@link Icon}.
    */
   public String getId() {
-    return id;
+    return mId;
   }
 
   /**
@@ -33,7 +33,7 @@ public class Icon {
    * @return The {@link Bitmap} being used for the {@link Icon}.
    */
   public Bitmap getBitmap() {
-    return bitmap;
+    return mBitmap;
   }
 
   /**
@@ -54,10 +54,10 @@ public class Icon {
 
     Icon icon = (Icon) object;
 
-    if (!bitmap.equals(icon.bitmap)) {
+    if (!mBitmap.equals(icon.mBitmap)) {
       return false;
     }
-    return id.equals(icon.id);
+    return mId.equals(icon.mId);
   }
 
   /**
@@ -71,11 +71,11 @@ public class Icon {
   @Override
   public int hashCode() {
     int result = 0;
-    if (bitmap != null) {
-      result = bitmap.hashCode();
+    if (mBitmap != null) {
+      result = mBitmap.hashCode();
     }
-    if (id != null) {
-      result = 31 * result + id.hashCode();
+    if (mId != null) {
+      result = 31 * result + mId.hashCode();
     }
     return result;
   }

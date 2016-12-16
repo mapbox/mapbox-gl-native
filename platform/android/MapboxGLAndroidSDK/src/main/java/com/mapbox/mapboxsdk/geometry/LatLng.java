@@ -79,12 +79,12 @@ public class LatLng implements ILatLng, Parcelable {
   /**
    * Clone an existing latitude longitude point
    *
-   * @param latLng LatLng
+   * @param aLatLng LatLng
    */
-  public LatLng(LatLng latLng) {
-    this.latitude = latLng.latitude;
-    this.longitude = latLng.longitude;
-    this.altitude = latLng.altitude;
+  public LatLng(LatLng aLatLng) {
+    this.latitude = aLatLng.latitude;
+    this.longitude = aLatLng.longitude;
+    this.altitude = aLatLng.altitude;
   }
 
   protected LatLng(Parcel in) {
@@ -130,8 +130,8 @@ public class LatLng implements ILatLng, Parcelable {
     LatLng wrappedVersion = new LatLng(this);
     double lon = wrappedVersion.getLongitude();
     if (lon < GeoConstants.MIN_LONGITUDE || lon > GeoConstants.MAX_LONGITUDE) {
-      wrappedVersion.setLongitude(
-        MathUtils.wrap(wrappedVersion.getLongitude(), GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE));
+      wrappedVersion.setLongitude(MathUtils.wrap(wrappedVersion.getLongitude(), GeoConstants.MIN_LONGITUDE,
+        GeoConstants.MAX_LONGITUDE));
     }
     return wrappedVersion;
   }
@@ -147,8 +147,8 @@ public class LatLng implements ILatLng, Parcelable {
 
     LatLng latLng = (LatLng) object;
 
-    return Double.compare(latLng.altitude, altitude) == 0
-      && Double.compare(latLng.latitude, latitude) == 0 && Double.compare(latLng.longitude, longitude) == 0;
+    return Double.compare(latLng.altitude, altitude) == 0 && Double.compare(latLng.latitude, latitude) == 0
+      && Double.compare(latLng.longitude, longitude) == 0;
   }
 
   @Override
