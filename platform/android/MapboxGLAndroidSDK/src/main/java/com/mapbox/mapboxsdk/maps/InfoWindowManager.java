@@ -15,74 +15,79 @@ import java.util.List;
  * <p>
  * Maintains a {@link List} of opened {@link InfoWindow} and tracks configurations as
  * allowConcurrentMultipleInfoWindows which allows to have multiple {@link InfoWindow} open at the
- * same time. Responsible for managing listeners as
- * {@link com.mapbox.mapboxsdk.maps.MapboxMap.OnInfoWindowClickListener}
+ * same time. Responsible for managing listeners as {@link com.mapbox.mapboxsdk.maps.MapboxMap.OnInfoWindowClickListener}
  * and {@link com.mapbox.mapboxsdk.maps.MapboxMap.OnInfoWindowLongClickListener}.
  * </p>
  */
 class InfoWindowManager {
 
-  private List<InfoWindow> infoWindows;
-  private MapboxMap.InfoWindowAdapter infoWindowAdapter;
-  private boolean allowConcurrentMultipleInfoWindows;
+    private List<InfoWindow> infoWindows;
+    private MapboxMap.InfoWindowAdapter infoWindowAdapter;
+    private boolean allowConcurrentMultipleInfoWindows;
 
-  private MapboxMap.OnInfoWindowClickListener onInfoWindowClickListener;
-  private MapboxMap.OnInfoWindowLongClickListener onInfoWindowLongClickListener;
-  private MapboxMap.OnInfoWindowCloseListener onInfoWindowCloseListener;
+    private MapboxMap.OnInfoWindowClickListener onInfoWindowClickListener;
+    private MapboxMap.OnInfoWindowLongClickListener onInfoWindowLongClickListener;
+    private MapboxMap.OnInfoWindowCloseListener onInfoWindowCloseListener;
 
-  InfoWindowManager() {
-    this.infoWindows = new ArrayList<>();
-  }
+    InfoWindowManager() {
+        this.infoWindows = new ArrayList<>();
+    }
 
-  void setInfoWindowAdapter(@Nullable MapboxMap.InfoWindowAdapter infoWindowAdapter) {
-    this.infoWindowAdapter = infoWindowAdapter;
-  }
+    void update() {
+        for (InfoWindow infoWindow : infoWindows) {
+            infoWindow.update();
+        }
+    }
 
-  MapboxMap.InfoWindowAdapter getInfoWindowAdapter() {
-    return infoWindowAdapter;
-  }
+    void setInfoWindowAdapter(@Nullable MapboxMap.InfoWindowAdapter infoWindowAdapter) {
+        this.infoWindowAdapter = infoWindowAdapter;
+    }
 
-  void setAllowConcurrentMultipleOpenInfoWindows(boolean allow) {
-    allowConcurrentMultipleInfoWindows = allow;
-  }
+    MapboxMap.InfoWindowAdapter getInfoWindowAdapter() {
+        return infoWindowAdapter;
+    }
 
-  boolean isAllowConcurrentMultipleOpenInfoWindows() {
-    return allowConcurrentMultipleInfoWindows;
-  }
+    void setAllowConcurrentMultipleOpenInfoWindows(boolean allow) {
+        allowConcurrentMultipleInfoWindows = allow;
+    }
 
-  List<InfoWindow> getInfoWindows() {
-    return infoWindows;
-  }
+    boolean isAllowConcurrentMultipleOpenInfoWindows() {
+        return allowConcurrentMultipleInfoWindows;
+    }
 
-  boolean isInfoWindowValidForMarker(@NonNull Marker marker) {
-    return !TextUtils.isEmpty(marker.getTitle()) || !TextUtils.isEmpty(marker.getSnippet());
-  }
+    List<InfoWindow> getInfoWindows() {
+        return infoWindows;
+    }
 
-  void setOnInfoWindowClickListener(@Nullable MapboxMap.OnInfoWindowClickListener listener) {
-    onInfoWindowClickListener = listener;
-  }
+    boolean isInfoWindowValidForMarker(@NonNull Marker marker) {
+        return !TextUtils.isEmpty(marker.getTitle()) || !TextUtils.isEmpty(marker.getSnippet());
+    }
 
-  MapboxMap.OnInfoWindowClickListener getOnInfoWindowClickListener() {
-    return onInfoWindowClickListener;
-  }
+    void setOnInfoWindowClickListener(@Nullable MapboxMap.OnInfoWindowClickListener listener) {
+        onInfoWindowClickListener = listener;
+    }
 
-  void setOnInfoWindowLongClickListener(@Nullable MapboxMap.OnInfoWindowLongClickListener listener) {
-    onInfoWindowLongClickListener = listener;
-  }
+    MapboxMap.OnInfoWindowClickListener getOnInfoWindowClickListener() {
+        return onInfoWindowClickListener;
+    }
 
-  MapboxMap.OnInfoWindowLongClickListener getOnInfoWindowLongClickListener() {
-    return onInfoWindowLongClickListener;
-  }
+    void setOnInfoWindowLongClickListener(@Nullable MapboxMap.OnInfoWindowLongClickListener listener) {
+        onInfoWindowLongClickListener = listener;
+    }
 
-  void setOnInfoWindowCloseListener(@Nullable MapboxMap.OnInfoWindowCloseListener listener) {
-    onInfoWindowCloseListener = listener;
-  }
+    MapboxMap.OnInfoWindowLongClickListener getOnInfoWindowLongClickListener() {
+        return onInfoWindowLongClickListener;
+    }
 
-  MapboxMap.OnInfoWindowCloseListener getOnInfoWindowCloseListener() {
-    return onInfoWindowCloseListener;
-  }
+    void setOnInfoWindowCloseListener(@Nullable MapboxMap.OnInfoWindowCloseListener listener) {
+        onInfoWindowCloseListener = listener;
+    }
 
-  public void add(InfoWindow infoWindow) {
-    infoWindows.add(infoWindow);
-  }
+    MapboxMap.OnInfoWindowCloseListener getOnInfoWindowCloseListener() {
+        return onInfoWindowCloseListener;
+    }
+
+    public void add(InfoWindow infoWindow) {
+        infoWindows.add(infoWindow);
+    }
 }
