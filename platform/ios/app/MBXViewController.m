@@ -719,14 +719,14 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     }];
     waterLayer.fillColor = waterColorFunction;
 
-    MGLStyleValue *fillAntialias = [MGLStyleValue<NSNumber *> valueWithStops:@{
+    MGLStyleValue *fillAntialiasedFunction = [MGLStyleValue<NSNumber *> valueWithStops:@{
         @11: [MGLStyleValue<NSNumber *> valueWithRawValue:@YES],
         @12: [MGLStyleValue<NSNumber *> valueWithRawValue:@NO],
         @13: [MGLStyleValue<NSNumber *> valueWithRawValue:@YES],
         @14: [MGLStyleValue<NSNumber *> valueWithRawValue:@NO],
         @15: [MGLStyleValue<NSNumber *> valueWithRawValue:@YES],
     }];
-    waterLayer.fillAntialias = fillAntialias;
+    waterLayer.fillAntialiased = fillAntialiasedFunction;
 }
 
 - (void)styleRoadLayer

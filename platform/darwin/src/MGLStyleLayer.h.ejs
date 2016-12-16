@@ -96,8 +96,12 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
  This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-<%- type -%>-<%- property.original -%>"><code><%- property.original -%></code></a> layout property in the Mapbox Style Specification.
 <% } -%>
  */
-@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
 
+<% if (property.original) { %>
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> __attribute__((unavailable("Use <%- camelizeWithLeadingLowercase(property.name) %> instead.")));
+
+<% } -%>
 <% } -%>
 <% } -%>
 <% if (paintProperties.length) { -%>
@@ -118,8 +122,12 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
  This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-<%- property.original -%>"><code><%- property.original -%></code></a> paint property in the Mapbox Style Specification.
 <% } -%>
  */
-@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
 
+<% if (property.original) { %>
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> __attribute__((unavailable("Use <%- camelizeWithLeadingLowercase(property.name) %> instead.")));
+
+<% } -%>
 <% } -%>
 <% } -%>
 @end

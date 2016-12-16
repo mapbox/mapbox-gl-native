@@ -78,7 +78,7 @@ namespace mbgl {
     return [NSPredicate mgl_predicateWithFilter:self.rawLayer->getFilter()];
 }
 
-#pragma mark -  Adding to and removing from a map view
+#pragma mark - Adding to and removing from a map view
 
 - (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
 {
@@ -119,18 +119,23 @@ namespace mbgl {
 
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setFillAntialias:(MGLStyleValue<NSNumber *> *)fillAntialias {
+- (void)setFillAntialiased:(MGLStyleValue<NSNumber *> *)fillAntialiased {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<bool, NSNumber *>().toPropertyValue(fillAntialias);
+    auto mbglValue = MGLStyleValueTransformer<bool, NSNumber *>().toPropertyValue(fillAntialiased);
     self.rawLayer->setFillAntialias(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)fillAntialias {
+- (MGLStyleValue<NSNumber *> *)isFillAntialiased {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillAntialias() ?: self.rawLayer->getDefaultFillAntialias();
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
+}
+
+
+- (void)setFillAntialias:(MGLStyleValue<NSNumber *> *)fillAntialias {
+    NSAssert(NO, @"Use -setFillAntialiased: instead.");
 }
 
 - (void)setFillColor:(MGLStyleValue<MGLColor *> *)fillColor {

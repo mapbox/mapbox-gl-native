@@ -90,7 +90,7 @@ namespace mbgl {
     return [NSPredicate mgl_predicateWithFilter:self.rawLayer->getFilter()];
 }
 
-#pragma mark -  Adding to and removing from a map view
+#pragma mark - Adding to and removing from a map view
 
 - (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
 {
@@ -229,6 +229,11 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getLineDasharray() ?: self.rawLayer->getDefaultLineDasharray();
     return MGLStyleValueTransformer<std::vector<float>, NSArray<NSNumber *> *, float>().toStyleValue(propertyValue);
+}
+
+
+- (void)setLineDasharray:(MGLStyleValue<NSArray<NSNumber *> *> *)lineDasharray {
+    NSAssert(NO, @"Use -setLineDashPattern: instead.");
 }
 
 - (void)setLineGapWidth:(MGLStyleValue<NSNumber *> *)lineGapWidth {

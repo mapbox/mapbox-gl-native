@@ -41,7 +41,7 @@
     super.rawLayer = rawLayer;
 }
 
-#pragma mark -  Adding to and removing from a map view
+#pragma mark - Adding to and removing from a map view
 
 - (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
 {
@@ -96,6 +96,11 @@
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
+
+- (void)setRasterBrightnessMax:(MGLStyleValue<NSNumber *> *)rasterBrightnessMax {
+    NSAssert(NO, @"Use -setMaximumRasterBrightness: instead.");
+}
+
 - (void)setMinimumRasterBrightness:(MGLStyleValue<NSNumber *> *)minimumRasterBrightness {
     MGLAssertStyleLayerIsValid();
 
@@ -108,6 +113,11 @@
 
     auto propertyValue = self.rawLayer->getRasterBrightnessMin() ?: self.rawLayer->getDefaultRasterBrightnessMin();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+}
+
+
+- (void)setRasterBrightnessMin:(MGLStyleValue<NSNumber *> *)rasterBrightnessMin {
+    NSAssert(NO, @"Use -setMinimumRasterBrightness: instead.");
 }
 
 - (void)setRasterContrast:(MGLStyleValue<NSNumber *> *)rasterContrast {
@@ -150,6 +160,11 @@
 
     auto propertyValue = self.rawLayer->getRasterHueRotate() ?: self.rawLayer->getDefaultRasterHueRotate();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+}
+
+
+- (void)setRasterHueRotate:(MGLStyleValue<NSNumber *> *)rasterHueRotate {
+    NSAssert(NO, @"Use -setRasterHueRotation: instead.");
 }
 
 - (void)setRasterOpacity:(MGLStyleValue<NSNumber *> *)rasterOpacity {

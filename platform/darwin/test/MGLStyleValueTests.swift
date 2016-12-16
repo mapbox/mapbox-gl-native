@@ -9,8 +9,8 @@ extension MGLStyleValueTests {
         let symbolStyleLayer = MGLSymbolStyleLayer(identifier: "test", source: shapeSource)
         
         // Boolean
-        symbolStyleLayer.iconAllowOverlap = MGLStyleConstantValue(rawValue: true)
-        XCTAssertEqual((symbolStyleLayer.iconAllowOverlap as! MGLStyleConstantValue<NSNumber>).rawValue, true)
+        symbolStyleLayer.iconAllowsOverlap = MGLStyleConstantValue(rawValue: true)
+        XCTAssertEqual((symbolStyleLayer.iconAllowsOverlap as! MGLStyleConstantValue<NSNumber>).rawValue, true)
         
         // Number
         symbolStyleLayer.iconHaloWidth = MGLStyleConstantValue(rawValue: 3)
@@ -32,7 +32,7 @@ extension MGLStyleValueTests {
             3: MGLStyleValue(rawValue: true),
             4: MGLStyleValue(rawValue: false),
             ]
-        symbolStyleLayer.iconAllowOverlap = MGLStyleFunction<NSNumber>(base: 1, stops: stops)
-        XCTAssertEqual((symbolStyleLayer.iconAllowOverlap as! MGLStyleFunction<NSNumber>), MGLStyleFunction(base: 1, stops: stops))
+        symbolStyleLayer.iconAllowsOverlap = MGLStyleFunction<NSNumber>(base: 1, stops: stops)
+        XCTAssertEqual((symbolStyleLayer.iconAllowsOverlap as! MGLStyleFunction<NSNumber>), MGLStyleFunction(base: 1, stops: stops))
     }
 }
