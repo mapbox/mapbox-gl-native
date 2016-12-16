@@ -286,7 +286,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and `textField` is non-`nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconOptional;
+@property (nonatomic, null_resettable, getter=isIconOptional) MGLStyleValue<NSNumber *> *iconOptional;
 
 /**
  Size of the additional area around the icon bounding box used for detecting symbol collisions.

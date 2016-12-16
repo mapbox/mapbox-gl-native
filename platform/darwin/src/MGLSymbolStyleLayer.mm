@@ -256,7 +256,7 @@ namespace mbgl {
     self.rawLayer->setIconOptional(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)iconOptional {
+- (MGLStyleValue<NSNumber *> *)isIconOptional {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getIconOptional() ?: self.rawLayer->getDefaultIconOptional();

@@ -4,6 +4,7 @@
     "icon-image": "icon-image-name",
     "icon-ignore-placement": "icon-ignores-placement",
     "icon-keep-upright": "keeps-icon-upright",
+    "icon-optional": "is-icon-optional",
     "icon-rotate": "icon-rotation",
     "icon-size": "icon-scale",
     "symbol-avoid-edges": "symbol-avoids-edges",
