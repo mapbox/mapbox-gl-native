@@ -194,7 +194,11 @@ namespace mbgl {
 
 
 - (void)setIconAllowOverlap:(MGLStyleValue<NSNumber *> *)iconAllowOverlap {
-    NSAssert(NO, @"Use -setIconAllowsOverlap: instead.");
+    self.iconAllowsOverlap = iconAllowOverlap;
+}
+
+- (MGLStyleValue<NSNumber *> *)iconAllowOverlap {
+    return self.iconAllowsOverlap;
 }
 
 - (void)setIconIgnoresPlacement:(MGLStyleValue<NSNumber *> *)iconIgnoresPlacement {
@@ -213,7 +217,11 @@ namespace mbgl {
 
 
 - (void)setIconIgnorePlacement:(MGLStyleValue<NSNumber *> *)iconIgnorePlacement {
-    NSAssert(NO, @"Use -setIconIgnoresPlacement: instead.");
+    self.iconIgnoresPlacement = iconIgnorePlacement;
+}
+
+- (MGLStyleValue<NSNumber *> *)iconIgnorePlacement {
+    return self.iconIgnoresPlacement;
 }
 
 - (void)setIconImageName:(MGLStyleValue<NSString *> *)iconImageName {
@@ -232,7 +240,11 @@ namespace mbgl {
 
 
 - (void)setIconImage:(MGLStyleValue<NSString *> *)iconImage {
-    NSAssert(NO, @"Use -setIconImageName: instead.");
+    self.iconImageName = iconImage;
+}
+
+- (MGLStyleValue<NSString *> *)iconImage {
+    return self.iconImageName;
 }
 
 - (void)setIconOffset:(MGLStyleValue<NSValue *> *)iconOffset {
@@ -293,7 +305,11 @@ namespace mbgl {
 
 
 - (void)setIconRotate:(MGLStyleValue<NSNumber *> *)iconRotate {
-    NSAssert(NO, @"Use -setIconRotation: instead.");
+    self.iconRotation = iconRotate;
+}
+
+- (MGLStyleValue<NSNumber *> *)iconRotate {
+    return self.iconRotation;
 }
 
 - (void)setIconRotationAlignment:(MGLStyleValue<NSValue *> *)iconRotationAlignment {
@@ -326,7 +342,11 @@ namespace mbgl {
 
 
 - (void)setIconSize:(MGLStyleValue<NSNumber *> *)iconSize {
-    NSAssert(NO, @"Use -setIconScale: instead.");
+    self.iconScale = iconSize;
+}
+
+- (MGLStyleValue<NSNumber *> *)iconSize {
+    return self.iconScale;
 }
 
 - (void)setIconTextFit:(MGLStyleValue<NSValue *> *)iconTextFit {
@@ -373,7 +393,11 @@ namespace mbgl {
 
 
 - (void)setIconKeepUpright:(MGLStyleValue<NSNumber *> *)iconKeepUpright {
-    NSAssert(NO, @"Use -setKeepsIconUpright: instead.");
+    self.keepsIconUpright = iconKeepUpright;
+}
+
+- (MGLStyleValue<NSNumber *> *)iconKeepUpright {
+    return self.keepsIconUpright;
 }
 
 - (void)setKeepsTextUpright:(MGLStyleValue<NSNumber *> *)keepsTextUpright {
@@ -392,7 +416,11 @@ namespace mbgl {
 
 
 - (void)setTextKeepUpright:(MGLStyleValue<NSNumber *> *)textKeepUpright {
-    NSAssert(NO, @"Use -setKeepsTextUpright: instead.");
+    self.keepsTextUpright = textKeepUpright;
+}
+
+- (MGLStyleValue<NSNumber *> *)textKeepUpright {
+    return self.keepsTextUpright;
 }
 
 - (void)setMaximumTextAngle:(MGLStyleValue<NSNumber *> *)maximumTextAngle {
@@ -411,7 +439,11 @@ namespace mbgl {
 
 
 - (void)setTextMaxAngle:(MGLStyleValue<NSNumber *> *)textMaxAngle {
-    NSAssert(NO, @"Use -setMaximumTextAngle: instead.");
+    self.maximumTextAngle = textMaxAngle;
+}
+
+- (MGLStyleValue<NSNumber *> *)textMaxAngle {
+    return self.maximumTextAngle;
 }
 
 - (void)setMaximumTextWidth:(MGLStyleValue<NSNumber *> *)maximumTextWidth {
@@ -430,7 +462,11 @@ namespace mbgl {
 
 
 - (void)setTextMaxWidth:(MGLStyleValue<NSNumber *> *)textMaxWidth {
-    NSAssert(NO, @"Use -setMaximumTextWidth: instead.");
+    self.maximumTextWidth = textMaxWidth;
+}
+
+- (MGLStyleValue<NSNumber *> *)textMaxWidth {
+    return self.maximumTextWidth;
 }
 
 - (void)setSymbolAvoidsEdges:(MGLStyleValue<NSNumber *> *)symbolAvoidsEdges {
@@ -449,7 +485,11 @@ namespace mbgl {
 
 
 - (void)setSymbolAvoidEdges:(MGLStyleValue<NSNumber *> *)symbolAvoidEdges {
-    NSAssert(NO, @"Use -setSymbolAvoidsEdges: instead.");
+    self.symbolAvoidsEdges = symbolAvoidEdges;
+}
+
+- (MGLStyleValue<NSNumber *> *)symbolAvoidEdges {
+    return self.symbolAvoidsEdges;
 }
 
 - (void)setSymbolPlacement:(MGLStyleValue<NSValue *> *)symbolPlacement {
@@ -496,7 +536,11 @@ namespace mbgl {
 
 
 - (void)setTextAllowOverlap:(MGLStyleValue<NSNumber *> *)textAllowOverlap {
-    NSAssert(NO, @"Use -setTextAllowsOverlap: instead.");
+    self.textAllowsOverlap = textAllowOverlap;
+}
+
+- (MGLStyleValue<NSNumber *> *)textAllowOverlap {
+    return self.textAllowsOverlap;
 }
 
 - (void)setTextAnchor:(MGLStyleValue<NSValue *> *)textAnchor {
@@ -557,7 +601,11 @@ namespace mbgl {
 
 
 - (void)setTextIgnorePlacement:(MGLStyleValue<NSNumber *> *)textIgnorePlacement {
-    NSAssert(NO, @"Use -setTextIgnoresPlacement: instead.");
+    self.textIgnoresPlacement = textIgnorePlacement;
+}
+
+- (MGLStyleValue<NSNumber *> *)textIgnorePlacement {
+    return self.textIgnoresPlacement;
 }
 
 - (void)setTextJustification:(MGLStyleValue<NSValue *> *)textJustification {
@@ -576,7 +624,11 @@ namespace mbgl {
 
 
 - (void)setTextJustify:(MGLStyleValue<NSValue *> *)textJustify {
-    NSAssert(NO, @"Use -setTextJustification: instead.");
+    self.textJustification = textJustify;
+}
+
+- (MGLStyleValue<NSValue *> *)textJustify {
+    return self.textJustification;
 }
 
 - (void)setTextLetterSpacing:(MGLStyleValue<NSNumber *> *)textLetterSpacing {
@@ -679,7 +731,11 @@ namespace mbgl {
 
 
 - (void)setTextRotate:(MGLStyleValue<NSNumber *> *)textRotate {
-    NSAssert(NO, @"Use -setTextRotation: instead.");
+    self.textRotation = textRotate;
+}
+
+- (MGLStyleValue<NSNumber *> *)textRotate {
+    return self.textRotation;
 }
 
 - (void)setTextRotationAlignment:(MGLStyleValue<NSValue *> *)textRotationAlignment {

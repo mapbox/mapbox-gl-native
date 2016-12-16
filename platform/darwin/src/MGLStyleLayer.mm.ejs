@@ -188,7 +188,11 @@ namespace mbgl {
 
 <% if (property.original) { %>
 - (void)set<%- camelize(originalPropertyName(property)) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> {
-    NSAssert(NO, @"Use -set<%- camelize(property.name) %>: instead.");
+    self.<%- camelizeWithLeadingLowercase(property.name) %> = <%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>;
+}
+
+- (MGLStyleValue<<%- propertyType(property, true) %>> *)<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> {
+    return self.<%- objCGetter(property) %>;
 }
 
 <% } -%>
