@@ -20,6 +20,8 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/logging.hpp>
 
+#include <mapbox/polylabel.hpp>
+
 namespace mbgl {
 
 using namespace style;
@@ -301,12 +303,20 @@ void SymbolLayout::addFeature(const SymbolFeature& feature,
             }
         }
     } else if (feature.type == FeatureType::Polygon) {
-        // TODO: pole of inaccessibility
-        for (const auto& ring : feature.geometry) {
-            for (const auto& point : ring) {
-                Anchor anchor(point.x, point.y, 0, minScale);
-                addSymbolInstance(ring, anchor);
+        for (const auto& polygon : classifyRings(feature.geometry)) {
+            Polygon<double> poly;
+            for (const auto& ring : polygon) {
+                LinearRing<double> r;
+                for (const auto& p : ring) {
+                    r.push_back(convertPoint<double>(p));
+                }
+                poly.push_back(r);
             }
+
+            // 16 here represents 2 pixels
+            auto poi = mapbox::polylabel(poly, 16.0);
+            Anchor anchor(poi.x, poi.y, 0, minScale);
+            addSymbolInstance(polygon[0], anchor);
         }
     } else if (feature.type == FeatureType::LineString) {
         for (const auto& line : feature.geometry) {
