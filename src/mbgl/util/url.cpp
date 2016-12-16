@@ -1,11 +1,12 @@
 #include <mbgl/util/url.hpp>
+#include <mbgl/util/token.hpp>
 
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <cstdlib>
 #include <algorithm>
-
+#include <cstring>
 
 namespace {
 
@@ -76,6 +77,105 @@ bool isURL(const std::string& input) {
     return (it != input.end() && *it++ == ':') &&
            (it != input.end() && *it++ == '/') &&
            (it != input.end() && *it++ == '/');
+}
+
+URL::URL(const std::string& str)
+    : query([&]() -> Segment {
+          const auto hashPos = str.find('#');
+          const auto queryPos = str.find('?');
+          if (queryPos == std::string::npos || hashPos < queryPos) {
+              return { hashPos != std::string::npos ? hashPos : str.size(), 0 };
+          }
+          return { queryPos, (hashPos != std::string::npos ? hashPos : str.size()) - queryPos };
+      }()),
+      scheme([&]() -> Segment {
+          auto schemeEnd = str.find(':');
+          return { 0, schemeEnd == std::string::npos || schemeEnd > query.first ? 0 : schemeEnd };
+      }()),
+      domain([&]() -> Segment {
+          auto domainPos = scheme.first + scheme.second;
+          while (domainPos < query.first && (str[domainPos] == ':' || str[domainPos] == '/')) {
+              ++domainPos;
+          }
+          const bool isData = str.compare(scheme.first, scheme.second, "data") == 0;
+          const auto endPos = str.find(isData ? ',' : '/', domainPos);
+          return { domainPos, std::min(query.first, endPos) - domainPos };
+      }()),
+      path([&]() -> Segment {
+          auto pathPos = domain.first + domain.second;
+          const bool isData = str.compare(scheme.first, scheme.second, "data") == 0;
+          if (isData) {
+              // Skip comma
+              pathPos++;
+          } else {
+              // Skip optional leading slash
+              while (pathPos < query.first && (str[pathPos] == '/')) {
+                  ++pathPos;
+              }
+          }
+          return { pathPos, query.first - pathPos };
+      }()) {
+}
+
+Path::Path(const std::string& str, const size_t pos, const size_t count)
+    : directory([&]() -> Segment {
+          // Finds the string between pos and the first /, if it exists
+          const auto endPos = count == std::string::npos ? str.size() : pos + count;
+          const auto slashPos = str.rfind('/', endPos);
+          return { pos, slashPos == std::string::npos || slashPos < pos ? 0 : slashPos + 1 - pos };
+      }()),
+      extension([&]() -> Segment {
+          auto dotPos = str.rfind('.', pos + count);
+          const auto endPos = count == std::string::npos ? str.size() : pos + count;
+          // Count a preceding @2x to the file extension as well.
+          const char* factor = "@2x";
+          const size_t factorLen = strlen(factor);
+          if (dotPos >= factorLen && dotPos < endPos &&
+              str.compare(dotPos - factorLen, factorLen, factor) == 0) {
+              dotPos -= factorLen;
+          }
+          if (dotPos == std::string::npos || dotPos < directory.first + directory.second) {
+              return { endPos, 0 };
+          }
+          return { dotPos, endPos - dotPos };
+      }()),
+      filename([&]() -> Segment {
+          const auto filePos = directory.first + directory.second;
+          return { filePos, extension.first - filePos };
+      }()) {
+}
+
+std::string transformURL(const std::string& tpl, const std::string& str, const URL& url) {
+    auto result = util::replaceTokens(tpl, [&](const std::string& token) -> std::string {
+        if (token == "path") {
+            return str.substr(url.path.first, url.path.second);
+        } else if (token == "domain") {
+            return str.substr(url.domain.first, url.domain.second);
+        } else if (token == "scheme") {
+            return str.substr(url.scheme.first, url.scheme.second);
+        } else if (token == "directory") {
+            const Path path(str, url.path.first, url.path.second);
+            return str.substr(path.directory.first, path.directory.second);
+        } else if (token == "filename") {
+            const Path path(str, url.path.first, url.path.second);
+            return str.substr(path.filename.first, path.filename.second);
+        } else if (token == "extension") {
+            const Path path(str, url.path.first, url.path.second);
+            return str.substr(path.extension.first, path.extension.second);
+        }
+        return "";
+    });
+
+    // Append the query string if it exists.
+    if (url.query.second > 1) {
+        const auto amp = result.find('?') != std::string::npos ? result.size() : std::string::npos;
+        result.append(str, url.query.first, url.query.second);
+        // Transform the question mark to an ampersand if we had a query string previously.
+        if (amp < result.size()) {
+            result[amp] = '&';
+        }
+    }
+    return result;
 }
 
 } // namespace util
