@@ -4,7 +4,7 @@
 
 @implementation MGLShape
 
-+ (nullable instancetype)shapeWithData:(NSData *)data encoding:(NSStringEncoding)encoding error:(NSError * _Nullable *)outError {
++ (nullable MGLShape *)shapeWithData:(NSData *)data encoding:(NSStringEncoding)encoding error:(NSError * _Nullable *)outError {
     NSString *string = [[NSString alloc] initWithData:data encoding:encoding];
     if (!string) {
         if (outError) {
