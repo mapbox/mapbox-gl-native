@@ -68,7 +68,7 @@ public class CameraPositionTest {
     double longitude = 11;
     double tilt = 44;
 
-    double[] cameraVars = new double[] {latitude, longitude, bearing, tilt, zoom};
+    double[] cameraVars = new double[]{latitude, longitude, bearing, tilt, zoom};
     CameraPosition cameraPosition = new CameraPosition.Builder(cameraVars).build();
     assertEquals("bearing should match", bearing, cameraPosition.bearing, DELTA);
     assertEquals("latlng should match", new LatLng(latitude, longitude), cameraPosition.target);
@@ -80,7 +80,7 @@ public class CameraPositionTest {
   public void testToString() {
     LatLng latLng = new LatLng(1, 2);
     CameraPosition cameraPosition = new CameraPosition(latLng, 3, 4, 5);
-    assertEquals("toString should match", "Target: LatLng [latitude=1.0, longitude=2.0, altitude=0.0], Zoom:3.0,"
+    assertEquals("toString should match", "Target: LatLng [latitude=1.0, longitude=2.0, altitude=0.0], Zoom:3.0, "
       + "Bearing:5.0, Tilt:4.0", cameraPosition.toString());
   }
 
