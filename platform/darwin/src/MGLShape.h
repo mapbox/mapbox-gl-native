@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
     not be parsed as valid GeoJSON source code. If `nil`, `outError` contains an
     `NSError` object describing the problem.
  */
-+ (nullable instancetype)shapeWithData:(NSData *)data encoding:(NSStringEncoding)encoding error:(NSError * _Nullable *)outError;
++ (nullable MGLShape *)shapeWithData:(NSData *)data encoding:(NSStringEncoding)encoding error:(NSError * _Nullable *)outError;
 
 #pragma mark Accessing the Shape Attributes
 
