@@ -7,13 +7,14 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
-import timber.log.Timber;
-
-import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
 import java.io.File;
+
+import timber.log.Timber;
 
 /**
  * The offline manager is the main entry point for offline-related functionality.
@@ -91,15 +92,14 @@ public class OfflineManager {
   /*
    * Constructors
    */
-
   private OfflineManager(Context context) {
     // Get a pointer to the DefaultFileSource instance
     String assetRoot = getDatabasePath(context);
     String cachePath = assetRoot + File.separator + DATABASE_NAME;
     mDefaultFileSourcePtr = createDefaultFileSource(cachePath, assetRoot, DEFAULT_MAX_CACHE_SIZE);
 
-    if (MapboxAccountManager.getInstance() != null) {
-      setAccessToken(mDefaultFileSourcePtr, MapboxAccountManager.getInstance().getAccessToken());
+    if (!TextUtils.isEmpty(Mapbox.getAccessToken())) {
+      setAccessToken(mDefaultFileSourcePtr, Mapbox.getAccessToken());
     }
 
     // Delete any existing previous ambient cache database
@@ -117,10 +117,10 @@ public class OfflineManager {
       setStorageExternal = appInfo.metaData.getBoolean(
         MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
         MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL);
-    } catch (PackageManager.NameNotFoundException nameNotFoundException) {
-      Timber.e("Failed to read the package metadata: " + nameNotFoundException.getMessage());
+    } catch (PackageManager.NameNotFoundException exception) {
+      Timber.e("Failed to read the package metadata: ", exception);
     } catch (Exception exception) {
-      Timber.e("Failed to read the storage key: " + exception.getMessage());
+      Timber.e("Failed to read the storage key: ", exception);
     }
 
     String databasePath = null;
@@ -128,8 +128,8 @@ public class OfflineManager {
       try {
         // Try getting the external storage path
         databasePath = context.getExternalFilesDir(null).getAbsolutePath();
-      } catch (NullPointerException nullPointerException) {
-        Timber.e("Failed to obtain the external storage path: " + nullPointerException.getMessage());
+      } catch (NullPointerException exception) {
+        Timber.e("Failed to obtain the external storage path: ", exception);
       }
     }
 
@@ -177,7 +177,7 @@ public class OfflineManager {
             Timber.d("Old ambient cache database deleted to save space: " + path);
           }
         } catch (Exception exception) {
-          Timber.e("Failed to delete old ambient cache database: " + exception.getMessage());
+          Timber.e("Failed to delete old ambient cache database: ", exception);
         }
       }
     }).start();
@@ -187,6 +187,7 @@ public class OfflineManager {
     if (instance == null) {
       instance = new OfflineManager(context);
     }
+
     return instance;
   }
 
@@ -194,7 +195,7 @@ public class OfflineManager {
    * Access token getter/setter
    *
    * @param accessToken the accessToken to be used by the offline manager.
-   * @deprecated As of release 4.1.0, replaced by {@link MapboxAccountManager#start(Context, String)} ()}
+   * @deprecated As of release 4.1.0, replaced by {@link Mapbox#getInstance(Context, String)}}
    */
   @Deprecated
   public void setAccessToken(String accessToken) {
@@ -205,7 +206,7 @@ public class OfflineManager {
    * Get Access Token
    *
    * @return Access Token
-   * @deprecated As of release 4.1.0, replaced by {@link MapboxAccountManager#getAccessToken()}
+   * @deprecated As of release 4.1.0, replaced by {@link Mapbox#getAccessToken()}
    */
   @Deprecated
   public String getAccessToken() {
@@ -309,7 +310,6 @@ public class OfflineManager {
   /*
    * Native methods
    */
-
   private native long createDefaultFileSource(
     String cachePath, String assetRoot, long maximumCacheSize);
 

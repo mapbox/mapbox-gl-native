@@ -8,12 +8,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 
-import timber.log.Timber;
-
-import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.mapbox.mapboxsdk.Mapbox;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import timber.log.Timber;
 
 /**
  * Interface definition for a callback to be invoked when connectivity changes.
@@ -82,7 +82,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
    * @return true if connected
    */
   public boolean isConnected(Context context) {
-    Boolean connected = MapboxAccountManager.getInstance().isConnected();
+    Boolean connected = Mapbox.isConnected();
     if (connected != null) {
       // Connectivity state overridden by app
       return connected;

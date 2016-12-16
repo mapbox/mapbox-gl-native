@@ -6,16 +6,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-
-import timber.log.Timber;
-
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -36,6 +33,8 @@ import com.mapbox.mapboxsdk.testapp.model.other.OfflineListRegionsDialog;
 import com.mapbox.mapboxsdk.testapp.utils.OfflineUtils;
 
 import java.util.ArrayList;
+
+import timber.log.Timber;
 
 public class OfflineActivity extends AppCompatActivity
   implements OfflineDownloadRegionDialog.DownloadRegionDialogListener {
@@ -78,12 +77,12 @@ public class OfflineActivity extends AppCompatActivity
       actionBar.setDisplayShowHomeEnabled(true);
     }
 
-    // You can use MapboxAccountManager.setConnected(Boolean) to manually set the connectivity
+    // You can use Mapbox.setConnected(Boolean) to manually set the connectivity
     // state of your app. This will override any checks performed via the ConnectivityManager.
-    //MapboxAccountManager.getInstance().setConnected(false);
-    Boolean connected = MapboxAccountManager.getInstance().isConnected();
+    //Mapbox.getInstance().setConnected(false);
+    Boolean connected = Mapbox.isConnected();
     Timber.d(String.format(MapboxConstants.MAPBOX_LOCALE,
-      "MapboxAccountManager is connected: %b", connected));
+      "Mapbox is connected: %b", connected));
 
     // Set up map
     mapView = (MapView) findViewById(R.id.mapView);
@@ -186,7 +185,6 @@ public class OfflineActivity extends AppCompatActivity
   /*
    * Buttons logic
    */
-
   private void handleDownloadRegion() {
     Timber.d("handleDownloadRegion");
 
@@ -234,7 +232,6 @@ public class OfflineActivity extends AppCompatActivity
   /*
    * Dialogs
    */
-
   @Override
   public void onDownloadRegionDialogPositiveClick(final String regionName) {
     if (TextUtils.isEmpty(regionName)) {
@@ -318,7 +315,6 @@ public class OfflineActivity extends AppCompatActivity
   /*
    * Progress bar
    */
-
   private void startProgress() {
     // Disable buttons
     downloadRegion.setEnabled(false);
@@ -353,5 +349,4 @@ public class OfflineActivity extends AppCompatActivity
     // Show a toast
     Toast.makeText(OfflineActivity.this, message, Toast.LENGTH_LONG).show();
   }
-
 }

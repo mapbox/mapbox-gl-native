@@ -3,7 +3,6 @@
     <declare-styleable name="mapbox_MapView">
 
         <!--Configuration-->
-        <attr name="mapbox_accessToken" format="string" />
         <attr name="mapbox_styleUrl" format="string" />
         <attr name="mapbox_apiBaseUrl" format="string" />
 

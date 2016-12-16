@@ -3,7 +3,7 @@ package com.mapbox.mapboxsdk.testapp;
 import android.app.Application;
 import android.os.StrictMode;
 
-import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.squareup.leakcanary.LeakCanary;
 
 import timber.log.Timber;
@@ -37,7 +37,7 @@ public class MapboxApplication extends Application {
       .penaltyDeath()
       .build());
 
-    MapboxAccountManager.start(getApplicationContext(), getString(R.string.mapbox_access_token));
+    Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token));
   }
 
   private void initializeLogger() {

@@ -16,11 +16,10 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
-import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
@@ -73,8 +72,9 @@ public final class MapboxMap {
 
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
-  MapboxMap(NativeMapView map, Transform transform, UiSettings ui, TrackingSettings tracking, MyLocationViewSettings myLocationView,
-            Projection projection, OnRegisterTouchListener listener, AnnotationManager annotations) {
+  MapboxMap(NativeMapView map, Transform transform, UiSettings ui, TrackingSettings tracking,
+            MyLocationViewSettings myLocationView, Projection projection, OnRegisterTouchListener listener,
+            AnnotationManager annotations) {
     this.nativeMapView = map;
     this.uiSettings = ui;
     this.trackingSettings = tracking;
@@ -94,7 +94,6 @@ public final class MapboxMap {
     // Map configuration
     setDebugActive(options.getDebugActive());
     setApiBaseUrl(options);
-    setAccessToken(options);
     setStyleUrl(options);
   }
 
@@ -186,8 +185,8 @@ public final class MapboxMap {
     try {
       //noinspection unchecked
       return (T) nativeMapView.getLayer(layerId);
-    } catch (ClassCastException e) {
-      Timber.e(String.format("Layer: %s is a different type: %s", layerId, e.getMessage()));
+    } catch (ClassCastException exception) {
+      Timber.e(String.format("Layer: %s is a different type: %s", layerId, exception));
       return null;
     }
   }
@@ -217,7 +216,7 @@ public final class MapboxMap {
    * Removes the layer. Any references to the layer become invalid and should not be used anymore
    *
    * @param layerId the layer to remove
-   * @throws NoSuchLayerException
+   * @throws NoSuchLayerException the exception thrown when layer with layerId doesn't exist
    */
   @UiThread
   public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
@@ -228,7 +227,7 @@ public final class MapboxMap {
    * Removes the layer. The reference is re-usable after this and can be re-added
    *
    * @param layer the layer to remove
-   * @throws NoSuchLayerException
+   * @throws NoSuchLayerException the exeption thrown when the layer doesn't exist
    */
   @UiThread
   public void removeLayer(@NonNull Layer layer) throws NoSuchLayerException {
@@ -254,8 +253,8 @@ public final class MapboxMap {
     try {
       //noinspection unchecked
       return (T) nativeMapView.getSource(sourceId);
-    } catch (ClassCastException e) {
-      Timber.e(String.format("Source: %s is a different type: %s", sourceId, e.getMessage()));
+    } catch (ClassCastException exception) {
+      Timber.e(String.format("Source: %s is a different type: %s", sourceId, exception));
       return null;
     }
   }
@@ -274,7 +273,7 @@ public final class MapboxMap {
    * Removes the source. Any references to the source become invalid and should not be used anymore
    *
    * @param sourceId the source to remove
-   * @throws NoSuchSourceException
+   * @throws NoSuchSourceException the exception thrown when the source with sourceId doesn't exist
    */
   @UiThread
   public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
@@ -285,7 +284,7 @@ public final class MapboxMap {
    * Removes the source, preserving the reverence for re-use
    *
    * @param source the source to remove
-   * @throws NoSuchSourceException
+   * @throws NoSuchSourceException the exception thrown when the source with sourceId doesn't exist
    */
   @UiThread
   public void removeSource(@NonNull Source source) throws NoSuchSourceException {
@@ -354,7 +353,8 @@ public final class MapboxMap {
    * @param maxZoom The new maximum zoom level.
    */
   @UiThread
-  public void setMaxZoomPreference(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
+  public void setMaxZoomPreference(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
+    to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
     transform.setMaxZoom(maxZoom);
   }
 
@@ -610,7 +610,8 @@ public final class MapboxMap {
    *                           Do not update or ease the camera from within onCancel().
    */
   @UiThread
-  public final void easeCamera(final CameraUpdate update, final int durationMs, final boolean easingInterpolator, final boolean resetTrackingMode, final MapboxMap.CancelableCallback callback) {
+  public final void easeCamera(final CameraUpdate update, final int durationMs, final boolean easingInterpolator,
+                               final boolean resetTrackingMode, final MapboxMap.CancelableCallback callback) {
     new Handler().post(new Runnable() {
       @Override
       public void run() {
@@ -685,7 +686,8 @@ public final class MapboxMap {
    * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
    */
   @UiThread
-  public final void animateCamera(final CameraUpdate update, final int durationMs, final MapboxMap.CancelableCallback callback) {
+  public final void animateCamera(final CameraUpdate update, final int durationMs,
+                                  final MapboxMap.CancelableCallback callback) {
     new Handler().post(new Runnable() {
       @Override
       public void run() {
@@ -835,6 +837,11 @@ public final class MapboxMap {
   private void setStyleUrl(@NonNull MapboxMapOptions options) {
     String style = options.getStyle();
     if (!TextUtils.isEmpty(style)) {
+      // stopgap for https://github.com/mapbox/mapbox-gl-native/issues/6242
+      if (TextUtils.isEmpty(nativeMapView.getAccessToken())) {
+        Mapbox.validateAccessToken();
+        nativeMapView.setAccessToken(Mapbox.getAccessToken());
+      }
       setStyleUrl(style);
     }
   }
@@ -851,55 +858,6 @@ public final class MapboxMap {
   @NonNull
   public String getStyleUrl() {
     return nativeMapView.getStyleUrl();
-  }
-
-  //
-  // Access token
-  //
-
-  /**
-   * <p>
-   * DEPRECATED @see MapboxAccountManager#start(String)
-   * </p>
-   * <p>
-   * Sets the current Mapbox access token used to load map styles and tiles.
-   * </p>
-   *
-   * @param accessToken Your public Mapbox access token.
-   * @see MapView#setAccessToken(String)
-   * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.MapboxAccountManager#start(Context, String)}
-   */
-  @Deprecated
-  @UiThread
-  public void setAccessToken(@NonNull String accessToken) {
-    nativeMapView.setAccessToken(accessToken);
-  }
-
-  /**
-   * <p>
-   * DEPRECATED @see MapboxAccountManager#getAccessToken()
-   * </p>
-   * <p>
-   * Returns the current Mapbox access token used to load map styles and tiles.
-   * </p>
-   *
-   * @return The current Mapbox access token.
-   * @deprecated As of release 4.1.0, replaced by {@link MapboxAccountManager#getAccessToken()}
-   */
-  @Deprecated
-  @UiThread
-  @Nullable
-  public String getAccessToken() {
-    return nativeMapView.getAccessToken();
-  }
-
-  private void setAccessToken(@NonNull MapboxMapOptions options) {
-    String accessToken = options.getAccessToken();
-    if (!TextUtils.isEmpty(accessToken)) {
-      nativeMapView.setAccessToken(accessToken);
-    } else {
-      nativeMapView.setAccessToken(MapboxAccountManager.getInstance().getAccessToken());
-    }
   }
 
   //
@@ -968,15 +926,13 @@ public final class MapboxMap {
    */
   @UiThread
   @NonNull
-  public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions, final MarkerViewManager.OnMarkerViewAddedListener onMarkerViewAddedListener) {
+  public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions,
+                              final MarkerViewManager.OnMarkerViewAddedListener onMarkerViewAddedListener) {
     return annotationManager.addMarker(markerOptions, this, onMarkerViewAddedListener);
   }
 
   /**
    * FIXME javadoc
-   *
-   * @param markerViewOptions
-   * @return
    */
   @UiThread
   @NonNull
@@ -987,9 +943,6 @@ public final class MapboxMap {
 
   /**
    * FIXME javadoc
-   *
-   * @param rect
-   * @return
    */
   @UiThread
   @NonNull
@@ -1540,8 +1493,7 @@ public final class MapboxMap {
    * location and bearing.
    * </p>
    * In order to use the my-location layer feature you need to request permission for either
-   * {@link android.Manifest.permission#ACCESS_COARSE_LOCATION}
-   * or @link android.Manifest.permission#ACCESS_FINE_LOCATION.
+   * android.Manifest.permission#ACCESS_COARSE_LOCATION or android.Manifest.permission#ACCESS_FINE_LOCATION.
    *
    * @param enabled True to enable; false to disable.
    */
@@ -1581,7 +1533,8 @@ public final class MapboxMap {
    *                 To unset the callback, use null.
    */
   @UiThread
-  public void setOnMyLocationTrackingModeChangeListener(@Nullable MapboxMap.OnMyLocationTrackingModeChangeListener listener) {
+  public void setOnMyLocationTrackingModeChangeListener(
+    @Nullable MapboxMap.OnMyLocationTrackingModeChangeListener listener) {
     trackingSettings.setOnMyLocationTrackingModeChangeListener(listener);
   }
 
@@ -1867,7 +1820,8 @@ public final class MapboxMap {
      * </p>
      * <p>
      * Returning true indicates you want to the view reuse to be handled automatically.
-     * Returning false indicates you want to perform an animation and you are required calling {@link #releaseView(View)} yourself.
+     * Returning false indicates you want to perform an animation and you are required calling
+     * {@link #releaseView(View)} yourself.
      * </p>
      *
      * @param marker      the model representing the MarkerView

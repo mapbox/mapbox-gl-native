@@ -6,10 +6,8 @@ import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.text.TextUtils;
 
-import timber.log.Timber;
-
 import com.mapbox.mapboxsdk.BuildConfig;
-import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
 import java.io.IOException;
@@ -29,6 +27,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.internal.Util;
+import timber.log.Timber;
 
 class HTTPRequest implements Callback {
 
@@ -58,7 +57,7 @@ class HTTPRequest implements Callback {
 
     try {
       // Don't try a request if we aren't connected
-      if (!MapboxAccountManager.getInstance().isConnected()) {
+      if (!Mapbox.isConnected()) {
         throw new NoRouteToHostException("No Internet connection available.");
       }
 
@@ -196,7 +195,7 @@ class HTTPRequest implements Callback {
 
   private String getApplicationIdentifier() {
     try {
-      Context context = MapboxAccountManager.getInstance().getApplicationContext();
+      Context context = Mapbox.getApplicationContext();
       PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
       return String.format("%s/%s (%s)", context.getPackageName(), packageInfo.versionName, packageInfo.versionCode);
     } catch (Exception exception) {

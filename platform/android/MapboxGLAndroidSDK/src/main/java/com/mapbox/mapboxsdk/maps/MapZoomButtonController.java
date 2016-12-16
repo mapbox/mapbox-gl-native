@@ -25,7 +25,7 @@ final class MapZoomButtonController extends ZoomButtonsController {
 
   @Override
   public void setVisible(boolean visible) {
-    if(uiSettings.isZoomControlsEnabled()) {
+    if (uiSettings.isZoomControlsEnabled()) {
       super.setVisible(visible);
     }
   }
