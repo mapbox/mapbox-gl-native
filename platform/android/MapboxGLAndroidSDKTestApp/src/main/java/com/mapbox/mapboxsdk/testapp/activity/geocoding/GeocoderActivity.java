@@ -6,7 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
 import timber.log.Timber;
+
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -37,167 +39,167 @@ import retrofit2.Response;
 
 public class GeocoderActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private MapboxMap mapboxMap;
-    private MapView mapView;
-    private ImageView dropPinView;
-    private TextView textView;
+  private MapboxMap mapboxMap;
+  private MapView mapView;
+  private ImageView dropPinView;
+  private TextView textView;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_geocoder);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_geocoder);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
+    ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setDisplayShowHomeEnabled(true);
+    }
+
+    textView = (TextView) findViewById(R.id.message);
+    setMessage(getString(R.string.geocoder_instructions));
+
+    mapView = (MapView) findViewById(R.id.mapView);
+    mapView.setStyleUrl(Style.MAPBOX_STREETS);
+    mapView.onCreate(savedInstanceState);
+
+    dropPinView = new ImageView(this);
+    dropPinView.setImageResource(R.drawable.ic_droppin_24dp);
+    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+    dropPinView.setLayoutParams(params);
+    mapView.addView(dropPinView);
+    mapView.getMapAsync(this);
+  }
+
+  @Override
+  public void onMapReady(MapboxMap map) {
+    mapboxMap = map;
+    final Projection projection = mapboxMap.getProjection();
+    final int width = mapView.getMeasuredWidth();
+    final int height = mapView.getMeasuredHeight();
+
+    // Click listener
+    mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
+      @Override
+      public void onMapClick(@NonNull LatLng point) {
+        PointF centerPoint = new PointF(width / 2, (height + dropPinView.getHeight()) / 2);
+        LatLng centerLatLng = new LatLng(projection.fromScreenLocation(centerPoint));
+
+        setMessage("Geocoding...");
+
+        mapboxMap.removeAnnotations();
+        mapboxMap.addMarker(new MarkerOptions().position(centerLatLng));
+
+        geocode(centerLatLng);
+      }
+    });
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+    mapView.onStart();
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mapView.onResume();
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mapView.onPause();
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    mapView.onStop();
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    mapView.onDestroy();
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
+
+  /*
+   * Forward geocoding
+   */
+
+  private void geocode(final LatLng point) {
+
+    try {
+      MapboxGeocoding client = new MapboxGeocoding.Builder()
+        .setAccessToken(getString(R.string.mapbox_access_token))
+        .setCoordinates(Position.fromCoordinates(point.getLongitude(), point.getLatitude()))
+        .setGeocodingType(GeocodingCriteria.TYPE_POI)
+        .build();
+
+      client.enqueueCall(new Callback<GeocodingResponse>() {
+        @Override
+        public void onResponse(Call<GeocodingResponse> call, Response<GeocodingResponse> response) {
+
+          List<CarmenFeature> results = response.body().getFeatures();
+          if (results.size() > 0) {
+            String placeName = results.get(0).getPlaceName();
+            setSuccess(placeName);
+          } else {
+            setMessage("No results.");
+          }
+
         }
 
-        textView = (TextView) findViewById(R.id.message);
-        setMessage(getString(R.string.geocoder_instructions));
-
-        mapView = (MapView) findViewById(R.id.mapView);
-        mapView.setStyleUrl(Style.MAPBOX_STREETS);
-        mapView.onCreate(savedInstanceState);
-
-        dropPinView = new ImageView(this);
-        dropPinView.setImageResource(R.drawable.ic_droppin_24dp);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
-        dropPinView.setLayoutParams(params);
-        mapView.addView(dropPinView);
-        mapView.getMapAsync(this);
-    }
-
-    @Override
-    public void onMapReady(MapboxMap map) {
-        mapboxMap = map;
-        final Projection projection = mapboxMap.getProjection();
-        final int width = mapView.getMeasuredWidth();
-        final int height = mapView.getMeasuredHeight();
-
-        // Click listener
-        mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(@NonNull LatLng point) {
-                PointF centerPoint = new PointF(width / 2, (height + dropPinView.getHeight()) / 2);
-                LatLng centerLatLng = new LatLng(projection.fromScreenLocation(centerPoint));
-
-                setMessage("Geocoding...");
-
-                mapboxMap.removeAnnotations();
-                mapboxMap.addMarker(new MarkerOptions().position(centerLatLng));
-
-                geocode(centerLatLng);
-            }
-        });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
-    }
-
-    /*
-     * Forward geocoding
-     */
-
-    private void geocode(final LatLng point) {
-
-        try {
-            MapboxGeocoding client = new MapboxGeocoding.Builder()
-                    .setAccessToken(getString(R.string.mapbox_access_token))
-                    .setCoordinates(Position.fromCoordinates(point.getLongitude(), point.getLatitude()))
-                    .setGeocodingType(GeocodingCriteria.TYPE_POI)
-                    .build();
-
-            client.enqueueCall(new Callback<GeocodingResponse>() {
-                @Override
-                public void onResponse(Call<GeocodingResponse> call, Response<GeocodingResponse> response) {
-
-                    List<CarmenFeature> results = response.body().getFeatures();
-                    if (results.size() > 0) {
-                        String placeName = results.get(0).getPlaceName();
-                        setSuccess(placeName);
-                    } else {
-                        setMessage("No results.");
-                    }
-
-                }
-
-                @Override
-                public void onFailure(Call<GeocodingResponse> call, Throwable throwable) {
-                    setError(throwable.getMessage());
-                }
-            });
-        } catch (ServicesException servicesException) {
-            Timber.e("Error geocoding: " + servicesException.toString());
-            servicesException.printStackTrace();
-            setError(servicesException.getMessage());
+        @Override
+        public void onFailure(Call<GeocodingResponse> call, Throwable throwable) {
+          setError(throwable.getMessage());
         }
+      });
+    } catch (ServicesException servicesException) {
+      Timber.e("Error geocoding: " + servicesException.toString());
+      servicesException.printStackTrace();
+      setError(servicesException.getMessage());
     }
+  }
 
-    /*
-     * Update text view
-     */
+  /*
+   * Update text view
+   */
 
-    private void setMessage(String message) {
-        Timber.d("Message: " + message);
-        textView.setText(message);
+  private void setMessage(String message) {
+    Timber.d("Message: " + message);
+    textView.setText(message);
+  }
+
+  private void setSuccess(String placeName) {
+    Timber.d("Place name: " + placeName);
+    textView.setText(placeName);
+  }
+
+  private void setError(String message) {
+    Timber.e("Error: " + message);
+    textView.setText("Error: " + message);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        onBackPressed();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
     }
-
-    private void setSuccess(String placeName) {
-        Timber.d("Place name: " + placeName);
-        textView.setText(placeName);
-    }
-
-    private void setError(String message) {
-        Timber.e("Error: " + message);
-        textView.setText("Error: " + message);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+  }
 }

@@ -22,84 +22,85 @@ import static org.mockito.Mockito.when;
 
 public class MyLocationViewSettingsTest {
 
-    @InjectMocks
-    Projection projection = mock(Projection.class);
+  @InjectMocks
+  Projection projection = mock(Projection.class);
 
-    @InjectMocks
-    MyLocationView myLocationView = mock(MyLocationView.class);
+  @InjectMocks
+  MyLocationView myLocationView = mock(MyLocationView.class);
 
-    @InjectMocks
-    TrackingSettings trackingSettings = mock(TrackingSettings.class);
+  @InjectMocks
+  TrackingSettings trackingSettings = mock(TrackingSettings.class);
 
-    @InjectMocks
-    FocalPointChangeListener focalPointChangeListener = mock(FocalPointChangeListener.class);
+  @InjectMocks
+  FocalPointChangeListener focalPointChangeListener = mock(FocalPointChangeListener.class);
 
-    private MyLocationViewSettings locationViewSettings;
+  private MyLocationViewSettings locationViewSettings;
 
-    @Before
-    public void beforeTest() {
-        locationViewSettings = new MyLocationViewSettings(myLocationView, projection, focalPointChangeListener);
-    }
+  @Before
+  public void beforeTest() {
+    locationViewSettings = new MyLocationViewSettings(myLocationView, projection, focalPointChangeListener);
+  }
 
-    @Test
-    public void testSanity() {
-        assertNotNull("should not be null", locationViewSettings);
-    }
+  @Test
+  public void testSanity() {
+    assertNotNull("should not be null", locationViewSettings);
+  }
 
-    @Test
-    public void testForegroundDrawables() {
-        Drawable foregroundDrawable = mock(Drawable.class);
-        Drawable foregroundBearingDrawable = mock(Drawable.class);
-        Drawable.ConstantState constantState = mock(Drawable.ConstantState.class);
-        when(foregroundDrawable.getConstantState()).thenReturn(constantState);
-        when(constantState.newDrawable()).thenReturn(foregroundDrawable);
-        locationViewSettings.setForegroundDrawable(foregroundDrawable, foregroundBearingDrawable);
-        assertEquals("foreground should match", foregroundDrawable, locationViewSettings.getForegroundDrawable());
-        assertEquals("foreground bearing should match", foregroundBearingDrawable, locationViewSettings.getForegroundBearingDrawable());
-    }
+  @Test
+  public void testForegroundDrawables() {
+    Drawable foregroundDrawable = mock(Drawable.class);
+    Drawable foregroundBearingDrawable = mock(Drawable.class);
+    Drawable.ConstantState constantState = mock(Drawable.ConstantState.class);
+    when(foregroundDrawable.getConstantState()).thenReturn(constantState);
+    when(constantState.newDrawable()).thenReturn(foregroundDrawable);
+    locationViewSettings.setForegroundDrawable(foregroundDrawable, foregroundBearingDrawable);
+    assertEquals("foreground should match", foregroundDrawable, locationViewSettings.getForegroundDrawable());
+    assertEquals("foreground bearing should match", foregroundBearingDrawable,
+      locationViewSettings.getForegroundBearingDrawable());
+  }
 
-    @Test
-    public void testBackgroundDrawable() {
-        Drawable backgroundDrawable = mock(Drawable.class);
-        int[] offset = new int[]{1, 2, 3, 4};
-        locationViewSettings.setBackgroundDrawable(backgroundDrawable, offset);
-        assertEquals("foreground should match", backgroundDrawable, locationViewSettings.getBackgroundDrawable());
-        assertTrue("offsets should match", Arrays.equals(offset, locationViewSettings.getBackgroundOffset()));
-    }
+  @Test
+  public void testBackgroundDrawable() {
+    Drawable backgroundDrawable = mock(Drawable.class);
+    int[] offset = new int[] {1, 2, 3, 4};
+    locationViewSettings.setBackgroundDrawable(backgroundDrawable, offset);
+    assertEquals("foreground should match", backgroundDrawable, locationViewSettings.getBackgroundDrawable());
+    assertTrue("offsets should match", Arrays.equals(offset, locationViewSettings.getBackgroundOffset()));
+  }
 
-    @Test
-    public void testForegroundTint() {
-        int color = Color.RED;
-        locationViewSettings.setForegroundTintColor(Color.RED);
-        assertEquals("color should match", color, locationViewSettings.getForegroundTintColor());
-    }
+  @Test
+  public void testForegroundTint() {
+    int color = Color.RED;
+    locationViewSettings.setForegroundTintColor(Color.RED);
+    assertEquals("color should match", color, locationViewSettings.getForegroundTintColor());
+  }
 
-    @Test
-    public void testForegroundTransparentTint() {
-        int color = Color.TRANSPARENT;
-        locationViewSettings.setForegroundTintColor(Color.TRANSPARENT);
-        assertEquals("color should match", color, locationViewSettings.getForegroundTintColor());
-    }
+  @Test
+  public void testForegroundTransparentTint() {
+    int color = Color.TRANSPARENT;
+    locationViewSettings.setForegroundTintColor(Color.TRANSPARENT);
+    assertEquals("color should match", color, locationViewSettings.getForegroundTintColor());
+  }
 
-    @Test
-    public void testBackgroundTint() {
-        int color = Color.RED;
-        locationViewSettings.setBackgroundTintColor(Color.RED);
-        assertEquals("color should match", color, locationViewSettings.getBackgroundTintColor());
-    }
+  @Test
+  public void testBackgroundTint() {
+    int color = Color.RED;
+    locationViewSettings.setBackgroundTintColor(Color.RED);
+    assertEquals("color should match", color, locationViewSettings.getBackgroundTintColor());
+  }
 
-    @Test
-    public void testBackgroundTransparentTint() {
-        int color = Color.TRANSPARENT;
-        locationViewSettings.setBackgroundTintColor(Color.TRANSPARENT);
-        assertEquals("color should match", color, locationViewSettings.getBackgroundTintColor());
-    }
+  @Test
+  public void testBackgroundTransparentTint() {
+    int color = Color.TRANSPARENT;
+    locationViewSettings.setBackgroundTintColor(Color.TRANSPARENT);
+    assertEquals("color should match", color, locationViewSettings.getBackgroundTintColor());
+  }
 
-    @Test
-    public void testEnabled() {
-        assertFalse("initial state should be false", locationViewSettings.isEnabled());
-        locationViewSettings.setEnabled(true);
-        assertTrue("state should be true", locationViewSettings.isEnabled());
-    }
+  @Test
+  public void testEnabled() {
+    assertFalse("initial state should be false", locationViewSettings.isEnabled());
+    locationViewSettings.setEnabled(true);
+    assertTrue("state should be true", locationViewSettings.isEnabled());
+  }
 }
 

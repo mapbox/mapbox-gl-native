@@ -20,194 +20,194 @@ import timber.log.Timber;
 
 public class CameraAnimationTypeActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private static final LatLng LAT_LNG_LONDON_EYE = new LatLng(51.50325, -0.11968);
-    private static final LatLng LAT_LNG_TOWER_BRIDGE = new LatLng(51.50550, -0.07520);
+  private static final LatLng LAT_LNG_LONDON_EYE = new LatLng(51.50325, -0.11968);
+  private static final LatLng LAT_LNG_TOWER_BRIDGE = new LatLng(51.50550, -0.07520);
 
-    private MapboxMap mapboxMap;
-    private MapView mapView;
-    private boolean cameraState;
+  private MapboxMap mapboxMap;
+  private MapView mapView;
+  private boolean cameraState;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera_animation_types);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_camera_animation_types);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-        }
-
-        mapView = (MapView) findViewById(R.id.mapView);
-        if (mapView != null) {
-            mapView.onCreate(savedInstanceState);
-            mapView.getMapAsync(this);
-        }
+    ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setDisplayShowHomeEnabled(true);
     }
 
-    @Override
-    public void onMapReady(MapboxMap map) {
-        mapboxMap = map;
-        mapboxMap.getUiSettings().setAttributionEnabled(false);
-        mapboxMap.getUiSettings().setLogoEnabled(false);
-        mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
+    mapView = (MapView) findViewById(R.id.mapView);
+    if (mapView != null) {
+      mapView.onCreate(savedInstanceState);
+      mapView.getMapAsync(this);
+    }
+  }
+
+  @Override
+  public void onMapReady(MapboxMap map) {
+    mapboxMap = map;
+    mapboxMap.getUiSettings().setAttributionEnabled(false);
+    mapboxMap.getUiSettings().setLogoEnabled(false);
+    mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
+      @Override
+      public void onCameraChange(CameraPosition position) {
+        Timber.w(position.toString());
+      }
+    });
+
+    // handle move button clicks
+    View moveButton = findViewById(R.id.cameraMoveButton);
+    if (moveButton != null) {
+      moveButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          CameraPosition cameraPosition = new CameraPosition.Builder()
+            .target(getNextLatLng())
+            .zoom(14)
+            .tilt(30)
+            .tilt(0)
+            .build();
+          mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        }
+      });
+    }
+
+    // handle ease button clicks
+    View easeButton = findViewById(R.id.cameraEaseButton);
+    if (easeButton != null) {
+      easeButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          CameraPosition cameraPosition = new CameraPosition.Builder()
+            .target(getNextLatLng())
+            .zoom(15)
+            .bearing(180)
+            .tilt(30)
+            .build();
+
+          MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
             @Override
-            public void onCameraChange(CameraPosition position) {
-                Timber.w(position.toString());
+            public void onCancel() {
+              Timber.i("Duration onCancel Callback called.");
+              Toast.makeText(
+                CameraAnimationTypeActivity.this,
+                "Ease onCancel Callback called.",
+                Toast.LENGTH_LONG).show();
             }
-        });
 
-        // handle move button clicks
-        View moveButton = findViewById(R.id.cameraMoveButton);
-        if (moveButton != null) {
-            moveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(getNextLatLng())
-                            .zoom(14)
-                            .tilt(30)
-                            .tilt(0)
-                            .build();
-                    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                }
-            });
+            @Override
+            public void onFinish() {
+              Timber.i("Duration onFinish Callback called.");
+              Toast.makeText(
+                CameraAnimationTypeActivity.this,
+                "Ease onFinish Callback called.",
+                Toast.LENGTH_LONG).show();
+            }
+          };
+
+          mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 7500, callback);
         }
+      });
+    }
 
-        // handle ease button clicks
-        View easeButton = findViewById(R.id.cameraEaseButton);
-        if (easeButton != null) {
-            easeButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(getNextLatLng())
-                            .zoom(15)
-                            .bearing(180)
-                            .tilt(30)
-                            .build();
+    // handle animate button clicks
+    View animateButton = findViewById(R.id.cameraAnimateButton);
+    if (animateButton != null) {
+      animateButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          CameraPosition cameraPosition = new CameraPosition.Builder()
+            .target(getNextLatLng())
+            .bearing(270)
+            .tilt(20)
+            .build();
 
-                    MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
-                        @Override
-                        public void onCancel() {
-                            Timber.i("Duration onCancel Callback called.");
-                            Toast.makeText(
-                                    CameraAnimationTypeActivity.this,
-                                    "Ease onCancel Callback called.",
-                                    Toast.LENGTH_LONG).show();
-                        }
+          MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
+            @Override
+            public void onCancel() {
+              Timber.i("Duration onCancel Callback called.");
+              Toast.makeText(
+                CameraAnimationTypeActivity.this,
+                "Duration onCancel Callback called.",
+                Toast.LENGTH_LONG).show();
+            }
 
-                        @Override
-                        public void onFinish() {
-                            Timber.i("Duration onFinish Callback called.");
-                            Toast.makeText(
-                                    CameraAnimationTypeActivity.this,
-                                    "Ease onFinish Callback called.",
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    };
+            @Override
+            public void onFinish() {
+              Timber.i("Duration onFinish Callback called.");
+              Toast.makeText(
+                CameraAnimationTypeActivity.this,
+                "Duration onFinish Callback called.",
+                Toast.LENGTH_LONG).show();
+            }
+          };
 
-                    mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 7500, callback);
-                }
-            });
+          mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 7500, callback);
         }
-
-        // handle animate button clicks
-        View animateButton = findViewById(R.id.cameraAnimateButton);
-        if (animateButton != null) {
-            animateButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(getNextLatLng())
-                            .bearing(270)
-                            .tilt(20)
-                            .build();
-
-                    MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
-                        @Override
-                        public void onCancel() {
-                            Timber.i("Duration onCancel Callback called.");
-                            Toast.makeText(
-                                    CameraAnimationTypeActivity.this,
-                                    "Duration onCancel Callback called.",
-                                    Toast.LENGTH_LONG).show();
-                        }
-
-                        @Override
-                        public void onFinish() {
-                            Timber.i("Duration onFinish Callback called.");
-                            Toast.makeText(
-                                    CameraAnimationTypeActivity.this,
-                                    "Duration onFinish Callback called.",
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    };
-
-                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 7500, callback);
-                }
-            });
-        }
+      });
     }
+  }
 
-    private LatLng getNextLatLng() {
-        cameraState = !cameraState;
-        return cameraState ? LAT_LNG_TOWER_BRIDGE : LAT_LNG_LONDON_EYE;
-    }
+  private LatLng getNextLatLng() {
+    cameraState = !cameraState;
+    return cameraState ? LAT_LNG_TOWER_BRIDGE : LAT_LNG_LONDON_EYE;
+  }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
+  @Override
+  protected void onStart() {
+    super.onStart();
+    mapView.onStart();
+  }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mapView.onResume();
+  }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mapView.onPause();
+  }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
+  @Override
+  protected void onStop() {
+    super.onStop();
+    mapView.onStop();
+  }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
-    }
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
-    }
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    mapView.onDestroy();
+  }
 
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
+  @Override
+  public void onLowMemory() {
+    super.onLowMemory();
+    mapView.onLowMemory();
+  }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        onBackPressed();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
 }

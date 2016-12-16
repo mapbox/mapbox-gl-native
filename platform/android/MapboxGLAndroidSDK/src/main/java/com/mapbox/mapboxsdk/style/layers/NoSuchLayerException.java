@@ -5,7 +5,7 @@ package com.mapbox.mapboxsdk.style.layers;
  */
 public class NoSuchLayerException extends Exception {
 
-    public NoSuchLayerException(String message) {
-        super(message);
-    }
+  public NoSuchLayerException(String message) {
+    super(message);
+  }
 }

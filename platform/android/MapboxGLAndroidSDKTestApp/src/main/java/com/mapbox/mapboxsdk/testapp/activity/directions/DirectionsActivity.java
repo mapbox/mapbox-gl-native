@@ -6,8 +6,11 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
 import timber.log.Timber;
+
 import android.view.MenuItem;
+
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -35,176 +38,176 @@ import retrofit2.Response;
 
 public class DirectionsActivity extends AppCompatActivity {
 
-    private MapView mapView;
-    private MapboxMap mapboxMap;
+  private MapView mapView;
+  private MapboxMap mapboxMap;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_directions);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_directions);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
+    ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setDisplayShowHomeEnabled(true);
+    }
+
+    mapView = (MapView) findViewById(R.id.mapView);
+    mapView.onCreate(savedInstanceState);
+    mapView.getMapAsync(new OnMapReadyCallback() {
+      @Override
+      public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        DirectionsActivity.this.mapboxMap = mapboxMap;
+        loadRoute();
+      }
+    });
+  }
+
+  private void loadRoute() {
+    // Dupont Circle (Washington, DC)
+    Position origin = Position.fromCoordinates(-77.04341, 38.90962);
+
+    // The White House (Washington, DC)
+    Position destination = Position.fromCoordinates(-77.0365, 38.8977);
+
+    // Set map at centroid
+    LatLng centroid = new LatLng(
+      (origin.getLatitude() + destination.getLatitude()) / 2,
+      (origin.getLongitude() + destination.getLongitude()) / 2);
+
+    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+      .target(centroid)
+      .zoom(14)
+      .build()));
+
+    // Add origin and destination to the map
+    mapboxMap.addMarker(new MarkerOptions()
+      .position(new LatLng(origin.getLatitude(), origin.getLongitude()))
+      .title("Origin")
+      .snippet("Dupont Circle"));
+    mapboxMap.addMarker(new MarkerOptions()
+      .position(new LatLng(destination.getLatitude(), destination.getLongitude()))
+      .title("Destination")
+      .snippet("The White House"));
+
+    // Get route from API
+    getRoute(origin, destination);
+  }
+
+  private void getRoute(Position origin, Position destination) {
+    try {
+      MapboxDirections md = new MapboxDirections.Builder()
+        .setAccessToken(getString(R.string.mapbox_access_token))
+        .setOrigin(origin)
+        .setOverview(DirectionsCriteria.OVERVIEW_FULL)
+        .setDestination(destination)
+        .setProfile(DirectionsCriteria.PROFILE_WALKING)
+        .build();
+
+      md.enqueueCall(new Callback<DirectionsResponse>() {
+
+        @Override
+        public void onFailure(Call<DirectionsResponse> call, Throwable throwable) {
+          Timber.e("Error: " + throwable.getMessage());
         }
 
-        mapView = (MapView) findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                DirectionsActivity.this.mapboxMap = mapboxMap;
-                loadRoute();
-            }
-        });
-    }
+        @Override
+        public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
+          // You can get generic HTTP info about the response
+          Timber.d("Response code: " + response.code());
 
-    private void loadRoute() {
-        // Dupont Circle (Washington, DC)
-        Position origin = Position.fromCoordinates(-77.04341, 38.90962);
+          // Print some info about the route
+          DirectionsRoute currentRoute = response.body().getRoutes().get(0);
+          Timber.d("Distance: " + currentRoute.getDistance());
 
-        // The White House (Washington, DC)
-        Position destination = Position.fromCoordinates(-77.0365, 38.8977);
-
-        // Set map at centroid
-        LatLng centroid = new LatLng(
-                (origin.getLatitude() + destination.getLatitude()) / 2,
-                (origin.getLongitude() + destination.getLongitude()) / 2);
-
-        mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
-                .target(centroid)
-                .zoom(14)
-                .build()));
-
-        // Add origin and destination to the map
-        mapboxMap.addMarker(new MarkerOptions()
-                .position(new LatLng(origin.getLatitude(), origin.getLongitude()))
-                .title("Origin")
-                .snippet("Dupont Circle"));
-        mapboxMap.addMarker(new MarkerOptions()
-                .position(new LatLng(destination.getLatitude(), destination.getLongitude()))
-                .title("Destination")
-                .snippet("The White House"));
-
-        // Get route from API
-        getRoute(origin, destination);
-    }
-
-    private void getRoute(Position origin, Position destination) {
-        try {
-            MapboxDirections md = new MapboxDirections.Builder()
-                    .setAccessToken(getString(R.string.mapbox_access_token))
-                    .setOrigin(origin)
-                    .setOverview(DirectionsCriteria.OVERVIEW_FULL)
-                    .setDestination(destination)
-                    .setProfile(DirectionsCriteria.PROFILE_WALKING)
-                    .build();
-
-            md.enqueueCall(new Callback<DirectionsResponse>() {
-
-                @Override
-                public void onFailure(Call<DirectionsResponse> call, Throwable throwable) {
-                    Timber.e("Error: " + throwable.getMessage());
-                }
-
-                @Override
-                public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
-                    // You can get generic HTTP info about the response
-                    Timber.d("Response code: " + response.code());
-
-                    // Print some info about the route
-                    DirectionsRoute currentRoute = response.body().getRoutes().get(0);
-                    Timber.d("Distance: " + currentRoute.getDistance());
-
-                    // Draw the route on the map
-                    drawRoute(currentRoute);
-                }
-
-            });
-        } catch (ServicesException servicesException) {
-            Timber.e("Error displaying route: " + servicesException.toString());
-            servicesException.printStackTrace();
-        }
-    }
-
-    private void drawRoute(DirectionsRoute route) {
-
-        PolylineOptions builder = new PolylineOptions();
-        builder.color(Color.parseColor("#3887be"));
-        builder.alpha(0.5f);
-        builder.width(5);
-        builder.width(5);
-
-        LineString lineString = LineString.fromPolyline(route.getGeometry(), Constants.OSRM_PRECISION_V5);
-        List<Position> coordinates = lineString.getCoordinates();
-        List<LatLng> points = new ArrayList<>();
-        for (int i = 0; i < coordinates.size(); i++) {
-            points.add(new LatLng(
-              coordinates.get(i).getLatitude(),
-              coordinates.get(i).getLongitude()));
+          // Draw the route on the map
+          drawRoute(currentRoute);
         }
 
-        builder.addAll(points);
+      });
+    } catch (ServicesException servicesException) {
+      Timber.e("Error displaying route: " + servicesException.toString());
+      servicesException.printStackTrace();
+    }
+  }
 
-        // Draw Points on MapView
-        mapboxMap.addPolyline(builder);
+  private void drawRoute(DirectionsRoute route) {
+
+    PolylineOptions builder = new PolylineOptions();
+    builder.color(Color.parseColor("#3887be"));
+    builder.alpha(0.5f);
+    builder.width(5);
+    builder.width(5);
+
+    LineString lineString = LineString.fromPolyline(route.getGeometry(), Constants.OSRM_PRECISION_V5);
+    List<Position> coordinates = lineString.getCoordinates();
+    List<LatLng> points = new ArrayList<>();
+    for (int i = 0; i < coordinates.size(); i++) {
+      points.add(new LatLng(
+        coordinates.get(i).getLatitude(),
+        coordinates.get(i).getLongitude()));
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
+    builder.addAll(points);
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
+    // Draw Points on MapView
+    mapboxMap.addPolyline(builder);
+  }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
+  @Override
+  protected void onStart() {
+    super.onStart();
+    mapView.onStart();
+  }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mapView.onResume();
+  }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
-    }
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mapView.onPause();
+  }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
-    }
+  @Override
+  protected void onStop() {
+    super.onStop();
+    mapView.onStop();
+  }
 
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    mapView.onDestroy();
+  }
+
+  @Override
+  public void onLowMemory() {
+    super.onLowMemory();
+    mapView.onLowMemory();
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        onBackPressed();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
 
 }

@@ -32,111 +32,111 @@ import static org.junit.Assert.assertEquals;
 
 public class MarkerTest {
 
-    @Rule
-    public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
+  @Rule
+  public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
 
-    private OnMapReadyIdlingResource idlingResource;
-    private Marker marker;
+  private OnMapReadyIdlingResource idlingResource;
+  private Marker marker;
 
-    @Before
-    public void registerIdlingResource() {
-        idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-        Espresso.registerIdlingResources(idlingResource);
+  @Before
+  public void registerIdlingResource() {
+    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
+    Espresso.registerIdlingResources(idlingResource);
+  }
+
+  @Test
+  @Ignore
+  public void addMarkerTest() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    assertEquals("Markers should be empty", 0, mapboxMap.getMarkers().size());
+
+    MarkerOptions options = new MarkerOptions();
+    options.setPosition(new LatLng());
+    options.setSnippet(TestConstants.TEXT_MARKER_SNIPPET);
+    options.setTitle(TestConstants.TEXT_MARKER_TITLE);
+
+    onView(withId(R.id.mapView)).perform(new AddMarkerAction(mapboxMap, options));
+    assertEquals("Markers sze should be 1, ", 1, mapboxMap.getMarkers().size());
+    assertEquals("Marker id should be 0", 0, marker.getId());
+    assertEquals("Marker target should match", new LatLng(), marker.getPosition());
+    assertEquals("Marker snippet should match", TestConstants.TEXT_MARKER_SNIPPET, marker.getSnippet());
+    assertEquals("Marker target should match", TestConstants.TEXT_MARKER_TITLE, marker.getTitle());
+    mapboxMap.clear();
+    assertEquals("Markers should be empty", 0, mapboxMap.getMarkers().size());
+  }
+
+  @Test
+  @Ignore
+  public void showInfoWindowTest() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+
+    final MarkerOptions options = new MarkerOptions();
+    options.setPosition(new LatLng());
+    options.setSnippet(TestConstants.TEXT_MARKER_SNIPPET);
+    options.setTitle(TestConstants.TEXT_MARKER_TITLE);
+
+    onView(withId(R.id.mapView)).perform(new AddMarkerAction(mapboxMap, options));
+    onView(withId(R.id.mapView)).perform(new ShowInfoWindowAction(mapboxMap));
+    onView(withText(TestConstants.TEXT_MARKER_TITLE)).check(matches(isDisplayed()));
+    onView(withText(TestConstants.TEXT_MARKER_SNIPPET)).check(matches(isDisplayed()));
+  }
+
+  private class AddMarkerAction implements ViewAction {
+
+    private MapboxMap mapboxMap;
+    private MarkerOptions options;
+
+    AddMarkerAction(MapboxMap map, MarkerOptions markerOptions) {
+      mapboxMap = map;
+      options = markerOptions;
     }
 
-    @Test
-    @Ignore
-    public void addMarkerTest() {
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-        MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
-        assertEquals("Markers should be empty", 0, mapboxMap.getMarkers().size());
-
-        MarkerOptions options = new MarkerOptions();
-        options.setPosition(new LatLng());
-        options.setSnippet(TestConstants.TEXT_MARKER_SNIPPET);
-        options.setTitle(TestConstants.TEXT_MARKER_TITLE);
-
-        onView(withId(R.id.mapView)).perform(new AddMarkerAction(mapboxMap, options));
-        assertEquals("Markers sze should be 1, ", 1, mapboxMap.getMarkers().size());
-        assertEquals("Marker id should be 0", 0, marker.getId());
-        assertEquals("Marker target should match", new LatLng(), marker.getPosition());
-        assertEquals("Marker snippet should match", TestConstants.TEXT_MARKER_SNIPPET, marker.getSnippet());
-        assertEquals("Marker target should match", TestConstants.TEXT_MARKER_TITLE, marker.getTitle());
-        mapboxMap.clear();
-        assertEquals("Markers should be empty", 0, mapboxMap.getMarkers().size());
+    @Override
+    public Matcher<View> getConstraints() {
+      return isDisplayed();
     }
 
-    @Test
-    @Ignore
-    public void showInfoWindowTest(){
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-        MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
-
-        final MarkerOptions options = new MarkerOptions();
-        options.setPosition(new LatLng());
-        options.setSnippet(TestConstants.TEXT_MARKER_SNIPPET);
-        options.setTitle(TestConstants.TEXT_MARKER_TITLE);
-
-        onView(withId(R.id.mapView)).perform(new AddMarkerAction(mapboxMap, options));
-        onView(withId(R.id.mapView)).perform(new ShowInfoWindowAction(mapboxMap));
-        onView(withText(TestConstants.TEXT_MARKER_TITLE)).check(matches(isDisplayed()));
-        onView(withText(TestConstants.TEXT_MARKER_SNIPPET)).check(matches(isDisplayed()));
+    @Override
+    public String getDescription() {
+      return getClass().getSimpleName();
     }
 
-    private class AddMarkerAction implements ViewAction {
+    @Override
+    public void perform(UiController uiController, View view) {
+      marker = mapboxMap.addMarker(options);
+    }
+  }
 
-        private MapboxMap mapboxMap;
-        private MarkerOptions options;
+  private class ShowInfoWindowAction implements ViewAction {
 
-        AddMarkerAction(MapboxMap map, MarkerOptions markerOptions) {
-            mapboxMap = map;
-            options = markerOptions;
-        }
+    private MapboxMap mapboxMap;
 
-        @Override
-        public Matcher<View> getConstraints() {
-            return isDisplayed();
-        }
-
-        @Override
-        public String getDescription() {
-            return getClass().getSimpleName();
-        }
-
-        @Override
-        public void perform(UiController uiController, View view) {
-            marker = mapboxMap.addMarker(options);
-        }
+    ShowInfoWindowAction(MapboxMap map) {
+      mapboxMap = map;
     }
 
-    private class ShowInfoWindowAction implements ViewAction {
-
-        private MapboxMap mapboxMap;
-
-        ShowInfoWindowAction(MapboxMap map) {
-            mapboxMap = map;
-        }
-
-        @Override
-        public Matcher<View> getConstraints() {
-            return isDisplayed();
-        }
-
-        @Override
-        public String getDescription() {
-            return getClass().getSimpleName();
-        }
-
-        @Override
-        public void perform(UiController uiController, View view) {
-            mapboxMap.selectMarker(marker);
-
-        }
+    @Override
+    public Matcher<View> getConstraints() {
+      return isDisplayed();
     }
 
-
-    @After
-    public void unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(idlingResource);
+    @Override
+    public String getDescription() {
+      return getClass().getSimpleName();
     }
+
+    @Override
+    public void perform(UiController uiController, View view) {
+      mapboxMap.selectMarker(marker);
+
+    }
+  }
+
+
+  @After
+  public void unregisterIdlingResource() {
+    Espresso.unregisterIdlingResources(idlingResource);
+  }
 }

@@ -8,7 +8,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
 import timber.log.Timber;
+
 import android.view.MenuItem;
 import android.view.View;
 
@@ -32,126 +34,133 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
  * Example to add a sprite image and use it in a Symbol Layer
  */
 public class CustomSpriteActivity extends AppCompatActivity {
-    private static final String CUSTOM_ICON = "custom-icon";
+  private static final String CUSTOM_ICON = "custom-icon";
 
-    private MapboxMap mapboxMap;
-    private MapView mapView;
-    private Layer layer;
-    private GeoJsonSource source;
+  private MapboxMap mapboxMap;
+  private MapView mapView;
+  private Layer layer;
+  private GeoJsonSource source;
 
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_sprite);
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_add_sprite);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-        }
+    ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setDisplayShowHomeEnabled(true);
+    }
 
-        mapView = (MapView) findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(@NonNull final MapboxMap map) {
-                mapboxMap = map;
-                final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-                fab.setColorFilter(ContextCompat.getColor(CustomSpriteActivity.this, R.color.primary));
-                fab.setOnClickListener(new View.OnClickListener() {
-                    private Point point;
+    mapView = (MapView) findViewById(R.id.mapView);
+    mapView.onCreate(savedInstanceState);
+    mapView.getMapAsync(new OnMapReadyCallback() {
+      @Override
+      public void onMapReady(@NonNull final MapboxMap map) {
+        mapboxMap = map;
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setColorFilter(ContextCompat.getColor(CustomSpriteActivity.this, R.color.primary));
+        fab.setOnClickListener(new View.OnClickListener() {
+          private Point point;
 
-                    @Override
-                    public void onClick(View view) {
-                        if (point == null) {
-                            Timber.i("First click -> Car");
-                            // Add an icon to reference later
-                            mapboxMap.addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_car_top));
+          @Override
+          public void onClick(View view) {
+            if (point == null) {
+              Timber.i("First click -> Car");
+              // Add an icon to reference later
+              mapboxMap.addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_car_top));
 
-                            //Add a source with a geojson point
-                            point = Point.fromCoordinates(Position.fromCoordinates(13.400972d, 52.519003d));
-                            source = new GeoJsonSource("point", FeatureCollection.fromFeatures(new Feature[]{Feature.fromGeometry(point)}));
-                            mapboxMap.addSource(source);
+              //Add a source with a geojson point
+              point = Point.fromCoordinates(Position.fromCoordinates(13.400972d, 52.519003d));
+              source = new GeoJsonSource(
+                "point",
+                FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(point)})
+              );
+              mapboxMap.addSource(source);
 
-                            //Add a symbol layer that references that point source
-                            layer = new SymbolLayer("layer", "point");
-                            layer.setProperties(
-                                    //Set the id of the sprite to use
-                                    iconImage(CUSTOM_ICON)
-                            );
+              //Add a symbol layer that references that point source
+              layer = new SymbolLayer("layer", "point");
+              layer.setProperties(
+                //Set the id of the sprite to use
+                iconImage(CUSTOM_ICON)
+              );
 
-                            // lets add a circle below labels!
-                            mapboxMap.addLayer(layer, "waterway-label");
+              // lets add a circle below labels!
+              mapboxMap.addLayer(layer, "waterway-label");
 
-                            fab.setImageResource(R.drawable.ic_directions_car_black_24dp);
-                        } else {
-                            //Update point
-                            point = Point.fromCoordinates(Position.fromCoordinates(point.getCoordinates().getLongitude() + 0.001, point.getCoordinates().getLatitude() + 0.001));
-                            source.setGeoJson(FeatureCollection.fromFeatures(new Feature[]{Feature.fromGeometry(point)}));
+              fab.setImageResource(R.drawable.ic_directions_car_black_24dp);
+            } else {
+              //Update point
+              point = Point.fromCoordinates(
+                Position.fromCoordinates(point.getCoordinates().getLongitude() + 0.001,
+                  point.getCoordinates().getLatitude() + 0.001)
+              );
+              source.setGeoJson(FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(point)}));
 
-                            //Move the camera as well
-                            mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(point.getCoordinates().getLatitude(), point.getCoordinates().getLongitude())));
-                        }
-                    }
-                });
+              //Move the camera as well
+              mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(
+                point.getCoordinates().getLatitude(), point.getCoordinates().getLongitude())));
             }
+          }
         });
-    }
+      }
+    });
+  }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
+  @Override
+  protected void onStart() {
+    super.onStart();
+    mapView.onStart();
+  }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mapView.onResume();
+  }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mapView.onPause();
+  }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
+  @Override
+  protected void onStop() {
+    super.onStop();
+    mapView.onStop();
+  }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
-    }
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
 
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
+  @Override
+  public void onLowMemory() {
+    super.onLowMemory();
+    mapView.onLowMemory();
+  }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
-    }
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    mapView.onDestroy();
+  }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        onBackPressed();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
 }

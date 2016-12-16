@@ -7,7 +7,6 @@ import android.support.annotation.RawRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import timber.log.Timber;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -29,6 +28,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
 
+import timber.log.Timber;
+
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 
 /**
@@ -36,148 +37,150 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
  */
 public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivity {
 
-    public MapView mapView;
-    private MapboxMap mapboxMap;
+  public MapView mapView;
+  private MapboxMap mapboxMap;
 
-    private Toast toast;
+  private Toast toast;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_query_features_box);
-        setupActionBar();
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_query_features_box);
+    setupActionBar();
 
-        final float density = getResources().getDisplayMetrics().density;
+    final View selectionBox = findViewById(R.id.selection_box);
 
-        final View selectionBox = findViewById(R.id.selection_box);
+    //Initialize map as normal
+    mapView = (MapView) findViewById(R.id.mapView);
+    mapView.onCreate(savedInstanceState);
+    mapView.getMapAsync(new OnMapReadyCallback() {
+      @SuppressWarnings("ConstantConditions")
+      @Override
+      public void onMapReady(final MapboxMap mapboxMap) {
+        QueryRenderedFeaturesBoxSymbolCountActivity.this.mapboxMap = mapboxMap;
 
-        //Initialize map as normal
-        mapView = (MapView) findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @SuppressWarnings("ConstantConditions")
-            @Override
-            public void onMapReady(final MapboxMap mapboxMap) {
-                QueryRenderedFeaturesBoxSymbolCountActivity.this.mapboxMap = mapboxMap;
-
-                //Add a symbol layer (also works with annotations)
-                try {
-                    mapboxMap.addSource(new GeoJsonSource("symbols-source", readRawResource(R.raw.test_points_utrecht)));
-                } catch (IOException e) {
-                    Timber.e("Could not load geojson: " + e.getMessage());
-                    return;
-                }
-                mapboxMap.addImage("test-icon", BitmapFactory.decodeResource(getResources(), R.drawable.mapbox_marker_icon_default));
-                mapboxMap.addLayer(new SymbolLayer("symbols-layer", "symbols-source").withProperties(iconImage("test-icon")));
-
-                selectionBox.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //Query
-                        int top = selectionBox.getTop() - mapView.getTop();
-                        int left = selectionBox.getLeft() - mapView.getLeft();
-                        RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
-                        Timber.i(String.format("Querying box %s", box));
-                        List<Feature> features = mapboxMap.queryRenderedFeatures(box, "symbols-layer");
-
-                        //Show count
-                        if (toast != null) {
-                            toast.cancel();
-                        }
-                        toast = Toast.makeText(
-                                QueryRenderedFeaturesBoxSymbolCountActivity.this,
-                                String.format("%s features in box", features.size()),
-                                Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
-                });
-            }
-        });
-    }
-
-    private String readRawResource(@RawRes int rawResource) throws IOException {
-        InputStream is = getResources().openRawResource(rawResource);
-        Writer writer = new StringWriter();
-        char[] buffer = new char[1024];
+        //Add a symbol layer (also works with annotations)
         try {
-            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-            int n;
-            while ((n = reader.read(buffer)) != -1) {
-                writer.write(buffer, 0, n);
+          mapboxMap.addSource(new GeoJsonSource("symbols-source", readRawResource(R.raw.test_points_utrecht)));
+        } catch (IOException ioException) {
+          Timber.e("Could not load geojson: " + ioException.getMessage());
+          return;
+        }
+        mapboxMap.addImage(
+          "test-icon",
+          BitmapFactory.decodeResource(getResources(),
+            R.drawable.mapbox_marker_icon_default)
+        );
+        mapboxMap.addLayer(new SymbolLayer("symbols-layer", "symbols-source").withProperties(iconImage("test-icon")));
+
+        selectionBox.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View view) {
+            //Query
+            int top = selectionBox.getTop() - mapView.getTop();
+            int left = selectionBox.getLeft() - mapView.getLeft();
+            RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
+            Timber.i(String.format("Querying box %s", box));
+            List<Feature> features = mapboxMap.queryRenderedFeatures(box, "symbols-layer");
+
+            //Show count
+            if (toast != null) {
+              toast.cancel();
             }
-        } finally {
-            is.close();
-        }
+            toast = Toast.makeText(
+              QueryRenderedFeaturesBoxSymbolCountActivity.this,
+              String.format("%s features in box", features.size()),
+              Toast.LENGTH_SHORT);
+            toast.show();
+          }
+        });
+      }
+    });
+  }
 
-        return writer.toString();
+  private String readRawResource(@RawRes int rawResource) throws IOException {
+    InputStream is = getResources().openRawResource(rawResource);
+    Writer writer = new StringWriter();
+    char[] buffer = new char[1024];
+    try {
+      Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+      int numRead;
+      while ((numRead = reader.read(buffer)) != -1) {
+        writer.write(buffer, 0, numRead);
+      }
+    } finally {
+      is.close();
     }
 
-    public MapboxMap getMapboxMap() {
-        return mapboxMap;
-    }
+    return writer.toString();
+  }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
+  public MapboxMap getMapboxMap() {
+    return mapboxMap;
+  }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
+  @Override
+  protected void onStart() {
+    super.onStart();
+    mapView.onStart();
+  }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mapView.onResume();
+  }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mapView.onPause();
+  }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
-    }
+  @Override
+  protected void onStop() {
+    super.onStop();
+    mapView.onStop();
+  }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
-    }
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
 
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    mapView.onDestroy();
+  }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+  @Override
+  public void onLowMemory() {
+    super.onLowMemory();
+    mapView.onLowMemory();
+  }
 
-    private void setupActionBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        final ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-        }
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        onBackPressed();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
+
+  private void setupActionBar() {
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+
+    final ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setDisplayShowHomeEnabled(true);
+    }
+  }
 
 }

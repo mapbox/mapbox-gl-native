@@ -7,83 +7,83 @@ import android.support.annotation.NonNull;
  */
 public abstract class Layer {
 
-    private long nativePtr;
-    private boolean invalidated;
+  private long nativePtr;
+  private boolean invalidated;
 
-    public Layer(long nativePtr) {
-        this.nativePtr = nativePtr;
+  public Layer(long nativePtr) {
+    this.nativePtr = nativePtr;
+  }
+
+  public Layer() {
+  }
+
+  public void setProperties(@NonNull Property<?>... properties) {
+    if (properties.length == 0) {
+      return;
     }
 
-    public Layer() {
+    for (Property<?> property : properties) {
+      Object converted = convertValue(property.value);
+      if (property instanceof PaintProperty) {
+        nativeSetPaintProperty(property.name, converted);
+      } else {
+        nativeSetLayoutProperty(property.name, converted);
+      }
     }
+  }
 
-    public void setProperties(@NonNull Property<?>... properties) {
-        if (properties.length == 0) {
-            return;
-        }
+  public String getId() {
+    return nativeGetId();
+  }
 
-        for (Property<?> property : properties) {
-            Object converted = convertValue(property.value);
-            if (property instanceof PaintProperty) {
-                nativeSetPaintProperty(property.name, converted);
-            } else {
-                nativeSetLayoutProperty(property.name, converted);
-            }
-        }
-    }
+  public PropertyValue<String> getVisibility() {
+    return new PropertyValue<>(nativeGetVisibility());
+  }
 
-    public String getId() {
-        return nativeGetId();
-    }
+  public float getMinZoom() {
+    return nativeGetMinZoom();
+  }
 
-    public PropertyValue<String> getVisibility() {
-        return new PropertyValue<>(nativeGetVisibility());
-    }
+  public float getMaxZoom() {
+    return nativeGetMaxZoom();
+  }
 
-    public float getMinZoom() {
-        return nativeGetMinZoom();
-    }
+  public void setMinZoom(float zoom) {
+    nativeSetMinZoom(zoom);
+  }
 
-    public float getMaxZoom() {
-        return nativeGetMaxZoom();
-    }
+  public void setMaxZoom(float zoom) {
+    nativeSetMaxZoom(zoom);
+  }
 
-    public void setMinZoom(float zoom) {
-        nativeSetMinZoom(zoom);
-    }
+  @Override
+  protected native void finalize() throws Throwable;
 
-    public void setMaxZoom(float zoom) {
-        nativeSetMaxZoom(zoom);
-    }
+  protected native String nativeGetId();
 
-    @Override
-    protected native void finalize() throws Throwable;
+  protected native Object nativeGetVisibility();
 
-    protected native String nativeGetId();
+  protected native void nativeSetLayoutProperty(String name, Object value);
 
-    protected native Object nativeGetVisibility();
+  protected native void nativeSetPaintProperty(String name, Object value);
 
-    protected native void nativeSetLayoutProperty(String name, Object value);
+  protected native void nativeSetFilter(Object[] filter);
 
-    protected native void nativeSetPaintProperty(String name, Object value);
+  protected native void nativeSetSourceLayer(String sourceLayer);
 
-    protected native void nativeSetFilter(Object[] filter);
+  protected native float nativeGetMinZoom();
 
-    protected native void nativeSetSourceLayer(String sourceLayer);
+  protected native float nativeGetMaxZoom();
 
-    protected native float nativeGetMinZoom();
+  protected native void nativeSetMinZoom(float zoom);
 
-    protected native float nativeGetMaxZoom();
+  protected native void nativeSetMaxZoom(float zoom);
 
-    protected native void nativeSetMinZoom(float zoom);
+  public long getNativePtr() {
+    return nativePtr;
+  }
 
-    protected native void nativeSetMaxZoom(float zoom);
-
-    public long getNativePtr() {
-        return nativePtr;
-    }
-
-    private Object convertValue(Object value) {
-        return value != null && value instanceof Function ? ((Function) value).toValueObject() : value;
-    }
+  private Object convertValue(Object value) {
+    return value != null && value instanceof Function ? ((Function) value).toValueObject() : value;
+  }
 }

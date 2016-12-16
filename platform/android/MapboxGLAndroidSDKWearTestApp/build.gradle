@@ -37,3 +37,4 @@ dependencies {
 }
 
 apply from: 'gradle-config.gradle'
+apply from: 'gradle-checkstyle.gradle'

@@ -37,6 +37,14 @@ workflows:
             curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
             sudo apt-get install -y pkg-config nodejs cmake
     - script:
+        title: Run Checkstyle
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - content: |-
+            #!/bin/bash
+            # Run checkstyle gradle task on all modules
+            cd platform/android && ./gradlew checkstyle
+    - script:
         title: Configure Google Cloud SDK
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
