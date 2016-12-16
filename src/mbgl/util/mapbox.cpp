@@ -1,10 +1,12 @@
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/url.hpp>
 
 #include <stdexcept>
 #include <vector>
 #include <iostream>
+#include <cstring>
 
 namespace {
 
@@ -21,188 +23,144 @@ bool isMapboxURL(const std::string& url) {
     return url.compare(0, protocolLength, protocol) == 0;
 }
 
-static std::vector<std::string> getMapboxURLPathname(const std::string& url) {
-    std::vector<std::string> pathname;
-    auto startIndex = protocolLength;
-    auto end = url.find_first_of("?#");
-    if (end == std::string::npos) {
-        end = url.length();
-    }
-    while (startIndex < end) {
-        auto endIndex = url.find("/", startIndex);
-        if (endIndex == std::string::npos) {
-            endIndex = end;
-        }
-        pathname.push_back(url.substr(startIndex, endIndex - startIndex));
-        startIndex = endIndex + 1;
-    }
-    return pathname;
+static bool equals(const std::string& str, const URL::Segment& segment, const char* ref) {
+    return str.compare(segment.first, segment.second, ref) == 0;
 }
 
-static std::pair<std::string, std::size_t> normalizeQuery(const std::string& url) {
-    std::string query;
-
-    auto queryIdx = url.find("?");
-    if (queryIdx != std::string::npos) {
-        query = url.substr(queryIdx + 1, url.length() - queryIdx + 1);
-        if (!query.empty()) {
-            query = "&" + query;
-        }
+std::string normalizeSourceURL(const std::string& baseURL,
+                               const std::string& str,
+                               const std::string& accessToken) {
+    if (!isMapboxURL(str)) {
+        return str;
     }
-
-    return std::make_pair(query, queryIdx);
-}
-
-std::string normalizeSourceURL(const std::string& baseURL, const std::string& url, const std::string& accessToken) {
-    if (!isMapboxURL(url)) {
-        return url;
-    }
-
     if (accessToken.empty()) {
-        throw std::runtime_error("You must provide a Mapbox API access token for Mapbox tile sources");
+        throw std::runtime_error(
+            "You must provide a Mapbox API access token for Mapbox tile sources");
     }
 
-    auto query = normalizeQuery(url);
-    return baseURL + "/v4/" + url.substr(protocolLength, query.second - protocolLength) + ".json?access_token=" + accessToken + "&secure" + query.first;
+    const URL url(str);
+    const auto tpl = baseURL + "/v4/{domain}.json?access_token=" + accessToken + "&secure";
+    return transformURL(tpl, str, url);
 }
 
-std::string normalizeStyleURL(const std::string& baseURL, const std::string& url, const std::string& accessToken) {
-    if (!isMapboxURL(url)) {
-        return url;
+std::string normalizeStyleURL(const std::string& baseURL,
+                              const std::string& str,
+                              const std::string& accessToken) {
+    if (!isMapboxURL(str)) {
+        return str;
     }
 
-    const auto pathname = getMapboxURLPathname(url);
-    if (pathname.size() < 3) {
+    const URL url(str);
+    if (!equals(str, url.domain, "styles")) {
         Log::Error(Event::ParseStyle, "Invalid style URL");
-        return url;
+        return str;
     }
 
-    const auto& user = pathname[1];
-    const auto& id = pathname[2];
-    const bool isDraft = pathname.size() > 3;
-    return baseURL + "/styles/v1/" + user + "/" + id + (isDraft ? "/draft" : "") + "?access_token=" + accessToken + normalizeQuery(url).first;
+    const auto tpl = baseURL + "/styles/v1/{path}?access_token=" + accessToken;
+    return transformURL(tpl, str, url);
 }
 
-std::string normalizeSpriteURL(const std::string& baseURL, const std::string& url, const std::string& accessToken) {
-    if (!isMapboxURL(url)) {
-        return url;
+std::string normalizeSpriteURL(const std::string& baseURL,
+                               const std::string& str,
+                               const std::string& accessToken) {
+    if (!isMapboxURL(str)) {
+        return str;
     }
 
-    const auto pathname = getMapboxURLPathname(url);
-    if (pathname.size() < 3) {
+    const URL url(str);
+    if (!equals(str, url.domain, "sprites")) {
         Log::Error(Event::ParseStyle, "Invalid sprite URL");
-        return url;
+        return str;
     }
 
-    const auto& user = pathname[1];
-    const bool isDraft = pathname.size() > 3;
-
-    const auto& name = isDraft ? pathname[3] : pathname[2];
-    const size_t index = name.find_first_of("@.");
-    if (index == std::string::npos) {
-        Log::Error(Event::ParseStyle, "Invalid sprite URL");
-        return url;
-    }
-    const auto& extension = name.substr(index);
-
-    if (isDraft) {
-        const auto& id = pathname[2];
-        return baseURL + "/styles/v1/" + user + "/" + id + "/draft/sprite" + extension +
-               "?access_token=" + accessToken;
-
-    } else {
-        const auto& id = pathname[2].substr(0, index);
-        return baseURL + "/styles/v1/" + user + "/" + id + "/sprite" + extension + "?access_token=" +
-               accessToken;
-    }
+    const auto tpl =
+        baseURL + "/styles/v1/{directory}{filename}/sprite{extension}?access_token=" + accessToken;
+    return transformURL(tpl, str, url);
 }
 
-std::string normalizeGlyphsURL(const std::string& baseURL, const std::string& url, const std::string& accessToken) {
-    if (!isMapboxURL(url)) {
-        return url;
+std::string normalizeGlyphsURL(const std::string& baseURL,
+                               const std::string& str,
+                               const std::string& accessToken) {
+    if (!isMapboxURL(str)) {
+        return str;
     }
 
-    const auto pathname = getMapboxURLPathname(url);
-    if (pathname.size() < 4) {
-      Log::Error(Event::ParseStyle, "Invalid glyph URL");
-      return url;
+    const URL url(str);
+    if (!equals(str, url.domain, "fonts")) {
+        Log::Error(Event::ParseStyle, "Invalid glyph URL");
+        return str;
     }
 
-    const auto& user = pathname[1];
-    const auto& fontstack = pathname[2];
-    const auto& range = pathname[3];
-
-    return baseURL + "/fonts/v1/" + user + "/" + fontstack + "/" + range + "?access_token=" + accessToken;
+    const auto tpl = baseURL + "/fonts/v1/{path}?access_token=" + accessToken;
+    return transformURL(tpl, str, url);
 }
 
-std::string normalizeTileURL(const std::string& baseURL, const std::string& url, const std::string& accessToken) {
-    if (!isMapboxURL(url)) {
-        return url;
+std::string normalizeTileURL(const std::string& baseURL,
+                             const std::string& str,
+                             const std::string& accessToken) {
+    if (!isMapboxURL(str)) {
+        return str;
     }
 
-    auto query = normalizeQuery(url);
-    return baseURL + "/v4/" + url.substr(sizeof("mapbox://tiles/") - 1, query.second - sizeof("mapbox://tiles/") + 1) + "?access_token=" + accessToken + normalizeQuery(url).first;
+    const URL url(str);
+    if (!equals(str, url.domain, "tiles")) {
+        Log::Error(Event::ParseStyle, "Invalid tile URL");
+        return str;
+    }
+
+    const auto tpl = baseURL + "/v4/{path}?access_token=" + accessToken;
+    return transformURL(tpl, str, url);
 }
 
-std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_t tileSize) {
-    auto tilesetStartIdx = url.find("/v4/");
-    if (tilesetStartIdx == std::string::npos) {
-        return url;
+std::string
+canonicalizeTileURL(const std::string& str, const SourceType type, const uint16_t tileSize) {
+    const char* version = "v4/";
+    const size_t versionLen = strlen(version);
+
+    const URL url(str);
+    const Path path(str, url.path.first, url.path.second);
+
+    // Make sure that we are dealing with a valid Mapbox tile URL.
+    // Has to be /v4/, with a valid filename + extension
+    if (str.compare(url.path.first, versionLen, version) != 0 || path.filename.second == 0 ||
+        path.extension.second <= 1) {
+        // Not a proper Mapbox tile URL.
+        return str;
     }
 
-    tilesetStartIdx += sizeof("/v4/") - 1;
-
-    const auto tilesetEndIdx = url.find("/", tilesetStartIdx);
-    if (tilesetEndIdx == std::string::npos) {
-        return url;
-    }
-
-    auto queryIdx = url.rfind("?");
-    if (queryIdx == std::string::npos) {
-        queryIdx = url.length();
-    }
-
-    auto basenameIdx = url.rfind("/", queryIdx);
-    if (basenameIdx == std::string::npos || basenameIdx == queryIdx - 1) {
-        basenameIdx = url.length();
-    } else {
-        basenameIdx += 1;
-    }
-
-    const auto extensionIdx = url.find(".", basenameIdx);
-    if (extensionIdx == std::string::npos || extensionIdx == queryIdx - 1) {
-        return url;
-    }
-
-    const auto tileset = url.substr(tilesetStartIdx, tilesetEndIdx - tilesetStartIdx);
-    auto extension = url.substr(extensionIdx + 1, queryIdx - extensionIdx - 1);
-
-#if !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
-    // Replace PNG with WebP.
-    if (extension == "png") {
-        extension = "webp";
-    }
-#endif // !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
-
-    std::string result = "mapbox://tiles/" + tileset + "/{z}/{x}/{y}";
-
+    // Reassemble the canonical URL from the parts we've parsed before.
+    std::string result = "mapbox://tiles/";
+    result.append(str, path.directory.first + versionLen, path.directory.second - versionLen);
+    result.append(str, path.filename.first, path.filename.second);
     if (type == SourceType::Raster) {
         result += tileSize == util::tileSize ? "@2x" : "{ratio}";
     }
 
-    result += "." + extension;
+#if !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
+    const bool forceWebP = str.compare(path.extension.first, path.extension.second, ".png") == 0;
+#else
+    const bool forceWebP = false;
+#endif // !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
 
-    // get the query and remove access_token, if more parameters exist, add them to the final result
-    if (queryIdx != url.length()) {
-        auto idx = queryIdx;
+    // Replace PNG with WebP if necessary.
+    if (forceWebP) {
+        result += ".webp";
+    } else {
+        result.append(str, path.extension.first, path.extension.second);
+    }
+
+    // Append the query string, minus the access token parameter.
+    if (url.query.second > 1) {
+        auto idx = url.query.first;
         bool hasQuery = false;
         while (idx != std::string::npos) {
             idx++; // skip & or ?
-            auto ampersandIdx = url.find("&", idx);
-            if (url.substr(idx, 13) != "access_token=") {
-                result += hasQuery ? "&" : "?";
-                result += url.substr(idx, ampersandIdx != std::string::npos ? ampersandIdx - idx
-                                                                            : std::string::npos);
+            auto ampersandIdx = str.find('&', idx);
+            const char* accessToken = "access_token=";
+            if (str.compare(idx, strlen(accessToken), accessToken) != 0) {
+                result.append(1, hasQuery ? '&' : '?');
+                result.append(str, idx, ampersandIdx != std::string::npos ? ampersandIdx - idx
+                                                                          : std::string::npos);
                 hasQuery = true;
             }
             idx = ampersandIdx;
