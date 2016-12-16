@@ -277,6 +277,9 @@ public final class CameraPosition implements Parcelable {
          * @return CameraPosition
          */
         public CameraPosition build() {
+            if (target == null) {
+                throw new NullPointerException("Target can't be null, provide a non-null value through CameraPosition.Builder#target(LatLng)");
+            }
             return new CameraPosition(target, zoom, tilt, bearing);
         }
 
