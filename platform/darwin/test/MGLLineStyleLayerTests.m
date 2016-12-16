@@ -8,6 +8,10 @@
 
 @implementation MGLLineLayerTests
 
++ (NSString *)layerType {
+    return @"line";
+}
+
 - (void)testLineLayer {
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
@@ -80,6 +84,23 @@
     XCTAssertEqualObjects(gLayer.lineTranslate, [MGLRuntimeStylingHelper testOffsetFunction]);
     XCTAssertEqualObjects(gLayer.lineTranslateAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLLineTranslateAnchorViewport type:@encode(MGLLineTranslateAnchor)]);
     XCTAssertEqualObjects(gLayer.lineWidth, [MGLRuntimeStylingHelper testNumberFunction]);
+}
+
+- (void)testPropertyNames {
+    [self testPropertyName:@"line-cap" isBoolean:NO];
+    [self testPropertyName:@"line-join" isBoolean:NO];
+    [self testPropertyName:@"line-miter-limit" isBoolean:NO];
+    [self testPropertyName:@"line-round-limit" isBoolean:NO];
+    [self testPropertyName:@"line-blur" isBoolean:NO];
+    [self testPropertyName:@"line-color" isBoolean:NO];
+    [self testPropertyName:@"line-dash-pattern" isBoolean:NO];
+    [self testPropertyName:@"line-gap-width" isBoolean:NO];
+    [self testPropertyName:@"line-offset" isBoolean:NO];
+    [self testPropertyName:@"line-opacity" isBoolean:NO];
+    [self testPropertyName:@"line-pattern" isBoolean:NO];
+    [self testPropertyName:@"line-translate" isBoolean:NO];
+    [self testPropertyName:@"line-translate-anchor" isBoolean:NO];
+    [self testPropertyName:@"line-width" isBoolean:NO];
 }
 
 @end

@@ -8,6 +8,10 @@
 
 @implementation MGLSymbolLayerTests
 
++ (NSString *)layerType {
+    return @"symbol";
+}
+
 - (void)testSymbolLayer {
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
@@ -223,6 +227,57 @@
     XCTAssertEqualObjects(gLayer.textOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.textTranslate, [MGLRuntimeStylingHelper testOffsetFunction]);
     XCTAssertEqualObjects(gLayer.textTranslateAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLTextTranslateAnchorViewport type:@encode(MGLTextTranslateAnchor)]);
+}
+
+- (void)testPropertyNames {
+    [self testPropertyName:@"icon-allows-overlap" isBoolean:YES];
+    [self testPropertyName:@"icon-ignores-placement" isBoolean:YES];
+    [self testPropertyName:@"icon-image-name" isBoolean:NO];
+    [self testPropertyName:@"icon-offset" isBoolean:NO];
+    [self testPropertyName:@"is-icon-optional" isBoolean:YES];
+    [self testPropertyName:@"icon-padding" isBoolean:NO];
+    [self testPropertyName:@"icon-rotation" isBoolean:NO];
+    [self testPropertyName:@"icon-rotation-alignment" isBoolean:NO];
+    [self testPropertyName:@"icon-scale" isBoolean:NO];
+    [self testPropertyName:@"icon-text-fit" isBoolean:NO];
+    [self testPropertyName:@"icon-text-fit-padding" isBoolean:NO];
+    [self testPropertyName:@"keeps-icon-upright" isBoolean:YES];
+    [self testPropertyName:@"keeps-text-upright" isBoolean:YES];
+    [self testPropertyName:@"maximum-text-angle" isBoolean:NO];
+    [self testPropertyName:@"maximum-text-width" isBoolean:NO];
+    [self testPropertyName:@"symbol-avoids-edges" isBoolean:YES];
+    [self testPropertyName:@"symbol-placement" isBoolean:NO];
+    [self testPropertyName:@"symbol-spacing" isBoolean:NO];
+    [self testPropertyName:@"text-allows-overlap" isBoolean:YES];
+    [self testPropertyName:@"text-anchor" isBoolean:NO];
+    [self testPropertyName:@"text-field" isBoolean:NO];
+    [self testPropertyName:@"text-font" isBoolean:NO];
+    [self testPropertyName:@"text-ignores-placement" isBoolean:YES];
+    [self testPropertyName:@"text-justification" isBoolean:NO];
+    [self testPropertyName:@"text-letter-spacing" isBoolean:NO];
+    [self testPropertyName:@"text-line-height" isBoolean:NO];
+    [self testPropertyName:@"text-offset" isBoolean:NO];
+    [self testPropertyName:@"is-text-optional" isBoolean:YES];
+    [self testPropertyName:@"text-padding" isBoolean:NO];
+    [self testPropertyName:@"text-pitch-alignment" isBoolean:NO];
+    [self testPropertyName:@"text-rotation" isBoolean:NO];
+    [self testPropertyName:@"text-rotation-alignment" isBoolean:NO];
+    [self testPropertyName:@"text-size" isBoolean:NO];
+    [self testPropertyName:@"text-transform" isBoolean:NO];
+    [self testPropertyName:@"icon-color" isBoolean:NO];
+    [self testPropertyName:@"icon-halo-blur" isBoolean:NO];
+    [self testPropertyName:@"icon-halo-color" isBoolean:NO];
+    [self testPropertyName:@"icon-halo-width" isBoolean:NO];
+    [self testPropertyName:@"icon-opacity" isBoolean:NO];
+    [self testPropertyName:@"icon-translate" isBoolean:NO];
+    [self testPropertyName:@"icon-translate-anchor" isBoolean:NO];
+    [self testPropertyName:@"text-color" isBoolean:NO];
+    [self testPropertyName:@"text-halo-blur" isBoolean:NO];
+    [self testPropertyName:@"text-halo-color" isBoolean:NO];
+    [self testPropertyName:@"text-halo-width" isBoolean:NO];
+    [self testPropertyName:@"text-opacity" isBoolean:NO];
+    [self testPropertyName:@"text-translate" isBoolean:NO];
+    [self testPropertyName:@"text-translate-anchor" isBoolean:NO];
 }
 
 @end

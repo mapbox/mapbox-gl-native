@@ -8,6 +8,10 @@
 
 @implementation MGLBackgroundLayerTests
 
++ (NSString *)layerType {
+    return @"background";
+}
+
 - (void)testBackgroundLayer {
     MGLBackgroundStyleLayer *layer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"layerID"];
     [self.mapView.style addLayer:layer];
@@ -29,6 +33,12 @@
     XCTAssertEqualObjects(gLayer.backgroundColor, [MGLRuntimeStylingHelper testColorFunction]);
     XCTAssertEqualObjects(gLayer.backgroundOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.backgroundPattern, [MGLRuntimeStylingHelper testStringFunction]);
+}
+
+- (void)testPropertyNames {
+    [self testPropertyName:@"background-color" isBoolean:NO];
+    [self testPropertyName:@"background-opacity" isBoolean:NO];
+    [self testPropertyName:@"background-pattern" isBoolean:NO];
 }
 
 @end

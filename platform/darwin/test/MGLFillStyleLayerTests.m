@@ -8,6 +8,10 @@
 
 @implementation MGLFillLayerTests
 
++ (NSString *)layerType {
+    return @"fill";
+}
+
 - (void)testFillLayer {
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
@@ -50,6 +54,16 @@
     XCTAssertEqualObjects(gLayer.fillPattern, [MGLRuntimeStylingHelper testStringFunction]);
     XCTAssertEqualObjects(gLayer.fillTranslate, [MGLRuntimeStylingHelper testOffsetFunction]);
     XCTAssertEqualObjects(gLayer.fillTranslateAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLFillTranslateAnchorViewport type:@encode(MGLFillTranslateAnchor)]);
+}
+
+- (void)testPropertyNames {
+    [self testPropertyName:@"is-fill-antialiased" isBoolean:YES];
+    [self testPropertyName:@"fill-color" isBoolean:NO];
+    [self testPropertyName:@"fill-opacity" isBoolean:NO];
+    [self testPropertyName:@"fill-outline-color" isBoolean:NO];
+    [self testPropertyName:@"fill-pattern" isBoolean:NO];
+    [self testPropertyName:@"fill-translate" isBoolean:NO];
+    [self testPropertyName:@"fill-translate-anchor" isBoolean:NO];
 }
 
 @end

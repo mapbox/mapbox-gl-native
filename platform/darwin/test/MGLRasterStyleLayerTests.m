@@ -8,6 +8,10 @@
 
 @implementation MGLRasterLayerTests
 
++ (NSString *)layerType {
+    return @"raster";
+}
+
 - (void)testRasterLayer {
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
@@ -49,6 +53,16 @@
     XCTAssertEqualObjects(gLayer.rasterHueRotation, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.rasterOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.rasterSaturation, [MGLRuntimeStylingHelper testNumberFunction]);
+}
+
+- (void)testPropertyNames {
+    [self testPropertyName:@"maximum-raster-brightness" isBoolean:NO];
+    [self testPropertyName:@"minimum-raster-brightness" isBoolean:NO];
+    [self testPropertyName:@"raster-contrast" isBoolean:NO];
+    [self testPropertyName:@"raster-fade-duration" isBoolean:NO];
+    [self testPropertyName:@"raster-hue-rotation" isBoolean:NO];
+    [self testPropertyName:@"raster-opacity" isBoolean:NO];
+    [self testPropertyName:@"raster-saturation" isBoolean:NO];
 }
 
 @end

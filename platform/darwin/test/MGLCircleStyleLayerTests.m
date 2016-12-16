@@ -8,6 +8,10 @@
 
 @implementation MGLCircleLayerTests
 
++ (NSString *)layerType {
+    return @"circle";
+}
+
 - (void)testCircleLayer {
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
@@ -51,6 +55,16 @@
     XCTAssertEqualObjects(gLayer.circleRadius, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.circleTranslate, [MGLRuntimeStylingHelper testOffsetFunction]);
     XCTAssertEqualObjects(gLayer.circleTranslateAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLCircleTranslateAnchorViewport type:@encode(MGLCircleTranslateAnchor)]);
+}
+
+- (void)testPropertyNames {
+    [self testPropertyName:@"circle-blur" isBoolean:NO];
+    [self testPropertyName:@"circle-color" isBoolean:NO];
+    [self testPropertyName:@"circle-opacity" isBoolean:NO];
+    [self testPropertyName:@"circle-pitch-scale" isBoolean:NO];
+    [self testPropertyName:@"circle-radius" isBoolean:NO];
+    [self testPropertyName:@"circle-translate" isBoolean:NO];
+    [self testPropertyName:@"circle-translate-anchor" isBoolean:NO];
 }
 
 @end
