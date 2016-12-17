@@ -55,9 +55,10 @@
             // We use long long here to avoid any truncation.
             return { (int64_t)number.longLongValue };
         }
+    } else if (value != [NSNull null]) {
+        [NSException raise:@"Value not handled"
+                    format:@"Can’t convert %s:%@ to mbgl::Value", [value objCType], value];
     }
-    [NSException raise:@"Value not handled"
-                format:@"Can’t convert %s:%@ to mbgl::Value", [value objCType], value];
     return { };
 }
 

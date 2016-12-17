@@ -197,4 +197,13 @@
     }
 }
 
+#pragma mark - Null Tests
+
+- (void)testExpressionConversionNull
+{
+    NSComparisonPredicate *predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNull null]];
+    mbgl::Value convertedValue = predicate.rightExpression.mgl_filterValue;
+    XCTAssertTrue(convertedValue.is<mbgl::NullValue>());
+}
+
 @end
