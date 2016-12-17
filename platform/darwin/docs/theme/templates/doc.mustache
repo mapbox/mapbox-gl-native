@@ -8,6 +8,15 @@
     <script src="{{path_to_root}}js/jquery.min.js" defer></script>
     <script src="{{path_to_root}}js/jazzy.js" defer></script>
     {{{custom_head}}}
+    <style type="text/css">
+      .nav-group-name[data-name="{{name}}"] > .small-heading,
+      .nav-group-task[data-name="{{name}}"] {
+        background-color: #f5f8fc;
+        font-family: "Open Sans Bold";
+        border-left: 3px solid #3a68d8;
+        padding-left: 5px
+      }
+    </style>
   </head>
   <body>
 

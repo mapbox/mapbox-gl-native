@@ -367,6 +367,11 @@ pre code {
   color: $navigation_task_color;
 }
 
+.nav-group-name > .small-heading,
+.nav-group-task-link {
+  display: block;
+}
+
 .nav-group-task-link {
    color: $color_darkblue_lighten;
 }
