@@ -41,7 +41,8 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
   // Requires removing MapboxMap from Annotations by using Peer model from #6912
   private MapboxMap mapboxMap;
 
-  private long viewMarkerBoundsUpdateTime;
+  private boolean enabled;
+  private long updateTime;
   private MapboxMap.OnMarkerViewClickListener onMarkerViewClickListener;
   private boolean isWaitingForRenderInvoke;
 
@@ -61,13 +62,16 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
     this.mapboxMap = mapboxMap;
   }
 
-
   @Override
   public void onMapChanged(@MapView.MapChange int change) {
     if (isWaitingForRenderInvoke && change == MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
       isWaitingForRenderInvoke = false;
       invalidateViewMarkersInVisibleRegion();
     }
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 
   public void setWaitingForRenderInvoke(boolean waitingForRenderInvoke) {
@@ -418,13 +422,13 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
    * </p>
    */
   public void scheduleViewMarkerInvalidation() {
-    if (!markerViewAdapters.isEmpty()) {
+    if (enabled) {
       long currentTime = SystemClock.elapsedRealtime();
-      if (currentTime < viewMarkerBoundsUpdateTime) {
+      if (currentTime < updateTime) {
         return;
       }
       invalidateViewMarkersInVisibleRegion();
-      viewMarkerBoundsUpdateTime = currentTime + 250;
+      updateTime = currentTime + 250;
     }
   }
 
@@ -592,11 +596,11 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
    * Default MarkerViewAdapter used for base class of {@link MarkerView} to adapt a MarkerView to
    * an ImageView.
    */
-  public static class ImageMarkerViewAdapter extends MapboxMap.MarkerViewAdapter<MarkerView> {
+  private static class ImageMarkerViewAdapter extends MapboxMap.MarkerViewAdapter<MarkerView> {
 
     private LayoutInflater inflater;
 
-    public ImageMarkerViewAdapter(Context context) {
+    ImageMarkerViewAdapter(Context context) {
       super(context);
       inflater = LayoutInflater.from(context);
     }

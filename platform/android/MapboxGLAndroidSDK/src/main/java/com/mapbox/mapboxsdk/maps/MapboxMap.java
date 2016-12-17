@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.location.Location;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
@@ -15,11 +16,10 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
-import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
@@ -60,12 +60,14 @@ import timber.log.Timber;
 public final class MapboxMap {
 
   private final NativeMapView nativeMapView;
+
   private final UiSettings uiSettings;
   private final TrackingSettings trackingSettings;
   private final Projection projection;
   private final Transform transform;
   private final AnnotationManager annotationManager;
   private final MyLocationViewSettings myLocationViewSettings;
+
   private final OnRegisterTouchListener onRegisterTouchListener;
 
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
@@ -87,13 +89,79 @@ public final class MapboxMap {
     transform.initialise(this, options);
     uiSettings.initialise(context, options);
     myLocationViewSettings.initialise(options);
-    setMyLocationEnabled(options.getLocationEnabled());
+    trackingSettings.initialise(options);
 
-    // api base url
+    // Map configuration
     setDebugActive(options.getDebugActive());
     setApiBaseUrl(options);
-    setAccessToken(options);
     setStyleUrl(options);
+  }
+
+  void onStart() {
+    nativeMapView.update();
+    trackingSettings.onStart();
+    if (TextUtils.isEmpty(nativeMapView.getStyleUrl())) {
+      // if user hasn't loaded a Style yet
+      nativeMapView.setStyleUrl(Style.MAPBOX_STREETS);
+    }
+  }
+
+  void onStop() {
+    trackingSettings.onStop();
+  }
+
+  void onSaveInstanceState(Bundle outState) {
+    outState.putParcelable(MapboxConstants.STATE_CAMERA_POSITION, transform.getCameraPosition());
+    outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, nativeMapView.getDebug());
+    outState.putString(MapboxConstants.STATE_STYLE_URL, nativeMapView.getStyleUrl());
+    trackingSettings.onSaveInstanceState(outState);
+    uiSettings.onSaveInstanceState(outState);
+  }
+
+  void onRestoreInstanceState(Bundle savedInstanceState) {
+    final CameraPosition cameraPosition = savedInstanceState.getParcelable(MapboxConstants.STATE_CAMERA_POSITION);
+    if (cameraPosition != null) {
+      moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder(cameraPosition).build()));
+    }
+
+    uiSettings.onRestoreInstanceState(savedInstanceState);
+    trackingSettings.onRestoreInstanceState(savedInstanceState);
+    nativeMapView.setDebug(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
+
+    final String styleUrl = savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL);
+    if (!TextUtils.isEmpty(styleUrl)) {
+      nativeMapView.setStyleUrl(savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL));
+    }
+  }
+
+  /**
+   * Called before the OnMapReadyCallback is invoked.
+   */
+  void onPreMapReady() {
+    annotationManager.reloadMarkers();
+    annotationManager.adjustTopOffsetPixels(this);
+  }
+
+  /**
+   * Called when the OnMapReadyCallback has finished executing.
+   * <p>
+   * Invalidation of the camera position is required to update the added components in
+   * OnMapReadyCallback with the correct transformation.
+   * </p>
+   */
+  void onPostMapReady() {
+    invalidateCameraPosition();
+  }
+
+  /**
+   * Called when the user
+   */
+  void onUpdate() {
+    CameraPosition cameraPosition = transform.getCameraPosition();
+    uiSettings.update(cameraPosition);
+    // FIXME introduce update method with camera position
+    trackingSettings.update();
+    annotationManager.update();
   }
 
   // Style
@@ -117,8 +185,8 @@ public final class MapboxMap {
     try {
       //noinspection unchecked
       return (T) nativeMapView.getLayer(layerId);
-    } catch (ClassCastException classCastException) {
-      Timber.e(String.format("Layer: %s is a different type: %s", layerId, classCastException.getMessage()));
+    } catch (ClassCastException exception) {
+      Timber.e(String.format("Layer: %s is a different type: %s", layerId, exception));
       return null;
     }
   }
@@ -148,7 +216,7 @@ public final class MapboxMap {
    * Removes the layer. Any references to the layer become invalid and should not be used anymore
    *
    * @param layerId the layer to remove
-   * @throws NoSuchLayerException Thrown when the layer doesn't exist.
+   * @throws NoSuchLayerException the exception thrown when layer with layerId doesn't exist
    */
   @UiThread
   public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
@@ -159,7 +227,7 @@ public final class MapboxMap {
    * Removes the layer. The reference is re-usable after this and can be re-added
    *
    * @param layer the layer to remove
-   * @throws NoSuchLayerException Thrown when the layer doesn't exist.
+   * @throws NoSuchLayerException the exeption thrown when the layer doesn't exist
    */
   @UiThread
   public void removeLayer(@NonNull Layer layer) throws NoSuchLayerException {
@@ -185,8 +253,8 @@ public final class MapboxMap {
     try {
       //noinspection unchecked
       return (T) nativeMapView.getSource(sourceId);
-    } catch (ClassCastException classCastException) {
-      Timber.e(String.format("Source: %s is a different type: %s", sourceId, classCastException.getMessage()));
+    } catch (ClassCastException exception) {
+      Timber.e(String.format("Source: %s is a different type: %s", sourceId, exception));
       return null;
     }
   }
@@ -205,7 +273,7 @@ public final class MapboxMap {
    * Removes the source. Any references to the source become invalid and should not be used anymore
    *
    * @param sourceId the source to remove
-   * @throws NoSuchSourceException Thrown when the source doesn't exist.
+   * @throws NoSuchSourceException the exception thrown when the source with sourceId doesn't exist
    */
   @UiThread
   public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
@@ -216,7 +284,7 @@ public final class MapboxMap {
    * Removes the source, preserving the reverence for re-use
    *
    * @param source the source to remove
-   * @throws NoSuchSourceException Thrown when the source doesn't exist.
+   * @throws NoSuchSourceException the exception thrown when the source with sourceId doesn't exist
    */
   @UiThread
   public void removeSource(@NonNull Source source) throws NoSuchSourceException {
@@ -285,8 +353,8 @@ public final class MapboxMap {
    * @param maxZoom The new maximum zoom level.
    */
   @UiThread
-  public void setMaxZoomPreference(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to
-    = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
+  public void setMaxZoomPreference(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
+    to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
     transform.setMaxZoom(maxZoom);
   }
 
@@ -707,28 +775,6 @@ public final class MapboxMap {
 
   /**
    * <p>
-   * Loads a new map style from the specified bundled style.
-   * </p>
-   * <p>
-   * This method is asynchronous and will return immediately before the style finishes loading.
-   * If you wish to wait for the map to finish loading listen for the {@link MapView#DID_FINISH_LOADING_MAP} event.
-   * </p>
-   * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
-   * sent.
-   *
-   * @param style The bundled style. Accepts one of the values from {@link Style}.
-   * @see Style
-   * @deprecated use {@link #setStyleUrl(String)} instead with versioned url methods from {@link Style}
-   */
-  @UiThread
-  @Deprecated
-  public void setStyle(@Style.StyleUrl String style) {
-    setStyleUrl(style);
-  }
-
-  /**
-   * <p>
    * Loads a new map style from the specified URL.
    * </p>
    * {@code url} can take the following forms:
@@ -762,6 +808,28 @@ public final class MapboxMap {
   }
 
   /**
+   * <p>
+   * Loads a new map style from the specified bundled style.
+   * </p>
+   * <p>
+   * This method is asynchronous and will return immediately before the style finishes loading.
+   * If you wish to wait for the map to finish loading listen for the {@link MapView#DID_FINISH_LOADING_MAP} event.
+   * </p>
+   * If the style fails to load or an invalid style URL is set, the map view will become blank.
+   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
+   * sent.
+   *
+   * @param style The bundled style. Accepts one of the values from {@link Style}.
+   * @see Style
+   * @deprecated use {@link #setStyleUrl(String)} instead with versioned url methods from {@link Style}
+   */
+  @UiThread
+  @Deprecated
+  public void setStyle(@Style.StyleUrl String style) {
+    setStyleUrl(style);
+  }
+
+  /**
    * Loads a new map style from MapboxMapOptions if available.
    *
    * @param options the object containing the style url
@@ -769,6 +837,11 @@ public final class MapboxMap {
   private void setStyleUrl(@NonNull MapboxMapOptions options) {
     String style = options.getStyle();
     if (!TextUtils.isEmpty(style)) {
+      // stopgap for https://github.com/mapbox/mapbox-gl-native/issues/6242
+      if (TextUtils.isEmpty(nativeMapView.getAccessToken())) {
+        Mapbox.validateAccessToken();
+        nativeMapView.setAccessToken(Mapbox.getAccessToken());
+      }
       setStyleUrl(style);
     }
   }
@@ -785,56 +858,6 @@ public final class MapboxMap {
   @NonNull
   public String getStyleUrl() {
     return nativeMapView.getStyleUrl();
-  }
-
-  //
-  // Access token
-  //
-
-  /**
-   * <p>
-   * DEPRECATED @see MapboxAccountManager#getAccessToken()
-   * </p>
-   * <p>
-   * Returns the current Mapbox access token used to load map styles and tiles.
-   * </p>
-   *
-   * @return The current Mapbox access token.
-   * @deprecated As of release 4.1.0, replaced by {@link MapboxAccountManager#getAccessToken()}
-   */
-  @Deprecated
-  @UiThread
-  @Nullable
-  public String getAccessToken() {
-    return nativeMapView.getAccessToken();
-  }
-
-  /**
-   * <p>
-   * DEPRECATED @see MapboxAccountManager#start(String)
-   * </p>
-   * <p>
-   * Sets the current Mapbox access token used to load map styles and tiles.
-   * </p>
-   *
-   * @param accessToken Your public Mapbox access token.
-   * @see MapView#setAccessToken(String)
-   * @deprecated As of release 4.1.0, replaced by
-   * {@link com.mapbox.mapboxsdk.MapboxAccountManager#start(Context, String)}
-   */
-  @Deprecated
-  @UiThread
-  public void setAccessToken(@NonNull String accessToken) {
-    nativeMapView.setAccessToken(accessToken);
-  }
-
-  private void setAccessToken(@NonNull MapboxMapOptions options) {
-    String accessToken = options.getAccessToken();
-    if (!TextUtils.isEmpty(accessToken)) {
-      nativeMapView.setAccessToken(accessToken);
-    } else {
-      nativeMapView.setAccessToken(MapboxAccountManager.getInstance().getAccessToken());
-    }
   }
 
   //
@@ -908,6 +931,9 @@ public final class MapboxMap {
     return annotationManager.addMarker(markerOptions, this, onMarkerViewAddedListener);
   }
 
+  /**
+   * FIXME javadoc
+   */
   @UiThread
   @NonNull
   public List<MarkerView> addMarkerViews(@NonNull List<? extends
@@ -915,6 +941,9 @@ public final class MapboxMap {
     return annotationManager.addMarkerViews(markerViewOptions, this);
   }
 
+  /**
+   * FIXME javadoc
+   */
   @UiThread
   @NonNull
   public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rect) {
@@ -1276,20 +1305,6 @@ public final class MapboxMap {
     return annotationManager.getInfoWindowManager().isAllowConcurrentMultipleOpenInfoWindows();
   }
 
-  // Internal API
-  List<InfoWindow> getInfoWindows() {
-    return annotationManager.getInfoWindowManager().getInfoWindows();
-  }
-
-  AnnotationManager getAnnotationManager() {
-    return annotationManager;
-  }
-
-  Transform getTransform() {
-    return transform;
-  }
-
-
   //
   // Padding
   //
@@ -1409,7 +1424,7 @@ public final class MapboxMap {
    */
   @UiThread
   public void setOnInfoWindowClickListener(@Nullable OnInfoWindowClickListener listener) {
-    getAnnotationManager().getInfoWindowManager().setOnInfoWindowClickListener(listener);
+    annotationManager.getInfoWindowManager().setOnInfoWindowClickListener(listener);
   }
 
   /**
@@ -1419,7 +1434,7 @@ public final class MapboxMap {
    */
   @UiThread
   public OnInfoWindowClickListener getOnInfoWindowClickListener() {
-    return getAnnotationManager().getInfoWindowManager().getOnInfoWindowClickListener();
+    return annotationManager.getInfoWindowManager().getOnInfoWindowClickListener();
   }
 
   /**
@@ -1431,7 +1446,7 @@ public final class MapboxMap {
   @UiThread
   public void setOnInfoWindowLongClickListener(@Nullable OnInfoWindowLongClickListener
                                                  listener) {
-    getAnnotationManager().getInfoWindowManager().setOnInfoWindowLongClickListener(listener);
+    annotationManager.getInfoWindowManager().setOnInfoWindowLongClickListener(listener);
   }
 
   /**
@@ -1440,11 +1455,11 @@ public final class MapboxMap {
    * @return Current active InfoWindow long Click Listener
    */
   public OnInfoWindowLongClickListener getOnInfoWindowLongClickListener() {
-    return getAnnotationManager().getInfoWindowManager().getOnInfoWindowLongClickListener();
+    return annotationManager.getInfoWindowManager().getOnInfoWindowLongClickListener();
   }
 
   public void setOnInfoWindowCloseListener(@Nullable OnInfoWindowCloseListener listener) {
-    getAnnotationManager().getInfoWindowManager().setOnInfoWindowCloseListener(listener);
+    annotationManager.getInfoWindowManager().setOnInfoWindowCloseListener(listener);
   }
 
   /**
@@ -1454,7 +1469,7 @@ public final class MapboxMap {
    */
   @UiThread
   public OnInfoWindowCloseListener getOnInfoWindowCloseListener() {
-    return getAnnotationManager().getInfoWindowManager().getOnInfoWindowCloseListener();
+    return annotationManager.getInfoWindowManager().getOnInfoWindowCloseListener();
   }
 
   //
@@ -1472,13 +1487,13 @@ public final class MapboxMap {
   }
 
   /**
+   * <p>
    * Enables or disables the my-location layer.
    * While enabled, the my-location layer continuously draws an indication of a user's current
    * location and bearing.
-   * <p>
-   * In order to use the my-location layer feature you need to request permission for either
-   * {@code ACCESS_COARSE_LOCATION} or {@code ACCESS_FINE_LOCATION}.
    * </p>
+   * In order to use the my-location layer feature you need to request permission for either
+   * android.Manifest.permission#ACCESS_COARSE_LOCATION or android.Manifest.permission#ACCESS_FINE_LOCATION.
    *
    * @param enabled True to enable; false to disable.
    */
@@ -1967,5 +1982,12 @@ public final class MapboxMap {
      * @param snapshot the snapshot bitmap
      */
     void onSnapshotReady(Bitmap snapshot);
+  }
+
+  //
+  // Used for instrumentation testing
+  //
+  Transform getTransform() {
+    return transform;
   }
 }

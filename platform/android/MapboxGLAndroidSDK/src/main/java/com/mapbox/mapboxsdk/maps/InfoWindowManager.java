@@ -16,8 +16,8 @@ import java.util.List;
  * Maintains a {@link List} of opened {@link InfoWindow} and tracks configurations as
  * allowConcurrentMultipleInfoWindows which allows to have multiple {@link InfoWindow} open at the
  * same time. Responsible for managing listeners as
- * {@link com.mapbox.mapboxsdk.maps.MapboxMap.OnInfoWindowClickListener}
- * and {@link com.mapbox.mapboxsdk.maps.MapboxMap.OnInfoWindowLongClickListener}.
+ * {@link com.mapbox.mapboxsdk.maps.MapboxMap.OnInfoWindowClickListener} and
+ * {@link com.mapbox.mapboxsdk.maps.MapboxMap.OnInfoWindowLongClickListener}.
  * </p>
  */
 class InfoWindowManager {
@@ -32,6 +32,12 @@ class InfoWindowManager {
 
   InfoWindowManager() {
     this.infoWindows = new ArrayList<>();
+  }
+
+  void update() {
+    for (InfoWindow infoWindow : infoWindows) {
+      infoWindow.update();
+    }
   }
 
   void setInfoWindowAdapter(@Nullable MapboxMap.InfoWindowAdapter infoWindowAdapter) {

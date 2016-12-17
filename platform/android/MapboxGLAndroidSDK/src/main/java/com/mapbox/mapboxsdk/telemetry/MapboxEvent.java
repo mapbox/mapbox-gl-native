@@ -77,16 +77,20 @@ public class MapboxEvent implements Serializable {
    * Helper method for tracking gesture events
    *
    * @param projection  Projection of the Map object
-   * @param gestureId   Type of Gesture See {@see MapboxEvent#GESTURE_SINGLETAP MapboxEvent#GESTURE_DOUBLETAP
-   *                    MapboxEvent#GESTURE_TWO_FINGER_SINGLETAP MapboxEvent#GESTURE_QUICK_ZOOM
-   *                    MapboxEvent#GESTURE_PAN_START MapboxEvent#GESTURE_PINCH_START
-   *                    MapboxEvent#GESTURE_ROTATION_START MapboxEvent#GESTURE_PITCH_START}
+   * @param gestureId   Type of Gesture See {@see MapboxEvent#GESTURE_SINGLETAP
+   *                    MapboxEvent#GESTURE_DOUBLETAP
+   *                    MapboxEvent#GESTURE_TWO_FINGER_SINGLETAP
+   *                    MapboxEvent#GESTURE_QUICK_ZOOM
+   *                    MapboxEvent#GESTURE_PAN_START
+   *                    MapboxEvent#GESTURE_PINCH_START
+   *                    MapboxEvent#GESTURE_ROTATION_START
+   *                    MapboxEvent#GESTURE_PITCH_START}
    * @param xCoordinate Original x screen coordinate at start of gesture
    * @param yCoordinate Original y screen cooridnate at start of gesture
    * @param zoom        Zoom level to be registered
    */
-  public static void trackGestureEvent(@NonNull Projection projection, @NonNull String gestureId,
-                                       float xCoordinate, float yCoordinate, double zoom) {
+  public static void trackGestureEvent(@NonNull Projection projection, @NonNull String gestureId, float xCoordinate,
+                                       float yCoordinate, double zoom) {
     LatLng tapLatLng = projection.fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
     // NaN and Infinite checks to prevent JSON errors at send to server time
@@ -120,8 +124,8 @@ public class MapboxEvent implements Serializable {
    * @param yCoordinate Orginal y screen coordinate at end of drag
    * @param zoom        Zoom level to be registered
    */
-  public static void trackGestureDragEndEvent(@NonNull Projection projection, float xCoordinate,
-                                              float yCoordinate, double zoom) {
+  public static void trackGestureDragEndEvent(@NonNull Projection projection, float xCoordinate, float yCoordinate,
+                                              double zoom) {
     LatLng tapLatLng = projection.fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
     // NaN and Infinite checks to prevent JSON errors at send to server time
@@ -142,6 +146,16 @@ public class MapboxEvent implements Serializable {
     evt.put(MapboxEvent.KEY_LONGITUDE, tapLatLng.getLongitude());
     evt.put(MapboxEvent.KEY_ZOOM, zoom);
 
+    MapboxEventManager.getMapboxEventManager().pushEvent(evt);
+  }
+
+  /**
+   * Helper method for tracking map load event
+   */
+  public static void trackMapLoadEvent() {
+    Hashtable<String, Object> evt = new Hashtable<>();
+    evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_LOAD);
+    evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
     MapboxEventManager.getMapboxEventManager().pushEvent(evt);
   }
 }

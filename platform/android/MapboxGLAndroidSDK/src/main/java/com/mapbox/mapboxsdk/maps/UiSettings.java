@@ -1,9 +1,11 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +17,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
 
@@ -66,6 +70,23 @@ public final class UiSettings {
     initialiseCompass(options, resources);
     initialiseLogo(options, resources);
     initialiseAttribution(context, options);
+    initialiseZoomControl(context);
+  }
+
+  void onSaveInstanceState(Bundle outState) {
+    saveGestures(outState);
+    saveCompass(outState);
+    saveLogo(outState);
+    saveAttribution(outState);
+    saveZoomControl(outState);
+  }
+
+  void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+    restoreGestures(savedInstanceState);
+    restoreCompass(savedInstanceState);
+    restoreLogo(savedInstanceState);
+    restoreAttribution(savedInstanceState);
+    restoreZoomControl(savedInstanceState);
   }
 
   private void initialiseGestures(MapboxMapOptions options) {
@@ -78,6 +99,28 @@ public final class UiSettings {
     setTiltGesturesEnabled(options.getTiltGesturesEnabled());
     setTiltGestureChangeAllowed(options.getTiltGesturesEnabled());
     setZoomControlsEnabled(options.getZoomControlsEnabled());
+  }
+
+  private void saveGestures(Bundle outState) {
+    outState.putBoolean(MapboxConstants.STATE_ZOOM_ENABLED, isZoomGesturesEnabled());
+    outState.putBoolean(MapboxConstants.STATE_ZOOM_ENABLED_CHANGE, isZoomGestureChangeAllowed());
+    outState.putBoolean(MapboxConstants.STATE_SCROLL_ENABLED, isScrollGesturesEnabled());
+    outState.putBoolean(MapboxConstants.STATE_SCROLL_ENABLED_CHANGE, isScrollGestureChangeAllowed());
+    outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED, isRotateGesturesEnabled());
+    outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED_CHANGE, isRotateGestureChangeAllowed());
+    outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED, isTiltGesturesEnabled());
+    outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED_CHANGE, isTiltGestureChangeAllowed());
+  }
+
+  private void restoreGestures(Bundle savedInstanceState) {
+    setZoomGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ZOOM_ENABLED));
+    setZoomGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_ZOOM_ENABLED_CHANGE));
+    setScrollGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_SCROLL_ENABLED));
+    setScrollGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_SCROLL_ENABLED_CHANGE));
+    setRotateGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ROTATE_ENABLED));
+    setRotateGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_ROTATE_ENABLED_CHANGE));
+    setTiltGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_TILT_ENABLED));
+    setTiltGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_TILT_ENABLED_CHANGE));
   }
 
   private void initialiseCompass(MapboxMapOptions options, Resources resources) {
@@ -93,6 +136,26 @@ public final class UiSettings {
     setCompassFadeFacingNorth(options.getCompassFadeFacingNorth());
   }
 
+  private void saveCompass(Bundle outState) {
+    outState.putBoolean(MapboxConstants.STATE_COMPASS_ENABLED, isCompassEnabled());
+    outState.putInt(MapboxConstants.STATE_COMPASS_GRAVITY, getCompassGravity());
+    outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_LEFT, getCompassMarginLeft());
+    outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_TOP, getCompassMarginTop());
+    outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_BOTTOM, getCompassMarginBottom());
+    outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_RIGHT, getCompassMarginRight());
+    outState.putBoolean(MapboxConstants.STATE_COMPASS_FADE_WHEN_FACING_NORTH, isCompassFadeWhenFacingNorth());
+  }
+
+  private void restoreCompass(Bundle savedInstanceState) {
+    setCompassEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_COMPASS_ENABLED));
+    setCompassGravity(savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_GRAVITY));
+    setCompassMargins(savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_LEFT),
+      savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_TOP),
+      savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_RIGHT),
+      savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_BOTTOM));
+    setCompassFadeFacingNorth(savedInstanceState.getBoolean(MapboxConstants.STATE_COMPASS_FADE_WHEN_FACING_NORTH));
+  }
+
   private void initialiseLogo(MapboxMapOptions options, Resources resources) {
     setLogoEnabled(options.getLogoEnabled());
     setLogoGravity(options.getLogoGravity());
@@ -103,6 +166,24 @@ public final class UiSettings {
       int sixteenDp = (int) resources.getDimension(R.dimen.mapbox_sixteen_dp);
       setLogoMargins(sixteenDp, sixteenDp, sixteenDp, sixteenDp);
     }
+  }
+
+  private void saveLogo(Bundle outState) {
+    outState.putInt(MapboxConstants.STATE_LOGO_GRAVITY, getLogoGravity());
+    outState.putInt(MapboxConstants.STATE_LOGO_MARGIN_LEFT, getLogoMarginLeft());
+    outState.putInt(MapboxConstants.STATE_LOGO_MARGIN_TOP, getLogoMarginTop());
+    outState.putInt(MapboxConstants.STATE_LOGO_MARGIN_RIGHT, getLogoMarginRight());
+    outState.putInt(MapboxConstants.STATE_LOGO_MARGIN_BOTTOM, getLogoMarginBottom());
+    outState.putBoolean(MapboxConstants.STATE_LOGO_ENABLED, isLogoEnabled());
+  }
+
+  private void restoreLogo(Bundle savedInstanceState) {
+    setLogoEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_LOGO_ENABLED));
+    setLogoGravity(savedInstanceState.getInt(MapboxConstants.STATE_LOGO_GRAVITY));
+    setLogoMargins(savedInstanceState.getInt(MapboxConstants.STATE_LOGO_MARGIN_LEFT),
+      savedInstanceState.getInt(MapboxConstants.STATE_LOGO_MARGIN_TOP),
+      savedInstanceState.getInt(MapboxConstants.STATE_LOGO_MARGIN_RIGHT),
+      savedInstanceState.getInt(MapboxConstants.STATE_LOGO_MARGIN_BOTTOM));
   }
 
   private void initialiseAttribution(Context context, MapboxMapOptions options) {
@@ -121,6 +202,38 @@ public final class UiSettings {
     int attributionTintColor = options.getAttributionTintColor();
     setAttributionTintColor(attributionTintColor != -1
       ? attributionTintColor : ColorUtils.getPrimaryColor(context));
+  }
+
+  private void saveAttribution(Bundle outState) {
+    outState.putInt(MapboxConstants.STATE_ATTRIBUTION_GRAVITY, getAttributionGravity());
+    outState.putInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_LEFT, getAttributionMarginLeft());
+    outState.putInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_TOP, getAttributionMarginTop());
+    outState.putInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_RIGHT, getAttributionMarginRight());
+    outState.putInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_BOTTOM, getAttributionMarginBottom());
+    outState.putBoolean(MapboxConstants.STATE_ATTRIBUTION_ENABLED, isAttributionEnabled());
+  }
+
+  private void restoreAttribution(Bundle savedInstanceState) {
+    setAttributionEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ATTRIBUTION_ENABLED));
+    setAttributionGravity(savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_GRAVITY));
+    setAttributionMargins(savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_LEFT),
+      savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_TOP),
+      savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_RIGHT),
+      savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_BOTTOM));
+  }
+
+  private void initialiseZoomControl(Context context) {
+    if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
+      setZoomControlsEnabled(true);
+    }
+  }
+
+  private void saveZoomControl(Bundle outState) {
+    outState.putBoolean(MapboxConstants.STATE_ZOOM_CONTROLS_ENABLED, isZoomControlsEnabled());
+  }
+
+  private void restoreZoomControl(Bundle savedInstanceState) {
+    setZoomControlsEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ZOOM_CONTROLS_ENABLED));
   }
 
   /**
@@ -240,6 +353,14 @@ public final class UiSettings {
    */
   public int getCompassMarginBottom() {
     return ((FrameLayout.LayoutParams) compassView.getLayoutParams()).bottomMargin;
+  }
+
+  void update(@NonNull CameraPosition cameraPosition) {
+    if (!isCompassEnabled()) {
+      return;
+    }
+
+    compassView.update(cameraPosition.bearing);
   }
 
   /**
@@ -401,8 +522,8 @@ public final class UiSettings {
   public void setAttributionTintColor(@ColorInt int tintColor) {
     // Check that the tint color being passed in isn't transparent.
     if (Color.alpha(tintColor) == 0) {
-      ColorUtils.setTintList(attributionsView, ContextCompat.getColor(attributionsView.getContext(),
-        R.color.mapbox_blue));
+      ColorUtils.setTintList(attributionsView,
+        ContextCompat.getColor(attributionsView.getContext(), R.color.mapbox_blue));
     } else {
       ColorUtils.setTintList(attributionsView, tintColor);
     }

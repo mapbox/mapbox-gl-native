@@ -9,6 +9,7 @@ import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ViewConfiguration;
+import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
@@ -119,8 +120,8 @@ final class MapGestureDetector {
           && uiSettings.isZoomGesturesEnabled();
         if (twoTap) {
           // Confirmed 2nd Finger Down
-          MapboxEvent.trackGestureEvent(projection, MapboxEvent.GESTURE_TWO_FINGER_SINGLETAP, event.getX(),
-            event.getY(), transform.getZoom());
+          MapboxEvent.trackGestureEvent(projection,
+            MapboxEvent.GESTURE_TWO_FINGER_SINGLETAP, event.getX(), event.getY(), transform.getZoom());
         }
         break;
 
@@ -220,12 +221,12 @@ final class MapGestureDetector {
     }
 
     @Override
-    public boolean onDoubleTapEvent(MotionEvent motionEvent) {
+    public boolean onDoubleTapEvent(MotionEvent e) {
       if (!uiSettings.isZoomGesturesEnabled()) {
         return false;
       }
 
-      switch (motionEvent.getAction()) {
+      switch (e.getAction()) {
         case MotionEvent.ACTION_DOWN:
           break;
         case MotionEvent.ACTION_MOVE:
@@ -243,13 +244,12 @@ final class MapGestureDetector {
             transform.zoom(true, focalPoint.x, focalPoint.y);
           } else {
             // Zoom in on gesture
-            transform.zoom(true, motionEvent.getX(), motionEvent.getY());
+            transform.zoom(true, e.getX(), e.getY());
           }
           break;
       }
 
-      MapboxEvent.trackGestureEvent(projection, MapboxEvent.GESTURE_DOUBLETAP, motionEvent.getX(), motionEvent.getY(),
-        transform.getZoom());
+      MapboxEvent.trackGestureEvent(projection, MapboxEvent.GESTURE_DOUBLETAP, e.getX(), e.getY(), transform.getZoom());
 
       return true;
     }
@@ -278,16 +278,16 @@ final class MapGestureDetector {
         }
       }
 
-      MapboxEvent.trackGestureEvent(projection, MapboxEvent.GESTURE_SINGLETAP, motionEvent.getX(), motionEvent.getY(),
-        transform.getZoom());
+      MapboxEvent.trackGestureEvent(projection,
+        MapboxEvent.GESTURE_SINGLETAP, motionEvent.getX(), motionEvent.getY(), transform.getZoom());
       return true;
     }
 
     @Override
     public void onLongPress(MotionEvent motionEvent) {
       if (onMapLongClickListener != null && !quickZoom) {
-        onMapLongClickListener.onMapLongClick(projection.fromScreenLocation(new PointF(motionEvent.getX(),
-          motionEvent.getY())));
+        onMapLongClickListener.onMapLongClick(
+          projection.fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY())));
       }
     }
 
@@ -318,8 +318,8 @@ final class MapGestureDetector {
         onFlingListener.onFling();
       }
 
-      MapboxEvent.trackGestureEvent(projection, MapboxEvent.GESTURE_PAN_START, e1.getX(), e1.getY(),
-        transform.getZoom());
+      MapboxEvent.trackGestureEvent(projection,
+        MapboxEvent.GESTURE_PAN_START, e1.getX(), e1.getY(), transform.getZoom());
       return true;
     }
 
@@ -368,8 +368,8 @@ final class MapGestureDetector {
       }
 
       beginTime = detector.getEventTime();
-      MapboxEvent.trackGestureEvent(projection, MapboxEvent.GESTURE_PINCH_START, detector.getFocusX(),
-        detector.getFocusY(), transform.getZoom());
+      MapboxEvent.trackGestureEvent(projection,
+        MapboxEvent.GESTURE_PINCH_START, detector.getFocusX(), detector.getFocusY(), transform.getZoom());
       return true;
     }
 
@@ -455,8 +455,8 @@ final class MapGestureDetector {
       }
 
       beginTime = detector.getEventTime();
-      MapboxEvent.trackGestureEvent(projection, MapboxEvent.GESTURE_ROTATION_START, detector.getFocusX(),
-        detector.getFocusY(), transform.getZoom());
+      MapboxEvent.trackGestureEvent(projection,
+        MapboxEvent.GESTURE_ROTATION_START, detector.getFocusX(), detector.getFocusY(), transform.getZoom());
       return true;
     }
 
@@ -535,8 +535,8 @@ final class MapGestureDetector {
       }
 
       beginTime = detector.getEventTime();
-      MapboxEvent.trackGestureEvent(projection, MapboxEvent.GESTURE_PITCH_START, detector.getFocusX(),
-        detector.getFocusY(), transform.getZoom());
+      MapboxEvent.trackGestureEvent(projection,
+        MapboxEvent.GESTURE_PITCH_START, detector.getFocusX(), detector.getFocusY(), transform.getZoom());
       return true;
     }
 
@@ -587,6 +587,34 @@ final class MapGestureDetector {
       dragStarted = true;
 
       return true;
+    }
+  }
+
+  // This class handles input events from the zoom control buttons
+  // Zoom controls allow single touch only devices to zoom in and out
+  private static class OnZoomListener implements ZoomButtonsController.OnZoomListener {
+
+    private UiSettings uiSettings;
+    private Transform transform;
+
+    OnZoomListener(UiSettings uiSettings, Transform transform) {
+      this.uiSettings = uiSettings;
+      this.transform = transform;
+    }
+
+    // Not used
+    @Override
+    public void onVisibilityChanged(boolean visible) {
+      // Ignore
+    }
+
+    // Called when user pushes a zoom button
+    @Override
+    public void onZoom(boolean zoomIn) {
+      if (!uiSettings.isZoomGesturesEnabled()) {
+        return;
+      }
+      transform.zoom(zoomIn);
     }
   }
 
