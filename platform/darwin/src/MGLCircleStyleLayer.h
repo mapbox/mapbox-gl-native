@@ -9,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Controls the scaling behavior of the circle when the map is pitched.
  
- Values of this type are used in the `circlePitchScale` property of `MGLCircleStyleLayer`.
+ Values of this type are used in the `MGLCircleStyleLayer.circlePitchScale` property.
  */
 typedef NS_ENUM(NSUInteger, MGLCirclePitchScale) {
     /**
@@ -25,7 +25,7 @@ typedef NS_ENUM(NSUInteger, MGLCirclePitchScale) {
 /**
  Controls the translation reference point.
  
- Values of this type are used in the `circleTranslateAnchor` property of `MGLCircleStyleLayer`.
+ Values of this type are used in the `MGLCircleStyleLayer.circleTranslateAnchor` property.
  */
 typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
     /**

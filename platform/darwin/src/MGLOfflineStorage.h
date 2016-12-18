@@ -18,7 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
  `userInfo` dictionary contains the pack’s current state in the
  `MGLOfflinePackStateUserInfoKey` key and details about the pack’s current
  progress in the `MGLOfflinePackProgressUserInfoKey` key. You may also consult
- the pack’s `state` and `progress` properties, which provide the same values.
+ the `MGLOfflinePack.state` and `MGLOfflinePack.progress` properties, which
+ provide the same values.
  
  If you only need to observe changes in a particular pack’s progress, you can
  alternatively observe KVO change notifications to the pack’s `progress` key
@@ -161,8 +162,9 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
  Creates and registers an offline pack that downloads the resources needed to
  use the given region offline.
  
- The resulting pack is added to the shared offline storage object’s `packs`
- property, then the `completion` block is executed with that pack passed in.
+ The resulting pack is added to the shared offline storage object’s
+ `MGLOfflineStorage.packs` property, then the `completion` block is executed
+ with that pack passed in.
  
  The pack has an initial state of `MGLOfflinePackStateInactive`. To begin
  downloading resources, call `-[MGLOfflinePack resume]` on the pack from within

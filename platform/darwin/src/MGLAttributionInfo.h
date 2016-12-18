@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
  coordinate and zoom level.
  
  @param centerCoordinate The map’s center coordinate.
- @param zoomLevel The map’s zoom level. See `MGLMapView`’s `zoomLevel` property
+ @param zoomLevel The map’s zoom level. See the `MGLMapView.zoomLevel` property
     for more information.
  @return A modified URL containing a fragment that points to the specified
     viewport. If the `feedbackLink` property is set to `NO`, this method returns

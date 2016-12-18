@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  <%- propertyDoc(property.name, property, type) %>
  
- Values of this type are used in the `<%- camelizeWithLeadingLowercase(property.name) %>` property of `MGL<%- camelize(type) %>StyleLayer`.
+ Values of this type are used in the `MGL<%- camelize(type) %>StyleLayer.<%- camelizeWithLeadingLowercase(property.name) %>` property.
  */
 typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 <% for (const value in property.values) { -%>
@@ -40,7 +40,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 /**
  <%- propertyDoc(property.name, property, type) %>
  
- Values of this type are used in the `<%- camelizeWithLeadingLowercase(property.name) %>` property of `MGL<%- camelize(type) %>StyleLayer`.
+ Values of this type are used in the `MGL<%- camelize(type) %>StyleLayer.<%- camelizeWithLeadingLowercase(property.name) %>` property.
  */
 typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 <% for (const value in property.values) { -%>

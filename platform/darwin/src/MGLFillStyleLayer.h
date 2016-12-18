@@ -9,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Controls the translation reference point.
  
- Values of this type are used in the `fillTranslateAnchor` property of `MGLFillStyleLayer`.
+ Values of this type are used in the `MGLFillStyleLayer.fillTranslateAnchor` property.
  */
 typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
     /**

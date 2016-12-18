@@ -9,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The display of line endings.
  
- Values of this type are used in the `lineCap` property of `MGLLineStyleLayer`.
+ Values of this type are used in the `MGLLineStyleLayer.lineCap` property.
  */
 typedef NS_ENUM(NSUInteger, MGLLineCap) {
     /**
@@ -29,7 +29,7 @@ typedef NS_ENUM(NSUInteger, MGLLineCap) {
 /**
  The display of lines when joining.
  
- Values of this type are used in the `lineJoin` property of `MGLLineStyleLayer`.
+ Values of this type are used in the `MGLLineStyleLayer.lineJoin` property.
  */
 typedef NS_ENUM(NSUInteger, MGLLineJoin) {
     /**
@@ -49,7 +49,7 @@ typedef NS_ENUM(NSUInteger, MGLLineJoin) {
 /**
  Controls the translation reference point.
  
- Values of this type are used in the `lineTranslateAnchor` property of `MGLLineStyleLayer`.
+ Values of this type are used in the `MGLLineStyleLayer.lineTranslateAnchor` property.
  */
 typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
     /**
