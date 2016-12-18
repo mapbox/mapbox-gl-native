@@ -7,10 +7,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A raster layer which allows customization of styling properties at runtime. You may 
- instantiate a new raster layer to add to a map style or you may query an 
- `MGLMapView` for its `style` and obtain existing layers using the 
- `-[MGLStyle layerWithIdentifier:]` method. 
+ An `MGLRasterStyleLayer` is a style layer that renders raster tiles on the map.
+ 
+ Use a raster style layer to configure the color parameters of raster tiles loaded by an `MGLRasterSource` object. For example, you could use a raster style layer to render <a href="https://www.mapbox.com/satellite/">Mapbox Satellite</a> imagery, a <a href="https://www.mapbox.com/help/define-tileset/#raster-tilesets">raster tile set</a> uploaded to Mapbox Studio, or a raster map authored in <a href="https://tilemill-project.github.io/tilemill/">TileMill</a>, the classic Mapbox Editor, or Mapbox Studio Classic.
+ 
+ You can access an existing raster style layer using the `-[MGLStyle layerWithIdentifier:]` method if you know its identifier; otherwise, find it using the `MGLStyle.layers` property. You can also create a new raster style layer and add it to the style using a method such as `-[MGLStyle addLayer:]`.
  */
 @interface MGLRasterStyleLayer : MGLForegroundStyleLayer
 

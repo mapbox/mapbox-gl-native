@@ -23,10 +23,11 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
 };
 
 /**
- A fill layer which allows customization of styling properties at runtime. You may 
- instantiate a new fill layer to add to a map style or you may query an 
- `MGLMapView` for its `style` and obtain existing layers using the 
- `-[MGLStyle layerWithIdentifier:]` method. 
+ An `MGLFillStyleLayer` is a style layer that renders one or more filled (and optionally stroked) polygons on the map.
+ 
+ Use a fill style layer to configure the visual appearance of polygon or multipolygon features in vector tiles loaded by an `MGLVectorSource` object or `MGLPolygon`, `MGLPolygonFeature`, `MGLMultiPolygon`, or `MGLMultiPolygonFeature` instances in an `MGLShapeSource` object.
+ 
+ You can access an existing fill style layer using the `-[MGLStyle layerWithIdentifier:]` method if you know its identifier; otherwise, find it using the `MGLStyle.layers` property. You can also create a new fill style layer and add it to the style using a method such as `-[MGLStyle addLayer:]`.
  */
 @interface MGLFillStyleLayer : MGLVectorStyleLayer
 

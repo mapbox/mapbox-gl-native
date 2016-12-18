@@ -7,10 +7,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A map style's background layer is the bottommost layer and is used to style a color 
- or pattern to show below all other map features. You can query an `MGLMapView` for its 
- `style` and obtain the background layer using the `-[MGLStyle layerWithIdentifier:]` 
- method and passing `background` for the identifier. 
+ An `MGLBackgroundStyleLayer` is a style layer that covers the entire map. Use a background style layer to configure a color or pattern to show below all other map content. If the style’s other layers use the Mapbox Streets source, the background style layer is responsible for drawing land, whereas the oceans and other bodies of water are drawn by `MGLFillStyleLayer` objects.
+ 
+ A background style layer is typically the bottommost layer in a style, because it covers the entire map and can occlude any layers below it. You can therefore access it by getting the last item in the `MGLStyle.layers` array.
+ 
+ If the background style layer is transparent or omitted from the style, any portion of the map view that does not show another style layer is transparent.
  */
 @interface MGLBackgroundStyleLayer : MGLStyleLayer
 

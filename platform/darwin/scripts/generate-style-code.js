@@ -365,6 +365,7 @@ const layers = Object.keys(spec.layer.type.values).map((type) => {
     }, []);
 
     return {
+        doc: spec.layer.type.values[type].doc.replace(/\n/g, '\n '),
         type: type,
         layoutProperties: _.sortBy(layoutProperties, ['name']),
         paintProperties: _.sortBy(paintProperties, ['name']),

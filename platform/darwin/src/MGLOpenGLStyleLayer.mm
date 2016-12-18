@@ -52,10 +52,19 @@ void MGLFinishCustomStyleLayer(void *context) {
 }
 
 /**
- An `MGLOpenGLStyleLayer` is a style layer that is rendered by OpenGL code in
- Objective-C blocks or Swift closures that you specify. You may initialize a new
- OpenGL style layer to add to an `MGLStyle` or obtain one from an `MGLMapView`’s
- current style using the `-[MGLStyle layerWithIdentifier:]` method.
+ An `MGLOpenGLStyleLayer` is a style layer that is rendered by OpenGL code that
+ you provide.
+ 
+ By default, this class does nothing. You can subclass this class to provide
+ custom OpenGL drawing code that is run on each frame of the map. Your subclass
+ should override the `-didMoveToMapView:`, `-willMoveFromMapView:`, and
+ `-drawInMapView:withContext:` methods.
+ 
+ You can access an existing OpenGL style layer using the
+ `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
+ otherwise, find it using the `MGLStyle.layers` property. You can also create a
+ new OpenGL style layer and add it to the style using a method such as
+ `-[MGLStyle addLayer:]`.
  
  @warning This API is undocumented and therefore unsupported. It may change at
     any time without notice.

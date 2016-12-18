@@ -63,10 +63,11 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
 };
 
 /**
- A line layer which allows customization of styling properties at runtime. You may 
- instantiate a new line layer to add to a map style or you may query an 
- `MGLMapView` for its `style` and obtain existing layers using the 
- `-[MGLStyle layerWithIdentifier:]` method. 
+ An `MGLLineStyleLayer` is a style layer that renders one or more stroked polylines on the map.
+ 
+ Use a line style layer to configure the visual appearance of polyline or multipolyline features in vector tiles loaded by an `MGLVectorSource` object or `MGLPolyline`, `MGLPolylineFeature`, `MGLMultiPolyline`, or `MGLMultiPolylineFeature` instances in an `MGLShapeSource` object.
+ 
+ You can access an existing line style layer using the `-[MGLStyle layerWithIdentifier:]` method if you know its identifier; otherwise, find it using the `MGLStyle.layers` property. You can also create a new line style layer and add it to the style using a method such as `-[MGLStyle addLayer:]`.
  */
 @interface MGLLineStyleLayer : MGLVectorStyleLayer
 

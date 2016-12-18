@@ -1,4 +1,5 @@
 <%
+  const doc = locals.doc;
   const type = locals.type;
   const layoutProperties = locals.layoutProperties;
   const paintProperties = locals.paintProperties;
@@ -55,17 +56,13 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 <% } -%>
 <% if (type == 'background') { -%>
 /**
- A map style's background layer is the bottommost layer and is used to style a color 
- or pattern to show below all other map features. You can query an `MGLMapView` for its 
- `style` and obtain the background layer using the `-[MGLStyle layerWithIdentifier:]` 
- method and passing `background` for the identifier. 
+ <%- doc %>
  */
 <% } else { -%>
 /**
- A <%- type %> layer which allows customization of styling properties at runtime. You may 
- instantiate a new <%- type %> layer to add to a map style or you may query an 
- `MGLMapView` for its `style` and obtain existing layers using the 
- `-[MGLStyle layerWithIdentifier:]` method. 
+ <%- doc %>
+ 
+ You can access an existing <%- type %> style layer using the `-[MGLStyle layerWithIdentifier:]` method if you know its identifier; otherwise, find it using the `MGLStyle.layers` property. You can also create a new <%- type %> style layer and add it to the style using a method such as `-[MGLStyle addLayer:]`.
  */
 <% } -%>
 @interface MGL<%- camelize(type) %>StyleLayer : MGL<%-

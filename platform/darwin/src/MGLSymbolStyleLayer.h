@@ -223,10 +223,11 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 };
 
 /**
- A symbol layer which allows customization of styling properties at runtime. You may 
- instantiate a new symbol layer to add to a map style or you may query an 
- `MGLMapView` for its `style` and obtain existing layers using the 
- `-[MGLStyle layerWithIdentifier:]` method. 
+ An `MGLSymbolStyleLayer` is a style layer that renders icon and text labels at points or along lines on the map.
+ 
+ Use a symbol style layer to configure the visual appearance of labels for features in vector tiles loaded by an `MGLVectorSource` object or `MGLShape` or `MGLFeature` instances in an `MGLShapeSource` object.
+ 
+ You can access an existing symbol style layer using the `-[MGLStyle layerWithIdentifier:]` method if you know its identifier; otherwise, find it using the `MGLStyle.layers` property. You can also create a new symbol style layer and add it to the style using a method such as `-[MGLStyle addLayer:]`.
  */
 @interface MGLSymbolStyleLayer : MGLVectorStyleLayer
 

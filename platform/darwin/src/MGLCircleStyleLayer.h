@@ -39,10 +39,13 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
 };
 
 /**
- A circle layer which allows customization of styling properties at runtime. You may 
- instantiate a new circle layer to add to a map style or you may query an 
- `MGLMapView` for its `style` and obtain existing layers using the 
- `-[MGLStyle layerWithIdentifier:]` method. 
+ An `MGLCircleStyleLayer` is a style layer that renders one or more filled circles on the map.
+ 
+ Use a circle style layer to configure the visual appearance of point or point collection features in vector tiles loaded by an `MGLVectorSource` object or `MGLPointAnnotation`, `MGLPointFeature`, `MGLPointCollection`, or `MGLPointCollectionFeature` instances in an `MGLShapeSource` object.
+ 
+ A circle style layer renders circles whose radii are measured in screen units. To display circles on the map whose radii correspond to real-world distances, use many-sided regular polygons and configure their appearance using an `MGLFillStyleLayer` object.
+ 
+ You can access an existing circle style layer using the `-[MGLStyle layerWithIdentifier:]` method if you know its identifier; otherwise, find it using the `MGLStyle.layers` property. You can also create a new circle style layer and add it to the style using a method such as `-[MGLStyle addLayer:]`.
  */
 @interface MGLCircleStyleLayer : MGLVectorStyleLayer
 
