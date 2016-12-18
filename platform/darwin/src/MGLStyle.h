@@ -30,14 +30,24 @@ NS_ASSUME_NONNULL_BEGIN
 static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
- The proxy object for the current map style for customization purposes and a
- set of convenience methods for creating style URLs of default styles provided
- by Mapbox.
+ The proxy object for the current map style.
+ 
+ MGLStyle provides a set of convenience methods for changing Mapbox
+ default styles using `-[MGLMapView styleURL]`.
  <a href="https://www.mapbox.com/maps/">Learn more about Mapbox default styles</a>.
+ 
+ It is also possible to directly manipulate the current map style 
+ via `-[MGLMapView style]` by updating the style's data sources or layers.
+ 
+ @note Wait until the map style has finished loading before modifying a map's
+    style via any of the MGLStyle instance methods below.
+    You can use the `MGLMapViewDelegate` methods `-mapViewDidFinishLoadingMap:`
+    or `-mapView:didFinishLoadingStyle:` as indicators that it's safe
+    to modify the map's style.
  */
 @interface MGLStyle : NSObject
 
-#pragma mark Accessing Common Styles
+#pragma mark Accessing Default Styles
 
 /**
  Returns the URL to version 8 of the
@@ -199,8 +209,8 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Adds a new source to the current style.
-
- @note Adding the same source instance more than once will result in a 
+ 
+ @note Adding the same source instance more than once will result in a
     `MGLRedundantSourceException`. Reusing the same source identifier, even with
     different source instances, will result in a 
     `MGLRedundantSourceIdentifierException`.
@@ -251,7 +261,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Adds a new layer on top of existing layers.
-
+ 
  @note Adding the same layer instance more than once will result in a
     `MGLRedundantLayerException`. Reusing the same layer identifer, even with
     different layer instances, will also result in an exception.
