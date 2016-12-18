@@ -391,8 +391,6 @@ const layers = Object.keys(spec.layer.type.values).map((type) => {
         type: type,
         layoutProperties: _.sortBy(layoutProperties, ['name']),
         paintProperties: _.sortBy(paintProperties, ['name']),
-        layoutPropertiesByName: spec[`layout_${type}`],
-        paintPropertiesByName: spec[`paint_${type}`],
     };
 });
 
