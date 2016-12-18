@@ -55,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
  the map, it is redrawn immediately.
  
  @param coords The array of coordinates to insert into the shape. The data in
-    this array is copied to the shape’s `coordinate` property.
+    this array is copied to the shape’s `coordinates` property.
  @param count The number of items in the `coords` array.
  @param index The zero-based index at which the first coordinate in `coords`
     will appear in the `coordinates` property.
@@ -67,7 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
  the map, it is redrawn immediately.
  
  @param coords The array of coordinates to add to the shape. The data in this
-    array is copied to the shape’s `coordinate` property.
+    array is copied to the shape’s `coordinates` property.
  @param count The number of items in the `coords` array.
  */
 - (void)appendCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count;
@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
     being the second vertex, and so on. The `length` field indicates the number
     of vertices to replace.
  @param coords The array of coordinates defining part of the shape. The data in
-    this array is copied to the shape’s `coordinate` property.
+    this array is copied to the shape’s `coordinates` property.
  */
 - (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(const CLLocationCoordinate2D *)coords;
 
