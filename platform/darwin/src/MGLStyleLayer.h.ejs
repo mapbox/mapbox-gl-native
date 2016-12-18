@@ -21,14 +21,15 @@ NS_ASSUME_NONNULL_BEGIN
 <% for (const property of layoutProperties) { -%>
 <% if (property.type == "enum") { -%>
 /**
- <%- propertyDoc(property.name, property, type) %>
+<%- propertyDoc(property.name, property, type, 'enum').wrap(80, 1) %>
  
- Values of this type are used in the `MGL<%- camelize(type) %>StyleLayer.<%- camelizeWithLeadingLowercase(property.name) %>` property.
+ Values of this type are used in the `MGL<%- camelize(type) %>StyleLayer.<%- camelizeWithLeadingLowercase(property.name) %>`
+ property.
  */
 typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 <% for (const value in property.values) { -%>
     /**
-     <%- propertyDoc(property.name, property.values[value], type) %>
+<%- propertyDoc(property.name, property.values[value], type, 'enum').wrap(80, 4+1) %>
      */
     MGL<%- camelize(property.name) %><%- camelize(value) %>,
 <% } -%>
@@ -39,14 +40,15 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 <% for (const property of paintProperties) { -%>
 <% if (property.type == "enum") { -%>
 /**
- <%- propertyDoc(property.name, property, type) %>
+<%- propertyDoc(property.name, property, type, 'enum').wrap(80, 1) %>
  
- Values of this type are used in the `MGL<%- camelize(type) %>StyleLayer.<%- camelizeWithLeadingLowercase(property.name) %>` property.
+ Values of this type are used in the `MGL<%- camelize(type) %>StyleLayer.<%- camelizeWithLeadingLowercase(property.name) %>`
+ property.
  */
 typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 <% for (const value in property.values) { -%>
     /**
-     <%- propertyDoc(property.name, property.values[value], type) %>
+<%- propertyDoc(property.name, property.values[value], type, 'enum').wrap(80, 4+1) %>
      */
     MGL<%- camelize(property.name) %><%- camelize(value) %>,
 <% } -%>
@@ -56,13 +58,17 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 <% } -%>
 <% if (type == 'background') { -%>
 /**
- <%- doc %>
+<%- doc.wrap(80, 1) %>
  */
 <% } else { -%>
 /**
- <%- doc %>
+<%- doc.wrap(80, 1) %>
  
- You can access an existing <%- type %> style layer using the `-[MGLStyle layerWithIdentifier:]` method if you know its identifier; otherwise, find it using the `MGLStyle.layers` property. You can also create a new <%- type %> style layer and add it to the style using a method such as `-[MGLStyle addLayer:]`.
+ You can access an existing <%- type %> style layer using the
+ `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
+ otherwise, find it using the `MGLStyle.layers` property. You can also create a
+ new <%- type %> style layer and add it to the style using a method such as
+ `-[MGLStyle addLayer:]`.
  */
 <% } -%>
 @interface MGL<%- camelize(type) %>StyleLayer : MGL<%-
@@ -80,18 +86,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 
 <% for (const property of layoutProperties) { -%>
 /**
- <%- propertyDoc(property.name, property, type) %>
-<% if ('default' in property) { -%>
- 
- The default value of this property is <%- propertyDefault(property, type) %>.<% if (!property.required) { %> Set this property to `nil` to reset it to the default value.<% } %>
-<% } if (property.requires) { -%>
- 
- <%- propertyReqs(property, layoutPropertiesByName, type) %>
-<% } -%>
-<% if (property.original) { -%>
- 
- This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-<%- type -%>-<%- property.original -%>"><code><%- property.original -%></code></a> layout property in the Mapbox Style Specification.
-<% } -%>
+<%- propertyDoc(property.name, property, type, 'layout').wrap(80, 1) %>
  */
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
 
@@ -106,18 +101,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 
 <% for (const property of paintProperties) { -%>
 /**
- <%- propertyDoc(property.name, property, type) %>
-<% if ('default' in property) { -%>
- 
- The default value of this property is <%- propertyDefault(property, type) %>.<% if (!property.required) { %> Set this property to `nil` to reset it to the default value.<% } %>
-<% } if (property.requires) { -%>
-
- <%- propertyReqs(property, paintPropertiesByName, type) %>
-<% } -%>
-<% if (property.original) { -%>
- 
- This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-<%- property.original -%>"><code><%- property.original -%></code></a> paint property in the Mapbox Style Specification.
-<% } -%>
+<%- propertyDoc(property.name, property, type, 'paint').wrap(80, 1) %>
  */
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
 
