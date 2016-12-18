@@ -146,7 +146,6 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDashPattern;
 
-
 @property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDasharray __attribute__((unavailable("Use lineDashPattern instead.")));
 
 /**
