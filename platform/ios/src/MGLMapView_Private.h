@@ -1,11 +1,13 @@
 #import <Mapbox/Mapbox.h>
 
-#include <mbgl/mbgl.hpp>
+namespace mbgl {
+    class Map;
+}
 
 /// Minimum size of an annotation’s accessibility element.
 extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;
 
-@interface MGLMapView (Internal)
+@interface MGLMapView (Private)
 
 /// Currently shown popover representing the selected annotation.
 @property (nonatomic) UIView<MGLCalloutView> *calloutViewForSelectedAnnotation;

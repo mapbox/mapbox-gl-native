@@ -1,6 +1,8 @@
 #import "MGLMapView.h"
 
-#import <mbgl/mbgl.hpp>
+namespace mbgl {
+    class Map;
+}
 
 @interface MGLMapView (Private)
 
