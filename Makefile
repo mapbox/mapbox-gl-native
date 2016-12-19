@@ -565,6 +565,14 @@ android-ui-test:
 run-android-ui-test:
 	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:connectedAndroidTest -i	
 
+.PHONY: run-android-ui-test-aws
+run-android-ui-test-aws:
+	cd platform/android && ./gradlew devicefarmUpload
+
+.PHONY: run-android-ui-test-spoon
+run-android-ui-test-spoon:
+	cd platform/android && ./gradlew spoon
+
 .PHONY: apackage
 apackage:
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
@@ -576,6 +584,10 @@ test-code-android:
 .PHONY: android-ndk-stack
 android-ndk-stack:
 	adb logcat | ndk-stack -sym build/android-arm-v7/Debug	
+
+.PHONY: android-checkstyle	
+android-checkstyle:
+	cd platform/android && ./gradlew checkstyle
 
 #### Miscellaneous targets #####################################################
 
