@@ -52,7 +52,7 @@ custom_categories:
     children:
       - MGLCalloutView
       - MGLCalloutViewDelegate
-  - name: Style Features
+  - name: Style Primitives
     children:
       - MGLPointFeature
       - MGLPolygonFeature
@@ -61,22 +61,20 @@ custom_categories:
       - MGLMultiPolylineFeature
       - MGLPointCollectionFeature
       - MGLShapeCollectionFeature
-  - name: Style Sources
+  - name: Style Content
     children:
       - MGLSource
-      - MGLTileSet
-      - MGLGeoJSONSource
+      - MGLTileSource
+      - MGLShapeSource
       - MGLRasterSource
       - MGLVectorSource
-  - name: Style Layers (Abstract)
+  - name: Style Layers
     children:
       - MGLStyleLayer
       - MGLForegroundStyleLayer
-      - MGLVectorStyleLayer
-  - name: Style Layers
-    children:
       - MGLBackgroundStyleLayer
       - MGLRasterStyleLayer
+      - MGLVectorStyleLayer
       - MGLCircleStyleLayer
       - MGLFillStyleLayer
       - MGLLineStyleLayer
@@ -84,7 +82,6 @@ custom_categories:
   - name: Style Values
     children:
       - MGLStyleValue
-      - NSValue(MGLAdditions)
   - name: Offline Maps
     children:
       - MGLOfflineRegion
