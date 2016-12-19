@@ -3,6 +3,7 @@
 #import "MGLStyleLayer.h"
 #import "MGLStyleValue_Private.h"
 
+#include <mbgl/mbgl.hpp>
 #include <mbgl/style/layer.hpp>
 
 NS_ASSUME_NONNULL_BEGIN

@@ -5,6 +5,7 @@
 #import "MGLTileSource_Private.h"
 #import "NSURL+MGLAdditions.h"
 
+#include <mbgl/mbgl.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
 
 const MGLTileSourceOption MGLTileSourceOptionTileSize = @"MGLTileSourceOptionTileSize";

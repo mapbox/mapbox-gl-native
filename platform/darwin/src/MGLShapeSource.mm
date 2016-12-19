@@ -7,6 +7,7 @@
 
 #import "NSURL+MGLAdditions.h"
 
+#include <mbgl/mbgl.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 
 const MGLShapeSourceOption MGLShapeSourceOptionClustered = @"MGLShapeSourceOptionClustered";
