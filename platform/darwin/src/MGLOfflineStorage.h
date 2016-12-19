@@ -162,9 +162,8 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
  Creates and registers an offline pack that downloads the resources needed to
  use the given region offline.
  
- The resulting pack is added to the shared offline storage object’s
- `MGLOfflineStorage.packs` property, then the `completion` block is executed
- with that pack passed in.
+ The resulting pack is added to the shared offline storage object’s `packs`
+ property, then the `completion` block is executed with that pack passed in.
  
  The pack has an initial state of `MGLOfflinePackStateInactive`. To begin
  downloading resources, call `-[MGLOfflinePack resume]` on the pack from within

@@ -16,10 +16,10 @@ NS_ASSUME_NONNULL_BEGIN
  
  You can add custom data to display on the map by creating feature objects and
  adding them to an `MGLShapeSource` using the
- `-[MGLShapeSource initWithIdentifier:shape:options:]` method or `shape`
- property. Similarly, you can add `MGLPointFeature`, `MGLPolylineFeature`, and
- `MGLPolygonFeature` objects to the map as annotations using
- `-[MGLMapView addAnnotations:]` and related methods.
+ `-[MGLShapeSource initWithIdentifier:shape:options:]` method or
+ `MGLShapeSource.shape` property. Similarly, you can add `MGLPointFeature`,
+ `MGLPolylineFeature`, and `MGLPolygonFeature` objects to the map as annotations
+ using `-[MGLMapView addAnnotations:]` and related methods.
  
  In addition to adding data to the map, you can also extract data from the map:
  `-[MGLMapView visibleFeaturesAtPoint:]` and related methods return feature
