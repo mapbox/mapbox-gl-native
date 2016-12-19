@@ -49,13 +49,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Creates and returns an `MGLStyleFunction` object representing a zoom level
- function with an exponential base and any number of stops.
+ function with an exponential interpolation base and any number of stops.
  
- @param base The exponential base of the interpolation curve.
+ @param interpolationBase The exponential base of the interpolation curve.
  @param stops A dictionary associating zoom levels with style values.
- @return An `MGLStyleFunction` object with the given base and stops.
+ @return An `MGLStyleFunction` object with the given interpolation base and stops.
  */
-+ (instancetype)valueWithBase:(CGFloat)base stops:(NSDictionary<NSNumber *, MGLStyleValue<T> *> *)stops;
++ (instancetype)valueWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary<NSNumber *, MGLStyleValue<T> *> *)stops;
 
 @end
 
@@ -126,38 +126,38 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Creates and returns an `MGLStyleFunction` object representing a zoom level
- function with an exponential base and any number of stops.
+ function with an exponential interpolation base and any number of stops.
  
- @param base The exponential base of the interpolation curve.
+ @param interpolationBase The exponential base of the interpolation curve.
  @param stops A dictionary associating zoom levels with style values.
- @return An `MGLStyleFunction` object with the given base and stops.
+ @return An `MGLStyleFunction` object with the given interpolation base and stops.
  */
-+ (instancetype)functionWithBase:(CGFloat)base stops:(NSDictionary<NSNumber *, MGLStyleValue<T> *> *)stops;
++ (instancetype)functionWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary<NSNumber *, MGLStyleValue<T> *> *)stops;
 
 #pragma mark Initializing a Style Function
 
 /**
  Returns an `MGLStyleFunction` object representing a zoom level function with an
- exponential base and any number of stops.
+ exponential interpolation base and any number of stops.
  
- @param base The exponential base of the interpolation curve.
+ @param interpolationBase The exponential base of the interpolation curve.
  @param stops A dictionary associating zoom levels with style values.
- @return An `MGLStyleFunction` object with the given base and stops.
+ @return An `MGLStyleFunction` object with the given interpolation base and stops.
  */
-- (instancetype)initWithBase:(CGFloat)base stops:(NSDictionary<NSNumber *, MGLStyleValue<T> *> *)stops NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary<NSNumber *, MGLStyleValue<T> *> *)stops NS_DESIGNATED_INITIALIZER;
 
 #pragma mark Accessing the Parameters of a Function
 
 /**
- The exponential base of the function’s interpolation curve.
+ The exponential interpolation base of the function’s interpolation curve.
  
- The exponential base controls the rate at which the function’s output values
+ The exponential interpolation base controls the rate at which the function’s output values
  increase. A value of 1 causes the function to increase linearly by zoom level.
- A higher exponential base causes the function’s output values to vary
+ A higher exponential interpolation base causes the function’s output values to vary
  exponentially, increasing more rapidly towards the high end of the function’s
  range. The default value of this property is 1, for a linear curve.
  */
-@property (nonatomic) CGFloat base;
+@property (nonatomic) CGFloat interpolationBase;
 
 /**
  A dictionary associating zoom levels with style values.
