@@ -42,7 +42,7 @@ public:
             for (const auto &mbglStop : mbglStops) {
                 stops[@(mbglStop.first)] = toEnumStyleConstantValue<>(mbglStop.second);
             }
-            return [MGLStyleFunction<NSValue *> functionWithBase:mbglValue.asFunction().getBase() stops:stops];
+            return [MGLStyleFunction<NSValue *> functionWithInterpolationBase:mbglValue.asFunction().getBase() stops:stops];
         } else {
             return nil;
         }
@@ -62,7 +62,7 @@ public:
                 NSCAssert(mbglStopValue.isConstant(), @"Stops must be constant");
                 mbglStops.emplace_back(zoomKey.floatValue, mbglStopValue.asConstant());
             }];
-            return mbgl::style::Function<MBGLType>({{mbglStops}}, function.base);
+            return mbgl::style::Function<MBGLType>({{mbglStops}}, function.interpolationBase);
         } else if (value) {
             [NSException raise:@"MGLAbstractClassException" format:
              @"The style value %@ cannot be applied to the style. "
@@ -92,7 +92,7 @@ public:
                 NSCAssert(mbglStopValue.isConstant(), @"Stops must be constant");
                 mbglStops.emplace_back(zoomKey.floatValue, mbglStopValue.asConstant());
             }];
-            return mbgl::style::Function<MBGLEnum>({{mbglStops}}, function.base);
+            return mbgl::style::Function<MBGLEnum>({{mbglStops}}, function.interpolationBase);
         } else if (value) {
             [NSException raise:@"MGLAbstractClassException" format:
              @"The style value %@ cannot be applied to the style. "
@@ -118,7 +118,7 @@ private:
             auto rawValue = toMGLRawStyleValue(mbglStop.second);
             stops[@(mbglStop.first)] = [MGLStyleValue valueWithRawValue:rawValue];
         }
-        return [MGLStyleFunction<ObjCType> functionWithBase:mbglFunction.getBase() stops:stops];
+        return [MGLStyleFunction<ObjCType> functionWithInterpolationBase:mbglFunction.getBase() stops:stops];
     }
 
     template <typename MBGLEnum = MBGLType,

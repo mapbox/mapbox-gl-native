@@ -32,7 +32,7 @@ extension MGLStyleValueTests {
             3: MGLStyleValue(rawValue: true),
             4: MGLStyleValue(rawValue: false),
             ]
-        symbolStyleLayer.iconAllowsOverlap = MGLStyleFunction<NSNumber>(base: 1, stops: stops)
-        XCTAssertEqual((symbolStyleLayer.iconAllowsOverlap as! MGLStyleFunction<NSNumber>), MGLStyleFunction(base: 1, stops: stops))
+        symbolStyleLayer.iconAllowsOverlap = MGLStyleFunction<NSNumber>(interpolationBase: 1, stops: stops)
+        XCTAssertEqual((symbolStyleLayer.iconAllowsOverlap as! MGLStyleFunction<NSNumber>), MGLStyleFunction(interpolationBase: 1, stops: stops))
     }
 }
