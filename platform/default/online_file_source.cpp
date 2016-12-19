@@ -13,6 +13,7 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/timer.hpp>
+#include <mbgl/util/url.hpp>
 #include <mbgl/util/http_timeout.hpp>
 
 #include <algorithm>
@@ -164,33 +165,63 @@ OnlineFileSource::OnlineFileSource()
 
 OnlineFileSource::~OnlineFileSource() = default;
 
+void OnlineFileSource::setURLSchemeTemplate(const std::string& scheme, const std::string& tpl) {
+    if (scheme == "mapbox") {
+        throw std::runtime_error("Cannot override mapbox:// URL scheme");
+    }
+    auto it = urlSchemeTemplates.find(scheme);
+    if (tpl.empty()) {
+        urlSchemeTemplates.erase(it);
+    } else {
+        if (it != urlSchemeTemplates.end()) {
+            it->second = tpl;
+        } else {
+            urlSchemeTemplates.emplace(scheme, tpl);
+        }
+    }
+}
+
+std::string OnlineFileSource::getURLSchemeTemplate(const std::string& scheme) const {
+    auto it = urlSchemeTemplates.find(scheme);
+    return it != urlSchemeTemplates.end() ? it->second : "";
+}
+
 std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource, Callback callback) {
     Resource res = resource;
 
-    switch (resource.kind) {
-    case Resource::Kind::Unknown:
-        break;
+    const util::URL url(resource.url);
 
-    case Resource::Kind::Style:
-        res.url = mbgl::util::mapbox::normalizeStyleURL(apiBaseURL, resource.url, accessToken);
-        break;
+    if (resource.url.compare(url.scheme.first, url.scheme.second, "mapbox") == 0) {
+        switch (resource.kind) {
+        case Resource::Kind::Style:
+            res.url = mbgl::util::mapbox::normalizeStyleURL(apiBaseURL, resource.url, accessToken);
+            break;
 
-    case Resource::Kind::Source:
-        res.url = util::mapbox::normalizeSourceURL(apiBaseURL, resource.url, accessToken);
-        break;
+        case Resource::Kind::Source:
+            res.url = util::mapbox::normalizeSourceURL(apiBaseURL, resource.url, accessToken);
+            break;
 
-    case Resource::Kind::Glyphs:
-        res.url = util::mapbox::normalizeGlyphsURL(apiBaseURL, resource.url, accessToken);
-        break;
+        case Resource::Kind::Glyphs:
+            res.url = util::mapbox::normalizeGlyphsURL(apiBaseURL, resource.url, accessToken);
+            break;
 
-    case Resource::Kind::SpriteImage:
-    case Resource::Kind::SpriteJSON:
-        res.url = util::mapbox::normalizeSpriteURL(apiBaseURL, resource.url, accessToken);
-        break;
+        case Resource::Kind::SpriteImage:
+        case Resource::Kind::SpriteJSON:
+            res.url = util::mapbox::normalizeSpriteURL(apiBaseURL, resource.url, accessToken);
+            break;
 
-    case Resource::Kind::Tile:
-        res.url = util::mapbox::normalizeTileURL(apiBaseURL, resource.url, accessToken);
-        break;
+        case Resource::Kind::Tile:
+            res.url = util::mapbox::normalizeTileURL(apiBaseURL, resource.url, accessToken);
+            break;
+
+        default:
+            break;
+        }
+    } else {
+        auto it = urlSchemeTemplates.find(resource.url.substr(url.scheme.first, url.scheme.second));
+        if (it != urlSchemeTemplates.end() && !it->second.empty()) {
+            res.url = util::transformURL(it->second, res.url, url);
+        }
     }
 
     return std::make_unique<OnlineFileRequest>(std::move(res), std::move(callback), *impl);

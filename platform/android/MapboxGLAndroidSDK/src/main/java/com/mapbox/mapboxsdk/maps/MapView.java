@@ -373,6 +373,34 @@ public class MapView extends FrameLayout {
   }
 
   /**
+   * <p>Sets a URL template for the given scheme.</p>
+   * <p>Any URLs encountered in styles and subsequently loaded sources will be fed through a URL
+   *   replacement mechanism that e.g. transforms {@code mapbox://} URLs into regular
+   *   {@code https://} URLs. You can provide URL replacement patterns for your own scheme, e.g.
+   *   {@code example://}.</p>
+   * <p>Any query string will be preserved from the original URL and merged with a query string of
+   *   the template URL, if any.</p>
+   *
+   * @param scheme scheme The scheme that this template should be used for. Specify the scheme
+   * without trailing {@code ://}, e.g. just {@code example}. You may use arbitrary alphanumeric
+   * schemes, with the exception of the protected scheme {@code mapbox}.
+   * @param tpl A templated URL. it may contain these brace-enclosed replacement tokens, e.g. for
+   *   {@code &quot;http://example.com/foo/bar/baz.png&quot;}, valid tokens are:
+   *   <ul>
+   *   <li>{@code {scheme}}: {@code &quot;http&quot;}</li>
+   *   <li>{@code {domain}}: {@code &quot;example.com&quot;}</li>
+   *   <li>{@code {path}}: {@code &quot;foo/bar/baz.png&quot;} (without leading {@code /})</li>
+   *   <li>{@code {directory}}: {@code &quot;foo/bar/&quot;} (with trailing {@code /})</li>
+   *   <li>{@code {filename}}: {@code &quot;baz&quot;} (without file extension)</li>
+   *   <li>{@code {extension}}: {@code &quot;.png&quot;} (optionally with a preceding {@code @2x}
+   *   ratio specifier)</li>
+   *   </ul>
+   */
+  public void setURLSchemeTemplate(String scheme, String tpl) {
+    nativeMapView.setURLSchemeTemplate(scheme, tpl);
+  }
+
+  /**
    * <p>
    * Loads a new map style from the specified URL.
    * </p>

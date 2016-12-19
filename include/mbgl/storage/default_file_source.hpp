@@ -36,6 +36,9 @@ public:
     void setAccessToken(const std::string&);
     std::string getAccessToken() const;
 
+    void setURLSchemeTemplate(const std::string& scheme, const std::string& tpl);
+    std::string getURLSchemeTemplate(const std::string& scheme) const;
+
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
     /*

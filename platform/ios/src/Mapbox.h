@@ -26,6 +26,7 @@ FOUNDATION_EXPORT MGL_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLOfflinePack.h"
 #import "MGLOfflineRegion.h"
 #import "MGLOfflineStorage.h"
+#import "MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h"
 #import "MGLOverlay.h"
 #import "MGLPointAnnotation.h"
 #import "MGLPointCollection.h"
