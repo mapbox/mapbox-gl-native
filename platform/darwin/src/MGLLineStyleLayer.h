@@ -93,9 +93,9 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
  ```swift
  let layer = MGLLineStyleLayer(identifier: "trails-path", source: trails)
  layer.sourceLayerIdentifier = "trails"
- layer.lineWidth = MGLStyleValue(base: 1.5, stops: [
- 14: MGLStyleValue(rawValue: 2),
- 18: MGLStyleValue(rawValue: 20),
+ layer.lineWidth = MGLStyleValue(interpolationBase: 1.5, stops: [
+    14: MGLStyleValue(rawValue: 2),
+    18: MGLStyleValue(rawValue: 20),
  ])
  layer.lineColor = MGLStyleValue(rawValue: UIColor.brown)
  layer.lineCap = MGLStyleValue(rawValue: NSValue(mglLineCap: .round))

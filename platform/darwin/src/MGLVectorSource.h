@@ -28,13 +28,13 @@ NS_ASSUME_NONNULL_BEGIN
  ### Example ###
 
  ```swift
- // Define tileset
- let tileset = MGLTileSet(tileURLTemplates: ["https://example.com/vector-tiles/{z}/{x}/{y}.mvt"])
- tileset.minimumZoomLevel = 9
- tileset.maximumZoomLevel = 16
- tileset.attribution = "© Mapbox"
- // Add source to map
- let source = MGLVectorSource(identifier: "pois", tileSet: tileset)
+ let source = MGLVectorSource(identifier: "pois", tileURLTemplates: ["https://example.com/vector-tiles/{z}/{x}/{y}.mvt"], options: [
+    .minimumZoomLevel: 9,
+    .maximumZoomLevel: 16,
+    .attributionInfos: [
+	MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+    ]
+ ])
  mapView.style.addSource(source)
  ```
  */

@@ -17,19 +17,6 @@ NS_ASSUME_NONNULL_BEGIN
  
  This option is only applicable to `MGLRasterSource` objects; it is ignored when
  initializing `MGLVectorSource` objects.
-
- ### Example ###
-
- ```swift
- // Define tileset
- let tileset = MGLTileSet(tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"])
- tileset.minimumZoomLevel = 9
- tileset.maximumZoomLevel = 16
- tileset.attribution = "© Mapbox"
- // Add source to map
- let source = MGLRasterSource(identifier: "clouds", tileSet: tileset, tileSize: 512)
- mapView.style.addSource(source)
- ```
  */
 extern const MGLTileSourceOption MGLTileSourceOptionTileSize;
 
@@ -48,6 +35,20 @@ extern const MGLTileSourceOption MGLTileSourceOptionTileSize;
  `MGLRasterSource` object that you can use to initialize new style layers. You
  can also add and remove sources dynamically using methods such as
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
+
+ ### Example ###
+
+ ```swift
+ let source = MGLRasterSource(identifier: "clouds", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
+    .minimumZoomLevel: 9,
+    .maximumZoomLevel: 16,
+    .tileSize: 512,
+    .attributionInfos: [
+	MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+    ]
+ ])
+ mapView.style.addSource(source)
+ ```
  */
 @interface MGLRasterSource : MGLTileSource
 
