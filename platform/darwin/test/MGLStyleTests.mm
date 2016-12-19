@@ -217,4 +217,36 @@
     XCTAssertEqual(image.size.height, styleImage.size.height);
 }
 
+- (void)testLayersOrder {
+    [self.mapView setStyleURL:[MGLStyle streetsStyleURLWithVersion:8]];
+    
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
+    NSURL *url = [NSURL fileURLWithPath:filePath];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLCircleStyleLayer *layer1 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer1" source:source];
+    [self.mapView.style addLayer:layer1];
+    
+    MGLCircleStyleLayer *layer3 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer3" source:source];
+    [self.mapView.style addLayer:layer3];
+    
+    MGLCircleStyleLayer *layer2 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer2" source:source];
+    [self.mapView.style insertLayer:layer2 aboveLayer:layer1];
+    
+    MGLCircleStyleLayer *layer4 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer4" source:source];
+    [self.mapView.style insertLayer:layer4 aboveLayer:layer3];
+    
+    MGLCircleStyleLayer *layer0 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer0" source:source];
+    [self.mapView.style insertLayer:layer0 belowLayer:layer1];
+    
+    NSArray<MGLStyleLayer *> *layers = [self.mapView.style layers];
+    
+    XCTAssert([[layers[0] identifier] isEqualToString:layer0.identifier]);
+    XCTAssert([[layers[1] identifier] isEqualToString:layer1.identifier]);
+    XCTAssert([[layers[2] identifier] isEqualToString:layer2.identifier]);
+    XCTAssert([[layers[3] identifier] isEqualToString:layer3.identifier]);
+    XCTAssert([[layers[4] identifier] isEqualToString:layer4.identifier]);
+}
+
 @end
