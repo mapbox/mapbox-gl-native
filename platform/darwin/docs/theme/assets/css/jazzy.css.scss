@@ -367,6 +367,17 @@ pre code {
   color: $navigation_task_color;
 }
 
+.nav-group-task[data-url^="Protocols/"],
+.nav-group-task[data-name="MGLForegroundStyleLayer"],
+.nav-group-task[data-name="MGLMultiPoint"],
+.nav-group-task[data-name="MGLShape"],
+.nav-group-task[data-name="MGLSource"],
+.nav-group-task[data-name="MGLStyleLayer"],
+.nav-group-task[data-name="MGLTileSource"],
+.nav-group-task[data-name="MGLVectorStyleLayer"] {
+  font-style: italic;
+}
+
 .nav-group-name > .small-heading,
 .nav-group-task-link {
   display: block;
