@@ -95,19 +95,42 @@ private:
     }
 
     void addFeature(const vt_point& point, const property_map& props) {
+#if !defined(__GNUC__) || __GNUC__ >= 5
         tile.features.push_back({ transform(point), props });
+#else
+        mapbox::geometry::feature<int16_t> feature;
+        feature.geometry = transform(point);
+        feature.properties = props;
+        tile.features.push_back(std::move(feature));
+#endif
     }
 
     void addFeature(const vt_line_string& line, const property_map& props) {
         const auto new_line = transform(line);
-        if (!new_line.empty())
+        if (!new_line.empty()) {
+#if !defined(__GNUC__) || __GNUC__ >= 5
             tile.features.push_back({ std::move(new_line), props });
+#else
+            mapbox::geometry::feature<int16_t> feature;
+            feature.geometry = std::move(new_line);
+            feature.properties = props;
+            tile.features.push_back(std::move(feature));
+#endif
+        }
     }
 
     void addFeature(const vt_polygon& polygon, const property_map& props) {
         const auto new_polygon = transform(polygon);
-        if (!new_polygon.empty())
+        if (!new_polygon.empty()) {
+#if !defined(__GNUC__) || __GNUC__ >= 5
             tile.features.push_back({ std::move(new_polygon), props });
+#else
+            mapbox::geometry::feature<int16_t> feature;
+            feature.geometry = std::move(new_polygon);
+            feature.properties = props;
+            tile.features.push_back(std::move(feature));
+#endif
+        }
     }
 
     void addFeature(const vt_geometry_collection& collection, const property_map& props) {
@@ -127,18 +150,36 @@ private:
         case 0:
             break;
         case 1:
+#if !defined(__GNUC__) || __GNUC__ >= 5
             tile.features.push_back({ std::move(new_multi[0]), props });
+#else
+            {
+                mapbox::geometry::feature<int16_t> feature;
+                feature.geometry = std::move(new_multi[0]);
+                feature.properties = props;
+                tile.features.push_back(std::move(feature));
+            }
+#endif
             break;
         default:
+#if !defined(__GNUC__) || __GNUC__ >= 5
             tile.features.push_back({ std::move(new_multi), props });
+#else
+            {
+                mapbox::geometry::feature<int16_t> feature;
+                feature.geometry = std::move(new_multi);
+                feature.properties = props;
+                tile.features.push_back(std::move(feature));
+            }
+#endif
             break;
         }
     }
 
     mapbox::geometry::point<int16_t> transform(const vt_point& p) {
         ++tile.num_simplified;
-        return { static_cast<int16_t>(std::round((p.x * z2 - x) * extent)),
-                 static_cast<int16_t>(std::round((p.y * z2 - y) * extent)) };
+        return { static_cast<int16_t>(::round((p.x * z2 - x) * extent)),
+                 static_cast<int16_t>(::round((p.y * z2 - y) * extent)) };
     }
 
     mapbox::geometry::multi_point<int16_t> transform(const vt_multi_point& points) {
