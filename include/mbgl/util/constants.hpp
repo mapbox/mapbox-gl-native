@@ -2,6 +2,7 @@
 
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/unitbezier.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <cmath>
 #include <string>
@@ -43,7 +44,7 @@ constexpr uint64_t DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
 constexpr Duration DEFAULT_FADE_DURATION = Milliseconds(300);
 constexpr Seconds CLOCK_SKEW_RETRY_TIMEOUT { 30 };
 
-constexpr UnitBezier DEFAULT_TRANSITION_EASE = { 0, 0, 0.25, 1 };
+const UnitBezier DEFAULT_TRANSITION_EASE = { 0, 0, 0.25, 1 };
     
 constexpr int DEFAULT_RATE_LIMIT_TIMEOUT = 5;
 
