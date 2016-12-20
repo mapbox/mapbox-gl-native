@@ -28,6 +28,10 @@ using ShapeAnnotationGeometry = variant<
 
 class LineAnnotation {
 public:
+    LineAnnotation(const ShapeAnnotationGeometry &geometry_, const style::PropertyValue<float> &opacity_,
+            const style::PropertyValue<float> &width_, const style::PropertyValue<Color> &color_) :
+        geometry(geometry_), opacity(opacity_), width(width_), color(color_) {}
+
     ShapeAnnotationGeometry geometry;
     style::PropertyValue<float> opacity { 1.0f };
     style::PropertyValue<float> width { 1.0f };
@@ -36,6 +40,10 @@ public:
 
 class FillAnnotation {
 public:
+    FillAnnotation(const ShapeAnnotationGeometry &geometry_, const style::PropertyValue<float> &opacity_,
+            const style::PropertyValue<Color> &color_, const style::PropertyValue<Color> &outlineColor_) :
+        geometry(geometry_), opacity(opacity_), color(color_), outlineColor(outlineColor_) {}
+
     ShapeAnnotationGeometry geometry;
     style::PropertyValue<float> opacity { 1.0f };
     style::PropertyValue<Color> color { Color::black() };

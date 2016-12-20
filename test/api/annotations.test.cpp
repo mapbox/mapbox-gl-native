@@ -58,9 +58,7 @@ TEST(Annotations, LineAnnotation) {
     AnnotationTest test;
 
     LineString<double> line = {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }};
-    LineAnnotation annotation { line };
-    annotation.color = Color::red();
-    annotation.width = { 5 };
+    LineAnnotation annotation(line, 1.0f, 5, Color::red());
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotation(annotation);
@@ -74,8 +72,7 @@ TEST(Annotations, FillAnnotation) {
     AnnotationTest test;
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
-    FillAnnotation annotation { polygon };
-    annotation.color = Color::red();
+    FillAnnotation annotation(polygon, 1.0f, Color::red(), {});
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotation(annotation);
@@ -93,14 +90,11 @@ TEST(Annotations, AntimeridianAnnotationSmall) {
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
     LineString<double> line = {{ { antimeridian, 20 }, { antimeridian, -20 } }};
-    LineAnnotation lineAnnotation { line };
-    lineAnnotation.color = Color::red();
-    lineAnnotation.width = { 2 };
+    LineAnnotation lineAnnotation(line, 1.0f, 2, Color::red());
     test.map.addAnnotation(lineAnnotation);
 
     Polygon<double> polygon = {{ {{ { antimeridian+10, 0 }, { antimeridian - 10, 10 }, { antimeridian-10, -10 } }} }};
-    FillAnnotation polygonAnnotation { polygon };
-    polygonAnnotation.color = Color::blue();
+    FillAnnotation polygonAnnotation(polygon, 1.0f, Color::blue(), {});
     test.map.addAnnotation(polygonAnnotation);
 
     test.checkRendering("antimeridian_annotation_small");
@@ -114,14 +108,11 @@ TEST(Annotations, AntimeridianAnnotationLarge) {
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
     LineString<double> line = {{ { antimeridian, 20 }, { antimeridian, -20 } }};
-    LineAnnotation lineAnnotation { line };
-    lineAnnotation.color = Color::red();
-    lineAnnotation.width = { 2 };
+    LineAnnotation lineAnnotation(line, 1.0f, 2, Color::red());
     test.map.addAnnotation(lineAnnotation);
 
     Polygon<double> polygon = {{ {{ { antimeridian-10, 0 }, { -antimeridian+10, 10 }, { -antimeridian+10, -10 } }} }};
-    FillAnnotation polygonAnnotation { polygon };
-    polygonAnnotation.color = Color::blue();
+    FillAnnotation polygonAnnotation(polygon, 1.0f, Color::blue(), {});
     test.map.addAnnotation(polygonAnnotation);
 
     test.checkRendering("antimeridian_annotation_large");
@@ -131,10 +122,8 @@ TEST(Annotations, OverlappingFillAnnotation) {
     AnnotationTest test;
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
-    FillAnnotation underlaidAnnotation { polygon };
-    underlaidAnnotation.color = Color::green();
-    FillAnnotation overlaidAnnotation { polygon };
-    overlaidAnnotation.color = Color::red();
+    FillAnnotation underlaidAnnotation(polygon, 1.0f, Color::green(), {});
+    FillAnnotation overlaidAnnotation(polygon, 1.0f, Color::red(), {});
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotation(underlaidAnnotation);
@@ -172,8 +161,7 @@ TEST(Annotations, NonImmediateAdd) {
     test::render(test.map, test.view);
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
-    FillAnnotation annotation { polygon };
-    annotation.color = Color::red();
+    FillAnnotation annotation(polygon, 1.0f, Color::red(), {});
 
     test.map.addAnnotation(annotation);
     test.checkRendering("non_immediate_add");
@@ -210,9 +198,7 @@ TEST(Annotations, UpdateSymbolAnnotationIcon) {
 TEST(Annotations, UpdateLineAnnotationGeometry) {
     AnnotationTest test;
 
-    LineAnnotation annotation { LineString<double> {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }} };
-    annotation.color = Color::red();
-    annotation.width = { 5 };
+    LineAnnotation annotation(LineString<double> {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }}, 1.0f, 5, Color::red());
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     AnnotationID line = test.map.addAnnotation(annotation);
@@ -227,9 +213,7 @@ TEST(Annotations, UpdateLineAnnotationGeometry) {
 TEST(Annotations, UpdateLineAnnotationStyle) {
     AnnotationTest test;
 
-    LineAnnotation annotation { LineString<double> {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }} };
-    annotation.color = Color::red();
-    annotation.width = { 5 };
+    LineAnnotation annotation(LineString<double> {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }}, 1.0f, 5, Color::red());
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     AnnotationID line = test.map.addAnnotation(annotation);
@@ -245,8 +229,7 @@ TEST(Annotations, UpdateLineAnnotationStyle) {
 TEST(Annotations, UpdateFillAnnotationGeometry) {
     AnnotationTest test;
 
-    FillAnnotation annotation { Polygon<double> {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }} };
-    annotation.color = Color::red();
+    FillAnnotation annotation(Polygon<double> {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }}, 1.0f, Color::red(), {});
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     AnnotationID fill = test.map.addAnnotation(annotation);
@@ -262,8 +245,7 @@ TEST(Annotations, UpdateFillAnnotationStyle) {
     AnnotationTest test;
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
-    FillAnnotation annotation { polygon };
-    annotation.color = Color::red();
+    FillAnnotation annotation(polygon, 1.0f, Color::red(), {});
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     AnnotationID fill = test.map.addAnnotation(annotation);
@@ -292,9 +274,7 @@ TEST(Annotations, RemoveShape) {
     AnnotationTest test;
 
     LineString<double> line = {{ { 0, 0 }, { 45, 45 } }};
-    LineAnnotation annotation { line };
-    annotation.color = Color::red();
-    annotation.width = { 5 };
+    LineAnnotation annotation(line, 1.0f, 5, Color::red());
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     AnnotationID shape = test.map.addAnnotation(annotation);
@@ -308,7 +288,7 @@ TEST(Annotations, RemoveShape) {
 TEST(Annotations, ImmediateRemoveShape) {
     AnnotationTest test;
 
-    test.map.removeAnnotation(test.map.addAnnotation(LineAnnotation { LineString<double>() }));
+    test.map.removeAnnotation(test.map.addAnnotation(LineAnnotation(LineString<double>(), 1.0f, 1.0f, {})));
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
     test::render(test.map, test.view);

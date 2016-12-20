@@ -199,7 +199,7 @@ TEST(Map, StyleExpiredWithAnnotations) {
     fileSource.respond(Resource::Style, response);
     EXPECT_EQ(1u, fileSource.requests.size());
 
-    map.addAnnotation(LineAnnotation { LineString<double> {{ { 0, 0 }, { 10, 10 } }} });
+    map.addAnnotation(LineAnnotation(LineString<double> {{ { 0, 0 }, { 10, 10 } }}, 1.0f, 1.0f, {}));
     EXPECT_EQ(1u, fileSource.requests.size());
 
     fileSource.respond(Resource::Style, response);

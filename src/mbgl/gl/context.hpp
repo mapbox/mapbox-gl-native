@@ -91,7 +91,7 @@ public:
     template <typename Image>
     Texture createTexture(const Image& image, TextureUnit unit = 0) {
         auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
-        return { image.size, createTexture(image.size, image.data.get(), format, unit) };
+        return Texture(image.size, [&] { return createTexture(image.size, image.data.get(), format, unit); });
     }
 
     template <typename Image>
@@ -105,7 +105,7 @@ public:
     Texture createTexture(const Size size,
                           TextureFormat format = TextureFormat::RGBA,
                           TextureUnit unit = 0) {
-        return { size, createTexture(size, nullptr, format, unit) };
+        return Texture(size, [&] { return createTexture(size, nullptr, format, unit); });
     }
 
     void bindTexture(Texture&,

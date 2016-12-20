@@ -22,7 +22,11 @@ optional<TransitionOptions> parseTransitionOptions(const char *, const JSValue& 
         return {};
     }
 
-    return TransitionOptions { duration, delay };
+    TransitionOptions options;
+    options.duration = std::move(duration);
+    options.delay = std::move(delay);
+
+    return options;
 }
 
 } // namespace style

@@ -845,7 +845,11 @@ void QMapboxGL::setTransitionOptions(qint64 duration, qint64 delay) {
         return std::chrono::duration_cast<mbgl::Duration>(mbgl::Milliseconds(value));
     };
 
-    d_ptr->mapObj->setTransitionOptions(mbgl::style::TransitionOptions{ convert(duration), convert(delay) });
+    mbgl::style::TransitionOptions transitionOptions;
+    transitionOptions.duration = convert(duration);
+    transitionOptions.delay = convert(delay);
+
+    d_ptr->mapObj->setTransitionOptions(transitionOptions);
 }
 
 mbgl::Annotation fromPointAnnotation(const PointAnnotation &pointAnnotation) {

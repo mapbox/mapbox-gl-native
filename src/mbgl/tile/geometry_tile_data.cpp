@@ -208,7 +208,12 @@ static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometr
 }
 
 Feature convertFeature(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID) {
+#if !defined(__GNUC__) || __GNUC__ >= 5
     Feature feature { convertGeometry(geometryTileFeature, tileID) };
+#else
+    Feature feature;
+    feature.geometry = convertGeometry(geometryTileFeature, tileID);
+#endif
     feature.properties = geometryTileFeature.getProperties();
     feature.id = geometryTileFeature.getID();
     return feature;

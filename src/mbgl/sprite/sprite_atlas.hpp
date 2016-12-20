@@ -28,6 +28,7 @@ class SpritePosition;
 
 class SpriteAtlasPosition {
 public:
+    SpriteAtlasPosition(std::array<float, 2> size_, std::array<float, 2> tl_, std::array<float, 2> br_) : size(std::move(size_)), tl(std::move(tl_)), br(std::move(br_)) {}
     std::array<float, 2> size = {{ 0, 0 }};
     std::array<float, 2> tl = {{ 0, 0 }};
     std::array<float, 2> br = {{ 0, 0 }};

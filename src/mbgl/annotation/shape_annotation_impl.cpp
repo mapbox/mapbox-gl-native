@@ -24,7 +24,14 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
     if (!shapeTiler) {
         mapbox::geometry::feature_collection<double> features;
         features.emplace_back(ShapeAnnotationGeometry::visit(geometry(), [] (auto&& geom) {
+#if !defined(__GNUC__) || __GNUC__ >= 5
             return Feature { std::move(geom) };
+#else
+            Feature feature;
+            feature.geometry = std::move(geom);
+
+            return feature;
+#endif
         }));
         mapbox::geojsonvt::Options options;
         options.maxZoom = maxZoom;

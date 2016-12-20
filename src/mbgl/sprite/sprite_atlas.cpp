@@ -224,11 +224,11 @@ optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name,
     const float w = spriteImage->getWidth() * (*img).relativePixelRatio;
     const float h = spriteImage->getHeight() * (*img).relativePixelRatio;
 
-    return SpriteAtlasPosition {
-        {{ float(spriteImage->getWidth()), spriteImage->getHeight() }},
-        {{ float(rect.x + padding)     / size.width, float(rect.y + padding)     / size.height }},
-        {{ float(rect.x + padding + w) / size.width, float(rect.y + padding + h) / size.height }}
-    };
+    return SpriteAtlasPosition(
+        std::array<float, 2> {{ float(spriteImage->getWidth()), float(spriteImage->getHeight()) }},
+        std::array<float, 2> {{ float(rect.x + padding) / size.width, float(rect.y + padding) / size.height }},
+        std::array<float, 2> {{ float(rect.x + padding + w) / size.width, float(rect.y + padding + h) / size.height }}
+        );
 }
 
 void copyBitmap(const uint32_t *src, const uint32_t srcStride, const uint32_t srcX, const uint32_t srcY,
