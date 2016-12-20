@@ -20,6 +20,9 @@ namespace supercluster {
 using namespace mapbox::geometry;
 
 struct Cluster {
+    Cluster(point<double> pos_, std::uint32_t num_points_, std::uint32_t id_)
+        : pos(pos_), num_points(num_points_), id(id_) {}
+
     point<double> pos;
     std::uint32_t num_points;
     std::uint32_t id = 0;
@@ -118,9 +121,14 @@ public:
         auto visitor = [&, this](const auto &id) {
             auto const &c = zoom.clusters[id];
 
-            TilePoint point(std::round(this->options.extent * (c.pos.x * z2 - x)),
-                            std::round(this->options.extent * (c.pos.y * z2 - y)));
-            TileFeature feature{ point };
+            TilePoint point(::round(this->options.extent * (c.pos.x * z2 - x)),
+                            ::round(this->options.extent * (c.pos.y * z2 - y)));
+#if !defined(__GNUC__) || __GNUC__ >= 5
+            TileFeature feature { point };
+#else
+            TileFeature feature;
+            feature.geometry = point;
+#endif
 
             if (c.num_points == 1) {
                 feature.properties = this->features[c.id].properties;
@@ -161,7 +169,7 @@ private:
             std::uint32_t i = 0;
 
             for (const auto &f : features_) {
-                clusters.push_back({ project(f.geometry.get<GeoJSONPoint>()), 1, i++ });
+                clusters.emplace_back(project(f.geometry.get<GeoJSONPoint>()), 1, i++);
             }
 
             tree.fill(clusters);
@@ -190,7 +198,7 @@ private:
                     num_points += b.num_points;
                 });
 
-                clusters.push_back({ weight / double(num_points), num_points, p.id });
+                clusters.emplace_back(weight / double(num_points), num_points, p.id);
             }
 
             tree.fill(clusters);
