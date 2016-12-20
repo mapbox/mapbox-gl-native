@@ -51,9 +51,11 @@ macro(mbgl_platform_core)
 
     if(NOT WITH_QT_I18N)
         target_sources(mbgl-core PRIVATE platform/default/bidi.cpp)
+        target_sources(mbgl-core PRIVATE platform/default/utf.cpp)
         target_add_mason_package(mbgl-core PRIVATE icu)
     else()
         target_sources(mbgl-core PRIVATE platform/qt/src/bidi.cpp)
+        target_sources(mbgl-core PRIVATE platform/qt/src/utf.cpp)
     endif()
 
 endmacro()

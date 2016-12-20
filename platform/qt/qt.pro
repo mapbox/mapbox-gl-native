@@ -376,7 +376,8 @@ SOURCES += \
     src/run_loop.cpp \
     src/string_stdlib.cpp \
     src/thread_local.cpp \
-    src/timer.cpp
+    src/timer.cpp \
+    src/utf.cpp
 
 HEADERS += \
     include/qmapbox.hpp \
