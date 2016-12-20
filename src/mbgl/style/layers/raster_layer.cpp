@@ -2,6 +2,7 @@
 
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/raster_layer_impl.hpp>
+#include <mbgl/style/conversion/stringify.hpp>
 
 namespace mbgl {
 namespace style {
@@ -27,9 +28,11 @@ std::unique_ptr<Layer> RasterLayer::Impl::clone() const {
 std::unique_ptr<Layer> RasterLayer::Impl::cloneRef(const std::string& id_) const {
     auto result = std::make_unique<RasterLayer>(*this);
     result->impl->id = id_;
-    result->impl->ref = this->id;
     result->impl->paint = RasterPaintProperties();
     return std::move(result);
+}
+
+void RasterLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
 // Source

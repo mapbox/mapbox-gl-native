@@ -33,11 +33,10 @@ bool FillLayer::Impl::evaluate(const PropertyEvaluationParameters& parameters) {
 std::unique_ptr<Bucket> FillLayer::Impl::createBucket(BucketParameters& parameters, const GeometryTileLayer& layer) const {
     auto bucket = std::make_unique<FillBucket>();
 
-    auto& name = bucketName();
     parameters.eachFilteredFeature(filter, layer, [&] (const auto& feature, std::size_t index, const std::string& layerName) {
         auto geometries = feature.getGeometries();
         bucket->addGeometry(geometries);
-        parameters.featureIndex.insert(geometries, index, layerName, name);
+        parameters.featureIndex.insert(geometries, index, layerName, id);
     });
 
     return std::move(bucket);

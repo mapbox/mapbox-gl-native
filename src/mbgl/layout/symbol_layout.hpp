@@ -21,13 +21,14 @@ class SymbolBucket;
 
 namespace style {
 class Filter;
+class Layer;
 } // namespace style
 
 struct Anchor;
 
 class SymbolLayout {
 public:
-    SymbolLayout(std::string bucketName_,
+    SymbolLayout(std::vector<std::unique_ptr<style::Layer>>,
                  std::string sourceLayerName_,
                  uint32_t overscaling,
                  float zoom,
@@ -55,7 +56,7 @@ public:
 
     State state = Pending;
 
-    const std::string bucketName;
+    const std::vector<std::unique_ptr<style::Layer>> layers;
     const std::string sourceLayerName;
 
 private:

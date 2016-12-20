@@ -116,6 +116,8 @@ public:
 
     // Private implementation
     const std::unique_ptr<Impl> baseImpl;
+
+    friend std::string layoutKey(const Layer&);
 };
 
 } // namespace style

@@ -2,6 +2,7 @@
 
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
+#include <mbgl/style/conversion/stringify.hpp>
 
 namespace mbgl {
 namespace style {
@@ -27,9 +28,11 @@ std::unique_ptr<Layer> CircleLayer::Impl::clone() const {
 std::unique_ptr<Layer> CircleLayer::Impl::cloneRef(const std::string& id_) const {
     auto result = std::make_unique<CircleLayer>(*this);
     result->impl->id = id_;
-    result->impl->ref = this->id;
     result->impl->paint = CirclePaintProperties();
     return std::move(result);
+}
+
+void CircleLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
 // Source

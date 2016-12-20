@@ -34,6 +34,9 @@ std::unique_ptr<Layer> CustomLayer::Impl::cloneRef(const std::string&) const {
     return std::make_unique<CustomLayer>(*this);
 }
 
+void CustomLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
+}
+
 void CustomLayer::Impl::initialize() {
     assert(initializeFn);
     initializeFn(context);
