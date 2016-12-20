@@ -79,6 +79,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/android/src/logging_android.cpp
         PRIVATE platform/default/string_stdlib.cpp
         PRIVATE platform/default/bidi.cpp
+        PRIVATE platform/default/utf.cpp
 
         # Image handling
         PRIVATE platform/default/image.cpp
