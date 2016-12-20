@@ -1,7 +1,10 @@
 apply plugin: 'com.android.application'
 
 ext {
-    supportLibVersion = '25.0.1'
+    supportLibVersion = '25.1.0'
+    espressoVersion = '2.2.2'
+    testRunnerVersion = '0.5'
+    leakCanaryVersion = '1.5'
 }
 
 android {
@@ -14,7 +17,6 @@ android {
         targetSdkVersion 25
         versionCode 11
         versionName "5.0.0"
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -66,24 +68,19 @@ dependencies {
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
 
     // Leak Canary
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
-    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
-
-    // Mapbox Android Services
-    compile('com.mapbox.mapboxsdk:mapbox-android-services:1.3.0@aar') {
-        transitive = true
-    }
+    debugCompile "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}"
+    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
+    testCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
 
     // Testing dependencies
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.2.27'
-    androidTestCompile "com.android.support:support-annotations:${supportLibVersion}"
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support.test:rules:0.5'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.squareup.spoon:spoon-client:1.6.2'
-    androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
+    androidTestCompile "com.android.support:support-annotations:${supportLibVersion}"
+    androidTestCompile "com.android.support.test:runner:${testRunnerVersion}"
+    androidTestCompile "com.android.support.test:rules:${testRunnerVersion}"
+    androidTestCompile "com.android.support.test.espresso:espresso-core:${espressoVersion}"
+    androidTestCompile "com.android.support.test.espresso:espresso-intents:${espressoVersion}"
 }
 
 apply from: 'gradle-make.gradle'

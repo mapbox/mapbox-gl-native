@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 ext {
-    supportLibVersion = '25.0.0'
+    supportLibVersion = '25.1.0'
 }
 
 dependencies {
@@ -9,7 +9,7 @@ dependencies {
     compile "com.android.support:support-v4:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
     compile 'com.squareup.okhttp3:okhttp:3.5.0'
-    compile 'com.mapzen.android:lost:1.1.1'
+    compile 'com.mapzen.android:lost:2.0.0'
     compile 'com.jakewharton.timber:timber:4.3.1'
 
     // Mapbox Android Services

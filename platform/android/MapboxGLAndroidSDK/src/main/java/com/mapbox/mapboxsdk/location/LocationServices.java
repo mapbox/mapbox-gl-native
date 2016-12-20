@@ -17,6 +17,8 @@ import com.mapzen.android.lost.api.LostApiClient;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.mapzen.android.lost.api.LocationServices.FusedLocationApi;
+
 /**
  * Manages locational updates. Contains methods to register and unregister location listeners.
  * <ul>
@@ -31,7 +33,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * in the history stack.
  * </p>
  */
-public class LocationServices implements com.mapzen.android.lost.api.LocationListener {
+public class LocationServices implements LostApiClient.ConnectionCallbacks,
+  com.mapzen.android.lost.api.LocationListener {
 
   private static LocationServices instance;
 
@@ -50,7 +53,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
     super();
     this.context = context;
     // Setup location services
-    locationClient = new LostApiClient.Builder(context).build();
+    locationClient = new LostApiClient.Builder(context).addConnectionCallbacks(this).build();
     locationListeners = new CopyOnWriteArrayList<>();
   }
 
@@ -81,38 +84,46 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
     // Disconnect
     if (locationClient.isConnected()) {
       // Disconnect first to ensure that the new requests are GPS
-      com.mapzen.android.lost.api.LocationServices.FusedLocationApi.removeLocationUpdates(this);
+      FusedLocationApi.removeLocationUpdates(locationClient, this);
       locationClient.disconnect();
     }
+    isGpsEnabled = enableGPS;
 
     // Setup Fresh
     locationClient.connect();
-    Location lastLocation = com.mapzen.android.lost.api.LocationServices.FusedLocationApi.getLastLocation();
+  }
+
+  @Override
+  public void onConnected() {
+    //noinspection MissingPermission
+    Location lastLocation = FusedLocationApi.getLastLocation(locationClient);
     if (lastLocation != null) {
       this.lastLocation = lastLocation;
     }
 
     LocationRequest locationRequest;
 
-    if (enableGPS) {
+    if (isGpsEnabled) {
       // LocationRequest Tuned for GPS
       locationRequest = LocationRequest.create()
         .setFastestInterval(1000)
         .setSmallestDisplacement(3.0f)
         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-      com.mapzen.android.lost.api.LocationServices.FusedLocationApi.requestLocationUpdates(locationRequest, this);
+      //noinspection MissingPermission
+      FusedLocationApi.requestLocationUpdates(locationClient, locationRequest, this);
     } else {
       // LocationRequest Tuned for PASSIVE
       locationRequest = LocationRequest.create()
         .setFastestInterval(1000)
         .setSmallestDisplacement(3.0f)
         .setPriority(LocationRequest.PRIORITY_NO_POWER);
-
-      com.mapzen.android.lost.api.LocationServices.FusedLocationApi.requestLocationUpdates(locationRequest, this);
+      //noinspection MissingPermission
+      FusedLocationApi.requestLocationUpdates(locationClient, locationRequest, this);
     }
+  }
 
-    isGpsEnabled = enableGPS;
+  @Override
+  public void onConnectionSuspended() {
   }
 
   /**
@@ -189,5 +200,13 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
       return false;
     }
     return true;
+  }
+
+  @Override
+  public void onProviderDisabled(String provider) {
+  }
+
+  @Override
+  public void onProviderEnabled(String provider) {
   }
 }
