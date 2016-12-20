@@ -1,10 +1,34 @@
 #pragma once
 
+#include <sstream>
 #include <string>
 #include <cassert>
+#include <cstdlib>
 #include <exception>
 
 #include <mbgl/util/dtoa.hpp>
+
+#if defined(__ANDROID__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 9)
+
+namespace std {
+
+template <typename T>
+std::string to_string(T value)
+{
+    std::ostringstream oss;
+    oss << value;
+
+    return oss.str();
+}
+
+inline int stoi(const std::string &str)
+{
+    return atoi(str.c_str());
+}
+
+} // namespace std
+
+#endif
 
 namespace mbgl {
 namespace util {

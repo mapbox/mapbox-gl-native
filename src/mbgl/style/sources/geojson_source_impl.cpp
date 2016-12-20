@@ -6,6 +6,7 @@
 #include <mbgl/tile/geojson_tile.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
+#include <mbgl/util/string.hpp>
 #include <mapbox/geojson.hpp>
 #include <mapbox/geojson/rapidjson.hpp>
 #include <mapbox/geojsonvt.hpp>
@@ -14,6 +15,7 @@
 
 #include <rapidjson/error/en.h>
 
+#include <cmath>
 #include <sstream>
 
 namespace mbgl {
@@ -69,7 +71,7 @@ void GeoJSONSource::Impl::_setGeoJSON(const GeoJSON& geoJSON) {
         mapbox::supercluster::Options clusterOptions;
         clusterOptions.maxZoom = options.clusterMaxZoom;
         clusterOptions.extent = util::EXTENT;
-        clusterOptions.radius = std::round(scale * options.clusterRadius);
+        clusterOptions.radius = ::round(scale * options.clusterRadius);
 
         const auto& features = geoJSON.get<mapbox::geometry::feature_collection<double>>();
         geoJSONOrSupercluster =
@@ -78,7 +80,7 @@ void GeoJSONSource::Impl::_setGeoJSON(const GeoJSON& geoJSON) {
         mapbox::geojsonvt::Options vtOptions;
         vtOptions.maxZoom = options.maxzoom;
         vtOptions.extent = util::EXTENT;
-        vtOptions.buffer = std::round(scale * options.buffer);
+        vtOptions.buffer = ::round(scale * options.buffer);
         vtOptions.tolerance = scale * options.tolerance;
         geoJSONOrSupercluster = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(geoJSON, vtOptions);
     }

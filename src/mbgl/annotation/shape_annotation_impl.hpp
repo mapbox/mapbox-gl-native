@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/util/string.hpp>
 #include <mapbox/geojsonvt.hpp>
 
 #include <mbgl/annotation/annotation.hpp>

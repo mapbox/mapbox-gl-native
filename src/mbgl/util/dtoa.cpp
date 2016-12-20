@@ -1,5 +1,7 @@
 #include "dtoa.hpp"
 
+#include <mbgl/util/string.hpp>
+
 // Clang on Windows 64-bits can't parse rapidjson's dtoa
 #if !defined(_WINDOWS)
 #include <rapidjson/internal/dtoa.h>
