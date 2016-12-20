@@ -1,9 +1,31 @@
 {
   "layout_symbol": {
-    "icon-image": "icon-image-name"
+    "icon-allow-overlap": "icon-allows-overlap",
+    "icon-image": "icon-image-name",
+    "icon-ignore-placement": "icon-ignores-placement",
+    "icon-keep-upright": "keeps-icon-upright",
+    "icon-optional": "is-icon-optional",
+    "icon-rotate": "icon-rotation",
+    "icon-size": "icon-scale",
+    "symbol-avoid-edges": "symbol-avoids-edges",
+    "text-allow-overlap": "text-allows-overlap",
+    "text-ignore-placement": "text-ignores-placement",
+    "text-justify": "text-justification",
+    "text-keep-upright": "keeps-text-upright",
+    "text-max-angle": "maximum-text-angle",
+    "text-max-width": "maximum-text-width",
+    "text-optional": "is-text-optional",
+    "text-rotate": "text-rotation"
   },
   "paint_raster": {
     "raster-brightness-min": "minimum-raster-brightness",
-    "raster-brightness-max": "maximum-raster-brightness"
+    "raster-brightness-max": "maximum-raster-brightness",
+    "raster-hue-rotate": "raster-hue-rotation"
+  },
+  "paint_line": {
+    "line-dasharray": "line-dash-pattern"
+  },
+  "paint_fill": {
+    "fill-antialias": "is-fill-antialiased"
   }
 }

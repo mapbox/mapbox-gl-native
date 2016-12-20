@@ -5,6 +5,8 @@
 
 #import "MGLPolyline+MGLAdditions.h"
 
+#import <mbgl/util/geojson.hpp>
+
 @implementation MGLPolyline
 
 @dynamic overlayBounds;
@@ -37,8 +39,8 @@
     return annotation;
 }
 
-- (mbgl::Feature)featureObject {
-    return mbgl::Feature {[self lineString]};    
+- (mbgl::Geometry<double>)geometryObject {
+    return [self lineString];
 }
 
 - (NSDictionary *)geoJSONDictionary {
@@ -79,16 +81,16 @@
 }
 
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
-    return MGLLatLngBoundsFromCoordinateBounds(_overlayBounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
+    return MGLCoordinateBoundsIntersectsCoordinateBounds(_overlayBounds, overlayBounds);
 }
 
-- (mbgl::Feature)featureObject {
+- (mbgl::Geometry<double>)geometryObject {
     mbgl::MultiLineString<double> multiLineString;
     multiLineString.reserve(self.polylines.count);
     for (MGLPolyline *polyline in self.polylines) {
         multiLineString.push_back([polyline lineString]);
     }
-    return mbgl::Feature {multiLineString};
+    return multiLineString;
 }
 
 - (NSDictionary *)geoJSONDictionary {

@@ -8,10 +8,14 @@
 
 @implementation MGLCircleLayerTests
 
++ (NSString *)layerType {
+    return @"circle";
+}
+
 - (void)testCircleLayer {
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
     [self.mapView.style addSource:source];
     MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     [self.mapView.style addLayer:layer];
@@ -63,6 +67,19 @@
     XCTAssertEqualObjects(gLayer.circleStrokeWidth, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.circleTranslate, [MGLRuntimeStylingHelper testOffsetFunction]);
     XCTAssertEqualObjects(gLayer.circleTranslateAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLCircleTranslateAnchorViewport type:@encode(MGLCircleTranslateAnchor)]);
+}
+
+- (void)testPropertyNames {
+    [self testPropertyName:@"circle-blur" isBoolean:NO];
+    [self testPropertyName:@"circle-color" isBoolean:NO];
+    [self testPropertyName:@"circle-opacity" isBoolean:NO];
+    [self testPropertyName:@"circle-pitch-scale" isBoolean:NO];
+    [self testPropertyName:@"circle-radius" isBoolean:NO];
+    [self testPropertyName:@"circle-stroke-color" isBoolean:NO];
+    [self testPropertyName:@"circle-stroke-opacity" isBoolean:NO];
+    [self testPropertyName:@"circle-stroke-width" isBoolean:NO];
+    [self testPropertyName:@"circle-translate" isBoolean:NO];
+    [self testPropertyName:@"circle-translate-anchor" isBoolean:NO];
 }
 
 @end

@@ -32,6 +32,9 @@ mkdir -p ${OUTPUT}
 
 cp platform/ios/screenshot.png "${OUTPUT}"
 
+DEFAULT_THEME="platform/darwin/docs/theme"
+THEME=${JAZZY_THEME:-$DEFAULT_THEME}
+
 jazzy \
     --config platform/ios/jazzy.yml \
     --sdk iphonesimulator \
@@ -40,8 +43,8 @@ jazzy \
     --readme ${README} \
     --documentation="platform/ios/docs/Info.plist Keys.md" \
     --root-url https://www.mapbox.com/ios-sdk/api/${RELEASE_VERSION}/ \
-    --theme platform/darwin/docs/theme \
+    --theme ${THEME} \
     --output ${OUTPUT}
 # https://github.com/realm/jazzy/issues/411
 find ${OUTPUT} -name *.html -exec \
-    perl -pi -e 's/Mapbox\s+(Docs|Reference)/Mapbox iOS SDK $1/' {} \;
+    perl -pi -e 's/BRANDLESS_DOCSET_TITLE/iOS SDK $1/, s/Mapbox\s+(Docs|Reference)/Mapbox iOS SDK $1/' {} \;

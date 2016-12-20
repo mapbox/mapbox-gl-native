@@ -36,8 +36,13 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
  Whether or not the fill should be antialiased.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing `YES`. Set this property to `nil` to reset it to the default value.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-antialias"><code>fill-antialias</code></a> paint property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillAntialias;
+@property (nonatomic, null_resettable, getter=isFillAntialiased) MGLStyleValue<NSNumber *> *fillAntialiased;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillAntialias __attribute__((unavailable("Use fillAntialiased instead.")));
 
 #if TARGET_OS_IPHONE
 /**
@@ -69,7 +74,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
 /**
  The outline color of the fill. Matches the value of `fillColor` if unspecified.
 
- This property is only applied to the style if `fillPattern` is set to `nil`, and `fillAntialias` is set to an `MGLStyleValue` object containing an `NSNumber` object containing `YES`. Otherwise, it is ignored.
+ This property is only applied to the style if `fillPattern` is set to `nil`, and `fillAntialiased` is set to an `MGLStyleValue` object containing an `NSNumber` object containing `YES`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *fillOutlineColor;
 

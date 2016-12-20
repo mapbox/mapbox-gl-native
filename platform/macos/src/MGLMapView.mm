@@ -1,6 +1,7 @@
 #import "MGLMapView_Private.h"
 #import "MGLAnnotationImage_Private.h"
 #import "MGLAttributionButton.h"
+#import "MGLAttributionInfo.h"
 #import "MGLCompassCell.h"
 #import "MGLOpenGLLayer.h"
 #import "MGLStyle.h"
@@ -82,23 +83,6 @@ const CGFloat MGLAnnotationImagePaddingForHitTest = 4;
 
 /// Distance from the callout’s anchor point to the annotation it points to.
 const CGFloat MGLAnnotationImagePaddingForCallout = 4;
-
-/// Copyright notices displayed in the attribution view.
-struct MGLAttribution {
-    /// Attribution button label text. A copyright symbol is prepended to this string.
-    NSString *title;
-    /// URL to open when the attribution button is clicked.
-    NSString *urlString;
-} MGLAttributions[] = {
-    {
-        .title = NSLocalizedStringWithDefaultValue(@"COPYRIGHT_MAPBOX", nil, nil, @"Mapbox", @"Linked part of copyright notice"),
-        .urlString = NSLocalizedStringWithDefaultValue(@"COPYRIGHT_MAPBOX_LINK", nil, nil, @"https://www.mapbox.com/about/maps/", @"Copyright notice link"),
-    },
-    {
-        .title = NSLocalizedStringWithDefaultValue(@"COPYRIGHT_OSM", nil, nil, @"OpenStreetMap", @"Linked part of copyright notice"),
-        .urlString = NSLocalizedStringWithDefaultValue(@"COPYRIGHT_OSM_LINK", nil, nil, @"http://www.openstreetmap.org/about/", @"Copyright notice link"),
-    },
-};
 
 /// Unique identifier representing a single annotation in mbgl.
 typedef uint32_t MGLAnnotationTag;
@@ -378,6 +362,7 @@ public:
 
 /// Adds legally required map attribution to the lower-left corner.
 - (void)installAttributionView {
+    [_attributionView removeFromSuperview];
     _attributionView = [[NSView alloc] initWithFrame:NSZeroRect];
     _attributionView.wantsLayer = YES;
 
@@ -440,35 +425,67 @@ public:
 /// Updates the attribution view to reflect the sources used. For now, this is
 /// hard-coded to the standard Mapbox and OpenStreetMap attribution.
 - (void)updateAttributionView {
-    self.attributionView.subviews = @[];
-
-    for (NSUInteger i = 0; i < sizeof(MGLAttributions) / sizeof(MGLAttributions[0]); i++) {
+    NSView *attributionView = self.attributionView;
+    for (NSView *button in attributionView.subviews) {
+        [button removeConstraints:button.constraints];
+    }
+    attributionView.subviews = @[];
+    [attributionView removeConstraints:attributionView.constraints];
+    
+    // Make the whole string mini by default.
+    // Force links to be black, because the default blue is distracting.
+    CGFloat miniSize = [NSFont systemFontSizeForControlSize:NSMiniControlSize];
+    NSArray *attributionInfos = [self.style attributionInfosWithFontSize:miniSize linkColor:[NSColor blackColor]];
+    for (MGLAttributionInfo *info in attributionInfos) {
+        // Feedback links are added to the Help menu.
+        if (info.feedbackLink) {
+            continue;
+        }
+        
         // For each attribution, add a borderless button that responds to clicks
         // and feels like a hyperlink.
-        NSURL *url = [NSURL URLWithString:MGLAttributions[i].urlString];
-        NSButton *button = [[MGLAttributionButton alloc] initWithTitle:MGLAttributions[i].title URL:url];
+        NSButton *button = [[MGLAttributionButton alloc] initWithAttributionInfo:info];
         button.controlSize = NSMiniControlSize;
         button.translatesAutoresizingMaskIntoConstraints = NO;
 
         // Set the new button flush with the buttom of the container and to the
         // right of the previous button, with standard spacing. If there is no
         // previous button, align to the container instead.
-        NSView *previousView = self.attributionView.subviews.lastObject;
-        [self.attributionView addSubview:button];
-        [_attributionView addConstraint:
+        NSView *previousView = attributionView.subviews.lastObject;
+        [attributionView addSubview:button];
+        [attributionView addConstraint:
          [NSLayoutConstraint constraintWithItem:button
                                       attribute:NSLayoutAttributeBottom
                                       relatedBy:NSLayoutRelationEqual
-                                         toItem:_attributionView
+                                         toItem:attributionView
                                       attribute:NSLayoutAttributeBottom
                                      multiplier:1
                                        constant:0]];
-        [_attributionView addConstraint:
+        [attributionView addConstraint:
          [NSLayoutConstraint constraintWithItem:button
                                       attribute:NSLayoutAttributeLeading
                                       relatedBy:NSLayoutRelationEqual
-                                         toItem:previousView ? previousView : _attributionView
+                                         toItem:previousView ? previousView : attributionView
                                       attribute:previousView ? NSLayoutAttributeTrailing : NSLayoutAttributeLeading
+                                     multiplier:1
+                                       constant:8]];
+        [attributionView addConstraint:
+         [NSLayoutConstraint constraintWithItem:button
+                                      attribute:NSLayoutAttributeTop
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:attributionView
+                                      attribute:NSLayoutAttributeTop
+                                     multiplier:1
+                                       constant:0]];
+    }
+    
+    if (attributionInfos.count) {
+        [attributionView addConstraint:
+         [NSLayoutConstraint constraintWithItem:attributionView
+                                      attribute:NSLayoutAttributeTrailing
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:attributionView.subviews.lastObject
+                                      attribute:NSLayoutAttributeTrailing
                                      multiplier:1
                                        constant:8]];
     }
@@ -738,20 +755,6 @@ public:
                                                      attribute:NSLayoutAttributeTrailing
                                                     multiplier:1
                                                       constant:8]];
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:_attributionView.subviews.firstObject
-                                                     attribute:NSLayoutAttributeTop
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:_attributionView
-                                                     attribute:NSLayoutAttributeTop
-                                                    multiplier:1
-                                                      constant:0]];
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:_attributionView
-                                                     attribute:NSLayoutAttributeTrailing
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:_attributionView.subviews.lastObject
-                                                     attribute:NSLayoutAttributeTrailing
-                                                    multiplier:1
-                                                      constant:8]];
 
     [super updateConstraints];
 }
@@ -802,7 +805,7 @@ public:
     _mbglMap->setSourceTileCacheSize(cacheSize);
 }
 
-- (void)invalidate {
+- (void)setNeedsGLDisplay {
     MGLAssertIsMainThread();
 
     [self.layer setNeedsDisplay];
@@ -930,6 +933,12 @@ public:
             }
             break;
         }
+        case mbgl::MapChangeSourceDidChange:
+        {
+            [self installAttributionView];
+            self.needsUpdateConstraints = YES;
+            break;
+        }
     }
 }
 
@@ -937,7 +946,7 @@ public:
 
 - (void)print:(__unused id)sender {
     _isPrinting = YES;
-    [self invalidate];
+    [self setNeedsGLDisplay];
 }
 
 - (void)printWithImage:(NSImage *)image {
@@ -1644,6 +1653,23 @@ public:
 
 - (IBAction)rotate:(NSSlider *)sender {
     [self setDirection:-sender.doubleValue animated:YES];
+}
+
+- (IBAction)giveFeedback:(id)sender {
+    CLLocationCoordinate2D centerCoordinate = self.centerCoordinate;
+    double zoomLevel = self.zoomLevel;
+    NSMutableArray *urls = [NSMutableArray array];
+    for (MGLAttributionInfo *info in [self.style attributionInfosWithFontSize:0 linkColor:nil]) {
+        NSURL *url = [info feedbackURLAtCenterCoordinate:centerCoordinate zoomLevel:zoomLevel];
+        if (url) {
+            [urls addObject:url];
+        }
+    }
+    [[NSWorkspace sharedWorkspace] openURLs:urls
+                    withAppBundleIdentifier:nil
+                                    options:0
+             additionalEventParamDescriptor:nil
+                          launchIdentifiers:nil];
 }
 
 #pragma mark Annotations
@@ -2460,6 +2486,15 @@ public:
     return MGLFeaturesFromMBGLFeatures(features);
 }
 
+#pragma mark User interface validation
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
+    if (menuItem.action == @selector(giveFeedback:)) {
+        return YES;
+    }
+    return [super validateMenuItem:menuItem];
+}
+
 #pragma mark Interface Builder methods
 
 - (void)prepareForInterfaceBuilder {
@@ -2629,7 +2664,7 @@ public:
     }
 
     void invalidate() override {
-        [nativeView invalidate];
+        [nativeView setNeedsGLDisplay];
     }
 
     void activate() override {

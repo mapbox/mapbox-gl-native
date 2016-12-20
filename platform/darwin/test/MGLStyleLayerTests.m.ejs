@@ -13,13 +13,17 @@
 
 @implementation MGL<%- camelize(type) %>LayerTests
 
++ (NSString *)layerType {
+    return @"<%- type %>";
+}
+
 - (void)test<%- camelize(type) %>Layer {
 <% if (type === 'background') { -%>
     MGL<%- camelize(type) %>StyleLayer *layer = [[MGL<%- camelize(type) %>StyleLayer alloc] initWithIdentifier:@"layerID"];
 <% } else { -%>
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
     [self.mapView.style addSource:source];
     MGL<%- camelize(type) %>StyleLayer *layer = [[MGL<%- camelize(type) %>StyleLayer alloc] initWithIdentifier:@"layerID" source:source];
 <% } -%>
@@ -53,6 +57,15 @@
 <% } -%>
 <% for (const property of paintProperties) { -%>
     <%- testGetterImplementation(property, type, true) %>
+<% } -%>
+}
+
+- (void)testPropertyNames {
+<% for (const property of layoutProperties) { -%>
+    [self testPropertyName:@"<%- property.getter || property.name %>" isBoolean:<%- property.type === 'boolean' ? 'YES' : 'NO' %>];
+<% } -%>
+<% for (const property of paintProperties) { -%>
+    [self testPropertyName:@"<%- property.getter || property.name %>" isBoolean:<%- property.type === 'boolean' ? 'YES' : 'NO' %>];
 <% } -%>
 }
 

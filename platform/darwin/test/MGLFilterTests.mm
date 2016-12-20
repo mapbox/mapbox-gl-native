@@ -5,7 +5,7 @@
 
 
 @interface MGLFilterTests : MGLStyleLayerTests {
-    MGLGeoJSONSource *source;
+    MGLShapeSource *source;
     MGLLineStyleLayer *layer;
 }
 @end
@@ -18,7 +18,11 @@
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
     NSData *geoJSONData = [NSData dataWithContentsOfURL:url];
-    source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"test-source" geoJSONData:geoJSONData options:nil];
+    NSError *error;
+    MGLShape *shape = [MGLShape shapeWithData:geoJSONData encoding:NSUTF8StringEncoding error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(shape);
+    source = [[MGLShapeSource alloc] initWithIdentifier:@"test-source" shape:shape options:nil];
     [self.mapView.style addSource:source];
     layer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"test-layer" source:source];
 }

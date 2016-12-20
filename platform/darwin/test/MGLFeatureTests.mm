@@ -159,7 +159,7 @@
 }
 
 - (void)testPointFeatureGeoJSONDictionary {
-    MGLPointFeature<MGLFeaturePrivate> *pointFeature = (MGLPointFeature<MGLFeaturePrivate> *)[[MGLPointFeature alloc] init];
+    MGLPointFeature *pointFeature = [[MGLPointFeature alloc] init];
     CLLocationCoordinate2D coordinate = { 10, 10 };
     pointFeature.coordinate = coordinate;
     

@@ -2,6 +2,20 @@
 
 @implementation UIImage (MGLAdditions)
 
+- (nullable instancetype)initWithMGLSpriteImage:(const mbgl::SpriteImage *)spriteImage
+{
+    std::string png = encodePNG(spriteImage->image);
+    NSData *data = [[NSData alloc] initWithBytes:png.data() length:png.size()];
+    if (self = [self initWithData:data scale:spriteImage->pixelRatio])
+    {
+        if (spriteImage->sdf)
+        {
+            self = [self imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        }
+    }
+    return self;
+}
+
 - (std::unique_ptr<mbgl::SpriteImage>)mgl_spriteImage
 {
     CGImageRef cgImage = self.CGImage;
@@ -21,7 +35,8 @@
     CGContextRelease(context);
     CGColorSpaceRelease(colorSpace);
 
-    return std::make_unique<mbgl::SpriteImage>(std::move(cPremultipliedImage), float(self.scale));
+    BOOL isTemplate = self.renderingMode == UIImageRenderingModeAlwaysTemplate;
+    return std::make_unique<mbgl::SpriteImage>(std::move(cPremultipliedImage), float(self.scale), isTemplate);
 }
 
 @end

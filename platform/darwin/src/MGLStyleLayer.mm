@@ -3,6 +3,12 @@
 
 #include <mbgl/style/layer.hpp>
 
+@interface MGLStyleLayer ()
+
+@property (nonatomic) mbgl::style::Layer *rawLayer;
+
+@end
+
 @implementation MGLStyleLayer
 
 - (instancetype)initWithIdentifier:(NSString *)identifier

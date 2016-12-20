@@ -55,6 +55,7 @@
 #import "MGLCompactCalloutView.h"
 #import "MGLAnnotationContainerView.h"
 #import "MGLAnnotationContainerView_Private.h"
+#import "MGLAttributionInfo.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -310,6 +311,8 @@ public:
     BOOL _delegateHasLineWidthsForShapeAnnotations;
 
     MGLCompassDirectionFormatter *_accessibilityCompassFormatter;
+    
+    NS_ARRAY_OF(MGLAttributionInfo *) *_attributionInfos;
 }
 
 #pragma mark - Setup & Teardown -
@@ -376,6 +379,11 @@ public:
     NSURL *styleURL = self.styleURL;
     _mbglMap->setStyleURL("");
     self.styleURL = styleURL;
+}
+
+- (mbgl::Map *)mbglMap
+{
+    return _mbglMap;
 }
 
 - (void)commonInit
@@ -1717,44 +1725,27 @@ public:
 
 - (void)showAttribution
 {
-    if ( ! self.attributionSheet)
+    self.attributionSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"SDK_NAME", nil, nil, @"Mapbox iOS SDK", @"Action sheet title")
+                                                        delegate:self
+                                               cancelButtonTitle:NSLocalizedStringWithDefaultValue(@"CANCEL", nil, nil, @"Cancel", @"")
+                                          destructiveButtonTitle:nil
+                                               otherButtonTitles:nil];
+    
+    _attributionInfos = [self.style attributionInfosWithFontSize:[UIFont buttonFontSize] linkColor:nil];
+    for (MGLAttributionInfo *info in _attributionInfos)
     {
-        self.attributionSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"SDK_NAME", nil, nil, @"Mapbox iOS SDK", @"Action sheet title")
-                                                            delegate:self
-                                                   cancelButtonTitle:NSLocalizedStringWithDefaultValue(@"CANCEL", nil, nil, @"Cancel", @"")
-                                              destructiveButtonTitle:nil
-                                                   otherButtonTitles:
-                                 NSLocalizedStringWithDefaultValue(@"COPY_MAPBOX", nil, nil, @"© Mapbox", @"Copyright notice in attribution sheet"),
-                                 NSLocalizedStringWithDefaultValue(@"COPY_OSM", nil, nil, @"© OpenStreetMap", @"Copyright notice in attribution sheet"),
-                                 NSLocalizedStringWithDefaultValue(@"MAP_FEEDBACK", nil, nil, @"Improve This Map", @"Action in attribution sheet"),
-                                 NSLocalizedStringWithDefaultValue(@"TELEMETRY_NAME", nil, nil, @"Mapbox Telemetry", @"Action in attribution sheet"),
-                                 nil];
-
+        NSString *title = [info.title.string capitalizedStringWithLocale:[NSLocale currentLocale]];
+        [self.attributionSheet addButtonWithTitle:title];
     }
-
+    
+    [self.attributionSheet addButtonWithTitle:NSLocalizedStringWithDefaultValue(@"TELEMETRY_NAME", nil, nil, @"Mapbox Telemetry", @"Action in attribution sheet")];
+    
     [self.attributionSheet showFromRect:self.attributionButton.frame inView:self animated:YES];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex == actionSheet.firstOtherButtonIndex)
-    {
-        [[UIApplication sharedApplication] openURL:
-         [NSURL URLWithString:@"https://www.mapbox.com/about/maps/"]];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1)
-    {
-        [[UIApplication sharedApplication] openURL:
-         [NSURL URLWithString:@"http://www.openstreetmap.org/about/"]];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2)
-    {
-        NSString *feedbackURL = [NSString stringWithFormat:@"https://www.mapbox.com/map-feedback/#/%.5f/%.5f/%i",
-                                 self.longitude, self.latitude, (int)round(self.zoomLevel + 1)];
-        [[UIApplication sharedApplication] openURL:
-         [NSURL URLWithString:feedbackURL]];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 3)
+    if (buttonIndex == actionSheet.numberOfButtons - 1)
     {
         NSString *message;
         NSString *participate;
@@ -1779,6 +1770,19 @@ public:
                                               cancelButtonTitle:participate
                                               otherButtonTitles:NSLocalizedStringWithDefaultValue(@"TELEMETRY_MORE", nil, nil, @"Tell Me More", @"Telemetry prompt button"), optOut, nil];
         [alert show];
+    }
+    else if (buttonIndex > 0)
+    {
+        MGLAttributionInfo *info = _attributionInfos[buttonIndex + actionSheet.firstOtherButtonIndex];
+        NSURL *url = info.URL;
+        if (url)
+        {
+            if (info.feedbackLink)
+            {
+                url = [info feedbackURLAtCenterCoordinate:self.centerCoordinate zoomLevel:self.zoomLevel];
+            }
+            [[UIApplication sharedApplication] openURL:url];
+        }
     }
 }
 
@@ -4562,7 +4566,23 @@ public:
                 || self.userTrackingMode == MGLUserTrackingModeNone
                 || self.userTrackingState != MGLUserTrackingStateChanged)
             {
-                [self deselectAnnotation:self.selectedAnnotation animated:NO];
+                // Deselect annotation if it lies outside the viewport
+                if (self.selectedAnnotation) {
+                    MGLAnnotationTag tag = [self annotationTagForAnnotation:self.selectedAnnotation];
+                    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(tag);
+                    MGLAnnotationView *annotationView = annotationContext.annotationView;
+                    
+                    CGRect rect = [self positioningRectForCalloutForAnnotationWithTag:tag];
+                    
+                    if (annotationView)
+                    {
+                        rect = annotationView.frame;
+                    }
+                    
+                    if ( ! CGRectIntersectsRect(rect, self.frame)) {
+                        [self deselectAnnotation:self.selectedAnnotation animated:NO];
+                    }
+                }
             }
 
             if ( ! [self isSuppressingChangeDelimiters] && [self.delegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)])
@@ -4661,6 +4681,7 @@ public:
                 [self.style didChangeValueForKey:@"layers"];
             }
             [self updateAnnotationViews];
+            [self updateCalloutView];
             if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingFrame:fullyRendered:)])
             {
                 [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:(change == mbgl::MapChangeDidFinishRenderingFrameFullyRendered)];
@@ -4678,6 +4699,10 @@ public:
             {
                 [self.delegate mapView:self didFinishLoadingStyle:self.style];
             }
+            break;
+        }
+        case mbgl::MapChangeSourceDidChange:
+        {
             break;
         }
     }
@@ -4728,8 +4753,8 @@ public:
         if (!annotationView)
         {
             // This will dequeue views if the delegate implements the dequeue call
-            MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotationContext.annotation];
-            
+            annotationView = [self annotationViewForAnnotation:annotationContext.annotation];
+
             if (annotationView)
             {
                 annotationView.mapView = self;
@@ -4748,14 +4773,9 @@ public:
             annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
         }
     }
-    
-    CGPoint upperLeft = {_largestAnnotationViewSize.width,_largestAnnotationViewSize.height};
-    CGPoint lowerRight = {CGRectGetWidth(self.bounds) + _largestAnnotationViewSize.width,
-                          CGRectGetHeight(self.bounds) + _largestAnnotationViewSize.height};
-    
-    CLLocationCoordinate2D upperLeftCoordinate = [self convertPoint:upperLeft toCoordinateFromView:self];
-    CLLocationCoordinate2D lowerRightCoordinate = [self convertPoint:lowerRight toCoordinateFromView:self];
-    
+
+    MGLCoordinateBounds coordinateBounds = [self convertRect:viewPort toCoordinateBoundsFromView:self];
+
     // Enqueue (and move if required) offscreen annotation views
     for (id<MGLAnnotation> annotation in offscreenAnnotations)
     {
@@ -4778,22 +4798,47 @@ public:
             // moved and the enqueue operation is avoided. This allows us to keep the performance benefit of
             // using the mbgl query result. It also forces views that have just gone offscreen to be cleared
             // fully from view.
-            if ((coordinate.latitude > upperLeftCoordinate.latitude || coordinate.latitude < lowerRightCoordinate.latitude) ||
-                (coordinate.longitude < upperLeftCoordinate.longitude || coordinate.longitude > lowerRightCoordinate.longitude))
+            if (MGLCoordinateInCoordinateBounds(coordinate, coordinateBounds))
             {
-                CGRect adjustedFrame = annotationView.frame;
-                adjustedFrame.origin.x = -CGRectGetWidth(adjustedFrame) * 2.0;
-                annotationView.frame = adjustedFrame;
-                [self enqueueAnnotationViewForAnnotationContext:annotationContext];
+                annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
             }
             else
             {
-                annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
+                CGRect adjustedFrame = annotationView.frame;
+                adjustedFrame.origin.x = CGRectGetWidth(annotationView.layer.presentationLayer.frame) * -2.0;
+                annotationView.frame = adjustedFrame;
+                [self enqueueAnnotationViewForAnnotationContext:annotationContext];
             }
         }
     }
 
     [CATransaction commit];
+}
+
+- (void)updateCalloutView
+{
+    UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
+    id <MGLAnnotation> annotation = calloutView.representedObject;
+    
+    if (calloutView && annotation)
+    {
+        MGLAnnotationTag tag = [self annotationTagForAnnotation:annotation];
+        MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(tag);
+        MGLAnnotationView *annotationView = annotationContext.annotationView;
+        
+        CGRect rect = [self positioningRectForCalloutForAnnotationWithTag:tag];
+        
+        if (annotationView)
+        {
+            rect = annotationView.frame;
+        }
+        
+        CGPoint point = CGPointMake(CGRectGetMidX(rect), CGRectGetMinY(rect));
+        
+        if ( ! CGPointEqualToPoint(calloutView.center, point)) {
+            calloutView.center = point;
+        }
+    }
 }
 
 - (void)enqueueAnnotationViewForAnnotationContext:(MGLAnnotationContext &)annotationContext
@@ -5293,87 +5338,6 @@ private:
 - (void)setAllowsTilting:(BOOL)allowsTilting
 {
     self.pitchEnabled = allowsTilting;
-}
-
-@end
-
-#pragma mark - MGLCustomStyleLayerAdditions methods
-
-class MGLCustomStyleLayerHandlers
-{
-public:
-    MGLCustomStyleLayerHandlers(MGLCustomStyleLayerPreparationHandler p,
-                                MGLCustomStyleLayerDrawingHandler d,
-                                MGLCustomStyleLayerCompletionHandler f)
-    : prepare(p), draw(d), finish(f) {}
-
-    MGLCustomStyleLayerPreparationHandler prepare;
-    MGLCustomStyleLayerDrawingHandler draw;
-    MGLCustomStyleLayerCompletionHandler finish;
-};
-
-void MGLPrepareCustomStyleLayer(void *context)
-{
-    MGLCustomStyleLayerPreparationHandler prepare = reinterpret_cast<MGLCustomStyleLayerHandlers *>(context)->prepare;
-    if (prepare)
-    {
-        prepare();
-    }
-}
-
-void MGLDrawCustomStyleLayer(void *context, const mbgl::style::CustomLayerRenderParameters &params)
-{
-    CGSize size = CGSizeMake(params.width, params.height);
-    CLLocationCoordinate2D centerCoordinate = CLLocationCoordinate2DMake(params.latitude, params.longitude);
-    double zoomLevel = params.zoom;
-    CLLocationDirection direction = mbgl::util::wrap(params.bearing, 0., 360.);
-    CGFloat pitch = params.pitch;
-    CGFloat perspectiveSkew = params.altitude;
-    MGLCustomStyleLayerDrawingHandler draw = reinterpret_cast<MGLCustomStyleLayerHandlers *>(context)->draw;
-    if (draw)
-    {
-        draw(size, centerCoordinate, zoomLevel, direction, pitch, perspectiveSkew);
-    }
-}
-
-void MGLFinishCustomStyleLayer(void *context)
-{
-    MGLCustomStyleLayerHandlers *handlers = reinterpret_cast<MGLCustomStyleLayerHandlers *>(context);
-    MGLCustomStyleLayerCompletionHandler finish = handlers->finish;
-    if (finish)
-    {
-        finish();
-    }
-    delete handlers;
-}
-
-@implementation MGLMapView (MGLCustomStyleLayerAdditions)
-
-- (void)insertCustomStyleLayerWithIdentifier:(NSString *)identifier preparationHandler:(void (^)())preparation drawingHandler:(MGLCustomStyleLayerDrawingHandler)drawing completionHandler:(void (^)())completion belowStyleLayerWithIdentifier:(nullable NSString *)otherIdentifier
-{
-    NSAssert(identifier, @"Style layer needs an identifier");
-    MGLCustomStyleLayerHandlers *context = new MGLCustomStyleLayerHandlers(preparation, drawing, completion);
-    try {
-        _mbglMap->addLayer(std::make_unique<mbgl::style::CustomLayer>(identifier.UTF8String, MGLPrepareCustomStyleLayer,
-                                                                      MGLDrawCustomStyleLayer, MGLFinishCustomStyleLayer, context),
-                           otherIdentifier ? mbgl::optional<std::string>(otherIdentifier.UTF8String) : mbgl::optional<std::string>());
-    } catch (std::runtime_error & err) {
-        [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
-    }
-}
-
-- (void)removeCustomStyleLayerWithIdentifier:(NSString *)identifier
-{
-    _mbglMap->removeLayer(identifier.UTF8String);
-}
-
-- (void)setCustomStyleLayersNeedDisplay
-{
-    [self setNeedsGLDisplay];
-}
-
-- (mbgl::Map *)mbglMap {
-    return _mbglMap;
 }
 
 @end

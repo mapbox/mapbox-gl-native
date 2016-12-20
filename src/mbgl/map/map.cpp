@@ -923,6 +923,13 @@ void Map::removeImage(const std::string& name) {
     impl->onUpdate(Update::Repaint);
 }
 
+const SpriteImage* Map::getImage(const std::string& name) {
+    if (impl->style) {
+        return impl->style->spriteAtlas->getSprite(name).get();
+    }
+    return nullptr;
+}
+
 #pragma mark - Defaults
 
 std::string Map::getStyleName() const {

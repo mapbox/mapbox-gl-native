@@ -1,6 +1,7 @@
 #import "MapDocument.h"
 
 #import "AppDelegate.h"
+#import "LimeGreenStyleLayer.h"
 #import "DroppedPinAnnotation.h"
 
 #import <Mapbox/Mapbox.h>
@@ -604,6 +605,37 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         cos(angle) * 20);
 }
 
+- (IBAction)insertCustomStyleLayer:(id)sender {
+    [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
+        [self removeCustomStyleLayer:sender];
+    }];
+    
+    if (!self.undoManager.isUndoing) {
+        [self.undoManager setActionName:@"Add Lime Green Layer"];
+    }
+    
+    LimeGreenStyleLayer *layer = [[LimeGreenStyleLayer alloc] initWithIdentifier:@"mbx-custom"];
+    MGLStyleLayer *houseNumberLayer = [self.mapView.style layerWithIdentifier:@"housenum-label"];
+    if (houseNumberLayer) {
+        [self.mapView.style insertLayer:layer belowLayer:houseNumberLayer];
+    } else {
+        [self.mapView.style addLayer:layer];
+    }
+}
+
+- (IBAction)removeCustomStyleLayer:(id)sender {
+    [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
+        [self insertCustomStyleLayer:sender];
+    }];
+    
+    if (!self.undoManager.isUndoing) {
+        [self.undoManager setActionName:@"Delete Lime Green Layer"];
+    }
+    
+    MGLStyleLayer *layer = [self.mapView.style layerWithIdentifier:@"mbx-custom"];
+    [self.mapView.style removeLayer:layer];
+}
+
 #pragma mark Offline packs
 
 - (IBAction)addOfflinePack:(id)sender {
@@ -634,15 +666,6 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }];
 }
 
-#pragma mark Help methods
-
-- (IBAction)giveFeedback:(id)sender {
-    CLLocationCoordinate2D centerCoordinate = self.mapView.centerCoordinate;
-    NSURL *feedbackURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.mapbox.com/map-feedback/#/%.5f/%.5f/%.0f",
-                                               centerCoordinate.longitude, centerCoordinate.latitude, round(self.mapView.zoomLevel + 1)]];
-    [[NSWorkspace sharedWorkspace] openURL:feedbackURL];
-}
-
 #pragma mark Mouse events
 
 - (void)handlePressGesture:(NSPressGestureRecognizer *)gestureRecognizer {
@@ -668,13 +691,29 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"ams" URL:geoJSONURL options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"ams" URL:geoJSONURL options:nil];
     [self.mapView.style addSource:source];
     
     MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"test" source:source];
     fillLayer.fillColor = [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor greenColor]];
     fillLayer.predicate = [NSPredicate predicateWithFormat:@"%K == %@", @"type", @"park"];
     [self.mapView.style addLayer:fillLayer];
+    
+    NSImage *image = [NSImage imageNamed:NSImageNameIChatTheaterTemplate];
+    [self.mapView.style setImage:image forName:NSImageNameIChatTheaterTemplate];
+    
+    MGLSource *streetsSource = [self.mapView.style sourceWithIdentifier:@"composite"];
+    MGLSymbolStyleLayer *theaterLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"theaters" source:streetsSource];
+    theaterLayer.sourceLayerIdentifier = @"poi_label";
+    theaterLayer.predicate = [NSPredicate predicateWithFormat:@"maki == 'theatre'"];
+    theaterLayer.iconImageName = [MGLStyleValue valueWithRawValue:NSImageNameIChatTheaterTemplate];
+    theaterLayer.iconScale = [MGLStyleValue valueWithRawValue:@2];
+    theaterLayer.iconColor = [MGLStyleValue valueWithStops:@{
+        @16.0: [MGLStyleValue valueWithRawValue:[NSColor redColor]],
+        @18.0: [MGLStyleValue valueWithRawValue:[NSColor yellowColor]],
+        @20.0: [MGLStyleValue valueWithRawValue:[NSColor blackColor]],
+    }];
+    [self.mapView.style addLayer:theaterLayer];
 }
 
 - (IBAction)dropPin:(NSMenuItem *)sender {
@@ -875,6 +914,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     if (menuItem.action == @selector(drawAnimatedAnnotation:)) {
         return !_isShowingAnimatedAnnotation;
+    }
+    if (menuItem.action == @selector(insertCustomStyleLayer:)) {
+        return ![self.mapView.style layerWithIdentifier:@"mbx-custom"];
     }
     if (menuItem.action == @selector(showAllAnnotations:) || menuItem.action == @selector(removeAllAnnotations:)) {
         return self.mapView.annotations.count > 0;

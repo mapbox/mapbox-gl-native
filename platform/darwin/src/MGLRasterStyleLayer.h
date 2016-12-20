@@ -20,15 +20,25 @@ NS_ASSUME_NONNULL_BEGIN
  Increase or reduce the brightness of the image. The value is the maximum brightness.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `1`. Set this property to `nil` to reset it to the default value.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-brightness-max"><code>raster-brightness-max</code></a> paint property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumRasterBrightness;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterBrightnessMax __attribute__((unavailable("Use maximumRasterBrightness instead.")));
 
 /**
  Increase or reduce the brightness of the image. The value is the minimum brightness.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-brightness-min"><code>raster-brightness-min</code></a> paint property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *minimumRasterBrightness;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterBrightnessMin __attribute__((unavailable("Use minimumRasterBrightness instead.")));
 
 /**
  Increase or reduce the contrast of the image.
@@ -52,8 +62,13 @@ NS_ASSUME_NONNULL_BEGIN
  This property is measured in degrees.
  
  The default value of this property is an `MGLStyleValue` object containing an `NSNumber` object containing the float `0`. Set this property to `nil` to reset it to the default value.
+ 
+ This attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-hue-rotate"><code>raster-hue-rotate</code></a> paint property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotate;
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotation;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotate __attribute__((unavailable("Use rasterHueRotation instead.")));
 
 /**
  The opacity at which the image will be drawn.

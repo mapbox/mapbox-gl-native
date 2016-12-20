@@ -11,7 +11,7 @@
  
  @note `MGLPointCollection` objects cannot be added to a map view using
  `-[MGLMapView addAnnotations:]` and related methods. However, when used in a
- `MGLPointCollectionFeature` to initialize a `MGLGeoJSONSource` that is added
+ `MGLPointCollectionFeature` to initialize a `MGLShapeSource` that is added
  to the map view's style, the point collection represents as a group of distinct 
  annotations.
  */

@@ -1,10 +1,7 @@
 #import "MGLMapView.h"
 #import "MGLStyle_Private.h"
-#if TARGET_OS_IPHONE
-#import "MGLMapView+MGLCustomStyleLayerAdditions.h"
-#endif
 
-#import "MGLGeoJSONSource.h"
+#import "MGLShapeSource.h"
 #import "MGLRasterSource.h"
 #import "MGLVectorSource.h"
 
@@ -12,6 +9,7 @@
 #import "MGLCircleStyleLayer.h"
 #import "MGLFillStyleLayer.h"
 #import "MGLLineStyleLayer.h"
+#import "MGLOpenGLStyleLayer.h"
 #import "MGLRasterStyleLayer.h"
 #import "MGLSymbolStyleLayer.h"
 
@@ -20,6 +18,11 @@
 #import <mbgl/util/default_styles.hpp>
 
 #import <XCTest/XCTest.h>
+#if TARGET_OS_IPHONE
+    #import <UIKit/UIKit.h>
+#else
+    #import <Cocoa/Cocoa.h>
+#endif
 #import <objc/runtime.h>
 
 @interface MGLStyleTests : XCTestCase
@@ -119,29 +122,29 @@
 }
 
 - (void)testAddingSourcesTwice {
-    MGLGeoJSONSource *geoJSONSource = [[MGLGeoJSONSource alloc] initWithIdentifier:@"geoJSONSource" features:@[] options:nil];
-    [self.style addSource:geoJSONSource];
-    XCTAssertThrowsSpecificNamed([self.style addSource:geoJSONSource], NSException, @"MGLRedundantSourceException");
+    MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
+    [self.style addSource:shapeSource];
+    XCTAssertThrowsSpecificNamed([self.style addSource:shapeSource], NSException, @"MGLRedundantSourceException");
 
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"rasterSource" URL:[NSURL new] tileSize:42];
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"rasterSource" configurationURL:[NSURL URLWithString:@".json"] tileSize:42];
     [self.style addSource:rasterSource];
     XCTAssertThrowsSpecificNamed([self.style addSource:rasterSource], NSException, @"MGLRedundantSourceException");
 
-    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"vectorSource" URL:[NSURL new]];
+    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"vectorSource" configurationURL:[NSURL URLWithString:@".json"]];
     [self.style addSource:vectorSource];
     XCTAssertThrowsSpecificNamed([self.style addSource:vectorSource], NSException, @"MGLRedundantSourceException");
 }
 
 - (void)testAddingSourcesWithDuplicateIdentifiers {
-    MGLVectorSource *source1 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" URL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
-    MGLVectorSource *source2 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" URL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorSource *source1 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorSource *source2 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
 
     [self.style addSource: source1];
-    XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, @"MGLRedundantSourceIdentiferException");
+    XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, @"MGLRedundantSourceIdentifierException");
 }
 
 - (void)testAddingLayersTwice {
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"geoJSONSource" features:@[] options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
 
     MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"backgroundLayer"];
     [self.style addLayer:backgroundLayer];
@@ -170,7 +173,7 @@
 
 - (void)testAddingLayersWithDuplicateIdentifiers {
     //Just some source
-    MGLVectorSource *source = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" URL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorSource *source = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
     [self.mapView.style addSource: source];
     
     //Add initial layer
@@ -182,14 +185,7 @@
     XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] belowLayer:initial],NSException, @"MGLRedundantLayerIdentifierException");
     XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] aboveLayer:initial], NSException, @"MGLRedundantLayerIdentifierException");
     XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] atIndex:0], NSException, @"MGLRedundantLayerIdentifierException");
-
-#if TARGET_OS_IPHONE
-    //Try to insert a duplicate custom layer
-    MGLCustomStyleLayerDrawingHandler drawingHandler = ^(CGSize size, CLLocationCoordinate2D centerCoordinate, double zoomLevel, CLLocationDirection direction, CGFloat pitch, CGFloat perspectiveSkew) {
-    };
-    
-    XCTAssertThrowsSpecific([self.mapView insertCustomStyleLayerWithIdentifier:@"my-layer" preparationHandler:^{} drawingHandler:drawingHandler completionHandler: ^{} belowStyleLayerWithIdentifier:nil], NSException);
-#endif
+    XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"my-layer"] atIndex:0], NSException, @"MGLRedundantLayerIdentifierException");
 }
 
 - (NSString *)stringWithContentsOfStyleHeader {
@@ -200,6 +196,25 @@
     NSString *styleHeader = [NSString stringWithContentsOfURL:styleHeaderURL usedEncoding:nil error:&styleHeaderError];
     XCTAssertNil(styleHeaderError, @"Error getting contents of MGLStyle.h.");
     return styleHeader;
+}
+
+- (void)testImages {
+    NSString *imageName = @"TrackingLocationMask";
+#if TARGET_OS_IPHONE
+    MGLImage *image = [MGLImage imageNamed:imageName
+                                  inBundle:[NSBundle bundleForClass:[self class]]
+             compatibleWithTraitCollection:nil];
+#else
+    MGLImage *image = [[NSBundle bundleForClass:[self class]] imageForResource:imageName];
+#endif
+    XCTAssertNotNil(image);
+    
+    [self.mapView.style setImage:image forName:imageName];
+    MGLImage *styleImage = [self.mapView.style imageForName:imageName];
+    
+    XCTAssertNotNil(styleImage);
+    XCTAssertEqual(image.size.width, styleImage.size.width);
+    XCTAssertEqual(image.size.height, styleImage.size.height);
 }
 
 @end

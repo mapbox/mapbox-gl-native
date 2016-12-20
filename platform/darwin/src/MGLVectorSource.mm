@@ -1,64 +1,50 @@
-#import "MGLVectorSource.h"
+#import "MGLVectorSource_Private.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
-#import "MGLTileSet_Private.h"
+#import "MGLTileSource_Private.h"
 #import "NSURL+MGLAdditions.h"
 
 #include <mbgl/style/sources/vector_source.hpp>
 
 @interface MGLVectorSource ()
 
+- (instancetype)initWithRawSource:(mbgl::style::VectorSource *)rawSource NS_DESIGNATED_INITIALIZER;
+
 @property (nonatomic) mbgl::style::VectorSource *rawSource;
 
 @end
 
-@implementation MGLVectorSource
-{
+@implementation MGLVectorSource {
     std::unique_ptr<mbgl::style::VectorSource> _pendingSource;
 }
 
-- (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url
-{
-    if (self = [super initWithIdentifier:identifier])
-    {
-        _URL = url;
-        [self commonInit];
+- (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL {
+    if (self = [super initWithIdentifier:identifier configurationURL:configurationURL]) {
+        auto source = std::make_unique<mbgl::style::VectorSource>(identifier.UTF8String,
+                                                                  configurationURL.mgl_URLByStandardizingScheme.absoluteString.UTF8String);
+        _pendingSource = std::move(source);
+        self.rawSource = _pendingSource.get();
     }
     return self;
 }
 
-- (instancetype)initWithIdentifier:(NSString *)identifier tileSet:(MGLTileSet *)tileSet
-{
-    if (self = [super initWithIdentifier:identifier])
-    {
-        _tileSet = tileSet;
-        [self commonInit];
+- (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options {
+    if (self = [super initWithIdentifier:identifier tileURLTemplates:tileURLTemplates options:options]) {
+        mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
+        
+        auto source = std::make_unique<mbgl::style::VectorSource>(identifier.UTF8String, tileSet);
+        _pendingSource = std::move(source);
+        self.rawSource = _pendingSource.get();
     }
     return self;
 }
 
-- (void)commonInit
-{
-    std::unique_ptr<mbgl::style::VectorSource> source;
-    
-    if (self.URL)
-    {
-        source = std::make_unique<mbgl::style::VectorSource>(self.identifier.UTF8String,
-                                                             self.URL.mgl_URLByStandardizingScheme.absoluteString.UTF8String);
-    }
-    else
-    {
-        source = std::make_unique<mbgl::style::VectorSource>(self.identifier.UTF8String,
-                                                             self.tileSet.mbglTileset);
-    }
-    
-    _pendingSource = std::move(source);
-    self.rawSource = _pendingSource.get();
+- (instancetype)initWithRawSource:(mbgl::style::VectorSource *)rawSource {
+    return [super initWithRawSource:rawSource];
 }
 
-- (void)addToMapView:(MGLMapView *)mapView
-{
+- (void)addToMapView:(MGLMapView *)mapView {
     if (_pendingSource == nullptr) {
         [NSException raise:@"MGLRedundantSourceException"
                     format:@"This instance %@ was already added to %@. Adding the same source instance " \
@@ -68,18 +54,24 @@
     mapView.mbglMap->addSource(std::move(_pendingSource));
 }
 
-- (void)removeFromMapView:(MGLMapView *)mapView
-{
+- (void)removeFromMapView:(MGLMapView *)mapView {
     auto removedSource = mapView.mbglMap->removeSource(self.identifier.UTF8String);
 
     _pendingSource = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::VectorSource> &>(removedSource));
     self.rawSource = _pendingSource.get();
 }
 
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; tileSet = %@>",
-            NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.tileSet];
+- (mbgl::style::VectorSource *)rawSource {
+    return (mbgl::style::VectorSource *)super.rawSource;
+}
+
+- (void)setRawSource:(mbgl::style::VectorSource *)rawSource {
+    super.rawSource = rawSource;
+}
+
+- (NSString *)attributionHTMLString {
+    auto attribution = self.rawSource->getAttribution();
+    return attribution ? @(attribution->c_str()) : nil;
 }
 
 @end

@@ -62,6 +62,14 @@ NS_INLINE BOOL MGLCoordinateBoundsEqualToCoordinateBounds(MGLCoordinateBounds bo
             bounds1.ne.longitude == bounds2.ne.longitude);
 }
 
+/** Returns `YES` if the two coordinate bounds intersect. */
+NS_INLINE BOOL MGLCoordinateBoundsIntersectsCoordinateBounds(MGLCoordinateBounds bounds1, MGLCoordinateBounds bounds2) {
+    return (bounds1.ne.latitude  > bounds2.sw.latitude  &&
+            bounds1.sw.latitude  < bounds2.ne.latitude  &&
+            bounds1.ne.longitude > bounds2.sw.longitude &&
+            bounds1.sw.longitude < bounds2.ne.longitude);
+}
+
 /** Returns `YES` if the coordinate is within the coordinate bounds. */
 NS_INLINE BOOL MGLCoordinateInCoordinateBounds(CLLocationCoordinate2D coordinate, MGLCoordinateBounds bounds) {
     return (coordinate.latitude  >= bounds.sw.latitude  &&

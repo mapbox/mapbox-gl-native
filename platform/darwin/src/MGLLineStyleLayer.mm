@@ -46,15 +46,26 @@ namespace mbgl {
     if (self = [super initWithIdentifier:identifier source:source]) {
         auto layer = std::make_unique<mbgl::style::LineLayer>(identifier.UTF8String, source.identifier.UTF8String);
         _pendingLayer = std::move(layer);
-        _rawLayer = _pendingLayer.get();
+        self.rawLayer = _pendingLayer.get();
     }
     return self;
 }
+
+- (mbgl::style::LineLayer *)rawLayer
+{
+    return (mbgl::style::LineLayer *)super.rawLayer;
+}
+
+- (void)setRawLayer:(mbgl::style::LineLayer *)rawLayer
+{
+    super.rawLayer = rawLayer;
+}
+
 - (NSString *)sourceLayerIdentifier
 {
     MGLAssertStyleLayerIsValid();
 
-    auto layerID = _rawLayer->getSourceLayer();
+    auto layerID = self.rawLayer->getSourceLayer();
     return layerID.empty() ? nil : @(layerID.c_str());
 }
 
@@ -62,25 +73,26 @@ namespace mbgl {
 {
     MGLAssertStyleLayerIsValid();
 
-    _rawLayer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
+    self.rawLayer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
 }
 
 - (void)setPredicate:(NSPredicate *)predicate
 {
     MGLAssertStyleLayerIsValid();
 
-    _rawLayer->setFilter(predicate.mgl_filter);
+    self.rawLayer->setFilter(predicate.mgl_filter);
 }
 
 - (NSPredicate *)predicate
 {
     MGLAssertStyleLayerIsValid();
 
-    return [NSPredicate mgl_predicateWithFilter:_rawLayer->getFilter()];
+    return [NSPredicate mgl_predicateWithFilter:self.rawLayer->getFilter()];
 }
-#pragma mark -  Adding to and removing from a map view
 
-- (void)addToMapView:(MGLMapView *)mapView
+#pragma mark - Adding to and removing from a map view
+
+- (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
 {
     if (_pendingLayer == nullptr) {
         [NSException raise:@"MGLRedundantLayerException"
@@ -88,11 +100,6 @@ namespace mbgl {
                     "to the style more than once is invalid.", self, mapView.style];
     }
 
-    [self addToMapView:mapView belowLayer:nil];
-}
-
-- (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
-{
     if (otherLayer) {
         const mbgl::optional<std::string> belowLayerId{otherLayer.identifier.UTF8String};
         mapView.mbglMap->addLayer(std::move(_pendingLayer), belowLayerId);
@@ -104,7 +111,7 @@ namespace mbgl {
 - (void)removeFromMapView:(MGLMapView *)mapView
 {
     _pendingLayer = nullptr;
-    _rawLayer = nullptr;
+    self.rawLayer = nullptr;
 
     auto removedLayer = mapView.mbglMap->removeLayer(self.identifier.UTF8String);
     if (!removedLayer) {
@@ -119,7 +126,7 @@ namespace mbgl {
     removedLayer.release();
 
     _pendingLayer = std::unique_ptr<mbgl::style::LineLayer>(layer);
-    _rawLayer = _pendingLayer.get();
+    self.rawLayer = _pendingLayer.get();
 }
 
 #pragma mark - Accessing the Layout Attributes
@@ -128,13 +135,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineCapType, NSValue *, mbgl::style::LineCapType, MGLLineCap>().toEnumPropertyValue(lineCap);
-    _rawLayer->setLineCap(mbglValue);
+    self.rawLayer->setLineCap(mbglValue);
 }
 
 - (MGLStyleValue<NSValue *> *)lineCap {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLineCap() ?: _rawLayer->getDefaultLineCap();
+    auto propertyValue = self.rawLayer->getLineCap() ?: self.rawLayer->getDefaultLineCap();
     return MGLStyleValueTransformer<mbgl::style::LineCapType, NSValue *, mbgl::style::LineCapType, MGLLineCap>().toEnumStyleValue(propertyValue);
 }
 
@@ -142,13 +149,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toEnumPropertyValue(lineJoin);
-    _rawLayer->setLineJoin(mbglValue);
+    self.rawLayer->setLineJoin(mbglValue);
 }
 
 - (MGLStyleValue<NSValue *> *)lineJoin {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLineJoin() ?: _rawLayer->getDefaultLineJoin();
+    auto propertyValue = self.rawLayer->getLineJoin() ?: self.rawLayer->getDefaultLineJoin();
     return MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toEnumStyleValue(propertyValue);
 }
 
@@ -156,13 +163,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineMiterLimit);
-    _rawLayer->setLineMiterLimit(mbglValue);
+    self.rawLayer->setLineMiterLimit(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineMiterLimit {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLineMiterLimit() ?: _rawLayer->getDefaultLineMiterLimit();
+    auto propertyValue = self.rawLayer->getLineMiterLimit() ?: self.rawLayer->getDefaultLineMiterLimit();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -170,13 +177,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineRoundLimit);
-    _rawLayer->setLineRoundLimit(mbglValue);
+    self.rawLayer->setLineRoundLimit(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineRoundLimit {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLineRoundLimit() ?: _rawLayer->getDefaultLineRoundLimit();
+    auto propertyValue = self.rawLayer->getLineRoundLimit() ?: self.rawLayer->getDefaultLineRoundLimit();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -186,13 +193,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineBlur);
-    _rawLayer->setLineBlur(mbglValue);
+    self.rawLayer->setLineBlur(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineBlur {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLineBlur() ?: _rawLayer->getDefaultLineBlur();
+    auto propertyValue = self.rawLayer->getLineBlur() ?: self.rawLayer->getDefaultLineBlur();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -200,41 +207,46 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue(lineColor);
-    _rawLayer->setLineColor(mbglValue);
+    self.rawLayer->setLineColor(mbglValue);
 }
 
 - (MGLStyleValue<MGLColor *> *)lineColor {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLineColor() ?: _rawLayer->getDefaultLineColor();
+    auto propertyValue = self.rawLayer->getLineColor() ?: self.rawLayer->getDefaultLineColor();
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
 }
 
-- (void)setLineDasharray:(MGLStyleValue<NSArray<NSNumber *> *> *)lineDasharray {
+- (void)setLineDashPattern:(MGLStyleValue<NSArray<NSNumber *> *> *)lineDashPattern {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::vector<float>, NSArray<NSNumber *> *, float>().toPropertyValue(lineDasharray);
-    _rawLayer->setLineDasharray(mbglValue);
+    auto mbglValue = MGLStyleValueTransformer<std::vector<float>, NSArray<NSNumber *> *, float>().toPropertyValue(lineDashPattern);
+    self.rawLayer->setLineDasharray(mbglValue);
 }
 
-- (MGLStyleValue<NSArray<NSNumber *> *> *)lineDasharray {
+- (MGLStyleValue<NSArray<NSNumber *> *> *)lineDashPattern {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLineDasharray() ?: _rawLayer->getDefaultLineDasharray();
+    auto propertyValue = self.rawLayer->getLineDasharray() ?: self.rawLayer->getDefaultLineDasharray();
     return MGLStyleValueTransformer<std::vector<float>, NSArray<NSNumber *> *, float>().toStyleValue(propertyValue);
+}
+
+
+- (void)setLineDasharray:(MGLStyleValue<NSArray<NSNumber *> *> *)lineDasharray {
+    NSAssert(NO, @"Use -setLineDashPattern: instead.");
 }
 
 - (void)setLineGapWidth:(MGLStyleValue<NSNumber *> *)lineGapWidth {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineGapWidth);
-    _rawLayer->setLineGapWidth(mbglValue);
+    self.rawLayer->setLineGapWidth(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineGapWidth {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLineGapWidth() ?: _rawLayer->getDefaultLineGapWidth();
+    auto propertyValue = self.rawLayer->getLineGapWidth() ?: self.rawLayer->getDefaultLineGapWidth();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -242,13 +254,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineOffset);
-    _rawLayer->setLineOffset(mbglValue);
+    self.rawLayer->setLineOffset(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineOffset {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLineOffset() ?: _rawLayer->getDefaultLineOffset();
+    auto propertyValue = self.rawLayer->getLineOffset() ?: self.rawLayer->getDefaultLineOffset();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -256,13 +268,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineOpacity);
-    _rawLayer->setLineOpacity(mbglValue);
+    self.rawLayer->setLineOpacity(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLineOpacity() ?: _rawLayer->getDefaultLineOpacity();
+    auto propertyValue = self.rawLayer->getLineOpacity() ?: self.rawLayer->getDefaultLineOpacity();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -270,13 +282,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(linePattern);
-    _rawLayer->setLinePattern(mbglValue);
+    self.rawLayer->setLinePattern(mbglValue);
 }
 
 - (MGLStyleValue<NSString *> *)linePattern {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLinePattern() ?: _rawLayer->getDefaultLinePattern();
+    auto propertyValue = self.rawLayer->getLinePattern() ?: self.rawLayer->getDefaultLinePattern();
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 
@@ -284,13 +296,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue(lineTranslate);
-    _rawLayer->setLineTranslate(mbglValue);
+    self.rawLayer->setLineTranslate(mbglValue);
 }
 
 - (MGLStyleValue<NSValue *> *)lineTranslate {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLineTranslate() ?: _rawLayer->getDefaultLineTranslate();
+    auto propertyValue = self.rawLayer->getLineTranslate() ?: self.rawLayer->getDefaultLineTranslate();
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
@@ -298,13 +310,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLLineTranslateAnchor>().toEnumPropertyValue(lineTranslateAnchor);
-    _rawLayer->setLineTranslateAnchor(mbglValue);
+    self.rawLayer->setLineTranslateAnchor(mbglValue);
 }
 
 - (MGLStyleValue<NSValue *> *)lineTranslateAnchor {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLineTranslateAnchor() ?: _rawLayer->getDefaultLineTranslateAnchor();
+    auto propertyValue = self.rawLayer->getLineTranslateAnchor() ?: self.rawLayer->getDefaultLineTranslateAnchor();
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLLineTranslateAnchor>().toEnumStyleValue(propertyValue);
 }
 
@@ -312,13 +324,13 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(lineWidth);
-    _rawLayer->setLineWidth(mbglValue);
+    self.rawLayer->setLineWidth(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)lineWidth {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = _rawLayer->getLineWidth() ?: _rawLayer->getDefaultLineWidth();
+    auto propertyValue = self.rawLayer->getLineWidth() ?: self.rawLayer->getDefaultLineWidth();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 

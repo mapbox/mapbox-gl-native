@@ -1,4 +1,4 @@
-#import "MGLStyle.h"
+#import "MGLStyle_Private.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLStyleLayer.h"
@@ -8,6 +8,7 @@
 #import "MGLSymbolStyleLayer.h"
 #import "MGLRasterStyleLayer.h"
 #import "MGLBackgroundStyleLayer.h"
+#import "MGLOpenGLStyleLayer.h"
 
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
@@ -16,9 +17,12 @@
 #import "NSDate+MGLAdditions.h"
 
 #import "MGLSource.h"
+#import "MGLTileSource_Private.h"
 #import "MGLVectorSource.h"
 #import "MGLRasterSource.h"
-#import "MGLGeoJSONSource.h"
+#import "MGLShapeSource.h"
+
+#import "MGLAttributionInfo_Private.h"
 
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
@@ -28,6 +32,7 @@
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
@@ -42,6 +47,7 @@
 
 @property (nonatomic, readwrite, weak) MGLMapView *mapView;
 @property (readonly, copy, nullable) NSURL *URL;
+@property (nonatomic, readwrite, strong) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLOpenGLStyleLayer *) *openGLLayers;
 
 @end
 
@@ -108,6 +114,7 @@ static NSURL *MGLStyleURL_emerald;
 - (instancetype)initWithMapView:(MGLMapView *)mapView {
     if (self = [super init]) {
         _mapView = mapView;
+        _openGLLayers = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -157,25 +164,18 @@ static NSURL *MGLStyleURL_emerald;
     return rawSource ? [self sourceFromMBGLSource:rawSource] : nil;
 }
 
-- (MGLSource *)sourceFromMBGLSource:(mbgl::style::Source *)mbglSource {
-    NSString *identifier = @(mbglSource->getID().c_str());
-    
+- (MGLSource *)sourceFromMBGLSource:(mbgl::style::Source *)source {
     // TODO: Fill in options specific to the respective source classes
     // https://github.com/mapbox/mapbox-gl-native/issues/6584
-    MGLSource *source;
-    if (mbglSource->is<mbgl::style::VectorSource>()) {
-        source = [[MGLVectorSource alloc] initWithIdentifier:identifier];
-    } else if (mbglSource->is<mbgl::style::GeoJSONSource>()) {
-        source = [[MGLGeoJSONSource alloc] initWithIdentifier:identifier];
-    } else if (mbglSource->is<mbgl::style::RasterSource>()) {
-        source = [[MGLRasterSource alloc] initWithIdentifier:identifier];
+    if (auto vectorSource = source->as<mbgl::style::VectorSource>()) {
+        return [[MGLVectorSource alloc] initWithRawSource:vectorSource];
+    } else if (auto geoJSONSource = source->as<mbgl::style::GeoJSONSource>()) {
+        return [[MGLShapeSource alloc] initWithRawSource:geoJSONSource];
+    } else if (auto rasterSource = source->as<mbgl::style::RasterSource>()) {
+        return [[MGLRasterSource alloc] initWithRawSource:rasterSource];
     } else {
-        source = [[MGLSource alloc] initWithIdentifier:identifier];
+        return [[MGLSource alloc] initWithRawSource:source];
     }
-    
-    source.rawSource = mbglSource;
-
-    return source;
 }
 
 - (void)addSource:(MGLSource *)source
@@ -190,7 +190,7 @@ static NSURL *MGLStyleURL_emerald;
     try {
         [source addToMapView:self.mapView];
     } catch (std::runtime_error & err) {
-        [NSException raise:@"MGLRedundantSourceIdentiferException" format:@"%s", err.what()];
+        [NSException raise:@"MGLRedundantSourceIdentifierException" format:@"%s", err.what()];
     }
 }
 
@@ -203,6 +203,24 @@ static NSURL *MGLStyleURL_emerald;
          source];
     }
     [source removeFromMapView:self.mapView];
+}
+
+- (nullable NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
+    // It’d be incredibly convenient to use -sources here, but this operation
+    // depends on the sources being sorted in ascending order by creation, as
+    // with the std::vector used in mbgl.
+    auto rawSources = self.mapView.mbglMap->getSources();
+    NSMutableArray *infos = [NSMutableArray arrayWithCapacity:rawSources.size()];
+    for (auto rawSource = rawSources.begin(); rawSource != rawSources.end(); ++rawSource) {
+        MGLTileSource *source = (MGLTileSource *)[self sourceFromMBGLSource:*rawSource];
+        if (![source isKindOfClass:[MGLTileSource class]]) {
+            continue;
+        }
+        
+        NSArray *tileSetInfos = [source attributionInfosWithFontSize:fontSize linkColor:linkColor];
+        [infos growArrayByAddingAttributionInfosFromArray:tileSetInfos];
+    }
+    return infos;
 }
 
 #pragma mark Style layers
@@ -272,7 +290,7 @@ static NSURL *MGLStyleURL_emerald;
                     format:@"Cannot insert style layer at out-of-bounds index %lu.", (unsigned long)index];
     } else if (index == 0) {
         try {
-            [styleLayer addToMapView:self.mapView];
+            [styleLayer addToMapView:self.mapView belowLayer:nil];
         } catch (const std::runtime_error & err) {
             [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
         }
@@ -294,7 +312,8 @@ static NSURL *MGLStyleURL_emerald;
                     format:@"Cannot remove style layer at out-of-bounds index %lu.", (unsigned long)index];
     }
     auto layer = layers.at(layers.size() - 1 - index);
-    self.mapView.mbglMap->removeLayer(layer->getID());
+    MGLStyleLayer *styleLayer = [self layerFromMBGLLayer:layer];
+    [styleLayer removeFromMapView:self.mapView];
 }
 
 - (MGLStyleLayer *)layerFromMBGLLayer:(mbgl::style::Layer *)mbglLayer
@@ -318,8 +337,15 @@ static NSURL *MGLStyleURL_emerald;
     } else if (auto circleLayer = mbglLayer->as<mbgl::style::CircleLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(circleLayer->getSourceID().c_str())];
         styleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:identifier source:source];
-    } else if (mbglLayer->as<mbgl::style::BackgroundLayer>()) {
+    } else if (mbglLayer->is<mbgl::style::BackgroundLayer>()) {
         styleLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:identifier];
+    } else if (auto customLayer = mbglLayer->as<mbgl::style::CustomLayer>()) {
+        styleLayer = self.openGLLayers[identifier];
+        if (styleLayer) {
+            NSAssert(styleLayer.rawLayer == customLayer, @"%@ wraps a CustomLayer that differs from the one associated with the underlying style.", styleLayer);
+            return styleLayer;
+        }
+        styleLayer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:identifier];
     } else {
         NSAssert(NO, @"Unrecognized layer type");
         return nil;
@@ -359,7 +385,7 @@ static NSURL *MGLStyleURL_emerald;
     }
     [self willChangeValueForKey:@"layers"];
     try {
-        [layer addToMapView:self.mapView];
+        [layer addToMapView:self.mapView belowLayer:nil];
     } catch (std::runtime_error & err) {
         [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
     }
@@ -430,7 +456,7 @@ static NSURL *MGLStyleURL_emerald;
          sibling];
     } else if (index + 1 == layers.size()) {
         try {
-            [layer addToMapView:self.mapView];
+            [layer addToMapView:self.mapView belowLayer:nil];
         } catch (std::runtime_error & err) {
             [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
         }
@@ -509,17 +535,37 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)setImage:(MGLImage *)image forName:(NSString *)name
 {
-    NSAssert(image, @"image is null");
-    NSAssert(name, @"name is null");
+    if (!image) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"Cannot assign nil image to “%@”.", name];
+    }
+    if (!name) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"Cannot assign image %@ to a nil name.", image];
+    }
 
     self.mapView.mbglMap->addImage([name UTF8String], image.mgl_spriteImage);
 }
 
 - (void)removeImageForName:(NSString *)name
 {
-    NSAssert(name, @"name is null");
+    if (!name) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"Cannot remove image with nil name."];
+    }
 
     self.mapView.mbglMap->removeImage([name UTF8String]);
+}
+
+- (MGLImage *)imageForName:(NSString *)name
+{
+    if (!name) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"Cannot get image with nil name."];
+    }
+
+    auto spriteImage = self.mapView.mbglMap->getImage([name UTF8String]);
+    return spriteImage ? [[MGLImage alloc] initWithMGLSpriteImage:spriteImage] : nil;
 }
 
 - (NSString *)description
