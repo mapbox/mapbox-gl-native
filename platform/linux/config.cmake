@@ -72,6 +72,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/string_stdlib.cpp
         PRIVATE platform/default/thread.cpp
         PRIVATE platform/default/bidi.cpp
+        PRIVATE platform/default/utf.cpp
 
         # Image handling
         PRIVATE platform/default/image.cpp
