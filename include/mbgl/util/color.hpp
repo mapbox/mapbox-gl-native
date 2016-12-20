@@ -36,6 +36,7 @@ public:
     static Color blue()  { return { 0.0f, 0.0f, 1.0f, 1.0f }; };
 
     static optional<Color> parse(const std::string&);
+    std::string stringify() const;
 };
 
 inline bool operator==(const Color& colorA, const Color& colorB) {

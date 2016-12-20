@@ -60,6 +60,8 @@ mason_use(pixelmatch VERSION 0.10.0 HEADER_ONLY)
 mason_use(geojson VERSION 0.4.0 HEADER_ONLY)
 mason_use(polylabel VERSION 1.0.2 HEADER_ONLY)
 
+add_definitions(-DRAPIDJSON_HAS_STDSTRING=1)
+
 if(WITH_COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")

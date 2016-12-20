@@ -27,6 +27,7 @@ public:
 private:
     std::unique_ptr<Layer> clone() const override;
     std::unique_ptr<Layer> cloneRef(const std::string& id) const override;
+    void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
     void cascade(const CascadeParameters&) final {}
     bool evaluate(const PropertyEvaluationParameters&) final;

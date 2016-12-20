@@ -8,6 +8,9 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
+
 #include <memory>
 #include <string>
 #include <limits>
@@ -37,20 +40,19 @@ class Layer::Impl {
 public:
     virtual ~Impl() = default;
 
-    // Create a new layer with the specified `id`, `ref`, and `sourceID`. All other properties
+    // Create a new layer with the specified `id` and `sourceID`. All other properties
     // are copied from this layer.
     std::unique_ptr<Layer> copy(const std::string& id,
-                                const std::string& ref,
                                 const std::string& sourceID) const;
 
     // Create an identical copy of this layer.
     virtual std::unique_ptr<Layer> clone() const = 0;
 
-    // Create a layer, copying all properties except id, ref, and paint properties from this layer.
+    // Create a layer, copying all properties except id and paint properties from this layer.
     virtual std::unique_ptr<Layer> cloneRef(const std::string& id) const = 0;
 
-    // If the layer has a ref, the ref. Otherwise, the id.
-    const std::string& bucketName() const;
+    // Utility function for automatic layer grouping.
+    virtual void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const = 0;
 
     // Partially evaluate paint properties based on a set of classes.
     virtual void cascade(const CascadeParameters&) = 0;
@@ -78,7 +80,6 @@ public:
 
 public:
     std::string id;
-    std::string ref;
     std::string source;
     std::string sourceLayer;
     Filter filter;

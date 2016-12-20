@@ -16,6 +16,7 @@ namespace style {
 
 <% for (const property of layoutProperties) { -%>
 struct <%- camelize(property.name) %> : LayoutProperty<<%- propertyType(property) %>> {
+    static constexpr const char * key = "<%- property.name %>";
     static <%- propertyType(property) %> defaultValue() { return <%- defaultValue(property) %>; }
 };
 
