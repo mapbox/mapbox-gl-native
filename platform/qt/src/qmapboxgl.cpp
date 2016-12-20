@@ -92,7 +92,12 @@ auto fromQMapboxTransitionOptions(const QMapbox::TransitionOptions &options) {
         };
         return {};
     };
-    return mbgl::style::TransitionOptions { convert(options.duration), convert(options.delay) };
+
+    mbgl::style::TransitionOptions transitionOptions;
+    transitionOptions.duration = convert(options.duration);
+    transitionOptions.delay = convert(options.delay);
+
+    return transitionOptions;
 }
 
 auto toQMapboxTransitionOptions(const mbgl::style::TransitionOptions &options) {

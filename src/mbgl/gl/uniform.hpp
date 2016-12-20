@@ -28,6 +28,8 @@ public:
 
     class State {
     public:
+        State(UniformLocation location_) : location(std::move(location_)) {}
+
         void operator=(const Value& value) {
             if (!current || *current != value.t) {
                 current = value.t;
@@ -67,7 +69,7 @@ public:
     using Values = IndexedTuple<TypeList<Us...>, TypeList<typename Us::Value...>>;
 
     static State state(const ProgramID& id) {
-        return State { { uniformLocation(id, Us::name) }... };
+        return State(typename Us::State(uniformLocation(id, Us::name))...);
     }
 
     static std::function<void ()> binder(State& state, Values&& values_) {
