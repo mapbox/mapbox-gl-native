@@ -37,7 +37,9 @@ struct geometry : geometry_base<T>
      * The default constructor would create a point geometry with default-constructed coordinates;
      * i.e. (0, 0). Since this is not particularly useful, and could hide bugs, it is disabled.
      */
+#if !defined(__GNUC__) || __GNUC__ >= 5
     geometry() = delete;
+#endif
 };
 
 template <typename T, template <typename...> class Cont>
