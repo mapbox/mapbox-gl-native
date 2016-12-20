@@ -11,7 +11,7 @@ public class MapboxApplication extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
-    Mapbox.start(getApplicationContext(), getString(R.string.mapbox_access_token));
+    Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token));
     LeakCanary.install(this);
     StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
       .detectDiskReads()
