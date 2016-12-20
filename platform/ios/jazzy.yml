@@ -15,6 +15,9 @@ hide_documentation_coverage: Yes
 custom_categories:
   - name: Guides
     children:
+      - Adding Points to a Map
+      - Runtime Styling
+      - Working with Mapbox Studio
       - Info.plist Keys
   - name: Maps
     children:
