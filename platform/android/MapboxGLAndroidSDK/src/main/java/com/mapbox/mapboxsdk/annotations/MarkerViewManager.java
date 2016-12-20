@@ -118,8 +118,8 @@ public class MarkerViewManager {
      * The {@link MarkerView} will be rotated from its current rotation to the given rotation.
      * </p>
      *
-     * @param marker   the MarkerView to rotate
-     * @param rotation the rotation value
+     * @param marker   the MarkerView to rotate.
+     * @param rotation the rotation value.
      */
     public void animateRotation(@NonNull MarkerView marker, float rotation) {
         View convertView = markerViewMap.get(marker);
@@ -131,8 +131,8 @@ public class MarkerViewManager {
     /**
      * Animate a MarkerView with a given rotation.
      *
-     * @param marker   the MarkerView to rotate by
-     * @param rotation the rotation by value, limited to 0 - 360 degrees
+     * @param marker   the MarkerView to rotate by.
+     * @param rotation the rotation by value, limited to 0 - 360 degrees.
      */
     public void animateRotationBy(@NonNull MarkerView marker, float rotation) {
         View convertView = markerViewMap.get(marker);
@@ -155,8 +155,8 @@ public class MarkerViewManager {
      * The {@link MarkerView} will be transformed from its current alpha value to the given value.
      * </p>
      *
-     * @param marker the MarkerView to change its alpha value
-     * @param alpha  the alpha value
+     * @param marker the MarkerView to change its alpha value.
+     * @param alpha  the alpha value.
      */
     public void animateAlpha(@NonNull MarkerView marker, float alpha) {
         View convertView = markerViewMap.get(marker);
@@ -178,6 +178,10 @@ public class MarkerViewManager {
         View convertView = markerViewMap.get(marker);
         if (convertView != null) {
             convertView.setVisibility(visible ? View.VISIBLE : View.GONE);
+            if(visible && marker.isFlat()){
+                // apply tilting after visible change
+                convertView.setRotationX(marker.getTilt());
+            }
         }
     }
 
@@ -185,8 +189,8 @@ public class MarkerViewManager {
      * Updates the position of MarkerViews currently found in the viewport.
      * <p>
      * The collection of {@link MarkerView} will be iterated and each item position will be updated.
-     * If an item is View state is not visible and its related flag is set to visible,
-     * The {@link MarkerView} will be animated to visible using alpha animation.
+     * If an item is View state is not visible and its related flag is set to visible, the
+     * {@link MarkerView} will be animated to visible using alpha animation.
      * </p>
      */
     public void update() {
@@ -208,15 +212,15 @@ public class MarkerViewManager {
     /**
      * Set tilt on every non flat MarkerView currently shown in the Viewport.
      *
-     * @param tilt the tilt value
+     * @param tilt the tilt value.
      */
     public void setTilt(float tilt) {
         View convertView;
         for (MarkerView markerView : markerViewMap.keySet()) {
             if (markerView.isFlat()) {
                 convertView = markerViewMap.get(markerView);
+                markerView.setTilt(tilt);
                 if (convertView != null) {
-                    markerView.setTilt(tilt);
                     convertView.setRotationX(tilt);
                 }
             }
@@ -226,7 +230,7 @@ public class MarkerViewManager {
     /**
      * Update and invalidate the MarkerView icon.
      *
-     * @param markerView the marker view to updates
+     * @param markerView the marker view to updates.
      */
     public void updateIcon(@NonNull MarkerView markerView) {
         View convertView = markerViewMap.get(markerView);
@@ -239,10 +243,11 @@ public class MarkerViewManager {
     /**
      * Animate a MarkerView to a deselected state.
      * <p>
-     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onDeselect(MarkerView, View)} will be called to execute an animation.
+     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onDeselect(MarkerView, View)}
+     * will be called to execute an animation.
      * </p>
      *
-     * @param marker the MarkerView to deselect
+     * @param marker the MarkerView to deselect.
      */
     public void deselect(@NonNull MarkerView marker) {
         deselect(marker, true);
@@ -251,11 +256,12 @@ public class MarkerViewManager {
     /**
      * Animate a MarkerView to a deselected state.
      * <p>
-     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onDeselect(MarkerView, View)} will be called to execute an animation.
+     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onDeselect(MarkerView, View)}
+     * will be called to execute an animation.
      * </p>
      *
-     * @param marker        the MarkerView to deselect
-     * @param callbackToMap indicates if deselect marker must be called on MapboxMap
+     * @param marker        the MarkerView to deselect.
+     * @param callbackToMap indicates if deselect marker must be called on MapboxMap.
      */
     public void deselect(@NonNull MarkerView marker, boolean callbackToMap) {
         final View convertView = markerViewMap.get(marker);
@@ -265,17 +271,17 @@ public class MarkerViewManager {
                     adapter.onDeselect(marker, convertView);
                 }
             }
-            if (callbackToMap) {
-                mapboxMap.deselectMarker(marker);
-            }
-            marker.setSelected(false);
         }
+        if (callbackToMap) {
+            mapboxMap.deselectMarker(marker);
+        }
+        marker.setSelected(false);
     }
 
     /**
      * Animate a MarkerView to a selected state.
      *
-     * @param marker the MarkerView object to select
+     * @param marker the MarkerView object to select.
      */
     public void select(@NonNull MarkerView marker) {
         select(marker, true);
@@ -284,8 +290,8 @@ public class MarkerViewManager {
     /**
      * Animate a MarkerView to a selected state.
      *
-     * @param marker        the MarkerView object to select
-     * @param callbackToMap indicates if select marker must be called on MapboxMap
+     * @param marker        the MarkerView object to select.
+     * @param callbackToMap indicates if select marker must be called on {@link MapboxMap}.
      */
     public void select(@NonNull MarkerView marker, boolean callbackToMap) {
         final View convertView = markerViewMap.get(marker);
@@ -299,28 +305,29 @@ public class MarkerViewManager {
     /**
      * Animate a MarkerView to a selected state.
      * <p>
-     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onSelect(MarkerView, View, boolean)} will be called to execute an animation.
+     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onSelect(MarkerView, View, boolean)}
+     * will be called to execute an animation.
      * </p>
      *
-     * @param marker      the MarkerView object to select
-     * @param convertView the View presentation of the MarkerView
-     * @param adapter     the adapter used to adapt the marker to the convertView
+     * @param marker      the MarkerView object to select.
+     * @param convertView the View presentation of the MarkerView.
+     * @param adapter     the adapter used to adapt the marker to the convertView.
      */
     public void select(@NonNull MarkerView marker, View convertView, MapboxMap.MarkerViewAdapter adapter) {
         select(marker, convertView, adapter, true);
     }
 
-
     /**
      * Animate a MarkerView to a selected state.
      * <p>
-     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onSelect(MarkerView, View, boolean)} will be called to execute an animation.
+     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onSelect(MarkerView, View, boolean)}
+     * will be called to execute an animation.
      * </p>
      *
-     * @param marker        the MarkerView object to select
-     * @param convertView   the View presentation of the MarkerView
-     * @param adapter       the adapter used to adapt the marker to the convertView
-     * @param callbackToMap indicates if select marker must be called on MapboxMap
+     * @param marker        the MarkerView object to select.
+     * @param convertView   the View presentation of the MarkerView.
+     * @param adapter       the adapter used to adapt the marker to the convertView.
+     * @param callbackToMap indicates if select marker must be called on MapboxMap.
      */
     public void select(@NonNull MarkerView marker, View convertView, MapboxMap.MarkerViewAdapter adapter, boolean callbackToMap) {
         if (convertView != null) {
@@ -338,19 +345,34 @@ public class MarkerViewManager {
     }
 
     /**
-     * Get view representation from a MarkerView.
+     * Get the View representation for a MarkerView.
      * <p>
-     * If marker is not found in current viewport, null is returned.
+     * Note that this method returns null in following situations:
+     * </p>
+     * <p><ul>
+     * <li>The MarkerView isn't rendered yet, adding a marker is an asynchronous operation</li>
+     * <li>The MarkerView isn't found in the Map viewport, related View has been recycled</li>
+     * </ul><p>
+     * <p>
+     * To handle the asynchronous addition, you can register to Map change events with
+     * {@link MapView#addOnMapChangedListener(MapView.OnMapChangedListener)} and validate if
+     * the View has been added.
      * </p>
      *
-     * @param marker the marker to get the view for
-     * @return the android SDK View object
+     * @param marker the marker to get the view representation for
+     * @return the android SDK View representing the MarkerView
      */
     @Nullable
     public View getView(MarkerView marker) {
         return markerViewMap.get(marker);
     }
 
+    /**
+     * Get the MarkerViewAdapter for a MarkerView.
+     *
+     * @param markerView the MarkerView to get the adapter for
+     * @return the MarkerViewAdapter is there is one available for the provided MarkerView
+     */
     @Nullable
     public MapboxMap.MarkerViewAdapter getViewAdapter(MarkerView markerView) {
         MapboxMap.MarkerViewAdapter adapter = null;
@@ -371,7 +393,7 @@ public class MarkerViewManager {
      * the {@link MarkerView} from the underlying collection if needed.
      * </p>
      *
-     * @param marker the MarkerView to remove
+     * @param marker the MarkerView to remove.
      */
     public void removeMarkerView(MarkerView marker) {
         final View viewHolder = markerViewMap.get(marker);
@@ -393,10 +415,10 @@ public class MarkerViewManager {
     /**
      * Add a MarkerViewAdapter to the MarkerViewManager.
      * <p>
-     * The provided MarkerViewAdapter must use supply a generic subclass of MarkerView.
+     * The provided MarkerViewAdapter must supply a generic subclass of MarkerView.
      * </p>
      *
-     * @param markerViewAdapter the MarkerViewAdapter to add
+     * @param markerViewAdapter the MarkerViewAdapter to add.
      */
     public void addMarkerViewAdapter(MapboxMap.MarkerViewAdapter markerViewAdapter) {
         if (markerViewAdapter.getMarkerClass().equals(MarkerView.class)) {
@@ -412,7 +434,7 @@ public class MarkerViewManager {
     /**
      * Get all MarkerViewAdapters associated with this MarkerViewManager.
      *
-     * @return a List of MarkerViewAdapters
+     * @return a List of MarkerViewAdapters.
      */
     public List<MapboxMap.MarkerViewAdapter> getMarkerViewAdapters() {
         return markerViewAdapters;
@@ -421,7 +443,7 @@ public class MarkerViewManager {
     /**
      * Register a callback to be invoked when this view is clicked.
      *
-     * @param listener the callback to be invoked
+     * @param listener the callback to be invoked.
      */
     public void setOnMarkerViewClickListener(@Nullable MapboxMap.OnMarkerViewClickListener listener) {
         onMarkerViewClickListener = listener;
@@ -448,7 +470,7 @@ public class MarkerViewManager {
     /**
      * Invalidate the ViewMarkers found in the viewport.
      * <p>
-     * This method will remove any markers that aren't in the viewport any more and will add new
+     * This method will remove any markers that aren't in the viewport anymore and will add new
      * ones for each found Marker in the changed viewport.
      * </p>
      */
@@ -541,6 +563,12 @@ public class MarkerViewManager {
         }*/
     }
 
+    /**
+     * When the provided {@link MarkerView} is clicked on by a user, we check if a custom click
+     * event has been created and if not, display a {@link InfoWindow}.
+     *
+     * @param markerView that the click event occurred.
+     */
     public void onClickMarkerView(MarkerView markerView) {
         boolean clickHandled = false;
 
@@ -561,7 +589,11 @@ public class MarkerViewManager {
         }
     }
 
-    //TODO: This whole method is a stopgap for: https://github.com/mapbox/mapbox-gl-native/issues/5384
+    /**
+     * Handles the {@link MarkerView}'s info window offset.
+     *
+     * @param marker that we are ensuring info window offset.
+     */
     public void ensureInfoWindowOffset(MarkerView marker) {
         View view = null;
         if (markerViewMap.containsKey(marker)) {
@@ -606,7 +638,8 @@ public class MarkerViewManager {
     }
 
     /**
-     * Default MarkerViewAdapter used for base class of MarkerView to adapt a MarkerView to an ImageView
+     * Default MarkerViewAdapter used for base class of {@link MarkerView} to adapt a MarkerView to
+     * an ImageView.
      */
     public static class ImageMarkerViewAdapter extends MapboxMap.MarkerViewAdapter<MarkerView> {
 
@@ -639,5 +672,22 @@ public class MarkerViewManager {
             ImageView imageView;
             public MarkerView marker;
         }
+    }
+
+    /**
+     * Interface definition invoked when the View of a MarkerView has been added to the map.
+     * <p>
+     * This callback will be invoked as a result of {@link MapboxMap#addMarker(BaseMarkerOptions)}
+     * and only when the related MarkerView is found in the viewport of the map.
+     * </p>
+     */
+    public interface OnMarkerViewAddedListener {
+
+        /**
+         * Invoked when the View of a MarkerView has been added to the Map.
+         *
+         * @param markerView The MarkerView the View was added for
+         */
+        void onViewAdded(@NonNull  MarkerView markerView);
     }
 }

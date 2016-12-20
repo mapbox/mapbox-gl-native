@@ -10,7 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -24,7 +24,7 @@ public class PressForMarkerActivity extends AppCompatActivity {
 
     private MapView mapView;
     private MapboxMap mapboxMap;
-    private ArrayList<MarkerOptions> markerList = new ArrayList<>();
+    private ArrayList<MarkerViewOptions> markerList = new ArrayList<>();
 
     private static final DecimalFormat LAT_LON_FORMATTER = new DecimalFormat("#.#####");
 
@@ -60,7 +60,7 @@ public class PressForMarkerActivity extends AppCompatActivity {
                         String title = LAT_LON_FORMATTER.format(point.getLatitude()) + ", " + LAT_LON_FORMATTER.format(point.getLongitude());
                         String snippet = "X = " + (int) pixel.x + ", Y = " + (int) pixel.y;
 
-                        MarkerOptions marker = new MarkerOptions()
+                        MarkerViewOptions marker = new MarkerViewOptions()
                                 .position(point)
                                 .title(title)
                                 .snippet(snippet);
@@ -72,7 +72,7 @@ public class PressForMarkerActivity extends AppCompatActivity {
 
                 if (savedInstanceState != null) {
                     markerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);
-                    mapboxMap.addMarkers(markerList);
+                    mapboxMap.addMarkerViews(markerList);
                 }
             }
         });

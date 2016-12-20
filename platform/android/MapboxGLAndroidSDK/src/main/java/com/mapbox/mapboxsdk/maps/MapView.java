@@ -527,7 +527,6 @@ public class MapView extends FrameLayout {
      *
      * @param outState Pass in the parent's outState.
      */
-
     @UiThread
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putBoolean(MapboxConstants.STATE_HAS_SAVED_STATE, true);
@@ -1260,6 +1259,16 @@ public class MapView extends FrameLayout {
         return new ArrayList<>(annotations);
     }
 
+    /**
+     * Use to determine which {@link MarkerView}s are found within a given {@link RectF}
+     * <p>
+     * Note that adding a Marker is an asynchronous operation and requires the map to render first
+     * before querying the map for them.
+     * </p>
+     *
+     * @param rectangle Holds four float coordinates for a rectangle.
+     * @return The list of {@link MarkerView}s found within the provided {@link RectF}.
+     */
     public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rectangle) {
         if (destroyed || rectangle == null) {
             return new ArrayList<>();
@@ -1323,6 +1332,9 @@ public class MapView extends FrameLayout {
         nativeMapView.setContentPadding(top / screenDensity, left / screenDensity, bottom / screenDensity, right / screenDensity);
     }
 
+    /**
+     * Used internally for the {@link MyLocationViewSettings#setPadding(int, int, int, int)}.
+     */
     public void invalidateContentPadding() {
         setContentPadding(contentPaddingLeft, contentPaddingTop, contentPaddingRight, contentPaddingBottom);
 
@@ -1399,7 +1411,7 @@ public class MapView extends FrameLayout {
                 @Override
                 public void onMapChanged(@MapChange int change) {
                     if (change == REGION_DID_CHANGE_ANIMATED && cameraCancelableCallback != null) {
-                        cancelableCallback.onFinish();
+                        cameraCancelableCallback.onFinish();
                         cameraCancelableCallback = null;
                         // Clean up after self
                         removeOnMapChangedListener(this);
@@ -1458,6 +1470,11 @@ public class MapView extends FrameLayout {
         postInvalidate();
     }
 
+    /**
+     * Used internally.
+     *
+     * @param canvas a Canvas object which holds the "draw" calls.
+     */
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -1679,7 +1696,11 @@ public class MapView extends FrameLayout {
     /**
      * Helper method for tracking gesture events
      *
-     * @param gestureId   Type of Gesture See {@see MapboxEvent#GESTURE_SINGLETAP MapboxEvent#GESTURE_DOUBLETAP MapboxEvent#GESTURE_TWO_FINGER_SINGLETAP MapboxEvent#GESTURE_QUICK_ZOOM MapboxEvent#GESTURE_PAN_START MapboxEvent#GESTURE_PINCH_START MapboxEvent#GESTURE_ROTATION_START MapboxEvent#GESTURE_PITCH_START}
+     * @param gestureId   Type of Gesture See {@see MapboxEvent#GESTURE_SINGLETAP
+     *                    MapboxEvent#GESTURE_DOUBLETAP MapboxEvent#GESTURE_TWO_FINGER_SINGLETAP
+     *                    MapboxEvent#GESTURE_QUICK_ZOOM MapboxEvent#GESTURE_PAN_START
+     *                    MapboxEvent#GESTURE_PINCH_START MapboxEvent#GESTURE_ROTATION_START
+     *                    MapboxEvent#GESTURE_PITCH_START}
      * @param xCoordinate Original x screen coordinate at start of gesture
      * @param yCoordinate Original y screen cooridnate at start of gesture
      */
@@ -1743,7 +1764,12 @@ public class MapView extends FrameLayout {
         }
     }
 
-    // Called when user touches the screen, all positions are absolute
+    /**
+     * Called when user touches the screen, all positions are absolute.
+     *
+     * @param event The motion event.
+     * @return True if the event was handled, false otherwise.
+     */
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         // Check and ignore non touch or left clicks
@@ -2451,8 +2477,12 @@ public class MapView extends FrameLayout {
         return super.onKeyUp(keyCode, event);
     }
 
-    // Called for trackball events, all motions are relative in device specific
-    // units
+    /**
+     * Called for trackball events, all motions are relative in device specific units.
+     *
+     * @param event The motion event.
+     * @return True if the event was handled, false otherwise.
+     */
     @Override
     public boolean onTrackballEvent(MotionEvent event) {
         if (destroyed) {
@@ -2544,8 +2574,13 @@ public class MapView extends FrameLayout {
         }
     }
 
-    // Called for events that don't fit the other handlers
-    // such as mouse scroll events, mouse moves, joystick, trackpad
+    /**
+     * Called for events that don't fit the other handlers such as mouse scroll events, mouse moves,
+     * joystick, trackpad.
+     *
+     * @param event The generic motion event being processed.
+     * @return True if the event was handled, false otherwise.
+     */
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
         if (destroyed) {
@@ -2585,6 +2620,14 @@ public class MapView extends FrameLayout {
 
     // Called when the mouse pointer enters or exits the view
     // or when it fades in or out due to movement
+
+    /**
+     * Called when the mouse pointer enters or exits the view or when it fades in or out due to
+     * movement
+     *
+     * @param event The motion event that describes the hover.
+     * @return True if the view handled the hover event.
+     */
     @Override
     public boolean onHoverEvent(@NonNull MotionEvent event) {
         switch (event.getActionMasked()) {
@@ -3059,7 +3102,8 @@ public class MapView extends FrameLayout {
             WILL_START_RENDERING_MAP,
             DID_FINISH_RENDERING_MAP,
             DID_FINISH_RENDERING_MAP_FULLY_RENDERED,
-            DID_FINISH_LOADING_STYLE
+            DID_FINISH_LOADING_STYLE,
+            SOURCE_DID_CHANGE
     })
     @Retention(RetentionPolicy.SOURCE)
     public @interface MapChange {
@@ -3234,6 +3278,18 @@ public class MapView extends FrameLayout {
      * @see MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_LOADING_STYLE = 14;
+
+
+    /**
+     * This {@link MapChange} is triggered when a source attribution changes.
+     * <p>
+     * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
+     * </p>
+     *
+     * @see MapChange
+     * @see MapView.OnMapChangedListener
+     */
+    public static final int SOURCE_DID_CHANGE = 15;
 
     /**
      * Interface definition for a callback to be invoked when the displayed map view changes.
