@@ -496,11 +496,14 @@ final class NativeMapView {
 
     public void addLayer(@NonNull Layer layer, @Nullable String before) {
         nativeAddLayer(nativeMapViewPtr, layer.getNativePtr(), before);
-        layer.invalidate();
     }
 
     public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
-        nativeRemoveLayer(nativeMapViewPtr, layerId);
+        nativeRemoveLayerById(nativeMapViewPtr, layerId);
+    }
+
+    public void removeLayer(@NonNull Layer layer) throws NoSuchLayerException {
+        nativeRemoveLayer(nativeMapViewPtr, layer.getNativePtr());
     }
 
     public Source getSource(@NonNull String sourceId) {
@@ -512,7 +515,11 @@ final class NativeMapView {
     }
 
     public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
-        nativeRemoveSource(nativeMapViewPtr, sourceId);
+        nativeRemoveSourceById(nativeMapViewPtr, sourceId);
+    }
+
+    public void removeSource(@NonNull Source source) throws NoSuchSourceException {
+        nativeRemoveSource(nativeMapViewPtr, source.getNativePtr());
     }
 
     public void addImage(@NonNull String name, @NonNull Bitmap image) {
@@ -744,13 +751,17 @@ final class NativeMapView {
 
     private native void nativeAddLayer(long nativeMapViewPtr, long layerPtr, String before);
 
-    private native void nativeRemoveLayer(long nativeMapViewPtr, String layerId) throws NoSuchLayerException;
+    private native void nativeRemoveLayerById(long nativeMapViewPtr, String layerId) throws NoSuchLayerException;
+
+    private native void nativeRemoveLayer(long nativeMapViewPtr, long layerId) throws NoSuchLayerException;
 
     private native Source nativeGetSource(long nativeMapViewPtr, String sourceId);
 
     private native void nativeAddSource(long nativeMapViewPtr, long nativeSourcePtr);
 
-    private native void nativeRemoveSource(long nativeMapViewPtr, String sourceId) throws NoSuchSourceException;
+    private native void nativeRemoveSourceById(long nativeMapViewPtr, String sourceId) throws NoSuchSourceException;
+
+    private native void nativeRemoveSource(long nativeMapViewPtr, long sourcePtr) throws NoSuchSourceException;
 
     private native void nativeAddImage(long nativeMapViewPtr, String name, int width, int height, float pixelRatio, byte[] array);
 

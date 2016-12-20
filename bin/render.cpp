@@ -3,8 +3,8 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-#include <mbgl/platform/default/headless_display.hpp>
-#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/headless_backend.hpp>
+#include <mbgl/platform/default/offscreen_view.hpp>
 #include <mbgl/platform/default/thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
@@ -27,9 +27,8 @@ int main(int argc, char *argv[]) {
     double bearing = 0;
     double pitch = 0;
 
-    int width = 512;
-    int height = 512;
-    double pixelRatio = 1.0;
+    uint32_t width = 512;
+    uint32_t height = 512;
     static std::string output = "out.png";
     std::string cache_file = "cache.sqlite";
     std::string asset_root = ".";
@@ -84,9 +83,10 @@ int main(int argc, char *argv[]) {
         fileSource.setAccessToken(std::string(token));
     }
 
-    HeadlessView view(pixelRatio, width, height);
+    HeadlessBackend backend;
+    OffscreenView view(backend.getContext(), { width, height });
     ThreadPool threadPool(4);
-    Map map(view, fileSource, threadPool, MapMode::Still);
+    Map map(backend, view.size, 1, fileSource, threadPool, MapMode::Still);
 
     map.setStyleJSON(style);
     map.setClasses(classes);
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
         map.setDebug(debug ? mbgl::MapDebugOptions::TileBorders | mbgl::MapDebugOptions::ParseStatus : mbgl::MapDebugOptions::NoDebug);
     }
 
-    map.renderStill([&](std::exception_ptr error, PremultipliedImage&& image) {
+    map.renderStill(view, [&](std::exception_ptr error) {
         try {
             if (error) {
                 std::rethrow_exception(error);
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
             exit(1);
         }
 
-        util::write_file(output, encodePNG(image));
+        util::write_file(output, encodePNG(view.readStillImage()));
         loop.stop();
     });
 

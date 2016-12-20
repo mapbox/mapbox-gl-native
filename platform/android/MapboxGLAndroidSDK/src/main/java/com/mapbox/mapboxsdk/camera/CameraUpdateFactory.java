@@ -184,10 +184,7 @@ public final class CameraUpdateFactory {
         public CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap) {
             CameraPosition previousPosition = mapboxMap.getCameraPosition();
             if (target == null) {
-                return new CameraPosition.Builder()
-                        .tilt(tilt)
-                        .zoom(zoom)
-                        .bearing(bearing)
+                return new CameraPosition.Builder(this)
                         .target(previousPosition.target)
                         .build();
             }

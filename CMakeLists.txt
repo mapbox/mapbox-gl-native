@@ -14,9 +14,14 @@ include(.mason/mason.cmake)
 
 option(WITH_CXX11ABI "Use cxx11abi mason packages" OFF)
 option(WITH_COVERAGE "Enable coverage reports" OFF)
+option(WITH_OSMESA   "Use OSMesa headless backend" OFF)
 
 if(WITH_CXX11ABI)
     set(MASON_CXXABI_SUFFIX -cxx11abi)
+endif()
+
+if(WITH_OSMESA)
+    add_compile_options(-D__OSMESA__)
 endif()
 
 mason_use(geometry VERSION 0.8.0 HEADER_ONLY)

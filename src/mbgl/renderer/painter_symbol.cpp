@@ -69,7 +69,7 @@ void Painter::renderSDF(SymbolBucket& bucket,
     sdfShader.u_texture = 0;
     sdfShader.u_pitch = state.getPitch();
     sdfShader.u_bearing = -1.0f * state.getAngle();
-    sdfShader.u_aspect_ratio = (state.getWidth() * 1.0f) / (state.getHeight() * 1.0f);
+    sdfShader.u_aspect_ratio = double(state.getSize().width) / state.getSize().height;
 
     // adjust min/max zooms for variable font sies
     float zoomAdjust = std::log(fontSize / layoutSize) / std::log(2);

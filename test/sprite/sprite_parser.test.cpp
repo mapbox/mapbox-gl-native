@@ -24,8 +24,8 @@ TEST(Sprite, SpriteImageCreationInvalid) {
 
     const PremultipliedImage image_1x = decodeImage(util::read_file("test/fixtures/annotations/emerald.png"));
 
-    ASSERT_EQ(200u, image_1x.width);
-    ASSERT_EQ(299u, image_1x.height);
+    ASSERT_EQ(200u, image_1x.size.width);
+    ASSERT_EQ(299u, image_1x.size.height);
 
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 0, 16, 1, false));    // width == 0
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 16, 0, 1, false));    // height == 0
@@ -38,8 +38,8 @@ TEST(Sprite, SpriteImageCreationInvalid) {
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 16, 1025, 1, false)); // too tall
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, -1, 0, 16, 16, 1, false));  // srcX < 0
     ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, -1, 16, 16, 1, false));  // srcY < 0
-    ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, image_1x.width + 1, 16, 1, false));   // right edge out of bounds
-    ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 16, image_1x.height + 1, 1, false));  // bottom edge out of bounds
+    ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, image_1x.size.width + 1, 16, 1, false));   // right edge out of bounds
+    ASSERT_EQ(nullptr, createSpriteImage(image_1x, 0, 0, 16, image_1x.size.height + 1, 1, false));  // bottom edge out of bounds
 
     EXPECT_EQ(13u, log.count({
                       EventSeverity::Error,
@@ -52,16 +52,16 @@ TEST(Sprite, SpriteImageCreationInvalid) {
 TEST(Sprite, SpriteImageCreation1x) {
     const PremultipliedImage image_1x = decodeImage(util::read_file("test/fixtures/annotations/emerald.png"));
 
-    ASSERT_EQ(200u, image_1x.width);
-    ASSERT_EQ(299u, image_1x.height);
+    ASSERT_EQ(200u, image_1x.size.width);
+    ASSERT_EQ(299u, image_1x.size.height);
 
     { // "museum_icon":{"x":177,"y":187,"width":18,"height":18,"pixelRatio":1,"sdf":false}
         const auto sprite = createSpriteImage(image_1x, 177, 187, 18, 18, 1, false);
         ASSERT_TRUE(sprite.get());
         EXPECT_EQ(18, sprite->getWidth());
         EXPECT_EQ(18, sprite->getHeight());
-        EXPECT_EQ(18u, sprite->image.width);
-        EXPECT_EQ(18u, sprite->image.height);
+        EXPECT_EQ(18u, sprite->image.size.width);
+        EXPECT_EQ(18u, sprite->image.size.height);
         EXPECT_EQ(1, sprite->pixelRatio);
         EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteimagecreation1x-museum.png"),
                   sprite->image);
@@ -76,8 +76,8 @@ TEST(Sprite, SpriteImageCreation2x) {
     ASSERT_TRUE(sprite.get());
     EXPECT_EQ(18, sprite->getWidth());
     EXPECT_EQ(18, sprite->getHeight());
-    EXPECT_EQ(36u, sprite->image.width);
-    EXPECT_EQ(36u, sprite->image.height);
+    EXPECT_EQ(36u, sprite->image.size.width);
+    EXPECT_EQ(36u, sprite->image.size.height);
     EXPECT_EQ(2, sprite->pixelRatio);
     EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteimagecreation2x.png"),
               sprite->image);
@@ -91,8 +91,8 @@ TEST(Sprite, SpriteImageCreation1_5x) {
     ASSERT_TRUE(sprite.get());
     EXPECT_EQ(24, sprite->getWidth());
     EXPECT_EQ(24, sprite->getHeight());
-    EXPECT_EQ(36u, sprite->image.width);
-    EXPECT_EQ(36u, sprite->image.height);
+    EXPECT_EQ(36u, sprite->image.size.width);
+    EXPECT_EQ(36u, sprite->image.size.height);
     EXPECT_EQ(1.5, sprite->pixelRatio);
     EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteimagecreation1_5x-museum.png"),
               sprite->image);
@@ -102,8 +102,8 @@ TEST(Sprite, SpriteImageCreation1_5x) {
     ASSERT_TRUE(sprite2.get());
     EXPECT_EQ(float(35 / 1.5), sprite2->getWidth());
     EXPECT_EQ(float(35 / 1.5), sprite2->getHeight());
-    EXPECT_EQ(35u, sprite2->image.width);
-    EXPECT_EQ(35u, sprite2->image.height);
+    EXPECT_EQ(35u, sprite2->image.size.width);
+    EXPECT_EQ(35u, sprite2->image.size.height);
     EXPECT_EQ(1.5, sprite2->pixelRatio);
     EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteimagecreation1_5x-hospital.png"),
               sprite2->image);
@@ -198,8 +198,8 @@ TEST(Sprite, SpriteParsing) {
         auto sprite = images.find("generic-metro")->second;
         EXPECT_EQ(18, sprite->getWidth());
         EXPECT_EQ(18, sprite->getHeight());
-        EXPECT_EQ(18u, sprite->image.width);
-        EXPECT_EQ(18u, sprite->image.height);
+        EXPECT_EQ(18u, sprite->image.size.width);
+        EXPECT_EQ(18u, sprite->image.size.height);
         EXPECT_EQ(1, sprite->pixelRatio);
         EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteparsing.png"), sprite->image);
     }

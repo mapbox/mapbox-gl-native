@@ -246,7 +246,7 @@ TEST(Layer, Observer) {
 
     // Notifies observer on layout property change.
     bool layoutPropertyChanged = false;
-    observer.layerLayoutPropertyChanged = [&] (Layer& layer_) {
+    observer.layerLayoutPropertyChanged = [&] (Layer& layer_, const char *) {
         EXPECT_EQ(layer.get(), &layer_);
         layoutPropertyChanged = true;
     };

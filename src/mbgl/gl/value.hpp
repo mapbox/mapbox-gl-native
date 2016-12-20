@@ -2,6 +2,7 @@
 
 #include <mbgl/gl/types.hpp>
 #include <mbgl/util/color.hpp>
+#include <mbgl/util/size.hpp>
 
 namespace mbgl {
 namespace gl {
@@ -177,19 +178,31 @@ struct Viewport {
     struct Type {
         int32_t x;
         int32_t y;
-        uint16_t width;
-        uint16_t height;
+        Size size;
     };
+    static const constexpr Type Default = { 0, 0, { 0, 0 } };
     static void Set(const Type&);
     static Type Get();
 };
 
 constexpr bool operator!=(const Viewport::Type& a, const Viewport::Type& b) {
-    return a.x != b.x || a.y != b.y || a.width != b.width || a.height != b.height;
+    return a.x != b.x || a.y != b.y || a.size != b.size;
+}
+
+constexpr bool operator==(const Viewport::Type& a, const Viewport::Type& b) {
+    return !(a != b);
 }
 
 struct BindFramebuffer {
     using Type = FramebufferID;
+    static const constexpr Type Default = 0;
+    static void Set(const Type&);
+    static Type Get();
+};
+
+struct BindRenderbuffer {
+    using Type = RenderbufferID;
+    static const constexpr Type Default = 0;
     static void Set(const Type&);
     static Type Get();
 };

@@ -265,17 +265,9 @@ public class MarkerView extends Marker {
             newRotation += 360;
         }
 
-        // calculate new direction
-        float diff = newRotation - this.rotation;
-        if (diff > 180.0f) {
-            diff -= 360.0f;
-        } else if (diff < -180.0f) {
-            diff += 360.f;
-        }
-
         this.rotation = newRotation;
         if (markerViewManager != null) {
-            markerViewManager.animateRotationBy(this, diff);
+            markerViewManager.animateRotationBy(this, newRotation);
         }
     }
 

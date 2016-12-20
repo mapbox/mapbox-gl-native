@@ -2,12 +2,11 @@
 
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/image.hpp>
-#include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/size.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/transition_options.hpp>
 
@@ -19,6 +18,7 @@
 
 namespace mbgl {
 
+class Backend;
 class View;
 class FileSource;
 class Scheduler;
@@ -33,7 +33,11 @@ class Layer;
 
 class Map : private util::noncopyable {
 public:
-    explicit Map(View&, FileSource&, Scheduler&,
+    explicit Map(Backend&,
+                 Size size,
+                 float pixelRatio,
+                 FileSource&,
+                 Scheduler&,
                  MapMode mapMode = MapMode::Continuous,
                  GLContextMode contextMode = GLContextMode::Unique,
                  ConstrainMode constrainMode = ConstrainMode::HeightOnly,
@@ -42,14 +46,14 @@ public:
 
     // Register a callback that will get called (on the render thread) when all resources have
     // been loaded and a complete render occurs.
-    using StillImageCallback = std::function<void (std::exception_ptr, PremultipliedImage&&)>;
-    void renderStill(StillImageCallback callback);
+    using StillImageCallback = std::function<void (std::exception_ptr)>;
+    void renderStill(View&, StillImageCallback callback);
+
+    // Triggers a repaint.
+    void triggerRepaint();
 
     // Main render function.
-    void render();
-
-    // Notifies the Map that the state has changed and an update might be necessary.
-    void update(Update update);
+    void render(View&);
 
     // Styling
     void addClass(const std::string&);
@@ -133,8 +137,8 @@ public:
     ViewportMode getViewportMode() const;
 
     // Size
-    uint16_t getWidth() const;
-    uint16_t getHeight() const;
+    void setSize(Size);
+    Size getSize() const;
 
     // Projection
     double getMetersPerPixelAtLatitude(double lat, double zoom) const;
@@ -155,12 +159,12 @@ public:
     // Sources
     style::Source* getSource(const std::string& sourceID);
     void addSource(std::unique_ptr<style::Source>);
-    void removeSource(const std::string& sourceID);
+    std::unique_ptr<style::Source> removeSource(const std::string& sourceID);
 
     // Layers
     style::Layer* getLayer(const std::string& layerID);
     void addLayer(std::unique_ptr<style::Layer>, const optional<std::string>& beforeLayerID = {});
-    void removeLayer(const std::string& layerID);
+    std::unique_ptr<style::Layer> removeLayer(const std::string& layerID);
 
     // Add image, bound to the style
     void addImage(const std::string&, std::unique_ptr<const SpriteImage>);
