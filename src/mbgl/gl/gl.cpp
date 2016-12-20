@@ -1,12 +1,13 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/util.hpp>
 
 namespace mbgl {
 namespace gl {
 
 namespace {
 
-constexpr const char* stringFromError(GLenum err) {
+MBGL_CONSTEXPR const char* stringFromError(GLenum err) {
     switch (err) {
     case GL_INVALID_ENUM:
         return "GL_INVALID_ENUM";
