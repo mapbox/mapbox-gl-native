@@ -3,11 +3,13 @@ package com.mapbox.mapboxsdk.location;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.mapbox.mapboxsdk.telemetry.TelemetryLocationReceiver;
@@ -138,10 +140,9 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
             listener.onLocationChanged(location);
         }
 
-        // Update the Telemetry Receiver
-        Intent locIntent = new Intent(TelemetryLocationReceiver.INTENT_STRING);
+        Intent locIntent = new Intent();
         locIntent.putExtra(LocationManager.KEY_LOCATION_CHANGED, location);
-        context.sendBroadcast(locIntent);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(locIntent);
     }
 
     /**
