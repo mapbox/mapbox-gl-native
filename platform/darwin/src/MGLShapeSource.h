@@ -87,9 +87,6 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
  let source = MGLShapeSource(identifier: "lines", shape: shape, options: nil)
  mapView.style.addSource(source)
  ```
-
- @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson">The
-    style specification.</a>
  */
 @interface MGLShapeSource : MGLSource
 

@@ -35,11 +35,15 @@ cp platform/ios/screenshot.png "${OUTPUT}"
 DEFAULT_THEME="platform/darwin/docs/theme"
 THEME=${JAZZY_THEME:-$DEFAULT_THEME}
 
+FRAMEWORK_PATH="build/ios/pkg/dynamic/Mapbox.framework"
+
 jazzy \
     --config platform/ios/jazzy.yml \
     --sdk iphonesimulator \
     --github-file-prefix https://github.com/mapbox/mapbox-gl-native/tree/${BRANCH} \
     --module-version ${SHORT_VERSION} \
+    --framework-root ${FRAMEWORK_PATH} \
+    --umbrella-header "${FRAMEWORK_PATH}/Headers/Mapbox.h" \
     --readme ${README} \
     --documentation="platform/ios/docs/Info.plist Keys.md" \
     --root-url https://www.mapbox.com/ios-sdk/api/${RELEASE_VERSION}/ \

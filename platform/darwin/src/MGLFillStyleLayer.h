@@ -38,15 +38,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
  new fill style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
 
- ### Example ###
-
- ```swift
- let layer = MGLFillStyleLayer(identifier: "parks", source: parks)
- layer.sourceLayerIdentifier = "parks"
- layer.fillColor = MGLStyleValue(rawValue: UIColor.green)
- layer.predicate = NSPredicate(format: "type == %@", "national-park")
- mapView.style.addLayer(layer)
- ```
+ <!--EXAMPLE: MGLFillStyleLayer-->
  */
 @interface MGLFillStyleLayer : MGLVectorStyleLayer
 

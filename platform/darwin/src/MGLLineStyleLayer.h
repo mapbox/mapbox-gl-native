@@ -88,20 +88,7 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
  new line style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
 
- ### Example ###
-
- ```swift
- let layer = MGLLineStyleLayer(identifier: "trails-path", source: trails)
- layer.sourceLayerIdentifier = "trails"
- layer.lineWidth = MGLStyleValue(interpolationBase: 1.5, stops: [
-    14: MGLStyleValue(rawValue: 2),
-    18: MGLStyleValue(rawValue: 20),
- ])
- layer.lineColor = MGLStyleValue(rawValue: UIColor.brown)
- layer.lineCap = MGLStyleValue(rawValue: NSValue(mglLineCap: .round))
- layer.predicate = NSPredicate(format: "%K == %@", "trail-type", "mountain-biking")
- mapView.style.addLayer(layer)
- ```
+ <!--EXAMPLE: MGLLineStyleLayer-->
  */
 @interface MGLLineStyleLayer : MGLVectorStyleLayer
 

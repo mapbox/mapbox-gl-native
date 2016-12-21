@@ -1693,6 +1693,7 @@
 				DA8847CE1CBAF91600AB86E3 /* Frameworks */,
 				DA8847CF1CBAF91600AB86E3 /* Headers */,
 				DA8847D01CBAF91600AB86E3 /* Resources */,
+				64E5BF321E09D729005223F7 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1727,6 +1728,7 @@
 				DAA4E4101CBB71D400178DFB /* Frameworks */,
 				DAA4E4111CBB71D400178DFB /* CopyFiles */,
 				DABFB85C1CBE99DE00D62B32 /* Headers */,
+				6421B07A1E09EA4B00AF169B /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1917,6 +1919,35 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6421B07A1E09EA4B00AF169B /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "node \"${SRCROOT}/scripts/add-examples-to-docs.js\"";
+		};
+		64E5BF321E09D729005223F7 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "node \"${SRCROOT}/scripts/add-examples-to-docs.js\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		DA1DC9461CB6C1C2006E619F /* Sources */ = {
