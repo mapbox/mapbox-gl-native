@@ -316,7 +316,9 @@ public class MyLocationView extends View {
     this.bearing = bearing;
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
       if (myBearingTrackingMode == MyBearingTracking.GPS) {
-        setCompass(location.getBearing() - bearing);
+        if (location != null) {
+          setCompass(location.getBearing() - bearing);
+        }
       } else if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
         setCompass(magneticHeading - bearing);
       }
