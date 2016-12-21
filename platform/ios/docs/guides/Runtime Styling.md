@@ -38,7 +38,7 @@ Mapbox can support data visualizations that were slow or impossible with traditi
 
 The Mapbox SDK gives you access to all of the same tools we use to render our maps. Annotate your place data or custom polygons with labels that make your maps stand out.
 
-<!--*example showing custom pois before and after -->
+![custom annotations](img/runtime-styling/CustomAnnotations.gif "an example showing custom annotations")
 
 ### Custom shapes
 
