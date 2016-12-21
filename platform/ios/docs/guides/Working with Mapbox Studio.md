@@ -16,14 +16,14 @@ The default [Mapbox Streets tileset](https://www.mapbox.com/studio/tilesets/mapb
 For example, if you're looking to prototype points of interest, consider the `poi_label` layer; if you want to style GPS traces, the `roads` layer might be a good proxy. Take a look at what's available in [Mapbox Streets](https://www.mapbox.com/studio/tilesets/mapbox.mapbox-streets-v7/): there's probably a layer that closely matches your data.
 
 ### Importing real data
-If you can't find a good approximate for your data in Mapbox Streets, consider uploading a small subset of your data into Mapbox Studio as a custom tileset.
+If you can't find a good approximation for your data in Mapbox Streets, consider uploading a small subset of your data into Mapbox Studio as a custom tileset.
 
-Head to [mapbox.com/studio/tilesets](https://www.mapbox.com/studio/tilesets/) and click `New Tileset` to get started with most common geo file formats including KML, GPX, GeoJSON, Shapefiles, and CSV.
+From the [Mapbox Studio Dashboard](https://www.mapbox.com/studio/), click `Tilesets` in the sidebar, then click `New Tileset` to get started with most common geo file formats including KML, GPX, GeoJSON, Shapefiles, and CSV.
 
 ### Faking placeholder data
 If you don't have any custom data on hand in a format that works easily with the Tileset importer, you can fake placeholder data with the Dataset Editor.
 
-Head to [mapbox.com/studio/dataset](https://www.mapbox.com/studio/datasets/) and click on `New Dataset` to get started.
+From the [Mapbox Studio Dashboard](https://www.mapbox.com/studio/), click `Datasets` in the sidebar, then click on `New Dataset` to get started.
 
 Zoom into your desired location and use the draw tools on the left to start creating a set of sample data.
 
@@ -91,6 +91,7 @@ It's possible to use stop functions in Mapbox Studio to transition the style of 
 
 ## Resources
 
-* [Mapbox style spec](https://www.mapbox.com/mapbox-gl-style-spec/)
-* [Mapbox studio](https://www.mapbox.com/mapbox-studio/)
+* [Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-style-spec/)
+* [Mapbox Studio](https://www.mapbox.com/mapbox-studio/)
 * [iOS code examples](https://www.mapbox.com/ios-sdk/examples/)
+

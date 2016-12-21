@@ -1,4 +1,4 @@
-# Adding points to a map
+# Adding Points to a Map
 
 Mapbox offers a few different ways to add points to a map, each with different tradeoffs.
 
@@ -36,16 +36,20 @@ By default, annotations added to the map are displayed with a red pin. If you'd 
 
 * Annotation images are purely static
 * No control over z-ordering
+* Limits to the size and number of images you can add
 
 ### Annotation Views (`MGLAnnotationView`)
 
 If you're looking to add custom UIViews or have annotations that are dynamic or animatable, consider an `MGLAnnotationView` instead of an `MGLAnnotationImage` ([example](http://mapbox.com/ios-sdk/examples)).
 
-You'll need to implement `MGLMapViewDelegate` `-mapView:viewForAnnotation` and provide a custom `MGLAnnotationView` (`UIView`) subclass.
+Annotation views are a big advantage over annotation images when you need every annotation to be unique. For example, annotation views are ideal if as an example you want to show user locations on a map using their profile pictures.
+
+To use annotation views, you'll need to implement `MGLMapViewDelegate` `-mapView:viewForAnnotation` and provide a custom `MGLAnnotationView` (`UIView`) subclass.
 
 **Pros**
 
 * Custom, native UIViews
+* No limit on style or image size
 * Full support for animations
 * Familiar API to MapKit
 * Relative control over z-ordering using the `zPosition` property on `CALayer`
@@ -76,4 +80,5 @@ From there, you can create one or many `MGLSymbolStyleLayer` or `MGLCircleStyleL
 **Cons**
 
 * Currently you must implement your own tap gesture recognizer together with `MGLMapView.visibleFeaturesAtPoint` to recognize taps and manually show callouts ([example](http://mapbox.com/ios-sdk/examples)).
-* Currently no SDK support for animations. If you need animations, consider running your own CADisplayLink and updating the layer properties accordingly.
+* Currently no SDK support for animations. If you need animations, consider using an NSTimer and updating the layer properties accordingly.
+

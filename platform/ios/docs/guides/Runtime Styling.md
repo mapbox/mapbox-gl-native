@@ -20,7 +20,7 @@ For maps that aren't going to change in response to custom data or user interact
 
 ### Map interactivity
 
-You can customize the map to the point of having it respond dynamically based on the actions your users are taking. Increase the text size of streets while a user is driving, emphasize points of interest tailored a user's preferences, change your UI if user are near parks, trails, landmarks, or rivers.
+You can customize the map to the point of having it respond dynamically based on the actions your users are taking. Increase the text size of streets while a user is driving, emphasize points of interest tailored to a user's preferences, change your UI if user are near parks, trails, landmarks, or rivers.
 
 ![emojis](img/runtime-styling/Emoji.gif "an example showing emoji interaction")
 
@@ -34,7 +34,7 @@ Mapbox can support data visualizations that were slow or impossible with traditi
 ![population](img/runtime-styling/Population.gif "an example showing population density")
 ![snow levels](img/runtime-styling/SnowLevels.gif "an example visualizing snow levels in the mountains")
 
-### Powerful Annotations
+### Powerful annotations
 
 The Mapbox SDK gives you access to all of the same tools we use to render our maps. Annotate your place data or custom polygons with labels that make your maps stand out.
 
@@ -49,8 +49,8 @@ Draw custom shapes on the map the same way you would a custom `UIView` or `CALay
 
 ## Resources
 
-* [Mapbox style spec](https://www.mapbox.com/mapbox-gl-style-spec/)
-* [Mapbox studio](https://www.mapbox.com/mapbox-studio/)
+* [Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-style-spec/)
+* [Mapbox Studio](https://www.mapbox.com/mapbox-studio/)
 * [iOS code examples](https://www.mapbox.com/ios-sdk/examples/)
 
 Contact support@mapbox.com with futher questions about how to leverage runtime styling.
