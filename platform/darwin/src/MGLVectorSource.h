@@ -26,7 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
  `sourceLayerIdentifier` property.
 
  <!--EXAMPLE: MGLVectorSource-->
- ```
  */
 @interface MGLVectorSource : MGLTileSource
 
