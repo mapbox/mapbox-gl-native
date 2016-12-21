@@ -56,7 +56,7 @@ public class SupportMapFragmentActivity extends AppCompatActivity implements OnM
         .zoom(11)
         .build());
 
-      mapFragment = SupportMapFragment.newInstance(options);
+      mapFragment = SupportMapFragment.newInstance();
 
       transaction.add(R.id.fragment_container, mapFragment, "com.mapbox.map");
       transaction.commit();
