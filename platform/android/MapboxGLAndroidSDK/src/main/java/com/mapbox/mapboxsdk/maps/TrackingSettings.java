@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.PointF;
 import android.location.Location;
@@ -10,12 +11,15 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.content.ContextCompat;
 
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocation;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 
 import timber.log.Timber;
@@ -29,6 +33,8 @@ public final class TrackingSettings {
   private final UiSettings uiSettings;
   private final FocalPointChangeListener focalPointChangedListener;
   private LocationListener myLocationListener;
+  private MapboxMap mapboxMap;
+  private Context context;
 
   private boolean myLocationEnabled;
   private boolean dismissLocationTrackingOnGesture = true;
@@ -38,8 +44,9 @@ public final class TrackingSettings {
   private MapboxMap.OnMyBearingTrackingModeChangeListener onMyBearingTrackingModeChangeListener;
 
   TrackingSettings(@NonNull MyLocationView myLocationView, UiSettings uiSettings,
-                   FocalPointChangeListener focalPointChangedListener) {
+                   FocalPointChangeListener focalPointChangedListener, Context context) {
     this.myLocationView = myLocationView;
+    this.context = context;
     this.focalPointChangedListener = focalPointChangedListener;
     this.uiSettings = uiSettings;
   }
@@ -348,7 +355,16 @@ public final class TrackingSettings {
       return;
     }
     myLocationEnabled = locationEnabled;
-    myLocationView.setEnabled(locationEnabled);
+    MyLocation myLocation = new MyLocation(mapboxMap, context);
+    myLocation.toggleGps(locationEnabled);
+
+
+
+    //myLocationView.setEnabled(locationEnabled);
+  }
+
+  public void setMapboxMap(MapboxMap mapboxMap) {
+    this.mapboxMap = mapboxMap;
   }
 
   void update() {

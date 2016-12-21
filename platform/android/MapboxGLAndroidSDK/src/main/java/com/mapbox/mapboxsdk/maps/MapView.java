@@ -138,13 +138,15 @@ public class MapView extends FrameLayout {
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
     UiSettings uiSettings = new UiSettings(proj, focalPoint, compassView, attrView, view.findViewById(R.id.logoView));
-    TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPoint);
+    TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPoint, context);
     MyLocationViewSettings myLocationViewSettings = new MyLocationViewSettings(myLocationView, proj, focalPoint);
     MarkerViewManager markerViewManager = new MarkerViewManager((ViewGroup) findViewById(R.id.markerViewContainer));
     AnnotationManager annotations = new AnnotationManager(nativeMapView, this, markerViewManager);
     Transform transform = new Transform(nativeMapView, annotations.getMarkerViewManager(), trackingSettings);
     mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, trackingSettings, myLocationViewSettings, proj,
       registerTouchListener, annotations);
+
+    trackingSettings.setMapboxMap(mapboxMap);
 
     // user input
     mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings, trackingSettings, annotations);
