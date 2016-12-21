@@ -14,58 +14,62 @@ umbrella_header: src/Mapbox.h
 framework_root: ../darwin/src
 
 custom_categories:
+  - name: Guides
+    children:
+      - Info.plist Keys
   - name: Maps
     children:
       - MGLAccountManager
       - MGLMapCamera
       - MGLMapView
       - MGLMapViewDelegate
-      - MGLStyle
       - MGLUserTrackingMode
-  - name: Annotations
+  - name: Shapes and Annotations
     children:
       - MGLAnnotation
       - MGLAnnotationImage
+      - MGLOverlay
+      - MGLShape
       - MGLMultiPoint
-      - MGLMultiPolygon
-      - MGLMultiPolyline
       - MGLPointAnnotation
       - MGLPointCollection
       - MGLPolygon
       - MGLPolyline
-      - MGLOverlay
-      - MGLShape
+      - MGLMultiPolygon
+      - MGLMultiPolyline
       - MGLShapeCollection
-  - name: Map Data
+  - name: Styling the Map
+    children:
+      - MGLStyle
+      - MGLStyleValue
+  - name: Content Primitives
     children:
       - MGLFeature
-      - MGLMultiPolygonFeature
-      - MGLMultiPolylineFeature
-      - MGLPointCollectionFeature
       - MGLPointFeature
       - MGLPolygonFeature
       - MGLPolylineFeature
+      - MGLMultiPolygonFeature
+      - MGLMultiPolylineFeature
+      - MGLPointCollectionFeature
       - MGLShapeCollectionFeature
-  - name: Style Layers
-    children:
-      - MGLBackgroundStyleLayer
-      - MGLCircleStyleLayer
-      - MGLFillStyleLayer
-      - MGLForegroundStyleLayer
-      - MGLLineStyleLayer
-      - MGLRasterStyleLayer
-      - MGLStyleLayer
-      - MGLSymbolStyleLayer
-      - MGLVectorStyleLayer
   - name: Content Sources
     children:
-      - MGLAttributionInfo
-      - MGLRasterSource
-      - MGLShapeSource
       - MGLSource
-      - MGLTileCoordinateSystem
       - MGLTileSource
+      - MGLShapeSource
+      - MGLRasterSource
       - MGLVectorSource
+  - name: Style Layers
+    children:
+      - MGLStyleLayer
+      - MGLForegroundStyleLayer
+      - MGLBackgroundStyleLayer
+      - MGLRasterStyleLayer
+      - MGLVectorStyleLayer
+      - MGLCircleStyleLayer
+      - MGLFillStyleLayer
+      - MGLLineStyleLayer
+      - MGLSymbolStyleLayer
   - name: Offline Maps
     children:
       - MGLOfflineRegion
@@ -76,15 +80,13 @@ custom_categories:
       - MGLTilePyramidOfflineRegion
   - name: Geometry
     children:
-      - MGLClockDirectionFormatter
-      - MGLCompassDirectionFormatter
       - MGLCoordinateBounds
       - MGLCoordinateBoundsEqualToCoordinateBounds
       - MGLCoordinateBoundsGetCoordinateSpan
+      - MGLCoordinateBoundsIntersectsCoordinateBounds
       - MGLCoordinateBoundsIsEmpty
       - MGLCoordinateBoundsMake
       - MGLCoordinateBoundsOffset
-      - MGLCoordinateFormatter
       - MGLCoordinateInCoordinateBounds
       - MGLCoordinateSpan
       - MGLCoordinateSpanEqualToCoordinateSpan
@@ -93,3 +95,8 @@ custom_categories:
       - MGLDegreesFromRadians
       - MGLRadiansFromDegrees
       - MGLStringFromCoordinateBounds
+  - name: Formatters
+    children:
+      - MGLClockDirectionFormatter
+      - MGLCompassDirectionFormatter
+      - MGLCoordinateFormatter
