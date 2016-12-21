@@ -9,9 +9,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `MGLOverlay` protocol defines a specific type of annotation that represents
  both a point and an area on a map. Overlay objects are essentially data objects
- that contain the geographic data needed to represent the map area. For example,
- overlays can take the form of common shapes such as rectangles and circles.
- They can also describe polygons and other complex shapes.
+ that contain the geographic data needed to represent the map area. Overlays can
+ take the form of a polyline or polygon.
  
  You use overlays to layer more sophisticated content on top of a map view. For
  example, you could use an overlay to show the boundaries of a national park or

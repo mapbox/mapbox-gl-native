@@ -18,7 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
  `userInfo` dictionary contains the pack’s current state in the
  `MGLOfflinePackStateUserInfoKey` key and details about the pack’s current
  progress in the `MGLOfflinePackProgressUserInfoKey` key. You may also consult
- the pack’s `state` and `progress` properties, which provide the same values.
+ the `MGLOfflinePack.state` and `MGLOfflinePack.progress` properties, which
+ provide the same values.
  
  If you only need to observe changes in a particular pack’s progress, you can
  alternatively observe KVO change notifications to the pack’s `progress` key

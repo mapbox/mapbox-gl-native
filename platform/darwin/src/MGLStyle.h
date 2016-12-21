@@ -40,7 +40,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  via `-[MGLMapView style]` by updating the style's data sources or layers.
  
  @note Wait until the map style has finished loading before modifying a map's
-    style via any of the MGLStyle instance methods below.
+    style via any of the `MGLStyle` instance methods below.
     You can use the `MGLMapViewDelegate` methods `-mapViewDidFinishLoadingMap:`
     or `-mapView:didFinishLoadingStyle:` as indicators that it's safe
     to modify the map's style.

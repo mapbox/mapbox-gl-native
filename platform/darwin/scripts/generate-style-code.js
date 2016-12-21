@@ -46,6 +46,15 @@ _.forOwn(cocoaConventions, function (properties, kind) {
     })
 });
 
+String.prototype.wrap = function (cols, indent) {
+	let wrapRe = new RegExp(`(.{1,${cols - indent}})(?: +|\n|$)`, "gm");
+	return this.replace(wrapRe, "$1\n").replace(/\s+$/, "").indent(indent);
+};
+
+String.prototype.indent = function (cols) {
+	return this.replace(/^|\n/g, "$&" + " ".repeat(cols));
+};
+
 global.camelize = function (str) {
     return str.replace(/(?:^|-)(.)/g, function (_, x) {
         return x.toUpperCase();
@@ -126,7 +135,7 @@ global.testHelperMessage = function (property, layerType, isFunction) {
     }
 };
 
-global.propertyDoc = function (propertyName, property, layerType) {
+global.propertyDoc = function (propertyName, property, layerType, kind) {
     // Match references to other property names & values. 
     // Requires the format 'When `foo` is set to `bar`,'.
     let doc = property.doc.replace(/`([^`]+?)` is set to `([^`]+?)`/g, function (m, peerPropertyName, propertyValue, offset, str) {
@@ -157,11 +166,24 @@ global.propertyDoc = function (propertyName, property, layerType) {
         if (!property.units.match(/s$/)) {
             property.units += 's';
         }
-        doc += `
-
- This property is measured in ${property.units}.`;
+        doc += `\n\nThis property is measured in ${property.units}.`;
     }
-    return doc.replace(/(p)ixel/gi, '$1oint').replace(/(\d)px\b/g, '$1pt');
+    doc = doc.replace(/(p)ixel/gi, '$1oint').replace(/(\d)px\b/g, '$1pt');
+    if (kind !== 'enum') {
+        if ('default' in property) {
+            doc += `\n\nThe default value of this property is ${propertyDefault(property, layerType)}.`;
+            if (!property.required) {
+                doc += ' Set this property to `nil` to reset it to the default value.';
+            }
+        }
+        if ('requires' in property) {
+            doc += '\n\n' + propertyReqs(property, spec[`${kind}_${layerType}`], layerType);
+        }
+        if ('original' in property) {
+            doc += `\n\nThis attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-${layerType}-${property.original}"><code>${property.original}</code></a> layout property in the Mapbox Style Specification.`;
+        }
+    }
+    return doc;
 };
 
 global.propertyReqs = function (property, propertiesByName, type) {
@@ -365,11 +387,10 @@ const layers = Object.keys(spec.layer.type.values).map((type) => {
     }, []);
 
     return {
+        doc: spec.layer.type.values[type].doc,
         type: type,
         layoutProperties: _.sortBy(layoutProperties, ['name']),
         paintProperties: _.sortBy(paintProperties, ['name']),
-        layoutPropertiesByName: spec[`layout_${type}`],
-        paintPropertiesByName: spec[`paint_${type}`],
     };
 });
 

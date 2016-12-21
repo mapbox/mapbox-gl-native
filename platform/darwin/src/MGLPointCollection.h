@@ -5,15 +5,26 @@
 #import "MGLShape.h"
 
 /**
- The `MGLPointCollection` class is used to define an array of disconnected 
- coordinates. The points in the collection may be related but are not 
- connected visually in any way.
+ An `MGLPointCollection` object represents a shape consisting of one or more
+ disconnected vertices, specified as `CLLocationCoordinate2D` instances. The
+ points in the collection may be related but are not connected spatially. For
+ example, you could use a point collection to represent all the trees in an
+ orchard.
  
- @note `MGLPointCollection` objects cannot be added to a map view using
- `-[MGLMapView addAnnotations:]` and related methods. However, when used in a
- `MGLPointCollectionFeature` to initialize a `MGLShapeSource` that is added
- to the map view's style, the point collection represents as a group of distinct 
- annotations.
+ You can add point collections to the map by adding them to an `MGLShapeSource`
+ object. Configure the appearance of an `MGLShapeSource`’s or
+ `MGLVectorSource`’s point collections collectively using an
+ `MGLCircleStyleLayer` or `MGLSymbolStyleLayer` object.
+ 
+ You cannot add an `MGLPointCollection` object directly to a map view as an
+ annotation. However, you can create individual `MGLPointAnnotation` objects
+ from the `coordinates` array and add those annotation objects to the map view
+ using the `-[MGLMapView addAnnotations:]` method.
+ 
+ A point collection is known as a
+ <a href="https://tools.ietf.org/html/rfc7946#section-3.1.3">MultiPoint</a>
+ geometry in GeoJSON. Do not confuse `MGLPointCollection` with `MGLMultiPoint`,
+ the abstract superclass of `MGLPolyline` and `MGLPolygon`.
  */
 @interface MGLPointCollection : MGLShape <MGLOverlay>
 
