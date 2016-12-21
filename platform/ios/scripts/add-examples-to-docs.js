@@ -18,6 +18,8 @@ const exampleRegex = /\/\*---BEGIN EXAMPLE:(.*)---\*\/\s*(\/\*+[\s\S]*?\*+\/)?([
 
 var path = `${process.env.TARGET_BUILD_DIR}/${process.env.PUBLIC_HEADERS_FOLDER_PATH}`;
 
+console.log("Installing examples...");
+
 var match;
 while ((match = exampleRegex.exec(examples)) !== null) {
   const token = match[1].trim();
@@ -50,8 +52,14 @@ while ((match = exampleRegex.exec(examples)) !== null) {
     const file = fs.readFileSync(filename, 'utf8');
     // Check for example placeholder in file & update file if found
     if (placeholderRegex.test(file)) {
-      console.log("Updating examples:", filename);
+      console.log("Updating example:", filename);
       fs.writeFileSync(filename, file.replace(placeholderRegex, exampleText));
+    } else if (file.indexOf(exampleText) === -1) {
+      console.log(`Placeholder "${token}" missing:`, filename);
+    } else {
+      console.log(`Example "${token}" already replaced.`);
     }
+  } else if (token !== "ExampleToken") {
+    console.log("Error file doesn't exist:", filename);
   }
 }
