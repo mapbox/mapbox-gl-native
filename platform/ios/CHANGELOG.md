@@ -7,7 +7,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Labels written in Arabic, Hebrew, and other scripts are written right-to-left. Arabic characters are correctly shaped. ([#6984](https://github.com/mapbox/mapbox-gl-native/pull/6984), [#7123](https://github.com/mapbox/mapbox-gl-native/pull/7123))
 * Improved the line wrapping behavior of point-placed labels written in Chinese, Japanese, and Yi. ([#6828](https://github.com/mapbox/mapbox-gl-native/pull/6828))
 * Fixed an issue where translucent, non-view-backed point annotations along tile boundaries would be drawn darker than expected. ([#6832](https://github.com/mapbox/mapbox-gl-native/pull/6832))
-* Added the Simplified Chinese localization. ([#7316](https://github.com/mapbox/mapbox-gl-native/pull/7316))
+* Added a Simplified Chinese localization. ([#7316](https://github.com/mapbox/mapbox-gl-native/pull/7316))
 
 ## 3.4.0
 
