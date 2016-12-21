@@ -13,63 +13,71 @@ skip_undocumented: Yes
 hide_documentation_coverage: Yes
 
 custom_categories:
+  - name: Guides
+    children:
+      - Info.plist Keys
   - name: Maps
     children:
       - MGLAccountManager
       - MGLMapCamera
       - MGLMapView
       - MGLMapViewDelegate
-      - MGLStyle
       - MGLUserTrackingMode
-  - name: Annotations
+  - name: Primitive Shapes
     children:
       - MGLAnnotation
-      - MGLAnnotationImage
-      - MGLAnnotationView
-      - MGLCalloutView
-      - MGLCalloutViewDelegate
+      - MGLOverlay
+      - MGLShape
       - MGLMultiPoint
-      - MGLMultiPolygon
-      - MGLMultiPolyline
       - MGLPointAnnotation
       - MGLPointCollection
       - MGLPolygon
       - MGLPolyline
-      - MGLOverlay
-      - MGLShape
+      - MGLMultiPolygon
+      - MGLMultiPolyline
       - MGLShapeCollection
+  - name: Annotations
+    children:
+      - MGLAnnotationImage
+      - MGLAnnotationView
       - MGLUserLocation
       - MGLUserLocationAnnotationView
-  - name: Map Data
+  - name: User Interaction
+    children:
+      - MGLCalloutView
+      - MGLCalloutViewDelegate
+  - name: Styling the Map
+    children:
+      - MGLStyle
+      - MGLStyleValue
+  - name: Style Primitives
     children:
       - MGLFeature
-      - MGLMultiPolygonFeature
-      - MGLMultiPolylineFeature
-      - MGLPointCollectionFeature
       - MGLPointFeature
       - MGLPolygonFeature
       - MGLPolylineFeature
+      - MGLMultiPolygonFeature
+      - MGLMultiPolylineFeature
+      - MGLPointCollectionFeature
       - MGLShapeCollectionFeature
+  - name: Style Content
+    children:
+      - MGLSource
+      - MGLTileSource
+      - MGLShapeSource
+      - MGLRasterSource
+      - MGLVectorSource
   - name: Style Layers
     children:
+      - MGLStyleLayer
+      - MGLForegroundStyleLayer
       - MGLBackgroundStyleLayer
+      - MGLRasterStyleLayer
+      - MGLVectorStyleLayer
       - MGLCircleStyleLayer
       - MGLFillStyleLayer
-      - MGLForegroundStyleLayer
       - MGLLineStyleLayer
-      - MGLRasterStyleLayer
-      - MGLStyleLayer
       - MGLSymbolStyleLayer
-      - MGLVectorStyleLayer
-  - name: Content Sources
-    children:
-      - MGLAttributionInfo
-      - MGLRasterSource
-      - MGLShapeSource
-      - MGLSource
-      - MGLTileCoordinateSystem
-      - MGLTileSource
-      - MGLVectorSource
   - name: Offline Maps
     children:
       - MGLOfflineRegion
@@ -80,15 +88,13 @@ custom_categories:
       - MGLTilePyramidOfflineRegion
   - name: Geometry
     children:
-      - MGLClockDirectionFormatter
-      - MGLCompassDirectionFormatter
       - MGLCoordinateBounds
       - MGLCoordinateBoundsEqualToCoordinateBounds
       - MGLCoordinateBoundsGetCoordinateSpan
+      - MGLCoordinateBoundsIntersectsCoordinateBounds
       - MGLCoordinateBoundsIsEmpty
       - MGLCoordinateBoundsMake
       - MGLCoordinateBoundsOffset
-      - MGLCoordinateFormatter
       - MGLCoordinateInCoordinateBounds
       - MGLCoordinateSpan
       - MGLCoordinateSpanEqualToCoordinateSpan
@@ -97,3 +103,8 @@ custom_categories:
       - MGLDegreesFromRadians
       - MGLRadiansFromDegrees
       - MGLStringFromCoordinateBounds
+  - name: Formatters
+    children:
+      - MGLClockDirectionFormatter
+      - MGLCompassDirectionFormatter
+      - MGLCoordinateFormatter
