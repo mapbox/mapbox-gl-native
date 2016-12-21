@@ -47,13 +47,10 @@ public class DoubleMapActivity extends AppCompatActivity {
       actionBar.setDisplayShowHomeEnabled(true);
     }
 
-    Fragment mapFragment;
     if (savedInstanceState == null) {
       FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-      transaction.add(R.id.fragment_container, mapFragment = new DoubleMapFragment(), TAG_FRAGMENT);
+      transaction.add(R.id.fragment_container, new DoubleMapFragment(), TAG_FRAGMENT);
       transaction.commit();
-    } else {
-      mapFragment = (DoubleMapFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT);
     }
   }
 
@@ -151,10 +148,24 @@ public class DoubleMapActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onStart() {
+      super.onStart();
+      mapView.onStart();
+      mapViewMini.onStart();
+    }
+
+    @Override
     public void onPause() {
       super.onPause();
       mapView.onPause();
       mapViewMini.onPause();
+    }
+
+    @Override
+    public void onStop() {
+      super.onStop();
+      mapView.onStop();
+      mapViewMini.onStop();
     }
 
     @Override

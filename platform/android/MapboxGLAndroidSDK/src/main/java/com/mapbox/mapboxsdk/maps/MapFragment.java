@@ -2,17 +2,14 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxsdk.R;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.utils.MapFragmentUtils;
 
 /**
  * Fragment wrapper around a map view.
@@ -34,16 +31,23 @@ public final class MapFragment extends Fragment {
   private OnMapReadyCallback onMapReadyCallback;
 
   /**
+   * Creates a default MapFragment instance
+   *
+   * @return MapFragment instantiated
+   */
+  public static MapFragment newInstance() {
+    return new MapFragment();
+  }
+
+  /**
    * Creates a MapFragment instance
    *
    * @param mapboxMapOptions The configuration options to be used.
-   * @return MapFragment created.
+   * @return MapFragment instantiated.
    */
   public static MapFragment newInstance(@Nullable MapboxMapOptions mapboxMapOptions) {
     MapFragment mapFragment = new MapFragment();
-    Bundle bundle = new Bundle();
-    bundle.putParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS, mapboxMapOptions);
-    mapFragment.setArguments(bundle);
+    mapFragment.setArguments(MapFragmentUtils.createFragmentArgs(mapboxMapOptions));
     return mapFragment;
   }
 
@@ -59,31 +63,7 @@ public final class MapFragment extends Fragment {
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     super.onCreateView(inflater, container, savedInstanceState);
     Context context = inflater.getContext();
-    MapboxMapOptions options = null;
-
-    // Get bundle
-    Bundle bundle = getArguments();
-    if (bundle != null && bundle.containsKey(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS)) {
-      options = bundle.getParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS);
-    }
-
-    Drawable foregroundDrawable = options.getMyLocationForegroundDrawable();
-    Drawable foregroundBearingDrawable = options.getMyLocationForegroundBearingDrawable();
-    if (foregroundDrawable == null || foregroundBearingDrawable == null) {
-      if (foregroundDrawable == null) {
-        foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_icon_default);
-      }
-      if (foregroundBearingDrawable == null) {
-        foregroundBearingDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_icon_bearing);
-      }
-      options.myLocationForegroundDrawables(foregroundDrawable, foregroundBearingDrawable);
-    }
-
-    if (options.getMyLocationBackgroundDrawable() == null) {
-      options.myLocationBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_bg_shape));
-    }
-
-    return map = new MapView(inflater.getContext(), options);
+    return map = new MapView(context, MapFragmentUtils.resolveArgs(context, getArguments()));
   }
 
   /**
