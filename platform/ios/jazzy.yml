@@ -24,17 +24,13 @@ custom_categories:
       - MGLMapCamera
       - MGLMapView
       - MGLMapViewDelegate
-      - MGLStyle
       - MGLUserTrackingMode
-  - name: Protocols and Abstract Classes
+  - name: Primitive Shapes
     children:
       - MGLAnnotation
       - MGLOverlay
       - MGLShape
       - MGLMultiPoint
-      - MGLFeature
-  - name: Primitive Shapes
-    children:
       - MGLPointAnnotation
       - MGLPointCollection
       - MGLPolygon
@@ -52,8 +48,13 @@ custom_categories:
     children:
       - MGLCalloutView
       - MGLCalloutViewDelegate
+  - name: Styling the Map
+    children:
+      - MGLStyle
+      - MGLStyleValue
   - name: Style Primitives
     children:
+      - MGLFeature
       - MGLPointFeature
       - MGLPolygonFeature
       - MGLPolylineFeature
@@ -79,9 +80,6 @@ custom_categories:
       - MGLFillStyleLayer
       - MGLLineStyleLayer
       - MGLSymbolStyleLayer
-  - name: Style Values
-    children:
-      - MGLStyleValue
   - name: Offline Maps
     children:
       - MGLOfflineRegion
