@@ -157,7 +157,7 @@ public final class MapboxMap {
    * Called when the user
    */
   void onUpdate() {
-    CameraPosition cameraPosition = transform.getCameraPosition();
+    CameraPosition cameraPosition = transform.invalidateCameraPosition();
     uiSettings.update(cameraPosition);
     // FIXME introduce update method with camera position
     trackingSettings.update();
