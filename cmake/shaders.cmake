@@ -1,6 +1,6 @@
 function(add_shader VAR name)
     set(shader_build_cmd ${NodeJS_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/build-shaders.js)
-    set(shader_file_prefix ${CMAKE_SOURCE_DIR}/node_modules/mapbox-gl/shaders)
+    set(shader_file_prefix ${CMAKE_SOURCE_DIR}/mapbox-gl-js/shaders)
     set(shader_source_prefix ${MBGL_GENERATED}/include/mbgl/shader)
 
     add_custom_command(

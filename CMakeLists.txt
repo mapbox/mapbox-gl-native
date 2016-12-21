@@ -10,6 +10,12 @@ if(NOT EXISTS ".mason/mason.cmake")
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif()
 
+if(NOT EXISTS "mapbox-gl-js/package.json")
+   execute_process(
+        COMMAND git submodule update --init mapbox-gl-js
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+endif()
+
 include(.mason/mason.cmake)
 
 option(WITH_CXX11ABI "Use cxx11abi mason packages" OFF)
