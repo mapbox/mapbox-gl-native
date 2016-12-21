@@ -51,6 +51,7 @@ $navigation_bg_color: #fbfbfb;
 $navigation_task_color: $link_color;
 
 $section_name_color: $color_darkblue;
+$navigation_gloss_color: #999;
 
 // ----- Content
 
@@ -365,6 +366,30 @@ pre code {
   overflow: hidden;
   text-overflow: ellipsis;
   color: $navigation_task_color;
+}
+
+%nav-group-task-gloss {
+  color: $navigation_gloss_color;
+  font-size: 90%;
+  margin-left: 0.5em;
+}
+
+.nav-group-task[data-url^="Protocols/"] > .nav-group-task-link::after {
+  @extend %nav-group-task-gloss;
+  content: "(Protocol)";
+}
+
+.nav-group-task[data-name="MGLForegroundStyleLayer"],
+.nav-group-task[data-name="MGLMultiPoint"],
+.nav-group-task[data-name="MGLShape"],
+.nav-group-task[data-name="MGLSource"],
+.nav-group-task[data-name="MGLStyleLayer"],
+.nav-group-task[data-name="MGLTileSource"],
+.nav-group-task[data-name="MGLVectorStyleLayer"] {
+  .nav-group-task-link::after {
+    @extend %nav-group-task-gloss;
+    content: "(Abstract Class)";
+  }
 }
 
 .nav-group-name > .small-heading,
