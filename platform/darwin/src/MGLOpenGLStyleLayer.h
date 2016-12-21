@@ -14,7 +14,6 @@ typedef struct MGLStyleLayerDrawingContext {
     double zoomLevel;
     CLLocationDirection direction;
     CGFloat pitch;
-    CGFloat perspectiveSkew;
 } MGLStyleLayerDrawingContext;
 
 @interface MGLOpenGLStyleLayer : MGLStyleLayer

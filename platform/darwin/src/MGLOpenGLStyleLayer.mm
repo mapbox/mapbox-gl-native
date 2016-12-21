@@ -34,7 +34,6 @@ void MGLDrawCustomStyleLayer(void *context, const mbgl::style::CustomLayerRender
         .zoomLevel = params.zoom,
         .direction = mbgl::util::wrap(params.bearing, 0., 360.),
         .pitch = static_cast<CGFloat>(params.pitch),
-        .perspectiveSkew = static_cast<CGFloat>(params.altitude),
     };
     [layer drawInMapView:layer.mapView withContext:drawingContext];
 }
