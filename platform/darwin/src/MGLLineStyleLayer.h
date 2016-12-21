@@ -87,6 +87,8 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
  otherwise, find it using the `MGLStyle.layers` property. You can also create a
  new line style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
+
+ <!--EXAMPLE: MGLLineStyleLayer-->
  */
 @interface MGLLineStyleLayer : MGLVectorStyleLayer
 

@@ -128,6 +128,8 @@ NS_ASSUME_NONNULL_BEGIN
  style attributes and also `hyphen-minus` and `tag:subtag`. However, you must use
  `%K` in the format string to represent these variables:
  `@"%K == 'LineString'", @"$type"`.
+
+ <!--EXAMPLE: MGLVectorStyleLayer.predicate-->
  */
 @property (nonatomic, nullable) NSPredicate *predicate;
 

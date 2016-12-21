@@ -260,6 +260,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  otherwise, find it using the `MGLStyle.layers` property. You can also create a
  new symbol style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
+
+ <!--EXAMPLE: MGLSymbolStyleLayer-->
  */
 @interface MGLSymbolStyleLayer : MGLVectorStyleLayer
 

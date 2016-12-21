@@ -74,6 +74,9 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
  
  Any vector style layer initialized with a shape source should have a `nil`
  value in its `sourceLayerIdentifier` property.
+
+ <!--EXAMPLE: MGLShapeSource-->
+ ```
  */
 @interface MGLShapeSource : MGLSource
 

@@ -35,6 +35,9 @@ extern const MGLTileSourceOption MGLTileSourceOptionTileSize;
  `MGLRasterSource` object that you can use to initialize new style layers. You
  can also add and remove sources dynamically using methods such as
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
+
+ <!--EXAMPLE: MGLRasterSource-->
+ ```
  */
 @interface MGLRasterSource : MGLTileSource
 

@@ -24,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
  (<var>extent</var>&nbsp;×&nbsp;2)&nbsp;−&nbsp;1, inclusive. Any vector style
  layer initialized with a vector source must have a non-`nil` value in its
  `sourceLayerIdentifier` property.
+
+ <!--EXAMPLE: MGLVectorSource-->
  */
 @interface MGLVectorSource : MGLTileSource
 
