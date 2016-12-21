@@ -25,17 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  layer initialized with a vector source must have a non-`nil` value in its
  `sourceLayerIdentifier` property.
 
- ### Example ###
-
- ```swift
- let source = MGLVectorSource(identifier: "pois", tileURLTemplates: ["https://example.com/vector-tiles/{z}/{x}/{y}.mvt"], options: [
-    .minimumZoomLevel: 9,
-    .maximumZoomLevel: 16,
-    .attributionInfos: [
-	MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
-    ]
- ])
- mapView.style.addSource(source)
+ <!--EXAMPLE: MGLVectorSource-->
  ```
  */
 @interface MGLVectorSource : MGLTileSource

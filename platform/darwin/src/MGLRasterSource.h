@@ -36,18 +36,7 @@ extern const MGLTileSourceOption MGLTileSourceOptionTileSize;
  can also add and remove sources dynamically using methods such as
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
 
- ### Example ###
-
- ```swift
- let source = MGLRasterSource(identifier: "clouds", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
-    .minimumZoomLevel: 9,
-    .maximumZoomLevel: 16,
-    .tileSize: 512,
-    .attributionInfos: [
-	MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
-    ]
- ])
- mapView.style.addSource(source)
+ <!--EXAMPLE: MGLRasterSource-->
  ```
  */
 @interface MGLRasterSource : MGLTileSource
