@@ -35,7 +35,8 @@ cp platform/ios/screenshot.png "${OUTPUT}"
 DEFAULT_THEME="platform/darwin/docs/theme"
 THEME=${JAZZY_THEME:-$DEFAULT_THEME}
 
-FRAMEWORK_PATH="build/ios/pkg/dynamic/Mapbox.framework"
+DEFAULT_FRAMEWORK_PATH="build/ios/pkg/dynamic/Mapbox.framework"
+FRAMEWORK_PATH=${FRAMEWORK_PATH:-$DEFAULT_FRAMEWORK_PATH}
 
 jazzy \
     --config platform/ios/jazzy.yml \
