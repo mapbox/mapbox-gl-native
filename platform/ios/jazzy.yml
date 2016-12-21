@@ -47,7 +47,7 @@ custom_categories:
       - MGLFeature
       - MGLMultiPolygonFeature
       - MGLMultiPolylineFeature
-      - MGLPointCollectionFeature      
+      - MGLPointCollectionFeature
       - MGLPointFeature
       - MGLPolygonFeature
       - MGLPolylineFeature
