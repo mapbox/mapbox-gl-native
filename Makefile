@@ -478,6 +478,8 @@ MBGL_ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
 MBGL_ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
 MBGL_ANDROID_LIBDIR = lib$(if $(filter arm-v8 x86-64,$1),64)
 MBGL_ANDROID_DALVIKVM = dalvikvm$(if $(filter arm-v8 x86-64,$1),64,32)
+MBGL_ANDROID_APK_SUFFIX = $(if $(filter Release,$(BUILDTYPE)),release-unsigned,debug)
+MBGL_ANDROID_CORE_TEST_DIR = build/android-$1/$(BUILDTYPE)/core-tests
 
 .PHONY: android-style-code
 android-style-code:
@@ -511,40 +513,50 @@ android-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile
 android-$1: android-lib-$1
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
 
-run-android-core-test-$1: android-test-lib-$1
+.PHONY: android-core-test-$1
+android-core-test-$1: android-test-lib-$1
+	mkdir -p $(MBGL_ANDROID_CORE_TEST_DIR)
+
 	# Compile main sources and extract the classes (using the test app to get all transitive dependencies in one place)
-	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:assembleDebug
-	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk classes.dex -d build/android-$1/$(BUILDTYPE)
+	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
+	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-$(MBGL_ANDROID_APK_SUFFIX).apk classes.dex -d $(MBGL_ANDROID_CORE_TEST_DIR)
 
-	#Compile Test runner
-	find platform/android/src/test -name "*.java" > build/android-$1/$(BUILDTYPE)/java-sources.txt
-	javac -sourcepath platform/android/src/test -d build/android-$1/$(BUILDTYPE) -source 1.7 -target 1.7 @build/android-$1/$(BUILDTYPE)/java-sources.txt
-	#Combine and dex
-	cd build/android-$1/$(BUILDTYPE) && $(ANDROID_HOME)/build-tools/25.0.0/dx --dex --output=test.jar *.class classes.dex
+	# Compile Test runner
+	find platform/android/src/test -name "*.java" > $(MBGL_ANDROID_CORE_TEST_DIR)/java-sources.txt
+	javac -sourcepath platform/android/src/test -d $(MBGL_ANDROID_CORE_TEST_DIR) -source 1.7 -target 1.7 @$(MBGL_ANDROID_CORE_TEST_DIR)/java-sources.txt
 
-	#Ensure clean state on the device
+	# Combine and dex
+	cd $(MBGL_ANDROID_CORE_TEST_DIR) && $(ANDROID_HOME)/build-tools/25.0.0/dx --dex --output=test.jar *.class classes.dex
+
+run-android-core-test-$1-%: android-core-test-$1
+	# Ensure clean state on the device
 	adb shell "rm -Rf $(MBGL_ANDROID_LOCAL_WORK_DIR) && mkdir -p $(MBGL_ANDROID_LOCAL_WORK_DIR)/test"
 
 	# Generate zipped asset files
 	cd test/fixtures/api && zip -r assets.zip assets && cd -
 	cd test/fixtures/storage && zip -r assets.zip assets && cd -
 
-	#Push all needed files to the device
-	adb push build/android-$1/$(BUILDTYPE)/test.jar $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
+	# Push all needed files to the device
+	adb push $(MBGL_ANDROID_CORE_TEST_DIR)/test.jar $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
 	adb push test/fixtures $(MBGL_ANDROID_LOCAL_WORK_DIR)/test > /dev/null 2>&1
 	adb push build/android-$1/$(BUILDTYPE)/stripped/libmapbox-gl.so $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
 	adb push build/android-$1/$(BUILDTYPE)/stripped/libmbgl-test.so $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
 
-	#Kick off the tests
-	adb shell "export LD_LIBRARY_PATH=/system/$(MBGL_ANDROID_LIBDIR):$(MBGL_ANDROID_LOCAL_WORK_DIR) && cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && $(MBGL_ANDROID_DALVIKVM) -cp $(MBGL_ANDROID_LOCAL_WORK_DIR)/test.jar Main"
+	# Kick off the tests
+	adb shell "export LD_LIBRARY_PATH=/system/$(MBGL_ANDROID_LIBDIR):$(MBGL_ANDROID_LOCAL_WORK_DIR) && cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && $(MBGL_ANDROID_DALVIKVM) -cp $(MBGL_ANDROID_LOCAL_WORK_DIR)/test.jar Main --gtest_filter=$$*"
 
-	#Gather the results
+	# Gather the results and unpack them
 	adb shell "cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && tar -cvzf results.tgz test/fixtures/*  > /dev/null 2>&1"
-	adb pull $(MBGL_ANDROID_LOCAL_WORK_DIR)/results.tgz build/android-$1/$(BUILDTYPE)/ > /dev/null 2>&1
+	adb pull $(MBGL_ANDROID_LOCAL_WORK_DIR)/results.tgz $(MBGL_ANDROID_CORE_TEST_DIR)/ > /dev/null 2>&1
+	rm -rf $(MBGL_ANDROID_CORE_TEST_DIR)/results && mkdir -p $(MBGL_ANDROID_CORE_TEST_DIR)/results
+	tar -xzf $(MBGL_ANDROID_CORE_TEST_DIR)/results.tgz --strip-components=2 -C $(MBGL_ANDROID_CORE_TEST_DIR)/results
+
+.PHONY: run-android-core-test-$1
+run-android-core-test-$1: run-android-core-test-$1-*
 
 .PHONY: run-android-$1
 run-android-$1: android-$1
-	cd platform/android  && ./gradlew :MapboxGLAndroidSDKTestApp:installDebug && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity
+	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:install$(BUILDTYPE) && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity
 
 apackage: android-lib-$1
 endef
