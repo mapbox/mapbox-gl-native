@@ -16,14 +16,12 @@ NS_ASSUME_NONNULL_BEGIN
  
  The `MGLStyleValue` class takes a generic parameter `T` that indicates the
  Foundation class being wrapped by this class. Common values for `T` include:
- 
- <ul>
- <li>`NSNumber` (for Boolean values, floating-point numbers, and enumerations)</li>
- <li>`NSValue` (for `CGVector`, `NSEdgeInset`, and `UIEdgeInset`s)</li>
- <li>`NSString`</li>
- <li>`NSColor` or `UIColor`</li>
- <li>`NSArray`</li>
- </ul>
+
+   - `NSNumber` (for Boolean values and floating-point numbers)
+   - `NSValue` (for `CGVector`, `NSEdgeInsets`, `UIEdgeInsets`, and enumerations)
+   - `NSString`
+   - `NSColor` or `UIColor`
+   - `NSArray`
  */
 @interface MGLStyleValue<T> : NSObject
 
