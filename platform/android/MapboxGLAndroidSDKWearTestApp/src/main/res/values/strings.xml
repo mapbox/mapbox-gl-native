@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MapboxGLAndroidSDKWearTestApp</string>
+    <string name="app_name">Mapbox Test App</string>
 
     <!-- Feature Titles -->
     <string name="activity_simple_mapview_title">A simple map view</string>
