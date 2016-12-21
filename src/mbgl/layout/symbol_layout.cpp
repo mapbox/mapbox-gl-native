@@ -313,8 +313,8 @@ void SymbolLayout::addFeature(const SymbolFeature& feature,
                 poly.push_back(r);
             }
 
-            // 16 here represents 2 pixels
-            auto poi = mapbox::polylabel(poly, 16.0);
+            // 1 pixel worth of precision, in tile coordinates
+            auto poi = mapbox::polylabel(poly, double(util::EXTENT / util::tileSize));
             Anchor anchor(poi.x, poi.y, 0, minScale);
             addSymbolInstance(polygon[0], anchor);
         }
