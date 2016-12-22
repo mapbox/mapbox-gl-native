@@ -42,10 +42,6 @@
 
 using namespace QMapbox;
 
-// mbgl::MapMode
-static_assert(mbgl::underlying_type(QMapboxGLSettings::ContinuousMap) == mbgl::underlying_type(mbgl::MapMode::Continuous), "error");
-static_assert(mbgl::underlying_type(QMapboxGLSettings::StillMap) == mbgl::underlying_type(mbgl::MapMode::Still), "error");
-
 // mbgl::GLContextMode
 static_assert(mbgl::underlying_type(QMapboxGLSettings::UniqueGLContext) == mbgl::underlying_type(mbgl::GLContextMode::Unique), "error");
 static_assert(mbgl::underlying_type(QMapboxGLSettings::SharedGLContext) == mbgl::underlying_type(mbgl::GLContextMode::Shared), "error");
@@ -165,8 +161,7 @@ std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
     configuration is valid for initializing a QMapboxGL.
 */
 QMapboxGLSettings::QMapboxGLSettings()
-    : m_mapMode(QMapboxGLSettings::ContinuousMap)
-    , m_contextMode(QMapboxGLSettings::SharedGLContext)
+    : m_contextMode(QMapboxGLSettings::SharedGLContext)
     , m_constrainMode(QMapboxGLSettings::ConstrainHeightOnly)
     , m_viewportMode(QMapboxGLSettings::DefaultViewport)
     , m_cacheMaximumSize(mbgl::util::DEFAULT_MAX_CACHE_SIZE)
@@ -174,16 +169,6 @@ QMapboxGLSettings::QMapboxGLSettings()
     , m_assetPath(QCoreApplication::applicationDirPath())
     , m_accessToken(qgetenv("MAPBOX_ACCESS_TOKEN"))
 {
-}
-
-QMapboxGLSettings::MapMode QMapboxGLSettings::mapMode() const
-{
-    return m_mapMode;
-}
-
-void QMapboxGLSettings::setMapMode(MapMode mode)
-{
-    m_mapMode = mode;
 }
 
 QMapboxGLSettings::GLContextMode QMapboxGLSettings::contextMode() const
@@ -867,7 +852,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     , mapObj(std::make_unique<mbgl::Map>(
         *this, mbgl::Size{ static_cast<uint32_t>(size.width()), static_cast<uint32_t>(size.height()) },
         pixelRatio, *fileSourceObj, threadPool,
-        static_cast<mbgl::MapMode>(settings.mapMode()),
+        mbgl::MapMode::Continuous,
         static_cast<mbgl::GLContextMode>(settings.contextMode()),
         static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
         static_cast<mbgl::ViewportMode>(settings.viewportMode())))
