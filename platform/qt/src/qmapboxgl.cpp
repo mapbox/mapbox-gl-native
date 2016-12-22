@@ -83,7 +83,7 @@ namespace {
 
 QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
 
-// Convertion helper functions.
+// Conversion helper functions.
 
 auto fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
     const LineString &lineString = shapeAnnotation.first;
@@ -141,7 +141,7 @@ std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
 /*!
     \enum QMapboxGLSettings::GLContextMode
 
-    This enum sets the expectations towards the GL state.
+    This enum sets the expectations for the GL state.
 
     \value UniqueGLContext  The GL context is only used by QMapboxGL, so it is not
     reset before each rendering. Use this mode if the intention is to only draw a
@@ -157,16 +157,16 @@ std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
 /*!
     \enum QMapboxGLSettings::ConstrainMode
 
-    This enum sets whenever a map should wrap.
+    This enum determines if the map wraps.
 
     \value NoConstrain              The map will wrap on the horizontal axis. Since it doesn't
-    make sense to wrap on the vertical axis in a Mercator projection, the map will simply scroll
+    make sense to wrap on the vertical axis in a Web Mercator projection, the map will scroll
     and show some empty space.
 
     \value ConstrainHeightOnly      The map will wrap around the horizontal axis, like a spinning
-    globe. This is usually what you want.
+    globe. This is the recommended constrain mode.
 
-    \value ConstrainWidthAndHeight  The map won't wrap and panning is restrict to the boundaries
+    \value ConstrainWidthAndHeight  The map won't wrap and panning is restricted to the boundaries
     of the map.
 
     \sa constrainMode()
@@ -175,9 +175,9 @@ std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
 /*!
     \enum QMapboxGLSettings::ViewportMode
 
-    This enum is used for flipping the map vertically.
+    This enum flips the map vertically.
 
-    \value DefaultViewport  Native horientation.
+    \value DefaultViewport  Native orientation.
 
     \value FlippedYViewport  Mirrored vertically.
 
@@ -259,7 +259,8 @@ void QMapboxGLSettings::setViewportMode(ViewportMode mode)
 /*!
     Returns the cache database maximum hard size in bytes. The database
     will grow until the limit is reached. Setting a maximum size smaller
-    than the current size of an existing database is undefined.
+    than the current size of an existing database results in undefined
+    behavior
 
     By default, it is set to 50 MB.
 */
@@ -283,8 +284,8 @@ void QMapboxGLSettings::setCacheDatabaseMaximumSize(unsigned size)
     \l {https://github.com/mapbox/mapbox-gl-native/blob/master/bin/offline.sh}
     {Offline Tool}.
 
-    By default, it is set to \b :memory: meaning it will create a in-memory
-    cache instead of a file in the disk.
+    By default, it is set to \b :memory: meaning it will create an in-memory
+    cache instead of a file on disk.
 */
 QString QMapboxGLSettings::cacheDatabasePath() const
 {
@@ -333,11 +334,14 @@ QString QMapboxGLSettings::accessToken() const {
 }
 
 /*!
-    Sets the access \a token. An access token is required for styles and tiles
-    hosted at Mapbox servers.
+    Sets the access \a token.
 
-    An access token for the Starter plan can be created free of charge at the
-    \l {https://www.mapbox.com/pricing/}{Mapbox website}.
+    Mapbox-hosted vector tiles and styles require an API
+    \l {https://www.mapbox.com/help/define-access-token/}{access token}, which you
+    can obtain from the \l {https://www.mapbox.com/studio/account/tokens/}
+    {Mapbox account page}. Access tokens associate requests to Mapbox's vector tile
+    and style APIs with your Mapbox account. They also deter other developers from
+    using your styles without your permission.
 */
 void QMapboxGLSettings::setAccessToken(const QString &token)
 {
@@ -362,8 +366,28 @@ void QMapboxGLSettings::setAccessToken(const QString &token)
 */
 
 /*!
+    \enum QMapboxGL::NorthOrientation
+
+    This enum sets the orientation of the north bearing. It will directly affect bearing when
+    resetting the north (i.e. setting bearing to 0).
+
+    \value NorthUpwards     The north is pointing up in the map. This is usually how maps are oriented.
+
+    \value NorthRightwards  The north is pointing right.
+
+    \value NorthDownwards   The north is pointing down.
+
+    \value NorthLeftwards   The north is pointing left.
+
+    \sa northOrientation()
+    \sa bearing()
+*/
+
+/*!
     Constructs a QMapboxGL object with \a settings and sets \a parent as the parent
-    object. The \a settings cannot be changed after the object is constructed.
+    object. The \a settings cannot be changed after the object is constructed. The
+    \a size represents the size of the viewport and the \a pixelRatio the initial pixel
+    density of the screen.
 */
 QMapboxGL::QMapboxGL(QObject *parent, const QMapboxGLSettings &settings, const QSize& size, qreal pixelRatio)
     : QObject(parent)
@@ -377,56 +401,76 @@ QMapboxGL::QMapboxGL(QObject *parent, const QMapboxGLSettings &settings, const Q
     d_ptr = new QMapboxGLPrivate(this, settings, size, pixelRatio);
 }
 
+/*!
+    Destroys this QMapboxGL.
+*/
 QMapboxGL::~QMapboxGL()
 {
     delete d_ptr;
 }
 
+/*!
+    Cycles through several debug options like showing the tile borders,
+    tile numbers, expiration time and wireframe.
+*/
 void QMapboxGL::cycleDebugOptions()
 {
     d_ptr->mapObj->cycleDebugOptions();
 }
 
-QString QMapboxGL::styleJson() const
-{
-    return QString::fromStdString(d_ptr->mapObj->getStyleJSON());
-}
-
-QString QMapboxGL::styleUrl() const
-{
-    return QString::fromStdString(d_ptr->mapObj->getStyleURL());
-}
-
 /*!
-    Sets a new \a style from a JSON that must conform with the
+    \property QMapboxGL::styleJson
+    \brief the map style JSON.
+
+    Sets a new \a style from a JSON that must conform to the
     \l {https://www.mapbox.com/mapbox-gl-style-spec/}
     {Mapbox Style Specification}.
 
     \note In case of a invalid style it will trigger a mapChanged
     signal with QMapboxGL::MapChangeDidFailLoadingMap as argument.
 */
+QString QMapboxGL::styleJson() const
+{
+    return QString::fromStdString(d_ptr->mapObj->getStyleJSON());
+}
+
 void QMapboxGL::setStyleJson(const QString &style)
 {
     d_ptr->mapObj->setStyleJSON(style.toStdString());
 }
 
 /*!
-    Sets a URL for fetching a JSON that will be later feed to
+    \property QMapboxGL::styleUrl
+    \brief the map style URL.
+
+    Sets a URL for fetching a JSON that will be later fed to
     setStyleJson. URLs using the Mapbox scheme (\a mapbox://) are
     also accepted and translated automatically to an actual HTTPS
     request.
 
-    The Mapbox scheme is not enforced by any means and a style can
-    be fetched from anything that QNetworkAccessManager can handle.
+    The Mapbox scheme is not enforced and a style can be fetched
+    from anything that QNetworkAccessManager can handle.
 
     \note In case of a invalid style it will trigger a mapChanged
     signal with QMapboxGL::MapChangeDidFailLoadingMap as argument.
 */
+QString QMapboxGL::styleUrl() const
+{
+    return QString::fromStdString(d_ptr->mapObj->getStyleURL());
+}
+
 void QMapboxGL::setStyleUrl(const QString &url)
 {
     d_ptr->mapObj->setStyleURL(url.toStdString());
 }
 
+/*!
+    \property QMapboxGL::latitude
+    \brief the map's current latitude in degrees.
+
+    Setting a latitude doesn't necessarily mean it will be accepted since QMapboxGL
+    might constrain it within the limits of the Web Mercator projection.
+*/
 double QMapboxGL::latitude() const
 {
     return d_ptr->mapObj->getLatLng(d_ptr->margins).latitude;
@@ -437,6 +481,13 @@ void QMapboxGL::setLatitude(double latitude_)
     d_ptr->mapObj->setLatLng(mbgl::LatLng { latitude_, longitude() }, d_ptr->margins);
 }
 
+/*!
+    \property QMapboxGL::longitude
+    \brief the map current longitude in degrees.
+
+    Setting a longitude doesn't necessarily mean it will be accepted since QMapboxGL
+    might constrain it within the limits of the Web Mercator projection.
+*/
 double QMapboxGL::longitude() const
 {
     return d_ptr->mapObj->getLatLng(d_ptr->margins).longitude;
@@ -447,6 +498,16 @@ void QMapboxGL::setLongitude(double longitude_)
     d_ptr->mapObj->setLatLng(mbgl::LatLng { latitude(), longitude_ }, d_ptr->margins);
 }
 
+/*!
+    \property QMapboxGL::scale
+    \brief the map scale factor.
+
+    This property is used to zoom the map. When \a center is defined, the map will
+    scale in the direction of the center pixel coordinates. This function could be used for
+    implementing a pinch gesture or zooming by using the mouse scroll wheel.
+
+    \sa zoom()
+*/
 double QMapboxGL::scale() const
 {
     return d_ptr->mapObj->getScale();
@@ -457,6 +518,16 @@ void QMapboxGL::setScale(double scale_, const QPointF &center)
     d_ptr->mapObj->setScale(scale_, mbgl::ScreenCoordinate { center.x(), center.y() });
 }
 
+/*!
+    \property QMapboxGL::zoom
+    \brief the map zoom factor.
+
+    This property is used to zoom the map. When \a center is defined, the map will
+    zoom in the direction of the center. This function could be used for implementing
+    a pinch gesture or zooming by using the mouse scroll wheel.
+
+    \sa scale()
+*/
 double QMapboxGL::zoom() const
 {
     return d_ptr->mapObj->getZoom();
@@ -477,6 +548,14 @@ double QMapboxGL::maximumZoom() const
     return d_ptr->mapObj->getMaxZoom();
 }
 
+/*!
+    \property QMapboxGL::coordinate
+    \brief the map center \a coordinate.
+
+    Centers the map at a geographic coordinate respecting the margins, if set.
+
+    \sa margins()
+*/
 Coordinate QMapboxGL::coordinate() const
 {
     const mbgl::LatLng& latLng = d_ptr->mapObj->getLatLng(d_ptr->margins);
@@ -488,12 +567,24 @@ void QMapboxGL::setCoordinate(const Coordinate &coordinate_)
     d_ptr->mapObj->setLatLng(mbgl::LatLng { coordinate_.first, coordinate_.second }, d_ptr->margins);
 }
 
+/*!
+    Convenience method for setting the \a coordinate and \a zoom simultaneously.
+
+    \note Setting \a coordinate and \a zoom at once is more efficient than doing
+    it in two steps.
+
+    \sa zoom()
+    \sa coordinate()
+*/
 void QMapboxGL::setCoordinateZoom(const Coordinate &coordinate_, double zoom_)
 {
     d_ptr->mapObj->setLatLngZoom(
             mbgl::LatLng { coordinate_.first, coordinate_.second }, zoom_, d_ptr->margins);
 }
 
+/*!
+    Atomically jumps to the \a camera options.
+*/
 void QMapboxGL::jumpTo(const QMapboxGLCameraOptions& camera)
 {
     mbgl::CameraOptions mbglCamera;
@@ -520,6 +611,18 @@ void QMapboxGL::jumpTo(const QMapboxGLCameraOptions& camera)
     d_ptr->mapObj->jumpTo(mbglCamera);
 }
 
+/*!
+    \property QMapboxGL::bearing
+    \brief the map bearing in degrees.
+
+    Set the angle in degrees. Negative values and values over 360 are
+    valid and will wrap. The direction of the rotation is counterclockwise.
+
+    When \a center is defined, the map will rotate around the center pixel coordinate
+    respecting the margins if defined.
+
+    \sa margins()
+*/
 double QMapboxGL::bearing() const
 {
     return d_ptr->mapObj->getBearing();
@@ -535,6 +638,15 @@ void QMapboxGL::setBearing(double degrees, const QPointF &center)
     d_ptr->mapObj->setBearing(degrees, mbgl::ScreenCoordinate { center.x(), center.y() });
 }
 
+/*!
+    \property QMapboxGL::pitch
+    \brief the map pitch in degrees.
+
+    Pitch toward the horizon measured in degrees, with 0 resulting in a
+    two-dimensional map. It will be constrained at 60 degrees.
+
+    \sa margins()
+*/
 double QMapboxGL::pitch() const
 {
     return d_ptr->mapObj->getPitch();
@@ -560,26 +672,60 @@ void QMapboxGL::setGestureInProgress(bool inProgress)
     d_ptr->mapObj->setGestureInProgress(inProgress);
 }
 
+/*!
+    Adds an \a className to the list of active classes. Layers tagged with a certain class
+    will only be active when the class is added.
+
+    This was removed from \l {https://www.mapbox.com/mapbox-gl-style-spec/#layer-paint.*}
+    {the vector tiles specification} and should no longer be used.
+
+    \deprecated
+    \sa removeClass()
+*/
 void QMapboxGL::addClass(const QString &className)
 {
     d_ptr->mapObj->addClass(className.toStdString());
 }
 
+/*!
+    Removes a \a className.
+
+    \deprecated
+    \sa addClass()
+*/
 void QMapboxGL::removeClass(const QString &className)
 {
     d_ptr->mapObj->removeClass(className.toStdString());
 }
 
+/*!
+    Returns true when \a className is active, false otherwise.
+
+    \deprecated
+    \sa addClass()
+*/
 bool QMapboxGL::hasClass(const QString &className) const
 {
     return d_ptr->mapObj->hasClass(className.toStdString());
 }
 
+/*!
+    Bulk adds a list of \a classNames.
+
+    \deprecated
+    \sa addClass()
+*/
 void QMapboxGL::setClasses(const QStringList &classNames)
 {
     d_ptr->mapObj->setClasses(fromQStringList(classNames));
 }
 
+/*!
+    Returns a list of active classes.
+
+    \deprecated
+    \sa setClasses()
+*/
 QStringList QMapboxGL::getClasses() const
 {
     QStringList classNames;
@@ -707,11 +853,20 @@ void QMapboxGL::resize(const QSize& size, const QSize& framebufferSize)
         { static_cast<uint32_t>(size.width()), static_cast<uint32_t>(size.height()) });
 }
 
-void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &sprite)
-{
-    if (sprite.isNull()) return;
+/*!
+    Adds an \a icon to the annotation icon pool. This can be later used by the annotation
+    functions to shown any drawing on the map by referencing its \a name.
 
-    d_ptr->mapObj->addAnnotationIcon(name.toStdString(), toSpriteImage(sprite));
+    Unlike using addIcon() for runtime styling, annotations added with addPointAnnotation()
+    will survive style changes.
+
+    \sa addPointAnnotation()
+*/
+void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &icon)
+{
+    if (icon.isNull()) return;
+
+    d_ptr->mapObj->addAnnotationIcon(name.toStdString(), toSpriteImage(icon));
 }
 
 QPointF QMapboxGL::pixelForCoordinate(const Coordinate &coordinate_) const
@@ -759,6 +914,12 @@ CoordinateZoom QMapboxGL::coordinateZoomForBounds(const Coordinate &sw, Coordina
     return {{ (*camera.center).latitude, (*camera.center).longitude }, *camera.zoom };
 }
 
+/*!
+    \property QMapboxGL::margins
+    \brief the map margins in pixels from the corners of the map.
+
+    This property sets a new reference center for the map.
+*/
 void QMapboxGL::setMargins(const QMargins &margins_)
 {
     d_ptr->margins = {
