@@ -2,9 +2,10 @@
 #define QMAPBOXGL_H
 
 #include <QMapbox>
+#include <QMargins>
 #include <QObject>
-#include <QSize>
 #include <QPointF>
+#include <QSize>
 
 class QImage;
 class QMargins;
@@ -78,6 +79,11 @@ class Q_DECL_EXPORT QMapboxGL : public QObject
     Q_PROPERTY(double zoom READ zoom WRITE setZoom)
     Q_PROPERTY(double bearing READ bearing WRITE setBearing)
     Q_PROPERTY(double pitch READ pitch WRITE setPitch)
+    Q_PROPERTY(QString styleJson READ styleJson WRITE setStyleJson)
+    Q_PROPERTY(QString styleUrl READ styleUrl WRITE setStyleUrl)
+    Q_PROPERTY(double scale READ scale WRITE setScale)
+    Q_PROPERTY(QMapbox::Coordinate coordinate READ coordinate WRITE setCoordinate)
+    Q_PROPERTY(QMargins margins READ margins WRITE setMargins)
 
 public:
     // Determines the orientation of the map.
