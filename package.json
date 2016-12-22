@@ -1,5 +1,5 @@
 {
-  "name": "mapbox-gl-native",
+  "name": "@mapbox/mapbox-gl-native",
   "version": "3.4.2",
   "description": "Renders map tiles with Mapbox GL",
   "keywords": [
