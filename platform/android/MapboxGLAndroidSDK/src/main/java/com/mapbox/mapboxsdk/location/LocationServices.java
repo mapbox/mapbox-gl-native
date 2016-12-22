@@ -140,9 +140,9 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
             listener.onLocationChanged(location);
         }
 
-        Intent locIntent = new Intent();
+        Intent locIntent = new Intent(TelemetryLocationReceiver.INTENT_STRING);
         locIntent.putExtra(LocationManager.KEY_LOCATION_CHANGED, location);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(locIntent);
+        LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(locIntent);
     }
 
     /**
