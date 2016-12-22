@@ -22,11 +22,6 @@ class Q_DECL_EXPORT QMapboxGLSettings
 public:
     QMapboxGLSettings();
 
-    enum MapMode {
-        ContinuousMap = 0,
-        StillMap
-    };
-
     enum GLContextMode {
         UniqueGLContext = 0,
         SharedGLContext
@@ -42,9 +37,6 @@ public:
         DefaultViewport = 0,
         FlippedYViewport
     };
-
-    MapMode mapMode() const;
-    void setMapMode(MapMode);
 
     GLContextMode contextMode() const;
     void setContextMode(GLContextMode);
@@ -68,7 +60,6 @@ public:
     void setAccessToken(const QString &);
 
 private:
-    MapMode m_mapMode;
     GLContextMode m_contextMode;
     ConstrainMode m_constrainMode;
     ViewportMode m_viewportMode;
