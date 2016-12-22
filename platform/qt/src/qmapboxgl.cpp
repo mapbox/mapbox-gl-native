@@ -141,7 +141,7 @@ std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
 /*!
     \enum QMapboxGLSettings::GLContextMode
 
-    This enum set the expectations towards the GL state.
+    This enum sets the expectations towards the GL state.
 
     \value UniqueGLContext  The GL context is only used by QMapboxGL, so it is not
     reset before each rendering. Use this mode if the intention is to only draw a
@@ -152,6 +152,36 @@ std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
     we call QMapboxGL::render for rendering a map.
 
     \sa contextMode()
+*/
+
+/*!
+    \enum QMapboxGLSettings::ConstrainMode
+
+    This enum sets whenever a map should wrap.
+
+    \value NoConstrain              The map will wrap on the horizontal axis. Since it doesn't
+    make sense to wrap on the vertical axis in a Mercator projection, the map will simply scroll
+    and show some empty space.
+
+    \value ConstrainHeightOnly      The map will wrap around the horizontal axis, like a spinning
+    globe. This is usually what you want.
+
+    \value ConstrainWidthAndHeight  The map won't wrap and panning is restrict to the boundaries
+    of the map.
+
+    \sa constrainMode()
+*/
+
+/*!
+    \enum QMapboxGLSettings::ViewportMode
+
+    This enum is used for flipping the map vertically.
+
+    \value DefaultViewport  Native horientation.
+
+    \value FlippedYViewport  Mirrored vertically.
+
+    \sa viewportMode()
 */
 
 /*!
@@ -169,70 +199,146 @@ QMapboxGLSettings::QMapboxGLSettings()
 {
 }
 
+/*!
+    Returns the OpenGL context mode. This is specially important when mixing
+    with other GL draw calls.
+
+    By default, it is set to QMapboxGLSettings::SharedGLContext.
+*/
 QMapboxGLSettings::GLContextMode QMapboxGLSettings::contextMode() const
 {
     return m_contextMode;
 }
 
+/*!
+    Sets the OpenGL context \a mode.
+*/
 void QMapboxGLSettings::setContextMode(GLContextMode mode)
 {
     m_contextMode = mode;
 }
 
+/*!
+    Returns the constrain mode. This is used to limit the map to wrap
+    around the globe horizontally.
+
+    By default, it is set to QMapboxGLSettings::ConstrainHeightOnly.
+*/
 QMapboxGLSettings::ConstrainMode QMapboxGLSettings::constrainMode() const
 {
     return m_constrainMode;
 }
 
+/*!
+    Sets the map constrain \a mode.
+*/
 void QMapboxGLSettings::setConstrainMode(ConstrainMode mode)
 {
     m_constrainMode = mode;
 }
 
+/*!
+    Returns the viewport mode. This is used to flip the vertical
+    orientation of the map as some devices may use inverted orientation.
+
+    By default, it is set to QMapboxGLSettings::DefaultViewport.
+*/
 QMapboxGLSettings::ViewportMode QMapboxGLSettings::viewportMode() const
 {
     return m_viewportMode;
 }
 
+/*!
+    Sets the viewport \a mode.
+*/
 void QMapboxGLSettings::setViewportMode(ViewportMode mode)
 {
     m_viewportMode = mode;
 }
 
+/*!
+    Returns the cache database maximum hard size in bytes. The database
+    will grow until the limit is reached. Setting a maximum size smaller
+    than the current size of an existing database is undefined.
+
+    By default, it is set to 50 MB.
+*/
 unsigned QMapboxGLSettings::cacheDatabaseMaximumSize() const
 {
     return m_cacheMaximumSize;
 }
 
+/*!
+    Returns the maximum allowed cache database \a size in bytes.
+*/
 void QMapboxGLSettings::setCacheDatabaseMaximumSize(unsigned size)
 {
     m_cacheMaximumSize = size;
 }
 
+/*!
+    Returns the cache database path. The cache is used for storing
+    recently used resources like tiles and also an offline tile database
+    pre-populated by the
+    \l {https://github.com/mapbox/mapbox-gl-native/blob/master/bin/offline.sh}
+    {Offline Tool}.
+
+    By default, it is set to \b :memory: meaning it will create a in-memory
+    cache instead of a file in the disk.
+*/
 QString QMapboxGLSettings::cacheDatabasePath() const
 {
     return m_cacheDatabasePath;
 }
 
+/*!
+    Sets the cache database \a path.
+
+    Setting the \a path to \b :memory: will create an in-memory cache.
+*/
 void QMapboxGLSettings::setCacheDatabasePath(const QString &path)
 {
     m_cacheDatabasePath = path;
 }
 
+/*!
+    Returns the asset path, which is the root directory from where
+    the \b asset:// scheme gets resolved in a style. \b asset:// can be used
+    for loading a resource from the disk in a style rather than fetching
+    it from the network.
+
+    By default, it is set to the value returned by QCoreApplication::applicationDirPath().
+*/
 QString QMapboxGLSettings::assetPath() const
 {
     return m_assetPath;
 }
 
+/*!
+    Sets the asset \a path.
+*/
 void QMapboxGLSettings::setAssetPath(const QString &path)
 {
     m_assetPath = path;
 }
 
+/*!
+    Returns the access token.
+
+    By default, it is taken from the environment variable \b MAPBOX_ACCESS_TOKEN
+    or empty if the variable is not set.
+*/
 QString QMapboxGLSettings::accessToken() const {
     return m_accessToken;
 }
 
+/*!
+    Sets the access \a token. An access token is required for styles and tiles
+    hosted at Mapbox servers.
+
+    An access token for the Starter plan can be created free of charge at the
+    \l {https://www.mapbox.com/pricing/}{Mapbox website}.
+*/
 void QMapboxGLSettings::setAccessToken(const QString &token)
 {
     m_accessToken = token;
