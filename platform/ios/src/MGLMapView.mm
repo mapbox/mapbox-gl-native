@@ -56,6 +56,7 @@
 #import "MGLAnnotationContainerView.h"
 #import "MGLAnnotationContainerView_Private.h"
 #import "MGLAttributionInfo.h"
+#import "MGLScaleControlView.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -230,6 +231,8 @@ public:
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
 @property (nonatomic) UIImageView *glSnapshotView;
+@property (nonatomic, readwrite) MGLScaleControlView *scaleControlView;
+@property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *scaleControlViewConstraints;
 @property (nonatomic, readwrite) UIImageView *compassView;
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *compassViewConstraints;
 @property (nonatomic, readwrite) UIImageView *logoView;
@@ -486,6 +489,13 @@ public:
     _compassView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_compassView];
     _compassViewConstraints = [NSMutableArray array];
+    
+    // setup scale control
+    //
+    _scaleControlView = [[MGLScaleControlView alloc] init];
+    _scaleControlView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:_scaleControlView];
+    _scaleControlViewConstraints = [NSMutableArray array];
 
     // setup interaction
     //
@@ -770,6 +780,31 @@ public:
 
 - (void)updateConstraints
 {
+    // scale control
+    //
+    [self removeConstraints:self.scaleControlViewConstraints];
+    [self.scaleControlViewConstraints removeAllObjects];
+    
+    [self.scaleControlViewConstraints addObject:
+     [NSLayoutConstraint constraintWithItem:self.scaleControlView
+                                  attribute:NSLayoutAttributeTop
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeTop
+                                 multiplier:1
+                                   constant:5+self.contentInset.top]];
+    
+    [self.scaleControlViewConstraints addObject:
+     [NSLayoutConstraint constraintWithItem:self.scaleControlView
+                                  attribute:NSLayoutAttributeLeading
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeLeading
+                                 multiplier:1
+                                   constant:8 + self.contentInset.left]];
+    
+    [self addConstraints:self.scaleControlViewConstraints];
+    
     // compass
     //
     [self removeConstraints:self.compassViewConstraints];
@@ -4587,7 +4622,8 @@ public:
         case mbgl::MapChangeRegionIsChanging:
         {
             [self updateCompass];
-
+            [self.scaleControlView updateWithZoomLevel:self.zoomLevel metersPerPoint:[self metersPerPointAtLatitude:self.latitude]];
+            
             if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
             {
                 [self.delegate mapViewRegionIsChanging:self];
