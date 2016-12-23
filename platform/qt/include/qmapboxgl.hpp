@@ -147,8 +147,7 @@ public:
     void setClasses(const QStringList &);
     QStringList getClasses() const;
 
-    QMapbox::TransitionOptions getTransitionOptions() const;
-    void setTransitionOptions(const QMapbox::TransitionOptions&);
+    void setTransitionOptions(qint64 duration, qint64 delay = 0);
 
     QMapbox::AnnotationID addPointAnnotation(const QMapbox::PointAnnotation &);
     QMapbox::AnnotationID addShapeAnnotation(const QMapbox::ShapeAnnotation &);
