@@ -289,3 +289,33 @@
 /* West longitude format, short: {longitude} */
 "COORD_W_SHORT" = "%@W";
 
+/* Distance format, long: {1 foot} */
+"DISTANCE_FOOT_LONG" = "%@ foot/feet";
+
+/* Distance format, short: {1 ft} */
+"DISTANCE_FOOT_SHORT" = "%@ ft";
+
+/* Distance format, long: {1 kilometer} */
+"DISTANCE_KILOMETER_LONG" = "%@ kilometer(s)";
+
+/* Distance format, short: {1 km} */
+"DISTANCE_KILOMETER_SHORT" = "%@ km";
+
+/* Distance format, long: {1 meter} */
+"DISTANCE_METER_LONG" = "%@ meter(s)";
+
+/* Distance format, short: {1 m} */
+"DISTANCE_METER_SHORT" = "%@ m";
+
+/* Distance format, long: {1 mile} */
+"DISTANCE_MILE_LONG" = "%@ mile(s)";
+
+/* Distance format, short: {1 mi} */
+"DISTANCE_MILE_SHORT" = "%@ mi";
+
+/* Distance format, long: {1 yard} */
+"DISTANCE_YARD_LONG" = "%@ yard(s)";
+
+/* Distance format, short: {1 yd} */
+"DISTANCE_YARD_SHORT" = "%@ yd";
+

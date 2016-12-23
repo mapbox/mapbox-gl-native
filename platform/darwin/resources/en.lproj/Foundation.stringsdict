@@ -50,5 +50,85 @@
 			<string>%d seconds</string>
 		</dict>
 	</dict>
+    <key>DISTANCE_METER_LONG</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@meter@</string>
+        <key>meter</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>@</string>
+            <key>one</key>
+            <string>%@ meter</string>
+            <key>other</key>
+            <string>%@ meters</string>
+        </dict>
+    </dict>
+    <key>DISTANCE_KILOMETER_LONG</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@kilometer@</string>
+        <key>kilometer</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>@</string>
+            <key>one</key>
+            <string>%@ kilometer</string>
+            <key>other</key>
+            <string>%@ kilometers</string>
+        </dict>
+    </dict>
+    <key>DISTANCE_FOOT_LONG</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@foot@</string>
+        <key>foot</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>@</string>
+            <key>one</key>
+            <string>%@ foot</string>
+            <key>other</key>
+            <string>%@ feet</string>
+        </dict>
+    </dict>
+    <key>DISTANCE_MILE_LONG</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@mile@</string>
+        <key>mile</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>@</string>
+            <key>one</key>
+            <string>%@ mile</string>
+            <key>other</key>
+            <string>%@ miles</string>
+        </dict>
+    </dict>
+    <key>DISTANCE_YARD_LONG</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@yard@</string>
+        <key>yard</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>@</string>
+            <key>one</key>
+            <string>%@ yard</string>
+            <key>other</key>
+            <string>%@ yards</string>
+        </dict>
+    </dict>
 </dict>
 </plist>
