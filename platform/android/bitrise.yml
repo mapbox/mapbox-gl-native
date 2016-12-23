@@ -83,13 +83,21 @@ workflows:
             echo "Compiling core tests:"
             BUILDTYPE=Debug make android-test-lib-arm-v7
     - script:
-        title: Run local JVM Unit tests
+        title: Run local JVM Unit tests on phone module
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
-            echo "Running unit tests from testapp/src/test:"
+            echo "Running unit tests from MapboxGLAndroidSDKTestApp/src/test:"
             make run-android-unit-test
+    - script:
+        title: Run local JVM Unit tests on wear module
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - content: |-
+            #!/bin/bash
+            echo "Running unit tests from MapboxGLAndroidSDKWearTestApp/src/test:"
+            make run-android-wear-unit-test
     - script:
         title: Generate Espresso sanity tests
         run_if: '{{enveq "SKIPCI" "false"}}'

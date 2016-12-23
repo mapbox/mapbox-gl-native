@@ -511,7 +511,7 @@ run-android-core-test-$1: android-test-lib-$1
 	# Compile main sources and extract the classes (using the test app to get all transitive dependencies in one place)
 	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:assembleDebug
 	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk classes.dex -d build/android-$1/$(BUILDTYPE)
-	
+
 	#Compile Test runner
 	find platform/android/src/test -name "*.java" > build/android-$1/$(BUILDTYPE)/java-sources.txt
 	javac -sourcepath platform/android/src/test -d build/android-$1/$(BUILDTYPE) -source 1.7 -target 1.7 @build/android-$1/$(BUILDTYPE)/java-sources.txt
@@ -540,7 +540,7 @@ run-android-core-test-$1: android-test-lib-$1
 
 .PHONY: run-android-$1
 run-android-$1: android-$1
-	cd platform/android  && ./gradlew :MapboxGLAndroidSDKTestApp:installDebug && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity	
+	cd platform/android  && ./gradlew :MapboxGLAndroidSDKTestApp:installDebug && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity
 
 apackage: android-lib-$1
 endef
@@ -552,10 +552,14 @@ android: android-arm-v7
 
 .PHONY: run-android
 run-android: run-android-arm-v7
-	 
+
 .PHONY: run-android-unit-test
 run-android-unit-test:
 	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:testDebugUnitTest --continue
+
+.PHONY: run-android-wear-unit-test
+run-android-wear-unit-test:
+	cd platform/android && ./gradlew :MapboxGLAndroidSDKWearTestApp:testDebugUnitTest --continue
 
 .PHONY: android-ui-test
 android-ui-test:
@@ -563,7 +567,7 @@ android-ui-test:
 
 .PHONY: run-android-ui-test
 run-android-ui-test:
-	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:connectedAndroidTest -i	
+	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:connectedAndroidTest -i
 
 .PHONY: run-android-ui-test-aws
 run-android-ui-test-aws:
@@ -583,9 +587,9 @@ test-code-android:
 
 .PHONY: android-ndk-stack
 android-ndk-stack:
-	adb logcat | ndk-stack -sym build/android-arm-v7/Debug	
+	adb logcat | ndk-stack -sym build/android-arm-v7/Debug
 
-.PHONY: android-checkstyle	
+.PHONY: android-checkstyle
 android-checkstyle:
 	cd platform/android && ./gradlew checkstyle
 
