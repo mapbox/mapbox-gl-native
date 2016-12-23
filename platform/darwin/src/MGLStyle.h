@@ -189,7 +189,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 /**
  A set containing the style’s sources.
  */
-@property (nonatomic, strong) NS_MUTABLE_SET_OF(MGLSource *) *sources;
+@property (nonatomic, strong) NS_SET_OF(MGLSource *) *sources;
 
 /**
  Returns a source with the given identifier in the current style.
@@ -240,7 +240,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  The layers included in the style, arranged according to their back-to-front
  ordering on the screen.
  */
-@property (nonatomic, strong) NS_MUTABLE_ARRAY_OF(MGLStyleLayer *) *layers;
+@property (nonatomic, strong) NS_ARRAY_OF(MGLStyleLayer *) *layers;
 
 /**
  Returns a style layer with the given identifier in the current style.
