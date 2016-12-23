@@ -81,26 +81,6 @@ auto fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
     return mbgl::StyleSourcedAnnotation { std::move(mbglLineString), styleLayer.toStdString() };
 }
 
-auto fromQMapboxTransitionOptions(const QMapbox::TransitionOptions &options) {
-    auto convert = [](auto& value) -> mbgl::optional<mbgl::Duration> {
-        if (value.isValid()) {
-            return std::chrono::duration_cast<mbgl::Duration>(mbgl::Milliseconds(value.template value<qint64>()));
-        };
-        return {};
-    };
-    return mbgl::style::TransitionOptions { convert(options.duration), convert(options.delay) };
-}
-
-auto toQMapboxTransitionOptions(const mbgl::style::TransitionOptions &options) {
-    auto convert = [](auto& value) -> QVariant {
-        if (value) {
-            return qint64(std::chrono::duration_cast<mbgl::Milliseconds>(*value).count());
-        }
-        return {};
-    };
-    return QMapbox::TransitionOptions { convert(options.duration), convert(options.delay) };
-}
-
 auto fromQStringList(const QStringList &list)
 {
     std::vector<std::string> strings;
@@ -485,12 +465,12 @@ QStringList QMapboxGL::getClasses() const
     return classNames;
 }
 
-QMapbox::TransitionOptions QMapboxGL::getTransitionOptions() const {
-    return toQMapboxTransitionOptions(d_ptr->mapObj->getTransitionOptions());
-}
+void QMapboxGL::setTransitionOptions(qint64 duration, qint64 delay) {
+    static auto convert = [](qint64 value) -> mbgl::optional<mbgl::Duration> {
+        return std::chrono::duration_cast<mbgl::Duration>(mbgl::Milliseconds(value));
+    };
 
-void QMapboxGL::setTransitionOptions(const QMapbox::TransitionOptions &options) {
-    d_ptr->mapObj->setTransitionOptions(fromQMapboxTransitionOptions(options));
+    d_ptr->mapObj->setTransitionOptions(mbgl::style::TransitionOptions{ convert(duration), convert(delay) });
 }
 
 mbgl::Annotation fromPointAnnotation(const PointAnnotation &pointAnnotation) {

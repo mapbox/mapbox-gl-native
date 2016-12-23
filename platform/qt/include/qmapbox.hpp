@@ -74,11 +74,6 @@ struct Q_DECL_EXPORT CustomLayerRenderParameters {
     double altitude;
 };
 
-struct Q_DECL_EXPORT TransitionOptions {
-    QVariant duration; // qint64
-    QVariant delay; // qint64
-};
-
 typedef void (*CustomLayerInitializeFunction)(void* context) ;
 typedef void (*CustomLayerRenderFunction)(void* context, const CustomLayerRenderParameters&);
 typedef void (*CustomLayerDeinitializeFunction)(void* context);
