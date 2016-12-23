@@ -180,6 +180,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGLPointCollectionFeature : MGLPointCollection <MGLFeature>
 @end
 
+// https://github.com/mapbox/mapbox-gl-native/issues/7473
+@compatibility_alias MGLMultiPointFeature MGLPointCollectionFeature;
+
 /**
  An `MGLMultiPolylineFeature` object associates a multipolyline shape with an
  optional identifier and attributes.
