@@ -75,6 +75,7 @@ public:
 
     RenderState renderState = RenderState::Never;
     Transform transform;
+    TransformState state;
 
     const MapMode mode;
     const GLContextMode contextMode;
@@ -279,6 +280,7 @@ void Map::Impl::update() {
         render(stillImageRequest->view);
     }
 
+    state = transform.getState();
     updateFlags = Update::Nothing;
 
     // When no transition is in progress, updateTransitions returns Nothing, which means we don't
@@ -292,7 +294,7 @@ void Map::Impl::update() {
 
 void Map::Impl::render(View& view) {
     if (!painter) {
-        painter = std::make_unique<Painter>(backend.getContext(), transform.getState(), pixelRatio);
+        painter = std::make_unique<Painter>(backend.getContext(), state, pixelRatio);
     }
 
     FrameData frameData { timePoint,
