@@ -66,8 +66,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     NSPoint _mouseLocationForMapViewContextMenu;
     NSUInteger _droppedPinCounter;
     NSNumberFormatter *_spellOutNumberFormatter;
-
-    BOOL _isLocalizingLabels;
+    
+    BOOL _isTraditional;
     BOOL _showsToolTipsOnDroppedPins;
     BOOL _randomizesCursorsOnDroppedPins;
     BOOL _isTouringWorld;
@@ -127,12 +127,12 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 - (void)window:(NSWindow *)window willEncodeRestorableState:(NSCoder *)state {
     [state encodeObject:self.mapView.styleURL forKey:@"MBXMapViewStyleURL"];
-    [state encodeBool:_isLocalizingLabels forKey:@"MBXLocalizeLabels"];
+    [state encodeBool:_isTraditional forKey:@"MBXLocalizeLabels"];
 }
 
 - (void)window:(NSWindow *)window didDecodeRestorableState:(NSCoder *)state {
     self.mapView.styleURL = [state decodeObjectForKey:@"MBXMapViewStyleURL"];
-    _isLocalizingLabels = [state decodeBoolForKey:@"MBXLocalizeLabels"];
+    _isTraditional = [state decodeBoolForKey:@"MBXLocalizeLabels"];
 }
 
 #pragma mark Services
@@ -339,13 +339,13 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 - (IBAction)setLabelLanguage:(NSMenuItem *)sender {
-    _isLocalizingLabels = sender.tag;
+    _isTraditional = sender.tag;
     [self reload:sender];
 }
 
 - (void)updateLabels {
     MGLStyle *style = self.mapView.style;
-    NSString *preferredLanguage = _isLocalizingLabels ? [MGLVectorSource preferredMapboxStreetsLanguage] : nil;
+    NSString *preferredLanguage = @"zh";
     NSMutableDictionary *localizedKeysByKeyBySourceIdentifier = [NSMutableDictionary dictionary];
     for (MGLSymbolStyleLayer *layer in style.layers) {
         if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
@@ -388,6 +388,18 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
             }];
             function.stops = stops;
             layer.text = function;
+        }
+        
+        if ([layer.textTransform isKindOfClass:[MGLStyleConstantValue class]]) {
+            layer.textTransform = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLTextTransform:_isTraditional ? MGLTextTransformUppercase : MGLTextTransformLowercase]];
+        } else if ([layer.textTransform isKindOfClass:[MGLStyleFunction class]]) {
+            MGLStyleFunction *function = (MGLStyleFunction<NSValue *> *)layer.textTransform;
+            NSMutableDictionary *stops = function.stops.mutableCopy;
+            [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLStyleConstantValue<NSValue *> *stop, BOOL *done) {
+                stops[zoomLevel] = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLTextTransform:_isTraditional ? MGLTextTransformUppercase : MGLTextTransformLowercase]];
+            }];
+            function.stops = stops;
+            layer.textTransform = function;
         }
     }
 }
@@ -795,7 +807,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     NSString *title;
     for (id <MGLFeature> feature in features) {
         if (!title) {
-            title = [feature attributeForKey:@"name_en"] ?: [feature attributeForKey:@"name"];
+            title = [feature attributeForKey:@"name_zh"] ?: [feature attributeForKey:@"name"];
         }
     }
 
@@ -903,11 +915,12 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return self.styleLayersTableView.clickedRow >= 0 || self.styleLayersTableView.selectedRow >= 0;
     }
     if (menuItem.action == @selector(setLabelLanguage:)) {
-        menuItem.state = menuItem.tag == _isLocalizingLabels ? NSOnState: NSOffState;
+        menuItem.state = menuItem.tag == _isTraditional ? NSOnState: NSOffState;
+        NSLocale *locale = [NSLocale localeWithLocaleIdentifier:[NSBundle mainBundle].developmentLocalization];
         if (menuItem.tag) {
-            NSLocale *locale = [NSLocale localeWithLocaleIdentifier:[NSBundle mainBundle].developmentLocalization];
-            NSString *preferredLanguage = [MGLVectorSource preferredMapboxStreetsLanguage];
-            menuItem.title = [locale displayNameForKey:NSLocaleIdentifier value:preferredLanguage];
+            menuItem.title = [locale displayNameForKey:NSLocaleIdentifier value:@"zh-Hant"];
+        } else {
+            menuItem.title = [locale displayNameForKey:NSLocaleIdentifier value:@"zh-Hans"];
         }
         return YES;
     }
