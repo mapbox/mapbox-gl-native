@@ -200,8 +200,6 @@ void Map::render(View& view) {
 
     impl->backend.notifyMapChange(MapChangeWillStartRenderingFrame);
 
-    const Update flags = impl->transform.updateTransitions(Clock::now());
-
     impl->render(view);
 
     impl->backend.notifyMapChange(isFullyLoaded() ?
@@ -218,12 +216,6 @@ void Map::render(View& view) {
             impl->backend.notifyMapChange(MapChangeDidFinishLoadingMap);
         }
     }
-
-    // Triggers an asynchronous update, that eventually triggers a view
-    // invalidation, causing renderSync to be called again if in transition.
-    if (flags != Update::Nothing) {
-        impl->onUpdate(flags);
-    }
 }
 
 void Map::triggerRepaint() {
@@ -235,14 +227,17 @@ void Map::Impl::update() {
         updateFlags = Update::Nothing;
     }
 
-    if (updateFlags == Update::Nothing || (mode == MapMode::Still && !stillImageRequest)) {
-        return;
-    }
-
     // This time point is used to:
     // - Calculate style property transitions;
     // - Hint style sources to notify when all its tiles are loaded;
     timePoint = Clock::now();
+
+    const auto newFlags = transform.updateTransitions(timePoint);
+    updateFlags |= newFlags;
+
+    if (updateFlags == Update::Nothing || (mode == MapMode::Still && !stillImageRequest)) {
+        return;
+    }
 
     if (style->loaded && updateFlags & Update::AnnotationStyle) {
         annotationManager->updateStyle(*style);
@@ -285,6 +280,14 @@ void Map::Impl::update() {
     }
 
     updateFlags = Update::Nothing;
+
+    // When no transition is in progress, updateTransitions returns Nothing, which means we don't
+    // have to trigger a subsequent update. When a current transition is in progress, it'll return
+    // UpdateStyle (when zoom levels change) or Repaint (when only lat/lon changes). In both cases,
+    // we'll have to render a new frame immediately.
+    if (newFlags != Update::Nothing) {
+        onUpdate(newFlags);
+    }
 }
 
 void Map::Impl::render(View& view) {
