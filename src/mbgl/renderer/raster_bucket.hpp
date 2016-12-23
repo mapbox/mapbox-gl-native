@@ -9,13 +9,13 @@ namespace mbgl {
 
 class RasterBucket : public Bucket {
 public:
-    RasterBucket(PremultipliedImage&&);
+    RasterBucket(UnassociatedImage&&);
 
     void upload(gl::Context&) override;
     void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
     bool hasData() const override;
 
-    PremultipliedImage image;
+    UnassociatedImage image;
     optional<gl::Texture> texture;
 };
 

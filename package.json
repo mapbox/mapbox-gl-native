@@ -23,7 +23,7 @@
     "express": "^4.11.1",
     "lodash": "^4.16.4",
     "mapbox-gl-style-spec": "mapbox/mapbox-gl-style-spec#49e8b407bdbbe6f7c92dbcb56d3d51f425fc2653",
-    "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#da53a81453068f4c2b440f9077d6bd5e7e14ff3d",
+    "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#2bdca923fc4190156b5a22af71be29442451db54",
     "mkdirp": "^0.5.1",
     "node-cmake": "^1.2.1",
     "pixelmatch": "^4.0.2",
