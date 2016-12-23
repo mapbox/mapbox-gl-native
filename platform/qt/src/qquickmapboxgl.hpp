@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qmapbox.hpp"
+#include "qmapboxgl.hpp"
 #include "qquickmapboxglmapparameter.hpp"
 
 #include <QColor>
@@ -98,7 +99,7 @@ public slots:
     void setCenter(const QGeoCoordinate &center);
 
 private slots:
-    void onMapChanged(QMapbox::MapChange);
+    void onMapChanged(QMapboxGL::MapChange);
     void onParameterPropertyUpdated(const QString &name);
 
 private:

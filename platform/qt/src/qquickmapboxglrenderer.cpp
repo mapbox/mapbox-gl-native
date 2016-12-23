@@ -46,7 +46,7 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
     auto quickMap = qobject_cast<QQuickMapboxGL*>(item);
     if (!m_initialized) {
         QObject::connect(m_map.data(), &QMapboxGL::needsRendering, quickMap, &QQuickMapboxGL::update);
-        QObject::connect(m_map.data(), SIGNAL(mapChanged(QMapbox::MapChange)), quickMap, SLOT(onMapChanged(QMapbox::MapChange)));
+        QObject::connect(m_map.data(), SIGNAL(mapChanged(QMapboxGL::MapChange)), quickMap, SLOT(onMapChanged(QMapboxGL::MapChange)));
         QObject::connect(this, &QQuickMapboxGLRenderer::centerChanged, quickMap, &QQuickMapboxGL::setCenter);
         m_initialized = true;
     }

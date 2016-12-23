@@ -92,7 +92,7 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
 
             m_sourceAdded = true;
 
-            QFile geojson(":source.geojson");
+            QFile geojson(":source1.geojson");
             geojson.open(QIODevice::ReadOnly);
 
             // The data source for the route line and markers

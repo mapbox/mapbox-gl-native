@@ -11,8 +11,8 @@ class QMapboxGLTest : public QObject, public ::testing::Test {
 
 public:
     QMapboxGLTest() : app(argc, const_cast<char**>(&argv)), map(nullptr, settings) {
-        connect(&map, SIGNAL(mapChanged(QMapbox::MapChange)),
-                this, SLOT(onMapChanged(QMapbox::MapChange)));
+        connect(&map, SIGNAL(mapChanged(QMapboxGL::MapChange)),
+                this, SLOT(onMapChanged(QMapboxGL::MapChange)));
         connect(&map, SIGNAL(needsRendering()),
                 this, SLOT(onNeedsRendering()));
 
@@ -23,8 +23,8 @@ public:
         map.setCoordinateZoom(QMapbox::Coordinate(60.170448, 24.942046), 14);
     }
 
-    void runUntil(QMapbox::MapChange status) {
-        changeCallback = [&](QMapbox::MapChange change) {
+    void runUntil(QMapboxGL::MapChange status) {
+        changeCallback = [&](QMapboxGL::MapChange change) {
             if (change == status) {
                 app.exit();
                 changeCallback = nullptr;
@@ -45,10 +45,10 @@ protected:
     QMapboxGLSettings settings;
     QMapboxGL map;
 
-    std::function<void(QMapbox::MapChange)> changeCallback;
+    std::function<void(QMapboxGL::MapChange)> changeCallback;
 
 private slots:
-    void onMapChanged(QMapbox::MapChange change) {
+    void onMapChanged(QMapboxGL::MapChange change) {
         if (changeCallback) {
             changeCallback(change);
         }
@@ -65,16 +65,16 @@ TEST_F(QMapboxGLTest, TEST_DISABLED_ON_CI(styleJson)) {
 
     map.setStyleJson(json);
     ASSERT_EQ(map.styleJson(), json);
-    runUntil(QMapbox::MapChangeDidFinishLoadingMap);
+    runUntil(QMapboxGL::MapChangeDidFinishLoadingMap);
 
     map.setStyleJson("invalid json");
-    runUntil(QMapbox::MapChangeDidFailLoadingMap);
+    runUntil(QMapboxGL::MapChangeDidFailLoadingMap);
 
     map.setStyleJson("\"\"");
-    runUntil(QMapbox::MapChangeDidFailLoadingMap);
+    runUntil(QMapboxGL::MapChangeDidFailLoadingMap);
 
     map.setStyleJson(QString());
-    runUntil(QMapbox::MapChangeDidFailLoadingMap);
+    runUntil(QMapboxGL::MapChangeDidFailLoadingMap);
 }
 
 TEST_F(QMapboxGLTest, TEST_DISABLED_ON_CI(styleUrl)) {
@@ -82,13 +82,13 @@ TEST_F(QMapboxGLTest, TEST_DISABLED_ON_CI(styleUrl)) {
 
     map.setStyleUrl(url);
     ASSERT_EQ(map.styleUrl(), url);
-    runUntil(QMapbox::MapChangeDidFinishLoadingMap);
+    runUntil(QMapboxGL::MapChangeDidFinishLoadingMap);
 
     map.setStyleUrl("invalid://url");
-    runUntil(QMapbox::MapChangeDidFailLoadingMap);
+    runUntil(QMapboxGL::MapChangeDidFailLoadingMap);
 
     map.setStyleUrl(QString());
-    runUntil(QMapbox::MapChangeDidFailLoadingMap);
+    runUntil(QMapboxGL::MapChangeDidFailLoadingMap);
 }
 
 #include "qmapboxgl.moc"
