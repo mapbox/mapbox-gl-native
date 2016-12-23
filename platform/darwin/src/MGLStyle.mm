@@ -127,9 +127,9 @@ static NSURL *MGLStyleURL_emerald;
 
 #pragma mark Sources
 
-- (NS_SET_OF(MGLSource *) *)sources {
+- (NS_SET_OF(__kindof MGLSource *) *)sources {
     auto rawSources = self.mapView.mbglMap->getSources();
-    NSMutableSet *sources = [NSMutableSet setWithCapacity:rawSources.size()];
+    NS_MUTABLE_SET_OF(__kindof MGLSource *) *sources = [NSMutableSet setWithCapacity:rawSources.size()];
     for (auto rawSource = rawSources.begin(); rawSource != rawSources.end(); ++rawSource) {
         MGLSource *source = [self sourceFromMBGLSource:*rawSource];
         [sources addObject:source];
@@ -137,7 +137,7 @@ static NSURL *MGLStyleURL_emerald;
     return sources;
 }
 
-- (void)setSources:(NS_SET_OF(MGLSource *) *)sources {
+- (void)setSources:(NS_SET_OF(__kindof MGLSource *) *)sources {
     for (MGLSource *source in self.sources) {
         [self removeSource:source];
     }
@@ -222,10 +222,10 @@ static NSURL *MGLStyleURL_emerald;
 
 #pragma mark Style layers
 
-- (NS_ARRAY_OF(MGLStyleLayer *) *)layers
+- (NS_ARRAY_OF(__kindof MGLStyleLayer *) *)layers
 {
     auto layers = self.mapView.mbglMap->getLayers();
-    NSMutableArray *styleLayers = [NSMutableArray arrayWithCapacity:layers.size()];
+    NS_MUTABLE_ARRAY_OF(__kindof MGLStyleLayer *) *styleLayers = [NSMutableArray arrayWithCapacity:layers.size()];
     for (auto layer : layers) {
         MGLStyleLayer *styleLayer = [self layerFromMBGLLayer:layer];
         [styleLayers addObject:styleLayer];
@@ -233,7 +233,7 @@ static NSURL *MGLStyleURL_emerald;
     return styleLayers;
 }
 
-- (void)setLayers:(NS_ARRAY_OF(MGLStyleLayer *) *)layers {
+- (void)setLayers:(NS_ARRAY_OF(__kindof MGLStyleLayer *) *)layers {
     for (MGLStyleLayer *layer in self.layers) {
         [self removeLayer:layer];
     }
