@@ -50,6 +50,6 @@ public slots:
 
 signals:
     void needsRendering();
-    void mapChanged(QMapbox::MapChange);
+    void mapChanged(QMapboxGL::MapChange);
     void copyrightsChanged(const QString &copyrightsHtml);
 };

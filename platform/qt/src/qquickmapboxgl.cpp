@@ -1,6 +1,5 @@
 #include "qquickmapboxgl.hpp"
 
-#include "qmapbox.hpp"
 #include "qquickmapboxglmapparameter.hpp"
 #include "qquickmapboxglrenderer.hpp"
 
@@ -202,9 +201,9 @@ void QQuickMapboxGL::pan(int dx, int dy)
     update();
 }
 
-void QQuickMapboxGL::onMapChanged(QMapbox::MapChange change)
+void QQuickMapboxGL::onMapChanged(QMapboxGL::MapChange change)
 {
-    if (change == QMapbox::MapChangeDidFinishLoadingStyle) {
+    if (change == QMapboxGL::MapChangeDidFinishLoadingStyle) {
         m_styleLoaded = true;
         update();
     }

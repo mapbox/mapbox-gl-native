@@ -18,24 +18,6 @@
 static_assert(mbgl::underlying_type(QMapbox::Online) == mbgl::underlying_type(mbgl::NetworkStatus::Status::Online), "error");
 static_assert(mbgl::underlying_type(QMapbox::Offline) == mbgl::underlying_type(mbgl::NetworkStatus::Status::Offline), "error");
 
-// mbgl::MapChange
-static_assert(mbgl::underlying_type(QMapbox::MapChangeRegionWillChange) == mbgl::underlying_type(mbgl::MapChangeRegionWillChange), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeRegionWillChangeAnimated) == mbgl::underlying_type(mbgl::MapChangeRegionWillChangeAnimated), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeRegionIsChanging) == mbgl::underlying_type(mbgl::MapChangeRegionIsChanging), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeRegionDidChange) == mbgl::underlying_type(mbgl::MapChangeRegionDidChange), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeRegionDidChangeAnimated) == mbgl::underlying_type(mbgl::MapChangeRegionDidChangeAnimated), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeWillStartLoadingMap) == mbgl::underlying_type(mbgl::MapChangeWillStartLoadingMap), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeDidFinishLoadingMap) == mbgl::underlying_type(mbgl::MapChangeDidFinishLoadingMap), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeDidFailLoadingMap) == mbgl::underlying_type(mbgl::MapChangeDidFailLoadingMap), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeWillStartRenderingFrame) == mbgl::underlying_type(mbgl::MapChangeWillStartRenderingFrame), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeDidFinishRenderingFrame) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingFrame), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeDidFinishRenderingFrameFullyRendered) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingFrameFullyRendered), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeWillStartRenderingMap) == mbgl::underlying_type(mbgl::MapChangeWillStartRenderingMap), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeDidFinishRenderingMap) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingMap), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeDidFinishRenderingMapFullyRendered) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingMapFullyRendered), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeDidFinishLoadingStyle) == mbgl::underlying_type(mbgl::MapChangeDidFinishLoadingStyle), "error");
-static_assert(mbgl::underlying_type(QMapbox::MapChangeSourceDidChange) == mbgl::underlying_type(mbgl::MapChangeSourceDidChange), "error");
-
 namespace QMapbox {
 
 Q_DECL_EXPORT NetworkMode networkMode()

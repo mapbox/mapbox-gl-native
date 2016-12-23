@@ -71,6 +71,14 @@ private:
     QString m_accessToken;
 };
 
+struct Q_DECL_EXPORT QMapboxGLCameraOptions {
+    QVariant center;  // Coordinate
+    QVariant anchor;  // QPointF
+    QVariant zoom;    // double
+    QVariant angle;   // double
+    QVariant pitch;   // double
+};
+
 class Q_DECL_EXPORT QMapboxGL : public QObject
 {
     Q_OBJECT
@@ -86,6 +94,26 @@ class Q_DECL_EXPORT QMapboxGL : public QObject
     Q_PROPERTY(QMargins margins READ margins WRITE setMargins)
 
 public:
+    // Reflects mbgl::MapChange.
+    enum MapChange {
+        MapChangeRegionWillChange = 0,
+        MapChangeRegionWillChangeAnimated,
+        MapChangeRegionIsChanging,
+        MapChangeRegionDidChange,
+        MapChangeRegionDidChangeAnimated,
+        MapChangeWillStartLoadingMap,
+        MapChangeDidFinishLoadingMap,
+        MapChangeDidFailLoadingMap,
+        MapChangeWillStartRenderingFrame,
+        MapChangeDidFinishRenderingFrame,
+        MapChangeDidFinishRenderingFrameFullyRendered,
+        MapChangeWillStartRenderingMap,
+        MapChangeDidFinishRenderingMap,
+        MapChangeDidFinishRenderingMapFullyRendered,
+        MapChangeDidFinishLoadingStyle,
+        MapChangeSourceDidChange
+    };
+
     // Determines the orientation of the map.
     enum NorthOrientation {
         NorthUpwards, // Default
@@ -137,7 +165,7 @@ public:
     void setCoordinate(const QMapbox::Coordinate &);
     void setCoordinateZoom(const QMapbox::Coordinate &, double zoom);
 
-    void jumpTo(const QMapbox::CameraOptions&);
+    void jumpTo(const QMapboxGLCameraOptions&);
 
     void setGestureInProgress(bool inProgress);
 
@@ -209,7 +237,7 @@ public slots:
 
 signals:
     void needsRendering();
-    void mapChanged(QMapbox::MapChange);
+    void mapChanged(QMapboxGL::MapChange);
     void copyrightsChanged(const QString &copyrightsHtml);
 
 private:
@@ -217,5 +245,7 @@ private:
 
     QMapboxGLPrivate *d_ptr;
 };
+
+Q_DECLARE_METATYPE(QMapboxGL::MapChange);
 
 #endif // QMAPBOXGL_H
