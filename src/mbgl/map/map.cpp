@@ -63,8 +63,8 @@ public:
     void onStyleError() override;
     void onResourceError(std::exception_ptr) override;
 
-    void update();
     void render(View&);
+    void renderStill();
 
     void loadStyleJSON(const std::string&);
 
@@ -83,7 +83,6 @@ public:
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
 
     Update updateFlags = Update::Nothing;
-    util::AsyncTask asyncUpdate;
 
     std::unique_ptr<AnnotationManager> annotationManager;
     std::unique_ptr<Painter> painter;
@@ -96,10 +95,11 @@ public:
 
     std::unique_ptr<AsyncRequest> styleRequest;
 
-    std::unique_ptr<StillImageRequest> stillImageRequest;
     size_t sourceCacheSize;
-    TimePoint timePoint;
     bool loading = false;
+
+    util::AsyncTask asyncInvalidate;
+    std::unique_ptr<StillImageRequest> stillImageRequest;
 };
 
 Map::Map(Backend& backend,
@@ -142,8 +142,14 @@ Map::Impl::Impl(Map& map_,
       mode(mode_),
       contextMode(contextMode_),
       pixelRatio(pixelRatio_),
-      asyncUpdate([this] { update(); }),
-      annotationManager(std::make_unique<AnnotationManager>(pixelRatio)) {
+      annotationManager(std::make_unique<AnnotationManager>(pixelRatio)),
+      asyncInvalidate([this] {
+          if (mode == MapMode::Continuous) {
+              backend.invalidate();
+          } else {
+              renderStill();
+          }
+      }) {
 }
 
 Map::~Map() {
@@ -185,64 +191,37 @@ void Map::renderStill(View& view, StillImageCallback callback) {
     }
 
     impl->stillImageRequest = std::make_unique<StillImageRequest>(view, std::move(callback));
-    impl->updateFlags |= Update::RenderStill;
-    impl->asyncUpdate.send();
+    impl->onUpdate(Update::Repaint);
 }
 
-void Map::render(View& view) {
-    if (!impl->style) {
+void Map::Impl::renderStill() {
+    if (!stillImageRequest) {
         return;
     }
 
-    if (impl->renderState == RenderState::Never) {
-        impl->backend.notifyMapChange(MapChangeWillStartRenderingMap);
-    }
-
-    impl->backend.notifyMapChange(MapChangeWillStartRenderingFrame);
-
-    const Update flags = impl->transform.updateTransitions(Clock::now());
-
-    impl->render(view);
-
-    impl->backend.notifyMapChange(isFullyLoaded() ?
-        MapChangeDidFinishRenderingFrameFullyRendered :
-        MapChangeDidFinishRenderingFrame);
-
-    if (!isFullyLoaded()) {
-        impl->renderState = RenderState::Partial;
-    } else if (impl->renderState != RenderState::Fully) {
-        impl->renderState = RenderState::Fully;
-        impl->backend.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
-        if (impl->loading) {
-            impl->loading = false;
-            impl->backend.notifyMapChange(MapChangeDidFinishLoadingMap);
-        }
-    }
-
-    // Triggers an asynchronous update, that eventually triggers a view
-    // invalidation, causing renderSync to be called again if in transition.
-    if (flags != Update::Nothing) {
-        impl->onUpdate(flags);
-    }
+    // TODO: determine whether we need activate/deactivate
+    BackendScope guard(backend);
+    render(stillImageRequest->view);
 }
 
 void Map::triggerRepaint() {
     impl->backend.invalidate();
 }
 
-void Map::Impl::update() {
-    if (!style) {
-        updateFlags = Update::Nothing;
-    }
+void Map::render(View& view) {
+    impl->render(view);
+}
 
-    if (updateFlags == Update::Nothing || (mode == MapMode::Still && !stillImageRequest)) {
+void Map::Impl::render(View& view) {
+    if (!style) {
         return;
     }
 
-    // This time point is used to:
-    // - Calculate style property transitions;
-    // - Hint style sources to notify when all its tiles are loaded;
-    timePoint = Clock::now();
+    TimePoint timePoint = Clock::now();
+
+    auto flags = transform.updateTransitions(timePoint);
+
+    updateFlags |= flags;
 
     if (style->loaded && updateFlags & Update::AnnotationStyle) {
         annotationManager->updateStyle(*style);
@@ -276,46 +255,74 @@ void Map::Impl::update() {
 
     style->updateTiles(parameters);
 
-    if (mode == MapMode::Continuous) {
-        backend.invalidate();
-    } else if (stillImageRequest && style->isLoaded()) {
-        // TODO: determine whether we need activate/deactivate
-        BackendScope guard(backend);
-        render(stillImageRequest->view);
-    }
-
     updateFlags = Update::Nothing;
-}
 
-void Map::Impl::render(View& view) {
     if (!painter) {
         painter = std::make_unique<Painter>(backend.getContext(), transform.getState(), pixelRatio);
     }
 
-    FrameData frameData { timePoint,
-                          pixelRatio,
-                          mode,
-                          contextMode,
-                          debugOptions };
+    if (mode == MapMode::Continuous) {
+        if (renderState == RenderState::Never) {
+            backend.notifyMapChange(MapChangeWillStartRenderingMap);
+        }
 
-    painter->render(*style,
-                    frameData,
-                    view,
-                    annotationManager->getSpriteAtlas());
+        backend.notifyMapChange(MapChangeWillStartRenderingFrame);
 
-    if (mode == MapMode::Still) {
+        FrameData frameData { timePoint,
+                              pixelRatio,
+                              mode,
+                              contextMode,
+                              debugOptions };
+
+        painter->render(*style,
+                        frameData,
+                        view,
+                        annotationManager->getSpriteAtlas());
+
+        painter->cleanup();
+
+        backend.notifyMapChange(style->isLoaded() ?
+            MapChangeDidFinishRenderingFrameFullyRendered :
+            MapChangeDidFinishRenderingFrame);
+
+        if (!style->isLoaded()) {
+            renderState = RenderState::Partial;
+        } else if (renderState != RenderState::Fully) {
+            renderState = RenderState::Fully;
+            backend.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
+            if (loading) {
+                loading = false;
+                backend.notifyMapChange(MapChangeDidFinishLoadingMap);
+            }
+        }
+
+        if (style->hasTransitions()) {
+            flags |= Update::RecalculateStyle;
+        } else if (painter->needsAnimation()) {
+            flags |= Update::Repaint;
+        }
+
+        // Only schedule an update if we need to paint another frame due to transitions or
+        // animations that are still in progress
+        if (flags != Update::Nothing) {
+            onUpdate(flags);
+        }
+    } else if (stillImageRequest && style->isLoaded()) {
+        FrameData frameData { timePoint,
+                              pixelRatio,
+                              mode,
+                              contextMode,
+                              debugOptions };
+
+        painter->render(*style,
+                        frameData,
+                        view,
+                        annotationManager->getSpriteAtlas());
+
         auto request = std::move(stillImageRequest);
         request->callback(nullptr);
-    }
 
-    painter->cleanup();
-
-    if (style->hasTransitions()) {
-        updateFlags |= Update::RecalculateStyle;
-        asyncUpdate.send();
-    } else if (painter->needsAnimation()) {
-        updateFlags |= Update::Repaint;
-        asyncUpdate.send();
+        painter->cleanup();
     }
 }
 
@@ -399,8 +406,7 @@ void Map::Impl::loadStyleJSON(const std::string& json) {
         map.setPitch(map.getDefaultPitch());
     }
 
-    updateFlags |= Update::Classes | Update::RecalculateStyle | Update::AnnotationStyle;
-    asyncUpdate.send();
+    onUpdate(Update::Classes | Update::RecalculateStyle | Update::AnnotationStyle);
 }
 
 std::string Map::getStyleURL() const {
@@ -1075,9 +1081,9 @@ void Map::Impl::onSourceAttributionChanged(style::Source&, const std::string&) {
 
 void Map::Impl::onUpdate(Update flags) {
     updateFlags |= flags;
-    asyncUpdate.send();
+    asyncInvalidate.send();
 }
-    
+
 void Map::Impl::onStyleLoaded() {
     backend.notifyMapChange(MapChangeDidFinishLoadingStyle);
 }
