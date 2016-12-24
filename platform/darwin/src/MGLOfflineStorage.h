@@ -182,8 +182,8 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
 - (void)addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(nullable MGLOfflinePackAdditionCompletionHandler)completion;
 
 /**
- Unregisters the given offline pack and frees any resources that are no longer
- required by any remaining packs.
+ Unregisters the given offline pack and allows resources that are no longer
+ required by any remaining packs to be potentially freed.
  
  As soon as this method is called on a pack, the pack becomes invalid; any
  attempt to send it a message will result in an exception being thrown. If an
@@ -195,6 +195,13 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
  KVO change notifications on the shared offline storage object’s `packs` key
  path. Removals from that array result in an `NSKeyValueChangeRemoval` change.
  
+ When you remove an offline pack, any resources that are required by that pack,
+ but not other packs, become eligible for deletion from offline storage. Because
+ the backing store used for offline storage is also used as a general purpose
+ cache for map resources, such resources may not be immediately removed if the
+ implementation determines that they remain useful for general performance of
+ the map.
+
  @param pack The offline pack to remove.
  @param completion The completion handler to call once the pack has been
     removed. This handler is executed asynchronously on the main queue.
