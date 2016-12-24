@@ -370,6 +370,7 @@ const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm
 const testLayers = ejs.compile(fs.readFileSync('platform/darwin/test/MGLStyleLayerTests.m.ejs', 'utf8'), { strict: true});
 const categoryH = ejs.compile(fs.readFileSync('platform/darwin/src/NSValue+MGLStyleEnumAttributeAdditions.h.ejs', 'utf8'), { strict: true});
 const categoryM = ejs.compile(fs.readFileSync('platform/darwin/src/NSValue+MGLStyleEnumAttributeAdditions.mm.ejs', 'utf8'), { strict: true});
+const guideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/For Style Authors.md.ejs', 'utf8'), { strict: true });
 
 const layers = Object.keys(spec.layer.type.values).map((type) => {
     const layoutProperties = Object.keys(spec[`layout_${type}`]).reduce((memo, name) => {
@@ -416,14 +417,21 @@ ${macosComment}${decl}
 var allLayoutProperties = [];
 var allPaintProperties = [];
 var allTypes = [];
+var allRenamedProperties = {};
 
-for (var layer of layers) {
+for (let layer of layers) {
     allLayoutProperties.push(layer.layoutProperties);
     allPaintProperties.push(layer.paintProperties);
     allTypes.push(layer.type);
-    const containsEnumerationProperties =  _.filter(layer.layoutProperties, function(property){ return property["type"] === "enum"; }).length  || _.filter(layer.paintProperties, function(property){ return property["type"] === "enum"; }).length;
-    layer.containsEnumerationProperties = containsEnumerationProperties;
+    let properties = _.concat(layer.layoutProperties, layer.paintProperties);
+    layer.containsEnumerationProperties = _.some(properties, prop => prop.type === "enum");
     
+    let renamedProperties = {};
+    _.assign(renamedProperties, _.filter(properties, prop => 'original' in prop || 'getter' in prop));
+    if (!_.isEmpty(renamedProperties)) {
+        allRenamedProperties[layer.type] = renamedProperties;
+    }
+
     fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, duplicatePlatformDecls(layerH(layer)));
     fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
     fs.writeFileSync(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.m`, testLayers(layer));
@@ -437,4 +445,9 @@ fs.writeFileSync(`platform/darwin/src/NSValue+MGLStyleEnumAttributeAdditions.h`,
 fs.writeFileSync(`platform/darwin/src/NSValue+MGLStyleEnumAttributeAdditions.mm`, categoryM({
     layoutProperties: _.flatten(allLayoutProperties),
     paintProperties: _.flatten(allPaintProperties)
+}));
+
+fs.writeFileSync(`platform/darwin/docs/guides/For Style Authors.md`, guideMD({
+    renamedProperties: allRenamedProperties,
+    types: allTypes,
 }));

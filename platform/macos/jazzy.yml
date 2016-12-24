@@ -18,6 +18,7 @@ custom_categories:
     children:
       - Info.plist Keys
       - Working with GeoJSON Data
+      - For Style Authors
   - name: Maps
     children:
       - MGLAccountManager
