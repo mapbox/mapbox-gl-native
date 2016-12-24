@@ -30,6 +30,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.Property;
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
@@ -75,10 +76,15 @@ public class MyLocation {
   private Source userLocationSource;
 
   private ValueAnimator accuracyAnimator;
+  private ValueAnimator directionAnimator;
 
   private LatLng latLng;
   private Location location;
   private float accuracy;
+  private float previousDirection;
+
+  private double bearing;
+  private float magneticHeading;
 
   private Matrix matrix;
   private Camera camera;
@@ -91,15 +97,14 @@ public class MyLocation {
   @MyBearingTracking.Mode
   private int myBearingTrackingMode;
 
-  public MyLocation(@NonNull MapboxMap mapboxMap, Context context) {
-    this.mapboxMap = mapboxMap;
+  public MyLocation(Context context) {
     this.context = context;
     init();
   }
 
   private void init() {
 
-    toggleGps(false);
+   // toggleGps(false);
 
     matrix = new Matrix();
     camera = new Camera();
@@ -108,26 +113,32 @@ public class MyLocation {
     myLocationBehavior = new MyLocationBehaviorFactory().getBehavioralModel(MyLocationTracking.TRACKING_NONE);
     compassListener = new CompassListener(context);
 
-    addLayers();
+//    addLayers();
   }
 
   private void addLayers() {
     if (mapboxMap.getLayer(ACCURACY_LAYER) == null) {
       FillLayer accuracyLayer = new FillLayer(ACCURACY_LAYER, USER_LOCATION_ACCURACY_SOURCE).withProperties(
-        fillColor(Color.parseColor("#A44CF2")),
+        fillColor(Color.parseColor("#4C9AF2")),
         fillOpacity(0.3f)
       );
       mapboxMap.addLayer(accuracyLayer);
     }
 
     if (mapboxMap.getLayer(LOCATION_LAYER) == null) {
-      // Add the location icon image to the map
-      Drawable drawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon);
-      Bitmap icon = getBitmapFromDrawable(drawable);
-      mapboxMap.addImage(USER_LOCATION_ICON, icon);
+
+        // Add the location icon image to the map
+        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon);
+        Bitmap icon = getBitmapFromDrawable(drawable);
+        mapboxMap.addImage(USER_LOCATION_ICON, icon);
+
+        Drawable bearingDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon_arrow);
+        Bitmap bearingIcon = getBitmapFromDrawable(bearingDrawable);
+        mapboxMap.addImage(USER_LOCATION_ARROW_ICON, bearingIcon);
+
 
       SymbolLayer locationLayer = new SymbolLayer(LOCATION_LAYER, USER_LOCATION_SOURCE).withProperties(
-        iconImage(USER_LOCATION_ICON),
+        iconImage(myBearingTrackingMode == MyBearingTracking.NONE ? USER_LOCATION_ICON : USER_LOCATION_ARROW_ICON),
         iconAllowOverlap(true),
         iconIgnorePlacement(true),
         iconRotationAlignment(Property.ICON_ROTATION_ALIGNMENT_MAP)
@@ -158,17 +169,25 @@ public class MyLocation {
   }
 
   public void onStart() {
-   // if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
-    //  compassListener.onResume();
-  //  }
+    if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+      compassListener.onResume();
+    }
    // if (isEnabled()) {
    //   toggleGps(true);
    // }
   }
 
   public void onStop() {
-   // compassListener.onPause();
+    compassListener.onPause();
     //toggleGps(false);
+  }
+
+  public void setMapboxMap(MapboxMap mapboxMap) {
+    this.mapboxMap = mapboxMap;
+  }
+
+  public Context getContext() {
+    return context;
   }
 
   /**
@@ -192,6 +211,7 @@ public class MyLocation {
       }
 
       locationServices.addLocationListener(userLocationListener);
+      addLayers();
     } else {
       // Disable location and user dot
       location = null;
@@ -226,6 +246,12 @@ public class MyLocation {
   }
 
   public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
+    // Change the icon image to display arrow
+    if (mapboxMap.getLayer(LOCATION_LAYER) != null) {
+      mapboxMap.getLayer(LOCATION_LAYER).setProperties(
+        iconImage(myBearingTrackingMode == MyBearingTracking.NONE ? USER_LOCATION_ICON : USER_LOCATION_ARROW_ICON)
+      );
+    }
     this.myBearingTrackingMode = myBearingTrackingMode;
     if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
       compassListener.onResume();
@@ -273,26 +299,32 @@ public class MyLocation {
   }
 
   private void setCompass(double bearing, long duration) {
-//    float oldDir = previousDirection;
-//    if (directionAnimator != null) {
-//      oldDir = (Float) directionAnimator.getAnimatedValue();
-//      directionAnimator.end();
-//      directionAnimator = null;
-//    }
-//
-//    float newDir = (float) bearing;
-//    float diff = oldDir - newDir;
-//    if (diff > 180.0f) {
-//      newDir += 360.0f;
-//    } else if (diff < -180.0f) {
-//      newDir -= 360.f;
-//    }
-//    previousDirection = newDir;
-//
-//    directionAnimator = ValueAnimator.ofFloat(oldDir, newDir);
-//    directionAnimator.setDuration(duration);
-//    directionAnimator.addUpdateListener(invalidateSelfOnUpdateListener);
-//    directionAnimator.start();
+    float oldDir = previousDirection;
+    if (directionAnimator != null) {
+      oldDir = (Float) directionAnimator.getAnimatedValue();
+      directionAnimator.end();
+      directionAnimator = null;
+    }
+
+    float newDir = (float) bearing;
+    float diff = oldDir - newDir;
+    if (diff > 180.0f) {
+      newDir += 360.0f;
+    } else if (diff < -180.0f) {
+      newDir -= 360.f;
+    }
+    previousDirection = newDir;
+    directionAnimator = ValueAnimator.ofFloat(oldDir, newDir);
+    directionAnimator.setDuration(duration);
+    directionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+      @Override
+      public void onAnimationUpdate(ValueAnimator valueAnimator) {
+        mapboxMap.getLayer(LOCATION_LAYER).setProperties(
+          PropertyFactory.iconRotate((float) valueAnimator.getAnimatedValue())
+        );
+      }
+    });
+    directionAnimator.start();
   }
 
   private static class GpsLocationListener implements LocationListener {
@@ -356,15 +388,12 @@ public class MyLocation {
         SensorManager.getRotationMatrixFromVector(matrix, event.values);
         SensorManager.getOrientation(matrix, orientation);
 
-//        magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation)[0]);
-//        if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-//          // Change the user location view orientation to reflect the device orientation
-//          rotateCamera(magneticHeading);
-//          setCompass(0, COMPASS_UPDATE_RATE_MS);
-//        } else {
-//          // Change compass direction
-//          setCompass(magneticHeading - bearing, COMPASS_UPDATE_RATE_MS);
-//        }
+        magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation)[0]);
+        if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
+          rotateCamera(magneticHeading);
+        }
+        // Change compass direction
+        setCompass(magneticHeading - bearing, COMPASS_UPDATE_RATE_MS);
 
         compassUpdateNextTimestamp = currentTime + COMPASS_UPDATE_RATE_MS;
       }
@@ -549,13 +578,5 @@ public class MyLocation {
 //      locationChangeAnimator.start();
       latLng = newLocation;
     }
-
-//    @Override
-//    void invalidate() {
-////      if (latLng != null) {
-////        screenLocation = projection.toScreenLocation(latLng);
-////      }
-////      MyLocationView.this.invalidate();
-//    }
   }
 }

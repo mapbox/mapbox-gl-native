@@ -148,7 +148,6 @@ public class MyLocationToggleActivity extends AppCompatActivity {
 
   private void enableLocation(boolean enabled) {
     if (enabled) {
-      System.out.println(mapboxMap.getCameraPosition().zoom);
       Location lastLocation = locationServices.getLastLocation();
       if (lastLocation != null) {
         if (mapboxMap.getCameraPosition().zoom < 16) {

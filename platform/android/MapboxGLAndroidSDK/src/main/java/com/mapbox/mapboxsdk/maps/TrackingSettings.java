@@ -29,12 +29,11 @@ import timber.log.Timber;
  */
 public final class TrackingSettings {
 
-  private final MyLocationView myLocationView;
+  // TODO Rename myLocation variable
+  private final MyLocation myLocationView;
   private final UiSettings uiSettings;
   private final FocalPointChangeListener focalPointChangedListener;
   private LocationListener myLocationListener;
-  private MapboxMap mapboxMap;
-  private Context context;
 
   private boolean myLocationEnabled;
   private boolean dismissLocationTrackingOnGesture = true;
@@ -43,10 +42,9 @@ public final class TrackingSettings {
   private MapboxMap.OnMyLocationTrackingModeChangeListener onMyLocationTrackingModeChangeListener;
   private MapboxMap.OnMyBearingTrackingModeChangeListener onMyBearingTrackingModeChangeListener;
 
-  TrackingSettings(@NonNull MyLocationView myLocationView, UiSettings uiSettings,
-                   FocalPointChangeListener focalPointChangedListener, Context context) {
+  TrackingSettings(@NonNull MyLocation myLocationView, UiSettings uiSettings,
+                   FocalPointChangeListener focalPointChangedListener) {
     this.myLocationView = myLocationView;
-    this.context = context;
     this.focalPointChangedListener = focalPointChangedListener;
     this.uiSettings = uiSettings;
   }
@@ -99,8 +97,9 @@ public final class TrackingSettings {
     myLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
 
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-      focalPointChangedListener.onFocalPointChanged(new PointF(myLocationView.getCenterX(),
-        myLocationView.getCenterY()));
+      // TODO replace this code
+      //focalPointChangedListener.onFocalPointChanged(new PointF(myLocationView.getCenterX(),
+     //   myLocationView.getCenterY()));
     } else {
       focalPointChangedListener.onFocalPointChanged(null);
     }
@@ -339,7 +338,8 @@ public final class TrackingSettings {
     this.onMyBearingTrackingModeChangeListener = listener;
   }
 
-  MyLocationView getMyLocationView() {
+  //TODO edit this getter naming
+  MyLocation getMyLocationView() {
     return myLocationView;
   }
 
@@ -355,24 +355,19 @@ public final class TrackingSettings {
       return;
     }
     myLocationEnabled = locationEnabled;
-    MyLocation myLocation = new MyLocation(mapboxMap, context);
-    myLocation.toggleGps(locationEnabled);
+    myLocationView.toggleGps(locationEnabled);
 
 
 
     //myLocationView.setEnabled(locationEnabled);
   }
 
-  public void setMapboxMap(MapboxMap mapboxMap) {
-    this.mapboxMap = mapboxMap;
-  }
-
-  void update() {
-    if (!myLocationView.isEnabled()) {
-      return;
-    }
-    myLocationView.update();
-  }
+//  void update() {
+//    if (!myLocationView.isEnabled()) {
+//      return;
+//    }
+//    myLocationView.update();
+//  }
 
   void onStart() {
     myLocationView.onStart();
