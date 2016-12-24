@@ -17,6 +17,7 @@ custom_categories:
   - name: Guides
     children:
       - Info.plist Keys
+      - Working with GeoJSON Data
   - name: Maps
     children:
       - MGLAccountManager

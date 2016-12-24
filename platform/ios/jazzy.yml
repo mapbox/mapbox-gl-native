@@ -21,6 +21,7 @@ custom_categories:
       - Runtime Styling
       - Working with Mapbox Studio
       - Info.plist Keys
+      - Working with GeoJSON Data
   - name: Maps
     children:
       - MGLAccountManager

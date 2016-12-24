@@ -41,7 +41,7 @@ jazzy \
     --github-file-prefix https://github.com/mapbox/mapbox-gl-native/tree/${BRANCH} \
     --module-version ${SHORT_VERSION} \
     --readme ${README} \
-    --documentation="platform/ios/docs/guides/*.md" \
+    --documentation="platform/{darwin,ios}/docs/guides/*.md" \
     --root-url https://www.mapbox.com/ios-sdk/api/${RELEASE_VERSION}/ \
     --theme ${THEME} \
     --output ${OUTPUT}
