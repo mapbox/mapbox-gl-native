@@ -195,12 +195,12 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
  KVO change notifications on the shared offline storage object’s `packs` key
  path. Removals from that array result in an `NSKeyValueChangeRemoval` change.
  
- @note When you remove an offline pack, any resources that are required by that
-    pack, but not other packs, become eligible for removal from the offline
-    database. Because the offline database is also used as a general purpose
-    cache for map resources, such resources may not be immediately removed if
-    the implementation determines that they remain useful for general
-    performance of the map.
+ When you remove an offline pack, any resources that are required by that pack,
+ but not other packs, become eligible for deletion from offline storage. Because
+ the backing store used for offline storage is also used as a general purpose
+ cache for map resources, such resources may not be immediately removed if the
+ implementation determines that they remain useful for general performance of
+ the map.
 
  @param pack The offline pack to remove.
  @param completion The completion handler to call once the pack has been
