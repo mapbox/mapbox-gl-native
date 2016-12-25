@@ -16,6 +16,10 @@ typedef NSString *MGLShapeSourceOption NS_STRING_ENUM;
  An `NSNumber` object containing a Boolean enabling or disabling clustering.
  If the `shape` property contains point shapes, setting this option to
  `YES` clusters the points by radius into groups. The default value is `NO`.
+
+ This attribute corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-cluster"><code>cluster</code></a>
+ source property in the Mapbox Style Specification.
  */
 extern const MGLShapeSourceOption MGLShapeSourceOptionClustered;
 
@@ -31,6 +35,10 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
  which to cluster points if clustering is enabled. Defaults to one zoom level 
  less than the value of `MGLShapeSourceOptionMaximumZoomLevel` so that, at the
  maximum zoom level, the shapes are not clustered.
+
+ This attribute corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-clusterMaxZoom"><code>clusterMaxZoom</code></a>
+ source property in the Mapbox Style Specification.
  */
 extern const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForClustering;
 
@@ -38,6 +46,10 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForCluster
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
  which to create vector tiles. A greater value produces greater detail at high
  zoom levels. The default value is 18.
+
+ This attribute corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-maxzoom"><code>maxzoom</code></a>
+ source property in the Mapbox Style Specification.
  */
 extern const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevel;
 
@@ -46,6 +58,10 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevel;
  buffer on each side. A value of 0 produces no buffer. A value of 512 produces a 
  buffer as wide as the tile itself. Larger values produce fewer rendering 
  artifacts near tile edges and slower performance. The default value is 128.
+
+ This attribute corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-buffer"><code>buffer</code></a>
+ source property in the Mapbox Style Specification.
  */
 extern const MGLShapeSourceOption MGLShapeSourceOptionBuffer;
 
@@ -53,6 +69,10 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionBuffer;
  An `NSNumber` object containing a double; specifies the Douglas-Peucker
  simplification tolerance. A greater value produces simpler geometries and
  improves performance. The default value is 0.375.
+
+ This attribute corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-tolerance"><code>tolerance</code></a>
+ source property in the Mapbox Style Specification.
  */
 extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 

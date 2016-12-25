@@ -70,7 +70,7 @@ _Human Interface Guidelines_ document for
 [iOS](https://developer.apple.com/ios/human-interface-guidelines/) or
 [macOS](https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/OSXHIGuidelines/).
 
-## Setting the style
+## Applying your style
 
 You set an `MGLMapView` object’s style either in code, by setting the
 `MGLMapView.styleURL` property, or in Interface Builder, by setting the “Style
@@ -120,6 +120,45 @@ In style JSON | In the SDK
 `vector`      | `MGLVectorSource`
 
 `image` and `video` sources are not supported.
+
+### Tile sources
+
+Raster and vector sources may be defined in TileJSON configuration files. This
+SDK supports the properties defined in the style specification, which are a
+subset of the keys defined in version 2.1.0 of the
+[TileJSON](https://github.com/mapbox/tilejson-spec/tree/master/2.1.0)
+specification. As an alternative to authoring a custom TileJSON file, you may
+supply various tile source options when creating a raster or vector source.
+These options are detailed in the `MGLTileSourceOption` documentation:
+
+In style JSON | In TileJSON   | In the SDK
+--------------|---------------|-----------
+`url`         | —             | `configurationURL` parameter in `-[MGLTileSource initWithIdentifier:configurationURL:]`
+`tiles`       | `tiles`       | `tileURLTemplates` parameter in `-[MGLTileSource initWithIdentifier:tileURLTemplates:options:]`
+`minzoom`     | `minzoom`     | `MGLTileSourceOptionMinimumZoomLevel`
+`maxzoom`     | `maxzoom`     | `MGLTileSourceOptionMaximumZoomLevel`
+`tileSize`    | —             | `MGLTileSourceOptionTileSize`
+`attribution` | `attribution` | `MGLTileSourceOptionAttributionHTMLString` (but consider specifying `MGLTileSourceOptionAttributionInfos` instead for improved security)
+`scheme`      | `scheme`      | `MGLTileSourceOptionTileCoordinateSystem`
+
+### Shape sources
+
+Shape sources also accept various options. These options are detailed in the
+`MGLShapeSourceOption` documentation:
+
+In style JSON    | In the SDK
+-----------------|-----------
+`data`           | `url` parameter in `-[MGLShapeSource initWithIdentifier:URL:options:]`
+`maxzoom`        | `MGLShapeSourceOptionMaximumZoomLevel`
+`buffer`         | `MGLShapeSourceOptionBuffer`
+`tolerance`      | `MGLShapeSourceOptionSimplificationTolerance`
+`cluster`        | `MGLShapeSourceOptionClustered`
+`clusterRadius`  | `MGLShapeSourceOptionClusterRadius`
+`clusterMaxZoom` | `MGLShapeSourceOptionMaximumZoomLevelForClustering`
+
+To create a shape source from local GeoJSON data, first
+[convert the GeoJSON data into a shape](working-with-geojson-data.html#converting-geojson-data-into-shape-objects),
+then use the `-[MGLShapeSource initWithIdentifier:shape:options:]` method.
 
 ## Configuring the map content’s appearance
 

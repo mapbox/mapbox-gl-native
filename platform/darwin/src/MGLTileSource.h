@@ -19,6 +19,10 @@ typedef NSString *MGLTileSourceOption NS_STRING_ENUM;
  The value should be between 0 and 22, inclusive, and less than
  `MGLTileSourceOptionMaximumZoomLevel`, if specified. The default value for this
  option is 0.
+
+ This option corresponds to the `minzoom` key in the
+ <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">TileJSON</a>
+ specification.
  */
 extern const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel;
 
@@ -29,6 +33,10 @@ extern const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel;
  The value should be between 0 and 22, inclusive, and less than
  `MGLTileSourceOptionMinimumZoomLevel`, if specified. The default value for this
  option is 22.
+
+ This option corresponds to the `maxzoom` key in the
+ <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">TileJSON</a>
+ specification.
  */
 extern const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel;
 
@@ -41,6 +49,10 @@ extern const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel;
  By default, no attribution statements are displayed. If the
  `MGLTileSourceOptionAttributionInfos` option is specified, this option is
  ignored.
+
+ This option corresponds to the `attribution` key in the
+ <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">TileJSON</a>
+ specification.
  */
 extern const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
 
@@ -60,6 +72,10 @@ extern const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
  By default, no attribution statements are displayed. If the
  `MGLTileSourceOptionAttributionInfos` option is specified, this option is
  ignored.
+
+ This option corresponds to the `attribution` key in the
+ <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">TileJSON</a>
+ specification.
  */
 extern const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
 
@@ -79,6 +95,10 @@ extern const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
  the constants described in `MGLTileCoordinateSystem`.
  
  The default value for this option is `MGLTileCoordinateSystemXYZ`.
+
+ This option corresponds to the `scheme` key in the
+ <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">TileJSON</a>
+ specification.
  */
 extern const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem;
 
