@@ -447,7 +447,13 @@ fs.writeFileSync(`platform/darwin/src/NSValue+MGLStyleEnumAttributeAdditions.mm`
     paintProperties: _.flatten(allPaintProperties)
 }));
 
-fs.writeFileSync(`platform/darwin/docs/guides/For Style Authors.md`, guideMD({
+fs.writeFileSync(`platform/ios/docs/guides/For Style Authors.md`, guideMD({
+    os: 'iOS',
+    renamedProperties: allRenamedProperties,
+    types: allTypes,
+}));
+fs.writeFileSync(`platform/macos/docs/guides/For Style Authors.md`, guideMD({
+    os: 'macOS',
     renamedProperties: allRenamedProperties,
     types: allTypes,
 }));

@@ -1,11 +1,3 @@
-<%
-  const os = locals.os;
-  const iOS = os === 'iOS';
-  const macOS = os === 'macOS';
-  const cocoaPrefix = iOS ? 'UI' : 'NS';
-  const types = locals.types;
-  const renamedProperties = locals.renamedProperties;
--%>
 <!--
   This file is generated.
   Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
@@ -19,14 +11,10 @@ JSON in a text editor, you can use that style in this SDK and manipulate it
 afterwards in code. This document provides information you can use to ensure a
 seamless transition from Mapbox Studio to your application.
 
-<% if (iOS) { -%>
-## Designing for iOS
-<% } else { -%>
 ## Designing for macOS
-<% } -%>
 
 When designing your style, consider the context in which your application shows
-the style. There are a number of considerations specific to <%- os %> that may
+the style. There are a number of considerations specific to macOS that may
 not be obvious when designing your style in Mapbox Studio on the Web. A map view
 is essentially a graphical user interface element, so many of same issues in
 user interface design also apply when designing a map style.
@@ -38,48 +26,21 @@ style is present. Standard user interface elements such as toolbars, sidebars,
 and sheets often overlap the map view with a translucent, blurred background, so
 make sure the contents of these elements remain legible with the map view
 underneath.
-<% if (iOS) { -%>
-The user location annotation view, the attribution button, any buttons in
-callout views, and any items in the navigation bar are influenced by your
-application’s tint color, so choose a tint color that constrasts well with your
-map style. If you intend your style to be used in the dark, consider the impact
-that Night Shift may have on your style’s colors.
-<% } -%>
 
 ### Typography and graphics
 
-<% if (iOS) { -%>
-Choose font and icon sizes appropriate to iOS devices. iPhones and iPads have
-smaller screens than the typical browser window in which you would use Mapbox
-Studio, especially when multitasking is enabled. Your user’s viewing distance
-may be shorter than on a desktop computer. Some of your users may use the Larger
-Dynamic Type and Accessibility Text features to increase the size of all text on
-the device. You can use the
-[runtime styling API](#manipulating-the-style-at-runtime) to adjust your style’s
-font and icon sizes accordingly.
-<% } -%>
 
 Design sprite images and choose font weights that look crisp on both
 standard-resolution displays and Retina displays. This SDK supports the same
-resolutions as <%- os %>.
-<% if (iOS) { -%>
-Standard-resolution displays are limited to older devices that your application
-may or may not support, depending on its minimum deployment target.
-<% } else { -%>
+resolutions as macOS.
 Standard-resolution displays are often found on external monitors. Even with
 built-in screens, some of your users may use the Larger Text option in Display
 Preferences, which is essentially standard resolution, to make text easier to
 read.
-<% } -%>
 
 Icon and text labels should be legible regardless of the map’s orientation.
-<% if (iOS) { -%>
-By default, this SDK makes it easy for your users to rotate or tilt the map
-using multitouch gestures.
-<% } else { -%>
 By default, this SDK makes it easy for your users to rotate or tilt the map
 using multitouch trackpad gestures or keyboard shortcuts.
-<% } -%>
 If you do not intend your design to accommodate rotation and tilting, disable
 these gestures using the `MGLMapView.rotateEnabled` and
 `MGLMapView.pitchEnabled` properties, respectively, or the corresponding
@@ -88,42 +49,22 @@ inspectables in Interface Builder.
 ### Interactivity
 
 Pay attention to whether elements of your style appear to be interactive.
-<% if (iOS) { -%>
-A text label may look like a tappable button merely due to matching your
-application’s tint color or the default blue tint color.
-<% } else { -%>
 An icon with a shadow or shading effect may appear to be clickable.
-<% } -%>
 You can make an icon or text label interactive by installing a gesture
 recognizer and performing feature querying (e.g.,
 `-[MGLMapView visibleFeaturesAtPoint:]`) to get details about the selected
 feature.
-<% if (macOS) { -%>
 You can install cursor or tooltip tracking rectangles to indicate interactive
 features as an alternative to prominent hover effects.
-<% } -%>
 
-<% if (iOS) { -%>
-Make sure your users can easily distinguish any interactive elements from the
-surrounding map, such as pins, the user location annotation view, or a route
-line. Avoid relying on hover effects to indicate interactive elements. Leave
-enough room between interactive elements to accommodate imprecise tapping
-gestures.
-<% } else { -%>
 Make sure your users can easily distinguish any interactive elements from the
 surrounding map, such as pins or a route line. If your application supports
 printing, consider using the
 [runtime styling API](#manipulating-the-style-at-runtime) to optimize your style
 for ink economy before printing the map view.
-<% } -%>
 
-<% if (iOS) { -%>
-For more information about user interface design, consult Apple’s
-[_iOS Human Interface Guidelines_](https://developer.apple.com/ios/human-interface-guidelines/).
-<% } else { -%>
 For more information about user interface design, consult Apple’s
 [_macOS Human Interface Guidelines_](https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/OSXHIGuidelines/).
-<% } -%>
 
 ## Applying your style
 
@@ -144,7 +85,7 @@ represented at runtime by an `MGLStyle` object, which provides access to various
 `MGLSource` and `MGLStyleLayer` objects that represent content sources and style
 layers, respectively.
 
-The names of runtime styling classes and properties on <%- os %> are generally
+The names of runtime styling classes and properties on macOS are generally
 consistent with the style specification and Mapbox Studio’s Styles editor. Any
 exceptions are listed in this document.
 
@@ -223,28 +164,58 @@ object is a member of one of the following subclasses of `MGLStyleLayer`:
 
 In style JSON | In the SDK
 --------------|-----------
-<% for (const type of types) { -%>
-`<%- type %>` | `MGL<%- camelize(type) %>StyleLayer`
-<% } -%>
+`fill` | `MGLFillStyleLayer`
+`line` | `MGLLineStyleLayer`
+`symbol` | `MGLSymbolStyleLayer`
+`circle` | `MGLCircleStyleLayer`
+`raster` | `MGLRasterStyleLayer`
+`background` | `MGLBackgroundStyleLayer`
 
 You configure layout and paint attributes by setting properties on these style
 layer objects. The property names generally correspond to the style JSON
 properties, except for the use of camelCase instead of kebab-case. Properties
 whose names differ from the style specification are listed below:
-<% for (const type in renamedProperties) { -%>
-<% if (renamedProperties.hasOwnProperty(type)) { -%>
 
-### <%- camelize(type) %> style layers
+### Fill style layers
 
 In style JSON | In Objective-C | In Swift
 --------------|----------------|---------
-<% for (const name in renamedProperties[type]) { -%>
-<% if (renamedProperties[type].hasOwnProperty(name)) { -%>
-`<%- originalPropertyName(renamedProperties[type][name]) %>` | `MGL<%- camelize(type) %>StyleLayer.<%- objCName(renamedProperties[type][name]) %>` | `MGL<%- camelize(type) %>StyleLayer.<%- objCGetter(renamedProperties[type][name]) %>`
-<% } -%>
-<% } -%>
-<% } -%>
-<% } -%>
+`fill-antialias` | `MGLFillStyleLayer.fillAntialiased` | `MGLFillStyleLayer.isFillAntialiased`
+
+### Line style layers
+
+In style JSON | In Objective-C | In Swift
+--------------|----------------|---------
+`line-dasharray` | `MGLLineStyleLayer.lineDashPattern` | `MGLLineStyleLayer.lineDashPattern`
+
+### Symbol style layers
+
+In style JSON | In Objective-C | In Swift
+--------------|----------------|---------
+`icon-allow-overlap` | `MGLSymbolStyleLayer.iconAllowsOverlap` | `MGLSymbolStyleLayer.iconAllowsOverlap`
+`icon-ignore-placement` | `MGLSymbolStyleLayer.iconIgnoresPlacement` | `MGLSymbolStyleLayer.iconIgnoresPlacement`
+`icon-image` | `MGLSymbolStyleLayer.iconImageName` | `MGLSymbolStyleLayer.iconImageName`
+`icon-optional` | `MGLSymbolStyleLayer.iconOptional` | `MGLSymbolStyleLayer.isIconOptional`
+`icon-rotate` | `MGLSymbolStyleLayer.iconRotation` | `MGLSymbolStyleLayer.iconRotation`
+`icon-size` | `MGLSymbolStyleLayer.iconScale` | `MGLSymbolStyleLayer.iconScale`
+`icon-keep-upright` | `MGLSymbolStyleLayer.keepsIconUpright` | `MGLSymbolStyleLayer.keepsIconUpright`
+`text-keep-upright` | `MGLSymbolStyleLayer.keepsTextUpright` | `MGLSymbolStyleLayer.keepsTextUpright`
+`text-max-angle` | `MGLSymbolStyleLayer.maximumTextAngle` | `MGLSymbolStyleLayer.maximumTextAngle`
+`text-max-width` | `MGLSymbolStyleLayer.maximumTextWidth` | `MGLSymbolStyleLayer.maximumTextWidth`
+`symbol-avoid-edges` | `MGLSymbolStyleLayer.symbolAvoidsEdges` | `MGLSymbolStyleLayer.symbolAvoidsEdges`
+`text-allow-overlap` | `MGLSymbolStyleLayer.textAllowsOverlap` | `MGLSymbolStyleLayer.textAllowsOverlap`
+`text-ignore-placement` | `MGLSymbolStyleLayer.textIgnoresPlacement` | `MGLSymbolStyleLayer.textIgnoresPlacement`
+`text-justify` | `MGLSymbolStyleLayer.textJustification` | `MGLSymbolStyleLayer.textJustification`
+`text-optional` | `MGLSymbolStyleLayer.textOptional` | `MGLSymbolStyleLayer.isTextOptional`
+`text-rotate` | `MGLSymbolStyleLayer.textRotation` | `MGLSymbolStyleLayer.textRotation`
+
+### Raster style layers
+
+In style JSON | In Objective-C | In Swift
+--------------|----------------|---------
+`raster-brightness-max` | `MGLRasterStyleLayer.maximumRasterBrightness` | `MGLRasterStyleLayer.maximumRasterBrightness`
+`raster-brightness-min` | `MGLRasterStyleLayer.minimumRasterBrightness` | `MGLRasterStyleLayer.minimumRasterBrightness`
+`raster-hue-rotate` | `MGLRasterStyleLayer.rasterHueRotation` | `MGLRasterStyleLayer.rasterHueRotation`
 
 ## Setting attribute values
 
@@ -261,7 +232,7 @@ Pay close attention to the SDK documentation for the attribute you want to set.
 
 In style JSON | In Objective-C        | In Swift
 --------------|-----------------------|---------
-Color         | `<%- cocoaPrefix %>Color` | `<%- cocoaPrefix %>Color`
+Color         | `NSColor` | `NSColor`
 Enum          | `NSValue` (see `NSValue(MGLAdditions)`) | `NSValue` (see `NSValue(MGLAdditions)`)
 String        | `NSString`            | `String`
 Boolean       | `NSNumber.boolValue`  | `NSNumber.boolValue`
@@ -269,7 +240,7 @@ Number        | `NSNumber.floatValue` | `NSNumber.floatValue`
 Array (`-dasharray`) | `NSArray<NSNumber>` | `[NSNumber]`
 Array (`-font`) | `NSArray<NSString>` | `[String]`
 Array (`-offset`, `-translate`) | `CGVector` | `CGVector`
-Array (`-padding`) | `<%- cocoaPrefix %>EdgeInsets` | `<%- cocoaPrefix %>EdgeInsets`
+Array (`-padding`) | `NSEdgeInsets` | `NSEdgeInsets`
 
 ## Filtering sources
 

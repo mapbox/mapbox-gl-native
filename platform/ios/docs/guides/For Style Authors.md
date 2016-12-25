@@ -11,64 +11,70 @@ JSON in a text editor, you can use that style in this SDK and manipulate it
 afterwards in code. This document provides information you can use to ensure a
 seamless transition from Mapbox Studio to your application.
 
-## Designing for the platform
+## Designing for iOS
 
 When designing your style, consider the context in which your application shows
-the style. There are a number of considerations specific to iOS and macOS that
-may not be obvious when designing your style in Mapbox Studio on the Web. A map
-view is essentially a graphical user interface element, so many of same issues
-in user interface design also apply when designing a map style.
+the style. There are a number of considerations specific to iOS that may
+not be obvious when designing your style in Mapbox Studio on the Web. A map view
+is essentially a graphical user interface element, so many of same issues in
+user interface design also apply when designing a map style.
 
 ### Color
 
 Ensure sufficient contrast in your application’s user interface when your map
-style is present. Standard user interface elements such as toolbars and sidebars
-often overlap the map view with a translucent, blurred background, so make sure
-the contents of these elements remain legible with the map view underneath. On
-iOS, the user location annotation view, the attribution button, any buttons in
+style is present. Standard user interface elements such as toolbars, sidebars,
+and sheets often overlap the map view with a translucent, blurred background, so
+make sure the contents of these elements remain legible with the map view
+underneath.
+The user location annotation view, the attribution button, any buttons in
 callout views, and any items in the navigation bar are influenced by your
 application’s tint color, so choose a tint color that constrasts well with your
 map style. If you intend your style to be used in the dark, consider the impact
-that the Night Shift mode on iOS may have on your style’s colors.
+that Night Shift may have on your style’s colors.
 
 ### Typography and graphics
 
-Choose font and icon sizes appropriate to the device: iOS devices have smaller
-screens than the typical browser window in which you would use Mapbox Studio,
-and your user’s viewing distance may be shorter than on a desktop computer. Some
-of your users may use the Dynamic Type and Accessibility Text features on iOS
-and macOS to increase the size of all text on the device. You can use the
+Choose font and icon sizes appropriate to iOS devices. iPhones and iPads have
+smaller screens than the typical browser window in which you would use Mapbox
+Studio, especially when multitasking is enabled. Your user’s viewing distance
+may be shorter than on a desktop computer. Some of your users may use the Larger
+Dynamic Type and Accessibility Text features to increase the size of all text on
+the device. You can use the
 [runtime styling API](#manipulating-the-style-at-runtime) to adjust your style’s
 font and icon sizes accordingly.
 
 Design sprite images and choose font weights that look crisp on both
 standard-resolution displays and Retina displays. This SDK supports the same
-resolutions as the operating system it runs on. On iOS, standard-resolution
-displays are limited to older devices that your application may or may not
-support, depending on its minimum deployment target. On macOS,
-standard-resolution displays are often found on external monitors.
+resolutions as iOS.
+Standard-resolution displays are limited to older devices that your application
+may or may not support, depending on its minimum deployment target.
+
+Icon and text labels should be legible regardless of the map’s orientation.
+By default, this SDK makes it easy for your users to rotate or tilt the map
+using multitouch gestures.
+If you do not intend your design to accommodate rotation and tilting, disable
+these gestures using the `MGLMapView.rotateEnabled` and
+`MGLMapView.pitchEnabled` properties, respectively, or the corresponding
+inspectables in Interface Builder.
 
 ### Interactivity
 
-Pay attention to whether elements of your style appear to be interactive. An
-icon with a shadow or shading effect may appear to be clickable on macOS.
-Likewise, a text label may look like a tappable button on iOS merely due to
-matching your application’s tint color or the default blue tint color. You can
-actually make an icon or text label interactive by installing a gesture
+Pay attention to whether elements of your style appear to be interactive.
+A text label may look like a tappable button merely due to matching your
+application’s tint color or the default blue tint color.
+You can make an icon or text label interactive by installing a gesture
 recognizer and performing feature querying (e.g.,
 `-[MGLMapView visibleFeaturesAtPoint:]`) to get details about the selected
 feature.
 
 Make sure your users can easily distinguish any interactive elements from the
 surrounding map, such as pins, the user location annotation view, or a route
-line. On iOS, avoid relying on hover effects to indicate interactive elements,
-and leave enough room between interactive elements to accommodate imprecise
-tapping gestures.
+line. Avoid relying on hover effects to indicate interactive elements. Leave
+enough room between interactive elements to accommodate imprecise tapping
+gestures.
 
 For more information about user interface design, consult Apple’s
-_Human Interface Guidelines_ document for
-[iOS](https://developer.apple.com/ios/human-interface-guidelines/) or
-[macOS](https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/OSXHIGuidelines/).
+[_iOS Human Interface Guidelines_](https://developer.apple.com/ios/human-interface-guidelines/).
 
 ## Applying your style
 
@@ -89,9 +95,9 @@ represented at runtime by an `MGLStyle` object, which provides access to various
 `MGLSource` and `MGLStyleLayer` objects that represent content sources and style
 layers, respectively.
 
-The names of runtime styling classes and properties on iOS and macOS are
-generally consistent with the style specification and Mapbox Studio’s Styles
-editor. Any exceptions are listed in this document.
+The names of runtime styling classes and properties on iOS are generally
+consistent with the style specification and Mapbox Studio’s Styles editor. Any
+exceptions are listed in this document.
 
 To avoid conflicts with Objective-C keywords or Cocoa terminology, this SDK uses
 the following terms for concepts defined in the style specification:
@@ -236,7 +242,7 @@ Pay close attention to the SDK documentation for the attribute you want to set.
 
 In style JSON | In Objective-C        | In Swift
 --------------|-----------------------|---------
-Color         | `NSColor` (macOS)<br>`UIColor` (iOS) | `NSColor` (macOS)<br>`UIColor` (iOS)
+Color         | `UIColor` | `UIColor`
 Enum          | `NSValue` (see `NSValue(MGLAdditions)`) | `NSValue` (see `NSValue(MGLAdditions)`)
 String        | `NSString`            | `String`
 Boolean       | `NSNumber.boolValue`  | `NSNumber.boolValue`
@@ -244,7 +250,7 @@ Number        | `NSNumber.floatValue` | `NSNumber.floatValue`
 Array (`-dasharray`) | `NSArray<NSNumber>` | `[NSNumber]`
 Array (`-font`) | `NSArray<NSString>` | `[String]`
 Array (`-offset`, `-translate`) | `CGVector` | `CGVector`
-Array (`-padding`) | `NSEdgeInsets` (macOS)<br>`UIEdgeInsets` (iOS) | `NSEdgeInsets` (macOS)<br>`UIEdgeInsets` (iOS)
+Array (`-padding`) | `UIEdgeInsets` | `UIEdgeInsets`
 
 ## Filtering sources
 
