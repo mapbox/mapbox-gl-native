@@ -4,15 +4,19 @@
 
 - (std::vector<mbgl::Value>)mgl_filterValues
 {
-    if ([self.constantValue isKindOfClass:NSArray.class]) {
-        NSArray *values = self.constantValue;
-        std::vector<mbgl::Value>convertedValues;
-        for (id value in values) {
-            convertedValues.push_back([self mgl_convertedValueWithValue:value]);
+    if ([self.constantValue isKindOfClass:[NSArray class]] || [self.constantValue isKindOfClass:[NSSet class]]) {
+        std::vector<mbgl::Value> convertedValues;
+        for (id item in self.constantValue) {
+            id constantValue = item;
+            if ([item isKindOfClass:[NSExpression class]]) {
+                constantValue = [constantValue constantValue];
+            }
+            convertedValues.push_back([self mgl_convertedValueWithValue:constantValue]);
         }
         return convertedValues;
     }
-    [NSException raise:@"Values not handled" format:@""];
+    [NSException raise:NSInvalidArgumentException
+                format:@"Constant value expression must contain an array or set."];
     return { };
 }
 
@@ -42,7 +46,10 @@
             // We still do this conversion in order to provide a valid value.
             static dispatch_once_t onceToken;
             dispatch_once(&onceToken, ^{
-                NSLog(@"One-time warning: Float values are converted to double and can introduce imprecision; please use double values explicitly in predicate arguments.");
+                NSLog(@"Float value in expression will be converted to a double; some imprecision may result. "
+                      @"Use double values explicitly when specifying constant expression values and "
+                      @"when specifying arguments to predicate and expression format strings. "
+                      @"This will be logged only once.");
             });
             return { (double)number.doubleValue };
         } else if ([number compare:@(0)] == NSOrderedDescending ||
@@ -55,8 +62,8 @@
             // We use long long here to avoid any truncation.
             return { (int64_t)number.longLongValue };
         }
-    } else if (value != [NSNull null]) {
-        [NSException raise:@"Value not handled"
+    } else if (value && value != [NSNull null]) {
+        [NSException raise:NSInvalidArgumentException
                     format:@"Can’t convert %s:%@ to mbgl::Value", [value objCType], value];
     }
     return { };
