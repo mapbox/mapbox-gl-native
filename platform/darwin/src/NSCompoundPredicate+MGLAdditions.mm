@@ -18,32 +18,49 @@
 {
     switch (self.compoundPredicateType) {
         case NSNotPredicateType: {
+            NSAssert(self.subpredicates.count <= 1, @"NOT predicate cannot have multiple subpredicates.");
+            NSPredicate *subpredicate = self.subpredicates.firstObject;
+            mbgl::style::Filter subfilter = subpredicate.mgl_filter;
             
-            // Translate a nested NSComparisonPredicate with operator type NSInPredicateOperatorType into a flat mbgl::NotIn filter.
-            NSArray<NSComparisonPredicate *> *comparisonPredicates = [self.subpredicates filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"class == %@", [NSComparisonPredicate class]]];
-            NSArray<NSComparisonPredicate *> *notInPredicates = [comparisonPredicates filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSComparisonPredicate *_Nonnull predicate, NSDictionary<NSString *,id> * _Nullable bindings) {
-                return predicate.predicateOperatorType == NSInPredicateOperatorType;
-            }]];
-            
-            if (notInPredicates.count) {
-                auto filter = mbgl::style::NotInFilter();
-                filter.key = notInPredicates.firstObject.leftExpression.keyPath.UTF8String;
-                filter.values = notInPredicates.firstObject.rightExpression.mgl_filterValues;
-                return filter;
-            } else {
-                auto filter = mbgl::style::NoneFilter();
-                filter.filters = [self mgl_subfilters];
-                return filter;
+            // Convert NOT(!= nil) to NotHasFilter.
+            if (subfilter.is<mbgl::style::HasFilter>()) {
+                auto hasFilter = subfilter.get<mbgl::style::HasFilter>();
+                return mbgl::style::NotHasFilter { .key = hasFilter.key };
             }
+            
+            // Convert NOT(== nil) to HasFilter.
+            if (subfilter.is<mbgl::style::NotHasFilter>()) {
+                auto hasFilter = subfilter.get<mbgl::style::NotHasFilter>();
+                return mbgl::style::HasFilter { .key = hasFilter.key };
+            }
+            
+            // Convert NOT(IN) or NOT(CONTAINS) to NotInFilter.
+            if (subfilter.is<mbgl::style::InFilter>()) {
+                auto inFilter = subfilter.get<mbgl::style::InFilter>();
+                mbgl::style::NotInFilter notInFilter;
+                notInFilter.key = inFilter.key;
+                notInFilter.values = inFilter.values;
+                return notInFilter;
+            }
+            
+            // Convert NOT(), NOT(AND), NOT(NOT), NOT(==), etc. into NoneFilter.
+            mbgl::style::NoneFilter noneFilter;
+            if (subfilter.is<mbgl::style::AnyFilter>()) {
+                // Flatten NOT(OR).
+                noneFilter.filters = subfilter.get<mbgl::style::AnyFilter>().filters;
+            } else if (subpredicate) {
+                noneFilter.filters = { subfilter };
+            }
+            return noneFilter;
         }
         case NSAndPredicateType: {
-            auto filter = mbgl::style::AllFilter();
-            filter.filters = [self mgl_subfilters];
+            mbgl::style::AllFilter filter;
+            filter.filters = self.mgl_subfilters;
             return filter;
         }
         case NSOrPredicateType: {
-            auto filter = mbgl::style::AnyFilter();
-            filter.filters = [self mgl_subfilters];
+            mbgl::style::AnyFilter filter;
+            filter.filters = self.mgl_subfilters;
             return filter;
         }
     }

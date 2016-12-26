@@ -7,95 +7,189 @@
 
 - (mbgl::style::Filter)mgl_filter
 {
+    NSExpression *leftExpression = self.leftExpression;
+    NSExpression *rightExpression = self.rightExpression;
+    NSExpressionType leftType = leftExpression.expressionType;
+    NSExpressionType rightType = rightExpression.expressionType;
+    BOOL isReversed = ((leftType == NSConstantValueExpressionType || leftType == NSAggregateExpressionType)
+                       && rightType == NSKeyPathExpressionType);
     switch (self.predicateOperatorType) {
         case NSEqualToPredicateOperatorType: {
-            if (self.rightExpression.constantValue)
-            {
-                auto filter = mbgl::style::EqualsFilter();
-                filter.key = self.leftExpression.keyPath.UTF8String;
-                filter.value = self.rightExpression.mgl_filterValue;
-                return filter;
+            mbgl::style::EqualsFilter eqFilter;
+            eqFilter.key = self.mgl_keyPath.UTF8String;
+            eqFilter.value = self.mgl_constantValue;
+            
+            // Convert == nil to NotHasFilter.
+            if (eqFilter.value.is<mbgl::NullValue>()) {
+                mbgl::style::NotHasFilter notHasFilter;
+                notHasFilter.key = eqFilter.key;
+                return notHasFilter;
             }
-            else
-            {
-                auto filter = mbgl::style::NotHasFilter();
-                filter.key = self.leftExpression.keyPath.UTF8String;
-                return filter;
-            }
+            
+            return eqFilter;
         }
         case NSNotEqualToPredicateOperatorType: {
-            if (self.rightExpression.constantValue)
-            {
-                auto filter = mbgl::style::NotEqualsFilter();
-                filter.key = self.leftExpression.keyPath.UTF8String;
-                filter.value = self.rightExpression.mgl_filterValue;
-                return filter;
+            mbgl::style::NotEqualsFilter neFilter;
+            neFilter.key = self.mgl_keyPath.UTF8String;
+            neFilter.value = self.mgl_constantValue;
+            
+            // Convert != nil to HasFilter.
+            if (neFilter.value.is<mbgl::NullValue>()) {
+                mbgl::style::HasFilter hasFilter;
+                hasFilter.key = neFilter.key;
+                return hasFilter;
             }
-            else
-            {
-                auto filter = mbgl::style::HasFilter();
-                filter.key = self.leftExpression.keyPath.UTF8String;
-                return filter;
-            }
+            
+            return neFilter;
         }
         case NSGreaterThanPredicateOperatorType: {
-            auto filter = mbgl::style::GreaterThanFilter();
-            filter.key = self.leftExpression.keyPath.UTF8String;
-            filter.value = self.rightExpression.mgl_filterValue;
-            return filter;
+            if (isReversed) {
+                mbgl::style::LessThanFilter ltFilter;
+                ltFilter.key = self.mgl_keyPath.UTF8String;
+                ltFilter.value = self.mgl_constantValue;
+                return ltFilter;
+            } else {
+                mbgl::style::GreaterThanFilter gtFilter;
+                gtFilter.key = self.mgl_keyPath.UTF8String;
+                gtFilter.value = self.mgl_constantValue;
+                return gtFilter;
+            }
         }
         case NSGreaterThanOrEqualToPredicateOperatorType: {
-            auto filter = mbgl::style::GreaterThanEqualsFilter();
-            filter.key = self.leftExpression.keyPath.UTF8String;
-            filter.value = self.rightExpression.mgl_filterValue;
-            return filter;
+            if (isReversed) {
+                mbgl::style::LessThanEqualsFilter lteFilter;
+                lteFilter.key = self.mgl_keyPath.UTF8String;
+                lteFilter.value = self.mgl_constantValue;
+                return lteFilter;
+            } else {
+                mbgl::style::GreaterThanEqualsFilter gteFilter;
+                gteFilter.key = self.mgl_keyPath.UTF8String;
+                gteFilter.value = self.mgl_constantValue;
+                return gteFilter;
+            }
         }
         case NSLessThanPredicateOperatorType: {
-            auto filter = mbgl::style::LessThanFilter();
-            filter.key = self.leftExpression.keyPath.UTF8String;
-            filter.value = self.rightExpression.mgl_filterValue;
-            return filter;
+            if (isReversed) {
+                mbgl::style::GreaterThanFilter gtFilter;
+                gtFilter.key = self.mgl_keyPath.UTF8String;
+                gtFilter.value = self.mgl_constantValue;
+                return gtFilter;
+            } else {
+                mbgl::style::LessThanFilter ltFilter;
+                ltFilter.key = self.mgl_keyPath.UTF8String;
+                ltFilter.value = self.mgl_constantValue;
+                return ltFilter;
+            }
         }
         case NSLessThanOrEqualToPredicateOperatorType: {
-            auto filter = mbgl::style::LessThanEqualsFilter();
-            filter.key = self.leftExpression.keyPath.UTF8String;
-            filter.value = self.rightExpression.mgl_filterValue;
-            return filter;
+            if (isReversed) {
+                mbgl::style::GreaterThanEqualsFilter gteFilter;
+                gteFilter.key = self.mgl_keyPath.UTF8String;
+                gteFilter.value = self.mgl_constantValue;
+                return gteFilter;
+            } else {
+                mbgl::style::LessThanEqualsFilter lteFilter;
+                lteFilter.key = self.mgl_keyPath.UTF8String;
+                lteFilter.value = self.mgl_constantValue;
+                return lteFilter;
+            }
         }
         case NSInPredicateOperatorType: {
-            auto filter = mbgl::style::InFilter();
-            filter.key = self.leftExpression.keyPath.UTF8String;
-            filter.values = self.rightExpression.mgl_filterValues;
-            return filter;
+            if (isReversed) {
+                if (leftType == NSConstantValueExpressionType && [leftExpression.constantValue isKindOfClass:[NSString class]]) {
+                    [NSException raise:NSInvalidArgumentException
+                                format:@"CONTAINS not supported for string comparison."];
+                }
+                [NSException raise:NSInvalidArgumentException
+                            format:@"Predicate cannot compare values IN attribute."];
+            }
+            mbgl::style::InFilter inFilter;
+            inFilter.key = leftExpression.keyPath.UTF8String;
+            inFilter.values = rightExpression.mgl_filterValues;
+            return inFilter;
         }
         case NSContainsPredicateOperatorType: {
-            auto filter = mbgl::style::InFilter();
-            filter.key = [self.rightExpression.constantValue UTF8String];
-            filter.values = self.leftExpression.mgl_filterValues;
-            return filter;
+            if (!isReversed) {
+                if (rightType == NSConstantValueExpressionType && [rightExpression.constantValue isKindOfClass:[NSString class]]) {
+                    [NSException raise:NSInvalidArgumentException
+                                format:@"IN not supported for string comparison."];
+                }
+                [NSException raise:NSInvalidArgumentException
+                            format:@"Predicate cannot compare attribute CONTAINS values."];
+            }
+            mbgl::style::InFilter inFilter;
+            inFilter.key = rightExpression.keyPath.UTF8String;
+            inFilter.values = leftExpression.mgl_filterValues;
+            return inFilter;
         }
         case NSBetweenPredicateOperatorType: {
-            auto filter = mbgl::style::AllFilter();
-            auto gteFilter = mbgl::style::GreaterThanEqualsFilter();
-            gteFilter.key = self.leftExpression.keyPath.UTF8String;
-            gteFilter.value = self.rightExpression.mgl_filterValues[0];
-            filter.filters.push_back(gteFilter);
-            auto lteFilter = mbgl::style::LessThanEqualsFilter();
-            lteFilter.key = self.leftExpression.keyPath.UTF8String;
-            lteFilter.value = self.rightExpression.mgl_filterValues[1];
-            filter.filters.push_back(lteFilter);
-            return filter;
+            if (isReversed) {
+                [NSException raise:NSInvalidArgumentException
+                            format:@"Predicate cannot compare bounds BETWEEN attribute."];
+            }
+            if (![rightExpression.constantValue isKindOfClass:[NSArray class]]) {
+                [NSException raise:NSInvalidArgumentException
+                            format:@"Right side of BETWEEN predicate must be an array."]; // not NSSet
+            }
+            auto values = rightExpression.mgl_filterValues;
+            if (values.size() != 2) {
+                [NSException raise:NSInvalidArgumentException
+                            format:@"Right side of BETWEEN predicate must have two items."];
+            }
+            mbgl::style::AllFilter allFilter;
+            mbgl::style::GreaterThanEqualsFilter gteFilter;
+            gteFilter.key = leftExpression.keyPath.UTF8String;
+            gteFilter.value = values[0];
+            allFilter.filters.push_back(gteFilter);
+            mbgl::style::LessThanEqualsFilter lteFilter;
+            lteFilter.key = leftExpression.keyPath.UTF8String;
+            lteFilter.value = values[1];
+            allFilter.filters.push_back(lteFilter);
+            return allFilter;
         }
         case NSMatchesPredicateOperatorType:
         case NSLikePredicateOperatorType:
         case NSBeginsWithPredicateOperatorType:
         case NSEndsWithPredicateOperatorType:
         case NSCustomSelectorPredicateOperatorType:
-            [NSException raise:@"Unsupported operator type"
+            [NSException raise:NSInvalidArgumentException
                         format:@"NSPredicateOperatorType:%lu is not supported.", (unsigned long)self.predicateOperatorType];
     }
     
     return {};
+}
+
+- (NSString *)mgl_keyPath {
+    NSExpression *leftExpression = self.leftExpression;
+    NSExpression *rightExpression = self.rightExpression;
+    NSExpressionType leftType = leftExpression.expressionType;
+    NSExpressionType rightType = rightExpression.expressionType;
+    if (leftType == NSKeyPathExpressionType && rightType == NSConstantValueExpressionType) {
+        return leftExpression.keyPath;
+    } else if (leftType == NSConstantValueExpressionType && rightType == NSKeyPathExpressionType) {
+        return rightExpression.keyPath;
+    }
+    
+    [NSException raise:NSInvalidArgumentException
+                format:@"Comparison predicate must compare an attribute (as a key path) to a constant or vice versa."];
+    return nil;
+}
+
+- (mbgl::Value)mgl_constantValue {
+    NSExpression *leftExpression = self.leftExpression;
+    NSExpression *rightExpression = self.rightExpression;
+    NSExpressionType leftType = leftExpression.expressionType;
+    NSExpressionType rightType = rightExpression.expressionType;
+    mbgl::Value value;
+    if (leftType == NSKeyPathExpressionType && rightType == NSConstantValueExpressionType) {
+        value = rightExpression.mgl_filterValue;
+    } else if (leftType == NSConstantValueExpressionType && rightType == NSKeyPathExpressionType) {
+        value = leftExpression.mgl_filterValue;
+    } else {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"Comparison predicate must compare an attribute (as a key path) to a constant or vice versa."];
+    }
+    return value;
 }
 
 @end
