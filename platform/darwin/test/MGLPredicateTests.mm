@@ -369,9 +369,9 @@ namespace mbgl {
     [self testSymmetryWithFormat:@"a > 1" reverseFormat:@"1 < a" mustRoundTrip:YES];
     [self testSymmetryWithFormat:@"a >= 1" reverseFormat:@"1 <= a" mustRoundTrip:YES];
     
-    [self testSymmetryWithFormat:@"a BETWEEN {1, 2}" reverseFormat:nil mustRoundTrip:YES];
+    [self testSymmetryWithFormat:@"a BETWEEN {1, 2}" reverseFormat:@"1 <= a && 2 >= a" mustRoundTrip:YES];
     [self testSymmetryWithPredicate:[NSPredicate predicateWithFormat:@"a BETWEEN %@", @[@1, @2]]
-                   reversePredicate:nil
+                   reversePredicate:[NSPredicate predicateWithFormat:@"1 <= a && 2 >= a"]
                       mustRoundTrip:YES];
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"{1, 2} BETWEEN a"].mgl_filter, NSException, NSInvalidArgumentException);
     NSPredicate *betweenSetPredicate = [NSPredicate predicateWithFormat:@"a BETWEEN %@", [NSSet setWithObjects:@1, @2, nil]];
@@ -384,9 +384,11 @@ namespace mbgl {
                    reversePredicate:[NSPredicate predicateWithFormat:@"%@ CONTAINS a", @[@1, @2]]
                       mustRoundTrip:YES];
     
-    [self testSymmetryWithFormat:@"{1, 2} CONTAINS a" reverseFormat:@"a IN {1, 2}" mustRoundTrip:NO];
+    // The reverse formats here are a bit backwards because we canonicalize
+    // a reverse CONTAINS to a forward IN.
+    [self testSymmetryWithFormat:@"{1, 2} CONTAINS a" reverseFormat:@"{1, 2} CONTAINS a" mustRoundTrip:NO];
     [self testSymmetryWithPredicate:[NSPredicate predicateWithFormat:@"%@ CONTAINS a", @[@1, @2]]
-                   reversePredicate:[NSPredicate predicateWithFormat:@"a IN %@", @[@1, @2]]
+                   reversePredicate:[NSPredicate predicateWithFormat:@"%@ CONTAINS a", @[@1, @2]]
                       mustRoundTrip:NO];
 }
 
@@ -400,7 +402,8 @@ namespace mbgl {
     auto forwardFilter = forwardPredicate.mgl_filter;
     NSPredicate *forwardPredicateAfter = [NSPredicate mgl_predicateWithFilter:forwardFilter];
     if (mustRoundTrip) {
-        // Aggregates should round-trip, but for some reason only their format strings do.
+        // A collection of ints may turn into an aggregate of longs, for
+        // example, so compare formats instead of the predicates themselves.
         XCTAssertEqualObjects(forwardPredicate.predicateFormat, forwardPredicateAfter.predicateFormat);
     }
     

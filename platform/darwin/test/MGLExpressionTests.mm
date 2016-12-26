@@ -28,9 +28,17 @@
 - (void)testExpressionConversionString
 {
     NSComparisonPredicate *predicate = [self equalityComparisonPredicateWithRightConstantValue:@"bar"];
-    mbgl::Value convertedValue = predicate.rightExpression.mgl_filterValue;
-    XCTAssert(convertedValue.is<std::string>() == true);
+    mbgl::Value convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
+    XCTAssertTrue(convertedValue.is<std::string>());
     XCTAssertEqualObjects(@(convertedValue.get<std::string>().c_str()), @"bar");
+}
+
+- (void)testExpressionConversionStringWithUnicode
+{
+    NSComparisonPredicate *predicate = [self equalityComparisonPredicateWithRightConstantValue:@"🆔🆗🇦🇶"];
+    mbgl::Value convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
+    XCTAssertTrue(convertedValue.is<std::string>());
+    XCTAssertEqual(convertedValue.get<std::string>(), "🆔🆗🇦🇶");
 }
 
 #pragma mark - Boolean Tests
@@ -38,17 +46,17 @@
 - (void)testExpressionConversionBooleanTrue
 {
     NSComparisonPredicate *predicate = [self equalityComparisonPredicateWithRightConstantValue:@YES];
-    mbgl::Value convertedValue = predicate.rightExpression.mgl_filterValue;
-    XCTAssert(convertedValue.is<bool>() == true);
-    XCTAssert(convertedValue.get<bool>() == true);
+    mbgl::Value convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
+    XCTAssertTrue(convertedValue.is<bool>());
+    XCTAssertEqual(convertedValue.get<bool>(), true);
 }
 
 - (void)testExpressionConversionBooleanFalse
 {
     NSComparisonPredicate *predicate = [self equalityComparisonPredicateWithRightConstantValue:@NO];
-    mbgl::Value convertedValue = predicate.rightExpression.mgl_filterValue;
-    XCTAssert(convertedValue.is<bool>() == true);
-    XCTAssert(convertedValue.get<bool>() == false);
+    mbgl::Value convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
+    XCTAssertTrue(convertedValue.is<bool>());
+    XCTAssertEqual(convertedValue.get<bool>(), false);
 }
 
 #pragma mark - Floating Point Tests
@@ -59,12 +67,12 @@
     mbgl::Value convertedValue;
 
     predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNumber numberWithDouble:DBL_MIN]];
-    convertedValue = predicate.rightExpression.mgl_filterValue;
+    convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
     XCTAssertTrue(convertedValue.is<double>());
     XCTAssertEqual(convertedValue.get<double>(), DBL_MIN);
 
     predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNumber numberWithDouble:DBL_MAX]];
-    convertedValue = predicate.rightExpression.mgl_filterValue;
+    convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
     XCTAssertTrue(convertedValue.is<double>());
     XCTAssertEqual(convertedValue.get<double>(), DBL_MAX);
 }
@@ -72,7 +80,7 @@
 - (void)testExpressionConversionFloat
 {
     // Because we can't guarantee precision when using float, and because
-    // we warn the user to this effect in mgl_convertedValueWithValue:,
+    // we warn the user to this effect in -[NSExpression mgl_constantMBGLValue],
     // we just check that things are in the ballpark here with integer values
     // and some lower-precision checks.
 
@@ -80,26 +88,24 @@
     mbgl::Value convertedValue;
 
     predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNumber numberWithFloat:-1]];
-    convertedValue = predicate.rightExpression.mgl_filterValue;
+    convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
     XCTAssertTrue(convertedValue.is<double>());
     XCTAssertEqual(convertedValue.get<double>(), -1);
 
     predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNumber numberWithFloat:1]];
-    convertedValue = predicate.rightExpression.mgl_filterValue;
+    convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
     XCTAssertTrue(convertedValue.is<double>());
     XCTAssertEqual(convertedValue.get<double>(), 1);
 
     predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNumber numberWithFloat:-23.232342]];
-    convertedValue = predicate.rightExpression.mgl_filterValue;
+    convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
     XCTAssertTrue(convertedValue.is<double>());
-    XCTAssertLessThan(-23.24, convertedValue.get<double>());
-    XCTAssertGreaterThan(-23.23, convertedValue.get<double>());
+    XCTAssertEqualWithAccuracy(convertedValue.get<double>(), -23.232342, 0.000001);
 
     predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNumber numberWithFloat:23.232342]];
-    convertedValue = predicate.rightExpression.mgl_filterValue;
+    convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
     XCTAssertTrue(convertedValue.is<double>());
-    XCTAssertLessThan(23.23, convertedValue.get<double>());
-    XCTAssertGreaterThan(23.24, convertedValue.get<double>());
+    XCTAssertEqualWithAccuracy(convertedValue.get<double>(), 23.232342, 0.000001);
 }
 
 #pragma mark - Integer Tests
@@ -132,7 +138,7 @@
     for (NSNumber *min in minValues)
     {
         predicate = [self equalityComparisonPredicateWithRightConstantValue:min];
-        convertedValue = predicate.rightExpression.mgl_filterValue;
+        convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
         XCTAssertTrue(convertedValue.is<int64_t>());
         XCTAssertEqual(convertedValue.get<int64_t>(), min.longLongValue);
     }
@@ -144,7 +150,7 @@
     for (NSNumber *max in maxValues)
     {
         predicate = [self equalityComparisonPredicateWithRightConstantValue:max];
-        convertedValue = predicate.rightExpression.mgl_filterValue;
+        convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
         XCTAssertTrue(convertedValue.is<uint64_t>());
         XCTAssertEqual(convertedValue.get<uint64_t>(), max.unsignedLongLongValue);
     }
@@ -179,7 +185,7 @@
     for (NSNumber *min in minValues)
     {
         predicate = [self equalityComparisonPredicateWithRightConstantValue:min];
-        convertedValue = predicate.rightExpression.mgl_filterValue;
+        convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
         XCTAssertTrue(convertedValue.is<uint64_t>());
         XCTAssertEqual(convertedValue.get<uint64_t>(), min.unsignedLongLongValue);
     }
@@ -191,7 +197,7 @@
     for (NSNumber *max in maxValues)
     {
         predicate = [self equalityComparisonPredicateWithRightConstantValue:max];
-        convertedValue = predicate.rightExpression.mgl_filterValue;
+        convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
         XCTAssertTrue(convertedValue.is<uint64_t>());
         XCTAssertEqual(convertedValue.get<uint64_t>(), max.unsignedLongLongValue);
     }
@@ -202,7 +208,7 @@
 - (void)testExpressionConversionNull
 {
     NSComparisonPredicate *predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNull null]];
-    mbgl::Value convertedValue = predicate.rightExpression.mgl_filterValue;
+    mbgl::Value convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
     XCTAssertTrue(convertedValue.is<mbgl::NullValue>());
 }
 
