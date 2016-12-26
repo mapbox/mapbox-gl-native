@@ -13,9 +13,9 @@ namespace mbgl {
 }
 
 #define MGLAssertEqualFilters(actual, expected, ...) \
-    XCTAssertTrue(actual.is<typeof expected>()); \
-    if (actual.is<typeof expected>()) { \
-        XCTAssertEqual(actual.get<typeof expected>(), expected, __VA_ARGS__); \
+    XCTAssertTrue(actual.is<__typeof__(expected)>()); \
+    if (actual.is<__typeof__(expected)>()) { \
+        XCTAssertEqual(actual.get<__typeof__(expected)>(), expected, __VA_ARGS__); \
     }
 
 @interface MGLPredicateTests : XCTestCase
