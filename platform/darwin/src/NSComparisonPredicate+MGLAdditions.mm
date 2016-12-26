@@ -105,7 +105,7 @@
             }
             mbgl::style::InFilter inFilter;
             inFilter.key = leftExpression.keyPath.UTF8String;
-            inFilter.values = rightExpression.mgl_filterValues;
+            inFilter.values = rightExpression.mgl_aggregateMBGLValue;
             return inFilter;
         }
         case NSContainsPredicateOperatorType: {
@@ -119,7 +119,7 @@
             }
             mbgl::style::InFilter inFilter;
             inFilter.key = rightExpression.keyPath.UTF8String;
-            inFilter.values = leftExpression.mgl_filterValues;
+            inFilter.values = leftExpression.mgl_aggregateMBGLValue;
             return inFilter;
         }
         case NSBetweenPredicateOperatorType: {
@@ -131,7 +131,7 @@
                 [NSException raise:NSInvalidArgumentException
                             format:@"Right side of BETWEEN predicate must be an array."]; // not NSSet
             }
-            auto values = rightExpression.mgl_filterValues;
+            auto values = rightExpression.mgl_aggregateMBGLValue;
             if (values.size() != 2) {
                 [NSException raise:NSInvalidArgumentException
                             format:@"Right side of BETWEEN predicate must have two items."];
@@ -182,9 +182,9 @@
     NSExpressionType rightType = rightExpression.expressionType;
     mbgl::Value value;
     if (leftType == NSKeyPathExpressionType && rightType == NSConstantValueExpressionType) {
-        value = rightExpression.mgl_filterValue;
+        value = rightExpression.mgl_constantMBGLValue;
     } else if (leftType == NSConstantValueExpressionType && rightType == NSKeyPathExpressionType) {
-        value = leftExpression.mgl_filterValue;
+        value = leftExpression.mgl_constantMBGLValue;
     } else {
         [NSException raise:NSInvalidArgumentException
                     format:@"Comparison predicate must compare an attribute (as a key path) to a constant or vice versa."];

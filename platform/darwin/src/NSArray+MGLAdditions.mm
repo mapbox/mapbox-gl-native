@@ -17,9 +17,9 @@
             vector.push_back(propertyMap);
         } else {
             NSExpression *expression = [NSExpression expressionForConstantValue:value];
-            vector.push_back([expression mgl_filterValue]);
+            vector.push_back(expression.mgl_constantMBGLValue);
         }
-    }    
+    }
     return vector;
 }
 
