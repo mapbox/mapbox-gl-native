@@ -54,7 +54,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 @property (weak) IBOutlet NSArrayController *styleLayersArrayController;
 @property (weak) IBOutlet NSTableView *styleLayersTableView;
 @property (weak) IBOutlet NSMenu *mapViewContextMenu;
-@property (weak) IBOutlet NSSplitView *splitView;
+@property (weak) IBOutlet NSSplitView *styleLayersSplitView;
+@property (weak) IBOutlet NSSplitView *predicateSplitView;
 
 @end
 
@@ -105,7 +106,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     NSPressGestureRecognizer *pressGestureRecognizer = [[NSPressGestureRecognizer alloc] initWithTarget:self action:@selector(handlePressGesture:)];
     [self.mapView addGestureRecognizer:pressGestureRecognizer];
     
-    [self.splitView setPosition:0 ofDividerAtIndex:0];
+    [self.styleLayersSplitView setPosition:0 ofDividerAtIndex:0];
+    [self.predicateSplitView setPosition:DBL_MAX ofDividerAtIndex:0];
     
     [self applyPendingState];
 }
@@ -235,10 +237,10 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
  Show or hide the Layers sidebar.
  */
 - (IBAction)toggleLayers:(id)sender {
-    BOOL isShown = ![self.splitView isSubviewCollapsed:self.splitView.arrangedSubviews.firstObject];
+    BOOL isShown = ![self.styleLayersSplitView isSubviewCollapsed:self.styleLayersSplitView.arrangedSubviews.firstObject];
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
         context.allowsImplicitAnimation = YES;
-        [self.splitView setPosition:isShown ? 0 : 100 ofDividerAtIndex:0];
+        [self.styleLayersSplitView setPosition:isShown ? 0 : 100 ofDividerAtIndex:0];
         [self.window.toolbar validateVisibleItems];
     } completionHandler:nil];
 }
@@ -329,6 +331,17 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     
     [self.styleLayersArrayController removeObjectsAtArrangedObjectIndexes:indices];
+}
+
+/**
+ Show or hide the Layer Filter pane.
+ */
+- (IBAction)toggleLayerFilter:(id)sender {
+    BOOL isShown = ![self.predicateSplitView isSubviewCollapsed:self.predicateSplitView.arrangedSubviews.lastObject];
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
+        context.allowsImplicitAnimation = YES;
+        [self.predicateSplitView setPosition:isShown ? DBL_MAX : self.mapView.frame.size.height - 100 ofDividerAtIndex:0];
+    } completionHandler:nil];
 }
 
 - (IBAction)setLabelLanguage:(NSMenuItem *)sender {
@@ -813,7 +826,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return YES;
     }
     if (menuItem.action == @selector(toggleLayers:)) {
-        BOOL isShown = ![self.splitView isSubviewCollapsed:self.splitView.arrangedSubviews.firstObject];
+        BOOL isShown = ![self.styleLayersSplitView isSubviewCollapsed:self.styleLayersSplitView.arrangedSubviews.firstObject];
         menuItem.title = isShown ? @"Hide Layers" : @"Show Layers";
         return YES;
     }
@@ -832,6 +845,11 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     if (menuItem.action == @selector(deleteStyleLayers:)) {
         return self.styleLayersTableView.clickedRow >= 0 || self.styleLayersTableView.selectedRow >= 0;
+    }
+    if (menuItem.action == @selector(toggleLayerFilter:)) {
+        BOOL isShown = ![self.predicateSplitView isSubviewCollapsed:self.predicateSplitView.arrangedSubviews.lastObject];
+        menuItem.title = isShown ? @"Hide Layer Filter" : @"Show Layer Filter";
+        return YES;
     }
     if (menuItem.action == @selector(setLabelLanguage:)) {
         menuItem.state = menuItem.tag == _isLocalizingLabels ? NSOnState: NSOffState;
@@ -984,7 +1002,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         }
     }
     if (action == @selector(toggleLayers:)) {
-        BOOL isShown = ![self.splitView isSubviewCollapsed:self.splitView.arrangedSubviews.firstObject];
+        BOOL isShown = ![self.styleLayersSplitView isSubviewCollapsed:self.styleLayersSplitView.arrangedSubviews.firstObject];
         [(NSButton *)toolbarItem.view setState:isShown ? NSOnState : NSOffState];
     }
     return NO;
@@ -1074,14 +1092,14 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 - (void)mapView:(MGLMapView *)mapView didSelectAnnotation:(id <MGLAnnotation>)annotation {
     if ([annotation isKindOfClass:[DroppedPinAnnotation class]]) {
-        DroppedPinAnnotation *droppedPin = annotation;
+        DroppedPinAnnotation *droppedPin = (DroppedPinAnnotation *)annotation;
         [droppedPin resume];
     }
 }
 
 - (void)mapView:(MGLMapView *)mapView didDeselectAnnotation:(id <MGLAnnotation>)annotation {
     if ([annotation isKindOfClass:[DroppedPinAnnotation class]]) {
-        DroppedPinAnnotation *droppedPin = annotation;
+        DroppedPinAnnotation *droppedPin = (DroppedPinAnnotation *)annotation;
         [droppedPin pause];
     }
 }

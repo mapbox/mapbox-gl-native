@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11191" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="15G1212" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11191"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -432,6 +433,12 @@
                             <menuItem title="Show Layers" keyEquivalent="L" id="qtg-l9-BH3">
                                 <connections>
                                     <action selector="toggleLayers:" target="-1" id="YdA-Mr-MHi"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show Layer Filter" id="q0e-JO-Xth">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleLayerFilter:" target="-1" id="6FD-mU-yq3"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="8aO-Nm-fxF"/>
