@@ -451,6 +451,12 @@
                                     <action selector="toggleLayers:" target="-1" id="YdA-Mr-MHi"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Show Layer Filter" id="q0e-JO-Xth">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleLayerFilter:" target="-1" id="6FD-mU-yq3"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="8aO-Nm-fxF"/>
                             <menuItem title="Labels In" id="M7v-B1-vo3">
                                 <modifierMask key="keyEquivalentModifierMask"/>
