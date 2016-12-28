@@ -1,8 +1,13 @@
 apply plugin: 'com.android.application'
 
+ext {
+    wearableVersion = '2.0.0-alpha3'
+    leakCanaryVersion = '1.5'
+}
+
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.1"
 
     defaultConfig {
         applicationId "com.mapbox.mapboxsdk.testapp"
@@ -13,6 +18,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            testCoverageEnabled = true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -27,13 +35,17 @@ dependencies {
 
     // Wear
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.google.android.support:wearable:2.0.0-alpha3'
-    provided 'com.google.android.wearable:wearable:2.0.0-alpha3'
+    compile "com.google.android.support:wearable:${wearableVersion}"
+    provided "com.google.android.wearable:wearable:${wearableVersion}"
 
     // Leak Canary
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
-    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+    debugCompile "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}"
+    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
+    testCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
+
+    // Testing dependencies
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:2.2.27'
 }
 
 apply from: 'gradle-config.gradle'
