@@ -205,6 +205,8 @@ std::set<std::size_t> GlyphSet::determineLineBreaks(const std::u16string& logica
     
     std::list<PotentialBreak> potentialBreaks;
     float currentX = 0;
+    
+    float insideParenthesesPenalty = 0;
 
     for (std::size_t i = 0; i < logicalInput.size(); i++) {
         const char16_t codePoint = logicalInput[i];
@@ -220,8 +222,15 @@ std::set<std::size_t> GlyphSet::determineLineBreaks(const std::u16string& logica
             const char16_t previousCodePoint = i > 0 ? logicalInput[i-1] : 0;
 
             potentialBreaks.push_back(evaluateBreak(i, currentX, targetWidth, potentialBreaks,
-                                                     calculatePenalty(codePoint, previousCodePoint),
+                                                     calculatePenalty(codePoint, previousCodePoint) + insideParenthesesPenalty,
                                                      false));
+        }
+        
+        // Make breaking within a parentheses essentially impossible
+        if (codePoint == 0x28 || codePoint == 0xff08 ) {
+            insideParenthesesPenalty += 10000000;
+        } else if (codePoint == 0x29 || codePoint == 0xff09 ) {
+            insideParenthesesPenalty -= 10000000;
         }
 
         currentX += it->second.metrics.advance + spacing;
