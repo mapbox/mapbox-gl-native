@@ -4,6 +4,7 @@
 #import "LimeGreenStyleLayer.h"
 #import "DroppedPinAnnotation.h"
 
+#import "MGLStyle+MBXAdditions.h"
 #import "MGLVectorSource+MBXAdditions.h"
 
 #import <Mapbox/Mapbox.h>
@@ -256,7 +257,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 - (void)toggleStyleLayersAtArrangedObjectIndexes:(NSIndexSet *)indices {
-    NS_ARRAY_OF(MGLStyleLayer *) *layers = [self.mapView.style.layers objectsAtIndexes:indices];
+    NS_ARRAY_OF(MGLStyleLayer *) *layers = [self.mapView.style.reversedLayers objectsAtIndexes:indices];
     BOOL isVisible = layers.firstObject.visible;
     [self.undoManager registerUndoWithTarget:self handler:^(MapDocument * _Nonnull target) {
         [target toggleStyleLayersAtArrangedObjectIndexes:indices];
@@ -312,7 +313,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 - (void)deleteStyleLayersAtArrangedObjectIndexes:(NSIndexSet *)indices {
-    NS_ARRAY_OF(MGLStyleLayer *) *layers = [self.mapView.style.layers objectsAtIndexes:indices];
+    NS_ARRAY_OF(MGLStyleLayer *) *layers = [self.mapView.style.reversedLayers objectsAtIndexes:indices];
     [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
         [self insertStyleLayers:layers atArrangedObjectIndexes:indices];
     }];
@@ -825,7 +826,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         if (row == -1) {
             menuItem.title = @"Show";
         } else {
-            BOOL isVisible = self.mapView.style.layers[row].visible;
+            BOOL isVisible = self.mapView.style.reversedLayers[row].visible;
             menuItem.title = isVisible ? @"Hide" : @"Show";
         }
         return row != -1;

@@ -131,6 +131,7 @@
 		DAA48EFD1D6A4731006A7E36 /* StyleLayerIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = DAA48EFC1D6A4731006A7E36 /* StyleLayerIconTransformer.m */; };
 		DAB2CCE51DF632ED001B2FE1 /* LimeGreenStyleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DAB2CCE41DF632ED001B2FE1 /* LimeGreenStyleLayer.m */; };
 		DAC2ABC51CC6D343006D18C4 /* MGLAnnotationImage_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAC2ABC41CC6D343006D18C4 /* MGLAnnotationImage_Private.h */; };
+		DACB0C391E18DFFD005DDBEA /* MGLStyle+MBXAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DACB0C381E18DFFD005DDBEA /* MGLStyle+MBXAdditions.m */; };
 		DACC22141CF3D3E200D220D9 /* MGLFeature.h in Headers */ = {isa = PBXBuildFile; fileRef = DACC22121CF3D3E200D220D9 /* MGLFeature.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DACC22151CF3D3E200D220D9 /* MGLFeature.mm in Sources */ = {isa = PBXBuildFile; fileRef = DACC22131CF3D3E200D220D9 /* MGLFeature.mm */; };
 		DACC22181CF3D4F700D220D9 /* MGLFeature_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DACC22171CF3D4F700D220D9 /* MGLFeature_Private.h */; };
@@ -395,6 +396,8 @@
 		DAB2CCE31DF632ED001B2FE1 /* LimeGreenStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LimeGreenStyleLayer.h; sourceTree = "<group>"; };
 		DAB2CCE41DF632ED001B2FE1 /* LimeGreenStyleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LimeGreenStyleLayer.m; sourceTree = "<group>"; };
 		DAC2ABC41CC6D343006D18C4 /* MGLAnnotationImage_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationImage_Private.h; sourceTree = "<group>"; };
+		DACB0C371E18DFFD005DDBEA /* MGLStyle+MBXAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLStyle+MBXAdditions.h"; sourceTree = "<group>"; };
+		DACB0C381E18DFFD005DDBEA /* MGLStyle+MBXAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLStyle+MBXAdditions.m"; sourceTree = "<group>"; };
 		DACC22121CF3D3E200D220D9 /* MGLFeature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFeature.h; sourceTree = "<group>"; };
 		DACC22131CF3D3E200D220D9 /* MGLFeature.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFeature.mm; sourceTree = "<group>"; };
 		DACC22171CF3D4F700D220D9 /* MGLFeature_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFeature_Private.h; sourceTree = "<group>"; };
@@ -636,6 +639,8 @@
 				DA839E9B1CC2E3400062CAFB /* MapDocument.h */,
 				DA839E9C1CC2E3400062CAFB /* MapDocument.m */,
 				DA839E9E1CC2E3400062CAFB /* MapDocument.xib */,
+				DACB0C371E18DFFD005DDBEA /* MGLStyle+MBXAdditions.h */,
+				DACB0C381E18DFFD005DDBEA /* MGLStyle+MBXAdditions.m */,
 				DAF0D81A1DFF567C00B28378 /* MGLVectorSource+MBXAdditions.h */,
 				DAF0D81B1DFF567C00B28378 /* MGLVectorSource+MBXAdditions.m */,
 				DAE6C2E91CC3050F00DB3429 /* OfflinePackNameValueTransformer.h */,
@@ -1239,6 +1244,7 @@
 				DAE6C2EE1CC3050F00DB3429 /* LocationCoordinate2DTransformer.m in Sources */,
 				DAB2CCE51DF632ED001B2FE1 /* LimeGreenStyleLayer.m in Sources */,
 				DAE6C2F11CC3050F00DB3429 /* TimeIntervalTransformer.m in Sources */,
+				DACB0C391E18DFFD005DDBEA /* MGLStyle+MBXAdditions.m in Sources */,
 				DA839E9A1CC2E3400062CAFB /* main.m in Sources */,
 				DA839E971CC2E3400062CAFB /* AppDelegate.m in Sources */,
 				DAF0D81C1DFF567C00B28378 /* MGLVectorSource+MBXAdditions.m in Sources */,
