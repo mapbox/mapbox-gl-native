@@ -483,7 +483,7 @@ void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         uint16_t index = segment.vertexLength;
 
         // Encode angle of glyph
-        uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);
+        uint8_t glyphAngle = ::round((symbol.glyphAngle / (M_PI * 2)) * 256);
 
         // coordinates (2 triangles)
         buffer.vertices.emplace_back(SymbolAttributes::vertex(anchorPoint, tl, tex.x, tex.y,

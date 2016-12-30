@@ -21,7 +21,7 @@ struct ClearDepth {
 
 struct ClearColor {
     using Type = Color;
-    static const constexpr Type Default = { 0, 0, 0, 0 };
+    static const Type Default;
     static void Set(const Type&);
     static Type Get();
 };
@@ -142,7 +142,7 @@ constexpr bool operator!=(const BlendFunc::Type& a, const BlendFunc::Type& b) {
 
 struct BlendColor {
     using Type = Color;
-    static const constexpr Type Default = { 0, 0, 0, 0 };
+    static const Type Default;
     static void Set(const Type&);
     static Type Get();
 };

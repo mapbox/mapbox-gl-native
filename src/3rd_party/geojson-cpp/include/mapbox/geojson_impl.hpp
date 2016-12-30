@@ -162,7 +162,12 @@ feature convert<feature>(const rapidjson_value &json) {
     if (geom_itr == json_end)
         throw error("Feature must have a geometry property");
 
+#if !defined(__GNUC__) || __GNUC__ >= 5
     feature result{ convert<geometry>(geom_itr->value) };
+#else
+    feature result;
+    result.geometry = convert<geometry>(geom_itr->value);
+#endif
 
     auto const &id_itr = json.FindMember("id");
     if (id_itr != json_end) {

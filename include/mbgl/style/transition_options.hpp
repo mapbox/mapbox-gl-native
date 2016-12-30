@@ -12,10 +12,12 @@ public:
     optional<Duration> delay = {};
 
     TransitionOptions reverseMerge(const TransitionOptions& defaults) const {
-        return {
-            duration ? duration : defaults.duration,
-            delay ? delay : defaults.delay
-        };
+        TransitionOptions options;
+
+        options.duration = duration ? duration : defaults.duration;
+        options.delay = delay ? delay : defaults.delay;
+
+        return options;
     }
 
     explicit operator bool() const {

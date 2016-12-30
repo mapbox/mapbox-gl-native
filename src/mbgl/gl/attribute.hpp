@@ -148,11 +148,8 @@ public:
     using State = IndexedTuple<TypeList<As...>, TypeList<typename As::State...>>;
     using Vertex = detail::Vertex<As...>;
 
-    template <class A>
-    static constexpr std::size_t Index = TypeIndex<A, As...>::value;
-
     static State state(const ProgramID& id) {
-        return State { typename As::State(bindAttributeLocation(id, Index<As>, As::name))... };
+        return State { typename As::State(bindAttributeLocation(id, TypeIndex<As, As...>::value, As::name))... };
     }
 
     static std::function<void (std::size_t)> binder(const State& state) {
@@ -162,7 +159,7 @@ public:
                                           state.template get<As>().type,
                                           sizeof(Vertex),
                                           vertexOffset,
-                                          Vertex::attributeOffsets[Index<As>]), 0)... });
+                                          Vertex::attributeOffsets[TypeIndex<As, As...>::value]), 0)... });
         };
     }
 };

@@ -9,10 +9,6 @@
 namespace mbgl {
 namespace util {
 
-template class ThreadLocal<RunLoop>;
-template class ThreadLocal<int>;
-template class ThreadLocal<style::ClassDictionary>;
-
 template <class T>
 class ThreadLocal<T>::Impl {
 public:
@@ -38,6 +34,10 @@ template <class T>
 void ThreadLocal<T>::set(T* ptr) {
    impl->local.localData()[0] = ptr;
 }
+
+template class ThreadLocal<RunLoop>;
+template class ThreadLocal<int>;
+template class ThreadLocal<style::ClassDictionary>;
 
 } // namespace util
 } // namespace mbgl
