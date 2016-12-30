@@ -211,7 +211,7 @@ std::set<std::size_t> GlyphSet::determineLineBreaks(const std::u16string& logica
     for (std::size_t i = 0; i < logicalInput.size(); i++) {
         const char16_t codePoint = logicalInput[i];
         auto it = sdfs.find(codePoint);
-        if (it == sdfs.end()) {
+        if (it == sdfs.end() || codePoint == 0x0a) {
             continue;
         }
 
@@ -233,7 +233,9 @@ std::set<std::size_t> GlyphSet::determineLineBreaks(const std::u16string& logica
             insideParenthesesPenalty -= 10000000;
         }
 
-        currentX += it->second.metrics.advance + spacing;
+        if (it != sdfs.end()) {
+            currentX += it->second.metrics.advance + spacing;
+        }
     }
 
     return leastBadBreaks(evaluateBreak(logicalInput.size(), currentX, targetWidth, potentialBreaks, 0, true));
