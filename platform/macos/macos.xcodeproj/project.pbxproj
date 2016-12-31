@@ -130,6 +130,7 @@
 		DAA578331E11FD46009B2566 /* FeatureAttributePredicateEditorRowTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = DAA578321E11FD46009B2566 /* FeatureAttributePredicateEditorRowTemplate.m */; };
 		DAB2CCE51DF632ED001B2FE1 /* LimeGreenStyleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DAB2CCE41DF632ED001B2FE1 /* LimeGreenStyleLayer.m */; };
 		DAC2ABC51CC6D343006D18C4 /* MGLAnnotationImage_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAC2ABC41CC6D343006D18C4 /* MGLAnnotationImage_Private.h */; };
+		DACB0C2A1E17C50D005DDBEA /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACB0C291E17C50D005DDBEA /* ScriptingBridge.framework */; };
 		DACC22141CF3D3E200D220D9 /* MGLFeature.h in Headers */ = {isa = PBXBuildFile; fileRef = DACC22121CF3D3E200D220D9 /* MGLFeature.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DACC22151CF3D3E200D220D9 /* MGLFeature.mm in Sources */ = {isa = PBXBuildFile; fileRef = DACC22131CF3D3E200D220D9 /* MGLFeature.mm */; };
 		DACC22181CF3D4F700D220D9 /* MGLFeature_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DACC22171CF3D4F700D220D9 /* MGLFeature_Private.h */; };
@@ -394,6 +395,7 @@
 		DAB2CCE31DF632ED001B2FE1 /* LimeGreenStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LimeGreenStyleLayer.h; sourceTree = "<group>"; };
 		DAB2CCE41DF632ED001B2FE1 /* LimeGreenStyleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LimeGreenStyleLayer.m; sourceTree = "<group>"; };
 		DAC2ABC41CC6D343006D18C4 /* MGLAnnotationImage_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationImage_Private.h; sourceTree = "<group>"; };
+		DACB0C291E17C50D005DDBEA /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SDKROOT; };
 		DACC22121CF3D3E200D220D9 /* MGLFeature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFeature.h; sourceTree = "<group>"; };
 		DACC22131CF3D3E200D220D9 /* MGLFeature.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFeature.mm; sourceTree = "<group>"; };
 		DACC22171CF3D4F700D220D9 /* MGLFeature_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFeature_Private.h; sourceTree = "<group>"; };
@@ -497,6 +499,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DACB0C2A1E17C50D005DDBEA /* ScriptingBridge.framework in Frameworks */,
 				DAE6C33D1CC30DB200DB3429 /* Mapbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -854,6 +857,7 @@
 		DAE6C31E1CC308BC00DB3429 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DACB0C291E17C50D005DDBEA /* ScriptingBridge.framework */,
 				558F18211D0B13B000123F46 /* libmbgl-loop.a */,
 				5548BE7B1D0ACBBD005DDE81 /* libmbgl-loop-darwin.a */,
 				5548BE791D0ACBB2005DDE81 /* libmbgl-loop-darwin.a */,
@@ -1090,6 +1094,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DA839EA91CC2E3400062CAFB /* Build configuration list for PBXNativeTarget "macosapp" */;
 			buildPhases = (
+				DACB0C2E1E186A3C005DDBEA /* Generate Xcode Scripting Bridge Header */,
 				DA839E8E1CC2E3400062CAFB /* Sources */,
 				DA839E8F1CC2E3400062CAFB /* Frameworks */,
 				DA839E901CC2E3400062CAFB /* Resources */,
@@ -1225,6 +1230,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		DACB0C2E1E186A3C005DDBEA /* Generate Xcode Scripting Bridge Header */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate Xcode Scripting Bridge Header";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Xcode.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"${DERIVED_FILE_DIR}\";\nsdef /Applications/Xcode.app | sdp -fh --basename Xcode;\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		DA839E8E1CC2E3400062CAFB /* Sources */ = {

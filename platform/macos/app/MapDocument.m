@@ -3,6 +3,7 @@
 #import "AppDelegate.h"
 #import "LimeGreenStyleLayer.h"
 #import "DroppedPinAnnotation.h"
+#import "Xcode.h"
 
 #import "MGLVectorSource+MBXAdditions.h"
 
@@ -69,11 +70,16 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     NSNumberFormatter *_spellOutNumberFormatter;
     
     BOOL _isLocalizingLabels;
+    BOOL _isRecording;
     BOOL _showsToolTipsOnDroppedPins;
     BOOL _randomizesCursorsOnDroppedPins;
     BOOL _isTouringWorld;
     BOOL _isShowingPolygonAndPolylineAnnotations;
     BOOL _isShowingAnimatedAnnotation;
+    
+    NSMutableString *_recordedObjectiveCCode;
+    NSMutableString *_recordedSwiftCode;
+    NSMutableString *_recordedAppleScriptCode;
 }
 
 #pragma mark Lifecycle
@@ -279,6 +285,14 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     
     for (MGLStyleLayer *layer in layers) {
         layer.visible = !isVisible;
+        
+        NSString *identifier = layer.identifier;
+        [_recordedObjectiveCCode appendFormat:@"[self.mapView.style layerWithIdentifier:@\"%@\"].visible = %@;\n",
+         identifier, !isVisible ? @"@YES" : @"@NO"];
+        [_recordedSwiftCode appendFormat:@"mapView.style.layer(withIdentifier: \"%@\")?.isVisible = %@\n",
+         identifier, !isVisible ? @"true" : @"false"];
+        [_recordedAppleScriptCode appendFormat:@"set the visibility of (mapView's style's layerWithIdentifier:\"%@\") to %@\n",
+         identifier, !isVisible ? @"true" : @"false"];
     }
     
     NSIndexSet *columnIndices = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)];
@@ -342,6 +356,62 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         context.allowsImplicitAnimation = YES;
         [self.predicateSplitView setPosition:isShown ? DBL_MAX : self.mapView.frame.size.height - 100 ofDividerAtIndex:0];
     } completionHandler:nil];
+}
+
+- (IBAction)toggleRecording:(id)sender {
+    _isRecording = !_isRecording;
+    
+    if (!_isRecording) {
+        XcodeApplication *xcodeApp = [SBApplication applicationWithBundleIdentifier:@"com.apple.dt.xcode"];
+        if (xcodeApp.running) {
+            XcodeWindow *window = xcodeApp.windows.firstObject;
+            XcodeSourceDocument *document = [xcodeApp.sourceDocuments objectWithName:window.name];
+            NSString *path = document.path;
+            NSArray *selectedCharacterIndices = document.selectedCharacterRange;
+            
+            NSMutableString *recordedCode;
+            if ([path.pathExtension isEqualToString:@"m"] || [path.pathExtension isEqualToString:@"mm"]) {
+                recordedCode = _recordedObjectiveCCode;
+            } else if ([path.pathExtension isEqualToString:@"swift"]) {
+                recordedCode = _recordedSwiftCode;
+            } else if ([path.pathExtension isEqualToString:@"applescript"]) {
+                recordedCode = _recordedAppleScriptCode;
+            } else {
+                recordedCode = [NSMutableString string];
+            }
+            NSUInteger start = MIN([selectedCharacterIndices[1] unsignedIntegerValue], [selectedCharacterIndices[0] unsignedIntegerValue]);
+            NSUInteger end = MAX([selectedCharacterIndices[1] unsignedIntegerValue], [selectedCharacterIndices[0] unsignedIntegerValue]);
+            NSRange selectedCharacterRange = NSMakeRange(start, end - start);
+            
+            NSError *error;
+            NSMutableString *code = [[NSString stringWithContentsOfFile:path
+                                                               encoding:NSUTF8StringEncoding
+                                                                  error:&error] mutableCopy];
+            if (!error) {
+                NSRange lineRange = [code lineRangeForRange:NSMakeRange(selectedCharacterRange.location, 0)];
+                NSString *line = [code substringWithRange:lineRange];
+                NSUInteger indentation = [line rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet].invertedSet].location;
+                if (indentation != NSNotFound) {
+                    NSString *indentationString = [line substringWithRange:NSMakeRange(0, indentation)];
+                    [recordedCode replaceOccurrencesOfString:@"\n"
+                                                  withString:[NSString stringWithFormat:@"\n%@", indentationString]
+                                                     options:0
+                                                       range:NSMakeRange(0, recordedCode.length)];
+                }
+                selectedCharacterIndices = @[@(selectedCharacterRange.location + recordedCode.length)];
+                [recordedCode appendString:@"\n"];
+                [code replaceCharactersInRange:selectedCharacterRange withString:recordedCode];
+                [code writeToFile:path
+                       atomically:YES
+                         encoding:NSUTF8StringEncoding
+                            error:NULL];
+                document.selectedCharacterRange = selectedCharacterIndices;
+            }
+        }
+    }
+    _recordedObjectiveCCode = [NSMutableString string];
+    _recordedSwiftCode = [NSMutableString string];
+    _recordedAppleScriptCode = [NSMutableString string];
 }
 
 - (IBAction)setLabelLanguage:(NSMenuItem *)sender {
@@ -1004,6 +1074,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     if (action == @selector(toggleLayers:)) {
         BOOL isShown = ![self.styleLayersSplitView isSubviewCollapsed:self.styleLayersSplitView.arrangedSubviews.firstObject];
         [(NSButton *)toolbarItem.view setState:isShown ? NSOnState : NSOffState];
+    }
+    if (action == @selector(toggleRecording:)) {
+        [(NSButton *)toolbarItem.view setState:_isRecording ? NSOnState : NSOffState];
     }
     return NO;
 }

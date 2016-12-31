@@ -431,9 +431,26 @@
                             <action selector="toggleLayers:" target="-1" id="NHT-rn-BuG"/>
                         </connections>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="998D85AC-B477-4DB9-81BB-859D5DB0D60C" label="Record" paletteLabel="Record" image="NSStatusUnavailable" id="bBI-JB-B5E" customClass="ValidatedToolbarItem">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="47" height="32"/>
+                        <size key="maxSize" width="48" height="32"/>
+                        <button key="view" verticalHuggingPriority="750" id="pCQ-OY-G48">
+                            <rect key="frame" x="0.0" y="14" width="47" height="32"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="NSStatusUnavailable" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="y9R-H0-zRJ">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                        </button>
+                        <connections>
+                            <action selector="toggleRecording:" target="-2" id="Au9-wH-hdr"/>
+                        </connections>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="THR-Dm-mn8"/>
+                    <toolbarItem reference="bBI-JB-B5E"/>
                     <toolbarItem reference="XJT-Ho-tuZ"/>
                     <toolbarItem reference="z4l-5x-MzK"/>
                     <toolbarItem reference="u23-0z-Otl"/>
@@ -502,6 +519,7 @@
     <resources>
         <image name="NSListViewTemplate" width="14" height="10"/>
         <image name="NSShareTemplate" width="11" height="16"/>
+        <image name="NSStatusUnavailable" width="16" height="16"/>
         <image name="symbol" width="13" height="13"/>
     </resources>
 </document>
