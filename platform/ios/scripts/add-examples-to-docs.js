@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 
-const examples = fs.readFileSync(`${__dirname}/../test/MGLDocumentationExampleTests.swift`, 'utf8');
+const examples = fs.readFileSync(process.env.SCRIPT_INPUT_FILE_0, 'utf8');
 
 // Regex extracts the following block
 // /** Front matter to describe the example. **/
