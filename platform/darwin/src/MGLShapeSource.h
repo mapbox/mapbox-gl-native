@@ -76,7 +76,6 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
  value in its `sourceLayerIdentifier` property.
 
  <!--EXAMPLE: MGLShapeSource-->
- ```
  */
 @interface MGLShapeSource : MGLSource
 

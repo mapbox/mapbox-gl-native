@@ -37,7 +37,6 @@ extern const MGLTileSourceOption MGLTileSourceOptionTileSize;
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
 
  <!--EXAMPLE: MGLRasterSource-->
- ```
  */
 @interface MGLRasterSource : MGLTileSource
 
