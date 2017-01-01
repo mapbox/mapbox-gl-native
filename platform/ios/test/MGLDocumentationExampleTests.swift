@@ -12,14 +12,16 @@ import UIKit
  placeholder comment in the built header files.
 
  Adding examples:
- 1. Add a test case below
+ 1. Add a test case named in the form testMGLClass or testMGLClass$method.
  2. Wrap the code you'd like to appear in the documentation within the
     following comment blocks:
-    `/*---BEGIN EXAMPLE: ExampleToken---*/`
+    ```
+    //#-example-code
     ...
-    `/*---END EXAMPLE---*/`
+    //#-end-example-code
+    ```
  3. Insert a comment `<!--EXAMPLE: ExampleToken-->` inside the header file
-    where you'd like the example code to be inserted
+    where you'd like the example code to be inserted.
  */
 class MGLDocumentationExampleTests: XCTestCase {
     var mapView: MGLMapView!
@@ -34,9 +36,8 @@ class MGLDocumentationExampleTests: XCTestCase {
         super.tearDown()
     }
 
-    // MGLShapeSource
-    func testMGLShapeSourceExample() {
-        /*---BEGIN EXAMPLE: MGLShapeSource---*/
+    func testMGLShapeSource() {
+        //#-example-code
         var coordinates: [CLLocationCoordinate2D] = [
             CLLocationCoordinate2D(latitude: 37.77, longitude: -122.42),
             CLLocationCoordinate2D(latitude: 38.91, longitude: -77.04),
@@ -45,14 +46,13 @@ class MGLDocumentationExampleTests: XCTestCase {
         let shape = MGLShapeCollectionFeature(shapes: [polyline])
         let source = MGLShapeSource(identifier: "lines", shape: shape, options: nil)
         mapView.style.addSource(source)
-        /*---END EXAMPLE---*/
+        //#-end-example-code
 
         XCTAssertNotNil(mapView.style.source(withIdentifier: "lines"))
     }
 
-    // MGLRasterSource
-    func testMGLRasterSourceExample() {
-        /*---BEGIN EXAMPLE: MGLRasterSource---*/
+    func testMGLRasterSource() {
+        //#-example-code
         let source = MGLRasterSource(identifier: "clouds", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
             .minimumZoomLevel: 9,
             .maximumZoomLevel: 16,
@@ -62,14 +62,13 @@ class MGLDocumentationExampleTests: XCTestCase {
             ]
         ])
         mapView.style.addSource(source)
-        /*---END EXAMPLE---*/
+        //#-end-example-code
 
         XCTAssertNotNil(mapView.style.source(withIdentifier: "clouds"))
     }
 
-    // MGLVectorSource
     func testMGLVectorSource() {
-        /*---BEGIN EXAMPLE: MGLVectorSource---*/
+        //#-example-code
         let source = MGLVectorSource(identifier: "pois", tileURLTemplates: ["https://example.com/vector-tiles/{z}/{x}/{y}.mvt"], options: [
             .minimumZoomLevel: 9,
             .maximumZoomLevel: 16,
@@ -78,17 +77,16 @@ class MGLDocumentationExampleTests: XCTestCase {
             ]
         ])
         mapView.style.addSource(source)
-        /*---END EXAMPLE---*/
+        //#-end-example-code
 
         XCTAssertNotNil(mapView.style.source(withIdentifier: "pois"))
     }
 
-    // MGLCircleStyleLayer
-    func testMGLCircleStyleLayerExample() {
+    func testMGLCircleStyleLayer() {
         let population = MGLVectorSource(identifier: "population", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style.addSource(population)
         
-        /*---BEGIN EXAMPLE: MGLCircleStyleLayer---*/
+        //#-example-code
         let layer = MGLCircleStyleLayer(identifier: "circles", source: population)
         layer.sourceLayerIdentifier = "population"
         layer.circleColor = MGLStyleValue(rawValue: UIColor.green)
@@ -99,17 +97,16 @@ class MGLDocumentationExampleTests: XCTestCase {
         layer.circleOpacity = MGLStyleValue(rawValue: 0.7)
         layer.predicate = NSPredicate(format: "%K == %@", "marital-status", "married")
         mapView.style.addLayer(layer)
-        /*---END EXAMPLE---*/
+        //#-end-example-code
 
         XCTAssertNotNil(mapView.style.layer(withIdentifier: "circles"))
     }
 
-    // MGLLineStyleLayer
-    func testMGLLineStyleLayerExample() {
+    func testMGLLineStyleLayer() {
         let trails = MGLVectorSource(identifier: "trails", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style.addSource(trails)
 
-        /*---BEGIN EXAMPLE: MGLLineStyleLayer---*/
+        //#-example-code
         let layer = MGLLineStyleLayer(identifier: "trails-path", source: trails)
         layer.sourceLayerIdentifier = "trails"
         layer.lineWidth = MGLStyleValue(interpolationBase: 1.5, stops: [
@@ -120,33 +117,31 @@ class MGLDocumentationExampleTests: XCTestCase {
         layer.lineCap = MGLStyleValue(rawValue: NSValue(mglLineCap: .round))
         layer.predicate = NSPredicate(format: "%K == %@", "trail-type", "mountain-biking")
         mapView.style.addLayer(layer)
-        /*---END EXAMPLE---*/
+        //#-end-example-code
 
         XCTAssertNotNil(mapView.style.layer(withIdentifier: "trails-path"))
     }
 
-    // MGLFillStyleLayer
-    func testMGLFillStyleLayerExample() {
+    func testMGLFillStyleLayer() {
         let parks = MGLVectorSource(identifier: "parks", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style.addSource(parks)
 
-        /*---BEGIN EXAMPLE: MGLFillStyleLayer---*/
+        //#-example-code
         let layer = MGLFillStyleLayer(identifier: "parks", source: parks)
         layer.sourceLayerIdentifier = "parks"
         layer.fillColor = MGLStyleValue(rawValue: UIColor.green)
         layer.predicate = NSPredicate(format: "type == %@", "national-park")
         mapView.style.addLayer(layer)
-        /*---END EXAMPLE---*/
+        //#-end-example-code
 
         XCTAssertNotNil(mapView.style.layer(withIdentifier: "parks"))
     }
 
-    // MGLSymbolStyleLayer
-    func testMGLSymbolStyleLayerExample() {
+    func testMGLSymbolStyleLayer() {
         let pois = MGLVectorSource(identifier: "pois", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style.addSource(pois)
 
-        /*---BEGIN EXAMPLE: MGLSymbolStyleLayer---*/
+        //#-example-code
         let layer = MGLSymbolStyleLayer(identifier: "coffeeshops", source: pois)
         layer.sourceLayerIdentifier = "pois"
         layer.iconImageName = MGLStyleValue(rawValue: "coffee")
@@ -157,47 +152,45 @@ class MGLDocumentationExampleTests: XCTestCase {
         layer.textAnchor = MGLStyleValue(rawValue: NSValue(mglTextAnchor: .left))
         layer.predicate = NSPredicate(format: "%K == %@", "venue-type", "coffee")
         mapView.style.addLayer(layer)
-        /*---END EXAMPLE---*/
+        //#-end-example-code
 
         XCTAssertNotNil(mapView.style.layer(withIdentifier: "coffeeshops"))
     }
 
-    // MGLRasterStyleLayer
     func testMGLRasterStyleLayer() {
         let source = MGLRasterSource(identifier: "clouds", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
             .minimumZoomLevel: 9,
             .maximumZoomLevel: 16,
             .tileSize: 512,
             .attributionInfos: [
-            MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
             ]
         ])
         mapView.style.addSource(source)
 
-        /*---BEGIN EXAMPLE: MGLRasterStyleLayer---*/
+        //#-example-code
         let layer = MGLRasterStyleLayer(identifier: "clouds", source: source)
         layer.rasterOpacity = MGLStyleValue(rawValue: 0.5)
         mapView.style.addLayer(layer)
-        /*---END EXAMPLE---*/
+        //#-end-example-code
 
         XCTAssertNotNil(mapView.style.layer(withIdentifier: "clouds"))
     }
 
-    // MGLVectorStyleLayer.predicate
-    func testMGLVectorStyleLayer() {
+    /**
+     To create a filter with the logic `(index == 10 || index == 5) && ele >= 200`,
+     you could create a predicate using `NSCompoundPredicate` along these lines:
+     */
+    func testMGLVectorStyleLayer$predicate() {
         let terrain = MGLVectorSource(identifier: "terrain", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style.addSource(terrain)
 
-        /*---BEGIN EXAMPLE: MGLVectorStyleLayer.predicate---*/
-        /**
-         To create a filter with the logic `(index == 10 || index == 5) && ele >= 200`,
-         you could create a predicate using `NSCompoundPredicate` along these lines:
-         */
+        //#-example-code
         let layer = MGLLineStyleLayer(identifier: "contour", source: terrain)
         layer.sourceLayerIdentifier = "contours"
         layer.predicate = NSPredicate(format: "(index == 10 || index == 5) && ele >= 1500.0")
         mapView.style.addLayer(layer)
-        /*---END EXAMPLE---*/
+        //#-end-example-code
 
         XCTAssertNotNil(mapView.style.layer(withIdentifier: "contour"))
     }

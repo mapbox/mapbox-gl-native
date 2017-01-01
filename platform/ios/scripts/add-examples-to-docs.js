@@ -5,45 +5,47 @@ const fs = require('fs');
 const examples = fs.readFileSync(`${__dirname}/../test/MGLDocumentationExampleTests.swift`, 'utf8');
 
 // Regex extracts the following block
-// /*---BEGIN EXAMPLE: MGLStyleSource---*/
-// /* Frontmatter to describe the example */
-// let sampleCode: String?
-// /*---END EXAMPLE---*/
+// /** Front matter to describe the example. **/
+// func testMGLClass$method() {
+//     ...
+//     //#-example-code
+//     let sampleCode: String?
+//     //#-end-example-code
+//     ...
+// }
 //
 // into the following regex groups:
-// 1 (token): " MGLStyleSource"
-// 2 (frontmatter): "/* Frontmatter to describe the example */"
-// 3 (sample code): "let sampleCode: String?"
-const exampleRegex = /\/\*---BEGIN EXAMPLE:(.*)---\*\/\s*(\/\*+[\s\S]*?\*+\/)?([\s\S]*?)\/\*---END EXAMPLE---\*\//gm;
+// 1 (front matter): "Front matter to describe the example."
+// 2 (class name): "MGLClass"
+// 3 (method name): "method"
+// 4 (indentation): "    "
+// 5 (sample code): "let sampleCode: String?"
+const exampleRegex = /(?:\/\*\*\s*((?:[^*]|\*(?=\/))+?)\s*\*\/\s*)?func test(\w+)(?:\$(\w+))?\s*\(\)\s*\{[^]*?\n([ \t]+)\/\/#-example-code\n([^]+?)\n\4\/\/#-end-example-code\n/gm;
 
-var path = `${process.env.TARGET_BUILD_DIR}/${process.env.PUBLIC_HEADERS_FOLDER_PATH}`;
+let path = `${process.env.TARGET_BUILD_DIR}/${process.env.PUBLIC_HEADERS_FOLDER_PATH}`;
 
 console.log("Installing examples...");
 
-var match;
+let match;
 while ((match = exampleRegex.exec(examples)) !== null) {
-  const token = match[1].trim();
-  const className = token.split('.')[0];
+  let frontmatter = match[1],
+      className = match[2],
+      token = match[3] ? `${className}.${match[3]}` : className,
+      indentation = match[4],
+      exampleCode = match[5];
 
-  const frontmatter = (match[2] || '')
-    .replace(/\/\*+/g, '') // Remove block comment /**
-    .replace(/\*+\//g, '') // Remove block comment end */
-    .trim()
-    .replace(/\n {8,9}/g, '\n'); // Remove leading whitespace (8-9 spaces incl block comment)
-
-  const exampleCode = match[3]
-    .trim()
-    .replace(/\n {8}/g, '\n'); // Remove leading whitespace (8 spaces)
+  // Remove leading whitespace from front matter and example code.
+  frontmatter = frontmatter && frontmatter.replace(/^\s+/gm, '');
+  exampleCode = exampleCode.replace(new RegExp('^' + indentation, 'gm'), '');
 
   // Generate example text
   var exampleText = "### Example\n\n";
-  if (frontmatter.length > 0) {
+  if (frontmatter) {
     exampleText += `${frontmatter}\n\n`;
   }
-  exampleText += "```swift\n" + exampleCode + "\n```";
-  exampleText = exampleText.replace(/\n/g, '\n ');
+  exampleText += '```swift\n' + exampleCode + '\n```';
 
-  const placeholderRegex = new RegExp(`<!--EXAMPLE: ${token}-->`);
+  const placeholderRegex = new RegExp(`^([ \\t]*)<!--EXAMPLE: ${token.replace(/\./g, '\\.')}-->`, 'm');
 
   // check if file exists at path
   const filename = `${path}/${className}.h`;
@@ -53,13 +55,15 @@ while ((match = exampleRegex.exec(examples)) !== null) {
     // Check for example placeholder in file & update file if found
     if (placeholderRegex.test(file)) {
       console.log("Updating example:", filename);
-      fs.writeFileSync(filename, file.replace(placeholderRegex, exampleText));
-    } else if (file.indexOf(exampleText) === -1) {
-      console.log(`Placeholder "${token}" missing:`, filename);
+      fs.writeFileSync(filename, file.replace(placeholderRegex, function (m, indentation) {
+        return exampleText.replace(/^/gm, indentation);
+      }));
+    } else if (file.replace(/^\s+/gm, '').indexOf(exampleText.replace(/^\s+/gm, '')) === -1) {
+      console.log(`error: Placeholder "${token}" missing:`, filename);
     } else {
       console.log(`Example "${token}" already replaced.`);
     }
   } else if (token !== "ExampleToken") {
-    console.log("Error file doesn't exist:", filename);
+    console.log("error: Error file doesn't exist:", filename);
   }
 }
