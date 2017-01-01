@@ -89,7 +89,7 @@ class MGLDocumentationExampleTests: XCTestCase {
         //#-example-code
         let layer = MGLCircleStyleLayer(identifier: "circles", source: population)
         layer.sourceLayerIdentifier = "population"
-        layer.circleColor = MGLStyleValue(rawValue: UIColor.green)
+        layer.circleColor = MGLStyleValue(rawValue: .green)
         layer.circleRadius = MGLStyleValue(interpolationBase: 1.75, stops: [
             12: MGLStyleValue(rawValue: 2),
             22: MGLStyleValue(rawValue: 180)
@@ -113,7 +113,7 @@ class MGLDocumentationExampleTests: XCTestCase {
             14: MGLStyleValue(rawValue: 2),
             18: MGLStyleValue(rawValue: 20),
         ])
-        layer.lineColor = MGLStyleValue(rawValue: UIColor.brown)
+        layer.lineColor = MGLStyleValue(rawValue: .brown)
         layer.lineCap = MGLStyleValue(rawValue: NSValue(mglLineCap: .round))
         layer.predicate = NSPredicate(format: "%K == %@", "trail-type", "mountain-biking")
         mapView.style.addLayer(layer)
@@ -129,7 +129,7 @@ class MGLDocumentationExampleTests: XCTestCase {
         //#-example-code
         let layer = MGLFillStyleLayer(identifier: "parks", source: parks)
         layer.sourceLayerIdentifier = "parks"
-        layer.fillColor = MGLStyleValue(rawValue: UIColor.green)
+        layer.fillColor = MGLStyleValue(rawValue: .green)
         layer.predicate = NSPredicate(format: "type == %@", "national-park")
         mapView.style.addLayer(layer)
         //#-end-example-code
