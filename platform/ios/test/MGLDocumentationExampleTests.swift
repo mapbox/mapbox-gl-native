@@ -178,8 +178,9 @@ class MGLDocumentationExampleTests: XCTestCase {
     }
 
     /**
-     To create a filter with the logic `(index == 10 || index == 5) && ele >= 200`,
-     you could create a predicate using `NSCompoundPredicate` along these lines:
+     To filter the layer to include only the features whose `index` attribute is 5
+     or 10 and whose `ele` attribute is at least 1,500, you could create an
+     `NSCompoundPredicate` along these lines:
      */
     func testMGLVectorStyleLayer$predicate() {
         let terrain = MGLVectorSource(identifier: "terrain", configurationURL: URL(string: "https://example.com/style.json")!)
@@ -188,7 +189,7 @@ class MGLDocumentationExampleTests: XCTestCase {
         //#-example-code
         let layer = MGLLineStyleLayer(identifier: "contour", source: terrain)
         layer.sourceLayerIdentifier = "contours"
-        layer.predicate = NSPredicate(format: "(index == 10 || index == 5) && ele >= 1500.0")
+        layer.predicate = NSPredicate(format: "(index == 5 || index == 10) && ele >= 1500.0")
         mapView.style.addLayer(layer)
         //#-end-example-code
 
