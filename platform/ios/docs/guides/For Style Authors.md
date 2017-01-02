@@ -176,12 +176,12 @@ object is a member of one of the following subclasses of `MGLStyleLayer`:
 
 In style JSON | In the SDK
 --------------|-----------
+`background` | `MGLBackgroundStyleLayer`
+`circle` | `MGLCircleStyleLayer`
 `fill` | `MGLFillStyleLayer`
 `line` | `MGLLineStyleLayer`
-`symbol` | `MGLSymbolStyleLayer`
-`circle` | `MGLCircleStyleLayer`
 `raster` | `MGLRasterStyleLayer`
-`background` | `MGLBackgroundStyleLayer`
+`symbol` | `MGLSymbolStyleLayer`
 
 You configure layout and paint attributes by setting properties on these style
 layer objects. The property names generally correspond to the style JSON
@@ -199,6 +199,14 @@ In style JSON | In Objective-C | In Swift
 In style JSON | In Objective-C | In Swift
 --------------|----------------|---------
 `line-dasharray` | `MGLLineStyleLayer.lineDashPattern` | `MGLLineStyleLayer.lineDashPattern`
+
+### Raster style layers
+
+In style JSON | In Objective-C | In Swift
+--------------|----------------|---------
+`raster-brightness-max` | `MGLRasterStyleLayer.maximumRasterBrightness` | `MGLRasterStyleLayer.maximumRasterBrightness`
+`raster-brightness-min` | `MGLRasterStyleLayer.minimumRasterBrightness` | `MGLRasterStyleLayer.minimumRasterBrightness`
+`raster-hue-rotate` | `MGLRasterStyleLayer.rasterHueRotation` | `MGLRasterStyleLayer.rasterHueRotation`
 
 ### Symbol style layers
 
@@ -220,14 +228,6 @@ In style JSON | In Objective-C | In Swift
 `text-justify` | `MGLSymbolStyleLayer.textJustification` | `MGLSymbolStyleLayer.textJustification`
 `text-optional` | `MGLSymbolStyleLayer.textOptional` | `MGLSymbolStyleLayer.isTextOptional`
 `text-rotate` | `MGLSymbolStyleLayer.textRotation` | `MGLSymbolStyleLayer.textRotation`
-
-### Raster style layers
-
-In style JSON | In Objective-C | In Swift
---------------|----------------|---------
-`raster-brightness-max` | `MGLRasterStyleLayer.maximumRasterBrightness` | `MGLRasterStyleLayer.maximumRasterBrightness`
-`raster-brightness-min` | `MGLRasterStyleLayer.minimumRasterBrightness` | `MGLRasterStyleLayer.minimumRasterBrightness`
-`raster-hue-rotate` | `MGLRasterStyleLayer.rasterHueRotation` | `MGLRasterStyleLayer.rasterHueRotation`
 
 ## Setting attribute values
 
