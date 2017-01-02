@@ -23,12 +23,16 @@ const examples = fs.readFileSync('platform/ios/test/MGLDocumentationExampleTests
 // 4 (sample code): "let sampleCode: String?"
 const exampleRegex = /func test(\w+)(?:\$(\w+))?\s*\(\)\s*\{[^]*?\n([ \t]+)\/\/#-example-code\n([^]+?)\n\3\/\/#-end-example-code\n/gm;
 
+console.log("Installing examples...");
+
+let sysroot = execFileSync('xcrun', ['--show-sdk-path', '--sdk', 'iphonesimulator']).toString().trim();
+let docStr = execFileSync('sourcekitten', ['doc', '--objc', 'platform/ios/src/Mapbox.h', '--', '-x', 'objective-c', '-I', 'platform/darwin/src/', '-isysroot', sysroot]).toString().trim();
+let docJson = JSON.parse(docStr);
+
 /**
  * Returns the one-based line number of a symbol in the file at the given path.
  */
 function getLineForSymbol(path, className, memberName) {
-  let docStr = execFileSync('sourcekitten', ['doc', '--objc', path, '--', '-x', 'objective-c']).toString().trim();
-  let docJson = JSON.parse(docStr);
   let fileStructure = _.find(docJson, fileStructure => path in fileStructure)[path];
   let substructure = fileStructure['key.substructure'];
   substructure = _.find(substructure, decl => decl['key.name'] === className);
@@ -70,7 +74,7 @@ function completeSymbolInSource(src, line, exampleCode) {
  * Edits the file at the given path to include the given example code.
  */
 function completeSymbolInFile(path, className, memberName, exampleCode) {
-  // Use SourceKitten to find the class or class member named by the test method.
+  // Find the class or class member named by the test method.
   let startLine = getLineForSymbol(path, className, memberName);
   
   // Update the documentation comment for the class or class member.
@@ -85,8 +89,6 @@ function completeSymbolInFile(path, className, memberName, exampleCode) {
     fs.writeFileSync(path, newSrc);
   }
 }
-
-console.log("Installing examples...");
 
 let match;
 while ((match = exampleRegex.exec(examples)) !== null) {
