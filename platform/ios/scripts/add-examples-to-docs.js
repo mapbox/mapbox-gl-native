@@ -4,7 +4,7 @@ const fs = require('fs');
 const execFileSync = require('child_process').execFileSync;
 const _ = require('lodash');
 
-const examples = fs.readFileSync('platform/ios/test/MGLDocumentationExampleTests.swift', 'utf8');
+const examplesSrc = fs.readFileSync('platform/ios/test/MGLDocumentationExampleTests.swift', 'utf8');
 
 // Regex extracts the following block
 // /** Front matter to describe the example. **/
@@ -17,38 +17,19 @@ const examples = fs.readFileSync('platform/ios/test/MGLDocumentationExampleTests
 // }
 //
 // into the following regex groups:
-// 1 (class name): "MGLClass"
-// 2 (member name): "member" or "initWithArg_anotherArg_"
-// 3 (indentation): "    "
-// 4 (sample code): "let sampleCode: String?"
-const exampleRegex = /func test(\w+)(?:\$(\w+))?\s*\(\)\s*\{[^]*?\n([ \t]+)\/\/#-example-code\n([^]+?)\n\3\/\/#-end-example-code\n/gm;
-
-console.log("Installing examples...");
-
-let sysroot = execFileSync('xcrun', ['--show-sdk-path', '--sdk', 'iphonesimulator']).toString().trim();
-let docStr = execFileSync('sourcekitten', ['doc', '--objc', 'platform/ios/src/Mapbox.h', '--', '-x', 'objective-c', '-I', 'platform/darwin/src/', '-isysroot', sysroot]).toString().trim();
-let docJson = JSON.parse(docStr);
-
-/**
- * Returns the one-based line number of a symbol in the file at the given path.
- */
-function getLineForSymbol(path, className, memberName) {
-  let fileStructure = _.find(docJson, fileStructure => path in fileStructure)[path];
-  let substructure = fileStructure['key.substructure'];
-  substructure = _.find(substructure, decl => decl['key.name'] === className);
-  if (memberName) {
-    substructure = _.find(substructure['key.substructure'] || [], decl => decl['key.name'].match(memberName));
-  }
-  if (!substructure) {
-    console.log(`error: ${className} not found in ${path}`);
-    process.exit(1);
-  }
-  return substructure['key.parsed_scope.start'];
-}
+// 1 (test method name): "MGLClass" or "MGLClass$member" or "MGLClass$initWithArg_anotherArg_"
+// 2 (indentation): "    "
+// 3 (sample code): "let sampleCode: String?"
+const exampleRegex = /func test([\w$]+)\s*\(\)\s*\{[^]*?\n([ \t]+)\/\/#-example-code\n([^]+?)\n\2\/\/#-end-example-code\n/gm;
 
 /**
  * Returns the given source with example code inserted into the documentation
- * comment for the symbol at the given line.
+ * comment for the symbol at the given one-based line.
+ *
+ * @param {String} src Source code to insert the example code into.
+ * @param {Number} line One-based line number of the symbol being documented.
+ * @param {String} exampleCode Example code to insert.
+ * @returns {String} `src` with `exampleCode` inserted just above `line`.
  */
 function completeSymbolInSource(src, line, exampleCode) {
   // Split the file contents right before the symbol declaration (but after its documentation comment).
@@ -70,54 +51,73 @@ function completeSymbolInSource(src, line, exampleCode) {
   return srcUpToSymbol + srcFromSymbol;
 }
 
-/**
- * Edits the file at the given path to include the given example code.
- */
-function completeSymbolInFile(path, className, memberName, exampleCode) {
-  // Find the class or class member named by the test method.
-  let startLine = getLineForSymbol(path, className, memberName);
-  
-  // Update the documentation comment for the class or class member.
-  let src = fs.readFileSync(path, 'utf8');
-  let newSrc = completeSymbolInSource(src, startLine, exampleCode);
-  
-  // Write out the modified file contents.
-  if (src === newSrc) {
-    console.log('Skipping', path);
-  } else {
-    console.log("Updating", path);
-    fs.writeFileSync(path, newSrc);
-  }
-}
+console.log("Installing examples...");
 
+let examples = {};
 let match;
-while ((match = exampleRegex.exec(examples)) !== null) {
-  let className = match[1],
-      memberName = match[2],
-      indentation = match[3],
-      exampleCode = match[4];
+while ((match = exampleRegex.exec(examplesSrc)) !== null) {
+  let testMethodName = match[1],
+      indentation = match[2],
+      exampleCode = match[3];
 
   // Trim leading whitespace from the example code.
   exampleCode = exampleCode.replace(new RegExp('^' + indentation, 'gm'), '');
   
-  if (memberName) {
-    memberName = memberName.replace(/(.)_/g, '$1:');
-    memberName = new RegExp(`^[-+]?${memberName}$`);
-  }
-
-  // check if file exists at path
-  let path = `platform/darwin/src/${className}.h`;
-  if (fs.existsSync(path)) {
-    completeSymbolInFile(path, className, memberName, exampleCode);
-    continue;
-  }
-  
-  path = `platform/ios/src/${className}.h`;
-  if (fs.existsSync(path)) {
-    completeSymbolInFile(path, className, memberName, exampleCode);
-    continue;
-  }
-  
-  console.log("error: File doesn't exist:", path);
-  process.exit(1);
+  examples[testMethodName] = exampleCode;
 }
+
+let sysroot = execFileSync('xcrun', ['--show-sdk-path', '--sdk', 'iphonesimulator']).toString().trim();
+let docStr = execFileSync('sourcekitten', ['doc', '--objc', 'platform/ios/src/Mapbox.h', '--', '-x', 'objective-c', '-I', 'platform/darwin/src/', '-isysroot', sysroot]).toString().trim();
+let docJson = JSON.parse(docStr);
+_.forEach(docJson, function (result) {
+  _.forEach(result, function (structure, path) {
+    let src;
+    let newSrc;
+    // Recursively search for code blocks in documentation comments and populate
+    // them with example code from the test methods. Find and replace the code
+    // blocks in reverse to keep the SourceKitten line numbers accurate.
+    _.forEachRight(structure['key.substructure'], function completeSubstructure(substructure, idx, substructures, symbolPath) {
+      if (!symbolPath) {
+        symbolPath = [substructure['key.name']];
+      }
+      _.forEachRight(substructure['key.substructure'], function (substructure, idx, substructures) {
+        completeSubstructure(substructure, idx, substructures, _.concat(symbolPath, substructure['key.name']));
+      });
+      
+      let comment = substructure['key.doc.comment'];
+      if (!comment || !comment.match(/^(?:\s*)```swift\n/m)) {
+        return;
+      }
+      
+      // Lazily read in the existing file.
+      if (!src) {
+        newSrc = src = fs.readFileSync(path, 'utf8');
+      }
+      
+      // Get the contents of the test method whose name matches the symbol path.
+      let testMethodName = symbolPath.join('$').replace(/$[+-]/, '').replace(/:/g, '_');
+      let example = examples[testMethodName];
+      if (!example) {
+        console.error(`MGLDocumentationExampleTests.${testMethodName}() not found.`);
+        process.exit(1);
+      }
+      
+      // Insert the test method contents into the documentation comment just
+      // above the substructure.
+      let startLine = substructure['key.parsed_scope.start'];
+      newSrc = completeSymbolInSource(newSrc, startLine, example);
+    });
+    
+    if (!src) {
+      return;
+    }
+    
+    // Write out the modified file contents.
+    if (src === newSrc) {
+      console.log('Skipping', path);
+    } else {
+      console.log('Updating', path);
+      fs.writeFileSync(path, newSrc);
+    }
+  });
+});
