@@ -24,17 +24,27 @@ import Mapbox
  4. Run `make darwin-update-examples` to extract example code from the test
     method below and insert it into the header.
  */
-class MGLDocumentationExampleTests: XCTestCase {
+class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     var mapView: MGLMapView!
+    var styleLoadingExpectation: XCTestExpectation!
 
     override func setUp() {
         super.setUp()
-        self.mapView = MGLMapView(frame: CGRect(x: 0, y: 0, width: 256, height: 256))
+        mapView = MGLMapView(frame: CGRect(x: 0, y: 0, width: 256, height: 256))
+        mapView.delegate = self
+        mapView.styleURL = Bundle(for: MGLDocumentationExampleTests.self).url(forResource: "one-liner", withExtension: "json")
+        styleLoadingExpectation = expectation(description: "Map view should finish loading style")
+        waitForExpectations(timeout: 1, handler: nil)
     }
 
     override func tearDown() {
-        self.mapView = nil
+        mapView = nil
+        styleLoadingExpectation = nil
         super.tearDown()
+    }
+    
+    func mapView(_ mapView: MGLMapView, didFinishLoading style: MGLStyle) {
+        styleLoadingExpectation.fulfill()
     }
 
     func testMGLShapeSource() {
@@ -150,7 +160,7 @@ class MGLDocumentationExampleTests: XCTestCase {
         layer.textField = MGLStyleValue(rawValue: "{name}")
         #if os(macOS)
             var vector = CGVector(dx: 10, dy: 0)
-            layer.textTranslate = MGLStyleValue(rawValue: NSValue(bytes: &vector, objCType: "{dd}"))
+            layer.textTranslate = MGLStyleValue(rawValue: NSValue(bytes: &vector, objCType: "{CGVector=dd}"))
         #else
             layer.textTranslate = MGLStyleValue(rawValue: NSValue(cgVector: CGVector(dx: 10, dy: 0)))
         #endif
