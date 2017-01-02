@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,6 +16,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -67,7 +70,8 @@ public class MyLocation {
   private static final String USER_LOCATION_ICON = "user-location-icon";
   private static final String USER_LOCATION_ARROW_ICON = "user-location-arrow-icon";
 
-  private static final int COMPASS_UPDATE_RATE_MS = 500;
+  private static final int COMPASS_UPDATE_RATE_MS = 750;
+  private static final int STALE_USER_LOCATION_MS = 2000;
 
   private MyLocationBehavior myLocationBehavior;
   private GpsLocationListener userLocationListener;
@@ -77,6 +81,12 @@ public class MyLocation {
 
   private ValueAnimator accuracyAnimator;
   private ValueAnimator directionAnimator;
+  private ValueAnimator locationChangeAnimator;
+  private long locationUpdateTimestamp;
+
+  private Handler staleHandler;
+  private Runnable staleRunnable;
+
 
   private LatLng latLng;
   private Location location;
@@ -264,6 +274,32 @@ public class MyLocation {
     }
   }
 
+//  private class MarkerCoordinateAnimatorListener implements ValueAnimator.AnimatorUpdateListener {
+//
+//    private MyLocationBehavior behavior;
+//    private double fromLat;
+//    private double fromLng;
+//    private double toLat;
+//    private double toLng;
+//
+//    private MarkerCoordinateAnimatorListener(MyLocationBehavior myLocationBehavior, LatLng from, LatLng to) {
+//      behavior = myLocationBehavior;
+//      fromLat = from.getLatitude();
+//      fromLng = from.getLongitude();
+//      toLat = to.getLatitude();
+//      toLng = to.getLongitude();
+//    }
+//
+//    @Override
+//    public void onAnimationUpdate(ValueAnimator animation) {
+//      float frac = animation.getAnimatedFraction();
+//      double latitude = fromLat + (toLat - fromLat) * frac;
+//      double longitude = fromLng + (toLng - fromLng) * frac;
+//      behavior.updateLatLng(latitude, longitude);
+//      behavior.updateAccuracy(latitude, longitude);
+//    }
+//  }
+
   public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
     MyLocationBehaviorFactory factory = new MyLocationBehaviorFactory();
     myLocationBehavior = factory.getBehavioralModel(myLocationTrackingMode);
@@ -307,6 +343,10 @@ public class MyLocation {
     }
 
     float newDir = (float) bearing;
+    // No visible change occurred
+    if (Math.abs(newDir - oldDir) < 1) {
+      return;
+    }
     float diff = oldDir - newDir;
     if (diff > 180.0f) {
       newDir += 360.0f;
@@ -412,6 +452,17 @@ public class MyLocation {
 
   }
 
+  // TODO finish implementing stale feature
+  private boolean isStale(Location location) {
+    // TODO don't use stale if compass enabled
+    if (location != null) {
+      long ageInNanos = SystemClock.elapsedRealtime() - location.getTime();
+      return ageInNanos > STALE_USER_LOCATION_MS;
+    } else {
+      return false;
+    }
+  }
+
   // https://github.com/mapbox/mapbox-gl-style-spec/issues/459#issuecomment-240555277
   private FeatureCollection createGeoJSONCircle(Position center, double radius) throws TurfException {
     // turf circle
@@ -443,11 +494,8 @@ public class MyLocation {
 
     void updateLatLng(@NonNull Location newLocation) {
       location = newLocation;
-      // TODO animate from location to new location
 
-      List<Position> p = new ArrayList<>();
-      p.add(Position.fromCoordinates(location.getLongitude(), location.getLatitude()));
-      MultiPoint multiPoint = MultiPoint.fromCoordinates(p);
+      MultiPoint multiPoint = MultiPoint.fromCoordinates(new double[][]{new double[]{location.getLongitude(), location.getLatitude()}});
       FeatureCollection featureCollection = FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(multiPoint)});
       GeoJsonSource source = mapboxMap.getSourceAs(USER_LOCATION_SOURCE);
       if (source != null) {
@@ -456,18 +504,41 @@ public class MyLocation {
         userLocationSource = new GeoJsonSource(USER_LOCATION_SOURCE, featureCollection);
         mapboxMap.addSource(userLocationSource);
       }
+
+      staleHandler
     }
 
-    void updateLatLng(double lat, double lon) {
-      if (latLng != null) {
-        latLng.setLatitude(lat);
-        latLng.setLongitude(lon);
-      }
-    }
+//    void updateLatLng(double lat, double lon) {
+//      if (latLng != null) {
+//        latLng.setLatitude(lat);
+//        latLng.setLongitude(lon);
+//      }
+//      // TODO animate the user location
+//      MultiPoint multiPoint = MultiPoint.fromCoordinates(new double[][]{new double[]{lon, lat}});
+//      FeatureCollection featureCollection = FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(multiPoint)});
+//      GeoJsonSource source = mapboxMap.getSourceAs(USER_LOCATION_SOURCE);
+//      if (source != null) {
+//        source.setGeoJson(featureCollection);
+//      } else {
+//        userLocationSource = new GeoJsonSource(USER_LOCATION_SOURCE, featureCollection);
+//        mapboxMap.addSource(userLocationSource);
+//      }
+//    }
 
-    void updateAccuracy(@NonNull final Location location) {
+    void updateAccuracy(final double lat, final double lon) {
       // TODO remove devision of 10 once https://github.com/mapbox/mapbox-java/issues/248 is resolved.
       // TODO filter out occasional flickering?
+      // animate changes
+//      if (accuracyAnimator != null) {
+//        accuracyAnimator.end();
+//        accuracyAnimator = null;
+//      }
+
+      // No need to animate since the accuracy is identical.
+//      if (accuracy == location.getAccuracy()) {
+//        return;
+//      }
+
       accuracyAnimator = ValueAnimator.ofFloat(accuracy / 10, location.getAccuracy() / 10);
       accuracyAnimator.setDuration(750);
       accuracyAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -475,8 +546,8 @@ public class MyLocation {
         public void onAnimationUpdate(ValueAnimator valueAnimator) {
           try {
             FeatureCollection featureCollection = createGeoJSONCircle(Position.fromCoordinates(
-              location.getLongitude(),
-              location.getLatitude()),
+              lon,
+              lat),
               (float) accuracyAnimator.getAnimatedValue()
             );
             GeoJsonSource source = mapboxMap.getSourceAs(USER_LOCATION_ACCURACY_SOURCE);
@@ -504,21 +575,21 @@ public class MyLocation {
       if (latLng == null) {
         // first location fix
         latLng = new LatLng(location);
-      //  locationUpdateTimestamp = SystemClock.elapsedRealtime();
+        locationUpdateTimestamp = SystemClock.elapsedRealtime();
       }
 
       // updateLatLng timestamp
-     // float previousUpdateTimeStamp = locationUpdateTimestamp;
-    //  locationUpdateTimestamp = SystemClock.elapsedRealtime();
+      float previousUpdateTimeStamp = locationUpdateTimestamp;
+      locationUpdateTimestamp = SystemClock.elapsedRealtime();
 
       // calculate animation duration
       float animationDuration;
-     // if (previousUpdateTimeStamp == 0) {
+      if (previousUpdateTimeStamp == 0) {
         animationDuration = 0;
-    //  } else {
-     //   animationDuration = (locationUpdateTimestamp - previousUpdateTimeStamp) * 1.1f
+      } else {
+        animationDuration = (locationUpdateTimestamp - previousUpdateTimeStamp) * 1.1f
         /*make animation slightly longer*/;
-   //  }
+     }
 
       // calculate interpolated location
       latLng = new LatLng(location);
@@ -533,7 +604,7 @@ public class MyLocation {
       }
 
       // accuracy
-      updateAccuracy(location);
+      updateAccuracy(location.getLatitude(), location.getLongitude());
 
       // ease to new camera position with a linear interpolator
       mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), (int) animationDuration,
@@ -550,33 +621,32 @@ public class MyLocation {
       if (latLng == null) {
         // first location update
         latLng = new LatLng(location);
-        // locationUpdateTimestamp = SystemClock.elapsedRealtime();
+        locationUpdateTimestamp = SystemClock.elapsedRealtime();
       }
 
       // update LatLng location
-      LatLng newLocation = new LatLng(location);
+      //LatLng newLocation = new LatLng(location);
 
-      updateAccuracy(location);
       // update LatLng accuracy
-//
-//      // calculate updateLatLng time + add some extra offset to improve animation
-//      long previousUpdateTimeStamp = locationUpdateTimestamp;
-//      locationUpdateTimestamp = SystemClock.elapsedRealtime();
-//      long locationUpdateDuration = (long) ((locationUpdateTimestamp - previousUpdateTimeStamp) * 1.2f);
-//
-//      // animate changes
+      updateAccuracy(location.getLatitude(), location.getLongitude());
+
+      // calculate updateLatLng time + add some extra offset to improve animation
+      //long previousUpdateTimeStamp = locationUpdateTimestamp;
+      //locationUpdateTimestamp = SystemClock.elapsedRealtime();
+      //long locationUpdateDuration = (long) ((locationUpdateTimestamp - previousUpdateTimeStamp) * 1.2f);
+
+      // animate changes
 //      if (locationChangeAnimator != null) {
 //        locationChangeAnimator.end();
 //        locationChangeAnimator = null;
 //      }
-//
+
 //      locationChangeAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
 //      locationChangeAnimator.setDuration(locationUpdateDuration);
-//      locationChangeAnimator.addUpdateListener(new MyLocationView.MarkerCoordinateAnimatorListener(this,
+//      locationChangeAnimator.addUpdateListener(new MyLocation.MarkerCoordinateAnimatorListener(this,
 //        latLng, newLocation
 //      ));
 //      locationChangeAnimator.start();
-      latLng = newLocation;
     }
   }
 }
