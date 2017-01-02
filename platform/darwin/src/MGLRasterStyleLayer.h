@@ -23,8 +23,11 @@ NS_ASSUME_NONNULL_BEGIN
  otherwise, find it using the `MGLStyle.layers` property. You can also create a
  new raster style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
-
- <!--EXAMPLE: MGLRasterStyleLayer-->
+ 
+ ### Example
+ 
+ ```swift
+ ```
  */
 @interface MGLRasterStyleLayer : MGLForegroundStyleLayer
 

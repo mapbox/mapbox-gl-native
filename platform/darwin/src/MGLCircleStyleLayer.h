@@ -59,8 +59,11 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
  otherwise, find it using the `MGLStyle.layers` property. You can also create a
  new circle style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
-
- <!--EXAMPLE: MGLCircleStyleLayer-->
+ 
+ ### Example
+ 
+ ```swift
+ ```
  */
 @interface MGLCircleStyleLayer : MGLVectorStyleLayer
 

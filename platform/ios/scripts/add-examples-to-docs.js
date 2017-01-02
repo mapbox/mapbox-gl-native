@@ -1,12 +1,14 @@
 'use strict';
 
 const fs = require('fs');
+const execFileSync = require('child_process').execFileSync;
+const _ = require('lodash');
 
-const examples = fs.readFileSync(process.env.SCRIPT_INPUT_FILE_0, 'utf8');
+const examples = fs.readFileSync('platform/ios/test/MGLDocumentationExampleTests.swift', 'utf8');
 
 // Regex extracts the following block
 // /** Front matter to describe the example. **/
-// func testMGLClass$method() {
+// func testMGLClass$member() {
 //     ...
 //     //#-example-code
 //     let sampleCode: String?
@@ -15,55 +17,66 @@ const examples = fs.readFileSync(process.env.SCRIPT_INPUT_FILE_0, 'utf8');
 // }
 //
 // into the following regex groups:
-// 1 (front matter): "Front matter to describe the example."
-// 2 (class name): "MGLClass"
-// 3 (method name): "method"
-// 4 (indentation): "    "
-// 5 (sample code): "let sampleCode: String?"
-const exampleRegex = /(?:\/\*\*\s*((?:[^*]|\*(?=\/))+?)\s*\*\/\s*)?func test(\w+)(?:\$(\w+))?\s*\(\)\s*\{[^]*?\n([ \t]+)\/\/#-example-code\n([^]+?)\n\4\/\/#-end-example-code\n/gm;
-
-let path = `${process.env.TARGET_BUILD_DIR}/${process.env.PUBLIC_HEADERS_FOLDER_PATH}`;
+// 1 (class name): "MGLClass"
+// 2 (member name): "member"
+// 3 (indentation): "    "
+// 4 (sample code): "let sampleCode: String?"
+const exampleRegex = /func test(\w+)(?:\$(\w+))?\s*\(\)\s*\{[^]*?\n([ \t]+)\/\/#-example-code\n([^]+?)\n\3\/\/#-end-example-code\n/gm;
 
 console.log("Installing examples...");
 
 let match;
 while ((match = exampleRegex.exec(examples)) !== null) {
-  let frontmatter = match[1],
-      className = match[2],
-      token = match[3] ? `${className}.${match[3]}` : className,
-      indentation = match[4],
-      exampleCode = match[5];
+  let className = match[1],
+      memberName = match[2],
+      token = memberName ? `${className}.${memberName}` : className,
+      indentation = match[3],
+      exampleCode = match[4];
 
-  // Remove leading whitespace from front matter and example code.
-  frontmatter = frontmatter && frontmatter.replace(/^\s+/gm, '');
+  // Trim leading whitespace from the example code.
   exampleCode = exampleCode.replace(new RegExp('^' + indentation, 'gm'), '');
 
-  // Generate example text
-  var exampleText = "### Example\n\n";
-  if (frontmatter) {
-    exampleText += `${frontmatter}\n\n`;
-  }
-  exampleText += '```swift\n' + exampleCode + '\n```';
-
-  const placeholderRegex = new RegExp(`^([ \\t]*)<!--EXAMPLE: ${token.replace(/\./g, '\\.')}-->`, 'm');
-
   // check if file exists at path
-  const filename = `${path}/${className}.h`;
+  let path = `platform/darwin/src/${className}.h`;
+  if (!fs.existsSync(path)) {
+    path = `platform/ios/src/${className}.h`;
+  }
 
-  if (fs.existsSync(filename)) {
-    const file = fs.readFileSync(filename, 'utf8');
-    // Check for example placeholder in file & update file if found
-    if (placeholderRegex.test(file)) {
-      console.log("Updating example:", filename);
-      fs.writeFileSync(filename, file.replace(placeholderRegex, function (m, indentation) {
-        return exampleText.replace(/^/gm, indentation);
-      }));
-    } else if (file.replace(/^\s+/gm, '').indexOf(exampleText.replace(/^\s+/gm, '')) === -1) {
-      console.log(`error: Placeholder "${token}" missing:`, filename);
-    } else {
-      console.log(`Example "${token}" already replaced.`);
+  if (fs.existsSync(path)) {
+    let file = fs.readFileSync(path, 'utf8');
+    
+    // Use SourceKitten to find the class or class member named by the test method.
+    let docStr = execFileSync('sourcekitten', ['doc', '--objc', path, '--', '-x', 'objective-c']).toString().trim();
+    let docJson = JSON.parse(docStr);
+    let fileStructure = _.find(docJson, fileStructure => path in fileStructure)[path];
+    let substructure = fileStructure['key.substructure'];
+    substructure = _.find(substructure, decl => decl['key.name'] === className);
+    if (memberName) {
+        substructure = _.find(substructure['key.substructure'], decl => decl['key.name'] === memberName);
     }
+    
+    // Split the file contents right before the symbol declaration (but after its documentation comment).
+    let fileUpToSymbol = file.split('\n', substructure['key.parsed_scope.start'] - 1).join('\n');
+    let fileFromSymbol = file.substr(fileUpToSymbol.length);
+    
+    // Match the documentation comment block that is not followed by the beginning or end of a declaration.
+    let commentMatch = fileUpToSymbol.match(/\/\*\*\s*(?:[^*]|\*(?!\/))+?\s*\*\/[^;{}]*?$/);
+    
+    // Replace the Swift code block with the test method’s contents.
+    let completedComment = commentMatch[0].replace(/^([ \t]*)```swift\n[^]*?```/m, function (m, indentation) {
+      // Apply the original indentation to each line.
+      return ('```swift\n' + exampleCode + '\n```').replace(/^/gm, indentation);
+    });
+    
+    // Splice the modified comment into the overall file contents.
+    fileUpToSymbol = (fileUpToSymbol.substr(0, commentMatch.index) + completedComment +
+                      fileUpToSymbol.substr(commentMatch.index + commentMatch[0].length));
+    file = fileUpToSymbol + fileFromSymbol;
+    
+    // Write out the modified file contents.
+    console.log("Updating example:", path);
+    fs.writeFileSync(path, fileUpToSymbol + fileFromSymbol);
   } else if (token !== "ExampleToken") {
-    console.log("error: Error file doesn't exist:", filename);
+    console.log("error: File doesn't exist:", path);
   }
 }

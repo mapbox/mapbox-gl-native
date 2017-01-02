@@ -20,8 +20,8 @@ import UIKit
     ...
     //#-end-example-code
     ```
- 3. Insert a comment `<!--EXAMPLE: ExampleToken-->` inside the header file
-    where you'd like the example code to be inserted.
+ 3. Insert an empty Swift code block inside the header file where you'd like the
+    example code to be inserted.
  */
 class MGLDocumentationExampleTests: XCTestCase {
     var mapView: MGLMapView!
@@ -177,11 +177,6 @@ class MGLDocumentationExampleTests: XCTestCase {
         XCTAssertNotNil(mapView.style.layer(withIdentifier: "clouds"))
     }
 
-    /**
-     To filter the layer to include only the features whose `index` attribute is 5
-     or 10 and whose `ele` attribute is at least 1,500, you could create an
-     `NSCompoundPredicate` along these lines:
-     */
     func testMGLVectorStyleLayer$predicate() {
         let terrain = MGLVectorSource(identifier: "terrain", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style.addSource(terrain)
