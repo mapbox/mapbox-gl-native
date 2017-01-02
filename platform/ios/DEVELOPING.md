@@ -131,7 +131,7 @@ To add an example code listing to the documentation for a class or class member:
 
 ```bash
 brew install sourcekitten
-make ios-add-examples-to-docs
+make darwin-update-examples
 ```
 
 ## Testing

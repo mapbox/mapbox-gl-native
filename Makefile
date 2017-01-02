@@ -276,8 +276,8 @@ idocument:
 style-code-darwin:
 	node platform/darwin/scripts/generate-style-code.js
 
-ios-add-examples-to-docs:
-	node platform/ios/scripts/add-examples-to-docs.js
+darwin-update-examples:
+	node platform/darwin/scripts/update-examples.js
 endif
 
 #### Linux targets #####################################################

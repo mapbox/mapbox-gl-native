@@ -1,17 +1,16 @@
 import XCTest
 import Mapbox
-import UIKit
+#if os(iOS)
+    import UIKit
+#else
+    import Cocoa
+#endif
 
 /**
  Test cases that ensure the inline examples in the project documentation
  compile.
 
- There is a run script build phase for the dynamic & static iOS targets
- that invokes `/platform/ios/scrips/add-examples-to-docs.js`. This script
- will pull example code out of this test file and replace the corresponding
- placeholder comment in the built header files.
-
- Adding examples:
+ To add an example:
  1. Add a test case named in the form testMGLClass or testMGLClass$method.
  2. Wrap the code you'd like to appear in the documentation within the
     following comment blocks:
@@ -22,6 +21,8 @@ import UIKit
     ```
  3. Insert an empty Swift code block inside the header file where you'd like the
     example code to be inserted.
+ 4. Run `make darwin-update-examples` to extract example code from the test
+    method below and insert it into the header.
  */
 class MGLDocumentationExampleTests: XCTestCase {
     var mapView: MGLMapView!
@@ -147,7 +148,12 @@ class MGLDocumentationExampleTests: XCTestCase {
         layer.iconImageName = MGLStyleValue(rawValue: "coffee")
         layer.iconScale = MGLStyleValue(rawValue: 0.5)
         layer.textField = MGLStyleValue(rawValue: "{name}")
-        layer.textTranslate = MGLStyleValue(rawValue: NSValue(cgVector: CGVector(dx: 10, dy: 0)))
+        #if os(macOS)
+            var vector = CGVector(dx: 10, dy: 0)
+            layer.textTranslate = MGLStyleValue(rawValue: NSValue(bytes: &vector, objCType: "{dd}"))
+        #else
+            layer.textTranslate = MGLStyleValue(rawValue: NSValue(cgVector: CGVector(dx: 10, dy: 0)))
+        #endif
         layer.textJustification = MGLStyleValue(rawValue: NSValue(mglTextJustification: .left))
         layer.textAnchor = MGLStyleValue(rawValue: NSValue(mglTextAnchor: .left))
         layer.predicate = NSPredicate(format: "%K == %@", "venue-type", "coffee")
