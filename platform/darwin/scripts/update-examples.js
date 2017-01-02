@@ -128,7 +128,9 @@ function completeExamples(os) {
         console.log('Skipping', path);
       } else {
         console.log('Updating', path);
-        fs.writeFileSync(path, newSrc);
+        if (['0', 'false'].indexOf(process.env.DRY_RUN || '0') !== -1) {
+          fs.writeFileSync(path, newSrc);
+        }
       }
     });
   });
