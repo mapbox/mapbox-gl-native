@@ -4,7 +4,6 @@
 
 #import "NSValue+MGLStyleAttributeAdditions.h"
 #import "MGLTypes.h"
-#import "MGLLineStyleLayer.h"
 #import <mbgl/util/enum.hpp>
 
 #if TARGET_OS_IPHONE

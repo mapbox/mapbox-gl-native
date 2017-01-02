@@ -3,7 +3,7 @@
   const iOS = os === 'iOS';
   const macOS = os === 'macOS';
   const cocoaPrefix = iOS ? 'UI' : 'NS';
-  const types = locals.types;
+  const layers = locals.layers;
   const renamedProperties = locals.renamedProperties;
 -%>
 <!--
@@ -227,8 +227,8 @@ object is a member of one of the following subclasses of `MGLStyleLayer`:
 
 In style JSON | In the SDK
 --------------|-----------
-<% for (const type of types) { -%>
-`<%- type %>` | `MGL<%- camelize(type) %>StyleLayer`
+<% for (const layer of layers) { -%>
+`<%- layer.type %>` | `MGL<%- camelize(layer.type) %>StyleLayer`
 <% } -%>
 
 You configure layout and paint attributes by setting properties on these style

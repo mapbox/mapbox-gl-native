@@ -44,8 +44,8 @@
 		35C5D84A1D6DD66D00E95907 /* NSCompoundPredicate+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35C5D8461D6DD66D00E95907 /* NSCompoundPredicate+MGLAdditions.mm */; };
 		35D65C5A1D65AD5500722C23 /* NSDate+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 35D65C581D65AD5500722C23 /* NSDate+MGLAdditions.h */; };
 		35D65C5B1D65AD5500722C23 /* NSDate+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35D65C591D65AD5500722C23 /* NSDate+MGLAdditions.mm */; };
-		4032C5C51DE1FE930062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 4032C5B91DE1EEBA0062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4032C5C61DE1FE9B0062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4032C5C31DE1FE810062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.mm */; };
+		4032C5C51DE1FE930062E8BD /* NSValue+MGLStyleLayerAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 4032C5B91DE1EEBA0062E8BD /* NSValue+MGLStyleLayerAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4032C5C61DE1FE9B0062E8BD /* NSValue+MGLStyleLayerAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4032C5C31DE1FE810062E8BD /* NSValue+MGLStyleLayerAdditions.mm */; };
 		4049C2A51DB6CE7F00B3F799 /* MGLPointCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 4049C2A11DB6CE7800B3F799 /* MGLPointCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4049C2AD1DB8020600B3F799 /* MGLPointCollection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4049C2A71DB6D09B00B3F799 /* MGLPointCollection.mm */; };
 		408AA85B1DAEECFE00022900 /* MGLShape_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 408AA85A1DAEECF100022900 /* MGLShape_Private.h */; };
@@ -293,10 +293,10 @@
 		35C5D84B1D6DD75B00E95907 /* MGLPredicateTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLPredicateTests.mm; path = ../../darwin/test/MGLPredicateTests.mm; sourceTree = "<group>"; };
 		35D65C581D65AD5500722C23 /* NSDate+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+MGLAdditions.h"; sourceTree = "<group>"; };
 		35D65C591D65AD5500722C23 /* NSDate+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSDate+MGLAdditions.mm"; sourceTree = "<group>"; };
-		4032C5B91DE1EEBA0062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+MGLStyleEnumAttributeAdditions.h"; sourceTree = "<group>"; };
-		4032C5BA1DE1EECB0062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.h.ejs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "NSValue+MGLStyleEnumAttributeAdditions.h.ejs"; sourceTree = "<group>"; };
-		4032C5C31DE1FE810062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSValue+MGLStyleEnumAttributeAdditions.mm"; sourceTree = "<group>"; };
-		4032C5C71DE1FEAB0062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.mm.ejs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "NSValue+MGLStyleEnumAttributeAdditions.mm.ejs"; sourceTree = "<group>"; };
+		4032C5B91DE1EEBA0062E8BD /* NSValue+MGLStyleLayerAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+MGLStyleLayerAdditions.h"; sourceTree = "<group>"; };
+		4032C5BA1DE1EECB0062E8BD /* NSValue+MGLStyleLayerAdditions.h.ejs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "NSValue+MGLStyleLayerAdditions.h.ejs"; sourceTree = "<group>"; };
+		4032C5C31DE1FE810062E8BD /* NSValue+MGLStyleLayerAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSValue+MGLStyleLayerAdditions.mm"; sourceTree = "<group>"; };
+		4032C5C71DE1FEAB0062E8BD /* NSValue+MGLStyleLayerAdditions.mm.ejs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "NSValue+MGLStyleLayerAdditions.mm.ejs"; sourceTree = "<group>"; };
 		4049C2A11DB6CE7800B3F799 /* MGLPointCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPointCollection.h; sourceTree = "<group>"; };
 		4049C2A71DB6D09B00B3F799 /* MGLPointCollection.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLPointCollection.mm; sourceTree = "<group>"; };
 		405C03961DB0004E001AC280 /* NSImage+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSImage+MGLAdditions.h"; sourceTree = "<group>"; };
@@ -560,8 +560,8 @@
 		352742791D4C235C00A1ECE6 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
-				4032C5B91DE1EEBA0062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.h */,
-				4032C5C31DE1FE810062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.mm */,
+				4032C5B91DE1EEBA0062E8BD /* NSValue+MGLStyleLayerAdditions.h */,
+				4032C5C31DE1FE810062E8BD /* NSValue+MGLStyleLayerAdditions.mm */,
 				DA8F25A61D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.h */,
 				DA8F25A71D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.mm */,
 			);
@@ -737,8 +737,8 @@
 				DA8F25B61D51D2240010E6B5 /* MGLStyleLayer.h.ejs */,
 				DA8F25B71D51D2240010E6B5 /* MGLStyleLayer.mm.ejs */,
 				DA8F25B51D51D2240010E6B5 /* MGLStyleLayerTests.m.ejs */,
-				4032C5BA1DE1EECB0062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.h.ejs */,
-				4032C5C71DE1FEAB0062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.mm.ejs */,
+				4032C5BA1DE1EECB0062E8BD /* NSValue+MGLStyleLayerAdditions.h.ejs */,
+				4032C5C71DE1FEAB0062E8BD /* NSValue+MGLStyleLayerAdditions.mm.ejs */,
 			);
 			name = "Foundation Templates";
 			path = ../../darwin/src;
@@ -1000,7 +1000,7 @@
 				352742781D4C220900A1ECE6 /* MGLStyleValue.h in Headers */,
 				DAE6C35E1CC31E0400DB3429 /* MGLMultiPoint.h in Headers */,
 				35602BFF1D3EA9B40050646F /* MGLStyleLayer_Private.h in Headers */,
-				4032C5C51DE1FE930062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.h in Headers */,
+				4032C5C51DE1FE930062E8BD /* NSValue+MGLStyleLayerAdditions.h in Headers */,
 				DAF0D8161DFE6B1800B28378 /* MGLAttributionInfo_Private.h in Headers */,
 				DAE6C3971CC31E2A00DB3429 /* NSBundle+MGLAdditions.h in Headers */,
 				DAED385F1D62CED700D7640F /* NSURL+MGLAdditions.h in Headers */,
@@ -1274,7 +1274,7 @@
 				DAE6C3931CC31E2A00DB3429 /* MGLShape.mm in Sources */,
 				352742861D4C244700A1ECE6 /* MGLRasterSource.mm in Sources */,
 				DAE6C39D1CC31E2A00DB3429 /* NSString+MGLAdditions.m in Sources */,
-				4032C5C61DE1FE9B0062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.mm in Sources */,
+				4032C5C61DE1FE9B0062E8BD /* NSValue+MGLStyleLayerAdditions.mm in Sources */,
 				3598195A1E02F611008FC139 /* NSCoder+MGLAdditions.mm in Sources */,
 				DAE6C3941CC31E2A00DB3429 /* MGLStyle.mm in Sources */,
 				DAE6C3871CC31E2A00DB3429 /* MGLGeometry.mm in Sources */,
