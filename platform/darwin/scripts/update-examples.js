@@ -136,6 +136,17 @@ function completeExamples(os) {
   });
 }
 
+function ensureSourceKittenIsInstalled() {
+  try {
+    execFileSync('which', ['sourcekitten']);
+  } catch (e) {
+    console.log(`Installing SourceKitten via Homebrew…`);
+    execFileSync('brew', ['install', 'sourcekitten']);
+  }
+}
+
+ensureSourceKittenIsInstalled();
+
 // Where a particular comment is part of both SDKs, prefer the iOS example.
 completeExamples('macOS');
 completeExamples('iOS');

@@ -126,13 +126,13 @@ To add an example code listing to the documentation for a class or class member:
    to [MGLDocumentationExampleTests](test/MGLDocumentationExampleTests.swift).
    Wrap the code you’d like to appear in the documentation within
    `//#-example-code` and `//#-end-example-code` comments.
-1. Install [SourceKitten](https://github.com/jpsim/SourceKitten/), then insert
-   the code listings into the headers:
+1. Insert the code listings into the headers:
 
 ```bash
-brew install sourcekitten
 make darwin-update-examples
 ```
+
+[SourceKitten](https://github.com/jpsim/SourceKitten/) is required and will be installed automatically using Homebrew.
 
 ## Testing
 
