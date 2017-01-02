@@ -29,7 +29,6 @@ let match;
 while ((match = exampleRegex.exec(examples)) !== null) {
   let className = match[1],
       memberName = match[2],
-      token = memberName ? `${className}.${memberName}` : className,
       indentation = match[3],
       exampleCode = match[4];
 
@@ -43,7 +42,7 @@ while ((match = exampleRegex.exec(examples)) !== null) {
   }
 
   if (fs.existsSync(path)) {
-    let file = fs.readFileSync(path, 'utf8');
+    let src = fs.readFileSync(path, 'utf8');
     
     // Use SourceKitten to find the class or class member named by the test method.
     let docStr = execFileSync('sourcekitten', ['doc', '--objc', path, '--', '-x', 'objective-c']).toString().trim();
@@ -52,15 +51,15 @@ while ((match = exampleRegex.exec(examples)) !== null) {
     let substructure = fileStructure['key.substructure'];
     substructure = _.find(substructure, decl => decl['key.name'] === className);
     if (memberName) {
-        substructure = _.find(substructure['key.substructure'], decl => decl['key.name'] === memberName);
+      substructure = _.find(substructure['key.substructure'], decl => decl['key.name'] === memberName);
     }
     
     // Split the file contents right before the symbol declaration (but after its documentation comment).
-    let fileUpToSymbol = file.split('\n', substructure['key.parsed_scope.start'] - 1).join('\n');
-    let fileFromSymbol = file.substr(fileUpToSymbol.length);
+    let srcUpToSymbol = src.split('\n', substructure['key.parsed_scope.start'] - 1).join('\n');
+    let srcFromSymbol = src.substr(srcUpToSymbol.length);
     
     // Match the documentation comment block that is not followed by the beginning or end of a declaration.
-    let commentMatch = fileUpToSymbol.match(/\/\*\*\s*(?:[^*]|\*(?!\/))+?\s*\*\/[^;{}]*?$/);
+    let commentMatch = srcUpToSymbol.match(/\/\*\*\s*(?:[^*]|\*(?!\/))+?\s*\*\/[^;{}]*?$/);
     
     // Replace the Swift code block with the test method’s contents.
     let completedComment = commentMatch[0].replace(/^([ \t]*)```swift\n[^]*?```/m, function (m, indentation) {
@@ -69,14 +68,18 @@ while ((match = exampleRegex.exec(examples)) !== null) {
     });
     
     // Splice the modified comment into the overall file contents.
-    fileUpToSymbol = (fileUpToSymbol.substr(0, commentMatch.index) + completedComment +
-                      fileUpToSymbol.substr(commentMatch.index + commentMatch[0].length));
-    file = fileUpToSymbol + fileFromSymbol;
+    srcUpToSymbol = (srcUpToSymbol.substr(0, commentMatch.index) + completedComment +
+                     srcUpToSymbol.substr(commentMatch.index + commentMatch[0].length));
+    let newSrc = srcUpToSymbol + srcFromSymbol;
     
     // Write out the modified file contents.
-    console.log("Updating example:", path);
-    fs.writeFileSync(path, fileUpToSymbol + fileFromSymbol);
-  } else if (token !== "ExampleToken") {
+    if (src === newSrc) {
+      console.log('Skipping', path);
+    } else {
+      console.log("Updating", path);
+      fs.writeFileSync(path, newSrc);
+    }
+  } else {
     console.log("error: File doesn't exist:", path);
   }
 }
