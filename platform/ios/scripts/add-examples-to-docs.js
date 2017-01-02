@@ -18,7 +18,7 @@ const examples = fs.readFileSync('platform/ios/test/MGLDocumentationExampleTests
 //
 // into the following regex groups:
 // 1 (class name): "MGLClass"
-// 2 (member name): "member"
+// 2 (member name): "member" or "initWithArg_anotherArg_"
 // 3 (indentation): "    "
 // 4 (sample code): "let sampleCode: String?"
 const exampleRegex = /func test(\w+)(?:\$(\w+))?\s*\(\)\s*\{[^]*?\n([ \t]+)\/\/#-example-code\n([^]+?)\n\3\/\/#-end-example-code\n/gm;
@@ -37,7 +37,7 @@ function getLineForSymbol(path, className, memberName) {
   let substructure = fileStructure['key.substructure'];
   substructure = _.find(substructure, decl => decl['key.name'] === className);
   if (memberName) {
-    substructure = _.find(substructure['key.substructure'] || [], decl => decl['key.name'] === memberName);
+    substructure = _.find(substructure['key.substructure'] || [], decl => decl['key.name'].match(memberName));
   }
   if (!substructure) {
     console.log(`error: ${className} not found in ${path}`);
@@ -99,6 +99,11 @@ while ((match = exampleRegex.exec(examples)) !== null) {
 
   // Trim leading whitespace from the example code.
   exampleCode = exampleCode.replace(new RegExp('^' + indentation, 'gm'), '');
+  
+  if (memberName) {
+    memberName = memberName.replace(/(.)_/g, '$1:');
+    memberName = new RegExp(`^[-+]?${memberName}$`);
+  }
 
   // check if file exists at path
   let path = `platform/darwin/src/${className}.h`;
