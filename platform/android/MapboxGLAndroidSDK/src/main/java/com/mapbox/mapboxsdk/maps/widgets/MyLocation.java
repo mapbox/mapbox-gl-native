@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.maps.widgets;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
@@ -20,6 +22,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -69,6 +72,8 @@ public class MyLocation {
   private static final String LOCATION_LAYER = "location-layer";
   private static final String USER_LOCATION_ICON = "user-location-icon";
   private static final String USER_LOCATION_ARROW_ICON = "user-location-arrow-icon";
+  private static final String USER_LOCATION_ICON_BACKGROUND = "user-location-icon-background";
+  private static final String LOCATION_LAYER_BACKGROUND = "location-layer-background";
 
   private static final int COMPASS_UPDATE_RATE_MS = 750;
   private static final int STALE_USER_LOCATION_MS = 2000;
@@ -86,6 +91,9 @@ public class MyLocation {
 
   private Handler staleHandler;
   private Runnable staleRunnable;
+  public boolean isStale;
+
+  private int tintColor;
 
 
   private LatLng latLng;
@@ -123,7 +131,7 @@ public class MyLocation {
     myLocationBehavior = new MyLocationBehaviorFactory().getBehavioralModel(MyLocationTracking.TRACKING_NONE);
     compassListener = new CompassListener(context);
 
-//    addLayers();
+    tintColor = Color.parseColor("#4C9AF2");
   }
 
   private void addLayers() {
@@ -142,10 +150,21 @@ public class MyLocation {
         Bitmap icon = getBitmapFromDrawable(drawable);
         mapboxMap.addImage(USER_LOCATION_ICON, icon);
 
+      Drawable user_location_drawable_background = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon_background);
+      Bitmap user_location_icon_background = getBitmapFromDrawable(user_location_drawable_background);
+      mapboxMap.addImage(USER_LOCATION_ICON_BACKGROUND, user_location_icon_background);
+
         Drawable bearingDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon_arrow);
         Bitmap bearingIcon = getBitmapFromDrawable(bearingDrawable);
         mapboxMap.addImage(USER_LOCATION_ARROW_ICON, bearingIcon);
 
+      SymbolLayer locationLayerBackground = new SymbolLayer(LOCATION_LAYER_BACKGROUND, USER_LOCATION_SOURCE).withProperties(
+        iconImage(myBearingTrackingMode == MyBearingTracking.NONE ? USER_LOCATION_ICON_BACKGROUND : USER_LOCATION_ARROW_ICON),
+        iconAllowOverlap(true),
+        iconIgnorePlacement(true),
+        iconRotationAlignment(Property.ICON_ROTATION_ALIGNMENT_MAP)
+      );
+      mapboxMap.addLayer(locationLayerBackground);
 
       SymbolLayer locationLayer = new SymbolLayer(LOCATION_LAYER, USER_LOCATION_SOURCE).withProperties(
         iconImage(myBearingTrackingMode == MyBearingTracking.NONE ? USER_LOCATION_ICON : USER_LOCATION_ARROW_ICON),
@@ -190,6 +209,24 @@ public class MyLocation {
   public void onStop() {
     compassListener.onPause();
     //toggleGps(false);
+  }
+
+  // TODO make more generic
+  public void setForegroundDrawableTint() {
+        final Drawable drawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon);
+        DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
+
+        ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), tintColor, Color.parseColor("#C8C6C6"));
+        colorAnimator.setDuration(500);
+        colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+          @Override
+          public void onAnimationUpdate(ValueAnimator valueAnimator) {
+            DrawableCompat.setTint(drawable, (int) valueAnimator.getAnimatedValue());
+            Bitmap icon = getBitmapFromDrawable(drawable);
+            mapboxMap.addImage(USER_LOCATION_ICON, icon);
+          }
+        });
+        colorAnimator.start();
   }
 
   public void setMapboxMap(MapboxMap mapboxMap) {
@@ -452,17 +489,6 @@ public class MyLocation {
 
   }
 
-  // TODO finish implementing stale feature
-  private boolean isStale(Location location) {
-    // TODO don't use stale if compass enabled
-    if (location != null) {
-      long ageInNanos = SystemClock.elapsedRealtime() - location.getTime();
-      return ageInNanos > STALE_USER_LOCATION_MS;
-    } else {
-      return false;
-    }
-  }
-
   // https://github.com/mapbox/mapbox-gl-style-spec/issues/459#issuecomment-240555277
   private FeatureCollection createGeoJSONCircle(Position center, double radius) throws TurfException {
     // turf circle
@@ -495,6 +521,25 @@ public class MyLocation {
     void updateLatLng(@NonNull Location newLocation) {
       location = newLocation;
 
+      if (isStale) {
+        final Drawable drawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon);
+        DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
+
+
+        ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), Color.parseColor("#C8C6C6"), tintColor);
+        colorAnimator.setDuration(500);
+        colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+          @Override
+          public void onAnimationUpdate(ValueAnimator valueAnimator) {
+            DrawableCompat.setTint(drawable, (int) valueAnimator.getAnimatedValue());
+            Bitmap icon = getBitmapFromDrawable(drawable);
+            mapboxMap.addImage(USER_LOCATION_ICON, icon);
+          }
+        });
+        colorAnimator.start();
+      }
+      isStale = false;
+
       MultiPoint multiPoint = MultiPoint.fromCoordinates(new double[][]{new double[]{location.getLongitude(), location.getLatitude()}});
       FeatureCollection featureCollection = FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(multiPoint)});
       GeoJsonSource source = mapboxMap.getSourceAs(USER_LOCATION_SOURCE);
@@ -505,7 +550,29 @@ public class MyLocation {
         mapboxMap.addSource(userLocationSource);
       }
 
-      staleHandler
+      staleHandler = new Handler();
+      staleRunnable = new Runnable() {
+        @Override
+        public void run() {
+          isStale = true;
+          final Drawable drawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon);
+          DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
+
+          ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), tintColor, Color.parseColor("#C8C6C6"));
+          colorAnimator.setDuration(500);
+          colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+              DrawableCompat.setTint(drawable, (int) valueAnimator.getAnimatedValue());
+              Bitmap icon = getBitmapFromDrawable(drawable);
+              mapboxMap.addImage(USER_LOCATION_ICON, icon);
+            }
+          });
+          colorAnimator.start();
+        }
+
+      };
+      staleHandler.postDelayed(staleRunnable, STALE_USER_LOCATION_MS);
     }
 
 //    void updateLatLng(double lat, double lon) {
