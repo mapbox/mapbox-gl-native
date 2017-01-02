@@ -30,9 +30,9 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
 
     override func setUp() {
         super.setUp()
-        mapView = MGLMapView(frame: CGRect(x: 0, y: 0, width: 256, height: 256))
+        let styleURL = Bundle(for: MGLDocumentationExampleTests.self).url(forResource: "one-liner", withExtension: "json")
+        mapView = MGLMapView(frame: CGRect(x: 0, y: 0, width: 256, height: 256), styleURL: styleURL)
         mapView.delegate = self
-        mapView.styleURL = Bundle(for: MGLDocumentationExampleTests.self).url(forResource: "one-liner", withExtension: "json")
         styleLoadingExpectation = expectation(description: "Map view should finish loading style")
         waitForExpectations(timeout: 1, handler: nil)
     }
