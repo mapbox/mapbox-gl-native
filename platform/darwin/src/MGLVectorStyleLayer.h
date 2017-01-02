@@ -141,6 +141,10 @@ NS_ASSUME_NONNULL_BEGIN
  `NSCompoundPredicate` along these lines:
  
  ```swift
+ let layer = MGLLineStyleLayer(identifier: "contour", source: terrain)
+ layer.sourceLayerIdentifier = "contours"
+ layer.predicate = NSPredicate(format: "(index == 5 || index == 10) && ele >= 1500.0")
+ mapView.style.addLayer(layer)
  ```
  */
 @property (nonatomic, nullable) NSPredicate *predicate;

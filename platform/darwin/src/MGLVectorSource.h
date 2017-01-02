@@ -28,6 +28,14 @@ NS_ASSUME_NONNULL_BEGIN
  ### Example
  
  ```swift
+ let source = MGLVectorSource(identifier: "pois", tileURLTemplates: ["https://example.com/vector-tiles/{z}/{x}/{y}.mvt"], options: [
+     .minimumZoomLevel: 9,
+     .maximumZoomLevel: 16,
+     .attributionInfos: [
+         MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+     ]
+ ])
+ mapView.style.addSource(source)
  ```
  */
 @interface MGLVectorSource : MGLTileSource
