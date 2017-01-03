@@ -164,4 +164,40 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
 
 @end
 
+/**
+ Methods for wrapping an enumeration value for a style layer attribute in an
+ `MGLCircleStyleLayer` object and unwrapping its raw value.
+ */
+@interface NSValue (MGLCircleStyleLayerAdditions)
+
+#pragma mark Working with Circle Style Layer Attribute Values
+
+/**
+ Creates a new value object containing the given `MGLCirclePitchScale` enumeration.
+
+ @param circlePitchScale The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLCirclePitchScale:(MGLCirclePitchScale)circlePitchScale;
+
+/**
+ The `MGLCirclePitchScale` enumeration representation of the value.
+ */
+@property (readonly) MGLCirclePitchScale MGLCirclePitchScaleValue;
+
+/**
+ Creates a new value object containing the given `MGLCircleTranslateAnchor` enumeration.
+
+ @param circleTranslateAnchor The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLCircleTranslateAnchor:(MGLCircleTranslateAnchor)circleTranslateAnchor;
+
+/**
+ The `MGLCircleTranslateAnchor` enumeration representation of the value.
+ */
+@property (readonly) MGLCircleTranslateAnchor MGLCircleTranslateAnchorValue;
+
+@end
+
 NS_ASSUME_NONNULL_END

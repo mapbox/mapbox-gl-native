@@ -144,4 +144,27 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
 
 @end
 
+/**
+ Methods for wrapping an enumeration value for a style layer attribute in an
+ `MGLFillStyleLayer` object and unwrapping its raw value.
+ */
+@interface NSValue (MGLFillStyleLayerAdditions)
+
+#pragma mark Working with Fill Style Layer Attribute Values
+
+/**
+ Creates a new value object containing the given `MGLFillTranslateAnchor` enumeration.
+
+ @param fillTranslateAnchor The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLFillTranslateAnchor:(MGLFillTranslateAnchor)fillTranslateAnchor;
+
+/**
+ The `MGLFillTranslateAnchor` enumeration representation of the value.
+ */
+@property (readonly) MGLFillTranslateAnchor MGLFillTranslateAnchorValue;
+
+@end
+
 NS_ASSUME_NONNULL_END

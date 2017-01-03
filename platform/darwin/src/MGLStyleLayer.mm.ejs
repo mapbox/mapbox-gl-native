@@ -2,7 +2,7 @@
   const type = locals.type;
   const layoutProperties = locals.layoutProperties;
   const paintProperties = locals.paintProperties;
-  const containsEnumerationProperties = locals.containsEnumerationProperties;
+  const enumProperties = locals.enumProperties;
 -%>
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
@@ -15,7 +15,7 @@
 #import "MGL<%- camelize(type) %>StyleLayer.h"
 
 #include <mbgl/style/layers/<%- type %>_layer.hpp>
-<% if (containsEnumerationProperties)  { -%>
+<% if (enumProperties) { -%>
 namespace mbgl {
 
 <% if (layoutProperties.length) { -%>
@@ -243,3 +243,21 @@ namespace mbgl {
 <% } -%>
 
 @end
+<% if (enumProperties) { -%>
+
+@implementation NSValue (MGL<%- camelize(type) %>StyleLayerAdditions)
+
+<% for (let property of enumProperties) { -%>
++ (NSValue *)valueWithMGL<%- camelize(property.name) %>:(MGL<%- camelize(property.name) %>)<%- objCName(property) %> {
+    return [NSValue value:&<%- objCName(property) %> withObjCType:@encode(MGL<%- camelize(property.name) %>)];
+}
+
+- (MGL<%- camelize(property.name) %>)MGL<%- camelize(property.name) %>Value {
+    MGL<%- camelize(property.name) %> <%- objCName(property) %>;
+    [self getValue:&<%- objCName(property) %>];
+    return <%- objCName(property) %>;
+}
+
+<% } -%>
+@end
+<% } -%>
