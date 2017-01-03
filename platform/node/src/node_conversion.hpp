@@ -36,7 +36,7 @@ inline v8::Local<v8::Value> arrayMember(v8::Local<v8::Value> value, std::size_t 
 
 inline bool isObject(v8::Local<v8::Value> value) {
     Nan::HandleScope scope;
-    return value->IsObject();
+    return value->IsObject() && !value->IsArray();
 }
 
 inline optional<v8::Local<v8::Value>> objectMember(v8::Local<v8::Value> value, const char * name) {
