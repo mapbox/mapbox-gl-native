@@ -75,8 +75,8 @@ Once you're happy with the styles you've created, it's time to [get setup with M
 To implement your prototypes with runtime styling:
 
 1. Implement `MGLMapViewDelegate` `-mapView:didFinishLoadingStyle:`
-2. Add your real data as a source ([see some examples](https://www.mapbox.com/ios-sdk/examples/))
-    * This can be done using vector data from tileset editor, custom vector tiles, added as GeoJSON, or added manually through the app via `MGLShapeSource`)
+2. Add your real data as a source
+    * This can be done using vector data from tileset editor ([example](https://www.mapbox.com/ios-sdk/examples/runtime-circle-styles)), custom vector tiles, added as GeoJSON ([example](https://www.mapbox.com/ios-sdk/examples/runtime-add-line), or added manually through the app via `MGLShapeSource` ([example](https://www.mapbox.com/ios-sdk/examples/runtime-multiple-annotations))
 3. For each layer you've prototyped in studio, add it's corresponding `MGLStyleLayer` subclass: `MGLSymbolStyleLayer`, `MGLLineStyleLayer`, `MGLFillStyleLayer`, or `MGLCircleStyleLayer`.
 
 **Translating style attributes from Studio**

@@ -1,10 +1,10 @@
-# Dynamically Styling Maps
+# Runtime Styling
 
-Mapbox's runtime styling features allow you direct control over every layer in your maps with code. It's now possible create dynamic maps and visualizations that aren't possible with other mobile mapping SDKs.
+Mapbox's runtime styling features allow you direct control over every layer in your maps with code. It's now possible create dynamic maps and visualizations that aren't possible with other mobile maps SDKs.
 
-Runtime styling expands upon the design power of Mapbox Studio and exposes all of the same properties and attributes directly to mobile developers in our SDK.
+Runtime styling expands upon the design power of [Mapbox Studio](https://www.mapbox.com/mapbox-studio/) and exposes all of the same properties and attributes directly to mobile developers in our SDK.
 
-Beyond the custom styled maps that you can create with [Mapbox Studio](https://www.mapbox.com/mapbox-studio/), you can now change the look and feel of your map on the fly having maps in your app visually respond to user interaction or or context. Or leverage the power of OpenGL for highly performant and complex data visualizations. Now it's possible to mix in your own data and bring your map to life.
+Beyond the custom styled maps that you can create with Mapbox Studio, you can now change the look and feel of your map on the fly having maps in your app visually respond to user interaction or or context. Or leverage the power of OpenGL for highly performant and complex data visualizations. Now it's possible to mix in your own data and bring your map to life.
 
 ## Example use cases
 
@@ -20,7 +20,7 @@ For maps that aren't going to change in response to custom data or user interact
 
 ### Map interactivity
 
-You can customize the map to the point of having it respond dynamically based on the actions your users are taking. Increase the text size of streets while a user is driving, emphasize points of interest tailored to a user's preferences, change your UI if user are near parks, trails, landmarks, or rivers.
+You can customize the map to the point of having it respond dynamically based on the actions your users are taking. Increase the text size of streets while a user is driving, emphasize points of interest tailored to a user's preferences, or change your UI if users are at parks, trails, landmarks, or rivers.
 
 ![emojis](img/runtime-styling/Emoji.gif "an example showing emoji interaction")
 
@@ -28,7 +28,7 @@ You can customize the map to the point of having it respond dynamically based on
 
 Mapbox maps are built on top of OpenGL and can support rendering data without the traditional overhead of `UIView`-based map annotations.
 
-Mapbox can support data visualizations that were slow or impossible with traditional map SDKs:
+Mapbox can support data visualizations that were slow or impossible with traditional map SDKs. Render heatmaps, visualize population density, or even go so far as updating the snow levels in the mountains to match recent snowfall.
 
 ![hex bins](img/runtime-styling/HexBins.gif "an example using hex bins")
 ![population](img/runtime-styling/Population.gif "an example showing population density")
@@ -36,16 +36,17 @@ Mapbox can support data visualizations that were slow or impossible with traditi
 
 ### Powerful annotations
 
-The Mapbox SDK gives you access to all of the same tools we use to render our maps. Annotate your place data or custom polygons with labels that make your maps stand out.
+The Mapbox SDK gives you access to all of the same tools we use to render our default map styles. Instead of using generic pin markers, enrich your place data or custom polygons with icons and labels that make your maps stand out.
 
 ![custom annotations](img/runtime-styling/CustomAnnotations.gif "an example showing custom annotations")
 
 ### Custom shapes
 
-Draw custom shapes on the map the same way you would a custom `UIView` or `CALayer`. These shapes keep their geographic scale and are perfect for visualizing everything from indoor floor plans to earthquakes to metro systems.
+Draw custom shapes on the map the same way you would a custom `UIView` or `CALayer`. These shapes keep their geographic scale and are perfect for visualizing everything from indoor floor plans to metro systems to hurricane tracks.
 
-<!-- custom storm tracks? -->
-<!-- indoor maps -->
+<!-- TODO: custom storm tracks -->
+<!-- TODO: metro system -->
+<!-- TODO: indoor maps -->
 
 ## Resources
 
