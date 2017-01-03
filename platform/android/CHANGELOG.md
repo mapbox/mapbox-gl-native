@@ -4,6 +4,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## 5.0.0 - TBA
 
+* Consistent double tap zoom acceleration [#7514](https://github.com/mapbox/mapbox-gl-native/issues/7514)
 * Support for Android Nougat [#5910](5910-move-listener-logic-for-nougat) & [#6390](https://github.com/mapbox/mapbox-gl-native/pull/6390)
 
 ## 4.2.1 - December 22, 2016

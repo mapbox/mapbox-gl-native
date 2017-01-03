@@ -428,7 +428,11 @@ final class MapGestureDetector {
         transform.zoomBy(detector.getScaleFactor(), focalPoint.x, focalPoint.y);
       } else if (quickZoom) {
         // around center map
-        transform.zoomBy(detector.getScaleFactor(), uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+        float scaleFactor = detector.getScaleFactor();
+        if (scaleFactor > 0.65 && scaleFactor < 1.35) {
+          // limit scale factors we feed to core #7514
+          transform.zoomBy(scaleFactor, uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+        }
       } else {
         // around gesture
         transform.zoomBy(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
