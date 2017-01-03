@@ -4,7 +4,6 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## 5.0.0 - TBA
 
-* Consistent double tap zoom acceleration [#7514](https://github.com/mapbox/mapbox-gl-native/issues/7514)
 * Cleanup inconsistencies float vs double [#4445](https://github.com/mapbox/mapbox-gl-native/issues/4445)
 * Add `mapbox_` prefix to attributes [#6482](https://github.com/mapbox/mapbox-gl-native/issues/6482)
 * Update LOST to 2.0.0 [#6573](https://github.com/mapbox/mapbox-gl-native/issues/6537)
@@ -41,6 +40,7 @@ Mapbox Android 4.2.2 builds further on v4.2.1 and resolves:
 * OnFling gesture improvements
  - Improve fling by calculating animation time based on velocity [#7676](https://github.com/mapbox/mapbox-gl-native/pull/7676)
  - Avoid triggering a fling after a scale gesture [#7675](https://github.com/mapbox/mapbox-gl-native/issues/7675)
+* Consistent double tap zoom acceleration [#7514](https://github.com/mapbox/mapbox-gl-native/issues/7514)
 * Deselect marker on infowindow click [#7784](https://github.com/mapbox/mapbox-gl-native/issues/7784)
 * Update build tools to Bitrise supported one [#7729](https://github.com/mapbox/mapbox-gl-native/issues/7729)
 * Removal of redudant log statements in native_map_view.cpp [#7801](https://github.com/mapbox/mapbox-gl-native/issues/7801)

@@ -84,6 +84,7 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
+import com.mapbox.mapboxsdk.utils.MathUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -2124,8 +2125,12 @@ public class MapView extends FrameLayout {
                 // arround user provided focal point
                 nativeMapView.scaleBy(detector.getScaleFactor(), focalPoint.x / screenDensity, focalPoint.y / screenDensity);
             } else if (quickZoom) {
+                // clamp scale factors we feed to core #7514
+                float scaleFactor = MathUtils.clamp(detector.getScaleFactor(),
+                    MapboxConstants.MINIMUM_SCALE_FACTOR_CLAMP,
+                    MapboxConstants.MAXIMUM_SCALE_FACTOR_CLAMP);
                 // around center map
-                nativeMapView.scaleBy(detector.getScaleFactor(), (getWidth() / 2) / screenDensity, (getHeight() / 2) / screenDensity);
+                nativeMapView.scaleBy(scaleFactor, (getWidth() / 2) / screenDensity, (getHeight() / 2) / screenDensity);
             } else {
                 // around gesture
                 nativeMapView.scaleBy(detector.getScaleFactor(), detector.getFocusX() / screenDensity, detector.getFocusY() / screenDensity);
