@@ -2039,20 +2039,15 @@ public class MapView extends FrameLayout {
 
             resetTrackingModesIfRequired(true, false);
 
-            // Fling the map
-            float ease = 0.25f;
-
-            velocityX = velocityX * ease;
-            velocityY = velocityY * ease;
-
-            double speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
-            double deceleration = 2500;
-            double duration = speed / (deceleration * ease);
+            double tilt = getTilt();
+            double limitFactor = 2 + ((tilt != 0) ? (tilt / 10) : 0);
+            double offsetX = velocityX / limitFactor / screenDensity;
+            double offsetY = velocityY / limitFactor / screenDensity;
 
             // Cancel any animation
             cancelTransitions();
 
-            nativeMapView.moveBy(velocityX * duration / 2.0 / screenDensity, velocityY * duration / 2.0 / screenDensity, (long) (duration * 1000.0f));
+            nativeMapView.moveBy(offsetX, offsetY, MapboxConstants.ANIMATION_DURATION_FLING);
 
             MapboxMap.OnFlingListener listener = mapboxMap.getOnFlingListener();
             if (listener != null) {
