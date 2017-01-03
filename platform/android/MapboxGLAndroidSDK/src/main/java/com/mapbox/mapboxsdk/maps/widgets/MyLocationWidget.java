@@ -1,28 +1,15 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
-import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Camera;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
-import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 
-import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
@@ -31,11 +18,9 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
-import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.commons.geojson.Feature;
@@ -51,29 +36,22 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mapbox.mapboxsdk.constants.MyLocationConstants.ACCURACY_LAYER;
-import static com.mapbox.mapboxsdk.constants.MyLocationConstants.LOCATION_LAYER;
-import static com.mapbox.mapboxsdk.constants.MyLocationConstants.LOCATION_LAYER_BACKGROUND;
-import static com.mapbox.mapboxsdk.constants.MyLocationConstants.USER_LOCATION_ACCURACY_SOURCE;
-import static com.mapbox.mapboxsdk.constants.MyLocationConstants.USER_LOCATION_ARROW_ICON;
-import static com.mapbox.mapboxsdk.constants.MyLocationConstants.USER_LOCATION_ICON;
-import static com.mapbox.mapboxsdk.constants.MyLocationConstants.USER_LOCATION_ICON_BACKGROUND;
-import static com.mapbox.mapboxsdk.constants.MyLocationConstants.USER_LOCATION_SOURCE;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.ACCURACY_LAYER;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.LOCATION_LAYER;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.LOCATION_LAYER_BACKGROUND;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.USER_LOCATION_ACCURACY_SOURCE;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.USER_LOCATION_BEARING_ICON;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.USER_LOCATION_ICON;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.USER_LOCATION_SOURCE;
+import static com.mapbox.mapboxsdk.style.layers.Property.VISIBLE;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconRotationAlignment;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
 
-public class MyLocation {
+public class MyLocationWidget {
 
-  // TODO port Turf Circle to MAS
   // TODO Check if code works in edit mode (I removed isInEditMode())
 
   private static final int COMPASS_UPDATE_RATE_MS = 750;
-  private static final int STALE_USER_LOCATION_MS = 10000;
 
   private MyLocationBehavior myLocationBehavior;
   private GpsLocationListener userLocationListener;
@@ -83,27 +61,12 @@ public class MyLocation {
 
   private ValueAnimator accuracyAnimator;
   private ValueAnimator directionAnimator;
-  private ValueAnimator locationChangeAnimator;
   private long locationUpdateTimestamp;
-
-  private Handler staleHandler;
-  private Runnable staleRunnable;
-  public boolean isStale;
-
-  private int tintColor;
-  private int staleStateTintColor;
-  private int accuracyTintColor;
 
   private LatLng latLng;
   private Location location;
   private float accuracy;
   private float previousDirection;
-
-  private double bearing;
-  private float magneticHeading;
-
-  private Matrix matrix;
-  private Camera camera;
 
   private MapboxMap mapboxMap;
 
@@ -113,96 +76,28 @@ public class MyLocation {
   @MyBearingTracking.Mode
   private int myBearingTrackingMode;
 
-  public MyLocation(Context context) {
+  public MyLocationWidget(Context context) {
     this.context = context;
     init();
   }
 
   private void init() {
-
-   // toggleGps(false);
-
-    matrix = new Matrix();
-    camera = new Camera();
-    camera.setLocation(0, 0, -1000);
-
     myLocationBehavior = new MyLocationBehaviorFactory().getBehavioralModel(MyLocationTracking.TRACKING_NONE);
     compassListener = new CompassListener(context);
-
-    tintColor = Color.parseColor("#4C9AF2");
-    staleStateTintColor = Color.parseColor("#C8C6C6");
-    accuracyTintColor = Color.parseColor("#4C9AF2");
-  }
-
-  private void addLayers() {
-    if (mapboxMap.getLayer(ACCURACY_LAYER) == null) {
-      FillLayer accuracyLayer = new FillLayer(ACCURACY_LAYER, USER_LOCATION_ACCURACY_SOURCE).withProperties(
-        fillColor(accuracyTintColor),
-        fillOpacity(0.3f)
-      );
-      mapboxMap.addLayer(accuracyLayer);
-    }
-
-    if (mapboxMap.getLayer(LOCATION_LAYER) == null) {
-
-      // Add the location icon image to the map
-      Drawable drawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon);
-      Drawable bearingDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon_arrow);
-      mapboxMap.getMyLocationViewSettings().setForegroundDrawable(drawable, bearingDrawable);
-
-      Drawable userLocationDrawableBackground = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon_background);
-      mapboxMap.getMyLocationViewSettings().setBackgroundDrawable(userLocationDrawableBackground);
-
-      SymbolLayer locationLayerBackground = new SymbolLayer(LOCATION_LAYER_BACKGROUND, USER_LOCATION_SOURCE).withProperties(
-        iconImage(myBearingTrackingMode == MyBearingTracking.NONE ? USER_LOCATION_ICON_BACKGROUND : USER_LOCATION_ARROW_ICON),
-        iconAllowOverlap(true),
-        iconIgnorePlacement(true),
-        iconRotationAlignment(Property.ICON_ROTATION_ALIGNMENT_MAP)
-      );
-      mapboxMap.addLayer(locationLayerBackground);
-
-      SymbolLayer locationLayer = new SymbolLayer(LOCATION_LAYER, USER_LOCATION_SOURCE).withProperties(
-        iconImage(myBearingTrackingMode == MyBearingTracking.NONE ? USER_LOCATION_ICON : USER_LOCATION_ARROW_ICON),
-        iconAllowOverlap(true),
-        iconIgnorePlacement(true),
-        iconRotationAlignment(Property.ICON_ROTATION_ALIGNMENT_MAP)
-      );
-      mapboxMap.addLayer(locationLayer);
-    }
-  }
-
-  //TODO move to utils?
-  private static Bitmap getBitmapFromDrawable(Drawable drawable) {
-    if (drawable instanceof BitmapDrawable) {
-      return ((BitmapDrawable) drawable).getBitmap();
-    } else {
-      Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
-        Bitmap.Config.ARGB_8888);
-      Canvas canvas = new Canvas(bitmap);
-      drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-      drawable.draw(canvas);
-      return bitmap;
-    }
-  }
-
-  public void setCameraPosition(CameraPosition position) {
-    // if (position != null) {
-    //    setTilt(position.tilt);
-    //     setBearing(position.bearing);
-    //  }
   }
 
   public void onStart() {
     if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
       compassListener.onResume();
     }
-    // TODO check if location was enabled
-//    if (isEnabled()) {
+    // TODO need to save state of mylocation
+    if (mapboxMap.getMyLocationWidgetSettings().isEnabled()) {
       toggleGps(true);
-   // }
+    }
   }
 
   public void onStop() {
+    mapboxMap.getMyLocationWidgetSettings().onStop();
     compassListener.onPause();
     toggleGps(false);
   }
@@ -220,7 +115,6 @@ public class MyLocation {
    *
    * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
    */
-  // TODO rename to enable?
   public void toggleGps(boolean enableGps) {
     LocationServices locationServices = LocationServices.getLocationServices(context);
     if (enableGps) {
@@ -232,11 +126,10 @@ public class MyLocation {
       }
 
       if (userLocationListener == null) {
-        userLocationListener = new MyLocation.GpsLocationListener(this);
+        userLocationListener = new MyLocationWidget.GpsLocationListener(this);
       }
 
       locationServices.addLocationListener(userLocationListener);
-      addLayers();
     } else {
       // Disable location and user dot
       location = null;
@@ -245,12 +138,17 @@ public class MyLocation {
 
     Layer accuracy = mapboxMap.getLayer(ACCURACY_LAYER);
     if (accuracy != null) {
-      accuracy.setProperties(visibility(enableGps ? Property.VISIBLE : Property.NONE));
+      accuracy.setProperties(visibility(enableGps ? VISIBLE : Property.NONE));
+    }
+
+    Layer locationBackgroundIcon = mapboxMap.getLayer(LOCATION_LAYER_BACKGROUND);
+    if (locationBackgroundIcon != null) {
+      locationBackgroundIcon.setProperties(visibility(enableGps ? VISIBLE : Property.NONE));
     }
 
     Layer locationIcon = mapboxMap.getLayer(LOCATION_LAYER);
     if (locationIcon != null) {
-      locationIcon.setProperties(visibility(enableGps ? Property.VISIBLE : Property.NONE));
+      locationIcon.setProperties(visibility(enableGps ? VISIBLE : Property.NONE));
     }
 
     locationServices.toggleGPS(enableGps);
@@ -274,7 +172,7 @@ public class MyLocation {
     // Change the icon image to display arrow
     if (mapboxMap.getLayer(LOCATION_LAYER) != null) {
       mapboxMap.getLayer(LOCATION_LAYER).setProperties(
-        iconImage(myBearingTrackingMode == MyBearingTracking.NONE ? USER_LOCATION_ICON : USER_LOCATION_ARROW_ICON)
+        iconImage(myBearingTrackingMode == MyBearingTracking.NONE ? USER_LOCATION_ICON : USER_LOCATION_BEARING_ICON)
       );
     }
     this.myBearingTrackingMode = myBearingTrackingMode;
@@ -288,32 +186,6 @@ public class MyLocation {
       }
     }
   }
-
-//  private class MarkerCoordinateAnimatorListener implements ValueAnimator.AnimatorUpdateListener {
-//
-//    private MyLocationBehavior behavior;
-//    private double fromLat;
-//    private double fromLng;
-//    private double toLat;
-//    private double toLng;
-//
-//    private MarkerCoordinateAnimatorListener(MyLocationBehavior myLocationBehavior, LatLng from, LatLng to) {
-//      behavior = myLocationBehavior;
-//      fromLat = from.getLatitude();
-//      fromLng = from.getLongitude();
-//      toLat = to.getLatitude();
-//      toLng = to.getLongitude();
-//    }
-//
-//    @Override
-//    public void onAnimationUpdate(ValueAnimator animation) {
-//      float frac = animation.getAnimatedFraction();
-//      double latitude = fromLat + (toLat - fromLat) * frac;
-//      double longitude = fromLng + (toLng - fromLng) * frac;
-//      behavior.updateLatLng(latitude, longitude);
-//      behavior.updateAccuracy(latitude, longitude);
-//    }
-//  }
 
   public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
     MyLocationBehaviorFactory factory = new MyLocationBehaviorFactory();
@@ -384,10 +256,10 @@ public class MyLocation {
 
   private static class GpsLocationListener implements LocationListener {
 
-    private WeakReference<MyLocation> userLocation;
+    private WeakReference<MyLocationWidget> userLocation;
 
-    GpsLocationListener(MyLocation myLocation) {
-      userLocation = new WeakReference<>(myLocation);
+    GpsLocationListener(MyLocationWidget myLocationWidget) {
+      userLocation = new WeakReference<>(myLocationWidget);
     }
 
     /**
@@ -397,9 +269,9 @@ public class MyLocation {
      */
     @Override
     public void onLocationChanged(Location location) {
-      MyLocation myLocation = userLocation.get();
-      if (myLocation != null) {
-        myLocation.setLocation(location);
+      MyLocationWidget myLocationWidget = userLocation.get();
+      if (myLocationWidget != null) {
+        myLocationWidget.setLocation(location);
       }
     }
   }
@@ -443,12 +315,12 @@ public class MyLocation {
         SensorManager.getRotationMatrixFromVector(matrix, event.values);
         SensorManager.getOrientation(matrix, orientation);
 
-        magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation)[0]);
+        float magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation)[0]);
         if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
           rotateCamera(magneticHeading);
         }
         // Change compass direction
-        setCompass(magneticHeading - bearing, COMPASS_UPDATE_RATE_MS);
+        setCompass(magneticHeading, COMPASS_UPDATE_RATE_MS);
 
         compassUpdateNextTimestamp = currentTime + COMPASS_UPDATE_RATE_MS;
       }
@@ -464,9 +336,9 @@ public class MyLocation {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
-
   }
 
+  // TODO port Turf Circle to MAS
   // https://github.com/mapbox/mapbox-gl-style-spec/issues/459#issuecomment-224957055
   private FeatureCollection createGeoJSONCircle(Position center, double radius) throws TurfException {
     // turf circle
@@ -499,27 +371,14 @@ public class MyLocation {
     void updateLatLng(@NonNull Location newLocation) {
       location = newLocation;
 
-      if (isStale) {
-        final Drawable drawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon);
-        DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
+      mapboxMap.getMyLocationWidgetSettings().staleTransition();
 
-
-        ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), Color.parseColor("#C8C6C6"), tintColor);
-        colorAnimator.setDuration(500);
-        colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-          @Override
-          public void onAnimationUpdate(ValueAnimator valueAnimator) {
-            DrawableCompat.setTint(drawable, (int) valueAnimator.getAnimatedValue());
-            Bitmap icon = getBitmapFromDrawable(drawable);
-            mapboxMap.addImage(USER_LOCATION_ICON, icon);
-          }
-        });
-        colorAnimator.start();
-      }
-      isStale = false;
-
-      MultiPoint multiPoint = MultiPoint.fromCoordinates(new double[][]{new double[]{location.getLongitude(), location.getLatitude()}});
-      FeatureCollection featureCollection = FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(multiPoint)});
+      MultiPoint multiPoint = MultiPoint.fromCoordinates(
+        new double[][] {new double[] {location.getLongitude(), location.getLatitude()}}
+      );
+      FeatureCollection featureCollection = FeatureCollection.fromFeatures(
+        new Feature[] {Feature.fromGeometry(multiPoint)}
+      );
       GeoJsonSource source = mapboxMap.getSourceAs(USER_LOCATION_SOURCE);
       if (source != null) {
         source.setGeoJson(featureCollection);
@@ -527,65 +386,11 @@ public class MyLocation {
         userLocationSource = new GeoJsonSource(USER_LOCATION_SOURCE, featureCollection);
         mapboxMap.addSource(userLocationSource);
       }
-
-      if (staleHandler != null && staleRunnable != null) {
-        staleHandler.removeCallbacks(staleRunnable);
-      }
-      staleHandler = new Handler();
-      staleRunnable = new Runnable() {
-        @Override
-        public void run() {
-          isStale = true;
-          final Drawable drawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon);
-          DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
-
-          ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), tintColor, staleStateTintColor);
-          colorAnimator.setDuration(1000);
-          colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-              DrawableCompat.setTint(drawable, (int) valueAnimator.getAnimatedValue());
-              Bitmap icon = getBitmapFromDrawable(drawable);
-              mapboxMap.addImage(USER_LOCATION_ICON, icon);
-            }
-          });
-          colorAnimator.start();
-        }
-
-      };
-      staleHandler.postDelayed(staleRunnable, STALE_USER_LOCATION_MS);
     }
 
-//    void updateLatLng(double lat, double lon) {
-//      if (latLng != null) {
-//        latLng.setLatitude(lat);
-//        latLng.setLongitude(lon);
-//      }
-//      // TODO animate the user location
-//      MultiPoint multiPoint = MultiPoint.fromCoordinates(new double[][]{new double[]{lon, lat}});
-//      FeatureCollection featureCollection = FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(multiPoint)});
-//      GeoJsonSource source = mapboxMap.getSourceAs(USER_LOCATION_SOURCE);
-//      if (source != null) {
-//        source.setGeoJson(featureCollection);
-//      } else {
-//        userLocationSource = new GeoJsonSource(USER_LOCATION_SOURCE, featureCollection);
-//        mapboxMap.addSource(userLocationSource);
-//      }
-//    }
-
     void updateAccuracy(final double lat, final double lon) {
-      // TODO remove devision of 10 once https://github.com/mapbox/mapbox-java/issues/248 is resolved.
+      // TODO remove division of 10 once https://github.com/mapbox/mapbox-java/issues/248 is resolved.
       // TODO filter out occasional flickering?
-      // animate changes
-//      if (accuracyAnimator != null) {
-//        accuracyAnimator.end();
-//        accuracyAnimator = null;
-//      }
-
-      // No need to animate since the accuracy is identical.
-//      if (accuracy == location.getAccuracy()) {
-//        return;
-//      }
 
       accuracyAnimator = ValueAnimator.ofFloat(accuracy / 10, location.getAccuracy() / 10);
       accuracyAnimator.setDuration(750);
@@ -615,7 +420,7 @@ public class MyLocation {
     }
   }
 
-  private class MyLocationTrackingBehavior extends MyLocation.MyLocationBehavior {
+  private class MyLocationTrackingBehavior extends MyLocationWidget.MyLocationBehavior {
 
     @Override
     void updateLatLng(@NonNull Location location) {
@@ -637,7 +442,7 @@ public class MyLocation {
       } else {
         animationDuration = (locationUpdateTimestamp - previousUpdateTimeStamp) * 1.1f
         /*make animation slightly longer*/;
-     }
+      }
 
       // calculate interpolated location
       latLng = new LatLng(location);
@@ -660,7 +465,7 @@ public class MyLocation {
     }
   }
 
-  private class MyLocationShowBehavior extends MyLocation.MyLocationBehavior {
+  private class MyLocationShowBehavior extends MyLocationWidget.MyLocationBehavior {
 
     @Override
     void updateLatLng(@NonNull final Location location) {
@@ -672,29 +477,8 @@ public class MyLocation {
         locationUpdateTimestamp = SystemClock.elapsedRealtime();
       }
 
-      // update LatLng location
-      //LatLng newLocation = new LatLng(location);
-
       // update LatLng accuracy
       updateAccuracy(location.getLatitude(), location.getLongitude());
-
-      // calculate updateLatLng time + add some extra offset to improve animation
-      //long previousUpdateTimeStamp = locationUpdateTimestamp;
-      //locationUpdateTimestamp = SystemClock.elapsedRealtime();
-      //long locationUpdateDuration = (long) ((locationUpdateTimestamp - previousUpdateTimeStamp) * 1.2f);
-
-      // animate changes
-//      if (locationChangeAnimator != null) {
-//        locationChangeAnimator.end();
-//        locationChangeAnimator = null;
-//      }
-
-//      locationChangeAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
-//      locationChangeAnimator.setDuration(locationUpdateDuration);
-//      locationChangeAnimator.addUpdateListener(new MyLocation.MarkerCoordinateAnimatorListener(this,
-//        latLng, newLocation
-//      ));
-//      locationChangeAnimator.start();
     }
   }
 }

@@ -26,8 +26,9 @@
         <!--UI-Controls-->
         <attr name="mapbox_uiZoomControls" format="boolean" />
 
-        <!--MyLocation-->
+        <!--MyLocationWidget-->
         <attr name="mapbox_myLocation" format="boolean" />
+        <attr name="mapbox_myLocationStaleTintColor" format="color" />
         <attr name="mapbox_myLocationTintColor" format="color" />
         <attr name="mapbox_myLocationDrawable" format="reference" />
         <attr name="mapbox_myLocationBearingDrawable" format="reference" />
@@ -38,7 +39,7 @@
         <attr name="mapbox_myLocationBackgroundMarginRight" format="dimension" />
         <attr name="mapbox_myLocationBackgroundMarginBottom" format="dimension" />
         <attr name="mapbox_myLocationAccuracyTintColor" format="color" />
-        <attr name="mapbox_myLocationAccuracyAlpha" format="integer" />
+        <attr name="mapbox_myLocationAccuracyAlpha" format="float" />
 
         <!--Compass-->
         <attr name="mapbox_uiCompass" format="boolean" />

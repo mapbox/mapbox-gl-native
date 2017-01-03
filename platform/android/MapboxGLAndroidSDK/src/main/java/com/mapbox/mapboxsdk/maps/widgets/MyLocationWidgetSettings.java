@@ -1,40 +1,56 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.PointF;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.support.annotation.ColorInt;
-import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 
-import com.mapbox.mapboxsdk.R;
-import com.mapbox.mapboxsdk.constants.MyLocationTracking;
+import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.maps.FocalPointChangeListener;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.Projection;
+import com.mapbox.mapboxsdk.style.layers.FillLayer;
+import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 
-import static com.mapbox.mapboxsdk.constants.MyLocationConstants.ACCURACY_LAYER;
-import static com.mapbox.mapboxsdk.constants.MyLocationConstants.USER_LOCATION_ARROW_ICON;
-import static com.mapbox.mapboxsdk.constants.MyLocationConstants.USER_LOCATION_ICON;
-import static com.mapbox.mapboxsdk.constants.MyLocationConstants.USER_LOCATION_ICON_BACKGROUND;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.ACCURACY_LAYER;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.LOCATION_LAYER;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.LOCATION_LAYER_BACKGROUND;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.USER_LOCATION_ACCURACY_SOURCE;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.USER_LOCATION_BEARING_ICON;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.USER_LOCATION_ICON;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.USER_LOCATION_ICON_BACKGROUND;
+import static com.mapbox.mapboxsdk.constants.MyLocationWidgetConstants.USER_LOCATION_SOURCE;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconRotationAlignment;
 
 // TODO change file name
+
 /**
  * Settings to configure the visual appearance of the MyLocationView.
  */
-public class MyLocationViewSettings {
+public class MyLocationWidgetSettings {
 
   private Projection projection;
-  private MyLocationView myLocationView;
+  private MyLocationWidget myLocationWidget;
   private FocalPointChangeListener focalPointChangeListener;
   private MapboxMap mapboxMap;
+
+  private static final int STALE_USER_LOCATION_MS = 10000;
+  private static final int STALE_STATE_TRANSITION_DURATION_MS = 1000;
 
   //
   // State
@@ -71,6 +87,15 @@ public class MyLocationViewSettings {
   @ColorInt
   private int accuracyTintColor;
 
+  @MyBearingTracking.Mode
+  private int myBearingTrackingMode;
+
+  // Stale state variables
+  private Handler staleHandler;
+  private Runnable staleRunnable;
+  private boolean isStale;
+  private int staleStateTintColor;
+
   //
   // Padding
   //
@@ -78,32 +103,29 @@ public class MyLocationViewSettings {
   private int[] padding = new int[4];
 
   /**
-   * Creates an instance of MyLocationViewSettings
+   * Creates an instance of MyLocationWidgetSettings
    * <p>
    *
-   * @param myLocationView            the MyLocationView to apply the settings to
+   * @param myLocationWidget          the MyLocationWidget to apply the settings to
    * @param projection                the MapView projection
    * @param focalPointChangedListener the interface to be invoked when focal points changes
-   * @see MyLocationView
+   * @see MyLocationWidget
    */
-  public MyLocationViewSettings(MyLocationView myLocationView, Projection projection, FocalPointChangeListener
+  public MyLocationWidgetSettings(MyLocationWidget myLocationWidget, Projection projection, FocalPointChangeListener
     focalPointChangedListener) {
-    this.myLocationView = myLocationView;
+    this.myLocationWidget = myLocationWidget;
     this.projection = projection;
     this.focalPointChangeListener = focalPointChangedListener;
   }
 
   public void initialise(@NonNull MapboxMapOptions options) {
-    CameraPosition position = options.getCamera();
-    if (position != null && !position.equals(CameraPosition.DEFAULT)) {
-      setTilt(position.tilt);
-    }
-    setForegroundDrawable(options.getMyLocationForegroundDrawable(), options.getMyLocationForegroundBearingDrawable());
-    setForegroundTintColor(options.getMyLocationForegroundTintColor());
+    setAccuracyTintColor(options.getMyLocationAccuracyTintColor());
+    setAccuracyAlpha(options.getMyLocationAccuracyAlpha());
     setBackgroundDrawable(options.getMyLocationBackgroundDrawable());
     setBackgroundTintColor(options.getMyLocationBackgroundTintColor());
-    setAccuracyAlpha(options.getMyLocationAccuracyAlpha());
-    setAccuracyTintColor(options.getMyLocationAccuracyTintColor());
+    setForegroundDrawable(options.getMyLocationForegroundDrawable(), options.getMyLocationForegroundBearingDrawable());
+    setForegroundTintColor(options.getMyLocationForegroundTintColor());
+    setStaleStateTint(options.getMyLocationStaleTintColor());
   }
 
   public void setMapboxMap(MapboxMap mapboxMap) {
@@ -126,14 +148,12 @@ public class MyLocationViewSettings {
    */
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
-    myLocationView.setEnabled(enabled);
+    myLocationWidget.toggleGps(enabled);
   }
 
-  public void setStaleStateTint() {
-
+  public void setStaleStateTint(@ColorInt int staleStateTintColor) {
+    this.staleStateTintColor = staleStateTintColor;
   }
-
-  public
 
   /**
    * Set the foreground drawable of the MyLocationView
@@ -152,7 +172,18 @@ public class MyLocationViewSettings {
     mapboxMap.addImage(USER_LOCATION_ICON, icon);
 
     Bitmap bearingIcon = getBitmapFromDrawable(foregroundBearingDrawable);
-    mapboxMap.addImage(USER_LOCATION_ARROW_ICON, bearingIcon);
+    mapboxMap.addImage(USER_LOCATION_BEARING_ICON, bearingIcon);
+
+    if (mapboxMap.getLayer(LOCATION_LAYER) == null) {
+
+      SymbolLayer locationLayer = new SymbolLayer(LOCATION_LAYER, USER_LOCATION_SOURCE).withProperties(
+        iconImage(myBearingTrackingMode == MyBearingTracking.NONE ? USER_LOCATION_ICON : USER_LOCATION_BEARING_ICON),
+        iconAllowOverlap(true),
+        iconIgnorePlacement(true),
+        iconRotationAlignment(Property.ICON_ROTATION_ALIGNMENT_MAP)
+      );
+      mapboxMap.addLayer(locationLayer);
+    }
   }
 
   /**
@@ -191,7 +222,7 @@ public class MyLocationViewSettings {
     if (foregroundBearingDrawable != null) {
       DrawableCompat.setTint(foregroundBearingDrawable, foregroundTintColor);
       Bitmap userBearingIcon = getBitmapFromDrawable(foregroundBearingDrawable);
-      mapboxMap.addImage(USER_LOCATION_ARROW_ICON, userBearingIcon);
+      mapboxMap.addImage(USER_LOCATION_BEARING_ICON, userBearingIcon);
     }
   }
 
@@ -227,8 +258,20 @@ public class MyLocationViewSettings {
    */
   public void setBackgroundDrawable(Drawable backgroundDrawable) {
     this.backgroundDrawable = backgroundDrawable;
+
     Bitmap bitmap = getBitmapFromDrawable(backgroundDrawable);
     mapboxMap.addImage(USER_LOCATION_ICON_BACKGROUND, bitmap);
+
+
+    if (mapboxMap.getLayer(LOCATION_LAYER_BACKGROUND) == null) {
+      SymbolLayer locationLayerBackground = new SymbolLayer(LOCATION_LAYER_BACKGROUND, USER_LOCATION_SOURCE).withProperties(
+        iconImage(myBearingTrackingMode == MyBearingTracking.NONE ? USER_LOCATION_ICON_BACKGROUND : USER_LOCATION_BEARING_ICON),
+        iconAllowOverlap(true),
+        iconIgnorePlacement(true),
+        iconRotationAlignment(Property.ICON_ROTATION_ALIGNMENT_MAP)
+      );
+      mapboxMap.addLayer(locationLayerBackground);
+    }
   }
 
   /**
@@ -280,9 +323,9 @@ public class MyLocationViewSettings {
    */
   public void setPadding(int left, int top, int right, int bottom) {
     padding = new int[] {left, top, right, bottom};
-    myLocationView.setContentPadding(padding);
-    projection.invalidateContentPadding(padding);
-    invalidateFocalPointForTracking(myLocationView);
+    //myLocationView.setContentPadding(padding);
+    //projection.invalidateContentPadding(padding);
+    //invalidateFocalPointForTracking(myLocationView);
     // TODO allow setting padding
   }
 
@@ -305,7 +348,7 @@ public class MyLocationViewSettings {
   }
 
   /**
-   * Set the alpha value of the accuracy circle of MyLocation. Default is {@code 0.3f} and can range from 0 to 1.
+   * Set the alpha value of the accuracy circle of MyLocationWidget. Default is {@code 0.3f} and can range from 0 to 1.
    *
    * @param accuracyAlpha the alpha value to set
    */
@@ -334,23 +377,84 @@ public class MyLocationViewSettings {
    */
   public void setAccuracyTintColor(@ColorInt int accuracyTintColor) {
     this.accuracyTintColor = accuracyTintColor;
-    if (mapboxMap.getLayer(ACCURACY_LAYER) != null) {
+    if (mapboxMap.getLayer(ACCURACY_LAYER) == null) {
+      FillLayer accuracyLayer = new FillLayer(ACCURACY_LAYER, USER_LOCATION_ACCURACY_SOURCE).withProperties(
+        fillColor(accuracyTintColor),
+        fillOpacity(0.3f)
+      );
+      mapboxMap.addLayer(accuracyLayer);
+    } else {
       mapboxMap.getLayer(ACCURACY_LAYER).setProperties(
         PropertyFactory.fillColor(accuracyTintColor)
       );
     }
   }
 
-  public void setTilt(double tilt) {
-    myLocationView.setTilt(tilt);
-  }
-
-  private void invalidateFocalPointForTracking(MyLocationView myLocationView) {
-    if (!(myLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE)) {
-      focalPointChangeListener.onFocalPointChanged(new PointF(myLocationView.getCenterX(),
-        myLocationView.getCenterY()));
-    } else {
-      focalPointChangeListener.onFocalPointChanged(null);
+  public void onStop() {
+    if (staleHandler != null && staleRunnable != null) {
+      staleHandler.removeCallbacks(staleRunnable);
     }
   }
+
+  public void staleTransition() {
+    if (isStale) {
+      final Drawable drawable = mapboxMap.getMyLocationWidgetSettings().getForegroundDrawable();
+      DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
+
+      int tintColor = mapboxMap.getMyLocationWidgetSettings().getForegroundTintColor();
+
+      ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), staleStateTintColor, tintColor);
+      colorAnimator.setDuration(STALE_STATE_TRANSITION_DURATION_MS);
+      colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        @Override
+        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+          DrawableCompat.setTint(drawable, (int) valueAnimator.getAnimatedValue());
+          Bitmap icon = getBitmapFromDrawable(drawable);
+          mapboxMap.addImage(USER_LOCATION_ICON, icon);
+        }
+      });
+      colorAnimator.start();
+      isStale = false;
+    }
+
+    // TODO handle stale state when user leaves and returns to app
+    if (staleHandler != null && staleRunnable != null) {
+      staleHandler.removeCallbacks(staleRunnable);
+    }
+    staleHandler = new Handler();
+    staleRunnable = new Runnable() {
+      @Override
+      public void run() {
+        isStale = true;
+
+        final Drawable drawable = mapboxMap.getMyLocationWidgetSettings().getForegroundDrawable();
+        DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
+
+        int tintColor = mapboxMap.getMyLocationWidgetSettings().getForegroundTintColor();
+
+        ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), tintColor, staleStateTintColor);
+        colorAnimator.setDuration(STALE_STATE_TRANSITION_DURATION_MS);
+        colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+          @Override
+          public void onAnimationUpdate(ValueAnimator valueAnimator) {
+            DrawableCompat.setTint(drawable, (int) valueAnimator.getAnimatedValue());
+            Bitmap icon = getBitmapFromDrawable(drawable);
+            mapboxMap.addImage(USER_LOCATION_ICON, icon);
+          }
+        });
+        colorAnimator.start();
+      }
+
+    };
+    staleHandler.postDelayed(staleRunnable, STALE_USER_LOCATION_MS);
+  }
+
+//  private void invalidateFocalPointForTracking(MyLocationView myLocationView) {
+//    if (!(myLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE)) {
+//      focalPointChangeListener.onFocalPointChanged(new PointF(myLocationView.getCenterX(),
+//        myLocationView.getCenterY()));
+//    } else {
+//      focalPointChangeListener.onFocalPointChanged(null);
+//    }
+//  }
 }

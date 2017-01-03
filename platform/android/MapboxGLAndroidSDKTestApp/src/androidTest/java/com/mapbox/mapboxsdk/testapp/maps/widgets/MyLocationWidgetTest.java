@@ -18,7 +18,6 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
@@ -49,7 +48,7 @@ import static org.hamcrest.Matchers.not;
  * {@link com.mapbox.mapboxsdk.maps.TrackingSettings#setMyBearingTrackingMode(int)}.
  * </p>
  */
-public class MyLocationViewTest {
+public class MyLocationWidgetTest {
 
   @Rule
   public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
@@ -200,8 +199,8 @@ public class MyLocationViewTest {
     @Override
     protected boolean matchesSafely(View target) {
       Drawable currentDrawable = isBearingDrawable
-        ? mapboxMap.getMyLocationViewSettings().getForegroundBearingDrawable() :
-        mapboxMap.getMyLocationViewSettings().getForegroundDrawable();
+        ? mapboxMap.getMyLocationWidgetSettings().getForegroundBearingDrawable() :
+        mapboxMap.getMyLocationWidgetSettings().getForegroundDrawable();
 
       Resources resources = target.getContext().getResources();
       Drawable expectedDrawable = resources.getDrawable(expectedId);

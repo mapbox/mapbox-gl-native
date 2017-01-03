@@ -45,9 +45,8 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocation;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationWidget;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationWidgetSettings;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 
@@ -123,7 +122,6 @@ public class MapView extends FrameLayout {
     // inflate view
     View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
     CompassView compassView = (CompassView) view.findViewById(R.id.compassView);
-    MyLocationView myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
     ImageView attrView = (ImageView) view.findViewById(R.id.attributionView);
     initalizeDrawingSurface(context, options);
 
@@ -139,13 +137,13 @@ public class MapView extends FrameLayout {
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
     UiSettings uiSettings = new UiSettings(proj, focalPoint, compassView, attrView, view.findViewById(R.id.logoView));
-    MyLocation myLocation = new MyLocation(context);
-    TrackingSettings trackingSettings = new TrackingSettings(myLocation, uiSettings, focalPoint);
-    MyLocationViewSettings myLocationViewSettings = new MyLocationViewSettings(myLocationView, proj, focalPoint);
+    MyLocationWidget myLocationWidget = new MyLocationWidget(context);
+    TrackingSettings trackingSettings = new TrackingSettings(myLocationWidget, uiSettings, focalPoint);
+    MyLocationWidgetSettings myLocationWidgetSettings = new MyLocationWidgetSettings(myLocationWidget, proj, focalPoint);
     MarkerViewManager markerViewManager = new MarkerViewManager((ViewGroup) findViewById(R.id.markerViewContainer));
     AnnotationManager annotations = new AnnotationManager(nativeMapView, this, markerViewManager);
     Transform transform = new Transform(nativeMapView, annotations.getMarkerViewManager(), trackingSettings);
-    mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, trackingSettings, myLocationViewSettings, proj,
+    mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, trackingSettings, myLocationWidgetSettings, proj,
       registerTouchListener, annotations);
 
     // user input
@@ -155,9 +153,8 @@ public class MapView extends FrameLayout {
 
     // inject widgets with MapboxMap
     compassView.setMapboxMap(mapboxMap);
-    myLocation.setMapboxMap(mapboxMap);
-    myLocationView.setMapboxMap(mapboxMap);
-    myLocationViewSettings.setMapboxMap(mapboxMap);
+    myLocationWidget.setMapboxMap(mapboxMap);
+    myLocationWidgetSettings.setMapboxMap(mapboxMap);
     attrView.setOnClickListener(new AttributionOnClickListener(context, transform));
 
     // Ensure this view is interactable

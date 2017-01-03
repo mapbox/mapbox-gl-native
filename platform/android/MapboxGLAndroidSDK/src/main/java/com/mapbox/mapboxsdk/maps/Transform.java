@@ -10,8 +10,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocation;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationWidget;
 
 import java.util.concurrent.TimeUnit;
 
@@ -31,7 +30,7 @@ final class Transform implements MapView.OnMapChangedListener {
   private final NativeMapView mapView;
   private final MarkerViewManager markerViewManager;
   private final TrackingSettings trackingSettings;
-  private final MyLocation myLocationView;
+  private final MyLocationWidget myLocationWidget;
 
   private CameraPosition cameraPosition;
   private MapboxMap.CancelableCallback cameraCancelableCallback;
@@ -41,7 +40,7 @@ final class Transform implements MapView.OnMapChangedListener {
     this.mapView = mapView;
     this.markerViewManager = markerViewManager;
     this.trackingSettings = trackingSettings;
-    this.myLocationView = trackingSettings.getMyLocationView();
+    this.myLocationWidget = trackingSettings.getMyLocationWidget();
   }
 
   void initialise(@NonNull MapboxMap mapboxMap, @NonNull MapboxMapOptions options) {
@@ -65,8 +64,8 @@ final class Transform implements MapView.OnMapChangedListener {
 
   @UiThread
   void updateCameraPosition(@NonNull CameraPosition position) {
-    if (myLocationView != null) {
-      myLocationView.setCameraPosition(position);
+    if (myLocationWidget != null) {
+//      myLocationWidget.setCameraPosition(position);
     }
     markerViewManager.setTilt((float) position.tilt);
   }
@@ -206,15 +205,15 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   void setBearing(double bearing) {
-    if (myLocationView != null) {
-      //myLocationView.setBearing(bearing);
+    if (myLocationWidget != null) {
+      //myLocationWidget.setBearing(bearing);
     }
     mapView.setBearing(bearing);
   }
 
   void setBearing(double bearing, float focalX, float focalY) {
-    if (myLocationView != null) {
-      //myLocationView.setBearing(bearing);
+    if (myLocationWidget != null) {
+      //myLocationWidget.setBearing(bearing);
     }
     mapView.setBearing(bearing, focalX, focalY);
   }
@@ -237,8 +236,8 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   void setTilt(Double pitch) {
-    if (myLocationView != null) {
-      //myLocationView.setTilt(pitch);
+    if (myLocationWidget != null) {
+      //myLocationWidget.setTilt(pitch);
     }
     markerViewManager.setTilt(pitch.floatValue());
     mapView.setPitch(pitch, 0);

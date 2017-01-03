@@ -20,7 +20,7 @@ import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MyLocationViewSettingsTest {
+public class MyLocationWidgetSettingsTest {
 
   @InjectMocks
   Projection projection = mock(Projection.class);
@@ -34,11 +34,11 @@ public class MyLocationViewSettingsTest {
   @InjectMocks
   FocalPointChangeListener focalPointChangeListener = mock(FocalPointChangeListener.class);
 
-  private MyLocationViewSettings locationViewSettings;
+  private MyLocationWidgetSettings locationViewSettings;
 
   @Before
   public void beforeTest() {
-    locationViewSettings = new MyLocationViewSettings(myLocationView, projection, focalPointChangeListener);
+    locationViewSettings = new MyLocationWidgetSettings(myLocationView, projection, focalPointChangeListener);
   }
 
   @Test

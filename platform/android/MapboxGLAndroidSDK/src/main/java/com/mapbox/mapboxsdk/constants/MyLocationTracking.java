@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.constants;
 import android.support.annotation.IntDef;
 
 import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -12,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
  * MyLocationTracking exposes different types of locational tracking modes.
  *
  * @see com.mapbox.mapboxsdk.maps.TrackingSettings#setMyLocationTrackingMode(int)
- * @see MyLocationView#setMyLocationTrackingMode(int)
+ * @see com.mapbox.mapboxsdk.maps.widgets.MyLocationWidget#setMyLocationTrackingMode(int)
  */
 public class MyLocationTracking {
 
@@ -30,7 +29,8 @@ public class MyLocationTracking {
   public static final int TRACKING_NONE = 0x00000000;
 
   /**
-   * Tracking the location of the user, {@link MapView} will reposition to center of {@link MyLocationView}
+   * Tracking the location of the user, {@link MapView} will reposition to center of
+   * {@link com.mapbox.mapboxsdk.maps.widgets.MyLocationWidget}
    */
   public static final int TRACKING_FOLLOW = 0x00000004;
 

@@ -27,7 +27,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationWidgetSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
 public class MyLocationTintActivity extends AppCompatActivity implements LocationListener {
@@ -63,8 +63,8 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
         toggleGps(!mapboxMap.isMyLocationEnabled());
 
         // add some padding
-        final MyLocationViewSettings myLocationViewSettings = mapboxMap.getMyLocationViewSettings();
-        myLocationViewSettings.setPadding(0, 500, 0, 0);
+        final MyLocationWidgetSettings myLocationWidgetSettings = mapboxMap.getMyLocationWidgetSettings();
+        myLocationWidgetSettings.setPadding(0, 500, 0, 0);
 
         // enable tracking
         TrackingSettings settings = mapboxMap.getTrackingSettings();
@@ -78,11 +78,11 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
           new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              myLocationViewSettings.setAccuracyTintColor(ContextCompat.getColor(
+              myLocationWidgetSettings.setAccuracyTintColor(ContextCompat.getColor(
                 MyLocationTintActivity.this, R.color.mapbox_blue));
-              myLocationViewSettings.setForegroundTintColor(ContextCompat.getColor(
+              myLocationWidgetSettings.setForegroundTintColor(ContextCompat.getColor(
                 MyLocationTintActivity.this, R.color.mapbox_blue));
-              myLocationViewSettings.setBackgroundTintColor(Color.WHITE);
+              myLocationWidgetSettings.setBackgroundTintColor(Color.WHITE);
             }
           });
 
@@ -93,11 +93,11 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
           new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              myLocationViewSettings.setAccuracyTintColor(
+              myLocationWidgetSettings.setAccuracyTintColor(
                 ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapbox_green));
-              myLocationViewSettings.setForegroundTintColor(
+              myLocationWidgetSettings.setForegroundTintColor(
                 ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapbox_green));
-              myLocationViewSettings.setBackgroundTintColor(Color.WHITE);
+              myLocationWidgetSettings.setBackgroundTintColor(Color.WHITE);
             }
           });
 
@@ -108,11 +108,11 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
           new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              myLocationViewSettings.setAccuracyTintColor(
+              myLocationWidgetSettings.setAccuracyTintColor(
                 ContextCompat.getColor(MyLocationTintActivity.this, R.color.accent));
-              myLocationViewSettings.setForegroundTintColor(
+              myLocationWidgetSettings.setForegroundTintColor(
                 ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapbox_blue));
-              myLocationViewSettings.setBackgroundTintColor(Color.WHITE);
+              myLocationWidgetSettings.setBackgroundTintColor(Color.WHITE);
             }
           });
 
@@ -122,8 +122,8 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
           new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              myLocationViewSettings.setForegroundTintColor(Color.TRANSPARENT);
-              myLocationViewSettings.setBackgroundTintColor(Color.TRANSPARENT);
+              myLocationWidgetSettings.setForegroundTintColor(Color.TRANSPARENT);
+              myLocationWidgetSettings.setBackgroundTintColor(Color.TRANSPARENT);
             }
           }
         );

@@ -36,7 +36,7 @@ import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationWidgetSettings;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
@@ -66,20 +66,21 @@ public final class MapboxMap {
   private final Projection projection;
   private final Transform transform;
   private final AnnotationManager annotationManager;
-  private final MyLocationViewSettings myLocationViewSettings;
+  private final MyLocationWidgetSettings myLocationWidgetSettings;
+  private MapboxMapOptions options;
 
   private final OnRegisterTouchListener onRegisterTouchListener;
 
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, TrackingSettings tracking,
-            MyLocationViewSettings myLocationView, Projection projection, OnRegisterTouchListener listener,
+            MyLocationWidgetSettings myLocationView, Projection projection, OnRegisterTouchListener listener,
             AnnotationManager annotations) {
     this.nativeMapView = map;
     this.uiSettings = ui;
     this.trackingSettings = tracking;
     this.projection = projection;
-    this.myLocationViewSettings = myLocationView;
+    this.myLocationWidgetSettings = myLocationView;
     this.annotationManager = annotations.bind(this);
     this.transform = transform;
     this.onRegisterTouchListener = listener;
@@ -88,8 +89,8 @@ public final class MapboxMap {
   void initialise(@NonNull Context context, @NonNull MapboxMapOptions options) {
     transform.initialise(this, options);
     uiSettings.initialise(context, options);
-    myLocationViewSettings.initialise(options);
     trackingSettings.initialise(options);
+    this.options = options;
 
     // Map configuration
     setDebugActive(options.getDebugActive());
@@ -140,6 +141,7 @@ public final class MapboxMap {
   void onPreMapReady() {
     annotationManager.reloadMarkers();
     annotationManager.adjustTopOffsetPixels(this);
+    myLocationWidgetSettings.initialise(options);
   }
 
   /**
@@ -397,16 +399,16 @@ public final class MapboxMap {
   }
 
   //
-  // MyLocationViewSettings
+  // MyLocationWidgetSettings
   //
 
   /**
    * Gets the settings of the user location for the map.
    *
-   * @return the MyLocationViewSettings associated with this map
+   * @return the MyLocationWidgetSettings associated with this map
    */
-  public MyLocationViewSettings getMyLocationViewSettings() {
-    return myLocationViewSettings;
+  public MyLocationWidgetSettings getMyLocationWidgetSettings() {
+    return myLocationWidgetSettings;
   }
 
   //
@@ -1328,7 +1330,7 @@ public final class MapboxMap {
    * @param bottom The bottom margin in pixels.
    */
   public void setPadding(int left, int top, int right, int bottom) {
-    projection.setContentPadding(new int[] {left, top, right, bottom}, myLocationViewSettings.getPadding());
+    projection.setContentPadding(new int[] {left, top, right, bottom}, myLocationWidgetSettings.getPadding());
     uiSettings.invalidate();
   }
 

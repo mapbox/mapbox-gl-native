@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
-import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -71,11 +70,12 @@ public class MapboxMapOptions implements Parcelable {
   private Drawable myLocationForegroundDrawable;
   private Drawable myLocationForegroundBearingDrawable;
   private Drawable myLocationBackgroundDrawable;
+  private int myLocationStaleTintColor;
   private int myLocationForegroundTintColor;
   private int myLocationBackgroundTintColor;
   private int[] myLocationBackgroundPadding;
   private int myLocationAccuracyTintColor;
-  private int myLocationAccuracyAlpha;
+  private float myLocationAccuracyAlpha;
 
   private String apiBaseUrl;
 
@@ -134,6 +134,7 @@ public class MapboxMapOptions implements Parcelable {
       myLocationBackgroundDrawable = new BitmapDrawable(backgroundBitmap);
     }
 
+    myLocationStaleTintColor = in.readInt();
     myLocationForegroundTintColor = in.readInt();
     myLocationBackgroundTintColor = in.readInt();
     myLocationBackgroundPadding = in.createIntArray();
@@ -235,6 +236,8 @@ public class MapboxMapOptions implements Parcelable {
           DIMENSION_SEVEN_DP * pxlRatio))});
 
       mapboxMapOptions.locationEnabled(typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_myLocation, false));
+      mapboxMapOptions.myLocationStaleTintColor(
+        typedArray.getColor(R.styleable.mapbox_MapView_mapbox_myLocationStaleTintColor, Color.parseColor("#C8C6C6")));
       mapboxMapOptions.myLocationForegroundTintColor(
         typedArray.getColor(R.styleable.mapbox_MapView_mapbox_myLocationTintColor,
           ColorUtils.getPrimaryColor(context)));
@@ -243,19 +246,19 @@ public class MapboxMapOptions implements Parcelable {
 
       Drawable foregroundDrawable = typedArray.getDrawable(R.styleable.mapbox_MapView_mapbox_myLocationDrawable);
       if (foregroundDrawable == null) {
-        foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_icon_default);
+        foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon);
       }
 
       Drawable foregroundBearingDrawable = typedArray.getDrawable(
         R.styleable.mapbox_MapView_mapbox_myLocationBearingDrawable);
       if (foregroundBearingDrawable == null) {
-        foregroundBearingDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_icon_bearing);
+        foregroundBearingDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon_bearing);
       }
 
       Drawable backgroundDrawable = typedArray.getDrawable(
         R.styleable.mapbox_MapView_mapbox_myLocationBackgroundDrawable);
       if (backgroundDrawable == null) {
-        backgroundDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_bg_shape);
+        backgroundDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon_background);
       }
 
       mapboxMapOptions.myLocationForegroundDrawables(foregroundDrawable, foregroundBearingDrawable);
@@ -271,7 +274,7 @@ public class MapboxMapOptions implements Parcelable {
           0) * pxlRatio)
       });
       mapboxMapOptions.myLocationAccuracyAlpha(
-        typedArray.getInt(R.styleable.mapbox_MapView_mapbox_myLocationAccuracyAlpha, 100));
+        typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_myLocationAccuracyAlpha, 0.3f));
       mapboxMapOptions.myLocationAccuracyTint(
         typedArray.getColor(R.styleable.mapbox_MapView_mapbox_myLocationAccuracyTintColor,
           ColorUtils.getPrimaryColor(context)));
@@ -581,6 +584,11 @@ public class MapboxMapOptions implements Parcelable {
     return this;
   }
 
+  public MapboxMapOptions myLocationStaleTintColor(@ColorInt int myLocationStaleTintColor) {
+    this.myLocationStaleTintColor = myLocationStaleTintColor;
+    return this;
+  }
+
   /**
    * Set the foreground tint color of MyLocationView.
    * <p>
@@ -634,7 +642,7 @@ public class MapboxMapOptions implements Parcelable {
    * @param alpha the alpha value
    * @return This
    */
-  public MapboxMapOptions myLocationAccuracyAlpha(@IntRange(from = 0, to = 255) int alpha) {
+  public MapboxMapOptions myLocationAccuracyAlpha(float alpha) {
     this.myLocationAccuracyAlpha = alpha;
     return this;
   }
@@ -890,6 +898,9 @@ public class MapboxMapOptions implements Parcelable {
     return myLocationForegroundTintColor;
   }
 
+  public int getMyLocationStaleTintColor() {
+    return myLocationStaleTintColor;
+  }
   /**
    * Get the current configured MyLocationView background tint color.
    *
@@ -922,7 +933,7 @@ public class MapboxMapOptions implements Parcelable {
    *
    * @return the alpha value
    */
-  public int getMyLocationAccuracyAlpha() {
+  public float getMyLocationAccuracyAlpha() {
     return myLocationAccuracyAlpha;
   }
 
@@ -996,10 +1007,11 @@ public class MapboxMapOptions implements Parcelable {
       ? getBitmapFromDrawable(myLocationForegroundBearingDrawable) : null, flags);
     dest.writeParcelable(myLocationBackgroundDrawable != null
       ? getBitmapFromDrawable(myLocationBackgroundDrawable) : null, flags);
+    dest.writeInt(myLocationStaleTintColor);
     dest.writeInt(myLocationForegroundTintColor);
     dest.writeInt(myLocationBackgroundTintColor);
     dest.writeIntArray(myLocationBackgroundPadding);
-    dest.writeInt(myLocationAccuracyAlpha);
+    dest.writeFloat(myLocationAccuracyAlpha);
     dest.writeInt(myLocationAccuracyTintColor);
 
     dest.writeString(style);
@@ -1067,6 +1079,9 @@ public class MapboxMapOptions implements Parcelable {
       return false;
     }
     if (myLocationEnabled != options.myLocationEnabled) {
+      return false;
+    }
+    if (myLocationStaleTintColor != options.myLocationStaleTintColor) {
       return false;
     }
     if (myLocationForegroundTintColor != options.myLocationForegroundTintColor) {
@@ -1151,11 +1166,12 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (myLocationForegroundBearingDrawable != null
       ? myLocationForegroundBearingDrawable.hashCode() : 0);
     result = 31 * result + (myLocationBackgroundDrawable != null ? myLocationBackgroundDrawable.hashCode() : 0);
+    result = 31 * result + myLocationStaleTintColor;
     result = 31 * result + myLocationForegroundTintColor;
     result = 31 * result + myLocationBackgroundTintColor;
     result = 31 * result + Arrays.hashCode(myLocationBackgroundPadding);
     result = 31 * result + myLocationAccuracyTintColor;
-    result = 31 * result + myLocationAccuracyAlpha;
+    result = 31 * result + (int) myLocationAccuracyAlpha;
     result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
     result = 31 * result + (textureMode ? 1 : 0);
     result = 31 * result + (style != null ? style.hashCode() : 0);

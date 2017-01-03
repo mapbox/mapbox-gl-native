@@ -27,7 +27,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationWidgetSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
 public class CarDrivingActivity extends AppCompatActivity implements MapboxMap.OnMyLocationChangeListener {
@@ -60,7 +60,7 @@ public class CarDrivingActivity extends AppCompatActivity implements MapboxMap.O
         CarDrivingActivity.this.mapboxMap = mapboxMap;
 
         // view settings
-        MyLocationViewSettings settings = mapboxMap.getMyLocationViewSettings();
+        MyLocationWidgetSettings settings = mapboxMap.getMyLocationWidgetSettings();
         settings.setPadding(0, getWindow().getDecorView().getMeasuredHeight() / 3, 0, 0);
 
         // get car

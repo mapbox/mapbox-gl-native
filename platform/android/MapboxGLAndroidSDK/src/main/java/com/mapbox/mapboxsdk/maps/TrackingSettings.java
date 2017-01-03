@@ -1,9 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.PointF;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,16 +9,13 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.content.ContextCompat;
 
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocation;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationWidget;
 
 import timber.log.Timber;
 
@@ -30,7 +25,7 @@ import timber.log.Timber;
 public final class TrackingSettings {
 
   // TODO Rename myLocation variable
-  private final MyLocation myLocationView;
+  private final MyLocationWidget myLocationWidget;
   private final UiSettings uiSettings;
   private final FocalPointChangeListener focalPointChangedListener;
   private LocationListener myLocationListener;
@@ -42,9 +37,9 @@ public final class TrackingSettings {
   private MapboxMap.OnMyLocationTrackingModeChangeListener onMyLocationTrackingModeChangeListener;
   private MapboxMap.OnMyBearingTrackingModeChangeListener onMyBearingTrackingModeChangeListener;
 
-  TrackingSettings(@NonNull MyLocation myLocationView, UiSettings uiSettings,
+  TrackingSettings(@NonNull MyLocationWidget myLocationWidget, UiSettings uiSettings,
                    FocalPointChangeListener focalPointChangedListener) {
-    this.myLocationView = myLocationView;
+    this.myLocationWidget = myLocationWidget;
     this.focalPointChangedListener = focalPointChangedListener;
     this.uiSettings = uiSettings;
   }
@@ -94,12 +89,12 @@ public final class TrackingSettings {
    */
   @UiThread
   public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
-    myLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
+    myLocationWidget.setMyLocationTrackingMode(myLocationTrackingMode);
 
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
       // TODO replace this code
-      //focalPointChangedListener.onFocalPointChanged(new PointF(myLocationView.getCenterX(),
-     //   myLocationView.getCenterY()));
+      //focalPointChangedListener.onFocalPointChanged(new PointF(myLocationWidget.getCenterX(),
+     //   myLocationWidget.getCenterY()));
     } else {
       focalPointChangedListener.onFocalPointChanged(null);
     }
@@ -119,7 +114,7 @@ public final class TrackingSettings {
   @UiThread
   @MyLocationTracking.Mode
   public int getMyLocationTrackingMode() {
-    return myLocationView.getMyLocationTrackingMode();
+    return myLocationWidget.getMyLocationTrackingMode();
   }
 
   /**
@@ -128,7 +123,7 @@ public final class TrackingSettings {
    * </p>
    * Shows the direction the user is heading.
    * <p>
-   * When location tracking is disabled the direction of {@link MyLocationView} is rotated. When
+   * When location tracking is disabled the direction of {@link MyLocationWidget} is rotated. When
    * location tracking is enabled the {@link MapView} is rotated based on the bearing value.
    * </p>
    * See {@link MyBearingTracking} for different values.
@@ -139,7 +134,7 @@ public final class TrackingSettings {
    */
   @UiThread
   public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
-    myLocationView.setMyBearingTrackingMode(myBearingTrackingMode);
+    myLocationWidget.setMyBearingTrackingMode(myBearingTrackingMode);
     if (onMyBearingTrackingModeChangeListener != null) {
       onMyBearingTrackingModeChangeListener.onMyBearingTrackingModeChange(myBearingTrackingMode);
     }
@@ -155,7 +150,7 @@ public final class TrackingSettings {
   @UiThread
   @MyBearingTracking.Mode
   public int getMyBearingTrackingMode() {
-    return myLocationView.getMyBearingTrackingMode();
+    return myLocationWidget.getMyBearingTrackingMode();
   }
 
   /**
@@ -241,7 +236,7 @@ public final class TrackingSettings {
    * @return True if location tracking is disabled.
    */
   public boolean isLocationTrackingDisabled() {
-    return myLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE;
+    return myLocationWidget.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE;
   }
 
   /**
@@ -250,7 +245,7 @@ public final class TrackingSettings {
    * @return True if bearing tracking is disabled.
    */
   public boolean isBearingTrackingDisabled() {
-    return myLocationView.getMyBearingTrackingMode() == MyBearingTracking.NONE;
+    return myLocationWidget.getMyBearingTrackingMode() == MyBearingTracking.NONE;
   }
 
   /**
@@ -264,8 +259,8 @@ public final class TrackingSettings {
     //    EITHER bearing tracking is dismissed on gesture OR there is no bearing tracking
     return uiSettings.isRotateGesturesEnabled()
       && (dismissBearingTrackingOnGesture
-      || myLocationView.getMyBearingTrackingMode() == MyBearingTracking.NONE
-      || myLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE);
+      || myLocationWidget.getMyBearingTrackingMode() == MyBearingTracking.NONE
+      || myLocationWidget.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE);
   }
 
   /**
@@ -276,7 +271,7 @@ public final class TrackingSettings {
   public boolean isScrollGestureCurrentlyEnabled() {
     return uiSettings.isScrollGesturesEnabled()
       && (dismissLocationTrackingOnGesture
-      || myLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE);
+      || myLocationWidget.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE);
   }
 
   /**
@@ -303,7 +298,7 @@ public final class TrackingSettings {
   }
 
   Location getMyLocation() {
-    return myLocationView.getLocation();
+    return myLocationWidget.getLocation();
   }
 
   void setOnMyLocationChangeListener(@Nullable final MapboxMap.OnMyLocationChangeListener listener) {
@@ -316,17 +311,17 @@ public final class TrackingSettings {
           }
         }
       };
-      LocationServices.getLocationServices(myLocationView.getContext()).addLocationListener(myLocationListener);
+      LocationServices.getLocationServices(myLocationWidget.getContext()).addLocationListener(myLocationListener);
     } else {
-      LocationServices.getLocationServices(myLocationView.getContext()).removeLocationListener(myLocationListener);
+      LocationServices.getLocationServices(myLocationWidget.getContext()).removeLocationListener(myLocationListener);
       myLocationListener = null;
     }
   }
 
   boolean isPermissionsAccepted() {
-    return (ContextCompat.checkSelfPermission(myLocationView.getContext(),
+    return (ContextCompat.checkSelfPermission(myLocationWidget.getContext(),
       Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-      || ContextCompat.checkSelfPermission(myLocationView.getContext(),
+      || ContextCompat.checkSelfPermission(myLocationWidget.getContext(),
       Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
   }
 
@@ -339,8 +334,8 @@ public final class TrackingSettings {
   }
 
   //TODO edit this getter naming
-  MyLocation getMyLocationView() {
-    return myLocationView;
+  MyLocationWidget getMyLocationWidget() {
+    return myLocationWidget;
   }
 
 
@@ -355,25 +350,21 @@ public final class TrackingSettings {
       return;
     }
     myLocationEnabled = locationEnabled;
-    myLocationView.toggleGps(locationEnabled);
-
-
-
-    //myLocationView.setEnabled(locationEnabled);
+    myLocationWidget.toggleGps(locationEnabled);
   }
 
 //  void update() {
-//    if (!myLocationView.isEnabled()) {
+//    if (!myLocationWidget.isEnabled()) {
 //      return;
 //    }
-//    myLocationView.update();
+//    myLocationWidget.update();
 //  }
 
   void onStart() {
-    myLocationView.onStart();
+    myLocationWidget.onStart();
   }
 
   void onStop() {
-    myLocationView.onStop();
+    myLocationWidget.onStop();
   }
 }

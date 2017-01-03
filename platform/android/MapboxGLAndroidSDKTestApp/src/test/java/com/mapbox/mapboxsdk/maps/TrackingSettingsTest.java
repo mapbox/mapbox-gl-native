@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 
 import org.junit.Before;
 import org.junit.Test;
