@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLFoundation.h"
 #import "MGLMultiPoint.h"
 #import "MGLOverlay.h"
 
@@ -14,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
  are provided. The first and last points are connected to each other to create
  the closed shape.
  */
+MGL_EXPORT
 @interface MGLPolygon : MGLMultiPoint <MGLOverlay>
 
 /**
@@ -64,6 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
  @note `MGLMultiPolygon` objects cannot be added to a map view using
     `-[MGLMapView addAnnotations:]` and related methods.
  */
+MGL_EXPORT
 @interface MGLMultiPolygon : MGLShape <MGLOverlay>
 
 /**

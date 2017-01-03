@@ -2,6 +2,7 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLFoundation.h"
 #import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -10,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
  Information about an attribution statement, usually a copyright or trademark
  statement, associated with a map content source.
  */
+MGL_EXPORT
 @interface MGLAttributionInfo : NSObject
 
 /**

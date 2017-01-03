@@ -1,6 +1,7 @@
-#import "MGLTileSource.h"
-
 #import <CoreGraphics/CoreGraphics.h>
+
+#import "MGLFoundation.h"
+#import "MGLTileSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
  This option is only applicable to `MGLRasterSource` objects; it is ignored when
  initializing `MGLVectorSource` objects.
  */
-extern const MGLTileSourceOption MGLTileSourceOptionTileSize;
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileSize;
 
 /**
  `MGLRasterSource` is a map content source that supplies raster image tiles to
@@ -36,6 +37,7 @@ extern const MGLTileSourceOption MGLTileSourceOptionTileSize;
  can also add and remove sources dynamically using methods such as
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
  */
+MGL_EXPORT
 @interface MGLRasterSource : MGLTileSource
 
 #pragma mark Initializing a Source

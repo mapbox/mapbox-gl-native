@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 
+#import "MGLFoundation.h"
 #import "MGLOfflineRegion.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -100,6 +101,7 @@ typedef struct MGLOfflinePackProgress {
  `+[MGLOfflineStorage addPackForRegion:withContext:completionHandler:]` method.
  A pack created using `-[MGLOfflinePack init]` is immediately invalid.
  */
+MGL_EXPORT
 @interface MGLOfflinePack : NSObject
 
 /**

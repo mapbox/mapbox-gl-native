@@ -1,6 +1,7 @@
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
+#import "MGLFoundation.h"
 #import "MGLStyleValue.h"
 #import "MGLVectorStyleLayer.h"
 
@@ -28,6 +29,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
  `MGLMapView` for its `style` and obtain existing layers using the 
  `-[MGLStyle layerWithIdentifier:]` method. 
  */
+MGL_EXPORT
 @interface MGLFillStyleLayer : MGLVectorStyleLayer
 
 #pragma mark - Accessing the Paint Attributes

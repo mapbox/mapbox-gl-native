@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLFoundation.h"
 #import "MGLOverlay.h"
 #import "MGLShape.h"
 
@@ -15,6 +16,7 @@
  to the map view's style, the point collection represents as a group of distinct 
  annotations.
  */
+MGL_EXPORT
 @interface MGLPointCollection : MGLShape <MGLOverlay>
 
 /**

@@ -1,6 +1,7 @@
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
+#import "MGLFoundation.h"
 #import "MGLStyleValue.h"
 #import "MGLForegroundStyleLayer.h"
 
@@ -12,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLMapView` for its `style` and obtain existing layers using the 
  `-[MGLStyle layerWithIdentifier:]` method. 
  */
+MGL_EXPORT
 @interface MGLRasterStyleLayer : MGLForegroundStyleLayer
 
 #pragma mark - Accessing the Paint Attributes
