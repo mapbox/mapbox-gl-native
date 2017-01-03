@@ -286,4 +286,53 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
 
 @end
 
+/**
+ Methods for wrapping an enumeration value for a style layer attribute in an
+ `MGLLineStyleLayer` object and unwrapping its raw value.
+ */
+@interface NSValue (MGLLineStyleLayerAdditions)
+
+#pragma mark Working with Line Style Layer Attribute Values
+
+/**
+ Creates a new value object containing the given `MGLLineCap` enumeration.
+
+ @param lineCap The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLLineCap:(MGLLineCap)lineCap;
+
+/**
+ The `MGLLineCap` enumeration representation of the value.
+ */
+@property (readonly) MGLLineCap MGLLineCapValue;
+
+/**
+ Creates a new value object containing the given `MGLLineJoin` enumeration.
+
+ @param lineJoin The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLLineJoin:(MGLLineJoin)lineJoin;
+
+/**
+ The `MGLLineJoin` enumeration representation of the value.
+ */
+@property (readonly) MGLLineJoin MGLLineJoinValue;
+
+/**
+ Creates a new value object containing the given `MGLLineTranslateAnchor` enumeration.
+
+ @param lineTranslateAnchor The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLLineTranslateAnchor:(MGLLineTranslateAnchor)lineTranslateAnchor;
+
+/**
+ The `MGLLineTranslateAnchor` enumeration representation of the value.
+ */
+@property (readonly) MGLLineTranslateAnchor MGLLineTranslateAnchorValue;
+
+@end
+
 NS_ASSUME_NONNULL_END

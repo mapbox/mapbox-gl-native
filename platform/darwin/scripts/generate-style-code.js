@@ -368,8 +368,6 @@ global.mbglType = function(property) {
 const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.ejs', 'utf8'), { strict: true });
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
 const testLayers = ejs.compile(fs.readFileSync('platform/darwin/test/MGLStyleLayerTests.m.ejs', 'utf8'), { strict: true});
-const categoryH = ejs.compile(fs.readFileSync('platform/darwin/src/NSValue+MGLStyleLayerAdditions.h.ejs', 'utf8'), { strict: true});
-const categoryM = ejs.compile(fs.readFileSync('platform/darwin/src/NSValue+MGLStyleLayerAdditions.mm.ejs', 'utf8'), { strict: true});
 const guideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/For Style Authors.md.ejs', 'utf8'), { strict: true });
 
 const layers = _(spec.layer.type.values).map((value, layerType) => {
@@ -414,15 +412,13 @@ ${macosComment}${decl}
     });
 }
 
-let enumPropertiesByLayerType = {};
 var renamedPropertiesByLayerType = {};
 
 for (var layer of layers) {
     let properties = _.concat(layer.layoutProperties, layer.paintProperties);
     let enumProperties = _.filter(properties, prop => prop.type === 'enum');
     if (enumProperties.length) {
-        enumPropertiesByLayerType[layer.type] = enumProperties;
-        layer.containsEnumerationProperties = true;
+        layer.enumProperties = enumProperties;
     }
     
     let renamedProperties = {};
@@ -435,13 +431,6 @@ for (var layer of layers) {
     fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
     fs.writeFileSync(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.m`, testLayers(layer));
 }
-
-fs.writeFileSync(`platform/darwin/src/NSValue+MGLStyleLayerAdditions.h`, categoryH({
-    enumPropertiesByLayerType: enumPropertiesByLayerType,
-}));
-fs.writeFileSync(`platform/darwin/src/NSValue+MGLStyleLayerAdditions.mm`, categoryM({
-    enumPropertiesByLayerType: enumPropertiesByLayerType,
-}));
 
 fs.writeFileSync(`platform/ios/docs/guides/For Style Authors.md`, guideMD({
     os: 'iOS',

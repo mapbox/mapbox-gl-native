@@ -343,3 +343,37 @@ namespace mbgl {
 
 
 @end
+
+@implementation NSValue (MGLLineStyleLayerAdditions)
+
++ (NSValue *)valueWithMGLLineCap:(MGLLineCap)lineCap {
+    return [NSValue value:&lineCap withObjCType:@encode(MGLLineCap)];
+}
+
+- (MGLLineCap)MGLLineCapValue {
+    MGLLineCap lineCap;
+    [self getValue:&lineCap];
+    return lineCap;
+}
+
++ (NSValue *)valueWithMGLLineJoin:(MGLLineJoin)lineJoin {
+    return [NSValue value:&lineJoin withObjCType:@encode(MGLLineJoin)];
+}
+
+- (MGLLineJoin)MGLLineJoinValue {
+    MGLLineJoin lineJoin;
+    [self getValue:&lineJoin];
+    return lineJoin;
+}
+
++ (NSValue *)valueWithMGLLineTranslateAnchor:(MGLLineTranslateAnchor)lineTranslateAnchor {
+    return [NSValue value:&lineTranslateAnchor withObjCType:@encode(MGLLineTranslateAnchor)];
+}
+
+- (MGLLineTranslateAnchor)MGLLineTranslateAnchorValue {
+    MGLLineTranslateAnchor lineTranslateAnchor;
+    [self getValue:&lineTranslateAnchor];
+    return lineTranslateAnchor;
+}
+
+@end

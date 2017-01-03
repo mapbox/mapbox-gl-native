@@ -231,3 +231,17 @@ namespace mbgl {
 
 
 @end
+
+@implementation NSValue (MGLFillStyleLayerAdditions)
+
++ (NSValue *)valueWithMGLFillTranslateAnchor:(MGLFillTranslateAnchor)fillTranslateAnchor {
+    return [NSValue value:&fillTranslateAnchor withObjCType:@encode(MGLFillTranslateAnchor)];
+}
+
+- (MGLFillTranslateAnchor)MGLFillTranslateAnchorValue {
+    MGLFillTranslateAnchor fillTranslateAnchor;
+    [self getValue:&fillTranslateAnchor];
+    return fillTranslateAnchor;
+}
+
+@end

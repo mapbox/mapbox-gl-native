@@ -1064,4 +1064,144 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 
 @end
 
+/**
+ Methods for wrapping an enumeration value for a style layer attribute in an
+ `MGLSymbolStyleLayer` object and unwrapping its raw value.
+ */
+@interface NSValue (MGLSymbolStyleLayerAdditions)
+
+#pragma mark Working with Symbol Style Layer Attribute Values
+
+/**
+ Creates a new value object containing the given `MGLIconRotationAlignment` enumeration.
+
+ @param iconRotationAlignment The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLIconRotationAlignment:(MGLIconRotationAlignment)iconRotationAlignment;
+
+/**
+ The `MGLIconRotationAlignment` enumeration representation of the value.
+ */
+@property (readonly) MGLIconRotationAlignment MGLIconRotationAlignmentValue;
+
+/**
+ Creates a new value object containing the given `MGLIconTextFit` enumeration.
+
+ @param iconTextFit The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLIconTextFit:(MGLIconTextFit)iconTextFit;
+
+/**
+ The `MGLIconTextFit` enumeration representation of the value.
+ */
+@property (readonly) MGLIconTextFit MGLIconTextFitValue;
+
+/**
+ Creates a new value object containing the given `MGLSymbolPlacement` enumeration.
+
+ @param symbolPlacement The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLSymbolPlacement:(MGLSymbolPlacement)symbolPlacement;
+
+/**
+ The `MGLSymbolPlacement` enumeration representation of the value.
+ */
+@property (readonly) MGLSymbolPlacement MGLSymbolPlacementValue;
+
+/**
+ Creates a new value object containing the given `MGLTextAnchor` enumeration.
+
+ @param textAnchor The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLTextAnchor:(MGLTextAnchor)textAnchor;
+
+/**
+ The `MGLTextAnchor` enumeration representation of the value.
+ */
+@property (readonly) MGLTextAnchor MGLTextAnchorValue;
+
+/**
+ Creates a new value object containing the given `MGLTextJustification` enumeration.
+
+ @param textJustification The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLTextJustification:(MGLTextJustification)textJustification;
+
+/**
+ The `MGLTextJustification` enumeration representation of the value.
+ */
+@property (readonly) MGLTextJustification MGLTextJustificationValue;
+
+/**
+ Creates a new value object containing the given `MGLTextPitchAlignment` enumeration.
+
+ @param textPitchAlignment The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLTextPitchAlignment:(MGLTextPitchAlignment)textPitchAlignment;
+
+/**
+ The `MGLTextPitchAlignment` enumeration representation of the value.
+ */
+@property (readonly) MGLTextPitchAlignment MGLTextPitchAlignmentValue;
+
+/**
+ Creates a new value object containing the given `MGLTextRotationAlignment` enumeration.
+
+ @param textRotationAlignment The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLTextRotationAlignment:(MGLTextRotationAlignment)textRotationAlignment;
+
+/**
+ The `MGLTextRotationAlignment` enumeration representation of the value.
+ */
+@property (readonly) MGLTextRotationAlignment MGLTextRotationAlignmentValue;
+
+/**
+ Creates a new value object containing the given `MGLTextTransform` enumeration.
+
+ @param textTransform The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLTextTransform:(MGLTextTransform)textTransform;
+
+/**
+ The `MGLTextTransform` enumeration representation of the value.
+ */
+@property (readonly) MGLTextTransform MGLTextTransformValue;
+
+/**
+ Creates a new value object containing the given `MGLIconTranslateAnchor` enumeration.
+
+ @param iconTranslateAnchor The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLIconTranslateAnchor:(MGLIconTranslateAnchor)iconTranslateAnchor;
+
+/**
+ The `MGLIconTranslateAnchor` enumeration representation of the value.
+ */
+@property (readonly) MGLIconTranslateAnchor MGLIconTranslateAnchorValue;
+
+/**
+ Creates a new value object containing the given `MGLTextTranslateAnchor` enumeration.
+
+ @param textTranslateAnchor The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLTextTranslateAnchor:(MGLTextTranslateAnchor)textTranslateAnchor;
+
+/**
+ The `MGLTextTranslateAnchor` enumeration representation of the value.
+ */
+@property (readonly) MGLTextTranslateAnchor MGLTextTranslateAnchorValue;
+
+@end
+
 NS_ASSUME_NONNULL_END

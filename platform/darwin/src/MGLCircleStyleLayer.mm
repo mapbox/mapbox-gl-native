@@ -231,3 +231,27 @@ namespace mbgl {
 
 
 @end
+
+@implementation NSValue (MGLCircleStyleLayerAdditions)
+
++ (NSValue *)valueWithMGLCirclePitchScale:(MGLCirclePitchScale)circlePitchScale {
+    return [NSValue value:&circlePitchScale withObjCType:@encode(MGLCirclePitchScale)];
+}
+
+- (MGLCirclePitchScale)MGLCirclePitchScaleValue {
+    MGLCirclePitchScale circlePitchScale;
+    [self getValue:&circlePitchScale];
+    return circlePitchScale;
+}
+
++ (NSValue *)valueWithMGLCircleTranslateAnchor:(MGLCircleTranslateAnchor)circleTranslateAnchor {
+    return [NSValue value:&circleTranslateAnchor withObjCType:@encode(MGLCircleTranslateAnchor)];
+}
+
+- (MGLCircleTranslateAnchor)MGLCircleTranslateAnchorValue {
+    MGLCircleTranslateAnchor circleTranslateAnchor;
+    [self getValue:&circleTranslateAnchor];
+    return circleTranslateAnchor;
+}
+
+@end
