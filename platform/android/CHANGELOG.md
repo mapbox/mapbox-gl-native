@@ -4,8 +4,35 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## 5.0.0 - TBA
 
+<<<<<<< HEAD
 * Consistent double tap zoom acceleration [#7514](https://github.com/mapbox/mapbox-gl-native/issues/7514)
-* Support for Android Nougat [#5910](5910-move-listener-logic-for-nougat) & [#6390](https://github.com/mapbox/mapbox-gl-native/pull/6390)
+* Cleanup inconsistencies float vs double [#4445](https://github.com/mapbox/mapbox-gl-native/issues/4445)
+* Add `mapbox_` prefix to attributes [#6482](https://github.com/mapbox/mapbox-gl-native/issues/6482)
+* Update LOST to 2.0.0 [#6573](https://github.com/mapbox/mapbox-gl-native/issues/6537)
+* Support for Android Nougat [#5910](5910-move-listener-logic-for-nougat)
+  - move location listening logic to onStart/onStop Activity lifecylce methods
+* Removal of accesstoken on MapView and MapboxMap [#5621](https://github.com/mapbox/mapbox-gl-native/issues/5621)
+* Introduction of new make targets [#5940](https://github.com/mapbox/mapbox-gl-native/issues/5940)
+  - Targets for testing, running and using external tools directly from the commandline
+* Cleanup gradle files [#6009](https://github.com/mapbox/mapbox-gl-native/issues/6009)
+  - Introducing single purpose .gradle files
+* Checkstyle integration [#7442](https://github.com/mapbox/mapbox-gl-native/pull/7442)
+* Transform refactor [#6532](https://github.com/mapbox/mapbox-gl-native/issues/6532)
+  - All camera related code is moved to a dedicated transfrom class cfr. core architecture
+* Encapsulate Gestures [#6557](https://github.com/mapbox/mapbox-gl-native/issues/6557)
+  - All gesture event code is encapsulated in MapGestureDetector
+  - All key event  code is encapsulated in MapKeyListener
+* Transparent background for MyLocationView [#7116](https://github.com/mapbox/mapbox-gl-native/issues/7116)
+* Update documentation on generate sanity tests [#7147](https://github.com/mapbox/mapbox-gl-native/issues/7147)
+* Update documentation on style templates [#7157](https://github.com/mapbox/mapbox-gl-native/issues/7157)
+* NullPointerException during save instance state [#7157](https://github.com/mapbox/mapbox-gl-native/issues/7157)
+* Move management style to core [#7275](https://github.com/mapbox/mapbox-gl-native/issues/7275)
+* OnCameraChange not called for the final position of animation bug [#7350](https://github.com/mapbox/mapbox-gl-native/issues/7350)
+* MapboxAccountManager refactor [#6534](https://github.com/mapbox/mapbox-gl-native/issues/6534)
+  - Consolidating the location where tokens are set
+  - Rename to reflect the increased responsibilities introduced in prior releases
+* AnnotationManager refactor [#6067](https://github.com/mapbox/mapbox-gl-native/issues/6067)
+  - Extracting all business logic related to annotations into a seperate class cfr. to core and the iOS codebase
 
 ## 4.2.1 - December 22, 2016
 
