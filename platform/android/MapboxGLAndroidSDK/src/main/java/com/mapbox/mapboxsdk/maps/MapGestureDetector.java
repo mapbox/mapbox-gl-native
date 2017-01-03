@@ -16,6 +16,7 @@ import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
+import com.mapbox.mapboxsdk.utils.MathUtils;
 
 /**
  * Manages gestures events on a MapView.
@@ -427,8 +428,12 @@ final class MapGestureDetector {
         // arround user provided focal point
         transform.zoomBy(detector.getScaleFactor(), focalPoint.x, focalPoint.y);
       } else if (quickZoom) {
+        // clamp scale factors we feed to core #7514
+        float scaleFactor = MathUtils.clamp(detector.getScaleFactor(),
+          MapboxConstants.MINIMUM_SCALE_FACTOR_CLAMP,
+          MapboxConstants.MAXIMUM_SCALE_FACTOR_CLAMP);
         // around center map
-        transform.zoomBy(detector.getScaleFactor(), uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+        transform.zoomBy(scaleFactor, uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
       } else {
         // around gesture
         transform.zoomBy(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
