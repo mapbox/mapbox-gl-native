@@ -277,6 +277,10 @@ idocument:
 darwin-style-code:
 	node platform/darwin/scripts/generate-style-code.js
 style-code: darwin-style-code
+
+.PHONY: check-public-symbols
+check-public-symbols:
+	node platform/darwin/scripts/check-public-symbols.js macOS
 endif
 
 #### Linux targets #####################################################
