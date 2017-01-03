@@ -75,3 +75,6 @@ sed -n -e '/^## /,$p' platform/macos/CHANGELOG.md > "${OUTPUT}/CHANGELOG.md"
 
 step "Generating API documentation…"
 make xdocument OUTPUT="${OUTPUT}/documentation"
+
+step "Checking that all public symbols are exported…"
+node platform/darwin/scripts/check-public-symbols.js macOS
