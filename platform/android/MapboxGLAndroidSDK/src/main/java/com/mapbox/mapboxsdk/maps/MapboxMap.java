@@ -160,7 +160,7 @@ public final class MapboxMap {
     CameraPosition cameraPosition = transform.invalidateCameraPosition();
     uiSettings.update(cameraPosition);
     // FIXME introduce update method with camera position
-    trackingSettings.update();
+    //trackingSettings.update();
     annotationManager.update();
   }
 

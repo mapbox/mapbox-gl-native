@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.PointF;
 import android.location.Location;
@@ -10,12 +11,15 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.content.ContextCompat;
 
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocation;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 
 import timber.log.Timber;
@@ -25,7 +29,8 @@ import timber.log.Timber;
  */
 public final class TrackingSettings {
 
-  private final MyLocationView myLocationView;
+  // TODO Rename myLocation variable
+  private final MyLocation myLocationView;
   private final UiSettings uiSettings;
   private final FocalPointChangeListener focalPointChangedListener;
   private LocationListener myLocationListener;
@@ -37,7 +42,7 @@ public final class TrackingSettings {
   private MapboxMap.OnMyLocationTrackingModeChangeListener onMyLocationTrackingModeChangeListener;
   private MapboxMap.OnMyBearingTrackingModeChangeListener onMyBearingTrackingModeChangeListener;
 
-  TrackingSettings(@NonNull MyLocationView myLocationView, UiSettings uiSettings,
+  TrackingSettings(@NonNull MyLocation myLocationView, UiSettings uiSettings,
                    FocalPointChangeListener focalPointChangedListener) {
     this.myLocationView = myLocationView;
     this.focalPointChangedListener = focalPointChangedListener;
@@ -92,8 +97,9 @@ public final class TrackingSettings {
     myLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
 
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-      focalPointChangedListener.onFocalPointChanged(new PointF(myLocationView.getCenterX(),
-        myLocationView.getCenterY()));
+      // TODO replace this code
+      //focalPointChangedListener.onFocalPointChanged(new PointF(myLocationView.getCenterX(),
+     //   myLocationView.getCenterY()));
     } else {
       focalPointChangedListener.onFocalPointChanged(null);
     }
@@ -332,7 +338,8 @@ public final class TrackingSettings {
     this.onMyBearingTrackingModeChangeListener = listener;
   }
 
-  MyLocationView getMyLocationView() {
+  //TODO edit this getter naming
+  MyLocation getMyLocationView() {
     return myLocationView;
   }
 
@@ -348,15 +355,19 @@ public final class TrackingSettings {
       return;
     }
     myLocationEnabled = locationEnabled;
-    myLocationView.setEnabled(locationEnabled);
+    myLocationView.toggleGps(locationEnabled);
+
+
+
+    //myLocationView.setEnabled(locationEnabled);
   }
 
-  void update() {
-    if (!myLocationView.isEnabled()) {
-      return;
-    }
-    myLocationView.update();
-  }
+//  void update() {
+//    if (!myLocationView.isEnabled()) {
+//      return;
+//    }
+//    myLocationView.update();
+//  }
 
   void onStart() {
     myLocationView.onStart();

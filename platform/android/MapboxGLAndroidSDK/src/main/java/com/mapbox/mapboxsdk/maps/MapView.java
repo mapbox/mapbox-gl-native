@@ -45,6 +45,7 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocation;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
@@ -138,7 +139,8 @@ public class MapView extends FrameLayout {
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
     UiSettings uiSettings = new UiSettings(proj, focalPoint, compassView, attrView, view.findViewById(R.id.logoView));
-    TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPoint);
+    MyLocation myLocation = new MyLocation(context);
+    TrackingSettings trackingSettings = new TrackingSettings(myLocation, uiSettings, focalPoint);
     MyLocationViewSettings myLocationViewSettings = new MyLocationViewSettings(myLocationView, proj, focalPoint);
     MarkerViewManager markerViewManager = new MarkerViewManager((ViewGroup) findViewById(R.id.markerViewContainer));
     AnnotationManager annotations = new AnnotationManager(nativeMapView, this, markerViewManager);
@@ -153,6 +155,7 @@ public class MapView extends FrameLayout {
 
     // inject widgets with MapboxMap
     compassView.setMapboxMap(mapboxMap);
+    myLocation.setMapboxMap(mapboxMap);
     myLocationView.setMapboxMap(mapboxMap);
     attrView.setOnClickListener(new AttributionOnClickListener(context, transform));
 
