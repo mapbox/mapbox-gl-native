@@ -157,6 +157,7 @@ public class MapView extends FrameLayout {
     compassView.setMapboxMap(mapboxMap);
     myLocation.setMapboxMap(mapboxMap);
     myLocationView.setMapboxMap(mapboxMap);
+    myLocationViewSettings.setMapboxMap(mapboxMap);
     attrView.setOnClickListener(new AttributionOnClickListener(context, transform));
 
     // Ensure this view is interactable

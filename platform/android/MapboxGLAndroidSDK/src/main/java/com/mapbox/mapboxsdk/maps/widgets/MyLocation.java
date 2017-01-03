@@ -1,7 +1,5 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -53,6 +51,14 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mapbox.mapboxsdk.constants.MyLocationConstants.ACCURACY_LAYER;
+import static com.mapbox.mapboxsdk.constants.MyLocationConstants.LOCATION_LAYER;
+import static com.mapbox.mapboxsdk.constants.MyLocationConstants.LOCATION_LAYER_BACKGROUND;
+import static com.mapbox.mapboxsdk.constants.MyLocationConstants.USER_LOCATION_ACCURACY_SOURCE;
+import static com.mapbox.mapboxsdk.constants.MyLocationConstants.USER_LOCATION_ARROW_ICON;
+import static com.mapbox.mapboxsdk.constants.MyLocationConstants.USER_LOCATION_ICON;
+import static com.mapbox.mapboxsdk.constants.MyLocationConstants.USER_LOCATION_ICON_BACKGROUND;
+import static com.mapbox.mapboxsdk.constants.MyLocationConstants.USER_LOCATION_SOURCE;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
@@ -65,18 +71,9 @@ public class MyLocation {
 
   // TODO port Turf Circle to MAS
   // TODO Check if code works in edit mode (I removed isInEditMode())
-  // TODO rename source/layer to none common id so users don't accidentally use it.
-  private static final String USER_LOCATION_ACCURACY_SOURCE = "user-location-accuracy-source";
-  private static final String ACCURACY_LAYER = "accuracy-layer";
-  private static final String USER_LOCATION_SOURCE = "user-location-source";
-  private static final String LOCATION_LAYER = "location-layer";
-  private static final String USER_LOCATION_ICON = "user-location-icon";
-  private static final String USER_LOCATION_ARROW_ICON = "user-location-arrow-icon";
-  private static final String USER_LOCATION_ICON_BACKGROUND = "user-location-icon-background";
-  private static final String LOCATION_LAYER_BACKGROUND = "location-layer-background";
 
   private static final int COMPASS_UPDATE_RATE_MS = 750;
-  private static final int STALE_USER_LOCATION_MS = 2000;
+  private static final int STALE_USER_LOCATION_MS = 10000;
 
   private MyLocationBehavior myLocationBehavior;
   private GpsLocationListener userLocationListener;
@@ -94,7 +91,8 @@ public class MyLocation {
   public boolean isStale;
 
   private int tintColor;
-
+  private int staleStateTintColor;
+  private int accuracyTintColor;
 
   private LatLng latLng;
   private Location location;
@@ -132,12 +130,14 @@ public class MyLocation {
     compassListener = new CompassListener(context);
 
     tintColor = Color.parseColor("#4C9AF2");
+    staleStateTintColor = Color.parseColor("#C8C6C6");
+    accuracyTintColor = Color.parseColor("#4C9AF2");
   }
 
   private void addLayers() {
     if (mapboxMap.getLayer(ACCURACY_LAYER) == null) {
       FillLayer accuracyLayer = new FillLayer(ACCURACY_LAYER, USER_LOCATION_ACCURACY_SOURCE).withProperties(
-        fillColor(Color.parseColor("#4C9AF2")),
+        fillColor(accuracyTintColor),
         fillOpacity(0.3f)
       );
       mapboxMap.addLayer(accuracyLayer);
@@ -145,18 +145,13 @@ public class MyLocation {
 
     if (mapboxMap.getLayer(LOCATION_LAYER) == null) {
 
-        // Add the location icon image to the map
-        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon);
-        Bitmap icon = getBitmapFromDrawable(drawable);
-        mapboxMap.addImage(USER_LOCATION_ICON, icon);
+      // Add the location icon image to the map
+      Drawable drawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon);
+      Drawable bearingDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon_arrow);
+      mapboxMap.getMyLocationViewSettings().setForegroundDrawable(drawable, bearingDrawable);
 
-      Drawable user_location_drawable_background = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon_background);
-      Bitmap user_location_icon_background = getBitmapFromDrawable(user_location_drawable_background);
-      mapboxMap.addImage(USER_LOCATION_ICON_BACKGROUND, user_location_icon_background);
-
-        Drawable bearingDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon_arrow);
-        Bitmap bearingIcon = getBitmapFromDrawable(bearingDrawable);
-        mapboxMap.addImage(USER_LOCATION_ARROW_ICON, bearingIcon);
+      Drawable userLocationDrawableBackground = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon_background);
+      mapboxMap.getMyLocationViewSettings().setBackgroundDrawable(userLocationDrawableBackground);
 
       SymbolLayer locationLayerBackground = new SymbolLayer(LOCATION_LAYER_BACKGROUND, USER_LOCATION_SOURCE).withProperties(
         iconImage(myBearingTrackingMode == MyBearingTracking.NONE ? USER_LOCATION_ICON_BACKGROUND : USER_LOCATION_ARROW_ICON),
@@ -201,32 +196,15 @@ public class MyLocation {
     if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
       compassListener.onResume();
     }
-   // if (isEnabled()) {
-   //   toggleGps(true);
+    // TODO check if location was enabled
+//    if (isEnabled()) {
+      toggleGps(true);
    // }
   }
 
   public void onStop() {
     compassListener.onPause();
-    //toggleGps(false);
-  }
-
-  // TODO make more generic
-  public void setForegroundDrawableTint() {
-        final Drawable drawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon);
-        DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
-
-        ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), tintColor, Color.parseColor("#C8C6C6"));
-        colorAnimator.setDuration(500);
-        colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-          @Override
-          public void onAnimationUpdate(ValueAnimator valueAnimator) {
-            DrawableCompat.setTint(drawable, (int) valueAnimator.getAnimatedValue());
-            Bitmap icon = getBitmapFromDrawable(drawable);
-            mapboxMap.addImage(USER_LOCATION_ICON, icon);
-          }
-        });
-        colorAnimator.start();
+    toggleGps(false);
   }
 
   public void setMapboxMap(MapboxMap mapboxMap) {
@@ -489,7 +467,7 @@ public class MyLocation {
 
   }
 
-  // https://github.com/mapbox/mapbox-gl-style-spec/issues/459#issuecomment-240555277
+  // https://github.com/mapbox/mapbox-gl-style-spec/issues/459#issuecomment-224957055
   private FeatureCollection createGeoJSONCircle(Position center, double radius) throws TurfException {
     // turf circle
     int steps = 64;
@@ -550,6 +528,9 @@ public class MyLocation {
         mapboxMap.addSource(userLocationSource);
       }
 
+      if (staleHandler != null && staleRunnable != null) {
+        staleHandler.removeCallbacks(staleRunnable);
+      }
       staleHandler = new Handler();
       staleRunnable = new Runnable() {
         @Override
@@ -558,8 +539,8 @@ public class MyLocation {
           final Drawable drawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon);
           DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
 
-          ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), tintColor, Color.parseColor("#C8C6C6"));
-          colorAnimator.setDuration(500);
+          ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), tintColor, staleStateTintColor);
+          colorAnimator.setDuration(1000);
           colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
