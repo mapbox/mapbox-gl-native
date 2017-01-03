@@ -9,6 +9,8 @@
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/annotation/annotation.hpp>
+#include <mbgl/sprite/sprite_image.hpp>
 
 #include <unistd.h>
 
@@ -20,6 +22,12 @@
 
 namespace node_mbgl {
 
+struct AnnotationOptions {
+    double latitude = 0;
+    double longitude = 0;
+    std::string image;
+};
+
 struct NodeMap::RenderOptions {
     double zoom = 0;
     double bearing = 0;
@@ -29,6 +37,7 @@ struct NodeMap::RenderOptions {
     unsigned int width = 512;
     unsigned int height = 512;
     std::vector<std::string> classes;
+    std::vector<AnnotationOptions> annotations;
     mbgl::MapDebugOptions debugOptions = mbgl::MapDebugOptions::NoDebug;
 };
 
@@ -248,6 +257,23 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
         options.pitch = Nan::Get(obj, Nan::New("pitch").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
 
+    if (Nan::Has(obj, Nan::New("annotations").ToLocalChecked()).FromJust()) {
+        auto annotationsArray = Nan::Get(obj, Nan::New("annotations").ToLocalChecked()).ToLocalChecked();
+        if (annotationsArray->IsArray()) {
+            auto annotations = annotationsArray.As<v8::Array>();
+            const int length = annotations->Length();
+            for (int i = 0; i < length; i++) {
+                auto annotationObj = annotations->Get(i).As<v8::Object>();
+                double latitude = Nan::Get(annotationObj, Nan::New("latitude").ToLocalChecked()).ToLocalChecked()->NumberValue();
+                double longitude = Nan::Get(annotationObj, Nan::New("longitude").ToLocalChecked()).ToLocalChecked()->NumberValue();
+                std::string image = "foo";
+                options.annotations.push_back({
+                    latitude, longitude, image
+                });
+            }
+        }
+    }
+
     if (Nan::Has(obj, Nan::New("center").ToLocalChecked()).FromJust()) {
         auto centerObj = Nan::Get(obj, Nan::New("center").ToLocalChecked()).ToLocalChecked();
         if (centerObj->IsArray()) {
@@ -390,6 +416,27 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
 
     if (map->getDebug() != options.debugOptions) {
         map->setDebug(options.debugOptions);
+    }
+
+    for(auto id: annotationIDs) {
+        map->removeAnnotation(id);
+    }
+    annotationIDs.clear();
+
+    for(auto annotationIconString: annotationIconNames) {
+        map->removeAnnotationIcon(annotationIconString);
+    }
+    annotationIconNames.clear();
+
+    for(auto annotation: options.annotations) {
+        std::string iconName = "airfield-15";
+        annotationIconNames.push_back(iconName);
+
+        mbgl::PremultipliedImage cPremultipliedImage({ static_cast<uint32_t>(40), static_cast<uint32_t>(40) });
+        auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(std::move(cPremultipliedImage), 1);
+        map->addAnnotationIcon(iconName, cSpriteImage);
+        map->addAnnotation(mbgl::SymbolAnnotation {{ annotation.longitude, annotation.latitude }, iconName });
+        annotationIDs.push_back(map->addAnnotation(mbgl::SymbolAnnotation {{ annotation.longitude, annotation.latitude }, iconName }));
     }
 
     map->renderStill(*view, [this](const std::exception_ptr eptr) {
