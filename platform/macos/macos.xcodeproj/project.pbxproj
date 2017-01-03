@@ -58,6 +58,8 @@
 		40E1601D1DF217D6005EA6D9 /* MGLStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 40E1601B1DF216E6005EA6D9 /* MGLStyleLayerTests.m */; };
 		52BECB0A1CC5A26F009CD791 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52BECB091CC5A26F009CD791 /* SystemConfiguration.framework */; };
 		5548BE781D09E718005DDE81 /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */; };
+		556660C61E1BEA0100E2C41B /* MGLFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 556660C51E1BEA0100E2C41B /* MGLFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		556660D61E1D07E400E2C41B /* MGLVersionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 556660D51E1D07E400E2C41B /* MGLVersionNumber.m */; };
 		558F18221D0B13B100123F46 /* libmbgl-loop.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 558F18211D0B13B000123F46 /* libmbgl-loop.a */; };
 		55D9B4B11D005D3900C1CCE2 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D9B4B01D005D3900C1CCE2 /* libz.tbd */; };
 		DA00FC8A1D5EEAC3009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -305,6 +307,8 @@
 		52BECB091CC5A26F009CD791 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		5548BE791D0ACBB2005DDE81 /* libmbgl-loop-darwin.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-loop-darwin.a"; path = "cmake/Debug/libmbgl-loop-darwin.a"; sourceTree = "<group>"; };
 		5548BE7B1D0ACBBD005DDE81 /* libmbgl-loop-darwin.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-loop-darwin.a"; path = "cmake/Debug/libmbgl-loop-darwin.a"; sourceTree = "<group>"; };
+		556660C51E1BEA0100E2C41B /* MGLFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLFoundation.h; sourceTree = "<group>"; };
+		556660D51E1D07E400E2C41B /* MGLVersionNumber.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLVersionNumber.m; path = ../../darwin/test/MGLVersionNumber.m; sourceTree = "<group>"; };
 		558F18211D0B13B000123F46 /* libmbgl-loop.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-loop.a"; path = "../../build/osx/Debug/libmbgl-loop.a"; sourceTree = "<group>"; };
 		55D9B4B01D005D3900C1CCE2 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		55FE0E8D1D100A0900FD240B /* config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = config.xcconfig; path = ../../build/macos/config.xcconfig; sourceTree = "<group>"; };
@@ -882,6 +886,7 @@
 				DAE6C3CB1CC34BD800DB3429 /* MGLOfflineStorageTests.m */,
 				DAE6C3CC1CC34BD800DB3429 /* MGLStyleTests.mm */,
 				DD58A4C71D822C6200E1F038 /* MGLExpressionTests.mm */,
+				556660D51E1D07E400E2C41B /* MGLVersionNumber.m */,
 				DAE6C33A1CC30DB200DB3429 /* Info.plist */,
 				DA2784FD1DF03060001D5B8D /* Media.xcassets */,
 			);
@@ -903,6 +908,7 @@
 				DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */,
 				DAF0D8151DFE6B1800B28378 /* MGLAttributionInfo_Private.h */,
 				DA00FC891D5EEAC3009AABC8 /* MGLAttributionInfo.mm */,
+				556660C51E1BEA0100E2C41B /* MGLFoundation.h */,
 				DAE6C34D1CC31E0400DB3429 /* MGLMapCamera.h */,
 				DAE6C36E1CC31E2A00DB3429 /* MGLMapCamera.mm */,
 				DD0902B01DB1AC6400C5BDCE /* MGLNetworkConfiguration.h */,
@@ -957,6 +963,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				556660C61E1BEA0100E2C41B /* MGLFoundation.h in Headers */,
 				DA8F258F1D51CA600010E6B5 /* MGLRasterStyleLayer.h in Headers */,
 				3508EC641D749D39009B0EE4 /* NSExpression+MGLAdditions.h in Headers */,
 				DAE6C38D1CC31E2A00DB3429 /* MGLOfflineRegion_Private.h in Headers */,
@@ -1322,6 +1329,7 @@
 				3599A3E81DF70E2000E77FB2 /* MGLStyleValueTests.m in Sources */,
 				DAEDC4321D6033F1000224FF /* MGLAttributionInfoTests.m in Sources */,
 				DA0CD58E1CF56F5800A5F5A5 /* MGLFeatureTests.mm in Sources */,
+				556660D61E1D07E400E2C41B /* MGLVersionNumber.m in Sources */,
 				DA2207BC1DC076940002F84D /* MGLStyleValueTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1489,6 +1497,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				OTHER_CFLAGS = "-fvisibility=hidden";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
 				PRODUCT_NAME = "Mapbox GL";
 			};
@@ -1501,6 +1510,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				OTHER_CFLAGS = "-fvisibility=hidden";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
 				PRODUCT_NAME = "Mapbox GL";
 			};
@@ -1542,7 +1552,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(mbgl_core_INCLUDE_DIRECTORIES)",
 					"$(mbgl_loop_INCLUDE_DIRECTORIES)",
@@ -1550,6 +1559,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/sdk/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_LDFLAGS = (
 					"$(mbgl_core_LINK_LIBRARIES)",
 					"$(mbgl_loop_LINK_LIBRARIES)",
@@ -1558,7 +1568,7 @@
 				PRODUCT_NAME = Mapbox;
 				SKIP_INSTALL = YES;
 				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
+				VERSION_INFO_PREFIX = "__attribute__((visibility (\"default\"))) ";
 			};
 			name = Debug;
 		};
@@ -1575,7 +1585,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(mbgl_core_INCLUDE_DIRECTORIES)",
 					"$(mbgl_loop_INCLUDE_DIRECTORIES)",
@@ -1583,6 +1592,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/sdk/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_LDFLAGS = (
 					"$(mbgl_core_LINK_LIBRARIES)",
 					"$(mbgl_loop_LINK_LIBRARIES)",
@@ -1592,7 +1602,7 @@
 				SKIP_INSTALL = YES;
 				STRIP_STYLE = "non-global";
 				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
+				VERSION_INFO_PREFIX = "__attribute__((visibility (\"default\"))) ";
 			};
 			name = Release;
 		};

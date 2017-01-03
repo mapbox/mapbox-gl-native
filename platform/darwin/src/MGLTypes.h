@@ -1,5 +1,7 @@
 #import <Foundation/Foundation.h>
 
+#import "MGLFoundation.h"
+
 #pragma once
 
 #if TARGET_OS_IPHONE
@@ -28,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 
 /** Indicates an error occurred in the Mapbox SDK. */
-extern NSErrorDomain const MGLErrorDomain;
+extern MGL_EXPORT NSErrorDomain const MGLErrorDomain;
 
 /** Error constants for the Mapbox SDK. */
 typedef NS_ENUM(NSInteger, MGLErrorCode) {

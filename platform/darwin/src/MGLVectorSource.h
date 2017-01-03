@@ -1,3 +1,4 @@
+#import "MGLFoundation.h"
 #import "MGLTileSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -25,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  layer initialized with a vector source must have a non-`nil` value in its
  `sourceLayerIdentifier` property.
  */
+MGL_EXPORT
 @interface MGLVectorSource : MGLTileSource
 
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL NS_DESIGNATED_INITIALIZER;

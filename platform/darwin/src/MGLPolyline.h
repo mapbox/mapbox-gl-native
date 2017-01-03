@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLFoundation.h"
 #import "MGLMultiPoint.h"
 #import "MGLOverlay.h"
 
@@ -14,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
  the order they are provided. The first and last points are not connected to
  each other.
  */
+MGL_EXPORT
 @interface MGLPolyline : MGLMultiPoint <MGLOverlay>
 
 /**
@@ -39,6 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
  @note `MGLMultiPolyline` objects cannot be added to a map view using
     `-[MGLMapView addAnnotations:]` and related methods.
  */
+MGL_EXPORT
 @interface MGLMultiPolyline : MGLShape <MGLOverlay>
 
 /**

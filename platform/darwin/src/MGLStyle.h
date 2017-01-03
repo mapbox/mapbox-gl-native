@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 
+#import "MGLFoundation.h"
 #import "MGLStyleLayer.h"
 
 #import "MGLTypes.h"
@@ -27,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
     the constant itself. Such details may change significantly from version to
     version.
  */
-static const NSInteger MGLStyleDefaultVersion = 9;
+static MGL_EXPORT const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  The proxy object for the current map style.
@@ -45,6 +46,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
     or `-mapView:didFinishLoadingStyle:` as indicators that it's safe
     to modify the map's style.
  */
+MGL_EXPORT
 @interface MGLStyle : NSObject
 
 #pragma mark Accessing Default Styles

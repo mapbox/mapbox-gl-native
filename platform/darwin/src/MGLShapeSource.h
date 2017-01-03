@@ -1,5 +1,6 @@
 #import "MGLSource.h"
 
+#import "MGLFoundation.h"
 #import "MGLTypes.h"
 #import "MGLShape.h"
 
@@ -17,14 +18,14 @@ typedef NSString *MGLShapeSourceOption NS_STRING_ENUM;
  If the `shape` property contains point shapes, setting this option to
  `YES` clusters the points by radius into groups. The default value is `NO`.
  */
-extern const MGLShapeSourceOption MGLShapeSourceOptionClustered;
+extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClustered;
 
 /**
  An `NSNumber` object containing an integer; specifies the radius of each
  cluster if clustering is enabled. A value of 512 produces a radius equal to
  the width of a tile. The default value is 50.
  */
-extern const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
+extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
 
 /**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
@@ -32,14 +33,14 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
  less than the value of `MGLShapeSourceOptionMaximumZoomLevel` so that, at the
  maximum zoom level, the shapes are not clustered.
  */
-extern const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForClustering;
+extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForClustering;
 
 /**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
  which to create vector tiles. A greater value produces greater detail at high
  zoom levels. The default value is 18.
  */
-extern const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevel;
+extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevel;
 
 /**
  An `NSNumber` object containing an integer; specifies the size of the tile
@@ -47,14 +48,14 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevel;
  buffer as wide as the tile itself. Larger values produce fewer rendering 
  artifacts near tile edges and slower performance. The default value is 128.
  */
-extern const MGLShapeSourceOption MGLShapeSourceOptionBuffer;
+extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionBuffer;
 
 /**
  An `NSNumber` object containing a double; specifies the Douglas-Peucker
  simplification tolerance. A greater value produces simpler geometries and
  improves performance. The default value is 0.375.
  */
-extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
+extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 
 /**
  `MGLShapeSource` is a map content source that supplies vector shapes to be
@@ -75,6 +76,7 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
  Any vector style layer initialized with a shape source should have a `nil`
  value in its `sourceLayerIdentifier` property.
  */
+MGL_EXPORT
 @interface MGLShapeSource : MGLSource
 
 #pragma mark Initializing a Source

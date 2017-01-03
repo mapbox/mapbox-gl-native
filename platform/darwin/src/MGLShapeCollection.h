@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 
+#import "MGLFoundation.h"
 #import "MGLShape.h"
 
 #import "MGLTypes.h"
@@ -14,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
  @note `MGLShapeCollection` objects cannot be added to a map view using
     `-[MGLMapView addAnnotations:]` and related methods.
  */
+MGL_EXPORT
 @interface MGLShapeCollection : MGLShape
 
 /**

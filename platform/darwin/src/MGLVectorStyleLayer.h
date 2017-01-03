@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 
+#import "MGLFoundation.h"
 #import "MGLForegroundStyleLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -13,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
  subclasses: `MGLCircleStyleLayer`, `MGLFillStyleLayer`, `MGLLineStyleLayer`,
  and `MGLSymbolStyleLayer`.
  */
+MGL_EXPORT
 @interface MGLVectorStyleLayer : MGLForegroundStyleLayer
 
 #pragma mark Refining a Style Layer’s Content

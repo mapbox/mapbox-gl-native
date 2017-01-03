@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLFoundation.h"
 #import "MGLShape.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -11,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
  situations where all you want to do is associate a point on the map with a
  title.
  */
+MGL_EXPORT
 @interface MGLPointAnnotation : MGLShape
 
 /**

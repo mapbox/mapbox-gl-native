@@ -1,6 +1,7 @@
-#import "MGLTileSource.h"
-
 #import <CoreGraphics/CoreGraphics.h>
+
+#import "MGLFoundation.h"
+#import "MGLTileSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,6 +32,7 @@ namespace mbgl {
 
 @end
 
+MGL_EXPORT
 mbgl::Tileset MGLTileSetFromTileURLTemplates(NS_ARRAY_OF(NSString *) *tileURLTemplates, NS_DICTIONARY_OF(MGLTileSourceOption, id) * _Nullable options);
 
 NS_ASSUME_NONNULL_END

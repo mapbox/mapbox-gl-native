@@ -8,6 +8,7 @@
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
+#import "MGLFoundation.h"
 #import "MGLStyleValue.h"
 #import "MGL<%-
 (type === 'background' ? '' :
@@ -68,6 +69,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
  `-[MGLStyle layerWithIdentifier:]` method. 
  */
 <% } -%>
+MGL_EXPORT
 @interface MGL<%- camelize(type) %>StyleLayer : MGL<%-
 (type === 'background' ? '' :
  (type === 'raster' ? 'Foreground' :

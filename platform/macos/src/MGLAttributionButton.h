@@ -1,5 +1,6 @@
 #import <Cocoa/Cocoa.h>
 
+#import "MGLFoundation.h"
 #import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -7,6 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class MGLAttributionInfo;
 
 /// Button that looks like a hyperlink and opens a URL.
+MGL_EXPORT
 @interface MGLAttributionButton : NSButton
 
 /// Returns an `MGLAttributionButton` instance with the given info.

@@ -1,6 +1,7 @@
 // This file is generated. 
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
+#import "MGLFoundation.h"
 #import "MGLStyleValue.h"
 #import "MGLStyleLayer.h"
 
@@ -12,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  `style` and obtain the background layer using the `-[MGLStyle layerWithIdentifier:]` 
  method and passing `background` for the identifier. 
  */
+MGL_EXPORT
 @interface MGLBackgroundStyleLayer : MGLStyleLayer
 
 - (instancetype)initWithIdentifier:(NSString *)identifier NS_DESIGNATED_INITIALIZER;

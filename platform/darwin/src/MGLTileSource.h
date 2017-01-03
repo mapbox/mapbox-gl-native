@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 
+#import "MGLFoundation.h"
 #import "MGLSource.h"
 #import "MGLTypes.h"
 
@@ -20,7 +21,7 @@ typedef NSString *MGLTileSourceOption NS_STRING_ENUM;
  `MGLTileSourceOptionMaximumZoomLevel`, if specified. The default value for this
  option is 0.
  */
-extern const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel;
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel;
 
 /**
  An `NSNumber` object containing an unsigned integer that specifies the maximum
@@ -30,7 +31,7 @@ extern const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel;
  `MGLTileSourceOptionMinimumZoomLevel`, if specified. The default value for this
  option is 22.
  */
-extern const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel;
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel;
 
 #if TARGET_OS_IPHONE
 /**
@@ -42,7 +43,7 @@ extern const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel;
  `MGLTileSourceOptionAttributionInfos` option is specified, this option is
  ignored.
  */
-extern const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
 
 /**
  An array of `MGLAttributionInfo` objects defining the buttons to be displayed
@@ -51,7 +52,7 @@ extern const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
  
  By default, no attribution statements are displayed.
  */
-extern const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
 #else
 /**
  An HTML string defining the buttons to be displayed in the map view’s
@@ -61,7 +62,7 @@ extern const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
  `MGLTileSourceOptionAttributionInfos` option is specified, this option is
  ignored.
  */
-extern const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
 
 /**
  An array of `MGLAttributionInfo` objects defining the buttons to be displayed
@@ -70,7 +71,7 @@ extern const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
  
  By default, no attribution statements are displayed.
  */
-extern const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
 #endif
 
 /**
@@ -80,7 +81,7 @@ extern const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
  
  The default value for this option is `MGLTileCoordinateSystemXYZ`.
  */
-extern const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem;
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem;
 
 /**
  Tile coordinate systems that determine how tile coordinates in tile URLs are
@@ -119,6 +120,7 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
  subclasses of this class. Instead, create instances of `MGLRasterSource` and
  `MGLVectorSource`.
  */
+MGL_EXPORT
 @interface MGLTileSource : MGLSource
 
 #pragma mark Initializing a Source
