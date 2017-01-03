@@ -54,6 +54,7 @@ To add any Objective-C type, constant, or member to the iOS SDK’s public inter
 
 To add an Objective-C class, protocol, category, typedef, enumeration, or global constant to the macOS SDK’s public interface:
 
+1. _(Optional.)_ Add the macro `MGL_EXPORT` prior to the declaration for classes and global constants. To use this macro, include `MGLFoundation.h`. You can check whether all public symbols are exported correctly by running `make check-public-symbols`.
 1. _(Optional.)_ Add the type or constant’s name to the relevant category in the `custom_categories` section of [the jazzy configuration file](./jazzy.yml). This is required for classes and protocols and also recommended for any other type that is strongly associated with a particular class or protocol. If you leave out this step, the symbol will appear in an “Other” section in the generated HTML documentation’s table of contents.
 1. _(Optional.)_ If the symbol would also be publicly exposed in the iOS SDK, consult [the companion iOS document](../ios/DEVELOPING.md#making-a-type-or-constant-public) for further instructions.
 
