@@ -181,6 +181,8 @@ public:
 
     void setTransitionOptions(qint64 duration, qint64 delay = 0);
 
+    void addAnnotationIcon(const QString &name, const QImage &sprite);
+
     QMapbox::AnnotationID addPointAnnotation(const QMapbox::PointAnnotation &);
     QMapbox::AnnotationID addShapeAnnotation(const QMapbox::ShapeAnnotation &);
 
@@ -198,8 +200,6 @@ public:
     void rotateBy(const QPointF &first, const QPointF &second);
 
     void resize(const QSize &size, const QSize &framebufferSize);
-
-    void addAnnotationIcon(const QString &name, const QImage &sprite);
 
     QPointF pixelForCoordinate(const QMapbox::Coordinate &) const;
     QMapbox::Coordinate coordinateForPixel(const QPointF &) const;
