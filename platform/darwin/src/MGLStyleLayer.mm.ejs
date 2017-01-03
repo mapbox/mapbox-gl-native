@@ -89,7 +89,15 @@ namespace mbgl {
     super.rawLayer = rawLayer;
 }
 
-<% if (type !== 'background' && type !== 'raster') { -%>
+<% if (type !== 'background') { -%>
+- (NSString *)sourceIdentifier
+{
+    MGLAssertStyleLayerIsValid();
+    
+    return @(self.rawLayer->getSourceID().c_str());
+}
+
+<% if (type !== 'raster') { -%>
 - (NSString *)sourceLayerIdentifier
 {
     MGLAssertStyleLayerIsValid();
@@ -119,7 +127,7 @@ namespace mbgl {
     return [NSPredicate mgl_predicateWithFilter:self.rawLayer->getFilter()];
 }
 
-<% } -%>
+<% }} -%>
 #pragma mark - Adding to and removing from a map view
 
 - (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
