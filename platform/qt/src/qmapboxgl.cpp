@@ -827,21 +827,6 @@ void QMapboxGL::setPaintProperty(const QString& layer_, const QString& property,
     }
 }
 
-bool QMapboxGL::isRotating() const
-{
-    return d_ptr->mapObj->isRotating();
-}
-
-bool QMapboxGL::isScaling() const
-{
-    return d_ptr->mapObj->isScaling();
-}
-
-bool QMapboxGL::isPanning() const
-{
-    return d_ptr->mapObj->isPanning();
-}
-
 bool QMapboxGL::isFullyLoaded() const
 {
     return d_ptr->mapObj->isFullyLoaded();
