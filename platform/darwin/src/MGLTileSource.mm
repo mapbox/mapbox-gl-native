@@ -45,6 +45,7 @@ const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem = @"MGLTileSou
 
 @end
 
+MGL_EXPORT
 mbgl::Tileset MGLTileSetFromTileURLTemplates(NS_ARRAY_OF(NSString *) *tileURLTemplates, NS_DICTIONARY_OF(MGLTileSourceOption, id) * _Nullable options) {
     mbgl::Tileset tileSet;
     

@@ -45,6 +45,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
     or `-mapView:didFinishLoadingStyle:` as indicators that it's safe
     to modify the map's style.
  */
+MGL_EXPORT
 @interface MGLStyle : NSObject
 
 #pragma mark Accessing Default Styles

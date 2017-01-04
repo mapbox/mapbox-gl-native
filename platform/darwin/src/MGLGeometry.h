@@ -1,4 +1,5 @@
-#import <Foundation/Foundation.h>
+#import "MGLTypes.h"
+
 #import <CoreLocation/CoreLocation.h>
 #import <CoreGraphics/CGBase.h>
 
@@ -33,7 +34,7 @@ NS_INLINE BOOL MGLCoordinateSpanEqualToCoordinateSpan(MGLCoordinateSpan span1, M
 }
 
 /** An area of zero width and zero height. */
-extern const MGLCoordinateSpan MGLCoordinateSpanZero;
+extern MGL_EXPORT const MGLCoordinateSpan MGLCoordinateSpanZero;
 
 /** A rectangular area as measured on a two-dimensional map projection. */
 typedef struct MGLCoordinateBounds {

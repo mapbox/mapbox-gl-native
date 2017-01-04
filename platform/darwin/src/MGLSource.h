@@ -1,4 +1,4 @@
-#import <Foundation/Foundation.h>
+#import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
  subclasses of this class. Instead, create instances of `MGLShapeSource` and the
  concrete subclasses of `MGLTileSource`.
  */
+MGL_EXPORT
 @interface MGLSource : NSObject
 
 #pragma mark Initializing a Source
