@@ -103,3 +103,4 @@ custom_categories:
       - MGLClockDirectionFormatter
       - MGLCompassDirectionFormatter
       - MGLCoordinateFormatter
+      - MGLDistanceFormatter
