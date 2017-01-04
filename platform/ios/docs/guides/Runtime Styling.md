@@ -1,6 +1,6 @@
 # Runtime Styling
 
-Mapbox's runtime styling features allow you direct control over every layer in your maps with code. It's now possible create dynamic maps and visualizations that aren't possible with other mobile maps SDKs.
+Mapbox's runtime styling features allow you direct control over every layer in your maps with code. It's now possible to create dynamic maps and visualizations that aren't possible with other mobile maps SDKs.
 
 Runtime styling expands upon the design power of [Mapbox Studio](https://www.mapbox.com/mapbox-studio/) and exposes all of the same properties and attributes directly to mobile developers in our SDK.
 
@@ -43,10 +43,6 @@ The Mapbox SDK gives you access to all of the same tools we use to render our de
 ### Custom shapes
 
 Draw custom shapes on the map the same way you would a custom `UIView` or `CALayer`. These shapes keep their geographic scale and are perfect for visualizing everything from indoor floor plans to metro systems to hurricane tracks.
-
-<!-- TODO: custom storm tracks -->
-<!-- TODO: metro system -->
-<!-- TODO: indoor maps -->
 
 ## Resources
 
