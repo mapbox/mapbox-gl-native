@@ -39,7 +39,21 @@ public final class Mapbox {
    * @return Mapbox Access Token
    */
   public static String getAccessToken() {
+    validateAccessToken();
     return INSTANCE.accessToken;
+  }
+
+  /**
+   * Runtime validation of Access Token.
+   *
+   * @throws InvalidAccessTokenException exception thrown when not using a valid accessToken
+   */
+  private static void validateAccessToken() throws InvalidAccessTokenException {
+    String accessToken = INSTANCE.accessToken;
+    if (TextUtils.isEmpty(accessToken) || (!accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("pk.")
+      && !accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("sk."))) {
+      throw new InvalidAccessTokenException();
+    }
   }
 
   /**
@@ -47,19 +61,6 @@ public final class Mapbox {
    */
   public static Context getApplicationContext() {
     return INSTANCE.context;
-  }
-
-  /**
-   * Runtime validation of Access Token.
-   *
-   * @throws InvalidAccessTokenException the exception thrown
-   */
-  public static void validateAccessToken() throws InvalidAccessTokenException {
-    String accessToken = INSTANCE.accessToken;
-    if (TextUtils.isEmpty(accessToken) || (!accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("pk.")
-      && !accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("sk."))) {
-      throw new InvalidAccessTokenException();
-    }
   }
 
   /**

@@ -202,7 +202,6 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onCreate(@Nullable Bundle savedInstanceState) {
-    Mapbox.validateAccessToken();
     nativeMapView.setAccessToken(Mapbox.getAccessToken());
 
     if (savedInstanceState == null) {
@@ -411,7 +410,6 @@ public class MapView extends FrameLayout {
 
     // stopgap for https://github.com/mapbox/mapbox-gl-native/issues/6242
     if (TextUtils.isEmpty(nativeMapView.getAccessToken())) {
-      Mapbox.validateAccessToken();
       nativeMapView.setAccessToken(Mapbox.getAccessToken());
     }
 

@@ -839,7 +839,6 @@ public final class MapboxMap {
     if (!TextUtils.isEmpty(style)) {
       // stopgap for https://github.com/mapbox/mapbox-gl-native/issues/6242
       if (TextUtils.isEmpty(nativeMapView.getAccessToken())) {
-        Mapbox.validateAccessToken();
         nativeMapView.setAccessToken(Mapbox.getAccessToken());
       }
       setStyleUrl(style);
