@@ -117,9 +117,13 @@ float GlyphSet::determineAverageLineWidth(const std::u16string& logicalInput,
     
 float calculateBadness(const float lineWidth, const float targetWidth, const float penalty, const bool isLastBreak) {
     const float raggedness = std::pow(lineWidth - targetWidth, 2);
-    if (isLastBreak && lineWidth < targetWidth) {
-        // Be more tolerant of short final lines
-        return std::fmax(0, raggedness - 150);
+    if (isLastBreak) {
+        // Favor finals lines shorter than average over longer than average
+        if (lineWidth < targetWidth) {
+            return raggedness / 2;
+        } else {
+            return raggedness * 2;
+        }
     }
     if (penalty < 0) {
         return raggedness - std::pow(penalty, 2);
@@ -127,20 +131,22 @@ float calculateBadness(const float lineWidth, const float targetWidth, const flo
     return raggedness + std::pow(penalty, 2);
 }
     
-float calculatePenalty(char16_t codePoint, char16_t previousCodePoint) {
+float calculatePenalty(char16_t codePoint, char16_t nextCodePoint) {
     float penalty = 0;
     // Force break on newline
     if (codePoint == 0x0a) {
         penalty -= 10000;
     }
     // Penalize open parenthesis at end of line
-    if (previousCodePoint && (previousCodePoint == 0x28 || previousCodePoint == 0xff08)) {
+    if (codePoint == 0x28 || codePoint == 0xff08) {
         penalty += 50;
     }
+
     // Penalize close parenthesis at beginning of line
-    if (codePoint == 0x29 || codePoint == 0xff09) {
+    if (nextCodePoint == 0x29 || nextCodePoint == 0xff09) {
         penalty += 50;
     }
+    
     return penalty;
 }
     
@@ -164,16 +170,16 @@ PotentialBreak evaluateBreak(const std::size_t breakIndex, const float breakX, c
     
     const PotentialBreak* bestPriorBreak = nullptr;
     float bestBreakBadness = calculateBadness(breakX, targetWidth, penalty, isLastBreak);
-
     for (const auto& potentialBreak : potentialBreaks) {
         const float lineWidth = breakX - potentialBreak.x;
-        float breakBadness = calculateBadness(lineWidth, targetWidth, penalty, isLastBreak) + potentialBreak.badness;
+        float breakBadness =
+            calculateBadness(lineWidth, targetWidth, penalty, isLastBreak) + potentialBreak.badness;
         if (breakBadness <= bestBreakBadness) {
             bestPriorBreak = &potentialBreak;
             bestBreakBadness = breakBadness;
         }
     }
-    
+
     return PotentialBreak(breakIndex, breakX, bestPriorBreak, bestBreakBadness);
 }
     
@@ -200,7 +206,7 @@ std::set<std::size_t> GlyphSet::determineLineBreaks(const std::u16string& logica
     if (logicalInput.empty()) {
         return {};
     }
-    
+ 
     const float targetWidth = determineAverageLineWidth(logicalInput, spacing, maxWidth);
     
     std::list<PotentialBreak> potentialBreaks;
@@ -209,22 +215,18 @@ std::set<std::size_t> GlyphSet::determineLineBreaks(const std::u16string& logica
     for (std::size_t i = 0; i < logicalInput.size(); i++) {
         const char16_t codePoint = logicalInput[i];
         auto it = sdfs.find(codePoint);
-        if (it == sdfs.end()) {
-            continue;
+        if (it != sdfs.end() && !boost::algorithm::is_any_of(u" \t\n\v\f\r")(codePoint)) {
+            currentX += it->second.metrics.advance + spacing;
         }
-
+        
         // Ideographic characters, spaces, and word-breaking punctuation that often appear without
         // surrounding spaces.
-        if (util::i18n::allowsWordBreaking(codePoint) ||
-            util::i18n::allowsIdeographicBreaking(codePoint)) {
-            const char16_t previousCodePoint = i > 0 ? logicalInput[i-1] : 0;
-
-            potentialBreaks.push_back(evaluateBreak(i, currentX, targetWidth, potentialBreaks,
-                                                     calculatePenalty(codePoint, previousCodePoint),
+        if ((i < logicalInput.size() - 1) &&
+            (util::i18n::allowsWordBreaking(codePoint) || util::i18n::allowsIdeographicBreaking(codePoint))) {
+            potentialBreaks.push_back(evaluateBreak(i+1, currentX, targetWidth, potentialBreaks,
+                                                     calculatePenalty(codePoint, logicalInput[i+1]),
                                                      false));
         }
-
-        currentX += it->second.metrics.advance + spacing;
     }
 
     return leastBadBreaks(evaluateBreak(logicalInput.size(), currentX, targetWidth, potentialBreaks, 0, true));
