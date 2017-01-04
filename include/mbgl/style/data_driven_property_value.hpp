@@ -26,6 +26,11 @@ private:
         return lhs.value == rhs.value;
     }
 
+    friend bool operator!=(const DataDrivenPropertyValue& lhs,
+                           const DataDrivenPropertyValue& rhs) {
+        return !(lhs == rhs);
+    }
+
 public:
     DataDrivenPropertyValue() = default;
     DataDrivenPropertyValue(                  T  v) : value(std::move(v)) {}

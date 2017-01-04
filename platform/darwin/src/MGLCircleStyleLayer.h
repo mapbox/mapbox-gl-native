@@ -44,12 +44,12 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
 /**
  An `MGLCircleStyleLayer` is a style layer that renders one or more filled
  circles on the map.
-
+ 
  Use a circle style layer to configure the visual appearance of point or point
  collection features in vector tiles loaded by an `MGLVectorSource` object or
  `MGLPointAnnotation`, `MGLPointFeature`, `MGLPointCollection`, or
  `MGLPointCollectionFeature` instances in an `MGLShapeSource` object.
-
+ 
  A circle style layer renders circles whose radii are measured in screen units.
  To display circles on the map whose radii correspond to real-world distances,
  use many-sided regular polygons and configure their appearance using an
@@ -84,7 +84,7 @@ MGL_EXPORT
 /**
  Amount to blur the circle. 1 blurs the circle such that only the centerpoint is
  full opacity.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
  it to the default value.
@@ -94,7 +94,7 @@ MGL_EXPORT
 #if TARGET_OS_IPHONE
 /**
  The fill color of the circle.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing
  `UIColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
@@ -103,7 +103,7 @@ MGL_EXPORT
 #else
 /**
  The fill color of the circle.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing
  `NSColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
@@ -113,7 +113,7 @@ MGL_EXPORT
 
 /**
  The opacity at which the circle will be drawn.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `1`. Set this property to `nil` to reset
  it to the default value.
@@ -122,9 +122,9 @@ MGL_EXPORT
 
 /**
  Circle radius.
-
+ 
  This property is measured in points.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `5`. Set this property to `nil` to reset
  it to the default value.
@@ -133,11 +133,11 @@ MGL_EXPORT
 
 /**
  Controls the scaling behavior of the circle when the map is pitched.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSValue` object containing `MGLCircleScaleAlignmentMap`. Set this property to
  `nil` to reset it to the default value.
-
+ 
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-circle-pitch-scale"><code>circle-pitch-scale</code></a>
  layout property in the Mapbox Style Specification.
@@ -149,7 +149,7 @@ MGL_EXPORT
 #if TARGET_OS_IPHONE
 /**
  The stroke color of the circle.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing
  `UIColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
@@ -158,7 +158,7 @@ MGL_EXPORT
 #else
 /**
  The stroke color of the circle.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing
  `NSColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
@@ -168,7 +168,7 @@ MGL_EXPORT
 
 /**
  The opacity of the circle's stroke.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `1`. Set this property to `nil` to reset
  it to the default value.
@@ -177,10 +177,10 @@ MGL_EXPORT
 
 /**
  The width of the circle's stroke. Strokes are placed outside of the
- "circle-radius".
-
+ `circleRadius`.
+ 
  This property is measured in points.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
  it to the default value.
@@ -190,13 +190,13 @@ MGL_EXPORT
 #if TARGET_OS_IPHONE
 /**
  The geometry's offset.
-
+ 
  This property is measured in points.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
  points downward. Set this property to `nil` to reset it to the default value.
-
+ 
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-circle-translate"><code>circle-translate</code></a>
  layout property in the Mapbox Style Specification.
@@ -205,13 +205,13 @@ MGL_EXPORT
 #else
 /**
  The geometry's offset.
-
+ 
  This property is measured in points.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
  points upward. Set this property to `nil` to reset it to the default value.
-
+ 
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-circle-translate"><code>circle-translate</code></a>
  layout property in the Mapbox Style Specification.
@@ -223,14 +223,14 @@ MGL_EXPORT
 
 /**
  Controls the translation reference point.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSValue` object containing `MGLCircleTranslationAnchorMap`. Set this property
  to `nil` to reset it to the default value.
-
+ 
  This property is only applied to the style if `circleTranslation` is non-`nil`.
  Otherwise, it is ignored.
-
+ 
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-circle-translate-anchor"><code>circle-translate-anchor</code></a>
  layout property in the Mapbox Style Specification.

@@ -86,28 +86,34 @@
 - (void)setBackgroundColor:(MGLStyleValue<MGLColor *> *)backgroundColor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue(backgroundColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toInterpolatablePropertyValue(backgroundColor);
     self.rawLayer->setBackgroundColor(mbglValue);
 }
 
 - (MGLStyleValue<MGLColor *> *)backgroundColor {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = self.rawLayer->getBackgroundColor() ?: self.rawLayer->getDefaultBackgroundColor();
+    auto propertyValue = self.rawLayer->getBackgroundColor();
+    if (propertyValue.isUndefined()) {
+        return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(self.rawLayer->getDefaultBackgroundColor());
+    }
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
 }
 
 - (void)setBackgroundOpacity:(MGLStyleValue<NSNumber *> *)backgroundOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(backgroundOpacity);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(backgroundOpacity);
     self.rawLayer->setBackgroundOpacity(mbglValue);
 }
 
 - (MGLStyleValue<NSNumber *> *)backgroundOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = self.rawLayer->getBackgroundOpacity() ?: self.rawLayer->getDefaultBackgroundOpacity();
+    auto propertyValue = self.rawLayer->getBackgroundOpacity();
+    if (propertyValue.isUndefined()) {
+        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultBackgroundOpacity());
+    }
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -121,7 +127,10 @@
 - (MGLStyleValue<NSString *> *)backgroundPattern {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = self.rawLayer->getBackgroundPattern() ?: self.rawLayer->getDefaultBackgroundPattern();
+    auto propertyValue = self.rawLayer->getBackgroundPattern();
+    if (propertyValue.isUndefined()) {
+        return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(self.rawLayer->getDefaultBackgroundPattern());
+    }
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 

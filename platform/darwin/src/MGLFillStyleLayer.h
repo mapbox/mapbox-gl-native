@@ -27,7 +27,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslationAnchor) {
 /**
  An `MGLFillStyleLayer` is a style layer that renders one or more filled (and
  optionally stroked) polygons on the map.
-
+ 
  Use a fill style layer to configure the visual appearance of polygon or
  multipolygon features in vector tiles loaded by an `MGLVectorSource` object or
  `MGLPolygon`, `MGLPolygonFeature`, `MGLMultiPolygon`, or
@@ -56,11 +56,11 @@ MGL_EXPORT
 
 /**
  Whether or not the fill should be antialiased.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing `YES`. Set this property to `nil` to reset it to
  the default value.
-
+ 
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-antialias"><code>fill-antialias</code></a>
  layout property in the Mapbox Style Specification.
@@ -72,11 +72,11 @@ MGL_EXPORT
 #if TARGET_OS_IPHONE
 /**
  The color of the filled part of this layer.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing
  `UIColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
-
+ 
  This property is only applied to the style if `fillPattern` is set to `nil`.
  Otherwise, it is ignored.
  */
@@ -84,11 +84,11 @@ MGL_EXPORT
 #else
 /**
  The color of the filled part of this layer.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing
  `NSColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
-
+ 
  This property is only applied to the style if `fillPattern` is set to `nil`.
  Otherwise, it is ignored.
  */
@@ -98,7 +98,7 @@ MGL_EXPORT
 /**
  The opacity of the entire fill layer. In contrast to the `fillColor`, this
  value will also affect the 1pt stroke around the fill, if the stroke is used.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `1`. Set this property to `nil` to reset
  it to the default value.
@@ -108,7 +108,7 @@ MGL_EXPORT
 #if TARGET_OS_IPHONE
 /**
  The outline color of the fill. Matches the value of `fillColor` if unspecified.
-
+ 
  This property is only applied to the style if `fillPattern` is set to `nil`,
  and `fillAntialiased` is set to an `MGLStyleValue` object containing an
  `NSNumber` object containing `YES`. Otherwise, it is ignored.
@@ -117,7 +117,7 @@ MGL_EXPORT
 #else
 /**
  The outline color of the fill. Matches the value of `fillColor` if unspecified.
-
+ 
  This property is only applied to the style if `fillPattern` is set to `nil`,
  and `fillAntialiased` is set to an `MGLStyleValue` object containing an
  `NSNumber` object containing `YES`. Otherwise, it is ignored.
@@ -134,13 +134,13 @@ MGL_EXPORT
 #if TARGET_OS_IPHONE
 /**
  The geometry's offset.
-
+ 
  This property is measured in points.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
  points downward. Set this property to `nil` to reset it to the default value.
-
+ 
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-translate"><code>fill-translate</code></a>
  layout property in the Mapbox Style Specification.
@@ -149,13 +149,13 @@ MGL_EXPORT
 #else
 /**
  The geometry's offset.
-
+ 
  This property is measured in points.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
  points upward. Set this property to `nil` to reset it to the default value.
-
+ 
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-translate"><code>fill-translate</code></a>
  layout property in the Mapbox Style Specification.
@@ -167,14 +167,14 @@ MGL_EXPORT
 
 /**
  Controls the translation reference point.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSValue` object containing `MGLFillTranslationAnchorMap`. Set this property to
  `nil` to reset it to the default value.
-
+ 
  This property is only applied to the style if `fillTranslation` is non-`nil`.
  Otherwise, it is ignored.
-
+ 
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-translate-anchor"><code>fill-translate-anchor</code></a>
  layout property in the Mapbox Style Specification.
