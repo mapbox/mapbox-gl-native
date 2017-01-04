@@ -8,8 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.SurfaceTexture;
@@ -86,7 +84,6 @@ public class MapView extends FrameLayout {
   private MapZoomButtonController mapZoomButtonController;
 
   private ConnectivityReceiver connectivityReceiver;
-  private SnapshotRequest snapshotRequest;
 
   @UiThread
   public MapView(@NonNull Context context) {
@@ -609,14 +606,6 @@ public class MapView extends FrameLayout {
     }
   }
 
-  // Called when the map view transformation has changed
-  // Called via JNI from NativeMapView
-  // Forward to any listeners
-  protected void onMapChanged(int mapChange) {
-    nativeMapView.onMapChangedEventDispatch(mapChange);
-  }
-
-
   /**
    * Sets a callback object which will be triggered when the {@link MapboxMap} instance is ready to be used.
    *
@@ -639,53 +628,6 @@ public class MapView extends FrameLayout {
 
   void setMapboxMap(MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-  }
-
-  //
-  // Snapshot API
-  //
-
-  @UiThread
-  void snapshot(@NonNull final MapboxMap.SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
-    snapshotRequest = new SnapshotRequest(bitmap, callback);
-    nativeMapView.scheduleTakeSnapshot();
-    nativeMapView.render();
-  }
-
-  // Called when the snapshot method was executed
-  // Called via JNI from NativeMapView
-  // Forward to any listeners
-  protected void onSnapshotReady(byte[] bytes) {
-    if (snapshotRequest != null && bytes != null) {
-      BitmapFactory.Options options = new BitmapFactory.Options();
-      options.inBitmap = snapshotRequest.getBitmap();  // the old Bitmap to be reused
-      options.inMutable = true;
-      options.inSampleSize = 1;
-      Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-
-      MapboxMap.SnapshotReadyCallback callback = snapshotRequest.getCallback();
-      if (callback != null) {
-        callback.onSnapshotReady(bitmap);
-      }
-    }
-  }
-
-  private class SnapshotRequest {
-    private Bitmap bitmap;
-    private MapboxMap.SnapshotReadyCallback callback;
-
-    SnapshotRequest(Bitmap bitmap, MapboxMap.SnapshotReadyCallback callback) {
-      this.bitmap = bitmap;
-      this.callback = callback;
-    }
-
-    public Bitmap getBitmap() {
-      return bitmap;
-    }
-
-    public MapboxMap.SnapshotReadyCallback getCallback() {
-      return callback;
-    }
   }
 
   private static class AttributionOnClickListener implements View.OnClickListener, DialogInterface.OnClickListener {
@@ -1062,7 +1004,7 @@ public class MapView extends FrameLayout {
       }
     }
 
-    public boolean isInitialLoad() {
+    boolean isInitialLoad() {
       return initialLoad;
     }
 
