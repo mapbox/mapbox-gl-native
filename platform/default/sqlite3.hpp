@@ -57,8 +57,6 @@ private:
     Statement(const Statement &) = delete;
     Statement &operator=(const Statement &) = delete;
 
-    void check(int err);
-
 public:
     Statement(Database *db, const char *sql);
     Statement(Statement &&);
