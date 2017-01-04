@@ -9,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  An `MGLRasterStyleLayer` is a style layer that renders raster tiles on the map.
-
+ 
  Use a raster style layer to configure the color parameters of raster tiles
  loaded by an `MGLRasterSource` object. For example, you could use a raster
  style layer to render <a href="https://www.mapbox.com/satellite/">Mapbox
@@ -41,11 +41,11 @@ MGL_EXPORT
 /**
  Increase or reduce the brightness of the image. The value is the maximum
  brightness.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `1`. Set this property to `nil` to reset
  it to the default value.
-
+ 
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-brightness-max"><code>raster-brightness-max</code></a>
  layout property in the Mapbox Style Specification.
@@ -57,11 +57,11 @@ MGL_EXPORT
 /**
  Increase or reduce the brightness of the image. The value is the minimum
  brightness.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
  it to the default value.
-
+ 
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-brightness-min"><code>raster-brightness-min</code></a>
  layout property in the Mapbox Style Specification.
@@ -72,7 +72,7 @@ MGL_EXPORT
 
 /**
  Increase or reduce the contrast of the image.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
  it to the default value.
@@ -81,9 +81,9 @@ MGL_EXPORT
 
 /**
  Fade duration when a new tile is added.
-
+ 
  This property is measured in milliseconds.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `300`. Set this property to `nil` to
  reset it to the default value.
@@ -92,13 +92,13 @@ MGL_EXPORT
 
 /**
  Rotates hues around the color wheel.
-
+ 
  This property is measured in degrees.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
  it to the default value.
-
+ 
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-hue-rotate"><code>raster-hue-rotate</code></a>
  layout property in the Mapbox Style Specification.
@@ -109,7 +109,7 @@ MGL_EXPORT
 
 /**
  The opacity at which the image will be drawn.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `1`. Set this property to `nil` to reset
  it to the default value.
@@ -118,7 +118,7 @@ MGL_EXPORT
 
 /**
  Increase or reduce the saturation of the image.
-
+ 
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
  it to the default value.
