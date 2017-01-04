@@ -55,6 +55,12 @@ public:
         sqlite3_finalize(stmt);
     }
 
+    void check(int err) {
+        if (err != SQLITE_OK) {
+            throw Exception { err, sqlite3_errmsg(sqlite3_db_handle(stmt)) };
+        }
+    }
+
     sqlite3_stmt* stmt = nullptr;
     int64_t lastInsertRowId = 0;
     int64_t changes = 0;
@@ -156,70 +162,64 @@ Statement::operator bool() const {
     return impl.operator bool();
 }
 
-void Statement::check(int err) {
-    if (err != SQLITE_OK) {
-        throw Exception { err, sqlite3_errmsg(sqlite3_db_handle(impl->stmt)) };
-    }
-}
-
 template <> void Statement::bind(int offset, std::nullptr_t) {
     assert(impl);
-    check(sqlite3_bind_null(impl->stmt, offset));
+    impl->check(sqlite3_bind_null(impl->stmt, offset));
 }
 
 template <> void Statement::bind(int offset, int8_t value) {
     assert(impl);
-    check(sqlite3_bind_int64(impl->stmt, offset, value));
+    impl->check(sqlite3_bind_int64(impl->stmt, offset, value));
 }
 
 template <> void Statement::bind(int offset, int16_t value) {
     assert(impl);
-    check(sqlite3_bind_int64(impl->stmt, offset, value));
+    impl->check(sqlite3_bind_int64(impl->stmt, offset, value));
 }
 
 template <> void Statement::bind(int offset, int32_t value) {
     assert(impl);
-    check(sqlite3_bind_int64(impl->stmt, offset, value));
+    impl->check(sqlite3_bind_int64(impl->stmt, offset, value));
 }
 
 template <> void Statement::bind(int offset, int64_t value) {
     assert(impl);
-    check(sqlite3_bind_int64(impl->stmt, offset, value));
+    impl->check(sqlite3_bind_int64(impl->stmt, offset, value));
 }
 
 template <> void Statement::bind(int offset, uint8_t value) {
     assert(impl);
-    check(sqlite3_bind_int64(impl->stmt, offset, value));
+    impl->check(sqlite3_bind_int64(impl->stmt, offset, value));
 }
 
 template <> void Statement::bind(int offset, uint16_t value) {
     assert(impl);
-    check(sqlite3_bind_int64(impl->stmt, offset, value));
+    impl->check(sqlite3_bind_int64(impl->stmt, offset, value));
 }
 
 template <> void Statement::bind(int offset, uint32_t value) {
     assert(impl);
-    check(sqlite3_bind_int64(impl->stmt, offset, value));
+    impl->check(sqlite3_bind_int64(impl->stmt, offset, value));
 }
 
 template <> void Statement::bind(int offset, float value) {
     assert(impl);
-    check(sqlite3_bind_double(impl->stmt, offset, value));
+    impl->check(sqlite3_bind_double(impl->stmt, offset, value));
 }
 
 template <> void Statement::bind(int offset, double value) {
     assert(impl);
-    check(sqlite3_bind_double(impl->stmt, offset, value));
+    impl->check(sqlite3_bind_double(impl->stmt, offset, value));
 }
 
 template <> void Statement::bind(int offset, bool value) {
     assert(impl);
-    check(sqlite3_bind_int(impl->stmt, offset, value));
+    impl->check(sqlite3_bind_int(impl->stmt, offset, value));
 }
 
 template <> void Statement::bind(int offset, const char *value) {
     assert(impl);
-    check(sqlite3_bind_text(impl->stmt, offset, value, -1, SQLITE_STATIC));
+    impl->check(sqlite3_bind_text(impl->stmt, offset, value, -1, SQLITE_STATIC));
 }
 
 // We currently cannot use sqlite3_bind_blob64 / sqlite3_bind_text64 because they
@@ -234,7 +234,7 @@ void Statement::bind(int offset, const char * value, std::size_t length, bool re
     if (length > std::numeric_limits<int>::max()) {
         throw std::range_error("value too long for sqlite3_bind_text");
     }
-    check(sqlite3_bind_text(impl->stmt, offset, value, int(length),
+    impl->check(sqlite3_bind_text(impl->stmt, offset, value, int(length),
                             retain ? SQLITE_TRANSIENT : SQLITE_STATIC));
 }
 
@@ -247,7 +247,7 @@ void Statement::bindBlob(int offset, const void * value, std::size_t length, boo
     if (length > std::numeric_limits<int>::max()) {
         throw std::range_error("value too long for sqlite3_bind_text");
     }
-    check(sqlite3_bind_blob(impl->stmt, offset, value, int(length),
+    impl->check(sqlite3_bind_blob(impl->stmt, offset, value, int(length),
                             retain ? SQLITE_TRANSIENT : SQLITE_STATIC));
 }
 
@@ -259,7 +259,7 @@ template <>
 void Statement::bind(
         int offset, std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds> value) {
     assert(impl);
-    check(sqlite3_bind_int64(impl->stmt, offset, std::chrono::system_clock::to_time_t(value)));
+    impl->check(sqlite3_bind_int64(impl->stmt, offset, std::chrono::system_clock::to_time_t(value)));
 }
 
 template <> void Statement::bind(int offset, optional<std::string> value) {
