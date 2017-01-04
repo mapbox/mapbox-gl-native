@@ -101,8 +101,9 @@ public class MyLocationView extends View {
     private PointF screenLocation;
 
     // camera vars
-    private float bearing;
-    private float tilt;
+    private double tilt;
+    private double bearing;
+    private float magneticHeading;
 
     // Controls the compass update rate in milliseconds
     private static final int COMPASS_UPDATE_RATE_MS = 500;
@@ -277,7 +278,7 @@ public class MyLocationView extends View {
 
         // put camera in position
         camera.save();
-        camera.rotate(tilt, 0, 0);
+        camera.rotate((float) tilt, 0, 0);
         // map camera matrix on our matrix
         camera.getMatrix(matrix);
 
@@ -335,9 +336,39 @@ public class MyLocationView extends View {
         }
     }
 
-    public void setBearing(double bearing) {
-        this.bearing = (float) bearing;
+    public void setBearing(double newBearing) {
+        // take account of screen rotation away from its natural rotation
+        int rotation = mWindowManager.getDefaultDisplay().getRotation();
+        float screen_adjustment = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                screen_adjustment = 0;
+                break;
+            case Surface.ROTATION_90:
+                screen_adjustment = 90;
+                break;
+            case Surface.ROTATION_180:
+                screen_adjustment = 180;
+                break;
+            case Surface.ROTATION_270:
+                screen_adjustment = 270;
+                break;
+        }
+        bearing = (newBearing - screen_adjustment) % 360;
+        setCompass(magneticHeading - bearing);
     }
+
+    /* Mappy : redefined above without tracking notion
+    public void setBearing(double bearing) {
+        this.bearing = bearing;
+        if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+            if (myBearingTrackingMode == MyBearingTracking.GPS) {
+                setCompass(location.getBearing() - bearing);
+            } else if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+                setCompass(magneticHeading - bearing);
+            }
+        }
+    } Mappy */
 
     public void setCameraPosition(CameraPosition position) {
         setTilt(position.tilt);
@@ -421,7 +452,7 @@ public class MyLocationView extends View {
     protected Parcelable onSaveInstanceState() {
         Bundle bundle = new Bundle();
         bundle.putParcelable("superState", super.onSaveInstanceState());
-        bundle.putFloat("tilt", tilt);
+        bundle.putDouble("tilt", tilt);
         return bundle;
     }
 
@@ -488,6 +519,8 @@ public class MyLocationView extends View {
             if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
                 // always face north
                 setCompass(0);
+            } else {
+                myLocationBehavior.invalidate();
             }
         }
         invalidate();
@@ -512,7 +545,7 @@ public class MyLocationView extends View {
         invalidate();
     }
 
-    private void setCompass(float bearing) {
+    private void setCompass(double bearing) {
         float oldDir = previousDirection;
         if (directionAnimator != null) {
             oldDir = (Float) directionAnimator.getAnimatedValue();
@@ -520,7 +553,7 @@ public class MyLocationView extends View {
             directionAnimator = null;
         }
 
-        float newDir = bearing;
+        float newDir = (float) bearing;
         float diff = oldDir - newDir;
         if (diff > 180.0f) {
             newDir += 360.0f;
@@ -578,8 +611,6 @@ public class MyLocationView extends View {
         float[] matrix = new float[9];
         float[] orientation = new float[3];
 
-        private int currentDegree = 0;
-
         // Compass data
         private long compassUpdateNextTimestamp = 0;
 
@@ -607,63 +638,31 @@ public class MyLocationView extends View {
 
             if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
 
-                /**
-                 * Mappy Fix
-                 * On some Samsung devices (e.g. Galaxy Note 3 and Galaxy S4) the
-                 * SensorManager.getRotationMatrixFromVector() appears to throw an
-                 * exception when the passed rotation vector has length > 4.
-                 * In this case
-                 */
-                try {
-                    // calculate the rotation matrix
-                    SensorManager.getRotationMatrixFromVector(matrix, event.values);
-                    SensorManager.getOrientation(matrix, orientation);
+                // calculate the rotation matrix
+                SensorManager.getRotationMatrixFromVector(matrix, event.values);
+                SensorManager.getOrientation(matrix, orientation);
 
-                    float magneticHeading = (float) Math.toDegrees(orientation[0]);
+                float magneticHeading = (float) Math.toDegrees(orientation[0]);
+                setCompass(magneticHeading - bearing);
 
-                    currentDegree = (int) (magneticHeading);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    currentDegree = 0;
-                }
-
-                /* Mappy, the bearing of the sensor doesn't allow to rotate the map
-                // Change the user location view orientation to reflect the device orientation
-                setBearing(currentDegree);
-
-                 if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-                 rotateCamera();
-                 }
-                 */
+                 /* Mappy, the bearing of the sensor doesn't allow to rotate the map
+                if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
+                    // Change the user location view orientation to reflect the device orientation
+                    rotateCamera(magneticHeading);
+                    setCompass(0);
+                } else {
+                    // Change compass direction
+                    setCompass(magneticHeading - bearing);
+                }*/
 
                 compassUpdateNextTimestamp = currentTime + COMPASS_UPDATE_RATE_MS;
             }
         }
 
-        private void setBearing(int newBearing) {
-            // take account of screen rotation away from its natural rotation
-            int rotation = mWindowManager.getDefaultDisplay().getRotation();
-            float screen_adjustment = 0;
-            switch (rotation) {
-                case Surface.ROTATION_0:
-                    screen_adjustment = 0;
-                    break;
-                case Surface.ROTATION_90:
-                    screen_adjustment = 90;
-                    break;
-                case Surface.ROTATION_180:
-                    screen_adjustment = 180;
-                    break;
-                case Surface.ROTATION_270:
-                    screen_adjustment = 270;
-                    break;
-            }
-            bearing = (newBearing - screen_adjustment) % 360;
-        }
 
-        private void rotateCamera() {
+        private void rotateCamera(float rotation) {
             CameraPosition.Builder builder = new CameraPosition.Builder();
-            builder.bearing(currentDegree);
+            builder.bearing(rotation);
             mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), COMPASS_UPDATE_RATE_MS, false /*linear interpolator*/, false /*do not disable tracking*/, null);
         }
 
@@ -811,11 +810,6 @@ public class MyLocationView extends View {
 
             // update LatLng location
             LatLng newLocation = new LatLng(location);
-
-            // update LatLng direction
-            if (myBearingTrackingMode == MyBearingTracking.GPS && location.hasBearing()) {
-                setCompass(location.getBearing() + bearing);
-            }
 
             // update LatLng accuracy
             updateAccuracy(location);

@@ -1,6 +1,13 @@
 #pragma once
 
-#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/gl/implementation.hpp>
+
+#if MBGL_USE_CGL
+#include <OpenGL/OpenGL.h>
+#elif MBGL_USE_GLX
+typedef struct _XDisplay Display;
+typedef struct __GLXFBConfigRec* GLXFBConfig;
+#endif
 
 namespace mbgl {
 

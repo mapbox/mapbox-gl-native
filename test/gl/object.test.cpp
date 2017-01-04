@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/platform/default/headless_display.hpp>
-#include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/platform/default/headless_backend.hpp>
+#include <mbgl/platform/default/offscreen_view.hpp>
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/context.hpp>
@@ -43,11 +43,8 @@ TEST(GLObject, Value) {
 
     auto object = std::make_unique<mbgl::gl::State<MockGLObject>>();
     EXPECT_EQ(object->getCurrentValue(), false);
-    EXPECT_FALSE(object->isDirty());
-    EXPECT_FALSE(setFlag);
-
-    object->setDirty();
     EXPECT_TRUE(object->isDirty());
+    EXPECT_FALSE(setFlag);
 
     *object = false;
     EXPECT_EQ(object->getCurrentValue(), false);
@@ -59,16 +56,11 @@ TEST(GLObject, Value) {
     EXPECT_EQ(object->getCurrentValue(), true);
     EXPECT_FALSE(object->isDirty());
     EXPECT_TRUE(setFlag);
-
-    object->reset();
-    EXPECT_EQ(object->getCurrentValue(), false);
-    EXPECT_FALSE(object->isDirty());
-    EXPECT_TRUE(setFlag);
 }
 
 TEST(GLObject, Store) {
-    mbgl::HeadlessView view(std::make_shared<mbgl::HeadlessDisplay>(), 1);
-    view.activate();
+    mbgl::HeadlessBackend backend;
+    mbgl::OffscreenView view(backend.getContext());
 
     mbgl::gl::Context context;
     EXPECT_TRUE(context.empty());
@@ -106,5 +98,5 @@ TEST(GLObject, Store) {
     context.reset();
     EXPECT_TRUE(context.empty());
 
-    view.deactivate();
+    backend.deactivate();
 }

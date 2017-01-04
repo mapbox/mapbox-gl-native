@@ -271,9 +271,9 @@ public class OfflineManager {
      * optionally registering an `OfflineRegionObserver` beforehand.
      * </p>
      *
-     * @param definition the offline region definition
-     * @param metadata   the metadata in bytes
-     * @param callback   the callback to be invoked
+     * @param definition the offline region definition.
+     * @param metadata   the metadata in bytes.
+     * @param callback   the callback to be invoked.
      */
     public void createOfflineRegion(
             @NonNull OfflineRegionDefinition definition,
