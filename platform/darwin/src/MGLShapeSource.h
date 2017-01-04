@@ -74,8 +74,18 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
  
  Any vector style layer initialized with a shape source should have a `nil`
  value in its `sourceLayerIdentifier` property.
-
- <!--EXAMPLE: MGLShapeSource-->
+ 
+ ### Example
+ 
+ ```swift
+ var coordinates: [CLLocationCoordinate2D] = [
+     CLLocationCoordinate2D(latitude: 37.77, longitude: -122.42),
+     CLLocationCoordinate2D(latitude: 38.91, longitude: -77.04),
+ ]
+ let polyline = MGLPolylineFeature(coordinates: &coordinates, count: UInt(coordinates.count))
+ let shape = MGLShapeCollectionFeature(shapes: [polyline])
+ let source = MGLShapeSource(identifier: "lines", shape: shape, options: nil)
+ mapView.style.addSource(source)
  ```
  */
 @interface MGLShapeSource : MGLSource

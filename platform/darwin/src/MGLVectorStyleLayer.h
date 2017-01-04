@@ -59,7 +59,10 @@ NS_ASSUME_NONNULL_BEGIN
  <li><code>NSContainsPredicateOperatorType</code> (<code>CONTAINS</code>)</li>
  </ul>
  
- To test whether a feature has or lacks a specific attribute, compare the attribute to `NULL` or `NIL`. Predicates created using the `+[NSPredicate predicateWithValue:]` method are also supported. String operators and custom operators are not supported.
+ To test whether a feature has or lacks a specific attribute, compare the
+ attribute to `NULL` or `NIL`. Predicates created using the
+ `+[NSPredicate predicateWithValue:]` method are also supported. String
+ operators and custom operators are not supported.
  
  For details about the predicate format string syntax, consult the “Predicate
  Format String Syntax” chapter of the
@@ -130,8 +133,19 @@ NS_ASSUME_NONNULL_BEGIN
  style attributes and also `hyphen-minus` and `tag:subtag`. However, you must use
  `%K` in the format string to represent these variables:
  `@"%K == 'LineString'", @"$type"`.
-
- <!--EXAMPLE: MGLVectorStyleLayer.predicate-->
+ 
+ ### Example
+ 
+ To filter the layer to include only the features whose `index` attribute is 5
+ or 10 and whose `ele` attribute is at least 1,500, you could create an
+ `NSCompoundPredicate` along these lines:
+ 
+ ```swift
+ let layer = MGLLineStyleLayer(identifier: "contour", source: terrain)
+ layer.sourceLayerIdentifier = "contours"
+ layer.predicate = NSPredicate(format: "(index == 5 || index == 10) && ele >= 1500.0")
+ mapView.style.addLayer(layer)
+ ```
  */
 @property (nonatomic, nullable) NSPredicate *predicate;
 

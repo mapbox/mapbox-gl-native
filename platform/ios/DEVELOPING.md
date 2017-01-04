@@ -118,6 +118,22 @@ To add a localization to the iOS SDK:
 1. In the Project navigator, expand each .strings and .stringsdict file in the project. An additional version for your localization should be listed; translate it. Translate everything on the right side of the equals sign. Leave the left side and any comments unmodified. See Apple’s documentation on the [.strings](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/LoadingResources/Strings/Strings.html) and [.stringsdict](https://developer.apple.com/library/content/documentation/MacOSX/Conceptual/BPInternational/StringsdictFileFormat/StringsdictFileFormat.html) formats.
 1. You’re already most of the way towards localizing the macOS SDK too – consider [completing that localization](../macos/DEVELOPING.md#adding-a-localization).
 
+### Adding a code example
+
+To add an example code listing to the documentation for a class or class member:
+
+1. Add a test method named in the form `testMGLClass` or `testMGLClass$method`
+   to [MGLDocumentationExampleTests](test/MGLDocumentationExampleTests.swift).
+   Wrap the code you’d like to appear in the documentation within
+   `//#-example-code` and `//#-end-example-code` comments.
+1. Insert the code listings into the headers:
+
+```bash
+make darwin-update-examples
+```
+
+[SourceKitten](https://github.com/jpsim/SourceKitten/) is required and will be installed automatically using Homebrew.
+
 ## Testing
 
 `make ios-test` builds and runs unit tests of cross-platform code as well as the SDK.

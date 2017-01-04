@@ -1,3 +1,4 @@
+#import "MGLAccountManager.h"
 #import "MGLMapView.h"
 #import "MGLStyle_Private.h"
 #import "MGLOpenGLStyleLayer.h"
@@ -36,9 +37,19 @@
 
 - (void)setUp {
     [super setUp];
-
+    
+    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
     self.mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-    self.style = [[MGLStyle alloc] initWithMapView:self.mapView];
+}
+
+- (void)tearDown {
+    self.mapView = nil;
+    
+    [super tearDown];
+}
+
+- (MGLStyle *)style {
+    return self.mapView.style;
 }
 
 - (void)testUnversionedStyleURLs {
@@ -174,18 +185,18 @@
 - (void)testAddingLayersWithDuplicateIdentifiers {
     //Just some source
     MGLVectorSource *source = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
-    [self.mapView.style addSource: source];
+    [self.style addSource: source];
     
     //Add initial layer
     MGLFillStyleLayer *initial = [[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source];
-    [self.mapView.style addLayer:initial];
+    [self.style addLayer:initial];
     
     //Try to add the duplicate
-    XCTAssertThrowsSpecificNamed([self.mapView.style addLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source]], NSException, @"MGLRedundantLayerIdentifierException");
-    XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] belowLayer:initial],NSException, @"MGLRedundantLayerIdentifierException");
-    XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] aboveLayer:initial], NSException, @"MGLRedundantLayerIdentifierException");
-    XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] atIndex:0], NSException, @"MGLRedundantLayerIdentifierException");
-    XCTAssertThrowsSpecificNamed([self.mapView.style insertLayer:[[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"my-layer"] atIndex:0], NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.style addLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source]], NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] belowLayer:initial],NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] aboveLayer:initial], NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] atIndex:0], NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.style insertLayer:[[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"my-layer"] atIndex:0], NSException, @"MGLRedundantLayerIdentifierException");
 }
 
 - (NSString *)stringWithContentsOfStyleHeader {
@@ -209,8 +220,8 @@
 #endif
     XCTAssertNotNil(image);
     
-    [self.mapView.style setImage:image forName:imageName];
-    MGLImage *styleImage = [self.mapView.style imageForName:imageName];
+    [self.style setImage:image forName:imageName];
+    MGLImage *styleImage = [self.style imageForName:imageName];
     
     XCTAssertNotNil(styleImage);
     XCTAssertEqual(image.size.width, styleImage.size.width);
@@ -218,29 +229,27 @@
 }
 
 - (void)testLayersOrder {
-    [self.mapView setStyleURL:[MGLStyle streetsStyleURLWithVersion:8]];
-    
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
-    [self.mapView.style addSource:source];
+    [self.style addSource:source];
     
     MGLCircleStyleLayer *layer1 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer1" source:source];
-    [self.mapView.style addLayer:layer1];
+    [self.style addLayer:layer1];
     
     MGLCircleStyleLayer *layer3 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer3" source:source];
-    [self.mapView.style addLayer:layer3];
+    [self.style addLayer:layer3];
     
     MGLCircleStyleLayer *layer2 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer2" source:source];
-    [self.mapView.style insertLayer:layer2 aboveLayer:layer1];
+    [self.style insertLayer:layer2 aboveLayer:layer1];
     
     MGLCircleStyleLayer *layer4 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer4" source:source];
-    [self.mapView.style insertLayer:layer4 aboveLayer:layer3];
+    [self.style insertLayer:layer4 aboveLayer:layer3];
     
     MGLCircleStyleLayer *layer0 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer0" source:source];
-    [self.mapView.style insertLayer:layer0 belowLayer:layer1];
+    [self.style insertLayer:layer0 belowLayer:layer1];
     
-    NSArray<MGLStyleLayer *> *layers = [self.mapView.style layers];
+    NSArray<MGLStyleLayer *> *layers = [self.style layers];
     
     XCTAssert([[layers[0] identifier] isEqualToString:layer0.identifier]);
     XCTAssert([[layers[1] identifier] isEqualToString:layer1.identifier]);

@@ -10,6 +10,7 @@
 
 - (void)setUp {
     [super setUp];
+    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
 #if TARGET_OS_IPHONE
     UIApplication *app = [UIApplication sharedApplication];
     UIViewController *vc = [[UIViewController alloc] init];
@@ -19,10 +20,15 @@
     [vc.view addSubview:_mapView];
     _mapView.delegate = self;
 #else
-    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
     NSWindowController *windowController = [[NSWindowController alloc] initWithWindowNibName:@"MGLStyleLayerTests" owner:self];
     [windowController showWindow:nil];
 #endif
+}
+
+- (void)tearDown {
+    _mapView = nil;
+    
+    [super tearDown];
 }
 
 - (void)testPropertyName:(NSString *)name isBoolean:(BOOL)isBoolean {
