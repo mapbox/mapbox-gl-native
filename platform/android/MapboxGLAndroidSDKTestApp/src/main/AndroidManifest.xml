@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mapbox.mapboxsdk.testapp">
+          package="com.mapbox.mapboxsdk.testapp">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:name=".MapboxApplication"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@drawable/icon"
-        android:roundIcon="@drawable/ic_launcher_round"
         android:label="@string/app_name"
+        android:roundIcon="@drawable/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.FeatureOverviewActivity"
+            android:launchMode="singleTop"
             android:label="@string/app_name">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
@@ -31,7 +32,10 @@
             android:label="@string/activity_info_window">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_infowindow" />
+                android:value="@string/category_infowindow"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.infowindow.InfoWindowAdapterActivity"
@@ -39,7 +43,10 @@
             android:label="@string/activity_infowindow_adapter">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_infowindow" />
+                android:value="@string/category_infowindow"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.infowindow.DynamicInfoWindowAdapterActivity"
@@ -47,7 +54,10 @@
             android:label="@string/activity_dynamic_infowindow_adapter">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_infowindow" />
+                android:value="@string/category_infowindow"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.annotation.BulkMarkerActivity"
@@ -56,7 +66,10 @@
             android:label="@string/activity_add_bulk_markers">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_annotation" />
+                android:value="@string/category_annotation"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.annotation.AnimatedMarkerActivity"
@@ -64,7 +77,10 @@
             android:label="@string/activity_animated_marker">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_annotation" />
+                android:value="@string/category_annotation"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.annotation.DynamicMarkerChangeActivity"
@@ -72,7 +88,10 @@
             android:label="@string/activity_dynamic_marker">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_annotation" />
+                android:value="@string/category_annotation"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.annotation.PressForMarkerActivity"
@@ -80,7 +99,10 @@
             android:label="@string/activity_press_for_marker">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_annotation" />
+                android:value="@string/category_annotation"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.camera.CameraAnimationTypeActivity"
@@ -88,7 +110,10 @@
             android:label="@string/activity_camera_animation_types">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_camera" />
+                android:value="@string/category_camera"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.camera.CameraPositionActivity"
@@ -96,7 +121,10 @@
             android:label="@string/activity_camera_position">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_camera" />
+                android:value="@string/category_camera"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.camera.LatLngBoundsActivity"
@@ -105,7 +133,10 @@
             android:screenOrientation="portrait">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_camera" />
+                android:value="@string/category_camera"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.fragment.MapFragmentActivity"
@@ -113,7 +144,10 @@
             android:label="@string/activity_map_fragment">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_fragment" />
+                android:value="@string/category_fragment"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.fragment.SupportMapFragmentActivity"
@@ -121,7 +155,10 @@
             android:label="@string/activity_map_fragment_suport">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_fragment" />
+                android:value="@string/category_fragment"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.fragment.MultiMapActivity"
@@ -129,7 +166,10 @@
             android:label="@string/activity_multimap">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_fragment" />
+                android:value="@string/category_fragment"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.camera.ManualZoomActivity"
@@ -137,7 +177,10 @@
             android:label="@string/activity_camera_zoom">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_camera" />
+                android:value="@string/category_camera"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.camera.MaxMinZoomActivity"
@@ -145,7 +188,10 @@
             android:label="@string/activity_minmax_zoom">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_camera" />
+                android:value="@string/category_camera"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.customlayer.CustomLayerActivity"
@@ -153,15 +199,22 @@
             android:label="@string/activity_custom_layer">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_custom_layer" />
+                android:value="@string/category_custom_layer"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.userlocation.MyLocationTrackingModeActivity"
             android:description="@string/description_user_location_tracking"
-            android:label="@string/activity_user_tracking_mode">
+            android:label="@string/activity_user_tracking_mode"
+            android:theme="@style/NoActionBar">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_userlocation" />
+                android:value="@string/category_userlocation"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.userlocation.MyLocationDrawableActivity"
@@ -169,7 +222,10 @@
             android:label="@string/activity_user_tracking_customization">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_userlocation" />
+                android:value="@string/category_userlocation"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.userlocation.MyLocationTintActivity"
@@ -177,7 +233,10 @@
             android:label="@string/activity_user_dot_color">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_userlocation" />
+                android:value="@string/category_userlocation"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.userlocation.MyLocationToggleActivity"
@@ -185,7 +244,10 @@
             android:label="@string/activity_user_location_toggle">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_userlocation" />
+                android:value="@string/category_userlocation"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.annotation.PolygonActivity"
@@ -193,7 +255,10 @@
             android:label="@string/activity_polygon">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_annotation" />
+                android:value="@string/category_annotation"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.annotation.PolylineActivity"
@@ -201,31 +266,22 @@
             android:label="@string/activity_polyline">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_annotation" />
-        </activity>
-        <activity
-            android:name=".activity.directions.DirectionsActivity"
-            android:description="@string/description_directions"
-            android:label="@string/activity_directions">
+                android:value="@string/category_annotation"/>
             <meta-data
-                android:name="@string/category"
-                android:value="@string/category_directions" />
-        </activity>
-        <activity
-            android:name=".activity.geocoding.GeocoderActivity"
-            android:description="@string/description_geocoder"
-            android:label="@string/activity_geocoder">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_geocoding" />
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.camera.ScrollByActivity"
             android:description="@string/description_scroll_by"
-            android:label="@string/activity_scroll_by">
+            android:label="@string/activity_scroll_by"
+            android:theme="@style/NoActionBar">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_camera" />
+                android:value="@string/category_camera"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.maplayout.MapPaddingActivity"
@@ -234,7 +290,10 @@
             android:screenOrientation="portrait">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_maplayout" />
+                android:value="@string/category_maplayout"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.maplayout.DebugModeActivity"
@@ -242,7 +301,10 @@
             android:label="@string/activity_debug_mode">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_maplayout" />
+                android:value="@string/category_maplayout"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.offline.OfflineActivity"
@@ -250,7 +312,10 @@
             android:label="@string/activity_offline">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_offline" />
+                android:value="@string/category_offline"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.offline.UpdateMetadataActivity"
@@ -258,7 +323,10 @@
             android:label="@string/activity_update_metadata">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_offline" />
+                android:value="@string/category_offline"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.imagegenerator.SnapshotActivity"
@@ -266,7 +334,10 @@
             android:label="@string/activity_snapshot">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_imagegenerator" />
+                android:value="@string/category_imagegenerator"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.maplayout.DoubleMapActivity"
@@ -274,7 +345,10 @@
             android:label="@string/activity_double_map">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_maplayout" />
+                android:value="@string/category_maplayout"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.annotation.MarkerViewActivity"
@@ -282,23 +356,10 @@
             android:label="@string/activity_view_marker">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_annotation" />
-        </activity>
-        <activity
-            android:name=".activity.annotation.MarkerViewScaleActivity"
-            android:description="@string/description_view_marker_scale"
-            android:label="@string/activity_view_marker_scale">
+                android:value="@string/category_annotation"/>
             <meta-data
-                android:name="@string/category"
-                android:value="@string/category_annotation" />
-        </activity>
-        <activity
-            android:name=".activity.navigation.LocationPickerActivity"
-            android:description="@string/description_location_picker"
-            android:label="@string/activity_location_picker">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_navigation" />
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.fragment.ViewPagerActivity"
@@ -306,7 +367,10 @@
             android:label="@string/activity_viewpager">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_fragment" />
+                android:value="@string/category_fragment"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.maplayout.NavigationDrawerActivity"
@@ -315,7 +379,10 @@
             android:theme="@style/AppTheme.ActionBar.Transparent">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_fragment" />
+                android:value="@string/category_maplayout"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.maplayout.SimpleMapActivity"
@@ -323,7 +390,10 @@
             android:label="@string/activity_simple_map">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_maplayout" />
+                android:value="@string/category_maplayout"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.style.RuntimeStyleActivity"
@@ -331,7 +401,10 @@
             android:label="@string/activity_runtime_style">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_style" />
+                android:value="@string/category_style"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.style.CircleLayerActivity"
@@ -340,6 +413,20 @@
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_style"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.style.SymbolLayerActivity"
+            android:description="@string/description_symbol_layer"
+            android:label="@string/activity_symbol_layer">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.style.GeoJsonClusteringActivity"
@@ -347,14 +434,21 @@
             android:label="@string/activity_geojson_clustering">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_style" />
+                android:value="@string/category_style"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
-        <activity android:name=".activity.style.RealTimeGeoJsonActivity"
+        <activity
+            android:name=".activity.style.RealTimeGeoJsonActivity"
             android:description="@string/description_geojson_realtime"
             android:label="@string/activity_geojson_realtime">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_style" />
+                android:value="@string/category_style"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.style.StyleFileActivity"
@@ -362,7 +456,10 @@
             android:label="@string/activity_style_file">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_style" />
+                android:value="@string/category_style"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.style.CustomSpriteActivity"
@@ -370,7 +467,10 @@
             android:label="@string/activity_add_sprite">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_style" />
+                android:value="@string/category_style"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.imagegenerator.PrintActivity"
@@ -378,7 +478,10 @@
             android:label="@string/activity_print">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_imagegenerator" />
+                android:value="@string/category_imagegenerator"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
 
         <!-- Features -->
@@ -388,7 +491,10 @@
             android:label="@string/activity_query_rendered_feature_properties">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_features" />
+                android:value="@string/category_features"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.feature.QueryRenderedFeaturesBoxCountActivity"
@@ -396,7 +502,10 @@
             android:label="@string/activity_query_rendered_features_box_count">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_features" />
+                android:value="@string/category_features"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.feature.QueryRenderedFeaturesBoxSymbolCountActivity"
@@ -404,7 +513,10 @@
             android:label="@string/activity_query_rendered_features_box_symbol_count">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_features" />
+                android:value="@string/category_features"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.feature.QueryRenderedFeaturesBoxHighlightActivity"
@@ -412,15 +524,10 @@
             android:label="@string/activity_query_rendered_features_box_highlight">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_features" />
-        </activity>
-        <activity
-            android:name=".activity.navigation.CarDrivingActivity"
-            android:description="@string/description_car_driving"
-            android:label="@string/activity_car_driving">
+                android:value="@string/category_features"/>
             <meta-data
-                android:name="@string/category"
-                android:value="@string/category_navigation" />
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.annotation.AddRemoveMarkerActivity"
@@ -428,7 +535,10 @@
             android:label="@string/activity_add_remove_markers">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_annotation" />
+                android:value="@string/category_annotation"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.maplayout.MapInDialogActivity"
@@ -436,7 +546,10 @@
             android:label="@string/activity_map_in_dialog">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_maplayout" />
+                android:value="@string/category_maplayout"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
             android:name=".activity.annotation.MarkerViewsInRectangleActivity"
@@ -444,28 +557,31 @@
             android:label="@string/activity_marker_view_rectangle">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_annotation" />
+                android:value="@string/category_annotation"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
 
         <!-- For Instrumentation tests -->
-        <activity android:name=".activity.style.RuntimeStyleTestActivity" />
-        <activity android:name=".activity.style.RuntimeStyleTimingTestActivity" />
-        <activity android:name=".activity.espresso.EspressoTestActivity" />
+        <activity android:name=".activity.style.RuntimeStyleTestActivity"/>
+        <activity android:name=".activity.style.RuntimeStyleTimingTestActivity"/>
+        <activity android:name=".activity.espresso.EspressoTestActivity"/>
 
         <!-- Configuration Settings -->
         <meta-data
             android:name="com.mapbox.TestEventsServer"
-            android:value="https://cloudfront-staging.tilestream.net" />
+            android:value="https://cloudfront-staging.tilestream.net"/>
         <meta-data
             android:name="com.mapbox.TestEventsAccessToken"
-            android:value="pk.eyJ1IjoiYmxzdGFnaW5nIiwiYSI6ImNpdDF3OHpoaTAwMDcyeXA5Y3Z0Nmk2dzEifQ.0IfB7v5Qbm2MGVYt8Kb8fg" />
+            android:value="pk.eyJ1IjoiYmxzdGFnaW5nIiwiYSI6ImNpdDF3OHpoaTAwMDcyeXA5Y3Z0Nmk2dzEifQ.0IfB7v5Qbm2MGVYt8Kb8fg"/>
 
         <!-- Comment out this setting to switch to external storage (and disable internal) in your app -->
         <!-- <meta-data -->
         <!-- android:name="com.mapbox.SetStorageExternal" -->
         <!-- android:value="true" /> -->
 
-        <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
+        <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService"/>
     </application>
 
 </manifest>

@@ -5,13 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
-import timber.log.Timber;
-
-import android.view.MenuItem;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -27,6 +21,8 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.layers.Filter.in;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
@@ -49,15 +45,6 @@ public class CircleLayerActivity extends AppCompatActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_circle_layer);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
@@ -155,16 +142,5 @@ public class CircleLayerActivity extends AppCompatActivity {
   public void onDestroy() {
     super.onDestroy();
     mapView.onDestroy();
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
   }
 }

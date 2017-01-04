@@ -5,9 +5,7 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -50,15 +48,6 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_symbollayer);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
@@ -195,9 +184,6 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
       case R.id.action_toggle_text_size:
         toggleTextSize();
         return true;
@@ -211,5 +197,4 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
         return super.onOptionsItemSelected(item);
     }
   }
-
 }

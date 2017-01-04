@@ -6,13 +6,7 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
-import timber.log.Timber;
-
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,6 +24,8 @@ import com.mapbox.services.commons.geojson.Feature;
 import java.util.List;
 import java.util.Map;
 
+import timber.log.Timber;
+
 /**
  * Demo's query rendered features
  */
@@ -43,7 +39,6 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_query_features_point);
-    setupActionBar();
 
     final float density = getResources().getDisplayMetrics().density;
 
@@ -186,28 +181,6 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
     mapView.onLowMemory();
   }
 
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
-  }
-
-  private void setupActionBar() {
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    final ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
-  }
-
   private static class CustomMarker extends Marker {
 
     private final List<Feature> features;
@@ -245,8 +218,8 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
       return new CustomMarker(this, features);
     }
 
-    public static final Parcelable.Creator<CustomMarkerOptions> CREATOR
-      = new Parcelable.Creator<CustomMarkerOptions>() {
+    public static final Parcelable.Creator<CustomMarkerOptions> CREATOR =
+      new Parcelable.Creator<CustomMarkerOptions>() {
         public CustomMarkerOptions createFromParcel(Parcel in) {
           return new CustomMarkerOptions(in);
         }

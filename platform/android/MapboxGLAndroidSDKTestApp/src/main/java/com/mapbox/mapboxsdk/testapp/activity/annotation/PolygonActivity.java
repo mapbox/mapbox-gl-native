@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
@@ -17,7 +16,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.utils.ToolbarComposer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +48,6 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_polygon);
-    ToolbarComposer.initDefaultUpToolbar(this, R.id.toolbar);
 
     // configure inital map state
     MapboxMapOptions options = new MapboxMapOptions()
@@ -72,11 +68,7 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
 
-    // add to layout
-    ViewGroup container = (ViewGroup) findViewById(R.id.container);
-    if (container != null) {
-      container.addView(mapView);
-    }
+    setContentView(mapView);
   }
 
   @Override
@@ -132,25 +124,18 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-
       case R.id.action_id_alpha:
         fullAlpha = !fullAlpha;
         polygon.setAlpha(fullAlpha ? FULL_ALPHA : PARTIAL_ALPHA);
         return true;
-
       case R.id.action_id_visible:
         visible = !visible;
         polygon.setAlpha(visible ? (fullAlpha ? FULL_ALPHA : PARTIAL_ALPHA) : NO_ALPHA);
         return true;
-
       case R.id.action_id_points:
         allPoints = !allPoints;
         polygon.setPoints(allPoints ? STAR_SHAPE_POINTS : BROKEN_SHAPE_POINTS);
         return true;
-
       case R.id.action_id_color:
         color = !color;
         polygon.setFillColor(color ? BLUE_COLOR : RED_COLOR);

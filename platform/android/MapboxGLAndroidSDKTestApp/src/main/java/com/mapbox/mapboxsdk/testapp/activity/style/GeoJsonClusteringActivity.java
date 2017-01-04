@@ -3,12 +3,7 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
-import timber.log.Timber;
-
 import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -24,6 +19,8 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.layers.Filter.all;
 import static com.mapbox.mapboxsdk.style.layers.Filter.gte;
@@ -47,8 +44,6 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_geojson_clustering);
-
-    setupActionBar();
 
     //Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
@@ -138,9 +133,9 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
 
     //Add unclustered layer
     int[][] layers = new int[][] {
-      new int[] {150, ResourcesCompat.getColor(getResources(), R.color.red_accent, getTheme())},
-      new int[] {20, ResourcesCompat.getColor(getResources(), R.color.green_accent, getTheme())},
-      new int[] {0, ResourcesCompat.getColor(getResources(), R.color.blue_accent, getTheme())}
+      new int[] {150, ResourcesCompat.getColor(getResources(), R.color.redAccent, getTheme())},
+      new int[] {20, ResourcesCompat.getColor(getResources(), R.color.greenAccent, getTheme())},
+      new int[] {0, ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme())}
     };
 
     SymbolLayer unclustered = new SymbolLayer("unclustered-points", "earthquakes");
@@ -174,16 +169,5 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
 
     //Zoom out to start
     mapboxMap.animateCamera(CameraUpdateFactory.zoomTo(1));
-  }
-
-  private void setupActionBar() {
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
   }
 }

@@ -10,12 +10,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.app.ActionBar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
-import timber.log.Timber;
-
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -44,6 +41,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import timber.log.Timber;
+
 public class BulkMarkerActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
   private MapboxMap mapboxMap;
@@ -56,31 +55,12 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_marker_bulk);
 
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    final ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayShowTitleEnabled(false);
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
-
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {
       @Override
       public void onMapReady(@NonNull MapboxMap mapboxMap) {
         BulkMarkerActivity.this.mapboxMap = mapboxMap;
-
-        if (actionBar != null) {
-          ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
-            actionBar.getThemedContext(), R.array.bulk_marker_list, android.R.layout.simple_spinner_item);
-          spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-          Spinner spinner = (Spinner) findViewById(R.id.spinner);
-          spinner.setAdapter(spinnerAdapter);
-          spinner.setOnItemSelectedListener(BulkMarkerActivity.this);
-        }
       }
     });
 
@@ -88,6 +68,19 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     if (fab != null) {
       fab.setOnClickListener(new FabClickListener());
     }
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
+      this, R.array.bulk_marker_list, android.R.layout.simple_spinner_item);
+    spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    getMenuInflater().inflate(R.menu.menu_bulk_marker, menu);
+    MenuItem item = menu.findItem(R.id.spinner);
+    Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
+    spinner.setAdapter(spinnerAdapter);
+    spinner.setOnItemSelectedListener(BulkMarkerActivity.this);
+    return true;
   }
 
   @Override
@@ -207,17 +200,6 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
   public void onLowMemory() {
     super.onLowMemory();
     mapView.onLowMemory();
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
   }
 
   private class FabClickListener implements View.OnClickListener {

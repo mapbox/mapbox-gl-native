@@ -1,10 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.activity.camera;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -22,15 +19,6 @@ public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyC
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_maxmin_zoom);
 
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
-
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
@@ -41,16 +29,6 @@ public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyC
     mapboxMap = map;
     mapboxMap.setMinZoomPreference(3);
     mapboxMap.setMaxZoomPreference(5);
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-    }
-    return false;
   }
 
   @Override
@@ -94,5 +72,4 @@ public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyC
     super.onLowMemory();
     mapView.onLowMemory();
   }
-
 }

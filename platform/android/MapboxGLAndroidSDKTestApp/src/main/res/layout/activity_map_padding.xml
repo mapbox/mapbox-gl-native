@@ -12,7 +12,6 @@
     <View
         android:layout_width="@dimen/map_padding_left"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
         android:alpha="0.5"
         android:background="@color/mapbox_blue" />
 
@@ -27,19 +26,10 @@
         android:alpha="0.5"
         android:background="@color/mapbox_blue" />
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:alpha="0.5"
-        android:background="@color/primary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
-
     <View
         android:layout_width="@dimen/map_padding_right"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:layout_marginTop="?attr/actionBarSize"
         android:alpha="0.5"
         android:background="@color/mapbox_blue" />
 

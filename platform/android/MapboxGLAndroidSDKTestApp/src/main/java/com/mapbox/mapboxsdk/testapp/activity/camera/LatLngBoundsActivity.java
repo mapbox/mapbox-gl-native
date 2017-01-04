@@ -1,13 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.activity.camera;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
-import timber.log.Timber;
-
-import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -23,6 +17,8 @@ import com.mapbox.mapboxsdk.testapp.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 public class LatLngBoundsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   private static final LatLng LOS_ANGELES = new LatLng(34.053940, -118.242622);
@@ -35,15 +31,6 @@ public class LatLngBoundsActivity extends AppCompatActivity implements OnMapRead
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_visible_bounds);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.setStyleUrl(Style.DARK);
@@ -129,16 +116,5 @@ public class LatLngBoundsActivity extends AppCompatActivity implements OnMapRead
   public void onLowMemory() {
     super.onLowMemory();
     mapView.onLowMemory();
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
   }
 }
