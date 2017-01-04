@@ -16,9 +16,9 @@ framework_root: ../darwin/src
 custom_categories:
   - name: Guides
     children:
-      - Info.plist Keys
       - Working with GeoJSON Data
       - For Style Authors
+      - Info.plist Keys
   - name: Maps
     children:
       - MGLAccountManager

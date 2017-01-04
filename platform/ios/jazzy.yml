@@ -20,9 +20,9 @@ custom_categories:
       - Adding Points to a Map
       - Runtime Styling
       - Working with Mapbox Studio
-      - Info.plist Keys
       - Working with GeoJSON Data
       - For Style Authors
+      - Info.plist Keys
   - name: Maps
     children:
       - MGLAccountManager
