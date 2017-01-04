@@ -56,6 +56,8 @@ public:
     }
 
     sqlite3_stmt* stmt = nullptr;
+    int64_t lastInsertRowId = 0;
+    int64_t changes = 0;
 };
 
 template <typename T>
@@ -131,16 +133,6 @@ void Database::exec(const std::string &sql) {
 Statement Database::prepare(const char *query) {
     assert(impl);
     return Statement(this, query);
-}
-
-int64_t Database::lastInsertRowid() const {
-    assert(impl);
-    return sqlite3_last_insert_rowid(impl->db);
-}
-
-uint64_t Database::changes() const {
-    assert(impl);
-    return sqlite3_changes(impl->db);
 }
 
 Statement::Statement(Database *db, const char *sql)
@@ -292,6 +284,8 @@ void Statement::bind(
 bool Statement::run() {
     assert(impl);
     const int err = sqlite3_step(impl->stmt);
+    impl->lastInsertRowId = sqlite3_last_insert_rowid(sqlite3_db_handle(impl->stmt));
+    impl->changes = sqlite3_changes(sqlite3_db_handle(impl->stmt));
     if (err == SQLITE_DONE) {
         return false;
     } else if (err == SQLITE_ROW) {
@@ -388,6 +382,17 @@ void Statement::reset() {
 void Statement::clearBindings() {
     assert(impl);
     sqlite3_clear_bindings(impl->stmt);
+}
+
+int64_t Statement::lastInsertRowId() const {
+    assert(impl);
+    return impl->lastInsertRowId;
+}
+
+uint64_t Statement::changes() const {
+    assert(impl);
+    auto changes = impl->changes;
+    return (changes < 0 ? 0 : changes);
 }
 
 Transaction::Transaction(Database& db_, Mode mode)

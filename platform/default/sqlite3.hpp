@@ -46,9 +46,6 @@ public:
     void exec(const std::string &sql);
     Statement prepare(const char *query);
 
-    int64_t lastInsertRowid() const;
-    uint64_t changes() const;
-
 private:
     std::unique_ptr<DatabaseImpl> impl;
 
@@ -85,6 +82,9 @@ public:
     bool run();
     void reset();
     void clearBindings();
+
+    int64_t lastInsertRowId() const;
+    uint64_t changes() const;
 
 private:
     std::unique_ptr<StatementImpl> impl;
