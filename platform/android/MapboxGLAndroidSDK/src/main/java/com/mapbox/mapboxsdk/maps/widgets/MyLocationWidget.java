@@ -90,8 +90,7 @@ public class MyLocationWidget {
     if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
       compassListener.onResume();
     }
-    // TODO need to save state of mylocation
-    if (mapboxMap.getMyLocationWidgetSettings().isEnabled()) {
+    if (mapboxMap.isMyLocationEnabled()) {
       toggleGps(true);
     }
   }
@@ -170,8 +169,9 @@ public class MyLocationWidget {
 
   public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
     // Change the icon image to display arrow
-    if (mapboxMap.getLayer(LOCATION_LAYER) != null) {
-      mapboxMap.getLayer(LOCATION_LAYER).setProperties(
+    Layer locationLayer = mapboxMap.getLayer(LOCATION_LAYER);
+    if (locationLayer != null) {
+      locationLayer.setProperties(
         iconImage(myBearingTrackingMode == MyBearingTracking.NONE ? USER_LOCATION_ICON : USER_LOCATION_BEARING_ICON)
       );
     }
@@ -234,6 +234,7 @@ public class MyLocationWidget {
     if (Math.abs(newDir - oldDir) < 1) {
       return;
     }
+    // Make sure the icon is always rotated the shortest distance.
     float diff = oldDir - newDir;
     if (diff > 180.0f) {
       newDir += 360.0f;
@@ -246,9 +247,12 @@ public class MyLocationWidget {
     directionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
       @Override
       public void onAnimationUpdate(ValueAnimator valueAnimator) {
-        mapboxMap.getLayer(LOCATION_LAYER).setProperties(
-          PropertyFactory.iconRotate((float) valueAnimator.getAnimatedValue())
-        );
+        Layer locationLayer = mapboxMap.getLayer(LOCATION_LAYER);
+        if (locationLayer != null) {
+          locationLayer.setProperties(
+            PropertyFactory.iconRotate((float) valueAnimator.getAnimatedValue())
+          );
+        }
       }
     });
     directionAnimator.start();

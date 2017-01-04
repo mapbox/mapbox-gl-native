@@ -37,8 +37,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacem
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconRotationAlignment;
 
-// TODO change file name
-
 /**
  * Settings to configure the visual appearance of the MyLocationView.
  */

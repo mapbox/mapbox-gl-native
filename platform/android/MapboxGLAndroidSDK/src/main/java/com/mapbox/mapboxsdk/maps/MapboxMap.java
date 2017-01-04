@@ -74,13 +74,13 @@ public final class MapboxMap {
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, TrackingSettings tracking,
-            MyLocationWidgetSettings myLocationView, Projection projection, OnRegisterTouchListener listener,
+            MyLocationWidgetSettings myLocationWidgetSettings, Projection projection, OnRegisterTouchListener listener,
             AnnotationManager annotations) {
     this.nativeMapView = map;
     this.uiSettings = ui;
     this.trackingSettings = tracking;
     this.projection = projection;
-    this.myLocationWidgetSettings = myLocationView;
+    this.myLocationWidgetSettings = myLocationWidgetSettings;
     this.annotationManager = annotations.bind(this);
     this.transform = transform;
     this.onRegisterTouchListener = listener;

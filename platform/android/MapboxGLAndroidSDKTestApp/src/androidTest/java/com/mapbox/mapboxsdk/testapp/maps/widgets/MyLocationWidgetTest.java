@@ -18,6 +18,7 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationWidget;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
@@ -42,7 +43,7 @@ import static org.hamcrest.Matchers.not;
  * Experimental MyLocationView tests,
  * requires application to be granted with runtime location permissions.
  * <p>
- * Tests for enabling and disabling the {@link MyLocationView}.
+ * Tests for enabling and disabling the {@link MyLocationWidgetTest}.
  * Tests for enabling tracking modes and if the correct default images are shown when toggling
  * {@link com.mapbox.mapboxsdk.maps.TrackingSettings#setMyLocationTrackingMode(int)} &
  * {@link com.mapbox.mapboxsdk.maps.TrackingSettings#setMyBearingTrackingMode(int)}.
@@ -84,10 +85,10 @@ public class MyLocationWidgetTest {
     onView(withId(R.id.mapView)).perform(new EnableLocationTrackingAction(mapboxMap));
     onView(withId(R.id.userLocationView)).check(matches(isDisplayed()));
     onView(withId(R.id.userLocationView)).check(matches(new DrawableMatcher(mapboxMap,
-      R.drawable.mapbox_mylocation_icon_default, false)));
+      R.drawable.mapbox_user_icon, false)));
     onView(withId(R.id.mapView)).perform(new EnableCompassBearingTrackingAction(mapboxMap));
     onView(withId(R.id.userLocationView)).check(matches(new DrawableMatcher(mapboxMap,
-      R.drawable.mapbox_mylocation_icon_bearing, true)));
+      R.drawable.mapbox_user_icon_bearing, true)));
   }
 
   @After
@@ -190,7 +191,7 @@ public class MyLocationWidgetTest {
     private final int expectedId;
 
     DrawableMatcher(MapboxMap mapboxMap, int expectedId, boolean isBearingDrawable) {
-      super(MyLocationView.class);
+      super(MyLocationWidget.class);
       this.mapboxMap = mapboxMap;
       this.expectedId = expectedId;
       this.isBearingDrawable = isBearingDrawable;
