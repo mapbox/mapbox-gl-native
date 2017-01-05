@@ -7,7 +7,6 @@
 #include <mbgl/util/logging.hpp>
 
 #include "sqlite3.hpp"
-#include <sqlite3.h>
 
 namespace mbgl {
 
@@ -57,13 +56,13 @@ void OfflineDatabase::ensureSchema() {
             removeExisting();
             connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
         } catch (mapbox::sqlite::Exception& ex) {
-            if (ex.code != SQLITE_CANTOPEN && ex.code != SQLITE_NOTADB) {
+            if (ex.code != mapbox::sqlite::Exception::Code::CANTOPEN && ex.code != mapbox::sqlite::Exception::Code::NOTADB) {
                 Log::Error(Event::Database, "Unexpected error connecting to database: %s", ex.what());
                 throw;
             }
 
             try {
-                if (ex.code == SQLITE_NOTADB) {
+                if (ex.code == mapbox::sqlite::Exception::Code::NOTADB) {
                     removeExisting();
                 }
                 connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
