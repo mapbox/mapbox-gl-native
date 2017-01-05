@@ -11,9 +11,9 @@
 #include <mbgl/style/layers/circle_layer.hpp>
 namespace mbgl {
 
-    MBGL_DEFINE_ENUM(MGLCirclePitchScale, {
-        { MGLCirclePitchScaleMap, "map" },
-        { MGLCirclePitchScaleViewport, "viewport" },
+    MBGL_DEFINE_ENUM(MGLCircleScaleAlignment, {
+        { MGLCircleScaleAlignmentMap, "map" },
+        { MGLCircleScaleAlignmentViewport, "viewport" },
     });
 
     MBGL_DEFINE_ENUM(MGLCircleTranslateAnchor, {
@@ -173,20 +173,6 @@ namespace mbgl {
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-- (void)setCirclePitchScale:(MGLStyleValue<NSValue *> *)circlePitchScale {
-    MGLAssertStyleLayerIsValid();
-
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::CirclePitchScaleType, NSValue *, mbgl::style::CirclePitchScaleType, MGLCirclePitchScale>().toEnumPropertyValue(circlePitchScale);
-    self.rawLayer->setCirclePitchScale(mbglValue);
-}
-
-- (MGLStyleValue<NSValue *> *)circlePitchScale {
-    MGLAssertStyleLayerIsValid();
-
-    auto propertyValue = self.rawLayer->getCirclePitchScale() ?: self.rawLayer->getDefaultCirclePitchScale();
-    return MGLStyleValueTransformer<mbgl::style::CirclePitchScaleType, NSValue *, mbgl::style::CirclePitchScaleType, MGLCirclePitchScale>().toEnumStyleValue(propertyValue);
-}
-
 - (void)setCircleRadius:(MGLStyleValue<NSNumber *> *)circleRadius {
     MGLAssertStyleLayerIsValid();
 
@@ -199,6 +185,25 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getCircleRadius() ?: self.rawLayer->getDefaultCircleRadius();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+}
+
+- (void)setCircleScaleAlignment:(MGLStyleValue<NSValue *> *)circleScaleAlignment {
+    MGLAssertStyleLayerIsValid();
+
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::CirclePitchScaleType, NSValue *, mbgl::style::CirclePitchScaleType, MGLCircleScaleAlignment>().toEnumPropertyValue(circleScaleAlignment);
+    self.rawLayer->setCirclePitchScale(mbglValue);
+}
+
+- (MGLStyleValue<NSValue *> *)circleScaleAlignment {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getCirclePitchScale() ?: self.rawLayer->getDefaultCirclePitchScale();
+    return MGLStyleValueTransformer<mbgl::style::CirclePitchScaleType, NSValue *, mbgl::style::CirclePitchScaleType, MGLCircleScaleAlignment>().toEnumStyleValue(propertyValue);
+}
+
+
+- (void)setCirclePitchScale:(MGLStyleValue<NSValue *> *)circlePitchScale {
+    NSAssert(NO, @"Use -setCircleScaleAlignment: instead.");
 }
 
 - (void)setCircleTranslate:(MGLStyleValue<NSValue *> *)circleTranslate {
@@ -234,14 +239,14 @@ namespace mbgl {
 
 @implementation NSValue (MGLCircleStyleLayerAdditions)
 
-+ (NSValue *)valueWithMGLCirclePitchScale:(MGLCirclePitchScale)circlePitchScale {
-    return [NSValue value:&circlePitchScale withObjCType:@encode(MGLCirclePitchScale)];
++ (NSValue *)valueWithMGLCircleScaleAlignment:(MGLCircleScaleAlignment)circleScaleAlignment {
+    return [NSValue value:&circleScaleAlignment withObjCType:@encode(MGLCircleScaleAlignment)];
 }
 
-- (MGLCirclePitchScale)MGLCirclePitchScaleValue {
-    MGLCirclePitchScale circlePitchScale;
-    [self getValue:&circlePitchScale];
-    return circlePitchScale;
+- (MGLCircleScaleAlignment)MGLCircleScaleAlignmentValue {
+    MGLCircleScaleAlignment circleScaleAlignment;
+    [self getValue:&circleScaleAlignment];
+    return circleScaleAlignment;
 }
 
 + (NSValue *)valueWithMGLCircleTranslateAnchor:(MGLCircleTranslateAnchor)circleTranslateAnchor {

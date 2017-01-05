@@ -188,6 +188,12 @@ layer objects. The property names generally correspond to the style JSON
 properties, except for the use of camelCase instead of kebab-case. Properties
 whose names differ from the style specification are listed below:
 
+### Circle style layers
+
+In style JSON | In Objective-C | In Swift
+--------------|----------------|---------
+`circle-pitch-scale` | `MGLCircleStyleLayer.circleScaleAlignment` | `MGLCircleStyleLayer.circleScaleAlignment`
+
 ### Fill style layers
 
 In style JSON | In Objective-C | In Swift
@@ -223,7 +229,10 @@ In style JSON | In Objective-C | In Swift
 `text-max-angle` | `MGLSymbolStyleLayer.maximumTextAngle` | `MGLSymbolStyleLayer.maximumTextAngle`
 `text-max-width` | `MGLSymbolStyleLayer.maximumTextWidth` | `MGLSymbolStyleLayer.maximumTextWidth`
 `symbol-avoid-edges` | `MGLSymbolStyleLayer.symbolAvoidsEdges` | `MGLSymbolStyleLayer.symbolAvoidsEdges`
+`text-field` | `MGLSymbolStyleLayer.text` | `MGLSymbolStyleLayer.text`
 `text-allow-overlap` | `MGLSymbolStyleLayer.textAllowsOverlap` | `MGLSymbolStyleLayer.textAllowsOverlap`
+`text-font` | `MGLSymbolStyleLayer.textFontNames` | `MGLSymbolStyleLayer.textFontNames`
+`text-size` | `MGLSymbolStyleLayer.textFontSize` | `MGLSymbolStyleLayer.textFontSize`
 `text-ignore-placement` | `MGLSymbolStyleLayer.textIgnoresPlacement` | `MGLSymbolStyleLayer.textIgnoresPlacement`
 `text-justify` | `MGLSymbolStyleLayer.textJustification` | `MGLSymbolStyleLayer.textJustification`
 `text-optional` | `MGLSymbolStyleLayer.textOptional` | `MGLSymbolStyleLayer.isTextOptional`

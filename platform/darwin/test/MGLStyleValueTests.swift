@@ -17,8 +17,8 @@ extension MGLStyleValueTests {
         XCTAssertEqual((symbolStyleLayer.iconHaloWidth as! MGLStyleConstantValue<NSNumber>).rawValue, 3)
         
         // String
-        symbolStyleLayer.textField = MGLStyleConstantValue(rawValue: "{name}")
-        XCTAssertEqual((symbolStyleLayer.textField as! MGLStyleConstantValue<NSString>).rawValue, "{name}")
+        symbolStyleLayer.text = MGLStyleConstantValue(rawValue: "{name}")
+        XCTAssertEqual((symbolStyleLayer.text as! MGLStyleConstantValue<NSString>).rawValue, "{name}")
     }
     
     func testFunctions() {

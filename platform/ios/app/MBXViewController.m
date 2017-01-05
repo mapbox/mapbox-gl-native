@@ -1184,13 +1184,13 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         MGLSymbolStyleLayer *layer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:layerName];
 
         if ([layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
-            if ([layer.textField isKindOfClass:[MGLStyleConstantValue class]]) {
-                MGLStyleConstantValue *label = (MGLStyleConstantValue<NSString *> *)layer.textField;
+            if ([layer.text isKindOfClass:[MGLStyleConstantValue class]]) {
+                MGLStyleConstantValue *label = (MGLStyleConstantValue<NSString *> *)layer.text;
                 if ([label.rawValue hasPrefix:@"{name"]) {
-                    layer.textField = [MGLStyleValue valueWithRawValue:language];
+                    layer.text = [MGLStyleValue valueWithRawValue:language];
                 }
-            } else if ([layer.textField isKindOfClass:[MGLStyleFunction class]]) {
-                MGLStyleFunction *function = (MGLStyleFunction<NSString *> *)layer.textField;
+            } else if ([layer.text isKindOfClass:[MGLStyleFunction class]]) {
+                MGLStyleFunction *function = (MGLStyleFunction<NSString *> *)layer.text;
                 [function.stops enumerateKeysAndObjectsUsingBlock:^(id zoomLevel, id stop, BOOL *done) {
                     if ([stop isKindOfClass:[MGLStyleConstantValue class]]) {
                         MGLStyleConstantValue *label = (MGLStyleConstantValue<NSString *> *)stop;
@@ -1199,7 +1199,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                         }
                     }
                 }];
-                layer.textField = function;
+                layer.text = function;
             }
         } else {
             NSLog(@"%@ is not a symbol style layer", layerName);

@@ -527,6 +527,29 @@ namespace mbgl {
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
+- (void)setText:(MGLStyleValue<NSString *> *)text {
+    MGLAssertStyleLayerIsValid();
+
+    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(text);
+    self.rawLayer->setTextField(mbglValue);
+}
+
+- (MGLStyleValue<NSString *> *)text {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getTextField() ?: self.rawLayer->getDefaultTextField();
+    return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
+}
+
+
+- (void)setTextField:(MGLStyleValue<NSString *> *)textField {
+    self.text = textField;
+}
+
+- (MGLStyleValue<NSString *> *)textField {
+    return self.text;
+}
+
 - (void)setTextAllowsOverlap:(MGLStyleValue<NSNumber *> *)textAllowsOverlap {
     MGLAssertStyleLayerIsValid();
 
@@ -564,32 +587,50 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::style::TextAnchorType, NSValue *, mbgl::style::TextAnchorType, MGLTextAnchor>().toEnumStyleValue(propertyValue);
 }
 
-- (void)setTextField:(MGLStyleValue<NSString *> *)textField {
+- (void)setTextFontNames:(MGLStyleValue<NSArray<NSString *> *> *)textFontNames {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(textField);
-    self.rawLayer->setTextField(mbglValue);
-}
-
-- (MGLStyleValue<NSString *> *)textField {
-    MGLAssertStyleLayerIsValid();
-
-    auto propertyValue = self.rawLayer->getTextField() ?: self.rawLayer->getDefaultTextField();
-    return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
-}
-
-- (void)setTextFont:(MGLStyleValue<NSArray<NSString *> *> *)textFont {
-    MGLAssertStyleLayerIsValid();
-
-    auto mbglValue = MGLStyleValueTransformer<std::vector<std::string>, NSArray<NSString *> *, std::string>().toPropertyValue(textFont);
+    auto mbglValue = MGLStyleValueTransformer<std::vector<std::string>, NSArray<NSString *> *, std::string>().toPropertyValue(textFontNames);
     self.rawLayer->setTextFont(mbglValue);
 }
 
-- (MGLStyleValue<NSArray<NSString *> *> *)textFont {
+- (MGLStyleValue<NSArray<NSString *> *> *)textFontNames {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getTextFont() ?: self.rawLayer->getDefaultTextFont();
     return MGLStyleValueTransformer<std::vector<std::string>, NSArray<NSString *> *, std::string>().toStyleValue(propertyValue);
+}
+
+
+- (void)setTextFont:(MGLStyleValue<NSArray<NSString *> *> *)textFont {
+    self.textFontNames = textFont;
+}
+
+- (MGLStyleValue<NSArray<NSString *> *> *)textFont {
+    return self.textFontNames;
+}
+
+- (void)setTextFontSize:(MGLStyleValue<NSNumber *> *)textFontSize {
+    MGLAssertStyleLayerIsValid();
+
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(textFontSize);
+    self.rawLayer->setTextSize(mbglValue);
+}
+
+- (MGLStyleValue<NSNumber *> *)textFontSize {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getTextSize() ?: self.rawLayer->getDefaultTextSize();
+    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+}
+
+
+- (void)setTextSize:(MGLStyleValue<NSNumber *> *)textSize {
+    self.textFontSize = textSize;
+}
+
+- (MGLStyleValue<NSNumber *> *)textSize {
+    return self.textFontSize;
 }
 
 - (void)setTextIgnoresPlacement:(MGLStyleValue<NSNumber *> *)textIgnoresPlacement {
@@ -757,20 +798,6 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextRotationAlignment() ?: self.rawLayer->getDefaultTextRotationAlignment();
     return MGLStyleValueTransformer<mbgl::style::AlignmentType, NSValue *, mbgl::style::AlignmentType, MGLTextRotationAlignment>().toEnumStyleValue(propertyValue);
-}
-
-- (void)setTextSize:(MGLStyleValue<NSNumber *> *)textSize {
-    MGLAssertStyleLayerIsValid();
-
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue(textSize);
-    self.rawLayer->setTextSize(mbglValue);
-}
-
-- (MGLStyleValue<NSNumber *> *)textSize {
-    MGLAssertStyleLayerIsValid();
-
-    auto propertyValue = self.rawLayer->getTextSize() ?: self.rawLayer->getDefaultTextSize();
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
 - (void)setTextTransform:(MGLStyleValue<NSValue *> *)textTransform {

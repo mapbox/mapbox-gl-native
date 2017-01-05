@@ -9,18 +9,18 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Controls the scaling behavior of the circle when the map is pitched.
  
- Values of this type are used in the `MGLCircleStyleLayer.circlePitchScale`
+ Values of this type are used in the `MGLCircleStyleLayer.circleScaleAlignment`
  property.
  */
-typedef NS_ENUM(NSUInteger, MGLCirclePitchScale) {
+typedef NS_ENUM(NSUInteger, MGLCircleScaleAlignment) {
     /**
      Circles are scaled according to their apparent distance to the camera.
      */
-    MGLCirclePitchScaleMap,
+    MGLCircleScaleAlignmentMap,
     /**
      Circles are not scaled.
      */
-    MGLCirclePitchScaleViewport,
+    MGLCircleScaleAlignmentViewport,
 };
 
 /**
@@ -119,15 +119,6 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleOpacity;
 
 /**
- Controls the scaling behavior of the circle when the map is pitched.
- 
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLCirclePitchScaleMap`. Set this property to
- `nil` to reset it to the default value.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circlePitchScale;
-
-/**
  Circle radius.
  
  This property is measured in points.
@@ -137,6 +128,21 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
  it to the default value.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleRadius;
+
+/**
+ Controls the scaling behavior of the circle when the map is pitched.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSValue` object containing `MGLCircleScaleAlignmentMap`. Set this property to
+ `nil` to reset it to the default value.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-circle-circle-pitch-scale"><code>circle-pitch-scale</code></a>
+ layout property in the Mapbox Style Specification.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleScaleAlignment;
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circlePitchScale __attribute__((unavailable("Use circleScaleAlignment instead.")));
 
 /**
  The geometry's offset.
@@ -173,17 +179,17 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
 #pragma mark Working with Circle Style Layer Attribute Values
 
 /**
- Creates a new value object containing the given `MGLCirclePitchScale` enumeration.
+ Creates a new value object containing the given `MGLCircleScaleAlignment` enumeration.
 
- @param circlePitchScale The value for the new object.
+ @param circleScaleAlignment The value for the new object.
  @return A new value object that contains the enumeration value.
  */
-+ (instancetype)valueWithMGLCirclePitchScale:(MGLCirclePitchScale)circlePitchScale;
++ (instancetype)valueWithMGLCircleScaleAlignment:(MGLCircleScaleAlignment)circleScaleAlignment;
 
 /**
- The `MGLCirclePitchScale` enumeration representation of the value.
+ The `MGLCircleScaleAlignment` enumeration representation of the value.
  */
-@property (readonly) MGLCirclePitchScale MGLCirclePitchScaleValue;
+@property (readonly) MGLCircleScaleAlignment MGLCircleScaleAlignmentValue;
 
 /**
  Creates a new value object containing the given `MGLCircleTranslateAnchor` enumeration.

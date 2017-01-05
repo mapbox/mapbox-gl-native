@@ -268,7 +268,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  layer.sourceLayerIdentifier = "pois"
  layer.iconImageName = MGLStyleValue(rawValue: "coffee")
  layer.iconScale = MGLStyleValue(rawValue: 0.5)
- layer.textField = MGLStyleValue(rawValue: "{name}")
+ layer.text = MGLStyleValue(rawValue: "{name}")
  layer.textTranslate = MGLStyleValue(rawValue: NSValue(cgVector: CGVector(dx: 10, dy: 0)))
  layer.textJustification = MGLStyleValue(rawValue: NSValue(mglTextJustification: .left))
  layer.textAnchor = MGLStyleValue(rawValue: NSValue(mglTextAnchor: .left))
@@ -352,7 +352,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and
- `textField` is non-`nil`. Otherwise, it is ignored.
+ `text` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable, getter=isIconOptional) MGLStyleValue<NSNumber *> *iconOptional;
 
@@ -432,7 +432,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and
- `textField` is non-`nil`. Otherwise, it is ignored.
+ `text` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFit;
 
@@ -446,7 +446,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and
- `textField` is non-`nil`, and `iconTextFit` is set to an `MGLStyleValue` object
+ `text` is non-`nil`, and `iconTextFit` is set to an `MGLStyleValue` object
  containing an `NSValue` object containing `MGLIconTextFitBoth`,
  `MGLIconTextFitWidth`, or `MGLIconTextFitHeight`. Otherwise, it is ignored.
  */
@@ -482,7 +482,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSNumber` object containing `YES`. Set this property to `nil` to reset it to
  the default value.
  
- This property is only applied to the style if `textField` is non-`nil`, and
+ This property is only applied to the style if `text` is non-`nil`, and
  `textRotationAlignment` is set to an `MGLStyleValue` object containing an
  `NSValue` object containing `MGLTextRotationAlignmentMap`, and
  `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue`
@@ -506,7 +506,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSNumber` object containing the float `45`. Set this property to `nil` to
  reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`, and
+ This property is only applied to the style if `text` is non-`nil`, and
  `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue`
  object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
  
@@ -528,8 +528,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSNumber` object containing the float `10`. Set this property to `nil` to
  reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-max-width"><code>text-max-width</code></a>
@@ -584,6 +584,22 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolSpacing;
 
 /**
+ Value to use for a text label. Feature properties are specified using tokens
+ like {field_name}.
+ 
+ The default value of this property is an `MGLStyleValue` object containing the
+ empty string. Set this property to `nil` to reset it to the default value.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-field"><code>text-field</code></a>
+ layout property in the Mapbox Style Specification.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *text;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *textField __attribute__((unavailable("Use text instead.")));
+
+/**
  If true, the text will be visible even if it collides with other previously
  drawn symbols.
  
@@ -591,8 +607,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSNumber` object containing `NO`. Set this property to `nil` to reset it to
  the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-allow-overlap"><code>text-allow-overlap</code></a>
@@ -610,31 +626,60 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSValue` object containing `MGLTextAnchorCenter`. Set this property to `nil`
  to reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textAnchor;
 
 /**
- Value to use for a text label. Feature properties are specified using tokens
- like {field_name}.
+ An array of font face names used to display the text.
  
- The default value of this property is an `MGLStyleValue` object containing the
- empty string. Set this property to `nil` to reset it to the default value.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *textField;
-
-/**
- Font stack to use for displaying text.
+ Each font name must be included in the `{fontstack}` portion of the JSON
+ stylesheet’s <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#glyphs"><code>glyphs</code></a>
+ property. You can register a custom font when designing the style in Mapbox
+ Studio. Fonts installed on the system are not used.
+ 
+ The first font named in the array is applied to the text. For each character in
+ the text, if the first font lacks a glyph for the character, the next font is
+ applied as a fallback, and so on.
  
  The default value of this property is an `MGLStyleValue` object containing the
  array `Open Sans Regular`, `Arial Unicode MS Regular`. Set this property to
  `nil` to reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-font"><code>text-font</code></a>
+ layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSString *> *> *textFont;
+@property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSString *> *> *textFontNames;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSString *> *> *textFont __attribute__((unavailable("Use textFontNames instead.")));
+
+/**
+ Font size.
+ 
+ This property is measured in points.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSNumber` object containing the float `16`. Set this property to `nil` to
+ reset it to the default value.
+ 
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-size"><code>text-size</code></a>
+ layout property in the Mapbox Style Specification.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textFontSize;
+
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textSize __attribute__((unavailable("Use textFontSize instead.")));
 
 /**
  If true, other symbols can be visible even if they collide with the text.
@@ -643,8 +688,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSNumber` object containing `NO`. Set this property to `nil` to reset it to
  the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-ignore-placement"><code>text-ignore-placement</code></a>
@@ -662,8 +707,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSValue` object containing `MGLTextJustificationCenter`. Set this property to
  `nil` to reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-justify"><code>text-justify</code></a>
@@ -683,8 +728,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
  it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textLetterSpacing;
 
@@ -697,8 +742,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSNumber` object containing the float `1.2`. Set this property to `nil` to
  reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textLineHeight;
 
@@ -712,8 +757,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  0 ems from the top. Set this property to `nil` to reset it to the default
  value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textOffset;
 
@@ -725,7 +770,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSNumber` object containing `NO`. Set this property to `nil` to reset it to
  the default value.
  
- This property is only applied to the style if `textField` is non-`nil`, and
+ This property is only applied to the style if `text` is non-`nil`, and
  `iconImageName` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable, getter=isTextOptional) MGLStyleValue<NSNumber *> *textOptional;
@@ -740,8 +785,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSNumber` object containing the float `2`. Set this property to `nil` to reset
  it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textPadding;
 
@@ -752,8 +797,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSValue` object containing `MGLTextPitchAlignmentAuto`. Set this property to
  `nil` to reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textPitchAlignment;
 
@@ -766,8 +811,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
  it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-rotate"><code>text-rotate</code></a>
@@ -786,24 +831,10 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSValue` object containing `MGLTextRotationAlignmentAuto`. Set this property
  to `nil` to reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textRotationAlignment;
-
-/**
- Font size.
- 
- This property is measured in points.
- 
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `16`. Set this property to `nil` to
- reset it to the default value.
- 
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textSize;
 
 /**
  Specifies how to capitalize text.
@@ -812,8 +843,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSValue` object containing `MGLTextTransformNone`. Set this property to `nil`
  to reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTransform;
 
@@ -950,8 +981,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `UIColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *textColor;
 #else
@@ -962,8 +993,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *textColor;
 #endif
@@ -977,8 +1008,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
  it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloBlur;
 
@@ -990,8 +1021,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `UIColor.clearColor`. Set this property to `nil` to reset it to the default
  value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *textHaloColor;
 #else
@@ -1002,8 +1033,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSColor.clearColor`. Set this property to `nil` to reset it to the default
  value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *textHaloColor;
 #endif
@@ -1018,8 +1049,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
  it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloWidth;
 
@@ -1030,8 +1061,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSNumber` object containing the float `1`. Set this property to `nil` to reset
  it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textOpacity;
 
@@ -1045,8 +1076,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  and 0 points from the top. Set this property to `nil` to reset it to the
  default value.
  
- This property is only applied to the style if `textField` is non-`nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslate;
 
@@ -1057,7 +1088,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  `NSValue` object containing `MGLTextTranslateAnchorMap`. Set this property to
  `nil` to reset it to the default value.
  
- This property is only applied to the style if `textField` is non-`nil`, and
+ This property is only applied to the style if `text` is non-`nil`, and
  `textTranslate` is non-`nil`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslateAnchor;

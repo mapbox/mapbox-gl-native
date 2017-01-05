@@ -369,18 +369,18 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
             return localizedString;
         };
         
-        if ([layer.textField isKindOfClass:[MGLStyleConstantValue class]]) {
-            NSString *textField = [(MGLStyleConstantValue<NSString *> *)layer.textField rawValue];
-            layer.textField = [MGLStyleValue<NSString *> valueWithRawValue:stringByLocalizingString(textField)];
-        } else if ([layer.textField isKindOfClass:[MGLStyleFunction class]]) {
-            MGLStyleFunction *function = (MGLStyleFunction<NSString *> *)layer.textField;
+        if ([layer.text isKindOfClass:[MGLStyleConstantValue class]]) {
+            NSString *textField = [(MGLStyleConstantValue<NSString *> *)layer.text rawValue];
+            layer.text = [MGLStyleValue<NSString *> valueWithRawValue:stringByLocalizingString(textField)];
+        } else if ([layer.text isKindOfClass:[MGLStyleFunction class]]) {
+            MGLStyleFunction *function = (MGLStyleFunction<NSString *> *)layer.text;
             NSMutableDictionary *stops = function.stops.mutableCopy;
             [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLStyleConstantValue<NSString *> *stop, BOOL *done) {
                 NSString *textField = stop.rawValue;
                 stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:stringByLocalizingString(textField)];
             }];
             function.stops = stops;
-            layer.textField = function;
+            layer.text = function;
         }
     }
 }

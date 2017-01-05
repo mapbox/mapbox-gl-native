@@ -157,7 +157,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         layer.sourceLayerIdentifier = "pois"
         layer.iconImageName = MGLStyleValue(rawValue: "coffee")
         layer.iconScale = MGLStyleValue(rawValue: 0.5)
-        layer.textField = MGLStyleValue(rawValue: "{name}")
+        layer.text = MGLStyleValue(rawValue: "{name}")
         #if os(macOS)
             var vector = CGVector(dx: 10, dy: 0)
             layer.textTranslate = MGLStyleValue(rawValue: NSValue(bytes: &vector, objCType: "{CGVector=dd}"))

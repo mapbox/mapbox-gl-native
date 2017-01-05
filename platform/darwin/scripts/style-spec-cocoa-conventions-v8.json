@@ -9,13 +9,19 @@
     "icon-size": "icon-scale",
     "symbol-avoid-edges": "symbol-avoids-edges",
     "text-allow-overlap": "text-allows-overlap",
+    "text-field": "text",
+    "text-font": "text-font-names",
     "text-ignore-placement": "text-ignores-placement",
     "text-justify": "text-justification",
     "text-keep-upright": "keeps-text-upright",
     "text-max-angle": "maximum-text-angle",
     "text-max-width": "maximum-text-width",
     "text-optional": "is-text-optional",
-    "text-rotate": "text-rotation"
+    "text-rotate": "text-rotation",
+    "text-size": "text-font-size"
+  },
+  "paint_circle": {
+    "circle-pitch-scale": "circle-scale-alignment"
   },
   "paint_raster": {
     "raster-brightness-min": "minimum-raster-brightness",
