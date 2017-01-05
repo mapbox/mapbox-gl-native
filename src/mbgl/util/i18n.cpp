@@ -298,6 +298,8 @@ bool allowsWordBreaking(uint16_t chr) {
     return (chr == 0x0a      /* newline */
             || chr == 0x20   /* space */
             || chr == 0x26   /* ampersand */
+            || chr == 0x28   /* open parenthesis */
+            || chr == 0x29   /* close parenthesis */
             || chr == 0x2b   /* plus sign */
             || chr == 0x2d   /* hyphen-minus */
             || chr == 0x2f   /* solidus */

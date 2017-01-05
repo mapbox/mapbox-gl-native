@@ -19,12 +19,8 @@ public:
     UBiDi* bidiLine = nullptr;
 };
     
-BiDi::BiDi() : impl(std::make_unique<BiDiImpl>())
-{
-}
-
-BiDi::~BiDi() {
-}
+BiDi::BiDi() : impl(std::make_unique<BiDiImpl>()) {}
+BiDi::~BiDi() = default;
 
 // Takes UTF16 input in logical order and applies Arabic shaping to the input while maintaining
 // logical order. Output won't be intelligible until the bidirectional algorithm is applied
@@ -53,7 +49,7 @@ std::u16string applyArabicShaping(const std::u16string& input) {
     return std::u16string(outputText.get(), outputLength);
 }
 
-void BiDi::mergeParagraphLineBreaks(std::set<int32_t>& lineBreakPoints) {
+void BiDi::mergeParagraphLineBreaks(std::set<size_t>& lineBreakPoints) {
     int32_t paragraphCount = ubidi_countParagraphs(impl->bidiText);
     for (int32_t i = 0; i < paragraphCount; i++) {
         UErrorCode errorCode = U_ZERO_ERROR;
@@ -65,11 +61,11 @@ void BiDi::mergeParagraphLineBreaks(std::set<int32_t>& lineBreakPoints) {
                                      u_errorName(errorCode));
         }
 
-        lineBreakPoints.insert(paragraphEndIndex);
+        lineBreakPoints.insert(static_cast<std::size_t>(paragraphEndIndex));
     }
 }
 
-std::vector<std::u16string> BiDi::applyLineBreaking(std::set<int32_t> lineBreakPoints) {
+std::vector<std::u16string> BiDi::applyLineBreaking(std::set<std::size_t> lineBreakPoints) {
     // BiDi::getLine will error if called across a paragraph boundary, so we need to ensure that all
     // paragraph boundaries are included in the set of line break points. The calling code might not
     // include the line break because it didn't need to wrap at that point, or because the text was
@@ -77,8 +73,8 @@ std::vector<std::u16string> BiDi::applyLineBreaking(std::set<int32_t> lineBreakP
     mergeParagraphLineBreaks(lineBreakPoints);
 
     std::vector<std::u16string> transformedLines;
-    int32_t start = 0;
-    for (int32_t lineBreakPoint : lineBreakPoints) {
+    std::size_t start = 0;
+    for (std::size_t lineBreakPoint : lineBreakPoints) {
         transformedLines.push_back(getLine(start, lineBreakPoint));
         start = lineBreakPoint;
     }
@@ -87,7 +83,7 @@ std::vector<std::u16string> BiDi::applyLineBreaking(std::set<int32_t> lineBreakP
 }
 
 std::vector<std::u16string> BiDi::processText(const std::u16string& input,
-                                              std::set<int32_t> lineBreakPoints) {
+                                              std::set<std::size_t> lineBreakPoints) {
     UErrorCode errorCode = U_ZERO_ERROR;
 
     ubidi_setPara(impl->bidiText, input.c_str(), static_cast<int32_t>(input.size()),
@@ -100,9 +96,9 @@ std::vector<std::u16string> BiDi::processText(const std::u16string& input,
     return applyLineBreaking(lineBreakPoints);
 }
 
-std::u16string BiDi::getLine(int32_t start, int32_t end) {
+std::u16string BiDi::getLine(std::size_t start, std::size_t end) {
     UErrorCode errorCode = U_ZERO_ERROR;
-    ubidi_setLine(impl->bidiText, start, end, impl->bidiLine, &errorCode);
+    ubidi_setLine(impl->bidiText, static_cast<int32_t>(start), static_cast<int32_t>(end), impl->bidiLine, &errorCode);
 
     if (U_FAILURE(errorCode)) {
         throw std::runtime_error(std::string("BiDi::getLine (setLine): ") + u_errorName(errorCode));

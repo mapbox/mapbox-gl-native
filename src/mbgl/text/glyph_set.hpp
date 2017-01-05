@@ -21,10 +21,10 @@ public:
                              BiDi& bidi) const;
 
 private:
-    float determineIdeographicLineWidth(const std::u16string& logicalInput,
+    float determineAverageLineWidth(const std::u16string& logicalInput,
                                         const float spacing,
                                         float maxWidth) const;
-    std::set<int32_t> determineLineBreaks(const std::u16string& logicalInput,
+    std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
                                           const float spacing,
                                           float maxWidth) const;
 
