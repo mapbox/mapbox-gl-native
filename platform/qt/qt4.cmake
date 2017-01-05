@@ -5,6 +5,7 @@ set(MBGL_QT_LIBRARIES
     PRIVATE Qt4::QtGui
     PRIVATE Qt4::QtNetwork
     PRIVATE Qt4::QtOpenGL
+    PRIVATE Qt4::QtSql
 )
 
 target_link_libraries(qmapboxgl

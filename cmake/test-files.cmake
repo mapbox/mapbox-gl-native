@@ -68,6 +68,7 @@ set(MBGL_TEST_FILES
     test/storage/offline_download.test.cpp
     test/storage/online_file_source.test.cpp
     test/storage/resource.test.cpp
+    test/storage/sqlite.test.cpp
 
     # style/conversion
     test/style/conversion/function.test.cpp

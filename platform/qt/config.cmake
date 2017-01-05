@@ -23,8 +23,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/qt/include
     )
 
-    target_add_mason_package(mbgl-core PRIVATE sqlite)
-
     target_link_libraries(mbgl-core
         ${MBGL_QT_LIBRARIES}
     )
