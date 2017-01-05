@@ -70,6 +70,7 @@ macro(mbgl_platform_core)
 
     target_compile_options(mbgl-core
         PRIVATE -fobjc-arc
+        PRIVATE -fvisibility=hidden
     )
 
     # TODO: Remove this by converting to ARC
