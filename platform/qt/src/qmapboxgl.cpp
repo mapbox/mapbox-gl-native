@@ -196,6 +196,7 @@ QMapboxGLSettings::QMapboxGLSettings()
     , m_cacheDatabasePath(":memory:")
     , m_assetPath(QCoreApplication::applicationDirPath())
     , m_accessToken(qgetenv("MAPBOX_ACCESS_TOKEN"))
+    , m_apiBaseUrl(mbgl::util::API_BASE_URL)
 {
 }
 
@@ -346,6 +347,26 @@ QString QMapboxGLSettings::accessToken() const {
 void QMapboxGLSettings::setAccessToken(const QString &token)
 {
     m_accessToken = token;
+}
+
+/*!
+    Returns the API base URL.
+*/
+QString QMapboxGLSettings::apiBaseUrl() const
+{
+    return m_apiBaseUrl;
+}
+
+/*!
+    Sets the API base \a url.
+
+    The API base URL is the URL that the \b "mapbox://" protocol will
+    be resolved to. It defaults to "https://api.mapbox.com" but can be
+    changed, for instance, to a tile cache server address.
+*/
+void QMapboxGLSettings::setApiBaseUrl(const QString& url)
+{
+    m_apiBaseUrl = url;
 }
 
 /*!
@@ -1125,6 +1146,8 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     qRegisterMetaType<QMapboxGL::MapChange>("QMapboxGL::MapChange");
 
     fileSourceObj->setAccessToken(settings.accessToken().toStdString());
+    fileSourceObj->setAPIBaseURL(settings.apiBaseUrl().toStdString());
+
     connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()), Qt::QueuedConnection);
     connect(this, SIGNAL(mapChanged(QMapboxGL::MapChange)), q_ptr, SIGNAL(mapChanged(QMapboxGL::MapChange)), Qt::QueuedConnection);
     connect(this, SIGNAL(copyrightsChanged(QString)), q_ptr, SIGNAL(copyrightsChanged(QString)), Qt::QueuedConnection);
