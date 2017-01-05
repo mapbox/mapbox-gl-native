@@ -2039,6 +2039,7 @@ public class MapView extends FrameLayout {
 
             resetTrackingModesIfRequired(true, false);
 
+/*          Mappy : Don't like new animation when swipe the map/ Back to basics
             double tilt = getTilt();
             double limitFactor = 2 + ((tilt != 0) ? (tilt / 10) : 0);
             double offsetX = velocityX / limitFactor / screenDensity;
@@ -2047,7 +2048,19 @@ public class MapView extends FrameLayout {
             // Cancel any animation
             cancelTransitions();
 
-            nativeMapView.moveBy(offsetX, offsetY, MapboxConstants.ANIMATION_DURATION_FLING);
+            nativeMapView.moveBy(offsetX, offsetY, MapboxConstants.ANIMATION_DURATION_FLING);*/
+
+            double decelerationRate = 1;
+
+            // Cancel any animation
+            cancelTransitions();
+
+            double offsetX = velocityX * decelerationRate / 4 / screenDensity;
+            double offsetY = velocityY * decelerationRate / 4 / screenDensity;
+
+            nativeMapView.setGestureInProgress(true);
+            nativeMapView.moveBy(offsetX, offsetY, (long) (decelerationRate * 1000.0f));
+            nativeMapView.setGestureInProgress(false);
 
             MapboxMap.OnFlingListener listener = mapboxMap.getOnFlingListener();
             if (listener != null) {
