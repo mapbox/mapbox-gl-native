@@ -60,6 +60,9 @@ public:
     QString accessToken() const;
     void setAccessToken(const QString &);
 
+    QString apiBaseUrl() const;
+    void setApiBaseUrl(const QString &);
+
 private:
     GLContextMode m_contextMode;
     ConstrainMode m_constrainMode;
@@ -69,6 +72,7 @@ private:
     QString m_cacheDatabasePath;
     QString m_assetPath;
     QString m_accessToken;
+    QString m_apiBaseUrl;
 };
 
 struct Q_DECL_EXPORT QMapboxGLCameraOptions {
