@@ -2,6 +2,9 @@
 
 var mbgl = require('../index');
 var request = require('request');
+var PNG = require('pngjs').PNG;
+var fs = require('fs');
+var path = require('path');
 
 mbgl.on('message', function(msg) {
     console.log('%s (%s): %s', msg.severity, msg.class, msg.text);
@@ -65,6 +68,16 @@ module.exports = function (style, options, callback) {
                 applyOperations(operations.slice(1), callback);
             });
 
+        } else if (operation[0] === 'addImage') {
+            var img = PNG.sync.read(fs.readFileSync(path.join(__dirname, '../../../node_modules', 'mapbox-gl-test-suite', operation[2])));
+
+            map.addImage(operation[1], img.data, {
+                height: img.height,
+                width: img.width,
+                pixelRatio: 1
+            });
+
+            applyOperations(operations.slice(1), callback);
         } else {
             // Ensure that the next `map.render(options)` does not overwrite this change.
             if (operation[0] === 'setCenter') {
