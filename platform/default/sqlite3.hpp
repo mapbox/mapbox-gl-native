@@ -20,9 +20,15 @@ enum OpenFlag : int {
 };
 
 struct Exception : std::runtime_error {
+    enum Code : int {
+        OK = 0,
+        CANTOPEN = 14,
+        NOTADB = 26
+    };
+
     Exception(int err, const char *msg) : std::runtime_error(msg), code(err) {}
     Exception(int err, const std::string& msg) : std::runtime_error(msg), code(err) {}
-    const int code = 0;
+    const int code = OK;
 };
 
 class DatabaseImpl;
