@@ -46,6 +46,8 @@ Draw custom shapes on the map the same way you would a custom `UIView` or `CALay
 
 ## Resources
 
+* [Information for style authors](for-style-authors.html)
+* [Mapbox Streets source reference](https://www.mapbox.com/vector-tiles/mapbox-streets-v7/)
 * [Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-style-spec/)
 * [Mapbox Studio](https://www.mapbox.com/mapbox-studio/)
 * [iOS code examples](https://www.mapbox.com/ios-sdk/examples/)

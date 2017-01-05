@@ -1,6 +1,6 @@
 # Working with Mapbox Studio
 
-[Mapbox Studio](http://mapbox.com/studio) is Mapbox's tool for creating custom map styles. It also serves as an excellent tool for rapidly prototyping dynamic maps and runtime styling interactions for iOS.
+[Mapbox Studio’s Styles editor](http://mapbox.com/studio) is Mapbox's tool for creating custom map styles. It also serves as an excellent tool for rapidly prototyping dynamic maps and [runtime styling](runtime-styling.html) interactions for iOS.
 
 ## Creating a base style
 
@@ -38,7 +38,7 @@ Next, add data properties you'd like to use to drive your style. Consider catego
 * Text along a line: add line with a text property
 * Text at specific points on a line or polygon: in addition to the line, create points at the specific points you'd like with text properties
 * If you want circles where scale doesn't matter relative to the geography (e.g. always 20 pixels), you can add as a point and style with a circle layer or a symbol
-* If you want circles or arcs where the scale matters (e.g. 10 mile radius), you'll need to approximately freehand a polygon, and you can create more precisely later in code.
+* If you want circles or arcs where the scale matters (e.g. 10 mile radius), you'll need to approximately freehand a polygon that you can create more precisely later in code.
 
 When you're done, save your dataset and export as a tileset. When that's complete, add your tileset to your style.
 
@@ -74,18 +74,18 @@ Once you're happy with the styles you've created, it's time to [get setup with M
 
 To implement your prototypes with runtime styling:
 
-1. Implement `MGLMapViewDelegate` `-mapView:didFinishLoadingStyle:`
-2. Add your real data as a source
+1. Implement `-[MGLMapViewDelegate mapView:didFinishLoadingStyle:]`.
+2. Add your real data as a source:
     * This can be done using vector data from tileset editor ([example](https://www.mapbox.com/ios-sdk/examples/runtime-circle-styles)), custom vector tiles, added as GeoJSON ([example](https://www.mapbox.com/ios-sdk/examples/runtime-add-line), or added manually through the app via `MGLShapeSource` ([example](https://www.mapbox.com/ios-sdk/examples/runtime-multiple-annotations))
-3. For each layer you've prototyped in studio, add it's corresponding `MGLStyleLayer` subclass: `MGLSymbolStyleLayer`, `MGLLineStyleLayer`, `MGLFillStyleLayer`, or `MGLCircleStyleLayer`.
+3. For each layer you've prototyped in Studio, add its corresponding `MGLStyleLayer` subclass. See [“Configuring the map content’s appearance”](for-style-authors.html#configuring-the-map-content-s-appearance) for the available style layer classes.
 
 **Translating style attributes from Studio**
-For each property you've edited in Studio, you can hover over the property name to find it's corresponding property in the iOS SDK. They're generally the camelCased version of the Property ID.
+For each property you've edited in Studio, you can hover over the property name to find the corresponding property in the iOS SDK. It’ll generally be the camelCased version of the Property ID, but see [“Configuring the map content’s appearance”](for-style-authors.html#configuring-the-map-content-s-appearance) for a table of properties that differ between Mapbox Studio and the iOS SDK.
 
 ![property values](img/studio-workflow/property-values.png)
 
 **Translating stop functions**
-It's possible to use stop functions in Mapbox Studio to transition the style of a layer by it's zoom level (e.g. a line that gets wider as you zoom in). These can be translated in the mobile SDKs using `+[MGLSyleValue valueWithInterpolationBase:stops:]`. The rate of change between stops in studio is represented by `interpolationBase`.
+It's possible to use stop functions in Mapbox Studio to transition the style of a layer by its zoom level (e.g. a line that gets wider as you zoom in). These can be translated in the mobile SDKs using `+[MGLSyleValue valueWithInterpolationBase:stops:]`. The rate of change between stops in Studio is represented by `interpolationBase`.
 
 ![Stop functions](img/studio-workflow/stop-functions.png)
 
@@ -94,4 +94,3 @@ It's possible to use stop functions in Mapbox Studio to transition the style of 
 * [Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-style-spec/)
 * [Mapbox Studio](https://www.mapbox.com/mapbox-studio/)
 * [iOS code examples](https://www.mapbox.com/ios-sdk/examples/)
-
