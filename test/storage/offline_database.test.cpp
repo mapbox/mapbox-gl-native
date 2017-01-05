@@ -80,25 +80,6 @@ private:
 
 } // namespace
 
-TEST(OfflineDatabase, Statement) {
-    using namespace mbgl;
-
-    mapbox::sqlite::Database db(":memory:", mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
-    db.exec("CREATE TABLE test (id INTEGER)");
-    mapbox::sqlite::Statement stmt1 = db.prepare("INSERT INTO test (id) VALUES (?1)");
-    stmt1.bind(1, 0);
-    stmt1.run();
-    ASSERT_EQ(stmt1.lastInsertRowId(), 1);
-    ASSERT_EQ(stmt1.changes(), 1);
-
-    mapbox::sqlite::Statement stmt2 = db.prepare("INSERT INTO test (id) VALUES (?1)");
-    stmt2.bind(1, 0);
-    stmt2.run();
-    ASSERT_EQ(stmt1.lastInsertRowId(), 1);
-    ASSERT_EQ(stmt2.lastInsertRowId(), 2);
-    ASSERT_EQ(stmt2.changes(), 1);
-}
-
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
     using namespace mbgl;
 
