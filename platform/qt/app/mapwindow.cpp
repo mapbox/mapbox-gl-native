@@ -125,6 +125,12 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
             m_map->setLayoutProperty("route", "line-join", "round");
             m_map->setLayoutProperty("route", "line-cap", "round");
 
+            QVariantList lineDashArray;
+            lineDashArray.append(1);
+            lineDashArray.append(2);
+
+            m_map->setPaintProperty("route", "line-dasharray", lineDashArray);
+
             // Markers at the beginning and end of the route
             m_map->addImage("label-arrow", QImage(":label-arrow.svg"));
             m_map->addImage("label-background", QImage(":label-background.svg"));
