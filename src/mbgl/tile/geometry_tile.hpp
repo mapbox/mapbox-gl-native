@@ -50,7 +50,7 @@ public:
 
     class LayoutResult {
     public:
-        std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
+        std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
         std::unique_ptr<FeatureIndex> featureIndex;
         std::unique_ptr<GeometryTileData> tileData;
         uint64_t correlationID;
@@ -59,7 +59,7 @@ public:
 
     class PlacementResult {
     public:
-        std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
+        std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
         std::unique_ptr<CollisionTile> collisionTile;
         uint64_t correlationID;
     };
@@ -80,7 +80,8 @@ private:
     uint64_t correlationID = 0;
     optional<PlacementConfig> requestedConfig;
 
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
+    std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
+    std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
     std::unique_ptr<FeatureIndex> featureIndex;
     std::unique_ptr<const GeometryTileData> data;
 };
