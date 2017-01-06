@@ -62,14 +62,6 @@ TEST(VectorTile, Issue7615) {
     auto symbolBucket = std::make_shared<SymbolBucket>(
         MapMode::Continuous, style::SymbolLayoutProperties::Evaluated(), false, false);
 
-    // First onLayout is required so that a non-null FeatureIndex is available.
-    tile.onLayout(GeometryTile::LayoutResult {
-        {},
-        std::make_unique<FeatureIndex>(),
-        nullptr,
-        0
-    });
-
     // Simulate placement of a symbol layer.
     tile.onPlacement(GeometryTile::PlacementResult {
         {{
@@ -80,7 +72,7 @@ TEST(VectorTile, Issue7615) {
         0
     });
 
-    // Second onLayout should not cause the existing symbol bucket to be discarded.
+    // Subsequent onLayout should not cause the existing symbol bucket to be discarded.
     tile.onLayout(GeometryTile::LayoutResult {
         {},
         nullptr,

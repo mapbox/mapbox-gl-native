@@ -117,7 +117,7 @@ void GeometryTile::onPlacement(PlacementResult result) {
         availableData = DataAvailability::All;
     }
     symbolBuckets = std::move(result.symbolBuckets);
-    featureIndex->setCollisionTile(std::move(result.collisionTile));
+    collisionTile = std::move(result.collisionTile);
     observer->onTileChanged(*this);
 }
 
@@ -153,7 +153,8 @@ void GeometryTile::queryRenderedFeatures(
                         layerIDs,
                         *data,
                         id.canonical,
-                        style);
+                        style,
+                        collisionTile.get());
 }
 
 } // namespace mbgl
