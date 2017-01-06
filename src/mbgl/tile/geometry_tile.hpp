@@ -81,9 +81,11 @@ private:
     optional<PlacementConfig> requestedConfig;
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
     std::unique_ptr<FeatureIndex> featureIndex;
     std::unique_ptr<const GeometryTileData> data;
+
+    std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
+    std::unique_ptr<CollisionTile> collisionTile;
 };
 
 } // namespace mbgl

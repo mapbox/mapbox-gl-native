@@ -42,7 +42,8 @@ public:
             const optional<std::vector<std::string>>& layerIDs,
             const GeometryTileData&,
             const CanonicalTileID&,
-            const style::Style&) const;
+            const style::Style&,
+            const CollisionTile*) const;
 
     static optional<GeometryCoordinates> translateQueryGeometry(
             const GeometryCoordinates& queryGeometry,
@@ -52,8 +53,6 @@ public:
             const float pixelsToTileUnits);
 
     void addBucketLayerName(const std::string& bucketName, const std::string& layerName);
-
-    void setCollisionTile(std::unique_ptr<CollisionTile>);
 
 private:
     void addFeature(
@@ -67,7 +66,6 @@ private:
             const float bearing,
             const float pixelsToTileUnits) const;
 
-    std::unique_ptr<CollisionTile> collisionTile;
     GridIndex<IndexedSubfeature> grid;
     unsigned int sortIndex = 0;
 

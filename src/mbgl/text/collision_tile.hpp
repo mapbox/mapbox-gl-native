@@ -42,7 +42,7 @@ public:
     float placeFeature(const CollisionFeature&, bool allowOverlap, bool avoidEdges);
     void insertFeature(CollisionFeature&, float minPlacementScale, bool ignorePlacement);
 
-    std::vector<IndexedSubfeature> queryRenderedSymbols(const GeometryCoordinates&, float scale);
+    std::vector<IndexedSubfeature> queryRenderedSymbols(const GeometryCoordinates&, float scale) const;
 
     const PlacementConfig config;
 
