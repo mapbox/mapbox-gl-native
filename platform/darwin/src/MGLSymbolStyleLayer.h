@@ -216,35 +216,35 @@ typedef NS_ENUM(NSUInteger, MGLTextTransform) {
 /**
  Controls the translation reference point.
  
- Values of this type are used in the `MGLSymbolStyleLayer.iconTranslateAnchor`
+ Values of this type are used in the `MGLSymbolStyleLayer.iconTranslationAnchor`
  property.
  */
-typedef NS_ENUM(NSUInteger, MGLIconTranslateAnchor) {
+typedef NS_ENUM(NSUInteger, MGLIconTranslationAnchor) {
     /**
      Icons are translated relative to the map.
      */
-    MGLIconTranslateAnchorMap,
+    MGLIconTranslationAnchorMap,
     /**
      Icons are translated relative to the viewport.
      */
-    MGLIconTranslateAnchorViewport,
+    MGLIconTranslationAnchorViewport,
 };
 
 /**
  Controls the translation reference point.
  
- Values of this type are used in the `MGLSymbolStyleLayer.textTranslateAnchor`
+ Values of this type are used in the `MGLSymbolStyleLayer.textTranslationAnchor`
  property.
  */
-typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
+typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
     /**
      The text is translated relative to the map.
      */
-    MGLTextTranslateAnchorMap,
+    MGLTextTranslationAnchorMap,
     /**
      The text is translated relative to the viewport.
      */
-    MGLTextTranslateAnchorViewport,
+    MGLTextTranslationAnchorViewport,
 };
 
 /**
@@ -269,7 +269,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  layer.iconImageName = MGLStyleValue(rawValue: "coffee")
  layer.iconScale = MGLStyleValue(rawValue: 0.5)
  layer.text = MGLStyleValue(rawValue: "{name}")
- layer.textTranslate = MGLStyleValue(rawValue: NSValue(cgVector: CGVector(dx: 10, dy: 0)))
+ layer.textTranslation = MGLStyleValue(rawValue: NSValue(cgVector: CGVector(dx: 10, dy: 0)))
  layer.textJustification = MGLStyleValue(rawValue: NSValue(mglTextJustification: .left))
  layer.textAnchor = MGLStyleValue(rawValue: NSValue(mglTextAnchor: .left))
  layer.predicate = NSPredicate(format: "%K == %@", "venue-type", "coffee")
@@ -958,20 +958,32 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-translate"><code>icon-translate</code></a>
+ layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslate;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslation;
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslate __attribute__((unavailable("Use iconTranslation instead.")));
 
 /**
  Controls the translation reference point.
  
  The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLIconTranslateAnchorMap`. Set this property to
+ `NSValue` object containing `MGLIconTranslationAnchorMap`. Set this property to
  `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and
- `iconTranslate` is non-`nil`. Otherwise, it is ignored.
+ `iconTranslation` is non-`nil`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-translate-anchor"><code>icon-translate-anchor</code></a>
+ layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslateAnchor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslationAnchor;
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslateAnchor __attribute__((unavailable("Use iconTranslationAnchor instead.")));
 
 #if TARGET_OS_IPHONE
 /**
@@ -1078,20 +1090,32 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-translate"><code>text-translate</code></a>
+ layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslate;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslation;
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslate __attribute__((unavailable("Use textTranslation instead.")));
 
 /**
  Controls the translation reference point.
  
  The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLTextTranslateAnchorMap`. Set this property to
+ `NSValue` object containing `MGLTextTranslationAnchorMap`. Set this property to
  `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`, and
- `textTranslate` is non-`nil`. Otherwise, it is ignored.
+ `textTranslation` is non-`nil`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-translate-anchor"><code>text-translate-anchor</code></a>
+ layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslateAnchor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslationAnchor;
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslateAnchor __attribute__((unavailable("Use textTranslationAnchor instead.")));
 
 @end
 
@@ -1208,30 +1232,30 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslateAnchor) {
 @property (readonly) MGLTextTransform MGLTextTransformValue;
 
 /**
- Creates a new value object containing the given `MGLIconTranslateAnchor` enumeration.
+ Creates a new value object containing the given `MGLIconTranslationAnchor` enumeration.
 
- @param iconTranslateAnchor The value for the new object.
+ @param iconTranslationAnchor The value for the new object.
  @return A new value object that contains the enumeration value.
  */
-+ (instancetype)valueWithMGLIconTranslateAnchor:(MGLIconTranslateAnchor)iconTranslateAnchor;
++ (instancetype)valueWithMGLIconTranslationAnchor:(MGLIconTranslationAnchor)iconTranslationAnchor;
 
 /**
- The `MGLIconTranslateAnchor` enumeration representation of the value.
+ The `MGLIconTranslationAnchor` enumeration representation of the value.
  */
-@property (readonly) MGLIconTranslateAnchor MGLIconTranslateAnchorValue;
+@property (readonly) MGLIconTranslationAnchor MGLIconTranslationAnchorValue;
 
 /**
- Creates a new value object containing the given `MGLTextTranslateAnchor` enumeration.
+ Creates a new value object containing the given `MGLTextTranslationAnchor` enumeration.
 
- @param textTranslateAnchor The value for the new object.
+ @param textTranslationAnchor The value for the new object.
  @return A new value object that contains the enumeration value.
  */
-+ (instancetype)valueWithMGLTextTranslateAnchor:(MGLTextTranslateAnchor)textTranslateAnchor;
++ (instancetype)valueWithMGLTextTranslationAnchor:(MGLTextTranslationAnchor)textTranslationAnchor;
 
 /**
- The `MGLTextTranslateAnchor` enumeration representation of the value.
+ The `MGLTextTranslationAnchor` enumeration representation of the value.
  */
-@property (readonly) MGLTextTranslateAnchor MGLTextTranslateAnchorValue;
+@property (readonly) MGLTextTranslationAnchor MGLTextTranslationAnchorValue;
 
 @end
 

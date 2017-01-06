@@ -256,16 +256,18 @@ global.describeValue = function (value, property, layerType) {
             if (units) {
                 units = ` ${units}`.replace(/pixel/, 'point');
             }
-            if (property.name.indexOf('padding') !== -1) {
-                if (value[0] === 0 && value[1] === 0 && value[2] === 0 && value[3] === 0) {
-                    return 'an `NSValue` object containing `NSEdgeInsetsZero` or `UIEdgeInsetsZero`';
-                }
-                return 'an `NSValue` object containing an `NSEdgeInsets` or `UIEdgeInsets` struct set to' + ` ${value[0]}${units} on the top, ${value[3]}${units} on the left, ${value[2]}${units} on the bottom, and ${value[1]}${units} on the right`;
+            switch (arrayType(property)) {
+                case 'padding':
+                    if (value[0] === 0 && value[1] === 0 && value[2] === 0 && value[3] === 0) {
+                        return 'an `NSValue` object containing `NSEdgeInsetsZero` or `UIEdgeInsetsZero`';
+                    }
+                    return 'an `NSValue` object containing an `NSEdgeInsets` or `UIEdgeInsets` struct set to' + ` ${value[0]}${units} on the top, ${value[3]}${units} on the left, ${value[2]}${units} on the bottom, and ${value[1]}${units} on the right`;
+                case 'offset':
+                case 'translate':
+                    return 'an `NSValue` object containing a `CGVector` struct set to' + ` ${value[0]}${units} from the left and ${value[1]}${units} from the top`;
+                default:
+                    return 'the array `' + value.join('`, `') + '`';
             }
-            if (property.name.indexOf('offset') !== -1 || property.name.indexOf('translate') !== -1) {
-                return 'an `NSValue` object containing a `CGVector` struct set to' + ` ${value[0]}${units} from the left and ${value[1]}${units} from the top`;
-            }
-            return 'the array `' + value.join('`, `') + '`';
         default:
             throw new Error(`unknown type for ${property.name}`);
     }

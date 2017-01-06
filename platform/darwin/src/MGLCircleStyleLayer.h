@@ -26,18 +26,18 @@ typedef NS_ENUM(NSUInteger, MGLCircleScaleAlignment) {
 /**
  Controls the translation reference point.
  
- Values of this type are used in the `MGLCircleStyleLayer.circleTranslateAnchor`
+ Values of this type are used in the `MGLCircleStyleLayer.circleTranslationAnchor`
  property.
  */
-typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
+typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
     /**
      The circle is translated relative to the map.
      */
-    MGLCircleTranslateAnchorMap,
+    MGLCircleTranslationAnchorMap,
     /**
      The circle is translated relative to the viewport.
      */
-    MGLCircleTranslateAnchorViewport,
+    MGLCircleTranslationAnchorViewport,
 };
 
 /**
@@ -153,20 +153,32 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
  `NSValue` object containing a `CGVector` struct set to 0 points from the left
  and 0 points from the top. Set this property to `nil` to reset it to the
  default value.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-circle-circle-translate"><code>circle-translate</code></a>
+ layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslate;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslation;
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslate __attribute__((unavailable("Use circleTranslation instead.")));
 
 /**
  Controls the translation reference point.
  
  The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLCircleTranslateAnchorMap`. Set this property to
- `nil` to reset it to the default value.
+ `NSValue` object containing `MGLCircleTranslationAnchorMap`. Set this property
+ to `nil` to reset it to the default value.
  
- This property is only applied to the style if `circleTranslate` is non-`nil`.
+ This property is only applied to the style if `circleTranslation` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-circle-circle-translate-anchor"><code>circle-translate-anchor</code></a>
+ layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslateAnchor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslationAnchor;
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslateAnchor __attribute__((unavailable("Use circleTranslationAnchor instead.")));
 
 @end
 
@@ -192,17 +204,17 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslateAnchor) {
 @property (readonly) MGLCircleScaleAlignment MGLCircleScaleAlignmentValue;
 
 /**
- Creates a new value object containing the given `MGLCircleTranslateAnchor` enumeration.
+ Creates a new value object containing the given `MGLCircleTranslationAnchor` enumeration.
 
- @param circleTranslateAnchor The value for the new object.
+ @param circleTranslationAnchor The value for the new object.
  @return A new value object that contains the enumeration value.
  */
-+ (instancetype)valueWithMGLCircleTranslateAnchor:(MGLCircleTranslateAnchor)circleTranslateAnchor;
++ (instancetype)valueWithMGLCircleTranslationAnchor:(MGLCircleTranslationAnchor)circleTranslationAnchor;
 
 /**
- The `MGLCircleTranslateAnchor` enumeration representation of the value.
+ The `MGLCircleTranslationAnchor` enumeration representation of the value.
  */
-@property (readonly) MGLCircleTranslateAnchor MGLCircleTranslateAnchorValue;
+@property (readonly) MGLCircleTranslationAnchor MGLCircleTranslationAnchorValue;
 
 @end
 

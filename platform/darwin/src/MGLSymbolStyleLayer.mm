@@ -65,14 +65,14 @@ namespace mbgl {
         { MGLTextTransformLowercase, "lowercase" },
     });
 
-    MBGL_DEFINE_ENUM(MGLIconTranslateAnchor, {
-        { MGLIconTranslateAnchorMap, "map" },
-        { MGLIconTranslateAnchorViewport, "viewport" },
+    MBGL_DEFINE_ENUM(MGLIconTranslationAnchor, {
+        { MGLIconTranslationAnchorMap, "map" },
+        { MGLIconTranslationAnchorViewport, "viewport" },
     });
 
-    MBGL_DEFINE_ENUM(MGLTextTranslateAnchor, {
-        { MGLTextTranslateAnchorMap, "map" },
-        { MGLTextTranslateAnchorViewport, "viewport" },
+    MBGL_DEFINE_ENUM(MGLTextTranslationAnchor, {
+        { MGLTextTranslationAnchorMap, "map" },
+        { MGLTextTranslationAnchorViewport, "viewport" },
     });
 
 }
@@ -886,32 +886,42 @@ namespace mbgl {
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-- (void)setIconTranslate:(MGLStyleValue<NSValue *> *)iconTranslate {
+- (void)setIconTranslation:(MGLStyleValue<NSValue *> *)iconTranslation {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue(iconTranslate);
+    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue(iconTranslation);
     self.rawLayer->setIconTranslate(mbglValue);
 }
 
-- (MGLStyleValue<NSValue *> *)iconTranslate {
+- (MGLStyleValue<NSValue *> *)iconTranslation {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getIconTranslate() ?: self.rawLayer->getDefaultIconTranslate();
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
-- (void)setIconTranslateAnchor:(MGLStyleValue<NSValue *> *)iconTranslateAnchor {
+
+- (void)setIconTranslate:(MGLStyleValue<NSValue *> *)iconTranslate {
+    NSAssert(NO, @"Use -setIconTranslation: instead.");
+}
+
+- (void)setIconTranslationAnchor:(MGLStyleValue<NSValue *> *)iconTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLIconTranslateAnchor>().toEnumPropertyValue(iconTranslateAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLIconTranslationAnchor>().toEnumPropertyValue(iconTranslationAnchor);
     self.rawLayer->setIconTranslateAnchor(mbglValue);
 }
 
-- (MGLStyleValue<NSValue *> *)iconTranslateAnchor {
+- (MGLStyleValue<NSValue *> *)iconTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getIconTranslateAnchor() ?: self.rawLayer->getDefaultIconTranslateAnchor();
-    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLIconTranslateAnchor>().toEnumStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLIconTranslationAnchor>().toEnumStyleValue(propertyValue);
+}
+
+
+- (void)setIconTranslateAnchor:(MGLStyleValue<NSValue *> *)iconTranslateAnchor {
+    NSAssert(NO, @"Use -setIconTranslationAnchor: instead.");
 }
 
 - (void)setTextColor:(MGLStyleValue<MGLColor *> *)textColor {
@@ -984,32 +994,42 @@ namespace mbgl {
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-- (void)setTextTranslate:(MGLStyleValue<NSValue *> *)textTranslate {
+- (void)setTextTranslation:(MGLStyleValue<NSValue *> *)textTranslation {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue(textTranslate);
+    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue(textTranslation);
     self.rawLayer->setTextTranslate(mbglValue);
 }
 
-- (MGLStyleValue<NSValue *> *)textTranslate {
+- (MGLStyleValue<NSValue *> *)textTranslation {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getTextTranslate() ?: self.rawLayer->getDefaultTextTranslate();
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
-- (void)setTextTranslateAnchor:(MGLStyleValue<NSValue *> *)textTranslateAnchor {
+
+- (void)setTextTranslate:(MGLStyleValue<NSValue *> *)textTranslate {
+    NSAssert(NO, @"Use -setTextTranslation: instead.");
+}
+
+- (void)setTextTranslationAnchor:(MGLStyleValue<NSValue *> *)textTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLTextTranslateAnchor>().toEnumPropertyValue(textTranslateAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLTextTranslationAnchor>().toEnumPropertyValue(textTranslationAnchor);
     self.rawLayer->setTextTranslateAnchor(mbglValue);
 }
 
-- (MGLStyleValue<NSValue *> *)textTranslateAnchor {
+- (MGLStyleValue<NSValue *> *)textTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getTextTranslateAnchor() ?: self.rawLayer->getDefaultTextTranslateAnchor();
-    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLTextTranslateAnchor>().toEnumStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLTextTranslationAnchor>().toEnumStyleValue(propertyValue);
+}
+
+
+- (void)setTextTranslateAnchor:(MGLStyleValue<NSValue *> *)textTranslateAnchor {
+    NSAssert(NO, @"Use -setTextTranslationAnchor: instead.");
 }
 
 
@@ -1097,24 +1117,24 @@ namespace mbgl {
     return textTransform;
 }
 
-+ (NSValue *)valueWithMGLIconTranslateAnchor:(MGLIconTranslateAnchor)iconTranslateAnchor {
-    return [NSValue value:&iconTranslateAnchor withObjCType:@encode(MGLIconTranslateAnchor)];
++ (NSValue *)valueWithMGLIconTranslationAnchor:(MGLIconTranslationAnchor)iconTranslationAnchor {
+    return [NSValue value:&iconTranslationAnchor withObjCType:@encode(MGLIconTranslationAnchor)];
 }
 
-- (MGLIconTranslateAnchor)MGLIconTranslateAnchorValue {
-    MGLIconTranslateAnchor iconTranslateAnchor;
-    [self getValue:&iconTranslateAnchor];
-    return iconTranslateAnchor;
+- (MGLIconTranslationAnchor)MGLIconTranslationAnchorValue {
+    MGLIconTranslationAnchor iconTranslationAnchor;
+    [self getValue:&iconTranslationAnchor];
+    return iconTranslationAnchor;
 }
 
-+ (NSValue *)valueWithMGLTextTranslateAnchor:(MGLTextTranslateAnchor)textTranslateAnchor {
-    return [NSValue value:&textTranslateAnchor withObjCType:@encode(MGLTextTranslateAnchor)];
++ (NSValue *)valueWithMGLTextTranslationAnchor:(MGLTextTranslationAnchor)textTranslationAnchor {
+    return [NSValue value:&textTranslationAnchor withObjCType:@encode(MGLTextTranslationAnchor)];
 }
 
-- (MGLTextTranslateAnchor)MGLTextTranslateAnchorValue {
-    MGLTextTranslateAnchor textTranslateAnchor;
-    [self getValue:&textTranslateAnchor];
-    return textTranslateAnchor;
+- (MGLTextTranslationAnchor)MGLTextTranslationAnchorValue {
+    MGLTextTranslationAnchor textTranslationAnchor;
+    [self getValue:&textTranslationAnchor];
+    return textTranslationAnchor;
 }
 
 @end

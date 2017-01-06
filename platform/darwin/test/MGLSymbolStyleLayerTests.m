@@ -59,15 +59,15 @@
     layer.iconHaloColor = [MGLRuntimeStylingHelper testColor];
     layer.iconHaloWidth = [MGLRuntimeStylingHelper testNumber];
     layer.iconOpacity = [MGLRuntimeStylingHelper testNumber];
-    layer.iconTranslate = [MGLRuntimeStylingHelper testOffset];
-    layer.iconTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLIconTranslateAnchorViewport type:@encode(MGLIconTranslateAnchor)];
+    layer.iconTranslation = [MGLRuntimeStylingHelper testOffset];
+    layer.iconTranslationAnchor = [MGLRuntimeStylingHelper testEnum:MGLIconTranslationAnchorViewport type:@encode(MGLIconTranslationAnchor)];
     layer.textColor = [MGLRuntimeStylingHelper testColor];
     layer.textHaloBlur = [MGLRuntimeStylingHelper testNumber];
     layer.textHaloColor = [MGLRuntimeStylingHelper testColor];
     layer.textHaloWidth = [MGLRuntimeStylingHelper testNumber];
     layer.textOpacity = [MGLRuntimeStylingHelper testNumber];
-    layer.textTranslate = [MGLRuntimeStylingHelper testOffset];
-    layer.textTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLTextTranslateAnchorViewport type:@encode(MGLTextTranslateAnchor)];
+    layer.textTranslation = [MGLRuntimeStylingHelper testOffset];
+    layer.textTranslationAnchor = [MGLRuntimeStylingHelper testEnum:MGLTextTranslationAnchorViewport type:@encode(MGLTextTranslationAnchor)];
 
     MGLSymbolStyleLayer *gLayer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:@"layerID"];
     XCTAssertTrue([gLayer isKindOfClass:[MGLSymbolStyleLayer class]]);
@@ -118,17 +118,17 @@
     XCTAssertEqualObjects(gLayer.iconHaloColor, [MGLRuntimeStylingHelper testColor]);
     XCTAssertEqualObjects(gLayer.iconHaloWidth, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.iconOpacity, [MGLRuntimeStylingHelper testNumber]);
-    XCTAssertEqualObjects(gLayer.iconTranslate, [MGLRuntimeStylingHelper testOffset]);
-    XCTAssert([gLayer.iconTranslateAnchor isKindOfClass:[MGLStyleConstantValue class]]);
-    XCTAssertEqualObjects(gLayer.iconTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLIconTranslateAnchorViewport type:@encode(MGLIconTranslateAnchor)]);
+    XCTAssertEqualObjects(gLayer.iconTranslation, [MGLRuntimeStylingHelper testOffset]);
+    XCTAssert([gLayer.iconTranslationAnchor isKindOfClass:[MGLStyleConstantValue class]]);
+    XCTAssertEqualObjects(gLayer.iconTranslationAnchor, [MGLRuntimeStylingHelper testEnum:MGLIconTranslationAnchorViewport type:@encode(MGLIconTranslationAnchor)]);
     XCTAssertEqualObjects(gLayer.textColor, [MGLRuntimeStylingHelper testColor]);
     XCTAssertEqualObjects(gLayer.textHaloBlur, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.textHaloColor, [MGLRuntimeStylingHelper testColor]);
     XCTAssertEqualObjects(gLayer.textHaloWidth, [MGLRuntimeStylingHelper testNumber]);
     XCTAssertEqualObjects(gLayer.textOpacity, [MGLRuntimeStylingHelper testNumber]);
-    XCTAssertEqualObjects(gLayer.textTranslate, [MGLRuntimeStylingHelper testOffset]);
-    XCTAssert([gLayer.textTranslateAnchor isKindOfClass:[MGLStyleConstantValue class]]);
-    XCTAssertEqualObjects(gLayer.textTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLTextTranslateAnchorViewport type:@encode(MGLTextTranslateAnchor)]);
+    XCTAssertEqualObjects(gLayer.textTranslation, [MGLRuntimeStylingHelper testOffset]);
+    XCTAssert([gLayer.textTranslationAnchor isKindOfClass:[MGLStyleConstantValue class]]);
+    XCTAssertEqualObjects(gLayer.textTranslationAnchor, [MGLRuntimeStylingHelper testEnum:MGLTextTranslationAnchorViewport type:@encode(MGLTextTranslationAnchor)]);
 
     layer.iconAllowsOverlap = [MGLRuntimeStylingHelper testBoolFunction];
     layer.iconIgnoresPlacement = [MGLRuntimeStylingHelper testBoolFunction];
@@ -169,15 +169,15 @@
     layer.iconHaloColor = [MGLRuntimeStylingHelper testColorFunction];
     layer.iconHaloWidth = [MGLRuntimeStylingHelper testNumberFunction];
     layer.iconOpacity = [MGLRuntimeStylingHelper testNumberFunction];
-    layer.iconTranslate = [MGLRuntimeStylingHelper testOffsetFunction];
-    layer.iconTranslateAnchor = [MGLRuntimeStylingHelper testEnumFunction:MGLIconTranslateAnchorViewport type:@encode(MGLIconTranslateAnchor)];
+    layer.iconTranslation = [MGLRuntimeStylingHelper testOffsetFunction];
+    layer.iconTranslationAnchor = [MGLRuntimeStylingHelper testEnumFunction:MGLIconTranslationAnchorViewport type:@encode(MGLIconTranslationAnchor)];
     layer.textColor = [MGLRuntimeStylingHelper testColorFunction];
     layer.textHaloBlur = [MGLRuntimeStylingHelper testNumberFunction];
     layer.textHaloColor = [MGLRuntimeStylingHelper testColorFunction];
     layer.textHaloWidth = [MGLRuntimeStylingHelper testNumberFunction];
     layer.textOpacity = [MGLRuntimeStylingHelper testNumberFunction];
-    layer.textTranslate = [MGLRuntimeStylingHelper testOffsetFunction];
-    layer.textTranslateAnchor = [MGLRuntimeStylingHelper testEnumFunction:MGLTextTranslateAnchorViewport type:@encode(MGLTextTranslateAnchor)];
+    layer.textTranslation = [MGLRuntimeStylingHelper testOffsetFunction];
+    layer.textTranslationAnchor = [MGLRuntimeStylingHelper testEnumFunction:MGLTextTranslationAnchorViewport type:@encode(MGLTextTranslationAnchor)];
 
     XCTAssertEqualObjects(gLayer.iconAllowsOverlap, [MGLRuntimeStylingHelper testBoolFunction]);
     XCTAssertEqualObjects(gLayer.iconIgnoresPlacement, [MGLRuntimeStylingHelper testBoolFunction]);
@@ -218,15 +218,15 @@
     XCTAssertEqualObjects(gLayer.iconHaloColor, [MGLRuntimeStylingHelper testColorFunction]);
     XCTAssertEqualObjects(gLayer.iconHaloWidth, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.iconOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
-    XCTAssertEqualObjects(gLayer.iconTranslate, [MGLRuntimeStylingHelper testOffsetFunction]);
-    XCTAssertEqualObjects(gLayer.iconTranslateAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLIconTranslateAnchorViewport type:@encode(MGLIconTranslateAnchor)]);
+    XCTAssertEqualObjects(gLayer.iconTranslation, [MGLRuntimeStylingHelper testOffsetFunction]);
+    XCTAssertEqualObjects(gLayer.iconTranslationAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLIconTranslationAnchorViewport type:@encode(MGLIconTranslationAnchor)]);
     XCTAssertEqualObjects(gLayer.textColor, [MGLRuntimeStylingHelper testColorFunction]);
     XCTAssertEqualObjects(gLayer.textHaloBlur, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.textHaloColor, [MGLRuntimeStylingHelper testColorFunction]);
     XCTAssertEqualObjects(gLayer.textHaloWidth, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.textOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
-    XCTAssertEqualObjects(gLayer.textTranslate, [MGLRuntimeStylingHelper testOffsetFunction]);
-    XCTAssertEqualObjects(gLayer.textTranslateAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLTextTranslateAnchorViewport type:@encode(MGLTextTranslateAnchor)]);
+    XCTAssertEqualObjects(gLayer.textTranslation, [MGLRuntimeStylingHelper testOffsetFunction]);
+    XCTAssertEqualObjects(gLayer.textTranslationAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLTextTranslationAnchorViewport type:@encode(MGLTextTranslationAnchor)]);
 }
 
 - (void)testPropertyNames {
@@ -269,15 +269,15 @@
     [self testPropertyName:@"icon-halo-color" isBoolean:NO];
     [self testPropertyName:@"icon-halo-width" isBoolean:NO];
     [self testPropertyName:@"icon-opacity" isBoolean:NO];
-    [self testPropertyName:@"icon-translate" isBoolean:NO];
-    [self testPropertyName:@"icon-translate-anchor" isBoolean:NO];
+    [self testPropertyName:@"icon-translation" isBoolean:NO];
+    [self testPropertyName:@"icon-translation-anchor" isBoolean:NO];
     [self testPropertyName:@"text-color" isBoolean:NO];
     [self testPropertyName:@"text-halo-blur" isBoolean:NO];
     [self testPropertyName:@"text-halo-color" isBoolean:NO];
     [self testPropertyName:@"text-halo-width" isBoolean:NO];
     [self testPropertyName:@"text-opacity" isBoolean:NO];
-    [self testPropertyName:@"text-translate" isBoolean:NO];
-    [self testPropertyName:@"text-translate-anchor" isBoolean:NO];
+    [self testPropertyName:@"text-translation" isBoolean:NO];
+    [self testPropertyName:@"text-translation-anchor" isBoolean:NO];
 }
 
 @end

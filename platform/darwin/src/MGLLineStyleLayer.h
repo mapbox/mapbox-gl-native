@@ -59,18 +59,18 @@ typedef NS_ENUM(NSUInteger, MGLLineJoin) {
 /**
  Controls the translation reference point.
  
- Values of this type are used in the `MGLLineStyleLayer.lineTranslateAnchor`
+ Values of this type are used in the `MGLLineStyleLayer.lineTranslationAnchor`
  property.
  */
-typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
+typedef NS_ENUM(NSUInteger, MGLLineTranslationAnchor) {
     /**
      The line is translated relative to the map.
      */
-    MGLLineTranslateAnchorMap,
+    MGLLineTranslationAnchorMap,
     /**
      The line is translated relative to the viewport.
      */
-    MGLLineTranslateAnchorViewport,
+    MGLLineTranslationAnchorViewport,
 };
 
 /**
@@ -258,20 +258,32 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
  `NSValue` object containing a `CGVector` struct set to 0 points from the left
  and 0 points from the top. Set this property to `nil` to reset it to the
  default value.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-line-line-translate"><code>line-translate</code></a>
+ layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslate;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslation;
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslate __attribute__((unavailable("Use lineTranslation instead.")));
 
 /**
  Controls the translation reference point.
  
  The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLLineTranslateAnchorMap`. Set this property to
+ `NSValue` object containing `MGLLineTranslationAnchorMap`. Set this property to
  `nil` to reset it to the default value.
  
- This property is only applied to the style if `lineTranslate` is non-`nil`.
+ This property is only applied to the style if `lineTranslation` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-line-line-translate-anchor"><code>line-translate-anchor</code></a>
+ layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslateAnchor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslationAnchor;
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslateAnchor __attribute__((unavailable("Use lineTranslationAnchor instead.")));
 
 /**
  Stroke thickness.
@@ -321,17 +333,17 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslateAnchor) {
 @property (readonly) MGLLineJoin MGLLineJoinValue;
 
 /**
- Creates a new value object containing the given `MGLLineTranslateAnchor` enumeration.
+ Creates a new value object containing the given `MGLLineTranslationAnchor` enumeration.
 
- @param lineTranslateAnchor The value for the new object.
+ @param lineTranslationAnchor The value for the new object.
  @return A new value object that contains the enumeration value.
  */
-+ (instancetype)valueWithMGLLineTranslateAnchor:(MGLLineTranslateAnchor)lineTranslateAnchor;
++ (instancetype)valueWithMGLLineTranslationAnchor:(MGLLineTranslationAnchor)lineTranslationAnchor;
 
 /**
- The `MGLLineTranslateAnchor` enumeration representation of the value.
+ The `MGLLineTranslationAnchor` enumeration representation of the value.
  */
-@property (readonly) MGLLineTranslateAnchor MGLLineTranslateAnchorValue;
+@property (readonly) MGLLineTranslationAnchor MGLLineTranslationAnchorValue;
 
 @end
 

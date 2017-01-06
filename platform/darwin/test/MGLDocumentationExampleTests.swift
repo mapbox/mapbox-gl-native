@@ -160,9 +160,9 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         layer.text = MGLStyleValue(rawValue: "{name}")
         #if os(macOS)
             var vector = CGVector(dx: 10, dy: 0)
-            layer.textTranslate = MGLStyleValue(rawValue: NSValue(bytes: &vector, objCType: "{CGVector=dd}"))
+            layer.textTranslation = MGLStyleValue(rawValue: NSValue(bytes: &vector, objCType: "{CGVector=dd}"))
         #else
-            layer.textTranslate = MGLStyleValue(rawValue: NSValue(cgVector: CGVector(dx: 10, dy: 0)))
+            layer.textTranslation = MGLStyleValue(rawValue: NSValue(cgVector: CGVector(dx: 10, dy: 0)))
         #endif
         layer.textJustification = MGLStyleValue(rawValue: NSValue(mglTextJustification: .left))
         layer.textAnchor = MGLStyleValue(rawValue: NSValue(mglTextAnchor: .left))

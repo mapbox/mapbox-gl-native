@@ -25,8 +25,8 @@
     layer.circleOpacity = [MGLRuntimeStylingHelper testNumber];
     layer.circleRadius = [MGLRuntimeStylingHelper testNumber];
     layer.circleScaleAlignment = [MGLRuntimeStylingHelper testEnum:MGLCircleScaleAlignmentViewport type:@encode(MGLCircleScaleAlignment)];
-    layer.circleTranslate = [MGLRuntimeStylingHelper testOffset];
-    layer.circleTranslateAnchor = [MGLRuntimeStylingHelper testEnum:MGLCircleTranslateAnchorViewport type:@encode(MGLCircleTranslateAnchor)];
+    layer.circleTranslation = [MGLRuntimeStylingHelper testOffset];
+    layer.circleTranslationAnchor = [MGLRuntimeStylingHelper testEnum:MGLCircleTranslationAnchorViewport type:@encode(MGLCircleTranslationAnchor)];
 
     MGLCircleStyleLayer *gLayer = (MGLCircleStyleLayer *)[self.mapView.style layerWithIdentifier:@"layerID"];
     XCTAssertTrue([gLayer isKindOfClass:[MGLCircleStyleLayer class]]);
@@ -36,25 +36,25 @@
     XCTAssertEqualObjects(gLayer.circleRadius, [MGLRuntimeStylingHelper testNumber]);
     XCTAssert([gLayer.circleScaleAlignment isKindOfClass:[MGLStyleConstantValue class]]);
     XCTAssertEqualObjects(gLayer.circleScaleAlignment, [MGLRuntimeStylingHelper testEnum:MGLCircleScaleAlignmentViewport type:@encode(MGLCircleScaleAlignment)]);
-    XCTAssertEqualObjects(gLayer.circleTranslate, [MGLRuntimeStylingHelper testOffset]);
-    XCTAssert([gLayer.circleTranslateAnchor isKindOfClass:[MGLStyleConstantValue class]]);
-    XCTAssertEqualObjects(gLayer.circleTranslateAnchor, [MGLRuntimeStylingHelper testEnum:MGLCircleTranslateAnchorViewport type:@encode(MGLCircleTranslateAnchor)]);
+    XCTAssertEqualObjects(gLayer.circleTranslation, [MGLRuntimeStylingHelper testOffset]);
+    XCTAssert([gLayer.circleTranslationAnchor isKindOfClass:[MGLStyleConstantValue class]]);
+    XCTAssertEqualObjects(gLayer.circleTranslationAnchor, [MGLRuntimeStylingHelper testEnum:MGLCircleTranslationAnchorViewport type:@encode(MGLCircleTranslationAnchor)]);
 
     layer.circleBlur = [MGLRuntimeStylingHelper testNumberFunction];
     layer.circleColor = [MGLRuntimeStylingHelper testColorFunction];
     layer.circleOpacity = [MGLRuntimeStylingHelper testNumberFunction];
     layer.circleRadius = [MGLRuntimeStylingHelper testNumberFunction];
     layer.circleScaleAlignment = [MGLRuntimeStylingHelper testEnumFunction:MGLCircleScaleAlignmentViewport type:@encode(MGLCircleScaleAlignment)];
-    layer.circleTranslate = [MGLRuntimeStylingHelper testOffsetFunction];
-    layer.circleTranslateAnchor = [MGLRuntimeStylingHelper testEnumFunction:MGLCircleTranslateAnchorViewport type:@encode(MGLCircleTranslateAnchor)];
+    layer.circleTranslation = [MGLRuntimeStylingHelper testOffsetFunction];
+    layer.circleTranslationAnchor = [MGLRuntimeStylingHelper testEnumFunction:MGLCircleTranslationAnchorViewport type:@encode(MGLCircleTranslationAnchor)];
 
     XCTAssertEqualObjects(gLayer.circleBlur, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.circleColor, [MGLRuntimeStylingHelper testColorFunction]);
     XCTAssertEqualObjects(gLayer.circleOpacity, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.circleRadius, [MGLRuntimeStylingHelper testNumberFunction]);
     XCTAssertEqualObjects(gLayer.circleScaleAlignment, [MGLRuntimeStylingHelper testEnumFunction:MGLCircleScaleAlignmentViewport type:@encode(MGLCircleScaleAlignment)]);
-    XCTAssertEqualObjects(gLayer.circleTranslate, [MGLRuntimeStylingHelper testOffsetFunction]);
-    XCTAssertEqualObjects(gLayer.circleTranslateAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLCircleTranslateAnchorViewport type:@encode(MGLCircleTranslateAnchor)]);
+    XCTAssertEqualObjects(gLayer.circleTranslation, [MGLRuntimeStylingHelper testOffsetFunction]);
+    XCTAssertEqualObjects(gLayer.circleTranslationAnchor, [MGLRuntimeStylingHelper testEnumFunction:MGLCircleTranslationAnchorViewport type:@encode(MGLCircleTranslationAnchor)]);
 }
 
 - (void)testPropertyNames {
@@ -63,8 +63,8 @@
     [self testPropertyName:@"circle-opacity" isBoolean:NO];
     [self testPropertyName:@"circle-radius" isBoolean:NO];
     [self testPropertyName:@"circle-scale-alignment" isBoolean:NO];
-    [self testPropertyName:@"circle-translate" isBoolean:NO];
-    [self testPropertyName:@"circle-translate-anchor" isBoolean:NO];
+    [self testPropertyName:@"circle-translation" isBoolean:NO];
+    [self testPropertyName:@"circle-translation-anchor" isBoolean:NO];
 }
 
 @end

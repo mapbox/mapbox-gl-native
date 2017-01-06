@@ -11,9 +11,9 @@
 #include <mbgl/style/layers/fill_layer.hpp>
 namespace mbgl {
 
-    MBGL_DEFINE_ENUM(MGLFillTranslateAnchor, {
-        { MGLFillTranslateAnchorMap, "map" },
-        { MGLFillTranslateAnchorViewport, "viewport" },
+    MBGL_DEFINE_ENUM(MGLFillTranslationAnchor, {
+        { MGLFillTranslationAnchorMap, "map" },
+        { MGLFillTranslationAnchorViewport, "viewport" },
     });
 
 }
@@ -201,32 +201,42 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 
-- (void)setFillTranslate:(MGLStyleValue<NSValue *> *)fillTranslate {
+- (void)setFillTranslation:(MGLStyleValue<NSValue *> *)fillTranslation {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue(fillTranslate);
+    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue(fillTranslation);
     self.rawLayer->setFillTranslate(mbglValue);
 }
 
-- (MGLStyleValue<NSValue *> *)fillTranslate {
+- (MGLStyleValue<NSValue *> *)fillTranslation {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillTranslate() ?: self.rawLayer->getDefaultFillTranslate();
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
-- (void)setFillTranslateAnchor:(MGLStyleValue<NSValue *> *)fillTranslateAnchor {
+
+- (void)setFillTranslate:(MGLStyleValue<NSValue *> *)fillTranslate {
+    NSAssert(NO, @"Use -setFillTranslation: instead.");
+}
+
+- (void)setFillTranslationAnchor:(MGLStyleValue<NSValue *> *)fillTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslateAnchor>().toEnumPropertyValue(fillTranslateAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslationAnchor>().toEnumPropertyValue(fillTranslationAnchor);
     self.rawLayer->setFillTranslateAnchor(mbglValue);
 }
 
-- (MGLStyleValue<NSValue *> *)fillTranslateAnchor {
+- (MGLStyleValue<NSValue *> *)fillTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillTranslateAnchor() ?: self.rawLayer->getDefaultFillTranslateAnchor();
-    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslateAnchor>().toEnumStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslationAnchor>().toEnumStyleValue(propertyValue);
+}
+
+
+- (void)setFillTranslateAnchor:(MGLStyleValue<NSValue *> *)fillTranslateAnchor {
+    NSAssert(NO, @"Use -setFillTranslationAnchor: instead.");
 }
 
 
@@ -234,14 +244,14 @@ namespace mbgl {
 
 @implementation NSValue (MGLFillStyleLayerAdditions)
 
-+ (NSValue *)valueWithMGLFillTranslateAnchor:(MGLFillTranslateAnchor)fillTranslateAnchor {
-    return [NSValue value:&fillTranslateAnchor withObjCType:@encode(MGLFillTranslateAnchor)];
++ (NSValue *)valueWithMGLFillTranslationAnchor:(MGLFillTranslationAnchor)fillTranslationAnchor {
+    return [NSValue value:&fillTranslationAnchor withObjCType:@encode(MGLFillTranslationAnchor)];
 }
 
-- (MGLFillTranslateAnchor)MGLFillTranslateAnchorValue {
-    MGLFillTranslateAnchor fillTranslateAnchor;
-    [self getValue:&fillTranslateAnchor];
-    return fillTranslateAnchor;
+- (MGLFillTranslationAnchor)MGLFillTranslationAnchorValue {
+    MGLFillTranslationAnchor fillTranslationAnchor;
+    [self getValue:&fillTranslationAnchor];
+    return fillTranslationAnchor;
 }
 
 @end

@@ -9,18 +9,18 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Controls the translation reference point.
  
- Values of this type are used in the `MGLFillStyleLayer.fillTranslateAnchor`
+ Values of this type are used in the `MGLFillStyleLayer.fillTranslationAnchor`
  property.
  */
-typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
+typedef NS_ENUM(NSUInteger, MGLFillTranslationAnchor) {
     /**
      The fill is translated relative to the map.
      */
-    MGLFillTranslateAnchorMap,
+    MGLFillTranslationAnchorMap,
     /**
      The fill is translated relative to the viewport.
      */
-    MGLFillTranslateAnchorViewport,
+    MGLFillTranslationAnchorViewport,
 };
 
 /**
@@ -127,20 +127,32 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
  `NSValue` object containing a `CGVector` struct set to 0 points from the left
  and 0 points from the top. Set this property to `nil` to reset it to the
  default value.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-fill-fill-translate"><code>fill-translate</code></a>
+ layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslate;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslation;
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslate __attribute__((unavailable("Use fillTranslation instead.")));
 
 /**
  Controls the translation reference point.
  
  The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLFillTranslateAnchorMap`. Set this property to
+ `NSValue` object containing `MGLFillTranslationAnchorMap`. Set this property to
  `nil` to reset it to the default value.
  
- This property is only applied to the style if `fillTranslate` is non-`nil`.
+ This property is only applied to the style if `fillTranslation` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-fill-fill-translate-anchor"><code>fill-translate-anchor</code></a>
+ layout property in the Mapbox Style Specification.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslateAnchor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslationAnchor;
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslateAnchor __attribute__((unavailable("Use fillTranslationAnchor instead.")));
 
 @end
 
@@ -153,17 +165,17 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslateAnchor) {
 #pragma mark Working with Fill Style Layer Attribute Values
 
 /**
- Creates a new value object containing the given `MGLFillTranslateAnchor` enumeration.
+ Creates a new value object containing the given `MGLFillTranslationAnchor` enumeration.
 
- @param fillTranslateAnchor The value for the new object.
+ @param fillTranslationAnchor The value for the new object.
  @return A new value object that contains the enumeration value.
  */
-+ (instancetype)valueWithMGLFillTranslateAnchor:(MGLFillTranslateAnchor)fillTranslateAnchor;
++ (instancetype)valueWithMGLFillTranslationAnchor:(MGLFillTranslationAnchor)fillTranslationAnchor;
 
 /**
- The `MGLFillTranslateAnchor` enumeration representation of the value.
+ The `MGLFillTranslationAnchor` enumeration representation of the value.
  */
-@property (readonly) MGLFillTranslateAnchor MGLFillTranslateAnchorValue;
+@property (readonly) MGLFillTranslationAnchor MGLFillTranslationAnchorValue;
 
 @end
 

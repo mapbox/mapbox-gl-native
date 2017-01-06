@@ -21,7 +21,14 @@
     "text-size": "text-font-size"
   },
   "paint_circle": {
-    "circle-pitch-scale": "circle-scale-alignment"
+    "circle-pitch-scale": "circle-scale-alignment",
+    "circle-translate": "circle-translation",
+    "circle-translate-anchor": "circle-translation-anchor"
+  },
+  "paint_fill": {
+    "fill-antialias": "is-fill-antialiased",
+    "fill-translate": "fill-translation",
+    "fill-translate-anchor": "fill-translation-anchor"
   },
   "paint_raster": {
     "raster-brightness-min": "minimum-raster-brightness",
@@ -29,9 +36,14 @@
     "raster-hue-rotate": "raster-hue-rotation"
   },
   "paint_line": {
-    "line-dasharray": "line-dash-pattern"
+    "line-dasharray": "line-dash-pattern",
+    "line-translate": "line-translation",
+    "line-translate-anchor": "line-translation-anchor"
   },
-  "paint_fill": {
-    "fill-antialias": "is-fill-antialiased"
+  "paint_symbol": {
+    "icon-translate": "icon-translation",
+    "icon-translate-anchor": "icon-translation-anchor",
+    "text-translate": "text-translation",
+    "text-translate-anchor": "text-translation-anchor"
   }
 }

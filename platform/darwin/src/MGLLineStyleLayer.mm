@@ -23,9 +23,9 @@ namespace mbgl {
         { MGLLineJoinMiter, "miter" },
     });
 
-    MBGL_DEFINE_ENUM(MGLLineTranslateAnchor, {
-        { MGLLineTranslateAnchorMap, "map" },
-        { MGLLineTranslateAnchorViewport, "viewport" },
+    MBGL_DEFINE_ENUM(MGLLineTranslationAnchor, {
+        { MGLLineTranslationAnchorMap, "map" },
+        { MGLLineTranslationAnchorViewport, "viewport" },
     });
 
 }
@@ -299,32 +299,42 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 
-- (void)setLineTranslate:(MGLStyleValue<NSValue *> *)lineTranslate {
+- (void)setLineTranslation:(MGLStyleValue<NSValue *> *)lineTranslation {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue(lineTranslate);
+    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue(lineTranslation);
     self.rawLayer->setLineTranslate(mbglValue);
 }
 
-- (MGLStyleValue<NSValue *> *)lineTranslate {
+- (MGLStyleValue<NSValue *> *)lineTranslation {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getLineTranslate() ?: self.rawLayer->getDefaultLineTranslate();
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
-- (void)setLineTranslateAnchor:(MGLStyleValue<NSValue *> *)lineTranslateAnchor {
+
+- (void)setLineTranslate:(MGLStyleValue<NSValue *> *)lineTranslate {
+    NSAssert(NO, @"Use -setLineTranslation: instead.");
+}
+
+- (void)setLineTranslationAnchor:(MGLStyleValue<NSValue *> *)lineTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLLineTranslateAnchor>().toEnumPropertyValue(lineTranslateAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLLineTranslationAnchor>().toEnumPropertyValue(lineTranslationAnchor);
     self.rawLayer->setLineTranslateAnchor(mbglValue);
 }
 
-- (MGLStyleValue<NSValue *> *)lineTranslateAnchor {
+- (MGLStyleValue<NSValue *> *)lineTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getLineTranslateAnchor() ?: self.rawLayer->getDefaultLineTranslateAnchor();
-    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLLineTranslateAnchor>().toEnumStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLLineTranslationAnchor>().toEnumStyleValue(propertyValue);
+}
+
+
+- (void)setLineTranslateAnchor:(MGLStyleValue<NSValue *> *)lineTranslateAnchor {
+    NSAssert(NO, @"Use -setLineTranslationAnchor: instead.");
 }
 
 - (void)setLineWidth:(MGLStyleValue<NSNumber *> *)lineWidth {
@@ -366,14 +376,14 @@ namespace mbgl {
     return lineJoin;
 }
 
-+ (NSValue *)valueWithMGLLineTranslateAnchor:(MGLLineTranslateAnchor)lineTranslateAnchor {
-    return [NSValue value:&lineTranslateAnchor withObjCType:@encode(MGLLineTranslateAnchor)];
++ (NSValue *)valueWithMGLLineTranslationAnchor:(MGLLineTranslationAnchor)lineTranslationAnchor {
+    return [NSValue value:&lineTranslationAnchor withObjCType:@encode(MGLLineTranslationAnchor)];
 }
 
-- (MGLLineTranslateAnchor)MGLLineTranslateAnchorValue {
-    MGLLineTranslateAnchor lineTranslateAnchor;
-    [self getValue:&lineTranslateAnchor];
-    return lineTranslateAnchor;
+- (MGLLineTranslationAnchor)MGLLineTranslationAnchorValue {
+    MGLLineTranslationAnchor lineTranslationAnchor;
+    [self getValue:&lineTranslationAnchor];
+    return lineTranslationAnchor;
 }
 
 @end
