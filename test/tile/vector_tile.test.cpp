@@ -8,7 +8,13 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/update_parameters.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/text/collision_tile.hpp>
+#include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
+
+#include <memory>
 
 using namespace mbgl;
 
@@ -46,4 +52,41 @@ TEST(VectorTile, onError) {
     VectorTile tile(OverscaledTileID(0, 0, 0), "source", test.updateParameters, test.tileset);
     tile.onError(std::make_exception_ptr(std::runtime_error("test")));
     EXPECT_TRUE(tile.isRenderable());
+}
+
+TEST(VectorTile, Issue7615) {
+    VectorTileTest test;
+    VectorTile tile(OverscaledTileID(0, 0, 0), "source", test.updateParameters, test.tileset);
+
+    style::SymbolLayer symbolLayer("symbol", "source");
+    auto symbolBucket = std::make_shared<SymbolBucket>(
+        MapMode::Continuous, style::SymbolLayoutProperties::Evaluated(), false, false);
+
+    // First onLayout is required so that a non-null FeatureIndex is available.
+    tile.onLayout(GeometryTile::LayoutResult {
+        {},
+        std::make_unique<FeatureIndex>(),
+        nullptr,
+        0
+    });
+
+    // Simulate placement of a symbol layer.
+    tile.onPlacement(GeometryTile::PlacementResult {
+        {{
+            symbolLayer.getID(),
+            symbolBucket
+        }},
+        nullptr,
+        0
+    });
+
+    // Second onLayout should not cause the existing symbol bucket to be discarded.
+    tile.onLayout(GeometryTile::LayoutResult {
+        {},
+        nullptr,
+        nullptr,
+        0
+    });
+
+    EXPECT_EQ(symbolBucket.get(), tile.getBucket(symbolLayer));
 }
