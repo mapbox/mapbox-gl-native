@@ -43,8 +43,8 @@ public final class CameraUpdateFactory {
     }
 
     /**
-     * Returns a CameraUpdate that transforms the camera such that the specified latitude/longitude
-     * bounds are centered on screen at the greatest possible zoom level.
+     * Returns a {@link CameraUpdate} that transforms the camera such that the specified
+     * latitude/longitude bounds are centered on screen at the greatest possible zoom level.
      * You can specify padding, in order to inset the bounding box from the map view's edges.
      * The returned CameraUpdate has a bearing of 0 and a tilt of 0.
      *
@@ -57,8 +57,8 @@ public final class CameraUpdateFactory {
     }
 
     /**
-     * Returns a CameraUpdate that transforms the camera such that the specified latitude/longitude
-     * bounds are centered on screen at the greatest possible zoom level.
+     * Returns a {@link CameraUpdate} that transforms the camera such that the specified
+     * latitude/longitude bounds are centered on screen at the greatest possible zoom level.
      * You can specify padding, in order to inset the bounding box from the map view's edges.
      * The returned CameraUpdate has a bearing of 0 and a tilt of 0.
      *
@@ -74,8 +74,8 @@ public final class CameraUpdateFactory {
     }
 
     /**
-     * Returns a CameraUpdate that moves the center of the screen to a latitude and longitude specified by a LatLng object,
-     * and moves to the given zoom level.
+     * Returns a CameraUpdate that moves the center of the screen to a latitude and longitude
+     * specified by a LatLng object, and moves to the given zoom level.
      *
      * @param latLng Target location to change to
      * @param zoom   Zoom level to change to
@@ -119,7 +119,8 @@ public final class CameraUpdateFactory {
     }
 
     /**
-     * Returns a CameraUpdate that zooms in on the map by moving the viewpoint's height closer to the Earth's surface. The zoom increment is 1.0.
+     * Returns a CameraUpdate that zooms in on the map by moving the viewpoint's height closer to
+     * the Earth's surface. The zoom increment is 1.0.
      *
      * @return CameraUpdate Final Camera Position
      */
@@ -128,7 +129,8 @@ public final class CameraUpdateFactory {
     }
 
     /**
-     * Returns a CameraUpdate that zooms out on the map by moving the viewpoint's height farther away from the Earth's surface. The zoom increment is -1.0.
+     * Returns a CameraUpdate that zooms out on the map by moving the viewpoint's height farther
+     * away from the Earth's surface. The zoom increment is -1.0.
      *
      * @return CameraUpdate Final Camera Position
      */

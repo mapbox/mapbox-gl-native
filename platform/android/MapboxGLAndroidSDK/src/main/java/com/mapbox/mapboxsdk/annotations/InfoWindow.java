@@ -17,11 +17,16 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import java.lang.ref.WeakReference;
 
 /**
+ * {@code InfoWindow} is a tooltip shown when a {@link Marker} or {@link MarkerView} is tapped. Only
+ * one info window is displayed at a time. When the user clicks on a marker, the currently open info
+ * window will be closed and the new info window will be displayed. If the user clicks the same
+ * marker while its info window is currently open, the info window will be closed.
  * <p>
- * InfoWindow is a tooltip shown when a {@link Marker} is tapped.
- * </p>
- * <p>
- * This is a UI element placed over a map at a specific geographic location.
+ * The info window is drawn oriented against the device's screen, centered above its associated
+ * marker by default. The info window anchoring can be adjusted using
+ * {@link MarkerView#setInfoWindowAnchor(float, float)} for {@link MarkerView}. The default info
+ * window contains the title in bold and snippet text below the title. While either the title and
+ * snippet are optional, at least one is required to open the info window.
  * </p>
  */
 public class InfoWindow {
@@ -90,13 +95,15 @@ public class InfoWindow {
 
 
     /**
-     * open the window at the specified position.
+     * Open the info window at the specified position.
      *
-     * @param boundMarker the marker on which is hooked the view
-     * @param position    to place the window on the map
-     * @param offsetX     (&offsetY) the offset of the view to the position, in pixels.
-     *                    This allows to offset the view from the object position.
-     * @return this infowindow
+     * @param boundMarker The marker on which is hooked the view.
+     * @param position    to place the window on the map.
+     * @param offsetX     The offset of the view to the position, in pixels. This allows to offset
+     *                    the view from the object position.
+     * @param offsetY     The offset of the view to the position, in pixels. This allows to offset
+     *                    the view from the object position.
+     * @return this {@link InfoWindow}.
      */
     InfoWindow open(MapView mapView, Marker boundMarker, LatLng position, int offsetX, int offsetY) {
         setBoundMarker(boundMarker);
@@ -190,9 +197,9 @@ public class InfoWindow {
     }
 
     /**
-     * Close this InfoWindow if it is visible, otherwise don't do anything.
+     * Close this {@link InfoWindow} if it is visible, otherwise calling this will do nothing.
      *
-     * @return this info window
+     * @return This {@link InfoWindow}
      */
     InfoWindow close() {
         MapboxMap mapboxMap = mMapboxMap.get();
@@ -215,8 +222,8 @@ public class InfoWindow {
     }
 
     /**
-     * Constructs the view that is displayed when the InfoWindow opens.
-     * This retrieves data from overlayItem and shows it in the tooltip.
+     * Constructs the view that is displayed when the InfoWindow opens. This retrieves data from
+     * overlayItem and shows it in the tooltip.
      *
      * @param overlayItem the tapped overlay item
      */
@@ -258,6 +265,9 @@ public class InfoWindow {
         return mBoundMarker.get();
     }
 
+    /**
+     * Will result in getting this {@link InfoWindow} and updating the view being displayed.
+     */
     public void update() {
         MapboxMap mapboxMap = mMapboxMap.get();
         Marker marker = mBoundMarker.get();
@@ -274,6 +284,11 @@ public class InfoWindow {
         }
     }
 
+    /**
+     * Retrieve this {@link InfoWindow}'s current view being used.
+     *
+     * @return This {@link InfoWindow}'s current View.
+     */
     public View getView() {
         return mView != null ? mView.get() : null;
     }

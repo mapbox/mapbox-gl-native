@@ -12,8 +12,8 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
  * Extending this class requires implementing Parceable interface.
  * </p>
  *
- * @param <U> Type of the marker view to be composed
- * @param <T> Type of the builder to be used for composing
+ * @param <U> Type of the marker view to be composed.
+ * @param <T> Type of the builder to be used for composing.
  */
 public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends BaseMarkerViewOptions<U, T>> implements Parcelable {
 
@@ -42,8 +42,8 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     /**
      * Set the geographical location of the MarkerView.
      *
-     * @param position the location to position the MarkerView
-     * @return the object for which the method was called
+     * @param position the location to position the {@link MarkerView}.
+     * @return the object for which the method was called.
      */
     public T position(@NonNull LatLng position) {
         this.position = position;
@@ -53,8 +53,8 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     /**
      * Set the snippet of the MarkerView.
      *
-     * @param snippet the snippet of the MarkerView
-     * @return the object for which the method was called
+     * @param snippet the snippet of the {@link MarkerView}.
+     * @return the object for which the method was called.
      */
     public T snippet(String snippet) {
         this.snippet = snippet;
@@ -64,8 +64,8 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     /**
      * Set the title of the MarkerView.
      *
-     * @param title the title of the MarkerView
-     * @return the object for which the method was called
+     * @param title the title of the {@link MarkerView}.
+     * @return the object for which the method was called.
      */
     public T title(String title) {
         this.title = title;
@@ -75,8 +75,8 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     /**
      * Set the icon of the MarkerView.
      *
-     * @param icon the icon of the MarkerView
-     * @return the object for which the method was called
+     * @param icon the icon of the {@link MarkerView}.
+     * @return the object for which the method was called.
      */
     public T icon(Icon icon) {
         this.icon = icon;
@@ -97,8 +97,8 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     /**
      * Set the flat state of the MarkerView.
      *
-     * @param flat the flat state of the MarkerView
-     * @return the object for which the method was called
+     * @param flat the flat state of the {@link MarkerView}.
+     * @return the object for which the method was called.
      */
     public T flat(boolean flat) {
         this.flat = flat;
@@ -106,11 +106,11 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     }
 
     /**
-     * Set the anchor of the MarkerView.
+     * Set the anchor of the {@link MarkerView}.
      *
-     * @param u the u-value
-     * @param v the v-value
-     * @return the object for which the method was called
+     * @param u the u-value.
+     * @param v the v-value.
+     * @return the object for which the method was called.
      */
     public T anchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
         this.anchorU = u;
@@ -119,11 +119,11 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     }
 
     /**
-     * Set the InfoWindow anchor of the MarkerView.
+     * Set the InfoWindow anchor of the {@link MarkerView}.
      *
-     * @param u the u-value
-     * @param v the v-values
-     * @return the object for which the method was called
+     * @param u the u-value.
+     * @param v the v-values.
+     * @return the object for which the method was called.
      */
     public T infoWindowAnchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
         this.infoWindowAnchorU = u;
@@ -132,10 +132,10 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     }
 
     /**
-     * Set the rotation of the MarkerView.
+     * Set the rotation of the {@link MarkerView}.
      *
-     * @param rotation the rotation value
-     * @return the object for which the method was called
+     * @param rotation the rotation value.
+     * @return the object for which the method was called.
      */
     public T rotation(float rotation) {
         this.rotation = rotation;
@@ -149,10 +149,10 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     }
 
     /**
-     * Set the visibility state of the MarkerView.
+     * Set the visibility state of the {@link MarkerView}.
      *
-     * @param visible the visible state
-     * @return the object for which the method was called
+     * @param visible the visible state.
+     * @return the object for which the method was called.
      */
     public T visible(boolean visible) {
         this.visible = visible;
@@ -160,10 +160,10 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     }
 
     /**
-     * Set the alpha of the MarkerView.
+     * Set the alpha of the {@link MarkerView}.
      *
-     * @param alpha the alpha value
-     * @return the object for which the method was called
+     * @param alpha the alpha value.
+     * @return the object for which the method was called.
      */
     public T alpha(float alpha) {
         this.alpha = alpha;
@@ -182,36 +182,36 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     }
 
     /**
-     * Get the geographical location of the MarkerView.
+     * Get the geographical location of the {@link MarkerView}.
      *
-     * @return the geographical location
+     * @return the geographical location.
      */
     public LatLng getPosition() {
         return position;
     }
 
     /**
-     * Get the snippet of the MarkerView.
+     * Get the snippet of the {@link MarkerView}.
      *
-     * @return the snippet
+     * @return the snippet.
      */
     public String getSnippet() {
         return snippet;
     }
 
     /**
-     * Get the title of the MarkerView.
+     * Get the title of the {@link MarkerView}.
      *
-     * @return the title
+     * @return the title.
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     * Get the icon of the MarkerView.
+     * Get the icon of the {@link MarkerView}.
      *
-     * @return the icon
+     * @return the icon.
      */
     public Icon getIcon() {
         return icon;
@@ -228,27 +228,27 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     }
 
     /**
-     * Get the flat state of the MarkerView.
+     * Get the flat state of the {@link MarkerView}.
      *
-     * @return the flat state
+     * @return the flat state.
      */
     public boolean isFlat() {
         return flat;
     }
 
     /**
-     * Get the u-value of the MarkerView anchor.
+     * Get the u-value of the {@link MarkerView} anchor.
      *
-     * @return the u-value
+     * @return the u-value.
      */
     public float getAnchorU() {
         return anchorU;
     }
 
     /**
-     * Get the v-value of the MarkerView anchor.
+     * Get the v-value of the {@link MarkerView} anchor.
      *
-     * @return the v-value
+     * @return the v-value.
      */
     public float getAnchorV() {
         return anchorV;
@@ -257,7 +257,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     /**
      * Get the u-value of the MarkerView InfoWindow anchor.
      *
-     * @return the u-value
+     * @return the u-value.
      */
     public float getInfoWindowAnchorU() {
         return infoWindowAnchorU;
@@ -266,7 +266,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     /**
      * Get the v-value of the MarkerView InfoWindow anchor.
      *
-     * @return the v-value
+     * @return the v-value.
      */
     public float getInfoWindowAnchorV() {
         return infoWindowAnchorV;
@@ -275,7 +275,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     /**
      * Get the rotation of the MarkerView.
      *
-     * @return the rotation value
+     * @return the rotation value.
      */
     public float getRotation() {
         return rotation;
@@ -284,7 +284,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     /**
      * Get the visibility state of the MarkerView.
      *
-     * @return the visibility state
+     * @return the visibility state.
      */
     public boolean isVisible() {
         return visible;
@@ -293,7 +293,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     /**
      * Get the alpha of the MarkerView.
      *
-     * @return the alpha value
+     * @return the alpha value.
      */
     public float getAlpha() {
         return alpha;
@@ -310,14 +310,14 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     /**
      * Get the instance of the object for which this method was called.
      *
-     * @return the object for which the this method was called
+     * @return the object for which the this method was called.
      */
     public abstract T getThis();
 
     /**
      * Get the MarkerView.
      *
-     * @return the MarkerView created from this builder
+     * @return the MarkerView created from this builder.
      */
     public abstract U getMarker();
 

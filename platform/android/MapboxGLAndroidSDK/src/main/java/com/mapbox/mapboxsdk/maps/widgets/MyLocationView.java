@@ -363,7 +363,9 @@ public class MyLocationView extends View {
         this.bearing = bearing;
         if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
             if (myBearingTrackingMode == MyBearingTracking.GPS) {
-                setCompass(location.getBearing() - bearing);
+                if(location!=null) {
+                    setCompass(location.getBearing() - bearing);
+                }
             } else if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
                 setCompass(magneticHeading - bearing);
             }
@@ -460,7 +462,7 @@ public class MyLocationView extends View {
     public void onRestoreInstanceState(Parcelable state) {
         if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
-            tilt = bundle.getFloat("tilt");
+            tilt = bundle.getDouble("tilt");
             state = bundle.getParcelable("superState");
         }
         super.onRestoreInstanceState(state);
@@ -638,14 +640,25 @@ public class MyLocationView extends View {
 
             if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
 
-                // calculate the rotation matrix
-                SensorManager.getRotationMatrixFromVector(matrix, event.values);
-                SensorManager.getOrientation(matrix, orientation);
+                /**
+                 * Mappy Fix
+                 * On some Samsung devices (e.g. Galaxy Note 3 and Galaxy S4) the
+                 * SensorManager.getRotationMatrixFromVector() appears to throw an
+                 * exception when the passed rotation vector has length > 4.
+                 * In this case
+                 */
+                try {
+                    // calculate the rotation matrix
+                    SensorManager.getRotationMatrixFromVector(matrix, event.values);
+                    SensorManager.getOrientation(matrix, orientation);
 
-                float magneticHeading = (float) Math.toDegrees(orientation[0]);
-                setCompass(magneticHeading - bearing);
+                    float magneticHeading = (float) Math.toDegrees(orientation[0]);
+                    setCompass(magneticHeading - bearing);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                 /* Mappy, the bearing of the sensor doesn't allow to rotate the map
+                /* Mappy, the bearing of the sensor doesn't allow to rotate the map
                 if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
                     // Change the user location view orientation to reflect the device orientation
                     rotateCamera(magneticHeading);

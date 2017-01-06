@@ -350,11 +350,11 @@ public class MapboxEventManager {
         }
 
         // NaN and Infinite checks to prevent JSON errors at send to server time
-        if (Double.isNaN(location.getLatitude()) || Double.isNaN(location.getLongitude()) || Double.isNaN(location.getAltitude())) {
+        if (Double.isNaN(location.getLatitude()) || Double.isNaN(location.getLongitude()) || Double.isNaN(location.getAltitude()) || Float.isNaN(location.getAccuracy())) {
             return;
         }
 
-        if (Double.isInfinite(location.getLatitude()) || Double.isInfinite(location.getLongitude()) || Double.isInfinite(location.getAltitude())) {
+        if (Double.isInfinite(location.getLatitude()) || Double.isInfinite(location.getLongitude()) || Double.isInfinite(location.getAltitude()) || Float.isInfinite(location.getAccuracy())) {
             return;
         }
 
@@ -367,6 +367,7 @@ public class MapboxEventManager {
         event.put(MapboxEvent.KEY_LATITUDE, Math.floor(location.getLatitude() * locationEventAccuracy) / locationEventAccuracy);
         event.put(MapboxEvent.KEY_LONGITUDE, Math.floor(location.getLongitude() * locationEventAccuracy) / locationEventAccuracy);
         event.put(MapboxEvent.KEY_ALTITUDE, location.getAltitude());
+        event.put(MapboxEvent.KEY_HORIZONTAL_ACCURACY, Math.round(location.getAccuracy()));
         event.put(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, operatingSystem);
         event.put(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, getApplicationState());
 
