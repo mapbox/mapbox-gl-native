@@ -129,51 +129,51 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
             m_map->addImage("label-arrow", QImage(":label-arrow.svg"));
             m_map->addImage("label-background", QImage(":label-background.svg"));
 
-            QVariantMap makerArrow;
-            makerArrow["id"] = "makerArrow";
-            makerArrow["type"] = "symbol";
-            makerArrow["source"] = "routeSource";
-            m_map->addLayer(makerArrow);
+            QVariantMap markerArrow;
+            markerArrow["id"] = "markerArrow";
+            markerArrow["type"] = "symbol";
+            markerArrow["source"] = "routeSource";
+            m_map->addLayer(markerArrow);
 
-            m_map->setLayoutProperty("makerArrow", "icon-image", "label-arrow");
-            m_map->setLayoutProperty("makerArrow", "icon-size", 0.5);
-            m_map->setLayoutProperty("makerArrow", "icon-ignore-placement", true);
+            m_map->setLayoutProperty("markerArrow", "icon-image", "label-arrow");
+            m_map->setLayoutProperty("markerArrow", "icon-size", 0.5);
+            m_map->setLayoutProperty("markerArrow", "icon-ignore-placement", true);
 
             QVariantList arrowOffset;
             arrowOffset.append(0.0);
             arrowOffset.append(-15.0);
-            m_map->setLayoutProperty("makerArrow", "icon-offset", arrowOffset);
+            m_map->setLayoutProperty("markerArrow", "icon-offset", arrowOffset);
 
-            QVariantMap makerBackground;
-            makerBackground["id"] = "makerBackground";
-            makerBackground["type"] = "symbol";
-            makerBackground["source"] = "routeSource";
-            m_map->addLayer(makerBackground);
+            QVariantMap markerBackground;
+            markerBackground["id"] = "markerBackground";
+            markerBackground["type"] = "symbol";
+            markerBackground["source"] = "routeSource";
+            m_map->addLayer(markerBackground);
 
-            m_map->setLayoutProperty("makerBackground", "icon-image", "label-background");
-            m_map->setLayoutProperty("makerBackground", "text-field", "{name}");
-            m_map->setLayoutProperty("makerBackground", "icon-text-fit", "both");
-            m_map->setLayoutProperty("makerBackground", "icon-ignore-placement", true);
-            m_map->setLayoutProperty("makerBackground", "text-ignore-placement", true);
-            m_map->setLayoutProperty("makerBackground", "text-anchor", "left");
-            m_map->setLayoutProperty("makerBackground", "text-size", 16.0);
-            m_map->setLayoutProperty("makerBackground", "text-padding", 0.0);
-            m_map->setLayoutProperty("makerBackground", "text-line-height", 1.0);
-            m_map->setLayoutProperty("makerBackground", "text-max-width", 8.0);
+            m_map->setLayoutProperty("markerBackground", "icon-image", "label-background");
+            m_map->setLayoutProperty("markerBackground", "text-field", "{name}");
+            m_map->setLayoutProperty("markerBackground", "icon-text-fit", "both");
+            m_map->setLayoutProperty("markerBackground", "icon-ignore-placement", true);
+            m_map->setLayoutProperty("markerBackground", "text-ignore-placement", true);
+            m_map->setLayoutProperty("markerBackground", "text-anchor", "left");
+            m_map->setLayoutProperty("markerBackground", "text-size", 16.0);
+            m_map->setLayoutProperty("markerBackground", "text-padding", 0.0);
+            m_map->setLayoutProperty("markerBackground", "text-line-height", 1.0);
+            m_map->setLayoutProperty("markerBackground", "text-max-width", 8.0);
 
             QVariantList iconTextFitPadding;
             iconTextFitPadding.append(15.0);
             iconTextFitPadding.append(10.0);
             iconTextFitPadding.append(15.0);
             iconTextFitPadding.append(10.0);
-            m_map->setLayoutProperty("makerBackground", "icon-text-fit-padding", iconTextFitPadding);
+            m_map->setLayoutProperty("markerBackground", "icon-text-fit-padding", iconTextFitPadding);
 
             QVariantList backgroundOffset;
             backgroundOffset.append(-0.5);
             backgroundOffset.append(-1.5);
-            m_map->setLayoutProperty("makerBackground", "text-offset", backgroundOffset);
+            m_map->setLayoutProperty("markerBackground", "text-offset", backgroundOffset);
 
-            m_map->setPaintProperty("makerBackground", "text-color", QColor("white"));
+            m_map->setPaintProperty("markerBackground", "text-color", QColor("white"));
 
             QVariantList filterExpression;
             filterExpression.append("==");
@@ -183,8 +183,8 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
             QVariantList filter;
             filter.append(filterExpression);
 
-            m_map->setFilter("makerArrow", filter);
-            m_map->setFilter("makerBackground", filter);
+            m_map->setFilter("markerArrow", filter);
+            m_map->setFilter("markerBackground", filter);
 
             // Tilt the labels when tilting the map and make them larger
             m_map->setLayoutProperty("road-label-large", "text-size", 30.0);
