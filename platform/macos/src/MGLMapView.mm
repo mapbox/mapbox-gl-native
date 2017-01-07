@@ -2486,7 +2486,7 @@ public:
     if (menuItem.action == @selector(giveFeedback:)) {
         return YES;
     }
-    return [super validateMenuItem:menuItem];
+    return NO;
 }
 
 #pragma mark Interface Builder methods
