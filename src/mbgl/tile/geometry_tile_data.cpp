@@ -127,7 +127,7 @@ void limitHoles(GeometryCollection& polygon, uint32_t maxHoles) {
                          polygon.begin() + 1 + maxHoles,
                          polygon.end(),
                          [] (const auto& a, const auto& b) {
-                             return signedArea(a) > signedArea(b);
+                             return std::fabs(signedArea(a)) > std::fabs(signedArea(b));
                          });
         polygon.resize(1 + maxHoles);
     }
