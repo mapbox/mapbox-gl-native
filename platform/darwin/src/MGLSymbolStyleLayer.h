@@ -960,7 +960,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  Otherwise, it is ignored.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-translate"><code>icon-translate</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-icon-translate"><code>icon-translate</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslation;
@@ -978,7 +978,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  `iconTranslation` is non-`nil`. Otherwise, it is ignored.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-translate-anchor"><code>icon-translate-anchor</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-icon-translate-anchor"><code>icon-translate-anchor</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslationAnchor;
@@ -1092,7 +1092,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  it is ignored.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-translate"><code>text-translate</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-text-translate"><code>text-translate</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslation;
@@ -1110,7 +1110,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  `textTranslation` is non-`nil`. Otherwise, it is ignored.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-translate-anchor"><code>text-translate-anchor</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-text-translate-anchor"><code>text-translate-anchor</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslationAnchor;

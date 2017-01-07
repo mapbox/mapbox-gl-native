@@ -201,7 +201,7 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslationAnchor) {
  Otherwise, it is ignored.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-line-line-dasharray"><code>line-dasharray</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-line-dasharray"><code>line-dasharray</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDashPattern;
@@ -260,7 +260,7 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslationAnchor) {
  default value.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-line-line-translate"><code>line-translate</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-line-translate"><code>line-translate</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslation;
@@ -278,7 +278,7 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslationAnchor) {
  Otherwise, it is ignored.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-line-line-translate-anchor"><code>line-translate-anchor</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-line-translate-anchor"><code>line-translate-anchor</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslationAnchor;

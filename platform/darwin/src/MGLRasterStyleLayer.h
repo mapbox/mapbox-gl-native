@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
  it to the default value.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-raster-raster-brightness-max"><code>raster-brightness-max</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-brightness-max"><code>raster-brightness-max</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumRasterBrightness;
@@ -61,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
  it to the default value.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-raster-raster-brightness-min"><code>raster-brightness-min</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-brightness-min"><code>raster-brightness-min</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *minimumRasterBrightness;
@@ -98,7 +98,7 @@ NS_ASSUME_NONNULL_BEGIN
  it to the default value.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-raster-raster-hue-rotate"><code>raster-hue-rotate</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-hue-rotate"><code>raster-hue-rotate</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotation;

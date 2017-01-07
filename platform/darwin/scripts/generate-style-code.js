@@ -180,7 +180,16 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
             doc += '\n\n' + propertyReqs(property, spec[`${kind}_${layerType}`], layerType);
         }
         if ('original' in property) {
-            doc += `\n\nThis attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-${layerType}-${property.original}"><code>${property.original}</code></a> layout property in the Mapbox Style Specification.`;
+            let anchor;
+            switch (kind) {
+                case 'layout':
+                    anchor = `layout-${layerType}-${property.original}`;
+                    break;
+                case 'paint':
+                    anchor = `paint-${property.original}`;
+                    break;
+            }
+            doc += `\n\nThis attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#${anchor}"><code>${property.original}</code></a> layout property in the Mapbox Style Specification.`;
         }
     }
     return doc;

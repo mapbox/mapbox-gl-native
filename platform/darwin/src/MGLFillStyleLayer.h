@@ -60,7 +60,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslationAnchor) {
  the default value.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-fill-fill-antialias"><code>fill-antialias</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-antialias"><code>fill-antialias</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable, getter=isFillAntialiased) MGLStyleValue<NSNumber *> *fillAntialiased;
@@ -129,7 +129,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslationAnchor) {
  default value.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-fill-fill-translate"><code>fill-translate</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-translate"><code>fill-translate</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslation;
@@ -147,7 +147,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslationAnchor) {
  Otherwise, it is ignored.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-fill-fill-translate-anchor"><code>fill-translate-anchor</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-translate-anchor"><code>fill-translate-anchor</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslationAnchor;

@@ -137,7 +137,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
  `nil` to reset it to the default value.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-circle-circle-pitch-scale"><code>circle-pitch-scale</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-circle-pitch-scale"><code>circle-pitch-scale</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleScaleAlignment;
@@ -155,7 +155,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
  default value.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-circle-circle-translate"><code>circle-translate</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-circle-translate"><code>circle-translate</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslation;
@@ -173,7 +173,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
  Otherwise, it is ignored.
  
  This attribute corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-circle-circle-translate-anchor"><code>circle-translate-anchor</code></a>
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-circle-translate-anchor"><code>circle-translate-anchor</code></a>
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslationAnchor;
