@@ -2,18 +2,17 @@
 
 #include <memory>
 
-#include <boost/regex/pending/unicode_iterator.hpp>
+#include <locale>
+#include <codecvt>
 
 namespace mbgl {
 namespace util {
 
-class utf8_to_utf32 {
- public:
-    static std::u32string convert(std::string const& utf8)
-    {
-        boost::u8_to_u32_iterator<std::string::const_iterator> begin(utf8.begin());
-        boost::u8_to_u32_iterator<std::string::const_iterator> end(utf8.end());
-        return std::u32string(begin,end);
+class utf8_to_utf16 {
+public:
+    static std::u16string convert(std::string const& utf8) {
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
+        return converter.from_bytes(utf8);
     }
 };
 

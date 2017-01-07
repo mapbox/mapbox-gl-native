@@ -84,7 +84,7 @@ void GlyphAtlas::setObserver(GlyphAtlasObserver* observer_) {
 }
 
 void GlyphAtlas::addGlyphs(uintptr_t tileUID,
-                           const std::u32string& text,
+                           const std::u16string& text,
                            const FontStack& fontStack,
                            const GlyphSet& glyphSet,
                            GlyphPositions& face)
@@ -93,7 +93,7 @@ void GlyphAtlas::addGlyphs(uintptr_t tileUID,
 
     const std::map<uint32_t, SDFGlyph>& sdfs = glyphSet.getSDFs();
 
-    for (uint32_t chr : text)
+    for (char16_t chr : text)
     {
         auto sdf_it = sdfs.find(chr);
         if (sdf_it == sdfs.end()) {

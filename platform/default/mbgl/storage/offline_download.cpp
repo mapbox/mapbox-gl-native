@@ -184,7 +184,7 @@ void OfflineDownload::activateDownload() {
 
         if (!parser.glyphURL.empty()) {
             for (const auto& fontStack : parser.fontStacks()) {
-                for (uint32_t i = 0; i < GLYPH_RANGES_PER_FONT_STACK; i++) {
+                for (char16_t i = 0; i < GLYPH_RANGES_PER_FONT_STACK; i++) {
                     queueResource(Resource::glyphs(parser.glyphURL, fontStack, getGlyphRange(i * GLYPHS_PER_GLYPH_RANGE)));
                 }
             }
