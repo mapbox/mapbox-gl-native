@@ -41,6 +41,14 @@ NS_ASSUME_NONNULL_BEGIN
  collection object, the returned value is an instance of
  `MGLShapeCollectionFeature`.
  
+ ### Example
+ 
+ ```swift
+ let url = mainBundle.url(forResource: "amsterdam", withExtension: "geojson")!
+ let data = try! Data(contentsOf: url)
+ let feature = try! MGLShape(data: data, encoding: String.Encoding.utf8.rawValue) as! MGLShapeCollectionFeature
+ ```
+ 
  @param data String data containing GeoJSON source code.
  @param encoding The encoding used by `data`.
  @param outError Upon return, if an error has occurred, a pointer to an
