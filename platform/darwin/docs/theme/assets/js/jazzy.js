@@ -40,3 +40,8 @@ $(".token").click(function(event) {
   }
   event.preventDefault();
 });
+
+// Dumb down quotes within code blocks that delimit strings instead of quotations.
+$("code q").replaceWith(function () {
+  return ["\"", $(this).contents(), "\""];
+});
