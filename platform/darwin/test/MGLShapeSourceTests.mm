@@ -37,6 +37,19 @@
     XCTAssertNil(source.shape);
 }
 
+- (void)testUnclusterableShape {
+    NSDictionary *options = @{
+        MGLShapeSourceOptionClustered: @YES,
+    };
+    
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"id" shape:[[MGLPointFeature alloc] init] options:options];
+    XCTAssertTrue([source.shape isKindOfClass:[MGLPointFeature class]]);
+    
+    MGLShapeCollectionFeature *feature = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[]];
+    source = [[MGLShapeSource alloc] initWithIdentifier:@"id" shape:feature options:options];
+    XCTAssertTrue([source.shape isKindOfClass:[MGLShapeCollectionFeature class]]);
+}
+
 - (void)testMGLShapeSourceWithDataMultipleFeatures {
     
     NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-104.34814453125,37.64903402157866]]}}]}";
