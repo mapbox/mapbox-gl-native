@@ -4797,7 +4797,12 @@ public:
             else
             {
                 CGRect adjustedFrame = annotationView.frame;
-                adjustedFrame.origin.x = CGRectGetWidth(annotationView.layer.presentationLayer.frame) * -2.0;
+                if (annotationView.layer.presentationLayer) {
+                    adjustedFrame.origin.x = -CGRectGetWidth(annotationView.layer.presentationLayer.frame) * 10.0;
+                } else {
+                    // views that are added off screen do not have a presentationLayer
+                    adjustedFrame.origin.x = -CGRectGetWidth(adjustedFrame) * 10.0;
+                }
                 annotationView.frame = adjustedFrame;
                 [self enqueueAnnotationViewForAnnotationContext:annotationContext];
             }
