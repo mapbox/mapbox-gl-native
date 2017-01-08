@@ -213,8 +213,11 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  @note Adding the same source instance more than once will result in a
     `MGLRedundantSourceException`. Reusing the same source identifier, even with
     different source instances, will result in a 
-    `MGLRedundantSourceIdentifierException`.
- 
+    `MGLRedundantSourceIdentifierException`. Sources should be added in 
+    `MGLMapViewDelegates`'s `mapView:didFinishLoadingStyle:` or
+    `mapViewDidFinishLoadingMap:` methods to ensure that the map has loaded
+    the style and is ready to accept a new source or layer.
+
  @param source The source to add to the current style.
  */
 - (void)addSource:(MGLSource *)source;
@@ -264,7 +267,10 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  
  @note Adding the same layer instance more than once will result in a
     `MGLRedundantLayerException`. Reusing the same layer identifer, even with
-    different layer instances, will also result in an exception.
+    different layer instances, will also result in an exception. Layers should 
+    be added in `MGLMapViewDelegates`'s `mapView:didFinishLoadingStyle:` or
+    `mapViewDidFinishLoadingMap:` methods to ensure that the map has loaded
+    the style and is ready to accept a new source or layer.
 
  @param layer The layer object to add to the map view. This object must be an
     instance of a concrete subclass of `MGLStyleLayer`.
@@ -276,7 +282,10 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  
  @note Adding the same layer instance more than once will result in a
     `MGLRedundantLayerException`. Reusing the same layer identifer, even with
-    different layer instances, will also result in an exception.
+    different layer instances, will also result in an exception. Layers should
+    be added in `MGLMapViewDelegates`'s `mapView:didFinishLoadingStyle:` or
+    `mapViewDidFinishLoadingMap:` methods to ensure that the map has loaded
+    the style and is ready to accept a new source or layer.
 
  @param layer The layer to insert.
  @param index The index at which to insert the layer. An index of 0 would send

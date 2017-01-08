@@ -1615,6 +1615,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     }
     
     MGLPointAnnotation *point = annotation;
+    MGLPointAnnotation *point = (MGLPointAnnotation *)annotation;
     point.coordinate = [self.mapView convertPoint:self.mapView.center toCoordinateFromView:self.mapView];
 }
 
