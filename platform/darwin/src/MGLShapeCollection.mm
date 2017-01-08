@@ -12,7 +12,6 @@
 
 - (instancetype)initWithShapes:(NS_ARRAY_OF(MGLShape *) *)shapes {
     if (self = [super init]) {
-        NSAssert(shapes.count, @"Cannot create an empty shape collection");
         _shapes = shapes.copy;
     }
     return self;

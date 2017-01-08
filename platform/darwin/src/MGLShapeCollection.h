@@ -7,7 +7,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- An `MGLShapeCollection` object represents a shape consisting of one or more
+ An `MGLShapeCollection` object represents a shape consisting of zero or more
  distinct but related shapes that are instances of `MGLShape`. The constituent
  shapes can be a mixture of different kinds of shapes.
  
