@@ -46,6 +46,18 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     func mapView(_ mapView: MGLMapView, didFinishLoading style: MGLStyle) {
         styleLoadingExpectation.fulfill()
     }
+    
+    func testMGLShape$shapeWithData_encoding_error_() {
+        let mainBundle = Bundle(for: MGLDocumentationExampleTests.self)
+        
+        //#-example-code
+        let url = mainBundle.url(forResource: "amsterdam", withExtension: "geojson")!
+        let data = try! Data(contentsOf: url)
+        let feature = try! MGLShape(data: data, encoding: String.Encoding.utf8.rawValue) as! MGLShapeCollectionFeature
+        //#-end-example-code
+        
+        XCTAssertNotNil(feature.shapes.first as? MGLPolygonFeature)
+    }
 
     func testMGLShapeSource() {
         //#-example-code

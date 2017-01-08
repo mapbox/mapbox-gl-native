@@ -100,7 +100,7 @@ function completeExamples(os) {
         }
         
         // Get the contents of the test method whose name matches the symbol path.
-        let testMethodName = symbolPath.join('$').replace(/$[+-]/, '').replace(/:/g, '_');
+        let testMethodName = symbolPath.join('$').replace(/\$[+-]/, '$').replace(/:/g, '_');
         let example = examples[testMethodName];
         if (!example) {
           console.error(`MGLDocumentationExampleTests.${testMethodName}() not found.`);
