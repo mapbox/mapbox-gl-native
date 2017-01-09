@@ -72,6 +72,11 @@ dependencies {
     releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
     testCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
 
+    // Mapbox Android Services (Java component)
+    compile('com.mapbox.mapboxsdk:mapbox-java-services:2.0.0-SNAPSHOT@jar') {
+        transitive = true
+    }
+
     // Testing dependencies
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.2.27'

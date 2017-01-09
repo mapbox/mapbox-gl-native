@@ -24,12 +24,12 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.services.commons.ServicesException;
+import com.mapbox.services.api.ServicesException;
 import com.mapbox.services.commons.models.Position;
-import com.mapbox.services.geocoding.v5.GeocodingCriteria;
-import com.mapbox.services.geocoding.v5.MapboxGeocoding;
-import com.mapbox.services.geocoding.v5.models.CarmenFeature;
-import com.mapbox.services.geocoding.v5.models.GeocodingResponse;
+import com.mapbox.services.api.geocoding.v5.GeocodingCriteria;
+import com.mapbox.services.api.geocoding.v5.MapboxGeocoding;
+import com.mapbox.services.api.geocoding.v5.models.CarmenFeature;
+import com.mapbox.services.api.geocoding.v5.models.GeocodingResponse;
 
 import java.util.List;
 

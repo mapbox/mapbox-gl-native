@@ -28,7 +28,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.services.commons.models.Position;
-import com.mapbox.services.commons.turf.TurfMeasurement;
+import com.mapbox.services.api.utils.turf.TurfMeasurement;
 
 import java.util.Random;
 
