@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  This property is only applied to the style if `backgroundPattern` is set to
  `nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *backgroundColor;
+@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *backgroundColor;
 #else
 /**
  The color with which the background will be drawn.
@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
  This property is only applied to the style if `backgroundPattern` is set to
  `nil`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *backgroundColor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *backgroundColor;
 #endif
 
 /**

@@ -251,15 +251,15 @@ global.describeValue = function (value, property, layerType) {
                 throw new Error(`unrecognized color format in default value of ${property.name}`);
             }
             if (color.r === 0 && color.g === 0 && color.b === 0 && color.a === 0) {
-                return '`MGLColor.clearColor`';
+                return '`UIColor.clearColor`';
             }
             if (color.r === 0 && color.g === 0 && color.b === 0 && color.a === 1) {
-                return '`MGLColor.blackColor`';
+                return '`UIColor.blackColor`';
             }
             if (color.r === 1 && color.g === 1 && color.b === 1 && color.a === 1) {
-                return '`MGLColor.whiteColor`';
+                return '`UIColor.whiteColor`';
             }
-            return 'an `MGLColor`' + ` object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
+            return 'a `UIColor`' + ` object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
         case 'array':
             let units = property.units || '';
             if (units) {
@@ -268,9 +268,9 @@ global.describeValue = function (value, property, layerType) {
             switch (arrayType(property)) {
                 case 'padding':
                     if (value[0] === 0 && value[1] === 0 && value[2] === 0 && value[3] === 0) {
-                        return 'an `NSValue` object containing `NSEdgeInsetsZero` or `UIEdgeInsetsZero`';
+                        return 'an `NSValue` object containing `UIEdgeInsetsZero`';
                     }
-                    return 'an `NSValue` object containing an `NSEdgeInsets` or `UIEdgeInsets` struct set to' + ` ${value[0]}${units} on the top, ${value[3]}${units} on the left, ${value[2]}${units} on the bottom, and ${value[1]}${units} on the right`;
+                    return 'an `NSValue` object containing a `UIEdgeInsets` struct set to' + ` ${value[0]}${units} on the top, ${value[3]}${units} on the left, ${value[2]}${units} on the bottom, and ${value[1]}${units} on the right`;
                 case 'offset':
                 case 'translate':
                     return 'an `NSValue` object containing a `CGVector` struct set to' + ` ${value[0]}${units} rightward and ${value[1]}${units} downward`;
@@ -405,26 +405,28 @@ const layers = _(spec.layer.type.values).map((value, layerType) => {
 }).sortBy(['type']).value();
 
 function duplicatePlatformDecls(src) {
-    // Look for a documentation comment that contains “MGLColor” and the
-    // subsequent function, method, or property declaration. Try not to match
-    // greedily.
-    return src.replace(/(\/\*\*(?:\*[^\/]|[^*])*?\bMGLColor\b[\s\S]*?\*\/)(\s*.+?;)/g,
+    // Look for a documentation comment that contains “MGLColor” or “UIColor”
+    // and the subsequent function, method, or property declaration. Try not to
+    // match greedily.
+    return src.replace(/(\/\*\*(?:\*[^\/]|[^*])*?\*\/)(\s*[^;]+?\b(?:MGL|NS|UI)(?:Color|EdgeInsets(?:Zero)?)\b[^;]+?;)/g,
                        (match, comment, decl) => {
-        let iosComment = comment.replace(/\bMGLColor\b/g, 'UIColor')
+        let macosComment = comment.replace(/\b(?:MGL|UI)(Color|EdgeInsets(?:Zero)?)\b/g, 'NS$1')
             // Use the correct indefinite article.
-            .replace(/\b(a)n(\s+`?UIColor)\b/gi, '$1$2');
-        let macosComment = comment.replace(/\bMGLColor\b/g, 'NSColor');
+            .replace(/\ba(\s+`?NS(?:Color|EdgeInsets))\b/gi, 'an$1');
+        let iosDecl = decl.replace(/\bMGL(Color|EdgeInsets)\b/g, 'UI$1');
+        let macosDecl = decl.replace(/\b(?:MGL|UI)(Color|EdgeInsets)\b/g, 'NS$1');
         return `\
 #if TARGET_OS_IPHONE
-${iosComment}${decl}
+${comment}${iosDecl}
 #else
-${macosComment}${decl}
+${macosComment}${macosDecl}
 #endif`;
     })
         // Do the same for CGVector-typed properties.
-        .replace(/(\/\*\*(?:\*[^\/]|[^*])*?\bCGVector\b[\s\S]*?\*\/)(\s*.+?;)/g,
+        .replace(/(\/\*\*(?:\*[^\/]|[^*])*?\b(?:CGVector|UIEdgeInsets(?:Zero)?)\b[\s\S]*?\*\/)(\s*.+?;)/g,
                        (match, comment, decl) => {
-        let macosComment = comment.replace(/\bdownward\b/g, 'upward');
+        let macosComment = comment.replace(/\bdownward\b/g, 'upward')
+            .replace(/\bUI(EdgeInsets(?:Zero)?)\b/g, 'NS$1');
         return `\
 #if TARGET_OS_IPHONE
 ${comment}${decl}
