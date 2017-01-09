@@ -274,6 +274,11 @@ Array (`-font`) | `NSArray<NSString>` | `[String]`
 Array (`-offset`, `-translate`) | `NSValue.CGVectorValue` | `NSValue.cgVectorValue`
 Array (`-padding`) | `NSValue.UIEdgeInsetsValue` | `NSValue.uiEdgeInsetsValue`
 
+For padding attributes, note that the arguments to
+`UIEdgeInsetsMake()` in Objective-C and
+`EdgeInsets(top:left:bottom:right:)` in Swift are specified in counterclockwise
+order, in contrast to the clockwise order defined by the style specification.
+
 ## Filtering sources
 
 You can filter a shape or vector source by setting the
