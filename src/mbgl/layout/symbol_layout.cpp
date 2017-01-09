@@ -27,7 +27,7 @@ namespace mbgl {
 
 using namespace style;
 
-SymbolLayout::SymbolLayout(std::vector<std::unique_ptr<Layer>> layers_,
+SymbolLayout::SymbolLayout(std::vector<std::string> layerIDs_,
                            std::string sourceLayerName_,
                            uint32_t overscaling_,
                            float zoom_,
@@ -37,7 +37,7 @@ SymbolLayout::SymbolLayout(std::vector<std::unique_ptr<Layer>> layers_,
                            style::SymbolLayoutProperties::Evaluated layout_,
                            float textMaxSize_,
                            SpriteAtlas& spriteAtlas_)
-    : layers(std::move(layers_)),
+    : layerIDs(std::move(layerIDs_)),
       sourceLayerName(std::move(sourceLayerName_)),
       overscaling(overscaling_),
       zoom(zoom_),
@@ -254,7 +254,7 @@ void SymbolLayout::addFeature(const SymbolFeature& feature,
                                                   ? SymbolPlacementType::Point
                                                   : layout.get<SymbolPlacement>();
     const float textRepeatDistance = symbolSpacing / 2;
-    IndexedSubfeature indexedFeature = {feature.index, sourceLayerName, layers.at(0)->getID(), symbolInstances.size()};
+    IndexedSubfeature indexedFeature = {feature.index, sourceLayerName, layerIDs.at(0), symbolInstances.size()};
 
     auto addSymbolInstance = [&] (const GeometryCoordinates& line, Anchor& anchor) {
         // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers

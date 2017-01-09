@@ -28,7 +28,7 @@ struct Anchor;
 
 class SymbolLayout {
 public:
-    SymbolLayout(std::vector<std::unique_ptr<style::Layer>>,
+    SymbolLayout(std::vector<std::string> layerIDs_,
                  std::string sourceLayerName_,
                  uint32_t overscaling,
                  float zoom,
@@ -56,7 +56,7 @@ public:
 
     State state = Pending;
 
-    const std::vector<std::unique_ptr<style::Layer>> layers;
+    const std::vector<std::string> layerIDs;
     const std::string sourceLayerName;
 
 private:

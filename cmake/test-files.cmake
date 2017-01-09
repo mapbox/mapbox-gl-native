@@ -90,6 +90,7 @@ set(MBGL_TEST_FILES
     test/text/quads.test.cpp
 
     # tile
+    test/tile/geojson_tile.test.cpp
     test/tile/geometry_tile_data.test.cpp
     test/tile/raster_tile.test.cpp
     test/tile/tile_coordinate.test.cpp

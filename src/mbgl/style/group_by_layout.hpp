@@ -8,7 +8,7 @@ namespace style {
 
 class Layer;
 
-std::vector<std::vector<std::unique_ptr<Layer>>> groupByLayout(std::vector<std::unique_ptr<Layer>>);
+std::vector<std::vector<const Layer*>> groupByLayout(const std::vector<std::unique_ptr<Layer>>&);
 
 } // namespace style
 } // namespace mbgl

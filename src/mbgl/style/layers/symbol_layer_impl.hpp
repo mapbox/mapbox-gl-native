@@ -52,7 +52,7 @@ public:
 
     std::unique_ptr<Bucket> createBucket(BucketParameters&, const GeometryTileLayer&) const override;
     std::unique_ptr<SymbolLayout> createLayout(BucketParameters&, const GeometryTileLayer&,
-                                               std::vector<std::unique_ptr<Layer>>) const;
+                                               std::vector<std::string>) const;
 
     SymbolPropertyValues iconPropertyValues(const SymbolLayoutProperties::Evaluated&) const;
     SymbolPropertyValues textPropertyValues(const SymbolLayoutProperties::Evaluated&) const;
