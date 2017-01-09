@@ -322,6 +322,15 @@
                                                                              @[@(coord2.longitude), @(coord2.latitude)]]}
                                                        ]};
     XCTAssertEqualObjects(geoJSONFeature[@"geometry"], expectedGeometry);
+
+    // When the shape collection is created with an empty array of shapes
+    shapeCollectionFeature = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[]];
+
+    // it has the correct (empty) geometry
+    geoJSONFeature = [shapeCollectionFeature geoJSONDictionary];
+    expectedGeometry = @{@"type": @"GeometryCollection",
+                         @"geometries": @[]};
+    XCTAssertEqualObjects(geoJSONFeature[@"geometry"], expectedGeometry);
 }
 
 @end
