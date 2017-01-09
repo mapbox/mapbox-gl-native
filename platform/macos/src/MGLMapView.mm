@@ -194,9 +194,11 @@ public:
     /// True if the view is currently printing itself.
     BOOL _isPrinting;
 
-    // True until the map view loads the style set initially
+    // True while the map view is loading a style
     BOOL _isWaitingForStyleLoad;
 }
+
+@synthesize style = _style;
 
 #pragma mark Lifecycle
 
@@ -2281,12 +2283,20 @@ public:
     return _mbglMap;
 }
 
+- (void)setStyle:(MGLStyle *)style
+{
+    if (style != _style) {
+        _isWaitingForStyleLoad = YES;
+        _style = style;
+    }
+}
+
 - (MGLStyle *)style
 {
     if (_isWaitingForStyleLoad) {
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
-            NSLog(@"WARNING: -[MGLMapView style] was called before -[MGLMapViewDelegate mapView:didFinishLoadingStyle:]. Wait for the map to finish loading the style before attempting to change the style at runtime.");
+            NSLog(@"WARNING: -[MGLMapView style] was called before -[MGLMapViewDelegate mapView:didFinishLoadingStyle:]. Wait for the map to finish loading the style before attempting to change the style at runtime. This warning will only appear once.");
         });
     }
     return _style;

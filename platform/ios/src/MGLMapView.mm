@@ -314,9 +314,11 @@ public:
     
     NS_ARRAY_OF(MGLAttributionInfo *) *_attributionInfos;
 
-    // True until the map view loads the style set initially
+    // True while the map view is loading a style
     BOOL _isWaitingForStyleLoad;
 }
+
+@synthesize style = _style;
 
 #pragma mark - Setup & Teardown -
 
@@ -373,7 +375,7 @@ public:
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
     [self willChangeValueForKey:@"style"];
-    _style = [[MGLStyle alloc] initWithMapView:self];
+    self.style = [[MGLStyle alloc] initWithMapView:self];
     _mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
     [self didChangeValueForKey:@"style"];
 }
@@ -1986,12 +1988,20 @@ public:
     _mbglMap->onLowMemory();
 }
 
+- (void)setStyle:(MGLStyle *)style
+{
+    if (style != _style) {
+        _isWaitingForStyleLoad = YES;
+        _style = style;
+    }
+}
+
 - (MGLStyle *)style
 {
     if (_isWaitingForStyleLoad) {
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
-            NSLog(@"WARNING: -[MGLMapView style] was called before -[MGLMapViewDelegate mapView:didFinishLoadingStyle:]. Wait for the map to finish loading the style before attempting to change the style at runtime.");
+            NSLog(@"WARNING: -[MGLMapView style] was called before -[MGLMapViewDelegate mapView:didFinishLoadingStyle:]. Wait for the map to finish loading the style before attempting to change the style at runtime. This warning will only appear once.");
         });
     }
     return _style;
