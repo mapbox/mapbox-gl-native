@@ -89,6 +89,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 @end
 
 @interface MBXCustomCalloutAnnotation : MGLPointAnnotation
+@property (nonatomic, assign) BOOL anchoredToAnnotation;
+@property (nonatomic, assign) BOOL dismissesAutomatically;
 @end
 
 @implementation MBXCustomCalloutAnnotation
@@ -699,12 +701,28 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 {
     [self.mapView removeAnnotations:self.mapView.annotations];
 
-    MBXCustomCalloutAnnotation *annotation = [[MBXCustomCalloutAnnotation alloc] init];
-    annotation.coordinate = CLLocationCoordinate2DMake(48.8533940, 2.3775439);
-    annotation.title = @"Custom Callout";
+    MBXCustomCalloutAnnotation *firstAnnotation = [[MBXCustomCalloutAnnotation alloc] init];
+    firstAnnotation.coordinate = CLLocationCoordinate2DMake(48.8533940, 2.3775439);
+    firstAnnotation.title = @"Open anchored to annotation";
+    firstAnnotation.anchoredToAnnotation = YES;
+    firstAnnotation.dismissesAutomatically = NO;
+    
+    MBXCustomCalloutAnnotation *secondAnnotation = [[MBXCustomCalloutAnnotation alloc] init];
+    secondAnnotation.coordinate = CLLocationCoordinate2DMake(48.8543940, 2.3775439);
+    secondAnnotation.title = @"Open not anchored to annotation";
+    secondAnnotation.anchoredToAnnotation = NO;
+    secondAnnotation.dismissesAutomatically = NO;
 
-    [self.mapView addAnnotation:annotation];
-    [self.mapView showAnnotations:@[annotation] animated:YES];
+    MBXCustomCalloutAnnotation *thirdAnnotation = [[MBXCustomCalloutAnnotation alloc] init];
+    thirdAnnotation.coordinate = CLLocationCoordinate2DMake(48.8553940, 2.3775439);
+    thirdAnnotation.title = @"Dismisses automatically";
+    thirdAnnotation.anchoredToAnnotation = YES;
+    thirdAnnotation.dismissesAutomatically = YES;
+    
+    NSArray *annotations = @[firstAnnotation, secondAnnotation, thirdAnnotation];
+    [self.mapView addAnnotations:annotations];
+    
+    [self.mapView showAnnotations:annotations animated:YES];
 }
 
 - (void)styleWaterLayer
@@ -1582,8 +1600,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     if ([annotation respondsToSelector:@selector(title)]
         && [annotation isKindOfClass:[MBXCustomCalloutAnnotation class]])
     {
+        MBXCustomCalloutAnnotation *customAnnotation = (MBXCustomCalloutAnnotation *)annotation;
         MBXCustomCalloutView *calloutView = [[MBXCustomCalloutView alloc] init];
         calloutView.representedObject = annotation;
+        calloutView.anchoredToAnnotation = customAnnotation.anchoredToAnnotation;
+        calloutView.dismissesAutomatically = customAnnotation.dismissesAutomatically;
         return calloutView;
     }
     return nil;
