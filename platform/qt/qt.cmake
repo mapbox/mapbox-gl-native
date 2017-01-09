@@ -80,7 +80,7 @@ else()
 endif()
 
 # OS specific configurations
-if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+if (MASON_PLATFORM STREQUAL "osx" OR MASON_PLATFORM STREQUAL "ios")
     list(APPEND MBGL_QT_FILES
         PRIVATE platform/darwin/src/nsthread.mm
     )
