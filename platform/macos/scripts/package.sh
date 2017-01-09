@@ -68,6 +68,19 @@ if [[ ${BUILDTYPE} == Release ]]; then
         "${OUTPUT}/${NAME}.framework/${NAME}"
 fi
 
+function create_podspec {
+    step "Creating local podspec…"
+    [[ $SYMBOLS = YES ]] && POD_SUFFIX="-symbols" || POD_SUFFIX=""
+    POD_SOURCE_PATH='    :path => ".",'
+    POD_FRAMEWORKS="  m.vendored_frameworks = '"${NAME}".framework'"
+    INPUT_PODSPEC=platform/macos/${NAME}-macOS-SDK${POD_SUFFIX}.podspec
+    OUTPUT_PODSPEC=${OUTPUT}/${NAME}-macOS-SDK${POD_SUFFIX}.podspec
+    sed "s/.*:http.*/${POD_SOURCE_PATH}/" ${INPUT_PODSPEC} > ${OUTPUT_PODSPEC}
+    sed -i '' "s/.*vendored_frameworks.*/${POD_FRAMEWORKS}/" ${OUTPUT_PODSPEC}
+}
+
+create_podspec
+
 step "Copying library resources…"
 cp -pv LICENSE.md "${OUTPUT}"
 cp -pv platform/macos/docs/pod-README.md "${OUTPUT}/README.md"
