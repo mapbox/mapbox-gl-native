@@ -273,7 +273,7 @@ global.describeValue = function (value, property, layerType) {
                     return 'an `NSValue` object containing an `NSEdgeInsets` or `UIEdgeInsets` struct set to' + ` ${value[0]}${units} on the top, ${value[3]}${units} on the left, ${value[2]}${units} on the bottom, and ${value[1]}${units} on the right`;
                 case 'offset':
                 case 'translate':
-                    return 'an `NSValue` object containing a `CGVector` struct set to' + ` ${value[0]}${units} from the left and ${value[1]}${units} from the top`;
+                    return 'an `NSValue` object containing a `CGVector` struct set to' + ` ${value[0]}${units} rightward and ${value[1]}${units} downward`;
                 default:
                     return 'the array `' + value.join('`, `') + '`';
             }
@@ -417,6 +417,17 @@ function duplicatePlatformDecls(src) {
         return `\
 #if TARGET_OS_IPHONE
 ${iosComment}${decl}
+#else
+${macosComment}${decl}
+#endif`;
+    })
+        // Do the same for CGVector-typed properties.
+        .replace(/(\/\*\*(?:\*[^\/]|[^*])*?\bCGVector\b[\s\S]*?\*\/)(\s*.+?;)/g,
+                       (match, comment, decl) => {
+        let macosComment = comment.replace(/\bdownward\b/g, 'upward');
+        return `\
+#if TARGET_OS_IPHONE
+${comment}${decl}
 #else
 ${macosComment}${decl}
 #endif`;

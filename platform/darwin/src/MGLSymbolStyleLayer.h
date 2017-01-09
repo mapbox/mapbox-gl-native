@@ -331,17 +331,31 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *iconImage __attribute__((unavailable("Use iconImageName instead.")));
 
+#if TARGET_OS_IPHONE
 /**
  Offset distance of icon from its anchor.
  
  The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing a `CGVector` struct set to 0 from the left and 0
- from the top. Set this property to `nil` to reset it to the default value.
+ `NSValue` object containing a `CGVector` struct set to 0 rightward and 0
+ downward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconOffset;
+#else
+/**
+ Offset distance of icon from its anchor.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSValue` object containing a `CGVector` struct set to 0 rightward and 0
+ upward. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `iconImageName` is non-`nil`.
+ Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconOffset;
+#endif
 
 /**
  If true, text will display without their corresponding icons when the icon
@@ -747,20 +761,35 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textLineHeight;
 
+#if TARGET_OS_IPHONE
 /**
  Offset distance of text from its anchor.
  
  This property is measured in ems.
  
  The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing a `CGVector` struct set to 0 ems from the left and
- 0 ems from the top. Set this property to `nil` to reset it to the default
- value.
+ `NSValue` object containing a `CGVector` struct set to 0 ems rightward and 0
+ ems downward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textOffset;
+#else
+/**
+ Offset distance of text from its anchor.
+ 
+ This property is measured in ems.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSValue` object containing a `CGVector` struct set to 0 ems rightward and 0
+ ems upward. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textOffset;
+#endif
 
 /**
  If true, icons will display without their corresponding text when the text
@@ -946,15 +975,15 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconOpacity;
 
+#if TARGET_OS_IPHONE
 /**
  Distance that the icon's anchor is moved from its original placement.
  
  This property is measured in points.
  
  The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing a `CGVector` struct set to 0 points from the left
- and 0 points from the top. Set this property to `nil` to reset it to the
- default value.
+ `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
+ points downward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
@@ -964,6 +993,25 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslation;
+#else
+/**
+ Distance that the icon's anchor is moved from its original placement.
+ 
+ This property is measured in points.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
+ points upward. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `iconImageName` is non-`nil`.
+ Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-icon-translate"><code>icon-translate</code></a>
+ layout property in the Mapbox Style Specification.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslation;
+#endif
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslate __attribute__((unavailable("Use iconTranslation instead.")));
 
@@ -1078,15 +1126,15 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textOpacity;
 
+#if TARGET_OS_IPHONE
 /**
  Distance that the text's anchor is moved from its original placement.
  
  This property is measured in points.
  
  The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing a `CGVector` struct set to 0 points from the left
- and 0 points from the top. Set this property to `nil` to reset it to the
- default value.
+ `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
+ points downward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1096,6 +1144,25 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  layout property in the Mapbox Style Specification.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslation;
+#else
+/**
+ Distance that the text's anchor is moved from its original placement.
+ 
+ This property is measured in points.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
+ points upward. Set this property to `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-text-translate"><code>text-translate</code></a>
+ layout property in the Mapbox Style Specification.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslation;
+#endif
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslate __attribute__((unavailable("Use textTranslation instead.")));
 
