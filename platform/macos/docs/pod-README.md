@@ -4,6 +4,8 @@ The Mapbox macOS SDK is an open-source framework for embedding interactive map v
 
 <img alt="" src="https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/macos/screenshot.png" width="645">
 
+Mapbox macOS SDK releases are [available on GitHub](https://github.com/mapbox/mapbox-gl-native/releases/) – look for the releases that begin with “macos-”. You can also integrate the Mapbox macOS SDK into your application using CocoaPods.
+
 ## Installation
 
 1. Open the project editor, select your application target, then go to the General tab. Drag Mapbox.framework from the `dynamic` folder into the “Embedded Binaries” section. (Don’t drag it into the “Linked Frameworks and Libraries” section; Xcode will add it there automatically.) In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
@@ -46,6 +48,6 @@ script AppDelegate
 end script
 ```
 
-Full API documentation is included in this package, within the `documentation` folder. The [Mapbox iOS SDK](https://www.mapbox.com/ios-sdk/)’s [API documentation](https://www.mapbox.com/ios-sdk/api/) and [online examples](https://www.mapbox.com/ios-sdk/examples/) apply to the Mapbox macOS SDK with few differences, mostly around unimplemented features like user location tracking.
+Full API documentation is included in this package, within the `documentation` folder, and [online](https://mapbox.github.io/mapbox-gl-native/macos/). The [Mapbox iOS SDK](https://www.mapbox.com/ios-sdk/)’s [API documentation](https://www.mapbox.com/ios-sdk/api/) and [online examples](https://www.mapbox.com/ios-sdk/examples/) apply to the Mapbox macOS SDK with few differences, mostly around unimplemented features like user location tracking.
 
 Mapbox does not officially support the macOS SDK to the same extent as the iOS SDK; however, [bug reports and pull requests](https://github.com/mapbox/mapbox-gl-native/issues/) are certainly welcome.
