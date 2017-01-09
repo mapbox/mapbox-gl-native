@@ -146,11 +146,12 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 - (NSURL *)shareURL {
     NSArray *components = self.mapView.styleURL.pathComponents;
-    CLLocationCoordinate2D centerCoordinate = self.mapView.centerCoordinate;
+    MGLMapCamera *camera = self.mapView.camera;
     return [NSURL URLWithString:
-            [NSString stringWithFormat:@"https://api.mapbox.com/styles/v1/%@/%@.html?access_token=%@#%.2f/%.5f/%.5f/%.f",
+            [NSString stringWithFormat:@"https://api.mapbox.com/styles/v1/%@/%@.html?access_token=%@#%.2f/%.5f/%.5f/%.f/%.f",
              components[1], components[2], [MGLAccountManager accessToken],
-             self.mapView.zoomLevel, centerCoordinate.latitude, centerCoordinate.longitude, self.mapView.direction]];
+             self.mapView.zoomLevel, camera.centerCoordinate.latitude, camera.centerCoordinate.longitude,
+             camera.heading, camera.pitch]];
 }
 
 #pragma mark View methods
