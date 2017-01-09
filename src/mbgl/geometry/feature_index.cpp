@@ -151,8 +151,8 @@ optional<GeometryCoordinates> FeatureIndex::translateQueryGeometry(
     return translated;
 }
 
-void FeatureIndex::addBucketLayerName(const std::string& bucketName, const std::string& layerID) {
-    bucketLayerIDs[bucketName].push_back(layerID);
+void FeatureIndex::setBucketLayerIDs(const std::string& bucketName, const std::vector<std::string>& layerIDs) {
+    bucketLayerIDs[bucketName] = layerIDs;
 }
 
 } // namespace mbgl

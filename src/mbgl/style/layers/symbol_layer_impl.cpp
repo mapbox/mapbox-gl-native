@@ -31,7 +31,7 @@ std::unique_ptr<Bucket> SymbolLayer::Impl::createBucket(BucketParameters&, const
 
 std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(BucketParameters& parameters,
                                                               const GeometryTileLayer& layer,
-                                                              std::vector<std::unique_ptr<Layer>> group) const {
+                                                              std::vector<std::string> group) const {
     PropertyEvaluationParameters p(parameters.tileID.overscaledZ);
     SymbolLayoutProperties::Evaluated evaluated = layout.evaluate(p);
 

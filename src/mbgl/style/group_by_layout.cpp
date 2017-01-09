@@ -32,16 +32,15 @@ std::string layoutKey(const Layer& layer) {
     return s.GetString();
 }
 
-std::vector<std::vector<std::unique_ptr<Layer>>> groupByLayout(std::vector<std::unique_ptr<Layer>> layers) {
-    std::unordered_map<std::string, std::vector<std::unique_ptr<Layer>>> map;
+std::vector<std::vector<const Layer*>> groupByLayout(const std::vector<std::unique_ptr<Layer>>& layers) {
+    std::unordered_map<std::string, std::vector<const Layer*>> map;
     for (auto& layer : layers) {
-        auto& vector = map[layoutKey(*layer)];
-        vector.push_back(std::move(layer));
+        map[layoutKey(*layer)].push_back(layer.get());
     }
 
-    std::vector<std::vector<std::unique_ptr<Layer>>> result;
+    std::vector<std::vector<const Layer*>> result;
     for (auto& pair : map) {
-        result.push_back(std::move(pair.second));
+        result.push_back(pair.second);
     }
 
     return result;

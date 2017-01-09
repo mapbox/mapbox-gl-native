@@ -12,7 +12,7 @@ TEST(GroupByLayout, Related) {
     std::vector<std::unique_ptr<Layer>> layers;
     layers.push_back(std::make_unique<LineLayer>("a", "source"));
     layers.push_back(std::make_unique<LineLayer>("b", "source"));
-    auto result = groupByLayout(std::move(layers));
+    auto result = groupByLayout(layers);
     ASSERT_EQ(1u, result.size());
     ASSERT_EQ(2u, result[0].size());
 }
@@ -21,7 +21,7 @@ TEST(GroupByLayout, UnrelatedType) {
     std::vector<std::unique_ptr<Layer>> layers;
     layers.push_back(std::make_unique<BackgroundLayer>("background"));
     layers.push_back(std::make_unique<CircleLayer>("circle", "source"));
-    auto result = groupByLayout(std::move(layers));
+    auto result = groupByLayout(layers);
     ASSERT_EQ(2u, result.size());
 }
 
@@ -30,7 +30,7 @@ TEST(GroupByLayout, UnrelatedFilter) {
     layers.push_back(std::make_unique<LineLayer>("a", "source"));
     layers.push_back(std::make_unique<LineLayer>("b", "source"));
     layers[0]->as<LineLayer>()->setFilter(EqualsFilter());
-    auto result = groupByLayout(std::move(layers));
+    auto result = groupByLayout(layers);
     ASSERT_EQ(2u, result.size());
 }
 
@@ -39,6 +39,6 @@ TEST(GroupByLayout, UnrelatedLayout) {
     layers.push_back(std::make_unique<LineLayer>("a", "source"));
     layers.push_back(std::make_unique<LineLayer>("b", "source"));
     layers[0]->as<LineLayer>()->setLineCap(LineCapType::Square);
-    auto result = groupByLayout(std::move(layers));
+    auto result = groupByLayout(layers);
     ASSERT_EQ(2u, result.size());
 }

@@ -214,7 +214,7 @@ void GeometryTileWorker::redoLayout() {
     auto featureIndex = std::make_unique<FeatureIndex>();
     BucketParameters parameters { id, obsolete, *featureIndex, mode };
 
-    std::vector<std::vector<std::unique_ptr<Layer>>> groups = groupByLayout(std::move(*layers));
+    std::vector<std::vector<const Layer*>> groups = groupByLayout(*layers);
     for (auto& group : groups) {
         if (obsolete) {
             return;
@@ -231,13 +231,16 @@ void GeometryTileWorker::redoLayout() {
             continue;
         }
 
+        std::vector<std::string> layerIDs;
         for (const auto& layer : group) {
-            featureIndex->addBucketLayerName(leader.getID(), layer->getID());
+            layerIDs.push_back(layer->getID());
         }
+
+        featureIndex->setBucketLayerIDs(leader.getID(), layerIDs);
 
         if (leader.is<SymbolLayer>()) {
             symbolLayoutMap.emplace(leader.getID(),
-                leader.as<SymbolLayer>()->impl->createLayout(parameters, *geometryLayer, std::move(group)));
+                leader.as<SymbolLayer>()->impl->createLayout(parameters, *geometryLayer, layerIDs));
         } else {
             std::shared_ptr<Bucket> bucket = leader.baseImpl->createBucket(parameters, *geometryLayer);
             if (!bucket->hasData()) {
@@ -321,8 +324,8 @@ void GeometryTileWorker::attemptPlacement() {
         }
 
         std::shared_ptr<Bucket> bucket = symbolLayout->place(*collisionTile);
-        for (const auto& layer : symbolLayout->layers) {
-            buckets.emplace(layer->getID(), bucket);
+        for (const auto& layerID : symbolLayout->layerIDs) {
+            buckets.emplace(layerID, bucket);
         }
     }
 

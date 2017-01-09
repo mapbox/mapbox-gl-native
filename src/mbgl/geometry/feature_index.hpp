@@ -52,7 +52,7 @@ public:
             const float bearing,
             const float pixelsToTileUnits);
 
-    void addBucketLayerName(const std::string& bucketName, const std::string& layerName);
+    void setBucketLayerIDs(const std::string& bucketName, const std::vector<std::string>& layerIDs);
 
 private:
     void addFeature(
