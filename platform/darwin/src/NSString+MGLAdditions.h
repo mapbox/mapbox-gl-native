@@ -10,6 +10,15 @@ NS_ASSUME_NONNULL_BEGIN
 /** Returns the receiver if non-empty or nil if empty. */
 - (nullable NSString *)mgl_stringOrNilIfEmpty;
 
+/**
+ Returns a title-cased representation of the receiver using the specified
+ locale.
+ 
+ @param The locale. For strings presented to users, pass in the current locale
+    (`+[NSLocale currentLocale]`). To use the system locale, pass in `nil`.
+ */
+- (NSString *)mgl_titleCasedStringWithLocale:(NSLocale *)locale;
+
 @end
 
 @interface NSAttributedString (MGLAdditions)
