@@ -14,6 +14,9 @@ if(NOT EXISTS "mapbox-gl-js/package.json")
    execute_process(
         COMMAND git submodule update --init mapbox-gl-js
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+   execute_process(
+        COMMAND npm install
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/mapbox-gl-js)
 endif()
 
 include(.mason/mason.cmake)

@@ -69,7 +69,7 @@ module.exports = function (style, options, callback) {
             });
 
         } else if (operation[0] === 'addImage') {
-            var img = PNG.sync.read(fs.readFileSync(path.join(__dirname, '../../../node_modules', 'mapbox-gl-test-suite', operation[2])));
+            var img = PNG.sync.read(fs.readFileSync(path.join(__dirname, '../../../mapbox-gl-js/test/integration', operation[2])));
 
             map.addImage(operation[1], img.data, {
                 height: img.height,
