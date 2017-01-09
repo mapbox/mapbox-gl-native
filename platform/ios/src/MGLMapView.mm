@@ -1726,7 +1726,7 @@ public:
     _attributionInfos = [self.style attributionInfosWithFontSize:[UIFont buttonFontSize] linkColor:nil];
     for (MGLAttributionInfo *info in _attributionInfos)
     {
-        NSString *title = [info.title.string capitalizedStringWithLocale:[NSLocale currentLocale]];
+        NSString *title = [info.title.string mgl_titleCasedStringWithLocale:[NSLocale currentLocale]];
         [self.attributionSheet addButtonWithTitle:title];
     }
     
