@@ -6,7 +6,7 @@ set -o pipefail
 JOB=$1
 
 if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
-    gzip --stdout node_modules/mapbox-gl-test-suite/render-tests/index.html | \
+    gzip --stdout mapbox-gl-js/test/integration/render-tests/index.html | \
         aws s3 cp --acl public-read --content-encoding gzip --content-type text/html \
             - s3://mapbox/mapbox-gl-native/render-tests/$JOB/index.html
 
