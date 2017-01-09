@@ -247,7 +247,8 @@ you want the attribute to be set to.
 In contrast to the JSON type that the style specification defines for each
 layout or paint property, the style value object often contains a more specific
 Foundation or Cocoa type. General rules for attribute types are listed below.
-Pay close attention to the SDK documentation for the attribute you want to set.
+Pay close attention to the SDK documentation for the attribute you want to get
+or set.
 
 In style JSON | In Objective-C        | In Swift
 --------------|-----------------------|---------
@@ -258,8 +259,8 @@ Boolean       | `NSNumber.boolValue`  | `NSNumber.boolValue`
 Number        | `NSNumber.floatValue` | `NSNumber.floatValue`
 Array (`-dasharray`) | `NSArray<NSNumber>` | `[NSNumber]`
 Array (`-font`) | `NSArray<NSString>` | `[String]`
-Array (`-offset`, `-translate`) | `CGVector` | `CGVector`
-Array (`-padding`) | `NSEdgeInsets` | `NSEdgeInsets`
+Array (`-offset`, `-translate`) | `NSValue` containing `CGVector` | `NSValue` containing `CGVector`
+Array (`-padding`) | `NSValue.edgeInsetsValue` | `NSValue.edgeInsetsValue`
 
 ## Filtering sources
 
