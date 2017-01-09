@@ -78,7 +78,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslationAnchor) {
  This property is only applied to the style if `fillPattern` is set to `nil`.
  Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *fillColor;
+@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *fillColor;
 #else
 /**
  The color of the filled part of this layer.
@@ -90,7 +90,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslationAnchor) {
  This property is only applied to the style if `fillPattern` is set to `nil`.
  Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *fillColor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *fillColor;
 #endif
 
 /**
@@ -103,6 +103,7 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslationAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillOpacity;
 
+#if TARGET_OS_IPHONE
 /**
  The outline color of the fill. Matches the value of `fillColor` if unspecified.
  
@@ -110,7 +111,17 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslationAnchor) {
  and `fillAntialiased` is set to an `MGLStyleValue` object containing an
  `NSNumber` object containing `YES`. Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *fillOutlineColor;
+@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *fillOutlineColor;
+#else
+/**
+ The outline color of the fill. Matches the value of `fillColor` if unspecified.
+ 
+ This property is only applied to the style if `fillPattern` is set to `nil`,
+ and `fillAntialiased` is set to an `MGLStyleValue` object containing an
+ `NSNumber` object containing `YES`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *fillOutlineColor;
+#endif
 
 /**
  Name of image in sprite to use for drawing image fills. For seamless patterns,

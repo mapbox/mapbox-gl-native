@@ -175,7 +175,7 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslationAnchor) {
  This property is only applied to the style if `linePattern` is set to `nil`.
  Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *lineColor;
+@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *lineColor;
 #else
 /**
  The color with which the line will be drawn.
@@ -187,7 +187,7 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslationAnchor) {
  This property is only applied to the style if `linePattern` is set to `nil`.
  Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *lineColor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *lineColor;
 #endif
 
 /**

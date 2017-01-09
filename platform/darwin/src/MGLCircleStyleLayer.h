@@ -97,7 +97,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
  `UIColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *circleColor;
+@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *circleColor;
 #else
 /**
  The fill color of the circle.
@@ -106,7 +106,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
  `NSColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *circleColor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *circleColor;
 #endif
 
 /**

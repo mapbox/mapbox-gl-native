@@ -450,14 +450,15 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFit;
 
+#if TARGET_OS_IPHONE
 /**
  Size of the additional area added to dimensions determined by `iconTextFit`.
  
  This property is measured in points.
  
  The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `NSEdgeInsetsZero` or `UIEdgeInsetsZero`. Set this
- property to `nil` to reset it to the default value.
+ `NSValue` object containing `UIEdgeInsetsZero`. Set this property to `nil` to
+ reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and
  `text` is non-`nil`, and `iconTextFit` is set to an `MGLStyleValue` object
@@ -465,6 +466,23 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  `MGLIconTextFitWidth`, or `MGLIconTextFitHeight`. Otherwise, it is ignored.
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFitPadding;
+#else
+/**
+ Size of the additional area added to dimensions determined by `iconTextFit`.
+ 
+ This property is measured in points.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSValue` object containing `NSEdgeInsetsZero`. Set this property to `nil` to
+ reset it to the default value.
+ 
+ This property is only applied to the style if `iconImageName` is non-`nil`, and
+ `text` is non-`nil`, and `iconTextFit` is set to an `MGLStyleValue` object
+ containing an `NSValue` object containing `MGLIconTextFitBoth`,
+ `MGLIconTextFitWidth`, or `MGLIconTextFitHeight`. Otherwise, it is ignored.
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFitPadding;
+#endif
 
 /**
  If true, the icon may be flipped to prevent it from being rendered upside-down.
@@ -891,7 +909,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconColor;
+@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *iconColor;
 #else
 /**
  The tint color to apply to the icon. The `iconImageName` property must be set
@@ -904,7 +922,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconColor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *iconColor;
 #endif
 
 /**
@@ -933,7 +951,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconHaloColor;
+@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *iconHaloColor;
 #else
 /**
  The color of the icon’s halo. The `iconImageName` property must be set to a
@@ -946,7 +964,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *iconHaloColor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *iconHaloColor;
 #endif
 
 /**
@@ -1044,7 +1062,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *textColor;
+@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *textColor;
 #else
 /**
  The color with which the text will be drawn.
@@ -1056,7 +1074,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *textColor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *textColor;
 #endif
 
 /**
@@ -1084,7 +1102,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *textHaloColor;
+@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *textHaloColor;
 #else
 /**
  The color of the text's halo, which helps it stand out from backgrounds.
@@ -1096,7 +1114,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *textHaloColor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *textHaloColor;
 #endif
 
 /**
