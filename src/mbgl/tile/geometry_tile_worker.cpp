@@ -215,6 +215,8 @@ void GeometryTileWorker::redoLayout() {
     BucketParameters parameters { id, obsolete, *featureIndex, mode };
 
     std::vector<std::vector<std::unique_ptr<Layer>>> groups = groupByLayout(std::move(*layers));
+    layers = nullopt;
+
     for (auto& group : groups) {
         if (obsolete) {
             return;
@@ -280,7 +282,7 @@ bool GeometryTileWorker::hasPendingSymbolDependencies() const {
 }
 
 void GeometryTileWorker::attemptPlacement() {
-    if (!data || !layers || !placementConfig) {
+    if (!placementConfig) {
         return;
     }
 
