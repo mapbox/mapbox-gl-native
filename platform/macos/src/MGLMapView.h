@@ -100,6 +100,12 @@ IB_DESIGNABLE
     explicitly versioned style using a convenience method like
     `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
     inspectable in Interface Builder, or a manually constructed `NSURL`.
+ 
+ @note Wait until the map style has finished loading before modifying a map's
+    style via any of the `MGLStyle` instance methods. You can use the
+    `-[MGLMapViewDelegate mapView:didFinishLoadingStyle:]` or
+    `-[MGLMapViewDelegate mapViewDidFinishLoadingMap:]` methods as indicators
+    that it's safe to modify the map's style.
  */
 @property (nonatomic, readonly) MGLStyle *style;
 
