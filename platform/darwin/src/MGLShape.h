@@ -17,6 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
  types in the GeoJSON standard, but some have nonstandard names for backwards
  compatibility.
  
+ Although you do not create instances of this class directly, you can use its
+ `+[MGLShape shapeWithData:encoding:error:]` factory method to create one of the
+ concrete subclasses of `MGLShape` noted above from GeoJSON data.
+ 
  You can add shapes to the map by adding them to an `MGLShapeSource` object.
  Configure the appearance of an `MGLShapeSource`’s or `MGLVectorSource`’s shapes
  collectively using a concrete instance of `MGLVectorStyleLayer`. Alternatively,
