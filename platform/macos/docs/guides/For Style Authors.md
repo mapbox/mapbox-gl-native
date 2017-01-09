@@ -267,6 +267,12 @@ For padding attributes, note that the arguments to
 `EdgeInsets(top:left:bottom:right:)` in Swift are specified in counterclockwise
 order, in contrast to the clockwise order defined by the style specification.
 
+Additionally, on macOS, a screen coordinate of (0, 0) is located at the
+lower-left corner of the screen. Therefore, a positive `CGVector.dy` means an
+offset or translation upward, while a negative `CGVector.dy` means an offset or
+translation downward. This is the reverse of how `CGVector` is interpreted on
+iOS.
+
 ## Filtering sources
 
 You can filter a shape or vector source by setting the

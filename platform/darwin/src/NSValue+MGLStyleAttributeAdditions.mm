@@ -12,6 +12,11 @@
 + (instancetype)mgl_valueWithOffsetArray:(std::array<float, 2>)offsetArray
 {
     CGVector vector = CGVectorMake(offsetArray[0], offsetArray[1]);
+#if !TARGET_OS_IPHONE
+    // Style specification assumes an origin at the upper-left corner.
+    // macOS defines an origin at the lower-left corner.
+    vector.dy *= -1;
+#endif
     return [NSValue value:&vector withObjCType:@encode(CGVector)];
 }
 
@@ -33,6 +38,9 @@
     NSAssert(strcmp(self.objCType, @encode(CGVector)) == 0, @"Value does not represent a CGVector");
     CGVector vector;
     [self getValue:&vector];
+#if !TARGET_OS_IPHONE
+    vector.dy *= -1;
+#endif
     return {
         static_cast<float>(vector.dx),
         static_cast<float>(vector.dy),
