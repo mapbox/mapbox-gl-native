@@ -112,6 +112,9 @@ workflows:
         inputs:
         - content: |-
             #!/bin/bash
+            echo "Replace dummy keystore.propertiesfile for release signing the apk:"
+            rm -f platform/android/keystore.properties && wget -O platform/android/keystore.properties "$BITRISEIO_KEYSTORE_PROPERTIES_URL"
+
             echo "Downloading Mapbox accesstoken for running tests:"
             wget -O platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml "$BITRISEIO_TEST_ACCESS_TOKEN_UI_TEST_URL"
 
@@ -121,7 +124,7 @@ workflows:
             echo "Run tests on firebase:"
             gcloud auth activate-service-account --key-file secret.json --project android-gl-native
             gcloud beta test android devices list
-            gcloud beta test android run --type instrumentation --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest.apk --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 15m --test-targets "class com.mapbox.mapboxsdk.testapp.maps.widgets.AttributionTest"
+            gcloud beta test android run --type instrumentation --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-release.apk --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest.apk --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 15m --test-targets "class com.mapbox.mapboxsdk.testapp.maps.widgets.AttributionTest"
     - script:
         title: Download Firebase results
         run_if: '{{enveq "SKIPCI" "false"}}'

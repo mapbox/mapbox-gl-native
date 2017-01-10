@@ -591,7 +591,7 @@ run-android-wear-unit-test:
 
 .PHONY: android-ui-test
 android-ui-test:
-	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:assembleDebug --continue && ./gradlew :MapboxGLAndroidSDKTestApp:assembleAndroidTest --continue
+	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:assembleRelease --continue && ./gradlew :MapboxGLAndroidSDKTestApp:assembleAndroidTest --continue
 
 .PHONY: run-android-ui-test
 run-android-ui-test:
