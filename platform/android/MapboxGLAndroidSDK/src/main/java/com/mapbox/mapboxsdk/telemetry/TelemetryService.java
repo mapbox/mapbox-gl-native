@@ -8,6 +8,7 @@ import android.content.pm.ServiceInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 
 import timber.log.Timber;
 
@@ -55,9 +56,10 @@ public class TelemetryService extends Service {
     Timber.i("onCreate() called");
 
     // Enable Location Listening for lifecycle of app
-    IntentFilter filter = new IntentFilter(TelemetryLocationReceiver.INTENT_STRING);
-    telemetryLocationReceiver = new TelemetryLocationReceiver();
-    registerReceiver(telemetryLocationReceiver, filter);
+    LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
+      new TelemetryLocationReceiver(),
+      new IntentFilter(TelemetryLocationReceiver.INTENT_STRING)
+    );
   }
 
   /**
