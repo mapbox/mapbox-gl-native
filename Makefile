@@ -573,6 +573,9 @@ run-android: run-android-arm-v7
 run-android-unit-test:
 	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:testDebugUnitTest --continue
 
+run-android-unit-test-%:
+	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:testDebugUnitTest --tests "$*"
+
 .PHONY: run-android-wear-unit-test
 run-android-wear-unit-test:
 	cd platform/android && ./gradlew :MapboxGLAndroidSDKWearTestApp:testDebugUnitTest --continue
@@ -584,6 +587,9 @@ android-ui-test:
 .PHONY: run-android-ui-test
 run-android-ui-test:
 	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:connectedAndroidTest -i
+
+run-android-ui-test-%:
+		cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="$*"
 
 .PHONY: run-android-ui-test-aws
 run-android-ui-test-aws:
