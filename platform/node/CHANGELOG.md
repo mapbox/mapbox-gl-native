@@ -1,3 +1,7 @@
+# 3.4.3 - January 9, 2017
+
+- Adds `map.addImage()` and `map.removeImage()` APIs ([#7610](https://github.com/mapbox/mapbox-gl-native/pull/7610))
+
 # 3.4.2 - November 15, 2016
 
 - Switches back to publishing Linux binaries with GLX, to eliminate a runtime dependency on `libOSMesa.so.8` and enable dynamically linking against `libGL.so` provided by an alternate implementation, such as the NVIDIA proproetary drivers ([#7503](https://github.com/mapbox/mapbox-gl-native/pull/7053))
