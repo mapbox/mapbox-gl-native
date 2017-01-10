@@ -21,13 +21,13 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.services.Constants;
-import com.mapbox.services.commons.ServicesException;
+import com.mapbox.services.api.ServicesException;
 import com.mapbox.services.commons.geojson.LineString;
 import com.mapbox.services.commons.models.Position;
-import com.mapbox.services.directions.v5.DirectionsCriteria;
-import com.mapbox.services.directions.v5.MapboxDirections;
-import com.mapbox.services.directions.v5.models.DirectionsResponse;
-import com.mapbox.services.directions.v5.models.DirectionsRoute;
+import com.mapbox.services.api.directions.v5.DirectionsCriteria;
+import com.mapbox.services.api.directions.v5.MapboxDirections;
+import com.mapbox.services.api.directions.v5.models.DirectionsResponse;
+import com.mapbox.services.api.directions.v5.models.DirectionsRoute;
 
 import java.util.ArrayList;
 import java.util.List;

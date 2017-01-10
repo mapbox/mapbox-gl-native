@@ -12,8 +12,8 @@ dependencies {
     compile 'com.mapzen.android:lost:2.0.0'
     compile 'com.jakewharton.timber:timber:4.3.1'
 
-    // Mapbox Android Services
-    compile('com.mapbox.mapboxsdk:mapbox-java-services:1.3.1@jar') {
+    // Mapbox Android Services (GeoJSON support)
+    compile('com.mapbox.mapboxsdk:mapbox-java-geojson:2.0.0-SNAPSHOT@jar') {
         transitive = true
     }
 }
