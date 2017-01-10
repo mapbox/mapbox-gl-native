@@ -2293,7 +2293,7 @@ public:
 
 - (MGLStyle *)style
 {
-    if (_isWaitingForStyleLoad) {
+    if (_isWaitingForStyleLoad && _style) {
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
             NSLog(@"WARNING: -[MGLMapView style] was called before -[MGLMapViewDelegate mapView:didFinishLoadingStyle:]. Wait for the map to finish loading the style before attempting to change the style at runtime. This warning will only appear once.");
