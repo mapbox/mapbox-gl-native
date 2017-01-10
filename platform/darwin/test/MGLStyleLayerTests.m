@@ -4,7 +4,9 @@
 
 #define TEST_STRICT_NAMING_CONVENTIONS 0
 
-@implementation MGLStyleLayerTests
+@implementation MGLStyleLayerTests {
+    XCTestExpectation *_styleLoadingExpectation;
+}
 
 @dynamic layerType;
 
@@ -26,10 +28,13 @@
     [windowController showWindow:nil];
 #endif
     XCTAssertNil(self.mapView.style);
-    [self keyValueObservingExpectationForObject:self.mapView keyPath:@"style" handler:^BOOL(MGLMapView * _Nonnull observedMapView, NSDictionary * _Nonnull change) {
-        return observedMapView.style != nil;
-    }];
+    _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
     [self waitForExpectationsWithTimeout:1 handler:nil];
+}
+
+- (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
+    XCTAssertNotNil(mapView.style);
+    [_styleLoadingExpectation fulfill];
 }
 
 - (void)tearDown {
