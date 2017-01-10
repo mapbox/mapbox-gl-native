@@ -278,4 +278,43 @@
     XCTAssert(shape.shapes.count == 6, @"Shape collection should contain 6 shapes");
 }
 
+- (void)testMGLShapeSourceWithFeaturesConvenienceInitializer {
+    CLLocationCoordinate2D coordinates[] = {
+        CLLocationCoordinate2DMake(100.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 1.0),
+        CLLocationCoordinate2DMake(100.0, 1.0),
+        CLLocationCoordinate2DMake(100.0, 0.0)};
+
+    MGLPolygonFeature *polygonFeature = [MGLPolygonFeature polygonWithCoordinates:coordinates count:sizeof(coordinates)/sizeof(coordinates[0]) interiorPolygons:nil];
+
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" features:@[polygonFeature] options:nil];
+    MGLShapeCollectionFeature *shape = (MGLShapeCollectionFeature *)source.shape;
+
+    XCTAssertTrue([shape isKindOfClass:[MGLShapeCollectionFeature class]]);
+    XCTAssertEqual(shape.shapes.count, 1, @"Shape collection should contain 1 shape");
+
+    // when a shape is included in the features array
+    MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:coordinates count:sizeof(coordinates)/sizeof(coordinates[0]) interiorPolygons:nil];
+
+    XCTAssertThrowsSpecificNamed([[MGLShapeSource alloc] initWithIdentifier:@"source-id-invalid" features:@[polygon] options:nil], NSException, NSInvalidArgumentException, @"Shape source should raise an exception if a shape is sent to the features initializer");
+}
+
+- (void)testMGLShapeSourceWithShapesConvenienceInitializer {
+    CLLocationCoordinate2D coordinates[] = {
+        CLLocationCoordinate2DMake(100.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 1.0),
+        CLLocationCoordinate2DMake(100.0, 1.0),
+        CLLocationCoordinate2DMake(100.0, 0.0)};
+
+    MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:coordinates count:sizeof(coordinates)/sizeof(coordinates[0]) interiorPolygons:nil];
+
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shapes:@[polygon] options:nil];
+    MGLShapeCollectionFeature *shape = (MGLShapeCollectionFeature *)source.shape;
+
+    XCTAssertTrue([shape isKindOfClass:[MGLShapeCollection class]]);
+    XCTAssertEqual(shape.shapes.count, 1, @"Shape collection should contain 1 shape");
+}
+
 @end
