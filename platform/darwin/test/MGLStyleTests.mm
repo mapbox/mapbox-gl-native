@@ -39,7 +39,13 @@
     [super setUp];
     
     [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
-    self.mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+    self.mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 100, 100) styleURL:styleURL];
+    XCTAssertNil(self.mapView.style);
+    [self keyValueObservingExpectationForObject:self.mapView keyPath:@"style" handler:^BOOL(MGLMapView * _Nonnull observedMapView, NSDictionary * _Nonnull change) {
+        return observedMapView.style != nil;
+    }];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
 - (void)tearDown {
@@ -250,12 +256,16 @@
     [self.style insertLayer:layer0 belowLayer:layer1];
     
     NSArray<MGLStyleLayer *> *layers = [self.style layers];
+    NSUInteger startIndex = 0;
+    if ([layers.firstObject.identifier isEqualToString:@"com.mapbox.annotations.points"]) {
+        startIndex++;
+    }
     
-    XCTAssert([[layers[0] identifier] isEqualToString:layer0.identifier]);
-    XCTAssert([[layers[1] identifier] isEqualToString:layer1.identifier]);
-    XCTAssert([[layers[2] identifier] isEqualToString:layer2.identifier]);
-    XCTAssert([[layers[3] identifier] isEqualToString:layer3.identifier]);
-    XCTAssert([[layers[4] identifier] isEqualToString:layer4.identifier]);
+    XCTAssertEqualObjects(layers[startIndex++].identifier, layer0.identifier);
+    XCTAssertEqualObjects(layers[startIndex++].identifier, layer1.identifier);
+    XCTAssertEqualObjects(layers[startIndex++].identifier, layer2.identifier);
+    XCTAssertEqualObjects(layers[startIndex++].identifier, layer3.identifier);
+    XCTAssertEqualObjects(layers[startIndex++].identifier, layer4.identifier);
 }
 
 @end

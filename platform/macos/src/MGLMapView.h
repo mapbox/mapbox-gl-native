@@ -94,6 +94,13 @@ IB_DESIGNABLE
  Unlike the `styleURL` property, this property is set to an object that allows
  you to manipulate every aspect of the style locally.
  
+ If the style is loading, this property is set to `nil` until the style finishes
+ loading. If the style has failed to load, this property is set to `nil`.
+ Because the style loads asynchronously, you should manipulate it in the
+ `-[MGLMapViewDelegate mapView:didFinishLoadingStyle:]` or
+ `-[MGLMapViewDelegate mapViewDidFinishLoadingMap:]` method. It is not possible
+ to manipulate the style before it has finished loading.
+ 
  @note The default styles provided by Mapbox contain sources and layers with
     identifiers that will change over time. Applications that use APIs that
     manipulate a style's sources and layers must first set the style URL to an
@@ -101,7 +108,7 @@ IB_DESIGNABLE
     `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
     inspectable in Interface Builder, or a manually constructed `NSURL`.
  */
-@property (nonatomic, readonly) MGLStyle *style;
+@property (nonatomic, readonly, nullable) MGLStyle *style;
 
 /**
  URL of the style currently displayed in the receiver.

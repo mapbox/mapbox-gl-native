@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
          MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
      ]
  ])
- mapView.style.addSource(source)
+ mapView.style?.addSource(source)
  ```
  */
 @interface MGLVectorSource : MGLTileSource

@@ -47,7 +47,7 @@ extern const MGLTileSourceOption MGLTileSourceOptionTileSize;
          MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
      ]
  ])
- mapView.style.addSource(source)
+ mapView.style?.addSource(source)
  ```
  */
 @interface MGLRasterSource : MGLTileSource

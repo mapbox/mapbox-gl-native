@@ -68,10 +68,10 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         let polyline = MGLPolylineFeature(coordinates: &coordinates, count: UInt(coordinates.count))
         let shape = MGLShapeCollectionFeature(shapes: [polyline])
         let source = MGLShapeSource(identifier: "lines", shape: shape, options: nil)
-        mapView.style.addSource(source)
+        mapView.style?.addSource(source)
         //#-end-example-code
 
-        XCTAssertNotNil(mapView.style.source(withIdentifier: "lines"))
+        XCTAssertNotNil(mapView.style?.source(withIdentifier: "lines"))
     }
 
     func testMGLRasterSource() {
@@ -84,10 +84,10 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
                 MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
             ]
         ])
-        mapView.style.addSource(source)
+        mapView.style?.addSource(source)
         //#-end-example-code
 
-        XCTAssertNotNil(mapView.style.source(withIdentifier: "clouds"))
+        XCTAssertNotNil(mapView.style?.source(withIdentifier: "clouds"))
     }
 
     func testMGLVectorSource() {
@@ -99,15 +99,15 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
                 MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
             ]
         ])
-        mapView.style.addSource(source)
+        mapView.style?.addSource(source)
         //#-end-example-code
 
-        XCTAssertNotNil(mapView.style.source(withIdentifier: "pois"))
+        XCTAssertNotNil(mapView.style?.source(withIdentifier: "pois"))
     }
 
     func testMGLCircleStyleLayer() {
         let population = MGLVectorSource(identifier: "population", configurationURL: URL(string: "https://example.com/style.json")!)
-        mapView.style.addSource(population)
+        mapView.style?.addSource(population)
         
         //#-example-code
         let layer = MGLCircleStyleLayer(identifier: "circles", source: population)
@@ -119,15 +119,15 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         ])
         layer.circleOpacity = MGLStyleValue(rawValue: 0.7)
         layer.predicate = NSPredicate(format: "%K == %@", "marital-status", "married")
-        mapView.style.addLayer(layer)
+        mapView.style?.addLayer(layer)
         //#-end-example-code
 
-        XCTAssertNotNil(mapView.style.layer(withIdentifier: "circles"))
+        XCTAssertNotNil(mapView.style?.layer(withIdentifier: "circles"))
     }
 
     func testMGLLineStyleLayer() {
         let trails = MGLVectorSource(identifier: "trails", configurationURL: URL(string: "https://example.com/style.json")!)
-        mapView.style.addSource(trails)
+        mapView.style?.addSource(trails)
 
         //#-example-code
         let layer = MGLLineStyleLayer(identifier: "trails-path", source: trails)
@@ -139,30 +139,30 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         layer.lineColor = MGLStyleValue(rawValue: .brown)
         layer.lineCap = MGLStyleValue(rawValue: NSValue(mglLineCap: .round))
         layer.predicate = NSPredicate(format: "%K == %@", "trail-type", "mountain-biking")
-        mapView.style.addLayer(layer)
+        mapView.style?.addLayer(layer)
         //#-end-example-code
 
-        XCTAssertNotNil(mapView.style.layer(withIdentifier: "trails-path"))
+        XCTAssertNotNil(mapView.style?.layer(withIdentifier: "trails-path"))
     }
 
     func testMGLFillStyleLayer() {
         let parks = MGLVectorSource(identifier: "parks", configurationURL: URL(string: "https://example.com/style.json")!)
-        mapView.style.addSource(parks)
+        mapView.style?.addSource(parks)
 
         //#-example-code
         let layer = MGLFillStyleLayer(identifier: "parks", source: parks)
         layer.sourceLayerIdentifier = "parks"
         layer.fillColor = MGLStyleValue(rawValue: .green)
         layer.predicate = NSPredicate(format: "type == %@", "national-park")
-        mapView.style.addLayer(layer)
+        mapView.style?.addLayer(layer)
         //#-end-example-code
 
-        XCTAssertNotNil(mapView.style.layer(withIdentifier: "parks"))
+        XCTAssertNotNil(mapView.style?.layer(withIdentifier: "parks"))
     }
 
     func testMGLSymbolStyleLayer() {
         let pois = MGLVectorSource(identifier: "pois", configurationURL: URL(string: "https://example.com/style.json")!)
-        mapView.style.addSource(pois)
+        mapView.style?.addSource(pois)
 
         //#-example-code
         let layer = MGLSymbolStyleLayer(identifier: "coffeeshops", source: pois)
@@ -179,10 +179,10 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         layer.textJustification = MGLStyleValue(rawValue: NSValue(mglTextJustification: .left))
         layer.textAnchor = MGLStyleValue(rawValue: NSValue(mglTextAnchor: .left))
         layer.predicate = NSPredicate(format: "%K == %@", "venue-type", "coffee")
-        mapView.style.addLayer(layer)
+        mapView.style?.addLayer(layer)
         //#-end-example-code
 
-        XCTAssertNotNil(mapView.style.layer(withIdentifier: "coffeeshops"))
+        XCTAssertNotNil(mapView.style?.layer(withIdentifier: "coffeeshops"))
     }
 
     func testMGLRasterStyleLayer() {
@@ -194,28 +194,28 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
                 MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
             ]
         ])
-        mapView.style.addSource(source)
+        mapView.style?.addSource(source)
 
         //#-example-code
         let layer = MGLRasterStyleLayer(identifier: "clouds", source: source)
         layer.rasterOpacity = MGLStyleValue(rawValue: 0.5)
-        mapView.style.addLayer(layer)
+        mapView.style?.addLayer(layer)
         //#-end-example-code
 
-        XCTAssertNotNil(mapView.style.layer(withIdentifier: "clouds"))
+        XCTAssertNotNil(mapView.style?.layer(withIdentifier: "clouds"))
     }
 
     func testMGLVectorStyleLayer$predicate() {
         let terrain = MGLVectorSource(identifier: "terrain", configurationURL: URL(string: "https://example.com/style.json")!)
-        mapView.style.addSource(terrain)
+        mapView.style?.addSource(terrain)
 
         //#-example-code
         let layer = MGLLineStyleLayer(identifier: "contour", source: terrain)
         layer.sourceLayerIdentifier = "contours"
         layer.predicate = NSPredicate(format: "(index == 5 || index == 10) && ele >= 1500.0")
-        mapView.style.addLayer(layer)
+        mapView.style?.addLayer(layer)
         //#-end-example-code
 
-        XCTAssertNotNil(mapView.style.layer(withIdentifier: "contour"))
+        XCTAssertNotNil(mapView.style?.layer(withIdentifier: "contour"))
     }
 }

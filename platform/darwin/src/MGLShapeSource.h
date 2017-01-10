@@ -105,7 +105,7 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
  let polyline = MGLPolylineFeature(coordinates: &coordinates, count: UInt(coordinates.count))
  let shape = MGLShapeCollectionFeature(shapes: [polyline])
  let source = MGLShapeSource(identifier: "lines", shape: shape, options: nil)
- mapView.style.addSource(source)
+ mapView.style?.addSource(source)
  ```
  */
 @interface MGLShapeSource : MGLSource

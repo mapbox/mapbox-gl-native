@@ -590,6 +590,10 @@ public:
 
 #pragma mark Style
 
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingStyle {
+    return [NSSet setWithObject:@"styleURL"];
+}
+
 - (nonnull NSURL *)styleURL {
     NSString *styleURLString = @(_mbglMap->getStyleURL().c_str()).mgl_stringOrNilIfEmpty;
     return styleURLString ? [NSURL URLWithString:styleURLString] : [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
@@ -611,16 +615,18 @@ public:
     }
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
-    [self willChangeValueForKey:@"style"];
-    _style = [[MGLStyle alloc] initWithMapView:self];
+    self.style = nil;
     _mbglMap->setStyleURL(styleURL.absoluteString.UTF8String);
-    [self didChangeValueForKey:@"style"];
 }
 
 - (IBAction)reloadStyle:(__unused id)sender {
     NSURL *styleURL = self.styleURL;
     _mbglMap->setStyleURL("");
     self.styleURL = styleURL;
+}
+
+- (mbgl::Map *)mbglMap {
+    return _mbglMap;
 }
 
 #pragma mark View hierarchy and drawing
@@ -916,11 +922,7 @@ public:
         }
         case mbgl::MapChangeDidFinishLoadingStyle:
         {
-            [self.style willChangeValueForKey:@"name"];
-            [self.style willChangeValueForKey:@"sources"];
-            [self.style didChangeValueForKey:@"sources"];
-            [self.style willChangeValueForKey:@"layers"];
-            [self.style didChangeValueForKey:@"layers"];
+            self.style = [[MGLStyle alloc] initWithMapView:self];
             if ([self.delegate respondsToSelector:@selector(mapView:didFinishLoadingStyle:)])
             {
                 [self.delegate mapView:self didFinishLoadingStyle:self.style];
@@ -2266,13 +2268,6 @@ public:
     if (callout) {
         callout.positioningRect = [self positioningRectForCalloutForAnnotationWithTag:_selectedAnnotationTag];
     }
-}
-
-#pragma mark - Runtime styling
-
-- (mbgl::Map *)mbglMap
-{
-    return _mbglMap;
 }
 
 #pragma mark MGLMultiPointDelegate methods

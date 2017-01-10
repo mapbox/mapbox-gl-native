@@ -273,7 +273,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  layer.textJustification = MGLStyleValue(rawValue: NSValue(mglTextJustification: .left))
  layer.textAnchor = MGLStyleValue(rawValue: NSValue(mglTextAnchor: .left))
  layer.predicate = NSPredicate(format: "%K == %@", "venue-type", "coffee")
- mapView.style.addLayer(layer)
+ mapView.style?.addLayer(layer)
  ```
  */
 @interface MGLSymbolStyleLayer : MGLVectorStyleLayer
