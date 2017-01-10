@@ -313,7 +313,12 @@ public:
     MGLCompassDirectionFormatter *_accessibilityCompassFormatter;
     
     NS_ARRAY_OF(MGLAttributionInfo *) *_attributionInfos;
+
+    // True while the map view is loading a style
+    BOOL _isWaitingForStyleLoad;
 }
+
+@synthesize style = _style;
 
 #pragma mark - Setup & Teardown -
 
@@ -370,7 +375,7 @@ public:
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
     [self willChangeValueForKey:@"style"];
-    _style = [[MGLStyle alloc] initWithMapView:self];
+    self.style = [[MGLStyle alloc] initWithMapView:self];
     _mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
     [self didChangeValueForKey:@"style"];
 }
@@ -389,6 +394,8 @@ public:
 - (void)commonInit
 {
     MGLinitializeRunLoop();
+
+    _isWaitingForStyleLoad = YES;
 
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
     _opaque = YES;
@@ -1979,6 +1986,25 @@ public:
 - (void)emptyMemoryCache
 {
     _mbglMap->onLowMemory();
+}
+
+- (void)setStyle:(MGLStyle *)style
+{
+    if (style != _style) {
+        _isWaitingForStyleLoad = YES;
+        _style = style;
+    }
+}
+
+- (MGLStyle *)style
+{
+    if (_isWaitingForStyleLoad && _style) {
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            NSLog(@"WARNING: -[MGLMapView style] was called before -[MGLMapViewDelegate mapView:didFinishLoadingStyle:]. Wait for the map to finish loading the style before attempting to change the style at runtime. This warning will only appear once.");
+        });
+    }
+    return _style;
 }
 
 #pragma mark - Accessibility -
@@ -4682,6 +4708,7 @@ public:
         }
         case mbgl::MapChangeDidFinishLoadingStyle:
         {
+            _isWaitingForStyleLoad = NO;
             [self.style willChangeValueForKey:@"name"];
             [self.style willChangeValueForKey:@"sources"];
             [self.style didChangeValueForKey:@"sources"];

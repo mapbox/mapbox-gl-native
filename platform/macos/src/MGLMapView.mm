@@ -193,7 +193,12 @@ public:
 
     /// True if the view is currently printing itself.
     BOOL _isPrinting;
+
+    // True while the map view is loading a style
+    BOOL _isWaitingForStyleLoad;
 }
+
+@synthesize style = _style;
 
 #pragma mark Lifecycle
 
@@ -240,6 +245,8 @@ public:
 
 - (void)commonInit {
     MGLinitializeRunLoop();
+
+    _isWaitingForStyleLoad = YES;
 
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
 
@@ -916,6 +923,7 @@ public:
         }
         case mbgl::MapChangeDidFinishLoadingStyle:
         {
+            _isWaitingForStyleLoad = NO;
             [self.style willChangeValueForKey:@"name"];
             [self.style willChangeValueForKey:@"sources"];
             [self.style didChangeValueForKey:@"sources"];
@@ -2273,6 +2281,25 @@ public:
 - (mbgl::Map *)mbglMap
 {
     return _mbglMap;
+}
+
+- (void)setStyle:(MGLStyle *)style
+{
+    if (style != _style) {
+        _isWaitingForStyleLoad = YES;
+        _style = style;
+    }
+}
+
+- (MGLStyle *)style
+{
+    if (_isWaitingForStyleLoad && _style) {
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            NSLog(@"WARNING: -[MGLMapView style] was called before -[MGLMapViewDelegate mapView:didFinishLoadingStyle:]. Wait for the map to finish loading the style before attempting to change the style at runtime. This warning will only appear once.");
+        });
+    }
+    return _style;
 }
 
 #pragma mark MGLMultiPointDelegate methods
