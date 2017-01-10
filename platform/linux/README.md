@@ -22,6 +22,12 @@ Ensure you have git and other build essentials:
                          libcurl4-openssl-dev libpng-dev libsqlite3-dev \
                          libllvm3.4
 
+Ensure you have cmake 3.x:
+
+    sudo add-apt-repository --yes ppa:george-edison55/cmake-3.x
+    sudo apt-get update
+    sudo apt-get install cmake cmake-data
+
 Install glfw3 dependencies:
 
     sudo apt-get install libxi-dev libglu1-mesa-dev x11proto-randr-dev \
