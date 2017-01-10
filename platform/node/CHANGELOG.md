@@ -1,3 +1,7 @@
+# 3.4.4 - January 10, 2017
+
+- Updates the node binary publish location on s3 to reflect new package name ([#7653](https://github.com/mapbox/mapbox-gl-native/pull/7653))
+
 # 3.4.3 - January 9, 2017
 
 - Adds `map.addImage()` and `map.removeImage()` APIs ([#7610](https://github.com/mapbox/mapbox-gl-native/pull/7610))
