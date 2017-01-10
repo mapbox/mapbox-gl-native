@@ -77,7 +77,7 @@
                                         "s3:PutObjectAcl"
                                     ],
                                     "Resource": [
-                                        "arn:aws:s3:::mapbox-node-binary/mapbox-gl-native/*"
+                                        "arn:aws:s3:::mapbox-node-binary/@mapbox/mapbox-gl-native/*"
                                     ],
                                     "Effect": "Allow"
                                 }
