@@ -4,9 +4,7 @@
 
 #define TEST_STRICT_NAMING_CONVENTIONS 0
 
-@implementation MGLStyleLayerTests {
-    XCTestExpectation *_styleLoadingExpectation;
-}
+@implementation MGLStyleLayerTests
 
 @dynamic layerType;
 
@@ -21,20 +19,19 @@
     [vc view]; // Force load xib
     _mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 256, 256) styleURL:styleURL];
     [vc.view addSubview:_mapView];
-    _mapView.delegate = self;
 #else
     NSWindowController *windowController = [[NSWindowController alloc] initWithWindowNibName:@"MGLStyleLayerTests" owner:self];
-    self.mapView.styleURL = styleURL;
+    NSView *contentView = windowController.window.contentView;
+    _mapView = [[MGLMapView alloc] initWithFrame:contentView.bounds styleURL:styleURL];
+    [contentView addSubview:_mapView];
     [windowController showWindow:nil];
 #endif
-    XCTAssertNil(self.mapView.style);
-    _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
+    _mapView.delegate = self;
+    XCTAssertNil(_mapView.style);
+    [self keyValueObservingExpectationForObject:self.mapView keyPath:@"style" handler:^BOOL(MGLMapView * _Nonnull observedMapView, NSDictionary * _Nonnull change) {
+        return observedMapView.style != nil;
+    }];
     [self waitForExpectationsWithTimeout:1 handler:nil];
-}
-
-- (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
-    XCTAssertNotNil(mapView.style);
-    [_styleLoadingExpectation fulfill];
 }
 
 - (void)tearDown {
