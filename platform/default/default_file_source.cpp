@@ -160,13 +160,13 @@ private:
     std::unordered_map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
 };
 
-DefaultFileSource::DefaultFileSource(Scheduler&,
+DefaultFileSource::DefaultFileSource(Scheduler& scheduler,
                                      const std::string& cachePath,
                                      const std::string& assetRoot,
                                      uint64_t maximumCacheSize)
     : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"DefaultFileSource", util::ThreadPriority::Low},
             cachePath, maximumCacheSize)),
-      assetFileSource(std::make_unique<AssetFileSource>(assetRoot)),
+      assetFileSource(std::make_unique<AssetFileSource>(scheduler, assetRoot)),
       localFileSource(std::make_unique<LocalFileSource>()) {
 }
 
