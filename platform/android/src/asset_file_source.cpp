@@ -35,15 +35,6 @@ struct ZipFileHolder {
 
 namespace mbgl {
 
-class AssetFileRequest : public AsyncRequest {
-public:
-    AssetFileRequest(std::unique_ptr<WorkRequest> workRequest_)
-        : workRequest(std::move(workRequest_)) {
-    }
-
-    std::unique_ptr<WorkRequest> workRequest;
-};
-
 class AssetFileSource::Impl {
 public:
     Impl(const std::string& root_)
