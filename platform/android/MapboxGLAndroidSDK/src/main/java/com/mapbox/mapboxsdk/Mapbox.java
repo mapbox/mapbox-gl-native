@@ -18,6 +18,16 @@ public final class Mapbox {
   private String accessToken;
   private Boolean connected;
 
+  /**
+   * Get an instance of Mapbox.
+   * <p>
+   * This class manages the active access token, application context and connectivity state.
+   * </p>
+   *
+   * @param context     Android context which holds or is an application context
+   * @param accessToken Mapbox access token
+   * @return the single instance of Mapbox
+   */
   public static synchronized Mapbox getInstance(@NonNull Context context, @NonNull String accessToken) {
     if (INSTANCE == null) {
       Context appContext = context.getApplicationContext();
@@ -70,7 +80,7 @@ public final class Mapbox {
    * @param connected flag to determine the connectivity state, true for connected, false for
    *                  disconnected, null for ConnectivityManager to determine.
    */
-  public static void setConnected(Boolean connected) {
+  public static synchronized void setConnected(Boolean connected) {
     // Connectivity state overridden by app
     INSTANCE.connected = connected;
   }
@@ -81,7 +91,7 @@ public final class Mapbox {
    *
    * @return true if there is an Internet connection, false otherwise
    */
-  public static Boolean isConnected() {
+  public static synchronized Boolean isConnected() {
     if (INSTANCE.connected != null) {
       // Connectivity state overridden by app
       return INSTANCE.connected;
