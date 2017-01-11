@@ -42,7 +42,7 @@ By default, annotations added to the map are displayed with a red pin ([example]
 
 If you’re looking to add custom `UIView`s or have annotations that are dynamic or animatable, consider an `MGLAnnotationView` instead of an `MGLAnnotationImage` ([example](https://www.mapbox.com/ios-sdk/examples/annotation-views/)).
 
-Annotation views have big advantages over annotation images when you need every annotation to be unique. For example, annotation views are ideal for showing user locations on a map using high-resolution profile pictures.
+Annotation views have significant advantages over annotation images when you need every annotation to be unique. For example, annotation views are ideal for showing user locations on a map using high-resolution profile pictures.
 
 To use annotation views, implement `MGLMapViewDelegate` `-mapView:viewForAnnotation` and provide a custom `MGLAnnotationView` (`UIView`) subclass.
 
@@ -51,8 +51,8 @@ To use annotation views, implement `MGLMapViewDelegate` `-mapView:viewForAnnotat
 * Custom, native UIViews
 * No limit on style or image size
 * Full support for animations
-* Familiar API for MapKit users
 * Relative control over z-ordering using the `zPosition` property on `CALayer`
+* [Familiar API for MapKit users](https://www.mapbox.com/help/switch-mapkit/#annotations-pins)
 
 **Cons**
 
