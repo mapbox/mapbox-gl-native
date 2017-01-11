@@ -434,21 +434,15 @@ const NSTimeInterval MGLFlushInterval = 180;
     return nil;
 }
 
-- (void)updateDictionary:(NSMutableDictionary *)dictionary withKey:(NSString *)key value:(id)value {
-    if (key && value) {
-        [dictionary setValue:value forKey:key];
-    }
-}
-
 - (MGLMapboxEventAttributes *)locationEventWithAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
     MGLMutableMapboxEventAttributes *attributes = [NSMutableDictionary dictionary];
-    [self updateDictionary:attributes withKey:MGLEventKeyEvent value:MGLEventTypeLocation];
-    [self updateDictionary:attributes withKey:MGLEventKeySource value:MGLEventSource];
-    [self updateDictionary:attributes withKey:MGLEventKeySessionId value:self.instanceID];
-    [self updateDictionary:attributes withKey:MGLEventKeyOperatingSystem value:self.data.iOSVersion];
+    attributes[MGLEventKeyEvent] = MGLEventTypeLocation;
+    attributes[MGLEventKeySource] = MGLEventSource;
+    attributes[MGLEventKeySessionId] = self.instanceID;
+    attributes[MGLEventKeyOperatingSystem] = self.data.iOSVersion;
     NSString *currentApplicationState = [self applicationState];
     if (![currentApplicationState isEqualToString:MGLApplicationStateUnknown]) {
-        [self updateDictionary:attributes withKey:MGLEventKeyApplicationState value:currentApplicationState];
+        attributes[MGLEventKeyApplicationState] = currentApplicationState;
     }
 
     return [self eventForAttributes:attributes attributeDictionary:attributeDictionary];
@@ -456,37 +450,37 @@ const NSTimeInterval MGLFlushInterval = 180;
 
 - (MGLMapboxEventAttributes *)mapLoadEventWithAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
     MGLMutableMapboxEventAttributes *attributes = [NSMutableDictionary dictionary];
-    [self updateDictionary:attributes withKey:MGLEventKeyEvent value:MGLEventTypeMapLoad];
-    [self updateDictionary:attributes withKey:MGLEventKeyCreated value:[self.rfc3339DateFormatter stringFromDate:[NSDate date]]];
-    [self updateDictionary:attributes withKey:MGLEventKeyVendorID value:self.data.vendorId];
-    [self updateDictionary:attributes withKey:MGLEventKeyModel value:self.data.model];
-    [self updateDictionary:attributes withKey:MGLEventKeyOperatingSystem value:self.data.iOSVersion];
-    [self updateDictionary:attributes withKey:MGLEventKeyResolution value:@(self.data.scale)];
-    [self updateDictionary:attributes withKey:MGLEventKeyAccessibilityFontScale value:@([self contentSizeScale])];
-    [self updateDictionary:attributes withKey:MGLEventKeyOrientation value:[self deviceOrientation]];
-    [self updateDictionary:attributes withKey:MGLEventKeyWifi value:@([[MGLReachability reachabilityForLocalWiFi] isReachableViaWiFi])];
+    attributes[MGLEventKeyEvent] = MGLEventTypeMapLoad;
+    attributes[MGLEventKeyCreated] = [self.rfc3339DateFormatter stringFromDate:[NSDate date]];
+    attributes[MGLEventKeyVendorID] = self.data.vendorId;
+    attributes[MGLEventKeyModel] = self.data.model;
+    attributes[MGLEventKeyOperatingSystem] = self.data.iOSVersion;
+    attributes[MGLEventKeyResolution] = @(self.data.scale);
+    attributes[MGLEventKeyAccessibilityFontScale] = @([self contentSizeScale]);
+    attributes[MGLEventKeyOrientation] = [self deviceOrientation];
+    attributes[MGLEventKeyWifi] = @([[MGLReachability reachabilityForLocalWiFi] isReachableViaWiFi]);
 
     return [self eventForAttributes:attributes attributeDictionary:attributeDictionary];
 }
 
 - (MGLMapboxEventAttributes *)mapClickEventWithAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
     MGLMutableMapboxEventAttributes *attributes = [self interactionEvent];
-    [self updateDictionary:attributes withKey:MGLEventKeyEvent value:MGLEventTypeMapTap];
+    attributes[MGLEventKeyEvent] = MGLEventTypeMapTap;
     return [self eventForAttributes:attributes attributeDictionary:attributeDictionary];
 }
 
 - (MGLMapboxEventAttributes *)mapDragEndEventWithAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
     MGLMutableMapboxEventAttributes *attributes = [self interactionEvent];
-    [self updateDictionary:attributes withKey:MGLEventKeyEvent value:MGLEventTypeMapDragEnd];
+    attributes[MGLEventKeyEvent] = MGLEventTypeMapDragEnd;
 
     return [self eventForAttributes:attributes attributeDictionary:attributeDictionary];
 }
 
 - (MGLMutableMapboxEventAttributes *)interactionEvent {
     MGLMutableMapboxEventAttributes *attributes = [NSMutableDictionary dictionary];
-    [self updateDictionary:attributes withKey:MGLEventKeyCreated value:[self.rfc3339DateFormatter stringFromDate:[NSDate date]]];
-    [self updateDictionary:attributes withKey:MGLEventKeyOrientation value:[self deviceOrientation]];
-    [self updateDictionary:attributes withKey:MGLEventKeyWifi value:@([[MGLReachability reachabilityForLocalWiFi] isReachableViaWiFi])];
+    attributes[MGLEventKeyCreated] = [self.rfc3339DateFormatter stringFromDate:[NSDate date]];
+    attributes[MGLEventKeyOrientation] = [self deviceOrientation];
+    attributes[MGLEventKeyWifi] = @([[MGLReachability reachabilityForLocalWiFi] isReachableViaWiFi]);
 
     return attributes;
 }
