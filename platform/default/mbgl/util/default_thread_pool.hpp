@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/actor/scheduler.hpp>
+#include <mbgl/util/thread_context.hpp>
 
 #include <condition_variable>
 #include <mutex>
@@ -11,7 +12,7 @@ namespace mbgl {
 
 class ThreadPool : public Scheduler {
 public:
-    ThreadPool(std::size_t count);
+    ThreadPool(std::size_t count, const util::ThreadContext&);
     ~ThreadPool() override;
 
     void schedule(std::weak_ptr<Mailbox>) override;

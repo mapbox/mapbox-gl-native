@@ -59,7 +59,7 @@ public:
     HeadlessBackend backend { test::sharedDisplay() };
     OffscreenView view{ backend.getContext(), { 512, 512 } };
     StubFileSource fileSource;
-    ThreadPool threadPool { 4 };
+    ThreadPool threadPool{ 4, { "Worker" } };
 
 private:
     Response response(const std::string& path) {

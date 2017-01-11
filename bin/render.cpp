@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
 
     HeadlessBackend backend;
     OffscreenView view(backend.getContext(), { width * pixelRatio, height * pixelRatio });
-    ThreadPool threadPool(4);
+    ThreadPool threadPool(4, { "Worker" });
     Map map(backend, mbgl::Size { width, height }, pixelRatio, fileSource, threadPool, MapMode::Still);
 
     if (util::isURL(style_path)) {

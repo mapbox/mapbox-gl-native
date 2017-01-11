@@ -29,7 +29,7 @@ public:
     HeadlessBackend backend { test::sharedDisplay() };
     OffscreenView view { backend.getContext() };
     StubFileSource fileSource;
-    ThreadPool threadPool { 4 };
+    ThreadPool threadPool { 4, { "Worker" } };
     Map map { backend, view.size, 1, fileSource, threadPool, MapMode::Still };
 };
 

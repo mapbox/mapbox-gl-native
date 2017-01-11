@@ -30,7 +30,7 @@ TEST(ActorRef, CanOutliveActor) {
         }
     };
 
-    ThreadPool pool { 1 };
+    ThreadPool pool { 1, { "ActorRefCanOutliveActor" } };
     bool died = false;
 
     ActorRef<Test> test = [&] () {

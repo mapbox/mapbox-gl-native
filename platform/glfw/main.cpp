@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
         fileSource.setAccessToken(std::string(token));
     }
 
-    mbgl::ThreadPool threadPool(4);
+    mbgl::ThreadPool threadPool(4, { "Worker" });
 
     mbgl::Map map(backend, view->getSize(), view->getPixelRatio(), fileSource, threadPool);
 

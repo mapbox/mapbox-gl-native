@@ -19,7 +19,7 @@ TEST(Actor, Construction) {
         };
     };
 
-    ThreadPool pool { 1 };
+    ThreadPool pool { 1, { "ActorConstruction" } };
     bool constructed = false;
     Actor<Test> test(pool, std::ref(constructed));
 
@@ -52,7 +52,7 @@ TEST(Actor, DestructionClosesMailbox) {
         }
     };
 
-    ThreadPool pool { 1 };
+    ThreadPool pool { 1, { "ActorDestructionClosesMailbox" } };
 
     std::promise<void> enteredPromise;
     std::future<void> enteredFuture = enteredPromise.get_future();
@@ -88,7 +88,7 @@ TEST(Actor, OrderedMailbox) {
         }
     };
 
-    ThreadPool pool { 1 };
+    ThreadPool pool { 1, { "ActorOrderedMailbox" } };
 
     std::promise<void> endedPromise;
     std::future<void> endedFuture = endedPromise.get_future();
@@ -124,7 +124,7 @@ TEST(Actor, NonConcurrentMailbox) {
         }
     };
 
-    ThreadPool pool { 10 };
+    ThreadPool pool { 10, { "ActorNonConcurrentMailbox" } };
 
     std::promise<void> endedPromise;
     std::future<void> endedFuture = endedPromise.get_future();

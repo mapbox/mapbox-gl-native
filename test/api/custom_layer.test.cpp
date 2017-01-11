@@ -95,7 +95,7 @@ TEST(CustomLayer, Basic) {
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
 #endif
 
-    ThreadPool threadPool(4);
+    ThreadPool threadPool{ 4, { "Worker" } };
 
     Map map(backend, view.size, 1, fileSource, threadPool, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));

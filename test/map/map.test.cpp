@@ -26,7 +26,7 @@ struct MapTest {
     HeadlessBackend backend { test::sharedDisplay() };
     OffscreenView view { backend.getContext() };
     StubFileSource fileSource;
-    ThreadPool threadPool { 4 };
+    ThreadPool threadPool{ 4, { "Worker" } };
 };
 
 TEST(Map, LatLngBehavior) {
@@ -475,7 +475,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     util::RunLoop runLoop;
     MockBackend backend { test::sharedDisplay() };
     OffscreenView view { backend.getContext() };
-    ThreadPool threadPool { 4 };
+    ThreadPool threadPool{ 4, { "Worker" } };
 
 #ifdef MBGL_ASSET_ZIP
     // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`

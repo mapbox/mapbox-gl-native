@@ -22,7 +22,7 @@ public:
     FakeFileSource fileSource;
     TransformState transformState;
     util::RunLoop loop;
-    ThreadPool threadPool { 1 };
+    ThreadPool threadPool{ 1, { "Worker" } };
     AnnotationManager annotationManager { 1.0 };
     style::Style style { fileSource, 1.0 };
     Tileset tileset { { "https://example.com" }, { 0, 22 }, "none" };

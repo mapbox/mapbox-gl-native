@@ -30,7 +30,7 @@ TEST(API, RepeatedRender) {
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
 #endif
 
-    ThreadPool threadPool(4);
+    ThreadPool threadPool{ 4, { "Worker" } };
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 

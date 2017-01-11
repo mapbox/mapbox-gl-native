@@ -41,7 +41,7 @@ NativeMapView::NativeMapView(JNIEnv *env_, jobject obj_, float pixelRatio, int a
     : env(env_),
       availableProcessors(availableProcessors_),
       totalMemory(totalMemory_),
-      threadPool(4) {
+      threadPool(4, { "Worker" }) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
 
     assert(env_ != nullptr);
