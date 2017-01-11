@@ -71,9 +71,9 @@ TEST(Function, Stops) {
     EXPECT_EQ("string2", evaluate(discrete_0, 10));
 
     Function<bool> discreteBool({{1, false}, {3, true}}, 1);
-    EXPECT_EQ(false, evaluate(discreteBool, 0));
-    EXPECT_EQ(false, evaluate(discreteBool, 1));
-    EXPECT_EQ(false, evaluate(discreteBool, 2));
-    EXPECT_EQ(true, evaluate(discreteBool, 3));
-    EXPECT_EQ(true, evaluate(discreteBool, 4));
+    EXPECT_FALSE(evaluate(discreteBool, 0));
+    EXPECT_FALSE(evaluate(discreteBool, 1));
+    EXPECT_FALSE(evaluate(discreteBool, 2));
+    EXPECT_TRUE(evaluate(discreteBool, 3));
+    EXPECT_TRUE(evaluate(discreteBool, 4));
 }
