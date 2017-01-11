@@ -51,7 +51,7 @@ static const CGFloat MGLRasterSourceRetinaTileSize = 512;
     if (self = [super initWithIdentifier:identifier tileURLTemplates:tileURLTemplates options:options]) {
         mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
         
-        uint16_t tileSize;
+        uint16_t tileSize = MGLRasterSourceRetinaTileSize;
         if (NSNumber *tileSizeNumber = options[MGLTileSourceOptionTileSize]) {
             if (![tileSizeNumber isKindOfClass:[NSNumber class]]) {
                 [NSException raise:NSInvalidArgumentException
