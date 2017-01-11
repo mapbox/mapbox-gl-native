@@ -57,15 +57,11 @@
     
     return ((!_reuseIdentifier && !otherAnnotationImage.reuseIdentifier) || [_reuseIdentifier isEqualToString:otherAnnotationImage.reuseIdentifier])
     && _enabled == otherAnnotationImage.enabled
-    && ((!_image && !otherAnnotationImage.image) || [UIImagePNGRepresentation(_image) isEqualToData:UIImagePNGRepresentation(otherAnnotationImage.image)]);
+    && ((!_image && !otherAnnotationImage.image) || [_image isEqual:otherAnnotationImage.image]);
 }
 
 - (NSUInteger)hash {
-    NSUInteger hash;
-    hash += [_reuseIdentifier hash];
-    hash += _enabled;
-    hash += [_image hash];
-    return hash;
+    return _reuseIdentifier.hash + _enabled + _image.hash;
 }
 
 - (void)setImage:(UIImage *)image {
