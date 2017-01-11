@@ -192,7 +192,6 @@ template void Statement::bind(int, int8_t);
 template void Statement::bind(int, int32_t);
 template void Statement::bind(int, int64_t);
 template void Statement::bind(int, uint8_t);
-template void Statement::bind(int, bool);
 
 template <typename T>
 void Statement::bind(int offset, T value) {
@@ -208,6 +207,11 @@ void Statement::bind(int offset, std::nullptr_t) {
     // Field numbering starts at 0.
     impl->query.bindValue(offset - 1, QVariant(QVariant::Invalid), QSql::In);
     checkQueryError(impl->query);
+}
+
+template <>
+void Statement::bind(int offset, bool value) {
+    bind(offset, static_cast<int>(value));
 }
 
 template <>
