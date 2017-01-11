@@ -33,6 +33,8 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
   - Rename to reflect the increased responsibilities introduced in prior releases
 * AnnotationManager refactor [#6067](https://github.com/mapbox/mapbox-gl-native/issues/6067)
   - Extracting all business logic related to annotations into a seperate class cfr. to core and the iOS codebase
+* Gesture handling bugs
+  - Avoid calls to onFling when while pinch zooming [#7666](https://github.com/mapbox/mapbox-gl-native/issues/7666)
 
 ## 4.2.1 - December 22, 2016
 
