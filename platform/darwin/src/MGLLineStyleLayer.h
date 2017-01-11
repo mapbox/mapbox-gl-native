@@ -100,7 +100,7 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslationAnchor) {
  layer.lineColor = MGLStyleValue(rawValue: .brown)
  layer.lineCap = MGLStyleValue(rawValue: NSValue(mglLineCap: .round))
  layer.predicate = NSPredicate(format: "%K == %@", "trail-type", "mountain-biking")
- mapView.style.addLayer(layer)
+ mapView.style?.addLayer(layer)
  ```
  */
 @interface MGLLineStyleLayer : MGLVectorStyleLayer
