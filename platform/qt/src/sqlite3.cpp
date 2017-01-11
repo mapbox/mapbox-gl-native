@@ -233,7 +233,7 @@ void Statement::bind(int offset, optional<mbgl::Timestamp> value) {
     }
 }
 
-void Statement::bind(int offset, const char* value, std::size_t length, bool /* retain */) {
+void Statement::bind(int offset, const char* value, std::size_t length, bool retain) {
     assert(impl);
     if (length > std::numeric_limits<int>::max()) {
         // Kept for consistence with the default implementation.
@@ -241,22 +241,23 @@ void Statement::bind(int offset, const char* value, std::size_t length, bool /* 
     }
 
     // Field numbering starts at 0.
-    impl->query.bindValue(offset - 1, QString::fromLatin1(value, length), QSql::In);
+    impl->query.bindValue(offset - 1, retain ? QByteArray(value, length) :
+            QByteArray::fromRawData(value, length), QSql::In);
+
     checkQueryError(impl->query);
 }
 
-void Statement::bind(int offset, const std::string& value, bool /* retain */) {
-    // Field numbering starts at 0.
-    impl->query.bindValue(offset - 1, QString::fromStdString(value), QSql::In);
-    checkQueryError(impl->query);
+void Statement::bind(int offset, const std::string& value, bool retain) {
+    bind(offset, value.data(), value.size(), retain);
 }
 
-void Statement::bindBlob(int offset, const void* value, std::size_t length, bool /* retain */) {
-    assert(impl);
+void Statement::bindBlob(int offset, const void* value_, std::size_t length, bool retain) {
     const char* value = reinterpret_cast<const char*>(value_);
 
     // Field numbering starts at 0.
-    impl->query.bindValue(offset - 1, QByteArray(reinterpret_cast<const char*>(value), length), QSql::In | QSql::Binary);
+    impl->query.bindValue(offset - 1, retain ? QByteArray(value, length) :
+            QByteArray::fromRawData(value, length), QSql::In | QSql::Binary);
+
     checkQueryError(impl->query);
 }
 
