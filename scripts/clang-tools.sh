@@ -5,8 +5,8 @@ set -o pipefail
 
 export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
 
-CLANG_TIDY=${CLANG_TIDY:-$(mason prefix clang-tidy 3.8.0)/bin/clang-tidy}
-CLANG_FORMAT=${CLANG_FORMAT:-$(mason prefix clang-format 3.8.0)/bin/clang-format}
+CLANG_TIDY=${CLANG_TIDY:-$(mason prefix clang-tidy 3.9.1)/bin/clang-tidy}
+CLANG_FORMAT=${CLANG_FORMAT:-$(mason prefix clang-format 3.9.1)/bin/clang-format}
 
 command -v ${CLANG_TIDY} >/dev/null 2>&1 || {
     echo "Can't find ${CLANG_TIDY} in PATH."

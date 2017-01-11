@@ -188,8 +188,8 @@ compdb: $(BUILD_DEPS) $(TEST_DEPS) $(MACOS_COMPDB_PATH)/Makefile
 
 .PHONY: clang-tools
 clang-tools: compdb
-	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
-	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
+	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.9.1; fi
+	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.9.1; fi
 	$(MAKE) -C $(MACOS_COMPDB_PATH) mbgl-headers
 
 .PHONY: tidy
@@ -355,8 +355,8 @@ compdb: $(LINUX_BUILD)
 
 .PHONY: clang-tools
 clang-tools: compdb
-	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
-	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
+	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.9.1; fi
+	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.9.1; fi
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-headers
 
 .PHONY: tidy
