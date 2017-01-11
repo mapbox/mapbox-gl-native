@@ -1,14 +1,14 @@
 # Runtime Styling
 
-Mapbox's runtime styling features allow you direct control over every layer in your maps with code. It's now possible to create dynamic maps and visualizations that aren't possible with other mobile maps SDKs.
+Mapbox’s runtime styling features allow you direct control over every layer in your maps with code. It’s now possible to create dynamic maps and visualizations that aren’t possible with other mobile maps SDKs.
 
 Runtime styling expands upon the design power of [Mapbox Studio](https://www.mapbox.com/mapbox-studio/) and exposes all of the same properties and attributes directly to mobile developers in our SDK.
 
-Beyond the custom styled maps that you can create with Mapbox Studio, you can now change the look and feel of your map on the fly having maps in your app visually respond to user interaction or or context. Or leverage the power of OpenGL for highly performant and complex data visualizations. Now it's possible to mix in your own data and bring your map to life.
+Beyond the custom styled maps that you can create with Mapbox Studio, you can now change the look and feel of your map on the fly having maps in your app visually respond to user interaction or or context. Or leverage the power of OpenGL for highly performant and complex data visualizations. Now it’s possible to mix in your own data and bring your map to life.
 
 ## Example use cases
 
-As an example of what's possible with runtime styling, consider some of the following use cases:
+As an example of what’s possible with runtime styling, consider some of the following use cases:
 
 ### Styling maps on the fly
 
@@ -16,11 +16,11 @@ At runtime, you can tailor the map specifically to your user interface. Tweak co
 
 ![dynamic styles](img/runtime-styling/DynamicStyles.gif "an example showing dynamic styles")
 
-For maps that aren't going to change in response to custom data or user interaction, consider creating a custom map style with [Mapbox Studio](https://www.mapbox.com/mapbox-studio/).
+For maps that aren’t going to change in response to custom data or user interaction, consider creating a custom map style with [Mapbox Studio](https://www.mapbox.com/mapbox-studio/).
 
 ### Map interactivity
 
-You can customize the map to the point of having it respond dynamically based on the actions your users are taking. Increase the text size of streets while a user is driving, emphasize points of interest tailored to a user's preferences, or change your UI if users are at parks, trails, landmarks, or rivers.
+You can customize the map to the point of having it respond dynamically based on the actions your users are taking. Increase the text size of streets while a user is driving, emphasize points of interest tailored to a user’s preferences, or change your UI if users are at parks, trails, landmarks, or rivers.
 
 ![emojis](img/runtime-styling/Emoji.gif "an example showing emoji interaction")
 
@@ -51,5 +51,3 @@ Draw custom shapes on the map the same way you would a custom `UIView` or `CALay
 * [Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-style-spec/)
 * [Mapbox Studio](https://www.mapbox.com/mapbox-studio/)
 * [iOS code examples](https://www.mapbox.com/ios-sdk/examples/)
-
-Contact support@mapbox.com with futher questions about how to leverage runtime styling.
