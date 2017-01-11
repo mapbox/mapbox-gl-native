@@ -1,4 +1,3 @@
-#ifndef NDEBUG
 #include <mbgl/gl/debugging.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/extension.hpp>
@@ -190,5 +189,3 @@ group::~group() {
 } // namespace debugging
 } // namespace gl
 } // namespace mbgl
-
-#endif
