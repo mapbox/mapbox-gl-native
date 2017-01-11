@@ -36,14 +36,14 @@ addons_shortcuts:
       packages:
         - *common_packages
         - *gcc5_packages
-        - [ 'libjemalloc-dev', 'mesa-utils', 'qt4-default' ]
+        - [ 'libjemalloc-dev', 'mesa-utils', 'qt4-default', 'libqt4-sql-mysql' ]
   addons_qt5: &qt5
     apt:
       sources: *common_sources
       packages:
         - *common_packages
         - *gcc5_packages
-        - [ 'mesa-utils', 'libc6-dbg', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev', 'qtpositioning5-dev', 'qtlocation5-dev' ]
+        - [ 'mesa-utils', 'libc6-dbg', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev', 'qtpositioning5-dev', 'qtlocation5-dev', 'libqt5sql5-sqlite' ]
 
 env:
   global:
