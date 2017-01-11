@@ -10,6 +10,7 @@
 #import "MGLGeometry_Private.h"
 #import "MGLMultiPoint_Private.h"
 #import "MGLOfflineStorage_Private.h"
+#import "MGLThreadPool_Private.h"
 #import "MGLStyle_Private.h"
 
 #import "MGLAccountManager.h"
@@ -23,7 +24,6 @@
 #import <mbgl/annotation/annotation.hpp>
 #import <mbgl/map/camera.hpp>
 #import <mbgl/storage/reachability.h>
-#import <mbgl/util/default_thread_pool.hpp>
 #import <mbgl/gl/extension.hpp>
 #import <mbgl/gl/context.hpp>
 #import <mbgl/map/backend.hpp>
@@ -150,7 +150,6 @@ public:
     /// Cross-platform map view controller.
     mbgl::Map *_mbglMap;
     MGLMapViewImpl *_mbglView;
-    mbgl::ThreadPool *_mbglThreadPool;
 
     NSPanGestureRecognizer *_panGestureRecognizer;
     NSMagnificationGestureRecognizer *_magnificationGestureRecognizer;
@@ -257,10 +256,13 @@ public:
     NSURL *legacyCacheURL = [cachesDirectoryURL URLByAppendingPathComponent:@"cache.db"];
     [[NSFileManager defaultManager] removeItemAtURL:legacyCacheURL error:NULL];
 
-    mbgl::DefaultFileSource* mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
+    mbgl::DefaultFileSource* mbglFileSource =
+        [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
 
-    _mbglThreadPool = new mbgl::ThreadPool(4, { "Worker" });
-    _mbglMap = new mbgl::Map(*_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
+    _mbglMap = new mbgl::Map(*_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor,
+                             *mbglFileSource, *[MGLThreadPool sharedPool].mbglThreadPool,
+                             mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique,
+                             mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
     [self validateTileCacheSize];
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
@@ -509,10 +511,6 @@ public:
     if (_mbglView) {
         delete _mbglView;
         _mbglView = nullptr;
-    }
-    if (_mbglThreadPool) {
-        delete _mbglThreadPool;
-        _mbglThreadPool = nullptr;
     }
 }
 

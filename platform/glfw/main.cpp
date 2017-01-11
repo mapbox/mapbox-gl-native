@@ -108,7 +108,9 @@ int main(int argc, char *argv[]) {
     GLFWView backend(fullscreen, benchmark);
     view = &backend;
 
-    mbgl::DefaultFileSource fileSource("/tmp/mbgl-cache.db", ".");
+    mbgl::ThreadPool threadPool(4, { "Worker" });
+
+    mbgl::DefaultFileSource fileSource(threadPool, "/tmp/mbgl-cache.db", ".");
 
     // Set access token if present
     const char *token = getenv("MAPBOX_ACCESS_TOKEN");
@@ -117,8 +119,6 @@ int main(int argc, char *argv[]) {
     } else {
         fileSource.setAccessToken(std::string(token));
     }
-
-    mbgl::ThreadPool threadPool(4, { "Worker" });
 
     mbgl::Map map(backend, view->getSize(), view->getPixelRatio(), fileSource, threadPool);
 

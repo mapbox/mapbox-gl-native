@@ -22,6 +22,7 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
     using namespace mbgl;
 
     util::RunLoop loop;
+    ThreadPool threadPool{ 4, { "Worker" } };
 
     const auto style = util::read_file("test/fixtures/api/water_missing_tiles.json");
 
@@ -29,12 +30,10 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
     OffscreenView view { backend.getContext(), { 256, 512 } };
 #ifdef MBGL_ASSET_ZIP
     // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
+    DefaultFileSource fileSource(threadPool, ":memory:", "test/fixtures/api/assets.zip");
 #else
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
+    DefaultFileSource fileSource(threadPool, ":memory:", "test/fixtures/api/assets");
 #endif
-
-    ThreadPool threadPool{ 4, { "Worker" } };
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 

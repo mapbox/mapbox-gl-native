@@ -69,7 +69,8 @@ int main(int argc, char *argv[]) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    DefaultFileSource fileSource(cache_file, asset_root);
+    ThreadPool threadPool(4, { "Worker" });
+    DefaultFileSource fileSource(threadPool, cache_file, asset_root);
 
     // Try to load the token from the environment.
     if (!token.size()) {
@@ -86,7 +87,6 @@ int main(int argc, char *argv[]) {
 
     HeadlessBackend backend;
     OffscreenView view(backend.getContext(), { width * pixelRatio, height * pixelRatio });
-    ThreadPool threadPool(4, { "Worker" });
     Map map(backend, mbgl::Size { width, height }, pixelRatio, fileSource, threadPool, MapMode::Still);
 
     if (util::isURL(style_path)) {

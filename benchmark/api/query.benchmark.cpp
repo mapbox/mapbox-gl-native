@@ -35,8 +35,8 @@ public:
     util::RunLoop loop;
     HeadlessBackend backend;
     OffscreenView view{ backend.getContext(), { 1000, 1000 } };
-    DefaultFileSource fileSource{ "benchmark/fixtures/api/cache.db", "." };
     ThreadPool threadPool{ 4, { "Worker" } };
+    DefaultFileSource fileSource{ threadPool, "benchmark/fixtures/api/cache.db", "." };
     Map map{ backend, view.size, 1, fileSource, threadPool, MapMode::Still };
     ScreenBox box{{ 0, 0 }, { 1000, 1000 }};
 };

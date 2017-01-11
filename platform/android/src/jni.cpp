@@ -11,6 +11,7 @@
 #include "jni.hpp"
 #include "java_types.hpp"
 #include "native_map_view.hpp"
+#include "shared_thread_pool.hpp"
 #include "connectivity_listener.hpp"
 #include "style/layers/layers.hpp"
 #include "style/sources/sources.hpp"
@@ -1236,7 +1237,8 @@ void nativeScheduleTakeSnapshot(JNIEnv *env, jni::jobject* obj, jlong nativeMapV
 jlong createDefaultFileSource(JNIEnv *env, jni::jobject* obj, jni::jstring* cachePath_, jni::jstring* assetRoot_, jlong maximumCacheSize) {
     std::string cachePath = std_string_from_jstring(env, cachePath_);
     std::string assetRoot = std_string_from_jstring(env, assetRoot_);
-    mbgl::DefaultFileSource *defaultFileSource = new mbgl::DefaultFileSource(cachePath, assetRoot, maximumCacheSize);
+    mbgl::DefaultFileSource* defaultFileSource = new mbgl::DefaultFileSource(
+        mbgl::android::sharedThreadPool(), cachePath, assetRoot, maximumCacheSize);
     jlong defaultFileSourcePtr = reinterpret_cast<jlong>(defaultFileSource);
     return defaultFileSourcePtr;
 }

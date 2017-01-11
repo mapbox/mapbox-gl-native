@@ -1,5 +1,6 @@
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/io.hpp>
 
@@ -55,7 +56,8 @@ int main(int argc, char *argv[]) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    DefaultFileSource fileSource(output, ".");
+    ThreadPool threadPool{ 2, { "Worker" } };
+    DefaultFileSource fileSource(threadPool, output, ".");
     std::unique_ptr<OfflineRegion> region;
 
     fileSource.setAccessToken(token);

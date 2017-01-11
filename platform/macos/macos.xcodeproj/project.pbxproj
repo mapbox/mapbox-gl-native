@@ -57,6 +57,8 @@
 		40B77E461DB11BCD003DA2FE /* NSArray+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 40B77E421DB11BB0003DA2FE /* NSArray+MGLAdditions.mm */; };
 		40E1601D1DF217D6005EA6D9 /* MGLStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 40E1601B1DF216E6005EA6D9 /* MGLStyleLayerTests.m */; };
 		52BECB0A1CC5A26F009CD791 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52BECB091CC5A26F009CD791 /* SystemConfiguration.framework */; };
+		553B1F051E267AD900606163 /* MGLThreadPool_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 553B1F021E267AD900606163 /* MGLThreadPool_Private.h */; };
+		553B1F071E267AD900606163 /* MGLThreadPool.mm in Sources */ = {isa = PBXBuildFile; fileRef = 553B1F041E267AD900606163 /* MGLThreadPool.mm */; };
 		5548BE781D09E718005DDE81 /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */; };
 		556660C61E1BEA0100E2C41B /* MGLFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 556660C51E1BEA0100E2C41B /* MGLFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		556660D61E1D07E400E2C41B /* MGLVersionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 556660D51E1D07E400E2C41B /* MGLVersionNumber.m */; };
@@ -305,6 +307,8 @@
 		40E1601A1DF216E6005EA6D9 /* MGLStyleLayerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLStyleLayerTests.h; sourceTree = "<group>"; };
 		40E1601B1DF216E6005EA6D9 /* MGLStyleLayerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLStyleLayerTests.m; sourceTree = "<group>"; };
 		52BECB091CC5A26F009CD791 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		553B1F021E267AD900606163 /* MGLThreadPool_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLThreadPool_Private.h; sourceTree = "<group>"; };
+		553B1F041E267AD900606163 /* MGLThreadPool.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLThreadPool.mm; sourceTree = "<group>"; };
 		5548BE791D0ACBB2005DDE81 /* libmbgl-loop-darwin.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-loop-darwin.a"; path = "cmake/Debug/libmbgl-loop-darwin.a"; sourceTree = "<group>"; };
 		5548BE7B1D0ACBBD005DDE81 /* libmbgl-loop-darwin.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-loop-darwin.a"; path = "cmake/Debug/libmbgl-loop-darwin.a"; sourceTree = "<group>"; };
 		556660C51E1BEA0100E2C41B /* MGLFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLFoundation.h; sourceTree = "<group>"; };
@@ -916,6 +920,8 @@
 				DAE6C3571CC31E0400DB3429 /* MGLStyle.h */,
 				3537CA731D3F93A600380318 /* MGLStyle_Private.h */,
 				DAE6C37A1CC31E2A00DB3429 /* MGLStyle.mm */,
+				553B1F021E267AD900606163 /* MGLThreadPool_Private.h */,
+				553B1F041E267AD900606163 /* MGLThreadPool.mm */,
 				DAE6C3591CC31E0400DB3429 /* MGLTypes.h */,
 				DAE6C37C1CC31E2A00DB3429 /* MGLTypes.m */,
 				DA87A99F1DC9DC6200810D09 /* MGLValueEvaluator.h */,
@@ -1009,6 +1015,7 @@
 				352742811D4C243B00A1ECE6 /* MGLSource.h in Headers */,
 				DAE6C3C21CC31F4500DB3429 /* Mapbox.h in Headers */,
 				DAE6C3641CC31E0400DB3429 /* MGLPolygon.h in Headers */,
+				553B1F051E267AD900606163 /* MGLThreadPool_Private.h in Headers */,
 				DA35A2BF1CCA9B1A00E826B2 /* MGLClockDirectionFormatter.h in Headers */,
 				35602BFA1D3EA99F0050646F /* MGLFillStyleLayer.h in Headers */,
 				DA35A2A41CC9EB1A00E826B2 /* MGLCoordinateFormatter.h in Headers */,
@@ -1267,6 +1274,7 @@
 				DA35A2D01CCAAED300E826B2 /* NSValue+MGLAdditions.m in Sources */,
 				3538AA241D542685008EC33D /* MGLStyleLayer.mm in Sources */,
 				DA35A2C01CCA9B1A00E826B2 /* MGLClockDirectionFormatter.m in Sources */,
+				553B1F071E267AD900606163 /* MGLThreadPool.mm in Sources */,
 				DAE6C3BA1CC31EF300DB3429 /* MGLOpenGLLayer.mm in Sources */,
 				DAE6C38A1CC31E2A00DB3429 /* MGLMultiPoint.mm in Sources */,
 				DAE6C3961CC31E2A00DB3429 /* MGLTypes.m in Sources */,

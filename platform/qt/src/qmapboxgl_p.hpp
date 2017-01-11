@@ -37,8 +37,8 @@ public:
 
     QMapboxGL *q_ptr { nullptr };
 
-    std::unique_ptr<mbgl::DefaultFileSource> fileSourceObj;
     mbgl::ThreadPool threadPool;
+    std::unique_ptr<mbgl::DefaultFileSource> fileSourceObj;
     std::unique_ptr<mbgl::Map> mapObj;
 
     bool dirty { false };

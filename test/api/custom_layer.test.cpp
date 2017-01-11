@@ -84,18 +84,17 @@ public:
 
 TEST(CustomLayer, Basic) {
     util::RunLoop loop;
+    ThreadPool threadPool{ 4, { "Worker" } };
 
     HeadlessBackend backend { test::sharedDisplay() };
     OffscreenView view { backend.getContext() };
 
 #ifdef MBGL_ASSET_ZIP
     // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
+    DefaultFileSource fileSource(threadPool, ":memory:", "test/fixtures/api/assets.zip");
 #else
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
+    DefaultFileSource fileSource(threadPool, ":memory:", "test/fixtures/api/assets");
 #endif
-
-    ThreadPool threadPool{ 4, { "Worker" } };
 
     Map map(backend, view.size, 1, fileSource, threadPool, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));

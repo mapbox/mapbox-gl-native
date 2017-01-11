@@ -1,5 +1,6 @@
 #include "native_map_view.hpp"
 #include "jni.hpp"
+#include "shared_thread_pool.hpp"
 
 #include <cstdlib>
 #include <ctime>
@@ -40,8 +41,7 @@ void log_egl_string(EGLDisplay display, EGLint name, const char *label) {
 NativeMapView::NativeMapView(JNIEnv *env_, jobject obj_, float pixelRatio, int availableProcessors_, size_t totalMemory_)
     : env(env_),
       availableProcessors(availableProcessors_),
-      totalMemory(totalMemory_),
-      threadPool(4, { "Worker" }) {
+      totalMemory(totalMemory_) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
 
     assert(env_ != nullptr);
@@ -59,12 +59,13 @@ NativeMapView::NativeMapView(JNIEnv *env_, jobject obj_, float pixelRatio, int a
     }
 
     fileSource = std::make_unique<mbgl::DefaultFileSource>(
+        sharedThreadPool(),
         mbgl::android::cachePath + "/mbgl-offline.db",
         mbgl::android::apkPath);
 
     map = std::make_unique<mbgl::Map>(
         *this, mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) },
-        pixelRatio, *fileSource, threadPool, MapMode::Continuous);
+        pixelRatio, *fileSource, sharedThreadPool(), MapMode::Continuous);
 
     float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
     float cpuFactor    = availableProcessors;

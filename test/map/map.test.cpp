@@ -47,7 +47,7 @@ TEST(Map, LatLngBehavior) {
 
 TEST(Map, Offline) {
     MapTest test;
-    DefaultFileSource fileSource(":memory:", ".");
+    DefaultFileSource fileSource(test.threadPool, ":memory:", ".");
 
     auto expiredItem = [] (const std::string& path) {
         Response response;
@@ -479,9 +479,9 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
 
 #ifdef MBGL_ASSET_ZIP
     // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
+    DefaultFileSource fileSource(threadPool, ":memory:", "test/fixtures/api/assets.zip");
 #else
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
+    DefaultFileSource fileSource(threadPool, ":memory:", "test/fixtures/api/assets");
 #endif
 
     Map map(backend, view.size, 1, fileSource, threadPool, MapMode::Continuous);

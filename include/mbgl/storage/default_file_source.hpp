@@ -8,6 +8,8 @@
 
 namespace mbgl {
 
+class Scheduler;
+
 namespace util {
 template <typename T> class Thread;
 } // namespace util
@@ -21,7 +23,8 @@ public:
      * regions, we want the database to remain fairly small (order tens or low hundreds
      * of megabytes).
      */
-    DefaultFileSource(const std::string& cachePath,
+    DefaultFileSource(Scheduler&,
+                      const std::string& cachePath,
                       const std::string& assetRoot,
                       uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
     ~DefaultFileSource() override;
