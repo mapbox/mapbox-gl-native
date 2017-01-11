@@ -446,7 +446,10 @@ const NSTimeInterval MGLFlushInterval = 180;
     [self updateDictionary:attributes withKey:MGLEventKeySource value:MGLEventSource];
     [self updateDictionary:attributes withKey:MGLEventKeySessionId value:self.instanceID];
     [self updateDictionary:attributes withKey:MGLEventKeyOperatingSystem value:self.data.iOSVersion];
-    [self addApplicationStateToAttributes:attributes];
+    NSString *currentApplicationState = [self applicationState];
+    if (![currentApplicationState isEqualToString:MGLApplicationStateUnknown]) {
+        [self updateDictionary:attributes withKey:MGLEventKeyApplicationState value:currentApplicationState];
+    }
 
     return [self eventForAttributes:attributes attributeDictionary:attributeDictionary];
 }
@@ -605,29 +608,6 @@ const NSTimeInterval MGLFlushInterval = 180;
     }
     
     return result;
-}
-
-- (void)addBatteryStateToAttributes:(MGLMutableMapboxEventAttributes *)attributes {
-    UIDeviceBatteryState batteryState = [[UIDevice currentDevice] batteryState];
-    switch (batteryState) {
-        case UIDeviceBatteryStateCharging:
-        case UIDeviceBatteryStateFull:
-            attributes[MGLEventKeyPluggedIn] = @(YES);
-            break;
-        case UIDeviceBatteryStateUnplugged:
-            attributes[MGLEventKeyPluggedIn] = @(NO);
-            break;
-        default:
-            // do nothing
-            break;
-    }
-}
-
-- (void)addApplicationStateToAttributes:(MGLMutableMapboxEventAttributes *)attributes {
-    NSString *currentApplicationState = [self applicationState];
-    if (![currentApplicationState isEqualToString:MGLApplicationStateUnknown]) {
-        attributes[MGLEventKeyApplicationState] = currentApplicationState;
-    }
 }
 
 + (void)ensureMetricsOptoutExists {
