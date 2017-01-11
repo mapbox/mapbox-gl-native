@@ -49,6 +49,7 @@ final class MapGestureDetector {
   private boolean dragStarted = false;
   private boolean quickZoom = false;
   private boolean scrollInProgress = false;
+  private boolean scaleGestureOccurred = false;
 
   MapGestureDetector(Context context, Transform transform, Projection projection, UiSettings uiSettings,
                      TrackingSettings trackingSettings, AnnotationManager annotationManager) {
@@ -111,7 +112,8 @@ final class MapGestureDetector {
     // Handle two finger tap
     switch (event.getActionMasked()) {
       case MotionEvent.ACTION_DOWN:
-        // First pointer down
+        // First pointer down, reset scaleGestureOccurred, used to avoid triggering a fling after a scale gesture #7666
+        scaleGestureOccurred = false;
         transform.setGestureInProgress(true);
         break;
 
@@ -294,7 +296,9 @@ final class MapGestureDetector {
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-      if (!trackingSettings.isScrollGestureCurrentlyEnabled()) {
+      if ((!trackingSettings.isScrollGestureCurrentlyEnabled()) || scaleGestureOccurred) {
+        // don't allow a fling is scroll is disabled
+        // and ignore when a scale gesture has occurred
         return false;
       }
 
@@ -368,6 +372,7 @@ final class MapGestureDetector {
         return false;
       }
 
+      scaleGestureOccurred = true;
       beginTime = detector.getEventTime();
       MapboxEvent.trackGestureEvent(projection,
         MapboxEvent.GESTURE_PINCH_START, detector.getFocusX(), detector.getFocusY(), transform.getZoom());
