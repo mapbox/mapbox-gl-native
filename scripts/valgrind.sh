@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-.mason/mason install valgrind latest
+.mason/mason install valgrind 3.12.0
 
 PARAMS="\
     --leak-check=full \
@@ -13,6 +13,6 @@ PARAMS="\
     --gen-suppressions=all \
     --suppressions=scripts/valgrind.sup"
 
-export VALGRIND_LIB=$(.mason/mason prefix valgrind latest)/lib/valgrind
+export VALGRIND_LIB=$(.mason/mason prefix valgrind 3.12.0)/lib/valgrind
 
-$(.mason/mason prefix valgrind latest)/bin/valgrind $PARAMS $@
+$(.mason/mason prefix valgrind 3.12.0)/bin/valgrind $PARAMS $@
