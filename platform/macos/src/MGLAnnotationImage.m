@@ -57,11 +57,7 @@
 }
 
 - (NSUInteger)hash {
-    NSUInteger hash;
-    hash += [_reuseIdentifier hash];
-    hash += _selectable;
-    hash += [_image hash];
-    return hash;
+    return _reuseIdentifier.hash + @(_selectable).hash + _image.hash;
 }
 
 @end
