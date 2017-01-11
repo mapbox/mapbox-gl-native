@@ -20,11 +20,7 @@
     _mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 256, 256) styleURL:styleURL];
     [vc.view addSubview:_mapView];
 #else
-    NSWindowController *windowController = [[NSWindowController alloc] initWithWindowNibName:@"MGLStyleLayerTests" owner:self];
-    NSView *contentView = windowController.window.contentView;
-    _mapView = [[MGLMapView alloc] initWithFrame:contentView.bounds styleURL:styleURL];
-    [contentView addSubview:_mapView];
-    [windowController showWindow:nil];
+    _mapView = [[MGLMapView alloc] initWithFrame:NSMakeRect(0, 0, 256, 256) styleURL:styleURL];
 #endif
     _mapView.delegate = self;
     XCTAssertNil(_mapView.style);
