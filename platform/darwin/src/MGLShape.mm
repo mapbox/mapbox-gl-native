@@ -94,9 +94,7 @@ bool operator==(const CLLocationCoordinate2D lhs, const CLLocationCoordinate2D r
 
 - (NSUInteger)hash
 {
-    NSUInteger hash;
-    hash += _title.hash;
-    hash += _subtitle.hash;
+    NSUInteger hash = _title.hash + _subtitle.hash;
 #if !TARGET_OS_IPHONE
     hash += _toolTip.hash;
 #endif
