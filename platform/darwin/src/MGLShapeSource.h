@@ -187,14 +187,14 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 
 /**
  The contents of the source. A shape can represent a GeoJSON geometry, a
- feature, or a collection of features. 
+ feature, or a collection of features.
 
  If the receiver was initialized using `-initWithIdentifier:URL:options:`, this
  property is set to `nil`. This property is unavailable until the receiver is
  passed into `-[MGLStyle addSource:]`.
  
- You can get/set the shapes within a collection via this property. Setting
- this property must be performed on the application's main thread.
+ You can get/set the shapes within a collection via this property. Actions must 
+ be performed on the application's main thread.
  */
 @property (nonatomic, copy, nullable) MGLShape *shape;
 
