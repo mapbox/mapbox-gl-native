@@ -148,6 +148,7 @@ public class MapView extends FrameLayout {
     private boolean dragStarted = false;
     private boolean quickZoom = false;
     private boolean scrollInProgress = false;
+    private boolean scaleGestureOccurred = false;
 
     private int contentPaddingLeft;
     private int contentPaddingTop;
@@ -1783,7 +1784,8 @@ public class MapView extends FrameLayout {
         // Handle two finger tap
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                // First pointer down
+                // First pointer down, reset scaleGestureOccurred, used to avoid triggering a fling after a scale gesture #7666
+                scaleGestureOccurred = false;
                 nativeMapView.setGestureInProgress(true);
                 break;
 
@@ -1980,7 +1982,7 @@ public class MapView extends FrameLayout {
         // Called for flings
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            if (destroyed || !mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
+            if (destroyed || !mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled() || scaleGestureOccurred) {
                 return false;
             }
 
@@ -2050,6 +2052,7 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
+            scaleGestureOccurred = true;
             beginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_PINCH_START, detector.getFocusX(), detector.getFocusY());
             return true;
