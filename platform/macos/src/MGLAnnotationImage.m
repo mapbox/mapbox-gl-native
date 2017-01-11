@@ -53,7 +53,7 @@
     return ((!_reuseIdentifier && !otherAnnotationImage.reuseIdentifier) || [_reuseIdentifier isEqualToString:otherAnnotationImage.reuseIdentifier])
     && _selectable == otherAnnotationImage.selectable
     && ((!_cursor && !otherAnnotationImage.cursor) || [_cursor isEqual:otherAnnotationImage.cursor])
-    && ((!_image && !otherAnnotationImage.image) || [[_image TIFFRepresentation] isEqualToData:[otherAnnotationImage.image TIFFRepresentation]]);
+    && (_image == otherAnnotationImage.image || [[_image TIFFRepresentation] isEqualToData:[otherAnnotationImage.image TIFFRepresentation]]);
 }
 
 - (NSUInteger)hash {
