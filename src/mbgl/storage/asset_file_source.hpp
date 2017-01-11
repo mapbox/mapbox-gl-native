@@ -4,7 +4,9 @@
 
 namespace mbgl {
 
+template <class> class Actor;
 class Scheduler;
+class Mailbox;
 
 class AssetFileSource : public FileSource {
 public:
@@ -14,8 +16,12 @@ public:
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
 private:
-    class Impl;
-    const std::unique_ptr<Impl> impl;
+    void respond(std::weak_ptr<Callback>, Response);
+
+private:
+    std::shared_ptr<Mailbox> mailbox;
+    class Worker;
+    const std::unique_ptr<Actor<Worker>> worker;
 };
 
 } // namespace mbgl

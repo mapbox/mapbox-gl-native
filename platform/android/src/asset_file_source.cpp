@@ -1,8 +1,12 @@
 #include <mbgl/storage/asset_file_source.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/url.hpp>
+
+#include <mbgl/actor/actor.hpp>
+#include <mbgl/actor/actor_ref.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -35,13 +39,23 @@ struct ZipFileHolder {
 
 namespace mbgl {
 
-class AssetFileSource::Impl {
+class AssetFileRequest : public AsyncRequest {
 public:
-    Impl(const std::string& root_)
-        : root(root_) {
+    AssetFileRequest(std::shared_ptr<FileSource::Callback> callback_)
+        : callback(std::move(callback_)) {
     }
 
-    void request(const std::string& url, FileSource::Callback callback) {
+private:
+    std::shared_ptr<FileSource::Callback> callback;
+};
+
+class AssetFileSource::Worker {
+public:
+    Worker(ActorRef<Worker>, ActorRef<AssetFileSource> parent_, std::string root_)
+        : parent(std::move(parent_)), root(std::move(root_)) {
+    }
+
+    void readFile(const std::string& url, std::weak_ptr<Callback> callback) {
         ZipHolder archive = ::zip_open(root.c_str(), 0, nullptr);
         if (!archive.archive) {
             reportError(Response::Error::Reason::Other, "Could not open zip archive", callback);
@@ -76,29 +90,55 @@ public:
 
         Response response;
         response.data = buf;
-        callback(response);
+
+        parent.invoke(&AssetFileSource::respond, callback, response);
     }
 
-    void reportError(Response::Error::Reason reason, const char * message, FileSource::Callback callback) {
+    void reportError(Response::Error::Reason reason,
+                     const char* message,
+                     std::weak_ptr<Callback> callback) {
         Response response;
         response.error = std::make_unique<Response::Error>(reason, message);
-        callback(response);
+        parent.invoke(&AssetFileSource::respond, callback, response);
     }
 
 private:
+    ActorRef<AssetFileSource> parent;
     std::string root;
 };
 
-AssetFileSource::AssetFileSource(const std::string& root)
-    : thread(std::make_unique<util::Thread<Impl>>(
-        util::ThreadContext{"AssetFileSource", util::ThreadPriority::Low},
-        root)) {
+// AssetFileSource::AssetFileSource(const std::string& root)
+//     : thread(std::make_unique<util::Thread<Impl>>(
+//         util::ThreadContext{"AssetFileSource", util::ThreadPriority::Low},
+//         root)) {
+// }
+
+// AssetFileSource::~AssetFileSource() = default;
+
+// std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource, Callback callback) {
+//     return thread->invokeWithCallback(&Impl::request, resource.url, callback);
+// }
+
+
+AssetFileSource::AssetFileSource(Scheduler& scheduler, const std::string& root)
+    : mailbox(std::make_shared<Mailbox>(*util::RunLoop::Get())),
+      worker(std::make_unique<Actor<Worker>>(
+          scheduler, ActorRef<AssetFileSource>(*this, mailbox), root)) {
 }
 
 AssetFileSource::~AssetFileSource() = default;
 
-std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource, Callback callback) {
-    return thread->invokeWithCallback(&Impl::request, resource.url, callback);
+std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource,
+                                                       Callback callback) {
+    auto cb = std::make_shared<Callback>(std::move(callback));
+    worker->invoke(&Worker::readFile, resource.url, cb);
+    return std::make_unique<AssetFileRequest>(std::move(cb));
+}
+
+void AssetFileSource::respond(std::weak_ptr<Callback> callback, Response response) {
+    if (auto locked = callback.lock()) {
+        (*locked)(response);
+    }
 }
 
 }
