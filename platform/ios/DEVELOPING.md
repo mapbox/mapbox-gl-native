@@ -6,7 +6,7 @@ This document explains how to build the Mapbox iOS SDK from source. It is intend
 
 The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. The SDK is intended to run on iOS 7.0 and above, while iosapp is intended to run on iOS 8.0 and above due to the use of a dynamic framework. Both require Xcode on a computer running macOS.
 
-The Mapbox iOS SDK requires Xcode 7.3 or higher.
+The Mapbox iOS SDK requires Xcode 7.3 or above. The iosapp demo application requires Xcode 8.0 or above to build.
 
 ## Building the SDK
 
