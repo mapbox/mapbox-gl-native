@@ -103,8 +103,7 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
      CLLocationCoordinate2D(latitude: 38.91, longitude: -77.04),
  ]
  let polyline = MGLPolylineFeature(coordinates: &coordinates, count: UInt(coordinates.count))
- let shape = MGLShapeCollectionFeature(shapes: [polyline])
- let source = MGLShapeSource(identifier: "lines", shape: shape, options: nil)
+ let source = MGLShapeSource(identifier: "lines", features: [polyline], options: nil)
  mapView.style?.addSource(source)
  ```
  */
@@ -131,7 +130,9 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
  To specify attributes about the shape, use an instance of an `MGLShape`
  subclass that conforms to the `MGLFeature` protocol, such as `MGLPointFeature`.
  To include multiple shapes in the source, use an `MGLShapeCollection` or
- `MGLShapeCollectionFeature` object.
+ `MGLShapeCollectionFeature` object, or use the
+ `-initWithIdentifier:features:options:` or 
+ `-initWithIdentifier:shapes:options:` methods.
  
  To create a shape from GeoJSON source code, use the
  `+[MGLShape shapeWithData:encoding:error:]` method.
@@ -142,6 +143,45 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
  @return An initialized shape source.
  */
 - (instancetype)initWithIdentifier:(NSString *)identifier shape:(nullable MGLShape *)shape options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
+
+/**
+ Returns a shape source with an identifier, an array of features, and a dictionary
+ of options for the source.
+ 
+ Unlike `-initWithIdentifier:shapes:options:`, this method accepts `MGLFeature`
+ instances, such as `MGLPointFeature` objects, whose attributes you can use when
+ applying a predicate to `MGLVectorStyleLayer` or configuring a style layer’s
+ appearance.
+
+ To create a shape from GeoJSON source code, use the
+ `+[MGLShape shapeWithData:encoding:error:]` method.
+
+ @param identifier A string that uniquely identifies the source.
+ @param features An array of objects that conform to the MGLFeature protocol.
+ @param options An `NSDictionary` of options for this source.
+ @return An initialized shape source.
+ */
+- (instancetype)initWithIdentifier:(NSString *)identifier features:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)features options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options;
+
+/**
+ Returns a shape source with an identifier, an array of shapes, and a dictionary of
+ options for the source.
+ 
+ Any `MGLFeature` instance passed into this initializer is treated as an ordinary
+ shape, causing any attributes to be inaccessible to an `MGLVectorStyleLayer` when
+ evaluating a predicate or configuring certain layout or paint attributes. To 
+ preserve the attributes associated with each feature, use the 
+ `-initWithIdentifier:features:options:` method instead.
+
+ To create a shape from GeoJSON source code, use the
+ `+[MGLShape shapeWithData:encoding:error:]` method.
+
+ @param identifier A string that uniquely identifies the source.
+ @param shapes An array of shapes; each shape is a member of a concrete subclass of MGLShape.
+ @param options An `NSDictionary` of options for this source.
+ @return An initialized shape source.
+ */
+- (instancetype)initWithIdentifier:(NSString *)identifier shapes:(NS_ARRAY_OF(MGLShape *) *)shapes options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options;
 
 #pragma mark Accessing a Source’s Content
 

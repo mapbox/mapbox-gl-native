@@ -66,8 +66,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
             CLLocationCoordinate2D(latitude: 38.91, longitude: -77.04),
         ]
         let polyline = MGLPolylineFeature(coordinates: &coordinates, count: UInt(coordinates.count))
-        let shape = MGLShapeCollectionFeature(shapes: [polyline])
-        let source = MGLShapeSource(identifier: "lines", shape: shape, options: nil)
+        let source = MGLShapeSource(identifier: "lines", features: [polyline], options: nil)
         mapView.style?.addSource(source)
         //#-end-example-code
 

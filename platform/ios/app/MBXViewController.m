@@ -919,8 +919,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        MGLShapeCollectionFeature *features = [MGLShapeCollectionFeature shapeCollectionWithShapes:visibleFeatures];
-        MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:querySourceID shape:features options:nil];
+        MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:querySourceID features:visibleFeatures options:nil];
         [self.mapView.style addSource:source];
         
         MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:queryLayerID source:source];

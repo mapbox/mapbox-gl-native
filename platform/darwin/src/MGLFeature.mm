@@ -184,7 +184,7 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 
 @dynamic shapes;
 
-+ (instancetype)shapeCollectionWithShapes:(NSArray *)shapes {
++ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)shapes {
     return [super shapeCollectionWithShapes:shapes];
 }
 

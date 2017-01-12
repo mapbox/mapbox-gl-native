@@ -36,6 +36,16 @@ resulting shape or feature object into the
 the map, or you can use the object and its properties to power non-map-related
 functionality in your application.
 
+To include multiple shapes in the source, create and pass an `MGLShapeCollection` or
+ `MGLShapeCollectionFeature` object to 
+ `-[MGLShapeSource initWithIdentifier:shape:options:]`. Alternatively, use the
+ `-[MGLShapeSource initWithIdentifier:features:options:]` or 
+ `-[MGLShapeSource initWithIdentifier:shapes:options:]` method to create a shape source 
+ with an array. `-[MGLShapeSource initWithIdentifier:features:options:]` accepts only `MGLFeature`
+ instances, such as `MGLPointFeature` objects, whose attributes you can use when
+ applying a predicate to `MGLVectorStyleLayer` or configuring a style layer’s
+ appearance.
+
 ## Extracting GeoJSON data from the map
 
 Any `MGLShape`, `MGLFeature`, or `MGLShapeCollectionFeature` object has an
