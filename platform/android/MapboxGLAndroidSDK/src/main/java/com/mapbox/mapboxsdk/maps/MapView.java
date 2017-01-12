@@ -1986,17 +1986,28 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
+            // calculate velocity vector for xy dimensions, independent from screen size
+            double velocityXY = Math.hypot(velocityX / screenDensity, velocityY / screenDensity);
+            if (velocityXY < MapboxConstants.VELOCITY_THRESHOLD_IGNORE_FLING) {
+                // ignore short flings, these can occur when other gestures just have finished executing
+                return false;
+            }
+
             resetTrackingModesIfRequired(true, false);
 
+            // tilt results in a bigger translation, limiting input for #5281
             double tilt = getTilt();
-            double limitFactor = 2 + ((tilt != 0) ? (tilt / 10) : 0);
-            double offsetX = velocityX / limitFactor / screenDensity;
-            double offsetY = velocityY / limitFactor / screenDensity;
+            double tiltFactor = 1 + ((tilt != 0) ? (tilt / 10) : 0); /* 1 -> 7 */
+            double offsetX = velocityX / tiltFactor / screenDensity;
+            double offsetY = velocityY / tiltFactor / screenDensity;
+
+            // calculate animation time
+            long animationTime = (long) (velocityXY / 7 / tiltFactor + MapboxConstants.ANIMATION_DURATION_FLING_BASE);
 
             // Cancel any animation
             cancelTransitions();
 
-            nativeMapView.moveBy(offsetX, offsetY, MapboxConstants.ANIMATION_DURATION_FLING);
+            nativeMapView.moveBy(offsetX, offsetY, animationTime);
 
             MapboxMap.OnFlingListener listener = mapboxMap.getOnFlingListener();
             if (listener != null) {
