@@ -255,9 +255,9 @@ In style JSON | In Objective-C        | In Swift
 Color         | `NSColor` | `NSColor`
 Enum          | `NSValue` (see `NSValue(MGLAdditions)`) | `NSValue` (see `NSValue(MGLAdditions)`)
 String        | `NSString`            | `String`
-Boolean       | `NSNumber.boolValue`  | `NSNumber.boolValue`
-Number        | `NSNumber.floatValue` | `NSNumber.floatValue`
-Array (`-dasharray`) | `NSArray<NSNumber>` | `[NSNumber]`
+Boolean       | `NSNumber.boolValue`  | `Bool`
+Number        | `NSNumber.floatValue` | `Float`
+Array (`-dasharray`) | `NSArray<NSNumber>` | `[Float]`
 Array (`-font`) | `NSArray<NSString>` | `[String]`
 Array (`-offset`, `-translate`) | `NSValue` containing `CGVector` | `NSValue` containing `CGVector`
 Array (`-padding`) | `NSValue.edgeInsetsValue` | `NSValue.edgeInsetsValue`
