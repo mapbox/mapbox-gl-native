@@ -14,20 +14,12 @@
     [super setUp];
     [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
     NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
-#if TARGET_OS_IPHONE
-    UIApplication *app = [UIApplication sharedApplication];
-    UIViewController *vc = [[UIViewController alloc] init];
-    app.keyWindow.rootViewController = vc;
-    [vc view]; // Force load xib
-    _mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 256, 256) styleURL:styleURL];
-    [vc.view addSubview:_mapView];
-#else
-    _mapView = [[MGLMapView alloc] initWithFrame:NSMakeRect(0, 0, 256, 256) styleURL:styleURL];
-#endif
-    _mapView.delegate = self;
-    XCTAssertNil(_mapView.style);
-    _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    self.mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 256, 256) styleURL:styleURL];
+    self.mapView.delegate = self;
+    if (!self.mapView.style) {
+        _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
+        [self waitForExpectationsWithTimeout:1 handler:nil];
+    }
 }
 
 - (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {

@@ -1,18 +1,4 @@
-#import "MGLAccountManager.h"
-#import "MGLMapView.h"
-#import "MGLStyle_Private.h"
-#import "MGLOpenGLStyleLayer.h"
-
-#import "MGLShapeSource.h"
-#import "MGLRasterSource.h"
-#import "MGLVectorSource.h"
-
-#import "MGLBackgroundStyleLayer.h"
-#import "MGLCircleStyleLayer.h"
-#import "MGLFillStyleLayer.h"
-#import "MGLLineStyleLayer.h"
-#import "MGLRasterStyleLayer.h"
-#import "MGLSymbolStyleLayer.h"
+#import <Mapbox/Mapbox.h>
 
 #import "NSBundle+MGLAdditions.h"
 
@@ -26,14 +12,16 @@
 #endif
 #import <objc/runtime.h>
 
-@interface MGLStyleTests : XCTestCase
+@interface MGLStyleTests : XCTestCase <MGLMapViewDelegate>
 
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) MGLStyle *style;
 
 @end
 
-@implementation MGLStyleTests
+@implementation MGLStyleTests {
+    XCTestExpectation *_styleLoadingExpectation;
+}
 
 - (void)setUp {
     [super setUp];
@@ -41,14 +29,23 @@
     [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
     NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
     self.mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 100, 100) styleURL:styleURL];
-    XCTAssertNil(self.mapView.style);
-    [self keyValueObservingExpectationForObject:self.mapView keyPath:@"style" handler:^BOOL(MGLMapView * _Nonnull observedMapView, NSDictionary * _Nonnull change) {
-        return observedMapView.style != nil;
-    }];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    self.mapView.delegate = self;
+    if (!self.mapView.style) {
+        _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
+        [self waitForExpectationsWithTimeout:1 handler:nil];
+    }
+}
+
+- (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
+    XCTAssertNotNil(mapView.style);
+    XCTAssertEqual(mapView.style, style);
+    XCTAssertNil(style.name);
+    
+    [_styleLoadingExpectation fulfill];
 }
 
 - (void)tearDown {
+    _styleLoadingExpectation = nil;
     self.mapView = nil;
     
     [super tearDown];
