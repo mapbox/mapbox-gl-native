@@ -1,6 +1,6 @@
 mason_use(glfw VERSION 3.2.1)
 if(IS_CI_BUILD AND NOT WITH_EGL)
-    mason_use(mesa VERSION 13.0.0${MASON_MESA_SUFFIX}${MASON_CXXABI_SUFFIX})
+    mason_use(mesa VERSION 13.0.0${MASON_MESA_SUFFIX})
 endif()
 mason_use(boost_libprogram_options VERSION 1.62.0)
 mason_use(sqlite VERSION 3.14.2)
