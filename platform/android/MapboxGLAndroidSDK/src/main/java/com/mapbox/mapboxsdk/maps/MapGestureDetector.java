@@ -302,21 +302,32 @@ final class MapGestureDetector {
         return false;
       }
 
-      trackingSettings.resetTrackingModesIfRequired(true, false);
-
-      // Cancel any animation
-      transform.cancelTransitions();
-
       float screenDensity = uiSettings.getPixelRatio();
 
-      double tilt = transform.getTilt();
-      // tilt results in a bigger translation, need to limit input #5281, limitFactor ranges from 2 -> 8
-      double limitFactor = 2 + ((tilt != 0) ? (tilt / 10) : 0);
-      double offsetX = velocityX / limitFactor / screenDensity;
-      double offsetY = velocityY / limitFactor / screenDensity;
+      // calculate velocity vector for xy dimensions, independent from screen size
+      double velocityXY = Math.hypot(velocityX / screenDensity, velocityY / screenDensity);
+      if (velocityXY < MapboxConstants.VELOCITY_THRESHOLD_IGNORE_FLING) {
+        // ignore short flings, these can occur when other gestures just have finished executing
+        return false;
+      }
 
+      trackingSettings.resetTrackingModesIfRequired(true, false);
+
+      // cancel any animation
+      transform.cancelTransitions();
+
+      // tilt results in a bigger translation, limiting input for #5281
+      double tilt = transform.getTilt();
+      double tiltFactor = 1 + ((tilt != 0) ? (tilt / 10) : 0); /* 1 -> 7 */
+      double offsetX = velocityX / tiltFactor / screenDensity;
+      double offsetY = velocityY / tiltFactor / screenDensity;
+
+      // calculate animation time based on displacement
+      long animationTime = (long) (velocityXY / 7 / tiltFactor + MapboxConstants.ANIMATION_DURATION_FLING_BASE);
+
+      // update transformation
       transform.setGestureInProgress(true);
-      transform.moveBy(offsetX, offsetY, MapboxConstants.ANIMATION_DURATION_FLING);
+      transform.moveBy(offsetX, offsetY, animationTime);
       transform.setGestureInProgress(false);
 
       if (onFlingListener != null) {
