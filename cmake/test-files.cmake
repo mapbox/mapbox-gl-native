@@ -88,6 +88,7 @@ set(MBGL_TEST_FILES
 
     # text
     test/text/glyph_atlas.test.cpp
+    test/text/glyph_pbf.test.cpp
     test/text/quads.test.cpp
 
     # tile

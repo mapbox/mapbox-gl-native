@@ -107,9 +107,6 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
                                     const FontStack& fontStack,
                                     const SDFGlyph& glyph)
 {
-    // Use constant value for now.
-    const uint8_t buffer = 3;
-
     std::map<uint32_t, GlyphValue>& face = index[fontStack];
     auto it = face.find(glyph.id);
 
@@ -125,8 +122,8 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
         return Rect<uint16_t>{ 0, 0, 0, 0 };
     }
 
-    uint16_t buffered_width = glyph.metrics.width + buffer * 2;
-    uint16_t buffered_height = glyph.metrics.height + buffer * 2;
+    uint16_t buffered_width = glyph.metrics.width + SDFGlyph::borderSize * 2;
+    uint16_t buffered_height = glyph.metrics.height + SDFGlyph::borderSize * 2;
 
     // Add a 1px border around every image.
     const uint16_t padding = 1;
