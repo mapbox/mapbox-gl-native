@@ -142,3 +142,43 @@ TEST(GlyphAtlas, LoadingCancel) {
         {{"Test Stack"}},
         {{0, 255}});
 }
+
+TEST(GlyphAtlas, InvalidSDFGlyph) {
+    GlyphSet glyphSet;
+    glyphSet.insert(65, SDFGlyph{ 65 /* ASCII 'A' */,
+                                  "x" /* bitmap is too short */,
+                                  { 1 /* width */, 1 /* height */, 0 /* left */, 0 /* top */,
+                                    0 /* advance */ } });
+    glyphSet.insert(66, SDFGlyph{ 66 /* ASCII 'B' */,
+                                  std::string(7 * 7, 'x'), /* correct */
+                                  { 1 /* width */, 1 /* height */, 0 /* left */, 0 /* top */,
+                                    0 /* advance */ } });
+    glyphSet.insert(67, SDFGlyph{ 67 /* ASCII 'C' */,
+                                  std::string(518 * 8, 'x'), /* correct */
+                                  { 512 /* width */, 2 /* height */, 0 /* left */, 0 /* top */,
+                                    0 /* advance */ } });
+
+
+    const FontStack fontStack{ "Mock Font" };
+
+    GlyphAtlasTest test;
+    GlyphPositions positions;
+    test.glyphAtlas.addGlyphs(1, std::u16string{u"ABC"}, fontStack, glyphSet, positions);
+
+    ASSERT_EQ(3u, positions.size());
+
+    // 'A' was not placed because the bitmap size is invalid.
+    ASSERT_NE(positions.end(), positions.find(65));
+    ASSERT_EQ((Rect<uint16_t>{ 0, 0, 0, 0 }), positions[65].rect);
+
+    // 'B' was placed at the top left.
+    ASSERT_NE(positions.end(), positions.find(66));
+    // Width is 12 because actual dimensions are 1+6 pixels, with 1px border added, rounded up to
+    // the next multiple of 4.
+    ASSERT_EQ((Rect<uint16_t>{ 0, 0, 12, 12 }), positions[66].rect);
+
+    // 'C' was not placed because the width is too big.
+    ASSERT_NE(positions.end(), positions.find(67));
+    ASSERT_EQ((Rect<uint16_t>{ 0, 0, 0, 0 }), positions[67].rect);
+
+}
