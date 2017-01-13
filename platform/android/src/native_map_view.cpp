@@ -151,10 +151,13 @@ void NativeMapView::deactivate() {
 void NativeMapView::invalidate() {
     assert(vm != nullptr);
     assert(obj != nullptr);
-
-    env->CallVoidMethod(obj, onInvalidateId);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
+    JNIEnv *env2;
+    jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Callback Thread");
+    if (!renderDetach) {
+        env2->CallVoidMethod(obj, onInvalidateId);
+        if(env2->ExceptionCheck()) {
+            env2->ExceptionDescribe();
+        }
     }
 }
 
@@ -169,18 +172,21 @@ void NativeMapView::render() {
     updateViewBinding();
     map->render(*this);
 
-    if(snapshot){
-         snapshot = false;
+    if (snapshot){
+        snapshot = false;
 
-         // take snapshot
-         auto image = getContext().readFramebuffer<mbgl::PremultipliedImage>(getFramebufferSize());
-         auto bitmap = Bitmap::CreateBitmap(*env, std::move(image));
+        // take snapshot
+        auto image = getContext().readFramebuffer<mbgl::PremultipliedImage>(getFramebufferSize());
+        auto bitmap = Bitmap::CreateBitmap(*env, std::move(image));
 
-         // invoke Mapview#OnSnapshotReady
-         env->CallVoidMethod(obj, onSnapshotReadyId, jni::Unwrap(*bitmap));
-         if (env->ExceptionCheck()) {
-             env->ExceptionDescribe();
-         }
+        JNIEnv *env2;
+        jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Callback Thread");
+        if (!renderDetach) {
+            env2->CallVoidMethod(obj, onSnapshotReadyId, jni::Unwrap(*bitmap));
+            if (env2->ExceptionCheck()) {
+                env2->ExceptionDescribe();
+            }
+        }
     }
 
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE)) {
@@ -205,7 +211,7 @@ void NativeMapView::initializeDisplay() {
     assert(config == nullptr);
     assert(format < 0);
 
-    display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    display = eglGetCurrentDisplay();
     if (display == EGL_NO_DISPLAY) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglGetDisplay() returned error %d", eglGetError());
         throw std::runtime_error("eglGetDisplay() failed");
@@ -287,15 +293,7 @@ void NativeMapView::initializeDisplay() {
 
 void NativeMapView::terminateDisplay() {
     if (display != EGL_NO_DISPLAY) {
-        // Destroy the surface first, if it still exists. This call needs a valid surface.
-        if (surface != EGL_NO_SURFACE) {
-            if (!eglDestroySurface(display, surface)) {
-                mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroySurface() returned error %d",
-                                 eglGetError());
-                throw std::runtime_error("eglDestroySurface() failed");
-            }
-            surface = EGL_NO_SURFACE;
-        }
+        surface = EGL_NO_SURFACE;
 
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
@@ -320,8 +318,7 @@ void NativeMapView::initializeContext() {
     assert(context == EGL_NO_CONTEXT);
     assert(config != nullptr);
 
-    const EGLint contextAttribs[] = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE};
-    context = eglCreateContext(display, config, EGL_NO_CONTEXT, contextAttribs);
+    context = eglGetCurrentContext();
     if (context == EGL_NO_CONTEXT) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateContext() returned error %d",
                          eglGetError());
@@ -338,13 +335,6 @@ void NativeMapView::terminateContext() {
             throw std::runtime_error("eglMakeCurrent() failed");
         }
 
-        if (context != EGL_NO_CONTEXT) {
-            if (!eglDestroyContext(display, context)) {
-                mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroyContext() returned error %d",
-                                 eglGetError());
-                throw std::runtime_error("eglDestroyContext() failed");
-            }
-        }
     }
 
     context = EGL_NO_CONTEXT;
@@ -362,8 +352,7 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
 
     ANativeWindow_setBuffersGeometry(window, 0, 0, format);
 
-    const EGLint surfaceAttribs[] = {EGL_NONE};
-    surface = eglCreateWindowSurface(display, config, window, surfaceAttribs);
+    surface = eglGetCurrentSurface(EGL_DRAW);
     if (surface == EGL_NO_SURFACE) {
         mbgl::Log::Error(mbgl::Event::OpenGL, "eglCreateWindowSurface() returned error %d",
                          eglGetError());
@@ -592,9 +581,13 @@ void NativeMapView::notifyMapChange(mbgl::MapChange change) {
     assert(vm != nullptr);
     assert(obj != nullptr);
 
-    env->CallVoidMethod(obj, onMapChangedId, change);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
+    JNIEnv *env2;
+    jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Callback Thread");
+    if (!renderDetach) {
+        env2->CallVoidMethod(obj, onMapChangedId, change);
+        if(env2->ExceptionCheck()) {
+            env2->ExceptionDescribe();
+        }
     }
 }
 
@@ -625,9 +618,13 @@ void NativeMapView::updateFps() {
     assert(vm != nullptr);
     assert(obj != nullptr);
 
-    env->CallVoidMethod(obj, onFpsChangedId, fps);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
+    JNIEnv *env2;
+    jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Callback Thread");
+    if (!renderDetach) {
+        env2->CallVoidMethod(obj, onFpsChangedId, fps);
+        if(env2->ExceptionCheck()) {
+            env2->ExceptionDescribe();
+        }
     }
 }
 

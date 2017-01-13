@@ -80,9 +80,6 @@ public class MapboxMapOptions implements Parcelable {
 
   private String apiBaseUrl;
 
-  @Deprecated
-  private boolean textureMode;
-
   private String style;
 
   /**
@@ -144,7 +141,6 @@ public class MapboxMapOptions implements Parcelable {
 
     style = in.readString();
     apiBaseUrl = in.readString();
-    textureMode = in.readByte() != 0;
   }
 
   public static Bitmap getBitmapFromDrawable(Drawable drawable) {
@@ -279,8 +275,6 @@ public class MapboxMapOptions implements Parcelable {
       mapboxMapOptions.myLocationAccuracyTint(
         typedArray.getColor(R.styleable.mapbox_MapView_mapbox_myLocationAccuracyTintColor,
           ColorUtils.getPrimaryColor(context)));
-      mapboxMapOptions.textureMode(
-        typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_renderTextureMode, false));
     } finally {
       typedArray.recycle();
     }
@@ -655,22 +649,6 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
-   * Enable TextureView as rendered surface.
-   * <p>
-   * Since the 4.2.0 release we replaced our TextureView with an SurfaceView implemenation.
-   * Enabling this option will use the deprecated TextureView instead.
-   * </p>
-   *
-   * @param textureMode True to enable texture mode
-   * @return This
-   * @deprecated As of the 4.2.0 release, using TextureView is deprecated.
-   */
-  public MapboxMapOptions textureMode(boolean textureMode) {
-    this.textureMode = textureMode;
-    return this;
-  }
-
-  /**
    * Get the current configured API endpoint base URL.
    *
    * @return Base URL to be used API endpoint.
@@ -959,16 +937,6 @@ public class MapboxMapOptions implements Parcelable {
     return debugActive;
   }
 
-  /**
-   * Returns true if TextureView is being used a render view.
-   *
-   * @return True if TextureView is used.
-   * @deprecated As of the 4.2.0 release, using TextureView is deprecated.
-   */
-  public boolean getTextureMode() {
-    return textureMode;
-  }
-
   public static final Parcelable.Creator<MapboxMapOptions> CREATOR = new Parcelable.Creator<MapboxMapOptions>() {
     public MapboxMapOptions createFromParcel(Parcel in) {
       return new MapboxMapOptions(in);
@@ -1029,7 +997,6 @@ public class MapboxMapOptions implements Parcelable {
 
     dest.writeString(style);
     dest.writeString(apiBaseUrl);
-    dest.writeByte((byte) (textureMode ? 1 : 0));
   }
 
   @Override
@@ -1186,7 +1153,6 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + myLocationAccuracyTintColor;
     result = 31 * result + myLocationAccuracyAlpha;
     result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
-    result = 31 * result + (textureMode ? 1 : 0);
     result = 31 * result + (style != null ? style.hashCode() : 0);
     return result;
   }
