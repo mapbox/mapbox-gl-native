@@ -626,6 +626,17 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
     [self.mapView addAnnotation:triangle];
 
+    // West coast polyline
+    //
+    CLLocationCoordinate2D lineCoordinates[4] = {
+        CLLocationCoordinate2DMake(47.6025, -122.3327),
+        CLLocationCoordinate2DMake(45.5189, -122.6726),
+        CLLocationCoordinate2DMake(37.7790, -122.4177),
+        CLLocationCoordinate2DMake(34.0532, -118.2349)
+    };
+    MGLPolyline *line = [MGLPolyline polylineWithCoordinates:lineCoordinates count:4];
+    [self.mapView addAnnotation:line];
+
     // Orcas Island, WA hike polyline
     //
     NSDictionary *hike = [NSJSONSerialization JSONObjectWithData:
