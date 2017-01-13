@@ -790,6 +790,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 - (void)styleBuildingLayer
 {
+    [self.mapView.style setTransitionDuration:5];
+//    [self.mapView.style setTransitionDelay:2];
     MGLFillStyleLayer *buildingLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"building"];
     buildingLayer.fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor blackColor]];
 }

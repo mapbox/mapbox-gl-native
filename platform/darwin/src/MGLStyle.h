@@ -427,6 +427,13 @@ MGL_EXPORT
  */
 - (void)removeImageForName:(NSString *)name;
 
+#pragma mark Managing a Style’s Transition Options
+
+- (void)setTransitionDuration:(NSTimeInterval)duration;
+- (NSTimeInterval)transitionDuration;
+- (void)setTransitionDelay:(NSTimeInterval)delay;
+- (NSTimeInterval)transitionDelay;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -568,6 +568,34 @@ static NSURL *MGLStyleURL_emerald;
     return spriteImage ? [[MGLImage alloc] initWithMGLSpriteImage:spriteImage] : nil;
 }
 
+#pragma mark Style transitions
+
+- (void)setTransitionDuration:(NSTimeInterval)duration
+{
+    mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
+    transitionOptions.duration = MGLDurationInSeconds(duration);
+    self.mapView.mbglMap->setTransitionOptions(transitionOptions);
+}
+
+- (NSTimeInterval)transitionDuration
+{
+    const mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
+    return MGLSecondsFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+}
+
+- (void)setTransitionDelay:(NSTimeInterval)delay
+{
+    mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
+    transitionOptions.delay = MGLDurationInSeconds(delay);
+    self.mapView.mbglMap->setTransitionOptions(transitionOptions);
+}
+
+- (NSTimeInterval)transitionDelay
+{
+    const mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
+    return MGLSecondsFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p; name = %@, URL = %@>",
