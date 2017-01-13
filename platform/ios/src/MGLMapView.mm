@@ -3132,23 +3132,9 @@ public:
 
 - (double)alphaForShapeAnnotation:(MGLShape *)annotation
 {
-    // The explicit -mapView:alphaForShapeAnnotation: delegate method is deprecated
-    // but still used, if implemented. When not implemented, call the stroke or
-    // fill color delegate methods and pull the alpha from the returned color.
     if (_delegateHasAlphasForShapeAnnotations)
     {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         return [self.delegate mapView:self alphaForShapeAnnotation:annotation];
-#pragma clang diagnostic pop
-    }
-    else if ([annotation isKindOfClass:[MGLPolygon class]])
-    {
-        return [self fillColorForPolygonAnnotation:(MGLPolygon *)annotation].a ?: 1.0;
-    }
-    else if ([annotation isKindOfClass:[MGLShape class]])
-    {
-        return [self strokeColorForShapeAnnotation:annotation].a ?: 1.0;
     }
     return 1.0;
 }

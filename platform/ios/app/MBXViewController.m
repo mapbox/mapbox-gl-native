@@ -1554,9 +1554,15 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     return YES;
 }
 
+- (CGFloat)mapView:(__unused MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation
+{
+    return ([annotation isKindOfClass:[MGLPolygon class]] ? 0.5 : 1.0);
+}
+
 - (UIColor *)mapView:(__unused MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation
 {
-    return ([annotation isKindOfClass:[MGLPolyline class]] ? [UIColor purpleColor] : [UIColor blackColor]);
+    UIColor *color = [annotation isKindOfClass:[MGLPolyline class]] ? [UIColor greenColor] : [UIColor blackColor];
+    return [color colorWithAlphaComponent:0.9];
 }
 
 - (UIColor *)mapView:(__unused MGLMapView *)mapView fillColorForPolygonAnnotation:(__unused MGLPolygon *)annotation
