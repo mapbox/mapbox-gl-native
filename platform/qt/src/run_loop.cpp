@@ -31,22 +31,6 @@ RunLoop* RunLoop::Get() {
 }
 
 RunLoop::RunLoop(Type type) : impl(std::make_unique<Impl>()) {
-    // XXX: We should probably throw an runtime exception
-    // here instead of creating a QCoreApplication which is
-    // way too intrusive. This is a hack mostly for the unit
-    // tests to work, as you always need a QCoreApplication
-    // prior to run a Qt app.
-    if (!QCoreApplication::instance()) {
-        static const char* argv[] = { "mbgl" };
-        static int argc = 1;
-
-        // We need to keep this around because it would otherwise crash
-        // on Qt4 due to a bug on QNetworkConfigurationManager when recreating
-        // a QCoreApplication: https://bugreports.qt.io/browse/QTBUG-36897
-        static auto* app = new QCoreApplication(argc, const_cast<char**>(argv));
-        Q_UNUSED(app);
-    }
-
     switch (type) {
     case Type::New:
         impl->loop = std::make_unique<QEventLoop>();
@@ -80,6 +64,7 @@ void RunLoop::push(std::shared_ptr<WorkTask> task) {
 }
 
 void RunLoop::run() {
+    assert(QCoreApplication::instance());
     MBGL_VERIFY_THREAD(tid);
 
     if (impl->type == Type::Default) {
@@ -90,6 +75,7 @@ void RunLoop::run() {
 }
 
 void RunLoop::stop() {
+    assert(QCoreApplication::instance());
     invoke([&] {
         if (impl->type == Type::Default) {
             QCoreApplication::instance()->exit();
@@ -100,6 +86,7 @@ void RunLoop::stop() {
 }
 
 void RunLoop::runOnce() {
+    assert(QCoreApplication::instance());
     MBGL_VERIFY_THREAD(tid);
 
     if (impl->type == Type::Default) {

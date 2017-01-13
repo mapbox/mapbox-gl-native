@@ -1,6 +1,5 @@
 #include <mbgl/gl/headless_backend.hpp>
 
-#include <QApplication>
 #include <QGLContext>
 #include <QGLWidget>
 
@@ -40,13 +39,6 @@ bool HeadlessBackend::hasDisplay() {
 
 void HeadlessBackend::createContext() {
     assert(!hasContext());
-
-    static const char* argv[] = { "mbgl" };
-    static int argc = 1;
-    static auto* app = new QApplication(argc, const_cast<char**>(argv));
-
-    Q_UNUSED(app);
-
     impl.reset(new QtImpl);
 }
 
