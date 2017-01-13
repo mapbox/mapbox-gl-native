@@ -10,7 +10,7 @@ class QMapboxGLTest : public QObject, public ::testing::Test {
     Q_OBJECT
 
 public:
-    QMapboxGLTest() : app(argc, const_cast<char**>(&argv)), map(nullptr, settings) {
+    QMapboxGLTest() : map(nullptr, settings) {
         connect(&map, SIGNAL(mapChanged(QMapboxGL::MapChange)),
                 this, SLOT(onMapChanged(QMapboxGL::MapChange)));
         connect(&map, SIGNAL(needsRendering()),
@@ -26,19 +26,15 @@ public:
     void runUntil(QMapboxGL::MapChange status) {
         changeCallback = [&](QMapboxGL::MapChange change) {
             if (change == status) {
-                app.exit();
+                qApp->exit();
                 changeCallback = nullptr;
             }
         };
 
-        app.exec();
+        qApp->exec();
     }
 
 private:
-    int argc = 1;
-    const char* argv = "mbgl-test";
-
-    QApplication app;
     QGLWidget widget;
 
 protected:
