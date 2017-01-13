@@ -201,9 +201,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::style::CirclePitchScaleType, NSValue *, mbgl::style::CirclePitchScaleType, MGLCircleScaleAlignment>().toEnumStyleValue(propertyValue);
 }
 
-
 - (void)setCirclePitchScale:(MGLStyleValue<NSValue *> *)circlePitchScale {
-    NSAssert(NO, @"Use -setCircleScaleAlignment: instead.");
+}
+
+- (MGLStyleValue<NSValue *> *)circlePitchScale {
+    return self.circleScaleAlignment;
 }
 
 - (void)setCircleTranslation:(MGLStyleValue<NSValue *> *)circleTranslation {
@@ -220,9 +222,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setCircleTranslate:(MGLStyleValue<NSValue *> *)circleTranslate {
-    NSAssert(NO, @"Use -setCircleTranslation: instead.");
+}
+
+- (MGLStyleValue<NSValue *> *)circleTranslate {
+    return self.circleTranslation;
 }
 
 - (void)setCircleTranslationAnchor:(MGLStyleValue<NSValue *> *)circleTranslationAnchor {
@@ -239,9 +243,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLCircleTranslationAnchor>().toEnumStyleValue(propertyValue);
 }
 
-
 - (void)setCircleTranslateAnchor:(MGLStyleValue<NSValue *> *)circleTranslateAnchor {
-    NSAssert(NO, @"Use -setCircleTranslationAnchor: instead.");
+}
+
+- (MGLStyleValue<NSValue *> *)circleTranslateAnchor {
+    return self.circleTranslationAnchor;
 }
 
 

@@ -69,15 +69,15 @@ global.camelizeWithLeadingLowercase = function (str) {
 
 global.objCName = function (property) {
     return camelizeWithLeadingLowercase(property.name);
-}
+};
 
 global.objCGetter = function (property) {
     return camelizeWithLeadingLowercase(property.getter || property.name);
-}
+};
 
 global.objCType = function (layerType, propertyName) {
     return `${prefix}${camelize(propertyName)}`;
-}
+};
 
 global.arrayType = function (property) {
     return property.type === 'array' ? originalPropertyName(property).split('-').pop() : false;
@@ -86,7 +86,87 @@ global.arrayType = function (property) {
 global.testImplementation = function (property, layerType, isFunction) {
     let helperMsg = testHelperMessage(property, layerType, isFunction);
     return `layer.${objCName(property)} = [MGLRuntimeStylingHelper ${helperMsg}];`;
-}
+};
+
+global.objCTestValue = function (property, layerType, indent) {
+    let propertyName = originalPropertyName(property);
+    switch (property.type) {
+        case 'boolean':
+            return property.default ? '@NO' : '@YES';
+        case 'number':
+            return '@0xff';
+        case 'string':
+            return `@"${_.startCase(propertyName)}"`;
+        case 'enum':
+            let type = objCType(layerType, property.name);
+            let value = `${type}${camelize(_.last(_.keys(property.values)))}`;
+            return `[NSValue valueWith${type}:${value}]`;
+        case 'color':
+            return '[MGLColor redColor]';
+        case 'array':
+            switch (arrayType(property)) {
+                case 'dasharray':
+                    return '@[@1, @2]';
+                case 'font':
+                    return `@[@"${_.startCase(propertyName)}", @"${_.startCase(_.reverse(propertyName.split('')).join(''))}"]`;
+                case 'padding': {
+                    let iosValue = '[NSValue valueWithUIEdgeInsets:UIEdgeInsetsMake(1, 1, 1, 1)]'.indent(indent * 4);
+                    let macosValue = '[NSValue valueWithEdgeInsets:NSEdgeInsetsMake(1, 1, 1, 1)]'.indent(indent * 4);
+                    return `\n#if TARGET_OS_IPHONE\n${iosValue}\n#else\n${macosValue}\n#endif\n${''.indent((indent - 1) * 4)}`;
+                }
+                case 'offset':
+                case 'translate':
+                    let iosValue = '[NSValue valueWithCGVector:CGVectorMake(1, 1)]'.indent(indent * 4);
+                    let macosValue = '[NSValue valueWithMGLVector:CGVectorMake(1, -1)]'.indent(indent * 4);
+                    return `\n#if TARGET_OS_IPHONE\n${iosValue}\n#else\n${macosValue}\n#endif\n${''.indent((indent - 1) * 4)}`;
+                default:
+                    throw new Error(`unknown array type for ${property.name}`);
+            }
+        default:
+            throw new Error(`unknown type for ${property.name}`);
+    }
+};
+
+global.mbglTestValue = function (property, layerType) {
+    let propertyName = originalPropertyName(property);
+    switch (property.type) {
+        case 'boolean':
+            return property.default ? 'false' : 'true';
+        case 'number':
+            return '0xff';
+        case 'string':
+            return `"${_.startCase(propertyName)}"`;
+        case 'enum': {
+            let type = camelize(originalPropertyName(property));
+            if (/-translate-anchor$/.test(originalPropertyName(property))) {
+                type = 'TranslateAnchor';
+            }
+            if (/-(rotation|pitch)-alignment$/.test(originalPropertyName(property))) {
+                type = 'Alignment';
+            }
+            let value = camelize(_.last(_.keys(property.values)));
+            return `mbgl::style::${type}Type::${value}`;
+        }
+        case 'color':
+            return '{ .r = 1, .g = 0, .b = 0, .a = 1 }';
+        case 'array':
+            switch (arrayType(property)) {
+                case 'dasharray':
+                    return '{1, 2}';
+                case 'font':
+                    return `{ "${_.startCase(propertyName)}", "${_.startCase(_.reverse(propertyName.split('')).join(''))}" }`;
+                case 'padding':
+                    return '{ 1, 1, 1, 1 }';
+                case 'offset':
+                case 'translate':
+                    return '{ 1, 1 }';
+                default:
+                    throw new Error(`unknown array type for ${property.name}`);
+            }
+        default:
+            throw new Error(`unknown type for ${property.name}`);
+    }
+};
 
 global.testGetterImplementation = function (property, layerType, isFunction) {
     let helperMsg = testHelperMessage(property, layerType, isFunction);
@@ -99,7 +179,7 @@ global.testGetterImplementation = function (property, layerType, isFunction) {
     XCTAssertEqualObjects(gLayer.${objCName(property)}, ${value});`;
     }
     return `XCTAssertEqualObjects(gLayer.${objCName(property)}, ${value});`;
-}
+};
 
 global.testHelperMessage = function (property, layerType, isFunction) {
     let fnSuffix = isFunction ? 'Function' : '';
@@ -153,7 +233,7 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
     // Requires symbols to be surrounded by backticks.
     doc = doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
         if ('values' in property && Object.keys(property.values).indexOf(symbol) !== -1) {
-            let objCType = objCType(layerType, property.name);
+            let objCType = global.objCType(layerType, property.name);
             return '`' + `${objCType}${camelize(symbol)}` + '`';
         }
         if (str.substr(offset - 4, 3) !== 'CSS') {
@@ -288,7 +368,7 @@ global.propertyDefault = function (property, layerType) {
 
 global.originalPropertyName = function (property) {
     return property.original || property.name;
-}
+};
 
 global.propertyType = function (property) {
     switch (property.type) {
@@ -353,32 +433,60 @@ global.valueTransformerArguments = function (property) {
     }
 };
 
+global.mbglType = function(property) {
+    switch (property.type) {
+        case 'boolean':
+            return 'bool';
+        case 'number':
+            return 'float';
+        case 'string':
+            return 'std::string';
+        case 'enum': {
+            let type = camelize(originalPropertyName(property));
+            if (/-translate-anchor$/.test(originalPropertyName(property))) {
+                type = 'TranslateAnchor';
+            }
+            if (/-(rotation|pitch)-alignment$/.test(originalPropertyName(property))) {
+                type = 'Alignment';
+            }
+            return `mbgl::style::${type}Type`;
+        }
+        case 'color':
+            return 'mbgl::Color';
+        case 'array':
+            switch (arrayType(property)) {
+                case 'dasharray':
+                    return 'std::vector<float>';
+                case 'font':
+                    return 'std::vector<std::string>';
+                case 'padding':
+                    return 'std::array<float, 4>';
+                case 'offset':
+                case 'translate':
+                    return 'std::array<float, 2>';
+                default:
+                    throw new Error(`unknown array type for ${property.name}`);
+            }
+        default:
+            throw new Error(`unknown type for ${property.name}`);
+    }
+};
+
 global.initLayer = function (layerType) {
     if (layerType == "background") {
        return `_layer = new mbgl::style::${camelize(layerType)}Layer(identifier.UTF8String);`
     } else {
         return `_layer = new mbgl::style::${camelize(layerType)}Layer(identifier.UTF8String, source.identifier.UTF8String);`
     }
-}
+};
 
 global.setSourceLayer = function() {
-   return `_layer->setSourceLayer(sourceLayer.UTF8String);`
-}
-
-global.mbglType = function(property) {
-    let mbglType = camelize(originalPropertyName(property)) + 'Type';
-    if (/-translate-anchor$/.test(originalPropertyName(property))) {
-        mbglType = 'TranslateAnchorType';
-    }
-    if (/-(rotation|pitch)-alignment$/.test(originalPropertyName(property))) {
-        mbglType = 'AlignmentType';
-    }
-    return mbglType;
-}
+    return `_layer->setSourceLayer(sourceLayer.UTF8String);`
+};
 
 const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.ejs', 'utf8'), { strict: true });
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
-const testLayers = ejs.compile(fs.readFileSync('platform/darwin/test/MGLStyleLayerTests.m.ejs', 'utf8'), { strict: true});
+const testLayers = ejs.compile(fs.readFileSync('platform/darwin/test/MGLStyleLayerTests.mm.ejs', 'utf8'), { strict: true});
 const guideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/For Style Authors.md.ejs', 'utf8'), { strict: true });
 
 const layers = _(spec.layer.type.values).map((value, layerType) => {
@@ -439,21 +547,21 @@ ${macosComment}${decl}
 var renamedPropertiesByLayerType = {};
 
 for (var layer of layers) {
-    let properties = _.concat(layer.layoutProperties, layer.paintProperties);
-    let enumProperties = _.filter(properties, prop => prop.type === 'enum');
+    layer.properties = _.concat(layer.layoutProperties, layer.paintProperties);
+    let enumProperties = _.filter(layer.properties, prop => prop.type === 'enum');
     if (enumProperties.length) {
         layer.enumProperties = enumProperties;
     }
     
     let renamedProperties = {};
-    _.assign(renamedProperties, _.filter(properties, prop => 'original' in prop || 'getter' in prop));
+    _.assign(renamedProperties, _.filter(layer.properties, prop => 'original' in prop || 'getter' in prop));
     if (!_.isEmpty(renamedProperties)) {
         renamedPropertiesByLayerType[layer.type] = renamedProperties;
     }
 
     fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, duplicatePlatformDecls(layerH(layer)));
     fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
-    fs.writeFileSync(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.m`, testLayers(layer));
+    fs.writeFileSync(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.mm`, testLayers(layer));
 }
 
 fs.writeFileSync(`platform/ios/docs/guides/For Style Authors.md`, guideMD({

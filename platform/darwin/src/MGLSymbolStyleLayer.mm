@@ -199,9 +199,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setIconAllowOverlap:(MGLStyleValue<NSNumber *> *)iconAllowOverlap {
-    self.iconAllowsOverlap = iconAllowOverlap;
 }
 
 - (MGLStyleValue<NSNumber *> *)iconAllowOverlap {
@@ -222,9 +220,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setIconIgnorePlacement:(MGLStyleValue<NSNumber *> *)iconIgnorePlacement {
-    self.iconIgnoresPlacement = iconIgnorePlacement;
 }
 
 - (MGLStyleValue<NSNumber *> *)iconIgnorePlacement {
@@ -245,9 +241,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setIconImage:(MGLStyleValue<NSString *> *)iconImage {
-    self.iconImageName = iconImage;
 }
 
 - (MGLStyleValue<NSString *> *)iconImage {
@@ -310,9 +304,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setIconRotate:(MGLStyleValue<NSNumber *> *)iconRotate {
-    self.iconRotation = iconRotate;
 }
 
 - (MGLStyleValue<NSNumber *> *)iconRotate {
@@ -347,9 +339,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setIconSize:(MGLStyleValue<NSNumber *> *)iconSize {
-    self.iconScale = iconSize;
 }
 
 - (MGLStyleValue<NSNumber *> *)iconSize {
@@ -398,9 +388,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setIconKeepUpright:(MGLStyleValue<NSNumber *> *)iconKeepUpright {
-    self.keepsIconUpright = iconKeepUpright;
 }
 
 - (MGLStyleValue<NSNumber *> *)iconKeepUpright {
@@ -421,9 +409,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setTextKeepUpright:(MGLStyleValue<NSNumber *> *)textKeepUpright {
-    self.keepsTextUpright = textKeepUpright;
 }
 
 - (MGLStyleValue<NSNumber *> *)textKeepUpright {
@@ -444,9 +430,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setTextMaxAngle:(MGLStyleValue<NSNumber *> *)textMaxAngle {
-    self.maximumTextAngle = textMaxAngle;
 }
 
 - (MGLStyleValue<NSNumber *> *)textMaxAngle {
@@ -467,9 +451,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setTextMaxWidth:(MGLStyleValue<NSNumber *> *)textMaxWidth {
-    self.maximumTextWidth = textMaxWidth;
 }
 
 - (MGLStyleValue<NSNumber *> *)textMaxWidth {
@@ -490,9 +472,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setSymbolAvoidEdges:(MGLStyleValue<NSNumber *> *)symbolAvoidEdges {
-    self.symbolAvoidsEdges = symbolAvoidEdges;
 }
 
 - (MGLStyleValue<NSNumber *> *)symbolAvoidEdges {
@@ -541,9 +521,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setTextField:(MGLStyleValue<NSString *> *)textField {
-    self.text = textField;
 }
 
 - (MGLStyleValue<NSString *> *)textField {
@@ -564,9 +542,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setTextAllowOverlap:(MGLStyleValue<NSNumber *> *)textAllowOverlap {
-    self.textAllowsOverlap = textAllowOverlap;
 }
 
 - (MGLStyleValue<NSNumber *> *)textAllowOverlap {
@@ -601,9 +577,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::vector<std::string>, NSArray<NSString *> *, std::string>().toStyleValue(propertyValue);
 }
 
-
 - (void)setTextFont:(MGLStyleValue<NSArray<NSString *> *> *)textFont {
-    self.textFontNames = textFont;
 }
 
 - (MGLStyleValue<NSArray<NSString *> *> *)textFont {
@@ -624,9 +598,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setTextSize:(MGLStyleValue<NSNumber *> *)textSize {
-    self.textFontSize = textSize;
 }
 
 - (MGLStyleValue<NSNumber *> *)textSize {
@@ -647,9 +619,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setTextIgnorePlacement:(MGLStyleValue<NSNumber *> *)textIgnorePlacement {
-    self.textIgnoresPlacement = textIgnorePlacement;
 }
 
 - (MGLStyleValue<NSNumber *> *)textIgnorePlacement {
@@ -670,9 +640,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::style::TextJustifyType, NSValue *, mbgl::style::TextJustifyType, MGLTextJustification>().toEnumStyleValue(propertyValue);
 }
 
-
 - (void)setTextJustify:(MGLStyleValue<NSValue *> *)textJustify {
-    self.textJustification = textJustify;
 }
 
 - (MGLStyleValue<NSValue *> *)textJustify {
@@ -777,9 +745,7 @@ namespace mbgl {
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setTextRotate:(MGLStyleValue<NSNumber *> *)textRotate {
-    self.textRotation = textRotate;
 }
 
 - (MGLStyleValue<NSNumber *> *)textRotate {
@@ -900,9 +866,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setIconTranslate:(MGLStyleValue<NSValue *> *)iconTranslate {
-    NSAssert(NO, @"Use -setIconTranslation: instead.");
+}
+
+- (MGLStyleValue<NSValue *> *)iconTranslate {
+    return self.iconTranslation;
 }
 
 - (void)setIconTranslationAnchor:(MGLStyleValue<NSValue *> *)iconTranslationAnchor {
@@ -919,9 +887,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLIconTranslationAnchor>().toEnumStyleValue(propertyValue);
 }
 
-
 - (void)setIconTranslateAnchor:(MGLStyleValue<NSValue *> *)iconTranslateAnchor {
-    NSAssert(NO, @"Use -setIconTranslationAnchor: instead.");
+}
+
+- (MGLStyleValue<NSValue *> *)iconTranslateAnchor {
+    return self.iconTranslationAnchor;
 }
 
 - (void)setTextColor:(MGLStyleValue<MGLColor *> *)textColor {
@@ -1008,9 +978,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setTextTranslate:(MGLStyleValue<NSValue *> *)textTranslate {
-    NSAssert(NO, @"Use -setTextTranslation: instead.");
+}
+
+- (MGLStyleValue<NSValue *> *)textTranslate {
+    return self.textTranslation;
 }
 
 - (void)setTextTranslationAnchor:(MGLStyleValue<NSValue *> *)textTranslationAnchor {
@@ -1027,9 +999,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLTextTranslationAnchor>().toEnumStyleValue(propertyValue);
 }
 
-
 - (void)setTextTranslateAnchor:(MGLStyleValue<NSValue *> *)textTranslateAnchor {
-    NSAssert(NO, @"Use -setTextTranslationAnchor: instead.");
+}
+
+- (MGLStyleValue<NSValue *> *)textTranslateAnchor {
+    return self.textTranslationAnchor;
 }
 
 

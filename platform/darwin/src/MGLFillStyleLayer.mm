@@ -140,9 +140,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setFillAntialias:(MGLStyleValue<NSNumber *> *)fillAntialias {
-    NSAssert(NO, @"Use -setFillAntialiased: instead.");
+}
+
+- (MGLStyleValue<NSNumber *> *)fillAntialias {
+    return self.isFillAntialiased;
 }
 
 - (void)setFillColor:(MGLStyleValue<MGLColor *> *)fillColor {
@@ -215,9 +217,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setFillTranslate:(MGLStyleValue<NSValue *> *)fillTranslate {
-    NSAssert(NO, @"Use -setFillTranslation: instead.");
+}
+
+- (MGLStyleValue<NSValue *> *)fillTranslate {
+    return self.fillTranslation;
 }
 
 - (void)setFillTranslationAnchor:(MGLStyleValue<NSValue *> *)fillTranslationAnchor {
@@ -234,9 +238,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslationAnchor>().toEnumStyleValue(propertyValue);
 }
 
-
 - (void)setFillTranslateAnchor:(MGLStyleValue<NSValue *> *)fillTranslateAnchor {
-    NSAssert(NO, @"Use -setFillTranslationAnchor: instead.");
+}
+
+- (MGLStyleValue<NSValue *> *)fillTranslateAnchor {
+    return self.fillTranslationAnchor;
 }
 
 
