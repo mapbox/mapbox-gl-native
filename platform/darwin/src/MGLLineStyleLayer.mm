@@ -238,9 +238,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::vector<float>, NSArray<NSNumber *> *, float>().toStyleValue(propertyValue);
 }
 
-
 - (void)setLineDasharray:(MGLStyleValue<NSArray<NSNumber *> *> *)lineDasharray {
-    NSAssert(NO, @"Use -setLineDashPattern: instead.");
+}
+
+- (MGLStyleValue<NSArray<NSNumber *> *> *)lineDasharray {
+    return self.lineDashPattern;
 }
 
 - (void)setLineGapWidth:(MGLStyleValue<NSNumber *> *)lineGapWidth {
@@ -313,9 +315,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setLineTranslate:(MGLStyleValue<NSValue *> *)lineTranslate {
-    NSAssert(NO, @"Use -setLineTranslation: instead.");
+}
+
+- (MGLStyleValue<NSValue *> *)lineTranslate {
+    return self.lineTranslation;
 }
 
 - (void)setLineTranslationAnchor:(MGLStyleValue<NSValue *> *)lineTranslationAnchor {
@@ -332,9 +336,11 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLLineTranslationAnchor>().toEnumStyleValue(propertyValue);
 }
 
-
 - (void)setLineTranslateAnchor:(MGLStyleValue<NSValue *> *)lineTranslateAnchor {
-    NSAssert(NO, @"Use -setLineTranslationAnchor: instead.");
+}
+
+- (MGLStyleValue<NSValue *> *)lineTranslateAnchor {
+    return self.lineTranslationAnchor;
 }
 
 - (void)setLineWidth:(MGLStyleValue<NSNumber *> *)lineWidth {

@@ -39,7 +39,6 @@
 - (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
     XCTAssertNotNil(mapView.style);
     XCTAssertEqual(mapView.style, style);
-    XCTAssertNil(style.name);
     
     [_styleLoadingExpectation fulfill];
 }
@@ -135,6 +134,24 @@
     }];
 }
 
+- (void)testName {
+    XCTAssertNil(self.style.name);
+}
+
+- (void)testSources {
+    NSSet<MGLSource *> *initialSources = self.style.sources;
+    if ([initialSources.anyObject.identifier isEqualToString:@"com.mapbox.annotations"]) {
+        XCTAssertEqual(self.style.sources.count, 1);
+    } else {
+        XCTAssertEqual(self.style.sources.count, 0);
+    }
+    MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
+    [self.style addSource:shapeSource];
+    XCTAssertEqual(self.style.sources.count, initialSources.count + 1);
+    [self.style removeSource:shapeSource];
+    XCTAssertEqual(self.style.sources.count, initialSources.count);
+}
+
 - (void)testAddingSourcesTwice {
     MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
     [self.style addSource:shapeSource];
@@ -155,6 +172,22 @@
 
     [self.style addSource: source1];
     XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, @"MGLRedundantSourceIdentifierException");
+}
+
+- (void)testLayers {
+    NSArray<MGLStyleLayer *> *initialLayers = self.style.layers;
+    if ([initialLayers.firstObject.identifier isEqualToString:@"com.mapbox.annotations.points"]) {
+        XCTAssertEqual(self.style.layers.count, 1);
+    } else {
+        XCTAssertEqual(self.style.layers.count, 0);
+    }
+    MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
+    [self.style addSource:shapeSource];
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:shapeSource];
+    [self.style addLayer:fillLayer];
+    XCTAssertEqual(self.style.layers.count, initialLayers.count + 1);
+    [self.style removeLayer:fillLayer];
+    XCTAssertEqual(self.style.layers.count, initialLayers.count);
 }
 
 - (void)testAddingLayersTwice {
@@ -210,6 +243,10 @@
     NSString *styleHeader = [NSString stringWithContentsOfURL:styleHeaderURL usedEncoding:nil error:&styleHeaderError];
     XCTAssertNil(styleHeaderError, @"Error getting contents of MGLStyle.h.");
     return styleHeader;
+}
+
+- (void)testClasses {
+    XCTAssertEqual(self.style.styleClasses.count, 0);
 }
 
 - (void)testImages {

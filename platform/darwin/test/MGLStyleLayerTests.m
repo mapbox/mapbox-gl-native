@@ -4,37 +4,32 @@
 
 #define TEST_STRICT_NAMING_CONVENTIONS 0
 
-@implementation MGLStyleLayerTests {
-    XCTestExpectation *_styleLoadingExpectation;
-}
+@implementation MGLStyleLayerTests
 
 @dynamic layerType;
 
-- (void)setUp {
-    [super setUp];
-    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
-    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
-    self.mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 256, 256) styleURL:styleURL];
-    self.mapView.delegate = self;
-    if (!self.mapView.style) {
-        _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
-        [self waitForExpectationsWithTimeout:1 handler:nil];
-    }
-}
-
-- (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
-    XCTAssertNotNil(mapView.style);
-    XCTAssertEqual(mapView.style, style);
-    XCTAssertNil(style.name);
+- (void)testProperties {
+    MGLPointFeature *feature = [[MGLPointFeature alloc] init];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" shape:feature options:nil];
     
-    [_styleLoadingExpectation fulfill];
-}
-
-- (void)tearDown {
-    _styleLoadingExpectation = nil;
-    _mapView = nil;
+    MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     
-    [super tearDown];
+    XCTAssertEqualObjects(layer.identifier, @"layerID");
+    XCTAssertEqualObjects(layer.sourceIdentifier, source.identifier);
+    
+    XCTAssertTrue(layer.visible);
+    layer.visible = NO;
+    XCTAssertFalse(layer.visible);
+    layer.visible = YES;
+    XCTAssertTrue(layer.visible);
+    
+    XCTAssertEqual(layer.minimumZoomLevel, -INFINITY);
+    layer.minimumZoomLevel = 22;
+    XCTAssertEqual(layer.minimumZoomLevel, 22);
+    
+    XCTAssertEqual(layer.maximumZoomLevel, INFINITY);
+    layer.maximumZoomLevel = 0;
+    XCTAssertEqual(layer.maximumZoomLevel, 0);
 }
 
 - (void)testPropertyName:(NSString *)name isBoolean:(BOOL)isBoolean {
@@ -96,6 +91,28 @@
                                options:options
                            orthography:orthography
                            tokenRanges:NULL].firstObject;
+}
+
+@end
+
+@implementation NSValue (MGLStyleLayerTestAdditions)
+
++ (instancetype)valueWithMGLVector:(CGVector)vector {
+#if TARGET_OS_IPHONE
+    return [self valueWithCGVector:vector];
+#else
+    return [self value:&vector withObjCType:@encode(CGVector)];
+#endif
+}
+
+- (CGVector)MGLVectorValue {
+#if TARGET_OS_IPHONE
+    return self.CGVectorValue;
+#else
+    CGVector vector;
+    [self getValue:&vector];
+    return vector;
+#endif
 }
 
 @end
