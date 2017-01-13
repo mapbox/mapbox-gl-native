@@ -429,10 +429,8 @@ MGL_EXPORT
 
 #pragma mark Managing a Style’s Transition Options
 
-- (void)setTransitionDuration:(NSTimeInterval)duration;
-- (NSTimeInterval)transitionDuration;
-- (void)setTransitionDelay:(NSTimeInterval)delay;
-- (NSTimeInterval)transitionDelay;
+@property (nonatomic) NSTimeInterval transitionDuration;
+@property (nonatomic) NSTimeInterval transitionDelay;
 
 @end
 
