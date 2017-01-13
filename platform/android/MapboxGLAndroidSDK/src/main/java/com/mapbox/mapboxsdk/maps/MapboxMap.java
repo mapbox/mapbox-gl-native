@@ -48,8 +48,10 @@ import com.mapbox.services.commons.geojson.Feature;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  * The general class to interact with in the Android Mapbox SDK. It exposes the entry point for all
@@ -2143,7 +2145,10 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates, @Nullable String... layerIds) {
-        return mapView.getNativeMapView().queryRenderedFeatures(coordinates, layerIds);
+        if (mapView != null && mapView.getNativeMapView() != null) {
+            return mapView.getNativeMapView().queryRenderedFeatures(coordinates, layerIds);
+        }
+        return Collections.EMPTY_LIST;
     }
 
     public void forceUpdateMarkers() {
