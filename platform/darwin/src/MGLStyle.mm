@@ -572,7 +572,7 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)setTransitionDuration:(NSTimeInterval)duration
 {
-    mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
+    auto transitionOptions = self.mapView.mbglMap->getTransitionOptions();
     transitionOptions.duration = MGLDurationInSeconds(duration);
     self.mapView.mbglMap->setTransitionOptions(transitionOptions);
 }
@@ -585,7 +585,7 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)setTransitionDelay:(NSTimeInterval)delay
 {
-    mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
+    auto transitionOptions = self.mapView.mbglMap->getTransitionOptions();
     transitionOptions.delay = MGLDurationInSeconds(delay);
     self.mapView.mbglMap->setTransitionOptions(transitionOptions);
 }
