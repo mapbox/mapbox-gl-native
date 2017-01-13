@@ -1,0 +1,86 @@
+# Make changes below, then run this command to update the encoded PBF file:
+# protoc --encode glyphs test/fixtures/resources/fake_glyphs.proto < test/fixtures/resources/fake_glyphs-0-255.pbf.txt > test/fixtures/resources/fake_glyphs-0-255.pbf
+
+stacks {
+  # testing invalid metrics and bitmap too short
+  glyphs {
+    id: 65
+    bitmap: "fake"
+    width: -1
+    height: 65536
+    left: -10000000
+    top: 10000000
+    advance: -42
+  }
+
+  # testing missing bitmap => malformed
+  glyphs {
+    id: 66
+    width: 12
+    height: 17
+    left: 2
+    top: -11
+    advance: 15
+  }
+
+  # testing bitmap too long => malformed
+  glyphs {
+    id: 67
+    bitmap: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    width: 1
+    height: 1
+  }
+
+  # testing missing ID => malformed
+  glyphs {
+    width: 12
+    height: 17
+    left: 2
+    top: -11
+    advance: 15
+  }
+
+  # invalid metrics + bitmap => malformed
+  glyphs {
+    id: 65
+    bitmap: "fake"
+    width: -1
+    height: 65536
+    left: -10000000
+    top: 10000000
+    advance: -42
+  }
+
+  # invalid metrics => malformed
+  glyphs {
+    id: 68
+    bitmap: "x"
+    width: 1
+    height: 1
+    left: -10000000
+    top: 10000000
+    advance: -42
+  }
+
+  # a valid glyph
+  glyphs {
+    id: 69
+    bitmap: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    width: 1
+    height: 1
+    left: 20
+    top: 2
+    advance: 8
+  }
+
+  # a valid glyph that has an ID outside the range
+  glyphs {
+    id: 300
+    bitmap: ""
+    width: 0
+    height: 0
+    left: 0
+    top: 0
+    advance: 0
+  }
+}
