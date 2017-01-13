@@ -72,6 +72,7 @@ set(MBGL_TEST_FILES
     test/storage/resource.test.cpp
 
     # style/conversion
+    test/style/conversion/function.test.cpp
     test/style/conversion/geojson_options.test.cpp
     test/style/conversion/stringify.test.cpp
 
