@@ -26,9 +26,20 @@
     // Apply a bogus, easily detectable style rule to any feedback link, since
     // NSAttributedString doesn’t preserve the class attribute.
     NSMutableString *css = [NSMutableString stringWithString:
+                            @"html { font-family: -apple-system, -apple-system-font, sans-serif; }"
                             @".mapbox-improve-map { -webkit-text-stroke-width: 1000px; }"];
     if (fontSize) {
-        [css appendFormat:@"html { font-size: %.1fpx; }", fontSize];
+        NSString *sizeRule = [NSString stringWithFormat:@"font-size: %.1fpx;", fontSize];
+#if !TARGET_OS_IPHONE
+        if (fontSize == [NSFont systemFontSizeForControlSize:NSMiniControlSize]) {
+            sizeRule = @"font: -webkit-mini-control";
+        } else if (fontSize == [NSFont systemFontSizeForControlSize:NSSmallControlSize]) {
+            sizeRule = @"font: -webkit-small-control";
+        } else if (fontSize == [NSFont systemFontSizeForControlSize:NSRegularControlSize]) {
+            sizeRule = @"font: -webkit-control";
+        }
+#endif
+        [css appendFormat:@"html { %@ }", sizeRule];
     }
     if (linkColor) {
         CGFloat red;
