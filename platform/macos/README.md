@@ -10,15 +10,15 @@ Put interactive, scalable world maps into your native Cocoa application with the
 * A well-designed, fully documented API helps you stay productive.
 * Develop across [multiple platforms](../../README.md), including [iOS](../ios/README.md), using the same styles and similar APIs.
 
+![](docs/img/screenshot.jpg)
+
 The Mapbox macOS SDK is compatible with macOS 10.10.0 and above for Cocoa applications developed in Objective-C, Swift, Interface Builder, or AppleScript. For hybrid applications, consider [Mapbox GL JS](https://github.com/mapbox/mapbox-gl-js/).
 
 * [Integrate the Mapbox macOS SDK into your application](INSTALL.md)
 * [Contribute to the Mapbox macOS SDK](DEVELOPING.md)
-* [Mapbox macOS SDK reference documentation](https://mapbox.github.io/mapbox-gl-native/macos/api/)
+* [Mapbox macOS SDK reference documentation](https://mapbox.github.io/mapbox-gl-native/macos/)
 * [See example styles designed in Mapbox Studio](https://www.mapbox.com/gallery/)
 * [Hand-authoring a macOS SDK–compatible style](https://www.mapbox.com/mapbox-gl-style-spec/)
 * [Mapbox Vector Tile Specification](https://www.mapbox.com/developers/vector-tiles/)
-
-![](docs/img/screenshot.jpg)
 
 Mapbox does not officially support the Mapbox macOS SDK to the same extent as the Mapbox iOS SDK; however, bug reports and pull requests are certainly welcome.
