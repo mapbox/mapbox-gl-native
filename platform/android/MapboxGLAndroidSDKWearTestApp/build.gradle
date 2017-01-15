@@ -20,8 +20,8 @@ gradle.projectsEvaluated {
 }
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         applicationId "com.mapbox.mapboxsdk.testapp"
