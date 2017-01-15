@@ -22,7 +22,13 @@ RELEASE_VERSION=$( echo ${SHORT_VERSION} | sed -e 's/^macos-v//' -e 's/-.*//' )
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/README.md
-cp platform/macos/docs/doc-README.md "${README}"
+if [[ ${STANDALONE:-} ]]; then
+    cp platform/macos/docs/pod-README.md "${README}"
+    perl -pi -e 's|https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/macos/docs/||' \
+        "${README}"
+else
+    cp platform/macos/docs/doc-README.md "${README}"
+fi
 # http://stackoverflow.com/a/4858011/4585461
 echo "## Changes in [version ${RELEASE_VERSION}](https://github.com/mapbox/mapbox-gl-native/releases/tag/${BRANCH})" >> "${README}"
 sed -n -e '/^## /{' -e ':a' -e 'n' -e '/^## /q' -e 'p' -e 'ba' -e '}' platform/macos/CHANGELOG.md >> "${README}"
