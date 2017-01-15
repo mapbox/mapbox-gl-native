@@ -33,6 +33,8 @@ public:
     Scheduler& scheduler;
     FileSource& fileSource;
     AnnotationManager& annotationManager;
+
+    const uint8_t prefetchZoomDelta = 0;
 };
 
 } // namespace mbgl

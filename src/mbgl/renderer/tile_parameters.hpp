@@ -22,6 +22,7 @@ public:
     AnnotationManager& annotationManager;
     ImageManager& imageManager;
     GlyphManager& glyphManager;
+    const uint8_t prefetchZoomDelta = 0;
 };
 
 } // namespace mbgl

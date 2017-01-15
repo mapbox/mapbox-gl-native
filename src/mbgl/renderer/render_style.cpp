@@ -105,7 +105,8 @@ void RenderStyle::update(const UpdateParameters& parameters) {
         parameters.mode,
         parameters.annotationManager,
         *imageManager,
-        *glyphManager
+        *glyphManager,
+        parameters.prefetchZoomDelta
     };
 
     glyphManager->setURL(parameters.glyphURL);

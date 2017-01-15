@@ -13,6 +13,7 @@
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_style.hpp>
 #include <mbgl/renderer/render_style_observer.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/exception.hpp>
@@ -92,6 +93,9 @@ public:
     std::unique_ptr<RenderStyle> renderStyle;
 
     bool cameraMutated = false;
+
+    uint8_t prefetchZoomDelta = util::DEFAULT_PREFETCH_ZOOM_DELTA;
+
     bool loading = false;
 
     util::AsyncTask asyncInvalidate;
@@ -245,7 +249,8 @@ void Map::Impl::render(View& view) {
         style->impl->getLayerImpls(),
         scheduler,
         fileSource,
-        annotationManager
+        annotationManager,
+        prefetchZoomDelta
     });
 
     bool loaded = style->impl->isLoaded() && renderStyle->isLoaded();
@@ -821,6 +826,14 @@ MapDebugOptions Map::getDebug() const {
 
 bool Map::isFullyLoaded() const {
     return impl->style->impl->isLoaded() && impl->renderStyle && impl->renderStyle->isLoaded();
+}
+
+void Map::setPrefetchZoomDelta(uint8_t delta) {
+    impl->prefetchZoomDelta = delta;
+}
+
+uint8_t Map::getPrefetchZoomDelta() const {
+    return impl->prefetchZoomDelta;
 }
 
 void Map::onLowMemory() {
